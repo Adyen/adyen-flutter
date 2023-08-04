@@ -1,13 +1,13 @@
 import 'package:pigeon/pigeon.dart';
 
-//dart run pigeon --input pigeons/platform_interface.dart
+//dart run pigeon --input pigeons/platform_api.dart
 @ConfigurePigeon(PigeonOptions(
   dartOut: 'lib/platform_api.g.dart',
   dartOptions: DartOptions(),
   kotlinOut:
-      'android/src/main/kotlin/com/adyen/adyen_checkout/PlatformInterface.g.kt',
+      'android/src/main/kotlin/com/adyen/adyen_checkout/PlatformApi.kt',
   kotlinOptions: KotlinOptions(),
-  swiftOut: 'ios/Classes/PlatformInterface.g.swift',
+  swiftOut: 'ios/Classes/PlatformApi.swift',
   swiftOptions: SwiftOptions(),
   dartPackageName: 'adyen_checkout',
 ))
