@@ -119,7 +119,7 @@ struct Amount {
 }
 
 /// Generated class from Pigeon that represents data sent in messages.
-struct DropInConfiguration {
+struct DropInConfigurationModel {
   var shopperLocale: Locale? = nil
   var environment: Environment
   var clientKey: String
@@ -130,7 +130,7 @@ struct DropInConfiguration {
   var isRemovingStoredPaymentMethodsEnabled: Bool? = nil
   var additionalDataForDropInService: String? = nil
 
-  static func fromList(_ list: [Any?]) -> DropInConfiguration? {
+  static func fromList(_ list: [Any?]) -> DropInConfigurationModel? {
     var shopperLocale: Locale? = nil
     let shopperLocaleEnumVal: Int? = nilOrValue(list[0])
     if let shopperLocaleRawValue = shopperLocaleEnumVal {
@@ -145,7 +145,7 @@ struct DropInConfiguration {
     let isRemovingStoredPaymentMethodsEnabled: Bool? = nilOrValue(list[7])
     let additionalDataForDropInService: String? = nilOrValue(list[8])
 
-    return DropInConfiguration(
+    return DropInConfigurationModel(
       shopperLocale: shopperLocale,
       environment: environment,
       clientKey: clientKey,
@@ -172,35 +172,13 @@ struct DropInConfiguration {
   }
 }
 
-/// Generated class from Pigeon that represents data sent in messages.
-struct SessionDropInResult {
-  var sessionDropInResult: SessionDropInResultEnum
-  var data: String
-
-  static func fromList(_ list: [Any?]) -> SessionDropInResult? {
-    let sessionDropInResult = SessionDropInResultEnum(rawValue: list[0] as! Int)!
-    let data = list[1] as! String
-
-    return SessionDropInResult(
-      sessionDropInResult: sessionDropInResult,
-      data: data
-    )
-  }
-  func toList() -> [Any?] {
-    return [
-      sessionDropInResult.rawValue,
-      data,
-    ]
-  }
-}
-
-private class DropInSessionsApiCodecReader: FlutterStandardReader {
+private class CheckoutApiCodecReader: FlutterStandardReader {
   override func readValue(ofType type: UInt8) -> Any? {
     switch type {
       case 128:
         return Amount.fromList(self.readValue() as! [Any?])
       case 129:
-        return DropInConfiguration.fromList(self.readValue() as! [Any?])
+        return DropInConfigurationModel.fromList(self.readValue() as! [Any?])
       case 130:
         return SessionModel.fromList(self.readValue() as! [Any?])
       default:
@@ -209,12 +187,12 @@ private class DropInSessionsApiCodecReader: FlutterStandardReader {
   }
 }
 
-private class DropInSessionsApiCodecWriter: FlutterStandardWriter {
+private class CheckoutApiCodecWriter: FlutterStandardWriter {
   override func writeValue(_ value: Any) {
     if let value = value as? Amount {
       super.writeByte(128)
       super.writeValue(value.toList())
-    } else if let value = value as? DropInConfiguration {
+    } else if let value = value as? DropInConfigurationModel {
       super.writeByte(129)
       super.writeValue(value.toList())
     } else if let value = value as? SessionModel {
@@ -226,37 +204,53 @@ private class DropInSessionsApiCodecWriter: FlutterStandardWriter {
   }
 }
 
-private class DropInSessionsApiCodecReaderWriter: FlutterStandardReaderWriter {
+private class CheckoutApiCodecReaderWriter: FlutterStandardReaderWriter {
   override func reader(with data: Data) -> FlutterStandardReader {
-    return DropInSessionsApiCodecReader(data: data)
+    return CheckoutApiCodecReader(data: data)
   }
 
   override func writer(with data: NSMutableData) -> FlutterStandardWriter {
-    return DropInSessionsApiCodecWriter(data: data)
+    return CheckoutApiCodecWriter(data: data)
   }
 }
 
-class DropInSessionsApiCodec: FlutterStandardMessageCodec {
-  static let shared = DropInSessionsApiCodec(readerWriter: DropInSessionsApiCodecReaderWriter())
+class CheckoutApiCodec: FlutterStandardMessageCodec {
+  static let shared = CheckoutApiCodec(readerWriter: CheckoutApiCodecReaderWriter())
 }
 
 /// Generated protocol from Pigeon that represents a handler of messages from Flutter.
-protocol DropInSessionsApi {
-  func startPayment(sessionModel: SessionModel, dropInConfiguration: DropInConfiguration, completion: @escaping (Result<Void, Error>) -> Void)
+protocol CheckoutApi {
+  func getPlatformVersion(completion: @escaping (Result<String, Error>) -> Void)
+  func startPayment(sessionModel: SessionModel, dropInConfiguration: DropInConfigurationModel, completion: @escaping (Result<Void, Error>) -> Void)
 }
 
 /// Generated setup class from Pigeon to handle messages through the `binaryMessenger`.
-class DropInSessionsApiSetup {
-  /// The codec used by DropInSessionsApi.
-  static var codec: FlutterStandardMessageCodec { DropInSessionsApiCodec.shared }
-  /// Sets up an instance of `DropInSessionsApi` to handle messages through the `binaryMessenger`.
-  static func setUp(binaryMessenger: FlutterBinaryMessenger, api: DropInSessionsApi?) {
-    let startPaymentChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.DropInSessionsApi.startPayment", binaryMessenger: binaryMessenger, codec: codec)
+class CheckoutApiSetup {
+  /// The codec used by CheckoutApi.
+  static var codec: FlutterStandardMessageCodec { CheckoutApiCodec.shared }
+  /// Sets up an instance of `CheckoutApi` to handle messages through the `binaryMessenger`.
+  static func setUp(binaryMessenger: FlutterBinaryMessenger, api: CheckoutApi?) {
+    let getPlatformVersionChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.CheckoutApi.getPlatformVersion", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      getPlatformVersionChannel.setMessageHandler { _, reply in
+        api.getPlatformVersion() { result in
+          switch result {
+            case .success(let res):
+              reply(wrapResult(res))
+            case .failure(let error):
+              reply(wrapError(error))
+          }
+        }
+      }
+    } else {
+      getPlatformVersionChannel.setMessageHandler(nil)
+    }
+    let startPaymentChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.CheckoutApi.startPayment", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {
       startPaymentChannel.setMessageHandler { message, reply in
         let args = message as! [Any?]
         let sessionModelArg = args[0] as! SessionModel
-        let dropInConfigurationArg = args[1] as! DropInConfiguration
+        let dropInConfigurationArg = args[1] as! DropInConfigurationModel
         api.startPayment(sessionModel: sessionModelArg, dropInConfiguration: dropInConfigurationArg) { result in
           switch result {
             case .success:
@@ -268,58 +262,6 @@ class DropInSessionsApiSetup {
       }
     } else {
       startPaymentChannel.setMessageHandler(nil)
-    }
-  }
-}
-private class FlutterCommunicationApiCodecReader: FlutterStandardReader {
-  override func readValue(ofType type: UInt8) -> Any? {
-    switch type {
-      case 128:
-        return SessionDropInResult.fromList(self.readValue() as! [Any?])
-      default:
-        return super.readValue(ofType: type)
-    }
-  }
-}
-
-private class FlutterCommunicationApiCodecWriter: FlutterStandardWriter {
-  override func writeValue(_ value: Any) {
-    if let value = value as? SessionDropInResult {
-      super.writeByte(128)
-      super.writeValue(value.toList())
-    } else {
-      super.writeValue(value)
-    }
-  }
-}
-
-private class FlutterCommunicationApiCodecReaderWriter: FlutterStandardReaderWriter {
-  override func reader(with data: Data) -> FlutterStandardReader {
-    return FlutterCommunicationApiCodecReader(data: data)
-  }
-
-  override func writer(with data: NSMutableData) -> FlutterStandardWriter {
-    return FlutterCommunicationApiCodecWriter(data: data)
-  }
-}
-
-class FlutterCommunicationApiCodec: FlutterStandardMessageCodec {
-  static let shared = FlutterCommunicationApiCodec(readerWriter: FlutterCommunicationApiCodecReaderWriter())
-}
-
-/// Generated class from Pigeon that represents Flutter messages that can be called from Swift.
-class FlutterCommunicationApi {
-  private let binaryMessenger: FlutterBinaryMessenger
-  init(binaryMessenger: FlutterBinaryMessenger){
-    self.binaryMessenger = binaryMessenger
-  }
-  var codec: FlutterStandardMessageCodec {
-    return FlutterCommunicationApiCodec.shared
-  }
-  func onDropInResult(sessionDropInResult sessionDropInResultArg: SessionDropInResult, completion: @escaping () -> Void) {
-    let channel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.FlutterCommunicationApi.onDropInResult", binaryMessenger: binaryMessenger, codec: codec)
-    channel.sendMessage([sessionDropInResultArg] as [Any?]) { _ in
-      completion()
     }
   }
 }

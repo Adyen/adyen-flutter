@@ -1,8 +1,11 @@
 
-import 'adyen_checkout_platform_interface.dart';
+import 'package:adyen_checkout/platform_api.g.dart';
 
 class AdyenCheckout {
-  Future<String?> getPlatformVersion() {
-    return AdyenCheckoutPlatform.instance.getPlatformVersion();
+  final CheckoutApi adyenCheckout = CheckoutApi();
+
+  Future<String?> getPlatformVersionPigeon() {
+    return adyenCheckout.getPlatformVersion();
   }
+
 }

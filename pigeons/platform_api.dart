@@ -4,8 +4,7 @@ import 'package:pigeon/pigeon.dart';
 @ConfigurePigeon(PigeonOptions(
   dartOut: 'lib/platform_api.g.dart',
   dartOptions: DartOptions(),
-  kotlinOut:
-      'android/src/main/kotlin/com/adyen/adyen_checkout/PlatformApi.kt',
+  kotlinOut: 'android/src/main/kotlin/com/adyen/adyen_checkout/PlatformApi.kt',
   kotlinOptions: KotlinOptions(),
   swiftOut: 'ios/Classes/PlatformApi.swift',
   swiftOptions: SwiftOptions(),
@@ -65,7 +64,7 @@ enum Locale {
   us
 }
 
-class DropInConfiguration {
+class DropInConfigurationModel {
   Locale? shopperLocale;
   final Environment environment;
   final String clientKey;
@@ -76,7 +75,7 @@ class DropInConfiguration {
   bool? isRemovingStoredPaymentMethodsEnabled;
   String? additionalDataForDropInService;
 
-  DropInConfiguration({
+  DropInConfigurationModel({
     required this.environment,
     required this.clientKey,
     required this.amount,
@@ -111,15 +110,13 @@ enum SessionDropInResultEnum {
 }
 
 @HostApi()
-abstract class DropInSessionsApi {
+abstract class CheckoutApi {
+  @async
+  String getPlatformVersion();
+
   @async
   void startPayment(
     SessionModel sessionModel,
-    DropInConfiguration dropInConfiguration,
+    DropInConfigurationModel dropInConfiguration,
   );
-}
-
-@FlutterApi()
-abstract class FlutterCommunicationApi {
-  void onDropInResult(SessionDropInResult sessionDropInResult);
 }

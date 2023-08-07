@@ -145,7 +145,7 @@ data class Amount (
 }
 
 /** Generated class from Pigeon that represents data sent in messages. */
-data class DropInConfiguration (
+data class DropInConfigurationModel (
   val shopperLocale: Locale? = null,
   val environment: Environment,
   val clientKey: String,
@@ -159,7 +159,7 @@ data class DropInConfiguration (
 ) {
   companion object {
     @Suppress("UNCHECKED_CAST")
-    fun fromList(list: List<Any?>): DropInConfiguration {
+    fun fromList(list: List<Any?>): DropInConfigurationModel {
       val shopperLocale: Locale? = (list[0] as Int?)?.let {
         Locale.ofRaw(it)
       }
@@ -171,7 +171,7 @@ data class DropInConfiguration (
       val skipListWhenSinglePaymentMethod = list[6] as Boolean?
       val isRemovingStoredPaymentMethodsEnabled = list[7] as Boolean?
       val additionalDataForDropInService = list[8] as String?
-      return DropInConfiguration(shopperLocale, environment, clientKey, amount, isAnalyticsEnabled, showPreselectedStoredPaymentMethod, skipListWhenSinglePaymentMethod, isRemovingStoredPaymentMethodsEnabled, additionalDataForDropInService)
+      return DropInConfigurationModel(shopperLocale, environment, clientKey, amount, isAnalyticsEnabled, showPreselectedStoredPaymentMethod, skipListWhenSinglePaymentMethod, isRemovingStoredPaymentMethodsEnabled, additionalDataForDropInService)
     }
   }
   fun toList(): List<Any?> {
@@ -189,30 +189,8 @@ data class DropInConfiguration (
   }
 }
 
-/** Generated class from Pigeon that represents data sent in messages. */
-data class SessionDropInResult (
-  val sessionDropInResult: SessionDropInResultEnum,
-  val data: String
-
-) {
-  companion object {
-    @Suppress("UNCHECKED_CAST")
-    fun fromList(list: List<Any?>): SessionDropInResult {
-      val sessionDropInResult = SessionDropInResultEnum.ofRaw(list[0] as Int)!!
-      val data = list[1] as String
-      return SessionDropInResult(sessionDropInResult, data)
-    }
-  }
-  fun toList(): List<Any?> {
-    return listOf<Any?>(
-      sessionDropInResult.raw,
-      data,
-    )
-  }
-}
-
 @Suppress("UNCHECKED_CAST")
-private object DropInSessionsApiCodec : StandardMessageCodec() {
+private object CheckoutApiCodec : StandardMessageCodec() {
   override fun readValueOfType(type: Byte, buffer: ByteBuffer): Any? {
     return when (type) {
       128.toByte() -> {
@@ -222,7 +200,7 @@ private object DropInSessionsApiCodec : StandardMessageCodec() {
       }
       129.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          DropInConfiguration.fromList(it)
+          DropInConfigurationModel.fromList(it)
         }
       }
       130.toByte() -> {
@@ -239,7 +217,7 @@ private object DropInSessionsApiCodec : StandardMessageCodec() {
         stream.write(128)
         writeValue(stream, value.toList())
       }
-      is DropInConfiguration -> {
+      is DropInConfigurationModel -> {
         stream.write(129)
         writeValue(stream, value.toList())
       }
@@ -253,24 +231,43 @@ private object DropInSessionsApiCodec : StandardMessageCodec() {
 }
 
 /** Generated interface from Pigeon that represents a handler of messages from Flutter. */
-interface DropInSessionsApi {
-  fun startPayment(sessionModel: SessionModel, dropInConfiguration: DropInConfiguration, callback: (Result<Unit>) -> Unit)
+interface CheckoutApi {
+  fun getPlatformVersion(callback: (Result<String>) -> Unit)
+  fun startPayment(sessionModel: SessionModel, dropInConfiguration: DropInConfigurationModel, callback: (Result<Unit>) -> Unit)
 
   companion object {
-    /** The codec used by DropInSessionsApi. */
+    /** The codec used by CheckoutApi. */
     val codec: MessageCodec<Any?> by lazy {
-      DropInSessionsApiCodec
+      CheckoutApiCodec
     }
-    /** Sets up an instance of `DropInSessionsApi` to handle messages through the `binaryMessenger`. */
+    /** Sets up an instance of `CheckoutApi` to handle messages through the `binaryMessenger`. */
     @Suppress("UNCHECKED_CAST")
-    fun setUp(binaryMessenger: BinaryMessenger, api: DropInSessionsApi?) {
+    fun setUp(binaryMessenger: BinaryMessenger, api: CheckoutApi?) {
       run {
-        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.adyen_checkout.DropInSessionsApi.startPayment", codec)
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.adyen_checkout.CheckoutApi.getPlatformVersion", codec)
+        if (api != null) {
+          channel.setMessageHandler { _, reply ->
+            api.getPlatformVersion() { result: Result<String> ->
+              val error = result.exceptionOrNull()
+              if (error != null) {
+                reply.reply(wrapError(error))
+              } else {
+                val data = result.getOrNull()
+                reply.reply(wrapResult(data))
+              }
+            }
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.adyen_checkout.CheckoutApi.startPayment", codec)
         if (api != null) {
           channel.setMessageHandler { message, reply ->
             val args = message as List<Any?>
             val sessionModelArg = args[0] as SessionModel
-            val dropInConfigurationArg = args[1] as DropInConfiguration
+            val dropInConfigurationArg = args[1] as DropInConfigurationModel
             api.startPayment(sessionModelArg, dropInConfigurationArg) { result: Result<Unit> ->
               val error = result.exceptionOrNull()
               if (error != null) {
@@ -284,45 +281,6 @@ interface DropInSessionsApi {
           channel.setMessageHandler(null)
         }
       }
-    }
-  }
-}
-@Suppress("UNCHECKED_CAST")
-private object FlutterCommunicationApiCodec : StandardMessageCodec() {
-  override fun readValueOfType(type: Byte, buffer: ByteBuffer): Any? {
-    return when (type) {
-      128.toByte() -> {
-        return (readValue(buffer) as? List<Any?>)?.let {
-          SessionDropInResult.fromList(it)
-        }
-      }
-      else -> super.readValueOfType(type, buffer)
-    }
-  }
-  override fun writeValue(stream: ByteArrayOutputStream, value: Any?)   {
-    when (value) {
-      is SessionDropInResult -> {
-        stream.write(128)
-        writeValue(stream, value.toList())
-      }
-      else -> super.writeValue(stream, value)
-    }
-  }
-}
-
-/** Generated class from Pigeon that represents Flutter messages that can be called from Kotlin. */
-@Suppress("UNCHECKED_CAST")
-class FlutterCommunicationApi(private val binaryMessenger: BinaryMessenger) {
-  companion object {
-    /** The codec used by FlutterCommunicationApi. */
-    val codec: MessageCodec<Any?> by lazy {
-      FlutterCommunicationApiCodec
-    }
-  }
-  fun onDropInResult(sessionDropInResultArg: SessionDropInResult, callback: () -> Unit) {
-    val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.adyen_checkout.FlutterCommunicationApi.onDropInResult", codec)
-    channel.send(listOf(sessionDropInResultArg)) {
-      callback()
     }
   }
 }
