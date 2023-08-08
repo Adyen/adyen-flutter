@@ -4,49 +4,28 @@ import CheckoutPlatformApi
 import DropInConfigurationModel
 import SessionModel
 import androidx.annotation.NonNull
-
 import io.flutter.embedding.engine.plugins.FlutterPlugin
-import io.flutter.plugin.common.MethodCall
-import io.flutter.plugin.common.MethodChannel
-import io.flutter.plugin.common.MethodChannel.MethodCallHandler
-import io.flutter.plugin.common.MethodChannel.Result
 
 /** AdyenCheckoutPlugin */
-class AdyenCheckoutPlugin: FlutterPlugin, MethodCallHandler, CheckoutPlatformApi {
-  /// The MethodChannel that will the communication between Flutter and native Android
-  ///
-  /// This local reference serves to register the plugin with the Flutter Engine and unregister it
-  /// when the Flutter Engine is detached from the Activity
-  private lateinit var channel : MethodChannel
+class AdyenCheckoutPlugin : FlutterPlugin, CheckoutPlatformApi {
 
-  override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
-    CheckoutPlatformApi.setUp(flutterPluginBinding.binaryMessenger, this)
-
-    channel = MethodChannel(flutterPluginBinding.binaryMessenger, "adyen_checkout")
-    channel.setMethodCallHandler(this)
-  }
-
-  override fun onMethodCall(@NonNull call: MethodCall, @NonNull result: Result) {
-    if (call.method == "getPlatformVersion") {
-      result.success("Android ${android.os.Build.VERSION.RELEASE}")
-    } else {
-      result.notImplemented()
+    override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
+        CheckoutPlatformApi.setUp(flutterPluginBinding.binaryMessenger, this)
     }
-  }
 
-  override fun onDetachedFromEngine(@NonNull binding: FlutterPlugin.FlutterPluginBinding) {
-    channel.setMethodCallHandler(null)
-  }
+    override fun onDetachedFromEngine(@NonNull binding: FlutterPlugin.FlutterPluginBinding) {
+        CheckoutPlatformApi.setUp(binding.binaryMessenger, null)
+    }
 
-  override fun getPlatformVersion(callback: (kotlin.Result<String>) -> Unit) {
-    callback.invoke(kotlin.Result.success("Android ${android.os.Build.VERSION.RELEASE}"))
-  }
+    override fun getPlatformVersion(callback: (Result<String>) -> Unit) {
+        callback.invoke(Result.success("Android ${android.os.Build.VERSION.RELEASE}"))
+    }
 
-  override fun startPayment(
-    sessionModel: SessionModel,
-    dropInConfiguration: DropInConfigurationModel,
-    callback: (kotlin.Result<Unit>) -> Unit
-  ) {
-    TODO("Not yet implemented")
-  }
+    override fun startPayment(
+        sessionModel: SessionModel,
+        dropInConfiguration: DropInConfigurationModel,
+        callback: (Result<Unit>) -> Unit
+    ) {
+        TODO("Not yet implemented")
+    }
 }
