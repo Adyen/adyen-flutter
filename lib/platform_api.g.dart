@@ -163,8 +163,8 @@ class DropInConfigurationModel {
   }
 }
 
-class _CheckoutApiCodec extends StandardMessageCodec {
-  const _CheckoutApiCodec();
+class _CheckoutPlatformApiCodec extends StandardMessageCodec {
+  const _CheckoutPlatformApiCodec();
   @override
   void writeValue(WriteBuffer buffer, Object? value) {
     if (value is Amount) {
@@ -196,19 +196,19 @@ class _CheckoutApiCodec extends StandardMessageCodec {
   }
 }
 
-class CheckoutApi {
-  /// Constructor for [CheckoutApi].  The [binaryMessenger] named argument is
+class CheckoutPlatformApi {
+  /// Constructor for [CheckoutPlatformApi].  The [binaryMessenger] named argument is
   /// available for dependency injection.  If it is left null, the default
   /// BinaryMessenger will be used which routes to the host platform.
-  CheckoutApi({BinaryMessenger? binaryMessenger})
+  CheckoutPlatformApi({BinaryMessenger? binaryMessenger})
       : _binaryMessenger = binaryMessenger;
   final BinaryMessenger? _binaryMessenger;
 
-  static const MessageCodec<Object?> codec = _CheckoutApiCodec();
+  static const MessageCodec<Object?> codec = _CheckoutPlatformApiCodec();
 
   Future<String> getPlatformVersion() async {
     final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
-        'dev.flutter.pigeon.adyen_checkout.CheckoutApi.getPlatformVersion', codec,
+        'dev.flutter.pigeon.adyen_checkout.CheckoutPlatformApi.getPlatformVersion', codec,
         binaryMessenger: _binaryMessenger);
     final List<Object?>? replyList =
         await channel.send(null) as List<Object?>?;
@@ -235,7 +235,7 @@ class CheckoutApi {
 
   Future<void> startPayment(SessionModel arg_sessionModel, DropInConfigurationModel arg_dropInConfiguration) async {
     final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
-        'dev.flutter.pigeon.adyen_checkout.CheckoutApi.startPayment', codec,
+        'dev.flutter.pigeon.adyen_checkout.CheckoutPlatformApi.startPayment', codec,
         binaryMessenger: _binaryMessenger);
     final List<Object?>? replyList =
         await channel.send(<Object?>[arg_sessionModel, arg_dropInConfiguration]) as List<Object?>?;

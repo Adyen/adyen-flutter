@@ -190,7 +190,7 @@ data class DropInConfigurationModel (
 }
 
 @Suppress("UNCHECKED_CAST")
-private object CheckoutApiCodec : StandardMessageCodec() {
+private object CheckoutPlatformApiCodec : StandardMessageCodec() {
   override fun readValueOfType(type: Byte, buffer: ByteBuffer): Any? {
     return when (type) {
       128.toByte() -> {
@@ -231,20 +231,20 @@ private object CheckoutApiCodec : StandardMessageCodec() {
 }
 
 /** Generated interface from Pigeon that represents a handler of messages from Flutter. */
-interface CheckoutApi {
+interface CheckoutPlatformApi {
   fun getPlatformVersion(callback: (Result<String>) -> Unit)
   fun startPayment(sessionModel: SessionModel, dropInConfiguration: DropInConfigurationModel, callback: (Result<Unit>) -> Unit)
 
   companion object {
-    /** The codec used by CheckoutApi. */
+    /** The codec used by CheckoutPlatformApi. */
     val codec: MessageCodec<Any?> by lazy {
-      CheckoutApiCodec
+      CheckoutPlatformApiCodec
     }
-    /** Sets up an instance of `CheckoutApi` to handle messages through the `binaryMessenger`. */
+    /** Sets up an instance of `CheckoutPlatformApi` to handle messages through the `binaryMessenger`. */
     @Suppress("UNCHECKED_CAST")
-    fun setUp(binaryMessenger: BinaryMessenger, api: CheckoutApi?) {
+    fun setUp(binaryMessenger: BinaryMessenger, api: CheckoutPlatformApi?) {
       run {
-        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.adyen_checkout.CheckoutApi.getPlatformVersion", codec)
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformApi.getPlatformVersion", codec)
         if (api != null) {
           channel.setMessageHandler { _, reply ->
             api.getPlatformVersion() { result: Result<String> ->
@@ -262,7 +262,7 @@ interface CheckoutApi {
         }
       }
       run {
-        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.adyen_checkout.CheckoutApi.startPayment", codec)
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformApi.startPayment", codec)
         if (api != null) {
           channel.setMessageHandler { message, reply ->
             val args = message as List<Any?>

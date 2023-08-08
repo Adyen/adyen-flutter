@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:adyen_checkout/adyen_checkout.dart';
+import 'package:adyen_checkout/platform_api.g.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -17,7 +18,7 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   String _platformVersion = 'Unknown';
-  final _adyenCheckoutPlugin = AdyenCheckout();
+  final _adyenCheckout = AdyenCheckout();
 
   @override
   void initState() {
@@ -32,7 +33,7 @@ class _MyAppState extends State<MyApp> {
     // We also handle the message potentially returning null.
     try {
       platformVersion =
-          await _adyenCheckoutPlugin.getPlatformVersion() ?? 'Unknown platform version';
+          await _adyenCheckout.getPlatformVersion() ?? 'Unknown platform version';
     } on PlatformException {
       platformVersion = 'Failed to get platform version.';
     }
@@ -55,7 +56,28 @@ class _MyAppState extends State<MyApp> {
           title: const Text('Plugin example app'),
         ),
         body: Center(
-          child: Text('Running on: $_platformVersion\n'),
+          child:  Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text('Running on: $_platformVersion\n'),
+              TextButton(onPressed: ()  {
+                SessionModel sessionModel =
+                SessionModel(id: "1111", sessionData: "Session data example value");
+                DropInConfigurationModel dropInConfiguration = DropInConfigurationModel(
+                    environment: Environment.test,
+                    clientKey: "",
+                    amount: Amount(
+                      currency: "EUR",
+                      value: 1000,
+                    ));
+
+
+
+                _adyenCheckout.startPayment(sessionModel, dropInConfiguration);
+
+              }, child: Text("Test"))
+            ],
+          ),
         ),
       ),
     );

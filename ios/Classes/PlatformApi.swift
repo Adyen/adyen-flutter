@@ -172,7 +172,7 @@ struct DropInConfigurationModel {
   }
 }
 
-private class CheckoutApiCodecReader: FlutterStandardReader {
+private class CheckoutPlatformApiCodecReader: FlutterStandardReader {
   override func readValue(ofType type: UInt8) -> Any? {
     switch type {
       case 128:
@@ -187,7 +187,7 @@ private class CheckoutApiCodecReader: FlutterStandardReader {
   }
 }
 
-private class CheckoutApiCodecWriter: FlutterStandardWriter {
+private class CheckoutPlatformApiCodecWriter: FlutterStandardWriter {
   override func writeValue(_ value: Any) {
     if let value = value as? Amount {
       super.writeByte(128)
@@ -204,33 +204,33 @@ private class CheckoutApiCodecWriter: FlutterStandardWriter {
   }
 }
 
-private class CheckoutApiCodecReaderWriter: FlutterStandardReaderWriter {
+private class CheckoutPlatformApiCodecReaderWriter: FlutterStandardReaderWriter {
   override func reader(with data: Data) -> FlutterStandardReader {
-    return CheckoutApiCodecReader(data: data)
+    return CheckoutPlatformApiCodecReader(data: data)
   }
 
   override func writer(with data: NSMutableData) -> FlutterStandardWriter {
-    return CheckoutApiCodecWriter(data: data)
+    return CheckoutPlatformApiCodecWriter(data: data)
   }
 }
 
-class CheckoutApiCodec: FlutterStandardMessageCodec {
-  static let shared = CheckoutApiCodec(readerWriter: CheckoutApiCodecReaderWriter())
+class CheckoutPlatformApiCodec: FlutterStandardMessageCodec {
+  static let shared = CheckoutPlatformApiCodec(readerWriter: CheckoutPlatformApiCodecReaderWriter())
 }
 
 /// Generated protocol from Pigeon that represents a handler of messages from Flutter.
-protocol CheckoutApi {
+protocol CheckoutPlatformApi {
   func getPlatformVersion(completion: @escaping (Result<String, Error>) -> Void)
   func startPayment(sessionModel: SessionModel, dropInConfiguration: DropInConfigurationModel, completion: @escaping (Result<Void, Error>) -> Void)
 }
 
 /// Generated setup class from Pigeon to handle messages through the `binaryMessenger`.
-class CheckoutApiSetup {
-  /// The codec used by CheckoutApi.
-  static var codec: FlutterStandardMessageCodec { CheckoutApiCodec.shared }
-  /// Sets up an instance of `CheckoutApi` to handle messages through the `binaryMessenger`.
-  static func setUp(binaryMessenger: FlutterBinaryMessenger, api: CheckoutApi?) {
-    let getPlatformVersionChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.CheckoutApi.getPlatformVersion", binaryMessenger: binaryMessenger, codec: codec)
+class CheckoutPlatformApiSetup {
+  /// The codec used by CheckoutPlatformApi.
+  static var codec: FlutterStandardMessageCodec { CheckoutPlatformApiCodec.shared }
+  /// Sets up an instance of `CheckoutPlatformApi` to handle messages through the `binaryMessenger`.
+  static func setUp(binaryMessenger: FlutterBinaryMessenger, api: CheckoutPlatformApi?) {
+    let getPlatformVersionChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformApi.getPlatformVersion", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {
       getPlatformVersionChannel.setMessageHandler { _, reply in
         api.getPlatformVersion() { result in
@@ -245,7 +245,7 @@ class CheckoutApiSetup {
     } else {
       getPlatformVersionChannel.setMessageHandler(nil)
     }
-    let startPaymentChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.CheckoutApi.startPayment", binaryMessenger: binaryMessenger, codec: codec)
+    let startPaymentChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformApi.startPayment", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {
       startPaymentChannel.setMessageHandler { message, reply in
         let args = message as! [Any?]

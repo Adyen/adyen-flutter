@@ -110,7 +110,7 @@ enum SessionDropInResultEnum {
 }
 
 @HostApi()
-abstract class CheckoutApi {
+abstract class CheckoutPlatformApi {
   @async
   String getPlatformVersion();
 

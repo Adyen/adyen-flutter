@@ -1,6 +1,6 @@
 package com.adyen.adyen_checkout
 
-import CheckoutApi
+import CheckoutPlatformApi
 import DropInConfigurationModel
 import SessionModel
 import androidx.annotation.NonNull
@@ -12,7 +12,7 @@ import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import io.flutter.plugin.common.MethodChannel.Result
 
 /** AdyenCheckoutPlugin */
-class AdyenCheckoutPlugin: FlutterPlugin, MethodCallHandler, CheckoutApi {
+class AdyenCheckoutPlugin: FlutterPlugin, MethodCallHandler, CheckoutPlatformApi {
   /// The MethodChannel that will the communication between Flutter and native Android
   ///
   /// This local reference serves to register the plugin with the Flutter Engine and unregister it
@@ -20,7 +20,7 @@ class AdyenCheckoutPlugin: FlutterPlugin, MethodCallHandler, CheckoutApi {
   private lateinit var channel : MethodChannel
 
   override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
-    CheckoutApi.setUp(flutterPluginBinding.binaryMessenger, this)
+    CheckoutPlatformApi.setUp(flutterPluginBinding.binaryMessenger, this)
 
     channel = MethodChannel(flutterPluginBinding.binaryMessenger, "adyen_checkout")
     channel.setMethodCallHandler(this)

@@ -1,18 +1,19 @@
 import 'package:adyen_checkout/platform_api.g.dart';
 import 'package:adyen_checkout/src/adyen_checkout_interface.dart';
 
-class AdyenCheckout {
+class AdyenCheckoutApi implements AdyenCheckoutInterface {
+  final CheckoutPlatformApi checkoutApi = CheckoutPlatformApi();
+
+  @override
   Future<String> getPlatformVersion() {
-    return AdyenCheckoutInterface.instance.getPlatformVersion();
+    return checkoutApi.getPlatformVersion();
   }
 
+  @override
   Future<void> startPayment(
     SessionModel sessionModel,
     DropInConfigurationModel dropInConfiguration,
   ) {
-    return AdyenCheckoutInterface.instance.startPayment(
-      sessionModel,
-      dropInConfiguration,
-    );
+    return checkoutApi.startPayment(sessionModel, dropInConfiguration);
   }
 }
