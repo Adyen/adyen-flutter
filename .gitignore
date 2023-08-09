@@ -15,7 +15,7 @@ doc/api/
 .env*
 
 # Secrets
-*.secrets.json
+secrets.json
 
 # Avoid committing generated Javascript files:
 *.dart.js
