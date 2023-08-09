@@ -172,7 +172,7 @@ struct DropInConfigurationModel {
   }
 }
 
-private class CheckoutPlatformApiCodecReader: FlutterStandardReader {
+private class CheckoutPlatformApiInterfaceCodecReader: FlutterStandardReader {
   override func readValue(ofType type: UInt8) -> Any? {
     switch type {
       case 128:
@@ -187,7 +187,7 @@ private class CheckoutPlatformApiCodecReader: FlutterStandardReader {
   }
 }
 
-private class CheckoutPlatformApiCodecWriter: FlutterStandardWriter {
+private class CheckoutPlatformApiInterfaceCodecWriter: FlutterStandardWriter {
   override func writeValue(_ value: Any) {
     if let value = value as? Amount {
       super.writeByte(128)
@@ -204,33 +204,33 @@ private class CheckoutPlatformApiCodecWriter: FlutterStandardWriter {
   }
 }
 
-private class CheckoutPlatformApiCodecReaderWriter: FlutterStandardReaderWriter {
+private class CheckoutPlatformApiInterfaceCodecReaderWriter: FlutterStandardReaderWriter {
   override func reader(with data: Data) -> FlutterStandardReader {
-    return CheckoutPlatformApiCodecReader(data: data)
+    return CheckoutPlatformApiInterfaceCodecReader(data: data)
   }
 
   override func writer(with data: NSMutableData) -> FlutterStandardWriter {
-    return CheckoutPlatformApiCodecWriter(data: data)
+    return CheckoutPlatformApiInterfaceCodecWriter(data: data)
   }
 }
 
-class CheckoutPlatformApiCodec: FlutterStandardMessageCodec {
-  static let shared = CheckoutPlatformApiCodec(readerWriter: CheckoutPlatformApiCodecReaderWriter())
+class CheckoutPlatformApiInterfaceCodec: FlutterStandardMessageCodec {
+  static let shared = CheckoutPlatformApiInterfaceCodec(readerWriter: CheckoutPlatformApiInterfaceCodecReaderWriter())
 }
 
 /// Generated protocol from Pigeon that represents a handler of messages from Flutter.
-protocol CheckoutPlatformApi {
+protocol CheckoutPlatformApiInterface {
   func getPlatformVersion(completion: @escaping (Result<String, Error>) -> Void)
   func startPayment(sessionModel: SessionModel, dropInConfiguration: DropInConfigurationModel, completion: @escaping (Result<Void, Error>) -> Void)
 }
 
 /// Generated setup class from Pigeon to handle messages through the `binaryMessenger`.
-class CheckoutPlatformApiSetup {
-  /// The codec used by CheckoutPlatformApi.
-  static var codec: FlutterStandardMessageCodec { CheckoutPlatformApiCodec.shared }
-  /// Sets up an instance of `CheckoutPlatformApi` to handle messages through the `binaryMessenger`.
-  static func setUp(binaryMessenger: FlutterBinaryMessenger, api: CheckoutPlatformApi?) {
-    let getPlatformVersionChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformApi.getPlatformVersion", binaryMessenger: binaryMessenger, codec: codec)
+class CheckoutPlatformApiInterfaceSetup {
+  /// The codec used by CheckoutPlatformApiInterface.
+  static var codec: FlutterStandardMessageCodec { CheckoutPlatformApiInterfaceCodec.shared }
+  /// Sets up an instance of `CheckoutPlatformApiInterface` to handle messages through the `binaryMessenger`.
+  static func setUp(binaryMessenger: FlutterBinaryMessenger, api: CheckoutPlatformApiInterface?) {
+    let getPlatformVersionChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformApiInterface.getPlatformVersion", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {
       getPlatformVersionChannel.setMessageHandler { _, reply in
         api.getPlatformVersion() { result in
@@ -245,7 +245,7 @@ class CheckoutPlatformApiSetup {
     } else {
       getPlatformVersionChannel.setMessageHandler(nil)
     }
-    let startPaymentChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformApi.startPayment", binaryMessenger: binaryMessenger, codec: codec)
+    let startPaymentChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformApiInterface.startPayment", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {
       startPaymentChannel.setMessageHandler { message, reply in
         let args = message as! [Any?]

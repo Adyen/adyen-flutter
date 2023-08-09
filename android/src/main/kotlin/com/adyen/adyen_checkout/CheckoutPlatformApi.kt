@@ -1,6 +1,6 @@
 package com.adyen.adyen_checkout
 
-import CheckoutPlatformApi
+import CheckoutPlatformApiInterface
 import DropInConfigurationModel
 import SessionModel
 import androidx.activity.result.ActivityResultLauncher
@@ -17,7 +17,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class CheckoutPlatformApiImpl : CheckoutPlatformApi {
+class CheckoutPlatformApi : CheckoutPlatformApiInterface {
     lateinit var activity: FragmentActivity
     lateinit var dropInSessionLauncher: ActivityResultLauncher<SessionDropInResultContractParams>
 

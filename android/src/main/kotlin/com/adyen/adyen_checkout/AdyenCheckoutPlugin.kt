@@ -1,6 +1,5 @@
 package com.adyen.adyen_checkout
 
-import CheckoutPlatformApi
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
@@ -13,15 +12,15 @@ import io.flutter.embedding.engine.plugins.lifecycle.HiddenLifecycleReference
 
 /** AdyenCheckoutPlugin */
 class AdyenCheckoutPlugin : FlutterPlugin, ActivityAware {
-    private val checkoutPlatformApi = CheckoutPlatformApiImpl()
+    private val checkoutPlatformApi = CheckoutPlatformApi()
     private var lifecycleReference: HiddenLifecycleReference? = null
     private var lifecycleObserver: LifecycleEventObserver? = null
 
     override fun onAttachedToEngine(flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) =
-        CheckoutPlatformApi.setUp(flutterPluginBinding.binaryMessenger, checkoutPlatformApi)
+        CheckoutPlatformApiInterface.setUp(flutterPluginBinding.binaryMessenger, checkoutPlatformApi)
 
     override fun onDetachedFromEngine(binding: FlutterPlugin.FlutterPluginBinding) =
-        CheckoutPlatformApi.setUp(binding.binaryMessenger, null)
+        CheckoutPlatformApiInterface.setUp(binding.binaryMessenger, null)
 
     override fun onAttachedToActivity(binding: ActivityPluginBinding) = setupActivity(binding)
 

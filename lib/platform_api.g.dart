@@ -163,8 +163,8 @@ class DropInConfigurationModel {
   }
 }
 
-class _CheckoutPlatformApiCodec extends StandardMessageCodec {
-  const _CheckoutPlatformApiCodec();
+class _CheckoutPlatformApiInterfaceCodec extends StandardMessageCodec {
+  const _CheckoutPlatformApiInterfaceCodec();
   @override
   void writeValue(WriteBuffer buffer, Object? value) {
     if (value is Amount) {
@@ -196,19 +196,19 @@ class _CheckoutPlatformApiCodec extends StandardMessageCodec {
   }
 }
 
-class CheckoutPlatformApi {
-  /// Constructor for [CheckoutPlatformApi].  The [binaryMessenger] named argument is
+class CheckoutPlatformApiInterface {
+  /// Constructor for [CheckoutPlatformApiInterface].  The [binaryMessenger] named argument is
   /// available for dependency injection.  If it is left null, the default
   /// BinaryMessenger will be used which routes to the host platform.
-  CheckoutPlatformApi({BinaryMessenger? binaryMessenger})
+  CheckoutPlatformApiInterface({BinaryMessenger? binaryMessenger})
       : _binaryMessenger = binaryMessenger;
   final BinaryMessenger? _binaryMessenger;
 
-  static const MessageCodec<Object?> codec = _CheckoutPlatformApiCodec();
+  static const MessageCodec<Object?> codec = _CheckoutPlatformApiInterfaceCodec();
 
   Future<String> getPlatformVersion() async {
     final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
-        'dev.flutter.pigeon.adyen_checkout.CheckoutPlatformApi.getPlatformVersion', codec,
+        'dev.flutter.pigeon.adyen_checkout.CheckoutPlatformApiInterface.getPlatformVersion', codec,
         binaryMessenger: _binaryMessenger);
     final List<Object?>? replyList =
         await channel.send(null) as List<Object?>?;
@@ -235,7 +235,7 @@ class CheckoutPlatformApi {
 
   Future<void> startPayment(SessionModel arg_sessionModel, DropInConfigurationModel arg_dropInConfiguration) async {
     final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
-        'dev.flutter.pigeon.adyen_checkout.CheckoutPlatformApi.startPayment', codec,
+        'dev.flutter.pigeon.adyen_checkout.CheckoutPlatformApiInterface.startPayment', codec,
         binaryMessenger: _binaryMessenger);
     final List<Object?>? replyList =
         await channel.send(<Object?>[arg_sessionModel, arg_dropInConfiguration]) as List<Object?>?;

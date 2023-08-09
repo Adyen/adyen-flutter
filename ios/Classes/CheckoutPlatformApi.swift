@@ -7,7 +7,7 @@
 
 import Foundation
 
-class CheckoutPlatformApiImpl : CheckoutPlatformApi {
+class CheckoutPlatformApi : CheckoutPlatformApiInterface {
     func getPlatformVersion(completion: @escaping (Result<String, Error>) -> Void) {
         let systemVersion = UIDevice.current.systemVersion
         completion(Result.success(systemVersion))
