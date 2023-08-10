@@ -17,7 +17,10 @@ class AdyenCheckoutPlugin : FlutterPlugin, ActivityAware {
     private var lifecycleObserver: LifecycleEventObserver? = null
 
     override fun onAttachedToEngine(flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) =
-        CheckoutPlatformApiInterface.setUp(flutterPluginBinding.binaryMessenger, checkoutPlatformApi)
+        CheckoutPlatformApiInterface.setUp(
+            flutterPluginBinding.binaryMessenger,
+            checkoutPlatformApi
+        )
 
     override fun onDetachedFromEngine(binding: FlutterPlugin.FlutterPluginBinding) =
         CheckoutPlatformApiInterface.setUp(binding.binaryMessenger, null)
@@ -45,17 +48,18 @@ class AdyenCheckoutPlugin : FlutterPlugin, ActivityAware {
         return LifecycleEventObserver { source, event ->
             when (event) {
                 Lifecycle.Event.ON_CREATE -> {
-                    val dropInSessionLauncher = DropIn.registerForDropInResult(fragmentActivity,
-                        SessionDropInCallback { sessionDropInResult ->
-                            sessionDropInResult?.let {
-
-                            }
-                        })
-                    checkoutPlatformApi.dropInSessionLauncher = dropInSessionLauncher
+                    checkoutPlatformApi.dropInSessionLauncher =
+                        DropIn.registerForDropInResult(fragmentActivity, sessionDropInCallback())
                 }
 
                 else -> {}
             }
+        }
+    }
+
+    private fun sessionDropInCallback() = SessionDropInCallback { sessionDropInResult ->
+        sessionDropInResult?.let {
+
         }
     }
 
