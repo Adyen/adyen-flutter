@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:adyen_checkout/platform_api.g.dart';
 import 'package:adyen_checkout/src/adyen_checkout_interface.dart';
 import 'package:adyen_checkout/src/adyen_checkout_result_api.dart';
@@ -14,14 +16,21 @@ class AdyenCheckout {
     return AdyenCheckoutInterface.instance.getPlatformVersion();
   }
 
-  Future<void> startPayment(
+  Future<SessionDropInResultModel> startDropInSessionsPayment(
     SessionModel sessionModel,
     DropInConfigurationModel dropInConfiguration,
-  ) {
-    return AdyenCheckoutInterface.instance.startPayment(
+  ) async {
+    _adyenCheckoutResultApi.sessionDropInResultStream =
+        StreamController<SessionDropInResultModel>();
+
+    AdyenCheckoutInterface.instance.startPayment(
       sessionModel,
       dropInConfiguration,
     );
+
+    final sessionDropInResultModel = await _adyenCheckoutResultApi.sessionDropInResultStream.stream.first;
+    await _adyenCheckoutResultApi.sessionDropInResultStream.close();
+    return sessionDropInResultModel;
   }
 
   void _setupCheckoutResultApi() =>

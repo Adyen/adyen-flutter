@@ -2,21 +2,16 @@ package com.adyen.adyen_checkout
 
 import CheckoutPlatformInterface
 import CheckoutResultFlutterInterface
-import OrderResponseModel
 import SessionDropInResultEnum
 import SessionDropInResultModel
 import SessionPaymentResultModel
-import android.util.Log
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import com.adyen.adyen_checkout.Mapper.mapToOrderResponseModel
-import com.adyen.adyen_checkout.Mapper.mapTopAmount
-import com.adyen.checkout.components.core.OrderResponse
 import com.adyen.checkout.dropin.DropIn
 import com.adyen.checkout.dropin.SessionDropInCallback
 import com.adyen.checkout.dropin.SessionDropInResult
-import com.adyen.checkout.sessions.core.SessionPaymentResult
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.embedding.engine.plugins.activity.ActivityAware
 import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding
@@ -101,7 +96,6 @@ class AdyenCheckoutPlugin : FlutterPlugin, ActivityAware {
                 }
             }
 
-            Log.d("SessionDropIn", "DropIn result: $it")
             checkoutResultFlutterInterface?.onSessionDropInResult(result) {}
         }
     }

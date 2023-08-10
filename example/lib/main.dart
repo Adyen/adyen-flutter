@@ -8,7 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(const MaterialApp(home: MyApp()));
 }
 
 class MyApp extends StatefulWidget {
@@ -53,30 +53,28 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(
-        appBar: AppBar(
-          title: const Text('Plugin example app'),
-        ),
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text('Running on: $_platformVersion\n'),
-              TextButton(
-                  onPressed: () {
-                    startDropInSessions();
-                  },
-                  child: const Text("DropIn sessions"))
-            ],
-          ),
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Plugin example app'),
+      ),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text('Running on: $_platformVersion\n'),
+            TextButton(
+                onPressed: () {
+                  startDropInSessions(context);
+                },
+                child: const Text("DropIn sessions"))
+          ],
         ),
       ),
     );
   }
 
-  Future<void> startDropInSessions() async {
-    Amount amount = Amount(currency: "EUR", value: 2400);
+  Future<void> startDropInSessions(BuildContext context) async {
+    Amount amount = Amount(currency: "EUR", value: 8000);
     SessionModel sessionModel =
         await _adyenSessionRepository.createSession(amount);
     DropInConfigurationModel dropInConfiguration = DropInConfigurationModel(
@@ -85,6 +83,33 @@ class _MyAppState extends State<MyApp> {
       amount: amount,
     );
 
-    await _adyenCheckout.startPayment(sessionModel, dropInConfiguration);
+    final sessionDropInResultModel = await _adyenCheckout
+        .startDropInSessionsPayment(sessionModel, dropInConfiguration);
+
+    _dialogBuilder(context, sessionDropInResultModel);
+  }
+
+  _dialogBuilder(
+      BuildContext context, SessionDropInResultModel sessionDropInResultModel) {
+    return showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(sessionDropInResultModel.sessionDropInResult.name),
+          content: Text("Result code: ${sessionDropInResultModel.result?.resultCode}"),
+          actions: <Widget>[
+            TextButton(
+              style: TextButton.styleFrom(
+                textStyle: Theme.of(context).textTheme.labelLarge,
+              ),
+              child: const Text('Close'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 }
