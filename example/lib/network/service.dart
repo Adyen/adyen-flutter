@@ -10,9 +10,8 @@ class Service {
 
   Future<SessionResponseNetworkModel> createSession(
       SessionRequestNetworkModel sessionRequestNetworkModel) async {
-    var url = Uri.https(baseUrl, "/$apiVersion/$sessions");
-
-    var response = await http.post(
+    final url = Uri.https(baseUrl, "/$apiVersion/$sessions");
+    final response = await http.post(
       url,
       headers: {
         "content-type": "application/json",
@@ -20,7 +19,6 @@ class Service {
       },
       body: sessionRequestNetworkModel.toRawJson(),
     );
-
     return SessionResponseNetworkModel.fromRawJson(response.body);
   }
 }
