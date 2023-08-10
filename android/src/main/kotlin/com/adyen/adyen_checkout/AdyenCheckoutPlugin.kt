@@ -1,10 +1,22 @@
 package com.adyen.adyen_checkout
 
+import CheckoutPlatformInterface
+import CheckoutResultFlutterInterface
+import OrderResponseModel
+import SessionDropInResultEnum
+import SessionDropInResultModel
+import SessionPaymentResultModel
+import android.util.Log
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
+import com.adyen.adyen_checkout.Mapper.mapToOrderResponseModel
+import com.adyen.adyen_checkout.Mapper.mapTopAmount
+import com.adyen.checkout.components.core.OrderResponse
 import com.adyen.checkout.dropin.DropIn
 import com.adyen.checkout.dropin.SessionDropInCallback
+import com.adyen.checkout.dropin.SessionDropInResult
+import com.adyen.checkout.sessions.core.SessionPaymentResult
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.embedding.engine.plugins.activity.ActivityAware
 import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding
@@ -13,17 +25,23 @@ import io.flutter.embedding.engine.plugins.lifecycle.HiddenLifecycleReference
 /** AdyenCheckoutPlugin */
 class AdyenCheckoutPlugin : FlutterPlugin, ActivityAware {
     private val checkoutPlatformApi = CheckoutPlatformApi()
+    private var checkoutResultFlutterInterface: CheckoutResultFlutterInterface? = null
     private var lifecycleReference: HiddenLifecycleReference? = null
     private var lifecycleObserver: LifecycleEventObserver? = null
 
-    override fun onAttachedToEngine(flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) =
-        CheckoutPlatformApiInterface.setUp(
+    override fun onAttachedToEngine(flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
+        CheckoutPlatformInterface.setUp(
             flutterPluginBinding.binaryMessenger,
             checkoutPlatformApi
         )
+        checkoutResultFlutterInterface =
+            CheckoutResultFlutterInterface(flutterPluginBinding.binaryMessenger)
+    }
 
-    override fun onDetachedFromEngine(binding: FlutterPlugin.FlutterPluginBinding) =
-        CheckoutPlatformApiInterface.setUp(binding.binaryMessenger, null)
+    override fun onDetachedFromEngine(binding: FlutterPlugin.FlutterPluginBinding) {
+        CheckoutPlatformInterface.setUp(binding.binaryMessenger, null)
+        checkoutResultFlutterInterface = null
+    }
 
     override fun onAttachedToActivity(binding: ActivityPluginBinding) = setupActivity(binding)
 
@@ -59,7 +77,32 @@ class AdyenCheckoutPlugin : FlutterPlugin, ActivityAware {
 
     private fun sessionDropInCallback() = SessionDropInCallback { sessionDropInResult ->
         sessionDropInResult?.let {
+            val result = when (it) {
+                is SessionDropInResult.CancelledByUser -> SessionDropInResultModel(
+                    SessionDropInResultEnum.CANCELLEDBYUSER
+                )
 
+                is SessionDropInResult.Error -> SessionDropInResultModel(
+                    SessionDropInResultEnum.ERROR,
+                    reason = it.reason
+                )
+
+                is SessionDropInResult.Finished -> {
+                    SessionDropInResultModel(
+                        SessionDropInResultEnum.FINISHED,
+                        result = SessionPaymentResultModel(
+                            it.result.sessionId,
+                            it.result.sessionResult,
+                            it.result.sessionData,
+                            it.result.resultCode,
+                            it.result.order?.mapToOrderResponseModel(),
+                        )
+                    )
+                }
+            }
+
+            Log.d("SessionDropIn", "DropIn result: $it")
+            checkoutResultFlutterInterface?.onSessionDropInResult(result) {}
         }
     }
 

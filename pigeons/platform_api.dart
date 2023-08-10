@@ -28,14 +28,20 @@ class SessionModel {
   final String id;
   final String sessionData;
 
-  SessionModel({required this.id, required this.sessionData});
+  SessionModel({
+    required this.id,
+    required this.sessionData,
+  });
 }
 
 class Amount {
-  final String currency;
-  final double value;
+  final String? currency;
+  final int value;
 
-  Amount({required this.currency, required this.value});
+  Amount({
+    required this.currency,
+    required this.value,
+  });
 }
 
 enum Locale {
@@ -82,13 +88,29 @@ class DropInConfigurationModel {
   });
 }
 
-class OrderResponse {
+class SessionPaymentResultModel {
+  final String? sessionId;
+  final String? sessionResult;
+  final String? sessionData;
+  final String? resultCode;
+  final OrderResponseModel? order;
+
+  SessionPaymentResultModel(
+    this.sessionId,
+    this.sessionResult,
+    this.sessionData,
+    this.resultCode,
+    this.order,
+  );
+}
+
+class OrderResponseModel {
   final String pspReference;
   final String orderData;
   final Amount? amount;
   final Amount? remainingAmount;
 
-  OrderResponse({
+  OrderResponseModel({
     required this.pspReference,
     required this.orderData,
     this.amount,
@@ -96,11 +118,16 @@ class OrderResponse {
   });
 }
 
-class SessionDropInResult {
+class SessionDropInResultModel {
   final SessionDropInResultEnum sessionDropInResult;
-  final String data;
+  final String? reason;
+  final SessionPaymentResultModel? result;
 
-  SessionDropInResult(this.sessionDropInResult, this.data);
+  SessionDropInResultModel(
+    this.sessionDropInResult,
+    this.reason,
+    this.result,
+  );
 }
 
 enum SessionDropInResultEnum {
@@ -110,7 +137,7 @@ enum SessionDropInResultEnum {
 }
 
 @HostApi()
-abstract class CheckoutPlatformApiInterface {
+abstract class CheckoutPlatformInterface {
   @async
   String getPlatformVersion();
 
@@ -119,4 +146,9 @@ abstract class CheckoutPlatformApiInterface {
     SessionModel sessionModel,
     DropInConfigurationModel dropInConfiguration,
   );
+}
+
+@FlutterApi()
+abstract class CheckoutResultFlutterInterface {
+  void onSessionDropInResult(SessionDropInResultModel sessionDropInResult);
 }

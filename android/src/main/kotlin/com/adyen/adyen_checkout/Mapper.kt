@@ -3,8 +3,11 @@ package com.adyen.adyen_checkout
 import Amount
 import DropInConfigurationModel
 import Environment
+import OrderResponseModel
 import SessionModel
 import android.content.Context
+import com.adyen.adyen_checkout.Mapper.mapTopAmount
+import com.adyen.checkout.components.core.OrderResponse
 
 object Mapper {
 
@@ -27,6 +30,19 @@ object Mapper {
     }
 
     fun Amount.mapToAmount(): com.adyen.checkout.components.core.Amount {
-        return com.adyen.checkout.components.core.Amount(this.currency, this.value.toLong())
+        return com.adyen.checkout.components.core.Amount(this.currency, this.value)
+    }
+
+    fun com.adyen.checkout.components.core.Amount.mapTopAmount() : Amount {
+        return Amount(this.currency, this.value)
+    }
+
+    fun OrderResponse.mapToOrderResponseModel() : OrderResponseModel {
+        return  OrderResponseModel(
+            pspReference = pspReference,
+            orderData = orderData,
+            amount = amount?.mapTopAmount(),
+            remainingAmount = remainingAmount?.mapTopAmount()
+        )
     }
 }

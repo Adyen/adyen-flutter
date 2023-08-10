@@ -1,6 +1,6 @@
 class AmountNetworkModel {
-  final String currency;
-  final double value;
+  final String? currency;
+  final int value;
 
   AmountNetworkModel({
     required this.currency,
@@ -10,7 +10,7 @@ class AmountNetworkModel {
   factory AmountNetworkModel.fromJson(Map<String, dynamic> json) =>
       AmountNetworkModel(
         currency: json["currency"],
-        value: json["value"]?.toDouble(),
+        value: json["value"],
       );
 
   Map<String, dynamic> toJson() => {
