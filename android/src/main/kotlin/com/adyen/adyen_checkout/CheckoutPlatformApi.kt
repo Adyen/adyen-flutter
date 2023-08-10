@@ -17,6 +17,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
+@Suppress("NAME_SHADOWING")
 class CheckoutPlatformApi : CheckoutPlatformInterface {
     lateinit var activity: FragmentActivity
     lateinit var dropInSessionLauncher: ActivityResultLauncher<SessionDropInResultContractParams>
@@ -53,11 +54,9 @@ class CheckoutPlatformApi : CheckoutPlatformInterface {
     ): CheckoutSession {
         val checkoutSessionResult =
             CheckoutSessionProvider.createSession(sessionModel, dropInConfiguration)
-
         return when (checkoutSessionResult) {
             is CheckoutSessionResult.Success -> checkoutSessionResult.checkoutSession
             is CheckoutSessionResult.Error -> throw checkoutSessionResult.exception
-            else -> throw Exception("Todo - add later")
         }
     }
 

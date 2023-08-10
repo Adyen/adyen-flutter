@@ -10,6 +10,8 @@ import 'package:adyen_checkout_example/network/service.dart';
 class AdyenSessionsRepository {
   final Service service = Service();
 
+  //A session should not being created from the mobile application.
+  //Please provide a CheckoutSession object from your own backend.
   Future<SessionModel> createSession(Amount amount) async {
     SessionRequestNetworkModel sessionRequestNetworkModel =
         SessionRequestNetworkModel(

@@ -71,33 +71,34 @@ class AdyenCheckoutPlugin : FlutterPlugin, ActivityAware {
     }
 
     private fun sessionDropInCallback() = SessionDropInCallback { sessionDropInResult ->
-        sessionDropInResult?.let {
-            val result = when (it) {
-                is SessionDropInResult.CancelledByUser -> SessionDropInResultModel(
-                    SessionDropInResultEnum.CANCELLEDBYUSER
-                )
-
-                is SessionDropInResult.Error -> SessionDropInResultModel(
-                    SessionDropInResultEnum.ERROR,
-                    reason = it.reason
-                )
-
-                is SessionDropInResult.Finished -> {
-                    SessionDropInResultModel(
-                        SessionDropInResultEnum.FINISHED,
-                        result = SessionPaymentResultModel(
-                            it.result.sessionId,
-                            it.result.sessionResult,
-                            it.result.sessionData,
-                            it.result.resultCode,
-                            it.result.order?.mapToOrderResponseModel(),
-                        )
-                    )
-                }
-            }
-
-            checkoutResultFlutterInterface?.onSessionDropInResult(result) {}
+        if (sessionDropInResult == null) {
+            return@SessionDropInCallback
         }
+
+        val mappedResult = when (sessionDropInResult) {
+            is SessionDropInResult.CancelledByUser -> SessionDropInResultModel(
+                SessionDropInResultEnum.CANCELLEDBYUSER
+            )
+
+            is SessionDropInResult.Error -> SessionDropInResultModel(
+                SessionDropInResultEnum.ERROR,
+                reason = sessionDropInResult.reason
+            )
+
+            is SessionDropInResult.Finished -> {
+                SessionDropInResultModel(
+                    SessionDropInResultEnum.FINISHED,
+                    result = SessionPaymentResultModel(
+                        sessionDropInResult.result.sessionId,
+                        sessionDropInResult.result.sessionResult,
+                        sessionDropInResult.result.sessionData,
+                        sessionDropInResult.result.resultCode,
+                        sessionDropInResult.result.order?.mapToOrderResponseModel(),
+                    )
+                )
+            }
+        }
+        checkoutResultFlutterInterface?.onSessionDropInResult(mappedResult) {}
     }
 
     private fun teardown() {
