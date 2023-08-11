@@ -38,7 +38,7 @@ class AdyenSessionsRepository {
     if (Platform.isAndroid) {
       return "adyencheckout://com.adyen.adyen_checkout_example";
     } else if (Platform.isIOS) {
-      return "iOS";
+      return "ui-host://payments";
     } else {
       throw Exception("Unsupported platform");
     }

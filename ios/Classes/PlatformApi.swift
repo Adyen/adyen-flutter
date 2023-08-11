@@ -175,24 +175,21 @@ struct DropInConfigurationModel {
 /// Generated class from Pigeon that represents data sent in messages.
 struct SessionPaymentResultModel {
   var sessionId: String? = nil
-  var sessionResult: String? = nil
   var sessionData: String? = nil
   var resultCode: String? = nil
   var order: OrderResponseModel? = nil
 
   static func fromList(_ list: [Any?]) -> SessionPaymentResultModel? {
     let sessionId: String? = nilOrValue(list[0])
-    let sessionResult: String? = nilOrValue(list[1])
-    let sessionData: String? = nilOrValue(list[2])
-    let resultCode: String? = nilOrValue(list[3])
+    let sessionData: String? = nilOrValue(list[1])
+    let resultCode: String? = nilOrValue(list[2])
     var order: OrderResponseModel? = nil
-    if let orderList: [Any?] = nilOrValue(list[4]) {
+    if let orderList: [Any?] = nilOrValue(list[3]) {
       order = OrderResponseModel.fromList(orderList)
     }
 
     return SessionPaymentResultModel(
       sessionId: sessionId,
-      sessionResult: sessionResult,
       sessionData: sessionData,
       resultCode: resultCode,
       order: order
@@ -201,7 +198,6 @@ struct SessionPaymentResultModel {
   func toList() -> [Any?] {
     return [
       sessionId,
-      sessionResult,
       sessionData,
       resultCode,
       order?.toList(),

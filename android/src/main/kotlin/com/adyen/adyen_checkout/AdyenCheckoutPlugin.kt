@@ -90,7 +90,6 @@ class AdyenCheckoutPlugin : FlutterPlugin, ActivityAware {
                     SessionDropInResultEnum.FINISHED,
                     result = SessionPaymentResultModel(
                         sessionDropInResult.result.sessionId,
-                        sessionDropInResult.result.sessionResult,
                         sessionDropInResult.result.sessionData,
                         sessionDropInResult.result.resultCode,
                         sessionDropInResult.result.order?.mapToOrderResponseModel(),

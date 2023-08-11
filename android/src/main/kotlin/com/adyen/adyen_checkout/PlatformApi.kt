@@ -192,7 +192,6 @@ data class DropInConfigurationModel (
 /** Generated class from Pigeon that represents data sent in messages. */
 data class SessionPaymentResultModel (
   val sessionId: String? = null,
-  val sessionResult: String? = null,
   val sessionData: String? = null,
   val resultCode: String? = null,
   val order: OrderResponseModel? = null
@@ -202,19 +201,17 @@ data class SessionPaymentResultModel (
     @Suppress("UNCHECKED_CAST")
     fun fromList(list: List<Any?>): SessionPaymentResultModel {
       val sessionId = list[0] as String?
-      val sessionResult = list[1] as String?
-      val sessionData = list[2] as String?
-      val resultCode = list[3] as String?
-      val order: OrderResponseModel? = (list[4] as List<Any?>?)?.let {
+      val sessionData = list[1] as String?
+      val resultCode = list[2] as String?
+      val order: OrderResponseModel? = (list[3] as List<Any?>?)?.let {
         OrderResponseModel.fromList(it)
       }
-      return SessionPaymentResultModel(sessionId, sessionResult, sessionData, resultCode, order)
+      return SessionPaymentResultModel(sessionId, sessionData, resultCode, order)
     }
   }
   fun toList(): List<Any?> {
     return listOf<Any?>(
       sessionId,
-      sessionResult,
       sessionData,
       resultCode,
       order?.toList(),

@@ -90,14 +90,12 @@ class DropInConfigurationModel {
 
 class SessionPaymentResultModel {
   final String? sessionId;
-  final String? sessionResult;
   final String? sessionData;
   final String? resultCode;
   final OrderResponseModel? order;
 
   SessionPaymentResultModel(
     this.sessionId,
-    this.sessionResult,
     this.sessionData,
     this.resultCode,
     this.order,

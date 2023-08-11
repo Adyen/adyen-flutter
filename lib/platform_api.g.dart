@@ -166,15 +166,12 @@ class DropInConfigurationModel {
 class SessionPaymentResultModel {
   SessionPaymentResultModel({
     this.sessionId,
-    this.sessionResult,
     this.sessionData,
     this.resultCode,
     this.order,
   });
 
   String? sessionId;
-
-  String? sessionResult;
 
   String? sessionData;
 
@@ -185,7 +182,6 @@ class SessionPaymentResultModel {
   Object encode() {
     return <Object?>[
       sessionId,
-      sessionResult,
       sessionData,
       resultCode,
       order?.encode(),
@@ -196,11 +192,10 @@ class SessionPaymentResultModel {
     result as List<Object?>;
     return SessionPaymentResultModel(
       sessionId: result[0] as String?,
-      sessionResult: result[1] as String?,
-      sessionData: result[2] as String?,
-      resultCode: result[3] as String?,
-      order: result[4] != null
-          ? OrderResponseModel.decode(result[4]! as List<Object?>)
+      sessionData: result[1] as String?,
+      resultCode: result[2] as String?,
+      order: result[3] != null
+          ? OrderResponseModel.decode(result[3]! as List<Object?>)
           : null,
     );
   }
