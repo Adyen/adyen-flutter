@@ -86,6 +86,7 @@ class CheckoutPlatformApi : CheckoutPlatformInterface {
     private func getCountryCode(locale: Locale?) -> String {
         return "NL"
     }
+
     func getReturnUrl() -> String {
         return "";
     }
