@@ -2,11 +2,14 @@ import 'dart:async';
 
 import 'package:adyen_checkout/adyen_checkout.dart';
 import 'package:adyen_checkout/platform_api.g.dart';
+import 'package:adyen_checkout_example/config.dart';
+import 'package:adyen_checkout_example/network/service.dart';
+import 'package:adyen_checkout_example/repositories/adyen_sessions_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(const MaterialApp(home: MyApp()));
 }
 
 class MyApp extends StatefulWidget {
@@ -19,6 +22,7 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   String _platformVersion = 'Unknown';
   final _adyenCheckout = AdyenCheckout();
+  late AdyenSessionsRepository _adyenSessionRepository;
 
   @override
   void initState() {
@@ -28,12 +32,17 @@ class _MyAppState extends State<MyApp> {
 
   // Platform messages are asynchronous, so we initialize in an async method.
   Future<void> initPlatformState() async {
+    _adyenSessionRepository = AdyenSessionsRepository(
+      adyenCheckout: _adyenCheckout,
+      service: Service(),
+    );
+
     String platformVersion;
     // Platform messages may fail, so we use a try/catch PlatformException.
     // We also handle the message potentially returning null.
     try {
-      platformVersion =
-          await _adyenCheckout.getPlatformVersion() ?? 'Unknown platform version';
+      platformVersion = await _adyenCheckout.getPlatformVersion() ??
+          'Unknown platform version';
     } on PlatformException {
       platformVersion = 'Failed to get platform version.';
     }
@@ -50,36 +59,63 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(
-        appBar: AppBar(
-          title: const Text('Plugin example app'),
-        ),
-        body: Center(
-          child:  Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text('Running on: $_platformVersion\n'),
-              TextButton(onPressed: ()  {
-                SessionModel sessionModel =
-                SessionModel(id: "1111", sessionData: "Session data example value");
-                DropInConfigurationModel dropInConfiguration = DropInConfigurationModel(
-                    environment: Environment.test,
-                    clientKey: "",
-                    amount: Amount(
-                      currency: "EUR",
-                      value: 1000,
-                    ));
-
-
-
-                _adyenCheckout.startPayment(sessionModel, dropInConfiguration);
-
-              }, child: Text("Test"))
-            ],
-          ),
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Plugin example app'),
+      ),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text('Running on: $_platformVersion\n'),
+            TextButton(
+                onPressed: () {
+                  startDropInSessions(context);
+                },
+                child: const Text("DropIn sessions"))
+          ],
         ),
       ),
+    );
+  }
+
+  Future<void> startDropInSessions(BuildContext context) async {
+    SessionModel sessionModel = await _adyenSessionRepository.createSession(
+        Config.amount, Config.environment);
+    DropInConfigurationModel dropInConfiguration = DropInConfigurationModel(
+      environment: Environment.test,
+      clientKey: Config.clientKey,
+      amount: Config.amount,
+    );
+
+    final sessionDropInResultModel = await _adyenCheckout
+        .startDropInSessionsPayment(sessionModel, dropInConfiguration);
+
+    _dialogBuilder(context, sessionDropInResultModel);
+  }
+
+  _dialogBuilder(
+      BuildContext context, SessionDropInResultModel sessionDropInResultModel) {
+    return showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(sessionDropInResultModel.sessionDropInResult.name),
+          content: Text(
+              "Result code: ${sessionDropInResultModel.result?.resultCode}"),
+          actions: <Widget>[
+            TextButton(
+              style: TextButton.styleFrom(
+                textStyle: Theme.of(context).textTheme.labelLarge,
+              ),
+              child: const Text('Close'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 }

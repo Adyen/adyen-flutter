@@ -4,9 +4,9 @@ import UIKit
 public class AdyenCheckoutPlugin: NSObject, FlutterPlugin {
     
     public static func register(with registrar: FlutterPluginRegistrar) {
-        let api: CheckoutPlatformApi = CheckoutPlatformApiImpl()
+        let api: CheckoutPlatformApi = CheckoutPlatformApi()
         let messenger : FlutterBinaryMessenger = registrar.messenger()
-        CheckoutPlatformApiSetup.setUp(binaryMessenger: messenger, api: api)
+        CheckoutPlatformInterfaceSetup.setUp(binaryMessenger: messenger, api: api)
     }
     
 }
