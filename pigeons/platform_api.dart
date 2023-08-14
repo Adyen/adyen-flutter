@@ -11,17 +11,12 @@ import 'package:pigeon/pigeon.dart';
   dartPackageName: 'adyen_checkout',
 ))
 enum Environment {
-  test(url: "https://checkoutshopper-test.adyen.com/checkoutshopper/"),
-  europe(url: "https://checkoutshopper-live.adyen.com/checkoutshopper/"),
-  unitedStates(
-      url: "https://checkoutshopper-live-us.adyen.com/checkoutshopper/"),
-  australia(url: "https://checkoutshopper-live-au.adyen.com/checkoutshopper/"),
-  india(url: "https://checkoutshopper-live-in.adyen.com/checkoutshopper/"),
-  apse(url: "https://checkoutshopper-live-apse.adyen.com/checkoutshopper/");
-
-  final String url;
-
-  const Environment({required this.url});
+  test,
+  europe,
+  unitedStates,
+  australia,
+  india,
+  apse;
 }
 
 class SessionModel {

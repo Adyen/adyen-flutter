@@ -74,13 +74,12 @@ class _MyAppState extends State<MyApp> {
   }
 
   Future<void> startDropInSessions(BuildContext context) async {
-    Amount amount = Amount(currency: "EUR", value: 8000);
     SessionModel sessionModel =
-        await _adyenSessionRepository.createSession(amount);
+        await _adyenSessionRepository.createSession(Config.amount, Config.environment);
     DropInConfigurationModel dropInConfiguration = DropInConfigurationModel(
       environment: Environment.test,
       clientKey: Config.clientKey,
-      amount: amount,
+      amount: Config.amount,
     );
 
     final sessionDropInResultModel = await _adyenCheckout
@@ -96,7 +95,8 @@ class _MyAppState extends State<MyApp> {
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text(sessionDropInResultModel.sessionDropInResult.name),
-          content: Text("Result code: ${sessionDropInResultModel.result?.resultCode}"),
+          content: Text(
+              "Result code: ${sessionDropInResultModel.result?.resultCode}"),
           actions: <Widget>[
             TextButton(
               style: TextButton.styleFrom(

@@ -28,7 +28,8 @@ class AdyenCheckout {
       dropInConfiguration,
     );
 
-    final sessionDropInResultModel = await _adyenCheckoutResultApi.sessionDropInResultStream.stream.first;
+    final sessionDropInResultModel =
+        await _adyenCheckoutResultApi.sessionDropInResultStream.stream.first;
     await _adyenCheckoutResultApi.sessionDropInResultStream.close();
     return sessionDropInResultModel;
   }

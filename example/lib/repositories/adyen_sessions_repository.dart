@@ -12,7 +12,7 @@ class AdyenSessionsRepository {
 
   //A session should not being created from the mobile application.
   //Please provide a CheckoutSession object from your own backend.
-  Future<SessionModel> createSession(Amount amount) async {
+  Future<SessionModel> createSession(Amount amount, Environment environment) async {
     SessionRequestNetworkModel sessionRequestNetworkModel =
         SessionRequestNetworkModel(
       merchantAccount: Config.merchantAccount,
@@ -26,7 +26,7 @@ class AdyenSessionsRepository {
     );
 
     SessionResponseNetworkModel sessionResponseNetworkModel =
-        await service.createSession(sessionRequestNetworkModel);
+        await service.createSession(sessionRequestNetworkModel, environment);
 
     return SessionModel(
       id: sessionResponseNetworkModel.id,
