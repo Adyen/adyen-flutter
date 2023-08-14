@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:adyen_checkout/adyen_checkout.dart';
 import 'package:adyen_checkout/platform_api.g.dart';
 import 'package:adyen_checkout_example/config.dart';
 import 'package:adyen_checkout_example/network/models/amount_network_model.dart';
@@ -9,19 +8,11 @@ import 'package:adyen_checkout_example/network/models/session_response_network_m
 import 'package:adyen_checkout_example/network/service.dart';
 
 class AdyenSessionsRepository {
-  AdyenSessionsRepository(
-      {required AdyenCheckout adyenCheckout, required Service service})
-      : _service = service,
-        _adyenCheckout = adyenCheckout;
-
-  final AdyenCheckout _adyenCheckout;
-  final Service _service;
+  final Service service = Service();
 
   //A session should not being created from the mobile application.
   //Please provide a CheckoutSession object from your own backend.
-  Future<SessionModel> createSession(
-      Amount amount, Environment environment) async {
-    String returnUrl = await determineExampleReturnUrl();
+  Future<SessionModel> createSession(Amount amount, Environment environment) async {
     SessionRequestNetworkModel sessionRequestNetworkModel =
         SessionRequestNetworkModel(
       merchantAccount: Config.merchantAccount,
@@ -29,13 +20,13 @@ class AdyenSessionsRepository {
         currency: amount.currency,
         value: amount.value,
       ),
-      returnUrl: returnUrl,
+      returnUrl: determineExampleReturnUrl(),
       reference: Config.shopperReference,
       countryCode: Config.countryCode,
     );
 
     SessionResponseNetworkModel sessionResponseNetworkModel =
-        await _service.createSession(sessionRequestNetworkModel, environment);
+        await service.createSession(sessionRequestNetworkModel, environment);
 
     return SessionModel(
       id: sessionResponseNetworkModel.id,
@@ -43,11 +34,11 @@ class AdyenSessionsRepository {
     );
   }
 
-  Future<String> determineExampleReturnUrl() async {
+  String determineExampleReturnUrl() {
     if (Platform.isAndroid) {
-      return await _adyenCheckout.getReturnUrl();
+      return "adyencheckout://com.adyen.adyen_checkout_example";
     } else if (Platform.isIOS) {
-      return Config.iOSReturnUrl;
+      return "iOS";
     } else {
       throw Exception("Unsupported platform");
     }

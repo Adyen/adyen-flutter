@@ -8,10 +8,6 @@ class Service {
   Future<SessionResponseNetworkModel> createSession(
       SessionRequestNetworkModel sessionRequestNetworkModel,
       Environment environment) async {
-    if (Config.xApiKey.isEmpty) {
-      throw AssertionError('X_API_KEY is not set in secrets.json');
-    }
-
     final url = Uri.https(Config.baseUrl, "/${Config.apiVersion}/sessions");
     final response = await http.post(
       url,
