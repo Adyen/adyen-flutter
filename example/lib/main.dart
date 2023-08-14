@@ -74,17 +74,12 @@ class _MyAppState extends State<MyApp> {
   }
 
   Future<void> startDropInSessions(BuildContext context) async {
-    if (Config.clientKey.isEmpty) {
-      throw AssertionError('CLIENT_KEY is not set in secrets.json');
-    }
-
-    Amount amount = Amount(currency: "EUR", value: 22000);
     SessionModel sessionModel =
-        await _adyenSessionRepository.createSession(amount);
+        await _adyenSessionRepository.createSession(Config.amount, Config.environment);
     DropInConfigurationModel dropInConfiguration = DropInConfigurationModel(
       environment: Environment.test,
       clientKey: Config.clientKey,
-      amount: amount,
+      amount: Config.amount,
     );
 
     final sessionDropInResultModel = await _adyenCheckout
