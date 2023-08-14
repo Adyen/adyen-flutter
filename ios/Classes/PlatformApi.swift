@@ -320,6 +320,7 @@ class CheckoutPlatformInterfaceCodec: FlutterStandardMessageCodec {
 protocol CheckoutPlatformInterface {
   func getPlatformVersion(completion: @escaping (Result<String, Error>) -> Void)
   func startPayment(sessionModel: SessionModel, dropInConfiguration: DropInConfigurationModel, completion: @escaping (Result<Void, Error>) -> Void)
+  func getReturnUrl() throws -> String
 }
 
 /// Generated setup class from Pigeon to handle messages through the `binaryMessenger`.
@@ -360,6 +361,19 @@ class CheckoutPlatformInterfaceSetup {
       }
     } else {
       startPaymentChannel.setMessageHandler(nil)
+    }
+    let getReturnUrlChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.getReturnUrl", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      getReturnUrlChannel.setMessageHandler { _, reply in
+        do {
+          let result = try api.getReturnUrl()
+          reply(wrapResult(result))
+        } catch {
+          reply(wrapError(error))
+        }
+      }
+    } else {
+      getReturnUrlChannel.setMessageHandler(nil)
     }
   }
 }

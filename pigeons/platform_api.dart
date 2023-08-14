@@ -139,6 +139,8 @@ abstract class CheckoutPlatformInterface {
     SessionModel sessionModel,
     DropInConfigurationModel dropInConfiguration,
   );
+
+  String getReturnUrl();
 }
 
 @FlutterApi()

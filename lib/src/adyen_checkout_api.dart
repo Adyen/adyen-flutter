@@ -16,4 +16,9 @@ class AdyenCheckoutApi implements AdyenCheckoutInterface {
   ) {
     return checkoutApi.startPayment(sessionModel, dropInConfiguration);
   }
+
+  @override
+  Future<String> getReturnUrl() {
+    return checkoutApi.getReturnUrl();
+  }
 }

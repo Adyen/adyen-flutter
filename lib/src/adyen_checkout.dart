@@ -34,6 +34,10 @@ class AdyenCheckout {
     return sessionDropInResultModel;
   }
 
+  Future<String> getReturnUrl() {
+    return AdyenCheckoutInterface.instance.getReturnUrl();
+  }
+
   void _setupCheckoutResultApi() =>
       CheckoutResultFlutterInterface.setup(_adyenCheckoutResultApi);
 }

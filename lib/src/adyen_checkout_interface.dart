@@ -21,4 +21,7 @@ abstract class AdyenCheckoutInterface extends PlatformInterface {
     SessionModel sessionModel,
     DropInConfigurationModel dropInConfiguration,
   );
+
+  Future<String> getReturnUrl();
+
 }
