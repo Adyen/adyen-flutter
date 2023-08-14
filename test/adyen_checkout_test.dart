@@ -16,6 +16,11 @@ class MockAdyenCheckoutPlatform
     DropInConfigurationModel dropInConfiguration,
   ) =>
       Future.value(null);
+
+  @override
+  Future<String> getReturnUrl() {
+    return Future.value("adyencheckout://com.adyen.adyen_checkout_example");
+  }
 }
 
 void main() {

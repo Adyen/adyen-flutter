@@ -10,6 +10,7 @@ import com.adyen.adyen_checkout.Mapper.mapToDropInConfiguration
 import com.adyen.adyen_checkout.Mapper.mapToSessionModel
 import com.adyen.checkout.dropin.DropIn
 import com.adyen.checkout.dropin.internal.ui.model.SessionDropInResultContractParams
+import com.adyen.checkout.redirect.RedirectComponent
 import com.adyen.checkout.sessions.core.CheckoutSession
 import com.adyen.checkout.sessions.core.CheckoutSessionProvider
 import com.adyen.checkout.sessions.core.CheckoutSessionResult
@@ -46,6 +47,10 @@ class CheckoutPlatformApi : CheckoutPlatformInterface {
             }
         }
 
+    }
+
+    override fun getReturnUrl(): String {
+        return RedirectComponent.getReturnUrl(activity.applicationContext)
     }
 
     private suspend fun createCheckoutSession(

@@ -326,6 +326,7 @@ private object CheckoutPlatformInterfaceCodec : StandardMessageCodec() {
 interface CheckoutPlatformInterface {
   fun getPlatformVersion(callback: (Result<String>) -> Unit)
   fun startPayment(sessionModel: SessionModel, dropInConfiguration: DropInConfigurationModel, callback: (Result<Unit>) -> Unit)
+  fun getReturnUrl(): String
 
   companion object {
     /** The codec used by CheckoutPlatformInterface. */
@@ -368,6 +369,22 @@ interface CheckoutPlatformInterface {
                 reply.reply(wrapResult(null))
               }
             }
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.getReturnUrl", codec)
+        if (api != null) {
+          channel.setMessageHandler { _, reply ->
+            var wrapped: List<Any?>
+            try {
+              wrapped = listOf<Any?>(api.getReturnUrl())
+            } catch (exception: Throwable) {
+              wrapped = wrapError(exception)
+            }
+            reply.reply(wrapped)
           }
         } else {
           channel.setMessageHandler(null)

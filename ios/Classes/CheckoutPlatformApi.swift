@@ -8,6 +8,7 @@
 import Foundation
 
 class CheckoutPlatformApi : CheckoutPlatformInterface {
+  
     func getPlatformVersion(completion: @escaping (Result<String, Error>) -> Void) {
         let systemVersion = UIDevice.current.systemVersion
         completion(Result.success(systemVersion))
@@ -16,5 +17,8 @@ class CheckoutPlatformApi : CheckoutPlatformInterface {
     func startPayment(sessionModel: SessionModel, dropInConfiguration: DropInConfigurationModel, completion: @escaping (Result<Void, Error>) -> Void) {
     }
     
+    func getReturnUrl() -> String {
+        return "";
+    }
     
 }
