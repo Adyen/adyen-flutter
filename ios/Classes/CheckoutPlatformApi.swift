@@ -82,7 +82,7 @@ class CheckoutPlatformApi : CheckoutPlatformInterface {
         //TODO map to correct environment
         return Adyen.Environment.test
     }
-    
+
     private func getCountryCode(locale: Locale?) -> String {
         return "NL"
     }
