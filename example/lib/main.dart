@@ -84,7 +84,6 @@ class _MyAppState extends State<MyApp> {
       throw AssertionError('CLIENT_KEY is not set in secrets.json');
     }
 
-    Amount amount = Amount(currency: "EUR", value: 22000);
     SessionModel sessionModel = await _adyenSessionRepository.createSession(
         Config.amount, Config.environment);
     DropInConfigurationModel dropInConfiguration = DropInConfigurationModel(
