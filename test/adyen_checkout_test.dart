@@ -1,6 +1,7 @@
 import 'package:adyen_checkout/platform_api.g.dart';
 import 'package:adyen_checkout/src/adyen_checkout.dart';
 import 'package:adyen_checkout/src/adyen_checkout_interface.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
@@ -19,11 +20,12 @@ class MockAdyenCheckoutPlatform
 
   @override
   Future<String> getReturnUrl() {
-    return Future.value("adyencheckout://com.adyen.adyen_checkout_example");
+    return Future.value("ui-host://payments");
   }
 }
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
   final AdyenCheckout initialPlatform = AdyenCheckout();
 
   test('$AdyenCheckout is the default instance', () {
