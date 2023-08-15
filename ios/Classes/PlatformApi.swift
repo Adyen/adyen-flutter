@@ -120,10 +120,10 @@ struct Amount {
 
 /// Generated class from Pigeon that represents data sent in messages.
 struct DropInConfigurationModel {
-  var shopperLocale: Locale? = nil
   var environment: Environment
   var clientKey: String
   var amount: Amount
+  var shopperLocale: String? = nil
   var isAnalyticsEnabled: Bool? = nil
   var showPreselectedStoredPaymentMethod: Bool? = nil
   var skipListWhenSinglePaymentMethod: Bool? = nil
@@ -131,14 +131,10 @@ struct DropInConfigurationModel {
   var additionalDataForDropInService: String? = nil
 
   static func fromList(_ list: [Any?]) -> DropInConfigurationModel? {
-    var shopperLocale: Locale? = nil
-    let shopperLocaleEnumVal: Int? = nilOrValue(list[0])
-    if let shopperLocaleRawValue = shopperLocaleEnumVal {
-      shopperLocale = Locale(rawValue: shopperLocaleRawValue)!
-    }
-    let environment = Environment(rawValue: list[1] as! Int)!
-    let clientKey = list[2] as! String
-    let amount = Amount.fromList(list[3] as! [Any?])!
+    let environment = Environment(rawValue: list[0] as! Int)!
+    let clientKey = list[1] as! String
+    let amount = Amount.fromList(list[2] as! [Any?])!
+    let shopperLocale: String? = nilOrValue(list[3])
     let isAnalyticsEnabled: Bool? = nilOrValue(list[4])
     let showPreselectedStoredPaymentMethod: Bool? = nilOrValue(list[5])
     let skipListWhenSinglePaymentMethod: Bool? = nilOrValue(list[6])
@@ -146,10 +142,10 @@ struct DropInConfigurationModel {
     let additionalDataForDropInService: String? = nilOrValue(list[8])
 
     return DropInConfigurationModel(
-      shopperLocale: shopperLocale,
       environment: environment,
       clientKey: clientKey,
       amount: amount,
+      shopperLocale: shopperLocale,
       isAnalyticsEnabled: isAnalyticsEnabled,
       showPreselectedStoredPaymentMethod: showPreselectedStoredPaymentMethod,
       skipListWhenSinglePaymentMethod: skipListWhenSinglePaymentMethod,
@@ -159,10 +155,10 @@ struct DropInConfigurationModel {
   }
   func toList() -> [Any?] {
     return [
-      shopperLocale?.rawValue,
       environment.rawValue,
       clientKey,
       amount.toList(),
+      shopperLocale,
       isAnalyticsEnabled,
       showPreselectedStoredPaymentMethod,
       skipListWhenSinglePaymentMethod,

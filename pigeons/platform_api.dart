@@ -66,10 +66,10 @@ enum Locale {
 }
 
 class DropInConfigurationModel {
-  Locale? shopperLocale;
   final Environment environment;
   final String clientKey;
   final Amount amount;
+  String? shopperLocale;
   bool? isAnalyticsEnabled;
   bool? showPreselectedStoredPaymentMethod;
   bool? skipListWhenSinglePaymentMethod;

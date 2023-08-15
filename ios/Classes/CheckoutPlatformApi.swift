@@ -71,12 +71,11 @@ class CheckoutPlatformApi : CheckoutPlatformInterface {
     }
     
     private func createAdyenContext(dropInConfiguration: DropInConfigurationModel) -> AdyenContext {
-        let apiContext = try? APIContext(environment: mapToEnvironment(environment: dropInConfiguration.environment), clientKey: dropInConfiguration.clientKey)
+        let apiContext = try! APIContext(environment: mapToEnvironment(environment: dropInConfiguration.environment), clientKey: dropInConfiguration.clientKey)
         let value: Int = Int(dropInConfiguration.amount.value)
         let currencyCode : String = dropInConfiguration.amount.currency ?? ""
         let amount = Adyen.Amount(value: value, currencyCode: currencyCode)
-        let payment = Payment.init(amount: amount, countryCode: getCountryCode(locale: dropInConfiguration.shopperLocale))
-        let adyenContext = AdyenContext(apiContext: apiContext!, payment:payment)
+        let adyenContext = AdyenContext(apiContext: apiContext, payment: nil)
         return adyenContext
     }
     

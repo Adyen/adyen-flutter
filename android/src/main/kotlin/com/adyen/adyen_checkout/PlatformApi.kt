@@ -146,10 +146,10 @@ data class Amount (
 
 /** Generated class from Pigeon that represents data sent in messages. */
 data class DropInConfigurationModel (
-  val shopperLocale: Locale? = null,
   val environment: Environment,
   val clientKey: String,
   val amount: Amount,
+  val shopperLocale: String? = null,
   val isAnalyticsEnabled: Boolean? = null,
   val showPreselectedStoredPaymentMethod: Boolean? = null,
   val skipListWhenSinglePaymentMethod: Boolean? = null,
@@ -160,26 +160,24 @@ data class DropInConfigurationModel (
   companion object {
     @Suppress("UNCHECKED_CAST")
     fun fromList(list: List<Any?>): DropInConfigurationModel {
-      val shopperLocale: Locale? = (list[0] as Int?)?.let {
-        Locale.ofRaw(it)
-      }
-      val environment = Environment.ofRaw(list[1] as Int)!!
-      val clientKey = list[2] as String
-      val amount = Amount.fromList(list[3] as List<Any?>)
+      val environment = Environment.ofRaw(list[0] as Int)!!
+      val clientKey = list[1] as String
+      val amount = Amount.fromList(list[2] as List<Any?>)
+      val shopperLocale = list[3] as String?
       val isAnalyticsEnabled = list[4] as Boolean?
       val showPreselectedStoredPaymentMethod = list[5] as Boolean?
       val skipListWhenSinglePaymentMethod = list[6] as Boolean?
       val isRemovingStoredPaymentMethodsEnabled = list[7] as Boolean?
       val additionalDataForDropInService = list[8] as String?
-      return DropInConfigurationModel(shopperLocale, environment, clientKey, amount, isAnalyticsEnabled, showPreselectedStoredPaymentMethod, skipListWhenSinglePaymentMethod, isRemovingStoredPaymentMethodsEnabled, additionalDataForDropInService)
+      return DropInConfigurationModel(environment, clientKey, amount, shopperLocale, isAnalyticsEnabled, showPreselectedStoredPaymentMethod, skipListWhenSinglePaymentMethod, isRemovingStoredPaymentMethodsEnabled, additionalDataForDropInService)
     }
   }
   fun toList(): List<Any?> {
     return listOf<Any?>(
-      shopperLocale?.raw,
       environment.raw,
       clientKey,
       amount.toList(),
+      shopperLocale,
       isAnalyticsEnabled,
       showPreselectedStoredPaymentMethod,
       skipListWhenSinglePaymentMethod,
