@@ -60,7 +60,7 @@ class CheckoutPlatformApi : CheckoutPlatformInterface {
                     self?.dropInComponent = dropInComponent
                     self?.viewController?.present(dropInComponent.viewController, animated: true)
                 case let .failure(error):
-                    print(error)
+                    completion(.failure(error))
                 }
             }
         }
@@ -81,8 +81,20 @@ class CheckoutPlatformApi : CheckoutPlatformInterface {
     }
     
     private func mapToEnvironment(environment: Environment) -> Adyen.Environment {
-        //TODO map to correct environment
-        return Adyen.Environment.test
+        switch environment {
+        case .test:
+            return Adyen.Environment.test
+        case .europe:
+            return Adyen.Environment.liveEurope
+        case .unitedStates:
+            return Adyen.Environment.liveUnitedStates
+        case .australia:
+            return Adyen.Environment.liveAustralia
+        case .india:
+            return Adyen.Environment.liveIndia
+        case .apse:
+            return Adyen.Environment.liveApse
+        }
     }
     
     private func getCountryCode(locale: Locale?) -> String {
