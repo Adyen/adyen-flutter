@@ -22,7 +22,7 @@ jobs:
       - uses: actions/checkout@v3
 
       - name: Install Flutter
-        run: ./.github/workflows/scripts/setup.sh
+        run: ./.github/workflows/scripts/test.sh
         shell: bash
 
       # Note: This workflow uses the latest stable version of the Dart SDK.
