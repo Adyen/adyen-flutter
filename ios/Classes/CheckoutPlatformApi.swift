@@ -95,11 +95,7 @@ class CheckoutPlatformApi : CheckoutPlatformInterface {
             return Adyen.Environment.liveApse
         }
     }
-    
-    private func getCountryCode(locale: Locale?) -> String {
-        return "NL"
-    }
-    
+
     private func createDropInConfiguration(paymentMethods: PaymentMethods) -> DropInComponent.Configuration {
         let dropInConfiguration = DropInComponent.Configuration()
         dropInConfiguration.actionComponent.threeDS.delegateAuthentication = CheckoutPlatformApi.delegatedAuthenticationConfigurations
