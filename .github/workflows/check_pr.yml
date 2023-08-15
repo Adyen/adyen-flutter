@@ -15,8 +15,16 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+    env:
+      FLUTTER_VERSION: "3.10.6"
+
     steps:
       - uses: actions/checkout@v3
+
+
+      - name: Install Flutter
+        run: $GITHUB_ACTION_PATH/scripts/setup.sh
+        shell: bash
 
       # Note: This workflow uses the latest stable version of the Dart SDK.
       # You can specify other versions if desired, see documentation here:
