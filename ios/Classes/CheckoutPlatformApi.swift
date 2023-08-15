@@ -78,9 +78,6 @@ class CheckoutPlatformApi : CheckoutPlatformInterface {
         let payment = Payment.init(amount: amount, countryCode: getCountryCode(locale: dropInConfiguration.shopperLocale))
         let adyenContext = AdyenContext(apiContext: apiContext!, payment:payment)
         return adyenContext
-
-    func getReturnUrl() -> String {
-        return "";
     }
     
     private func mapToEnvironment(environment: Environment) -> Adyen.Environment {
