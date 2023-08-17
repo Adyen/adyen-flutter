@@ -71,7 +71,12 @@ class _MyAppState extends State<MyApp> {
                 onPressed: () {
                   startDropInSessions(context);
                 },
-                child: const Text("DropIn sessions"))
+                child: const Text("DropIn sessions")),
+            TextButton(
+                onPressed: () {
+                  startDropInAdvancedFlow(context);
+                },
+                child: const Text("DropIn advanced flow"))
           ],
         ),
       ),
@@ -92,6 +97,32 @@ class _MyAppState extends State<MyApp> {
         .startDropInSessionsPayment(sessionModel, dropInConfiguration);
 
     _dialogBuilder(context, sessionDropInResultModel);
+  }
+
+  Future<void> startDropInAdvancedFlow(BuildContext context) async {
+    final paymentMethodsResponse =
+        await _adyenSessionRepository.fetchPaymentMethods();
+    DropInConfigurationModel dropInConfiguration = DropInConfigurationModel(
+      environment: Environment.test,
+      clientKey: Config.clientKey,
+      amount: Config.amount,
+    );
+
+    final paymentComponentJson =
+        await _adyenCheckout.startDropInAdvancedFlowPayment(
+      paymentMethodsResponse,
+      dropInConfiguration,
+    );
+
+    Map<String, dynamic> paymentsResponse  =
+        await _adyenSessionRepository.postPayment(paymentComponentJson);
+    // if (paymentsResponse.containsKey("ACTION")) {
+    //     _adyenCheckout.onPaymentsResult(paymentsResponse.toString());
+    // }
+    _adyenCheckout.onPaymentsResult(paymentsResponse);
+
+
+    print("YAY");
   }
 
   _dialogBuilder(

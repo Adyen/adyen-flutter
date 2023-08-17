@@ -13,12 +13,24 @@ class AdyenCheckoutApi implements AdyenCheckoutInterface {
   Future<void> startPayment(
     SessionModel sessionModel,
     DropInConfigurationModel dropInConfiguration,
-  ) {
+  ) async {
     return checkoutApi.startPayment(sessionModel, dropInConfiguration);
   }
 
   @override
-  Future<String> getReturnUrl() {
+  Future<void> startDropInAdvancedFlowPayment(String paymentMethodsResponse,
+      DropInConfigurationModel dropInConfiguration) async {
+    return checkoutApi.startPaymentDropInAdvancedFlow(
+        paymentMethodsResponse, dropInConfiguration);
+  }
+
+  @override
+  Future<String> getReturnUrl() async {
     return checkoutApi.getReturnUrl();
+  }
+
+  @override
+  Future<void> onPaymentsResult(Map<String, Object?> paymentsResult) {
+    return checkoutApi.onPaymentsResult(paymentsResult);
   }
 }

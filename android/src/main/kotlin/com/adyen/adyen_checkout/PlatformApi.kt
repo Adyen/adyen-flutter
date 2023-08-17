@@ -292,7 +292,22 @@ private object CheckoutPlatformInterfaceCodec : StandardMessageCodec() {
       }
       130.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
+          OrderResponseModel.fromList(it)
+        }
+      }
+      131.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          SessionDropInResultModel.fromList(it)
+        }
+      }
+      132.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
           SessionModel.fromList(it)
+        }
+      }
+      133.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          SessionPaymentResultModel.fromList(it)
         }
       }
       else -> super.readValueOfType(type, buffer)
@@ -308,8 +323,20 @@ private object CheckoutPlatformInterfaceCodec : StandardMessageCodec() {
         stream.write(129)
         writeValue(stream, value.toList())
       }
-      is SessionModel -> {
+      is OrderResponseModel -> {
         stream.write(130)
+        writeValue(stream, value.toList())
+      }
+      is SessionDropInResultModel -> {
+        stream.write(131)
+        writeValue(stream, value.toList())
+      }
+      is SessionModel -> {
+        stream.write(132)
+        writeValue(stream, value.toList())
+      }
+      is SessionPaymentResultModel -> {
+        stream.write(133)
         writeValue(stream, value.toList())
       }
       else -> super.writeValue(stream, value)
@@ -322,6 +349,8 @@ interface CheckoutPlatformInterface {
   fun getPlatformVersion(callback: (Result<String>) -> Unit)
   fun startPayment(sessionModel: SessionModel, dropInConfiguration: DropInConfigurationModel, callback: (Result<Unit>) -> Unit)
   fun getReturnUrl(): String
+  fun startPaymentDropInAdvancedFlow(paymentMethodsResponse: String, dropInConfiguration: DropInConfigurationModel, callback: (Result<Unit>) -> Unit)
+  fun onPaymentsResult(paymentsResult: Map<String, Any?>, callback: (Result<Unit>) -> Unit)
 
   companion object {
     /** The codec used by CheckoutPlatformInterface. */
@@ -380,6 +409,45 @@ interface CheckoutPlatformInterface {
               wrapped = wrapError(exception)
             }
             reply.reply(wrapped)
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.startPaymentDropInAdvancedFlow", codec)
+        if (api != null) {
+          channel.setMessageHandler { message, reply ->
+            val args = message as List<Any?>
+            val paymentMethodsResponseArg = args[0] as String
+            val dropInConfigurationArg = args[1] as DropInConfigurationModel
+            api.startPaymentDropInAdvancedFlow(paymentMethodsResponseArg, dropInConfigurationArg) { result: Result<Unit> ->
+              val error = result.exceptionOrNull()
+              if (error != null) {
+                reply.reply(wrapError(error))
+              } else {
+                reply.reply(wrapResult(null))
+              }
+            }
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.onPaymentsResult", codec)
+        if (api != null) {
+          channel.setMessageHandler { message, reply ->
+            val args = message as List<Any?>
+            val paymentsResultArg = args[0] as Map<String, Any?>
+            api.onPaymentsResult(paymentsResultArg) { result: Result<Unit> ->
+              val error = result.exceptionOrNull()
+              if (error != null) {
+                reply.reply(wrapError(error))
+              } else {
+                reply.reply(wrapResult(null))
+              }
+            }
           }
         } else {
           channel.setMessageHandler(null)
@@ -450,6 +518,12 @@ class CheckoutResultFlutterInterface(private val binaryMessenger: BinaryMessenge
   fun onSessionDropInResult(sessionDropInResultArg: SessionDropInResultModel, callback: () -> Unit) {
     val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.adyen_checkout.CheckoutResultFlutterInterface.onSessionDropInResult", codec)
     channel.send(listOf(sessionDropInResultArg)) {
+      callback()
+    }
+  }
+  fun onPaymentComponentResult(paymentComponentJsonArg: String, callback: () -> Unit) {
+    val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.adyen_checkout.CheckoutResultFlutterInterface.onPaymentComponentResult", codec)
+    channel.send(listOf(paymentComponentJsonArg)) {
       callback()
     }
   }

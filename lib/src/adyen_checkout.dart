@@ -34,8 +34,31 @@ class AdyenCheckout {
     return sessionDropInResultModel;
   }
 
+  Future<String> startDropInAdvancedFlowPayment(
+    String paymentMethodsResponse,
+    DropInConfigurationModel dropInConfiguration,
+  ) async {
+    _adyenCheckoutResultApi.dropInAdvancedFlowPaymentComponentStream =
+        StreamController<String>();
+
+    AdyenCheckoutInterface.instance.startDropInAdvancedFlowPayment(
+      paymentMethodsResponse,
+      dropInConfiguration,
+    );
+
+    final result = await _adyenCheckoutResultApi
+        .dropInAdvancedFlowPaymentComponentStream.stream.first;
+    await _adyenCheckoutResultApi.dropInAdvancedFlowPaymentComponentStream
+        .close();
+    return result;
+  }
+
   Future<String> getReturnUrl() {
     return AdyenCheckoutInterface.instance.getReturnUrl();
+  }
+
+  Future<void> onPaymentsResult(Map<String, Object?> paymentsResult) {
+    return AdyenCheckoutInterface.instance.onPaymentsResult(paymentsResult);
   }
 
   void _setupCheckoutResultApi() =>
