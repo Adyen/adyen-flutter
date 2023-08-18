@@ -4,7 +4,8 @@ import 'package:adyen_checkout/platform_api.g.dart';
 
 class AdyenCheckoutResultApi implements CheckoutResultFlutterInterface {
   var sessionDropInResultStream = StreamController<SessionDropInResultModel>();
-  var dropInAdvancedFlowPaymentComponentStream = StreamController<String>();
+  var dropInAdvancedFlowResultStream =
+      StreamController<SessionDropInResultModel>();
 
   @override
   void onSessionDropInResult(SessionDropInResultModel sessionDropInResult) {
@@ -12,7 +13,8 @@ class AdyenCheckoutResultApi implements CheckoutResultFlutterInterface {
   }
 
   @override
-  void onPaymentComponentResult(String paymentComponentJson) {
-    dropInAdvancedFlowPaymentComponentStream.sink.add(paymentComponentJson);
+  void onDropInAdvancedFlowResult(
+      SessionDropInResultModel dropInAdvancedFlowResult) {
+    dropInAdvancedFlowResultStream.sink.add(dropInAdvancedFlowResult);
   }
 }

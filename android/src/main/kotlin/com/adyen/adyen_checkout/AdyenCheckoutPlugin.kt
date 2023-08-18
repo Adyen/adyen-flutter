@@ -68,9 +68,10 @@ class AdyenCheckoutPlugin : FlutterPlugin, ActivityAware {
                 Lifecycle.Event.ON_CREATE -> {
                     checkoutPlatformApi?.dropInSessionLauncher =
                         DropIn.registerForDropInResult(fragmentActivity, sessionDropInCallback())
-                    checkoutPlatformApi?.dropInAdvancedFlowLauncher = DropIn.registerForDropInResult(
-                        fragmentActivity, dropInAdvancedFlowCallback()
-                    )
+                    checkoutPlatformApi?.dropInAdvancedFlowLauncher =
+                        DropIn.registerForDropInResult(
+                            fragmentActivity, dropInAdvancedFlowCallback()
+                        )
                 }
 
                 else -> {}
@@ -106,16 +107,26 @@ class AdyenCheckoutPlugin : FlutterPlugin, ActivityAware {
         checkoutResultFlutterInterface?.onSessionDropInResult(mappedResult) {}
     }
 
-    private fun dropInAdvancedFlowCallback() = DropInCallback { dropInResult ->
-        if (dropInResult == null) {
+    private fun dropInAdvancedFlowCallback() = DropInCallback { dropInAdvancedFlowResult ->
+        if (dropInAdvancedFlowResult == null) {
             return@DropInCallback
         }
 
-        when (dropInResult) {
-            is DropInResult.CancelledByUser -> Log.d("CheckoutTest", "DropIn cancelled")
-            is DropInResult.Error -> Log.d("CheckoutTest", "DropIn error")
-            is DropInResult.Finished -> Log.d("CheckoutTest", "DropIn finished")
+        val mappedResult = when (dropInAdvancedFlowResult) {
+            is DropInResult.CancelledByUser -> SessionDropInResultModel(
+                SessionDropInResultEnum.CANCELLEDBYUSER
+            )
+
+            is DropInResult.Error -> SessionDropInResultModel(
+                SessionDropInResultEnum.ERROR, reason = dropInAdvancedFlowResult.reason
+            )
+
+            is DropInResult.Finished -> SessionDropInResultModel(
+                SessionDropInResultEnum.FINISHED
+            )
         }
+
+        checkoutResultFlutterInterface?.onDropInAdvancedFlowResult(mappedResult) {}
     }
 
     private fun teardown() {

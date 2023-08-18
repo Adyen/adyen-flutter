@@ -23,14 +23,21 @@ class MockAdyenCheckoutPlatform
   }
 
   @override
-  Future<void> startDropInAdvancedFlowPayment(
+  Future<String> startDropInAdvancedFlowPayment(
     String paymentMethodsResponse,
     DropInConfigurationModel dropInConfiguration,
   ) =>
-      Future.value(null);
+      Future.value("Result");
 
   @override
-  Future<void> onPaymentsResult(Map<String, Object?>  paymentsResult) => Future.value(null);
+  Future<String> onPaymentsResult(Map<String, Object?> paymentsResult) =>
+      Future.value("Result");
+
+  @override
+  Future<void> onPaymentsDetailsResult(
+      Map<String, Object?> paymentsDetailsResult) {
+    return Future.value(null);
+  }
 }
 
 void main() {

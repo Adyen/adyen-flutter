@@ -130,6 +130,49 @@ enum SessionDropInResultEnum {
   finished,
 }
 
+// class DropInAdvancedFlowResultModel {
+//   final String? result;
+//   final ActionModel? action;
+//   final ErrorModel? error;
+//
+//   DropInAdvancedFlowResultModel(
+//     this.result,
+//     this.action,
+//     this.error,
+//   );
+// }
+//
+// enum DropInServiceResultEnum {
+//   finished,
+//   action,
+//   update,
+//   error,
+// }
+//
+// class ActionModel {
+//   final String? type;
+//   final String? paymentData;
+//   final String? paymentMethodType;
+//
+//   ActionModel(
+//     this.type,
+//     this.paymentData,
+//     this.paymentMethodType,
+//   );
+// }
+//
+// class ErrorModel {
+//   final String? errorMessage;
+//   final String? reason;
+//   final bool dismissDropIn;
+//
+//   ErrorModel(
+//     this.errorMessage,
+//     this.reason,
+//     this.dismissDropIn,
+//   );
+// }
+
 @HostApi()
 abstract class CheckoutPlatformInterface {
   @async
@@ -144,18 +187,22 @@ abstract class CheckoutPlatformInterface {
   String getReturnUrl();
 
   @async
-  void startPaymentDropInAdvancedFlow(
-      String paymentMethodsResponse,
-      DropInConfigurationModel dropInConfiguration,
-      );
+  String startPaymentDropInAdvancedFlow(
+    String paymentMethodsResponse,
+    DropInConfigurationModel dropInConfiguration,
+  );
 
   @async
-  void onPaymentsResult(Map<String, Object?> paymentsResult);
+  String? onPaymentsResult(Map<String, Object?> paymentsResult);
+
+  @async
+  void onPaymentsDetailsResult(Map<String, Object?> paymentsDetailsResult);
 }
 
 @FlutterApi()
 abstract class CheckoutResultFlutterInterface {
   void onSessionDropInResult(SessionDropInResultModel sessionDropInResult);
 
-  void onPaymentComponentResult(String paymentComponentJson);
+  void onDropInAdvancedFlowResult(
+      SessionDropInResultModel dropInAdvancedFlowResult);
 }

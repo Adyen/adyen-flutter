@@ -22,12 +22,15 @@ abstract class AdyenCheckoutInterface extends PlatformInterface {
     DropInConfigurationModel dropInConfiguration,
   );
 
-  Future<void> startDropInAdvancedFlowPayment(
+  Future<String> startDropInAdvancedFlowPayment(
     String paymentMethodsResponse,
     DropInConfigurationModel dropInConfiguration,
   );
 
   Future<String> getReturnUrl();
 
-  Future<void> onPaymentsResult(Map<String, Object?> paymentsResult);
+  Future<String?> onPaymentsResult(Map<String, Object?> paymentsResult);
+
+  Future<void> onPaymentsDetailsResult(Map<String, Object?> paymentsDetailsResult);
+
 }

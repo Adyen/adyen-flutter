@@ -114,13 +114,13 @@ class _MyAppState extends State<MyApp> {
       dropInConfiguration,
     );
 
-    Map<String, dynamic> paymentsResponse  =
-        await _adyenSessionRepository.postPayment(paymentComponentJson);
-    // if (paymentsResponse.containsKey("ACTION")) {
-    //     _adyenCheckout.onPaymentsResult(paymentsResponse.toString());
-    // }
-    _adyenCheckout.onPaymentsResult(paymentsResponse);
-
+    Map<String, dynamic> paymentsResponse =
+        await _adyenSessionRepository.postPayments(paymentComponentJson);
+    final additionalDetails =
+        await _adyenCheckout.onPaymentsResult(paymentsResponse);
+    Map<String, dynamic> paymentsDetailsResponse =
+        await _adyenSessionRepository.postPaymentsDetails(additionalDetails);
+    var finalResult = await _adyenCheckout.onPaymentsDetailsResult(paymentsDetailsResponse);
 
     print("YAY");
   }

@@ -332,8 +332,9 @@ protocol CheckoutPlatformInterface {
   func getPlatformVersion(completion: @escaping (Result<String, Error>) -> Void)
   func startPayment(sessionModel: SessionModel, dropInConfiguration: DropInConfigurationModel, completion: @escaping (Result<Void, Error>) -> Void)
   func getReturnUrl() throws -> String
-  func startPaymentDropInAdvancedFlow(paymentMethodsResponse: String, dropInConfiguration: DropInConfigurationModel, completion: @escaping (Result<Void, Error>) -> Void)
-  func onPaymentsResult(paymentsResult: [String: Any?], completion: @escaping (Result<Void, Error>) -> Void)
+  func startPaymentDropInAdvancedFlow(paymentMethodsResponse: String, dropInConfiguration: DropInConfigurationModel, completion: @escaping (Result<String, Error>) -> Void)
+  func onPaymentsResult(paymentsResult: [String: Any?], completion: @escaping (Result<String?, Error>) -> Void)
+  func onPaymentsDetailsResult(paymentsDetailsResult: [String: Any?], completion: @escaping (Result<Void, Error>) -> Void)
 }
 
 /// Generated setup class from Pigeon to handle messages through the `binaryMessenger`.
@@ -396,8 +397,8 @@ class CheckoutPlatformInterfaceSetup {
         let dropInConfigurationArg = args[1] as! DropInConfigurationModel
         api.startPaymentDropInAdvancedFlow(paymentMethodsResponse: paymentMethodsResponseArg, dropInConfiguration: dropInConfigurationArg) { result in
           switch result {
-            case .success:
-              reply(wrapResult(nil))
+            case .success(let res):
+              reply(wrapResult(res))
             case .failure(let error):
               reply(wrapError(error))
           }
@@ -413,6 +414,23 @@ class CheckoutPlatformInterfaceSetup {
         let paymentsResultArg = args[0] as! [String: Any?]
         api.onPaymentsResult(paymentsResult: paymentsResultArg) { result in
           switch result {
+            case .success(let res):
+              reply(wrapResult(res))
+            case .failure(let error):
+              reply(wrapError(error))
+          }
+        }
+      }
+    } else {
+      onPaymentsResultChannel.setMessageHandler(nil)
+    }
+    let onPaymentsDetailsResultChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.onPaymentsDetailsResult", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      onPaymentsDetailsResultChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let paymentsDetailsResultArg = args[0] as! [String: Any?]
+        api.onPaymentsDetailsResult(paymentsDetailsResult: paymentsDetailsResultArg) { result in
+          switch result {
             case .success:
               reply(wrapResult(nil))
             case .failure(let error):
@@ -421,7 +439,7 @@ class CheckoutPlatformInterfaceSetup {
         }
       }
     } else {
-      onPaymentsResultChannel.setMessageHandler(nil)
+      onPaymentsDetailsResultChannel.setMessageHandler(nil)
     }
   }
 }
@@ -491,9 +509,9 @@ class CheckoutResultFlutterInterface {
       completion()
     }
   }
-  func onPaymentComponentResult(paymentComponentJson paymentComponentJsonArg: String, completion: @escaping () -> Void) {
-    let channel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.CheckoutResultFlutterInterface.onPaymentComponentResult", binaryMessenger: binaryMessenger, codec: codec)
-    channel.sendMessage([paymentComponentJsonArg] as [Any?]) { _ in
+  func onDropInAdvancedFlowResult(dropInAdvancedFlowResult dropInAdvancedFlowResultArg: SessionDropInResultModel, completion: @escaping () -> Void) {
+    let channel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.CheckoutResultFlutterInterface.onDropInAdvancedFlowResult", binaryMessenger: binaryMessenger, codec: codec)
+    channel.sendMessage([dropInAdvancedFlowResultArg] as [Any?]) { _ in
       completion()
     }
   }

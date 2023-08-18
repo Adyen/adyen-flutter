@@ -1,25 +1,4 @@
-import 'dart:convert';
-
 import 'package:adyen_checkout_example/network/models/amount_network_model.dart';
-
-class PaymentsRequestNetworkModel {
-  final Map<String, dynamic> paymentComponentData;
-  final PaymentsRequestData requestData;
-
-  PaymentsRequestNetworkModel({
-    required this.paymentComponentData,
-    required this.requestData,
-  });
-
-  String toRawJson() => json.encode(toJson());
-
-  Map<String, dynamic> toJson() {
-    return {
-      'paymentComponentData': paymentComponentData,
-      'requestData': requestData.toJson(),
-    };
-  }
-}
 
 class PaymentsRequestData {
   final String merchantAccount;

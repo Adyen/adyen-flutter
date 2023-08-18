@@ -2,31 +2,33 @@ package com.adyen.adyen_checkout.dropInAdvancedFlow
 
 
 import android.content.Intent
+import android.os.IBinder
 import android.util.Log
-import androidx.annotation.CallSuper
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ServiceLifecycleDispatcher
+import androidx.lifecycle.lifecycleScope
 import com.adyen.checkout.components.core.ActionComponentData
 import com.adyen.checkout.components.core.PaymentComponentData
 import com.adyen.checkout.components.core.PaymentComponentState
-import com.adyen.checkout.components.core.action.Action
 import com.adyen.checkout.dropin.DropInService
 import com.adyen.checkout.dropin.DropInServiceResult
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.json.JSONObject
 
-//We should discuss if we can use LifecycleService
+//We should discuss if we can use LifecycleService instead of Service
 class AdvancedFlowDropInService : DropInService(), LifecycleOwner {
     private val dispatcher = ServiceLifecycleDispatcher(this)
-    private var dropInPaymentObserver: Observer<JSONObject>? = null
+    private var dropInPaymentsObserver: Observer<JSONObject>? = null
+    private var dropInAdditionalDetailsObserver: Observer<JSONObject>? = null
+    private val dropInServiceResultHandler = DropInServiceResultHandler(this.lifecycleScope)
 
     override fun onSubmit(state: PaymentComponentState<*>) {
         setAdvancedFlowDropInServiceObserver()
 
-        launch(Dispatchers.IO) {
+        lifecycleScope.launch(Dispatchers.IO) {
             try {
                 val paymentComponentJson = PaymentComponentData.SERIALIZER.serialize(state.data)
                 DropInServiceResultMessenger.sendResult(paymentComponentJson)
@@ -39,11 +41,13 @@ class AdvancedFlowDropInService : DropInService(), LifecycleOwner {
     }
 
     override fun onAdditionalDetails(actionComponentData: ActionComponentData) {
-        launch(Dispatchers.IO) {
+        setAdvancedFlowDropInAdditionalDataObserver()
+
+        lifecycleScope.launch(Dispatchers.IO) {
             try {
-                val actionComponentJson =
-                    ActionComponentData.SERIALIZER.serialize(actionComponentData)
-                DropInServiceResultMessenger.sendResult(actionComponentJson)
+                val actionComponentJson = ActionComponentData.SERIALIZER.serialize(actionComponentData)
+                DropInAdditionalDetailsResultMessenger.sendResult(actionComponentJson)
+
             } catch (exception: Exception) {
                 Log.e("AdyenCheckoutTest", "Exception occurred: $exception")
                 sendResult(DropInServiceResult.Error())
@@ -51,42 +55,51 @@ class AdvancedFlowDropInService : DropInService(), LifecycleOwner {
         }
     }
 
-
     private fun setAdvancedFlowDropInServiceObserver() {
-        dropInPaymentObserver = Observer { message ->
-            val resultCode = Action.SERIALIZER.deserialize(
-                JSONObject(message.get("action").toString())
-            )
-            sendResult(DropInServiceResult.Action(resultCode))
+        dropInPaymentsObserver = Observer { message ->
+            val result = dropInServiceResultHandler.handleResponse(message) ?: return@Observer
+            sendResult(result)
             DropInPaymentResultMessenger.instance().removeObservers(this)
         }
 
-        dropInPaymentObserver?.let {
+        dropInPaymentsObserver?.let {
             DropInPaymentResultMessenger.instance().observe(this, it)
         }
     }
 
-    @CallSuper
+    private fun setAdvancedFlowDropInAdditionalDataObserver() {
+        dropInAdditionalDetailsObserver = Observer { message ->
+            val result = dropInServiceResultHandler.handleResponse(message) ?: return@Observer
+            sendResult(result)
+            DropInPaymentResultMessenger.instance().removeObservers(this)
+        }
+
+        dropInPaymentsObserver?.let {
+            DropInAdditionalDetailsResultMessenger.instance().observe(this, it)
+        }
+    }
+
+    override fun onBind(intent: Intent?): IBinder {
+        dispatcher.onServicePreSuperOnBind()
+        return super.onBind(intent)
+    }
+
     override fun onCreate() {
         dispatcher.onServicePreSuperOnCreate()
         super.onCreate()
     }
 
     @Deprecated("Deprecated in Java")
-    @Suppress("DEPRECATION")
-    @CallSuper
     override fun onStart(intent: Intent?, startId: Int) {
         dispatcher.onServicePreSuperOnStart()
         super.onStart(intent, startId)
     }
 
-
-    @CallSuper
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        dispatcher.onServicePreSuperOnStart()
         return super.onStartCommand(intent, flags, startId)
     }
 
-    @CallSuper
     override fun onDestroy() {
         dispatcher.onServicePreSuperOnDestroy()
         super.onDestroy()

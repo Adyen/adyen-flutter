@@ -349,8 +349,9 @@ interface CheckoutPlatformInterface {
   fun getPlatformVersion(callback: (Result<String>) -> Unit)
   fun startPayment(sessionModel: SessionModel, dropInConfiguration: DropInConfigurationModel, callback: (Result<Unit>) -> Unit)
   fun getReturnUrl(): String
-  fun startPaymentDropInAdvancedFlow(paymentMethodsResponse: String, dropInConfiguration: DropInConfigurationModel, callback: (Result<Unit>) -> Unit)
-  fun onPaymentsResult(paymentsResult: Map<String, Any?>, callback: (Result<Unit>) -> Unit)
+  fun startPaymentDropInAdvancedFlow(paymentMethodsResponse: String, dropInConfiguration: DropInConfigurationModel, callback: (Result<String>) -> Unit)
+  fun onPaymentsResult(paymentsResult: Map<String, Any?>, callback: (Result<String?>) -> Unit)
+  fun onPaymentsDetailsResult(paymentsDetailsResult: Map<String, Any?>, callback: (Result<Unit>) -> Unit)
 
   companion object {
     /** The codec used by CheckoutPlatformInterface. */
@@ -421,12 +422,13 @@ interface CheckoutPlatformInterface {
             val args = message as List<Any?>
             val paymentMethodsResponseArg = args[0] as String
             val dropInConfigurationArg = args[1] as DropInConfigurationModel
-            api.startPaymentDropInAdvancedFlow(paymentMethodsResponseArg, dropInConfigurationArg) { result: Result<Unit> ->
+            api.startPaymentDropInAdvancedFlow(paymentMethodsResponseArg, dropInConfigurationArg) { result: Result<String> ->
               val error = result.exceptionOrNull()
               if (error != null) {
                 reply.reply(wrapError(error))
               } else {
-                reply.reply(wrapResult(null))
+                val data = result.getOrNull()
+                reply.reply(wrapResult(data))
               }
             }
           }
@@ -440,7 +442,27 @@ interface CheckoutPlatformInterface {
           channel.setMessageHandler { message, reply ->
             val args = message as List<Any?>
             val paymentsResultArg = args[0] as Map<String, Any?>
-            api.onPaymentsResult(paymentsResultArg) { result: Result<Unit> ->
+            api.onPaymentsResult(paymentsResultArg) { result: Result<String?> ->
+              val error = result.exceptionOrNull()
+              if (error != null) {
+                reply.reply(wrapError(error))
+              } else {
+                val data = result.getOrNull()
+                reply.reply(wrapResult(data))
+              }
+            }
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.onPaymentsDetailsResult", codec)
+        if (api != null) {
+          channel.setMessageHandler { message, reply ->
+            val args = message as List<Any?>
+            val paymentsDetailsResultArg = args[0] as Map<String, Any?>
+            api.onPaymentsDetailsResult(paymentsDetailsResultArg) { result: Result<Unit> ->
               val error = result.exceptionOrNull()
               if (error != null) {
                 reply.reply(wrapError(error))
@@ -521,9 +543,9 @@ class CheckoutResultFlutterInterface(private val binaryMessenger: BinaryMessenge
       callback()
     }
   }
-  fun onPaymentComponentResult(paymentComponentJsonArg: String, callback: () -> Unit) {
-    val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.adyen_checkout.CheckoutResultFlutterInterface.onPaymentComponentResult", codec)
-    channel.send(listOf(paymentComponentJsonArg)) {
+  fun onDropInAdvancedFlowResult(dropInAdvancedFlowResultArg: SessionDropInResultModel, callback: () -> Unit) {
+    val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.adyen_checkout.CheckoutResultFlutterInterface.onDropInAdvancedFlowResult", codec)
+    channel.send(listOf(dropInAdvancedFlowResultArg)) {
       callback()
     }
   }

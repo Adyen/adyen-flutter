@@ -38,27 +38,37 @@ class AdyenCheckout {
     String paymentMethodsResponse,
     DropInConfigurationModel dropInConfiguration,
   ) async {
-    _adyenCheckoutResultApi.dropInAdvancedFlowPaymentComponentStream =
-        StreamController<String>();
-
-    AdyenCheckoutInterface.instance.startDropInAdvancedFlowPayment(
+    final paymentComponent =
+        await AdyenCheckoutInterface.instance.startDropInAdvancedFlowPayment(
       paymentMethodsResponse,
       dropInConfiguration,
     );
 
-    final result = await _adyenCheckoutResultApi
-        .dropInAdvancedFlowPaymentComponentStream.stream.first;
-    await _adyenCheckoutResultApi.dropInAdvancedFlowPaymentComponentStream
-        .close();
-    return result;
+    return paymentComponent;
   }
 
-  Future<String> getReturnUrl() {
+  Future<String> getReturnUrl() async {
     return AdyenCheckoutInterface.instance.getReturnUrl();
   }
 
-  Future<void> onPaymentsResult(Map<String, Object?> paymentsResult) {
-    return AdyenCheckoutInterface.instance.onPaymentsResult(paymentsResult);
+  Future<String> onPaymentsResult(Map<String, Object?> paymentsResult) async {
+    final result =
+        await AdyenCheckoutInterface.instance.onPaymentsResult(paymentsResult);
+
+    return result ?? "ERROR";
+  }
+
+  Future<void> onPaymentsDetailsResult(
+      Map<String, Object?> paymentsDetailsResult) async {
+    _adyenCheckoutResultApi.dropInAdvancedFlowResultStream =
+        StreamController<SessionDropInResultModel>();
+
+    AdyenCheckoutInterface.instance
+        .onPaymentsDetailsResult(paymentsDetailsResult);
+
+    final sessionDropInResultModel =
+    await _adyenCheckoutResultApi.sessionDropInResultStream.stream.first;
+    await _adyenCheckoutResultApi.sessionDropInResultStream.close();
   }
 
   void _setupCheckoutResultApi() =>

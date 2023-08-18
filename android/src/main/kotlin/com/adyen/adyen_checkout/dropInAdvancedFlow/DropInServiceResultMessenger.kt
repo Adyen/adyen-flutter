@@ -13,13 +13,25 @@ class DropInServiceResultMessenger : LiveData<JSONObject>() {
     }
 }
 
-class DropInPaymentResultMessenger: LiveData<JSONObject>() {
+class DropInPaymentResultMessenger : LiveData<JSONObject>() {
     companion object {
         private val dropInPaymentResultMessenger = DropInPaymentResultMessenger()
 
         fun instance() = dropInPaymentResultMessenger
         fun sendResult(value: JSONObject) {
             dropInPaymentResultMessenger.postValue(value)
+        }
+    }
+}
+
+class DropInAdditionalDetailsResultMessenger : LiveData<JSONObject>() {
+    companion object {
+        private val dropInAdditionalDetailsResultMessenger =
+            DropInAdditionalDetailsResultMessenger()
+
+        fun instance() = dropInAdditionalDetailsResultMessenger
+        fun sendResult(value: JSONObject) {
+            dropInAdditionalDetailsResultMessenger.postValue(value)
         }
     }
 }

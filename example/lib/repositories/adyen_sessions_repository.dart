@@ -51,7 +51,7 @@ class AdyenSessionsRepository {
         merchantAccount: Config.merchantAccount));
   }
 
-  Future<Map<String, dynamic>> postPayment(String paymentComponentJson) async {
+  Future<Map<String, dynamic>> postPayments(String paymentComponentJson) async {
     String returnUrl = await _determineExampleReturnUrl();
     PaymentsRequestData paymentsRequestData = PaymentsRequestData(
       merchantAccount: Config.merchantAccount,
@@ -66,7 +66,11 @@ class AdyenSessionsRepository {
     Map<String, dynamic> mergedJson = <String, dynamic>{};
     mergedJson.addAll(json.decode(paymentComponentJson));
     mergedJson.addAll(paymentsRequestData.toJson());
-    return await _service.postPayment(mergedJson);
+    return await _service.postPayments(mergedJson);
+  }
+
+  Future<Map<String, dynamic>> postPaymentsDetails(String additionalDetails) async {
+    return await _service.postPaymentsDetails(json.decode(additionalDetails));
   }
 
   Future<String> _determineExampleReturnUrl() async {

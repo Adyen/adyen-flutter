@@ -406,7 +406,7 @@ class CheckoutPlatformInterface {
     }
   }
 
-  Future<void> startPaymentDropInAdvancedFlow(String arg_paymentMethodsResponse, DropInConfigurationModel arg_dropInConfiguration) async {
+  Future<String> startPaymentDropInAdvancedFlow(String arg_paymentMethodsResponse, DropInConfigurationModel arg_dropInConfiguration) async {
     final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
         'dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.startPaymentDropInAdvancedFlow', codec,
         binaryMessenger: _binaryMessenger);
@@ -423,17 +423,44 @@ class CheckoutPlatformInterface {
         message: replyList[1] as String?,
         details: replyList[2],
       );
+    } else if (replyList[0] == null) {
+      throw PlatformException(
+        code: 'null-error',
+        message: 'Host platform returned null value for non-null return value.',
+      );
     } else {
-      return;
+      return (replyList[0] as String?)!;
     }
   }
 
-  Future<void> onPaymentsResult(Map<String?, Object?> arg_paymentsResult) async {
+  Future<String?> onPaymentsResult(Map<String?, Object?> arg_paymentsResult) async {
     final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
         'dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.onPaymentsResult', codec,
         binaryMessenger: _binaryMessenger);
     final List<Object?>? replyList =
         await channel.send(<Object?>[arg_paymentsResult]) as List<Object?>?;
+    if (replyList == null) {
+      throw PlatformException(
+        code: 'channel-error',
+        message: 'Unable to establish connection on channel.',
+      );
+    } else if (replyList.length > 1) {
+      throw PlatformException(
+        code: replyList[0]! as String,
+        message: replyList[1] as String?,
+        details: replyList[2],
+      );
+    } else {
+      return (replyList[0] as String?);
+    }
+  }
+
+  Future<void> onPaymentsDetailsResult(Map<String?, Object?> arg_paymentsDetailsResult) async {
+    final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
+        'dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.onPaymentsDetailsResult', codec,
+        binaryMessenger: _binaryMessenger);
+    final List<Object?>? replyList =
+        await channel.send(<Object?>[arg_paymentsDetailsResult]) as List<Object?>?;
     if (replyList == null) {
       throw PlatformException(
         code: 'channel-error',
@@ -494,7 +521,7 @@ abstract class CheckoutResultFlutterInterface {
 
   void onSessionDropInResult(SessionDropInResultModel sessionDropInResult);
 
-  void onPaymentComponentResult(String paymentComponentJson);
+  void onDropInAdvancedFlowResult(SessionDropInResultModel dropInAdvancedFlowResult);
 
   static void setup(CheckoutResultFlutterInterface? api, {BinaryMessenger? binaryMessenger}) {
     {
@@ -518,19 +545,19 @@ abstract class CheckoutResultFlutterInterface {
     }
     {
       final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
-          'dev.flutter.pigeon.adyen_checkout.CheckoutResultFlutterInterface.onPaymentComponentResult', codec,
+          'dev.flutter.pigeon.adyen_checkout.CheckoutResultFlutterInterface.onDropInAdvancedFlowResult', codec,
           binaryMessenger: binaryMessenger);
       if (api == null) {
         channel.setMessageHandler(null);
       } else {
         channel.setMessageHandler((Object? message) async {
           assert(message != null,
-          'Argument for dev.flutter.pigeon.adyen_checkout.CheckoutResultFlutterInterface.onPaymentComponentResult was null.');
+          'Argument for dev.flutter.pigeon.adyen_checkout.CheckoutResultFlutterInterface.onDropInAdvancedFlowResult was null.');
           final List<Object?> args = (message as List<Object?>?)!;
-          final String? arg_paymentComponentJson = (args[0] as String?);
-          assert(arg_paymentComponentJson != null,
-              'Argument for dev.flutter.pigeon.adyen_checkout.CheckoutResultFlutterInterface.onPaymentComponentResult was null, expected non-null String.');
-          api.onPaymentComponentResult(arg_paymentComponentJson!);
+          final SessionDropInResultModel? arg_dropInAdvancedFlowResult = (args[0] as SessionDropInResultModel?);
+          assert(arg_dropInAdvancedFlowResult != null,
+              'Argument for dev.flutter.pigeon.adyen_checkout.CheckoutResultFlutterInterface.onDropInAdvancedFlowResult was null, expected non-null SessionDropInResultModel.');
+          api.onDropInAdvancedFlowResult(arg_dropInAdvancedFlowResult!);
           return;
         });
       }
