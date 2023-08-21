@@ -73,8 +73,10 @@ class _MyAppState extends State<MyApp> {
                 },
                 child: const Text("DropIn sessions")),
             TextButton(
-                onPressed: () {
-                  startDropInAdvancedFlow(context);
+                onPressed: () async {
+                  final sessionDropInResultModel =
+                      await startDropInAdvancedFlow();
+                  _dialogBuilder(context, sessionDropInResultModel);
                 },
                 child: const Text("DropIn advanced flow"))
           ],
@@ -99,8 +101,8 @@ class _MyAppState extends State<MyApp> {
     _dialogBuilder(context, sessionDropInResultModel);
   }
 
-  Future<void> startDropInAdvancedFlow(BuildContext context) async {
-    final paymentMethodsResponse =
+  Future<SessionDropInResultModel> startDropInAdvancedFlow() async {
+    final String paymentMethodsResponse =
         await _adyenSessionRepository.fetchPaymentMethods();
     DropInConfigurationModel dropInConfiguration = DropInConfigurationModel(
       environment: Environment.test,
@@ -108,21 +110,12 @@ class _MyAppState extends State<MyApp> {
       amount: Config.amount,
     );
 
-    final paymentComponentJson =
-        await _adyenCheckout.startDropInAdvancedFlowPayment(
+    return await _adyenCheckout.startDropInAdvancedFlowPayment(
       paymentMethodsResponse,
       dropInConfiguration,
+      _adyenSessionRepository.postPayments,
+      _adyenSessionRepository.postPaymentsDetails,
     );
-
-    Map<String, dynamic> paymentsResponse =
-        await _adyenSessionRepository.postPayments(paymentComponentJson);
-    final additionalDetails =
-        await _adyenCheckout.onPaymentsResult(paymentsResponse);
-    Map<String, dynamic> paymentsDetailsResponse =
-        await _adyenSessionRepository.postPaymentsDetails(additionalDetails);
-    var finalResult = await _adyenCheckout.onPaymentsDetailsResult(paymentsDetailsResponse);
-
-    print("YAY");
   }
 
   _dialogBuilder(

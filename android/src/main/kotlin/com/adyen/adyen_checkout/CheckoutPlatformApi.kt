@@ -91,10 +91,10 @@ class CheckoutPlatformApi(val checkoutResultFlutterInterface: CheckoutResultFlut
         callback: (Result<String?>) -> Unit
     ) {
         val paymentsResultJson = JSONObject(paymentsResult)
-        if (paymentsResult.containsKey("action")) {
+        if (paymentsResultJson.has("action")) {
             setAdvanceFlowDropInAdditionalDetailsMessengerObserver(callback)
         } else {
-            //callback(Result.success(null))
+            callback(Result.success(null))
         }
         DropInPaymentResultMessenger.sendResult(paymentsResultJson)
     }
