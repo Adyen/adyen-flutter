@@ -3,35 +3,18 @@ import 'dart:async';
 import 'package:adyen_checkout/platform_api.g.dart';
 
 class AdyenCheckoutResultApi implements CheckoutResultFlutterInterface {
-  var sessionDropInResultStream = StreamController<SessionDropInResultModel>();
-
-  //Advanced flow
-  var dropInAdvancedFlowPaymentComponentResultStream =
-      StreamController<String>();
-  var dropInAdvancedFlowPaymentAdditionalDetailsStream =
-      StreamController<String>();
-  var dropInAdvancedFlowResultStream =
-      StreamController<SessionDropInResultModel>();
+  var sessionDropInResultStream = StreamController<DropInResultModel>();
+  var dropInAdvancedFlowPlatformCommunicationStream =
+      StreamController<PlatformCommunicationModel>();
 
   @override
-  void onSessionDropInResult(SessionDropInResultModel sessionDropInResult) {
+  void onSessionDropInResult(DropInResultModel sessionDropInResult) {
     sessionDropInResultStream.sink.add(sessionDropInResult);
   }
 
   @override
-  void onDropInAdvancedFlowPaymentComponent(String paymentComponent) {
-    dropInAdvancedFlowPaymentComponentResultStream.sink.add(paymentComponent);
-  }
-
-  @override
-  void onDropInAdvancedFlowAdditionalDetails(String additionalDetails) {
-    dropInAdvancedFlowPaymentAdditionalDetailsStream.sink
-        .add(additionalDetails);
-  }
-
-  @override
-  void onDropInAdvancedFlowResult(
-      SessionDropInResultModel dropInAdvancedFlowResult) {
-    dropInAdvancedFlowResultStream.sink.add(dropInAdvancedFlowResult);
+  void onDropInAdvancedFlowPlatformCommunication(
+      PlatformCommunicationModel data) {
+    dropInAdvancedFlowPlatformCommunicationStream.sink.add(data);
   }
 }

@@ -3,6 +3,7 @@ package com.adyen.adyen_checkout
 import CheckoutPlatformInterface
 import CheckoutResultFlutterInterface
 import DropInConfigurationModel
+import PlatformCommunicationModel
 import SessionModel
 import androidx.activity.result.ActivityResultLauncher
 import androidx.fragment.app.FragmentActivity
@@ -11,6 +12,7 @@ import androidx.lifecycle.lifecycleScope
 import com.adyen.adyen_checkout.Mapper.mapToDropInConfiguration
 import com.adyen.adyen_checkout.Mapper.mapToSessionModel
 import com.adyen.adyen_checkout.dropInAdvancedFlow.AdvancedFlowDropInService
+import com.adyen.adyen_checkout.dropInAdvancedFlow.DropInAdditionalDetailsPlatformMessenger
 import com.adyen.adyen_checkout.dropInAdvancedFlow.DropInAdditionalDetailsResultMessenger
 import com.adyen.adyen_checkout.dropInAdvancedFlow.DropInPaymentResultMessenger
 import com.adyen.adyen_checkout.dropInAdvancedFlow.DropInServiceResultMessenger
@@ -40,10 +42,13 @@ class CheckoutPlatformApi(val checkoutResultFlutterInterface: CheckoutResultFlut
         callback.invoke(Result.success("Android ${android.os.Build.VERSION.RELEASE}"))
     }
 
+    override fun getReturnUrl(callback: (Result<String>) -> Unit) {
+        callback(Result.success(RedirectComponent.getReturnUrl(activity.applicationContext)))
+    }
+
     override fun startPayment(
         sessionModel: SessionModel,
         dropInConfiguration: DropInConfigurationModel,
-        callback: (Result<Unit>) -> Unit
     ) {
         activity.lifecycleScope.launch(Dispatchers.IO) {
             val sessionModel = sessionModel.mapToSessionModel()
@@ -65,7 +70,6 @@ class CheckoutPlatformApi(val checkoutResultFlutterInterface: CheckoutResultFlut
     override fun startPaymentDropInAdvancedFlow(
         paymentMethodsResponse: String,
         dropInConfiguration: DropInConfigurationModel,
-        callback: (Result<Unit>) -> Unit
     ) {
         setAdvancedFlowDropInServiceObserver()
         activity.lifecycleScope.launch(Dispatchers.IO) {
@@ -86,28 +90,16 @@ class CheckoutPlatformApi(val checkoutResultFlutterInterface: CheckoutResultFlut
         }
     }
 
-    override fun onPaymentsResult(
-        paymentsResult: Map<String, Any?>,
-        callback: (Result<String?>) -> Unit
-    ) {
+    override fun onPaymentsResult(paymentsResult: Map<String, Any?>) {
         val paymentsResultJson = JSONObject(paymentsResult)
         if (paymentsResultJson.has("action")) {
-            setAdvanceFlowDropInAdditionalDetailsMessengerObserver(callback)
-        } else {
-            callback(Result.success(null))
+            setAdvanceFlowDropInAdditionalDetailsMessengerObserver()
         }
         DropInPaymentResultMessenger.sendResult(paymentsResultJson)
     }
 
-    override fun onPaymentsDetailsResult(
-        paymentsDetailsResult: Map<String, Any?>,
-        callback: (Result<Unit>) -> Unit
-    ) {
+    override fun onPaymentsDetailsResult(paymentsDetailsResult: Map<String, Any?>) {
         DropInAdditionalDetailsResultMessenger.sendResult(JSONObject(paymentsDetailsResult))
-    }
-
-    override fun getReturnUrl(): String {
-        return RedirectComponent.getReturnUrl(activity.applicationContext)
     }
 
     private suspend fun createCheckoutSession(
@@ -130,20 +122,29 @@ class CheckoutPlatformApi(val checkoutResultFlutterInterface: CheckoutResultFlut
                 return@Observer
             }
 
-            checkoutResultFlutterInterface.onDropInAdvancedFlowPaymentComponent(message.contentIfNotHandled.toString()) {}
+            val model = PlatformCommunicationModel(
+                PlatformCommunicationType.PAYMENTCOMPONENT,
+                data = message.contentIfNotHandled.toString()
+            )
+            checkoutResultFlutterInterface.onDropInAdvancedFlowPlatformCommunication(model) {}
         })
 
     }
 
-    private fun setAdvanceFlowDropInAdditionalDetailsMessengerObserver(callback: (Result<String?>) -> Unit) {
+    private fun setAdvanceFlowDropInAdditionalDetailsMessengerObserver() {
         advancedFlowDropInAdditionalDetailsObserver = Observer { message ->
-            callback.invoke(Result.success(message.toString()))
 
-            DropInAdditionalDetailsResultMessenger.instance().removeObserver(advancedFlowDropInAdditionalDetailsObserver!!)
+            val model = PlatformCommunicationModel(
+                PlatformCommunicationType.ADDITIONALDETAILS,
+                data = message.toString()
+            )
+            checkoutResultFlutterInterface.onDropInAdvancedFlowPlatformCommunication(model) {}
+
         }
 
         advancedFlowDropInAdditionalDetailsObserver?.let {
-            DropInAdditionalDetailsResultMessenger.instance().observe(activity, it)
+            DropInAdditionalDetailsPlatformMessenger.instance().removeObservers(activity)
+            DropInAdditionalDetailsPlatformMessenger.instance().observe(activity, it)
         }
     }
 

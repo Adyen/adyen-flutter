@@ -45,7 +45,7 @@ class AdvancedFlowDropInService : DropInService(), LifecycleOwner {
         try {
             val actionComponentJson =
                 ActionComponentData.SERIALIZER.serialize(actionComponentData)
-            DropInAdditionalDetailsResultMessenger.sendResult(actionComponentJson)
+            DropInAdditionalDetailsPlatformMessenger.sendResult(actionComponentJson)
         } catch (exception: Exception) {
             Log.e("AdyenCheckoutTest", "Exception occurred: $exception")
             sendResult(DropInServiceResult.Error(errorMessage = exception.message))

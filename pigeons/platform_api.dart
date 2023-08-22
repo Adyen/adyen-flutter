@@ -112,66 +112,41 @@ class OrderResponseModel {
   });
 }
 
-class SessionDropInResultModel {
-  final SessionDropInResultEnum sessionDropInResult;
+class DropInResultModel {
+  final DropInResultEnum sessionDropInResult;
   final String? reason;
   final SessionPaymentResultModel? result;
 
-  SessionDropInResultModel(
+  DropInResultModel(
     this.sessionDropInResult,
     this.reason,
     this.result,
   );
 }
 
-enum SessionDropInResultEnum {
+enum DropInResultEnum {
   cancelledByUser,
   error,
   finished,
 }
 
-// class DropInAdvancedFlowResultModel {
-//   final String? result;
-//   final ActionModel? action;
-//   final ErrorModel? error;
-//
-//   DropInAdvancedFlowResultModel(
-//     this.result,
-//     this.action,
-//     this.error,
-//   );
-// }
-//
-// enum DropInServiceResultEnum {
-//   finished,
-//   action,
-//   update,
-//   error,
-// }
-//
-// class ActionModel {
-//   final String? type;
-//   final String? paymentData;
-//   final String? paymentMethodType;
-//
-//   ActionModel(
-//     this.type,
-//     this.paymentData,
-//     this.paymentMethodType,
-//   );
-// }
-//
-// class ErrorModel {
-//   final String? errorMessage;
-//   final String? reason;
-//   final bool dismissDropIn;
-//
-//   ErrorModel(
-//     this.errorMessage,
-//     this.reason,
-//     this.dismissDropIn,
-//   );
-// }
+class PlatformCommunicationModel {
+  final PlatformCommunicationType type;
+  final String? data;
+  final DropInResultModel? result;
+
+  PlatformCommunicationModel({
+    required this.type,
+    this.data,
+    this.result,
+  });
+}
+
+enum PlatformCommunicationType {
+  paymentComponent,
+  additionalDetails,
+  result,
+}
 
 @HostApi()
 abstract class CheckoutPlatformInterface {
@@ -179,34 +154,27 @@ abstract class CheckoutPlatformInterface {
   String getPlatformVersion();
 
   @async
+  String getReturnUrl();
+
   void startPayment(
     SessionModel sessionModel,
     DropInConfigurationModel dropInConfiguration,
   );
 
-  String getReturnUrl();
-
-  @async
   void startPaymentDropInAdvancedFlow(
     String paymentMethodsResponse,
     DropInConfigurationModel dropInConfiguration,
   );
 
-  @async
-  String? onPaymentsResult(Map<String, Object?> paymentsResult);
+  void onPaymentsResult(Map<String, Object?> paymentsResult);
 
-  @async
   void onPaymentsDetailsResult(Map<String, Object?> paymentsDetailsResult);
 }
 
 @FlutterApi()
 abstract class CheckoutResultFlutterInterface {
-  void onSessionDropInResult(SessionDropInResultModel sessionDropInResult);
+  void onSessionDropInResult(DropInResultModel sessionDropInResult);
 
-  void onDropInAdvancedFlowPaymentComponent(String paymentComponent);
-
-  void onDropInAdvancedFlowAdditionalDetails(String additionalDetails);
-
-  void onDropInAdvancedFlowResult(
-      SessionDropInResultModel dropInAdvancedFlowResult);
+  void onDropInAdvancedFlowPlatformCommunication(
+      PlatformCommunicationModel platformCommunicationModel);
 }

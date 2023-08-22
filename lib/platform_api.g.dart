@@ -42,10 +42,16 @@ enum Locale {
   us,
 }
 
-enum SessionDropInResultEnum {
+enum DropInResultEnum {
   cancelledByUser,
   error,
   finished,
+}
+
+enum PlatformCommunicationType {
+  paymentComponent,
+  additionalDetails,
+  result,
 }
 
 class SessionModel {
@@ -239,14 +245,14 @@ class OrderResponseModel {
   }
 }
 
-class SessionDropInResultModel {
-  SessionDropInResultModel({
+class DropInResultModel {
+  DropInResultModel({
     required this.sessionDropInResult,
     this.reason,
     this.result,
   });
 
-  SessionDropInResultEnum sessionDropInResult;
+  DropInResultEnum sessionDropInResult;
 
   String? reason;
 
@@ -260,13 +266,46 @@ class SessionDropInResultModel {
     ];
   }
 
-  static SessionDropInResultModel decode(Object result) {
+  static DropInResultModel decode(Object result) {
     result as List<Object?>;
-    return SessionDropInResultModel(
-      sessionDropInResult: SessionDropInResultEnum.values[result[0]! as int],
+    return DropInResultModel(
+      sessionDropInResult: DropInResultEnum.values[result[0]! as int],
       reason: result[1] as String?,
       result: result[2] != null
           ? SessionPaymentResultModel.decode(result[2]! as List<Object?>)
+          : null,
+    );
+  }
+}
+
+class PlatformCommunicationModel {
+  PlatformCommunicationModel({
+    required this.type,
+    this.data,
+    this.result,
+  });
+
+  PlatformCommunicationType type;
+
+  String? data;
+
+  DropInResultModel? result;
+
+  Object encode() {
+    return <Object?>[
+      type.index,
+      data,
+      result?.encode(),
+    ];
+  }
+
+  static PlatformCommunicationModel decode(Object result) {
+    result as List<Object?>;
+    return PlatformCommunicationModel(
+      type: PlatformCommunicationType.values[result[0]! as int],
+      data: result[1] as String?,
+      result: result[2] != null
+          ? DropInResultModel.decode(result[2]! as List<Object?>)
           : null,
     );
   }
@@ -282,17 +321,20 @@ class _CheckoutPlatformInterfaceCodec extends StandardMessageCodec {
     } else if (value is DropInConfigurationModel) {
       buffer.putUint8(129);
       writeValue(buffer, value.encode());
-    } else if (value is OrderResponseModel) {
+    } else if (value is DropInResultModel) {
       buffer.putUint8(130);
       writeValue(buffer, value.encode());
-    } else if (value is SessionDropInResultModel) {
+    } else if (value is OrderResponseModel) {
       buffer.putUint8(131);
       writeValue(buffer, value.encode());
-    } else if (value is SessionModel) {
+    } else if (value is PlatformCommunicationModel) {
       buffer.putUint8(132);
       writeValue(buffer, value.encode());
-    } else if (value is SessionPaymentResultModel) {
+    } else if (value is SessionModel) {
       buffer.putUint8(133);
+      writeValue(buffer, value.encode());
+    } else if (value is SessionPaymentResultModel) {
+      buffer.putUint8(134);
       writeValue(buffer, value.encode());
     } else {
       super.writeValue(buffer, value);
@@ -307,12 +349,14 @@ class _CheckoutPlatformInterfaceCodec extends StandardMessageCodec {
       case 129: 
         return DropInConfigurationModel.decode(readValue(buffer)!);
       case 130: 
-        return OrderResponseModel.decode(readValue(buffer)!);
+        return DropInResultModel.decode(readValue(buffer)!);
       case 131: 
-        return SessionDropInResultModel.decode(readValue(buffer)!);
+        return OrderResponseModel.decode(readValue(buffer)!);
       case 132: 
-        return SessionModel.decode(readValue(buffer)!);
+        return PlatformCommunicationModel.decode(readValue(buffer)!);
       case 133: 
+        return SessionModel.decode(readValue(buffer)!);
+      case 134: 
         return SessionPaymentResultModel.decode(readValue(buffer)!);
       default:
         return super.readValueOfType(type, buffer);
@@ -333,6 +377,33 @@ class CheckoutPlatformInterface {
   Future<String> getPlatformVersion() async {
     final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
         'dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.getPlatformVersion', codec,
+        binaryMessenger: _binaryMessenger);
+    final List<Object?>? replyList =
+        await channel.send(null) as List<Object?>?;
+    if (replyList == null) {
+      throw PlatformException(
+        code: 'channel-error',
+        message: 'Unable to establish connection on channel.',
+      );
+    } else if (replyList.length > 1) {
+      throw PlatformException(
+        code: replyList[0]! as String,
+        message: replyList[1] as String?,
+        details: replyList[2],
+      );
+    } else if (replyList[0] == null) {
+      throw PlatformException(
+        code: 'null-error',
+        message: 'Host platform returned null value for non-null return value.',
+      );
+    } else {
+      return (replyList[0] as String?)!;
+    }
+  }
+
+  Future<String> getReturnUrl() async {
+    final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
+        'dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.getReturnUrl', codec,
         binaryMessenger: _binaryMessenger);
     final List<Object?>? replyList =
         await channel.send(null) as List<Object?>?;
@@ -379,33 +450,6 @@ class CheckoutPlatformInterface {
     }
   }
 
-  Future<String> getReturnUrl() async {
-    final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
-        'dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.getReturnUrl', codec,
-        binaryMessenger: _binaryMessenger);
-    final List<Object?>? replyList =
-        await channel.send(null) as List<Object?>?;
-    if (replyList == null) {
-      throw PlatformException(
-        code: 'channel-error',
-        message: 'Unable to establish connection on channel.',
-      );
-    } else if (replyList.length > 1) {
-      throw PlatformException(
-        code: replyList[0]! as String,
-        message: replyList[1] as String?,
-        details: replyList[2],
-      );
-    } else if (replyList[0] == null) {
-      throw PlatformException(
-        code: 'null-error',
-        message: 'Host platform returned null value for non-null return value.',
-      );
-    } else {
-      return (replyList[0] as String?)!;
-    }
-  }
-
   Future<void> startPaymentDropInAdvancedFlow(String arg_paymentMethodsResponse, DropInConfigurationModel arg_dropInConfiguration) async {
     final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
         'dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.startPaymentDropInAdvancedFlow', codec,
@@ -428,7 +472,7 @@ class CheckoutPlatformInterface {
     }
   }
 
-  Future<String?> onPaymentsResult(Map<String?, Object?> arg_paymentsResult) async {
+  Future<void> onPaymentsResult(Map<String?, Object?> arg_paymentsResult) async {
     final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
         'dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.onPaymentsResult', codec,
         binaryMessenger: _binaryMessenger);
@@ -446,7 +490,7 @@ class CheckoutPlatformInterface {
         details: replyList[2],
       );
     } else {
-      return (replyList[0] as String?);
+      return;
     }
   }
 
@@ -480,14 +524,17 @@ class _CheckoutResultFlutterInterfaceCodec extends StandardMessageCodec {
     if (value is Amount) {
       buffer.putUint8(128);
       writeValue(buffer, value.encode());
-    } else if (value is OrderResponseModel) {
+    } else if (value is DropInResultModel) {
       buffer.putUint8(129);
       writeValue(buffer, value.encode());
-    } else if (value is SessionDropInResultModel) {
+    } else if (value is OrderResponseModel) {
       buffer.putUint8(130);
       writeValue(buffer, value.encode());
-    } else if (value is SessionPaymentResultModel) {
+    } else if (value is PlatformCommunicationModel) {
       buffer.putUint8(131);
+      writeValue(buffer, value.encode());
+    } else if (value is SessionPaymentResultModel) {
+      buffer.putUint8(132);
       writeValue(buffer, value.encode());
     } else {
       super.writeValue(buffer, value);
@@ -500,10 +547,12 @@ class _CheckoutResultFlutterInterfaceCodec extends StandardMessageCodec {
       case 128: 
         return Amount.decode(readValue(buffer)!);
       case 129: 
-        return OrderResponseModel.decode(readValue(buffer)!);
+        return DropInResultModel.decode(readValue(buffer)!);
       case 130: 
-        return SessionDropInResultModel.decode(readValue(buffer)!);
+        return OrderResponseModel.decode(readValue(buffer)!);
       case 131: 
+        return PlatformCommunicationModel.decode(readValue(buffer)!);
+      case 132: 
         return SessionPaymentResultModel.decode(readValue(buffer)!);
       default:
         return super.readValueOfType(type, buffer);
@@ -514,13 +563,9 @@ class _CheckoutResultFlutterInterfaceCodec extends StandardMessageCodec {
 abstract class CheckoutResultFlutterInterface {
   static const MessageCodec<Object?> codec = _CheckoutResultFlutterInterfaceCodec();
 
-  void onSessionDropInResult(SessionDropInResultModel sessionDropInResult);
+  void onSessionDropInResult(DropInResultModel sessionDropInResult);
 
-  void onDropInAdvancedFlowPaymentComponent(String paymentComponent);
-
-  void onDropInAdvancedFlowAdditionalDetails(String additionalDetails);
-
-  void onDropInAdvancedFlowResult(SessionDropInResultModel dropInAdvancedFlowResult);
+  void onDropInAdvancedFlowPlatformCommunication(PlatformCommunicationModel platformCommunicationModel);
 
   static void setup(CheckoutResultFlutterInterface? api, {BinaryMessenger? binaryMessenger}) {
     {
@@ -534,9 +579,9 @@ abstract class CheckoutResultFlutterInterface {
           assert(message != null,
           'Argument for dev.flutter.pigeon.adyen_checkout.CheckoutResultFlutterInterface.onSessionDropInResult was null.');
           final List<Object?> args = (message as List<Object?>?)!;
-          final SessionDropInResultModel? arg_sessionDropInResult = (args[0] as SessionDropInResultModel?);
+          final DropInResultModel? arg_sessionDropInResult = (args[0] as DropInResultModel?);
           assert(arg_sessionDropInResult != null,
-              'Argument for dev.flutter.pigeon.adyen_checkout.CheckoutResultFlutterInterface.onSessionDropInResult was null, expected non-null SessionDropInResultModel.');
+              'Argument for dev.flutter.pigeon.adyen_checkout.CheckoutResultFlutterInterface.onSessionDropInResult was null, expected non-null DropInResultModel.');
           api.onSessionDropInResult(arg_sessionDropInResult!);
           return;
         });
@@ -544,57 +589,19 @@ abstract class CheckoutResultFlutterInterface {
     }
     {
       final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
-          'dev.flutter.pigeon.adyen_checkout.CheckoutResultFlutterInterface.onDropInAdvancedFlowPaymentComponent', codec,
+          'dev.flutter.pigeon.adyen_checkout.CheckoutResultFlutterInterface.onDropInAdvancedFlowPlatformCommunication', codec,
           binaryMessenger: binaryMessenger);
       if (api == null) {
         channel.setMessageHandler(null);
       } else {
         channel.setMessageHandler((Object? message) async {
           assert(message != null,
-          'Argument for dev.flutter.pigeon.adyen_checkout.CheckoutResultFlutterInterface.onDropInAdvancedFlowPaymentComponent was null.');
+          'Argument for dev.flutter.pigeon.adyen_checkout.CheckoutResultFlutterInterface.onDropInAdvancedFlowPlatformCommunication was null.');
           final List<Object?> args = (message as List<Object?>?)!;
-          final String? arg_paymentComponent = (args[0] as String?);
-          assert(arg_paymentComponent != null,
-              'Argument for dev.flutter.pigeon.adyen_checkout.CheckoutResultFlutterInterface.onDropInAdvancedFlowPaymentComponent was null, expected non-null String.');
-          api.onDropInAdvancedFlowPaymentComponent(arg_paymentComponent!);
-          return;
-        });
-      }
-    }
-    {
-      final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
-          'dev.flutter.pigeon.adyen_checkout.CheckoutResultFlutterInterface.onDropInAdvancedFlowAdditionalDetails', codec,
-          binaryMessenger: binaryMessenger);
-      if (api == null) {
-        channel.setMessageHandler(null);
-      } else {
-        channel.setMessageHandler((Object? message) async {
-          assert(message != null,
-          'Argument for dev.flutter.pigeon.adyen_checkout.CheckoutResultFlutterInterface.onDropInAdvancedFlowAdditionalDetails was null.');
-          final List<Object?> args = (message as List<Object?>?)!;
-          final String? arg_additionalDetails = (args[0] as String?);
-          assert(arg_additionalDetails != null,
-              'Argument for dev.flutter.pigeon.adyen_checkout.CheckoutResultFlutterInterface.onDropInAdvancedFlowAdditionalDetails was null, expected non-null String.');
-          api.onDropInAdvancedFlowAdditionalDetails(arg_additionalDetails!);
-          return;
-        });
-      }
-    }
-    {
-      final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
-          'dev.flutter.pigeon.adyen_checkout.CheckoutResultFlutterInterface.onDropInAdvancedFlowResult', codec,
-          binaryMessenger: binaryMessenger);
-      if (api == null) {
-        channel.setMessageHandler(null);
-      } else {
-        channel.setMessageHandler((Object? message) async {
-          assert(message != null,
-          'Argument for dev.flutter.pigeon.adyen_checkout.CheckoutResultFlutterInterface.onDropInAdvancedFlowResult was null.');
-          final List<Object?> args = (message as List<Object?>?)!;
-          final SessionDropInResultModel? arg_dropInAdvancedFlowResult = (args[0] as SessionDropInResultModel?);
-          assert(arg_dropInAdvancedFlowResult != null,
-              'Argument for dev.flutter.pigeon.adyen_checkout.CheckoutResultFlutterInterface.onDropInAdvancedFlowResult was null, expected non-null SessionDropInResultModel.');
-          api.onDropInAdvancedFlowResult(arg_dropInAdvancedFlowResult!);
+          final PlatformCommunicationModel? arg_platformCommunicationModel = (args[0] as PlatformCommunicationModel?);
+          assert(arg_platformCommunicationModel != null,
+              'Argument for dev.flutter.pigeon.adyen_checkout.CheckoutResultFlutterInterface.onDropInAdvancedFlowPlatformCommunication was null, expected non-null PlatformCommunicationModel.');
+          api.onDropInAdvancedFlowPlatformCommunication(arg_platformCommunicationModel!);
           return;
         });
       }

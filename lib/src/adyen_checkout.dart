@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:convert';
 
 import 'package:adyen_checkout/platform_api.g.dart';
 import 'package:adyen_checkout/src/adyen_checkout_interface.dart';
@@ -17,12 +16,12 @@ class AdyenCheckout {
     return AdyenCheckoutInterface.instance.getPlatformVersion();
   }
 
-  Future<SessionDropInResultModel> startDropInSessionsPayment(
+  Future<DropInResultModel> startDropInSessionsPayment(
     SessionModel sessionModel,
     DropInConfigurationModel dropInConfiguration,
   ) async {
     _adyenCheckoutResultApi.sessionDropInResultStream =
-        StreamController<SessionDropInResultModel>();
+        StreamController<DropInResultModel>();
 
     AdyenCheckoutInterface.instance.startPayment(
       sessionModel,
@@ -35,7 +34,7 @@ class AdyenCheckout {
     return sessionDropInResultModel;
   }
 
-  Future<SessionDropInResultModel> startDropInAdvancedFlowPayment(
+  Future<DropInResultModel> startDropInAdvancedFlowPayment(
     String paymentMethodsResponse,
     DropInConfigurationModel dropInConfiguration,
     Future<Map<String, dynamic>> Function(String paymentComponentJson)
@@ -43,7 +42,7 @@ class AdyenCheckout {
     Future<Map<String, dynamic>> Function(String additionalDetails)
         postPaymentsDetails,
   ) async {
-    final completer = Completer<SessionDropInResultModel>();
+    final completer = Completer<DropInResultModel>();
     launchAdvancedFlow(
       paymentMethodsResponse,
       dropInConfiguration,
@@ -63,47 +62,51 @@ class AdyenCheckout {
         postPaymentsDetails,
     Completer<dynamic> completer,
   ) async {
-    _adyenCheckoutResultApi.dropInAdvancedFlowResultStream =
-        StreamController<SessionDropInResultModel>();
-    _adyenCheckoutResultApi.dropInAdvancedFlowResultStream.stream.first
-        .then((value) {
-      completer.complete(value);
-      _adyenCheckoutResultApi.dropInAdvancedFlowResultStream.close();
-    });
-
-    _adyenCheckoutResultApi.dropInAdvancedFlowPaymentComponentResultStream =
-        StreamController<String>();
-
     AdyenCheckoutInterface.instance.startDropInAdvancedFlowPayment(
       paymentMethodsResponse,
       dropInConfiguration,
     );
 
+    _adyenCheckoutResultApi.dropInAdvancedFlowPlatformCommunicationStream =
+        StreamController<PlatformCommunicationModel>.broadcast();
+    _adyenCheckoutResultApi.dropInAdvancedFlowPlatformCommunicationStream.stream
+        .asBroadcastStream()
+        .listen((event) async {
+      print(event.type);
+      print(event.data);
 
-    _adyenCheckoutResultApi.dropInAdvancedFlowPaymentComponentResultStream.stream.asBroadcastStream().listen((paymentComponent) async {
-      final paymentsResult = await postPayments(paymentComponent);
-      final additionalDetails = await onPaymentsResult(paymentsResult);
-      if (additionalDetails != null) {
-        await onPaymentsDetailsResult(json.decode(additionalDetails));
+      switch (event.type) {
+        case PlatformCommunicationType.paymentComponent:
+          {
+            final paymentsResult = await postPayments(event.data!);
+            onPaymentsResult(paymentsResult);
+          }
+        case PlatformCommunicationType.additionalDetails:
+          {
+            final paymentsDetailsResult =
+                await postPaymentsDetails(event.data!);
+            onPaymentsDetailsResult(paymentsDetailsResult);
+          }
+        case PlatformCommunicationType.result:
+          {
+            print(event.result.toString());
+            completer.complete(event.result);
+          }
       }
-      await _adyenCheckoutResultApi.dropInAdvancedFlowPaymentComponentResultStream.close();
     });
-
-
   }
 
   Future<String> getReturnUrl() async {
     return await AdyenCheckoutInterface.instance.getReturnUrl();
   }
 
-  Future<String?> onPaymentsResult(Map<String, Object?> paymentsResult) async {
-    return await AdyenCheckoutInterface.instance
-        .onPaymentsResult(paymentsResult);
+  void onPaymentsResult(Map<String, Object?> paymentsResult) async {
+    AdyenCheckoutInterface.instance.onPaymentsResult(paymentsResult);
   }
 
-  Future<void> onPaymentsDetailsResult(
+  void onPaymentsDetailsResult(
       Map<String, Object?> paymentsDetailsResult) async {
-    await AdyenCheckoutInterface.instance
+    AdyenCheckoutInterface.instance
         .onPaymentsDetailsResult(paymentsDetailsResult);
   }
 

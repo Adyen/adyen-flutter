@@ -2,10 +2,9 @@ package com.adyen.adyen_checkout
 
 import CheckoutPlatformInterface
 import CheckoutResultFlutterInterface
-import SessionDropInResultEnum
-import SessionDropInResultModel
+import DropInResultModel
+import PlatformCommunicationModel
 import SessionPaymentResultModel
-import android.util.Log
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
@@ -85,16 +84,16 @@ class AdyenCheckoutPlugin : FlutterPlugin, ActivityAware {
         }
 
         val mappedResult = when (sessionDropInResult) {
-            is SessionDropInResult.CancelledByUser -> SessionDropInResultModel(
-                SessionDropInResultEnum.CANCELLEDBYUSER
+            is SessionDropInResult.CancelledByUser -> DropInResultModel(
+                DropInResultEnum.CANCELLEDBYUSER
             )
 
-            is SessionDropInResult.Error -> SessionDropInResultModel(
-                SessionDropInResultEnum.ERROR, reason = sessionDropInResult.reason
+            is SessionDropInResult.Error -> DropInResultModel(
+                DropInResultEnum.ERROR, reason = sessionDropInResult.reason
             )
 
-            is SessionDropInResult.Finished -> SessionDropInResultModel(
-                SessionDropInResultEnum.FINISHED, result = SessionPaymentResultModel(
+            is SessionDropInResult.Finished -> DropInResultModel(
+                DropInResultEnum.FINISHED, result = SessionPaymentResultModel(
                     sessionDropInResult.result.sessionId,
                     sessionDropInResult.result.sessionData,
                     sessionDropInResult.result.resultCode,
@@ -111,22 +110,27 @@ class AdyenCheckoutPlugin : FlutterPlugin, ActivityAware {
         }
 
         val mappedResult = when (dropInAdvancedFlowResult) {
-            is DropInResult.CancelledByUser -> SessionDropInResultModel(
-                SessionDropInResultEnum.CANCELLEDBYUSER
+            is DropInResult.CancelledByUser -> DropInResultModel(
+                DropInResultEnum.CANCELLEDBYUSER
             )
 
-            is DropInResult.Error -> SessionDropInResultModel(
-                SessionDropInResultEnum.ERROR, reason = dropInAdvancedFlowResult.reason
+            is DropInResult.Error -> DropInResultModel(
+                DropInResultEnum.ERROR, reason = dropInAdvancedFlowResult.reason
             )
 
-            is DropInResult.Finished -> SessionDropInResultModel(
-                SessionDropInResultEnum.FINISHED, result = SessionPaymentResultModel(
+            is DropInResult.Finished -> DropInResultModel(
+                DropInResultEnum.FINISHED, result = SessionPaymentResultModel(
                     resultCode = dropInAdvancedFlowResult.result
                 )
             )
         }
 
-        checkoutResultFlutterInterface?.onDropInAdvancedFlowResult(mappedResult) {}
+        val model = PlatformCommunicationModel(
+            PlatformCommunicationType.RESULT,
+            data = "",
+            result = mappedResult
+        )
+        checkoutResultFlutterInterface?.onDropInAdvancedFlowPlatformCommunication(model) {}
     }
 
     private fun teardown() {

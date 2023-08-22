@@ -25,6 +25,18 @@ class DropInPaymentResultMessenger : LiveData<Event<JSONObject>>() {
     }
 }
 
+class DropInAdditionalDetailsPlatformMessenger : LiveData<JSONObject>() {
+    companion object {
+        private val dropInAdditionalDetailsPlatformMessenger =
+            DropInAdditionalDetailsPlatformMessenger()
+
+        fun instance() = dropInAdditionalDetailsPlatformMessenger
+        fun sendResult(value: JSONObject) {
+            dropInAdditionalDetailsPlatformMessenger.postValue(value)
+        }
+    }
+}
+
 class DropInAdditionalDetailsResultMessenger : LiveData<JSONObject>() {
     companion object {
         private val dropInAdditionalDetailsResultMessenger =

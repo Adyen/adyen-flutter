@@ -75,7 +75,7 @@ class _MyAppState extends State<MyApp> {
             TextButton(
                 onPressed: () async {
                   final sessionDropInResultModel =
-                  await startDropInAdvancedFlow();
+                      await startDropInAdvancedFlow();
                   _dialogBuilder(context, sessionDropInResultModel);
                 },
                 child: const Text("DropIn advanced flow"))
@@ -95,15 +95,17 @@ class _MyAppState extends State<MyApp> {
       shopperLocale: Config.countryCode,
     );
 
-    final sessionDropInResultModel = await _adyenCheckout
-        .startDropInSessionsPayment(sessionModel, dropInConfiguration);
+    final sessionDropInResultModel = await _adyenCheckout.startDropInSessionsPayment(
+      sessionModel,
+      dropInConfiguration,
+    );
 
     _dialogBuilder(context, sessionDropInResultModel);
   }
 
-  Future<SessionDropInResultModel> startDropInAdvancedFlow() async {
+  Future<DropInResultModel> startDropInAdvancedFlow() async {
     final String paymentMethodsResponse =
-    await _adyenSessionRepository.fetchPaymentMethods();
+        await _adyenSessionRepository.fetchPaymentMethods();
     DropInConfigurationModel dropInConfiguration = DropInConfigurationModel(
       environment: Environment.test,
       clientKey: Config.clientKey,
@@ -118,22 +120,17 @@ class _MyAppState extends State<MyApp> {
     );
   }
 
-  _dialogBuilder(BuildContext context,
-      SessionDropInResultModel sessionDropInResultModel) {
+  _dialogBuilder(BuildContext context, DropInResultModel dropInResultModel) {
     return showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text(sessionDropInResultModel.sessionDropInResult.name),
-          content: Text(
-              "Result code: ${sessionDropInResultModel.result?.resultCode}"),
+          title: Text(dropInResultModel.sessionDropInResult.name),
+          content: Text("Result code: ${dropInResultModel.result?.resultCode}"),
           actions: <Widget>[
             TextButton(
               style: TextButton.styleFrom(
-                textStyle: Theme
-                    .of(context)
-                    .textTheme
-                    .labelLarge,
+                textStyle: Theme.of(context).textTheme.labelLarge,
               ),
               child: const Text('Close'),
               onPressed: () {
