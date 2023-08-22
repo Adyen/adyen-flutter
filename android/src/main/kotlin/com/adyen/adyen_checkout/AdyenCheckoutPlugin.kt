@@ -93,16 +93,14 @@ class AdyenCheckoutPlugin : FlutterPlugin, ActivityAware {
                 SessionDropInResultEnum.ERROR, reason = sessionDropInResult.reason
             )
 
-            is SessionDropInResult.Finished -> {
-                SessionDropInResultModel(
-                    SessionDropInResultEnum.FINISHED, result = SessionPaymentResultModel(
-                        sessionDropInResult.result.sessionId,
-                        sessionDropInResult.result.sessionData,
-                        sessionDropInResult.result.resultCode,
-                        sessionDropInResult.result.order?.mapToOrderResponseModel(),
-                    )
+            is SessionDropInResult.Finished -> SessionDropInResultModel(
+                SessionDropInResultEnum.FINISHED, result = SessionPaymentResultModel(
+                    sessionDropInResult.result.sessionId,
+                    sessionDropInResult.result.sessionData,
+                    sessionDropInResult.result.resultCode,
+                    sessionDropInResult.result.order?.mapToOrderResponseModel(),
                 )
-            }
+            )
         }
         checkoutResultFlutterInterface?.onSessionDropInResult(mappedResult) {}
     }
@@ -122,7 +120,9 @@ class AdyenCheckoutPlugin : FlutterPlugin, ActivityAware {
             )
 
             is DropInResult.Finished -> SessionDropInResultModel(
-                SessionDropInResultEnum.FINISHED
+                SessionDropInResultEnum.FINISHED, result = SessionPaymentResultModel(
+                    resultCode = dropInAdvancedFlowResult.result
+                )
             )
         }
 

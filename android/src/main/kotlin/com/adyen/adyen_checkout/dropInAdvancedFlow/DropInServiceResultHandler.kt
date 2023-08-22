@@ -15,6 +15,13 @@ class DropInServiceResultHandler(val lifecycleCoroutineScope: LifecycleCoroutine
                 DropInServiceResult.Error(reason = "IOException")
             }
 
+            isError(jsonResponse) -> {
+                DropInServiceResult.Error(
+                    errorMessage = jsonResponse.get("message").toString(),
+                    dismissDropIn = true
+                )
+            }
+
             isRefusedInPartialPaymentFlow(jsonResponse) -> {
                 DropInServiceResult.Error(reason = "Refused")
             }
@@ -40,6 +47,10 @@ class DropInServiceResultHandler(val lifecycleCoroutineScope: LifecycleCoroutine
                 DropInServiceResult.Finished(resultCode)
             }
         }
+    }
+
+    private fun isError(jsonResponse: JSONObject): Boolean {
+        return jsonResponse.has("errorCode")
     }
 
     private fun isRefusedInPartialPaymentFlow(jsonResponse: JSONObject) =

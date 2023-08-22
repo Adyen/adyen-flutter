@@ -71,17 +71,25 @@ class AdyenCheckout {
       _adyenCheckoutResultApi.dropInAdvancedFlowResultStream.close();
     });
 
-    final paymentComponent =
-        await AdyenCheckoutInterface.instance.startDropInAdvancedFlowPayment(
+    _adyenCheckoutResultApi.dropInAdvancedFlowPaymentComponentResultStream =
+        StreamController<String>();
+
+    AdyenCheckoutInterface.instance.startDropInAdvancedFlowPayment(
       paymentMethodsResponse,
       dropInConfiguration,
     );
 
-    final paymentsResult = await postPayments(paymentComponent);
-    final additionalDetails = await onPaymentsResult(paymentsResult);
-    if (additionalDetails != null) {
-      await onPaymentsDetailsResult(json.decode(additionalDetails));
-    }
+
+    _adyenCheckoutResultApi.dropInAdvancedFlowPaymentComponentResultStream.stream.asBroadcastStream().listen((paymentComponent) async {
+      final paymentsResult = await postPayments(paymentComponent);
+      final additionalDetails = await onPaymentsResult(paymentsResult);
+      if (additionalDetails != null) {
+        await onPaymentsDetailsResult(json.decode(additionalDetails));
+      }
+      await _adyenCheckoutResultApi.dropInAdvancedFlowPaymentComponentResultStream.close();
+    });
+
+
   }
 
   Future<String> getReturnUrl() async {

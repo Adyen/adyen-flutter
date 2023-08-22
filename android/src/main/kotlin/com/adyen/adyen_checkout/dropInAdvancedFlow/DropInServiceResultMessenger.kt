@@ -1,25 +1,26 @@
 package com.adyen.adyen_checkout.dropInAdvancedFlow
 
 import androidx.lifecycle.LiveData
+import com.adyen.adyen_checkout.utils.Event
 import org.json.JSONObject
 
-class DropInServiceResultMessenger : LiveData<JSONObject>() {
+class DropInServiceResultMessenger : LiveData<Event<JSONObject>>() {
     companion object {
         private val dropInServiceResultMessenger = DropInServiceResultMessenger()
         fun instance() = dropInServiceResultMessenger
         fun sendResult(value: JSONObject) {
-            dropInServiceResultMessenger.postValue(value)
+            dropInServiceResultMessenger.postValue(Event(value))
         }
     }
 }
 
-class DropInPaymentResultMessenger : LiveData<JSONObject>() {
+class DropInPaymentResultMessenger : LiveData<Event<JSONObject>>() {
     companion object {
         private val dropInPaymentResultMessenger = DropInPaymentResultMessenger()
 
         fun instance() = dropInPaymentResultMessenger
         fun sendResult(value: JSONObject) {
-            dropInPaymentResultMessenger.postValue(value)
+            dropInPaymentResultMessenger.postValue(Event(value))
         }
     }
 }

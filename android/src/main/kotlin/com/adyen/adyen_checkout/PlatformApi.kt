@@ -349,7 +349,7 @@ interface CheckoutPlatformInterface {
   fun getPlatformVersion(callback: (Result<String>) -> Unit)
   fun startPayment(sessionModel: SessionModel, dropInConfiguration: DropInConfigurationModel, callback: (Result<Unit>) -> Unit)
   fun getReturnUrl(): String
-  fun startPaymentDropInAdvancedFlow(paymentMethodsResponse: String, dropInConfiguration: DropInConfigurationModel, callback: (Result<String>) -> Unit)
+  fun startPaymentDropInAdvancedFlow(paymentMethodsResponse: String, dropInConfiguration: DropInConfigurationModel, callback: (Result<Unit>) -> Unit)
   fun onPaymentsResult(paymentsResult: Map<String, Any?>, callback: (Result<String?>) -> Unit)
   fun onPaymentsDetailsResult(paymentsDetailsResult: Map<String, Any?>, callback: (Result<Unit>) -> Unit)
 
@@ -422,13 +422,12 @@ interface CheckoutPlatformInterface {
             val args = message as List<Any?>
             val paymentMethodsResponseArg = args[0] as String
             val dropInConfigurationArg = args[1] as DropInConfigurationModel
-            api.startPaymentDropInAdvancedFlow(paymentMethodsResponseArg, dropInConfigurationArg) { result: Result<String> ->
+            api.startPaymentDropInAdvancedFlow(paymentMethodsResponseArg, dropInConfigurationArg) { result: Result<Unit> ->
               val error = result.exceptionOrNull()
               if (error != null) {
                 reply.reply(wrapError(error))
               } else {
-                val data = result.getOrNull()
-                reply.reply(wrapResult(data))
+                reply.reply(wrapResult(null))
               }
             }
           }
@@ -540,6 +539,18 @@ class CheckoutResultFlutterInterface(private val binaryMessenger: BinaryMessenge
   fun onSessionDropInResult(sessionDropInResultArg: SessionDropInResultModel, callback: () -> Unit) {
     val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.adyen_checkout.CheckoutResultFlutterInterface.onSessionDropInResult", codec)
     channel.send(listOf(sessionDropInResultArg)) {
+      callback()
+    }
+  }
+  fun onDropInAdvancedFlowPaymentComponent(paymentComponentArg: String, callback: () -> Unit) {
+    val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.adyen_checkout.CheckoutResultFlutterInterface.onDropInAdvancedFlowPaymentComponent", codec)
+    channel.send(listOf(paymentComponentArg)) {
+      callback()
+    }
+  }
+  fun onDropInAdvancedFlowAdditionalDetails(additionalDetailsArg: String, callback: () -> Unit) {
+    val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.adyen_checkout.CheckoutResultFlutterInterface.onDropInAdvancedFlowAdditionalDetails", codec)
+    channel.send(listOf(additionalDetailsArg)) {
       callback()
     }
   }

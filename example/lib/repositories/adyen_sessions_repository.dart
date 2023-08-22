@@ -48,19 +48,30 @@ class AdyenSessionsRepository {
 
   Future<String> fetchPaymentMethods() async {
     return await _service.fetchPaymentMethods(PaymentMethodsRequestNetworkModel(
-        merchantAccount: Config.merchantAccount));
+      merchantAccount: Config.merchantAccount,
+      countryCode: Config.countryCode,
+    ));
   }
 
   Future<Map<String, dynamic>> postPayments(String paymentComponentJson) async {
     String returnUrl = await _determineExampleReturnUrl();
     PaymentsRequestData paymentsRequestData = PaymentsRequestData(
       merchantAccount: Config.merchantAccount,
-      reference: Config.shopperReference,
+      shopperReference: Config.shopperReference,
+      reference: "flutter-test_${DateTime.now().millisecondsSinceEpoch}",
       returnUrl: returnUrl,
       amount: AmountNetworkModel(
         value: Config.amount.value,
         currency: Config.amount.currency,
       ),
+      shopperIP: Config.shopperIp,
+      countryCode: Config.countryCode,
+      channel: Config.channel,
+      additionalData: AdditionalData(allow3DS2: true, executeThreeD: false),
+      threeDS2RequestData: ThreeDS2RequestDataRequest(),
+      threeDSAuthenticationOnly: false,
+      recurringProcessingModel: RecurringProcessingModel.subscription,
+      lineItems: [],
     );
 
     Map<String, dynamic> mergedJson = <String, dynamic>{};
@@ -69,7 +80,8 @@ class AdyenSessionsRepository {
     return await _service.postPayments(mergedJson);
   }
 
-  Future<Map<String, dynamic>> postPaymentsDetails(String additionalDetails) async {
+  Future<Map<String, dynamic>> postPaymentsDetails(
+      String additionalDetails) async {
     return await _service.postPaymentsDetails(json.decode(additionalDetails));
   }
 

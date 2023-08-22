@@ -14,7 +14,7 @@ class PaymentsRequestData {
   final List<Item>? lineItems;
   final String? shopperEmail;
   final ThreeDS2RequestDataRequest? threeDS2RequestData;
-  final String? recurringProcessingModel;
+  final RecurringProcessingModel? recurringProcessingModel;
 
   PaymentsRequestData({
     required this.merchantAccount,
@@ -52,18 +52,18 @@ class PaymentsRequestData {
       if (threeDS2RequestData != null)
         "threeDS2RequestData": threeDS2RequestData?.toJson(),
       if (recurringProcessingModel != null)
-        "recurringProcessingModel": recurringProcessingModel,
+        "recurringProcessingModel": recurringProcessingModel?.recurringModel,
     };
   }
 }
 
 class AdditionalData {
-  final String allow3DS2;
-  final String executeThreeD;
+  final bool allow3DS2;
+  final bool executeThreeD;
 
   AdditionalData({
-    this.allow3DS2 = 'false',
-    this.executeThreeD = 'false',
+    required this.allow3DS2,
+    required this.executeThreeD,
   });
 
   Map<String, dynamic> toJson() {
@@ -120,5 +120,24 @@ class ThreeDS2RequestDataRequest {
       'deviceChannel': deviceChannel,
       'challengeIndicator': challengeIndicator,
     };
+  }
+}
+
+enum RecurringProcessingModel {
+  subscription,
+  cardOnFile,
+  unscheduledCardOnFile
+}
+
+extension RecurringProcessingModelExtension on RecurringProcessingModel {
+  String get recurringModel {
+    switch (this) {
+      case RecurringProcessingModel.subscription:
+        return 'Subscription';
+      case RecurringProcessingModel.cardOnFile:
+        return 'CardOnFile';
+      case RecurringProcessingModel.unscheduledCardOnFile:
+        return 'UnscheduledCardOnFile';
+    }
   }
 }

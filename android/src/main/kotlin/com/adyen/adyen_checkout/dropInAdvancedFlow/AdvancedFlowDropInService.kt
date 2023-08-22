@@ -9,6 +9,7 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ServiceLifecycleDispatcher
 import androidx.lifecycle.lifecycleScope
+import com.adyen.adyen_checkout.utils.Event
 import com.adyen.checkout.components.core.ActionComponentData
 import com.adyen.checkout.components.core.PaymentComponentData
 import com.adyen.checkout.components.core.PaymentComponentState
@@ -21,60 +22,61 @@ import org.json.JSONObject
 //We should discuss if we can use LifecycleService instead of Service
 class AdvancedFlowDropInService : DropInService(), LifecycleOwner {
     private val dispatcher = ServiceLifecycleDispatcher(this)
-    private var dropInPaymentsObserver: Observer<JSONObject>? = null
-    private var dropInAdditionalDetailsObserver: Observer<JSONObject>? = null
+    private var dropInPaymentsObserver: Observer<Event<JSONObject>>? = null
     private val dropInServiceResultHandler = DropInServiceResultHandler(this.lifecycleScope)
 
     override fun onSubmit(state: PaymentComponentState<*>) {
+        Log.d("AdyenCheckout", "onSubmit CALLED")
         setAdvancedFlowDropInServiceObserver()
 
-        lifecycleScope.launch(Dispatchers.IO) {
-            try {
-                val paymentComponentJson = PaymentComponentData.SERIALIZER.serialize(state.data)
-                DropInServiceResultMessenger.sendResult(paymentComponentJson)
-            } catch (exception: Exception) {
-                Log.e("AdyenCheckout", "Exception occurred: $exception")
-                sendResult(DropInServiceResult.Error())
-            }
+        try {
+            val paymentComponentJson = PaymentComponentData.SERIALIZER.serialize(state.data)
+            DropInServiceResultMessenger.sendResult(paymentComponentJson)
+        } catch (exception: Exception) {
+            Log.e("AdyenCheckout", "Exception occurred: $exception")
+            sendResult(DropInServiceResult.Error(errorMessage = exception.message))
         }
     }
 
     override fun onAdditionalDetails(actionComponentData: ActionComponentData) {
-        setAdvancedFlowDropInAdditionalDataObserver()
+        Log.d("AdyenCheckout", "onAdditionalDetails CALLED")
+        setAdvancedFlowDropInAdditionalDetailsObserver()
 
-        lifecycleScope.launch(Dispatchers.IO) {
-            try {
-                val actionComponentJson = ActionComponentData.SERIALIZER.serialize(actionComponentData)
-                DropInAdditionalDetailsResultMessenger.sendResult(actionComponentJson)
-            } catch (exception: Exception) {
-                Log.e("AdyenCheckoutTest", "Exception occurred: $exception")
-                sendResult(DropInServiceResult.Error())
-            }
+        try {
+            val actionComponentJson =
+                ActionComponentData.SERIALIZER.serialize(actionComponentData)
+            DropInAdditionalDetailsResultMessenger.sendResult(actionComponentJson)
+        } catch (exception: Exception) {
+            Log.e("AdyenCheckoutTest", "Exception occurred: $exception")
+            sendResult(DropInServiceResult.Error(errorMessage = exception.message))
         }
+
     }
 
     private fun setAdvancedFlowDropInServiceObserver() {
         dropInPaymentsObserver = Observer { message ->
-            val result = dropInServiceResultHandler.handleResponse(message) ?: return@Observer
+            if (message.hasBeenHandled()) {
+                return@Observer
+            }
+
+            val result = dropInServiceResultHandler.handleResponse(message.contentIfNotHandled)
+                ?: return@Observer
             sendResult(result)
-            DropInPaymentResultMessenger.instance().removeObservers(this)
         }
 
         dropInPaymentsObserver?.let {
+            DropInPaymentResultMessenger.instance().removeObservers(this)
             DropInPaymentResultMessenger.instance().observe(this, it)
         }
     }
 
-    private fun setAdvancedFlowDropInAdditionalDataObserver() {
-        dropInAdditionalDetailsObserver = Observer { message ->
+    private fun setAdvancedFlowDropInAdditionalDetailsObserver() {
+        DropInAdditionalDetailsResultMessenger.instance().removeObservers(this)
+        DropInAdditionalDetailsResultMessenger.instance().observe(this, Observer { message ->
             val result = dropInServiceResultHandler.handleResponse(message) ?: return@Observer
             sendResult(result)
-            DropInPaymentResultMessenger.instance().removeObservers(this)
-        }
+        })
 
-        dropInPaymentsObserver?.let {
-            DropInAdditionalDetailsResultMessenger.instance().observe(this, it)
-        }
     }
 
     override fun onBind(intent: Intent?): IBinder {

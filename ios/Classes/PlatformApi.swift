@@ -332,7 +332,7 @@ protocol CheckoutPlatformInterface {
   func getPlatformVersion(completion: @escaping (Result<String, Error>) -> Void)
   func startPayment(sessionModel: SessionModel, dropInConfiguration: DropInConfigurationModel, completion: @escaping (Result<Void, Error>) -> Void)
   func getReturnUrl() throws -> String
-  func startPaymentDropInAdvancedFlow(paymentMethodsResponse: String, dropInConfiguration: DropInConfigurationModel, completion: @escaping (Result<String, Error>) -> Void)
+  func startPaymentDropInAdvancedFlow(paymentMethodsResponse: String, dropInConfiguration: DropInConfigurationModel, completion: @escaping (Result<Void, Error>) -> Void)
   func onPaymentsResult(paymentsResult: [String: Any?], completion: @escaping (Result<String?, Error>) -> Void)
   func onPaymentsDetailsResult(paymentsDetailsResult: [String: Any?], completion: @escaping (Result<Void, Error>) -> Void)
 }
@@ -397,8 +397,8 @@ class CheckoutPlatformInterfaceSetup {
         let dropInConfigurationArg = args[1] as! DropInConfigurationModel
         api.startPaymentDropInAdvancedFlow(paymentMethodsResponse: paymentMethodsResponseArg, dropInConfiguration: dropInConfigurationArg) { result in
           switch result {
-            case .success(let res):
-              reply(wrapResult(res))
+            case .success:
+              reply(wrapResult(nil))
             case .failure(let error):
               reply(wrapError(error))
           }
@@ -506,6 +506,18 @@ class CheckoutResultFlutterInterface {
   func onSessionDropInResult(sessionDropInResult sessionDropInResultArg: SessionDropInResultModel, completion: @escaping () -> Void) {
     let channel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.CheckoutResultFlutterInterface.onSessionDropInResult", binaryMessenger: binaryMessenger, codec: codec)
     channel.sendMessage([sessionDropInResultArg] as [Any?]) { _ in
+      completion()
+    }
+  }
+  func onDropInAdvancedFlowPaymentComponent(paymentComponent paymentComponentArg: String, completion: @escaping () -> Void) {
+    let channel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.CheckoutResultFlutterInterface.onDropInAdvancedFlowPaymentComponent", binaryMessenger: binaryMessenger, codec: codec)
+    channel.sendMessage([paymentComponentArg] as [Any?]) { _ in
+      completion()
+    }
+  }
+  func onDropInAdvancedFlowAdditionalDetails(additionalDetails additionalDetailsArg: String, completion: @escaping () -> Void) {
+    let channel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.CheckoutResultFlutterInterface.onDropInAdvancedFlowAdditionalDetails", binaryMessenger: binaryMessenger, codec: codec)
+    channel.sendMessage([additionalDetailsArg] as [Any?]) { _ in
       completion()
     }
   }

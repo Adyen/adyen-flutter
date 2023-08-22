@@ -406,7 +406,7 @@ class CheckoutPlatformInterface {
     }
   }
 
-  Future<String> startPaymentDropInAdvancedFlow(String arg_paymentMethodsResponse, DropInConfigurationModel arg_dropInConfiguration) async {
+  Future<void> startPaymentDropInAdvancedFlow(String arg_paymentMethodsResponse, DropInConfigurationModel arg_dropInConfiguration) async {
     final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
         'dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.startPaymentDropInAdvancedFlow', codec,
         binaryMessenger: _binaryMessenger);
@@ -423,13 +423,8 @@ class CheckoutPlatformInterface {
         message: replyList[1] as String?,
         details: replyList[2],
       );
-    } else if (replyList[0] == null) {
-      throw PlatformException(
-        code: 'null-error',
-        message: 'Host platform returned null value for non-null return value.',
-      );
     } else {
-      return (replyList[0] as String?)!;
+      return;
     }
   }
 
@@ -521,6 +516,10 @@ abstract class CheckoutResultFlutterInterface {
 
   void onSessionDropInResult(SessionDropInResultModel sessionDropInResult);
 
+  void onDropInAdvancedFlowPaymentComponent(String paymentComponent);
+
+  void onDropInAdvancedFlowAdditionalDetails(String additionalDetails);
+
   void onDropInAdvancedFlowResult(SessionDropInResultModel dropInAdvancedFlowResult);
 
   static void setup(CheckoutResultFlutterInterface? api, {BinaryMessenger? binaryMessenger}) {
@@ -539,6 +538,44 @@ abstract class CheckoutResultFlutterInterface {
           assert(arg_sessionDropInResult != null,
               'Argument for dev.flutter.pigeon.adyen_checkout.CheckoutResultFlutterInterface.onSessionDropInResult was null, expected non-null SessionDropInResultModel.');
           api.onSessionDropInResult(arg_sessionDropInResult!);
+          return;
+        });
+      }
+    }
+    {
+      final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
+          'dev.flutter.pigeon.adyen_checkout.CheckoutResultFlutterInterface.onDropInAdvancedFlowPaymentComponent', codec,
+          binaryMessenger: binaryMessenger);
+      if (api == null) {
+        channel.setMessageHandler(null);
+      } else {
+        channel.setMessageHandler((Object? message) async {
+          assert(message != null,
+          'Argument for dev.flutter.pigeon.adyen_checkout.CheckoutResultFlutterInterface.onDropInAdvancedFlowPaymentComponent was null.');
+          final List<Object?> args = (message as List<Object?>?)!;
+          final String? arg_paymentComponent = (args[0] as String?);
+          assert(arg_paymentComponent != null,
+              'Argument for dev.flutter.pigeon.adyen_checkout.CheckoutResultFlutterInterface.onDropInAdvancedFlowPaymentComponent was null, expected non-null String.');
+          api.onDropInAdvancedFlowPaymentComponent(arg_paymentComponent!);
+          return;
+        });
+      }
+    }
+    {
+      final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
+          'dev.flutter.pigeon.adyen_checkout.CheckoutResultFlutterInterface.onDropInAdvancedFlowAdditionalDetails', codec,
+          binaryMessenger: binaryMessenger);
+      if (api == null) {
+        channel.setMessageHandler(null);
+      } else {
+        channel.setMessageHandler((Object? message) async {
+          assert(message != null,
+          'Argument for dev.flutter.pigeon.adyen_checkout.CheckoutResultFlutterInterface.onDropInAdvancedFlowAdditionalDetails was null.');
+          final List<Object?> args = (message as List<Object?>?)!;
+          final String? arg_additionalDetails = (args[0] as String?);
+          assert(arg_additionalDetails != null,
+              'Argument for dev.flutter.pigeon.adyen_checkout.CheckoutResultFlutterInterface.onDropInAdvancedFlowAdditionalDetails was null, expected non-null String.');
+          api.onDropInAdvancedFlowAdditionalDetails(arg_additionalDetails!);
           return;
         });
       }

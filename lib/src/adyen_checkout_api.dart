@@ -18,9 +18,9 @@ class AdyenCheckoutApi implements AdyenCheckoutInterface {
   }
 
   @override
-  Future<String> startDropInAdvancedFlowPayment(String paymentMethodsResponse,
+  Future<void> startDropInAdvancedFlowPayment(String paymentMethodsResponse,
       DropInConfigurationModel dropInConfiguration) async {
-    return checkoutApi.startPaymentDropInAdvancedFlow(
+    checkoutApi.startPaymentDropInAdvancedFlow(
         paymentMethodsResponse, dropInConfiguration);
   }
 
@@ -35,7 +35,8 @@ class AdyenCheckoutApi implements AdyenCheckoutInterface {
   }
 
   @override
-  Future<void> onPaymentsDetailsResult(Map<String, Object?> paymentsDetailsResult) async {
+  Future<void> onPaymentsDetailsResult(
+      Map<String, Object?> paymentsDetailsResult) async {
     return checkoutApi.onPaymentsDetailsResult(paymentsDetailsResult);
   }
 }

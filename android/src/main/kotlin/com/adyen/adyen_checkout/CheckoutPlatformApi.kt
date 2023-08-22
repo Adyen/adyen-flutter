@@ -34,7 +34,7 @@ class CheckoutPlatformApi(val checkoutResultFlutterInterface: CheckoutResultFlut
     lateinit var dropInSessionLauncher: ActivityResultLauncher<SessionDropInResultContractParams>
     lateinit var dropInAdvancedFlowLauncher: ActivityResultLauncher<DropInResultContractParams>
 
-    private var advancedFlowDropInServiceObserver: Observer<JSONObject>? = null
+    private var advancedFlowDropInAdditionalDetailsObserver: Observer<JSONObject>? = null
 
     override fun getPlatformVersion(callback: (Result<String>) -> Unit) {
         callback.invoke(Result.success("Android ${android.os.Build.VERSION.RELEASE}"))
@@ -65,9 +65,9 @@ class CheckoutPlatformApi(val checkoutResultFlutterInterface: CheckoutResultFlut
     override fun startPaymentDropInAdvancedFlow(
         paymentMethodsResponse: String,
         dropInConfiguration: DropInConfigurationModel,
-        callback: (Result<String>) -> Unit
+        callback: (Result<Unit>) -> Unit
     ) {
-        setAdvancedFlowDropInServiceObserver(callback)
+        setAdvancedFlowDropInServiceObserver()
         activity.lifecycleScope.launch(Dispatchers.IO) {
             val paymentMethodsApiResponse = PaymentMethodsApiResponse.SERIALIZER.deserialize(
                 JSONObject(paymentMethodsResponse)
@@ -123,24 +123,26 @@ class CheckoutPlatformApi(val checkoutResultFlutterInterface: CheckoutResultFlut
     }
 
 
-    private fun setAdvancedFlowDropInServiceObserver(callback: (Result<String>) -> Unit) {
-        advancedFlowDropInServiceObserver = Observer { message ->
-            callback.invoke(Result.success(message.toString()))
-            DropInServiceResultMessenger.instance().removeObservers(activity)
-        }
+    private fun setAdvancedFlowDropInServiceObserver() {
+        DropInServiceResultMessenger.instance().removeObservers(activity)
+        DropInServiceResultMessenger.instance().observe(activity, Observer { message ->
+            if (message.hasBeenHandled()) {
+                return@Observer
+            }
 
-        advancedFlowDropInServiceObserver?.let {
-            DropInServiceResultMessenger.instance().observe(activity, it)
-        }
+            checkoutResultFlutterInterface.onDropInAdvancedFlowPaymentComponent(message.contentIfNotHandled.toString()) {}
+        })
+
     }
 
-    private fun setAdvanceFlowDropInAdditionalDetailsMessengerObserver(callback: (Result<String>) -> Unit) {
-        advancedFlowDropInServiceObserver = Observer { message ->
+    private fun setAdvanceFlowDropInAdditionalDetailsMessengerObserver(callback: (Result<String?>) -> Unit) {
+        advancedFlowDropInAdditionalDetailsObserver = Observer { message ->
             callback.invoke(Result.success(message.toString()))
-            DropInAdditionalDetailsResultMessenger.instance().removeObservers(activity)
+
+            DropInAdditionalDetailsResultMessenger.instance().removeObserver(advancedFlowDropInAdditionalDetailsObserver!!)
         }
 
-        advancedFlowDropInServiceObserver?.let {
+        advancedFlowDropInAdditionalDetailsObserver?.let {
             DropInAdditionalDetailsResultMessenger.instance().observe(activity, it)
         }
     }

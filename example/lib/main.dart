@@ -75,7 +75,7 @@ class _MyAppState extends State<MyApp> {
             TextButton(
                 onPressed: () async {
                   final sessionDropInResultModel =
-                      await startDropInAdvancedFlow();
+                  await startDropInAdvancedFlow();
                   _dialogBuilder(context, sessionDropInResultModel);
                 },
                 child: const Text("DropIn advanced flow"))
@@ -103,7 +103,7 @@ class _MyAppState extends State<MyApp> {
 
   Future<SessionDropInResultModel> startDropInAdvancedFlow() async {
     final String paymentMethodsResponse =
-        await _adyenSessionRepository.fetchPaymentMethods();
+    await _adyenSessionRepository.fetchPaymentMethods();
     DropInConfigurationModel dropInConfiguration = DropInConfigurationModel(
       environment: Environment.test,
       clientKey: Config.clientKey,
@@ -118,8 +118,8 @@ class _MyAppState extends State<MyApp> {
     );
   }
 
-  _dialogBuilder(
-      BuildContext context, SessionDropInResultModel sessionDropInResultModel) {
+  _dialogBuilder(BuildContext context,
+      SessionDropInResultModel sessionDropInResultModel) {
     return showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -130,7 +130,10 @@ class _MyAppState extends State<MyApp> {
           actions: <Widget>[
             TextButton(
               style: TextButton.styleFrom(
-                textStyle: Theme.of(context).textTheme.labelLarge,
+                textStyle: Theme
+                    .of(context)
+                    .textTheme
+                    .labelLarge,
               ),
               child: const Text('Close'),
               onPressed: () {
