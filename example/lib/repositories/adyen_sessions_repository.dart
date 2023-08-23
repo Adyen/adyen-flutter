@@ -67,11 +67,21 @@ class AdyenSessionsRepository {
       shopperIP: Config.shopperIp,
       countryCode: Config.countryCode,
       channel: Config.channel,
-      additionalData: AdditionalData(allow3DS2: true, executeThreeD: false),
+      additionalData: AdditionalData(allow3DS2: true, executeThreeD: true),
       threeDS2RequestData: ThreeDS2RequestDataRequest(),
       threeDSAuthenticationOnly: false,
       recurringProcessingModel: RecurringProcessingModel.subscription,
-      lineItems: [],
+      lineItems: [
+        Item(
+          quantity: 2,
+          amountExcludingTax: 100,
+          taxPercentage: 0,
+          description: "Coffee",
+          id: DateTime.now().millisecondsSinceEpoch.toString(),
+          amountIncludingTax: 100,
+          taxCategory: "Low",
+        )
+      ],
     );
 
     Map<String, dynamic> mergedJson = <String, dynamic>{};

@@ -72,25 +72,32 @@ class AdyenCheckout {
     _adyenCheckoutResultApi.dropInAdvancedFlowPlatformCommunicationStream.stream
         .asBroadcastStream()
         .listen((event) async {
-      print(event.type);
-      print(event.data);
-
       switch (event.type) {
         case PlatformCommunicationType.paymentComponent:
           {
-            final paymentsResult = await postPayments(event.data!);
-            onPaymentsResult(paymentsResult);
+            if (event.data != null) {
+              final Map<String, dynamic> paymentsResult =
+                  await postPayments(event.data!);
+              onPaymentsResult(paymentsResult);
+              break;
+            }
           }
         case PlatformCommunicationType.additionalDetails:
           {
-            final paymentsDetailsResult =
-                await postPaymentsDetails(event.data!);
-            onPaymentsDetailsResult(paymentsDetailsResult);
+            if (event.data != null) {
+              final Map<String, dynamic> paymentsDetailsResult =
+                  await postPaymentsDetails(event.data!);
+              onPaymentsDetailsResult(paymentsDetailsResult);
+              break;
+            }
           }
         case PlatformCommunicationType.result:
           {
-            print(event.result.toString());
             completer.complete(event.result);
+            _adyenCheckoutResultApi
+                .dropInAdvancedFlowPlatformCommunicationStream
+                .close();
+            break;
           }
       }
     });
