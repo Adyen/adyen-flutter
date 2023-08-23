@@ -26,7 +26,7 @@ class CheckoutPlatformApi : CheckoutPlatformInterface {
     init(checkoutResultFlutterInterface: CheckoutResultFlutterInterface) {
         self.checkoutResultFlutterInterface = checkoutResultFlutterInterface
     }
-    
+
     func getPlatformVersion(completion: @escaping (Result<String, Error>) -> Void) {
         let systemVersion = UIDevice.current.systemVersion
         completion(Result.success(systemVersion))
@@ -63,8 +63,24 @@ class CheckoutPlatformApi : CheckoutPlatformInterface {
         }
     }
     
-    func getReturnUrl() -> String {
-        return "";
+    func getReturnUrl(completion: @escaping (Result<String, Error>) -> Void) {
+        completion(Result.success(""))
+    }
+
+    func startPayment(sessionModel: SessionModel, dropInConfiguration: DropInConfigurationModel) throws {
+
+    }
+
+    func startPaymentDropInAdvancedFlow(paymentMethodsResponse: String, dropInConfiguration: DropInConfigurationModel) throws {
+
+    }
+
+    func onPaymentsResult(paymentsResult: [String : Any?]) throws {
+
+    }
+
+    func onPaymentsDetailsResult(paymentsDetailsResult: [String : Any?]) throws {
+
     }
     
     private func createAdyenContext(dropInConfiguration: DropInConfigurationModel) throws  -> AdyenContext  {
@@ -94,7 +110,7 @@ class CheckoutPlatformApi : CheckoutPlatformInterface {
             return Adyen.Environment.liveApse
         }
     }
-    
+
     private func createDropInConfiguration(paymentMethods: PaymentMethods) -> DropInComponent.Configuration {
         let dropInConfiguration = DropInComponent.Configuration()
         return dropInConfiguration
@@ -113,7 +129,7 @@ extension CheckoutPlatformApi: AdyenSessionDelegate {
     
     func didFail(with error: Error, from component: Component, session: AdyenSession) {
         self.viewController?.dismiss(animated: true)
-        checkoutResultFlutterInterface.onSessionDropInResult(sessionDropInResult: SessionDropInResultModel(sessionDropInResult: SessionDropInResultEnum.cancelledByUser)) {}
+        checkoutResultFlutterInterface.onSessionDropInResult(sessionDropInResult: DropInResultModel(sessionDropInResult: DropInResultEnum.cancelledByUser)) {}
     }
     
     func didOpenExternalApplication(component: ActionComponent, session: AdyenSession) {
