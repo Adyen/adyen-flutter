@@ -95,9 +95,9 @@ class _MyAppState extends State<MyApp> {
       shopperLocale: Config.countryCode,
     );
 
-    final sessionDropInResultModel = await _adyenCheckout.startDropInSessionsPayment(
-      sessionModel,
-      dropInConfiguration,
+    final sessionDropInResultModel = await _adyenCheckout.startPayment(
+      dropInConfiguration: dropInConfiguration,
+      sessionModel: sessionModel,
     );
 
     _dialogBuilder(context, sessionDropInResultModel);
@@ -112,11 +112,11 @@ class _MyAppState extends State<MyApp> {
       amount: Config.amount,
     );
 
-    return await _adyenCheckout.startDropInAdvancedFlowPayment(
-      paymentMethodsResponse,
-      dropInConfiguration,
-      _adyenSessionRepository.postPayments,
-      _adyenSessionRepository.postPaymentsDetails,
+    return await _adyenCheckout.startPayment(
+      dropInConfiguration: dropInConfiguration,
+      paymentMethodsResponse: paymentMethodsResponse,
+      postPayments: _adyenSessionRepository.postPayments,
+      postPaymentsDetails: _adyenSessionRepository.postPaymentsDetails,
     );
   }
 

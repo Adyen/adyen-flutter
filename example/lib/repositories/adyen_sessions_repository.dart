@@ -71,7 +71,7 @@ class AdyenSessionsRepository {
       additionalData: AdditionalData(allow3DS2: true, executeThreeD: true),
       threeDS2RequestData: ThreeDS2RequestDataRequest(),
       threeDSAuthenticationOnly: false,
-      recurringProcessingModel: RecurringProcessingModel.subscription,
+      recurringProcessingModel: RecurringProcessingModel.cardOnFile,
       lineItems: [],
     );
 
