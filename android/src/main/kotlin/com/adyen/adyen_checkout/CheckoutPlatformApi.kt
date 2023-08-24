@@ -36,8 +36,6 @@ class CheckoutPlatformApi(val checkoutResultFlutterInterface: CheckoutResultFlut
     lateinit var dropInSessionLauncher: ActivityResultLauncher<SessionDropInResultContractParams>
     lateinit var dropInAdvancedFlowLauncher: ActivityResultLauncher<DropInResultContractParams>
 
-    private var advancedFlowDropInAdditionalDetailsObserver: Observer<JSONObject>? = null
-
     override fun getPlatformVersion(callback: (Result<String>) -> Unit) {
         callback.invoke(Result.success("Android ${android.os.Build.VERSION.RELEASE}"))
     }
@@ -117,9 +115,9 @@ class CheckoutPlatformApi(val checkoutResultFlutterInterface: CheckoutResultFlut
 
     private fun setAdvancedFlowDropInServiceObserver() {
         DropInServiceResultMessenger.instance().removeObservers(activity)
-        DropInServiceResultMessenger.instance().observe(activity, Observer { message ->
+        DropInServiceResultMessenger.instance().observe(activity) { message ->
             if (message.hasBeenHandled()) {
-                return@Observer
+                return@observe
             }
 
             val model = PlatformCommunicationModel(
@@ -127,24 +125,21 @@ class CheckoutPlatformApi(val checkoutResultFlutterInterface: CheckoutResultFlut
                 data = message.contentIfNotHandled.toString()
             )
             checkoutResultFlutterInterface.onDropInAdvancedFlowPlatformCommunication(model) {}
-        })
-
+        }
     }
 
     private fun setAdvanceFlowDropInAdditionalDetailsMessengerObserver() {
-        advancedFlowDropInAdditionalDetailsObserver = Observer { message ->
+        DropInAdditionalDetailsPlatformMessenger.instance().removeObservers(activity)
+        DropInAdditionalDetailsPlatformMessenger.instance().observe(activity) { message ->
+            if (message.hasBeenHandled()) {
+                return@observe
+            }
 
             val model = PlatformCommunicationModel(
                 PlatformCommunicationType.ADDITIONALDETAILS,
-                data = message.toString()
+                data = message.contentIfNotHandled.toString()
             )
             checkoutResultFlutterInterface.onDropInAdvancedFlowPlatformCommunication(model) {}
-
-        }
-
-        advancedFlowDropInAdditionalDetailsObserver?.let {
-            DropInAdditionalDetailsPlatformMessenger.instance().removeObservers(activity)
-            DropInAdditionalDetailsPlatformMessenger.instance().observe(activity, it)
         }
     }
 

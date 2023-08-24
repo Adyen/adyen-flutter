@@ -50,6 +50,7 @@ class AdyenSessionsRepository {
     return await _service.fetchPaymentMethods(PaymentMethodsRequestNetworkModel(
       merchantAccount: Config.merchantAccount,
       countryCode: Config.countryCode,
+      channel: Config.channel
     ));
   }
 
@@ -71,17 +72,7 @@ class AdyenSessionsRepository {
       threeDS2RequestData: ThreeDS2RequestDataRequest(),
       threeDSAuthenticationOnly: false,
       recurringProcessingModel: RecurringProcessingModel.subscription,
-      lineItems: [
-        Item(
-          quantity: 2,
-          amountExcludingTax: 100,
-          taxPercentage: 0,
-          description: "Coffee",
-          id: DateTime.now().millisecondsSinceEpoch.toString(),
-          amountIncludingTax: 100,
-          taxCategory: "Low",
-        )
-      ],
+      lineItems: [],
     );
 
     Map<String, dynamic> mergedJson = <String, dynamic>{};
