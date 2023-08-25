@@ -1,13 +1,12 @@
 package com.adyen.adyen_checkout
 
+import CheckoutFlutterApi
 import CheckoutPlatformInterface
-import CheckoutResultFlutterInterface
 import DropInConfigurationModel
 import PlatformCommunicationModel
 import SessionModel
 import androidx.activity.result.ActivityResultLauncher
 import androidx.fragment.app.FragmentActivity
-import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import com.adyen.adyen_checkout.Mapper.mapToDropInConfiguration
 import com.adyen.adyen_checkout.Mapper.mapToSessionModel
@@ -30,7 +29,7 @@ import kotlinx.coroutines.withContext
 import org.json.JSONObject
 
 @Suppress("NAME_SHADOWING")
-class CheckoutPlatformApi(val checkoutResultFlutterInterface: CheckoutResultFlutterInterface) :
+class CheckoutPlatformApi(private val checkoutFlutterApi: CheckoutFlutterApi?) :
     CheckoutPlatformInterface {
     lateinit var activity: FragmentActivity
     lateinit var dropInSessionLauncher: ActivityResultLauncher<SessionDropInResultContractParams>
@@ -45,8 +44,8 @@ class CheckoutPlatformApi(val checkoutResultFlutterInterface: CheckoutResultFlut
     }
 
     override fun startPayment(
-        sessionModel: SessionModel,
         dropInConfiguration: DropInConfigurationModel,
+        sessionModel: SessionModel,
     ) {
         activity.lifecycleScope.launch(Dispatchers.IO) {
             val sessionModel = sessionModel.mapToSessionModel()
@@ -66,8 +65,8 @@ class CheckoutPlatformApi(val checkoutResultFlutterInterface: CheckoutResultFlut
     }
 
     override fun startPaymentDropInAdvancedFlow(
-        paymentMethodsResponse: String,
         dropInConfiguration: DropInConfigurationModel,
+        paymentMethodsResponse: String,
     ) {
         setAdvancedFlowDropInServiceObserver()
         activity.lifecycleScope.launch(Dispatchers.IO) {
@@ -124,7 +123,7 @@ class CheckoutPlatformApi(val checkoutResultFlutterInterface: CheckoutResultFlut
                 PlatformCommunicationType.PAYMENTCOMPONENT,
                 data = message.contentIfNotHandled.toString()
             )
-            checkoutResultFlutterInterface.onDropInAdvancedFlowPlatformCommunication(model) {}
+            checkoutFlutterApi?.onDropInAdvancedFlowPlatformCommunication(model) {}
         }
     }
 
@@ -139,7 +138,7 @@ class CheckoutPlatformApi(val checkoutResultFlutterInterface: CheckoutResultFlut
                 PlatformCommunicationType.ADDITIONALDETAILS,
                 data = message.contentIfNotHandled.toString()
             )
-            checkoutResultFlutterInterface.onDropInAdvancedFlowPlatformCommunication(model) {}
+            checkoutFlutterApi?.onDropInAdvancedFlowPlatformCommunication(model) {}
         }
     }
 

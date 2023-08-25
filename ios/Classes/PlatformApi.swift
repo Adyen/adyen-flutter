@@ -363,26 +363,54 @@ private class CheckoutPlatformInterfaceCodecReaderWriter: FlutterStandardReaderW
   }
 }
 
-class CheckoutPlatformInterfaceCodec: FlutterStandardMessageCodec {
-  static let shared = CheckoutPlatformInterfaceCodec(readerWriter: CheckoutPlatformInterfaceCodecReaderWriter())
+class CheckoutPlatformInterfaceCodec : FlutterStandardMessageCodec {
+    static let shared = CheckoutPlatformInterfaceCodec(readerWriter
+    :
+
+    CheckoutPlatformInterfaceCodecReaderWriter()
+
+    )
 }
 
 /// Generated protocol from Pigeon that represents a handler of messages from Flutter.
-protocol CheckoutPlatformInterface {
-  func getPlatformVersion(completion: @escaping (Result<String, Error>) -> Void)
-  func getReturnUrl(completion: @escaping (Result<String, Error>) -> Void)
-  func startPayment(sessionModel: SessionModel, dropInConfiguration: DropInConfigurationModel) throws
-  func startPaymentDropInAdvancedFlow(paymentMethodsResponse: String, dropInConfiguration: DropInConfigurationModel) throws
-  func onPaymentsResult(paymentsResult: [String: Any?]) throws
-  func onPaymentsDetailsResult(paymentsDetailsResult: [String: Any?]) throws
+protocol
+
+CheckoutPlatformInterface {
+func getPlatformVersion(completion
+: @
+escaping (Result<String, Error>)
+-> Void)
+func getReturnUrl(completion
+: @
+escaping (Result<String, Error>)
+-> Void)
+func startPayment(dropInConfiguration
+: DropInConfigurationModel, sessionModel: SessionModel)
+throws
+        func
+startPaymentDropInAdvancedFlow(dropInConfiguration
+: DropInConfigurationModel, paymentMethodsResponse: String)
+throws
+        func
+onPaymentsResult(paymentsResult
+: [String: Any?])
+throws
+        func
+onPaymentsDetailsResult(paymentsDetailsResult
+: [String: Any?]) throws
 }
 
 /// Generated setup class from Pigeon to handle messages through the `binaryMessenger`.
 class CheckoutPlatformInterfaceSetup {
-  /// The codec used by CheckoutPlatformInterface.
-  static var codec: FlutterStandardMessageCodec { CheckoutPlatformInterfaceCodec.shared }
-  /// Sets up an instance of `CheckoutPlatformInterface` to handle messages through the `binaryMessenger`.
-  static func setUp(binaryMessenger: FlutterBinaryMessenger, api: CheckoutPlatformInterface?) {
+    /// The codec used by CheckoutPlatformInterface.
+    static var codec: FlutterStandardMessageCodec{CheckoutPlatformInterfaceCodec.shared}
+
+    /// Sets up an instance of `CheckoutPlatformInterface` to handle messages through the `binaryMessenger`.
+    static func setUp(binaryMessenger
+
+    : FlutterBinaryMessenger,
+    api: CheckoutPlatformInterface ?
+    ) {
     let getPlatformVersionChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.getPlatformVersion", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {
       getPlatformVersionChannel.setMessageHandler { _, reply in
@@ -415,33 +443,59 @@ class CheckoutPlatformInterfaceSetup {
     }
     let startPaymentChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.startPayment", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {
-      startPaymentChannel.setMessageHandler { message, reply in
-        let args = message as! [Any?]
-        let sessionModelArg = args[0] as! SessionModel
-        let dropInConfigurationArg = args[1] as! DropInConfigurationModel
-        do {
-          try api.startPayment(sessionModel: sessionModelArg, dropInConfiguration: dropInConfigurationArg)
-          reply(wrapResult(nil))
-        } catch {
-          reply(wrapError(error))
-        }
-      }
+      startPaymentChannel.setMessageHandler {
+                    message, reply
+                    in
+                    let
+                    args = message
+                    as
+                    ! [Any ?]
+                    let
+                    dropInConfigurationArg = args[0]
+                    as
+                    !DropInConfigurationModel
+                    let
+                    sessionModelArg = args[1]
+                    as
+                    !SessionModel
+                    do {
+                        try
+                        api.startPayment(
+                                dropInConfiguration: dropInConfigurationArg, sessionModel: sessionModelArg)
+                        reply(wrapResult(nil))
+                    } catch {
+                        reply(wrapError(error))
+                    }
+                }
     } else {
       startPaymentChannel.setMessageHandler(nil)
     }
     let startPaymentDropInAdvancedFlowChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.startPaymentDropInAdvancedFlow", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {
-      startPaymentDropInAdvancedFlowChannel.setMessageHandler { message, reply in
-        let args = message as! [Any?]
-        let paymentMethodsResponseArg = args[0] as! String
-        let dropInConfigurationArg = args[1] as! DropInConfigurationModel
-        do {
-          try api.startPaymentDropInAdvancedFlow(paymentMethodsResponse: paymentMethodsResponseArg, dropInConfiguration: dropInConfigurationArg)
-          reply(wrapResult(nil))
-        } catch {
-          reply(wrapError(error))
-        }
-      }
+      startPaymentDropInAdvancedFlowChannel.setMessageHandler {
+                    message, reply
+                    in
+                    let
+                    args = message
+                    as
+                    ! [Any ?]
+                    let
+                    dropInConfigurationArg = args[0]
+                    as
+                    !DropInConfigurationModel
+                    let
+                    paymentMethodsResponseArg = args[1]
+                    as
+                    !String
+                    do {
+                        try
+                        api.startPaymentDropInAdvancedFlow(
+                                dropInConfiguration: dropInConfigurationArg, paymentMethodsResponse: paymentMethodsResponseArg)
+                        reply(wrapResult(nil))
+                    } catch {
+                        reply(wrapError(error))
+                    }
+                }
     } else {
       startPaymentDropInAdvancedFlowChannel.setMessageHandler(nil)
     }
@@ -467,91 +521,142 @@ class CheckoutPlatformInterfaceSetup {
         let paymentsDetailsResultArg = args[0] as! [String: Any?]
         do {
           try api.onPaymentsDetailsResult(paymentsDetailsResult: paymentsDetailsResultArg)
-          reply(wrapResult(nil))
+            reply(wrapResult(nil))
         } catch {
-          reply(wrapError(error))
+                        reply(wrapError(error))
+                    }
+                }
+        } else {
+            onPaymentsDetailsResultChannel.setMessageHandler(nil)
         }
-      }
-    } else {
-      onPaymentsDetailsResultChannel.setMessageHandler(nil)
     }
-  }
-}
-private class CheckoutResultFlutterInterfaceCodecReader: FlutterStandardReader {
-  override func readValue(ofType type: UInt8) -> Any? {
-    switch type {
-      case 128:
-        return Amount.fromList(self.readValue() as! [Any?])
-      case 129:
-        return DropInResultModel.fromList(self.readValue() as! [Any?])
-      case 130:
-        return OrderResponseModel.fromList(self.readValue() as! [Any?])
-      case 131:
-        return PlatformCommunicationModel.fromList(self.readValue() as! [Any?])
-      case 132:
-        return SessionPaymentResultModel.fromList(self.readValue() as! [Any?])
-      default:
-        return super.readValue(ofType: type)
-    }
-  }
 }
 
-private class CheckoutResultFlutterInterfaceCodecWriter: FlutterStandardWriter {
-  override func writeValue(_ value: Any) {
-    if let value = value as? Amount {
-      super.writeByte(128)
-      super.writeValue(value.toList())
-    } else if let value = value as? DropInResultModel {
-      super.writeByte(129)
-      super.writeValue(value.toList())
-    } else if let value = value as? OrderResponseModel {
-      super.writeByte(130)
-      super.writeValue(value.toList())
+private
+
+class CheckoutFlutterApiCodecReader : FlutterStandardReader {
+    override func
+    readValue(ofType
+    type: UInt8
+    ) -> Any? {
+        switch type{
+                    case 128:
+                    return Amount.fromList(self.readValue() as![Any?])
+                    case 129:
+                    return DropInResultModel.fromList(self.readValue() as![Any?])
+                    case 130:
+                    return OrderResponseModel.fromList(self.readValue() as![Any?])
+                    case 131:
+                    return PlatformCommunicationModel.fromList(self.readValue() as![Any?])
+                    case 132:
+                    return SessionPaymentResultModel.fromList(self.readValue() as![Any?])
+                    default:
+                    return super.readValue(ofType: type)
+            }
+    }
+}
+
+private
+
+class CheckoutFlutterApiCodecWriter : FlutterStandardWriter {
+    override func
+    writeValue(_
+    value: Any
+    ) {
+        if let
+        value = value
+        as ? Amount{
+                super.writeByte(128)
+                super.writeValue(value.toList())
+        } else if let
+        value = value
+        as ? DropInResultModel{
+                super.writeByte(129)
+                super.writeValue(value.toList())
+        } else if let
+        value = value
+        as ? OrderResponseModel{
+                super.writeByte(130)
+                super.writeValue(value.toList())
     } else if let value = value as? PlatformCommunicationModel {
       super.writeByte(131)
-      super.writeValue(value.toList())
-    } else if let value = value as? SessionPaymentResultModel {
-      super.writeByte(132)
-      super.writeValue(value.toList())
-    } else {
-      super.writeValue(value)
+                super.writeValue(value.toList())
+        } else if let
+        value = value
+        as ? SessionPaymentResultModel{
+                super.writeByte(132)
+                super.writeValue(value.toList())
+        } else {
+            super.writeValue(value)
+        }
     }
-  }
 }
 
-private class CheckoutResultFlutterInterfaceCodecReaderWriter: FlutterStandardReaderWriter {
-  override func reader(with data: Data) -> FlutterStandardReader {
-    return CheckoutResultFlutterInterfaceCodecReader(data: data)
-  }
+private
 
-  override func writer(with data: NSMutableData) -> FlutterStandardWriter {
-    return CheckoutResultFlutterInterfaceCodecWriter(data: data)
-  }
+class CheckoutFlutterApiCodecReaderWriter : FlutterStandardReaderWriter {
+    override func
+    reader(with
+    data: Data
+    ) -> FlutterStandardReader {
+        return CheckoutFlutterApiCodecReader(data: data)
+    }
+
+    override func
+    writer(with
+    data: NSMutableData
+    ) -> FlutterStandardWriter {
+        return CheckoutFlutterApiCodecWriter(data: data)
+    }
 }
 
-class CheckoutResultFlutterInterfaceCodec: FlutterStandardMessageCodec {
-  static let shared = CheckoutResultFlutterInterfaceCodec(readerWriter: CheckoutResultFlutterInterfaceCodecReaderWriter())
+class CheckoutFlutterApiCodec : FlutterStandardMessageCodec {
+    static let shared = CheckoutFlutterApiCodec(readerWriter
+    :
+
+    CheckoutFlutterApiCodecReaderWriter()
+
+    )
 }
 
 /// Generated class from Pigeon that represents Flutter messages that can be called from Swift.
-class CheckoutResultFlutterInterface {
-  private let binaryMessenger: FlutterBinaryMessenger
-  init(binaryMessenger: FlutterBinaryMessenger){
-    self.binaryMessenger = binaryMessenger
-  }
-  var codec: FlutterStandardMessageCodec {
-    return CheckoutResultFlutterInterfaceCodec.shared
-  }
-  func onSessionDropInResult(sessionDropInResult sessionDropInResultArg: DropInResultModel, completion: @escaping () -> Void) {
-    let channel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.CheckoutResultFlutterInterface.onSessionDropInResult", binaryMessenger: binaryMessenger, codec: codec)
-    channel.sendMessage([sessionDropInResultArg] as [Any?]) { _ in
-      completion()
+class CheckoutFlutterApi {
+private
+    let binaryMessenger: FlutterBinaryMessenger
+            init(binaryMessenger
+    : FlutterBinaryMessenger){
+        self.binaryMessenger = binaryMessenger
     }
-  }
-  func onDropInAdvancedFlowPlatformCommunication(platformCommunicationModel platformCommunicationModelArg: PlatformCommunicationModel, completion: @escaping () -> Void) {
-    let channel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.CheckoutResultFlutterInterface.onDropInAdvancedFlowPlatformCommunication", binaryMessenger: binaryMessenger, codec: codec)
-    channel.sendMessage([platformCommunicationModelArg] as [Any?]) { _ in
-      completion()
+    var codec: FlutterStandardMessageCodec{
+            return CheckoutFlutterApiCodec.shared
     }
-  }
+            func
+    onDropInSessionResult(sessionDropInResult
+    sessionDropInResultArg: DropInResultModel, completion:
+    @escaping() -> Void) {
+        let
+        channel = FlutterBasicMessageChannel(
+                name: "dev.flutter.pigeon.adyen_checkout.CheckoutFlutterApi.onDropInSessionResult", binaryMessenger: binaryMessenger, codec: codec)
+        channel.sendMessage([sessionDropInResultArg]
+        as[Any ?]) {
+            _ in
+            completion()
+        }
+    }
+
+    func onDropInAdvancedFlowPlatformCommunication(
+            platformCommunicationModel platformCommunicationModelArg
+
+    : PlatformCommunicationModel,
+    completion:
+    @escaping() -> Void) {
+        let
+        channel = FlutterBasicMessageChannel(
+                name: "dev.flutter.pigeon.adyen_checkout.CheckoutFlutterApi.onDropInAdvancedFlowPlatformCommunication", binaryMessenger: binaryMessenger, codec: codec)
+        channel.sendMessage([platformCommunicationModelArg]
+        as[Any ?]) {
+            _ in
+            completion()
+        }
+    }
 }

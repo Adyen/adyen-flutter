@@ -1,7 +1,7 @@
 package com.adyen.adyen_checkout
 
+import CheckoutFlutterApi
 import CheckoutPlatformInterface
-import CheckoutResultFlutterInterface
 import DropInResultModel
 import PlatformCommunicationModel
 import SessionPaymentResultModel
@@ -22,24 +22,19 @@ import io.flutter.embedding.engine.plugins.lifecycle.HiddenLifecycleReference
 /** AdyenCheckoutPlugin */
 class AdyenCheckoutPlugin : FlutterPlugin, ActivityAware {
     private var checkoutPlatformApi: CheckoutPlatformApi? = null
-    private var checkoutResultFlutterInterface: CheckoutResultFlutterInterface? = null
+    private var checkoutFlutterApi: CheckoutFlutterApi? = null
     private var lifecycleReference: HiddenLifecycleReference? = null
     private var lifecycleObserver: LifecycleEventObserver? = null
 
     override fun onAttachedToEngine(flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
-        checkoutResultFlutterInterface =
-            CheckoutResultFlutterInterface(flutterPluginBinding.binaryMessenger)
-        checkoutResultFlutterInterface?.let {
-            checkoutPlatformApi = CheckoutPlatformApi(it)
-            CheckoutPlatformInterface.setUp(
-                flutterPluginBinding.binaryMessenger, checkoutPlatformApi
-            )
-        }
+        checkoutFlutterApi = CheckoutFlutterApi(flutterPluginBinding.binaryMessenger)
+        checkoutPlatformApi = CheckoutPlatformApi(checkoutFlutterApi)
+        CheckoutPlatformInterface.setUp(flutterPluginBinding.binaryMessenger, checkoutPlatformApi)
     }
 
     override fun onDetachedFromEngine(binding: FlutterPlugin.FlutterPluginBinding) {
         CheckoutPlatformInterface.setUp(binding.binaryMessenger, null)
-        checkoutResultFlutterInterface = null
+        checkoutFlutterApi = null
     }
 
     override fun onAttachedToActivity(binding: ActivityPluginBinding) = setupActivity(binding)
@@ -62,7 +57,7 @@ class AdyenCheckoutPlugin : FlutterPlugin, ActivityAware {
     }
 
     private fun lifecycleEventObserver(fragmentActivity: FragmentActivity): LifecycleEventObserver {
-        return LifecycleEventObserver { source, event ->
+        return LifecycleEventObserver { _, event ->
             when (event) {
                 Lifecycle.Event.ON_CREATE -> {
                     checkoutPlatformApi?.dropInSessionLauncher =
@@ -101,7 +96,7 @@ class AdyenCheckoutPlugin : FlutterPlugin, ActivityAware {
                 )
             )
         }
-        checkoutResultFlutterInterface?.onSessionDropInResult(mappedResult) {}
+        checkoutFlutterApi?.onDropInSessionResult(mappedResult) {}
     }
 
     private fun dropInAdvancedFlowCallback() = DropInCallback { dropInAdvancedFlowResult ->
@@ -126,11 +121,9 @@ class AdyenCheckoutPlugin : FlutterPlugin, ActivityAware {
         }
 
         val model = PlatformCommunicationModel(
-            PlatformCommunicationType.RESULT,
-            data = "",
-            result = mappedResult
+            PlatformCommunicationType.RESULT, data = "", result = mappedResult
         )
-        checkoutResultFlutterInterface?.onDropInAdvancedFlowPlatformCommunication(model) {}
+        checkoutFlutterApi?.onDropInAdvancedFlowPlatformCommunication(model) {}
     }
 
     private fun teardown() {

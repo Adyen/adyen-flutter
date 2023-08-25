@@ -48,15 +48,15 @@ class AdyenCheckout {
     SessionModel sessionModel,
     DropInConfigurationModel dropInConfiguration,
   ) async {
-    _resultApi.sessionDropInResultStream =
+    _resultApi.dropInSessionResultStream =
         StreamController<DropInResultModel>();
     AdyenCheckoutInterface.instance.startPayment(
       sessionModel,
       dropInConfiguration,
     );
     final sessionDropInResultModel =
-        await _resultApi.sessionDropInResultStream.stream.first;
-    await _resultApi.sessionDropInResultStream.close();
+        await _resultApi.dropInSessionResultStream.stream.first;
+    await _resultApi.dropInSessionResultStream.close();
     return sessionDropInResultModel;
   }
 
@@ -81,28 +81,11 @@ class AdyenCheckout {
         .listen((event) async {
       switch (event.type) {
         case PlatformCommunicationType.paymentComponent:
-          {
-            if (event.data != null) {
-              final Map<String, dynamic> paymentsResult =
-                  await postPayments(event.data!);
-              onPaymentsResult(paymentsResult);
-              break;
-            }
-          }
+          await _handlePaymentComponent(event, postPayments);
         case PlatformCommunicationType.additionalDetails:
-          {
-            if (event.data != null) {
-              final Map<String, dynamic> paymentsDetailsResult =
-                  await postPaymentsDetails(event.data!);
-              onPaymentsDetailsResult(paymentsDetailsResult);
-              break;
-            }
-          }
+          await _handleAdditionalDetails(event, postPaymentsDetails);
         case PlatformCommunicationType.result:
-          {
-            dropInAdvancedFlowCompleter.complete(event.result);
-            break;
-          }
+          _handleResult(dropInAdvancedFlowCompleter, event);
       }
     });
 
@@ -111,6 +94,35 @@ class AdyenCheckout {
 
       return value;
     });
+  }
+
+  void _handleResult(Completer<DropInResultModel> dropInAdvancedFlowCompleter,
+      PlatformCommunicationModel event) {
+    dropInAdvancedFlowCompleter.complete(event.result);
+  }
+
+  Future<void> _handleAdditionalDetails(
+    PlatformCommunicationModel event,
+    Future<Map<String, dynamic>> Function(String additionalDetails)
+        postPaymentsDetails,
+  ) async {
+    if (event.data != null) {
+      final Map<String, dynamic> paymentsDetailsResult =
+          await postPaymentsDetails(event.data!);
+      onPaymentsDetailsResult(paymentsDetailsResult);
+    }
+  }
+
+  Future<void> _handlePaymentComponent(
+    PlatformCommunicationModel event,
+    Future<Map<String, dynamic>> Function(String paymentComponentJson)
+        postPayments,
+  ) async {
+    if (event.data != null) {
+      final Map<String, dynamic> paymentsResult =
+          await postPayments(event.data!);
+      onPaymentsResult(paymentsResult);
+    }
   }
 
   Future<String> getReturnUrl() =>
@@ -123,5 +135,5 @@ class AdyenCheckout {
       AdyenCheckoutInterface.instance
           .onPaymentsDetailsResult(paymentsDetailsResult);
 
-  void _setupResultApi() => CheckoutResultFlutterInterface.setup(_resultApi);
+  void _setupResultApi() => CheckoutFlutterApi.setup(_resultApi);
 }

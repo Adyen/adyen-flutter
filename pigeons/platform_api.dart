@@ -157,13 +157,13 @@ abstract class CheckoutPlatformInterface {
   String getReturnUrl();
 
   void startPayment(
-    SessionModel sessionModel,
     DropInConfigurationModel dropInConfiguration,
+    SessionModel sessionModel,
   );
 
   void startPaymentDropInAdvancedFlow(
-    String paymentMethodsResponse,
     DropInConfigurationModel dropInConfiguration,
+    String paymentMethodsResponse,
   );
 
   void onPaymentsResult(Map<String, Object?> paymentsResult);
@@ -172,8 +172,8 @@ abstract class CheckoutPlatformInterface {
 }
 
 @FlutterApi()
-abstract class CheckoutResultFlutterInterface {
-  void onSessionDropInResult(DropInResultModel sessionDropInResult);
+abstract class CheckoutFlutterApi {
+  void onDropInSessionResult(DropInResultModel sessionDropInResult);
 
   void onDropInAdvancedFlowPlatformCommunication(
       PlatformCommunicationModel platformCommunicationModel);

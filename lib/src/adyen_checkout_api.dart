@@ -5,37 +5,36 @@ class AdyenCheckoutApi implements AdyenCheckoutInterface {
   final CheckoutPlatformInterface checkoutApi = CheckoutPlatformInterface();
 
   @override
-  Future<String> getPlatformVersion() {
-    return checkoutApi.getPlatformVersion();
-  }
+  Future<String> getPlatformVersion() => checkoutApi.getPlatformVersion();
 
   @override
   void startPayment(
     SessionModel sessionModel,
     DropInConfigurationModel dropInConfiguration,
-  ) {
-    checkoutApi.startPayment(sessionModel, dropInConfiguration);
-  }
+  ) =>
+      checkoutApi.startPayment(
+        dropInConfiguration,
+        sessionModel,
+      );
 
   @override
-  void startDropInAdvancedFlowPayment(String paymentMethodsResponse,
-      DropInConfigurationModel dropInConfiguration) async {
-    checkoutApi.startPaymentDropInAdvancedFlow(
-        paymentMethodsResponse, dropInConfiguration);
-  }
+  void startDropInAdvancedFlowPayment(
+    String paymentMethodsResponse,
+    DropInConfigurationModel dropInConfiguration,
+  ) =>
+      checkoutApi.startPaymentDropInAdvancedFlow(
+        dropInConfiguration,
+        paymentMethodsResponse,
+      );
 
   @override
-  Future<String> getReturnUrl() async {
-    return checkoutApi.getReturnUrl();
-  }
+  Future<String> getReturnUrl() => checkoutApi.getReturnUrl();
 
   @override
-  void onPaymentsResult(Map<String, Object?> paymentsResult) {
-    checkoutApi.onPaymentsResult(paymentsResult);
-  }
+  void onPaymentsResult(Map<String, Object?> paymentsResult) =>
+      checkoutApi.onPaymentsResult(paymentsResult);
 
   @override
-  void onPaymentsDetailsResult(Map<String, Object?> paymentsDetailsResult) {
-    checkoutApi.onPaymentsDetailsResult(paymentsDetailsResult);
-  }
+  void onPaymentsDetailsResult(Map<String, Object?> paymentsDetailsResult) =>
+      checkoutApi.onPaymentsDetailsResult(paymentsDetailsResult);
 }

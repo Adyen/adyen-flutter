@@ -17,14 +17,13 @@ import AdyenNetworking
 // 3) Add AppDelegate redirect
 
 class CheckoutPlatformApi : CheckoutPlatformInterface {
-    
-    private let checkoutResultFlutterInterface: CheckoutResultFlutterInterface
+    private let checkoutFlutterApi: CheckoutFlutterApi
     private var session: AdyenSession?
     private var dropInComponent: DropInComponent?
     private var viewController : UIViewController?
     
-    init(checkoutResultFlutterInterface: CheckoutResultFlutterInterface) {
-        self.checkoutResultFlutterInterface = checkoutResultFlutterInterface
+    init(checkoutFlutterApi: CheckoutFlutterApi) {
+        self.checkoutFlutterApi = checkoutFlutterApi
     }
 
     func getPlatformVersion(completion: @escaping (Result<String, Error>) -> Void) {
@@ -32,7 +31,7 @@ class CheckoutPlatformApi : CheckoutPlatformInterface {
         completion(Result.success(systemVersion))
     }
     
-    func startPayment(sessionModel: SessionModel, dropInConfiguration: DropInConfigurationModel, completion: @escaping (Result<Void, Error>) -> Void) {
+    func startPayment(dropInConfiguration: DropInConfigurationModel, sessionModel: SessionModel) {
         do {
             viewController = UIApplication.shared.adyen.mainKeyWindow?.rootViewController
             let adyenContext = try createAdyenContext(dropInConfiguration: dropInConfiguration)
@@ -62,17 +61,14 @@ class CheckoutPlatformApi : CheckoutPlatformInterface {
             completion(.failure(error))
         }
     }
-    
+
+
+    func startPaymentDropInAdvancedFlow(dropInConfiguration: DropInConfigurationModel, paymentMethodsResponse: String) {
+
+    }
+
     func getReturnUrl(completion: @escaping (Result<String, Error>) -> Void) {
         completion(Result.success(""))
-    }
-
-    func startPayment(sessionModel: SessionModel, dropInConfiguration: DropInConfigurationModel) throws {
-
-    }
-
-    func startPaymentDropInAdvancedFlow(paymentMethodsResponse: String, dropInConfiguration: DropInConfigurationModel) throws {
-
     }
 
     func onPaymentsResult(paymentsResult: [String : Any?]) throws {
@@ -129,7 +125,7 @@ extension CheckoutPlatformApi: AdyenSessionDelegate {
     
     func didFail(with error: Error, from component: Component, session: AdyenSession) {
         self.viewController?.dismiss(animated: true)
-        checkoutResultFlutterInterface.onSessionDropInResult(sessionDropInResult: DropInResultModel(sessionDropInResult: DropInResultEnum.cancelledByUser)) {}
+        checkoutFlutterApi.onDropInSessionResult(sessionDropInResult: DropInResultModel(sessionDropInResult: DropInResultEnum.cancelledByUser)) {}
     }
     
     func didOpenExternalApplication(component: ActionComponent, session: AdyenSession) {
