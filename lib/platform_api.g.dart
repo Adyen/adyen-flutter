@@ -102,10 +102,10 @@ class Amount {
 
 class DropInConfigurationModel {
   DropInConfigurationModel({
-    this.shopperLocale,
     required this.environment,
     required this.clientKey,
     required this.amount,
+    required this.shopperLocale,
     this.isAnalyticsEnabled,
     this.showPreselectedStoredPaymentMethod,
     this.skipListWhenSinglePaymentMethod,
@@ -113,13 +113,13 @@ class DropInConfigurationModel {
     this.additionalDataForDropInService,
   });
 
-  Locale? shopperLocale;
-
   Environment environment;
 
   String clientKey;
 
   Amount amount;
+
+  String shopperLocale;
 
   bool? isAnalyticsEnabled;
 
@@ -133,10 +133,10 @@ class DropInConfigurationModel {
 
   Object encode() {
     return <Object?>[
-      shopperLocale?.index,
       environment.index,
       clientKey,
       amount.encode(),
+      shopperLocale,
       isAnalyticsEnabled,
       showPreselectedStoredPaymentMethod,
       skipListWhenSinglePaymentMethod,
@@ -148,12 +148,10 @@ class DropInConfigurationModel {
   static DropInConfigurationModel decode(Object result) {
     result as List<Object?>;
     return DropInConfigurationModel(
-      shopperLocale: result[0] != null
-          ? Locale.values[result[0]! as int]
-          : null,
-      environment: Environment.values[result[1]! as int],
-      clientKey: result[2]! as String,
-      amount: Amount.decode(result[3]! as List<Object?>),
+      environment: Environment.values[result[0]! as int],
+      clientKey: result[1]! as String,
+      amount: Amount.decode(result[2]! as List<Object?>),
+      shopperLocale: result[3]! as String,
       isAnalyticsEnabled: result[4] as bool?,
       showPreselectedStoredPaymentMethod: result[5] as bool?,
       skipListWhenSinglePaymentMethod: result[6] as bool?,
@@ -166,15 +164,12 @@ class DropInConfigurationModel {
 class SessionPaymentResultModel {
   SessionPaymentResultModel({
     this.sessionId,
-    this.sessionResult,
     this.sessionData,
     this.resultCode,
     this.order,
   });
 
   String? sessionId;
-
-  String? sessionResult;
 
   String? sessionData;
 
@@ -185,7 +180,6 @@ class SessionPaymentResultModel {
   Object encode() {
     return <Object?>[
       sessionId,
-      sessionResult,
       sessionData,
       resultCode,
       order?.encode(),
@@ -196,11 +190,10 @@ class SessionPaymentResultModel {
     result as List<Object?>;
     return SessionPaymentResultModel(
       sessionId: result[0] as String?,
-      sessionResult: result[1] as String?,
-      sessionData: result[2] as String?,
-      resultCode: result[3] as String?,
-      order: result[4] != null
-          ? OrderResponseModel.decode(result[4]! as List<Object?>)
+      sessionData: result[1] as String?,
+      resultCode: result[2] as String?,
+      order: result[3] != null
+          ? OrderResponseModel.decode(result[3]! as List<Object?>)
           : null,
     );
   }

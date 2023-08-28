@@ -66,10 +66,10 @@ enum Locale {
 }
 
 class DropInConfigurationModel {
-  Locale? shopperLocale;
   final Environment environment;
   final String clientKey;
   final Amount amount;
+  final String shopperLocale;
   bool? isAnalyticsEnabled;
   bool? showPreselectedStoredPaymentMethod;
   bool? skipListWhenSinglePaymentMethod;
@@ -80,19 +80,18 @@ class DropInConfigurationModel {
     required this.environment,
     required this.clientKey,
     required this.amount,
+    required this.shopperLocale,
   });
 }
 
 class SessionPaymentResultModel {
   final String? sessionId;
-  final String? sessionResult;
   final String? sessionData;
   final String? resultCode;
   final OrderResponseModel? order;
 
   SessionPaymentResultModel(
     this.sessionId,
-    this.sessionResult,
     this.sessionData,
     this.resultCode,
     this.order,
