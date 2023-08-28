@@ -120,59 +120,31 @@ struct Amount {
 
 /// Generated class from Pigeon that represents data sent in messages.
 struct DropInConfigurationModel {
-    var environment: Environment
-            var
-    clientKey: String
-            var
-    amount: Amount
-            var
-    shopperLocale: String
-            var
-    isAnalyticsEnabled: Bool ? = nil
-    var showPreselectedStoredPaymentMethod: Bool ? = nil
-    var skipListWhenSinglePaymentMethod: Bool ? = nil
-    var isRemovingStoredPaymentMethodsEnabled: Bool ? = nil
-    var additionalDataForDropInService: String ? = nil
+  var environment: Environment
+  var clientKey: String
+  var amount: Amount
+  var shopperLocale: String
+  var isAnalyticsEnabled: Bool? = nil
+  var showPreselectedStoredPaymentMethod: Bool? = nil
+  var skipListWhenSinglePaymentMethod: Bool? = nil
+  var isRemovingStoredPaymentMethodsEnabled: Bool? = nil
+  var additionalDataForDropInService: String? = nil
 
-    static func fromList(_ list
+  static func fromList(_ list: [Any?]) -> DropInConfigurationModel? {
+    let environment = Environment(rawValue: list[0] as! Int)!
+    let clientKey = list[1] as! String
+    let amount = Amount.fromList(list[2] as! [Any?])!
+    let shopperLocale = list[3] as! String
+    let isAnalyticsEnabled: Bool? = nilOrValue(list[4])
+    let showPreselectedStoredPaymentMethod: Bool? = nilOrValue(list[5])
+    let skipListWhenSinglePaymentMethod: Bool? = nilOrValue(list[6])
+    let isRemovingStoredPaymentMethodsEnabled: Bool? = nilOrValue(list[7])
+    let additionalDataForDropInService: String? = nilOrValue(list[8])
 
-    : [Any?]) -> DropInConfigurationModel? {
-        let
-        environment = Environment(rawValue: list[0]
-        as
-        !Int)!
-                let
-        clientKey = list[1]
-        as
-        !String
-        let
-        amount = Amount.fromList(list[2]
-        as
-        ! [Any ?])!
-                let
-        shopperLocale = list[3]
-        as
-        !String
-        let
-        isAnalyticsEnabled:
-        Bool ? = nilOrValue(list[4])
-        let
-        showPreselectedStoredPaymentMethod:
-        Bool ? = nilOrValue(list[5])
-        let
-        skipListWhenSinglePaymentMethod:
-        Bool ? = nilOrValue(list[6])
-        let
-        isRemovingStoredPaymentMethodsEnabled:
-        Bool ? = nilOrValue(list[7])
-        let
-        additionalDataForDropInService:
-        String ? = nilOrValue(list[8])
-
-        return DropInConfigurationModel(
-                environment: environment,
-                clientKey: clientKey,
-                amount: amount,
+    return DropInConfigurationModel(
+      environment: environment,
+      clientKey: clientKey,
+      amount: amount,
       shopperLocale: shopperLocale,
       isAnalyticsEnabled: isAnalyticsEnabled,
       showPreselectedStoredPaymentMethod: showPreselectedStoredPaymentMethod,
