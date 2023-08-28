@@ -149,7 +149,7 @@ data class DropInConfigurationModel (
   val environment: Environment,
   val clientKey: String,
   val amount: Amount,
-  val shopperLocale: String? = null,
+  val shopperLocale: String,
   val isAnalyticsEnabled: Boolean? = null,
   val showPreselectedStoredPaymentMethod: Boolean? = null,
   val skipListWhenSinglePaymentMethod: Boolean? = null,
@@ -163,7 +163,7 @@ data class DropInConfigurationModel (
       val environment = Environment.ofRaw(list[0] as Int)!!
       val clientKey = list[1] as String
       val amount = Amount.fromList(list[2] as List<Any?>)
-      val shopperLocale = list[3] as String?
+      val shopperLocale = list[3] as String
       val isAnalyticsEnabled = list[4] as Boolean?
       val showPreselectedStoredPaymentMethod = list[5] as Boolean?
       val skipListWhenSinglePaymentMethod = list[6] as Boolean?

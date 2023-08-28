@@ -27,42 +27,39 @@ class CheckoutPlatformApi : CheckoutPlatformInterface {
         self.checkoutResultFlutterInterface = checkoutResultFlutterInterface
     }
     
-    private static var delegatedAuthenticationConfigurations: ThreeDS2Component.Configuration.DelegatedAuthentication {
-        .init(localizedRegistrationReason: "Authenticate your card!",
-              localizedAuthenticationReason: "Register this device!",
-              appleTeamIdentifier: "AppleTeamIdentifier")
-    }
-    
     func getPlatformVersion(completion: @escaping (Result<String, Error>) -> Void) {
         let systemVersion = UIDevice.current.systemVersion
         completion(Result.success(systemVersion))
     }
     
     func startPayment(sessionModel: SessionModel, dropInConfiguration: DropInConfigurationModel, completion: @escaping (Result<Void, Error>) -> Void) {
-        viewController = UIApplication.shared.adyen.mainKeyWindow?.rootViewController
-        let adyenContext = createAdyenContext(dropInConfiguration: dropInConfiguration)
-        let configuration = AdyenSession.Configuration(sessionIdentifier: sessionModel.id,
-                                                       initialSessionData: sessionModel.sessionData,
-                                                       context: adyenContext)
-        DispatchQueue.main.async {
-            AdyenSession.initialize(with: configuration, delegate: self, presentationDelegate: self) { [weak self] result in
-                switch result {
-                case let .success(session):
-                    self?.session = session
-                    let paymentMethods = session.sessionContext.paymentMethods
-                    let dropInConfiguration = self?.createDropInConfiguration(paymentMethods: paymentMethods)
-                    let dropInComponent = DropInComponent(paymentMethods: session.sessionContext.paymentMethods,
-                                                          context: adyenContext,
-                                                          configuration: dropInConfiguration!,
-                                                          title: "TEST")
-                    dropInComponent.delegate = session
-                    dropInComponent.partialPaymentDelegate = session
-                    self?.dropInComponent = dropInComponent
-                    self?.viewController?.present(dropInComponent.viewController, animated: true)
-                case let .failure(error):
-                    completion(.failure(error))
+        do {
+            viewController = UIApplication.shared.adyen.mainKeyWindow?.rootViewController
+            let adyenContext = try createAdyenContext(dropInConfiguration: dropInConfiguration)
+            let configuration = AdyenSession.Configuration(sessionIdentifier: sessionModel.id,
+                                                           initialSessionData: sessionModel.sessionData,
+                                                           context: adyenContext)
+            DispatchQueue.main.async {
+                AdyenSession.initialize(with: configuration, delegate: self, presentationDelegate: self) { [weak self] result in
+                    switch result {
+                    case let .success(session):
+                        self?.session = session
+                        let paymentMethods = session.sessionContext.paymentMethods
+                        let dropInConfiguration = self?.createDropInConfiguration(paymentMethods: paymentMethods)
+                        let dropInComponent = DropInComponent(paymentMethods: session.sessionContext.paymentMethods,
+                                                              context: adyenContext,
+                                                              configuration: dropInConfiguration!)
+                        dropInComponent.delegate = session
+                        dropInComponent.partialPaymentDelegate = session
+                        self?.dropInComponent = dropInComponent
+                        self?.viewController?.present(dropInComponent.viewController, animated: true)
+                    case let .failure(error):
+                        completion(.failure(error))
+                    }
                 }
             }
+        } catch let error {
+            completion(.failure(error))
         }
     }
     
@@ -70,12 +67,14 @@ class CheckoutPlatformApi : CheckoutPlatformInterface {
         return "";
     }
     
-    private func createAdyenContext(dropInConfiguration: DropInConfigurationModel) -> AdyenContext {
-        let apiContext = try! APIContext(environment: mapToEnvironment(environment: dropInConfiguration.environment), clientKey: dropInConfiguration.clientKey)
+    private func createAdyenContext(dropInConfiguration: DropInConfigurationModel) throws  -> AdyenContext  {
+        let apiContext = try APIContext(environment: mapToEnvironment(environment: dropInConfiguration.environment), clientKey: dropInConfiguration.clientKey)
         let value: Int = Int(dropInConfiguration.amount.value)
-        let currencyCode : String = dropInConfiguration.amount.currency ?? ""
+        guard let currencyCode : String = dropInConfiguration.amount.currency else {
+            throw BalanceChecker.Error.unexpectedCurrencyCode
+        }
         let amount = Adyen.Amount(value: value, currencyCode: currencyCode)
-        let adyenContext = AdyenContext(apiContext: apiContext, payment: nil)
+        let adyenContext = AdyenContext(apiContext: apiContext, payment: Payment(amount: amount, countryCode: dropInConfiguration.shopperLocale))
         return adyenContext
     }
     
@@ -95,10 +94,9 @@ class CheckoutPlatformApi : CheckoutPlatformInterface {
             return Adyen.Environment.liveApse
         }
     }
-
+    
     private func createDropInConfiguration(paymentMethods: PaymentMethods) -> DropInComponent.Configuration {
         let dropInConfiguration = DropInComponent.Configuration()
-        dropInConfiguration.actionComponent.threeDS.delegateAuthentication = CheckoutPlatformApi.delegatedAuthenticationConfigurations
         return dropInConfiguration
     }
     
@@ -106,13 +104,11 @@ class CheckoutPlatformApi : CheckoutPlatformInterface {
 
 extension CheckoutPlatformApi: AdyenSessionDelegate {
     func didComplete(with resultCode: SessionPaymentResultCode, component: Component, session: AdyenSession) {
-        self.viewController?.dismiss(animated: false)
-        checkoutResultFlutterInterface.onSessionDropInResult(sessionDropInResult: SessionDropInResultModel(
-            sessionDropInResult: SessionDropInResultEnum.finished,
-            result: SessionPaymentResultModel(sessionId: session.sessionContext.identifier,
-                                              sessionData: session.sessionContext.data,
-                                              resultCode: resultCode.rawValue)
-        )) {}
+        self.viewController?.dismiss(animated: false, completion: {
+            self.checkoutResultFlutterInterface.onSessionDropInResult(sessionDropInResult: SessionDropInResultModel(
+                sessionDropInResult: SessionDropInResultEnum.finished,
+                result: SessionPaymentResultModel(sessionId: session.sessionContext.identifier, sessionData: session.sessionContext.data, resultCode: resultCode.rawValue)), completion: {})
+        })
     }
     
     func didFail(with error: Error, from component: Component, session: AdyenSession) {
@@ -128,5 +124,6 @@ extension CheckoutPlatformApi: AdyenSessionDelegate {
 extension CheckoutPlatformApi: PresentationDelegate {
     func present(component: PresentableComponent) {
         print("presentable component")
+        //This is required later when integrating components
     }
 }

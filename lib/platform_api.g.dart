@@ -105,7 +105,7 @@ class DropInConfigurationModel {
     required this.environment,
     required this.clientKey,
     required this.amount,
-    this.shopperLocale,
+    required this.shopperLocale,
     this.isAnalyticsEnabled,
     this.showPreselectedStoredPaymentMethod,
     this.skipListWhenSinglePaymentMethod,
@@ -119,7 +119,7 @@ class DropInConfigurationModel {
 
   Amount amount;
 
-  String? shopperLocale;
+  String shopperLocale;
 
   bool? isAnalyticsEnabled;
 
@@ -151,7 +151,7 @@ class DropInConfigurationModel {
       environment: Environment.values[result[0]! as int],
       clientKey: result[1]! as String,
       amount: Amount.decode(result[2]! as List<Object?>),
-      shopperLocale: result[3] as String?,
+      shopperLocale: result[3]! as String,
       isAnalyticsEnabled: result[4] as bool?,
       showPreselectedStoredPaymentMethod: result[5] as bool?,
       skipListWhenSinglePaymentMethod: result[6] as bool?,

@@ -86,6 +86,7 @@ class _MyAppState extends State<MyApp> {
       environment: Environment.test,
       clientKey: Config.clientKey,
       amount: Config.amount,
+      shopperLocale: Config.countryCode,
     );
 
     final sessionDropInResultModel = await _adyenCheckout
