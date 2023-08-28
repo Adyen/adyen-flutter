@@ -1,7 +1,6 @@
 import 'package:adyen_checkout/platform_api.g.dart';
 import 'package:adyen_checkout/src/adyen_checkout.dart';
 import 'package:adyen_checkout/src/adyen_checkout_interface.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
@@ -25,7 +24,7 @@ class MockAdyenCheckoutPlatform
 }
 
 void main() {
-  WidgetsFlutterBinding.ensureInitialized();
+  TestWidgetsFlutterBinding.ensureInitialized();
   final AdyenCheckout initialPlatform = AdyenCheckout();
 
   test('$AdyenCheckout is the default instance', () {

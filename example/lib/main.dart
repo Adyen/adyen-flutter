@@ -41,8 +41,7 @@ class _MyAppState extends State<MyApp> {
     // Platform messages may fail, so we use a try/catch PlatformException.
     // We also handle the message potentially returning null.
     try {
-      platformVersion = await _adyenCheckout.getPlatformVersion() ??
-          'Unknown platform version';
+      platformVersion = await _adyenCheckout.getPlatformVersion();
     } on PlatformException {
       platformVersion = 'Failed to get platform version.';
     }
