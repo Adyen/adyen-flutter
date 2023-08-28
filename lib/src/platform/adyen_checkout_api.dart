@@ -1,7 +1,7 @@
 import 'package:adyen_checkout/platform_api.g.dart';
-import 'package:adyen_checkout/src/adyen_checkout_interface.dart';
+import 'package:adyen_checkout/src/platform/adyen_checkout_platform_interface.dart';
 
-class AdyenCheckoutApi implements AdyenCheckoutInterface {
+class AdyenCheckoutApi implements AdyenCheckoutPlatformInterface {
   final CheckoutPlatformInterface checkoutApi = CheckoutPlatformInterface();
 
   @override

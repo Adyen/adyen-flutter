@@ -2,23 +2,27 @@ import 'dart:async';
 
 import 'package:adyen_checkout/platform_api.g.dart';
 import 'package:adyen_checkout/src/adyen_checkout_interface.dart';
-import 'package:adyen_checkout/src/adyen_checkout_result_api.dart';
 import 'package:adyen_checkout/src/models/payment_flow.dart';
 import 'package:adyen_checkout/src/models/payment_type.dart';
+import 'package:adyen_checkout/src/platform/adyen_checkout_platform_interface.dart';
+import 'package:adyen_checkout/src/platform/adyen_checkout_result_api.dart';
 
-class AdyenCheckout {
+class AdyenCheckout implements AdyenCheckoutInterface {
   AdyenCheckout() {
     _setupResultApi();
   }
 
   final AdyenCheckoutResultApi _resultApi = AdyenCheckoutResultApi();
 
+  @override
   Future<String> getPlatformVersion() =>
-      AdyenCheckoutInterface.instance.getPlatformVersion();
+      AdyenCheckoutPlatformInterface.instance.getPlatformVersion();
 
+  @override
   Future<String> getReturnUrl() =>
-      AdyenCheckoutInterface.instance.getReturnUrl();
+      AdyenCheckoutPlatformInterface.instance.getReturnUrl();
 
+  @override
   Future<DropInResultModel> startPayment(
       {required PaymentFlow paymentFlow}) async {
     switch (paymentFlow.paymentType) {
@@ -45,7 +49,7 @@ class AdyenCheckout {
   ) async {
     _resultApi.dropInSessionResultStream =
         StreamController<DropInResultModel>();
-    AdyenCheckoutInterface.instance.startPayment(
+    AdyenCheckoutPlatformInterface.instance.startPayment(
       sessionModel,
       dropInConfiguration,
     );
@@ -64,7 +68,7 @@ class AdyenCheckout {
         postPaymentsDetails,
   ) async {
     final dropInAdvancedFlowCompleter = Completer<DropInResultModel>();
-    AdyenCheckoutInterface.instance.startDropInAdvancedFlowPayment(
+    AdyenCheckoutPlatformInterface.instance.startDropInAdvancedFlowPayment(
       paymentMethodsResponse,
       dropInConfiguration,
     );
@@ -103,7 +107,7 @@ class AdyenCheckout {
     if (event.data != null) {
       final Map<String, dynamic> paymentsDetailsResult =
           await postPaymentsDetails(event.data!);
-      AdyenCheckoutInterface.instance
+      AdyenCheckoutPlatformInterface.instance
           .onPaymentsDetailsResult(paymentsDetailsResult);
     }
   }
@@ -116,7 +120,7 @@ class AdyenCheckout {
     if (event.data != null) {
       final Map<String, dynamic> paymentsResult =
           await postPayments(event.data!);
-      AdyenCheckoutInterface.instance.onPaymentsResult(paymentsResult);
+      AdyenCheckoutPlatformInterface.instance.onPaymentsResult(paymentsResult);
     }
   }
 

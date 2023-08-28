@@ -1,12 +1,12 @@
 import 'package:adyen_checkout/platform_api.g.dart';
 import 'package:adyen_checkout/src/adyen_checkout.dart';
-import 'package:adyen_checkout/src/adyen_checkout_interface.dart';
+import 'package:adyen_checkout/src/platform/adyen_checkout_platform_interface.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
 class MockAdyenCheckoutPlatform
     with MockPlatformInterfaceMixin
-    implements AdyenCheckoutInterface {
+    implements AdyenCheckoutPlatformInterface {
   @override
   Future<String> getPlatformVersion() => Future.value('42');
 
@@ -51,7 +51,7 @@ void main() {
   test('getPlatformVersion', () async {
     AdyenCheckout adyenCheckoutPlugin = AdyenCheckout();
     MockAdyenCheckoutPlatform fakePlatform = MockAdyenCheckoutPlatform();
-    AdyenCheckoutInterface.instance = fakePlatform;
+    AdyenCheckoutPlatformInterface.instance = fakePlatform;
 
     expect(await adyenCheckoutPlugin.getPlatformVersion(), '42');
   });

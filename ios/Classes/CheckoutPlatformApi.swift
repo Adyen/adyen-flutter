@@ -53,11 +53,13 @@ class CheckoutPlatformApi : CheckoutPlatformInterface {
                         self?.dropInComponent = dropInComponent
                         self?.viewController?.present(dropInComponent.viewController, animated: true)
                     case let .failure(error):
+                        print("Native sdk error: \(error.localizedDescription)")
                         self?.checkoutFlutterApi.onDropInSessionResult(sessionDropInResult: DropInResultModel(sessionDropInResult: DropInResultEnum.error, reason: error.localizedDescription)) {}
                     }
                 }
             }
         } catch let error {
+            print("Native sdk error: \(error.localizedDescription)")
             checkoutFlutterApi.onDropInSessionResult(sessionDropInResult: DropInResultModel(sessionDropInResult: DropInResultEnum.error, reason: error.localizedDescription)) {}
         }
     }
@@ -125,7 +127,8 @@ extension CheckoutPlatformApi: AdyenSessionDelegate {
     
     func didFail(with error: Error, from component: Component, session: AdyenSession) {
         self.viewController?.dismiss(animated: true)
-        checkoutFlutterApi.onDropInSessionResult(sessionDropInResult: DropInResultModel(sessionDropInResult: DropInResultEnum.cancelledByUser)) {}
+        print("Native sdk error: \(error.localizedDescription)")
+        checkoutFlutterApi.onDropInSessionResult(sessionDropInResult: DropInResultModel(sessionDropInResult: DropInResultEnum.error, reason: error.localizedDescription)) {}
     }
     
     func didOpenExternalApplication(component: ActionComponent, session: AdyenSession) {
