@@ -53,12 +53,12 @@ class CheckoutPlatformApi : CheckoutPlatformInterface {
                         self?.dropInComponent = dropInComponent
                         self?.viewController?.present(dropInComponent.viewController, animated: true)
                     case let .failure(error):
-                        completion(.failure(error))
+                        self?.checkoutFlutterApi.onDropInSessionResult(sessionDropInResult: DropInResultModel(sessionDropInResult: DropInResultEnum.error, reason: error.localizedDescription)) {}
                     }
                 }
             }
         } catch let error {
-            completion(.failure(error))
+            checkoutFlutterApi.onDropInSessionResult(sessionDropInResult: DropInResultModel(sessionDropInResult: DropInResultEnum.error, reason: error.localizedDescription)) {}
         }
     }
 
@@ -86,7 +86,7 @@ class CheckoutPlatformApi : CheckoutPlatformInterface {
             throw BalanceChecker.Error.unexpectedCurrencyCode
         }
         let amount = Adyen.Amount(value: value, currencyCode: currencyCode)
-        let adyenContext = AdyenContext(apiContext: apiContext, payment: Payment(amount: amount, countryCode: dropInConfiguration.shopperLocale))
+        let adyenContext = AdyenContext(apiContext: apiContext, payment: Payment(amount: amount, countryCode: dropInConfiguration.countryCode))
         return adyenContext
     }
     
@@ -117,8 +117,8 @@ class CheckoutPlatformApi : CheckoutPlatformInterface {
 extension CheckoutPlatformApi: AdyenSessionDelegate {
     func didComplete(with resultCode: SessionPaymentResultCode, component: Component, session: AdyenSession) {
         self.viewController?.dismiss(animated: false, completion: {
-            self.checkoutResultFlutterInterface.onSessionDropInResult(sessionDropInResult: SessionDropInResultModel(
-                sessionDropInResult: SessionDropInResultEnum.finished,
+            self.checkoutFlutterApi.onDropInSessionResult(sessionDropInResult: DropInResultModel(
+                sessionDropInResult: DropInResultEnum.finished,
                 result: SessionPaymentResultModel(sessionId: session.sessionContext.identifier, sessionData: session.sessionContext.data, resultCode: resultCode.rawValue)), completion: {})
         })
     }

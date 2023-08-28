@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:adyen_checkout/platform_api.g.dart';
 import 'package:adyen_checkout/src/adyen_checkout_interface.dart';
 import 'package:adyen_checkout/src/adyen_checkout_result_api.dart';
+import 'package:adyen_checkout/src/models/payment_flow.dart';
+import 'package:adyen_checkout/src/models/payment_type.dart';
 
 class AdyenCheckout {
   AdyenCheckout() {
@@ -14,34 +16,27 @@ class AdyenCheckout {
   Future<String> getPlatformVersion() =>
       AdyenCheckoutInterface.instance.getPlatformVersion();
 
-  Future<DropInResultModel> startPayment({
-    required DropInConfigurationModel dropInConfiguration,
-    SessionModel? sessionModel,
-    String? paymentMethodsResponse,
-    Future<Map<String, dynamic>> Function(String paymentComponentJson)?
-        postPayments,
-    Future<Map<String, dynamic>> Function(String additionalDetailsJson)?
-        postPaymentsDetails,
-  }) async {
-    if (sessionModel != null) {
-      return await _startDropInSessionsPayment(
-        sessionModel,
-        dropInConfiguration,
-      );
-    }
+  Future<String> getReturnUrl() =>
+      AdyenCheckoutInterface.instance.getReturnUrl();
 
-    if (paymentMethodsResponse != null &&
-        postPayments != null &&
-        postPaymentsDetails != null) {
-      return await _startDropInAdvancedFlowPayment(
-        paymentMethodsResponse,
-        dropInConfiguration,
-        (paymentComponentJson) => postPayments(paymentComponentJson),
-        (additionalDetailsJson) => postPaymentsDetails(additionalDetailsJson),
-      );
+  Future<DropInResultModel> startPayment(
+      {required PaymentFlow paymentFlow}) async {
+    switch (paymentFlow.paymentType) {
+      case PaymentType.dropInSessions:
+        return await _startDropInSessionsPayment(
+          paymentFlow.sessionModel!,
+          paymentFlow.dropInConfiguration,
+        );
+      case PaymentType.dropInAdvancedFlow:
+        return await _startDropInAdvancedFlowPayment(
+          paymentFlow.paymentMethodsResponse!,
+          paymentFlow.dropInConfiguration,
+          (paymentComponentJson) =>
+              paymentFlow.postPayments!(paymentComponentJson),
+          (additionalDetailsJson) =>
+              paymentFlow.postPaymentsDetails!(additionalDetailsJson),
+        );
     }
-
-    throw Exception("Wrong method parameters provided");
   }
 
   Future<DropInResultModel> _startDropInSessionsPayment(
@@ -91,7 +86,6 @@ class AdyenCheckout {
 
     return dropInAdvancedFlowCompleter.future.then((value) {
       _resultApi.dropInAdvancedFlowPlatformCommunicationStream.close();
-
       return value;
     });
   }
@@ -109,7 +103,8 @@ class AdyenCheckout {
     if (event.data != null) {
       final Map<String, dynamic> paymentsDetailsResult =
           await postPaymentsDetails(event.data!);
-      onPaymentsDetailsResult(paymentsDetailsResult);
+      AdyenCheckoutInterface.instance
+          .onPaymentsDetailsResult(paymentsDetailsResult);
     }
   }
 
@@ -121,19 +116,9 @@ class AdyenCheckout {
     if (event.data != null) {
       final Map<String, dynamic> paymentsResult =
           await postPayments(event.data!);
-      onPaymentsResult(paymentsResult);
+      AdyenCheckoutInterface.instance.onPaymentsResult(paymentsResult);
     }
   }
-
-  Future<String> getReturnUrl() =>
-      AdyenCheckoutInterface.instance.getReturnUrl();
-
-  void onPaymentsResult(Map<String, Object?> paymentsResult) =>
-      AdyenCheckoutInterface.instance.onPaymentsResult(paymentsResult);
-
-  void onPaymentsDetailsResult(Map<String, Object?> paymentsDetailsResult) =>
-      AdyenCheckoutInterface.instance
-          .onPaymentsDetailsResult(paymentsDetailsResult);
 
   void _setupResultApi() => CheckoutFlutterApi.setup(_resultApi);
 }

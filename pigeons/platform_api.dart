@@ -69,7 +69,7 @@ class DropInConfigurationModel {
   final Environment environment;
   final String clientKey;
   final Amount amount;
-  final String shopperLocale;
+  final String countryCode;
   bool? isAnalyticsEnabled;
   bool? showPreselectedStoredPaymentMethod;
   bool? skipListWhenSinglePaymentMethod;
@@ -80,7 +80,7 @@ class DropInConfigurationModel {
     required this.environment,
     required this.clientKey,
     required this.amount,
-    required this.shopperLocale,
+    required this.countryCode,
   });
 }
 

@@ -161,7 +161,7 @@ data class DropInConfigurationModel (
   val environment: Environment,
   val clientKey: String,
   val amount: Amount,
-  val shopperLocale: String,
+  val countryCode: String,
   val isAnalyticsEnabled: Boolean? = null,
   val showPreselectedStoredPaymentMethod: Boolean? = null,
   val skipListWhenSinglePaymentMethod: Boolean? = null,
@@ -175,13 +175,13 @@ data class DropInConfigurationModel (
       val environment = Environment.ofRaw(list[0] as Int)!!
       val clientKey = list[1] as String
       val amount = Amount.fromList(list[2] as List<Any?>)
-      val shopperLocale = list[3] as String
+      val countryCode = list[3] as String
       val isAnalyticsEnabled = list[4] as Boolean?
       val showPreselectedStoredPaymentMethod = list[5] as Boolean?
       val skipListWhenSinglePaymentMethod = list[6] as Boolean?
       val isRemovingStoredPaymentMethodsEnabled = list[7] as Boolean?
       val additionalDataForDropInService = list[8] as String?
-      return DropInConfigurationModel(environment, clientKey, amount, shopperLocale, isAnalyticsEnabled, showPreselectedStoredPaymentMethod, skipListWhenSinglePaymentMethod, isRemovingStoredPaymentMethodsEnabled, additionalDataForDropInService)
+      return DropInConfigurationModel(environment, clientKey, amount, countryCode, isAnalyticsEnabled, showPreselectedStoredPaymentMethod, skipListWhenSinglePaymentMethod, isRemovingStoredPaymentMethodsEnabled, additionalDataForDropInService)
     }
   }
   fun toList(): List<Any?> {
@@ -189,7 +189,7 @@ data class DropInConfigurationModel (
       environment.raw,
       clientKey,
       amount.toList(),
-      shopperLocale,
+      countryCode,
       isAnalyticsEnabled,
       showPreselectedStoredPaymentMethod,
       skipListWhenSinglePaymentMethod,
@@ -397,11 +397,7 @@ interface CheckoutPlatformInterface {
   fun getPlatformVersion(callback: (Result<String>) -> Unit)
   fun getReturnUrl(callback: (Result<String>) -> Unit)
   fun startPayment(dropInConfiguration: DropInConfigurationModel, sessionModel: SessionModel)
-  fun startPaymentDropInAdvancedFlow(
-    dropInConfiguration: DropInConfigurationModel,
-    paymentMethodsResponse: String
-  )
-
+  fun startPaymentDropInAdvancedFlow(dropInConfiguration: DropInConfigurationModel, paymentMethodsResponse: String)
   fun onPaymentsResult(paymentsResult: Map<String, Any?>)
   fun onPaymentsDetailsResult(paymentsDetailsResult: Map<String, Any?>)
 
@@ -410,7 +406,6 @@ interface CheckoutPlatformInterface {
     val codec: MessageCodec<Any?> by lazy {
       CheckoutPlatformInterfaceCodec
     }
-
     /** Sets up an instance of `CheckoutPlatformInterface` to handle messages through the `binaryMessenger`. */
     @Suppress("UNCHECKED_CAST")
     fun setUp(binaryMessenger: BinaryMessenger, api: CheckoutPlatformInterface?) {
@@ -531,7 +526,6 @@ interface CheckoutPlatformInterface {
     }
   }
 }
-
 @Suppress("UNCHECKED_CAST")
 private object CheckoutFlutterApiCodec : StandardMessageCodec() {
   override fun readValueOfType(type: Byte, buffer: ByteBuffer): Any? {
@@ -541,7 +535,6 @@ private object CheckoutFlutterApiCodec : StandardMessageCodec() {
           Amount.fromList(it)
         }
       }
-
       129.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
           DropInResultModel.fromList(it)
@@ -601,27 +594,14 @@ class CheckoutFlutterApi(private val binaryMessenger: BinaryMessenger) {
       CheckoutFlutterApiCodec
     }
   }
-
   fun onDropInSessionResult(sessionDropInResultArg: DropInResultModel, callback: () -> Unit) {
-    val channel = BasicMessageChannel<Any?>(
-      binaryMessenger,
-      "dev.flutter.pigeon.adyen_checkout.CheckoutFlutterApi.onDropInSessionResult",
-      codec
-    )
+    val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.adyen_checkout.CheckoutFlutterApi.onDropInSessionResult", codec)
     channel.send(listOf(sessionDropInResultArg)) {
       callback()
     }
   }
-
-  fun onDropInAdvancedFlowPlatformCommunication(
-    platformCommunicationModelArg: PlatformCommunicationModel,
-    callback: () -> Unit
-  ) {
-    val channel = BasicMessageChannel<Any?>(
-      binaryMessenger,
-      "dev.flutter.pigeon.adyen_checkout.CheckoutFlutterApi.onDropInAdvancedFlowPlatformCommunication",
-      codec
-    )
+  fun onDropInAdvancedFlowPlatformCommunication(platformCommunicationModelArg: PlatformCommunicationModel, callback: () -> Unit) {
+    val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.adyen_checkout.CheckoutFlutterApi.onDropInAdvancedFlowPlatformCommunication", codec)
     channel.send(listOf(platformCommunicationModelArg)) {
       callback()
     }

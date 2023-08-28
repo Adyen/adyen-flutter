@@ -68,15 +68,15 @@ class _MyAppState extends State<MyApp> {
           children: [
             Text('Running on: $_platformVersion\n'),
             TextButton(
-                onPressed: () {
-                  startDropInSessions(context);
+                onPressed: () async {
+                  final result = await startDropInSessions();
+                  _dialogBuilder(context, result);
                 },
                 child: const Text("DropIn sessions")),
             TextButton(
                 onPressed: () async {
-                  final sessionDropInResultModel =
-                      await startDropInAdvancedFlow();
-                  _dialogBuilder(context, sessionDropInResultModel);
+                  final result = await startDropInAdvancedFlow();
+                  _dialogBuilder(context, result);
                 },
                 child: const Text("DropIn advanced flow"))
           ],
@@ -85,22 +85,26 @@ class _MyAppState extends State<MyApp> {
     );
   }
 
-  Future<void> startDropInSessions(BuildContext context) async {
-    SessionModel sessionModel = await _adyenSessionRepository.createSession(
-        Config.amount, Config.environment);
-    DropInConfigurationModel dropInConfiguration = DropInConfigurationModel(
+  Future<DropInResultModel> startDropInSessions() async {
+    final SessionModel sessionModel =
+        await _adyenSessionRepository.createSession(
+      Config.amount,
+      Config.environment,
+    );
+    final DropInConfigurationModel dropInConfiguration =
+        DropInConfigurationModel(
       environment: Environment.test,
       clientKey: Config.clientKey,
       amount: Config.amount,
-      shopperLocale: Config.countryCode,
+      countryCode: Config.countryCode,
     );
 
-    final sessionDropInResultModel = await _adyenCheckout.startPayment(
-      dropInConfiguration: dropInConfiguration,
-      sessionModel: sessionModel,
+    return await _adyenCheckout.startPayment(
+      paymentFlow: PaymentFlow.dropInSessions(
+        dropInConfiguration: dropInConfiguration,
+        sessionModel: sessionModel,
+      ),
     );
-
-    _dialogBuilder(context, sessionDropInResultModel);
   }
 
   Future<DropInResultModel> startDropInAdvancedFlow() async {
@@ -110,13 +114,16 @@ class _MyAppState extends State<MyApp> {
       environment: Environment.test,
       clientKey: Config.clientKey,
       amount: Config.amount,
+      countryCode: Config.countryCode,
     );
 
     return await _adyenCheckout.startPayment(
-      dropInConfiguration: dropInConfiguration,
-      paymentMethodsResponse: paymentMethodsResponse,
-      postPayments: _adyenSessionRepository.postPayments,
-      postPaymentsDetails: _adyenSessionRepository.postPaymentsDetails,
+      paymentFlow: PaymentFlow.dropInAdvancedFlow(
+        dropInConfiguration: dropInConfiguration,
+        paymentMethodsResponse: paymentMethodsResponse,
+        postPayments: _adyenSessionRepository.postPayments,
+        postPaymentsDetails: _adyenSessionRepository.postPaymentsDetails,
+      ),
     );
   }
 
