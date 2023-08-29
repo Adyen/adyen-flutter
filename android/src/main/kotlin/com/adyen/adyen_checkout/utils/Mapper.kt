@@ -1,4 +1,4 @@
-package com.adyen.adyen_checkout
+package com.adyen.adyen_checkout.utils
 
 import Amount
 import DropInConfiguration
@@ -24,8 +24,15 @@ object Mapper {
     }
 
     private fun Environment.mapToEnvironment(): com.adyen.checkout.core.Environment {
-        //TODO map to actual value
-        return com.adyen.checkout.core.Environment.TEST
+        return when (this) {
+            Environment.TEST -> com.adyen.checkout.core.Environment.TEST
+            Environment.EUROPE -> com.adyen.checkout.core.Environment.EUROPE
+            Environment.UNITEDSTATES -> com.adyen.checkout.core.Environment.UNITED_STATES
+            Environment.AUSTRALIA -> com.adyen.checkout.core.Environment.AUSTRALIA
+            Environment.INDIA -> com.adyen.checkout.core.Environment.INDIA
+            Environment.APSE -> com.adyen.checkout.core.Environment.APSE
+        }
+
     }
 
     private fun Amount.mapToAmount(): com.adyen.checkout.components.core.Amount {

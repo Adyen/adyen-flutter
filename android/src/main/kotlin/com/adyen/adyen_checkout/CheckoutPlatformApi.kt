@@ -8,8 +8,8 @@ import Session
 import androidx.activity.result.ActivityResultLauncher
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.lifecycleScope
-import com.adyen.adyen_checkout.Mapper.mapToDropInConfiguration
-import com.adyen.adyen_checkout.Mapper.mapToSession
+import com.adyen.adyen_checkout.utils.Mapper.mapToDropInConfiguration
+import com.adyen.adyen_checkout.utils.Mapper.mapToSession
 import com.adyen.adyen_checkout.dropInAdvancedFlow.AdvancedFlowDropInService
 import com.adyen.adyen_checkout.dropInAdvancedFlow.DropInAdditionalDetailsPlatformMessenger
 import com.adyen.adyen_checkout.dropInAdvancedFlow.DropInAdditionalDetailsResultMessenger
