@@ -23,12 +23,11 @@ class AdyenCheckout implements AdyenCheckoutInterface {
       AdyenCheckoutPlatformInterface.instance.getReturnUrl();
 
   @override
-  Future<DropInResultModel> startPayment(
-      {required PaymentFlow paymentFlow}) async {
+  Future<DropInResult> startPayment({required PaymentFlow paymentFlow}) async {
     switch (paymentFlow.paymentType) {
       case PaymentType.dropInSessions:
         return await _startDropInSessionsPayment(
-          paymentFlow.sessionModel!,
+          paymentFlow.session!,
           paymentFlow.dropInConfiguration,
         );
       case PaymentType.dropInAdvancedFlow:
@@ -43,14 +42,13 @@ class AdyenCheckout implements AdyenCheckoutInterface {
     }
   }
 
-  Future<DropInResultModel> _startDropInSessionsPayment(
-    SessionModel sessionModel,
-    DropInConfigurationModel dropInConfiguration,
+  Future<DropInResult> _startDropInSessionsPayment(
+    Session session,
+    DropInConfiguration dropInConfiguration,
   ) async {
-    _resultApi.dropInSessionResultStream =
-        StreamController<DropInResultModel>();
-    AdyenCheckoutPlatformInterface.instance.startPayment(
-      sessionModel,
+    _resultApi.dropInSessionResultStream = StreamController<DropInResult>();
+    AdyenCheckoutPlatformInterface.instance.startDropInSessionPayment(
+      session,
       dropInConfiguration,
     );
     final sessionDropInResultModel =
@@ -59,15 +57,15 @@ class AdyenCheckout implements AdyenCheckoutInterface {
     return sessionDropInResultModel;
   }
 
-  Future<DropInResultModel> _startDropInAdvancedFlowPayment(
+  Future<DropInResult> _startDropInAdvancedFlowPayment(
     String paymentMethodsResponse,
-    DropInConfigurationModel dropInConfiguration,
+    DropInConfiguration dropInConfiguration,
     Future<Map<String, dynamic>> Function(String paymentComponentJson)
         postPayments,
     Future<Map<String, dynamic>> Function(String additionalDetails)
         postPaymentsDetails,
   ) async {
-    final dropInAdvancedFlowCompleter = Completer<DropInResultModel>();
+    final dropInAdvancedFlowCompleter = Completer<DropInResult>();
     AdyenCheckoutPlatformInterface.instance.startDropInAdvancedFlowPayment(
       paymentMethodsResponse,
       dropInConfiguration,
@@ -94,9 +92,9 @@ class AdyenCheckout implements AdyenCheckoutInterface {
     });
   }
 
-  void _handleResult(Completer<DropInResultModel> dropInAdvancedFlowCompleter,
+  void _handleResult(Completer<DropInResult> dropInAdvancedFlowCompleter,
       PlatformCommunicationModel event) {
-    dropInAdvancedFlowCompleter.complete(event.result);
+    dropInAdvancedFlowCompleter.complete(event.dropInResult);
   }
 
   Future<void> _handleAdditionalDetails(

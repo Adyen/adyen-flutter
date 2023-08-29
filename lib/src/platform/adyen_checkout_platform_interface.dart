@@ -19,14 +19,14 @@ abstract class AdyenCheckoutPlatformInterface extends PlatformInterface {
 
   Future<String> getReturnUrl();
 
-  void startPayment(
-    SessionModel sessionModel,
-    DropInConfigurationModel dropInConfiguration,
+  void startDropInSessionPayment(
+    Session session,
+    DropInConfiguration dropInConfiguration,
   );
 
   void startDropInAdvancedFlowPayment(
     String paymentMethodsResponse,
-    DropInConfigurationModel dropInConfiguration,
+    DropInConfiguration dropInConfiguration,
   );
 
   void onPaymentsResult(Map<String, Object?> paymentsResult);

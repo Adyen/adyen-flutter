@@ -2,14 +2,14 @@ package com.adyen.adyen_checkout
 
 import CheckoutFlutterApi
 import CheckoutPlatformInterface
-import DropInConfigurationModel
+import DropInConfiguration
 import PlatformCommunicationModel
-import SessionModel
+import Session
 import androidx.activity.result.ActivityResultLauncher
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.lifecycleScope
 import com.adyen.adyen_checkout.Mapper.mapToDropInConfiguration
-import com.adyen.adyen_checkout.Mapper.mapToSessionModel
+import com.adyen.adyen_checkout.Mapper.mapToSession
 import com.adyen.adyen_checkout.dropInAdvancedFlow.AdvancedFlowDropInService
 import com.adyen.adyen_checkout.dropInAdvancedFlow.DropInAdditionalDetailsPlatformMessenger
 import com.adyen.adyen_checkout.dropInAdvancedFlow.DropInAdditionalDetailsResultMessenger
@@ -43,12 +43,12 @@ class CheckoutPlatformApi(private val checkoutFlutterApi: CheckoutFlutterApi?) :
         callback(Result.success(RedirectComponent.getReturnUrl(activity.applicationContext)))
     }
 
-    override fun startPayment(
-        dropInConfiguration: DropInConfigurationModel,
-        sessionModel: SessionModel,
+    override fun startDropInSessionPayment(
+        dropInConfiguration: DropInConfiguration,
+        session: Session,
     ) {
         activity.lifecycleScope.launch(Dispatchers.IO) {
-            val sessionModel = sessionModel.mapToSessionModel()
+            val sessionModel = session.mapToSession()
             val dropInConfiguration =
                 dropInConfiguration.mapToDropInConfiguration(activity.applicationContext)
             val checkoutSession = createCheckoutSession(sessionModel, dropInConfiguration)
@@ -64,8 +64,8 @@ class CheckoutPlatformApi(private val checkoutFlutterApi: CheckoutFlutterApi?) :
 
     }
 
-    override fun startPaymentDropInAdvancedFlow(
-        dropInConfiguration: DropInConfigurationModel,
+    override fun startDropInAdvancedFlowPayment(
+        dropInConfiguration: DropInConfiguration,
         paymentMethodsResponse: String,
     ) {
         setAdvancedFlowDropInServiceObserver()

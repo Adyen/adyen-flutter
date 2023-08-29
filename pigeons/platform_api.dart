@@ -19,11 +19,11 @@ enum Environment {
   apse;
 }
 
-class SessionModel {
+class Session {
   final String id;
   final String sessionData;
 
-  SessionModel({
+  Session({
     required this.id,
     required this.sessionData,
   });
@@ -39,33 +39,7 @@ class Amount {
   });
 }
 
-enum Locale {
-  canada,
-  canadaFrench,
-  china,
-  chinese,
-  english,
-  france,
-  french,
-  german,
-  germany,
-  italian,
-  italy,
-  japan,
-  japanese,
-  korea,
-  korean,
-  //Do we need to support prc and root?
-  prc,
-  root,
-  simplifiedChinese,
-  taiwan,
-  traditionalChinese,
-  uk,
-  us
-}
-
-class DropInConfigurationModel {
+class DropInConfiguration {
   final Environment environment;
   final String clientKey;
   final Amount amount;
@@ -76,7 +50,7 @@ class DropInConfigurationModel {
   bool? isRemovingStoredPaymentMethodsEnabled;
   String? additionalDataForDropInService;
 
-  DropInConfigurationModel({
+  DropInConfiguration({
     required this.environment,
     required this.clientKey,
     required this.amount,
@@ -112,13 +86,13 @@ class OrderResponseModel {
   });
 }
 
-class DropInResultModel {
-  final DropInResultEnum sessionDropInResult;
+class DropInResult {
+  final DropInResultEnum type;
   final String? reason;
   final SessionPaymentResultModel? result;
 
-  DropInResultModel(
-    this.sessionDropInResult,
+  DropInResult(
+    this.type,
     this.reason,
     this.result,
   );
@@ -133,12 +107,12 @@ enum DropInResultEnum {
 class PlatformCommunicationModel {
   final PlatformCommunicationType type;
   final String? data;
-  final DropInResultModel? result;
+  final DropInResult? dropInResult;
 
   PlatformCommunicationModel({
     required this.type,
     this.data,
-    this.result,
+    this.dropInResult,
   });
 }
 
@@ -156,13 +130,13 @@ abstract class CheckoutPlatformInterface {
   @async
   String getReturnUrl();
 
-  void startPayment(
-    DropInConfigurationModel dropInConfiguration,
-    SessionModel sessionModel,
+  void startDropInSessionPayment(
+    DropInConfiguration dropInConfiguration,
+    Session session,
   );
 
-  void startPaymentDropInAdvancedFlow(
-    DropInConfigurationModel dropInConfiguration,
+  void startDropInAdvancedFlowPayment(
+    DropInConfiguration dropInConfiguration,
     String paymentMethodsResponse,
   );
 
@@ -173,7 +147,7 @@ abstract class CheckoutPlatformInterface {
 
 @FlutterApi()
 abstract class CheckoutFlutterApi {
-  void onDropInSessionResult(DropInResultModel sessionDropInResult);
+  void onDropInSessionResult(DropInResult sessionDropInResult);
 
   void onDropInAdvancedFlowPlatformCommunication(
       PlatformCommunicationModel platformCommunicationModel);

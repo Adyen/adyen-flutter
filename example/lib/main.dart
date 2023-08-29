@@ -60,7 +60,7 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Plugin example app'),
+        title: const Center(child: Text('Checkout example app')),
       ),
       body: Center(
         child: Column(
@@ -85,14 +85,12 @@ class _MyAppState extends State<MyApp> {
     );
   }
 
-  Future<DropInResultModel> startDropInSessions() async {
-    final SessionModel sessionModel =
-        await _adyenSessionRepository.createSession(
+  Future<DropInResult> startDropInSessions() async {
+    final Session session = await _adyenSessionRepository.createSession(
       Config.amount,
       Config.environment,
     );
-    final DropInConfigurationModel dropInConfiguration =
-        DropInConfigurationModel(
+    final DropInConfiguration dropInConfiguration = DropInConfiguration(
       environment: Environment.test,
       clientKey: Config.clientKey,
       amount: Config.amount,
@@ -100,17 +98,17 @@ class _MyAppState extends State<MyApp> {
     );
 
     return await _adyenCheckout.startPayment(
-      paymentFlow: PaymentFlow.dropInSessions(
+      paymentFlow: PaymentFlow.dropIn(
         dropInConfiguration: dropInConfiguration,
-        sessionModel: sessionModel,
+        session: session,
       ),
     );
   }
 
-  Future<DropInResultModel> startDropInAdvancedFlow() async {
+  Future<DropInResult> startDropInAdvancedFlow() async {
     final String paymentMethodsResponse =
         await _adyenSessionRepository.fetchPaymentMethods();
-    DropInConfigurationModel dropInConfiguration = DropInConfigurationModel(
+    DropInConfiguration dropInConfiguration = DropInConfiguration(
       environment: Environment.test,
       clientKey: Config.clientKey,
       amount: Config.amount,
@@ -118,7 +116,7 @@ class _MyAppState extends State<MyApp> {
     );
 
     return await _adyenCheckout.startPayment(
-      paymentFlow: PaymentFlow.dropInAdvancedFlow(
+      paymentFlow: PaymentFlow.dropInAdvanced(
         dropInConfiguration: dropInConfiguration,
         paymentMethodsResponse: paymentMethodsResponse,
         postPayments: _adyenSessionRepository.postPayments,
@@ -127,13 +125,13 @@ class _MyAppState extends State<MyApp> {
     );
   }
 
-  _dialogBuilder(BuildContext context, DropInResultModel dropInResultModel) {
+  _dialogBuilder(BuildContext context, DropInResult dropInResult) {
     return showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text(dropInResultModel.sessionDropInResult.name),
-          content: Text("Result code: ${dropInResultModel.result?.resultCode}"),
+          title: Text(dropInResult.type.name),
+          content: Text("Result code: ${dropInResult.result?.resultCode}"),
           actions: <Widget>[
             TextButton(
               style: TextButton.styleFrom(

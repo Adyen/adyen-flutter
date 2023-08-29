@@ -2,7 +2,7 @@ package com.adyen.adyen_checkout
 
 import CheckoutFlutterApi
 import CheckoutPlatformInterface
-import DropInResultModel
+import DropInResult as FlutterDropInResult
 import PlatformCommunicationModel
 import SessionPaymentResultModel
 import androidx.fragment.app.FragmentActivity
@@ -79,15 +79,15 @@ class AdyenCheckoutPlugin : FlutterPlugin, ActivityAware {
         }
 
         val mappedResult = when (sessionDropInResult) {
-            is SessionDropInResult.CancelledByUser -> DropInResultModel(
+            is SessionDropInResult.CancelledByUser -> FlutterDropInResult(
                 DropInResultEnum.CANCELLEDBYUSER
             )
 
-            is SessionDropInResult.Error -> DropInResultModel(
+            is SessionDropInResult.Error -> FlutterDropInResult(
                 DropInResultEnum.ERROR, reason = sessionDropInResult.reason
             )
 
-            is SessionDropInResult.Finished -> DropInResultModel(
+            is SessionDropInResult.Finished -> FlutterDropInResult(
                 DropInResultEnum.FINISHED, result = SessionPaymentResultModel(
                     sessionDropInResult.result.sessionId,
                     sessionDropInResult.result.sessionData,
@@ -105,15 +105,15 @@ class AdyenCheckoutPlugin : FlutterPlugin, ActivityAware {
         }
 
         val mappedResult = when (dropInAdvancedFlowResult) {
-            is DropInResult.CancelledByUser -> DropInResultModel(
+            is DropInResult.CancelledByUser -> FlutterDropInResult(
                 DropInResultEnum.CANCELLEDBYUSER
             )
 
-            is DropInResult.Error -> DropInResultModel(
+            is DropInResult.Error -> FlutterDropInResult(
                 DropInResultEnum.ERROR, reason = dropInAdvancedFlowResult.reason
             )
 
-            is DropInResult.Finished -> DropInResultModel(
+            is DropInResult.Finished -> FlutterDropInResult(
                 DropInResultEnum.FINISHED, result = SessionPaymentResultModel(
                     resultCode = dropInAdvancedFlowResult.result
                 )
@@ -121,7 +121,7 @@ class AdyenCheckoutPlugin : FlutterPlugin, ActivityAware {
         }
 
         val model = PlatformCommunicationModel(
-            PlatformCommunicationType.RESULT, data = "", result = mappedResult
+            PlatformCommunicationType.RESULT, data = "", dropInResult = mappedResult
         )
         checkoutFlutterApi?.onDropInAdvancedFlowPlatformCommunication(model) {}
     }

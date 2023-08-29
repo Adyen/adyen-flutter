@@ -43,31 +43,6 @@ enum Environment: Int {
   case apse = 5
 }
 
-enum Locale: Int {
-  case canada = 0
-  case canadaFrench = 1
-  case china = 2
-  case chinese = 3
-  case english = 4
-  case france = 5
-  case french = 6
-  case german = 7
-  case germany = 8
-  case italian = 9
-  case italy = 10
-  case japan = 11
-  case japanese = 12
-  case korea = 13
-  case korean = 14
-  case prc = 15
-  case root = 16
-  case simplifiedChinese = 17
-  case taiwan = 18
-  case traditionalChinese = 19
-  case uk = 20
-  case us = 21
-}
-
 enum DropInResultEnum: Int {
   case cancelledByUser = 0
   case error = 1
@@ -81,15 +56,15 @@ enum PlatformCommunicationType: Int {
 }
 
 /// Generated class from Pigeon that represents data sent in messages.
-struct SessionModel {
+struct Session {
   var id: String
   var sessionData: String
 
-  static func fromList(_ list: [Any?]) -> SessionModel? {
+  static func fromList(_ list: [Any?]) -> Session? {
     let id = list[0] as! String
     let sessionData = list[1] as! String
 
-    return SessionModel(
+    return Session(
       id: id,
       sessionData: sessionData
     )
@@ -125,7 +100,7 @@ struct Amount {
 }
 
 /// Generated class from Pigeon that represents data sent in messages.
-struct DropInConfigurationModel {
+struct DropInConfiguration {
   var environment: Environment
   var clientKey: String
   var amount: Amount
@@ -136,7 +111,7 @@ struct DropInConfigurationModel {
   var isRemovingStoredPaymentMethodsEnabled: Bool? = nil
   var additionalDataForDropInService: String? = nil
 
-  static func fromList(_ list: [Any?]) -> DropInConfigurationModel? {
+  static func fromList(_ list: [Any?]) -> DropInConfiguration? {
     let environment = Environment(rawValue: list[0] as! Int)!
     let clientKey = list[1] as! String
     let amount = Amount.fromList(list[2] as! [Any?])!
@@ -147,7 +122,7 @@ struct DropInConfigurationModel {
     let isRemovingStoredPaymentMethodsEnabled: Bool? = nilOrValue(list[7])
     let additionalDataForDropInService: String? = nilOrValue(list[8])
 
-    return DropInConfigurationModel(
+    return DropInConfiguration(
       environment: environment,
       clientKey: clientKey,
       amount: amount,
@@ -244,28 +219,28 @@ struct OrderResponseModel {
 }
 
 /// Generated class from Pigeon that represents data sent in messages.
-struct DropInResultModel {
-  var sessionDropInResult: DropInResultEnum
+struct DropInResult {
+  var type: DropInResultEnum
   var reason: String? = nil
   var result: SessionPaymentResultModel? = nil
 
-  static func fromList(_ list: [Any?]) -> DropInResultModel? {
-    let sessionDropInResult = DropInResultEnum(rawValue: list[0] as! Int)!
+  static func fromList(_ list: [Any?]) -> DropInResult? {
+    let type = DropInResultEnum(rawValue: list[0] as! Int)!
     let reason: String? = nilOrValue(list[1])
     var result: SessionPaymentResultModel? = nil
     if let resultList: [Any?] = nilOrValue(list[2]) {
       result = SessionPaymentResultModel.fromList(resultList)
     }
 
-    return DropInResultModel(
-      sessionDropInResult: sessionDropInResult,
+    return DropInResult(
+      type: type,
       reason: reason,
       result: result
     )
   }
   func toList() -> [Any?] {
     return [
-      sessionDropInResult.rawValue,
+      type.rawValue,
       reason,
       result?.toList(),
     ]
@@ -276,27 +251,27 @@ struct DropInResultModel {
 struct PlatformCommunicationModel {
   var type: PlatformCommunicationType
   var data: String? = nil
-  var result: DropInResultModel? = nil
+  var dropInResult: DropInResult? = nil
 
   static func fromList(_ list: [Any?]) -> PlatformCommunicationModel? {
     let type = PlatformCommunicationType(rawValue: list[0] as! Int)!
     let data: String? = nilOrValue(list[1])
-    var result: DropInResultModel? = nil
-    if let resultList: [Any?] = nilOrValue(list[2]) {
-      result = DropInResultModel.fromList(resultList)
+    var dropInResult: DropInResult? = nil
+    if let dropInResultList: [Any?] = nilOrValue(list[2]) {
+      dropInResult = DropInResult.fromList(dropInResultList)
     }
 
     return PlatformCommunicationModel(
       type: type,
       data: data,
-      result: result
+      dropInResult: dropInResult
     )
   }
   func toList() -> [Any?] {
     return [
       type.rawValue,
       data,
-      result?.toList(),
+      dropInResult?.toList(),
     ]
   }
 }
@@ -307,15 +282,15 @@ private class CheckoutPlatformInterfaceCodecReader: FlutterStandardReader {
       case 128:
         return Amount.fromList(self.readValue() as! [Any?])
       case 129:
-        return DropInConfigurationModel.fromList(self.readValue() as! [Any?])
+        return DropInConfiguration.fromList(self.readValue() as! [Any?])
       case 130:
-        return DropInResultModel.fromList(self.readValue() as! [Any?])
+        return DropInResult.fromList(self.readValue() as! [Any?])
       case 131:
         return OrderResponseModel.fromList(self.readValue() as! [Any?])
       case 132:
         return PlatformCommunicationModel.fromList(self.readValue() as! [Any?])
       case 133:
-        return SessionModel.fromList(self.readValue() as! [Any?])
+        return Session.fromList(self.readValue() as! [Any?])
       case 134:
         return SessionPaymentResultModel.fromList(self.readValue() as! [Any?])
       default:
@@ -329,10 +304,10 @@ private class CheckoutPlatformInterfaceCodecWriter: FlutterStandardWriter {
     if let value = value as? Amount {
       super.writeByte(128)
       super.writeValue(value.toList())
-    } else if let value = value as? DropInConfigurationModel {
+    } else if let value = value as? DropInConfiguration {
       super.writeByte(129)
       super.writeValue(value.toList())
-    } else if let value = value as? DropInResultModel {
+    } else if let value = value as? DropInResult {
       super.writeByte(130)
       super.writeValue(value.toList())
     } else if let value = value as? OrderResponseModel {
@@ -341,7 +316,7 @@ private class CheckoutPlatformInterfaceCodecWriter: FlutterStandardWriter {
     } else if let value = value as? PlatformCommunicationModel {
       super.writeByte(132)
       super.writeValue(value.toList())
-    } else if let value = value as? SessionModel {
+    } else if let value = value as? Session {
       super.writeByte(133)
       super.writeValue(value.toList())
     } else if let value = value as? SessionPaymentResultModel {
@@ -371,8 +346,8 @@ class CheckoutPlatformInterfaceCodec: FlutterStandardMessageCodec {
 protocol CheckoutPlatformInterface {
   func getPlatformVersion(completion: @escaping (Result<String, Error>) -> Void)
   func getReturnUrl(completion: @escaping (Result<String, Error>) -> Void)
-  func startPayment(dropInConfiguration: DropInConfigurationModel, sessionModel: SessionModel) throws
-  func startPaymentDropInAdvancedFlow(dropInConfiguration: DropInConfigurationModel, paymentMethodsResponse: String) throws
+  func startDropInSessionPayment(dropInConfiguration: DropInConfiguration, session: Session) throws
+  func startDropInAdvancedFlowPayment(dropInConfiguration: DropInConfiguration, paymentMethodsResponse: String) throws
   func onPaymentsResult(paymentsResult: [String: Any?]) throws
   func onPaymentsDetailsResult(paymentsDetailsResult: [String: Any?]) throws
 }
@@ -413,37 +388,37 @@ class CheckoutPlatformInterfaceSetup {
     } else {
       getReturnUrlChannel.setMessageHandler(nil)
     }
-    let startPaymentChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.startPayment", binaryMessenger: binaryMessenger, codec: codec)
+    let startDropInSessionPaymentChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.startDropInSessionPayment", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {
-      startPaymentChannel.setMessageHandler { message, reply in
+      startDropInSessionPaymentChannel.setMessageHandler { message, reply in
         let args = message as! [Any?]
-        let dropInConfigurationArg = args[0] as! DropInConfigurationModel
-        let sessionModelArg = args[1] as! SessionModel
+        let dropInConfigurationArg = args[0] as! DropInConfiguration
+        let sessionArg = args[1] as! Session
         do {
-          try api.startPayment(dropInConfiguration: dropInConfigurationArg, sessionModel: sessionModelArg)
+          try api.startDropInSessionPayment(dropInConfiguration: dropInConfigurationArg, session: sessionArg)
           reply(wrapResult(nil))
         } catch {
           reply(wrapError(error))
         }
       }
     } else {
-      startPaymentChannel.setMessageHandler(nil)
+      startDropInSessionPaymentChannel.setMessageHandler(nil)
     }
-    let startPaymentDropInAdvancedFlowChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.startPaymentDropInAdvancedFlow", binaryMessenger: binaryMessenger, codec: codec)
+    let startDropInAdvancedFlowPaymentChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.startDropInAdvancedFlowPayment", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {
-      startPaymentDropInAdvancedFlowChannel.setMessageHandler { message, reply in
+      startDropInAdvancedFlowPaymentChannel.setMessageHandler { message, reply in
         let args = message as! [Any?]
-        let dropInConfigurationArg = args[0] as! DropInConfigurationModel
+        let dropInConfigurationArg = args[0] as! DropInConfiguration
         let paymentMethodsResponseArg = args[1] as! String
         do {
-          try api.startPaymentDropInAdvancedFlow(dropInConfiguration: dropInConfigurationArg, paymentMethodsResponse: paymentMethodsResponseArg)
+          try api.startDropInAdvancedFlowPayment(dropInConfiguration: dropInConfigurationArg, paymentMethodsResponse: paymentMethodsResponseArg)
           reply(wrapResult(nil))
         } catch {
           reply(wrapError(error))
         }
       }
     } else {
-      startPaymentDropInAdvancedFlowChannel.setMessageHandler(nil)
+      startDropInAdvancedFlowPaymentChannel.setMessageHandler(nil)
     }
     let onPaymentsResultChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.onPaymentsResult", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {
@@ -483,7 +458,7 @@ private class CheckoutFlutterApiCodecReader: FlutterStandardReader {
       case 128:
         return Amount.fromList(self.readValue() as! [Any?])
       case 129:
-        return DropInResultModel.fromList(self.readValue() as! [Any?])
+        return DropInResult.fromList(self.readValue() as! [Any?])
       case 130:
         return OrderResponseModel.fromList(self.readValue() as! [Any?])
       case 131:
@@ -501,7 +476,7 @@ private class CheckoutFlutterApiCodecWriter: FlutterStandardWriter {
     if let value = value as? Amount {
       super.writeByte(128)
       super.writeValue(value.toList())
-    } else if let value = value as? DropInResultModel {
+    } else if let value = value as? DropInResult {
       super.writeByte(129)
       super.writeValue(value.toList())
     } else if let value = value as? OrderResponseModel {
@@ -542,7 +517,7 @@ class CheckoutFlutterApi {
   var codec: FlutterStandardMessageCodec {
     return CheckoutFlutterApiCodec.shared
   }
-  func onDropInSessionResult(sessionDropInResult sessionDropInResultArg: DropInResultModel, completion: @escaping () -> Void) {
+  func onDropInSessionResult(sessionDropInResult sessionDropInResultArg: DropInResult, completion: @escaping () -> Void) {
     let channel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.CheckoutFlutterApi.onDropInSessionResult", binaryMessenger: binaryMessenger, codec: codec)
     channel.sendMessage([sessionDropInResultArg] as [Any?]) { _ in
       completion()

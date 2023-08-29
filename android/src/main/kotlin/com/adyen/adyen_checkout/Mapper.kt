@@ -1,21 +1,20 @@
 package com.adyen.adyen_checkout
 
 import Amount
-import DropInConfigurationModel
+import DropInConfiguration
 import Environment
 import OrderResponseModel
-import SessionModel
+import Session
 import android.content.Context
-import com.adyen.adyen_checkout.Mapper.mapTopAmount
 import com.adyen.checkout.components.core.OrderResponse
 
 object Mapper {
 
-    fun SessionModel.mapToSessionModel(): com.adyen.checkout.sessions.core.SessionModel {
+    fun Session.mapToSession(): com.adyen.checkout.sessions.core.SessionModel {
         return com.adyen.checkout.sessions.core.SessionModel(this.id, this.sessionData)
     }
 
-    fun DropInConfigurationModel.mapToDropInConfiguration(context: Context): com.adyen.checkout.dropin.DropInConfiguration {
+    fun DropInConfiguration.mapToDropInConfiguration(context: Context): com.adyen.checkout.dropin.DropInConfiguration {
         val amount = this.amount.mapToAmount()
         return com.adyen.checkout.dropin.DropInConfiguration.Builder(
             context,
@@ -24,21 +23,21 @@ object Mapper {
         ).setAmount(amount).build();
     }
 
-    fun Environment.mapToEnvironment(): com.adyen.checkout.core.Environment {
+    private fun Environment.mapToEnvironment(): com.adyen.checkout.core.Environment {
         //TODO map to actual value
         return com.adyen.checkout.core.Environment.TEST
     }
 
-    fun Amount.mapToAmount(): com.adyen.checkout.components.core.Amount {
+    private fun Amount.mapToAmount(): com.adyen.checkout.components.core.Amount {
         return com.adyen.checkout.components.core.Amount(this.currency, this.value)
     }
 
-    fun com.adyen.checkout.components.core.Amount.mapTopAmount() : Amount {
+    private fun com.adyen.checkout.components.core.Amount.mapTopAmount(): Amount {
         return Amount(this.currency, this.value)
     }
 
-    fun OrderResponse.mapToOrderResponseModel() : OrderResponseModel {
-        return  OrderResponseModel(
+    fun OrderResponse.mapToOrderResponseModel(): OrderResponseModel {
+        return OrderResponseModel(
             pspReference = pspReference,
             orderData = orderData,
             amount = amount?.mapTopAmount(),

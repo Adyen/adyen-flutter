@@ -5,22 +5,23 @@ import 'package:adyen_checkout/src/models/payment_type.dart';
 
 class PaymentFlow {
   late final PaymentType paymentType;
-  final DropInConfigurationModel dropInConfiguration;
-  SessionModel? sessionModel;
+  final DropInConfiguration dropInConfiguration;
+  String? componentConfiguration;
+  Session? session;
   String? paymentMethodsResponse;
   Future<Map<String, dynamic>> Function(String paymentComponentJson)?
       postPayments;
   Future<Map<String, dynamic>> Function(String additionalDetailsJson)?
       postPaymentsDetails;
 
-  PaymentFlow.dropInSessions({
+  PaymentFlow.dropIn({
     required this.dropInConfiguration,
-    required this.sessionModel,
+    required this.session,
   }) {
     paymentType = PaymentType.dropInSessions;
   }
 
-  PaymentFlow.dropInAdvancedFlow({
+  PaymentFlow.dropInAdvanced({
     required this.dropInConfiguration,
     required this.paymentMethodsResponse,
     required this.postPayments,

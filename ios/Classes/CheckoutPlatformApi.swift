@@ -31,12 +31,12 @@ class CheckoutPlatformApi : CheckoutPlatformInterface {
         completion(Result.success(systemVersion))
     }
     
-    func startPayment(dropInConfiguration: DropInConfigurationModel, sessionModel: SessionModel) {
+    func startDropInSessionPayment(dropInConfiguration: DropInConfiguration, session: Session) {
         do {
             viewController = UIApplication.shared.adyen.mainKeyWindow?.rootViewController
             let adyenContext = try createAdyenContext(dropInConfiguration: dropInConfiguration)
-            let configuration = AdyenSession.Configuration(sessionIdentifier: sessionModel.id,
-                                                           initialSessionData: sessionModel.sessionData,
+            let configuration = AdyenSession.Configuration(sessionIdentifier: session.id,
+                                                           initialSessionData: session.sessionData,
                                                            context: adyenContext)
             DispatchQueue.main.async {
                 AdyenSession.initialize(with: configuration, delegate: self, presentationDelegate: self) { [weak self] result in
@@ -54,18 +54,18 @@ class CheckoutPlatformApi : CheckoutPlatformInterface {
                         self?.viewController?.present(dropInComponent.viewController, animated: true)
                     case let .failure(error):
                         print("Native sdk error: \(error.localizedDescription)")
-                        self?.checkoutFlutterApi.onDropInSessionResult(sessionDropInResult: DropInResultModel(sessionDropInResult: DropInResultEnum.error, reason: error.localizedDescription)) {}
+                        self?.checkoutFlutterApi.onDropInSessionResult(sessionDropInResult: DropInResult(type: DropInResultEnum.error, reason: error.localizedDescription)) {}
                     }
                 }
             }
         } catch let error {
             print("Native sdk error: \(error.localizedDescription)")
-            checkoutFlutterApi.onDropInSessionResult(sessionDropInResult: DropInResultModel(sessionDropInResult: DropInResultEnum.error, reason: error.localizedDescription)) {}
+            checkoutFlutterApi.onDropInSessionResult(sessionDropInResult: DropInResult(type: DropInResultEnum.error, reason: error.localizedDescription)) {}
         }
     }
 
 
-    func startPaymentDropInAdvancedFlow(dropInConfiguration: DropInConfigurationModel, paymentMethodsResponse: String) {
+    func startDropInAdvancedFlowPayment(dropInConfiguration: DropInConfiguration, paymentMethodsResponse: String) {
 
     }
 
@@ -81,7 +81,7 @@ class CheckoutPlatformApi : CheckoutPlatformInterface {
 
     }
     
-    private func createAdyenContext(dropInConfiguration: DropInConfigurationModel) throws  -> AdyenContext  {
+    private func createAdyenContext(dropInConfiguration: DropInConfiguration) throws  -> AdyenContext  {
         let apiContext = try APIContext(environment: mapToEnvironment(environment: dropInConfiguration.environment), clientKey: dropInConfiguration.clientKey)
         let value: Int = Int(dropInConfiguration.amount.value)
         guard let currencyCode : String = dropInConfiguration.amount.currency else {
@@ -119,8 +119,8 @@ class CheckoutPlatformApi : CheckoutPlatformInterface {
 extension CheckoutPlatformApi: AdyenSessionDelegate {
     func didComplete(with resultCode: SessionPaymentResultCode, component: Component, session: AdyenSession) {
         self.viewController?.dismiss(animated: false, completion: {
-            self.checkoutFlutterApi.onDropInSessionResult(sessionDropInResult: DropInResultModel(
-                sessionDropInResult: DropInResultEnum.finished,
+            self.checkoutFlutterApi.onDropInSessionResult(sessionDropInResult: DropInResult(
+                type: DropInResultEnum.finished,
                 result: SessionPaymentResultModel(sessionId: session.sessionContext.identifier, sessionData: session.sessionContext.data, resultCode: resultCode.rawValue)), completion: {})
         })
     }
@@ -128,7 +128,7 @@ extension CheckoutPlatformApi: AdyenSessionDelegate {
     func didFail(with error: Error, from component: Component, session: AdyenSession) {
         self.viewController?.dismiss(animated: true)
         print("Native sdk error: \(error.localizedDescription)")
-        checkoutFlutterApi.onDropInSessionResult(sessionDropInResult: DropInResultModel(sessionDropInResult: DropInResultEnum.error, reason: error.localizedDescription)) {}
+        checkoutFlutterApi.onDropInSessionResult(sessionDropInResult: DropInResult(type: DropInResultEnum.cancelledByUser, reason: error.localizedDescription)) {}
     }
     
     func didOpenExternalApplication(component: ActionComponent, session: AdyenSession) {

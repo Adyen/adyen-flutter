@@ -8,21 +8,21 @@ class AdyenCheckoutApi implements AdyenCheckoutPlatformInterface {
   Future<String> getPlatformVersion() => checkoutApi.getPlatformVersion();
 
   @override
-  void startPayment(
-    SessionModel sessionModel,
-    DropInConfigurationModel dropInConfiguration,
+  void startDropInSessionPayment(
+    Session session,
+    DropInConfiguration dropInConfiguration,
   ) =>
-      checkoutApi.startPayment(
+      checkoutApi.startDropInSessionPayment(
         dropInConfiguration,
-        sessionModel,
+        session,
       );
 
   @override
   void startDropInAdvancedFlowPayment(
     String paymentMethodsResponse,
-    DropInConfigurationModel dropInConfiguration,
+    DropInConfiguration dropInConfiguration,
   ) =>
-      checkoutApi.startPaymentDropInAdvancedFlow(
+      checkoutApi.startDropInAdvancedFlowPayment(
         dropInConfiguration,
         paymentMethodsResponse,
       );
