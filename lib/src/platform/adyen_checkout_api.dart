@@ -37,4 +37,7 @@ class AdyenCheckoutApi implements AdyenCheckoutPlatformInterface {
   @override
   void onPaymentsDetailsResult(DropInResult paymentsDetailsResult) =>
       checkoutApi.onPaymentsDetailsResult(paymentsDetailsResult);
+
+  @override
+  void hide() => checkoutApi.hide();
 }

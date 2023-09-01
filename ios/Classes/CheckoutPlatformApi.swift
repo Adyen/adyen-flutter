@@ -144,6 +144,10 @@ class CheckoutPlatformApi : CheckoutPlatformInterface {
                         self?.checkoutFlutterApi.onDropInAdvancedFlowPlatformCommunication(platformCommunicationModel: PlatformCommunicationModel(type: PlatformCommunicationType.result, dropInResult: dropInResult), completion: {})
                     })
                 }
+            } else {
+                let dropInResult = DropInResult(type: DropInResultEnum.error, reason: "\(result)")
+                self.checkoutFlutterApi.onDropInAdvancedFlowPlatformCommunication(platformCommunicationModel: PlatformCommunicationModel(type: PlatformCommunicationType.result, dropInResult: dropInResult), completion: {})
+                self.finalize(false, "\(result)")
             }
         } catch let error {
             print(error)
