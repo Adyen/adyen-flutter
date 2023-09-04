@@ -14,7 +14,6 @@ import com.adyen.checkout.components.core.PaymentComponentState
 import com.adyen.checkout.dropin.DropInService
 import com.adyen.checkout.dropin.DropInServiceResult
 
-//We should discuss if we can use LifecycleService instead of Service
 class AdvancedFlowDropInService : DropInService(), LifecycleOwner {
     private val dispatcher = ServiceLifecycleDispatcher(this)
     private val dropInServiceResultHandler = DropInServiceResultHandler(this.lifecycleScope)
