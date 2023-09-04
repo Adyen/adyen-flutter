@@ -6,18 +6,13 @@ import android.os.IBinder
 import android.util.Log
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ServiceLifecycleDispatcher
 import androidx.lifecycle.lifecycleScope
-import com.adyen.adyen_checkout.utils.Event
 import com.adyen.checkout.components.core.ActionComponentData
 import com.adyen.checkout.components.core.PaymentComponentData
 import com.adyen.checkout.components.core.PaymentComponentState
 import com.adyen.checkout.dropin.DropInService
 import com.adyen.checkout.dropin.DropInServiceResult
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import org.json.JSONObject
 
 //We should discuss if we can use LifecycleService instead of Service
 class AdvancedFlowDropInService : DropInService(), LifecycleOwner {
@@ -54,7 +49,6 @@ class AdvancedFlowDropInService : DropInService(), LifecycleOwner {
             }
 
             val result = dropInServiceResultHandler.handleResponse(message.contentIfNotHandled)
-                ?: return@observe
             sendResult(result)
         }
     }
@@ -67,7 +61,6 @@ class AdvancedFlowDropInService : DropInService(), LifecycleOwner {
             }
 
             val result = dropInServiceResultHandler.handleResponse(message.contentIfNotHandled)
-                ?: return@observe
             sendResult(result)
         }
     }
