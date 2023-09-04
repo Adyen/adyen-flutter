@@ -9,7 +9,7 @@ import org.json.JSONObject
 
 class DropInServiceResultHandler(val lifecycleCoroutineScope: LifecycleCoroutineScope) {
 
-    fun handleResponse(jsonResponse: JSONObject?): DropInServiceResult? {
+    fun handleResponse(jsonResponse: JSONObject?): DropInServiceResult {
         return when {
             jsonResponse == null -> {
                 DropInServiceResult.Error(reason = "IOException")
@@ -31,18 +31,10 @@ class DropInServiceResultHandler(val lifecycleCoroutineScope: LifecycleCoroutine
                 DropInServiceResult.Action(action)
             }
 
-            isNonFullyPaidOrder(jsonResponse) -> {
-//                TODO Not yet implemented
-//                val order = getOrderFromResponse(jsonResponse)
-//                fetchPaymentMethods(order)
-                null
-            }
-
             else -> {
-                val resultCode = if (jsonResponse.has("resultCode")) {
-                    jsonResponse.get("resultCode").toString()
-                } else {
-                    "EMPTY"
+                val resultCode = when {
+                    jsonResponse.has("resultCode") -> jsonResponse.get("resultCode").toString()
+                    else -> "EMPTY"
                 }
                 DropInServiceResult.Finished(resultCode)
             }
