@@ -21,9 +21,9 @@ class DropInSessionsDelegate : AdyenSessionDelegate {
         viewController?.dismiss(animated: true, completion: {
             switch (error) {
             case ComponentError.cancelled:
-                self.checkoutFlutterApi.onDropInSessionResult(sessionDropInResult: DropInResult(type: DropInResultEnum.cancelledByUser, reason: error.localizedDescription)) {}
+                self.checkoutFlutterApi.onDropInSessionResult(sessionDropInResult: DropInResult(type: DropInResultEnum.cancelledByUser, errorReason: error.localizedDescription)) {}
             default:
-                self.checkoutFlutterApi.onDropInSessionResult(sessionDropInResult: DropInResult(type: DropInResultEnum.error, reason: error.localizedDescription)) {}
+                self.checkoutFlutterApi.onDropInSessionResult(sessionDropInResult: DropInResult(type: DropInResultEnum.error, errorReason: error.localizedDescription)) {}
             }
         })
     }

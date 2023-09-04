@@ -126,12 +126,18 @@ class _MyAppState extends State<MyApp> {
   }
 
   _dialogBuilder(BuildContext context, PaymentResult dropInResult) {
+    String message = "";
+    if (dropInResult.result != null) {
+      message = "Result code: ${dropInResult.result?.resultCode}";
+    } else {
+      message = "Error: ${dropInResult.errorReason}";
+    }
     return showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text(dropInResult.type.name),
-          content: Text("Result code: ${dropInResult.result?.resultCode}"),
+          content: Text(message),
           actions: <Widget>[
             TextButton(
               style: TextButton.styleFrom(

@@ -51,11 +51,11 @@ class CheckoutPlatformApi : CheckoutPlatformInterface {
                     self?.dropInComponent = dropInComponent
                     self?.viewController?.present(dropInComponent.viewController, animated: true)
                 case let .failure(error):
-                    self?.checkoutFlutterApi.onDropInSessionResult(sessionDropInResult: DropInResult(type: DropInResultEnum.error, reason: error.localizedDescription)) {}
+                    self?.checkoutFlutterApi.onDropInSessionResult(sessionDropInResult: DropInResult(type: DropInResultEnum.error, errorReason: error.localizedDescription)) {}
                 }
             }
         } catch let error {
-            checkoutFlutterApi.onDropInSessionResult(sessionDropInResult: DropInResult(type: DropInResultEnum.error, reason: error.localizedDescription)) {}
+            checkoutFlutterApi.onDropInSessionResult(sessionDropInResult: DropInResult(type: DropInResultEnum.error, errorReason: error.localizedDescription)) {}
         }
     }
 
@@ -78,7 +78,7 @@ class CheckoutPlatformApi : CheckoutPlatformInterface {
             self.dropInComponent = dropInComponent
             self.viewController?.present(dropInComponent.viewController, animated: true)
         } catch let error {
-            let platformCommunicationModel = PlatformCommunicationModel(type: PlatformCommunicationType.result, dropInResult: DropInResult(type: DropInResultEnum.error, reason: error.localizedDescription))
+            let platformCommunicationModel = PlatformCommunicationModel(type: PlatformCommunicationType.result, dropInResult: DropInResult(type: DropInResultEnum.error, errorReason: error.localizedDescription))
             checkoutFlutterApi.onDropInAdvancedFlowPlatformCommunication(platformCommunicationModel: platformCommunicationModel, completion: {})
         }
     }
@@ -94,7 +94,7 @@ class CheckoutPlatformApi : CheckoutPlatformInterface {
     func onPaymentsDetailsResult(paymentsDetailsResult: DropInResult) {
         handleResponse(result: paymentsDetailsResult)
     }
-    
+        
     private func createAdyenContext(dropInConfiguration: DropInConfiguration) throws  -> AdyenContext  {
         let apiContext = try APIContext(environment: mapToEnvironment(environment: dropInConfiguration.environment), clientKey: dropInConfiguration.clientKey)
         let value: Int = Int(dropInConfiguration.amount.value)
@@ -145,7 +145,7 @@ class CheckoutPlatformApi : CheckoutPlatformInterface {
                     })
                 }
             } else {
-                let dropInResult = DropInResult(type: DropInResultEnum.error, reason: "\(result)")
+                let dropInResult = DropInResult(type: DropInResultEnum.error, errorReason: "\(String(describing: result["message"]!!))")
                 self.checkoutFlutterApi.onDropInAdvancedFlowPlatformCommunication(platformCommunicationModel: PlatformCommunicationModel(type: PlatformCommunicationType.result, dropInResult: dropInResult), completion: {})
                 self.finalize(false, "\(result)")
             }
