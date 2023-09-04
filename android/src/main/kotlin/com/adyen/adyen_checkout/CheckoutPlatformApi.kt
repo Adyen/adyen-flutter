@@ -62,11 +62,10 @@ class CheckoutPlatformApi(private val checkoutFlutterApi: CheckoutFlutterApi?) :
                     activity.applicationContext,
                     dropInSessionLauncher,
                     checkoutSession,
-                    dropInConfiguration
+                    dropInConfiguration,
                 )
             }
         }
-
     }
 
     override fun startDropInAdvancedFlowPayment(
@@ -77,7 +76,7 @@ class CheckoutPlatformApi(private val checkoutFlutterApi: CheckoutFlutterApi?) :
         setAdvancedFlowDropInServiceObserver()
         activity.lifecycleScope.launch(Dispatchers.IO) {
             val paymentMethodsApiResponse = PaymentMethodsApiResponse.SERIALIZER.deserialize(
-                JSONObject(paymentMethodsResponse)
+                JSONObject(paymentMethodsResponse),
             )
             val paymentMethodsWithoutGiftCards =
                 removeGiftCardPaymentMethods(paymentMethodsApiResponse)
@@ -109,7 +108,7 @@ class CheckoutPlatformApi(private val checkoutFlutterApi: CheckoutFlutterApi?) :
 
     private suspend fun createCheckoutSession(
         sessionModel: com.adyen.checkout.sessions.core.SessionModel,
-        dropInConfiguration: com.adyen.checkout.dropin.DropInConfiguration
+        dropInConfiguration: com.adyen.checkout.dropin.DropInConfiguration,
     ): CheckoutSession {
         val checkoutSessionResult =
             CheckoutSessionProvider.createSession(sessionModel, dropInConfiguration)
@@ -118,7 +117,6 @@ class CheckoutPlatformApi(private val checkoutFlutterApi: CheckoutFlutterApi?) :
             is CheckoutSessionResult.Error -> throw checkoutSessionResult.exception
         }
     }
-
 
     private fun setAdvancedFlowDropInServiceObserver() {
         DropInServiceResultMessenger.instance().removeObservers(activity)
@@ -129,7 +127,7 @@ class CheckoutPlatformApi(private val checkoutFlutterApi: CheckoutFlutterApi?) :
 
             val model = PlatformCommunicationModel(
                 PlatformCommunicationType.PAYMENTCOMPONENT,
-                data = message.contentIfNotHandled.toString()
+                data = message.contentIfNotHandled.toString(),
             )
             checkoutFlutterApi?.onDropInAdvancedFlowPlatformCommunication(model) {}
         }
@@ -144,7 +142,7 @@ class CheckoutPlatformApi(private val checkoutFlutterApi: CheckoutFlutterApi?) :
 
             val model = PlatformCommunicationModel(
                 PlatformCommunicationType.ADDITIONALDETAILS,
-                data = message.contentIfNotHandled.toString()
+                data = message.contentIfNotHandled.toString(),
             )
             checkoutFlutterApi?.onDropInAdvancedFlowPlatformCommunication(model) {}
         }

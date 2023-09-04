@@ -1,0 +1,28 @@
+configurations {
+   ktlint
+}
+
+dependencies {
+    ktlint "com.pinterest:ktlint:0.50.0"
+}
+
+tasks.register('ktlintCheck', JavaExec) {
+    description = "Check Kotlin code style."
+    group = "verification"
+
+    classpath = configurations.ktlint
+    main = "com.pinterest.ktlint.Main"
+    args "src/**/main/**/*.kt", "--reporter=plain", "--reporter=checkstyle,output=${project.buildDir}/reports/klint/klint-results.xml"
+}
+
+check.dependsOn ktlintCheck
+
+tasks.register('ktlintFormat', JavaExec) {
+    description = "Fix Kotlin code style deviations."
+    group = "formatting"
+
+    classpath = configurations.ktlint
+    main = "com.pinterest.ktlint.Main"
+    args "-F", "src/main/**/*.kt"
+    jvmArgs("--add-opens", "java.base/java.lang=ALL-UNNAMED")
+}
