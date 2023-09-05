@@ -1,11 +1,5 @@
 package com.adyen.adyen_checkout
 
-import CheckoutResultFlutterInterface
-import io.flutter.plugin.common.MethodCall
-import io.flutter.plugin.common.MethodChannel
-import kotlin.test.Test
-import org.mockito.Mockito
-
 /*
  * This demonstrates a simple unit test of the Kotlin portion of this plugin's implementation.
  *
