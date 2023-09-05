@@ -7,6 +7,7 @@ import OrderResponseModel
 import Session
 import android.content.Context
 import com.adyen.checkout.components.core.OrderResponse
+import com.adyen.checkout.core.Environment as SDKEnvironment
 
 object Mapper {
 
@@ -25,12 +26,12 @@ object Mapper {
 
     private fun Environment.mapToEnvironment(): com.adyen.checkout.core.Environment {
         return when (this) {
-            Environment.TEST -> com.adyen.checkout.core.Environment.TEST
-            Environment.EUROPE -> com.adyen.checkout.core.Environment.EUROPE
-            Environment.UNITEDSTATES -> com.adyen.checkout.core.Environment.UNITED_STATES
-            Environment.AUSTRALIA -> com.adyen.checkout.core.Environment.AUSTRALIA
-            Environment.INDIA -> com.adyen.checkout.core.Environment.INDIA
-            Environment.APSE -> com.adyen.checkout.core.Environment.APSE
+            Environment.TEST -> SDKEnvironment.TEST
+            Environment.EUROPE -> SDKEnvironment.EUROPE
+            Environment.UNITEDSTATES -> SDKEnvironment.UNITED_STATES
+            Environment.AUSTRALIA -> SDKEnvironment.AUSTRALIA
+            Environment.INDIA -> SDKEnvironment.INDIA
+            Environment.APSE -> SDKEnvironment.APSE
         }
 
     }

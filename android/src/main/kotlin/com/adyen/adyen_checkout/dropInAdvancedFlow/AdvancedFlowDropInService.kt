@@ -16,7 +16,7 @@ import com.adyen.checkout.dropin.DropInServiceResult
 
 class AdvancedFlowDropInService : DropInService(), LifecycleOwner {
     private val dispatcher = ServiceLifecycleDispatcher(this)
-    private val dropInServiceResultHandler = DropInServiceResultHandler(this.lifecycleScope)
+    private val dropInServiceResultHandler = DropInServiceResultHandler(lifecycleScope)
 
     override fun onSubmit(state: PaymentComponentState<*>) {
         try {

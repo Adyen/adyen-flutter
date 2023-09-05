@@ -2,8 +2,9 @@ package com.adyen.adyen_checkout
 
 import CheckoutFlutterApi
 import CheckoutPlatformInterface
-import DropInResult as FlutterDropInResult
+import DropInResultEnum
 import PlatformCommunicationModel
+import PlatformCommunicationType
 import SessionPaymentResultModel
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.Lifecycle
@@ -19,7 +20,7 @@ import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.embedding.engine.plugins.activity.ActivityAware
 import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding
 import io.flutter.embedding.engine.plugins.lifecycle.HiddenLifecycleReference
-import java.lang.Exception
+import DropInResult as FlutterDropInResult
 
 /** AdyenCheckoutPlugin */
 class AdyenCheckoutPlugin : FlutterPlugin, ActivityAware {
@@ -70,7 +71,7 @@ class AdyenCheckoutPlugin : FlutterPlugin, ActivityAware {
                         DropIn.registerForDropInResult(fragmentActivity, sessionDropInCallback())
                     checkoutPlatformApi?.dropInAdvancedFlowLauncher =
                         DropIn.registerForDropInResult(
-                            fragmentActivity, dropInAdvancedFlowCallback()
+                            fragmentActivity, dropInAdvancedFlowCallback
                         )
                 }
 
@@ -94,18 +95,20 @@ class AdyenCheckoutPlugin : FlutterPlugin, ActivityAware {
             )
 
             is SessionDropInResult.Finished -> FlutterDropInResult(
-                DropInResultEnum.FINISHED, result = SessionPaymentResultModel(
-                    sessionDropInResult.result.sessionId,
-                    sessionDropInResult.result.sessionData,
-                    sessionDropInResult.result.resultCode,
-                    sessionDropInResult.result.order?.mapToOrderResponseModel(),
-                )
+                DropInResultEnum.FINISHED, result = with(sessionDropInResult.result) {
+                    SessionPaymentResultModel(
+                        sessionId,
+                        sessionData,
+                        resultCode,
+                        order?.mapToOrderResponseModel()
+                    )
+                }
             )
         }
         checkoutFlutterApi?.onDropInSessionResult(mappedResult) {}
     }
 
-    private fun dropInAdvancedFlowCallback() = DropInCallback { dropInAdvancedFlowResult ->
+    private val dropInAdvancedFlowCallback = DropInCallback { dropInAdvancedFlowResult ->
         if (dropInAdvancedFlowResult == null) {
             return@DropInCallback
         }
