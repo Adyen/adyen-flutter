@@ -19,6 +19,8 @@ class CheckoutPlatformApi : CheckoutPlatformInterface {
     private var dropInSessionsPresentationDelegate : PresentationDelegate?
     private var dropInAdvancedFlowDelegate : DropInComponentDelegate?
     private var storedPaymentMethodsDelegate : StoredPaymentMethodsDelegate?
+    private let actionKey = "action"
+    private let resultCodeKey = "resultCode"
     
     init(checkoutFlutterApi: CheckoutFlutterApi) {
         self.checkoutFlutterApi = checkoutFlutterApi
@@ -84,7 +86,7 @@ class CheckoutPlatformApi : CheckoutPlatformInterface {
     }
 
     func getReturnUrl(completion: @escaping (Result<String, Error>) -> Void) {
-        completion(Result.success(""))
+        completion(Result.failure(PlatformError(errorDescription: "Please use your app url type instead of this method.")))
     }
 
     func onPaymentsResult(paymentsResult: DropInResult) {
@@ -102,8 +104,7 @@ class CheckoutPlatformApi : CheckoutPlatformInterface {
             throw BalanceChecker.Error.unexpectedCurrencyCode
         }
         let amount = Adyen.Amount(value: value, currencyCode: currencyCode)
-        let adyenContext = AdyenContext(apiContext: apiContext, payment: Payment(amount: amount, countryCode: dropInConfiguration.countryCode))
-        return adyenContext
+        return AdyenContext(apiContext: apiContext, payment: Payment(amount: amount, countryCode: dropInConfiguration.countryCode))
     }
     
     private func mapToEnvironment(environment: Environment) -> Adyen.Environment {
@@ -124,19 +125,18 @@ class CheckoutPlatformApi : CheckoutPlatformInterface {
     }
 
     private func createDropInConfiguration() -> DropInComponent.Configuration {
-        let dropInConfiguration = DropInComponent.Configuration()
-        return dropInConfiguration
+        return DropInComponent.Configuration()
     }
     
     private func handleResponse(result: [String : Any?]) {
         do {
-            if (result.keys.contains("action")) {
-                let action = result["action"]
+            if (result.keys.contains(actionKey)) {
+                let action = result[actionKey]
                 let jsonData = try JSONSerialization.data(withJSONObject: action as! [String: Any], options: [])
                 let result = try JSONDecoder().decode(Action.self, from: jsonData)
                 self.dropInComponent?.handle(result)
-            } else if (result.keys.contains("resultCode")) {
-                let resultCode = ResultCode(rawValue: result["resultCode"] as! String)
+            } else if (result.keys.contains(resultCodeKey)) {
+                let resultCode = ResultCode(rawValue: result[resultCodeKey] as! String)
                 let success = resultCode == .authorised || resultCode == .received || resultCode == .pending
                 self.dropInComponent?.finalizeIfNeeded(with: success) { [weak self] in
                     self?.dropInComponent?.viewController.presentingViewController?.dismiss(animated: false, completion: {
@@ -150,7 +150,9 @@ class CheckoutPlatformApi : CheckoutPlatformInterface {
                 self.finalize(false, "\(result)")
             }
         } catch let error {
-            print(error)
+            let dropInResult = DropInResult(type: DropInResultEnum.error, errorReason: error.localizedDescription)
+            self.checkoutFlutterApi.onDropInAdvancedFlowPlatformCommunication(platformCommunicationModel: PlatformCommunicationModel(type: PlatformCommunicationType.result, dropInResult: dropInResult), completion: {})
+            self.finalize(false, "\(result)")
         }
     }
 
