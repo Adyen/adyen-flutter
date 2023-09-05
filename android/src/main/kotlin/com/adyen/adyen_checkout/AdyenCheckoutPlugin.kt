@@ -8,6 +8,7 @@ import SessionPaymentResultModel
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
+import com.adyen.adyen_checkout.utils.Constants.Companion.WRONG_FLUTTER_ACTIVITY_USAGE_ERROR_MESSAGE
 import com.adyen.adyen_checkout.utils.Mapper.mapToOrderResponseModel
 import com.adyen.checkout.dropin.DropIn
 import com.adyen.checkout.dropin.DropInCallback
@@ -18,6 +19,7 @@ import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.embedding.engine.plugins.activity.ActivityAware
 import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding
 import io.flutter.embedding.engine.plugins.lifecycle.HiddenLifecycleReference
+import java.lang.Exception
 
 /** AdyenCheckoutPlugin */
 class AdyenCheckoutPlugin : FlutterPlugin, ActivityAware {
@@ -47,6 +49,10 @@ class AdyenCheckoutPlugin : FlutterPlugin, ActivityAware {
     override fun onDetachedFromActivity() = teardown()
 
     private fun setupActivity(binding: ActivityPluginBinding) {
+        if (binding.activity !is FragmentActivity) {
+            throw Exception(WRONG_FLUTTER_ACTIVITY_USAGE_ERROR_MESSAGE)
+        }
+
         val fragmentActivity = binding.activity as FragmentActivity
         checkoutPlatformApi?.activity = fragmentActivity
         lifecycleReference = binding.lifecycle as HiddenLifecycleReference
