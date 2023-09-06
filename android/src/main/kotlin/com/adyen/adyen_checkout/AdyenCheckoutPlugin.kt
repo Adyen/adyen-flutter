@@ -2,7 +2,8 @@ package com.adyen.adyen_checkout
 
 import CheckoutFlutterApi
 import CheckoutPlatformInterface
-import DropInResultEnum
+import PaymentResult
+import PaymentResultEnum
 import PlatformCommunicationModel
 import PlatformCommunicationType
 import SessionPaymentResultModel
@@ -20,7 +21,6 @@ import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.embedding.engine.plugins.activity.ActivityAware
 import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding
 import io.flutter.embedding.engine.plugins.lifecycle.HiddenLifecycleReference
-import DropInResult as FlutterDropInResult
 
 /** AdyenCheckoutPlugin */
 class AdyenCheckoutPlugin : FlutterPlugin, ActivityAware {
@@ -86,16 +86,16 @@ class AdyenCheckoutPlugin : FlutterPlugin, ActivityAware {
         }
 
         val mappedResult = when (sessionDropInResult) {
-            is SessionDropInResult.CancelledByUser -> FlutterDropInResult(
-                DropInResultEnum.CANCELLEDBYUSER
+            is SessionDropInResult.CancelledByUser -> PaymentResult(
+                PaymentResultEnum.CANCELLEDBYUSER
             )
 
-            is SessionDropInResult.Error -> FlutterDropInResult(
-                DropInResultEnum.ERROR, reason = sessionDropInResult.reason
+            is SessionDropInResult.Error -> PaymentResult(
+                PaymentResultEnum.ERROR, reason = sessionDropInResult.reason
             )
 
-            is SessionDropInResult.Finished -> FlutterDropInResult(
-                DropInResultEnum.FINISHED, result = with(sessionDropInResult.result) {
+            is SessionDropInResult.Finished -> PaymentResult(
+                PaymentResultEnum.FINISHED, result = with(sessionDropInResult.result) {
                     SessionPaymentResultModel(
                         sessionId,
                         sessionData,
@@ -114,23 +114,23 @@ class AdyenCheckoutPlugin : FlutterPlugin, ActivityAware {
         }
 
         val mappedResult = when (dropInAdvancedFlowResult) {
-            is DropInResult.CancelledByUser -> FlutterDropInResult(
-                DropInResultEnum.CANCELLEDBYUSER
+            is DropInResult.CancelledByUser -> PaymentResult(
+                PaymentResultEnum.CANCELLEDBYUSER
             )
 
-            is DropInResult.Error -> FlutterDropInResult(
-                DropInResultEnum.ERROR, reason = dropInAdvancedFlowResult.reason
+            is DropInResult.Error -> PaymentResult(
+                PaymentResultEnum.ERROR, reason = dropInAdvancedFlowResult.reason
             )
 
-            is DropInResult.Finished -> FlutterDropInResult(
-                DropInResultEnum.FINISHED, result = SessionPaymentResultModel(
+            is DropInResult.Finished -> PaymentResult(
+                PaymentResultEnum.FINISHED, result = SessionPaymentResultModel(
                     resultCode = dropInAdvancedFlowResult.result
                 )
             )
         }
 
         val model = PlatformCommunicationModel(
-            PlatformCommunicationType.RESULT, data = "", dropInResult = mappedResult
+            PlatformCommunicationType.RESULT, data = "", paymentResult = mappedResult
         )
         checkoutFlutterApi?.onDropInAdvancedFlowPlatformCommunication(model) {}
     }

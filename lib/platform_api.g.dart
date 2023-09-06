@@ -17,7 +17,7 @@ enum Environment {
   apse,
 }
 
-enum DropInResultEnum {
+enum PaymentResultEnum {
   cancelledByUser,
   error,
   finished,
@@ -142,6 +142,39 @@ class DropInConfiguration {
   }
 }
 
+class PaymentResult {
+  PaymentResult({
+    required this.type,
+    this.reason,
+    this.result,
+  });
+
+  PaymentResultEnum type;
+
+  String? reason;
+
+  SessionPaymentResultModel? result;
+
+  Object encode() {
+    return <Object?>[
+      type.index,
+      reason,
+      result?.encode(),
+    ];
+  }
+
+  static PaymentResult decode(Object result) {
+    result as List<Object?>;
+    return PaymentResult(
+      type: PaymentResultEnum.values[result[0]! as int],
+      reason: result[1] as String?,
+      result: result[2] != null
+          ? SessionPaymentResultModel.decode(result[2]! as List<Object?>)
+          : null,
+    );
+  }
+}
+
 class SessionPaymentResultModel {
   SessionPaymentResultModel({
     this.sessionId,
@@ -220,57 +253,24 @@ class OrderResponseModel {
   }
 }
 
-class DropInResult {
-  DropInResult({
-    required this.type,
-    this.reason,
-    this.result,
-  });
-
-  DropInResultEnum type;
-
-  String? reason;
-
-  SessionPaymentResultModel? result;
-
-  Object encode() {
-    return <Object?>[
-      type.index,
-      reason,
-      result?.encode(),
-    ];
-  }
-
-  static DropInResult decode(Object result) {
-    result as List<Object?>;
-    return DropInResult(
-      type: DropInResultEnum.values[result[0]! as int],
-      reason: result[1] as String?,
-      result: result[2] != null
-          ? SessionPaymentResultModel.decode(result[2]! as List<Object?>)
-          : null,
-    );
-  }
-}
-
 class PlatformCommunicationModel {
   PlatformCommunicationModel({
     required this.type,
     this.data,
-    this.dropInResult,
+    this.paymentResult,
   });
 
   PlatformCommunicationType type;
 
   String? data;
 
-  DropInResult? dropInResult;
+  PaymentResult? paymentResult;
 
   Object encode() {
     return <Object?>[
       type.index,
       data,
-      dropInResult?.encode(),
+      paymentResult?.encode(),
     ];
   }
 
@@ -279,8 +279,8 @@ class PlatformCommunicationModel {
     return PlatformCommunicationModel(
       type: PlatformCommunicationType.values[result[0]! as int],
       data: result[1] as String?,
-      dropInResult: result[2] != null
-          ? DropInResult.decode(result[2]! as List<Object?>)
+      paymentResult: result[2] != null
+          ? PaymentResult.decode(result[2]! as List<Object?>)
           : null,
     );
   }
@@ -296,10 +296,10 @@ class _CheckoutPlatformInterfaceCodec extends StandardMessageCodec {
     } else if (value is DropInConfiguration) {
       buffer.putUint8(129);
       writeValue(buffer, value.encode());
-    } else if (value is DropInResult) {
+    } else if (value is OrderResponseModel) {
       buffer.putUint8(130);
       writeValue(buffer, value.encode());
-    } else if (value is OrderResponseModel) {
+    } else if (value is PaymentResult) {
       buffer.putUint8(131);
       writeValue(buffer, value.encode());
     } else if (value is PlatformCommunicationModel) {
@@ -324,9 +324,9 @@ class _CheckoutPlatformInterfaceCodec extends StandardMessageCodec {
       case 129: 
         return DropInConfiguration.decode(readValue(buffer)!);
       case 130: 
-        return DropInResult.decode(readValue(buffer)!);
-      case 131: 
         return OrderResponseModel.decode(readValue(buffer)!);
+      case 131: 
+        return PaymentResult.decode(readValue(buffer)!);
       case 132: 
         return PlatformCommunicationModel.decode(readValue(buffer)!);
       case 133: 
@@ -499,10 +499,10 @@ class _CheckoutFlutterApiCodec extends StandardMessageCodec {
     if (value is Amount) {
       buffer.putUint8(128);
       writeValue(buffer, value.encode());
-    } else if (value is DropInResult) {
+    } else if (value is OrderResponseModel) {
       buffer.putUint8(129);
       writeValue(buffer, value.encode());
-    } else if (value is OrderResponseModel) {
+    } else if (value is PaymentResult) {
       buffer.putUint8(130);
       writeValue(buffer, value.encode());
     } else if (value is PlatformCommunicationModel) {
@@ -522,9 +522,9 @@ class _CheckoutFlutterApiCodec extends StandardMessageCodec {
       case 128: 
         return Amount.decode(readValue(buffer)!);
       case 129: 
-        return DropInResult.decode(readValue(buffer)!);
-      case 130: 
         return OrderResponseModel.decode(readValue(buffer)!);
+      case 130: 
+        return PaymentResult.decode(readValue(buffer)!);
       case 131: 
         return PlatformCommunicationModel.decode(readValue(buffer)!);
       case 132: 
@@ -538,7 +538,7 @@ class _CheckoutFlutterApiCodec extends StandardMessageCodec {
 abstract class CheckoutFlutterApi {
   static const MessageCodec<Object?> codec = _CheckoutFlutterApiCodec();
 
-  void onDropInSessionResult(DropInResult sessionDropInResult);
+  void onDropInSessionResult(PaymentResult sessionDropInResult);
 
   void onDropInAdvancedFlowPlatformCommunication(PlatformCommunicationModel platformCommunicationModel);
 
@@ -554,9 +554,9 @@ abstract class CheckoutFlutterApi {
           assert(message != null,
           'Argument for dev.flutter.pigeon.adyen_checkout.CheckoutFlutterApi.onDropInSessionResult was null.');
           final List<Object?> args = (message as List<Object?>?)!;
-          final DropInResult? arg_sessionDropInResult = (args[0] as DropInResult?);
+          final PaymentResult? arg_sessionDropInResult = (args[0] as PaymentResult?);
           assert(arg_sessionDropInResult != null,
-              'Argument for dev.flutter.pigeon.adyen_checkout.CheckoutFlutterApi.onDropInSessionResult was null, expected non-null DropInResult.');
+              'Argument for dev.flutter.pigeon.adyen_checkout.CheckoutFlutterApi.onDropInSessionResult was null, expected non-null PaymentResult.');
           api.onDropInSessionResult(arg_sessionDropInResult!);
           return;
         });

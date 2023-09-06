@@ -4,18 +4,19 @@ import CheckoutFlutterApi
 import CheckoutPlatformInterface
 import DropInConfiguration
 import PlatformCommunicationModel
+import PlatformCommunicationType
 import Session
 import androidx.activity.result.ActivityResultLauncher
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.lifecycleScope
-import com.adyen.adyen_checkout.utils.Mapper.mapToDropInConfiguration
-import com.adyen.adyen_checkout.utils.Mapper.mapToSession
 import com.adyen.adyen_checkout.dropInAdvancedFlow.AdvancedFlowDropInService
 import com.adyen.adyen_checkout.dropInAdvancedFlow.DropInAdditionalDetailsPlatformMessenger
 import com.adyen.adyen_checkout.dropInAdvancedFlow.DropInAdditionalDetailsResultMessenger
 import com.adyen.adyen_checkout.dropInAdvancedFlow.DropInPaymentResultMessenger
 import com.adyen.adyen_checkout.dropInAdvancedFlow.DropInServiceResultMessenger
 import com.adyen.adyen_checkout.utils.Constants.Companion.WRONG_FLUTTER_ACTIVITY_USAGE_ERROR_MESSAGE
+import com.adyen.adyen_checkout.utils.Mapper.mapToDropInConfiguration
+import com.adyen.adyen_checkout.utils.Mapper.mapToSession
 import com.adyen.checkout.components.core.PaymentMethodsApiResponse
 import com.adyen.checkout.dropin.DropIn
 import com.adyen.checkout.dropin.internal.ui.model.DropInResultContractParams
@@ -28,7 +29,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
-import java.lang.Exception
 
 @Suppress("NAME_SHADOWING")
 class CheckoutPlatformApi(private val checkoutFlutterApi: CheckoutFlutterApi?) :
@@ -147,9 +147,9 @@ class CheckoutPlatformApi(private val checkoutFlutterApi: CheckoutFlutterApi?) :
     }
 
     private fun checkForFlutterFragmentActivity() {
-       if (!this::activity.isInitialized) {
-           throw Exception(WRONG_FLUTTER_ACTIVITY_USAGE_ERROR_MESSAGE)
-       }
+        if (!this::activity.isInitialized) {
+            throw Exception(WRONG_FLUTTER_ACTIVITY_USAGE_ERROR_MESSAGE)
+        }
     }
 
 }

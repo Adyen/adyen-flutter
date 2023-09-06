@@ -85,7 +85,7 @@ class _MyAppState extends State<MyApp> {
     );
   }
 
-  Future<DropInResult> startDropInSessions() async {
+  Future<PaymentResult> startDropInSessions() async {
     final Session session = await _adyenSessionRepository.createSession(
       Config.amount,
       Config.environment,
@@ -105,7 +105,7 @@ class _MyAppState extends State<MyApp> {
     );
   }
 
-  Future<DropInResult> startDropInAdvancedFlow() async {
+  Future<PaymentResult> startDropInAdvancedFlow() async {
     final String paymentMethodsResponse =
         await _adyenSessionRepository.fetchPaymentMethods();
     DropInConfiguration dropInConfiguration = DropInConfiguration(
@@ -125,7 +125,7 @@ class _MyAppState extends State<MyApp> {
     );
   }
 
-  _dialogBuilder(BuildContext context, DropInResult dropInResult) {
+  _dialogBuilder(BuildContext context, PaymentResult dropInResult) {
     return showDialog(
       context: context,
       builder: (BuildContext context) {

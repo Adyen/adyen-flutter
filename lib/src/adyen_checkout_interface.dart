@@ -6,5 +6,5 @@ abstract class AdyenCheckoutInterface {
 
   Future<String> getReturnUrl();
 
-  Future<DropInResult> startPayment({required PaymentFlow paymentFlow});
+  Future<PaymentResult> startPayment({required PaymentFlow paymentFlow});
 }

@@ -3,12 +3,12 @@ import 'dart:async';
 import 'package:adyen_checkout/platform_api.g.dart';
 
 class AdyenCheckoutResultApi implements CheckoutFlutterApi {
-  var dropInSessionResultStream = StreamController<DropInResult>();
+  var dropInSessionResultStream = StreamController<PaymentResult>();
   var dropInAdvancedFlowPlatformCommunicationStream =
       StreamController<PlatformCommunicationModel>();
 
   @override
-  void onDropInSessionResult(DropInResult sessionDropInResult) =>
+  void onDropInSessionResult(PaymentResult sessionDropInResult) =>
       dropInSessionResultStream.sink.add(sessionDropInResult);
 
   @override

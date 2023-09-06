@@ -47,7 +47,7 @@ enum Environment: Int {
   case apse = 5
 }
 
-enum DropInResultEnum: Int {
+enum PaymentResultEnum: Int {
   case cancelledByUser = 0
   case error = 1
   case finished = 2
@@ -154,6 +154,35 @@ struct DropInConfiguration {
 }
 
 /// Generated class from Pigeon that represents data sent in messages.
+struct PaymentResult {
+  var type: PaymentResultEnum
+  var reason: String? = nil
+  var result: SessionPaymentResultModel? = nil
+
+  static func fromList(_ list: [Any?]) -> PaymentResult? {
+    let type = PaymentResultEnum(rawValue: list[0] as! Int)!
+    let reason: String? = nilOrValue(list[1])
+    var result: SessionPaymentResultModel? = nil
+    if let resultList: [Any?] = nilOrValue(list[2]) {
+      result = SessionPaymentResultModel.fromList(resultList)
+    }
+
+    return PaymentResult(
+      type: type,
+      reason: reason,
+      result: result
+    )
+  }
+  func toList() -> [Any?] {
+    return [
+      type.rawValue,
+      reason,
+      result?.toList(),
+    ]
+  }
+}
+
+/// Generated class from Pigeon that represents data sent in messages.
 struct SessionPaymentResultModel {
   var sessionId: String? = nil
   var sessionData: String? = nil
@@ -223,59 +252,30 @@ struct OrderResponseModel {
 }
 
 /// Generated class from Pigeon that represents data sent in messages.
-struct DropInResult {
-  var type: DropInResultEnum
-  var reason: String? = nil
-  var result: SessionPaymentResultModel? = nil
-
-  static func fromList(_ list: [Any?]) -> DropInResult? {
-    let type = DropInResultEnum(rawValue: list[0] as! Int)!
-    let reason: String? = nilOrValue(list[1])
-    var result: SessionPaymentResultModel? = nil
-    if let resultList: [Any?] = nilOrValue(list[2]) {
-      result = SessionPaymentResultModel.fromList(resultList)
-    }
-
-    return DropInResult(
-      type: type,
-      reason: reason,
-      result: result
-    )
-  }
-  func toList() -> [Any?] {
-    return [
-      type.rawValue,
-      reason,
-      result?.toList(),
-    ]
-  }
-}
-
-/// Generated class from Pigeon that represents data sent in messages.
 struct PlatformCommunicationModel {
   var type: PlatformCommunicationType
   var data: String? = nil
-  var dropInResult: DropInResult? = nil
+  var paymentResult: PaymentResult? = nil
 
   static func fromList(_ list: [Any?]) -> PlatformCommunicationModel? {
     let type = PlatformCommunicationType(rawValue: list[0] as! Int)!
     let data: String? = nilOrValue(list[1])
-    var dropInResult: DropInResult? = nil
-    if let dropInResultList: [Any?] = nilOrValue(list[2]) {
-      dropInResult = DropInResult.fromList(dropInResultList)
+    var paymentResult: PaymentResult? = nil
+    if let paymentResultList: [Any?] = nilOrValue(list[2]) {
+      paymentResult = PaymentResult.fromList(paymentResultList)
     }
 
     return PlatformCommunicationModel(
       type: type,
       data: data,
-      dropInResult: dropInResult
+      paymentResult: paymentResult
     )
   }
   func toList() -> [Any?] {
     return [
       type.rawValue,
       data,
-      dropInResult?.toList(),
+      paymentResult?.toList(),
     ]
   }
 }
@@ -288,9 +288,9 @@ private class CheckoutPlatformInterfaceCodecReader: FlutterStandardReader {
       case 129:
         return DropInConfiguration.fromList(self.readValue() as! [Any?])
       case 130:
-        return DropInResult.fromList(self.readValue() as! [Any?])
-      case 131:
         return OrderResponseModel.fromList(self.readValue() as! [Any?])
+      case 131:
+        return PaymentResult.fromList(self.readValue() as! [Any?])
       case 132:
         return PlatformCommunicationModel.fromList(self.readValue() as! [Any?])
       case 133:
@@ -311,10 +311,10 @@ private class CheckoutPlatformInterfaceCodecWriter: FlutterStandardWriter {
     } else if let value = value as? DropInConfiguration {
       super.writeByte(129)
       super.writeValue(value.toList())
-    } else if let value = value as? DropInResult {
+    } else if let value = value as? OrderResponseModel {
       super.writeByte(130)
       super.writeValue(value.toList())
-    } else if let value = value as? OrderResponseModel {
+    } else if let value = value as? PaymentResult {
       super.writeByte(131)
       super.writeValue(value.toList())
     } else if let value = value as? PlatformCommunicationModel {
@@ -462,9 +462,9 @@ private class CheckoutFlutterApiCodecReader: FlutterStandardReader {
       case 128:
         return Amount.fromList(self.readValue() as! [Any?])
       case 129:
-        return DropInResult.fromList(self.readValue() as! [Any?])
-      case 130:
         return OrderResponseModel.fromList(self.readValue() as! [Any?])
+      case 130:
+        return PaymentResult.fromList(self.readValue() as! [Any?])
       case 131:
         return PlatformCommunicationModel.fromList(self.readValue() as! [Any?])
       case 132:
@@ -480,10 +480,10 @@ private class CheckoutFlutterApiCodecWriter: FlutterStandardWriter {
     if let value = value as? Amount {
       super.writeByte(128)
       super.writeValue(value.toList())
-    } else if let value = value as? DropInResult {
+    } else if let value = value as? OrderResponseModel {
       super.writeByte(129)
       super.writeValue(value.toList())
-    } else if let value = value as? OrderResponseModel {
+    } else if let value = value as? PaymentResult {
       super.writeByte(130)
       super.writeValue(value.toList())
     } else if let value = value as? PlatformCommunicationModel {
@@ -521,7 +521,7 @@ class CheckoutFlutterApi {
   var codec: FlutterStandardMessageCodec {
     return CheckoutFlutterApiCodec.shared
   }
-  func onDropInSessionResult(sessionDropInResult sessionDropInResultArg: DropInResult, completion: @escaping () -> Void) {
+  func onDropInSessionResult(sessionDropInResult sessionDropInResultArg: PaymentResult, completion: @escaping () -> Void) {
     let channel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.CheckoutFlutterApi.onDropInSessionResult", binaryMessenger: binaryMessenger, codec: codec)
     channel.sendMessage([sessionDropInResultArg] as [Any?]) { _ in
       completion()

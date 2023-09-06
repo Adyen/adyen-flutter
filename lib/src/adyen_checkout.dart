@@ -23,7 +23,7 @@ class AdyenCheckout implements AdyenCheckoutInterface {
       AdyenCheckoutPlatformInterface.instance.getReturnUrl();
 
   @override
-  Future<DropInResult> startPayment({required PaymentFlow paymentFlow}) async {
+  Future<PaymentResult> startPayment({required PaymentFlow paymentFlow}) async {
     switch (paymentFlow.paymentType) {
       case PaymentType.dropInSessions:
         return await _startDropInSessionsPayment(
@@ -42,11 +42,11 @@ class AdyenCheckout implements AdyenCheckoutInterface {
     }
   }
 
-  Future<DropInResult> _startDropInSessionsPayment(
+  Future<PaymentResult> _startDropInSessionsPayment(
     Session session,
     DropInConfiguration dropInConfiguration,
   ) async {
-    _resultApi.dropInSessionResultStream = StreamController<DropInResult>();
+    _resultApi.dropInSessionResultStream = StreamController<PaymentResult>();
     AdyenCheckoutPlatformInterface.instance.startDropInSessionPayment(
       session,
       dropInConfiguration,
@@ -57,7 +57,7 @@ class AdyenCheckout implements AdyenCheckoutInterface {
     return sessionDropInResultModel;
   }
 
-  Future<DropInResult> _startDropInAdvancedFlowPayment(
+  Future<PaymentResult> _startDropInAdvancedFlowPayment(
     String paymentMethodsResponse,
     DropInConfiguration dropInConfiguration,
     Future<Map<String, dynamic>> Function(String paymentComponentJson)
@@ -65,7 +65,7 @@ class AdyenCheckout implements AdyenCheckoutInterface {
     Future<Map<String, dynamic>> Function(String additionalDetails)
         postPaymentsDetails,
   ) async {
-    final dropInAdvancedFlowCompleter = Completer<DropInResult>();
+    final dropInAdvancedFlowCompleter = Completer<PaymentResult>();
     AdyenCheckoutPlatformInterface.instance.startDropInAdvancedFlowPayment(
       paymentMethodsResponse,
       dropInConfiguration,
@@ -92,9 +92,11 @@ class AdyenCheckout implements AdyenCheckoutInterface {
     });
   }
 
-  void _handleResult(Completer<DropInResult> dropInAdvancedFlowCompleter,
-      PlatformCommunicationModel event) {
-    dropInAdvancedFlowCompleter.complete(event.dropInResult);
+  void _handleResult(
+    Completer<PaymentResult> dropInAdvancedFlowCompleter,
+    PlatformCommunicationModel event,
+  ) {
+    dropInAdvancedFlowCompleter.complete(event.paymentResult);
   }
 
   Future<void> _handleAdditionalDetails(

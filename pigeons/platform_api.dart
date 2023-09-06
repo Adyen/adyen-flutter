@@ -58,6 +58,24 @@ class DropInConfiguration {
   });
 }
 
+class PaymentResult {
+  final PaymentResultEnum type;
+  final String? reason;
+  final SessionPaymentResultModel? result;
+
+  PaymentResult(
+    this.type,
+    this.reason,
+    this.result,
+  );
+}
+
+enum PaymentResultEnum {
+  cancelledByUser,
+  error,
+  finished,
+}
+
 class SessionPaymentResultModel {
   final String? sessionId;
   final String? sessionData;
@@ -86,35 +104,25 @@ class OrderResponseModel {
   });
 }
 
-class DropInResult {
-  final DropInResultEnum type;
-  final String? reason;
-  final SessionPaymentResultModel? result;
-
-  DropInResult(
-    this.type,
-    this.reason,
-    this.result,
-  );
-}
-
-enum DropInResultEnum {
-  cancelledByUser,
-  error,
-  finished,
-}
-
 class PlatformCommunicationModel {
   final PlatformCommunicationType type;
   final String? data;
-  final DropInResult? dropInResult;
+  final PaymentResult? paymentResult;
 
   PlatformCommunicationModel({
     required this.type,
     this.data,
-    this.dropInResult,
+    this.paymentResult,
   });
 }
+
+// sealed class DropInResult {}
+//
+// class Finished extends DropInResult {
+//   final String result;
+//
+//   Finished(this.result);
+// }
 
 enum PlatformCommunicationType {
   paymentComponent,
@@ -147,7 +155,7 @@ abstract class CheckoutPlatformInterface {
 
 @FlutterApi()
 abstract class CheckoutFlutterApi {
-  void onDropInSessionResult(DropInResult sessionDropInResult);
+  void onDropInSessionResult(PaymentResult sessionDropInResult);
 
   void onDropInAdvancedFlowPlatformCommunication(
       PlatformCommunicationModel platformCommunicationModel);
