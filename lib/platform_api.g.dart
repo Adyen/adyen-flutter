@@ -29,6 +29,12 @@ enum PlatformCommunicationType {
   result,
 }
 
+enum DropInResultType {
+  finished,
+  action,
+  error,
+}
+
 class Session {
   Session({
     required this.id,
@@ -286,6 +292,75 @@ class PlatformCommunicationModel {
   }
 }
 
+class DropInResult {
+  DropInResult({
+    required this.dropInResultType,
+    this.result,
+    this.actionResponse,
+    this.error,
+  });
+
+  DropInResultType dropInResultType;
+
+  String? result;
+
+  Map<String?, Object?>? actionResponse;
+
+  DropInError? error;
+
+  Object encode() {
+    return <Object?>[
+      dropInResultType.index,
+      result,
+      actionResponse,
+      error?.encode(),
+    ];
+  }
+
+  static DropInResult decode(Object result) {
+    result as List<Object?>;
+    return DropInResult(
+      dropInResultType: DropInResultType.values[result[0]! as int],
+      result: result[1] as String?,
+      actionResponse: (result[2] as Map<Object?, Object?>?)?.cast<String?, Object?>(),
+      error: result[3] != null
+          ? DropInError.decode(result[3]! as List<Object?>)
+          : null,
+    );
+  }
+}
+
+class DropInError {
+  DropInError({
+    this.errorMessage,
+    this.reason,
+    this.dismissDropIn,
+  });
+
+  String? errorMessage;
+
+  String? reason;
+
+  bool? dismissDropIn;
+
+  Object encode() {
+    return <Object?>[
+      errorMessage,
+      reason,
+      dismissDropIn,
+    ];
+  }
+
+  static DropInError decode(Object result) {
+    result as List<Object?>;
+    return DropInError(
+      errorMessage: result[0] as String?,
+      reason: result[1] as String?,
+      dismissDropIn: result[2] as bool?,
+    );
+  }
+}
+
 class _CheckoutPlatformInterfaceCodec extends StandardMessageCodec {
   const _CheckoutPlatformInterfaceCodec();
   @override
@@ -296,20 +371,14 @@ class _CheckoutPlatformInterfaceCodec extends StandardMessageCodec {
     } else if (value is DropInConfiguration) {
       buffer.putUint8(129);
       writeValue(buffer, value.encode());
-    } else if (value is OrderResponseModel) {
+    } else if (value is DropInError) {
       buffer.putUint8(130);
       writeValue(buffer, value.encode());
-    } else if (value is PaymentResult) {
+    } else if (value is DropInResult) {
       buffer.putUint8(131);
       writeValue(buffer, value.encode());
-    } else if (value is PlatformCommunicationModel) {
-      buffer.putUint8(132);
-      writeValue(buffer, value.encode());
     } else if (value is Session) {
-      buffer.putUint8(133);
-      writeValue(buffer, value.encode());
-    } else if (value is SessionPaymentResultModel) {
-      buffer.putUint8(134);
+      buffer.putUint8(132);
       writeValue(buffer, value.encode());
     } else {
       super.writeValue(buffer, value);
@@ -324,15 +393,11 @@ class _CheckoutPlatformInterfaceCodec extends StandardMessageCodec {
       case 129: 
         return DropInConfiguration.decode(readValue(buffer)!);
       case 130: 
-        return OrderResponseModel.decode(readValue(buffer)!);
+        return DropInError.decode(readValue(buffer)!);
       case 131: 
-        return PaymentResult.decode(readValue(buffer)!);
+        return DropInResult.decode(readValue(buffer)!);
       case 132: 
-        return PlatformCommunicationModel.decode(readValue(buffer)!);
-      case 133: 
         return Session.decode(readValue(buffer)!);
-      case 134: 
-        return SessionPaymentResultModel.decode(readValue(buffer)!);
       default:
         return super.readValueOfType(type, buffer);
     }
@@ -447,7 +512,7 @@ class CheckoutPlatformInterface {
     }
   }
 
-  Future<void> onPaymentsResult(Map<String?, Object?> arg_paymentsResult) async {
+  Future<void> onPaymentsResult(DropInResult arg_paymentsResult) async {
     final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
         'dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.onPaymentsResult', codec,
         binaryMessenger: _binaryMessenger);
@@ -469,7 +534,7 @@ class CheckoutPlatformInterface {
     }
   }
 
-  Future<void> onPaymentsDetailsResult(Map<String?, Object?> arg_paymentsDetailsResult) async {
+  Future<void> onPaymentsDetailsResult(DropInResult arg_paymentsDetailsResult) async {
     final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
         'dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.onPaymentsDetailsResult', codec,
         binaryMessenger: _binaryMessenger);
@@ -538,7 +603,7 @@ class _CheckoutFlutterApiCodec extends StandardMessageCodec {
 abstract class CheckoutFlutterApi {
   static const MessageCodec<Object?> codec = _CheckoutFlutterApiCodec();
 
-  void onDropInSessionResult(PaymentResult sessionDropInResult);
+  void onDropInSessionResult(PaymentResult sessionPaymentResult);
 
   void onDropInAdvancedFlowPlatformCommunication(PlatformCommunicationModel platformCommunicationModel);
 
@@ -554,10 +619,10 @@ abstract class CheckoutFlutterApi {
           assert(message != null,
           'Argument for dev.flutter.pigeon.adyen_checkout.CheckoutFlutterApi.onDropInSessionResult was null.');
           final List<Object?> args = (message as List<Object?>?)!;
-          final PaymentResult? arg_sessionDropInResult = (args[0] as PaymentResult?);
-          assert(arg_sessionDropInResult != null,
+          final PaymentResult? arg_sessionPaymentResult = (args[0] as PaymentResult?);
+          assert(arg_sessionPaymentResult != null,
               'Argument for dev.flutter.pigeon.adyen_checkout.CheckoutFlutterApi.onDropInSessionResult was null, expected non-null PaymentResult.');
-          api.onDropInSessionResult(arg_sessionDropInResult!);
+          api.onDropInSessionResult(arg_sessionPaymentResult!);
           return;
         });
       }

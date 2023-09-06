@@ -31,10 +31,10 @@ class AdyenCheckoutApi implements AdyenCheckoutPlatformInterface {
   Future<String> getReturnUrl() => checkoutApi.getReturnUrl();
 
   @override
-  void onPaymentsResult(Map<String, Object?> paymentsResult) =>
+  void onPaymentsResult(DropInResult paymentsResult) =>
       checkoutApi.onPaymentsResult(paymentsResult);
 
   @override
-  void onPaymentsDetailsResult(Map<String, Object?> paymentsDetailsResult) =>
+  void onPaymentsDetailsResult(DropInResult paymentsDetailsResult) =>
       checkoutApi.onPaymentsDetailsResult(paymentsDetailsResult);
 }

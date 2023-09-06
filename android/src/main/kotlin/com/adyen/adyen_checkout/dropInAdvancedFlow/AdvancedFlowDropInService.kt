@@ -1,22 +1,23 @@
 package com.adyen.adyen_checkout.dropInAdvancedFlow
 
 
+import DropInResult
+import DropInResultType.*
 import android.content.Intent
 import android.os.IBinder
-import android.util.Log
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ServiceLifecycleDispatcher
-import androidx.lifecycle.lifecycleScope
 import com.adyen.checkout.components.core.ActionComponentData
 import com.adyen.checkout.components.core.PaymentComponentData
 import com.adyen.checkout.components.core.PaymentComponentState
+import com.adyen.checkout.components.core.action.Action
 import com.adyen.checkout.dropin.DropInService
 import com.adyen.checkout.dropin.DropInServiceResult
+import org.json.JSONObject
 
 class AdvancedFlowDropInService : DropInService(), LifecycleOwner {
     private val dispatcher = ServiceLifecycleDispatcher(this)
-    private val dropInServiceResultHandler = DropInServiceResultHandler(lifecycleScope)
 
     override fun onSubmit(state: PaymentComponentState<*>) {
         try {
@@ -24,7 +25,6 @@ class AdvancedFlowDropInService : DropInService(), LifecycleOwner {
             val paymentComponentJson = PaymentComponentData.SERIALIZER.serialize(state.data)
             DropInServiceResultMessenger.sendResult(paymentComponentJson)
         } catch (exception: Exception) {
-            Log.e("AdyenCheckout", "Exception occurred: $exception")
             sendResult(DropInServiceResult.Error(errorMessage = exception.message))
         }
     }
@@ -35,7 +35,6 @@ class AdvancedFlowDropInService : DropInService(), LifecycleOwner {
             val actionComponentJson = ActionComponentData.SERIALIZER.serialize(actionComponentData)
             DropInAdditionalDetailsPlatformMessenger.sendResult(actionComponentJson)
         } catch (exception: Exception) {
-            Log.e("AdyenCheckoutTest", "Exception occurred: $exception")
             sendResult(DropInServiceResult.Error(errorMessage = exception.message))
         }
     }
@@ -47,8 +46,8 @@ class AdvancedFlowDropInService : DropInService(), LifecycleOwner {
                 return@observe
             }
 
-            val result = dropInServiceResultHandler.handleResponse(message.contentIfNotHandled)
-            sendResult(result)
+            val dropInServiceResult = mapToDropInServiceResult(message.contentIfNotHandled)
+            sendResult(dropInServiceResult)
         }
     }
 
@@ -59,8 +58,26 @@ class AdvancedFlowDropInService : DropInService(), LifecycleOwner {
                 return@observe
             }
 
-            val result = dropInServiceResultHandler.handleResponse(message.contentIfNotHandled)
-            sendResult(result)
+            val dropInServiceResult = mapToDropInServiceResult(message.contentIfNotHandled)
+            sendResult(dropInServiceResult)
+        }
+    }
+
+    private fun mapToDropInServiceResult(dropInResultDTO: DropInResult?): DropInServiceResult {
+        return when (dropInResultDTO?.dropInResultType) {
+            FINISHED -> DropInServiceResult.Finished(result = "${dropInResultDTO.result}")
+            ERROR -> DropInServiceResult.Error(reason = dropInResultDTO.error?.reason)
+            ACTION -> {
+                if (dropInResultDTO.actionResponse == null) {
+                    DropInServiceResult.Error(reason = "Action response not provided")
+                } else {
+                    val actionJson = JSONObject(dropInResultDTO.actionResponse)
+                    val action = Action.SERIALIZER.deserialize(actionJson)
+                    DropInServiceResult.Action(action = action)
+                }
+            }
+
+            null -> DropInServiceResult.Error(reason = "IOException")
         }
     }
 

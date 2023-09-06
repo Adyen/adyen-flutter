@@ -81,6 +81,18 @@ enum class PlatformCommunicationType(val raw: Int) {
   }
 }
 
+enum class DropInResultType(val raw: Int) {
+  FINISHED(0),
+  ACTION(1),
+  ERROR(2);
+
+  companion object {
+    fun ofRaw(raw: Int): DropInResultType? {
+      return values().firstOrNull { it.raw == raw }
+    }
+  }
+}
+
 /** Generated class from Pigeon that represents data sent in messages. */
 data class Session (
   val id: String,
@@ -284,6 +296,61 @@ data class PlatformCommunicationModel (
   }
 }
 
+/** Generated class from Pigeon that represents data sent in messages. */
+data class DropInResult (
+  val dropInResultType: DropInResultType,
+  val result: String? = null,
+  val actionResponse: Map<String?, Any?>? = null,
+  val error: DropInError? = null
+
+) {
+  companion object {
+    @Suppress("UNCHECKED_CAST")
+    fun fromList(list: List<Any?>): DropInResult {
+      val dropInResultType = DropInResultType.ofRaw(list[0] as Int)!!
+      val result = list[1] as String?
+      val actionResponse = list[2] as Map<String?, Any?>?
+      val error: DropInError? = (list[3] as List<Any?>?)?.let {
+        DropInError.fromList(it)
+      }
+      return DropInResult(dropInResultType, result, actionResponse, error)
+    }
+  }
+  fun toList(): List<Any?> {
+    return listOf<Any?>(
+      dropInResultType.raw,
+      result,
+      actionResponse,
+      error?.toList(),
+    )
+  }
+}
+
+/** Generated class from Pigeon that represents data sent in messages. */
+data class DropInError (
+  val errorMessage: String? = null,
+  val reason: String? = null,
+  val dismissDropIn: Boolean? = null
+
+) {
+  companion object {
+    @Suppress("UNCHECKED_CAST")
+    fun fromList(list: List<Any?>): DropInError {
+      val errorMessage = list[0] as String?
+      val reason = list[1] as String?
+      val dismissDropIn = list[2] as Boolean?
+      return DropInError(errorMessage, reason, dismissDropIn)
+    }
+  }
+  fun toList(): List<Any?> {
+    return listOf<Any?>(
+      errorMessage,
+      reason,
+      dismissDropIn,
+    )
+  }
+}
+
 @Suppress("UNCHECKED_CAST")
 private object CheckoutPlatformInterfaceCodec : StandardMessageCodec() {
   override fun readValueOfType(type: Byte, buffer: ByteBuffer): Any? {
@@ -300,27 +367,17 @@ private object CheckoutPlatformInterfaceCodec : StandardMessageCodec() {
       }
       130.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          OrderResponseModel.fromList(it)
+          DropInError.fromList(it)
         }
       }
       131.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          PaymentResult.fromList(it)
+          DropInResult.fromList(it)
         }
       }
       132.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          PlatformCommunicationModel.fromList(it)
-        }
-      }
-      133.toByte() -> {
-        return (readValue(buffer) as? List<Any?>)?.let {
           Session.fromList(it)
-        }
-      }
-      134.toByte() -> {
-        return (readValue(buffer) as? List<Any?>)?.let {
-          SessionPaymentResultModel.fromList(it)
         }
       }
       else -> super.readValueOfType(type, buffer)
@@ -336,24 +393,16 @@ private object CheckoutPlatformInterfaceCodec : StandardMessageCodec() {
         stream.write(129)
         writeValue(stream, value.toList())
       }
-      is OrderResponseModel -> {
+      is DropInError -> {
         stream.write(130)
         writeValue(stream, value.toList())
       }
-      is PaymentResult -> {
+      is DropInResult -> {
         stream.write(131)
         writeValue(stream, value.toList())
       }
-      is PlatformCommunicationModel -> {
-        stream.write(132)
-        writeValue(stream, value.toList())
-      }
       is Session -> {
-        stream.write(133)
-        writeValue(stream, value.toList())
-      }
-      is SessionPaymentResultModel -> {
-        stream.write(134)
+        stream.write(132)
         writeValue(stream, value.toList())
       }
       else -> super.writeValue(stream, value)
@@ -367,8 +416,8 @@ interface CheckoutPlatformInterface {
   fun getReturnUrl(callback: (Result<String>) -> Unit)
   fun startDropInSessionPayment(dropInConfiguration: DropInConfiguration, session: Session)
   fun startDropInAdvancedFlowPayment(dropInConfiguration: DropInConfiguration, paymentMethodsResponse: String)
-  fun onPaymentsResult(paymentsResult: Map<String, Any?>)
-  fun onPaymentsDetailsResult(paymentsDetailsResult: Map<String, Any?>)
+  fun onPaymentsResult(paymentsResult: DropInResult)
+  fun onPaymentsDetailsResult(paymentsDetailsResult: DropInResult)
 
   companion object {
     /** The codec used by CheckoutPlatformInterface. */
@@ -459,7 +508,7 @@ interface CheckoutPlatformInterface {
         if (api != null) {
           channel.setMessageHandler { message, reply ->
             val args = message as List<Any?>
-            val paymentsResultArg = args[0] as Map<String, Any?>
+            val paymentsResultArg = args[0] as DropInResult
             var wrapped: List<Any?>
             try {
               api.onPaymentsResult(paymentsResultArg)
@@ -478,7 +527,7 @@ interface CheckoutPlatformInterface {
         if (api != null) {
           channel.setMessageHandler { message, reply ->
             val args = message as List<Any?>
-            val paymentsDetailsResultArg = args[0] as Map<String, Any?>
+            val paymentsDetailsResultArg = args[0] as DropInResult
             var wrapped: List<Any?>
             try {
               api.onPaymentsDetailsResult(paymentsDetailsResultArg)
@@ -563,9 +612,9 @@ class CheckoutFlutterApi(private val binaryMessenger: BinaryMessenger) {
       CheckoutFlutterApiCodec
     }
   }
-  fun onDropInSessionResult(sessionDropInResultArg: PaymentResult, callback: () -> Unit) {
+  fun onDropInSessionResult(sessionPaymentResultArg: PaymentResult, callback: () -> Unit) {
     val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.adyen_checkout.CheckoutFlutterApi.onDropInSessionResult", codec)
-    channel.send(listOf(sessionDropInResultArg)) {
+    channel.send(listOf(sessionPaymentResultArg)) {
       callback()
     }
   }

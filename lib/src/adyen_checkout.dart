@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:adyen_checkout/platform_api.g.dart';
 import 'package:adyen_checkout/src/adyen_checkout_interface.dart';
+import 'package:adyen_checkout/src/models/drop_in_outcome.dart';
 import 'package:adyen_checkout/src/models/payment_flow.dart';
 import 'package:adyen_checkout/src/models/payment_type.dart';
 import 'package:adyen_checkout/src/platform/adyen_checkout_platform_interface.dart';
@@ -60,9 +61,8 @@ class AdyenCheckout implements AdyenCheckoutInterface {
   Future<PaymentResult> _startDropInAdvancedFlowPayment(
     String paymentMethodsResponse,
     DropInConfiguration dropInConfiguration,
-    Future<Map<String, dynamic>> Function(String paymentComponentJson)
-        postPayments,
-    Future<Map<String, dynamic>> Function(String additionalDetails)
+    Future<DropInOutcome> Function(String paymentComponentJson) postPayments,
+    Future<DropInOutcome> Function(String additionalDetailsJson)
         postPaymentsDetails,
   ) async {
     final dropInAdvancedFlowCompleter = Completer<PaymentResult>();
@@ -101,27 +101,48 @@ class AdyenCheckout implements AdyenCheckoutInterface {
 
   Future<void> _handleAdditionalDetails(
     PlatformCommunicationModel event,
-    Future<Map<String, dynamic>> Function(String additionalDetails)
+    Future<DropInOutcome> Function(String additionalDetails)
         postPaymentsDetails,
   ) async {
     if (event.data != null) {
-      final Map<String, dynamic> paymentsDetailsResult =
+      final DropInOutcome paymentsDetailsResult =
           await postPaymentsDetails(event.data!);
+      DropInResult dropInResult = mapToDropInResult(paymentsDetailsResult);
       AdyenCheckoutPlatformInterface.instance
-          .onPaymentsDetailsResult(paymentsDetailsResult);
+          .onPaymentsDetailsResult(dropInResult);
     }
   }
 
   Future<void> _handlePaymentComponent(
     PlatformCommunicationModel event,
-    Future<Map<String, dynamic>> Function(String paymentComponentJson)
-        postPayments,
+    Future<DropInOutcome> Function(String paymentComponentJson) postPayments,
   ) async {
     if (event.data != null) {
-      final Map<String, dynamic> paymentsResult =
-          await postPayments(event.data!);
-      AdyenCheckoutPlatformInterface.instance.onPaymentsResult(paymentsResult);
+      final DropInOutcome paymentsResult = await postPayments(event.data!);
+      DropInResult dropInResult = mapToDropInResult(paymentsResult);
+      AdyenCheckoutPlatformInterface.instance.onPaymentsResult(dropInResult);
     }
+  }
+
+  DropInResult mapToDropInResult(DropInOutcome dropInOutcome) {
+    return switch (dropInOutcome) {
+      Finished() => DropInResult(
+          dropInResultType: DropInResultType.finished,
+          result: dropInOutcome.resultCode,
+        ),
+      Action() => DropInResult(
+          dropInResultType: DropInResultType.action,
+          actionResponse: dropInOutcome.actionResponse,
+        ),
+      Error() => DropInResult(
+          dropInResultType: DropInResultType.error,
+          error: DropInError(
+            errorMessage: dropInOutcome.errorMessage,
+            reason: dropInOutcome.reason,
+            dismissDropIn: dropInOutcome.dismissDropIn,
+          ),
+        ),
+    };
   }
 
   void _setupResultApi() => CheckoutFlutterApi.setup(_resultApi);

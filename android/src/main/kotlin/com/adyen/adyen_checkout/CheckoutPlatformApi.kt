@@ -3,6 +3,8 @@ package com.adyen.adyen_checkout
 import CheckoutFlutterApi
 import CheckoutPlatformInterface
 import DropInConfiguration
+import DropInResult
+import DropInResultType
 import PlatformCommunicationModel
 import PlatformCommunicationType
 import Session
@@ -91,16 +93,16 @@ class CheckoutPlatformApi(private val checkoutFlutterApi: CheckoutFlutterApi?) :
         }
     }
 
-    override fun onPaymentsResult(paymentsResult: Map<String, Any?>) {
-        val paymentsResultJson = JSONObject(paymentsResult)
-        if (paymentsResultJson.has("action")) {
+    override fun onPaymentsResult(paymentsResult: DropInResult) {
+        if (paymentsResult.dropInResultType == DropInResultType.ACTION) {
             setAdvanceFlowDropInAdditionalDetailsMessengerObserver()
         }
-        DropInPaymentResultMessenger.sendResult(paymentsResultJson)
+
+        DropInPaymentResultMessenger.sendResult(paymentsResult)
     }
 
-    override fun onPaymentsDetailsResult(paymentsDetailsResult: Map<String, Any?>) {
-        DropInAdditionalDetailsResultMessenger.sendResult(JSONObject(paymentsDetailsResult))
+    override fun onPaymentsDetailsResult(paymentsDetailsResult: DropInResult) {
+        DropInAdditionalDetailsResultMessenger.sendResult(paymentsDetailsResult)
     }
 
     private suspend fun createCheckoutSession(

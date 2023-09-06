@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:adyen_checkout/platform_api.g.dart';
+import 'package:adyen_checkout/src/models/drop_in_outcome.dart';
 import 'package:adyen_checkout/src/models/payment_type.dart';
 
 class PaymentFlow {
@@ -9,9 +10,8 @@ class PaymentFlow {
   String? componentConfiguration;
   Session? session;
   String? paymentMethodsResponse;
-  Future<Map<String, dynamic>> Function(String paymentComponentJson)?
-      postPayments;
-  Future<Map<String, dynamic>> Function(String additionalDetailsJson)?
+  Future<DropInOutcome> Function(String paymentComponentJson)? postPayments;
+  Future<DropInOutcome> Function(String additionalDetailsJson)?
       postPaymentsDetails;
 
   PaymentFlow.dropIn({

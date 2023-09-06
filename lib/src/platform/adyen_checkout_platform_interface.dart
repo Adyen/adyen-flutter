@@ -29,7 +29,7 @@ abstract class AdyenCheckoutPlatformInterface extends PlatformInterface {
     DropInConfiguration dropInConfiguration,
   );
 
-  void onPaymentsResult(Map<String, Object?> paymentsResult);
+  void onPaymentsResult(DropInResult paymentsResult);
 
-  void onPaymentsDetailsResult(Map<String, Object?> paymentsDetailsResult);
+  void onPaymentsDetailsResult(DropInResult paymentsDetailsResult);
 }

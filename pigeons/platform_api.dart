@@ -116,18 +116,43 @@ class PlatformCommunicationModel {
   });
 }
 
-// sealed class DropInResult {}
-//
-// class Finished extends DropInResult {
-//   final String result;
-//
-//   Finished(this.result);
-// }
-
 enum PlatformCommunicationType {
   paymentComponent,
   additionalDetails,
   result,
+}
+
+//UseDropInOutcome when sealed classes are supported by pigeon
+class DropInResult {
+  final DropInResultType dropInResultType;
+  final String? result;
+  final Map<String?, Object?>? actionResponse;
+  final DropInError? error;
+
+  DropInResult({
+    required this.dropInResultType,
+    this.result,
+    this.actionResponse,
+    this.error,
+  });
+}
+
+enum DropInResultType {
+  finished,
+  action,
+  error,
+}
+
+class DropInError {
+  final String? errorMessage;
+  final String? reason;
+  final bool? dismissDropIn;
+
+  DropInError({
+    this.errorMessage,
+    this.reason,
+    this.dismissDropIn = false,
+  });
 }
 
 @HostApi()
@@ -148,14 +173,14 @@ abstract class CheckoutPlatformInterface {
     String paymentMethodsResponse,
   );
 
-  void onPaymentsResult(Map<String, Object?> paymentsResult);
+  void onPaymentsResult(DropInResult paymentsResult);
 
-  void onPaymentsDetailsResult(Map<String, Object?> paymentsDetailsResult);
+  void onPaymentsDetailsResult(DropInResult paymentsDetailsResult);
 }
 
 @FlutterApi()
 abstract class CheckoutFlutterApi {
-  void onDropInSessionResult(PaymentResult sessionDropInResult);
+  void onDropInSessionResult(PaymentResult sessionPaymentResult);
 
   void onDropInAdvancedFlowPlatformCommunication(
       PlatformCommunicationModel platformCommunicationModel);
