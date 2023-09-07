@@ -47,7 +47,7 @@ android {
     }
 
     dependencies {
-        implementation 'com.adyen.checkout:drop-in:5.0.0-alpha02'
+        implementation 'com.adyen.checkout:drop-in:5.0.0-beta01'
         implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
         testImplementation 'org.jetbrains.kotlin:kotlin-test'
         testImplementation 'org.mockito:mockito-core:5.5.0'
