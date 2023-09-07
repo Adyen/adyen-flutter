@@ -4,7 +4,6 @@ import 'package:adyen_checkout/platform_api.g.dart';
 import 'package:adyen_checkout/src/adyen_checkout_interface.dart';
 import 'package:adyen_checkout/src/models/drop_in_outcome.dart';
 import 'package:adyen_checkout/src/models/payment_flow.dart';
-import 'package:adyen_checkout/src/models/payment_type.dart';
 import 'package:adyen_checkout/src/platform/adyen_checkout_platform_interface.dart';
 import 'package:adyen_checkout/src/platform/adyen_checkout_result_api.dart';
 
@@ -25,32 +24,20 @@ class AdyenCheckout implements AdyenCheckoutInterface {
 
   @override
   Future<PaymentResult> startPayment({required PaymentFlow paymentFlow}) async {
-    switch (paymentFlow.paymentType) {
-      case PaymentType.dropInSessions:
-        return await _startDropInSessionsPayment(
-          paymentFlow.session!,
-          paymentFlow.dropInConfiguration,
-        );
-      case PaymentType.dropInAdvancedFlow:
-        return await _startDropInAdvancedFlowPayment(
-          paymentFlow.paymentMethodsResponse!,
-          paymentFlow.dropInConfiguration,
-          (paymentComponentJson) =>
-              paymentFlow.postPayments!(paymentComponentJson),
-          (additionalDetailsJson) =>
-              paymentFlow.postPaymentsDetails!(additionalDetailsJson),
-        );
+    switch (paymentFlow) {
+      case DropInSession():
+        return await _startDropInSessionsPayment(paymentFlow);
+      case DropInAdvancedFlow():
+        return await _startDropInAdvancedFlowPayment(paymentFlow);
     }
   }
 
   Future<PaymentResult> _startDropInSessionsPayment(
-    Session session,
-    DropInConfiguration dropInConfiguration,
-  ) async {
+      DropInSession dropInSession) async {
     _resultApi.dropInSessionResultStream = StreamController<PaymentResult>();
     AdyenCheckoutPlatformInterface.instance.startDropInSessionPayment(
-      session,
-      dropInConfiguration,
+      dropInSession.session,
+      dropInSession.dropInConfiguration,
     );
     final sessionDropInResultModel =
         await _resultApi.dropInSessionResultStream.stream.first;
@@ -59,16 +46,11 @@ class AdyenCheckout implements AdyenCheckoutInterface {
   }
 
   Future<PaymentResult> _startDropInAdvancedFlowPayment(
-    String paymentMethodsResponse,
-    DropInConfiguration dropInConfiguration,
-    Future<DropInOutcome> Function(String paymentComponentJson) postPayments,
-    Future<DropInOutcome> Function(String additionalDetailsJson)
-        postPaymentsDetails,
-  ) async {
+      DropInAdvancedFlow dropInAdvancedFlow) async {
     final dropInAdvancedFlowCompleter = Completer<PaymentResult>();
     AdyenCheckoutPlatformInterface.instance.startDropInAdvancedFlowPayment(
-      paymentMethodsResponse,
-      dropInConfiguration,
+      dropInAdvancedFlow.paymentMethodsResponse,
+      dropInAdvancedFlow.dropInConfiguration,
     );
 
     _resultApi.dropInAdvancedFlowPlatformCommunicationStream =
@@ -78,9 +60,10 @@ class AdyenCheckout implements AdyenCheckoutInterface {
         .listen((event) async {
       switch (event.type) {
         case PlatformCommunicationType.paymentComponent:
-          await _handlePaymentComponent(event, postPayments);
+          await _handlePaymentComponent(event, dropInAdvancedFlow.postPayments);
         case PlatformCommunicationType.additionalDetails:
-          await _handleAdditionalDetails(event, postPaymentsDetails);
+          await _handleAdditionalDetails(
+              event, dropInAdvancedFlow.postPaymentsDetails);
         case PlatformCommunicationType.result:
           _handleResult(dropInAdvancedFlowCompleter, event);
       }

@@ -159,7 +159,7 @@ class PaymentResult {
 
   String? reason;
 
-  SessionPaymentResultModel? result;
+  PaymentResultModel? result;
 
   Object encode() {
     return <Object?>[
@@ -175,14 +175,14 @@ class PaymentResult {
       type: PaymentResultEnum.values[result[0]! as int],
       reason: result[1] as String?,
       result: result[2] != null
-          ? SessionPaymentResultModel.decode(result[2]! as List<Object?>)
+          ? PaymentResultModel.decode(result[2]! as List<Object?>)
           : null,
     );
   }
 }
 
-class SessionPaymentResultModel {
-  SessionPaymentResultModel({
+class PaymentResultModel {
+  PaymentResultModel({
     this.sessionId,
     this.sessionData,
     this.resultCode,
@@ -206,9 +206,9 @@ class SessionPaymentResultModel {
     ];
   }
 
-  static SessionPaymentResultModel decode(Object result) {
+  static PaymentResultModel decode(Object result) {
     result as List<Object?>;
-    return SessionPaymentResultModel(
+    return PaymentResultModel(
       sessionId: result[0] as String?,
       sessionData: result[1] as String?,
       resultCode: result[2] as String?,
@@ -570,10 +570,10 @@ class _CheckoutFlutterApiCodec extends StandardMessageCodec {
     } else if (value is PaymentResult) {
       buffer.putUint8(130);
       writeValue(buffer, value.encode());
-    } else if (value is PlatformCommunicationModel) {
+    } else if (value is PaymentResultModel) {
       buffer.putUint8(131);
       writeValue(buffer, value.encode());
-    } else if (value is SessionPaymentResultModel) {
+    } else if (value is PlatformCommunicationModel) {
       buffer.putUint8(132);
       writeValue(buffer, value.encode());
     } else {
@@ -591,9 +591,9 @@ class _CheckoutFlutterApiCodec extends StandardMessageCodec {
       case 130: 
         return PaymentResult.decode(readValue(buffer)!);
       case 131: 
-        return PlatformCommunicationModel.decode(readValue(buffer)!);
+        return PaymentResultModel.decode(readValue(buffer)!);
       case 132: 
-        return SessionPaymentResultModel.decode(readValue(buffer)!);
+        return PlatformCommunicationModel.decode(readValue(buffer)!);
       default:
         return super.readValueOfType(type, buffer);
     }

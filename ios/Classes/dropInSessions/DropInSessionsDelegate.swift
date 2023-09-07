@@ -12,8 +12,8 @@ class DropInSessionsDelegate : AdyenSessionDelegate {
     
     func didComplete(with resultCode: SessionPaymentResultCode, component: Component, session: AdyenSession) {
         viewController?.dismiss(animated: false, completion: {
-            let paymentResult = PaymentResult(sessionId: session.sessionContext.identifier, sessionData: session.sessionContext.data, resultCode: resultCode.rawValue)
-            self.checkoutFlutterApi.onDropInSessionResult(sessionDropInResult: DropInResult(type: DropInResultEnum.finished,result: paymentResult), completion: {})
+            let paymentResult = PaymentResultModel(sessionId: session.sessionContext.identifier, sessionData: session.sessionContext.data, resultCode: resultCode.rawValue)
+            self.checkoutFlutterApi.onDropInSessionResult(sessionPaymentResult: PaymentResult(type: PaymentResultEnum.finished, result: paymentResult), completion: {})
         })
     }
     
@@ -21,9 +21,9 @@ class DropInSessionsDelegate : AdyenSessionDelegate {
         viewController?.dismiss(animated: true, completion: {
             switch (error) {
             case ComponentError.cancelled:
-                self.checkoutFlutterApi.onDropInSessionResult(sessionDropInResult: DropInResult(type: DropInResultEnum.cancelledByUser, errorReason: error.localizedDescription)) {}
+                self.checkoutFlutterApi.onDropInSessionResult(sessionPaymentResult: PaymentResult(type: PaymentResultEnum.cancelledByUser, reason: error.localizedDescription)) {}
             default:
-                self.checkoutFlutterApi.onDropInSessionResult(sessionDropInResult: DropInResult(type: DropInResultEnum.error, errorReason: error.localizedDescription)) {}
+                self.checkoutFlutterApi.onDropInSessionResult(sessionPaymentResult: PaymentResult(type: PaymentResultEnum.error, reason: error.localizedDescription)) {}
             }
         })
     }

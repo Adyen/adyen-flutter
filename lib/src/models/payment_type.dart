@@ -1,4 +1,0 @@
-enum PaymentType {
-  dropInSessions,
-  dropInAdvancedFlow,
-}

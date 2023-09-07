@@ -184,7 +184,7 @@ data class DropInConfiguration (
 data class PaymentResult (
   val type: PaymentResultEnum,
   val reason: String? = null,
-  val result: SessionPaymentResultModel? = null
+  val result: PaymentResultModel? = null
 
 ) {
   companion object {
@@ -192,8 +192,8 @@ data class PaymentResult (
     fun fromList(list: List<Any?>): PaymentResult {
       val type = PaymentResultEnum.ofRaw(list[0] as Int)!!
       val reason = list[1] as String?
-      val result: SessionPaymentResultModel? = (list[2] as List<Any?>?)?.let {
-        SessionPaymentResultModel.fromList(it)
+      val result: PaymentResultModel? = (list[2] as List<Any?>?)?.let {
+        PaymentResultModel.fromList(it)
       }
       return PaymentResult(type, reason, result)
     }
@@ -208,7 +208,7 @@ data class PaymentResult (
 }
 
 /** Generated class from Pigeon that represents data sent in messages. */
-data class SessionPaymentResultModel (
+data class PaymentResultModel (
   val sessionId: String? = null,
   val sessionData: String? = null,
   val resultCode: String? = null,
@@ -217,14 +217,14 @@ data class SessionPaymentResultModel (
 ) {
   companion object {
     @Suppress("UNCHECKED_CAST")
-    fun fromList(list: List<Any?>): SessionPaymentResultModel {
+    fun fromList(list: List<Any?>): PaymentResultModel {
       val sessionId = list[0] as String?
       val sessionData = list[1] as String?
       val resultCode = list[2] as String?
       val order: OrderResponseModel? = (list[3] as List<Any?>?)?.let {
         OrderResponseModel.fromList(it)
       }
-      return SessionPaymentResultModel(sessionId, sessionData, resultCode, order)
+      return PaymentResultModel(sessionId, sessionData, resultCode, order)
     }
   }
   fun toList(): List<Any?> {
@@ -565,12 +565,12 @@ private object CheckoutFlutterApiCodec : StandardMessageCodec() {
       }
       131.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          PlatformCommunicationModel.fromList(it)
+          PaymentResultModel.fromList(it)
         }
       }
       132.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          SessionPaymentResultModel.fromList(it)
+          PlatformCommunicationModel.fromList(it)
         }
       }
       else -> super.readValueOfType(type, buffer)
@@ -590,11 +590,11 @@ private object CheckoutFlutterApiCodec : StandardMessageCodec() {
         stream.write(130)
         writeValue(stream, value.toList())
       }
-      is PlatformCommunicationModel -> {
+      is PaymentResultModel -> {
         stream.write(131)
         writeValue(stream, value.toList())
       }
-      is SessionPaymentResultModel -> {
+      is PlatformCommunicationModel -> {
         stream.write(132)
         writeValue(stream, value.toList())
       }

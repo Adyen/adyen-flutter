@@ -14,7 +14,7 @@ class DropInOutcomeHandler {
   static const resultCodeKey = "resultCode";
   static const actionKey = "action";
   static const orderKey = "order";
-  static const messageKey = "messageKey";
+  static const messageKey = "message";
 
   DropInOutcome handleResponse(Map<String, dynamic> jsonResponse) {
     if (_isError(jsonResponse)) {

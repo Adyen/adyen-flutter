@@ -163,14 +163,14 @@ struct DropInConfiguration {
 struct PaymentResult {
   var type: PaymentResultEnum
   var reason: String? = nil
-  var result: SessionPaymentResultModel? = nil
+  var result: PaymentResultModel? = nil
 
   static func fromList(_ list: [Any?]) -> PaymentResult? {
     let type = PaymentResultEnum(rawValue: list[0] as! Int)!
     let reason: String? = nilOrValue(list[1])
-    var result: SessionPaymentResultModel? = nil
+    var result: PaymentResultModel? = nil
     if let resultList: [Any?] = nilOrValue(list[2]) {
-      result = SessionPaymentResultModel.fromList(resultList)
+      result = PaymentResultModel.fromList(resultList)
     }
 
     return PaymentResult(
@@ -189,13 +189,13 @@ struct PaymentResult {
 }
 
 /// Generated class from Pigeon that represents data sent in messages.
-struct SessionPaymentResultModel {
+struct PaymentResultModel {
   var sessionId: String? = nil
   var sessionData: String? = nil
   var resultCode: String? = nil
   var order: OrderResponseModel? = nil
 
-  static func fromList(_ list: [Any?]) -> SessionPaymentResultModel? {
+  static func fromList(_ list: [Any?]) -> PaymentResultModel? {
     let sessionId: String? = nilOrValue(list[0])
     let sessionData: String? = nilOrValue(list[1])
     let resultCode: String? = nilOrValue(list[2])
@@ -204,7 +204,7 @@ struct SessionPaymentResultModel {
       order = OrderResponseModel.fromList(orderList)
     }
 
-    return SessionPaymentResultModel(
+    return PaymentResultModel(
       sessionId: sessionId,
       sessionData: sessionData,
       resultCode: resultCode,
@@ -521,9 +521,9 @@ private class CheckoutFlutterApiCodecReader: FlutterStandardReader {
       case 130:
         return PaymentResult.fromList(self.readValue() as! [Any?])
       case 131:
-        return PlatformCommunicationModel.fromList(self.readValue() as! [Any?])
+        return PaymentResultModel.fromList(self.readValue() as! [Any?])
       case 132:
-        return SessionPaymentResultModel.fromList(self.readValue() as! [Any?])
+        return PlatformCommunicationModel.fromList(self.readValue() as! [Any?])
       default:
         return super.readValue(ofType: type)
     }
@@ -541,10 +541,10 @@ private class CheckoutFlutterApiCodecWriter: FlutterStandardWriter {
     } else if let value = value as? PaymentResult {
       super.writeByte(130)
       super.writeValue(value.toList())
-    } else if let value = value as? PlatformCommunicationModel {
+    } else if let value = value as? PaymentResultModel {
       super.writeByte(131)
       super.writeValue(value.toList())
-    } else if let value = value as? SessionPaymentResultModel {
+    } else if let value = value as? PlatformCommunicationModel {
       super.writeByte(132)
       super.writeValue(value.toList())
     } else {

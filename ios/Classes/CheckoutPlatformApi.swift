@@ -19,13 +19,11 @@ class CheckoutPlatformApi : CheckoutPlatformInterface {
     private var dropInSessionsPresentationDelegate : PresentationDelegate?
     private var dropInAdvancedFlowDelegate : DropInComponentDelegate?
     private var storedPaymentMethodsDelegate : StoredPaymentMethodsDelegate?
-    private let actionKey = "action"
-    private let resultCodeKey = "resultCode"
     
     init(checkoutFlutterApi: CheckoutFlutterApi) {
         self.checkoutFlutterApi = checkoutFlutterApi
     }
-
+    
     func getPlatformVersion(completion: @escaping (Result<String, Error>) -> Void) {
         let systemVersion = UIDevice.current.systemVersion
         completion(Result.success(systemVersion))
@@ -36,7 +34,7 @@ class CheckoutPlatformApi : CheckoutPlatformInterface {
             guard let viewController = UIApplication.shared.adyen.mainKeyWindow?.rootViewController else {
                 return
             }
-
+            
             self.viewController = viewController
             dropInSessionsDelegate = DropInSessionsDelegate(viewController: viewController, checkoutFlutterApi: checkoutFlutterApi)
             dropInSessionsPresentationDelegate = DropInSessionsPresentationDelegate()
@@ -53,21 +51,21 @@ class CheckoutPlatformApi : CheckoutPlatformInterface {
                     self?.dropInComponent = dropInComponent
                     self?.viewController?.present(dropInComponent.viewController, animated: true)
                 case let .failure(error):
-                    self?.checkoutFlutterApi.onDropInSessionResult(sessionDropInResult: DropInResult(type: DropInResultEnum.error, errorReason: error.localizedDescription)) {}
+                    self?.checkoutFlutterApi.onDropInSessionResult(sessionPaymentResult: PaymentResult(type: PaymentResultEnum.error, reason: error.localizedDescription)) {}
                 }
             }
         } catch let error {
-            checkoutFlutterApi.onDropInSessionResult(sessionDropInResult: DropInResult(type: DropInResultEnum.error, errorReason: error.localizedDescription)) {}
+            checkoutFlutterApi.onDropInSessionResult(sessionPaymentResult: PaymentResult(type: PaymentResultEnum.error, reason: error.localizedDescription)) {}
         }
     }
-
-
+    
+    
     func startDropInAdvancedFlowPayment(dropInConfiguration: DropInConfiguration, paymentMethodsResponse: String) {
         do {
             guard let viewController = UIApplication.shared.adyen.mainKeyWindow?.rootViewController else {
                 return
             }
-
+            
             self.viewController = viewController
             let adyenContext = try createAdyenContext(dropInConfiguration: dropInConfiguration)
             let paymentMethods = try jsonDecoder.decode(PaymentMethods.self, from:Data(paymentMethodsResponse.utf8))
@@ -80,23 +78,23 @@ class CheckoutPlatformApi : CheckoutPlatformInterface {
             self.dropInComponent = dropInComponent
             self.viewController?.present(dropInComponent.viewController, animated: true)
         } catch let error {
-            let platformCommunicationModel = PlatformCommunicationModel(type: PlatformCommunicationType.result, dropInResult: DropInResult(type: DropInResultEnum.error, errorReason: error.localizedDescription))
+            let platformCommunicationModel = PlatformCommunicationModel(type: PlatformCommunicationType.result, paymentResult: PaymentResult(type: PaymentResultEnum.error, reason: error.localizedDescription))
             checkoutFlutterApi.onDropInAdvancedFlowPlatformCommunication(platformCommunicationModel: platformCommunicationModel, completion: {})
         }
     }
-
+    
     func getReturnUrl(completion: @escaping (Result<String, Error>) -> Void) {
         completion(Result.failure(PlatformError(errorDescription: "Please use your app url type instead of this method.")))
     }
-
+    
     func onPaymentsResult(paymentsResult: DropInResult) {
-        handleResponse(result: paymentsResult)
+        handleDropInResult(dropInResult: paymentsResult)
     }
-
+    
     func onPaymentsDetailsResult(paymentsDetailsResult: DropInResult) {
-        handleResponse(result: paymentsDetailsResult)
+        handleDropInResult(dropInResult: paymentsDetailsResult)
     }
-        
+    
     private func createAdyenContext(dropInConfiguration: DropInConfiguration) throws  -> AdyenContext  {
         let apiContext = try APIContext(environment: mapToEnvironment(environment: dropInConfiguration.environment), clientKey: dropInConfiguration.clientKey)
         let value: Int = Int(dropInConfiguration.amount.value)
@@ -123,39 +121,39 @@ class CheckoutPlatformApi : CheckoutPlatformInterface {
             return Adyen.Environment.liveApse
         }
     }
-
+    
     private func createDropInConfiguration() -> DropInComponent.Configuration {
         return DropInComponent.Configuration()
     }
     
-    private func handleResponse(result: [String : Any?]) {
+    private func handleDropInResult(dropInResult: DropInResult) {
         do {
-            if (result.keys.contains(actionKey)) {
-                let action = result[actionKey]
-                let jsonData = try JSONSerialization.data(withJSONObject: action as! [String: Any], options: [])
-                let result = try JSONDecoder().decode(Action.self, from: jsonData)
-                self.dropInComponent?.handle(result)
-            } else if (result.keys.contains(resultCodeKey)) {
-                let resultCode = ResultCode(rawValue: result[resultCodeKey] as! String)
+            switch dropInResult.dropInResultType {
+            case .finished:
+                let resultCode = ResultCode(rawValue: dropInResult.result ?? "")
                 let success = resultCode == .authorised || resultCode == .received || resultCode == .pending
                 self.dropInComponent?.finalizeIfNeeded(with: success) { [weak self] in
                     self?.dropInComponent?.viewController.presentingViewController?.dismiss(animated: false, completion: {
-                        let dropInResult = DropInResult(type: DropInResultEnum.finished, result: PaymentResult(resultCode: resultCode?.rawValue))
-                        self?.checkoutFlutterApi.onDropInAdvancedFlowPlatformCommunication(platformCommunicationModel: PlatformCommunicationModel(type: PlatformCommunicationType.result, dropInResult: dropInResult), completion: {})
+                        let paymentResult = PaymentResult(type: PaymentResultEnum.finished, result: PaymentResultModel(resultCode: resultCode?.rawValue))
+                        self?.checkoutFlutterApi.onDropInAdvancedFlowPlatformCommunication(platformCommunicationModel: PlatformCommunicationModel(type: PlatformCommunicationType.result, paymentResult: paymentResult), completion: {})
                     })
                 }
-            } else {
-                let dropInResult = DropInResult(type: DropInResultEnum.error, errorReason: "\(String(describing: result["message"]!!))")
-                self.checkoutFlutterApi.onDropInAdvancedFlowPlatformCommunication(platformCommunicationModel: PlatformCommunicationModel(type: PlatformCommunicationType.result, dropInResult: dropInResult), completion: {})
-                self.finalize(false, "\(result)")
+            case .action:
+                let jsonData = try JSONSerialization.data(withJSONObject: dropInResult.actionResponse!, options: [])
+                let result = try JSONDecoder().decode(Action.self, from: jsonData)
+                self.dropInComponent?.handle(result)
+            case .error:
+                let dropInResult = PaymentResult(type: PaymentResultEnum.error, reason: dropInResult.error?.errorMessage)
+                self.checkoutFlutterApi.onDropInAdvancedFlowPlatformCommunication(platformCommunicationModel: PlatformCommunicationModel(type: PlatformCommunicationType.result, paymentResult: dropInResult), completion: {})
+                self.finalize(false, dropInResult.reason ?? "")
             }
         } catch let error {
-            let dropInResult = DropInResult(type: DropInResultEnum.error, errorReason: error.localizedDescription)
-            self.checkoutFlutterApi.onDropInAdvancedFlowPlatformCommunication(platformCommunicationModel: PlatformCommunicationModel(type: PlatformCommunicationType.result, dropInResult: dropInResult), completion: {})
-            self.finalize(false, "\(result)")
+            let dropInResult = PaymentResult(type: PaymentResultEnum.error, reason: error.localizedDescription)
+            self.checkoutFlutterApi.onDropInAdvancedFlowPlatformCommunication(platformCommunicationModel: PlatformCommunicationModel(type: PlatformCommunicationType.result, paymentResult: dropInResult), completion: {})
+            self.finalize(false, "\(error.localizedDescription)")
         }
     }
-
+    
     private func finalize(_ success: Bool, _ message: String) {
         dropInComponent?.finalizeIfNeeded(with: success) { [weak self] in
             guard let self = self else { return }

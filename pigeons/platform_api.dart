@@ -61,7 +61,7 @@ class DropInConfiguration {
 class PaymentResult {
   final PaymentResultEnum type;
   final String? reason;
-  final SessionPaymentResultModel? result;
+  final PaymentResultModel? result;
 
   PaymentResult(
     this.type,
@@ -76,13 +76,13 @@ enum PaymentResultEnum {
   finished,
 }
 
-class SessionPaymentResultModel {
+class PaymentResultModel {
   final String? sessionId;
   final String? sessionData;
   final String? resultCode;
   final OrderResponseModel? order;
 
-  SessionPaymentResultModel(
+  PaymentResultModel(
     this.sessionId,
     this.sessionData,
     this.resultCode,
