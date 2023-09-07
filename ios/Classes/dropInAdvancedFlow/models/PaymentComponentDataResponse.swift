@@ -17,7 +17,7 @@ struct PaymentComponentDataResponse : Encodable {
     
     let installments: Installments?
     
-    let supportNativeRedirect: Bool = true
+    let supportNativeRedirect: Bool = false
     
     let shopperName: ShopperName?
     
