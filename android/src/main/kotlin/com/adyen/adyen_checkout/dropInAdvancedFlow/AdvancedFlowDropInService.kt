@@ -19,21 +19,27 @@ import org.json.JSONObject
 class AdvancedFlowDropInService : DropInService(), LifecycleOwner {
     private val dispatcher = ServiceLifecycleDispatcher(this)
 
-    override fun onSubmit(state: PaymentComponentState<*>) {
-        try {
-            setAdvancedFlowDropInServiceObserver()
-            val paymentComponentJson = PaymentComponentData.SERIALIZER.serialize(state.data)
-            DropInServiceResultMessenger.sendResult(paymentComponentJson)
-        } catch (exception: Exception) {
-            sendResult(DropInServiceResult.Error(errorMessage = exception.message))
-        }
-    }
+    override fun onSubmit(state: PaymentComponentState<*>) = onPaymentComponentState(state)
 
     override fun onAdditionalDetails(actionComponentData: ActionComponentData) {
         try {
             setAdvancedFlowDropInAdditionalDetailsObserver()
             val actionComponentJson = ActionComponentData.SERIALIZER.serialize(actionComponentData)
             DropInAdditionalDetailsPlatformMessenger.sendResult(actionComponentJson)
+        } catch (exception: Exception) {
+            sendResult(DropInServiceResult.Error(errorMessage = exception.message))
+        }
+    }
+
+    override fun onBalanceCheck(paymentComponentState: PaymentComponentState<*>) =
+        onPaymentComponentState(paymentComponentState)
+
+    private fun onPaymentComponentState(paymentComponentState: PaymentComponentState<*>) {
+        try {
+            setAdvancedFlowDropInServiceObserver()
+            val paymentComponentJson =
+                PaymentComponentData.SERIALIZER.serialize(paymentComponentState.data)
+            DropInServiceResultMessenger.sendResult(paymentComponentJson)
         } catch (exception: Exception) {
             sendResult(DropInServiceResult.Error(errorMessage = exception.message))
         }
@@ -63,17 +69,22 @@ class AdvancedFlowDropInService : DropInService(), LifecycleOwner {
         }
     }
 
-    private fun mapToDropInServiceResult(dropInResultDTO: DropInResult?): DropInServiceResult {
-        return when (dropInResultDTO?.dropInResultType) {
-            FINISHED -> DropInServiceResult.Finished(result = "${dropInResultDTO.result}")
-            ERROR -> DropInServiceResult.Error(reason = dropInResultDTO.error?.reason)
+    private fun mapToDropInServiceResult(dropInResult: DropInResult?): DropInServiceResult {
+        return when (dropInResult?.dropInResultType) {
+            FINISHED -> DropInServiceResult.Finished(result = "${dropInResult.result}")
+
+            ERROR -> DropInServiceResult.Error(
+                errorMessage = dropInResult.error?.errorMessage,
+                reason = dropInResult.error?.reason,
+                dismissDropIn = dropInResult.error?.dismissDropIn ?: false
+            )
+
             ACTION -> {
-                if (dropInResultDTO.actionResponse == null) {
+                if (dropInResult.actionResponse == null) {
                     DropInServiceResult.Error(reason = "Action response not provided")
                 } else {
-                    val actionJson = JSONObject(dropInResultDTO.actionResponse)
-                    val action = Action.SERIALIZER.deserialize(actionJson)
-                    DropInServiceResult.Action(action = action)
+                    val actionJson = JSONObject(dropInResult.actionResponse)
+                    DropInServiceResult.Action(action = Action.SERIALIZER.deserialize(actionJson))
                 }
             }
 

@@ -122,7 +122,7 @@ enum PlatformCommunicationType {
   result,
 }
 
-//UseDropInOutcome when sealed classes are supported by pigeon
+//Use DropInOutcome class when sealed classes are supported by pigeon
 class DropInResult {
   final DropInResultType dropInResultType;
   final String? result;

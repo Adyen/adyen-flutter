@@ -9,7 +9,7 @@ class DropInOutcomeHandler {
   static const resultError = "error";
   static const resultCanceled = "canceled";
 
-  //DropIn
+  //Response keys
   static const errorCodeKey = "errorCode";
   static const resultCodeKey = "resultCode";
   static const actionKey = "action";
@@ -19,13 +19,16 @@ class DropInOutcomeHandler {
   DropInOutcome handleResponse(Map<String, dynamic> jsonResponse) {
     if (_isError(jsonResponse)) {
       return Error(
-        errorMessage: jsonResponse[messageKey].toString(),
+        errorMessage: jsonResponse[messageKey],
         dismissDropIn: true,
       );
     }
 
     if (_isRefusedInPartialPaymentFlow(jsonResponse)) {
-      return Error(reason: "Refused");
+      return Error(
+        reason: "Refused",
+        dismissDropIn: true,
+      );
     }
 
     if (_isAction(jsonResponse)) {
@@ -33,7 +36,7 @@ class DropInOutcomeHandler {
     }
 
     if (jsonResponse.containsKey(resultCodeKey)) {
-      return Finished(resultCode: jsonResponse[resultCodeKey].toString());
+      return Finished(resultCode: jsonResponse[resultCodeKey]);
     }
 
     return Finished(resultCode: "EMPTY");
