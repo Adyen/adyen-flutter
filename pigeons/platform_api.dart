@@ -19,11 +19,11 @@ enum Environment {
   apse;
 }
 
-class SessionModel {
+class Session {
   final String id;
   final String sessionData;
 
-  SessionModel({
+  Session({
     required this.id,
     required this.sessionData,
   });
@@ -39,49 +39,41 @@ class Amount {
   });
 }
 
-enum Locale {
-  canada,
-  canadaFrench,
-  china,
-  chinese,
-  english,
-  france,
-  french,
-  german,
-  germany,
-  italian,
-  italy,
-  japan,
-  japanese,
-  korea,
-  korean,
-  //Do we need to support prc and root?
-  prc,
-  root,
-  simplifiedChinese,
-  taiwan,
-  traditionalChinese,
-  uk,
-  us
-}
-
-class DropInConfigurationModel {
+class DropInConfiguration {
   final Environment environment;
   final String clientKey;
   final Amount amount;
-  final String shopperLocale;
+  final String countryCode;
   bool? isAnalyticsEnabled;
   bool? showPreselectedStoredPaymentMethod;
   bool? skipListWhenSinglePaymentMethod;
   bool? isRemovingStoredPaymentMethodsEnabled;
   String? additionalDataForDropInService;
 
-  DropInConfigurationModel({
+  DropInConfiguration({
     required this.environment,
     required this.clientKey,
     required this.amount,
-    required this.shopperLocale,
+    required this.countryCode,
   });
+}
+
+class PaymentResult {
+  final PaymentResultEnum type;
+  final String? reason;
+  final SessionPaymentResultModel? result;
+
+  PaymentResult(
+    this.type,
+    this.reason,
+    this.result,
+  );
+}
+
+enum PaymentResultEnum {
+  cancelledByUser,
+  error,
+  finished,
 }
 
 class SessionPaymentResultModel {
@@ -112,22 +104,55 @@ class OrderResponseModel {
   });
 }
 
-class SessionDropInResultModel {
-  final SessionDropInResultEnum sessionDropInResult;
-  final String? reason;
-  final SessionPaymentResultModel? result;
+class PlatformCommunicationModel {
+  final PlatformCommunicationType type;
+  final String? data;
+  final PaymentResult? paymentResult;
 
-  SessionDropInResultModel(
-    this.sessionDropInResult,
-    this.reason,
-    this.result,
-  );
+  PlatformCommunicationModel({
+    required this.type,
+    this.data,
+    this.paymentResult,
+  });
 }
 
-enum SessionDropInResultEnum {
-  cancelledByUser,
-  error,
+enum PlatformCommunicationType {
+  paymentComponent,
+  additionalDetails,
+  result,
+}
+
+//Use DropInOutcome class when sealed classes are supported by pigeon
+class DropInResult {
+  final DropInResultType dropInResultType;
+  final String? result;
+  final Map<String?, Object?>? actionResponse;
+  final DropInError? error;
+
+  DropInResult({
+    required this.dropInResultType,
+    this.result,
+    this.actionResponse,
+    this.error,
+  });
+}
+
+enum DropInResultType {
   finished,
+  action,
+  error,
+}
+
+class DropInError {
+  final String? errorMessage;
+  final String? reason;
+  final bool? dismissDropIn;
+
+  DropInError({
+    this.errorMessage,
+    this.reason,
+    this.dismissDropIn = false,
+  });
 }
 
 @HostApi()
@@ -136,15 +161,27 @@ abstract class CheckoutPlatformInterface {
   String getPlatformVersion();
 
   @async
-  void startPayment(
-    SessionModel sessionModel,
-    DropInConfigurationModel dropInConfiguration,
+  String getReturnUrl();
+
+  void startDropInSessionPayment(
+    DropInConfiguration dropInConfiguration,
+    Session session,
   );
 
-  String getReturnUrl();
+  void startDropInAdvancedFlowPayment(
+    DropInConfiguration dropInConfiguration,
+    String paymentMethodsResponse,
+  );
+
+  void onPaymentsResult(DropInResult paymentsResult);
+
+  void onPaymentsDetailsResult(DropInResult paymentsDetailsResult);
 }
 
 @FlutterApi()
-abstract class CheckoutResultFlutterInterface {
-  void onSessionDropInResult(SessionDropInResultModel sessionDropInResult);
+abstract class CheckoutFlutterApi {
+  void onDropInSessionResult(PaymentResult sessionPaymentResult);
+
+  void onDropInAdvancedFlowPlatformCommunication(
+      PlatformCommunicationModel platformCommunicationModel);
 }

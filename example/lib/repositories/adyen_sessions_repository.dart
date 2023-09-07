@@ -1,12 +1,16 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:adyen_checkout/adyen_checkout.dart';
 import 'package:adyen_checkout/platform_api.g.dart';
 import 'package:adyen_checkout_example/config.dart';
 import 'package:adyen_checkout_example/network/models/amount_network_model.dart';
+import 'package:adyen_checkout_example/network/models/payment_methods_request_network_model.dart';
+import 'package:adyen_checkout_example/network/models/payment_request_network_model.dart';
 import 'package:adyen_checkout_example/network/models/session_request_network_model.dart';
 import 'package:adyen_checkout_example/network/models/session_response_network_model.dart';
 import 'package:adyen_checkout_example/network/service.dart';
+import 'package:adyen_checkout_example/repositories/drop_in_outcome_handler.dart';
 
 class AdyenSessionsRepository {
   AdyenSessionsRepository(
@@ -16,12 +20,12 @@ class AdyenSessionsRepository {
 
   final AdyenCheckout _adyenCheckout;
   final Service _service;
+  final DropInOutcomeHandler _dropInOutcomeHandler = DropInOutcomeHandler();
 
   //A session should not being created from the mobile application.
   //Please provide a CheckoutSession object from your own backend.
-  Future<SessionModel> createSession(
-      Amount amount, Environment environment) async {
-    String returnUrl = await determineExampleReturnUrl();
+  Future<Session> createSession(Amount amount, Environment environment) async {
+    String returnUrl = await _determineExampleReturnUrl();
     SessionRequestNetworkModel sessionRequestNetworkModel =
         SessionRequestNetworkModel(
       merchantAccount: Config.merchantAccount,
@@ -37,13 +41,55 @@ class AdyenSessionsRepository {
     SessionResponseNetworkModel sessionResponseNetworkModel =
         await _service.createSession(sessionRequestNetworkModel, environment);
 
-    return SessionModel(
+    return Session(
       id: sessionResponseNetworkModel.id,
       sessionData: sessionResponseNetworkModel.sessionData,
     );
   }
 
-  Future<String> determineExampleReturnUrl() async {
+  Future<String> fetchPaymentMethods() async {
+    return await _service.fetchPaymentMethods(PaymentMethodsRequestNetworkModel(
+      merchantAccount: Config.merchantAccount,
+      countryCode: Config.countryCode,
+      channel: Config.channel,
+    ));
+  }
+
+  Future<DropInOutcome> postPayments(String paymentComponentJson) async {
+    String returnUrl = await _determineExampleReturnUrl();
+    PaymentsRequestData paymentsRequestData = PaymentsRequestData(
+      merchantAccount: Config.merchantAccount,
+      shopperReference: Config.shopperReference,
+      reference: "flutter-test_${DateTime.now().millisecondsSinceEpoch}",
+      returnUrl: returnUrl,
+      amount: AmountNetworkModel(
+        value: Config.amount.value,
+        currency: Config.amount.currency,
+      ),
+      shopperIP: Config.shopperIp,
+      countryCode: Config.countryCode,
+      channel: Config.channel,
+      additionalData: AdditionalData(allow3DS2: true, executeThreeD: true),
+      threeDS2RequestData: ThreeDS2RequestDataRequest(),
+      threeDSAuthenticationOnly: false,
+      recurringProcessingModel: RecurringProcessingModel.cardOnFile,
+      lineItems: [],
+    );
+
+    Map<String, dynamic> mergedJson = <String, dynamic>{};
+    mergedJson.addAll(jsonDecode(paymentComponentJson));
+    mergedJson.addAll(paymentsRequestData.toJson());
+    final response = await _service.postPayments(mergedJson);
+    return _dropInOutcomeHandler.handleResponse(response);
+  }
+
+  Future<DropInOutcome> postPaymentsDetails(String additionalDetails) async {
+    final response =
+        await _service.postPaymentsDetails(jsonDecode(additionalDetails));
+    return _dropInOutcomeHandler.handleResponse(response);
+  }
+
+  Future<String> _determineExampleReturnUrl() async {
     if (Platform.isAndroid) {
       return await _adyenCheckout.getReturnUrl();
     } else if (Platform.isIOS) {
