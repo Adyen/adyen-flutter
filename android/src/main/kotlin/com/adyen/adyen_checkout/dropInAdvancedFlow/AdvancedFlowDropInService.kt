@@ -27,7 +27,13 @@ class AdvancedFlowDropInService : DropInService(), LifecycleOwner {
             val actionComponentJson = ActionComponentData.SERIALIZER.serialize(actionComponentData)
             DropInAdditionalDetailsPlatformMessenger.sendResult(actionComponentJson)
         } catch (exception: Exception) {
-            sendResult(DropInServiceResult.Error(errorMessage = exception.message))
+            sendResult(
+                DropInServiceResult.Error(
+                    errorDialog = null,
+                    reason = exception.message,
+                    dismissDropIn = true
+                )
+            )
         }
     }
 
@@ -41,7 +47,13 @@ class AdvancedFlowDropInService : DropInService(), LifecycleOwner {
                 PaymentComponentData.SERIALIZER.serialize(paymentComponentState.data)
             DropInServiceResultMessenger.sendResult(paymentComponentJson)
         } catch (exception: Exception) {
-            sendResult(DropInServiceResult.Error(errorMessage = exception.message))
+            sendResult(
+                DropInServiceResult.Error(
+                    errorDialog = null,
+                    reason = exception.message,
+                    dismissDropIn = true
+                )
+            )
         }
     }
 
@@ -74,21 +86,29 @@ class AdvancedFlowDropInService : DropInService(), LifecycleOwner {
             FINISHED -> DropInServiceResult.Finished(result = "${dropInResult.result}")
 
             ERROR -> DropInServiceResult.Error(
-                errorMessage = dropInResult.error?.errorMessage,
+                errorDialog = null,
                 reason = dropInResult.error?.reason,
                 dismissDropIn = dropInResult.error?.dismissDropIn ?: false
             )
 
             ACTION -> {
                 if (dropInResult.actionResponse == null) {
-                    DropInServiceResult.Error(reason = "Action response not provided")
+                    DropInServiceResult.Error(
+                        errorDialog = null,
+                        reason = "Action response not provided",
+                        dismissDropIn = true
+                    )
                 } else {
                     val actionJson = JSONObject(dropInResult.actionResponse)
                     DropInServiceResult.Action(action = Action.SERIALIZER.deserialize(actionJson))
                 }
             }
 
-            null -> DropInServiceResult.Error(reason = "IOException")
+            null -> DropInServiceResult.Error(
+                errorDialog = null,
+                reason = "IOException",
+                dismissDropIn = true
+            )
         }
     }
 
