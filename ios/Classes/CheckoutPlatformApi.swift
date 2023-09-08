@@ -1,7 +1,6 @@
 import Foundation
 @_spi(AdyenInternal)
 import Adyen
-@_spi(AdyenInternal)
 import AdyenNetworking
 
 //Todo Add config:
@@ -15,8 +14,8 @@ class CheckoutPlatformApi : CheckoutPlatformInterface {
     private let checkoutFlutterApi: CheckoutFlutterApi
     private var viewController : UIViewController?
     private var session: AdyenSession?
-    private var dropInSessionsDelegate : AdyenSessionDelegate?
-    private var dropInSessionsPresentationDelegate : PresentationDelegate?
+    private var dropInSessionDelegate : AdyenSessionDelegate?
+    private var dropInSessionPresentationDelegate : PresentationDelegate?
     private var dropInAdvancedFlowDelegate : DropInComponentDelegate?
     private var storedPaymentMethodsDelegate : StoredPaymentMethodsDelegate?
     
@@ -31,16 +30,16 @@ class CheckoutPlatformApi : CheckoutPlatformInterface {
     
     func startDropInSessionPayment(dropInConfiguration: DropInConfiguration, session: Session) {
         do {
-            guard let viewController = UIApplication.shared.adyen.mainKeyWindow?.rootViewController else {
+            guard let viewController = getTopMostViewController() else {
                 return
             }
             
             self.viewController = viewController
-            dropInSessionsDelegate = DropInSessionsDelegate(viewController: viewController, checkoutFlutterApi: checkoutFlutterApi)
-            dropInSessionsPresentationDelegate = DropInSessionsPresentationDelegate()
+            dropInSessionDelegate = DropInSessionsDelegate(viewController: viewController, checkoutFlutterApi: checkoutFlutterApi)
+            dropInSessionPresentationDelegate = DropInSessionsPresentationDelegate()
             let adyenContext = try createAdyenContext(dropInConfiguration: dropInConfiguration)
-            let configuration = AdyenSession.Configuration(sessionIdentifier: session.id, initialSessionData: session.sessionData, context: adyenContext)
-            AdyenSession.initialize(with: configuration, delegate: self.dropInSessionsDelegate!, presentationDelegate: self.dropInSessionsPresentationDelegate!) { [weak self] result in
+            let sessionConfiguration = AdyenSession.Configuration(sessionIdentifier: session.id, initialSessionData: session.sessionData, context: adyenContext)
+            AdyenSession.initialize(with: sessionConfiguration, delegate: dropInSessionDelegate!, presentationDelegate: dropInSessionPresentationDelegate!) { [weak self] result in
                 switch result {
                 case let .success(session):
                     self?.session = session
@@ -59,10 +58,9 @@ class CheckoutPlatformApi : CheckoutPlatformInterface {
         }
     }
     
-    
     func startDropInAdvancedFlowPayment(dropInConfiguration: DropInConfiguration, paymentMethodsResponse: String) {
         do {
-            guard let viewController = UIApplication.shared.adyen.mainKeyWindow?.rootViewController else {
+            guard let viewController = getTopMostViewController() else {
                 return
             }
             
@@ -95,9 +93,25 @@ class CheckoutPlatformApi : CheckoutPlatformInterface {
         handleDropInResult(dropInResult: paymentsDetailsResult)
     }
     
+    private func getTopMostViewController() -> UIViewController? {
+        var topMostViewController = UIApplication.shared.adyen.mainKeyWindow?.rootViewController
+        while let presentedViewController = topMostViewController?.presentedViewController {
+            let type = String(describing: type(of: presentedViewController))
+            // We need to discuss how the SDK should react if a DropInNavigationController is already displayed
+            if (type == "DropInNavigationController") {
+                return nil;
+            } else {
+                topMostViewController = presentedViewController
+            }
+        }
+        
+        return topMostViewController
+    }
+    
     private func createAdyenContext(dropInConfiguration: DropInConfiguration) throws  -> AdyenContext  {
-        let apiContext = try APIContext(environment: mapToEnvironment(environment: dropInConfiguration.environment), clientKey: dropInConfiguration.clientKey)
-        let value: Int = Int(dropInConfiguration.amount.value)
+        let environment = mapToEnvironment(environment: dropInConfiguration.environment)
+        let apiContext = try APIContext(environment: environment, clientKey: dropInConfiguration.clientKey)
+        let value = Int(dropInConfiguration.amount.value)
         guard let currencyCode : String = dropInConfiguration.amount.currency else {
             throw BalanceChecker.Error.unexpectedCurrencyCode
         }
@@ -139,17 +153,17 @@ class CheckoutPlatformApi : CheckoutPlatformInterface {
                     })
                 }
             case .action:
-                let jsonData = try JSONSerialization.data(withJSONObject: dropInResult.actionResponse!, options: [])
+                let jsonData = try JSONSerialization.data(withJSONObject: dropInResult.actionResponse as Any, options: [])
                 let result = try JSONDecoder().decode(Action.self, from: jsonData)
                 self.dropInComponent?.handle(result)
             case .error:
-                let dropInResult = PaymentResult(type: PaymentResultEnum.error, reason: dropInResult.error?.errorMessage)
-                self.checkoutFlutterApi.onDropInAdvancedFlowPlatformCommunication(platformCommunicationModel: PlatformCommunicationModel(type: PlatformCommunicationType.result, paymentResult: dropInResult), completion: {})
-                self.finalize(false, dropInResult.reason ?? "")
+                let paymentResult = PaymentResult(type: PaymentResultEnum.error, reason: dropInResult.error?.errorMessage)
+                self.checkoutFlutterApi.onDropInAdvancedFlowPlatformCommunication(platformCommunicationModel: PlatformCommunicationModel(type: PlatformCommunicationType.result, paymentResult: paymentResult), completion: {})
+                self.finalize(false, dropInResult.error?.errorMessage ?? "")
             }
         } catch let error {
-            let dropInResult = PaymentResult(type: PaymentResultEnum.error, reason: error.localizedDescription)
-            self.checkoutFlutterApi.onDropInAdvancedFlowPlatformCommunication(platformCommunicationModel: PlatformCommunicationModel(type: PlatformCommunicationType.result, paymentResult: dropInResult), completion: {})
+            let paymentResult = PaymentResult(type: PaymentResultEnum.error, reason: error.localizedDescription)
+            self.checkoutFlutterApi.onDropInAdvancedFlowPlatformCommunication(platformCommunicationModel: PlatformCommunicationModel(type: PlatformCommunicationType.result, paymentResult: paymentResult), completion: {})
             self.finalize(false, "\(error.localizedDescription)")
         }
     }

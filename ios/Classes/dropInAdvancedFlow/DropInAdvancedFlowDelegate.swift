@@ -61,7 +61,6 @@ class DropInAdvancedFlowDelegate : DropInComponentDelegate {
     }
     
     private func sendErrorToFlutterLayer(error: Error) {
-        print(error.localizedDescription)
         let platformCommunicationModel = PlatformCommunicationModel(type: PlatformCommunicationType.result, paymentResult: PaymentResult(type: PaymentResultEnum.error, reason: error.localizedDescription))
         checkoutFlutterApi.onDropInAdvancedFlowPlatformCommunication(platformCommunicationModel: platformCommunicationModel, completion: {})
     }
