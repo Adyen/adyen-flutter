@@ -9,24 +9,24 @@ class DropInAdvancedFlowDelegate : DropInComponentDelegate {
         self.checkoutFlutterApi = checkoutFlutterApi
         self.component = component
     }
-
+    
     func didSubmit(_ data: PaymentComponentData, from component: PaymentComponent, in dropInComponent: AnyDropInComponent) {
         do {
             let paymentComponentData = PaymentComponentDataResponse(amount: data.amount, paymentMethod: data.paymentMethod.encodable, storePaymentMethod: data.storePaymentMethod, order: data.order, amountToPay: data.order?.remainingAmount, installments: data.installments, shopperName: data.shopperName, emailAddress: data.emailAddress, telephoneNumber: data.telephoneNumber, browserInfo: data.browserInfo, checkoutAttemptId: data.checkoutAttemptId, billingAddress: data.billingAddress, deliveryAddress: data.deliveryAddress, socialSecurityNumber: data.socialSecurityNumber, delegatedAuthenticationData: data.delegatedAuthenticationData)
-            let json = try JSONEncoder().encode(paymentComponentData)
-            let jsonString = String(data: json, encoding: .utf8)
-            checkoutFlutterApi.onDropInAdvancedFlowPlatformCommunication(platformCommunicationModel:PlatformCommunicationModel(type: PlatformCommunicationType.paymentComponent, data:jsonString ), completion: {})
+            let paymentComponentJson = try JSONEncoder().encode(paymentComponentData)
+            let paymentComponentString = String(data: paymentComponentJson, encoding: .utf8)
+            checkoutFlutterApi.onDropInAdvancedFlowPlatformCommunication(platformCommunicationModel:PlatformCommunicationModel(type: PlatformCommunicationType.paymentComponent, data: paymentComponentString), completion: {})
         } catch let error {
             self.sendErrorToFlutterLayer(error: error)
         }
     }
-
+    
     func didProvide(_ data: ActionComponentData, from component: ActionComponent, in dropInComponent: AnyDropInComponent) {
         do {
             let actionComponentData = ActionComponentDataModel(details: data.details.encodable, paymentData: data.paymentData)
-            let json = try JSONEncoder().encode(actionComponentData)
-            let jsonString = String(data: json, encoding: .utf8)
-            checkoutFlutterApi.onDropInAdvancedFlowPlatformCommunication(platformCommunicationModel:PlatformCommunicationModel(type: PlatformCommunicationType.additionalDetails, data:jsonString ), completion: {})
+            let actionComponentDataJson = try JSONEncoder().encode(actionComponentData)
+            let actionComponentDataString = String(data: actionComponentDataJson, encoding: .utf8)
+            checkoutFlutterApi.onDropInAdvancedFlowPlatformCommunication(platformCommunicationModel: PlatformCommunicationModel(type: PlatformCommunicationType.additionalDetails, data: actionComponentDataString), completion: {})
         } catch let error {
             self.sendErrorToFlutterLayer(error: error)
         }
