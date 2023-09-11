@@ -1,4 +1,5 @@
-import 'package:adyen_checkout/platform_api.g.dart';
+
+import 'package:adyen_checkout/adyen_checkout.dart';
 
 class Config {
   /*

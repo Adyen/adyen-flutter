@@ -87,13 +87,13 @@ class Amount {
   }
 }
 
-class DropInConfiguration {
-  DropInConfiguration({
+class Configuration {
+  Configuration({
     required this.environment,
     required this.clientKey,
     required this.amount,
     required this.countryCode,
-    this.isAnalyticsEnabled,
+    this.analytics,
     this.showPreselectedStoredPaymentMethod,
     this.skipListWhenSinglePaymentMethod,
     this.isRemovingStoredPaymentMethodsEnabled,
@@ -108,7 +108,7 @@ class DropInConfiguration {
 
   String countryCode;
 
-  bool? isAnalyticsEnabled;
+  AnalyticsOptions? analytics;
 
   bool? showPreselectedStoredPaymentMethod;
 
@@ -124,7 +124,7 @@ class DropInConfiguration {
       clientKey,
       amount.encode(),
       countryCode,
-      isAnalyticsEnabled,
+      analytics?.encode(),
       showPreselectedStoredPaymentMethod,
       skipListWhenSinglePaymentMethod,
       isRemovingStoredPaymentMethodsEnabled,
@@ -132,18 +132,46 @@ class DropInConfiguration {
     ];
   }
 
-  static DropInConfiguration decode(Object result) {
+  static Configuration decode(Object result) {
     result as List<Object?>;
-    return DropInConfiguration(
+    return Configuration(
       environment: Environment.values[result[0]! as int],
       clientKey: result[1]! as String,
       amount: Amount.decode(result[2]! as List<Object?>),
       countryCode: result[3]! as String,
-      isAnalyticsEnabled: result[4] as bool?,
+      analytics: result[4] != null
+          ? AnalyticsOptions.decode(result[4]! as List<Object?>)
+          : null,
       showPreselectedStoredPaymentMethod: result[5] as bool?,
       skipListWhenSinglePaymentMethod: result[6] as bool?,
       isRemovingStoredPaymentMethodsEnabled: result[7] as bool?,
       additionalDataForDropInService: result[8] as String?,
+    );
+  }
+}
+
+class AnalyticsOptions {
+  AnalyticsOptions({
+    this.enabled,
+    this.payload,
+  });
+
+  bool? enabled;
+
+  String? payload;
+
+  Object encode() {
+    return <Object?>[
+      enabled,
+      payload,
+    ];
+  }
+
+  static AnalyticsOptions decode(Object result) {
+    result as List<Object?>;
+    return AnalyticsOptions(
+      enabled: result[0] as bool?,
+      payload: result[1] as String?,
     );
   }
 }
@@ -368,17 +396,20 @@ class _CheckoutPlatformInterfaceCodec extends StandardMessageCodec {
     if (value is Amount) {
       buffer.putUint8(128);
       writeValue(buffer, value.encode());
-    } else if (value is DropInConfiguration) {
+    } else if (value is AnalyticsOptions) {
       buffer.putUint8(129);
       writeValue(buffer, value.encode());
-    } else if (value is DropInError) {
+    } else if (value is Configuration) {
       buffer.putUint8(130);
       writeValue(buffer, value.encode());
-    } else if (value is DropInResult) {
+    } else if (value is DropInError) {
       buffer.putUint8(131);
       writeValue(buffer, value.encode());
-    } else if (value is Session) {
+    } else if (value is DropInResult) {
       buffer.putUint8(132);
+      writeValue(buffer, value.encode());
+    } else if (value is Session) {
+      buffer.putUint8(133);
       writeValue(buffer, value.encode());
     } else {
       super.writeValue(buffer, value);
@@ -391,12 +422,14 @@ class _CheckoutPlatformInterfaceCodec extends StandardMessageCodec {
       case 128: 
         return Amount.decode(readValue(buffer)!);
       case 129: 
-        return DropInConfiguration.decode(readValue(buffer)!);
+        return AnalyticsOptions.decode(readValue(buffer)!);
       case 130: 
-        return DropInError.decode(readValue(buffer)!);
+        return Configuration.decode(readValue(buffer)!);
       case 131: 
-        return DropInResult.decode(readValue(buffer)!);
+        return DropInError.decode(readValue(buffer)!);
       case 132: 
+        return DropInResult.decode(readValue(buffer)!);
+      case 133: 
         return Session.decode(readValue(buffer)!);
       default:
         return super.readValueOfType(type, buffer);
@@ -468,7 +501,7 @@ class CheckoutPlatformInterface {
     }
   }
 
-  Future<void> startDropInSessionPayment(DropInConfiguration arg_dropInConfiguration, Session arg_session) async {
+  Future<void> startDropInSessionPayment(Configuration arg_dropInConfiguration, Session arg_session) async {
     final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
         'dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.startDropInSessionPayment', codec,
         binaryMessenger: _binaryMessenger);
@@ -490,7 +523,7 @@ class CheckoutPlatformInterface {
     }
   }
 
-  Future<void> startDropInAdvancedFlowPayment(DropInConfiguration arg_dropInConfiguration, String arg_paymentMethodsResponse) async {
+  Future<void> startDropInAdvancedFlowPayment(Configuration arg_dropInConfiguration, String arg_paymentMethodsResponse) async {
     final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
         'dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.startDropInAdvancedFlowPayment', codec,
         binaryMessenger: _binaryMessenger);

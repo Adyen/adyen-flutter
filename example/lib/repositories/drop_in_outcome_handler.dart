@@ -1,5 +1,4 @@
 import 'package:adyen_checkout/adyen_checkout.dart';
-import 'package:adyen_checkout/platform_api.g.dart';
 
 class DropInOutcomeHandler {
   //DropIn results
