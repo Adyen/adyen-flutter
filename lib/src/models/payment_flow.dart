@@ -1,4 +1,5 @@
-import 'package:adyen_checkout/platform_api.g.dart';
+import 'package:adyen_checkout/src/generated/platform_api.g.dart';
+import 'package:adyen_checkout/src/models/adyen_configuration.dart';
 import 'package:adyen_checkout/src/models/drop_in_outcome.dart';
 
 sealed class PaymentFlow {}

@@ -1,9 +1,8 @@
 import 'dart:async';
 
-import 'package:adyen_checkout/platform_api.g.dart';
+import 'package:adyen_checkout/adyen_checkout.dart';
 import 'package:adyen_checkout/src/adyen_checkout_interface.dart';
-import 'package:adyen_checkout/src/models/drop_in_outcome.dart';
-import 'package:adyen_checkout/src/models/payment_flow.dart';
+import 'package:adyen_checkout/src/generated/platform_api.g.dart';
 import 'package:adyen_checkout/src/platform/adyen_checkout_platform_interface.dart';
 import 'package:adyen_checkout/src/platform/adyen_checkout_result_api.dart';
 
@@ -35,9 +34,15 @@ class AdyenCheckout implements AdyenCheckoutInterface {
   Future<PaymentResult> _startDropInSessionsPayment(
       DropInSession dropInSession) async {
     _resultApi.dropInSessionResultStream = StreamController<PaymentResult>();
+    Configuration dropInConfiguration = Configuration(
+      environment: dropInSession.dropInConfiguration.environment,
+      clientKey: dropInSession.dropInConfiguration.clientKey,
+      amount: dropInSession.dropInConfiguration.amount,
+      countryCode: dropInSession.dropInConfiguration.countryCode,
+    );
     AdyenCheckoutPlatformInterface.instance.startDropInSessionPayment(
       dropInSession.session,
-      dropInSession.dropInConfiguration,
+      dropInConfiguration,
     );
     final sessionDropInResultModel =
         await _resultApi.dropInSessionResultStream.stream.first;
@@ -48,9 +53,15 @@ class AdyenCheckout implements AdyenCheckoutInterface {
   Future<PaymentResult> _startDropInAdvancedFlowPayment(
       DropInAdvancedFlow dropInAdvancedFlow) async {
     final dropInAdvancedFlowCompleter = Completer<PaymentResult>();
+    Configuration dropInConfiguration = Configuration(
+      environment: dropInAdvancedFlow.dropInConfiguration.environment,
+      clientKey: dropInAdvancedFlow.dropInConfiguration.clientKey,
+      amount: dropInAdvancedFlow.dropInConfiguration.amount,
+      countryCode: dropInAdvancedFlow.dropInConfiguration.countryCode,
+    );
     AdyenCheckoutPlatformInterface.instance.startDropInAdvancedFlowPayment(
       dropInAdvancedFlow.paymentMethodsResponse,
-      dropInAdvancedFlow.dropInConfiguration,
+      dropInConfiguration,
     );
 
     _resultApi.dropInAdvancedFlowPlatformCommunicationStream =

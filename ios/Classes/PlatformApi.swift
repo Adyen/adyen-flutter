@@ -110,34 +110,37 @@ struct Amount {
 }
 
 /// Generated class from Pigeon that represents data sent in messages.
-struct DropInConfiguration {
+struct Configuration {
   var environment: Environment
   var clientKey: String
   var amount: Amount
   var countryCode: String
-  var isAnalyticsEnabled: Bool? = nil
+  var analytics: AnalyticsOptions? = nil
   var showPreselectedStoredPaymentMethod: Bool? = nil
   var skipListWhenSinglePaymentMethod: Bool? = nil
   var isRemovingStoredPaymentMethodsEnabled: Bool? = nil
   var additionalDataForDropInService: String? = nil
 
-  static func fromList(_ list: [Any?]) -> DropInConfiguration? {
+  static func fromList(_ list: [Any?]) -> Configuration? {
     let environment = Environment(rawValue: list[0] as! Int)!
     let clientKey = list[1] as! String
     let amount = Amount.fromList(list[2] as! [Any?])!
     let countryCode = list[3] as! String
-    let isAnalyticsEnabled: Bool? = nilOrValue(list[4])
+    var analytics: AnalyticsOptions? = nil
+    if let analyticsList: [Any?] = nilOrValue(list[4]) {
+      analytics = AnalyticsOptions.fromList(analyticsList)
+    }
     let showPreselectedStoredPaymentMethod: Bool? = nilOrValue(list[5])
     let skipListWhenSinglePaymentMethod: Bool? = nilOrValue(list[6])
     let isRemovingStoredPaymentMethodsEnabled: Bool? = nilOrValue(list[7])
     let additionalDataForDropInService: String? = nilOrValue(list[8])
 
-    return DropInConfiguration(
+    return Configuration(
       environment: environment,
       clientKey: clientKey,
       amount: amount,
       countryCode: countryCode,
-      isAnalyticsEnabled: isAnalyticsEnabled,
+      analytics: analytics,
       showPreselectedStoredPaymentMethod: showPreselectedStoredPaymentMethod,
       skipListWhenSinglePaymentMethod: skipListWhenSinglePaymentMethod,
       isRemovingStoredPaymentMethodsEnabled: isRemovingStoredPaymentMethodsEnabled,
@@ -150,11 +153,33 @@ struct DropInConfiguration {
       clientKey,
       amount.toList(),
       countryCode,
-      isAnalyticsEnabled,
+      analytics?.toList(),
       showPreselectedStoredPaymentMethod,
       skipListWhenSinglePaymentMethod,
       isRemovingStoredPaymentMethodsEnabled,
       additionalDataForDropInService,
+    ]
+  }
+}
+
+/// Generated class from Pigeon that represents data sent in messages.
+struct AnalyticsOptions {
+  var enabled: Bool? = nil
+  var payload: String? = nil
+
+  static func fromList(_ list: [Any?]) -> AnalyticsOptions? {
+    let enabled: Bool? = nilOrValue(list[0])
+    let payload: String? = nilOrValue(list[1])
+
+    return AnalyticsOptions(
+      enabled: enabled,
+      payload: payload
+    )
+  }
+  func toList() -> [Any?] {
+    return [
+      enabled,
+      payload,
     ]
   }
 }
@@ -351,12 +376,14 @@ private class CheckoutPlatformInterfaceCodecReader: FlutterStandardReader {
       case 128:
         return Amount.fromList(self.readValue() as! [Any?])
       case 129:
-        return DropInConfiguration.fromList(self.readValue() as! [Any?])
+        return AnalyticsOptions.fromList(self.readValue() as! [Any?])
       case 130:
-        return DropInError.fromList(self.readValue() as! [Any?])
+        return Configuration.fromList(self.readValue() as! [Any?])
       case 131:
-        return DropInResult.fromList(self.readValue() as! [Any?])
+        return DropInError.fromList(self.readValue() as! [Any?])
       case 132:
+        return DropInResult.fromList(self.readValue() as! [Any?])
+      case 133:
         return Session.fromList(self.readValue() as! [Any?])
       default:
         return super.readValue(ofType: type)
@@ -369,17 +396,20 @@ private class CheckoutPlatformInterfaceCodecWriter: FlutterStandardWriter {
     if let value = value as? Amount {
       super.writeByte(128)
       super.writeValue(value.toList())
-    } else if let value = value as? DropInConfiguration {
+    } else if let value = value as? AnalyticsOptions {
       super.writeByte(129)
       super.writeValue(value.toList())
-    } else if let value = value as? DropInError {
+    } else if let value = value as? Configuration {
       super.writeByte(130)
       super.writeValue(value.toList())
-    } else if let value = value as? DropInResult {
+    } else if let value = value as? DropInError {
       super.writeByte(131)
       super.writeValue(value.toList())
-    } else if let value = value as? Session {
+    } else if let value = value as? DropInResult {
       super.writeByte(132)
+      super.writeValue(value.toList())
+    } else if let value = value as? Session {
+      super.writeByte(133)
       super.writeValue(value.toList())
     } else {
       super.writeValue(value)
@@ -405,8 +435,8 @@ class CheckoutPlatformInterfaceCodec: FlutterStandardMessageCodec {
 protocol CheckoutPlatformInterface {
   func getPlatformVersion(completion: @escaping (Result<String, Error>) -> Void)
   func getReturnUrl(completion: @escaping (Result<String, Error>) -> Void)
-  func startDropInSessionPayment(dropInConfiguration: DropInConfiguration, session: Session) throws
-  func startDropInAdvancedFlowPayment(dropInConfiguration: DropInConfiguration, paymentMethodsResponse: String) throws
+  func startDropInSessionPayment(dropInConfiguration: Configuration, session: Session) throws
+  func startDropInAdvancedFlowPayment(dropInConfiguration: Configuration, paymentMethodsResponse: String) throws
   func onPaymentsResult(paymentsResult: DropInResult) throws
   func onPaymentsDetailsResult(paymentsDetailsResult: DropInResult) throws
 }
@@ -451,7 +481,7 @@ class CheckoutPlatformInterfaceSetup {
     if let api = api {
       startDropInSessionPaymentChannel.setMessageHandler { message, reply in
         let args = message as! [Any?]
-        let dropInConfigurationArg = args[0] as! DropInConfiguration
+        let dropInConfigurationArg = args[0] as! Configuration
         let sessionArg = args[1] as! Session
         do {
           try api.startDropInSessionPayment(dropInConfiguration: dropInConfigurationArg, session: sessionArg)
@@ -467,7 +497,7 @@ class CheckoutPlatformInterfaceSetup {
     if let api = api {
       startDropInAdvancedFlowPaymentChannel.setMessageHandler { message, reply in
         let args = message as! [Any?]
-        let dropInConfigurationArg = args[0] as! DropInConfiguration
+        let dropInConfigurationArg = args[0] as! Configuration
         let paymentMethodsResponseArg = args[1] as! String
         do {
           try api.startDropInAdvancedFlowPayment(dropInConfiguration: dropInConfigurationArg, paymentMethodsResponse: paymentMethodsResponseArg)
