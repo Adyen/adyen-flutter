@@ -1,6 +1,7 @@
 import 'dart:async';
 
-import 'package:adyen_checkout/platform_api.g.dart';
+import 'package:adyen_checkout/src/generated/platform_api.g.dart';
+
 
 class AdyenCheckoutResultApi implements CheckoutFlutterApi {
   var dropInSessionResultStream = StreamController<PaymentResult>();

@@ -1,5 +1,5 @@
-import 'package:adyen_checkout/platform_api.g.dart';
 import 'package:adyen_checkout/src/adyen_checkout.dart';
+import 'package:adyen_checkout/src/generated/platform_api.g.dart';
 import 'package:adyen_checkout/src/platform/adyen_checkout_platform_interface.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
@@ -13,7 +13,7 @@ class MockAdyenCheckoutPlatform
   @override
   Future<void> startDropInSessionPayment(
     Session sessionModel,
-    DropInConfiguration dropInConfiguration,
+    Configuration dropInConfiguration,
   ) =>
       Future.value(null);
 
@@ -25,7 +25,7 @@ class MockAdyenCheckoutPlatform
   @override
   Future<String> startDropInAdvancedFlowPayment(
     String paymentMethodsResponse,
-    DropInConfiguration dropInConfiguration,
+    Configuration dropInConfiguration,
   ) =>
       Future.value("Result");
 

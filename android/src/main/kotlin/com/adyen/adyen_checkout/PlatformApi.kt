@@ -138,12 +138,12 @@ data class Amount (
 }
 
 /** Generated class from Pigeon that represents data sent in messages. */
-data class DropInConfiguration (
+data class Configuration (
   val environment: Environment,
   val clientKey: String,
   val amount: Amount,
   val countryCode: String,
-  val isAnalyticsEnabled: Boolean? = null,
+  val analytics: AnalyticsOptions? = null,
   val showPreselectedStoredPaymentMethod: Boolean? = null,
   val skipListWhenSinglePaymentMethod: Boolean? = null,
   val isRemovingStoredPaymentMethodsEnabled: Boolean? = null,
@@ -152,17 +152,19 @@ data class DropInConfiguration (
 ) {
   companion object {
     @Suppress("UNCHECKED_CAST")
-    fun fromList(list: List<Any?>): DropInConfiguration {
+    fun fromList(list: List<Any?>): Configuration {
       val environment = Environment.ofRaw(list[0] as Int)!!
       val clientKey = list[1] as String
       val amount = Amount.fromList(list[2] as List<Any?>)
       val countryCode = list[3] as String
-      val isAnalyticsEnabled = list[4] as Boolean?
+      val analytics: AnalyticsOptions? = (list[4] as List<Any?>?)?.let {
+        AnalyticsOptions.fromList(it)
+      }
       val showPreselectedStoredPaymentMethod = list[5] as Boolean?
       val skipListWhenSinglePaymentMethod = list[6] as Boolean?
       val isRemovingStoredPaymentMethodsEnabled = list[7] as Boolean?
       val additionalDataForDropInService = list[8] as String?
-      return DropInConfiguration(environment, clientKey, amount, countryCode, isAnalyticsEnabled, showPreselectedStoredPaymentMethod, skipListWhenSinglePaymentMethod, isRemovingStoredPaymentMethodsEnabled, additionalDataForDropInService)
+      return Configuration(environment, clientKey, amount, countryCode, analytics, showPreselectedStoredPaymentMethod, skipListWhenSinglePaymentMethod, isRemovingStoredPaymentMethodsEnabled, additionalDataForDropInService)
     }
   }
   fun toList(): List<Any?> {
@@ -171,11 +173,33 @@ data class DropInConfiguration (
       clientKey,
       amount.toList(),
       countryCode,
-      isAnalyticsEnabled,
+      analytics?.toList(),
       showPreselectedStoredPaymentMethod,
       skipListWhenSinglePaymentMethod,
       isRemovingStoredPaymentMethodsEnabled,
       additionalDataForDropInService,
+    )
+  }
+}
+
+/** Generated class from Pigeon that represents data sent in messages. */
+data class AnalyticsOptions (
+  val enabled: Boolean? = null,
+  val payload: String? = null
+
+) {
+  companion object {
+    @Suppress("UNCHECKED_CAST")
+    fun fromList(list: List<Any?>): AnalyticsOptions {
+      val enabled = list[0] as Boolean?
+      val payload = list[1] as String?
+      return AnalyticsOptions(enabled, payload)
+    }
+  }
+  fun toList(): List<Any?> {
+    return listOf<Any?>(
+      enabled,
+      payload,
     )
   }
 }
@@ -362,20 +386,25 @@ private object CheckoutPlatformInterfaceCodec : StandardMessageCodec() {
       }
       129.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          DropInConfiguration.fromList(it)
+          AnalyticsOptions.fromList(it)
         }
       }
       130.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          DropInError.fromList(it)
+          Configuration.fromList(it)
         }
       }
       131.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          DropInResult.fromList(it)
+          DropInError.fromList(it)
         }
       }
       132.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          DropInResult.fromList(it)
+        }
+      }
+      133.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
           Session.fromList(it)
         }
@@ -389,20 +418,24 @@ private object CheckoutPlatformInterfaceCodec : StandardMessageCodec() {
         stream.write(128)
         writeValue(stream, value.toList())
       }
-      is DropInConfiguration -> {
+      is AnalyticsOptions -> {
         stream.write(129)
         writeValue(stream, value.toList())
       }
-      is DropInError -> {
+      is Configuration -> {
         stream.write(130)
         writeValue(stream, value.toList())
       }
-      is DropInResult -> {
+      is DropInError -> {
         stream.write(131)
         writeValue(stream, value.toList())
       }
-      is Session -> {
+      is DropInResult -> {
         stream.write(132)
+        writeValue(stream, value.toList())
+      }
+      is Session -> {
+        stream.write(133)
         writeValue(stream, value.toList())
       }
       else -> super.writeValue(stream, value)
@@ -414,8 +447,8 @@ private object CheckoutPlatformInterfaceCodec : StandardMessageCodec() {
 interface CheckoutPlatformInterface {
   fun getPlatformVersion(callback: (Result<String>) -> Unit)
   fun getReturnUrl(callback: (Result<String>) -> Unit)
-  fun startDropInSessionPayment(dropInConfiguration: DropInConfiguration, session: Session)
-  fun startDropInAdvancedFlowPayment(dropInConfiguration: DropInConfiguration, paymentMethodsResponse: String)
+  fun startDropInSessionPayment(dropInConfiguration: Configuration, session: Session)
+  fun startDropInAdvancedFlowPayment(dropInConfiguration: Configuration, paymentMethodsResponse: String)
   fun onPaymentsResult(paymentsResult: DropInResult)
   fun onPaymentsDetailsResult(paymentsDetailsResult: DropInResult)
 
@@ -468,7 +501,7 @@ interface CheckoutPlatformInterface {
         if (api != null) {
           channel.setMessageHandler { message, reply ->
             val args = message as List<Any?>
-            val dropInConfigurationArg = args[0] as DropInConfiguration
+            val dropInConfigurationArg = args[0] as Configuration
             val sessionArg = args[1] as Session
             var wrapped: List<Any?>
             try {
@@ -488,7 +521,7 @@ interface CheckoutPlatformInterface {
         if (api != null) {
           channel.setMessageHandler { message, reply ->
             val args = message as List<Any?>
-            val dropInConfigurationArg = args[0] as DropInConfiguration
+            val dropInConfigurationArg = args[0] as Configuration
             val paymentMethodsResponseArg = args[1] as String
             var wrapped: List<Any?>
             try {

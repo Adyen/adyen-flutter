@@ -2,7 +2,7 @@ import 'package:pigeon/pigeon.dart';
 
 //dart run pigeon --input pigeons/platform_api.dart
 @ConfigurePigeon(PigeonOptions(
-  dartOut: 'lib/platform_api.g.dart',
+  dartOut: 'lib/src/generated/platform_api.g.dart',
   dartOptions: DartOptions(),
   kotlinOut: 'android/src/main/kotlin/com/adyen/adyen_checkout/PlatformApi.kt',
   kotlinOptions: KotlinOptions(),
@@ -39,22 +39,34 @@ class Amount {
   });
 }
 
-class DropInConfiguration {
+//Use sealed classes when they are supported by pigeon
+class Configuration {
   final Environment environment;
   final String clientKey;
   final Amount amount;
   final String countryCode;
-  bool? isAnalyticsEnabled;
+  final AnalyticsOptions? analytics;
   bool? showPreselectedStoredPaymentMethod;
   bool? skipListWhenSinglePaymentMethod;
   bool? isRemovingStoredPaymentMethodsEnabled;
   String? additionalDataForDropInService;
 
-  DropInConfiguration({
+  Configuration({
     required this.environment,
     required this.clientKey,
     required this.amount,
     required this.countryCode,
+    this.analytics,
+  });
+}
+
+class AnalyticsOptions {
+  final bool? enabled;
+  final String? payload;
+
+  AnalyticsOptions({
+    this.enabled,
+    this.payload,
   });
 }
 
@@ -164,12 +176,12 @@ abstract class CheckoutPlatformInterface {
   String getReturnUrl();
 
   void startDropInSessionPayment(
-    DropInConfiguration dropInConfiguration,
+    Configuration dropInConfiguration,
     Session session,
   );
 
   void startDropInAdvancedFlowPayment(
-    DropInConfiguration dropInConfiguration,
+    Configuration dropInConfiguration,
     String paymentMethodsResponse,
   );
 

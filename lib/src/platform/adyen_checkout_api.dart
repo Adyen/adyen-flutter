@@ -1,4 +1,4 @@
-import 'package:adyen_checkout/platform_api.g.dart';
+import 'package:adyen_checkout/src/generated/platform_api.g.dart';
 import 'package:adyen_checkout/src/platform/adyen_checkout_platform_interface.dart';
 
 class AdyenCheckoutApi implements AdyenCheckoutPlatformInterface {
@@ -10,7 +10,7 @@ class AdyenCheckoutApi implements AdyenCheckoutPlatformInterface {
   @override
   void startDropInSessionPayment(
     Session session,
-    DropInConfiguration dropInConfiguration,
+    Configuration dropInConfiguration,
   ) =>
       checkoutApi.startDropInSessionPayment(
         dropInConfiguration,
@@ -20,7 +20,7 @@ class AdyenCheckoutApi implements AdyenCheckoutPlatformInterface {
   @override
   void startDropInAdvancedFlowPayment(
     String paymentMethodsResponse,
-    DropInConfiguration dropInConfiguration,
+    Configuration dropInConfiguration,
   ) =>
       checkoutApi.startDropInAdvancedFlowPayment(
         dropInConfiguration,

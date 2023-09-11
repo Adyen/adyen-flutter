@@ -1,7 +1,7 @@
 package com.adyen.adyen_checkout.utils
 
 import Amount
-import DropInConfiguration
+import Configuration
 import Environment
 import OrderResponseModel
 import Session
@@ -15,7 +15,7 @@ object Mapper {
         return com.adyen.checkout.sessions.core.SessionModel(this.id, this.sessionData)
     }
 
-    fun DropInConfiguration.mapToDropInConfiguration(context: Context): com.adyen.checkout.dropin.DropInConfiguration {
+    fun Configuration.mapToDropInConfiguration(context: Context): com.adyen.checkout.dropin.DropInConfiguration {
         val amount = this.amount.mapToAmount()
         return com.adyen.checkout.dropin.DropInConfiguration.Builder(
             context,
