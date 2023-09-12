@@ -38,6 +38,21 @@ struct PaymentComponentDataResponse : Encodable {
     let delegatedAuthenticationData: DelegatedAuthenticationData?
     
     enum CodingKeys: String, CodingKey {
-        case amount, paymentMethod, storePaymentMethod, order, amountToPay, installments, supportNativeRedirect,shopperName,emailAddress, telephoneNumber, browserInfo, checkoutAttemptId, billingAddress, deliveryAddress, socialSecurityNumber, delegatedAuthenticationData
+        case amount,
+             paymentMethod,
+             storePaymentMethod,
+             order,
+             amountToPay,
+             installments,
+             supportNativeRedirect,
+             shopperName,
+             emailAddress,
+             telephoneNumber,
+             browserInfo,
+             checkoutAttemptId,
+             billingAddress,
+             deliveryAddress,
+             socialSecurityNumber,
+             delegatedAuthenticationData
     }
 }

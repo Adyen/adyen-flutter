@@ -108,7 +108,7 @@ class _MyAppState extends State<MyApp> {
   Future<PaymentResult> startDropInAdvancedFlow() async {
     final String paymentMethodsResponse =
         await _adyenSessionRepository.fetchPaymentMethods();
-    DropInConfiguration dropInConfiguration = DropInConfiguration(
+    final DropInConfiguration dropInConfiguration = DropInConfiguration(
       environment: Environment.test,
       clientKey: Config.clientKey,
       amount: Config.amount,

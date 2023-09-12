@@ -79,13 +79,15 @@ class CheckoutPlatformApi(private val checkoutFlutterApi: CheckoutFlutterApi?) :
             val paymentMethodsApiResponse = PaymentMethodsApiResponse.SERIALIZER.deserialize(
                 JSONObject(paymentMethodsResponse)
             )
+            val paymentMethodsWithoutGiftCards =
+                removeGiftCardPaymentMethods(paymentMethodsApiResponse)
             val dropInConfiguration =
                 dropInConfiguration.mapToDropInConfiguration(activity.applicationContext)
             withContext(Dispatchers.Main) {
                 DropIn.startPayment(
                     activity.applicationContext,
                     dropInAdvancedFlowLauncher,
-                    paymentMethodsApiResponse,
+                    paymentMethodsWithoutGiftCards,
                     dropInConfiguration,
                     AdvancedFlowDropInService::class.java,
                 )
@@ -154,4 +156,17 @@ class CheckoutPlatformApi(private val checkoutFlutterApi: CheckoutFlutterApi?) :
         }
     }
 
+    //Gift cards will be supported in a later version
+    private fun removeGiftCardPaymentMethods(paymentMethodsResponse: PaymentMethodsApiResponse): PaymentMethodsApiResponse {
+        val giftCardTypeIdentifier = "giftcard"
+        val storedPaymentMethods =
+            paymentMethodsResponse.storedPaymentMethods?.filterNot { it.type == giftCardTypeIdentifier }
+        val paymentMethods =
+            paymentMethodsResponse.paymentMethods?.filterNot { it.type == giftCardTypeIdentifier }
+
+        return PaymentMethodsApiResponse(
+            storedPaymentMethods = storedPaymentMethods,
+            paymentMethods = paymentMethods
+        )
+    }
 }
