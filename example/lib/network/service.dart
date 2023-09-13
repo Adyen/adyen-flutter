@@ -39,7 +39,8 @@ class Service {
     return jsonDecode(response.body);
   }
 
-  Future<Map<String, dynamic>> postPaymentsDetails(Map<String, dynamic> body) async {
+  Future<Map<String, dynamic>> postPaymentsDetails(
+      Map<String, dynamic> body) async {
     final response = await http.post(
       Uri.https(Config.baseUrl, "/${Config.apiVersion}/payments/details"),
       headers: _createHeaders(),

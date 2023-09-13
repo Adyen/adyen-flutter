@@ -51,7 +51,7 @@ class AdyenSessionsRepository {
     return await _service.fetchPaymentMethods(PaymentMethodsRequestNetworkModel(
       merchantAccount: Config.merchantAccount,
       countryCode: Config.countryCode,
-      channel: Config.channel,
+      channel: _determineChannel(),
     ));
   }
 
@@ -66,9 +66,8 @@ class AdyenSessionsRepository {
         value: Config.amount.value,
         currency: Config.amount.currency,
       ),
-      shopperIP: Config.shopperIp,
       countryCode: Config.countryCode,
-      channel: Config.channel,
+      channel: _determineChannel(),
       additionalData: AdditionalData(allow3DS2: true, executeThreeD: true),
       threeDS2RequestData: ThreeDS2RequestDataRequest(),
       threeDSAuthenticationOnly: false,
@@ -97,5 +96,17 @@ class AdyenSessionsRepository {
     } else {
       throw Exception("Unsupported platform");
     }
+  }
+
+  String _determineChannel() {
+    if (Platform.isAndroid) {
+      return "Android";
+    }
+
+    if (Platform.isIOS) {
+      return "iOS";
+    }
+
+    throw Exception("Unsupported platform");
   }
 }

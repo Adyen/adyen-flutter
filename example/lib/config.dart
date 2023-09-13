@@ -21,8 +21,6 @@ class Config {
   static const String baseUrl = "checkout-test.adyen.com";
   static const String apiVersion = "v70";
   static const String iOSReturnUrl = "ui-host://payments";
-  static const String channel = "Android";
-  static const String shopperIp = "142.12.31.22";
 
   //Example data
   static Amount amount = Amount(currency: "EUR", value: 2100);

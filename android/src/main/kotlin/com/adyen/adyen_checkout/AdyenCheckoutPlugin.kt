@@ -4,9 +4,9 @@ import CheckoutFlutterApi
 import CheckoutPlatformInterface
 import PaymentResult
 import PaymentResultEnum
+import PaymentResultModel
 import PlatformCommunicationModel
 import PlatformCommunicationType
-import SessionPaymentResultModel
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
@@ -96,7 +96,7 @@ class AdyenCheckoutPlugin : FlutterPlugin, ActivityAware {
 
             is SessionDropInResult.Finished -> PaymentResult(
                 PaymentResultEnum.FINISHED, result = with(sessionDropInResult.result) {
-                    SessionPaymentResultModel(
+                    PaymentResultModel(
                         sessionId,
                         sessionData,
                         resultCode,
@@ -123,7 +123,7 @@ class AdyenCheckoutPlugin : FlutterPlugin, ActivityAware {
             )
 
             is DropInResult.Finished -> PaymentResult(
-                PaymentResultEnum.FINISHED, result = SessionPaymentResultModel(
+                PaymentResultEnum.FINISHED, result = PaymentResultModel(
                     resultCode = dropInAdvancedFlowResult.result
                 )
             )

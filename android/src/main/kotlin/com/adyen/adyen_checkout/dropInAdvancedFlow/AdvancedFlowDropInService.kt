@@ -52,7 +52,7 @@ class AdvancedFlowDropInService : DropInService(), LifecycleOwner {
                 return@observe
             }
 
-            val dropInServiceResult = mapToDropInServiceResult(message.contentIfNotHandled)
+            val dropInServiceResult = mapToDropInResult(message.contentIfNotHandled)
             sendResult(dropInServiceResult)
         }
     }
@@ -64,12 +64,12 @@ class AdvancedFlowDropInService : DropInService(), LifecycleOwner {
                 return@observe
             }
 
-            val dropInServiceResult = mapToDropInServiceResult(message.contentIfNotHandled)
+            val dropInServiceResult = mapToDropInResult(message.contentIfNotHandled)
             sendResult(dropInServiceResult)
         }
     }
 
-    private fun mapToDropInServiceResult(dropInResult: DropInResult?): DropInServiceResult {
+    private fun mapToDropInResult(dropInResult: DropInResult?): DropInServiceResult {
         return when (dropInResult?.dropInResultType) {
             FINISHED -> DropInServiceResult.Finished(result = "${dropInResult.result}")
 

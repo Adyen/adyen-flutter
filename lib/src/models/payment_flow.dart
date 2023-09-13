@@ -1,32 +1,29 @@
-import 'dart:async';
-
 import 'package:adyen_checkout/platform_api.g.dart';
 import 'package:adyen_checkout/src/models/drop_in_outcome.dart';
-import 'package:adyen_checkout/src/models/payment_type.dart';
 
-class PaymentFlow {
-  late final PaymentType paymentType;
+sealed class PaymentFlow {}
+
+class DropInSession extends PaymentFlow {
   final DropInConfiguration dropInConfiguration;
-  String? componentConfiguration;
-  Session? session;
-  String? paymentMethodsResponse;
-  Future<DropInOutcome> Function(String paymentComponentJson)? postPayments;
-  Future<DropInOutcome> Function(String additionalDetailsJson)?
-      postPaymentsDetails;
+  final Session session;
 
-  PaymentFlow.dropIn({
+  DropInSession({
     required this.dropInConfiguration,
     required this.session,
-  }) {
-    paymentType = PaymentType.dropInSessions;
-  }
+  });
+}
 
-  PaymentFlow.dropInAdvanced({
+class DropInAdvancedFlow extends PaymentFlow {
+  final DropInConfiguration dropInConfiguration;
+  final String paymentMethodsResponse;
+  Future<DropInOutcome> Function(String paymentComponentJson) postPayments;
+  Future<DropInOutcome> Function(String additionalDetailsJson)
+      postPaymentsDetails;
+
+  DropInAdvancedFlow({
     required this.dropInConfiguration,
     required this.paymentMethodsResponse,
     required this.postPayments,
     required this.postPaymentsDetails,
-  }) {
-    paymentType = PaymentType.dropInAdvancedFlow;
-  }
+  });
 }

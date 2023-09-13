@@ -98,7 +98,7 @@ class _MyAppState extends State<MyApp> {
     );
 
     return await _adyenCheckout.startPayment(
-      paymentFlow: PaymentFlow.dropIn(
+      paymentFlow: DropInSession(
         dropInConfiguration: dropInConfiguration,
         session: session,
       ),
@@ -108,7 +108,7 @@ class _MyAppState extends State<MyApp> {
   Future<PaymentResult> startDropInAdvancedFlow() async {
     final String paymentMethodsResponse =
         await _adyenSessionRepository.fetchPaymentMethods();
-    DropInConfiguration dropInConfiguration = DropInConfiguration(
+    final DropInConfiguration dropInConfiguration = DropInConfiguration(
       environment: Environment.test,
       clientKey: Config.clientKey,
       amount: Config.amount,
@@ -116,7 +116,7 @@ class _MyAppState extends State<MyApp> {
     );
 
     return await _adyenCheckout.startPayment(
-      paymentFlow: PaymentFlow.dropInAdvanced(
+      paymentFlow: DropInAdvancedFlow(
         dropInConfiguration: dropInConfiguration,
         paymentMethodsResponse: paymentMethodsResponse,
         postPayments: _adyenSessionRepository.postPayments,
@@ -125,13 +125,20 @@ class _MyAppState extends State<MyApp> {
     );
   }
 
-  _dialogBuilder(BuildContext context, PaymentResult dropInResult) {
+  _dialogBuilder(BuildContext context, PaymentResult paymentResult) {
+    String message = "";
+    if (paymentResult.result != null) {
+      message = "Result code: ${paymentResult.result?.resultCode}";
+    } else {
+      message = "Error: ${paymentResult.reason}";
+    }
+
     return showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text(dropInResult.type.name),
-          content: Text("Result code: ${dropInResult.result?.resultCode}"),
+          title: Text(paymentResult.type.name),
+          content: Text(message),
           actions: <Widget>[
             TextButton(
               style: TextButton.styleFrom(

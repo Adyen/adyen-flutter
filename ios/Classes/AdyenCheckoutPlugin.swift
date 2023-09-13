@@ -1,7 +1,5 @@
 import Flutter
 import UIKit
-@_spi(AdyenInternal)
-import Adyen
 
 public class AdyenCheckoutPlugin: NSObject, FlutterPlugin {
     
