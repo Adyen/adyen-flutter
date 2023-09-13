@@ -20,6 +20,7 @@ class DropInOutcomeHandler {
     if (_isError(jsonResponse)) {
       return Error(
         errorMessage: jsonResponse[messageKey],
+        reason: jsonResponse[messageKey],
         dismissDropIn: true,
       );
     }
