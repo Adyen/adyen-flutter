@@ -92,8 +92,8 @@ class _MyAppState extends State<MyApp> {
     final DropInConfiguration dropInConfiguration = DropInConfiguration(
       environment: Environment.test,
       clientKey: Config.clientKey,
-      amount: Config.amount,
       countryCode: Config.countryCode,
+      amount: Config.amount,
     );
 
     return await _adyenCheckout.startPayment(
@@ -107,11 +107,17 @@ class _MyAppState extends State<MyApp> {
   Future<PaymentResult> startDropInAdvancedFlow() async {
     final String paymentMethodsResponse =
         await _adyenSessionRepository.fetchPaymentMethods();
+
+    final CardsConfiguration cardsConfiguration = CardsConfiguration(
+      holderNameRequired: true
+    );
+
     final DropInConfiguration dropInConfiguration = DropInConfiguration(
       environment: Environment.test,
       clientKey: Config.clientKey,
-      amount: Config.amount,
       countryCode: Config.countryCode,
+      amount: Config.amount,
+      cardsConfiguration: cardsConfiguration,
     );
 
     return await _adyenCheckout.startPayment(

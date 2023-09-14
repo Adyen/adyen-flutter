@@ -34,11 +34,12 @@ class AdyenCheckout implements AdyenCheckoutInterface {
   Future<PaymentResult> _startDropInSessionsPayment(
       DropInSession dropInSession) async {
     _resultApi.dropInSessionResultStream = StreamController<PaymentResult>();
-    Configuration dropInConfiguration = Configuration(
+    DropInConfigurationDTO dropInConfiguration = DropInConfigurationDTO(
       environment: dropInSession.dropInConfiguration.environment,
       clientKey: dropInSession.dropInConfiguration.clientKey,
-      amount: dropInSession.dropInConfiguration.amount,
       countryCode: dropInSession.dropInConfiguration.countryCode,
+      amount: dropInSession.dropInConfiguration.amount,
+      cardsConfiguration: dropInSession.dropInConfiguration.cardsConfiguration,
     );
     AdyenCheckoutPlatformInterface.instance.startDropInSessionPayment(
       dropInSession.session,
@@ -53,11 +54,13 @@ class AdyenCheckout implements AdyenCheckoutInterface {
   Future<PaymentResult> _startDropInAdvancedFlowPayment(
       DropInAdvancedFlow dropInAdvancedFlow) async {
     final dropInAdvancedFlowCompleter = Completer<PaymentResult>();
-    Configuration dropInConfiguration = Configuration(
+    DropInConfigurationDTO dropInConfiguration = DropInConfigurationDTO(
       environment: dropInAdvancedFlow.dropInConfiguration.environment,
       clientKey: dropInAdvancedFlow.dropInConfiguration.clientKey,
-      amount: dropInAdvancedFlow.dropInConfiguration.amount,
       countryCode: dropInAdvancedFlow.dropInConfiguration.countryCode,
+      amount: dropInAdvancedFlow.dropInConfiguration.amount,
+      cardsConfiguration:
+          dropInAdvancedFlow.dropInConfiguration.cardsConfiguration,
     );
     AdyenCheckoutPlatformInterface.instance.startDropInAdvancedFlowPayment(
       dropInAdvancedFlow.paymentMethodsResponse,

@@ -21,12 +21,12 @@ abstract class AdyenCheckoutPlatformInterface extends PlatformInterface {
 
   void startDropInSessionPayment(
     Session session,
-    Configuration dropInConfiguration,
+    DropInConfigurationDTO dropInConfiguration,
   );
 
   void startDropInAdvancedFlowPayment(
     String paymentMethodsResponse,
-    Configuration dropInConfiguration,
+    DropInConfigurationDTO dropInConfiguration,
   );
 
   void onPaymentsResult(DropInResult paymentsResult);

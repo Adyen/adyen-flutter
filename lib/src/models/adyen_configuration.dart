@@ -1,67 +1,70 @@
 import 'package:adyen_checkout/src/generated/platform_api.g.dart';
 
-sealed class AdyenConfiguration {
+abstract class AdyenConfiguration {
   final Environment environment;
   final String clientKey;
-  final Amount amount;
   final String countryCode;
-  final AnalyticsOptions? analytics;
+  final Amount amount;
 
-  AdyenConfiguration({
-    required this.environment,
-    required this.clientKey,
-    required this.amount,
-    required this.countryCode,
-    required this.analytics,
-  });
+  AdyenConfiguration(
+    this.environment,
+    this.clientKey,
+    this.countryCode,
+    this.amount,
+  );
 }
 
-class DropInConfiguration extends AdyenConfiguration {
-  final bool showPreselectedStoredPaymentMethod;
-  final bool skipListWhenSinglePaymentMethod;
-
+class DropInConfiguration extends DropInConfigurationDTO
+    implements AdyenConfiguration {
   DropInConfiguration({
     required super.environment,
     required super.clientKey,
-    required super.amount,
     required super.countryCode,
-    super.analytics,
-    this.showPreselectedStoredPaymentMethod = false,
-    this.skipListWhenSinglePaymentMethod = false,
-  });
+    required super.amount,
+    CardsConfiguration? cardsConfiguration,
+    AnalyticsOptions? analyticsOptions,
+    bool showPreselectedStoredPaymentMethod = false,
+    bool skipListWhenSinglePaymentMethod = false,
+  }) : super(
+          analyticsOptions: analyticsOptions,
+          showPreselectedStoredPaymentMethod:
+              showPreselectedStoredPaymentMethod,
+          skipListWhenSinglePaymentMethod: skipListWhenSinglePaymentMethod,
+          cardsConfiguration: CardsConfigurationDTO(
+            holderNameRequired: cardsConfiguration?.holderNameRequired ?? false,
+            addressMode: cardsConfiguration?.addressMode ?? AddressMode.none,
+            showStorePaymentField:
+                cardsConfiguration?.showStorePaymentField ?? false,
+            hideCvcStoredCard: cardsConfiguration?.hideCvcStoredCard ?? false,
+            hideCvc: cardsConfiguration?.hideCvc ?? false,
+            kcpVisible: cardsConfiguration?.kcpVisible ?? false,
+            socialSecurityVisible:
+                cardsConfiguration?.socialSecurityVisible ?? false,
+            supportedCardTypes: cardsConfiguration?.supportedCardTypes ?? [],
+          ),
+        );
 }
 
-class CardsConfiguration extends AdyenConfiguration {
-  final bool holderNameRequired;
-  final AddressMode addressVisibility;
-  final bool showStorePaymentField;
-  final bool hideCvcStoredCard;
-  final bool hideCvc;
-  final bool kcpVisible;
-  final bool socialSecurityVisible;
-  final List<String> supportedCardTypes;
-
+class CardsConfiguration extends CardsConfigurationDTO {
   CardsConfiguration({
-    required super.environment,
-    required super.clientKey,
-    required super.amount,
-    required super.countryCode,
-    super.analytics,
-    this.holderNameRequired = false,
-    this.addressVisibility = AddressMode.none,
-    this.showStorePaymentField = false,
-    this.hideCvcStoredCard = false,
-    this.hideCvc = false,
-    this.kcpVisible = false,
-    this.socialSecurityVisible = false,
-    this.supportedCardTypes = const [],
-  });
-}
-
-enum AddressMode {
-  full,
-  postalCode,
-  none,
+    bool holderNameRequired = false,
+    AddressMode addressMode = AddressMode.none,
+    bool showStorePaymentField = false,
+    bool hideCvcStoredCard = false,
+    bool hideCvc = false,
+    bool kcpVisible = false,
+    bool socialSecurityVisible = false,
+    List<String?> supportedCardTypes = const [],
+  }) : super(
+          holderNameRequired: holderNameRequired,
+          addressMode: addressMode,
+          showStorePaymentField: showStorePaymentField,
+          hideCvcStoredCard: hideCvcStoredCard,
+          hideCvc: hideCvc,
+          kcpVisible: kcpVisible,
+          socialSecurityVisible: socialSecurityVisible,
+          supportedCardTypes: supportedCardTypes,
+        );
 }
 
 class ApplePayConfiguration extends AdyenConfiguration {
@@ -69,12 +72,11 @@ class ApplePayConfiguration extends AdyenConfiguration {
   final String merchantName;
   final bool allowOnboarding;
 
-  ApplePayConfiguration({
-    required super.environment,
-    required super.clientKey,
-    required super.amount,
-    required super.countryCode,
-    required super.analytics,
+  ApplePayConfiguration(
+    super.environment,
+    super.clientKey,
+    super.countryCode,
+    super.amount, {
     required this.merchantId,
     required this.merchantName,
     this.allowOnboarding = false,
@@ -93,12 +95,11 @@ class GooglePayConfiguration extends AdyenConfiguration {
   final bool existingPaymentMethodRequired;
   final GooglePayEnvironment googlePayEnvironment;
 
-  GooglePayConfiguration({
-    required super.environment,
-    required super.clientKey,
-    required super.amount,
-    required super.countryCode,
-    required super.analytics,
+  GooglePayConfiguration(
+    super.environment,
+    super.clientKey,
+    super.countryCode,
+    super.amount, {
     required this.totalPriceStatus,
     required this.googlePayEnvironment,
     this.merchantAccount = "",

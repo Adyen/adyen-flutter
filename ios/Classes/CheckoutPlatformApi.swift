@@ -28,7 +28,7 @@ class CheckoutPlatformApi : CheckoutPlatformInterface {
         completion(Result.success(systemVersion))
     }
     
-    func startDropInSessionPayment(dropInConfiguration: Configuration, session: Session) {
+    func startDropInSessionPayment(dropInConfiguration: DropInConfigurationDTO, session: Session) {
         do {
             guard let viewController = getViewController() else {
                 return
@@ -64,7 +64,7 @@ class CheckoutPlatformApi : CheckoutPlatformInterface {
         }
     }
     
-    func startDropInAdvancedFlowPayment(dropInConfiguration: Configuration, paymentMethodsResponse: String) {
+    func startDropInAdvancedFlowPayment(dropInConfiguration: DropInConfigurationDTO, paymentMethodsResponse: String) {
         do {
             guard let viewController = getViewController() else {
                 return
@@ -117,7 +117,7 @@ class CheckoutPlatformApi : CheckoutPlatformInterface {
         return rootViewController
     }
     
-    private func createAdyenContext(dropInConfiguration: Configuration) throws  -> AdyenContext  {
+    private func createAdyenContext(dropInConfiguration: DropInConfigurationDTO) throws  -> AdyenContext  {
         let environment = mapToEnvironment(environment: dropInConfiguration.environment)
         let apiContext = try APIContext(environment: environment, clientKey: dropInConfiguration.clientKey)
         let value = Int(dropInConfiguration.amount.value)

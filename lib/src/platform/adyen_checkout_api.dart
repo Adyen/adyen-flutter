@@ -10,7 +10,7 @@ class AdyenCheckoutApi implements AdyenCheckoutPlatformInterface {
   @override
   void startDropInSessionPayment(
     Session session,
-    Configuration dropInConfiguration,
+    DropInConfigurationDTO dropInConfiguration,
   ) =>
       checkoutApi.startDropInSessionPayment(
         dropInConfiguration,
@@ -20,7 +20,7 @@ class AdyenCheckoutApi implements AdyenCheckoutPlatformInterface {
   @override
   void startDropInAdvancedFlowPayment(
     String paymentMethodsResponse,
-    Configuration dropInConfiguration,
+    DropInConfigurationDTO dropInConfiguration,
   ) =>
       checkoutApi.startDropInAdvancedFlowPayment(
         dropInConfiguration,

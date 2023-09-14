@@ -13,7 +13,7 @@ class MockAdyenCheckoutPlatform
   @override
   Future<void> startDropInSessionPayment(
     Session sessionModel,
-    Configuration dropInConfiguration,
+    DropInConfigurationDTO dropInConfiguration,
   ) =>
       Future.value(null);
 
@@ -25,7 +25,7 @@ class MockAdyenCheckoutPlatform
   @override
   Future<String> startDropInAdvancedFlowPayment(
     String paymentMethodsResponse,
-    Configuration dropInConfiguration,
+    DropInConfigurationDTO dropInConfiguration,
   ) =>
       Future.value("Result");
 

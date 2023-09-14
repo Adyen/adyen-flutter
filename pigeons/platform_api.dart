@@ -39,25 +39,54 @@ class Amount {
   });
 }
 
-//Use sealed classes when they are supported by pigeon
-class Configuration {
+class DropInConfigurationDTO {
   final Environment environment;
   final String clientKey;
-  final Amount amount;
   final String countryCode;
-  final AnalyticsOptions? analytics;
-  bool? showPreselectedStoredPaymentMethod;
-  bool? skipListWhenSinglePaymentMethod;
-  bool? isRemovingStoredPaymentMethodsEnabled;
-  String? additionalDataForDropInService;
+  final Amount amount;
+  final AnalyticsOptions? analyticsOptions;
+  final bool? showPreselectedStoredPaymentMethod;
+  final bool? skipListWhenSinglePaymentMethod;
+  final CardsConfigurationDTO? cardsConfiguration;
 
-  Configuration({
-    required this.environment,
-    required this.clientKey,
-    required this.amount,
-    required this.countryCode,
-    this.analytics,
-  });
+  DropInConfigurationDTO(
+    this.environment,
+    this.clientKey,
+    this.countryCode,
+    this.amount,
+    this.analyticsOptions,
+    this.cardsConfiguration,
+    this.showPreselectedStoredPaymentMethod,
+    this.skipListWhenSinglePaymentMethod,
+  );
+}
+
+class CardsConfigurationDTO {
+  final bool holderNameRequired;
+  final AddressMode addressMode;
+  final bool showStorePaymentField;
+  final bool hideCvcStoredCard;
+  final bool hideCvc;
+  final bool kcpVisible;
+  final bool socialSecurityVisible;
+  final List<String?> supportedCardTypes;
+
+  CardsConfigurationDTO(
+    this.holderNameRequired,
+    this.addressMode,
+    this.showStorePaymentField,
+    this.hideCvcStoredCard,
+    this.hideCvc,
+    this.kcpVisible,
+    this.socialSecurityVisible,
+    this.supportedCardTypes,
+  );
+}
+
+enum AddressMode {
+  full,
+  postalCode,
+  none,
 }
 
 class AnalyticsOptions {
@@ -176,12 +205,12 @@ abstract class CheckoutPlatformInterface {
   String getReturnUrl();
 
   void startDropInSessionPayment(
-    Configuration dropInConfiguration,
+    DropInConfigurationDTO dropInConfiguration,
     Session session,
   );
 
   void startDropInAdvancedFlowPayment(
-    Configuration dropInConfiguration,
+    DropInConfigurationDTO dropInConfiguration,
     String paymentMethodsResponse,
   );
 

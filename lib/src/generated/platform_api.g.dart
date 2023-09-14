@@ -17,6 +17,12 @@ enum Environment {
   apse,
 }
 
+enum AddressMode {
+  full,
+  postalCode,
+  none,
+}
+
 enum PaymentResultEnum {
   cancelledByUser,
   error,
@@ -87,65 +93,118 @@ class Amount {
   }
 }
 
-class Configuration {
-  Configuration({
+class DropInConfigurationDTO {
+  DropInConfigurationDTO({
     required this.environment,
     required this.clientKey,
-    required this.amount,
     required this.countryCode,
-    this.analytics,
+    required this.amount,
+    this.analyticsOptions,
     this.showPreselectedStoredPaymentMethod,
     this.skipListWhenSinglePaymentMethod,
-    this.isRemovingStoredPaymentMethodsEnabled,
-    this.additionalDataForDropInService,
+    this.cardsConfiguration,
   });
 
   Environment environment;
 
   String clientKey;
 
-  Amount amount;
-
   String countryCode;
 
-  AnalyticsOptions? analytics;
+  Amount amount;
+
+  AnalyticsOptions? analyticsOptions;
 
   bool? showPreselectedStoredPaymentMethod;
 
   bool? skipListWhenSinglePaymentMethod;
 
-  bool? isRemovingStoredPaymentMethodsEnabled;
-
-  String? additionalDataForDropInService;
+  CardsConfigurationDTO? cardsConfiguration;
 
   Object encode() {
     return <Object?>[
       environment.index,
       clientKey,
-      amount.encode(),
       countryCode,
-      analytics?.encode(),
+      amount.encode(),
+      analyticsOptions?.encode(),
       showPreselectedStoredPaymentMethod,
       skipListWhenSinglePaymentMethod,
-      isRemovingStoredPaymentMethodsEnabled,
-      additionalDataForDropInService,
+      cardsConfiguration?.encode(),
     ];
   }
 
-  static Configuration decode(Object result) {
+  static DropInConfigurationDTO decode(Object result) {
     result as List<Object?>;
-    return Configuration(
+    return DropInConfigurationDTO(
       environment: Environment.values[result[0]! as int],
       clientKey: result[1]! as String,
-      amount: Amount.decode(result[2]! as List<Object?>),
-      countryCode: result[3]! as String,
-      analytics: result[4] != null
+      countryCode: result[2]! as String,
+      amount: Amount.decode(result[3]! as List<Object?>),
+      analyticsOptions: result[4] != null
           ? AnalyticsOptions.decode(result[4]! as List<Object?>)
           : null,
       showPreselectedStoredPaymentMethod: result[5] as bool?,
       skipListWhenSinglePaymentMethod: result[6] as bool?,
-      isRemovingStoredPaymentMethodsEnabled: result[7] as bool?,
-      additionalDataForDropInService: result[8] as String?,
+      cardsConfiguration: result[7] != null
+          ? CardsConfigurationDTO.decode(result[7]! as List<Object?>)
+          : null,
+    );
+  }
+}
+
+class CardsConfigurationDTO {
+  CardsConfigurationDTO({
+    required this.holderNameRequired,
+    required this.addressMode,
+    required this.showStorePaymentField,
+    required this.hideCvcStoredCard,
+    required this.hideCvc,
+    required this.kcpVisible,
+    required this.socialSecurityVisible,
+    required this.supportedCardTypes,
+  });
+
+  bool holderNameRequired;
+
+  AddressMode addressMode;
+
+  bool showStorePaymentField;
+
+  bool hideCvcStoredCard;
+
+  bool hideCvc;
+
+  bool kcpVisible;
+
+  bool socialSecurityVisible;
+
+  List<String?> supportedCardTypes;
+
+  Object encode() {
+    return <Object?>[
+      holderNameRequired,
+      addressMode.index,
+      showStorePaymentField,
+      hideCvcStoredCard,
+      hideCvc,
+      kcpVisible,
+      socialSecurityVisible,
+      supportedCardTypes,
+    ];
+  }
+
+  static CardsConfigurationDTO decode(Object result) {
+    result as List<Object?>;
+    return CardsConfigurationDTO(
+      holderNameRequired: result[0]! as bool,
+      addressMode: AddressMode.values[result[1]! as int],
+      showStorePaymentField: result[2]! as bool,
+      hideCvcStoredCard: result[3]! as bool,
+      hideCvc: result[4]! as bool,
+      kcpVisible: result[5]! as bool,
+      socialSecurityVisible: result[6]! as bool,
+      supportedCardTypes: (result[7] as List<Object?>?)!.cast<String?>(),
     );
   }
 }
@@ -399,17 +458,20 @@ class _CheckoutPlatformInterfaceCodec extends StandardMessageCodec {
     } else if (value is AnalyticsOptions) {
       buffer.putUint8(129);
       writeValue(buffer, value.encode());
-    } else if (value is Configuration) {
+    } else if (value is CardsConfigurationDTO) {
       buffer.putUint8(130);
       writeValue(buffer, value.encode());
-    } else if (value is DropInError) {
+    } else if (value is DropInConfigurationDTO) {
       buffer.putUint8(131);
       writeValue(buffer, value.encode());
-    } else if (value is DropInResult) {
+    } else if (value is DropInError) {
       buffer.putUint8(132);
       writeValue(buffer, value.encode());
-    } else if (value is Session) {
+    } else if (value is DropInResult) {
       buffer.putUint8(133);
+      writeValue(buffer, value.encode());
+    } else if (value is Session) {
+      buffer.putUint8(134);
       writeValue(buffer, value.encode());
     } else {
       super.writeValue(buffer, value);
@@ -424,12 +486,14 @@ class _CheckoutPlatformInterfaceCodec extends StandardMessageCodec {
       case 129: 
         return AnalyticsOptions.decode(readValue(buffer)!);
       case 130: 
-        return Configuration.decode(readValue(buffer)!);
+        return CardsConfigurationDTO.decode(readValue(buffer)!);
       case 131: 
-        return DropInError.decode(readValue(buffer)!);
+        return DropInConfigurationDTO.decode(readValue(buffer)!);
       case 132: 
-        return DropInResult.decode(readValue(buffer)!);
+        return DropInError.decode(readValue(buffer)!);
       case 133: 
+        return DropInResult.decode(readValue(buffer)!);
+      case 134: 
         return Session.decode(readValue(buffer)!);
       default:
         return super.readValueOfType(type, buffer);
@@ -501,7 +565,7 @@ class CheckoutPlatformInterface {
     }
   }
 
-  Future<void> startDropInSessionPayment(Configuration arg_dropInConfiguration, Session arg_session) async {
+  Future<void> startDropInSessionPayment(DropInConfigurationDTO arg_dropInConfiguration, Session arg_session) async {
     final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
         'dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.startDropInSessionPayment', codec,
         binaryMessenger: _binaryMessenger);
@@ -523,7 +587,7 @@ class CheckoutPlatformInterface {
     }
   }
 
-  Future<void> startDropInAdvancedFlowPayment(Configuration arg_dropInConfiguration, String arg_paymentMethodsResponse) async {
+  Future<void> startDropInAdvancedFlowPayment(DropInConfigurationDTO arg_dropInConfiguration, String arg_paymentMethodsResponse) async {
     final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
         'dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.startDropInAdvancedFlowPayment', codec,
         binaryMessenger: _binaryMessenger);
