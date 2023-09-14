@@ -21,7 +21,6 @@ import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.embedding.engine.plugins.activity.ActivityAware
 import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding
 import io.flutter.embedding.engine.plugins.lifecycle.HiddenLifecycleReference
-import DropInResult as FlutterDropInResult
 
 /** AdyenCheckoutPlugin */
 class AdyenCheckoutPlugin : FlutterPlugin, ActivityAware {
