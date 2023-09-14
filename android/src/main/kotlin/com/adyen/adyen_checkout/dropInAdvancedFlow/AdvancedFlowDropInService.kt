@@ -1,8 +1,7 @@
 package com.adyen.adyen_checkout.dropInAdvancedFlow
 
-
 import DropInResult
-import DropInResultType.*
+import DropInResultType
 import android.content.Intent
 import android.os.IBinder
 import androidx.lifecycle.Lifecycle
@@ -83,15 +82,17 @@ class AdvancedFlowDropInService : DropInService(), LifecycleOwner {
 
     private fun mapToDropInResult(dropInResult: DropInResult?): DropInServiceResult {
         return when (dropInResult?.dropInResultType) {
-            FINISHED -> DropInServiceResult.Finished(result = "${dropInResult.result}")
+            DropInResultType.FINISHED -> DropInServiceResult.Finished(
+                result = "${dropInResult.result}"
+            )
 
-            ERROR -> DropInServiceResult.Error(
+            DropInResultType.ERROR -> DropInServiceResult.Error(
                 errorDialog = null,
                 reason = dropInResult.error?.reason,
                 dismissDropIn = dropInResult.error?.dismissDropIn ?: false
             )
 
-            ACTION -> {
+            DropInResultType.ACTION -> {
                 if (dropInResult.actionResponse == null) {
                     DropInServiceResult.Error(
                         errorDialog = null,
@@ -141,4 +142,3 @@ class AdvancedFlowDropInService : DropInService(), LifecycleOwner {
     override val lifecycle: Lifecycle
         get() = dispatcher.lifecycle
 }
-

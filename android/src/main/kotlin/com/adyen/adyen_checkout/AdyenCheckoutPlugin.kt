@@ -21,7 +21,6 @@ import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.embedding.engine.plugins.activity.ActivityAware
 import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding
 import io.flutter.embedding.engine.plugins.lifecycle.HiddenLifecycleReference
-import DropInResult as FlutterDropInResult
 
 /** AdyenCheckoutPlugin */
 class AdyenCheckoutPlugin : FlutterPlugin, ActivityAware {
@@ -45,8 +44,9 @@ class AdyenCheckoutPlugin : FlutterPlugin, ActivityAware {
 
     override fun onDetachedFromActivityForConfigChanges() = teardown()
 
-    override fun onReattachedToActivityForConfigChanges(binding: ActivityPluginBinding) =
-        setupActivity(binding)
+    override fun onReattachedToActivityForConfigChanges(binding: ActivityPluginBinding) = setupActivity(
+        binding
+    )
 
     override fun onDetachedFromActivity() = teardown()
 
@@ -70,10 +70,9 @@ class AdyenCheckoutPlugin : FlutterPlugin, ActivityAware {
                 Lifecycle.Event.ON_CREATE -> {
                     checkoutPlatformApi?.dropInSessionLauncher =
                         DropIn.registerForDropInResult(fragmentActivity, sessionDropInCallback())
-                    checkoutPlatformApi?.dropInAdvancedFlowLauncher =
-                        DropIn.registerForDropInResult(
-                            fragmentActivity, dropInAdvancedFlowCallback
-                        )
+                    checkoutPlatformApi?.dropInAdvancedFlowLauncher = DropIn.registerForDropInResult(
+                        fragmentActivity, dropInAdvancedFlowCallback
+                    )
                 }
 
                 else -> {}
@@ -92,11 +91,13 @@ class AdyenCheckoutPlugin : FlutterPlugin, ActivityAware {
             )
 
             is SessionDropInResult.Error -> PaymentResult(
-                PaymentResultEnum.ERROR, reason = sessionDropInResult.reason
+                PaymentResultEnum.ERROR,
+                reason = sessionDropInResult.reason
             )
 
             is SessionDropInResult.Finished -> PaymentResult(
-                PaymentResultEnum.FINISHED, result = with(sessionDropInResult.result) {
+                PaymentResultEnum.FINISHED,
+                result = with(sessionDropInResult.result) {
                     PaymentResultModel(
                         sessionId,
                         sessionData,
@@ -120,18 +121,22 @@ class AdyenCheckoutPlugin : FlutterPlugin, ActivityAware {
             )
 
             is DropInResult.Error -> PaymentResult(
-                PaymentResultEnum.ERROR, reason = dropInAdvancedFlowResult.reason
+                PaymentResultEnum.ERROR,
+                reason = dropInAdvancedFlowResult.reason
             )
 
             is DropInResult.Finished -> PaymentResult(
-                PaymentResultEnum.FINISHED, result = PaymentResultModel(
+                PaymentResultEnum.FINISHED,
+                result = PaymentResultModel(
                     resultCode = dropInAdvancedFlowResult.result
                 )
             )
         }
 
         val model = PlatformCommunicationModel(
-            PlatformCommunicationType.RESULT, data = "", paymentResult = mappedResult
+            PlatformCommunicationType.RESULT,
+            data = "",
+            paymentResult = mappedResult
         )
         checkoutFlutterApi?.onDropInAdvancedFlowPlatformCommunication(model) {}
     }
