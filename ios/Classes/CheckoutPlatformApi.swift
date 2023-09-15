@@ -2,6 +2,7 @@ import Foundation
 @_spi(AdyenInternal)
 import Adyen
 import AdyenNetworking
+import PassKit
 
 //TODO: Add config:
 // 1) Add Info.plist for adding photo library usage description
@@ -28,7 +29,7 @@ class CheckoutPlatformApi : CheckoutPlatformInterface {
         completion(Result.success(systemVersion))
     }
     
-    func startDropInSessionPayment(dropInConfiguration: DropInConfigurationDTO, session: Session) {
+    func startDropInSessionPayment(dropInConfigurationDTO: DropInConfigurationDTO, session: Session) {
         do {
             guard let viewController = getViewController() else {
                 return
@@ -37,7 +38,7 @@ class CheckoutPlatformApi : CheckoutPlatformInterface {
             self.viewController = viewController
             dropInSessionDelegate = DropInSessionsDelegate(viewController: viewController, checkoutFlutterApi: checkoutFlutterApi)
             dropInSessionPresentationDelegate = DropInSessionsPresentationDelegate()
-            let adyenContext = try createAdyenContext(dropInConfiguration: dropInConfiguration)
+            let adyenContext = try createAdyenContext(dropInConfiguration: dropInConfigurationDTO)
             let sessionConfiguration = AdyenSession.Configuration(sessionIdentifier: session.id,
                                                                   initialSessionData: session.sessionData,
                                                                   context: adyenContext)
@@ -46,15 +47,19 @@ class CheckoutPlatformApi : CheckoutPlatformInterface {
                                     presentationDelegate: dropInSessionPresentationDelegate!) { [weak self] result in
                 switch result {
                 case let .success(session):
-                    self?.session = session
-                    let dropInConfiguration = self?.createDropInConfiguration(dropInConfiguration: dropInConfiguration)
-                    let dropInComponent = DropInComponent(paymentMethods: session.sessionContext.paymentMethods,
-                                                          context: adyenContext,
-                                                          configuration: dropInConfiguration!)
-                    dropInComponent.delegate = session
-                    dropInComponent.partialPaymentDelegate = session
-                    self?.dropInComponent = dropInComponent
-                    self?.viewController?.present(dropInComponent.viewController, animated: true)
+                    do {
+                        self?.session = session
+                        let dropInConfiguration = try self?.createDropInConfiguration(dropInConfigurationDTO: dropInConfigurationDTO)
+                        let dropInComponent = DropInComponent(paymentMethods: session.sessionContext.paymentMethods,
+                                                              context: adyenContext,
+                                                              configuration: dropInConfiguration!)
+                        dropInComponent.delegate = session
+                        dropInComponent.partialPaymentDelegate = session
+                        self?.dropInComponent = dropInComponent
+                        self?.viewController?.present(dropInComponent.viewController, animated: true)
+                    } catch let error {
+                        self?.checkoutFlutterApi.onDropInSessionResult(sessionPaymentResult: PaymentResult(type: PaymentResultEnum.error, reason: error.localizedDescription)) {}
+                    }
                 case let .failure(error):
                     self?.checkoutFlutterApi.onDropInSessionResult(sessionPaymentResult: PaymentResult(type: PaymentResultEnum.error, reason: error.localizedDescription)) {}
                 }
@@ -64,17 +69,17 @@ class CheckoutPlatformApi : CheckoutPlatformInterface {
         }
     }
     
-    func startDropInAdvancedFlowPayment(dropInConfiguration: DropInConfigurationDTO, paymentMethodsResponse: String) {
+    func startDropInAdvancedFlowPayment(dropInConfigurationDTO: DropInConfigurationDTO, paymentMethodsResponse: String) {
         do {
             guard let viewController = getViewController() else {
                 return
             }
             
             self.viewController = viewController
-            let adyenContext = try createAdyenContext(dropInConfiguration: dropInConfiguration)
+            let adyenContext = try createAdyenContext(dropInConfiguration: dropInConfigurationDTO)
             let paymentMethods = try jsonDecoder.decode(PaymentMethods.self, from:Data(paymentMethodsResponse.utf8))
             let paymentMethodsWithoutGiftCards = removeGiftCardPaymentMethods(paymentMethods: paymentMethods)
-            let configuration = createDropInConfiguration(dropInConfiguration: dropInConfiguration)
+            let configuration = try createDropInConfiguration(dropInConfigurationDTO: dropInConfigurationDTO)
             let dropInComponent = DropInComponent(paymentMethods: paymentMethodsWithoutGiftCards,
                                                   context: adyenContext,
                                                   configuration: configuration)
@@ -145,26 +150,33 @@ class CheckoutPlatformApi : CheckoutPlatformInterface {
         }
     }
     
-    private func createDropInConfiguration(dropInConfiguration: DropInConfigurationDTO) -> DropInComponent.Configuration {
-        let koreanAuthenticationMode = determineFieldVisibility(visible: dropInConfiguration.cardsConfiguration?.kcpVisible)
-        let socialSecurityNumberMode = determineFieldVisibility(visible: dropInConfiguration.cardsConfiguration?.socialSecurityVisible)
-        let storedCardConfiguration = createStoredCardConfiguration(hideCvcStoredCard: dropInConfiguration.cardsConfiguration?.hideCvcStoredCard)
-        let allowedCardTypes = determineAllowedCardTypes(cardTypes: dropInConfiguration.cardsConfiguration?.supportedCardTypes)
-        let billingAddressConfiguration = determineBillingAddressConfiguration(addressMode: dropInConfiguration.cardsConfiguration?.addressMode)
-        let cardConfiguration = DropInComponent.Card.init(
-            showsHolderNameField: dropInConfiguration.cardsConfiguration?.holderNameRequired ?? false,
-            showsStorePaymentMethodField: dropInConfiguration.cardsConfiguration?.showStorePaymentField ?? true,
-            showsSecurityCodeField: dropInConfiguration.cardsConfiguration?.hideCvc == false,
-            koreanAuthenticationMode: koreanAuthenticationMode,
-            socialSecurityNumberMode: socialSecurityNumberMode,
-            storedCardConfiguration: storedCardConfiguration,
-            allowedCardTypes: allowedCardTypes,
-            billingAddress: billingAddressConfiguration
-        )
+    private func createDropInConfiguration(dropInConfigurationDTO: DropInConfigurationDTO) throws -> DropInComponent.Configuration {
+        let dropInConfiguration = DropInComponent.Configuration(allowsSkippingPaymentList: dropInConfigurationDTO.skipListWhenSinglePaymentMethod ?? false,
+                                                                allowPreselectedPaymentView: dropInConfigurationDTO.showPreselectedStoredPaymentMethod ?? false)
         
-        let dropInConfiguration = DropInComponent.Configuration(allowsSkippingPaymentList: dropInConfiguration.skipListWhenSinglePaymentMethod ?? false,
-                                                                allowPreselectedPaymentView: dropInConfiguration.showPreselectedStoredPaymentMethod ?? false)
-        dropInConfiguration.card = cardConfiguration
+        if let cardsConfigurationDTO = dropInConfigurationDTO.cardsConfigurationDTO {
+            let koreanAuthenticationMode = determineFieldVisibility(visible: cardsConfigurationDTO.kcpVisible)
+            let socialSecurityNumberMode = determineFieldVisibility(visible: cardsConfigurationDTO.socialSecurityVisible)
+            let storedCardConfiguration = createStoredCardConfiguration(hideCvcStoredCard: cardsConfigurationDTO.hideCvcStoredCard)
+            let allowedCardTypes = determineAllowedCardTypes(cardTypes: cardsConfigurationDTO.supportedCardTypes)
+            let billingAddressConfiguration = determineBillingAddressConfiguration(addressMode: cardsConfigurationDTO.addressMode)
+            let cardConfiguration = DropInComponent.Card.init(
+                showsHolderNameField: cardsConfigurationDTO.holderNameRequired,
+                showsStorePaymentMethodField: cardsConfigurationDTO.showStorePaymentField,
+                showsSecurityCodeField: cardsConfigurationDTO.hideCvc == false,
+                koreanAuthenticationMode: koreanAuthenticationMode,
+                socialSecurityNumberMode: socialSecurityNumberMode,
+                storedCardConfiguration: storedCardConfiguration,
+                allowedCardTypes: allowedCardTypes,
+                billingAddress: billingAddressConfiguration
+            )
+            
+            dropInConfiguration.card = cardConfiguration
+        }
+        
+        if let appleConfigurationDTO = dropInConfigurationDTO.applePayConfigurationDTO {
+            let appleConfiguration = try buildApplePayConfiguration(dropInConfigurationDTO: dropInConfigurationDTO)
+        }
         
         return dropInConfiguration
     }
@@ -211,7 +223,24 @@ class CheckoutPlatformApi : CheckoutPlatformInterface {
         return billingAddressConfiguration
     }
     
-   
+    private func buildApplePayConfiguration(dropInConfigurationDTO: DropInConfigurationDTO) throws -> Adyen.ApplePayComponent.Configuration {
+        let value = Int(dropInConfigurationDTO.amount.value)
+        guard let currencyCode : String = dropInConfigurationDTO.amount.currency else {
+            throw BalanceChecker.Error.unexpectedCurrencyCode
+        }
+        
+        let amount = AmountFormatter.decimalAmount(value,
+                                                   currencyCode: currencyCode,
+                                                   localeIdentifier: nil)
+        
+        let applePayPayment = try ApplePayPayment.init(countryCode: dropInConfigurationDTO.countryCode,
+                                                       currencyCode: currencyCode,
+                                                       summaryItems: [PKPaymentSummaryItem(label: dropInConfigurationDTO.applePayConfigurationDTO!.merchantName, amount: amount)])
+        
+        return ApplePayComponent.Configuration.init(payment: applePayPayment,
+                                                    merchantIdentifier: dropInConfigurationDTO.applePayConfigurationDTO!.merchantId)
+    }
+    
     
     private func handleDropInResult(dropInResult: DropInResult) {
         do {

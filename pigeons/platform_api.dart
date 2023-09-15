@@ -44,20 +44,22 @@ class DropInConfigurationDTO {
   final String clientKey;
   final String countryCode;
   final Amount amount;
-  final AnalyticsOptions? analyticsOptions;
+  final AnalyticsOptionsDTO? analyticsOptionsDTO;
   final bool? showPreselectedStoredPaymentMethod;
   final bool? skipListWhenSinglePaymentMethod;
-  final CardsConfigurationDTO? cardsConfiguration;
+  final CardsConfigurationDTO? cardsConfigurationDTO;
+  final ApplePayConfigurationDTO? applePayConfigurationDTO;
 
   DropInConfigurationDTO(
     this.environment,
     this.clientKey,
     this.countryCode,
     this.amount,
-    this.analyticsOptions,
-    this.cardsConfiguration,
+    this.analyticsOptionsDTO,
+    this.cardsConfigurationDTO,
     this.showPreselectedStoredPaymentMethod,
     this.skipListWhenSinglePaymentMethod,
+    this.applePayConfigurationDTO,
   );
 }
 
@@ -89,14 +91,26 @@ enum AddressMode {
   none,
 }
 
-class AnalyticsOptions {
+class AnalyticsOptionsDTO {
   final bool? enabled;
   final String? payload;
 
-  AnalyticsOptions({
+  AnalyticsOptionsDTO(
     this.enabled,
     this.payload,
-  });
+  );
+}
+
+class ApplePayConfigurationDTO {
+  final String merchantId;
+  final String merchantName;
+  final bool allowOnboarding;
+
+  ApplePayConfigurationDTO(
+    this.merchantId,
+    this.merchantName,
+    this.allowOnboarding,
+  );
 }
 
 class PaymentResult {
@@ -205,12 +219,12 @@ abstract class CheckoutPlatformInterface {
   String getReturnUrl();
 
   void startDropInSessionPayment(
-    DropInConfigurationDTO dropInConfiguration,
+    DropInConfigurationDTO dropInConfigurationDTO,
     Session session,
   );
 
   void startDropInAdvancedFlowPayment(
-    DropInConfigurationDTO dropInConfiguration,
+    DropInConfigurationDTO dropInConfigurationDTO,
     String paymentMethodsResponse,
   );
 

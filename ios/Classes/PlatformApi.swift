@@ -121,25 +121,30 @@ struct DropInConfigurationDTO {
   var clientKey: String
   var countryCode: String
   var amount: Amount
-  var analyticsOptions: AnalyticsOptions? = nil
+  var analyticsOptionsDTO: AnalyticsOptionsDTO? = nil
   var showPreselectedStoredPaymentMethod: Bool? = nil
   var skipListWhenSinglePaymentMethod: Bool? = nil
-  var cardsConfiguration: CardsConfigurationDTO? = nil
+  var cardsConfigurationDTO: CardsConfigurationDTO? = nil
+  var applePayConfigurationDTO: ApplePayConfigurationDTO? = nil
 
   static func fromList(_ list: [Any?]) -> DropInConfigurationDTO? {
     let environment = Environment(rawValue: list[0] as! Int)!
     let clientKey = list[1] as! String
     let countryCode = list[2] as! String
     let amount = Amount.fromList(list[3] as! [Any?])!
-    var analyticsOptions: AnalyticsOptions? = nil
-    if let analyticsOptionsList: [Any?] = nilOrValue(list[4]) {
-      analyticsOptions = AnalyticsOptions.fromList(analyticsOptionsList)
+    var analyticsOptionsDTO: AnalyticsOptionsDTO? = nil
+    if let analyticsOptionsDTOList: [Any?] = nilOrValue(list[4]) {
+      analyticsOptionsDTO = AnalyticsOptionsDTO.fromList(analyticsOptionsDTOList)
     }
     let showPreselectedStoredPaymentMethod: Bool? = nilOrValue(list[5])
     let skipListWhenSinglePaymentMethod: Bool? = nilOrValue(list[6])
-    var cardsConfiguration: CardsConfigurationDTO? = nil
-    if let cardsConfigurationList: [Any?] = nilOrValue(list[7]) {
-      cardsConfiguration = CardsConfigurationDTO.fromList(cardsConfigurationList)
+    var cardsConfigurationDTO: CardsConfigurationDTO? = nil
+    if let cardsConfigurationDTOList: [Any?] = nilOrValue(list[7]) {
+      cardsConfigurationDTO = CardsConfigurationDTO.fromList(cardsConfigurationDTOList)
+    }
+    var applePayConfigurationDTO: ApplePayConfigurationDTO? = nil
+    if let applePayConfigurationDTOList: [Any?] = nilOrValue(list[8]) {
+      applePayConfigurationDTO = ApplePayConfigurationDTO.fromList(applePayConfigurationDTOList)
     }
 
     return DropInConfigurationDTO(
@@ -147,10 +152,11 @@ struct DropInConfigurationDTO {
       clientKey: clientKey,
       countryCode: countryCode,
       amount: amount,
-      analyticsOptions: analyticsOptions,
+      analyticsOptionsDTO: analyticsOptionsDTO,
       showPreselectedStoredPaymentMethod: showPreselectedStoredPaymentMethod,
       skipListWhenSinglePaymentMethod: skipListWhenSinglePaymentMethod,
-      cardsConfiguration: cardsConfiguration
+      cardsConfigurationDTO: cardsConfigurationDTO,
+      applePayConfigurationDTO: applePayConfigurationDTO
     )
   }
   func toList() -> [Any?] {
@@ -159,10 +165,11 @@ struct DropInConfigurationDTO {
       clientKey,
       countryCode,
       amount.toList(),
-      analyticsOptions?.toList(),
+      analyticsOptionsDTO?.toList(),
       showPreselectedStoredPaymentMethod,
       skipListWhenSinglePaymentMethod,
-      cardsConfiguration?.toList(),
+      cardsConfigurationDTO?.toList(),
+      applePayConfigurationDTO?.toList(),
     ]
   }
 }
@@ -214,15 +221,15 @@ struct CardsConfigurationDTO {
 }
 
 /// Generated class from Pigeon that represents data sent in messages.
-struct AnalyticsOptions {
+struct AnalyticsOptionsDTO {
   var enabled: Bool? = nil
   var payload: String? = nil
 
-  static func fromList(_ list: [Any?]) -> AnalyticsOptions? {
+  static func fromList(_ list: [Any?]) -> AnalyticsOptionsDTO? {
     let enabled: Bool? = nilOrValue(list[0])
     let payload: String? = nilOrValue(list[1])
 
-    return AnalyticsOptions(
+    return AnalyticsOptionsDTO(
       enabled: enabled,
       payload: payload
     )
@@ -231,6 +238,32 @@ struct AnalyticsOptions {
     return [
       enabled,
       payload,
+    ]
+  }
+}
+
+/// Generated class from Pigeon that represents data sent in messages.
+struct ApplePayConfigurationDTO {
+  var merchantId: String
+  var merchantName: String
+  var allowOnboarding: Bool
+
+  static func fromList(_ list: [Any?]) -> ApplePayConfigurationDTO? {
+    let merchantId = list[0] as! String
+    let merchantName = list[1] as! String
+    let allowOnboarding = list[2] as! Bool
+
+    return ApplePayConfigurationDTO(
+      merchantId: merchantId,
+      merchantName: merchantName,
+      allowOnboarding: allowOnboarding
+    )
+  }
+  func toList() -> [Any?] {
+    return [
+      merchantId,
+      merchantName,
+      allowOnboarding,
     ]
   }
 }
@@ -427,16 +460,18 @@ private class CheckoutPlatformInterfaceCodecReader: FlutterStandardReader {
       case 128:
         return Amount.fromList(self.readValue() as! [Any?])
       case 129:
-        return AnalyticsOptions.fromList(self.readValue() as! [Any?])
+        return AnalyticsOptionsDTO.fromList(self.readValue() as! [Any?])
       case 130:
-        return CardsConfigurationDTO.fromList(self.readValue() as! [Any?])
+        return ApplePayConfigurationDTO.fromList(self.readValue() as! [Any?])
       case 131:
-        return DropInConfigurationDTO.fromList(self.readValue() as! [Any?])
+        return CardsConfigurationDTO.fromList(self.readValue() as! [Any?])
       case 132:
-        return DropInError.fromList(self.readValue() as! [Any?])
+        return DropInConfigurationDTO.fromList(self.readValue() as! [Any?])
       case 133:
-        return DropInResult.fromList(self.readValue() as! [Any?])
+        return DropInError.fromList(self.readValue() as! [Any?])
       case 134:
+        return DropInResult.fromList(self.readValue() as! [Any?])
+      case 135:
         return Session.fromList(self.readValue() as! [Any?])
       default:
         return super.readValue(ofType: type)
@@ -449,23 +484,26 @@ private class CheckoutPlatformInterfaceCodecWriter: FlutterStandardWriter {
     if let value = value as? Amount {
       super.writeByte(128)
       super.writeValue(value.toList())
-    } else if let value = value as? AnalyticsOptions {
+    } else if let value = value as? AnalyticsOptionsDTO {
       super.writeByte(129)
       super.writeValue(value.toList())
-    } else if let value = value as? CardsConfigurationDTO {
+    } else if let value = value as? ApplePayConfigurationDTO {
       super.writeByte(130)
       super.writeValue(value.toList())
-    } else if let value = value as? DropInConfigurationDTO {
+    } else if let value = value as? CardsConfigurationDTO {
       super.writeByte(131)
       super.writeValue(value.toList())
-    } else if let value = value as? DropInError {
+    } else if let value = value as? DropInConfigurationDTO {
       super.writeByte(132)
       super.writeValue(value.toList())
-    } else if let value = value as? DropInResult {
+    } else if let value = value as? DropInError {
       super.writeByte(133)
       super.writeValue(value.toList())
-    } else if let value = value as? Session {
+    } else if let value = value as? DropInResult {
       super.writeByte(134)
+      super.writeValue(value.toList())
+    } else if let value = value as? Session {
+      super.writeByte(135)
       super.writeValue(value.toList())
     } else {
       super.writeValue(value)
@@ -491,8 +529,8 @@ class CheckoutPlatformInterfaceCodec: FlutterStandardMessageCodec {
 protocol CheckoutPlatformInterface {
   func getPlatformVersion(completion: @escaping (Result<String, Error>) -> Void)
   func getReturnUrl(completion: @escaping (Result<String, Error>) -> Void)
-  func startDropInSessionPayment(dropInConfiguration: DropInConfigurationDTO, session: Session) throws
-  func startDropInAdvancedFlowPayment(dropInConfiguration: DropInConfigurationDTO, paymentMethodsResponse: String) throws
+  func startDropInSessionPayment(dropInConfigurationDTO: DropInConfigurationDTO, session: Session) throws
+  func startDropInAdvancedFlowPayment(dropInConfigurationDTO: DropInConfigurationDTO, paymentMethodsResponse: String) throws
   func onPaymentsResult(paymentsResult: DropInResult) throws
   func onPaymentsDetailsResult(paymentsDetailsResult: DropInResult) throws
 }
@@ -537,10 +575,10 @@ class CheckoutPlatformInterfaceSetup {
     if let api = api {
       startDropInSessionPaymentChannel.setMessageHandler { message, reply in
         let args = message as! [Any?]
-        let dropInConfigurationArg = args[0] as! DropInConfigurationDTO
+        let dropInConfigurationDTOArg = args[0] as! DropInConfigurationDTO
         let sessionArg = args[1] as! Session
         do {
-          try api.startDropInSessionPayment(dropInConfiguration: dropInConfigurationArg, session: sessionArg)
+          try api.startDropInSessionPayment(dropInConfigurationDTO: dropInConfigurationDTOArg, session: sessionArg)
           reply(wrapResult(nil))
         } catch {
           reply(wrapError(error))
@@ -553,10 +591,10 @@ class CheckoutPlatformInterfaceSetup {
     if let api = api {
       startDropInAdvancedFlowPaymentChannel.setMessageHandler { message, reply in
         let args = message as! [Any?]
-        let dropInConfigurationArg = args[0] as! DropInConfigurationDTO
+        let dropInConfigurationDTOArg = args[0] as! DropInConfigurationDTO
         let paymentMethodsResponseArg = args[1] as! String
         do {
-          try api.startDropInAdvancedFlowPayment(dropInConfiguration: dropInConfigurationArg, paymentMethodsResponse: paymentMethodsResponseArg)
+          try api.startDropInAdvancedFlowPayment(dropInConfigurationDTO: dropInConfigurationDTOArg, paymentMethodsResponse: paymentMethodsResponseArg)
           reply(wrapResult(nil))
         } catch {
           reply(wrapError(error))

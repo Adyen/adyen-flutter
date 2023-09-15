@@ -39,7 +39,7 @@ class AdyenCheckout implements AdyenCheckoutInterface {
       clientKey: dropInSession.dropInConfiguration.clientKey,
       countryCode: dropInSession.dropInConfiguration.countryCode,
       amount: dropInSession.dropInConfiguration.amount,
-      cardsConfiguration: dropInSession.dropInConfiguration.cardsConfiguration,
+      cardsConfigurationDTO: dropInSession.dropInConfiguration.cardsConfigurationDTO,
     );
     AdyenCheckoutPlatformInterface.instance.startDropInSessionPayment(
       dropInSession.session,
@@ -59,8 +59,8 @@ class AdyenCheckout implements AdyenCheckoutInterface {
       clientKey: dropInAdvancedFlow.dropInConfiguration.clientKey,
       countryCode: dropInAdvancedFlow.dropInConfiguration.countryCode,
       amount: dropInAdvancedFlow.dropInConfiguration.amount,
-      cardsConfiguration:
-          dropInAdvancedFlow.dropInConfiguration.cardsConfiguration,
+      cardsConfigurationDTO:
+          dropInAdvancedFlow.dropInConfiguration.cardsConfigurationDTO,
     );
     AdyenCheckoutPlatformInterface.instance.startDropInAdvancedFlowPayment(
       dropInAdvancedFlow.paymentMethodsResponse,

@@ -99,10 +99,11 @@ class DropInConfigurationDTO {
     required this.clientKey,
     required this.countryCode,
     required this.amount,
-    this.analyticsOptions,
+    this.analyticsOptionsDTO,
     this.showPreselectedStoredPaymentMethod,
     this.skipListWhenSinglePaymentMethod,
-    this.cardsConfiguration,
+    this.cardsConfigurationDTO,
+    this.applePayConfigurationDTO,
   });
 
   Environment environment;
@@ -113,13 +114,15 @@ class DropInConfigurationDTO {
 
   Amount amount;
 
-  AnalyticsOptions? analyticsOptions;
+  AnalyticsOptionsDTO? analyticsOptionsDTO;
 
   bool? showPreselectedStoredPaymentMethod;
 
   bool? skipListWhenSinglePaymentMethod;
 
-  CardsConfigurationDTO? cardsConfiguration;
+  CardsConfigurationDTO? cardsConfigurationDTO;
+
+  ApplePayConfigurationDTO? applePayConfigurationDTO;
 
   Object encode() {
     return <Object?>[
@@ -127,10 +130,11 @@ class DropInConfigurationDTO {
       clientKey,
       countryCode,
       amount.encode(),
-      analyticsOptions?.encode(),
+      analyticsOptionsDTO?.encode(),
       showPreselectedStoredPaymentMethod,
       skipListWhenSinglePaymentMethod,
-      cardsConfiguration?.encode(),
+      cardsConfigurationDTO?.encode(),
+      applePayConfigurationDTO?.encode(),
     ];
   }
 
@@ -141,13 +145,16 @@ class DropInConfigurationDTO {
       clientKey: result[1]! as String,
       countryCode: result[2]! as String,
       amount: Amount.decode(result[3]! as List<Object?>),
-      analyticsOptions: result[4] != null
-          ? AnalyticsOptions.decode(result[4]! as List<Object?>)
+      analyticsOptionsDTO: result[4] != null
+          ? AnalyticsOptionsDTO.decode(result[4]! as List<Object?>)
           : null,
       showPreselectedStoredPaymentMethod: result[5] as bool?,
       skipListWhenSinglePaymentMethod: result[6] as bool?,
-      cardsConfiguration: result[7] != null
+      cardsConfigurationDTO: result[7] != null
           ? CardsConfigurationDTO.decode(result[7]! as List<Object?>)
+          : null,
+      applePayConfigurationDTO: result[8] != null
+          ? ApplePayConfigurationDTO.decode(result[8]! as List<Object?>)
           : null,
     );
   }
@@ -209,8 +216,8 @@ class CardsConfigurationDTO {
   }
 }
 
-class AnalyticsOptions {
-  AnalyticsOptions({
+class AnalyticsOptionsDTO {
+  AnalyticsOptionsDTO({
     this.enabled,
     this.payload,
   });
@@ -226,11 +233,42 @@ class AnalyticsOptions {
     ];
   }
 
-  static AnalyticsOptions decode(Object result) {
+  static AnalyticsOptionsDTO decode(Object result) {
     result as List<Object?>;
-    return AnalyticsOptions(
+    return AnalyticsOptionsDTO(
       enabled: result[0] as bool?,
       payload: result[1] as String?,
+    );
+  }
+}
+
+class ApplePayConfigurationDTO {
+  ApplePayConfigurationDTO({
+    required this.merchantId,
+    required this.merchantName,
+    required this.allowOnboarding,
+  });
+
+  String merchantId;
+
+  String merchantName;
+
+  bool allowOnboarding;
+
+  Object encode() {
+    return <Object?>[
+      merchantId,
+      merchantName,
+      allowOnboarding,
+    ];
+  }
+
+  static ApplePayConfigurationDTO decode(Object result) {
+    result as List<Object?>;
+    return ApplePayConfigurationDTO(
+      merchantId: result[0]! as String,
+      merchantName: result[1]! as String,
+      allowOnboarding: result[2]! as bool,
     );
   }
 }
@@ -455,23 +493,26 @@ class _CheckoutPlatformInterfaceCodec extends StandardMessageCodec {
     if (value is Amount) {
       buffer.putUint8(128);
       writeValue(buffer, value.encode());
-    } else if (value is AnalyticsOptions) {
+    } else if (value is AnalyticsOptionsDTO) {
       buffer.putUint8(129);
       writeValue(buffer, value.encode());
-    } else if (value is CardsConfigurationDTO) {
+    } else if (value is ApplePayConfigurationDTO) {
       buffer.putUint8(130);
       writeValue(buffer, value.encode());
-    } else if (value is DropInConfigurationDTO) {
+    } else if (value is CardsConfigurationDTO) {
       buffer.putUint8(131);
       writeValue(buffer, value.encode());
-    } else if (value is DropInError) {
+    } else if (value is DropInConfigurationDTO) {
       buffer.putUint8(132);
       writeValue(buffer, value.encode());
-    } else if (value is DropInResult) {
+    } else if (value is DropInError) {
       buffer.putUint8(133);
       writeValue(buffer, value.encode());
-    } else if (value is Session) {
+    } else if (value is DropInResult) {
       buffer.putUint8(134);
+      writeValue(buffer, value.encode());
+    } else if (value is Session) {
+      buffer.putUint8(135);
       writeValue(buffer, value.encode());
     } else {
       super.writeValue(buffer, value);
@@ -484,16 +525,18 @@ class _CheckoutPlatformInterfaceCodec extends StandardMessageCodec {
       case 128: 
         return Amount.decode(readValue(buffer)!);
       case 129: 
-        return AnalyticsOptions.decode(readValue(buffer)!);
+        return AnalyticsOptionsDTO.decode(readValue(buffer)!);
       case 130: 
-        return CardsConfigurationDTO.decode(readValue(buffer)!);
+        return ApplePayConfigurationDTO.decode(readValue(buffer)!);
       case 131: 
-        return DropInConfigurationDTO.decode(readValue(buffer)!);
+        return CardsConfigurationDTO.decode(readValue(buffer)!);
       case 132: 
-        return DropInError.decode(readValue(buffer)!);
+        return DropInConfigurationDTO.decode(readValue(buffer)!);
       case 133: 
-        return DropInResult.decode(readValue(buffer)!);
+        return DropInError.decode(readValue(buffer)!);
       case 134: 
+        return DropInResult.decode(readValue(buffer)!);
+      case 135: 
         return Session.decode(readValue(buffer)!);
       default:
         return super.readValueOfType(type, buffer);
@@ -565,12 +608,12 @@ class CheckoutPlatformInterface {
     }
   }
 
-  Future<void> startDropInSessionPayment(DropInConfigurationDTO arg_dropInConfiguration, Session arg_session) async {
+  Future<void> startDropInSessionPayment(DropInConfigurationDTO arg_dropInConfigurationDTO, Session arg_session) async {
     final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
         'dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.startDropInSessionPayment', codec,
         binaryMessenger: _binaryMessenger);
     final List<Object?>? replyList =
-        await channel.send(<Object?>[arg_dropInConfiguration, arg_session]) as List<Object?>?;
+        await channel.send(<Object?>[arg_dropInConfigurationDTO, arg_session]) as List<Object?>?;
     if (replyList == null) {
       throw PlatformException(
         code: 'channel-error',
@@ -587,12 +630,12 @@ class CheckoutPlatformInterface {
     }
   }
 
-  Future<void> startDropInAdvancedFlowPayment(DropInConfigurationDTO arg_dropInConfiguration, String arg_paymentMethodsResponse) async {
+  Future<void> startDropInAdvancedFlowPayment(DropInConfigurationDTO arg_dropInConfigurationDTO, String arg_paymentMethodsResponse) async {
     final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
         'dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.startDropInAdvancedFlowPayment', codec,
         binaryMessenger: _binaryMessenger);
     final List<Object?>? replyList =
-        await channel.send(<Object?>[arg_dropInConfiguration, arg_paymentMethodsResponse]) as List<Object?>?;
+        await channel.send(<Object?>[arg_dropInConfigurationDTO, arg_paymentMethodsResponse]) as List<Object?>?;
     if (replyList == null) {
       throw PlatformException(
         code: 'channel-error',

@@ -6,7 +6,6 @@ export 'src/generated/platform_api.g.dart'
         Environment,
         Session,
         OrderResponseModel,
-        AnalyticsOptions,
         AddressMode;
 export 'src/models/adyen_configuration.dart';
 export 'src/models/drop_in_outcome.dart';

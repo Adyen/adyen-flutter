@@ -155,10 +155,11 @@ data class DropInConfigurationDTO (
   val clientKey: String,
   val countryCode: String,
   val amount: Amount,
-  val analyticsOptions: AnalyticsOptions? = null,
+  val analyticsOptionsDTO: AnalyticsOptionsDTO? = null,
   val showPreselectedStoredPaymentMethod: Boolean? = null,
   val skipListWhenSinglePaymentMethod: Boolean? = null,
-  val cardsConfiguration: CardsConfigurationDTO? = null
+  val cardsConfigurationDTO: CardsConfigurationDTO? = null,
+  val applePayConfigurationDTO: ApplePayConfigurationDTO? = null
 
 ) {
   companion object {
@@ -168,15 +169,18 @@ data class DropInConfigurationDTO (
       val clientKey = list[1] as String
       val countryCode = list[2] as String
       val amount = Amount.fromList(list[3] as List<Any?>)
-      val analyticsOptions: AnalyticsOptions? = (list[4] as List<Any?>?)?.let {
-        AnalyticsOptions.fromList(it)
+      val analyticsOptionsDTO: AnalyticsOptionsDTO? = (list[4] as List<Any?>?)?.let {
+        AnalyticsOptionsDTO.fromList(it)
       }
       val showPreselectedStoredPaymentMethod = list[5] as Boolean?
       val skipListWhenSinglePaymentMethod = list[6] as Boolean?
-      val cardsConfiguration: CardsConfigurationDTO? = (list[7] as List<Any?>?)?.let {
+      val cardsConfigurationDTO: CardsConfigurationDTO? = (list[7] as List<Any?>?)?.let {
         CardsConfigurationDTO.fromList(it)
       }
-      return DropInConfigurationDTO(environment, clientKey, countryCode, amount, analyticsOptions, showPreselectedStoredPaymentMethod, skipListWhenSinglePaymentMethod, cardsConfiguration)
+      val applePayConfigurationDTO: ApplePayConfigurationDTO? = (list[8] as List<Any?>?)?.let {
+        ApplePayConfigurationDTO.fromList(it)
+      }
+      return DropInConfigurationDTO(environment, clientKey, countryCode, amount, analyticsOptionsDTO, showPreselectedStoredPaymentMethod, skipListWhenSinglePaymentMethod, cardsConfigurationDTO, applePayConfigurationDTO)
     }
   }
   fun toList(): List<Any?> {
@@ -185,10 +189,11 @@ data class DropInConfigurationDTO (
       clientKey,
       countryCode,
       amount.toList(),
-      analyticsOptions?.toList(),
+      analyticsOptionsDTO?.toList(),
       showPreselectedStoredPaymentMethod,
       skipListWhenSinglePaymentMethod,
-      cardsConfiguration?.toList(),
+      cardsConfigurationDTO?.toList(),
+      applePayConfigurationDTO?.toList(),
     )
   }
 }
@@ -234,23 +239,48 @@ data class CardsConfigurationDTO (
 }
 
 /** Generated class from Pigeon that represents data sent in messages. */
-data class AnalyticsOptions (
+data class AnalyticsOptionsDTO (
   val enabled: Boolean? = null,
   val payload: String? = null
 
 ) {
   companion object {
     @Suppress("UNCHECKED_CAST")
-    fun fromList(list: List<Any?>): AnalyticsOptions {
+    fun fromList(list: List<Any?>): AnalyticsOptionsDTO {
       val enabled = list[0] as Boolean?
       val payload = list[1] as String?
-      return AnalyticsOptions(enabled, payload)
+      return AnalyticsOptionsDTO(enabled, payload)
     }
   }
   fun toList(): List<Any?> {
     return listOf<Any?>(
       enabled,
       payload,
+    )
+  }
+}
+
+/** Generated class from Pigeon that represents data sent in messages. */
+data class ApplePayConfigurationDTO (
+  val merchantId: String,
+  val merchantName: String,
+  val allowOnboarding: Boolean
+
+) {
+  companion object {
+    @Suppress("UNCHECKED_CAST")
+    fun fromList(list: List<Any?>): ApplePayConfigurationDTO {
+      val merchantId = list[0] as String
+      val merchantName = list[1] as String
+      val allowOnboarding = list[2] as Boolean
+      return ApplePayConfigurationDTO(merchantId, merchantName, allowOnboarding)
+    }
+  }
+  fun toList(): List<Any?> {
+    return listOf<Any?>(
+      merchantId,
+      merchantName,
+      allowOnboarding,
     )
   }
 }
@@ -437,30 +467,35 @@ private object CheckoutPlatformInterfaceCodec : StandardMessageCodec() {
       }
       129.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          AnalyticsOptions.fromList(it)
+          AnalyticsOptionsDTO.fromList(it)
         }
       }
       130.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          CardsConfigurationDTO.fromList(it)
+          ApplePayConfigurationDTO.fromList(it)
         }
       }
       131.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          DropInConfigurationDTO.fromList(it)
+          CardsConfigurationDTO.fromList(it)
         }
       }
       132.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          DropInError.fromList(it)
+          DropInConfigurationDTO.fromList(it)
         }
       }
       133.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          DropInResult.fromList(it)
+          DropInError.fromList(it)
         }
       }
       134.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          DropInResult.fromList(it)
+        }
+      }
+      135.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
           Session.fromList(it)
         }
@@ -474,28 +509,32 @@ private object CheckoutPlatformInterfaceCodec : StandardMessageCodec() {
         stream.write(128)
         writeValue(stream, value.toList())
       }
-      is AnalyticsOptions -> {
+      is AnalyticsOptionsDTO -> {
         stream.write(129)
         writeValue(stream, value.toList())
       }
-      is CardsConfigurationDTO -> {
+      is ApplePayConfigurationDTO -> {
         stream.write(130)
         writeValue(stream, value.toList())
       }
-      is DropInConfigurationDTO -> {
+      is CardsConfigurationDTO -> {
         stream.write(131)
         writeValue(stream, value.toList())
       }
-      is DropInError -> {
+      is DropInConfigurationDTO -> {
         stream.write(132)
         writeValue(stream, value.toList())
       }
-      is DropInResult -> {
+      is DropInError -> {
         stream.write(133)
         writeValue(stream, value.toList())
       }
-      is Session -> {
+      is DropInResult -> {
         stream.write(134)
+        writeValue(stream, value.toList())
+      }
+      is Session -> {
+        stream.write(135)
         writeValue(stream, value.toList())
       }
       else -> super.writeValue(stream, value)
@@ -507,8 +546,8 @@ private object CheckoutPlatformInterfaceCodec : StandardMessageCodec() {
 interface CheckoutPlatformInterface {
   fun getPlatformVersion(callback: (Result<String>) -> Unit)
   fun getReturnUrl(callback: (Result<String>) -> Unit)
-  fun startDropInSessionPayment(dropInConfiguration: DropInConfigurationDTO, session: Session)
-  fun startDropInAdvancedFlowPayment(dropInConfiguration: DropInConfigurationDTO, paymentMethodsResponse: String)
+  fun startDropInSessionPayment(dropInConfigurationDTO: DropInConfigurationDTO, session: Session)
+  fun startDropInAdvancedFlowPayment(dropInConfigurationDTO: DropInConfigurationDTO, paymentMethodsResponse: String)
   fun onPaymentsResult(paymentsResult: DropInResult)
   fun onPaymentsDetailsResult(paymentsDetailsResult: DropInResult)
 
@@ -561,11 +600,11 @@ interface CheckoutPlatformInterface {
         if (api != null) {
           channel.setMessageHandler { message, reply ->
             val args = message as List<Any?>
-            val dropInConfigurationArg = args[0] as DropInConfigurationDTO
+            val dropInConfigurationDTOArg = args[0] as DropInConfigurationDTO
             val sessionArg = args[1] as Session
             var wrapped: List<Any?>
             try {
-              api.startDropInSessionPayment(dropInConfigurationArg, sessionArg)
+              api.startDropInSessionPayment(dropInConfigurationDTOArg, sessionArg)
               wrapped = listOf<Any?>(null)
             } catch (exception: Throwable) {
               wrapped = wrapError(exception)
@@ -581,11 +620,11 @@ interface CheckoutPlatformInterface {
         if (api != null) {
           channel.setMessageHandler { message, reply ->
             val args = message as List<Any?>
-            val dropInConfigurationArg = args[0] as DropInConfigurationDTO
+            val dropInConfigurationDTOArg = args[0] as DropInConfigurationDTO
             val paymentMethodsResponseArg = args[1] as String
             var wrapped: List<Any?>
             try {
-              api.startDropInAdvancedFlowPayment(dropInConfigurationArg, paymentMethodsResponseArg)
+              api.startDropInAdvancedFlowPayment(dropInConfigurationDTOArg, paymentMethodsResponseArg)
               wrapped = listOf<Any?>(null)
             } catch (exception: Throwable) {
               wrapped = wrapError(exception)
