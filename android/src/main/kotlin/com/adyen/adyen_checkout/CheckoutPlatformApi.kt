@@ -35,138 +35,139 @@ import org.json.JSONObject
 @Suppress("NAME_SHADOWING")
 class CheckoutPlatformApi(private val checkoutFlutterApi: CheckoutFlutterApi?) :
     CheckoutPlatformInterface {
-    lateinit var activity: FragmentActivity
-    lateinit var dropInSessionLauncher: ActivityResultLauncher<SessionDropInResultContractParams>
-    lateinit var dropInAdvancedFlowLauncher: ActivityResultLauncher<DropInResultContractParams>
+        lateinit var activity: FragmentActivity
+        lateinit var dropInSessionLauncher:
+            ActivityResultLauncher<SessionDropInResultContractParams>
+        lateinit var dropInAdvancedFlowLauncher: ActivityResultLauncher<DropInResultContractParams>
 
-    override fun getPlatformVersion(callback: (Result<String>) -> Unit) {
-        callback.invoke(Result.success("Android ${android.os.Build.VERSION.RELEASE}"))
-    }
+        override fun getPlatformVersion(callback: (Result<String>) -> Unit) {
+            callback.invoke(Result.success("Android ${android.os.Build.VERSION.RELEASE}"))
+        }
 
-    override fun getReturnUrl(callback: (Result<String>) -> Unit) {
-        callback(Result.success(RedirectComponent.getReturnUrl(activity.applicationContext)))
-    }
+        override fun getReturnUrl(callback: (Result<String>) -> Unit) {
+            callback(Result.success(RedirectComponent.getReturnUrl(activity.applicationContext)))
+        }
 
-    override fun startDropInSessionPayment(
-        dropInConfiguration: DropInConfiguration,
-        session: Session,
-    ) {
-        checkForFlutterFragmentActivity()
-        activity.lifecycleScope.launch(Dispatchers.IO) {
-            val sessionModel = session.mapToSession()
-            val dropInConfiguration =
-                dropInConfiguration.mapToDropInConfiguration(activity.applicationContext)
-            val checkoutSession = createCheckoutSession(sessionModel, dropInConfiguration)
-            withContext(Dispatchers.Main) {
-                DropIn.startPayment(
-                    activity.applicationContext,
-                    dropInSessionLauncher,
-                    checkoutSession,
-                    dropInConfiguration
+        override fun startDropInSessionPayment(
+            dropInConfiguration: DropInConfiguration,
+            session: Session,
+        ) {
+            checkForFlutterFragmentActivity()
+            activity.lifecycleScope.launch(Dispatchers.IO) {
+                val sessionModel = session.mapToSession()
+                val dropInConfiguration =
+                    dropInConfiguration.mapToDropInConfiguration(activity.applicationContext)
+                val checkoutSession = createCheckoutSession(sessionModel, dropInConfiguration)
+                withContext(Dispatchers.Main) {
+                    DropIn.startPayment(
+                        activity.applicationContext,
+                        dropInSessionLauncher,
+                        checkoutSession,
+                        dropInConfiguration,
+                    )
+                }
+            }
+        }
+
+        override fun startDropInAdvancedFlowPayment(
+            dropInConfiguration: DropInConfiguration,
+            paymentMethodsResponse: String,
+        ) {
+            checkForFlutterFragmentActivity()
+            setAdvancedFlowDropInServiceObserver()
+            activity.lifecycleScope.launch(Dispatchers.IO) {
+                val paymentMethodsApiResponse = PaymentMethodsApiResponse.SERIALIZER.deserialize(
+                    JSONObject(paymentMethodsResponse),
                 )
+                val paymentMethodsWithoutGiftCards =
+                    removeGiftCardPaymentMethods(paymentMethodsApiResponse)
+                val dropInConfiguration =
+                    dropInConfiguration.mapToDropInConfiguration(activity.applicationContext)
+                withContext(Dispatchers.Main) {
+                    DropIn.startPayment(
+                        activity.applicationContext,
+                        dropInAdvancedFlowLauncher,
+                        paymentMethodsWithoutGiftCards,
+                        dropInConfiguration,
+                        AdvancedFlowDropInService::class.java,
+                    )
+                }
             }
         }
 
-    }
+        override fun onPaymentsResult(paymentsResult: DropInResult) {
+            if (paymentsResult.dropInResultType == DropInResultType.ACTION) {
+                setAdvanceFlowDropInAdditionalDetailsMessengerObserver()
+            }
 
-    override fun startDropInAdvancedFlowPayment(
-        dropInConfiguration: DropInConfiguration,
-        paymentMethodsResponse: String,
-    ) {
-        checkForFlutterFragmentActivity()
-        setAdvancedFlowDropInServiceObserver()
-        activity.lifecycleScope.launch(Dispatchers.IO) {
-            val paymentMethodsApiResponse = PaymentMethodsApiResponse.SERIALIZER.deserialize(
-                JSONObject(paymentMethodsResponse)
-            )
-            val paymentMethodsWithoutGiftCards =
-                removeGiftCardPaymentMethods(paymentMethodsApiResponse)
-            val dropInConfiguration =
-                dropInConfiguration.mapToDropInConfiguration(activity.applicationContext)
-            withContext(Dispatchers.Main) {
-                DropIn.startPayment(
-                    activity.applicationContext,
-                    dropInAdvancedFlowLauncher,
-                    paymentMethodsWithoutGiftCards,
-                    dropInConfiguration,
-                    AdvancedFlowDropInService::class.java,
+            DropInPaymentResultMessenger.sendResult(paymentsResult)
+        }
+
+        override fun onPaymentsDetailsResult(paymentsDetailsResult: DropInResult) {
+            DropInAdditionalDetailsResultMessenger.sendResult(paymentsDetailsResult)
+        }
+
+        private suspend fun createCheckoutSession(
+            sessionModel: com.adyen.checkout.sessions.core.SessionModel,
+            dropInConfiguration: com.adyen.checkout.dropin.DropInConfiguration,
+        ): CheckoutSession {
+            val checkoutSessionResult =
+                CheckoutSessionProvider.createSession(sessionModel, dropInConfiguration)
+            return when (checkoutSessionResult) {
+                is CheckoutSessionResult.Success -> checkoutSessionResult.checkoutSession
+                is CheckoutSessionResult.Error -> throw checkoutSessionResult.exception
+            }
+        }
+
+        private fun setAdvancedFlowDropInServiceObserver() {
+            DropInServiceResultMessenger.instance().removeObservers(activity)
+            DropInServiceResultMessenger.instance().observe(activity) { message ->
+                if (message.hasBeenHandled()) {
+                    return@observe
+                }
+
+                val model = PlatformCommunicationModel(
+                    PlatformCommunicationType.PAYMENTCOMPONENT,
+                    data = message.contentIfNotHandled.toString(),
                 )
+                checkoutFlutterApi?.onDropInAdvancedFlowPlatformCommunication(model) {}
             }
         }
-    }
 
-    override fun onPaymentsResult(paymentsResult: DropInResult) {
-        if (paymentsResult.dropInResultType == DropInResultType.ACTION) {
-            setAdvanceFlowDropInAdditionalDetailsMessengerObserver()
-        }
+        private fun setAdvanceFlowDropInAdditionalDetailsMessengerObserver() {
+            DropInAdditionalDetailsPlatformMessenger.instance().removeObservers(activity)
+            DropInAdditionalDetailsPlatformMessenger.instance().observe(activity) { message ->
+                if (message.hasBeenHandled()) {
+                    return@observe
+                }
 
-        DropInPaymentResultMessenger.sendResult(paymentsResult)
-    }
-
-    override fun onPaymentsDetailsResult(paymentsDetailsResult: DropInResult) {
-        DropInAdditionalDetailsResultMessenger.sendResult(paymentsDetailsResult)
-    }
-
-    private suspend fun createCheckoutSession(
-        sessionModel: com.adyen.checkout.sessions.core.SessionModel,
-        dropInConfiguration: com.adyen.checkout.dropin.DropInConfiguration
-    ): CheckoutSession {
-        val checkoutSessionResult =
-            CheckoutSessionProvider.createSession(sessionModel, dropInConfiguration)
-        return when (checkoutSessionResult) {
-            is CheckoutSessionResult.Success -> checkoutSessionResult.checkoutSession
-            is CheckoutSessionResult.Error -> throw checkoutSessionResult.exception
-        }
-    }
-
-
-    private fun setAdvancedFlowDropInServiceObserver() {
-        DropInServiceResultMessenger.instance().removeObservers(activity)
-        DropInServiceResultMessenger.instance().observe(activity) { message ->
-            if (message.hasBeenHandled()) {
-                return@observe
+                val model = PlatformCommunicationModel(
+                    PlatformCommunicationType.ADDITIONALDETAILS,
+                    data = message.contentIfNotHandled.toString(),
+                )
+                checkoutFlutterApi?.onDropInAdvancedFlowPlatformCommunication(model) {}
             }
+        }
 
-            val model = PlatformCommunicationModel(
-                PlatformCommunicationType.PAYMENTCOMPONENT,
-                data = message.contentIfNotHandled.toString()
+        private fun checkForFlutterFragmentActivity() {
+            if (!this::activity.isInitialized) {
+                throw Exception(WRONG_FLUTTER_ACTIVITY_USAGE_ERROR_MESSAGE)
+            }
+        }
+
+        // Gift cards will be supported in a later version
+        private fun removeGiftCardPaymentMethods(
+            paymentMethodsResponse: PaymentMethodsApiResponse
+        ): PaymentMethodsApiResponse {
+            val giftCardTypeIdentifier = "giftcard"
+            val storedPaymentMethods =
+                paymentMethodsResponse.storedPaymentMethods?.filterNot { it.type == giftCardTypeIdentifier }
+            val paymentMethods =
+                paymentMethodsResponse.paymentMethods?.filterNot { it.type == giftCardTypeIdentifier }
+
+            return PaymentMethodsApiResponse(
+                storedPaymentMethods = storedPaymentMethods,
+                paymentMethods = paymentMethods
             )
-            checkoutFlutterApi?.onDropInAdvancedFlowPlatformCommunication(model) {}
         }
     }
-
-    private fun setAdvanceFlowDropInAdditionalDetailsMessengerObserver() {
-        DropInAdditionalDetailsPlatformMessenger.instance().removeObservers(activity)
-        DropInAdditionalDetailsPlatformMessenger.instance().observe(activity) { message ->
-            if (message.hasBeenHandled()) {
-                return@observe
-            }
-
-            val model = PlatformCommunicationModel(
-                PlatformCommunicationType.ADDITIONALDETAILS,
-                data = message.contentIfNotHandled.toString()
-            )
-            checkoutFlutterApi?.onDropInAdvancedFlowPlatformCommunication(model) {}
-        }
-    }
-
-    private fun checkForFlutterFragmentActivity() {
-        if (!this::activity.isInitialized) {
-            throw Exception(WRONG_FLUTTER_ACTIVITY_USAGE_ERROR_MESSAGE)
-        }
-    }
-
-    //Gift cards will be supported in a later version
-    private fun removeGiftCardPaymentMethods(paymentMethodsResponse: PaymentMethodsApiResponse): PaymentMethodsApiResponse {
-        val giftCardTypeIdentifier = "giftcard"
-        val storedPaymentMethods =
-            paymentMethodsResponse.storedPaymentMethods?.filterNot { it.type == giftCardTypeIdentifier }
-        val paymentMethods =
-            paymentMethodsResponse.paymentMethods?.filterNot { it.type == giftCardTypeIdentifier }
-
-        return PaymentMethodsApiResponse(
-            storedPaymentMethods = storedPaymentMethods,
-            paymentMethods = paymentMethods
-        )
-    }
-}

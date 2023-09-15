@@ -20,8 +20,8 @@ object Mapper {
         return com.adyen.checkout.dropin.DropInConfiguration.Builder(
             context,
             this.environment.mapToEnvironment(),
-            clientKey
-        ).setAmount(amount).build();
+            clientKey,
+        ).setAmount(amount).build()
     }
 
     private fun Environment.mapToEnvironment(): com.adyen.checkout.core.Environment {
@@ -33,7 +33,6 @@ object Mapper {
             Environment.INDIA -> SDKEnvironment.INDIA
             Environment.APSE -> SDKEnvironment.APSE
         }
-
     }
 
     private fun Amount.mapToAmount(): com.adyen.checkout.components.core.Amount {
@@ -49,7 +48,7 @@ object Mapper {
             pspReference = pspReference,
             orderData = orderData,
             amount = amount?.mapTopAmount(),
-            remainingAmount = remainingAmount?.mapTopAmount()
+            remainingAmount = remainingAmount?.mapTopAmount(),
         )
     }
 }
