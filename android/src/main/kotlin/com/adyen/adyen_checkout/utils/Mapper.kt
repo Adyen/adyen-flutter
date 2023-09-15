@@ -1,11 +1,17 @@
 package com.adyen.adyen_checkout.utils
 
+import AddressMode
 import Amount
-import Configuration
+import DropInConfigurationDTO
 import Environment
 import OrderResponseModel
 import Session
 import android.content.Context
+import com.adyen.checkout.card.AddressConfiguration
+import com.adyen.checkout.card.CardConfiguration
+import com.adyen.checkout.card.CardType
+import com.adyen.checkout.card.KCPAuthVisibility
+import com.adyen.checkout.card.SocialSecurityNumberVisibility
 import com.adyen.checkout.components.core.OrderResponse
 import com.adyen.checkout.core.Environment as SDKEnvironment
 
@@ -15,13 +21,67 @@ object Mapper {
         return com.adyen.checkout.sessions.core.SessionModel(this.id, this.sessionData)
     }
 
-    fun Configuration.mapToDropInConfiguration(context: Context): com.adyen.checkout.dropin.DropInConfiguration {
+    fun DropInConfigurationDTO.mapToDropInConfiguration(context: Context): com.adyen.checkout.dropin.DropInConfiguration {
+        val environment = this.environment.mapToEnvironment()
+        val cardConfiguration = CardConfiguration.Builder(
+                context = context,
+                environment = environment,
+                clientKey = this.clientKey
+        )
+                .setShowStorePaymentField(cardsConfiguration?.showStorePaymentField ?: false)
+                .setAddressConfiguration(cardsConfiguration?.addressMode?.mapToAddressConfiguration()
+                        ?: AddressConfiguration.None)
+                .setShowStorePaymentField(cardsConfiguration?.showStorePaymentField ?: false)
+                .setHideCvcStoredCard(cardsConfiguration?.hideCvcStoredCard ?: false)
+                .setHideCvc(cardsConfiguration?.hideCvc ?: false)
+                .setKcpAuthVisibility(determineKcpAuthVisibility(cardsConfiguration?.kcpVisible))
+                .setSocialSecurityNumberVisibility(determineSocialSecurityNumberVisibility(cardsConfiguration?.socialSecurityVisible))
+                .setSupportedCardTypes(*mapToSupportedCardTypes(cardsConfiguration?.supportedCardTypes))
+                .setHolderNameRequired(cardsConfiguration?.holderNameRequired ?: false)
+                .build()
         val amount = this.amount.mapToAmount()
         return com.adyen.checkout.dropin.DropInConfiguration.Builder(
             context,
             this.environment.mapToEnvironment(),
             clientKey,
         ).setAmount(amount).build()
+                context,
+                this.environment.mapToEnvironment(),
+                clientKey
+        ).setAmount(amount).addCardConfiguration(cardConfiguration).build();
+    }
+
+    private fun AddressMode.mapToAddressConfiguration(): AddressConfiguration {
+        return when (this) {
+            AddressMode.FULL -> AddressConfiguration.FullAddress()
+            AddressMode.POSTALCODE -> AddressConfiguration.PostalCode()
+            AddressMode.NONE -> AddressConfiguration.None
+        }
+    }
+
+    private fun determineKcpAuthVisibility(visible: Boolean?): KCPAuthVisibility {
+        return when (visible) {
+            true -> KCPAuthVisibility.SHOW
+            else -> KCPAuthVisibility.HIDE
+        }
+    }
+
+    private fun determineSocialSecurityNumberVisibility(visible: Boolean?): SocialSecurityNumberVisibility {
+        return when (visible) {
+            true -> SocialSecurityNumberVisibility.SHOW
+            else -> SocialSecurityNumberVisibility.HIDE
+        }
+    }
+
+    private fun mapToSupportedCardTypes(cardTypes: List<String?>?): Array<CardType> {
+        if (cardTypes == null) {
+            return emptyArray()
+        }
+
+        val mappedCardTypes = cardTypes.map { cardBrandName ->
+            cardBrandName?.let { CardType.getByBrandName(it.lowercase()) }
+        }
+        return mappedCardTypes.filterNotNull().toTypedArray() ?: emptyArray()
     }
 
     private fun Environment.mapToEnvironment(): com.adyen.checkout.core.Environment {
@@ -45,10 +105,10 @@ object Mapper {
 
     fun OrderResponse.mapToOrderResponseModel(): OrderResponseModel {
         return OrderResponseModel(
-            pspReference = pspReference,
-            orderData = orderData,
-            amount = amount?.mapTopAmount(),
-            remainingAmount = remainingAmount?.mapTopAmount(),
+                pspReference = pspReference,
+                orderData = orderData,
+                amount = amount?.mapTopAmount(),
+                remainingAmount = remainingAmount?.mapTopAmount(),
         )
     }
 }

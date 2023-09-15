@@ -109,7 +109,7 @@ class _MyAppState extends State<MyApp> {
         await _adyenSessionRepository.fetchPaymentMethods();
 
     final CardsConfiguration cardsConfiguration = CardsConfiguration(
-      holderNameRequired: true
+      holderNameRequired: true,
     );
 
     final DropInConfiguration dropInConfiguration = DropInConfiguration(

@@ -47,7 +47,7 @@ class CheckoutPlatformApi : CheckoutPlatformInterface {
                 switch result {
                 case let .success(session):
                     self?.session = session
-                    let dropInConfiguration = self?.createDropInConfiguration()
+                    let dropInConfiguration = self?.createDropInConfiguration(dropInConfiguration: dropInConfiguration)
                     let dropInComponent = DropInComponent(paymentMethods: session.sessionContext.paymentMethods,
                                                           context: adyenContext,
                                                           configuration: dropInConfiguration!)
@@ -74,7 +74,7 @@ class CheckoutPlatformApi : CheckoutPlatformInterface {
             let adyenContext = try createAdyenContext(dropInConfiguration: dropInConfiguration)
             let paymentMethods = try jsonDecoder.decode(PaymentMethods.self, from:Data(paymentMethodsResponse.utf8))
             let paymentMethodsWithoutGiftCards = removeGiftCardPaymentMethods(paymentMethods: paymentMethods)
-            let configuration = createDropInConfiguration()
+            let configuration = createDropInConfiguration(dropInConfiguration: dropInConfiguration)
             let dropInComponent = DropInComponent(paymentMethods: paymentMethodsWithoutGiftCards,
                                                   context: adyenContext,
                                                   configuration: configuration)
@@ -145,9 +145,73 @@ class CheckoutPlatformApi : CheckoutPlatformInterface {
         }
     }
     
-    private func createDropInConfiguration() -> DropInComponent.Configuration {
-        return DropInComponent.Configuration()
+    private func createDropInConfiguration(dropInConfiguration: DropInConfigurationDTO) -> DropInComponent.Configuration {
+        let koreanAuthenticationMode = determineFieldVisibility(visible: dropInConfiguration.cardsConfiguration?.kcpVisible)
+        let socialSecurityNumberMode = determineFieldVisibility(visible: dropInConfiguration.cardsConfiguration?.socialSecurityVisible)
+        let storedCardConfiguration = createStoredCardConfiguration(hideCvcStoredCard: dropInConfiguration.cardsConfiguration?.hideCvcStoredCard)
+        let allowedCardTypes = determineAllowedCardTypes(cardTypes: dropInConfiguration.cardsConfiguration?.supportedCardTypes)
+        let billingAddressConfiguration = determineBillingAddressConfiguration(addressMode: dropInConfiguration.cardsConfiguration?.addressMode)
+        let cardConfiguration = DropInComponent.Card.init(
+            showsHolderNameField: dropInConfiguration.cardsConfiguration?.holderNameRequired ?? false,
+            showsStorePaymentMethodField: dropInConfiguration.cardsConfiguration?.showStorePaymentField ?? true,
+            showsSecurityCodeField: dropInConfiguration.cardsConfiguration?.hideCvc == false,
+            koreanAuthenticationMode: koreanAuthenticationMode,
+            socialSecurityNumberMode: socialSecurityNumberMode,
+            storedCardConfiguration: storedCardConfiguration,
+            allowedCardTypes: allowedCardTypes,
+            billingAddress: billingAddressConfiguration
+        )
+        
+        let dropInConfiguration = DropInComponent.Configuration(allowsSkippingPaymentList: dropInConfiguration.skipListWhenSinglePaymentMethod ?? false,
+                                                                allowPreselectedPaymentView: dropInConfiguration.showPreselectedStoredPaymentMethod ?? false)
+        dropInConfiguration.card = cardConfiguration
+        
+        return dropInConfiguration
     }
+    
+    private func determineFieldVisibility(visible: Bool?) -> CardComponent.FieldVisibility {
+        if (visible == true) {
+            return .show
+        } else {
+            return .hide
+        }
+    }
+    
+    private func createStoredCardConfiguration(hideCvcStoredCard: Bool?) -> StoredCardConfiguration {
+        var storedCardConfiguration = StoredCardConfiguration()
+        storedCardConfiguration.showsSecurityCodeField = hideCvcStoredCard ?? true
+        return storedCardConfiguration;
+    }
+    
+    private func determineAllowedCardTypes(cardTypes: [String?]?) -> [CardType]? {
+        guard let mappedCardTypes = cardTypes else {
+            return nil
+        }
+        
+        if mappedCardTypes.isEmpty {
+            return nil
+        }
+        
+        return mappedCardTypes.compactMap{$0}.map { CardType(rawValue: $0.lowercased()) }
+    }
+    
+    private func determineBillingAddressConfiguration(addressMode: AddressMode?) -> BillingAddressConfiguration {
+        var billingAddressConfiguration = BillingAddressConfiguration.init()
+        switch addressMode {
+            case .full:
+                billingAddressConfiguration.mode = CardComponent.AddressFormType.full
+            case .postalCode:
+                billingAddressConfiguration.mode = CardComponent.AddressFormType.postalCode
+            case .none?:
+                billingAddressConfiguration.mode = CardComponent.AddressFormType.none
+            default:
+                billingAddressConfiguration.mode = CardComponent.AddressFormType.none
+        }
+        
+        return billingAddressConfiguration
+    }
+    
+   
     
     private func handleDropInResult(dropInResult: DropInResult) {
         do {

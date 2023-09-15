@@ -2,7 +2,7 @@ package com.adyen.adyen_checkout
 
 import CheckoutFlutterApi
 import CheckoutPlatformInterface
-import Configuration
+import DropInConfigurationDTO
 import DropInResult
 import DropInResultType
 import PlatformCommunicationModel
@@ -49,7 +49,7 @@ class CheckoutPlatformApi(private val checkoutFlutterApi: CheckoutFlutterApi?) :
         }
 
         override fun startDropInSessionPayment(
-            dropInConfiguration: Configuration,
+            dropInConfiguration: DropInConfigurationDTO,
             session: Session,
         ) {
             checkForFlutterFragmentActivity()
@@ -70,7 +70,7 @@ class CheckoutPlatformApi(private val checkoutFlutterApi: CheckoutFlutterApi?) :
         }
 
         override fun startDropInAdvancedFlowPayment(
-            dropInConfiguration: Configuration,
+            dropInConfiguration: DropInConfigurationDTO,
             paymentMethodsResponse: String,
         ) {
             checkForFlutterFragmentActivity()

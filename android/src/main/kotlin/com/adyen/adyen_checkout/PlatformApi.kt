@@ -57,6 +57,18 @@ enum class Environment(val raw: Int) {
   }
 }
 
+enum class AddressMode(val raw: Int) {
+  FULL(0),
+  POSTALCODE(1),
+  NONE(2);
+
+  companion object {
+    fun ofRaw(raw: Int): AddressMode? {
+      return values().firstOrNull { it.raw == raw }
+    }
+  }
+}
+
 enum class PaymentResultEnum(val raw: Int) {
   CANCELLEDBYUSER(0),
   ERROR(1),
@@ -138,46 +150,85 @@ data class Amount (
 }
 
 /** Generated class from Pigeon that represents data sent in messages. */
-data class Configuration (
+data class DropInConfigurationDTO (
   val environment: Environment,
   val clientKey: String,
-  val amount: Amount,
   val countryCode: String,
-  val analytics: AnalyticsOptions? = null,
+  val amount: Amount,
+  val analyticsOptions: AnalyticsOptions? = null,
   val showPreselectedStoredPaymentMethod: Boolean? = null,
   val skipListWhenSinglePaymentMethod: Boolean? = null,
-  val isRemovingStoredPaymentMethodsEnabled: Boolean? = null,
-  val additionalDataForDropInService: String? = null
+  val cardsConfiguration: CardsConfigurationDTO? = null
 
 ) {
   companion object {
     @Suppress("UNCHECKED_CAST")
-    fun fromList(list: List<Any?>): Configuration {
+    fun fromList(list: List<Any?>): DropInConfigurationDTO {
       val environment = Environment.ofRaw(list[0] as Int)!!
       val clientKey = list[1] as String
-      val amount = Amount.fromList(list[2] as List<Any?>)
-      val countryCode = list[3] as String
-      val analytics: AnalyticsOptions? = (list[4] as List<Any?>?)?.let {
+      val countryCode = list[2] as String
+      val amount = Amount.fromList(list[3] as List<Any?>)
+      val analyticsOptions: AnalyticsOptions? = (list[4] as List<Any?>?)?.let {
         AnalyticsOptions.fromList(it)
       }
       val showPreselectedStoredPaymentMethod = list[5] as Boolean?
       val skipListWhenSinglePaymentMethod = list[6] as Boolean?
-      val isRemovingStoredPaymentMethodsEnabled = list[7] as Boolean?
-      val additionalDataForDropInService = list[8] as String?
-      return Configuration(environment, clientKey, amount, countryCode, analytics, showPreselectedStoredPaymentMethod, skipListWhenSinglePaymentMethod, isRemovingStoredPaymentMethodsEnabled, additionalDataForDropInService)
+      val cardsConfiguration: CardsConfigurationDTO? = (list[7] as List<Any?>?)?.let {
+        CardsConfigurationDTO.fromList(it)
+      }
+      return DropInConfigurationDTO(environment, clientKey, countryCode, amount, analyticsOptions, showPreselectedStoredPaymentMethod, skipListWhenSinglePaymentMethod, cardsConfiguration)
     }
   }
   fun toList(): List<Any?> {
     return listOf<Any?>(
       environment.raw,
       clientKey,
-      amount.toList(),
       countryCode,
-      analytics?.toList(),
+      amount.toList(),
+      analyticsOptions?.toList(),
       showPreselectedStoredPaymentMethod,
       skipListWhenSinglePaymentMethod,
-      isRemovingStoredPaymentMethodsEnabled,
-      additionalDataForDropInService,
+      cardsConfiguration?.toList(),
+    )
+  }
+}
+
+/** Generated class from Pigeon that represents data sent in messages. */
+data class CardsConfigurationDTO (
+  val holderNameRequired: Boolean,
+  val addressMode: AddressMode,
+  val showStorePaymentField: Boolean,
+  val hideCvcStoredCard: Boolean,
+  val hideCvc: Boolean,
+  val kcpVisible: Boolean,
+  val socialSecurityVisible: Boolean,
+  val supportedCardTypes: List<String?>
+
+) {
+  companion object {
+    @Suppress("UNCHECKED_CAST")
+    fun fromList(list: List<Any?>): CardsConfigurationDTO {
+      val holderNameRequired = list[0] as Boolean
+      val addressMode = AddressMode.ofRaw(list[1] as Int)!!
+      val showStorePaymentField = list[2] as Boolean
+      val hideCvcStoredCard = list[3] as Boolean
+      val hideCvc = list[4] as Boolean
+      val kcpVisible = list[5] as Boolean
+      val socialSecurityVisible = list[6] as Boolean
+      val supportedCardTypes = list[7] as List<String?>
+      return CardsConfigurationDTO(holderNameRequired, addressMode, showStorePaymentField, hideCvcStoredCard, hideCvc, kcpVisible, socialSecurityVisible, supportedCardTypes)
+    }
+  }
+  fun toList(): List<Any?> {
+    return listOf<Any?>(
+      holderNameRequired,
+      addressMode.raw,
+      showStorePaymentField,
+      hideCvcStoredCard,
+      hideCvc,
+      kcpVisible,
+      socialSecurityVisible,
+      supportedCardTypes,
     )
   }
 }
@@ -391,20 +442,25 @@ private object CheckoutPlatformInterfaceCodec : StandardMessageCodec() {
       }
       130.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          Configuration.fromList(it)
+          CardsConfigurationDTO.fromList(it)
         }
       }
       131.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          DropInError.fromList(it)
+          DropInConfigurationDTO.fromList(it)
         }
       }
       132.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          DropInResult.fromList(it)
+          DropInError.fromList(it)
         }
       }
       133.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          DropInResult.fromList(it)
+        }
+      }
+      134.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
           Session.fromList(it)
         }
@@ -422,20 +478,24 @@ private object CheckoutPlatformInterfaceCodec : StandardMessageCodec() {
         stream.write(129)
         writeValue(stream, value.toList())
       }
-      is Configuration -> {
+      is CardsConfigurationDTO -> {
         stream.write(130)
         writeValue(stream, value.toList())
       }
-      is DropInError -> {
+      is DropInConfigurationDTO -> {
         stream.write(131)
         writeValue(stream, value.toList())
       }
-      is DropInResult -> {
+      is DropInError -> {
         stream.write(132)
         writeValue(stream, value.toList())
       }
-      is Session -> {
+      is DropInResult -> {
         stream.write(133)
+        writeValue(stream, value.toList())
+      }
+      is Session -> {
+        stream.write(134)
         writeValue(stream, value.toList())
       }
       else -> super.writeValue(stream, value)
@@ -447,8 +507,8 @@ private object CheckoutPlatformInterfaceCodec : StandardMessageCodec() {
 interface CheckoutPlatformInterface {
   fun getPlatformVersion(callback: (Result<String>) -> Unit)
   fun getReturnUrl(callback: (Result<String>) -> Unit)
-  fun startDropInSessionPayment(dropInConfiguration: Configuration, session: Session)
-  fun startDropInAdvancedFlowPayment(dropInConfiguration: Configuration, paymentMethodsResponse: String)
+  fun startDropInSessionPayment(dropInConfiguration: DropInConfigurationDTO, session: Session)
+  fun startDropInAdvancedFlowPayment(dropInConfiguration: DropInConfigurationDTO, paymentMethodsResponse: String)
   fun onPaymentsResult(paymentsResult: DropInResult)
   fun onPaymentsDetailsResult(paymentsDetailsResult: DropInResult)
 
@@ -501,7 +561,7 @@ interface CheckoutPlatformInterface {
         if (api != null) {
           channel.setMessageHandler { message, reply ->
             val args = message as List<Any?>
-            val dropInConfigurationArg = args[0] as Configuration
+            val dropInConfigurationArg = args[0] as DropInConfigurationDTO
             val sessionArg = args[1] as Session
             var wrapped: List<Any?>
             try {
@@ -521,7 +581,7 @@ interface CheckoutPlatformInterface {
         if (api != null) {
           channel.setMessageHandler { message, reply ->
             val args = message as List<Any?>
-            val dropInConfigurationArg = args[0] as Configuration
+            val dropInConfigurationArg = args[0] as DropInConfigurationDTO
             val paymentMethodsResponseArg = args[1] as String
             var wrapped: List<Any?>
             try {
