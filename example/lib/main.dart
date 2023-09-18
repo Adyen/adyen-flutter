@@ -119,8 +119,10 @@ class _MyAppState extends State<MyApp> {
 
     final GooglePayConfiguration googlePayConfiguration =
         GooglePayConfiguration(
-      totalPriceStatus: TotalPriceStatus.finalPrice,
+      merchantAccount: Config.merchantAccount,
+      totalPriceStatus: TotalPriceStatus.notCurrentlyKnown,
       googlePayEnvironment: GooglePayEnvironment.test,
+      shippingAddressRequired: true,
     );
 
     final DropInConfiguration dropInConfiguration = DropInConfiguration(

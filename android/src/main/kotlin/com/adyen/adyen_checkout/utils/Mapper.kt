@@ -8,6 +8,7 @@ import GooglePayConfigurationDTO
 import GooglePayEnvironment
 import OrderResponseModel
 import Session
+import TotalPriceStatus
 import android.content.Context
 import com.adyen.checkout.card.AddressConfiguration
 import com.adyen.checkout.card.CardConfiguration
@@ -19,6 +20,7 @@ import com.adyen.checkout.dropin.DropInConfiguration
 import com.adyen.checkout.googlepay.GooglePayConfiguration
 import com.adyen.checkout.sessions.core.SessionModel
 import com.google.android.gms.wallet.WalletConstants
+import java.util.Locale
 import com.adyen.checkout.core.Environment as SDKEnvironment
 
 object Mapper {
@@ -37,8 +39,9 @@ object Mapper {
     }
 
     fun DropInConfigurationDTO.mapToDropInConfiguration(context: Context): DropInConfiguration {
-        val environment = this.environment.mapToEnvironment()
-        val amount = this.amount.mapToAmount()
+        val environment = environment.mapToEnvironment()
+        val amount = amount.mapToAmount()
+        val shopperLocale = Locale.forLanguageTag(shopperLocale)
         val cardConfiguration = CardConfiguration.Builder(
             context = context,
             environment = environment,
@@ -64,7 +67,11 @@ object Mapper {
             .addCardConfiguration(cardConfiguration)
 
         if (googlePayConfigurationDTO != null) {
-            val googlePayConfigurationBuilder = GooglePayConfiguration.Builder(context, environment, clientKey)
+            val googlePayConfigurationBuilder = GooglePayConfiguration.Builder(
+                shopperLocale,
+                environment,
+                clientKey
+            )
             val googlePayConfiguration =
                 googlePayConfigurationDTO.mapToGooglePayConfiguration(googlePayConfigurationBuilder)
             dropInConfiguration.addGooglePayConfiguration(googlePayConfiguration)
@@ -126,10 +133,16 @@ object Mapper {
     }
 
     private fun GooglePayConfigurationDTO.mapToGooglePayConfiguration(builder: GooglePayConfiguration.Builder): GooglePayConfiguration {
+        if (allowedCardNetworks.isNotEmpty()) {
+            builder.setAllowedCardNetworks(allowedCardNetworks.filterNotNull())
+        }
+
+        if (allowedAuthMethods.isNotEmpty()) {
+            builder.setAllowedAuthMethods(allowedAuthMethods.filterNotNull())
+        }
+
         builder.setMerchantAccount(merchantAccount)
-        builder.setAllowedCardNetworks(allowedCardNetworks.filterNotNull())
-        builder.setAllowedAuthMethods(allowedAuthMethods.filterNotNull())
-        builder.setTotalPriceStatus(totalPriceStatus.toString())
+        builder.setTotalPriceStatus(totalPriceStatus.mapToTotalPriceStatus())
         builder.setAllowPrepaidCards(allowPrepaidCards)
         builder.setBillingAddressRequired(billingAddressRequired)
         builder.setEmailRequired(emailRequired)
@@ -144,4 +157,14 @@ object Mapper {
             GooglePayEnvironment.PRODUCTION -> WalletConstants.ENVIRONMENT_PRODUCTION
         }
     }
+
+    private fun TotalPriceStatus.mapToTotalPriceStatus(): String {
+        return when (this) {
+            TotalPriceStatus.NOTCURRENTLYKNOWN -> "NOT_CURRENTLY_KNOWN"
+            TotalPriceStatus.ESTIMATED -> "ESTIMATED"
+            TotalPriceStatus.FINALPRICE -> "FINAL"
+        }
+    }
+
 }
+

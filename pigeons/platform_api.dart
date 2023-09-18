@@ -94,7 +94,7 @@ class DropInConfigurationDTO {
   final String clientKey;
   final String countryCode;
   final Amount amount;
-  final String? shopperLocale;
+  final String shopperLocale;
   final AnalyticsOptionsDTO? analyticsOptionsDTO;
   final bool? showPreselectedStoredPaymentMethod;
   final bool? skipListWhenSinglePaymentMethod;

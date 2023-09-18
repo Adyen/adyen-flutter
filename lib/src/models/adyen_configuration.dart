@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:adyen_checkout/src/generated/platform_api.g.dart';
 
 sealed class AdyenConfiguration {
@@ -32,7 +34,7 @@ class DropInConfiguration extends DropInConfigurationDTO
     bool showPreselectedStoredPaymentMethod = false,
     bool skipListWhenSinglePaymentMethod = false,
   }) : super(
-    shopperLocale: shopperLocale,
+          shopperLocale: shopperLocale ?? Platform.localeName,
           cardsConfigurationDTO: _toCardsConfigurationDTO(cardsConfiguration),
           applePayConfigurationDTO:
               _toApplePayConfigurationDTO(applePayConfiguration),
@@ -170,7 +172,7 @@ class GooglePayConfiguration {
   GooglePayConfiguration({
     required this.totalPriceStatus,
     required this.googlePayEnvironment,
-    this.merchantAccount = "",
+    required this.merchantAccount,
     this.allowedCardNetworks = const [],
     this.allowedAuthMethods = const [],
     this.allowPrepaidCards = true,

@@ -211,7 +211,7 @@ data class DropInConfigurationDTO (
   val clientKey: String,
   val countryCode: String,
   val amount: Amount,
-  val shopperLocale: String? = null,
+  val shopperLocale: String,
   val analyticsOptionsDTO: AnalyticsOptionsDTO? = null,
   val showPreselectedStoredPaymentMethod: Boolean? = null,
   val skipListWhenSinglePaymentMethod: Boolean? = null,
@@ -227,7 +227,7 @@ data class DropInConfigurationDTO (
       val clientKey = list[1] as String
       val countryCode = list[2] as String
       val amount = Amount.fromList(list[3] as List<Any?>)
-      val shopperLocale = list[4] as String?
+      val shopperLocale = list[4] as String
       val analyticsOptionsDTO: AnalyticsOptionsDTO? = (list[5] as List<Any?>?)?.let {
         AnalyticsOptionsDTO.fromList(it)
       }

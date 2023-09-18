@@ -159,7 +159,7 @@ struct DropInConfigurationDTO {
   var clientKey: String
   var countryCode: String
   var amount: Amount
-  var shopperLocale: String? = nil
+  var shopperLocale: String
   var analyticsOptionsDTO: AnalyticsOptionsDTO? = nil
   var showPreselectedStoredPaymentMethod: Bool? = nil
   var skipListWhenSinglePaymentMethod: Bool? = nil
@@ -172,7 +172,7 @@ struct DropInConfigurationDTO {
     let clientKey = list[1] as! String
     let countryCode = list[2] as! String
     let amount = Amount.fromList(list[3] as! [Any?])!
-    let shopperLocale: String? = nilOrValue(list[4])
+    let shopperLocale = list[4] as! String
     var analyticsOptionsDTO: AnalyticsOptionsDTO? = nil
     if let analyticsOptionsDTOList: [Any?] = nilOrValue(list[5]) {
       analyticsOptionsDTO = AnalyticsOptionsDTO.fromList(analyticsOptionsDTOList)

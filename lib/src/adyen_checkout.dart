@@ -39,7 +39,15 @@ class AdyenCheckout implements AdyenCheckoutInterface {
       clientKey: dropInSession.dropInConfiguration.clientKey,
       countryCode: dropInSession.dropInConfiguration.countryCode,
       amount: dropInSession.dropInConfiguration.amount,
-      cardsConfigurationDTO: dropInSession.dropInConfiguration.cardsConfigurationDTO,
+      shopperLocale: dropInSession.dropInConfiguration.shopperLocale,
+      cardsConfigurationDTO:
+          dropInSession.dropInConfiguration.cardsConfigurationDTO,
+      applePayConfigurationDTO:
+          dropInSession.dropInConfiguration.applePayConfigurationDTO,
+      googlePayConfigurationDTO:
+          dropInSession.dropInConfiguration.googlePayConfigurationDTO,
+      analyticsOptionsDTO:
+          dropInSession.dropInConfiguration.analyticsOptionsDTO,
     );
     AdyenCheckoutPlatformInterface.instance.startDropInSessionPayment(
       dropInSession.session,
@@ -59,8 +67,15 @@ class AdyenCheckout implements AdyenCheckoutInterface {
       clientKey: dropInAdvancedFlow.dropInConfiguration.clientKey,
       countryCode: dropInAdvancedFlow.dropInConfiguration.countryCode,
       amount: dropInAdvancedFlow.dropInConfiguration.amount,
+      shopperLocale: dropInAdvancedFlow.dropInConfiguration.shopperLocale,
       cardsConfigurationDTO:
           dropInAdvancedFlow.dropInConfiguration.cardsConfigurationDTO,
+      applePayConfigurationDTO:
+          dropInAdvancedFlow.dropInConfiguration.applePayConfigurationDTO,
+      googlePayConfigurationDTO:
+          dropInAdvancedFlow.dropInConfiguration.googlePayConfigurationDTO,
+      analyticsOptionsDTO:
+          dropInAdvancedFlow.dropInConfiguration.analyticsOptionsDTO,
     );
     AdyenCheckoutPlatformInterface.instance.startDropInAdvancedFlowPayment(
       dropInAdvancedFlow.paymentMethodsResponse,

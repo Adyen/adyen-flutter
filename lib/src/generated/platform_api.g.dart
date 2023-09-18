@@ -141,7 +141,7 @@ class DropInConfigurationDTO {
     required this.clientKey,
     required this.countryCode,
     required this.amount,
-    this.shopperLocale,
+    required this.shopperLocale,
     this.analyticsOptionsDTO,
     this.showPreselectedStoredPaymentMethod,
     this.skipListWhenSinglePaymentMethod,
@@ -158,7 +158,7 @@ class DropInConfigurationDTO {
 
   Amount amount;
 
-  String? shopperLocale;
+  String shopperLocale;
 
   AnalyticsOptionsDTO? analyticsOptionsDTO;
 
@@ -195,7 +195,7 @@ class DropInConfigurationDTO {
       clientKey: result[1]! as String,
       countryCode: result[2]! as String,
       amount: Amount.decode(result[3]! as List<Object?>),
-      shopperLocale: result[4] as String?,
+      shopperLocale: result[4]! as String,
       analyticsOptionsDTO: result[5] != null
           ? AnalyticsOptionsDTO.decode(result[5]! as List<Object?>)
           : null,
