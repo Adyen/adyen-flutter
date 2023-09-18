@@ -155,15 +155,15 @@ class CheckoutPlatformApi : CheckoutPlatformInterface {
                                                                 allowPreselectedPaymentView: dropInConfigurationDTO.showPreselectedStoredPaymentMethod ?? false)
         
         if let cardsConfigurationDTO = dropInConfigurationDTO.cardsConfigurationDTO {
-            let koreanAuthenticationMode = determineFieldVisibility(visible: cardsConfigurationDTO.kcpVisible)
-            let socialSecurityNumberMode = determineFieldVisibility(visible: cardsConfigurationDTO.socialSecurityVisible)
-            let storedCardConfiguration = createStoredCardConfiguration(hideCvcStoredCard: cardsConfigurationDTO.hideCvcStoredCard)
+            let koreanAuthenticationMode = determineFieldVisibility(visible: cardsConfigurationDTO.showKcpField)
+            let socialSecurityNumberMode = determineFieldVisibility(visible: cardsConfigurationDTO.showSocialSecurityNumberField)
+            let storedCardConfiguration = createStoredCardConfiguration(showCvcForStoredCard: cardsConfigurationDTO.showCvcForStoredCard)
             let allowedCardTypes = determineAllowedCardTypes(cardTypes: cardsConfigurationDTO.supportedCardTypes)
             let billingAddressConfiguration = determineBillingAddressConfiguration(addressMode: cardsConfigurationDTO.addressMode)
             let cardConfiguration = DropInComponent.Card.init(
                 showsHolderNameField: cardsConfigurationDTO.holderNameRequired,
                 showsStorePaymentMethodField: cardsConfigurationDTO.showStorePaymentField,
-                showsSecurityCodeField: cardsConfigurationDTO.hideCvc == false,
+                showsSecurityCodeField: cardsConfigurationDTO.showCvc == true,
                 koreanAuthenticationMode: koreanAuthenticationMode,
                 socialSecurityNumberMode: socialSecurityNumberMode,
                 storedCardConfiguration: storedCardConfiguration,
@@ -172,6 +172,7 @@ class CheckoutPlatformApi : CheckoutPlatformInterface {
             )
             
             dropInConfiguration.card = cardConfiguration
+            
         }
         
         if let appleConfigurationDTO = dropInConfigurationDTO.applePayConfigurationDTO {
@@ -189,9 +190,9 @@ class CheckoutPlatformApi : CheckoutPlatformInterface {
         }
     }
     
-    private func createStoredCardConfiguration(hideCvcStoredCard: Bool?) -> StoredCardConfiguration {
+    private func createStoredCardConfiguration(showCvcForStoredCard: Bool?) -> StoredCardConfiguration {
         var storedCardConfiguration = StoredCardConfiguration()
-        storedCardConfiguration.showsSecurityCodeField = hideCvcStoredCard ?? true
+        storedCardConfiguration.showsSecurityCodeField = showCvcForStoredCard ?? false
         return storedCardConfiguration;
     }
     

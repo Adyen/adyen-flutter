@@ -19,6 +19,46 @@ enum Environment {
   apse;
 }
 
+enum AddressMode {
+  full,
+  postalCode,
+  none,
+}
+
+enum CardAuthMethod {
+  panOnly,
+  cryptogram3DS,
+}
+
+enum TotalPriceStatus {
+  notCurrentlyKnown,
+  estimated,
+  finalPrice,
+}
+
+enum GooglePayEnvironment {
+  test,
+  production,
+}
+
+enum PaymentResultEnum {
+  cancelledByUser,
+  error,
+  finished,
+}
+
+enum PlatformCommunicationType {
+  paymentComponent,
+  additionalDetails,
+  result,
+}
+
+enum DropInResultType {
+  finished,
+  action,
+  error,
+}
+
 class Session {
   final String id;
   final String sessionData;
@@ -39,58 +79,6 @@ class Amount {
   });
 }
 
-class DropInConfigurationDTO {
-  final Environment environment;
-  final String clientKey;
-  final String countryCode;
-  final Amount amount;
-  final AnalyticsOptionsDTO? analyticsOptionsDTO;
-  final bool? showPreselectedStoredPaymentMethod;
-  final bool? skipListWhenSinglePaymentMethod;
-  final CardsConfigurationDTO? cardsConfigurationDTO;
-  final ApplePayConfigurationDTO? applePayConfigurationDTO;
-
-  DropInConfigurationDTO(
-    this.environment,
-    this.clientKey,
-    this.countryCode,
-    this.amount,
-    this.analyticsOptionsDTO,
-    this.cardsConfigurationDTO,
-    this.showPreselectedStoredPaymentMethod,
-    this.skipListWhenSinglePaymentMethod,
-    this.applePayConfigurationDTO,
-  );
-}
-
-class CardsConfigurationDTO {
-  final bool holderNameRequired;
-  final AddressMode addressMode;
-  final bool showStorePaymentField;
-  final bool hideCvcStoredCard;
-  final bool hideCvc;
-  final bool kcpVisible;
-  final bool socialSecurityVisible;
-  final List<String?> supportedCardTypes;
-
-  CardsConfigurationDTO(
-    this.holderNameRequired,
-    this.addressMode,
-    this.showStorePaymentField,
-    this.hideCvcStoredCard,
-    this.hideCvc,
-    this.kcpVisible,
-    this.socialSecurityVisible,
-    this.supportedCardTypes,
-  );
-}
-
-enum AddressMode {
-  full,
-  postalCode,
-  none,
-}
-
 class AnalyticsOptionsDTO {
   final bool? enabled;
   final String? payload;
@@ -98,6 +86,56 @@ class AnalyticsOptionsDTO {
   AnalyticsOptionsDTO(
     this.enabled,
     this.payload,
+  );
+}
+
+class DropInConfigurationDTO {
+  final Environment environment;
+  final String clientKey;
+  final String countryCode;
+  final Amount amount;
+  final String? shopperLocale;
+  final AnalyticsOptionsDTO? analyticsOptionsDTO;
+  final bool? showPreselectedStoredPaymentMethod;
+  final bool? skipListWhenSinglePaymentMethod;
+  final CardsConfigurationDTO? cardsConfigurationDTO;
+  final ApplePayConfigurationDTO? applePayConfigurationDTO;
+  final GooglePayConfigurationDTO? googlePayConfigurationDTO;
+
+  DropInConfigurationDTO(
+    this.environment,
+    this.clientKey,
+    this.countryCode,
+    this.amount,
+    this.shopperLocale,
+    this.analyticsOptionsDTO,
+    this.cardsConfigurationDTO,
+    this.showPreselectedStoredPaymentMethod,
+    this.skipListWhenSinglePaymentMethod,
+    this.applePayConfigurationDTO,
+    this.googlePayConfigurationDTO,
+  );
+}
+
+class CardsConfigurationDTO {
+  final bool holderNameRequired;
+  final AddressMode addressMode;
+  final bool showStorePaymentField;
+  final bool showCvcForStoredCard;
+  final bool showCvc;
+  final bool showKcpField;
+  final bool showSocialSecurityNumberField;
+  final List<String?> supportedCardTypes;
+
+  CardsConfigurationDTO(
+    this.holderNameRequired,
+    this.addressMode,
+    this.showStorePaymentField,
+    this.showCvcForStoredCard,
+    this.showCvc,
+    this.showKcpField,
+    this.showSocialSecurityNumberField,
+    this.supportedCardTypes,
   );
 }
 
@@ -113,6 +151,32 @@ class ApplePayConfigurationDTO {
   );
 }
 
+class GooglePayConfigurationDTO {
+  final String merchantAccount;
+  final List<String?> allowedCardNetworks;
+  final List<String?> allowedAuthMethods;
+  final TotalPriceStatus totalPriceStatus;
+  final bool allowPrepaidCards;
+  final bool billingAddressRequired;
+  final bool emailRequired;
+  final bool shippingAddressRequired;
+  final bool existingPaymentMethodRequired;
+  final GooglePayEnvironment googlePayEnvironment;
+
+  GooglePayConfigurationDTO(
+    this.totalPriceStatus,
+    this.googlePayEnvironment,
+    this.merchantAccount,
+    this.allowedCardNetworks,
+    this.allowedAuthMethods,
+    this.allowPrepaidCards,
+    this.billingAddressRequired,
+    this.emailRequired,
+    this.shippingAddressRequired,
+    this.existingPaymentMethodRequired,
+  );
+}
+
 class PaymentResult {
   final PaymentResultEnum type;
   final String? reason;
@@ -123,12 +187,6 @@ class PaymentResult {
     this.reason,
     this.result,
   );
-}
-
-enum PaymentResultEnum {
-  cancelledByUser,
-  error,
-  finished,
 }
 
 class PaymentResultModel {
@@ -171,12 +229,6 @@ class PlatformCommunicationModel {
   });
 }
 
-enum PlatformCommunicationType {
-  paymentComponent,
-  additionalDetails,
-  result,
-}
-
 //Use DropInOutcome class when sealed classes are supported by pigeon
 class DropInResult {
   final DropInResultType dropInResultType;
@@ -190,12 +242,6 @@ class DropInResult {
     this.actionResponse,
     this.error,
   });
-}
-
-enum DropInResultType {
-  finished,
-  action,
-  error,
 }
 
 class DropInError {

@@ -53,6 +53,22 @@ enum AddressMode: Int {
   case none = 2
 }
 
+enum CardAuthMethod: Int {
+  case panOnly = 0
+  case cryptogram3DS = 1
+}
+
+enum TotalPriceStatus: Int {
+  case notCurrentlyKnown = 0
+  case estimated = 1
+  case finalPrice = 2
+}
+
+enum GooglePayEnvironment: Int {
+  case test = 0
+  case production = 1
+}
+
 enum PaymentResultEnum: Int {
   case cancelledByUser = 0
   case error = 1
@@ -116,111 +132,6 @@ struct Amount {
 }
 
 /// Generated class from Pigeon that represents data sent in messages.
-struct DropInConfigurationDTO {
-  var environment: Environment
-  var clientKey: String
-  var countryCode: String
-  var amount: Amount
-  var analyticsOptionsDTO: AnalyticsOptionsDTO? = nil
-  var showPreselectedStoredPaymentMethod: Bool? = nil
-  var skipListWhenSinglePaymentMethod: Bool? = nil
-  var cardsConfigurationDTO: CardsConfigurationDTO? = nil
-  var applePayConfigurationDTO: ApplePayConfigurationDTO? = nil
-
-  static func fromList(_ list: [Any?]) -> DropInConfigurationDTO? {
-    let environment = Environment(rawValue: list[0] as! Int)!
-    let clientKey = list[1] as! String
-    let countryCode = list[2] as! String
-    let amount = Amount.fromList(list[3] as! [Any?])!
-    var analyticsOptionsDTO: AnalyticsOptionsDTO? = nil
-    if let analyticsOptionsDTOList: [Any?] = nilOrValue(list[4]) {
-      analyticsOptionsDTO = AnalyticsOptionsDTO.fromList(analyticsOptionsDTOList)
-    }
-    let showPreselectedStoredPaymentMethod: Bool? = nilOrValue(list[5])
-    let skipListWhenSinglePaymentMethod: Bool? = nilOrValue(list[6])
-    var cardsConfigurationDTO: CardsConfigurationDTO? = nil
-    if let cardsConfigurationDTOList: [Any?] = nilOrValue(list[7]) {
-      cardsConfigurationDTO = CardsConfigurationDTO.fromList(cardsConfigurationDTOList)
-    }
-    var applePayConfigurationDTO: ApplePayConfigurationDTO? = nil
-    if let applePayConfigurationDTOList: [Any?] = nilOrValue(list[8]) {
-      applePayConfigurationDTO = ApplePayConfigurationDTO.fromList(applePayConfigurationDTOList)
-    }
-
-    return DropInConfigurationDTO(
-      environment: environment,
-      clientKey: clientKey,
-      countryCode: countryCode,
-      amount: amount,
-      analyticsOptionsDTO: analyticsOptionsDTO,
-      showPreselectedStoredPaymentMethod: showPreselectedStoredPaymentMethod,
-      skipListWhenSinglePaymentMethod: skipListWhenSinglePaymentMethod,
-      cardsConfigurationDTO: cardsConfigurationDTO,
-      applePayConfigurationDTO: applePayConfigurationDTO
-    )
-  }
-  func toList() -> [Any?] {
-    return [
-      environment.rawValue,
-      clientKey,
-      countryCode,
-      amount.toList(),
-      analyticsOptionsDTO?.toList(),
-      showPreselectedStoredPaymentMethod,
-      skipListWhenSinglePaymentMethod,
-      cardsConfigurationDTO?.toList(),
-      applePayConfigurationDTO?.toList(),
-    ]
-  }
-}
-
-/// Generated class from Pigeon that represents data sent in messages.
-struct CardsConfigurationDTO {
-  var holderNameRequired: Bool
-  var addressMode: AddressMode
-  var showStorePaymentField: Bool
-  var hideCvcStoredCard: Bool
-  var hideCvc: Bool
-  var kcpVisible: Bool
-  var socialSecurityVisible: Bool
-  var supportedCardTypes: [String?]
-
-  static func fromList(_ list: [Any?]) -> CardsConfigurationDTO? {
-    let holderNameRequired = list[0] as! Bool
-    let addressMode = AddressMode(rawValue: list[1] as! Int)!
-    let showStorePaymentField = list[2] as! Bool
-    let hideCvcStoredCard = list[3] as! Bool
-    let hideCvc = list[4] as! Bool
-    let kcpVisible = list[5] as! Bool
-    let socialSecurityVisible = list[6] as! Bool
-    let supportedCardTypes = list[7] as! [String?]
-
-    return CardsConfigurationDTO(
-      holderNameRequired: holderNameRequired,
-      addressMode: addressMode,
-      showStorePaymentField: showStorePaymentField,
-      hideCvcStoredCard: hideCvcStoredCard,
-      hideCvc: hideCvc,
-      kcpVisible: kcpVisible,
-      socialSecurityVisible: socialSecurityVisible,
-      supportedCardTypes: supportedCardTypes
-    )
-  }
-  func toList() -> [Any?] {
-    return [
-      holderNameRequired,
-      addressMode.rawValue,
-      showStorePaymentField,
-      hideCvcStoredCard,
-      hideCvc,
-      kcpVisible,
-      socialSecurityVisible,
-      supportedCardTypes,
-    ]
-  }
-}
-
-/// Generated class from Pigeon that represents data sent in messages.
 struct AnalyticsOptionsDTO {
   var enabled: Bool? = nil
   var payload: String? = nil
@@ -238,6 +149,122 @@ struct AnalyticsOptionsDTO {
     return [
       enabled,
       payload,
+    ]
+  }
+}
+
+/// Generated class from Pigeon that represents data sent in messages.
+struct DropInConfigurationDTO {
+  var environment: Environment
+  var clientKey: String
+  var countryCode: String
+  var amount: Amount
+  var shopperLocale: String? = nil
+  var analyticsOptionsDTO: AnalyticsOptionsDTO? = nil
+  var showPreselectedStoredPaymentMethod: Bool? = nil
+  var skipListWhenSinglePaymentMethod: Bool? = nil
+  var cardsConfigurationDTO: CardsConfigurationDTO? = nil
+  var applePayConfigurationDTO: ApplePayConfigurationDTO? = nil
+  var googlePayConfigurationDTO: GooglePayConfigurationDTO? = nil
+
+  static func fromList(_ list: [Any?]) -> DropInConfigurationDTO? {
+    let environment = Environment(rawValue: list[0] as! Int)!
+    let clientKey = list[1] as! String
+    let countryCode = list[2] as! String
+    let amount = Amount.fromList(list[3] as! [Any?])!
+    let shopperLocale: String? = nilOrValue(list[4])
+    var analyticsOptionsDTO: AnalyticsOptionsDTO? = nil
+    if let analyticsOptionsDTOList: [Any?] = nilOrValue(list[5]) {
+      analyticsOptionsDTO = AnalyticsOptionsDTO.fromList(analyticsOptionsDTOList)
+    }
+    let showPreselectedStoredPaymentMethod: Bool? = nilOrValue(list[6])
+    let skipListWhenSinglePaymentMethod: Bool? = nilOrValue(list[7])
+    var cardsConfigurationDTO: CardsConfigurationDTO? = nil
+    if let cardsConfigurationDTOList: [Any?] = nilOrValue(list[8]) {
+      cardsConfigurationDTO = CardsConfigurationDTO.fromList(cardsConfigurationDTOList)
+    }
+    var applePayConfigurationDTO: ApplePayConfigurationDTO? = nil
+    if let applePayConfigurationDTOList: [Any?] = nilOrValue(list[9]) {
+      applePayConfigurationDTO = ApplePayConfigurationDTO.fromList(applePayConfigurationDTOList)
+    }
+    var googlePayConfigurationDTO: GooglePayConfigurationDTO? = nil
+    if let googlePayConfigurationDTOList: [Any?] = nilOrValue(list[10]) {
+      googlePayConfigurationDTO = GooglePayConfigurationDTO.fromList(googlePayConfigurationDTOList)
+    }
+
+    return DropInConfigurationDTO(
+      environment: environment,
+      clientKey: clientKey,
+      countryCode: countryCode,
+      amount: amount,
+      shopperLocale: shopperLocale,
+      analyticsOptionsDTO: analyticsOptionsDTO,
+      showPreselectedStoredPaymentMethod: showPreselectedStoredPaymentMethod,
+      skipListWhenSinglePaymentMethod: skipListWhenSinglePaymentMethod,
+      cardsConfigurationDTO: cardsConfigurationDTO,
+      applePayConfigurationDTO: applePayConfigurationDTO,
+      googlePayConfigurationDTO: googlePayConfigurationDTO
+    )
+  }
+  func toList() -> [Any?] {
+    return [
+      environment.rawValue,
+      clientKey,
+      countryCode,
+      amount.toList(),
+      shopperLocale,
+      analyticsOptionsDTO?.toList(),
+      showPreselectedStoredPaymentMethod,
+      skipListWhenSinglePaymentMethod,
+      cardsConfigurationDTO?.toList(),
+      applePayConfigurationDTO?.toList(),
+      googlePayConfigurationDTO?.toList(),
+    ]
+  }
+}
+
+/// Generated class from Pigeon that represents data sent in messages.
+struct CardsConfigurationDTO {
+  var holderNameRequired: Bool
+  var addressMode: AddressMode
+  var showStorePaymentField: Bool
+  var showCvcForStoredCard: Bool
+  var showCvc: Bool
+  var showKcpField: Bool
+  var showSocialSecurityNumberField: Bool
+  var supportedCardTypes: [String?]
+
+  static func fromList(_ list: [Any?]) -> CardsConfigurationDTO? {
+    let holderNameRequired = list[0] as! Bool
+    let addressMode = AddressMode(rawValue: list[1] as! Int)!
+    let showStorePaymentField = list[2] as! Bool
+    let showCvcForStoredCard = list[3] as! Bool
+    let showCvc = list[4] as! Bool
+    let showKcpField = list[5] as! Bool
+    let showSocialSecurityNumberField = list[6] as! Bool
+    let supportedCardTypes = list[7] as! [String?]
+
+    return CardsConfigurationDTO(
+      holderNameRequired: holderNameRequired,
+      addressMode: addressMode,
+      showStorePaymentField: showStorePaymentField,
+      showCvcForStoredCard: showCvcForStoredCard,
+      showCvc: showCvc,
+      showKcpField: showKcpField,
+      showSocialSecurityNumberField: showSocialSecurityNumberField,
+      supportedCardTypes: supportedCardTypes
+    )
+  }
+  func toList() -> [Any?] {
+    return [
+      holderNameRequired,
+      addressMode.rawValue,
+      showStorePaymentField,
+      showCvcForStoredCard,
+      showCvc,
+      showKcpField,
+      showSocialSecurityNumberField,
+      supportedCardTypes,
     ]
   }
 }
@@ -264,6 +291,60 @@ struct ApplePayConfigurationDTO {
       merchantId,
       merchantName,
       allowOnboarding,
+    ]
+  }
+}
+
+/// Generated class from Pigeon that represents data sent in messages.
+struct GooglePayConfigurationDTO {
+  var merchantAccount: String
+  var allowedCardNetworks: [String?]
+  var allowedAuthMethods: [String?]
+  var totalPriceStatus: TotalPriceStatus
+  var allowPrepaidCards: Bool
+  var billingAddressRequired: Bool
+  var emailRequired: Bool
+  var shippingAddressRequired: Bool
+  var existingPaymentMethodRequired: Bool
+  var googlePayEnvironment: GooglePayEnvironment
+
+  static func fromList(_ list: [Any?]) -> GooglePayConfigurationDTO? {
+    let merchantAccount = list[0] as! String
+    let allowedCardNetworks = list[1] as! [String?]
+    let allowedAuthMethods = list[2] as! [String?]
+    let totalPriceStatus = TotalPriceStatus(rawValue: list[3] as! Int)!
+    let allowPrepaidCards = list[4] as! Bool
+    let billingAddressRequired = list[5] as! Bool
+    let emailRequired = list[6] as! Bool
+    let shippingAddressRequired = list[7] as! Bool
+    let existingPaymentMethodRequired = list[8] as! Bool
+    let googlePayEnvironment = GooglePayEnvironment(rawValue: list[9] as! Int)!
+
+    return GooglePayConfigurationDTO(
+      merchantAccount: merchantAccount,
+      allowedCardNetworks: allowedCardNetworks,
+      allowedAuthMethods: allowedAuthMethods,
+      totalPriceStatus: totalPriceStatus,
+      allowPrepaidCards: allowPrepaidCards,
+      billingAddressRequired: billingAddressRequired,
+      emailRequired: emailRequired,
+      shippingAddressRequired: shippingAddressRequired,
+      existingPaymentMethodRequired: existingPaymentMethodRequired,
+      googlePayEnvironment: googlePayEnvironment
+    )
+  }
+  func toList() -> [Any?] {
+    return [
+      merchantAccount,
+      allowedCardNetworks,
+      allowedAuthMethods,
+      totalPriceStatus.rawValue,
+      allowPrepaidCards,
+      billingAddressRequired,
+      emailRequired,
+      shippingAddressRequired,
+      existingPaymentMethodRequired,
+      googlePayEnvironment.rawValue,
     ]
   }
 }
@@ -472,6 +553,8 @@ private class CheckoutPlatformInterfaceCodecReader: FlutterStandardReader {
       case 134:
         return DropInResult.fromList(self.readValue() as! [Any?])
       case 135:
+        return GooglePayConfigurationDTO.fromList(self.readValue() as! [Any?])
+      case 136:
         return Session.fromList(self.readValue() as! [Any?])
       default:
         return super.readValue(ofType: type)
@@ -502,8 +585,11 @@ private class CheckoutPlatformInterfaceCodecWriter: FlutterStandardWriter {
     } else if let value = value as? DropInResult {
       super.writeByte(134)
       super.writeValue(value.toList())
-    } else if let value = value as? Session {
+    } else if let value = value as? GooglePayConfigurationDTO {
       super.writeByte(135)
+      super.writeValue(value.toList())
+    } else if let value = value as? Session {
+      super.writeByte(136)
       super.writeValue(value.toList())
     } else {
       super.writeValue(value)

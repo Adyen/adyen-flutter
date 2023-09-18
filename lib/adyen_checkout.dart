@@ -6,7 +6,9 @@ export 'src/generated/platform_api.g.dart'
         Environment,
         Session,
         OrderResponseModel,
-        AddressMode;
+        AddressMode,
+        TotalPriceStatus,
+        GooglePayEnvironment;
 export 'src/models/adyen_configuration.dart';
 export 'src/models/drop_in_outcome.dart';
 export 'src/models/payment_flow.dart';

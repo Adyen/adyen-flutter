@@ -23,6 +23,22 @@ enum AddressMode {
   none,
 }
 
+enum CardAuthMethod {
+  panOnly,
+  cryptogram3DS,
+}
+
+enum TotalPriceStatus {
+  notCurrentlyKnown,
+  estimated,
+  finalPrice,
+}
+
+enum GooglePayEnvironment {
+  test,
+  production,
+}
+
 enum PaymentResultEnum {
   cancelledByUser,
   error,
@@ -93,129 +109,6 @@ class Amount {
   }
 }
 
-class DropInConfigurationDTO {
-  DropInConfigurationDTO({
-    required this.environment,
-    required this.clientKey,
-    required this.countryCode,
-    required this.amount,
-    this.analyticsOptionsDTO,
-    this.showPreselectedStoredPaymentMethod,
-    this.skipListWhenSinglePaymentMethod,
-    this.cardsConfigurationDTO,
-    this.applePayConfigurationDTO,
-  });
-
-  Environment environment;
-
-  String clientKey;
-
-  String countryCode;
-
-  Amount amount;
-
-  AnalyticsOptionsDTO? analyticsOptionsDTO;
-
-  bool? showPreselectedStoredPaymentMethod;
-
-  bool? skipListWhenSinglePaymentMethod;
-
-  CardsConfigurationDTO? cardsConfigurationDTO;
-
-  ApplePayConfigurationDTO? applePayConfigurationDTO;
-
-  Object encode() {
-    return <Object?>[
-      environment.index,
-      clientKey,
-      countryCode,
-      amount.encode(),
-      analyticsOptionsDTO?.encode(),
-      showPreselectedStoredPaymentMethod,
-      skipListWhenSinglePaymentMethod,
-      cardsConfigurationDTO?.encode(),
-      applePayConfigurationDTO?.encode(),
-    ];
-  }
-
-  static DropInConfigurationDTO decode(Object result) {
-    result as List<Object?>;
-    return DropInConfigurationDTO(
-      environment: Environment.values[result[0]! as int],
-      clientKey: result[1]! as String,
-      countryCode: result[2]! as String,
-      amount: Amount.decode(result[3]! as List<Object?>),
-      analyticsOptionsDTO: result[4] != null
-          ? AnalyticsOptionsDTO.decode(result[4]! as List<Object?>)
-          : null,
-      showPreselectedStoredPaymentMethod: result[5] as bool?,
-      skipListWhenSinglePaymentMethod: result[6] as bool?,
-      cardsConfigurationDTO: result[7] != null
-          ? CardsConfigurationDTO.decode(result[7]! as List<Object?>)
-          : null,
-      applePayConfigurationDTO: result[8] != null
-          ? ApplePayConfigurationDTO.decode(result[8]! as List<Object?>)
-          : null,
-    );
-  }
-}
-
-class CardsConfigurationDTO {
-  CardsConfigurationDTO({
-    required this.holderNameRequired,
-    required this.addressMode,
-    required this.showStorePaymentField,
-    required this.hideCvcStoredCard,
-    required this.hideCvc,
-    required this.kcpVisible,
-    required this.socialSecurityVisible,
-    required this.supportedCardTypes,
-  });
-
-  bool holderNameRequired;
-
-  AddressMode addressMode;
-
-  bool showStorePaymentField;
-
-  bool hideCvcStoredCard;
-
-  bool hideCvc;
-
-  bool kcpVisible;
-
-  bool socialSecurityVisible;
-
-  List<String?> supportedCardTypes;
-
-  Object encode() {
-    return <Object?>[
-      holderNameRequired,
-      addressMode.index,
-      showStorePaymentField,
-      hideCvcStoredCard,
-      hideCvc,
-      kcpVisible,
-      socialSecurityVisible,
-      supportedCardTypes,
-    ];
-  }
-
-  static CardsConfigurationDTO decode(Object result) {
-    result as List<Object?>;
-    return CardsConfigurationDTO(
-      holderNameRequired: result[0]! as bool,
-      addressMode: AddressMode.values[result[1]! as int],
-      showStorePaymentField: result[2]! as bool,
-      hideCvcStoredCard: result[3]! as bool,
-      hideCvc: result[4]! as bool,
-      kcpVisible: result[5]! as bool,
-      socialSecurityVisible: result[6]! as bool,
-      supportedCardTypes: (result[7] as List<Object?>?)!.cast<String?>(),
-    );
-  }
-}
-
 class AnalyticsOptionsDTO {
   AnalyticsOptionsDTO({
     this.enabled,
@@ -238,6 +131,141 @@ class AnalyticsOptionsDTO {
     return AnalyticsOptionsDTO(
       enabled: result[0] as bool?,
       payload: result[1] as String?,
+    );
+  }
+}
+
+class DropInConfigurationDTO {
+  DropInConfigurationDTO({
+    required this.environment,
+    required this.clientKey,
+    required this.countryCode,
+    required this.amount,
+    this.shopperLocale,
+    this.analyticsOptionsDTO,
+    this.showPreselectedStoredPaymentMethod,
+    this.skipListWhenSinglePaymentMethod,
+    this.cardsConfigurationDTO,
+    this.applePayConfigurationDTO,
+    this.googlePayConfigurationDTO,
+  });
+
+  Environment environment;
+
+  String clientKey;
+
+  String countryCode;
+
+  Amount amount;
+
+  String? shopperLocale;
+
+  AnalyticsOptionsDTO? analyticsOptionsDTO;
+
+  bool? showPreselectedStoredPaymentMethod;
+
+  bool? skipListWhenSinglePaymentMethod;
+
+  CardsConfigurationDTO? cardsConfigurationDTO;
+
+  ApplePayConfigurationDTO? applePayConfigurationDTO;
+
+  GooglePayConfigurationDTO? googlePayConfigurationDTO;
+
+  Object encode() {
+    return <Object?>[
+      environment.index,
+      clientKey,
+      countryCode,
+      amount.encode(),
+      shopperLocale,
+      analyticsOptionsDTO?.encode(),
+      showPreselectedStoredPaymentMethod,
+      skipListWhenSinglePaymentMethod,
+      cardsConfigurationDTO?.encode(),
+      applePayConfigurationDTO?.encode(),
+      googlePayConfigurationDTO?.encode(),
+    ];
+  }
+
+  static DropInConfigurationDTO decode(Object result) {
+    result as List<Object?>;
+    return DropInConfigurationDTO(
+      environment: Environment.values[result[0]! as int],
+      clientKey: result[1]! as String,
+      countryCode: result[2]! as String,
+      amount: Amount.decode(result[3]! as List<Object?>),
+      shopperLocale: result[4] as String?,
+      analyticsOptionsDTO: result[5] != null
+          ? AnalyticsOptionsDTO.decode(result[5]! as List<Object?>)
+          : null,
+      showPreselectedStoredPaymentMethod: result[6] as bool?,
+      skipListWhenSinglePaymentMethod: result[7] as bool?,
+      cardsConfigurationDTO: result[8] != null
+          ? CardsConfigurationDTO.decode(result[8]! as List<Object?>)
+          : null,
+      applePayConfigurationDTO: result[9] != null
+          ? ApplePayConfigurationDTO.decode(result[9]! as List<Object?>)
+          : null,
+      googlePayConfigurationDTO: result[10] != null
+          ? GooglePayConfigurationDTO.decode(result[10]! as List<Object?>)
+          : null,
+    );
+  }
+}
+
+class CardsConfigurationDTO {
+  CardsConfigurationDTO({
+    required this.holderNameRequired,
+    required this.addressMode,
+    required this.showStorePaymentField,
+    required this.showCvcForStoredCard,
+    required this.showCvc,
+    required this.showKcpField,
+    required this.showSocialSecurityNumberField,
+    required this.supportedCardTypes,
+  });
+
+  bool holderNameRequired;
+
+  AddressMode addressMode;
+
+  bool showStorePaymentField;
+
+  bool showCvcForStoredCard;
+
+  bool showCvc;
+
+  bool showKcpField;
+
+  bool showSocialSecurityNumberField;
+
+  List<String?> supportedCardTypes;
+
+  Object encode() {
+    return <Object?>[
+      holderNameRequired,
+      addressMode.index,
+      showStorePaymentField,
+      showCvcForStoredCard,
+      showCvc,
+      showKcpField,
+      showSocialSecurityNumberField,
+      supportedCardTypes,
+    ];
+  }
+
+  static CardsConfigurationDTO decode(Object result) {
+    result as List<Object?>;
+    return CardsConfigurationDTO(
+      holderNameRequired: result[0]! as bool,
+      addressMode: AddressMode.values[result[1]! as int],
+      showStorePaymentField: result[2]! as bool,
+      showCvcForStoredCard: result[3]! as bool,
+      showCvc: result[4]! as bool,
+      showKcpField: result[5]! as bool,
+      showSocialSecurityNumberField: result[6]! as bool,
+      supportedCardTypes: (result[7] as List<Object?>?)!.cast<String?>(),
     );
   }
 }
@@ -269,6 +297,72 @@ class ApplePayConfigurationDTO {
       merchantId: result[0]! as String,
       merchantName: result[1]! as String,
       allowOnboarding: result[2]! as bool,
+    );
+  }
+}
+
+class GooglePayConfigurationDTO {
+  GooglePayConfigurationDTO({
+    required this.merchantAccount,
+    required this.allowedCardNetworks,
+    required this.allowedAuthMethods,
+    required this.totalPriceStatus,
+    required this.allowPrepaidCards,
+    required this.billingAddressRequired,
+    required this.emailRequired,
+    required this.shippingAddressRequired,
+    required this.existingPaymentMethodRequired,
+    required this.googlePayEnvironment,
+  });
+
+  String merchantAccount;
+
+  List<String?> allowedCardNetworks;
+
+  List<String?> allowedAuthMethods;
+
+  TotalPriceStatus totalPriceStatus;
+
+  bool allowPrepaidCards;
+
+  bool billingAddressRequired;
+
+  bool emailRequired;
+
+  bool shippingAddressRequired;
+
+  bool existingPaymentMethodRequired;
+
+  GooglePayEnvironment googlePayEnvironment;
+
+  Object encode() {
+    return <Object?>[
+      merchantAccount,
+      allowedCardNetworks,
+      allowedAuthMethods,
+      totalPriceStatus.index,
+      allowPrepaidCards,
+      billingAddressRequired,
+      emailRequired,
+      shippingAddressRequired,
+      existingPaymentMethodRequired,
+      googlePayEnvironment.index,
+    ];
+  }
+
+  static GooglePayConfigurationDTO decode(Object result) {
+    result as List<Object?>;
+    return GooglePayConfigurationDTO(
+      merchantAccount: result[0]! as String,
+      allowedCardNetworks: (result[1] as List<Object?>?)!.cast<String?>(),
+      allowedAuthMethods: (result[2] as List<Object?>?)!.cast<String?>(),
+      totalPriceStatus: TotalPriceStatus.values[result[3]! as int],
+      allowPrepaidCards: result[4]! as bool,
+      billingAddressRequired: result[5]! as bool,
+      emailRequired: result[6]! as bool,
+      shippingAddressRequired: result[7]! as bool,
+      existingPaymentMethodRequired: result[8]! as bool,
+      googlePayEnvironment: GooglePayEnvironment.values[result[9]! as int],
     );
   }
 }
@@ -511,8 +605,11 @@ class _CheckoutPlatformInterfaceCodec extends StandardMessageCodec {
     } else if (value is DropInResult) {
       buffer.putUint8(134);
       writeValue(buffer, value.encode());
-    } else if (value is Session) {
+    } else if (value is GooglePayConfigurationDTO) {
       buffer.putUint8(135);
+      writeValue(buffer, value.encode());
+    } else if (value is Session) {
+      buffer.putUint8(136);
       writeValue(buffer, value.encode());
     } else {
       super.writeValue(buffer, value);
@@ -537,6 +634,8 @@ class _CheckoutPlatformInterfaceCodec extends StandardMessageCodec {
       case 134: 
         return DropInResult.decode(readValue(buffer)!);
       case 135: 
+        return GooglePayConfigurationDTO.decode(readValue(buffer)!);
+      case 136: 
         return Session.decode(readValue(buffer)!);
       default:
         return super.readValueOfType(type, buffer);

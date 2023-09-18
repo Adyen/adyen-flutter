@@ -14,6 +14,9 @@ sealed class AdyenConfiguration {
   );
 }
 
+//1. Identify common grounds for the four configs on native side
+//2. CashPay config,
+
 class DropInConfiguration extends DropInConfigurationDTO
     implements AdyenConfiguration {
   DropInConfiguration({
@@ -21,15 +24,20 @@ class DropInConfiguration extends DropInConfigurationDTO
     required super.clientKey,
     required super.countryCode,
     required super.amount,
+    String? shopperLocale,
     CardsConfiguration? cardsConfiguration,
     ApplePayConfiguration? applePayConfiguration,
+    GooglePayConfiguration? googlePayConfiguration,
     AnalyticsOptions? analyticsOptions,
     bool showPreselectedStoredPaymentMethod = false,
     bool skipListWhenSinglePaymentMethod = false,
   }) : super(
+    shopperLocale: shopperLocale,
           cardsConfigurationDTO: _toCardsConfigurationDTO(cardsConfiguration),
           applePayConfigurationDTO:
               _toApplePayConfigurationDTO(applePayConfiguration),
+          googlePayConfigurationDTO:
+              _toGooglePayConfiguration(googlePayConfiguration),
           analyticsOptionsDTO: _toAnalyticsOptionsDTO(analyticsOptions),
           showPreselectedStoredPaymentMethod:
               showPreselectedStoredPaymentMethod,
@@ -46,10 +54,11 @@ class DropInConfiguration extends DropInConfigurationDTO
       holderNameRequired: cardsConfiguration.holderNameRequired,
       addressMode: cardsConfiguration.addressMode,
       showStorePaymentField: cardsConfiguration.showStorePaymentField,
-      hideCvcStoredCard: cardsConfiguration.hideCvcStoredCard,
-      hideCvc: cardsConfiguration.hideCvc,
-      kcpVisible: cardsConfiguration.kcpVisible,
-      socialSecurityVisible: cardsConfiguration.socialSecurityVisible,
+      showCvcForStoredCard: cardsConfiguration.showCvcForStoredCard,
+      showCvc: cardsConfiguration.showCvc,
+      showKcpField: cardsConfiguration.showKcpField,
+      showSocialSecurityNumberField:
+          cardsConfiguration.showSocialSecurityNumberField,
       supportedCardTypes: cardsConfiguration.supportedCardTypes,
     );
   }
@@ -78,6 +87,28 @@ class DropInConfiguration extends DropInConfigurationDTO
       payload: analyticsOptions.payload,
     );
   }
+
+  static GooglePayConfigurationDTO? _toGooglePayConfiguration(
+      GooglePayConfiguration? googlePayConfiguration) {
+    if (googlePayConfiguration == null) {
+      return null;
+    }
+
+    return GooglePayConfigurationDTO(
+        merchantAccount: googlePayConfiguration.merchantAccount,
+        allowedCardNetworks: googlePayConfiguration.allowedCardNetworks,
+        allowedAuthMethods: googlePayConfiguration.allowedAuthMethods
+            .map((allowedAuthMethod) => allowedAuthMethod.name)
+            .toList(),
+        totalPriceStatus: googlePayConfiguration.totalPriceStatus,
+        allowPrepaidCards: googlePayConfiguration.allowPrepaidCards,
+        billingAddressRequired: googlePayConfiguration.billingAddressRequired,
+        emailRequired: googlePayConfiguration.emailRequired,
+        shippingAddressRequired: googlePayConfiguration.shippingAddressRequired,
+        existingPaymentMethodRequired:
+            googlePayConfiguration.existingPaymentMethodRequired,
+        googlePayEnvironment: googlePayConfiguration.googlePayEnvironment);
+  }
 }
 
 class CardsConfiguration extends CardsConfigurationDTO {
@@ -85,19 +116,19 @@ class CardsConfiguration extends CardsConfigurationDTO {
     bool holderNameRequired = false,
     AddressMode addressMode = AddressMode.none,
     bool showStorePaymentField = false,
-    bool hideCvcStoredCard = false,
-    bool hideCvc = false,
-    bool kcpVisible = false,
-    bool socialSecurityVisible = false,
+    bool showCvcForStoredCard = true,
+    bool showCvc = true,
+    bool showKcpField = false,
+    bool showSocialSecurityNumberField = false,
     List<String?> supportedCardTypes = const [],
   }) : super(
           holderNameRequired: holderNameRequired,
           addressMode: addressMode,
           showStorePaymentField: showStorePaymentField,
-          hideCvcStoredCard: hideCvcStoredCard,
-          hideCvc: hideCvc,
-          kcpVisible: kcpVisible,
-          socialSecurityVisible: socialSecurityVisible,
+          showCvcForStoredCard: showCvcForStoredCard,
+          showCvc: showCvc,
+          showKcpField: showKcpField,
+          showSocialSecurityNumberField: showSocialSecurityNumberField,
           supportedCardTypes: supportedCardTypes,
         );
 }
@@ -148,20 +179,4 @@ class GooglePayConfiguration {
     this.shippingAddressRequired = false,
     this.existingPaymentMethodRequired = false,
   });
-}
-
-enum CardAuthMethod {
-  panOnly,
-  cryptogram3DS,
-}
-
-enum TotalPriceStatus {
-  notCurrentlyKnown,
-  estimated,
-  finalPrice,
-}
-
-enum GooglePayEnvironment {
-  test,
-  production,
 }

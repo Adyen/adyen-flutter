@@ -69,6 +69,40 @@ enum class AddressMode(val raw: Int) {
   }
 }
 
+enum class CardAuthMethod(val raw: Int) {
+  PANONLY(0),
+  CRYPTOGRAM3DS(1);
+
+  companion object {
+    fun ofRaw(raw: Int): CardAuthMethod? {
+      return values().firstOrNull { it.raw == raw }
+    }
+  }
+}
+
+enum class TotalPriceStatus(val raw: Int) {
+  NOTCURRENTLYKNOWN(0),
+  ESTIMATED(1),
+  FINALPRICE(2);
+
+  companion object {
+    fun ofRaw(raw: Int): TotalPriceStatus? {
+      return values().firstOrNull { it.raw == raw }
+    }
+  }
+}
+
+enum class GooglePayEnvironment(val raw: Int) {
+  TEST(0),
+  PRODUCTION(1);
+
+  companion object {
+    fun ofRaw(raw: Int): GooglePayEnvironment? {
+      return values().firstOrNull { it.raw == raw }
+    }
+  }
+}
+
 enum class PaymentResultEnum(val raw: Int) {
   CANCELLEDBYUSER(0),
   ERROR(1),
@@ -150,95 +184,6 @@ data class Amount (
 }
 
 /** Generated class from Pigeon that represents data sent in messages. */
-data class DropInConfigurationDTO (
-  val environment: Environment,
-  val clientKey: String,
-  val countryCode: String,
-  val amount: Amount,
-  val analyticsOptionsDTO: AnalyticsOptionsDTO? = null,
-  val showPreselectedStoredPaymentMethod: Boolean? = null,
-  val skipListWhenSinglePaymentMethod: Boolean? = null,
-  val cardsConfigurationDTO: CardsConfigurationDTO? = null,
-  val applePayConfigurationDTO: ApplePayConfigurationDTO? = null
-
-) {
-  companion object {
-    @Suppress("UNCHECKED_CAST")
-    fun fromList(list: List<Any?>): DropInConfigurationDTO {
-      val environment = Environment.ofRaw(list[0] as Int)!!
-      val clientKey = list[1] as String
-      val countryCode = list[2] as String
-      val amount = Amount.fromList(list[3] as List<Any?>)
-      val analyticsOptionsDTO: AnalyticsOptionsDTO? = (list[4] as List<Any?>?)?.let {
-        AnalyticsOptionsDTO.fromList(it)
-      }
-      val showPreselectedStoredPaymentMethod = list[5] as Boolean?
-      val skipListWhenSinglePaymentMethod = list[6] as Boolean?
-      val cardsConfigurationDTO: CardsConfigurationDTO? = (list[7] as List<Any?>?)?.let {
-        CardsConfigurationDTO.fromList(it)
-      }
-      val applePayConfigurationDTO: ApplePayConfigurationDTO? = (list[8] as List<Any?>?)?.let {
-        ApplePayConfigurationDTO.fromList(it)
-      }
-      return DropInConfigurationDTO(environment, clientKey, countryCode, amount, analyticsOptionsDTO, showPreselectedStoredPaymentMethod, skipListWhenSinglePaymentMethod, cardsConfigurationDTO, applePayConfigurationDTO)
-    }
-  }
-  fun toList(): List<Any?> {
-    return listOf<Any?>(
-      environment.raw,
-      clientKey,
-      countryCode,
-      amount.toList(),
-      analyticsOptionsDTO?.toList(),
-      showPreselectedStoredPaymentMethod,
-      skipListWhenSinglePaymentMethod,
-      cardsConfigurationDTO?.toList(),
-      applePayConfigurationDTO?.toList(),
-    )
-  }
-}
-
-/** Generated class from Pigeon that represents data sent in messages. */
-data class CardsConfigurationDTO (
-  val holderNameRequired: Boolean,
-  val addressMode: AddressMode,
-  val showStorePaymentField: Boolean,
-  val hideCvcStoredCard: Boolean,
-  val hideCvc: Boolean,
-  val kcpVisible: Boolean,
-  val socialSecurityVisible: Boolean,
-  val supportedCardTypes: List<String?>
-
-) {
-  companion object {
-    @Suppress("UNCHECKED_CAST")
-    fun fromList(list: List<Any?>): CardsConfigurationDTO {
-      val holderNameRequired = list[0] as Boolean
-      val addressMode = AddressMode.ofRaw(list[1] as Int)!!
-      val showStorePaymentField = list[2] as Boolean
-      val hideCvcStoredCard = list[3] as Boolean
-      val hideCvc = list[4] as Boolean
-      val kcpVisible = list[5] as Boolean
-      val socialSecurityVisible = list[6] as Boolean
-      val supportedCardTypes = list[7] as List<String?>
-      return CardsConfigurationDTO(holderNameRequired, addressMode, showStorePaymentField, hideCvcStoredCard, hideCvc, kcpVisible, socialSecurityVisible, supportedCardTypes)
-    }
-  }
-  fun toList(): List<Any?> {
-    return listOf<Any?>(
-      holderNameRequired,
-      addressMode.raw,
-      showStorePaymentField,
-      hideCvcStoredCard,
-      hideCvc,
-      kcpVisible,
-      socialSecurityVisible,
-      supportedCardTypes,
-    )
-  }
-}
-
-/** Generated class from Pigeon that represents data sent in messages. */
 data class AnalyticsOptionsDTO (
   val enabled: Boolean? = null,
   val payload: String? = null
@@ -256,6 +201,103 @@ data class AnalyticsOptionsDTO (
     return listOf<Any?>(
       enabled,
       payload,
+    )
+  }
+}
+
+/** Generated class from Pigeon that represents data sent in messages. */
+data class DropInConfigurationDTO (
+  val environment: Environment,
+  val clientKey: String,
+  val countryCode: String,
+  val amount: Amount,
+  val shopperLocale: String? = null,
+  val analyticsOptionsDTO: AnalyticsOptionsDTO? = null,
+  val showPreselectedStoredPaymentMethod: Boolean? = null,
+  val skipListWhenSinglePaymentMethod: Boolean? = null,
+  val cardsConfigurationDTO: CardsConfigurationDTO? = null,
+  val applePayConfigurationDTO: ApplePayConfigurationDTO? = null,
+  val googlePayConfigurationDTO: GooglePayConfigurationDTO? = null
+
+) {
+  companion object {
+    @Suppress("UNCHECKED_CAST")
+    fun fromList(list: List<Any?>): DropInConfigurationDTO {
+      val environment = Environment.ofRaw(list[0] as Int)!!
+      val clientKey = list[1] as String
+      val countryCode = list[2] as String
+      val amount = Amount.fromList(list[3] as List<Any?>)
+      val shopperLocale = list[4] as String?
+      val analyticsOptionsDTO: AnalyticsOptionsDTO? = (list[5] as List<Any?>?)?.let {
+        AnalyticsOptionsDTO.fromList(it)
+      }
+      val showPreselectedStoredPaymentMethod = list[6] as Boolean?
+      val skipListWhenSinglePaymentMethod = list[7] as Boolean?
+      val cardsConfigurationDTO: CardsConfigurationDTO? = (list[8] as List<Any?>?)?.let {
+        CardsConfigurationDTO.fromList(it)
+      }
+      val applePayConfigurationDTO: ApplePayConfigurationDTO? = (list[9] as List<Any?>?)?.let {
+        ApplePayConfigurationDTO.fromList(it)
+      }
+      val googlePayConfigurationDTO: GooglePayConfigurationDTO? = (list[10] as List<Any?>?)?.let {
+        GooglePayConfigurationDTO.fromList(it)
+      }
+      return DropInConfigurationDTO(environment, clientKey, countryCode, amount, shopperLocale, analyticsOptionsDTO, showPreselectedStoredPaymentMethod, skipListWhenSinglePaymentMethod, cardsConfigurationDTO, applePayConfigurationDTO, googlePayConfigurationDTO)
+    }
+  }
+  fun toList(): List<Any?> {
+    return listOf<Any?>(
+      environment.raw,
+      clientKey,
+      countryCode,
+      amount.toList(),
+      shopperLocale,
+      analyticsOptionsDTO?.toList(),
+      showPreselectedStoredPaymentMethod,
+      skipListWhenSinglePaymentMethod,
+      cardsConfigurationDTO?.toList(),
+      applePayConfigurationDTO?.toList(),
+      googlePayConfigurationDTO?.toList(),
+    )
+  }
+}
+
+/** Generated class from Pigeon that represents data sent in messages. */
+data class CardsConfigurationDTO (
+  val holderNameRequired: Boolean,
+  val addressMode: AddressMode,
+  val showStorePaymentField: Boolean,
+  val showCvcForStoredCard: Boolean,
+  val showCvc: Boolean,
+  val showKcpField: Boolean,
+  val showSocialSecurityNumberField: Boolean,
+  val supportedCardTypes: List<String?>
+
+) {
+  companion object {
+    @Suppress("UNCHECKED_CAST")
+    fun fromList(list: List<Any?>): CardsConfigurationDTO {
+      val holderNameRequired = list[0] as Boolean
+      val addressMode = AddressMode.ofRaw(list[1] as Int)!!
+      val showStorePaymentField = list[2] as Boolean
+      val showCvcForStoredCard = list[3] as Boolean
+      val showCvc = list[4] as Boolean
+      val showKcpField = list[5] as Boolean
+      val showSocialSecurityNumberField = list[6] as Boolean
+      val supportedCardTypes = list[7] as List<String?>
+      return CardsConfigurationDTO(holderNameRequired, addressMode, showStorePaymentField, showCvcForStoredCard, showCvc, showKcpField, showSocialSecurityNumberField, supportedCardTypes)
+    }
+  }
+  fun toList(): List<Any?> {
+    return listOf<Any?>(
+      holderNameRequired,
+      addressMode.raw,
+      showStorePaymentField,
+      showCvcForStoredCard,
+      showCvc,
+      showKcpField,
+      showSocialSecurityNumberField,
+      supportedCardTypes,
     )
   }
 }
@@ -281,6 +323,52 @@ data class ApplePayConfigurationDTO (
       merchantId,
       merchantName,
       allowOnboarding,
+    )
+  }
+}
+
+/** Generated class from Pigeon that represents data sent in messages. */
+data class GooglePayConfigurationDTO (
+  val merchantAccount: String,
+  val allowedCardNetworks: List<String?>,
+  val allowedAuthMethods: List<String?>,
+  val totalPriceStatus: TotalPriceStatus,
+  val allowPrepaidCards: Boolean,
+  val billingAddressRequired: Boolean,
+  val emailRequired: Boolean,
+  val shippingAddressRequired: Boolean,
+  val existingPaymentMethodRequired: Boolean,
+  val googlePayEnvironment: GooglePayEnvironment
+
+) {
+  companion object {
+    @Suppress("UNCHECKED_CAST")
+    fun fromList(list: List<Any?>): GooglePayConfigurationDTO {
+      val merchantAccount = list[0] as String
+      val allowedCardNetworks = list[1] as List<String?>
+      val allowedAuthMethods = list[2] as List<String?>
+      val totalPriceStatus = TotalPriceStatus.ofRaw(list[3] as Int)!!
+      val allowPrepaidCards = list[4] as Boolean
+      val billingAddressRequired = list[5] as Boolean
+      val emailRequired = list[6] as Boolean
+      val shippingAddressRequired = list[7] as Boolean
+      val existingPaymentMethodRequired = list[8] as Boolean
+      val googlePayEnvironment = GooglePayEnvironment.ofRaw(list[9] as Int)!!
+      return GooglePayConfigurationDTO(merchantAccount, allowedCardNetworks, allowedAuthMethods, totalPriceStatus, allowPrepaidCards, billingAddressRequired, emailRequired, shippingAddressRequired, existingPaymentMethodRequired, googlePayEnvironment)
+    }
+  }
+  fun toList(): List<Any?> {
+    return listOf<Any?>(
+      merchantAccount,
+      allowedCardNetworks,
+      allowedAuthMethods,
+      totalPriceStatus.raw,
+      allowPrepaidCards,
+      billingAddressRequired,
+      emailRequired,
+      shippingAddressRequired,
+      existingPaymentMethodRequired,
+      googlePayEnvironment.raw,
     )
   }
 }
@@ -497,6 +585,11 @@ private object CheckoutPlatformInterfaceCodec : StandardMessageCodec() {
       }
       135.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
+          GooglePayConfigurationDTO.fromList(it)
+        }
+      }
+      136.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
           Session.fromList(it)
         }
       }
@@ -533,8 +626,12 @@ private object CheckoutPlatformInterfaceCodec : StandardMessageCodec() {
         stream.write(134)
         writeValue(stream, value.toList())
       }
-      is Session -> {
+      is GooglePayConfigurationDTO -> {
         stream.write(135)
+        writeValue(stream, value.toList())
+      }
+      is Session -> {
+        stream.write(136)
         writeValue(stream, value.toList())
       }
       else -> super.writeValue(stream, value)

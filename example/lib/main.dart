@@ -112,12 +112,26 @@ class _MyAppState extends State<MyApp> {
       holderNameRequired: true,
     );
 
+    final ApplePayConfiguration applePayConfiguration = ApplePayConfiguration(
+      merchantId: Config.merchantAccount,
+      merchantName: Config.merchantName,
+    );
+
+    final GooglePayConfiguration googlePayConfiguration =
+        GooglePayConfiguration(
+      totalPriceStatus: TotalPriceStatus.finalPrice,
+      googlePayEnvironment: GooglePayEnvironment.test,
+    );
+
     final DropInConfiguration dropInConfiguration = DropInConfiguration(
       environment: Environment.test,
       clientKey: Config.clientKey,
       countryCode: Config.countryCode,
+      shopperLocale: Config.shopperLocale,
       amount: Config.amount,
       cardsConfiguration: cardsConfiguration,
+      applePayConfiguration: applePayConfiguration,
+      googlePayConfiguration: googlePayConfiguration,
     );
 
     return await _adyenCheckout.startPayment(
