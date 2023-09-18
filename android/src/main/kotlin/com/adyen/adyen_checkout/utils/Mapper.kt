@@ -13,42 +13,44 @@ import com.adyen.checkout.card.CardType
 import com.adyen.checkout.card.KCPAuthVisibility
 import com.adyen.checkout.card.SocialSecurityNumberVisibility
 import com.adyen.checkout.components.core.OrderResponse
+import com.adyen.checkout.dropin.DropInConfiguration
+import com.adyen.checkout.sessions.core.SessionModel
 import com.adyen.checkout.core.Environment as SDKEnvironment
 
 object Mapper {
 
-    fun Session.mapToSession(): com.adyen.checkout.sessions.core.SessionModel {
-        return com.adyen.checkout.sessions.core.SessionModel(this.id, this.sessionData)
+    fun Session.mapToSession(): SessionModel {
+        return SessionModel(this.id, this.sessionData)
     }
 
-    fun DropInConfigurationDTO.mapToDropInConfiguration(context: Context): com.adyen.checkout.dropin.DropInConfiguration {
+    fun DropInConfigurationDTO.mapToDropInConfiguration(context: Context): DropInConfiguration {
         val environment = this.environment.mapToEnvironment()
         val cardConfiguration = CardConfiguration.Builder(
-                context = context,
-                environment = environment,
-                clientKey = this.clientKey
+            context = context,
+            environment = environment,
+            clientKey = this.clientKey
         )
-                .setShowStorePaymentField(cardsConfigurationDTO?.showStorePaymentField ?: false)
-                .setAddressConfiguration(cardsConfigurationDTO?.addressMode?.mapToAddressConfiguration()
-                        ?: AddressConfiguration.None)
-                .setShowStorePaymentField(cardsConfigurationDTO?.showStorePaymentField ?: false)
-                .setHideCvcStoredCard(cardsConfigurationDTO?.hideCvcStoredCard ?: false)
-                .setHideCvc(cardsConfigurationDTO?.hideCvc ?: false)
-                .setKcpAuthVisibility(determineKcpAuthVisibility(cardsConfigurationDTO?.kcpVisible))
-                .setSocialSecurityNumberVisibility(determineSocialSecurityNumberVisibility(cardsConfigurationDTO?.socialSecurityVisible))
-                .setSupportedCardTypes(*mapToSupportedCardTypes(cardsConfigurationDTO?.supportedCardTypes))
-                .setHolderNameRequired(cardsConfigurationDTO?.holderNameRequired ?: false)
-                .build()
+            .setShowStorePaymentField(cardsConfigurationDTO?.showStorePaymentField ?: false)
+            .setAddressConfiguration(
+                cardsConfigurationDTO?.addressMode?.mapToAddressConfiguration()
+                    ?: AddressConfiguration.None
+            )
+            .setShowStorePaymentField(cardsConfigurationDTO?.showStorePaymentField ?: false)
+            .setHideCvcStoredCard(cardsConfigurationDTO?.hideCvcStoredCard ?: false)
+            .setHideCvc(cardsConfigurationDTO?.hideCvc ?: false)
+            .setKcpAuthVisibility(determineKcpAuthVisibility(cardsConfigurationDTO?.kcpVisible))
+            .setSocialSecurityNumberVisibility(
+                determineSocialSecurityNumberVisibility(cardsConfigurationDTO?.socialSecurityVisible)
+            )
+            .setSupportedCardTypes(*mapToSupportedCardTypes(cardsConfigurationDTO?.supportedCardTypes))
+            .setHolderNameRequired(cardsConfigurationDTO?.holderNameRequired ?: false)
+            .build()
         val amount = this.amount.mapToAmount()
-        return com.adyen.checkout.dropin.DropInConfiguration.Builder(
+        return DropInConfiguration.Builder(
             context,
             this.environment.mapToEnvironment(),
             clientKey,
-        ).setAmount(amount).build()
-                context,
-                this.environment.mapToEnvironment(),
-                clientKey
-        ).setAmount(amount).addCardConfiguration(cardConfiguration).build();
+        ).setAmount(amount).addCardConfiguration(cardConfiguration).build()
     }
 
     private fun AddressMode.mapToAddressConfiguration(): AddressConfiguration {
@@ -105,10 +107,10 @@ object Mapper {
 
     fun OrderResponse.mapToOrderResponseModel(): OrderResponseModel {
         return OrderResponseModel(
-                pspReference = pspReference,
-                orderData = orderData,
-                amount = amount?.mapTopAmount(),
-                remainingAmount = remainingAmount?.mapTopAmount(),
+            pspReference = pspReference,
+            orderData = orderData,
+            amount = amount?.mapTopAmount(),
+            remainingAmount = remainingAmount?.mapTopAmount(),
         )
     }
 }

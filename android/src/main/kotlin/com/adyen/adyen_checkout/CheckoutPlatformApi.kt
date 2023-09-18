@@ -34,7 +34,7 @@ import org.json.JSONObject
 
 @Suppress("NAME_SHADOWING")
 class CheckoutPlatformApi(private val checkoutFlutterApi: CheckoutFlutterApi?) :
-        CheckoutPlatformInterface {
+    CheckoutPlatformInterface {
         lateinit var activity: FragmentActivity
         lateinit var dropInSessionLauncher:
             ActivityResultLauncher<SessionDropInResultContractParams>
@@ -48,18 +48,18 @@ class CheckoutPlatformApi(private val checkoutFlutterApi: CheckoutFlutterApi?) :
             callback(Result.success(RedirectComponent.getReturnUrl(activity.applicationContext)))
         }
 
-    override fun startDropInSessionPayment(
+        override fun startDropInSessionPayment(
             dropInConfigurationDTO: DropInConfigurationDTO,
             session: Session,
-    ) {
-        checkForFlutterFragmentActivity()
-        activity.lifecycleScope.launch(Dispatchers.IO) {
-            val sessionModel = session.mapToSession()
-            val dropInConfiguration =
+        ) {
+            checkForFlutterFragmentActivity()
+            activity.lifecycleScope.launch(Dispatchers.IO) {
+                val sessionModel = session.mapToSession()
+                val dropInConfiguration =
                     dropInConfigurationDTO.mapToDropInConfiguration(activity.applicationContext)
-            val checkoutSession = createCheckoutSession(sessionModel, dropInConfiguration)
-            withContext(Dispatchers.Main) {
-                DropIn.startPayment(
+                val checkoutSession = createCheckoutSession(sessionModel, dropInConfiguration)
+                withContext(Dispatchers.Main) {
+                    DropIn.startPayment(
                         activity.applicationContext,
                         dropInSessionLauncher,
                         checkoutSession,
@@ -69,31 +69,31 @@ class CheckoutPlatformApi(private val checkoutFlutterApi: CheckoutFlutterApi?) :
             }
         }
 
-    override fun startDropInAdvancedFlowPayment(
+        override fun startDropInAdvancedFlowPayment(
             dropInConfigurationDTO: DropInConfigurationDTO,
             paymentMethodsResponse: String,
-    ) {
-        checkForFlutterFragmentActivity()
-        setAdvancedFlowDropInServiceObserver()
-        activity.lifecycleScope.launch(Dispatchers.IO) {
-            val paymentMethodsApiResponse = PaymentMethodsApiResponse.SERIALIZER.deserialize(
+        ) {
+            checkForFlutterFragmentActivity()
+            setAdvancedFlowDropInServiceObserver()
+            activity.lifecycleScope.launch(Dispatchers.IO) {
+                val paymentMethodsApiResponse = PaymentMethodsApiResponse.SERIALIZER.deserialize(
                     JSONObject(paymentMethodsResponse),
-            )
-            val paymentMethodsWithoutGiftCards =
+                )
+                val paymentMethodsWithoutGiftCards =
                     removeGiftCardPaymentMethods(paymentMethodsApiResponse)
-            val dropInConfiguration =
+                val dropInConfiguration =
                     dropInConfigurationDTO.mapToDropInConfiguration(activity.applicationContext)
-            withContext(Dispatchers.Main) {
-                DropIn.startPayment(
+                withContext(Dispatchers.Main) {
+                    DropIn.startPayment(
                         activity.applicationContext,
                         dropInAdvancedFlowLauncher,
                         paymentMethodsWithoutGiftCards,
                         dropInConfiguration,
                         AdvancedFlowDropInService::class.java,
-                )
+                    )
+                }
             }
         }
-    }
 
         override fun onPaymentsResult(paymentsResult: DropInResult) {
             if (paymentsResult.dropInResultType == DropInResultType.ACTION) {
