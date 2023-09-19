@@ -87,6 +87,11 @@ enum DropInResultType: Int {
   case error = 2
 }
 
+enum CashAppPayEnvironment: Int {
+  case sandbox = 0
+  case production = 1
+}
+
 /// Generated class from Pigeon that represents data sent in messages.
 struct Session {
   var id: String
@@ -166,6 +171,7 @@ struct DropInConfigurationDTO {
   var cardsConfigurationDTO: CardsConfigurationDTO? = nil
   var applePayConfigurationDTO: ApplePayConfigurationDTO? = nil
   var googlePayConfigurationDTO: GooglePayConfigurationDTO? = nil
+  var cashAppPayConfigurationDTO: CashAppPayConfigurationDTO? = nil
 
   static func fromList(_ list: [Any?]) -> DropInConfigurationDTO? {
     let environment = Environment(rawValue: list[0] as! Int)!
@@ -191,6 +197,10 @@ struct DropInConfigurationDTO {
     if let googlePayConfigurationDTOList: [Any?] = nilOrValue(list[10]) {
       googlePayConfigurationDTO = GooglePayConfigurationDTO.fromList(googlePayConfigurationDTOList)
     }
+    var cashAppPayConfigurationDTO: CashAppPayConfigurationDTO? = nil
+    if let cashAppPayConfigurationDTOList: [Any?] = nilOrValue(list[11]) {
+      cashAppPayConfigurationDTO = CashAppPayConfigurationDTO.fromList(cashAppPayConfigurationDTOList)
+    }
 
     return DropInConfigurationDTO(
       environment: environment,
@@ -203,7 +213,8 @@ struct DropInConfigurationDTO {
       skipListWhenSinglePaymentMethod: skipListWhenSinglePaymentMethod,
       cardsConfigurationDTO: cardsConfigurationDTO,
       applePayConfigurationDTO: applePayConfigurationDTO,
-      googlePayConfigurationDTO: googlePayConfigurationDTO
+      googlePayConfigurationDTO: googlePayConfigurationDTO,
+      cashAppPayConfigurationDTO: cashAppPayConfigurationDTO
     )
   }
   func toList() -> [Any?] {
@@ -219,6 +230,7 @@ struct DropInConfigurationDTO {
       cardsConfigurationDTO?.toList(),
       applePayConfigurationDTO?.toList(),
       googlePayConfigurationDTO?.toList(),
+      cashAppPayConfigurationDTO?.toList(),
     ]
   }
 }
@@ -345,6 +357,24 @@ struct GooglePayConfigurationDTO {
       shippingAddressRequired,
       existingPaymentMethodRequired,
       googlePayEnvironment.rawValue,
+    ]
+  }
+}
+
+/// Generated class from Pigeon that represents data sent in messages.
+struct CashAppPayConfigurationDTO {
+  var cashAppPayEnvironment: CashAppPayEnvironment
+
+  static func fromList(_ list: [Any?]) -> CashAppPayConfigurationDTO? {
+    let cashAppPayEnvironment = CashAppPayEnvironment(rawValue: list[0] as! Int)!
+
+    return CashAppPayConfigurationDTO(
+      cashAppPayEnvironment: cashAppPayEnvironment
+    )
+  }
+  func toList() -> [Any?] {
+    return [
+      cashAppPayEnvironment.rawValue,
     ]
   }
 }
@@ -547,14 +577,16 @@ private class CheckoutPlatformInterfaceCodecReader: FlutterStandardReader {
       case 131:
         return CardsConfigurationDTO.fromList(self.readValue() as! [Any?])
       case 132:
-        return DropInConfigurationDTO.fromList(self.readValue() as! [Any?])
+        return CashAppPayConfigurationDTO.fromList(self.readValue() as! [Any?])
       case 133:
-        return DropInError.fromList(self.readValue() as! [Any?])
+        return DropInConfigurationDTO.fromList(self.readValue() as! [Any?])
       case 134:
-        return DropInResult.fromList(self.readValue() as! [Any?])
+        return DropInError.fromList(self.readValue() as! [Any?])
       case 135:
-        return GooglePayConfigurationDTO.fromList(self.readValue() as! [Any?])
+        return DropInResult.fromList(self.readValue() as! [Any?])
       case 136:
+        return GooglePayConfigurationDTO.fromList(self.readValue() as! [Any?])
+      case 137:
         return Session.fromList(self.readValue() as! [Any?])
       default:
         return super.readValue(ofType: type)
@@ -576,20 +608,23 @@ private class CheckoutPlatformInterfaceCodecWriter: FlutterStandardWriter {
     } else if let value = value as? CardsConfigurationDTO {
       super.writeByte(131)
       super.writeValue(value.toList())
-    } else if let value = value as? DropInConfigurationDTO {
+    } else if let value = value as? CashAppPayConfigurationDTO {
       super.writeByte(132)
       super.writeValue(value.toList())
-    } else if let value = value as? DropInError {
+    } else if let value = value as? DropInConfigurationDTO {
       super.writeByte(133)
       super.writeValue(value.toList())
-    } else if let value = value as? DropInResult {
+    } else if let value = value as? DropInError {
       super.writeByte(134)
       super.writeValue(value.toList())
-    } else if let value = value as? GooglePayConfigurationDTO {
+    } else if let value = value as? DropInResult {
       super.writeByte(135)
       super.writeValue(value.toList())
-    } else if let value = value as? Session {
+    } else if let value = value as? GooglePayConfigurationDTO {
       super.writeByte(136)
+      super.writeValue(value.toList())
+    } else if let value = value as? Session {
+      super.writeByte(137)
       super.writeValue(value.toList())
     } else {
       super.writeValue(value)

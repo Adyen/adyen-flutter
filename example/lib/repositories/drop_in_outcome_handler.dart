@@ -14,12 +14,13 @@ class DropInOutcomeHandler {
   static const actionKey = "action";
   static const orderKey = "order";
   static const messageKey = "message";
+  static const refusalReasonKey = "refusalReason";
 
   DropInOutcome handleResponse(Map<String, dynamic> jsonResponse) {
     if (_isError(jsonResponse)) {
       return Error(
         errorMessage: jsonResponse[messageKey],
-        reason: jsonResponse[messageKey],
+        reason: jsonResponse[messageKey] ?? jsonResponse[refusalReasonKey],
         dismissDropIn: true,
       );
     }
@@ -42,7 +43,14 @@ class DropInOutcomeHandler {
     return Finished(resultCode: "EMPTY");
   }
 
-  bool _isError(jsonResponse) => jsonResponse.containsKey(errorCodeKey);
+  bool _isError(jsonResponse) {
+    final hasErrorCodeKey = jsonResponse.containsKey(errorCodeKey);
+    final hasErrorResultCode = (jsonResponse[resultCodeKey] as String?)
+            ?.toLowerCase()
+            .contains(resultError) ??
+        false;
+    return hasErrorCodeKey || hasErrorResultCode;
+  }
 
   bool _isRefusedInPartialPaymentFlow(jsonResponse) =>
       _isRefused(jsonResponse) && _isNonFullyPaidOrder(jsonResponse);

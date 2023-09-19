@@ -116,24 +116,28 @@ class AdyenCheckout implements AdyenCheckoutInterface {
     Future<DropInOutcome> Function(String additionalDetails)
         postPaymentsDetails,
   ) async {
-    if (event.data != null) {
-      final DropInOutcome paymentsDetailsResult =
-          await postPaymentsDetails(event.data!);
-      DropInResult dropInResult = mapToDropInResult(paymentsDetailsResult);
-      AdyenCheckoutPlatformInterface.instance
-          .onPaymentsDetailsResult(dropInResult);
+    if (event.data == null) {
+      throw Exception("Additional data is not provided.");
     }
+
+    final DropInOutcome paymentsDetailsResult =
+        await postPaymentsDetails(event.data!);
+    DropInResult dropInResult = mapToDropInResult(paymentsDetailsResult);
+    AdyenCheckoutPlatformInterface.instance
+        .onPaymentsDetailsResult(dropInResult);
   }
 
   Future<void> _handlePaymentComponent(
     PlatformCommunicationModel event,
     Future<DropInOutcome> Function(String paymentComponentJson) postPayments,
   ) async {
-    if (event.data != null) {
-      final DropInOutcome paymentsResult = await postPayments(event.data!);
-      DropInResult dropInResult = mapToDropInResult(paymentsResult);
-      AdyenCheckoutPlatformInterface.instance.onPaymentsResult(dropInResult);
+    if (event.data == null) {
+      throw Exception("Payment data is not provided.");
     }
+
+    final DropInOutcome paymentsResult = await postPayments(event.data!);
+    DropInResult dropInResult = mapToDropInResult(paymentsResult);
+    AdyenCheckoutPlatformInterface.instance.onPaymentsResult(dropInResult);
   }
 
   DropInResult mapToDropInResult(DropInOutcome dropInOutcome) {

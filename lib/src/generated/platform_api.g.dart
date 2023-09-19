@@ -57,6 +57,11 @@ enum DropInResultType {
   error,
 }
 
+enum CashAppPayEnvironment {
+  sandbox,
+  production,
+}
+
 class Session {
   Session({
     required this.id,
@@ -148,6 +153,7 @@ class DropInConfigurationDTO {
     this.cardsConfigurationDTO,
     this.applePayConfigurationDTO,
     this.googlePayConfigurationDTO,
+    this.cashAppPayConfigurationDTO,
   });
 
   Environment environment;
@@ -172,6 +178,8 @@ class DropInConfigurationDTO {
 
   GooglePayConfigurationDTO? googlePayConfigurationDTO;
 
+  CashAppPayConfigurationDTO? cashAppPayConfigurationDTO;
+
   Object encode() {
     return <Object?>[
       environment.index,
@@ -185,6 +193,7 @@ class DropInConfigurationDTO {
       cardsConfigurationDTO?.encode(),
       applePayConfigurationDTO?.encode(),
       googlePayConfigurationDTO?.encode(),
+      cashAppPayConfigurationDTO?.encode(),
     ];
   }
 
@@ -209,6 +218,9 @@ class DropInConfigurationDTO {
           : null,
       googlePayConfigurationDTO: result[10] != null
           ? GooglePayConfigurationDTO.decode(result[10]! as List<Object?>)
+          : null,
+      cashAppPayConfigurationDTO: result[11] != null
+          ? CashAppPayConfigurationDTO.decode(result[11]! as List<Object?>)
           : null,
     );
   }
@@ -363,6 +375,27 @@ class GooglePayConfigurationDTO {
       shippingAddressRequired: result[7]! as bool,
       existingPaymentMethodRequired: result[8]! as bool,
       googlePayEnvironment: GooglePayEnvironment.values[result[9]! as int],
+    );
+  }
+}
+
+class CashAppPayConfigurationDTO {
+  CashAppPayConfigurationDTO({
+    required this.cashAppPayEnvironment,
+  });
+
+  CashAppPayEnvironment cashAppPayEnvironment;
+
+  Object encode() {
+    return <Object?>[
+      cashAppPayEnvironment.index,
+    ];
+  }
+
+  static CashAppPayConfigurationDTO decode(Object result) {
+    result as List<Object?>;
+    return CashAppPayConfigurationDTO(
+      cashAppPayEnvironment: CashAppPayEnvironment.values[result[0]! as int],
     );
   }
 }
@@ -596,20 +629,23 @@ class _CheckoutPlatformInterfaceCodec extends StandardMessageCodec {
     } else if (value is CardsConfigurationDTO) {
       buffer.putUint8(131);
       writeValue(buffer, value.encode());
-    } else if (value is DropInConfigurationDTO) {
+    } else if (value is CashAppPayConfigurationDTO) {
       buffer.putUint8(132);
       writeValue(buffer, value.encode());
-    } else if (value is DropInError) {
+    } else if (value is DropInConfigurationDTO) {
       buffer.putUint8(133);
       writeValue(buffer, value.encode());
-    } else if (value is DropInResult) {
+    } else if (value is DropInError) {
       buffer.putUint8(134);
       writeValue(buffer, value.encode());
-    } else if (value is GooglePayConfigurationDTO) {
+    } else if (value is DropInResult) {
       buffer.putUint8(135);
       writeValue(buffer, value.encode());
-    } else if (value is Session) {
+    } else if (value is GooglePayConfigurationDTO) {
       buffer.putUint8(136);
+      writeValue(buffer, value.encode());
+    } else if (value is Session) {
+      buffer.putUint8(137);
       writeValue(buffer, value.encode());
     } else {
       super.writeValue(buffer, value);
@@ -628,14 +664,16 @@ class _CheckoutPlatformInterfaceCodec extends StandardMessageCodec {
       case 131: 
         return CardsConfigurationDTO.decode(readValue(buffer)!);
       case 132: 
-        return DropInConfigurationDTO.decode(readValue(buffer)!);
+        return CashAppPayConfigurationDTO.decode(readValue(buffer)!);
       case 133: 
-        return DropInError.decode(readValue(buffer)!);
+        return DropInConfigurationDTO.decode(readValue(buffer)!);
       case 134: 
-        return DropInResult.decode(readValue(buffer)!);
+        return DropInError.decode(readValue(buffer)!);
       case 135: 
-        return GooglePayConfigurationDTO.decode(readValue(buffer)!);
+        return DropInResult.decode(readValue(buffer)!);
       case 136: 
+        return GooglePayConfigurationDTO.decode(readValue(buffer)!);
+      case 137: 
         return Session.decode(readValue(buffer)!);
       default:
         return super.readValueOfType(type, buffer);

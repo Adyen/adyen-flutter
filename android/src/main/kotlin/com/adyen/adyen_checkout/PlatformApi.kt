@@ -139,6 +139,17 @@ enum class DropInResultType(val raw: Int) {
   }
 }
 
+enum class CashAppPayEnvironment(val raw: Int) {
+  SANDBOX(0),
+  PRODUCTION(1);
+
+  companion object {
+    fun ofRaw(raw: Int): CashAppPayEnvironment? {
+      return values().firstOrNull { it.raw == raw }
+    }
+  }
+}
+
 /** Generated class from Pigeon that represents data sent in messages. */
 data class Session (
   val id: String,
@@ -217,7 +228,8 @@ data class DropInConfigurationDTO (
   val skipListWhenSinglePaymentMethod: Boolean? = null,
   val cardsConfigurationDTO: CardsConfigurationDTO? = null,
   val applePayConfigurationDTO: ApplePayConfigurationDTO? = null,
-  val googlePayConfigurationDTO: GooglePayConfigurationDTO? = null
+  val googlePayConfigurationDTO: GooglePayConfigurationDTO? = null,
+  val cashAppPayConfigurationDTO: CashAppPayConfigurationDTO? = null
 
 ) {
   companion object {
@@ -242,7 +254,10 @@ data class DropInConfigurationDTO (
       val googlePayConfigurationDTO: GooglePayConfigurationDTO? = (list[10] as List<Any?>?)?.let {
         GooglePayConfigurationDTO.fromList(it)
       }
-      return DropInConfigurationDTO(environment, clientKey, countryCode, amount, shopperLocale, analyticsOptionsDTO, showPreselectedStoredPaymentMethod, skipListWhenSinglePaymentMethod, cardsConfigurationDTO, applePayConfigurationDTO, googlePayConfigurationDTO)
+      val cashAppPayConfigurationDTO: CashAppPayConfigurationDTO? = (list[11] as List<Any?>?)?.let {
+        CashAppPayConfigurationDTO.fromList(it)
+      }
+      return DropInConfigurationDTO(environment, clientKey, countryCode, amount, shopperLocale, analyticsOptionsDTO, showPreselectedStoredPaymentMethod, skipListWhenSinglePaymentMethod, cardsConfigurationDTO, applePayConfigurationDTO, googlePayConfigurationDTO, cashAppPayConfigurationDTO)
     }
   }
   fun toList(): List<Any?> {
@@ -258,6 +273,7 @@ data class DropInConfigurationDTO (
       cardsConfigurationDTO?.toList(),
       applePayConfigurationDTO?.toList(),
       googlePayConfigurationDTO?.toList(),
+      cashAppPayConfigurationDTO?.toList(),
     )
   }
 }
@@ -369,6 +385,25 @@ data class GooglePayConfigurationDTO (
       shippingAddressRequired,
       existingPaymentMethodRequired,
       googlePayEnvironment.raw,
+    )
+  }
+}
+
+/** Generated class from Pigeon that represents data sent in messages. */
+data class CashAppPayConfigurationDTO (
+  val cashAppPayEnvironment: CashAppPayEnvironment
+
+) {
+  companion object {
+    @Suppress("UNCHECKED_CAST")
+    fun fromList(list: List<Any?>): CashAppPayConfigurationDTO {
+      val cashAppPayEnvironment = CashAppPayEnvironment.ofRaw(list[0] as Int)!!
+      return CashAppPayConfigurationDTO(cashAppPayEnvironment)
+    }
+  }
+  fun toList(): List<Any?> {
+    return listOf<Any?>(
+      cashAppPayEnvironment.raw,
     )
   }
 }
@@ -570,25 +605,30 @@ private object CheckoutPlatformInterfaceCodec : StandardMessageCodec() {
       }
       132.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          DropInConfigurationDTO.fromList(it)
+          CashAppPayConfigurationDTO.fromList(it)
         }
       }
       133.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          DropInError.fromList(it)
+          DropInConfigurationDTO.fromList(it)
         }
       }
       134.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          DropInResult.fromList(it)
+          DropInError.fromList(it)
         }
       }
       135.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          GooglePayConfigurationDTO.fromList(it)
+          DropInResult.fromList(it)
         }
       }
       136.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          GooglePayConfigurationDTO.fromList(it)
+        }
+      }
+      137.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
           Session.fromList(it)
         }
@@ -614,24 +654,28 @@ private object CheckoutPlatformInterfaceCodec : StandardMessageCodec() {
         stream.write(131)
         writeValue(stream, value.toList())
       }
-      is DropInConfigurationDTO -> {
+      is CashAppPayConfigurationDTO -> {
         stream.write(132)
         writeValue(stream, value.toList())
       }
-      is DropInError -> {
+      is DropInConfigurationDTO -> {
         stream.write(133)
         writeValue(stream, value.toList())
       }
-      is DropInResult -> {
+      is DropInError -> {
         stream.write(134)
         writeValue(stream, value.toList())
       }
-      is GooglePayConfigurationDTO -> {
+      is DropInResult -> {
         stream.write(135)
         writeValue(stream, value.toList())
       }
-      is Session -> {
+      is GooglePayConfigurationDTO -> {
         stream.write(136)
+        writeValue(stream, value.toList())
+      }
+      is Session -> {
+        stream.write(137)
         writeValue(stream, value.toList())
       }
       else -> super.writeValue(stream, value)

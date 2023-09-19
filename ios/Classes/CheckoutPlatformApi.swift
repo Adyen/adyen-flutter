@@ -172,11 +172,16 @@ class CheckoutPlatformApi : CheckoutPlatformInterface {
             )
             
             dropInConfiguration.card = cardConfiguration
-            
         }
         
         if let appleConfigurationDTO = dropInConfigurationDTO.applePayConfigurationDTO {
             let appleConfiguration = try buildApplePayConfiguration(dropInConfigurationDTO: dropInConfigurationDTO)
+            dropInConfiguration.applePay = appleConfiguration
+        }
+        
+        if let cashAppPayConfigurationDTO = dropInConfigurationDTO.cashAppPayConfigurationDTO {
+            let cashAppPayConfiguration = DropInComponent.CashAppPay.init(redirectURL: try URL(from: "test" as! Decoder))
+            dropInConfiguration.cashAppPay = cashAppPayConfiguration
         }
         
         return dropInConfiguration

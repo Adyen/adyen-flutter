@@ -2,6 +2,8 @@ package com.adyen.adyen_checkout.utils
 
 import AddressMode
 import Amount
+import CashAppPayConfigurationDTO
+import CashAppPayEnvironment
 import DropInConfigurationDTO
 import Environment
 import GooglePayConfigurationDTO
@@ -15,12 +17,14 @@ import com.adyen.checkout.card.CardConfiguration
 import com.adyen.checkout.card.CardType
 import com.adyen.checkout.card.KCPAuthVisibility
 import com.adyen.checkout.card.SocialSecurityNumberVisibility
+import com.adyen.checkout.cashapppay.CashAppPayConfiguration
 import com.adyen.checkout.components.core.OrderResponse
 import com.adyen.checkout.dropin.DropInConfiguration
 import com.adyen.checkout.googlepay.GooglePayConfiguration
 import com.adyen.checkout.sessions.core.SessionModel
 import com.google.android.gms.wallet.WalletConstants
 import java.util.Locale
+import com.adyen.checkout.cashapppay.CashAppPayEnvironment as SDKCashAppPayEnvironment
 import com.adyen.checkout.core.Environment as SDKEnvironment
 
 object Mapper {
@@ -42,29 +46,30 @@ object Mapper {
         val environment = environment.mapToEnvironment()
         val amount = amount.mapToAmount()
         val shopperLocale = Locale.forLanguageTag(shopperLocale)
-        val cardConfiguration = CardConfiguration.Builder(
-            context = context,
-            environment = environment,
-            clientKey = this.clientKey
-        )
-            .setShowStorePaymentField(cardsConfigurationDTO?.showStorePaymentField ?: false)
-            .setAddressConfiguration(
-                cardsConfigurationDTO?.addressMode?.mapToAddressConfiguration()
-                    ?: AddressConfiguration.None
+        val dropInConfiguration = DropInConfiguration.Builder(shopperLocale, environment, clientKey)
+
+        if (cardsConfigurationDTO != null) {
+            val cardConfiguration = CardConfiguration.Builder(
+                context = context,
+                environment = environment,
+                clientKey = this.clientKey
             )
-            .setShowStorePaymentField(cardsConfigurationDTO?.showStorePaymentField ?: false)
-            .setHideCvcStoredCard(cardsConfigurationDTO?.showCvcForStoredCard ?: true)
-            .setHideCvc(cardsConfigurationDTO?.showCvc ?: true)
-            .setKcpAuthVisibility(determineKcpAuthVisibility(cardsConfigurationDTO?.showKcpField))
-            .setSocialSecurityNumberVisibility(
-                determineSocialSecurityNumberVisibility(cardsConfigurationDTO?.showSocialSecurityNumberField)
-            )
-            .setSupportedCardTypes(*mapToSupportedCardTypes(cardsConfigurationDTO?.supportedCardTypes))
-            .setHolderNameRequired(cardsConfigurationDTO?.holderNameRequired ?: false)
-            .build()
-        val dropInConfiguration = DropInConfiguration.Builder(context, environment, clientKey)
-            .setAmount(amount)
-            .addCardConfiguration(cardConfiguration)
+                .setShowStorePaymentField(cardsConfigurationDTO.showStorePaymentField)
+                .setAddressConfiguration(
+                    cardsConfigurationDTO.addressMode.mapToAddressConfiguration()
+                )
+                .setShowStorePaymentField(cardsConfigurationDTO.showStorePaymentField)
+                .setHideCvcStoredCard(cardsConfigurationDTO.showCvcForStoredCard)
+                .setHideCvc(cardsConfigurationDTO.showCvc)
+                .setKcpAuthVisibility(determineKcpAuthVisibility(cardsConfigurationDTO.showKcpField))
+                .setSocialSecurityNumberVisibility(
+                    determineSocialSecurityNumberVisibility(cardsConfigurationDTO.showSocialSecurityNumberField)
+                )
+                .setSupportedCardTypes(*mapToSupportedCardTypes(cardsConfigurationDTO.supportedCardTypes))
+                .setHolderNameRequired(cardsConfigurationDTO.holderNameRequired)
+                .build()
+            dropInConfiguration.addCardConfiguration(cardConfiguration)
+        }
 
         if (googlePayConfigurationDTO != null) {
             val googlePayConfigurationBuilder = GooglePayConfiguration.Builder(
@@ -77,6 +82,18 @@ object Mapper {
             dropInConfiguration.addGooglePayConfiguration(googlePayConfiguration)
         }
 
+        if (cashAppPayConfigurationDTO != null) {
+            val cashAppPayConfigurationBuilder = CashAppPayConfiguration.Builder(
+                shopperLocale,
+                environment,
+                clientKey
+            )
+            val cashAppPayConfiguration =
+                cashAppPayConfigurationDTO.mapToCashAppPayConfiguration(cashAppPayConfigurationBuilder)
+            dropInConfiguration.addCashAppPayConfiguration(cashAppPayConfiguration)
+        }
+
+        dropInConfiguration.setAmount(amount)
         return dropInConfiguration.build()
     }
 
@@ -163,6 +180,18 @@ object Mapper {
             TotalPriceStatus.NOTCURRENTLYKNOWN -> "NOT_CURRENTLY_KNOWN"
             TotalPriceStatus.ESTIMATED -> "ESTIMATED"
             TotalPriceStatus.FINALPRICE -> "FINAL"
+        }
+    }
+
+    private fun CashAppPayConfigurationDTO.mapToCashAppPayConfiguration(builder: CashAppPayConfiguration.Builder): CashAppPayConfiguration {
+        builder.setCashAppPayEnvironment(cashAppPayEnvironment.mapToCashAppPayEnvironment())
+        return builder.build();
+    }
+
+    private fun CashAppPayEnvironment.mapToCashAppPayEnvironment(): SDKCashAppPayEnvironment {
+        return when (this) {
+            CashAppPayEnvironment.SANDBOX -> SDKCashAppPayEnvironment.SANDBOX
+            CashAppPayEnvironment.PRODUCTION -> SDKCashAppPayEnvironment.PRODUCTION
         }
     }
 

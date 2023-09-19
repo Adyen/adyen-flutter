@@ -59,6 +59,11 @@ enum DropInResultType {
   error,
 }
 
+enum CashAppPayEnvironment {
+  sandbox,
+  production,
+}
+
 class Session {
   final String id;
   final String sessionData;
@@ -101,6 +106,7 @@ class DropInConfigurationDTO {
   final CardsConfigurationDTO? cardsConfigurationDTO;
   final ApplePayConfigurationDTO? applePayConfigurationDTO;
   final GooglePayConfigurationDTO? googlePayConfigurationDTO;
+  final CashAppPayConfigurationDTO? cashAppPayConfigurationDTO;
 
   DropInConfigurationDTO(
     this.environment,
@@ -114,6 +120,7 @@ class DropInConfigurationDTO {
     this.skipListWhenSinglePaymentMethod,
     this.applePayConfigurationDTO,
     this.googlePayConfigurationDTO,
+    this.cashAppPayConfigurationDTO,
   );
 }
 
@@ -175,6 +182,12 @@ class GooglePayConfigurationDTO {
     this.shippingAddressRequired,
     this.existingPaymentMethodRequired,
   );
+}
+
+class CashAppPayConfigurationDTO {
+  final CashAppPayEnvironment cashAppPayEnvironment;
+
+  CashAppPayConfigurationDTO(this.cashAppPayEnvironment);
 }
 
 class PaymentResult {
