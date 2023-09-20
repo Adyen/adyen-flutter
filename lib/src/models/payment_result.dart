@@ -1,4 +1,4 @@
-import 'package:adyen_checkout/src/generated/platform_api.g.dart';
+import 'package:adyen_checkout/adyen_checkout.dart';
 
 class PaymentResult {
   final PaymentResultEnum type;
@@ -16,7 +16,7 @@ class PaymentResultModel {
   final String? sessionId;
   final String? sessionData;
   final String? resultCode;
-  final OrderResponseDTO? order;
+  final OrderResponse? order;
 
   PaymentResultModel(
     this.sessionId,

@@ -81,6 +81,13 @@ extension PaymentResulModelMapper on PaymentResultModelDTO {
         sessionId,
         sessionData,
         resultCode,
-        order,
+        order?.fromDTO(),
+      );
+}
+
+extension OrderResponseMapper on OrderResponseDTO {
+  OrderResponse fromDTO() => OrderResponse(
+        pspReference: pspReference,
+        orderData: orderData,
       );
 }
