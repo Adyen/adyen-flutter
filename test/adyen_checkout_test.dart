@@ -31,11 +31,11 @@ class MockAdyenCheckoutPlatform
   }
 
   @override
-  Future<String> onPaymentsResult(DropInResult paymentsResult) =>
+  Future<String> onPaymentsResult(DropInResultDTO paymentsResult) =>
       Future.value("Result");
 
   @override
-  Future<void> onPaymentsDetailsResult(DropInResult paymentsDetailsResult) {
+  Future<void> onPaymentsDetailsResult(DropInResultDTO paymentsDetailsResult) {
     return Future.value(null);
   }
 }

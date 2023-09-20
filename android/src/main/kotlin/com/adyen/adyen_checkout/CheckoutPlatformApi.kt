@@ -3,7 +3,7 @@ package com.adyen.adyen_checkout
 import CheckoutFlutterApi
 import CheckoutPlatformInterface
 import DropInConfigurationDTO
-import DropInResult
+import DropInResultDTO
 import DropInResultType
 import PlatformCommunicationModel
 import PlatformCommunicationType
@@ -95,7 +95,7 @@ class CheckoutPlatformApi(private val checkoutFlutterApi: CheckoutFlutterApi?) :
             }
         }
 
-        override fun onPaymentsResult(paymentsResult: DropInResult) {
+        override fun onPaymentsResult(paymentsResult: DropInResultDTO) {
             if (paymentsResult.dropInResultType == DropInResultType.ACTION) {
                 setAdvanceFlowDropInAdditionalDetailsMessengerObserver()
             }
@@ -103,7 +103,7 @@ class CheckoutPlatformApi(private val checkoutFlutterApi: CheckoutFlutterApi?) :
             DropInPaymentResultMessenger.sendResult(paymentsResult)
         }
 
-        override fun onPaymentsDetailsResult(paymentsDetailsResult: DropInResult) {
+        override fun onPaymentsDetailsResult(paymentsDetailsResult: DropInResultDTO) {
             DropInAdditionalDetailsResultMessenger.sendResult(paymentsDetailsResult)
         }
 

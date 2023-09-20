@@ -58,14 +58,14 @@ class CheckoutPlatformApi : CheckoutPlatformInterface {
                         self?.dropInComponent = dropInComponent
                         self?.viewController?.present(dropInComponent.viewController, animated: true)
                     } catch let error {
-                        self?.checkoutFlutterApi.onDropInSessionResult(sessionPaymentResult: PaymentResult(type: PaymentResultEnum.error, reason: error.localizedDescription)) {}
+                        self?.checkoutFlutterApi.onDropInSessionResult(sessionPaymentResult: PaymentResultDTO(type: PaymentResultEnum.error, reason: error.localizedDescription)) {}
                     }
                 case let .failure(error):
-                    self?.checkoutFlutterApi.onDropInSessionResult(sessionPaymentResult: PaymentResult(type: PaymentResultEnum.error, reason: error.localizedDescription)) {}
+                    self?.checkoutFlutterApi.onDropInSessionResult(sessionPaymentResult: PaymentResultDTO(type: PaymentResultEnum.error, reason: error.localizedDescription)) {}
                 }
             }
         } catch let error {
-            checkoutFlutterApi.onDropInSessionResult(sessionPaymentResult: PaymentResult(type: PaymentResultEnum.error, reason: error.localizedDescription)) {}
+            checkoutFlutterApi.onDropInSessionResult(sessionPaymentResult: PaymentResultDTO(type: PaymentResultEnum.error, reason: error.localizedDescription)) {}
         }
     }
     
@@ -89,7 +89,7 @@ class CheckoutPlatformApi : CheckoutPlatformInterface {
             self.dropInComponent = dropInComponent
             self.viewController?.present(dropInComponent.viewController, animated: true)
         } catch let error {
-            let platformCommunicationModel = PlatformCommunicationModel(type: PlatformCommunicationType.result, paymentResult: PaymentResult(type: PaymentResultEnum.error, reason: error.localizedDescription))
+            let platformCommunicationModel = PlatformCommunicationModel(type: PlatformCommunicationType.result, paymentResult: PaymentResultDTO(type: PaymentResultEnum.error, reason: error.localizedDescription))
             checkoutFlutterApi.onDropInAdvancedFlowPlatformCommunication(platformCommunicationModel: platformCommunicationModel, completion: {})
         }
     }
@@ -98,11 +98,11 @@ class CheckoutPlatformApi : CheckoutPlatformInterface {
         completion(Result.failure(PlatformError(errorDescription: "Please use your app url type instead of this method.")))
     }
     
-    func onPaymentsResult(paymentsResult: DropInResult) {
+    func onPaymentsResult(paymentsResult: DropInResultDTO) {
         handleDropInResult(dropInResult: paymentsResult)
     }
     
-    func onPaymentsDetailsResult(paymentsDetailsResult: DropInResult) {
+    func onPaymentsDetailsResult(paymentsDetailsResult: DropInResultDTO) {
         handleDropInResult(dropInResult: paymentsDetailsResult)
     }
     
@@ -246,7 +246,7 @@ class CheckoutPlatformApi : CheckoutPlatformInterface {
     }
     
     
-    private func handleDropInResult(dropInResult: DropInResult) {
+    private func handleDropInResult(dropInResult: DropInResultDTO) {
         do {
             switch dropInResult.dropInResultType {
             case .finished:
@@ -257,31 +257,31 @@ class CheckoutPlatformApi : CheckoutPlatformInterface {
                 onDropInResultError(dropInResult: dropInResult)
             }
         } catch let error {
-            let paymentResult = PaymentResult(type: PaymentResultEnum.error, reason: error.localizedDescription)
+            let paymentResult = PaymentResultDTO(type: PaymentResultEnum.error, reason: error.localizedDescription)
             self.checkoutFlutterApi.onDropInAdvancedFlowPlatformCommunication(platformCommunicationModel: PlatformCommunicationModel(type: PlatformCommunicationType.result, paymentResult: paymentResult), completion: {})
             self.finalize(false, "\(error.localizedDescription)")
         }
     }
     
-    private func onDropInResultFinished(dropInResult: DropInResult) {
+    private func onDropInResultFinished(dropInResult: DropInResultDTO) {
         let resultCode = ResultCode(rawValue: dropInResult.result ?? "")
         let success = resultCode == .authorised || resultCode == .received || resultCode == .pending
         self.dropInComponent?.finalizeIfNeeded(with: success) { [weak self] in
             self?.dropInComponent?.viewController.presentingViewController?.dismiss(animated: false, completion: {
-                let paymentResult = PaymentResult(type: PaymentResultEnum.finished, result: PaymentResultModel(resultCode: resultCode?.rawValue))
+                let paymentResult = PaymentResultDTO(type: PaymentResultEnum.finished, result: PaymentResultModelDTO(resultCode: resultCode?.rawValue))
                 self?.checkoutFlutterApi.onDropInAdvancedFlowPlatformCommunication(platformCommunicationModel: PlatformCommunicationModel(type: PlatformCommunicationType.result, paymentResult: paymentResult), completion: {})
             })
         }
     }
     
-    private func onDropInResultAction(dropInResult: DropInResult) throws {
+    private func onDropInResultAction(dropInResult: DropInResultDTO) throws {
         let jsonData = try JSONSerialization.data(withJSONObject: dropInResult.actionResponse as Any, options: [])
         let result = try JSONDecoder().decode(Action.self, from: jsonData)
         self.dropInComponent?.handle(result)
     }
     
-    private func onDropInResultError(dropInResult: DropInResult) {
-        let paymentResult = PaymentResult(type: PaymentResultEnum.error, reason: dropInResult.error?.errorMessage)
+    private func onDropInResultError(dropInResult: DropInResultDTO) {
+        let paymentResult = PaymentResultDTO(type: PaymentResultEnum.error, reason: dropInResult.error?.errorMessage)
         self.checkoutFlutterApi.onDropInAdvancedFlowPlatformCommunication(platformCommunicationModel: PlatformCommunicationModel(type: PlatformCommunicationType.result, paymentResult: paymentResult), completion: {})
         self.finalize(false, dropInResult.error?.errorMessage ?? "")
     }

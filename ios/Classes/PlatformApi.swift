@@ -69,6 +69,11 @@ enum GooglePayEnvironment: Int {
   case production = 1
 }
 
+enum CashAppPayEnvironment: Int {
+  case sandbox = 0
+  case production = 1
+}
+
 enum PaymentResultEnum: Int {
   case cancelledByUser = 0
   case error = 1
@@ -85,11 +90,6 @@ enum DropInResultType: Int {
   case finished = 0
   case action = 1
   case error = 2
-}
-
-enum CashAppPayEnvironment: Int {
-  case sandbox = 0
-  case production = 1
 }
 
 /// Generated class from Pigeon that represents data sent in messages.
@@ -384,20 +384,20 @@ struct CashAppPayConfigurationDTO {
 }
 
 /// Generated class from Pigeon that represents data sent in messages.
-struct PaymentResult {
+struct PaymentResultDTO {
   var type: PaymentResultEnum
   var reason: String? = nil
-  var result: PaymentResultModel? = nil
+  var result: PaymentResultModelDTO? = nil
 
-  static func fromList(_ list: [Any?]) -> PaymentResult? {
+  static func fromList(_ list: [Any?]) -> PaymentResultDTO? {
     let type = PaymentResultEnum(rawValue: list[0] as! Int)!
     let reason: String? = nilOrValue(list[1])
-    var result: PaymentResultModel? = nil
+    var result: PaymentResultModelDTO? = nil
     if let resultList: [Any?] = nilOrValue(list[2]) {
-      result = PaymentResultModel.fromList(resultList)
+      result = PaymentResultModelDTO.fromList(resultList)
     }
 
-    return PaymentResult(
+    return PaymentResultDTO(
       type: type,
       reason: reason,
       result: result
@@ -413,13 +413,13 @@ struct PaymentResult {
 }
 
 /// Generated class from Pigeon that represents data sent in messages.
-struct PaymentResultModel {
+struct PaymentResultModelDTO {
   var sessionId: String? = nil
   var sessionData: String? = nil
   var resultCode: String? = nil
   var order: OrderResponseDTO? = nil
 
-  static func fromList(_ list: [Any?]) -> PaymentResultModel? {
+  static func fromList(_ list: [Any?]) -> PaymentResultModelDTO? {
     let sessionId: String? = nilOrValue(list[0])
     let sessionData: String? = nilOrValue(list[1])
     let resultCode: String? = nilOrValue(list[2])
@@ -428,7 +428,7 @@ struct PaymentResultModel {
       order = OrderResponseDTO.fromList(orderList)
     }
 
-    return PaymentResultModel(
+    return PaymentResultModelDTO(
       sessionId: sessionId,
       sessionData: sessionData,
       resultCode: resultCode,
@@ -485,14 +485,14 @@ struct OrderResponseDTO {
 struct PlatformCommunicationModel {
   var type: PlatformCommunicationType
   var data: String? = nil
-  var paymentResult: PaymentResult? = nil
+  var paymentResult: PaymentResultDTO? = nil
 
   static func fromList(_ list: [Any?]) -> PlatformCommunicationModel? {
     let type = PlatformCommunicationType(rawValue: list[0] as! Int)!
     let data: String? = nilOrValue(list[1])
-    var paymentResult: PaymentResult? = nil
+    var paymentResult: PaymentResultDTO? = nil
     if let paymentResultList: [Any?] = nilOrValue(list[2]) {
-      paymentResult = PaymentResult.fromList(paymentResultList)
+      paymentResult = PaymentResultDTO.fromList(paymentResultList)
     }
 
     return PlatformCommunicationModel(
@@ -511,22 +511,22 @@ struct PlatformCommunicationModel {
 }
 
 /// Generated class from Pigeon that represents data sent in messages.
-struct DropInResult {
+struct DropInResultDTO {
   var dropInResultType: DropInResultType
   var result: String? = nil
   var actionResponse: [String?: Any?]? = nil
-  var error: DropInError? = nil
+  var error: DropInErrorDTO? = nil
 
-  static func fromList(_ list: [Any?]) -> DropInResult? {
+  static func fromList(_ list: [Any?]) -> DropInResultDTO? {
     let dropInResultType = DropInResultType(rawValue: list[0] as! Int)!
     let result: String? = nilOrValue(list[1])
     let actionResponse: [String?: Any?]? = nilOrValue(list[2])
-    var error: DropInError? = nil
+    var error: DropInErrorDTO? = nil
     if let errorList: [Any?] = nilOrValue(list[3]) {
-      error = DropInError.fromList(errorList)
+      error = DropInErrorDTO.fromList(errorList)
     }
 
-    return DropInResult(
+    return DropInResultDTO(
       dropInResultType: dropInResultType,
       result: result,
       actionResponse: actionResponse,
@@ -544,17 +544,17 @@ struct DropInResult {
 }
 
 /// Generated class from Pigeon that represents data sent in messages.
-struct DropInError {
+struct DropInErrorDTO {
   var errorMessage: String? = nil
   var reason: String? = nil
   var dismissDropIn: Bool? = nil
 
-  static func fromList(_ list: [Any?]) -> DropInError? {
+  static func fromList(_ list: [Any?]) -> DropInErrorDTO? {
     let errorMessage: String? = nilOrValue(list[0])
     let reason: String? = nilOrValue(list[1])
     let dismissDropIn: Bool? = nilOrValue(list[2])
 
-    return DropInError(
+    return DropInErrorDTO(
       errorMessage: errorMessage,
       reason: reason,
       dismissDropIn: dismissDropIn
@@ -585,9 +585,9 @@ private class CheckoutPlatformInterfaceCodecReader: FlutterStandardReader {
       case 133:
         return DropInConfigurationDTO.fromList(self.readValue() as! [Any?])
       case 134:
-        return DropInError.fromList(self.readValue() as! [Any?])
+        return DropInErrorDTO.fromList(self.readValue() as! [Any?])
       case 135:
-        return DropInResult.fromList(self.readValue() as! [Any?])
+        return DropInResultDTO.fromList(self.readValue() as! [Any?])
       case 136:
         return GooglePayConfigurationDTO.fromList(self.readValue() as! [Any?])
       case 137:
@@ -618,10 +618,10 @@ private class CheckoutPlatformInterfaceCodecWriter: FlutterStandardWriter {
     } else if let value = value as? DropInConfigurationDTO {
       super.writeByte(133)
       super.writeValue(value.toList())
-    } else if let value = value as? DropInError {
+    } else if let value = value as? DropInErrorDTO {
       super.writeByte(134)
       super.writeValue(value.toList())
-    } else if let value = value as? DropInResult {
+    } else if let value = value as? DropInResultDTO {
       super.writeByte(135)
       super.writeValue(value.toList())
     } else if let value = value as? GooglePayConfigurationDTO {
@@ -656,8 +656,8 @@ protocol CheckoutPlatformInterface {
   func getReturnUrl(completion: @escaping (Result<String, Error>) -> Void)
   func startDropInSessionPayment(dropInConfigurationDTO: DropInConfigurationDTO, session: SessionDTO) throws
   func startDropInAdvancedFlowPayment(dropInConfigurationDTO: DropInConfigurationDTO, paymentMethodsResponse: String) throws
-  func onPaymentsResult(paymentsResult: DropInResult) throws
-  func onPaymentsDetailsResult(paymentsDetailsResult: DropInResult) throws
+  func onPaymentsResult(paymentsResult: DropInResultDTO) throws
+  func onPaymentsDetailsResult(paymentsDetailsResult: DropInResultDTO) throws
 }
 
 /// Generated setup class from Pigeon to handle messages through the `binaryMessenger`.
@@ -732,7 +732,7 @@ class CheckoutPlatformInterfaceSetup {
     if let api = api {
       onPaymentsResultChannel.setMessageHandler { message, reply in
         let args = message as! [Any?]
-        let paymentsResultArg = args[0] as! DropInResult
+        let paymentsResultArg = args[0] as! DropInResultDTO
         do {
           try api.onPaymentsResult(paymentsResult: paymentsResultArg)
           reply(wrapResult(nil))
@@ -747,7 +747,7 @@ class CheckoutPlatformInterfaceSetup {
     if let api = api {
       onPaymentsDetailsResultChannel.setMessageHandler { message, reply in
         let args = message as! [Any?]
-        let paymentsDetailsResultArg = args[0] as! DropInResult
+        let paymentsDetailsResultArg = args[0] as! DropInResultDTO
         do {
           try api.onPaymentsDetailsResult(paymentsDetailsResult: paymentsDetailsResultArg)
           reply(wrapResult(nil))
@@ -768,9 +768,9 @@ private class CheckoutFlutterApiCodecReader: FlutterStandardReader {
       case 129:
         return OrderResponseDTO.fromList(self.readValue() as! [Any?])
       case 130:
-        return PaymentResult.fromList(self.readValue() as! [Any?])
+        return PaymentResultDTO.fromList(self.readValue() as! [Any?])
       case 131:
-        return PaymentResultModel.fromList(self.readValue() as! [Any?])
+        return PaymentResultModelDTO.fromList(self.readValue() as! [Any?])
       case 132:
         return PlatformCommunicationModel.fromList(self.readValue() as! [Any?])
       default:
@@ -787,10 +787,10 @@ private class CheckoutFlutterApiCodecWriter: FlutterStandardWriter {
     } else if let value = value as? OrderResponseDTO {
       super.writeByte(129)
       super.writeValue(value.toList())
-    } else if let value = value as? PaymentResult {
+    } else if let value = value as? PaymentResultDTO {
       super.writeByte(130)
       super.writeValue(value.toList())
-    } else if let value = value as? PaymentResultModel {
+    } else if let value = value as? PaymentResultModelDTO {
       super.writeByte(131)
       super.writeValue(value.toList())
     } else if let value = value as? PlatformCommunicationModel {
@@ -825,7 +825,7 @@ class CheckoutFlutterApi {
   var codec: FlutterStandardMessageCodec {
     return CheckoutFlutterApiCodec.shared
   }
-  func onDropInSessionResult(sessionPaymentResult sessionPaymentResultArg: PaymentResult, completion: @escaping () -> Void) {
+  func onDropInSessionResult(sessionPaymentResult sessionPaymentResultArg: PaymentResultDTO, completion: @escaping () -> Void) {
     let channel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.CheckoutFlutterApi.onDropInSessionResult", binaryMessenger: binaryMessenger, codec: codec)
     channel.sendMessage([sessionPaymentResultArg] as [Any?]) { _ in
       completion()

@@ -41,6 +41,11 @@ enum GooglePayEnvironment {
   production,
 }
 
+enum CashAppPayEnvironment {
+  sandbox,
+  production,
+}
+
 enum PaymentResultEnum {
   cancelledByUser,
   error,
@@ -59,18 +64,13 @@ enum DropInResultType {
   error,
 }
 
-enum CashAppPayEnvironment {
-  sandbox,
-  production,
-}
-
 class SessionDTO {
   final String id;
   final String sessionData;
 
   SessionDTO(
-     this.id,
-     this.sessionData,
+    this.id,
+    this.sessionData,
   );
 }
 
@@ -79,8 +79,8 @@ class AmountDTO {
   final int value;
 
   AmountDTO(
-     this.currency,
-     this.value,
+    this.currency,
+    this.value,
   );
 }
 
@@ -194,25 +194,25 @@ class CashAppPayConfigurationDTO {
   );
 }
 
-class PaymentResult {
+class PaymentResultDTO {
   final PaymentResultEnum type;
   final String? reason;
-  final PaymentResultModel? result;
+  final PaymentResultModelDTO? result;
 
-  PaymentResult(
+  PaymentResultDTO(
     this.type,
     this.reason,
     this.result,
   );
 }
 
-class PaymentResultModel {
+class PaymentResultModelDTO {
   final String? sessionId;
   final String? sessionData;
   final String? resultCode;
   final OrderResponseDTO? order;
 
-  PaymentResultModel(
+  PaymentResultModelDTO(
     this.sessionId,
     this.sessionData,
     this.resultCode,
@@ -237,7 +237,7 @@ class OrderResponseDTO {
 class PlatformCommunicationModel {
   final PlatformCommunicationType type;
   final String? data;
-  final PaymentResult? paymentResult;
+  final PaymentResultDTO? paymentResult;
 
   PlatformCommunicationModel({
     required this.type,
@@ -247,13 +247,13 @@ class PlatformCommunicationModel {
 }
 
 //Use DropInOutcome class when sealed classes are supported by pigeon
-class DropInResult {
+class DropInResultDTO {
   final DropInResultType dropInResultType;
   final String? result;
   final Map<String?, Object?>? actionResponse;
-  final DropInError? error;
+  final DropInErrorDTO? error;
 
-  DropInResult({
+  DropInResultDTO({
     required this.dropInResultType,
     this.result,
     this.actionResponse,
@@ -261,12 +261,12 @@ class DropInResult {
   });
 }
 
-class DropInError {
+class DropInErrorDTO {
   final String? errorMessage;
   final String? reason;
   final bool? dismissDropIn;
 
-  DropInError({
+  DropInErrorDTO({
     this.errorMessage,
     this.reason,
     this.dismissDropIn = false,
@@ -291,14 +291,14 @@ abstract class CheckoutPlatformInterface {
     String paymentMethodsResponse,
   );
 
-  void onPaymentsResult(DropInResult paymentsResult);
+  void onPaymentsResult(DropInResultDTO paymentsResult);
 
-  void onPaymentsDetailsResult(DropInResult paymentsDetailsResult);
+  void onPaymentsDetailsResult(DropInResultDTO paymentsDetailsResult);
 }
 
 @FlutterApi()
 abstract class CheckoutFlutterApi {
-  void onDropInSessionResult(PaymentResult sessionPaymentResult);
+  void onDropInSessionResult(PaymentResultDTO sessionPaymentResult);
 
   void onDropInAdvancedFlowPlatformCommunication(
       PlatformCommunicationModel platformCommunicationModel);

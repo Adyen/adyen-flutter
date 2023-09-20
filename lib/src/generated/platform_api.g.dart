@@ -39,6 +39,11 @@ enum GooglePayEnvironment {
   production,
 }
 
+enum CashAppPayEnvironment {
+  sandbox,
+  production,
+}
+
 enum PaymentResultEnum {
   cancelledByUser,
   error,
@@ -55,11 +60,6 @@ enum DropInResultType {
   finished,
   action,
   error,
-}
-
-enum CashAppPayEnvironment {
-  sandbox,
-  production,
 }
 
 class SessionDTO {
@@ -405,8 +405,8 @@ class CashAppPayConfigurationDTO {
   }
 }
 
-class PaymentResult {
-  PaymentResult({
+class PaymentResultDTO {
+  PaymentResultDTO({
     required this.type,
     this.reason,
     this.result,
@@ -416,7 +416,7 @@ class PaymentResult {
 
   String? reason;
 
-  PaymentResultModel? result;
+  PaymentResultModelDTO? result;
 
   Object encode() {
     return <Object?>[
@@ -426,20 +426,20 @@ class PaymentResult {
     ];
   }
 
-  static PaymentResult decode(Object result) {
+  static PaymentResultDTO decode(Object result) {
     result as List<Object?>;
-    return PaymentResult(
+    return PaymentResultDTO(
       type: PaymentResultEnum.values[result[0]! as int],
       reason: result[1] as String?,
       result: result[2] != null
-          ? PaymentResultModel.decode(result[2]! as List<Object?>)
+          ? PaymentResultModelDTO.decode(result[2]! as List<Object?>)
           : null,
     );
   }
 }
 
-class PaymentResultModel {
-  PaymentResultModel({
+class PaymentResultModelDTO {
+  PaymentResultModelDTO({
     this.sessionId,
     this.sessionData,
     this.resultCode,
@@ -463,9 +463,9 @@ class PaymentResultModel {
     ];
   }
 
-  static PaymentResultModel decode(Object result) {
+  static PaymentResultModelDTO decode(Object result) {
     result as List<Object?>;
-    return PaymentResultModel(
+    return PaymentResultModelDTO(
       sessionId: result[0] as String?,
       sessionData: result[1] as String?,
       resultCode: result[2] as String?,
@@ -527,7 +527,7 @@ class PlatformCommunicationModel {
 
   String? data;
 
-  PaymentResult? paymentResult;
+  PaymentResultDTO? paymentResult;
 
   Object encode() {
     return <Object?>[
@@ -543,14 +543,14 @@ class PlatformCommunicationModel {
       type: PlatformCommunicationType.values[result[0]! as int],
       data: result[1] as String?,
       paymentResult: result[2] != null
-          ? PaymentResult.decode(result[2]! as List<Object?>)
+          ? PaymentResultDTO.decode(result[2]! as List<Object?>)
           : null,
     );
   }
 }
 
-class DropInResult {
-  DropInResult({
+class DropInResultDTO {
+  DropInResultDTO({
     required this.dropInResultType,
     this.result,
     this.actionResponse,
@@ -563,7 +563,7 @@ class DropInResult {
 
   Map<String?, Object?>? actionResponse;
 
-  DropInError? error;
+  DropInErrorDTO? error;
 
   Object encode() {
     return <Object?>[
@@ -574,21 +574,21 @@ class DropInResult {
     ];
   }
 
-  static DropInResult decode(Object result) {
+  static DropInResultDTO decode(Object result) {
     result as List<Object?>;
-    return DropInResult(
+    return DropInResultDTO(
       dropInResultType: DropInResultType.values[result[0]! as int],
       result: result[1] as String?,
       actionResponse: (result[2] as Map<Object?, Object?>?)?.cast<String?, Object?>(),
       error: result[3] != null
-          ? DropInError.decode(result[3]! as List<Object?>)
+          ? DropInErrorDTO.decode(result[3]! as List<Object?>)
           : null,
     );
   }
 }
 
-class DropInError {
-  DropInError({
+class DropInErrorDTO {
+  DropInErrorDTO({
     this.errorMessage,
     this.reason,
     this.dismissDropIn,
@@ -608,9 +608,9 @@ class DropInError {
     ];
   }
 
-  static DropInError decode(Object result) {
+  static DropInErrorDTO decode(Object result) {
     result as List<Object?>;
-    return DropInError(
+    return DropInErrorDTO(
       errorMessage: result[0] as String?,
       reason: result[1] as String?,
       dismissDropIn: result[2] as bool?,
@@ -640,10 +640,10 @@ class _CheckoutPlatformInterfaceCodec extends StandardMessageCodec {
     } else if (value is DropInConfigurationDTO) {
       buffer.putUint8(133);
       writeValue(buffer, value.encode());
-    } else if (value is DropInError) {
+    } else if (value is DropInErrorDTO) {
       buffer.putUint8(134);
       writeValue(buffer, value.encode());
-    } else if (value is DropInResult) {
+    } else if (value is DropInResultDTO) {
       buffer.putUint8(135);
       writeValue(buffer, value.encode());
     } else if (value is GooglePayConfigurationDTO) {
@@ -673,9 +673,9 @@ class _CheckoutPlatformInterfaceCodec extends StandardMessageCodec {
       case 133: 
         return DropInConfigurationDTO.decode(readValue(buffer)!);
       case 134: 
-        return DropInError.decode(readValue(buffer)!);
+        return DropInErrorDTO.decode(readValue(buffer)!);
       case 135: 
-        return DropInResult.decode(readValue(buffer)!);
+        return DropInResultDTO.decode(readValue(buffer)!);
       case 136: 
         return GooglePayConfigurationDTO.decode(readValue(buffer)!);
       case 137: 
@@ -794,7 +794,7 @@ class CheckoutPlatformInterface {
     }
   }
 
-  Future<void> onPaymentsResult(DropInResult arg_paymentsResult) async {
+  Future<void> onPaymentsResult(DropInResultDTO arg_paymentsResult) async {
     final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
         'dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.onPaymentsResult', codec,
         binaryMessenger: _binaryMessenger);
@@ -816,7 +816,7 @@ class CheckoutPlatformInterface {
     }
   }
 
-  Future<void> onPaymentsDetailsResult(DropInResult arg_paymentsDetailsResult) async {
+  Future<void> onPaymentsDetailsResult(DropInResultDTO arg_paymentsDetailsResult) async {
     final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
         'dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.onPaymentsDetailsResult', codec,
         binaryMessenger: _binaryMessenger);
@@ -849,10 +849,10 @@ class _CheckoutFlutterApiCodec extends StandardMessageCodec {
     } else if (value is OrderResponseDTO) {
       buffer.putUint8(129);
       writeValue(buffer, value.encode());
-    } else if (value is PaymentResult) {
+    } else if (value is PaymentResultDTO) {
       buffer.putUint8(130);
       writeValue(buffer, value.encode());
-    } else if (value is PaymentResultModel) {
+    } else if (value is PaymentResultModelDTO) {
       buffer.putUint8(131);
       writeValue(buffer, value.encode());
     } else if (value is PlatformCommunicationModel) {
@@ -871,9 +871,9 @@ class _CheckoutFlutterApiCodec extends StandardMessageCodec {
       case 129: 
         return OrderResponseDTO.decode(readValue(buffer)!);
       case 130: 
-        return PaymentResult.decode(readValue(buffer)!);
+        return PaymentResultDTO.decode(readValue(buffer)!);
       case 131: 
-        return PaymentResultModel.decode(readValue(buffer)!);
+        return PaymentResultModelDTO.decode(readValue(buffer)!);
       case 132: 
         return PlatformCommunicationModel.decode(readValue(buffer)!);
       default:
@@ -885,7 +885,7 @@ class _CheckoutFlutterApiCodec extends StandardMessageCodec {
 abstract class CheckoutFlutterApi {
   static const MessageCodec<Object?> codec = _CheckoutFlutterApiCodec();
 
-  void onDropInSessionResult(PaymentResult sessionPaymentResult);
+  void onDropInSessionResult(PaymentResultDTO sessionPaymentResult);
 
   void onDropInAdvancedFlowPlatformCommunication(PlatformCommunicationModel platformCommunicationModel);
 
@@ -901,9 +901,9 @@ abstract class CheckoutFlutterApi {
           assert(message != null,
           'Argument for dev.flutter.pigeon.adyen_checkout.CheckoutFlutterApi.onDropInSessionResult was null.');
           final List<Object?> args = (message as List<Object?>?)!;
-          final PaymentResult? arg_sessionPaymentResult = (args[0] as PaymentResult?);
+          final PaymentResultDTO? arg_sessionPaymentResult = (args[0] as PaymentResultDTO?);
           assert(arg_sessionPaymentResult != null,
-              'Argument for dev.flutter.pigeon.adyen_checkout.CheckoutFlutterApi.onDropInSessionResult was null, expected non-null PaymentResult.');
+              'Argument for dev.flutter.pigeon.adyen_checkout.CheckoutFlutterApi.onDropInSessionResult was null, expected non-null PaymentResultDTO.');
           api.onDropInSessionResult(arg_sessionPaymentResult!);
           return;
         });

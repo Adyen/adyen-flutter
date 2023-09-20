@@ -34,7 +34,7 @@ class AdyenCheckout implements AdyenCheckoutInterface {
 
   Future<PaymentResult> _startDropInSessionsPayment(
       DropInSession dropInSession) async {
-    _resultApi.dropInSessionResultStream = StreamController<PaymentResult>();
+    _resultApi.dropInSessionResultStream = StreamController<PaymentResultDTO>();
     DropInConfigurationDTO dropInConfiguration = DropInConfigurationDTO(
       environment: dropInSession.dropInConfiguration.environment,
       clientKey: dropInSession.dropInConfiguration.clientKey,
@@ -59,12 +59,12 @@ class AdyenCheckout implements AdyenCheckoutInterface {
     final sessionDropInResultModel =
         await _resultApi.dropInSessionResultStream.stream.first;
     await _resultApi.dropInSessionResultStream.close();
-    return sessionDropInResultModel;
+    return sessionDropInResultModel.fromDTO();
   }
 
   Future<PaymentResult> _startDropInAdvancedFlowPayment(
       DropInAdvancedFlow dropInAdvancedFlow) async {
-    final dropInAdvancedFlowCompleter = Completer<PaymentResult>();
+    final dropInAdvancedFlowCompleter = Completer<PaymentResultDTO>();
     DropInConfigurationDTO dropInConfiguration = DropInConfigurationDTO(
       environment: dropInAdvancedFlow.dropInConfiguration.environment,
       clientKey: dropInAdvancedFlow.dropInConfiguration.clientKey,
@@ -105,12 +105,12 @@ class AdyenCheckout implements AdyenCheckoutInterface {
 
     return dropInAdvancedFlowCompleter.future.then((value) {
       _resultApi.dropInAdvancedFlowPlatformCommunicationStream.close();
-      return value;
+      return value.fromDTO();
     });
   }
 
   void _handleResult(
-    Completer<PaymentResult> dropInAdvancedFlowCompleter,
+    Completer<PaymentResultDTO> dropInAdvancedFlowCompleter,
     PlatformCommunicationModel event,
   ) {
     dropInAdvancedFlowCompleter.complete(event.paymentResult);
@@ -127,7 +127,7 @@ class AdyenCheckout implements AdyenCheckoutInterface {
 
     final DropInOutcome paymentsDetailsResult =
         await postPaymentsDetails(event.data!);
-    DropInResult dropInResult = mapToDropInResult(paymentsDetailsResult);
+    DropInResultDTO dropInResult = mapToDropInResult(paymentsDetailsResult);
     AdyenCheckoutPlatformInterface.instance
         .onPaymentsDetailsResult(dropInResult);
   }
@@ -141,23 +141,23 @@ class AdyenCheckout implements AdyenCheckoutInterface {
     }
 
     final DropInOutcome paymentsResult = await postPayments(event.data!);
-    DropInResult dropInResult = mapToDropInResult(paymentsResult);
+    DropInResultDTO dropInResult = mapToDropInResult(paymentsResult);
     AdyenCheckoutPlatformInterface.instance.onPaymentsResult(dropInResult);
   }
 
-  DropInResult mapToDropInResult(DropInOutcome dropInOutcome) {
+  DropInResultDTO mapToDropInResult(DropInOutcome dropInOutcome) {
     return switch (dropInOutcome) {
-      Finished() => DropInResult(
+      Finished() => DropInResultDTO(
           dropInResultType: DropInResultType.finished,
           result: dropInOutcome.resultCode,
         ),
-      Action() => DropInResult(
+      Action() => DropInResultDTO(
           dropInResultType: DropInResultType.action,
           actionResponse: dropInOutcome.actionResponse,
         ),
-      Error() => DropInResult(
+      Error() => DropInResultDTO(
           dropInResultType: DropInResultType.error,
-          error: DropInError(
+          error: DropInErrorDTO(
             errorMessage: dropInOutcome.errorMessage,
             reason: dropInOutcome.reason,
             dismissDropIn: dropInOutcome.dismissDropIn,

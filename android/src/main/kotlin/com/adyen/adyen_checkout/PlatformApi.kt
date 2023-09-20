@@ -103,6 +103,17 @@ enum class GooglePayEnvironment(val raw: Int) {
   }
 }
 
+enum class CashAppPayEnvironment(val raw: Int) {
+  SANDBOX(0),
+  PRODUCTION(1);
+
+  companion object {
+    fun ofRaw(raw: Int): CashAppPayEnvironment? {
+      return values().firstOrNull { it.raw == raw }
+    }
+  }
+}
+
 enum class PaymentResultEnum(val raw: Int) {
   CANCELLEDBYUSER(0),
   ERROR(1),
@@ -134,17 +145,6 @@ enum class DropInResultType(val raw: Int) {
 
   companion object {
     fun ofRaw(raw: Int): DropInResultType? {
-      return values().firstOrNull { it.raw == raw }
-    }
-  }
-}
-
-enum class CashAppPayEnvironment(val raw: Int) {
-  SANDBOX(0),
-  PRODUCTION(1);
-
-  companion object {
-    fun ofRaw(raw: Int): CashAppPayEnvironment? {
       return values().firstOrNull { it.raw == raw }
     }
   }
@@ -412,21 +412,21 @@ data class CashAppPayConfigurationDTO (
 }
 
 /** Generated class from Pigeon that represents data sent in messages. */
-data class PaymentResult (
+data class PaymentResultDTO (
   val type: PaymentResultEnum,
   val reason: String? = null,
-  val result: PaymentResultModel? = null
+  val result: PaymentResultModelDTO? = null
 
 ) {
   companion object {
     @Suppress("UNCHECKED_CAST")
-    fun fromList(list: List<Any?>): PaymentResult {
+    fun fromList(list: List<Any?>): PaymentResultDTO {
       val type = PaymentResultEnum.ofRaw(list[0] as Int)!!
       val reason = list[1] as String?
-      val result: PaymentResultModel? = (list[2] as List<Any?>?)?.let {
-        PaymentResultModel.fromList(it)
+      val result: PaymentResultModelDTO? = (list[2] as List<Any?>?)?.let {
+        PaymentResultModelDTO.fromList(it)
       }
-      return PaymentResult(type, reason, result)
+      return PaymentResultDTO(type, reason, result)
     }
   }
   fun toList(): List<Any?> {
@@ -439,7 +439,7 @@ data class PaymentResult (
 }
 
 /** Generated class from Pigeon that represents data sent in messages. */
-data class PaymentResultModel (
+data class PaymentResultModelDTO (
   val sessionId: String? = null,
   val sessionData: String? = null,
   val resultCode: String? = null,
@@ -448,14 +448,14 @@ data class PaymentResultModel (
 ) {
   companion object {
     @Suppress("UNCHECKED_CAST")
-    fun fromList(list: List<Any?>): PaymentResultModel {
+    fun fromList(list: List<Any?>): PaymentResultModelDTO {
       val sessionId = list[0] as String?
       val sessionData = list[1] as String?
       val resultCode = list[2] as String?
       val order: OrderResponseDTO? = (list[3] as List<Any?>?)?.let {
         OrderResponseDTO.fromList(it)
       }
-      return PaymentResultModel(sessionId, sessionData, resultCode, order)
+      return PaymentResultModelDTO(sessionId, sessionData, resultCode, order)
     }
   }
   fun toList(): List<Any?> {
@@ -504,7 +504,7 @@ data class OrderResponseDTO (
 data class PlatformCommunicationModel (
   val type: PlatformCommunicationType,
   val data: String? = null,
-  val paymentResult: PaymentResult? = null
+  val paymentResult: PaymentResultDTO? = null
 
 ) {
   companion object {
@@ -512,8 +512,8 @@ data class PlatformCommunicationModel (
     fun fromList(list: List<Any?>): PlatformCommunicationModel {
       val type = PlatformCommunicationType.ofRaw(list[0] as Int)!!
       val data = list[1] as String?
-      val paymentResult: PaymentResult? = (list[2] as List<Any?>?)?.let {
-        PaymentResult.fromList(it)
+      val paymentResult: PaymentResultDTO? = (list[2] as List<Any?>?)?.let {
+        PaymentResultDTO.fromList(it)
       }
       return PlatformCommunicationModel(type, data, paymentResult)
     }
@@ -528,23 +528,23 @@ data class PlatformCommunicationModel (
 }
 
 /** Generated class from Pigeon that represents data sent in messages. */
-data class DropInResult (
+data class DropInResultDTO (
   val dropInResultType: DropInResultType,
   val result: String? = null,
   val actionResponse: Map<String?, Any?>? = null,
-  val error: DropInError? = null
+  val error: DropInErrorDTO? = null
 
 ) {
   companion object {
     @Suppress("UNCHECKED_CAST")
-    fun fromList(list: List<Any?>): DropInResult {
+    fun fromList(list: List<Any?>): DropInResultDTO {
       val dropInResultType = DropInResultType.ofRaw(list[0] as Int)!!
       val result = list[1] as String?
       val actionResponse = list[2] as Map<String?, Any?>?
-      val error: DropInError? = (list[3] as List<Any?>?)?.let {
-        DropInError.fromList(it)
+      val error: DropInErrorDTO? = (list[3] as List<Any?>?)?.let {
+        DropInErrorDTO.fromList(it)
       }
-      return DropInResult(dropInResultType, result, actionResponse, error)
+      return DropInResultDTO(dropInResultType, result, actionResponse, error)
     }
   }
   fun toList(): List<Any?> {
@@ -558,7 +558,7 @@ data class DropInResult (
 }
 
 /** Generated class from Pigeon that represents data sent in messages. */
-data class DropInError (
+data class DropInErrorDTO (
   val errorMessage: String? = null,
   val reason: String? = null,
   val dismissDropIn: Boolean? = null
@@ -566,11 +566,11 @@ data class DropInError (
 ) {
   companion object {
     @Suppress("UNCHECKED_CAST")
-    fun fromList(list: List<Any?>): DropInError {
+    fun fromList(list: List<Any?>): DropInErrorDTO {
       val errorMessage = list[0] as String?
       val reason = list[1] as String?
       val dismissDropIn = list[2] as Boolean?
-      return DropInError(errorMessage, reason, dismissDropIn)
+      return DropInErrorDTO(errorMessage, reason, dismissDropIn)
     }
   }
   fun toList(): List<Any?> {
@@ -618,12 +618,12 @@ private object CheckoutPlatformInterfaceCodec : StandardMessageCodec() {
       }
       134.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          DropInError.fromList(it)
+          DropInErrorDTO.fromList(it)
         }
       }
       135.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          DropInResult.fromList(it)
+          DropInResultDTO.fromList(it)
         }
       }
       136.toByte() -> {
@@ -665,11 +665,11 @@ private object CheckoutPlatformInterfaceCodec : StandardMessageCodec() {
         stream.write(133)
         writeValue(stream, value.toList())
       }
-      is DropInError -> {
+      is DropInErrorDTO -> {
         stream.write(134)
         writeValue(stream, value.toList())
       }
-      is DropInResult -> {
+      is DropInResultDTO -> {
         stream.write(135)
         writeValue(stream, value.toList())
       }
@@ -692,8 +692,8 @@ interface CheckoutPlatformInterface {
   fun getReturnUrl(callback: (Result<String>) -> Unit)
   fun startDropInSessionPayment(dropInConfigurationDTO: DropInConfigurationDTO, session: SessionDTO)
   fun startDropInAdvancedFlowPayment(dropInConfigurationDTO: DropInConfigurationDTO, paymentMethodsResponse: String)
-  fun onPaymentsResult(paymentsResult: DropInResult)
-  fun onPaymentsDetailsResult(paymentsDetailsResult: DropInResult)
+  fun onPaymentsResult(paymentsResult: DropInResultDTO)
+  fun onPaymentsDetailsResult(paymentsDetailsResult: DropInResultDTO)
 
   companion object {
     /** The codec used by CheckoutPlatformInterface. */
@@ -784,7 +784,7 @@ interface CheckoutPlatformInterface {
         if (api != null) {
           channel.setMessageHandler { message, reply ->
             val args = message as List<Any?>
-            val paymentsResultArg = args[0] as DropInResult
+            val paymentsResultArg = args[0] as DropInResultDTO
             var wrapped: List<Any?>
             try {
               api.onPaymentsResult(paymentsResultArg)
@@ -803,7 +803,7 @@ interface CheckoutPlatformInterface {
         if (api != null) {
           channel.setMessageHandler { message, reply ->
             val args = message as List<Any?>
-            val paymentsDetailsResultArg = args[0] as DropInResult
+            val paymentsDetailsResultArg = args[0] as DropInResultDTO
             var wrapped: List<Any?>
             try {
               api.onPaymentsDetailsResult(paymentsDetailsResultArg)
@@ -836,12 +836,12 @@ private object CheckoutFlutterApiCodec : StandardMessageCodec() {
       }
       130.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          PaymentResult.fromList(it)
+          PaymentResultDTO.fromList(it)
         }
       }
       131.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          PaymentResultModel.fromList(it)
+          PaymentResultModelDTO.fromList(it)
         }
       }
       132.toByte() -> {
@@ -862,11 +862,11 @@ private object CheckoutFlutterApiCodec : StandardMessageCodec() {
         stream.write(129)
         writeValue(stream, value.toList())
       }
-      is PaymentResult -> {
+      is PaymentResultDTO -> {
         stream.write(130)
         writeValue(stream, value.toList())
       }
-      is PaymentResultModel -> {
+      is PaymentResultModelDTO -> {
         stream.write(131)
         writeValue(stream, value.toList())
       }
@@ -888,7 +888,7 @@ class CheckoutFlutterApi(private val binaryMessenger: BinaryMessenger) {
       CheckoutFlutterApiCodec
     }
   }
-  fun onDropInSessionResult(sessionPaymentResultArg: PaymentResult, callback: () -> Unit) {
+  fun onDropInSessionResult(sessionPaymentResultArg: PaymentResultDTO, callback: () -> Unit) {
     val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.adyen_checkout.CheckoutFlutterApi.onDropInSessionResult", codec)
     channel.send(listOf(sessionPaymentResultArg)) {
       callback()

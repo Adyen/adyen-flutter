@@ -1,6 +1,6 @@
 package com.adyen.adyen_checkout.dropInAdvancedFlow
 
-import DropInResult
+import DropInResultDTO
 import DropInResultType
 import android.content.Intent
 import android.os.IBinder
@@ -80,27 +80,27 @@ class AdvancedFlowDropInService : DropInService(), LifecycleOwner {
         }
     }
 
-    private fun mapToDropInResult(dropInResult: DropInResult?): DropInServiceResult {
-        return when (dropInResult?.dropInResultType) {
+    private fun mapToDropInResult(dropInResultDTO: DropInResultDTO?): DropInServiceResult {
+        return when (dropInResultDTO?.dropInResultType) {
             DropInResultType.FINISHED -> DropInServiceResult.Finished(
-                result = "${dropInResult.result}"
+                result = "${dropInResultDTO.result}"
             )
 
             DropInResultType.ERROR -> DropInServiceResult.Error(
                 errorDialog = null,
-                reason = dropInResult.error?.reason,
-                dismissDropIn = dropInResult.error?.dismissDropIn ?: false
+                reason = dropInResultDTO.error?.reason,
+                dismissDropIn = dropInResultDTO.error?.dismissDropIn ?: false
             )
 
             DropInResultType.ACTION -> {
-                if (dropInResult.actionResponse == null) {
+                if (dropInResultDTO.actionResponse == null) {
                     DropInServiceResult.Error(
                         errorDialog = null,
                         reason = "Action response not provided",
                         dismissDropIn = true
                     )
                 } else {
-                    val actionJson = JSONObject(dropInResult.actionResponse)
+                    val actionJson = JSONObject(dropInResultDTO.actionResponse)
                     DropInServiceResult.Action(action = Action.SERIALIZER.deserialize(actionJson))
                 }
             }

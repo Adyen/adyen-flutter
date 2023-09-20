@@ -2,9 +2,9 @@ package com.adyen.adyen_checkout
 
 import CheckoutFlutterApi
 import CheckoutPlatformInterface
-import PaymentResult
+import PaymentResultDTO
 import PaymentResultEnum
-import PaymentResultModel
+import PaymentResultModelDTO
 import PlatformCommunicationModel
 import PlatformCommunicationType
 import androidx.fragment.app.FragmentActivity
@@ -86,19 +86,19 @@ class AdyenCheckoutPlugin : FlutterPlugin, ActivityAware {
         }
 
         val mappedResult = when (sessionDropInResult) {
-            is SessionDropInResult.CancelledByUser -> PaymentResult(
+            is SessionDropInResult.CancelledByUser -> PaymentResultDTO(
                 PaymentResultEnum.CANCELLEDBYUSER
             )
 
-            is SessionDropInResult.Error -> PaymentResult(
+            is SessionDropInResult.Error -> PaymentResultDTO(
                 PaymentResultEnum.ERROR,
                 reason = sessionDropInResult.reason
             )
 
-            is SessionDropInResult.Finished -> PaymentResult(
+            is SessionDropInResult.Finished -> PaymentResultDTO(
                 PaymentResultEnum.FINISHED,
                 result = with(sessionDropInResult.result) {
-                    PaymentResultModel(
+                    PaymentResultModelDTO(
                         sessionId,
                         sessionData,
                         resultCode,
@@ -116,18 +116,18 @@ class AdyenCheckoutPlugin : FlutterPlugin, ActivityAware {
         }
 
         val mappedResult = when (dropInAdvancedFlowResult) {
-            is DropInResult.CancelledByUser -> PaymentResult(
+            is DropInResult.CancelledByUser -> PaymentResultDTO(
                 PaymentResultEnum.CANCELLEDBYUSER
             )
 
-            is DropInResult.Error -> PaymentResult(
+            is DropInResult.Error -> PaymentResultDTO(
                 PaymentResultEnum.ERROR,
                 reason = dropInAdvancedFlowResult.reason
             )
 
-            is DropInResult.Finished -> PaymentResult(
+            is DropInResult.Finished -> PaymentResultDTO(
                 PaymentResultEnum.FINISHED,
-                result = PaymentResultModel(
+                result = PaymentResultModelDTO(
                     resultCode = dropInAdvancedFlowResult.result
                 )
             )
