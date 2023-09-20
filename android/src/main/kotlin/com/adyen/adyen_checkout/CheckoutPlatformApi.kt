@@ -7,7 +7,7 @@ import DropInResult
 import DropInResultType
 import PlatformCommunicationModel
 import PlatformCommunicationType
-import Session
+import SessionDTO
 import androidx.activity.result.ActivityResultLauncher
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.lifecycleScope
@@ -50,7 +50,7 @@ class CheckoutPlatformApi(private val checkoutFlutterApi: CheckoutFlutterApi?) :
 
         override fun startDropInSessionPayment(
             dropInConfigurationDTO: DropInConfigurationDTO,
-            session: Session,
+            session: SessionDTO,
         ) {
             checkForFlutterFragmentActivity()
             activity.lifecycleScope.launch(Dispatchers.IO) {

@@ -112,7 +112,7 @@ class _MyAppState extends State<MyApp> {
         await _adyenSessionRepository.determineExampleReturnUrl();
 
     final CardsConfiguration cardsConfiguration = CardsConfiguration(
-      holderNameRequired: true,
+      holderNameRequired: false,
     );
 
     final ApplePayConfiguration applePayConfiguration = ApplePayConfiguration(

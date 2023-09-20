@@ -66,15 +66,6 @@ class DropInOutcomeHandler {
       jsonResponse.containsKey(orderKey) &&
       (getOrderFromResponse(jsonResponse).remainingAmount?.value ?? 0) > 0;
 
-  OrderResponseModel getOrderFromResponse(jsonResponse) {
-    return OrderResponseModel(
-        pspReference: jsonResponse['pspReference'],
-        orderData: jsonResponse['orderData'],
-        amount: jsonResponse['amount'] != null
-            ? Amount(value: jsonResponse['amount']['value'])
-            : null,
-        remainingAmount: jsonResponse['remainingAmount'] != null
-            ? Amount(value: jsonResponse['remainingAmount']['value'])
-            : null);
-  }
+  OrderResponse getOrderFromResponse(jsonResponse) =>
+      OrderResponse.fromJson(jsonResponse);
 }

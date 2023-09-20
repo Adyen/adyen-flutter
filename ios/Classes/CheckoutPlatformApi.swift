@@ -29,7 +29,7 @@ class CheckoutPlatformApi : CheckoutPlatformInterface {
         completion(Result.success(systemVersion))
     }
     
-    func startDropInSessionPayment(dropInConfigurationDTO: DropInConfigurationDTO, session: Session) {
+    func startDropInSessionPayment(dropInConfigurationDTO: DropInConfigurationDTO, session: SessionDTO) {
         do {
             guard let viewController = getViewController() else {
                 return

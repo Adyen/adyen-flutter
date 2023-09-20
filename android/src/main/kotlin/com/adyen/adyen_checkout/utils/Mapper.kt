@@ -1,15 +1,15 @@
 package com.adyen.adyen_checkout.utils
 
 import AddressMode
-import Amount
+import AmountDTO
 import CashAppPayConfigurationDTO
 import CashAppPayEnvironment
 import DropInConfigurationDTO
 import Environment
 import GooglePayConfigurationDTO
 import GooglePayEnvironment
-import OrderResponseModel
-import Session
+import OrderResponseDTO
+import SessionDTO
 import TotalPriceStatus
 import android.content.Context
 import com.adyen.checkout.card.AddressConfiguration
@@ -18,6 +18,7 @@ import com.adyen.checkout.card.CardType
 import com.adyen.checkout.card.KCPAuthVisibility
 import com.adyen.checkout.card.SocialSecurityNumberVisibility
 import com.adyen.checkout.cashapppay.CashAppPayConfiguration
+import com.adyen.checkout.components.core.Amount
 import com.adyen.checkout.components.core.OrderResponse
 import com.adyen.checkout.dropin.DropInConfiguration
 import com.adyen.checkout.googlepay.GooglePayConfiguration
@@ -29,16 +30,16 @@ import com.adyen.checkout.core.Environment as SDKEnvironment
 
 object Mapper {
 
-    fun Session.mapToSession(): SessionModel {
+    fun SessionDTO.mapToSession(): SessionModel {
         return SessionModel(this.id, this.sessionData)
     }
 
-    fun OrderResponse.mapToOrderResponseModel(): OrderResponseModel {
-        return OrderResponseModel(
+    fun OrderResponse.mapToOrderResponseModel(): OrderResponseDTO {
+        return OrderResponseDTO(
             pspReference = pspReference,
             orderData = orderData,
-            amount = amount?.mapTopAmount(),
-            remainingAmount = remainingAmount?.mapTopAmount(),
+            amount = amount?.mapToDTOAmount(),
+            remainingAmount = remainingAmount?.mapToDTOAmount(),
         )
     }
 
@@ -59,8 +60,8 @@ object Mapper {
                     cardsConfigurationDTO.addressMode.mapToAddressConfiguration()
                 )
                 .setShowStorePaymentField(cardsConfigurationDTO.showStorePaymentField)
-                .setHideCvcStoredCard(cardsConfigurationDTO.showCvcForStoredCard)
-                .setHideCvc(cardsConfigurationDTO.showCvc)
+                .setHideCvcStoredCard(!cardsConfigurationDTO.showCvcForStoredCard)
+                .setHideCvc(!cardsConfigurationDTO.showCvc)
                 .setKcpAuthVisibility(determineKcpAuthVisibility(cardsConfigurationDTO.showKcpField))
                 .setSocialSecurityNumberVisibility(
                     determineSocialSecurityNumberVisibility(cardsConfigurationDTO.showSocialSecurityNumberField)
@@ -141,12 +142,12 @@ object Mapper {
         }
     }
 
-    private fun Amount.mapToAmount(): com.adyen.checkout.components.core.Amount {
-        return com.adyen.checkout.components.core.Amount(this.currency, this.value)
+    private fun AmountDTO.mapToAmount(): Amount {
+        return Amount(this.currency, this.value)
     }
 
-    private fun com.adyen.checkout.components.core.Amount.mapTopAmount(): Amount {
-        return Amount(this.currency, this.value)
+    private fun Amount.mapToDTOAmount(): AmountDTO {
+        return AmountDTO(this.currency, this.value)
     }
 
     private fun GooglePayConfigurationDTO.mapToGooglePayConfiguration(builder: GooglePayConfiguration.Builder): GooglePayConfiguration {

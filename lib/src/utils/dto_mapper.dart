@@ -60,3 +60,10 @@ extension SessionMapper on Session {
         sessionData: sessionData,
       );
 }
+
+extension AmountMapper on Amount {
+  AmountDTO toDTO() => AmountDTO(
+        value: value,
+        currency: currency,
+      );
+}

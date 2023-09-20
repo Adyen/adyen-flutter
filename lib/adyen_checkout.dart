@@ -2,15 +2,15 @@ export 'src/adyen_checkout.dart';
 export 'src/generated/platform_api.g.dart'
     show
         PaymentResult,
-        Amount,
         Environment,
-        OrderResponseModel,
         AddressMode,
         TotalPriceStatus,
         GooglePayEnvironment,
         CashAppPayEnvironment;
 export 'src/models/adyen_configuration.dart';
+export 'src/models/amount.dart';
 export 'src/models/drop_in_outcome.dart';
+export 'src/models/oder_response.dart';
 export 'src/models/payment_flow.dart';
 export 'src/models/payment_method_configurations/apple_pay_configuration.dart';
 export 'src/models/payment_method_configurations/cards_configuration.dart';

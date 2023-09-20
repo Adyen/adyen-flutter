@@ -93,15 +93,15 @@ enum CashAppPayEnvironment: Int {
 }
 
 /// Generated class from Pigeon that represents data sent in messages.
-struct Session {
+struct SessionDTO {
   var id: String
   var sessionData: String
 
-  static func fromList(_ list: [Any?]) -> Session? {
+  static func fromList(_ list: [Any?]) -> SessionDTO? {
     let id = list[0] as! String
     let sessionData = list[1] as! String
 
-    return Session(
+    return SessionDTO(
       id: id,
       sessionData: sessionData
     )
@@ -115,15 +115,15 @@ struct Session {
 }
 
 /// Generated class from Pigeon that represents data sent in messages.
-struct Amount {
+struct AmountDTO {
   var currency: String? = nil
   var value: Int64
 
-  static func fromList(_ list: [Any?]) -> Amount? {
+  static func fromList(_ list: [Any?]) -> AmountDTO? {
     let currency: String? = nilOrValue(list[0])
     let value = list[1] is Int64 ? list[1] as! Int64 : Int64(list[1] as! Int32)
 
-    return Amount(
+    return AmountDTO(
       currency: currency,
       value: value
     )
@@ -163,7 +163,7 @@ struct DropInConfigurationDTO {
   var environment: Environment
   var clientKey: String
   var countryCode: String
-  var amount: Amount
+  var amount: AmountDTO
   var shopperLocale: String
   var analyticsOptionsDTO: AnalyticsOptionsDTO? = nil
   var showPreselectedStoredPaymentMethod: Bool? = nil
@@ -177,7 +177,7 @@ struct DropInConfigurationDTO {
     let environment = Environment(rawValue: list[0] as! Int)!
     let clientKey = list[1] as! String
     let countryCode = list[2] as! String
-    let amount = Amount.fromList(list[3] as! [Any?])!
+    let amount = AmountDTO.fromList(list[3] as! [Any?])!
     let shopperLocale = list[4] as! String
     var analyticsOptionsDTO: AnalyticsOptionsDTO? = nil
     if let analyticsOptionsDTOList: [Any?] = nilOrValue(list[5]) {
@@ -417,15 +417,15 @@ struct PaymentResultModel {
   var sessionId: String? = nil
   var sessionData: String? = nil
   var resultCode: String? = nil
-  var order: OrderResponseModel? = nil
+  var order: OrderResponseDTO? = nil
 
   static func fromList(_ list: [Any?]) -> PaymentResultModel? {
     let sessionId: String? = nilOrValue(list[0])
     let sessionData: String? = nilOrValue(list[1])
     let resultCode: String? = nilOrValue(list[2])
-    var order: OrderResponseModel? = nil
+    var order: OrderResponseDTO? = nil
     if let orderList: [Any?] = nilOrValue(list[3]) {
-      order = OrderResponseModel.fromList(orderList)
+      order = OrderResponseDTO.fromList(orderList)
     }
 
     return PaymentResultModel(
@@ -446,25 +446,25 @@ struct PaymentResultModel {
 }
 
 /// Generated class from Pigeon that represents data sent in messages.
-struct OrderResponseModel {
+struct OrderResponseDTO {
   var pspReference: String
   var orderData: String
-  var amount: Amount? = nil
-  var remainingAmount: Amount? = nil
+  var amount: AmountDTO? = nil
+  var remainingAmount: AmountDTO? = nil
 
-  static func fromList(_ list: [Any?]) -> OrderResponseModel? {
+  static func fromList(_ list: [Any?]) -> OrderResponseDTO? {
     let pspReference = list[0] as! String
     let orderData = list[1] as! String
-    var amount: Amount? = nil
+    var amount: AmountDTO? = nil
     if let amountList: [Any?] = nilOrValue(list[2]) {
-      amount = Amount.fromList(amountList)
+      amount = AmountDTO.fromList(amountList)
     }
-    var remainingAmount: Amount? = nil
+    var remainingAmount: AmountDTO? = nil
     if let remainingAmountList: [Any?] = nilOrValue(list[3]) {
-      remainingAmount = Amount.fromList(remainingAmountList)
+      remainingAmount = AmountDTO.fromList(remainingAmountList)
     }
 
-    return OrderResponseModel(
+    return OrderResponseDTO(
       pspReference: pspReference,
       orderData: orderData,
       amount: amount,
@@ -573,7 +573,7 @@ private class CheckoutPlatformInterfaceCodecReader: FlutterStandardReader {
   override func readValue(ofType type: UInt8) -> Any? {
     switch type {
       case 128:
-        return Amount.fromList(self.readValue() as! [Any?])
+        return AmountDTO.fromList(self.readValue() as! [Any?])
       case 129:
         return AnalyticsOptionsDTO.fromList(self.readValue() as! [Any?])
       case 130:
@@ -591,7 +591,7 @@ private class CheckoutPlatformInterfaceCodecReader: FlutterStandardReader {
       case 136:
         return GooglePayConfigurationDTO.fromList(self.readValue() as! [Any?])
       case 137:
-        return Session.fromList(self.readValue() as! [Any?])
+        return SessionDTO.fromList(self.readValue() as! [Any?])
       default:
         return super.readValue(ofType: type)
     }
@@ -600,7 +600,7 @@ private class CheckoutPlatformInterfaceCodecReader: FlutterStandardReader {
 
 private class CheckoutPlatformInterfaceCodecWriter: FlutterStandardWriter {
   override func writeValue(_ value: Any) {
-    if let value = value as? Amount {
+    if let value = value as? AmountDTO {
       super.writeByte(128)
       super.writeValue(value.toList())
     } else if let value = value as? AnalyticsOptionsDTO {
@@ -627,7 +627,7 @@ private class CheckoutPlatformInterfaceCodecWriter: FlutterStandardWriter {
     } else if let value = value as? GooglePayConfigurationDTO {
       super.writeByte(136)
       super.writeValue(value.toList())
-    } else if let value = value as? Session {
+    } else if let value = value as? SessionDTO {
       super.writeByte(137)
       super.writeValue(value.toList())
     } else {
@@ -654,7 +654,7 @@ class CheckoutPlatformInterfaceCodec: FlutterStandardMessageCodec {
 protocol CheckoutPlatformInterface {
   func getPlatformVersion(completion: @escaping (Result<String, Error>) -> Void)
   func getReturnUrl(completion: @escaping (Result<String, Error>) -> Void)
-  func startDropInSessionPayment(dropInConfigurationDTO: DropInConfigurationDTO, session: Session) throws
+  func startDropInSessionPayment(dropInConfigurationDTO: DropInConfigurationDTO, session: SessionDTO) throws
   func startDropInAdvancedFlowPayment(dropInConfigurationDTO: DropInConfigurationDTO, paymentMethodsResponse: String) throws
   func onPaymentsResult(paymentsResult: DropInResult) throws
   func onPaymentsDetailsResult(paymentsDetailsResult: DropInResult) throws
@@ -701,7 +701,7 @@ class CheckoutPlatformInterfaceSetup {
       startDropInSessionPaymentChannel.setMessageHandler { message, reply in
         let args = message as! [Any?]
         let dropInConfigurationDTOArg = args[0] as! DropInConfigurationDTO
-        let sessionArg = args[1] as! Session
+        let sessionArg = args[1] as! SessionDTO
         do {
           try api.startDropInSessionPayment(dropInConfigurationDTO: dropInConfigurationDTOArg, session: sessionArg)
           reply(wrapResult(nil))
@@ -764,9 +764,9 @@ private class CheckoutFlutterApiCodecReader: FlutterStandardReader {
   override func readValue(ofType type: UInt8) -> Any? {
     switch type {
       case 128:
-        return Amount.fromList(self.readValue() as! [Any?])
+        return AmountDTO.fromList(self.readValue() as! [Any?])
       case 129:
-        return OrderResponseModel.fromList(self.readValue() as! [Any?])
+        return OrderResponseDTO.fromList(self.readValue() as! [Any?])
       case 130:
         return PaymentResult.fromList(self.readValue() as! [Any?])
       case 131:
@@ -781,10 +781,10 @@ private class CheckoutFlutterApiCodecReader: FlutterStandardReader {
 
 private class CheckoutFlutterApiCodecWriter: FlutterStandardWriter {
   override func writeValue(_ value: Any) {
-    if let value = value as? Amount {
+    if let value = value as? AmountDTO {
       super.writeByte(128)
       super.writeValue(value.toList())
-    } else if let value = value as? OrderResponseModel {
+    } else if let value = value as? OrderResponseDTO {
       super.writeByte(129)
       super.writeValue(value.toList())
     } else if let value = value as? PaymentResult {

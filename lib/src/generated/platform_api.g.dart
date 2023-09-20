@@ -88,8 +88,8 @@ class SessionDTO {
   }
 }
 
-class Amount {
-  Amount({
+class AmountDTO {
+  AmountDTO({
     this.currency,
     required this.value,
   });
@@ -105,9 +105,9 @@ class Amount {
     ];
   }
 
-  static Amount decode(Object result) {
+  static AmountDTO decode(Object result) {
     result as List<Object?>;
-    return Amount(
+    return AmountDTO(
       currency: result[0] as String?,
       value: result[1]! as int,
     );
@@ -162,7 +162,7 @@ class DropInConfigurationDTO {
 
   String countryCode;
 
-  Amount amount;
+  AmountDTO amount;
 
   String shopperLocale;
 
@@ -203,7 +203,7 @@ class DropInConfigurationDTO {
       environment: Environment.values[result[0]! as int],
       clientKey: result[1]! as String,
       countryCode: result[2]! as String,
-      amount: Amount.decode(result[3]! as List<Object?>),
+      amount: AmountDTO.decode(result[3]! as List<Object?>),
       shopperLocale: result[4]! as String,
       analyticsOptionsDTO: result[5] != null
           ? AnalyticsOptionsDTO.decode(result[5]! as List<Object?>)
@@ -452,7 +452,7 @@ class PaymentResultModel {
 
   String? resultCode;
 
-  OrderResponseModel? order;
+  OrderResponseDTO? order;
 
   Object encode() {
     return <Object?>[
@@ -470,14 +470,14 @@ class PaymentResultModel {
       sessionData: result[1] as String?,
       resultCode: result[2] as String?,
       order: result[3] != null
-          ? OrderResponseModel.decode(result[3]! as List<Object?>)
+          ? OrderResponseDTO.decode(result[3]! as List<Object?>)
           : null,
     );
   }
 }
 
-class OrderResponseModel {
-  OrderResponseModel({
+class OrderResponseDTO {
+  OrderResponseDTO({
     required this.pspReference,
     required this.orderData,
     this.amount,
@@ -488,9 +488,9 @@ class OrderResponseModel {
 
   String orderData;
 
-  Amount? amount;
+  AmountDTO? amount;
 
-  Amount? remainingAmount;
+  AmountDTO? remainingAmount;
 
   Object encode() {
     return <Object?>[
@@ -501,16 +501,16 @@ class OrderResponseModel {
     ];
   }
 
-  static OrderResponseModel decode(Object result) {
+  static OrderResponseDTO decode(Object result) {
     result as List<Object?>;
-    return OrderResponseModel(
+    return OrderResponseDTO(
       pspReference: result[0]! as String,
       orderData: result[1]! as String,
       amount: result[2] != null
-          ? Amount.decode(result[2]! as List<Object?>)
+          ? AmountDTO.decode(result[2]! as List<Object?>)
           : null,
       remainingAmount: result[3] != null
-          ? Amount.decode(result[3]! as List<Object?>)
+          ? AmountDTO.decode(result[3]! as List<Object?>)
           : null,
     );
   }
@@ -622,7 +622,7 @@ class _CheckoutPlatformInterfaceCodec extends StandardMessageCodec {
   const _CheckoutPlatformInterfaceCodec();
   @override
   void writeValue(WriteBuffer buffer, Object? value) {
-    if (value is Amount) {
+    if (value is AmountDTO) {
       buffer.putUint8(128);
       writeValue(buffer, value.encode());
     } else if (value is AnalyticsOptionsDTO) {
@@ -661,7 +661,7 @@ class _CheckoutPlatformInterfaceCodec extends StandardMessageCodec {
   Object? readValueOfType(int type, ReadBuffer buffer) {
     switch (type) {
       case 128: 
-        return Amount.decode(readValue(buffer)!);
+        return AmountDTO.decode(readValue(buffer)!);
       case 129: 
         return AnalyticsOptionsDTO.decode(readValue(buffer)!);
       case 130: 
@@ -843,10 +843,10 @@ class _CheckoutFlutterApiCodec extends StandardMessageCodec {
   const _CheckoutFlutterApiCodec();
   @override
   void writeValue(WriteBuffer buffer, Object? value) {
-    if (value is Amount) {
+    if (value is AmountDTO) {
       buffer.putUint8(128);
       writeValue(buffer, value.encode());
-    } else if (value is OrderResponseModel) {
+    } else if (value is OrderResponseDTO) {
       buffer.putUint8(129);
       writeValue(buffer, value.encode());
     } else if (value is PaymentResult) {
@@ -867,9 +867,9 @@ class _CheckoutFlutterApiCodec extends StandardMessageCodec {
   Object? readValueOfType(int type, ReadBuffer buffer) {
     switch (type) {
       case 128: 
-        return Amount.decode(readValue(buffer)!);
+        return AmountDTO.decode(readValue(buffer)!);
       case 129: 
-        return OrderResponseModel.decode(readValue(buffer)!);
+        return OrderResponseDTO.decode(readValue(buffer)!);
       case 130: 
         return PaymentResult.decode(readValue(buffer)!);
       case 131: 

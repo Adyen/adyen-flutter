@@ -68,20 +68,20 @@ class SessionDTO {
   final String id;
   final String sessionData;
 
-  SessionDTO({
-    required this.id,
-    required this.sessionData,
-  });
+  SessionDTO(
+     this.id,
+     this.sessionData,
+  );
 }
 
-class Amount {
+class AmountDTO {
   final String? currency;
   final int value;
 
-  Amount({
-    required this.currency,
-    required this.value,
-  });
+  AmountDTO(
+     this.currency,
+     this.value,
+  );
 }
 
 class AnalyticsOptionsDTO {
@@ -98,7 +98,7 @@ class DropInConfigurationDTO {
   final Environment environment;
   final String clientKey;
   final String countryCode;
-  final Amount amount;
+  final AmountDTO amount;
   final String shopperLocale;
   final AnalyticsOptionsDTO? analyticsOptionsDTO;
   final bool? showPreselectedStoredPaymentMethod;
@@ -210,7 +210,7 @@ class PaymentResultModel {
   final String? sessionId;
   final String? sessionData;
   final String? resultCode;
-  final OrderResponseModel? order;
+  final OrderResponseDTO? order;
 
   PaymentResultModel(
     this.sessionId,
@@ -220,13 +220,13 @@ class PaymentResultModel {
   );
 }
 
-class OrderResponseModel {
+class OrderResponseDTO {
   final String pspReference;
   final String orderData;
-  final Amount? amount;
-  final Amount? remainingAmount;
+  final AmountDTO? amount;
+  final AmountDTO? remainingAmount;
 
-  OrderResponseModel({
+  OrderResponseDTO({
     required this.pspReference,
     required this.orderData,
     this.amount,

@@ -1,24 +1,19 @@
 import 'dart:io';
 
+import 'package:adyen_checkout/adyen_checkout.dart';
 import 'package:adyen_checkout/src/generated/platform_api.g.dart';
 import 'package:adyen_checkout/src/models/analytics_options.dart';
-import 'package:adyen_checkout/src/models/payment_method_configurations/apple_pay_configuration.dart';
-import 'package:adyen_checkout/src/models/payment_method_configurations/cards_configuration.dart';
-import 'package:adyen_checkout/src/models/payment_method_configurations/cash_app_pay_configuration.dart';
-import 'package:adyen_checkout/src/models/payment_method_configurations/google_pay_configuration.dart';
 import 'package:adyen_checkout/src/utils/dto_mapper.dart';
 
 sealed class AdyenConfiguration {
   final Environment environment;
   final String clientKey;
   final String countryCode;
-  final Amount amount;
 
   AdyenConfiguration(
     this.environment,
     this.clientKey,
     this.countryCode,
-    this.amount,
   );
 }
 
@@ -28,7 +23,7 @@ class DropInConfiguration extends DropInConfigurationDTO
     required super.environment,
     required super.clientKey,
     required super.countryCode,
-    required super.amount,
+    required Amount amount,
     String? shopperLocale,
     CardsConfiguration? cardsConfiguration,
     ApplePayConfiguration? applePayConfiguration,
@@ -38,6 +33,7 @@ class DropInConfiguration extends DropInConfigurationDTO
     bool showPreselectedStoredPaymentMethod = false,
     bool skipListWhenSinglePaymentMethod = false,
   }) : super(
+          amount: amount.toDTO(),
           shopperLocale: shopperLocale ?? Platform.localeName,
           cardsConfigurationDTO: cardsConfiguration?.toDTO(),
           applePayConfigurationDTO: applePayConfiguration?.toDTO(),
