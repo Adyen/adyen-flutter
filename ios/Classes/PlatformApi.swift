@@ -364,17 +364,21 @@ struct GooglePayConfigurationDTO {
 /// Generated class from Pigeon that represents data sent in messages.
 struct CashAppPayConfigurationDTO {
   var cashAppPayEnvironment: CashAppPayEnvironment
+  var returnUrl: String
 
   static func fromList(_ list: [Any?]) -> CashAppPayConfigurationDTO? {
     let cashAppPayEnvironment = CashAppPayEnvironment(rawValue: list[0] as! Int)!
+    let returnUrl = list[1] as! String
 
     return CashAppPayConfigurationDTO(
-      cashAppPayEnvironment: cashAppPayEnvironment
+      cashAppPayEnvironment: cashAppPayEnvironment,
+      returnUrl: returnUrl
     )
   }
   func toList() -> [Any?] {
     return [
       cashAppPayEnvironment.rawValue,
+      returnUrl,
     ]
   }
 }

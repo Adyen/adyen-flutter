@@ -89,6 +89,7 @@ class _MyAppState extends State<MyApp> {
       Config.amount,
       Config.environment,
     );
+
     final DropInConfiguration dropInConfiguration = DropInConfiguration(
       environment: Environment.test,
       clientKey: Config.clientKey,
@@ -107,6 +108,8 @@ class _MyAppState extends State<MyApp> {
   Future<PaymentResult> startDropInAdvancedFlow() async {
     final String paymentMethodsResponse =
         await _adyenSessionRepository.fetchPaymentMethods();
+    final String returnUrl =
+        await _adyenSessionRepository.determineExampleReturnUrl();
 
     final CardsConfiguration cardsConfiguration = CardsConfiguration(
       holderNameRequired: true,
@@ -125,6 +128,12 @@ class _MyAppState extends State<MyApp> {
       shippingAddressRequired: true,
     );
 
+    final CashAppPayConfiguration cashAppPayConfiguration =
+        CashAppPayConfiguration(
+      CashAppPayEnvironment.sandbox,
+      returnUrl,
+    );
+
     final DropInConfiguration dropInConfiguration = DropInConfiguration(
       environment: Environment.test,
       clientKey: Config.clientKey,
@@ -134,6 +143,7 @@ class _MyAppState extends State<MyApp> {
       cardsConfiguration: cardsConfiguration,
       applePayConfiguration: applePayConfiguration,
       googlePayConfiguration: googlePayConfiguration,
+      cashAppPayConfiguration: cashAppPayConfiguration,
     );
 
     return await _adyenCheckout.startPayment(

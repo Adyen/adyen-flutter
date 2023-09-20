@@ -184,8 +184,10 @@ object Mapper {
     }
 
     private fun CashAppPayConfigurationDTO.mapToCashAppPayConfiguration(builder: CashAppPayConfiguration.Builder): CashAppPayConfiguration {
-        builder.setCashAppPayEnvironment(cashAppPayEnvironment.mapToCashAppPayEnvironment())
-        return builder.build();
+        builder
+            .setCashAppPayEnvironment(cashAppPayEnvironment.mapToCashAppPayEnvironment())
+            .setReturnUrl(returnUrl)
+        return builder.build()
     }
 
     private fun CashAppPayEnvironment.mapToCashAppPayEnvironment(): SDKCashAppPayEnvironment {

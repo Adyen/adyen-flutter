@@ -46,6 +46,8 @@ class AdyenCheckout implements AdyenCheckoutInterface {
           dropInSession.dropInConfiguration.applePayConfigurationDTO,
       googlePayConfigurationDTO:
           dropInSession.dropInConfiguration.googlePayConfigurationDTO,
+      cashAppPayConfigurationDTO:
+          dropInSession.dropInConfiguration.cashAppPayConfigurationDTO,
       analyticsOptionsDTO:
           dropInSession.dropInConfiguration.analyticsOptionsDTO,
     );
@@ -74,6 +76,8 @@ class AdyenCheckout implements AdyenCheckoutInterface {
           dropInAdvancedFlow.dropInConfiguration.applePayConfigurationDTO,
       googlePayConfigurationDTO:
           dropInAdvancedFlow.dropInConfiguration.googlePayConfigurationDTO,
+      cashAppPayConfigurationDTO:
+          dropInAdvancedFlow.dropInConfiguration.cashAppPayConfigurationDTO,
       analyticsOptionsDTO:
           dropInAdvancedFlow.dropInConfiguration.analyticsOptionsDTO,
     );

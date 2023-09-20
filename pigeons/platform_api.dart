@@ -186,8 +186,12 @@ class GooglePayConfigurationDTO {
 
 class CashAppPayConfigurationDTO {
   final CashAppPayEnvironment cashAppPayEnvironment;
+  final String returnUrl;
 
-  CashAppPayConfigurationDTO(this.cashAppPayEnvironment);
+  CashAppPayConfigurationDTO(
+    this.cashAppPayEnvironment,
+    this.returnUrl,
+  );
 }
 
 class PaymentResult {

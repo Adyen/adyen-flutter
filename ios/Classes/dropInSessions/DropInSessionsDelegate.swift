@@ -2,6 +2,7 @@ import Adyen
 import AdyenNetworking
 
 class DropInSessionsDelegate : AdyenSessionDelegate {
+  
     private let viewController : UIViewController?
     private let checkoutFlutterApi: CheckoutFlutterApi
     
@@ -10,9 +11,9 @@ class DropInSessionsDelegate : AdyenSessionDelegate {
         self.checkoutFlutterApi = checkoutFlutterApi
     }
     
-    func didComplete(with resultCode: SessionPaymentResultCode, component: Component, session: AdyenSession) {
+    func didComplete(with result: Adyen.AdyenSessionResult, component: Adyen.Component, session: Adyen.AdyenSession) {
         viewController?.dismiss(animated: false, completion: {
-            let paymentResult = PaymentResultModel(sessionId: session.sessionContext.identifier, sessionData: session.sessionContext.data, resultCode: resultCode.rawValue)
+            let paymentResult = PaymentResultModel(sessionId: session.sessionContext.identifier, sessionData: session.sessionContext.data, resultCode: result.resultCode.rawValue)
             self.checkoutFlutterApi.onDropInSessionResult(sessionPaymentResult: PaymentResult(type: PaymentResultEnum.finished, result: paymentResult), completion: {})
         })
     }

@@ -180,8 +180,7 @@ class CheckoutPlatformApi : CheckoutPlatformInterface {
         }
         
         if let cashAppPayConfigurationDTO = dropInConfigurationDTO.cashAppPayConfigurationDTO {
-            let cashAppPayConfiguration = DropInComponent.CashAppPay.init(redirectURL: try URL(from: "test" as! Decoder))
-            dropInConfiguration.cashAppPay = cashAppPayConfiguration
+            dropInConfiguration.cashAppPay = DropInComponent.CashAppPay(redirectURL: URL(string: cashAppPayConfigurationDTO.returnUrl)!)
         }
         
         return dropInConfiguration

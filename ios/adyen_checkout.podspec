@@ -22,4 +22,5 @@ Adyen checkout SDK for Flutter
   s.swift_version = '5.0'
 
   s.dependency 'Adyen', '5.3.0'
+  s.dependency 'Adyen/CashAppPay'
 end

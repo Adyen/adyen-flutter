@@ -24,7 +24,7 @@ class AdyenSessionsRepository {
   //A session should not being created from the mobile application.
   //Please provide a CheckoutSession object from your own backend.
   Future<Session> createSession(Amount amount, Environment environment) async {
-    String returnUrl = await _determineExampleReturnUrl();
+    String returnUrl = await determineExampleReturnUrl();
     SessionRequestNetworkModel sessionRequestNetworkModel =
         SessionRequestNetworkModel(
       merchantAccount: Config.merchantAccount,
@@ -55,7 +55,7 @@ class AdyenSessionsRepository {
   }
 
   Future<DropInOutcome> postPayments(String paymentComponentJson) async {
-    String returnUrl = await _determineExampleReturnUrl();
+    String returnUrl = await determineExampleReturnUrl();
     PaymentsRequestData paymentsRequestData = PaymentsRequestData(
       merchantAccount: Config.merchantAccount,
       shopperReference: Config.shopperReference,
@@ -87,7 +87,7 @@ class AdyenSessionsRepository {
     return _dropInOutcomeHandler.handleResponse(response);
   }
 
-  Future<String> _determineExampleReturnUrl() async {
+  Future<String> determineExampleReturnUrl() async {
     if (Platform.isAndroid) {
       return await _adyenCheckout.getReturnUrl();
     } else if (Platform.isIOS) {

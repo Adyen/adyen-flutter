@@ -382,13 +382,17 @@ class GooglePayConfigurationDTO {
 class CashAppPayConfigurationDTO {
   CashAppPayConfigurationDTO({
     required this.cashAppPayEnvironment,
+    required this.returnUrl,
   });
 
   CashAppPayEnvironment cashAppPayEnvironment;
 
+  String returnUrl;
+
   Object encode() {
     return <Object?>[
       cashAppPayEnvironment.index,
+      returnUrl,
     ];
   }
 
@@ -396,6 +400,7 @@ class CashAppPayConfigurationDTO {
     result as List<Object?>;
     return CashAppPayConfigurationDTO(
       cashAppPayEnvironment: CashAppPayEnvironment.values[result[0]! as int],
+      returnUrl: result[1]! as String,
     );
   }
 }

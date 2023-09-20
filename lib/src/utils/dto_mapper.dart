@@ -1,7 +1,6 @@
 import 'package:adyen_checkout/adyen_checkout.dart';
 import 'package:adyen_checkout/src/generated/platform_api.g.dart';
 import 'package:adyen_checkout/src/models/analytics_options.dart';
-import 'package:adyen_checkout/src/models/payment_method_configurations/cash_app_pay_configuration.dart';
 
 extension AnalyticsOptionsMapper on AnalyticsOptions {
   AnalyticsOptionsDTO toDTO() => AnalyticsOptionsDTO(
@@ -51,5 +50,6 @@ extension ApplePayConfigurationMapper on ApplePayConfiguration {
 extension CashAppPayConfigurationMapper on CashAppPayConfiguration {
   CashAppPayConfigurationDTO toDTO() => CashAppPayConfigurationDTO(
         cashAppPayEnvironment: cashAppPayEnvironment,
+        returnUrl: returnUrl,
       );
 }

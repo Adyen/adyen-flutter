@@ -15,4 +15,6 @@ export 'src/models/drop_in_outcome.dart';
 export 'src/models/payment_flow.dart';
 export 'src/models/payment_method_configurations/apple_pay_configuration.dart';
 export 'src/models/payment_method_configurations/cards_configuration.dart';
+export 'src/models/payment_method_configurations/cash_app_pay_configuration.dart';
 export 'src/models/payment_method_configurations/google_pay_configuration.dart';
+

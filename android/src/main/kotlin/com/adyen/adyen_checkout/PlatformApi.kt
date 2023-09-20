@@ -391,19 +391,22 @@ data class GooglePayConfigurationDTO (
 
 /** Generated class from Pigeon that represents data sent in messages. */
 data class CashAppPayConfigurationDTO (
-  val cashAppPayEnvironment: CashAppPayEnvironment
+  val cashAppPayEnvironment: CashAppPayEnvironment,
+  val returnUrl: String
 
 ) {
   companion object {
     @Suppress("UNCHECKED_CAST")
     fun fromList(list: List<Any?>): CashAppPayConfigurationDTO {
       val cashAppPayEnvironment = CashAppPayEnvironment.ofRaw(list[0] as Int)!!
-      return CashAppPayConfigurationDTO(cashAppPayEnvironment)
+      val returnUrl = list[1] as String
+      return CashAppPayConfigurationDTO(cashAppPayEnvironment, returnUrl)
     }
   }
   fun toList(): List<Any?> {
     return listOf<Any?>(
       cashAppPayEnvironment.raw,
+      returnUrl,
     )
   }
 }
