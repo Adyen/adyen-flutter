@@ -11,11 +11,11 @@ class MockAdyenCheckoutPlatform
   Future<String> getPlatformVersion() => Future.value('42');
 
   @override
-  Future<void> startDropInSessionPayment(
-    Session sessionModel,
-    DropInConfigurationDTO dropInConfiguration,
-  ) =>
-      Future.value(null);
+  void startDropInSessionPayment(
+      {required SessionDTO session,
+      required DropInConfigurationDTO dropInConfiguration}) {
+    return;
+  }
 
   @override
   Future<String> getReturnUrl() {
@@ -23,11 +23,12 @@ class MockAdyenCheckoutPlatform
   }
 
   @override
-  Future<String> startDropInAdvancedFlowPayment(
-    String paymentMethodsResponse,
-    DropInConfigurationDTO dropInConfiguration,
-  ) =>
-      Future.value("Result");
+  void startDropInAdvancedFlowPayment({
+    required String paymentMethodsResponse,
+    required DropInConfigurationDTO dropInConfiguration,
+  }) {
+    return;
+  }
 
   @override
   Future<String> onPaymentsResult(DropInResult paymentsResult) =>

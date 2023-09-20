@@ -53,3 +53,10 @@ extension CashAppPayConfigurationMapper on CashAppPayConfiguration {
         returnUrl: returnUrl,
       );
 }
+
+extension SessionMapper on Session {
+  SessionDTO toDTO() => SessionDTO(
+        id: id,
+        sessionData: sessionData,
+      );
+}

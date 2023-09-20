@@ -62,8 +62,8 @@ enum CashAppPayEnvironment {
   production,
 }
 
-class Session {
-  Session({
+class SessionDTO {
+  SessionDTO({
     required this.id,
     required this.sessionData,
   });
@@ -79,9 +79,9 @@ class Session {
     ];
   }
 
-  static Session decode(Object result) {
+  static SessionDTO decode(Object result) {
     result as List<Object?>;
-    return Session(
+    return SessionDTO(
       id: result[0]! as String,
       sessionData: result[1]! as String,
     );
@@ -649,7 +649,7 @@ class _CheckoutPlatformInterfaceCodec extends StandardMessageCodec {
     } else if (value is GooglePayConfigurationDTO) {
       buffer.putUint8(136);
       writeValue(buffer, value.encode());
-    } else if (value is Session) {
+    } else if (value is SessionDTO) {
       buffer.putUint8(137);
       writeValue(buffer, value.encode());
     } else {
@@ -679,7 +679,7 @@ class _CheckoutPlatformInterfaceCodec extends StandardMessageCodec {
       case 136: 
         return GooglePayConfigurationDTO.decode(readValue(buffer)!);
       case 137: 
-        return Session.decode(readValue(buffer)!);
+        return SessionDTO.decode(readValue(buffer)!);
       default:
         return super.readValueOfType(type, buffer);
     }
@@ -750,7 +750,7 @@ class CheckoutPlatformInterface {
     }
   }
 
-  Future<void> startDropInSessionPayment(DropInConfigurationDTO arg_dropInConfigurationDTO, Session arg_session) async {
+  Future<void> startDropInSessionPayment(DropInConfigurationDTO arg_dropInConfigurationDTO, SessionDTO arg_session) async {
     final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
         'dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.startDropInSessionPayment', codec,
         binaryMessenger: _binaryMessenger);

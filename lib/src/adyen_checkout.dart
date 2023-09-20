@@ -5,6 +5,7 @@ import 'package:adyen_checkout/src/adyen_checkout_interface.dart';
 import 'package:adyen_checkout/src/generated/platform_api.g.dart';
 import 'package:adyen_checkout/src/platform/adyen_checkout_platform_interface.dart';
 import 'package:adyen_checkout/src/platform/adyen_checkout_result_api.dart';
+import 'package:adyen_checkout/src/utils/dto_mapper.dart';
 
 class AdyenCheckout implements AdyenCheckoutInterface {
   AdyenCheckout() {
@@ -52,8 +53,8 @@ class AdyenCheckout implements AdyenCheckoutInterface {
           dropInSession.dropInConfiguration.analyticsOptionsDTO,
     );
     AdyenCheckoutPlatformInterface.instance.startDropInSessionPayment(
-      dropInSession.session,
-      dropInConfiguration,
+      session: dropInSession.session.toDTO(),
+      dropInConfiguration: dropInConfiguration,
     );
     final sessionDropInResultModel =
         await _resultApi.dropInSessionResultStream.stream.first;
@@ -82,8 +83,8 @@ class AdyenCheckout implements AdyenCheckoutInterface {
           dropInAdvancedFlow.dropInConfiguration.analyticsOptionsDTO,
     );
     AdyenCheckoutPlatformInterface.instance.startDropInAdvancedFlowPayment(
-      dropInAdvancedFlow.paymentMethodsResponse,
-      dropInConfiguration,
+      paymentMethodsResponse: dropInAdvancedFlow.paymentMethodsResponse,
+      dropInConfiguration: dropInConfiguration,
     );
 
     _resultApi.dropInAdvancedFlowPlatformCommunicationStream =

@@ -74,7 +74,6 @@ class CheckoutPlatformApi : CheckoutPlatformInterface {
             guard let viewController = getViewController() else {
                 return
             }
-            
             self.viewController = viewController
             let adyenContext = try createAdyenContext(dropInConfiguration: dropInConfigurationDTO)
             let paymentMethods = try jsonDecoder.decode(PaymentMethods.self, from:Data(paymentMethodsResponse.utf8))

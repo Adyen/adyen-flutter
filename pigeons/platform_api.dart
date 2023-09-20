@@ -64,11 +64,11 @@ enum CashAppPayEnvironment {
   production,
 }
 
-class Session {
+class SessionDTO {
   final String id;
   final String sessionData;
 
-  Session({
+  SessionDTO({
     required this.id,
     required this.sessionData,
   });
@@ -283,7 +283,7 @@ abstract class CheckoutPlatformInterface {
 
   void startDropInSessionPayment(
     DropInConfigurationDTO dropInConfigurationDTO,
-    Session session,
+    SessionDTO session,
   );
 
   void startDropInAdvancedFlowPayment(
