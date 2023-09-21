@@ -51,6 +51,7 @@ class AdyenSessionsRepository {
       merchantAccount: Config.merchantAccount,
       countryCode: Config.countryCode,
       channel: _determineChannel(),
+      shopperReference: Config.shopperReference,
     ));
   }
 

@@ -49,6 +49,7 @@ object ConfigurationMapper {
         val amount = amount.mapToAmount()
         val shopperLocale = Locale.forLanguageTag(shopperLocale)
         val dropInConfiguration = DropInConfiguration.Builder(shopperLocale, environment, clientKey)
+        dropInConfiguration.setEnableRemovingStoredPaymentMethods(isRemoveStoredPaymentMethodEnabled)
 
         if (cardsConfigurationDTO != null) {
             val cardConfiguration = buildCardConfiguration(context, environment, cardsConfigurationDTO)

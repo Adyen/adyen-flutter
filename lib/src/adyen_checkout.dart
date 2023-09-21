@@ -51,6 +51,8 @@ class AdyenCheckout implements AdyenCheckoutInterface {
           dropInSession.dropInConfiguration.cashAppPayConfigurationDTO,
       analyticsOptionsDTO:
           dropInSession.dropInConfiguration.analyticsOptionsDTO,
+      isRemoveStoredPaymentMethodEnabled: dropInSession
+          .dropInConfiguration.isRemoveStoredPaymentMethodEnabled,
     );
     AdyenCheckoutPlatformInterface.instance.startDropInSessionPayment(
       session: dropInSession.session.toDTO(),
@@ -81,6 +83,8 @@ class AdyenCheckout implements AdyenCheckoutInterface {
           dropInAdvancedFlow.dropInConfiguration.cashAppPayConfigurationDTO,
       analyticsOptionsDTO:
           dropInAdvancedFlow.dropInConfiguration.analyticsOptionsDTO,
+      isRemoveStoredPaymentMethodEnabled: dropInAdvancedFlow
+          .dropInConfiguration.isRemoveStoredPaymentMethodEnabled,
     );
     AdyenCheckoutPlatformInterface.instance.startDropInAdvancedFlowPayment(
       paymentMethodsResponse: dropInAdvancedFlow.paymentMethodsResponse,

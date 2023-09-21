@@ -32,6 +32,7 @@ class DropInConfiguration extends DropInConfigurationDTO
     AnalyticsOptions? analyticsOptions,
     bool showPreselectedStoredPaymentMethod = false,
     bool skipListWhenSinglePaymentMethod = false,
+    bool isRemoveStoredPaymentMethodEnabled = true,
   }) : super(
           amount: amount.toDTO(),
           shopperLocale: shopperLocale ?? Platform.localeName,
@@ -43,5 +44,7 @@ class DropInConfiguration extends DropInConfigurationDTO
           showPreselectedStoredPaymentMethod:
               showPreselectedStoredPaymentMethod,
           skipListWhenSinglePaymentMethod: skipListWhenSinglePaymentMethod,
+          isRemoveStoredPaymentMethodEnabled:
+              isRemoveStoredPaymentMethodEnabled,
         );
 }

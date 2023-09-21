@@ -147,13 +147,14 @@ class DropInConfigurationDTO {
     required this.countryCode,
     required this.amount,
     required this.shopperLocale,
-    this.analyticsOptionsDTO,
-    this.showPreselectedStoredPaymentMethod,
-    this.skipListWhenSinglePaymentMethod,
     this.cardsConfigurationDTO,
     this.applePayConfigurationDTO,
     this.googlePayConfigurationDTO,
     this.cashAppPayConfigurationDTO,
+    this.analyticsOptionsDTO,
+    this.showPreselectedStoredPaymentMethod,
+    this.skipListWhenSinglePaymentMethod,
+    required this.isRemoveStoredPaymentMethodEnabled,
   });
 
   Environment environment;
@@ -166,12 +167,6 @@ class DropInConfigurationDTO {
 
   String shopperLocale;
 
-  AnalyticsOptionsDTO? analyticsOptionsDTO;
-
-  bool? showPreselectedStoredPaymentMethod;
-
-  bool? skipListWhenSinglePaymentMethod;
-
   CardsConfigurationDTO? cardsConfigurationDTO;
 
   ApplePayConfigurationDTO? applePayConfigurationDTO;
@@ -180,6 +175,14 @@ class DropInConfigurationDTO {
 
   CashAppPayConfigurationDTO? cashAppPayConfigurationDTO;
 
+  AnalyticsOptionsDTO? analyticsOptionsDTO;
+
+  bool? showPreselectedStoredPaymentMethod;
+
+  bool? skipListWhenSinglePaymentMethod;
+
+  bool isRemoveStoredPaymentMethodEnabled;
+
   Object encode() {
     return <Object?>[
       environment.index,
@@ -187,13 +190,14 @@ class DropInConfigurationDTO {
       countryCode,
       amount.encode(),
       shopperLocale,
-      analyticsOptionsDTO?.encode(),
-      showPreselectedStoredPaymentMethod,
-      skipListWhenSinglePaymentMethod,
       cardsConfigurationDTO?.encode(),
       applePayConfigurationDTO?.encode(),
       googlePayConfigurationDTO?.encode(),
       cashAppPayConfigurationDTO?.encode(),
+      analyticsOptionsDTO?.encode(),
+      showPreselectedStoredPaymentMethod,
+      skipListWhenSinglePaymentMethod,
+      isRemoveStoredPaymentMethodEnabled,
     ];
   }
 
@@ -205,23 +209,24 @@ class DropInConfigurationDTO {
       countryCode: result[2]! as String,
       amount: AmountDTO.decode(result[3]! as List<Object?>),
       shopperLocale: result[4]! as String,
-      analyticsOptionsDTO: result[5] != null
-          ? AnalyticsOptionsDTO.decode(result[5]! as List<Object?>)
+      cardsConfigurationDTO: result[5] != null
+          ? CardsConfigurationDTO.decode(result[5]! as List<Object?>)
           : null,
-      showPreselectedStoredPaymentMethod: result[6] as bool?,
-      skipListWhenSinglePaymentMethod: result[7] as bool?,
-      cardsConfigurationDTO: result[8] != null
-          ? CardsConfigurationDTO.decode(result[8]! as List<Object?>)
+      applePayConfigurationDTO: result[6] != null
+          ? ApplePayConfigurationDTO.decode(result[6]! as List<Object?>)
           : null,
-      applePayConfigurationDTO: result[9] != null
-          ? ApplePayConfigurationDTO.decode(result[9]! as List<Object?>)
+      googlePayConfigurationDTO: result[7] != null
+          ? GooglePayConfigurationDTO.decode(result[7]! as List<Object?>)
           : null,
-      googlePayConfigurationDTO: result[10] != null
-          ? GooglePayConfigurationDTO.decode(result[10]! as List<Object?>)
+      cashAppPayConfigurationDTO: result[8] != null
+          ? CashAppPayConfigurationDTO.decode(result[8]! as List<Object?>)
           : null,
-      cashAppPayConfigurationDTO: result[11] != null
-          ? CashAppPayConfigurationDTO.decode(result[11]! as List<Object?>)
+      analyticsOptionsDTO: result[9] != null
+          ? AnalyticsOptionsDTO.decode(result[9]! as List<Object?>)
           : null,
+      showPreselectedStoredPaymentMethod: result[10] as bool?,
+      skipListWhenSinglePaymentMethod: result[11] as bool?,
+      isRemoveStoredPaymentMethodEnabled: result[12]! as bool,
     );
   }
 }

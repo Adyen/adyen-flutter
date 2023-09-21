@@ -100,13 +100,14 @@ class DropInConfigurationDTO {
   final String countryCode;
   final AmountDTO amount;
   final String shopperLocale;
-  final AnalyticsOptionsDTO? analyticsOptionsDTO;
-  final bool? showPreselectedStoredPaymentMethod;
-  final bool? skipListWhenSinglePaymentMethod;
   final CardsConfigurationDTO? cardsConfigurationDTO;
   final ApplePayConfigurationDTO? applePayConfigurationDTO;
   final GooglePayConfigurationDTO? googlePayConfigurationDTO;
   final CashAppPayConfigurationDTO? cashAppPayConfigurationDTO;
+  final AnalyticsOptionsDTO? analyticsOptionsDTO;
+  final bool? showPreselectedStoredPaymentMethod;
+  final bool? skipListWhenSinglePaymentMethod;
+  final bool isRemoveStoredPaymentMethodEnabled;
 
   DropInConfigurationDTO(
     this.environment,
@@ -114,13 +115,14 @@ class DropInConfigurationDTO {
     this.countryCode,
     this.amount,
     this.shopperLocale,
-    this.analyticsOptionsDTO,
     this.cardsConfigurationDTO,
-    this.showPreselectedStoredPaymentMethod,
-    this.skipListWhenSinglePaymentMethod,
     this.applePayConfigurationDTO,
     this.googlePayConfigurationDTO,
     this.cashAppPayConfigurationDTO,
+    this.analyticsOptionsDTO,
+    this.showPreselectedStoredPaymentMethod,
+    this.skipListWhenSinglePaymentMethod,
+    this.isRemoveStoredPaymentMethodEnabled,
   );
 }
 

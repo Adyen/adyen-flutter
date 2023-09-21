@@ -165,13 +165,14 @@ struct DropInConfigurationDTO {
   var countryCode: String
   var amount: AmountDTO
   var shopperLocale: String
-  var analyticsOptionsDTO: AnalyticsOptionsDTO? = nil
-  var showPreselectedStoredPaymentMethod: Bool? = nil
-  var skipListWhenSinglePaymentMethod: Bool? = nil
   var cardsConfigurationDTO: CardsConfigurationDTO? = nil
   var applePayConfigurationDTO: ApplePayConfigurationDTO? = nil
   var googlePayConfigurationDTO: GooglePayConfigurationDTO? = nil
   var cashAppPayConfigurationDTO: CashAppPayConfigurationDTO? = nil
+  var analyticsOptionsDTO: AnalyticsOptionsDTO? = nil
+  var showPreselectedStoredPaymentMethod: Bool? = nil
+  var skipListWhenSinglePaymentMethod: Bool? = nil
+  var isRemoveStoredPaymentMethodEnabled: Bool
 
   static func fromList(_ list: [Any?]) -> DropInConfigurationDTO? {
     let environment = Environment(rawValue: list[0] as! Int)!
@@ -179,28 +180,29 @@ struct DropInConfigurationDTO {
     let countryCode = list[2] as! String
     let amount = AmountDTO.fromList(list[3] as! [Any?])!
     let shopperLocale = list[4] as! String
-    var analyticsOptionsDTO: AnalyticsOptionsDTO? = nil
-    if let analyticsOptionsDTOList: [Any?] = nilOrValue(list[5]) {
-      analyticsOptionsDTO = AnalyticsOptionsDTO.fromList(analyticsOptionsDTOList)
-    }
-    let showPreselectedStoredPaymentMethod: Bool? = nilOrValue(list[6])
-    let skipListWhenSinglePaymentMethod: Bool? = nilOrValue(list[7])
     var cardsConfigurationDTO: CardsConfigurationDTO? = nil
-    if let cardsConfigurationDTOList: [Any?] = nilOrValue(list[8]) {
+    if let cardsConfigurationDTOList: [Any?] = nilOrValue(list[5]) {
       cardsConfigurationDTO = CardsConfigurationDTO.fromList(cardsConfigurationDTOList)
     }
     var applePayConfigurationDTO: ApplePayConfigurationDTO? = nil
-    if let applePayConfigurationDTOList: [Any?] = nilOrValue(list[9]) {
+    if let applePayConfigurationDTOList: [Any?] = nilOrValue(list[6]) {
       applePayConfigurationDTO = ApplePayConfigurationDTO.fromList(applePayConfigurationDTOList)
     }
     var googlePayConfigurationDTO: GooglePayConfigurationDTO? = nil
-    if let googlePayConfigurationDTOList: [Any?] = nilOrValue(list[10]) {
+    if let googlePayConfigurationDTOList: [Any?] = nilOrValue(list[7]) {
       googlePayConfigurationDTO = GooglePayConfigurationDTO.fromList(googlePayConfigurationDTOList)
     }
     var cashAppPayConfigurationDTO: CashAppPayConfigurationDTO? = nil
-    if let cashAppPayConfigurationDTOList: [Any?] = nilOrValue(list[11]) {
+    if let cashAppPayConfigurationDTOList: [Any?] = nilOrValue(list[8]) {
       cashAppPayConfigurationDTO = CashAppPayConfigurationDTO.fromList(cashAppPayConfigurationDTOList)
     }
+    var analyticsOptionsDTO: AnalyticsOptionsDTO? = nil
+    if let analyticsOptionsDTOList: [Any?] = nilOrValue(list[9]) {
+      analyticsOptionsDTO = AnalyticsOptionsDTO.fromList(analyticsOptionsDTOList)
+    }
+    let showPreselectedStoredPaymentMethod: Bool? = nilOrValue(list[10])
+    let skipListWhenSinglePaymentMethod: Bool? = nilOrValue(list[11])
+    let isRemoveStoredPaymentMethodEnabled = list[12] as! Bool
 
     return DropInConfigurationDTO(
       environment: environment,
@@ -208,13 +210,14 @@ struct DropInConfigurationDTO {
       countryCode: countryCode,
       amount: amount,
       shopperLocale: shopperLocale,
-      analyticsOptionsDTO: analyticsOptionsDTO,
-      showPreselectedStoredPaymentMethod: showPreselectedStoredPaymentMethod,
-      skipListWhenSinglePaymentMethod: skipListWhenSinglePaymentMethod,
       cardsConfigurationDTO: cardsConfigurationDTO,
       applePayConfigurationDTO: applePayConfigurationDTO,
       googlePayConfigurationDTO: googlePayConfigurationDTO,
-      cashAppPayConfigurationDTO: cashAppPayConfigurationDTO
+      cashAppPayConfigurationDTO: cashAppPayConfigurationDTO,
+      analyticsOptionsDTO: analyticsOptionsDTO,
+      showPreselectedStoredPaymentMethod: showPreselectedStoredPaymentMethod,
+      skipListWhenSinglePaymentMethod: skipListWhenSinglePaymentMethod,
+      isRemoveStoredPaymentMethodEnabled: isRemoveStoredPaymentMethodEnabled
     )
   }
   func toList() -> [Any?] {
@@ -224,13 +227,14 @@ struct DropInConfigurationDTO {
       countryCode,
       amount.toList(),
       shopperLocale,
-      analyticsOptionsDTO?.toList(),
-      showPreselectedStoredPaymentMethod,
-      skipListWhenSinglePaymentMethod,
       cardsConfigurationDTO?.toList(),
       applePayConfigurationDTO?.toList(),
       googlePayConfigurationDTO?.toList(),
       cashAppPayConfigurationDTO?.toList(),
+      analyticsOptionsDTO?.toList(),
+      showPreselectedStoredPaymentMethod,
+      skipListWhenSinglePaymentMethod,
+      isRemoveStoredPaymentMethodEnabled,
     ]
   }
 }
