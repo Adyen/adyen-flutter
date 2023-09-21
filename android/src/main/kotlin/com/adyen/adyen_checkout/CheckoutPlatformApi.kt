@@ -16,9 +16,9 @@ import com.adyen.adyen_checkout.dropInAdvancedFlow.DropInAdditionalDetailsPlatfo
 import com.adyen.adyen_checkout.dropInAdvancedFlow.DropInAdditionalDetailsResultMessenger
 import com.adyen.adyen_checkout.dropInAdvancedFlow.DropInPaymentResultMessenger
 import com.adyen.adyen_checkout.dropInAdvancedFlow.DropInServiceResultMessenger
+import com.adyen.adyen_checkout.utils.ConfigurationMapper.mapToDropInConfiguration
+import com.adyen.adyen_checkout.utils.ConfigurationMapper.mapToSession
 import com.adyen.adyen_checkout.utils.Constants.Companion.WRONG_FLUTTER_ACTIVITY_USAGE_ERROR_MESSAGE
-import com.adyen.adyen_checkout.utils.Mapper.mapToDropInConfiguration
-import com.adyen.adyen_checkout.utils.Mapper.mapToSession
 import com.adyen.checkout.components.core.PaymentMethodsApiResponse
 import com.adyen.checkout.dropin.DropIn
 import com.adyen.checkout.dropin.internal.ui.model.DropInResultContractParams

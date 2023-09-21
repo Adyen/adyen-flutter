@@ -2,7 +2,6 @@ import Foundation
 @_spi(AdyenInternal)
 import Adyen
 import AdyenNetworking
-import PassKit
 
 //TODO: Add config:
 // 1) Add Info.plist for adding photo library usage description
@@ -12,6 +11,7 @@ import PassKit
 class CheckoutPlatformApi : CheckoutPlatformInterface {
     var dropInComponent: DropInComponent?
     private let jsonDecoder = JSONDecoder()
+    private let configurationMapper = ConfigurationMapper()
     private let checkoutFlutterApi: CheckoutFlutterApi
     private var viewController : UIViewController?
     private var session: AdyenSession?
@@ -19,6 +19,7 @@ class CheckoutPlatformApi : CheckoutPlatformInterface {
     private var dropInSessionPresentationDelegate : PresentationDelegate?
     private var dropInAdvancedFlowDelegate : DropInComponentDelegate?
     private var storedPaymentMethodsDelegate : StoredPaymentMethodsDelegate?
+
     
     init(checkoutFlutterApi: CheckoutFlutterApi) {
         self.checkoutFlutterApi = checkoutFlutterApi
@@ -49,7 +50,7 @@ class CheckoutPlatformApi : CheckoutPlatformInterface {
                 case let .success(session):
                     do {
                         self?.session = session
-                        let dropInConfiguration = try self?.createDropInConfiguration(dropInConfigurationDTO: dropInConfigurationDTO)
+                        let dropInConfiguration = try self?.configurationMapper.createDropInConfiguration(dropInConfigurationDTO: dropInConfigurationDTO)
                         let dropInComponent = DropInComponent(paymentMethods: session.sessionContext.paymentMethods,
                                                               context: adyenContext,
                                                               configuration: dropInConfiguration!)
@@ -78,7 +79,7 @@ class CheckoutPlatformApi : CheckoutPlatformInterface {
             let adyenContext = try createAdyenContext(dropInConfiguration: dropInConfigurationDTO)
             let paymentMethods = try jsonDecoder.decode(PaymentMethods.self, from:Data(paymentMethodsResponse.utf8))
             let paymentMethodsWithoutGiftCards = removeGiftCardPaymentMethods(paymentMethods: paymentMethods)
-            let configuration = try createDropInConfiguration(dropInConfigurationDTO: dropInConfigurationDTO)
+            let configuration = try configurationMapper.createDropInConfiguration(dropInConfigurationDTO: dropInConfigurationDTO)
             let dropInComponent = DropInComponent(paymentMethods: paymentMethodsWithoutGiftCards,
                                                   context: adyenContext,
                                                   configuration: configuration)
@@ -147,102 +148,6 @@ class CheckoutPlatformApi : CheckoutPlatformInterface {
         case .apse:
             return .liveApse
         }
-    }
-    
-    private func createDropInConfiguration(dropInConfigurationDTO: DropInConfigurationDTO) throws -> DropInComponent.Configuration {
-        let dropInConfiguration = DropInComponent.Configuration(allowsSkippingPaymentList: dropInConfigurationDTO.skipListWhenSinglePaymentMethod ?? false,
-                                                                allowPreselectedPaymentView: dropInConfigurationDTO.showPreselectedStoredPaymentMethod ?? false)
-        
-        if let cardsConfigurationDTO = dropInConfigurationDTO.cardsConfigurationDTO {
-            let koreanAuthenticationMode = determineFieldVisibility(visible: cardsConfigurationDTO.showKcpField)
-            let socialSecurityNumberMode = determineFieldVisibility(visible: cardsConfigurationDTO.showSocialSecurityNumberField)
-            let storedCardConfiguration = createStoredCardConfiguration(showCvcForStoredCard: cardsConfigurationDTO.showCvcForStoredCard)
-            let allowedCardTypes = determineAllowedCardTypes(cardTypes: cardsConfigurationDTO.supportedCardTypes)
-            let billingAddressConfiguration = determineBillingAddressConfiguration(addressMode: cardsConfigurationDTO.addressMode)
-            let cardConfiguration = DropInComponent.Card.init(
-                showsHolderNameField: cardsConfigurationDTO.holderNameRequired,
-                showsStorePaymentMethodField: cardsConfigurationDTO.showStorePaymentField,
-                showsSecurityCodeField: cardsConfigurationDTO.showCvc == true,
-                koreanAuthenticationMode: koreanAuthenticationMode,
-                socialSecurityNumberMode: socialSecurityNumberMode,
-                storedCardConfiguration: storedCardConfiguration,
-                allowedCardTypes: allowedCardTypes,
-                billingAddress: billingAddressConfiguration
-            )
-            
-            dropInConfiguration.card = cardConfiguration
-        }
-        
-        if let appleConfigurationDTO = dropInConfigurationDTO.applePayConfigurationDTO {
-            let appleConfiguration = try buildApplePayConfiguration(dropInConfigurationDTO: dropInConfigurationDTO)
-            dropInConfiguration.applePay = appleConfiguration
-        }
-        
-        if let cashAppPayConfigurationDTO = dropInConfigurationDTO.cashAppPayConfigurationDTO {
-            dropInConfiguration.cashAppPay = DropInComponent.CashAppPay(redirectURL: URL(string: cashAppPayConfigurationDTO.returnUrl)!)
-        }
-        
-        return dropInConfiguration
-    }
-    
-    private func determineFieldVisibility(visible: Bool?) -> CardComponent.FieldVisibility {
-        if (visible == true) {
-            return .show
-        } else {
-            return .hide
-        }
-    }
-    
-    private func createStoredCardConfiguration(showCvcForStoredCard: Bool?) -> StoredCardConfiguration {
-        var storedCardConfiguration = StoredCardConfiguration()
-        storedCardConfiguration.showsSecurityCodeField = showCvcForStoredCard ?? false
-        return storedCardConfiguration;
-    }
-    
-    private func determineAllowedCardTypes(cardTypes: [String?]?) -> [CardType]? {
-        guard let mappedCardTypes = cardTypes else {
-            return nil
-        }
-        
-        if mappedCardTypes.isEmpty {
-            return nil
-        }
-        
-        return mappedCardTypes.compactMap{$0}.map { CardType(rawValue: $0.lowercased()) }
-    }
-    
-    private func determineBillingAddressConfiguration(addressMode: AddressMode?) -> BillingAddressConfiguration {
-        var billingAddressConfiguration = BillingAddressConfiguration.init()
-        switch addressMode {
-            case .full:
-                billingAddressConfiguration.mode = CardComponent.AddressFormType.full
-            case .postalCode:
-                billingAddressConfiguration.mode = CardComponent.AddressFormType.postalCode
-            case .none?:
-                billingAddressConfiguration.mode = CardComponent.AddressFormType.none
-            default:
-                billingAddressConfiguration.mode = CardComponent.AddressFormType.none
-        }
-        
-        return billingAddressConfiguration
-    }
-    
-    private func buildApplePayConfiguration(dropInConfigurationDTO: DropInConfigurationDTO) throws -> Adyen.ApplePayComponent.Configuration {
-        let value = Int(dropInConfigurationDTO.amount.value)
-        guard let currencyCode : String = dropInConfigurationDTO.amount.currency else {
-            throw BalanceChecker.Error.unexpectedCurrencyCode
-        }
-        
-        let amount = AmountFormatter.decimalAmount(value,
-                                                   currencyCode: currencyCode,
-                                                   localeIdentifier: nil)
-        
-        let applePayPayment = try ApplePayPayment.init(countryCode: dropInConfigurationDTO.countryCode,
-                                                       currencyCode: currencyCode,
-                                                       summaryItems: [PKPaymentSummaryItem(label: dropInConfigurationDTO.applePayConfigurationDTO!.merchantName, amount: amount)])
-        
-        return ApplePayComponent.Configuration.init(payment: applePayPayment,
-                                                    merchantIdentifier: dropInConfigurationDTO.applePayConfigurationDTO!.merchantId)
     }
     
     
