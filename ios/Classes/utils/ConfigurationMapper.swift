@@ -55,7 +55,7 @@ class ConfigurationMapper {
     }
     
     private func determineAllowedCardTypes(cardTypes: [String?]?) -> [CardType]? {
-        guard let mappedCardTypes = cardTypes else {
+        guard let mappedCardTypes = cardTypes, !mappedCardTypes.isEmpty else {
             return nil
         }
         
