@@ -81,7 +81,7 @@ class ConfigurationMapper {
         return billingAddressConfiguration
     }
     
-    private func buildApplePayConfiguration(applePayConfigurationDTO: ApplePayConfigurationDTO, amount: AmountDTO, countryCode: String ) throws -> Adyen.ApplePayComponent.Configuration {
+    private func buildApplePayConfiguration(applePayConfigurationDTO: ApplePayConfigurationDTO, amount: AmountDTO, countryCode: String) throws -> Adyen.ApplePayComponent.Configuration {
         let value = Int(amount.value)
         guard let currencyCode = amount.currency else {
             throw BalanceChecker.Error.unexpectedCurrencyCode
