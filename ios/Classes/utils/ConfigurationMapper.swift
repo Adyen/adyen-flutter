@@ -59,7 +59,6 @@ class ConfigurationMapper {
             return nil
         }
         
-        if mappedCardTypes.isEmpty {
             return nil
         }
         
