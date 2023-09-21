@@ -40,12 +40,8 @@ class ConfigurationMapper {
         return dropInConfiguration
     }
     
-    private func determineFieldVisibility(visible: Bool?) -> CardComponent.FieldVisibility {
-        visible ? .show : .hide
-            return .show
-        } else {
-            return .hide
-        }
+    private func determineFieldVisibility(visible: Bool) -> CardComponent.FieldVisibility {
+        return visible ? .show : .hide
     }
     
     private func createStoredCardConfiguration(showCvcForStoredCard: Bool?) -> StoredCardConfiguration {
@@ -56,9 +52,6 @@ class ConfigurationMapper {
     
     private func determineAllowedCardTypes(cardTypes: [String?]?) -> [CardType]? {
         guard let mappedCardTypes = cardTypes, !mappedCardTypes.isEmpty else {
-            return nil
-        }
-        
             return nil
         }
         
@@ -82,7 +75,9 @@ class ConfigurationMapper {
     }
     
     private func buildApplePayConfiguration(applePayConfigurationDTO: ApplePayConfigurationDTO, amount: AmountDTO, countryCode: String) throws -> Adyen.ApplePayComponent.Configuration {
-        let value = Int(amount.value)
+        guard let value = Int(exactly: amount.value) else {
+            throw PlatformError(errorDescription: "Cannot map Int64 to Int32.")
+        }
         guard let currencyCode = amount.currency else {
             throw BalanceChecker.Error.unexpectedCurrencyCode
         }
