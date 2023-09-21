@@ -41,7 +41,7 @@ class ConfigurationMapper {
     }
     
     private func determineFieldVisibility(visible: Bool?) -> CardComponent.FieldVisibility {
-        if (visible == true) {
+        visible ? .show : .hide
             return .show
         } else {
             return .hide
