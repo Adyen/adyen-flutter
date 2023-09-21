@@ -309,30 +309,35 @@ struct ApplePayConfigurationDTO {
 
 /// Generated class from Pigeon that represents data sent in messages.
 struct GooglePayConfigurationDTO {
-  var merchantAccount: String
+  var googlePayEnvironment: GooglePayEnvironment
+  var merchantAccount: String? = nil
   var allowedCardNetworks: [String?]
   var allowedAuthMethods: [String?]
-  var totalPriceStatus: TotalPriceStatus
+  var totalPriceStatus: TotalPriceStatus? = nil
   var allowPrepaidCards: Bool
   var billingAddressRequired: Bool
   var emailRequired: Bool
   var shippingAddressRequired: Bool
   var existingPaymentMethodRequired: Bool
-  var googlePayEnvironment: GooglePayEnvironment
 
   static func fromList(_ list: [Any?]) -> GooglePayConfigurationDTO? {
-    let merchantAccount = list[0] as! String
-    let allowedCardNetworks = list[1] as! [String?]
-    let allowedAuthMethods = list[2] as! [String?]
-    let totalPriceStatus = TotalPriceStatus(rawValue: list[3] as! Int)!
-    let allowPrepaidCards = list[4] as! Bool
-    let billingAddressRequired = list[5] as! Bool
-    let emailRequired = list[6] as! Bool
-    let shippingAddressRequired = list[7] as! Bool
-    let existingPaymentMethodRequired = list[8] as! Bool
-    let googlePayEnvironment = GooglePayEnvironment(rawValue: list[9] as! Int)!
+    let googlePayEnvironment = GooglePayEnvironment(rawValue: list[0] as! Int)!
+    let merchantAccount: String? = nilOrValue(list[1])
+    let allowedCardNetworks = list[2] as! [String?]
+    let allowedAuthMethods = list[3] as! [String?]
+    var totalPriceStatus: TotalPriceStatus? = nil
+    let totalPriceStatusEnumVal: Int? = nilOrValue(list[4])
+    if let totalPriceStatusRawValue = totalPriceStatusEnumVal {
+      totalPriceStatus = TotalPriceStatus(rawValue: totalPriceStatusRawValue)!
+    }
+    let allowPrepaidCards = list[5] as! Bool
+    let billingAddressRequired = list[6] as! Bool
+    let emailRequired = list[7] as! Bool
+    let shippingAddressRequired = list[8] as! Bool
+    let existingPaymentMethodRequired = list[9] as! Bool
 
     return GooglePayConfigurationDTO(
+      googlePayEnvironment: googlePayEnvironment,
       merchantAccount: merchantAccount,
       allowedCardNetworks: allowedCardNetworks,
       allowedAuthMethods: allowedAuthMethods,
@@ -341,22 +346,21 @@ struct GooglePayConfigurationDTO {
       billingAddressRequired: billingAddressRequired,
       emailRequired: emailRequired,
       shippingAddressRequired: shippingAddressRequired,
-      existingPaymentMethodRequired: existingPaymentMethodRequired,
-      googlePayEnvironment: googlePayEnvironment
+      existingPaymentMethodRequired: existingPaymentMethodRequired
     )
   }
   func toList() -> [Any?] {
     return [
+      googlePayEnvironment.rawValue,
       merchantAccount,
       allowedCardNetworks,
       allowedAuthMethods,
-      totalPriceStatus.rawValue,
+      totalPriceStatus?.rawValue,
       allowPrepaidCards,
       billingAddressRequired,
       emailRequired,
       shippingAddressRequired,
       existingPaymentMethodRequired,
-      googlePayEnvironment.rawValue,
     ]
   }
 }

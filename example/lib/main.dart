@@ -122,10 +122,9 @@ class _MyAppState extends State<MyApp> {
 
     final GooglePayConfiguration googlePayConfiguration =
         GooglePayConfiguration(
-      merchantAccount: Config.merchantAccount,
-      totalPriceStatus: TotalPriceStatus.notCurrentlyKnown,
       googlePayEnvironment: GooglePayEnvironment.test,
       shippingAddressRequired: true,
+      billingAddressRequired: true,
     );
 
     final CashAppPayConfiguration cashAppPayConfiguration =

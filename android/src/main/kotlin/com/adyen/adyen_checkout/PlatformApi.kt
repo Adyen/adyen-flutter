@@ -345,46 +345,48 @@ data class ApplePayConfigurationDTO (
 
 /** Generated class from Pigeon that represents data sent in messages. */
 data class GooglePayConfigurationDTO (
-  val merchantAccount: String,
+  val googlePayEnvironment: GooglePayEnvironment,
+  val merchantAccount: String? = null,
   val allowedCardNetworks: List<String?>,
   val allowedAuthMethods: List<String?>,
-  val totalPriceStatus: TotalPriceStatus,
+  val totalPriceStatus: TotalPriceStatus? = null,
   val allowPrepaidCards: Boolean,
   val billingAddressRequired: Boolean,
   val emailRequired: Boolean,
   val shippingAddressRequired: Boolean,
-  val existingPaymentMethodRequired: Boolean,
-  val googlePayEnvironment: GooglePayEnvironment
+  val existingPaymentMethodRequired: Boolean
 
 ) {
   companion object {
     @Suppress("UNCHECKED_CAST")
     fun fromList(list: List<Any?>): GooglePayConfigurationDTO {
-      val merchantAccount = list[0] as String
-      val allowedCardNetworks = list[1] as List<String?>
-      val allowedAuthMethods = list[2] as List<String?>
-      val totalPriceStatus = TotalPriceStatus.ofRaw(list[3] as Int)!!
-      val allowPrepaidCards = list[4] as Boolean
-      val billingAddressRequired = list[5] as Boolean
-      val emailRequired = list[6] as Boolean
-      val shippingAddressRequired = list[7] as Boolean
-      val existingPaymentMethodRequired = list[8] as Boolean
-      val googlePayEnvironment = GooglePayEnvironment.ofRaw(list[9] as Int)!!
-      return GooglePayConfigurationDTO(merchantAccount, allowedCardNetworks, allowedAuthMethods, totalPriceStatus, allowPrepaidCards, billingAddressRequired, emailRequired, shippingAddressRequired, existingPaymentMethodRequired, googlePayEnvironment)
+      val googlePayEnvironment = GooglePayEnvironment.ofRaw(list[0] as Int)!!
+      val merchantAccount = list[1] as String?
+      val allowedCardNetworks = list[2] as List<String?>
+      val allowedAuthMethods = list[3] as List<String?>
+      val totalPriceStatus: TotalPriceStatus? = (list[4] as Int?)?.let {
+        TotalPriceStatus.ofRaw(it)
+      }
+      val allowPrepaidCards = list[5] as Boolean
+      val billingAddressRequired = list[6] as Boolean
+      val emailRequired = list[7] as Boolean
+      val shippingAddressRequired = list[8] as Boolean
+      val existingPaymentMethodRequired = list[9] as Boolean
+      return GooglePayConfigurationDTO(googlePayEnvironment, merchantAccount, allowedCardNetworks, allowedAuthMethods, totalPriceStatus, allowPrepaidCards, billingAddressRequired, emailRequired, shippingAddressRequired, existingPaymentMethodRequired)
     }
   }
   fun toList(): List<Any?> {
     return listOf<Any?>(
+      googlePayEnvironment.raw,
       merchantAccount,
       allowedCardNetworks,
       allowedAuthMethods,
-      totalPriceStatus.raw,
+      totalPriceStatus?.raw,
       allowPrepaidCards,
       billingAddressRequired,
       emailRequired,
       shippingAddressRequired,
       existingPaymentMethodRequired,
-      googlePayEnvironment.raw,
     )
   }
 }

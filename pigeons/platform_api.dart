@@ -159,21 +159,21 @@ class ApplePayConfigurationDTO {
 }
 
 class GooglePayConfigurationDTO {
-  final String merchantAccount;
+  final GooglePayEnvironment googlePayEnvironment;
+  final String? merchantAccount;
   final List<String?> allowedCardNetworks;
   final List<String?> allowedAuthMethods;
-  final TotalPriceStatus totalPriceStatus;
+  final TotalPriceStatus? totalPriceStatus;
   final bool allowPrepaidCards;
   final bool billingAddressRequired;
   final bool emailRequired;
   final bool shippingAddressRequired;
   final bool existingPaymentMethodRequired;
-  final GooglePayEnvironment googlePayEnvironment;
 
   GooglePayConfigurationDTO(
-    this.totalPriceStatus,
     this.googlePayEnvironment,
     this.merchantAccount,
+    this.totalPriceStatus,
     this.allowedCardNetworks,
     this.allowedAuthMethods,
     this.allowPrepaidCards,

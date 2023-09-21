@@ -159,8 +159,14 @@ object Mapper {
             builder.setAllowedAuthMethods(allowedAuthMethods.filterNotNull())
         }
 
-        builder.setMerchantAccount(merchantAccount)
-        builder.setTotalPriceStatus(totalPriceStatus.mapToTotalPriceStatus())
+        merchantAccount?.let { merchantAccount ->
+            builder.setMerchantAccount(merchantAccount)
+        }
+
+        totalPriceStatus?.let { totalPriceStatus ->
+            builder.setTotalPriceStatus(totalPriceStatus.mapToTotalPriceStatus())
+        }
+
         builder.setAllowPrepaidCards(allowPrepaidCards)
         builder.setBillingAddressRequired(billingAddressRequired)
         builder.setEmailRequired(emailRequired)

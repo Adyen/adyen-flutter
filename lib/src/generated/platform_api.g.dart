@@ -315,25 +315,27 @@ class ApplePayConfigurationDTO {
 
 class GooglePayConfigurationDTO {
   GooglePayConfigurationDTO({
-    required this.merchantAccount,
+    required this.googlePayEnvironment,
+    this.merchantAccount,
     required this.allowedCardNetworks,
     required this.allowedAuthMethods,
-    required this.totalPriceStatus,
+    this.totalPriceStatus,
     required this.allowPrepaidCards,
     required this.billingAddressRequired,
     required this.emailRequired,
     required this.shippingAddressRequired,
     required this.existingPaymentMethodRequired,
-    required this.googlePayEnvironment,
   });
 
-  String merchantAccount;
+  GooglePayEnvironment googlePayEnvironment;
+
+  String? merchantAccount;
 
   List<String?> allowedCardNetworks;
 
   List<String?> allowedAuthMethods;
 
-  TotalPriceStatus totalPriceStatus;
+  TotalPriceStatus? totalPriceStatus;
 
   bool allowPrepaidCards;
 
@@ -345,36 +347,36 @@ class GooglePayConfigurationDTO {
 
   bool existingPaymentMethodRequired;
 
-  GooglePayEnvironment googlePayEnvironment;
-
   Object encode() {
     return <Object?>[
+      googlePayEnvironment.index,
       merchantAccount,
       allowedCardNetworks,
       allowedAuthMethods,
-      totalPriceStatus.index,
+      totalPriceStatus?.index,
       allowPrepaidCards,
       billingAddressRequired,
       emailRequired,
       shippingAddressRequired,
       existingPaymentMethodRequired,
-      googlePayEnvironment.index,
     ];
   }
 
   static GooglePayConfigurationDTO decode(Object result) {
     result as List<Object?>;
     return GooglePayConfigurationDTO(
-      merchantAccount: result[0]! as String,
-      allowedCardNetworks: (result[1] as List<Object?>?)!.cast<String?>(),
-      allowedAuthMethods: (result[2] as List<Object?>?)!.cast<String?>(),
-      totalPriceStatus: TotalPriceStatus.values[result[3]! as int],
-      allowPrepaidCards: result[4]! as bool,
-      billingAddressRequired: result[5]! as bool,
-      emailRequired: result[6]! as bool,
-      shippingAddressRequired: result[7]! as bool,
-      existingPaymentMethodRequired: result[8]! as bool,
-      googlePayEnvironment: GooglePayEnvironment.values[result[9]! as int],
+      googlePayEnvironment: GooglePayEnvironment.values[result[0]! as int],
+      merchantAccount: result[1] as String?,
+      allowedCardNetworks: (result[2] as List<Object?>?)!.cast<String?>(),
+      allowedAuthMethods: (result[3] as List<Object?>?)!.cast<String?>(),
+      totalPriceStatus: result[4] != null
+          ? TotalPriceStatus.values[result[4]! as int]
+          : null,
+      allowPrepaidCards: result[5]! as bool,
+      billingAddressRequired: result[6]! as bool,
+      emailRequired: result[7]! as bool,
+      shippingAddressRequired: result[8]! as bool,
+      existingPaymentMethodRequired: result[9]! as bool,
     );
   }
 }
