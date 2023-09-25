@@ -90,11 +90,19 @@ class _MyAppState extends State<MyApp> {
       Config.environment,
     );
 
+    final CardsConfiguration cardsConfiguration = CardsConfiguration(
+      showStorePaymentField: true,
+      holderNameRequired: true,
+    );
+
     final DropInConfiguration dropInConfiguration = DropInConfiguration(
       environment: Environment.test,
       clientKey: Config.clientKey,
       countryCode: Config.countryCode,
       amount: Config.amount,
+      shopperLocale: Config.shopperLocale,
+      cardsConfiguration: cardsConfiguration,
+      showPreselectedStoredPaymentMethod: false,
     );
 
     return await _adyenCheckout.startPayment(
@@ -111,9 +119,8 @@ class _MyAppState extends State<MyApp> {
     final String returnUrl =
         await _adyenSessionRepository.determineExampleReturnUrl();
 
-    final CardsConfiguration cardsConfiguration = CardsConfiguration(
-      showStorePaymentField: true
-    );
+    final CardsConfiguration cardsConfiguration =
+        CardsConfiguration(showStorePaymentField: true);
 
     final ApplePayConfiguration applePayConfiguration = ApplePayConfiguration(
       merchantId: Config.merchantAccount,

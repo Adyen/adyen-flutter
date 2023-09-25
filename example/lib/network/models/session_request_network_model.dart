@@ -8,6 +8,9 @@ class SessionRequestNetworkModel {
   final String returnUrl;
   final String reference;
   final String countryCode;
+  final String? shopperReference;
+  final String? storePaymentMethodMode;
+  final String? recurringProcessingModel;
 
   SessionRequestNetworkModel({
     required this.merchantAccount,
@@ -15,6 +18,9 @@ class SessionRequestNetworkModel {
     required this.returnUrl,
     required this.reference,
     required this.countryCode,
+    this.shopperReference,
+    this.storePaymentMethodMode,
+    this.recurringProcessingModel,
   });
 
   String toRawJson() => json.encode(toJson());
@@ -26,6 +32,47 @@ class SessionRequestNetworkModel {
     data['returnUrl'] = returnUrl;
     data['reference'] = reference;
     data['countryCode'] = countryCode;
+    data['shopperReference'] = shopperReference;
+    data['storePaymentMethodMode'] = storePaymentMethodMode;
+    data['recurringProcessingModel'] = recurringProcessingModel;
     return data;
+  }
+}
+
+enum StorePaymentMethodMode {
+  disabled,
+  askForConsent,
+  enabled,
+}
+
+enum RecurringProcessingModel {
+  subscription,
+  cardOnFile,
+  unscheduledCardOnFile
+}
+
+extension StorePaymentMethodModeExtension on StorePaymentMethodMode {
+  String get storePaymentMethodModeString {
+    switch (this) {
+      case StorePaymentMethodMode.disabled:
+        return "disabled";
+      case StorePaymentMethodMode.askForConsent:
+        return "askForConsent";
+      case StorePaymentMethodMode.enabled:
+        return "enabled";
+    }
+  }
+}
+
+extension RecurringProcessingModelExtension on RecurringProcessingModel {
+  String get recurringModelString {
+    switch (this) {
+      case RecurringProcessingModel.subscription:
+        return 'Subscription';
+      case RecurringProcessingModel.cardOnFile:
+        return 'CardOnFile';
+      case RecurringProcessingModel.unscheduledCardOnFile:
+        return 'UnscheduledCardOnFile';
+    }
   }
 }

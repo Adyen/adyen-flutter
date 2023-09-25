@@ -36,7 +36,7 @@ class AdyenCheckout implements AdyenCheckoutInterface {
       DropInSession dropInSession) async {
     _resultApi.dropInSessionResultStream = StreamController<PaymentResultDTO>();
 
-    //Remove disable flag for store payment field when native SDK receive updates.
+    //TODO - Remove disable flag for store payment field when native SDK receive updates.
     CardsConfigurationDTO? cardsConfigurationWithoutStorePaymentMethod =
         dropInSession.dropInConfiguration.cardsConfigurationDTO?.copyWith(
       showStorePaymentField: false,
@@ -58,6 +58,12 @@ class AdyenCheckout implements AdyenCheckoutInterface {
       analyticsOptionsDTO:
           dropInSession.dropInConfiguration.analyticsOptionsDTO,
       isRemoveStoredPaymentMethodEnabled: false,
+      // isRemoveStoredPaymentMethodEnabled:
+      //     dropInSession.dropInConfiguration.isRemoveStoredPaymentMethodEnabled,
+      showPreselectedStoredPaymentMethod:
+          dropInSession.dropInConfiguration.showPreselectedStoredPaymentMethod,
+      skipListWhenSinglePaymentMethod:
+          dropInSession.dropInConfiguration.skipListWhenSinglePaymentMethod,
     );
     AdyenCheckoutPlatformInterface.instance.startDropInSessionPayment(
       session: dropInSession.session.toDTO(),
@@ -88,8 +94,12 @@ class AdyenCheckout implements AdyenCheckoutInterface {
           dropInAdvancedFlow.dropInConfiguration.cashAppPayConfigurationDTO,
       analyticsOptionsDTO:
           dropInAdvancedFlow.dropInConfiguration.analyticsOptionsDTO,
+      showPreselectedStoredPaymentMethod: dropInAdvancedFlow
+          .dropInConfiguration.showPreselectedStoredPaymentMethod,
       isRemoveStoredPaymentMethodEnabled: dropInAdvancedFlow
           .dropInConfiguration.isRemoveStoredPaymentMethodEnabled,
+      skipListWhenSinglePaymentMethod: dropInAdvancedFlow
+          .dropInConfiguration.skipListWhenSinglePaymentMethod,
     );
     AdyenCheckoutPlatformInterface.instance.startDropInAdvancedFlowPayment(
       paymentMethodsResponse: dropInAdvancedFlow.paymentMethodsResponse,

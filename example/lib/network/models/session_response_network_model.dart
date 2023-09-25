@@ -11,6 +11,9 @@ class SessionResponseNetworkModel {
   final String reference;
   final String returnUrl;
   final String sessionData;
+  final String? shopperReference;
+  final String? storePaymentMethodMode;
+  final String? recurringProcessingModel;
 
   SessionResponseNetworkModel({
     required this.amount,
@@ -21,33 +24,25 @@ class SessionResponseNetworkModel {
     required this.reference,
     required this.returnUrl,
     required this.sessionData,
+    this.shopperReference,
+    this.storePaymentMethodMode,
+    this.recurringProcessingModel,
   });
 
   factory SessionResponseNetworkModel.fromRawJson(String str) =>
       SessionResponseNetworkModel.fromJson(json.decode(str));
 
-  String toRawJson() => json.encode(toJson());
-
-  factory SessionResponseNetworkModel.fromJson(Map<String, dynamic> json) =>
-      SessionResponseNetworkModel(
-        amount: AmountNetworkModel.fromJson(json["amount"]),
-        countryCode: json["countryCode"],
-        expiresAt: DateTime.parse(json["expiresAt"]),
-        id: json["id"],
-        merchantAccount: json["merchantAccount"],
-        reference: json["reference"],
-        returnUrl: json["returnUrl"],
-        sessionData: json["sessionData"],
-      );
-
-  Map<String, dynamic> toJson() => {
-        "amount": amount.toJson(),
-        "countryCode": countryCode,
-        "expiresAt": expiresAt.toIso8601String(),
-        "id": id,
-        "merchantAccount": merchantAccount,
-        "reference": reference,
-        "returnUrl": returnUrl,
-        "sessionData": sessionData,
-      };
+  factory SessionResponseNetworkModel.fromJson(Map<String, dynamic> json) => SessionResponseNetworkModel(
+      amount: AmountNetworkModel.fromJson(json["amount"]),
+      countryCode: json["countryCode"],
+      expiresAt: DateTime.parse(json["expiresAt"]),
+      id: json["id"],
+      merchantAccount: json["merchantAccount"],
+      reference: json["reference"],
+      returnUrl: json["returnUrl"],
+      sessionData: json["sessionData"],
+      shopperReference: json["shopperReference"],
+      storePaymentMethodMode: json["storePaymentMethodMode"],
+      recurringProcessingModel: json["recurringProcessingModel"],
+    );
 }

@@ -49,7 +49,18 @@ object ConfigurationMapper {
         val amount = amount.mapToAmount()
         val shopperLocale = Locale.forLanguageTag(shopperLocale)
         val dropInConfiguration = DropInConfiguration.Builder(shopperLocale, environment, clientKey)
-        dropInConfiguration.setEnableRemovingStoredPaymentMethods(isRemoveStoredPaymentMethodEnabled)
+
+        isRemoveStoredPaymentMethodEnabled?.let {
+            dropInConfiguration.setEnableRemovingStoredPaymentMethods(it)
+        }
+
+        showPreselectedStoredPaymentMethod?.let {
+            dropInConfiguration.setShowPreselectedStoredPaymentMethod(it)
+        }
+
+        skipListWhenSinglePaymentMethod?.let {
+            dropInConfiguration.setSkipListWhenSinglePaymentMethod(it)
+        }
 
         if (cardsConfigurationDTO != null) {
             val cardConfiguration = buildCardConfiguration(context, environment, cardsConfigurationDTO)
@@ -82,7 +93,6 @@ object ConfigurationMapper {
             environment = environment,
             clientKey = clientKey
         )
-            .setShowStorePaymentField(cardsConfigurationDTO.showStorePaymentField)
             .setAddressConfiguration(
                 cardsConfigurationDTO.addressMode.mapToAddressConfiguration()
             )

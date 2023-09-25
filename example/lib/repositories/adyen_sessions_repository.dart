@@ -33,8 +33,14 @@ class AdyenSessionsRepository {
         value: amount.value,
       ),
       returnUrl: returnUrl,
-      reference: Config.shopperReference,
+      reference:
+          "flutter-session-test_${DateTime.now().millisecondsSinceEpoch}",
       countryCode: Config.countryCode,
+      shopperReference: Config.shopperReference,
+      storePaymentMethodMode:
+          StorePaymentMethodMode.enabled.storePaymentMethodModeString,
+      recurringProcessingModel:
+          RecurringProcessingModel.cardOnFile.recurringModelString,
     );
 
     SessionResponseNetworkModel sessionResponseNetworkModel =
