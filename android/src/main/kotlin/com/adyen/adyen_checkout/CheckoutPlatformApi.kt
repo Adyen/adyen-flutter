@@ -2,6 +2,7 @@ package com.adyen.adyen_checkout
 
 import CheckoutFlutterApi
 import CheckoutPlatformInterface
+import DeletedStoredPaymentMethodResultDTO
 import DropInConfigurationDTO
 import DropInResultDTO
 import DropInResultType
@@ -14,6 +15,8 @@ import androidx.lifecycle.lifecycleScope
 import com.adyen.adyen_checkout.dropInAdvancedFlow.AdvancedFlowDropInService
 import com.adyen.adyen_checkout.dropInAdvancedFlow.DropInAdditionalDetailsPlatformMessenger
 import com.adyen.adyen_checkout.dropInAdvancedFlow.DropInAdditionalDetailsResultMessenger
+import com.adyen.adyen_checkout.dropInAdvancedFlow.DropInPaymentMethodDeletionPlatformMessenger
+import com.adyen.adyen_checkout.dropInAdvancedFlow.DropInPaymentMethodDeletionResultMessenger
 import com.adyen.adyen_checkout.dropInAdvancedFlow.DropInPaymentResultMessenger
 import com.adyen.adyen_checkout.dropInAdvancedFlow.DropInServiceResultMessenger
 import com.adyen.adyen_checkout.utils.ConfigurationMapper.mapToDropInConfiguration
@@ -75,6 +78,7 @@ class CheckoutPlatformApi(private val checkoutFlutterApi: CheckoutFlutterApi?) :
         ) {
             checkForFlutterFragmentActivity()
             setAdvancedFlowDropInServiceObserver()
+            setStoredPaymentMethodDeletionObserver()
             activity.lifecycleScope.launch(Dispatchers.IO) {
                 val paymentMethodsApiResponse = PaymentMethodsApiResponse.SERIALIZER.deserialize(
                     JSONObject(paymentMethodsResponse),
@@ -107,6 +111,13 @@ class CheckoutPlatformApi(private val checkoutFlutterApi: CheckoutFlutterApi?) :
             DropInAdditionalDetailsResultMessenger.sendResult(paymentsDetailsResult)
         }
 
+        override fun onDeleteStoredPaymentMethodResult(
+            deleteStoredPaymentMethodResultDTO:
+                DeletedStoredPaymentMethodResultDTO
+        ) {
+            DropInPaymentMethodDeletionResultMessenger.sendResult(deleteStoredPaymentMethodResultDTO)
+        }
+
         private suspend fun createCheckoutSession(
             sessionModel: com.adyen.checkout.sessions.core.SessionModel,
             dropInConfiguration: com.adyen.checkout.dropin.DropInConfiguration,
@@ -130,6 +141,22 @@ class CheckoutPlatformApi(private val checkoutFlutterApi: CheckoutFlutterApi?) :
                     PlatformCommunicationType.PAYMENTCOMPONENT,
                     data = message.contentIfNotHandled.toString(),
                 )
+                checkoutFlutterApi?.onDropInAdvancedFlowPlatformCommunication(model) {}
+            }
+        }
+
+        private fun setStoredPaymentMethodDeletionObserver() {
+            DropInPaymentMethodDeletionPlatformMessenger.instance().removeObservers(activity)
+            DropInPaymentMethodDeletionPlatformMessenger.instance().observe(activity) { message ->
+                if (message.hasBeenHandled()) {
+                    return@observe
+                }
+
+                val model = PlatformCommunicationModel(
+                    PlatformCommunicationType.DELETESTOREDPAYMENTMETHOD,
+                    data = message.contentIfNotHandled.toString(),
+                )
+
                 checkoutFlutterApi?.onDropInAdvancedFlowPlatformCommunication(model) {}
             }
         }

@@ -129,7 +129,8 @@ enum class PaymentResultEnum(val raw: Int) {
 enum class PlatformCommunicationType(val raw: Int) {
   PAYMENTCOMPONENT(0),
   ADDITIONALDETAILS(1),
-  RESULT(2);
+  RESULT(2),
+  DELETESTOREDPAYMENTMETHOD(3);
 
   companion object {
     fun ofRaw(raw: Int): PlatformCommunicationType? {
@@ -230,7 +231,7 @@ data class DropInConfigurationDTO (
   val analyticsOptionsDTO: AnalyticsOptionsDTO? = null,
   val showPreselectedStoredPaymentMethod: Boolean? = null,
   val skipListWhenSinglePaymentMethod: Boolean? = null,
-  val isRemoveStoredPaymentMethodEnabled: Boolean
+  val isRemoveStoredPaymentMethodEnabled: Boolean? = null
 
 ) {
   companion object {
@@ -258,7 +259,7 @@ data class DropInConfigurationDTO (
       }
       val showPreselectedStoredPaymentMethod = list[10] as Boolean?
       val skipListWhenSinglePaymentMethod = list[11] as Boolean?
-      val isRemoveStoredPaymentMethodEnabled = list[12] as Boolean
+      val isRemoveStoredPaymentMethodEnabled = list[12] as Boolean?
       return DropInConfigurationDTO(environment, clientKey, countryCode, amount, shopperLocale, cardsConfigurationDTO, applePayConfigurationDTO, googlePayConfigurationDTO, cashAppPayConfigurationDTO, analyticsOptionsDTO, showPreselectedStoredPaymentMethod, skipListWhenSinglePaymentMethod, isRemoveStoredPaymentMethodEnabled)
     }
   }
@@ -587,6 +588,28 @@ data class DropInErrorDTO (
   }
 }
 
+/** Generated class from Pigeon that represents data sent in messages. */
+data class DeletedStoredPaymentMethodResultDTO (
+  val storedPaymentMethodId: String,
+  val isSuccessfullyRemoved: Boolean
+
+) {
+  companion object {
+    @Suppress("UNCHECKED_CAST")
+    fun fromList(list: List<Any?>): DeletedStoredPaymentMethodResultDTO {
+      val storedPaymentMethodId = list[0] as String
+      val isSuccessfullyRemoved = list[1] as Boolean
+      return DeletedStoredPaymentMethodResultDTO(storedPaymentMethodId, isSuccessfullyRemoved)
+    }
+  }
+  fun toList(): List<Any?> {
+    return listOf<Any?>(
+      storedPaymentMethodId,
+      isSuccessfullyRemoved,
+    )
+  }
+}
+
 @Suppress("UNCHECKED_CAST")
 private object CheckoutPlatformInterfaceCodec : StandardMessageCodec() {
   override fun readValueOfType(type: Byte, buffer: ByteBuffer): Any? {
@@ -618,25 +641,30 @@ private object CheckoutPlatformInterfaceCodec : StandardMessageCodec() {
       }
       133.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          DropInConfigurationDTO.fromList(it)
+          DeletedStoredPaymentMethodResultDTO.fromList(it)
         }
       }
       134.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          DropInErrorDTO.fromList(it)
+          DropInConfigurationDTO.fromList(it)
         }
       }
       135.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          DropInResultDTO.fromList(it)
+          DropInErrorDTO.fromList(it)
         }
       }
       136.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          GooglePayConfigurationDTO.fromList(it)
+          DropInResultDTO.fromList(it)
         }
       }
       137.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          GooglePayConfigurationDTO.fromList(it)
+        }
+      }
+      138.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
           SessionDTO.fromList(it)
         }
@@ -666,24 +694,28 @@ private object CheckoutPlatformInterfaceCodec : StandardMessageCodec() {
         stream.write(132)
         writeValue(stream, value.toList())
       }
-      is DropInConfigurationDTO -> {
+      is DeletedStoredPaymentMethodResultDTO -> {
         stream.write(133)
         writeValue(stream, value.toList())
       }
-      is DropInErrorDTO -> {
+      is DropInConfigurationDTO -> {
         stream.write(134)
         writeValue(stream, value.toList())
       }
-      is DropInResultDTO -> {
+      is DropInErrorDTO -> {
         stream.write(135)
         writeValue(stream, value.toList())
       }
-      is GooglePayConfigurationDTO -> {
+      is DropInResultDTO -> {
         stream.write(136)
         writeValue(stream, value.toList())
       }
-      is SessionDTO -> {
+      is GooglePayConfigurationDTO -> {
         stream.write(137)
+        writeValue(stream, value.toList())
+      }
+      is SessionDTO -> {
+        stream.write(138)
         writeValue(stream, value.toList())
       }
       else -> super.writeValue(stream, value)
@@ -699,6 +731,7 @@ interface CheckoutPlatformInterface {
   fun startDropInAdvancedFlowPayment(dropInConfigurationDTO: DropInConfigurationDTO, paymentMethodsResponse: String)
   fun onPaymentsResult(paymentsResult: DropInResultDTO)
   fun onPaymentsDetailsResult(paymentsDetailsResult: DropInResultDTO)
+  fun onDeleteStoredPaymentMethodResult(deleteStoredPaymentMethodResultDTO: DeletedStoredPaymentMethodResultDTO)
 
   companion object {
     /** The codec used by CheckoutPlatformInterface. */
@@ -812,6 +845,25 @@ interface CheckoutPlatformInterface {
             var wrapped: List<Any?>
             try {
               api.onPaymentsDetailsResult(paymentsDetailsResultArg)
+              wrapped = listOf<Any?>(null)
+            } catch (exception: Throwable) {
+              wrapped = wrapError(exception)
+            }
+            reply.reply(wrapped)
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.onDeleteStoredPaymentMethodResult", codec)
+        if (api != null) {
+          channel.setMessageHandler { message, reply ->
+            val args = message as List<Any?>
+            val deleteStoredPaymentMethodResultDTOArg = args[0] as DeletedStoredPaymentMethodResultDTO
+            var wrapped: List<Any?>
+            try {
+              api.onDeleteStoredPaymentMethodResult(deleteStoredPaymentMethodResultDTOArg)
               wrapped = listOf<Any?>(null)
             } catch (exception: Throwable) {
               wrapped = wrapError(exception)

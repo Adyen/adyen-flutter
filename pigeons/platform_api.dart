@@ -56,6 +56,7 @@ enum PlatformCommunicationType {
   paymentComponent,
   additionalDetails,
   result,
+  deleteStoredPaymentMethod,
 }
 
 enum DropInResultType {
@@ -107,7 +108,7 @@ class DropInConfigurationDTO {
   final AnalyticsOptionsDTO? analyticsOptionsDTO;
   final bool? showPreselectedStoredPaymentMethod;
   final bool? skipListWhenSinglePaymentMethod;
-  final bool isRemoveStoredPaymentMethodEnabled;
+  final bool? isRemoveStoredPaymentMethodEnabled;
 
   DropInConfigurationDTO(
     this.environment,
@@ -275,6 +276,16 @@ class DropInErrorDTO {
   });
 }
 
+class DeletedStoredPaymentMethodResultDTO {
+  final String storedPaymentMethodId;
+  final bool isSuccessfullyRemoved;
+
+  DeletedStoredPaymentMethodResultDTO(
+    this.storedPaymentMethodId,
+    this.isSuccessfullyRemoved,
+  );
+}
+
 @HostApi()
 abstract class CheckoutPlatformInterface {
   @async
@@ -296,6 +307,9 @@ abstract class CheckoutPlatformInterface {
   void onPaymentsResult(DropInResultDTO paymentsResult);
 
   void onPaymentsDetailsResult(DropInResultDTO paymentsDetailsResult);
+
+  void onDeleteStoredPaymentMethodResult(
+      DeletedStoredPaymentMethodResultDTO deleteStoredPaymentMethodResultDTO);
 }
 
 @FlutterApi()

@@ -84,6 +84,7 @@ enum PlatformCommunicationType: Int {
   case paymentComponent = 0
   case additionalDetails = 1
   case result = 2
+  case deleteStoredPaymentMethod = 3
 }
 
 enum DropInResultType: Int {
@@ -172,7 +173,7 @@ struct DropInConfigurationDTO {
   var analyticsOptionsDTO: AnalyticsOptionsDTO? = nil
   var showPreselectedStoredPaymentMethod: Bool? = nil
   var skipListWhenSinglePaymentMethod: Bool? = nil
-  var isRemoveStoredPaymentMethodEnabled: Bool
+  var isRemoveStoredPaymentMethodEnabled: Bool? = nil
 
   static func fromList(_ list: [Any?]) -> DropInConfigurationDTO? {
     let environment = Environment(rawValue: list[0] as! Int)!
@@ -202,7 +203,7 @@ struct DropInConfigurationDTO {
     }
     let showPreselectedStoredPaymentMethod: Bool? = nilOrValue(list[10])
     let skipListWhenSinglePaymentMethod: Bool? = nilOrValue(list[11])
-    let isRemoveStoredPaymentMethodEnabled = list[12] as! Bool
+    let isRemoveStoredPaymentMethodEnabled: Bool? = nilOrValue(list[12])
 
     return DropInConfigurationDTO(
       environment: environment,
@@ -577,6 +578,28 @@ struct DropInErrorDTO {
   }
 }
 
+/// Generated class from Pigeon that represents data sent in messages.
+struct DeletedStoredPaymentMethodResultDTO {
+  var storedPaymentMethodId: String
+  var isSuccessfullyRemoved: Bool
+
+  static func fromList(_ list: [Any?]) -> DeletedStoredPaymentMethodResultDTO? {
+    let storedPaymentMethodId = list[0] as! String
+    let isSuccessfullyRemoved = list[1] as! Bool
+
+    return DeletedStoredPaymentMethodResultDTO(
+      storedPaymentMethodId: storedPaymentMethodId,
+      isSuccessfullyRemoved: isSuccessfullyRemoved
+    )
+  }
+  func toList() -> [Any?] {
+    return [
+      storedPaymentMethodId,
+      isSuccessfullyRemoved,
+    ]
+  }
+}
+
 private class CheckoutPlatformInterfaceCodecReader: FlutterStandardReader {
   override func readValue(ofType type: UInt8) -> Any? {
     switch type {
@@ -591,14 +614,16 @@ private class CheckoutPlatformInterfaceCodecReader: FlutterStandardReader {
       case 132:
         return CashAppPayConfigurationDTO.fromList(self.readValue() as! [Any?])
       case 133:
-        return DropInConfigurationDTO.fromList(self.readValue() as! [Any?])
+        return DeletedStoredPaymentMethodResultDTO.fromList(self.readValue() as! [Any?])
       case 134:
-        return DropInErrorDTO.fromList(self.readValue() as! [Any?])
+        return DropInConfigurationDTO.fromList(self.readValue() as! [Any?])
       case 135:
-        return DropInResultDTO.fromList(self.readValue() as! [Any?])
+        return DropInErrorDTO.fromList(self.readValue() as! [Any?])
       case 136:
-        return GooglePayConfigurationDTO.fromList(self.readValue() as! [Any?])
+        return DropInResultDTO.fromList(self.readValue() as! [Any?])
       case 137:
+        return GooglePayConfigurationDTO.fromList(self.readValue() as! [Any?])
+      case 138:
         return SessionDTO.fromList(self.readValue() as! [Any?])
       default:
         return super.readValue(ofType: type)
@@ -623,20 +648,23 @@ private class CheckoutPlatformInterfaceCodecWriter: FlutterStandardWriter {
     } else if let value = value as? CashAppPayConfigurationDTO {
       super.writeByte(132)
       super.writeValue(value.toList())
-    } else if let value = value as? DropInConfigurationDTO {
+    } else if let value = value as? DeletedStoredPaymentMethodResultDTO {
       super.writeByte(133)
       super.writeValue(value.toList())
-    } else if let value = value as? DropInErrorDTO {
+    } else if let value = value as? DropInConfigurationDTO {
       super.writeByte(134)
       super.writeValue(value.toList())
-    } else if let value = value as? DropInResultDTO {
+    } else if let value = value as? DropInErrorDTO {
       super.writeByte(135)
       super.writeValue(value.toList())
-    } else if let value = value as? GooglePayConfigurationDTO {
+    } else if let value = value as? DropInResultDTO {
       super.writeByte(136)
       super.writeValue(value.toList())
-    } else if let value = value as? SessionDTO {
+    } else if let value = value as? GooglePayConfigurationDTO {
       super.writeByte(137)
+      super.writeValue(value.toList())
+    } else if let value = value as? SessionDTO {
+      super.writeByte(138)
       super.writeValue(value.toList())
     } else {
       super.writeValue(value)
@@ -666,6 +694,7 @@ protocol CheckoutPlatformInterface {
   func startDropInAdvancedFlowPayment(dropInConfigurationDTO: DropInConfigurationDTO, paymentMethodsResponse: String) throws
   func onPaymentsResult(paymentsResult: DropInResultDTO) throws
   func onPaymentsDetailsResult(paymentsDetailsResult: DropInResultDTO) throws
+  func onDeleteStoredPaymentMethodResult(deleteStoredPaymentMethodResultDTO: DeletedStoredPaymentMethodResultDTO) throws
 }
 
 /// Generated setup class from Pigeon to handle messages through the `binaryMessenger`.
@@ -765,6 +794,21 @@ class CheckoutPlatformInterfaceSetup {
       }
     } else {
       onPaymentsDetailsResultChannel.setMessageHandler(nil)
+    }
+    let onDeleteStoredPaymentMethodResultChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.onDeleteStoredPaymentMethodResult", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      onDeleteStoredPaymentMethodResultChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let deleteStoredPaymentMethodResultDTOArg = args[0] as! DeletedStoredPaymentMethodResultDTO
+        do {
+          try api.onDeleteStoredPaymentMethodResult(deleteStoredPaymentMethodResultDTO: deleteStoredPaymentMethodResultDTOArg)
+          reply(wrapResult(nil))
+        } catch {
+          reply(wrapError(error))
+        }
+      }
+    } else {
+      onDeleteStoredPaymentMethodResultChannel.setMessageHandler(nil)
     }
   }
 }

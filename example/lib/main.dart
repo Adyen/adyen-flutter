@@ -92,7 +92,11 @@ class _MyAppState extends State<MyApp> {
 
     final CardsConfiguration cardsConfiguration = CardsConfiguration(
       showStorePaymentField: true,
-      holderNameRequired: true,
+    );
+
+    final StoredPaymentMethodConfiguration storedPaymentMethodConfiguration =
+        StoredPaymentMethodConfiguration(
+      showPreselectedStoredPaymentMethod: false,
     );
 
     final DropInConfiguration dropInConfiguration = DropInConfiguration(
@@ -102,7 +106,7 @@ class _MyAppState extends State<MyApp> {
       amount: Config.amount,
       shopperLocale: Config.shopperLocale,
       cardsConfiguration: cardsConfiguration,
-      showPreselectedStoredPaymentMethod: false,
+      storedPaymentMethodConfiguration: storedPaymentMethodConfiguration,
     );
 
     return await _adyenCheckout.startPayment(
@@ -140,6 +144,14 @@ class _MyAppState extends State<MyApp> {
       returnUrl,
     );
 
+    final StoredPaymentMethodConfiguration storedPaymentMethodConfiguration =
+        StoredPaymentMethodConfiguration(
+      isRemoveStoredPaymentMethodEnabled: true,
+      showPreselectedStoredPaymentMethod: false,
+      deleteStoredPaymentMethodCallback:
+          _adyenSessionRepository.deleteStoredPaymentMethod,
+    );
+
     final DropInConfiguration dropInConfiguration = DropInConfiguration(
       environment: Environment.test,
       clientKey: Config.clientKey,
@@ -150,6 +162,7 @@ class _MyAppState extends State<MyApp> {
       applePayConfiguration: applePayConfiguration,
       googlePayConfiguration: googlePayConfiguration,
       cashAppPayConfiguration: cashAppPayConfiguration,
+      storedPaymentMethodConfiguration: storedPaymentMethodConfiguration,
     );
 
     return await _adyenCheckout.startPayment(

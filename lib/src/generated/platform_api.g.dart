@@ -54,6 +54,7 @@ enum PlatformCommunicationType {
   paymentComponent,
   additionalDetails,
   result,
+  deleteStoredPaymentMethod,
 }
 
 enum DropInResultType {
@@ -154,7 +155,7 @@ class DropInConfigurationDTO {
     this.analyticsOptionsDTO,
     this.showPreselectedStoredPaymentMethod,
     this.skipListWhenSinglePaymentMethod,
-    required this.isRemoveStoredPaymentMethodEnabled,
+    this.isRemoveStoredPaymentMethodEnabled,
   });
 
   Environment environment;
@@ -181,7 +182,7 @@ class DropInConfigurationDTO {
 
   bool? skipListWhenSinglePaymentMethod;
 
-  bool isRemoveStoredPaymentMethodEnabled;
+  bool? isRemoveStoredPaymentMethodEnabled;
 
   Object encode() {
     return <Object?>[
@@ -226,7 +227,7 @@ class DropInConfigurationDTO {
           : null,
       showPreselectedStoredPaymentMethod: result[10] as bool?,
       skipListWhenSinglePaymentMethod: result[11] as bool?,
-      isRemoveStoredPaymentMethodEnabled: result[12]! as bool,
+      isRemoveStoredPaymentMethodEnabled: result[12] as bool?,
     );
   }
 }
@@ -625,6 +626,32 @@ class DropInErrorDTO {
   }
 }
 
+class DeletedStoredPaymentMethodResultDTO {
+  DeletedStoredPaymentMethodResultDTO({
+    required this.storedPaymentMethodId,
+    required this.isSuccessfullyRemoved,
+  });
+
+  String storedPaymentMethodId;
+
+  bool isSuccessfullyRemoved;
+
+  Object encode() {
+    return <Object?>[
+      storedPaymentMethodId,
+      isSuccessfullyRemoved,
+    ];
+  }
+
+  static DeletedStoredPaymentMethodResultDTO decode(Object result) {
+    result as List<Object?>;
+    return DeletedStoredPaymentMethodResultDTO(
+      storedPaymentMethodId: result[0]! as String,
+      isSuccessfullyRemoved: result[1]! as bool,
+    );
+  }
+}
+
 class _CheckoutPlatformInterfaceCodec extends StandardMessageCodec {
   const _CheckoutPlatformInterfaceCodec();
   @override
@@ -644,20 +671,23 @@ class _CheckoutPlatformInterfaceCodec extends StandardMessageCodec {
     } else if (value is CashAppPayConfigurationDTO) {
       buffer.putUint8(132);
       writeValue(buffer, value.encode());
-    } else if (value is DropInConfigurationDTO) {
+    } else if (value is DeletedStoredPaymentMethodResultDTO) {
       buffer.putUint8(133);
       writeValue(buffer, value.encode());
-    } else if (value is DropInErrorDTO) {
+    } else if (value is DropInConfigurationDTO) {
       buffer.putUint8(134);
       writeValue(buffer, value.encode());
-    } else if (value is DropInResultDTO) {
+    } else if (value is DropInErrorDTO) {
       buffer.putUint8(135);
       writeValue(buffer, value.encode());
-    } else if (value is GooglePayConfigurationDTO) {
+    } else if (value is DropInResultDTO) {
       buffer.putUint8(136);
       writeValue(buffer, value.encode());
-    } else if (value is SessionDTO) {
+    } else if (value is GooglePayConfigurationDTO) {
       buffer.putUint8(137);
+      writeValue(buffer, value.encode());
+    } else if (value is SessionDTO) {
+      buffer.putUint8(138);
       writeValue(buffer, value.encode());
     } else {
       super.writeValue(buffer, value);
@@ -678,14 +708,16 @@ class _CheckoutPlatformInterfaceCodec extends StandardMessageCodec {
       case 132: 
         return CashAppPayConfigurationDTO.decode(readValue(buffer)!);
       case 133: 
-        return DropInConfigurationDTO.decode(readValue(buffer)!);
+        return DeletedStoredPaymentMethodResultDTO.decode(readValue(buffer)!);
       case 134: 
-        return DropInErrorDTO.decode(readValue(buffer)!);
+        return DropInConfigurationDTO.decode(readValue(buffer)!);
       case 135: 
-        return DropInResultDTO.decode(readValue(buffer)!);
+        return DropInErrorDTO.decode(readValue(buffer)!);
       case 136: 
-        return GooglePayConfigurationDTO.decode(readValue(buffer)!);
+        return DropInResultDTO.decode(readValue(buffer)!);
       case 137: 
+        return GooglePayConfigurationDTO.decode(readValue(buffer)!);
+      case 138: 
         return SessionDTO.decode(readValue(buffer)!);
       default:
         return super.readValueOfType(type, buffer);
@@ -829,6 +861,28 @@ class CheckoutPlatformInterface {
         binaryMessenger: _binaryMessenger);
     final List<Object?>? replyList =
         await channel.send(<Object?>[arg_paymentsDetailsResult]) as List<Object?>?;
+    if (replyList == null) {
+      throw PlatformException(
+        code: 'channel-error',
+        message: 'Unable to establish connection on channel.',
+      );
+    } else if (replyList.length > 1) {
+      throw PlatformException(
+        code: replyList[0]! as String,
+        message: replyList[1] as String?,
+        details: replyList[2],
+      );
+    } else {
+      return;
+    }
+  }
+
+  Future<void> onDeleteStoredPaymentMethodResult(DeletedStoredPaymentMethodResultDTO arg_deleteStoredPaymentMethodResultDTO) async {
+    final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
+        'dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.onDeleteStoredPaymentMethodResult', codec,
+        binaryMessenger: _binaryMessenger);
+    final List<Object?>? replyList =
+        await channel.send(<Object?>[arg_deleteStoredPaymentMethodResultDTO]) as List<Object?>?;
     if (replyList == null) {
       throw PlatformException(
         code: 'channel-error',

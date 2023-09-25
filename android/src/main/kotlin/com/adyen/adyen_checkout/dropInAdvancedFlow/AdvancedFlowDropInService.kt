@@ -1,5 +1,6 @@
 package com.adyen.adyen_checkout.dropInAdvancedFlow
 
+import DeletedStoredPaymentMethodResultDTO
 import DropInResultDTO
 import DropInResultType
 import android.content.Intent
@@ -10,9 +11,12 @@ import androidx.lifecycle.ServiceLifecycleDispatcher
 import com.adyen.checkout.components.core.ActionComponentData
 import com.adyen.checkout.components.core.PaymentComponentData
 import com.adyen.checkout.components.core.PaymentComponentState
+import com.adyen.checkout.components.core.StoredPaymentMethod
 import com.adyen.checkout.components.core.action.Action
 import com.adyen.checkout.dropin.DropInService
 import com.adyen.checkout.dropin.DropInServiceResult
+import com.adyen.checkout.dropin.ErrorDialog
+import com.adyen.checkout.dropin.RecurringDropInServiceResult
 import org.json.JSONObject
 
 class AdvancedFlowDropInService : DropInService(), LifecycleOwner {
@@ -38,6 +42,22 @@ class AdvancedFlowDropInService : DropInService(), LifecycleOwner {
 
     override fun onBalanceCheck(paymentComponentState: PaymentComponentState<*>) =
         onPaymentComponentState(paymentComponentState)
+
+    override fun onRemoveStoredPaymentMethod(storedPaymentMethod: StoredPaymentMethod) {
+        try {
+            setAdvancedFlowDropInDeleteStoredPaymentMethodObserver()
+            val storedPaymentMethodId = storedPaymentMethod.id.orEmpty()
+            DropInPaymentMethodDeletionPlatformMessenger.sendResult(storedPaymentMethodId)
+        } catch (exception: Exception) {
+            sendResult(
+                DropInServiceResult.Error(
+                    errorDialog = null,
+                    reason = exception.message,
+                    dismissDropIn = true
+                )
+            )
+        }
+    }
 
     private fun onPaymentComponentState(paymentComponentState: PaymentComponentState<*>) {
         try {
@@ -77,6 +97,27 @@ class AdvancedFlowDropInService : DropInService(), LifecycleOwner {
 
             val dropInServiceResult = mapToDropInResult(message.contentIfNotHandled)
             sendResult(dropInServiceResult)
+        }
+    }
+
+    private fun setAdvancedFlowDropInDeleteStoredPaymentMethodObserver() {
+        DropInPaymentMethodDeletionResultMessenger.instance().removeObservers(this)
+        DropInPaymentMethodDeletionResultMessenger.instance().observe(this) { message ->
+            if (message.hasBeenHandled()) {
+                return@observe
+            }
+
+            val deletionResult = mapToDeletionDropInResult(message.contentIfNotHandled)
+            sendRecurringResult(deletionResult)
+        }
+    }
+
+    private fun mapToDeletionDropInResult(deleteStoredPaymentMethodResultDTO: DeletedStoredPaymentMethodResultDTO?):
+        RecurringDropInServiceResult {
+        return if (deleteStoredPaymentMethodResultDTO?.isSuccessfullyRemoved == true) {
+            RecurringDropInServiceResult.PaymentMethodRemoved(deleteStoredPaymentMethodResultDTO.storedPaymentMethodId)
+        } else {
+            RecurringDropInServiceResult.Error(errorDialog = ErrorDialog(message = "IOException"))
         }
     }
 

@@ -38,7 +38,7 @@ class AdyenSessionsRepository {
       countryCode: Config.countryCode,
       shopperReference: Config.shopperReference,
       storePaymentMethodMode:
-          StorePaymentMethodMode.enabled.storePaymentMethodModeString,
+          StorePaymentMethodMode.askForConsent.storePaymentMethodModeString,
       recurringProcessingModel:
           RecurringProcessingModel.cardOnFile.recurringModelString,
     );
@@ -102,6 +102,14 @@ class AdyenSessionsRepository {
     } else {
       throw Exception("Unsupported platform");
     }
+  }
+
+  Future<bool> deleteStoredPaymentMethod(String storedPaymentMethodId) async {
+    return await _service.deleteStoredPaymentMethod(
+      storedPaymentMethodId: storedPaymentMethodId,
+      merchantAccount: Config.merchantAccount,
+      shopperReference: Config.shopperReference,
+    );
   }
 
   String _determineChannel() {

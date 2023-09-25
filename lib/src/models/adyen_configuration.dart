@@ -30,9 +30,8 @@ class DropInConfiguration extends DropInConfigurationDTO
     GooglePayConfiguration? googlePayConfiguration,
     CashAppPayConfiguration? cashAppPayConfiguration,
     AnalyticsOptions? analyticsOptions,
-    bool showPreselectedStoredPaymentMethod = false,
     bool skipListWhenSinglePaymentMethod = false,
-    bool isRemoveStoredPaymentMethodEnabled = true,
+    this.storedPaymentMethodConfiguration,
   }) : super(
           amount: amount.toDTO(),
           shopperLocale: shopperLocale ?? Platform.localeName,
@@ -41,10 +40,20 @@ class DropInConfiguration extends DropInConfigurationDTO
           googlePayConfigurationDTO: googlePayConfiguration?.toDTO(),
           cashAppPayConfigurationDTO: cashAppPayConfiguration?.toDTO(),
           analyticsOptionsDTO: analyticsOptions?.toDTO(),
-          showPreselectedStoredPaymentMethod:
-              showPreselectedStoredPaymentMethod,
           skipListWhenSinglePaymentMethod: skipListWhenSinglePaymentMethod,
-          isRemoveStoredPaymentMethodEnabled:
-              isRemoveStoredPaymentMethodEnabled,
         );
+
+  final StoredPaymentMethodConfiguration? storedPaymentMethodConfiguration;
+}
+
+class StoredPaymentMethodConfiguration {
+  final bool showPreselectedStoredPaymentMethod;
+  final bool isRemoveStoredPaymentMethodEnabled;
+  final Future<bool> Function(String)? deleteStoredPaymentMethodCallback;
+
+  StoredPaymentMethodConfiguration({
+    this.showPreselectedStoredPaymentMethod = true,
+    this.isRemoveStoredPaymentMethodEnabled = true,
+    this.deleteStoredPaymentMethodCallback,
+  });
 }
