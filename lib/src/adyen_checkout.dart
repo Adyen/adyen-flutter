@@ -35,14 +35,20 @@ class AdyenCheckout implements AdyenCheckoutInterface {
   Future<PaymentResult> _startDropInSessionsPayment(
       DropInSession dropInSession) async {
     _resultApi.dropInSessionResultStream = StreamController<PaymentResultDTO>();
+
+    //Remove disable flag for store payment field when native SDK receive updates.
+    CardsConfigurationDTO? cardsConfigurationWithoutStorePaymentMethod =
+        dropInSession.dropInConfiguration.cardsConfigurationDTO?.copyWith(
+      showStorePaymentField: false,
+    );
+
     DropInConfigurationDTO dropInConfiguration = DropInConfigurationDTO(
       environment: dropInSession.dropInConfiguration.environment,
       clientKey: dropInSession.dropInConfiguration.clientKey,
       countryCode: dropInSession.dropInConfiguration.countryCode,
       amount: dropInSession.dropInConfiguration.amount,
       shopperLocale: dropInSession.dropInConfiguration.shopperLocale,
-      cardsConfigurationDTO:
-          dropInSession.dropInConfiguration.cardsConfigurationDTO,
+      cardsConfigurationDTO: cardsConfigurationWithoutStorePaymentMethod,
       applePayConfigurationDTO:
           dropInSession.dropInConfiguration.applePayConfigurationDTO,
       googlePayConfigurationDTO:
@@ -51,8 +57,7 @@ class AdyenCheckout implements AdyenCheckoutInterface {
           dropInSession.dropInConfiguration.cashAppPayConfigurationDTO,
       analyticsOptionsDTO:
           dropInSession.dropInConfiguration.analyticsOptionsDTO,
-      isRemoveStoredPaymentMethodEnabled: dropInSession
-          .dropInConfiguration.isRemoveStoredPaymentMethodEnabled,
+      isRemoveStoredPaymentMethodEnabled: false,
     );
     AdyenCheckoutPlatformInterface.instance.startDropInSessionPayment(
       session: dropInSession.session.toDTO(),
