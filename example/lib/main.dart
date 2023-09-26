@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:adyen_checkout/adyen_checkout.dart';
-import 'package:adyen_checkout/platform_api.g.dart';
 import 'package:adyen_checkout_example/config.dart';
 import 'package:adyen_checkout_example/network/service.dart';
 import 'package:adyen_checkout_example/repositories/adyen_sessions_repository.dart';
@@ -90,11 +89,12 @@ class _MyAppState extends State<MyApp> {
       Config.amount,
       Config.environment,
     );
+
     final DropInConfiguration dropInConfiguration = DropInConfiguration(
       environment: Environment.test,
       clientKey: Config.clientKey,
-      amount: Config.amount,
       countryCode: Config.countryCode,
+      amount: Config.amount,
     );
 
     return await _adyenCheckout.startPayment(
@@ -108,11 +108,41 @@ class _MyAppState extends State<MyApp> {
   Future<PaymentResult> startDropInAdvancedFlow() async {
     final String paymentMethodsResponse =
         await _adyenSessionRepository.fetchPaymentMethods();
+    final String returnUrl =
+        await _adyenSessionRepository.determineExampleReturnUrl();
+
+    final CardsConfiguration cardsConfiguration = CardsConfiguration(
+      holderNameRequired: true,
+    );
+
+    final ApplePayConfiguration applePayConfiguration = ApplePayConfiguration(
+      merchantId: Config.merchantAccount,
+      merchantName: Config.merchantName,
+    );
+
+    final GooglePayConfiguration googlePayConfiguration =
+        GooglePayConfiguration(
+      googlePayEnvironment: GooglePayEnvironment.test,
+      shippingAddressRequired: true,
+      billingAddressRequired: true,
+    );
+
+    final CashAppPayConfiguration cashAppPayConfiguration =
+        CashAppPayConfiguration(
+      CashAppPayEnvironment.sandbox,
+      returnUrl,
+    );
+
     final DropInConfiguration dropInConfiguration = DropInConfiguration(
       environment: Environment.test,
       clientKey: Config.clientKey,
-      amount: Config.amount,
       countryCode: Config.countryCode,
+      shopperLocale: Config.shopperLocale,
+      amount: Config.amount,
+      cardsConfiguration: cardsConfiguration,
+      applePayConfiguration: applePayConfiguration,
+      googlePayConfiguration: googlePayConfiguration,
+      cashAppPayConfiguration: cashAppPayConfiguration,
     );
 
     return await _adyenCheckout.startPayment(

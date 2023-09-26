@@ -1,4 +1,4 @@
-import 'package:adyen_checkout/platform_api.g.dart';
+import 'package:adyen_checkout/src/generated/platform_api.g.dart';
 import 'package:adyen_checkout/src/platform/adyen_checkout_platform_interface.dart';
 
 class AdyenCheckoutApi implements AdyenCheckoutPlatformInterface {
@@ -8,20 +8,20 @@ class AdyenCheckoutApi implements AdyenCheckoutPlatformInterface {
   Future<String> getPlatformVersion() => checkoutApi.getPlatformVersion();
 
   @override
-  void startDropInSessionPayment(
-    Session session,
-    DropInConfiguration dropInConfiguration,
-  ) =>
+  void startDropInSessionPayment({
+    required SessionDTO session,
+    required DropInConfigurationDTO dropInConfiguration,
+  }) =>
       checkoutApi.startDropInSessionPayment(
         dropInConfiguration,
         session,
       );
 
   @override
-  void startDropInAdvancedFlowPayment(
-    String paymentMethodsResponse,
-    DropInConfiguration dropInConfiguration,
-  ) =>
+  void startDropInAdvancedFlowPayment({
+    required String paymentMethodsResponse,
+    required DropInConfigurationDTO dropInConfiguration,
+  }) =>
       checkoutApi.startDropInAdvancedFlowPayment(
         dropInConfiguration,
         paymentMethodsResponse,
@@ -31,10 +31,10 @@ class AdyenCheckoutApi implements AdyenCheckoutPlatformInterface {
   Future<String> getReturnUrl() => checkoutApi.getReturnUrl();
 
   @override
-  void onPaymentsResult(DropInResult paymentsResult) =>
+  void onPaymentsResult(DropInResultDTO paymentsResult) =>
       checkoutApi.onPaymentsResult(paymentsResult);
 
   @override
-  void onPaymentsDetailsResult(DropInResult paymentsDetailsResult) =>
+  void onPaymentsDetailsResult(DropInResultDTO paymentsDetailsResult) =>
       checkoutApi.onPaymentsDetailsResult(paymentsDetailsResult);
 }

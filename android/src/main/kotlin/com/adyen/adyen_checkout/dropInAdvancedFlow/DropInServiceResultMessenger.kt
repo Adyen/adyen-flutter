@@ -1,6 +1,6 @@
 package com.adyen.adyen_checkout.dropInAdvancedFlow
 
-import DropInResult
+import DropInResultDTO
 import androidx.lifecycle.LiveData
 import com.adyen.adyen_checkout.utils.Event
 import org.json.JSONObject
@@ -15,12 +15,12 @@ class DropInServiceResultMessenger : LiveData<Event<JSONObject>>() {
     }
 }
 
-class DropInPaymentResultMessenger : LiveData<Event<DropInResult>>() {
+class DropInPaymentResultMessenger : LiveData<Event<DropInResultDTO>>() {
     companion object {
         private val dropInPaymentResultMessenger = DropInPaymentResultMessenger()
 
         fun instance() = dropInPaymentResultMessenger
-        fun sendResult(value: DropInResult) {
+        fun sendResult(value: DropInResultDTO) {
             dropInPaymentResultMessenger.postValue(Event(value))
         }
     }
@@ -38,13 +38,13 @@ class DropInAdditionalDetailsPlatformMessenger : LiveData<Event<JSONObject>>() {
     }
 }
 
-class DropInAdditionalDetailsResultMessenger : LiveData<Event<DropInResult>>() {
+class DropInAdditionalDetailsResultMessenger : LiveData<Event<DropInResultDTO>>() {
     companion object {
         private val dropInAdditionalDetailsResultMessenger =
             DropInAdditionalDetailsResultMessenger()
 
         fun instance() = dropInAdditionalDetailsResultMessenger
-        fun sendResult(value: DropInResult) {
+        fun sendResult(value: DropInResultDTO) {
             dropInAdditionalDetailsResultMessenger.postValue(Event(value))
         }
     }

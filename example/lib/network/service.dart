@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:adyen_checkout/platform_api.g.dart';
+import 'package:adyen_checkout/adyen_checkout.dart';
 import 'package:adyen_checkout_example/config.dart';
 import 'package:adyen_checkout_example/network/models/payment_methods_request_network_model.dart';
 import 'package:adyen_checkout_example/network/models/session_request_network_model.dart';

@@ -1,4 +1,4 @@
-import 'package:adyen_checkout/platform_api.g.dart';
+import 'package:adyen_checkout/src/generated/platform_api.g.dart';
 import 'package:adyen_checkout/src/platform/adyen_checkout_api.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
@@ -19,17 +19,17 @@ abstract class AdyenCheckoutPlatformInterface extends PlatformInterface {
 
   Future<String> getReturnUrl();
 
-  void startDropInSessionPayment(
-    Session session,
-    DropInConfiguration dropInConfiguration,
-  );
+  void startDropInSessionPayment({
+    required SessionDTO session,
+    required DropInConfigurationDTO dropInConfiguration,
+  });
 
-  void startDropInAdvancedFlowPayment(
-    String paymentMethodsResponse,
-    DropInConfiguration dropInConfiguration,
-  );
+  void startDropInAdvancedFlowPayment({
+    required String paymentMethodsResponse,
+    required DropInConfigurationDTO dropInConfiguration,
+  });
 
-  void onPaymentsResult(DropInResult paymentsResult);
+  void onPaymentsResult(DropInResultDTO paymentsResult);
 
-  void onPaymentsDetailsResult(DropInResult paymentsDetailsResult);
+  void onPaymentsDetailsResult(DropInResultDTO paymentsDetailsResult);
 }

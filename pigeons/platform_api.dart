@@ -2,7 +2,7 @@ import 'package:pigeon/pigeon.dart';
 
 //dart run pigeon --input pigeons/platform_api.dart
 @ConfigurePigeon(PigeonOptions(
-  dartOut: 'lib/platform_api.g.dart',
+  dartOut: 'lib/src/generated/platform_api.g.dart',
   dartOptions: DartOptions(),
   kotlinOut: 'android/src/main/kotlin/com/adyen/adyen_checkout/PlatformApi.kt',
   kotlinOptions: KotlinOptions(),
@@ -19,55 +19,31 @@ enum Environment {
   apse;
 }
 
-class Session {
-  final String id;
-  final String sessionData;
-
-  Session({
-    required this.id,
-    required this.sessionData,
-  });
+enum AddressMode {
+  full,
+  postalCode,
+  none,
 }
 
-class Amount {
-  final String? currency;
-  final int value;
-
-  Amount({
-    required this.currency,
-    required this.value,
-  });
+enum CardAuthMethod {
+  panOnly,
+  cryptogram3DS,
 }
 
-class DropInConfiguration {
-  final Environment environment;
-  final String clientKey;
-  final Amount amount;
-  final String countryCode;
-  bool? isAnalyticsEnabled;
-  bool? showPreselectedStoredPaymentMethod;
-  bool? skipListWhenSinglePaymentMethod;
-  bool? isRemovingStoredPaymentMethodsEnabled;
-  String? additionalDataForDropInService;
-
-  DropInConfiguration({
-    required this.environment,
-    required this.clientKey,
-    required this.amount,
-    required this.countryCode,
-  });
+enum TotalPriceStatus {
+  notCurrentlyKnown,
+  estimated,
+  finalPrice,
 }
 
-class PaymentResult {
-  final PaymentResultEnum type;
-  final String? reason;
-  final PaymentResultModel? result;
+enum GooglePayEnvironment {
+  test,
+  production,
+}
 
-  PaymentResult(
-    this.type,
-    this.reason,
-    this.result,
-  );
+enum CashAppPayEnvironment {
+  sandbox,
+  production,
 }
 
 enum PaymentResultEnum {
@@ -76,13 +52,167 @@ enum PaymentResultEnum {
   finished,
 }
 
-class PaymentResultModel {
+enum PlatformCommunicationType {
+  paymentComponent,
+  additionalDetails,
+  result,
+}
+
+enum DropInResultType {
+  finished,
+  action,
+  error,
+}
+
+class SessionDTO {
+  final String id;
+  final String sessionData;
+
+  SessionDTO(
+    this.id,
+    this.sessionData,
+  );
+}
+
+class AmountDTO {
+  final String? currency;
+  final int value;
+
+  AmountDTO(
+    this.currency,
+    this.value,
+  );
+}
+
+class AnalyticsOptionsDTO {
+  final bool? enabled;
+  final String? payload;
+
+  AnalyticsOptionsDTO(
+    this.enabled,
+    this.payload,
+  );
+}
+
+class DropInConfigurationDTO {
+  final Environment environment;
+  final String clientKey;
+  final String countryCode;
+  final AmountDTO amount;
+  final String shopperLocale;
+  final AnalyticsOptionsDTO? analyticsOptionsDTO;
+  final bool? showPreselectedStoredPaymentMethod;
+  final bool? skipListWhenSinglePaymentMethod;
+  final CardsConfigurationDTO? cardsConfigurationDTO;
+  final ApplePayConfigurationDTO? applePayConfigurationDTO;
+  final GooglePayConfigurationDTO? googlePayConfigurationDTO;
+  final CashAppPayConfigurationDTO? cashAppPayConfigurationDTO;
+
+  DropInConfigurationDTO(
+    this.environment,
+    this.clientKey,
+    this.countryCode,
+    this.amount,
+    this.shopperLocale,
+    this.analyticsOptionsDTO,
+    this.cardsConfigurationDTO,
+    this.showPreselectedStoredPaymentMethod,
+    this.skipListWhenSinglePaymentMethod,
+    this.applePayConfigurationDTO,
+    this.googlePayConfigurationDTO,
+    this.cashAppPayConfigurationDTO,
+  );
+}
+
+class CardsConfigurationDTO {
+  final bool holderNameRequired;
+  final AddressMode addressMode;
+  final bool showStorePaymentField;
+  final bool showCvcForStoredCard;
+  final bool showCvc;
+  final bool showKcpField;
+  final bool showSocialSecurityNumberField;
+  final List<String?> supportedCardTypes;
+
+  CardsConfigurationDTO(
+    this.holderNameRequired,
+    this.addressMode,
+    this.showStorePaymentField,
+    this.showCvcForStoredCard,
+    this.showCvc,
+    this.showKcpField,
+    this.showSocialSecurityNumberField,
+    this.supportedCardTypes,
+  );
+}
+
+class ApplePayConfigurationDTO {
+  final String merchantId;
+  final String merchantName;
+  final bool allowOnboarding;
+
+  ApplePayConfigurationDTO(
+    this.merchantId,
+    this.merchantName,
+    this.allowOnboarding,
+  );
+}
+
+class GooglePayConfigurationDTO {
+  final GooglePayEnvironment googlePayEnvironment;
+  final String? merchantAccount;
+  final List<String?> allowedCardNetworks;
+  final List<String?> allowedAuthMethods;
+  final TotalPriceStatus? totalPriceStatus;
+  final bool allowPrepaidCards;
+  final bool billingAddressRequired;
+  final bool emailRequired;
+  final bool shippingAddressRequired;
+  final bool existingPaymentMethodRequired;
+
+  GooglePayConfigurationDTO(
+    this.googlePayEnvironment,
+    this.merchantAccount,
+    this.totalPriceStatus,
+    this.allowedCardNetworks,
+    this.allowedAuthMethods,
+    this.allowPrepaidCards,
+    this.billingAddressRequired,
+    this.emailRequired,
+    this.shippingAddressRequired,
+    this.existingPaymentMethodRequired,
+  );
+}
+
+class CashAppPayConfigurationDTO {
+  final CashAppPayEnvironment cashAppPayEnvironment;
+  final String returnUrl;
+
+  CashAppPayConfigurationDTO(
+    this.cashAppPayEnvironment,
+    this.returnUrl,
+  );
+}
+
+class PaymentResultDTO {
+  final PaymentResultEnum type;
+  final String? reason;
+  final PaymentResultModelDTO? result;
+
+  PaymentResultDTO(
+    this.type,
+    this.reason,
+    this.result,
+  );
+}
+
+class PaymentResultModelDTO {
   final String? sessionId;
   final String? sessionData;
   final String? resultCode;
-  final OrderResponseModel? order;
+  final OrderResponseDTO? order;
 
-  PaymentResultModel(
+  PaymentResultModelDTO(
     this.sessionId,
     this.sessionData,
     this.resultCode,
@@ -90,13 +220,13 @@ class PaymentResultModel {
   );
 }
 
-class OrderResponseModel {
+class OrderResponseDTO {
   final String pspReference;
   final String orderData;
-  final Amount? amount;
-  final Amount? remainingAmount;
+  final AmountDTO? amount;
+  final AmountDTO? remainingAmount;
 
-  OrderResponseModel({
+  OrderResponseDTO({
     required this.pspReference,
     required this.orderData,
     this.amount,
@@ -107,7 +237,7 @@ class OrderResponseModel {
 class PlatformCommunicationModel {
   final PlatformCommunicationType type;
   final String? data;
-  final PaymentResult? paymentResult;
+  final PaymentResultDTO? paymentResult;
 
   PlatformCommunicationModel({
     required this.type,
@@ -116,20 +246,14 @@ class PlatformCommunicationModel {
   });
 }
 
-enum PlatformCommunicationType {
-  paymentComponent,
-  additionalDetails,
-  result,
-}
-
 //Use DropInOutcome class when sealed classes are supported by pigeon
-class DropInResult {
+class DropInResultDTO {
   final DropInResultType dropInResultType;
   final String? result;
   final Map<String?, Object?>? actionResponse;
-  final DropInError? error;
+  final DropInErrorDTO? error;
 
-  DropInResult({
+  DropInResultDTO({
     required this.dropInResultType,
     this.result,
     this.actionResponse,
@@ -137,18 +261,12 @@ class DropInResult {
   });
 }
 
-enum DropInResultType {
-  finished,
-  action,
-  error,
-}
-
-class DropInError {
+class DropInErrorDTO {
   final String? errorMessage;
   final String? reason;
   final bool? dismissDropIn;
 
-  DropInError({
+  DropInErrorDTO({
     this.errorMessage,
     this.reason,
     this.dismissDropIn = false,
@@ -164,23 +282,23 @@ abstract class CheckoutPlatformInterface {
   String getReturnUrl();
 
   void startDropInSessionPayment(
-    DropInConfiguration dropInConfiguration,
-    Session session,
+    DropInConfigurationDTO dropInConfigurationDTO,
+    SessionDTO session,
   );
 
   void startDropInAdvancedFlowPayment(
-    DropInConfiguration dropInConfiguration,
+    DropInConfigurationDTO dropInConfigurationDTO,
     String paymentMethodsResponse,
   );
 
-  void onPaymentsResult(DropInResult paymentsResult);
+  void onPaymentsResult(DropInResultDTO paymentsResult);
 
-  void onPaymentsDetailsResult(DropInResult paymentsDetailsResult);
+  void onPaymentsDetailsResult(DropInResultDTO paymentsDetailsResult);
 }
 
 @FlutterApi()
 abstract class CheckoutFlutterApi {
-  void onDropInSessionResult(PaymentResult sessionPaymentResult);
+  void onDropInSessionResult(PaymentResultDTO sessionPaymentResult);
 
   void onDropInAdvancedFlowPlatformCommunication(
       PlatformCommunicationModel platformCommunicationModel);

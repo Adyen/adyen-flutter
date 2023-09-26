@@ -2,12 +2,12 @@ package com.adyen.adyen_checkout
 
 import CheckoutFlutterApi
 import CheckoutPlatformInterface
-import DropInConfiguration
-import DropInResult
+import DropInConfigurationDTO
+import DropInResultDTO
 import DropInResultType
 import PlatformCommunicationModel
 import PlatformCommunicationType
-import Session
+import SessionDTO
 import androidx.activity.result.ActivityResultLauncher
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.lifecycleScope
@@ -16,9 +16,9 @@ import com.adyen.adyen_checkout.dropInAdvancedFlow.DropInAdditionalDetailsPlatfo
 import com.adyen.adyen_checkout.dropInAdvancedFlow.DropInAdditionalDetailsResultMessenger
 import com.adyen.adyen_checkout.dropInAdvancedFlow.DropInPaymentResultMessenger
 import com.adyen.adyen_checkout.dropInAdvancedFlow.DropInServiceResultMessenger
+import com.adyen.adyen_checkout.utils.ConfigurationMapper.mapToDropInConfiguration
+import com.adyen.adyen_checkout.utils.ConfigurationMapper.mapToSession
 import com.adyen.adyen_checkout.utils.Constants.Companion.WRONG_FLUTTER_ACTIVITY_USAGE_ERROR_MESSAGE
-import com.adyen.adyen_checkout.utils.Mapper.mapToDropInConfiguration
-import com.adyen.adyen_checkout.utils.Mapper.mapToSession
 import com.adyen.checkout.components.core.PaymentMethodsApiResponse
 import com.adyen.checkout.dropin.DropIn
 import com.adyen.checkout.dropin.internal.ui.model.DropInResultContractParams
@@ -49,14 +49,14 @@ class CheckoutPlatformApi(private val checkoutFlutterApi: CheckoutFlutterApi?) :
         }
 
         override fun startDropInSessionPayment(
-            dropInConfiguration: DropInConfiguration,
-            session: Session,
+            dropInConfigurationDTO: DropInConfigurationDTO,
+            session: SessionDTO,
         ) {
             checkForFlutterFragmentActivity()
             activity.lifecycleScope.launch(Dispatchers.IO) {
                 val sessionModel = session.mapToSession()
                 val dropInConfiguration =
-                    dropInConfiguration.mapToDropInConfiguration(activity.applicationContext)
+                    dropInConfigurationDTO.mapToDropInConfiguration(activity.applicationContext)
                 val checkoutSession = createCheckoutSession(sessionModel, dropInConfiguration)
                 withContext(Dispatchers.Main) {
                     DropIn.startPayment(
@@ -70,7 +70,7 @@ class CheckoutPlatformApi(private val checkoutFlutterApi: CheckoutFlutterApi?) :
         }
 
         override fun startDropInAdvancedFlowPayment(
-            dropInConfiguration: DropInConfiguration,
+            dropInConfigurationDTO: DropInConfigurationDTO,
             paymentMethodsResponse: String,
         ) {
             checkForFlutterFragmentActivity()
@@ -82,7 +82,7 @@ class CheckoutPlatformApi(private val checkoutFlutterApi: CheckoutFlutterApi?) :
                 val paymentMethodsWithoutGiftCards =
                     removeGiftCardPaymentMethods(paymentMethodsApiResponse)
                 val dropInConfiguration =
-                    dropInConfiguration.mapToDropInConfiguration(activity.applicationContext)
+                    dropInConfigurationDTO.mapToDropInConfiguration(activity.applicationContext)
                 withContext(Dispatchers.Main) {
                     DropIn.startPayment(
                         activity.applicationContext,
@@ -95,7 +95,7 @@ class CheckoutPlatformApi(private val checkoutFlutterApi: CheckoutFlutterApi?) :
             }
         }
 
-        override fun onPaymentsResult(paymentsResult: DropInResult) {
+        override fun onPaymentsResult(paymentsResult: DropInResultDTO) {
             if (paymentsResult.dropInResultType == DropInResultType.ACTION) {
                 setAdvanceFlowDropInAdditionalDetailsMessengerObserver()
             }
@@ -103,7 +103,7 @@ class CheckoutPlatformApi(private val checkoutFlutterApi: CheckoutFlutterApi?) :
             DropInPaymentResultMessenger.sendResult(paymentsResult)
         }
 
-        override fun onPaymentsDetailsResult(paymentsDetailsResult: DropInResult) {
+        override fun onPaymentsDetailsResult(paymentsDetailsResult: DropInResultDTO) {
             DropInAdditionalDetailsResultMessenger.sendResult(paymentsDetailsResult)
         }
 

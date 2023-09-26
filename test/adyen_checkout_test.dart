@@ -1,5 +1,5 @@
-import 'package:adyen_checkout/platform_api.g.dart';
 import 'package:adyen_checkout/src/adyen_checkout.dart';
+import 'package:adyen_checkout/src/generated/platform_api.g.dart';
 import 'package:adyen_checkout/src/platform/adyen_checkout_platform_interface.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
@@ -11,11 +11,11 @@ class MockAdyenCheckoutPlatform
   Future<String> getPlatformVersion() => Future.value('42');
 
   @override
-  Future<void> startDropInSessionPayment(
-    Session sessionModel,
-    DropInConfiguration dropInConfiguration,
-  ) =>
-      Future.value(null);
+  void startDropInSessionPayment(
+      {required SessionDTO session,
+      required DropInConfigurationDTO dropInConfiguration}) {
+    return;
+  }
 
   @override
   Future<String> getReturnUrl() {
@@ -23,18 +23,19 @@ class MockAdyenCheckoutPlatform
   }
 
   @override
-  Future<String> startDropInAdvancedFlowPayment(
-    String paymentMethodsResponse,
-    DropInConfiguration dropInConfiguration,
-  ) =>
+  void startDropInAdvancedFlowPayment({
+    required String paymentMethodsResponse,
+    required DropInConfigurationDTO dropInConfiguration,
+  }) {
+    return;
+  }
+
+  @override
+  Future<String> onPaymentsResult(DropInResultDTO paymentsResult) =>
       Future.value("Result");
 
   @override
-  Future<String> onPaymentsResult(DropInResult paymentsResult) =>
-      Future.value("Result");
-
-  @override
-  Future<void> onPaymentsDetailsResult(DropInResult paymentsDetailsResult) {
+  Future<void> onPaymentsDetailsResult(DropInResultDTO paymentsDetailsResult) {
     return Future.value(null);
   }
 }

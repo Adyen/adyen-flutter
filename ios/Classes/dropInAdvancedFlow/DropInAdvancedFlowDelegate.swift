@@ -52,7 +52,7 @@ class DropInAdvancedFlowDelegate : DropInComponentDelegate {
         dropInComponent.viewController.dismiss(animated: true, completion: {
             switch (error) {
             case ComponentError.cancelled:
-                let platformCommunicationModel = PlatformCommunicationModel(type: PlatformCommunicationType.result, paymentResult: PaymentResult(type: PaymentResultEnum.cancelledByUser, reason: error.localizedDescription))
+                let platformCommunicationModel = PlatformCommunicationModel(type: PlatformCommunicationType.result, paymentResult: PaymentResultDTO(type: PaymentResultEnum.cancelledByUser, reason: error.localizedDescription))
                 self.checkoutFlutterApi.onDropInAdvancedFlowPlatformCommunication(platformCommunicationModel: platformCommunicationModel, completion: {})
             default:
                 self.sendErrorToFlutterLayer(error: error)
@@ -61,7 +61,7 @@ class DropInAdvancedFlowDelegate : DropInComponentDelegate {
     }
     
     private func sendErrorToFlutterLayer(error: Error) {
-        let platformCommunicationModel = PlatformCommunicationModel(type: PlatformCommunicationType.result, paymentResult: PaymentResult(type: PaymentResultEnum.error, reason: error.localizedDescription))
+        let platformCommunicationModel = PlatformCommunicationModel(type: PlatformCommunicationType.result, paymentResult: PaymentResultDTO(type: PaymentResultEnum.error, reason: error.localizedDescription))
         checkoutFlutterApi.onDropInAdvancedFlowPlatformCommunication(platformCommunicationModel: platformCommunicationModel, completion: {})
     }
 }
