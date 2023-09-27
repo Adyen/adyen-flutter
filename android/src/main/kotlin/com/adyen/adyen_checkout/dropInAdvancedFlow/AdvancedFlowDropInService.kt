@@ -46,21 +46,12 @@ class AdvancedFlowDropInService : DropInService(), LifecycleOwner {
         onPaymentComponentState(paymentComponentState)
 
     override fun onRemoveStoredPaymentMethod(storedPaymentMethod: StoredPaymentMethod) {
-        try {
-            setDropInDeleteStoredPaymentMethodObserver()
-            val storedPaymentMethodId = storedPaymentMethod.id.orEmpty()
-            val dropInStoredPaymentMethodDeletionModel =
-                DropInStoredPaymentMethodDeletionModel(storedPaymentMethodId, DropInFlowType.ADVANCED_FLOW)
-            DropInPaymentMethodDeletionPlatformMessenger.sendResult(dropInStoredPaymentMethodDeletionModel)
-        } catch (exception: Exception) {
-            sendResult(
-                DropInServiceResult.Error(
-                    errorDialog = null,
-                    reason = exception.message,
-                    dismissDropIn = true
-                )
-            )
-        }
+        setStoredPaymentMethodDeletionObserver()
+        val dropInStoredPaymentMethodDeletionModel = DropInStoredPaymentMethodDeletionModel(
+            storedPaymentMethod.id.orEmpty(),
+            DropInFlowType.ADVANCED_FLOW
+        )
+        DropInPaymentMethodDeletionPlatformMessenger.sendResult(dropInStoredPaymentMethodDeletionModel)
     }
 
     private fun onPaymentComponentState(paymentComponentState: PaymentComponentState<*>) {
@@ -104,7 +95,7 @@ class AdvancedFlowDropInService : DropInService(), LifecycleOwner {
         }
     }
 
-    private fun setDropInDeleteStoredPaymentMethodObserver() {
+    private fun setStoredPaymentMethodDeletionObserver() {
         DropInPaymentMethodDeletionResultMessenger.instance().removeObservers(this)
         DropInPaymentMethodDeletionResultMessenger.instance().observe(this) { message ->
             if (message.hasBeenHandled()) {
@@ -121,7 +112,7 @@ class AdvancedFlowDropInService : DropInService(), LifecycleOwner {
         return if (deleteStoredPaymentMethodResultDTO?.isSuccessfullyRemoved == true) {
             RecurringDropInServiceResult.PaymentMethodRemoved(deleteStoredPaymentMethodResultDTO.storedPaymentMethodId)
         } else {
-            RecurringDropInServiceResult.Error(errorDialog = ErrorDialog(message = "IOException"))
+            RecurringDropInServiceResult.Error(errorDialog = ErrorDialog())
         }
     }
 

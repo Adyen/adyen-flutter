@@ -93,7 +93,6 @@ class _MyAppState extends State<MyApp> {
     final CardsConfiguration cardsConfiguration = CardsConfiguration(
       showStorePaymentField: true,
       showCvcForStoredCard: true,
-      addressMode: AddressMode.full
     );
 
     final StoredPaymentMethodConfiguration storedPaymentMethodConfiguration =

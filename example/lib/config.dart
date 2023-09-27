@@ -17,8 +17,8 @@ class Config {
   //Environment constants
   static const String merchantAccount = "TestMerchantCheckout";
   static const String merchantName = "Test Merchant";
-  static const String countryCode = "NL";
-  static const String shopperLocale = "nl-NL";
+  static const String countryCode = "US";
+  static const String shopperLocale = "us-US";
   static const String shopperReference = "Test reference";
   static const Environment environment = Environment.test;
   static const String baseUrl = "checkout-test.adyen.com";

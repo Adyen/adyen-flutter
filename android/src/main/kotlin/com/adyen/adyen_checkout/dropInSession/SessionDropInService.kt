@@ -11,7 +11,6 @@ import com.adyen.adyen_checkout.dropInAdvancedFlow.DropInPaymentMethodDeletionRe
 import com.adyen.adyen_checkout.models.DropInFlowType
 import com.adyen.adyen_checkout.models.DropInStoredPaymentMethodDeletionModel
 import com.adyen.checkout.components.core.StoredPaymentMethod
-import com.adyen.checkout.dropin.DropInServiceResult
 import com.adyen.checkout.dropin.ErrorDialog
 import com.adyen.checkout.dropin.RecurringDropInServiceResult
 import com.adyen.checkout.dropin.SessionDropInService
@@ -20,24 +19,15 @@ class SessionDropInService : SessionDropInService(), LifecycleOwner {
     private val dispatcher = ServiceLifecycleDispatcher(this)
 
     override fun onRemoveStoredPaymentMethod(storedPaymentMethod: StoredPaymentMethod) {
-        try {
-            setDropInDeleteStoredPaymentMethodObserver()
-            val storedPaymentMethodId = storedPaymentMethod.id.orEmpty()
-            val dropInStoredPaymentMethodDeletionModel =
-                DropInStoredPaymentMethodDeletionModel(storedPaymentMethodId, DropInFlowType.SESSION)
-            DropInPaymentMethodDeletionPlatformMessenger.sendResult(dropInStoredPaymentMethodDeletionModel)
-        } catch (exception: Exception) {
-            sendResult(
-                DropInServiceResult.Error(
-                    errorDialog = null,
-                    reason = exception.message,
-                    dismissDropIn = true
-                )
-            )
-        }
+        setStoredPaymentMethodDeletionObserver()
+        val dropInStoredPaymentMethodDeletionModel = DropInStoredPaymentMethodDeletionModel(
+            storedPaymentMethod.id.orEmpty(),
+            DropInFlowType.SESSION
+        )
+        DropInPaymentMethodDeletionPlatformMessenger.sendResult(dropInStoredPaymentMethodDeletionModel)
     }
 
-    private fun setDropInDeleteStoredPaymentMethodObserver() {
+    private fun setStoredPaymentMethodDeletionObserver() {
         DropInPaymentMethodDeletionResultMessenger.instance().removeObservers(this)
         DropInPaymentMethodDeletionResultMessenger.instance().observe(this) { message ->
             if (message.hasBeenHandled()) {
@@ -54,7 +44,7 @@ class SessionDropInService : SessionDropInService(), LifecycleOwner {
         return if (deleteStoredPaymentMethodResultDTO?.isSuccessfullyRemoved == true) {
             RecurringDropInServiceResult.PaymentMethodRemoved(deleteStoredPaymentMethodResultDTO.storedPaymentMethodId)
         } else {
-            RecurringDropInServiceResult.Error(errorDialog = ErrorDialog(message = "IOException"))
+            RecurringDropInServiceResult.Error(errorDialog = ErrorDialog())
         }
     }
 
