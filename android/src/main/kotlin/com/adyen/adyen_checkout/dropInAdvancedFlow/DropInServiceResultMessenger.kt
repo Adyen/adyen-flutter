@@ -3,6 +3,7 @@ package com.adyen.adyen_checkout.dropInAdvancedFlow
 import DeletedStoredPaymentMethodResultDTO
 import DropInResultDTO
 import androidx.lifecycle.LiveData
+import com.adyen.adyen_checkout.models.DropInStoredPaymentMethodDeletionModel
 import com.adyen.adyen_checkout.utils.Event
 import org.json.JSONObject
 
@@ -51,13 +52,13 @@ class DropInAdditionalDetailsResultMessenger : LiveData<Event<DropInResultDTO>>(
     }
 }
 
-class DropInPaymentMethodDeletionPlatformMessenger : LiveData<Event<String>>() {
+class DropInPaymentMethodDeletionPlatformMessenger : LiveData<Event<DropInStoredPaymentMethodDeletionModel>>() {
     companion object {
         private val dropInPaymentMethodDeletionPlatformMessenger =
             DropInPaymentMethodDeletionPlatformMessenger()
 
         fun instance() = dropInPaymentMethodDeletionPlatformMessenger
-        fun sendResult(value: String) {
+        fun sendResult(value: DropInStoredPaymentMethodDeletionModel) {
             dropInPaymentMethodDeletionPlatformMessenger.postValue(Event(value))
         }
     }

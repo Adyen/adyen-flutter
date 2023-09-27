@@ -945,9 +945,9 @@ class CheckoutFlutterApi(private val binaryMessenger: BinaryMessenger) {
       CheckoutFlutterApiCodec
     }
   }
-  fun onDropInSessionResult(sessionPaymentResultArg: PaymentResultDTO, callback: () -> Unit) {
-    val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.adyen_checkout.CheckoutFlutterApi.onDropInSessionResult", codec)
-    channel.send(listOf(sessionPaymentResultArg)) {
+  fun onDropInSessionPlatformCommunication(platformCommunicationModelArg: PlatformCommunicationModel, callback: () -> Unit) {
+    val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.adyen_checkout.CheckoutFlutterApi.onDropInSessionPlatformCommunication", codec)
+    channel.send(listOf(platformCommunicationModelArg)) {
       callback()
     }
   }

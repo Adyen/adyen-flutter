@@ -1,4 +1,4 @@
-import 'package:adyen_checkout/src/models/adyen_configuration.dart';
+import 'package:adyen_checkout/src/models/drop_in_configuration.dart';
 import 'package:adyen_checkout/src/models/drop_in_outcome.dart';
 import 'package:adyen_checkout/src/models/session.dart';
 

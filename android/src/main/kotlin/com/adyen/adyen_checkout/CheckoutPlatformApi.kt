@@ -19,6 +19,8 @@ import com.adyen.adyen_checkout.dropInAdvancedFlow.DropInPaymentMethodDeletionPl
 import com.adyen.adyen_checkout.dropInAdvancedFlow.DropInPaymentMethodDeletionResultMessenger
 import com.adyen.adyen_checkout.dropInAdvancedFlow.DropInPaymentResultMessenger
 import com.adyen.adyen_checkout.dropInAdvancedFlow.DropInServiceResultMessenger
+import com.adyen.adyen_checkout.dropInSession.SessionDropInService
+import com.adyen.adyen_checkout.models.DropInFlowType
 import com.adyen.adyen_checkout.utils.ConfigurationMapper.mapToDropInConfiguration
 import com.adyen.adyen_checkout.utils.ConfigurationMapper.mapToSession
 import com.adyen.adyen_checkout.utils.Constants.Companion.WRONG_FLUTTER_ACTIVITY_USAGE_ERROR_MESSAGE
@@ -56,6 +58,7 @@ class CheckoutPlatformApi(private val checkoutFlutterApi: CheckoutFlutterApi?) :
             session: SessionDTO,
         ) {
             checkForFlutterFragmentActivity()
+            setStoredPaymentMethodDeletionObserver()
             activity.lifecycleScope.launch(Dispatchers.IO) {
                 val sessionModel = session.mapToSession()
                 val dropInConfiguration =
@@ -67,6 +70,7 @@ class CheckoutPlatformApi(private val checkoutFlutterApi: CheckoutFlutterApi?) :
                         dropInSessionLauncher,
                         checkoutSession,
                         dropInConfiguration,
+                        SessionDropInService::class.java
                     )
                 }
             }
@@ -152,12 +156,23 @@ class CheckoutPlatformApi(private val checkoutFlutterApi: CheckoutFlutterApi?) :
                     return@observe
                 }
 
-                val model = PlatformCommunicationModel(
+                val dropInStoredPaymentMethodDeletionModel = message.contentIfNotHandled
+                val platformCommunicationModel = PlatformCommunicationModel(
                     PlatformCommunicationType.DELETESTOREDPAYMENTMETHOD,
-                    data = message.contentIfNotHandled.toString(),
+                    data = dropInStoredPaymentMethodDeletionModel?.storedPaymentMethodId,
                 )
 
-                checkoutFlutterApi?.onDropInAdvancedFlowPlatformCommunication(model) {}
+                when (dropInStoredPaymentMethodDeletionModel?.dropInFlowType) {
+                    DropInFlowType.SESSION -> checkoutFlutterApi?.onDropInSessionPlatformCommunication(
+                        platformCommunicationModel
+                    ) {}
+
+                    DropInFlowType.ADVANCED_FLOW -> checkoutFlutterApi?.onDropInAdvancedFlowPlatformCommunication(
+                        platformCommunicationModel
+                    ) {}
+
+                    null -> return@observe
+                }
             }
         }
 
@@ -168,11 +183,12 @@ class CheckoutPlatformApi(private val checkoutFlutterApi: CheckoutFlutterApi?) :
                     return@observe
                 }
 
-                val model = PlatformCommunicationModel(
+                val platformCommunicationModel = PlatformCommunicationModel(
                     PlatformCommunicationType.ADDITIONALDETAILS,
                     data = message.contentIfNotHandled.toString(),
                 )
-                checkoutFlutterApi?.onDropInAdvancedFlowPlatformCommunication(model) {}
+
+                checkoutFlutterApi?.onDropInAdvancedFlowPlatformCommunication(platformCommunicationModel) {}
             }
         }
 

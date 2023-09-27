@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:adyen_checkout/adyen_checkout.dart';
 import 'package:adyen_checkout/src/adyen_checkout_interface.dart';
@@ -34,30 +35,28 @@ class AdyenCheckout implements AdyenCheckoutInterface {
 
   Future<PaymentResult> _startDropInSessionsPayment(
       DropInSession dropInSession) async {
-    _resultApi.dropInSessionResultStream = StreamController<PaymentResultDTO>();
-
+    final dropInSessionCompleter = Completer<PaymentResultDTO>();
     DropInConfigurationDTO dropInConfiguration = DropInConfigurationDTO(
       environment: dropInSession.dropInConfiguration.environment,
       clientKey: dropInSession.dropInConfiguration.clientKey,
       countryCode: dropInSession.dropInConfiguration.countryCode,
-      amount: dropInSession.dropInConfiguration.amount,
-      shopperLocale: dropInSession.dropInConfiguration.shopperLocale,
+      amount: dropInSession.dropInConfiguration.amount.toDTO(),
+      shopperLocale: dropInSession.dropInConfiguration.shopperLocale ??
+          Platform.localeName,
       cardsConfigurationDTO:
-          dropInSession.dropInConfiguration.cardsConfigurationDTO,
+          dropInSession.dropInConfiguration.cardsConfiguration?.toDTO(),
       applePayConfigurationDTO:
-          dropInSession.dropInConfiguration.applePayConfigurationDTO,
+          dropInSession.dropInConfiguration.applePayConfiguration?.toDTO(),
       googlePayConfigurationDTO:
-          dropInSession.dropInConfiguration.googlePayConfigurationDTO,
+          dropInSession.dropInConfiguration.googlePayConfiguration?.toDTO(),
       cashAppPayConfigurationDTO:
-          dropInSession.dropInConfiguration.cashAppPayConfigurationDTO,
+          dropInSession.dropInConfiguration.cashAppPayConfiguration?.toDTO(),
       analyticsOptionsDTO:
-          dropInSession.dropInConfiguration.analyticsOptionsDTO,
-      //TODO - Remove disable flag for store payment field when native SDK receive updates.
-      isRemoveStoredPaymentMethodEnabled: false,
-      // isRemoveStoredPaymentMethodEnabled:
-      //     dropInSession.dropInConfiguration.isRemoveStoredPaymentMethodEnabled,
-      showPreselectedStoredPaymentMethod:
-          dropInSession.dropInConfiguration.showPreselectedStoredPaymentMethod,
+          dropInSession.dropInConfiguration.analyticsOptions?.toDTO(),
+      isRemoveStoredPaymentMethodEnabled:
+          isRemoveStoredPaymentMethodEnabled(dropInSession.dropInConfiguration),
+      showPreselectedStoredPaymentMethod: dropInSession.dropInConfiguration
+          .storedPaymentMethodConfiguration?.showPreselectedStoredPaymentMethod,
       skipListWhenSinglePaymentMethod:
           dropInSession.dropInConfiguration.skipListWhenSinglePaymentMethod,
     );
@@ -67,10 +66,27 @@ class AdyenCheckout implements AdyenCheckoutInterface {
       dropInConfiguration: dropInConfiguration,
     );
 
-    final sessionDropInResultModel =
-        await _resultApi.dropInSessionResultStream.stream.first;
-    await _resultApi.dropInSessionResultStream.close();
-    return sessionDropInResultModel.fromDTO();
+    _resultApi.dropInSessionPlatformCommunicationStream =
+        StreamController<PlatformCommunicationModel>.broadcast();
+    _resultApi.dropInSessionPlatformCommunicationStream.stream
+        .asBroadcastStream()
+        .listen((event) async {
+      switch (event.type) {
+        case PlatformCommunicationType.result:
+          dropInSessionCompleter.complete(event.paymentResult);
+        case PlatformCommunicationType.deleteStoredPaymentMethod:
+          _onDeleteStoredPaymentMethodCallback(
+            event,
+            dropInSession.dropInConfiguration.storedPaymentMethodConfiguration,
+          );
+        default:
+      }
+    });
+
+    return dropInSessionCompleter.future.then((value) {
+      _resultApi.dropInSessionPlatformCommunicationStream.close();
+      return value.fromDTO();
+    });
   }
 
   Future<PaymentResult> _startDropInAdvancedFlowPayment(
@@ -80,22 +96,23 @@ class AdyenCheckout implements AdyenCheckoutInterface {
       environment: dropInAdvancedFlow.dropInConfiguration.environment,
       clientKey: dropInAdvancedFlow.dropInConfiguration.clientKey,
       countryCode: dropInAdvancedFlow.dropInConfiguration.countryCode,
-      amount: dropInAdvancedFlow.dropInConfiguration.amount,
-      shopperLocale: dropInAdvancedFlow.dropInConfiguration.shopperLocale,
+      amount: dropInAdvancedFlow.dropInConfiguration.amount.toDTO(),
+      shopperLocale: dropInAdvancedFlow.dropInConfiguration.shopperLocale ??
+          Platform.localeName,
       cardsConfigurationDTO:
-          dropInAdvancedFlow.dropInConfiguration.cardsConfigurationDTO,
+      dropInAdvancedFlow.dropInConfiguration.cardsConfiguration?.toDTO(),
       applePayConfigurationDTO:
-          dropInAdvancedFlow.dropInConfiguration.applePayConfigurationDTO,
+      dropInAdvancedFlow.dropInConfiguration.applePayConfiguration?.toDTO(),
       googlePayConfigurationDTO:
-          dropInAdvancedFlow.dropInConfiguration.googlePayConfigurationDTO,
+      dropInAdvancedFlow.dropInConfiguration.googlePayConfiguration?.toDTO(),
       cashAppPayConfigurationDTO:
-          dropInAdvancedFlow.dropInConfiguration.cashAppPayConfigurationDTO,
+      dropInAdvancedFlow.dropInConfiguration.cashAppPayConfiguration?.toDTO(),
       analyticsOptionsDTO:
-          dropInAdvancedFlow.dropInConfiguration.analyticsOptionsDTO,
+      dropInAdvancedFlow.dropInConfiguration.analyticsOptions?.toDTO(),
       showPreselectedStoredPaymentMethod: dropInAdvancedFlow.dropInConfiguration
           .storedPaymentMethodConfiguration?.showPreselectedStoredPaymentMethod,
-      isRemoveStoredPaymentMethodEnabled: dropInAdvancedFlow.dropInConfiguration
-          .storedPaymentMethodConfiguration?.isRemoveStoredPaymentMethodEnabled,
+      isRemoveStoredPaymentMethodEnabled: isRemoveStoredPaymentMethodEnabled(
+          dropInAdvancedFlow.dropInConfiguration),
       skipListWhenSinglePaymentMethod: dropInAdvancedFlow
           .dropInConfiguration.skipListWhenSinglePaymentMethod,
     );
@@ -121,7 +138,8 @@ class AdyenCheckout implements AdyenCheckoutInterface {
         case PlatformCommunicationType.deleteStoredPaymentMethod:
           _onDeleteStoredPaymentMethodCallback(
             event,
-            dropInAdvancedFlow.dropInConfiguration,
+            dropInAdvancedFlow
+                .dropInConfiguration.storedPaymentMethodConfiguration,
           );
       }
     });
@@ -193,22 +211,30 @@ class AdyenCheckout implements AdyenCheckoutInterface {
 
   Future<void> _onDeleteStoredPaymentMethodCallback(
     PlatformCommunicationModel event,
-    DropInConfiguration dropInConfiguration,
+    StoredPaymentMethodConfiguration? storedPaymentMethodConfiguration,
   ) async {
-    if (dropInConfiguration.storedPaymentMethodConfiguration
-            ?.deleteStoredPaymentMethodCallback ==
-        null) {
-      return;
-    } else {
+    if (storedPaymentMethodConfiguration != null &&
+        storedPaymentMethodConfiguration.deleteStoredPaymentMethodCallback !=
+            null &&
+        event.data != null) {
       final storedPaymentMethodId = event.data;
-      final result = await dropInConfiguration.storedPaymentMethodConfiguration
-              ?.deleteStoredPaymentMethodCallback!(storedPaymentMethodId!) ??
-          false;
+      final result = await storedPaymentMethodConfiguration
+          .deleteStoredPaymentMethodCallback!(storedPaymentMethodId!);
       AdyenCheckoutPlatformInterface.instance.onDeleteStoredPaymentMethodResult(
           DeletedStoredPaymentMethodResultDTO(
-        storedPaymentMethodId: storedPaymentMethodId!,
+        storedPaymentMethodId: storedPaymentMethodId,
         isSuccessfullyRemoved: result,
       ));
     }
+  }
+
+  bool isRemoveStoredPaymentMethodEnabled(
+      DropInConfiguration dropInConfiguration) {
+    return dropInConfiguration.storedPaymentMethodConfiguration
+                ?.deleteStoredPaymentMethodCallback !=
+            null &&
+        dropInConfiguration.storedPaymentMethodConfiguration
+                ?.isRemoveStoredPaymentMethodEnabled ==
+            true;
   }
 }

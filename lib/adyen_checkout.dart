@@ -8,8 +8,8 @@ export 'src/generated/platform_api.g.dart'
         PaymentResultEnum,
         GooglePayEnvironment,
         CashAppPayEnvironment;
-export 'src/models/adyen_configuration.dart';
 export 'src/models/amount.dart';
+export 'src/models/drop_in_configuration.dart';
 export 'src/models/drop_in_outcome.dart';
 export 'src/models/oder_response.dart';
 export 'src/models/payment_flow.dart';

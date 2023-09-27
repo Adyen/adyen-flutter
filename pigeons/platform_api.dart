@@ -314,7 +314,8 @@ abstract class CheckoutPlatformInterface {
 
 @FlutterApi()
 abstract class CheckoutFlutterApi {
-  void onDropInSessionResult(PaymentResultDTO sessionPaymentResult);
+  void onDropInSessionPlatformCommunication(
+      PlatformCommunicationModel platformCommunicationModel);
 
   void onDropInAdvancedFlowPlatformCommunication(
       PlatformCommunicationModel platformCommunicationModel);

@@ -1,6 +1,6 @@
 import Adyen
 
-class DropInAdvancedFlowStoredPaymentMethodsDelegate : StoredPaymentMethodsDelegate {
+class DropInSessionsStoredPaymentMethodsDelegate : StoredPaymentMethodsDelegate {
     private let checkoutFlutterApi: CheckoutFlutterApi
     private var completionHandler: ((Bool) -> Void)?
     
@@ -11,10 +11,11 @@ class DropInAdvancedFlowStoredPaymentMethodsDelegate : StoredPaymentMethodsDeleg
     internal func disable(storedPaymentMethod: StoredPaymentMethod, completion: @escaping (Bool) -> Void) {
         completionHandler = completion
         let platformCommunicationModel = PlatformCommunicationModel(type: PlatformCommunicationType.deleteStoredPaymentMethod, data: storedPaymentMethod.identifier)
-        checkoutFlutterApi.onDropInAdvancedFlowPlatformCommunication(platformCommunicationModel: platformCommunicationModel, completion: {})
+        checkoutFlutterApi.onDropInSessionPlatformCommunication(platformCommunicationModel: platformCommunicationModel, completion: {})
     }
     
     func handleDisableResult(isSuccessfullyRemoved: Bool) {
         completionHandler?(isSuccessfullyRemoved)
     }
 }
+

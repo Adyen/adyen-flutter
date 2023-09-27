@@ -18,8 +18,8 @@ class CheckoutPlatformApi : CheckoutPlatformInterface {
     private var dropInSessionDelegate : AdyenSessionDelegate?
     private var dropInSessionPresentationDelegate : PresentationDelegate?
     private var dropInAdvancedFlowDelegate : DropInComponentDelegate?
-    private var storedPaymentMethodsDelegate : StoredPaymentMethodsDelegate?
-
+    private var dropInSessionStoredPaymentMethodsDelegate: DropInSessionsStoredPaymentMethodsDelegate?
+    private var dropInAdvancedFlowStoredPaymentMethodsDelegate : DropInAdvancedFlowStoredPaymentMethodsDelegate?
     
     init(checkoutFlutterApi: CheckoutFlutterApi) {
         self.checkoutFlutterApi = checkoutFlutterApi
@@ -43,6 +43,8 @@ class CheckoutPlatformApi : CheckoutPlatformInterface {
             let sessionConfiguration = AdyenSession.Configuration(sessionIdentifier: session.id,
                                                                   initialSessionData: session.sessionData,
                                                                   context: adyenContext)
+            self.dropInSessionStoredPaymentMethodsDelegate = DropInSessionsStoredPaymentMethodsDelegate(checkoutFlutterApi: self.checkoutFlutterApi)
+
             AdyenSession.initialize(with: sessionConfiguration,
                                     delegate: dropInSessionDelegate!,
                                     presentationDelegate: dropInSessionPresentationDelegate!) { [weak self] result in
@@ -56,17 +58,23 @@ class CheckoutPlatformApi : CheckoutPlatformInterface {
                                                               configuration: dropInConfiguration!)
                         dropInComponent.delegate = session
                         dropInComponent.partialPaymentDelegate = session
+                        if (dropInConfigurationDTO.isRemoveStoredPaymentMethodEnabled == true) {
+                            dropInComponent.storedPaymentMethodsDelegate = self?.dropInSessionStoredPaymentMethodsDelegate
+                        }
                         self?.dropInComponent = dropInComponent
                         self?.viewController?.present(dropInComponent.viewController, animated: true)
                     } catch let error {
-                        self?.checkoutFlutterApi.onDropInSessionResult(sessionPaymentResult: PaymentResultDTO(type: PaymentResultEnum.error, reason: error.localizedDescription)) {}
+                        let platformCommunicationModel = PlatformCommunicationModel(type: PlatformCommunicationType.result, paymentResult: PaymentResultDTO(type: PaymentResultEnum.error, reason: error.localizedDescription))
+                        self?.checkoutFlutterApi.onDropInSessionPlatformCommunication(platformCommunicationModel: platformCommunicationModel, completion: {})
                     }
                 case let .failure(error):
-                    self?.checkoutFlutterApi.onDropInSessionResult(sessionPaymentResult: PaymentResultDTO(type: PaymentResultEnum.error, reason: error.localizedDescription)) {}
+                    let platformCommunicationModel = PlatformCommunicationModel(type: PlatformCommunicationType.result, paymentResult: PaymentResultDTO(type: PaymentResultEnum.error, reason: error.localizedDescription))
+                    self?.checkoutFlutterApi.onDropInSessionPlatformCommunication(platformCommunicationModel: platformCommunicationModel, completion: {})
                 }
             }
         } catch let error {
-            checkoutFlutterApi.onDropInSessionResult(sessionPaymentResult: PaymentResultDTO(type: PaymentResultEnum.error, reason: error.localizedDescription)) {}
+            let platformCommunicationModel = PlatformCommunicationModel(type: PlatformCommunicationType.result, paymentResult: PaymentResultDTO(type: PaymentResultEnum.error, reason: error.localizedDescription))
+            checkoutFlutterApi.onDropInSessionPlatformCommunication(platformCommunicationModel: platformCommunicationModel, completion: {})
         }
     }
     
@@ -84,9 +92,11 @@ class CheckoutPlatformApi : CheckoutPlatformInterface {
                                                   context: adyenContext,
                                                   configuration: configuration)
             dropInAdvancedFlowDelegate = DropInAdvancedFlowDelegate(checkoutFlutterApi: checkoutFlutterApi, component: dropInComponent)
-            storedPaymentMethodsDelegate = DropInAdvancedFlowStoredPaymentMethodsDelegate()
+            dropInAdvancedFlowStoredPaymentMethodsDelegate = DropInAdvancedFlowStoredPaymentMethodsDelegate(checkoutFlutterApi: checkoutFlutterApi)
             dropInComponent.delegate = dropInAdvancedFlowDelegate
-            dropInComponent.storedPaymentMethodsDelegate = storedPaymentMethodsDelegate
+            if (dropInConfigurationDTO.isRemoveStoredPaymentMethodEnabled == true) {
+                dropInComponent.storedPaymentMethodsDelegate = dropInAdvancedFlowStoredPaymentMethodsDelegate
+            }
             self.dropInComponent = dropInComponent
             self.viewController?.present(dropInComponent.viewController, animated: true)
         } catch let error {
@@ -105,6 +115,11 @@ class CheckoutPlatformApi : CheckoutPlatformInterface {
     
     func onPaymentsDetailsResult(paymentsDetailsResult: DropInResultDTO) {
         handleDropInResult(dropInResult: paymentsDetailsResult)
+    }
+    
+    func onDeleteStoredPaymentMethodResult(deleteStoredPaymentMethodResultDTO: DeletedStoredPaymentMethodResultDTO) {
+        dropInSessionStoredPaymentMethodsDelegate?.handleDisableResult(isSuccessfullyRemoved: deleteStoredPaymentMethodResultDTO.isSuccessfullyRemoved)
+        dropInAdvancedFlowStoredPaymentMethodsDelegate?.handleDisableResult(isSuccessfullyRemoved: deleteStoredPaymentMethodResultDTO.isSuccessfullyRemoved)
     }
     
     private func getViewController() -> UIViewController? {

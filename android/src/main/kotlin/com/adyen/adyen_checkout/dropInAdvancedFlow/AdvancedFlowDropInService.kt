@@ -8,6 +8,8 @@ import android.os.IBinder
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ServiceLifecycleDispatcher
+import com.adyen.adyen_checkout.models.DropInFlowType
+import com.adyen.adyen_checkout.models.DropInStoredPaymentMethodDeletionModel
 import com.adyen.checkout.components.core.ActionComponentData
 import com.adyen.checkout.components.core.PaymentComponentData
 import com.adyen.checkout.components.core.PaymentComponentState
@@ -45,9 +47,11 @@ class AdvancedFlowDropInService : DropInService(), LifecycleOwner {
 
     override fun onRemoveStoredPaymentMethod(storedPaymentMethod: StoredPaymentMethod) {
         try {
-            setAdvancedFlowDropInDeleteStoredPaymentMethodObserver()
+            setDropInDeleteStoredPaymentMethodObserver()
             val storedPaymentMethodId = storedPaymentMethod.id.orEmpty()
-            DropInPaymentMethodDeletionPlatformMessenger.sendResult(storedPaymentMethodId)
+            val dropInStoredPaymentMethodDeletionModel =
+                DropInStoredPaymentMethodDeletionModel(storedPaymentMethodId, DropInFlowType.ADVANCED_FLOW)
+            DropInPaymentMethodDeletionPlatformMessenger.sendResult(dropInStoredPaymentMethodDeletionModel)
         } catch (exception: Exception) {
             sendResult(
                 DropInServiceResult.Error(
@@ -100,7 +104,7 @@ class AdvancedFlowDropInService : DropInService(), LifecycleOwner {
         }
     }
 
-    private fun setAdvancedFlowDropInDeleteStoredPaymentMethodObserver() {
+    private fun setDropInDeleteStoredPaymentMethodObserver() {
         DropInPaymentMethodDeletionResultMessenger.instance().removeObservers(this)
         DropInPaymentMethodDeletionResultMessenger.instance().observe(this) { message ->
             if (message.hasBeenHandled()) {

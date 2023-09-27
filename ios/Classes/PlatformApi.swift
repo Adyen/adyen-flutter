@@ -877,9 +877,9 @@ class CheckoutFlutterApi {
   var codec: FlutterStandardMessageCodec {
     return CheckoutFlutterApiCodec.shared
   }
-  func onDropInSessionResult(sessionPaymentResult sessionPaymentResultArg: PaymentResultDTO, completion: @escaping () -> Void) {
-    let channel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.CheckoutFlutterApi.onDropInSessionResult", binaryMessenger: binaryMessenger, codec: codec)
-    channel.sendMessage([sessionPaymentResultArg] as [Any?]) { _ in
+  func onDropInSessionPlatformCommunication(platformCommunicationModel platformCommunicationModelArg: PlatformCommunicationModel, completion: @escaping () -> Void) {
+    let channel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.CheckoutFlutterApi.onDropInSessionPlatformCommunication", binaryMessenger: binaryMessenger, codec: codec)
+    channel.sendMessage([platformCommunicationModelArg] as [Any?]) { _ in
       completion()
     }
   }

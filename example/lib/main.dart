@@ -92,11 +92,16 @@ class _MyAppState extends State<MyApp> {
 
     final CardsConfiguration cardsConfiguration = CardsConfiguration(
       showStorePaymentField: true,
+      showCvcForStoredCard: true,
+      addressMode: AddressMode.full
     );
 
     final StoredPaymentMethodConfiguration storedPaymentMethodConfiguration =
         StoredPaymentMethodConfiguration(
-      showPreselectedStoredPaymentMethod: false,
+      showPreselectedStoredPaymentMethod: true,
+      isRemoveStoredPaymentMethodEnabled: true,
+      deleteStoredPaymentMethodCallback:
+          _adyenSessionRepository.deleteStoredPaymentMethod,
     );
 
     final DropInConfiguration dropInConfiguration = DropInConfiguration(
@@ -146,8 +151,8 @@ class _MyAppState extends State<MyApp> {
 
     final StoredPaymentMethodConfiguration storedPaymentMethodConfiguration =
         StoredPaymentMethodConfiguration(
-      isRemoveStoredPaymentMethodEnabled: true,
       showPreselectedStoredPaymentMethod: false,
+      isRemoveStoredPaymentMethodEnabled: true,
       deleteStoredPaymentMethodCallback:
           _adyenSessionRepository.deleteStoredPaymentMethod,
     );
