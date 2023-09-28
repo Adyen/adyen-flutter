@@ -4,9 +4,11 @@ import 'dart:io';
 import 'package:adyen_checkout/adyen_checkout.dart';
 import 'package:adyen_checkout/src/adyen_checkout_interface.dart';
 import 'package:adyen_checkout/src/generated/platform_api.g.dart';
+import 'package:adyen_checkout/src/logging/adyen_logger.dart';
 import 'package:adyen_checkout/src/platform/adyen_checkout_platform_interface.dart';
 import 'package:adyen_checkout/src/platform/adyen_checkout_result_api.dart';
 import 'package:adyen_checkout/src/utils/dto_mapper.dart';
+import 'package:flutter/foundation.dart';
 
 class AdyenCheckout implements AdyenCheckoutInterface {
   AdyenCheckout() {
@@ -14,6 +16,7 @@ class AdyenCheckout implements AdyenCheckoutInterface {
   }
 
   final AdyenCheckoutResultApi _resultApi = AdyenCheckoutResultApi();
+  final AdyenLogger _adyenLogger = AdyenLogger();
 
   @override
   Future<String> getPlatformVersion() =>
@@ -33,8 +36,17 @@ class AdyenCheckout implements AdyenCheckoutInterface {
     }
   }
 
+  @override
+  void enableLogging({required bool loggingEnabled}) {
+    if (kDebugMode) {
+      _adyenLogger.shouldLog(loggingEnabled);
+      AdyenCheckoutPlatformInterface.instance.setupLogger(loggingEnabled);
+    }
+  }
+
   Future<PaymentResult> _startDropInSessionsPayment(
       DropInSession dropInSession) async {
+    _adyenLogger.log("Start Drop-in session");
     final dropInSessionCompleter = Completer<PaymentResultDTO>();
     DropInConfigurationDTO dropInConfiguration = DropInConfigurationDTO(
       environment: dropInSession.dropInConfiguration.environment,
@@ -63,7 +75,6 @@ class AdyenCheckout implements AdyenCheckoutInterface {
       skipListWhenSinglePaymentMethod:
           dropInSession.dropInConfiguration.skipListWhenSinglePaymentMethod,
     );
-
     AdyenCheckoutPlatformInterface.instance.startDropInSessionPayment(
       session: dropInSession.session.toDTO(),
       dropInConfiguration: dropInConfiguration,
@@ -89,12 +100,16 @@ class AdyenCheckout implements AdyenCheckoutInterface {
     return dropInSessionCompleter.future.then((value) {
       AdyenCheckoutPlatformInterface.instance.cleanUpDropIn();
       _resultApi.dropInSessionPlatformCommunicationStream.close();
+      _adyenLogger.log("Drop-in session result type: ${value.type.name}");
+      _adyenLogger
+          .log("Drop-in session result code: ${value.result?.resultCode}");
       return value.fromDTO();
     });
   }
 
   Future<PaymentResult> _startDropInAdvancedFlowPayment(
       DropInAdvancedFlow dropInAdvancedFlow) async {
+    _adyenLogger.log("Start Drop-in advanced flow");
     final dropInAdvancedFlowCompleter = Completer<PaymentResultDTO>();
     DropInConfigurationDTO dropInConfiguration = DropInConfigurationDTO(
       environment: dropInAdvancedFlow.dropInConfiguration.environment,
@@ -156,6 +171,9 @@ class AdyenCheckout implements AdyenCheckoutInterface {
     return dropInAdvancedFlowCompleter.future.then((value) {
       AdyenCheckoutPlatformInterface.instance.cleanUpDropIn();
       _resultApi.dropInAdvancedFlowPlatformCommunicationStream.close();
+      _adyenLogger.log("Drop-in advanced flow result type: ${value.type.name}");
+      _adyenLogger.log(
+          "Drop-in advanced flow result code: ${value.result?.resultCode}");
       return value.fromDTO();
     });
   }

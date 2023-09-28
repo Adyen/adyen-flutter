@@ -6,4 +6,6 @@ abstract class AdyenCheckoutInterface {
   Future<String> getReturnUrl();
 
   Future<PaymentResult> startPayment({required PaymentFlow paymentFlow});
+
+  void enableLogging({required bool loggingEnabled});
 }

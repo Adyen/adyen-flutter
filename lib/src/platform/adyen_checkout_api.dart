@@ -46,5 +46,10 @@ class AdyenCheckoutApi implements AdyenCheckoutPlatformInterface {
           deleteStoredPaymentMethodResultDTO);
 
   @override
+  void setupLogger(bool loggingEnabled) {
+    checkoutApi.setupLogger(loggingEnabled);
+  }
+
+  @override
   void cleanUpDropIn() => checkoutApi.cleanUpDropIn();
 }
