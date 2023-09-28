@@ -19,12 +19,16 @@ class SessionDropInService : SessionDropInService(), LifecycleOwner {
     private val dispatcher = ServiceLifecycleDispatcher(this)
 
     override fun onRemoveStoredPaymentMethod(storedPaymentMethod: StoredPaymentMethod) {
-        setStoredPaymentMethodDeletionObserver()
-        val dropInStoredPaymentMethodDeletionModel = DropInStoredPaymentMethodDeletionModel(
-            storedPaymentMethod.id.orEmpty(),
-            DropInFlowType.SESSION
-        )
-        DropInPaymentMethodDeletionPlatformMessenger.sendResult(dropInStoredPaymentMethodDeletionModel)
+        storedPaymentMethod.id?.let { storedPaymentMethodId ->
+            setStoredPaymentMethodDeletionObserver()
+            val dropInStoredPaymentMethodDeletionModel = DropInStoredPaymentMethodDeletionModel(
+                storedPaymentMethodId,
+                DropInFlowType.SESSION
+            )
+            DropInPaymentMethodDeletionPlatformMessenger.sendResult(dropInStoredPaymentMethodDeletionModel)
+        } ?: run {
+            sendRecurringResult(RecurringDropInServiceResult.Error(errorDialog = ErrorDialog()))
+        }
     }
 
     private fun setStoredPaymentMethodDeletionObserver() {

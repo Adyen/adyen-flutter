@@ -46,12 +46,16 @@ class AdvancedFlowDropInService : DropInService(), LifecycleOwner {
         onPaymentComponentState(paymentComponentState)
 
     override fun onRemoveStoredPaymentMethod(storedPaymentMethod: StoredPaymentMethod) {
-        setStoredPaymentMethodDeletionObserver()
-        val dropInStoredPaymentMethodDeletionModel = DropInStoredPaymentMethodDeletionModel(
-            storedPaymentMethod.id.orEmpty(),
-            DropInFlowType.ADVANCED_FLOW
-        )
-        DropInPaymentMethodDeletionPlatformMessenger.sendResult(dropInStoredPaymentMethodDeletionModel)
+        storedPaymentMethod.id?.let { storedPaymentMethodId ->
+            setStoredPaymentMethodDeletionObserver()
+            val dropInStoredPaymentMethodDeletionModel = DropInStoredPaymentMethodDeletionModel(
+                storedPaymentMethodId,
+                DropInFlowType.ADVANCED_FLOW
+            )
+            DropInPaymentMethodDeletionPlatformMessenger.sendResult(dropInStoredPaymentMethodDeletionModel)
+        } ?: run {
+            sendRecurringResult(RecurringDropInServiceResult.Error(errorDialog = ErrorDialog()))
+        }
     }
 
     private fun onPaymentComponentState(paymentComponentState: PaymentComponentState<*>) {
