@@ -171,9 +171,9 @@ struct DropInConfigurationDTO {
   var googlePayConfigurationDTO: GooglePayConfigurationDTO? = nil
   var cashAppPayConfigurationDTO: CashAppPayConfigurationDTO? = nil
   var analyticsOptionsDTO: AnalyticsOptionsDTO? = nil
-  var showPreselectedStoredPaymentMethod: Bool? = nil
-  var skipListWhenSinglePaymentMethod: Bool? = nil
-  var isRemoveStoredPaymentMethodEnabled: Bool? = nil
+  var showPreselectedStoredPaymentMethod: Bool
+  var skipListWhenSinglePaymentMethod: Bool
+  var isRemoveStoredPaymentMethodEnabled: Bool
 
   static func fromList(_ list: [Any?]) -> DropInConfigurationDTO? {
     let environment = Environment(rawValue: list[0] as! Int)!
@@ -201,9 +201,9 @@ struct DropInConfigurationDTO {
     if let analyticsOptionsDTOList: [Any?] = nilOrValue(list[9]) {
       analyticsOptionsDTO = AnalyticsOptionsDTO.fromList(analyticsOptionsDTOList)
     }
-    let showPreselectedStoredPaymentMethod: Bool? = nilOrValue(list[10])
-    let skipListWhenSinglePaymentMethod: Bool? = nilOrValue(list[11])
-    let isRemoveStoredPaymentMethodEnabled: Bool? = nilOrValue(list[12])
+    let showPreselectedStoredPaymentMethod = list[10] as! Bool
+    let skipListWhenSinglePaymentMethod = list[11] as! Bool
+    let isRemoveStoredPaymentMethodEnabled = list[12] as! Bool
 
     return DropInConfigurationDTO(
       environment: environment,

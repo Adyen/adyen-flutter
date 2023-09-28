@@ -106,9 +106,9 @@ class DropInConfigurationDTO {
   final GooglePayConfigurationDTO? googlePayConfigurationDTO;
   final CashAppPayConfigurationDTO? cashAppPayConfigurationDTO;
   final AnalyticsOptionsDTO? analyticsOptionsDTO;
-  final bool? showPreselectedStoredPaymentMethod;
-  final bool? skipListWhenSinglePaymentMethod;
-  final bool? isRemoveStoredPaymentMethodEnabled;
+  final bool showPreselectedStoredPaymentMethod;
+  final bool skipListWhenSinglePaymentMethod;
+  final bool isRemoveStoredPaymentMethodEnabled;
 
   DropInConfigurationDTO(
     this.environment,

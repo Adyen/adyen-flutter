@@ -153,9 +153,9 @@ class DropInConfigurationDTO {
     this.googlePayConfigurationDTO,
     this.cashAppPayConfigurationDTO,
     this.analyticsOptionsDTO,
-    this.showPreselectedStoredPaymentMethod,
-    this.skipListWhenSinglePaymentMethod,
-    this.isRemoveStoredPaymentMethodEnabled,
+    required this.showPreselectedStoredPaymentMethod,
+    required this.skipListWhenSinglePaymentMethod,
+    required this.isRemoveStoredPaymentMethodEnabled,
   });
 
   Environment environment;
@@ -178,11 +178,11 @@ class DropInConfigurationDTO {
 
   AnalyticsOptionsDTO? analyticsOptionsDTO;
 
-  bool? showPreselectedStoredPaymentMethod;
+  bool showPreselectedStoredPaymentMethod;
 
-  bool? skipListWhenSinglePaymentMethod;
+  bool skipListWhenSinglePaymentMethod;
 
-  bool? isRemoveStoredPaymentMethodEnabled;
+  bool isRemoveStoredPaymentMethodEnabled;
 
   Object encode() {
     return <Object?>[
@@ -225,9 +225,9 @@ class DropInConfigurationDTO {
       analyticsOptionsDTO: result[9] != null
           ? AnalyticsOptionsDTO.decode(result[9]! as List<Object?>)
           : null,
-      showPreselectedStoredPaymentMethod: result[10] as bool?,
-      skipListWhenSinglePaymentMethod: result[11] as bool?,
-      isRemoveStoredPaymentMethodEnabled: result[12] as bool?,
+      showPreselectedStoredPaymentMethod: result[10]! as bool,
+      skipListWhenSinglePaymentMethod: result[11]! as bool,
+      isRemoveStoredPaymentMethodEnabled: result[12]! as bool,
     );
   }
 }

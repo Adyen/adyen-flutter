@@ -229,9 +229,9 @@ data class DropInConfigurationDTO (
   val googlePayConfigurationDTO: GooglePayConfigurationDTO? = null,
   val cashAppPayConfigurationDTO: CashAppPayConfigurationDTO? = null,
   val analyticsOptionsDTO: AnalyticsOptionsDTO? = null,
-  val showPreselectedStoredPaymentMethod: Boolean? = null,
-  val skipListWhenSinglePaymentMethod: Boolean? = null,
-  val isRemoveStoredPaymentMethodEnabled: Boolean? = null
+  val showPreselectedStoredPaymentMethod: Boolean,
+  val skipListWhenSinglePaymentMethod: Boolean,
+  val isRemoveStoredPaymentMethodEnabled: Boolean
 
 ) {
   companion object {
@@ -257,9 +257,9 @@ data class DropInConfigurationDTO (
       val analyticsOptionsDTO: AnalyticsOptionsDTO? = (list[9] as List<Any?>?)?.let {
         AnalyticsOptionsDTO.fromList(it)
       }
-      val showPreselectedStoredPaymentMethod = list[10] as Boolean?
-      val skipListWhenSinglePaymentMethod = list[11] as Boolean?
-      val isRemoveStoredPaymentMethodEnabled = list[12] as Boolean?
+      val showPreselectedStoredPaymentMethod = list[10] as Boolean
+      val skipListWhenSinglePaymentMethod = list[11] as Boolean
+      val isRemoveStoredPaymentMethodEnabled = list[12] as Boolean
       return DropInConfigurationDTO(environment, clientKey, countryCode, amount, shopperLocale, cardsConfigurationDTO, applePayConfigurationDTO, googlePayConfigurationDTO, cashAppPayConfigurationDTO, analyticsOptionsDTO, showPreselectedStoredPaymentMethod, skipListWhenSinglePaymentMethod, isRemoveStoredPaymentMethodEnabled)
     }
   }

@@ -5,10 +5,10 @@ import PassKit
 class ConfigurationMapper {
     
     func createDropInConfiguration(dropInConfigurationDTO: DropInConfigurationDTO) throws -> DropInComponent.Configuration {
-        let dropInConfiguration = DropInComponent.Configuration(allowsSkippingPaymentList: dropInConfigurationDTO.skipListWhenSinglePaymentMethod ?? false,
-                                                                allowPreselectedPaymentView: dropInConfigurationDTO.showPreselectedStoredPaymentMethod ?? false)
+        let dropInConfiguration = DropInComponent.Configuration(allowsSkippingPaymentList: dropInConfigurationDTO.skipListWhenSinglePaymentMethod,
+                                                                allowPreselectedPaymentView: dropInConfigurationDTO.showPreselectedStoredPaymentMethod)
         
-        dropInConfiguration.paymentMethodsList.allowDisablingStoredPaymentMethods = dropInConfigurationDTO.isRemoveStoredPaymentMethodEnabled ?? false
+        dropInConfiguration.paymentMethodsList.allowDisablingStoredPaymentMethods = dropInConfigurationDTO.isRemoveStoredPaymentMethodEnabled
         
         if let cardsConfigurationDTO = dropInConfigurationDTO.cardsConfigurationDTO {
             let koreanAuthenticationMode = determineFieldVisibility(visible: cardsConfigurationDTO.showKcpField)
@@ -46,9 +46,9 @@ class ConfigurationMapper {
         return visible ? .show : .hide
     }
     
-    private func createStoredCardConfiguration(showCvcForStoredCard: Bool?) -> StoredCardConfiguration {
+    private func createStoredCardConfiguration(showCvcForStoredCard: Bool) -> StoredCardConfiguration {
         var storedCardConfiguration = StoredCardConfiguration()
-        storedCardConfiguration.showsSecurityCodeField = showCvcForStoredCard ?? false
+        storedCardConfiguration.showsSecurityCodeField = showCvcForStoredCard
         return storedCardConfiguration;
     }
     
@@ -78,7 +78,7 @@ class ConfigurationMapper {
     
     private func buildApplePayConfiguration(applePayConfigurationDTO: ApplePayConfigurationDTO, amount: AmountDTO, countryCode: String) throws -> Adyen.ApplePayComponent.Configuration {
         guard let value = Int(exactly: amount.value) else {
-            throw PlatformError(errorDescription: "Cannot map Int64 to Int32.")
+            throw PlatformError(errorDescription: "Cannot map Int64 to Int.")
         }
         guard let currencyCode = amount.currency else {
             throw BalanceChecker.Error.unexpectedCurrencyCode

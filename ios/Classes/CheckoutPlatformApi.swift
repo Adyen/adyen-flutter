@@ -44,7 +44,7 @@ class CheckoutPlatformApi : CheckoutPlatformInterface {
                                                                   initialSessionData: session.sessionData,
                                                                   context: adyenContext)
             self.dropInSessionStoredPaymentMethodsDelegate = DropInSessionsStoredPaymentMethodsDelegate(checkoutFlutterApi: self.checkoutFlutterApi)
-
+            
             AdyenSession.initialize(with: sessionConfiguration,
                                     delegate: dropInSessionDelegate!,
                                     presentationDelegate: dropInSessionPresentationDelegate!) { [weak self] result in
@@ -58,23 +58,20 @@ class CheckoutPlatformApi : CheckoutPlatformInterface {
                                                               configuration: dropInConfiguration!)
                         dropInComponent.delegate = session
                         dropInComponent.partialPaymentDelegate = session
-                        if (dropInConfigurationDTO.isRemoveStoredPaymentMethodEnabled == true) {
+                        if (dropInConfigurationDTO.isRemoveStoredPaymentMethodEnabled) {
                             dropInComponent.storedPaymentMethodsDelegate = self?.dropInSessionStoredPaymentMethodsDelegate
                         }
                         self?.dropInComponent = dropInComponent
                         self?.viewController?.present(dropInComponent.viewController, animated: true)
                     } catch let error {
-                        let platformCommunicationModel = PlatformCommunicationModel(type: PlatformCommunicationType.result, paymentResult: PaymentResultDTO(type: PaymentResultEnum.error, reason: error.localizedDescription))
-                        self?.checkoutFlutterApi.onDropInSessionPlatformCommunication(platformCommunicationModel: platformCommunicationModel, completion: {})
+                        self?.sendSessionError(error: error)
                     }
                 case let .failure(error):
-                    let platformCommunicationModel = PlatformCommunicationModel(type: PlatformCommunicationType.result, paymentResult: PaymentResultDTO(type: PaymentResultEnum.error, reason: error.localizedDescription))
-                    self?.checkoutFlutterApi.onDropInSessionPlatformCommunication(platformCommunicationModel: platformCommunicationModel, completion: {})
+                    self?.sendSessionError(error: error)
                 }
             }
         } catch let error {
-            let platformCommunicationModel = PlatformCommunicationModel(type: PlatformCommunicationType.result, paymentResult: PaymentResultDTO(type: PaymentResultEnum.error, reason: error.localizedDescription))
-            checkoutFlutterApi.onDropInSessionPlatformCommunication(platformCommunicationModel: platformCommunicationModel, completion: {})
+            sendSessionError(error: error)
         }
     }
     
@@ -217,5 +214,10 @@ class CheckoutPlatformApi : CheckoutPlatformInterface {
         let storedPaymentMethods = paymentMethods.stored.filter { !($0.type == PaymentMethodType.giftcard)}
         let paymentMethods = paymentMethods.regular.filter { !($0.type == PaymentMethodType.giftcard)}
         return PaymentMethods(regular: paymentMethods, stored: storedPaymentMethods)
+    }
+    
+    func sendSessionError(error: Error) {
+        let platformCommunicationModel = PlatformCommunicationModel(type: PlatformCommunicationType.result, paymentResult: PaymentResultDTO(type: PaymentResultEnum.error, reason: error.localizedDescription))
+        checkoutFlutterApi.onDropInSessionPlatformCommunication(platformCommunicationModel: platformCommunicationModel, completion: {})
     }
 }

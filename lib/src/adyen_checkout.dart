@@ -55,8 +55,11 @@ class AdyenCheckout implements AdyenCheckoutInterface {
           dropInSession.dropInConfiguration.analyticsOptions?.toDTO(),
       isRemoveStoredPaymentMethodEnabled:
           isRemoveStoredPaymentMethodEnabled(dropInSession.dropInConfiguration),
-      showPreselectedStoredPaymentMethod: dropInSession.dropInConfiguration
-          .storedPaymentMethodConfiguration?.showPreselectedStoredPaymentMethod,
+      showPreselectedStoredPaymentMethod: dropInSession
+              .dropInConfiguration
+              .storedPaymentMethodConfiguration
+              ?.showPreselectedStoredPaymentMethod ??
+          true,
       skipListWhenSinglePaymentMethod:
           dropInSession.dropInConfiguration.skipListWhenSinglePaymentMethod,
     );
@@ -100,17 +103,22 @@ class AdyenCheckout implements AdyenCheckoutInterface {
       shopperLocale: dropInAdvancedFlow.dropInConfiguration.shopperLocale ??
           Platform.localeName,
       cardsConfigurationDTO:
-      dropInAdvancedFlow.dropInConfiguration.cardsConfiguration?.toDTO(),
+          dropInAdvancedFlow.dropInConfiguration.cardsConfiguration?.toDTO(),
       applePayConfigurationDTO:
-      dropInAdvancedFlow.dropInConfiguration.applePayConfiguration?.toDTO(),
-      googlePayConfigurationDTO:
-      dropInAdvancedFlow.dropInConfiguration.googlePayConfiguration?.toDTO(),
-      cashAppPayConfigurationDTO:
-      dropInAdvancedFlow.dropInConfiguration.cashAppPayConfiguration?.toDTO(),
+          dropInAdvancedFlow.dropInConfiguration.applePayConfiguration?.toDTO(),
+      googlePayConfigurationDTO: dropInAdvancedFlow
+          .dropInConfiguration.googlePayConfiguration
+          ?.toDTO(),
+      cashAppPayConfigurationDTO: dropInAdvancedFlow
+          .dropInConfiguration.cashAppPayConfiguration
+          ?.toDTO(),
       analyticsOptionsDTO:
-      dropInAdvancedFlow.dropInConfiguration.analyticsOptions?.toDTO(),
-      showPreselectedStoredPaymentMethod: dropInAdvancedFlow.dropInConfiguration
-          .storedPaymentMethodConfiguration?.showPreselectedStoredPaymentMethod,
+          dropInAdvancedFlow.dropInConfiguration.analyticsOptions?.toDTO(),
+      showPreselectedStoredPaymentMethod: dropInAdvancedFlow
+              .dropInConfiguration
+              .storedPaymentMethodConfiguration
+              ?.showPreselectedStoredPaymentMethod ??
+          true,
       isRemoveStoredPaymentMethodEnabled: isRemoveStoredPaymentMethodEnabled(
           dropInAdvancedFlow.dropInConfiguration),
       skipListWhenSinglePaymentMethod: dropInAdvancedFlow
