@@ -117,11 +117,11 @@ struct SessionDTO {
 
 /// Generated class from Pigeon that represents data sent in messages.
 struct AmountDTO {
-  var currency: String? = nil
+  var currency: String
   var value: Int64
 
   static func fromList(_ list: [Any?]) -> AmountDTO? {
-    let currency: String? = nilOrValue(list[0])
+    let currency = list[0] as! String
     let value = list[1] is Int64 ? list[1] as! Int64 : Int64(list[1] as! Int32)
 
     return AmountDTO(

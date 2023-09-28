@@ -76,7 +76,7 @@ class SessionDTO {
 }
 
 class AmountDTO {
-  final String? currency;
+  final String currency;
   final int value;
 
   AmountDTO(

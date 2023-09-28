@@ -91,11 +91,11 @@ class SessionDTO {
 
 class AmountDTO {
   AmountDTO({
-    this.currency,
+    required this.currency,
     required this.value,
   });
 
-  String? currency;
+  String currency;
 
   int value;
 
@@ -109,7 +109,7 @@ class AmountDTO {
   static AmountDTO decode(Object result) {
     result as List<Object?>;
     return AmountDTO(
-      currency: result[0] as String?,
+      currency: result[0]! as String,
       value: result[1]! as int,
     );
   }

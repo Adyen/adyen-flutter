@@ -1,10 +1,10 @@
 class Amount {
   final int value;
-  final String? currency;
+  final String currency;
 
   Amount({
     required this.value,
-    this.currency,
+    required this.currency,
   });
 
   factory Amount.fromJson(Map<String, dynamic> json) {

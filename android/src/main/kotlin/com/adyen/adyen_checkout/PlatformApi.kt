@@ -175,14 +175,14 @@ data class SessionDTO (
 
 /** Generated class from Pigeon that represents data sent in messages. */
 data class AmountDTO (
-  val currency: String? = null,
+  val currency: String,
   val value: Long
 
 ) {
   companion object {
     @Suppress("UNCHECKED_CAST")
     fun fromList(list: List<Any?>): AmountDTO {
-      val currency = list[0] as String?
+      val currency = list[0] as String
       val value = list[1].let { if (it is Int) it.toLong() else it as Long }
       return AmountDTO(currency, value)
     }

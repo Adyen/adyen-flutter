@@ -80,10 +80,7 @@ class ConfigurationMapper {
         guard let value = Int(exactly: amount.value) else {
             throw PlatformError(errorDescription: "Cannot map Int64 to Int.")
         }
-        guard let currencyCode = amount.currency else {
-            throw BalanceChecker.Error.unexpectedCurrencyCode
-        }
-        
+        let currencyCode = amount.currency
         let formattedAmount = AmountFormatter.decimalAmount(value,
                                                             currencyCode: currencyCode,
                                                             localeIdentifier: nil)

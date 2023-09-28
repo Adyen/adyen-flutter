@@ -138,9 +138,7 @@ class CheckoutPlatformApi : CheckoutPlatformInterface {
         let environment = mapToEnvironment(environment: dropInConfiguration.environment)
         let apiContext = try APIContext(environment: environment, clientKey: dropInConfiguration.clientKey)
         let value = Int(dropInConfiguration.amount.value)
-        guard let currencyCode : String = dropInConfiguration.amount.currency else {
-            throw BalanceChecker.Error.unexpectedCurrencyCode
-        }
+        let currencyCode = dropInConfiguration.amount.currency
         let amount = Adyen.Amount(value: value, currencyCode: currencyCode)
         return AdyenContext(apiContext: apiContext, payment: Payment(amount: amount, countryCode: dropInConfiguration.countryCode))
     }
