@@ -90,11 +90,26 @@ class _MyAppState extends State<MyApp> {
       Config.environment,
     );
 
+    final CardsConfiguration cardsConfiguration = CardsConfiguration(
+      showStorePaymentField: true,
+    );
+
+    final StoredPaymentMethodConfiguration storedPaymentMethodConfiguration =
+        StoredPaymentMethodConfiguration(
+      showPreselectedStoredPaymentMethod: true,
+      isRemoveStoredPaymentMethodEnabled: true,
+      deleteStoredPaymentMethodCallback:
+          _adyenSessionRepository.deleteStoredPaymentMethod,
+    );
+
     final DropInConfiguration dropInConfiguration = DropInConfiguration(
       environment: Environment.test,
       clientKey: Config.clientKey,
       countryCode: Config.countryCode,
       amount: Config.amount,
+      shopperLocale: Config.shopperLocale,
+      cardsConfiguration: cardsConfiguration,
+      storedPaymentMethodConfiguration: storedPaymentMethodConfiguration,
     );
 
     return await _adyenCheckout.startPayment(
@@ -111,9 +126,8 @@ class _MyAppState extends State<MyApp> {
     final String returnUrl =
         await _adyenSessionRepository.determineExampleReturnUrl();
 
-    final CardsConfiguration cardsConfiguration = CardsConfiguration(
-      holderNameRequired: true,
-    );
+    final CardsConfiguration cardsConfiguration =
+        CardsConfiguration(showStorePaymentField: true);
 
     final ApplePayConfiguration applePayConfiguration = ApplePayConfiguration(
       merchantId: Config.merchantAccount,
@@ -133,6 +147,14 @@ class _MyAppState extends State<MyApp> {
       returnUrl,
     );
 
+    final StoredPaymentMethodConfiguration storedPaymentMethodConfiguration =
+        StoredPaymentMethodConfiguration(
+      showPreselectedStoredPaymentMethod: false,
+      isRemoveStoredPaymentMethodEnabled: true,
+      deleteStoredPaymentMethodCallback:
+          _adyenSessionRepository.deleteStoredPaymentMethod,
+    );
+
     final DropInConfiguration dropInConfiguration = DropInConfiguration(
       environment: Environment.test,
       clientKey: Config.clientKey,
@@ -143,6 +165,7 @@ class _MyAppState extends State<MyApp> {
       applePayConfiguration: applePayConfiguration,
       googlePayConfiguration: googlePayConfiguration,
       cashAppPayConfiguration: cashAppPayConfiguration,
+      storedPaymentMethodConfiguration: storedPaymentMethodConfiguration,
     );
 
     return await _adyenCheckout.startPayment(

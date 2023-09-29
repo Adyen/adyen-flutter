@@ -107,7 +107,14 @@ class AdyenCheckoutPlugin : FlutterPlugin, ActivityAware {
                 }
             )
         }
-        checkoutFlutterApi?.onDropInSessionResult(mappedResult) {}
+
+        val platformCommunicationModel = PlatformCommunicationModel(
+            PlatformCommunicationType.RESULT,
+            data = "",
+            paymentResult = mappedResult
+        )
+
+        checkoutFlutterApi?.onDropInSessionPlatformCommunication(platformCommunicationModel) {}
     }
 
     private val dropInAdvancedFlowCallback = DropInCallback { dropInAdvancedFlowResult ->
@@ -133,12 +140,12 @@ class AdyenCheckoutPlugin : FlutterPlugin, ActivityAware {
             )
         }
 
-        val model = PlatformCommunicationModel(
+        val platformCommunicationModel = PlatformCommunicationModel(
             PlatformCommunicationType.RESULT,
             data = "",
             paymentResult = mappedResult
         )
-        checkoutFlutterApi?.onDropInAdvancedFlowPlatformCommunication(model) {}
+        checkoutFlutterApi?.onDropInAdvancedFlowPlatformCommunication(platformCommunicationModel) {}
     }
 
     private fun teardown() {

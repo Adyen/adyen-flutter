@@ -50,6 +50,18 @@ object ConfigurationMapper {
         val shopperLocale = Locale.forLanguageTag(shopperLocale)
         val dropInConfiguration = DropInConfiguration.Builder(shopperLocale, environment, clientKey)
 
+        isRemoveStoredPaymentMethodEnabled.let {
+            dropInConfiguration.setEnableRemovingStoredPaymentMethods(it)
+        }
+
+        showPreselectedStoredPaymentMethod.let {
+            dropInConfiguration.setShowPreselectedStoredPaymentMethod(it)
+        }
+
+        skipListWhenSinglePaymentMethod.let {
+            dropInConfiguration.setSkipListWhenSinglePaymentMethod(it)
+        }
+
         if (cardsConfigurationDTO != null) {
             val cardConfiguration = buildCardConfiguration(context, environment, cardsConfigurationDTO)
             dropInConfiguration.addCardConfiguration(cardConfiguration)
@@ -81,7 +93,6 @@ object ConfigurationMapper {
             environment = environment,
             clientKey = clientKey
         )
-            .setShowStorePaymentField(cardsConfigurationDTO.showStorePaymentField)
             .setAddressConfiguration(
                 cardsConfigurationDTO.addressMode.mapToAddressConfiguration()
             )
@@ -172,7 +183,10 @@ object ConfigurationMapper {
     }
 
     private fun Amount.mapToDTOAmount(): AmountDTO {
-        return AmountDTO(this.currency, this.value)
+        return AmountDTO(
+            this.currency ?: throw Exception("Currency must not be null"),
+            this.value,
+        )
     }
 
     private fun GooglePayConfigurationDTO.mapToGooglePayConfiguration(builder: GooglePayConfiguration.Builder):

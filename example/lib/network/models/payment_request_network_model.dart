@@ -1,4 +1,5 @@
 import 'package:adyen_checkout_example/network/models/amount_network_model.dart';
+import 'package:adyen_checkout_example/network/models/session_request_network_model.dart';
 
 class PaymentsRequestData {
   final String merchantAccount;
@@ -52,7 +53,7 @@ class PaymentsRequestData {
       if (threeDS2RequestData != null)
         "threeDS2RequestData": threeDS2RequestData?.toJson(),
       if (recurringProcessingModel != null)
-        "recurringProcessingModel": recurringProcessingModel?.recurringModel,
+        "recurringProcessingModel": recurringProcessingModel?.recurringModelString,
     };
   }
 }
@@ -123,21 +124,3 @@ class ThreeDS2RequestDataRequest {
   }
 }
 
-enum RecurringProcessingModel {
-  subscription,
-  cardOnFile,
-  unscheduledCardOnFile
-}
-
-extension RecurringProcessingModelExtension on RecurringProcessingModel {
-  String get recurringModel {
-    switch (this) {
-      case RecurringProcessingModel.subscription:
-        return 'Subscription';
-      case RecurringProcessingModel.cardOnFile:
-        return 'CardOnFile';
-      case RecurringProcessingModel.unscheduledCardOnFile:
-        return 'UnscheduledCardOnFile';
-    }
-  }
-}

@@ -33,8 +33,14 @@ class AdyenSessionsRepository {
         value: amount.value,
       ),
       returnUrl: returnUrl,
-      reference: Config.shopperReference,
+      reference:
+          "flutter-session-test_${DateTime.now().millisecondsSinceEpoch}",
       countryCode: Config.countryCode,
+      shopperReference: Config.shopperReference,
+      storePaymentMethodMode:
+          StorePaymentMethodMode.askForConsent.storePaymentMethodModeString,
+      recurringProcessingModel:
+          RecurringProcessingModel.cardOnFile.recurringModelString,
     );
 
     SessionResponseNetworkModel sessionResponseNetworkModel =
@@ -51,6 +57,7 @@ class AdyenSessionsRepository {
       merchantAccount: Config.merchantAccount,
       countryCode: Config.countryCode,
       channel: _determineChannel(),
+      shopperReference: Config.shopperReference,
     ));
   }
 
@@ -95,6 +102,14 @@ class AdyenSessionsRepository {
     } else {
       throw Exception("Unsupported platform");
     }
+  }
+
+  Future<bool> deleteStoredPaymentMethod(String storedPaymentMethodId) async {
+    return await _service.deleteStoredPaymentMethod(
+      storedPaymentMethodId: storedPaymentMethodId,
+      merchantAccount: Config.merchantAccount,
+      shopperReference: Config.shopperReference,
+    );
   }
 
   String _determineChannel() {

@@ -84,6 +84,7 @@ enum PlatformCommunicationType: Int {
   case paymentComponent = 0
   case additionalDetails = 1
   case result = 2
+  case deleteStoredPaymentMethod = 3
 }
 
 enum DropInResultType: Int {
@@ -116,11 +117,11 @@ struct SessionDTO {
 
 /// Generated class from Pigeon that represents data sent in messages.
 struct AmountDTO {
-  var currency: String? = nil
+  var currency: String
   var value: Int64
 
   static func fromList(_ list: [Any?]) -> AmountDTO? {
-    let currency: String? = nilOrValue(list[0])
+    let currency = list[0] as! String
     let value = list[1] is Int64 ? list[1] as! Int64 : Int64(list[1] as! Int32)
 
     return AmountDTO(
@@ -165,13 +166,14 @@ struct DropInConfigurationDTO {
   var countryCode: String
   var amount: AmountDTO
   var shopperLocale: String
-  var analyticsOptionsDTO: AnalyticsOptionsDTO? = nil
-  var showPreselectedStoredPaymentMethod: Bool? = nil
-  var skipListWhenSinglePaymentMethod: Bool? = nil
   var cardsConfigurationDTO: CardsConfigurationDTO? = nil
   var applePayConfigurationDTO: ApplePayConfigurationDTO? = nil
   var googlePayConfigurationDTO: GooglePayConfigurationDTO? = nil
   var cashAppPayConfigurationDTO: CashAppPayConfigurationDTO? = nil
+  var analyticsOptionsDTO: AnalyticsOptionsDTO? = nil
+  var showPreselectedStoredPaymentMethod: Bool
+  var skipListWhenSinglePaymentMethod: Bool
+  var isRemoveStoredPaymentMethodEnabled: Bool
 
   static func fromList(_ list: [Any?]) -> DropInConfigurationDTO? {
     let environment = Environment(rawValue: list[0] as! Int)!
@@ -179,28 +181,29 @@ struct DropInConfigurationDTO {
     let countryCode = list[2] as! String
     let amount = AmountDTO.fromList(list[3] as! [Any?])!
     let shopperLocale = list[4] as! String
-    var analyticsOptionsDTO: AnalyticsOptionsDTO? = nil
-    if let analyticsOptionsDTOList: [Any?] = nilOrValue(list[5]) {
-      analyticsOptionsDTO = AnalyticsOptionsDTO.fromList(analyticsOptionsDTOList)
-    }
-    let showPreselectedStoredPaymentMethod: Bool? = nilOrValue(list[6])
-    let skipListWhenSinglePaymentMethod: Bool? = nilOrValue(list[7])
     var cardsConfigurationDTO: CardsConfigurationDTO? = nil
-    if let cardsConfigurationDTOList: [Any?] = nilOrValue(list[8]) {
+    if let cardsConfigurationDTOList: [Any?] = nilOrValue(list[5]) {
       cardsConfigurationDTO = CardsConfigurationDTO.fromList(cardsConfigurationDTOList)
     }
     var applePayConfigurationDTO: ApplePayConfigurationDTO? = nil
-    if let applePayConfigurationDTOList: [Any?] = nilOrValue(list[9]) {
+    if let applePayConfigurationDTOList: [Any?] = nilOrValue(list[6]) {
       applePayConfigurationDTO = ApplePayConfigurationDTO.fromList(applePayConfigurationDTOList)
     }
     var googlePayConfigurationDTO: GooglePayConfigurationDTO? = nil
-    if let googlePayConfigurationDTOList: [Any?] = nilOrValue(list[10]) {
+    if let googlePayConfigurationDTOList: [Any?] = nilOrValue(list[7]) {
       googlePayConfigurationDTO = GooglePayConfigurationDTO.fromList(googlePayConfigurationDTOList)
     }
     var cashAppPayConfigurationDTO: CashAppPayConfigurationDTO? = nil
-    if let cashAppPayConfigurationDTOList: [Any?] = nilOrValue(list[11]) {
+    if let cashAppPayConfigurationDTOList: [Any?] = nilOrValue(list[8]) {
       cashAppPayConfigurationDTO = CashAppPayConfigurationDTO.fromList(cashAppPayConfigurationDTOList)
     }
+    var analyticsOptionsDTO: AnalyticsOptionsDTO? = nil
+    if let analyticsOptionsDTOList: [Any?] = nilOrValue(list[9]) {
+      analyticsOptionsDTO = AnalyticsOptionsDTO.fromList(analyticsOptionsDTOList)
+    }
+    let showPreselectedStoredPaymentMethod = list[10] as! Bool
+    let skipListWhenSinglePaymentMethod = list[11] as! Bool
+    let isRemoveStoredPaymentMethodEnabled = list[12] as! Bool
 
     return DropInConfigurationDTO(
       environment: environment,
@@ -208,13 +211,14 @@ struct DropInConfigurationDTO {
       countryCode: countryCode,
       amount: amount,
       shopperLocale: shopperLocale,
-      analyticsOptionsDTO: analyticsOptionsDTO,
-      showPreselectedStoredPaymentMethod: showPreselectedStoredPaymentMethod,
-      skipListWhenSinglePaymentMethod: skipListWhenSinglePaymentMethod,
       cardsConfigurationDTO: cardsConfigurationDTO,
       applePayConfigurationDTO: applePayConfigurationDTO,
       googlePayConfigurationDTO: googlePayConfigurationDTO,
-      cashAppPayConfigurationDTO: cashAppPayConfigurationDTO
+      cashAppPayConfigurationDTO: cashAppPayConfigurationDTO,
+      analyticsOptionsDTO: analyticsOptionsDTO,
+      showPreselectedStoredPaymentMethod: showPreselectedStoredPaymentMethod,
+      skipListWhenSinglePaymentMethod: skipListWhenSinglePaymentMethod,
+      isRemoveStoredPaymentMethodEnabled: isRemoveStoredPaymentMethodEnabled
     )
   }
   func toList() -> [Any?] {
@@ -224,13 +228,14 @@ struct DropInConfigurationDTO {
       countryCode,
       amount.toList(),
       shopperLocale,
-      analyticsOptionsDTO?.toList(),
-      showPreselectedStoredPaymentMethod,
-      skipListWhenSinglePaymentMethod,
       cardsConfigurationDTO?.toList(),
       applePayConfigurationDTO?.toList(),
       googlePayConfigurationDTO?.toList(),
       cashAppPayConfigurationDTO?.toList(),
+      analyticsOptionsDTO?.toList(),
+      showPreselectedStoredPaymentMethod,
+      skipListWhenSinglePaymentMethod,
+      isRemoveStoredPaymentMethodEnabled,
     ]
   }
 }
@@ -573,6 +578,28 @@ struct DropInErrorDTO {
   }
 }
 
+/// Generated class from Pigeon that represents data sent in messages.
+struct DeletedStoredPaymentMethodResultDTO {
+  var storedPaymentMethodId: String
+  var isSuccessfullyRemoved: Bool
+
+  static func fromList(_ list: [Any?]) -> DeletedStoredPaymentMethodResultDTO? {
+    let storedPaymentMethodId = list[0] as! String
+    let isSuccessfullyRemoved = list[1] as! Bool
+
+    return DeletedStoredPaymentMethodResultDTO(
+      storedPaymentMethodId: storedPaymentMethodId,
+      isSuccessfullyRemoved: isSuccessfullyRemoved
+    )
+  }
+  func toList() -> [Any?] {
+    return [
+      storedPaymentMethodId,
+      isSuccessfullyRemoved,
+    ]
+  }
+}
+
 private class CheckoutPlatformInterfaceCodecReader: FlutterStandardReader {
   override func readValue(ofType type: UInt8) -> Any? {
     switch type {
@@ -587,14 +614,16 @@ private class CheckoutPlatformInterfaceCodecReader: FlutterStandardReader {
       case 132:
         return CashAppPayConfigurationDTO.fromList(self.readValue() as! [Any?])
       case 133:
-        return DropInConfigurationDTO.fromList(self.readValue() as! [Any?])
+        return DeletedStoredPaymentMethodResultDTO.fromList(self.readValue() as! [Any?])
       case 134:
-        return DropInErrorDTO.fromList(self.readValue() as! [Any?])
+        return DropInConfigurationDTO.fromList(self.readValue() as! [Any?])
       case 135:
-        return DropInResultDTO.fromList(self.readValue() as! [Any?])
+        return DropInErrorDTO.fromList(self.readValue() as! [Any?])
       case 136:
-        return GooglePayConfigurationDTO.fromList(self.readValue() as! [Any?])
+        return DropInResultDTO.fromList(self.readValue() as! [Any?])
       case 137:
+        return GooglePayConfigurationDTO.fromList(self.readValue() as! [Any?])
+      case 138:
         return SessionDTO.fromList(self.readValue() as! [Any?])
       default:
         return super.readValue(ofType: type)
@@ -619,20 +648,23 @@ private class CheckoutPlatformInterfaceCodecWriter: FlutterStandardWriter {
     } else if let value = value as? CashAppPayConfigurationDTO {
       super.writeByte(132)
       super.writeValue(value.toList())
-    } else if let value = value as? DropInConfigurationDTO {
+    } else if let value = value as? DeletedStoredPaymentMethodResultDTO {
       super.writeByte(133)
       super.writeValue(value.toList())
-    } else if let value = value as? DropInErrorDTO {
+    } else if let value = value as? DropInConfigurationDTO {
       super.writeByte(134)
       super.writeValue(value.toList())
-    } else if let value = value as? DropInResultDTO {
+    } else if let value = value as? DropInErrorDTO {
       super.writeByte(135)
       super.writeValue(value.toList())
-    } else if let value = value as? GooglePayConfigurationDTO {
+    } else if let value = value as? DropInResultDTO {
       super.writeByte(136)
       super.writeValue(value.toList())
-    } else if let value = value as? SessionDTO {
+    } else if let value = value as? GooglePayConfigurationDTO {
       super.writeByte(137)
+      super.writeValue(value.toList())
+    } else if let value = value as? SessionDTO {
+      super.writeByte(138)
       super.writeValue(value.toList())
     } else {
       super.writeValue(value)
@@ -662,6 +694,7 @@ protocol CheckoutPlatformInterface {
   func startDropInAdvancedFlowPayment(dropInConfigurationDTO: DropInConfigurationDTO, paymentMethodsResponse: String) throws
   func onPaymentsResult(paymentsResult: DropInResultDTO) throws
   func onPaymentsDetailsResult(paymentsDetailsResult: DropInResultDTO) throws
+  func onDeleteStoredPaymentMethodResult(deleteStoredPaymentMethodResultDTO: DeletedStoredPaymentMethodResultDTO) throws
 }
 
 /// Generated setup class from Pigeon to handle messages through the `binaryMessenger`.
@@ -762,6 +795,21 @@ class CheckoutPlatformInterfaceSetup {
     } else {
       onPaymentsDetailsResultChannel.setMessageHandler(nil)
     }
+    let onDeleteStoredPaymentMethodResultChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.onDeleteStoredPaymentMethodResult", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      onDeleteStoredPaymentMethodResultChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let deleteStoredPaymentMethodResultDTOArg = args[0] as! DeletedStoredPaymentMethodResultDTO
+        do {
+          try api.onDeleteStoredPaymentMethodResult(deleteStoredPaymentMethodResultDTO: deleteStoredPaymentMethodResultDTOArg)
+          reply(wrapResult(nil))
+        } catch {
+          reply(wrapError(error))
+        }
+      }
+    } else {
+      onDeleteStoredPaymentMethodResultChannel.setMessageHandler(nil)
+    }
   }
 }
 private class CheckoutFlutterApiCodecReader: FlutterStandardReader {
@@ -829,9 +877,9 @@ class CheckoutFlutterApi {
   var codec: FlutterStandardMessageCodec {
     return CheckoutFlutterApiCodec.shared
   }
-  func onDropInSessionResult(sessionPaymentResult sessionPaymentResultArg: PaymentResultDTO, completion: @escaping () -> Void) {
-    let channel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.CheckoutFlutterApi.onDropInSessionResult", binaryMessenger: binaryMessenger, codec: codec)
-    channel.sendMessage([sessionPaymentResultArg] as [Any?]) { _ in
+  func onDropInSessionPlatformCommunication(platformCommunicationModel platformCommunicationModelArg: PlatformCommunicationModel, completion: @escaping () -> Void) {
+    let channel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.CheckoutFlutterApi.onDropInSessionPlatformCommunication", binaryMessenger: binaryMessenger, codec: codec)
+    channel.sendMessage([platformCommunicationModelArg] as [Any?]) { _ in
       completion()
     }
   }
