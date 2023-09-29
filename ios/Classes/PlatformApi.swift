@@ -92,6 +92,11 @@ enum DropInResultType: Int {
   case error = 2
 }
 
+enum FieldVisibility: Int {
+  case show = 0
+  case hide = 1
+}
+
 /// Generated class from Pigeon that represents data sent in messages.
 struct SessionDTO {
   var id: String
@@ -242,8 +247,8 @@ struct CardsConfigurationDTO {
   var showStorePaymentField: Bool
   var showCvcForStoredCard: Bool
   var showCvc: Bool
-  var showKcpField: Bool
-  var showSocialSecurityNumberField: Bool
+  var kcpFieldVisibility: FieldVisibility
+  var socialSecurityNumberFieldVisibility: FieldVisibility
   var supportedCardTypes: [String?]
 
   static func fromList(_ list: [Any?]) -> CardsConfigurationDTO? {
@@ -252,8 +257,8 @@ struct CardsConfigurationDTO {
     let showStorePaymentField = list[2] as! Bool
     let showCvcForStoredCard = list[3] as! Bool
     let showCvc = list[4] as! Bool
-    let showKcpField = list[5] as! Bool
-    let showSocialSecurityNumberField = list[6] as! Bool
+    let kcpFieldVisibility = FieldVisibility(rawValue: list[5] as! Int)!
+    let socialSecurityNumberFieldVisibility = FieldVisibility(rawValue: list[6] as! Int)!
     let supportedCardTypes = list[7] as! [String?]
 
     return CardsConfigurationDTO(
@@ -262,8 +267,8 @@ struct CardsConfigurationDTO {
       showStorePaymentField: showStorePaymentField,
       showCvcForStoredCard: showCvcForStoredCard,
       showCvc: showCvc,
-      showKcpField: showKcpField,
-      showSocialSecurityNumberField: showSocialSecurityNumberField,
+      kcpFieldVisibility: kcpFieldVisibility,
+      socialSecurityNumberFieldVisibility: socialSecurityNumberFieldVisibility,
       supportedCardTypes: supportedCardTypes
     )
   }
@@ -274,8 +279,8 @@ struct CardsConfigurationDTO {
       showStorePaymentField,
       showCvcForStoredCard,
       showCvc,
-      showKcpField,
-      showSocialSecurityNumberField,
+      kcpFieldVisibility.rawValue,
+      socialSecurityNumberFieldVisibility.rawValue,
       supportedCardTypes,
     ]
   }

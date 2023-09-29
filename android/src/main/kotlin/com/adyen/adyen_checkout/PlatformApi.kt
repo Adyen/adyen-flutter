@@ -150,6 +150,17 @@ enum class DropInResultType(val raw: Int) {
   }
 }
 
+enum class FieldVisibility(val raw: Int) {
+  SHOW(0),
+  HIDE(1);
+
+  companion object {
+    fun ofRaw(raw: Int): FieldVisibility? {
+      return values().firstOrNull { it.raw == raw }
+    }
+  }
+}
+
 /** Generated class from Pigeon that represents data sent in messages. */
 data class SessionDTO (
   val id: String,
@@ -285,8 +296,8 @@ data class CardsConfigurationDTO (
   val showStorePaymentField: Boolean,
   val showCvcForStoredCard: Boolean,
   val showCvc: Boolean,
-  val showKcpField: Boolean,
-  val showSocialSecurityNumberField: Boolean,
+  val kcpFieldVisibility: FieldVisibility,
+  val socialSecurityNumberFieldVisibility: FieldVisibility,
   val supportedCardTypes: List<String?>
 
 ) {
@@ -298,10 +309,10 @@ data class CardsConfigurationDTO (
       val showStorePaymentField = list[2] as Boolean
       val showCvcForStoredCard = list[3] as Boolean
       val showCvc = list[4] as Boolean
-      val showKcpField = list[5] as Boolean
-      val showSocialSecurityNumberField = list[6] as Boolean
+      val kcpFieldVisibility = FieldVisibility.ofRaw(list[5] as Int)!!
+      val socialSecurityNumberFieldVisibility = FieldVisibility.ofRaw(list[6] as Int)!!
       val supportedCardTypes = list[7] as List<String?>
-      return CardsConfigurationDTO(holderNameRequired, addressMode, showStorePaymentField, showCvcForStoredCard, showCvc, showKcpField, showSocialSecurityNumberField, supportedCardTypes)
+      return CardsConfigurationDTO(holderNameRequired, addressMode, showStorePaymentField, showCvcForStoredCard, showCvc, kcpFieldVisibility, socialSecurityNumberFieldVisibility, supportedCardTypes)
     }
   }
   fun toList(): List<Any?> {
@@ -311,8 +322,8 @@ data class CardsConfigurationDTO (
       showStorePaymentField,
       showCvcForStoredCard,
       showCvc,
-      showKcpField,
-      showSocialSecurityNumberField,
+      kcpFieldVisibility.raw,
+      socialSecurityNumberFieldVisibility.raw,
       supportedCardTypes,
     )
   }

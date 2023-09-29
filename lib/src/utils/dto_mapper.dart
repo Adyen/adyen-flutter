@@ -16,8 +16,9 @@ extension CardsConfigurationMapper on CardsConfiguration {
         showStorePaymentField: showStorePaymentField,
         showCvcForStoredCard: showCvcForStoredCard,
         showCvc: showCvc,
-        showKcpField: showKcpField,
-        showSocialSecurityNumberField: showSocialSecurityNumberField,
+        kcpFieldVisibility: kcpFieldVisibility,
+        socialSecurityNumberFieldVisibility:
+            socialSecurityNumberFieldVisibility,
         supportedCardTypes: supportedCardTypes,
       );
 }

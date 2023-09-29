@@ -3,6 +3,7 @@ export 'src/generated/platform_api.g.dart'
     show
         Environment,
         AddressMode,
+        FieldVisibility,
         CardAuthMethod,
         TotalPriceStatus,
         PaymentResultEnum,

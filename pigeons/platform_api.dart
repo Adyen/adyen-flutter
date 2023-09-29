@@ -64,6 +64,11 @@ enum DropInResultType {
   error,
 }
 
+enum FieldVisibility {
+  show,
+  hide,
+}
+
 class SessionDTO {
   final String id;
   final String sessionData;
@@ -130,8 +135,8 @@ class CardsConfigurationDTO {
   final bool showStorePaymentField;
   final bool showCvcForStoredCard;
   final bool showCvc;
-  final bool showKcpField;
-  final bool showSocialSecurityNumberField;
+  final FieldVisibility kcpFieldVisibility;
+  final FieldVisibility socialSecurityNumberFieldVisibility;
   final List<String?> supportedCardTypes;
 
   CardsConfigurationDTO(
@@ -140,8 +145,8 @@ class CardsConfigurationDTO {
     this.showStorePaymentField,
     this.showCvcForStoredCard,
     this.showCvc,
-    this.showKcpField,
-    this.showSocialSecurityNumberField,
+    this.kcpFieldVisibility,
+    this.socialSecurityNumberFieldVisibility,
     this.supportedCardTypes,
   );
 }

@@ -62,6 +62,11 @@ enum DropInResultType {
   error,
 }
 
+enum FieldVisibility {
+  show,
+  hide,
+}
+
 class SessionDTO {
   SessionDTO({
     required this.id,
@@ -233,8 +238,8 @@ class CardsConfigurationDTO {
     required this.showStorePaymentField,
     required this.showCvcForStoredCard,
     required this.showCvc,
-    required this.showKcpField,
-    required this.showSocialSecurityNumberField,
+    required this.kcpFieldVisibility,
+    required this.socialSecurityNumberFieldVisibility,
     required this.supportedCardTypes,
   });
 
@@ -248,9 +253,9 @@ class CardsConfigurationDTO {
 
   bool showCvc;
 
-  bool showKcpField;
+  FieldVisibility kcpFieldVisibility;
 
-  bool showSocialSecurityNumberField;
+  FieldVisibility socialSecurityNumberFieldVisibility;
 
   List<String?> supportedCardTypes;
 
@@ -261,8 +266,8 @@ class CardsConfigurationDTO {
       showStorePaymentField,
       showCvcForStoredCard,
       showCvc,
-      showKcpField,
-      showSocialSecurityNumberField,
+      kcpFieldVisibility.index,
+      socialSecurityNumberFieldVisibility.index,
       supportedCardTypes,
     ];
   }
@@ -275,8 +280,8 @@ class CardsConfigurationDTO {
       showStorePaymentField: result[2]! as bool,
       showCvcForStoredCard: result[3]! as bool,
       showCvc: result[4]! as bool,
-      showKcpField: result[5]! as bool,
-      showSocialSecurityNumberField: result[6]! as bool,
+      kcpFieldVisibility: FieldVisibility.values[result[5]! as int],
+      socialSecurityNumberFieldVisibility: FieldVisibility.values[result[6]! as int],
       supportedCardTypes: (result[7] as List<Object?>?)!.cast<String?>(),
     );
   }

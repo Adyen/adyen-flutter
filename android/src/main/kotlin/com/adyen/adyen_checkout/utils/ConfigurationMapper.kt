@@ -7,6 +7,7 @@ import CashAppPayConfigurationDTO
 import CashAppPayEnvironment
 import DropInConfigurationDTO
 import Environment
+import FieldVisibility
 import GooglePayConfigurationDTO
 import GooglePayEnvironment
 import OrderResponseDTO
@@ -88,9 +89,9 @@ object ConfigurationMapper {
             .setShowStorePaymentField(cardsConfigurationDTO.showStorePaymentField)
             .setHideCvcStoredCard(!cardsConfigurationDTO.showCvcForStoredCard)
             .setHideCvc(!cardsConfigurationDTO.showCvc)
-            .setKcpAuthVisibility(determineKcpAuthVisibility(cardsConfigurationDTO.showKcpField))
+            .setKcpAuthVisibility(determineKcpAuthVisibility(cardsConfigurationDTO.kcpFieldVisibility))
             .setSocialSecurityNumberVisibility(
-                determineSocialSecurityNumberVisibility(cardsConfigurationDTO.showSocialSecurityNumberField)
+                determineSocialSecurityNumberVisibility(cardsConfigurationDTO.socialSecurityNumberFieldVisibility)
             )
             .setSupportedCardTypes(*mapToSupportedCardTypes(cardsConfigurationDTO.supportedCardTypes))
             .setHolderNameRequired(cardsConfigurationDTO.holderNameRequired)
@@ -131,17 +132,17 @@ object ConfigurationMapper {
         }
     }
 
-    private fun determineKcpAuthVisibility(visible: Boolean?): KCPAuthVisibility {
-        return when (visible) {
-            true -> KCPAuthVisibility.SHOW
-            else -> KCPAuthVisibility.HIDE
+    private fun determineKcpAuthVisibility(fieldVisibility: FieldVisibility): KCPAuthVisibility {
+        return when (fieldVisibility) {
+            FieldVisibility.SHOW -> KCPAuthVisibility.SHOW
+            FieldVisibility.HIDE -> KCPAuthVisibility.HIDE
         }
     }
 
-    private fun determineSocialSecurityNumberVisibility(visible: Boolean?): SocialSecurityNumberVisibility {
+    private fun determineSocialSecurityNumberVisibility(visible: FieldVisibility): SocialSecurityNumberVisibility {
         return when (visible) {
-            true -> SocialSecurityNumberVisibility.SHOW
-            else -> SocialSecurityNumberVisibility.HIDE
+            FieldVisibility.SHOW -> SocialSecurityNumberVisibility.SHOW
+            FieldVisibility.HIDE -> SocialSecurityNumberVisibility.HIDE
         }
     }
 

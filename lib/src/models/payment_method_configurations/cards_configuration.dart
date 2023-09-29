@@ -7,8 +7,8 @@ class CardsConfiguration extends CardsConfigurationDTO {
     bool showStorePaymentField = false,
     bool showCvcForStoredCard = true,
     bool showCvc = true,
-    bool showKcpField = false,
-    bool showSocialSecurityNumberField = false,
+    FieldVisibility kcpFieldVisibility = FieldVisibility.hide,
+    FieldVisibility socialSecurityNumberFieldVisibility = FieldVisibility.hide,
     List<String?> supportedCardTypes = const [],
   }) : super(
           holderNameRequired: holderNameRequired,
@@ -16,8 +16,9 @@ class CardsConfiguration extends CardsConfigurationDTO {
           showStorePaymentField: showStorePaymentField,
           showCvcForStoredCard: showCvcForStoredCard,
           showCvc: showCvc,
-          showKcpField: showKcpField,
-          showSocialSecurityNumberField: showSocialSecurityNumberField,
+          kcpFieldVisibility: kcpFieldVisibility,
+          socialSecurityNumberFieldVisibility:
+              socialSecurityNumberFieldVisibility,
           supportedCardTypes: supportedCardTypes,
         );
 }
