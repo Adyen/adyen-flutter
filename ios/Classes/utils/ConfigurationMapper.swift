@@ -77,6 +77,7 @@ class ConfigurationMapper {
     }
     
     private func buildApplePayConfiguration(applePayConfigurationDTO: ApplePayConfigurationDTO, amount: AmountDTO, countryCode: String) throws -> Adyen.ApplePayComponent.Configuration {
+        //TODO: Adjust pigeon code generation to use Int instead of Int64
         guard let value = Int(exactly: amount.value) else {
             throw PlatformError(errorDescription: "Cannot map Int64 to Int.")
         }
