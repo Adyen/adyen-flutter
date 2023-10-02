@@ -11,8 +11,8 @@ class ConfigurationMapper {
         dropInConfiguration.paymentMethodsList.allowDisablingStoredPaymentMethods = dropInConfigurationDTO.isRemoveStoredPaymentMethodEnabled
         
         if let cardsConfigurationDTO = dropInConfigurationDTO.cardsConfigurationDTO {
-            let koreanAuthenticationMode = determineFieldVisibility(visible: cardsConfigurationDTO.showKcpField)
-            let socialSecurityNumberMode = determineFieldVisibility(visible: cardsConfigurationDTO.showSocialSecurityNumberField)
+            let koreanAuthenticationMode = cardsConfigurationDTO.kcpFieldVisibility.toCardFieldVisibility()
+            let socialSecurityNumberMode = cardsConfigurationDTO.socialSecurityNumberFieldVisibility.toCardFieldVisibility()
             let storedCardConfiguration = createStoredCardConfiguration(showCvcForStoredCard: cardsConfigurationDTO.showCvcForStoredCard)
             let allowedCardTypes = determineAllowedCardTypes(cardTypes: cardsConfigurationDTO.supportedCardTypes)
             let billingAddressConfiguration = determineBillingAddressConfiguration(addressMode: cardsConfigurationDTO.addressMode)
@@ -42,11 +42,7 @@ class ConfigurationMapper {
         return dropInConfiguration
     }
     
-    private func determineFieldVisibility(visible: Bool) -> CardComponent.FieldVisibility {
-        return visible ? .show : .hide
-    }
-    
-    private func createStoredCardConfiguration(showCvcForStoredCard: Bool) -> StoredCardConfiguration {
+    private func createStoredCardConfiguration(showCvcForStoredCard: Bool?) -> StoredCardConfiguration {
         var storedCardConfiguration = StoredCardConfiguration()
         storedCardConfiguration.showsSecurityCodeField = showCvcForStoredCard
         return storedCardConfiguration;
@@ -92,5 +88,18 @@ class ConfigurationMapper {
         
         return ApplePayComponent.Configuration.init(payment: applePayPayment,
                                                     merchantIdentifier: applePayConfigurationDTO.merchantId)
+    }
+}
+
+
+extension FieldVisibility {
+    
+    func toCardFieldVisibility() -> CardComponent.FieldVisibility {
+        switch self {
+        case .show:
+            return .show
+        case .hide:
+            return .hide
+        }
     }
 }
