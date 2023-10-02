@@ -92,3 +92,28 @@ extension OrderResponseMapper on OrderResponseDTO {
         orderData: orderData,
       );
 }
+
+extension CardsConfigurationDTOCopy on CardsConfigurationDTO {
+  CardsConfigurationDTO copyWith({
+    bool? holderNameRequired,
+    AddressMode? addressMode,
+    bool? showStorePaymentField,
+    bool? showCvcForStoredCard,
+    bool? showCvc,
+    bool? showKcpField,
+    bool? showSocialSecurityNumberField,
+    List<String?>? supportedCardTypes,
+  }) =>
+      CardsConfigurationDTO(
+        holderNameRequired: holderNameRequired ?? this.holderNameRequired,
+        addressMode: addressMode ?? this.addressMode,
+        showStorePaymentField:
+            showStorePaymentField ?? this.showStorePaymentField,
+        showCvcForStoredCard: showCvcForStoredCard ?? this.showCvcForStoredCard,
+        showCvc: showCvc ?? this.showCvc,
+        showKcpField: showKcpField ?? this.showKcpField,
+        showSocialSecurityNumberField:
+            showSocialSecurityNumberField ?? this.showSocialSecurityNumberField,
+        supportedCardTypes: supportedCardTypes ?? this.supportedCardTypes,
+      );
+}

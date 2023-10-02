@@ -2,8 +2,8 @@
     package="com.adyen.adyen_checkout">
 
     <application>
+        <service android:name=".dropInSession.SessionDropInService" />
         <service android:name=".dropInAdvancedFlow.AdvancedFlowDropInService" />
-
     </application>
 
 </manifest>

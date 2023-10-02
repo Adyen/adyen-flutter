@@ -56,6 +56,7 @@ enum PlatformCommunicationType {
   paymentComponent,
   additionalDetails,
   result,
+  deleteStoredPaymentMethod,
 }
 
 enum DropInResultType {
@@ -80,7 +81,7 @@ class SessionDTO {
 }
 
 class AmountDTO {
-  final String? currency;
+  final String currency;
   final int value;
 
   AmountDTO(
@@ -105,13 +106,14 @@ class DropInConfigurationDTO {
   final String countryCode;
   final AmountDTO amount;
   final String shopperLocale;
-  final AnalyticsOptionsDTO? analyticsOptionsDTO;
-  final bool? showPreselectedStoredPaymentMethod;
-  final bool? skipListWhenSinglePaymentMethod;
   final CardsConfigurationDTO? cardsConfigurationDTO;
   final ApplePayConfigurationDTO? applePayConfigurationDTO;
   final GooglePayConfigurationDTO? googlePayConfigurationDTO;
   final CashAppPayConfigurationDTO? cashAppPayConfigurationDTO;
+  final AnalyticsOptionsDTO? analyticsOptionsDTO;
+  final bool showPreselectedStoredPaymentMethod;
+  final bool skipListWhenSinglePaymentMethod;
+  final bool isRemoveStoredPaymentMethodEnabled;
 
   DropInConfigurationDTO(
     this.environment,
@@ -119,13 +121,14 @@ class DropInConfigurationDTO {
     this.countryCode,
     this.amount,
     this.shopperLocale,
-    this.analyticsOptionsDTO,
     this.cardsConfigurationDTO,
-    this.showPreselectedStoredPaymentMethod,
-    this.skipListWhenSinglePaymentMethod,
     this.applePayConfigurationDTO,
     this.googlePayConfigurationDTO,
     this.cashAppPayConfigurationDTO,
+    this.analyticsOptionsDTO,
+    this.showPreselectedStoredPaymentMethod,
+    this.skipListWhenSinglePaymentMethod,
+    this.isRemoveStoredPaymentMethodEnabled,
   );
 }
 
@@ -278,6 +281,16 @@ class DropInErrorDTO {
   });
 }
 
+class DeletedStoredPaymentMethodResultDTO {
+  final String storedPaymentMethodId;
+  final bool isSuccessfullyRemoved;
+
+  DeletedStoredPaymentMethodResultDTO(
+    this.storedPaymentMethodId,
+    this.isSuccessfullyRemoved,
+  );
+}
+
 @HostApi()
 abstract class CheckoutPlatformInterface {
   @async
@@ -299,11 +312,15 @@ abstract class CheckoutPlatformInterface {
   void onPaymentsResult(DropInResultDTO paymentsResult);
 
   void onPaymentsDetailsResult(DropInResultDTO paymentsDetailsResult);
+
+  void onDeleteStoredPaymentMethodResult(
+      DeletedStoredPaymentMethodResultDTO deleteStoredPaymentMethodResultDTO);
 }
 
 @FlutterApi()
 abstract class CheckoutFlutterApi {
-  void onDropInSessionResult(PaymentResultDTO sessionPaymentResult);
+  void onDropInSessionPlatformCommunication(
+      PlatformCommunicationModel platformCommunicationModel);
 
   void onDropInAdvancedFlowPlatformCommunication(
       PlatformCommunicationModel platformCommunicationModel);

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:adyen_checkout/adyen_checkout.dart';
 import 'package:adyen_checkout/src/adyen_checkout_interface.dart';
@@ -34,32 +35,61 @@ class AdyenCheckout implements AdyenCheckoutInterface {
 
   Future<PaymentResult> _startDropInSessionsPayment(
       DropInSession dropInSession) async {
-    _resultApi.dropInSessionResultStream = StreamController<PaymentResultDTO>();
+    final dropInSessionCompleter = Completer<PaymentResultDTO>();
     DropInConfigurationDTO dropInConfiguration = DropInConfigurationDTO(
       environment: dropInSession.dropInConfiguration.environment,
       clientKey: dropInSession.dropInConfiguration.clientKey,
       countryCode: dropInSession.dropInConfiguration.countryCode,
-      amount: dropInSession.dropInConfiguration.amount,
-      shopperLocale: dropInSession.dropInConfiguration.shopperLocale,
+      amount: dropInSession.dropInConfiguration.amount.toDTO(),
+      shopperLocale: dropInSession.dropInConfiguration.shopperLocale ??
+          Platform.localeName,
       cardsConfigurationDTO:
-          dropInSession.dropInConfiguration.cardsConfigurationDTO,
+          dropInSession.dropInConfiguration.cardsConfiguration?.toDTO(),
       applePayConfigurationDTO:
-          dropInSession.dropInConfiguration.applePayConfigurationDTO,
+          dropInSession.dropInConfiguration.applePayConfiguration?.toDTO(),
       googlePayConfigurationDTO:
-          dropInSession.dropInConfiguration.googlePayConfigurationDTO,
+          dropInSession.dropInConfiguration.googlePayConfiguration?.toDTO(),
       cashAppPayConfigurationDTO:
-          dropInSession.dropInConfiguration.cashAppPayConfigurationDTO,
+          dropInSession.dropInConfiguration.cashAppPayConfiguration?.toDTO(),
       analyticsOptionsDTO:
-          dropInSession.dropInConfiguration.analyticsOptionsDTO,
+          dropInSession.dropInConfiguration.analyticsOptions?.toDTO(),
+      isRemoveStoredPaymentMethodEnabled:
+          isRemoveStoredPaymentMethodEnabled(dropInSession.dropInConfiguration),
+      showPreselectedStoredPaymentMethod: dropInSession
+              .dropInConfiguration
+              .storedPaymentMethodConfiguration
+              ?.showPreselectedStoredPaymentMethod ??
+          true,
+      skipListWhenSinglePaymentMethod:
+          dropInSession.dropInConfiguration.skipListWhenSinglePaymentMethod,
     );
+
     AdyenCheckoutPlatformInterface.instance.startDropInSessionPayment(
       session: dropInSession.session.toDTO(),
       dropInConfiguration: dropInConfiguration,
     );
-    final sessionDropInResultModel =
-        await _resultApi.dropInSessionResultStream.stream.first;
-    await _resultApi.dropInSessionResultStream.close();
-    return sessionDropInResultModel.fromDTO();
+
+    _resultApi.dropInSessionPlatformCommunicationStream =
+        StreamController<PlatformCommunicationModel>.broadcast();
+    _resultApi.dropInSessionPlatformCommunicationStream.stream
+        .asBroadcastStream()
+        .listen((event) async {
+      switch (event.type) {
+        case PlatformCommunicationType.result:
+          dropInSessionCompleter.complete(event.paymentResult);
+        case PlatformCommunicationType.deleteStoredPaymentMethod:
+          _onDeleteStoredPaymentMethodCallback(
+            event,
+            dropInSession.dropInConfiguration.storedPaymentMethodConfiguration,
+          );
+        default:
+      }
+    });
+
+    return dropInSessionCompleter.future.then((value) {
+      _resultApi.dropInSessionPlatformCommunicationStream.close();
+      return value.fromDTO();
+    });
   }
 
   Future<PaymentResult> _startDropInAdvancedFlowPayment(
@@ -69,19 +99,32 @@ class AdyenCheckout implements AdyenCheckoutInterface {
       environment: dropInAdvancedFlow.dropInConfiguration.environment,
       clientKey: dropInAdvancedFlow.dropInConfiguration.clientKey,
       countryCode: dropInAdvancedFlow.dropInConfiguration.countryCode,
-      amount: dropInAdvancedFlow.dropInConfiguration.amount,
-      shopperLocale: dropInAdvancedFlow.dropInConfiguration.shopperLocale,
+      amount: dropInAdvancedFlow.dropInConfiguration.amount.toDTO(),
+      shopperLocale: dropInAdvancedFlow.dropInConfiguration.shopperLocale ??
+          Platform.localeName,
       cardsConfigurationDTO:
-          dropInAdvancedFlow.dropInConfiguration.cardsConfigurationDTO,
+          dropInAdvancedFlow.dropInConfiguration.cardsConfiguration?.toDTO(),
       applePayConfigurationDTO:
-          dropInAdvancedFlow.dropInConfiguration.applePayConfigurationDTO,
-      googlePayConfigurationDTO:
-          dropInAdvancedFlow.dropInConfiguration.googlePayConfigurationDTO,
-      cashAppPayConfigurationDTO:
-          dropInAdvancedFlow.dropInConfiguration.cashAppPayConfigurationDTO,
+          dropInAdvancedFlow.dropInConfiguration.applePayConfiguration?.toDTO(),
+      googlePayConfigurationDTO: dropInAdvancedFlow
+          .dropInConfiguration.googlePayConfiguration
+          ?.toDTO(),
+      cashAppPayConfigurationDTO: dropInAdvancedFlow
+          .dropInConfiguration.cashAppPayConfiguration
+          ?.toDTO(),
       analyticsOptionsDTO:
-          dropInAdvancedFlow.dropInConfiguration.analyticsOptionsDTO,
+          dropInAdvancedFlow.dropInConfiguration.analyticsOptions?.toDTO(),
+      showPreselectedStoredPaymentMethod: dropInAdvancedFlow
+              .dropInConfiguration
+              .storedPaymentMethodConfiguration
+              ?.showPreselectedStoredPaymentMethod ??
+          true,
+      isRemoveStoredPaymentMethodEnabled: isRemoveStoredPaymentMethodEnabled(
+          dropInAdvancedFlow.dropInConfiguration),
+      skipListWhenSinglePaymentMethod: dropInAdvancedFlow
+          .dropInConfiguration.skipListWhenSinglePaymentMethod,
     );
+
     AdyenCheckoutPlatformInterface.instance.startDropInAdvancedFlowPayment(
       paymentMethodsResponse: dropInAdvancedFlow.paymentMethodsResponse,
       dropInConfiguration: dropInConfiguration,
@@ -100,6 +143,12 @@ class AdyenCheckout implements AdyenCheckoutInterface {
               event, dropInAdvancedFlow.postPaymentsDetails);
         case PlatformCommunicationType.result:
           _handleResult(dropInAdvancedFlowCompleter, event);
+        case PlatformCommunicationType.deleteStoredPaymentMethod:
+          _onDeleteStoredPaymentMethodCallback(
+            event,
+            dropInAdvancedFlow
+                .dropInConfiguration.storedPaymentMethodConfiguration,
+          );
       }
     });
 
@@ -127,7 +176,7 @@ class AdyenCheckout implements AdyenCheckoutInterface {
 
     final DropInOutcome paymentsDetailsResult =
         await postPaymentsDetails(event.data!);
-    DropInResultDTO dropInResult = mapToDropInResult(paymentsDetailsResult);
+    DropInResultDTO dropInResult = _mapToDropInResult(paymentsDetailsResult);
     AdyenCheckoutPlatformInterface.instance
         .onPaymentsDetailsResult(dropInResult);
   }
@@ -141,11 +190,11 @@ class AdyenCheckout implements AdyenCheckoutInterface {
     }
 
     final DropInOutcome paymentsResult = await postPayments(event.data!);
-    DropInResultDTO dropInResult = mapToDropInResult(paymentsResult);
+    DropInResultDTO dropInResult = _mapToDropInResult(paymentsResult);
     AdyenCheckoutPlatformInterface.instance.onPaymentsResult(dropInResult);
   }
 
-  DropInResultDTO mapToDropInResult(DropInOutcome dropInOutcome) {
+  DropInResultDTO _mapToDropInResult(DropInOutcome dropInOutcome) {
     return switch (dropInOutcome) {
       Finished() => DropInResultDTO(
           dropInResultType: DropInResultType.finished,
@@ -167,4 +216,33 @@ class AdyenCheckout implements AdyenCheckoutInterface {
   }
 
   void _setupResultApi() => CheckoutFlutterApi.setup(_resultApi);
+
+  Future<void> _onDeleteStoredPaymentMethodCallback(
+    PlatformCommunicationModel event,
+    StoredPaymentMethodConfiguration? storedPaymentMethodConfiguration,
+  ) async {
+    if (storedPaymentMethodConfiguration != null &&
+        storedPaymentMethodConfiguration.deleteStoredPaymentMethodCallback !=
+            null &&
+        event.data != null) {
+      final storedPaymentMethodId = event.data;
+      final result = await storedPaymentMethodConfiguration
+          .deleteStoredPaymentMethodCallback!(storedPaymentMethodId!);
+      AdyenCheckoutPlatformInterface.instance.onDeleteStoredPaymentMethodResult(
+          DeletedStoredPaymentMethodResultDTO(
+        storedPaymentMethodId: storedPaymentMethodId,
+        isSuccessfullyRemoved: result,
+      ));
+    }
+  }
+
+  bool isRemoveStoredPaymentMethodEnabled(
+      DropInConfiguration dropInConfiguration) {
+    return dropInConfiguration.storedPaymentMethodConfiguration
+                ?.deleteStoredPaymentMethodCallback !=
+            null &&
+        dropInConfiguration.storedPaymentMethodConfiguration
+                ?.isRemoveStoredPaymentMethodEnabled ==
+            true;
+  }
 }

@@ -5,7 +5,7 @@ class CardsConfiguration extends CardsConfigurationDTO {
     bool holderNameRequired = false,
     AddressMode addressMode = AddressMode.none,
     bool showStorePaymentField = false,
-    bool showCvcForStoredCard = true,
+    bool showCvcForStoredCard = false,
     bool showCvc = true,
     FieldVisibility kcpFieldVisibility = FieldVisibility.hide,
     FieldVisibility socialSecurityNumberFieldVisibility = FieldVisibility.hide,

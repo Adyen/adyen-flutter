@@ -49,6 +49,32 @@ class Service {
     return jsonDecode(response.body);
   }
 
+  Future<bool> deleteStoredPaymentMethod({
+    required String storedPaymentMethodId,
+    required String merchantAccount,
+    required String shopperReference,
+  }) async {
+    final queryParameters = {
+      'merchantAccount': merchantAccount,
+      'shopperReference': shopperReference,
+    };
+
+    final response = await http.delete(
+      Uri.https(
+        Config.baseUrl,
+        "/${Config.apiVersion}/storedPaymentMethods/$storedPaymentMethodId",
+        queryParameters,
+      ),
+      headers: _createHeaders(),
+    );
+
+    if (response.statusCode == 204) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   Map<String, String> _createHeaders() => {
         "content-type": "application/json",
         "x-API-key": Config.xApiKey,
