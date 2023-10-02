@@ -42,7 +42,7 @@ class ConfigurationMapper {
         return dropInConfiguration
     }
     
-    private func createStoredCardConfiguration(showCvcForStoredCard: Bool?) -> StoredCardConfiguration {
+    private func createStoredCardConfiguration(showCvcForStoredCard: Bool) -> StoredCardConfiguration {
         var storedCardConfiguration = StoredCardConfiguration()
         storedCardConfiguration.showsSecurityCodeField = showCvcForStoredCard
         return storedCardConfiguration;
