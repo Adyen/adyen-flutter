@@ -9,8 +9,8 @@ class ConfigurationMapper {
                                                                 allowPreselectedPaymentView: dropInConfigurationDTO.showPreselectedStoredPaymentMethod ?? false)
         
         if let cardsConfigurationDTO = dropInConfigurationDTO.cardsConfigurationDTO {
-            let koreanAuthenticationMode = determineFieldVisibility(fieldVisibility: cardsConfigurationDTO.kcpFieldVisibility)
-            let socialSecurityNumberMode = determineFieldVisibility(fieldVisibility: cardsConfigurationDTO.socialSecurityNumberFieldVisibility)
+            let koreanAuthenticationMode = cardsConfigurationDTO.kcpFieldVisibility.toCardFieldVisibility()
+            let socialSecurityNumberMode = cardsConfigurationDTO.socialSecurityNumberFieldVisibility.toCardFieldVisibility()
             let storedCardConfiguration = createStoredCardConfiguration(showCvcForStoredCard: cardsConfigurationDTO.showCvcForStoredCard)
             let allowedCardTypes = determineAllowedCardTypes(cardTypes: cardsConfigurationDTO.supportedCardTypes)
             let billingAddressConfiguration = determineBillingAddressConfiguration(addressMode: cardsConfigurationDTO.addressMode)
@@ -38,15 +38,6 @@ class ConfigurationMapper {
         }
         
         return dropInConfiguration
-    }
-    
-    private func determineFieldVisibility(fieldVisibility: FieldVisibility) -> CardComponent.FieldVisibility {
-        switch (fieldVisibility) {
-        case .show:
-            return .show
-        case .hide:
-            return .hide
-        }
     }
     
     private func createStoredCardConfiguration(showCvcForStoredCard: Bool?) -> StoredCardConfiguration {
@@ -97,5 +88,18 @@ class ConfigurationMapper {
         
         return ApplePayComponent.Configuration.init(payment: applePayPayment,
                                                     merchantIdentifier: applePayConfigurationDTO.merchantId)
+    }
+}
+
+
+extension FieldVisibility {
+    
+    func toCardFieldVisibility() -> CardComponent.FieldVisibility {
+        switch self {
+        case .show:
+            return .show
+        case .hide:
+            return .hide
+        }
     }
 }
