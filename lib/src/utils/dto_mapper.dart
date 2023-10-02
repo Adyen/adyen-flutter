@@ -100,8 +100,8 @@ extension CardsConfigurationDTOCopy on CardsConfigurationDTO {
     bool? showStorePaymentField,
     bool? showCvcForStoredCard,
     bool? showCvc,
-    bool? showKcpField,
-    bool? showSocialSecurityNumberField,
+    FieldVisibility? kcpFieldVisibility,
+    FieldVisibility? socialSecurityNumberFieldVisibility,
     List<String?>? supportedCardTypes,
   }) =>
       CardsConfigurationDTO(
@@ -111,9 +111,10 @@ extension CardsConfigurationDTOCopy on CardsConfigurationDTO {
             showStorePaymentField ?? this.showStorePaymentField,
         showCvcForStoredCard: showCvcForStoredCard ?? this.showCvcForStoredCard,
         showCvc: showCvc ?? this.showCvc,
-        showKcpField: showKcpField ?? this.showKcpField,
-        showSocialSecurityNumberField:
-            showSocialSecurityNumberField ?? this.showSocialSecurityNumberField,
+        kcpFieldVisibility: kcpFieldVisibility ?? this.kcpFieldVisibility,
+        socialSecurityNumberFieldVisibility:
+            socialSecurityNumberFieldVisibility ??
+                this.socialSecurityNumberFieldVisibility,
         supportedCardTypes: supportedCardTypes ?? this.supportedCardTypes,
       );
 }
