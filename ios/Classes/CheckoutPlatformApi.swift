@@ -122,7 +122,7 @@ class CheckoutPlatformApi : CheckoutPlatformInterface {
         dropInAdvancedFlowStoredPaymentMethodsDelegate?.handleDisableResult(isSuccessfullyRemoved: deleteStoredPaymentMethodResultDTO.isSuccessfullyRemoved)
     }
     
-    func cleanUpDropIn() throws {
+    func cleanUpDropIn() {
         dropInSessionDelegate = nil
         dropInSessionPresentationDelegate = nil
         dropInSessionStoredPaymentMethodsDelegate = nil
