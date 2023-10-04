@@ -42,6 +42,9 @@ class MockAdyenCheckoutPlatform
   @override
   void onDeleteStoredPaymentMethodResult(
       DeletedStoredPaymentMethodResultDTO deleteStoredPaymentMethodResultDTO) {}
+
+  @override
+  void cleanUpDropIn() {}
 }
 
 void main() {
