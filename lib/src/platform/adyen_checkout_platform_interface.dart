@@ -35,4 +35,6 @@ abstract class AdyenCheckoutPlatformInterface extends PlatformInterface {
 
   void onDeleteStoredPaymentMethodResult(
       DeletedStoredPaymentMethodResultDTO deleteStoredPaymentMethodResultDTO);
+
+  void cleanUpDropIn();
 }

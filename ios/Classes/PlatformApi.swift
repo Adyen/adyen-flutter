@@ -700,6 +700,7 @@ protocol CheckoutPlatformInterface {
   func onPaymentsResult(paymentsResult: DropInResultDTO) throws
   func onPaymentsDetailsResult(paymentsDetailsResult: DropInResultDTO) throws
   func onDeleteStoredPaymentMethodResult(deleteStoredPaymentMethodResultDTO: DeletedStoredPaymentMethodResultDTO) throws
+  func cleanUpDropIn() throws
 }
 
 /// Generated setup class from Pigeon to handle messages through the `binaryMessenger`.
@@ -814,6 +815,19 @@ class CheckoutPlatformInterfaceSetup {
       }
     } else {
       onDeleteStoredPaymentMethodResultChannel.setMessageHandler(nil)
+    }
+    let cleanUpDropInChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.cleanUpDropIn", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      cleanUpDropInChannel.setMessageHandler { _, reply in
+        do {
+          try api.cleanUpDropIn()
+          reply(wrapResult(nil))
+        } catch {
+          reply(wrapError(error))
+        }
+      }
+    } else {
+      cleanUpDropInChannel.setMessageHandler(nil)
     }
   }
 }

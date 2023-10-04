@@ -1,11 +1,14 @@
+@_spi(AdyenInternal)
 import Adyen
 
 class DropInAdvancedFlowStoredPaymentMethodsDelegate : StoredPaymentMethodsDelegate {
     private let checkoutFlutterApi: CheckoutFlutterApi
+    private let viewController : UIViewController
     private var completionHandler: ((Bool) -> Void)?
     
-    init(checkoutFlutterApi: CheckoutFlutterApi) {
+    init(viewController: UIViewController, checkoutFlutterApi: CheckoutFlutterApi) {
         self.checkoutFlutterApi = checkoutFlutterApi
+        self.viewController = viewController
     }
     
     internal func disable(storedPaymentMethod: StoredPaymentMethod, completion: @escaping (Bool) -> Void) {
@@ -15,6 +18,11 @@ class DropInAdvancedFlowStoredPaymentMethodsDelegate : StoredPaymentMethodsDeleg
     }
     
     func handleDisableResult(isSuccessfullyRemoved: Bool) {
+        if (isSuccessfullyRemoved == false) {
+            let errorAlert = TemporaryAlertHelper.buildPaymentMethodDeletionErrorAlert()
+            viewController.adyen.topPresenter.present(errorAlert, animated: true)
+        }
+        
         completionHandler?(isSuccessfullyRemoved)
     }
 }

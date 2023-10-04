@@ -315,6 +315,8 @@ abstract class CheckoutPlatformInterface {
 
   void onDeleteStoredPaymentMethodResult(
       DeletedStoredPaymentMethodResultDTO deleteStoredPaymentMethodResultDTO);
+
+  void cleanUpDropIn();
 }
 
 @FlutterApi()
