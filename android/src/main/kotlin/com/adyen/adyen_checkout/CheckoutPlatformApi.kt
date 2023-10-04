@@ -122,7 +122,13 @@ class CheckoutPlatformApi(private val checkoutFlutterApi: CheckoutFlutterApi?) :
             DropInPaymentMethodDeletionResultMessenger.sendResult(deleteStoredPaymentMethodResultDTO)
         }
 
-        private suspend fun createCheckoutSession(
+    override fun cleanUpDropIn() {
+        DropInServiceResultMessenger.instance().removeObservers(activity)
+        DropInPaymentMethodDeletionPlatformMessenger.instance().removeObservers(activity)
+        DropInAdditionalDetailsPlatformMessenger.instance().removeObservers(activity)
+    }
+
+    private suspend fun createCheckoutSession(
             sessionModel: com.adyen.checkout.sessions.core.SessionModel,
             dropInConfiguration: com.adyen.checkout.dropin.DropInConfiguration,
         ): CheckoutSession {

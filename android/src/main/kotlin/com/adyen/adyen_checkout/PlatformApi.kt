@@ -743,6 +743,7 @@ interface CheckoutPlatformInterface {
   fun onPaymentsResult(paymentsResult: DropInResultDTO)
   fun onPaymentsDetailsResult(paymentsDetailsResult: DropInResultDTO)
   fun onDeleteStoredPaymentMethodResult(deleteStoredPaymentMethodResultDTO: DeletedStoredPaymentMethodResultDTO)
+  fun cleanUpDropIn()
 
   companion object {
     /** The codec used by CheckoutPlatformInterface. */
@@ -875,6 +876,23 @@ interface CheckoutPlatformInterface {
             var wrapped: List<Any?>
             try {
               api.onDeleteStoredPaymentMethodResult(deleteStoredPaymentMethodResultDTOArg)
+              wrapped = listOf<Any?>(null)
+            } catch (exception: Throwable) {
+              wrapped = wrapError(exception)
+            }
+            reply.reply(wrapped)
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.cleanUpDropIn", codec)
+        if (api != null) {
+          channel.setMessageHandler { _, reply ->
+            var wrapped: List<Any?>
+            try {
+              api.cleanUpDropIn()
               wrapped = listOf<Any?>(null)
             } catch (exception: Throwable) {
               wrapped = wrapError(exception)

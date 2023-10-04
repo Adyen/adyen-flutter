@@ -87,6 +87,7 @@ class AdyenCheckout implements AdyenCheckoutInterface {
     });
 
     return dropInSessionCompleter.future.then((value) {
+      AdyenCheckoutPlatformInterface.instance.cleanUpDropIn();
       _resultApi.dropInSessionPlatformCommunicationStream.close();
       return value.fromDTO();
     });
@@ -153,6 +154,7 @@ class AdyenCheckout implements AdyenCheckoutInterface {
     });
 
     return dropInAdvancedFlowCompleter.future.then((value) {
+      AdyenCheckoutPlatformInterface.instance.cleanUpDropIn();
       _resultApi.dropInAdvancedFlowPlatformCommunicationStream.close();
       return value.fromDTO();
     });
