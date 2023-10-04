@@ -14,7 +14,7 @@ class DropInSessionsStoredPaymentMethodsDelegate : StoredPaymentMethodsDelegate 
     internal func disable(storedPaymentMethod: StoredPaymentMethod, completion: @escaping (Bool) -> Void) {
         completionHandler = completion
         let platformCommunicationModel = PlatformCommunicationModel(type: PlatformCommunicationType.deleteStoredPaymentMethod, data: storedPaymentMethod.identifier)
-        checkoutFlutterApi.onDropInSessionPlatformCommunication(platformCommunicationModel: platformCommunicationModel, completion: {})
+        checkoutFlutterApi.onDropInSessionPlatformCommunication(platformCommunicationModel: platformCommunicationModel, completion: { _ in})
     }
     
     func handleDisableResult(isSuccessfullyRemoved: Bool) {

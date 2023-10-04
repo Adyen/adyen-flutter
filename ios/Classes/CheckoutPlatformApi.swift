@@ -101,7 +101,7 @@ class CheckoutPlatformApi : CheckoutPlatformInterface {
             self.viewController?.present(dropInComponent.viewController, animated: true)
         } catch let error {
             let platformCommunicationModel = PlatformCommunicationModel(type: PlatformCommunicationType.result, paymentResult: PaymentResultDTO(type: PaymentResultEnum.error, reason: error.localizedDescription))
-            checkoutFlutterApi.onDropInAdvancedFlowPlatformCommunication(platformCommunicationModel: platformCommunicationModel, completion: {})
+            checkoutFlutterApi.onDropInAdvancedFlowPlatformCommunication(platformCommunicationModel: platformCommunicationModel, completion: {_ in })
         }
     }
     
@@ -184,7 +184,7 @@ class CheckoutPlatformApi : CheckoutPlatformInterface {
             }
         } catch let error {
             let paymentResult = PaymentResultDTO(type: PaymentResultEnum.error, reason: error.localizedDescription)
-            checkoutFlutterApi.onDropInAdvancedFlowPlatformCommunication(platformCommunicationModel: PlatformCommunicationModel(type: PlatformCommunicationType.result, paymentResult: paymentResult), completion: {})
+            checkoutFlutterApi.onDropInAdvancedFlowPlatformCommunication(platformCommunicationModel: PlatformCommunicationModel(type: PlatformCommunicationType.result, paymentResult: paymentResult), completion: {_ in })
             finalize(false, "\(error.localizedDescription)")
         }
     }
@@ -195,7 +195,7 @@ class CheckoutPlatformApi : CheckoutPlatformInterface {
         dropInComponent?.finalizeIfNeeded(with: success) { [weak self] in
             self?.dropInComponent?.viewController.presentingViewController?.dismiss(animated: false, completion: {
                 let paymentResult = PaymentResultDTO(type: PaymentResultEnum.finished, result: PaymentResultModelDTO(resultCode: resultCode?.rawValue))
-                self?.checkoutFlutterApi.onDropInAdvancedFlowPlatformCommunication(platformCommunicationModel: PlatformCommunicationModel(type: PlatformCommunicationType.result, paymentResult: paymentResult), completion: {})
+                self?.checkoutFlutterApi.onDropInAdvancedFlowPlatformCommunication(platformCommunicationModel: PlatformCommunicationModel(type: PlatformCommunicationType.result, paymentResult: paymentResult), completion: {_ in })
             })
         }
     }
@@ -208,7 +208,7 @@ class CheckoutPlatformApi : CheckoutPlatformInterface {
     
     private func onDropInResultError(dropInResult: DropInResultDTO) {
         let paymentResult = PaymentResultDTO(type: PaymentResultEnum.error, reason: dropInResult.error?.errorMessage)
-        checkoutFlutterApi.onDropInAdvancedFlowPlatformCommunication(platformCommunicationModel: PlatformCommunicationModel(type: PlatformCommunicationType.result, paymentResult: paymentResult), completion: {})
+        checkoutFlutterApi.onDropInAdvancedFlowPlatformCommunication(platformCommunicationModel: PlatformCommunicationModel(type: PlatformCommunicationType.result, paymentResult: paymentResult), completion: {_ in })
         finalize(false, dropInResult.error?.errorMessage ?? "")
     }
     
@@ -227,6 +227,6 @@ class CheckoutPlatformApi : CheckoutPlatformInterface {
     
     private func sendSessionError(error: Error) {
         let platformCommunicationModel = PlatformCommunicationModel(type: PlatformCommunicationType.result, paymentResult: PaymentResultDTO(type: PaymentResultEnum.error, reason: error.localizedDescription))
-        checkoutFlutterApi.onDropInSessionPlatformCommunication(platformCommunicationModel: platformCommunicationModel, completion: {})
+        checkoutFlutterApi.onDropInSessionPlatformCommunication(platformCommunicationModel: platformCommunicationModel, completion: {_ in })
     }
 }
