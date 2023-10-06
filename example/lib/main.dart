@@ -128,8 +128,6 @@ class _MyAppState extends State<MyApp> {
   Future<PaymentResult> startDropInAdvancedFlow() async {
     final String paymentMethodsResponse =
         await _adyenSessionRepository.fetchPaymentMethods();
-    final String returnUrl =
-        await _adyenSessionRepository.determineExampleReturnUrl();
 
     final CardsConfiguration cardsConfiguration =
         CardsConfiguration(showStorePaymentField: true);
