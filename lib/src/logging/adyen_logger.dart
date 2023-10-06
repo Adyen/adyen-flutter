@@ -3,13 +3,16 @@
 import 'package:flutter/foundation.dart';
 
 class AdyenLogger {
-  var _loggingEnabled = false;
 
-  void log(String message) {
+  bool _loggingEnabled = true;
+
+  void enableLogging({required bool loggingEnabled}) {
+    _loggingEnabled = loggingEnabled;
+  }
+
+  void print(String message) {
     if (kDebugMode && _loggingEnabled) {
       debugPrint(message);
     }
   }
-
-  void shouldLog(bool enabled) => _loggingEnabled = enabled;
 }

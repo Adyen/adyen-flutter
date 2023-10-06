@@ -743,7 +743,7 @@ interface CheckoutPlatformInterface {
   fun onPaymentsResult(paymentsResult: DropInResultDTO)
   fun onPaymentsDetailsResult(paymentsDetailsResult: DropInResultDTO)
   fun onDeleteStoredPaymentMethodResult(deleteStoredPaymentMethodResultDTO: DeletedStoredPaymentMethodResultDTO)
-  fun setupLogger(loggingEnabled: Boolean)
+  fun enableLogging(loggingEnabled: Boolean)
   fun cleanUpDropIn()
 
   companion object {
@@ -888,14 +888,14 @@ interface CheckoutPlatformInterface {
         }
       }
       run {
-        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.setupLogger", codec)
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.enableLogging", codec)
         if (api != null) {
           channel.setMessageHandler { message, reply ->
             val args = message as List<Any?>
             val loggingEnabledArg = args[0] as Boolean
             var wrapped: List<Any?>
             try {
-              api.setupLogger(loggingEnabledArg)
+              api.enableLogging(loggingEnabledArg)
               wrapped = listOf<Any?>(null)
             } catch (exception: Throwable) {
               wrapped = wrapError(exception)

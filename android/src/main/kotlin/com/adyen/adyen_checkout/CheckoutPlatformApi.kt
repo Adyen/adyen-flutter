@@ -125,7 +125,7 @@ class CheckoutPlatformApi(private val checkoutFlutterApi: CheckoutFlutterApi?) :
             DropInPaymentMethodDeletionResultMessenger.sendResult(deleteStoredPaymentMethodResultDTO)
         }
 
-        override fun setupLogger(loggingEnabled: Boolean) {
+        override fun enableLogging(loggingEnabled: Boolean) {
             if (loggingEnabled) {
                 AdyenLogger.setLogLevel(Log.VERBOSE)
             } else {

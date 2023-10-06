@@ -44,7 +44,7 @@ class MockAdyenCheckoutPlatform
       DeletedStoredPaymentMethodResultDTO deleteStoredPaymentMethodResultDTO) {}
 
   @override
-  void setupLogger(bool loggingEnabled) {}
+  void enableLogging(bool loggingEnabled) {}
 
   @override
   void cleanUpDropIn() {}

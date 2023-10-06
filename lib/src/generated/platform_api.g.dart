@@ -913,9 +913,9 @@ class CheckoutPlatformInterface {
     }
   }
 
-  Future<void> setupLogger(bool arg_loggingEnabled) async {
+  Future<void> enableLogging(bool arg_loggingEnabled) async {
     final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
-        'dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.setupLogger', codec,
+        'dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.enableLogging', codec,
         binaryMessenger: _binaryMessenger);
     final List<Object?>? replyList =
         await channel.send(<Object?>[arg_loggingEnabled]) as List<Object?>?;

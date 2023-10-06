@@ -122,7 +122,7 @@ class CheckoutPlatformApi : CheckoutPlatformInterface {
         dropInAdvancedFlowStoredPaymentMethodsDelegate?.handleDisableResult(isSuccessfullyRemoved: deleteStoredPaymentMethodResultDTO.isSuccessfullyRemoved)
     }
     
-    func setupLogger(loggingEnabled: Bool) {
+    func enableLogging(loggingEnabled: Bool) {
         AdyenLogging.isEnabled = loggingEnabled
     }
 

@@ -700,7 +700,7 @@ protocol CheckoutPlatformInterface {
   func onPaymentsResult(paymentsResult: DropInResultDTO) throws
   func onPaymentsDetailsResult(paymentsDetailsResult: DropInResultDTO) throws
   func onDeleteStoredPaymentMethodResult(deleteStoredPaymentMethodResultDTO: DeletedStoredPaymentMethodResultDTO) throws
-  func setupLogger(loggingEnabled: Bool) throws
+  func enableLogging(loggingEnabled: Bool) throws
   func cleanUpDropIn() throws
 }
 
@@ -817,20 +817,20 @@ class CheckoutPlatformInterfaceSetup {
     } else {
       onDeleteStoredPaymentMethodResultChannel.setMessageHandler(nil)
     }
-    let setupLoggerChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.setupLogger", binaryMessenger: binaryMessenger, codec: codec)
+    let enableLoggingChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.enableLogging", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {
-      setupLoggerChannel.setMessageHandler { message, reply in
+      enableLoggingChannel.setMessageHandler { message, reply in
         let args = message as! [Any?]
         let loggingEnabledArg = args[0] as! Bool
         do {
-          try api.setupLogger(loggingEnabled: loggingEnabledArg)
+          try api.enableLogging(loggingEnabled: loggingEnabledArg)
           reply(wrapResult(nil))
         } catch {
           reply(wrapError(error))
         }
       }
     } else {
-      setupLoggerChannel.setMessageHandler(nil)
+      enableLoggingChannel.setMessageHandler(nil)
     }
     let cleanUpDropInChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.cleanUpDropIn", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {
