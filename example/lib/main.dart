@@ -103,6 +103,9 @@ class _MyAppState extends State<MyApp> {
           _adyenSessionRepository.deleteStoredPaymentMethod,
     );
 
+    final CashAppPayConfiguration cashAppPayConfiguration =
+        await _createCashAppPayConfiguration();
+
     final DropInConfiguration dropInConfiguration = DropInConfiguration(
       environment: Environment.test,
       clientKey: Config.clientKey,
@@ -111,6 +114,7 @@ class _MyAppState extends State<MyApp> {
       shopperLocale: Config.shopperLocale,
       cardsConfiguration: cardsConfiguration,
       storedPaymentMethodConfiguration: storedPaymentMethodConfiguration,
+      cashAppPayConfiguration: cashAppPayConfiguration,
     );
 
     return await _adyenCheckout.startPayment(
@@ -124,8 +128,6 @@ class _MyAppState extends State<MyApp> {
   Future<PaymentResult> startDropInAdvancedFlow() async {
     final String paymentMethodsResponse =
         await _adyenSessionRepository.fetchPaymentMethods();
-    final String returnUrl =
-        await _adyenSessionRepository.determineExampleReturnUrl();
 
     final CardsConfiguration cardsConfiguration =
         CardsConfiguration(showStorePaymentField: true);
@@ -143,10 +145,7 @@ class _MyAppState extends State<MyApp> {
     );
 
     final CashAppPayConfiguration cashAppPayConfiguration =
-        CashAppPayConfiguration(
-      CashAppPayEnvironment.sandbox,
-      returnUrl,
-    );
+        await _createCashAppPayConfiguration();
 
     final StoredPaymentMethodConfiguration storedPaymentMethodConfiguration =
         StoredPaymentMethodConfiguration(
@@ -178,6 +177,15 @@ class _MyAppState extends State<MyApp> {
       ),
     );
   }
+
+  //To support CashAppPay please add "pod 'Adyen/CashAppPay'" to your Podfile.
+  Future<CashAppPayConfiguration> _createCashAppPayConfiguration() async {
+    return CashAppPayConfiguration(
+      CashAppPayEnvironment.sandbox,
+      await _adyenSessionRepository.determineExampleReturnUrl(),
+    );
+  }
+
 
   _dialogBuilder(BuildContext context, PaymentResult paymentResult) {
     String message = "";
