@@ -1,24 +1,23 @@
 import 'package:adyen_checkout/src/generated/platform_api.g.dart';
 
-class CardsConfiguration extends CardsConfigurationDTO {
+class CardsConfiguration {
+  final bool holderNameRequired;
+  final AddressMode addressMode;
+  final bool showStorePaymentField;
+  final bool showCvcForStoredCard;
+  final bool showCvc;
+  final FieldVisibility kcpFieldVisibility;
+  final FieldVisibility socialSecurityNumberFieldVisibility;
+  final List<String?> supportedCardTypes;
+
   CardsConfiguration({
-    bool holderNameRequired = false,
-    AddressMode addressMode = AddressMode.none,
-    bool showStorePaymentField = false,
-    bool showCvcForStoredCard = false,
-    bool showCvc = true,
-    FieldVisibility kcpFieldVisibility = FieldVisibility.hide,
-    FieldVisibility socialSecurityNumberFieldVisibility = FieldVisibility.hide,
-    List<String?> supportedCardTypes = const [],
-  }) : super(
-          holderNameRequired: holderNameRequired,
-          addressMode: addressMode,
-          showStorePaymentField: showStorePaymentField,
-          showCvcForStoredCard: showCvcForStoredCard,
-          showCvc: showCvc,
-          kcpFieldVisibility: kcpFieldVisibility,
-          socialSecurityNumberFieldVisibility:
-              socialSecurityNumberFieldVisibility,
-          supportedCardTypes: supportedCardTypes,
-        );
+    this.holderNameRequired = false,
+    this.addressMode = AddressMode.none,
+    this.showStorePaymentField = false,
+    this.showCvcForStoredCard = false,
+    this.showCvc = true,
+    this.kcpFieldVisibility = FieldVisibility.hide,
+    this.socialSecurityNumberFieldVisibility = FieldVisibility.hide,
+    this.supportedCardTypes = const [],
+  });
 }
