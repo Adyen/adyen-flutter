@@ -1,8 +1,8 @@
 import Adyen
 
-class DropInSessionsPresentationDelegate : PresentationDelegate {
-    func present(component: PresentableComponent) {
+class DropInSessionsPresentationDelegate: PresentationDelegate {
+    func present(component _: PresentableComponent) {
         print("presentable component")
-        //This is required later when integrating components
+        // This is required later when integrating components
     }
 }
