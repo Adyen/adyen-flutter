@@ -316,6 +316,8 @@ abstract class CheckoutPlatformInterface {
   void onDeleteStoredPaymentMethodResult(
       DeletedStoredPaymentMethodResultDTO deleteStoredPaymentMethodResultDTO);
 
+  void enableLogging(bool loggingEnabled);
+
   void cleanUpDropIn();
 }
 

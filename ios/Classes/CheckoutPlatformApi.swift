@@ -91,7 +91,7 @@ class CheckoutPlatformApi : CheckoutPlatformInterface {
                                                   configuration: configuration)
             dropInAdvancedFlowDelegate = DropInAdvancedFlowDelegate(checkoutFlutterApi: checkoutFlutterApi, component: dropInComponent)
             dropInComponent.delegate = dropInAdvancedFlowDelegate
-            
+
             if (dropInConfigurationDTO.isRemoveStoredPaymentMethodEnabled == true) {
                 dropInAdvancedFlowStoredPaymentMethodsDelegate = DropInAdvancedFlowStoredPaymentMethodsDelegate(viewController:viewController,
                                                                                                                 checkoutFlutterApi: checkoutFlutterApi)
@@ -122,6 +122,10 @@ class CheckoutPlatformApi : CheckoutPlatformInterface {
         dropInAdvancedFlowStoredPaymentMethodsDelegate?.handleDisableResult(isSuccessfullyRemoved: deleteStoredPaymentMethodResultDTO.isSuccessfullyRemoved)
     }
     
+    func enableLogging(loggingEnabled: Bool) {
+        AdyenLogging.isEnabled = loggingEnabled
+    }
+
     func cleanUpDropIn() {
         dropInSessionDelegate = nil
         dropInSessionPresentationDelegate = nil
@@ -129,7 +133,7 @@ class CheckoutPlatformApi : CheckoutPlatformInterface {
         dropInAdvancedFlowDelegate = nil
         dropInAdvancedFlowStoredPaymentMethodsDelegate = nil
     }
-    
+
     private func getViewController() -> UIViewController? {
         var rootViewController = UIApplication.shared.adyen.mainKeyWindow?.rootViewController
         while let presentedViewController = rootViewController?.presentedViewController {

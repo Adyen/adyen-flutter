@@ -9,6 +9,7 @@ import DropInResultType
 import PlatformCommunicationModel
 import PlatformCommunicationType
 import SessionDTO
+import android.util.Log
 import androidx.activity.result.ActivityResultLauncher
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.lifecycleScope
@@ -25,6 +26,8 @@ import com.adyen.adyen_checkout.utils.ConfigurationMapper.mapToDropInConfigurati
 import com.adyen.adyen_checkout.utils.ConfigurationMapper.mapToSession
 import com.adyen.adyen_checkout.utils.Constants.Companion.WRONG_FLUTTER_ACTIVITY_USAGE_ERROR_MESSAGE
 import com.adyen.checkout.components.core.PaymentMethodsApiResponse
+import com.adyen.checkout.core.AdyenLogger
+import com.adyen.checkout.core.internal.util.Logger.NONE
 import com.adyen.checkout.dropin.DropIn
 import com.adyen.checkout.dropin.internal.ui.model.DropInResultContractParams
 import com.adyen.checkout.dropin.internal.ui.model.SessionDropInResultContractParams
@@ -120,6 +123,14 @@ class CheckoutPlatformApi(private val checkoutFlutterApi: CheckoutFlutterApi?) :
                 DeletedStoredPaymentMethodResultDTO
         ) {
             DropInPaymentMethodDeletionResultMessenger.sendResult(deleteStoredPaymentMethodResultDTO)
+        }
+
+        override fun enableLogging(loggingEnabled: Boolean) {
+            if (loggingEnabled) {
+                AdyenLogger.setLogLevel(Log.VERBOSE)
+            } else {
+                AdyenLogger.setLogLevel(NONE)
+            }
         }
 
     override fun cleanUpDropIn() {
