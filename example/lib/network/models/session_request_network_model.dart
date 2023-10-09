@@ -11,6 +11,7 @@ class SessionRequestNetworkModel {
   final String? shopperReference;
   final String? storePaymentMethodMode;
   final String? recurringProcessingModel;
+  final String? channel;
 
   SessionRequestNetworkModel({
     required this.merchantAccount,
@@ -21,6 +22,7 @@ class SessionRequestNetworkModel {
     this.shopperReference,
     this.storePaymentMethodMode,
     this.recurringProcessingModel,
+    this.channel,
   });
 
   String toRawJson() => json.encode(toJson());
@@ -35,6 +37,7 @@ class SessionRequestNetworkModel {
     data['shopperReference'] = shopperReference;
     data['storePaymentMethodMode'] = storePaymentMethodMode;
     data['recurringProcessingModel'] = recurringProcessingModel;
+    data['channel'] = channel;
     return data;
   }
 }
