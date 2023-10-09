@@ -41,6 +41,7 @@ class AdyenSessionsRepository {
           StorePaymentMethodMode.askForConsent.storePaymentMethodModeString,
       recurringProcessingModel:
           RecurringProcessingModel.cardOnFile.recurringModelString,
+      channel: _determineChannel(),
     );
 
     SessionResponseNetworkModel sessionResponseNetworkModel =

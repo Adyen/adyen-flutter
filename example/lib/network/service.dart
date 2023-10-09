@@ -16,6 +16,7 @@ class Service {
       headers: _createHeaders(),
       body: sessionRequestNetworkModel.toRawJson(),
     );
+    print("PspReference: ${response.headers["pspreference"]}");
     return SessionResponseNetworkModel.fromRawJson(response.body);
   }
 
@@ -36,6 +37,7 @@ class Service {
       headers: _createHeaders(),
       body: jsonEncode(body),
     );
+    print("PspReference: ${response.headers["pspreference"]}");
     return jsonDecode(response.body);
   }
 
