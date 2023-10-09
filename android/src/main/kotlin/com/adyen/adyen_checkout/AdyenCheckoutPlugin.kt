@@ -69,7 +69,7 @@ class AdyenCheckoutPlugin : FlutterPlugin, ActivityAware {
             when (event) {
                 Lifecycle.Event.ON_CREATE -> {
                     checkoutPlatformApi?.dropInSessionLauncher =
-                        DropIn.registerForDropInResult(fragmentActivity, sessionDropInCallback())
+                        DropIn.registerForDropInResult(fragmentActivity, sessionDropInCallback)
                     checkoutPlatformApi?.dropInAdvancedFlowLauncher = DropIn.registerForDropInResult(
                         fragmentActivity, dropInAdvancedFlowCallback
                     )
@@ -80,7 +80,7 @@ class AdyenCheckoutPlugin : FlutterPlugin, ActivityAware {
         }
     }
 
-    private fun sessionDropInCallback() = SessionDropInCallback { sessionDropInResult ->
+    private val sessionDropInCallback = SessionDropInCallback { sessionDropInResult ->
         if (sessionDropInResult == null) {
             return@SessionDropInCallback
         }
