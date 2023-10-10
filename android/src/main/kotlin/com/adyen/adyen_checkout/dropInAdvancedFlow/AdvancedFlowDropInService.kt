@@ -1,6 +1,7 @@
 package com.adyen.adyen_checkout.dropInAdvancedFlow
 
 import DeletedStoredPaymentMethodResultDTO
+import DropInErrorDTO
 import DropInResultDTO
 import DropInResultType
 import android.content.Intent
@@ -132,7 +133,7 @@ class AdvancedFlowDropInService : DropInService(), LifecycleOwner {
             )
 
             DropInResultType.ERROR -> DropInServiceResult.Error(
-                errorDialog = null,
+                errorDialog = buildErrorDialog(dropInResultDTO.error),
                 reason = dropInResultDTO.error?.reason,
                 dismissDropIn = dropInResultDTO.error?.dismissDropIn ?: false
             )
@@ -155,6 +156,14 @@ class AdvancedFlowDropInService : DropInService(), LifecycleOwner {
                 reason = "IOException",
                 dismissDropIn = true
             )
+        }
+    }
+
+    private fun buildErrorDialog(dropInError: DropInErrorDTO?): ErrorDialog? {
+        return if (dropInError?.dismissDropIn == true) {
+            null
+        } else {
+            ErrorDialog(message = dropInError?.errorMessage)
         }
     }
 

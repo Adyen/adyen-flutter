@@ -199,12 +199,14 @@ class AdyenCheckout implements AdyenCheckoutInterface {
       DropInResultDTO dropInResult = _mapToDropInResult(paymentsResult);
       AdyenCheckoutPlatformInterface.instance.onPaymentsResult(dropInResult);
     } catch (error) {
-      _adyenLogger.print(error.toString());
+      String errorMessage = error.toString();
+      _adyenLogger.print("Failure in postPayments, $errorMessage");
       AdyenCheckoutPlatformInterface.instance.onPaymentsResult(DropInResultDTO(
         dropInResultType: DropInResultType.error,
         error: DropInErrorDTO(
-          reason: "Failure executing postPayments, ${error.toString()}",
-          dismissDropIn: true,
+          errorMessage: errorMessage,
+          reason: "Failure in postPayments, $errorMessage",
+          dismissDropIn: false,
         ),
       ));
     }
@@ -226,13 +228,15 @@ class AdyenCheckout implements AdyenCheckoutInterface {
       AdyenCheckoutPlatformInterface.instance
           .onPaymentsDetailsResult(dropInResult);
     } catch (error) {
-      _adyenLogger.print(error.toString());
+      String errorMessage = error.toString();
+      _adyenLogger.print("Failure in postPaymentsDetails, $errorMessage");
       AdyenCheckoutPlatformInterface.instance
           .onPaymentsDetailsResult(DropInResultDTO(
         dropInResultType: DropInResultType.error,
         error: DropInErrorDTO(
-          reason: "Failure executing postPaymentsDetails, ${error.toString()}",
-          dismissDropIn: true,
+          errorMessage: errorMessage,
+          reason: "Failure in postPaymentsDetails, $errorMessage}",
+          dismissDropIn: false,
         ),
       ));
     }
