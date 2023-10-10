@@ -198,7 +198,7 @@ class _MyAppState extends State<MyApp> {
         message = "Result code: ${paymentResult.resultCode}";
       case PaymentCancelledByUser():
         title = "Cancelled by user";
-        message = "Drop-in cancelled manually by user";
+        message = "Drop-in cancelled by user";
       case PaymentError():
         title = "Error occurred";
         message = "${paymentResult.reason}";
