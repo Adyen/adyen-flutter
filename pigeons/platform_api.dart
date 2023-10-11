@@ -361,6 +361,9 @@ abstract class CheckoutFlutterApi {
 
   void onDropInAdvancedFlowPlatformCommunication(
       PlatformCommunicationModel platformCommunicationModel);
+
+  void onComponentCommunication(
+      PlatformCommunicationModel platformCommunicationModel);
 }
 
 @FlutterApi()

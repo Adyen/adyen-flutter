@@ -1089,6 +1089,20 @@ class CheckoutFlutterApi(private val binaryMessenger: BinaryMessenger) {
       } 
     }
   }
+  fun onComponentCommunication(platformCommunicationModelArg: PlatformCommunicationModel, callback: (Result<Unit>) -> Unit) {
+    val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.adyen_checkout.CheckoutFlutterApi.onComponentCommunication", codec)
+    channel.send(listOf(platformCommunicationModelArg)) {
+      if (it is List<*>) {
+        if (it.size > 1) {
+          callback(Result.failure(FlutterError(it[0] as String, it[1] as String, it[2] as String?)));
+        } else {
+          callback(Result.success(Unit));
+        }
+      } else {
+        callback(Result.failure(FlutterError("channel-error",  "Unable to establish connection on channel.", "")));
+      } 
+    }
+  }
 }
 @Suppress("UNCHECKED_CAST")
 private object ComponentFlutterApiCodec : StandardMessageCodec() {
