@@ -12,7 +12,7 @@ class AdyenLogger {
 
   void print(String message) {
     if (kDebugMode && _loggingEnabled) {
-      debugPrint(message);
+      debugPrint("AdyenCheckout: $message");
     }
   }
 }

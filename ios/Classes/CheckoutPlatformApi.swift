@@ -177,20 +177,14 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
     }
 
     private func handleDropInResult(dropInResult: DropInResultDTO) {
-        do {
             switch dropInResult.dropInResultType {
             case .finished:
                 onDropInResultFinished(dropInResult: dropInResult)
             case .action:
-                try onDropInResultAction(dropInResult: dropInResult)
+                onDropInResultAction(dropInResult: dropInResult)
             case .error:
                 onDropInResultError(dropInResult: dropInResult)
             }
-        } catch {
-            let paymentResult = PaymentResultDTO(type: PaymentResultEnum.error, reason: error.localizedDescription)
-            checkoutFlutterApi.onDropInAdvancedFlowPlatformCommunication(platformCommunicationModel: PlatformCommunicationModel(type: PlatformCommunicationType.result, paymentResult: paymentResult), completion: { _ in })
-            finalize(false, "\(error.localizedDescription)")
-        }
     }
 
     private func onDropInResultFinished(dropInResult: DropInResultDTO) {
@@ -204,16 +198,35 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
         }
     }
 
-    private func onDropInResultAction(dropInResult: DropInResultDTO) throws {
-        let jsonData = try JSONSerialization.data(withJSONObject: dropInResult.actionResponse as Any, options: [])
-        let result = try JSONDecoder().decode(Action.self, from: jsonData)
-        dropInComponent?.handle(result)
+    private func onDropInResultAction(dropInResult: DropInResultDTO) {
+        do {
+            let jsonData = try JSONSerialization.data(withJSONObject: dropInResult.actionResponse as Any, options: [])
+            let result = try JSONDecoder().decode(Action.self, from: jsonData)
+            dropInComponent?.handle(result)
+        } catch {
+            let paymentResult = PaymentResultDTO(type: PaymentResultEnum.error, reason: error.localizedDescription)
+            checkoutFlutterApi.onDropInAdvancedFlowPlatformCommunication(platformCommunicationModel: PlatformCommunicationModel(type: PlatformCommunicationType.result, paymentResult: paymentResult), completion: { _ in })
+            finalize(false, "\(error.localizedDescription)")
+        }
     }
 
     private func onDropInResultError(dropInResult: DropInResultDTO) {
-        let paymentResult = PaymentResultDTO(type: PaymentResultEnum.error, reason: dropInResult.error?.errorMessage)
-        checkoutFlutterApi.onDropInAdvancedFlowPlatformCommunication(platformCommunicationModel: PlatformCommunicationModel(type: PlatformCommunicationType.result, paymentResult: paymentResult), completion: { _ in })
-        finalize(false, dropInResult.error?.errorMessage ?? "")
+        dropInComponent?.stopLoading()
+        
+        if (dropInResult.error?.dismissDropIn == true) {
+            let paymentResult = PaymentResultDTO(type: PaymentResultEnum.error, reason: dropInResult.error?.errorMessage)
+            checkoutFlutterApi.onDropInAdvancedFlowPlatformCommunication(platformCommunicationModel: PlatformCommunicationModel(type: PlatformCommunicationType.result, paymentResult: paymentResult), completion: { _ in })
+            finalize(false, dropInResult.error?.errorMessage ?? "")
+        } else {
+            dropInComponent?.finalizeIfNeeded(with: false, completion: {})
+            let localizationParameters = (dropInComponent as? Localizable)?.localizationParameters
+            let title = localizedString(.errorTitle, localizationParameters)
+            let alertController = UIAlertController(title: title,
+                                                    message: dropInResult.error?.errorMessage,
+                                                    preferredStyle: .alert)
+            alertController.addAction(UIAlertAction(title: localizedString(.dismissButton, localizationParameters), style: .cancel))
+            viewController?.adyen.topPresenter.present(alertController, animated: true)
+        }
     }
 
     private func finalize(_ success: Bool, _: String) {

@@ -186,33 +186,60 @@ class AdyenCheckout implements AdyenCheckoutInterface {
     dropInAdvancedFlowCompleter.complete(event.paymentResult);
   }
 
+  Future<void> _handlePaymentComponent(
+    PlatformCommunicationModel event,
+    Future<DropInOutcome> Function(String paymentComponentJson) postPayments,
+  ) async {
+    try {
+      if (event.data == null) {
+        throw Exception("Payment data is not provided.");
+      }
+
+      final DropInOutcome paymentsResult = await postPayments(event.data!);
+      DropInResultDTO dropInResult = _mapToDropInResult(paymentsResult);
+      AdyenCheckoutPlatformInterface.instance.onPaymentsResult(dropInResult);
+    } catch (error) {
+      String errorMessage = error.toString();
+      _adyenLogger.print("Failure in postPayments, $errorMessage");
+      AdyenCheckoutPlatformInterface.instance.onPaymentsResult(DropInResultDTO(
+        dropInResultType: DropInResultType.error,
+        error: DropInErrorDTO(
+          errorMessage: errorMessage,
+          reason: "Failure in postPayments, $errorMessage",
+          dismissDropIn: false,
+        ),
+      ));
+    }
+  }
+
   Future<void> _handleAdditionalDetails(
     PlatformCommunicationModel event,
     Future<DropInOutcome> Function(String additionalDetails)
         postPaymentsDetails,
   ) async {
-    if (event.data == null) {
-      throw Exception("Additional data is not provided.");
+    try {
+      if (event.data == null) {
+        throw Exception("Additional data is not provided.");
+      }
+
+      final DropInOutcome paymentsDetailsResult =
+          await postPaymentsDetails(event.data!);
+      DropInResultDTO dropInResult = _mapToDropInResult(paymentsDetailsResult);
+      AdyenCheckoutPlatformInterface.instance
+          .onPaymentsDetailsResult(dropInResult);
+    } catch (error) {
+      String errorMessage = error.toString();
+      _adyenLogger.print("Failure in postPaymentsDetails, $errorMessage");
+      AdyenCheckoutPlatformInterface.instance
+          .onPaymentsDetailsResult(DropInResultDTO(
+        dropInResultType: DropInResultType.error,
+        error: DropInErrorDTO(
+          errorMessage: errorMessage,
+          reason: "Failure in postPaymentsDetails, $errorMessage}",
+          dismissDropIn: false,
+        ),
+      ));
     }
-
-    final DropInOutcome paymentsDetailsResult =
-        await postPaymentsDetails(event.data!);
-    DropInResultDTO dropInResult = _mapToDropInResult(paymentsDetailsResult);
-    AdyenCheckoutPlatformInterface.instance
-        .onPaymentsDetailsResult(dropInResult);
-  }
-
-  Future<void> _handlePaymentComponent(
-    PlatformCommunicationModel event,
-    Future<DropInOutcome> Function(String paymentComponentJson) postPayments,
-  ) async {
-    if (event.data == null) {
-      throw Exception("Payment data is not provided.");
-    }
-
-    final DropInOutcome paymentsResult = await postPayments(event.data!);
-    DropInResultDTO dropInResult = _mapToDropInResult(paymentsResult);
-    AdyenCheckoutPlatformInterface.instance.onPaymentsResult(dropInResult);
   }
 
   DropInResultDTO _mapToDropInResult(DropInOutcome dropInOutcome) {
@@ -242,18 +269,28 @@ class AdyenCheckout implements AdyenCheckoutInterface {
     PlatformCommunicationModel event,
     StoredPaymentMethodConfiguration? storedPaymentMethodConfiguration,
   ) async {
-    if (storedPaymentMethodConfiguration != null &&
-        storedPaymentMethodConfiguration.deleteStoredPaymentMethodCallback !=
-            null &&
-        event.data != null) {
-      final storedPaymentMethodId = event.data;
-      final result = await storedPaymentMethodConfiguration
-          .deleteStoredPaymentMethodCallback!(storedPaymentMethodId!);
-      AdyenCheckoutPlatformInterface.instance.onDeleteStoredPaymentMethodResult(
-          DeletedStoredPaymentMethodResultDTO(
-        storedPaymentMethodId: storedPaymentMethodId,
-        isSuccessfullyRemoved: result,
-      ));
+    final String? storedPaymentMethodId = event.data;
+    final deletionCallback =
+        storedPaymentMethodConfiguration?.deleteStoredPaymentMethodCallback;
+
+    if (storedPaymentMethodId != null && deletionCallback != null) {
+      try {
+        final bool result = await deletionCallback(storedPaymentMethodId);
+        AdyenCheckoutPlatformInterface.instance
+            .onDeleteStoredPaymentMethodResult(
+                DeletedStoredPaymentMethodResultDTO(
+          storedPaymentMethodId: storedPaymentMethodId,
+          isSuccessfullyRemoved: result,
+        ));
+      } catch (error) {
+        _adyenLogger.print(error.toString());
+        AdyenCheckoutPlatformInterface.instance
+            .onDeleteStoredPaymentMethodResult(
+                DeletedStoredPaymentMethodResultDTO(
+          storedPaymentMethodId: storedPaymentMethodId,
+          isSuccessfullyRemoved: false,
+        ));
+      }
     }
   }
 
