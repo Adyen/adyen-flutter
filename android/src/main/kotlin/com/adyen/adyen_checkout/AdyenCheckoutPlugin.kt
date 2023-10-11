@@ -10,6 +10,7 @@ import PlatformCommunicationType
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
+import com.adyen.adyen_checkout.component.CardComponentFactory
 import com.adyen.adyen_checkout.utils.ConfigurationMapper.mapToOrderResponseModel
 import com.adyen.adyen_checkout.utils.Constants.Companion.WRONG_FLUTTER_ACTIVITY_USAGE_ERROR_MESSAGE
 import com.adyen.checkout.dropin.DropIn
@@ -18,6 +19,7 @@ import com.adyen.checkout.dropin.DropInResult
 import com.adyen.checkout.dropin.SessionDropInCallback
 import com.adyen.checkout.dropin.SessionDropInResult
 import io.flutter.embedding.engine.plugins.FlutterPlugin
+import io.flutter.embedding.engine.plugins.FlutterPlugin.FlutterPluginBinding
 import io.flutter.embedding.engine.plugins.activity.ActivityAware
 import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding
 import io.flutter.embedding.engine.plugins.lifecycle.HiddenLifecycleReference
@@ -29,13 +31,16 @@ class AdyenCheckoutPlugin : FlutterPlugin, ActivityAware {
     private var lifecycleReference: HiddenLifecycleReference? = null
     private var lifecycleObserver: LifecycleEventObserver? = null
 
-    override fun onAttachedToEngine(flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
+    private var flutterPluginBinding: FlutterPluginBinding? = null
+
+    override fun onAttachedToEngine(flutterPluginBinding: FlutterPluginBinding) {
+        this.flutterPluginBinding = flutterPluginBinding
         checkoutFlutterApi = CheckoutFlutterApi(flutterPluginBinding.binaryMessenger)
         checkoutPlatformApi = CheckoutPlatformApi(checkoutFlutterApi)
         CheckoutPlatformInterface.setUp(flutterPluginBinding.binaryMessenger, checkoutPlatformApi)
     }
 
-    override fun onDetachedFromEngine(binding: FlutterPlugin.FlutterPluginBinding) {
+    override fun onDetachedFromEngine(binding: FlutterPluginBinding) {
         CheckoutPlatformInterface.setUp(binding.binaryMessenger, null)
         checkoutFlutterApi = null
     }
@@ -62,6 +67,11 @@ class AdyenCheckoutPlugin : FlutterPlugin, ActivityAware {
         lifecycleObserver?.let {
             lifecycleReference?.lifecycle?.addObserver(it)
         }
+
+        flutterPluginBinding?.platformViewRegistry?.registerViewFactory(
+            "<platform-view-type>",
+            CardComponentFactory(fragmentActivity, checkoutFlutterApi!!)
+        )
     }
 
     private fun lifecycleEventObserver(fragmentActivity: FragmentActivity): LifecycleEventObserver {

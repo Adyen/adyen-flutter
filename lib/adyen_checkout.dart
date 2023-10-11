@@ -1,4 +1,5 @@
 export 'src/adyen_checkout.dart';
+export 'src/components/card_widget.dart';
 export 'src/generated/platform_api.g.dart'
     show
         Environment,

@@ -8,13 +8,21 @@ class AdyenCheckoutResultApi implements CheckoutFlutterApi {
   var dropInAdvancedFlowPlatformCommunicationStream =
       StreamController<PlatformCommunicationModel>();
 
+  var componentCommunicationStream =
+      StreamController<PlatformCommunicationModel>();
+
   @override
-  void onDropInSessionPlatformCommunication(
-      PlatformCommunicationModel data) =>
+  void onDropInSessionPlatformCommunication(PlatformCommunicationModel data) =>
       dropInSessionPlatformCommunicationStream.sink.add(data);
 
   @override
   void onDropInAdvancedFlowPlatformCommunication(
           PlatformCommunicationModel data) =>
       dropInAdvancedFlowPlatformCommunicationStream.sink.add(data);
+
+  @override
+  void onComponentCommunication(
+      PlatformCommunicationModel platformCommunicationModel) {
+    componentCommunicationStream.sink.add(platformCommunicationModel);
+  }
 }

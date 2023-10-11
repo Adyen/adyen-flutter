@@ -924,4 +924,10 @@ class CheckoutFlutterApi {
       completion(.success(Void()))
     }
   }
+  func onComponentCommunication(platformCommunicationModel platformCommunicationModelArg: PlatformCommunicationModel, completion: @escaping (Result<Void, FlutterError>) -> Void) {
+    let channel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.CheckoutFlutterApi.onComponentCommunication", binaryMessenger: binaryMessenger, codec: codec)
+    channel.sendMessage([platformCommunicationModelArg] as [Any?]) { _ in
+      completion(.success(Void()))
+    }
+  }
 }

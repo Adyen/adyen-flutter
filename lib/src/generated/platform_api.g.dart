@@ -1008,6 +1008,8 @@ abstract class CheckoutFlutterApi {
 
   void onDropInAdvancedFlowPlatformCommunication(PlatformCommunicationModel platformCommunicationModel);
 
+  void onComponentCommunication(PlatformCommunicationModel platformCommunicationModel);
+
   static void setup(CheckoutFlutterApi? api, {BinaryMessenger? binaryMessenger}) {
     {
       final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
@@ -1050,6 +1052,31 @@ abstract class CheckoutFlutterApi {
               'Argument for dev.flutter.pigeon.adyen_checkout.CheckoutFlutterApi.onDropInAdvancedFlowPlatformCommunication was null, expected non-null PlatformCommunicationModel.');
           try {
             api.onDropInAdvancedFlowPlatformCommunication(arg_platformCommunicationModel!);
+            return wrapResponse(empty: true);
+          } on PlatformException catch (e) {
+            return wrapResponse(error: e);
+          }          catch (e) {
+            return wrapResponse(error: PlatformException(code: 'error', message: e.toString()));
+          }
+        });
+      }
+    }
+    {
+      final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
+          'dev.flutter.pigeon.adyen_checkout.CheckoutFlutterApi.onComponentCommunication', codec,
+          binaryMessenger: binaryMessenger);
+      if (api == null) {
+        channel.setMessageHandler(null);
+      } else {
+        channel.setMessageHandler((Object? message) async {
+          assert(message != null,
+          'Argument for dev.flutter.pigeon.adyen_checkout.CheckoutFlutterApi.onComponentCommunication was null.');
+          final List<Object?> args = (message as List<Object?>?)!;
+          final PlatformCommunicationModel? arg_platformCommunicationModel = (args[0] as PlatformCommunicationModel?);
+          assert(arg_platformCommunicationModel != null,
+              'Argument for dev.flutter.pigeon.adyen_checkout.CheckoutFlutterApi.onComponentCommunication was null, expected non-null PlatformCommunicationModel.');
+          try {
+            api.onComponentCommunication(arg_platformCommunicationModel!);
             return wrapResponse(empty: true);
           } on PlatformException catch (e) {
             return wrapResponse(error: e);

@@ -7,6 +7,8 @@ import 'package:adyen_checkout_example/repositories/adyen_sessions_repository.da
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import 'navigation/routes.dart';
+
 void main() {
   runApp(const MaterialApp(home: MyApp()));
 }
@@ -78,7 +80,19 @@ class _MyAppState extends State<MyApp> {
                   final result = await startDropInAdvancedFlow();
                   _dialogBuilder(context, result);
                 },
-                child: const Text("DropIn advanced flow"))
+                child: const Text("DropIn advanced flow")),
+            TextButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => FirstRoute(
+                              repository: _adyenSessionRepository,
+
+                            )),
+                  );
+                },
+                child: const Text("Card component")),
           ],
         ),
       ),

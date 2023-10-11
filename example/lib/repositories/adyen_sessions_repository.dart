@@ -110,7 +110,7 @@ class AdyenSessionsRepository {
       ),
       countryCode: Config.countryCode,
       channel: _determineChannel(),
-      additionalData: AdditionalData(allow3DS2: true, executeThreeD: true),
+      additionalData: AdditionalData(allow3DS2: false, executeThreeD: false),
       threeDS2RequestData: ThreeDS2RequestDataRequest(),
       threeDSAuthenticationOnly: false,
       recurringProcessingModel: RecurringProcessingModel.cardOnFile,
