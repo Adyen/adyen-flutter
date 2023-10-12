@@ -1,6 +1,9 @@
 import 'dart:convert';
 
 import 'package:adyen_checkout_example/network/models/amount_network_model.dart';
+import 'package:adyen_checkout_example/network/models/billing_address.dart';
+import 'package:adyen_checkout_example/network/models/delivery_address.dart';
+import 'package:adyen_checkout_example/network/models/line_item.dart';
 
 class SessionRequestNetworkModel {
   final String merchantAccount;
@@ -12,6 +15,12 @@ class SessionRequestNetworkModel {
   final String? storePaymentMethodMode;
   final String? recurringProcessingModel;
   final String? channel;
+  final String? telephoneNumber;
+  final String? dateOfBirth;
+  final String? socialSecurityNumber;
+  final DeliveryAddress? deliveryAddress;
+  final BillingAddress? billingAddress;
+  final List<LineItem>? lineItems;
 
   SessionRequestNetworkModel({
     required this.merchantAccount,
@@ -23,6 +32,12 @@ class SessionRequestNetworkModel {
     this.storePaymentMethodMode,
     this.recurringProcessingModel,
     this.channel,
+    this.telephoneNumber,
+    this.dateOfBirth,
+    this.socialSecurityNumber,
+    this.deliveryAddress,
+    this.billingAddress,
+    this.lineItems,
   });
 
   String toRawJson() => json.encode(toJson());
@@ -38,6 +53,13 @@ class SessionRequestNetworkModel {
     data['storePaymentMethodMode'] = storePaymentMethodMode;
     data['recurringProcessingModel'] = recurringProcessingModel;
     data['channel'] = channel;
+    data['telephoneNumber'] = telephoneNumber;
+    data['dateOfBirth'] = dateOfBirth;
+    data['socialSecurityNumber'] = socialSecurityNumber;
+    data['billingAddress'] = billingAddress?.toJson();
+    data['deliveryAddress'] = deliveryAddress?.toJson();
+    data['lineItems'] =
+        lineItems?.map((lineItem) => lineItem.toJson()).toList();
     return data;
   }
 }
