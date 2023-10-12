@@ -7,5 +7,8 @@ public class AdyenCheckoutPlugin: NSObject, FlutterPlugin {
         let checkoutFlutterApi = CheckoutFlutterApi(binaryMessenger: messenger)
         let checkoutPlatformApi = CheckoutPlatformApi(checkoutFlutterApi: checkoutFlutterApi)
         CheckoutPlatformInterfaceSetup.setUp(binaryMessenger: messenger, api: checkoutPlatformApi)
+        
+        let factory = CardComponentViewFactory(messenger: registrar.messenger())
+        registrar.register(factory, withId: "<platform-view-type>")
     }
 }

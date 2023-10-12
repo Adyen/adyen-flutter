@@ -12,6 +12,7 @@ class FirstRoute extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.lightGreen,
         appBar: AppBar(
           title: const Text('Card component'),
         ),
@@ -23,27 +24,44 @@ class FirstRoute extends StatelessWidget {
                 child: CircularProgressIndicator(),
               );
             } else {
-              return Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  const Padding(
-                    padding: EdgeInsets.all(24.0),
-                    child: FlutterLogo(size: 128),
-                  ),
-                  const Text("This is a Flutter view"),
-                  CardWidget(
-                    paymentMethods: snapshot.data!,
-                    clientKey: Config.clientKey,
-                    onSubmit: repository.postPayments,
-                    onResult: (event) async {
-                      _dialogBuilder(context, event);
-                    },
-                  ),
-                ],
+              return buildCardWidget(snapshot, context);
+              return SingleChildScrollView(
+                physics: ClampingScrollPhysics(),
+
+                child: Column(
+                  children: [
+                    const Padding(
+                      padding: EdgeInsets.all(24.0),
+                      child: FlutterLogo(size: 128),
+                    ),
+                    const Text("This is a Flutter view"),
+                    SizedBox(
+                      height: 350,
+                      child: buildCardWidget(snapshot, context),
+                    ),
+                    Container(height: 300, width: 200, color: Colors.pink,),
+                    Container(height: 500, width: 400, color: Colors.yellow,)
+
+                  ],
+                ),
               );
             }
           },
         ));
+  }
+
+  Widget buildCardWidget(AsyncSnapshot<String> snapshot, BuildContext context) {
+    return SizedBox(
+      height: 550,
+      child: CardWidget(
+                        paymentMethods: snapshot.data!,
+                        clientKey: Config.clientKey,
+                        onSubmit: repository.postPayments,
+                        onResult: (event) async {
+                          _dialogBuilder(context, event);
+                        },
+                      ),
+    );
   }
 
   _dialogBuilder(BuildContext context, PaymentResult paymentResult) {

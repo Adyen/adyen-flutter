@@ -49,31 +49,56 @@ class CardWidget extends StatelessWidget {
       }
     });
 
-    return Expanded(
-      child: PlatformViewLink(
-        viewType: viewType,
-        surfaceFactory: (context, controller) {
-          return AndroidViewSurface(
-            controller: controller as AndroidViewController,
-            gestureRecognizers: const <Factory<OneSequenceGestureRecognizer>>{},
-            hitTestBehavior: PlatformViewHitTestBehavior.opaque,
-          );
-        },
-        onCreatePlatformView: (params) {
-          return PlatformViewsService.initSurfaceAndroidView(
-            id: params.id,
-            viewType: viewType,
-            layoutDirection: TextDirection.ltr,
-            creationParams: creationParams,
-            creationParamsCodec: const StandardMessageCodec(),
-            onFocus: () {
-              params.onFocusChanged(true);
-            },
-          )
-            ..addOnPlatformViewCreatedListener(params.onPlatformViewCreated)
-            ..create();
-        },
-      ),
+    return buildCardView(viewType, creationParams);
+  }
+
+  Widget buildCardView(String viewType, Map<String, dynamic> creationParams) {
+    switch (defaultTargetPlatform) {
+      case TargetPlatform.android:
+        return buildAndroidCardView(viewType, creationParams);
+      case TargetPlatform.iOS:
+        return buildIosCardView(viewType, creationParams);
+      default:
+        throw UnsupportedError('Unsupported platform view');
+    }
+  }
+
+  Widget buildAndroidCardView(
+      String viewType, Map<String, dynamic> creationParams) {
+    return PlatformViewLink(
+      viewType: viewType,
+      surfaceFactory: (context, controller) {
+        return AndroidViewSurface(
+          controller: controller as AndroidViewController,
+          gestureRecognizers: const <Factory<OneSequenceGestureRecognizer>>{},
+          hitTestBehavior: PlatformViewHitTestBehavior.opaque,
+        );
+      },
+      onCreatePlatformView: (params) {
+        return PlatformViewsService.initSurfaceAndroidView(
+          id: params.id,
+          viewType: viewType,
+          layoutDirection: TextDirection.ltr,
+          creationParams: creationParams,
+          creationParamsCodec: const StandardMessageCodec(),
+          onFocus: () {
+            params.onFocusChanged(true);
+          },
+        )
+          ..addOnPlatformViewCreatedListener(params.onPlatformViewCreated)
+          ..create();
+      },
+    );
+  }
+
+  Widget buildIosCardView(
+      String viewType, Map<String, dynamic> creationParams) {
+    return UiKitView(
+      viewType: viewType,
+      layoutDirection: TextDirection.ltr,
+      creationParams: creationParams,
+      hitTestBehavior: PlatformViewHitTestBehavior.opaque,
+      creationParamsCodec: const StandardMessageCodec(),
     );
   }
 }
