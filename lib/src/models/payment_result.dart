@@ -1,27 +1,31 @@
 import 'package:adyen_checkout/adyen_checkout.dart';
 
-class PaymentResult {
-  final PaymentResultEnum type;
-  final String? reason;
-  final PaymentResultModel? result;
+sealed class PaymentResult {}
 
-  PaymentResult(
-    this.type,
-    this.reason,
-    this.result,
-  );
+class PaymentAdvancedFlowFinished extends PaymentResult {
+  final String resultCode;
+
+  PaymentAdvancedFlowFinished({required this.resultCode});
 }
 
-class PaymentResultModel {
-  final String? sessionId;
-  final String? sessionData;
-  final String? resultCode;
+class PaymentSessionFinished extends PaymentResult {
+  final String sessionId;
+  final String sessionData;
+  final String resultCode;
   final OrderResponse? order;
 
-  PaymentResultModel(
-    this.sessionId,
-    this.sessionData,
-    this.resultCode,
+  PaymentSessionFinished({
+    required this.sessionId,
+    required this.sessionData,
+    required this.resultCode,
     this.order,
-  );
+  });
+}
+
+class PaymentCancelledByUser extends PaymentResult {}
+
+class PaymentError extends PaymentResult {
+  final String? reason;
+
+  PaymentError({required this.reason});
 }

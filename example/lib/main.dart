@@ -186,20 +186,29 @@ class _MyAppState extends State<MyApp> {
     );
   }
 
-
   _dialogBuilder(BuildContext context, PaymentResult paymentResult) {
+    String title = "";
     String message = "";
-    if (paymentResult.result != null) {
-      message = "Result code: ${paymentResult.result?.resultCode}";
-    } else {
-      message = "Error: ${paymentResult.reason}";
+    switch (paymentResult) {
+      case PaymentAdvancedFlowFinished():
+        title = "Finished";
+        message = "Result code: ${paymentResult.resultCode}";
+      case PaymentSessionFinished():
+        title = "Finished";
+        message = "Result code: ${paymentResult.resultCode}";
+      case PaymentCancelledByUser():
+        title = "Cancelled by user";
+        message = "Drop-in cancelled by user";
+      case PaymentError():
+        title = "Error occurred";
+        message = "${paymentResult.reason}";
     }
 
     return showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text(paymentResult.type.name),
+          title: Text(title),
           content: Text(message),
           actions: <Widget>[
             TextButton(

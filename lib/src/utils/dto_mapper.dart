@@ -69,23 +69,6 @@ extension AmountMapper on Amount {
       );
 }
 
-extension PaymentResultMapper on PaymentResultDTO {
-  PaymentResult fromDTO() => PaymentResult(
-        type,
-        reason,
-        result?.fromDTO(),
-      );
-}
-
-extension PaymentResulModelMapper on PaymentResultModelDTO {
-  PaymentResultModel fromDTO() => PaymentResultModel(
-        sessionId,
-        sessionData,
-        resultCode,
-        order?.fromDTO(),
-      );
-}
-
 extension OrderResponseMapper on OrderResponseDTO {
   OrderResponse fromDTO() => OrderResponse(
         pspReference: pspReference,

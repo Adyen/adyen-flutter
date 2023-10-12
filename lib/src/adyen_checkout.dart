@@ -97,13 +97,26 @@ class AdyenCheckout implements AdyenCheckoutInterface {
       }
     });
 
-    return dropInSessionCompleter.future.then((value) {
+    return dropInSessionCompleter.future.then((paymentResultDTO) {
       AdyenCheckoutPlatformInterface.instance.cleanUpDropIn();
       _resultApi.dropInSessionPlatformCommunicationStream.close();
-      _adyenLogger.print("Drop-in session result type: ${value.type.name}");
       _adyenLogger
-          .print("Drop-in session result code: ${value.result?.resultCode}");
-      return value.fromDTO();
+          .print("Drop-in session result type: ${paymentResultDTO.type.name}");
+      _adyenLogger.print(
+          "Drop-in session result code: ${paymentResultDTO.result?.resultCode}");
+      switch (paymentResultDTO.type) {
+        case PaymentResultEnum.cancelledByUser:
+          return PaymentCancelledByUser();
+        case PaymentResultEnum.error:
+          return PaymentError(reason: paymentResultDTO.reason);
+        case PaymentResultEnum.finished:
+          return PaymentSessionFinished(
+            sessionId: paymentResultDTO.result?.sessionId ?? "",
+            sessionData: paymentResultDTO.result?.sessionData ?? "",
+            resultCode: paymentResultDTO.result?.resultCode ?? "",
+            order: paymentResultDTO.result?.order?.fromDTO(),
+          );
+      }
     });
   }
 
@@ -168,14 +181,23 @@ class AdyenCheckout implements AdyenCheckoutInterface {
       }
     });
 
-    return dropInAdvancedFlowCompleter.future.then((value) {
+    return dropInAdvancedFlowCompleter.future.then((paymentResultDTO) {
       AdyenCheckoutPlatformInterface.instance.cleanUpDropIn();
       _resultApi.dropInAdvancedFlowPlatformCommunicationStream.close();
-      _adyenLogger
-          .print("Drop-in advanced flow result type: ${value.type.name}");
       _adyenLogger.print(
-          "Drop-in advanced flow result code: ${value.result?.resultCode}");
-      return value.fromDTO();
+          "Drop-in advanced flow result type: ${paymentResultDTO.type.name}");
+      _adyenLogger.print(
+          "Drop-in advanced flow result code: ${paymentResultDTO.result?.resultCode}");
+      switch (paymentResultDTO.type) {
+        case PaymentResultEnum.cancelledByUser:
+          return PaymentCancelledByUser();
+        case PaymentResultEnum.error:
+          return PaymentError(reason: paymentResultDTO.reason);
+        case PaymentResultEnum.finished:
+          return PaymentAdvancedFlowFinished(
+            resultCode: paymentResultDTO.result?.resultCode ?? "",
+          );
+      }
     });
   }
 
