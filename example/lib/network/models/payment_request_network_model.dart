@@ -76,38 +76,6 @@ class AdditionalData {
   }
 }
 
-class Item {
-  final int quantity;
-  final int amountExcludingTax;
-  final int taxPercentage;
-  final String description;
-  final String id;
-  final int amountIncludingTax;
-  final String taxCategory;
-
-  Item({
-    required this.quantity,
-    required this.amountExcludingTax,
-    required this.taxPercentage,
-    required this.description,
-    required this.id,
-    required this.amountIncludingTax,
-    required this.taxCategory,
-  });
-
-  Map<String, dynamic> toJson() {
-    return {
-      'quantity': quantity,
-      'amountExcludingTax': amountExcludingTax,
-      'taxPercentage': taxPercentage,
-      'description': description,
-      'id': id,
-      'amountIncludingTax': amountIncludingTax,
-      'taxCategory': taxCategory,
-    };
-  }
-}
-
 class ThreeDS2RequestDataRequest {
   final String deviceChannel;
   final String challengeIndicator;
