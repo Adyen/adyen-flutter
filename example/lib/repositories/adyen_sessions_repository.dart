@@ -39,6 +39,7 @@ class AdyenSessionsRepository {
             reference:
                 "flutter-session-test_${DateTime.now().millisecondsSinceEpoch}",
             countryCode: Config.countryCode,
+            shopperLocale: Config.shopperLocale,
             shopperReference: Config.shopperReference,
             storePaymentMethodMode: StorePaymentMethodMode
                 .askForConsent.storePaymentMethodModeString,
@@ -111,7 +112,19 @@ class AdyenSessionsRepository {
       threeDS2RequestData: ThreeDS2RequestDataRequest(),
       threeDSAuthenticationOnly: false,
       recurringProcessingModel: RecurringProcessingModel.cardOnFile,
-      lineItems: [],
+      lineItems: [
+        LineItem(
+          quantity: 1,
+          amountExcludingTax: 331,
+          taxPercentage: 2100,
+          description: "Shoes",
+          id: "Item #1",
+          taxAmount: 69,
+          amountIncludingTax: 400,
+          productUrl: "URL_TO_PURCHASED_ITEM",
+          imageUrl: "URL_TO_PICTURE_OF_PURCHASED_ITEM",
+        )
+      ],
     );
 
     Map<String, dynamic> mergedJson = <String, dynamic>{};

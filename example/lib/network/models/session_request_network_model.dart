@@ -11,6 +11,7 @@ class SessionRequestNetworkModel {
   final String returnUrl;
   final String reference;
   final String countryCode;
+  final String? shopperLocale;
   final String? shopperReference;
   final String? storePaymentMethodMode;
   final String? recurringProcessingModel;
@@ -28,6 +29,7 @@ class SessionRequestNetworkModel {
     required this.returnUrl,
     required this.reference,
     required this.countryCode,
+    this.shopperLocale,
     this.shopperReference,
     this.storePaymentMethodMode,
     this.recurringProcessingModel,
@@ -49,6 +51,7 @@ class SessionRequestNetworkModel {
     data['returnUrl'] = returnUrl;
     data['reference'] = reference;
     data['countryCode'] = countryCode;
+    data['shopperLocale'] = shopperLocale;
     data['shopperReference'] = shopperReference;
     data['storePaymentMethodMode'] = storePaymentMethodMode;
     data['recurringProcessingModel'] = recurringProcessingModel;

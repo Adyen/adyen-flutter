@@ -14,6 +14,7 @@ class SessionResponseNetworkModel {
   final String reference;
   final String returnUrl;
   final String sessionData;
+  final String? shopperLocale;
   final String? shopperReference;
   final String? storePaymentMethodMode;
   final String? recurringProcessingModel;
@@ -33,6 +34,7 @@ class SessionResponseNetworkModel {
     required this.reference,
     required this.returnUrl,
     required this.sessionData,
+    this.shopperLocale,
     this.shopperReference,
     this.storePaymentMethodMode,
     this.recurringProcessingModel,
@@ -57,6 +59,7 @@ class SessionResponseNetworkModel {
         reference: json["reference"],
         returnUrl: json["returnUrl"],
         sessionData: json["sessionData"],
+        shopperLocale: json["shopperLocale"],
         shopperReference: json["shopperReference"],
         storePaymentMethodMode: json["storePaymentMethodMode"],
         recurringProcessingModel: json["recurringProcessingModel"],
