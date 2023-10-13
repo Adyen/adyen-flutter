@@ -90,7 +90,7 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
             let dropInComponent = DropInComponent(paymentMethods: paymentMethodsWithoutGiftCards,
                                                   context: adyenContext,
                                                   configuration: configuration)
-            dropInAdvancedFlowDelegate = DropInAdvancedFlowDelegate(checkoutFlutterApi: checkoutFlutterApi, component: dropInComponent)
+            dropInAdvancedFlowDelegate = DropInAdvancedFlowDelegate(checkoutFlutterApi: checkoutFlutterApi, dropInComponent: dropInComponent)
             dropInComponent.delegate = dropInAdvancedFlowDelegate
 
             if dropInConfigurationDTO.isRemoveStoredPaymentMethodEnabled == true {

@@ -3,11 +3,11 @@ import AdyenNetworking
 
 class DropInAdvancedFlowDelegate: DropInComponentDelegate {
     private let checkoutFlutterApi: CheckoutFlutterApi
-    private let component: DropInComponent
+    private let dropInComponent: DropInComponent
 
-    init(checkoutFlutterApi: CheckoutFlutterApi, component: DropInComponent) {
+    init(checkoutFlutterApi: CheckoutFlutterApi, dropInComponent: DropInComponent) {
         self.checkoutFlutterApi = checkoutFlutterApi
-        self.component = component
+        self.dropInComponent = dropInComponent
     }
 
     func didSubmit(_ data: PaymentComponentData, from _: PaymentComponent, in _: AnyDropInComponent) {
@@ -33,9 +33,15 @@ class DropInAdvancedFlowDelegate: DropInComponentDelegate {
     }
 
     func didComplete(from _: ActionComponent, in _: AnyDropInComponent) {
-        print("did complete")
+        let paymentResult = PaymentResultDTO(type: PaymentResultEnum.finished, result: PaymentResultModelDTO(resultCode: ResultCode.received.rawValue))
+        let platformCommunicationModel = PlatformCommunicationModel(type: PlatformCommunicationType.result, paymentResult: paymentResult)
+        checkoutFlutterApi.onDropInAdvancedFlowPlatformCommunication(platformCommunicationModel: platformCommunicationModel, completion: { _ in })
+        dropInComponent.finalizeIfNeeded(with: true, completion: { [weak self] in
+            guard let self = self else { return }
+            self.dropInComponent.viewController.dismiss(animated: true)
+        })
     }
-
+    
     func didFail(with error: Error, from _: PaymentComponent, in dropInComponent: AnyDropInComponent) {
         dropInComponent.viewController.presentedViewController?.dismiss(animated: true, completion: {
             self.sendErrorToFlutterLayer(error: error)
