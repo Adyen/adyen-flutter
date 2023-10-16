@@ -23,7 +23,7 @@ class Config {
   static const Environment environment = Environment.test;
   static const String baseUrl = "checkout-test.adyen.com";
   static const String apiVersion = "v70";
-  static const String iOSReturnUrl = "ui-host://payments";
+  static const String iOSReturnUrl = "flutter-ui-host://payments";
 
   //Example data
   static Amount amount = Amount(currency: "EUR", value: 2100);
