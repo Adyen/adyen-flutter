@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:adyen_checkout/adyen_checkout.dart';
 import 'package:adyen_checkout/src/generated/platform_api.g.dart';
 import 'package:adyen_checkout/src/models/analytics_options.dart';
@@ -7,6 +9,34 @@ extension AnalyticsOptionsMapper on AnalyticsOptions {
         enabled: enabled,
         payload: payload,
       );
+}
+
+extension DropInConfigurationMapper on DropInConfiguration {
+  DropInConfigurationDTO toDTO() => DropInConfigurationDTO(
+        environment: environment,
+        clientKey: clientKey,
+        countryCode: countryCode.toUpperCase(),
+        amount: amount.toDTO(),
+        shopperLocale: shopperLocale ?? Platform.localeName,
+        cardsConfigurationDTO: cardsConfiguration?.toDTO(),
+        applePayConfigurationDTO: applePayConfiguration?.toDTO(),
+        googlePayConfigurationDTO: googlePayConfiguration?.toDTO(),
+        cashAppPayConfigurationDTO: cashAppPayConfiguration?.toDTO(),
+        analyticsOptionsDTO: analyticsOptions?.toDTO(),
+        isRemoveStoredPaymentMethodEnabled: _isRemoveStoredPaymentMethodEnabled(
+            storedPaymentMethodConfiguration),
+        showPreselectedStoredPaymentMethod: storedPaymentMethodConfiguration
+                ?.showPreselectedStoredPaymentMethod ??
+            true,
+        skipListWhenSinglePaymentMethod: skipListWhenSinglePaymentMethod,
+      );
+
+  bool _isRemoveStoredPaymentMethodEnabled(
+          StoredPaymentMethodConfiguration? storedPaymentMethodConfiguration) =>
+      storedPaymentMethodConfiguration?.deleteStoredPaymentMethodCallback !=
+          null &&
+      storedPaymentMethodConfiguration?.isRemoveStoredPaymentMethodEnabled ==
+          true;
 }
 
 extension CardsConfigurationMapper on CardsConfiguration {
@@ -73,31 +103,5 @@ extension OrderResponseMapper on OrderResponseDTO {
   OrderResponse fromDTO() => OrderResponse(
         pspReference: pspReference,
         orderData: orderData,
-      );
-}
-
-extension CardsConfigurationDTOCopy on CardsConfigurationDTO {
-  CardsConfigurationDTO copyWith({
-    bool? holderNameRequired,
-    AddressMode? addressMode,
-    bool? showStorePaymentField,
-    bool? showCvcForStoredCard,
-    bool? showCvc,
-    FieldVisibility? kcpFieldVisibility,
-    FieldVisibility? socialSecurityNumberFieldVisibility,
-    List<String?>? supportedCardTypes,
-  }) =>
-      CardsConfigurationDTO(
-        holderNameRequired: holderNameRequired ?? this.holderNameRequired,
-        addressMode: addressMode ?? this.addressMode,
-        showStorePaymentField:
-            showStorePaymentField ?? this.showStorePaymentField,
-        showCvcForStoredCard: showCvcForStoredCard ?? this.showCvcForStoredCard,
-        showCvc: showCvc ?? this.showCvc,
-        kcpFieldVisibility: kcpFieldVisibility ?? this.kcpFieldVisibility,
-        socialSecurityNumberFieldVisibility:
-            socialSecurityNumberFieldVisibility ??
-                this.socialSecurityNumberFieldVisibility,
-        supportedCardTypes: supportedCardTypes ?? this.supportedCardTypes,
       );
 }

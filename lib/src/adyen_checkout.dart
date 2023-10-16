@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:io';
 
 import 'package:adyen_checkout/adyen_checkout.dart';
 import 'package:adyen_checkout/src/adyen_checkout_interface.dart';
@@ -48,36 +47,9 @@ class AdyenCheckout implements AdyenCheckoutInterface {
       DropInSession dropInSession) async {
     _adyenLogger.print("Start Drop-in session");
     final dropInSessionCompleter = Completer<PaymentResultDTO>();
-    DropInConfigurationDTO dropInConfiguration = DropInConfigurationDTO(
-      environment: dropInSession.dropInConfiguration.environment,
-      clientKey: dropInSession.dropInConfiguration.clientKey,
-      countryCode: dropInSession.dropInConfiguration.countryCode,
-      amount: dropInSession.dropInConfiguration.amount.toDTO(),
-      shopperLocale: dropInSession.dropInConfiguration.shopperLocale ??
-          Platform.localeName,
-      cardsConfigurationDTO:
-          dropInSession.dropInConfiguration.cardsConfiguration?.toDTO(),
-      applePayConfigurationDTO:
-          dropInSession.dropInConfiguration.applePayConfiguration?.toDTO(),
-      googlePayConfigurationDTO:
-          dropInSession.dropInConfiguration.googlePayConfiguration?.toDTO(),
-      cashAppPayConfigurationDTO:
-          dropInSession.dropInConfiguration.cashAppPayConfiguration?.toDTO(),
-      analyticsOptionsDTO:
-          dropInSession.dropInConfiguration.analyticsOptions?.toDTO(),
-      isRemoveStoredPaymentMethodEnabled:
-          isRemoveStoredPaymentMethodEnabled(dropInSession.dropInConfiguration),
-      showPreselectedStoredPaymentMethod: dropInSession
-              .dropInConfiguration
-              .storedPaymentMethodConfiguration
-              ?.showPreselectedStoredPaymentMethod ??
-          true,
-      skipListWhenSinglePaymentMethod:
-          dropInSession.dropInConfiguration.skipListWhenSinglePaymentMethod,
-    );
     AdyenCheckoutPlatformInterface.instance.startDropInSessionPayment(
       session: dropInSession.session.toDTO(),
-      dropInConfiguration: dropInConfiguration,
+      dropInConfiguration: dropInSession.dropInConfiguration.toDTO(),
     );
 
     _resultApi.dropInSessionPlatformCommunicationStream =
@@ -124,39 +96,10 @@ class AdyenCheckout implements AdyenCheckoutInterface {
       DropInAdvancedFlow dropInAdvancedFlow) async {
     _adyenLogger.print("Start Drop-in advanced flow");
     final dropInAdvancedFlowCompleter = Completer<PaymentResultDTO>();
-    DropInConfigurationDTO dropInConfiguration = DropInConfigurationDTO(
-      environment: dropInAdvancedFlow.dropInConfiguration.environment,
-      clientKey: dropInAdvancedFlow.dropInConfiguration.clientKey,
-      countryCode: dropInAdvancedFlow.dropInConfiguration.countryCode,
-      amount: dropInAdvancedFlow.dropInConfiguration.amount.toDTO(),
-      shopperLocale: dropInAdvancedFlow.dropInConfiguration.shopperLocale ??
-          Platform.localeName,
-      cardsConfigurationDTO:
-          dropInAdvancedFlow.dropInConfiguration.cardsConfiguration?.toDTO(),
-      applePayConfigurationDTO:
-          dropInAdvancedFlow.dropInConfiguration.applePayConfiguration?.toDTO(),
-      googlePayConfigurationDTO: dropInAdvancedFlow
-          .dropInConfiguration.googlePayConfiguration
-          ?.toDTO(),
-      cashAppPayConfigurationDTO: dropInAdvancedFlow
-          .dropInConfiguration.cashAppPayConfiguration
-          ?.toDTO(),
-      analyticsOptionsDTO:
-          dropInAdvancedFlow.dropInConfiguration.analyticsOptions?.toDTO(),
-      showPreselectedStoredPaymentMethod: dropInAdvancedFlow
-              .dropInConfiguration
-              .storedPaymentMethodConfiguration
-              ?.showPreselectedStoredPaymentMethod ??
-          true,
-      isRemoveStoredPaymentMethodEnabled: isRemoveStoredPaymentMethodEnabled(
-          dropInAdvancedFlow.dropInConfiguration),
-      skipListWhenSinglePaymentMethod: dropInAdvancedFlow
-          .dropInConfiguration.skipListWhenSinglePaymentMethod,
-    );
 
     AdyenCheckoutPlatformInterface.instance.startDropInAdvancedFlowPayment(
       paymentMethodsResponse: dropInAdvancedFlow.paymentMethodsResponse,
-      dropInConfiguration: dropInConfiguration,
+      dropInConfiguration: dropInAdvancedFlow.dropInConfiguration.toDTO(),
     );
 
     _resultApi.dropInAdvancedFlowPlatformCommunicationStream =
