@@ -15,6 +15,7 @@ class SessionRequestNetworkModel {
   final String? shopperReference;
   final String? storePaymentMethodMode;
   final String? recurringProcessingModel;
+  final String? shopperInteraction;
   final String? channel;
   final String? telephoneNumber;
   final String? dateOfBirth;
@@ -33,6 +34,7 @@ class SessionRequestNetworkModel {
     this.shopperReference,
     this.storePaymentMethodMode,
     this.recurringProcessingModel,
+    this.shopperInteraction,
     this.channel,
     this.telephoneNumber,
     this.dateOfBirth,
@@ -55,6 +57,7 @@ class SessionRequestNetworkModel {
     data['shopperReference'] = shopperReference;
     data['storePaymentMethodMode'] = storePaymentMethodMode;
     data['recurringProcessingModel'] = recurringProcessingModel;
+    data['shopperInteraction'] = shopperInteraction;
     data['channel'] = channel;
     data['telephoneNumber'] = telephoneNumber;
     data['dateOfBirth'] = dateOfBirth;
@@ -79,6 +82,13 @@ enum RecurringProcessingModel {
   unscheduledCardOnFile
 }
 
+enum ShopperInteractionModel {
+  ecommerce,
+  contAuth,
+  moto,
+  pos
+}
+
 extension StorePaymentMethodModeExtension on StorePaymentMethodMode {
   String get storePaymentMethodModeString {
     switch (this) {
@@ -101,6 +111,21 @@ extension RecurringProcessingModelExtension on RecurringProcessingModel {
         return 'CardOnFile';
       case RecurringProcessingModel.unscheduledCardOnFile:
         return 'UnscheduledCardOnFile';
+    }
+  }
+}
+
+extension ShopperInteractionModelExtension on ShopperInteractionModel {
+  String get shopperInteractionModelString {
+    switch (this) {
+      case ShopperInteractionModel.ecommerce:
+        return "Ecommerce";
+      case ShopperInteractionModel.contAuth:
+        return "ContAuth";
+      case ShopperInteractionModel.moto:
+        return "Moto";
+      case ShopperInteractionModel.pos:
+        return "POS";
     }
   }
 }

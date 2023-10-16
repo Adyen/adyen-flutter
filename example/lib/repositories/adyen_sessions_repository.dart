@@ -45,6 +45,8 @@ class AdyenSessionsRepository {
                 .askForConsent.storePaymentMethodModeString,
             recurringProcessingModel:
                 RecurringProcessingModel.cardOnFile.recurringModelString,
+            shopperInteraction:
+                ShopperInteractionModel.contAuth.shopperInteractionModelString,
             channel: _determineChannel(),
             telephoneNumber: "+8613012345678",
             dateOfBirth: "1996-09-04",
@@ -112,6 +114,8 @@ class AdyenSessionsRepository {
       threeDS2RequestData: ThreeDS2RequestDataRequest(),
       threeDSAuthenticationOnly: false,
       recurringProcessingModel: RecurringProcessingModel.cardOnFile,
+      shopperInteraction:
+          ShopperInteractionModel.contAuth.shopperInteractionModelString,
       lineItems: [
         LineItem(
           quantity: 1,

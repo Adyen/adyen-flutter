@@ -17,6 +17,7 @@ class PaymentsRequestData {
   final String? shopperEmail;
   final ThreeDS2RequestDataRequest? threeDS2RequestData;
   final RecurringProcessingModel? recurringProcessingModel;
+  final String? shopperInteraction;
 
   PaymentsRequestData({
     required this.merchantAccount,
@@ -33,6 +34,7 @@ class PaymentsRequestData {
     this.shopperEmail,
     this.threeDS2RequestData,
     this.recurringProcessingModel,
+    this.shopperInteraction,
   });
 
   Map<String, dynamic> toJson() {
@@ -55,6 +57,7 @@ class PaymentsRequestData {
         "threeDS2RequestData": threeDS2RequestData?.toJson(),
       if (recurringProcessingModel != null)
         "recurringProcessingModel": recurringProcessingModel?.recurringModelString,
+      if (shopperInteraction != null) "shopperInteraction" : shopperInteraction
     };
   }
 }
