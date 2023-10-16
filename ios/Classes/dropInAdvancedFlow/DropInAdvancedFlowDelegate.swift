@@ -55,14 +55,20 @@ class DropInAdvancedFlowDelegate: DropInComponentDelegate {
     }
 
     func didFail(with error: Error, from dropInComponent: Adyen.AnyDropInComponent) {
-        dropInComponent.viewController.dismiss(animated: true, completion: {
-            switch error {
-            case ComponentError.cancelled:
-                let platformCommunicationModel = PlatformCommunicationModel(type: PlatformCommunicationType.result, paymentResult: PaymentResultDTO(type: PaymentResultEnum.cancelledByUser, reason: error.localizedDescription))
-                self.checkoutFlutterApi.onDropInAdvancedFlowPlatformCommunication(platformCommunicationModel: platformCommunicationModel, completion: { _ in })
-            default:
-                self.sendErrorToFlutterLayer(error: error)
-            }
+        dropInComponent.viewController.dismiss(animated: false)
+        self.dropInComponent.finalizeIfNeeded(with: false, completion: { [weak self] in
+            guard let self = self else { return }
+            self.dropInComponent.viewController.dismiss(animated: true, completion: { [weak self] in
+                guard let self = self else { return }
+
+                switch error {
+                case ComponentError.cancelled:
+                    let platformCommunicationModel = PlatformCommunicationModel(type: PlatformCommunicationType.result, paymentResult: PaymentResultDTO(type: PaymentResultEnum.cancelledByUser, reason: error.localizedDescription))
+                    self.checkoutFlutterApi.onDropInAdvancedFlowPlatformCommunication(platformCommunicationModel: platformCommunicationModel, completion: { _ in })
+                default:
+                    self.sendErrorToFlutterLayer(error: error)
+                }
+            })
         })
     }
 
