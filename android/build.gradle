@@ -47,6 +47,12 @@ android {
         minSdkVersion 21
     }
 
+    buildTypes {
+        release {
+            consumerProguardFiles 'proguard-rules.pro'
+        }
+    }
+
     dependencies {
         implementation 'com.adyen.checkout:drop-in:5.0.0-beta01'
         implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
