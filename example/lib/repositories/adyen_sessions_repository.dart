@@ -46,7 +46,7 @@ class AdyenSessionsRepository {
             recurringProcessingModel:
                 RecurringProcessingModel.cardOnFile.recurringModelString,
             shopperInteraction:
-                ShopperInteractionModel.contAuth.shopperInteractionModelString,
+                ShopperInteractionModel.ecommerce.shopperInteractionModelString,
             channel: _determineChannel(),
             telephoneNumber: "+8613012345678",
             dateOfBirth: "1996-09-04",
@@ -115,7 +115,7 @@ class AdyenSessionsRepository {
       threeDSAuthenticationOnly: false,
       recurringProcessingModel: RecurringProcessingModel.cardOnFile,
       shopperInteraction:
-          ShopperInteractionModel.contAuth.shopperInteractionModelString,
+          ShopperInteractionModel.ecommerce.shopperInteractionModelString,
       lineItems: [
         LineItem(
           quantity: 1,
