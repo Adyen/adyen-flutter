@@ -9,7 +9,7 @@ class AdyenCheckoutResultApi implements CheckoutFlutterApi {
       StreamController<PlatformCommunicationModel>();
 
   var componentCommunicationStream =
-      StreamController<PlatformCommunicationModel>();
+      StreamController<ComponentCommunicationModel>();
 
   @override
   void onDropInSessionPlatformCommunication(PlatformCommunicationModel data) =>
@@ -22,7 +22,7 @@ class AdyenCheckoutResultApi implements CheckoutFlutterApi {
 
   @override
   void onComponentCommunication(
-      PlatformCommunicationModel platformCommunicationModel) {
-    componentCommunicationStream.sink.add(platformCommunicationModel);
+      ComponentCommunicationModel componentCommunicationModel) {
+    componentCommunicationStream.sink.add(componentCommunicationModel);
   }
 }

@@ -59,6 +59,11 @@ enum PlatformCommunicationType {
   deleteStoredPaymentMethod,
 }
 
+enum ComponentCommunicationType {
+  resize,
+  paymentComponent,
+}
+
 enum DropInResultType {
   finished,
   action,
@@ -254,6 +259,16 @@ class PlatformCommunicationModel {
   });
 }
 
+class ComponentCommunicationModel {
+  final ComponentCommunicationType type;
+  final Object? data;
+
+  ComponentCommunicationModel({
+    required this.type,
+    this.data,
+  });
+}
+
 //Use DropInOutcome class when sealed classes are supported by pigeon
 class DropInResultDTO {
   final DropInResultType dropInResultType;
@@ -330,5 +345,5 @@ abstract class CheckoutFlutterApi {
       PlatformCommunicationModel platformCommunicationModel);
 
   void onComponentCommunication(
-      PlatformCommunicationModel platformCommunicationModel);
+      ComponentCommunicationModel componentCommunicationModel);
 }

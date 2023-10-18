@@ -1,8 +1,8 @@
 package com.adyen.adyen_checkout.component
 
 import CheckoutFlutterApi
-import PlatformCommunicationModel
-import PlatformCommunicationType
+import ComponentCommunicationModel
+import ComponentCommunicationType
 import android.content.Context
 import android.util.Log
 import android.view.View
@@ -90,8 +90,8 @@ class CardCallback(private val checkoutFlutterApi: CheckoutFlutterApi) : Compone
 
         val paymentComponentJson =
             PaymentComponentData.SERIALIZER.serialize(state.data)
-        val model = PlatformCommunicationModel(
-            PlatformCommunicationType.PAYMENTCOMPONENT,
+        val model = ComponentCommunicationModel(
+            ComponentCommunicationType.PAYMENTCOMPONENT,
             data = paymentComponentJson.toString(),
         )
         checkoutFlutterApi.onComponentCommunication(model) {}

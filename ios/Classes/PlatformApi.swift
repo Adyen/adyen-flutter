@@ -87,6 +87,11 @@ enum PlatformCommunicationType: Int {
   case deleteStoredPaymentMethod = 3
 }
 
+enum ComponentCommunicationType: Int {
+  case resize = 0
+  case paymentComponent = 1
+}
+
 enum DropInResultType: Int {
   case finished = 0
   case action = 1
@@ -525,6 +530,28 @@ struct PlatformCommunicationModel {
 }
 
 /// Generated class from Pigeon that represents data sent in messages.
+struct ComponentCommunicationModel {
+  var type: ComponentCommunicationType
+  var data: Any? = nil
+
+  static func fromList(_ list: [Any?]) -> ComponentCommunicationModel? {
+    let type = ComponentCommunicationType(rawValue: list[0] as! Int)!
+    let data: Any? = list[1]
+
+    return ComponentCommunicationModel(
+      type: type,
+      data: data
+    )
+  }
+  func toList() -> [Any?] {
+    return [
+      type.rawValue,
+      data,
+    ]
+  }
+}
+
+/// Generated class from Pigeon that represents data sent in messages.
 struct DropInResultDTO {
   var dropInResultType: DropInResultType
   var result: String? = nil
@@ -853,12 +880,14 @@ private class CheckoutFlutterApiCodecReader: FlutterStandardReader {
       case 128:
         return AmountDTO.fromList(self.readValue() as! [Any?])
       case 129:
-        return OrderResponseDTO.fromList(self.readValue() as! [Any?])
+        return ComponentCommunicationModel.fromList(self.readValue() as! [Any?])
       case 130:
-        return PaymentResultDTO.fromList(self.readValue() as! [Any?])
+        return OrderResponseDTO.fromList(self.readValue() as! [Any?])
       case 131:
-        return PaymentResultModelDTO.fromList(self.readValue() as! [Any?])
+        return PaymentResultDTO.fromList(self.readValue() as! [Any?])
       case 132:
+        return PaymentResultModelDTO.fromList(self.readValue() as! [Any?])
+      case 133:
         return PlatformCommunicationModel.fromList(self.readValue() as! [Any?])
       default:
         return super.readValue(ofType: type)
@@ -871,17 +900,20 @@ private class CheckoutFlutterApiCodecWriter: FlutterStandardWriter {
     if let value = value as? AmountDTO {
       super.writeByte(128)
       super.writeValue(value.toList())
-    } else if let value = value as? OrderResponseDTO {
+    } else if let value = value as? ComponentCommunicationModel {
       super.writeByte(129)
       super.writeValue(value.toList())
-    } else if let value = value as? PaymentResultDTO {
+    } else if let value = value as? OrderResponseDTO {
       super.writeByte(130)
       super.writeValue(value.toList())
-    } else if let value = value as? PaymentResultModelDTO {
+    } else if let value = value as? PaymentResultDTO {
       super.writeByte(131)
       super.writeValue(value.toList())
-    } else if let value = value as? PlatformCommunicationModel {
+    } else if let value = value as? PaymentResultModelDTO {
       super.writeByte(132)
+      super.writeValue(value.toList())
+    } else if let value = value as? PlatformCommunicationModel {
+      super.writeByte(133)
       super.writeValue(value.toList())
     } else {
       super.writeValue(value)
@@ -924,9 +956,9 @@ class CheckoutFlutterApi {
       completion(.success(Void()))
     }
   }
-  func onComponentCommunication(platformCommunicationModel platformCommunicationModelArg: PlatformCommunicationModel, completion: @escaping (Result<Void, FlutterError>) -> Void) {
+  func onComponentCommunication(componentCommunicationModel componentCommunicationModelArg: ComponentCommunicationModel, completion: @escaping (Result<Void, FlutterError>) -> Void) {
     let channel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.CheckoutFlutterApi.onComponentCommunication", binaryMessenger: binaryMessenger, codec: codec)
-    channel.sendMessage([platformCommunicationModelArg] as [Any?]) { _ in
+    channel.sendMessage([componentCommunicationModelArg] as [Any?]) { _ in
       completion(.success(Void()))
     }
   }

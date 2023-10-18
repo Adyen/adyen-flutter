@@ -12,55 +12,46 @@ class FirstRoute extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.lightGreen,
+        backgroundColor: Colors.lightGreen,
         appBar: AppBar(
-          title: const Text('Card component'),
+          title: const Text('Adyen card component'),
         ),
-        body: FutureBuilder<String>(
-          future: repository.fetchPaymentMethods(),
-          builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
-            if (snapshot.data == null) {
-              return const Center(
-                child: CircularProgressIndicator(),
-              );
-            } else {
-              return buildCardWidget(snapshot, context);
-              return SingleChildScrollView(
-                physics: ClampingScrollPhysics(),
-
-                child: Column(
-                  children: [
-                    const Padding(
-                      padding: EdgeInsets.all(24.0),
-                      child: FlutterLogo(size: 128),
-                    ),
-                    const Text("This is a Flutter view"),
-                    SizedBox(
-                      height: 350,
-                      child: buildCardWidget(snapshot, context),
-                    ),
-                    Container(height: 300, width: 200, color: Colors.pink,),
-                    Container(height: 500, width: 400, color: Colors.yellow,)
-
-                  ],
-                ),
-              );
-            }
-          },
+        body: SafeArea(
+          child: FutureBuilder<String>(
+            future: repository.fetchPaymentMethods(),
+            builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
+              if (snapshot.data == null) {
+                return const Center(
+                  child: CircularProgressIndicator(),
+                );
+              } else {
+                return SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      const FlutterLogo(size: 128),
+                      buildCardWidget(snapshot, context),
+                      Container(height: 50),
+                      Container(height: 280, color: Colors.blue),
+                      const Text(
+                          "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."),
+                      Container(height: 180, color: Colors.yellow),
+                    ],
+                  ),
+                );
+              }
+            },
+          ),
         ));
   }
 
   Widget buildCardWidget(AsyncSnapshot<String> snapshot, BuildContext context) {
-    return SizedBox(
-      height: 550,
-      child: CardWidget(
-                        paymentMethods: snapshot.data!,
-                        clientKey: Config.clientKey,
-                        onSubmit: repository.postPayments,
-                        onResult: (event) async {
-                          _dialogBuilder(context, event);
-                        },
-                      ),
+    return AdyenCardWidget(
+      paymentMethods: snapshot.data!,
+      clientKey: Config.clientKey,
+      onSubmit: repository.postPayments,
+      onResult: (event) async {
+        _dialogBuilder(context, event);
+      },
     );
   }
 
@@ -103,5 +94,4 @@ class FirstRoute extends StatelessWidget {
       },
     );
   }
-
 }

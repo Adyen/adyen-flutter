@@ -66,6 +66,11 @@ enum PlatformCommunicationType {
   deleteStoredPaymentMethod,
 }
 
+enum ComponentCommunicationType {
+  resize,
+  paymentComponent,
+}
+
 enum DropInResultType {
   finished,
   action,
@@ -571,6 +576,32 @@ class PlatformCommunicationModel {
   }
 }
 
+class ComponentCommunicationModel {
+  ComponentCommunicationModel({
+    required this.type,
+    this.data,
+  });
+
+  ComponentCommunicationType type;
+
+  Object? data;
+
+  Object encode() {
+    return <Object?>[
+      type.index,
+      data,
+    ];
+  }
+
+  static ComponentCommunicationModel decode(Object result) {
+    result as List<Object?>;
+    return ComponentCommunicationModel(
+      type: ComponentCommunicationType.values[result[0]! as int],
+      data: result[1],
+    );
+  }
+}
+
 class DropInResultDTO {
   DropInResultDTO({
     required this.dropInResultType,
@@ -965,17 +996,20 @@ class _CheckoutFlutterApiCodec extends StandardMessageCodec {
     if (value is AmountDTO) {
       buffer.putUint8(128);
       writeValue(buffer, value.encode());
-    } else if (value is OrderResponseDTO) {
+    } else if (value is ComponentCommunicationModel) {
       buffer.putUint8(129);
       writeValue(buffer, value.encode());
-    } else if (value is PaymentResultDTO) {
+    } else if (value is OrderResponseDTO) {
       buffer.putUint8(130);
       writeValue(buffer, value.encode());
-    } else if (value is PaymentResultModelDTO) {
+    } else if (value is PaymentResultDTO) {
       buffer.putUint8(131);
       writeValue(buffer, value.encode());
-    } else if (value is PlatformCommunicationModel) {
+    } else if (value is PaymentResultModelDTO) {
       buffer.putUint8(132);
+      writeValue(buffer, value.encode());
+    } else if (value is PlatformCommunicationModel) {
+      buffer.putUint8(133);
       writeValue(buffer, value.encode());
     } else {
       super.writeValue(buffer, value);
@@ -988,12 +1022,14 @@ class _CheckoutFlutterApiCodec extends StandardMessageCodec {
       case 128: 
         return AmountDTO.decode(readValue(buffer)!);
       case 129: 
-        return OrderResponseDTO.decode(readValue(buffer)!);
+        return ComponentCommunicationModel.decode(readValue(buffer)!);
       case 130: 
-        return PaymentResultDTO.decode(readValue(buffer)!);
+        return OrderResponseDTO.decode(readValue(buffer)!);
       case 131: 
-        return PaymentResultModelDTO.decode(readValue(buffer)!);
+        return PaymentResultDTO.decode(readValue(buffer)!);
       case 132: 
+        return PaymentResultModelDTO.decode(readValue(buffer)!);
+      case 133: 
         return PlatformCommunicationModel.decode(readValue(buffer)!);
       default:
         return super.readValueOfType(type, buffer);
@@ -1008,7 +1044,7 @@ abstract class CheckoutFlutterApi {
 
   void onDropInAdvancedFlowPlatformCommunication(PlatformCommunicationModel platformCommunicationModel);
 
-  void onComponentCommunication(PlatformCommunicationModel platformCommunicationModel);
+  void onComponentCommunication(ComponentCommunicationModel componentCommunicationModel);
 
   static void setup(CheckoutFlutterApi? api, {BinaryMessenger? binaryMessenger}) {
     {
@@ -1072,11 +1108,11 @@ abstract class CheckoutFlutterApi {
           assert(message != null,
           'Argument for dev.flutter.pigeon.adyen_checkout.CheckoutFlutterApi.onComponentCommunication was null.');
           final List<Object?> args = (message as List<Object?>?)!;
-          final PlatformCommunicationModel? arg_platformCommunicationModel = (args[0] as PlatformCommunicationModel?);
-          assert(arg_platformCommunicationModel != null,
-              'Argument for dev.flutter.pigeon.adyen_checkout.CheckoutFlutterApi.onComponentCommunication was null, expected non-null PlatformCommunicationModel.');
+          final ComponentCommunicationModel? arg_componentCommunicationModel = (args[0] as ComponentCommunicationModel?);
+          assert(arg_componentCommunicationModel != null,
+              'Argument for dev.flutter.pigeon.adyen_checkout.CheckoutFlutterApi.onComponentCommunication was null, expected non-null ComponentCommunicationModel.');
           try {
-            api.onComponentCommunication(arg_platformCommunicationModel!);
+            api.onComponentCommunication(arg_componentCommunicationModel!);
             return wrapResponse(empty: true);
           } on PlatformException catch (e) {
             return wrapResponse(error: e);

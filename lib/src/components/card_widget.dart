@@ -10,8 +10,8 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 
-class CardWidget extends StatelessWidget {
-  CardWidget({
+class AdyenCardWidget extends StatelessWidget {
+  AdyenCardWidget({
     required this.clientKey,
     required this.paymentMethods,
     required this.onSubmit,
@@ -23,13 +23,11 @@ class CardWidget extends StatelessWidget {
   final String clientKey;
   final Future<DropInOutcome> Function(String) onSubmit;
   final Future<void> Function(PaymentResult) onResult;
-
   final AdyenCheckoutResultApi _resultApi = AdyenCheckoutResultApi();
 
   @override
   Widget build(BuildContext context) {
     const String viewType = '<platform-view-type>';
-    // Pass parameters to the platform side.
     Map<String, dynamic> creationParams = <String, dynamic>{
       "paymentMethods": paymentMethods,
       "clientKey": clientKey,
@@ -37,19 +35,45 @@ class CardWidget extends StatelessWidget {
 
     CheckoutFlutterApi.setup(_resultApi);
 
+    final resizeStream = StreamController<double>();
+
     _resultApi.componentCommunicationStream =
-        StreamController<PlatformCommunicationModel>();
+        StreamController<ComponentCommunicationModel>();
     _resultApi.componentCommunicationStream.stream
         .asBroadcastStream()
         .listen((event) async {
-      final DropInOutcome result = await onSubmit(event.data!);
-      if (result is Finished) {
-        print(result.resultCode);
-        onResult(PaymentAdvancedFlowFinished(resultCode: result.resultCode));
+      switch (event.type) {
+        case ComponentCommunicationType.resize:
+          resizeStream.add(event.data as double);
+        case ComponentCommunicationType.paymentComponent:
+          final DropInOutcome result = await onSubmit(event.data as String);
+          if (result is Finished) {
+            print(result.resultCode);
+            onResult(
+                PaymentAdvancedFlowFinished(resultCode: result.resultCode));
+          }
       }
     });
 
-    return buildCardView(viewType, creationParams);
+    Widget cardView = buildCardView(
+      viewType,
+      creationParams,
+    );
+
+    return StreamBuilder(
+        stream: resizeStream.stream,
+        builder: (BuildContext context, AsyncSnapshot<double> snapshot) {
+          print("value is: $snapshot");
+          return SizedBox(
+            height: snapshot.data ?? 500,
+            child: cardView,
+          );
+        });
+
+    // return SizedBox(
+    //   height: 500,
+    //   child: cardView,
+    // );
   }
 
   Widget buildCardView(String viewType, Map<String, dynamic> creationParams) {
@@ -65,6 +89,8 @@ class CardWidget extends StatelessWidget {
 
   Widget buildAndroidCardView(
       String viewType, Map<String, dynamic> creationParams) {
+    const codec = CheckoutPlatformInterface.codec;
+
     return PlatformViewLink(
       viewType: viewType,
       surfaceFactory: (context, controller) {
@@ -80,7 +106,7 @@ class CardWidget extends StatelessWidget {
           viewType: viewType,
           layoutDirection: TextDirection.ltr,
           creationParams: creationParams,
-          creationParamsCodec: const StandardMessageCodec(),
+          creationParamsCodec: codec,
           onFocus: () {
             params.onFocusChanged(true);
           },
@@ -93,12 +119,14 @@ class CardWidget extends StatelessWidget {
 
   Widget buildIosCardView(
       String viewType, Map<String, dynamic> creationParams) {
+    const codec = CheckoutPlatformInterface.codec;
+
     return UiKitView(
       viewType: viewType,
       layoutDirection: TextDirection.ltr,
       creationParams: creationParams,
       hitTestBehavior: PlatformViewHitTestBehavior.opaque,
-      creationParamsCodec: const StandardMessageCodec(),
+      creationParamsCodec: codec,
     );
   }
 }
