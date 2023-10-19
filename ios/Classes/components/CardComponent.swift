@@ -79,7 +79,6 @@ class FLNativeView: NSObject, FlutterPlatformView, PaymentComponentDelegate {
     }
 
     func createNativeView(view _view: TestView, args: NSDictionary){
-        _view.backgroundColor = UIColor.blue
         
         _view.handler = {
             let height = self.cardComponent?.viewController.preferredContentSize.height
@@ -97,6 +96,7 @@ class FLNativeView: NSObject, FlutterPlatformView, PaymentComponentDelegate {
             self.cardComponent = component
             let componentViewController = component.viewController
             
+            
             rootViewController = getViewController()
             rootViewController?.addChild(componentViewController)
 
@@ -104,6 +104,7 @@ class FLNativeView: NSObject, FlutterPlatformView, PaymentComponentDelegate {
             componentViewController.view.frame = CGRect(x:0.0, y:0.0, width: 0, height:0)
             (componentViewController.view.subviews[0].subviews[0] as? UIScrollView)?.bounces = false
             (componentViewController.view.subviews[0].subviews[0] as? UIScrollView)?.isScrollEnabled = false
+            (componentViewController.view.subviews[0].subviews[0] as? UIScrollView)?.alwaysBounceVertical = false
             
             
             //let formViewController = componentViewController.children[0]
@@ -154,8 +155,11 @@ class FLNativeView: NSObject, FlutterPlatformView, PaymentComponentDelegate {
             throw PlatformError(errorDescription: "error")
         }
 
+        var style = FormComponentStyle()
+        style.backgroundColor = UIColor.clear
         let component = CardComponent(paymentMethod: paymentMethod,
-                                      context: adyenContext
+                                      context: adyenContext,
+                                      configuration: .init(style: style)
                                 )
         component.cardComponentDelegate = self
         return component

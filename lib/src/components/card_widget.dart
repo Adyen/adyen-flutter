@@ -65,15 +65,10 @@ class AdyenCardWidget extends StatelessWidget {
         builder: (BuildContext context, AsyncSnapshot<double> snapshot) {
           print("value is: $snapshot");
           return SizedBox(
-            height: snapshot.data ?? 500,
+            height: (snapshot.data ?? 300) + 40,
             child: cardView,
           );
         });
-
-    // return SizedBox(
-    //   height: 500,
-    //   child: cardView,
-    // );
   }
 
   Widget buildCardView(String viewType, Map<String, dynamic> creationParams) {

@@ -29,7 +29,7 @@ class FirstRoute extends StatelessWidget {
                   child: Column(
                     children: [
                       const FlutterLogo(size: 128),
-                      buildCardWidget(snapshot, context),
+                      buildCardWidget(snapshot, context, repository),
                       Container(height: 50),
                       Container(height: 280, color: Colors.blue),
                       const Text(
@@ -43,55 +43,60 @@ class FirstRoute extends StatelessWidget {
           ),
         ));
   }
+}
 
-  Widget buildCardWidget(AsyncSnapshot<String> snapshot, BuildContext context) {
-    return AdyenCardWidget(
-      paymentMethods: snapshot.data!,
-      clientKey: Config.clientKey,
-      onSubmit: repository.postPayments,
-      onResult: (event) async {
-        _dialogBuilder(context, event);
-      },
-    );
+
+Widget buildCardWidget(
+  AsyncSnapshot<String> snapshot,
+  BuildContext context,
+  AdyenSessionsRepository repository,
+) {
+  return AdyenCardWidget(
+    paymentMethods: snapshot.data!,
+    clientKey: Config.clientKey,
+    onSubmit: repository.postPayments,
+    onResult: (event) async {
+      _dialogBuilder(context, event);
+    },
+  );
+}
+
+_dialogBuilder(BuildContext context, PaymentResult paymentResult) {
+  String title = "";
+  String message = "";
+  switch (paymentResult) {
+    case PaymentAdvancedFlowFinished():
+      title = "Finished";
+      message = "Result code: ${paymentResult.resultCode}";
+    case PaymentSessionFinished():
+      title = "Finished";
+      message = "Result code: ${paymentResult.resultCode}";
+    case PaymentCancelledByUser():
+      title = "Cancelled by user";
+      message = "Drop-in cancelled by user";
+    case PaymentError():
+      title = "Error occurred";
+      message = "${paymentResult.reason}";
   }
 
-  _dialogBuilder(BuildContext context, PaymentResult paymentResult) {
-    String title = "";
-    String message = "";
-    switch (paymentResult) {
-      case PaymentAdvancedFlowFinished():
-        title = "Finished";
-        message = "Result code: ${paymentResult.resultCode}";
-      case PaymentSessionFinished():
-        title = "Finished";
-        message = "Result code: ${paymentResult.resultCode}";
-      case PaymentCancelledByUser():
-        title = "Cancelled by user";
-        message = "Drop-in cancelled by user";
-      case PaymentError():
-        title = "Error occurred";
-        message = "${paymentResult.reason}";
-    }
-
-    return showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text(title),
-          content: Text(message),
-          actions: <Widget>[
-            TextButton(
-              style: TextButton.styleFrom(
-                textStyle: Theme.of(context).textTheme.labelLarge,
-              ),
-              child: const Text('Close'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
+  return showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: Text(title),
+        content: Text(message),
+        actions: <Widget>[
+          TextButton(
+            style: TextButton.styleFrom(
+              textStyle: Theme.of(context).textTheme.labelLarge,
             ),
-          ],
-        );
-      },
-    );
-  }
+            child: const Text('Close'),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+          ),
+        ],
+      );
+    },
+  );
 }

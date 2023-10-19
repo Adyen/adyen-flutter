@@ -25,9 +25,5 @@ class TestView : UIStackView {
         super.layoutSubviews()
         
         handler()
-        
-        print("Layout custom view")
-        print(bounds.height)
-        print(subviews.first?.systemLayoutSizeFitting(.init(width: bounds.width, height: .greatestFiniteMagnitude)))
     }
 }

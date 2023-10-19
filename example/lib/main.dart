@@ -88,11 +88,57 @@ class _MyAppState extends State<MyApp> {
                     MaterialPageRoute(
                         builder: (context) => FirstRoute(
                               repository: _adyenSessionRepository,
-
                             )),
                   );
                 },
-                child: const Text("Card component")),
+                child: const Text("Card component scroll view")),
+            TextButton(
+                onPressed: () {
+                  showModalBottomSheet(
+                      context: context,
+                      isScrollControlled: true,
+                      backgroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10.0),
+                      ),
+                      builder: (BuildContext context) {
+                        return SingleChildScrollView(
+                            child: Column(
+                          children: [
+                            Container(height: 8),
+                            Container(
+                              width: 48,
+                              height: 6,
+                              decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(10),
+                                  color: Colors.grey),
+                            ),
+                            Container(height: 8),
+                            Container(
+                              padding: EdgeInsets.only(
+                                  bottom:
+                                      MediaQuery.of(context).viewInsets.bottom),
+                              child: FutureBuilder<String>(
+                                future: _adyenSessionRepository
+                                    .fetchPaymentMethods(),
+                                builder: (BuildContext context,
+                                    AsyncSnapshot<String> snapshot) {
+                                  if (snapshot.data == null) {
+                                    return const Center(
+                                      child: CircularProgressIndicator(),
+                                    );
+                                  } else {
+                                    return buildCardWidget(snapshot, context,
+                                        _adyenSessionRepository);
+                                  }
+                                },
+                              ),
+                            ),
+                          ],
+                        ));
+                      });
+                },
+                child: const Text("Card component sheet")),
           ],
         ),
       ),
