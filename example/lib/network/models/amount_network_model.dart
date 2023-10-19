@@ -1,5 +1,5 @@
 class AmountNetworkModel {
-  final String? currency;
+  final String currency;
   final int value;
 
   AmountNetworkModel({

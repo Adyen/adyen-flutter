@@ -4,6 +4,9 @@ class DeliveryAddress {
   String? houseNumberOrName;
   String? postalCode;
   String? street;
+  String? firstName;
+  String? lastName;
+  String? stateOrProvince;
 
   DeliveryAddress({
     this.city,
@@ -11,6 +14,9 @@ class DeliveryAddress {
     this.houseNumberOrName,
     this.postalCode,
     this.street,
+    this.firstName,
+    this.lastName,
+    this.stateOrProvince
   });
 
   DeliveryAddress.fromJson(Map<String, dynamic> json) {
@@ -19,6 +25,9 @@ class DeliveryAddress {
     houseNumberOrName = json['houseNumberOrName'];
     postalCode = json['postalCode'];
     street = json['street'];
+    firstName = json['firstname'];
+    lastName = json['firstname'];
+    stateOrProvince = json['stateOrProvince'];
   }
 
   Map<String, dynamic> toJson() {
@@ -28,6 +37,9 @@ class DeliveryAddress {
     data['houseNumberOrName'] = houseNumberOrName;
     data['postalCode'] = postalCode;
     data['street'] = street;
+    data['firstName'] = firstName;
+    data['lastName'] = lastName;
+    data['stateOrProvince'] = stateOrProvince;
     return data;
   }
 }

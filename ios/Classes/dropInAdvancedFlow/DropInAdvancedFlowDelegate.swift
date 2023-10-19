@@ -2,10 +2,12 @@ import Adyen
 import AdyenNetworking
 
 class DropInAdvancedFlowDelegate: DropInComponentDelegate {
+    private let parentViewController: UIViewController
     private let checkoutFlutterApi: CheckoutFlutterApi
     private let dropInComponent: DropInComponent
 
-    init(checkoutFlutterApi: CheckoutFlutterApi, dropInComponent: DropInComponent) {
+    init(parentViewController: UIViewController, checkoutFlutterApi: CheckoutFlutterApi, dropInComponent: DropInComponent) {
+        self.parentViewController = parentViewController
         self.checkoutFlutterApi = checkoutFlutterApi
         self.dropInComponent = dropInComponent
     }
@@ -41,7 +43,7 @@ class DropInAdvancedFlowDelegate: DropInComponentDelegate {
             self.dropInComponent.viewController.dismiss(animated: true)
         })
     }
-    
+
     func didFail(with error: Error, from _: PaymentComponent, in dropInComponent: AnyDropInComponent) {
         dropInComponent.viewController.presentedViewController?.dismiss(animated: true, completion: {
             self.sendErrorToFlutterLayer(error: error)
@@ -54,26 +56,26 @@ class DropInAdvancedFlowDelegate: DropInComponentDelegate {
         })
     }
 
-    func didFail(with error: Error, from dropInComponent: Adyen.AnyDropInComponent) {
-        dropInComponent.viewController.dismiss(animated: false)
-        self.dropInComponent.finalizeIfNeeded(with: false, completion: { [weak self] in
-            guard let self = self else { return }
-            self.dropInComponent.viewController.dismiss(animated: true, completion: { [weak self] in
-                guard let self = self else { return }
-
+    func didFail(with error: Error, from _: Adyen.AnyDropInComponent) {
+        dropInComponent.finalizeIfNeeded(with: false, completion: { [weak self] in
+            self?.parentViewController.dismiss(animated: true, completion: { [weak self] in
                 switch error {
                 case ComponentError.cancelled:
-                    let platformCommunicationModel = PlatformCommunicationModel(type: PlatformCommunicationType.result, paymentResult: PaymentResultDTO(type: PaymentResultEnum.cancelledByUser, reason: error.localizedDescription))
-                    self.checkoutFlutterApi.onDropInAdvancedFlowPlatformCommunication(platformCommunicationModel: platformCommunicationModel, completion: { _ in })
+                    let platformCommunicationModel = PlatformCommunicationModel(type: PlatformCommunicationType.result,
+                                                                                paymentResult: PaymentResultDTO(type: PaymentResultEnum.cancelledByUser,
+                                                                                                                reason: error.localizedDescription))
+                    self?.checkoutFlutterApi.onDropInAdvancedFlowPlatformCommunication(platformCommunicationModel: platformCommunicationModel, completion: { _ in })
                 default:
-                    self.sendErrorToFlutterLayer(error: error)
+                    self?.sendErrorToFlutterLayer(error: error)
                 }
             })
         })
     }
 
     private func sendErrorToFlutterLayer(error: Error) {
-        let platformCommunicationModel = PlatformCommunicationModel(type: PlatformCommunicationType.result, paymentResult: PaymentResultDTO(type: PaymentResultEnum.error, reason: error.localizedDescription))
+        let platformCommunicationModel = PlatformCommunicationModel(type: PlatformCommunicationType.result,
+                                                                    paymentResult: PaymentResultDTO(type: PaymentResultEnum.error,
+                                                                                                    reason: error.localizedDescription))
         checkoutFlutterApi.onDropInAdvancedFlowPlatformCommunication(platformCommunicationModel: platformCommunicationModel, completion: { _ in })
     }
 }

@@ -90,7 +90,7 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
             let dropInComponent = DropInComponent(paymentMethods: paymentMethodsWithoutGiftCards,
                                                   context: adyenContext,
                                                   configuration: configuration)
-            dropInAdvancedFlowDelegate = DropInAdvancedFlowDelegate(checkoutFlutterApi: checkoutFlutterApi, dropInComponent: dropInComponent)
+            dropInAdvancedFlowDelegate = DropInAdvancedFlowDelegate(parentViewController: viewController, checkoutFlutterApi: checkoutFlutterApi, dropInComponent: dropInComponent)
             dropInComponent.delegate = dropInAdvancedFlowDelegate
 
             if dropInConfigurationDTO.isRemoveStoredPaymentMethodEnabled == true {
@@ -177,14 +177,14 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
     }
 
     private func handleDropInResult(dropInResult: DropInResultDTO) {
-            switch dropInResult.dropInResultType {
-            case .finished:
-                onDropInResultFinished(dropInResult: dropInResult)
-            case .action:
-                onDropInResultAction(dropInResult: dropInResult)
-            case .error:
-                onDropInResultError(dropInResult: dropInResult)
-            }
+        switch dropInResult.dropInResultType {
+        case .finished:
+            onDropInResultFinished(dropInResult: dropInResult)
+        case .action:
+            onDropInResultAction(dropInResult: dropInResult)
+        case .error:
+            onDropInResultError(dropInResult: dropInResult)
+        }
     }
 
     private func onDropInResultFinished(dropInResult: DropInResultDTO) {
@@ -212,8 +212,8 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
 
     private func onDropInResultError(dropInResult: DropInResultDTO) {
         dropInComponent?.stopLoading()
-        
-        if (dropInResult.error?.dismissDropIn == true) {
+
+        if dropInResult.error?.dismissDropIn == true {
             let paymentResult = PaymentResultDTO(type: PaymentResultEnum.error, reason: dropInResult.error?.errorMessage)
             checkoutFlutterApi.onDropInAdvancedFlowPlatformCommunication(platformCommunicationModel: PlatformCommunicationModel(type: PlatformCommunicationType.result, paymentResult: paymentResult), completion: { _ in })
             finalize(false, dropInResult.error?.errorMessage ?? "")
