@@ -90,7 +90,9 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
             let dropInComponent = DropInComponent(paymentMethods: paymentMethodsWithoutGiftCards,
                                                   context: adyenContext,
                                                   configuration: configuration)
-            dropInAdvancedFlowDelegate = DropInAdvancedFlowDelegate(parentViewController: viewController, checkoutFlutterApi: checkoutFlutterApi, dropInComponent: dropInComponent)
+            dropInAdvancedFlowDelegate = DropInAdvancedFlowDelegate(finalizeAndDismissCallback: finalizeAndDismiss,
+                                                                    checkoutFlutterApi: checkoutFlutterApi,
+                                                                    dropInComponent: dropInComponent)
             dropInComponent.delegate = dropInAdvancedFlowDelegate
 
             if dropInConfigurationDTO.isRemoveStoredPaymentMethodEnabled == true {
@@ -133,6 +135,7 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
         dropInSessionStoredPaymentMethodsDelegate = nil
         dropInAdvancedFlowDelegate = nil
         dropInAdvancedFlowStoredPaymentMethodsDelegate = nil
+        viewController = nil
     }
 
     private func getViewController() -> UIViewController? {
@@ -206,7 +209,7 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
         } catch {
             let paymentResult = PaymentResultDTO(type: PaymentResultEnum.error, reason: error.localizedDescription)
             checkoutFlutterApi.onDropInAdvancedFlowPlatformCommunication(platformCommunicationModel: PlatformCommunicationModel(type: PlatformCommunicationType.result, paymentResult: paymentResult), completion: { _ in })
-            finalize(false, "\(error.localizedDescription)")
+            finalizeAndDismiss(false)
         }
     }
 
@@ -216,7 +219,7 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
         if dropInResult.error?.dismissDropIn == true {
             let paymentResult = PaymentResultDTO(type: PaymentResultEnum.error, reason: dropInResult.error?.errorMessage)
             checkoutFlutterApi.onDropInAdvancedFlowPlatformCommunication(platformCommunicationModel: PlatformCommunicationModel(type: PlatformCommunicationType.result, paymentResult: paymentResult), completion: { _ in })
-            finalize(false, dropInResult.error?.errorMessage ?? "")
+            finalizeAndDismiss(false)
         } else {
             dropInComponent?.finalizeIfNeeded(with: false, completion: {})
             let localizationParameters = (dropInComponent as? Localizable)?.localizationParameters
@@ -229,10 +232,10 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
         }
     }
 
-    private func finalize(_ success: Bool, _: String) {
-        dropInComponent?.finalizeIfNeeded(with: success) { [weak self] in
-            guard let self = self else { return }
-            self.viewController?.dismiss(animated: true)
+    private func finalizeAndDismiss(_ success: Bool, completion: (() -> Void)? = {}) {
+         dropInComponent?.finalizeIfNeeded(with: success) { [weak self] in
+            self?.viewController?.dismiss(animated: true)
+            completion?()
         }
     }
 

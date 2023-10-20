@@ -2,12 +2,12 @@ import Adyen
 import AdyenNetworking
 
 class DropInAdvancedFlowDelegate: DropInComponentDelegate {
-    private let parentViewController: UIViewController
+    private let finalizeAndDismissCallback: (_ success: Bool, (() -> Void)?) -> Void?
     private let checkoutFlutterApi: CheckoutFlutterApi
     private let dropInComponent: DropInComponent
 
-    init(parentViewController: UIViewController, checkoutFlutterApi: CheckoutFlutterApi, dropInComponent: DropInComponent) {
-        self.parentViewController = parentViewController
+    init(finalizeAndDismissCallback: @escaping (_ success: Bool, (() -> Void)?) -> Void, checkoutFlutterApi: CheckoutFlutterApi, dropInComponent: DropInComponent) {
+        self.finalizeAndDismissCallback = finalizeAndDismissCallback
         self.checkoutFlutterApi = checkoutFlutterApi
         self.dropInComponent = dropInComponent
     }
@@ -57,18 +57,16 @@ class DropInAdvancedFlowDelegate: DropInComponentDelegate {
     }
 
     func didFail(with error: Error, from _: Adyen.AnyDropInComponent) {
-        dropInComponent.finalizeIfNeeded(with: false, completion: { [weak self] in
-            self?.parentViewController.dismiss(animated: true, completion: { [weak self] in
-                switch error {
-                case ComponentError.cancelled:
-                    let platformCommunicationModel = PlatformCommunicationModel(type: PlatformCommunicationType.result,
-                                                                                paymentResult: PaymentResultDTO(type: PaymentResultEnum.cancelledByUser,
-                                                                                                                reason: error.localizedDescription))
-                    self?.checkoutFlutterApi.onDropInAdvancedFlowPlatformCommunication(platformCommunicationModel: platformCommunicationModel, completion: { _ in })
-                default:
-                    self?.sendErrorToFlutterLayer(error: error)
-                }
-            })
+        finalizeAndDismissCallback(false, { [weak self] in
+            switch error {
+            case ComponentError.cancelled:
+                let platformCommunicationModel = PlatformCommunicationModel(type: PlatformCommunicationType.result,
+                                                                            paymentResult: PaymentResultDTO(type: PaymentResultEnum.cancelledByUser,
+                                                                                                            reason: error.localizedDescription))
+                self?.checkoutFlutterApi.onDropInAdvancedFlowPlatformCommunication(platformCommunicationModel: platformCommunicationModel, completion: { _ in })
+            default:
+                self?.sendErrorToFlutterLayer(error: error)
+            }
         })
     }
 
