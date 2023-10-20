@@ -35,13 +35,11 @@ class DropInAdvancedFlowDelegate: DropInComponentDelegate {
     }
 
     func didComplete(from _: ActionComponent, in _: AnyDropInComponent) {
-        let paymentResult = PaymentResultDTO(type: PaymentResultEnum.finished, result: PaymentResultModelDTO(resultCode: ResultCode.received.rawValue))
-        let platformCommunicationModel = PlatformCommunicationModel(type: PlatformCommunicationType.result, paymentResult: paymentResult)
-        checkoutFlutterApi.onDropInAdvancedFlowPlatformCommunication(platformCommunicationModel: platformCommunicationModel, completion: { _ in })
-        dropInComponent.finalizeIfNeeded(with: true, completion: { [weak self] in
-            guard let self = self else { return }
-            self.dropInComponent.viewController.dismiss(animated: true)
-        })
+        finalizeAndDismissCallback(true) { [weak self] in
+            let paymentResult = PaymentResultDTO(type: PaymentResultEnum.finished, result: PaymentResultModelDTO(resultCode: ResultCode.received.rawValue))
+            let platformCommunicationModel = PlatformCommunicationModel(type: PlatformCommunicationType.result, paymentResult: paymentResult)
+            self?.checkoutFlutterApi.onDropInAdvancedFlowPlatformCommunication(platformCommunicationModel: platformCommunicationModel, completion: { _ in })
+        }
     }
 
     func didFail(with error: Error, from _: PaymentComponent, in dropInComponent: AnyDropInComponent) {
@@ -57,7 +55,7 @@ class DropInAdvancedFlowDelegate: DropInComponentDelegate {
     }
 
     func didFail(with error: Error, from _: Adyen.AnyDropInComponent) {
-        finalizeAndDismissCallback(false, { [weak self] in
+        finalizeAndDismissCallback(false) { [weak self] in
             switch error {
             case ComponentError.cancelled:
                 let platformCommunicationModel = PlatformCommunicationModel(type: PlatformCommunicationType.result,
@@ -67,7 +65,7 @@ class DropInAdvancedFlowDelegate: DropInComponentDelegate {
             default:
                 self?.sendErrorToFlutterLayer(error: error)
             }
-        })
+        }
     }
 
     private func sendErrorToFlutterLayer(error: Error) {

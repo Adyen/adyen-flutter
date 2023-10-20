@@ -193,12 +193,10 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
     private func onDropInResultFinished(dropInResult: DropInResultDTO) {
         let resultCode = ResultCode(rawValue: dropInResult.result ?? "")
         let success = resultCode == .authorised || resultCode == .received || resultCode == .pending
-        dropInComponent?.finalizeIfNeeded(with: success) { [weak self] in
-            self?.dropInComponent?.viewController.presentingViewController?.dismiss(animated: false, completion: {
-                let paymentResult = PaymentResultDTO(type: PaymentResultEnum.finished, result: PaymentResultModelDTO(resultCode: resultCode?.rawValue))
-                self?.checkoutFlutterApi.onDropInAdvancedFlowPlatformCommunication(platformCommunicationModel: PlatformCommunicationModel(type: PlatformCommunicationType.result, paymentResult: paymentResult), completion: { _ in })
-            })
-        }
+        finalizeAndDismiss(true, completion: { [weak self] in
+            let paymentResult = PaymentResultDTO(type: PaymentResultEnum.finished, result: PaymentResultModelDTO(resultCode: resultCode?.rawValue))
+            self?.checkoutFlutterApi.onDropInAdvancedFlowPlatformCommunication(platformCommunicationModel: PlatformCommunicationModel(type: PlatformCommunicationType.result, paymentResult: paymentResult), completion: { _ in })
+        })
     }
 
     private func onDropInResultAction(dropInResult: DropInResultDTO) {
@@ -233,9 +231,10 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
     }
 
     private func finalizeAndDismiss(_ success: Bool, completion: (() -> Void)? = {}) {
-         dropInComponent?.finalizeIfNeeded(with: success) { [weak self] in
-            self?.viewController?.dismiss(animated: true)
-            completion?()
+        dropInComponent?.finalizeIfNeeded(with: success) { [weak self] in
+            self?.viewController?.dismiss(animated: true, completion: {
+                completion?()
+            })
         }
     }
 
