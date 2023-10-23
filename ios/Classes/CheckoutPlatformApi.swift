@@ -17,7 +17,7 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
     private var session: AdyenSession?
     private var dropInSessionDelegate: AdyenSessionDelegate?
     private var dropInSessionPresentationDelegate: PresentationDelegate?
-    private var dropInAdvancedFlowDelegate: DropInComponentDelegate?
+    private var dropInAdvancedFlowDelegate: DropInAdvancedFlowDelegate?
     private var dropInSessionStoredPaymentMethodsDelegate: DropInSessionsStoredPaymentMethodsDelegate?
     private var dropInAdvancedFlowStoredPaymentMethodsDelegate: DropInAdvancedFlowStoredPaymentMethodsDelegate?
 
@@ -90,9 +90,8 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
             let dropInComponent = DropInComponent(paymentMethods: paymentMethodsWithoutGiftCards,
                                                   context: adyenContext,
                                                   configuration: configuration)
-            dropInAdvancedFlowDelegate = DropInAdvancedFlowDelegate(finalizeAndDismissCallback: finalizeAndDismiss,
-                                                                    checkoutFlutterApi: checkoutFlutterApi,
-                                                                    dropInComponent: dropInComponent)
+            dropInAdvancedFlowDelegate = DropInAdvancedFlowDelegate(checkoutFlutterApi: checkoutFlutterApi)
+            dropInAdvancedFlowDelegate?.dropInInteractorDelegate = self
             dropInComponent.delegate = dropInAdvancedFlowDelegate
 
             if dropInConfigurationDTO.isRemoveStoredPaymentMethodEnabled == true {
@@ -133,6 +132,7 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
         dropInSessionDelegate = nil
         dropInSessionPresentationDelegate = nil
         dropInSessionStoredPaymentMethodsDelegate = nil
+        dropInAdvancedFlowDelegate?.dropInInteractorDelegate = nil
         dropInAdvancedFlowDelegate = nil
         dropInAdvancedFlowStoredPaymentMethodsDelegate = nil
         viewController = nil
@@ -193,7 +193,7 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
     private func onDropInResultFinished(dropInResult: DropInResultDTO) {
         let resultCode = ResultCode(rawValue: dropInResult.result ?? "")
         let success = resultCode == .authorised || resultCode == .received || resultCode == .pending
-        finalizeAndDismiss(true, completion: { [weak self] in
+        finalizeAndDismiss(success: true, completion: { [weak self] in
             let paymentResult = PaymentResultDTO(type: PaymentResultEnum.finished, result: PaymentResultModelDTO(resultCode: resultCode?.rawValue))
             self?.checkoutFlutterApi.onDropInAdvancedFlowPlatformCommunication(platformCommunicationModel: PlatformCommunicationModel(type: PlatformCommunicationType.result, paymentResult: paymentResult), completion: { _ in })
         })
@@ -207,7 +207,7 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
         } catch {
             let paymentResult = PaymentResultDTO(type: PaymentResultEnum.error, reason: error.localizedDescription)
             checkoutFlutterApi.onDropInAdvancedFlowPlatformCommunication(platformCommunicationModel: PlatformCommunicationModel(type: PlatformCommunicationType.result, paymentResult: paymentResult), completion: { _ in })
-            finalizeAndDismiss(false)
+            finalizeAndDismiss(success: false) {}
         }
     }
 
@@ -217,7 +217,7 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
         if dropInResult.error?.dismissDropIn == true {
             let paymentResult = PaymentResultDTO(type: PaymentResultEnum.error, reason: dropInResult.error?.errorMessage)
             checkoutFlutterApi.onDropInAdvancedFlowPlatformCommunication(platformCommunicationModel: PlatformCommunicationModel(type: PlatformCommunicationType.result, paymentResult: paymentResult), completion: { _ in })
-            finalizeAndDismiss(false)
+            finalizeAndDismiss(success: false) {}
         } else {
             dropInComponent?.finalizeIfNeeded(with: false, completion: {})
             let localizationParameters = (dropInComponent as? Localizable)?.localizationParameters
@@ -230,14 +230,6 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
         }
     }
 
-    private func finalizeAndDismiss(_ success: Bool, completion: (() -> Void)? = {}) {
-        dropInComponent?.finalizeIfNeeded(with: success) { [weak self] in
-            self?.viewController?.dismiss(animated: true, completion: {
-                completion?()
-            })
-        }
-    }
-
     private func removeGiftCardPaymentMethods(paymentMethods: PaymentMethods) -> PaymentMethods {
         let storedPaymentMethods = paymentMethods.stored.filter { !($0.type == PaymentMethodType.giftcard) }
         let paymentMethods = paymentMethods.regular.filter { !($0.type == PaymentMethodType.giftcard) }
@@ -247,5 +239,15 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
     private func sendSessionError(error: Error) {
         let platformCommunicationModel = PlatformCommunicationModel(type: PlatformCommunicationType.result, paymentResult: PaymentResultDTO(type: PaymentResultEnum.error, reason: error.localizedDescription))
         checkoutFlutterApi.onDropInSessionPlatformCommunication(platformCommunicationModel: platformCommunicationModel, completion: { _ in })
+    }
+}
+
+extension CheckoutPlatformApi : DropInInteractorDelegate {
+    func finalizeAndDismiss(success: Bool,  completion: @escaping (() -> Void)) {
+        dropInComponent?.finalizeIfNeeded(with: success) { [weak self] in
+            self?.viewController?.dismiss(animated: true, completion: {
+                completion()
+            })
+        }
     }
 }

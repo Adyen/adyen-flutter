@@ -2,14 +2,11 @@ import Adyen
 import AdyenNetworking
 
 class DropInAdvancedFlowDelegate: DropInComponentDelegate {
-    private let finalizeAndDismissCallback: (_ success: Bool, (() -> Void)?) -> Void?
     private let checkoutFlutterApi: CheckoutFlutterApi
-    private let dropInComponent: DropInComponent
+    public weak var dropInInteractorDelegate: DropInInteractorDelegate?
 
-    init(finalizeAndDismissCallback: @escaping (_ success: Bool, (() -> Void)?) -> Void, checkoutFlutterApi: CheckoutFlutterApi, dropInComponent: DropInComponent) {
-        self.finalizeAndDismissCallback = finalizeAndDismissCallback
+    init(checkoutFlutterApi: CheckoutFlutterApi) {
         self.checkoutFlutterApi = checkoutFlutterApi
-        self.dropInComponent = dropInComponent
     }
 
     func didSubmit(_ data: PaymentComponentData, from _: PaymentComponent, in _: AnyDropInComponent) {
@@ -35,7 +32,7 @@ class DropInAdvancedFlowDelegate: DropInComponentDelegate {
     }
 
     func didComplete(from _: ActionComponent, in _: AnyDropInComponent) {
-        finalizeAndDismissCallback(true) { [weak self] in
+        dropInInteractorDelegate?.finalizeAndDismiss(success:true) { [weak self] in
             let paymentResult = PaymentResultDTO(type: PaymentResultEnum.finished, result: PaymentResultModelDTO(resultCode: ResultCode.received.rawValue))
             let platformCommunicationModel = PlatformCommunicationModel(type: PlatformCommunicationType.result, paymentResult: paymentResult)
             self?.checkoutFlutterApi.onDropInAdvancedFlowPlatformCommunication(platformCommunicationModel: platformCommunicationModel, completion: { _ in })
@@ -43,19 +40,19 @@ class DropInAdvancedFlowDelegate: DropInComponentDelegate {
     }
 
     func didFail(with error: Error, from _: PaymentComponent, in dropInComponent: AnyDropInComponent) {
-        dropInComponent.viewController.presentedViewController?.dismiss(animated: true, completion: {
-            self.sendErrorToFlutterLayer(error: error)
-        })
+        dropInInteractorDelegate?.finalizeAndDismiss(success: false) { [weak self] in
+            self?.sendErrorToFlutterLayer(error: error)
+        }
     }
 
     func didFail(with error: Error, from _: ActionComponent, in dropInComponent: AnyDropInComponent) {
-        dropInComponent.viewController.presentedViewController?.dismiss(animated: true, completion: {
-            self.sendErrorToFlutterLayer(error: error)
-        })
+        dropInInteractorDelegate?.finalizeAndDismiss(success: false) { [weak self] in
+            self?.sendErrorToFlutterLayer(error: error)
+        }
     }
 
     func didFail(with error: Error, from _: Adyen.AnyDropInComponent) {
-        finalizeAndDismissCallback(false) { [weak self] in
+        dropInInteractorDelegate?.finalizeAndDismiss(success: false) { [weak self] in
             switch error {
             case ComponentError.cancelled:
                 let platformCommunicationModel = PlatformCommunicationModel(type: PlatformCommunicationType.result,
