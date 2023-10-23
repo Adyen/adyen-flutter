@@ -106,6 +106,11 @@ class _MyAppState extends State<MyApp> {
     final CashAppPayConfiguration cashAppPayConfiguration =
         await _createCashAppPayConfiguration();
 
+    final ApplePayConfiguration applePayConfiguration = ApplePayConfiguration(
+      merchantId: Config.merchantAccount,
+      merchantName: Config.merchantName,
+    );
+
     final DropInConfiguration dropInConfiguration = DropInConfiguration(
       environment: Environment.test,
       clientKey: Config.clientKey,
@@ -115,6 +120,7 @@ class _MyAppState extends State<MyApp> {
       cardsConfiguration: cardsConfiguration,
       storedPaymentMethodConfiguration: storedPaymentMethodConfiguration,
       cashAppPayConfiguration: cashAppPayConfiguration,
+      applePayConfiguration: applePayConfiguration,
     );
 
     return await _adyenCheckout.startPayment(
@@ -129,8 +135,9 @@ class _MyAppState extends State<MyApp> {
     final String paymentMethodsResponse =
         await _adyenSessionRepository.fetchPaymentMethods();
 
-    final CardsConfiguration cardsConfiguration =
-        CardsConfiguration(showStorePaymentField: true);
+    final CardsConfiguration cardsConfiguration = CardsConfiguration(
+        showStorePaymentField: true,
+    );
 
     final ApplePayConfiguration applePayConfiguration = ApplePayConfiguration(
       merchantId: Config.merchantAccount,

@@ -1,6 +1,9 @@
 import 'dart:convert';
 
 import 'package:adyen_checkout_example/network/models/amount_network_model.dart';
+import 'package:adyen_checkout_example/network/models/billing_address.dart';
+import 'package:adyen_checkout_example/network/models/delivery_address.dart';
+import 'package:adyen_checkout_example/network/models/line_item.dart';
 
 class SessionRequestNetworkModel {
   final String merchantAccount;
@@ -8,10 +11,18 @@ class SessionRequestNetworkModel {
   final String returnUrl;
   final String reference;
   final String countryCode;
+  final String? shopperLocale;
   final String? shopperReference;
   final String? storePaymentMethodMode;
   final String? recurringProcessingModel;
+  final String? shopperInteraction;
   final String? channel;
+  final String? telephoneNumber;
+  final String? dateOfBirth;
+  final String? socialSecurityNumber;
+  final DeliveryAddress? deliveryAddress;
+  final BillingAddress? billingAddress;
+  final List<LineItem>? lineItems;
 
   SessionRequestNetworkModel({
     required this.merchantAccount,
@@ -19,10 +30,18 @@ class SessionRequestNetworkModel {
     required this.returnUrl,
     required this.reference,
     required this.countryCode,
+    this.shopperLocale,
     this.shopperReference,
     this.storePaymentMethodMode,
     this.recurringProcessingModel,
+    this.shopperInteraction,
     this.channel,
+    this.telephoneNumber,
+    this.dateOfBirth,
+    this.socialSecurityNumber,
+    this.deliveryAddress,
+    this.billingAddress,
+    this.lineItems,
   });
 
   String toRawJson() => json.encode(toJson());
@@ -34,10 +53,19 @@ class SessionRequestNetworkModel {
     data['returnUrl'] = returnUrl;
     data['reference'] = reference;
     data['countryCode'] = countryCode;
+    data['shopperLocale'] = shopperLocale;
     data['shopperReference'] = shopperReference;
     data['storePaymentMethodMode'] = storePaymentMethodMode;
     data['recurringProcessingModel'] = recurringProcessingModel;
+    data['shopperInteraction'] = shopperInteraction;
     data['channel'] = channel;
+    data['telephoneNumber'] = telephoneNumber;
+    data['dateOfBirth'] = dateOfBirth;
+    data['socialSecurityNumber'] = socialSecurityNumber;
+    data['billingAddress'] = billingAddress?.toJson();
+    data['deliveryAddress'] = deliveryAddress?.toJson();
+    data['lineItems'] =
+        lineItems?.map((lineItem) => lineItem.toJson()).toList();
     return data;
   }
 }
@@ -52,6 +80,13 @@ enum RecurringProcessingModel {
   subscription,
   cardOnFile,
   unscheduledCardOnFile
+}
+
+enum ShopperInteractionModel {
+  ecommerce,
+  contAuth,
+  moto,
+  pos
 }
 
 extension StorePaymentMethodModeExtension on StorePaymentMethodMode {
@@ -76,6 +111,21 @@ extension RecurringProcessingModelExtension on RecurringProcessingModel {
         return 'CardOnFile';
       case RecurringProcessingModel.unscheduledCardOnFile:
         return 'UnscheduledCardOnFile';
+    }
+  }
+}
+
+extension ShopperInteractionModelExtension on ShopperInteractionModel {
+  String get shopperInteractionModelString {
+    switch (this) {
+      case ShopperInteractionModel.ecommerce:
+        return "Ecommerce";
+      case ShopperInteractionModel.contAuth:
+        return "ContAuth";
+      case ShopperInteractionModel.moto:
+        return "Moto";
+      case ShopperInteractionModel.pos:
+        return "POS";
     }
   }
 }

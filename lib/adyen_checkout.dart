@@ -20,3 +20,4 @@ export 'src/models/payment_method_configurations/cash_app_pay_configuration.dart
 export 'src/models/payment_method_configurations/google_pay_configuration.dart';
 export 'src/models/payment_result.dart';
 export 'src/models/session.dart';
+export 'src/models/stored_payment_method_configuration.dart';

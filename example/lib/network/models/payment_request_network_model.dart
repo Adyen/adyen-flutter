@@ -1,4 +1,5 @@
 import 'package:adyen_checkout_example/network/models/amount_network_model.dart';
+import 'package:adyen_checkout_example/network/models/line_item.dart';
 import 'package:adyen_checkout_example/network/models/session_request_network_model.dart';
 
 class PaymentsRequestData {
@@ -12,10 +13,11 @@ class PaymentsRequestData {
   final bool? threeDSAuthenticationOnly;
   final String? shopperIP;
   final String? channel;
-  final List<Item>? lineItems;
+  final List<LineItem>? lineItems;
   final String? shopperEmail;
   final ThreeDS2RequestDataRequest? threeDS2RequestData;
   final RecurringProcessingModel? recurringProcessingModel;
+  final String? shopperInteraction;
 
   PaymentsRequestData({
     required this.merchantAccount,
@@ -32,6 +34,7 @@ class PaymentsRequestData {
     this.shopperEmail,
     this.threeDS2RequestData,
     this.recurringProcessingModel,
+    this.shopperInteraction,
   });
 
   Map<String, dynamic> toJson() {
@@ -48,12 +51,13 @@ class PaymentsRequestData {
       "reference": reference,
       if (channel != null) "channel": channel,
       if (lineItems != null)
-        "lineItems": lineItems?.map((item) => item.toJson()).toList(),
+        "lineItems": lineItems?.map((lineItem) => lineItem.toJson()).toList(),
       if (shopperEmail != null) "shopperEmail": shopperEmail,
       if (threeDS2RequestData != null)
         "threeDS2RequestData": threeDS2RequestData?.toJson(),
       if (recurringProcessingModel != null)
         "recurringProcessingModel": recurringProcessingModel?.recurringModelString,
+      if (shopperInteraction != null) "shopperInteraction" : shopperInteraction
     };
   }
 }
@@ -71,38 +75,6 @@ class AdditionalData {
     return {
       'allow3DS2': allow3DS2,
       'executeThreeD': executeThreeD,
-    };
-  }
-}
-
-class Item {
-  final int quantity;
-  final int amountExcludingTax;
-  final int taxPercentage;
-  final String description;
-  final String id;
-  final int amountIncludingTax;
-  final String taxCategory;
-
-  Item({
-    required this.quantity,
-    required this.amountExcludingTax,
-    required this.taxPercentage,
-    required this.description,
-    required this.id,
-    required this.amountIncludingTax,
-    required this.taxCategory,
-  });
-
-  Map<String, dynamic> toJson() {
-    return {
-      'quantity': quantity,
-      'amountExcludingTax': amountExcludingTax,
-      'taxPercentage': taxPercentage,
-      'description': description,
-      'id': id,
-      'amountIncludingTax': amountIncludingTax,
-      'taxCategory': taxCategory,
     };
   }
 }

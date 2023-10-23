@@ -4,6 +4,9 @@ import 'dart:io';
 import 'package:adyen_checkout/adyen_checkout.dart';
 import 'package:adyen_checkout_example/config.dart';
 import 'package:adyen_checkout_example/network/models/amount_network_model.dart';
+import 'package:adyen_checkout_example/network/models/billing_address.dart';
+import 'package:adyen_checkout_example/network/models/delivery_address.dart';
+import 'package:adyen_checkout_example/network/models/line_item.dart';
 import 'package:adyen_checkout_example/network/models/payment_methods_request_network_model.dart';
 import 'package:adyen_checkout_example/network/models/payment_request_network_model.dart';
 import 'package:adyen_checkout_example/network/models/session_request_network_model.dart';
@@ -27,22 +30,54 @@ class AdyenSessionsRepository {
     String returnUrl = await determineExampleReturnUrl();
     SessionRequestNetworkModel sessionRequestNetworkModel =
         SessionRequestNetworkModel(
-      merchantAccount: Config.merchantAccount,
-      amount: AmountNetworkModel(
-        currency: amount.currency,
-        value: amount.value,
-      ),
-      returnUrl: returnUrl,
-      reference:
-          "flutter-session-test_${DateTime.now().millisecondsSinceEpoch}",
-      countryCode: Config.countryCode,
-      shopperReference: Config.shopperReference,
-      storePaymentMethodMode:
-          StorePaymentMethodMode.askForConsent.storePaymentMethodModeString,
-      recurringProcessingModel:
-          RecurringProcessingModel.cardOnFile.recurringModelString,
-      channel: _determineChannel(),
-    );
+            merchantAccount: Config.merchantAccount,
+            amount: AmountNetworkModel(
+              currency: amount.currency,
+              value: amount.value,
+            ),
+            returnUrl: returnUrl,
+            reference:
+                "flutter-session-test_${DateTime.now().millisecondsSinceEpoch}",
+            countryCode: Config.countryCode,
+            shopperLocale: Config.shopperLocale,
+            shopperReference: Config.shopperReference,
+            storePaymentMethodMode: StorePaymentMethodMode
+                .askForConsent.storePaymentMethodModeString,
+            recurringProcessingModel:
+                RecurringProcessingModel.cardOnFile.recurringModelString,
+            shopperInteraction:
+                ShopperInteractionModel.ecommerce.shopperInteractionModelString,
+            channel: _determineChannel(),
+            telephoneNumber: "+8613012345678",
+            dateOfBirth: "1996-09-04",
+            socialSecurityNumber: "0108",
+            deliveryAddress: DeliveryAddress(
+              city: "Ankeborg",
+              country: "SE",
+              houseNumberOrName: "1",
+              postalCode: "1234",
+              street: "Stargatan",
+            ),
+            billingAddress: BillingAddress(
+              city: "Ankeborg",
+              country: "SE",
+              houseNumberOrName: "1",
+              postalCode: "1234",
+              street: "Stargatan",
+            ),
+            lineItems: [
+          LineItem(
+            quantity: 1,
+            amountExcludingTax: 331,
+            taxPercentage: 2100,
+            description: "Shoes",
+            id: "Item #1",
+            taxAmount: 69,
+            amountIncludingTax: 400,
+            productUrl: "URL_TO_PURCHASED_ITEM",
+            imageUrl: "URL_TO_PICTURE_OF_PURCHASED_ITEM",
+          ),
+        ]);
 
     SessionResponseNetworkModel sessionResponseNetworkModel =
         await _service.createSession(sessionRequestNetworkModel, environment);
@@ -79,7 +114,21 @@ class AdyenSessionsRepository {
       threeDS2RequestData: ThreeDS2RequestDataRequest(),
       threeDSAuthenticationOnly: false,
       recurringProcessingModel: RecurringProcessingModel.cardOnFile,
-      lineItems: [],
+      shopperInteraction:
+          ShopperInteractionModel.ecommerce.shopperInteractionModelString,
+      lineItems: [
+        LineItem(
+          quantity: 1,
+          amountExcludingTax: 331,
+          taxPercentage: 2100,
+          description: "Shoes",
+          id: "Item #1",
+          taxAmount: 69,
+          amountIncludingTax: 400,
+          productUrl: "URL_TO_PURCHASED_ITEM",
+          imageUrl: "URL_TO_PICTURE_OF_PURCHASED_ITEM",
+        )
+      ],
     );
 
     Map<String, dynamic> mergedJson = <String, dynamic>{};
