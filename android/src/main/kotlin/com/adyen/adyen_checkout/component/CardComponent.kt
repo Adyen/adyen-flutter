@@ -6,7 +6,10 @@ import PlatformCommunicationType
 import android.content.Context
 import android.util.Log
 import android.view.View
+import android.widget.FrameLayout
 import androidx.activity.ComponentActivity
+import androidx.core.view.doOnNextLayout
+import com.adyen.adyen_checkout.R
 import com.adyen.checkout.card.CardComponent
 import com.adyen.checkout.card.CardComponentState
 import com.adyen.checkout.card.CardConfiguration
@@ -24,8 +27,8 @@ import org.json.JSONObject
 import java.util.Locale
 
 internal class CardComponent(
-    activity: ComponentActivity,
-    cardCallback: CardCallback,
+    private val activity: ComponentActivity,
+    private val checkoutFlutterApi: CheckoutFlutterApi,
     context: Context,
     id: Int,
     creationParams: Map<String?, Any?>?
@@ -40,15 +43,12 @@ internal class CardComponent(
 
     val clientKey = creationParams?.get("clientKey") as String
     val cardConfiguration =
-        CardConfiguration.Builder(Locale("nl", "NL"), Environment.TEST, clientKey).build()
+        CardConfiguration.Builder(Locale("nl", "NL"), Environment.TEST, clientKey)
+            .setHolderNameRequired(true)
+            .build()
 
     val schemes = paymentMethodsApiResponse.paymentMethods?.filter { it.type == "scheme" }
-    var cardComponent : CardComponent = CardComponent.PROVIDER.get(
-        activity = activity,
-        paymentMethod = schemes!!.first(),
-        configuration = cardConfiguration,
-        callback = cardCallback,
-    )
+    var cardComponent: CardComponent
 
 
     override fun dispose() {
@@ -56,17 +56,40 @@ internal class CardComponent(
             "AdyenCheckout",
             "DISPOSE VIEW"
         )
-        cardComponent.delegate.componentParams
         cardComponent.delegate.onCleared()
         componentView.invalidate()
     }
 
     init {
+        cardComponent = CardComponent.PROVIDER.get(
+            activity = activity,
+            paymentMethod = schemes!!.first(),
+            configuration = cardConfiguration,
+            callback = CardCallback(checkoutFlutterApi),
+            key = System.currentTimeMillis().toString()
+        )
+
         cardComponent.delegate
-
         componentView = AdyenComponentView(context)
-
         componentView.attach(cardComponent, activity)
+
+        componentView.doOnNextLayout {
+            view.height
+            val height = componentView.findViewById<FrameLayout>(R.id.frameLayout_componentContainer).height
+            Log.d(
+                "AdyenCheckout",
+                "Height: $height"
+            )
+//            checkoutFlutterApi.onComponentCommunication(
+//                ComponentCommunicationModel(
+//                    type = ComponentCommunicationType.RESIZE,
+//                    data = height.toDouble()
+//                ),
+//                callback = {},
+//            )
+        }
+
+
     }
 }
 
@@ -76,8 +99,7 @@ class CardComponentFactory(
 ) : PlatformViewFactory(StandardMessageCodec.INSTANCE) {
     override fun create(context: Context, viewId: Int, args: Any?): PlatformView {
         val creationParams = args as Map<String?, Any?>?
-        val cardCallback = CardCallback(checkoutFlutterApi)
-        return CardComponent(activity, cardCallback, context, viewId, creationParams)
+        return CardComponent(activity, checkoutFlutterApi, context, viewId, creationParams)
     }
 }
 
