@@ -8,7 +8,6 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
 
 class AdyenCardWidget extends StatelessWidget {
   AdyenCardWidget({
@@ -55,9 +54,12 @@ class AdyenCardWidget extends StatelessWidget {
       }
     });
 
-    Widget cardView = buildCardView(
-      viewType,
-      creationParams,
+    Widget cardView = Container(
+      color: Colors.white,
+      child: buildCardView(
+        viewType,
+        creationParams,
+      ),
     );
 
     return StreamBuilder(
