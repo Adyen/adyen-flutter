@@ -6,9 +6,12 @@ import ComponentCommunicationType
 import android.content.Context
 import android.util.Log
 import android.view.View
+import android.view.ViewGroup
 import android.widget.FrameLayout
+import android.widget.LinearLayout
 import androidx.activity.ComponentActivity
-import androidx.core.view.doOnNextLayout
+import androidx.core.view.children
+import androidx.core.view.doOnPreDraw
 import com.adyen.adyen_checkout.R
 import com.adyen.checkout.card.CardComponent
 import com.adyen.checkout.card.CardComponentState
@@ -34,8 +37,10 @@ internal class CardComponent(
     creationParams: Map<String?, Any?>?
 ) : PlatformView {
     private val componentView: AdyenComponentView
+
+    private val componentWrapperView: ComponentWrapperView
     override fun getView(): View {
-        return componentView
+        return componentWrapperView
     }
 
     val paymentMethods = creationParams?.get("paymentMethods") as String
@@ -72,24 +77,45 @@ internal class CardComponent(
         cardComponent.delegate
         componentView = AdyenComponentView(context)
         componentView.attach(cardComponent, activity)
+        componentWrapperView = ComponentWrapperView(activity, componentView)
+        val density = context.resources.displayMetrics.density
+        var sum = 0.0
 
-        componentView.doOnNextLayout {
-            view.height
-            val height = componentView.findViewById<FrameLayout>(R.id.frameLayout_componentContainer).height
-            Log.d(
-                "AdyenCheckout",
-                "Height: $height"
+        componentView.doOnPreDraw {
+            println("pre draw")
+            val card =
+                componentView.findViewById<FrameLayout>(R.id.frameLayout_componentContainer).getChildAt(0) as ViewGroup
+            val layoutparams = card.layoutParams
+            layoutparams.height = LinearLayout.LayoutParams.WRAP_CONTENT
+            card.layoutParams = layoutparams
+            card.children.forEach {
+                println(it.height)
+                sum += it.height
+            }
+
+            val payButton = componentView.findViewById<View>(R.id.frameLayout_buttonContainer).height
+            sum += payButton
+            println("sum is: $sum")
+            checkoutFlutterApi.onComponentCommunication(
+                ComponentCommunicationModel(
+                    type = ComponentCommunicationType.RESIZE,
+                    data = (componentView.height / density)
+                ),
+                callback = {},
             )
-//            checkoutFlutterApi.onComponentCommunication(
-//                ComponentCommunicationModel(
-//                    type = ComponentCommunicationType.RESIZE,
-//                    data = height.toDouble()
-//                ),
-//                callback = {},
-//            )
         }
 
-
+        componentView.addOnLayoutChangeListener { v, left, top, right, bottom, oldLeft, oldTop, oldRight, oldBottom ->
+            println("layoutChanged")
+            println("left: $left, top: $top, right: $right, bottom: $bottom, oldLeft: $oldLeft, oldTop: $oldTop, oldRight: $oldRight, oldBottom: $oldBottom")
+            val containerHeight = componentView.findViewById<FrameLayout>(R.id.frameLayout_componentContainer).height
+            val payButton =
+                componentView.findViewById<FrameLayout>(R.id.frameLayout_buttonContainer).height
+            val sumNew = containerHeight + payButton
+            if (sumNew > sum) {
+                println("updated value : $sum")
+            }
+        }
     }
 }
 

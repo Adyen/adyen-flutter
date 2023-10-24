@@ -62,15 +62,25 @@ class AdyenCardWidget extends StatelessWidget {
       ),
     );
 
+    var pixelRatio = MediaQuery.of(context).devicePixelRatio;
+
     return StreamBuilder(
         stream: resizeStream.stream,
         builder: (BuildContext context, AsyncSnapshot<double> snapshot) {
-          print("value is: $snapshot");
+          double platformHeight = snapshot.data ?? 500;
+
           return SizedBox(
-            height: (snapshot.data ?? 300) + 40,
+            height: _determineHeight(platformHeight, pixelRatio),
             child: cardView,
           );
         });
+  }
+
+  double _determineHeight(double nativeHeight, double pixelRatio) {
+    print("pixelRation: $pixelRatio");
+    print("height: $nativeHeight");
+
+    return nativeHeight;
   }
 
   Widget buildCardView(String viewType, Map<String, dynamic> creationParams) {
@@ -88,6 +98,8 @@ class AdyenCardWidget extends StatelessWidget {
       String viewType, Map<String, dynamic> creationParams) {
     const codec = CheckoutPlatformInterface.codec;
 
+    SurfaceAndroidViewController surfaceAndroidViewController;
+
     return PlatformViewLink(
       viewType: viewType,
       surfaceFactory: (context, controller) {
@@ -98,7 +110,8 @@ class AdyenCardWidget extends StatelessWidget {
         );
       },
       onCreatePlatformView: (params) {
-        return PlatformViewsService.initSurfaceAndroidView(
+        surfaceAndroidViewController =
+            PlatformViewsService.initSurfaceAndroidView(
           id: params.id,
           viewType: viewType,
           layoutDirection: TextDirection.ltr,
@@ -108,8 +121,10 @@ class AdyenCardWidget extends StatelessWidget {
             params.onFocusChanged(true);
           },
         )
-          ..addOnPlatformViewCreatedListener(params.onPlatformViewCreated)
-          ..create();
+              ..addOnPlatformViewCreatedListener(params.onPlatformViewCreated)
+              ..create();
+
+        return surfaceAndroidViewController;
       },
     );
   }
