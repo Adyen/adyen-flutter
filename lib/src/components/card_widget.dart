@@ -62,25 +62,27 @@ class AdyenCardWidget extends StatelessWidget {
       ),
     );
 
-    var pixelRatio = MediaQuery.of(context).devicePixelRatio;
-
     return StreamBuilder(
         stream: resizeStream.stream,
         builder: (BuildContext context, AsyncSnapshot<double> snapshot) {
-          double platformHeight = snapshot.data ?? 500;
+          double platformHeight = snapshot.data ?? _determineDefaultHeight();
 
           return SizedBox(
-            height: _determineHeight(platformHeight, pixelRatio),
+            height: platformHeight,
             child: cardView,
           );
         });
   }
 
-  double _determineHeight(double nativeHeight, double pixelRatio) {
-    print("pixelRation: $pixelRatio");
-    print("height: $nativeHeight");
-
-    return nativeHeight;
+  double _determineDefaultHeight() {
+    switch (defaultTargetPlatform) {
+      case TargetPlatform.android:
+        return 1800;
+      case TargetPlatform.iOS:
+        return 400;
+      default:
+        throw UnsupportedError('Unsupported platform view');
+    }
   }
 
   Widget buildCardView(String viewType, Map<String, dynamic> creationParams) {

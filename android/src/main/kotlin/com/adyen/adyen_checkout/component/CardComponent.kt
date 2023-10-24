@@ -104,18 +104,6 @@ internal class CardComponent(
                 callback = {},
             )
         }
-
-        componentView.addOnLayoutChangeListener { v, left, top, right, bottom, oldLeft, oldTop, oldRight, oldBottom ->
-            println("layoutChanged")
-            println("left: $left, top: $top, right: $right, bottom: $bottom, oldLeft: $oldLeft, oldTop: $oldTop, oldRight: $oldRight, oldBottom: $oldBottom")
-            val containerHeight = componentView.findViewById<FrameLayout>(R.id.frameLayout_componentContainer).height
-            val payButton =
-                componentView.findViewById<FrameLayout>(R.id.frameLayout_buttonContainer).height
-            val sumNew = containerHeight + payButton
-            if (sumNew > sum) {
-                println("updated value : $sum")
-            }
-        }
     }
 }
 

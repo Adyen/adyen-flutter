@@ -81,7 +81,8 @@ class FLNativeView: NSObject, FlutterPlatformView, PaymentComponentDelegate {
     func createNativeView(view _view: TestView, args: NSDictionary){
         
         _view.handler = {
-            let height = self.cardComponent?.viewController.preferredContentSize.height
+            var height = self.cardComponent?.viewController.preferredContentSize.height ?? 0
+            height += 30 //Bottom View
             self.checkoutFlutterApi.onComponentCommunication(componentCommunicationModel: ComponentCommunicationModel(type: ComponentCommunicationType.resize, data: height), completion: {_ in })
         }
         
