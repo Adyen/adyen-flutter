@@ -45,12 +45,7 @@ android {
 
     defaultConfig {
         minSdkVersion 21
-    }
-
-    buildTypes {
-        release {
-            consumerProguardFiles 'proguard-rules.pro'
-        }
+        consumerProguardFiles 'proguard-rules.pro'
     }
 
     dependencies {
