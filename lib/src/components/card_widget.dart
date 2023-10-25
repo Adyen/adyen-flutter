@@ -69,6 +69,7 @@ class AdyenCardWidget extends StatelessWidget {
         stream: resizeStream.stream,
         builder: (BuildContext context, AsyncSnapshot<double> snapshot) {
           double platformHeight = snapshot.data ?? _determineDefaultHeight();
+          print("PlatformHeight: $platformHeight");
 
           return SizedBox(
             height: platformHeight,
@@ -80,7 +81,7 @@ class AdyenCardWidget extends StatelessWidget {
   double _determineDefaultHeight() {
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
-        return 1800;
+        return 300;
       case TargetPlatform.iOS:
         return 400;
       default:

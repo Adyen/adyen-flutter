@@ -7,12 +7,7 @@ import ComponentFlutterApi
 import android.content.Context
 import android.util.Log
 import android.view.View
-import android.view.ViewGroup
-import android.widget.LinearLayout
 import androidx.activity.ComponentActivity
-import androidx.core.view.children
-import androidx.core.view.doOnPreDraw
-import com.adyen.adyen_checkout.R
 import com.adyen.adyen_checkout.utils.ConfigurationMapper.toNativeModel
 import com.adyen.checkout.card.CardComponent
 import com.adyen.checkout.card.CardComponentState
@@ -21,7 +16,6 @@ import com.adyen.checkout.components.core.ComponentCallback
 import com.adyen.checkout.components.core.ComponentError
 import com.adyen.checkout.components.core.PaymentComponentData
 import com.adyen.checkout.components.core.PaymentMethodsApiResponse
-import com.adyen.checkout.ui.core.AdyenComponentView
 import io.flutter.plugin.platform.PlatformView
 import io.flutter.plugin.platform.PlatformViewFactory
 import org.json.JSONObject
@@ -34,9 +28,6 @@ internal class CardComponent(
     id: Int,
     creationParams: Map<*, *>?
 ) : PlatformView {
-    private val componentView: AdyenComponentView = AdyenComponentView(context)
-    private val componentWrapperView = ComponentWrapperView(activity, componentView)
-    private val screenDensity = context.resources.displayMetrics.density
     private val configuration = creationParams?.get("cardComponentConfiguration") as CardComponentConfigurationDTO
     private val paymentMethods = creationParams?.get("paymentMethods") as String
     private val paymentMethodsApiResponse = PaymentMethodsApiResponse.SERIALIZER.deserialize(JSONObject(paymentMethods))
@@ -54,6 +45,7 @@ internal class CardComponent(
         callback = CardCallback(componentFlutterApi),
         key = UUID.randomUUID().toString()
     )
+    private val componentWrapperView = ComponentWrapperView(activity, componentFlutterApi)
 
     override fun getView(): View = componentWrapperView
 
@@ -63,20 +55,7 @@ internal class CardComponent(
     }
 
     init {
-        componentView.attach(cardComponent, activity)
-
-        componentView.doOnPreDraw {
-            componentView.findViewById<ViewGroup>(R.id.frameLayout_componentContainer).children.firstOrNull()?.let {
-                val layoutParams = it.layoutParams
-                layoutParams.height = LinearLayout.LayoutParams.WRAP_CONTENT
-                it.layoutParams = layoutParams
-            }
-
-            val componentHeight = componentView.height / screenDensity
-            componentFlutterApi.onComponentCommunication(
-                ComponentCommunicationModel(type = ComponentCommunicationType.RESIZE, data = componentHeight)
-            ) {}
-        }
+        componentWrapperView.addCard(cardComponent, activity)
     }
 }
 
@@ -105,6 +84,13 @@ class CardCallback(private val componentFlutterApi: ComponentFlutterApi) : Compo
     }
 
     override fun onError(componentError: ComponentError) {
+        println("ERROR")
+    }
+
+    override fun onStateChanged(state: CardComponentState) {
+        super.onStateChanged(state)
+
+        println("STATE CHAGNED ${state.isInputValid}")
     }
 
 
