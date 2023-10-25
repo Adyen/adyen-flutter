@@ -89,7 +89,7 @@ class SessionRequestNetworkModel {
     data['deliveryAddress'] = deliveryAddress?.toJson();
     data['lineItems'] =
         lineItems?.map((lineItem) => lineItem.toJson()).toList();
-    data['installmentOptions'] = installmentOptions;
+    // data['installmentOptions'] = installmentOptions;
     return data;
   }
 }

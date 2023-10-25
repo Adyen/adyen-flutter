@@ -45,15 +45,23 @@ class FirstRoute extends StatelessWidget {
   }
 }
 
-
 Widget buildCardWidget(
   AsyncSnapshot<String> snapshot,
   BuildContext context,
   AdyenSessionsRepository repository,
 ) {
-  return AdyenCardWidget(
-    paymentMethods: snapshot.data!,
+  final cardComponentConfiguration = CardComponentConfiguration(
+    environment: Config.environment,
     clientKey: Config.clientKey,
+    countryCode: Config.countryCode,
+    amount: Config.amount,
+    shopperLocale: Config.shopperLocale,
+    cardConfiguration: CardConfiguration()
+  );
+
+  return AdyenCardWidget(
+    cardComponentConfiguration: cardComponentConfiguration,
+    paymentMethods: snapshot.data!,
     onSubmit: repository.postPayments,
     onResult: (event) async {
       _dialogBuilder(context, event);

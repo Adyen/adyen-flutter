@@ -39,7 +39,7 @@ extension DropInConfigurationMapper on DropInConfiguration {
           true;
 }
 
-extension CardsConfigurationMapper on CardsConfiguration {
+extension CardsConfigurationMapper on CardConfiguration {
   CardsConfigurationDTO toDTO() => CardsConfigurationDTO(
         holderNameRequired: holderNameRequired,
         addressMode: addressMode,
@@ -103,5 +103,16 @@ extension OrderResponseMapper on OrderResponseDTO {
   OrderResponse fromDTO() => OrderResponse(
         pspReference: pspReference,
         orderData: orderData,
+      );
+}
+
+extension CardComponentConfigurationMapper on CardComponentConfiguration {
+  CardComponentConfigurationDTO toDTO() => CardComponentConfigurationDTO(
+        environment: environment,
+        clientKey: clientKey,
+        countryCode: countryCode,
+        amount: amount.toDTO(),
+        shopperLocale: shopperLocale,
+        cardsConfiguration: cardConfiguration.toDTO(),
       );
 }

@@ -1,136 +1,104 @@
 package com.adyen.adyen_checkout.component
 
-import CheckoutFlutterApi
+import CardComponentConfigurationDTO
 import ComponentCommunicationModel
 import ComponentCommunicationType
+import ComponentFlutterApi
 import android.content.Context
 import android.util.Log
 import android.view.View
 import android.view.ViewGroup
-import android.widget.FrameLayout
 import android.widget.LinearLayout
 import androidx.activity.ComponentActivity
 import androidx.core.view.children
 import androidx.core.view.doOnPreDraw
 import com.adyen.adyen_checkout.R
+import com.adyen.adyen_checkout.utils.ConfigurationMapper.toNativeModel
 import com.adyen.checkout.card.CardComponent
 import com.adyen.checkout.card.CardComponentState
-import com.adyen.checkout.card.CardConfiguration
 import com.adyen.checkout.components.core.ActionComponentData
 import com.adyen.checkout.components.core.ComponentCallback
 import com.adyen.checkout.components.core.ComponentError
 import com.adyen.checkout.components.core.PaymentComponentData
 import com.adyen.checkout.components.core.PaymentMethodsApiResponse
-import com.adyen.checkout.core.Environment
 import com.adyen.checkout.ui.core.AdyenComponentView
-import io.flutter.plugin.common.StandardMessageCodec
 import io.flutter.plugin.platform.PlatformView
 import io.flutter.plugin.platform.PlatformViewFactory
 import org.json.JSONObject
-import java.util.Locale
+import java.util.UUID
 
 internal class CardComponent(
     private val activity: ComponentActivity,
-    private val checkoutFlutterApi: CheckoutFlutterApi,
+    private val componentFlutterApi: ComponentFlutterApi,
     context: Context,
     id: Int,
-    creationParams: Map<String?, Any?>?
+    creationParams: Map<*, *>?
 ) : PlatformView {
-    private val componentView: AdyenComponentView
+    private val componentView: AdyenComponentView = AdyenComponentView(context)
+    private val componentWrapperView = ComponentWrapperView(activity, componentView)
+    private val screenDensity = context.resources.displayMetrics.density
+    private val configuration = creationParams?.get("cardComponentConfiguration") as CardComponentConfigurationDTO
+    private val paymentMethods = creationParams?.get("paymentMethods") as String
+    private val paymentMethodsApiResponse = PaymentMethodsApiResponse.SERIALIZER.deserialize(JSONObject(paymentMethods))
+    private val schemes = paymentMethodsApiResponse.paymentMethods?.firstOrNull { it.type == "scheme" }
+    private val environment = configuration.environment.toNativeModel()
+    private val cardConfiguration = configuration.cardsConfiguration.toNativeModel(
+        context,
+        environment,
+        configuration.clientKey
+    )
+    private var cardComponent: CardComponent = CardComponent.PROVIDER.get(
+        activity = activity,
+        paymentMethod = schemes!!,
+        configuration = cardConfiguration,
+        callback = CardCallback(componentFlutterApi),
+        key = UUID.randomUUID().toString()
+    )
 
-    private val componentWrapperView: ComponentWrapperView
-    override fun getView(): View {
-        return componentWrapperView
-    }
-
-    val paymentMethods = creationParams?.get("paymentMethods") as String
-    val paymentMethodsApiResponse = PaymentMethodsApiResponse.SERIALIZER.deserialize(JSONObject(paymentMethods))
-
-    val clientKey = creationParams?.get("clientKey") as String
-    val cardConfiguration =
-        CardConfiguration.Builder(Locale("nl", "NL"), Environment.TEST, clientKey)
-            .setHolderNameRequired(true)
-            .build()
-
-    val schemes = paymentMethodsApiResponse.paymentMethods?.filter { it.type == "scheme" }
-    var cardComponent: CardComponent
-
+    override fun getView(): View = componentWrapperView
 
     override fun dispose() {
-        Log.d(
-            "AdyenCheckout",
-            "DISPOSE VIEW"
-        )
+        Log.d("AdyenCheckout", "DISPOSE VIEW")
         cardComponent.delegate.onCleared()
-        componentView.invalidate()
     }
 
     init {
-        cardComponent = CardComponent.PROVIDER.get(
-            activity = activity,
-            paymentMethod = schemes!!.first(),
-            configuration = cardConfiguration,
-            callback = CardCallback(checkoutFlutterApi),
-            key = System.currentTimeMillis().toString()
-        )
-
-        cardComponent.delegate
-        componentView = AdyenComponentView(context)
         componentView.attach(cardComponent, activity)
-        componentWrapperView = ComponentWrapperView(activity, componentView)
-        val density = context.resources.displayMetrics.density
-        var sum = 0.0
 
         componentView.doOnPreDraw {
-            println("pre draw")
-            val card =
-                componentView.findViewById<FrameLayout>(R.id.frameLayout_componentContainer).getChildAt(0) as ViewGroup
-            val layoutparams = card.layoutParams
-            layoutparams.height = LinearLayout.LayoutParams.WRAP_CONTENT
-            card.layoutParams = layoutparams
-            card.children.forEach {
-                println(it.height)
-                sum += it.height
+            componentView.findViewById<ViewGroup>(R.id.frameLayout_componentContainer).children.firstOrNull()?.let {
+                val layoutParams = it.layoutParams
+                layoutParams.height = LinearLayout.LayoutParams.WRAP_CONTENT
+                it.layoutParams = layoutParams
             }
 
-            val payButton = componentView.findViewById<View>(R.id.frameLayout_buttonContainer).height
-            sum += payButton
-            println("sum is: $sum")
-            checkoutFlutterApi.onComponentCommunication(
-                ComponentCommunicationModel(
-                    type = ComponentCommunicationType.RESIZE,
-                    data = (componentView.height / density)
-                ),
-                callback = {},
-            )
+            val componentHeight = componentView.height / screenDensity
+            componentFlutterApi.onComponentCommunication(
+                ComponentCommunicationModel(type = ComponentCommunicationType.RESIZE, data = componentHeight)
+            ) {}
         }
     }
 }
 
 class CardComponentFactory(
     private val activity: ComponentActivity,
-    private val checkoutFlutterApi: CheckoutFlutterApi,
-) : PlatformViewFactory(StandardMessageCodec.INSTANCE) {
+    private val componentFlutterApi: ComponentFlutterApi,
+) : PlatformViewFactory(ComponentFlutterApi.codec) {
     override fun create(context: Context, viewId: Int, args: Any?): PlatformView {
-        val creationParams = args as Map<String?, Any?>?
-        return CardComponent(activity, checkoutFlutterApi, context, viewId, creationParams)
+        val creationParams = args as Map<*, *>?
+        return CardComponent(activity, componentFlutterApi, context, viewId, creationParams)
     }
 }
 
-class CardCallback(private val checkoutFlutterApi: CheckoutFlutterApi) : ComponentCallback<CardComponentState> {
+class CardCallback(private val componentFlutterApi: ComponentFlutterApi) : ComponentCallback<CardComponentState> {
     override fun onSubmit(state: CardComponentState) {
-        Log.d(
-            "AdyenCheckout",
-            state.toString()
-        )
-
-        val paymentComponentJson =
-            PaymentComponentData.SERIALIZER.serialize(state.data)
+        Log.d("AdyenCheckout", state.toString())
+        val paymentComponentJson = PaymentComponentData.SERIALIZER.serialize(state.data)
         val model = ComponentCommunicationModel(
             ComponentCommunicationType.PAYMENTCOMPONENT,
             data = paymentComponentJson.toString(),
         )
-        checkoutFlutterApi.onComponentCommunication(model) {}
+        componentFlutterApi.onComponentCommunication(model) {}
     }
 
     override fun onAdditionalDetails(actionComponentData: ActionComponentData) {

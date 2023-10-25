@@ -1,13 +1,9 @@
 import 'package:adyen_checkout/adyen_checkout.dart';
 import 'package:adyen_checkout/src/models/analytics_options.dart';
+import 'package:adyen_checkout/src/models/base_configuration.dart';
 
-class DropInConfiguration {
-  final Environment environment;
-  final String clientKey;
-  final String countryCode;
-  final Amount amount;
-  final String? shopperLocale;
-  final CardsConfiguration? cardsConfiguration;
+final class DropInConfiguration extends BaseConfiguration {
+  final CardConfiguration? cardsConfiguration;
   final ApplePayConfiguration? applePayConfiguration;
   final GooglePayConfiguration? googlePayConfiguration;
   final CashAppPayConfiguration? cashAppPayConfiguration;
@@ -16,11 +12,11 @@ class DropInConfiguration {
   final bool skipListWhenSinglePaymentMethod;
 
   DropInConfiguration({
-    required this.environment,
-    required this.clientKey,
-    required this.countryCode,
-    required this.amount,
-    this.shopperLocale,
+    required super.environment,
+    required super.clientKey,
+    required super.countryCode,
+    required super.amount,
+    super.shopperLocale,
     this.cardsConfiguration,
     this.applePayConfiguration,
     this.googlePayConfiguration,

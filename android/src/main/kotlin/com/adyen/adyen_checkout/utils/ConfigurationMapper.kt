@@ -46,7 +46,7 @@ object ConfigurationMapper {
     }
 
     fun DropInConfigurationDTO.mapToDropInConfiguration(context: Context): DropInConfiguration {
-        val environment = environment.mapToEnvironment()
+        val environment = environment.toNativeModel()
         val amount = amount.mapToAmount()
         val shopperLocale = Locale.forLanguageTag(shopperLocale)
         val dropInConfiguration = DropInConfiguration.Builder(shopperLocale, environment, clientKey)
@@ -64,7 +64,7 @@ object ConfigurationMapper {
         }
 
         if (cardsConfigurationDTO != null) {
-            val cardConfiguration = buildCardConfiguration(context, environment, cardsConfigurationDTO)
+            val cardConfiguration = cardsConfigurationDTO.toNativeModel(context, environment, clientKey)
             dropInConfiguration.addCardConfiguration(cardConfiguration)
         }
 
@@ -84,28 +84,26 @@ object ConfigurationMapper {
         return dropInConfiguration.build()
     }
 
-    private fun DropInConfigurationDTO.buildCardConfiguration(
+    fun CardsConfigurationDTO.toNativeModel(
         context: Context,
         environment: com.adyen.checkout.core.Environment,
-        cardsConfigurationDTO: CardsConfigurationDTO
+        clientKey: String,
     ): CardConfiguration {
         return CardConfiguration.Builder(
             context = context,
             environment = environment,
             clientKey = clientKey
         )
-            .setAddressConfiguration(
-                cardsConfigurationDTO.addressMode.mapToAddressConfiguration()
-            )
-            .setShowStorePaymentField(cardsConfigurationDTO.showStorePaymentField)
-            .setHideCvcStoredCard(!cardsConfigurationDTO.showCvcForStoredCard)
-            .setHideCvc(!cardsConfigurationDTO.showCvc)
-            .setKcpAuthVisibility(determineKcpAuthVisibility(cardsConfigurationDTO.kcpFieldVisibility))
+            .setAddressConfiguration(addressMode.mapToAddressConfiguration())
+            .setShowStorePaymentField(showStorePaymentField)
+            .setHideCvcStoredCard(!showCvcForStoredCard)
+            .setHideCvc(!showCvc)
+            .setKcpAuthVisibility(determineKcpAuthVisibility(kcpFieldVisibility))
             .setSocialSecurityNumberVisibility(
-                determineSocialSecurityNumberVisibility(cardsConfigurationDTO.socialSecurityNumberFieldVisibility)
+                determineSocialSecurityNumberVisibility(socialSecurityNumberFieldVisibility)
             )
-            .setSupportedCardTypes(*mapToSupportedCardTypes(cardsConfigurationDTO.supportedCardTypes))
-            .setHolderNameRequired(cardsConfigurationDTO.holderNameRequired)
+            .setSupportedCardTypes(*mapToSupportedCardTypes(supportedCardTypes))
+            .setHolderNameRequired(holderNameRequired)
             .build()
     }
 
@@ -168,7 +166,7 @@ object ConfigurationMapper {
         return mappedCardTypes.filterNotNull().toTypedArray()
     }
 
-    private fun Environment.mapToEnvironment(): SDKEnvironment {
+    fun Environment.toNativeModel(): SDKEnvironment {
         return when (this) {
             Environment.TEST -> SDKEnvironment.TEST
             Environment.EUROPE -> SDKEnvironment.EUROPE

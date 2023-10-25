@@ -306,6 +306,24 @@ class DeletedStoredPaymentMethodResultDTO {
   );
 }
 
+class CardComponentConfigurationDTO {
+  final Environment environment;
+  final String clientKey;
+  final String countryCode;
+  final AmountDTO amount;
+  final String? shopperLocale;
+  final CardsConfigurationDTO cardsConfiguration;
+
+  CardComponentConfigurationDTO(
+    this.environment,
+    this.clientKey,
+    this.countryCode,
+    this.amount,
+    this.shopperLocale,
+    this.cardsConfiguration,
+  );
+}
+
 @HostApi()
 abstract class CheckoutPlatformInterface {
   @async
@@ -343,6 +361,13 @@ abstract class CheckoutFlutterApi {
 
   void onDropInAdvancedFlowPlatformCommunication(
       PlatformCommunicationModel platformCommunicationModel);
+}
+
+@FlutterApi()
+abstract class ComponentFlutterApi {
+  // ignore: unused_element
+  void _generateCardComponentConfigurationClass(
+      CardComponentConfigurationDTO cardComponentConfigurationDTO);
 
   void onComponentCommunication(
       ComponentCommunicationModel componentCommunicationModel);

@@ -4,7 +4,7 @@ class CashAppPayConfiguration {
   final CashAppPayEnvironment cashAppPayEnvironment;
   final String returnUrl;
 
-  CashAppPayConfiguration(
+  const CashAppPayConfiguration(
     this.cashAppPayEnvironment,
     this.returnUrl,
   );

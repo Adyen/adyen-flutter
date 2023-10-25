@@ -1,6 +1,6 @@
 import 'package:adyen_checkout/src/generated/platform_api.g.dart';
 
-class CardsConfiguration {
+class CardConfiguration {
   final bool holderNameRequired;
   final AddressMode addressMode;
   final bool showStorePaymentField;
@@ -10,7 +10,7 @@ class CardsConfiguration {
   final FieldVisibility socialSecurityNumberFieldVisibility;
   final List<String?> supportedCardTypes;
 
-  CardsConfiguration({
+  const CardConfiguration({
     this.holderNameRequired = false,
     this.addressMode = AddressMode.none,
     this.showStorePaymentField = false,

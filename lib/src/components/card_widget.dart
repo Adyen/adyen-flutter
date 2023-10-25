@@ -1,8 +1,9 @@
 import 'dart:async';
 
 import 'package:adyen_checkout/adyen_checkout.dart';
+import 'package:adyen_checkout/src/components/component_result_api.dart';
 import 'package:adyen_checkout/src/generated/platform_api.g.dart';
-import 'package:adyen_checkout/src/platform/adyen_checkout_result_api.dart';
+import 'package:adyen_checkout/src/utils/dto_mapper.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -11,28 +12,30 @@ import 'package:flutter/services.dart';
 
 class AdyenCardWidget extends StatelessWidget {
   AdyenCardWidget({
-    required this.clientKey,
+    required this.cardComponentConfiguration,
     required this.paymentMethods,
     required this.onSubmit,
     required this.onResult,
     super.key,
   });
 
+  final CardComponentConfiguration cardComponentConfiguration;
   final String paymentMethods;
-  final String clientKey;
   final Future<DropInOutcome> Function(String) onSubmit;
   final Future<void> Function(PaymentResult) onResult;
-  final AdyenCheckoutResultApi _resultApi = AdyenCheckoutResultApi();
+  final ComponentResultApi _resultApi = ComponentResultApi();
+  final codec = ComponentFlutterApi.codec;
 
   @override
   Widget build(BuildContext context) {
     const String viewType = '<platform-view-type>';
     Map<String, dynamic> creationParams = <String, dynamic>{
       "paymentMethods": paymentMethods,
-      "clientKey": clientKey,
+      "clientKey": cardComponentConfiguration.clientKey,
+      "cardComponentConfiguration": cardComponentConfiguration.toDTO(),
     };
 
-    CheckoutFlutterApi.setup(_resultApi);
+    ComponentFlutterApi.setup(_resultApi);
 
     final resizeStream = StreamController<double>();
 
@@ -98,8 +101,6 @@ class AdyenCardWidget extends StatelessWidget {
 
   Widget buildAndroidCardView(
       String viewType, Map<String, dynamic> creationParams) {
-    const codec = CheckoutPlatformInterface.codec;
-
     SurfaceAndroidViewController surfaceAndroidViewController;
 
     return PlatformViewLink(
@@ -133,7 +134,6 @@ class AdyenCardWidget extends StatelessWidget {
 
   Widget buildIosCardView(
       String viewType, Map<String, dynamic> creationParams) {
-    const codec = CheckoutPlatformInterface.codec;
 
     return UiKitView(
       viewType: viewType,

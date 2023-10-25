@@ -2,6 +2,7 @@ package com.adyen.adyen_checkout
 
 import CheckoutFlutterApi
 import CheckoutPlatformInterface
+import ComponentFlutterApi
 import PaymentResultDTO
 import PaymentResultEnum
 import PaymentResultModelDTO
@@ -28,14 +29,15 @@ import io.flutter.embedding.engine.plugins.lifecycle.HiddenLifecycleReference
 class AdyenCheckoutPlugin : FlutterPlugin, ActivityAware {
     private var checkoutPlatformApi: CheckoutPlatformApi? = null
     private var checkoutFlutterApi: CheckoutFlutterApi? = null
+    private var componentFlutterApi : ComponentFlutterApi? = null
     private var lifecycleReference: HiddenLifecycleReference? = null
     private var lifecycleObserver: LifecycleEventObserver? = null
-
     private var flutterPluginBinding: FlutterPluginBinding? = null
 
     override fun onAttachedToEngine(flutterPluginBinding: FlutterPluginBinding) {
         this.flutterPluginBinding = flutterPluginBinding
         checkoutFlutterApi = CheckoutFlutterApi(flutterPluginBinding.binaryMessenger)
+        componentFlutterApi = ComponentFlutterApi(flutterPluginBinding.binaryMessenger)
         checkoutPlatformApi = CheckoutPlatformApi(checkoutFlutterApi)
         CheckoutPlatformInterface.setUp(flutterPluginBinding.binaryMessenger, checkoutPlatformApi)
     }
@@ -43,6 +45,7 @@ class AdyenCheckoutPlugin : FlutterPlugin, ActivityAware {
     override fun onDetachedFromEngine(binding: FlutterPluginBinding) {
         CheckoutPlatformInterface.setUp(binding.binaryMessenger, null)
         checkoutFlutterApi = null
+        componentFlutterApi = null
     }
 
     override fun onAttachedToActivity(binding: ActivityPluginBinding) = setupActivity(binding)
@@ -70,7 +73,7 @@ class AdyenCheckoutPlugin : FlutterPlugin, ActivityAware {
 
         flutterPluginBinding?.platformViewRegistry?.registerViewFactory(
             "<platform-view-type>",
-            CardComponentFactory(fragmentActivity, checkoutFlutterApi!!)
+            CardComponentFactory(fragmentActivity, componentFlutterApi!!)
         )
     }
 

@@ -151,7 +151,7 @@ class _MyAppState extends State<MyApp> {
       Config.environment,
     );
 
-    final CardsConfiguration cardsConfiguration = CardsConfiguration(
+    const CardConfiguration cardsConfiguration = CardConfiguration(
       showStorePaymentField: true,
     );
 
@@ -166,7 +166,7 @@ class _MyAppState extends State<MyApp> {
     final CashAppPayConfiguration cashAppPayConfiguration =
         await _createCashAppPayConfiguration();
 
-    final ApplePayConfiguration applePayConfiguration = ApplePayConfiguration(
+    const ApplePayConfiguration applePayConfiguration = ApplePayConfiguration(
       merchantId: Config.merchantAccount,
       merchantName: Config.merchantName,
     );
@@ -195,16 +195,16 @@ class _MyAppState extends State<MyApp> {
     final String paymentMethodsResponse =
         await _adyenSessionRepository.fetchPaymentMethods();
 
-    final CardsConfiguration cardsConfiguration = CardsConfiguration(
+    const CardConfiguration cardsConfiguration = CardConfiguration(
         showStorePaymentField: true,
     );
 
-    final ApplePayConfiguration applePayConfiguration = ApplePayConfiguration(
+    const ApplePayConfiguration applePayConfiguration = ApplePayConfiguration(
       merchantId: Config.merchantAccount,
       merchantName: Config.merchantName,
     );
 
-    final GooglePayConfiguration googlePayConfiguration =
+    const GooglePayConfiguration googlePayConfiguration =
         GooglePayConfiguration(
       googlePayEnvironment: GooglePayEnvironment.test,
       shippingAddressRequired: true,
