@@ -2,7 +2,7 @@ package com.adyen.adyen_checkout.utils
 
 import AddressMode
 import AmountDTO
-import CardsConfigurationDTO
+import CardConfigurationDTO
 import CashAppPayConfigurationDTO
 import CashAppPayEnvironment
 import DropInConfigurationDTO
@@ -63,8 +63,8 @@ object ConfigurationMapper {
             dropInConfiguration.setSkipListWhenSinglePaymentMethod(it)
         }
 
-        if (cardsConfigurationDTO != null) {
-            val cardConfiguration = cardsConfigurationDTO.toNativeModel(context, environment, clientKey)
+        if (cardConfigurationDTO != null) {
+            val cardConfiguration = cardConfigurationDTO.toNativeModel(context, environment, clientKey)
             dropInConfiguration.addCardConfiguration(cardConfiguration)
         }
 
@@ -84,7 +84,7 @@ object ConfigurationMapper {
         return dropInConfiguration.build()
     }
 
-    fun CardsConfigurationDTO.toNativeModel(
+    fun CardConfigurationDTO.toNativeModel(
         context: Context,
         environment: com.adyen.checkout.core.Environment,
         clientKey: String,

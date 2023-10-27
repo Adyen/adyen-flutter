@@ -9,7 +9,7 @@ class ConfigurationMapper {
 
         dropInConfiguration.paymentMethodsList.allowDisablingStoredPaymentMethods = dropInConfigurationDTO.isRemoveStoredPaymentMethodEnabled
 
-        if let cardsConfigurationDTO = dropInConfigurationDTO.cardsConfigurationDTO {
+        if let cardsConfigurationDTO = dropInConfigurationDTO.cardConfigurationDTO {
             let koreanAuthenticationMode = cardsConfigurationDTO.kcpFieldVisibility.toCardFieldVisibility()
             let socialSecurityNumberMode = cardsConfigurationDTO.socialSecurityNumberFieldVisibility.toCardFieldVisibility()
             let storedCardConfiguration = createStoredCardConfiguration(showCvcForStoredCard: cardsConfigurationDTO.showCvcForStoredCard)

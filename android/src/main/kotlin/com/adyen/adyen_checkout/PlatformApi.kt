@@ -246,7 +246,7 @@ data class DropInConfigurationDTO (
   val countryCode: String,
   val amount: AmountDTO,
   val shopperLocale: String,
-  val cardsConfigurationDTO: CardsConfigurationDTO? = null,
+  val cardConfigurationDTO: CardConfigurationDTO? = null,
   val applePayConfigurationDTO: ApplePayConfigurationDTO? = null,
   val googlePayConfigurationDTO: GooglePayConfigurationDTO? = null,
   val cashAppPayConfigurationDTO: CashAppPayConfigurationDTO? = null,
@@ -264,8 +264,8 @@ data class DropInConfigurationDTO (
       val countryCode = list[2] as String
       val amount = AmountDTO.fromList(list[3] as List<Any?>)
       val shopperLocale = list[4] as String
-      val cardsConfigurationDTO: CardsConfigurationDTO? = (list[5] as List<Any?>?)?.let {
-        CardsConfigurationDTO.fromList(it)
+      val cardConfigurationDTO: CardConfigurationDTO? = (list[5] as List<Any?>?)?.let {
+        CardConfigurationDTO.fromList(it)
       }
       val applePayConfigurationDTO: ApplePayConfigurationDTO? = (list[6] as List<Any?>?)?.let {
         ApplePayConfigurationDTO.fromList(it)
@@ -282,7 +282,7 @@ data class DropInConfigurationDTO (
       val showPreselectedStoredPaymentMethod = list[10] as Boolean
       val skipListWhenSinglePaymentMethod = list[11] as Boolean
       val isRemoveStoredPaymentMethodEnabled = list[12] as Boolean
-      return DropInConfigurationDTO(environment, clientKey, countryCode, amount, shopperLocale, cardsConfigurationDTO, applePayConfigurationDTO, googlePayConfigurationDTO, cashAppPayConfigurationDTO, analyticsOptionsDTO, showPreselectedStoredPaymentMethod, skipListWhenSinglePaymentMethod, isRemoveStoredPaymentMethodEnabled)
+      return DropInConfigurationDTO(environment, clientKey, countryCode, amount, shopperLocale, cardConfigurationDTO, applePayConfigurationDTO, googlePayConfigurationDTO, cashAppPayConfigurationDTO, analyticsOptionsDTO, showPreselectedStoredPaymentMethod, skipListWhenSinglePaymentMethod, isRemoveStoredPaymentMethodEnabled)
     }
   }
   fun toList(): List<Any?> {
@@ -292,7 +292,7 @@ data class DropInConfigurationDTO (
       countryCode,
       amount.toList(),
       shopperLocale,
-      cardsConfigurationDTO?.toList(),
+      cardConfigurationDTO?.toList(),
       applePayConfigurationDTO?.toList(),
       googlePayConfigurationDTO?.toList(),
       cashAppPayConfigurationDTO?.toList(),
@@ -305,7 +305,7 @@ data class DropInConfigurationDTO (
 }
 
 /** Generated class from Pigeon that represents data sent in messages. */
-data class CardsConfigurationDTO (
+data class CardConfigurationDTO (
   val holderNameRequired: Boolean,
   val addressMode: AddressMode,
   val showStorePaymentField: Boolean,
@@ -318,7 +318,7 @@ data class CardsConfigurationDTO (
 ) {
   companion object {
     @Suppress("UNCHECKED_CAST")
-    fun fromList(list: List<Any?>): CardsConfigurationDTO {
+    fun fromList(list: List<Any?>): CardConfigurationDTO {
       val holderNameRequired = list[0] as Boolean
       val addressMode = AddressMode.ofRaw(list[1] as Int)!!
       val showStorePaymentField = list[2] as Boolean
@@ -327,7 +327,7 @@ data class CardsConfigurationDTO (
       val kcpFieldVisibility = FieldVisibility.ofRaw(list[5] as Int)!!
       val socialSecurityNumberFieldVisibility = FieldVisibility.ofRaw(list[6] as Int)!!
       val supportedCardTypes = list[7] as List<String?>
-      return CardsConfigurationDTO(holderNameRequired, addressMode, showStorePaymentField, showCvcForStoredCard, showCvc, kcpFieldVisibility, socialSecurityNumberFieldVisibility, supportedCardTypes)
+      return CardConfigurationDTO(holderNameRequired, addressMode, showStorePaymentField, showCvcForStoredCard, showCvc, kcpFieldVisibility, socialSecurityNumberFieldVisibility, supportedCardTypes)
     }
   }
   fun toList(): List<Any?> {
@@ -661,7 +661,7 @@ data class CardComponentConfigurationDTO (
   val countryCode: String,
   val amount: AmountDTO,
   val shopperLocale: String? = null,
-  val cardsConfiguration: CardsConfigurationDTO
+  val cardConfiguration: CardConfigurationDTO
 
 ) {
   companion object {
@@ -672,8 +672,8 @@ data class CardComponentConfigurationDTO (
       val countryCode = list[2] as String
       val amount = AmountDTO.fromList(list[3] as List<Any?>)
       val shopperLocale = list[4] as String?
-      val cardsConfiguration = CardsConfigurationDTO.fromList(list[5] as List<Any?>)
-      return CardComponentConfigurationDTO(environment, clientKey, countryCode, amount, shopperLocale, cardsConfiguration)
+      val cardConfiguration = CardConfigurationDTO.fromList(list[5] as List<Any?>)
+      return CardComponentConfigurationDTO(environment, clientKey, countryCode, amount, shopperLocale, cardConfiguration)
     }
   }
   fun toList(): List<Any?> {
@@ -683,7 +683,7 @@ data class CardComponentConfigurationDTO (
       countryCode,
       amount.toList(),
       shopperLocale,
-      cardsConfiguration.toList(),
+      cardConfiguration.toList(),
     )
   }
 }
@@ -709,7 +709,7 @@ private object CheckoutPlatformInterfaceCodec : StandardMessageCodec() {
       }
       131.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          CardsConfigurationDTO.fromList(it)
+          CardConfigurationDTO.fromList(it)
         }
       }
       132.toByte() -> {
@@ -764,7 +764,7 @@ private object CheckoutPlatformInterfaceCodec : StandardMessageCodec() {
         stream.write(130)
         writeValue(stream, value.toList())
       }
-      is CardsConfigurationDTO -> {
+      is CardConfigurationDTO -> {
         stream.write(131)
         writeValue(stream, value.toList())
       }
@@ -1106,7 +1106,7 @@ private object ComponentFlutterApiCodec : StandardMessageCodec() {
       }
       130.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          CardsConfigurationDTO.fromList(it)
+          CardConfigurationDTO.fromList(it)
         }
       }
       131.toByte() -> {
@@ -1127,7 +1127,7 @@ private object ComponentFlutterApiCodec : StandardMessageCodec() {
         stream.write(129)
         writeValue(stream, value.toList())
       }
-      is CardsConfigurationDTO -> {
+      is CardConfigurationDTO -> {
         stream.write(130)
         writeValue(stream, value.toList())
       }

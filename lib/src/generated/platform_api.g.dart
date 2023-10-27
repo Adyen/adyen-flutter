@@ -167,7 +167,7 @@ class DropInConfigurationDTO {
     required this.countryCode,
     required this.amount,
     required this.shopperLocale,
-    this.cardsConfigurationDTO,
+    this.cardConfigurationDTO,
     this.applePayConfigurationDTO,
     this.googlePayConfigurationDTO,
     this.cashAppPayConfigurationDTO,
@@ -187,7 +187,7 @@ class DropInConfigurationDTO {
 
   String shopperLocale;
 
-  CardsConfigurationDTO? cardsConfigurationDTO;
+  CardConfigurationDTO? cardConfigurationDTO;
 
   ApplePayConfigurationDTO? applePayConfigurationDTO;
 
@@ -210,7 +210,7 @@ class DropInConfigurationDTO {
       countryCode,
       amount.encode(),
       shopperLocale,
-      cardsConfigurationDTO?.encode(),
+      cardConfigurationDTO?.encode(),
       applePayConfigurationDTO?.encode(),
       googlePayConfigurationDTO?.encode(),
       cashAppPayConfigurationDTO?.encode(),
@@ -229,8 +229,8 @@ class DropInConfigurationDTO {
       countryCode: result[2]! as String,
       amount: AmountDTO.decode(result[3]! as List<Object?>),
       shopperLocale: result[4]! as String,
-      cardsConfigurationDTO: result[5] != null
-          ? CardsConfigurationDTO.decode(result[5]! as List<Object?>)
+      cardConfigurationDTO: result[5] != null
+          ? CardConfigurationDTO.decode(result[5]! as List<Object?>)
           : null,
       applePayConfigurationDTO: result[6] != null
           ? ApplePayConfigurationDTO.decode(result[6]! as List<Object?>)
@@ -251,8 +251,8 @@ class DropInConfigurationDTO {
   }
 }
 
-class CardsConfigurationDTO {
-  CardsConfigurationDTO({
+class CardConfigurationDTO {
+  CardConfigurationDTO({
     required this.holderNameRequired,
     required this.addressMode,
     required this.showStorePaymentField,
@@ -292,9 +292,9 @@ class CardsConfigurationDTO {
     ];
   }
 
-  static CardsConfigurationDTO decode(Object result) {
+  static CardConfigurationDTO decode(Object result) {
     result as List<Object?>;
-    return CardsConfigurationDTO(
+    return CardConfigurationDTO(
       holderNameRequired: result[0]! as bool,
       addressMode: AddressMode.values[result[1]! as int],
       showStorePaymentField: result[2]! as bool,
@@ -704,7 +704,7 @@ class CardComponentConfigurationDTO {
     required this.countryCode,
     required this.amount,
     this.shopperLocale,
-    required this.cardsConfiguration,
+    required this.cardConfiguration,
   });
 
   Environment environment;
@@ -717,7 +717,7 @@ class CardComponentConfigurationDTO {
 
   String? shopperLocale;
 
-  CardsConfigurationDTO cardsConfiguration;
+  CardConfigurationDTO cardConfiguration;
 
   Object encode() {
     return <Object?>[
@@ -726,7 +726,7 @@ class CardComponentConfigurationDTO {
       countryCode,
       amount.encode(),
       shopperLocale,
-      cardsConfiguration.encode(),
+      cardConfiguration.encode(),
     ];
   }
 
@@ -738,7 +738,7 @@ class CardComponentConfigurationDTO {
       countryCode: result[2]! as String,
       amount: AmountDTO.decode(result[3]! as List<Object?>),
       shopperLocale: result[4] as String?,
-      cardsConfiguration: CardsConfigurationDTO.decode(result[5]! as List<Object?>),
+      cardConfiguration: CardConfigurationDTO.decode(result[5]! as List<Object?>),
     );
   }
 }
@@ -756,7 +756,7 @@ class _CheckoutPlatformInterfaceCodec extends StandardMessageCodec {
     } else if (value is ApplePayConfigurationDTO) {
       buffer.putUint8(130);
       writeValue(buffer, value.encode());
-    } else if (value is CardsConfigurationDTO) {
+    } else if (value is CardConfigurationDTO) {
       buffer.putUint8(131);
       writeValue(buffer, value.encode());
     } else if (value is CashAppPayConfigurationDTO) {
@@ -795,7 +795,7 @@ class _CheckoutPlatformInterfaceCodec extends StandardMessageCodec {
       case 130: 
         return ApplePayConfigurationDTO.decode(readValue(buffer)!);
       case 131: 
-        return CardsConfigurationDTO.decode(readValue(buffer)!);
+        return CardConfigurationDTO.decode(readValue(buffer)!);
       case 132: 
         return CashAppPayConfigurationDTO.decode(readValue(buffer)!);
       case 133: 
@@ -1149,7 +1149,7 @@ class _ComponentFlutterApiCodec extends StandardMessageCodec {
     } else if (value is CardComponentConfigurationDTO) {
       buffer.putUint8(129);
       writeValue(buffer, value.encode());
-    } else if (value is CardsConfigurationDTO) {
+    } else if (value is CardConfigurationDTO) {
       buffer.putUint8(130);
       writeValue(buffer, value.encode());
     } else if (value is ComponentCommunicationModel) {
@@ -1168,7 +1168,7 @@ class _ComponentFlutterApiCodec extends StandardMessageCodec {
       case 129: 
         return CardComponentConfigurationDTO.decode(readValue(buffer)!);
       case 130: 
-        return CardsConfigurationDTO.decode(readValue(buffer)!);
+        return CardConfigurationDTO.decode(readValue(buffer)!);
       case 131: 
         return ComponentCommunicationModel.decode(readValue(buffer)!);
       default:

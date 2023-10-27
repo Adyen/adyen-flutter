@@ -3,7 +3,7 @@ import 'package:adyen_checkout/src/models/analytics_options.dart';
 import 'package:adyen_checkout/src/models/base_configuration.dart';
 
 final class DropInConfiguration extends BaseConfiguration {
-  final CardConfiguration? cardsConfiguration;
+  final CardConfiguration? cardConfiguration;
   final ApplePayConfiguration? applePayConfiguration;
   final GooglePayConfiguration? googlePayConfiguration;
   final CashAppPayConfiguration? cashAppPayConfiguration;
@@ -17,7 +17,7 @@ final class DropInConfiguration extends BaseConfiguration {
     required super.countryCode,
     required super.amount,
     super.shopperLocale,
-    this.cardsConfiguration,
+    this.cardConfiguration,
     this.applePayConfiguration,
     this.googlePayConfiguration,
     this.cashAppPayConfiguration,

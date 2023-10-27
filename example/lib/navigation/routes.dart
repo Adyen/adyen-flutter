@@ -51,13 +51,14 @@ Widget buildCardWidget(
   AdyenSessionsRepository repository,
 ) {
   final cardComponentConfiguration = CardComponentConfiguration(
-    environment: Config.environment,
-    clientKey: Config.clientKey,
-    countryCode: Config.countryCode,
-    amount: Config.amount,
-    shopperLocale: Config.shopperLocale,
-    cardConfiguration: CardConfiguration()
-  );
+      environment: Config.environment,
+      clientKey: Config.clientKey,
+      countryCode: Config.countryCode,
+      amount: Config.amount,
+      shopperLocale: Config.shopperLocale,
+      cardConfiguration: const CardConfiguration(
+        showStorePaymentField: false
+      ));
 
   return AdyenCardWidget(
     cardComponentConfiguration: cardComponentConfiguration,

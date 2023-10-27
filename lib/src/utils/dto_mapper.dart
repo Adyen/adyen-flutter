@@ -18,7 +18,7 @@ extension DropInConfigurationMapper on DropInConfiguration {
         countryCode: countryCode.toUpperCase(),
         amount: amount.toDTO(),
         shopperLocale: shopperLocale ?? Platform.localeName,
-        cardsConfigurationDTO: cardsConfiguration?.toDTO(),
+        cardConfigurationDTO: cardConfiguration?.toDTO(),
         applePayConfigurationDTO: applePayConfiguration?.toDTO(),
         googlePayConfigurationDTO: googlePayConfiguration?.toDTO(),
         cashAppPayConfigurationDTO: cashAppPayConfiguration?.toDTO(),
@@ -40,7 +40,7 @@ extension DropInConfigurationMapper on DropInConfiguration {
 }
 
 extension CardsConfigurationMapper on CardConfiguration {
-  CardsConfigurationDTO toDTO() => CardsConfigurationDTO(
+  CardConfigurationDTO toDTO() => CardConfigurationDTO(
         holderNameRequired: holderNameRequired,
         addressMode: addressMode,
         showStorePaymentField: showStorePaymentField,
@@ -113,6 +113,6 @@ extension CardComponentConfigurationMapper on CardComponentConfiguration {
         countryCode: countryCode,
         amount: amount.toDTO(),
         shopperLocale: shopperLocale,
-        cardsConfiguration: cardConfiguration.toDTO(),
+        cardConfiguration: cardConfiguration.toDTO(),
       );
 }

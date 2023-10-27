@@ -5,11 +5,11 @@ import AdyenNetworking
 
 class CardComponentViewFactory: NSObject, FlutterPlatformViewFactory {
     private var messenger: FlutterBinaryMessenger
-    private let checkoutFlutterApi: CheckoutFlutterApi
+    private let componentFlutterApi: ComponentFlutterApi
 
-    init(messenger: FlutterBinaryMessenger, checkoutFlutterApi: CheckoutFlutterApi) {
+    init(messenger: FlutterBinaryMessenger, componentFlutterApi: ComponentFlutterApi) {
         self.messenger = messenger
-        self.checkoutFlutterApi = checkoutFlutterApi
+        self.componentFlutterApi = componentFlutterApi
         super.init()
     }
 
@@ -23,13 +23,14 @@ class CardComponentViewFactory: NSObject, FlutterPlatformViewFactory {
             viewIdentifier: viewId,
             arguments: args,
             binaryMessenger: messenger,
-            checkoutFlutterApi: checkoutFlutterApi
+            componentFlutterApi: componentFlutterApi
         )
     }
 
     /// Implementing this method is only necessary when the `arguments` in `createWithFrame` is not `nil`.
     public func createArgsCodec() -> FlutterMessageCodec & NSObjectProtocol {
-          return FlutterStandardMessageCodec.sharedInstance()
+         // return FlutterStandardMessageCodec.sharedInstance()
+        return componentFlutterApi.codec
     }
 }
 
@@ -40,7 +41,7 @@ class FLNativeView: NSObject, FlutterPlatformView, PaymentComponentDelegate {
             let paymentComponentData = PaymentComponentDataResponse(amount: data.amount, paymentMethod: data.paymentMethod.encodable, storePaymentMethod: data.storePaymentMethod, order: data.order, amountToPay: data.order?.remainingAmount, installments: data.installments, shopperName: data.shopperName, emailAddress: data.emailAddress, telephoneNumber: data.telephoneNumber, browserInfo: data.browserInfo, checkoutAttemptId: data.checkoutAttemptId, billingAddress: data.billingAddress, deliveryAddress: data.deliveryAddress, socialSecurityNumber: data.socialSecurityNumber, delegatedAuthenticationData: data.delegatedAuthenticationData)
             let paymentComponentJson = try JSONEncoder().encode(paymentComponentData)
             let paymentComponentString = String(data: paymentComponentJson, encoding: .utf8)
-            checkoutFlutterApi.onComponentCommunication(componentCommunicationModel: ComponentCommunicationModel(type: ComponentCommunicationType.paymentComponent, data: paymentComponentString), completion: { _ in })
+            componentFlutterApi.onComponentCommunication(componentCommunicationModel: ComponentCommunicationModel(type: ComponentCommunicationType.paymentComponent, data: paymentComponentString), completion: { _ in })
         } catch {
         }
     }
@@ -53,7 +54,7 @@ class FLNativeView: NSObject, FlutterPlatformView, PaymentComponentDelegate {
     private var _view: TestView
     private var cardComponent : CardComponent?
     private var rootViewController : UIViewController?
-    private let checkoutFlutterApi: CheckoutFlutterApi
+    private let componentFlutterApi: ComponentFlutterApi
     
     private var testView: TestView?
     
@@ -62,9 +63,9 @@ class FLNativeView: NSObject, FlutterPlatformView, PaymentComponentDelegate {
         viewIdentifier viewId: Int64,
         arguments args: Any?,
         binaryMessenger messenger: FlutterBinaryMessenger?,
-        checkoutFlutterApi: CheckoutFlutterApi
+        componentFlutterApi: ComponentFlutterApi
     ) {
-        self.checkoutFlutterApi = checkoutFlutterApi
+        self.componentFlutterApi = componentFlutterApi
         _view = TestView(handler: {
         })
         //_view = TestView()
@@ -82,17 +83,17 @@ class FLNativeView: NSObject, FlutterPlatformView, PaymentComponentDelegate {
         
         _view.handler = {
             var height = self.cardComponent?.viewController.preferredContentSize.height ?? 0
-            height += 30 //Bottom View
-            self.checkoutFlutterApi.onComponentCommunication(componentCommunicationModel: ComponentCommunicationModel(type: ComponentCommunicationType.resize, data: height), completion: {_ in })
+            height += 16 //Bottom View
+            self.componentFlutterApi.onComponentCommunication(componentCommunicationModel: ComponentCommunicationModel(type: ComponentCommunicationType.resize, data: height), completion: {_ in })
         }
         
         do {
             
-            let clientKey = args.value(forKey: "clientKey") as! String
             let paymentMethodsResponse = args.value(forKey: "paymentMethods") as! String
+            let cardComponentConfiguration = args.value(forKey: "cardComponentConfiguration") as! CardComponentConfigurationDTO
             
             let paymentMethods = try JSONDecoder().decode(PaymentMethods.self, from: Data(paymentMethodsResponse.utf8))
-            let component = try cardComponent(from: paymentMethods, clientKey: clientKey)
+            let component = try cardComponent(from: paymentMethods, cardComponentConfiguration: cardComponentConfiguration)
             component.delegate = self
             self.cardComponent = component
             let componentViewController = component.viewController
@@ -133,7 +134,7 @@ class FLNativeView: NSObject, FlutterPlatformView, PaymentComponentDelegate {
                 print("Container view height: \(_view.frame.height)")
             }
             
-            NotificationCenter.default.addObserver(self, selector: #selector(checkSize(notification:)), name: .updateSize, object: nil)
+            //NotificationCenter.default.addObserver(self, selector: #selector(checkSize(notification:)), name: .updateSize, object: nil)
 
             
         } catch {
@@ -146,8 +147,8 @@ class FLNativeView: NSObject, FlutterPlatformView, PaymentComponentDelegate {
          print("checkSize")
     }
     
-    private func cardComponent(from paymentMethods: PaymentMethods, clientKey: String) throws -> CardComponent {
-        let context = try APIContext(environment: Adyen.Environment.test, clientKey: clientKey)
+    private func cardComponent(from paymentMethods: PaymentMethods, cardComponentConfiguration: CardComponentConfigurationDTO) throws -> CardComponent {
+        let context = try APIContext(environment: Adyen.Environment.test, clientKey: cardComponentConfiguration.clientKey)
         let adyenContext = AdyenContext(apiContext: context,
                             payment: Payment(amount: Amount(value: 2100, currencyCode: "EUR"), countryCode: "NL"),
                             analyticsConfiguration: AnalyticsConfiguration())
@@ -160,7 +161,7 @@ class FLNativeView: NSObject, FlutterPlatformView, PaymentComponentDelegate {
         style.backgroundColor = UIColor.clear
         let component = CardComponent(paymentMethod: paymentMethod,
                                       context: adyenContext,
-                                      configuration: .init(style: style)
+                                      configuration: cardComponentConfiguration.cardConfiguration.toCardComponentConfiguration()
                                 )
         component.cardComponentDelegate = self
         return component
@@ -260,3 +261,59 @@ extension FormViewController {
         print("Did layout")
     }
 }
+
+extension CardConfigurationDTO {
+    
+    func toCardComponentConfiguration() -> CardComponent.Configuration {
+            let koreanAuthenticationMode = kcpFieldVisibility.toCardFieldVisibility()
+            let socialSecurityNumberMode = socialSecurityNumberFieldVisibility.toCardFieldVisibility()
+            let storedCardConfiguration = createStoredCardConfiguration(showCvcForStoredCard: showCvcForStoredCard)
+            let allowedCardTypes = determineAllowedCardTypes(cardTypes: supportedCardTypes)
+            let billingAddressConfiguration = determineBillingAddressConfiguration(addressMode: addressMode)
+        let cardConfiguration = CardComponent.Configuration(
+                showsHolderNameField: holderNameRequired,
+                showsStorePaymentMethodField: showStorePaymentField,
+                showsSecurityCodeField: showCvc,
+                koreanAuthenticationMode: koreanAuthenticationMode,
+                socialSecurityNumberMode: socialSecurityNumberMode,
+                storedCardConfiguration: storedCardConfiguration,
+                allowedCardTypes: allowedCardTypes,
+                billingAddress: billingAddressConfiguration
+            )
+
+            return cardConfiguration
+        }
+    
+    private func createStoredCardConfiguration(showCvcForStoredCard: Bool) -> StoredCardConfiguration {
+        var storedCardConfiguration = StoredCardConfiguration()
+        storedCardConfiguration.showsSecurityCodeField = showCvcForStoredCard
+        return storedCardConfiguration
+    }
+    
+    private func determineAllowedCardTypes(cardTypes: [String?]?) -> [CardType]? {
+        guard let mappedCardTypes = cardTypes, !mappedCardTypes.isEmpty else {
+            return nil
+        }
+
+        return mappedCardTypes.compactMap { $0 }.map { CardType(rawValue: $0.lowercased()) }
+    }
+    
+    private func determineBillingAddressConfiguration(addressMode: AddressMode?) -> BillingAddressConfiguration {
+        var billingAddressConfiguration = BillingAddressConfiguration()
+        switch addressMode {
+        case .full:
+            billingAddressConfiguration.mode = CardComponent.AddressFormType.full
+        case .postalCode:
+            billingAddressConfiguration.mode = CardComponent.AddressFormType.postalCode
+        case .none?:
+            billingAddressConfiguration.mode = CardComponent.AddressFormType.none
+        default:
+            billingAddressConfiguration.mode = CardComponent.AddressFormType.none
+        }
+
+        return billingAddressConfiguration
+    }
+    
+}
+
+

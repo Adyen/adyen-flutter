@@ -11,7 +11,7 @@ import PlatformCommunicationType
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
-import com.adyen.adyen_checkout.component.CardComponentFactory
+import com.adyen.adyen_checkout.components.card.CardComponentFactory
 import com.adyen.adyen_checkout.utils.ConfigurationMapper.mapToOrderResponseModel
 import com.adyen.adyen_checkout.utils.Constants.Companion.WRONG_FLUTTER_ACTIVITY_USAGE_ERROR_MESSAGE
 import com.adyen.checkout.dropin.DropIn
@@ -29,7 +29,7 @@ import io.flutter.embedding.engine.plugins.lifecycle.HiddenLifecycleReference
 class AdyenCheckoutPlugin : FlutterPlugin, ActivityAware {
     private var checkoutPlatformApi: CheckoutPlatformApi? = null
     private var checkoutFlutterApi: CheckoutFlutterApi? = null
-    private var componentFlutterApi : ComponentFlutterApi? = null
+    private var componentFlutterApi: ComponentFlutterApi? = null
     private var lifecycleReference: HiddenLifecycleReference? = null
     private var lifecycleObserver: LifecycleEventObserver? = null
     private var flutterPluginBinding: FlutterPluginBinding? = null
@@ -71,10 +71,11 @@ class AdyenCheckoutPlugin : FlutterPlugin, ActivityAware {
             lifecycleReference?.lifecycle?.addObserver(it)
         }
 
-        flutterPluginBinding?.platformViewRegistry?.registerViewFactory(
-            "<platform-view-type>",
-            CardComponentFactory(fragmentActivity, componentFlutterApi!!)
-        )
+        componentFlutterApi?.let {
+            flutterPluginBinding?.platformViewRegistry?.registerViewFactory(
+                "cardComponent", CardComponentFactory(fragmentActivity, it)
+            )
+        }
     }
 
     private fun lifecycleEventObserver(fragmentActivity: FragmentActivity): LifecycleEventObserver {

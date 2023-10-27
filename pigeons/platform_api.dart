@@ -111,7 +111,7 @@ class DropInConfigurationDTO {
   final String countryCode;
   final AmountDTO amount;
   final String shopperLocale;
-  final CardsConfigurationDTO? cardsConfigurationDTO;
+  final CardConfigurationDTO? cardConfigurationDTO;
   final ApplePayConfigurationDTO? applePayConfigurationDTO;
   final GooglePayConfigurationDTO? googlePayConfigurationDTO;
   final CashAppPayConfigurationDTO? cashAppPayConfigurationDTO;
@@ -126,7 +126,7 @@ class DropInConfigurationDTO {
     this.countryCode,
     this.amount,
     this.shopperLocale,
-    this.cardsConfigurationDTO,
+    this.cardConfigurationDTO,
     this.applePayConfigurationDTO,
     this.googlePayConfigurationDTO,
     this.cashAppPayConfigurationDTO,
@@ -137,7 +137,7 @@ class DropInConfigurationDTO {
   );
 }
 
-class CardsConfigurationDTO {
+class CardConfigurationDTO {
   final bool holderNameRequired;
   final AddressMode addressMode;
   final bool showStorePaymentField;
@@ -147,7 +147,7 @@ class CardsConfigurationDTO {
   final FieldVisibility socialSecurityNumberFieldVisibility;
   final List<String?> supportedCardTypes;
 
-  CardsConfigurationDTO(
+  CardConfigurationDTO(
     this.holderNameRequired,
     this.addressMode,
     this.showStorePaymentField,
@@ -312,7 +312,7 @@ class CardComponentConfigurationDTO {
   final String countryCode;
   final AmountDTO amount;
   final String? shopperLocale;
-  final CardsConfigurationDTO cardsConfiguration;
+  final CardConfigurationDTO cardConfiguration;
 
   CardComponentConfigurationDTO(
     this.environment,
@@ -320,7 +320,7 @@ class CardComponentConfigurationDTO {
     this.countryCode,
     this.amount,
     this.shopperLocale,
-    this.cardsConfiguration,
+    this.cardConfiguration,
   );
 }
 

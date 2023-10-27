@@ -28,10 +28,9 @@ class AdyenCardWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const String viewType = '<platform-view-type>';
+    const String viewType = 'cardComponent';
     Map<String, dynamic> creationParams = <String, dynamic>{
       "paymentMethods": paymentMethods,
-      "clientKey": cardComponentConfiguration.clientKey,
       "cardComponentConfiguration": cardComponentConfiguration.toDTO(),
     };
 
@@ -66,14 +65,18 @@ class AdyenCardWidget extends StatelessWidget {
     );
 
     return StreamBuilder(
-        stream: resizeStream.stream,
-        builder: (BuildContext context, AsyncSnapshot<double> snapshot) {
+        stream: resizeStream.stream.distinct(),
+        builder: (BuildContext context, AsyncSnapshot snapshot) {
           double platformHeight = snapshot.data ?? _determineDefaultHeight();
           print("PlatformHeight: $platformHeight");
 
-          return SizedBox(
-            height: platformHeight,
-            child: cardView,
+          return AnimatedSize(
+            curve: Curves.easeIn,
+            duration: const Duration(milliseconds: 200),
+            child: SizedBox(
+              height: platformHeight,
+              child: cardView,
+            ),
           );
         });
   }
@@ -81,9 +84,9 @@ class AdyenCardWidget extends StatelessWidget {
   double _determineDefaultHeight() {
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
-        return 300;
+        return 274;
       case TargetPlatform.iOS:
-        return 400;
+        return 279;
       default:
         throw UnsupportedError('Unsupported platform view');
     }
@@ -135,7 +138,6 @@ class AdyenCardWidget extends StatelessWidget {
 
   Widget buildIosCardView(
       String viewType, Map<String, dynamic> creationParams) {
-
     return UiKitView(
       viewType: viewType,
       layoutDirection: TextDirection.ltr,
