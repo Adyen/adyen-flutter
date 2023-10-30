@@ -1,9 +1,9 @@
 package com.adyen.adyen_checkout.dropInAdvancedFlow
 
 import DeletedStoredPaymentMethodResultDTO
-import DropInErrorDTO
-import DropInResultDTO
-import DropInResultType
+import ErrorDTO
+import PaymentFlowOutcomeDTO
+import PaymentFlowResultType
 import android.content.Intent
 import android.os.IBinder
 import androidx.lifecycle.Lifecycle
@@ -83,7 +83,7 @@ class AdvancedFlowDropInService : DropInService(), LifecycleOwner {
                 return@observe
             }
 
-            val dropInServiceResult = mapToDropInResult(message.contentIfNotHandled)
+            val dropInServiceResult = mapToDropInServiceResult(message.contentIfNotHandled)
             sendResult(dropInServiceResult)
         }
     }
@@ -95,7 +95,7 @@ class AdvancedFlowDropInService : DropInService(), LifecycleOwner {
                 return@observe
             }
 
-            val dropInServiceResult = mapToDropInResult(message.contentIfNotHandled)
+            val dropInServiceResult = mapToDropInServiceResult(message.contentIfNotHandled)
             sendResult(dropInServiceResult)
         }
     }
@@ -126,27 +126,27 @@ class AdvancedFlowDropInService : DropInService(), LifecycleOwner {
         }
     }
 
-    private fun mapToDropInResult(dropInResultDTO: DropInResultDTO?): DropInServiceResult {
-        return when (dropInResultDTO?.dropInResultType) {
-            DropInResultType.FINISHED -> DropInServiceResult.Finished(
-                result = "${dropInResultDTO.result}"
+    private fun mapToDropInServiceResult(paymentFlowOutcomeDTO: PaymentFlowOutcomeDTO?): DropInServiceResult {
+        return when (paymentFlowOutcomeDTO?.paymentFlowResultType) {
+            PaymentFlowResultType.FINISHED -> DropInServiceResult.Finished(
+                result = "${paymentFlowOutcomeDTO.result}"
             )
 
-            DropInResultType.ERROR -> DropInServiceResult.Error(
-                errorDialog = buildErrorDialog(dropInResultDTO.error),
-                reason = dropInResultDTO.error?.reason,
-                dismissDropIn = dropInResultDTO.error?.dismissDropIn ?: false
+            PaymentFlowResultType.ERROR -> DropInServiceResult.Error(
+                errorDialog = buildErrorDialog(paymentFlowOutcomeDTO.error),
+                reason = paymentFlowOutcomeDTO.error?.reason,
+                dismissDropIn = paymentFlowOutcomeDTO.error?.dismissDropIn ?: false
             )
 
-            DropInResultType.ACTION -> {
-                if (dropInResultDTO.actionResponse == null) {
+            PaymentFlowResultType.ACTION -> {
+                if (paymentFlowOutcomeDTO.actionResponse == null) {
                     DropInServiceResult.Error(
                         errorDialog = null,
                         reason = "Action response not provided",
                         dismissDropIn = true
                     )
                 } else {
-                    val actionJson = JSONObject(dropInResultDTO.actionResponse)
+                    val actionJson = JSONObject(paymentFlowOutcomeDTO.actionResponse)
                     DropInServiceResult.Action(action = Action.SERIALIZER.deserialize(actionJson))
                 }
             }
@@ -159,7 +159,7 @@ class AdvancedFlowDropInService : DropInService(), LifecycleOwner {
         }
     }
 
-    private fun buildErrorDialog(dropInError: DropInErrorDTO?): ErrorDialog? {
+    private fun buildErrorDialog(dropInError: ErrorDTO?): ErrorDialog? {
         return if (dropInError?.dismissDropIn == true) {
             null
         } else {

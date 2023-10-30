@@ -59,7 +59,7 @@ enum PlatformCommunicationType {
   deleteStoredPaymentMethod,
 }
 
-enum DropInResultType {
+enum PaymentFlowResultType {
   finished,
   action,
   error,
@@ -254,27 +254,27 @@ class PlatformCommunicationModel {
   });
 }
 
-//Use DropInOutcome class when sealed classes are supported by pigeon
-class DropInResultDTO {
-  final DropInResultType dropInResultType;
+//Use PaymentFlowOutcome class when sealed classes are supported by pigeon
+class PaymentFlowOutcomeDTO {
+  final PaymentFlowResultType paymentFlowResultType;
   final String? result;
   final Map<String?, Object?>? actionResponse;
-  final DropInErrorDTO? error;
+  final ErrorDTO? error;
 
-  DropInResultDTO({
-    required this.dropInResultType,
+  PaymentFlowOutcomeDTO({
+    required this.paymentFlowResultType,
     this.result,
     this.actionResponse,
     this.error,
   });
 }
 
-class DropInErrorDTO {
+class ErrorDTO {
   final String? errorMessage;
   final String? reason;
   final bool? dismissDropIn;
 
-  DropInErrorDTO({
+  ErrorDTO({
     this.errorMessage,
     this.reason,
     this.dismissDropIn = false,
@@ -309,9 +309,9 @@ abstract class CheckoutPlatformInterface {
     String paymentMethodsResponse,
   );
 
-  void onPaymentsResult(DropInResultDTO paymentsResult);
+  void onPaymentsResult(PaymentFlowOutcomeDTO paymentsResult);
 
-  void onPaymentsDetailsResult(DropInResultDTO paymentsDetailsResult);
+  void onPaymentsDetailsResult(PaymentFlowOutcomeDTO paymentsDetailsResult);
 
   void onDeleteStoredPaymentMethodResult(
       DeletedStoredPaymentMethodResultDTO deleteStoredPaymentMethodResultDTO);

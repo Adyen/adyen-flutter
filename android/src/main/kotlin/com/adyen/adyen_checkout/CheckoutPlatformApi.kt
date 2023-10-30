@@ -4,8 +4,8 @@ import CheckoutFlutterApi
 import CheckoutPlatformInterface
 import DeletedStoredPaymentMethodResultDTO
 import DropInConfigurationDTO
-import DropInResultDTO
-import DropInResultType
+import PaymentFlowOutcomeDTO
+import PaymentFlowResultType
 import PlatformCommunicationModel
 import PlatformCommunicationType
 import SessionDTO
@@ -104,15 +104,15 @@ class CheckoutPlatformApi(private val checkoutFlutterApi: CheckoutFlutterApi?) :
         }
     }
 
-    override fun onPaymentsResult(paymentsResult: DropInResultDTO) {
-        if (paymentsResult.dropInResultType == DropInResultType.ACTION) {
+    override fun onPaymentsResult(paymentsResult: PaymentFlowOutcomeDTO) {
+        if (paymentsResult.paymentFlowResultType == PaymentFlowResultType.ACTION) {
             setAdvanceFlowDropInAdditionalDetailsMessengerObserver()
         }
 
         DropInPaymentResultMessenger.sendResult(paymentsResult)
     }
 
-    override fun onPaymentsDetailsResult(paymentsDetailsResult: DropInResultDTO) {
+    override fun onPaymentsDetailsResult(paymentsDetailsResult: PaymentFlowOutcomeDTO) {
         DropInAdditionalDetailsResultMessenger.sendResult(paymentsDetailsResult)
     }
 

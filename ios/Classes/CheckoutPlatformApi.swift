@@ -111,12 +111,12 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
         completion(Result.failure(PlatformError(errorDescription: "Please use your app url type instead of this method.")))
     }
 
-    func onPaymentsResult(paymentsResult: DropInResultDTO) {
-        handleDropInResult(dropInResult: paymentsResult)
+    func onPaymentsResult(paymentsResult: PaymentFlowOutcomeDTO) {
+        handlePaymentFlowOutcome(paymentFlowOutcomeDTO: paymentsResult)
     }
 
-    func onPaymentsDetailsResult(paymentsDetailsResult: DropInResultDTO) {
-        handleDropInResult(dropInResult: paymentsDetailsResult)
+    func onPaymentsDetailsResult(paymentsDetailsResult: PaymentFlowOutcomeDTO) {
+        handlePaymentFlowOutcome(paymentFlowOutcomeDTO: paymentsDetailsResult)
     }
 
     func onDeleteStoredPaymentMethodResult(deleteStoredPaymentMethodResultDTO: DeletedStoredPaymentMethodResultDTO) {
@@ -179,19 +179,19 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
         }
     }
 
-    private func handleDropInResult(dropInResult: DropInResultDTO) {
-        switch dropInResult.dropInResultType {
+    private func handlePaymentFlowOutcome(paymentFlowOutcomeDTO: PaymentFlowOutcomeDTO) {
+        switch paymentFlowOutcomeDTO.paymentFlowResultType {
         case .finished:
-            onDropInResultFinished(dropInResult: dropInResult)
+            onDropInResultFinished(paymentFlowOutcome: paymentFlowOutcomeDTO)
         case .action:
-            onDropInResultAction(dropInResult: dropInResult)
+            onDropInResultAction(paymentFlowOutcome: paymentFlowOutcomeDTO)
         case .error:
-            onDropInResultError(dropInResult: dropInResult)
+            onDropInResultError(paymentFlowOutcome: paymentFlowOutcomeDTO)
         }
     }
 
-    private func onDropInResultFinished(dropInResult: DropInResultDTO) {
-        let resultCode = ResultCode(rawValue: dropInResult.result ?? "")
+    private func onDropInResultFinished(paymentFlowOutcome: PaymentFlowOutcomeDTO) {
+        let resultCode = ResultCode(rawValue: paymentFlowOutcome.result ?? "")
         let success = resultCode == .authorised || resultCode == .received || resultCode == .pending
         finalizeAndDismiss(success: true, completion: { [weak self] in
             let paymentResult = PaymentResultDTO(type: PaymentResultEnum.finished, result: PaymentResultModelDTO(resultCode: resultCode?.rawValue))
@@ -199,9 +199,9 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
         })
     }
 
-    private func onDropInResultAction(dropInResult: DropInResultDTO) {
+    private func onDropInResultAction(paymentFlowOutcome: PaymentFlowOutcomeDTO) {
         do {
-            let jsonData = try JSONSerialization.data(withJSONObject: dropInResult.actionResponse as Any, options: [])
+            let jsonData = try JSONSerialization.data(withJSONObject: paymentFlowOutcome.actionResponse as Any, options: [])
             let result = try JSONDecoder().decode(Action.self, from: jsonData)
             dropInComponent?.handle(result)
         } catch {
@@ -211,11 +211,11 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
         }
     }
 
-    private func onDropInResultError(dropInResult: DropInResultDTO) {
+    private func onDropInResultError(paymentFlowOutcome: PaymentFlowOutcomeDTO) {
         dropInComponent?.stopLoading()
 
-        if dropInResult.error?.dismissDropIn == true {
-            let paymentResult = PaymentResultDTO(type: PaymentResultEnum.error, reason: dropInResult.error?.errorMessage)
+        if paymentFlowOutcome.error?.dismissDropIn == true {
+            let paymentResult = PaymentResultDTO(type: PaymentResultEnum.error, reason: paymentFlowOutcome.error?.errorMessage)
             checkoutFlutterApi.onDropInAdvancedFlowPlatformCommunication(platformCommunicationModel: PlatformCommunicationModel(type: PlatformCommunicationType.result, paymentResult: paymentResult), completion: { _ in })
             finalizeAndDismiss(success: false) {}
         } else {
@@ -223,7 +223,7 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
             let localizationParameters = (dropInComponent as? Localizable)?.localizationParameters
             let title = localizedString(.errorTitle, localizationParameters)
             let alertController = UIAlertController(title: title,
-                                                    message: dropInResult.error?.errorMessage,
+                                                    message: paymentFlowOutcome.error?.errorMessage,
                                                     preferredStyle: .alert)
             alertController.addAction(UIAlertAction(title: localizedString(.dismissButton, localizationParameters), style: .cancel))
             viewController?.adyen.topPresenter.present(alertController, animated: true)

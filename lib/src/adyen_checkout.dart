@@ -161,15 +161,19 @@ class AdyenCheckout implements AdyenCheckoutInterface {
         throw Exception("Payment data is not provided.");
       }
 
-      final PaymentFlowOutcome paymentFlowOutcome = await postPayments(event.data!);
-      DropInResultDTO dropInResult = _mapToDropInResult(paymentFlowOutcome);
-      AdyenCheckoutPlatformInterface.instance.onPaymentsResult(dropInResult);
+      final PaymentFlowOutcome paymentFlowOutcome =
+          await postPayments(event.data!);
+      PaymentFlowOutcomeDTO paymentFlowOutcomeDTO =
+          _mapToPaymentOutcomeDTO(paymentFlowOutcome);
+      AdyenCheckoutPlatformInterface.instance
+          .onPaymentsResult(paymentFlowOutcomeDTO);
     } catch (error) {
       String errorMessage = error.toString();
       _adyenLogger.print("Failure in postPayments, $errorMessage");
-      AdyenCheckoutPlatformInterface.instance.onPaymentsResult(DropInResultDTO(
-        dropInResultType: DropInResultType.error,
-        error: DropInErrorDTO(
+      AdyenCheckoutPlatformInterface.instance
+          .onPaymentsResult(PaymentFlowOutcomeDTO(
+        paymentFlowResultType: PaymentFlowResultType.error,
+        error: ErrorDTO(
           errorMessage: errorMessage,
           reason: "Failure in postPayments, $errorMessage",
           dismissDropIn: false,
@@ -188,17 +192,19 @@ class AdyenCheckout implements AdyenCheckoutInterface {
         throw Exception("Additional data is not provided.");
       }
 
-      final PaymentFlowOutcome paymentFlowOutcome = await postPaymentsDetails(event.data!);
-      DropInResultDTO dropInResult = _mapToDropInResult(paymentFlowOutcome);
+      final PaymentFlowOutcome paymentFlowOutcome =
+          await postPaymentsDetails(event.data!);
+      PaymentFlowOutcomeDTO paymentFlowOutcomeDTO =
+          _mapToPaymentOutcomeDTO(paymentFlowOutcome);
       AdyenCheckoutPlatformInterface.instance
-          .onPaymentsDetailsResult(dropInResult);
+          .onPaymentsDetailsResult(paymentFlowOutcomeDTO);
     } catch (error) {
       String errorMessage = error.toString();
       _adyenLogger.print("Failure in postPaymentsDetails, $errorMessage");
       AdyenCheckoutPlatformInterface.instance
-          .onPaymentsDetailsResult(DropInResultDTO(
-        dropInResultType: DropInResultType.error,
-        error: DropInErrorDTO(
+          .onPaymentsDetailsResult(PaymentFlowOutcomeDTO(
+        paymentFlowResultType: PaymentFlowResultType.error,
+        error: ErrorDTO(
           errorMessage: errorMessage,
           reason: "Failure in postPaymentsDetails, $errorMessage}",
           dismissDropIn: false,
@@ -207,19 +213,20 @@ class AdyenCheckout implements AdyenCheckoutInterface {
     }
   }
 
-  DropInResultDTO _mapToDropInResult(PaymentFlowOutcome dropInOutcome) {
+  PaymentFlowOutcomeDTO _mapToPaymentOutcomeDTO(
+      PaymentFlowOutcome dropInOutcome) {
     return switch (dropInOutcome) {
-      Finished() => DropInResultDTO(
-          dropInResultType: DropInResultType.finished,
+      Finished() => PaymentFlowOutcomeDTO(
+          paymentFlowResultType: PaymentFlowResultType.finished,
           result: dropInOutcome.resultCode,
         ),
-      Action() => DropInResultDTO(
-          dropInResultType: DropInResultType.action,
+      Action() => PaymentFlowOutcomeDTO(
+          paymentFlowResultType: PaymentFlowResultType.action,
           actionResponse: dropInOutcome.actionResponse,
         ),
-      Error() => DropInResultDTO(
-          dropInResultType: DropInResultType.error,
-          error: DropInErrorDTO(
+      Error() => PaymentFlowOutcomeDTO(
+          paymentFlowResultType: PaymentFlowResultType.error,
+          error: ErrorDTO(
             errorMessage: dropInOutcome.errorMessage,
             reason: dropInOutcome.reason,
             dismissDropIn: dropInOutcome.dismissDropIn,
