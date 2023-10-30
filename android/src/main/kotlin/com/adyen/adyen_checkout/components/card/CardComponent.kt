@@ -3,7 +3,6 @@ package com.adyen.adyen_checkout.components.card
 import CardComponentConfigurationDTO
 import ComponentFlutterApi
 import android.content.Context
-import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
@@ -12,10 +11,12 @@ import androidx.activity.ComponentActivity
 import androidx.core.view.children
 import androidx.core.view.doOnNextLayout
 import com.adyen.adyen_checkout.R
+import com.adyen.adyen_checkout.components.ComponentMessenger
 import com.adyen.adyen_checkout.components.ComponentWrapperView
 import com.adyen.adyen_checkout.utils.ConfigurationMapper.toNativeModel
 import com.adyen.checkout.card.CardComponent
 import com.adyen.checkout.components.core.PaymentMethodsApiResponse
+import com.adyen.checkout.components.core.action.Action
 import com.adyen.checkout.ui.core.AdyenComponentView
 import io.flutter.plugin.platform.PlatformView
 import org.json.JSONObject
@@ -50,6 +51,7 @@ internal class CardComponent(
 
     init {
         componentWrapperView.addComponent(cardComponent)
+        addActionListener()
     }
 
     override fun getView(): View = componentWrapperView
@@ -63,7 +65,7 @@ internal class CardComponent(
     }
 
     override fun dispose() {
-        Log.d("AdyenCheckout", "Dispose card view")
+        ComponentMessenger.instance().removeObservers(activity)
         cardComponent.delegate.onCleared()
     }
 
@@ -97,5 +99,14 @@ internal class CardComponent(
         val cardLayoutParams = card?.layoutParams
         cardLayoutParams?.height = LinearLayout.LayoutParams.WRAP_CONTENT
         card?.layoutParams = cardLayoutParams
+    }
+
+    private fun addActionListener() {
+        ComponentMessenger.instance().observe(activity) { message ->
+            val action = message.contentIfNotHandled?.let { Action.SERIALIZER.deserialize(it) }
+            action?.let {
+                cardComponent.handleAction(action = it, activity = activity)
+            }
+        }
     }
 }

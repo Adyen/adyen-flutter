@@ -11,11 +11,8 @@ class MockAdyenCheckoutPlatform
   Future<String> getPlatformVersion() => Future.value('42');
 
   @override
-  void startDropInSessionPayment(
-      {required SessionDTO session,
-      required DropInConfigurationDTO dropInConfiguration}) {
-    return;
-  }
+  Future<void> startDropInSessionPayment(
+      DropInConfigurationDTO dropInConfiguration, SessionDTO session) async {}
 
   @override
   Future<String> getReturnUrl() {
@@ -23,12 +20,10 @@ class MockAdyenCheckoutPlatform
   }
 
   @override
-  void startDropInAdvancedFlowPayment({
-    required String paymentMethodsResponse,
-    required DropInConfigurationDTO dropInConfiguration,
-  }) {
-    return;
-  }
+  Future<void> startDropInAdvancedFlowPayment(
+    DropInConfigurationDTO dropInConfiguration,
+    String paymentMethodsResponse,
+  ) async {}
 
   @override
   Future<String> onPaymentsResult(PaymentFlowOutcomeDTO paymentsResult) =>
@@ -40,14 +35,15 @@ class MockAdyenCheckoutPlatform
       Future.value(null);
 
   @override
-  void onDeleteStoredPaymentMethodResult(
-      DeletedStoredPaymentMethodResultDTO deleteStoredPaymentMethodResultDTO) {}
+  Future<void> onDeleteStoredPaymentMethodResult(
+      DeletedStoredPaymentMethodResultDTO
+          deleteStoredPaymentMethodResultDTO) async {}
 
   @override
-  void enableLogging(bool loggingEnabled) {}
+  Future<void> enableLogging(bool loggingEnabled) async {}
 
   @override
-  void cleanUpDropIn() {}
+  Future<void> cleanUpDropIn() async {}
 }
 
 void main() {

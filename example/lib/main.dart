@@ -128,8 +128,8 @@ class _MyAppState extends State<MyApp> {
                                       child: CircularProgressIndicator(),
                                     );
                                   } else {
-                                    return buildCardWidget(snapshot, context,
-                                        _adyenSessionRepository);
+                                    return buildCardWidget(snapshot.data!,
+                                        context, _adyenSessionRepository);
                                   }
                                 },
                               ),
@@ -196,7 +196,7 @@ class _MyAppState extends State<MyApp> {
         await _adyenSessionRepository.fetchPaymentMethods();
 
     const CardConfiguration cardsConfiguration = CardConfiguration(
-        showStorePaymentField: true,
+      showStorePaymentField: true,
     );
 
     const ApplePayConfiguration applePayConfiguration = ApplePayConfiguration(

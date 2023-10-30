@@ -60,8 +60,10 @@ enum PlatformCommunicationType {
 }
 
 enum ComponentCommunicationType {
+  onSubmit,
+  additionalDetails,
+  error,
   resize,
-  paymentComponent,
 }
 
 enum PaymentFlowResultType {
@@ -364,6 +366,11 @@ abstract class CheckoutFlutterApi {
 
   void onComponentCommunication(
       PlatformCommunicationModel platformCommunicationModel);
+}
+
+@HostApi()
+abstract class ComponentPlatformInterface {
+  void onAction(Map<String?, Object?>? actionResponse);
 }
 
 @FlutterApi()

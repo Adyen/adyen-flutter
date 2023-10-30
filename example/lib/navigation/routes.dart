@@ -12,7 +12,7 @@ class FirstRoute extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: Colors.lightGreen,
+        backgroundColor: Colors.white,
         appBar: AppBar(
           title: const Text('Adyen card component'),
         ),
@@ -28,13 +28,10 @@ class FirstRoute extends StatelessWidget {
                 return SingleChildScrollView(
                   child: Column(
                     children: [
-                      const FlutterLogo(size: 128),
-                      buildCardWidget(snapshot, context, repository),
-                      Container(height: 50),
-                      Container(height: 280, color: Colors.blue),
-                      const Text(
-                          "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."),
-                      Container(height: 180, color: Colors.yellow),
+                      buildCardWidget(snapshot.data!, context, repository),
+                      Container(height: 300, color: Colors.blue),
+                      Container(height: 300, color: Colors.green),
+                      Container(height: 300, color: Colors.yellow),
                     ],
                   ),
                 );
@@ -46,7 +43,7 @@ class FirstRoute extends StatelessWidget {
 }
 
 Widget buildCardWidget(
-  AsyncSnapshot<String> snapshot,
+  String paymentMethods,
   BuildContext context,
   AdyenSessionsRepository repository,
 ) {
@@ -62,9 +59,11 @@ Widget buildCardWidget(
 
   return AdyenCardWidget(
     cardComponentConfiguration: cardComponentConfiguration,
-    paymentMethods: snapshot.data!,
-    onSubmit: repository.postPayments,
-    onResult: (event) async {
+    paymentMethods: paymentMethods,
+    onPayments: repository.postPayments,
+    onPaymentsDetails: repository.postPaymentsDetails,
+    onPaymentResult: (event) async {
+      Navigator.pop(context);
       _dialogBuilder(context, event);
     },
   );

@@ -3,6 +3,7 @@ package com.adyen.adyen_checkout
 import CheckoutFlutterApi
 import CheckoutPlatformInterface
 import ComponentFlutterApi
+import ComponentPlatformInterface
 import PaymentResultDTO
 import PaymentResultEnum
 import PaymentResultModelDTO
@@ -11,6 +12,7 @@ import PlatformCommunicationType
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
+import com.adyen.adyen_checkout.components.ComponentPlatformApi
 import com.adyen.adyen_checkout.components.card.CardComponentFactory
 import com.adyen.adyen_checkout.utils.ConfigurationMapper.mapToOrderResponseModel
 import com.adyen.adyen_checkout.utils.Constants.Companion.WRONG_FLUTTER_ACTIVITY_USAGE_ERROR_MESSAGE
@@ -29,6 +31,7 @@ import io.flutter.embedding.engine.plugins.lifecycle.HiddenLifecycleReference
 class AdyenCheckoutPlugin : FlutterPlugin, ActivityAware {
     private var checkoutPlatformApi: CheckoutPlatformApi? = null
     private var checkoutFlutterApi: CheckoutFlutterApi? = null
+    private var componentPlatformApi: ComponentPlatformApi? = null
     private var componentFlutterApi: ComponentFlutterApi? = null
     private var lifecycleReference: HiddenLifecycleReference? = null
     private var lifecycleObserver: LifecycleEventObserver? = null
@@ -37,9 +40,11 @@ class AdyenCheckoutPlugin : FlutterPlugin, ActivityAware {
     override fun onAttachedToEngine(flutterPluginBinding: FlutterPluginBinding) {
         this.flutterPluginBinding = flutterPluginBinding
         checkoutFlutterApi = CheckoutFlutterApi(flutterPluginBinding.binaryMessenger)
-        componentFlutterApi = ComponentFlutterApi(flutterPluginBinding.binaryMessenger)
         checkoutPlatformApi = CheckoutPlatformApi(checkoutFlutterApi)
+        componentFlutterApi = ComponentFlutterApi(flutterPluginBinding.binaryMessenger)
+        componentPlatformApi = ComponentPlatformApi()
         CheckoutPlatformInterface.setUp(flutterPluginBinding.binaryMessenger, checkoutPlatformApi)
+        ComponentPlatformInterface.setUp(flutterPluginBinding.binaryMessenger, componentPlatformApi)
     }
 
     override fun onDetachedFromEngine(binding: FlutterPluginBinding) {
@@ -71,9 +76,12 @@ class AdyenCheckoutPlugin : FlutterPlugin, ActivityAware {
             lifecycleReference?.lifecycle?.addObserver(it)
         }
 
-        componentFlutterApi?.let {
+        if (componentFlutterApi != null) {
             flutterPluginBinding?.platformViewRegistry?.registerViewFactory(
-                "cardComponent", CardComponentFactory(fragmentActivity, it)
+                "cardComponent", CardComponentFactory(
+                    fragmentActivity,
+                    componentFlutterApi!!,
+                )
             )
         }
     }

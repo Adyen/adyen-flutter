@@ -13,25 +13,27 @@ class CardCallback(private val componentFlutterApi: ComponentFlutterApi) : Compo
     override fun onSubmit(state: CardComponentState) {
         val paymentComponentJson = PaymentComponentData.SERIALIZER.serialize(state.data)
         val model = ComponentCommunicationModel(
-            ComponentCommunicationType.PAYMENTCOMPONENT,
+            ComponentCommunicationType.ONSUBMIT,
             data = paymentComponentJson.toString(),
         )
         componentFlutterApi.onComponentCommunication(model) {}
     }
 
     override fun onAdditionalDetails(actionComponentData: ActionComponentData) {
-        println("On additional details")
+        val actionComponentJson = ActionComponentData.SERIALIZER.serialize(actionComponentData)
+        val model = ComponentCommunicationModel(
+            ComponentCommunicationType.ADDITIONALDETAILS,
+            data = actionComponentJson.toString(),
+        )
+        componentFlutterApi.onComponentCommunication(model) {}
     }
 
     override fun onError(componentError: ComponentError) {
-        println("Error")
+        val model = ComponentCommunicationModel(
+            ComponentCommunicationType.ERROR,
+            data = componentError.exception.toString(),
+        )
+        componentFlutterApi.onComponentCommunication(model) {}
     }
-
-    override fun onStateChanged(state: CardComponentState) {
-        super.onStateChanged(state)
-
-        println("State changed ${state.isInputValid}")
-    }
-
 
 }

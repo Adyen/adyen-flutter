@@ -88,11 +88,13 @@ enum PlatformCommunicationType: Int {
 }
 
 enum ComponentCommunicationType: Int {
-  case resize = 0
-  case paymentComponent = 1
+  case onSubmit = 0
+  case additionalDetails = 1
+  case error = 2
+  case resize = 3
 }
 
-enum DropInResultType: Int {
+enum PaymentFlowResultType: Int {
   case finished = 0
   case action = 1
   case error = 2
@@ -552,23 +554,23 @@ struct ComponentCommunicationModel {
 }
 
 /// Generated class from Pigeon that represents data sent in messages.
-struct DropInResultDTO {
-  var dropInResultType: DropInResultType
+struct PaymentFlowOutcomeDTO {
+  var paymentFlowResultType: PaymentFlowResultType
   var result: String? = nil
   var actionResponse: [String?: Any?]? = nil
-  var error: DropInErrorDTO? = nil
+  var error: ErrorDTO? = nil
 
-  static func fromList(_ list: [Any?]) -> DropInResultDTO? {
-    let dropInResultType = DropInResultType(rawValue: list[0] as! Int)!
+  static func fromList(_ list: [Any?]) -> PaymentFlowOutcomeDTO? {
+    let paymentFlowResultType = PaymentFlowResultType(rawValue: list[0] as! Int)!
     let result: String? = nilOrValue(list[1])
     let actionResponse: [String?: Any?]? = nilOrValue(list[2])
-    var error: DropInErrorDTO? = nil
+    var error: ErrorDTO? = nil
     if let errorList: [Any?] = nilOrValue(list[3]) {
-      error = DropInErrorDTO.fromList(errorList)
+      error = ErrorDTO.fromList(errorList)
     }
 
-    return DropInResultDTO(
-      dropInResultType: dropInResultType,
+    return PaymentFlowOutcomeDTO(
+      paymentFlowResultType: paymentFlowResultType,
       result: result,
       actionResponse: actionResponse,
       error: error
@@ -576,7 +578,7 @@ struct DropInResultDTO {
   }
   func toList() -> [Any?] {
     return [
-      dropInResultType.rawValue,
+      paymentFlowResultType.rawValue,
       result,
       actionResponse,
       error?.toList(),
@@ -585,17 +587,17 @@ struct DropInResultDTO {
 }
 
 /// Generated class from Pigeon that represents data sent in messages.
-struct DropInErrorDTO {
+struct ErrorDTO {
   var errorMessage: String? = nil
   var reason: String? = nil
   var dismissDropIn: Bool? = nil
 
-  static func fromList(_ list: [Any?]) -> DropInErrorDTO? {
+  static func fromList(_ list: [Any?]) -> ErrorDTO? {
     let errorMessage: String? = nilOrValue(list[0])
     let reason: String? = nilOrValue(list[1])
     let dismissDropIn: Bool? = nilOrValue(list[2])
 
-    return DropInErrorDTO(
+    return ErrorDTO(
       errorMessage: errorMessage,
       reason: reason,
       dismissDropIn: dismissDropIn
@@ -688,11 +690,11 @@ private class CheckoutPlatformInterfaceCodecReader: FlutterStandardReader {
       case 134:
         return DropInConfigurationDTO.fromList(self.readValue() as! [Any?])
       case 135:
-        return DropInErrorDTO.fromList(self.readValue() as! [Any?])
+        return ErrorDTO.fromList(self.readValue() as! [Any?])
       case 136:
-        return DropInResultDTO.fromList(self.readValue() as! [Any?])
-      case 137:
         return GooglePayConfigurationDTO.fromList(self.readValue() as! [Any?])
+      case 137:
+        return PaymentFlowOutcomeDTO.fromList(self.readValue() as! [Any?])
       case 138:
         return SessionDTO.fromList(self.readValue() as! [Any?])
       default:
@@ -724,13 +726,13 @@ private class CheckoutPlatformInterfaceCodecWriter: FlutterStandardWriter {
     } else if let value = value as? DropInConfigurationDTO {
       super.writeByte(134)
       super.writeValue(value.toList())
-    } else if let value = value as? DropInErrorDTO {
+    } else if let value = value as? ErrorDTO {
       super.writeByte(135)
       super.writeValue(value.toList())
-    } else if let value = value as? DropInResultDTO {
+    } else if let value = value as? GooglePayConfigurationDTO {
       super.writeByte(136)
       super.writeValue(value.toList())
-    } else if let value = value as? GooglePayConfigurationDTO {
+    } else if let value = value as? PaymentFlowOutcomeDTO {
       super.writeByte(137)
       super.writeValue(value.toList())
     } else if let value = value as? SessionDTO {
@@ -762,8 +764,8 @@ protocol CheckoutPlatformInterface {
   func getReturnUrl(completion: @escaping (Result<String, Error>) -> Void)
   func startDropInSessionPayment(dropInConfigurationDTO: DropInConfigurationDTO, session: SessionDTO) throws
   func startDropInAdvancedFlowPayment(dropInConfigurationDTO: DropInConfigurationDTO, paymentMethodsResponse: String) throws
-  func onPaymentsResult(paymentsResult: DropInResultDTO) throws
-  func onPaymentsDetailsResult(paymentsDetailsResult: DropInResultDTO) throws
+  func onPaymentsResult(paymentsResult: PaymentFlowOutcomeDTO) throws
+  func onPaymentsDetailsResult(paymentsDetailsResult: PaymentFlowOutcomeDTO) throws
   func onDeleteStoredPaymentMethodResult(deleteStoredPaymentMethodResultDTO: DeletedStoredPaymentMethodResultDTO) throws
   func enableLogging(loggingEnabled: Bool) throws
   func cleanUpDropIn() throws
@@ -841,7 +843,7 @@ class CheckoutPlatformInterfaceSetup {
     if let api = api {
       onPaymentsResultChannel.setMessageHandler { message, reply in
         let args = message as! [Any?]
-        let paymentsResultArg = args[0] as! DropInResultDTO
+        let paymentsResultArg = args[0] as! PaymentFlowOutcomeDTO
         do {
           try api.onPaymentsResult(paymentsResult: paymentsResultArg)
           reply(wrapResult(nil))
@@ -856,7 +858,7 @@ class CheckoutPlatformInterfaceSetup {
     if let api = api {
       onPaymentsDetailsResultChannel.setMessageHandler { message, reply in
         let args = message as! [Any?]
-        let paymentsDetailsResultArg = args[0] as! DropInResultDTO
+        let paymentsDetailsResultArg = args[0] as! PaymentFlowOutcomeDTO
         do {
           try api.onPaymentsDetailsResult(paymentsDetailsResult: paymentsDetailsResultArg)
           reply(wrapResult(nil))
@@ -972,6 +974,7 @@ class CheckoutFlutterApiCodec: FlutterStandardMessageCodec {
 protocol CheckoutFlutterApiProtocol {
   func onDropInSessionPlatformCommunication(platformCommunicationModel platformCommunicationModelArg: PlatformCommunicationModel, completion: @escaping (Result<Void, FlutterError>) -> Void) 
   func onDropInAdvancedFlowPlatformCommunication(platformCommunicationModel platformCommunicationModelArg: PlatformCommunicationModel, completion: @escaping (Result<Void, FlutterError>) -> Void) 
+  func onComponentCommunication(platformCommunicationModel platformCommunicationModelArg: PlatformCommunicationModel, completion: @escaping (Result<Void, FlutterError>) -> Void) 
 }
 class CheckoutFlutterApi: CheckoutFlutterApiProtocol {
   private let binaryMessenger: FlutterBinaryMessenger
@@ -993,10 +996,154 @@ class CheckoutFlutterApi: CheckoutFlutterApiProtocol {
       completion(.success(Void()))
     }
   }
-  func onComponentCommunication(platformCommunicationModel platformCommunicationModelArg: PlatformCommunicationModel, completion: @escaping (Result<Void, FlutterError>) -> Void) {
+  func onComponentCommunication(platformCommunicationModel platformCommunicationModelArg: PlatformCommunicationModel, completion: @escaping (Result<Void, FlutterError>) -> Void)  {
     let channel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.CheckoutFlutterApi.onComponentCommunication", binaryMessenger: binaryMessenger, codec: codec)
     channel.sendMessage([platformCommunicationModelArg] as [Any?]) { _ in
       completion(.success(Void()))
+    }
+  }
+}
+private class ComponentPlatformInterfaceCodecReader: FlutterStandardReader {
+  override func readValue(ofType type: UInt8) -> Any? {
+    switch type {
+      case 128:
+        return AmountDTO.fromList(self.readValue() as! [Any?])
+      case 129:
+        return AnalyticsOptionsDTO.fromList(self.readValue() as! [Any?])
+      case 130:
+        return ApplePayConfigurationDTO.fromList(self.readValue() as! [Any?])
+      case 131:
+        return CardComponentConfigurationDTO.fromList(self.readValue() as! [Any?])
+      case 132:
+        return CardConfigurationDTO.fromList(self.readValue() as! [Any?])
+      case 133:
+        return CashAppPayConfigurationDTO.fromList(self.readValue() as! [Any?])
+      case 134:
+        return ComponentCommunicationModel.fromList(self.readValue() as! [Any?])
+      case 135:
+        return DeletedStoredPaymentMethodResultDTO.fromList(self.readValue() as! [Any?])
+      case 136:
+        return DropInConfigurationDTO.fromList(self.readValue() as! [Any?])
+      case 137:
+        return ErrorDTO.fromList(self.readValue() as! [Any?])
+      case 138:
+        return GooglePayConfigurationDTO.fromList(self.readValue() as! [Any?])
+      case 139:
+        return OrderResponseDTO.fromList(self.readValue() as! [Any?])
+      case 140:
+        return PaymentFlowOutcomeDTO.fromList(self.readValue() as! [Any?])
+      case 141:
+        return PaymentResultDTO.fromList(self.readValue() as! [Any?])
+      case 142:
+        return PaymentResultModelDTO.fromList(self.readValue() as! [Any?])
+      case 143:
+        return PlatformCommunicationModel.fromList(self.readValue() as! [Any?])
+      case 144:
+        return SessionDTO.fromList(self.readValue() as! [Any?])
+      default:
+        return super.readValue(ofType: type)
+    }
+  }
+}
+
+private class ComponentPlatformInterfaceCodecWriter: FlutterStandardWriter {
+  override func writeValue(_ value: Any) {
+    if let value = value as? AmountDTO {
+      super.writeByte(128)
+      super.writeValue(value.toList())
+    } else if let value = value as? AnalyticsOptionsDTO {
+      super.writeByte(129)
+      super.writeValue(value.toList())
+    } else if let value = value as? ApplePayConfigurationDTO {
+      super.writeByte(130)
+      super.writeValue(value.toList())
+    } else if let value = value as? CardComponentConfigurationDTO {
+      super.writeByte(131)
+      super.writeValue(value.toList())
+    } else if let value = value as? CardConfigurationDTO {
+      super.writeByte(132)
+      super.writeValue(value.toList())
+    } else if let value = value as? CashAppPayConfigurationDTO {
+      super.writeByte(133)
+      super.writeValue(value.toList())
+    } else if let value = value as? ComponentCommunicationModel {
+      super.writeByte(134)
+      super.writeValue(value.toList())
+    } else if let value = value as? DeletedStoredPaymentMethodResultDTO {
+      super.writeByte(135)
+      super.writeValue(value.toList())
+    } else if let value = value as? DropInConfigurationDTO {
+      super.writeByte(136)
+      super.writeValue(value.toList())
+    } else if let value = value as? ErrorDTO {
+      super.writeByte(137)
+      super.writeValue(value.toList())
+    } else if let value = value as? GooglePayConfigurationDTO {
+      super.writeByte(138)
+      super.writeValue(value.toList())
+    } else if let value = value as? OrderResponseDTO {
+      super.writeByte(139)
+      super.writeValue(value.toList())
+    } else if let value = value as? PaymentFlowOutcomeDTO {
+      super.writeByte(140)
+      super.writeValue(value.toList())
+    } else if let value = value as? PaymentResultDTO {
+      super.writeByte(141)
+      super.writeValue(value.toList())
+    } else if let value = value as? PaymentResultModelDTO {
+      super.writeByte(142)
+      super.writeValue(value.toList())
+    } else if let value = value as? PlatformCommunicationModel {
+      super.writeByte(143)
+      super.writeValue(value.toList())
+    } else if let value = value as? SessionDTO {
+      super.writeByte(144)
+      super.writeValue(value.toList())
+    } else {
+      super.writeValue(value)
+    }
+  }
+}
+
+private class ComponentPlatformInterfaceCodecReaderWriter: FlutterStandardReaderWriter {
+  override func reader(with data: Data) -> FlutterStandardReader {
+    return ComponentPlatformInterfaceCodecReader(data: data)
+  }
+
+  override func writer(with data: NSMutableData) -> FlutterStandardWriter {
+    return ComponentPlatformInterfaceCodecWriter(data: data)
+  }
+}
+
+class ComponentPlatformInterfaceCodec: FlutterStandardMessageCodec {
+  static let shared = ComponentPlatformInterfaceCodec(readerWriter: ComponentPlatformInterfaceCodecReaderWriter())
+}
+
+/// Generated protocol from Pigeon that represents a handler of messages from Flutter.
+protocol ComponentPlatformInterface {
+  func onAction(actionResponse: [String?: Any?]?) throws
+}
+
+/// Generated setup class from Pigeon to handle messages through the `binaryMessenger`.
+class ComponentPlatformInterfaceSetup {
+  /// The codec used by ComponentPlatformInterface.
+  static var codec: FlutterStandardMessageCodec { ComponentPlatformInterfaceCodec.shared }
+  /// Sets up an instance of `ComponentPlatformInterface` to handle messages through the `binaryMessenger`.
+  static func setUp(binaryMessenger: FlutterBinaryMessenger, api: ComponentPlatformInterface?) {
+    let onActionChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.ComponentPlatformInterface.onAction", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      onActionChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let actionResponseArg: [String?: Any?]? = nilOrValue(args[0])
+        do {
+          try api.onAction(actionResponse: actionResponseArg)
+          reply(wrapResult(nil))
+        } catch {
+          reply(wrapError(error))
+        }
+      }
+    } else {
+      onActionChannel.setMessageHandler(nil)
     }
   }
 }
