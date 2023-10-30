@@ -13,9 +13,9 @@ export 'src/generated/platform_api.g.dart'
 export 'src/models/amount.dart';
 export 'src/models/card_component_configuration.dart';
 export 'src/models/drop_in_configuration.dart';
-export 'src/models/drop_in_outcome.dart';
 export 'src/models/oder_response.dart';
 export 'src/models/payment_flow.dart';
+export 'src/models/payment_flow_outcome.dart';
 export 'src/models/payment_method_configurations/apple_pay_configuration.dart';
 export 'src/models/payment_method_configurations/card_configuration.dart';
 export 'src/models/payment_method_configurations/cash_app_pay_configuration.dart';

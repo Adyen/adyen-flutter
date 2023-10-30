@@ -66,12 +66,7 @@ enum PlatformCommunicationType {
   deleteStoredPaymentMethod,
 }
 
-enum ComponentCommunicationType {
-  resize,
-  paymentComponent,
-}
-
-enum DropInResultType {
+enum PaymentFlowResultType {
   finished,
   action,
   error,
@@ -167,7 +162,7 @@ class DropInConfigurationDTO {
     required this.countryCode,
     required this.amount,
     required this.shopperLocale,
-    this.cardConfigurationDTO,
+    this.cardsConfigurationDTO,
     this.applePayConfigurationDTO,
     this.googlePayConfigurationDTO,
     this.cashAppPayConfigurationDTO,
@@ -187,7 +182,7 @@ class DropInConfigurationDTO {
 
   String shopperLocale;
 
-  CardConfigurationDTO? cardConfigurationDTO;
+  CardsConfigurationDTO? cardsConfigurationDTO;
 
   ApplePayConfigurationDTO? applePayConfigurationDTO;
 
@@ -210,7 +205,7 @@ class DropInConfigurationDTO {
       countryCode,
       amount.encode(),
       shopperLocale,
-      cardConfigurationDTO?.encode(),
+      cardsConfigurationDTO?.encode(),
       applePayConfigurationDTO?.encode(),
       googlePayConfigurationDTO?.encode(),
       cashAppPayConfigurationDTO?.encode(),
@@ -229,8 +224,8 @@ class DropInConfigurationDTO {
       countryCode: result[2]! as String,
       amount: AmountDTO.decode(result[3]! as List<Object?>),
       shopperLocale: result[4]! as String,
-      cardConfigurationDTO: result[5] != null
-          ? CardConfigurationDTO.decode(result[5]! as List<Object?>)
+      cardsConfigurationDTO: result[5] != null
+          ? CardsConfigurationDTO.decode(result[5]! as List<Object?>)
           : null,
       applePayConfigurationDTO: result[6] != null
           ? ApplePayConfigurationDTO.decode(result[6]! as List<Object?>)
@@ -251,8 +246,8 @@ class DropInConfigurationDTO {
   }
 }
 
-class CardConfigurationDTO {
-  CardConfigurationDTO({
+class CardsConfigurationDTO {
+  CardsConfigurationDTO({
     required this.holderNameRequired,
     required this.addressMode,
     required this.showStorePaymentField,
@@ -292,9 +287,9 @@ class CardConfigurationDTO {
     ];
   }
 
-  static CardConfigurationDTO decode(Object result) {
+  static CardsConfigurationDTO decode(Object result) {
     result as List<Object?>;
-    return CardConfigurationDTO(
+    return CardsConfigurationDTO(
       holderNameRequired: result[0]! as bool,
       addressMode: AddressMode.values[result[1]! as int],
       showStorePaymentField: result[2]! as bool,
@@ -576,72 +571,46 @@ class PlatformCommunicationModel {
   }
 }
 
-class ComponentCommunicationModel {
-  ComponentCommunicationModel({
-    required this.type,
-    this.data,
-  });
-
-  ComponentCommunicationType type;
-
-  Object? data;
-
-  Object encode() {
-    return <Object?>[
-      type.index,
-      data,
-    ];
-  }
-
-  static ComponentCommunicationModel decode(Object result) {
-    result as List<Object?>;
-    return ComponentCommunicationModel(
-      type: ComponentCommunicationType.values[result[0]! as int],
-      data: result[1],
-    );
-  }
-}
-
-class DropInResultDTO {
-  DropInResultDTO({
-    required this.dropInResultType,
+class PaymentFlowOutcomeDTO {
+  PaymentFlowOutcomeDTO({
+    required this.paymentFlowResultType,
     this.result,
     this.actionResponse,
     this.error,
   });
 
-  DropInResultType dropInResultType;
+  PaymentFlowResultType paymentFlowResultType;
 
   String? result;
 
   Map<String?, Object?>? actionResponse;
 
-  DropInErrorDTO? error;
+  ErrorDTO? error;
 
   Object encode() {
     return <Object?>[
-      dropInResultType.index,
+      paymentFlowResultType.index,
       result,
       actionResponse,
       error?.encode(),
     ];
   }
 
-  static DropInResultDTO decode(Object result) {
+  static PaymentFlowOutcomeDTO decode(Object result) {
     result as List<Object?>;
-    return DropInResultDTO(
-      dropInResultType: DropInResultType.values[result[0]! as int],
+    return PaymentFlowOutcomeDTO(
+      paymentFlowResultType: PaymentFlowResultType.values[result[0]! as int],
       result: result[1] as String?,
       actionResponse: (result[2] as Map<Object?, Object?>?)?.cast<String?, Object?>(),
       error: result[3] != null
-          ? DropInErrorDTO.decode(result[3]! as List<Object?>)
+          ? ErrorDTO.decode(result[3]! as List<Object?>)
           : null,
     );
   }
 }
 
-class DropInErrorDTO {
-  DropInErrorDTO({
+class ErrorDTO {
+  ErrorDTO({
     this.errorMessage,
     this.reason,
     this.dismissDropIn,
@@ -661,9 +630,9 @@ class DropInErrorDTO {
     ];
   }
 
-  static DropInErrorDTO decode(Object result) {
+  static ErrorDTO decode(Object result) {
     result as List<Object?>;
-    return DropInErrorDTO(
+    return ErrorDTO(
       errorMessage: result[0] as String?,
       reason: result[1] as String?,
       dismissDropIn: result[2] as bool?,
@@ -697,52 +666,6 @@ class DeletedStoredPaymentMethodResultDTO {
   }
 }
 
-class CardComponentConfigurationDTO {
-  CardComponentConfigurationDTO({
-    required this.environment,
-    required this.clientKey,
-    required this.countryCode,
-    required this.amount,
-    this.shopperLocale,
-    required this.cardConfiguration,
-  });
-
-  Environment environment;
-
-  String clientKey;
-
-  String countryCode;
-
-  AmountDTO amount;
-
-  String? shopperLocale;
-
-  CardConfigurationDTO cardConfiguration;
-
-  Object encode() {
-    return <Object?>[
-      environment.index,
-      clientKey,
-      countryCode,
-      amount.encode(),
-      shopperLocale,
-      cardConfiguration.encode(),
-    ];
-  }
-
-  static CardComponentConfigurationDTO decode(Object result) {
-    result as List<Object?>;
-    return CardComponentConfigurationDTO(
-      environment: Environment.values[result[0]! as int],
-      clientKey: result[1]! as String,
-      countryCode: result[2]! as String,
-      amount: AmountDTO.decode(result[3]! as List<Object?>),
-      shopperLocale: result[4] as String?,
-      cardConfiguration: CardConfigurationDTO.decode(result[5]! as List<Object?>),
-    );
-  }
-}
-
 class _CheckoutPlatformInterfaceCodec extends StandardMessageCodec {
   const _CheckoutPlatformInterfaceCodec();
   @override
@@ -756,7 +679,7 @@ class _CheckoutPlatformInterfaceCodec extends StandardMessageCodec {
     } else if (value is ApplePayConfigurationDTO) {
       buffer.putUint8(130);
       writeValue(buffer, value.encode());
-    } else if (value is CardConfigurationDTO) {
+    } else if (value is CardsConfigurationDTO) {
       buffer.putUint8(131);
       writeValue(buffer, value.encode());
     } else if (value is CashAppPayConfigurationDTO) {
@@ -768,13 +691,13 @@ class _CheckoutPlatformInterfaceCodec extends StandardMessageCodec {
     } else if (value is DropInConfigurationDTO) {
       buffer.putUint8(134);
       writeValue(buffer, value.encode());
-    } else if (value is DropInErrorDTO) {
+    } else if (value is ErrorDTO) {
       buffer.putUint8(135);
       writeValue(buffer, value.encode());
-    } else if (value is DropInResultDTO) {
+    } else if (value is GooglePayConfigurationDTO) {
       buffer.putUint8(136);
       writeValue(buffer, value.encode());
-    } else if (value is GooglePayConfigurationDTO) {
+    } else if (value is PaymentFlowOutcomeDTO) {
       buffer.putUint8(137);
       writeValue(buffer, value.encode());
     } else if (value is SessionDTO) {
@@ -795,7 +718,7 @@ class _CheckoutPlatformInterfaceCodec extends StandardMessageCodec {
       case 130: 
         return ApplePayConfigurationDTO.decode(readValue(buffer)!);
       case 131: 
-        return CardConfigurationDTO.decode(readValue(buffer)!);
+        return CardsConfigurationDTO.decode(readValue(buffer)!);
       case 132: 
         return CashAppPayConfigurationDTO.decode(readValue(buffer)!);
       case 133: 
@@ -803,11 +726,11 @@ class _CheckoutPlatformInterfaceCodec extends StandardMessageCodec {
       case 134: 
         return DropInConfigurationDTO.decode(readValue(buffer)!);
       case 135: 
-        return DropInErrorDTO.decode(readValue(buffer)!);
+        return ErrorDTO.decode(readValue(buffer)!);
       case 136: 
-        return DropInResultDTO.decode(readValue(buffer)!);
-      case 137: 
         return GooglePayConfigurationDTO.decode(readValue(buffer)!);
+      case 137: 
+        return PaymentFlowOutcomeDTO.decode(readValue(buffer)!);
       case 138: 
         return SessionDTO.decode(readValue(buffer)!);
       default:
@@ -924,7 +847,7 @@ class CheckoutPlatformInterface {
     }
   }
 
-  Future<void> onPaymentsResult(DropInResultDTO arg_paymentsResult) async {
+  Future<void> onPaymentsResult(PaymentFlowOutcomeDTO arg_paymentsResult) async {
     final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
         'dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.onPaymentsResult', codec,
         binaryMessenger: _binaryMessenger);
@@ -946,7 +869,7 @@ class CheckoutPlatformInterface {
     }
   }
 
-  Future<void> onPaymentsDetailsResult(DropInResultDTO arg_paymentsDetailsResult) async {
+  Future<void> onPaymentsDetailsResult(PaymentFlowOutcomeDTO arg_paymentsDetailsResult) async {
     final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
         'dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.onPaymentsDetailsResult', codec,
         binaryMessenger: _binaryMessenger);
@@ -1085,8 +1008,6 @@ abstract class CheckoutFlutterApi {
 
   void onDropInAdvancedFlowPlatformCommunication(PlatformCommunicationModel platformCommunicationModel);
 
-  void onComponentCommunication(PlatformCommunicationModel platformCommunicationModel);
-
   static void setup(CheckoutFlutterApi? api, {BinaryMessenger? binaryMessenger}) {
     {
       final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
@@ -1129,130 +1050,6 @@ abstract class CheckoutFlutterApi {
               'Argument for dev.flutter.pigeon.adyen_checkout.CheckoutFlutterApi.onDropInAdvancedFlowPlatformCommunication was null, expected non-null PlatformCommunicationModel.');
           try {
             api.onDropInAdvancedFlowPlatformCommunication(arg_platformCommunicationModel!);
-            return wrapResponse(empty: true);
-          } on PlatformException catch (e) {
-            return wrapResponse(error: e);
-          }          catch (e) {
-            return wrapResponse(error: PlatformException(code: 'error', message: e.toString()));
-          }
-        });
-      }
-    }
-    {
-      final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
-          'dev.flutter.pigeon.adyen_checkout.CheckoutFlutterApi.onComponentCommunication', codec,
-          binaryMessenger: binaryMessenger);
-      if (api == null) {
-        channel.setMessageHandler(null);
-      } else {
-        channel.setMessageHandler((Object? message) async {
-          assert(message != null,
-          'Argument for dev.flutter.pigeon.adyen_checkout.CheckoutFlutterApi.onComponentCommunication was null.');
-          final List<Object?> args = (message as List<Object?>?)!;
-          final PlatformCommunicationModel? arg_platformCommunicationModel = (args[0] as PlatformCommunicationModel?);
-          assert(arg_platformCommunicationModel != null,
-              'Argument for dev.flutter.pigeon.adyen_checkout.CheckoutFlutterApi.onComponentCommunication was null, expected non-null PlatformCommunicationModel.');
-          try {
-            api.onComponentCommunication(arg_platformCommunicationModel!);
-            return wrapResponse(empty: true);
-          } on PlatformException catch (e) {
-            return wrapResponse(error: e);
-          }          catch (e) {
-            return wrapResponse(error: PlatformException(code: 'error', message: e.toString()));
-          }
-        });
-      }
-    }
-  }
-}
-
-class _ComponentFlutterApiCodec extends StandardMessageCodec {
-  const _ComponentFlutterApiCodec();
-  @override
-  void writeValue(WriteBuffer buffer, Object? value) {
-    if (value is AmountDTO) {
-      buffer.putUint8(128);
-      writeValue(buffer, value.encode());
-    } else if (value is CardComponentConfigurationDTO) {
-      buffer.putUint8(129);
-      writeValue(buffer, value.encode());
-    } else if (value is CardConfigurationDTO) {
-      buffer.putUint8(130);
-      writeValue(buffer, value.encode());
-    } else if (value is ComponentCommunicationModel) {
-      buffer.putUint8(131);
-      writeValue(buffer, value.encode());
-    } else {
-      super.writeValue(buffer, value);
-    }
-  }
-
-  @override
-  Object? readValueOfType(int type, ReadBuffer buffer) {
-    switch (type) {
-      case 128: 
-        return AmountDTO.decode(readValue(buffer)!);
-      case 129: 
-        return CardComponentConfigurationDTO.decode(readValue(buffer)!);
-      case 130: 
-        return CardConfigurationDTO.decode(readValue(buffer)!);
-      case 131: 
-        return ComponentCommunicationModel.decode(readValue(buffer)!);
-      default:
-        return super.readValueOfType(type, buffer);
-    }
-  }
-}
-
-abstract class ComponentFlutterApi {
-  static const MessageCodec<Object?> codec = _ComponentFlutterApiCodec();
-
-  void _generateCardComponentConfigurationClass(CardComponentConfigurationDTO cardComponentConfigurationDTO);
-
-  void onComponentCommunication(ComponentCommunicationModel componentCommunicationModel);
-
-  static void setup(ComponentFlutterApi? api, {BinaryMessenger? binaryMessenger}) {
-    {
-      final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
-          'dev.flutter.pigeon.adyen_checkout.ComponentFlutterApi._generateCardComponentConfigurationClass', codec,
-          binaryMessenger: binaryMessenger);
-      if (api == null) {
-        channel.setMessageHandler(null);
-      } else {
-        channel.setMessageHandler((Object? message) async {
-          assert(message != null,
-          'Argument for dev.flutter.pigeon.adyen_checkout.ComponentFlutterApi._generateCardComponentConfigurationClass was null.');
-          final List<Object?> args = (message as List<Object?>?)!;
-          final CardComponentConfigurationDTO? arg_cardComponentConfigurationDTO = (args[0] as CardComponentConfigurationDTO?);
-          assert(arg_cardComponentConfigurationDTO != null,
-              'Argument for dev.flutter.pigeon.adyen_checkout.ComponentFlutterApi._generateCardComponentConfigurationClass was null, expected non-null CardComponentConfigurationDTO.');
-          try {
-            api._generateCardComponentConfigurationClass(arg_cardComponentConfigurationDTO!);
-            return wrapResponse(empty: true);
-          } on PlatformException catch (e) {
-            return wrapResponse(error: e);
-          }          catch (e) {
-            return wrapResponse(error: PlatformException(code: 'error', message: e.toString()));
-          }
-        });
-      }
-    }
-    {
-      final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
-          'dev.flutter.pigeon.adyen_checkout.ComponentFlutterApi.onComponentCommunication', codec,
-          binaryMessenger: binaryMessenger);
-      if (api == null) {
-        channel.setMessageHandler(null);
-      } else {
-        channel.setMessageHandler((Object? message) async {
-          assert(message != null,
-          'Argument for dev.flutter.pigeon.adyen_checkout.ComponentFlutterApi.onComponentCommunication was null.');
-          final List<Object?> args = (message as List<Object?>?)!;
-          final ComponentCommunicationModel? arg_componentCommunicationModel = (args[0] as ComponentCommunicationModel?);
-          assert(arg_componentCommunicationModel != null,
-              'Argument for dev.flutter.pigeon.adyen_checkout.ComponentFlutterApi.onComponentCommunication was null, expected non-null ComponentCommunicationModel.');
-          try {
-            api.onComponentCommunication(arg_componentCommunicationModel!);
             return wrapResponse(empty: true);
           } on PlatformException catch (e) {
             return wrapResponse(error: e);
