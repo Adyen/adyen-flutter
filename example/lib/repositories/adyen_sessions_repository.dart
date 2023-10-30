@@ -12,7 +12,7 @@ import 'package:adyen_checkout_example/network/models/payment_request_network_mo
 import 'package:adyen_checkout_example/network/models/session_request_network_model.dart';
 import 'package:adyen_checkout_example/network/models/session_response_network_model.dart';
 import 'package:adyen_checkout_example/network/service.dart';
-import 'package:adyen_checkout_example/repositories/drop_in_outcome_handler.dart';
+import 'package:adyen_checkout_example/repositories/payment_flow_outcome_handler.dart';
 
 class AdyenSessionsRepository {
   AdyenSessionsRepository(
@@ -22,7 +22,8 @@ class AdyenSessionsRepository {
 
   final AdyenCheckout _adyenCheckout;
   final Service _service;
-  final DropInOutcomeHandler _dropInOutcomeHandler = DropInOutcomeHandler();
+  final PaymentFlowOutcomeHandler _paymentFlowOutcomeHandler =
+      PaymentFlowOutcomeHandler();
 
   //A session should not being created from the mobile application.
   //Please provide a CheckoutSession object from your own backend.
@@ -97,7 +98,7 @@ class AdyenSessionsRepository {
     ));
   }
 
-  Future<DropInOutcome> postPayments(String paymentComponentJson) async {
+  Future<PaymentFlowOutcome> postPayments(String paymentComponentJson) async {
     String returnUrl = await determineExampleReturnUrl();
     PaymentsRequestData paymentsRequestData = PaymentsRequestData(
       merchantAccount: Config.merchantAccount,
@@ -135,13 +136,14 @@ class AdyenSessionsRepository {
     mergedJson.addAll(jsonDecode(paymentComponentJson));
     mergedJson.addAll(paymentsRequestData.toJson());
     final response = await _service.postPayments(mergedJson);
-    return _dropInOutcomeHandler.handleResponse(response);
+    return _paymentFlowOutcomeHandler.handleResponse(response);
   }
 
-  Future<DropInOutcome> postPaymentsDetails(String additionalDetails) async {
+  Future<PaymentFlowOutcome> postPaymentsDetails(
+      String additionalDetails) async {
     final response =
         await _service.postPaymentsDetails(jsonDecode(additionalDetails));
-    return _dropInOutcomeHandler.handleResponse(response);
+    return _paymentFlowOutcomeHandler.handleResponse(response);
   }
 
   Future<String> determineExampleReturnUrl() async {

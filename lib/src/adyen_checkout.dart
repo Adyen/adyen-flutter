@@ -153,15 +153,16 @@ class AdyenCheckout implements AdyenCheckoutInterface {
 
   Future<void> _handlePaymentComponent(
     PlatformCommunicationModel event,
-    Future<DropInOutcome> Function(String paymentComponentJson) postPayments,
+    Future<PaymentFlowOutcome> Function(String paymentComponentJson)
+        postPayments,
   ) async {
     try {
       if (event.data == null) {
         throw Exception("Payment data is not provided.");
       }
 
-      final DropInOutcome paymentsResult = await postPayments(event.data!);
-      DropInResultDTO dropInResult = _mapToDropInResult(paymentsResult);
+      final PaymentFlowOutcome paymentFlowOutcome = await postPayments(event.data!);
+      DropInResultDTO dropInResult = _mapToDropInResult(paymentFlowOutcome);
       AdyenCheckoutPlatformInterface.instance.onPaymentsResult(dropInResult);
     } catch (error) {
       String errorMessage = error.toString();
@@ -179,7 +180,7 @@ class AdyenCheckout implements AdyenCheckoutInterface {
 
   Future<void> _handleAdditionalDetails(
     PlatformCommunicationModel event,
-    Future<DropInOutcome> Function(String additionalDetails)
+    Future<PaymentFlowOutcome> Function(String additionalDetails)
         postPaymentsDetails,
   ) async {
     try {
@@ -187,9 +188,8 @@ class AdyenCheckout implements AdyenCheckoutInterface {
         throw Exception("Additional data is not provided.");
       }
 
-      final DropInOutcome paymentsDetailsResult =
-          await postPaymentsDetails(event.data!);
-      DropInResultDTO dropInResult = _mapToDropInResult(paymentsDetailsResult);
+      final PaymentFlowOutcome paymentFlowOutcome = await postPaymentsDetails(event.data!);
+      DropInResultDTO dropInResult = _mapToDropInResult(paymentFlowOutcome);
       AdyenCheckoutPlatformInterface.instance
           .onPaymentsDetailsResult(dropInResult);
     } catch (error) {
@@ -207,7 +207,7 @@ class AdyenCheckout implements AdyenCheckoutInterface {
     }
   }
 
-  DropInResultDTO _mapToDropInResult(DropInOutcome dropInOutcome) {
+  DropInResultDTO _mapToDropInResult(PaymentFlowOutcome dropInOutcome) {
     return switch (dropInOutcome) {
       Finished() => DropInResultDTO(
           dropInResultType: DropInResultType.finished,
