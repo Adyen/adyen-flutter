@@ -47,7 +47,6 @@ class ComponentWrapperView
         activity.lifecycleScope.launch {
             delay(500)
             addOnLayoutChangeListener { v, left, top, right, bottom, oldLeft, oldTop, oldRight, oldBottom ->
-                println("layout change listener")
                 updateComponentViewHeight()
             }
         }
@@ -56,8 +55,8 @@ class ComponentWrapperView
     private fun updateComponentViewHeight() {
         val valueInPixels = resources.getDimension(R.dimen.standard_margin)
         val cardViewHeight = findViewById<FrameLayout>(R.id.frameLayout_componentContainer).getChildAt(0).height
-        val buttonHeight = findViewById<MaterialButton>(R.id.payButton).height + (valueInPixels)
-        val componentHeight = ((cardViewHeight + buttonHeight) / screenDensity).toDouble()
+        val buttonHeight = findViewById<MaterialButton>(R.id.payButton)?.height?.plus((valueInPixels))
+        val componentHeight = ((cardViewHeight + (buttonHeight ?: 0f)) / screenDensity).toDouble()
         componentFlutterApi.onComponentCommunication(
             ComponentCommunicationModel(type = ComponentCommunicationType.RESIZE, data = componentHeight)
         ) {}

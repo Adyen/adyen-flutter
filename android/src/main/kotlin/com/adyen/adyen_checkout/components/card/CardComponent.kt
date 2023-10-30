@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.LinearLayout
 import androidx.activity.ComponentActivity
+import androidx.core.view.children
 import androidx.core.view.doOnNextLayout
 import com.adyen.adyen_checkout.R
 import com.adyen.adyen_checkout.components.ComponentWrapperView
@@ -62,38 +63,39 @@ internal class CardComponent(
     }
 
     override fun dispose() {
-        Log.d("AdyenCheckout", "DISPOSE VIEW")
+        Log.d("AdyenCheckout", "Dispose card view")
         cardComponent.delegate.onCleared()
     }
 
     private fun adjustCardComponentLayout(flutterView: View) {
-        val param = LinearLayout.LayoutParams(
+        val linearLayoutParams = LinearLayout.LayoutParams(
             ViewGroup.LayoutParams.MATCH_PARENT,
             ViewGroup.LayoutParams.WRAP_CONTENT,
         )
+        //Adyen component view
         val adyenComponentView = flutterView.findViewById<AdyenComponentView>(R.id.adyen_component_view)
-        adyenComponentView.layoutParams = param
+        adyenComponentView.layoutParams = linearLayoutParams
 
-        //Container
-        var container = flutterView.findViewById<FrameLayout>(R.id.frameLayout_componentContainer)
-        container.layoutParams = param
+        //Component container
+        val componentContainer = flutterView.findViewById<FrameLayout>(R.id.frameLayout_componentContainer)
+        componentContainer.layoutParams = linearLayoutParams
 
         //Button container
-        var buttonContainer = flutterView.findViewById<FrameLayout>(R.id.frameLayout_buttonContainer)
-        buttonContainer.layoutParams = param
+        val buttonContainer = flutterView.findViewById<FrameLayout>(R.id.frameLayout_buttonContainer)
+        buttonContainer.layoutParams = linearLayoutParams
 
-        //Button
-        var button = flutterView.findViewById<FrameLayout>(R.id.frameLayout_buttonContainer).getChildAt(0)
+        //Pay button
+        val button = buttonContainer.children.firstOrNull()
         val buttonParams = FrameLayout.LayoutParams(
             ViewGroup.LayoutParams.MATCH_PARENT,
             ViewGroup.LayoutParams.WRAP_CONTENT,
         )
-        button.layoutParams = buttonParams
+        button?.layoutParams = buttonParams
 
-        // CARD
-        var card = flutterView.findViewById<FrameLayout>(R.id.frameLayout_componentContainer).getChildAt(0) as ViewGroup
-        var layoutparams = card.layoutParams
-        layoutparams.height = LinearLayout.LayoutParams.WRAP_CONTENT
-        card.layoutParams = layoutparams
+        //Card
+        val card = componentContainer.children.firstOrNull() as ViewGroup?
+        val cardLayoutParams = card?.layoutParams
+        cardLayoutParams?.height = LinearLayout.LayoutParams.WRAP_CONTENT
+        card?.layoutParams = cardLayoutParams
     }
 }
