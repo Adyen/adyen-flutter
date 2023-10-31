@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:adyen_checkout/adyen_checkout.dart';
 import 'package:adyen_checkout_example/config.dart';
+import 'package:adyen_checkout_example/network/models/session_response_network_model.dart';
 import 'package:adyen_checkout_example/network/service.dart';
 import 'package:adyen_checkout_example/repositories/adyen_sessions_repository.dart';
 import 'package:flutter/material.dart';
@@ -93,52 +94,45 @@ class _MyAppState extends State<MyApp> {
                 },
                 child: const Text("Card component scroll view")),
             TextButton(
-                onPressed: () {
-                  showModalBottomSheet(
-                      context: context,
-                      isScrollControlled: true,
-                      backgroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10.0),
-                      ),
-                      builder: (BuildContext context) {
-                        return SingleChildScrollView(
-                            child: Column(
-                          children: [
-                            Container(height: 8),
-                            Container(
-                              width: 48,
-                              height: 6,
-                              decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(10),
-                                  color: Colors.grey),
-                            ),
-                            Container(height: 8),
-                            Container(
-                              padding: EdgeInsets.only(
-                                  bottom:
-                                      MediaQuery.of(context).viewInsets.bottom),
-                              child: FutureBuilder<String>(
-                                future: _adyenSessionRepository
-                                    .fetchPaymentMethods(),
-                                builder: (BuildContext context,
-                                    AsyncSnapshot<String> snapshot) {
-                                  if (snapshot.data == null) {
-                                    return const Center(
-                                      child: CircularProgressIndicator(),
-                                    );
-                                  } else {
-                                    return buildCardWidget(snapshot.data!,
-                                        context, _adyenSessionRepository);
-                                  }
-                                },
-                              ),
-                            ),
-                          ],
-                        ));
-                      });
+                onPressed: () async {
+                  await _adyenSessionRepository
+                      .createSession()
+                      .then((value) => showModalBottomSheet(
+                          context: context,
+                          isScrollControlled: true,
+                          backgroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10.0),
+                          ),
+                          builder: (BuildContext context) {
+                            return SingleChildScrollView(
+                                child: Column(
+                              children: [
+                                Container(height: 8),
+                                Container(
+                                  width: 48,
+                                  height: 6,
+                                  decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(10),
+                                      color: Colors.grey),
+                                ),
+                                Container(height: 8),
+                                Container(
+                                  padding: EdgeInsets.only(
+                                      bottom: MediaQuery.of(context)
+                                          .viewInsets
+                                          .bottom),
+                                  child: _buildSessionCardWidget(
+                                    context,
+                                    _adyenSessionRepository,
+                                    value,
+                                  ),
+                                ),
+                              ],
+                            ));
+                          }));
                 },
-                child: const Text("Card component sheet")),
+                child: const Text("Card component session sheet")),
           ],
         ),
       ),
@@ -146,11 +140,14 @@ class _MyAppState extends State<MyApp> {
   }
 
   Future<PaymentResult> startDropInSessions() async {
-    final Session session = await _adyenSessionRepository.createSession(
-      Config.amount,
-      Config.environment,
+    final String sessionResponse =
+        await _adyenSessionRepository.createSession();
+    final SessionResponseNetworkModel sessionResponseNetworkModel =
+        SessionResponseNetworkModel.fromRawJson(sessionResponse);
+    final Session session = Session(
+      id: sessionResponseNetworkModel.id,
+      sessionData: sessionResponseNetworkModel.sessionData,
     );
-
     const CardConfiguration cardsConfiguration = CardConfiguration(
       showStorePaymentField: true,
     );
@@ -250,6 +247,32 @@ class _MyAppState extends State<MyApp> {
     return CashAppPayConfiguration(
       CashAppPayEnvironment.sandbox,
       await _adyenSessionRepository.determineExampleReturnUrl(),
+    );
+  }
+
+  Widget _buildSessionCardWidget(
+    BuildContext context,
+    AdyenSessionsRepository repository,
+    String sessionResponse,
+  ) {
+    final cardComponentConfiguration = CardComponentConfiguration(
+      environment: Config.environment,
+      clientKey: Config.clientKey,
+      countryCode: Config.countryCode,
+      amount: Config.amount,
+      shopperLocale: Config.shopperLocale,
+      cardConfiguration: const CardConfiguration(showStorePaymentField: false),
+    );
+
+    return AdyenCardComponentWidget(
+      componentPaymentFlow: CardComponentSessionFlow(
+        cardComponentConfiguration: cardComponentConfiguration,
+        sessionResponse: sessionResponse,
+      ),
+      onPaymentResult: (event) async {
+        Navigator.pop(context);
+        _dialogBuilder(context, event);
+      },
     );
   }
 

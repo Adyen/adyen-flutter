@@ -8,7 +8,7 @@ import 'package:adyen_checkout_example/network/models/session_response_network_m
 import 'package:http/http.dart' as http;
 
 class Service {
-  Future<SessionResponseNetworkModel> createSession(
+  Future<String> createSession(
       SessionRequestNetworkModel sessionRequestNetworkModel,
       Environment environment) async {
     final response = await http.post(
@@ -17,7 +17,7 @@ class Service {
       body: sessionRequestNetworkModel.toRawJson(),
     );
     print("PspReference: ${response.headers["pspreference"]}");
-    return SessionResponseNetworkModel.fromRawJson(response.body);
+    return response.body;
   }
 
   Future<String> fetchPaymentMethods(

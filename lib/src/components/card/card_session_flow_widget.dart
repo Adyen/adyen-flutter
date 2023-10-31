@@ -15,14 +15,14 @@ import 'package:flutter/services.dart';
 class CardSessionFlowWidget extends StatefulWidget {
   const CardSessionFlowWidget({
     required this.cardComponentConfiguration,
-    required this.session,
+    required this.sessionResponse,
     required this.onPaymentResult,
     required this.initialHeight,
     super.key,
   });
 
   final CardComponentConfiguration cardComponentConfiguration;
-  final Session session;
+  final String sessionResponse;
   final Future<void> Function(PaymentResult) onPaymentResult;
   final double initialHeight;
 
@@ -80,9 +80,9 @@ class _CardSessionFlowWidgetState extends State<CardSessionFlowWidget> {
   }
 
   Widget buildCardView() {
-    const String viewType = 'cardComponent';
+    const String viewType = 'cardComponentSessionFlow';
     final Map<String, dynamic> creationParams = <String, dynamic>{
-      "session": widget.session.toDTO(),
+      "sessionResponse": widget.sessionResponse,
       "cardComponentConfiguration": widget.cardComponentConfiguration.toDTO(),
     };
 

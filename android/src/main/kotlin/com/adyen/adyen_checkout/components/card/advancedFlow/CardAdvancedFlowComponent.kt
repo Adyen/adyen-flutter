@@ -1,4 +1,4 @@
-package com.adyen.adyen_checkout.components.card
+package com.adyen.adyen_checkout.components.card.advancedFlow
 
 import CardComponentConfigurationDTO
 import ComponentFlutterApi
@@ -22,7 +22,7 @@ import io.flutter.plugin.platform.PlatformView
 import org.json.JSONObject
 import java.util.UUID
 
-internal class CardComponent(
+internal class CardAdvancedFlowComponent(
     private val activity: ComponentActivity,
     private val componentFlutterApi: ComponentFlutterApi,
     context: Context,
@@ -32,7 +32,7 @@ internal class CardComponent(
     private val configuration = creationParams?.get("cardComponentConfiguration") as CardComponentConfigurationDTO
     private val paymentMethods = creationParams?.get("paymentMethods") as String
     private val paymentMethodsApiResponse = PaymentMethodsApiResponse.SERIALIZER.deserialize(JSONObject(paymentMethods))
-    private val schemes = paymentMethodsApiResponse.paymentMethods?.first { it.type == "scheme" }
+    private val paymentMethod = paymentMethodsApiResponse.paymentMethods?.first { it.type == "scheme" }
         ?: throw Exception("Card payment method not provided")
     private val environment = configuration.environment.toNativeModel()
     private val cardConfiguration = configuration.cardConfiguration.toNativeModel(
@@ -42,9 +42,9 @@ internal class CardComponent(
     )
     private var cardComponent = CardComponent.PROVIDER.get(
         activity = activity,
-        paymentMethod = schemes,
+        paymentMethod = paymentMethod,
         configuration = cardConfiguration,
-        callback = CardCallback(componentFlutterApi),
+        callback = CardAdvancedFlowCallback(componentFlutterApi),
         key = UUID.randomUUID().toString()
     )
     private val componentWrapperView = ComponentWrapperView(activity, componentFlutterApi)

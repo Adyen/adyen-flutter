@@ -27,14 +27,14 @@ class AdyenSessionsRepository {
 
   //A session should not being created from the mobile application.
   //Please provide a CheckoutSession object from your own backend.
-  Future<Session> createSession(Amount amount, Environment environment) async {
+  Future<String> createSession() async {
     String returnUrl = await determineExampleReturnUrl();
     SessionRequestNetworkModel sessionRequestNetworkModel =
         SessionRequestNetworkModel(
             merchantAccount: Config.merchantAccount,
             amount: AmountNetworkModel(
-              currency: amount.currency,
-              value: amount.value,
+              currency: Config.amount.currency,
+              value: Config.amount.value,
             ),
             returnUrl: returnUrl,
             reference:
@@ -42,10 +42,10 @@ class AdyenSessionsRepository {
             countryCode: Config.countryCode,
             shopperLocale: Config.shopperLocale,
             shopperReference: Config.shopperReference,
-            storePaymentMethodMode: StorePaymentMethodMode
-                .askForConsent.storePaymentMethodModeString,
-            recurringProcessingModel:
-                RecurringProcessingModel.cardOnFile.recurringModelString,
+            // storePaymentMethodMode: StorePaymentMethodMode
+            //     .askForConsent.storePaymentMethodModeString,
+            // recurringProcessingModel:
+            //     RecurringProcessingModel.cardOnFile.recurringModelString,
             shopperInteraction:
                 ShopperInteractionModel.ecommerce.shopperInteractionModelString,
             channel: _determineChannel(),
@@ -80,13 +80,11 @@ class AdyenSessionsRepository {
           ),
         ]);
 
-    SessionResponseNetworkModel sessionResponseNetworkModel =
-        await _service.createSession(sessionRequestNetworkModel, environment);
-
-    return Session(
-      id: sessionResponseNetworkModel.id,
-      sessionData: sessionResponseNetworkModel.sessionData,
+    String response = await _service.createSession(
+      sessionRequestNetworkModel,
+      Config.environment,
     );
+    return response;
   }
 
   Future<String> fetchPaymentMethods() async {

@@ -30,7 +30,7 @@ class AdyenCardComponentWidget extends StatelessWidget {
     return CardSessionFlowWidget(
       cardComponentConfiguration:
           cardComponentSessionFlow.cardComponentConfiguration,
-      session: cardComponentSessionFlow.session,
+      sessionResponse: cardComponentSessionFlow.sessionResponse,
       onPaymentResult: onPaymentResult,
       initialHeight: initialHeight,
     );
