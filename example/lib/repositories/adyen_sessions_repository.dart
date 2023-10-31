@@ -10,7 +10,6 @@ import 'package:adyen_checkout_example/network/models/line_item.dart';
 import 'package:adyen_checkout_example/network/models/payment_methods_request_network_model.dart';
 import 'package:adyen_checkout_example/network/models/payment_request_network_model.dart';
 import 'package:adyen_checkout_example/network/models/session_request_network_model.dart';
-import 'package:adyen_checkout_example/network/models/session_response_network_model.dart';
 import 'package:adyen_checkout_example/network/service.dart';
 import 'package:adyen_checkout_example/repositories/payment_flow_outcome_handler.dart';
 
