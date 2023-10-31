@@ -1,6 +1,6 @@
 import 'package:adyen_checkout/adyen_checkout.dart';
 
-class DropInOutcomeHandler {
+class PaymentFlowOutcomeHandler {
   //DropIn results
   static const resultPending = "pending";
   static const resultAuthorized = "authorised";
@@ -16,7 +16,7 @@ class DropInOutcomeHandler {
   static const messageKey = "message";
   static const refusalReasonKey = "refusalReason";
 
-  DropInOutcome handleResponse(Map<String, dynamic> jsonResponse) {
+  PaymentFlowOutcome handleResponse(Map<String, dynamic> jsonResponse) {
     if (_isError(jsonResponse)) {
       return Error(
         errorMessage: jsonResponse[messageKey],
