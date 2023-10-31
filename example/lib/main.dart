@@ -184,7 +184,7 @@ class _MyAppState extends State<MyApp> {
     );
 
     return await _adyenCheckout.startPayment(
-      paymentFlow: DropInSession(
+      paymentFlow: DropInSessionFlow(
         dropInConfiguration: dropInConfiguration,
         session: session,
       ),

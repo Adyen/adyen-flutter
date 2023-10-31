@@ -29,9 +29,10 @@ class AdyenCheckout implements AdyenCheckoutInterface {
       AdyenCheckoutPlatformInterface.instance.getReturnUrl();
 
   @override
-  Future<PaymentResult> startPayment({required PaymentFlow paymentFlow}) async {
+  Future<PaymentResult> startPayment(
+      {required DropInPaymentFlow paymentFlow}) async {
     switch (paymentFlow) {
-      case DropInSession():
+      case DropInSessionFlow():
         return await _startDropInSessionsPayment(paymentFlow);
       case DropInAdvancedFlow():
         return await _startDropInAdvancedFlowPayment(paymentFlow);
@@ -47,7 +48,7 @@ class AdyenCheckout implements AdyenCheckoutInterface {
   }
 
   Future<PaymentResult> _startDropInSessionsPayment(
-      DropInSession dropInSession) async {
+      DropInSessionFlow dropInSession) async {
     _adyenLogger.print("Start Drop-in session");
     final dropInSessionCompleter = Completer<PaymentResultDTO>();
     AdyenCheckoutPlatformInterface.instance.startDropInSessionPayment(

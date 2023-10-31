@@ -1,20 +1,18 @@
-import 'package:adyen_checkout/src/models/drop_in_configuration.dart';
-import 'package:adyen_checkout/src/models/payment_flow_outcome.dart';
-import 'package:adyen_checkout/src/models/session.dart';
+import 'package:adyen_checkout/adyen_checkout.dart';
 
-sealed class PaymentFlow {}
+sealed class DropInPaymentFlow {}
 
-class DropInSession extends PaymentFlow {
+class DropInSessionFlow extends DropInPaymentFlow {
   final DropInConfiguration dropInConfiguration;
   final Session session;
 
-  DropInSession({
+  DropInSessionFlow({
     required this.dropInConfiguration,
     required this.session,
   });
 }
 
-class DropInAdvancedFlow extends PaymentFlow {
+class DropInAdvancedFlow extends DropInPaymentFlow {
   final DropInConfiguration dropInConfiguration;
   final String paymentMethodsResponse;
   Future<PaymentFlowOutcome> Function(String paymentComponentJson) postPayments;
@@ -28,3 +26,4 @@ class DropInAdvancedFlow extends PaymentFlow {
     required this.postPaymentsDetails,
   });
 }
+

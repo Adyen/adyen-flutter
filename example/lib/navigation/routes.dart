@@ -48,20 +48,21 @@ Widget buildCardWidget(
   AdyenSessionsRepository repository,
 ) {
   final cardComponentConfiguration = CardComponentConfiguration(
-      environment: Config.environment,
-      clientKey: Config.clientKey,
-      countryCode: Config.countryCode,
-      amount: Config.amount,
-      shopperLocale: Config.shopperLocale,
-      cardConfiguration: const CardConfiguration(
-        showStorePaymentField: false
-      ));
+    environment: Config.environment,
+    clientKey: Config.clientKey,
+    countryCode: Config.countryCode,
+    amount: Config.amount,
+    shopperLocale: Config.shopperLocale,
+    cardConfiguration: const CardConfiguration(showStorePaymentField: false),
+  );
 
-  return AdyenCardWidget(
-    cardComponentConfiguration: cardComponentConfiguration,
-    paymentMethods: paymentMethods,
-    onPayments: repository.postPayments,
-    onPaymentsDetails: repository.postPaymentsDetails,
+  return AdyenCardComponentWidget(
+    componentPaymentFlow: CardComponentAdvancedFlow(
+      cardComponentConfiguration: cardComponentConfiguration,
+      paymentMethods: paymentMethods,
+      onPayments: repository.postPayments,
+      onPaymentsDetails: repository.postPaymentsDetails,
+    ),
     onPaymentResult: (event) async {
       Navigator.pop(context);
       _dialogBuilder(context, event);

@@ -12,8 +12,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 
-class AdyenCardWidget extends StatefulWidget {
-  const AdyenCardWidget({
+class CardAdvancedFlowWidget extends StatefulWidget {
+  const CardAdvancedFlowWidget({
     required this.cardComponentConfiguration,
     required this.paymentMethods,
     required this.onPayments,
@@ -29,25 +29,27 @@ class AdyenCardWidget extends StatefulWidget {
   final Future<void> Function(PaymentResult) onPaymentResult;
 
   @override
-  State<AdyenCardWidget> createState() => _AdyenCardWidgetState();
+  State<CardAdvancedFlowWidget> createState() => _CardAdvancedFlowWidgetState();
 }
 
-class _AdyenCardWidgetState extends State<AdyenCardWidget> {
+class _CardAdvancedFlowWidgetState extends State<CardAdvancedFlowWidget> {
   final MessageCodec<Object?> _codec = ComponentFlutterApi.codec;
   final AdyenComponentApi _adyenComponentApi = AdyenComponentApi();
   final ComponentResultApi _resultApi = ComponentResultApi();
-  final StreamController<double> _resizeStream =
-      StreamController<double>.broadcast();
   final PaymentFlowOutcomeHandler _paymentFlowOutcomeHandler =
       PaymentFlowOutcomeHandler();
+  late StreamController<double> _resizeStream;
+  late Widget _cardView;
 
   @override
-  Widget build(BuildContext context) {
-    ComponentFlutterApi.setup(_resultApi);
-    final Widget cardView = buildCardView();
+  void initState() {
+    super.initState();
 
+    _resizeStream = StreamController<double>.broadcast();
     _resultApi.componentCommunicationStream =
         StreamController<ComponentCommunicationModel>.broadcast();
+    ComponentFlutterApi.setup(_resultApi);
+    _cardView = buildCardView();
     _resultApi.componentCommunicationStream.stream
         .asBroadcastStream()
         .listen((event) async {
@@ -62,15 +64,19 @@ class _AdyenCardWidgetState extends State<AdyenCardWidget> {
           _onResize(event);
       }
     });
+  }
 
+  @override
+  Widget build(BuildContext context) {
     return StreamBuilder(
+        initialData: _determineInitialHeight(),
         stream: _resizeStream.stream.distinct(),
         builder: (BuildContext context, AsyncSnapshot snapshot) {
-          double platformHeight = snapshot.data ?? _determineDefaultHeight();
+          double platformHeight = snapshot.data;
           print("PlatformHeight: $platformHeight");
           return SizedBox(
             height: platformHeight,
-            child: cardView,
+            child: _cardView,
           );
         });
   }
@@ -107,8 +113,7 @@ class _AdyenCardWidgetState extends State<AdyenCardWidget> {
       case PaymentFlowResultType.finished:
         widget.onPaymentResult(PaymentAdvancedFlowFinished(
             resultCode: paymentFlowOutcomeDTO.result ?? ""));
-        setState(() {
-        });
+        setState(() {});
       case PaymentFlowResultType.action:
         _adyenComponentApi.onAction(paymentFlowOutcomeDTO.actionResponse);
       case PaymentFlowResultType.error:
@@ -117,7 +122,7 @@ class _AdyenCardWidgetState extends State<AdyenCardWidget> {
     }
   }
 
-  double _determineDefaultHeight() {
+  double _determineInitialHeight() {
     final cardConfiguration =
         widget.cardComponentConfiguration.cardConfiguration;
     switch (defaultTargetPlatform) {
