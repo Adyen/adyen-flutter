@@ -1,6 +1,7 @@
 import 'package:adyen_checkout/adyen_checkout.dart';
 import 'package:adyen_checkout/src/components/card/card_advanced_flow_widget.dart';
 import 'package:adyen_checkout/src/components/card/card_session_flow_widget.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 
 class AdyenCardComponentWidget extends StatelessWidget {
@@ -24,17 +25,22 @@ class AdyenCardComponentWidget extends StatelessWidget {
   CardSessionFlowWidget _buildCardSessionFlowWidget() {
     final CardComponentSessionFlow cardComponentSessionFlow =
         componentPaymentFlow as CardComponentSessionFlow;
+    final double initialHeight = _determineInitialHeight(
+        cardComponentSessionFlow.cardComponentConfiguration.cardConfiguration);
     return CardSessionFlowWidget(
       cardComponentConfiguration:
           cardComponentSessionFlow.cardComponentConfiguration,
       session: cardComponentSessionFlow.session,
       onPaymentResult: onPaymentResult,
+      initialHeight: initialHeight,
     );
   }
 
   CardAdvancedFlowWidget _buildCardAdvancedFlowWidget() {
     final CardComponentAdvancedFlow cardComponentAdvancedFlow =
         componentPaymentFlow as CardComponentAdvancedFlow;
+    final double initialHeight = _determineInitialHeight(
+        cardComponentAdvancedFlow.cardComponentConfiguration.cardConfiguration);
     return CardAdvancedFlowWidget(
       cardComponentConfiguration:
           cardComponentAdvancedFlow.cardComponentConfiguration,
@@ -42,6 +48,33 @@ class AdyenCardComponentWidget extends StatelessWidget {
       onPayments: cardComponentAdvancedFlow.onPayments,
       onPaymentsDetails: cardComponentAdvancedFlow.onPaymentsDetails,
       onPaymentResult: onPaymentResult,
+      initialHeight: initialHeight,
     );
+  }
+
+  double _determineInitialHeight(CardConfiguration cardConfiguration) {
+    switch (defaultTargetPlatform) {
+      case TargetPlatform.android:
+        return _determineInitialAndroidViewHeight(cardConfiguration);
+      case TargetPlatform.iOS:
+        return _determineInitialIosViewHeight(cardConfiguration);
+      default:
+        throw UnsupportedError('Unsupported platform view');
+    }
+  }
+
+  double _determineInitialAndroidViewHeight(
+      CardConfiguration cardConfiguration) {
+    if (cardConfiguration.showCvc) {
+      return 274;
+    } else if (cardConfiguration.holderNameRequired) {
+      return 370;
+    }
+
+    return 274;
+  }
+
+  double _determineInitialIosViewHeight(CardConfiguration cardConfiguration) {
+    return 279;
   }
 }

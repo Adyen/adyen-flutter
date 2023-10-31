@@ -19,6 +19,7 @@ class CardAdvancedFlowWidget extends StatefulWidget {
     required this.onPayments,
     required this.onPaymentsDetails,
     required this.onPaymentResult,
+    required this.initialHeight,
     super.key,
   });
 
@@ -27,6 +28,7 @@ class CardAdvancedFlowWidget extends StatefulWidget {
   final Future<PaymentFlowOutcome> Function(String) onPayments;
   final Future<PaymentFlowOutcome> Function(String) onPaymentsDetails;
   final Future<void> Function(PaymentResult) onPaymentResult;
+  final double initialHeight;
 
   @override
   State<CardAdvancedFlowWidget> createState() => _CardAdvancedFlowWidgetState();
@@ -69,7 +71,7 @@ class _CardAdvancedFlowWidgetState extends State<CardAdvancedFlowWidget> {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder(
-        initialData: _determineInitialHeight(),
+        initialData: widget.initialHeight,
         stream: _resizeStream.stream.distinct(),
         builder: (BuildContext context, AsyncSnapshot snapshot) {
           double platformHeight = snapshot.data;
@@ -120,34 +122,6 @@ class _CardAdvancedFlowWidgetState extends State<CardAdvancedFlowWidget> {
         widget.onPaymentResult(
             PaymentError(reason: paymentFlowOutcomeDTO.error?.reason));
     }
-  }
-
-  double _determineInitialHeight() {
-    final cardConfiguration =
-        widget.cardComponentConfiguration.cardConfiguration;
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.android:
-        return _determineInitialAndroidViewHeight(cardConfiguration);
-      case TargetPlatform.iOS:
-        return _determineInitialIosViewHeight(cardConfiguration);
-      default:
-        throw UnsupportedError('Unsupported platform view');
-    }
-  }
-
-  double _determineInitialAndroidViewHeight(
-      CardConfiguration cardConfiguration) {
-    if (cardConfiguration.showCvc) {
-      return 274;
-    } else if (cardConfiguration.holderNameRequired) {
-      return 370;
-    }
-
-    return 274;
-  }
-
-  double _determineInitialIosViewHeight(CardConfiguration cardConfiguration) {
-    return 279;
   }
 
   Widget buildCardView() {

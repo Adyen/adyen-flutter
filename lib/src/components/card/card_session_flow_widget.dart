@@ -17,12 +17,14 @@ class CardSessionFlowWidget extends StatefulWidget {
     required this.cardComponentConfiguration,
     required this.session,
     required this.onPaymentResult,
+    required this.initialHeight,
     super.key,
   });
 
   final CardComponentConfiguration cardComponentConfiguration;
   final Session session;
   final Future<void> Function(PaymentResult) onPaymentResult;
+  final double initialHeight;
 
   @override
   State<CardSessionFlowWidget> createState() => _CardSessionFlowWidgetState();
@@ -33,7 +35,7 @@ class _CardSessionFlowWidgetState extends State<CardSessionFlowWidget> {
   final AdyenComponentApi _adyenComponentApi = AdyenComponentApi();
   final ComponentResultApi _resultApi = ComponentResultApi();
   final PaymentFlowOutcomeHandler _paymentFlowOutcomeHandler =
-  PaymentFlowOutcomeHandler();
+      PaymentFlowOutcomeHandler();
   late StreamController<double> _resizeStream;
   late Widget _cardView;
 
@@ -43,7 +45,7 @@ class _CardSessionFlowWidgetState extends State<CardSessionFlowWidget> {
 
     _resizeStream = StreamController<double>.broadcast();
     _resultApi.componentCommunicationStream =
-    StreamController<ComponentCommunicationModel>.broadcast();
+        StreamController<ComponentCommunicationModel>.broadcast();
     ComponentFlutterApi.setup(_resultApi);
     _cardView = buildCardView();
     _resultApi.componentCommunicationStream.stream
@@ -58,7 +60,7 @@ class _CardSessionFlowWidgetState extends State<CardSessionFlowWidget> {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder(
-        initialData: _determineInitialHeight(),
+        initialData: widget.initialHeight,
         stream: _resizeStream.stream.distinct(),
         builder: (BuildContext context, AsyncSnapshot snapshot) {
           double platformHeight = snapshot.data;
@@ -75,34 +77,6 @@ class _CardSessionFlowWidgetState extends State<CardSessionFlowWidget> {
     _resultApi.componentCommunicationStream.close();
     _resizeStream.close();
     super.dispose();
-  }
-
-  double _determineInitialHeight() {
-    final cardConfiguration =
-        widget.cardComponentConfiguration.cardConfiguration;
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.android:
-        return _determineInitialAndroidViewHeight(cardConfiguration);
-      case TargetPlatform.iOS:
-        return _determineInitialIosViewHeight(cardConfiguration);
-      default:
-        throw UnsupportedError('Unsupported platform view');
-    }
-  }
-
-  double _determineInitialAndroidViewHeight(
-      CardConfiguration cardConfiguration) {
-    if (cardConfiguration.showCvc) {
-      return 274;
-    } else if (cardConfiguration.holderNameRequired) {
-      return 370;
-    }
-
-    return 274;
-  }
-
-  double _determineInitialIosViewHeight(CardConfiguration cardConfiguration) {
-    return 279;
   }
 
   Widget buildCardView() {
@@ -137,7 +111,7 @@ class _CardSessionFlowWidgetState extends State<CardSessionFlowWidget> {
       },
       onCreatePlatformView: (params) {
         surfaceAndroidViewController =
-        PlatformViewsService.initSurfaceAndroidView(
+            PlatformViewsService.initSurfaceAndroidView(
           id: params.id,
           viewType: viewType,
           layoutDirection: TextDirection.ltr,
@@ -147,8 +121,8 @@ class _CardSessionFlowWidgetState extends State<CardSessionFlowWidget> {
             params.onFocusChanged(true);
           },
         )
-          ..addOnPlatformViewCreatedListener(params.onPlatformViewCreated)
-          ..create();
+              ..addOnPlatformViewCreatedListener(params.onPlatformViewCreated)
+              ..create();
 
         return surfaceAndroidViewController;
       },
