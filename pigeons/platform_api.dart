@@ -62,6 +62,7 @@ enum PlatformCommunicationType {
 enum ComponentCommunicationType {
   onSubmit,
   additionalDetails,
+  result,
   error,
   resize,
 }
@@ -224,12 +225,14 @@ class PaymentResultDTO {
 class PaymentResultModelDTO {
   final String? sessionId;
   final String? sessionData;
+  final String? sessionResult;
   final String? resultCode;
   final OrderResponseDTO? order;
 
   PaymentResultModelDTO(
     this.sessionId,
     this.sessionData,
+    this.sessionResult,
     this.resultCode,
     this.order,
   );
@@ -264,10 +267,12 @@ class PlatformCommunicationModel {
 class ComponentCommunicationModel {
   final ComponentCommunicationType type;
   final Object? data;
+  final PaymentResultModelDTO? paymentResult;
 
   ComponentCommunicationModel({
     required this.type,
     this.data,
+    this.paymentResult,
   });
 }
 
@@ -362,9 +367,6 @@ abstract class CheckoutFlutterApi {
       PlatformCommunicationModel platformCommunicationModel);
 
   void onDropInAdvancedFlowPlatformCommunication(
-      PlatformCommunicationModel platformCommunicationModel);
-
-  void onComponentCommunication(
       PlatformCommunicationModel platformCommunicationModel);
 }
 

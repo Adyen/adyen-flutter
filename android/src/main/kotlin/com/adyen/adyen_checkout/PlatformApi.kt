@@ -142,8 +142,9 @@ enum class PlatformCommunicationType(val raw: Int) {
 enum class ComponentCommunicationType(val raw: Int) {
   ONSUBMIT(0),
   ADDITIONALDETAILS(1),
-  ERROR(2),
-  RESIZE(3);
+  RESULT(2),
+  ERROR(3),
+  RESIZE(4);
 
   companion object {
     fun ofRaw(raw: Int): ComponentCommunicationType? {
@@ -472,6 +473,7 @@ data class PaymentResultDTO (
 data class PaymentResultModelDTO (
   val sessionId: String? = null,
   val sessionData: String? = null,
+  val sessionResult: String? = null,
   val resultCode: String? = null,
   val order: OrderResponseDTO? = null
 
@@ -481,17 +483,19 @@ data class PaymentResultModelDTO (
     fun fromList(list: List<Any?>): PaymentResultModelDTO {
       val sessionId = list[0] as String?
       val sessionData = list[1] as String?
-      val resultCode = list[2] as String?
-      val order: OrderResponseDTO? = (list[3] as List<Any?>?)?.let {
+      val sessionResult = list[2] as String?
+      val resultCode = list[3] as String?
+      val order: OrderResponseDTO? = (list[4] as List<Any?>?)?.let {
         OrderResponseDTO.fromList(it)
       }
-      return PaymentResultModelDTO(sessionId, sessionData, resultCode, order)
+      return PaymentResultModelDTO(sessionId, sessionData, sessionResult, resultCode, order)
     }
   }
   fun toList(): List<Any?> {
     return listOf<Any?>(
       sessionId,
       sessionData,
+      sessionResult,
       resultCode,
       order?.toList(),
     )
@@ -560,7 +564,8 @@ data class PlatformCommunicationModel (
 /** Generated class from Pigeon that represents data sent in messages. */
 data class ComponentCommunicationModel (
   val type: ComponentCommunicationType,
-  val data: Any? = null
+  val data: Any? = null,
+  val paymentResult: PaymentResultModelDTO? = null
 
 ) {
   companion object {
@@ -568,13 +573,17 @@ data class ComponentCommunicationModel (
     fun fromList(list: List<Any?>): ComponentCommunicationModel {
       val type = ComponentCommunicationType.ofRaw(list[0] as Int)!!
       val data = list[1]
-      return ComponentCommunicationModel(type, data)
+      val paymentResult: PaymentResultModelDTO? = (list[2] as List<Any?>?)?.let {
+        PaymentResultModelDTO.fromList(it)
+      }
+      return ComponentCommunicationModel(type, data, paymentResult)
     }
   }
   fun toList(): List<Any?> {
     return listOf<Any?>(
       type.raw,
       data,
+      paymentResult?.toList(),
     )
   }
 }
@@ -1091,20 +1100,6 @@ class CheckoutFlutterApi(private val binaryMessenger: BinaryMessenger) {
       } 
     }
   }
-  fun onComponentCommunication(platformCommunicationModelArg: PlatformCommunicationModel, callback: (Result<Unit>) -> Unit) {
-    val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.adyen_checkout.CheckoutFlutterApi.onComponentCommunication", codec)
-    channel.send(listOf(platformCommunicationModelArg)) {
-      if (it is List<*>) {
-        if (it.size > 1) {
-          callback(Result.failure(FlutterError(it[0] as String, it[1] as String, it[2] as String?)));
-        } else {
-          callback(Result.success(Unit));
-        }
-      } else {
-        callback(Result.failure(FlutterError("channel-error",  "Unable to establish connection on channel.", "")));
-      } 
-    }
-  }
 }
 @Suppress("UNCHECKED_CAST")
 private object ComponentPlatformInterfaceCodec : StandardMessageCodec() {
@@ -1318,17 +1313,32 @@ private object ComponentFlutterApiCodec : StandardMessageCodec() {
       }
       129.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          CardComponentConfigurationDTO.fromList(it)
+          AmountDTO.fromList(it)
         }
       }
       130.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          CardConfigurationDTO.fromList(it)
+          CardComponentConfigurationDTO.fromList(it)
         }
       }
       131.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
+          CardConfigurationDTO.fromList(it)
+        }
+      }
+      132.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
           ComponentCommunicationModel.fromList(it)
+        }
+      }
+      133.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          OrderResponseDTO.fromList(it)
+        }
+      }
+      134.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          PaymentResultModelDTO.fromList(it)
         }
       }
       else -> super.readValueOfType(type, buffer)
@@ -1340,16 +1350,28 @@ private object ComponentFlutterApiCodec : StandardMessageCodec() {
         stream.write(128)
         writeValue(stream, value.toList())
       }
-      is CardComponentConfigurationDTO -> {
+      is AmountDTO -> {
         stream.write(129)
         writeValue(stream, value.toList())
       }
-      is CardConfigurationDTO -> {
+      is CardComponentConfigurationDTO -> {
         stream.write(130)
         writeValue(stream, value.toList())
       }
-      is ComponentCommunicationModel -> {
+      is CardConfigurationDTO -> {
         stream.write(131)
+        writeValue(stream, value.toList())
+      }
+      is ComponentCommunicationModel -> {
+        stream.write(132)
+        writeValue(stream, value.toList())
+      }
+      is OrderResponseDTO -> {
+        stream.write(133)
+        writeValue(stream, value.toList())
+      }
+      is PaymentResultModelDTO -> {
+        stream.write(134)
         writeValue(stream, value.toList())
       }
       else -> super.writeValue(stream, value)

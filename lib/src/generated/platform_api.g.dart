@@ -69,6 +69,7 @@ enum PlatformCommunicationType {
 enum ComponentCommunicationType {
   onSubmit,
   additionalDetails,
+  result,
   error,
   resize,
 }
@@ -471,6 +472,7 @@ class PaymentResultModelDTO {
   PaymentResultModelDTO({
     this.sessionId,
     this.sessionData,
+    this.sessionResult,
     this.resultCode,
     this.order,
   });
@@ -478,6 +480,8 @@ class PaymentResultModelDTO {
   String? sessionId;
 
   String? sessionData;
+
+  String? sessionResult;
 
   String? resultCode;
 
@@ -487,6 +491,7 @@ class PaymentResultModelDTO {
     return <Object?>[
       sessionId,
       sessionData,
+      sessionResult,
       resultCode,
       order?.encode(),
     ];
@@ -497,9 +502,10 @@ class PaymentResultModelDTO {
     return PaymentResultModelDTO(
       sessionId: result[0] as String?,
       sessionData: result[1] as String?,
-      resultCode: result[2] as String?,
-      order: result[3] != null
-          ? OrderResponseDTO.decode(result[3]! as List<Object?>)
+      sessionResult: result[2] as String?,
+      resultCode: result[3] as String?,
+      order: result[4] != null
+          ? OrderResponseDTO.decode(result[4]! as List<Object?>)
           : null,
     );
   }
@@ -582,16 +588,20 @@ class ComponentCommunicationModel {
   ComponentCommunicationModel({
     required this.type,
     this.data,
+    this.paymentResult,
   });
 
   ComponentCommunicationType type;
 
   Object? data;
 
+  PaymentResultModelDTO? paymentResult;
+
   Object encode() {
     return <Object?>[
       type.index,
       data,
+      paymentResult?.encode(),
     ];
   }
 
@@ -600,6 +610,9 @@ class ComponentCommunicationModel {
     return ComponentCommunicationModel(
       type: ComponentCommunicationType.values[result[0]! as int],
       data: result[1],
+      paymentResult: result[2] != null
+          ? PaymentResultModelDTO.decode(result[2]! as List<Object?>)
+          : null,
     );
   }
 }
@@ -1087,8 +1100,6 @@ abstract class CheckoutFlutterApi {
 
   void onDropInAdvancedFlowPlatformCommunication(PlatformCommunicationModel platformCommunicationModel);
 
-  void onComponentCommunication(PlatformCommunicationModel platformCommunicationModel);
-
   static void setup(CheckoutFlutterApi? api, {BinaryMessenger? binaryMessenger}) {
     {
       final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
@@ -1131,31 +1142,6 @@ abstract class CheckoutFlutterApi {
               'Argument for dev.flutter.pigeon.adyen_checkout.CheckoutFlutterApi.onDropInAdvancedFlowPlatformCommunication was null, expected non-null PlatformCommunicationModel.');
           try {
             api.onDropInAdvancedFlowPlatformCommunication(arg_platformCommunicationModel!);
-            return wrapResponse(empty: true);
-          } on PlatformException catch (e) {
-            return wrapResponse(error: e);
-          }          catch (e) {
-            return wrapResponse(error: PlatformException(code: 'error', message: e.toString()));
-          }
-        });
-      }
-    }
-    {
-      final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
-          'dev.flutter.pigeon.adyen_checkout.CheckoutFlutterApi.onComponentCommunication', codec,
-          binaryMessenger: binaryMessenger);
-      if (api == null) {
-        channel.setMessageHandler(null);
-      } else {
-        channel.setMessageHandler((Object? message) async {
-          assert(message != null,
-          'Argument for dev.flutter.pigeon.adyen_checkout.CheckoutFlutterApi.onComponentCommunication was null.');
-          final List<Object?> args = (message as List<Object?>?)!;
-          final PlatformCommunicationModel? arg_platformCommunicationModel = (args[0] as PlatformCommunicationModel?);
-          assert(arg_platformCommunicationModel != null,
-              'Argument for dev.flutter.pigeon.adyen_checkout.CheckoutFlutterApi.onComponentCommunication was null, expected non-null PlatformCommunicationModel.');
-          try {
-            api.onComponentCommunication(arg_platformCommunicationModel!);
             return wrapResponse(empty: true);
           } on PlatformException catch (e) {
             return wrapResponse(error: e);
@@ -1311,14 +1297,23 @@ class _ComponentFlutterApiCodec extends StandardMessageCodec {
     if (value is AmountDTO) {
       buffer.putUint8(128);
       writeValue(buffer, value.encode());
-    } else if (value is CardComponentConfigurationDTO) {
+    } else if (value is AmountDTO) {
       buffer.putUint8(129);
       writeValue(buffer, value.encode());
-    } else if (value is CardConfigurationDTO) {
+    } else if (value is CardComponentConfigurationDTO) {
       buffer.putUint8(130);
       writeValue(buffer, value.encode());
-    } else if (value is ComponentCommunicationModel) {
+    } else if (value is CardConfigurationDTO) {
       buffer.putUint8(131);
+      writeValue(buffer, value.encode());
+    } else if (value is ComponentCommunicationModel) {
+      buffer.putUint8(132);
+      writeValue(buffer, value.encode());
+    } else if (value is OrderResponseDTO) {
+      buffer.putUint8(133);
+      writeValue(buffer, value.encode());
+    } else if (value is PaymentResultModelDTO) {
+      buffer.putUint8(134);
       writeValue(buffer, value.encode());
     } else {
       super.writeValue(buffer, value);
@@ -1331,11 +1326,17 @@ class _ComponentFlutterApiCodec extends StandardMessageCodec {
       case 128: 
         return AmountDTO.decode(readValue(buffer)!);
       case 129: 
-        return CardComponentConfigurationDTO.decode(readValue(buffer)!);
+        return AmountDTO.decode(readValue(buffer)!);
       case 130: 
-        return CardConfigurationDTO.decode(readValue(buffer)!);
+        return CardComponentConfigurationDTO.decode(readValue(buffer)!);
       case 131: 
+        return CardConfigurationDTO.decode(readValue(buffer)!);
+      case 132: 
         return ComponentCommunicationModel.decode(readValue(buffer)!);
+      case 133: 
+        return OrderResponseDTO.decode(readValue(buffer)!);
+      case 134: 
+        return PaymentResultModelDTO.decode(readValue(buffer)!);
       default:
         return super.readValueOfType(type, buffer);
     }

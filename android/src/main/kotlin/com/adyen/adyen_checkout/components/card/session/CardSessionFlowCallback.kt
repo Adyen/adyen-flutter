@@ -3,7 +3,9 @@ package com.adyen.adyen_checkout.components.card.session
 import ComponentCommunicationModel
 import ComponentCommunicationType
 import ComponentFlutterApi
+import PaymentResultModelDTO
 import android.util.Log
+import com.adyen.adyen_checkout.utils.ConfigurationMapper.mapToOrderResponseModel
 import com.adyen.checkout.card.CardComponentState
 import com.adyen.checkout.components.core.ComponentError
 import com.adyen.checkout.components.core.action.Action
@@ -16,7 +18,21 @@ class CardSessionFlowCallback(
 ) :
     SessionComponentCallback<CardComponentState> {
     override fun onFinished(result: SessionPaymentResult) {
-        TODO("Not yet implemented")
+        val paymentResult = PaymentResultModelDTO(
+            result.sessionId,
+            result.sessionData,
+            result.sessionResult,
+            result.resultCode,
+            result.order?.mapToOrderResponseModel()
+        )
+
+        val model = ComponentCommunicationModel(
+            ComponentCommunicationType.RESULT,
+            data = "",
+            paymentResult = paymentResult
+        )
+
+        componentFlutterApi.onComponentCommunication(model) {}
     }
 
     override fun onAction(action: Action) {
@@ -31,6 +47,4 @@ class CardSessionFlowCallback(
         )
         componentFlutterApi.onComponentCommunication(model) {}
     }
-
-
 }

@@ -131,6 +131,7 @@ class AdyenCheckoutPlugin : FlutterPlugin, ActivityAware {
                     PaymentResultModelDTO(
                         sessionId,
                         sessionData,
+                        sessionResult,
                         resultCode,
                         order?.mapToOrderResponseModel()
                     )

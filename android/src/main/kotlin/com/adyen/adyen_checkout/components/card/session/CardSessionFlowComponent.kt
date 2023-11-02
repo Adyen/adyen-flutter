@@ -29,6 +29,7 @@ import com.adyen.checkout.ui.core.AdyenComponentView
 import io.flutter.plugin.platform.PlatformView
 import kotlinx.coroutines.launch
 import org.json.JSONObject
+import java.util.UUID
 
 internal class CardSessionFlowComponent(
     private val activity: ComponentActivity,
@@ -74,6 +75,7 @@ internal class CardSessionFlowComponent(
                 paymentMethod = paymentMethod,
                 configuration = cardConfiguration,
                 componentCallback = CardSessionFlowCallback(componentFlutterApi) { action -> onAction(action) },
+                key = UUID.randomUUID().toString()
             )
 
             componentWrapperView.addComponent(cardComponent)

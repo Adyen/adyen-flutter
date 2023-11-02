@@ -3,25 +3,27 @@ import 'dart:async';
 import 'package:adyen_checkout/adyen_checkout.dart';
 import 'package:adyen_checkout/src/components/adyen_component_api.dart';
 import 'package:adyen_checkout/src/components/component_result_api.dart';
+import 'package:adyen_checkout/src/components/platform/android_platform_view.dart';
+import 'package:adyen_checkout/src/components/platform/ios_platform_view.dart';
 import 'package:adyen_checkout/src/generated/platform_api.g.dart';
 import 'package:adyen_checkout/src/utils/dto_mapper.dart';
 import 'package:adyen_checkout/src/utils/payment_flow_outcome_handler.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 
 class CardAdvancedFlowWidget extends StatefulWidget {
-  const CardAdvancedFlowWidget({
+  CardAdvancedFlowWidget({
+    super.key,
     required this.cardComponentConfiguration,
     required this.paymentMethods,
     required this.onPayments,
     required this.onPaymentsDetails,
     required this.onPaymentResult,
     required this.initialHeight,
-    super.key,
-  });
+    PaymentFlowOutcomeHandler? paymentFlowOutcomeHandler,
+  }) : paymentFlowOutcomeHandler =
+            paymentFlowOutcomeHandler ?? PaymentFlowOutcomeHandler();
 
   final CardComponentConfiguration cardComponentConfiguration;
   final String paymentMethods;
@@ -29,6 +31,7 @@ class CardAdvancedFlowWidget extends StatefulWidget {
   final Future<PaymentFlowOutcome> Function(String) onPaymentsDetails;
   final Future<void> Function(PaymentResult) onPaymentResult;
   final double initialHeight;
+  final PaymentFlowOutcomeHandler paymentFlowOutcomeHandler;
 
   @override
   State<CardAdvancedFlowWidget> createState() => _CardAdvancedFlowWidgetState();
@@ -36,36 +39,20 @@ class CardAdvancedFlowWidget extends StatefulWidget {
 
 class _CardAdvancedFlowWidgetState extends State<CardAdvancedFlowWidget> {
   final MessageCodec<Object?> _codec = ComponentFlutterApi.codec;
-  final AdyenComponentApi _adyenComponentApi = AdyenComponentApi();
   final ComponentResultApi _resultApi = ComponentResultApi();
-  final PaymentFlowOutcomeHandler _paymentFlowOutcomeHandler =
-      PaymentFlowOutcomeHandler();
-  late StreamController<double> _resizeStream;
+  final StreamController<double> _resizeStream = StreamController.broadcast();
+  final AdyenComponentApi _adyenComponentApi = AdyenComponentApi();
   late Widget _cardView;
 
   @override
   void initState() {
     super.initState();
 
-    _resizeStream = StreamController<double>.broadcast();
-    _resultApi.componentCommunicationStream =
-        StreamController<ComponentCommunicationModel>.broadcast();
     ComponentFlutterApi.setup(_resultApi);
-    _cardView = buildCardView();
+    _cardView = _buildPlatformCardView();
     _resultApi.componentCommunicationStream.stream
         .asBroadcastStream()
-        .listen((event) async {
-      switch (event.type) {
-        case ComponentCommunicationType.onSubmit:
-          _onSubmit(event);
-        case ComponentCommunicationType.additionalDetails:
-          _onAdditionalDetails(event);
-        case ComponentCommunicationType.error:
-          _onError(event);
-        case ComponentCommunicationType.resize:
-          _onResize(event);
-      }
-    });
+        .listen(_handleComponentCommunication);
   }
 
   @override
@@ -90,6 +77,19 @@ class _CardAdvancedFlowWidgetState extends State<CardAdvancedFlowWidget> {
     super.dispose();
   }
 
+  void _handleComponentCommunication(event) async {
+    switch (event.type) {
+      case ComponentCommunicationType.onSubmit:
+        _onSubmit(event);
+      case ComponentCommunicationType.additionalDetails:
+        _onAdditionalDetails(event);
+      case ComponentCommunicationType.error:
+        _onError(event);
+      case ComponentCommunicationType.resize:
+        _onResize(event);
+    }
+  }
+
   Future<void> _onSubmit(ComponentCommunicationModel event) async {
     final PaymentFlowOutcome paymentFlowOutcome =
         await widget.onPayments(event.data as String);
@@ -102,30 +102,53 @@ class _CardAdvancedFlowWidgetState extends State<CardAdvancedFlowWidget> {
     _handlePaymentFlowOutcome(paymentFlowOutcome);
   }
 
-  void _onError(ComponentCommunicationModel event) =>
-      widget.onPaymentResult(PaymentError(reason: event.data as String?));
+  void _onError(ComponentCommunicationModel event) {
+    String errorMessage = event.data as String;
+    widget.onPaymentResult(PaymentError(reason: errorMessage));
+    _resetCardView();
+  }
+
+  void _resetCardView() {
+    setState(() {
+      _cardView = _buildPlatformCardView();
+    });
+  }
 
   void _onResize(ComponentCommunicationModel event) =>
       _resizeStream.add(event.data as double);
 
   void _handlePaymentFlowOutcome(PaymentFlowOutcome paymentFlowOutcome) {
-    final PaymentFlowOutcomeDTO paymentFlowOutcomeDTO =
-        _paymentFlowOutcomeHandler.mapToPaymentOutcomeDTO(paymentFlowOutcome);
+    final PaymentFlowOutcomeDTO paymentFlowOutcomeDTO = widget
+        .paymentFlowOutcomeHandler
+        .mapToPaymentOutcomeDTO(paymentFlowOutcome);
     switch (paymentFlowOutcomeDTO.paymentFlowResultType) {
       case PaymentFlowResultType.finished:
-        widget.onPaymentResult(PaymentAdvancedFlowFinished(
-            resultCode: paymentFlowOutcomeDTO.result ?? ""));
-        setState(() {});
+        _onPaymentFinished(paymentFlowOutcomeDTO);
       case PaymentFlowResultType.action:
-        _adyenComponentApi.onAction(paymentFlowOutcomeDTO.actionResponse);
+        _onAction(paymentFlowOutcomeDTO);
       case PaymentFlowResultType.error:
-        widget.onPaymentResult(
-            PaymentError(reason: paymentFlowOutcomeDTO.error?.reason));
+        _onPaymentError(paymentFlowOutcomeDTO);
     }
   }
 
-  Widget buildCardView() {
-    const String viewType = 'cardComponent';
+  void _onPaymentFinished(PaymentFlowOutcomeDTO paymentFlowOutcomeDTO) {
+    widget.onPaymentResult(PaymentAdvancedFlowFinished(
+        resultCode: paymentFlowOutcomeDTO.result ?? ""));
+    _resetCardView();
+  }
+
+  void _onAction(PaymentFlowOutcomeDTO paymentFlowOutcomeDTO) =>
+      _adyenComponentApi.onAction(paymentFlowOutcomeDTO.actionResponse);
+
+  void _onPaymentError(PaymentFlowOutcomeDTO paymentFlowOutcomeDTO) {
+    widget.onPaymentResult(
+        PaymentError(reason: paymentFlowOutcomeDTO.error?.reason));
+    _resetCardView();
+  }
+
+  Widget _buildPlatformCardView() {
+    final Key key = UniqueKey();
+    const String viewType = 'cardComponentAdvancedFlow';
     final Map<String, dynamic> creationParams = <String, dynamic>{
       "paymentMethods": widget.paymentMethods,
       "cardComponentConfiguration": widget.cardComponentConfiguration.toDTO(),
@@ -133,55 +156,21 @@ class _CardAdvancedFlowWidgetState extends State<CardAdvancedFlowWidget> {
 
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
-        return buildAndroidCardView(viewType, creationParams);
-      case TargetPlatform.iOS:
-        return buildIosCardView(viewType, creationParams);
-      default:
-        throw UnsupportedError('Unsupported platform view');
-    }
-  }
-
-  Widget buildAndroidCardView(
-      String viewType, Map<String, dynamic> creationParams) {
-    SurfaceAndroidViewController surfaceAndroidViewController;
-
-    return PlatformViewLink(
-      viewType: viewType,
-      surfaceFactory: (context, controller) {
-        return AndroidViewSurface(
-          controller: controller as AndroidViewController,
-          gestureRecognizers: const <Factory<OneSequenceGestureRecognizer>>{},
-          hitTestBehavior: PlatformViewHitTestBehavior.opaque,
-        );
-      },
-      onCreatePlatformView: (params) {
-        surfaceAndroidViewController =
-            PlatformViewsService.initSurfaceAndroidView(
-          id: params.id,
+        return AndroidPlatformView(
+          key: key,
           viewType: viewType,
-          layoutDirection: TextDirection.ltr,
+          codec: _codec,
           creationParams: creationParams,
-          creationParamsCodec: _codec,
-          onFocus: () {
-            params.onFocusChanged(true);
-          },
-        )
-              ..addOnPlatformViewCreatedListener(params.onPlatformViewCreated)
-              ..create();
-
-        return surfaceAndroidViewController;
-      },
-    );
-  }
-
-  Widget buildIosCardView(
-      String viewType, Map<String, dynamic> creationParams) {
-    return UiKitView(
-      viewType: viewType,
-      layoutDirection: TextDirection.ltr,
-      creationParams: creationParams,
-      hitTestBehavior: PlatformViewHitTestBehavior.opaque,
-      creationParamsCodec: _codec,
-    );
+        );
+      case TargetPlatform.iOS:
+        return IosPlatformView(
+          key: key,
+          viewType: viewType,
+          creationParams: creationParams,
+          codec: _codec,
+        );
+      default:
+        throw UnsupportedError('Unsupported platform');
+    }
   }
 }

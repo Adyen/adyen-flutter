@@ -3,6 +3,7 @@ package com.adyen.adyen_checkout.components.card.advancedFlow
 import CardComponentConfigurationDTO
 import ComponentFlutterApi
 import android.content.Context
+import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout

@@ -90,8 +90,9 @@ enum PlatformCommunicationType: Int {
 enum ComponentCommunicationType: Int {
   case onSubmit = 0
   case additionalDetails = 1
-  case error = 2
-  case resize = 3
+  case result = 2
+  case error = 3
+  case resize = 4
 }
 
 enum PaymentFlowResultType: Int {
@@ -437,21 +438,24 @@ struct PaymentResultDTO {
 struct PaymentResultModelDTO {
   var sessionId: String? = nil
   var sessionData: String? = nil
+  var sessionResult: String? = nil
   var resultCode: String? = nil
   var order: OrderResponseDTO? = nil
 
   static func fromList(_ list: [Any?]) -> PaymentResultModelDTO? {
     let sessionId: String? = nilOrValue(list[0])
     let sessionData: String? = nilOrValue(list[1])
-    let resultCode: String? = nilOrValue(list[2])
+    let sessionResult: String? = nilOrValue(list[2])
+    let resultCode: String? = nilOrValue(list[3])
     var order: OrderResponseDTO? = nil
-    if let orderList: [Any?] = nilOrValue(list[3]) {
+    if let orderList: [Any?] = nilOrValue(list[4]) {
       order = OrderResponseDTO.fromList(orderList)
     }
 
     return PaymentResultModelDTO(
       sessionId: sessionId,
       sessionData: sessionData,
+      sessionResult: sessionResult,
       resultCode: resultCode,
       order: order
     )
@@ -460,6 +464,7 @@ struct PaymentResultModelDTO {
     return [
       sessionId,
       sessionData,
+      sessionResult,
       resultCode,
       order?.toList(),
     ]
@@ -535,20 +540,27 @@ struct PlatformCommunicationModel {
 struct ComponentCommunicationModel {
   var type: ComponentCommunicationType
   var data: Any? = nil
+  var paymentResult: PaymentResultModelDTO? = nil
 
   static func fromList(_ list: [Any?]) -> ComponentCommunicationModel? {
     let type = ComponentCommunicationType(rawValue: list[0] as! Int)!
     let data: Any? = list[1]
+    var paymentResult: PaymentResultModelDTO? = nil
+    if let paymentResultList: [Any?] = nilOrValue(list[2]) {
+      paymentResult = PaymentResultModelDTO.fromList(paymentResultList)
+    }
 
     return ComponentCommunicationModel(
       type: type,
-      data: data
+      data: data,
+      paymentResult: paymentResult
     )
   }
   func toList() -> [Any?] {
     return [
       type.rawValue,
       data,
+      paymentResult?.toList(),
     ]
   }
 }
@@ -974,7 +986,6 @@ class CheckoutFlutterApiCodec: FlutterStandardMessageCodec {
 protocol CheckoutFlutterApiProtocol {
   func onDropInSessionPlatformCommunication(platformCommunicationModel platformCommunicationModelArg: PlatformCommunicationModel, completion: @escaping (Result<Void, FlutterError>) -> Void) 
   func onDropInAdvancedFlowPlatformCommunication(platformCommunicationModel platformCommunicationModelArg: PlatformCommunicationModel, completion: @escaping (Result<Void, FlutterError>) -> Void) 
-  func onComponentCommunication(platformCommunicationModel platformCommunicationModelArg: PlatformCommunicationModel, completion: @escaping (Result<Void, FlutterError>) -> Void) 
 }
 class CheckoutFlutterApi: CheckoutFlutterApiProtocol {
   private let binaryMessenger: FlutterBinaryMessenger
@@ -992,12 +1003,6 @@ class CheckoutFlutterApi: CheckoutFlutterApiProtocol {
   }
   func onDropInAdvancedFlowPlatformCommunication(platformCommunicationModel platformCommunicationModelArg: PlatformCommunicationModel, completion: @escaping (Result<Void, FlutterError>) -> Void)  {
     let channel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.CheckoutFlutterApi.onDropInAdvancedFlowPlatformCommunication", binaryMessenger: binaryMessenger, codec: codec)
-    channel.sendMessage([platformCommunicationModelArg] as [Any?]) { _ in
-      completion(.success(Void()))
-    }
-  }
-  func onComponentCommunication(platformCommunicationModel platformCommunicationModelArg: PlatformCommunicationModel, completion: @escaping (Result<Void, FlutterError>) -> Void)  {
-    let channel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.CheckoutFlutterApi.onComponentCommunication", binaryMessenger: binaryMessenger, codec: codec)
     channel.sendMessage([platformCommunicationModelArg] as [Any?]) { _ in
       completion(.success(Void()))
     }
@@ -1153,11 +1158,17 @@ private class ComponentFlutterApiCodecReader: FlutterStandardReader {
       case 128:
         return AmountDTO.fromList(self.readValue() as! [Any?])
       case 129:
-        return CardComponentConfigurationDTO.fromList(self.readValue() as! [Any?])
+        return AmountDTO.fromList(self.readValue() as! [Any?])
       case 130:
-        return CardConfigurationDTO.fromList(self.readValue() as! [Any?])
+        return CardComponentConfigurationDTO.fromList(self.readValue() as! [Any?])
       case 131:
+        return CardConfigurationDTO.fromList(self.readValue() as! [Any?])
+      case 132:
         return ComponentCommunicationModel.fromList(self.readValue() as! [Any?])
+      case 133:
+        return OrderResponseDTO.fromList(self.readValue() as! [Any?])
+      case 134:
+        return PaymentResultModelDTO.fromList(self.readValue() as! [Any?])
       default:
         return super.readValue(ofType: type)
     }
@@ -1169,14 +1180,23 @@ private class ComponentFlutterApiCodecWriter: FlutterStandardWriter {
     if let value = value as? AmountDTO {
       super.writeByte(128)
       super.writeValue(value.toList())
-    } else if let value = value as? CardComponentConfigurationDTO {
+    } else if let value = value as? AmountDTO {
       super.writeByte(129)
       super.writeValue(value.toList())
-    } else if let value = value as? CardConfigurationDTO {
+    } else if let value = value as? CardComponentConfigurationDTO {
       super.writeByte(130)
       super.writeValue(value.toList())
-    } else if let value = value as? ComponentCommunicationModel {
+    } else if let value = value as? CardConfigurationDTO {
       super.writeByte(131)
+      super.writeValue(value.toList())
+    } else if let value = value as? ComponentCommunicationModel {
+      super.writeByte(132)
+      super.writeValue(value.toList())
+    } else if let value = value as? OrderResponseDTO {
+      super.writeByte(133)
+      super.writeValue(value.toList())
+    } else if let value = value as? PaymentResultModelDTO {
+      super.writeByte(134)
       super.writeValue(value.toList())
     } else {
       super.writeValue(value)
