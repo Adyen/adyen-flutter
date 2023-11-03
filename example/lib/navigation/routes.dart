@@ -64,7 +64,7 @@ Widget buildCardWidget(
       onPaymentsDetails: repository.postPaymentsDetails,
     ),
     onPaymentResult: (event) async {
-      Navigator.pop(context);
+      //Navigator.pop(context);
       _dialogBuilder(context, event);
     },
   );

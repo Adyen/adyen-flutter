@@ -93,6 +93,7 @@ internal class CardSessionFlowComponent(
     }
 
     override fun dispose() {
+        cardComponent.delegate.onCleared()
         ComponentMessenger.instance().removeObservers(activity)
     }
 

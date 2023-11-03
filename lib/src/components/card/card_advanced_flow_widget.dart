@@ -134,7 +134,7 @@ class _CardAdvancedFlowWidgetState extends State<CardAdvancedFlowWidget> {
   void _onPaymentFinished(PaymentFlowOutcomeDTO paymentFlowOutcomeDTO) {
     widget.onPaymentResult(PaymentAdvancedFlowFinished(
         resultCode: paymentFlowOutcomeDTO.result ?? ""));
-    _resetCardView();
+    //_resetCardView();
   }
 
   void _onAction(PaymentFlowOutcomeDTO paymentFlowOutcomeDTO) =>

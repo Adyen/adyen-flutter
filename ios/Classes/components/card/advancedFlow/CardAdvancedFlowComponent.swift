@@ -1,91 +1,86 @@
 import Flutter
 
-@_spi(AdyenInternal) import Adyen
+@_spi(AdyenInternal)
+import Adyen
 import AdyenNetworking
 
-class CardComponentViewFactory: NSObject, FlutterPlatformViewFactory {
-    private var messenger: FlutterBinaryMessenger
-    private let componentFlutterApi: ComponentFlutterApi
-
-    init(messenger: FlutterBinaryMessenger, componentFlutterApi: ComponentFlutterApi) {
-        self.messenger = messenger
-        self.componentFlutterApi = componentFlutterApi
-        super.init()
-    }
-
-    func create(
-        withFrame frame: CGRect,
-        viewIdentifier viewId: Int64,
-        arguments args: Any?
-    ) -> FlutterPlatformView {
-        return FLNativeView(
-            frame: frame,
-            viewIdentifier: viewId,
-            arguments: args,
-            binaryMessenger: messenger,
-            componentFlutterApi: componentFlutterApi
-        )
-    }
-
-    /// Implementing this method is only necessary when the `arguments` in `createWithFrame` is not `nil`.
-    public func createArgsCodec() -> FlutterMessageCodec & NSObjectProtocol {
-         // return FlutterStandardMessageCodec.sharedInstance()
-        return componentFlutterApi.codec
-    }
-}
-
-class FLNativeView: NSObject, FlutterPlatformView, PaymentComponentDelegate {
-    func didSubmit(_ data: Adyen.PaymentComponentData, from component: Adyen.PaymentComponent) {
-        print("DID SUBMIT")
-        do {
-            let paymentComponentData = PaymentComponentDataResponse(amount: data.amount, paymentMethod: data.paymentMethod.encodable, storePaymentMethod: data.storePaymentMethod, order: data.order, amountToPay: data.order?.remainingAmount, installments: data.installments, shopperName: data.shopperName, emailAddress: data.emailAddress, telephoneNumber: data.telephoneNumber, browserInfo: data.browserInfo, checkoutAttemptId: data.checkoutAttemptId, billingAddress: data.billingAddress, deliveryAddress: data.deliveryAddress, socialSecurityNumber: data.socialSecurityNumber, delegatedAuthenticationData: data.delegatedAuthenticationData)
-            let paymentComponentJson = try JSONEncoder().encode(paymentComponentData)
-            let paymentComponentString = String(data: paymentComponentJson, encoding: .utf8)
-            componentFlutterApi.onComponentCommunication(componentCommunicationModel: ComponentCommunicationModel(type: ComponentCommunicationType.paymentComponent, data: paymentComponentString), completion: { _ in })
-        } catch {
-        }
-    }
+class FLNativeView: NSObject, FlutterPlatformView {
     
-    func didFail(with error: Error, from component: Adyen.PaymentComponent) {
-        print("DID FAILL")
-
-    }
-    
-    private var _view: TestView
+    private var componentWrapperView: ComponentWrapperView = ComponentWrapperView(resizeViewport: {})
     private var cardComponent : CardComponent?
     private var rootViewController : UIViewController?
     private let componentFlutterApi: ComponentFlutterApi
+    private let componentPlatformApi: ComponentPlatformApi
+    private var componentDelegate: CardAdvancedFlowDelegate?
     
-    private var testView: TestView?
+    
+    private var adyenActionComponent: AdyenActionComponent?
+  
     
     init(
         frame: CGRect,
         viewIdentifier viewId: Int64,
-        arguments args: Any?,
-        binaryMessenger messenger: FlutterBinaryMessenger?,
+        arguments: NSDictionary,
+        binaryMessenger: FlutterBinaryMessenger,
         componentFlutterApi: ComponentFlutterApi
     ) {
         self.componentFlutterApi = componentFlutterApi
-        _view = TestView(handler: {
-        })
-        //_view = TestView()
+        self.componentPlatformApi = ComponentPlatformApi(onActionCallback: {_ in })
+        
+        
         super.init()
         
-        // iOS views can be created here
-        createNativeView(view: _view, args: args as! NSDictionary)
+        self.adyenActionComponent = createActionComponent(arguments: arguments)
+
+        ComponentPlatformInterfaceSetup.setUp(binaryMessenger: binaryMessenger, api: componentPlatformApi)
+        self.componentPlatformApi.onActionCallback = { [weak self] jsonActionResponse in
+            self?.onAction(actionResponse: jsonActionResponse)
+        }
+        
+        createNativeView(args: arguments)
+    }
+    
+    func createActionComponent(arguments: NSDictionary) -> AdyenActionComponent? {
+        do {
+            let cardComponentConfiguration = arguments.value(forKey: "cardComponentConfiguration") as! CardComponentConfigurationDTO
+            let apiContext = try APIContext(environment: Adyen.Environment.test, clientKey: cardComponentConfiguration.clientKey)
+            let adyenContext = AdyenContext(apiContext: apiContext,
+                                            payment: Payment(amount: Amount(value: 2100, currencyCode: "EUR"), countryCode: "NL"))
+            
+            return AdyenActionComponent(context: adyenContext)
+        } catch {
+            return nil
+        }
+    }
+    
+    func onAction(actionResponse: [String? : Any?]) {
+        do {
+            let jsonData = try JSONSerialization.data(withJSONObject: actionResponse, options: [])
+            let action = try JSONDecoder().decode(Action.self, from: jsonData)
+            adyenActionComponent?.handle(action)
+            print("ACTION")
+        }catch {
+            print("ERRROR ACTION")
+        }
+        
+     
     }
 
     func view() -> UIView {
-        return _view
+        return componentWrapperView
     }
 
-    func createNativeView(view _view: TestView, args: NSDictionary){
+    func createNativeView(args: NSDictionary){
         
-        _view.handler = {
+        componentWrapperView.resizeViewportCallback = {
             var height = self.cardComponent?.viewController.preferredContentSize.height ?? 0
             height += 16 //Bottom View
             self.componentFlutterApi.onComponentCommunication(componentCommunicationModel: ComponentCommunicationModel(type: ComponentCommunicationType.resize, data: height), completion: {_ in })
         }
+        
+     
+        
+       
         
         do {
             
@@ -94,13 +89,16 @@ class FLNativeView: NSObject, FlutterPlatformView, PaymentComponentDelegate {
             
             let paymentMethods = try JSONDecoder().decode(PaymentMethods.self, from: Data(paymentMethodsResponse.utf8))
             let component = try cardComponent(from: paymentMethods, cardComponentConfiguration: cardComponentConfiguration)
-            component.delegate = self
+            componentDelegate = CardAdvancedFlowDelegate(componentFlutterApi: componentFlutterApi)
+            component.delegate = componentDelegate
             self.cardComponent = component
             let componentViewController = component.viewController
             
             
             rootViewController = getViewController()
             rootViewController?.addChild(componentViewController)
+            
+            
 
                         
             componentViewController.view.frame = CGRect(x:0.0, y:0.0, width: 0, height:0)
@@ -112,17 +110,17 @@ class FLNativeView: NSObject, FlutterPlatformView, PaymentComponentDelegate {
             //let formViewController = componentViewController.children[0]
             
             let cardView = componentViewController.view!
-            _view.addSubview(cardView)
+            componentWrapperView.addSubview(cardView)
             
             //_view.translatesAutoresizingMaskIntoConstraints = false
             //cardView.adyen.anchor(inside: _view)
             
             
             cardView.translatesAutoresizingMaskIntoConstraints = false
-            let horizontalConstraint1 = cardView.leadingAnchor.constraint(equalTo: _view.leadingAnchor)
-            let horizontalConstraint2 = cardView.trailingAnchor.constraint(equalTo: _view.trailingAnchor)
-            let horizontalConstraint3 = cardView.topAnchor.constraint(equalTo: _view.topAnchor)
-            let horizontalConstraint4 = cardView.bottomAnchor.constraint(equalTo: _view.bottomAnchor)
+            let horizontalConstraint1 = cardView.leadingAnchor.constraint(equalTo: componentWrapperView.leadingAnchor)
+            let horizontalConstraint2 = cardView.trailingAnchor.constraint(equalTo: componentWrapperView.trailingAnchor)
+            let horizontalConstraint3 = cardView.topAnchor.constraint(equalTo: componentWrapperView.topAnchor)
+            let horizontalConstraint4 = cardView.bottomAnchor.constraint(equalTo: componentWrapperView.bottomAnchor)
             NSLayoutConstraint.activate([horizontalConstraint1, horizontalConstraint2, horizontalConstraint3, horizontalConstraint4])
             
             
@@ -131,7 +129,7 @@ class FLNativeView: NSObject, FlutterPlatformView, PaymentComponentDelegate {
 
             DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
                 print("Form height: \(componentViewController.preferredContentSize.height)")
-                print("Container view height: \(_view.frame.height)")
+                print("Container view height: \(self.componentWrapperView.frame.height)")
             }
             
             //NotificationCenter.default.addObserver(self, selector: #selector(checkSize(notification:)), name: .updateSize, object: nil)
