@@ -32,20 +32,20 @@ class DropInAdvancedFlowDelegate: DropInComponentDelegate {
     }
 
     func didComplete(from _: ActionComponent, in _: AnyDropInComponent) {
-        dropInInteractorDelegate?.finalizeAndDismiss(success:true) { [weak self] in
+        dropInInteractorDelegate?.finalizeAndDismiss(success: true) { [weak self] in
             let paymentResult = PaymentResultDTO(type: PaymentResultEnum.finished, result: PaymentResultModelDTO(resultCode: ResultCode.received.rawValue))
             let platformCommunicationModel = PlatformCommunicationModel(type: PlatformCommunicationType.result, paymentResult: paymentResult)
             self?.checkoutFlutterApi.onDropInAdvancedFlowPlatformCommunication(platformCommunicationModel: platformCommunicationModel, completion: { _ in })
         }
     }
 
-    func didFail(with error: Error, from _: PaymentComponent, in dropInComponent: AnyDropInComponent) {
+    func didFail(with error: Error, from _: PaymentComponent, in _: AnyDropInComponent) {
         dropInInteractorDelegate?.finalizeAndDismiss(success: false) { [weak self] in
             self?.sendErrorToFlutterLayer(error: error)
         }
     }
 
-    func didFail(with error: Error, from _: ActionComponent, in dropInComponent: AnyDropInComponent) {
+    func didFail(with error: Error, from _: ActionComponent, in _: AnyDropInComponent) {
         dropInInteractorDelegate?.finalizeAndDismiss(success: false) { [weak self] in
             self?.sendErrorToFlutterLayer(error: error)
         }

@@ -1,13 +1,13 @@
 import Flutter
 
 class CardComponentViewFactory: NSObject, FlutterPlatformViewFactory {
-    private var messenger: FlutterBinaryMessenger
+    private let messenger: FlutterBinaryMessenger
     private let componentFlutterApi: ComponentFlutterApi
 
     init(messenger: FlutterBinaryMessenger, componentFlutterApi: ComponentFlutterApi) {
         self.messenger = messenger
         self.componentFlutterApi = componentFlutterApi
-       
+
         super.init()
     }
 
@@ -16,10 +16,10 @@ class CardComponentViewFactory: NSObject, FlutterPlatformViewFactory {
         viewIdentifier viewId: Int64,
         arguments args: Any?
     ) -> FlutterPlatformView {
-        return FLNativeView(
+        return CardAdvancedFlowComponent(
             frame: frame,
             viewIdentifier: viewId,
-            arguments: args as! NSDictionary,
+            arguments: args as? NSDictionary ?? [:],
             binaryMessenger: messenger,
             componentFlutterApi: componentFlutterApi
         )

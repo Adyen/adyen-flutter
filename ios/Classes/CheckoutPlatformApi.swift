@@ -242,8 +242,8 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
     }
 }
 
-extension CheckoutPlatformApi : DropInInteractorDelegate {
-    func finalizeAndDismiss(success: Bool,  completion: @escaping (() -> Void)) {
+extension CheckoutPlatformApi: DropInInteractorDelegate {
+    func finalizeAndDismiss(success: Bool, completion: @escaping (() -> Void)) {
         dropInComponent?.finalizeIfNeeded(with: success) { [weak self] in
             self?.viewController?.dismiss(animated: true, completion: {
                 completion()
