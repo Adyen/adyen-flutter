@@ -26,12 +26,17 @@ class FirstRoute extends StatelessWidget {
                 );
               } else {
                 return SingleChildScrollView(
+                  physics: const ClampingScrollPhysics(),
                   child: Column(
                     children: [
-                      buildCardWidget(snapshot.data!, context, repository),
-                      Container(height: 300, color: Colors.blue),
-                      Container(height: 300, color: Colors.green),
-                      Container(height: 300, color: Colors.yellow),
+                      Container(height: 200, color: Colors.blue),
+                      buildCardWidget(
+                        snapshot.data!,
+                        context,
+                        repository,
+                      ),
+                      Container(height: 200, color: Colors.yellow),
+                      Container(height: 200, color: Colors.green),
                     ],
                   ),
                 );
