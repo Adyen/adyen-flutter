@@ -9,6 +9,7 @@ class CardAdvancedFlowComponent: NSObject, FlutterPlatformView {
     private let componentWrapperView: ComponentWrapperView
     private let actionComponentDelegate: ActionComponentDelegate
     private let presentationDelegate: PresentationDelegate
+    private let configurationMapper: ConfigurationMapper
     private let initialFrame: CGRect
     private var cardComponent: CardComponent?
     private var cardDelegate: CardAdvancedFlowDelegate?
@@ -27,11 +28,20 @@ class CardAdvancedFlowComponent: NSObject, FlutterPlatformView {
         actionComponentDelegate = CardAdvancedFlowActionComponentDelegate(componentFlutterApi: componentFlutterApi)
         presentationDelegate = CardAdvancedFlowPresentationDelegate()
         componentWrapperView = .init()
+        configurationMapper = ConfigurationMapper()
         initialFrame = frame
         super.init()
 
         ComponentPlatformInterfaceSetup.setUp(binaryMessenger: binaryMessenger, api: componentPlatformApi)
         setupCallbacks()
+        setupCardView(arguments: arguments)
+    }
+
+    func view() -> UIView {
+        return componentWrapperView
+    }
+    
+    private func setupCardView(arguments: NSDictionary) {
         do {
             let cardView = try createCardComponentView(arguments: arguments)
             componentWrapperView.addSubview(cardView)
@@ -39,10 +49,6 @@ class CardAdvancedFlowComponent: NSObject, FlutterPlatformView {
         } catch {
             // TODO: Dispaly error
         }
-    }
-
-    func view() -> UIView {
-        return componentWrapperView
     }
 
     private func setupCallbacks() {
@@ -61,10 +67,9 @@ class CardAdvancedFlowComponent: NSObject, FlutterPlatformView {
         guard let paymentMethodsResponse = arguments.value(forKey: "paymentMethods") as? String else { throw PlatformError(errorDescription: "Payment methods not provided") }
         guard let cardComponentConfiguration = arguments.value(forKey: "cardComponentConfiguration") as? CardComponentConfigurationDTO else { throw PlatformError(errorDescription: "Card configuration not provided") }
         let paymentMethods = try JSONDecoder().decode(PaymentMethods.self, from: Data(paymentMethodsResponse.utf8))
-        cardComponent = try buildCardComponent(from: paymentMethods, cardComponentConfiguration: cardComponentConfiguration)
+        cardComponent = try buildCardComponent(paymentMethods: paymentMethods, cardComponentConfiguration: cardComponentConfiguration)
         cardDelegate = CardAdvancedFlowDelegate(componentFlutterApi: componentFlutterApi)
         cardComponent?.delegate = cardDelegate
-        actionComponent = createActionComponent(arguments: arguments)
         guard let componentViewController = cardComponent?.viewController else { throw PlatformError(errorDescription: "Failed to initialize card component") }
         guard let cardView = componentViewController.view else { throw PlatformError(errorDescription: "Failed to get card component view") }
         componentViewController.view.frame = initialFrame
@@ -91,47 +96,32 @@ class CardAdvancedFlowComponent: NSObject, FlutterPlatformView {
         NSLayoutConstraint.activate([leadingConstraint, trailingConstraint, topConstraint, bottomConstraint])
     }
 
-    private func buildCardComponent(from paymentMethods: PaymentMethods, cardComponentConfiguration: CardComponentConfigurationDTO) throws -> CardComponent {
-        let context = try APIContext(environment: Adyen.Environment.test, clientKey: cardComponentConfiguration.clientKey)
-        let adyenContext = AdyenContext(apiContext: context,
-                                        payment: Payment(amount: Amount(value: 2100, currencyCode: "EUR"), countryCode: "NL"),
-                                        analyticsConfiguration: AnalyticsConfiguration())
-
+    private func buildCardComponent(paymentMethods: PaymentMethods, cardComponentConfiguration: CardComponentConfigurationDTO) throws -> CardComponent {
         guard let paymentMethod = paymentMethods.paymentMethod(ofType: CardPaymentMethod.self) else {
-            throw PlatformError(errorDescription: "error")
+            throw PlatformError(errorDescription: "Card payment method not provided")
         }
 
-        let component = CardComponent(paymentMethod: paymentMethod,
-                                      context: adyenContext,
-                                      configuration: cardComponentConfiguration.cardConfiguration.toCardComponentConfiguration())
-        component.cardComponentDelegate = self
-        return component
+        let adyenContext = try cardComponentConfiguration.createAdyenContext()
+        let cardConfiguration = cardComponentConfiguration.cardConfiguration.mapToCardComponentConfiguration()
+        let cardComponent = CardComponent(paymentMethod: paymentMethod, context: adyenContext, configuration: cardConfiguration)
+        actionComponent = try buildActionComponent(adyenContext: adyenContext)
+        return cardComponent
     }
 
-    private func createActionComponent(arguments: NSDictionary) -> AdyenActionComponent? {
-        do {
-            let cardComponentConfiguration = arguments.value(forKey: "cardComponentConfiguration") as! CardComponentConfigurationDTO
-            let apiContext = try APIContext(environment: Adyen.Environment.test, clientKey: cardComponentConfiguration.clientKey)
-            let adyenContext = AdyenContext(apiContext: apiContext,
-                                            payment: Payment(amount: Amount(value: 2100, currencyCode: "EUR"), countryCode: "NL"))
-
-            let component = AdyenActionComponent(context: adyenContext)
-            component.delegate = actionComponentDelegate
-            component.presentationDelegate = presentationDelegate
-
-            return component
-        } catch {
-            return nil
-        }
+    private func buildActionComponent(adyenContext: AdyenContext) throws -> AdyenActionComponent {
+        let adyenActionComponent = AdyenActionComponent(context: adyenContext)
+        adyenActionComponent.delegate = actionComponentDelegate
+        adyenActionComponent.presentationDelegate = presentationDelegate
+        return adyenActionComponent
     }
 
-    func onAction(actionResponse: [String?: Any?]) {
+    private func onAction(actionResponse: [String?: Any?]) {
         do {
             let jsonData = try JSONSerialization.data(withJSONObject: actionResponse, options: [])
             let action = try JSONDecoder().decode(Action.self, from: jsonData)
             actionComponent?.handle(action)
         } catch {
-            print("ERRROR ACTION")
+            print("Error in handling action")
         }
     }
 
@@ -148,96 +138,5 @@ class CardAdvancedFlowComponent: NSObject, FlutterPlatformView {
         }
 
         return rootViewController
-    }
-}
-
-extension CardAdvancedFlowComponent: CardComponentDelegate {
-    func didSubmit(lastFour: String, finalBIN: String, component _: CardComponent) {
-        print("Card used: **** **** **** \(lastFour)")
-        print("Final BIN: \(finalBIN)")
-    }
-
-    func didChangeBIN(_ value: String, component _: CardComponent) {
-        print("Current BIN: \(value)")
-    }
-
-    func didChangeCardBrand(_ value: [CardBrand]?, component _: CardComponent) {
-        print("Current card type: \((value ?? []).reduce("") { "\($0), \($1)" })")
-    }
-}
-
-/*
-  extension FormView {
-
-      public override func layoutSubviews() {
-          super.layoutSubviews()
-
-          //print("Form layout subviews")
-          //NotificationCenter.default.post(name: .updateSize, object: nil)
-      }
-  }
-
- extension FormViewController {
-     override open func viewDidLayoutSubviews() {
-         super.viewDidLayoutSubviews()
-
-         print("Did layout")
-     }
- }
-
-  */
-
-extension CardConfigurationDTO {
-    func toCardComponentConfiguration() -> CardComponent.Configuration {
-        var formComponentStyle = FormComponentStyle()
-        formComponentStyle.backgroundColor = UIColor.clear
-        let koreanAuthenticationMode = kcpFieldVisibility.toCardFieldVisibility()
-        let socialSecurityNumberMode = socialSecurityNumberFieldVisibility.toCardFieldVisibility()
-        let storedCardConfiguration = createStoredCardConfiguration(showCvcForStoredCard: showCvcForStoredCard)
-        let allowedCardTypes = determineAllowedCardTypes(cardTypes: supportedCardTypes)
-        let billingAddressConfiguration = determineBillingAddressConfiguration(addressMode: addressMode)
-        let cardConfiguration = CardComponent.Configuration(
-            style: formComponentStyle,
-            showsHolderNameField: holderNameRequired,
-            showsStorePaymentMethodField: showStorePaymentField,
-            showsSecurityCodeField: showCvc,
-            koreanAuthenticationMode: koreanAuthenticationMode,
-            socialSecurityNumberMode: socialSecurityNumberMode,
-            storedCardConfiguration: storedCardConfiguration,
-            allowedCardTypes: allowedCardTypes,
-            billingAddress: billingAddressConfiguration
-        )
-
-        return cardConfiguration
-    }
-
-    private func createStoredCardConfiguration(showCvcForStoredCard: Bool) -> StoredCardConfiguration {
-        var storedCardConfiguration = StoredCardConfiguration()
-        storedCardConfiguration.showsSecurityCodeField = showCvcForStoredCard
-        return storedCardConfiguration
-    }
-
-    private func determineAllowedCardTypes(cardTypes: [String?]?) -> [CardType]? {
-        guard let mappedCardTypes = cardTypes, !mappedCardTypes.isEmpty else {
-            return nil
-        }
-
-        return mappedCardTypes.compactMap { $0 }.map { CardType(rawValue: $0.lowercased()) }
-    }
-
-    private func determineBillingAddressConfiguration(addressMode: AddressMode?) -> BillingAddressConfiguration {
-        var billingAddressConfiguration = BillingAddressConfiguration()
-        switch addressMode {
-        case .full:
-            billingAddressConfiguration.mode = CardComponent.AddressFormType.full
-        case .postalCode:
-            billingAddressConfiguration.mode = CardComponent.AddressFormType.postalCode
-        case .none?:
-            billingAddressConfiguration.mode = CardComponent.AddressFormType.none
-        default:
-            billingAddressConfiguration.mode = CardComponent.AddressFormType.none
-        }
-
-        return billingAddressConfiguration
     }
 }
