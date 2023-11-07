@@ -9,8 +9,7 @@ class CardAdvancedFlowComponent: NSObject, FlutterPlatformView {
     private let componentWrapperView: ComponentWrapperView
     private let actionComponentDelegate: ActionComponentDelegate
     private let presentationDelegate: PresentationDelegate
-    private let initialFrame : CGRect
-    
+    private let initialFrame: CGRect
     private var cardComponent: CardComponent?
     private var cardDelegate: CardAdvancedFlowDelegate?
     private var actionComponent: AdyenActionComponent?
@@ -33,49 +32,48 @@ class CardAdvancedFlowComponent: NSObject, FlutterPlatformView {
 
         ComponentPlatformInterfaceSetup.setUp(binaryMessenger: binaryMessenger, api: componentPlatformApi)
         setupCallbacks()
-        
         do {
             let cardView = try createCardComponentView(arguments: arguments)
             componentWrapperView.addSubview(cardView)
             adjustCardComponentLayout(cardView: cardView)
         } catch {
-            //TODO Dispaly error
+            // TODO: Dispaly error
         }
     }
 
     func view() -> UIView {
         return componentWrapperView
     }
-    
+
     private func setupCallbacks() {
         componentWrapperView.resizeViewportCallback = {
-            var viewHeight = Double(round(100 * (self.cardComponent?.viewController.preferredContentSize.height ?? 0) ) / 100)
-            viewHeight += 32  //TODO adjust view by preventing clamping scroll to prevent bottom view overscroll
+            var viewHeight = Double(round(100 * (self.cardComponent?.viewController.preferredContentSize.height ?? 0)) / 100)
+            viewHeight += 32 // TODO: adjust view by preventing clamping scroll to prevent bottom view overscroll
             self.componentFlutterApi.onComponentCommunication(componentCommunicationModel: ComponentCommunicationModel(type: ComponentCommunicationType.resize, data: viewHeight), completion: { _ in })
         }
-        
+
         componentPlatformApi.onActionCallback = { [weak self] jsonActionResponse in
             self?.onAction(actionResponse: jsonActionResponse)
         }
     }
 
-    private func createCardComponentView(arguments: NSDictionary) throws -> UIView  {
-            guard let paymentMethodsResponse = arguments.value(forKey: "paymentMethods") as? String else { throw PlatformError(errorDescription: "Payment methods not provided") }
-            guard let cardComponentConfiguration = arguments.value(forKey: "cardComponentConfiguration") as? CardComponentConfigurationDTO else { throw PlatformError(errorDescription: "Card configuration not provided")  }
-            let paymentMethods = try JSONDecoder().decode(PaymentMethods.self, from: Data(paymentMethodsResponse.utf8))
-            cardComponent = try buildCardComponent(from: paymentMethods, cardComponentConfiguration: cardComponentConfiguration)
-            cardDelegate = CardAdvancedFlowDelegate(componentFlutterApi: componentFlutterApi)
-            cardComponent?.delegate = cardDelegate
-            actionComponent = createActionComponent(arguments: arguments)
-            guard let componentViewController = cardComponent?.viewController else { throw PlatformError(errorDescription: "Failed to initialize card component")}
-            guard let cardView = componentViewController.view else {throw PlatformError(errorDescription: "Failed to get card component view")}
-            componentViewController.view.frame = initialFrame
-            rootViewController = getViewController()
-            rootViewController?.addChild(componentViewController)
-            disableNativeScrollingAndBouncing(componentViewController: componentViewController)
-            return cardView
+    private func createCardComponentView(arguments: NSDictionary) throws -> UIView {
+        guard let paymentMethodsResponse = arguments.value(forKey: "paymentMethods") as? String else { throw PlatformError(errorDescription: "Payment methods not provided") }
+        guard let cardComponentConfiguration = arguments.value(forKey: "cardComponentConfiguration") as? CardComponentConfigurationDTO else { throw PlatformError(errorDescription: "Card configuration not provided") }
+        let paymentMethods = try JSONDecoder().decode(PaymentMethods.self, from: Data(paymentMethodsResponse.utf8))
+        cardComponent = try buildCardComponent(from: paymentMethods, cardComponentConfiguration: cardComponentConfiguration)
+        cardDelegate = CardAdvancedFlowDelegate(componentFlutterApi: componentFlutterApi)
+        cardComponent?.delegate = cardDelegate
+        actionComponent = createActionComponent(arguments: arguments)
+        guard let componentViewController = cardComponent?.viewController else { throw PlatformError(errorDescription: "Failed to initialize card component") }
+        guard let cardView = componentViewController.view else { throw PlatformError(errorDescription: "Failed to get card component view") }
+        componentViewController.view.frame = initialFrame
+        rootViewController = getViewController()
+        rootViewController?.addChild(componentViewController)
+        disableNativeScrollingAndBouncing(componentViewController: componentViewController)
+        return cardView
     }
-    
+
     private func disableNativeScrollingAndBouncing(componentViewController: UIViewController) {
         let formView = componentViewController.view.subviews[0].subviews[0] as? UIScrollView
         formView?.bounces = false
@@ -83,8 +81,8 @@ class CardAdvancedFlowComponent: NSObject, FlutterPlatformView {
         formView?.alwaysBounceVertical = false
         formView?.contentInsetAdjustmentBehavior = .never
     }
-    
-    private func adjustCardComponentLayout(cardView : UIView) {
+
+    private func adjustCardComponentLayout(cardView: UIView) {
         cardView.translatesAutoresizingMaskIntoConstraints = false
         let leadingConstraint = cardView.leadingAnchor.constraint(equalTo: componentWrapperView.leadingAnchor)
         let trailingConstraint = cardView.trailingAnchor.constraint(equalTo: componentWrapperView.trailingAnchor)
@@ -105,13 +103,11 @@ class CardAdvancedFlowComponent: NSObject, FlutterPlatformView {
 
         let component = CardComponent(paymentMethod: paymentMethod,
                                       context: adyenContext,
-                                      configuration: cardComponentConfiguration.cardConfiguration.toCardComponentConfiguration()
-                                    )
+                                      configuration: cardComponentConfiguration.cardConfiguration.toCardComponentConfiguration())
         component.cardComponentDelegate = self
         return component
     }
 
-    
     private func createActionComponent(arguments: NSDictionary) -> AdyenActionComponent? {
         do {
             let cardComponentConfiguration = arguments.value(forKey: "cardComponentConfiguration") as! CardComponentConfigurationDTO
@@ -170,34 +166,29 @@ extension CardAdvancedFlowComponent: CardComponentDelegate {
     }
 }
 
-
-
 /*
- extension FormView {
+  extension FormView {
 
-     public override func layoutSubviews() {
-         super.layoutSubviews()
+      public override func layoutSubviews() {
+          super.layoutSubviews()
 
-         //print("Form layout subviews")
-         //NotificationCenter.default.post(name: .updateSize, object: nil)
+          //print("Form layout subviews")
+          //NotificationCenter.default.post(name: .updateSize, object: nil)
+      }
+  }
+
+ extension FormViewController {
+     override open func viewDidLayoutSubviews() {
+         super.viewDidLayoutSubviews()
+
+         print("Did layout")
      }
  }
-  
 
-extension FormViewController {
-    override open func viewDidLayoutSubviews() {
-        super.viewDidLayoutSubviews()
+  */
 
-        print("Did layout")
-    }
-}
-
- */
-
- 
 extension CardConfigurationDTO {
     func toCardComponentConfiguration() -> CardComponent.Configuration {
-        
         var formComponentStyle = FormComponentStyle()
         formComponentStyle.backgroundColor = UIColor.clear
         let koreanAuthenticationMode = kcpFieldVisibility.toCardFieldVisibility()
