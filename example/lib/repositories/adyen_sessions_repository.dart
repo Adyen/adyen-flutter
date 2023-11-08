@@ -10,6 +10,7 @@ import 'package:adyen_checkout_example/network/models/line_item.dart';
 import 'package:adyen_checkout_example/network/models/payment_methods_request_network_model.dart';
 import 'package:adyen_checkout_example/network/models/payment_request_network_model.dart';
 import 'package:adyen_checkout_example/network/models/session_request_network_model.dart';
+import 'package:adyen_checkout_example/network/models/session_response_network_model.dart';
 import 'package:adyen_checkout_example/network/service.dart';
 import 'package:adyen_checkout_example/repositories/payment_flow_outcome_handler.dart';
 
@@ -26,7 +27,7 @@ class AdyenSessionsRepository {
 
   //A session should not being created from the mobile application.
   //Please provide a CheckoutSession object from your own backend.
-  Future<String> createSession() async {
+  Future<SessionResponseNetworkModel> createSession() async {
     String returnUrl = await determineExampleReturnUrl();
     SessionRequestNetworkModel sessionRequestNetworkModel =
         SessionRequestNetworkModel(
@@ -79,11 +80,10 @@ class AdyenSessionsRepository {
           ),
         ]);
 
-    String response = await _service.createSession(
+    return await _service.createSession(
       sessionRequestNetworkModel,
       Config.environment,
     );
-    return response;
   }
 
   Future<String> fetchPaymentMethods() async {

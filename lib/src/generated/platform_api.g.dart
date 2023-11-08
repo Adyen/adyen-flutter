@@ -1315,6 +1315,9 @@ class _ComponentFlutterApiCodec extends StandardMessageCodec {
     } else if (value is PaymentResultModelDTO) {
       buffer.putUint8(134);
       writeValue(buffer, value.encode());
+    } else if (value is SessionDTO) {
+      buffer.putUint8(135);
+      writeValue(buffer, value.encode());
     } else {
       super.writeValue(buffer, value);
     }
@@ -1337,6 +1340,8 @@ class _ComponentFlutterApiCodec extends StandardMessageCodec {
         return OrderResponseDTO.decode(readValue(buffer)!);
       case 134: 
         return PaymentResultModelDTO.decode(readValue(buffer)!);
+      case 135: 
+        return SessionDTO.decode(readValue(buffer)!);
       default:
         return super.readValueOfType(type, buffer);
     }
@@ -1346,27 +1351,30 @@ class _ComponentFlutterApiCodec extends StandardMessageCodec {
 abstract class ComponentFlutterApi {
   static const MessageCodec<Object?> codec = _ComponentFlutterApiCodec();
 
-  void _generateCardComponentConfigurationClass(CardComponentConfigurationDTO cardComponentConfigurationDTO);
+  void _generateDtoClassesForCodec(CardComponentConfigurationDTO cardComponentConfigurationDTO, SessionDTO sessionDTO);
 
   void onComponentCommunication(ComponentCommunicationModel componentCommunicationModel);
 
   static void setup(ComponentFlutterApi? api, {BinaryMessenger? binaryMessenger}) {
     {
       final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
-          'dev.flutter.pigeon.adyen_checkout.ComponentFlutterApi._generateCardComponentConfigurationClass', codec,
+          'dev.flutter.pigeon.adyen_checkout.ComponentFlutterApi._generateDtoClassesForCodec', codec,
           binaryMessenger: binaryMessenger);
       if (api == null) {
         channel.setMessageHandler(null);
       } else {
         channel.setMessageHandler((Object? message) async {
           assert(message != null,
-          'Argument for dev.flutter.pigeon.adyen_checkout.ComponentFlutterApi._generateCardComponentConfigurationClass was null.');
+          'Argument for dev.flutter.pigeon.adyen_checkout.ComponentFlutterApi._generateDtoClassesForCodec was null.');
           final List<Object?> args = (message as List<Object?>?)!;
           final CardComponentConfigurationDTO? arg_cardComponentConfigurationDTO = (args[0] as CardComponentConfigurationDTO?);
           assert(arg_cardComponentConfigurationDTO != null,
-              'Argument for dev.flutter.pigeon.adyen_checkout.ComponentFlutterApi._generateCardComponentConfigurationClass was null, expected non-null CardComponentConfigurationDTO.');
+              'Argument for dev.flutter.pigeon.adyen_checkout.ComponentFlutterApi._generateDtoClassesForCodec was null, expected non-null CardComponentConfigurationDTO.');
+          final SessionDTO? arg_sessionDTO = (args[1] as SessionDTO?);
+          assert(arg_sessionDTO != null,
+              'Argument for dev.flutter.pigeon.adyen_checkout.ComponentFlutterApi._generateDtoClassesForCodec was null, expected non-null SessionDTO.');
           try {
-            api._generateCardComponentConfigurationClass(arg_cardComponentConfigurationDTO!);
+            api._generateDtoClassesForCodec(arg_cardComponentConfigurationDTO!, arg_sessionDTO!);
             return wrapResponse(empty: true);
           } on PlatformException catch (e) {
             return wrapResponse(error: e);

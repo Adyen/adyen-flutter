@@ -40,7 +40,7 @@ class CardAdvancedFlowComponent: NSObject, FlutterPlatformView {
     func view() -> UIView {
         return componentWrapperView
     }
-    
+
     private func setupCardView(arguments: NSDictionary) {
         do {
             let cardView = try createCardComponentView(arguments: arguments)
@@ -75,12 +75,11 @@ class CardAdvancedFlowComponent: NSObject, FlutterPlatformView {
         componentViewController.view.frame = initialFrame
         rootViewController = getViewController()
         rootViewController?.addChild(componentViewController)
-        disableNativeScrollingAndBouncing(componentViewController: componentViewController)
+        disableNativeScrollingAndBouncing(formView: componentViewController.view.subviews[0].subviews[0] as? UIScrollView)
         return cardView
     }
 
-    private func disableNativeScrollingAndBouncing(componentViewController: UIViewController) {
-        let formView = componentViewController.view.subviews[0].subviews[0] as? UIScrollView
+    private func disableNativeScrollingAndBouncing(formView: UIScrollView?) {
         formView?.bounces = false
         formView?.isScrollEnabled = false
         formView?.alwaysBounceVertical = false

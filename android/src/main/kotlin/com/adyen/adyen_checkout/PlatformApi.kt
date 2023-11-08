@@ -1341,6 +1341,11 @@ private object ComponentFlutterApiCodec : StandardMessageCodec() {
           PaymentResultModelDTO.fromList(it)
         }
       }
+      135.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          SessionDTO.fromList(it)
+        }
+      }
       else -> super.readValueOfType(type, buffer)
     }
   }
@@ -1374,6 +1379,10 @@ private object ComponentFlutterApiCodec : StandardMessageCodec() {
         stream.write(134)
         writeValue(stream, value.toList())
       }
+      is SessionDTO -> {
+        stream.write(135)
+        writeValue(stream, value.toList())
+      }
       else -> super.writeValue(stream, value)
     }
   }
@@ -1388,9 +1397,9 @@ class ComponentFlutterApi(private val binaryMessenger: BinaryMessenger) {
       ComponentFlutterApiCodec
     }
   }
-  fun _generateCardComponentConfigurationClass(cardComponentConfigurationDTOArg: CardComponentConfigurationDTO, callback: (Result<Unit>) -> Unit) {
-    val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.adyen_checkout.ComponentFlutterApi._generateCardComponentConfigurationClass", codec)
-    channel.send(listOf(cardComponentConfigurationDTOArg)) {
+  fun _generateDtoClassesForCodec(cardComponentConfigurationDTOArg: CardComponentConfigurationDTO, sessionDTOArg: SessionDTO, callback: (Result<Unit>) -> Unit) {
+    val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.adyen_checkout.ComponentFlutterApi._generateDtoClassesForCodec", codec)
+    channel.send(listOf(cardComponentConfigurationDTOArg, sessionDTOArg)) {
       if (it is List<*>) {
         if (it.size > 1) {
           callback(Result.failure(FlutterError(it[0] as String, it[1] as String, it[2] as String?)));

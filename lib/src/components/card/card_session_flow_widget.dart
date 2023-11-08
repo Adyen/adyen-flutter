@@ -13,14 +13,14 @@ import 'package:flutter/services.dart';
 class CardSessionFlowWidget extends StatefulWidget {
   const CardSessionFlowWidget({
     required this.cardComponentConfiguration,
-    required this.sessionResponse,
+    required this.session,
     required this.onPaymentResult,
     required this.initialHeight,
     super.key,
   });
 
-  final CardComponentConfiguration cardComponentConfiguration;
-  final String sessionResponse;
+  final CardComponentConfigurationDTO cardComponentConfiguration;
+  final SessionDTO session;
   final Future<void> Function(PaymentResult) onPaymentResult;
   final double initialHeight;
 
@@ -86,13 +86,13 @@ class _CardSessionFlowWidgetState extends State<CardSessionFlowWidget> {
   void _onResult(ComponentCommunicationModel event) {
     widget.onPaymentResult(PaymentAdvancedFlowFinished(
         resultCode: event.paymentResult?.resultCode ?? ""));
-    _resetCardView();
+   // _resetCardView();
   }
 
   void _onError(ComponentCommunicationModel event) {
     String errorMessage = event.data as String;
     widget.onPaymentResult(PaymentError(reason: errorMessage));
-    _resetCardView();
+   // _resetCardView();
   }
 
   void _onResize(ComponentCommunicationModel event) =>
@@ -102,8 +102,8 @@ class _CardSessionFlowWidgetState extends State<CardSessionFlowWidget> {
     final Key key = UniqueKey();
     const String viewType = 'cardComponentSessionFlow';
     final Map<String, dynamic> creationParams = <String, dynamic>{
-      "sessionResponse": widget.sessionResponse,
-      "cardComponentConfiguration": widget.cardComponentConfiguration.toDTO(),
+      "session": widget.session,
+      "cardComponentConfiguration": widget.cardComponentConfiguration,
     };
 
     switch (defaultTargetPlatform) {

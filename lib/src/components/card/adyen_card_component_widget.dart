@@ -1,6 +1,7 @@
 import 'package:adyen_checkout/adyen_checkout.dart';
 import 'package:adyen_checkout/src/components/card/card_advanced_flow_widget.dart';
 import 'package:adyen_checkout/src/components/card/card_session_flow_widget.dart';
+import 'package:adyen_checkout/src/utils/dto_mapper.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 
@@ -29,8 +30,8 @@ class AdyenCardComponentWidget extends StatelessWidget {
         cardComponentSessionFlow.cardComponentConfiguration.cardConfiguration);
     return CardSessionFlowWidget(
       cardComponentConfiguration:
-          cardComponentSessionFlow.cardComponentConfiguration,
-      sessionResponse: cardComponentSessionFlow.sessionResponse,
+          cardComponentSessionFlow.cardComponentConfiguration.toDTO(),
+      session: cardComponentSessionFlow.session.toDTO(),
       onPaymentResult: onPaymentResult,
       initialHeight: initialHeight,
     );
@@ -43,7 +44,7 @@ class AdyenCardComponentWidget extends StatelessWidget {
         cardComponentAdvancedFlow.cardComponentConfiguration.cardConfiguration);
     return CardAdvancedFlowWidget(
       cardComponentConfiguration:
-          cardComponentAdvancedFlow.cardComponentConfiguration,
+          cardComponentAdvancedFlow.cardComponentConfiguration.toDTO(),
       paymentMethods: cardComponentAdvancedFlow.paymentMethods,
       onPayments: cardComponentAdvancedFlow.onPayments,
       onPaymentsDetails: cardComponentAdvancedFlow.onPaymentsDetails,

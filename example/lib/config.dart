@@ -22,7 +22,7 @@ class Config {
   static const String shopperReference = "Test reference";
   static const Environment environment = Environment.test;
   static const String baseUrl = "checkout-test.adyen.com";
-  static const String apiVersion = "v70";
+  static const String apiVersion = "v71";
   static const String iOSReturnUrl = "flutter-ui-host://payments";
 
   //Example data

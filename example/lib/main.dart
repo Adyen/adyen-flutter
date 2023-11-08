@@ -97,7 +97,7 @@ class _MyAppState extends State<MyApp> {
                 onPressed: () async {
                   await _adyenSessionRepository
                       .createSession()
-                      .then((value) => showModalBottomSheet(
+                      .then((sessionResponse) => showModalBottomSheet(
                           context: context,
                           isScrollControlled: true,
                           backgroundColor: Colors.white,
@@ -125,7 +125,7 @@ class _MyAppState extends State<MyApp> {
                                   child: _buildSessionCardWidget(
                                     context,
                                     _adyenSessionRepository,
-                                    value,
+                                    sessionResponse,
                                   ),
                                 ),
                               ],
@@ -140,13 +140,11 @@ class _MyAppState extends State<MyApp> {
   }
 
   Future<PaymentResult> startDropInSessions() async {
-    final String sessionResponse =
+    final SessionResponseNetworkModel sessionResponse =
         await _adyenSessionRepository.createSession();
-    final SessionResponseNetworkModel sessionResponseNetworkModel =
-        SessionResponseNetworkModel.fromRawJson(sessionResponse);
     final Session session = Session(
-      id: sessionResponseNetworkModel.id,
-      sessionData: sessionResponseNetworkModel.sessionData,
+      id: sessionResponse.id,
+      sessionData: sessionResponse.sessionData,
     );
     const CardConfiguration cardsConfiguration = CardConfiguration(
       showStorePaymentField: true,
@@ -253,7 +251,7 @@ class _MyAppState extends State<MyApp> {
   Widget _buildSessionCardWidget(
     BuildContext context,
     AdyenSessionsRepository repository,
-    String sessionResponse,
+    SessionResponseNetworkModel sessionResponse,
   ) {
     final cardComponentConfiguration = CardComponentConfiguration(
       environment: Config.environment,
@@ -264,10 +262,15 @@ class _MyAppState extends State<MyApp> {
       cardConfiguration: const CardConfiguration(showStorePaymentField: false),
     );
 
+    final session = Session(
+      id: sessionResponse.id,
+      sessionData: sessionResponse.sessionData,
+    );
+
     return AdyenCardComponentWidget(
       componentPaymentFlow: CardComponentSessionFlow(
         cardComponentConfiguration: cardComponentConfiguration,
-        sessionResponse: sessionResponse,
+        session: session,
       ),
       onPaymentResult: (event) async {
         Navigator.pop(context);

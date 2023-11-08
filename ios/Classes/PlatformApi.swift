@@ -1169,6 +1169,8 @@ private class ComponentFlutterApiCodecReader: FlutterStandardReader {
         return OrderResponseDTO.fromList(self.readValue() as! [Any?])
       case 134:
         return PaymentResultModelDTO.fromList(self.readValue() as! [Any?])
+      case 135:
+        return SessionDTO.fromList(self.readValue() as! [Any?])
       default:
         return super.readValue(ofType: type)
     }
@@ -1198,6 +1200,9 @@ private class ComponentFlutterApiCodecWriter: FlutterStandardWriter {
     } else if let value = value as? PaymentResultModelDTO {
       super.writeByte(134)
       super.writeValue(value.toList())
+    } else if let value = value as? SessionDTO {
+      super.writeByte(135)
+      super.writeValue(value.toList())
     } else {
       super.writeValue(value)
     }
@@ -1220,7 +1225,7 @@ class ComponentFlutterApiCodec: FlutterStandardMessageCodec {
 
 /// Generated protocol from Pigeon that represents Flutter messages that can be called from Swift.
 protocol ComponentFlutterApiProtocol {
-  func _generateCardComponentConfigurationClass(cardComponentConfigurationDTO cardComponentConfigurationDTOArg: CardComponentConfigurationDTO, completion: @escaping (Result<Void, FlutterError>) -> Void) 
+  func _generateDtoClassesForCodec(cardComponentConfigurationDTO cardComponentConfigurationDTOArg: CardComponentConfigurationDTO, sessionDTO sessionDTOArg: SessionDTO, completion: @escaping (Result<Void, FlutterError>) -> Void) 
   func onComponentCommunication(componentCommunicationModel componentCommunicationModelArg: ComponentCommunicationModel, completion: @escaping (Result<Void, FlutterError>) -> Void) 
 }
 class ComponentFlutterApi: ComponentFlutterApiProtocol {
@@ -1231,9 +1236,9 @@ class ComponentFlutterApi: ComponentFlutterApiProtocol {
   var codec: FlutterStandardMessageCodec {
     return ComponentFlutterApiCodec.shared
   }
-  func _generateCardComponentConfigurationClass(cardComponentConfigurationDTO cardComponentConfigurationDTOArg: CardComponentConfigurationDTO, completion: @escaping (Result<Void, FlutterError>) -> Void)  {
-    let channel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.ComponentFlutterApi._generateCardComponentConfigurationClass", binaryMessenger: binaryMessenger, codec: codec)
-    channel.sendMessage([cardComponentConfigurationDTOArg] as [Any?]) { _ in
+  func _generateDtoClassesForCodec(cardComponentConfigurationDTO cardComponentConfigurationDTOArg: CardComponentConfigurationDTO, sessionDTO sessionDTOArg: SessionDTO, completion: @escaping (Result<Void, FlutterError>) -> Void)  {
+    let channel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.ComponentFlutterApi._generateDtoClassesForCodec", binaryMessenger: binaryMessenger, codec: codec)
+    channel.sendMessage([cardComponentConfigurationDTOArg, sessionDTOArg] as [Any?]) { _ in
       completion(.success(Void()))
     }
   }

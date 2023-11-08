@@ -1,6 +1,8 @@
+
+
 import Flutter
 
-class CardAdvancedFlowComponentFactory: NSObject, FlutterPlatformViewFactory {
+class CardSessionFlowComponentFactory: NSObject, FlutterPlatformViewFactory {
     private let messenger: FlutterBinaryMessenger
     private let componentFlutterApi: ComponentFlutterApi
 
@@ -16,7 +18,7 @@ class CardAdvancedFlowComponentFactory: NSObject, FlutterPlatformViewFactory {
         viewIdentifier viewId: Int64,
         arguments args: Any?
     ) -> FlutterPlatformView {
-        return CardAdvancedFlowComponent(
+        return CardSessionFlowComponent(
             frame: frame,
             viewIdentifier: viewId,
             arguments: args as? NSDictionary ?? [:],

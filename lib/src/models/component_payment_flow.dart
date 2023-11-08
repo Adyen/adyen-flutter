@@ -1,15 +1,14 @@
-import 'package:adyen_checkout/src/models/card_component_configuration.dart';
-import 'package:adyen_checkout/src/models/payment_flow_outcome.dart';
+import 'package:adyen_checkout/adyen_checkout.dart';
 
 sealed class ComponentPaymentFlow {}
 
 class CardComponentSessionFlow extends ComponentPaymentFlow {
   final CardComponentConfiguration cardComponentConfiguration;
-  final String sessionResponse;
+  final Session session;
 
   CardComponentSessionFlow({
     required this.cardComponentConfiguration,
-    required this.sessionResponse,
+    required this.session,
   });
 }
 

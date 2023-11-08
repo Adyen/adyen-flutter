@@ -4,10 +4,11 @@ import 'package:adyen_checkout/adyen_checkout.dart';
 import 'package:adyen_checkout_example/config.dart';
 import 'package:adyen_checkout_example/network/models/payment_methods_request_network_model.dart';
 import 'package:adyen_checkout_example/network/models/session_request_network_model.dart';
+import 'package:adyen_checkout_example/network/models/session_response_network_model.dart';
 import 'package:http/http.dart' as http;
 
 class Service {
-  Future<String> createSession(
+  Future<SessionResponseNetworkModel> createSession(
       SessionRequestNetworkModel sessionRequestNetworkModel,
       Environment environment) async {
     final response = await http.post(
@@ -16,7 +17,7 @@ class Service {
       body: sessionRequestNetworkModel.toRawJson(),
     );
     print("PspReference: ${response.headers["pspreference"]}");
-    return response.body;
+    return SessionResponseNetworkModel.fromRawJson(response.body);
   }
 
   Future<String> fetchPaymentMethods(

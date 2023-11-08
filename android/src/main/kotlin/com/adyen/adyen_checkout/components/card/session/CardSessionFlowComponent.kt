@@ -2,6 +2,7 @@ package com.adyen.adyen_checkout.components.card.session
 
 import CardComponentConfigurationDTO
 import ComponentFlutterApi
+import SessionDTO
 import android.content.Context
 import android.util.Log
 import android.view.View
@@ -28,7 +29,6 @@ import com.adyen.checkout.sessions.core.SessionModel
 import com.adyen.checkout.ui.core.AdyenComponentView
 import io.flutter.plugin.platform.PlatformView
 import kotlinx.coroutines.launch
-import org.json.JSONObject
 import java.util.UUID
 
 internal class CardSessionFlowComponent(
@@ -39,8 +39,8 @@ internal class CardSessionFlowComponent(
     creationParams: Map<*, *>?
 ) : PlatformView {
     private val configuration = creationParams?.get("cardComponentConfiguration") as CardComponentConfigurationDTO
-    private val sessionResponse = creationParams?.get("sessionResponse") as String
-    private val sessionModel = SessionModel.SERIALIZER.deserialize(JSONObject(sessionResponse))
+    private val session = creationParams?.get("session") as SessionDTO
+    private val sessionModel = SessionModel(id = session.id, sessionData =  session.sessionData)
     private val environment = configuration.environment.toNativeModel()
     private val cardConfiguration = configuration.cardConfiguration.toNativeModel(
         context,

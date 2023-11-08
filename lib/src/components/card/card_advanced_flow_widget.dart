@@ -25,7 +25,7 @@ class CardAdvancedFlowWidget extends StatefulWidget {
   }) : paymentFlowOutcomeHandler =
             paymentFlowOutcomeHandler ?? PaymentFlowOutcomeHandler();
 
-  final CardComponentConfiguration cardComponentConfiguration;
+  final CardComponentConfigurationDTO cardComponentConfiguration;
   final String paymentMethods;
   final Future<PaymentFlowOutcome> Function(String) onPayments;
   final Future<PaymentFlowOutcome> Function(String) onPaymentsDetails;
@@ -151,7 +151,7 @@ class _CardAdvancedFlowWidgetState extends State<CardAdvancedFlowWidget> {
     const String viewType = 'cardComponentAdvancedFlow';
     final Map<String, dynamic> creationParams = <String, dynamic>{
       "paymentMethods": widget.paymentMethods,
-      "cardComponentConfiguration": widget.cardComponentConfiguration.toDTO(),
+      "cardComponentConfiguration": widget.cardComponentConfiguration,
     };
 
     switch (defaultTargetPlatform) {
