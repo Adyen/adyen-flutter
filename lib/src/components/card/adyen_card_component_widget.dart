@@ -33,7 +33,7 @@ class AdyenCardComponentWidget extends StatelessWidget {
           cardComponentSessionFlow.cardComponentConfiguration.toDTO(),
       session: cardComponentSessionFlow.session.toDTO(),
       onPaymentResult: onPaymentResult,
-      initialHeight: initialHeight,
+      initialViewHeight: initialHeight,
     );
   }
 
@@ -49,7 +49,7 @@ class AdyenCardComponentWidget extends StatelessWidget {
       onPayments: cardComponentAdvancedFlow.onPayments,
       onPaymentsDetails: cardComponentAdvancedFlow.onPaymentsDetails,
       onPaymentResult: onPaymentResult,
-      initialHeight: initialHeight,
+      initialViewHeight: initialHeight,
     );
   }
 

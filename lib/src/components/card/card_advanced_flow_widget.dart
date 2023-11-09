@@ -6,7 +6,6 @@ import 'package:adyen_checkout/src/components/component_result_api.dart';
 import 'package:adyen_checkout/src/components/platform/android_platform_view.dart';
 import 'package:adyen_checkout/src/components/platform/ios_platform_view.dart';
 import 'package:adyen_checkout/src/generated/platform_api.g.dart';
-import 'package:adyen_checkout/src/utils/dto_mapper.dart';
 import 'package:adyen_checkout/src/utils/payment_flow_outcome_handler.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -20,7 +19,7 @@ class CardAdvancedFlowWidget extends StatefulWidget {
     required this.onPayments,
     required this.onPaymentsDetails,
     required this.onPaymentResult,
-    required this.initialHeight,
+    required this.initialViewHeight,
     PaymentFlowOutcomeHandler? paymentFlowOutcomeHandler,
   }) : paymentFlowOutcomeHandler =
             paymentFlowOutcomeHandler ?? PaymentFlowOutcomeHandler();
@@ -30,7 +29,7 @@ class CardAdvancedFlowWidget extends StatefulWidget {
   final Future<PaymentFlowOutcome> Function(String) onPayments;
   final Future<PaymentFlowOutcome> Function(String) onPaymentsDetails;
   final Future<void> Function(PaymentResult) onPaymentResult;
-  final double initialHeight;
+  final double initialViewHeight;
   final PaymentFlowOutcomeHandler paymentFlowOutcomeHandler;
 
   @override
@@ -58,13 +57,12 @@ class _CardAdvancedFlowWidgetState extends State<CardAdvancedFlowWidget> {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder(
-        initialData: widget.initialHeight,
+        initialData: widget.initialViewHeight,
         stream: _resizeStream.stream.distinct(),
         builder: (BuildContext context, AsyncSnapshot snapshot) {
-          double platformHeight = snapshot.data;
-          print("PlatformHeight: $platformHeight");
+          double platformViewHeight = snapshot.data;
           return SizedBox(
-            height: platformHeight,
+            height: platformViewHeight,
             child: _cardView,
           );
         });
@@ -75,6 +73,13 @@ class _CardAdvancedFlowWidgetState extends State<CardAdvancedFlowWidget> {
     _resultApi.componentCommunicationStream.close();
     _resizeStream.close();
     super.dispose();
+  }
+
+  // ignore: unused_element
+  void _resetCardView() {
+    setState(() {
+      _cardView = _buildPlatformCardView();
+    });
   }
 
   void _handleComponentCommunication(event) async {
@@ -105,13 +110,6 @@ class _CardAdvancedFlowWidgetState extends State<CardAdvancedFlowWidget> {
   void _onError(ComponentCommunicationModel event) {
     String errorMessage = event.data as String;
     widget.onPaymentResult(PaymentError(reason: errorMessage));
-    _resetCardView();
-  }
-
-  void _resetCardView() {
-    setState(() {
-      _cardView = _buildPlatformCardView();
-    });
   }
 
   void _onResize(ComponentCommunicationModel event) =>
@@ -132,18 +130,16 @@ class _CardAdvancedFlowWidgetState extends State<CardAdvancedFlowWidget> {
   }
 
   void _onPaymentFinished(PaymentFlowOutcomeDTO paymentFlowOutcomeDTO) {
-    widget.onPaymentResult(PaymentAdvancedFlowFinished(
-        resultCode: paymentFlowOutcomeDTO.result ?? ""));
-    //_resetCardView();
+    String resultCode = paymentFlowOutcomeDTO.result ?? "";
+    widget.onPaymentResult(PaymentAdvancedFlowFinished(resultCode: resultCode));
   }
 
   void _onAction(PaymentFlowOutcomeDTO paymentFlowOutcomeDTO) =>
       _adyenComponentApi.onAction(paymentFlowOutcomeDTO.actionResponse);
 
   void _onPaymentError(PaymentFlowOutcomeDTO paymentFlowOutcomeDTO) {
-    widget.onPaymentResult(
-        PaymentError(reason: paymentFlowOutcomeDTO.error?.reason));
-    _resetCardView();
+    String errorMessage = paymentFlowOutcomeDTO.error?.reason as String;
+    widget.onPaymentResult(PaymentError(reason: errorMessage));
   }
 
   Widget _buildPlatformCardView() {

@@ -14,14 +14,14 @@ class CardSessionFlowWidget extends StatefulWidget {
     required this.cardComponentConfiguration,
     required this.session,
     required this.onPaymentResult,
-    required this.initialHeight,
+    required this.initialViewHeight,
     super.key,
   });
 
   final CardComponentConfigurationDTO cardComponentConfiguration;
   final SessionDTO session;
   final Future<void> Function(PaymentResult) onPaymentResult;
-  final double initialHeight;
+  final double initialViewHeight;
 
   @override
   State<CardSessionFlowWidget> createState() => _CardSessionFlowWidgetState();
@@ -47,12 +47,12 @@ class _CardSessionFlowWidgetState extends State<CardSessionFlowWidget> {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder(
-        initialData: widget.initialHeight,
+        initialData: widget.initialViewHeight,
         stream: _resizeStream.stream.distinct(),
         builder: (BuildContext context, AsyncSnapshot snapshot) {
-          double platformHeight = snapshot.data;
+          double platformViewHeight = snapshot.data;
           return SizedBox(
-            height: platformHeight,
+            height: platformViewHeight,
             child: _cardView,
           );
         });
@@ -65,6 +65,7 @@ class _CardSessionFlowWidgetState extends State<CardSessionFlowWidget> {
     super.dispose();
   }
 
+  // ignore: unused_element
   void _resetCardView() {
     setState(() {
       _cardView = _buildPlatformCardView();
@@ -82,7 +83,7 @@ class _CardSessionFlowWidgetState extends State<CardSessionFlowWidget> {
   }
 
   void _onResult(ComponentCommunicationModel event) {
-    String resultCode = event.paymentResult?.resultCode as String ?? "";
+    String resultCode = event.paymentResult?.resultCode ?? "";
     widget.onPaymentResult(PaymentAdvancedFlowFinished(resultCode: resultCode));
   }
 
