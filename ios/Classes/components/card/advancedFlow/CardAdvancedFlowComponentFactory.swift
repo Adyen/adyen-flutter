@@ -1,17 +1,7 @@
 import Flutter
 
-class CardAdvancedFlowComponentFactory: NSObject, FlutterPlatformViewFactory {
-    private let messenger: FlutterBinaryMessenger
-    private let componentFlutterApi: ComponentFlutterApi
-
-    init(messenger: FlutterBinaryMessenger, componentFlutterApi: ComponentFlutterApi) {
-        self.messenger = messenger
-        self.componentFlutterApi = componentFlutterApi
-
-        super.init()
-    }
-
-    func create(
+class CardAdvancedFlowComponentFactory: ComponentFactory {
+    override func create(
         withFrame frame: CGRect,
         viewIdentifier viewId: Int64,
         arguments args: Any?
@@ -20,12 +10,8 @@ class CardAdvancedFlowComponentFactory: NSObject, FlutterPlatformViewFactory {
             frame: frame,
             viewIdentifier: viewId,
             arguments: args as? NSDictionary ?? [:],
-            binaryMessenger: messenger,
-            componentFlutterApi: componentFlutterApi
+            binaryMessenger: super.messenger,
+            componentFlutterApi: super.componentFlutterApi
         )
-    }
-
-    public func createArgsCodec() -> FlutterMessageCodec & NSObjectProtocol {
-        return componentFlutterApi.codec
     }
 }
