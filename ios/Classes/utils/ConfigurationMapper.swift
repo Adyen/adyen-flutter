@@ -120,7 +120,7 @@ extension DropInConfigurationDTO {
 extension CardConfigurationDTO {
     func mapToCardComponentConfiguration() -> CardComponent.Configuration {
         var formComponentStyle = FormComponentStyle()
-        formComponentStyle.backgroundColor = UIColor.clear
+        formComponentStyle.backgroundColor = UIColor.white
         let koreanAuthenticationMode = kcpFieldVisibility.toCardFieldVisibility()
         let socialSecurityNumberMode = socialSecurityNumberFieldVisibility.toCardFieldVisibility()
         let storedCardConfiguration = createStoredCardConfiguration(showCvcForStoredCard: showCvcForStoredCard)

@@ -19,7 +19,8 @@ class CardAdvancedFlowActionComponentDelegate: ActionComponentDelegate {
     }
 
     func didComplete(from _: Adyen.ActionComponent) {
-        // TODO: need to discuss this handling.
+        print("did complete")
+        // TODO: Could we discuss when this callback is being triggered and needs to be handled?
     }
 
     func didFail(with error: Error, from _: Adyen.ActionComponent) {

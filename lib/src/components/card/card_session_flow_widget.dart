@@ -5,7 +5,6 @@ import 'package:adyen_checkout/src/components/component_result_api.dart';
 import 'package:adyen_checkout/src/components/platform/android_platform_view.dart';
 import 'package:adyen_checkout/src/components/platform/ios_platform_view.dart';
 import 'package:adyen_checkout/src/generated/platform_api.g.dart';
-import 'package:adyen_checkout/src/utils/dto_mapper.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -52,7 +51,6 @@ class _CardSessionFlowWidgetState extends State<CardSessionFlowWidget> {
         stream: _resizeStream.stream.distinct(),
         builder: (BuildContext context, AsyncSnapshot snapshot) {
           double platformHeight = snapshot.data;
-          print("PlatformHeight: $platformHeight");
           return SizedBox(
             height: platformHeight,
             child: _cardView,
@@ -84,15 +82,13 @@ class _CardSessionFlowWidgetState extends State<CardSessionFlowWidget> {
   }
 
   void _onResult(ComponentCommunicationModel event) {
-    widget.onPaymentResult(PaymentAdvancedFlowFinished(
-        resultCode: event.paymentResult?.resultCode ?? ""));
-   // _resetCardView();
+    String resultCode = event.paymentResult?.resultCode as String ?? "";
+    widget.onPaymentResult(PaymentAdvancedFlowFinished(resultCode: resultCode));
   }
 
   void _onError(ComponentCommunicationModel event) {
     String errorMessage = event.data as String;
     widget.onPaymentResult(PaymentError(reason: errorMessage));
-   // _resetCardView();
   }
 
   void _onResize(ComponentCommunicationModel event) =>

@@ -58,7 +58,10 @@ Widget buildCardWidget(
     countryCode: Config.countryCode,
     amount: Config.amount,
     shopperLocale: Config.shopperLocale,
-    cardConfiguration: const CardConfiguration(showStorePaymentField: false),
+    cardConfiguration: const CardConfiguration(
+      showStorePaymentField: false,
+      holderNameRequired: false,
+    ),
   );
 
   return AdyenCardComponentWidget(

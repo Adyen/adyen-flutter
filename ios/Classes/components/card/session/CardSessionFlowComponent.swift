@@ -39,10 +39,12 @@ class CardSessionFlowComponent: BaseCardComponent {
                     self?.adyenSession = session
                     self?.attachComponent(session: session, cardComponentConfiguration: cardComponentConfiguration)
                 case let .failure(error):
-                    print("ERROR \(error)")
+                    self?.sendErrorToFlutterLayer(errorMessage: error.localizedDescription)
                 }
             }
-        } catch {}
+        } catch {
+            sendErrorToFlutterLayer(errorMessage: error.localizedDescription)
+        }
     }
 
     private func createSessionConfiguration(cardComponentConfiguration: CardComponentConfigurationDTO, session: SessionDTO) throws -> AdyenSession.Configuration {
@@ -61,7 +63,7 @@ class CardSessionFlowComponent: BaseCardComponent {
             guard let cardComponentView = cardComponent?.viewController.view else { throw PlatformError(errorDescription: "Failed to get card component view") }
             attachCardView(cardComponentView: cardComponentView)
         } catch {
-            print("Error")
+            sendErrorToFlutterLayer(errorMessage: error.localizedDescription)
         }
     }
 

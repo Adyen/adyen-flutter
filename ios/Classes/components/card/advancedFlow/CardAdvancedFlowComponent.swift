@@ -6,6 +6,7 @@ import Flutter
 class CardAdvancedFlowComponent: BaseCardComponent {
     private let actionComponentDelegate: ActionComponentDelegate
     private let presentationDelegate: PresentationDelegate
+    private var actionComponent: AdyenActionComponent?
 
     override init(
         frame: CGRect,
@@ -35,7 +36,7 @@ class CardAdvancedFlowComponent: BaseCardComponent {
                 self?.onAction(actionResponse: jsonActionResponse)
             }
         } catch {
-            // TODO: Dispaly error
+            sendErrorToFlutterLayer(errorMessage: error.localizedDescription)
         }
     }
 
@@ -46,25 +47,20 @@ class CardAdvancedFlowComponent: BaseCardComponent {
         cardComponent = try buildCardComponent(paymentMethods: paymentMethods, cardComponentConfiguration: cardComponentConfiguration)
         cardDelegate = CardAdvancedFlowDelegate(componentFlutterApi: componentFlutterApi)
         cardComponent?.delegate = cardDelegate
-        guard let componentViewController = cardComponent?.viewController else { throw PlatformError(errorDescription: "Failed to initialize card component") }
-        guard let cardView = componentViewController.view else { throw PlatformError(errorDescription: "Failed to get card component view") }
-        getViewController()?.addChild(componentViewController)
+        guard let cardView = cardComponent?.viewController.view else { throw PlatformError(errorDescription: "Failed to get card component view") }
         return cardView
     }
 
     private func buildCardComponent(paymentMethods: PaymentMethods, cardComponentConfiguration: CardComponentConfigurationDTO) throws -> CardComponent {
-        guard let paymentMethod = paymentMethods.paymentMethod(ofType: CardPaymentMethod.self) else {
-            throw PlatformError(errorDescription: "Card payment method not provided")
-        }
-
+        guard let paymentMethod = paymentMethods.paymentMethod(ofType: CardPaymentMethod.self) else { throw PlatformError(errorDescription: "Card payment method not provided") }
         let adyenContext = try cardComponentConfiguration.createAdyenContext()
         let cardConfiguration = cardComponentConfiguration.cardConfiguration.mapToCardComponentConfiguration()
         let cardComponent = CardComponent(paymentMethod: paymentMethod, context: adyenContext, configuration: cardConfiguration)
-        actionComponent = try buildActionComponent(adyenContext: adyenContext)
+        actionComponent = buildActionComponent(adyenContext: adyenContext)
         return cardComponent
     }
 
-    private func buildActionComponent(adyenContext: AdyenContext) throws -> AdyenActionComponent {
+    private func buildActionComponent(adyenContext: AdyenContext) -> AdyenActionComponent {
         let actionComponent = AdyenActionComponent(context: adyenContext)
         actionComponent.delegate = actionComponentDelegate
         actionComponent.presentationDelegate = presentationDelegate
@@ -77,7 +73,7 @@ class CardAdvancedFlowComponent: BaseCardComponent {
             let action = try JSONDecoder().decode(Action.self, from: jsonData)
             actionComponent?.handle(action)
         } catch {
-            print("Error in handling action")
+            sendErrorToFlutterLayer(errorMessage: error.localizedDescription)
         }
     }
 }

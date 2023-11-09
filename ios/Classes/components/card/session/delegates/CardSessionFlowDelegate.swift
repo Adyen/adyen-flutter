@@ -21,5 +21,6 @@ class CardSessionFlowDelegate: AdyenSessionDelegate {
 
     func didOpenExternalApplication(component _: ActionComponent, session _: AdyenSession) {
         print("did open external application")
+        // TODO: Could we discuss when this callback is being triggered and needs to be handled?
     }
 }

@@ -11,7 +11,6 @@ class BaseCardComponent: NSObject, FlutterPlatformView {
 
     var cardComponent: CardComponent?
     var cardDelegate: PaymentComponentDelegate?
-    var actionComponent: AdyenActionComponent?
 
     init(
         frame _: CGRect,
@@ -36,13 +35,7 @@ class BaseCardComponent: NSObject, FlutterPlatformView {
     func getViewController() -> UIViewController? {
         var rootViewController = UIApplication.shared.adyen.mainKeyWindow?.rootViewController
         while let presentedViewController = rootViewController?.presentedViewController {
-            let type = String(describing: type(of: presentedViewController))
-            // TODO: - We need to discuss how the SDK should react if a DropInNavigationController is already displayed
-            if type == "DropInNavigationController" {
-                return nil
-            } else {
-                rootViewController = presentedViewController
-            }
+            rootViewController = presentedViewController
         }
 
         return rootViewController
@@ -52,6 +45,12 @@ class BaseCardComponent: NSObject, FlutterPlatformView {
         componentWrapperView.addSubview(cardComponentView)
         disableNativeScrollingAndBouncing(cardComponentView: cardComponentView)
         adjustCardComponentLayout(cardComponentView: cardComponentView)
+    }
+
+    func sendErrorToFlutterLayer(errorMessage: String) {
+        let componentCommunicationModel = ComponentCommunicationModel(type: ComponentCommunicationType.error,
+                                                                      data: errorMessage)
+        componentFlutterApi.onComponentCommunication(componentCommunicationModel: componentCommunicationModel, completion: { _ in })
     }
 
     private func disableNativeScrollingAndBouncing(cardComponentView: UIView) {
