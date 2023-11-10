@@ -3,7 +3,7 @@ import Adyen
 import AdyenNetworking
 import Flutter
 
-class BaseCardComponent: NSObject, FlutterPlatformView {
+class BaseCardComponent: NSObject, FlutterPlatformView, UIScrollViewDelegate {
     let componentFlutterApi: ComponentFlutterApi
     let componentPlatformApi: ComponentPlatformApi
     let componentWrapperView: ComponentWrapperView
@@ -11,6 +11,7 @@ class BaseCardComponent: NSObject, FlutterPlatformView {
 
     var cardComponent: CardComponent?
     var cardDelegate: PaymentComponentDelegate?
+    var contentOffset : CGPoint?
 
     init(
         frame _: CGRect,
@@ -30,6 +31,10 @@ class BaseCardComponent: NSObject, FlutterPlatformView {
 
     func view() -> UIView {
         return componentWrapperView
+    }
+    
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        scrollView.contentOffset = .zero
     }
 
     func getViewController() -> UIViewController? {
@@ -55,6 +60,7 @@ class BaseCardComponent: NSObject, FlutterPlatformView {
 
     private func disableNativeScrollingAndBouncing(cardComponentView: UIView) {
         let formView = cardComponentView.subviews[0].subviews[0] as? UIScrollView
+        formView?.delegate = self
         formView?.bounces = false
         formView?.isScrollEnabled = false
         formView?.alwaysBounceVertical = false
@@ -72,8 +78,7 @@ class BaseCardComponent: NSObject, FlutterPlatformView {
 
     private func setupResizeViewportCallback() {
         componentWrapperView.resizeViewportCallback = {
-            var viewHeight = self.cardComponent?.viewController.preferredContentSize.height ?? 0
-            viewHeight += 32 // TODO: adjust view by preventing clamping scroll to prevent bottom view overscroll
+            let viewHeight = self.cardComponent?.viewController.preferredContentSize.height ?? 0
             let roundedViewHeight = Double(round(100 * viewHeight / 100))
             self.componentFlutterApi.onComponentCommunication(componentCommunicationModel: ComponentCommunicationModel(type: ComponentCommunicationType.resize, data: roundedViewHeight), completion: { _ in })
         }

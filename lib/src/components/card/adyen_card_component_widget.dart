@@ -66,16 +66,41 @@ class AdyenCardComponentWidget extends StatelessWidget {
 
   double _determineInitialAndroidViewHeight(
       CardConfiguration cardConfiguration) {
-    if (cardConfiguration.showCvc) {
-      return 274;
-    } else if (cardConfiguration.holderNameRequired) {
-      return 370;
-    }
+    double androidViewHeight = 294;
 
-    return 274;
+    if (cardConfiguration.holderNameRequired) {
+      androidViewHeight += 63;
+    }
+    if (cardConfiguration.showStorePaymentField) {
+      androidViewHeight += 55;
+    }
+    return androidViewHeight;
   }
 
   double _determineInitialIosViewHeight(CardConfiguration cardConfiguration) {
-    return 279;
+    double iosViewHeight = 294;
+
+    if (cardConfiguration.holderNameRequired) {
+      iosViewHeight += 63;
+    }
+
+    if (cardConfiguration.showStorePaymentField) {
+      iosViewHeight += 55;
+    }
+
+    if (cardConfiguration.addressMode != AddressMode.none) {
+      iosViewHeight += 63;
+    }
+
+    if (cardConfiguration.socialSecurityNumberFieldVisibility ==
+        FieldVisibility.show) {
+      iosViewHeight += 63;
+    }
+
+    if (cardConfiguration.kcpFieldVisibility == FieldVisibility.show) {
+      iosViewHeight += 63;
+    }
+
+    return iosViewHeight;
   }
 }
