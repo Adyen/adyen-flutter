@@ -7,6 +7,7 @@ class CardAdvancedFlowComponent: BaseCardComponent {
     private let actionComponentDelegate: ActionComponentDelegate
     private let presentationDelegate: PresentationDelegate
     private var actionComponent: AdyenActionComponent?
+    private let initialFrame: CGRect
 
     override init(
         frame: CGRect,
@@ -17,6 +18,7 @@ class CardAdvancedFlowComponent: BaseCardComponent {
     ) {
         presentationDelegate = CardAdvancedFlowPresentationDelegate()
         actionComponentDelegate = CardAdvancedFlowActionComponentDelegate(componentFlutterApi: componentFlutterApi)
+        initialFrame = frame
         super.init(
             frame: frame,
             viewIdentifier: viewIdentifier,
@@ -47,6 +49,7 @@ class CardAdvancedFlowComponent: BaseCardComponent {
         cardComponent = try buildCardComponent(paymentMethods: paymentMethods, cardComponentConfiguration: cardComponentConfiguration)
         cardDelegate = CardAdvancedFlowDelegate(componentFlutterApi: componentFlutterApi)
         cardComponent?.delegate = cardDelegate
+        cardComponent?.viewController.view.frame = initialFrame
         guard let cardView = cardComponent?.viewController.view else { throw PlatformError(errorDescription: "Failed to get card component view") }
         return cardView
     }

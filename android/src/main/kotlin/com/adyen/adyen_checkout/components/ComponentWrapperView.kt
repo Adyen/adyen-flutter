@@ -14,6 +14,8 @@ import com.adyen.checkout.components.core.internal.Component
 import com.adyen.checkout.ui.core.AdyenComponentView
 import com.adyen.checkout.ui.core.internal.ui.ViewableComponent
 import com.google.android.material.button.MaterialButton
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -32,6 +34,7 @@ class ComponentWrapperView
     private lateinit var activity: ComponentActivity
     private lateinit var componentFlutterApi: ComponentFlutterApi
     private val screenDensity = context.resources.displayMetrics.density
+    private var updateComponentViewHeightJob: Job? = null
 
     init {
         inflate(context, R.layout.component_wrapper_view, this)
@@ -43,10 +46,10 @@ class ComponentWrapperView
             attach(cardComponent, activity)
         }
 
-        // We delay adding the change listener to prevent initial layout change coverage
-        activity.lifecycleScope.launch {
-            delay(500)
-            addOnLayoutChangeListener { v, left, top, right, bottom, oldLeft, oldTop, oldRight, oldBottom ->
+        addOnLayoutChangeListener { v, left, top, right, bottom, oldLeft, oldTop, oldRight, oldBottom ->
+            updateComponentViewHeightJob?.cancel()
+            updateComponentViewHeightJob = activity.lifecycleScope.launch(Dispatchers.Main) {
+                delay(50)
                 updateComponentViewHeight()
             }
         }

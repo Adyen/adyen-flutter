@@ -7,11 +7,19 @@ import 'package:adyen_checkout_example/network/service.dart';
 import 'package:adyen_checkout_example/repositories/adyen_sessions_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 import 'navigation/routes.dart';
 
 void main() {
-  runApp(const MaterialApp(home: MyApp()));
+  runApp(const MaterialApp(localizationsDelegates: [
+    GlobalMaterialLocalizations.delegate,
+    GlobalWidgetsLocalizations.delegate,
+    GlobalCupertinoLocalizations.delegate,
+  ], supportedLocales: [
+    Locale('en'), // English
+    Locale('ar'), // Arabic
+  ], home: MyApp()));
 }
 
 class MyApp extends StatefulWidget {
@@ -105,31 +113,33 @@ class _MyAppState extends State<MyApp> {
                             borderRadius: BorderRadius.circular(10.0),
                           ),
                           builder: (BuildContext context) {
-                            return SingleChildScrollView(
-                                child: Column(
-                              children: [
-                                Container(height: 8),
-                                Container(
-                                  width: 48,
-                                  height: 6,
-                                  decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(10),
-                                      color: Colors.grey),
-                                ),
-                                Container(height: 8),
-                                Container(
-                                  padding: EdgeInsets.only(
-                                      bottom: MediaQuery.of(context)
-                                          .viewInsets
-                                          .bottom),
-                                  child: _buildSessionCardWidget(
-                                    context,
-                                    _adyenSessionRepository,
-                                    sessionResponse,
+                            return SafeArea(
+                              child: SingleChildScrollView(
+                                  child: Column(
+                                children: [
+                                  Container(height: 8),
+                                  Container(
+                                    width: 48,
+                                    height: 6,
+                                    decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(10),
+                                        color: Colors.grey),
                                   ),
-                                ),
-                              ],
-                            ));
+                                  Container(height: 8),
+                                  Container(
+                                    padding: EdgeInsets.only(
+                                        bottom: MediaQuery.of(context)
+                                            .viewInsets
+                                            .bottom),
+                                    child: _buildSessionCardWidget(
+                                      context,
+                                      _adyenSessionRepository,
+                                      sessionResponse,
+                                    ),
+                                  ),
+                                ],
+                              )),
+                            );
                           }));
                 },
                 child: const Text("Card component session sheet")),
@@ -259,7 +269,10 @@ class _MyAppState extends State<MyApp> {
       countryCode: Config.countryCode,
       amount: Config.amount,
       shopperLocale: Config.shopperLocale,
-      cardConfiguration: const CardConfiguration(showStorePaymentField: false),
+      cardConfiguration: const CardConfiguration(
+        showStorePaymentField: true,
+        holderNameRequired: false,
+      ),
     );
 
     final session = Session(

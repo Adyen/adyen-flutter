@@ -8,12 +8,14 @@ class AndroidPlatformView extends StatelessWidget {
   final String viewType;
   final Map<String, dynamic> creationParams;
   final MessageCodec codec;
+  final Set<Factory<OneSequenceGestureRecognizer>>? gestureRecognizers;
 
   const AndroidPlatformView({
     super.key,
     required this.viewType,
     required this.creationParams,
     required this.codec,
+    this.gestureRecognizers,
   });
 
   @override
@@ -23,7 +25,7 @@ class AndroidPlatformView extends StatelessWidget {
       surfaceFactory: (context, controller) {
         return AndroidViewSurface(
           controller: controller as AndroidViewController,
-          gestureRecognizers: const <Factory<OneSequenceGestureRecognizer>>{},
+          gestureRecognizers: gestureRecognizers ?? {},
           hitTestBehavior: PlatformViewHitTestBehavior.opaque,
         );
       },
@@ -31,7 +33,7 @@ class AndroidPlatformView extends StatelessWidget {
         return PlatformViewsService.initSurfaceAndroidView(
           id: params.id,
           viewType: viewType,
-          layoutDirection: TextDirection.ltr,
+          layoutDirection: Directionality.of(context),
           creationParams: creationParams,
           creationParamsCodec: codec,
           onFocus: () {

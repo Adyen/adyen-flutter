@@ -59,8 +59,8 @@ Widget buildCardWidget(
     amount: Config.amount,
     shopperLocale: Config.shopperLocale,
     cardConfiguration: const CardConfiguration(
-      showStorePaymentField: false,
-      holderNameRequired: false,
+      holderNameRequired: true,
+      showStorePaymentField: true,
     ),
   );
 

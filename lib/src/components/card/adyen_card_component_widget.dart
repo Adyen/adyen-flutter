@@ -3,16 +3,19 @@ import 'package:adyen_checkout/src/components/card/card_advanced_flow_widget.dar
 import 'package:adyen_checkout/src/components/card/card_session_flow_widget.dart';
 import 'package:adyen_checkout/src/utils/dto_mapper.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/widgets.dart';
 
 class AdyenCardComponentWidget extends StatelessWidget {
   final ComponentPaymentFlow componentPaymentFlow;
   final Future<void> Function(PaymentResult) onPaymentResult;
+  final Set<Factory<OneSequenceGestureRecognizer>>? gestureRecognizers;
 
   const AdyenCardComponentWidget({
     super.key,
     required this.componentPaymentFlow,
     required this.onPaymentResult,
+    this.gestureRecognizers,
   });
 
   @override
@@ -50,6 +53,7 @@ class AdyenCardComponentWidget extends StatelessWidget {
       onPaymentsDetails: cardComponentAdvancedFlow.onPaymentsDetails,
       onPaymentResult: onPaymentResult,
       initialViewHeight: initialHeight,
+      gestureRecognizers: gestureRecognizers,
     );
   }
 
@@ -69,11 +73,31 @@ class AdyenCardComponentWidget extends StatelessWidget {
     double androidViewHeight = 294;
 
     if (cardConfiguration.holderNameRequired) {
-      androidViewHeight += 63;
+      androidViewHeight += 61;
     }
+
     if (cardConfiguration.showStorePaymentField) {
-      androidViewHeight += 55;
+      androidViewHeight += 43;
     }
+
+    if (cardConfiguration.addressMode == AddressMode.full) {
+      androidViewHeight += 422;
+    }
+
+    if (cardConfiguration.addressMode == AddressMode.postalCode) {
+      androidViewHeight += 61;
+    }
+
+    if (cardConfiguration.socialSecurityNumberFieldVisibility ==
+        FieldVisibility.show) {
+      androidViewHeight += 61;
+    }
+
+    if (cardConfiguration.kcpFieldVisibility ==
+        FieldVisibility.show) {
+      androidViewHeight += 164;
+    }
+
     return androidViewHeight;
   }
 

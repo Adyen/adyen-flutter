@@ -6,8 +6,10 @@ import 'package:adyen_checkout/src/components/component_result_api.dart';
 import 'package:adyen_checkout/src/components/platform/android_platform_view.dart';
 import 'package:adyen_checkout/src/components/platform/ios_platform_view.dart';
 import 'package:adyen_checkout/src/generated/platform_api.g.dart';
+import 'package:adyen_checkout/src/utils/constants.dart';
 import 'package:adyen_checkout/src/utils/payment_flow_outcome_handler.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -21,6 +23,7 @@ class CardAdvancedFlowWidget extends StatefulWidget {
     required this.onPaymentResult,
     required this.initialViewHeight,
     PaymentFlowOutcomeHandler? paymentFlowOutcomeHandler,
+    this.gestureRecognizers,
   }) : paymentFlowOutcomeHandler =
             paymentFlowOutcomeHandler ?? PaymentFlowOutcomeHandler();
 
@@ -31,6 +34,7 @@ class CardAdvancedFlowWidget extends StatefulWidget {
   final Future<void> Function(PaymentResult) onPaymentResult;
   final double initialViewHeight;
   final PaymentFlowOutcomeHandler paymentFlowOutcomeHandler;
+  final Set<Factory<OneSequenceGestureRecognizer>>? gestureRecognizers;
 
   @override
   State<CardAdvancedFlowWidget> createState() => _CardAdvancedFlowWidgetState();
@@ -41,6 +45,7 @@ class _CardAdvancedFlowWidgetState extends State<CardAdvancedFlowWidget> {
   final ComponentResultApi _resultApi = ComponentResultApi();
   final StreamController<double> _resizeStream = StreamController.broadcast();
   final AdyenComponentApi _adyenComponentApi = AdyenComponentApi();
+  final GlobalKey _cardWidgetKey = GlobalKey(debugLabel: "CardWidget");
   late Widget _cardView;
 
   @override
@@ -61,7 +66,9 @@ class _CardAdvancedFlowWidgetState extends State<CardAdvancedFlowWidget> {
         stream: _resizeStream.stream.distinct(),
         builder: (BuildContext context, AsyncSnapshot snapshot) {
           double platformViewHeight = snapshot.data;
+          print(platformViewHeight);
           return SizedBox(
+            key: _cardWidgetKey,
             height: platformViewHeight,
             child: _cardView,
           );
@@ -78,7 +85,8 @@ class _CardAdvancedFlowWidgetState extends State<CardAdvancedFlowWidget> {
   // ignore: unused_element
   void _resetCardView() {
     setState(() {
-      _cardView = _buildPlatformCardView();
+      // TODO: We decide later if we want to reset the card view automatically.
+      //_cardView = _buildPlatformCardView();
     });
   }
 
@@ -143,27 +151,28 @@ class _CardAdvancedFlowWidgetState extends State<CardAdvancedFlowWidget> {
   }
 
   Widget _buildPlatformCardView() {
-    final Key key = UniqueKey();
-    const String viewType = 'cardComponentAdvancedFlow';
     final Map<String, dynamic> creationParams = <String, dynamic>{
-      "paymentMethods": widget.paymentMethods,
-      "cardComponentConfiguration": widget.cardComponentConfiguration,
+      Constants.paymentMethodsKey: widget.paymentMethods,
+      Constants.cardComponentConfigurationKey:
+          widget.cardComponentConfiguration,
     };
 
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
         return AndroidPlatformView(
-          key: key,
-          viewType: viewType,
+          key: UniqueKey(),
+          viewType: Constants.cardComponentAdvancedFlowKey,
           codec: _codec,
           creationParams: creationParams,
         );
       case TargetPlatform.iOS:
         return IosPlatformView(
-          key: key,
-          viewType: viewType,
-          creationParams: creationParams,
+          key: UniqueKey(),
+          viewType: Constants.cardComponentAdvancedFlowKey,
           codec: _codec,
+          creationParams: creationParams,
+          gestureRecognizers: widget.gestureRecognizers,
+          cardWidgetKey: _cardWidgetKey,
         );
       default:
         throw UnsupportedError('Unsupported platform');

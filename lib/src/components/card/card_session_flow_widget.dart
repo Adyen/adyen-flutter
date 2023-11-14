@@ -5,23 +5,27 @@ import 'package:adyen_checkout/src/components/component_result_api.dart';
 import 'package:adyen_checkout/src/components/platform/android_platform_view.dart';
 import 'package:adyen_checkout/src/components/platform/ios_platform_view.dart';
 import 'package:adyen_checkout/src/generated/platform_api.g.dart';
+import 'package:adyen_checkout/src/utils/constants.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 class CardSessionFlowWidget extends StatefulWidget {
   const CardSessionFlowWidget({
+    super.key,
     required this.cardComponentConfiguration,
     required this.session,
     required this.onPaymentResult,
     required this.initialViewHeight,
-    super.key,
+    this.gestureRecognizers,
   });
 
   final CardComponentConfigurationDTO cardComponentConfiguration;
   final SessionDTO session;
   final Future<void> Function(PaymentResult) onPaymentResult;
   final double initialViewHeight;
+  final Set<Factory<OneSequenceGestureRecognizer>>? gestureRecognizers;
 
   @override
   State<CardSessionFlowWidget> createState() => _CardSessionFlowWidgetState();
@@ -31,6 +35,7 @@ class _CardSessionFlowWidgetState extends State<CardSessionFlowWidget> {
   final MessageCodec<Object?> _codec = ComponentFlutterApi.codec;
   final ComponentResultApi _resultApi = ComponentResultApi();
   final StreamController<double> _resizeStream = StreamController.broadcast();
+  final GlobalKey _cardWidgetKey = GlobalKey();
   late Widget _cardView;
 
   @override
@@ -51,7 +56,9 @@ class _CardSessionFlowWidgetState extends State<CardSessionFlowWidget> {
         stream: _resizeStream.stream.distinct(),
         builder: (BuildContext context, AsyncSnapshot snapshot) {
           double platformViewHeight = snapshot.data;
+          print(platformViewHeight);
           return SizedBox(
+            key: _cardWidgetKey,
             height: platformViewHeight,
             child: _cardView,
           );
@@ -96,27 +103,28 @@ class _CardSessionFlowWidgetState extends State<CardSessionFlowWidget> {
       _resizeStream.add(event.data as double);
 
   Widget _buildPlatformCardView() {
-    final Key key = UniqueKey();
-    const String viewType = 'cardComponentSessionFlow';
     final Map<String, dynamic> creationParams = <String, dynamic>{
-      "session": widget.session,
-      "cardComponentConfiguration": widget.cardComponentConfiguration,
+      Constants.sessionKey: widget.session,
+      Constants.cardComponentConfigurationKey:
+          widget.cardComponentConfiguration,
     };
 
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
         return AndroidPlatformView(
-          key: key,
-          viewType: viewType,
+          key: UniqueKey(),
+          viewType: Constants.cardComponentSessionFlowKey,
           codec: _codec,
           creationParams: creationParams,
         );
       case TargetPlatform.iOS:
         return IosPlatformView(
-          key: key,
-          viewType: viewType,
+          key: UniqueKey(),
+          viewType: Constants.cardComponentSessionFlowKey,
           creationParams: creationParams,
           codec: _codec,
+          gestureRecognizers: widget.gestureRecognizers,
+          cardWidgetKey: _cardWidgetKey,
         );
       default:
         throw UnsupportedError('Unsupported platform');

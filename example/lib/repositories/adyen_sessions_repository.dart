@@ -42,10 +42,10 @@ class AdyenSessionsRepository {
             countryCode: Config.countryCode,
             shopperLocale: Config.shopperLocale,
             shopperReference: Config.shopperReference,
-            // storePaymentMethodMode: StorePaymentMethodMode
-            //     .askForConsent.storePaymentMethodModeString,
-            // recurringProcessingModel:
-            //     RecurringProcessingModel.cardOnFile.recurringModelString,
+             storePaymentMethodMode: StorePaymentMethodMode
+                .askForConsent.storePaymentMethodModeString,
+             recurringProcessingModel:
+                 RecurringProcessingModel.cardOnFile.recurringModelString,
             shopperInteraction:
                 ShopperInteractionModel.ecommerce.shopperInteractionModelString,
             channel: _determineChannel(),
