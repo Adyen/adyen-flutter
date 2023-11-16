@@ -4,12 +4,12 @@ import androidx.lifecycle.LiveData
 import com.adyen.adyen_checkout.utils.Event
 import org.json.JSONObject
 
-class ComponentMessenger : LiveData<Event<JSONObject>>() {
+class ComponentActionMessenger : LiveData<Event<JSONObject>>() {
     companion object {
-        private val componentMessenger = ComponentMessenger()
-        fun instance() = componentMessenger
+        private val componentActionMessenger = ComponentActionMessenger()
+        fun instance() = componentActionMessenger
         fun sendResult(value: JSONObject) {
-            componentMessenger.postValue(Event(value))
+            componentActionMessenger.postValue(Event(value))
         }
     }
 }

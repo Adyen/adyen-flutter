@@ -1,24 +1,17 @@
 package com.adyen.adyen_checkout.components.card.session
 
-import CardComponentConfigurationDTO
 import ComponentFlutterApi
 import SessionDTO
 import android.content.Context
 import android.util.Log
 import android.view.View
 import android.view.ViewGroup
-import android.widget.FrameLayout
-import android.widget.LinearLayout
 import androidx.activity.ComponentActivity
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.view.children
 import androidx.core.view.doOnNextLayout
 import androidx.lifecycle.lifecycleScope
 import com.adyen.adyen_checkout.R
-import com.adyen.adyen_checkout.components.ComponentHeightMessenger
-import com.adyen.adyen_checkout.components.ComponentMessenger
-import com.adyen.adyen_checkout.components.ComponentWrapperView
-import com.adyen.adyen_checkout.utils.ConfigurationMapper.toNativeModel
+import com.adyen.adyen_checkout.components.card.BaseCardComponent
 import com.adyen.checkout.card.CardComponent
 import com.adyen.checkout.card.CardConfiguration
 import com.adyen.checkout.components.core.PaymentMethodTypes
@@ -28,29 +21,18 @@ import com.adyen.checkout.sessions.core.CheckoutSessionProvider
 import com.adyen.checkout.sessions.core.CheckoutSessionResult
 import com.adyen.checkout.sessions.core.SessionModel
 import com.adyen.checkout.ui.core.AdyenComponentView
-import io.flutter.plugin.platform.PlatformView
 import kotlinx.coroutines.launch
 import java.util.UUID
 
-internal class CardSessionFlowComponent(
+class CardSessionFlowComponent(
     private val activity: ComponentActivity,
     private val componentFlutterApi: ComponentFlutterApi,
     context: Context,
     id: Int,
     creationParams: Map<*, *>?
-) : PlatformView {
-    private val configuration = creationParams?.get("cardComponentConfiguration") as CardComponentConfigurationDTO
+) : BaseCardComponent(activity, componentFlutterApi, context, id, creationParams) {
     private val session = creationParams?.get("session") as SessionDTO
-    private val sessionModel = SessionModel(id = session.id, sessionData =  session.sessionData)
-    private val environment = configuration.environment.toNativeModel()
-    private val cardConfiguration = configuration.cardConfiguration.toNativeModel(
-        context,
-        environment,
-        configuration.clientKey
-    )
-
-    private val componentWrapperView = ComponentWrapperView(activity, componentFlutterApi)
-    private lateinit var cardComponent: CardComponent
+    private val sessionModel = SessionModel(id = session.id, sessionData = session.sessionData)
 
     init {
         activity.lifecycleScope.launch {
@@ -79,11 +61,9 @@ internal class CardSessionFlowComponent(
                 key = UUID.randomUUID().toString()
             )
 
-            componentWrapperView.addComponent(cardComponent)
+            addComponent(cardComponent)
         }
     }
-
-    override fun getView(): View = componentWrapperView
 
     override fun onFlutterViewAttached(flutterView: View) {
         super.onFlutterViewAttached(flutterView)
@@ -93,44 +73,12 @@ internal class CardSessionFlowComponent(
         }
     }
 
-    override fun dispose() {
-        ComponentMessenger.instance().removeObservers(activity)
-        ComponentHeightMessenger.instance().removeObservers(activity)
-    }
-
     private fun adjustCardComponentLayout(flutterView: View) {
-        val linearLayoutParams = LinearLayout.LayoutParams(
-            ViewGroup.LayoutParams.MATCH_PARENT,
-            ViewGroup.LayoutParams.WRAP_CONTENT,
-        )
-        //Adyen component view
         val adyenComponentView = flutterView.findViewById<AdyenComponentView>(R.id.adyen_component_view)
         adyenComponentView.layoutParams = ConstraintLayout.LayoutParams(
             ViewGroup.LayoutParams.MATCH_PARENT,
             ViewGroup.LayoutParams.WRAP_CONTENT,
         )
-
-        //Component container
-        val componentContainer = flutterView.findViewById<FrameLayout>(R.id.frameLayout_componentContainer)
-        componentContainer.layoutParams = linearLayoutParams
-
-        //Button container
-        val buttonContainer = flutterView.findViewById<FrameLayout>(R.id.frameLayout_buttonContainer)
-        buttonContainer.layoutParams = linearLayoutParams
-
-        //Pay button
-        val button = buttonContainer.children.firstOrNull()
-        val buttonParams = FrameLayout.LayoutParams(
-            ViewGroup.LayoutParams.MATCH_PARENT,
-            ViewGroup.LayoutParams.WRAP_CONTENT,
-        )
-        button?.layoutParams = buttonParams
-
-        //Card
-        val card = componentContainer.children.firstOrNull() as ViewGroup?
-        val cardLayoutParams = card?.layoutParams
-        cardLayoutParams?.height = LinearLayout.LayoutParams.WRAP_CONTENT
-        card?.layoutParams = cardLayoutParams
     }
 
 

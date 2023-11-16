@@ -44,7 +44,7 @@ class ComponentWrapperView
     fun <T> addComponent(cardComponent: T) where T : ViewableComponent, T : Component {
         with(findViewById<AdyenComponentView>(R.id.adyen_component_view)) {
             attach(cardComponent, activity)
-            addComponentHeightUpdateObserver()
+            addComponentHeightObserver()
         }
 
         activity.lifecycleScope.launch {
@@ -55,7 +55,7 @@ class ComponentWrapperView
         }
     }
 
-    private fun addComponentHeightUpdateObserver() {
+    private fun addComponentHeightObserver() {
         ComponentHeightMessenger.instance().observe(activity) {
             updateComponentViewHeight()
         }
@@ -66,7 +66,7 @@ class ComponentWrapperView
         if (cardViewHeight == null) {
             activity.lifecycleScope.launch() {
                 //View not rendered therefore we try again after delay.
-                // This is a workaround because there is no listener from the native view available.
+                //This is a workaround because there is currently no notifier from the native view.
                 delay(100)
                 updateComponentViewHeight()
             }

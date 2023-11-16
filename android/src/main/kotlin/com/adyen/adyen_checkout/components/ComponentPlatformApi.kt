@@ -7,7 +7,7 @@ class ComponentPlatformApi : ComponentPlatformInterface {
     override fun onAction(actionResponse: Map<String?, Any?>?) {
         actionResponse?.let {
             val jsonActionResponse = JSONObject(it)
-            ComponentMessenger.sendResult(jsonActionResponse)
+            ComponentActionMessenger.sendResult(jsonActionResponse)
         }
     }
 
