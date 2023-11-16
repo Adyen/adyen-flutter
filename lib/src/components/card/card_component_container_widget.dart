@@ -13,6 +13,7 @@ class AdyenCardComponentContainerWidget extends StatelessWidget {
   final AsyncSnapshot snapshot;
   final Key cardWidgetKey;
   final Widget cardWidget;
+  final double marginBottom = 16;
 
   @override
   Widget build(BuildContext context) {
@@ -22,14 +23,10 @@ class AdyenCardComponentContainerWidget extends StatelessWidget {
           duration: const Duration(milliseconds: 300),
           curve: Curves.fastOutSlowIn,
           opacity: snapshot.data != null ? 1 : 0,
-          child: AnimatedSize(
-            duration: const Duration(milliseconds: 300),
-            curve: Curves.fastOutSlowIn,
-            child: SizedBox(
-              key: cardWidgetKey,
-              height: _determineHeight(snapshot),
-              child: cardWidget,
-            ),
+          child: SizedBox(
+            key: cardWidgetKey,
+            height: _determineHeight(snapshot),
+            child: cardWidget,
           ),
         ),
         if (snapshot.data == null)
@@ -46,7 +43,7 @@ class AdyenCardComponentContainerWidget extends StatelessWidget {
       return initialViewHeight;
     }
     if (snapshot.data > 0) {
-      return snapshot.data;
+      return snapshot.data + marginBottom;
     } else {
       return initialViewHeight;
     }

@@ -14,11 +14,9 @@ import com.adyen.checkout.components.core.internal.Component
 import com.adyen.checkout.ui.core.AdyenComponentView
 import com.adyen.checkout.ui.core.internal.ui.ViewableComponent
 import com.google.android.material.button.MaterialButton
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.math.round
-
 
 class ComponentWrapperView
 @JvmOverloads constructor(
@@ -34,30 +32,25 @@ class ComponentWrapperView
     private lateinit var activity: ComponentActivity
     private lateinit var componentFlutterApi: ComponentFlutterApi
     private val screenDensity = context.resources.displayMetrics.density
-    private var updateComponentViewHeightJob: Job? = null
 
     init {
         inflate(context, R.layout.component_wrapper_view, this)
     }
 
-    @Suppress("UNUSED_ANONYMOUS_PARAMETER")
     fun <T> addComponent(cardComponent: T) where T : ViewableComponent, T : Component {
         with(findViewById<AdyenComponentView>(R.id.adyen_component_view)) {
             attach(cardComponent, activity)
             addComponentHeightObserver()
         }
-
-        activity.lifecycleScope.launch {
-            delay(500)
-            addOnLayoutChangeListener { v, left, top, right, bottom, oldLeft, oldTop, oldRight, oldBottom ->
-                updateComponentViewHeight()
-            }
-        }
     }
 
     private fun addComponentHeightObserver() {
         ComponentHeightMessenger.instance().observe(activity) {
-            updateComponentViewHeight()
+            activity.lifecycleScope.launch {
+                //We need to wait for animation to finish
+                delay(300)
+                updateComponentViewHeight()
+            }
         }
     }
 

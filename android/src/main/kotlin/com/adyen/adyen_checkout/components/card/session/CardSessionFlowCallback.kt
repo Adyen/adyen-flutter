@@ -5,6 +5,7 @@ import ComponentCommunicationType
 import ComponentFlutterApi
 import PaymentResultModelDTO
 import android.util.Log
+import com.adyen.adyen_checkout.components.ComponentHeightMessenger
 import com.adyen.adyen_checkout.utils.ConfigurationMapper.mapToOrderResponseModel
 import com.adyen.checkout.card.CardComponentState
 import com.adyen.checkout.components.core.ComponentError
@@ -46,5 +47,9 @@ class CardSessionFlowCallback(
             data = componentError.exception.toString(),
         )
         componentFlutterApi.onComponentCommunication(model) {}
+    }
+
+    override fun onStateChanged(state: CardComponentState) {
+        ComponentHeightMessenger.sendResult(1)
     }
 }

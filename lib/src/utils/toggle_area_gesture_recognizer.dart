@@ -21,8 +21,7 @@ class ToggleAreaGestureRecognizer extends OneSequenceGestureRecognizer {
 
     switch (event) {
       case PointerDownEvent():
-        if (_isPointerOverToggle(event, renderBox) &&
-            _isPointerWithinBottomHalfOfCardView(event, renderBox)) {
+        if (_isPointerOverToggle(event, renderBox)) {
           resolve(GestureDisposition.accepted);
           stopTrackingPointer(event.pointer);
         }

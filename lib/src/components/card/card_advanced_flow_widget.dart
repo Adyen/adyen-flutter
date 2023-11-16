@@ -65,7 +65,7 @@ class _CardAdvancedFlowWidgetState extends State<CardAdvancedFlowWidget> {
   Widget build(BuildContext context) {
     return StreamBuilder(
         stream: _resizeStream.stream
-            .debounce(const Duration(milliseconds: 50))
+            .debounce(const Duration(milliseconds: 100))
             .distinct(),
         builder: (BuildContext context, AsyncSnapshot snapshot) {
           return AdyenCardComponentContainerWidget(
