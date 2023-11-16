@@ -102,7 +102,7 @@ class AdyenCardComponentWidget extends StatelessWidget {
   }
 
   double _determineInitialIosViewHeight(CardConfiguration cardConfiguration) {
-    double iosViewHeight = 294;
+    double iosViewHeight = 272;
 
     if (cardConfiguration.holderNameRequired) {
       iosViewHeight += 63;

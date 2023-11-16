@@ -43,7 +43,7 @@ class AdyenSessionsRepository {
             shopperLocale: Config.shopperLocale,
             shopperReference: Config.shopperReference,
              storePaymentMethodMode: StorePaymentMethodMode
-                .askForConsent.storePaymentMethodModeString,
+                .enabled.storePaymentMethodModeString,
              recurringProcessingModel:
                  RecurringProcessingModel.cardOnFile.recurringModelString,
             shopperInteraction:

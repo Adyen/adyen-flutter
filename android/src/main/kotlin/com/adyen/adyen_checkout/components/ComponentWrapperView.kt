@@ -14,10 +14,10 @@ import com.adyen.checkout.components.core.internal.Component
 import com.adyen.checkout.ui.core.AdyenComponentView
 import com.adyen.checkout.ui.core.internal.ui.ViewableComponent
 import com.google.android.material.button.MaterialButton
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlin.math.round
 
 
 class ComponentWrapperView
@@ -44,24 +44,41 @@ class ComponentWrapperView
     fun <T> addComponent(cardComponent: T) where T : ViewableComponent, T : Component {
         with(findViewById<AdyenComponentView>(R.id.adyen_component_view)) {
             attach(cardComponent, activity)
+            addComponentHeightUpdateObserver()
         }
 
-        addOnLayoutChangeListener { v, left, top, right, bottom, oldLeft, oldTop, oldRight, oldBottom ->
-            updateComponentViewHeightJob?.cancel()
-            updateComponentViewHeightJob = activity.lifecycleScope.launch(Dispatchers.Main) {
-                delay(50)
+        activity.lifecycleScope.launch {
+            delay(500)
+            addOnLayoutChangeListener { v, left, top, right, bottom, oldLeft, oldTop, oldRight, oldBottom ->
                 updateComponentViewHeight()
             }
         }
     }
 
+    private fun addComponentHeightUpdateObserver() {
+        ComponentHeightMessenger.instance().observe(activity) {
+            updateComponentViewHeight()
+        }
+    }
+
     private fun updateComponentViewHeight() {
-        val valueInPixels = resources.getDimension(R.dimen.standard_margin)
-        val cardViewHeight = findViewById<FrameLayout>(R.id.frameLayout_componentContainer).getChildAt(0).height
-        val buttonHeight = findViewById<MaterialButton>(R.id.payButton)?.height?.plus((valueInPixels))
-        val componentHeight = ((cardViewHeight + (buttonHeight ?: 0f)) / screenDensity).toDouble()
+        val cardViewHeight = findViewById<FrameLayout>(R.id.frameLayout_componentContainer)?.getChildAt(0)?.height
+        if (cardViewHeight == null) {
+            activity.lifecycleScope.launch() {
+                //View not rendered therefore we try again after delay.
+                // This is a workaround because there is no listener from the native view available.
+                delay(100)
+                updateComponentViewHeight()
+            }
+            return
+        }
+
+        val standardMargin = resources.getDimension(R.dimen.standard_margin)
+        val buttonHeight = (findViewById<MaterialButton>(R.id.payButton)?.height ?: 0).plus((standardMargin))
+        val componentHeight = ((cardViewHeight + buttonHeight) / screenDensity).toDouble()
+        val roundedHeight = round(componentHeight * 100) / 100
         componentFlutterApi.onComponentCommunication(
-            ComponentCommunicationModel(type = ComponentCommunicationType.RESIZE, data = componentHeight)
+            ComponentCommunicationModel(type = ComponentCommunicationType.RESIZE, data = roundedHeight)
         ) {}
     }
 

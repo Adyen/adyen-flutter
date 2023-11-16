@@ -15,6 +15,7 @@ import androidx.core.view.children
 import androidx.core.view.doOnNextLayout
 import androidx.lifecycle.lifecycleScope
 import com.adyen.adyen_checkout.R
+import com.adyen.adyen_checkout.components.ComponentHeightMessenger
 import com.adyen.adyen_checkout.components.ComponentMessenger
 import com.adyen.adyen_checkout.components.ComponentWrapperView
 import com.adyen.adyen_checkout.utils.ConfigurationMapper.toNativeModel
@@ -93,8 +94,8 @@ internal class CardSessionFlowComponent(
     }
 
     override fun dispose() {
-        cardComponent.delegate.onCleared()
         ComponentMessenger.instance().removeObservers(activity)
+        ComponentHeightMessenger.instance().removeObservers(activity)
     }
 
     private fun adjustCardComponentLayout(flutterView: View) {

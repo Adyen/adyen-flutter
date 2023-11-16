@@ -3,7 +3,6 @@ package com.adyen.adyen_checkout.components.card.advancedFlow
 import CardComponentConfigurationDTO
 import ComponentFlutterApi
 import android.content.Context
-import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
@@ -12,6 +11,7 @@ import androidx.activity.ComponentActivity
 import androidx.core.view.children
 import androidx.core.view.doOnNextLayout
 import com.adyen.adyen_checkout.R
+import com.adyen.adyen_checkout.components.ComponentHeightMessenger
 import com.adyen.adyen_checkout.components.ComponentMessenger
 import com.adyen.adyen_checkout.components.ComponentWrapperView
 import com.adyen.adyen_checkout.utils.ConfigurationMapper.toNativeModel
@@ -67,7 +67,7 @@ internal class CardAdvancedFlowComponent(
 
     override fun dispose() {
         ComponentMessenger.instance().removeObservers(activity)
-        cardComponent.delegate.onCleared()
+        ComponentHeightMessenger.instance().removeObservers(activity)
     }
 
     private fun adjustCardComponentLayout(flutterView: View) {

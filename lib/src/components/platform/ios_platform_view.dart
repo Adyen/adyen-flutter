@@ -12,6 +12,7 @@ class IosPlatformView extends StatelessWidget {
   final Map<String, dynamic> creationParams;
   final MessageCodec codec;
   final Set<Factory<OneSequenceGestureRecognizer>>? gestureRecognizers;
+  final Function(int) onPlatformViewCreated;
   final GlobalKey cardWidgetKey;
 
   const IosPlatformView({
@@ -19,6 +20,7 @@ class IosPlatformView extends StatelessWidget {
     required this.viewType,
     required this.creationParams,
     required this.codec,
+    required this.onPlatformViewCreated,
     required this.cardWidgetKey,
     this.gestureRecognizers,
   });
@@ -27,6 +29,7 @@ class IosPlatformView extends StatelessWidget {
   UiKitView build(BuildContext context) {
     return UiKitView(
       viewType: viewType,
+      onPlatformViewCreated: onPlatformViewCreated,
       layoutDirection: Directionality.of(context),
       creationParams: creationParams,
       hitTestBehavior: PlatformViewHitTestBehavior.opaque,

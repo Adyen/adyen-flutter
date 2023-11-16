@@ -373,6 +373,8 @@ abstract class CheckoutFlutterApi {
 @HostApi()
 abstract class ComponentPlatformInterface {
   void onAction(Map<String?, Object?>? actionResponse);
+
+  void updateViewHeight(int viewId);
 }
 
 @FlutterApi()

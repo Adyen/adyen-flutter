@@ -9,12 +9,14 @@ class AndroidPlatformView extends StatelessWidget {
   final Map<String, dynamic> creationParams;
   final MessageCodec codec;
   final Set<Factory<OneSequenceGestureRecognizer>>? gestureRecognizers;
+  final Function(int) onPlatformViewCreated;
 
   const AndroidPlatformView({
     super.key,
     required this.viewType,
     required this.creationParams,
     required this.codec,
+    required this.onPlatformViewCreated,
     this.gestureRecognizers,
   });
 
@@ -41,6 +43,7 @@ class AndroidPlatformView extends StatelessWidget {
           },
         )
           ..addOnPlatformViewCreatedListener(params.onPlatformViewCreated)
+          ..addOnPlatformViewCreatedListener(onPlatformViewCreated)
           ..create();
       },
     );

@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:adyen_checkout/adyen_checkout.dart';
 import 'package:adyen_checkout/src/components/adyen_component_api.dart';
+import 'package:adyen_checkout/src/components/card/card_component_container_widget.dart';
 import 'package:adyen_checkout/src/components/component_result_api.dart';
 import 'package:adyen_checkout/src/components/platform/android_platform_view.dart';
 import 'package:adyen_checkout/src/components/platform/ios_platform_view.dart';
@@ -12,6 +13,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:stream_transform/stream_transform.dart';
 
 class CardAdvancedFlowWidget extends StatefulWidget {
   CardAdvancedFlowWidget({
@@ -45,15 +47,15 @@ class _CardAdvancedFlowWidgetState extends State<CardAdvancedFlowWidget> {
   final ComponentResultApi _resultApi = ComponentResultApi();
   final StreamController<double> _resizeStream = StreamController.broadcast();
   final AdyenComponentApi _adyenComponentApi = AdyenComponentApi();
-  final GlobalKey _cardWidgetKey = GlobalKey(debugLabel: "CardWidget");
-  late Widget _cardView;
+  final GlobalKey _cardWidgetKey = GlobalKey();
+  late Widget _cardWidget;
 
   @override
   void initState() {
     super.initState();
 
     ComponentFlutterApi.setup(_resultApi);
-    _cardView = _buildPlatformCardView();
+    _cardWidget = _buildCardWidget();
     _resultApi.componentCommunicationStream.stream
         .asBroadcastStream()
         .listen(_handleComponentCommunication);
@@ -62,15 +64,15 @@ class _CardAdvancedFlowWidgetState extends State<CardAdvancedFlowWidget> {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder(
-        initialData: widget.initialViewHeight,
-        stream: _resizeStream.stream.distinct(),
+        stream: _resizeStream.stream
+            .debounce(const Duration(milliseconds: 50))
+            .distinct(),
         builder: (BuildContext context, AsyncSnapshot snapshot) {
-          double platformViewHeight = snapshot.data;
-          print(platformViewHeight);
-          return SizedBox(
-            key: _cardWidgetKey,
-            height: platformViewHeight,
-            child: _cardView,
+          return AdyenCardComponentContainerWidget(
+            snapshot: snapshot,
+            cardWidgetKey: _cardWidgetKey,
+            initialViewHeight: widget.initialViewHeight,
+            cardWidget: _cardWidget,
           );
         });
   }
@@ -83,12 +85,11 @@ class _CardAdvancedFlowWidgetState extends State<CardAdvancedFlowWidget> {
   }
 
   // ignore: unused_element
-  void _resetCardView() {
-    setState(() {
-      // TODO: We decide later if we want to reset the card view automatically.
-      //_cardView = _buildPlatformCardView();
-    });
-  }
+  // void _resetCardView() {
+  //   setState(() {
+  //     _cardView = _buildPlatformCardView();
+  //   });
+  // }
 
   void _handleComponentCommunication(event) async {
     switch (event.type) {
@@ -150,7 +151,7 @@ class _CardAdvancedFlowWidgetState extends State<CardAdvancedFlowWidget> {
     widget.onPaymentResult(PaymentError(reason: errorMessage));
   }
 
-  Widget _buildPlatformCardView() {
+  Widget _buildCardWidget() {
     final Map<String, dynamic> creationParams = <String, dynamic>{
       Constants.paymentMethodsKey: widget.paymentMethods,
       Constants.cardComponentConfigurationKey:
@@ -164,6 +165,8 @@ class _CardAdvancedFlowWidgetState extends State<CardAdvancedFlowWidget> {
           viewType: Constants.cardComponentAdvancedFlowKey,
           codec: _codec,
           creationParams: creationParams,
+          gestureRecognizers: widget.gestureRecognizers,
+          onPlatformViewCreated: _adyenComponentApi.updateViewHeight,
         );
       case TargetPlatform.iOS:
         return IosPlatformView(
@@ -172,6 +175,7 @@ class _CardAdvancedFlowWidgetState extends State<CardAdvancedFlowWidget> {
           codec: _codec,
           creationParams: creationParams,
           gestureRecognizers: widget.gestureRecognizers,
+          onPlatformViewCreated: _adyenComponentApi.updateViewHeight,
           cardWidgetKey: _cardWidgetKey,
         );
       default:

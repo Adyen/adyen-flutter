@@ -1127,6 +1127,7 @@ class ComponentPlatformInterfaceCodec: FlutterStandardMessageCodec {
 /// Generated protocol from Pigeon that represents a handler of messages from Flutter.
 protocol ComponentPlatformInterface {
   func onAction(actionResponse: [String?: Any?]?) throws
+  func updateViewHeight(viewId: Int64) throws
 }
 
 /// Generated setup class from Pigeon to handle messages through the `binaryMessenger`.
@@ -1149,6 +1150,21 @@ class ComponentPlatformInterfaceSetup {
       }
     } else {
       onActionChannel.setMessageHandler(nil)
+    }
+    let updateViewHeightChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.ComponentPlatformInterface.updateViewHeight", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      updateViewHeightChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let viewIdArg = args[0] is Int64 ? args[0] as! Int64 : Int64(args[0] as! Int32)
+        do {
+          try api.updateViewHeight(viewId: viewIdArg)
+          reply(wrapResult(nil))
+        } catch {
+          reply(wrapError(error))
+        }
+      }
+    } else {
+      updateViewHeightChannel.setMessageHandler(nil)
     }
   }
 }

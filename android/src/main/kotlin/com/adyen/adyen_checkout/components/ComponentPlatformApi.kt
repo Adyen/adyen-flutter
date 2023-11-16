@@ -10,4 +10,8 @@ class ComponentPlatformApi : ComponentPlatformInterface {
             ComponentMessenger.sendResult(jsonActionResponse)
         }
     }
+
+    override fun updateViewHeight(viewId: Long) {
+        ComponentHeightMessenger.sendResult(viewId);
+    }
 }

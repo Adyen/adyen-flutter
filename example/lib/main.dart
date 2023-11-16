@@ -270,7 +270,7 @@ class _MyAppState extends State<MyApp> {
       amount: Config.amount,
       shopperLocale: Config.shopperLocale,
       cardConfiguration: const CardConfiguration(
-        showStorePaymentField: true,
+        showStorePaymentField: false,
         holderNameRequired: false,
       ),
     );

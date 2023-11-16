@@ -1271,6 +1271,7 @@ private object ComponentPlatformInterfaceCodec : StandardMessageCodec() {
 /** Generated interface from Pigeon that represents a handler of messages from Flutter. */
 interface ComponentPlatformInterface {
   fun onAction(actionResponse: Map<String?, Any?>?)
+  fun updateViewHeight(viewId: Long)
 
   companion object {
     /** The codec used by ComponentPlatformInterface. */
@@ -1289,6 +1290,25 @@ interface ComponentPlatformInterface {
             var wrapped: List<Any?>
             try {
               api.onAction(actionResponseArg)
+              wrapped = listOf<Any?>(null)
+            } catch (exception: Throwable) {
+              wrapped = wrapError(exception)
+            }
+            reply.reply(wrapped)
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.adyen_checkout.ComponentPlatformInterface.updateViewHeight", codec)
+        if (api != null) {
+          channel.setMessageHandler { message, reply ->
+            val args = message as List<Any?>
+            val viewIdArg = args[0].let { if (it is Int) it.toLong() else it as Long }
+            var wrapped: List<Any?>
+            try {
+              api.updateViewHeight(viewIdArg)
               wrapped = listOf<Any?>(null)
             } catch (exception: Throwable) {
               wrapped = wrapError(exception)

@@ -50,6 +50,7 @@ class BaseCardComponent: NSObject, FlutterPlatformView, UIScrollViewDelegate {
         componentWrapperView.addSubview(cardComponentView)
         disableNativeScrollingAndBouncing(cardComponentView: cardComponentView)
         adjustCardComponentLayout(cardComponentView: cardComponentView)
+        sendHeightUpdate()
     }
 
     func sendErrorToFlutterLayer(errorMessage: String) {
@@ -78,9 +79,17 @@ class BaseCardComponent: NSObject, FlutterPlatformView, UIScrollViewDelegate {
 
     private func setupResizeViewportCallback() {
         componentWrapperView.resizeViewportCallback = {
-            let viewHeight = self.cardComponent?.viewController.preferredContentSize.height ?? 0
-            let roundedViewHeight = Double(round(100 * viewHeight / 100))
-            self.componentFlutterApi.onComponentCommunication(componentCommunicationModel: ComponentCommunicationModel(type: ComponentCommunicationType.resize, data: roundedViewHeight), completion: { _ in })
+            self.sendHeightUpdate()
         }
+        
+        componentPlatformApi.onUpdateViewHeightCallback = {
+            self.sendHeightUpdate()
+        }
+    }
+    
+    private func sendHeightUpdate() {
+        guard let viewHeight = self.cardComponent?.viewController.preferredContentSize.height else { return }
+        let roundedViewHeight = Double(round(100 * viewHeight / 100))
+        self.componentFlutterApi.onComponentCommunication(componentCommunicationModel: ComponentCommunicationModel(type: ComponentCommunicationType.resize, data: roundedViewHeight), completion: { _ in })
     }
 }

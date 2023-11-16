@@ -21,21 +21,19 @@ class FirstRoute extends StatelessWidget {
             future: repository.fetchPaymentMethods(),
             builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
               if (snapshot.data == null) {
-                return const Center(
-                  child: CircularProgressIndicator(),
-                );
+                return Container();
               } else {
                 return SingleChildScrollView(
                   physics: const ClampingScrollPhysics(),
                   child: Column(
                     children: [
-                      Container(height: 200, color: Colors.blue),
                       buildCardWidget(
                         snapshot.data!,
                         context,
                         repository,
                       ),
                       Container(height: 200, color: Colors.yellow),
+                      Container(height: 200, color: Colors.blue),
                       Container(height: 200, color: Colors.green),
                     ],
                   ),
