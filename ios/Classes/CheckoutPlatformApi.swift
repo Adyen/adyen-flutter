@@ -167,7 +167,7 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
     private func onDropInResultFinished(paymentFlowOutcome: PaymentFlowOutcomeDTO) {
         let resultCode = ResultCode(rawValue: paymentFlowOutcome.result ?? "")
         let success = resultCode == .authorised || resultCode == .received || resultCode == .pending
-        finalizeAndDismiss(success: true, completion: { [weak self] in
+        finalizeAndDismiss(success: success, completion: { [weak self] in
             let paymentResult = PaymentResultDTO(type: PaymentResultEnum.finished, result: PaymentResultModelDTO(resultCode: resultCode?.rawValue))
             self?.checkoutFlutterApi.onDropInAdvancedFlowPlatformCommunication(platformCommunicationModel: PlatformCommunicationModel(type: PlatformCommunicationType.result, paymentResult: paymentResult), completion: { _ in })
         })

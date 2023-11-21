@@ -47,7 +47,7 @@ class ComponentWrapperView
     private fun addComponentHeightObserver() {
         ComponentHeightMessenger.instance().observe(activity) {
             activity.lifecycleScope.launch {
-                //We need to wait for animation to finish
+                //We need to wait for animation to finish e.g. when scheme icons disappear
                 delay(300)
                 updateComponentViewHeight()
             }
@@ -74,5 +74,4 @@ class ComponentWrapperView
             ComponentCommunicationModel(type = ComponentCommunicationType.RESIZE, data = roundedHeight)
         ) {}
     }
-
 }

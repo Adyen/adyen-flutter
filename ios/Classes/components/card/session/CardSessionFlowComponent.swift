@@ -4,8 +4,8 @@ import AdyenNetworking
 import Flutter
 
 class CardSessionFlowComponent: BaseCardComponent {
-    private let cardSessionFlowDelegate: AdyenSessionDelegate
-    private let presentationDelegate: PresentationDelegate
+    private let cardSessionFlowDelegate: CardSessionFlowDelegate
+    private var presentationDelegate: PresentationDelegate?
     private var adyenSession: AdyenSession?
 
     override init(
@@ -15,7 +15,6 @@ class CardSessionFlowComponent: BaseCardComponent {
         binaryMessenger: FlutterBinaryMessenger,
         componentFlutterApi: ComponentFlutterApi
     ) {
-        presentationDelegate = CardSessionFlowPresentationDelegate()
         cardSessionFlowDelegate = CardSessionFlowDelegate(componentFlutterApi: componentFlutterApi)
         super.init(
             frame: frame,
@@ -24,7 +23,8 @@ class CardSessionFlowComponent: BaseCardComponent {
             binaryMessenger: binaryMessenger,
             componentFlutterApi: componentFlutterApi
         )
-
+        
+        cardSessionFlowDelegate.finalizeAndDismiss = finalizeAndDismiss
         setupCardComponentView(arguments: arguments)
     }
 
@@ -33,7 +33,8 @@ class CardSessionFlowComponent: BaseCardComponent {
             guard let cardComponentConfiguration = arguments.value(forKey: "cardComponentConfiguration") as? CardComponentConfigurationDTO else { throw PlatformError(errorDescription: "Card configuration not found") }
             guard let session = arguments.value(forKey: "session") as? SessionDTO else { throw PlatformError(errorDescription: "Session not found") }
             let sessionConfiguration = try createSessionConfiguration(cardComponentConfiguration: cardComponentConfiguration, session: session)
-            AdyenSession.initialize(with: sessionConfiguration, delegate: cardSessionFlowDelegate, presentationDelegate: presentationDelegate) { [weak self] result in
+            presentationDelegate = CardPresentationDelegate(topViewController: getViewController())
+            AdyenSession.initialize(with: sessionConfiguration, delegate: cardSessionFlowDelegate, presentationDelegate: presentationDelegate!) { [weak self] result in
                 switch result {
                 case let .success(session):
                     self?.adyenSession = session

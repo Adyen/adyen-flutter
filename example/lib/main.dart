@@ -107,6 +107,7 @@ class _MyAppState extends State<MyApp> {
                       .createSession()
                       .then((sessionResponse) => showModalBottomSheet(
                           context: context,
+                          isDismissible: false,
                           isScrollControlled: true,
                           backgroundColor: Colors.white,
                           shape: RoundedRectangleBorder(
@@ -269,10 +270,7 @@ class _MyAppState extends State<MyApp> {
       countryCode: Config.countryCode,
       amount: Config.amount,
       shopperLocale: Config.shopperLocale,
-      cardConfiguration: const CardConfiguration(
-        showStorePaymentField: false,
-        holderNameRequired: false,
-      ),
+      cardConfiguration: const CardConfiguration(),
     );
 
     final session = Session(

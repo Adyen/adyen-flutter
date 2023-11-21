@@ -3,7 +3,6 @@ package com.adyen.adyen_checkout.components.card.advancedFlow
 import ComponentCommunicationModel
 import ComponentCommunicationType
 import ComponentFlutterApi
-import android.util.Log
 import com.adyen.adyen_checkout.components.ComponentHeightMessenger
 import com.adyen.checkout.card.CardComponentState
 import com.adyen.checkout.components.core.ActionComponentData
@@ -32,7 +31,6 @@ class CardAdvancedFlowCallback(private val componentFlutterApi: ComponentFlutter
     }
 
     override fun onError(componentError: ComponentError) {
-        Log.d("AdyenCheckout", componentError.exception.toString())
         val model = ComponentCommunicationModel(
             ComponentCommunicationType.ERROR,
             data = componentError.exception.toString(),

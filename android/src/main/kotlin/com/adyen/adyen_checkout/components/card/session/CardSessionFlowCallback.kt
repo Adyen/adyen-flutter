@@ -4,7 +4,6 @@ import ComponentCommunicationModel
 import ComponentCommunicationType
 import ComponentFlutterApi
 import PaymentResultModelDTO
-import android.util.Log
 import com.adyen.adyen_checkout.components.ComponentHeightMessenger
 import com.adyen.adyen_checkout.utils.ConfigurationMapper.mapToOrderResponseModel
 import com.adyen.checkout.card.CardComponentState
@@ -26,13 +25,11 @@ class CardSessionFlowCallback(
             result.resultCode,
             result.order?.mapToOrderResponseModel()
         )
-
         val model = ComponentCommunicationModel(
             ComponentCommunicationType.RESULT,
             data = "",
             paymentResult = paymentResult
         )
-
         componentFlutterApi.onComponentCommunication(model) {}
     }
 
@@ -41,7 +38,6 @@ class CardSessionFlowCallback(
     }
 
     override fun onError(componentError: ComponentError) {
-        Log.d("AdyenCheckout", componentError.exception.toString())
         val model = ComponentCommunicationModel(
             ComponentCommunicationType.ERROR,
             data = componentError.exception.toString(),

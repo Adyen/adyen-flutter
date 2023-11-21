@@ -1,8 +1,8 @@
 import 'dart:async';
 
 import 'package:adyen_checkout/adyen_checkout.dart';
-import 'package:adyen_checkout/src/components/adyen_component_api.dart';
 import 'package:adyen_checkout/src/components/card/card_component_container_widget.dart';
+import 'package:adyen_checkout/src/components/component_platform_api.dart';
 import 'package:adyen_checkout/src/components/component_result_api.dart';
 import 'package:adyen_checkout/src/components/platform/android_platform_view.dart';
 import 'package:adyen_checkout/src/components/platform/ios_platform_view.dart';
@@ -37,7 +37,7 @@ class CardSessionFlowWidget extends StatefulWidget {
 class _CardSessionFlowWidgetState extends State<CardSessionFlowWidget> {
   final MessageCodec<Object?> _codec = ComponentFlutterApi.codec;
   final ComponentResultApi _resultApi = ComponentResultApi();
-  final AdyenComponentApi _adyenComponentApi = AdyenComponentApi();
+  final ComponentPlatformApi _componentPlatformApi = ComponentPlatformApi();
   final StreamController<double> _resizeStream = StreamController.broadcast();
   final GlobalKey _cardWidgetKey = GlobalKey();
   late Widget _cardWidget;
@@ -121,7 +121,7 @@ class _CardSessionFlowWidgetState extends State<CardSessionFlowWidget> {
           codec: _codec,
           creationParams: creationParams,
           gestureRecognizers: widget.gestureRecognizers,
-          onPlatformViewCreated: _adyenComponentApi.updateViewHeight,
+          onPlatformViewCreated: _componentPlatformApi.updateViewHeight,
         );
       case TargetPlatform.iOS:
         return IosPlatformView(
@@ -130,7 +130,7 @@ class _CardSessionFlowWidgetState extends State<CardSessionFlowWidget> {
           codec: _codec,
           creationParams: creationParams,
           gestureRecognizers: widget.gestureRecognizers,
-          onPlatformViewCreated: _adyenComponentApi.updateViewHeight,
+          onPlatformViewCreated: _componentPlatformApi.updateViewHeight,
           cardWidgetKey: _cardWidgetKey,
         );
       default:

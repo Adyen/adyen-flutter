@@ -14,7 +14,7 @@ class CardConfiguration {
     this.holderNameRequired = false,
     this.addressMode = AddressMode.none,
     this.showStorePaymentField = false,
-    this.showCvcForStoredCard = false,
+    this.showCvcForStoredCard = true,
     this.showCvc = true,
     this.kcpFieldVisibility = FieldVisibility.hide,
     this.socialSecurityNumberFieldVisibility = FieldVisibility.hide,

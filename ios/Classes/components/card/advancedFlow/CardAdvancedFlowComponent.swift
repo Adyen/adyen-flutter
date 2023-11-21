@@ -5,7 +5,7 @@ import Flutter
 
 class CardAdvancedFlowComponent: BaseCardComponent {
     private let actionComponentDelegate: ActionComponentDelegate
-    private let presentationDelegate: PresentationDelegate
+    private var presentationDelegate: PresentationDelegate?
     private var actionComponent: AdyenActionComponent?
     private let initialFrame: CGRect
 
@@ -16,7 +16,6 @@ class CardAdvancedFlowComponent: BaseCardComponent {
         binaryMessenger: FlutterBinaryMessenger,
         componentFlutterApi: ComponentFlutterApi
     ) {
-        presentationDelegate = CardAdvancedFlowPresentationDelegate()
         actionComponentDelegate = CardAdvancedFlowActionComponentDelegate(componentFlutterApi: componentFlutterApi)
         initialFrame = frame
         super.init(
@@ -28,6 +27,7 @@ class CardAdvancedFlowComponent: BaseCardComponent {
         )
 
         setupCardComponentView(arguments: arguments)
+        setupFinalizeComponentCallback()
     }
 
     private func setupCardComponentView(arguments: NSDictionary) {
@@ -59,6 +59,7 @@ class CardAdvancedFlowComponent: BaseCardComponent {
         let adyenContext = try cardComponentConfiguration.createAdyenContext()
         let cardConfiguration = cardComponentConfiguration.cardConfiguration.mapToCardComponentConfiguration()
         let cardComponent = CardComponent(paymentMethod: paymentMethod, context: adyenContext, configuration: cardConfiguration)
+        presentationDelegate = CardPresentationDelegate(topViewController: getViewController())
         actionComponent = buildActionComponent(adyenContext: adyenContext)
         return cardComponent
     }
@@ -79,4 +80,17 @@ class CardAdvancedFlowComponent: BaseCardComponent {
             sendErrorToFlutterLayer(errorMessage: error.localizedDescription)
         }
     }
+    
+    private func setupFinalizeComponentCallback() {
+        componentPlatformApi.onFinishCallback = { paymentFlowOutcome in
+            let resultCode = ResultCode(rawValue: paymentFlowOutcome.result ?? "")
+            let success = resultCode == .authorised || resultCode == .received || resultCode == .pending
+            self.finalizeAndDismiss(success: success, completion: {
+                let componentCommunicationModel = ComponentCommunicationModel(type: ComponentCommunicationType.result,
+                                                                              paymentResult: PaymentResultModelDTO(resultCode: resultCode?.rawValue))
+                self.componentFlutterApi.onComponentCommunication(componentCommunicationModel: componentCommunicationModel, completion: { _ in })
+            })
+        }
+    }
+
 }

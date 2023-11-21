@@ -1,5 +1,6 @@
 package com.adyen.adyen_checkout.components
 
+import PaymentResultModelDTO
 import androidx.lifecycle.LiveData
 import com.adyen.adyen_checkout.utils.Event
 import org.json.JSONObject
@@ -23,4 +24,16 @@ class ComponentHeightMessenger : LiveData<Event<Long>>() {
         }
     }
 }
+
+class ComponentResultMessenger: LiveData<Event<PaymentResultModelDTO>>(){
+    companion object {
+        private val componentResultMessenger = ComponentResultMessenger()
+        fun instance() = componentResultMessenger
+        fun sendResult(value: PaymentResultModelDTO) {
+            componentResultMessenger.postValue(Event(value))
+        }
+    }
+}
+
+
 

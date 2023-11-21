@@ -1,5 +1,7 @@
 package com.adyen.adyen_checkout.components.card.advancedFlow
 
+import ComponentCommunicationModel
+import ComponentCommunicationType
 import ComponentFlutterApi
 import android.content.Context
 import android.view.View
@@ -9,6 +11,7 @@ import androidx.activity.ComponentActivity
 import androidx.core.view.doOnNextLayout
 import com.adyen.adyen_checkout.R
 import com.adyen.adyen_checkout.components.ComponentActionMessenger
+import com.adyen.adyen_checkout.components.ComponentResultMessenger
 import com.adyen.adyen_checkout.components.card.BaseCardComponent
 import com.adyen.checkout.card.CardComponent
 import com.adyen.checkout.components.core.PaymentMethodsApiResponse
@@ -37,14 +40,13 @@ internal class CardAdvancedFlowComponent(
             callback = CardAdvancedFlowCallback(componentFlutterApi),
             key = UUID.randomUUID().toString()
         )
-
         addComponent(cardComponent)
         addActionListener()
+        addResultListener()
     }
 
     override fun onFlutterViewAttached(flutterView: View) {
         super.onFlutterViewAttached(flutterView)
-
         flutterView.doOnNextLayout {
             adjustCardComponentLayout(it)
         }
@@ -59,6 +61,7 @@ internal class CardAdvancedFlowComponent(
     }
 
     private fun addActionListener() {
+        ComponentActionMessenger.instance().removeObservers(activity)
         ComponentActionMessenger.instance().observe(activity) { message ->
             val action = message.contentIfNotHandled?.let { Action.SERIALIZER.deserialize(it) }
             action?.let {
@@ -66,4 +69,21 @@ internal class CardAdvancedFlowComponent(
             }
         }
     }
+
+    private fun addResultListener() {
+        ComponentResultMessenger.instance().removeObservers(activity)
+        ComponentResultMessenger.instance().observe(activity) { message ->
+            if (message.hasBeenHandled()) {
+                return@observe
+            }
+
+            val model = ComponentCommunicationModel(
+                ComponentCommunicationType.RESULT,
+                paymentResult = message.contentIfNotHandled,
+            )
+            componentFlutterApi.onComponentCommunication(model) {}
+        }
+    }
+
+
 }

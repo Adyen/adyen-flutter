@@ -48,8 +48,8 @@ object ConfigurationMapper {
     fun DropInConfigurationDTO.mapToDropInConfiguration(context: Context): DropInConfiguration {
         val environment = environment.toNativeModel()
         val amount = amount.mapToAmount()
-        val shopperLocale = Locale.forLanguageTag(shopperLocale)
-        val dropInConfiguration = DropInConfiguration.Builder(shopperLocale, environment, clientKey)
+        val locale = Locale.forLanguageTag(shopperLocale)
+        val dropInConfiguration = DropInConfiguration.Builder(locale, environment, clientKey)
 
         isRemoveStoredPaymentMethodEnabled.let {
             dropInConfiguration.setEnableRemovingStoredPaymentMethods(it)
@@ -64,19 +64,19 @@ object ConfigurationMapper {
         }
 
         if (cardConfigurationDTO != null) {
-            val cardConfiguration = cardConfigurationDTO.toNativeModel(context, environment, clientKey)
+            val cardConfiguration = cardConfigurationDTO.toNativeModel(shopperLocale, context,   environment, clientKey)
             dropInConfiguration.addCardConfiguration(cardConfiguration)
         }
 
         if (googlePayConfigurationDTO != null) {
             val googlePayConfiguration =
-                buildGooglePayConfiguration(shopperLocale, environment, googlePayConfigurationDTO)
+                buildGooglePayConfiguration(locale, environment, googlePayConfigurationDTO)
             dropInConfiguration.addGooglePayConfiguration(googlePayConfiguration)
         }
 
         if (cashAppPayConfigurationDTO != null) {
             val cashAppPayConfiguration =
-                buildCashAppPayConfiguration(shopperLocale, environment, cashAppPayConfigurationDTO)
+                buildCashAppPayConfiguration(locale, environment, cashAppPayConfigurationDTO)
             dropInConfiguration.addCashAppPayConfiguration(cashAppPayConfiguration)
         }
 
@@ -85,12 +85,15 @@ object ConfigurationMapper {
     }
 
     fun CardConfigurationDTO.toNativeModel(
+        shopperLocale: String,
         context: Context,
         environment: com.adyen.checkout.core.Environment,
         clientKey: String,
     ): CardConfiguration {
+        val locale = Locale.forLanguageTag(shopperLocale)
+
         return CardConfiguration.Builder(
-            context = context,
+            shopperLocale = locale,
             environment = environment,
             clientKey = clientKey
         )

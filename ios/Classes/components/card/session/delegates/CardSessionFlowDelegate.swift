@@ -3,15 +3,22 @@ import AdyenNetworking
 
 class CardSessionFlowDelegate: AdyenSessionDelegate {
     private let componentFlutterApi: ComponentFlutterApi
+    var finalizeAndDismiss: ((Bool, @escaping (() -> Void)) -> Void)?
 
     init(componentFlutterApi: ComponentFlutterApi) {
         self.componentFlutterApi = componentFlutterApi
     }
 
-    func didComplete(with result: Adyen.AdyenSessionResult, component _: Adyen.Component, session: Adyen.AdyenSession) {
-        let paymentResult = PaymentResultModelDTO(sessionId: session.sessionContext.identifier, sessionData: session.sessionContext.data, resultCode: result.resultCode.rawValue)
-        let componentCommunicationModel = ComponentCommunicationModel(type: ComponentCommunicationType.result, paymentResult: paymentResult)
-        componentFlutterApi.onComponentCommunication(componentCommunicationModel: componentCommunicationModel, completion: { _ in })
+    func didComplete(with result: Adyen.AdyenSessionResult, component : Adyen.Component, session: Adyen.AdyenSession) {
+        
+        let resultCode = result.resultCode
+        let success = resultCode == .authorised || resultCode == .received || resultCode == .pending
+        finalizeAndDismiss?(success, {
+            let paymentResult = PaymentResultModelDTO(sessionId: session.sessionContext.identifier, sessionData: session.sessionContext.data, resultCode: result.resultCode.rawValue)
+            let componentCommunicationModel = ComponentCommunicationModel(type: ComponentCommunicationType.result, paymentResult: paymentResult)
+            self.componentFlutterApi.onComponentCommunication(componentCommunicationModel: componentCommunicationModel, completion: { _ in })
+        })
+        
     }
 
     func didFail(with error: Error, from _: Component, session _: AdyenSession) {

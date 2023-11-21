@@ -1107,87 +1107,12 @@ private object ComponentPlatformInterfaceCodec : StandardMessageCodec() {
     return when (type) {
       128.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          AmountDTO.fromList(it)
+          ErrorDTO.fromList(it)
         }
       }
       129.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          AnalyticsOptionsDTO.fromList(it)
-        }
-      }
-      130.toByte() -> {
-        return (readValue(buffer) as? List<Any?>)?.let {
-          ApplePayConfigurationDTO.fromList(it)
-        }
-      }
-      131.toByte() -> {
-        return (readValue(buffer) as? List<Any?>)?.let {
-          CardComponentConfigurationDTO.fromList(it)
-        }
-      }
-      132.toByte() -> {
-        return (readValue(buffer) as? List<Any?>)?.let {
-          CardConfigurationDTO.fromList(it)
-        }
-      }
-      133.toByte() -> {
-        return (readValue(buffer) as? List<Any?>)?.let {
-          CashAppPayConfigurationDTO.fromList(it)
-        }
-      }
-      134.toByte() -> {
-        return (readValue(buffer) as? List<Any?>)?.let {
-          ComponentCommunicationModel.fromList(it)
-        }
-      }
-      135.toByte() -> {
-        return (readValue(buffer) as? List<Any?>)?.let {
-          DeletedStoredPaymentMethodResultDTO.fromList(it)
-        }
-      }
-      136.toByte() -> {
-        return (readValue(buffer) as? List<Any?>)?.let {
-          DropInConfigurationDTO.fromList(it)
-        }
-      }
-      137.toByte() -> {
-        return (readValue(buffer) as? List<Any?>)?.let {
-          ErrorDTO.fromList(it)
-        }
-      }
-      138.toByte() -> {
-        return (readValue(buffer) as? List<Any?>)?.let {
-          GooglePayConfigurationDTO.fromList(it)
-        }
-      }
-      139.toByte() -> {
-        return (readValue(buffer) as? List<Any?>)?.let {
-          OrderResponseDTO.fromList(it)
-        }
-      }
-      140.toByte() -> {
-        return (readValue(buffer) as? List<Any?>)?.let {
           PaymentFlowOutcomeDTO.fromList(it)
-        }
-      }
-      141.toByte() -> {
-        return (readValue(buffer) as? List<Any?>)?.let {
-          PaymentResultDTO.fromList(it)
-        }
-      }
-      142.toByte() -> {
-        return (readValue(buffer) as? List<Any?>)?.let {
-          PaymentResultModelDTO.fromList(it)
-        }
-      }
-      143.toByte() -> {
-        return (readValue(buffer) as? List<Any?>)?.let {
-          PlatformCommunicationModel.fromList(it)
-        }
-      }
-      144.toByte() -> {
-        return (readValue(buffer) as? List<Any?>)?.let {
-          SessionDTO.fromList(it)
         }
       }
       else -> super.readValueOfType(type, buffer)
@@ -1195,72 +1120,12 @@ private object ComponentPlatformInterfaceCodec : StandardMessageCodec() {
   }
   override fun writeValue(stream: ByteArrayOutputStream, value: Any?)   {
     when (value) {
-      is AmountDTO -> {
+      is ErrorDTO -> {
         stream.write(128)
         writeValue(stream, value.toList())
       }
-      is AnalyticsOptionsDTO -> {
-        stream.write(129)
-        writeValue(stream, value.toList())
-      }
-      is ApplePayConfigurationDTO -> {
-        stream.write(130)
-        writeValue(stream, value.toList())
-      }
-      is CardComponentConfigurationDTO -> {
-        stream.write(131)
-        writeValue(stream, value.toList())
-      }
-      is CardConfigurationDTO -> {
-        stream.write(132)
-        writeValue(stream, value.toList())
-      }
-      is CashAppPayConfigurationDTO -> {
-        stream.write(133)
-        writeValue(stream, value.toList())
-      }
-      is ComponentCommunicationModel -> {
-        stream.write(134)
-        writeValue(stream, value.toList())
-      }
-      is DeletedStoredPaymentMethodResultDTO -> {
-        stream.write(135)
-        writeValue(stream, value.toList())
-      }
-      is DropInConfigurationDTO -> {
-        stream.write(136)
-        writeValue(stream, value.toList())
-      }
-      is ErrorDTO -> {
-        stream.write(137)
-        writeValue(stream, value.toList())
-      }
-      is GooglePayConfigurationDTO -> {
-        stream.write(138)
-        writeValue(stream, value.toList())
-      }
-      is OrderResponseDTO -> {
-        stream.write(139)
-        writeValue(stream, value.toList())
-      }
       is PaymentFlowOutcomeDTO -> {
-        stream.write(140)
-        writeValue(stream, value.toList())
-      }
-      is PaymentResultDTO -> {
-        stream.write(141)
-        writeValue(stream, value.toList())
-      }
-      is PaymentResultModelDTO -> {
-        stream.write(142)
-        writeValue(stream, value.toList())
-      }
-      is PlatformCommunicationModel -> {
-        stream.write(143)
-        writeValue(stream, value.toList())
-      }
-      is SessionDTO -> {
-        stream.write(144)
+        stream.write(129)
         writeValue(stream, value.toList())
       }
       else -> super.writeValue(stream, value)
@@ -1270,8 +1135,9 @@ private object ComponentPlatformInterfaceCodec : StandardMessageCodec() {
 
 /** Generated interface from Pigeon that represents a handler of messages from Flutter. */
 interface ComponentPlatformInterface {
-  fun onAction(actionResponse: Map<String?, Any?>?)
   fun updateViewHeight(viewId: Long)
+  fun onPaymentsResult(paymentsResult: PaymentFlowOutcomeDTO)
+  fun onPaymentsDetailsResult(paymentsDetailsResult: PaymentFlowOutcomeDTO)
 
   companion object {
     /** The codec used by ComponentPlatformInterface. */
@@ -1282,14 +1148,14 @@ interface ComponentPlatformInterface {
     @Suppress("UNCHECKED_CAST")
     fun setUp(binaryMessenger: BinaryMessenger, api: ComponentPlatformInterface?) {
       run {
-        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.adyen_checkout.ComponentPlatformInterface.onAction", codec)
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.adyen_checkout.ComponentPlatformInterface.updateViewHeight", codec)
         if (api != null) {
           channel.setMessageHandler { message, reply ->
             val args = message as List<Any?>
-            val actionResponseArg = args[0] as Map<String?, Any?>?
+            val viewIdArg = args[0].let { if (it is Int) it.toLong() else it as Long }
             var wrapped: List<Any?>
             try {
-              api.onAction(actionResponseArg)
+              api.updateViewHeight(viewIdArg)
               wrapped = listOf<Any?>(null)
             } catch (exception: Throwable) {
               wrapped = wrapError(exception)
@@ -1301,14 +1167,33 @@ interface ComponentPlatformInterface {
         }
       }
       run {
-        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.adyen_checkout.ComponentPlatformInterface.updateViewHeight", codec)
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.adyen_checkout.ComponentPlatformInterface.onPaymentsResult", codec)
         if (api != null) {
           channel.setMessageHandler { message, reply ->
             val args = message as List<Any?>
-            val viewIdArg = args[0].let { if (it is Int) it.toLong() else it as Long }
+            val paymentsResultArg = args[0] as PaymentFlowOutcomeDTO
             var wrapped: List<Any?>
             try {
-              api.updateViewHeight(viewIdArg)
+              api.onPaymentsResult(paymentsResultArg)
+              wrapped = listOf<Any?>(null)
+            } catch (exception: Throwable) {
+              wrapped = wrapError(exception)
+            }
+            reply.reply(wrapped)
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.adyen_checkout.ComponentPlatformInterface.onPaymentsDetailsResult", codec)
+        if (api != null) {
+          channel.setMessageHandler { message, reply ->
+            val args = message as List<Any?>
+            val paymentsDetailsResultArg = args[0] as PaymentFlowOutcomeDTO
+            var wrapped: List<Any?>
+            try {
+              api.onPaymentsDetailsResult(paymentsDetailsResultArg)
               wrapped = listOf<Any?>(null)
             } catch (exception: Throwable) {
               wrapped = wrapError(exception)

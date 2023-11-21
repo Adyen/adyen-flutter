@@ -35,6 +35,7 @@ class FirstRoute extends StatelessWidget {
                       Container(height: 200, color: Colors.yellow),
                       Container(height: 200, color: Colors.blue),
                       Container(height: 200, color: Colors.green),
+                      Container(height: 200, color: Colors.purpleAccent),
                     ],
                   ),
                 );
@@ -57,7 +58,6 @@ Widget buildCardWidget(
     amount: Config.amount,
     shopperLocale: Config.shopperLocale,
     cardConfiguration: const CardConfiguration(
-      holderNameRequired: true,
       showStorePaymentField: true,
     ),
   );
@@ -70,7 +70,7 @@ Widget buildCardWidget(
       onPaymentsDetails: repository.postPaymentsDetails,
     ),
     onPaymentResult: (event) async {
-      //Navigator.pop(context);
+      Navigator.pop(context);
       _dialogBuilder(context, event);
     },
   );

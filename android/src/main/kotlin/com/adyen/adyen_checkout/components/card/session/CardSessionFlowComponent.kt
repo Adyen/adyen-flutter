@@ -1,9 +1,10 @@
 package com.adyen.adyen_checkout.components.card.session
 
+import ComponentCommunicationModel
+import ComponentCommunicationType
 import ComponentFlutterApi
 import SessionDTO
 import android.content.Context
-import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.ComponentActivity
@@ -38,20 +39,14 @@ class CardSessionFlowComponent(
         activity.lifecycleScope.launch {
             val checkoutSession: CheckoutSession? = getCheckoutSession(sessionModel, cardConfiguration)
             if (checkoutSession == null) {
-                Log.e("AdyenCheckout", "Failed to fetch session")
-                //TODO error handling
-                //_cardViewState.emit(CardViewState.Error)
+                sendErrorToFlutterLayer("Failed to fetch session.")
                 return@launch
             }
-
             val paymentMethod = checkoutSession.getPaymentMethod(PaymentMethodTypes.SCHEME)
             if (paymentMethod == null) {
-                Log.e("AdyenCheckout", "Session does not contain SCHEME payment method")
-                //TODO error handling
-                //_cardViewState.emit(CardViewState.Error)
+                sendErrorToFlutterLayer("Session does not contain SCHEME payment method.")
                 return@launch
             }
-
             cardComponent = CardComponent.PROVIDER.get(
                 activity = activity,
                 checkoutSession = checkoutSession,
@@ -60,14 +55,12 @@ class CardSessionFlowComponent(
                 componentCallback = CardSessionFlowCallback(componentFlutterApi) { action -> onAction(action) },
                 key = UUID.randomUUID().toString()
             )
-
             addComponent(cardComponent)
         }
     }
 
     override fun onFlutterViewAttached(flutterView: View) {
         super.onFlutterViewAttached(flutterView)
-
         flutterView.doOnNextLayout {
             adjustCardComponentLayout(it)
         }
@@ -93,4 +86,12 @@ class CardSessionFlowComponent(
     }
 
     private fun onAction(action: Action) = cardComponent.handleAction(action, activity)
+
+    private fun sendErrorToFlutterLayer(errorMessage: String) {
+        val model = ComponentCommunicationModel(
+            ComponentCommunicationType.ERROR,
+            data = errorMessage,
+        )
+        componentFlutterApi.onComponentCommunication(model) {}
+    }
 }

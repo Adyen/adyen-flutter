@@ -14,6 +14,7 @@ import androidx.core.view.doOnNextLayout
 import com.adyen.adyen_checkout.R
 import com.adyen.adyen_checkout.components.ComponentActionMessenger
 import com.adyen.adyen_checkout.components.ComponentHeightMessenger
+import com.adyen.adyen_checkout.components.ComponentResultMessenger
 import com.adyen.adyen_checkout.components.ComponentWrapperView
 import com.adyen.adyen_checkout.utils.ConfigurationMapper.toNativeModel
 import com.adyen.checkout.card.CardComponent
@@ -31,6 +32,8 @@ abstract class BaseCardComponent(
     private val environment = configuration.environment.toNativeModel()
     private val componentWrapperView = ComponentWrapperView(activity, componentFlutterApi)
     val cardConfiguration = configuration.cardConfiguration.toNativeModel(
+
+        "${configuration.shopperLocale}",
         context,
         environment,
         configuration.clientKey
@@ -42,7 +45,6 @@ abstract class BaseCardComponent(
 
     override fun onFlutterViewAttached(flutterView: View) {
         super.onFlutterViewAttached(flutterView)
-
         flutterView.doOnNextLayout {
             adjustCardComponentLayout(it)
         }
@@ -51,6 +53,7 @@ abstract class BaseCardComponent(
     override fun dispose() {
         ComponentActionMessenger.instance().removeObservers(activity)
         ComponentHeightMessenger.instance().removeObservers(activity)
+        ComponentResultMessenger.instance().removeObservers(activity)
     }
 
     private fun adjustCardComponentLayout(flutterView: View) {

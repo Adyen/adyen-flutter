@@ -58,6 +58,15 @@ class BaseCardComponent: NSObject, FlutterPlatformView, UIScrollViewDelegate {
                                                                       data: errorMessage)
         componentFlutterApi.onComponentCommunication(componentCommunicationModel: componentCommunicationModel, completion: { _ in })
     }
+    
+    func finalizeAndDismiss(success: Bool, completion: @escaping (() -> Void)) {
+        cardComponent?.finalizeIfNeeded(with: success) { [weak self] in
+            //Is this viewcontroller access correct?
+            self?.getViewController()?.dismiss(animated: true , completion:  {
+                completion()
+            })
+        }
+    }
 
     private func disableNativeScrollingAndBouncing(cardComponentView: UIView) {
         let formView = cardComponentView.subviews[0].subviews[0] as? UIScrollView
