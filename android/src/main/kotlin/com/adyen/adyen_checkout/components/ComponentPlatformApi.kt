@@ -1,6 +1,7 @@
 package com.adyen.adyen_checkout.components
 
 import ComponentPlatformInterface
+import ErrorDTO
 import PaymentFlowOutcomeDTO
 import PaymentFlowResultType
 import PaymentResultModelDTO
@@ -21,20 +22,28 @@ class ComponentPlatformApi : ComponentPlatformInterface {
     }
 
     private fun handlePaymentFlowOutcome(paymentFlowOutcomeDTO: PaymentFlowOutcomeDTO) {
-        println("PAYMENT FLOW $paymentFlowOutcomeDTO")
         when (paymentFlowOutcomeDTO.paymentFlowResultType) {
-            PaymentFlowResultType.FINISHED -> {
-                val paymentResult = PaymentResultModelDTO(resultCode = paymentFlowOutcomeDTO.result)
-                ComponentResultMessenger.sendResult(paymentResult)
-            }
-            PaymentFlowResultType.ACTION -> {
-                paymentFlowOutcomeDTO.actionResponse?.let {
-                    val jsonActionResponse = JSONObject(it)
-                    ComponentActionMessenger.sendResult(jsonActionResponse)
-                }
-            }
+            PaymentFlowResultType.FINISHED -> onFinished(paymentFlowOutcomeDTO.result)
+            PaymentFlowResultType.ACTION -> onAction(paymentFlowOutcomeDTO.actionResponse)
+            PaymentFlowResultType.ERROR -> onError(paymentFlowOutcomeDTO.error)
+        }
+    }
 
-            PaymentFlowResultType.ERROR -> TODO()
+    private fun onFinished(resultCode: String?) {
+        val paymentResult = PaymentResultModelDTO(resultCode = resultCode)
+        ComponentResultMessenger.sendResult(paymentResult)
+    }
+
+    private fun onAction(actionResponse: Map<String?, Any?>?) {
+        actionResponse?.let {
+            val jsonActionResponse = JSONObject(it)
+            ComponentActionMessenger.sendResult(jsonActionResponse)
+        }
+    }
+
+    private fun onError(error: ErrorDTO?) {
+        error?.let {
+            ComponentErrorMessenger.sendResult(it)
         }
     }
 

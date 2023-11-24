@@ -7,10 +7,11 @@ import android.content.Context
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
-import androidx.activity.ComponentActivity
 import androidx.core.view.doOnNextLayout
+import androidx.fragment.app.FragmentActivity
 import com.adyen.adyen_checkout.R
 import com.adyen.adyen_checkout.components.ComponentActionMessenger
+import com.adyen.adyen_checkout.components.ComponentErrorMessenger
 import com.adyen.adyen_checkout.components.ComponentResultMessenger
 import com.adyen.adyen_checkout.components.card.BaseCardComponent
 import com.adyen.checkout.card.CardComponent
@@ -21,15 +22,15 @@ import org.json.JSONObject
 import java.util.UUID
 
 internal class CardAdvancedFlowComponent(
-    private val activity: ComponentActivity,
+    private val activity: FragmentActivity,
     private val componentFlutterApi: ComponentFlutterApi,
     context: Context,
     id: Int,
     creationParams: Map<*, *>?
 ) : BaseCardComponent(activity, componentFlutterApi, context, id, creationParams) {
-    private val paymentMethods = creationParams?.get("paymentMethods") as String
+    private val paymentMethods = creationParams?.get(PAYMENT_METHODS_KEY) as String
     private val paymentMethodsApiResponse = PaymentMethodsApiResponse.SERIALIZER.deserialize(JSONObject(paymentMethods))
-    private val paymentMethod = paymentMethodsApiResponse.paymentMethods?.first { it.type == "scheme" }
+    private val paymentMethod = paymentMethodsApiResponse.paymentMethods?.first { it.type == SCHEME_KEY }
         ?: throw Exception("Card payment method not provided")
 
     init {
@@ -43,6 +44,7 @@ internal class CardAdvancedFlowComponent(
         addComponent(cardComponent)
         addActionListener()
         addResultListener()
+        addErrorListener()
     }
 
     override fun onFlutterViewAttached(flutterView: View) {
@@ -63,6 +65,10 @@ internal class CardAdvancedFlowComponent(
     private fun addActionListener() {
         ComponentActionMessenger.instance().removeObservers(activity)
         ComponentActionMessenger.instance().observe(activity) { message ->
+            if (message.hasBeenHandled()) {
+                return@observe
+            }
+
             val action = message.contentIfNotHandled?.let { Action.SERIALIZER.deserialize(it) }
             action?.let {
                 cardComponent.handleAction(action = it, activity = activity)
@@ -85,5 +91,24 @@ internal class CardAdvancedFlowComponent(
         }
     }
 
+    private fun addErrorListener() {
+        ComponentErrorMessenger.instance().removeObservers(activity)
+        ComponentErrorMessenger.instance().observe(activity) { message ->
+            if (message.hasBeenHandled()) {
+                return@observe
+            }
 
+
+            val model = ComponentCommunicationModel(
+                ComponentCommunicationType.ERROR,
+                data = message.contentIfNotHandled?.errorMessage,
+            )
+            componentFlutterApi.onComponentCommunication(model) {}
+        }
+    }
+
+    companion object {
+        const val PAYMENT_METHODS_KEY = "paymentMethods"
+        const val SCHEME_KEY = "scheme"
+    }
 }

@@ -3,21 +3,25 @@ package com.adyen.adyen_checkout.components.card
 import CardComponentConfigurationDTO
 import ComponentFlutterApi
 import android.content.Context
+import android.content.Intent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.LinearLayout
 import androidx.activity.ComponentActivity
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.util.Consumer
 import androidx.core.view.children
 import androidx.core.view.doOnNextLayout
 import com.adyen.adyen_checkout.R
 import com.adyen.adyen_checkout.components.ComponentActionMessenger
+import com.adyen.adyen_checkout.components.ComponentErrorMessenger
 import com.adyen.adyen_checkout.components.ComponentHeightMessenger
 import com.adyen.adyen_checkout.components.ComponentResultMessenger
 import com.adyen.adyen_checkout.components.ComponentWrapperView
 import com.adyen.adyen_checkout.utils.ConfigurationMapper.toNativeModel
 import com.adyen.checkout.card.CardComponent
+import com.adyen.checkout.redirect.RedirectComponent
 import com.adyen.checkout.ui.core.AdyenComponentView
 import io.flutter.plugin.platform.PlatformView
 
@@ -28,11 +32,11 @@ abstract class BaseCardComponent(
     id: Int,
     creationParams: Map<*, *>?
 ) : PlatformView {
-    private val configuration = creationParams?.get("cardComponentConfiguration") as CardComponentConfigurationDTO
+    private val configuration = creationParams?.get(CARD_COMPONENT_CONFIGURATION_KEY) as CardComponentConfigurationDTO
     private val environment = configuration.environment.toNativeModel()
     private val componentWrapperView = ComponentWrapperView(activity, componentFlutterApi)
+    private val intentListener = Consumer<Intent> { handleIntent(it) }
     val cardConfiguration = configuration.cardConfiguration.toNativeModel(
-
         "${configuration.shopperLocale}",
         context,
         environment,
@@ -40,6 +44,10 @@ abstract class BaseCardComponent(
     )
 
     lateinit var cardComponent: CardComponent
+
+    init {
+        activity.addOnNewIntentListener(intentListener);
+    }
 
     override fun getView(): View = componentWrapperView
 
@@ -51,9 +59,21 @@ abstract class BaseCardComponent(
     }
 
     override fun dispose() {
-        ComponentActionMessenger.instance().removeObservers(activity)
+        activity.removeOnNewIntentListener(intentListener)
         ComponentHeightMessenger.instance().removeObservers(activity)
+        ComponentActionMessenger.instance().removeObservers(activity)
         ComponentResultMessenger.instance().removeObservers(activity)
+        ComponentErrorMessenger.instance().removeObservers(activity)
+    }
+
+    fun addComponent(cardComponent: CardComponent) {
+        componentWrapperView.addComponent(cardComponent)
+    }
+
+    private fun handleIntent(intent: Intent) {
+        if (intent.data?.toString().orEmpty().startsWith(RedirectComponent.REDIRECT_RESULT_SCHEME)) {
+            cardComponent.handleIntent(intent)
+        }
     }
 
     private fun adjustCardComponentLayout(flutterView: View) {
@@ -91,7 +111,7 @@ abstract class BaseCardComponent(
         card?.layoutParams = cardLayoutParams
     }
 
-    fun addComponent(cardComponent: CardComponent) {
-        componentWrapperView.addComponent(cardComponent)
+    companion object {
+        const val CARD_COMPONENT_CONFIGURATION_KEY = "cardComponentConfiguration"
     }
 }

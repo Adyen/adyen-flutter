@@ -27,7 +27,6 @@ class CardSessionFlowCallback(
         )
         val model = ComponentCommunicationModel(
             ComponentCommunicationType.RESULT,
-            data = "",
             paymentResult = paymentResult
         )
         componentFlutterApi.onComponentCommunication(model) {}

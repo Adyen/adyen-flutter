@@ -7,6 +7,7 @@ import 'package:adyen_checkout/src/components/component_result_api.dart';
 import 'package:adyen_checkout/src/components/platform/android_platform_view.dart';
 import 'package:adyen_checkout/src/components/platform/ios_platform_view.dart';
 import 'package:adyen_checkout/src/generated/platform_api.g.dart';
+import 'package:adyen_checkout/src/logging/adyen_logger.dart';
 import 'package:adyen_checkout/src/utils/constants.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
@@ -15,20 +16,22 @@ import 'package:flutter/services.dart';
 import 'package:stream_transform/stream_transform.dart';
 
 class CardSessionFlowWidget extends StatefulWidget {
-  const CardSessionFlowWidget({
+  CardSessionFlowWidget({
     super.key,
     required this.cardComponentConfiguration,
     required this.session,
     required this.onPaymentResult,
     required this.initialViewHeight,
     this.gestureRecognizers,
-  });
+    AdyenLogger? adyenLogger,
+  }) : adyenLogger = adyenLogger ?? AdyenLogger();
 
   final CardComponentConfigurationDTO cardComponentConfiguration;
   final SessionDTO session;
   final Future<void> Function(PaymentResult) onPaymentResult;
   final double initialViewHeight;
   final Set<Factory<OneSequenceGestureRecognizer>>? gestureRecognizers;
+  final AdyenLogger adyenLogger;
 
   @override
   State<CardSessionFlowWidget> createState() => _CardSessionFlowWidgetState();
@@ -95,6 +98,7 @@ class _CardSessionFlowWidgetState extends State<CardSessionFlowWidget> {
 
   void _onResult(ComponentCommunicationModel event) {
     String resultCode = event.paymentResult?.resultCode ?? "";
+    widget.adyenLogger.print("Card session flow result code: $resultCode");
     widget.onPaymentResult(PaymentAdvancedFlowFinished(resultCode: resultCode));
   }
 

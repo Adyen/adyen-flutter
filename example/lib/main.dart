@@ -2,14 +2,14 @@ import 'dart:async';
 
 import 'package:adyen_checkout/adyen_checkout.dart';
 import 'package:adyen_checkout_example/config.dart';
+import 'package:adyen_checkout_example/navigation/card_component_screen.dart';
 import 'package:adyen_checkout_example/network/models/session_response_network_model.dart';
 import 'package:adyen_checkout_example/network/service.dart';
-import 'package:adyen_checkout_example/repositories/adyen_sessions_repository.dart';
+import 'package:adyen_checkout_example/repositories/adyen_card_component_repository.dart';
+import 'package:adyen_checkout_example/repositories/adyen_drop_in_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-
-import 'navigation/routes.dart';
 
 void main() {
   runApp(const MaterialApp(localizationsDelegates: [
@@ -32,7 +32,9 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   String _platformVersion = 'Unknown';
   final _adyenCheckout = AdyenCheckout();
-  late AdyenSessionsRepository _adyenSessionRepository;
+  final _service = Service();
+  late AdyenDropInRepository _adyenDropInRepository;
+  late AdyenCardComponentRepository _adyenCardComponentRepository;
 
   @override
   void initState() {
@@ -43,9 +45,14 @@ class _MyAppState extends State<MyApp> {
 
   // Platform messages are asynchronous, so we initialize in an async method.
   Future<void> initPlatformState() async {
-    _adyenSessionRepository = AdyenSessionsRepository(
+    _adyenDropInRepository = AdyenDropInRepository(
       adyenCheckout: _adyenCheckout,
-      service: Service(),
+      service: _service,
+    );
+
+    _adyenCardComponentRepository = AdyenCardComponentRepository(
+      adyenCheckout: _adyenCheckout,
+      service: _service,
     );
 
     String platformVersion;
@@ -95,15 +102,15 @@ class _MyAppState extends State<MyApp> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => FirstRoute(
-                              repository: _adyenSessionRepository,
+                        builder: (context) => CardComponentScreen(
+                              repository: _adyenCardComponentRepository,
                             )),
                   );
                 },
                 child: const Text("Card component scroll view")),
             TextButton(
                 onPressed: () async {
-                  await _adyenSessionRepository
+                  await _adyenCardComponentRepository
                       .createSession()
                       .then((sessionResponse) => showModalBottomSheet(
                           context: context,
@@ -134,7 +141,6 @@ class _MyAppState extends State<MyApp> {
                                             .bottom),
                                     child: _buildSessionCardWidget(
                                       context,
-                                      _adyenSessionRepository,
                                       sessionResponse,
                                     ),
                                   ),
@@ -152,7 +158,7 @@ class _MyAppState extends State<MyApp> {
 
   Future<PaymentResult> startDropInSessions() async {
     final SessionResponseNetworkModel sessionResponse =
-        await _adyenSessionRepository.createSession();
+        await _adyenDropInRepository.createSession();
     final Session session = Session(
       id: sessionResponse.id,
       sessionData: sessionResponse.sessionData,
@@ -166,7 +172,7 @@ class _MyAppState extends State<MyApp> {
       showPreselectedStoredPaymentMethod: true,
       isRemoveStoredPaymentMethodEnabled: true,
       deleteStoredPaymentMethodCallback:
-          _adyenSessionRepository.deleteStoredPaymentMethod,
+          _adyenDropInRepository.deleteStoredPaymentMethod,
     );
 
     final CashAppPayConfiguration cashAppPayConfiguration =
@@ -199,7 +205,7 @@ class _MyAppState extends State<MyApp> {
 
   Future<PaymentResult> startDropInAdvancedFlow() async {
     final String paymentMethodsResponse =
-        await _adyenSessionRepository.fetchPaymentMethods();
+        await _adyenDropInRepository.fetchPaymentMethods();
 
     const CardConfiguration cardsConfiguration = CardConfiguration(
       showStorePaymentField: true,
@@ -225,7 +231,7 @@ class _MyAppState extends State<MyApp> {
       showPreselectedStoredPaymentMethod: false,
       isRemoveStoredPaymentMethodEnabled: true,
       deleteStoredPaymentMethodCallback:
-          _adyenSessionRepository.deleteStoredPaymentMethod,
+          _adyenDropInRepository.deleteStoredPaymentMethod,
     );
 
     final DropInConfiguration dropInConfiguration = DropInConfiguration(
@@ -245,8 +251,8 @@ class _MyAppState extends State<MyApp> {
       paymentFlow: DropInAdvancedFlow(
         dropInConfiguration: dropInConfiguration,
         paymentMethodsResponse: paymentMethodsResponse,
-        postPayments: _adyenSessionRepository.postPayments,
-        postPaymentsDetails: _adyenSessionRepository.postPaymentsDetails,
+        postPayments: _adyenDropInRepository.postPayments,
+        postPaymentsDetails: _adyenDropInRepository.postPaymentsDetails,
       ),
     );
   }
@@ -255,13 +261,12 @@ class _MyAppState extends State<MyApp> {
   Future<CashAppPayConfiguration> _createCashAppPayConfiguration() async {
     return CashAppPayConfiguration(
       CashAppPayEnvironment.sandbox,
-      await _adyenSessionRepository.determineExampleReturnUrl(),
+      await _adyenDropInRepository.determineBaseReturnUrl(),
     );
   }
 
   Widget _buildSessionCardWidget(
     BuildContext context,
-    AdyenSessionsRepository repository,
     SessionResponseNetworkModel sessionResponse,
   ) {
     final cardComponentConfiguration = CardComponentConfiguration(

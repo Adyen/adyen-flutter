@@ -27,6 +27,7 @@ class PaymentFlowOutcomeHandler {
 
     if (_isRefusedInPartialPaymentFlow(jsonResponse)) {
       return Error(
+        errorMessage: "Payment is refused",
         reason: "Refused",
         dismissDropIn: true,
       );

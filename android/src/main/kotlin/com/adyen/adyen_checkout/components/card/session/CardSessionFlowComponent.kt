@@ -7,17 +7,15 @@ import SessionDTO
 import android.content.Context
 import android.view.View
 import android.view.ViewGroup
-import androidx.activity.ComponentActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.doOnNextLayout
+import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.lifecycleScope
 import com.adyen.adyen_checkout.R
 import com.adyen.adyen_checkout.components.card.BaseCardComponent
 import com.adyen.checkout.card.CardComponent
-import com.adyen.checkout.card.CardConfiguration
 import com.adyen.checkout.components.core.PaymentMethodTypes
 import com.adyen.checkout.components.core.action.Action
-import com.adyen.checkout.sessions.core.CheckoutSession
 import com.adyen.checkout.sessions.core.CheckoutSessionProvider
 import com.adyen.checkout.sessions.core.CheckoutSessionResult
 import com.adyen.checkout.sessions.core.SessionModel
@@ -26,36 +24,41 @@ import kotlinx.coroutines.launch
 import java.util.UUID
 
 class CardSessionFlowComponent(
-    private val activity: ComponentActivity,
+    private val activity: FragmentActivity,
     private val componentFlutterApi: ComponentFlutterApi,
     context: Context,
     id: Int,
     creationParams: Map<*, *>?
 ) : BaseCardComponent(activity, componentFlutterApi, context, id, creationParams) {
-    private val session = creationParams?.get("session") as SessionDTO
+    private val session = creationParams?.get(SESSION_KEY) as SessionDTO
     private val sessionModel = SessionModel(id = session.id, sessionData = session.sessionData)
 
     init {
         activity.lifecycleScope.launch {
-            val checkoutSession: CheckoutSession? = getCheckoutSession(sessionModel, cardConfiguration)
-            if (checkoutSession == null) {
-                sendErrorToFlutterLayer("Failed to fetch session.")
-                return@launch
+            when (val sessionResult = CheckoutSessionProvider.createSession(sessionModel, cardConfiguration)) {
+                is CheckoutSessionResult.Error -> {
+                    sessionResult.exception.message?.let { sendErrorToFlutterLayer(it) }
+                    return@launch
+                }
+
+                is CheckoutSessionResult.Success -> {
+                    val paymentMethod = sessionResult.checkoutSession.getPaymentMethod(PaymentMethodTypes.SCHEME)
+                    if (paymentMethod == null) {
+                        sendErrorToFlutterLayer("Session does not contain SCHEME payment method.")
+                        return@launch
+                    }
+
+                    cardComponent = CardComponent.PROVIDER.get(
+                        activity = activity,
+                        checkoutSession = sessionResult.checkoutSession,
+                        paymentMethod = paymentMethod,
+                        configuration = cardConfiguration,
+                        componentCallback = CardSessionFlowCallback(componentFlutterApi) { action -> onAction(action) },
+                        key = UUID.randomUUID().toString()
+                    )
+                    addComponent(cardComponent)
+                }
             }
-            val paymentMethod = checkoutSession.getPaymentMethod(PaymentMethodTypes.SCHEME)
-            if (paymentMethod == null) {
-                sendErrorToFlutterLayer("Session does not contain SCHEME payment method.")
-                return@launch
-            }
-            cardComponent = CardComponent.PROVIDER.get(
-                activity = activity,
-                checkoutSession = checkoutSession,
-                paymentMethod = paymentMethod,
-                configuration = cardConfiguration,
-                componentCallback = CardSessionFlowCallback(componentFlutterApi) { action -> onAction(action) },
-                key = UUID.randomUUID().toString()
-            )
-            addComponent(cardComponent)
         }
     }
 
@@ -74,17 +77,6 @@ class CardSessionFlowComponent(
         )
     }
 
-
-    private suspend fun getCheckoutSession(
-        sessionModel: SessionModel,
-        cardConfiguration: CardConfiguration,
-    ): CheckoutSession? {
-        return when (val result = CheckoutSessionProvider.createSession(sessionModel, cardConfiguration)) {
-            is CheckoutSessionResult.Success -> result.checkoutSession
-            is CheckoutSessionResult.Error -> null
-        }
-    }
-
     private fun onAction(action: Action) = cardComponent.handleAction(action, activity)
 
     private fun sendErrorToFlutterLayer(errorMessage: String) {
@@ -93,5 +85,9 @@ class CardSessionFlowComponent(
             data = errorMessage,
         )
         componentFlutterApi.onComponentCommunication(model) {}
+    }
+
+    companion object {
+        const val SESSION_KEY = "session"
     }
 }
