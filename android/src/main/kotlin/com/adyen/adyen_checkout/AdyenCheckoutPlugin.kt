@@ -50,6 +50,7 @@ class AdyenCheckoutPlugin : FlutterPlugin, ActivityAware {
 
     override fun onDetachedFromEngine(binding: FlutterPluginBinding) {
         CheckoutPlatformInterface.setUp(binding.binaryMessenger, null)
+        ComponentPlatformInterface.setUp(binding.binaryMessenger, null)
         checkoutFlutterApi = null
         componentFlutterApi = null
     }
