@@ -77,19 +77,13 @@ class AdyenCheckoutPlugin : FlutterPlugin, ActivityAware {
             lifecycleReference?.lifecycle?.addObserver(it)
         }
 
-        if (componentFlutterApi != null) {
+        componentFlutterApi?.let {
             flutterPluginBinding?.platformViewRegistry?.registerViewFactory(
-                "cardComponentAdvancedFlow", CardAdvancedFlowComponentFactory(
-                    fragmentActivity,
-                    componentFlutterApi!!,
-                )
+                "cardComponentAdvancedFlow", CardAdvancedFlowComponentFactory(fragmentActivity, it)
             )
 
             flutterPluginBinding?.platformViewRegistry?.registerViewFactory(
-                "cardComponentSessionFlow", CardSessionFlowComponentFactory(
-                    fragmentActivity,
-                    componentFlutterApi!!,
-                )
+                "cardComponentSessionFlow", CardSessionFlowComponentFactory(fragmentActivity, it)
             )
         }
     }
