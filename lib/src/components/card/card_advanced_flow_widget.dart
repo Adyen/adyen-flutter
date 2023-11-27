@@ -88,13 +88,6 @@ class _CardAdvancedFlowWidgetState extends State<CardAdvancedFlowWidget> {
     super.dispose();
   }
 
-  // ignore: unused_element
-  // void _resetCardView() {
-  //   setState(() {
-  //     _cardView = _buildPlatformCardView();
-  //   });
-  // }
-
   void _handleComponentCommunication(event) async {
     switch (event.type) {
       case ComponentCommunicationType.onSubmit:
