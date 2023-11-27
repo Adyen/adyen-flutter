@@ -47,6 +47,7 @@ class SessionRequestNetworkModel {
   String toRawJson() => json.encode(toJson());
 
   Map<String, dynamic> toJson() {
+    // ignore: unused_local_variable
     Map<String, dynamic> installmentOptions = json.decode("""{
         "visa": {
                 "plans": [

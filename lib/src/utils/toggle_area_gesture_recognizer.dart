@@ -39,6 +39,7 @@ class ToggleAreaGestureRecognizer extends OneSequenceGestureRecognizer {
   @override
   String get debugDescription => "ToggleAreaGestureRecognizer";
 
+  // ignore: unused_element
   bool _isPointerWithinBottomHalfOfCardView(
     PointerDownEvent event,
     RenderBox renderBox,
