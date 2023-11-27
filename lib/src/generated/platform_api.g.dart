@@ -1259,8 +1259,8 @@ class ComponentPlatformInterface {
   }
 }
 
-class _ComponentFlutterApiCodec extends StandardMessageCodec {
-  const _ComponentFlutterApiCodec();
+class _ComponentFlutterInterfaceCodec extends StandardMessageCodec {
+  const _ComponentFlutterInterfaceCodec();
   @override
   void writeValue(WriteBuffer buffer, Object? value) {
     if (value is AmountDTO) {
@@ -1317,33 +1317,33 @@ class _ComponentFlutterApiCodec extends StandardMessageCodec {
   }
 }
 
-abstract class ComponentFlutterApi {
-  static const MessageCodec<Object?> codec = _ComponentFlutterApiCodec();
+abstract class ComponentFlutterInterface {
+  static const MessageCodec<Object?> codec = _ComponentFlutterInterfaceCodec();
 
-  void _generateDtoClassesForCodec(CardComponentConfigurationDTO cardComponentConfigurationDTO, SessionDTO sessionDTO);
+  void _generateCodecForDTOs(CardComponentConfigurationDTO cardComponentConfigurationDTO, SessionDTO sessionDTO);
 
   void onComponentCommunication(ComponentCommunicationModel componentCommunicationModel);
 
-  static void setup(ComponentFlutterApi? api, {BinaryMessenger? binaryMessenger}) {
+  static void setup(ComponentFlutterInterface? api, {BinaryMessenger? binaryMessenger}) {
     {
       final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
-          'dev.flutter.pigeon.adyen_checkout.ComponentFlutterApi._generateDtoClassesForCodec', codec,
+          'dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface._generateCodecForDTOs', codec,
           binaryMessenger: binaryMessenger);
       if (api == null) {
         channel.setMessageHandler(null);
       } else {
         channel.setMessageHandler((Object? message) async {
           assert(message != null,
-          'Argument for dev.flutter.pigeon.adyen_checkout.ComponentFlutterApi._generateDtoClassesForCodec was null.');
+          'Argument for dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface._generateCodecForDTOs was null.');
           final List<Object?> args = (message as List<Object?>?)!;
           final CardComponentConfigurationDTO? arg_cardComponentConfigurationDTO = (args[0] as CardComponentConfigurationDTO?);
           assert(arg_cardComponentConfigurationDTO != null,
-              'Argument for dev.flutter.pigeon.adyen_checkout.ComponentFlutterApi._generateDtoClassesForCodec was null, expected non-null CardComponentConfigurationDTO.');
+              'Argument for dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface._generateCodecForDTOs was null, expected non-null CardComponentConfigurationDTO.');
           final SessionDTO? arg_sessionDTO = (args[1] as SessionDTO?);
           assert(arg_sessionDTO != null,
-              'Argument for dev.flutter.pigeon.adyen_checkout.ComponentFlutterApi._generateDtoClassesForCodec was null, expected non-null SessionDTO.');
+              'Argument for dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface._generateCodecForDTOs was null, expected non-null SessionDTO.');
           try {
-            api._generateDtoClassesForCodec(arg_cardComponentConfigurationDTO!, arg_sessionDTO!);
+            api._generateCodecForDTOs(arg_cardComponentConfigurationDTO!, arg_sessionDTO!);
             return wrapResponse(empty: true);
           } on PlatformException catch (e) {
             return wrapResponse(error: e);
@@ -1355,18 +1355,18 @@ abstract class ComponentFlutterApi {
     }
     {
       final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
-          'dev.flutter.pigeon.adyen_checkout.ComponentFlutterApi.onComponentCommunication', codec,
+          'dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface.onComponentCommunication', codec,
           binaryMessenger: binaryMessenger);
       if (api == null) {
         channel.setMessageHandler(null);
       } else {
         channel.setMessageHandler((Object? message) async {
           assert(message != null,
-          'Argument for dev.flutter.pigeon.adyen_checkout.ComponentFlutterApi.onComponentCommunication was null.');
+          'Argument for dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface.onComponentCommunication was null.');
           final List<Object?> args = (message as List<Object?>?)!;
           final ComponentCommunicationModel? arg_componentCommunicationModel = (args[0] as ComponentCommunicationModel?);
           assert(arg_componentCommunicationModel != null,
-              'Argument for dev.flutter.pigeon.adyen_checkout.ComponentFlutterApi.onComponentCommunication was null, expected non-null ComponentCommunicationModel.');
+              'Argument for dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface.onComponentCommunication was null, expected non-null ComponentCommunicationModel.');
           try {
             api.onComponentCommunication(arg_componentCommunicationModel!);
             return wrapResponse(empty: true);

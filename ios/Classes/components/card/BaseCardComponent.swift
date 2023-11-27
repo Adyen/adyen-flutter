@@ -4,7 +4,7 @@ import AdyenNetworking
 import Flutter
 
 class BaseCardComponent: NSObject, FlutterPlatformView, UIScrollViewDelegate {
-    let componentFlutterApi: ComponentFlutterApi
+    let componentFlutterApi: ComponentFlutterInterface
     let componentPlatformApi: ComponentPlatformApi
     let componentWrapperView: ComponentWrapperView
     let configurationMapper = ConfigurationMapper()
@@ -18,7 +18,7 @@ class BaseCardComponent: NSObject, FlutterPlatformView, UIScrollViewDelegate {
         viewIdentifier _: Int64,
         arguments _: NSDictionary,
         binaryMessenger: FlutterBinaryMessenger,
-        componentFlutterApi: ComponentFlutterApi
+        componentFlutterApi: ComponentFlutterInterface
     ) {
         self.componentFlutterApi = componentFlutterApi
         componentPlatformApi = ComponentPlatformApi()

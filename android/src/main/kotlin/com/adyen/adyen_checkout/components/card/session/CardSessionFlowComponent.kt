@@ -2,7 +2,7 @@ package com.adyen.adyen_checkout.components.card.session
 
 import ComponentCommunicationModel
 import ComponentCommunicationType
-import ComponentFlutterApi
+import ComponentFlutterInterface
 import SessionDTO
 import android.content.Context
 import android.view.View
@@ -25,7 +25,7 @@ import java.util.UUID
 
 class CardSessionFlowComponent(
     private val activity: FragmentActivity,
-    private val componentFlutterApi: ComponentFlutterApi,
+    private val componentFlutterApi: ComponentFlutterInterface,
     context: Context,
     id: Int,
     creationParams: Map<*, *>?

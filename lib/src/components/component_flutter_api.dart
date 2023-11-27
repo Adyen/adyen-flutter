@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:adyen_checkout/src/generated/platform_api.g.dart';
 
-class ComponentResultApi implements ComponentFlutterApi {
+class ComponentFlutterApi implements ComponentFlutterInterface {
   var componentCommunicationStream =
       StreamController<ComponentCommunicationModel>.broadcast();
 

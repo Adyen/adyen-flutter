@@ -14,7 +14,7 @@ class CardAdvancedFlowComponent: BaseCardComponent {
         viewIdentifier: Int64,
         arguments: NSDictionary,
         binaryMessenger: FlutterBinaryMessenger,
-        componentFlutterApi: ComponentFlutterApi
+        componentFlutterApi: ComponentFlutterInterface
     ) {
         actionComponentDelegate = CardAdvancedFlowActionComponentDelegate(componentFlutterApi: componentFlutterApi)
         initialFrame = frame

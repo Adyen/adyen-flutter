@@ -1,9 +1,9 @@
 import Adyen
 
 class CardAdvancedFlowDelegate: PaymentComponentDelegate {
-    private let componentFlutterApi: ComponentFlutterApi
+    private let componentFlutterApi: ComponentFlutterInterface
 
-    init(componentFlutterApi: ComponentFlutterApi) {
+    init(componentFlutterApi: ComponentFlutterInterface) {
         self.componentFlutterApi = componentFlutterApi
     }
 

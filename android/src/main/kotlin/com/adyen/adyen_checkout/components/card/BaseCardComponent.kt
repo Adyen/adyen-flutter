@@ -1,7 +1,7 @@
 package com.adyen.adyen_checkout.components.card
 
 import CardComponentConfigurationDTO
-import ComponentFlutterApi
+import ComponentFlutterInterface
 import android.content.Context
 import android.content.Intent
 import android.view.View
@@ -27,7 +27,7 @@ import io.flutter.plugin.platform.PlatformView
 
 abstract class BaseCardComponent(
     private val activity: ComponentActivity,
-    private val componentFlutterApi: ComponentFlutterApi,
+    private val componentFlutterApi: ComponentFlutterInterface,
     context: Context,
     id: Int,
     creationParams: Map<*, *>?

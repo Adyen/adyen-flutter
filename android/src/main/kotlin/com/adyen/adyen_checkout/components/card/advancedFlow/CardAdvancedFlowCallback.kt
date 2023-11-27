@@ -2,7 +2,7 @@ package com.adyen.adyen_checkout.components.card.advancedFlow
 
 import ComponentCommunicationModel
 import ComponentCommunicationType
-import ComponentFlutterApi
+import ComponentFlutterInterface
 import com.adyen.adyen_checkout.components.ComponentHeightMessenger
 import com.adyen.checkout.card.CardComponentState
 import com.adyen.checkout.components.core.ActionComponentData
@@ -10,7 +10,7 @@ import com.adyen.checkout.components.core.ComponentCallback
 import com.adyen.checkout.components.core.ComponentError
 import com.adyen.checkout.components.core.PaymentComponentData
 
-class CardAdvancedFlowCallback(private val componentFlutterApi: ComponentFlutterApi) :
+class CardAdvancedFlowCallback(private val componentFlutterApi: ComponentFlutterInterface) :
     ComponentCallback<CardComponentState> {
     override fun onSubmit(state: CardComponentState) {
         val paymentComponentJson = PaymentComponentData.SERIALIZER.serialize(state.data)

@@ -1208,7 +1208,7 @@ interface ComponentPlatformInterface {
   }
 }
 @Suppress("UNCHECKED_CAST")
-private object ComponentFlutterApiCodec : StandardMessageCodec() {
+private object ComponentFlutterInterfaceCodec : StandardMessageCodec() {
   override fun readValueOfType(type: Byte, buffer: ByteBuffer): Any? {
     return when (type) {
       128.toByte() -> {
@@ -1295,15 +1295,15 @@ private object ComponentFlutterApiCodec : StandardMessageCodec() {
 
 /** Generated class from Pigeon that represents Flutter messages that can be called from Kotlin. */
 @Suppress("UNCHECKED_CAST")
-class ComponentFlutterApi(private val binaryMessenger: BinaryMessenger) {
+class ComponentFlutterInterface(private val binaryMessenger: BinaryMessenger) {
   companion object {
-    /** The codec used by ComponentFlutterApi. */
+    /** The codec used by ComponentFlutterInterface. */
     val codec: MessageCodec<Any?> by lazy {
-      ComponentFlutterApiCodec
+      ComponentFlutterInterfaceCodec
     }
   }
-  fun _generateDtoClassesForCodec(cardComponentConfigurationDTOArg: CardComponentConfigurationDTO, sessionDTOArg: SessionDTO, callback: (Result<Unit>) -> Unit) {
-    val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.adyen_checkout.ComponentFlutterApi._generateDtoClassesForCodec", codec)
+  fun _generateCodecForDTOs(cardComponentConfigurationDTOArg: CardComponentConfigurationDTO, sessionDTOArg: SessionDTO, callback: (Result<Unit>) -> Unit) {
+    val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface._generateCodecForDTOs", codec)
     channel.send(listOf(cardComponentConfigurationDTOArg, sessionDTOArg)) {
       if (it is List<*>) {
         if (it.size > 1) {
@@ -1317,7 +1317,7 @@ class ComponentFlutterApi(private val binaryMessenger: BinaryMessenger) {
     }
   }
   fun onComponentCommunication(componentCommunicationModelArg: ComponentCommunicationModel, callback: (Result<Unit>) -> Unit) {
-    val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.adyen_checkout.ComponentFlutterApi.onComponentCommunication", codec)
+    val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface.onComponentCommunication", codec)
     channel.send(listOf(componentCommunicationModelArg)) {
       if (it is List<*>) {
         if (it.size > 1) {

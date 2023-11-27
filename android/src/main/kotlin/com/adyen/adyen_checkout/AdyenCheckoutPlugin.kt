@@ -2,7 +2,7 @@ package com.adyen.adyen_checkout
 
 import CheckoutFlutterApi
 import CheckoutPlatformInterface
-import ComponentFlutterApi
+import ComponentFlutterInterface
 import ComponentPlatformInterface
 import PaymentResultDTO
 import PaymentResultEnum
@@ -33,7 +33,7 @@ class AdyenCheckoutPlugin : FlutterPlugin, ActivityAware {
     private var checkoutPlatformApi: CheckoutPlatformApi? = null
     private var checkoutFlutterApi: CheckoutFlutterApi? = null
     private var componentPlatformApi: ComponentPlatformApi? = null
-    private var componentFlutterApi: ComponentFlutterApi? = null
+    private var componentFlutterApi: ComponentFlutterInterface? = null
     private var lifecycleReference: HiddenLifecycleReference? = null
     private var lifecycleObserver: LifecycleEventObserver? = null
     private var flutterPluginBinding: FlutterPluginBinding? = null
@@ -42,7 +42,7 @@ class AdyenCheckoutPlugin : FlutterPlugin, ActivityAware {
         this.flutterPluginBinding = flutterPluginBinding
         checkoutFlutterApi = CheckoutFlutterApi(flutterPluginBinding.binaryMessenger)
         checkoutPlatformApi = CheckoutPlatformApi(checkoutFlutterApi)
-        componentFlutterApi = ComponentFlutterApi(flutterPluginBinding.binaryMessenger)
+        componentFlutterApi = ComponentFlutterInterface(flutterPluginBinding.binaryMessenger)
         componentPlatformApi = ComponentPlatformApi()
         CheckoutPlatformInterface.setUp(flutterPluginBinding.binaryMessenger, checkoutPlatformApi)
         ComponentPlatformInterface.setUp(flutterPluginBinding.binaryMessenger, componentPlatformApi)

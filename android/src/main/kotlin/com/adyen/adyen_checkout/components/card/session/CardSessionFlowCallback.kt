@@ -2,7 +2,7 @@ package com.adyen.adyen_checkout.components.card.session
 
 import ComponentCommunicationModel
 import ComponentCommunicationType
-import ComponentFlutterApi
+import ComponentFlutterInterface
 import PaymentResultModelDTO
 import com.adyen.adyen_checkout.components.ComponentHeightMessenger
 import com.adyen.adyen_checkout.utils.ConfigurationMapper.mapToOrderResponseModel
@@ -13,7 +13,7 @@ import com.adyen.checkout.sessions.core.SessionComponentCallback
 import com.adyen.checkout.sessions.core.SessionPaymentResult
 
 class CardSessionFlowCallback(
-    private val componentFlutterApi: ComponentFlutterApi,
+    private val componentFlutterApi: ComponentFlutterInterface,
     private val onActionCallback: (Action) -> Unit
 ) :
     SessionComponentCallback<CardComponentState> {

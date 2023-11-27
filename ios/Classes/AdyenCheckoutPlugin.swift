@@ -11,7 +11,7 @@ public class AdyenCheckoutPlugin: NSObject, FlutterPlugin {
         CheckoutPlatformInterfaceSetup.setUp(binaryMessenger: messenger, api: checkoutPlatformApi)
 
         // Component
-        let componentFlutterApi = ComponentFlutterApi(binaryMessenger: messenger)
+        let componentFlutterApi = ComponentFlutterInterface(binaryMessenger: messenger)
         let cardComponentAdvancedFlowFactory = CardAdvancedFlowComponentFactory(messenger: messenger, componentFlutterApi: componentFlutterApi)
         registrar.register(cardComponentAdvancedFlowFactory, withId: "cardComponentAdvancedFlow")
         let cardComponentSessionFlowFactory = CardSessionFlowComponentFactory(messenger: messenger, componentFlutterApi: componentFlutterApi)

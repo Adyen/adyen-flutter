@@ -2,7 +2,7 @@ package com.adyen.adyen_checkout.components
 
 import ComponentCommunicationModel
 import ComponentCommunicationType
-import ComponentFlutterApi
+import ComponentFlutterInterface
 import android.content.Context
 import android.util.AttributeSet
 import android.widget.FrameLayout
@@ -24,13 +24,13 @@ class ComponentWrapperView
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0
 ) : ConstraintLayout(context, attrs, defStyleAttr) {
-    constructor(activity: ComponentActivity, componentFlutterApi: ComponentFlutterApi) : this(context = activity) {
+    constructor(activity: ComponentActivity, componentFlutterApi: ComponentFlutterInterface) : this(context = activity) {
         this.activity = activity
         this.componentFlutterApi = componentFlutterApi
     }
 
     private lateinit var activity: ComponentActivity
-    private lateinit var componentFlutterApi: ComponentFlutterApi
+    private lateinit var componentFlutterApi: ComponentFlutterInterface
     private val screenDensity = context.resources.displayMetrics.density
 
     init {

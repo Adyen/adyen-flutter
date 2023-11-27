@@ -13,7 +13,7 @@ class CardSessionFlowComponent: BaseCardComponent {
         viewIdentifier: Int64,
         arguments: NSDictionary,
         binaryMessenger: FlutterBinaryMessenger,
-        componentFlutterApi: ComponentFlutterApi
+        componentFlutterApi: ComponentFlutterInterface
     ) {
         cardSessionFlowDelegate = CardSessionFlowDelegate(componentFlutterApi: componentFlutterApi)
         super.init(

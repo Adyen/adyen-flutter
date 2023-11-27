@@ -2,9 +2,9 @@ import Flutter
 
 class ComponentFactory: NSObject, FlutterPlatformViewFactory {
     let messenger: FlutterBinaryMessenger
-    let componentFlutterApi: ComponentFlutterApi
+    let componentFlutterApi: ComponentFlutterInterface
 
-    init(messenger: FlutterBinaryMessenger, componentFlutterApi: ComponentFlutterApi) {
+    init(messenger: FlutterBinaryMessenger, componentFlutterApi: ComponentFlutterInterface) {
         self.messenger = messenger
         self.componentFlutterApi = componentFlutterApi
 

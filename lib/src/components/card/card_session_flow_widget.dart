@@ -2,8 +2,8 @@ import 'dart:async';
 
 import 'package:adyen_checkout/adyen_checkout.dart';
 import 'package:adyen_checkout/src/components/card/card_component_container_widget.dart';
+import 'package:adyen_checkout/src/components/component_flutter_api.dart';
 import 'package:adyen_checkout/src/components/component_platform_api.dart';
-import 'package:adyen_checkout/src/components/component_result_api.dart';
 import 'package:adyen_checkout/src/components/platform/android_platform_view.dart';
 import 'package:adyen_checkout/src/components/platform/ios_platform_view.dart';
 import 'package:adyen_checkout/src/generated/platform_api.g.dart';
@@ -38,8 +38,8 @@ class CardSessionFlowWidget extends StatefulWidget {
 }
 
 class _CardSessionFlowWidgetState extends State<CardSessionFlowWidget> {
-  final MessageCodec<Object?> _codec = ComponentFlutterApi.codec;
-  final ComponentResultApi _resultApi = ComponentResultApi();
+  final MessageCodec<Object?> _codec = ComponentFlutterInterface.codec;
+  final ComponentFlutterApi _resultApi = ComponentFlutterApi();
   final ComponentPlatformApi _componentPlatformApi = ComponentPlatformApi();
   final StreamController<double> _resizeStream = StreamController.broadcast();
   final GlobalKey _cardWidgetKey = GlobalKey();
@@ -49,7 +49,7 @@ class _CardSessionFlowWidgetState extends State<CardSessionFlowWidget> {
   void initState() {
     super.initState();
 
-    ComponentFlutterApi.setup(_resultApi);
+    ComponentFlutterInterface.setup(_resultApi);
     _cardWidget = _buildCardWidget();
     _resultApi.componentCommunicationStream.stream
         .asBroadcastStream()

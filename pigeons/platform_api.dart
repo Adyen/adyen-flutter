@@ -380,9 +380,9 @@ abstract class ComponentPlatformInterface {
 }
 
 @FlutterApi()
-abstract class ComponentFlutterApi {
+abstract class ComponentFlutterInterface {
   // ignore: unused_element
-  void _generateDtoClassesForCodec(
+  void _generateCodecForDTOs(
     CardComponentConfigurationDTO cardComponentConfigurationDTO,
     SessionDTO sessionDTO,
   );

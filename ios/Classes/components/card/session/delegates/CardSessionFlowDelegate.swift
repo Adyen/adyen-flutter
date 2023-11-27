@@ -2,10 +2,10 @@ import Adyen
 import AdyenNetworking
 
 class CardSessionFlowDelegate: AdyenSessionDelegate {
-    private let componentFlutterApi: ComponentFlutterApi
+    private let componentFlutterApi: ComponentFlutterInterface
     var finalizeAndDismiss: ((Bool, @escaping (() -> Void)) -> Void)?
 
-    init(componentFlutterApi: ComponentFlutterApi) {
+    init(componentFlutterApi: ComponentFlutterInterface) {
         self.componentFlutterApi = componentFlutterApi
     }
 

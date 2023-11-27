@@ -2,7 +2,7 @@ package com.adyen.adyen_checkout.components.card.advancedFlow
 
 import ComponentCommunicationModel
 import ComponentCommunicationType
-import ComponentFlutterApi
+import ComponentFlutterInterface
 import android.content.Context
 import android.view.View
 import android.view.ViewGroup
@@ -23,7 +23,7 @@ import java.util.UUID
 
 internal class CardAdvancedFlowComponent(
     private val activity: FragmentActivity,
-    private val componentFlutterApi: ComponentFlutterApi,
+    private val componentFlutterApi: ComponentFlutterInterface,
     context: Context,
     id: Int,
     creationParams: Map<*, *>?
