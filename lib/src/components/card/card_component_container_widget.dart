@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class AdyenCardComponentContainerWidget extends StatelessWidget {
@@ -32,10 +33,19 @@ class AdyenCardComponentContainerWidget extends StatelessWidget {
         if (snapshot.data == null)
           SizedBox(
             height: initialViewHeight,
-            child: const Center(child: CircularProgressIndicator()),
+            child: _buildLoadingWidget(),
           )
       ],
     );
+  }
+
+  Widget _buildLoadingWidget() {
+    switch (defaultTargetPlatform) {
+      case TargetPlatform.android:
+        return const Center(child: CircularProgressIndicator());
+      default:
+        return const Center(child: SizedBox.shrink());
+    }
   }
 
   double _determineHeight(AsyncSnapshot<dynamic> snapshot) {

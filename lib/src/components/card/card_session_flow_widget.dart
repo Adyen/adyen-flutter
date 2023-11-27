@@ -79,13 +79,6 @@ class _CardSessionFlowWidgetState extends State<CardSessionFlowWidget> {
     super.dispose();
   }
 
-  // ignore: unused_element
-  // void _resetCardView() {
-  //   setState(() {
-  //     _cardWidget = _buildCardWidget();
-  //   });
-  // }
-
   void _handleComponentCommunication(event) async {
     if (event.type case ComponentCommunicationType.result) {
       _onResult(event);
