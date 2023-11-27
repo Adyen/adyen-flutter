@@ -49,13 +49,13 @@ class AdyenCardComponentContainerWidget extends StatelessWidget {
   }
 
   double _determineHeight(AsyncSnapshot<dynamic> snapshot) {
-    if (snapshot.data == null) {
-      return initialViewHeight;
-    }
-    if (snapshot.data > 0) {
-      return snapshot.data + marginBottom;
-    } else {
-      return initialViewHeight;
+    switch (snapshot.data) {
+      case null:
+        return initialViewHeight;
+      case > 0:
+        return snapshot.data + marginBottom;
+      default:
+        return initialViewHeight;
     }
   }
 }
