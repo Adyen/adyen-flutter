@@ -82,13 +82,13 @@ class CardAdvancedFlowComponent: BaseCardComponent {
     }
     
     private func setupFinalizeComponentCallback() {
-        componentPlatformApi.onFinishCallback = { paymentFlowOutcome in
+        componentPlatformApi.onFinishCallback = { [weak self] paymentFlowOutcome in
             let resultCode = ResultCode(rawValue: paymentFlowOutcome.result ?? "")
             let success = resultCode == .authorised || resultCode == .received || resultCode == .pending
-            self.finalizeAndDismiss(success: success, completion: {
+            self?.finalizeAndDismiss(success: success, completion: { [weak self] in
                 let componentCommunicationModel = ComponentCommunicationModel(type: ComponentCommunicationType.result,
                                                                               paymentResult: PaymentResultModelDTO(resultCode: resultCode?.rawValue))
-                self.componentFlutterApi.onComponentCommunication(componentCommunicationModel: componentCommunicationModel, completion: { _ in })
+                self?.componentFlutterApi.onComponentCommunication(componentCommunicationModel: componentCommunicationModel, completion: { _ in })
             })
         }
     }

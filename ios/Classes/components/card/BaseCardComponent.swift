@@ -87,12 +87,12 @@ class BaseCardComponent: NSObject, FlutterPlatformView, UIScrollViewDelegate {
     }
 
     private func setupResizeViewportCallback() {
-        componentWrapperView.resizeViewportCallback = {
-            self.sendHeightUpdate()
+        componentWrapperView.resizeViewportCallback = { [weak self] in
+            self?.sendHeightUpdate()
         }
         
-        componentPlatformApi.onUpdateViewHeightCallback = {
-            self.sendHeightUpdate()
+        componentPlatformApi.onUpdateViewHeightCallback = { [weak self] in
+            self?.sendHeightUpdate()
         }
     }
     

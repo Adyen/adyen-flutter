@@ -10,15 +10,13 @@ class CardSessionFlowDelegate: AdyenSessionDelegate {
     }
 
     func didComplete(with result: Adyen.AdyenSessionResult, component : Adyen.Component, session: Adyen.AdyenSession) {
-        
         let resultCode = result.resultCode
         let success = resultCode == .authorised || resultCode == .received || resultCode == .pending
-        finalizeAndDismiss?(success, {
+        finalizeAndDismiss?(success, { [weak self] in
             let paymentResult = PaymentResultModelDTO(sessionId: session.sessionContext.identifier, sessionData: session.sessionContext.data, resultCode: result.resultCode.rawValue)
             let componentCommunicationModel = ComponentCommunicationModel(type: ComponentCommunicationType.result, paymentResult: paymentResult)
-            self.componentFlutterApi.onComponentCommunication(componentCommunicationModel: componentCommunicationModel, completion: { _ in })
+            self?.componentFlutterApi.onComponentCommunication(componentCommunicationModel: componentCommunicationModel, completion: { _ in })
         })
-        
     }
 
     func didFail(with error: Error, from _: Component, session _: AdyenSession) {
