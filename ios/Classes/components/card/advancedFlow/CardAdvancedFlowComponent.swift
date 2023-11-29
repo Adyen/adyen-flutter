@@ -4,10 +4,13 @@ import AdyenNetworking
 import Flutter
 
 class CardAdvancedFlowComponent: BaseCardComponent {
-    private let actionComponentDelegate: ActionComponentDelegate
-    private var presentationDelegate: PresentationDelegate?
-    private var actionComponent: AdyenActionComponent?
+    private let isStoredPaymentMethodKey = "isStoredPaymentMethod"
+    private let paymentMethodKey = "paymentMethod"
     private let initialFrame: CGRect
+    private let isStoredPaymentMethod: Bool
+    private let actionComponentDelegate: ActionComponentDelegate
+
+    private var actionComponent: AdyenActionComponent?
 
     override init(
         frame: CGRect,
@@ -16,6 +19,7 @@ class CardAdvancedFlowComponent: BaseCardComponent {
         binaryMessenger: FlutterBinaryMessenger,
         componentFlutterApi: ComponentFlutterInterface
     ) {
+        isStoredPaymentMethod = arguments.value(forKey: isStoredPaymentMethodKey) as? Bool ?? false
         actionComponentDelegate = CardAdvancedFlowActionComponentDelegate(componentFlutterApi: componentFlutterApi)
         initialFrame = frame
         super.init(
@@ -32,8 +36,16 @@ class CardAdvancedFlowComponent: BaseCardComponent {
 
     private func setupCardComponentView(arguments: NSDictionary) {
         do {
-            let cardComponentView = try createCardComponentView(arguments: arguments)
-            attachCardView(cardComponentView: cardComponentView)
+            cardComponent = try setupCardComponent(arguments: arguments)
+            if isStoredPaymentMethod {
+                guard let storedCardViewController = cardComponent?.viewController else { return }
+                attachActivityIndicator()
+                getViewController()?.presentViewController(storedCardViewController, animated: true)
+            } else {
+                guard let cardView = cardComponent?.viewController.view else { return }
+                attachCardView(cardView: cardView)
+            }
+
             componentPlatformApi.onActionCallback = { [weak self] jsonActionResponse in
                 self?.onAction(actionResponse: jsonActionResponse)
             }
@@ -42,26 +54,28 @@ class CardAdvancedFlowComponent: BaseCardComponent {
         }
     }
 
-    private func createCardComponentView(arguments: NSDictionary) throws -> UIView {
-        guard let paymentMethodsResponse = arguments.value(forKey: "paymentMethods") as? String else { throw PlatformError(errorDescription: "Payment methods not found") }
-        guard let cardComponentConfiguration = arguments.value(forKey: "cardComponentConfiguration") as? CardComponentConfigurationDTO else { throw PlatformError(errorDescription: "Card configuration not found") }
-        let paymentMethods = try JSONDecoder().decode(PaymentMethods.self, from: Data(paymentMethodsResponse.utf8))
-        cardComponent = try buildCardComponent(paymentMethods: paymentMethods, cardComponentConfiguration: cardComponentConfiguration)
+    private func setupCardComponent(arguments: NSDictionary) throws -> CardComponent {
+        guard let paymentMethodString = arguments.value(forKey: paymentMethodKey) as? String else { throw PlatformError(errorDescription: "Payment method not found") }
+        guard let cardComponentConfiguration = arguments.value(forKey: cardComponentConfigurationKey) as? CardComponentConfigurationDTO else { throw PlatformError(errorDescription: "Card configuration not found") }
+        let cardComponent = try buildCardComponent(paymentMethodString: paymentMethodString, isStoredPaymentMethod: isStoredPaymentMethod, cardComponentConfiguration: cardComponentConfiguration)
         cardDelegate = CardAdvancedFlowDelegate(componentFlutterApi: componentFlutterApi)
-        cardComponent?.delegate = cardDelegate
-        cardComponent?.viewController.view.frame = initialFrame
-        guard let cardView = cardComponent?.viewController.view else { throw PlatformError(errorDescription: "Failed to get card component view") }
-        return cardView
+        cardComponent.delegate = cardDelegate
+        cardComponent.viewController.view.frame = initialFrame
+        return cardComponent
     }
 
-    private func buildCardComponent(paymentMethods: PaymentMethods, cardComponentConfiguration: CardComponentConfigurationDTO) throws -> CardComponent {
-        guard let paymentMethod = paymentMethods.paymentMethod(ofType: CardPaymentMethod.self) else { throw PlatformError(errorDescription: "Card payment method not provided") }
+    private func buildCardComponent(paymentMethodString: String, isStoredPaymentMethod: Bool, cardComponentConfiguration: CardComponentConfigurationDTO) throws -> CardComponent {
         let adyenContext = try cardComponentConfiguration.createAdyenContext()
         let cardConfiguration = cardComponentConfiguration.cardConfiguration.mapToCardComponentConfiguration()
-        let cardComponent = CardComponent(paymentMethod: paymentMethod, context: adyenContext, configuration: cardConfiguration)
         presentationDelegate = CardPresentationDelegate(topViewController: getViewController())
         actionComponent = buildActionComponent(adyenContext: adyenContext)
-        return cardComponent
+        if isStoredPaymentMethod {
+            let paymentMethod = try JSONDecoder().decode(StoredCardPaymentMethod.self, from: Data(paymentMethodString.utf8))
+            return CardComponent(paymentMethod: paymentMethod, context: adyenContext, configuration: cardConfiguration)
+        } else {
+            let paymentMethod = try JSONDecoder().decode(CardPaymentMethod.self, from: Data(paymentMethodString.utf8))
+            return CardComponent(paymentMethod: paymentMethod, context: adyenContext, configuration: cardConfiguration)
+        }
     }
 
     private func buildActionComponent(adyenContext: AdyenContext) -> AdyenActionComponent {
@@ -80,7 +94,7 @@ class CardAdvancedFlowComponent: BaseCardComponent {
             sendErrorToFlutterLayer(errorMessage: error.localizedDescription)
         }
     }
-    
+
     private func setupFinalizeComponentCallback() {
         componentPlatformApi.onFinishCallback = { [weak self] paymentFlowOutcome in
             let resultCode = ResultCode(rawValue: paymentFlowOutcome.result ?? "")
@@ -92,5 +106,4 @@ class CardAdvancedFlowComponent: BaseCardComponent {
             })
         }
     }
-
 }

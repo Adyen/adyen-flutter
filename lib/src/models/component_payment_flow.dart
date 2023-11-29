@@ -14,13 +14,13 @@ class CardComponentSessionFlow extends ComponentPaymentFlow {
 
 class CardComponentAdvancedFlow extends ComponentPaymentFlow {
   final CardComponentConfiguration cardComponentConfiguration;
-  final String paymentMethods;
+  final Map<String, dynamic> paymentMethod;
   final Future<PaymentFlowOutcome> Function(String) onPayments;
   final Future<PaymentFlowOutcome> Function(String) onPaymentsDetails;
 
   CardComponentAdvancedFlow({
     required this.cardComponentConfiguration,
-    required this.paymentMethods,
+    required this.paymentMethod,
     required this.onPayments,
     required this.onPaymentsDetails,
   });

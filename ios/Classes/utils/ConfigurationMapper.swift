@@ -69,7 +69,7 @@ class ConfigurationMapper {
             billingAddressConfiguration.mode = CardComponent.AddressFormType.full
         case .postalCode:
             billingAddressConfiguration.mode = CardComponent.AddressFormType.postalCode
-        case .none?:
+        case .none:
             billingAddressConfiguration.mode = CardComponent.AddressFormType.none
         default:
             billingAddressConfiguration.mode = CardComponent.AddressFormType.none
@@ -126,7 +126,7 @@ extension CardConfigurationDTO {
         let storedCardConfiguration = createStoredCardConfiguration(showCvcForStoredCard: showCvcForStoredCard)
         let allowedCardTypes = determineAllowedCardTypes(cardTypes: supportedCardTypes)
         let billingAddressConfiguration = determineBillingAddressConfiguration(addressMode: addressMode)
-        let cardConfiguration = CardComponent.Configuration(
+        return CardComponent.Configuration(
             style: formComponentStyle,
             showsHolderNameField: holderNameRequired,
             showsStorePaymentMethodField: showStorePaymentField,
@@ -137,8 +137,6 @@ extension CardConfigurationDTO {
             allowedCardTypes: allowedCardTypes,
             billingAddress: billingAddressConfiguration
         )
-
-        return cardConfiguration
     }
 
     private func createStoredCardConfiguration(showCvcForStoredCard: Bool) -> StoredCardConfiguration {
@@ -162,7 +160,7 @@ extension CardConfigurationDTO {
             billingAddressConfiguration.mode = CardComponent.AddressFormType.full
         case .postalCode:
             billingAddressConfiguration.mode = CardComponent.AddressFormType.postalCode
-        case .none?:
+        case .none:
             billingAddressConfiguration.mode = CardComponent.AddressFormType.none
         default:
             billingAddressConfiguration.mode = CardComponent.AddressFormType.none

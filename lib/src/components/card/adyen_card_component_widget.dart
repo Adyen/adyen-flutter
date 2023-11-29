@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:adyen_checkout/adyen_checkout.dart';
 import 'package:adyen_checkout/src/components/card/card_advanced_flow_widget.dart';
 import 'package:adyen_checkout/src/components/card/card_session_flow_widget.dart';
@@ -10,6 +12,7 @@ class AdyenCardComponentWidget extends StatelessWidget {
   final ComponentPaymentFlow componentPaymentFlow;
   final Future<void> Function(PaymentResult) onPaymentResult;
   final Set<Factory<OneSequenceGestureRecognizer>>? gestureRecognizers;
+  final isStoredPaymentMethodIndicator = "id";
 
   const AdyenCardComponentWidget({
     super.key,
@@ -43,16 +46,21 @@ class AdyenCardComponentWidget extends StatelessWidget {
   CardAdvancedFlowWidget _buildCardAdvancedFlowWidget() {
     final CardComponentAdvancedFlow cardComponentAdvancedFlow =
         componentPaymentFlow as CardComponentAdvancedFlow;
-    final double initialHeight = _determineInitialHeight(
+    final initialHeight = _determineInitialHeight(
         cardComponentAdvancedFlow.cardComponentConfiguration.cardConfiguration);
+    final isStoredPaymentMethod = cardComponentAdvancedFlow.paymentMethod
+        .containsKey(isStoredPaymentMethodIndicator);
+    final encodedPaymentMethod = json.encode(cardComponentAdvancedFlow.paymentMethod);
+
     return CardAdvancedFlowWidget(
       cardComponentConfiguration:
           cardComponentAdvancedFlow.cardComponentConfiguration.toDTO(),
-      paymentMethods: cardComponentAdvancedFlow.paymentMethods,
+      paymentMethod: encodedPaymentMethod,
       onPayments: cardComponentAdvancedFlow.onPayments,
       onPaymentsDetails: cardComponentAdvancedFlow.onPaymentsDetails,
       onPaymentResult: onPaymentResult,
       initialViewHeight: initialHeight,
+      isStoredPaymentMethod: isStoredPaymentMethod,
       gestureRecognizers: gestureRecognizers,
     );
   }
@@ -93,8 +101,7 @@ class AdyenCardComponentWidget extends StatelessWidget {
       androidViewHeight += 61;
     }
 
-    if (cardConfiguration.kcpFieldVisibility ==
-        FieldVisibility.show) {
+    if (cardConfiguration.kcpFieldVisibility == FieldVisibility.show) {
       androidViewHeight += 164;
     }
 

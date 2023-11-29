@@ -4,6 +4,7 @@ import AdyenNetworking
 import Flutter
 
 class BaseCardComponent: NSObject, FlutterPlatformView, UIScrollViewDelegate {
+    let cardComponentConfigurationKey = "cardComponentConfiguration"
     let componentFlutterApi: ComponentFlutterInterface
     let componentPlatformApi: ComponentPlatformApi
     let componentWrapperView: ComponentWrapperView
@@ -11,7 +12,8 @@ class BaseCardComponent: NSObject, FlutterPlatformView, UIScrollViewDelegate {
 
     var cardComponent: CardComponent?
     var cardDelegate: PaymentComponentDelegate?
-    var contentOffset : CGPoint?
+    var presentationDelegate: PresentationDelegate?
+    var contentOffset: CGPoint?
 
     init(
         frame _: CGRect,
@@ -32,7 +34,7 @@ class BaseCardComponent: NSObject, FlutterPlatformView, UIScrollViewDelegate {
     func view() -> UIView {
         return componentWrapperView
     }
-    
+
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
         scrollView.contentOffset = .zero
     }
@@ -46,11 +48,24 @@ class BaseCardComponent: NSObject, FlutterPlatformView, UIScrollViewDelegate {
         return rootViewController
     }
 
-    func attachCardView(cardComponentView: UIView) {
-        componentWrapperView.addSubview(cardComponentView)
-        disableNativeScrollingAndBouncing(cardComponentView: cardComponentView)
-        adjustCardComponentLayout(cardComponentView: cardComponentView)
+    func attachCardView(cardView: UIView) {
+        componentWrapperView.addSubview(cardView)
+        disableNativeScrollingAndBouncing(cardView: cardView)
+        adjustCardComponentLayout(cardView: cardView)
         sendHeightUpdate()
+    }
+
+    func attachActivityIndicator() {
+        let activityIndicatorView = UIActivityIndicatorView(style: .whiteLarge)
+        activityIndicatorView.color = .gray
+        activityIndicatorView.startAnimating()
+        componentWrapperView.addSubview(activityIndicatorView)
+        activityIndicatorView.translatesAutoresizingMaskIntoConstraints = false
+        let leadingConstraint = activityIndicatorView.leadingAnchor.constraint(equalTo: componentWrapperView.leadingAnchor)
+        let trailingConstraint = activityIndicatorView.trailingAnchor.constraint(equalTo: componentWrapperView.trailingAnchor)
+        let topConstraint = activityIndicatorView.topAnchor.constraint(equalTo: componentWrapperView.topAnchor)
+        let bottomConstraint = activityIndicatorView.bottomAnchor.constraint(equalTo: componentWrapperView.bottomAnchor)
+        NSLayoutConstraint.activate([leadingConstraint, trailingConstraint, topConstraint, bottomConstraint])
     }
 
     func sendErrorToFlutterLayer(errorMessage: String) {
@@ -58,18 +73,18 @@ class BaseCardComponent: NSObject, FlutterPlatformView, UIScrollViewDelegate {
                                                                       data: errorMessage)
         componentFlutterApi.onComponentCommunication(componentCommunicationModel: componentCommunicationModel, completion: { _ in })
     }
-    
+
     func finalizeAndDismiss(success: Bool, completion: @escaping (() -> Void)) {
         cardComponent?.finalizeIfNeeded(with: success) { [weak self] in
-            //Is this viewcontroller access correct?
-            self?.getViewController()?.dismiss(animated: true , completion:  {
+            // Is this viewcontroller access correct?
+            self?.getViewController()?.dismiss(animated: true, completion: {
                 completion()
             })
         }
     }
 
-    private func disableNativeScrollingAndBouncing(cardComponentView: UIView) {
-        let formView = cardComponentView.subviews[0].subviews[0] as? UIScrollView
+    private func disableNativeScrollingAndBouncing(cardView: UIView) {
+        let formView = cardView.subviews[0].subviews[0] as? UIScrollView
         formView?.delegate = self
         formView?.bounces = false
         formView?.isScrollEnabled = false
@@ -77,12 +92,12 @@ class BaseCardComponent: NSObject, FlutterPlatformView, UIScrollViewDelegate {
         formView?.contentInsetAdjustmentBehavior = .never
     }
 
-    private func adjustCardComponentLayout(cardComponentView: UIView) {
-        cardComponentView.translatesAutoresizingMaskIntoConstraints = false
-        let leadingConstraint = cardComponentView.leadingAnchor.constraint(equalTo: componentWrapperView.leadingAnchor)
-        let trailingConstraint = cardComponentView.trailingAnchor.constraint(equalTo: componentWrapperView.trailingAnchor)
-        let topConstraint = cardComponentView.topAnchor.constraint(equalTo: componentWrapperView.topAnchor)
-        let bottomConstraint = cardComponentView.bottomAnchor.constraint(equalTo: componentWrapperView.bottomAnchor)
+    private func adjustCardComponentLayout(cardView: UIView) {
+        cardView.translatesAutoresizingMaskIntoConstraints = false
+        let leadingConstraint = cardView.leadingAnchor.constraint(equalTo: componentWrapperView.leadingAnchor)
+        let trailingConstraint = cardView.trailingAnchor.constraint(equalTo: componentWrapperView.trailingAnchor)
+        let topConstraint = cardView.topAnchor.constraint(equalTo: componentWrapperView.topAnchor)
+        let bottomConstraint = cardView.bottomAnchor.constraint(equalTo: componentWrapperView.bottomAnchor)
         NSLayoutConstraint.activate([leadingConstraint, trailingConstraint, topConstraint, bottomConstraint])
     }
 
@@ -90,15 +105,15 @@ class BaseCardComponent: NSObject, FlutterPlatformView, UIScrollViewDelegate {
         componentWrapperView.resizeViewportCallback = { [weak self] in
             self?.sendHeightUpdate()
         }
-        
+
         componentPlatformApi.onUpdateViewHeightCallback = { [weak self] in
             self?.sendHeightUpdate()
         }
     }
-    
+
     private func sendHeightUpdate() {
-        guard let viewHeight = self.cardComponent?.viewController.preferredContentSize.height else { return }
+        guard let viewHeight = cardComponent?.viewController.preferredContentSize.height else { return }
         let roundedViewHeight = Double(round(100 * viewHeight / 100))
-        self.componentFlutterApi.onComponentCommunication(componentCommunicationModel: ComponentCommunicationModel(type: ComponentCommunicationType.resize, data: roundedViewHeight), completion: { _ in })
+        componentFlutterApi.onComponentCommunication(componentCommunicationModel: ComponentCommunicationModel(type: ComponentCommunicationType.resize, data: roundedViewHeight), completion: { _ in })
     }
 }
