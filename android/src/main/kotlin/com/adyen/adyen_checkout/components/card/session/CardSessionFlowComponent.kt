@@ -36,27 +36,8 @@ class CardSessionFlowComponent(
     init {
         val checkoutSessionResponse = SessionSetupResponse.SERIALIZER.deserialize(JSONObject(session.sessionSetupResponse))
         val checkoutSession = CheckoutSession(sessionSetupResponse = checkoutSessionResponse, order = null)
-
         cardComponent = createCardComponent(checkoutSession)
         addComponent(cardComponent)
-
-//        activity.lifecycleScope.launch {
-//            when (val sessionResult = CheckoutSessionProvider.createSession(sessionModel, cardConfiguration)) {
-//                is CheckoutSessionResult.Error -> {
-//                    sessionResult.exception.message?.let { sendErrorToFlutterLayer(it) }
-//                    return@launch
-//                }
-//
-//                is CheckoutSessionResult.Success -> {
-//                    val paymentMethod =
-//                        sessionResult.checkoutSession.sessionSetupResponse.paymentMethodsApiResponse?.storedPaymentMethods?.first()
-//                    if (paymentMethod == null) {
-//                        sendErrorToFlutterLayer("Session does not contain SCHEME payment method.")
-//                        return@launch
-//                    }
-//                }
-//            }
-//        }
     }
 
     private fun createCardComponent(checkoutSession: CheckoutSession): CardComponent {

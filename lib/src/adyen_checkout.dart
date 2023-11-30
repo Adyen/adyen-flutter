@@ -4,6 +4,7 @@ import 'package:adyen_checkout/adyen_checkout.dart';
 import 'package:adyen_checkout/src/adyen_checkout_interface.dart';
 import 'package:adyen_checkout/src/generated/platform_api.g.dart';
 import 'package:adyen_checkout/src/logging/adyen_logger.dart';
+import 'package:adyen_checkout/src/models/base_configuration.dart';
 import 'package:adyen_checkout/src/platform/adyen_checkout_platform_interface.dart';
 import 'package:adyen_checkout/src/platform/adyen_checkout_result_api.dart';
 import 'package:adyen_checkout/src/utils/dto_mapper.dart';
@@ -45,6 +46,28 @@ class AdyenCheckout implements AdyenCheckoutInterface {
       _adyenLogger.enableLogging(loggingEnabled: loggingEnabled);
       AdyenCheckoutPlatformInterface.instance.enableLogging(loggingEnabled);
     }
+  }
+
+  @override
+  Future<Session> createSession(
+    String sessionResponse,
+    BaseConfiguration configuration,
+  ) async {
+    if (configuration is CardComponentConfiguration) {
+      print("IS CARD CONFIG");
+    }
+
+    SessionDTO sessionDTO =
+        await AdyenCheckoutPlatformInterface.instance.createSession(
+      sessionResponse,
+      (configuration as CardComponentConfiguration).toDTO(),
+    );
+    return Session(
+      id: sessionDTO.id,
+      sessionData: sessionDTO.sessionData,
+      paymentMethodsJson: sessionDTO.paymentMethodsJson,
+      sessionSetupResponse: sessionDTO.sessionSetupResponse,
+    );
   }
 
   Future<PaymentResult> _startDropInSessionsPayment(
