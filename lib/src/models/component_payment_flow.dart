@@ -5,10 +5,12 @@ sealed class ComponentPaymentFlow {}
 class CardComponentSessionFlow extends ComponentPaymentFlow {
   final CardComponentConfiguration cardComponentConfiguration;
   final Session session;
+  final Map<String, dynamic> paymentMethod;
 
   CardComponentSessionFlow({
     required this.cardComponentConfiguration,
     required this.session,
+    required this.paymentMethod,
   });
 }
 

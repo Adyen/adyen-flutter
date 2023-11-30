@@ -11,6 +11,16 @@ class AdyenCheckoutApi implements AdyenCheckoutPlatformInterface {
   Future<String> getReturnUrl() => checkoutApi.getReturnUrl();
 
   @override
+  Future<SessionDTO> createSession(
+    String sessionResponse,
+    dynamic configuration,
+  ) =>
+      checkoutApi.createSession(
+        sessionResponse,
+        configuration,
+      );
+
+  @override
   Future<void> startDropInSessionPayment(
     DropInConfigurationDTO dropInConfigurationDTO,
     SessionDTO session,

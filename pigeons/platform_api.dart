@@ -81,10 +81,14 @@ enum FieldVisibility {
 class SessionDTO {
   final String id;
   final String sessionData;
+  final String paymentMethodsJson;
+  final String sessionSetupResponse;
 
   SessionDTO(
     this.id,
     this.sessionData,
+    this.paymentMethodsJson,
+    this.sessionSetupResponse,
   );
 }
 
@@ -338,6 +342,12 @@ abstract class CheckoutPlatformInterface {
 
   @async
   String getReturnUrl();
+
+  @async
+  SessionDTO createSession(
+    String sessionResponse,
+    Object? configuration,
+  );
 
   void startDropInSessionPayment(
     DropInConfigurationDTO dropInConfigurationDTO,

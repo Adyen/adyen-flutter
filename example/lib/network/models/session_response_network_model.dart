@@ -18,4 +18,11 @@ class SessionResponseNetworkModel {
         id: json["id"],
         sessionData: json["sessionData"],
       );
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'sessionData': sessionData,
+    };
+  }
 }

@@ -179,7 +179,9 @@ enum class FieldVisibility(val raw: Int) {
 /** Generated class from Pigeon that represents data sent in messages. */
 data class SessionDTO (
   val id: String,
-  val sessionData: String
+  val sessionData: String,
+  val paymentMethodsJson: String,
+  val sessionSetupResponse: String
 
 ) {
   companion object {
@@ -187,13 +189,17 @@ data class SessionDTO (
     fun fromList(list: List<Any?>): SessionDTO {
       val id = list[0] as String
       val sessionData = list[1] as String
-      return SessionDTO(id, sessionData)
+      val paymentMethodsJson = list[2] as String
+      val sessionSetupResponse = list[3] as String
+      return SessionDTO(id, sessionData, paymentMethodsJson, sessionSetupResponse)
     }
   }
   fun toList(): List<Any?> {
     return listOf<Any?>(
       id,
       sessionData,
+      paymentMethodsJson,
+      sessionSetupResponse,
     )
   }
 }
@@ -720,40 +726,70 @@ private object CheckoutPlatformInterfaceCodec : StandardMessageCodec() {
       }
       131.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          CardConfigurationDTO.fromList(it)
+          CardComponentConfigurationDTO.fromList(it)
         }
       }
       132.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          CashAppPayConfigurationDTO.fromList(it)
+          CardConfigurationDTO.fromList(it)
         }
       }
       133.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          DeletedStoredPaymentMethodResultDTO.fromList(it)
+          CashAppPayConfigurationDTO.fromList(it)
         }
       }
       134.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          DropInConfigurationDTO.fromList(it)
+          ComponentCommunicationModel.fromList(it)
         }
       }
       135.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          ErrorDTO.fromList(it)
+          DeletedStoredPaymentMethodResultDTO.fromList(it)
         }
       }
       136.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          GooglePayConfigurationDTO.fromList(it)
+          DropInConfigurationDTO.fromList(it)
         }
       }
       137.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          PaymentFlowOutcomeDTO.fromList(it)
+          ErrorDTO.fromList(it)
         }
       }
       138.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          GooglePayConfigurationDTO.fromList(it)
+        }
+      }
+      139.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          OrderResponseDTO.fromList(it)
+        }
+      }
+      140.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          PaymentFlowOutcomeDTO.fromList(it)
+        }
+      }
+      141.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          PaymentResultDTO.fromList(it)
+        }
+      }
+      142.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          PaymentResultModelDTO.fromList(it)
+        }
+      }
+      143.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          PlatformCommunicationModel.fromList(it)
+        }
+      }
+      144.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
           SessionDTO.fromList(it)
         }
@@ -775,36 +811,60 @@ private object CheckoutPlatformInterfaceCodec : StandardMessageCodec() {
         stream.write(130)
         writeValue(stream, value.toList())
       }
-      is CardConfigurationDTO -> {
+      is CardComponentConfigurationDTO -> {
         stream.write(131)
         writeValue(stream, value.toList())
       }
-      is CashAppPayConfigurationDTO -> {
+      is CardConfigurationDTO -> {
         stream.write(132)
         writeValue(stream, value.toList())
       }
-      is DeletedStoredPaymentMethodResultDTO -> {
+      is CashAppPayConfigurationDTO -> {
         stream.write(133)
         writeValue(stream, value.toList())
       }
-      is DropInConfigurationDTO -> {
+      is ComponentCommunicationModel -> {
         stream.write(134)
         writeValue(stream, value.toList())
       }
-      is ErrorDTO -> {
+      is DeletedStoredPaymentMethodResultDTO -> {
         stream.write(135)
         writeValue(stream, value.toList())
       }
-      is GooglePayConfigurationDTO -> {
+      is DropInConfigurationDTO -> {
         stream.write(136)
         writeValue(stream, value.toList())
       }
-      is PaymentFlowOutcomeDTO -> {
+      is ErrorDTO -> {
         stream.write(137)
         writeValue(stream, value.toList())
       }
-      is SessionDTO -> {
+      is GooglePayConfigurationDTO -> {
         stream.write(138)
+        writeValue(stream, value.toList())
+      }
+      is OrderResponseDTO -> {
+        stream.write(139)
+        writeValue(stream, value.toList())
+      }
+      is PaymentFlowOutcomeDTO -> {
+        stream.write(140)
+        writeValue(stream, value.toList())
+      }
+      is PaymentResultDTO -> {
+        stream.write(141)
+        writeValue(stream, value.toList())
+      }
+      is PaymentResultModelDTO -> {
+        stream.write(142)
+        writeValue(stream, value.toList())
+      }
+      is PlatformCommunicationModel -> {
+        stream.write(143)
+        writeValue(stream, value.toList())
+      }
+      is SessionDTO -> {
+        stream.write(144)
         writeValue(stream, value.toList())
       }
       else -> super.writeValue(stream, value)
@@ -816,6 +876,7 @@ private object CheckoutPlatformInterfaceCodec : StandardMessageCodec() {
 interface CheckoutPlatformInterface {
   fun getPlatformVersion(callback: (Result<String>) -> Unit)
   fun getReturnUrl(callback: (Result<String>) -> Unit)
+  fun createSession(sessionResponse: String, configuration: Any?, callback: (Result<SessionDTO>) -> Unit)
   fun startDropInSessionPayment(dropInConfigurationDTO: DropInConfigurationDTO, session: SessionDTO)
   fun startDropInAdvancedFlowPayment(dropInConfigurationDTO: DropInConfigurationDTO, paymentMethodsResponse: String)
   fun onPaymentsResult(paymentsResult: PaymentFlowOutcomeDTO)
@@ -855,6 +916,27 @@ interface CheckoutPlatformInterface {
         if (api != null) {
           channel.setMessageHandler { _, reply ->
             api.getReturnUrl() { result: Result<String> ->
+              val error = result.exceptionOrNull()
+              if (error != null) {
+                reply.reply(wrapError(error))
+              } else {
+                val data = result.getOrNull()
+                reply.reply(wrapResult(data))
+              }
+            }
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.createSession", codec)
+        if (api != null) {
+          channel.setMessageHandler { message, reply ->
+            val args = message as List<Any?>
+            val sessionResponseArg = args[0] as String
+            val configurationArg = args[1]
+            api.createSession(sessionResponseArg, configurationArg) { result: Result<SessionDTO> ->
               val error = result.exceptionOrNull()
               if (error != null) {
                 reply.reply(wrapError(error))

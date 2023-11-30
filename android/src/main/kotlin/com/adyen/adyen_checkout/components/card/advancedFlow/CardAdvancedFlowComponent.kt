@@ -127,8 +127,4 @@ internal class CardAdvancedFlowComponent(
         }
     }
 
-    companion object {
-        const val PAYMENT_METHOD_KEY = "paymentMethod"
-        const val IS_STORED_PAYMENT_METHOD = "isStoredPaymentMethod"
-    }
 }

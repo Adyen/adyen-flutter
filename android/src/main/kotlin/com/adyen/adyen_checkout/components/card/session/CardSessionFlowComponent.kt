@@ -10,17 +10,16 @@ import android.view.ViewGroup
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.doOnNextLayout
 import androidx.fragment.app.FragmentActivity
-import androidx.lifecycle.lifecycleScope
 import com.adyen.adyen_checkout.R
 import com.adyen.adyen_checkout.components.card.BaseCardComponent
 import com.adyen.checkout.card.CardComponent
-import com.adyen.checkout.components.core.PaymentMethodTypes
+import com.adyen.checkout.components.core.PaymentMethod
+import com.adyen.checkout.components.core.StoredPaymentMethod
 import com.adyen.checkout.components.core.action.Action
-import com.adyen.checkout.sessions.core.CheckoutSessionProvider
-import com.adyen.checkout.sessions.core.CheckoutSessionResult
-import com.adyen.checkout.sessions.core.SessionModel
+import com.adyen.checkout.sessions.core.CheckoutSession
+import com.adyen.checkout.sessions.core.SessionSetupResponse
 import com.adyen.checkout.ui.core.AdyenComponentView
-import kotlinx.coroutines.launch
+import org.json.JSONObject
 import java.util.UUID
 
 class CardSessionFlowComponent(
@@ -31,33 +30,60 @@ class CardSessionFlowComponent(
     creationParams: Map<*, *>?
 ) : BaseCardComponent(activity, componentFlutterApi, context, id, creationParams) {
     private val session = creationParams?.get(SESSION_KEY) as SessionDTO
-    private val sessionModel = SessionModel(id = session.id, sessionData = session.sessionData)
+    private val paymentMethodString = creationParams?.get(PAYMENT_METHOD_KEY) as String
+    private val isStoredPaymentMethod = creationParams?.get(IS_STORED_PAYMENT_METHOD) as Boolean
 
     init {
-        activity.lifecycleScope.launch {
-            when (val sessionResult = CheckoutSessionProvider.createSession(sessionModel, cardConfiguration)) {
-                is CheckoutSessionResult.Error -> {
-                    sessionResult.exception.message?.let { sendErrorToFlutterLayer(it) }
-                    return@launch
-                }
+        val checkoutSessionResponse = SessionSetupResponse.SERIALIZER.deserialize(JSONObject(session.sessionSetupResponse))
+        val checkoutSession = CheckoutSession(sessionSetupResponse = checkoutSessionResponse, order = null)
 
-                is CheckoutSessionResult.Success -> {
-                    val paymentMethod = sessionResult.checkoutSession.getPaymentMethod(PaymentMethodTypes.SCHEME)
-                    if (paymentMethod == null) {
-                        sendErrorToFlutterLayer("Session does not contain SCHEME payment method.")
-                        return@launch
-                    }
+        cardComponent = createCardComponent(checkoutSession)
+        addComponent(cardComponent)
 
-                    cardComponent = CardComponent.PROVIDER.get(
-                        activity = activity,
-                        checkoutSession = sessionResult.checkoutSession,
-                        paymentMethod = paymentMethod,
-                        configuration = cardConfiguration,
-                        componentCallback = CardSessionFlowCallback(componentFlutterApi) { action -> onAction(action) },
-                        key = UUID.randomUUID().toString()
-                    )
-                    addComponent(cardComponent)
-                }
+//        activity.lifecycleScope.launch {
+//            when (val sessionResult = CheckoutSessionProvider.createSession(sessionModel, cardConfiguration)) {
+//                is CheckoutSessionResult.Error -> {
+//                    sessionResult.exception.message?.let { sendErrorToFlutterLayer(it) }
+//                    return@launch
+//                }
+//
+//                is CheckoutSessionResult.Success -> {
+//                    val paymentMethod =
+//                        sessionResult.checkoutSession.sessionSetupResponse.paymentMethodsApiResponse?.storedPaymentMethods?.first()
+//                    if (paymentMethod == null) {
+//                        sendErrorToFlutterLayer("Session does not contain SCHEME payment method.")
+//                        return@launch
+//                    }
+//                }
+//            }
+//        }
+    }
+
+    private fun createCardComponent(checkoutSession: CheckoutSession): CardComponent {
+        val paymentMethodJson = JSONObject(paymentMethodString)
+        when (isStoredPaymentMethod) {
+            true -> {
+                val storedPaymentMethod = StoredPaymentMethod.SERIALIZER.deserialize(paymentMethodJson)
+                return CardComponent.PROVIDER.get(
+                    activity = activity,
+                    checkoutSession = checkoutSession,
+                    storedPaymentMethod = storedPaymentMethod,
+                    configuration = cardConfiguration,
+                    componentCallback = CardSessionFlowCallback(componentFlutterApi) { action -> onAction(action) },
+                    key = UUID.randomUUID().toString()
+                )
+            }
+
+            false -> {
+                val paymentMethod = PaymentMethod.SERIALIZER.deserialize(paymentMethodJson)
+                return CardComponent.PROVIDER.get(
+                    activity = activity,
+                    checkoutSession = checkoutSession,
+                    paymentMethod = paymentMethod,
+                    configuration = cardConfiguration,
+                    componentCallback = CardSessionFlowCallback(componentFlutterApi) { action -> onAction(action) },
+                    key = UUID.randomUUID().toString()
+                )
             }
         }
     }

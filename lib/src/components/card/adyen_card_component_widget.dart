@@ -34,12 +34,19 @@ class AdyenCardComponentWidget extends StatelessWidget {
         componentPaymentFlow as CardComponentSessionFlow;
     final double initialHeight = _determineInitialHeight(
         cardComponentSessionFlow.cardComponentConfiguration.cardConfiguration);
+    final encodedPaymentMethod =
+        json.encode(cardComponentSessionFlow.paymentMethod);
+    final isStoredPaymentMethod = cardComponentSessionFlow.paymentMethod
+        .containsKey(isStoredPaymentMethodIndicator);
+
     return CardSessionFlowWidget(
       cardComponentConfiguration:
           cardComponentSessionFlow.cardComponentConfiguration.toDTO(),
+      paymentMethod: encodedPaymentMethod,
       session: cardComponentSessionFlow.session.toDTO(),
       onPaymentResult: onPaymentResult,
       initialViewHeight: initialHeight,
+      isStoredPaymentMethod: isStoredPaymentMethod,
     );
   }
 
@@ -48,9 +55,10 @@ class AdyenCardComponentWidget extends StatelessWidget {
         componentPaymentFlow as CardComponentAdvancedFlow;
     final initialHeight = _determineInitialHeight(
         cardComponentAdvancedFlow.cardComponentConfiguration.cardConfiguration);
+    final encodedPaymentMethod =
+        json.encode(cardComponentAdvancedFlow.paymentMethod);
     final isStoredPaymentMethod = cardComponentAdvancedFlow.paymentMethod
         .containsKey(isStoredPaymentMethodIndicator);
-    final encodedPaymentMethod = json.encode(cardComponentAdvancedFlow.paymentMethod);
 
     return CardAdvancedFlowWidget(
       cardComponentConfiguration:

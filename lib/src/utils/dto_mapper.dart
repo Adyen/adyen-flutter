@@ -89,6 +89,8 @@ extension SessionMapper on Session {
   SessionDTO toDTO() => SessionDTO(
         id: id,
         sessionData: sessionData,
+        paymentMethodsJson: paymentMethodsJson,
+        sessionSetupResponse: sessionSetupResponse,
       );
 }
 
