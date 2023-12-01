@@ -28,10 +28,10 @@ internal class CardAdvancedFlowComponent(
     id: Int,
     creationParams: Map<*, *>?
 ) : BaseCardComponent(activity, componentFlutterApi, context, id, creationParams) {
-    private val paymentMethods = creationParams?.get(PAYMENT_METHODS_KEY) as String
+    private val paymentMethods = creationParams?.get(PAYMENT_METHODS_KEY) as? String ?: throw Exception("Payment methods not found")
     private val paymentMethodsApiResponse = PaymentMethodsApiResponse.SERIALIZER.deserialize(JSONObject(paymentMethods))
     private val paymentMethod = paymentMethodsApiResponse.paymentMethods?.first { it.type == SCHEME_KEY }
-        ?: throw Exception("Card payment method not provided")
+        ?: throw Exception("Card payment method not provided") //TODO: Define custom exception
 
     init {
         cardComponent = CardComponent.PROVIDER.get(

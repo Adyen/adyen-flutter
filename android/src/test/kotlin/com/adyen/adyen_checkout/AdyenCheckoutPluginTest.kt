@@ -1,8 +1,5 @@
 package com.adyen.adyen_checkout
 
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Test
-
 /*
  * This demonstrates a simple unit test of the Kotlin portion of this plugin's implementation.
  *
@@ -13,8 +10,4 @@ import org.junit.jupiter.api.Test
 
 internal class AdyenCheckoutPluginTest {
 
-    @Test
-    fun test_a() {
-        assertEquals(true, false)
-    }
 }
