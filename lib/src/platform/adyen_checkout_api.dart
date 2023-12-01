@@ -12,11 +12,13 @@ class AdyenCheckoutApi implements AdyenCheckoutPlatformInterface {
 
   @override
   Future<SessionDTO> createSession(
-    String sessionResponse,
+    String sessionId,
+    String sessionData,
     dynamic configuration,
   ) =>
       checkoutApi.createSession(
-        sessionResponse,
+        sessionId,
+        sessionData,
         configuration,
       );
 

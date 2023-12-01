@@ -37,7 +37,8 @@ class AdyenCardComponentWidget extends StatelessWidget {
     final encodedPaymentMethod =
         json.encode(cardComponentSessionFlow.paymentMethod);
     final isStoredPaymentMethod = cardComponentSessionFlow.paymentMethod
-        .containsKey(isStoredPaymentMethodIndicator);
+            ?.containsKey(isStoredPaymentMethodIndicator) ??
+        false;
 
     return CardSessionFlowWidget(
       cardComponentConfiguration:
@@ -58,7 +59,8 @@ class AdyenCardComponentWidget extends StatelessWidget {
     final encodedPaymentMethod =
         json.encode(cardComponentAdvancedFlow.paymentMethod);
     final isStoredPaymentMethod = cardComponentAdvancedFlow.paymentMethod
-        .containsKey(isStoredPaymentMethodIndicator);
+            ?.containsKey(isStoredPaymentMethodIndicator) ??
+        false;
 
     return CardAdvancedFlowWidget(
       cardComponentConfiguration:

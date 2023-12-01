@@ -3,7 +3,6 @@ package com.adyen.adyen_checkout.components.card.session
 import ComponentCommunicationModel
 import ComponentCommunicationType
 import ComponentFlutterInterface
-import SessionDTO
 import android.content.Context
 import android.view.View
 import android.view.ViewGroup
@@ -12,7 +11,9 @@ import androidx.core.view.doOnNextLayout
 import androidx.fragment.app.FragmentActivity
 import com.adyen.adyen_checkout.R
 import com.adyen.adyen_checkout.components.card.BaseCardComponent
+import com.adyen.adyen_checkout.session.SessionHolder
 import com.adyen.checkout.card.CardComponent
+import com.adyen.checkout.components.core.Order
 import com.adyen.checkout.components.core.PaymentMethod
 import com.adyen.checkout.components.core.StoredPaymentMethod
 import com.adyen.checkout.components.core.action.Action
@@ -25,17 +26,18 @@ import java.util.UUID
 class CardSessionFlowComponent(
     private val activity: FragmentActivity,
     private val componentFlutterApi: ComponentFlutterInterface,
+    private val sessionHolder: SessionHolder,
     context: Context,
     id: Int,
     creationParams: Map<*, *>?
 ) : BaseCardComponent(activity, componentFlutterApi, context, id, creationParams) {
-    private val session = creationParams?.get(SESSION_KEY) as SessionDTO
     private val paymentMethodString = creationParams?.get(PAYMENT_METHOD_KEY) as String
     private val isStoredPaymentMethod = creationParams?.get(IS_STORED_PAYMENT_METHOD) as Boolean
 
     init {
-        val checkoutSessionResponse = SessionSetupResponse.SERIALIZER.deserialize(JSONObject(session.sessionSetupResponse))
-        val checkoutSession = CheckoutSession(sessionSetupResponse = checkoutSessionResponse, order = null)
+        val sessionSetupResponse = SessionSetupResponse.SERIALIZER.deserialize(sessionHolder.sessionSetupResponse)
+        val order = sessionHolder.orderResponse?.let { Order.SERIALIZER.deserialize(it) }
+        val checkoutSession = CheckoutSession(sessionSetupResponse = sessionSetupResponse, order = order)
         cardComponent = createCardComponent(checkoutSession)
         addComponent(cardComponent)
     }
@@ -92,9 +94,5 @@ class CardSessionFlowComponent(
             data = errorMessage,
         )
         componentFlutterApi.onComponentCommunication(model) {}
-    }
-
-    companion object {
-        const val SESSION_KEY = "session"
     }
 }

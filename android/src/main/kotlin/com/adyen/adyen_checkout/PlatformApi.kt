@@ -180,8 +180,7 @@ enum class FieldVisibility(val raw: Int) {
 data class SessionDTO (
   val id: String,
   val sessionData: String,
-  val paymentMethodsJson: String,
-  val sessionSetupResponse: String
+  val paymentMethodsJson: String
 
 ) {
   companion object {
@@ -190,8 +189,7 @@ data class SessionDTO (
       val id = list[0] as String
       val sessionData = list[1] as String
       val paymentMethodsJson = list[2] as String
-      val sessionSetupResponse = list[3] as String
-      return SessionDTO(id, sessionData, paymentMethodsJson, sessionSetupResponse)
+      return SessionDTO(id, sessionData, paymentMethodsJson)
     }
   }
   fun toList(): List<Any?> {
@@ -199,7 +197,6 @@ data class SessionDTO (
       id,
       sessionData,
       paymentMethodsJson,
-      sessionSetupResponse,
     )
   }
 }
@@ -876,7 +873,7 @@ private object CheckoutPlatformInterfaceCodec : StandardMessageCodec() {
 interface CheckoutPlatformInterface {
   fun getPlatformVersion(callback: (Result<String>) -> Unit)
   fun getReturnUrl(callback: (Result<String>) -> Unit)
-  fun createSession(sessionResponse: String, configuration: Any?, callback: (Result<SessionDTO>) -> Unit)
+  fun createSession(sessionId: String, sessionData: String, configuration: Any?, callback: (Result<SessionDTO>) -> Unit)
   fun startDropInSessionPayment(dropInConfigurationDTO: DropInConfigurationDTO, session: SessionDTO)
   fun startDropInAdvancedFlowPayment(dropInConfigurationDTO: DropInConfigurationDTO, paymentMethodsResponse: String)
   fun onPaymentsResult(paymentsResult: PaymentFlowOutcomeDTO)
@@ -934,9 +931,10 @@ interface CheckoutPlatformInterface {
         if (api != null) {
           channel.setMessageHandler { message, reply ->
             val args = message as List<Any?>
-            val sessionResponseArg = args[0] as String
-            val configurationArg = args[1]
-            api.createSession(sessionResponseArg, configurationArg) { result: Result<SessionDTO> ->
+            val sessionIdArg = args[0] as String
+            val sessionDataArg = args[1] as String
+            val configurationArg = args[2]
+            api.createSession(sessionIdArg, sessionDataArg, configurationArg) { result: Result<SessionDTO> ->
               val error = result.exceptionOrNull()
               if (error != null) {
                 reply.reply(wrapError(error))

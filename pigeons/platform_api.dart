@@ -82,13 +82,11 @@ class SessionDTO {
   final String id;
   final String sessionData;
   final String paymentMethodsJson;
-  final String sessionSetupResponse;
 
   SessionDTO(
     this.id,
     this.sessionData,
     this.paymentMethodsJson,
-    this.sessionSetupResponse,
   );
 }
 
@@ -345,7 +343,8 @@ abstract class CheckoutPlatformInterface {
 
   @async
   SessionDTO createSession(
-    String sessionResponse,
+    String sessionId,
+    String sessionData,
     Object? configuration,
   );
 

@@ -23,6 +23,7 @@ import com.adyen.adyen_checkout.dropInAdvancedFlow.DropInPaymentResultMessenger
 import com.adyen.adyen_checkout.dropInAdvancedFlow.DropInServiceResultMessenger
 import com.adyen.adyen_checkout.dropInSession.SessionDropInService
 import com.adyen.adyen_checkout.models.DropInFlowType
+import com.adyen.adyen_checkout.session.SessionHolder
 import com.adyen.adyen_checkout.utils.ConfigurationMapper.mapToDropInConfiguration
 import com.adyen.adyen_checkout.utils.ConfigurationMapper.mapToSession
 import com.adyen.adyen_checkout.utils.ConfigurationMapper.toNativeModel
@@ -47,7 +48,10 @@ import kotlinx.coroutines.withContext
 import org.json.JSONObject
 
 @Suppress("NAME_SHADOWING")
-class CheckoutPlatformApi(private val checkoutFlutterApi: CheckoutFlutterApi?) : CheckoutPlatformInterface {
+class CheckoutPlatformApi(
+    private val checkoutFlutterApi: CheckoutFlutterApi?,
+    private val sessionHolder: SessionHolder,
+) : CheckoutPlatformInterface {
     lateinit var activity: FragmentActivity
     lateinit var dropInSessionLauncher:
         ActivityResultLauncher<SessionDropInResultContractParams>
@@ -62,40 +66,35 @@ class CheckoutPlatformApi(private val checkoutFlutterApi: CheckoutFlutterApi?) :
     }
 
     override fun createSession(
-        sessionResponse: String,
+        sessionId: String,
+        sessionData: String,
         configuration: Any?,
         callback: (Result<SessionDTO>) -> Unit
     ) {
         activity.lifecycleScope.launch(Dispatchers.IO) {
-            val sessionModel = SessionModel.SERIALIZER.deserialize(JSONObject(sessionResponse))
+            val sessionModel = SessionModel(id = sessionId, sessionData = sessionData)
             val configuration = determineConfiguration(configuration)
             configuration?.let {
                 when (val sessionResult = CheckoutSessionProvider.createSession(sessionModel, configuration)) {
                     is CheckoutSessionResult.Error -> {
-                        throw sessionResult.exception
+                        callback(Result.failure(sessionResult.exception))
+                        return@launch
                     }
 
                     is CheckoutSessionResult.Success -> {
-                        var orderJson: JSONObject? = null
-                        var paymentMethodsJsonObject: JSONObject? = null
-
                         with(sessionResult.checkoutSession) {
-                            val sessionResultJson = SessionSetupResponse.SERIALIZER.serialize(sessionSetupResponse)
-                            order?.let { order ->
-                                orderJson = OrderRequest.SERIALIZER.serialize(order)
+                            val sessionResponse = SessionSetupResponse.SERIALIZER.serialize(sessionSetupResponse)
+                            val orderResponse = order?.let { OrderRequest.SERIALIZER.serialize(it) }
+                            val paymentMethodsJsonObject = sessionSetupResponse.paymentMethodsApiResponse?.let {
+                                PaymentMethodsApiResponse.SERIALIZER.serialize(it)
                             }
-                            sessionSetupResponse.paymentMethodsApiResponse?.let { paymentMethodsApiResponse ->
-                                paymentMethodsJsonObject =
-                                    PaymentMethodsApiResponse.SERIALIZER.serialize(paymentMethodsApiResponse)
-                            }
-
+                            sessionHolder.init(sessionResponse, orderResponse)
                             callback(
                                 Result.success(
                                     SessionDTO(
                                         id = sessionModel.id,
                                         sessionData = sessionModel.sessionData ?: "",
                                         paymentMethodsJson = paymentMethodsJsonObject?.toString() ?: "",
-                                        sessionSetupResponse = sessionResultJson.toString()
                                     )
                                 )
                             )

@@ -90,7 +90,6 @@ class SessionDTO {
     required this.id,
     required this.sessionData,
     required this.paymentMethodsJson,
-    required this.sessionSetupResponse,
   });
 
   String id;
@@ -99,14 +98,11 @@ class SessionDTO {
 
   String paymentMethodsJson;
 
-  String sessionSetupResponse;
-
   Object encode() {
     return <Object?>[
       id,
       sessionData,
       paymentMethodsJson,
-      sessionSetupResponse,
     ];
   }
 
@@ -116,7 +112,6 @@ class SessionDTO {
       id: result[0]! as String,
       sessionData: result[1]! as String,
       paymentMethodsJson: result[2]! as String,
-      sessionSetupResponse: result[3]! as String,
     );
   }
 }
@@ -935,12 +930,12 @@ class CheckoutPlatformInterface {
     }
   }
 
-  Future<SessionDTO> createSession(String arg_sessionResponse, Object? arg_configuration) async {
+  Future<SessionDTO> createSession(String arg_sessionId, String arg_sessionData, Object? arg_configuration) async {
     final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
         'dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.createSession', codec,
         binaryMessenger: _binaryMessenger);
     final List<Object?>? replyList =
-        await channel.send(<Object?>[arg_sessionResponse, arg_configuration]) as List<Object?>?;
+        await channel.send(<Object?>[arg_sessionId, arg_sessionData, arg_configuration]) as List<Object?>?;
     if (replyList == null) {
       throw PlatformException(
         code: 'channel-error',

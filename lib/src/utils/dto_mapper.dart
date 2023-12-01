@@ -90,7 +90,6 @@ extension SessionMapper on Session {
         id: id,
         sessionData: sessionData,
         paymentMethodsJson: paymentMethodsJson,
-        sessionSetupResponse: sessionSetupResponse,
       );
 }
 

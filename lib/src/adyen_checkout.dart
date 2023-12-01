@@ -50,24 +50,25 @@ class AdyenCheckout implements AdyenCheckoutInterface {
 
   @override
   Future<Session> createSession(
-    String sessionResponse,
+    String sessionId,
+    String sessionData,
     BaseConfiguration configuration,
   ) async {
     if (configuration is CardComponentConfiguration) {
-      print("IS CARD CONFIG");
+      SessionDTO sessionDTO =
+          await AdyenCheckoutPlatformInterface.instance.createSession(
+        sessionId,
+        sessionData,
+        configuration.toDTO(),
+      );
+      return Session(
+        id: sessionDTO.id,
+        sessionData: sessionDTO.sessionData,
+        paymentMethodsJson: sessionDTO.paymentMethodsJson,
+      );
+    } else {
+      throw Exception("Configuration is not valid");
     }
-
-    SessionDTO sessionDTO =
-        await AdyenCheckoutPlatformInterface.instance.createSession(
-      sessionResponse,
-      (configuration as CardComponentConfiguration).toDTO(),
-    );
-    return Session(
-      id: sessionDTO.id,
-      sessionData: sessionDTO.sessionData,
-      paymentMethodsJson: sessionDTO.paymentMethodsJson,
-      sessionSetupResponse: sessionDTO.sessionSetupResponse,
-    );
   }
 
   Future<PaymentResult> _startDropInSessionsPayment(

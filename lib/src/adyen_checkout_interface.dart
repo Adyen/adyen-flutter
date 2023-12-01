@@ -7,7 +7,8 @@ abstract class AdyenCheckoutInterface {
   Future<String> getReturnUrl();
 
   Future<Session> createSession(
-    String sessionResponse,
+    String sessionId,
+    String sessionData,
     BaseConfiguration configuration,
   );
 

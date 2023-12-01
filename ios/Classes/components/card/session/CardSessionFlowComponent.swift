@@ -4,18 +4,18 @@ import AdyenNetworking
 import Flutter
 
 class CardSessionFlowComponent: BaseCardComponent {
-    private let cardSessionFlowDelegate: CardSessionFlowDelegate
-    private var presentationDelegate: PresentationDelegate?
+    private let sessionHolder: SessionHolder
     private var adyenSession: AdyenSession?
 
-    override init(
+    init(
         frame: CGRect,
         viewIdentifier: Int64,
         arguments: NSDictionary,
         binaryMessenger: FlutterBinaryMessenger,
-        componentFlutterApi: ComponentFlutterInterface
+        componentFlutterApi: ComponentFlutterInterface,
+        sessionHolder: SessionHolder
     ) {
-        cardSessionFlowDelegate = CardSessionFlowDelegate(componentFlutterApi: componentFlutterApi)
+        self.sessionHolder = sessionHolder
         super.init(
             frame: frame,
             viewIdentifier: viewIdentifier,
@@ -23,58 +23,41 @@ class CardSessionFlowComponent: BaseCardComponent {
             binaryMessenger: binaryMessenger,
             componentFlutterApi: componentFlutterApi
         )
-        
-        cardSessionFlowDelegate.finalizeAndDismiss = finalizeAndDismiss
-        setupCardComponentView(arguments: arguments)
+
+        setupCardComponentView()
+        setupFinalizeComponentCallback()
     }
 
-    private func setupCardComponentView(arguments: NSDictionary) {
+    private func setupCardComponentView() {
         do {
-            guard let cardComponentConfiguration = arguments.value(forKey: "cardComponentConfiguration") as? CardComponentConfigurationDTO else { throw PlatformError(errorDescription: "Card configuration not found") }
-            guard let session = arguments.value(forKey: "session") as? SessionDTO else { throw PlatformError(errorDescription: "Session not found") }
-            let sessionConfiguration = try createSessionConfiguration(cardComponentConfiguration: cardComponentConfiguration, session: session)
-            presentationDelegate = CardPresentationDelegate(topViewController: getViewController())
-            AdyenSession.initialize(with: sessionConfiguration, delegate: cardSessionFlowDelegate, presentationDelegate: presentationDelegate!) { [weak self] result in
-                switch result {
-                case let .success(session):
-                    self?.adyenSession = session
-                    self?.attachComponent(session: session, cardComponentConfiguration: cardComponentConfiguration)
-                case let .failure(error):
-                    self?.sendErrorToFlutterLayer(errorMessage: error.localizedDescription)
-                }
-            }
+            cardComponent = try setupCardComponent()
+            showCardComponent()
         } catch {
             sendErrorToFlutterLayer(errorMessage: error.localizedDescription)
         }
     }
 
-    private func createSessionConfiguration(cardComponentConfiguration: CardComponentConfigurationDTO, session: SessionDTO) throws -> AdyenSession.Configuration {
-        let adyenContext = try cardComponentConfiguration.createAdyenContext()
-        return AdyenSession.Configuration(
-            sessionIdentifier: session.id,
-            initialSessionData: session.sessionData,
-            context: adyenContext,
-            actionComponent: .init()
-        )
-    }
-
-    private func attachComponent(session: AdyenSession, cardComponentConfiguration: CardComponentConfigurationDTO) {
-        do {
-            cardComponent = try buildCardComponent(session: session, cardComponentConfiguration: cardComponentConfiguration)
-            guard let cardComponentView = cardComponent?.viewController.view else { throw PlatformError(errorDescription: "Failed to get card component view") }
-            attachCardView(cardComponentView: cardComponentView)
-        } catch {
-            sendErrorToFlutterLayer(errorMessage: error.localizedDescription)
-        }
-    }
-
-    private func buildCardComponent(session: AdyenSession, cardComponentConfiguration: CardComponentConfigurationDTO) throws -> CardComponent {
-        let paymentMethods = session.sessionContext.paymentMethods
-        guard let cardPaymentMethod = paymentMethods.paymentMethod(ofType: CardPaymentMethod.self) else { throw PlatformError(errorDescription: "Cannot find card payment method") }
-        let cardComponent = try CardComponent(paymentMethod: cardPaymentMethod,
-                                              context: cardComponentConfiguration.createAdyenContext(),
-                                              configuration: cardComponentConfiguration.cardConfiguration.mapToCardComponentConfiguration())
+    private func setupCardComponent() throws -> CardComponent {
+        guard let cardComponentConfiguration = cardComponentConfiguration else { throw PlatformError(errorDescription: "Card configuration not found") }
+        guard let paymentMethodString = paymentMethod else { throw PlatformError(errorDescription: "Payment method not found") }
+        guard let session = sessionHolder.session else { throw PlatformError(errorDescription: "Session not found") }
+        let cardComponent = try buildCardComponent(paymentMethodString: paymentMethodString, cardComponentConfiguration: cardComponentConfiguration, session: session)
         cardComponent.delegate = session
         return cardComponent
+    }
+
+    private func buildCardComponent(paymentMethodString _: String, cardComponentConfiguration: CardComponentConfigurationDTO, session: AdyenSession) throws -> CardComponent {
+        let adyenContext = try cardComponentConfiguration.createAdyenContext()
+        let cardConfiguration = cardComponentConfiguration.cardConfiguration.mapToCardComponentConfiguration()
+        /*
+         let paymentMethod: AnyCardPaymentMethod = isStoredPaymentMethod ? try JSONDecoder().decode(StoredCardPaymentMethod.self, from: Data(paymentMethodString.utf8)) : try JSONDecoder().decode(CardPaymentMethod.self, from: Data(paymentMethodString.utf8))
+          */
+        // TODO: Replace cardPaymentMethod with payment method when available
+        guard let cardPaymentMethod = session.sessionContext.paymentMethods.paymentMethod(ofType: CardPaymentMethod.self) else { throw PlatformError(errorDescription: "Cannot find card payment method") }
+        return CardComponent(paymentMethod: cardPaymentMethod, context: adyenContext, configuration: cardConfiguration)
+    }
+
+    private func setupFinalizeComponentCallback() {
+        (sessionHolder.sessionDelegate as? CardSessionFlowDelegate)?.finalizeAndDismiss = finalizeAndDismiss
     }
 }

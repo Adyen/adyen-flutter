@@ -125,7 +125,8 @@ class _MyAppState extends State<MyApp> {
                     );
 
                     final session = await _adyenCheckout.createSession(
-                      jsonEncode(sessionResponse.toJson()),
+                      sessionResponse.id,
+                      sessionResponse.sessionData,
                       cardComponentConfiguration,
                     );
 
@@ -184,7 +185,6 @@ class _MyAppState extends State<MyApp> {
       id: sessionResponse.id,
       sessionData: sessionResponse.sessionData,
       paymentMethodsJson: "",
-      sessionSetupResponse: "",
     );
 
     const CardConfiguration cardsConfiguration = CardConfiguration(
@@ -310,17 +310,23 @@ class _MyAppState extends State<MyApp> {
   }
 
   Map<String, dynamic> extractPaymentMethod(String paymentMethods) {
+    if (paymentMethods.isEmpty) {
+      return <String, String>{};
+    }
+
     Map<String, dynamic> jsonPaymentMethods = jsonDecode(paymentMethods);
     List paymentMethodList = jsonPaymentMethods["paymentMethods"] as List;
     Map<String, dynamic> paymentMethod = paymentMethodList
         .firstWhere((paymentMethod) => paymentMethod["type"] == "scheme");
 
     List storedPaymentMethodList =
-        jsonPaymentMethods["storedPaymentMethods"] as List;
-    Map<String, dynamic> storedPaymentMethod =
+    jsonPaymentMethods.containsKey("storedPaymentMethods")
+        ? jsonPaymentMethods["storedPaymentMethods"] as List
+        : [];
+    Map<String, dynamic>? storedPaymentMethod =
         storedPaymentMethodList.firstOrNull;
 
-    return storedPaymentMethod;
+    return paymentMethod;
   }
 
   _dialogBuilder(BuildContext context, PaymentResult paymentResult) {

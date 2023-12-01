@@ -5,6 +5,11 @@ import Flutter
 
 class BaseCardComponent: NSObject, FlutterPlatformView, UIScrollViewDelegate {
     let cardComponentConfigurationKey = "cardComponentConfiguration"
+    let isStoredPaymentMethodKey = "isStoredPaymentMethod"
+    let paymentMethodKey = "paymentMethod"
+    let cardComponentConfiguration: CardComponentConfigurationDTO?
+    let isStoredPaymentMethod: Bool
+    let paymentMethod: String?
     let componentFlutterApi: ComponentFlutterInterface
     let componentPlatformApi: ComponentPlatformApi
     let componentWrapperView: ComponentWrapperView
@@ -18,11 +23,14 @@ class BaseCardComponent: NSObject, FlutterPlatformView, UIScrollViewDelegate {
     init(
         frame _: CGRect,
         viewIdentifier _: Int64,
-        arguments _: NSDictionary,
+        arguments: NSDictionary,
         binaryMessenger: FlutterBinaryMessenger,
         componentFlutterApi: ComponentFlutterInterface
     ) {
         self.componentFlutterApi = componentFlutterApi
+        cardComponentConfiguration = arguments.value(forKey: cardComponentConfigurationKey) as? CardComponentConfigurationDTO
+        paymentMethod = arguments.value(forKey: paymentMethodKey) as? String
+        isStoredPaymentMethod = arguments.value(forKey: isStoredPaymentMethodKey) as? Bool ?? false
         componentPlatformApi = ComponentPlatformApi()
         componentWrapperView = .init()
         ComponentPlatformInterfaceSetup.setUp(binaryMessenger: binaryMessenger, api: componentPlatformApi)
@@ -46,6 +54,17 @@ class BaseCardComponent: NSObject, FlutterPlatformView, UIScrollViewDelegate {
         }
 
         return rootViewController
+    }
+
+    func showCardComponent() {
+        if isStoredPaymentMethod {
+            guard let storedCardViewController = cardComponent?.viewController else { return }
+            attachActivityIndicator()
+            getViewController()?.presentViewController(storedCardViewController, animated: true)
+        } else {
+            guard let cardView = cardComponent?.viewController.view else { return }
+            attachCardView(cardView: cardView)
+        }
     }
 
     func attachCardView(cardView: UIView) {

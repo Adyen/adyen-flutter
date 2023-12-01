@@ -47,14 +47,14 @@ class MockAdyenCheckoutPlatform
 
   @override
   Future<SessionDTO> createSession(
-    String sessionResponse,
+    String sessionId,
+    String sessionData,
     dynamic configuration,
   ) async {
     return SessionDTO(
       id: "id",
       sessionData: "sessionData",
       paymentMethodsJson: "",
-      sessionSetupResponse: "",
     );
   }
 }
