@@ -1,4 +1,5 @@
 class ComponentPlatformApi: ComponentPlatformInterface {
+    //TODO: Group callbacks in a weak delegate
     var onUpdateViewHeightCallback: () -> Void = {  }
     var onActionCallback: ([String?: Any?]) -> Void = { _ in }
     var onFinishCallback: (PaymentFlowOutcomeDTO) -> Void = { _ in  }
