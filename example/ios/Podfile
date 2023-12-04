@@ -10,7 +10,8 @@ project 'Runner', {
   'Release' => :release,
 }
 
-pod 'Adyen/CashAppPay'
+pod "Adyen", :git => 'https://github.com/Adyen/adyen-ios.git', :branch => 'develop'
+#pod 'Adyen/CashAppPay'
 
 def flutter_root
   generated_xcode_build_settings_path = File.expand_path(File.join('..', 'Flutter', 'Generated.xcconfig'), __FILE__)

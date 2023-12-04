@@ -175,7 +175,9 @@ extension CardComponentConfigurationDTO {
         let environment = environment.mapToEnvironment()
         let apiContext = try APIContext(environment: environment, clientKey: clientKey)
         let amount = amount.mapToAmount()
-        return AdyenContext(apiContext: apiContext, payment: Payment(amount: amount, countryCode: countryCode), analyticsConfiguration: AnalyticsConfiguration())
+        var analyticsConfiguration = AnalyticsConfiguration()
+        //analyticsConfiguration.context = TelemetryContext(version: "VERSION_KEY", platform: "flutter")
+        return AdyenContext(apiContext: apiContext, payment: Payment(amount: amount, countryCode: countryCode), analyticsConfiguration: analyticsConfiguration)
     }
 }
 
