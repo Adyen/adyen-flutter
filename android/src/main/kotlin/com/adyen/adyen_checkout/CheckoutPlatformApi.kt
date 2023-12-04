@@ -53,8 +53,7 @@ class CheckoutPlatformApi(
     private val sessionHolder: SessionHolder,
 ) : CheckoutPlatformInterface {
     lateinit var activity: FragmentActivity
-    lateinit var dropInSessionLauncher:
-        ActivityResultLauncher<SessionDropInResultContractParams>
+    lateinit var dropInSessionLauncher: ActivityResultLauncher<SessionDropInResultContractParams>
     lateinit var dropInAdvancedFlowLauncher: ActivityResultLauncher<DropInResultContractParams>
 
     override fun getPlatformVersion(callback: (Result<String>) -> Unit) {
@@ -66,46 +65,25 @@ class CheckoutPlatformApi(
     }
 
     override fun createSession(
-        sessionId: String,
-        sessionData: String,
+        sessionId: String, sessionData: String,
         configuration: Any?,
-        callback: (Result<SessionDTO>) -> Unit
+        callback: (Result<SessionDTO>) -> Unit,
     ) {
         activity.lifecycleScope.launch(Dispatchers.IO) {
-            val sessionModel = SessionModel(id = sessionId, sessionData = sessionData)
-            val configuration = determineConfiguration(configuration)
-            configuration?.let {
-                when (val sessionResult = CheckoutSessionProvider.createSession(sessionModel, configuration)) {
-                    is CheckoutSessionResult.Error -> {
-                        callback(Result.failure(sessionResult.exception))
-                        return@launch
-                    }
-
-                    is CheckoutSessionResult.Success -> {
-                        with(sessionResult.checkoutSession) {
-                            val sessionResponse = SessionSetupResponse.SERIALIZER.serialize(sessionSetupResponse)
-                            val orderResponse = order?.let { OrderRequest.SERIALIZER.serialize(it) }
-                            val paymentMethodsJsonObject = sessionSetupResponse.paymentMethodsApiResponse?.let {
-                                PaymentMethodsApiResponse.SERIALIZER.serialize(it)
-                            }
-                            sessionHolder.init(sessionResponse, orderResponse)
-                            callback(
-                                Result.success(
-                                    SessionDTO(
-                                        id = sessionModel.id,
-                                        sessionData = sessionModel.sessionData ?: "",
-                                        paymentMethodsJson = paymentMethodsJsonObject?.toString() ?: "",
-                                    )
-                                )
-                            )
-                        }
-                    }
+            val sessionModel = SessionModel(sessionId, sessionData)
+            determineSessionConfiguration(configuration)?.let { sessionConfiguration ->
+                when (val sessionResult = CheckoutSessionProvider.createSession(sessionModel, sessionConfiguration)) {
+                    is CheckoutSessionResult.Error -> callback(Result.failure(sessionResult.exception))
+                    is CheckoutSessionResult.Success -> onSessionSuccessfullyCreated(
+                        sessionResult, sessionModel, callback
+                    )
                 }
             }
         }
     }
 
-    private fun determineConfiguration(configuration: Any?): Configuration? {
+
+    private fun determineSessionConfiguration(configuration: Any?): Configuration? {
         when (configuration) {
             is CardComponentConfigurationDTO -> {
                 return configuration.cardConfiguration.toNativeModel(
@@ -115,9 +93,37 @@ class CheckoutPlatformApi(
                     configuration.clientKey
                 )
             }
+
+            is DropInConfigurationDTO -> {
+                //TODO: Add support for DropIn session
+            }
         }
 
         return null
+    }
+
+    private fun onSessionSuccessfullyCreated(
+        sessionResult: CheckoutSessionResult.Success,
+        sessionModel: SessionModel,
+        callback: (Result<SessionDTO>) -> Unit,
+    ) {
+        with(sessionResult.checkoutSession) {
+            val sessionResponse = SessionSetupResponse.SERIALIZER.serialize(sessionSetupResponse)
+            val orderResponse = order?.let { OrderRequest.SERIALIZER.serialize(it) }
+            val paymentMethodsJsonObject = sessionSetupResponse.paymentMethodsApiResponse?.let {
+                PaymentMethodsApiResponse.SERIALIZER.serialize(it)
+            }
+            sessionHolder.init(sessionResponse, orderResponse)
+            callback(
+                Result.success(
+                    SessionDTO(
+                        id = sessionModel.id,
+                        sessionData = sessionModel.sessionData ?: "",
+                        paymentMethodsJson = paymentMethodsJsonObject?.toString() ?: "",
+                    )
+                )
+            )
+        }
     }
 
 
@@ -129,8 +135,7 @@ class CheckoutPlatformApi(
         setStoredPaymentMethodDeletionObserver()
         activity.lifecycleScope.launch(Dispatchers.IO) {
             val sessionModel = session.mapToSession()
-            val dropInConfiguration =
-                dropInConfigurationDTO.mapToDropInConfiguration(activity.applicationContext)
+            val dropInConfiguration = dropInConfigurationDTO.mapToDropInConfiguration(activity.applicationContext)
             val checkoutSession = createCheckoutSession(sessionModel, dropInConfiguration)
             withContext(Dispatchers.Main) {
                 DropIn.startPayment(
@@ -155,10 +160,8 @@ class CheckoutPlatformApi(
             val paymentMethodsApiResponse = PaymentMethodsApiResponse.SERIALIZER.deserialize(
                 JSONObject(paymentMethodsResponse),
             )
-            val paymentMethodsWithoutGiftCards =
-                removeGiftCardPaymentMethods(paymentMethodsApiResponse)
-            val dropInConfiguration =
-                dropInConfigurationDTO.mapToDropInConfiguration(activity.applicationContext)
+            val paymentMethodsWithoutGiftCards = removeGiftCardPaymentMethods(paymentMethodsApiResponse)
+            val dropInConfiguration = dropInConfigurationDTO.mapToDropInConfiguration(activity.applicationContext)
             withContext(Dispatchers.Main) {
                 DropIn.startPayment(
                     activity.applicationContext,
@@ -184,8 +187,7 @@ class CheckoutPlatformApi(
     }
 
     override fun onDeleteStoredPaymentMethodResult(
-        deleteStoredPaymentMethodResultDTO:
-        DeletedStoredPaymentMethodResultDTO
+        deleteStoredPaymentMethodResultDTO: DeletedStoredPaymentMethodResultDTO
     ) {
         DropInPaymentMethodDeletionResultMessenger.sendResult(deleteStoredPaymentMethodResultDTO)
     }
@@ -205,12 +207,11 @@ class CheckoutPlatformApi(
     }
 
     private suspend fun createCheckoutSession(
-        sessionModel: com.adyen.checkout.sessions.core.SessionModel,
+        sessionModel: SessionModel,
         dropInConfiguration: com.adyen.checkout.dropin.DropInConfiguration,
     ): CheckoutSession {
-        val checkoutSessionResult =
-            CheckoutSessionProvider.createSession(sessionModel, dropInConfiguration)
-        return when (checkoutSessionResult) {
+        return when (val checkoutSessionResult =
+            CheckoutSessionProvider.createSession(sessionModel, dropInConfiguration)) {
             is CheckoutSessionResult.Success -> checkoutSessionResult.checkoutSession
             is CheckoutSessionResult.Error -> throw checkoutSessionResult.exception
         }
@@ -287,12 +288,10 @@ class CheckoutPlatformApi(
         val giftCardTypeIdentifier = "giftcard"
         val storedPaymentMethods =
             paymentMethodsResponse.storedPaymentMethods?.filterNot { it.type == giftCardTypeIdentifier }
-        val paymentMethods =
-            paymentMethodsResponse.paymentMethods?.filterNot { it.type == giftCardTypeIdentifier }
+        val paymentMethods = paymentMethodsResponse.paymentMethods?.filterNot { it.type == giftCardTypeIdentifier }
 
         return PaymentMethodsApiResponse(
-            storedPaymentMethods = storedPaymentMethods,
-            paymentMethods = paymentMethods
+            storedPaymentMethods = storedPaymentMethods, paymentMethods = paymentMethods
         )
     }
 }
