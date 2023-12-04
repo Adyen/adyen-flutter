@@ -26,7 +26,9 @@ void main() {
       theme: ThemeData(
           useMaterial3: true,
           bottomSheetTheme: const BottomSheetThemeData(
-              surfaceTintColor: Colors.white, backgroundColor: Colors.white)),
+            surfaceTintColor: Colors.white,
+            backgroundColor: Colors.white,
+          )),
       home: const MyApp()));
 }
 
