@@ -76,10 +76,6 @@ class CardComponentScreen extends StatelessWidget {
   }
 
   Map<String, dynamic> extractPaymentMethod(String paymentMethods) {
-    if (paymentMethods.isEmpty) {
-      return <String, String>{};
-    }
-
     Map<String, dynamic> jsonPaymentMethods = jsonDecode(paymentMethods);
     List paymentMethodList = jsonPaymentMethods["paymentMethods"] as List;
     Map<String, dynamic> paymentMethod = paymentMethodList
