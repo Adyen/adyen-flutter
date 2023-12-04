@@ -309,7 +309,7 @@ class _MyAppState extends State<MyApp> {
     );
   }
 
-  Map<String, dynamic> extractPaymentMethod(String paymentMethods) {
+  Map<String, dynamic>? extractPaymentMethod(String paymentMethods) {
     if (paymentMethods.isEmpty) {
       return <String, String>{};
     }
@@ -326,7 +326,7 @@ class _MyAppState extends State<MyApp> {
     Map<String, dynamic>? storedPaymentMethod =
         storedPaymentMethodList.firstOrNull;
 
-    return storedPaymentMethod ?? {};
+    return storedPaymentMethod;
   }
 
   _dialogBuilder(BuildContext context, PaymentResult paymentResult) {

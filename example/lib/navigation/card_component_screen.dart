@@ -92,7 +92,7 @@ class CardComponentScreen extends StatelessWidget {
     Map<String, dynamic>? storedPaymentMethod =
         storedPaymentMethodList.firstOrNull;
 
-    return storedPaymentMethod ?? {};
+    return storedPaymentMethod ?? <String, String>{};
   }
 
   _dialogBuilder(BuildContext context, PaymentResult paymentResult) {

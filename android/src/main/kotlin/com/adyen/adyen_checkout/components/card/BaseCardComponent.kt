@@ -114,6 +114,7 @@ abstract class BaseCardComponent(
     companion object {
         const val CARD_COMPONENT_CONFIGURATION_KEY = "cardComponentConfiguration"
         const val PAYMENT_METHOD_KEY = "paymentMethod"
-        const val IS_STORED_PAYMENT_METHOD = "isStoredPaymentMethod"
+        const val IS_STORED_PAYMENT_METHOD_KEY = "isStoredPaymentMethod"
+        const val CARD_PAYMENT_METHOD_KEY = "scheme"
     }
 }

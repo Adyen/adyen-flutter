@@ -1,7 +1,5 @@
 package com.adyen.adyen_checkout.components.card.session
 
-import ComponentCommunicationModel
-import ComponentCommunicationType
 import ComponentFlutterInterface
 import android.content.Context
 import android.view.View
@@ -32,7 +30,7 @@ class CardSessionFlowComponent(
     creationParams: Map<*, *>?
 ) : BaseCardComponent(activity, componentFlutterApi, context, id, creationParams) {
     private val paymentMethodString = creationParams?.get(PAYMENT_METHOD_KEY) as String
-    private val isStoredPaymentMethod = creationParams?.get(IS_STORED_PAYMENT_METHOD) as Boolean
+    private val isStoredPaymentMethod = creationParams?.get(IS_STORED_PAYMENT_METHOD_KEY) as Boolean
 
     init {
         val sessionSetupResponse = SessionSetupResponse.SERIALIZER.deserialize(sessionHolder.sessionSetupResponse)
@@ -58,7 +56,7 @@ class CardSessionFlowComponent(
             }
 
             false -> {
-                val paymentMethod = PaymentMethod.SERIALIZER.deserialize(paymentMethodJson)
+                val paymentMethod = determineCardPaymentMethod(paymentMethodJson)
                 return CardComponent.PROVIDER.get(
                     activity = activity,
                     checkoutSession = checkoutSession,
@@ -88,11 +86,13 @@ class CardSessionFlowComponent(
 
     private fun onAction(action: Action) = cardComponent.handleAction(action, activity)
 
-    private fun sendErrorToFlutterLayer(errorMessage: String) {
-        val model = ComponentCommunicationModel(
-            ComponentCommunicationType.ERROR,
-            data = errorMessage,
-        )
-        componentFlutterApi.onComponentCommunication(model) {}
+    private fun determineCardPaymentMethod(paymentMethodJson: JSONObject): PaymentMethod {
+        return if (paymentMethodJson.length() > 0) {
+            PaymentMethod.SERIALIZER.deserialize(paymentMethodJson)
+        } else {
+            val sessionResponse = SessionSetupResponse.SERIALIZER.deserialize(sessionHolder.sessionSetupResponse)
+            sessionResponse.paymentMethodsApiResponse?.paymentMethods?.first { it.type == CARD_PAYMENT_METHOD_KEY }
+                ?: throw Exception("Cannot find card payment method")
+        }
     }
 }

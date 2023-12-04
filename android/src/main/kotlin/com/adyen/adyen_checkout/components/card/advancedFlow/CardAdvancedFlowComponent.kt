@@ -30,7 +30,7 @@ internal class CardAdvancedFlowComponent(
     creationParams: Map<*, *>?
 ) : BaseCardComponent(activity, componentFlutterApi, context, id, creationParams) {
     private val paymentMethodString = creationParams?.get(PAYMENT_METHOD_KEY) as String
-    private val isStoredPaymentMethod = creationParams?.get(IS_STORED_PAYMENT_METHOD) as Boolean
+    private val isStoredPaymentMethod = creationParams?.get(IS_STORED_PAYMENT_METHOD_KEY) as Boolean
 
     init {
         cardComponent = createCardComponent()
