@@ -95,8 +95,7 @@ class BaseCardComponent: NSObject, FlutterPlatformView, UIScrollViewDelegate {
 
     func finalizeAndDismiss(success: Bool, completion: @escaping (() -> Void)) {
         cardComponent?.finalizeIfNeeded(with: success) { [weak self] in
-            // Is this viewcontroller access correct?
-            self?.getViewController()?.dismiss(animated: true, completion: {
+            self?.getViewController()?.dismiss(animated: true , completion:  {
                 completion()
             })
         }

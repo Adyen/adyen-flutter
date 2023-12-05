@@ -19,8 +19,7 @@ class CardAdvancedFlowActionComponentDelegate: ActionComponentDelegate {
     }
 
     func didComplete(from _: Adyen.ActionComponent) {
-        print("did complete")
-        // TODO: Could we discuss when this callback is being triggered and needs to be handled?
+        //Only for voucher payment method
     }
 
     func didFail(with error: Error, from _: Adyen.ActionComponent) {
