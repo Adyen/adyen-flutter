@@ -1,9 +1,5 @@
 class AnalyticsOptions {
-  final bool? enabled;
-  final String? payload;
+  final bool enabled;
 
-  AnalyticsOptions({
-    this.enabled,
-    this.payload,
-  });
+  AnalyticsOptions({required this.enabled});
 }

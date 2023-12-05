@@ -1,5 +1,4 @@
 import 'package:adyen_checkout/adyen_checkout.dart';
-import 'package:adyen_checkout/src/models/analytics_options.dart';
 import 'package:adyen_checkout/src/models/base_configuration.dart';
 
 final class DropInConfiguration extends BaseConfiguration {
@@ -7,7 +6,7 @@ final class DropInConfiguration extends BaseConfiguration {
   final ApplePayConfiguration? applePayConfiguration;
   final GooglePayConfiguration? googlePayConfiguration;
   final CashAppPayConfiguration? cashAppPayConfiguration;
-  final AnalyticsOptions? analyticsOptions;
+  final AnalyticsOptions analyticsOptions;
   final StoredPaymentMethodConfiguration? storedPaymentMethodConfiguration;
   final bool skipListWhenSinglePaymentMethod;
 
@@ -21,8 +20,10 @@ final class DropInConfiguration extends BaseConfiguration {
     this.applePayConfiguration,
     this.googlePayConfiguration,
     this.cashAppPayConfiguration,
-    this.analyticsOptions,
     this.storedPaymentMethodConfiguration,
-    this.skipListWhenSinglePaymentMethod = false,
-  });
+    bool? skipListWhenSinglePaymentMethod,
+    AnalyticsOptions? analyticsOptions,
+  })  : analyticsOptions = analyticsOptions ?? AnalyticsOptions(enabled: true),
+        skipListWhenSinglePaymentMethod =
+            skipListWhenSinglePaymentMethod ?? false;
 }

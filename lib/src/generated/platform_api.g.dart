@@ -144,26 +144,26 @@ class AmountDTO {
 
 class AnalyticsOptionsDTO {
   AnalyticsOptionsDTO({
-    this.enabled,
-    this.payload,
+    required this.enabled,
+    required this.version,
   });
 
-  bool? enabled;
+  bool enabled;
 
-  String? payload;
+  String version;
 
   Object encode() {
     return <Object?>[
       enabled,
-      payload,
+      version,
     ];
   }
 
   static AnalyticsOptionsDTO decode(Object result) {
     result as List<Object?>;
     return AnalyticsOptionsDTO(
-      enabled: result[0] as bool?,
-      payload: result[1] as String?,
+      enabled: result[0]! as bool,
+      version: result[1]! as String,
     );
   }
 }
@@ -179,7 +179,7 @@ class DropInConfigurationDTO {
     this.applePayConfigurationDTO,
     this.googlePayConfigurationDTO,
     this.cashAppPayConfigurationDTO,
-    this.analyticsOptionsDTO,
+    required this.analyticsOptionsDTO,
     required this.showPreselectedStoredPaymentMethod,
     required this.skipListWhenSinglePaymentMethod,
     required this.isRemoveStoredPaymentMethodEnabled,
@@ -203,7 +203,7 @@ class DropInConfigurationDTO {
 
   CashAppPayConfigurationDTO? cashAppPayConfigurationDTO;
 
-  AnalyticsOptionsDTO? analyticsOptionsDTO;
+  AnalyticsOptionsDTO analyticsOptionsDTO;
 
   bool showPreselectedStoredPaymentMethod;
 
@@ -222,7 +222,7 @@ class DropInConfigurationDTO {
       applePayConfigurationDTO?.encode(),
       googlePayConfigurationDTO?.encode(),
       cashAppPayConfigurationDTO?.encode(),
-      analyticsOptionsDTO?.encode(),
+      analyticsOptionsDTO.encode(),
       showPreselectedStoredPaymentMethod,
       skipListWhenSinglePaymentMethod,
       isRemoveStoredPaymentMethodEnabled,
@@ -249,9 +249,7 @@ class DropInConfigurationDTO {
       cashAppPayConfigurationDTO: result[8] != null
           ? CashAppPayConfigurationDTO.decode(result[8]! as List<Object?>)
           : null,
-      analyticsOptionsDTO: result[9] != null
-          ? AnalyticsOptionsDTO.decode(result[9]! as List<Object?>)
-          : null,
+      analyticsOptionsDTO: AnalyticsOptionsDTO.decode(result[9]! as List<Object?>),
       showPreselectedStoredPaymentMethod: result[10]! as bool,
       skipListWhenSinglePaymentMethod: result[11]! as bool,
       isRemoveStoredPaymentMethodEnabled: result[12]! as bool,
@@ -725,6 +723,7 @@ class CardComponentConfigurationDTO {
     required this.amount,
     this.shopperLocale,
     required this.cardConfiguration,
+    required this.analyticsOptionsDTO,
   });
 
   Environment environment;
@@ -739,6 +738,8 @@ class CardComponentConfigurationDTO {
 
   CardConfigurationDTO cardConfiguration;
 
+  AnalyticsOptionsDTO analyticsOptionsDTO;
+
   Object encode() {
     return <Object?>[
       environment.index,
@@ -747,6 +748,7 @@ class CardComponentConfigurationDTO {
       amount.encode(),
       shopperLocale,
       cardConfiguration.encode(),
+      analyticsOptionsDTO.encode(),
     ];
   }
 
@@ -759,6 +761,7 @@ class CardComponentConfigurationDTO {
       amount: AmountDTO.decode(result[3]! as List<Object?>),
       shopperLocale: result[4] as String?,
       cardConfiguration: CardConfigurationDTO.decode(result[5]! as List<Object?>),
+      analyticsOptionsDTO: AnalyticsOptionsDTO.decode(result[6]! as List<Object?>),
     );
   }
 }
@@ -1331,23 +1334,26 @@ class _ComponentFlutterInterfaceCodec extends StandardMessageCodec {
     } else if (value is AmountDTO) {
       buffer.putUint8(129);
       writeValue(buffer, value.encode());
-    } else if (value is CardComponentConfigurationDTO) {
+    } else if (value is AnalyticsOptionsDTO) {
       buffer.putUint8(130);
       writeValue(buffer, value.encode());
-    } else if (value is CardConfigurationDTO) {
+    } else if (value is CardComponentConfigurationDTO) {
       buffer.putUint8(131);
       writeValue(buffer, value.encode());
-    } else if (value is ComponentCommunicationModel) {
+    } else if (value is CardConfigurationDTO) {
       buffer.putUint8(132);
       writeValue(buffer, value.encode());
-    } else if (value is OrderResponseDTO) {
+    } else if (value is ComponentCommunicationModel) {
       buffer.putUint8(133);
       writeValue(buffer, value.encode());
-    } else if (value is PaymentResultModelDTO) {
+    } else if (value is OrderResponseDTO) {
       buffer.putUint8(134);
       writeValue(buffer, value.encode());
-    } else if (value is SessionDTO) {
+    } else if (value is PaymentResultModelDTO) {
       buffer.putUint8(135);
+      writeValue(buffer, value.encode());
+    } else if (value is SessionDTO) {
+      buffer.putUint8(136);
       writeValue(buffer, value.encode());
     } else {
       super.writeValue(buffer, value);
@@ -1362,16 +1368,18 @@ class _ComponentFlutterInterfaceCodec extends StandardMessageCodec {
       case 129: 
         return AmountDTO.decode(readValue(buffer)!);
       case 130: 
-        return CardComponentConfigurationDTO.decode(readValue(buffer)!);
+        return AnalyticsOptionsDTO.decode(readValue(buffer)!);
       case 131: 
-        return CardConfigurationDTO.decode(readValue(buffer)!);
+        return CardComponentConfigurationDTO.decode(readValue(buffer)!);
       case 132: 
-        return ComponentCommunicationModel.decode(readValue(buffer)!);
+        return CardConfigurationDTO.decode(readValue(buffer)!);
       case 133: 
-        return OrderResponseDTO.decode(readValue(buffer)!);
+        return ComponentCommunicationModel.decode(readValue(buffer)!);
       case 134: 
-        return PaymentResultModelDTO.decode(readValue(buffer)!);
+        return OrderResponseDTO.decode(readValue(buffer)!);
       case 135: 
+        return PaymentResultModelDTO.decode(readValue(buffer)!);
+      case 136: 
         return SessionDTO.decode(readValue(buffer)!);
       default:
         return super.readValueOfType(type, buffer);

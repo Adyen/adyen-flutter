@@ -11,6 +11,7 @@ export 'src/generated/platform_api.g.dart'
         GooglePayEnvironment,
         CashAppPayEnvironment;
 export 'src/models/amount.dart';
+export 'src/models/analytics_options.dart';
 export 'src/models/card_component_configuration.dart';
 export 'src/models/component_payment_flow.dart';
 export 'src/models/drop_in_configuration.dart';

@@ -41,12 +41,6 @@ class ConfigurationMapper {
         return dropInConfiguration
     }
 
-    func createAdyenContext(environment: Environment, clientKey: String, amount: AmountDTO, countryCode: String) throws -> AdyenContext {
-        let environment = environment.mapToEnvironment()
-        let apiContext = try APIContext(environment: environment, clientKey: clientKey)
-        let amount = amount.mapToAmount()
-        return AdyenContext(apiContext: apiContext, payment: Payment(amount: amount, countryCode: countryCode), analyticsConfiguration: AnalyticsConfiguration())
-    }
 
     private func createStoredCardConfiguration(showCvcForStoredCard: Bool) -> StoredCardConfiguration {
         var storedCardConfiguration = StoredCardConfiguration()
@@ -113,7 +107,10 @@ extension DropInConfigurationDTO {
         let environment = environment.mapToEnvironment()
         let apiContext = try APIContext(environment: environment, clientKey: clientKey)
         let amount = amount.mapToAmount()
-        return AdyenContext(apiContext: apiContext, payment: Payment(amount: amount, countryCode: countryCode), analyticsConfiguration: AnalyticsConfiguration())
+        var analyticsConfiguration = AnalyticsConfiguration()
+        analyticsConfiguration.isEnabled = analyticsOptionsDTO.enabled
+        analyticsConfiguration.context = TelemetryContext(version: analyticsOptionsDTO.version, platform: .flutter)
+        return AdyenContext(apiContext: apiContext, payment: Payment(amount: amount, countryCode: countryCode), analyticsConfiguration: analyticsConfiguration)
     }
 }
 
@@ -176,7 +173,8 @@ extension CardComponentConfigurationDTO {
         let apiContext = try APIContext(environment: environment, clientKey: clientKey)
         let amount = amount.mapToAmount()
         var analyticsConfiguration = AnalyticsConfiguration()
-        //analyticsConfiguration.context = TelemetryContext(version: "VERSION_KEY", platform: "flutter")
+        analyticsConfiguration.isEnabled = analyticsOptionsDTO.enabled
+        analyticsConfiguration.context = TelemetryContext(version: analyticsOptionsDTO.version, platform: .flutter)
         return AdyenContext(apiContext: apiContext, payment: Payment(amount: amount, countryCode: countryCode), analyticsConfiguration: analyticsConfiguration)
     }
 }

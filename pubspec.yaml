@@ -1,6 +1,6 @@
 name: adyen_checkout
 description: Adyen checkout SDK for Flutter
-version: 0.0.1
+version: 0.0.1 #When updating the version, please also update the version number in constants
 homepage: https://github.com/Adyen/adyen-flutter
 
 environment:

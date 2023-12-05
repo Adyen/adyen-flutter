@@ -101,12 +101,12 @@ class AmountDTO {
 }
 
 class AnalyticsOptionsDTO {
-  final bool? enabled;
-  final String? payload;
+  final bool enabled;
+  final String version;
 
   AnalyticsOptionsDTO(
     this.enabled,
-    this.payload,
+    this.version,
   );
 }
 
@@ -120,7 +120,7 @@ class DropInConfigurationDTO {
   final ApplePayConfigurationDTO? applePayConfigurationDTO;
   final GooglePayConfigurationDTO? googlePayConfigurationDTO;
   final CashAppPayConfigurationDTO? cashAppPayConfigurationDTO;
-  final AnalyticsOptionsDTO? analyticsOptionsDTO;
+  final AnalyticsOptionsDTO analyticsOptionsDTO;
   final bool showPreselectedStoredPaymentMethod;
   final bool skipListWhenSinglePaymentMethod;
   final bool isRemoveStoredPaymentMethodEnabled;
@@ -322,6 +322,7 @@ class CardComponentConfigurationDTO {
   final AmountDTO amount;
   final String? shopperLocale;
   final CardConfigurationDTO cardConfiguration;
+  final AnalyticsOptionsDTO analyticsOptionsDTO;
 
   CardComponentConfigurationDTO(
     this.environment,
@@ -330,6 +331,7 @@ class CardComponentConfigurationDTO {
     this.amount,
     this.shopperLocale,
     this.cardConfiguration,
+    this.analyticsOptionsDTO,
   );
 }
 
