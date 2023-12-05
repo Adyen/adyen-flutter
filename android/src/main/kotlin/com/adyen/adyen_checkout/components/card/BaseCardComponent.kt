@@ -48,7 +48,7 @@ abstract class BaseCardComponent(
     lateinit var cardComponent: CardComponent
 
     init {
-        activity.addOnNewIntentListener(intentListener);
+        activity.addOnNewIntentListener(intentListener)
     }
 
     override fun getView(): View = componentWrapperView
