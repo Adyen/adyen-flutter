@@ -9,7 +9,7 @@ class CardSessionFlowDelegate: AdyenSessionDelegate {
         self.componentFlutterApi = componentFlutterApi
     }
 
-    func didComplete(with result: Adyen.AdyenSessionResult, component _: Adyen.Component, session: Adyen.AdyenSession) {
+    func didComplete(with result: AdyenSessionResult, component _: Component, session: AdyenSession) {
         let resultCode = result.resultCode
         let success = resultCode == .authorised || resultCode == .received || resultCode == .pending
         finalizeAndDismiss?(success, { [weak self] in
