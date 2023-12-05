@@ -7,6 +7,7 @@ import 'package:adyen_checkout/src/logging/adyen_logger.dart';
 import 'package:adyen_checkout/src/platform/adyen_checkout_platform_interface.dart';
 import 'package:adyen_checkout/src/platform/adyen_checkout_result_api.dart';
 import 'package:adyen_checkout/src/utils/dto_mapper.dart';
+import 'package:adyen_checkout/src/utils/payment_flow_outcome_handler.dart';
 import 'package:flutter/foundation.dart';
 
 class AdyenCheckout implements AdyenCheckoutInterface {
@@ -16,6 +17,8 @@ class AdyenCheckout implements AdyenCheckoutInterface {
 
   final AdyenCheckoutResultApi _resultApi = AdyenCheckoutResultApi();
   final AdyenLogger _adyenLogger = AdyenLogger();
+  final PaymentFlowOutcomeHandler _paymentFlowOutcomeHandler =
+      PaymentFlowOutcomeHandler();
 
   @override
   Future<String> getPlatformVersion() =>
@@ -26,9 +29,10 @@ class AdyenCheckout implements AdyenCheckoutInterface {
       AdyenCheckoutPlatformInterface.instance.getReturnUrl();
 
   @override
-  Future<PaymentResult> startPayment({required PaymentFlow paymentFlow}) async {
+  Future<PaymentResult> startPayment(
+      {required DropInPaymentFlow paymentFlow}) async {
     switch (paymentFlow) {
-      case DropInSession():
+      case DropInSessionFlow():
         return await _startDropInSessionsPayment(paymentFlow);
       case DropInAdvancedFlow():
         return await _startDropInAdvancedFlowPayment(paymentFlow);
@@ -44,12 +48,12 @@ class AdyenCheckout implements AdyenCheckoutInterface {
   }
 
   Future<PaymentResult> _startDropInSessionsPayment(
-      DropInSession dropInSession) async {
+      DropInSessionFlow dropInSession) async {
     _adyenLogger.print("Start Drop-in session");
     final dropInSessionCompleter = Completer<PaymentResultDTO>();
     AdyenCheckoutPlatformInterface.instance.startDropInSessionPayment(
-      session: dropInSession.session.toDTO(),
-      dropInConfiguration: dropInSession.dropInConfiguration.toDTO(),
+      dropInSession.dropInConfiguration.toDTO(),
+      dropInSession.session.toDTO(),
     );
 
     _resultApi.dropInSessionPlatformCommunicationStream =
@@ -98,8 +102,8 @@ class AdyenCheckout implements AdyenCheckoutInterface {
     final dropInAdvancedFlowCompleter = Completer<PaymentResultDTO>();
 
     AdyenCheckoutPlatformInterface.instance.startDropInAdvancedFlowPayment(
-      paymentMethodsResponse: dropInAdvancedFlow.paymentMethodsResponse,
-      dropInConfiguration: dropInAdvancedFlow.dropInConfiguration.toDTO(),
+      dropInAdvancedFlow.dropInConfiguration.toDTO(),
+      dropInAdvancedFlow.paymentMethodsResponse,
     );
 
     _resultApi.dropInAdvancedFlowPlatformCommunicationStream =
@@ -164,7 +168,7 @@ class AdyenCheckout implements AdyenCheckoutInterface {
       final PaymentFlowOutcome paymentFlowOutcome =
           await postPayments(event.data!);
       PaymentFlowOutcomeDTO paymentFlowOutcomeDTO =
-          _mapToPaymentOutcomeDTO(paymentFlowOutcome);
+          _paymentFlowOutcomeHandler.mapToPaymentOutcomeDTO(paymentFlowOutcome);
       AdyenCheckoutPlatformInterface.instance
           .onPaymentsResult(paymentFlowOutcomeDTO);
     } catch (error) {
@@ -195,7 +199,7 @@ class AdyenCheckout implements AdyenCheckoutInterface {
       final PaymentFlowOutcome paymentFlowOutcome =
           await postPaymentsDetails(event.data!);
       PaymentFlowOutcomeDTO paymentFlowOutcomeDTO =
-          _mapToPaymentOutcomeDTO(paymentFlowOutcome);
+          _paymentFlowOutcomeHandler.mapToPaymentOutcomeDTO(paymentFlowOutcome);
       AdyenCheckoutPlatformInterface.instance
           .onPaymentsDetailsResult(paymentFlowOutcomeDTO);
     } catch (error) {
@@ -211,28 +215,6 @@ class AdyenCheckout implements AdyenCheckoutInterface {
         ),
       ));
     }
-  }
-
-  PaymentFlowOutcomeDTO _mapToPaymentOutcomeDTO(
-      PaymentFlowOutcome dropInOutcome) {
-    return switch (dropInOutcome) {
-      Finished() => PaymentFlowOutcomeDTO(
-          paymentFlowResultType: PaymentFlowResultType.finished,
-          result: dropInOutcome.resultCode,
-        ),
-      Action() => PaymentFlowOutcomeDTO(
-          paymentFlowResultType: PaymentFlowResultType.action,
-          actionResponse: dropInOutcome.actionResponse,
-        ),
-      Error() => PaymentFlowOutcomeDTO(
-          paymentFlowResultType: PaymentFlowResultType.error,
-          error: ErrorDTO(
-            errorMessage: dropInOutcome.errorMessage,
-            reason: dropInOutcome.reason,
-            dismissDropIn: dropInOutcome.dismissDropIn,
-          ),
-        ),
-    };
   }
 
   void _setupResultApi() => CheckoutFlutterApi.setup(_resultApi);

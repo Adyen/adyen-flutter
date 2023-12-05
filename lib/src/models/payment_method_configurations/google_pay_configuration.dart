@@ -12,7 +12,7 @@ class GooglePayConfiguration {
   final bool shippingAddressRequired;
   final bool existingPaymentMethodRequired;
 
-  GooglePayConfiguration({
+  const GooglePayConfiguration({
     required this.googlePayEnvironment,
     this.merchantAccount,
     this.totalPriceStatus,

@@ -2,13 +2,24 @@ import 'dart:async';
 
 import 'package:adyen_checkout/adyen_checkout.dart';
 import 'package:adyen_checkout_example/config.dart';
+import 'package:adyen_checkout_example/navigation/card_component_screen.dart';
+import 'package:adyen_checkout_example/network/models/session_response_network_model.dart';
 import 'package:adyen_checkout_example/network/service.dart';
-import 'package:adyen_checkout_example/repositories/adyen_sessions_repository.dart';
+import 'package:adyen_checkout_example/repositories/adyen_card_component_repository.dart';
+import 'package:adyen_checkout_example/repositories/adyen_drop_in_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 void main() {
-  runApp(const MaterialApp(home: MyApp()));
+  runApp(const MaterialApp(localizationsDelegates: [
+    GlobalMaterialLocalizations.delegate,
+    GlobalWidgetsLocalizations.delegate,
+    GlobalCupertinoLocalizations.delegate,
+  ], supportedLocales: [
+    Locale('en'), // English
+    Locale('ar'), // Arabic
+  ], home: MyApp()));
 }
 
 class MyApp extends StatefulWidget {
@@ -21,7 +32,9 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   String _platformVersion = 'Unknown';
   final _adyenCheckout = AdyenCheckout();
-  late AdyenSessionsRepository _adyenSessionRepository;
+  final _service = Service();
+  late AdyenDropInRepository _adyenDropInRepository;
+  late AdyenCardComponentRepository _adyenCardComponentRepository;
 
   @override
   void initState() {
@@ -32,9 +45,14 @@ class _MyAppState extends State<MyApp> {
 
   // Platform messages are asynchronous, so we initialize in an async method.
   Future<void> initPlatformState() async {
-    _adyenSessionRepository = AdyenSessionsRepository(
+    _adyenDropInRepository = AdyenDropInRepository(
       adyenCheckout: _adyenCheckout,
-      service: Service(),
+      service: _service,
+    );
+
+    _adyenCardComponentRepository = AdyenCardComponentRepository(
+      adyenCheckout: _adyenCheckout,
+      service: _service,
     );
 
     String platformVersion;
@@ -78,7 +96,60 @@ class _MyAppState extends State<MyApp> {
                   final result = await startDropInAdvancedFlow();
                   _dialogBuilder(context, result);
                 },
-                child: const Text("DropIn advanced flow"))
+                child: const Text("DropIn advanced flow")),
+            TextButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => CardComponentScreen(
+                              repository: _adyenCardComponentRepository,
+                            )),
+                  );
+                },
+                child: const Text("Card component scroll view")),
+            TextButton(
+                onPressed: () async {
+                  await _adyenCardComponentRepository
+                      .createSession()
+                      .then((sessionResponse) => showModalBottomSheet(
+                          context: context,
+                          isDismissible: false,
+                          isScrollControlled: true,
+                          backgroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10.0),
+                          ),
+                          builder: (BuildContext context) {
+                            return SafeArea(
+                              child: SingleChildScrollView(
+                                  child: Column(
+                                children: [
+                                  Container(height: 8),
+                                  Container(
+                                    width: 48,
+                                    height: 6,
+                                    decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(10),
+                                        color: Colors.grey),
+                                  ),
+                                  Container(height: 8),
+                                  Container(
+                                    padding: EdgeInsets.only(
+                                        bottom: MediaQuery.of(context)
+                                            .viewInsets
+                                            .bottom),
+                                    child: _buildSessionCardWidget(
+                                      context,
+                                      sessionResponse,
+                                    ),
+                                  ),
+                                ],
+                              )),
+                            );
+                          }));
+                },
+                child: const Text("Card component session sheet")),
           ],
         ),
       ),
@@ -86,12 +157,13 @@ class _MyAppState extends State<MyApp> {
   }
 
   Future<PaymentResult> startDropInSessions() async {
-    final Session session = await _adyenSessionRepository.createSession(
-      Config.amount,
-      Config.environment,
+    final SessionResponseNetworkModel sessionResponse =
+        await _adyenDropInRepository.createSession();
+    final Session session = Session(
+      id: sessionResponse.id,
+      sessionData: sessionResponse.sessionData,
     );
-
-    final CardsConfiguration cardsConfiguration = CardsConfiguration(
+    const CardConfiguration cardsConfiguration = CardConfiguration(
       showStorePaymentField: true,
     );
 
@@ -100,13 +172,13 @@ class _MyAppState extends State<MyApp> {
       showPreselectedStoredPaymentMethod: true,
       isRemoveStoredPaymentMethodEnabled: true,
       deleteStoredPaymentMethodCallback:
-          _adyenSessionRepository.deleteStoredPaymentMethod,
+          _adyenDropInRepository.deleteStoredPaymentMethod,
     );
 
     final CashAppPayConfiguration cashAppPayConfiguration =
         await _createCashAppPayConfiguration();
 
-    final ApplePayConfiguration applePayConfiguration = ApplePayConfiguration(
+    const ApplePayConfiguration applePayConfiguration = ApplePayConfiguration(
       merchantId: Config.merchantAccount,
       merchantName: Config.merchantName,
     );
@@ -117,14 +189,14 @@ class _MyAppState extends State<MyApp> {
       countryCode: Config.countryCode,
       amount: Config.amount,
       shopperLocale: Config.shopperLocale,
-      cardsConfiguration: cardsConfiguration,
+      cardConfiguration: cardsConfiguration,
       storedPaymentMethodConfiguration: storedPaymentMethodConfiguration,
       cashAppPayConfiguration: cashAppPayConfiguration,
       applePayConfiguration: applePayConfiguration,
     );
 
     return await _adyenCheckout.startPayment(
-      paymentFlow: DropInSession(
+      paymentFlow: DropInSessionFlow(
         dropInConfiguration: dropInConfiguration,
         session: session,
       ),
@@ -133,18 +205,18 @@ class _MyAppState extends State<MyApp> {
 
   Future<PaymentResult> startDropInAdvancedFlow() async {
     final String paymentMethodsResponse =
-        await _adyenSessionRepository.fetchPaymentMethods();
+        await _adyenDropInRepository.fetchPaymentMethods();
 
-    final CardsConfiguration cardsConfiguration = CardsConfiguration(
-        showStorePaymentField: true,
+    const CardConfiguration cardsConfiguration = CardConfiguration(
+      showStorePaymentField: true,
     );
 
-    final ApplePayConfiguration applePayConfiguration = ApplePayConfiguration(
+    const ApplePayConfiguration applePayConfiguration = ApplePayConfiguration(
       merchantId: Config.merchantAccount,
       merchantName: Config.merchantName,
     );
 
-    final GooglePayConfiguration googlePayConfiguration =
+    const GooglePayConfiguration googlePayConfiguration =
         GooglePayConfiguration(
       googlePayEnvironment: GooglePayEnvironment.test,
       shippingAddressRequired: true,
@@ -159,7 +231,7 @@ class _MyAppState extends State<MyApp> {
       showPreselectedStoredPaymentMethod: false,
       isRemoveStoredPaymentMethodEnabled: true,
       deleteStoredPaymentMethodCallback:
-          _adyenSessionRepository.deleteStoredPaymentMethod,
+          _adyenDropInRepository.deleteStoredPaymentMethod,
     );
 
     final DropInConfiguration dropInConfiguration = DropInConfiguration(
@@ -168,7 +240,7 @@ class _MyAppState extends State<MyApp> {
       countryCode: Config.countryCode,
       shopperLocale: Config.shopperLocale,
       amount: Config.amount,
-      cardsConfiguration: cardsConfiguration,
+      cardConfiguration: cardsConfiguration,
       applePayConfiguration: applePayConfiguration,
       googlePayConfiguration: googlePayConfiguration,
       cashAppPayConfiguration: cashAppPayConfiguration,
@@ -179,8 +251,8 @@ class _MyAppState extends State<MyApp> {
       paymentFlow: DropInAdvancedFlow(
         dropInConfiguration: dropInConfiguration,
         paymentMethodsResponse: paymentMethodsResponse,
-        postPayments: _adyenSessionRepository.postPayments,
-        postPaymentsDetails: _adyenSessionRepository.postPaymentsDetails,
+        postPayments: _adyenDropInRepository.postPayments,
+        postPaymentsDetails: _adyenDropInRepository.postPaymentsDetails,
       ),
     );
   }
@@ -189,7 +261,37 @@ class _MyAppState extends State<MyApp> {
   Future<CashAppPayConfiguration> _createCashAppPayConfiguration() async {
     return CashAppPayConfiguration(
       CashAppPayEnvironment.sandbox,
-      await _adyenSessionRepository.determineExampleReturnUrl(),
+      await _adyenDropInRepository.determineBaseReturnUrl(),
+    );
+  }
+
+  Widget _buildSessionCardWidget(
+    BuildContext context,
+    SessionResponseNetworkModel sessionResponse,
+  ) {
+    final cardComponentConfiguration = CardComponentConfiguration(
+      environment: Config.environment,
+      clientKey: Config.clientKey,
+      countryCode: Config.countryCode,
+      amount: Config.amount,
+      shopperLocale: Config.shopperLocale,
+      cardConfiguration: const CardConfiguration(),
+    );
+
+    final session = Session(
+      id: sessionResponse.id,
+      sessionData: sessionResponse.sessionData,
+    );
+
+    return AdyenCardComponentWidget(
+      componentPaymentFlow: CardComponentSessionFlow(
+        cardComponentConfiguration: cardComponentConfiguration,
+        session: session,
+      ),
+      onPaymentResult: (event) async {
+        Navigator.pop(context);
+        _dialogBuilder(context, event);
+      },
     );
   }
 

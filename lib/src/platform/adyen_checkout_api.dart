@@ -8,48 +8,48 @@ class AdyenCheckoutApi implements AdyenCheckoutPlatformInterface {
   Future<String> getPlatformVersion() => checkoutApi.getPlatformVersion();
 
   @override
-  void startDropInSessionPayment({
-    required SessionDTO session,
-    required DropInConfigurationDTO dropInConfiguration,
-  }) =>
+  Future<String> getReturnUrl() => checkoutApi.getReturnUrl();
+
+  @override
+  Future<void> startDropInSessionPayment(
+    DropInConfigurationDTO dropInConfigurationDTO,
+    SessionDTO session,
+  ) =>
       checkoutApi.startDropInSessionPayment(
-        dropInConfiguration,
+        dropInConfigurationDTO,
         session,
       );
 
   @override
-  void startDropInAdvancedFlowPayment({
-    required String paymentMethodsResponse,
-    required DropInConfigurationDTO dropInConfiguration,
-  }) =>
+  Future<void> startDropInAdvancedFlowPayment(
+    DropInConfigurationDTO dropInConfiguration,
+    String paymentMethodsResponse,
+  ) =>
       checkoutApi.startDropInAdvancedFlowPayment(
         dropInConfiguration,
         paymentMethodsResponse,
       );
 
   @override
-  Future<String> getReturnUrl() => checkoutApi.getReturnUrl();
-
-  @override
-  void onPaymentsResult(PaymentFlowOutcomeDTO paymentsResult) =>
+  Future<void> onPaymentsResult(PaymentFlowOutcomeDTO paymentsResult) =>
       checkoutApi.onPaymentsResult(paymentsResult);
 
   @override
-  void onPaymentsDetailsResult(PaymentFlowOutcomeDTO paymentsDetailsResult) =>
+  Future<void> onPaymentsDetailsResult(
+          PaymentFlowOutcomeDTO paymentsDetailsResult) =>
       checkoutApi.onPaymentsDetailsResult(paymentsDetailsResult);
 
   @override
-  void onDeleteStoredPaymentMethodResult(
+  Future<void> onDeleteStoredPaymentMethodResult(
           DeletedStoredPaymentMethodResultDTO
               deleteStoredPaymentMethodResultDTO) =>
       checkoutApi.onDeleteStoredPaymentMethodResult(
           deleteStoredPaymentMethodResultDTO);
 
   @override
-  void enableLogging(bool loggingEnabled) {
-    checkoutApi.enableLogging(loggingEnabled);
-  }
+  Future<void> enableLogging(bool loggingEnabled) =>
+      checkoutApi.enableLogging(loggingEnabled);
 
   @override
-  void cleanUpDropIn() => checkoutApi.cleanUpDropIn();
+  Future<void> cleanUpDropIn() => checkoutApi.cleanUpDropIn();
 }

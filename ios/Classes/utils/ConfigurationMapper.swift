@@ -9,7 +9,7 @@ class ConfigurationMapper {
 
         dropInConfiguration.paymentMethodsList.allowDisablingStoredPaymentMethods = dropInConfigurationDTO.isRemoveStoredPaymentMethodEnabled
 
-        if let cardsConfigurationDTO = dropInConfigurationDTO.cardsConfigurationDTO {
+        if let cardsConfigurationDTO = dropInConfigurationDTO.cardConfigurationDTO {
             let koreanAuthenticationMode = cardsConfigurationDTO.kcpFieldVisibility.toCardFieldVisibility()
             let socialSecurityNumberMode = cardsConfigurationDTO.socialSecurityNumberFieldVisibility.toCardFieldVisibility()
             let storedCardConfiguration = createStoredCardConfiguration(showCvcForStoredCard: cardsConfigurationDTO.showCvcForStoredCard)
@@ -39,6 +39,13 @@ class ConfigurationMapper {
         }
 
         return dropInConfiguration
+    }
+
+    func createAdyenContext(environment: Environment, clientKey: String, amount: AmountDTO, countryCode: String) throws -> AdyenContext {
+        let environment = environment.mapToEnvironment()
+        let apiContext = try APIContext(environment: environment, clientKey: clientKey)
+        let amount = amount.mapToAmount()
+        return AdyenContext(apiContext: apiContext, payment: Payment(amount: amount, countryCode: countryCode), analyticsConfiguration: AnalyticsConfiguration())
     }
 
     private func createStoredCardConfiguration(showCvcForStoredCard: Bool) -> StoredCardConfiguration {
@@ -98,5 +105,103 @@ extension FieldVisibility {
         case .hide:
             return .hide
         }
+    }
+}
+
+extension DropInConfigurationDTO {
+    func createAdyenContext() throws -> AdyenContext {
+        let environment = environment.mapToEnvironment()
+        let apiContext = try APIContext(environment: environment, clientKey: clientKey)
+        let amount = amount.mapToAmount()
+        return AdyenContext(apiContext: apiContext, payment: Payment(amount: amount, countryCode: countryCode), analyticsConfiguration: AnalyticsConfiguration())
+    }
+}
+
+extension CardConfigurationDTO {
+    func mapToCardComponentConfiguration() -> CardComponent.Configuration {
+        var formComponentStyle = FormComponentStyle()
+        formComponentStyle.backgroundColor = UIColor.white
+        let koreanAuthenticationMode = kcpFieldVisibility.toCardFieldVisibility()
+        let socialSecurityNumberMode = socialSecurityNumberFieldVisibility.toCardFieldVisibility()
+        let storedCardConfiguration = createStoredCardConfiguration(showCvcForStoredCard: showCvcForStoredCard)
+        let allowedCardTypes = determineAllowedCardTypes(cardTypes: supportedCardTypes)
+        let billingAddressConfiguration = determineBillingAddressConfiguration(addressMode: addressMode)
+        let cardConfiguration = CardComponent.Configuration(
+            style: formComponentStyle,
+            showsHolderNameField: holderNameRequired,
+            showsStorePaymentMethodField: showStorePaymentField,
+            showsSecurityCodeField: showCvc,
+            koreanAuthenticationMode: koreanAuthenticationMode,
+            socialSecurityNumberMode: socialSecurityNumberMode,
+            storedCardConfiguration: storedCardConfiguration,
+            allowedCardTypes: allowedCardTypes,
+            billingAddress: billingAddressConfiguration
+        )
+
+        return cardConfiguration
+    }
+
+    private func createStoredCardConfiguration(showCvcForStoredCard: Bool) -> StoredCardConfiguration {
+        var storedCardConfiguration = StoredCardConfiguration()
+        storedCardConfiguration.showsSecurityCodeField = showCvcForStoredCard
+        return storedCardConfiguration
+    }
+
+    private func determineAllowedCardTypes(cardTypes: [String?]?) -> [CardType]? {
+        guard let mappedCardTypes = cardTypes, !mappedCardTypes.isEmpty else {
+            return nil
+        }
+
+        return mappedCardTypes.compactMap { $0 }.map { CardType(rawValue: $0.lowercased()) }
+    }
+
+    private func determineBillingAddressConfiguration(addressMode: AddressMode?) -> BillingAddressConfiguration {
+        var billingAddressConfiguration = BillingAddressConfiguration()
+        switch addressMode {
+        case .full:
+            billingAddressConfiguration.mode = CardComponent.AddressFormType.full
+        case .postalCode:
+            billingAddressConfiguration.mode = CardComponent.AddressFormType.postalCode
+        case .none?:
+            billingAddressConfiguration.mode = CardComponent.AddressFormType.none
+        default:
+            billingAddressConfiguration.mode = CardComponent.AddressFormType.none
+        }
+
+        return billingAddressConfiguration
+    }
+}
+
+extension CardComponentConfigurationDTO {
+    func createAdyenContext() throws -> AdyenContext {
+        let environment = environment.mapToEnvironment()
+        let apiContext = try APIContext(environment: environment, clientKey: clientKey)
+        let amount = amount.mapToAmount()
+        return AdyenContext(apiContext: apiContext, payment: Payment(amount: amount, countryCode: countryCode), analyticsConfiguration: AnalyticsConfiguration())
+    }
+}
+
+extension Environment {
+    func mapToEnvironment() -> Adyen.Environment {
+        switch self {
+        case .test:
+            return Adyen.Environment.test
+        case .europe:
+            return .liveEurope
+        case .unitedStates:
+            return .liveUnitedStates
+        case .australia:
+            return .liveAustralia
+        case .india:
+            return .liveIndia
+        case .apse:
+            return .liveApse
+        }
+    }
+}
+
+extension AmountDTO {
+    func mapToAmount() -> Adyen.Amount {
+        return Adyen.Amount(value: Int(value), currencyCode: currency)
     }
 }

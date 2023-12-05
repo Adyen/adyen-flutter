@@ -139,6 +139,20 @@ enum class PlatformCommunicationType(val raw: Int) {
   }
 }
 
+enum class ComponentCommunicationType(val raw: Int) {
+  ONSUBMIT(0),
+  ADDITIONALDETAILS(1),
+  RESULT(2),
+  ERROR(3),
+  RESIZE(4);
+
+  companion object {
+    fun ofRaw(raw: Int): ComponentCommunicationType? {
+      return values().firstOrNull { it.raw == raw }
+    }
+  }
+}
+
 enum class PaymentFlowResultType(val raw: Int) {
   FINISHED(0),
   ACTION(1),
@@ -235,7 +249,7 @@ data class DropInConfigurationDTO (
   val countryCode: String,
   val amount: AmountDTO,
   val shopperLocale: String,
-  val cardsConfigurationDTO: CardsConfigurationDTO? = null,
+  val cardConfigurationDTO: CardConfigurationDTO? = null,
   val applePayConfigurationDTO: ApplePayConfigurationDTO? = null,
   val googlePayConfigurationDTO: GooglePayConfigurationDTO? = null,
   val cashAppPayConfigurationDTO: CashAppPayConfigurationDTO? = null,
@@ -253,8 +267,8 @@ data class DropInConfigurationDTO (
       val countryCode = list[2] as String
       val amount = AmountDTO.fromList(list[3] as List<Any?>)
       val shopperLocale = list[4] as String
-      val cardsConfigurationDTO: CardsConfigurationDTO? = (list[5] as List<Any?>?)?.let {
-        CardsConfigurationDTO.fromList(it)
+      val cardConfigurationDTO: CardConfigurationDTO? = (list[5] as List<Any?>?)?.let {
+        CardConfigurationDTO.fromList(it)
       }
       val applePayConfigurationDTO: ApplePayConfigurationDTO? = (list[6] as List<Any?>?)?.let {
         ApplePayConfigurationDTO.fromList(it)
@@ -271,7 +285,7 @@ data class DropInConfigurationDTO (
       val showPreselectedStoredPaymentMethod = list[10] as Boolean
       val skipListWhenSinglePaymentMethod = list[11] as Boolean
       val isRemoveStoredPaymentMethodEnabled = list[12] as Boolean
-      return DropInConfigurationDTO(environment, clientKey, countryCode, amount, shopperLocale, cardsConfigurationDTO, applePayConfigurationDTO, googlePayConfigurationDTO, cashAppPayConfigurationDTO, analyticsOptionsDTO, showPreselectedStoredPaymentMethod, skipListWhenSinglePaymentMethod, isRemoveStoredPaymentMethodEnabled)
+      return DropInConfigurationDTO(environment, clientKey, countryCode, amount, shopperLocale, cardConfigurationDTO, applePayConfigurationDTO, googlePayConfigurationDTO, cashAppPayConfigurationDTO, analyticsOptionsDTO, showPreselectedStoredPaymentMethod, skipListWhenSinglePaymentMethod, isRemoveStoredPaymentMethodEnabled)
     }
   }
   fun toList(): List<Any?> {
@@ -281,7 +295,7 @@ data class DropInConfigurationDTO (
       countryCode,
       amount.toList(),
       shopperLocale,
-      cardsConfigurationDTO?.toList(),
+      cardConfigurationDTO?.toList(),
       applePayConfigurationDTO?.toList(),
       googlePayConfigurationDTO?.toList(),
       cashAppPayConfigurationDTO?.toList(),
@@ -294,7 +308,7 @@ data class DropInConfigurationDTO (
 }
 
 /** Generated class from Pigeon that represents data sent in messages. */
-data class CardsConfigurationDTO (
+data class CardConfigurationDTO (
   val holderNameRequired: Boolean,
   val addressMode: AddressMode,
   val showStorePaymentField: Boolean,
@@ -307,7 +321,7 @@ data class CardsConfigurationDTO (
 ) {
   companion object {
     @Suppress("UNCHECKED_CAST")
-    fun fromList(list: List<Any?>): CardsConfigurationDTO {
+    fun fromList(list: List<Any?>): CardConfigurationDTO {
       val holderNameRequired = list[0] as Boolean
       val addressMode = AddressMode.ofRaw(list[1] as Int)!!
       val showStorePaymentField = list[2] as Boolean
@@ -316,7 +330,7 @@ data class CardsConfigurationDTO (
       val kcpFieldVisibility = FieldVisibility.ofRaw(list[5] as Int)!!
       val socialSecurityNumberFieldVisibility = FieldVisibility.ofRaw(list[6] as Int)!!
       val supportedCardTypes = list[7] as List<String?>
-      return CardsConfigurationDTO(holderNameRequired, addressMode, showStorePaymentField, showCvcForStoredCard, showCvc, kcpFieldVisibility, socialSecurityNumberFieldVisibility, supportedCardTypes)
+      return CardConfigurationDTO(holderNameRequired, addressMode, showStorePaymentField, showCvcForStoredCard, showCvc, kcpFieldVisibility, socialSecurityNumberFieldVisibility, supportedCardTypes)
     }
   }
   fun toList(): List<Any?> {
@@ -459,6 +473,7 @@ data class PaymentResultDTO (
 data class PaymentResultModelDTO (
   val sessionId: String? = null,
   val sessionData: String? = null,
+  val sessionResult: String? = null,
   val resultCode: String? = null,
   val order: OrderResponseDTO? = null
 
@@ -468,17 +483,19 @@ data class PaymentResultModelDTO (
     fun fromList(list: List<Any?>): PaymentResultModelDTO {
       val sessionId = list[0] as String?
       val sessionData = list[1] as String?
-      val resultCode = list[2] as String?
-      val order: OrderResponseDTO? = (list[3] as List<Any?>?)?.let {
+      val sessionResult = list[2] as String?
+      val resultCode = list[3] as String?
+      val order: OrderResponseDTO? = (list[4] as List<Any?>?)?.let {
         OrderResponseDTO.fromList(it)
       }
-      return PaymentResultModelDTO(sessionId, sessionData, resultCode, order)
+      return PaymentResultModelDTO(sessionId, sessionData, sessionResult, resultCode, order)
     }
   }
   fun toList(): List<Any?> {
     return listOf<Any?>(
       sessionId,
       sessionData,
+      sessionResult,
       resultCode,
       order?.toList(),
     )
@@ -533,6 +550,33 @@ data class PlatformCommunicationModel (
         PaymentResultDTO.fromList(it)
       }
       return PlatformCommunicationModel(type, data, paymentResult)
+    }
+  }
+  fun toList(): List<Any?> {
+    return listOf<Any?>(
+      type.raw,
+      data,
+      paymentResult?.toList(),
+    )
+  }
+}
+
+/** Generated class from Pigeon that represents data sent in messages. */
+data class ComponentCommunicationModel (
+  val type: ComponentCommunicationType,
+  val data: Any? = null,
+  val paymentResult: PaymentResultModelDTO? = null
+
+) {
+  companion object {
+    @Suppress("UNCHECKED_CAST")
+    fun fromList(list: List<Any?>): ComponentCommunicationModel {
+      val type = ComponentCommunicationType.ofRaw(list[0] as Int)!!
+      val data = list[1]
+      val paymentResult: PaymentResultModelDTO? = (list[2] as List<Any?>?)?.let {
+        PaymentResultModelDTO.fromList(it)
+      }
+      return ComponentCommunicationModel(type, data, paymentResult)
     }
   }
   fun toList(): List<Any?> {
@@ -621,6 +665,40 @@ data class DeletedStoredPaymentMethodResultDTO (
   }
 }
 
+/** Generated class from Pigeon that represents data sent in messages. */
+data class CardComponentConfigurationDTO (
+  val environment: Environment,
+  val clientKey: String,
+  val countryCode: String,
+  val amount: AmountDTO,
+  val shopperLocale: String? = null,
+  val cardConfiguration: CardConfigurationDTO
+
+) {
+  companion object {
+    @Suppress("UNCHECKED_CAST")
+    fun fromList(list: List<Any?>): CardComponentConfigurationDTO {
+      val environment = Environment.ofRaw(list[0] as Int)!!
+      val clientKey = list[1] as String
+      val countryCode = list[2] as String
+      val amount = AmountDTO.fromList(list[3] as List<Any?>)
+      val shopperLocale = list[4] as String?
+      val cardConfiguration = CardConfigurationDTO.fromList(list[5] as List<Any?>)
+      return CardComponentConfigurationDTO(environment, clientKey, countryCode, amount, shopperLocale, cardConfiguration)
+    }
+  }
+  fun toList(): List<Any?> {
+    return listOf<Any?>(
+      environment.raw,
+      clientKey,
+      countryCode,
+      amount.toList(),
+      shopperLocale,
+      cardConfiguration.toList(),
+    )
+  }
+}
+
 @Suppress("UNCHECKED_CAST")
 private object CheckoutPlatformInterfaceCodec : StandardMessageCodec() {
   override fun readValueOfType(type: Byte, buffer: ByteBuffer): Any? {
@@ -642,7 +720,7 @@ private object CheckoutPlatformInterfaceCodec : StandardMessageCodec() {
       }
       131.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          CardsConfigurationDTO.fromList(it)
+          CardConfigurationDTO.fromList(it)
         }
       }
       132.toByte() -> {
@@ -697,7 +775,7 @@ private object CheckoutPlatformInterfaceCodec : StandardMessageCodec() {
         stream.write(130)
         writeValue(stream, value.toList())
       }
-      is CardsConfigurationDTO -> {
+      is CardConfigurationDTO -> {
         stream.write(131)
         writeValue(stream, value.toList())
       }
@@ -1011,6 +1089,236 @@ class CheckoutFlutterApi(private val binaryMessenger: BinaryMessenger) {
   fun onDropInAdvancedFlowPlatformCommunication(platformCommunicationModelArg: PlatformCommunicationModel, callback: (Result<Unit>) -> Unit) {
     val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.adyen_checkout.CheckoutFlutterApi.onDropInAdvancedFlowPlatformCommunication", codec)
     channel.send(listOf(platformCommunicationModelArg)) {
+      if (it is List<*>) {
+        if (it.size > 1) {
+          callback(Result.failure(FlutterError(it[0] as String, it[1] as String, it[2] as String?)));
+        } else {
+          callback(Result.success(Unit));
+        }
+      } else {
+        callback(Result.failure(FlutterError("channel-error",  "Unable to establish connection on channel.", "")));
+      } 
+    }
+  }
+}
+@Suppress("UNCHECKED_CAST")
+private object ComponentPlatformInterfaceCodec : StandardMessageCodec() {
+  override fun readValueOfType(type: Byte, buffer: ByteBuffer): Any? {
+    return when (type) {
+      128.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          ErrorDTO.fromList(it)
+        }
+      }
+      129.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          PaymentFlowOutcomeDTO.fromList(it)
+        }
+      }
+      else -> super.readValueOfType(type, buffer)
+    }
+  }
+  override fun writeValue(stream: ByteArrayOutputStream, value: Any?)   {
+    when (value) {
+      is ErrorDTO -> {
+        stream.write(128)
+        writeValue(stream, value.toList())
+      }
+      is PaymentFlowOutcomeDTO -> {
+        stream.write(129)
+        writeValue(stream, value.toList())
+      }
+      else -> super.writeValue(stream, value)
+    }
+  }
+}
+
+/** Generated interface from Pigeon that represents a handler of messages from Flutter. */
+interface ComponentPlatformInterface {
+  fun updateViewHeight(viewId: Long)
+  fun onPaymentsResult(paymentsResult: PaymentFlowOutcomeDTO)
+  fun onPaymentsDetailsResult(paymentsDetailsResult: PaymentFlowOutcomeDTO)
+
+  companion object {
+    /** The codec used by ComponentPlatformInterface. */
+    val codec: MessageCodec<Any?> by lazy {
+      ComponentPlatformInterfaceCodec
+    }
+    /** Sets up an instance of `ComponentPlatformInterface` to handle messages through the `binaryMessenger`. */
+    @Suppress("UNCHECKED_CAST")
+    fun setUp(binaryMessenger: BinaryMessenger, api: ComponentPlatformInterface?) {
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.adyen_checkout.ComponentPlatformInterface.updateViewHeight", codec)
+        if (api != null) {
+          channel.setMessageHandler { message, reply ->
+            val args = message as List<Any?>
+            val viewIdArg = args[0].let { if (it is Int) it.toLong() else it as Long }
+            var wrapped: List<Any?>
+            try {
+              api.updateViewHeight(viewIdArg)
+              wrapped = listOf<Any?>(null)
+            } catch (exception: Throwable) {
+              wrapped = wrapError(exception)
+            }
+            reply.reply(wrapped)
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.adyen_checkout.ComponentPlatformInterface.onPaymentsResult", codec)
+        if (api != null) {
+          channel.setMessageHandler { message, reply ->
+            val args = message as List<Any?>
+            val paymentsResultArg = args[0] as PaymentFlowOutcomeDTO
+            var wrapped: List<Any?>
+            try {
+              api.onPaymentsResult(paymentsResultArg)
+              wrapped = listOf<Any?>(null)
+            } catch (exception: Throwable) {
+              wrapped = wrapError(exception)
+            }
+            reply.reply(wrapped)
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.adyen_checkout.ComponentPlatformInterface.onPaymentsDetailsResult", codec)
+        if (api != null) {
+          channel.setMessageHandler { message, reply ->
+            val args = message as List<Any?>
+            val paymentsDetailsResultArg = args[0] as PaymentFlowOutcomeDTO
+            var wrapped: List<Any?>
+            try {
+              api.onPaymentsDetailsResult(paymentsDetailsResultArg)
+              wrapped = listOf<Any?>(null)
+            } catch (exception: Throwable) {
+              wrapped = wrapError(exception)
+            }
+            reply.reply(wrapped)
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+    }
+  }
+}
+@Suppress("UNCHECKED_CAST")
+private object ComponentFlutterInterfaceCodec : StandardMessageCodec() {
+  override fun readValueOfType(type: Byte, buffer: ByteBuffer): Any? {
+    return when (type) {
+      128.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          AmountDTO.fromList(it)
+        }
+      }
+      129.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          AmountDTO.fromList(it)
+        }
+      }
+      130.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          CardComponentConfigurationDTO.fromList(it)
+        }
+      }
+      131.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          CardConfigurationDTO.fromList(it)
+        }
+      }
+      132.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          ComponentCommunicationModel.fromList(it)
+        }
+      }
+      133.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          OrderResponseDTO.fromList(it)
+        }
+      }
+      134.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          PaymentResultModelDTO.fromList(it)
+        }
+      }
+      135.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          SessionDTO.fromList(it)
+        }
+      }
+      else -> super.readValueOfType(type, buffer)
+    }
+  }
+  override fun writeValue(stream: ByteArrayOutputStream, value: Any?)   {
+    when (value) {
+      is AmountDTO -> {
+        stream.write(128)
+        writeValue(stream, value.toList())
+      }
+      is AmountDTO -> {
+        stream.write(129)
+        writeValue(stream, value.toList())
+      }
+      is CardComponentConfigurationDTO -> {
+        stream.write(130)
+        writeValue(stream, value.toList())
+      }
+      is CardConfigurationDTO -> {
+        stream.write(131)
+        writeValue(stream, value.toList())
+      }
+      is ComponentCommunicationModel -> {
+        stream.write(132)
+        writeValue(stream, value.toList())
+      }
+      is OrderResponseDTO -> {
+        stream.write(133)
+        writeValue(stream, value.toList())
+      }
+      is PaymentResultModelDTO -> {
+        stream.write(134)
+        writeValue(stream, value.toList())
+      }
+      is SessionDTO -> {
+        stream.write(135)
+        writeValue(stream, value.toList())
+      }
+      else -> super.writeValue(stream, value)
+    }
+  }
+}
+
+/** Generated class from Pigeon that represents Flutter messages that can be called from Kotlin. */
+@Suppress("UNCHECKED_CAST")
+class ComponentFlutterInterface(private val binaryMessenger: BinaryMessenger) {
+  companion object {
+    /** The codec used by ComponentFlutterInterface. */
+    val codec: MessageCodec<Any?> by lazy {
+      ComponentFlutterInterfaceCodec
+    }
+  }
+  fun _generateCodecForDTOs(cardComponentConfigurationDTOArg: CardComponentConfigurationDTO, sessionDTOArg: SessionDTO, callback: (Result<Unit>) -> Unit) {
+    val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface._generateCodecForDTOs", codec)
+    channel.send(listOf(cardComponentConfigurationDTOArg, sessionDTOArg)) {
+      if (it is List<*>) {
+        if (it.size > 1) {
+          callback(Result.failure(FlutterError(it[0] as String, it[1] as String, it[2] as String?)));
+        } else {
+          callback(Result.success(Unit));
+        }
+      } else {
+        callback(Result.failure(FlutterError("channel-error",  "Unable to establish connection on channel.", "")));
+      } 
+    }
+  }
+  fun onComponentCommunication(componentCommunicationModelArg: ComponentCommunicationModel, callback: (Result<Unit>) -> Unit) {
+    val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface.onComponentCommunication", codec)
+    channel.send(listOf(componentCommunicationModelArg)) {
       if (it is List<*>) {
         if (it.size > 1) {
           callback(Result.failure(FlutterError(it[0] as String, it[1] as String, it[2] as String?)));

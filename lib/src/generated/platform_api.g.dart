@@ -66,6 +66,14 @@ enum PlatformCommunicationType {
   deleteStoredPaymentMethod,
 }
 
+enum ComponentCommunicationType {
+  onSubmit,
+  additionalDetails,
+  result,
+  error,
+  resize,
+}
+
 enum PaymentFlowResultType {
   finished,
   action,
@@ -162,7 +170,7 @@ class DropInConfigurationDTO {
     required this.countryCode,
     required this.amount,
     required this.shopperLocale,
-    this.cardsConfigurationDTO,
+    this.cardConfigurationDTO,
     this.applePayConfigurationDTO,
     this.googlePayConfigurationDTO,
     this.cashAppPayConfigurationDTO,
@@ -182,7 +190,7 @@ class DropInConfigurationDTO {
 
   String shopperLocale;
 
-  CardsConfigurationDTO? cardsConfigurationDTO;
+  CardConfigurationDTO? cardConfigurationDTO;
 
   ApplePayConfigurationDTO? applePayConfigurationDTO;
 
@@ -205,7 +213,7 @@ class DropInConfigurationDTO {
       countryCode,
       amount.encode(),
       shopperLocale,
-      cardsConfigurationDTO?.encode(),
+      cardConfigurationDTO?.encode(),
       applePayConfigurationDTO?.encode(),
       googlePayConfigurationDTO?.encode(),
       cashAppPayConfigurationDTO?.encode(),
@@ -224,8 +232,8 @@ class DropInConfigurationDTO {
       countryCode: result[2]! as String,
       amount: AmountDTO.decode(result[3]! as List<Object?>),
       shopperLocale: result[4]! as String,
-      cardsConfigurationDTO: result[5] != null
-          ? CardsConfigurationDTO.decode(result[5]! as List<Object?>)
+      cardConfigurationDTO: result[5] != null
+          ? CardConfigurationDTO.decode(result[5]! as List<Object?>)
           : null,
       applePayConfigurationDTO: result[6] != null
           ? ApplePayConfigurationDTO.decode(result[6]! as List<Object?>)
@@ -246,8 +254,8 @@ class DropInConfigurationDTO {
   }
 }
 
-class CardsConfigurationDTO {
-  CardsConfigurationDTO({
+class CardConfigurationDTO {
+  CardConfigurationDTO({
     required this.holderNameRequired,
     required this.addressMode,
     required this.showStorePaymentField,
@@ -287,9 +295,9 @@ class CardsConfigurationDTO {
     ];
   }
 
-  static CardsConfigurationDTO decode(Object result) {
+  static CardConfigurationDTO decode(Object result) {
     result as List<Object?>;
-    return CardsConfigurationDTO(
+    return CardConfigurationDTO(
       holderNameRequired: result[0]! as bool,
       addressMode: AddressMode.values[result[1]! as int],
       showStorePaymentField: result[2]! as bool,
@@ -464,6 +472,7 @@ class PaymentResultModelDTO {
   PaymentResultModelDTO({
     this.sessionId,
     this.sessionData,
+    this.sessionResult,
     this.resultCode,
     this.order,
   });
@@ -471,6 +480,8 @@ class PaymentResultModelDTO {
   String? sessionId;
 
   String? sessionData;
+
+  String? sessionResult;
 
   String? resultCode;
 
@@ -480,6 +491,7 @@ class PaymentResultModelDTO {
     return <Object?>[
       sessionId,
       sessionData,
+      sessionResult,
       resultCode,
       order?.encode(),
     ];
@@ -490,9 +502,10 @@ class PaymentResultModelDTO {
     return PaymentResultModelDTO(
       sessionId: result[0] as String?,
       sessionData: result[1] as String?,
-      resultCode: result[2] as String?,
-      order: result[3] != null
-          ? OrderResponseDTO.decode(result[3]! as List<Object?>)
+      sessionResult: result[2] as String?,
+      resultCode: result[3] as String?,
+      order: result[4] != null
+          ? OrderResponseDTO.decode(result[4]! as List<Object?>)
           : null,
     );
   }
@@ -566,6 +579,39 @@ class PlatformCommunicationModel {
       data: result[1] as String?,
       paymentResult: result[2] != null
           ? PaymentResultDTO.decode(result[2]! as List<Object?>)
+          : null,
+    );
+  }
+}
+
+class ComponentCommunicationModel {
+  ComponentCommunicationModel({
+    required this.type,
+    this.data,
+    this.paymentResult,
+  });
+
+  ComponentCommunicationType type;
+
+  Object? data;
+
+  PaymentResultModelDTO? paymentResult;
+
+  Object encode() {
+    return <Object?>[
+      type.index,
+      data,
+      paymentResult?.encode(),
+    ];
+  }
+
+  static ComponentCommunicationModel decode(Object result) {
+    result as List<Object?>;
+    return ComponentCommunicationModel(
+      type: ComponentCommunicationType.values[result[0]! as int],
+      data: result[1],
+      paymentResult: result[2] != null
+          ? PaymentResultModelDTO.decode(result[2]! as List<Object?>)
           : null,
     );
   }
@@ -666,6 +712,52 @@ class DeletedStoredPaymentMethodResultDTO {
   }
 }
 
+class CardComponentConfigurationDTO {
+  CardComponentConfigurationDTO({
+    required this.environment,
+    required this.clientKey,
+    required this.countryCode,
+    required this.amount,
+    this.shopperLocale,
+    required this.cardConfiguration,
+  });
+
+  Environment environment;
+
+  String clientKey;
+
+  String countryCode;
+
+  AmountDTO amount;
+
+  String? shopperLocale;
+
+  CardConfigurationDTO cardConfiguration;
+
+  Object encode() {
+    return <Object?>[
+      environment.index,
+      clientKey,
+      countryCode,
+      amount.encode(),
+      shopperLocale,
+      cardConfiguration.encode(),
+    ];
+  }
+
+  static CardComponentConfigurationDTO decode(Object result) {
+    result as List<Object?>;
+    return CardComponentConfigurationDTO(
+      environment: Environment.values[result[0]! as int],
+      clientKey: result[1]! as String,
+      countryCode: result[2]! as String,
+      amount: AmountDTO.decode(result[3]! as List<Object?>),
+      shopperLocale: result[4] as String?,
+      cardConfiguration: CardConfigurationDTO.decode(result[5]! as List<Object?>),
+    );
+  }
+}
+
 class _CheckoutPlatformInterfaceCodec extends StandardMessageCodec {
   const _CheckoutPlatformInterfaceCodec();
   @override
@@ -679,7 +771,7 @@ class _CheckoutPlatformInterfaceCodec extends StandardMessageCodec {
     } else if (value is ApplePayConfigurationDTO) {
       buffer.putUint8(130);
       writeValue(buffer, value.encode());
-    } else if (value is CardsConfigurationDTO) {
+    } else if (value is CardConfigurationDTO) {
       buffer.putUint8(131);
       writeValue(buffer, value.encode());
     } else if (value is CashAppPayConfigurationDTO) {
@@ -718,7 +810,7 @@ class _CheckoutPlatformInterfaceCodec extends StandardMessageCodec {
       case 130: 
         return ApplePayConfigurationDTO.decode(readValue(buffer)!);
       case 131: 
-        return CardsConfigurationDTO.decode(readValue(buffer)!);
+        return CardConfigurationDTO.decode(readValue(buffer)!);
       case 132: 
         return CashAppPayConfigurationDTO.decode(readValue(buffer)!);
       case 133: 
@@ -1050,6 +1142,233 @@ abstract class CheckoutFlutterApi {
               'Argument for dev.flutter.pigeon.adyen_checkout.CheckoutFlutterApi.onDropInAdvancedFlowPlatformCommunication was null, expected non-null PlatformCommunicationModel.');
           try {
             api.onDropInAdvancedFlowPlatformCommunication(arg_platformCommunicationModel!);
+            return wrapResponse(empty: true);
+          } on PlatformException catch (e) {
+            return wrapResponse(error: e);
+          }          catch (e) {
+            return wrapResponse(error: PlatformException(code: 'error', message: e.toString()));
+          }
+        });
+      }
+    }
+  }
+}
+
+class _ComponentPlatformInterfaceCodec extends StandardMessageCodec {
+  const _ComponentPlatformInterfaceCodec();
+  @override
+  void writeValue(WriteBuffer buffer, Object? value) {
+    if (value is ErrorDTO) {
+      buffer.putUint8(128);
+      writeValue(buffer, value.encode());
+    } else if (value is PaymentFlowOutcomeDTO) {
+      buffer.putUint8(129);
+      writeValue(buffer, value.encode());
+    } else {
+      super.writeValue(buffer, value);
+    }
+  }
+
+  @override
+  Object? readValueOfType(int type, ReadBuffer buffer) {
+    switch (type) {
+      case 128: 
+        return ErrorDTO.decode(readValue(buffer)!);
+      case 129: 
+        return PaymentFlowOutcomeDTO.decode(readValue(buffer)!);
+      default:
+        return super.readValueOfType(type, buffer);
+    }
+  }
+}
+
+class ComponentPlatformInterface {
+  /// Constructor for [ComponentPlatformInterface].  The [binaryMessenger] named argument is
+  /// available for dependency injection.  If it is left null, the default
+  /// BinaryMessenger will be used which routes to the host platform.
+  ComponentPlatformInterface({BinaryMessenger? binaryMessenger})
+      : _binaryMessenger = binaryMessenger;
+  final BinaryMessenger? _binaryMessenger;
+
+  static const MessageCodec<Object?> codec = _ComponentPlatformInterfaceCodec();
+
+  Future<void> updateViewHeight(int arg_viewId) async {
+    final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
+        'dev.flutter.pigeon.adyen_checkout.ComponentPlatformInterface.updateViewHeight', codec,
+        binaryMessenger: _binaryMessenger);
+    final List<Object?>? replyList =
+        await channel.send(<Object?>[arg_viewId]) as List<Object?>?;
+    if (replyList == null) {
+      throw PlatformException(
+        code: 'channel-error',
+        message: 'Unable to establish connection on channel.',
+      );
+    } else if (replyList.length > 1) {
+      throw PlatformException(
+        code: replyList[0]! as String,
+        message: replyList[1] as String?,
+        details: replyList[2],
+      );
+    } else {
+      return;
+    }
+  }
+
+  Future<void> onPaymentsResult(PaymentFlowOutcomeDTO arg_paymentsResult) async {
+    final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
+        'dev.flutter.pigeon.adyen_checkout.ComponentPlatformInterface.onPaymentsResult', codec,
+        binaryMessenger: _binaryMessenger);
+    final List<Object?>? replyList =
+        await channel.send(<Object?>[arg_paymentsResult]) as List<Object?>?;
+    if (replyList == null) {
+      throw PlatformException(
+        code: 'channel-error',
+        message: 'Unable to establish connection on channel.',
+      );
+    } else if (replyList.length > 1) {
+      throw PlatformException(
+        code: replyList[0]! as String,
+        message: replyList[1] as String?,
+        details: replyList[2],
+      );
+    } else {
+      return;
+    }
+  }
+
+  Future<void> onPaymentsDetailsResult(PaymentFlowOutcomeDTO arg_paymentsDetailsResult) async {
+    final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
+        'dev.flutter.pigeon.adyen_checkout.ComponentPlatformInterface.onPaymentsDetailsResult', codec,
+        binaryMessenger: _binaryMessenger);
+    final List<Object?>? replyList =
+        await channel.send(<Object?>[arg_paymentsDetailsResult]) as List<Object?>?;
+    if (replyList == null) {
+      throw PlatformException(
+        code: 'channel-error',
+        message: 'Unable to establish connection on channel.',
+      );
+    } else if (replyList.length > 1) {
+      throw PlatformException(
+        code: replyList[0]! as String,
+        message: replyList[1] as String?,
+        details: replyList[2],
+      );
+    } else {
+      return;
+    }
+  }
+}
+
+class _ComponentFlutterInterfaceCodec extends StandardMessageCodec {
+  const _ComponentFlutterInterfaceCodec();
+  @override
+  void writeValue(WriteBuffer buffer, Object? value) {
+    if (value is AmountDTO) {
+      buffer.putUint8(128);
+      writeValue(buffer, value.encode());
+    } else if (value is AmountDTO) {
+      buffer.putUint8(129);
+      writeValue(buffer, value.encode());
+    } else if (value is CardComponentConfigurationDTO) {
+      buffer.putUint8(130);
+      writeValue(buffer, value.encode());
+    } else if (value is CardConfigurationDTO) {
+      buffer.putUint8(131);
+      writeValue(buffer, value.encode());
+    } else if (value is ComponentCommunicationModel) {
+      buffer.putUint8(132);
+      writeValue(buffer, value.encode());
+    } else if (value is OrderResponseDTO) {
+      buffer.putUint8(133);
+      writeValue(buffer, value.encode());
+    } else if (value is PaymentResultModelDTO) {
+      buffer.putUint8(134);
+      writeValue(buffer, value.encode());
+    } else if (value is SessionDTO) {
+      buffer.putUint8(135);
+      writeValue(buffer, value.encode());
+    } else {
+      super.writeValue(buffer, value);
+    }
+  }
+
+  @override
+  Object? readValueOfType(int type, ReadBuffer buffer) {
+    switch (type) {
+      case 128: 
+        return AmountDTO.decode(readValue(buffer)!);
+      case 129: 
+        return AmountDTO.decode(readValue(buffer)!);
+      case 130: 
+        return CardComponentConfigurationDTO.decode(readValue(buffer)!);
+      case 131: 
+        return CardConfigurationDTO.decode(readValue(buffer)!);
+      case 132: 
+        return ComponentCommunicationModel.decode(readValue(buffer)!);
+      case 133: 
+        return OrderResponseDTO.decode(readValue(buffer)!);
+      case 134: 
+        return PaymentResultModelDTO.decode(readValue(buffer)!);
+      case 135: 
+        return SessionDTO.decode(readValue(buffer)!);
+      default:
+        return super.readValueOfType(type, buffer);
+    }
+  }
+}
+
+abstract class ComponentFlutterInterface {
+  static const MessageCodec<Object?> codec = _ComponentFlutterInterfaceCodec();
+
+  void _generateCodecForDTOs(CardComponentConfigurationDTO cardComponentConfigurationDTO, SessionDTO sessionDTO);
+
+  void onComponentCommunication(ComponentCommunicationModel componentCommunicationModel);
+
+  static void setup(ComponentFlutterInterface? api, {BinaryMessenger? binaryMessenger}) {
+    {
+      final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
+          'dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface._generateCodecForDTOs', codec,
+          binaryMessenger: binaryMessenger);
+      if (api == null) {
+        channel.setMessageHandler(null);
+      } else {
+        channel.setMessageHandler((Object? message) async {
+          assert(message != null,
+          'Argument for dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface._generateCodecForDTOs was null.');
+          final List<Object?> args = (message as List<Object?>?)!;
+          final CardComponentConfigurationDTO? arg_cardComponentConfigurationDTO = (args[0] as CardComponentConfigurationDTO?);
+          assert(arg_cardComponentConfigurationDTO != null,
+              'Argument for dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface._generateCodecForDTOs was null, expected non-null CardComponentConfigurationDTO.');
+          final SessionDTO? arg_sessionDTO = (args[1] as SessionDTO?);
+          assert(arg_sessionDTO != null,
+              'Argument for dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface._generateCodecForDTOs was null, expected non-null SessionDTO.');
+          try {
+            api._generateCodecForDTOs(arg_cardComponentConfigurationDTO!, arg_sessionDTO!);
+            return wrapResponse(empty: true);
+          } on PlatformException catch (e) {
+            return wrapResponse(error: e);
+          }          catch (e) {
+            return wrapResponse(error: PlatformException(code: 'error', message: e.toString()));
+          }
+        });
+      }
+    }
+    {
+      final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
+          'dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface.onComponentCommunication', codec,
+          binaryMessenger: binaryMessenger);
+      if (api == null) {
+        channel.setMessageHandler(null);
+      } else {
+        channel.setMessageHandler((Object? message) async {
+          assert(message != null,
+          'Argument for dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface.onComponentCommunication was null.');
+          final List<Object?> args = (message as List<Object?>?)!;
+          final ComponentCommunicationModel? arg_componentCommunicationModel = (args[0] as ComponentCommunicationModel?);
+          assert(arg_componentCommunicationModel != null,
+              'Argument for dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface.onComponentCommunication was null, expected non-null ComponentCommunicationModel.');
+          try {
+            api.onComponentCommunication(arg_componentCommunicationModel!);
             return wrapResponse(empty: true);
           } on PlatformException catch (e) {
             return wrapResponse(error: e);

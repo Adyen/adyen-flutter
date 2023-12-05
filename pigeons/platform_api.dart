@@ -59,6 +59,14 @@ enum PlatformCommunicationType {
   deleteStoredPaymentMethod,
 }
 
+enum ComponentCommunicationType {
+  onSubmit,
+  additionalDetails,
+  result,
+  error,
+  resize,
+}
+
 enum PaymentFlowResultType {
   finished,
   action,
@@ -106,7 +114,7 @@ class DropInConfigurationDTO {
   final String countryCode;
   final AmountDTO amount;
   final String shopperLocale;
-  final CardsConfigurationDTO? cardsConfigurationDTO;
+  final CardConfigurationDTO? cardConfigurationDTO;
   final ApplePayConfigurationDTO? applePayConfigurationDTO;
   final GooglePayConfigurationDTO? googlePayConfigurationDTO;
   final CashAppPayConfigurationDTO? cashAppPayConfigurationDTO;
@@ -121,7 +129,7 @@ class DropInConfigurationDTO {
     this.countryCode,
     this.amount,
     this.shopperLocale,
-    this.cardsConfigurationDTO,
+    this.cardConfigurationDTO,
     this.applePayConfigurationDTO,
     this.googlePayConfigurationDTO,
     this.cashAppPayConfigurationDTO,
@@ -132,7 +140,7 @@ class DropInConfigurationDTO {
   );
 }
 
-class CardsConfigurationDTO {
+class CardConfigurationDTO {
   final bool holderNameRequired;
   final AddressMode addressMode;
   final bool showStorePaymentField;
@@ -142,7 +150,7 @@ class CardsConfigurationDTO {
   final FieldVisibility socialSecurityNumberFieldVisibility;
   final List<String?> supportedCardTypes;
 
-  CardsConfigurationDTO(
+  CardConfigurationDTO(
     this.holderNameRequired,
     this.addressMode,
     this.showStorePaymentField,
@@ -217,12 +225,14 @@ class PaymentResultDTO {
 class PaymentResultModelDTO {
   final String? sessionId;
   final String? sessionData;
+  final String? sessionResult;
   final String? resultCode;
   final OrderResponseDTO? order;
 
   PaymentResultModelDTO(
     this.sessionId,
     this.sessionData,
+    this.sessionResult,
     this.resultCode,
     this.order,
   );
@@ -248,6 +258,18 @@ class PlatformCommunicationModel {
   final PaymentResultDTO? paymentResult;
 
   PlatformCommunicationModel({
+    required this.type,
+    this.data,
+    this.paymentResult,
+  });
+}
+
+class ComponentCommunicationModel {
+  final ComponentCommunicationType type;
+  final Object? data;
+  final PaymentResultModelDTO? paymentResult;
+
+  ComponentCommunicationModel({
     required this.type,
     this.data,
     this.paymentResult,
@@ -291,6 +313,24 @@ class DeletedStoredPaymentMethodResultDTO {
   );
 }
 
+class CardComponentConfigurationDTO {
+  final Environment environment;
+  final String clientKey;
+  final String countryCode;
+  final AmountDTO amount;
+  final String? shopperLocale;
+  final CardConfigurationDTO cardConfiguration;
+
+  CardComponentConfigurationDTO(
+    this.environment,
+    this.clientKey,
+    this.countryCode,
+    this.amount,
+    this.shopperLocale,
+    this.cardConfiguration,
+  );
+}
+
 @HostApi()
 abstract class CheckoutPlatformInterface {
   @async
@@ -328,4 +368,25 @@ abstract class CheckoutFlutterApi {
 
   void onDropInAdvancedFlowPlatformCommunication(
       PlatformCommunicationModel platformCommunicationModel);
+}
+
+@HostApi()
+abstract class ComponentPlatformInterface {
+  void updateViewHeight(int viewId);
+
+  void onPaymentsResult(PaymentFlowOutcomeDTO paymentsResult);
+
+  void onPaymentsDetailsResult(PaymentFlowOutcomeDTO paymentsDetailsResult);
+}
+
+@FlutterApi()
+abstract class ComponentFlutterInterface {
+  // ignore: unused_element
+  void _generateCodecForDTOs(
+    CardComponentConfigurationDTO cardComponentConfigurationDTO,
+    SessionDTO sessionDTO,
+  );
+
+  void onComponentCommunication(
+      ComponentCommunicationModel componentCommunicationModel);
 }

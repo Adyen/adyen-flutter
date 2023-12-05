@@ -2,6 +2,8 @@ package com.adyen.adyen_checkout
 
 import CheckoutFlutterApi
 import CheckoutPlatformInterface
+import ComponentFlutterInterface
+import ComponentPlatformInterface
 import PaymentResultDTO
 import PaymentResultEnum
 import PaymentResultModelDTO
@@ -10,6 +12,9 @@ import PlatformCommunicationType
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
+import com.adyen.adyen_checkout.components.ComponentPlatformApi
+import com.adyen.adyen_checkout.components.card.advancedFlow.CardAdvancedFlowComponentFactory
+import com.adyen.adyen_checkout.components.card.session.CardSessionFlowComponentFactory
 import com.adyen.adyen_checkout.utils.ConfigurationMapper.mapToOrderResponseModel
 import com.adyen.adyen_checkout.utils.Constants.Companion.WRONG_FLUTTER_ACTIVITY_USAGE_ERROR_MESSAGE
 import com.adyen.checkout.dropin.DropIn
@@ -18,6 +23,7 @@ import com.adyen.checkout.dropin.DropInResult
 import com.adyen.checkout.dropin.SessionDropInCallback
 import com.adyen.checkout.dropin.SessionDropInResult
 import io.flutter.embedding.engine.plugins.FlutterPlugin
+import io.flutter.embedding.engine.plugins.FlutterPlugin.FlutterPluginBinding
 import io.flutter.embedding.engine.plugins.activity.ActivityAware
 import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding
 import io.flutter.embedding.engine.plugins.lifecycle.HiddenLifecycleReference
@@ -26,18 +32,27 @@ import io.flutter.embedding.engine.plugins.lifecycle.HiddenLifecycleReference
 class AdyenCheckoutPlugin : FlutterPlugin, ActivityAware {
     private var checkoutPlatformApi: CheckoutPlatformApi? = null
     private var checkoutFlutterApi: CheckoutFlutterApi? = null
+    private var componentPlatformApi: ComponentPlatformApi? = null
+    private var componentFlutterApi: ComponentFlutterInterface? = null
     private var lifecycleReference: HiddenLifecycleReference? = null
     private var lifecycleObserver: LifecycleEventObserver? = null
+    private var flutterPluginBinding: FlutterPluginBinding? = null
 
-    override fun onAttachedToEngine(flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
+    override fun onAttachedToEngine(flutterPluginBinding: FlutterPluginBinding) {
+        this.flutterPluginBinding = flutterPluginBinding
         checkoutFlutterApi = CheckoutFlutterApi(flutterPluginBinding.binaryMessenger)
         checkoutPlatformApi = CheckoutPlatformApi(checkoutFlutterApi)
+        componentFlutterApi = ComponentFlutterInterface(flutterPluginBinding.binaryMessenger)
+        componentPlatformApi = ComponentPlatformApi()
         CheckoutPlatformInterface.setUp(flutterPluginBinding.binaryMessenger, checkoutPlatformApi)
+        ComponentPlatformInterface.setUp(flutterPluginBinding.binaryMessenger, componentPlatformApi)
     }
 
-    override fun onDetachedFromEngine(binding: FlutterPlugin.FlutterPluginBinding) {
+    override fun onDetachedFromEngine(binding: FlutterPluginBinding) {
         CheckoutPlatformInterface.setUp(binding.binaryMessenger, null)
+        ComponentPlatformInterface.setUp(binding.binaryMessenger, null)
         checkoutFlutterApi = null
+        componentFlutterApi = null
     }
 
     override fun onAttachedToActivity(binding: ActivityPluginBinding) = setupActivity(binding)
@@ -61,6 +76,16 @@ class AdyenCheckoutPlugin : FlutterPlugin, ActivityAware {
         lifecycleObserver = lifecycleEventObserver(fragmentActivity)
         lifecycleObserver?.let {
             lifecycleReference?.lifecycle?.addObserver(it)
+        }
+
+        componentFlutterApi?.let {
+            flutterPluginBinding?.platformViewRegistry?.registerViewFactory(
+                "cardComponentAdvancedFlow", CardAdvancedFlowComponentFactory(fragmentActivity, it)
+            )
+
+            flutterPluginBinding?.platformViewRegistry?.registerViewFactory(
+                "cardComponentSessionFlow", CardSessionFlowComponentFactory(fragmentActivity, it)
+            )
         }
     }
 
@@ -101,6 +126,7 @@ class AdyenCheckoutPlugin : FlutterPlugin, ActivityAware {
                     PaymentResultModelDTO(
                         sessionId,
                         sessionData,
+                        sessionResult,
                         resultCode,
                         order?.mapToOrderResponseModel()
                     )

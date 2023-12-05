@@ -17,12 +17,12 @@ class Config {
   //Environment constants
   static const String merchantAccount = "TestMerchantCheckout";
   static const String merchantName = "Test Merchant";
-  static const String countryCode = "NL";
-  static const String shopperLocale = "nl_NL";
+  static const String countryCode = "BE";
+  static const String shopperLocale = "be_BE";
   static const String shopperReference = "Test reference";
   static const Environment environment = Environment.test;
   static const String baseUrl = "checkout-test.adyen.com";
-  static const String apiVersion = "v70";
+  static const String apiVersion = "v71";
   static const String iOSReturnUrl = "flutter-ui-host://payments";
 
   //Example data

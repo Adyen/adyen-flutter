@@ -18,13 +18,14 @@
                  to determine the Window background behind the Flutter UI. -->
             <meta-data
                 android:name="io.flutter.embedding.android.NormalTheme"
-                android:resource="@style/NormalTheme" />
+                android:resource="@style/AppTheme" />
 
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
 
+            <!-- Add this intent filter to your activity that implements the FlutterFragmentActivity -->
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
 

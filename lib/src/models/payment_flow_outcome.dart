@@ -18,8 +18,8 @@ class Error extends PaymentFlowOutcome {
   final bool dismissDropIn;
 
   Error({
-    this.errorMessage,
-    this.reason,
+    required this.errorMessage,
+    this.reason = "",
     this.dismissDropIn = false,
   });
 }

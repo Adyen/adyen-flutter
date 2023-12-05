@@ -3,7 +3,7 @@ class ApplePayConfiguration {
   final String merchantName;
   final bool allowOnboarding;
 
-  ApplePayConfiguration({
+  const ApplePayConfiguration({
     required this.merchantId,
     required this.merchantName,
     this.allowOnboarding = false,

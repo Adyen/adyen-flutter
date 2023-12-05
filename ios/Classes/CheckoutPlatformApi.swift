@@ -39,7 +39,7 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
             self.viewController = viewController
             dropInSessionDelegate = DropInSessionsDelegate(viewController: viewController, checkoutFlutterApi: checkoutFlutterApi)
             dropInSessionPresentationDelegate = DropInSessionsPresentationDelegate()
-            let adyenContext = try createAdyenContext(dropInConfiguration: dropInConfigurationDTO)
+            let adyenContext = try dropInConfigurationDTO.createAdyenContext()
             let sessionConfiguration = AdyenSession.Configuration(sessionIdentifier: session.id,
                                                                   initialSessionData: session.sessionData,
                                                                   context: adyenContext)
@@ -83,7 +83,7 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
                 return
             }
             self.viewController = viewController
-            let adyenContext = try createAdyenContext(dropInConfiguration: dropInConfigurationDTO)
+            let adyenContext = try dropInConfigurationDTO.createAdyenContext()
             let paymentMethods = try jsonDecoder.decode(PaymentMethods.self, from: Data(paymentMethodsResponse.utf8))
             let paymentMethodsWithoutGiftCards = removeGiftCardPaymentMethods(paymentMethods: paymentMethods)
             let configuration = try configurationMapper.createDropInConfiguration(dropInConfigurationDTO: dropInConfigurationDTO)
@@ -153,32 +153,6 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
         return rootViewController
     }
 
-    private func createAdyenContext(dropInConfiguration: DropInConfigurationDTO) throws -> AdyenContext {
-        let environment = mapToEnvironment(environment: dropInConfiguration.environment)
-        let apiContext = try APIContext(environment: environment, clientKey: dropInConfiguration.clientKey)
-        let value = Int(dropInConfiguration.amount.value)
-        let currencyCode = dropInConfiguration.amount.currency
-        let amount = Adyen.Amount(value: value, currencyCode: currencyCode)
-        return AdyenContext(apiContext: apiContext, payment: Payment(amount: amount, countryCode: dropInConfiguration.countryCode))
-    }
-
-    private func mapToEnvironment(environment: Environment) -> Adyen.Environment {
-        switch environment {
-        case .test:
-            return Adyen.Environment.test
-        case .europe:
-            return .liveEurope
-        case .unitedStates:
-            return .liveUnitedStates
-        case .australia:
-            return .liveAustralia
-        case .india:
-            return .liveIndia
-        case .apse:
-            return .liveApse
-        }
-    }
-
     private func handlePaymentFlowOutcome(paymentFlowOutcomeDTO: PaymentFlowOutcomeDTO) {
         switch paymentFlowOutcomeDTO.paymentFlowResultType {
         case .finished:
@@ -193,7 +167,7 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
     private func onDropInResultFinished(paymentFlowOutcome: PaymentFlowOutcomeDTO) {
         let resultCode = ResultCode(rawValue: paymentFlowOutcome.result ?? "")
         let success = resultCode == .authorised || resultCode == .received || resultCode == .pending
-        finalizeAndDismiss(success: true, completion: { [weak self] in
+        finalizeAndDismiss(success: success, completion: { [weak self] in
             let paymentResult = PaymentResultDTO(type: PaymentResultEnum.finished, result: PaymentResultModelDTO(resultCode: resultCode?.rawValue))
             self?.checkoutFlutterApi.onDropInAdvancedFlowPlatformCommunication(platformCommunicationModel: PlatformCommunicationModel(type: PlatformCommunicationType.result, paymentResult: paymentResult), completion: { _ in })
         })
@@ -242,8 +216,8 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
     }
 }
 
-extension CheckoutPlatformApi : DropInInteractorDelegate {
-    func finalizeAndDismiss(success: Bool,  completion: @escaping (() -> Void)) {
+extension CheckoutPlatformApi: DropInInteractorDelegate {
+    func finalizeAndDismiss(success: Bool, completion: @escaping (() -> Void)) {
         dropInComponent?.finalizeIfNeeded(with: success) { [weak self] in
             self?.viewController?.dismiss(animated: true, completion: {
                 completion()

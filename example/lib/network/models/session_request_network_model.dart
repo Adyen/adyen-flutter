@@ -47,6 +47,30 @@ class SessionRequestNetworkModel {
   String toRawJson() => json.encode(toJson());
 
   Map<String, dynamic> toJson() {
+    // ignore: unused_local_variable
+    Map<String, dynamic> installmentOptions = json.decode("""{
+        "visa": {
+                "plans": [
+                    "regular"
+                ],
+                "values": [
+                    2,
+                    4
+                ]
+            },
+        "mc": {
+            "values": [
+                2,
+                3,
+                5
+            ],
+            "plans": [
+                "regular",
+                "revolving"
+            ]
+        }
+    }""");
+
     final Map<String, dynamic> data = <String, dynamic>{};
     data['merchantAccount'] = merchantAccount;
     data['amount'] = amount.toJson();
@@ -66,6 +90,7 @@ class SessionRequestNetworkModel {
     data['deliveryAddress'] = deliveryAddress?.toJson();
     data['lineItems'] =
         lineItems?.map((lineItem) => lineItem.toJson()).toList();
+    // data['installmentOptions'] = installmentOptions;
     return data;
   }
 }
