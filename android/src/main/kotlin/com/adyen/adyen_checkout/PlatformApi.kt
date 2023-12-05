@@ -225,22 +225,22 @@ data class AmountDTO (
 
 /** Generated class from Pigeon that represents data sent in messages. */
 data class AnalyticsOptionsDTO (
-  val enabled: Boolean? = null,
-  val payload: String? = null
+  val enabled: Boolean,
+  val version: String
 
 ) {
   companion object {
     @Suppress("UNCHECKED_CAST")
     fun fromList(list: List<Any?>): AnalyticsOptionsDTO {
-      val enabled = list[0] as Boolean?
-      val payload = list[1] as String?
-      return AnalyticsOptionsDTO(enabled, payload)
+      val enabled = list[0] as Boolean
+      val version = list[1] as String
+      return AnalyticsOptionsDTO(enabled, version)
     }
   }
   fun toList(): List<Any?> {
     return listOf<Any?>(
       enabled,
-      payload,
+      version,
     )
   }
 }
@@ -256,7 +256,7 @@ data class DropInConfigurationDTO (
   val applePayConfigurationDTO: ApplePayConfigurationDTO? = null,
   val googlePayConfigurationDTO: GooglePayConfigurationDTO? = null,
   val cashAppPayConfigurationDTO: CashAppPayConfigurationDTO? = null,
-  val analyticsOptionsDTO: AnalyticsOptionsDTO? = null,
+  val analyticsOptionsDTO: AnalyticsOptionsDTO,
   val showPreselectedStoredPaymentMethod: Boolean,
   val skipListWhenSinglePaymentMethod: Boolean,
   val isRemoveStoredPaymentMethodEnabled: Boolean
@@ -282,9 +282,7 @@ data class DropInConfigurationDTO (
       val cashAppPayConfigurationDTO: CashAppPayConfigurationDTO? = (list[8] as List<Any?>?)?.let {
         CashAppPayConfigurationDTO.fromList(it)
       }
-      val analyticsOptionsDTO: AnalyticsOptionsDTO? = (list[9] as List<Any?>?)?.let {
-        AnalyticsOptionsDTO.fromList(it)
-      }
+      val analyticsOptionsDTO = AnalyticsOptionsDTO.fromList(list[9] as List<Any?>)
       val showPreselectedStoredPaymentMethod = list[10] as Boolean
       val skipListWhenSinglePaymentMethod = list[11] as Boolean
       val isRemoveStoredPaymentMethodEnabled = list[12] as Boolean
@@ -302,7 +300,7 @@ data class DropInConfigurationDTO (
       applePayConfigurationDTO?.toList(),
       googlePayConfigurationDTO?.toList(),
       cashAppPayConfigurationDTO?.toList(),
-      analyticsOptionsDTO?.toList(),
+      analyticsOptionsDTO.toList(),
       showPreselectedStoredPaymentMethod,
       skipListWhenSinglePaymentMethod,
       isRemoveStoredPaymentMethodEnabled,
@@ -675,7 +673,8 @@ data class CardComponentConfigurationDTO (
   val countryCode: String,
   val amount: AmountDTO,
   val shopperLocale: String? = null,
-  val cardConfiguration: CardConfigurationDTO
+  val cardConfiguration: CardConfigurationDTO,
+  val analyticsOptionsDTO: AnalyticsOptionsDTO
 
 ) {
   companion object {
@@ -687,7 +686,8 @@ data class CardComponentConfigurationDTO (
       val amount = AmountDTO.fromList(list[3] as List<Any?>)
       val shopperLocale = list[4] as String?
       val cardConfiguration = CardConfigurationDTO.fromList(list[5] as List<Any?>)
-      return CardComponentConfigurationDTO(environment, clientKey, countryCode, amount, shopperLocale, cardConfiguration)
+      val analyticsOptionsDTO = AnalyticsOptionsDTO.fromList(list[6] as List<Any?>)
+      return CardComponentConfigurationDTO(environment, clientKey, countryCode, amount, shopperLocale, cardConfiguration, analyticsOptionsDTO)
     }
   }
   fun toList(): List<Any?> {
@@ -698,6 +698,7 @@ data class CardComponentConfigurationDTO (
       amount.toList(),
       shopperLocale,
       cardConfiguration.toList(),
+      analyticsOptionsDTO.toList(),
     )
   }
 }
@@ -1303,30 +1304,35 @@ private object ComponentFlutterInterfaceCodec : StandardMessageCodec() {
       }
       130.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          CardComponentConfigurationDTO.fromList(it)
+          AnalyticsOptionsDTO.fromList(it)
         }
       }
       131.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          CardConfigurationDTO.fromList(it)
+          CardComponentConfigurationDTO.fromList(it)
         }
       }
       132.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          ComponentCommunicationModel.fromList(it)
+          CardConfigurationDTO.fromList(it)
         }
       }
       133.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          OrderResponseDTO.fromList(it)
+          ComponentCommunicationModel.fromList(it)
         }
       }
       134.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          PaymentResultModelDTO.fromList(it)
+          OrderResponseDTO.fromList(it)
         }
       }
       135.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          PaymentResultModelDTO.fromList(it)
+        }
+      }
+      136.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
           SessionDTO.fromList(it)
         }
@@ -1344,28 +1350,32 @@ private object ComponentFlutterInterfaceCodec : StandardMessageCodec() {
         stream.write(129)
         writeValue(stream, value.toList())
       }
-      is CardComponentConfigurationDTO -> {
+      is AnalyticsOptionsDTO -> {
         stream.write(130)
         writeValue(stream, value.toList())
       }
-      is CardConfigurationDTO -> {
+      is CardComponentConfigurationDTO -> {
         stream.write(131)
         writeValue(stream, value.toList())
       }
-      is ComponentCommunicationModel -> {
+      is CardConfigurationDTO -> {
         stream.write(132)
         writeValue(stream, value.toList())
       }
-      is OrderResponseDTO -> {
+      is ComponentCommunicationModel -> {
         stream.write(133)
         writeValue(stream, value.toList())
       }
-      is PaymentResultModelDTO -> {
+      is OrderResponseDTO -> {
         stream.write(134)
         writeValue(stream, value.toList())
       }
-      is SessionDTO -> {
+      is PaymentResultModelDTO -> {
         stream.write(135)
+        writeValue(stream, value.toList())
+      }
+      is SessionDTO -> {
+        stream.write(136)
         writeValue(stream, value.toList())
       }
       else -> super.writeValue(stream, value)

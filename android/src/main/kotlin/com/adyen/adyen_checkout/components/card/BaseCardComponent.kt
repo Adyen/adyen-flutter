@@ -19,6 +19,7 @@ import com.adyen.adyen_checkout.components.ComponentErrorMessenger
 import com.adyen.adyen_checkout.components.ComponentHeightMessenger
 import com.adyen.adyen_checkout.components.ComponentResultMessenger
 import com.adyen.adyen_checkout.components.ComponentWrapperView
+import com.adyen.adyen_checkout.utils.ConfigurationMapper.mapToAnalyticsConfiguration
 import com.adyen.adyen_checkout.utils.ConfigurationMapper.toNativeModel
 import com.adyen.checkout.card.CardComponent
 import com.adyen.checkout.redirect.RedirectComponent
@@ -40,7 +41,8 @@ abstract class BaseCardComponent(
         "${configuration.shopperLocale}",
         context,
         environment,
-        configuration.clientKey
+        configuration.clientKey,
+        configuration.analyticsOptionsDTO.mapToAnalyticsConfiguration()
     )
 
     lateinit var cardComponent: CardComponent
