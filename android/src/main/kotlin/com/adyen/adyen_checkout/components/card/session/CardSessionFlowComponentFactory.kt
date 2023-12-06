@@ -13,7 +13,7 @@ class CardSessionFlowComponentFactory(
     private val sessionHolder: SessionHolder,
 ) : PlatformViewFactory(ComponentFlutterInterface.codec) {
     override fun create(context: Context, viewId: Int, args: Any?): PlatformView {
-        val creationParams = args as Map<*, *>?
+        val creationParams = args as Map<*, *>? ?: emptyMap<Any, Any>()
         return CardSessionFlowComponent(activity, componentFlutterApi, sessionHolder, context, viewId, creationParams)
     }
 }
