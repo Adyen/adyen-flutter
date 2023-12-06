@@ -29,8 +29,8 @@ class CardAdvancedFlowComponent: BaseCardComponent {
 
     private func setupCardComponentView() {
         do {
-            cardComponent = try setupCardComponent()
-            showCardComponent()
+            let cardComponent = try setupCardComponent()
+            showCardComponent(cardComponent: cardComponent)
             componentPlatformApi.onActionCallback = { [weak self] jsonActionResponse in
                 self?.onAction(actionResponse: jsonActionResponse)
             }

@@ -56,13 +56,14 @@ class BaseCardComponent: NSObject, FlutterPlatformView, UIScrollViewDelegate {
         return rootViewController
     }
 
-    func showCardComponent() {
+    func showCardComponent(cardComponent: CardComponent) {
+        self.cardComponent = cardComponent
         if isStoredPaymentMethod {
-            guard let storedCardViewController = cardComponent?.viewController else { return }
+            let storedCardViewController = cardComponent.viewController
             attachActivityIndicator()
             getViewController()?.presentViewController(storedCardViewController, animated: true)
         } else {
-            guard let cardView = cardComponent?.viewController.view else { return }
+            guard let cardView = cardComponent.viewController.view else { return }
             attachCardView(cardView: cardView)
         }
     }

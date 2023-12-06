@@ -30,8 +30,8 @@ class CardSessionFlowComponent: BaseCardComponent {
 
     private func setupCardComponentView() {
         do {
-            cardComponent = try setupCardComponent()
-            showCardComponent()
+            let cardComponent = try setupCardComponent()
+            showCardComponent(cardComponent: cardComponent)
         } catch {
             sendErrorToFlutterLayer(errorMessage: error.localizedDescription)
         }
@@ -58,6 +58,6 @@ class CardSessionFlowComponent: BaseCardComponent {
     }
 
     private func setupFinalizeComponentCallback() {
-        (sessionHolder.sessionDelegate as? CardSessionFlowDelegate)?.finalizeAndDismiss = finalizeAndDismiss
+        (sessionHolder.sessionDelegate as? CardSessionFlowDelegate)?.finalizeAndDismissHandler = finalizeAndDismiss
     }
 }
