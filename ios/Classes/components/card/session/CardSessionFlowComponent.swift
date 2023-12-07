@@ -62,14 +62,8 @@ class CardSessionFlowComponent: BaseCardComponent {
     
     func finalizeAndDismissSessionComponent(success: Bool, completion: @escaping (() -> Void)) {
         finalizeAndDismiss(success: success, completion: { [weak self] in
-            self?.cleanUp()
+            self?.sessionHolder.reset()
             completion()
         })
-    }
-    
-    private func cleanUp() {
-        sessionHolder.sessionDelegate = nil
-        sessionHolder.sessionPresentationDelegate = nil
-        sessionHolder.session = nil
     }
 }

@@ -4,7 +4,7 @@ import AdyenNetworking
 import Flutter
 
 class CardAdvancedFlowComponent: BaseCardComponent {
-    private var actionComponentDelegate: ActionComponentDelegate?
+    private let actionComponentDelegate: ActionComponentDelegate
     private var actionComponent: AdyenActionComponent?
     private var presentationDelegate: PresentationDelegate?
     private var cardDelegate: PaymentComponentDelegate?
@@ -81,17 +81,10 @@ class CardAdvancedFlowComponent: BaseCardComponent {
             let resultCode = ResultCode(rawValue: paymentFlowOutcome.result ?? "")
             let success = resultCode == .authorised || resultCode == .received || resultCode == .pending
             self?.finalizeAndDismiss(success: success, completion: { [weak self] in
-                self?.cleanUp()
                 let componentCommunicationModel = ComponentCommunicationModel(type: ComponentCommunicationType.result, paymentResult: PaymentResultModelDTO(resultCode: resultCode?.rawValue))
                 self?.componentFlutterApi.onComponentCommunication(componentCommunicationModel: componentCommunicationModel, completion: { _ in })
             })
         }
     }
     
-    private func cleanUp() {
-        presentationDelegate = nil
-        cardDelegate = nil
-        actionComponentDelegate = nil
-        actionComponent = nil
-    }
 }
