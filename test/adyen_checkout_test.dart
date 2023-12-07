@@ -44,6 +44,19 @@ class MockAdyenCheckoutPlatform
 
   @override
   Future<void> cleanUpDropIn() async {}
+
+  @override
+  Future<SessionDTO> createSession(
+    String sessionId,
+    String sessionData,
+    dynamic configuration,
+  ) async {
+    return SessionDTO(
+      id: "id",
+      sessionData: "sessionData",
+      paymentMethodsJson: "",
+    );
+  }
 }
 
 void main() {

@@ -20,16 +20,20 @@ class CardSessionFlowWidget extends StatefulWidget {
     super.key,
     required this.cardComponentConfiguration,
     required this.session,
+    required this.paymentMethod,
     required this.onPaymentResult,
     required this.initialViewHeight,
+    required this.isStoredPaymentMethod,
     this.gestureRecognizers,
     AdyenLogger? adyenLogger,
   }) : adyenLogger = adyenLogger ?? AdyenLogger();
 
   final CardComponentConfigurationDTO cardComponentConfiguration;
   final SessionDTO session;
+  final String paymentMethod;
   final Future<void> Function(PaymentResult) onPaymentResult;
   final double initialViewHeight;
+  final bool isStoredPaymentMethod;
   final Set<Factory<OneSequenceGestureRecognizer>>? gestureRecognizers;
   final AdyenLogger adyenLogger;
 
@@ -108,6 +112,9 @@ class _CardSessionFlowWidgetState extends State<CardSessionFlowWidget> {
       Constants.sessionKey: widget.session,
       Constants.cardComponentConfigurationKey:
           widget.cardComponentConfiguration,
+      Constants.paymentMethodKey: widget.paymentMethod,
+      Constants.isStoredPaymentMethodKey: widget.isStoredPaymentMethod,
+
     };
 
     switch (defaultTargetPlatform) {

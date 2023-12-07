@@ -110,20 +110,24 @@ enum FieldVisibility: Int {
 struct SessionDTO {
   var id: String
   var sessionData: String
+  var paymentMethodsJson: String
 
   static func fromList(_ list: [Any?]) -> SessionDTO? {
     let id = list[0] as! String
     let sessionData = list[1] as! String
+    let paymentMethodsJson = list[2] as! String
 
     return SessionDTO(
       id: id,
-      sessionData: sessionData
+      sessionData: sessionData,
+      paymentMethodsJson: paymentMethodsJson
     )
   }
   func toList() -> [Any?] {
     return [
       id,
       sessionData,
+      paymentMethodsJson,
     ]
   }
 }
@@ -694,20 +698,32 @@ private class CheckoutPlatformInterfaceCodecReader: FlutterStandardReader {
       case 130:
         return ApplePayConfigurationDTO.fromList(self.readValue() as! [Any?])
       case 131:
-        return CardConfigurationDTO.fromList(self.readValue() as! [Any?])
+        return CardComponentConfigurationDTO.fromList(self.readValue() as! [Any?])
       case 132:
-        return CashAppPayConfigurationDTO.fromList(self.readValue() as! [Any?])
+        return CardConfigurationDTO.fromList(self.readValue() as! [Any?])
       case 133:
-        return DeletedStoredPaymentMethodResultDTO.fromList(self.readValue() as! [Any?])
+        return CashAppPayConfigurationDTO.fromList(self.readValue() as! [Any?])
       case 134:
-        return DropInConfigurationDTO.fromList(self.readValue() as! [Any?])
+        return ComponentCommunicationModel.fromList(self.readValue() as! [Any?])
       case 135:
-        return ErrorDTO.fromList(self.readValue() as! [Any?])
+        return DeletedStoredPaymentMethodResultDTO.fromList(self.readValue() as! [Any?])
       case 136:
-        return GooglePayConfigurationDTO.fromList(self.readValue() as! [Any?])
+        return DropInConfigurationDTO.fromList(self.readValue() as! [Any?])
       case 137:
-        return PaymentFlowOutcomeDTO.fromList(self.readValue() as! [Any?])
+        return ErrorDTO.fromList(self.readValue() as! [Any?])
       case 138:
+        return GooglePayConfigurationDTO.fromList(self.readValue() as! [Any?])
+      case 139:
+        return OrderResponseDTO.fromList(self.readValue() as! [Any?])
+      case 140:
+        return PaymentFlowOutcomeDTO.fromList(self.readValue() as! [Any?])
+      case 141:
+        return PaymentResultDTO.fromList(self.readValue() as! [Any?])
+      case 142:
+        return PaymentResultModelDTO.fromList(self.readValue() as! [Any?])
+      case 143:
+        return PlatformCommunicationModel.fromList(self.readValue() as! [Any?])
+      case 144:
         return SessionDTO.fromList(self.readValue() as! [Any?])
       default:
         return super.readValue(ofType: type)
@@ -726,29 +742,47 @@ private class CheckoutPlatformInterfaceCodecWriter: FlutterStandardWriter {
     } else if let value = value as? ApplePayConfigurationDTO {
       super.writeByte(130)
       super.writeValue(value.toList())
-    } else if let value = value as? CardConfigurationDTO {
+    } else if let value = value as? CardComponentConfigurationDTO {
       super.writeByte(131)
       super.writeValue(value.toList())
-    } else if let value = value as? CashAppPayConfigurationDTO {
+    } else if let value = value as? CardConfigurationDTO {
       super.writeByte(132)
       super.writeValue(value.toList())
-    } else if let value = value as? DeletedStoredPaymentMethodResultDTO {
+    } else if let value = value as? CashAppPayConfigurationDTO {
       super.writeByte(133)
       super.writeValue(value.toList())
-    } else if let value = value as? DropInConfigurationDTO {
+    } else if let value = value as? ComponentCommunicationModel {
       super.writeByte(134)
       super.writeValue(value.toList())
-    } else if let value = value as? ErrorDTO {
+    } else if let value = value as? DeletedStoredPaymentMethodResultDTO {
       super.writeByte(135)
       super.writeValue(value.toList())
-    } else if let value = value as? GooglePayConfigurationDTO {
+    } else if let value = value as? DropInConfigurationDTO {
       super.writeByte(136)
       super.writeValue(value.toList())
-    } else if let value = value as? PaymentFlowOutcomeDTO {
+    } else if let value = value as? ErrorDTO {
       super.writeByte(137)
       super.writeValue(value.toList())
-    } else if let value = value as? SessionDTO {
+    } else if let value = value as? GooglePayConfigurationDTO {
       super.writeByte(138)
+      super.writeValue(value.toList())
+    } else if let value = value as? OrderResponseDTO {
+      super.writeByte(139)
+      super.writeValue(value.toList())
+    } else if let value = value as? PaymentFlowOutcomeDTO {
+      super.writeByte(140)
+      super.writeValue(value.toList())
+    } else if let value = value as? PaymentResultDTO {
+      super.writeByte(141)
+      super.writeValue(value.toList())
+    } else if let value = value as? PaymentResultModelDTO {
+      super.writeByte(142)
+      super.writeValue(value.toList())
+    } else if let value = value as? PlatformCommunicationModel {
+      super.writeByte(143)
+      super.writeValue(value.toList())
+    } else if let value = value as? SessionDTO {
+      super.writeByte(144)
       super.writeValue(value.toList())
     } else {
       super.writeValue(value)
@@ -774,6 +808,7 @@ class CheckoutPlatformInterfaceCodec: FlutterStandardMessageCodec {
 protocol CheckoutPlatformInterface {
   func getPlatformVersion(completion: @escaping (Result<String, Error>) -> Void)
   func getReturnUrl(completion: @escaping (Result<String, Error>) -> Void)
+  func createSession(sessionId: String, sessionData: String, configuration: Any?, completion: @escaping (Result<SessionDTO, Error>) -> Void)
   func startDropInSessionPayment(dropInConfigurationDTO: DropInConfigurationDTO, session: SessionDTO) throws
   func startDropInAdvancedFlowPayment(dropInConfigurationDTO: DropInConfigurationDTO, paymentMethodsResponse: String) throws
   func onPaymentsResult(paymentsResult: PaymentFlowOutcomeDTO) throws
@@ -818,6 +853,25 @@ class CheckoutPlatformInterfaceSetup {
       }
     } else {
       getReturnUrlChannel.setMessageHandler(nil)
+    }
+    let createSessionChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.createSession", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      createSessionChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let sessionIdArg = args[0] as! String
+        let sessionDataArg = args[1] as! String
+        let configurationArg: Any? = args[2]
+        api.createSession(sessionId: sessionIdArg, sessionData: sessionDataArg, configuration: configurationArg) { result in
+          switch result {
+            case .success(let res):
+              reply(wrapResult(res))
+            case .failure(let error):
+              reply(wrapError(error))
+          }
+        }
+      }
+    } else {
+      createSessionChannel.setMessageHandler(nil)
     }
     let startDropInSessionPaymentChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.startDropInSessionPayment", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {

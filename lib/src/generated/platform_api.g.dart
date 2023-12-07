@@ -89,16 +89,20 @@ class SessionDTO {
   SessionDTO({
     required this.id,
     required this.sessionData,
+    required this.paymentMethodsJson,
   });
 
   String id;
 
   String sessionData;
 
+  String paymentMethodsJson;
+
   Object encode() {
     return <Object?>[
       id,
       sessionData,
+      paymentMethodsJson,
     ];
   }
 
@@ -107,6 +111,7 @@ class SessionDTO {
     return SessionDTO(
       id: result[0]! as String,
       sessionData: result[1]! as String,
+      paymentMethodsJson: result[2]! as String,
     );
   }
 }
@@ -771,29 +776,47 @@ class _CheckoutPlatformInterfaceCodec extends StandardMessageCodec {
     } else if (value is ApplePayConfigurationDTO) {
       buffer.putUint8(130);
       writeValue(buffer, value.encode());
-    } else if (value is CardConfigurationDTO) {
+    } else if (value is CardComponentConfigurationDTO) {
       buffer.putUint8(131);
       writeValue(buffer, value.encode());
-    } else if (value is CashAppPayConfigurationDTO) {
+    } else if (value is CardConfigurationDTO) {
       buffer.putUint8(132);
       writeValue(buffer, value.encode());
-    } else if (value is DeletedStoredPaymentMethodResultDTO) {
+    } else if (value is CashAppPayConfigurationDTO) {
       buffer.putUint8(133);
       writeValue(buffer, value.encode());
-    } else if (value is DropInConfigurationDTO) {
+    } else if (value is ComponentCommunicationModel) {
       buffer.putUint8(134);
       writeValue(buffer, value.encode());
-    } else if (value is ErrorDTO) {
+    } else if (value is DeletedStoredPaymentMethodResultDTO) {
       buffer.putUint8(135);
       writeValue(buffer, value.encode());
-    } else if (value is GooglePayConfigurationDTO) {
+    } else if (value is DropInConfigurationDTO) {
       buffer.putUint8(136);
       writeValue(buffer, value.encode());
-    } else if (value is PaymentFlowOutcomeDTO) {
+    } else if (value is ErrorDTO) {
       buffer.putUint8(137);
       writeValue(buffer, value.encode());
-    } else if (value is SessionDTO) {
+    } else if (value is GooglePayConfigurationDTO) {
       buffer.putUint8(138);
+      writeValue(buffer, value.encode());
+    } else if (value is OrderResponseDTO) {
+      buffer.putUint8(139);
+      writeValue(buffer, value.encode());
+    } else if (value is PaymentFlowOutcomeDTO) {
+      buffer.putUint8(140);
+      writeValue(buffer, value.encode());
+    } else if (value is PaymentResultDTO) {
+      buffer.putUint8(141);
+      writeValue(buffer, value.encode());
+    } else if (value is PaymentResultModelDTO) {
+      buffer.putUint8(142);
+      writeValue(buffer, value.encode());
+    } else if (value is PlatformCommunicationModel) {
+      buffer.putUint8(143);
+      writeValue(buffer, value.encode());
+    } else if (value is SessionDTO) {
+      buffer.putUint8(144);
       writeValue(buffer, value.encode());
     } else {
       super.writeValue(buffer, value);
@@ -810,20 +833,32 @@ class _CheckoutPlatformInterfaceCodec extends StandardMessageCodec {
       case 130: 
         return ApplePayConfigurationDTO.decode(readValue(buffer)!);
       case 131: 
-        return CardConfigurationDTO.decode(readValue(buffer)!);
+        return CardComponentConfigurationDTO.decode(readValue(buffer)!);
       case 132: 
-        return CashAppPayConfigurationDTO.decode(readValue(buffer)!);
+        return CardConfigurationDTO.decode(readValue(buffer)!);
       case 133: 
-        return DeletedStoredPaymentMethodResultDTO.decode(readValue(buffer)!);
+        return CashAppPayConfigurationDTO.decode(readValue(buffer)!);
       case 134: 
-        return DropInConfigurationDTO.decode(readValue(buffer)!);
+        return ComponentCommunicationModel.decode(readValue(buffer)!);
       case 135: 
-        return ErrorDTO.decode(readValue(buffer)!);
+        return DeletedStoredPaymentMethodResultDTO.decode(readValue(buffer)!);
       case 136: 
-        return GooglePayConfigurationDTO.decode(readValue(buffer)!);
+        return DropInConfigurationDTO.decode(readValue(buffer)!);
       case 137: 
-        return PaymentFlowOutcomeDTO.decode(readValue(buffer)!);
+        return ErrorDTO.decode(readValue(buffer)!);
       case 138: 
+        return GooglePayConfigurationDTO.decode(readValue(buffer)!);
+      case 139: 
+        return OrderResponseDTO.decode(readValue(buffer)!);
+      case 140: 
+        return PaymentFlowOutcomeDTO.decode(readValue(buffer)!);
+      case 141: 
+        return PaymentResultDTO.decode(readValue(buffer)!);
+      case 142: 
+        return PaymentResultModelDTO.decode(readValue(buffer)!);
+      case 143: 
+        return PlatformCommunicationModel.decode(readValue(buffer)!);
+      case 144: 
         return SessionDTO.decode(readValue(buffer)!);
       default:
         return super.readValueOfType(type, buffer);
@@ -892,6 +927,33 @@ class CheckoutPlatformInterface {
       );
     } else {
       return (replyList[0] as String?)!;
+    }
+  }
+
+  Future<SessionDTO> createSession(String arg_sessionId, String arg_sessionData, Object? arg_configuration) async {
+    final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
+        'dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.createSession', codec,
+        binaryMessenger: _binaryMessenger);
+    final List<Object?>? replyList =
+        await channel.send(<Object?>[arg_sessionId, arg_sessionData, arg_configuration]) as List<Object?>?;
+    if (replyList == null) {
+      throw PlatformException(
+        code: 'channel-error',
+        message: 'Unable to establish connection on channel.',
+      );
+    } else if (replyList.length > 1) {
+      throw PlatformException(
+        code: replyList[0]! as String,
+        message: replyList[1] as String?,
+        details: replyList[2],
+      );
+    } else if (replyList[0] == null) {
+      throw PlatformException(
+        code: 'null-error',
+        message: 'Host platform returned null value for non-null return value.',
+      );
+    } else {
+      return (replyList[0] as SessionDTO?)!;
     }
   }
 

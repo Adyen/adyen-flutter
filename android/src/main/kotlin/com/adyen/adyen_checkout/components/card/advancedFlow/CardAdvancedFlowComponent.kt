@@ -15,7 +15,8 @@ import com.adyen.adyen_checkout.components.ComponentErrorMessenger
 import com.adyen.adyen_checkout.components.ComponentResultMessenger
 import com.adyen.adyen_checkout.components.card.BaseCardComponent
 import com.adyen.checkout.card.CardComponent
-import com.adyen.checkout.components.core.PaymentMethodsApiResponse
+import com.adyen.checkout.components.core.PaymentMethod
+import com.adyen.checkout.components.core.StoredPaymentMethod
 import com.adyen.checkout.components.core.action.Action
 import com.adyen.checkout.ui.core.AdyenComponentView
 import org.json.JSONObject
@@ -26,25 +27,44 @@ internal class CardAdvancedFlowComponent(
     private val componentFlutterApi: ComponentFlutterInterface,
     context: Context,
     id: Int,
-    creationParams: Map<*, *>?
+    creationParams: Map<*, *>
 ) : BaseCardComponent(activity, componentFlutterApi, context, id, creationParams) {
-    private val paymentMethods = creationParams?.get(PAYMENT_METHODS_KEY) as? String ?: throw Exception("Payment methods not found")
-    private val paymentMethodsApiResponse = PaymentMethodsApiResponse.SERIALIZER.deserialize(JSONObject(paymentMethods))
-    private val paymentMethod = paymentMethodsApiResponse.paymentMethods?.first { it.type == SCHEME_KEY }
-        ?: throw Exception("Card payment method not provided") //TODO: Define custom exception
+    private val paymentMethodString = creationParams.getOrDefault(PAYMENT_METHOD_KEY, "") as String
+    private val isStoredPaymentMethod = creationParams.getOrDefault(IS_STORED_PAYMENT_METHOD_KEY, false) as Boolean
 
     init {
-        cardComponent = CardComponent.PROVIDER.get(
-            activity = activity,
-            paymentMethod = paymentMethod,
-            configuration = cardConfiguration,
-            callback = CardAdvancedFlowCallback(componentFlutterApi),
-            key = UUID.randomUUID().toString()
-        )
+        cardComponent = createCardComponent()
         addComponent(cardComponent)
         addActionListener()
         addResultListener()
         addErrorListener()
+    }
+
+    private fun createCardComponent(): CardComponent {
+        val paymentMethodJson = JSONObject(paymentMethodString)
+        when (isStoredPaymentMethod) {
+            true -> {
+                val storedPaymentMethod = StoredPaymentMethod.SERIALIZER.deserialize(paymentMethodJson)
+                return CardComponent.PROVIDER.get(
+                    activity = activity,
+                    storedPaymentMethod = storedPaymentMethod,
+                    configuration = cardConfiguration,
+                    callback = CardAdvancedFlowCallback(componentFlutterApi),
+                    key = UUID.randomUUID().toString()
+                )
+            }
+
+            false -> {
+                val paymentMethod = PaymentMethod.SERIALIZER.deserialize(paymentMethodJson)
+                return CardComponent.PROVIDER.get(
+                    activity = activity,
+                    paymentMethod = paymentMethod,
+                    configuration = cardConfiguration,
+                    callback = CardAdvancedFlowCallback(componentFlutterApi),
+                    key = UUID.randomUUID().toString()
+                )
+            }
+        }
     }
 
     override fun onFlutterViewAttached(flutterView: View) {
@@ -107,8 +127,4 @@ internal class CardAdvancedFlowComponent(
         }
     }
 
-    companion object {
-        const val PAYMENT_METHODS_KEY = "paymentMethods"
-        const val SCHEME_KEY = "scheme"
-    }
 }

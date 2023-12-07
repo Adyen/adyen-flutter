@@ -5,9 +5,9 @@ import Flutter
 
 class CardAdvancedFlowComponent: BaseCardComponent {
     private let actionComponentDelegate: ActionComponentDelegate
-    private var presentationDelegate: PresentationDelegate?
     private var actionComponent: AdyenActionComponent?
-    private let initialFrame: CGRect
+    private var presentationDelegate: PresentationDelegate?
+    private var cardDelegate: PaymentComponentDelegate?
 
     override init(
         frame: CGRect,
@@ -17,7 +17,6 @@ class CardAdvancedFlowComponent: BaseCardComponent {
         componentFlutterApi: ComponentFlutterInterface
     ) {
         actionComponentDelegate = CardAdvancedFlowActionComponentDelegate(componentFlutterApi: componentFlutterApi)
-        initialFrame = frame
         super.init(
             frame: frame,
             viewIdentifier: viewIdentifier,
@@ -26,14 +25,14 @@ class CardAdvancedFlowComponent: BaseCardComponent {
             componentFlutterApi: componentFlutterApi
         )
 
-        setupCardComponentView(arguments: arguments)
+        setupCardComponentView()
         setupFinalizeComponentCallback()
     }
 
-    private func setupCardComponentView(arguments: NSDictionary) {
+    private func setupCardComponentView() {
         do {
-            let cardComponentView = try createCardComponentView(arguments: arguments)
-            attachCardView(cardComponentView: cardComponentView)
+            let cardComponent = try setupCardComponent()
+            showCardComponent(cardComponent: cardComponent)
             componentPlatformApi.onActionCallback = { [weak self] jsonActionResponse in
                 self?.onAction(actionResponse: jsonActionResponse)
             }
@@ -42,26 +41,22 @@ class CardAdvancedFlowComponent: BaseCardComponent {
         }
     }
 
-    private func createCardComponentView(arguments: NSDictionary) throws -> UIView {
-        guard let paymentMethodsResponse = arguments.value(forKey: "paymentMethods") as? String else { throw PlatformError(errorDescription: "Payment methods not found") }
-        guard let cardComponentConfiguration = arguments.value(forKey: "cardComponentConfiguration") as? CardComponentConfigurationDTO else { throw PlatformError(errorDescription: "Card configuration not found") }
-        let paymentMethods = try JSONDecoder().decode(PaymentMethods.self, from: Data(paymentMethodsResponse.utf8))
-        cardComponent = try buildCardComponent(paymentMethods: paymentMethods, cardComponentConfiguration: cardComponentConfiguration)
+    private func setupCardComponent() throws -> CardComponent {
+        guard let cardComponentConfiguration = cardComponentConfiguration else { throw PlatformError(errorDescription: "Card configuration not found") }
+        guard let paymentMethodString = paymentMethod else { throw PlatformError(errorDescription: "Payment method not found") }
+        let cardComponent = try buildCardComponent(paymentMethodString: paymentMethodString, isStoredPaymentMethod: isStoredPaymentMethod, cardComponentConfiguration: cardComponentConfiguration)
         cardDelegate = CardAdvancedFlowDelegate(componentFlutterApi: componentFlutterApi)
-        cardComponent?.delegate = cardDelegate
-        cardComponent?.viewController.view.frame = initialFrame
-        guard let cardView = cardComponent?.viewController.view else { throw PlatformError(errorDescription: "Failed to get card component view") }
-        return cardView
+        cardComponent.delegate = cardDelegate
+        return cardComponent
     }
 
-    private func buildCardComponent(paymentMethods: PaymentMethods, cardComponentConfiguration: CardComponentConfigurationDTO) throws -> CardComponent {
-        guard let paymentMethod = paymentMethods.paymentMethod(ofType: CardPaymentMethod.self) else { throw PlatformError(errorDescription: "Card payment method not provided") }
+    private func buildCardComponent(paymentMethodString: String, isStoredPaymentMethod: Bool, cardComponentConfiguration: CardComponentConfigurationDTO) throws -> CardComponent {
         let adyenContext = try cardComponentConfiguration.createAdyenContext()
         let cardConfiguration = cardComponentConfiguration.cardConfiguration.mapToCardComponentConfiguration()
-        let cardComponent = CardComponent(paymentMethod: paymentMethod, context: adyenContext, configuration: cardConfiguration)
+        let paymentMethod: AnyCardPaymentMethod = isStoredPaymentMethod ? try JSONDecoder().decode(StoredCardPaymentMethod.self, from: Data(paymentMethodString.utf8)) : try JSONDecoder().decode(CardPaymentMethod.self, from: Data(paymentMethodString.utf8))
         presentationDelegate = CardPresentationDelegate(topViewController: getViewController())
         actionComponent = buildActionComponent(adyenContext: adyenContext)
-        return cardComponent
+        return CardComponent(paymentMethod: paymentMethod, context: adyenContext, configuration: cardConfiguration)
     }
 
     private func buildActionComponent(adyenContext: AdyenContext) -> AdyenActionComponent {
@@ -80,17 +75,16 @@ class CardAdvancedFlowComponent: BaseCardComponent {
             sendErrorToFlutterLayer(errorMessage: error.localizedDescription)
         }
     }
-    
+
     private func setupFinalizeComponentCallback() {
         componentPlatformApi.onFinishCallback = { [weak self] paymentFlowOutcome in
             let resultCode = ResultCode(rawValue: paymentFlowOutcome.result ?? "")
             let success = resultCode == .authorised || resultCode == .received || resultCode == .pending
             self?.finalizeAndDismiss(success: success, completion: { [weak self] in
-                let componentCommunicationModel = ComponentCommunicationModel(type: ComponentCommunicationType.result,
-                                                                              paymentResult: PaymentResultModelDTO(resultCode: resultCode?.rawValue))
+                let componentCommunicationModel = ComponentCommunicationModel(type: ComponentCommunicationType.result, paymentResult: PaymentResultModelDTO(resultCode: resultCode?.rawValue))
                 self?.componentFlutterApi.onComponentCommunication(componentCommunicationModel: componentCommunicationModel, completion: { _ in })
             })
         }
     }
-
+    
 }

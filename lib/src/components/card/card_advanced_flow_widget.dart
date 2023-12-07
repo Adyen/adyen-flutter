@@ -20,11 +20,12 @@ class CardAdvancedFlowWidget extends StatefulWidget {
   CardAdvancedFlowWidget({
     super.key,
     required this.cardComponentConfiguration,
-    required this.paymentMethods,
+    required this.paymentMethod,
     required this.onPayments,
     required this.onPaymentsDetails,
     required this.onPaymentResult,
     required this.initialViewHeight,
+    required this.isStoredPaymentMethod,
     this.gestureRecognizers,
     PaymentFlowOutcomeHandler? paymentFlowOutcomeHandler,
     AdyenLogger? adyenLogger,
@@ -33,10 +34,11 @@ class CardAdvancedFlowWidget extends StatefulWidget {
         adyenLogger = adyenLogger ?? AdyenLogger();
 
   final CardComponentConfigurationDTO cardComponentConfiguration;
-  final String paymentMethods;
+  final String paymentMethod;
   final Future<PaymentFlowOutcome> Function(String) onPayments;
   final Future<PaymentFlowOutcome> Function(String) onPaymentsDetails;
   final Future<void> Function(PaymentResult) onPaymentResult;
+  final bool isStoredPaymentMethod;
   final double initialViewHeight;
   final PaymentFlowOutcomeHandler paymentFlowOutcomeHandler;
   final Set<Factory<OneSequenceGestureRecognizer>>? gestureRecognizers;
@@ -137,9 +139,10 @@ class _CardAdvancedFlowWidgetState extends State<CardAdvancedFlowWidget> {
 
   Widget _buildCardWidget() {
     final Map<String, dynamic> creationParams = <String, dynamic>{
-      Constants.paymentMethodsKey: widget.paymentMethods,
+      Constants.paymentMethodKey: widget.paymentMethod,
       Constants.cardComponentConfigurationKey:
           widget.cardComponentConfiguration,
+      Constants.isStoredPaymentMethodKey: widget.isStoredPaymentMethod,
     };
 
     switch (defaultTargetPlatform) {

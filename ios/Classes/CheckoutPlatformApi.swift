@@ -1,6 +1,5 @@
 import Foundation
-@_spi(AdyenInternal)
-import Adyen
+@_spi(AdyenInternal) import Adyen
 import AdyenNetworking
 
 // TODO: Add config:
@@ -13,21 +12,57 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
     private let jsonDecoder = JSONDecoder()
     private let configurationMapper = ConfigurationMapper()
     private let checkoutFlutterApi: CheckoutFlutterApi
+    private let componentFlutterApi: ComponentFlutterInterface
     private var viewController: UIViewController?
     private var session: AdyenSession?
+    private let sessionHolder: SessionHolder
     private var dropInSessionDelegate: AdyenSessionDelegate?
-    private var dropInSessionPresentationDelegate: PresentationDelegate?
     private var dropInAdvancedFlowDelegate: DropInAdvancedFlowDelegate?
     private var dropInSessionStoredPaymentMethodsDelegate: DropInSessionsStoredPaymentMethodsDelegate?
     private var dropInAdvancedFlowStoredPaymentMethodsDelegate: DropInAdvancedFlowStoredPaymentMethodsDelegate?
 
-    init(checkoutFlutterApi: CheckoutFlutterApi) {
+    init(checkoutFlutterApi: CheckoutFlutterApi, componentFlutterApi: ComponentFlutterInterface, sessionHolder: SessionHolder) {
         self.checkoutFlutterApi = checkoutFlutterApi
+        self.componentFlutterApi = componentFlutterApi
+        self.sessionHolder = sessionHolder
     }
 
     func getPlatformVersion(completion: @escaping (Result<String, Error>) -> Void) {
         let systemVersion = UIDevice.current.systemVersion
         completion(Result.success(systemVersion))
+    }
+
+    func createSession(sessionId: String, sessionData: String, configuration: Any?, completion: @escaping (Result<SessionDTO, Error>) -> Void) {
+        do {
+            switch configuration {
+            case is CardComponentConfigurationDTO:
+                let adyenContext = try (configuration as! CardComponentConfigurationDTO).createAdyenContext()
+                let sessionConfiguration = AdyenSession.Configuration(sessionIdentifier: sessionId,
+                                                                      initialSessionData: sessionData,
+                                                                      context: adyenContext,
+                                                                      actionComponent: .init())                
+                let sessionDelegate = CardSessionFlowDelegate(componentFlutterApi: componentFlutterApi)
+                let sessionPresentationDelegate = CardPresentationDelegate(topViewController: getViewController())
+                AdyenSession.initialize(with: sessionConfiguration,
+                                        delegate: sessionDelegate,
+                                        presentationDelegate: sessionPresentationDelegate) { [weak self] result in
+                    switch result {
+                    case let .success(session):
+                        self?.sessionHolder.setup(session: session, sessionPresentationDelegate: sessionPresentationDelegate, sessionDelegate: sessionDelegate)
+                        // TODO: serialize paymentMethods
+                        completion(Result.success(SessionDTO(id: sessionId,
+                                                             sessionData: sessionData,
+                                                             paymentMethodsJson: "")))
+                    case let .failure(error):
+                        completion(Result.failure(error))
+                    }
+                }
+            case .none, .some:
+                completion(Result.failure(PlatformError(errorDescription: "Configuration is not valid")))
+            }
+        } catch {
+            completion(Result.failure(error))
+        }
     }
 
     func startDropInSessionPayment(dropInConfigurationDTO: DropInConfigurationDTO, session: SessionDTO) {
@@ -38,7 +73,7 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
 
             self.viewController = viewController
             dropInSessionDelegate = DropInSessionsDelegate(viewController: viewController, checkoutFlutterApi: checkoutFlutterApi)
-            dropInSessionPresentationDelegate = DropInSessionsPresentationDelegate()
+            sessionHolder.sessionPresentationDelegate = DropInSessionsPresentationDelegate()
             let adyenContext = try dropInConfigurationDTO.createAdyenContext()
             let sessionConfiguration = AdyenSession.Configuration(sessionIdentifier: session.id,
                                                                   initialSessionData: session.sessionData,
@@ -48,7 +83,7 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
 
             AdyenSession.initialize(with: sessionConfiguration,
                                     delegate: dropInSessionDelegate!,
-                                    presentationDelegate: dropInSessionPresentationDelegate!)
+                                    presentationDelegate: sessionHolder.sessionPresentationDelegate!)
             { [weak self] result in
                 switch result {
                 case let .success(session):
@@ -129,8 +164,10 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
     }
 
     func cleanUpDropIn() {
+        sessionHolder.sessionPresentationDelegate = nil
+        sessionHolder.sessionDelegate = nil
+        sessionHolder.session = nil
         dropInSessionDelegate = nil
-        dropInSessionPresentationDelegate = nil
         dropInSessionStoredPaymentMethodsDelegate = nil
         dropInAdvancedFlowDelegate?.dropInInteractorDelegate = nil
         dropInAdvancedFlowDelegate = nil

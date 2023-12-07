@@ -11,7 +11,7 @@ class CardAdvancedFlowComponentFactory(
     private val componentFlutterApi: ComponentFlutterInterface,
 ) : PlatformViewFactory(ComponentFlutterInterface.codec) {
     override fun create(context: Context, viewId: Int, args: Any?): PlatformView {
-        val creationParams = args as Map<*, *>?
+        val creationParams = args as Map<*, *>? ?: emptyMap<Any, Any>()
         return CardAdvancedFlowComponent(activity, componentFlutterApi, context, viewId, creationParams)
     }
 }

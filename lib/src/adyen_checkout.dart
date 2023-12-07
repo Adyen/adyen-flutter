@@ -4,6 +4,7 @@ import 'package:adyen_checkout/adyen_checkout.dart';
 import 'package:adyen_checkout/src/adyen_checkout_interface.dart';
 import 'package:adyen_checkout/src/generated/platform_api.g.dart';
 import 'package:adyen_checkout/src/logging/adyen_logger.dart';
+import 'package:adyen_checkout/src/models/base_configuration.dart';
 import 'package:adyen_checkout/src/platform/adyen_checkout_platform_interface.dart';
 import 'package:adyen_checkout/src/platform/adyen_checkout_result_api.dart';
 import 'package:adyen_checkout/src/utils/dto_mapper.dart';
@@ -44,6 +45,29 @@ class AdyenCheckout implements AdyenCheckoutInterface {
     if (kDebugMode) {
       _adyenLogger.enableLogging(loggingEnabled: loggingEnabled);
       AdyenCheckoutPlatformInterface.instance.enableLogging(loggingEnabled);
+    }
+  }
+
+  @override
+  Future<Session> createSession(
+    String sessionId,
+    String sessionData,
+    BaseConfiguration configuration,
+  ) async {
+    if (configuration is CardComponentConfiguration) {
+      SessionDTO sessionDTO =
+          await AdyenCheckoutPlatformInterface.instance.createSession(
+        sessionId,
+        sessionData,
+        configuration.toDTO(),
+      );
+      return Session(
+        id: sessionDTO.id,
+        sessionData: sessionDTO.sessionData,
+        paymentMethodsJson: sessionDTO.paymentMethodsJson,
+      );
+    } else {
+      throw Exception("Configuration is not valid");
     }
   }
 

@@ -31,10 +31,11 @@ abstract class BaseCardComponent(
     private val componentFlutterApi: ComponentFlutterInterface,
     context: Context,
     id: Int,
-    creationParams: Map<*, *>?
+    creationParams: Map<*, *>
 ) : PlatformView {
-    private val configuration = creationParams?.get(CARD_COMPONENT_CONFIGURATION_KEY) as? CardComponentConfigurationDTO
-        ?: throw Exception("Card configuration not found")
+    private val configuration =
+        creationParams.getOrDefault(CARD_COMPONENT_CONFIGURATION_KEY, null) as CardComponentConfigurationDTO?
+            ?: throw Exception("Card configuration not found")
     private val environment = configuration.environment.toNativeModel()
     private val componentWrapperView = ComponentWrapperView(activity, componentFlutterApi)
     private val intentListener = Consumer<Intent> { handleIntent(it) }
@@ -48,7 +49,7 @@ abstract class BaseCardComponent(
     lateinit var cardComponent: CardComponent
 
     init {
-        activity.addOnNewIntentListener(intentListener);
+        activity.addOnNewIntentListener(intentListener)
     }
 
     override fun getView(): View = componentWrapperView
@@ -115,5 +116,8 @@ abstract class BaseCardComponent(
 
     companion object {
         const val CARD_COMPONENT_CONFIGURATION_KEY = "cardComponentConfiguration"
+        const val PAYMENT_METHOD_KEY = "paymentMethod"
+        const val IS_STORED_PAYMENT_METHOD_KEY = "isStoredPaymentMethod"
+        const val CARD_PAYMENT_METHOD_KEY = "scheme"
     }
 }

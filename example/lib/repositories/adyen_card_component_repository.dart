@@ -31,10 +31,10 @@ class AdyenCardComponentRepository extends AdyenBaseRepository {
       countryCode: Config.countryCode,
       shopperLocale: Config.shopperLocale,
       shopperReference: Config.shopperReference,
-      storePaymentMethodMode:
-          StorePaymentMethodMode.enabled.storePaymentMethodModeString,
-      recurringProcessingModel:
-          RecurringProcessingModel.cardOnFile.recurringModelString,
+      // storePaymentMethodMode:
+      //     StorePaymentMethodMode.enabled.storePaymentMethodModeString,
+      // recurringProcessingModel:
+      //     RecurringProcessingModel.cardOnFile.recurringModelString,
       shopperInteraction:
           ShopperInteractionModel.ecommerce.shopperInteractionModelString,
       channel: determineChannel(),

@@ -1,5 +1,6 @@
 package com.adyen.adyen_checkout
 
+import CardComponentConfigurationDTO
 import CheckoutFlutterApi
 import CheckoutPlatformInterface
 import DeletedStoredPaymentMethodResultDTO
@@ -22,10 +23,14 @@ import com.adyen.adyen_checkout.dropInAdvancedFlow.DropInPaymentResultMessenger
 import com.adyen.adyen_checkout.dropInAdvancedFlow.DropInServiceResultMessenger
 import com.adyen.adyen_checkout.dropInSession.SessionDropInService
 import com.adyen.adyen_checkout.models.DropInFlowType
+import com.adyen.adyen_checkout.session.SessionHolder
 import com.adyen.adyen_checkout.utils.ConfigurationMapper.mapToDropInConfiguration
 import com.adyen.adyen_checkout.utils.ConfigurationMapper.mapToSession
+import com.adyen.adyen_checkout.utils.ConfigurationMapper.toNativeModel
 import com.adyen.adyen_checkout.utils.Constants.Companion.WRONG_FLUTTER_ACTIVITY_USAGE_ERROR_MESSAGE
+import com.adyen.checkout.components.core.OrderRequest
 import com.adyen.checkout.components.core.PaymentMethodsApiResponse
+import com.adyen.checkout.components.core.internal.Configuration
 import com.adyen.checkout.core.AdyenLogger
 import com.adyen.checkout.core.internal.util.Logger.NONE
 import com.adyen.checkout.dropin.DropIn
@@ -35,15 +40,20 @@ import com.adyen.checkout.redirect.RedirectComponent
 import com.adyen.checkout.sessions.core.CheckoutSession
 import com.adyen.checkout.sessions.core.CheckoutSessionProvider
 import com.adyen.checkout.sessions.core.CheckoutSessionResult
+import com.adyen.checkout.sessions.core.SessionModel
+import com.adyen.checkout.sessions.core.SessionSetupResponse
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
 
-class CheckoutPlatformApi(private val checkoutFlutterApi: CheckoutFlutterApi?) : CheckoutPlatformInterface {
+@Suppress("NAME_SHADOWING")
+class CheckoutPlatformApi(
+    private val checkoutFlutterApi: CheckoutFlutterApi?,
+    private val sessionHolder: SessionHolder,
+) : CheckoutPlatformInterface {
     lateinit var activity: FragmentActivity
-    lateinit var dropInSessionLauncher:
-        ActivityResultLauncher<SessionDropInResultContractParams>
+    lateinit var dropInSessionLauncher: ActivityResultLauncher<SessionDropInResultContractParams>
     lateinit var dropInAdvancedFlowLauncher: ActivityResultLauncher<DropInResultContractParams>
 
     override fun getPlatformVersion(callback: (Result<String>) -> Unit) {
@@ -54,6 +64,70 @@ class CheckoutPlatformApi(private val checkoutFlutterApi: CheckoutFlutterApi?) :
         callback(Result.success(RedirectComponent.getReturnUrl(activity.applicationContext)))
     }
 
+    override fun createSession(
+        sessionId: String, sessionData: String,
+        configuration: Any?,
+        callback: (Result<SessionDTO>) -> Unit,
+    ) {
+        activity.lifecycleScope.launch(Dispatchers.IO) {
+            val sessionModel = SessionModel(sessionId, sessionData)
+            determineSessionConfiguration(configuration)?.let { sessionConfiguration ->
+                when (val sessionResult = CheckoutSessionProvider.createSession(sessionModel, sessionConfiguration)) {
+                    is CheckoutSessionResult.Error -> callback(Result.failure(sessionResult.exception))
+                    is CheckoutSessionResult.Success -> onSessionSuccessfullyCreated(
+                        sessionResult, sessionModel, callback
+                    )
+                }
+            }
+        }
+    }
+
+
+    private fun determineSessionConfiguration(configuration: Any?): Configuration? {
+        when (configuration) {
+            is CardComponentConfigurationDTO -> {
+                return configuration.cardConfiguration.toNativeModel(
+                    "${configuration.shopperLocale}",
+                    activity,
+                    configuration.environment.toNativeModel(),
+                    configuration.clientKey
+                )
+            }
+
+            is DropInConfigurationDTO -> {
+                //TODO: Add support for DropIn session
+            }
+        }
+
+        return null
+    }
+
+    private fun onSessionSuccessfullyCreated(
+        sessionResult: CheckoutSessionResult.Success,
+        sessionModel: SessionModel,
+        callback: (Result<SessionDTO>) -> Unit,
+    ) {
+        with(sessionResult.checkoutSession) {
+            val sessionResponse = SessionSetupResponse.SERIALIZER.serialize(sessionSetupResponse)
+            val orderResponse = order?.let { OrderRequest.SERIALIZER.serialize(it) }
+            val paymentMethodsJsonObject = sessionSetupResponse.paymentMethodsApiResponse?.let {
+                PaymentMethodsApiResponse.SERIALIZER.serialize(it)
+            }
+            sessionHolder.sessionSetupResponse = sessionResponse
+            sessionHolder.orderResponse = orderResponse
+            callback(
+                Result.success(
+                    SessionDTO(
+                        id = sessionModel.id,
+                        sessionData = sessionModel.sessionData ?: "",
+                        paymentMethodsJson = paymentMethodsJsonObject?.toString() ?: "",
+                    )
+                )
+            )
+        }
+    }
+
+
     override fun startDropInSessionPayment(
         dropInConfigurationDTO: DropInConfigurationDTO,
         session: SessionDTO,
@@ -62,8 +136,7 @@ class CheckoutPlatformApi(private val checkoutFlutterApi: CheckoutFlutterApi?) :
         setStoredPaymentMethodDeletionObserver()
         activity.lifecycleScope.launch(Dispatchers.IO) {
             val sessionModel = session.mapToSession()
-            val dropInConfiguration =
-                dropInConfigurationDTO.mapToDropInConfiguration(activity.applicationContext)
+            val dropInConfiguration = dropInConfigurationDTO.mapToDropInConfiguration(activity.applicationContext)
             val checkoutSession = createCheckoutSession(sessionModel, dropInConfiguration)
             withContext(Dispatchers.Main) {
                 DropIn.startPayment(
@@ -88,10 +161,8 @@ class CheckoutPlatformApi(private val checkoutFlutterApi: CheckoutFlutterApi?) :
             val paymentMethodsApiResponse = PaymentMethodsApiResponse.SERIALIZER.deserialize(
                 JSONObject(paymentMethodsResponse),
             )
-            val paymentMethodsWithoutGiftCards =
-                removeGiftCardPaymentMethods(paymentMethodsApiResponse)
-            val dropInConfiguration =
-                dropInConfigurationDTO.mapToDropInConfiguration(activity.applicationContext)
+            val paymentMethodsWithoutGiftCards = removeGiftCardPaymentMethods(paymentMethodsApiResponse)
+            val dropInConfiguration = dropInConfigurationDTO.mapToDropInConfiguration(activity.applicationContext)
             withContext(Dispatchers.Main) {
                 DropIn.startPayment(
                     activity.applicationContext,
@@ -117,8 +188,7 @@ class CheckoutPlatformApi(private val checkoutFlutterApi: CheckoutFlutterApi?) :
     }
 
     override fun onDeleteStoredPaymentMethodResult(
-        deleteStoredPaymentMethodResultDTO:
-            DeletedStoredPaymentMethodResultDTO
+        deleteStoredPaymentMethodResultDTO: DeletedStoredPaymentMethodResultDTO
     ) {
         DropInPaymentMethodDeletionResultMessenger.sendResult(deleteStoredPaymentMethodResultDTO)
     }
@@ -138,12 +208,11 @@ class CheckoutPlatformApi(private val checkoutFlutterApi: CheckoutFlutterApi?) :
     }
 
     private suspend fun createCheckoutSession(
-        sessionModel: com.adyen.checkout.sessions.core.SessionModel,
+        sessionModel: SessionModel,
         dropInConfiguration: com.adyen.checkout.dropin.DropInConfiguration,
     ): CheckoutSession {
-        val checkoutSessionResult =
-            CheckoutSessionProvider.createSession(sessionModel, dropInConfiguration)
-        return when (checkoutSessionResult) {
+        return when (val checkoutSessionResult =
+            CheckoutSessionProvider.createSession(sessionModel, dropInConfiguration)) {
             is CheckoutSessionResult.Success -> checkoutSessionResult.checkoutSession
             is CheckoutSessionResult.Error -> throw checkoutSessionResult.exception
         }
@@ -220,12 +289,10 @@ class CheckoutPlatformApi(private val checkoutFlutterApi: CheckoutFlutterApi?) :
         val giftCardTypeIdentifier = "giftcard"
         val storedPaymentMethods =
             paymentMethodsResponse.storedPaymentMethods?.filterNot { it.type == giftCardTypeIdentifier }
-        val paymentMethods =
-            paymentMethodsResponse.paymentMethods?.filterNot { it.type == giftCardTypeIdentifier }
+        val paymentMethods = paymentMethodsResponse.paymentMethods?.filterNot { it.type == giftCardTypeIdentifier }
 
         return PaymentMethodsApiResponse(
-            storedPaymentMethods = storedPaymentMethods,
-            paymentMethods = paymentMethods
+            storedPaymentMethods = storedPaymentMethods, paymentMethods = paymentMethods
         )
     }
 }

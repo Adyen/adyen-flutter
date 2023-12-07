@@ -20,7 +20,7 @@ class AdyenDropInRepository extends AdyenBaseRepository {
 
   //A session should not being created from the mobile application.
   //Please provide a CheckoutSession object from your own backend.
-  Future<SessionResponseNetworkModel> createSession() async {
+  Future<SessionResponseNetworkModel> fetchSession() async {
     String returnUrl = await determineBaseReturnUrl();
     SessionRequestNetworkModel sessionRequestNetworkModel =
         SessionRequestNetworkModel(
