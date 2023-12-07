@@ -16,8 +16,6 @@ class BaseCardComponent: NSObject, FlutterPlatformView, UIScrollViewDelegate {
     let configurationMapper = ConfigurationMapper()
 
     var cardComponent: CardComponent?
-    var cardDelegate: PaymentComponentDelegate?
-    var presentationDelegate: PresentationDelegate?
     var contentOffset: CGPoint?
 
     init(

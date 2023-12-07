@@ -165,6 +165,8 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
 
     func cleanUpDropIn() {
         sessionHolder.sessionPresentationDelegate = nil
+        sessionHolder.sessionDelegate = nil
+        sessionHolder.session = nil
         dropInSessionDelegate = nil
         dropInSessionStoredPaymentMethodsDelegate = nil
         dropInAdvancedFlowDelegate?.dropInInteractorDelegate = nil
