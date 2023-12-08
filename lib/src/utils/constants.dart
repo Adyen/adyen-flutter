@@ -1,7 +1,4 @@
 class Constants {
-  //Config
-  static const String versionNumber = "0.0.1";
-
   //Components
   static const String paymentMethodKey = "paymentMethod";
   static const String cardComponentConfigurationKey =

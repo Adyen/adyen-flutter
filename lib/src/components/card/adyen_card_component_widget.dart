@@ -28,13 +28,25 @@ class AdyenCardComponentWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return switch (componentPaymentFlow) {
-      CardComponentSessionFlow() => _buildCardSessionFlowWidget(),
-      CardComponentAdvancedFlow() => _buildCardAdvancedFlowWidget()
-    };
+    return FutureBuilder(
+      future: _sdkVersionNumberProvider.getSdkVersionNumber(),
+      builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
+        if (snapshot.data != null) {
+          final sdkVersionNumber = snapshot.data ?? "";
+          return switch (componentPaymentFlow) {
+            CardComponentSessionFlow() =>
+              _buildCardSessionFlowWidget(sdkVersionNumber),
+            CardComponentAdvancedFlow() =>
+              _buildCardAdvancedFlowWidget(sdkVersionNumber)
+          };
+        } else {
+          return const SizedBox.shrink();
+        }
+      },
+    );
   }
 
-  CardSessionFlowWidget _buildCardSessionFlowWidget() {
+  CardSessionFlowWidget _buildCardSessionFlowWidget(String sdkVersionNumber) {
     final CardComponentSessionFlow cardComponentSessionFlow =
         componentPaymentFlow as CardComponentSessionFlow;
     final double initialHeight = _determineInitialHeight(
@@ -43,7 +55,6 @@ class AdyenCardComponentWidget extends StatelessWidget {
         json.encode(cardComponentSessionFlow.paymentMethod);
     final isStoredPaymentMethod = cardComponentSessionFlow.paymentMethod
         .containsKey(_isStoredPaymentMethodIndicator);
-    final sdkVersionNumber = _sdkVersionNumberProvider.getSdkVersionNumber();
 
     return CardSessionFlowWidget(
       cardComponentConfiguration: cardComponentSessionFlow
@@ -57,7 +68,7 @@ class AdyenCardComponentWidget extends StatelessWidget {
     );
   }
 
-  CardAdvancedFlowWidget _buildCardAdvancedFlowWidget() {
+  CardAdvancedFlowWidget _buildCardAdvancedFlowWidget(String sdkVersionNumber) {
     final CardComponentAdvancedFlow cardComponentAdvancedFlow =
         componentPaymentFlow as CardComponentAdvancedFlow;
     final initialHeight = _determineInitialHeight(
@@ -67,7 +78,6 @@ class AdyenCardComponentWidget extends StatelessWidget {
     final isStoredPaymentMethod = cardComponentAdvancedFlow.paymentMethod
             ?.containsKey(_isStoredPaymentMethodIndicator) ??
         false;
-    final sdkVersionNumber = _sdkVersionNumberProvider.getSdkVersionNumber();
 
     return CardAdvancedFlowWidget(
       cardComponentConfiguration: cardComponentAdvancedFlow

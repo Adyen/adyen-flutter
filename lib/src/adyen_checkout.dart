@@ -57,7 +57,8 @@ class AdyenCheckout implements AdyenCheckoutInterface {
     String sessionData,
     BaseConfiguration configuration,
   ) async {
-    final sdkVersionNumber = _sdkVersionNumberProvider.getSdkVersionNumber();
+    final sdkVersionNumber =
+        await _sdkVersionNumberProvider.getSdkVersionNumber();
 
     if (configuration is CardComponentConfiguration) {
       SessionDTO sessionDTO =
@@ -80,7 +81,8 @@ class AdyenCheckout implements AdyenCheckoutInterface {
       DropInSessionFlow dropInSession) async {
     _adyenLogger.print("Start Drop-in session");
     final dropInSessionCompleter = Completer<PaymentResultDTO>();
-    final sdkVersionNumber = _sdkVersionNumberProvider.getSdkVersionNumber();
+    final sdkVersionNumber =
+        await _sdkVersionNumberProvider.getSdkVersionNumber();
 
     AdyenCheckoutPlatformInterface.instance.startDropInSessionPayment(
       dropInSession.dropInConfiguration.toDTO(sdkVersionNumber),
@@ -131,7 +133,8 @@ class AdyenCheckout implements AdyenCheckoutInterface {
       DropInAdvancedFlow dropInAdvancedFlow) async {
     _adyenLogger.print("Start Drop-in advanced flow");
     final dropInAdvancedFlowCompleter = Completer<PaymentResultDTO>();
-    final sdkVersionNumber = _sdkVersionNumberProvider.getSdkVersionNumber();
+    final sdkVersionNumber =
+        await _sdkVersionNumberProvider.getSdkVersionNumber();
 
     AdyenCheckoutPlatformInterface.instance.startDropInAdvancedFlowPayment(
       dropInAdvancedFlow.dropInConfiguration.toDTO(sdkVersionNumber),
