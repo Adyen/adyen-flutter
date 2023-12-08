@@ -153,7 +153,7 @@ class _CardComponentScreenState extends State<CardComponentScreen> {
     Map<String, dynamic>? storedPaymentMethod =
         storedPaymentMethodList.firstOrNull;
 
-    return storedPaymentMethod;
+    return paymentMethod;
   }
 
   _dialogBuilder(PaymentResult paymentResult) {

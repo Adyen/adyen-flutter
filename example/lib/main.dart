@@ -37,7 +37,7 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  final _adyenCheckout = AdyenCheckout();
+  final _adyenCheckout = AdyenCheckout.instance;
   final _service = Service();
   late AdyenDropInRepository _adyenDropInRepository;
   late AdyenCardComponentRepository _adyenCardComponentRepository;
@@ -46,7 +46,7 @@ class _MyAppState extends State<MyApp> {
   void initState() {
     super.initState();
     _initRepositories();
-    _adyenCheckout.enableConsoleLogging(enabled: true);
+    _adyenCheckout.enableConsoleLogging(enabled: false);
   }
 
   void _initRepositories() {

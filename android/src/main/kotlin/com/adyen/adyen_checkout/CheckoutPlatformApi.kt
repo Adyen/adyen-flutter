@@ -89,6 +89,7 @@ class CheckoutPlatformApi(
                     configuration.environment.toNativeModel(),
                     configuration.clientKey,
                     configuration.analyticsOptionsDTO.mapToAnalyticsConfiguration(),
+                    configuration.amount.toNativeModel()
                 )
             }
 

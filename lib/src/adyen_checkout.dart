@@ -13,10 +13,9 @@ import 'package:adyen_checkout/src/utils/sdk_version_number_provider.dart';
 import 'package:flutter/foundation.dart';
 
 class AdyenCheckout implements AdyenCheckoutInterface {
-  AdyenCheckout() {
-    _setupResultApi();
-  }
+  static AdyenCheckout? _instance;
 
+  static AdyenCheckout get instance => _instance ??= AdyenCheckout._init();
   final AdyenCheckoutResultApi _resultApi = AdyenCheckoutResultApi();
   final AdyenLogger _adyenLogger = AdyenLogger.instance;
   final PaymentFlowOutcomeHandler _paymentFlowOutcomeHandler =
@@ -24,13 +23,18 @@ class AdyenCheckout implements AdyenCheckoutInterface {
   final SdkVersionNumberProvider _sdkVersionNumberProvider =
       SdkVersionNumberProvider();
 
+  AdyenCheckout._init() {
+    _setup();
+  }
+
   @override
   Future<String> getReturnUrl() =>
       AdyenCheckoutPlatformInterface.instance.getReturnUrl();
 
   @override
-  Future<PaymentResult> startPayment(
-      {required DropInPaymentFlow paymentFlow}) async {
+  Future<PaymentResult> startPayment({
+    required DropInPaymentFlow paymentFlow,
+  }) async {
     switch (paymentFlow) {
       case DropInSessionFlow():
         return await _startDropInSessionsPayment(paymentFlow);
@@ -74,7 +78,8 @@ class AdyenCheckout implements AdyenCheckoutInterface {
   }
 
   Future<PaymentResult> _startDropInSessionsPayment(
-      DropInSessionFlow dropInSession) async {
+    DropInSessionFlow dropInSession,
+  ) async {
     _adyenLogger.print("Start Drop-in session");
     final dropInSessionCompleter = Completer<PaymentResultDTO>();
     final sdkVersionNumber =
@@ -126,7 +131,8 @@ class AdyenCheckout implements AdyenCheckoutInterface {
   }
 
   Future<PaymentResult> _startDropInAdvancedFlowPayment(
-      DropInAdvancedFlow dropInAdvancedFlow) async {
+    DropInAdvancedFlow dropInAdvancedFlow,
+  ) async {
     _adyenLogger.print("Start Drop-in advanced flow");
     final dropInAdvancedFlowCompleter = Completer<PaymentResultDTO>();
     final sdkVersionNumber =
@@ -248,7 +254,7 @@ class AdyenCheckout implements AdyenCheckoutInterface {
     }
   }
 
-  void _setupResultApi() => CheckoutFlutterApi.setup(_resultApi);
+  void _setup() => CheckoutFlutterApi.setup(_resultApi);
 
   Future<void> _onDeleteStoredPaymentMethodCallback(
     PlatformCommunicationModel event,
@@ -280,7 +286,8 @@ class AdyenCheckout implements AdyenCheckoutInterface {
   }
 
   bool isRemoveStoredPaymentMethodEnabled(
-      DropInConfiguration dropInConfiguration) {
+    DropInConfiguration dropInConfiguration,
+  ) {
     return dropInConfiguration.storedPaymentMethodConfiguration
                 ?.deleteStoredPaymentMethodCallback !=
             null &&

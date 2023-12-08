@@ -58,7 +58,7 @@ class MockAdyenCheckoutPlatform
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
-  final AdyenCheckout initialPlatform = AdyenCheckout();
+  final AdyenCheckout initialPlatform = AdyenCheckout.instance;
 
   test('$AdyenCheckout is the default instance', () {
     expect(initialPlatform, isInstanceOf<AdyenCheckout>());
