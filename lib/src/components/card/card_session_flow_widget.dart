@@ -26,7 +26,7 @@ class CardSessionFlowWidget extends StatefulWidget {
     required this.isStoredPaymentMethod,
     this.gestureRecognizers,
     AdyenLogger? adyenLogger,
-  }) : adyenLogger = adyenLogger ?? AdyenLogger();
+  }) : adyenLogger = adyenLogger ?? AdyenLogger.instance;
 
   final CardComponentConfigurationDTO cardComponentConfiguration;
   final SessionDTO session;

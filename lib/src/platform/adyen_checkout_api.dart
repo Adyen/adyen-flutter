@@ -5,9 +5,6 @@ class AdyenCheckoutApi implements AdyenCheckoutPlatformInterface {
   final CheckoutPlatformInterface checkoutApi = CheckoutPlatformInterface();
 
   @override
-  Future<String> getPlatformVersion() => checkoutApi.getPlatformVersion();
-
-  @override
   Future<String> getReturnUrl() => checkoutApi.getReturnUrl();
 
   @override
@@ -59,8 +56,8 @@ class AdyenCheckoutApi implements AdyenCheckoutPlatformInterface {
           deleteStoredPaymentMethodResultDTO);
 
   @override
-  Future<void> enableLogging(bool loggingEnabled) =>
-      checkoutApi.enableLogging(loggingEnabled);
+  Future<void> enableConsoleLogging(bool loggingEnabled) =>
+      checkoutApi.enableConsoleLogging(loggingEnabled);
 
   @override
   Future<void> cleanUpDropIn() => checkoutApi.cleanUpDropIn();

@@ -46,7 +46,7 @@ class _MyAppState extends State<MyApp> {
   void initState() {
     super.initState();
     _initRepositories();
-    _adyenCheckout.enableLogging(loggingEnabled: true);
+    _adyenCheckout.enableConsoleLogging(enabled: true);
   }
 
   void _initRepositories() {

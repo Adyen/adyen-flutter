@@ -57,10 +57,6 @@ class CheckoutPlatformApi(
     lateinit var dropInSessionLauncher: ActivityResultLauncher<SessionDropInResultContractParams>
     lateinit var dropInAdvancedFlowLauncher: ActivityResultLauncher<DropInResultContractParams>
 
-    override fun getPlatformVersion(callback: (Result<String>) -> Unit) {
-        callback.invoke(Result.success("Android ${android.os.Build.VERSION.RELEASE}"))
-    }
-
     override fun getReturnUrl(callback: (Result<String>) -> Unit) {
         callback(Result.success(RedirectComponent.getReturnUrl(activity.applicationContext)))
     }
@@ -195,7 +191,7 @@ class CheckoutPlatformApi(
         DropInPaymentMethodDeletionResultMessenger.sendResult(deleteStoredPaymentMethodResultDTO)
     }
 
-    override fun enableLogging(loggingEnabled: Boolean) {
+    override fun enableConsoleLogging(loggingEnabled: Boolean) {
         if (loggingEnabled) {
             AdyenLogger.setLogLevel(Log.VERBOSE)
         } else {

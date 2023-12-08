@@ -8,9 +8,6 @@ class MockAdyenCheckoutPlatform
     with MockPlatformInterfaceMixin
     implements AdyenCheckoutPlatformInterface {
   @override
-  Future<String> getPlatformVersion() => Future.value('42');
-
-  @override
   Future<void> startDropInSessionPayment(
       DropInConfigurationDTO dropInConfiguration, SessionDTO session) async {}
 
@@ -40,7 +37,7 @@ class MockAdyenCheckoutPlatform
           deleteStoredPaymentMethodResultDTO) async {}
 
   @override
-  Future<void> enableLogging(bool loggingEnabled) async {}
+  Future<void> enableConsoleLogging(bool loggingEnabled) async {}
 
   @override
   Future<void> cleanUpDropIn() async {}
@@ -65,13 +62,5 @@ void main() {
 
   test('$AdyenCheckout is the default instance', () {
     expect(initialPlatform, isInstanceOf<AdyenCheckout>());
-  });
-
-  test('getPlatformVersion', () async {
-    AdyenCheckout adyenCheckoutPlugin = AdyenCheckout();
-    MockAdyenCheckoutPlatform fakePlatform = MockAdyenCheckoutPlatform();
-    AdyenCheckoutPlatformInterface.instance = fakePlatform;
-
-    expect(await adyenCheckoutPlugin.getPlatformVersion(), '42');
   });
 }

@@ -27,11 +27,6 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
         self.sessionHolder = sessionHolder
     }
 
-    func getPlatformVersion(completion: @escaping (Result<String, Error>) -> Void) {
-        let systemVersion = UIDevice.current.systemVersion
-        completion(Result.success(systemVersion))
-    }
-
     func createSession(sessionId: String, sessionData: String, configuration: Any?, completion: @escaping (Result<SessionDTO, Error>) -> Void) {
         do {
             switch configuration {
@@ -159,7 +154,7 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
         dropInAdvancedFlowStoredPaymentMethodsDelegate?.handleDisableResult(isSuccessfullyRemoved: deleteStoredPaymentMethodResultDTO.isSuccessfullyRemoved)
     }
 
-    func enableLogging(loggingEnabled: Bool) {
+    func enableConsoleLogging(loggingEnabled: Bool) {
         AdyenLogging.isEnabled = loggingEnabled
     }
 

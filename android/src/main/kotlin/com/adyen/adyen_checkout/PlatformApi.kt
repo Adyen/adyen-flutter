@@ -875,7 +875,6 @@ private object CheckoutPlatformInterfaceCodec : StandardMessageCodec() {
 
 /** Generated interface from Pigeon that represents a handler of messages from Flutter. */
 interface CheckoutPlatformInterface {
-  fun getPlatformVersion(callback: (Result<String>) -> Unit)
   fun getReturnUrl(callback: (Result<String>) -> Unit)
   fun createSession(sessionId: String, sessionData: String, configuration: Any?, callback: (Result<SessionDTO>) -> Unit)
   fun startDropInSessionPayment(dropInConfigurationDTO: DropInConfigurationDTO, session: SessionDTO)
@@ -883,7 +882,7 @@ interface CheckoutPlatformInterface {
   fun onPaymentsResult(paymentsResult: PaymentFlowOutcomeDTO)
   fun onPaymentsDetailsResult(paymentsDetailsResult: PaymentFlowOutcomeDTO)
   fun onDeleteStoredPaymentMethodResult(deleteStoredPaymentMethodResultDTO: DeletedStoredPaymentMethodResultDTO)
-  fun enableLogging(loggingEnabled: Boolean)
+  fun enableConsoleLogging(loggingEnabled: Boolean)
   fun cleanUpDropIn()
 
   companion object {
@@ -894,24 +893,6 @@ interface CheckoutPlatformInterface {
     /** Sets up an instance of `CheckoutPlatformInterface` to handle messages through the `binaryMessenger`. */
     @Suppress("UNCHECKED_CAST")
     fun setUp(binaryMessenger: BinaryMessenger, api: CheckoutPlatformInterface?) {
-      run {
-        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.getPlatformVersion", codec)
-        if (api != null) {
-          channel.setMessageHandler { _, reply ->
-            api.getPlatformVersion() { result: Result<String> ->
-              val error = result.exceptionOrNull()
-              if (error != null) {
-                reply.reply(wrapError(error))
-              } else {
-                val data = result.getOrNull()
-                reply.reply(wrapResult(data))
-              }
-            }
-          }
-        } else {
-          channel.setMessageHandler(null)
-        }
-      }
       run {
         val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.getReturnUrl", codec)
         if (api != null) {
@@ -1050,14 +1031,14 @@ interface CheckoutPlatformInterface {
         }
       }
       run {
-        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.enableLogging", codec)
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.enableConsoleLogging", codec)
         if (api != null) {
           channel.setMessageHandler { message, reply ->
             val args = message as List<Any?>
             val loggingEnabledArg = args[0] as Boolean
             var wrapped: List<Any?>
             try {
-              api.enableLogging(loggingEnabledArg)
+              api.enableConsoleLogging(loggingEnabledArg)
               wrapped = listOf<Any?>(null)
             } catch (exception: Throwable) {
               wrapped = wrapError(exception)

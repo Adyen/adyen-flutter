@@ -338,9 +338,6 @@ class CardComponentConfigurationDTO {
 @HostApi()
 abstract class CheckoutPlatformInterface {
   @async
-  String getPlatformVersion();
-
-  @async
   String getReturnUrl();
 
   @async
@@ -367,7 +364,7 @@ abstract class CheckoutPlatformInterface {
   void onDeleteStoredPaymentMethodResult(
       DeletedStoredPaymentMethodResultDTO deleteStoredPaymentMethodResultDTO);
 
-  void enableLogging(bool loggingEnabled);
+  void enableConsoleLogging(bool loggingEnabled);
 
   void cleanUpDropIn();
 }

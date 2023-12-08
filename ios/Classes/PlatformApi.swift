@@ -811,7 +811,6 @@ class CheckoutPlatformInterfaceCodec: FlutterStandardMessageCodec {
 
 /// Generated protocol from Pigeon that represents a handler of messages from Flutter.
 protocol CheckoutPlatformInterface {
-  func getPlatformVersion(completion: @escaping (Result<String, Error>) -> Void)
   func getReturnUrl(completion: @escaping (Result<String, Error>) -> Void)
   func createSession(sessionId: String, sessionData: String, configuration: Any?, completion: @escaping (Result<SessionDTO, Error>) -> Void)
   func startDropInSessionPayment(dropInConfigurationDTO: DropInConfigurationDTO, session: SessionDTO) throws
@@ -819,7 +818,7 @@ protocol CheckoutPlatformInterface {
   func onPaymentsResult(paymentsResult: PaymentFlowOutcomeDTO) throws
   func onPaymentsDetailsResult(paymentsDetailsResult: PaymentFlowOutcomeDTO) throws
   func onDeleteStoredPaymentMethodResult(deleteStoredPaymentMethodResultDTO: DeletedStoredPaymentMethodResultDTO) throws
-  func enableLogging(loggingEnabled: Bool) throws
+  func enableConsoleLogging(loggingEnabled: Bool) throws
   func cleanUpDropIn() throws
 }
 
@@ -829,21 +828,6 @@ class CheckoutPlatformInterfaceSetup {
   static var codec: FlutterStandardMessageCodec { CheckoutPlatformInterfaceCodec.shared }
   /// Sets up an instance of `CheckoutPlatformInterface` to handle messages through the `binaryMessenger`.
   static func setUp(binaryMessenger: FlutterBinaryMessenger, api: CheckoutPlatformInterface?) {
-    let getPlatformVersionChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.getPlatformVersion", binaryMessenger: binaryMessenger, codec: codec)
-    if let api = api {
-      getPlatformVersionChannel.setMessageHandler { _, reply in
-        api.getPlatformVersion() { result in
-          switch result {
-            case .success(let res):
-              reply(wrapResult(res))
-            case .failure(let error):
-              reply(wrapError(error))
-          }
-        }
-      }
-    } else {
-      getPlatformVersionChannel.setMessageHandler(nil)
-    }
     let getReturnUrlChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.getReturnUrl", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {
       getReturnUrlChannel.setMessageHandler { _, reply in
@@ -955,20 +939,20 @@ class CheckoutPlatformInterfaceSetup {
     } else {
       onDeleteStoredPaymentMethodResultChannel.setMessageHandler(nil)
     }
-    let enableLoggingChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.enableLogging", binaryMessenger: binaryMessenger, codec: codec)
+    let enableConsoleLoggingChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.enableConsoleLogging", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {
-      enableLoggingChannel.setMessageHandler { message, reply in
+      enableConsoleLoggingChannel.setMessageHandler { message, reply in
         let args = message as! [Any?]
         let loggingEnabledArg = args[0] as! Bool
         do {
-          try api.enableLogging(loggingEnabled: loggingEnabledArg)
+          try api.enableConsoleLogging(loggingEnabled: loggingEnabledArg)
           reply(wrapResult(nil))
         } catch {
           reply(wrapError(error))
         }
       }
     } else {
-      enableLoggingChannel.setMessageHandler(nil)
+      enableConsoleLoggingChannel.setMessageHandler(nil)
     }
     let cleanUpDropInChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.cleanUpDropIn", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {

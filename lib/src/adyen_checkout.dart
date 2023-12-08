@@ -18,15 +18,11 @@ class AdyenCheckout implements AdyenCheckoutInterface {
   }
 
   final AdyenCheckoutResultApi _resultApi = AdyenCheckoutResultApi();
-  final AdyenLogger _adyenLogger = AdyenLogger();
+  final AdyenLogger _adyenLogger = AdyenLogger.instance;
   final PaymentFlowOutcomeHandler _paymentFlowOutcomeHandler =
       PaymentFlowOutcomeHandler();
   final SdkVersionNumberProvider _sdkVersionNumberProvider =
       SdkVersionNumberProvider();
-
-  @override
-  Future<String> getPlatformVersion() =>
-      AdyenCheckoutPlatformInterface.instance.getPlatformVersion();
 
   @override
   Future<String> getReturnUrl() =>
@@ -44,10 +40,10 @@ class AdyenCheckout implements AdyenCheckoutInterface {
   }
 
   @override
-  void enableLogging({required bool loggingEnabled}) {
+  void enableConsoleLogging({required bool enabled}) {
     if (kDebugMode) {
-      _adyenLogger.enableLogging(loggingEnabled: loggingEnabled);
-      AdyenCheckoutPlatformInterface.instance.enableLogging(loggingEnabled);
+      _adyenLogger.enableConsoleLogging(loggingEnabled: enabled);
+      AdyenCheckoutPlatformInterface.instance.enableConsoleLogging(enabled);
     }
   }
 

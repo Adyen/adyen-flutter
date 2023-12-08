@@ -3,17 +3,15 @@
 import 'package:flutter/foundation.dart';
 
 class AdyenLogger {
-  static final AdyenLogger _instance = AdyenLogger._init();
-
-  factory AdyenLogger() {
-    return _instance;
-  }
+  static AdyenLogger? _instance;
 
   AdyenLogger._init();
 
-  bool _loggingEnabled = true;
+  static AdyenLogger get instance => _instance ??= AdyenLogger._init();
 
-  void enableLogging({required bool loggingEnabled}) {
+  bool _loggingEnabled = false;
+
+  void enableConsoleLogging({required bool loggingEnabled}) {
     _loggingEnabled = loggingEnabled;
   }
 
