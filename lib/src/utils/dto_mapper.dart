@@ -2,17 +2,17 @@ import 'dart:io';
 
 import 'package:adyen_checkout/adyen_checkout.dart';
 import 'package:adyen_checkout/src/generated/platform_api.g.dart';
-import 'package:adyen_checkout/src/models/analytics_options.dart';
 
 extension AnalyticsOptionsMapper on AnalyticsOptions {
-  AnalyticsOptionsDTO toDTO() => AnalyticsOptionsDTO(
+  AnalyticsOptionsDTO toDTO(String version) => AnalyticsOptionsDTO(
         enabled: enabled,
-        payload: payload,
+        version: version,
       );
 }
 
 extension DropInConfigurationMapper on DropInConfiguration {
-  DropInConfigurationDTO toDTO() => DropInConfigurationDTO(
+  DropInConfigurationDTO toDTO(String sdkVersionNumber) =>
+      DropInConfigurationDTO(
         environment: environment,
         clientKey: clientKey,
         countryCode: countryCode.toUpperCase(),
@@ -22,7 +22,7 @@ extension DropInConfigurationMapper on DropInConfiguration {
         applePayConfigurationDTO: applePayConfiguration?.toDTO(),
         googlePayConfigurationDTO: googlePayConfiguration?.toDTO(),
         cashAppPayConfigurationDTO: cashAppPayConfiguration?.toDTO(),
-        analyticsOptionsDTO: analyticsOptions?.toDTO(),
+        analyticsOptionsDTO: analyticsOptions.toDTO(sdkVersionNumber),
         isRemoveStoredPaymentMethodEnabled: _isRemoveStoredPaymentMethodEnabled(
             storedPaymentMethodConfiguration),
         showPreselectedStoredPaymentMethod: storedPaymentMethodConfiguration
@@ -39,7 +39,7 @@ extension DropInConfigurationMapper on DropInConfiguration {
           true;
 }
 
-extension CardsConfigurationMapper on CardConfiguration {
+extension CardConfigurationMapper on CardConfiguration {
   CardConfigurationDTO toDTO() => CardConfigurationDTO(
         holderNameRequired: holderNameRequired,
         addressMode: addressMode,
@@ -108,12 +108,14 @@ extension OrderResponseMapper on OrderResponseDTO {
 }
 
 extension CardComponentConfigurationMapper on CardComponentConfiguration {
-  CardComponentConfigurationDTO toDTO() => CardComponentConfigurationDTO(
+  CardComponentConfigurationDTO toDTO(String sdkVersionNumber) =>
+      CardComponentConfigurationDTO(
         environment: environment,
         clientKey: clientKey,
         countryCode: countryCode,
         amount: amount.toDTO(),
         shopperLocale: shopperLocale,
         cardConfiguration: cardConfiguration.toDTO(),
+        analyticsOptionsDTO: analyticsOptions.toDTO(sdkVersionNumber),
       );
 }

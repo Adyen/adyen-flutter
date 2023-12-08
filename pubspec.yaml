@@ -20,6 +20,8 @@ dev_dependencies:
   pigeon: 12.0.1
 
 flutter:
+  assets:
+    - pubspec.yaml
   plugin:
     platforms:
       android:

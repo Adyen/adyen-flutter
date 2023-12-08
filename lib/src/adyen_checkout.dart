@@ -9,6 +9,7 @@ import 'package:adyen_checkout/src/platform/adyen_checkout_platform_interface.da
 import 'package:adyen_checkout/src/platform/adyen_checkout_result_api.dart';
 import 'package:adyen_checkout/src/utils/dto_mapper.dart';
 import 'package:adyen_checkout/src/utils/payment_flow_outcome_handler.dart';
+import 'package:adyen_checkout/src/utils/sdk_version_number_provider.dart';
 import 'package:flutter/foundation.dart';
 
 class AdyenCheckout implements AdyenCheckoutInterface {
@@ -20,6 +21,8 @@ class AdyenCheckout implements AdyenCheckoutInterface {
   final AdyenLogger _adyenLogger = AdyenLogger();
   final PaymentFlowOutcomeHandler _paymentFlowOutcomeHandler =
       PaymentFlowOutcomeHandler();
+  final SdkVersionNumberProvider _sdkVersionNumberProvider =
+      SdkVersionNumberProvider();
 
   @override
   Future<String> getPlatformVersion() =>
@@ -54,12 +57,15 @@ class AdyenCheckout implements AdyenCheckoutInterface {
     String sessionData,
     BaseConfiguration configuration,
   ) async {
+    final sdkVersionNumber =
+        await _sdkVersionNumberProvider.getSdkVersionNumber();
+
     if (configuration is CardComponentConfiguration) {
       SessionDTO sessionDTO =
           await AdyenCheckoutPlatformInterface.instance.createSession(
         sessionId,
         sessionData,
-        configuration.toDTO(),
+        configuration.toDTO(sdkVersionNumber),
       );
       return Session(
         id: sessionDTO.id,
@@ -75,8 +81,11 @@ class AdyenCheckout implements AdyenCheckoutInterface {
       DropInSessionFlow dropInSession) async {
     _adyenLogger.print("Start Drop-in session");
     final dropInSessionCompleter = Completer<PaymentResultDTO>();
+    final sdkVersionNumber =
+        await _sdkVersionNumberProvider.getSdkVersionNumber();
+
     AdyenCheckoutPlatformInterface.instance.startDropInSessionPayment(
-      dropInSession.dropInConfiguration.toDTO(),
+      dropInSession.dropInConfiguration.toDTO(sdkVersionNumber),
       dropInSession.session.toDTO(),
     );
 
@@ -124,9 +133,11 @@ class AdyenCheckout implements AdyenCheckoutInterface {
       DropInAdvancedFlow dropInAdvancedFlow) async {
     _adyenLogger.print("Start Drop-in advanced flow");
     final dropInAdvancedFlowCompleter = Completer<PaymentResultDTO>();
+    final sdkVersionNumber =
+        await _sdkVersionNumberProvider.getSdkVersionNumber();
 
     AdyenCheckoutPlatformInterface.instance.startDropInAdvancedFlowPayment(
-      dropInAdvancedFlow.dropInConfiguration.toDTO(),
+      dropInAdvancedFlow.dropInConfiguration.toDTO(sdkVersionNumber),
       dropInAdvancedFlow.paymentMethodsResponse,
     );
 

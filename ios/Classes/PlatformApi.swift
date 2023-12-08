@@ -156,22 +156,22 @@ struct AmountDTO {
 
 /// Generated class from Pigeon that represents data sent in messages.
 struct AnalyticsOptionsDTO {
-  var enabled: Bool? = nil
-  var payload: String? = nil
+  var enabled: Bool
+  var version: String
 
   static func fromList(_ list: [Any?]) -> AnalyticsOptionsDTO? {
-    let enabled: Bool? = nilOrValue(list[0])
-    let payload: String? = nilOrValue(list[1])
+    let enabled = list[0] as! Bool
+    let version = list[1] as! String
 
     return AnalyticsOptionsDTO(
       enabled: enabled,
-      payload: payload
+      version: version
     )
   }
   func toList() -> [Any?] {
     return [
       enabled,
-      payload,
+      version,
     ]
   }
 }
@@ -187,7 +187,7 @@ struct DropInConfigurationDTO {
   var applePayConfigurationDTO: ApplePayConfigurationDTO? = nil
   var googlePayConfigurationDTO: GooglePayConfigurationDTO? = nil
   var cashAppPayConfigurationDTO: CashAppPayConfigurationDTO? = nil
-  var analyticsOptionsDTO: AnalyticsOptionsDTO? = nil
+  var analyticsOptionsDTO: AnalyticsOptionsDTO
   var showPreselectedStoredPaymentMethod: Bool
   var skipListWhenSinglePaymentMethod: Bool
   var isRemoveStoredPaymentMethodEnabled: Bool
@@ -214,10 +214,7 @@ struct DropInConfigurationDTO {
     if let cashAppPayConfigurationDTOList: [Any?] = nilOrValue(list[8]) {
       cashAppPayConfigurationDTO = CashAppPayConfigurationDTO.fromList(cashAppPayConfigurationDTOList)
     }
-    var analyticsOptionsDTO: AnalyticsOptionsDTO? = nil
-    if let analyticsOptionsDTOList: [Any?] = nilOrValue(list[9]) {
-      analyticsOptionsDTO = AnalyticsOptionsDTO.fromList(analyticsOptionsDTOList)
-    }
+    let analyticsOptionsDTO = AnalyticsOptionsDTO.fromList(list[9] as! [Any?])!
     let showPreselectedStoredPaymentMethod = list[10] as! Bool
     let skipListWhenSinglePaymentMethod = list[11] as! Bool
     let isRemoveStoredPaymentMethodEnabled = list[12] as! Bool
@@ -249,7 +246,7 @@ struct DropInConfigurationDTO {
       applePayConfigurationDTO?.toList(),
       googlePayConfigurationDTO?.toList(),
       cashAppPayConfigurationDTO?.toList(),
-      analyticsOptionsDTO?.toList(),
+      analyticsOptionsDTO.toList(),
       showPreselectedStoredPaymentMethod,
       skipListWhenSinglePaymentMethod,
       isRemoveStoredPaymentMethodEnabled,
@@ -658,6 +655,7 @@ struct CardComponentConfigurationDTO {
   var amount: AmountDTO
   var shopperLocale: String? = nil
   var cardConfiguration: CardConfigurationDTO
+  var analyticsOptionsDTO: AnalyticsOptionsDTO
 
   static func fromList(_ list: [Any?]) -> CardComponentConfigurationDTO? {
     let environment = Environment(rawValue: list[0] as! Int)!
@@ -666,6 +664,7 @@ struct CardComponentConfigurationDTO {
     let amount = AmountDTO.fromList(list[3] as! [Any?])!
     let shopperLocale: String? = nilOrValue(list[4])
     let cardConfiguration = CardConfigurationDTO.fromList(list[5] as! [Any?])!
+    let analyticsOptionsDTO = AnalyticsOptionsDTO.fromList(list[6] as! [Any?])!
 
     return CardComponentConfigurationDTO(
       environment: environment,
@@ -673,7 +672,8 @@ struct CardComponentConfigurationDTO {
       countryCode: countryCode,
       amount: amount,
       shopperLocale: shopperLocale,
-      cardConfiguration: cardConfiguration
+      cardConfiguration: cardConfiguration,
+      analyticsOptionsDTO: analyticsOptionsDTO
     )
   }
   func toList() -> [Any?] {
@@ -684,6 +684,7 @@ struct CardComponentConfigurationDTO {
       amount.toList(),
       shopperLocale,
       cardConfiguration.toList(),
+      analyticsOptionsDTO.toList(),
     ]
   }
 }
@@ -1171,16 +1172,18 @@ private class ComponentFlutterInterfaceCodecReader: FlutterStandardReader {
       case 129:
         return AmountDTO.fromList(self.readValue() as! [Any?])
       case 130:
-        return CardComponentConfigurationDTO.fromList(self.readValue() as! [Any?])
+        return AnalyticsOptionsDTO.fromList(self.readValue() as! [Any?])
       case 131:
-        return CardConfigurationDTO.fromList(self.readValue() as! [Any?])
+        return CardComponentConfigurationDTO.fromList(self.readValue() as! [Any?])
       case 132:
-        return ComponentCommunicationModel.fromList(self.readValue() as! [Any?])
+        return CardConfigurationDTO.fromList(self.readValue() as! [Any?])
       case 133:
-        return OrderResponseDTO.fromList(self.readValue() as! [Any?])
+        return ComponentCommunicationModel.fromList(self.readValue() as! [Any?])
       case 134:
-        return PaymentResultModelDTO.fromList(self.readValue() as! [Any?])
+        return OrderResponseDTO.fromList(self.readValue() as! [Any?])
       case 135:
+        return PaymentResultModelDTO.fromList(self.readValue() as! [Any?])
+      case 136:
         return SessionDTO.fromList(self.readValue() as! [Any?])
       default:
         return super.readValue(ofType: type)
@@ -1196,23 +1199,26 @@ private class ComponentFlutterInterfaceCodecWriter: FlutterStandardWriter {
     } else if let value = value as? AmountDTO {
       super.writeByte(129)
       super.writeValue(value.toList())
-    } else if let value = value as? CardComponentConfigurationDTO {
+    } else if let value = value as? AnalyticsOptionsDTO {
       super.writeByte(130)
       super.writeValue(value.toList())
-    } else if let value = value as? CardConfigurationDTO {
+    } else if let value = value as? CardComponentConfigurationDTO {
       super.writeByte(131)
       super.writeValue(value.toList())
-    } else if let value = value as? ComponentCommunicationModel {
+    } else if let value = value as? CardConfigurationDTO {
       super.writeByte(132)
       super.writeValue(value.toList())
-    } else if let value = value as? OrderResponseDTO {
+    } else if let value = value as? ComponentCommunicationModel {
       super.writeByte(133)
       super.writeValue(value.toList())
-    } else if let value = value as? PaymentResultModelDTO {
+    } else if let value = value as? OrderResponseDTO {
       super.writeByte(134)
       super.writeValue(value.toList())
-    } else if let value = value as? SessionDTO {
+    } else if let value = value as? PaymentResultModelDTO {
       super.writeByte(135)
+      super.writeValue(value.toList())
+    } else if let value = value as? SessionDTO {
+      super.writeByte(136)
       super.writeValue(value.toList())
     } else {
       super.writeValue(value)

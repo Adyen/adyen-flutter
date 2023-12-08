@@ -24,6 +24,7 @@ import com.adyen.adyen_checkout.dropInAdvancedFlow.DropInServiceResultMessenger
 import com.adyen.adyen_checkout.dropInSession.SessionDropInService
 import com.adyen.adyen_checkout.models.DropInFlowType
 import com.adyen.adyen_checkout.session.SessionHolder
+import com.adyen.adyen_checkout.utils.ConfigurationMapper.mapToAnalyticsConfiguration
 import com.adyen.adyen_checkout.utils.ConfigurationMapper.mapToDropInConfiguration
 import com.adyen.adyen_checkout.utils.ConfigurationMapper.mapToSession
 import com.adyen.adyen_checkout.utils.ConfigurationMapper.toNativeModel
@@ -90,7 +91,8 @@ class CheckoutPlatformApi(
                     "${configuration.shopperLocale}",
                     activity,
                     configuration.environment.toNativeModel(),
-                    configuration.clientKey
+                    configuration.clientKey,
+                    configuration.analyticsOptionsDTO.mapToAnalyticsConfiguration(),
                 )
             }
 

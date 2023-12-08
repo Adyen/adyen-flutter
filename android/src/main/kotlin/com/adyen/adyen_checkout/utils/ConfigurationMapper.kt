@@ -2,6 +2,7 @@ package com.adyen.adyen_checkout.utils
 
 import AddressMode
 import AmountDTO
+import AnalyticsOptionsDTO
 import CardConfigurationDTO
 import CashAppPayConfigurationDTO
 import CashAppPayEnvironment
@@ -21,6 +22,8 @@ import com.adyen.checkout.card.KCPAuthVisibility
 import com.adyen.checkout.card.SocialSecurityNumberVisibility
 import com.adyen.checkout.cashapppay.CashAppPayConfiguration
 import com.adyen.checkout.components.core.Amount
+import com.adyen.checkout.components.core.AnalyticsConfiguration
+import com.adyen.checkout.components.core.AnalyticsLevel
 import com.adyen.checkout.components.core.OrderResponse
 import com.adyen.checkout.dropin.DropInConfiguration
 import com.adyen.checkout.googlepay.GooglePayConfiguration
@@ -50,6 +53,7 @@ object ConfigurationMapper {
         val amount = amount.mapToAmount()
         val locale = Locale.forLanguageTag(shopperLocale)
         val dropInConfiguration = DropInConfiguration.Builder(locale, environment, clientKey)
+        val analyticsConfiguration = analyticsOptionsDTO.mapToAnalyticsConfiguration()
 
         isRemoveStoredPaymentMethodEnabled.let {
             dropInConfiguration.setEnableRemovingStoredPaymentMethods(it)
@@ -64,19 +68,23 @@ object ConfigurationMapper {
         }
 
         if (cardConfigurationDTO != null) {
-            val cardConfiguration = cardConfigurationDTO.toNativeModel(shopperLocale, context,   environment, clientKey)
+            val cardConfiguration = cardConfigurationDTO.toNativeModel(
+                shopperLocale,
+                context,
+                environment,
+                clientKey,
+                analyticsConfiguration,
+            )
             dropInConfiguration.addCardConfiguration(cardConfiguration)
         }
 
         if (googlePayConfigurationDTO != null) {
-            val googlePayConfiguration =
-                buildGooglePayConfiguration(locale, environment, googlePayConfigurationDTO)
+            val googlePayConfiguration = buildGooglePayConfiguration(locale, environment, googlePayConfigurationDTO)
             dropInConfiguration.addGooglePayConfiguration(googlePayConfiguration)
         }
 
         if (cashAppPayConfigurationDTO != null) {
-            val cashAppPayConfiguration =
-                buildCashAppPayConfiguration(locale, environment, cashAppPayConfigurationDTO)
+            val cashAppPayConfiguration = buildCashAppPayConfiguration(locale, environment, cashAppPayConfigurationDTO)
             dropInConfiguration.addCashAppPayConfiguration(cashAppPayConfiguration)
         }
 
@@ -89,25 +97,32 @@ object ConfigurationMapper {
         context: Context,
         environment: com.adyen.checkout.core.Environment,
         clientKey: String,
+        analyticsConfiguration: AnalyticsConfiguration,
     ): CardConfiguration {
         val locale = Locale.forLanguageTag(shopperLocale)
 
         return CardConfiguration.Builder(
-            shopperLocale = locale,
-            environment = environment,
-            clientKey = clientKey
-        )
-            .setAddressConfiguration(addressMode.mapToAddressConfiguration())
-            .setShowStorePaymentField(showStorePaymentField)
-            .setHideCvcStoredCard(!showCvcForStoredCard)
-            .setHideCvc(!showCvc)
-            .setKcpAuthVisibility(determineKcpAuthVisibility(kcpFieldVisibility))
+            shopperLocale = locale, environment = environment, clientKey = clientKey
+        ).setAddressConfiguration(addressMode.mapToAddressConfiguration())
+            .setShowStorePaymentField(showStorePaymentField).setHideCvcStoredCard(!showCvcForStoredCard)
+            .setHideCvc(!showCvc).setKcpAuthVisibility(determineKcpAuthVisibility(kcpFieldVisibility))
             .setSocialSecurityNumberVisibility(
                 determineSocialSecurityNumberVisibility(socialSecurityNumberFieldVisibility)
-            )
-            .setSupportedCardTypes(*mapToSupportedCardTypes(supportedCardTypes))
-            .setHolderNameRequired(holderNameRequired)
-            .build()
+            ).setSupportedCardTypes(*mapToSupportedCardTypes(supportedCardTypes))
+            .setHolderNameRequired(holderNameRequired).setAnalyticsConfiguration(analyticsConfiguration).build()
+    }
+
+
+    fun AnalyticsOptionsDTO.mapToAnalyticsConfiguration(): AnalyticsConfiguration {
+        val analyticsLevel = when {
+            enabled -> AnalyticsLevel.ALL
+            else -> AnalyticsLevel.NONE
+        }
+//        AnalyticsMapper.Companion.overrideForCrossPlatform(
+//            AnalyticsPlatform.FLUTTER.value,
+//            version,
+//        )
+        return AnalyticsConfiguration(analyticsLevel)
     }
 
     private fun DropInConfigurationDTO.buildGooglePayConfiguration(
@@ -116,9 +131,7 @@ object ConfigurationMapper {
         googlePayConfigurationDTO: GooglePayConfigurationDTO
     ): GooglePayConfiguration {
         val googlePayConfigurationBuilder = GooglePayConfiguration.Builder(
-            shopperLocale,
-            environment,
-            clientKey
+            shopperLocale, environment, clientKey
         )
         return googlePayConfigurationDTO.mapToGooglePayConfiguration(googlePayConfigurationBuilder)
     }
@@ -129,9 +142,7 @@ object ConfigurationMapper {
         cashAppPayConfigurationDTO: CashAppPayConfigurationDTO
     ): CashAppPayConfiguration {
         val cashAppPayConfigurationBuilder = CashAppPayConfiguration.Builder(
-            shopperLocale,
-            environment,
-            clientKey
+            shopperLocale, environment, clientKey
         )
         return cashAppPayConfigurationDTO.mapToCashAppPayConfiguration(cashAppPayConfigurationBuilder)
     }
@@ -191,8 +202,7 @@ object ConfigurationMapper {
         )
     }
 
-    private fun GooglePayConfigurationDTO.mapToGooglePayConfiguration(builder: GooglePayConfiguration.Builder):
-        GooglePayConfiguration {
+    private fun GooglePayConfigurationDTO.mapToGooglePayConfiguration(builder: GooglePayConfiguration.Builder): GooglePayConfiguration {
         if (allowedCardNetworks.isNotEmpty()) {
             builder.setAllowedCardNetworks(allowedCardNetworks.filterNotNull())
         }
@@ -232,11 +242,8 @@ object ConfigurationMapper {
         }
     }
 
-    private fun CashAppPayConfigurationDTO.mapToCashAppPayConfiguration(builder: CashAppPayConfiguration.Builder):
-        CashAppPayConfiguration {
-        builder
-            .setCashAppPayEnvironment(cashAppPayEnvironment.mapToCashAppPayEnvironment())
-            .setReturnUrl(returnUrl)
+    private fun CashAppPayConfigurationDTO.mapToCashAppPayConfiguration(builder: CashAppPayConfiguration.Builder): CashAppPayConfiguration {
+        builder.setCashAppPayEnvironment(cashAppPayEnvironment.mapToCashAppPayEnvironment()).setReturnUrl(returnUrl)
         return builder.build()
     }
 
