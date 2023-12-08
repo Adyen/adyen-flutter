@@ -6,6 +6,8 @@ import Flutter
 class CardAdvancedFlowComponent: BaseCardComponent {
     private let actionComponentDelegate: ActionComponentDelegate
     private var actionComponent: AdyenActionComponent?
+    private var presentationDelegate: PresentationDelegate?
+    private var cardDelegate: PaymentComponentDelegate?
 
     override init(
         frame: CGRect,
@@ -29,8 +31,8 @@ class CardAdvancedFlowComponent: BaseCardComponent {
 
     private func setupCardComponentView() {
         do {
-            cardComponent = try setupCardComponent()
-            showCardComponent()
+            let cardComponent = try setupCardComponent()
+            showCardComponent(cardComponent: cardComponent)
             componentPlatformApi.onActionCallback = { [weak self] jsonActionResponse in
                 self?.onAction(actionResponse: jsonActionResponse)
             }
@@ -84,4 +86,5 @@ class CardAdvancedFlowComponent: BaseCardComponent {
             })
         }
     }
+    
 }

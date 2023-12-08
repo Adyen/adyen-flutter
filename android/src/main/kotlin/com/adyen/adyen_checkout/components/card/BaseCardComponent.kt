@@ -13,6 +13,7 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.util.Consumer
 import androidx.core.view.children
 import androidx.core.view.doOnNextLayout
+import androidx.core.view.updateLayoutParams
 import com.adyen.adyen_checkout.R
 import com.adyen.adyen_checkout.components.ComponentActionMessenger
 import com.adyen.adyen_checkout.components.ComponentErrorMessenger
@@ -31,9 +32,11 @@ abstract class BaseCardComponent(
     private val componentFlutterApi: ComponentFlutterInterface,
     context: Context,
     id: Int,
-    creationParams: Map<*, *>?
+    creationParams: Map<*, *>
 ) : PlatformView {
-    private val configuration = creationParams?.get(CARD_COMPONENT_CONFIGURATION_KEY) as CardComponentConfigurationDTO
+    private val configuration =
+        creationParams.getOrDefault(CARD_COMPONENT_CONFIGURATION_KEY, null) as CardComponentConfigurationDTO?
+            ?: throw Exception("Card configuration not found")
     private val environment = configuration.environment.toNativeModel()
     private val componentWrapperView = ComponentWrapperView(activity, componentFlutterApi)
     private val intentListener = Consumer<Intent> { handleIntent(it) }
@@ -48,7 +51,7 @@ abstract class BaseCardComponent(
     lateinit var cardComponent: CardComponent
 
     init {
-        activity.addOnNewIntentListener(intentListener);
+        activity.addOnNewIntentListener(intentListener)
     }
 
     override fun getView(): View = componentWrapperView
@@ -108,9 +111,9 @@ abstract class BaseCardComponent(
 
         //Card
         val card = componentContainer.children.firstOrNull() as ViewGroup?
-        val cardLayoutParams = card?.layoutParams
-        cardLayoutParams?.height = LinearLayout.LayoutParams.WRAP_CONTENT
-        card?.layoutParams = cardLayoutParams
+        card?.updateLayoutParams {
+            height = LinearLayout.LayoutParams.WRAP_CONTENT
+        }
     }
 
     companion object {

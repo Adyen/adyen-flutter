@@ -115,7 +115,8 @@ class CheckoutPlatformApi(
             val paymentMethodsJsonObject = sessionSetupResponse.paymentMethodsApiResponse?.let {
                 PaymentMethodsApiResponse.SERIALIZER.serialize(it)
             }
-            sessionHolder.init(sessionResponse, orderResponse)
+            sessionHolder.sessionSetupResponse = sessionResponse
+            sessionHolder.orderResponse = orderResponse
             callback(
                 Result.success(
                     SessionDTO(

@@ -5,7 +5,6 @@ import Flutter
 
 class CardSessionFlowComponent: BaseCardComponent {
     private let sessionHolder: SessionHolder
-    private var adyenSession: AdyenSession?
 
     init(
         frame: CGRect,
@@ -30,8 +29,8 @@ class CardSessionFlowComponent: BaseCardComponent {
 
     private func setupCardComponentView() {
         do {
-            cardComponent = try setupCardComponent()
-            showCardComponent()
+            let cardComponent = try setupCardComponent()
+            showCardComponent(cardComponent: cardComponent)
         } catch {
             sendErrorToFlutterLayer(errorMessage: error.localizedDescription)
         }
@@ -58,6 +57,13 @@ class CardSessionFlowComponent: BaseCardComponent {
     }
 
     private func setupFinalizeComponentCallback() {
-        (sessionHolder.sessionDelegate as? CardSessionFlowDelegate)?.finalizeAndDismiss = finalizeAndDismiss
+        (sessionHolder.sessionDelegate as? CardSessionFlowDelegate)?.finalizeAndDismissHandler = finalizeAndDismissSessionComponent
+    }
+    
+    func finalizeAndDismissSessionComponent(success: Bool, completion: @escaping (() -> Void)) {
+        finalizeAndDismiss(success: success, completion: { [weak self] in
+            self?.sessionHolder.reset()
+            completion()
+        })
     }
 }

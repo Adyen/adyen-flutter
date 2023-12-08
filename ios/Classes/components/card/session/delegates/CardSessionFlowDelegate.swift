@@ -3,16 +3,16 @@ import AdyenNetworking
 
 class CardSessionFlowDelegate: AdyenSessionDelegate {
     private let componentFlutterApi: ComponentFlutterInterface
-    var finalizeAndDismiss: ((Bool, @escaping (() -> Void)) -> Void)?
+    var finalizeAndDismissHandler: ((Bool, @escaping (() -> Void)) -> Void)?
 
     init(componentFlutterApi: ComponentFlutterInterface) {
         self.componentFlutterApi = componentFlutterApi
     }
 
-    func didComplete(with result: Adyen.AdyenSessionResult, component _: Adyen.Component, session: Adyen.AdyenSession) {
+    func didComplete(with result: AdyenSessionResult, component _: Component, session: AdyenSession) {
         let resultCode = result.resultCode
         let success = resultCode == .authorised || resultCode == .received || resultCode == .pending
-        finalizeAndDismiss?(success, { [weak self] in
+        finalizeAndDismissHandler?(success, { [weak self] in
             let paymentResult = PaymentResultModelDTO(sessionId: session.sessionContext.identifier, sessionData: session.sessionContext.data, resultCode: result.resultCode.rawValue)
             let componentCommunicationModel = ComponentCommunicationModel(type: ComponentCommunicationType.result, paymentResult: paymentResult)
             self?.componentFlutterApi.onComponentCommunication(componentCommunicationModel: componentCommunicationModel, completion: { _ in })
@@ -25,7 +25,6 @@ class CardSessionFlowDelegate: AdyenSessionDelegate {
     }
 
     func didOpenExternalApplication(component _: ActionComponent, session _: AdyenSession) {
-        print("did open external application")
-        // TODO: Could we discuss when this callback is being triggered and needs to be handled?
+        // TODO: Add implementation when we support external applications
     }
 }

@@ -40,15 +40,15 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
                 let sessionConfiguration = AdyenSession.Configuration(sessionIdentifier: sessionId,
                                                                       initialSessionData: sessionData,
                                                                       context: adyenContext,
-                                                                      actionComponent: .init())
-                sessionHolder.sessionPresentationDelegate = CardPresentationDelegate(topViewController: getViewController())
-                sessionHolder.sessionDelegate = CardSessionFlowDelegate(componentFlutterApi: componentFlutterApi)
+                                                                      actionComponent: .init())                
+                let sessionDelegate = CardSessionFlowDelegate(componentFlutterApi: componentFlutterApi)
+                let sessionPresentationDelegate = CardPresentationDelegate(topViewController: getViewController())
                 AdyenSession.initialize(with: sessionConfiguration,
-                                        delegate: sessionHolder.sessionDelegate!,
-                                        presentationDelegate: sessionHolder.sessionPresentationDelegate!) { [weak self] result in
+                                        delegate: sessionDelegate,
+                                        presentationDelegate: sessionPresentationDelegate) { [weak self] result in
                     switch result {
                     case let .success(session):
-                        self?.sessionHolder.session = session
+                        self?.sessionHolder.setup(session: session, sessionPresentationDelegate: sessionPresentationDelegate, sessionDelegate: sessionDelegate)
                         // TODO: serialize paymentMethods
                         completion(Result.success(SessionDTO(id: sessionId,
                                                              sessionData: sessionData,
@@ -165,6 +165,8 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
 
     func cleanUpDropIn() {
         sessionHolder.sessionPresentationDelegate = nil
+        sessionHolder.sessionDelegate = nil
+        sessionHolder.session = nil
         dropInSessionDelegate = nil
         dropInSessionStoredPaymentMethodsDelegate = nil
         dropInAdvancedFlowDelegate?.dropInInteractorDelegate = nil
