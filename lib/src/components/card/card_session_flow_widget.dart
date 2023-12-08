@@ -42,7 +42,8 @@ class CardSessionFlowWidget extends StatefulWidget {
 }
 
 class _CardSessionFlowWidgetState extends State<CardSessionFlowWidget> {
-  final MessageCodec<Object?> _codec = ComponentFlutterInterface.codec;
+  final MessageCodec<Object?> _codec =
+      ComponentFlutterInterface.pigeonChannelCodec;
   final ComponentFlutterApi _resultApi = ComponentFlutterApi();
   final ComponentPlatformApi _componentPlatformApi = ComponentPlatformApi();
   final StreamController<double> _resizeStream = StreamController.broadcast();
@@ -114,7 +115,6 @@ class _CardSessionFlowWidgetState extends State<CardSessionFlowWidget> {
           widget.cardComponentConfiguration,
       Constants.paymentMethodKey: widget.paymentMethod,
       Constants.isStoredPaymentMethodKey: widget.isStoredPaymentMethod,
-
     };
 
     switch (defaultTargetPlatform) {
