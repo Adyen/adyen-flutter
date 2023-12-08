@@ -109,7 +109,7 @@ extension DropInConfigurationDTO {
         let amount = amount.mapToAmount()
         var analyticsConfiguration = AnalyticsConfiguration()
         analyticsConfiguration.isEnabled = analyticsOptionsDTO.enabled
-        analyticsConfiguration.context = TelemetryContext(version: analyticsOptionsDTO.version, platform: .flutter)
+        //analyticsConfiguration.context = TelemetryContext(version: analyticsOptionsDTO.version, platform: .flutter)
         return AdyenContext(apiContext: apiContext, payment: Payment(amount: amount, countryCode: countryCode), analyticsConfiguration: analyticsConfiguration)
     }
 }
@@ -174,7 +174,7 @@ extension CardComponentConfigurationDTO {
         let amount = amount.mapToAmount()
         var analyticsConfiguration = AnalyticsConfiguration()
         analyticsConfiguration.isEnabled = analyticsOptionsDTO.enabled
-        analyticsConfiguration.context = TelemetryContext(version: analyticsOptionsDTO.version, platform: .flutter)
+        //analyticsConfiguration.context = TelemetryContext(version: analyticsOptionsDTO.version, platform: .flutter)
         return AdyenContext(apiContext: apiContext, payment: Payment(amount: amount, countryCode: countryCode), analyticsConfiguration: analyticsConfiguration)
     }
 }
