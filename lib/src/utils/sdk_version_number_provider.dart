@@ -1,3 +1,4 @@
+import 'package:adyen_checkout/src/logging/adyen_logger.dart';
 import 'package:flutter/services.dart';
 
 class SdkVersionNumberProvider {
@@ -10,6 +11,8 @@ class SdkVersionNumberProvider {
       final versionNumber = match?.group(1) ?? "";
       return versionNumber;
     } catch (exception) {
+      AdyenLogger().print(
+          "Could not find adyen checkout pubspec file for reading the SDK version number");
       return "";
     }
   }
