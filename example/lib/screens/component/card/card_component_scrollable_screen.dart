@@ -3,13 +3,13 @@
 import 'dart:convert';
 
 import 'package:adyen_checkout/adyen_checkout.dart';
+import 'package:adyen_checkout_example/config.dart';
 import 'package:adyen_checkout_example/repositories/adyen_card_component_repository.dart';
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 
-import '../config.dart';
-
-class CardComponentScreen extends StatelessWidget {
-  const CardComponentScreen({
+class CardComponentScrollableScreen extends StatelessWidget {
+  const CardComponentScrollableScreen({
     required this.repository,
     super.key,
   });
@@ -80,8 +80,8 @@ class CardComponentScreen extends StatelessWidget {
   Map<String, dynamic> extractPaymentMethod(String paymentMethods) {
     Map<String, dynamic> jsonPaymentMethods = jsonDecode(paymentMethods);
     List paymentMethodList = jsonPaymentMethods["paymentMethods"] as List;
-    Map<String, dynamic> paymentMethod = paymentMethodList
-        .firstWhere((paymentMethod) => paymentMethod["type"] == "scheme");
+    Map<String, dynamic>? paymentMethod = paymentMethodList
+        .firstWhereOrNull((paymentMethod) => paymentMethod["type"] == "scheme");
 
     List storedPaymentMethodList =
         jsonPaymentMethods.containsKey("storedPaymentMethods")
@@ -90,7 +90,7 @@ class CardComponentScreen extends StatelessWidget {
     Map<String, dynamic>? storedPaymentMethod =
         storedPaymentMethodList.firstOrNull;
 
-    return storedPaymentMethod ?? <String, String>{};
+    return paymentMethod ?? <String, String>{};
   }
 
   _dialogBuilder(BuildContext context, PaymentResult paymentResult) {

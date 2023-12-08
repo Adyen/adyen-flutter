@@ -13,6 +13,7 @@ dependencies:
   adyen_checkout:
     path: ../
   http: 1.1.0
+  collection: 1.18.0
   flutter_localizations:
     sdk: flutter
   intl: any

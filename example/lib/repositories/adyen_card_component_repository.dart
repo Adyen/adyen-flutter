@@ -15,7 +15,7 @@ class AdyenCardComponentRepository extends AdyenBaseRepository {
     required super.service,
   });
 
-  Future<SessionResponseNetworkModel> createSession() async {
+  Future<SessionResponseNetworkModel> fetchSession() async {
     String returnUrl = await determineBaseReturnUrl();
     returnUrl += "/card";
     SessionRequestNetworkModel sessionRequestNetworkModel =
