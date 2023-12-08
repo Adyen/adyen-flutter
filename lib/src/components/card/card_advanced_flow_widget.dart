@@ -49,7 +49,8 @@ class CardAdvancedFlowWidget extends StatefulWidget {
 }
 
 class _CardAdvancedFlowWidgetState extends State<CardAdvancedFlowWidget> {
-  final MessageCodec<Object?> _codec = ComponentFlutterInterface.codec;
+  final MessageCodec<Object?> _codec =
+      ComponentFlutterInterface.pigeonChannelCodec;
   final ComponentFlutterApi _resultApi = ComponentFlutterApi();
   final StreamController<double> _resizeStream = StreamController.broadcast();
   final ComponentPlatformApi _componentPlatformApi = ComponentPlatformApi();
