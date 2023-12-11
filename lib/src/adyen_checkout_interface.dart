@@ -1,5 +1,5 @@
 import 'package:adyen_checkout/adyen_checkout.dart';
-import 'package:adyen_checkout/src/models/base_configuration.dart';
+import 'package:adyen_checkout/src/common/models/base_configuration.dart';
 
 abstract class AdyenCheckoutInterface {
   Future<String> getReturnUrl();

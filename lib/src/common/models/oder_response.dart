@@ -1,4 +1,4 @@
-import 'package:adyen_checkout/src/models/amount.dart';
+import 'package:adyen_checkout/src/common/models/amount.dart';
 
 class OrderResponse {
   final String pspReference;

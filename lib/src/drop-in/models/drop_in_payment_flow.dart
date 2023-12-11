@@ -26,4 +26,3 @@ class DropInAdvancedFlow extends DropInPaymentFlow {
     required this.postPaymentsDetails,
   });
 }
-

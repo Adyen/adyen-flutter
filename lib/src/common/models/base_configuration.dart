@@ -1,5 +1,5 @@
+import 'package:adyen_checkout/src/common/models/amount.dart';
 import 'package:adyen_checkout/src/generated/platform_api.g.dart';
-import 'package:adyen_checkout/src/models/amount.dart';
 
 base class BaseConfiguration {
   final Environment environment;

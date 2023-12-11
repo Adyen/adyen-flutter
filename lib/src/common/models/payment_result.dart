@@ -1,4 +1,5 @@
 import 'package:adyen_checkout/adyen_checkout.dart';
+import 'package:adyen_checkout/src/common/models/oder_response.dart';
 
 sealed class PaymentResult {}
 
