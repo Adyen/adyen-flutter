@@ -1,28 +1,20 @@
 package com.adyen.adyen_checkout
 
-import CheckoutFlutterApi
 import CheckoutPlatformInterface
 import ComponentFlutterInterface
 import ComponentPlatformInterface
-import PaymentResultDTO
-import PaymentResultEnum
-import PaymentResultModelDTO
-import PlatformCommunicationModel
-import PlatformCommunicationType
+import DropInFlutterInterface
+import DropInPlatformInterface
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import com.adyen.adyen_checkout.components.ComponentPlatformApi
 import com.adyen.adyen_checkout.components.card.advancedFlow.CardAdvancedFlowComponentFactory
 import com.adyen.adyen_checkout.components.card.session.CardSessionFlowComponentFactory
+import com.adyen.adyen_checkout.dropIn.DropInPlatformApi
 import com.adyen.adyen_checkout.session.SessionHolder
-import com.adyen.adyen_checkout.utils.ConfigurationMapper.mapToOrderResponseModel
 import com.adyen.adyen_checkout.utils.Constants.Companion.WRONG_FLUTTER_ACTIVITY_USAGE_ERROR_MESSAGE
 import com.adyen.checkout.dropin.DropIn
-import com.adyen.checkout.dropin.DropInCallback
-import com.adyen.checkout.dropin.DropInResult
-import com.adyen.checkout.dropin.SessionDropInCallback
-import com.adyen.checkout.dropin.SessionDropInResult
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.embedding.engine.plugins.FlutterPlugin.FlutterPluginBinding
 import io.flutter.embedding.engine.plugins.activity.ActivityAware
@@ -32,9 +24,10 @@ import io.flutter.embedding.engine.plugins.lifecycle.HiddenLifecycleReference
 /** AdyenCheckoutPlugin */
 class AdyenCheckoutPlugin : FlutterPlugin, ActivityAware {
     private var checkoutPlatformApi: CheckoutPlatformApi? = null
-    private var checkoutFlutterApi: CheckoutFlutterApi? = null
-    private var componentPlatformApi: ComponentPlatformApi? = null
+    private var dropInFlutterApi: DropInFlutterInterface? = null
+    private var dropInPlatformApi: DropInPlatformApi? = null
     private var componentFlutterApi: ComponentFlutterInterface? = null
+    private var componentPlatformApi: ComponentPlatformApi? = null
     private var lifecycleReference: HiddenLifecycleReference? = null
     private var lifecycleObserver: LifecycleEventObserver? = null
     private var flutterPluginBinding: FlutterPluginBinding? = null
@@ -42,18 +35,24 @@ class AdyenCheckoutPlugin : FlutterPlugin, ActivityAware {
 
     override fun onAttachedToEngine(flutterPluginBinding: FlutterPluginBinding) {
         this.flutterPluginBinding = flutterPluginBinding
-        checkoutFlutterApi = CheckoutFlutterApi(flutterPluginBinding.binaryMessenger)
-        checkoutPlatformApi = CheckoutPlatformApi(checkoutFlutterApi, sessionHolder)
+        checkoutPlatformApi = CheckoutPlatformApi(sessionHolder)
+        CheckoutPlatformInterface.setUp(flutterPluginBinding.binaryMessenger, checkoutPlatformApi)
+
+        //DropIn init
+        dropInFlutterApi = DropInFlutterInterface(flutterPluginBinding.binaryMessenger)
+        dropInFlutterApi?.let { dropInPlatformApi = DropInPlatformApi(it) }
+        DropInPlatformInterface.setUp(flutterPluginBinding.binaryMessenger, dropInPlatformApi)
+
+        //Component init
         componentFlutterApi = ComponentFlutterInterface(flutterPluginBinding.binaryMessenger)
         componentPlatformApi = ComponentPlatformApi()
-        CheckoutPlatformInterface.setUp(flutterPluginBinding.binaryMessenger, checkoutPlatformApi)
         ComponentPlatformInterface.setUp(flutterPluginBinding.binaryMessenger, componentPlatformApi)
     }
 
     override fun onDetachedFromEngine(binding: FlutterPluginBinding) {
         CheckoutPlatformInterface.setUp(binding.binaryMessenger, null)
         ComponentPlatformInterface.setUp(binding.binaryMessenger, null)
-        checkoutFlutterApi = null
+        dropInFlutterApi = null
         componentFlutterApi = null
     }
 
@@ -74,6 +73,7 @@ class AdyenCheckoutPlugin : FlutterPlugin, ActivityAware {
 
         val fragmentActivity = binding.activity as FragmentActivity
         checkoutPlatformApi?.activity = fragmentActivity
+        dropInPlatformApi?.activity = fragmentActivity
         lifecycleReference = binding.lifecycle as HiddenLifecycleReference
         lifecycleObserver = lifecycleEventObserver(fragmentActivity)
         lifecycleObserver?.let {
@@ -95,11 +95,15 @@ class AdyenCheckoutPlugin : FlutterPlugin, ActivityAware {
         return LifecycleEventObserver { _, event ->
             when (event) {
                 Lifecycle.Event.ON_CREATE -> {
-                    checkoutPlatformApi?.dropInSessionLauncher =
-                        DropIn.registerForDropInResult(fragmentActivity, sessionDropInCallback)
-                    checkoutPlatformApi?.dropInAdvancedFlowLauncher = DropIn.registerForDropInResult(
-                        fragmentActivity, dropInAdvancedFlowCallback
-                    )
+                    dropInPlatformApi?.sessionDropInCallback?.let {
+                        dropInPlatformApi?.dropInSessionLauncher = DropIn.registerForDropInResult(fragmentActivity, it)
+                    }
+
+                    dropInPlatformApi?.dropInAdvancedFlowCallback?.let {
+                        dropInPlatformApi?.dropInAdvancedFlowLauncher = DropIn.registerForDropInResult(
+                            fragmentActivity, it
+                        )
+                    }
                 }
 
                 else -> {}
@@ -107,61 +111,6 @@ class AdyenCheckoutPlugin : FlutterPlugin, ActivityAware {
         }
     }
 
-    private val sessionDropInCallback = SessionDropInCallback { sessionDropInResult ->
-        if (sessionDropInResult == null) {
-            return@SessionDropInCallback
-        }
-
-        val mappedResult = when (sessionDropInResult) {
-            is SessionDropInResult.CancelledByUser -> PaymentResultDTO(
-                PaymentResultEnum.CANCELLEDBYUSER
-            )
-
-            is SessionDropInResult.Error -> PaymentResultDTO(
-                PaymentResultEnum.ERROR, reason = sessionDropInResult.reason
-            )
-
-            is SessionDropInResult.Finished -> PaymentResultDTO(PaymentResultEnum.FINISHED,
-                result = with(sessionDropInResult.result) {
-                    PaymentResultModelDTO(
-                        sessionId, sessionData, sessionResult, resultCode, order?.mapToOrderResponseModel()
-                    )
-                })
-        }
-
-        val platformCommunicationModel = PlatformCommunicationModel(
-            PlatformCommunicationType.RESULT, data = "", paymentResult = mappedResult
-        )
-
-        checkoutFlutterApi?.onDropInSessionPlatformCommunication(platformCommunicationModel) {}
-    }
-
-    private val dropInAdvancedFlowCallback = DropInCallback { dropInAdvancedFlowResult ->
-        if (dropInAdvancedFlowResult == null) {
-            return@DropInCallback
-        }
-
-        val mappedResult = when (dropInAdvancedFlowResult) {
-            is DropInResult.CancelledByUser -> PaymentResultDTO(
-                PaymentResultEnum.CANCELLEDBYUSER
-            )
-
-            is DropInResult.Error -> PaymentResultDTO(
-                PaymentResultEnum.ERROR, reason = dropInAdvancedFlowResult.reason
-            )
-
-            is DropInResult.Finished -> PaymentResultDTO(
-                PaymentResultEnum.FINISHED, result = PaymentResultModelDTO(
-                    resultCode = dropInAdvancedFlowResult.result
-                )
-            )
-        }
-
-        val platformCommunicationModel = PlatformCommunicationModel(
-            PlatformCommunicationType.RESULT, data = "", paymentResult = mappedResult
-        )
-        checkoutFlutterApi?.onDropInAdvancedFlowPlatformCommunication(platformCommunicationModel) {}
-    }
 
     private fun teardown() {
         lifecycleObserver?.let {

@@ -73,9 +73,9 @@ class _CardComponentScreenState extends State<CardComponentScreen> {
     );
 
     final session = await widget.adyenCheckout.createSession(
-      sessionResponse.id,
-      sessionResponse.sessionData,
-      cardComponentConfiguration,
+      sessionId: sessionResponse.id,
+      sessionData: sessionResponse.sessionData,
+      configuration: cardComponentConfiguration,
     );
 
     // ignore: use_build_context_synchronously

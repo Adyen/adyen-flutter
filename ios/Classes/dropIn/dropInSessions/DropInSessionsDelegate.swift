@@ -3,18 +3,18 @@ import AdyenNetworking
 
 class DropInSessionsDelegate: AdyenSessionDelegate {
     private let viewController: UIViewController?
-    private let checkoutFlutterApi: CheckoutFlutterApi
+    private let dropInFlutterApi: DropInFlutterInterface
 
-    init(viewController: UIViewController, checkoutFlutterApi: CheckoutFlutterApi) {
+    init(viewController: UIViewController, dropInFlutterApi: DropInFlutterInterface) {
         self.viewController = viewController
-        self.checkoutFlutterApi = checkoutFlutterApi
+        self.dropInFlutterApi = dropInFlutterApi
     }
 
     func didComplete(with result: Adyen.AdyenSessionResult, component _: Adyen.Component, session: Adyen.AdyenSession) {
         viewController?.dismiss(animated: false, completion: {
             let paymentResult = PaymentResultModelDTO(sessionId: session.sessionContext.identifier, sessionData: session.sessionContext.data, resultCode: result.resultCode.rawValue)
             let platformCommunicationModel = PlatformCommunicationModel(type: PlatformCommunicationType.result, paymentResult: PaymentResultDTO(type: PaymentResultEnum.finished, result: paymentResult))
-            self.checkoutFlutterApi.onDropInSessionPlatformCommunication(platformCommunicationModel: platformCommunicationModel, completion: { _ in })
+            self.dropInFlutterApi.onDropInSessionPlatformCommunication(platformCommunicationModel: platformCommunicationModel, completion: { _ in })
         })
     }
 
@@ -23,10 +23,10 @@ class DropInSessionsDelegate: AdyenSessionDelegate {
             switch error {
             case ComponentError.cancelled:
                 let platformCommunicationModel = PlatformCommunicationModel(type: PlatformCommunicationType.result, paymentResult: PaymentResultDTO(type: PaymentResultEnum.cancelledByUser, reason: error.localizedDescription))
-                self.checkoutFlutterApi.onDropInSessionPlatformCommunication(platformCommunicationModel: platformCommunicationModel, completion: { _ in })
+                self.dropInFlutterApi.onDropInSessionPlatformCommunication(platformCommunicationModel: platformCommunicationModel, completion: { _ in })
             default:
                 let platformCommunicationModel = PlatformCommunicationModel(type: PlatformCommunicationType.result, paymentResult: PaymentResultDTO(type: PaymentResultEnum.error, reason: error.localizedDescription))
-                self.checkoutFlutterApi.onDropInSessionPlatformCommunication(platformCommunicationModel: platformCommunicationModel, completion: { _ in })
+                self.dropInFlutterApi.onDropInSessionPlatformCommunication(platformCommunicationModel: platformCommunicationModel, completion: { _ in })
             }
         })
     }

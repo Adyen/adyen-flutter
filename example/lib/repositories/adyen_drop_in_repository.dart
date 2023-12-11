@@ -36,7 +36,7 @@ class AdyenDropInRepository extends AdyenBaseRepository {
             shopperLocale: Config.shopperLocale,
             shopperReference: Config.shopperReference,
             storePaymentMethodMode:
-                StorePaymentMethodMode.enabled.storePaymentMethodModeString,
+                StorePaymentMethodMode.askForConsent.storePaymentMethodModeString,
             recurringProcessingModel:
                 RecurringProcessingModel.cardOnFile.recurringModelString,
             shopperInteraction:

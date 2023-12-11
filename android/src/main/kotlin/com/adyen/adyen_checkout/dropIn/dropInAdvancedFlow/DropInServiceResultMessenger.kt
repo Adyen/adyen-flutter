@@ -1,9 +1,9 @@
-package com.adyen.adyen_checkout.dropInAdvancedFlow
+package com.adyen.adyen_checkout.dropIn.dropInAdvancedFlow
 
 import DeletedStoredPaymentMethodResultDTO
 import PaymentFlowOutcomeDTO
 import androidx.lifecycle.LiveData
-import com.adyen.adyen_checkout.models.DropInStoredPaymentMethodDeletionModel
+import com.adyen.adyen_checkout.dropIn.models.DropInStoredPaymentMethodDeletionModel
 import com.adyen.adyen_checkout.utils.Event
 import org.json.JSONObject
 

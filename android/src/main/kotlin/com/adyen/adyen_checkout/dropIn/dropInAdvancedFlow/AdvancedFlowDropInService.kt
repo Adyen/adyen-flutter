@@ -1,4 +1,4 @@
-package com.adyen.adyen_checkout.dropInAdvancedFlow
+package com.adyen.adyen_checkout.dropIn.dropInAdvancedFlow
 
 import DeletedStoredPaymentMethodResultDTO
 import ErrorDTO
@@ -9,8 +9,8 @@ import android.os.IBinder
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ServiceLifecycleDispatcher
-import com.adyen.adyen_checkout.models.DropInFlowType
-import com.adyen.adyen_checkout.models.DropInStoredPaymentMethodDeletionModel
+import com.adyen.adyen_checkout.dropIn.models.DropInFlowType
+import com.adyen.adyen_checkout.dropIn.models.DropInStoredPaymentMethodDeletionModel
 import com.adyen.checkout.components.core.ActionComponentData
 import com.adyen.checkout.components.core.PaymentComponentData
 import com.adyen.checkout.components.core.PaymentComponentState

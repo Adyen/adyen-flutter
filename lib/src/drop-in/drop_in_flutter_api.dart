@@ -2,13 +2,10 @@ import 'dart:async';
 
 import 'package:adyen_checkout/src/generated/platform_api.g.dart';
 
-class AdyenCheckoutResultApi implements CheckoutFlutterApi {
+class DropInFlutterApi implements DropInFlutterInterface {
   var dropInSessionPlatformCommunicationStream =
       StreamController<PlatformCommunicationModel>();
   var dropInAdvancedFlowPlatformCommunicationStream =
-      StreamController<PlatformCommunicationModel>();
-
-  var componentCommunicationStream =
       StreamController<PlatformCommunicationModel>();
 
   @override

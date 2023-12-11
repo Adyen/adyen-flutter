@@ -85,9 +85,7 @@ class _DropInScreenState extends State<DropInScreen> {
   }
 
   Future<DropInConfiguration> _createDropInConfiguration() async {
-    const CardConfiguration cardsConfiguration = CardConfiguration(
-      showStorePaymentField: false,
-    );
+    const CardConfiguration cardsConfiguration = CardConfiguration();
 
     const ApplePayConfiguration applePayConfiguration = ApplePayConfiguration(
       merchantId: Config.merchantAccount,
@@ -165,7 +163,7 @@ class _DropInScreenState extends State<DropInScreen> {
               style: TextButton.styleFrom(
                   textStyle: Theme.of(context).textTheme.labelLarge),
               child: const Text('Close'),
-              onPressed: () {
+              onPressed: () async {
                 Navigator.of(context).pop();
               },
             ),
