@@ -64,8 +64,8 @@ class CardComponentScrollableScreen extends StatelessWidget {
     );
 
     return AdyenCardComponentWidget(
+      configuration: cardComponentConfiguration,
       componentPaymentFlow: CardComponentAdvancedFlow(
-        cardComponentConfiguration: cardComponentConfiguration,
         paymentMethod: paymentMethod,
         onPayments: repository.postPayments,
         onPaymentsDetails: repository.postPaymentsDetails,
