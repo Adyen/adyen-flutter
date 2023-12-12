@@ -25,6 +25,8 @@ import com.adyen.checkout.components.core.Amount
 import com.adyen.checkout.components.core.AnalyticsConfiguration
 import com.adyen.checkout.components.core.AnalyticsLevel
 import com.adyen.checkout.components.core.OrderResponse
+import com.adyen.checkout.components.core.internal.data.api.AnalyticsMapper
+import com.adyen.checkout.components.core.internal.data.api.AnalyticsPlatform
 import com.adyen.checkout.dropin.DropInConfiguration
 import com.adyen.checkout.googlepay.GooglePayConfiguration
 import com.adyen.checkout.sessions.core.SessionModel
@@ -121,10 +123,7 @@ object ConfigurationMapper {
             enabled -> AnalyticsLevel.ALL
             else -> AnalyticsLevel.NONE
         }
-//        AnalyticsMapper.Companion.overrideForCrossPlatform(
-//            AnalyticsPlatform.FLUTTER.value,
-//            version,
-//        )
+        AnalyticsMapper.Companion.overrideForCrossPlatform(AnalyticsPlatform.FLUTTER, version)
         return AnalyticsConfiguration(analyticsLevel)
     }
 
