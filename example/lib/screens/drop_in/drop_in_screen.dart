@@ -58,8 +58,8 @@ class _DropInScreenState extends State<DropInScreen> {
     );
 
     final PaymentResult paymentResult = await widget.adyenCheckout.startPayment(
+      dropInConfiguration: dropInConfiguration,
       paymentFlow: DropInSessionFlow(
-        dropInConfiguration: dropInConfiguration,
         session: session,
       ),
     );
@@ -73,8 +73,8 @@ class _DropInScreenState extends State<DropInScreen> {
     final dropInConfiguration = await _createDropInConfiguration();
 
     final paymentResult = await widget.adyenCheckout.startPayment(
+      dropInConfiguration: dropInConfiguration,
       paymentFlow: DropInAdvancedFlow(
-        dropInConfiguration: dropInConfiguration,
         paymentMethodsResponse: paymentMethodsResponse,
         postPayments: widget.repository.postPayments,
         postPaymentsDetails: widget.repository.postPaymentsDetails,

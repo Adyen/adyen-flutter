@@ -10,7 +10,10 @@ abstract class AdyenCheckoutInterface {
     required BaseConfiguration configuration,
   });
 
-  Future<PaymentResult> startPayment({required DropInPaymentFlow paymentFlow});
+  Future<PaymentResult> startPayment({
+    required DropInConfiguration dropInConfiguration,
+    required DropInPaymentFlow paymentFlow,
+  });
 
   void enableConsoleLogging({required bool enabled});
 }
