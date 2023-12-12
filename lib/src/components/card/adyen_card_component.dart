@@ -1,8 +1,8 @@
 import 'dart:convert';
 
 import 'package:adyen_checkout/adyen_checkout.dart';
-import 'package:adyen_checkout/src/components/card/card_advanced_flow_widget.dart';
-import 'package:adyen_checkout/src/components/card/card_session_flow_widget.dart';
+import 'package:adyen_checkout/src/components/card/card_advanced_component.dart';
+import 'package:adyen_checkout/src/components/card/card_session_component.dart';
 import 'package:adyen_checkout/src/utils/constants.dart';
 import 'package:adyen_checkout/src/utils/dto_mapper.dart';
 import 'package:adyen_checkout/src/utils/sdk_version_number_provider.dart';
@@ -10,7 +10,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/widgets.dart';
 
-class AdyenCardComponentWidget extends StatelessWidget {
+class AdyenCardComponent extends StatelessWidget {
   final CardComponentConfiguration configuration;
   final ComponentPaymentFlow componentPaymentFlow;
   final Future<void> Function(PaymentResult) onPaymentResult;
@@ -20,7 +20,7 @@ class AdyenCardComponentWidget extends StatelessWidget {
   final SdkVersionNumberProvider _sdkVersionNumberProvider =
       SdkVersionNumberProvider();
 
-  AdyenCardComponentWidget({
+  AdyenCardComponent({
     super.key,
     required this.configuration,
     required this.componentPaymentFlow,
@@ -48,7 +48,7 @@ class AdyenCardComponentWidget extends StatelessWidget {
     );
   }
 
-  CardSessionFlowWidget _buildCardSessionFlowWidget(String sdkVersionNumber) {
+  CardSessionComponent _buildCardSessionFlowWidget(String sdkVersionNumber) {
     final CardComponentSessionFlow cardComponentSessionFlow =
         componentPaymentFlow as CardComponentSessionFlow;
     final double initialHeight =
@@ -58,7 +58,7 @@ class AdyenCardComponentWidget extends StatelessWidget {
     final isStoredPaymentMethod = cardComponentSessionFlow.paymentMethod
         .containsKey(_isStoredPaymentMethodIndicator);
 
-    return CardSessionFlowWidget(
+    return CardSessionComponent(
       cardComponentConfiguration: configuration.toDTO(sdkVersionNumber),
       paymentMethod: encodedPaymentMethod,
       session: cardComponentSessionFlow.session.toDTO(),
@@ -68,7 +68,7 @@ class AdyenCardComponentWidget extends StatelessWidget {
     );
   }
 
-  CardAdvancedFlowWidget _buildCardAdvancedFlowWidget(String sdkVersionNumber) {
+  CardAdvancedComponent _buildCardAdvancedFlowWidget(String sdkVersionNumber) {
     final CardComponentAdvancedFlow cardComponentAdvancedFlow =
         componentPaymentFlow as CardComponentAdvancedFlow;
     final initialHeight =
@@ -79,7 +79,7 @@ class AdyenCardComponentWidget extends StatelessWidget {
             ?.containsKey(_isStoredPaymentMethodIndicator) ??
         false;
 
-    return CardAdvancedFlowWidget(
+    return CardAdvancedComponent(
       cardComponentConfiguration: configuration.toDTO(sdkVersionNumber),
       paymentMethod: encodedPaymentMethod,
       onPayments: cardComponentAdvancedFlow.onPayments,

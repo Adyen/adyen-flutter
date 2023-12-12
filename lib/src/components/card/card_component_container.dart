@@ -1,8 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-class AdyenCardComponentContainerWidget extends StatelessWidget {
-  const AdyenCardComponentContainerWidget({
+class CardComponentContainer extends StatelessWidget {
+  const CardComponentContainer({
     super.key,
     required this.snapshot,
     required this.cardWidgetKey,
