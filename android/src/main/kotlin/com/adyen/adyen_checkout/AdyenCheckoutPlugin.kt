@@ -40,7 +40,7 @@ class AdyenCheckoutPlugin : FlutterPlugin, ActivityAware {
 
         //DropIn init
         dropInFlutterApi = DropInFlutterInterface(flutterPluginBinding.binaryMessenger)
-        dropInFlutterApi?.let { dropInPlatformApi = DropInPlatformApi(it) }
+        dropInFlutterApi?.let { dropInPlatformApi = DropInPlatformApi(it, sessionHolder) }
         DropInPlatformInterface.setUp(flutterPluginBinding.binaryMessenger, dropInPlatformApi)
 
         //Component init

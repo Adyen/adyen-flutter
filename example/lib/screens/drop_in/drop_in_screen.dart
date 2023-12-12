@@ -51,10 +51,11 @@ class _DropInScreenState extends State<DropInScreen> {
         await widget.repository.fetchSession();
     final DropInConfiguration dropInConfiguration =
         await _createDropInConfiguration();
-    final Session session = Session(
-      id: sessionResponse.id,
+
+    final Session session = await widget.adyenCheckout.createSession(
+      sessionId: sessionResponse.id,
       sessionData: sessionResponse.sessionData,
-      paymentMethodsJson: "",
+      configuration: dropInConfiguration,
     );
 
     final PaymentResult paymentResult = await widget.adyenCheckout.startPayment(

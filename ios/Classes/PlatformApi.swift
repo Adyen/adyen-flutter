@@ -896,8 +896,6 @@ private class DropInPlatformInterfaceCodecReader: FlutterStandardReader {
         return GooglePayConfigurationDTO.fromList(self.readValue() as! [Any?])
       case 137:
         return PaymentFlowOutcomeDTO.fromList(self.readValue() as! [Any?])
-      case 138:
-        return SessionDTO.fromList(self.readValue() as! [Any?])
       default:
         return super.readValue(ofType: type)
     }
@@ -936,9 +934,6 @@ private class DropInPlatformInterfaceCodecWriter: FlutterStandardWriter {
     } else if let value = value as? PaymentFlowOutcomeDTO {
       super.writeByte(137)
       super.writeValue(value.toList())
-    } else if let value = value as? SessionDTO {
-      super.writeByte(138)
-      super.writeValue(value.toList())
     } else {
       super.writeValue(value)
     }
@@ -961,7 +956,7 @@ class DropInPlatformInterfaceCodec: FlutterStandardMessageCodec {
 
 /// Generated protocol from Pigeon that represents a handler of messages from Flutter.
 protocol DropInPlatformInterface {
-  func startDropInSessionPayment(dropInConfigurationDTO: DropInConfigurationDTO, session: SessionDTO) throws
+  func startDropInSessionPayment(dropInConfigurationDTO: DropInConfigurationDTO) throws
   func startDropInAdvancedFlowPayment(dropInConfigurationDTO: DropInConfigurationDTO, paymentMethodsResponse: String) throws
   func onPaymentsResult(paymentsResult: PaymentFlowOutcomeDTO) throws
   func onPaymentsDetailsResult(paymentsDetailsResult: PaymentFlowOutcomeDTO) throws
@@ -980,9 +975,8 @@ class DropInPlatformInterfaceSetup {
       startDropInSessionPaymentChannel.setMessageHandler { message, reply in
         let args = message as! [Any?]
         let dropInConfigurationDTOArg = args[0] as! DropInConfigurationDTO
-        let sessionArg = args[1] as! SessionDTO
         do {
-          try api.startDropInSessionPayment(dropInConfigurationDTO: dropInConfigurationDTOArg, session: sessionArg)
+          try api.startDropInSessionPayment(dropInConfigurationDTO: dropInConfigurationDTOArg)
           reply(wrapResult(nil))
         } catch {
           reply(wrapError(error))
