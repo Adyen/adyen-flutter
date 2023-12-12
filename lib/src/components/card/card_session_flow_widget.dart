@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:adyen_checkout/adyen_checkout.dart';
+import 'package:adyen_checkout/src/common/models/payment_result.dart';
 import 'package:adyen_checkout/src/components/card/card_component_container_widget.dart';
 import 'package:adyen_checkout/src/components/component_flutter_api.dart';
 import 'package:adyen_checkout/src/components/component_platform_api.dart';
@@ -26,7 +26,7 @@ class CardSessionFlowWidget extends StatefulWidget {
     required this.isStoredPaymentMethod,
     this.gestureRecognizers,
     AdyenLogger? adyenLogger,
-  }) : adyenLogger = adyenLogger ?? AdyenLogger();
+  }) : adyenLogger = adyenLogger ?? AdyenLogger.instance;
 
   final CardComponentConfigurationDTO cardComponentConfiguration;
   final SessionDTO session;

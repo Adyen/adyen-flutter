@@ -92,9 +92,12 @@ class BaseCardComponent: NSObject, FlutterPlatformView, UIScrollViewDelegate {
         componentFlutterApi.onComponentCommunication(componentCommunicationModel: componentCommunicationModel, completion: { _ in })
     }
 
-    func finalizeAndDismiss(success: Bool, completion: @escaping (() -> Void)) {
+    func finalizeAndDismiss(
+        success: Bool,
+        completion: @escaping (() -> Void)
+    ) {
         cardComponent?.finalizeIfNeeded(with: success) { [weak self] in
-            self?.getViewController()?.dismiss(animated: true , completion:  {
+            self?.getViewController()?.dismiss(animated: true, completion: {
                 completion()
             })
         }

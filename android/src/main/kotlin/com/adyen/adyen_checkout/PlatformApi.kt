@@ -875,16 +875,9 @@ private object CheckoutPlatformInterfaceCodec : StandardMessageCodec() {
 
 /** Generated interface from Pigeon that represents a handler of messages from Flutter. */
 interface CheckoutPlatformInterface {
-  fun getPlatformVersion(callback: (Result<String>) -> Unit)
   fun getReturnUrl(callback: (Result<String>) -> Unit)
   fun createSession(sessionId: String, sessionData: String, configuration: Any?, callback: (Result<SessionDTO>) -> Unit)
-  fun startDropInSessionPayment(dropInConfigurationDTO: DropInConfigurationDTO, session: SessionDTO)
-  fun startDropInAdvancedFlowPayment(dropInConfigurationDTO: DropInConfigurationDTO, paymentMethodsResponse: String)
-  fun onPaymentsResult(paymentsResult: PaymentFlowOutcomeDTO)
-  fun onPaymentsDetailsResult(paymentsDetailsResult: PaymentFlowOutcomeDTO)
-  fun onDeleteStoredPaymentMethodResult(deleteStoredPaymentMethodResultDTO: DeletedStoredPaymentMethodResultDTO)
-  fun enableLogging(loggingEnabled: Boolean)
-  fun cleanUpDropIn()
+  fun enableConsoleLogging(loggingEnabled: Boolean)
 
   companion object {
     /** The codec used by CheckoutPlatformInterface. */
@@ -894,24 +887,6 @@ interface CheckoutPlatformInterface {
     /** Sets up an instance of `CheckoutPlatformInterface` to handle messages through the `binaryMessenger`. */
     @Suppress("UNCHECKED_CAST")
     fun setUp(binaryMessenger: BinaryMessenger, api: CheckoutPlatformInterface?) {
-      run {
-        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.getPlatformVersion", codec)
-        if (api != null) {
-          channel.setMessageHandler { _, reply ->
-            api.getPlatformVersion() { result: Result<String> ->
-              val error = result.exceptionOrNull()
-              if (error != null) {
-                reply.reply(wrapError(error))
-              } else {
-                val data = result.getOrNull()
-                reply.reply(wrapResult(data))
-              }
-            }
-          }
-        } else {
-          channel.setMessageHandler(null)
-        }
-      }
       run {
         val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.getReturnUrl", codec)
         if (api != null) {
@@ -953,7 +928,159 @@ interface CheckoutPlatformInterface {
         }
       }
       run {
-        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.startDropInSessionPayment", codec)
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.enableConsoleLogging", codec)
+        if (api != null) {
+          channel.setMessageHandler { message, reply ->
+            val args = message as List<Any?>
+            val loggingEnabledArg = args[0] as Boolean
+            var wrapped: List<Any?>
+            try {
+              api.enableConsoleLogging(loggingEnabledArg)
+              wrapped = listOf<Any?>(null)
+            } catch (exception: Throwable) {
+              wrapped = wrapError(exception)
+            }
+            reply.reply(wrapped)
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+    }
+  }
+}
+@Suppress("UNCHECKED_CAST")
+private object DropInPlatformInterfaceCodec : StandardMessageCodec() {
+  override fun readValueOfType(type: Byte, buffer: ByteBuffer): Any? {
+    return when (type) {
+      128.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          AmountDTO.fromList(it)
+        }
+      }
+      129.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          AnalyticsOptionsDTO.fromList(it)
+        }
+      }
+      130.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          ApplePayConfigurationDTO.fromList(it)
+        }
+      }
+      131.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          CardConfigurationDTO.fromList(it)
+        }
+      }
+      132.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          CashAppPayConfigurationDTO.fromList(it)
+        }
+      }
+      133.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          DeletedStoredPaymentMethodResultDTO.fromList(it)
+        }
+      }
+      134.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          DropInConfigurationDTO.fromList(it)
+        }
+      }
+      135.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          ErrorDTO.fromList(it)
+        }
+      }
+      136.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          GooglePayConfigurationDTO.fromList(it)
+        }
+      }
+      137.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          PaymentFlowOutcomeDTO.fromList(it)
+        }
+      }
+      138.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          SessionDTO.fromList(it)
+        }
+      }
+      else -> super.readValueOfType(type, buffer)
+    }
+  }
+  override fun writeValue(stream: ByteArrayOutputStream, value: Any?)   {
+    when (value) {
+      is AmountDTO -> {
+        stream.write(128)
+        writeValue(stream, value.toList())
+      }
+      is AnalyticsOptionsDTO -> {
+        stream.write(129)
+        writeValue(stream, value.toList())
+      }
+      is ApplePayConfigurationDTO -> {
+        stream.write(130)
+        writeValue(stream, value.toList())
+      }
+      is CardConfigurationDTO -> {
+        stream.write(131)
+        writeValue(stream, value.toList())
+      }
+      is CashAppPayConfigurationDTO -> {
+        stream.write(132)
+        writeValue(stream, value.toList())
+      }
+      is DeletedStoredPaymentMethodResultDTO -> {
+        stream.write(133)
+        writeValue(stream, value.toList())
+      }
+      is DropInConfigurationDTO -> {
+        stream.write(134)
+        writeValue(stream, value.toList())
+      }
+      is ErrorDTO -> {
+        stream.write(135)
+        writeValue(stream, value.toList())
+      }
+      is GooglePayConfigurationDTO -> {
+        stream.write(136)
+        writeValue(stream, value.toList())
+      }
+      is PaymentFlowOutcomeDTO -> {
+        stream.write(137)
+        writeValue(stream, value.toList())
+      }
+      is SessionDTO -> {
+        stream.write(138)
+        writeValue(stream, value.toList())
+      }
+      else -> super.writeValue(stream, value)
+    }
+  }
+}
+
+/** Generated interface from Pigeon that represents a handler of messages from Flutter. */
+interface DropInPlatformInterface {
+  fun startDropInSessionPayment(dropInConfigurationDTO: DropInConfigurationDTO, session: SessionDTO)
+  fun startDropInAdvancedFlowPayment(dropInConfigurationDTO: DropInConfigurationDTO, paymentMethodsResponse: String)
+  fun onPaymentsResult(paymentsResult: PaymentFlowOutcomeDTO)
+  fun onPaymentsDetailsResult(paymentsDetailsResult: PaymentFlowOutcomeDTO)
+  fun onDeleteStoredPaymentMethodResult(deleteStoredPaymentMethodResultDTO: DeletedStoredPaymentMethodResultDTO)
+  fun cleanUpDropIn()
+
+  companion object {
+    /** The codec used by DropInPlatformInterface. */
+    val codec: MessageCodec<Any?> by lazy {
+      DropInPlatformInterfaceCodec
+    }
+    /** Sets up an instance of `DropInPlatformInterface` to handle messages through the `binaryMessenger`. */
+    @Suppress("UNCHECKED_CAST")
+    fun setUp(binaryMessenger: BinaryMessenger, api: DropInPlatformInterface?) {
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.adyen_checkout.DropInPlatformInterface.startDropInSessionPayment", codec)
         if (api != null) {
           channel.setMessageHandler { message, reply ->
             val args = message as List<Any?>
@@ -973,7 +1100,7 @@ interface CheckoutPlatformInterface {
         }
       }
       run {
-        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.startDropInAdvancedFlowPayment", codec)
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.adyen_checkout.DropInPlatformInterface.startDropInAdvancedFlowPayment", codec)
         if (api != null) {
           channel.setMessageHandler { message, reply ->
             val args = message as List<Any?>
@@ -993,7 +1120,7 @@ interface CheckoutPlatformInterface {
         }
       }
       run {
-        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.onPaymentsResult", codec)
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.adyen_checkout.DropInPlatformInterface.onPaymentsResult", codec)
         if (api != null) {
           channel.setMessageHandler { message, reply ->
             val args = message as List<Any?>
@@ -1012,7 +1139,7 @@ interface CheckoutPlatformInterface {
         }
       }
       run {
-        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.onPaymentsDetailsResult", codec)
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.adyen_checkout.DropInPlatformInterface.onPaymentsDetailsResult", codec)
         if (api != null) {
           channel.setMessageHandler { message, reply ->
             val args = message as List<Any?>
@@ -1031,7 +1158,7 @@ interface CheckoutPlatformInterface {
         }
       }
       run {
-        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.onDeleteStoredPaymentMethodResult", codec)
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.adyen_checkout.DropInPlatformInterface.onDeleteStoredPaymentMethodResult", codec)
         if (api != null) {
           channel.setMessageHandler { message, reply ->
             val args = message as List<Any?>
@@ -1050,26 +1177,7 @@ interface CheckoutPlatformInterface {
         }
       }
       run {
-        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.enableLogging", codec)
-        if (api != null) {
-          channel.setMessageHandler { message, reply ->
-            val args = message as List<Any?>
-            val loggingEnabledArg = args[0] as Boolean
-            var wrapped: List<Any?>
-            try {
-              api.enableLogging(loggingEnabledArg)
-              wrapped = listOf<Any?>(null)
-            } catch (exception: Throwable) {
-              wrapped = wrapError(exception)
-            }
-            reply.reply(wrapped)
-          }
-        } else {
-          channel.setMessageHandler(null)
-        }
-      }
-      run {
-        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.cleanUpDropIn", codec)
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.adyen_checkout.DropInPlatformInterface.cleanUpDropIn", codec)
         if (api != null) {
           channel.setMessageHandler { _, reply ->
             var wrapped: List<Any?>
@@ -1089,7 +1197,7 @@ interface CheckoutPlatformInterface {
   }
 }
 @Suppress("UNCHECKED_CAST")
-private object CheckoutFlutterApiCodec : StandardMessageCodec() {
+private object DropInFlutterInterfaceCodec : StandardMessageCodec() {
   override fun readValueOfType(type: Byte, buffer: ByteBuffer): Any? {
     return when (type) {
       128.toByte() -> {
@@ -1149,15 +1257,15 @@ private object CheckoutFlutterApiCodec : StandardMessageCodec() {
 
 /** Generated class from Pigeon that represents Flutter messages that can be called from Kotlin. */
 @Suppress("UNCHECKED_CAST")
-class CheckoutFlutterApi(private val binaryMessenger: BinaryMessenger) {
+class DropInFlutterInterface(private val binaryMessenger: BinaryMessenger) {
   companion object {
-    /** The codec used by CheckoutFlutterApi. */
+    /** The codec used by DropInFlutterInterface. */
     val codec: MessageCodec<Any?> by lazy {
-      CheckoutFlutterApiCodec
+      DropInFlutterInterfaceCodec
     }
   }
   fun onDropInSessionPlatformCommunication(platformCommunicationModelArg: PlatformCommunicationModel, callback: (Result<Unit>) -> Unit) {
-    val channelName = "dev.flutter.pigeon.adyen_checkout.CheckoutFlutterApi.onDropInSessionPlatformCommunication"
+    val channelName = "dev.flutter.pigeon.adyen_checkout.DropInFlutterInterface.onDropInSessionPlatformCommunication"
     val channel = BasicMessageChannel<Any?>(binaryMessenger, channelName, codec)
     channel.send(listOf(platformCommunicationModelArg)) {
       if (it is List<*>) {
@@ -1172,7 +1280,7 @@ class CheckoutFlutterApi(private val binaryMessenger: BinaryMessenger) {
     }
   }
   fun onDropInAdvancedFlowPlatformCommunication(platformCommunicationModelArg: PlatformCommunicationModel, callback: (Result<Unit>) -> Unit) {
-    val channelName = "dev.flutter.pigeon.adyen_checkout.CheckoutFlutterApi.onDropInAdvancedFlowPlatformCommunication"
+    val channelName = "dev.flutter.pigeon.adyen_checkout.DropInFlutterInterface.onDropInAdvancedFlowPlatformCommunication"
     val channel = BasicMessageChannel<Any?>(binaryMessenger, channelName, codec)
     channel.send(listOf(platformCommunicationModelArg)) {
       if (it is List<*>) {

@@ -45,7 +45,8 @@ abstract class BaseCardComponent(
         context,
         environment,
         configuration.clientKey,
-        configuration.analyticsOptionsDTO.mapToAnalyticsConfiguration()
+        configuration.analyticsOptionsDTO.mapToAnalyticsConfiguration(),
+        configuration.amount.toNativeModel(),
     )
 
     lateinit var cardComponent: CardComponent

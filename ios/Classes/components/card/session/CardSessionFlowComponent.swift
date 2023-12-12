@@ -45,7 +45,11 @@ class CardSessionFlowComponent: BaseCardComponent {
         return cardComponent
     }
 
-    private func buildCardComponent(paymentMethodString _: String, cardComponentConfiguration: CardComponentConfigurationDTO, session: AdyenSession) throws -> CardComponent {
+    private func buildCardComponent(
+        paymentMethodString _: String,
+        cardComponentConfiguration: CardComponentConfigurationDTO,
+        session: AdyenSession
+    ) throws -> CardComponent {
         let adyenContext = try cardComponentConfiguration.createAdyenContext()
         let cardConfiguration = cardComponentConfiguration.cardConfiguration.mapToCardComponentConfiguration()
         /*
@@ -59,7 +63,7 @@ class CardSessionFlowComponent: BaseCardComponent {
     private func setupFinalizeComponentCallback() {
         (sessionHolder.sessionDelegate as? CardSessionFlowDelegate)?.finalizeAndDismissHandler = finalizeAndDismissSessionComponent
     }
-    
+
     func finalizeAndDismissSessionComponent(success: Bool, completion: @escaping (() -> Void)) {
         finalizeAndDismiss(success: success, completion: { [weak self] in
             self?.sessionHolder.reset()

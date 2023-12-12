@@ -338,9 +338,6 @@ class CardComponentConfigurationDTO {
 @HostApi()
 abstract class CheckoutPlatformInterface {
   @async
-  String getPlatformVersion();
-
-  @async
   String getReturnUrl();
 
   @async
@@ -350,6 +347,11 @@ abstract class CheckoutPlatformInterface {
     Object? configuration,
   );
 
+  void enableConsoleLogging(bool loggingEnabled);
+}
+
+@HostApi()
+abstract class DropInPlatformInterface {
   void startDropInSessionPayment(
     DropInConfigurationDTO dropInConfigurationDTO,
     SessionDTO session,
@@ -367,13 +369,11 @@ abstract class CheckoutPlatformInterface {
   void onDeleteStoredPaymentMethodResult(
       DeletedStoredPaymentMethodResultDTO deleteStoredPaymentMethodResultDTO);
 
-  void enableLogging(bool loggingEnabled);
-
   void cleanUpDropIn();
 }
 
 @FlutterApi()
-abstract class CheckoutFlutterApi {
+abstract class DropInFlutterInterface {
   void onDropInSessionPlatformCommunication(
       PlatformCommunicationModel platformCommunicationModel);
 

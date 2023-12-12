@@ -811,16 +811,9 @@ class CheckoutPlatformInterfaceCodec: FlutterStandardMessageCodec {
 
 /// Generated protocol from Pigeon that represents a handler of messages from Flutter.
 protocol CheckoutPlatformInterface {
-  func getPlatformVersion(completion: @escaping (Result<String, Error>) -> Void)
   func getReturnUrl(completion: @escaping (Result<String, Error>) -> Void)
   func createSession(sessionId: String, sessionData: String, configuration: Any?, completion: @escaping (Result<SessionDTO, Error>) -> Void)
-  func startDropInSessionPayment(dropInConfigurationDTO: DropInConfigurationDTO, session: SessionDTO) throws
-  func startDropInAdvancedFlowPayment(dropInConfigurationDTO: DropInConfigurationDTO, paymentMethodsResponse: String) throws
-  func onPaymentsResult(paymentsResult: PaymentFlowOutcomeDTO) throws
-  func onPaymentsDetailsResult(paymentsDetailsResult: PaymentFlowOutcomeDTO) throws
-  func onDeleteStoredPaymentMethodResult(deleteStoredPaymentMethodResultDTO: DeletedStoredPaymentMethodResultDTO) throws
-  func enableLogging(loggingEnabled: Bool) throws
-  func cleanUpDropIn() throws
+  func enableConsoleLogging(loggingEnabled: Bool) throws
 }
 
 /// Generated setup class from Pigeon to handle messages through the `binaryMessenger`.
@@ -829,21 +822,6 @@ class CheckoutPlatformInterfaceSetup {
   static var codec: FlutterStandardMessageCodec { CheckoutPlatformInterfaceCodec.shared }
   /// Sets up an instance of `CheckoutPlatformInterface` to handle messages through the `binaryMessenger`.
   static func setUp(binaryMessenger: FlutterBinaryMessenger, api: CheckoutPlatformInterface?) {
-    let getPlatformVersionChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.getPlatformVersion", binaryMessenger: binaryMessenger, codec: codec)
-    if let api = api {
-      getPlatformVersionChannel.setMessageHandler { _, reply in
-        api.getPlatformVersion() { result in
-          switch result {
-            case .success(let res):
-              reply(wrapResult(res))
-            case .failure(let error):
-              reply(wrapError(error))
-          }
-        }
-      }
-    } else {
-      getPlatformVersionChannel.setMessageHandler(nil)
-    }
     let getReturnUrlChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.getReturnUrl", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {
       getReturnUrlChannel.setMessageHandler { _, reply in
@@ -878,7 +856,126 @@ class CheckoutPlatformInterfaceSetup {
     } else {
       createSessionChannel.setMessageHandler(nil)
     }
-    let startDropInSessionPaymentChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.startDropInSessionPayment", binaryMessenger: binaryMessenger, codec: codec)
+    let enableConsoleLoggingChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.enableConsoleLogging", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      enableConsoleLoggingChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let loggingEnabledArg = args[0] as! Bool
+        do {
+          try api.enableConsoleLogging(loggingEnabled: loggingEnabledArg)
+          reply(wrapResult(nil))
+        } catch {
+          reply(wrapError(error))
+        }
+      }
+    } else {
+      enableConsoleLoggingChannel.setMessageHandler(nil)
+    }
+  }
+}
+private class DropInPlatformInterfaceCodecReader: FlutterStandardReader {
+  override func readValue(ofType type: UInt8) -> Any? {
+    switch type {
+      case 128:
+        return AmountDTO.fromList(self.readValue() as! [Any?])
+      case 129:
+        return AnalyticsOptionsDTO.fromList(self.readValue() as! [Any?])
+      case 130:
+        return ApplePayConfigurationDTO.fromList(self.readValue() as! [Any?])
+      case 131:
+        return CardConfigurationDTO.fromList(self.readValue() as! [Any?])
+      case 132:
+        return CashAppPayConfigurationDTO.fromList(self.readValue() as! [Any?])
+      case 133:
+        return DeletedStoredPaymentMethodResultDTO.fromList(self.readValue() as! [Any?])
+      case 134:
+        return DropInConfigurationDTO.fromList(self.readValue() as! [Any?])
+      case 135:
+        return ErrorDTO.fromList(self.readValue() as! [Any?])
+      case 136:
+        return GooglePayConfigurationDTO.fromList(self.readValue() as! [Any?])
+      case 137:
+        return PaymentFlowOutcomeDTO.fromList(self.readValue() as! [Any?])
+      case 138:
+        return SessionDTO.fromList(self.readValue() as! [Any?])
+      default:
+        return super.readValue(ofType: type)
+    }
+  }
+}
+
+private class DropInPlatformInterfaceCodecWriter: FlutterStandardWriter {
+  override func writeValue(_ value: Any) {
+    if let value = value as? AmountDTO {
+      super.writeByte(128)
+      super.writeValue(value.toList())
+    } else if let value = value as? AnalyticsOptionsDTO {
+      super.writeByte(129)
+      super.writeValue(value.toList())
+    } else if let value = value as? ApplePayConfigurationDTO {
+      super.writeByte(130)
+      super.writeValue(value.toList())
+    } else if let value = value as? CardConfigurationDTO {
+      super.writeByte(131)
+      super.writeValue(value.toList())
+    } else if let value = value as? CashAppPayConfigurationDTO {
+      super.writeByte(132)
+      super.writeValue(value.toList())
+    } else if let value = value as? DeletedStoredPaymentMethodResultDTO {
+      super.writeByte(133)
+      super.writeValue(value.toList())
+    } else if let value = value as? DropInConfigurationDTO {
+      super.writeByte(134)
+      super.writeValue(value.toList())
+    } else if let value = value as? ErrorDTO {
+      super.writeByte(135)
+      super.writeValue(value.toList())
+    } else if let value = value as? GooglePayConfigurationDTO {
+      super.writeByte(136)
+      super.writeValue(value.toList())
+    } else if let value = value as? PaymentFlowOutcomeDTO {
+      super.writeByte(137)
+      super.writeValue(value.toList())
+    } else if let value = value as? SessionDTO {
+      super.writeByte(138)
+      super.writeValue(value.toList())
+    } else {
+      super.writeValue(value)
+    }
+  }
+}
+
+private class DropInPlatformInterfaceCodecReaderWriter: FlutterStandardReaderWriter {
+  override func reader(with data: Data) -> FlutterStandardReader {
+    return DropInPlatformInterfaceCodecReader(data: data)
+  }
+
+  override func writer(with data: NSMutableData) -> FlutterStandardWriter {
+    return DropInPlatformInterfaceCodecWriter(data: data)
+  }
+}
+
+class DropInPlatformInterfaceCodec: FlutterStandardMessageCodec {
+  static let shared = DropInPlatformInterfaceCodec(readerWriter: DropInPlatformInterfaceCodecReaderWriter())
+}
+
+/// Generated protocol from Pigeon that represents a handler of messages from Flutter.
+protocol DropInPlatformInterface {
+  func startDropInSessionPayment(dropInConfigurationDTO: DropInConfigurationDTO, session: SessionDTO) throws
+  func startDropInAdvancedFlowPayment(dropInConfigurationDTO: DropInConfigurationDTO, paymentMethodsResponse: String) throws
+  func onPaymentsResult(paymentsResult: PaymentFlowOutcomeDTO) throws
+  func onPaymentsDetailsResult(paymentsDetailsResult: PaymentFlowOutcomeDTO) throws
+  func onDeleteStoredPaymentMethodResult(deleteStoredPaymentMethodResultDTO: DeletedStoredPaymentMethodResultDTO) throws
+  func cleanUpDropIn() throws
+}
+
+/// Generated setup class from Pigeon to handle messages through the `binaryMessenger`.
+class DropInPlatformInterfaceSetup {
+  /// The codec used by DropInPlatformInterface.
+  static var codec: FlutterStandardMessageCodec { DropInPlatformInterfaceCodec.shared }
+  /// Sets up an instance of `DropInPlatformInterface` to handle messages through the `binaryMessenger`.
+  static func setUp(binaryMessenger: FlutterBinaryMessenger, api: DropInPlatformInterface?) {
+    let startDropInSessionPaymentChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.DropInPlatformInterface.startDropInSessionPayment", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {
       startDropInSessionPaymentChannel.setMessageHandler { message, reply in
         let args = message as! [Any?]
@@ -894,7 +991,7 @@ class CheckoutPlatformInterfaceSetup {
     } else {
       startDropInSessionPaymentChannel.setMessageHandler(nil)
     }
-    let startDropInAdvancedFlowPaymentChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.startDropInAdvancedFlowPayment", binaryMessenger: binaryMessenger, codec: codec)
+    let startDropInAdvancedFlowPaymentChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.DropInPlatformInterface.startDropInAdvancedFlowPayment", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {
       startDropInAdvancedFlowPaymentChannel.setMessageHandler { message, reply in
         let args = message as! [Any?]
@@ -910,7 +1007,7 @@ class CheckoutPlatformInterfaceSetup {
     } else {
       startDropInAdvancedFlowPaymentChannel.setMessageHandler(nil)
     }
-    let onPaymentsResultChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.onPaymentsResult", binaryMessenger: binaryMessenger, codec: codec)
+    let onPaymentsResultChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.DropInPlatformInterface.onPaymentsResult", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {
       onPaymentsResultChannel.setMessageHandler { message, reply in
         let args = message as! [Any?]
@@ -925,7 +1022,7 @@ class CheckoutPlatformInterfaceSetup {
     } else {
       onPaymentsResultChannel.setMessageHandler(nil)
     }
-    let onPaymentsDetailsResultChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.onPaymentsDetailsResult", binaryMessenger: binaryMessenger, codec: codec)
+    let onPaymentsDetailsResultChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.DropInPlatformInterface.onPaymentsDetailsResult", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {
       onPaymentsDetailsResultChannel.setMessageHandler { message, reply in
         let args = message as! [Any?]
@@ -940,7 +1037,7 @@ class CheckoutPlatformInterfaceSetup {
     } else {
       onPaymentsDetailsResultChannel.setMessageHandler(nil)
     }
-    let onDeleteStoredPaymentMethodResultChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.onDeleteStoredPaymentMethodResult", binaryMessenger: binaryMessenger, codec: codec)
+    let onDeleteStoredPaymentMethodResultChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.DropInPlatformInterface.onDeleteStoredPaymentMethodResult", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {
       onDeleteStoredPaymentMethodResultChannel.setMessageHandler { message, reply in
         let args = message as! [Any?]
@@ -955,22 +1052,7 @@ class CheckoutPlatformInterfaceSetup {
     } else {
       onDeleteStoredPaymentMethodResultChannel.setMessageHandler(nil)
     }
-    let enableLoggingChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.enableLogging", binaryMessenger: binaryMessenger, codec: codec)
-    if let api = api {
-      enableLoggingChannel.setMessageHandler { message, reply in
-        let args = message as! [Any?]
-        let loggingEnabledArg = args[0] as! Bool
-        do {
-          try api.enableLogging(loggingEnabled: loggingEnabledArg)
-          reply(wrapResult(nil))
-        } catch {
-          reply(wrapError(error))
-        }
-      }
-    } else {
-      enableLoggingChannel.setMessageHandler(nil)
-    }
-    let cleanUpDropInChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.cleanUpDropIn", binaryMessenger: binaryMessenger, codec: codec)
+    let cleanUpDropInChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.DropInPlatformInterface.cleanUpDropIn", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {
       cleanUpDropInChannel.setMessageHandler { _, reply in
         do {
@@ -985,7 +1067,7 @@ class CheckoutPlatformInterfaceSetup {
     }
   }
 }
-private class CheckoutFlutterApiCodecReader: FlutterStandardReader {
+private class DropInFlutterInterfaceCodecReader: FlutterStandardReader {
   override func readValue(ofType type: UInt8) -> Any? {
     switch type {
       case 128:
@@ -1004,7 +1086,7 @@ private class CheckoutFlutterApiCodecReader: FlutterStandardReader {
   }
 }
 
-private class CheckoutFlutterApiCodecWriter: FlutterStandardWriter {
+private class DropInFlutterInterfaceCodecWriter: FlutterStandardWriter {
   override func writeValue(_ value: Any) {
     if let value = value as? AmountDTO {
       super.writeByte(128)
@@ -1027,35 +1109,35 @@ private class CheckoutFlutterApiCodecWriter: FlutterStandardWriter {
   }
 }
 
-private class CheckoutFlutterApiCodecReaderWriter: FlutterStandardReaderWriter {
+private class DropInFlutterInterfaceCodecReaderWriter: FlutterStandardReaderWriter {
   override func reader(with data: Data) -> FlutterStandardReader {
-    return CheckoutFlutterApiCodecReader(data: data)
+    return DropInFlutterInterfaceCodecReader(data: data)
   }
 
   override func writer(with data: NSMutableData) -> FlutterStandardWriter {
-    return CheckoutFlutterApiCodecWriter(data: data)
+    return DropInFlutterInterfaceCodecWriter(data: data)
   }
 }
 
-class CheckoutFlutterApiCodec: FlutterStandardMessageCodec {
-  static let shared = CheckoutFlutterApiCodec(readerWriter: CheckoutFlutterApiCodecReaderWriter())
+class DropInFlutterInterfaceCodec: FlutterStandardMessageCodec {
+  static let shared = DropInFlutterInterfaceCodec(readerWriter: DropInFlutterInterfaceCodecReaderWriter())
 }
 
 /// Generated protocol from Pigeon that represents Flutter messages that can be called from Swift.
-protocol CheckoutFlutterApiProtocol {
+protocol DropInFlutterInterfaceProtocol {
   func onDropInSessionPlatformCommunication(platformCommunicationModel platformCommunicationModelArg: PlatformCommunicationModel, completion: @escaping (Result<Void, FlutterError>) -> Void)
   func onDropInAdvancedFlowPlatformCommunication(platformCommunicationModel platformCommunicationModelArg: PlatformCommunicationModel, completion: @escaping (Result<Void, FlutterError>) -> Void)
 }
-class CheckoutFlutterApi: CheckoutFlutterApiProtocol {
+class DropInFlutterInterface: DropInFlutterInterfaceProtocol {
   private let binaryMessenger: FlutterBinaryMessenger
   init(binaryMessenger: FlutterBinaryMessenger){
     self.binaryMessenger = binaryMessenger
   }
   var codec: FlutterStandardMessageCodec {
-    return CheckoutFlutterApiCodec.shared
+    return DropInFlutterInterfaceCodec.shared
   }
   func onDropInSessionPlatformCommunication(platformCommunicationModel platformCommunicationModelArg: PlatformCommunicationModel, completion: @escaping (Result<Void, FlutterError>) -> Void) {
-    let channelName: String = "dev.flutter.pigeon.adyen_checkout.CheckoutFlutterApi.onDropInSessionPlatformCommunication"
+    let channelName: String = "dev.flutter.pigeon.adyen_checkout.DropInFlutterInterface.onDropInSessionPlatformCommunication"
     let channel = FlutterBasicMessageChannel(name: channelName, binaryMessenger: binaryMessenger, codec: codec)
     channel.sendMessage([platformCommunicationModelArg] as [Any?]) { response in
       guard let listResponse = response as? [Any?] else {
@@ -1073,7 +1155,7 @@ class CheckoutFlutterApi: CheckoutFlutterApiProtocol {
     }
   }
   func onDropInAdvancedFlowPlatformCommunication(platformCommunicationModel platformCommunicationModelArg: PlatformCommunicationModel, completion: @escaping (Result<Void, FlutterError>) -> Void) {
-    let channelName: String = "dev.flutter.pigeon.adyen_checkout.CheckoutFlutterApi.onDropInAdvancedFlowPlatformCommunication"
+    let channelName: String = "dev.flutter.pigeon.adyen_checkout.DropInFlutterInterface.onDropInAdvancedFlowPlatformCommunication"
     let channel = FlutterBasicMessageChannel(name: channelName, binaryMessenger: binaryMessenger, codec: codec)
     channel.sendMessage([platformCommunicationModelArg] as [Any?]) { response in
       guard let listResponse = response as? [Any?] else {

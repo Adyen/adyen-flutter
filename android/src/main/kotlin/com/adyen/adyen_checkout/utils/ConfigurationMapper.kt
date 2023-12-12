@@ -50,7 +50,7 @@ object ConfigurationMapper {
 
     fun DropInConfigurationDTO.mapToDropInConfiguration(context: Context): DropInConfiguration {
         val environment = environment.toNativeModel()
-        val amount = amount.mapToAmount()
+        val amount = amount.toNativeModel()
         val locale = Locale.forLanguageTag(shopperLocale)
         val dropInConfiguration = DropInConfiguration.Builder(locale, environment, clientKey)
         val analyticsConfiguration = analyticsOptionsDTO.mapToAnalyticsConfiguration()
@@ -74,6 +74,7 @@ object ConfigurationMapper {
                 environment,
                 clientKey,
                 analyticsConfiguration,
+                amount,
             )
             dropInConfiguration.addCardConfiguration(cardConfiguration)
         }
@@ -98,12 +99,14 @@ object ConfigurationMapper {
         environment: com.adyen.checkout.core.Environment,
         clientKey: String,
         analyticsConfiguration: AnalyticsConfiguration,
+        amount: Amount,
     ): CardConfiguration {
         val locale = Locale.forLanguageTag(shopperLocale)
 
         return CardConfiguration.Builder(
             shopperLocale = locale, environment = environment, clientKey = clientKey
         ).setAddressConfiguration(addressMode.mapToAddressConfiguration())
+            .setAmount(amount)
             .setShowStorePaymentField(showStorePaymentField).setHideCvcStoredCard(!showCvcForStoredCard)
             .setHideCvc(!showCvc).setKcpAuthVisibility(determineKcpAuthVisibility(kcpFieldVisibility))
             .setSocialSecurityNumberVisibility(
@@ -191,7 +194,7 @@ object ConfigurationMapper {
         }
     }
 
-    private fun AmountDTO.mapToAmount(): Amount {
+    fun AmountDTO.toNativeModel(): Amount {
         return Amount(this.currency, this.value)
     }
 

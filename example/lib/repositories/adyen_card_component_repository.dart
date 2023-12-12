@@ -15,7 +15,7 @@ class AdyenCardComponentRepository extends AdyenBaseRepository {
     required super.service,
   });
 
-  Future<SessionResponseNetworkModel> createSession() async {
+  Future<SessionResponseNetworkModel> fetchSession() async {
     String returnUrl = await determineBaseReturnUrl();
     returnUrl += "/card";
     SessionRequestNetworkModel sessionRequestNetworkModel =
@@ -31,10 +31,10 @@ class AdyenCardComponentRepository extends AdyenBaseRepository {
       countryCode: Config.countryCode,
       shopperLocale: Config.shopperLocale,
       shopperReference: Config.shopperReference,
-      // storePaymentMethodMode:
-      //     StorePaymentMethodMode.enabled.storePaymentMethodModeString,
-      // recurringProcessingModel:
-      //     RecurringProcessingModel.cardOnFile.recurringModelString,
+      storePaymentMethodMode:
+          StorePaymentMethodMode.enabled.storePaymentMethodModeString,
+      recurringProcessingModel:
+          RecurringProcessingModel.cardOnFile.recurringModelString,
       shopperInteraction:
           ShopperInteractionModel.ecommerce.shopperInteractionModelString,
       channel: determineChannel(),

@@ -19,7 +19,7 @@ class CardAdvancedFlowActionComponentDelegate: ActionComponentDelegate {
     }
 
     func didComplete(from _: Adyen.ActionComponent) {
-        //Only for voucher payment method
+        // Only for voucher payment method
     }
 
     func didFail(with error: Error, from _: Adyen.ActionComponent) {

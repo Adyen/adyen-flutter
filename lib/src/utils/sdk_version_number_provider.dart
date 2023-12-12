@@ -11,7 +11,7 @@ class SdkVersionNumberProvider {
       final versionNumber = match?.group(1) ?? "";
       return versionNumber;
     } catch (exception) {
-      AdyenLogger().print(
+      AdyenLogger.instance.print(
           "Could not find adyen checkout pubspec file for reading the SDK version number");
       return "";
     }

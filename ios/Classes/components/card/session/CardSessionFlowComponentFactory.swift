@@ -3,9 +3,12 @@ import Flutter
 class CardSessionFlowComponentFactory: ComponentFactory {
     let sessionHolder: SessionHolder
 
-    init(messenger: FlutterBinaryMessenger, componentFlutterApi: ComponentFlutterInterface, sessionHolder: SessionHolder) {
+    init(
+        messenger: FlutterBinaryMessenger,
+        componentFlutterApi: ComponentFlutterInterface,
+        sessionHolder: SessionHolder
+    ) {
         self.sessionHolder = sessionHolder
-
         super.init(messenger: messenger, componentFlutterApi: componentFlutterApi)
     }
 

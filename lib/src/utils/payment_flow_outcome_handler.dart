@@ -1,5 +1,5 @@
+import 'package:adyen_checkout/src/common/models/payment_flow_outcome.dart';
 import 'package:adyen_checkout/src/generated/platform_api.g.dart';
-import 'package:adyen_checkout/src/models/payment_flow_outcome.dart';
 
 class PaymentFlowOutcomeHandler {
   PaymentFlowOutcomeDTO mapToPaymentOutcomeDTO(

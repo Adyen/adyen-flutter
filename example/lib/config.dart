@@ -17,8 +17,8 @@ class Config {
   //Environment constants
   static const String merchantAccount = "TestMerchantCheckout";
   static const String merchantName = "Test Merchant";
-  static const String countryCode = "BE";
-  static const String shopperLocale = "be_BE";
+  static const String countryCode = "NL";
+  static const String shopperLocale = "nl_NL";
   static const String shopperReference = "Test reference";
   static const Environment environment = Environment.test;
   static const String baseUrl = "checkout-test.adyen.com";
@@ -26,5 +26,5 @@ class Config {
   static const String iOSReturnUrl = "flutter-ui-host://payments";
 
   //Example data
-  static Amount amount = Amount(currency: "EUR", value: 2100);
+  static Amount amount = Amount(currency: "EUR", value: 1200);
 }

@@ -31,7 +31,7 @@ class CardAdvancedFlowWidget extends StatefulWidget {
     AdyenLogger? adyenLogger,
   })  : paymentFlowOutcomeHandler =
             paymentFlowOutcomeHandler ?? PaymentFlowOutcomeHandler(),
-        adyenLogger = adyenLogger ?? AdyenLogger();
+        adyenLogger = adyenLogger ?? AdyenLogger.instance;
 
   final CardComponentConfigurationDTO cardComponentConfiguration;
   final String paymentMethod;

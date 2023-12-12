@@ -9,16 +9,16 @@ class ConfigurationMapper {
 
         dropInConfiguration.paymentMethodsList.allowDisablingStoredPaymentMethods = dropInConfigurationDTO.isRemoveStoredPaymentMethodEnabled
 
-        if let cardsConfigurationDTO = dropInConfigurationDTO.cardConfigurationDTO {
-            let koreanAuthenticationMode = cardsConfigurationDTO.kcpFieldVisibility.toCardFieldVisibility()
-            let socialSecurityNumberMode = cardsConfigurationDTO.socialSecurityNumberFieldVisibility.toCardFieldVisibility()
-            let storedCardConfiguration = createStoredCardConfiguration(showCvcForStoredCard: cardsConfigurationDTO.showCvcForStoredCard)
-            let allowedCardTypes = determineAllowedCardTypes(cardTypes: cardsConfigurationDTO.supportedCardTypes)
-            let billingAddressConfiguration = determineBillingAddressConfiguration(addressMode: cardsConfigurationDTO.addressMode)
+        if let cardConfigurationDTO = dropInConfigurationDTO.cardConfigurationDTO {
+            let koreanAuthenticationMode = cardConfigurationDTO.kcpFieldVisibility.toCardFieldVisibility()
+            let socialSecurityNumberMode = cardConfigurationDTO.socialSecurityNumberFieldVisibility.toCardFieldVisibility()
+            let storedCardConfiguration = createStoredCardConfiguration(showCvcForStoredCard: cardConfigurationDTO.showCvcForStoredCard)
+            let allowedCardTypes = determineAllowedCardTypes(cardTypes: cardConfigurationDTO.supportedCardTypes)
+            let billingAddressConfiguration = determineBillingAddressConfiguration(addressMode: cardConfigurationDTO.addressMode)
             let cardConfiguration = DropInComponent.Card(
-                showsHolderNameField: cardsConfigurationDTO.holderNameRequired,
-                showsStorePaymentMethodField: cardsConfigurationDTO.showStorePaymentField,
-                showsSecurityCodeField: cardsConfigurationDTO.showCvc,
+                showsHolderNameField: cardConfigurationDTO.holderNameRequired,
+                showsStorePaymentMethodField: cardConfigurationDTO.showStorePaymentField,
+                showsSecurityCodeField: cardConfigurationDTO.showCvc,
                 koreanAuthenticationMode: koreanAuthenticationMode,
                 socialSecurityNumberMode: socialSecurityNumberMode,
                 storedCardConfiguration: storedCardConfiguration,
@@ -40,7 +40,6 @@ class ConfigurationMapper {
 
         return dropInConfiguration
     }
-
 
     private func createStoredCardConfiguration(showCvcForStoredCard: Bool) -> StoredCardConfiguration {
         var storedCardConfiguration = StoredCardConfiguration()
@@ -109,7 +108,7 @@ extension DropInConfigurationDTO {
         let amount = amount.mapToAmount()
         var analyticsConfiguration = AnalyticsConfiguration()
         analyticsConfiguration.isEnabled = analyticsOptionsDTO.enabled
-        //analyticsConfiguration.context = TelemetryContext(version: analyticsOptionsDTO.version, platform: .flutter)
+        // analyticsConfiguration.context = TelemetryContext(version: analyticsOptionsDTO.version, platform: .flutter)
         return AdyenContext(apiContext: apiContext, payment: Payment(amount: amount, countryCode: countryCode), analyticsConfiguration: analyticsConfiguration)
     }
 }
@@ -174,7 +173,7 @@ extension CardComponentConfigurationDTO {
         let amount = amount.mapToAmount()
         var analyticsConfiguration = AnalyticsConfiguration()
         analyticsConfiguration.isEnabled = analyticsOptionsDTO.enabled
-        //analyticsConfiguration.context = TelemetryContext(version: analyticsOptionsDTO.version, platform: .flutter)
+        // analyticsConfiguration.context = TelemetryContext(version: analyticsOptionsDTO.version, platform: .flutter)
         return AdyenContext(apiContext: apiContext, payment: Payment(amount: amount, countryCode: countryCode), analyticsConfiguration: analyticsConfiguration)
     }
 }
