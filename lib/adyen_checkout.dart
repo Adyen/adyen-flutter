@@ -13,8 +13,8 @@ export 'src/common/models/stored_payment_method_configuration.dart';
 export 'src/components/card/adyen_card_component_widget.dart';
 export 'src/components/card/models/card_component_configuration.dart';
 export 'src/components/component_payment_flow.dart';
-export 'src/drop-in/models/drop_in_configuration.dart';
-export 'src/drop-in/models/drop_in_payment_flow.dart';
+export 'src/drop_in/models/drop_in_configuration.dart';
+export 'src/drop_in/models/drop_in_payment_flow.dart';
 export 'src/generated/platform_api.g.dart'
     show
         Environment,

@@ -1,8 +1,8 @@
 import 'dart:async';
 
 import 'package:adyen_checkout/adyen_checkout.dart';
-import 'package:adyen_checkout/src/drop-in/drop_in_flutter_api.dart';
-import 'package:adyen_checkout/src/drop-in/drop_in_platform_api.dart';
+import 'package:adyen_checkout/src/drop_in/drop_in_flutter_api.dart';
+import 'package:adyen_checkout/src/drop_in/drop_in_platform_api.dart';
 import 'package:adyen_checkout/src/generated/platform_api.g.dart';
 import 'package:adyen_checkout/src/logging/adyen_logger.dart';
 import 'package:adyen_checkout/src/utils/dto_mapper.dart';
