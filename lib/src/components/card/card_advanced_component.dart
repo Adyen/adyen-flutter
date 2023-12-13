@@ -1,7 +1,7 @@
 import 'dart:async';
 
-import 'package:adyen_checkout/src/common/models/payment_result.dart';
-import 'package:adyen_checkout/src/components/card/card_component_container_widget.dart';
+import 'package:adyen_checkout/adyen_checkout.dart';
+import 'package:adyen_checkout/src/components/card/card_component_container.dart';
 import 'package:adyen_checkout/src/components/component_flutter_api.dart';
 import 'package:adyen_checkout/src/components/component_platform_api.dart';
 import 'package:adyen_checkout/src/components/platform/android_platform_view.dart';
@@ -9,44 +9,51 @@ import 'package:adyen_checkout/src/components/platform/ios_platform_view.dart';
 import 'package:adyen_checkout/src/generated/platform_api.g.dart';
 import 'package:adyen_checkout/src/logging/adyen_logger.dart';
 import 'package:adyen_checkout/src/utils/constants.dart';
+import 'package:adyen_checkout/src/utils/payment_flow_outcome_handler.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:stream_transform/stream_transform.dart';
 
-class CardSessionFlowWidget extends StatefulWidget {
-  CardSessionFlowWidget({
+class CardAdvancedComponent extends StatefulWidget {
+  CardAdvancedComponent({
     super.key,
     required this.cardComponentConfiguration,
-    required this.session,
     required this.paymentMethod,
+    required this.onPayments,
+    required this.onPaymentsDetails,
     required this.onPaymentResult,
     required this.initialViewHeight,
     required this.isStoredPaymentMethod,
     this.gestureRecognizers,
+    PaymentFlowOutcomeHandler? paymentFlowOutcomeHandler,
     AdyenLogger? adyenLogger,
-  }) : adyenLogger = adyenLogger ?? AdyenLogger.instance;
+  })  : paymentFlowOutcomeHandler =
+            paymentFlowOutcomeHandler ?? PaymentFlowOutcomeHandler(),
+        adyenLogger = adyenLogger ?? AdyenLogger.instance;
 
   final CardComponentConfigurationDTO cardComponentConfiguration;
-  final SessionDTO session;
   final String paymentMethod;
+  final Future<PaymentFlowOutcome> Function(String) onPayments;
+  final Future<PaymentFlowOutcome> Function(String) onPaymentsDetails;
   final Future<void> Function(PaymentResult) onPaymentResult;
-  final double initialViewHeight;
   final bool isStoredPaymentMethod;
+  final double initialViewHeight;
+  final PaymentFlowOutcomeHandler paymentFlowOutcomeHandler;
   final Set<Factory<OneSequenceGestureRecognizer>>? gestureRecognizers;
   final AdyenLogger adyenLogger;
 
   @override
-  State<CardSessionFlowWidget> createState() => _CardSessionFlowWidgetState();
+  State<CardAdvancedComponent> createState() => _CardAdvancedFlowState();
 }
 
-class _CardSessionFlowWidgetState extends State<CardSessionFlowWidget> {
+class _CardAdvancedFlowState extends State<CardAdvancedComponent> {
   final MessageCodec<Object?> _codec =
       ComponentFlutterInterface.pigeonChannelCodec;
   final ComponentFlutterApi _resultApi = ComponentFlutterApi();
-  final ComponentPlatformApi _componentPlatformApi = ComponentPlatformApi();
   final StreamController<double> _resizeStream = StreamController.broadcast();
+  final ComponentPlatformApi _componentPlatformApi = ComponentPlatformApi();
   final GlobalKey _cardWidgetKey = GlobalKey();
   late Widget _cardWidget;
 
@@ -68,7 +75,7 @@ class _CardSessionFlowWidgetState extends State<CardSessionFlowWidget> {
             .debounce(const Duration(milliseconds: 100))
             .distinct(),
         builder: (BuildContext context, AsyncSnapshot snapshot) {
-          return AdyenCardComponentContainerWidget(
+          return CardComponentContainer(
             snapshot: snapshot,
             cardWidgetKey: _cardWidgetKey,
             initialViewHeight: widget.initialViewHeight,
@@ -85,19 +92,36 @@ class _CardSessionFlowWidgetState extends State<CardSessionFlowWidget> {
   }
 
   void _handleComponentCommunication(event) async {
-    if (event.type case ComponentCommunicationType.result) {
-      _onResult(event);
-    } else if (event.type case ComponentCommunicationType.error) {
-      _onError(event);
-    } else if (event.type case ComponentCommunicationType.resize) {
-      _onResize(event);
+    switch (event.type) {
+      case ComponentCommunicationType.onSubmit:
+        _onSubmit(event);
+      case ComponentCommunicationType.additionalDetails:
+        _onAdditionalDetails(event);
+      case ComponentCommunicationType.error:
+        _onError(event);
+      case ComponentCommunicationType.resize:
+        _onResize(event);
+      case ComponentCommunicationType.result:
+        _onHandleResult(event);
     }
   }
 
-  void _onResult(ComponentCommunicationModel event) {
-    String resultCode = event.paymentResult?.resultCode ?? "";
-    widget.adyenLogger.print("Card session flow result code: $resultCode");
-    widget.onPaymentResult(PaymentAdvancedFlowFinished(resultCode: resultCode));
+  Future<void> _onSubmit(ComponentCommunicationModel event) async {
+    final PaymentFlowOutcome paymentFlowOutcome =
+        await widget.onPayments(event.data as String);
+    final PaymentFlowOutcomeDTO paymentFlowOutcomeDTO = widget
+        .paymentFlowOutcomeHandler
+        .mapToPaymentOutcomeDTO(paymentFlowOutcome);
+    _componentPlatformApi.onPaymentsResult(paymentFlowOutcomeDTO);
+  }
+
+  Future<void> _onAdditionalDetails(ComponentCommunicationModel event) async {
+    final PaymentFlowOutcome paymentFlowOutcome =
+        await widget.onPaymentsDetails(event.data as String);
+    final PaymentFlowOutcomeDTO paymentFlowOutcomeDTO = widget
+        .paymentFlowOutcomeHandler
+        .mapToPaymentOutcomeDTO(paymentFlowOutcome);
+    _componentPlatformApi.onPaymentsDetailsResult(paymentFlowOutcomeDTO);
   }
 
   void _onError(ComponentCommunicationModel event) {
@@ -108,12 +132,17 @@ class _CardSessionFlowWidgetState extends State<CardSessionFlowWidget> {
   void _onResize(ComponentCommunicationModel event) =>
       _resizeStream.add(event.data as double);
 
+  void _onHandleResult(ComponentCommunicationModel event) {
+    String resultCode = event.paymentResult?.resultCode ?? "";
+    widget.adyenLogger.print("Card advanced flow result code: $resultCode");
+    widget.onPaymentResult(PaymentAdvancedFlowFinished(resultCode: resultCode));
+  }
+
   Widget _buildCardWidget() {
     final Map<String, dynamic> creationParams = <String, dynamic>{
-      Constants.sessionKey: widget.session,
+      Constants.paymentMethodKey: widget.paymentMethod,
       Constants.cardComponentConfigurationKey:
           widget.cardComponentConfiguration,
-      Constants.paymentMethodKey: widget.paymentMethod,
       Constants.isStoredPaymentMethodKey: widget.isStoredPaymentMethod,
     };
 
@@ -121,7 +150,7 @@ class _CardSessionFlowWidgetState extends State<CardSessionFlowWidget> {
       case TargetPlatform.android:
         return AndroidPlatformView(
           key: UniqueKey(),
-          viewType: Constants.cardComponentSessionFlowKey,
+          viewType: Constants.cardComponentAdvancedFlowKey,
           codec: _codec,
           creationParams: creationParams,
           gestureRecognizers: widget.gestureRecognizers,
@@ -130,7 +159,7 @@ class _CardSessionFlowWidgetState extends State<CardSessionFlowWidget> {
       case TargetPlatform.iOS:
         return IosPlatformView(
           key: UniqueKey(),
-          viewType: Constants.cardComponentSessionFlowKey,
+          viewType: Constants.cardComponentAdvancedFlowKey,
           codec: _codec,
           creationParams: creationParams,
           gestureRecognizers: widget.gestureRecognizers,

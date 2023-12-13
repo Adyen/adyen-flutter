@@ -10,7 +10,7 @@ export 'src/common/models/payment_method_configurations/google_pay_configuration
 export 'src/common/models/payment_result.dart';
 export 'src/common/models/session.dart';
 export 'src/common/models/stored_payment_method_configuration.dart';
-export 'src/components/card/adyen_card_component_widget.dart';
+export 'src/components/card/adyen_card_component.dart';
 export 'src/components/card/models/card_component_configuration.dart';
 export 'src/components/component_payment_flow.dart';
 export 'src/drop_in/models/drop_in_configuration.dart';

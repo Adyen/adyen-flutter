@@ -123,9 +123,9 @@ class _CardComponentScreenState extends State<CardComponentScreen> {
   ) {
     final paymentMethod = extractPaymentMethod(session.paymentMethodsJson);
 
-    return AdyenCardComponentWidget(
+    return AdyenCardComponent(
+      configuration: cardComponentConfiguration,
       componentPaymentFlow: CardComponentSessionFlow(
-        cardComponentConfiguration: cardComponentConfiguration,
         session: session,
         paymentMethod: paymentMethod,
       ),
