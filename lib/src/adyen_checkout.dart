@@ -31,9 +31,13 @@ class AdyenCheckout implements AdyenCheckoutInterface {
 
   @override
   Future<PaymentResult> startPayment({
+    required DropInConfiguration dropInConfiguration,
     required DropInPaymentFlow paymentFlow,
   }) async =>
-      _dropIn.startPayment(paymentFlow: paymentFlow);
+      _dropIn.startPayment(
+        dropInConfiguration: dropInConfiguration,
+        paymentFlow: paymentFlow,
+      );
 
   @override
   void enableConsoleLogging({required bool enabled}) {

@@ -28,17 +28,25 @@ class DropIn {
   final DropInPlatformApi dropInPlatformApi;
 
   Future<PaymentResult> startPayment({
+    required DropInConfiguration dropInConfiguration,
     required DropInPaymentFlow paymentFlow,
   }) async {
     switch (paymentFlow) {
       case DropInSessionFlow():
-        return await _startDropInSessionsPayment(paymentFlow);
+        return await _startDropInSessionsPayment(
+          dropInConfiguration,
+          paymentFlow,
+        );
       case DropInAdvancedFlow():
-        return await _startDropInAdvancedFlowPayment(paymentFlow);
+        return await _startDropInAdvancedFlowPayment(
+          dropInConfiguration,
+          paymentFlow,
+        );
     }
   }
 
   Future<PaymentResult> _startDropInSessionsPayment(
+    DropInConfiguration dropInConfiguration,
     DropInSessionFlow dropInSession,
   ) async {
     adyenLogger.print("Start Drop-in session");
@@ -47,7 +55,7 @@ class DropIn {
         await sdkVersionNumberProvider.getSdkVersionNumber();
 
     dropInPlatformApi.startDropInSessionPayment(
-      dropInSession.dropInConfiguration.toDTO(sdkVersionNumber),
+      dropInConfiguration.toDTO(sdkVersionNumber),
       dropInSession.session.toDTO(),
     );
 
@@ -62,7 +70,7 @@ class DropIn {
         case PlatformCommunicationType.deleteStoredPaymentMethod:
           _onDeleteStoredPaymentMethodCallback(
             event,
-            dropInSession.dropInConfiguration.storedPaymentMethodConfiguration,
+            dropInConfiguration.storedPaymentMethodConfiguration,
           );
         default:
       }
@@ -92,6 +100,7 @@ class DropIn {
   }
 
   Future<PaymentResult> _startDropInAdvancedFlowPayment(
+    DropInConfiguration dropInConfiguration,
     DropInAdvancedFlow dropInAdvancedFlow,
   ) async {
     adyenLogger.print("Start Drop-in advanced flow");
@@ -100,7 +109,7 @@ class DropIn {
         await sdkVersionNumberProvider.getSdkVersionNumber();
 
     dropInPlatformApi.startDropInAdvancedFlowPayment(
-      dropInAdvancedFlow.dropInConfiguration.toDTO(sdkVersionNumber),
+      dropInConfiguration.toDTO(sdkVersionNumber),
       dropInAdvancedFlow.paymentMethodsResponse,
     );
 
@@ -120,8 +129,7 @@ class DropIn {
         case PlatformCommunicationType.deleteStoredPaymentMethod:
           _onDeleteStoredPaymentMethodCallback(
             event,
-            dropInAdvancedFlow
-                .dropInConfiguration.storedPaymentMethodConfiguration,
+            dropInConfiguration.storedPaymentMethodConfiguration,
           );
       }
     });
