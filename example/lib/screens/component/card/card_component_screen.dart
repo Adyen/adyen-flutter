@@ -62,58 +62,65 @@ class _CardComponentScreenState extends State<CardComponentScreen> {
   }
 
   void showCardComponentBottomSheet() async {
-    final sessionResponse = await widget.repository.fetchSession();
-    final cardComponentConfiguration = CardComponentConfiguration(
-      environment: Config.environment,
-      clientKey: Config.clientKey,
-      countryCode: Config.countryCode,
-      amount: Config.amount,
-      shopperLocale: Config.shopperLocale,
-      cardConfiguration: const CardConfiguration(),
-    );
+    try {
+      final sessionResponse = await widget.repository.fetchSession();
+      final cardComponentConfiguration = CardComponentConfiguration(
+        environment: Config.environment,
+        clientKey: Config.clientKey,
+        countryCode: Config.countryCode,
+        amount: Config.amount,
+        shopperLocale: Config.shopperLocale,
+        cardConfiguration: const CardConfiguration(),
+      );
 
-    final session = await widget.adyenCheckout.createSession(
-      sessionId: sessionResponse.id,
-      sessionData: sessionResponse.sessionData,
-      configuration: cardComponentConfiguration,
-    );
+      final session = await widget.adyenCheckout.createSession(
+        sessionId: sessionResponse.id,
+        sessionData: sessionResponse.sessionData,
+        configuration: cardComponentConfiguration,
+      );
 
-    // ignore: use_build_context_synchronously
-    return showModalBottomSheet(
-      context: context,
-      isDismissible: false,
-      isScrollControlled: true,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10.0),
-      ),
-      builder: (BuildContext context) {
-        return SafeArea(
-          child: SingleChildScrollView(
-              child: Column(
-            children: [
-              Container(height: 8),
-              Container(
-                width: 48,
-                height: 6,
-                decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
-                    color: Colors.grey),
-              ),
-              Container(height: 8),
-              Container(
-                padding: EdgeInsets.only(
-                    bottom: MediaQuery.of(context).viewInsets.bottom),
-                child: _buildSessionCardWidget(
-                  context,
-                  session,
-                  cardComponentConfiguration,
-                ),
-              ),
-            ],
-          )),
-        );
-      },
-    );
+      // ignore: use_build_context_synchronously
+      return showModalBottomSheet(
+        context: context,
+        isDismissible: false,
+        isScrollControlled: true,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10.0),
+        ),
+        builder: (BuildContext context) {
+          return SafeArea(
+            child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    Container(height: 8),
+                    Container(
+                      width: 48,
+                      height: 6,
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          color: Colors.grey),
+                    ),
+                    Container(height: 8),
+                    Container(
+                      padding: EdgeInsets.only(
+                          bottom: MediaQuery
+                              .of(context)
+                              .viewInsets
+                              .bottom),
+                      child: _buildSessionCardWidget(
+                        context,
+                        session,
+                        cardComponentConfiguration,
+                      ),
+                    ),
+                  ],
+                )),
+          );
+        },
+      );
+    } catch (error) {
+      debugPrint(error.toString());
+    }
   }
 
   Widget _buildSessionCardWidget(
