@@ -11,7 +11,6 @@ import 'package:adyen_checkout_example/repositories/adyen_base_repository.dart';
 
 class AdyenCardComponentRepository extends AdyenBaseRepository {
   AdyenCardComponentRepository({
-    required super.adyenCheckout,
     required super.service,
   });
 

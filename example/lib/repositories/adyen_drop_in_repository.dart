@@ -13,10 +13,7 @@ import 'package:adyen_checkout_example/network/models/session_response_network_m
 import 'package:adyen_checkout_example/repositories/adyen_base_repository.dart';
 
 class AdyenDropInRepository extends AdyenBaseRepository {
-  AdyenDropInRepository({
-    required super.adyenCheckout,
-    required super.service,
-  });
+  AdyenDropInRepository({required super.service});
 
   //A session should not being created from the mobile application.
   //Please provide a CheckoutSession object from your own backend.
@@ -35,8 +32,8 @@ class AdyenDropInRepository extends AdyenBaseRepository {
             countryCode: Config.countryCode,
             shopperLocale: Config.shopperLocale,
             shopperReference: Config.shopperReference,
-            storePaymentMethodMode:
-                StorePaymentMethodMode.askForConsent.storePaymentMethodModeString,
+            storePaymentMethodMode: StorePaymentMethodMode
+                .askForConsent.storePaymentMethodModeString,
             recurringProcessingModel:
                 RecurringProcessingModel.cardOnFile.recurringModelString,
             shopperInteraction:
