@@ -30,6 +30,7 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
         completion: @escaping (Result<SessionDTO, Error>) -> Void
     ) {
         do {
+            // TODO: Let's plan a generic configuration mapping for creating a session.
             switch configuration {
             case is DropInConfigurationDTO:
                 try createSessionForDropIn(configuration as! DropInConfigurationDTO, sessionId, sessionData, completion)
