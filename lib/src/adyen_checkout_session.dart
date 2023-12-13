@@ -1,4 +1,5 @@
 import 'package:adyen_checkout/adyen_checkout.dart';
+import 'package:adyen_checkout/src/adyen_checkout_session_interface.dart';
 import 'package:adyen_checkout/src/common/adyen_checkout_api.dart';
 import 'package:adyen_checkout/src/common/models/base_configuration.dart';
 import 'package:adyen_checkout/src/drop_in/drop_in.dart';
@@ -58,17 +59,4 @@ class AdyenCheckoutSession implements AdyenCheckoutSessionInterface {
       return configuration.toDTO(sdkVersionNumber);
     }
   }
-}
-
-abstract class AdyenCheckoutSessionInterface {
-  Future<PaymentResult> startDropIn({
-    required DropInConfiguration dropInConfiguration,
-    required SessionCheckout checkout,
-  });
-
-  Future<SessionCheckout> create({
-    required String sessionId,
-    required String sessionData,
-    required BaseConfiguration configuration,
-  });
 }
