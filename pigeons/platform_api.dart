@@ -67,7 +67,7 @@ enum ComponentCommunicationType {
   resize,
 }
 
-enum PaymentFlowResultType {
+enum PaymentResultType {
   finished,
   action,
   error,
@@ -278,15 +278,15 @@ class ComponentCommunicationModel {
   });
 }
 
-//Use PaymentFlowOutcome class when sealed classes are supported by pigeon
-class PaymentFlowOutcomeDTO {
-  final PaymentFlowResultType paymentFlowResultType;
+//Use PaymentOutcome class when sealed classes are supported by pigeon
+class PaymentOutcomeDTO {
+  final PaymentResultType paymentResultType;
   final String? result;
   final Map<String?, Object?>? actionResponse;
   final ErrorDTO? error;
 
-  PaymentFlowOutcomeDTO({
-    required this.paymentFlowResultType,
+  PaymentOutcomeDTO({
+    required this.paymentResultType,
     this.result,
     this.actionResponse,
     this.error,
@@ -356,14 +356,14 @@ abstract class DropInPlatformInterface {
     DropInConfigurationDTO dropInConfigurationDTO,
   );
 
-  void startDropInAdvancedFlowPayment(
+  void startDropInAdvancedPayment(
     DropInConfigurationDTO dropInConfigurationDTO,
     String paymentMethodsResponse,
   );
 
-  void onPaymentsResult(PaymentFlowOutcomeDTO paymentsResult);
+  void onPaymentsResult(PaymentOutcomeDTO paymentsResult);
 
-  void onPaymentsDetailsResult(PaymentFlowOutcomeDTO paymentsDetailsResult);
+  void onPaymentsDetailsResult(PaymentOutcomeDTO paymentsDetailsResult);
 
   void onDeleteStoredPaymentMethodResult(
       DeletedStoredPaymentMethodResultDTO deleteStoredPaymentMethodResultDTO);
@@ -376,7 +376,7 @@ abstract class DropInFlutterInterface {
   void onDropInSessionPlatformCommunication(
       PlatformCommunicationModel platformCommunicationModel);
 
-  void onDropInAdvancedFlowPlatformCommunication(
+  void onDropInAdvancedPlatformCommunication(
       PlatformCommunicationModel platformCommunicationModel);
 }
 
@@ -384,9 +384,9 @@ abstract class DropInFlutterInterface {
 abstract class ComponentPlatformInterface {
   void updateViewHeight(int viewId);
 
-  void onPaymentsResult(PaymentFlowOutcomeDTO paymentsResult);
+  void onPaymentsResult(PaymentOutcomeDTO paymentsResult);
 
-  void onPaymentsDetailsResult(PaymentFlowOutcomeDTO paymentsDetailsResult);
+  void onPaymentsDetailsResult(PaymentOutcomeDTO paymentsDetailsResult);
 }
 
 @FlutterApi()

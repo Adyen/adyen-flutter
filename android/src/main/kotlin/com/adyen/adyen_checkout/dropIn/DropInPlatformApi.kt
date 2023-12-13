@@ -4,25 +4,25 @@ import DeletedStoredPaymentMethodResultDTO
 import DropInConfigurationDTO
 import DropInFlutterInterface
 import DropInPlatformInterface
-import PaymentFlowOutcomeDTO
-import PaymentFlowResultType
+import PaymentOutcomeDTO
 import PaymentResultDTO
 import PaymentResultEnum
 import PaymentResultModelDTO
+import PaymentResultType
 import PlatformCommunicationModel
 import PlatformCommunicationType
 import androidx.activity.result.ActivityResultLauncher
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.lifecycleScope
-import com.adyen.adyen_checkout.dropIn.dropInAdvancedFlow.AdvancedFlowDropInService
-import com.adyen.adyen_checkout.dropIn.dropInAdvancedFlow.DropInAdditionalDetailsPlatformMessenger
-import com.adyen.adyen_checkout.dropIn.dropInAdvancedFlow.DropInAdditionalDetailsResultMessenger
-import com.adyen.adyen_checkout.dropIn.dropInAdvancedFlow.DropInPaymentMethodDeletionPlatformMessenger
-import com.adyen.adyen_checkout.dropIn.dropInAdvancedFlow.DropInPaymentMethodDeletionResultMessenger
-import com.adyen.adyen_checkout.dropIn.dropInAdvancedFlow.DropInPaymentResultMessenger
-import com.adyen.adyen_checkout.dropIn.dropInAdvancedFlow.DropInServiceResultMessenger
-import com.adyen.adyen_checkout.dropIn.dropInSession.SessionDropInService
-import com.adyen.adyen_checkout.dropIn.models.DropInFlowType
+import com.adyen.adyen_checkout.dropIn.advanced.AdvancedDropInService
+import com.adyen.adyen_checkout.dropIn.advanced.DropInAdditionalDetailsPlatformMessenger
+import com.adyen.adyen_checkout.dropIn.advanced.DropInAdditionalDetailsResultMessenger
+import com.adyen.adyen_checkout.dropIn.advanced.DropInPaymentMethodDeletionPlatformMessenger
+import com.adyen.adyen_checkout.dropIn.advanced.DropInPaymentMethodDeletionResultMessenger
+import com.adyen.adyen_checkout.dropIn.advanced.DropInPaymentResultMessenger
+import com.adyen.adyen_checkout.dropIn.advanced.DropInServiceResultMessenger
+import com.adyen.adyen_checkout.dropIn.models.DropInType
+import com.adyen.adyen_checkout.dropIn.session.SessionDropInService
 import com.adyen.adyen_checkout.session.SessionHolder
 import com.adyen.adyen_checkout.utils.ConfigurationMapper.mapToDropInConfiguration
 import com.adyen.adyen_checkout.utils.ConfigurationMapper.mapToOrderResponseModel
@@ -62,7 +62,7 @@ class DropInPlatformApi(
         )
     }
 
-    override fun startDropInAdvancedFlowPayment(
+    override fun startDropInAdvancedPayment(
         dropInConfigurationDTO: DropInConfigurationDTO,
         paymentMethodsResponse: String,
     ) {
@@ -80,21 +80,21 @@ class DropInPlatformApi(
                     dropInAdvancedFlowLauncher,
                     paymentMethodsWithoutGiftCards,
                     dropInConfiguration,
-                    AdvancedFlowDropInService::class.java,
+                    AdvancedDropInService::class.java,
                 )
             }
         }
     }
 
-    override fun onPaymentsResult(paymentsResult: PaymentFlowOutcomeDTO) {
-        if (paymentsResult.paymentFlowResultType == PaymentFlowResultType.ACTION) {
+    override fun onPaymentsResult(paymentsResult: PaymentOutcomeDTO) {
+        if (paymentsResult.paymentResultType == PaymentResultType.ACTION) {
             setAdvanceFlowDropInAdditionalDetailsMessengerObserver()
         }
 
         DropInPaymentResultMessenger.sendResult(paymentsResult)
     }
 
-    override fun onPaymentsDetailsResult(paymentsDetailsResult: PaymentFlowOutcomeDTO) {
+    override fun onPaymentsDetailsResult(paymentsDetailsResult: PaymentOutcomeDTO) {
         DropInAdditionalDetailsResultMessenger.sendResult(paymentsDetailsResult)
     }
 
@@ -122,7 +122,7 @@ class DropInPlatformApi(
                 PlatformCommunicationType.PAYMENTCOMPONENT,
                 data = message.contentIfNotHandled.toString(),
             )
-            dropInFlutterApi.onDropInAdvancedFlowPlatformCommunication(model) {}
+            dropInFlutterApi.onDropInAdvancedPlatformCommunication(model) {}
         }
     }
 
@@ -140,11 +140,11 @@ class DropInPlatformApi(
             )
 
             when (dropInStoredPaymentMethodDeletionModel?.dropInFlowType) {
-                DropInFlowType.SESSION -> dropInFlutterApi.onDropInSessionPlatformCommunication(
+                DropInType.SESSION -> dropInFlutterApi.onDropInSessionPlatformCommunication(
                     platformCommunicationModel
                 ) {}
 
-                DropInFlowType.ADVANCED_FLOW -> dropInFlutterApi.onDropInAdvancedFlowPlatformCommunication(
+                DropInType.ADVANCED_FLOW -> dropInFlutterApi.onDropInAdvancedPlatformCommunication(
                     platformCommunicationModel
                 ) {}
 
@@ -165,7 +165,7 @@ class DropInPlatformApi(
                 data = message.contentIfNotHandled.toString(),
             )
 
-            dropInFlutterApi.onDropInAdvancedFlowPlatformCommunication(platformCommunicationModel) {}
+            dropInFlutterApi.onDropInAdvancedPlatformCommunication(platformCommunicationModel) {}
         }
     }
 
@@ -243,6 +243,6 @@ class DropInPlatformApi(
         val platformCommunicationModel = PlatformCommunicationModel(
             PlatformCommunicationType.RESULT, data = "", paymentResult = mappedResult
         )
-        dropInFlutterApi.onDropInAdvancedFlowPlatformCommunication(platformCommunicationModel) {}
+        dropInFlutterApi.onDropInAdvancedPlatformCommunication(platformCommunicationModel) {}
     }
 }

@@ -22,7 +22,7 @@ import com.adyen.checkout.ui.core.AdyenComponentView
 import org.json.JSONObject
 import java.util.UUID
 
-internal class CardAdvancedFlowComponent(
+internal class CardAdvancedComponent(
     private val activity: FragmentActivity,
     private val componentFlutterApi: ComponentFlutterInterface,
     context: Context,
@@ -49,7 +49,7 @@ internal class CardAdvancedFlowComponent(
                     activity = activity,
                     storedPaymentMethod = storedPaymentMethod,
                     configuration = cardConfiguration,
-                    callback = CardAdvancedFlowCallback(componentFlutterApi),
+                    callback = CardAdvancedCallback(componentFlutterApi),
                     key = UUID.randomUUID().toString()
                 )
             }
@@ -60,7 +60,7 @@ internal class CardAdvancedFlowComponent(
                     activity = activity,
                     paymentMethod = paymentMethod,
                     configuration = cardConfiguration,
-                    callback = CardAdvancedFlowCallback(componentFlutterApi),
+                    callback = CardAdvancedCallback(componentFlutterApi),
                     key = UUID.randomUUID().toString()
                 )
             }

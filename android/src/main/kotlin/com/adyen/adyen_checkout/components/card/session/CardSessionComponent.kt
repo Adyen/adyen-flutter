@@ -21,7 +21,7 @@ import com.adyen.checkout.ui.core.AdyenComponentView
 import org.json.JSONObject
 import java.util.UUID
 
-class CardSessionFlowComponent(
+class CardSessionComponent(
     private val activity: FragmentActivity,
     private val componentFlutterApi: ComponentFlutterInterface,
     private val sessionHolder: SessionHolder,
@@ -50,7 +50,7 @@ class CardSessionFlowComponent(
                     checkoutSession = checkoutSession,
                     storedPaymentMethod = storedPaymentMethod,
                     configuration = cardConfiguration,
-                    componentCallback = CardSessionFlowCallback(componentFlutterApi) { action -> onAction(action) },
+                    componentCallback = CardSessionCallback(componentFlutterApi) { action -> onAction(action) },
                     key = UUID.randomUUID().toString()
                 )
             }
@@ -62,7 +62,7 @@ class CardSessionFlowComponent(
                     checkoutSession = checkoutSession,
                     paymentMethod = paymentMethod,
                     configuration = cardConfiguration,
-                    componentCallback = CardSessionFlowCallback(componentFlutterApi) { action -> onAction(action) },
+                    componentCallback = CardSessionCallback(componentFlutterApi) { action -> onAction(action) },
                     key = UUID.randomUUID().toString()
                 )
             }

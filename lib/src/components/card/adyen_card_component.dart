@@ -12,7 +12,8 @@ import 'package:flutter/widgets.dart';
 
 class AdyenCardComponent extends StatelessWidget {
   final CardComponentConfiguration configuration;
-  final ComponentPaymentFlow componentPaymentFlow;
+  final Map<String, dynamic> paymentMethod;
+  final Checkout checkout;
   final Future<void> Function(PaymentResult) onPaymentResult;
   final Set<Factory<OneSequenceGestureRecognizer>>? gestureRecognizers;
   final _isStoredPaymentMethodIndicator =
@@ -23,7 +24,8 @@ class AdyenCardComponent extends StatelessWidget {
   AdyenCardComponent({
     super.key,
     required this.configuration,
-    required this.componentPaymentFlow,
+    required this.paymentMethod,
+    required this.checkout,
     required this.onPaymentResult,
     this.gestureRecognizers,
   });
@@ -35,11 +37,9 @@ class AdyenCardComponent extends StatelessWidget {
       builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
         if (snapshot.data != null) {
           final sdkVersionNumber = snapshot.data ?? "";
-          return switch (componentPaymentFlow) {
-            CardComponentSessionFlow() =>
-              _buildCardSessionFlowWidget(sdkVersionNumber),
-            CardComponentAdvancedFlow() =>
-              _buildCardAdvancedFlowWidget(sdkVersionNumber)
+          return switch (checkout) {
+            SessionCheckout() => _buildCardSessionFlowWidget(sdkVersionNumber),
+            AdvancedCheckout() => _buildCardAdvancedFlowWidget(sdkVersionNumber)
           };
         } else {
           return const SizedBox.shrink();
@@ -49,19 +49,17 @@ class AdyenCardComponent extends StatelessWidget {
   }
 
   CardSessionComponent _buildCardSessionFlowWidget(String sdkVersionNumber) {
-    final CardComponentSessionFlow cardComponentSessionFlow =
-        componentPaymentFlow as CardComponentSessionFlow;
+    final SessionCheckout checkoutSession = checkout as SessionCheckout;
     final double initialHeight =
         _determineInitialHeight(configuration.cardConfiguration);
-    final encodedPaymentMethod =
-        json.encode(cardComponentSessionFlow.paymentMethod);
-    final isStoredPaymentMethod = cardComponentSessionFlow.paymentMethod
-        .containsKey(_isStoredPaymentMethodIndicator);
+    final encodedPaymentMethod = json.encode(paymentMethod);
+    final isStoredPaymentMethod =
+        paymentMethod.containsKey(_isStoredPaymentMethodIndicator);
 
     return CardSessionComponent(
       cardComponentConfiguration: configuration.toDTO(sdkVersionNumber),
       paymentMethod: encodedPaymentMethod,
-      session: cardComponentSessionFlow.session.toDTO(),
+      session: checkoutSession.toDTO(),
       onPaymentResult: onPaymentResult,
       initialViewHeight: initialHeight,
       isStoredPaymentMethod: isStoredPaymentMethod,
@@ -69,21 +67,18 @@ class AdyenCardComponent extends StatelessWidget {
   }
 
   CardAdvancedComponent _buildCardAdvancedFlowWidget(String sdkVersionNumber) {
-    final CardComponentAdvancedFlow cardComponentAdvancedFlow =
-        componentPaymentFlow as CardComponentAdvancedFlow;
+    final AdvancedCheckout checkoutAdvanced = checkout as AdvancedCheckout;
     final initialHeight =
         _determineInitialHeight(configuration.cardConfiguration);
-    final encodedPaymentMethod =
-        json.encode(cardComponentAdvancedFlow.paymentMethod);
-    final isStoredPaymentMethod = cardComponentAdvancedFlow.paymentMethod
-            ?.containsKey(_isStoredPaymentMethodIndicator) ??
-        false;
+    final encodedPaymentMethod = json.encode(paymentMethod);
+    final isStoredPaymentMethod =
+        paymentMethod.containsKey(_isStoredPaymentMethodIndicator);
 
     return CardAdvancedComponent(
       cardComponentConfiguration: configuration.toDTO(sdkVersionNumber),
       paymentMethod: encodedPaymentMethod,
-      onPayments: cardComponentAdvancedFlow.onPayments,
-      onPaymentsDetails: cardComponentAdvancedFlow.onPaymentsDetails,
+      onPayments: checkoutAdvanced.postPayments,
+      onPaymentsDetails: checkoutAdvanced.postPaymentsDetails,
       onPaymentResult: onPaymentResult,
       initialViewHeight: initialHeight,
       isStoredPaymentMethod: isStoredPaymentMethod,

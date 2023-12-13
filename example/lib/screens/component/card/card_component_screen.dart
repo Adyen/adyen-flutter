@@ -10,12 +10,10 @@ import 'package:flutter/material.dart';
 
 class CardComponentScreen extends StatefulWidget {
   const CardComponentScreen({
-    required this.adyenCheckout,
     required this.repository,
     super.key,
   });
 
-  final AdyenCheckout adyenCheckout;
   final AdyenCardComponentRepository repository;
 
   @override
@@ -73,11 +71,14 @@ class _CardComponentScreenState extends State<CardComponentScreen> {
         cardConfiguration: const CardConfiguration(),
       );
 
-      final session = await widget.adyenCheckout.createSession(
+      final sessionCheckout = await AdyenCheckout.session.create(
         sessionId: sessionResponse.id,
         sessionData: sessionResponse.sessionData,
         configuration: cardComponentConfiguration,
       );
+
+      final paymentMethod =
+          extractPaymentMethod(sessionCheckout.paymentMethodsJson);
 
       // ignore: use_build_context_synchronously
       return showModalBottomSheet(
@@ -91,30 +92,31 @@ class _CardComponentScreenState extends State<CardComponentScreen> {
           return SafeArea(
             child: SingleChildScrollView(
                 child: Column(
-                  children: [
-                    Container(height: 8),
-                    Container(
-                      width: 48,
-                      height: 6,
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10),
-                          color: Colors.grey),
-                    ),
-                    Container(height: 8),
-                    Container(
-                      padding: EdgeInsets.only(
-                          bottom: MediaQuery
-                              .of(context)
-                              .viewInsets
-                              .bottom),
-                      child: _buildSessionCardWidget(
-                        context,
-                        session,
-                        cardComponentConfiguration,
-                      ),
-                    ),
-                  ],
-                )),
+              children: [
+                Container(height: 8),
+                Container(
+                  width: 48,
+                  height: 6,
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      color: Colors.grey),
+                ),
+                Container(height: 8),
+                Container(
+                  padding: EdgeInsets.only(
+                      bottom: MediaQuery.of(context).viewInsets.bottom),
+                  child: AdyenCardComponent(
+                    configuration: cardComponentConfiguration,
+                    paymentMethod: paymentMethod,
+                    checkout: sessionCheckout,
+                    onPaymentResult: (paymentResult) async {
+                      Navigator.pop(context);
+                      _dialogBuilder(paymentResult);
+                    },
+                  ),
+                ),
+              ],
+            )),
           );
         },
       );
@@ -123,27 +125,7 @@ class _CardComponentScreenState extends State<CardComponentScreen> {
     }
   }
 
-  Widget _buildSessionCardWidget(
-    BuildContext context,
-    Session session,
-    CardComponentConfiguration cardComponentConfiguration,
-  ) {
-    final paymentMethod = extractPaymentMethod(session.paymentMethodsJson);
-
-    return AdyenCardComponent(
-      configuration: cardComponentConfiguration,
-      componentPaymentFlow: CardComponentSessionFlow(
-        session: session,
-        paymentMethod: paymentMethod,
-      ),
-      onPaymentResult: (event) async {
-        Navigator.pop(context);
-        _dialogBuilder(event);
-      },
-    );
-  }
-
-  Map<String, dynamic>? extractPaymentMethod(String paymentMethods) {
+  Map<String, dynamic> extractPaymentMethod(String paymentMethods) {
     if (paymentMethods.isEmpty) {
       return <String, String>{};
     }
@@ -157,8 +139,8 @@ class _CardComponentScreenState extends State<CardComponentScreen> {
         jsonPaymentMethods.containsKey("storedPaymentMethods")
             ? jsonPaymentMethods["storedPaymentMethods"] as List
             : [];
-    Map<String, dynamic>? storedPaymentMethod =
-        storedPaymentMethodList.firstOrNull;
+    Map<String, dynamic> storedPaymentMethod =
+        storedPaymentMethodList.firstOrNull ?? <String, String>{};
 
     return paymentMethod;
   }

@@ -85,7 +85,7 @@ extension CashAppPayConfigurationMapper on CashAppPayConfiguration {
       );
 }
 
-extension SessionMapper on Session {
+extension SessionMapper on SessionCheckout {
   SessionDTO toDTO() => SessionDTO(
         id: id,
         sessionData: sessionData,

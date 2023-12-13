@@ -13,22 +13,22 @@ class DropInPlatformApi implements DropInPlatformInterface {
       );
 
   @override
-  Future<void> startDropInAdvancedFlowPayment(
+  Future<void> startDropInAdvancedPayment(
     DropInConfigurationDTO dropInConfiguration,
     String paymentMethodsResponse,
   ) =>
-      _dropInPlatformInterface.startDropInAdvancedFlowPayment(
+      _dropInPlatformInterface.startDropInAdvancedPayment(
         dropInConfiguration,
         paymentMethodsResponse,
       );
 
   @override
-  Future<void> onPaymentsResult(PaymentFlowOutcomeDTO paymentsResult) =>
+  Future<void> onPaymentsResult(PaymentOutcomeDTO paymentsResult) =>
       _dropInPlatformInterface.onPaymentsResult(paymentsResult);
 
   @override
   Future<void> onPaymentsDetailsResult(
-          PaymentFlowOutcomeDTO paymentsDetailsResult) =>
+      PaymentOutcomeDTO paymentsDetailsResult) =>
       _dropInPlatformInterface.onPaymentsDetailsResult(paymentsDetailsResult);
 
   @override

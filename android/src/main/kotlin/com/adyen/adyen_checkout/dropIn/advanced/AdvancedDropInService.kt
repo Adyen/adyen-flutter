@@ -1,16 +1,16 @@
-package com.adyen.adyen_checkout.dropIn.dropInAdvancedFlow
+package com.adyen.adyen_checkout.dropIn.advanced
 
 import DeletedStoredPaymentMethodResultDTO
 import ErrorDTO
-import PaymentFlowOutcomeDTO
-import PaymentFlowResultType
+import PaymentOutcomeDTO
+import PaymentResultType
 import android.content.Intent
 import android.os.IBinder
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ServiceLifecycleDispatcher
-import com.adyen.adyen_checkout.dropIn.models.DropInFlowType
 import com.adyen.adyen_checkout.dropIn.models.DropInStoredPaymentMethodDeletionModel
+import com.adyen.adyen_checkout.dropIn.models.DropInType
 import com.adyen.checkout.components.core.ActionComponentData
 import com.adyen.checkout.components.core.PaymentComponentData
 import com.adyen.checkout.components.core.PaymentComponentState
@@ -22,7 +22,7 @@ import com.adyen.checkout.dropin.ErrorDialog
 import com.adyen.checkout.dropin.RecurringDropInServiceResult
 import org.json.JSONObject
 
-class AdvancedFlowDropInService : DropInService(), LifecycleOwner {
+class AdvancedDropInService : DropInService(), LifecycleOwner {
     private val dispatcher = ServiceLifecycleDispatcher(this)
 
     override fun onSubmit(state: PaymentComponentState<*>) = onPaymentComponentState(state)
@@ -51,7 +51,7 @@ class AdvancedFlowDropInService : DropInService(), LifecycleOwner {
             setStoredPaymentMethodDeletionObserver()
             val dropInStoredPaymentMethodDeletionModel = DropInStoredPaymentMethodDeletionModel(
                 storedPaymentMethodId,
-                DropInFlowType.ADVANCED_FLOW
+                DropInType.ADVANCED_FLOW
             )
             DropInPaymentMethodDeletionPlatformMessenger.sendResult(dropInStoredPaymentMethodDeletionModel)
         } ?: run {
@@ -126,19 +126,19 @@ class AdvancedFlowDropInService : DropInService(), LifecycleOwner {
         }
     }
 
-    private fun mapToDropInServiceResult(paymentFlowOutcomeDTO: PaymentFlowOutcomeDTO?): DropInServiceResult {
-        return when (paymentFlowOutcomeDTO?.paymentFlowResultType) {
-            PaymentFlowResultType.FINISHED -> DropInServiceResult.Finished(
+    private fun mapToDropInServiceResult(paymentFlowOutcomeDTO: PaymentOutcomeDTO?): DropInServiceResult {
+        return when (paymentFlowOutcomeDTO?.paymentResultType) {
+            PaymentResultType.FINISHED -> DropInServiceResult.Finished(
                 result = "${paymentFlowOutcomeDTO.result}"
             )
 
-            PaymentFlowResultType.ERROR -> DropInServiceResult.Error(
+            PaymentResultType.ERROR -> DropInServiceResult.Error(
                 errorDialog = buildErrorDialog(paymentFlowOutcomeDTO.error),
                 reason = paymentFlowOutcomeDTO.error?.reason,
                 dismissDropIn = paymentFlowOutcomeDTO.error?.dismissDropIn ?: false
             )
 
-            PaymentFlowResultType.ACTION -> {
+            PaymentResultType.ACTION -> {
                 if (paymentFlowOutcomeDTO.actionResponse == null) {
                     DropInServiceResult.Error(
                         errorDialog = null,

@@ -62,14 +62,15 @@ class CardComponentScrollableScreen extends StatelessWidget {
       shopperLocale: Config.shopperLocale,
       cardConfiguration: const CardConfiguration(),
     );
+    final advancedCheckout = AdvancedCheckout(
+      postPayments: repository.postPayments,
+      postPaymentsDetails: repository.postPaymentsDetails,
+    );
 
     return AdyenCardComponent(
       configuration: cardComponentConfiguration,
-      componentPaymentFlow: CardComponentAdvancedFlow(
-        paymentMethod: paymentMethod,
-        onPayments: repository.postPayments,
-        onPaymentsDetails: repository.postPaymentsDetails,
-      ),
+      paymentMethod: paymentMethod,
+      checkout: advancedCheckout,
       onPaymentResult: (event) async {
         Navigator.pop(context);
         _dialogBuilder(context, event);

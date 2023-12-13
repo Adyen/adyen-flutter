@@ -2,9 +2,9 @@ package com.adyen.adyen_checkout.components
 
 import ComponentPlatformInterface
 import ErrorDTO
-import PaymentFlowOutcomeDTO
-import PaymentFlowResultType
+import PaymentOutcomeDTO
 import PaymentResultModelDTO
+import PaymentResultType
 import org.json.JSONObject
 
 class ComponentPlatformApi : ComponentPlatformInterface {
@@ -13,19 +13,19 @@ class ComponentPlatformApi : ComponentPlatformInterface {
         ComponentHeightMessenger.sendResult(viewId);
     }
 
-    override fun onPaymentsResult(paymentsResult: PaymentFlowOutcomeDTO) {
+    override fun onPaymentsResult(paymentsResult: PaymentOutcomeDTO) {
         handlePaymentFlowOutcome(paymentsResult)
     }
 
-    override fun onPaymentsDetailsResult(paymentsDetailsResult: PaymentFlowOutcomeDTO) {
+    override fun onPaymentsDetailsResult(paymentsDetailsResult: PaymentOutcomeDTO) {
         handlePaymentFlowOutcome(paymentsDetailsResult)
     }
 
-    private fun handlePaymentFlowOutcome(paymentFlowOutcomeDTO: PaymentFlowOutcomeDTO) {
-        when (paymentFlowOutcomeDTO.paymentFlowResultType) {
-            PaymentFlowResultType.FINISHED -> onFinished(paymentFlowOutcomeDTO.result)
-            PaymentFlowResultType.ACTION -> onAction(paymentFlowOutcomeDTO.actionResponse)
-            PaymentFlowResultType.ERROR -> onError(paymentFlowOutcomeDTO.error)
+    private fun handlePaymentFlowOutcome(paymentFlowOutcomeDTO: PaymentOutcomeDTO) {
+        when (paymentFlowOutcomeDTO.paymentResultType) {
+            PaymentResultType.FINISHED -> onFinished(paymentFlowOutcomeDTO.result)
+            PaymentResultType.ACTION -> onAction(paymentFlowOutcomeDTO.actionResponse)
+            PaymentResultType.ERROR -> onError(paymentFlowOutcomeDTO.error)
         }
     }
 

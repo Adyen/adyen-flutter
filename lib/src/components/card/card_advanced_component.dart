@@ -9,7 +9,7 @@ import 'package:adyen_checkout/src/components/platform/ios_platform_view.dart';
 import 'package:adyen_checkout/src/generated/platform_api.g.dart';
 import 'package:adyen_checkout/src/logging/adyen_logger.dart';
 import 'package:adyen_checkout/src/utils/constants.dart';
-import 'package:adyen_checkout/src/utils/payment_flow_outcome_handler.dart';
+import 'package:adyen_checkout/src/utils/payment_outcome_handler.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -27,20 +27,20 @@ class CardAdvancedComponent extends StatefulWidget {
     required this.initialViewHeight,
     required this.isStoredPaymentMethod,
     this.gestureRecognizers,
-    PaymentFlowOutcomeHandler? paymentFlowOutcomeHandler,
+    PaymentOutcomeHandler? paymentFlowOutcomeHandler,
     AdyenLogger? adyenLogger,
   })  : paymentFlowOutcomeHandler =
-            paymentFlowOutcomeHandler ?? PaymentFlowOutcomeHandler(),
+            paymentFlowOutcomeHandler ?? PaymentOutcomeHandler(),
         adyenLogger = adyenLogger ?? AdyenLogger.instance;
 
   final CardComponentConfigurationDTO cardComponentConfiguration;
   final String paymentMethod;
-  final Future<PaymentFlowOutcome> Function(String) onPayments;
-  final Future<PaymentFlowOutcome> Function(String) onPaymentsDetails;
+  final Future<PaymentOutcome> Function(String) onPayments;
+  final Future<PaymentOutcome> Function(String) onPaymentsDetails;
   final Future<void> Function(PaymentResult) onPaymentResult;
   final bool isStoredPaymentMethod;
   final double initialViewHeight;
-  final PaymentFlowOutcomeHandler paymentFlowOutcomeHandler;
+  final PaymentOutcomeHandler paymentFlowOutcomeHandler;
   final Set<Factory<OneSequenceGestureRecognizer>>? gestureRecognizers;
   final AdyenLogger adyenLogger;
 
@@ -107,18 +107,18 @@ class _CardAdvancedFlowState extends State<CardAdvancedComponent> {
   }
 
   Future<void> _onSubmit(ComponentCommunicationModel event) async {
-    final PaymentFlowOutcome paymentFlowOutcome =
+    final PaymentOutcome paymentFlowOutcome =
         await widget.onPayments(event.data as String);
-    final PaymentFlowOutcomeDTO paymentFlowOutcomeDTO = widget
+    final PaymentOutcomeDTO paymentFlowOutcomeDTO = widget
         .paymentFlowOutcomeHandler
         .mapToPaymentOutcomeDTO(paymentFlowOutcome);
     _componentPlatformApi.onPaymentsResult(paymentFlowOutcomeDTO);
   }
 
   Future<void> _onAdditionalDetails(ComponentCommunicationModel event) async {
-    final PaymentFlowOutcome paymentFlowOutcome =
+    final PaymentOutcome paymentFlowOutcome =
         await widget.onPaymentsDetails(event.data as String);
-    final PaymentFlowOutcomeDTO paymentFlowOutcomeDTO = widget
+    final PaymentOutcomeDTO paymentFlowOutcomeDTO = widget
         .paymentFlowOutcomeHandler
         .mapToPaymentOutcomeDTO(paymentFlowOutcome);
     _componentPlatformApi.onPaymentsDetailsResult(paymentFlowOutcomeDTO);

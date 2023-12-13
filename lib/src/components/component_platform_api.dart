@@ -10,13 +10,13 @@ class ComponentPlatformApi implements ComponentPlatformInterface {
 
   @override
   Future<void> onPaymentsResult(
-      PaymentFlowOutcomeDTO paymentFlowOutcomeDTO) async {
-    _componentPlatformInterface.onPaymentsResult(paymentFlowOutcomeDTO);
+      PaymentOutcomeDTO paymentOutcomeDTO) async {
+    _componentPlatformInterface.onPaymentsResult(paymentOutcomeDTO);
   }
 
   @override
   Future<void> onPaymentsDetailsResult(
-          PaymentFlowOutcomeDTO paymentFlowOutcomeDTO) async =>
+      PaymentOutcomeDTO paymentOutcomeDTO) async =>
       _componentPlatformInterface
-          .onPaymentsDetailsResult(paymentFlowOutcomeDTO);
+          .onPaymentsDetailsResult(paymentOutcomeDTO);
 }

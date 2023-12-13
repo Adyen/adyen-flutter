@@ -16,7 +16,7 @@ class PaymentFlowOutcomeHandler {
   static const messageKey = "message";
   static const refusalReasonKey = "refusalReason";
 
-  PaymentFlowOutcome handleResponse(Map<String, dynamic> jsonResponse) {
+  PaymentOutcome handleResponse(Map<String, dynamic> jsonResponse) {
     if (_isError(jsonResponse)) {
       return Error(
         errorMessage: jsonResponse[messageKey],

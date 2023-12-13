@@ -1,30 +1,30 @@
 class ComponentPlatformApi: ComponentPlatformInterface {
     var onUpdateViewHeightCallback: () -> Void = {}
     var onActionCallback: ([String?: Any?]) -> Void = { _ in }
-    var onFinishCallback: (PaymentFlowOutcomeDTO) -> Void = { _ in }
+    var onFinishCallback: (PaymentOutcomeDTO) -> Void = { _ in }
     var onErrorCallback: (ErrorDTO?) -> Void = { _ in }
 
     func updateViewHeight(viewId _: Int64) {
         onUpdateViewHeightCallback()
     }
 
-    func onPaymentsResult(paymentsResult: PaymentFlowOutcomeDTO) {
-        handlePaymentFlowOutcome(paymentFlowOutcomeDTO: paymentsResult)
+    func onPaymentsResult(paymentsResult: PaymentOutcomeDTO) {
+        handlePaymentOutcome(paymentOutcomeDTO: paymentsResult)
     }
 
-    func onPaymentsDetailsResult(paymentsDetailsResult: PaymentFlowOutcomeDTO) {
-        handlePaymentFlowOutcome(paymentFlowOutcomeDTO: paymentsDetailsResult)
+    func onPaymentsDetailsResult(paymentsDetailsResult: PaymentOutcomeDTO) {
+        handlePaymentOutcome(paymentOutcomeDTO: paymentsDetailsResult)
     }
 
-    private func handlePaymentFlowOutcome(paymentFlowOutcomeDTO: PaymentFlowOutcomeDTO) {
-        switch paymentFlowOutcomeDTO.paymentFlowResultType {
+    private func handlePaymentOutcome(paymentOutcomeDTO: PaymentOutcomeDTO) {
+        switch paymentOutcomeDTO.paymentResultType {
         case .finished:
-            onFinishCallback(paymentFlowOutcomeDTO)
+            onFinishCallback(paymentOutcomeDTO)
         case .action:
-            guard let jsonActionResponse = paymentFlowOutcomeDTO.actionResponse else { return }
+            guard let jsonActionResponse = paymentOutcomeDTO.actionResponse else { return }
             onActionCallback(jsonActionResponse)
         case .error:
-            onErrorCallback(paymentFlowOutcomeDTO.error)
+            onErrorCallback(paymentOutcomeDTO.error)
         }
     }
 }

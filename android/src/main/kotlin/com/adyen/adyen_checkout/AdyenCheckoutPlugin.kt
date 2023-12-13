@@ -9,8 +9,8 @@ import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import com.adyen.adyen_checkout.components.ComponentPlatformApi
-import com.adyen.adyen_checkout.components.card.advancedFlow.CardAdvancedFlowComponentFactory
-import com.adyen.adyen_checkout.components.card.session.CardSessionFlowComponentFactory
+import com.adyen.adyen_checkout.components.card.advancedFlow.CardAdvancedComponentFactory
+import com.adyen.adyen_checkout.components.card.session.CardSessionComponentFactory
 import com.adyen.adyen_checkout.dropIn.DropInPlatformApi
 import com.adyen.adyen_checkout.session.SessionHolder
 import com.adyen.adyen_checkout.utils.Constants.Companion.WRONG_FLUTTER_ACTIVITY_USAGE_ERROR_MESSAGE
@@ -82,11 +82,11 @@ class AdyenCheckoutPlugin : FlutterPlugin, ActivityAware {
 
         componentFlutterApi?.let {
             flutterPluginBinding?.platformViewRegistry?.registerViewFactory(
-                "cardComponentAdvancedFlow", CardAdvancedFlowComponentFactory(fragmentActivity, it)
+                "cardComponentAdvancedFlow", CardAdvancedComponentFactory(fragmentActivity, it)
             )
 
             flutterPluginBinding?.platformViewRegistry?.registerViewFactory(
-                "cardComponentSessionFlow", CardSessionFlowComponentFactory(fragmentActivity, it, sessionHolder)
+                "cardComponentSessionFlow", CardSessionComponentFactory(fragmentActivity, it, sessionHolder)
             )
         }
     }

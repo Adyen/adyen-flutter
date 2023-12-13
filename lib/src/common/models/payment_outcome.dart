@@ -1,18 +1,18 @@
-sealed class PaymentFlowOutcome {}
+sealed class PaymentOutcome {}
 
-class Finished extends PaymentFlowOutcome {
+class Finished extends PaymentOutcome {
   final String resultCode;
 
   Finished({required this.resultCode});
 }
 
-class Action extends PaymentFlowOutcome {
+class Action extends PaymentOutcome {
   final Map<String, dynamic> actionResponse;
 
   Action({required this.actionResponse});
 }
 
-class Error extends PaymentFlowOutcome {
+class Error extends PaymentOutcome {
   final String? errorMessage;
   final String? reason;
   final bool dismissDropIn;

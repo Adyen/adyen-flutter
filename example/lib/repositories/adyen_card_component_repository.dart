@@ -54,7 +54,7 @@ class AdyenCardComponentRepository extends AdyenBaseRepository {
     ));
   }
 
-  Future<PaymentFlowOutcome> postPayments(String paymentComponentJson) async {
+  Future<PaymentOutcome> postPayments(String paymentComponentJson) async {
     String returnUrl = await determineBaseReturnUrl();
     returnUrl += "/card";
     PaymentsRequestData paymentsRequestData = PaymentsRequestData(
@@ -83,7 +83,7 @@ class AdyenCardComponentRepository extends AdyenBaseRepository {
     return paymentFlowOutcomeHandler.handleResponse(response);
   }
 
-  Future<PaymentFlowOutcome> postPaymentsDetails(
+  Future<PaymentOutcome> postPaymentsDetails(
       String additionalDetails) async {
     final response =
         await service.postPaymentsDetails(jsonDecode(additionalDetails));

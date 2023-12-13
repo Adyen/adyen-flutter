@@ -51,18 +51,17 @@ class _DropInScreenState extends State<DropInScreen> {
       final DropInConfiguration dropInConfiguration =
           await _createDropInConfiguration();
 
-      final Session session = await AdyenCheckout.instance.createSession(
+      final SessionCheckout sessionCheckout =
+          await AdyenCheckout.session.create(
         sessionId: sessionResponse.id,
         sessionData: sessionResponse.sessionData,
         configuration: dropInConfiguration,
       );
 
       final PaymentResult paymentResult =
-          await AdyenCheckout.instance.startPayment(
-            dropInConfiguration: dropInConfiguration,
-            paymentFlow: DropInSessionFlow(
-          session: session,
-        ),
+          await AdyenCheckout.session.startDropIn(
+        dropInConfiguration: dropInConfiguration,
+        checkout: sessionCheckout,
       );
 
       _showPaymentResultDialog(paymentResult);
@@ -75,14 +74,15 @@ class _DropInScreenState extends State<DropInScreen> {
     final paymentMethodsResponse =
         await widget.repository.fetchPaymentMethods();
     final dropInConfiguration = await _createDropInConfiguration();
+    final advancedCheckout = AdvancedCheckout(
+      postPayments: widget.repository.postPayments,
+      postPaymentsDetails: widget.repository.postPaymentsDetails,
+    );
 
-    final paymentResult = await AdyenCheckout.instance.startPayment(
+    final paymentResult = await AdyenCheckout.advanced.startDropIn(
       dropInConfiguration: dropInConfiguration,
-      paymentFlow: DropInAdvancedFlow(
-        paymentMethodsResponse: paymentMethodsResponse,
-        postPayments: widget.repository.postPayments,
-        postPaymentsDetails: widget.repository.postPaymentsDetails,
-      ),
+      paymentMethodsResponse: paymentMethodsResponse,
+      checkout: advancedCheckout,
     );
 
     _showPaymentResultDialog(paymentResult);
