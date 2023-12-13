@@ -998,9 +998,6 @@ class _DropInPlatformInterfaceCodec extends StandardMessageCodec {
     } else if (value is PaymentFlowOutcomeDTO) {
       buffer.putUint8(137);
       writeValue(buffer, value.encode());
-    } else if (value is SessionDTO) {
-      buffer.putUint8(138);
-      writeValue(buffer, value.encode());
     } else {
       super.writeValue(buffer, value);
     }
@@ -1029,8 +1026,6 @@ class _DropInPlatformInterfaceCodec extends StandardMessageCodec {
         return GooglePayConfigurationDTO.decode(readValue(buffer)!);
       case 137: 
         return PaymentFlowOutcomeDTO.decode(readValue(buffer)!);
-      case 138: 
-        return SessionDTO.decode(readValue(buffer)!);
       default:
         return super.readValueOfType(type, buffer);
     }
@@ -1047,7 +1042,7 @@ class DropInPlatformInterface {
 
   static const MessageCodec<Object?> pigeonChannelCodec = _DropInPlatformInterfaceCodec();
 
-  Future<void> startDropInSessionPayment(DropInConfigurationDTO dropInConfigurationDTO, SessionDTO session) async {
+  Future<void> startDropInSessionPayment(DropInConfigurationDTO dropInConfigurationDTO) async {
     const String __pigeon_channelName = 'dev.flutter.pigeon.adyen_checkout.DropInPlatformInterface.startDropInSessionPayment';
     final BasicMessageChannel<Object?> __pigeon_channel = BasicMessageChannel<Object?>(
       __pigeon_channelName,
@@ -1055,7 +1050,7 @@ class DropInPlatformInterface {
       binaryMessenger: __pigeon_binaryMessenger,
     );
     final List<Object?>? __pigeon_replyList =
-        await __pigeon_channel.send(<Object?>[dropInConfigurationDTO, session]) as List<Object?>?;
+        await __pigeon_channel.send(<Object?>[dropInConfigurationDTO]) as List<Object?>?;
     if (__pigeon_replyList == null) {
       throw _createConnectionError(__pigeon_channelName);
     } else if (__pigeon_replyList.length > 1) {

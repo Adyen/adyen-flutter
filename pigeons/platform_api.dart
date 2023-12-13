@@ -354,7 +354,6 @@ abstract class CheckoutPlatformInterface {
 abstract class DropInPlatformInterface {
   void startDropInSessionPayment(
     DropInConfigurationDTO dropInConfigurationDTO,
-    SessionDTO session,
   );
 
   void startDropInAdvancedFlowPayment(

@@ -50,15 +50,9 @@ class _MyAppState extends State<MyApp> {
   }
 
   void _initRepositories() {
-    _adyenDropInRepository = AdyenDropInRepository(
-      adyenCheckout: _adyenCheckout,
-      service: _service,
-    );
-
-    _adyenCardComponentRepository = AdyenCardComponentRepository(
-      adyenCheckout: _adyenCheckout,
-      service: _service,
-    );
+    _adyenDropInRepository = AdyenDropInRepository(service: _service);
+    _adyenCardComponentRepository =
+        AdyenCardComponentRepository(service: _service);
   }
 
   @override
@@ -86,10 +80,7 @@ class _MyAppState extends State<MyApp> {
 
   MaterialPageRoute<dynamic> _buildDropInRoute() {
     return MaterialPageRoute(
-      builder: (context) => DropInScreen(
-        repository: _adyenDropInRepository,
-        adyenCheckout: _adyenCheckout,
-      ),
+      builder: (context) => DropInScreen(repository: _adyenDropInRepository),
     );
   }
 

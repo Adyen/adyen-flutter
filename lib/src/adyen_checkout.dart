@@ -56,19 +56,26 @@ class AdyenCheckout implements AdyenCheckoutInterface {
     final sdkVersionNumber =
         await _sdkVersionNumberProvider.getSdkVersionNumber();
 
+    SessionDTO sessionDTO = await _adyenCheckoutApi.createSession(
+      sessionId,
+      sessionData,
+      _mapConfiguration(configuration, sdkVersionNumber),
+    );
+    return Session(
+      id: sessionDTO.id,
+      sessionData: sessionDTO.sessionData,
+      paymentMethodsJson: sessionDTO.paymentMethodsJson,
+    );
+  }
+
+  dynamic _mapConfiguration(
+    BaseConfiguration configuration,
+    String sdkVersionNumber,
+  ) {
     if (configuration is CardComponentConfiguration) {
-      SessionDTO sessionDTO = await _adyenCheckoutApi.createSession(
-        sessionId,
-        sessionData,
-        configuration.toDTO(sdkVersionNumber),
-      );
-      return Session(
-        id: sessionDTO.id,
-        sessionData: sessionDTO.sessionData,
-        paymentMethodsJson: sessionDTO.paymentMethodsJson,
-      );
-    } else {
-      throw Exception("Configuration is not valid");
+      return configuration.toDTO(sdkVersionNumber);
+    } else if (configuration is DropInConfiguration) {
+      return configuration.toDTO(sdkVersionNumber);
     }
   }
 }

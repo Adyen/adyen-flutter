@@ -9,11 +9,9 @@ import 'package:flutter/material.dart';
 class DropInScreen extends StatefulWidget {
   const DropInScreen({
     required this.repository,
-    required this.adyenCheckout,
     super.key,
   });
 
-  final AdyenCheckout adyenCheckout;
   final AdyenDropInRepository repository;
 
   @override
@@ -47,24 +45,30 @@ class _DropInScreenState extends State<DropInScreen> {
   }
 
   Future<void> startDropInSessions() async {
-    final SessionResponseNetworkModel sessionResponse =
-        await widget.repository.fetchSession();
-    final DropInConfiguration dropInConfiguration =
-        await _createDropInConfiguration();
-    final Session session = Session(
-      id: sessionResponse.id,
-      sessionData: sessionResponse.sessionData,
-      paymentMethodsJson: "",
-    );
+    try {
+      final SessionResponseNetworkModel sessionResponse =
+          await widget.repository.fetchSession();
+      final DropInConfiguration dropInConfiguration =
+          await _createDropInConfiguration();
 
-    final PaymentResult paymentResult = await widget.adyenCheckout.startPayment(
-      dropInConfiguration: dropInConfiguration,
-      paymentFlow: DropInSessionFlow(
-        session: session,
-      ),
-    );
+      final Session session = await AdyenCheckout.instance.createSession(
+        sessionId: sessionResponse.id,
+        sessionData: sessionResponse.sessionData,
+        configuration: dropInConfiguration,
+      );
 
-    _showPaymentResultDialog(paymentResult);
+      final PaymentResult paymentResult =
+          await AdyenCheckout.instance.startPayment(
+            dropInConfiguration: dropInConfiguration,
+            paymentFlow: DropInSessionFlow(
+          session: session,
+        ),
+      );
+
+      _showPaymentResultDialog(paymentResult);
+    } catch (error) {
+      debugPrint(error.toString());
+    }
   }
 
   Future<void> startDropInAdvancedFlow() async {
@@ -72,7 +76,7 @@ class _DropInScreenState extends State<DropInScreen> {
         await widget.repository.fetchPaymentMethods();
     final dropInConfiguration = await _createDropInConfiguration();
 
-    final paymentResult = await widget.adyenCheckout.startPayment(
+    final paymentResult = await AdyenCheckout.instance.startPayment(
       dropInConfiguration: dropInConfiguration,
       paymentFlow: DropInAdvancedFlow(
         paymentMethodsResponse: paymentMethodsResponse,

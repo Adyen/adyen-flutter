@@ -9,6 +9,7 @@ import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.lifecycleScope
 import com.adyen.adyen_checkout.session.SessionHolder
 import com.adyen.adyen_checkout.utils.ConfigurationMapper.mapToAnalyticsConfiguration
+import com.adyen.adyen_checkout.utils.ConfigurationMapper.mapToDropInConfiguration
 import com.adyen.adyen_checkout.utils.ConfigurationMapper.toNativeModel
 import com.adyen.checkout.components.core.OrderRequest
 import com.adyen.checkout.components.core.PaymentMethodsApiResponse
@@ -66,7 +67,7 @@ class CheckoutPlatformApi(
             }
 
             is DropInConfigurationDTO -> {
-                //TODO: Add support for DropIn session
+                return configuration.mapToDropInConfiguration(activity)
             }
         }
 

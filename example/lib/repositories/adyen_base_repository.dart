@@ -7,18 +7,16 @@ import 'package:adyen_checkout_example/utils/payment_flow_outcome_handler.dart';
 
 class AdyenBaseRepository {
   AdyenBaseRepository({
-    required this.adyenCheckout,
     required this.service,
   });
 
-  final AdyenCheckout adyenCheckout;
   final Service service;
   final PaymentFlowOutcomeHandler paymentFlowOutcomeHandler =
       PaymentFlowOutcomeHandler();
 
   Future<String> determineBaseReturnUrl() async {
     if (Platform.isAndroid) {
-      return await adyenCheckout.getReturnUrl();
+      return await AdyenCheckout.instance.getReturnUrl();
     } else if (Platform.isIOS) {
       return Config.iOSReturnUrl;
     } else {

@@ -5,7 +5,7 @@ class DropInSessionsDelegate: AdyenSessionDelegate {
     private let viewController: UIViewController?
     private let dropInFlutterApi: DropInFlutterInterface
 
-    init(viewController: UIViewController, dropInFlutterApi: DropInFlutterInterface) {
+    init(viewController: UIViewController?, dropInFlutterApi: DropInFlutterInterface) {
         self.viewController = viewController
         self.dropInFlutterApi = dropInFlutterApi
     }

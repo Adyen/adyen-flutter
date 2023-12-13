@@ -56,7 +56,6 @@ class DropIn {
 
     dropInPlatformApi.startDropInSessionPayment(
       dropInConfiguration.toDTO(sdkVersionNumber),
-      dropInSession.session.toDTO(),
     );
 
     dropInFlutterApi.dropInSessionPlatformCommunicationStream =

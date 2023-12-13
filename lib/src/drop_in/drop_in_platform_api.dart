@@ -7,11 +7,9 @@ class DropInPlatformApi implements DropInPlatformInterface {
   @override
   Future<void> startDropInSessionPayment(
     DropInConfigurationDTO dropInConfigurationDTO,
-    SessionDTO session,
   ) =>
       _dropInPlatformInterface.startDropInSessionPayment(
         dropInConfigurationDTO,
-        session,
       );
 
   @override

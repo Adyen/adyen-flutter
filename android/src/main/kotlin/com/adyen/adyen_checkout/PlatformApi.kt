@@ -1003,11 +1003,6 @@ private object DropInPlatformInterfaceCodec : StandardMessageCodec() {
           PaymentFlowOutcomeDTO.fromList(it)
         }
       }
-      138.toByte() -> {
-        return (readValue(buffer) as? List<Any?>)?.let {
-          SessionDTO.fromList(it)
-        }
-      }
       else -> super.readValueOfType(type, buffer)
     }
   }
@@ -1053,10 +1048,6 @@ private object DropInPlatformInterfaceCodec : StandardMessageCodec() {
         stream.write(137)
         writeValue(stream, value.toList())
       }
-      is SessionDTO -> {
-        stream.write(138)
-        writeValue(stream, value.toList())
-      }
       else -> super.writeValue(stream, value)
     }
   }
@@ -1064,7 +1055,7 @@ private object DropInPlatformInterfaceCodec : StandardMessageCodec() {
 
 /** Generated interface from Pigeon that represents a handler of messages from Flutter. */
 interface DropInPlatformInterface {
-  fun startDropInSessionPayment(dropInConfigurationDTO: DropInConfigurationDTO, session: SessionDTO)
+  fun startDropInSessionPayment(dropInConfigurationDTO: DropInConfigurationDTO)
   fun startDropInAdvancedFlowPayment(dropInConfigurationDTO: DropInConfigurationDTO, paymentMethodsResponse: String)
   fun onPaymentsResult(paymentsResult: PaymentFlowOutcomeDTO)
   fun onPaymentsDetailsResult(paymentsDetailsResult: PaymentFlowOutcomeDTO)
@@ -1085,10 +1076,9 @@ interface DropInPlatformInterface {
           channel.setMessageHandler { message, reply ->
             val args = message as List<Any?>
             val dropInConfigurationDTOArg = args[0] as DropInConfigurationDTO
-            val sessionArg = args[1] as SessionDTO
             var wrapped: List<Any?>
             try {
-              api.startDropInSessionPayment(dropInConfigurationDTOArg, sessionArg)
+              api.startDropInSessionPayment(dropInConfigurationDTOArg)
               wrapped = listOf<Any?>(null)
             } catch (exception: Throwable) {
               wrapped = wrapError(exception)

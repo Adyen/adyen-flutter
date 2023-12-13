@@ -11,7 +11,6 @@ import PaymentResultEnum
 import PaymentResultModelDTO
 import PlatformCommunicationModel
 import PlatformCommunicationType
-import SessionDTO
 import androidx.activity.result.ActivityResultLauncher
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.lifecycleScope
@@ -24,9 +23,10 @@ import com.adyen.adyen_checkout.dropIn.dropInAdvancedFlow.DropInPaymentResultMes
 import com.adyen.adyen_checkout.dropIn.dropInAdvancedFlow.DropInServiceResultMessenger
 import com.adyen.adyen_checkout.dropIn.dropInSession.SessionDropInService
 import com.adyen.adyen_checkout.dropIn.models.DropInFlowType
+import com.adyen.adyen_checkout.session.SessionHolder
 import com.adyen.adyen_checkout.utils.ConfigurationMapper.mapToDropInConfiguration
 import com.adyen.adyen_checkout.utils.ConfigurationMapper.mapToOrderResponseModel
-import com.adyen.adyen_checkout.utils.ConfigurationMapper.mapToSession
+import com.adyen.checkout.components.core.Order
 import com.adyen.checkout.components.core.PaymentMethodsApiResponse
 import com.adyen.checkout.dropin.DropIn
 import com.adyen.checkout.dropin.DropInCallback
@@ -36,9 +36,7 @@ import com.adyen.checkout.dropin.SessionDropInResult
 import com.adyen.checkout.dropin.internal.ui.model.DropInResultContractParams
 import com.adyen.checkout.dropin.internal.ui.model.SessionDropInResultContractParams
 import com.adyen.checkout.sessions.core.CheckoutSession
-import com.adyen.checkout.sessions.core.CheckoutSessionProvider
-import com.adyen.checkout.sessions.core.CheckoutSessionResult
-import com.adyen.checkout.sessions.core.SessionModel
+import com.adyen.checkout.sessions.core.SessionSetupResponse
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -46,29 +44,22 @@ import org.json.JSONObject
 
 class DropInPlatformApi(
     private val dropInFlutterApi: DropInFlutterInterface,
+    private val sessionHolder: SessionHolder,
 ) : DropInPlatformInterface {
     lateinit var activity: FragmentActivity
     lateinit var dropInSessionLauncher: ActivityResultLauncher<SessionDropInResultContractParams>
     lateinit var dropInAdvancedFlowLauncher: ActivityResultLauncher<DropInResultContractParams>
-    override fun startDropInSessionPayment(
-        dropInConfigurationDTO: DropInConfigurationDTO,
-        session: SessionDTO,
-    ) {
+    override fun startDropInSessionPayment(dropInConfigurationDTO: DropInConfigurationDTO) {
         setStoredPaymentMethodDeletionObserver()
-        activity.lifecycleScope.launch(Dispatchers.IO) {
-            val sessionModel = session.mapToSession()
-            val dropInConfiguration = dropInConfigurationDTO.mapToDropInConfiguration(activity.applicationContext)
-            val checkoutSession = createCheckoutSession(sessionModel, dropInConfiguration)
-            withContext(Dispatchers.Main) {
-                DropIn.startPayment(
-                    activity.applicationContext,
-                    dropInSessionLauncher,
-                    checkoutSession,
-                    dropInConfiguration,
-                    SessionDropInService::class.java
-                )
-            }
-        }
+        val dropInConfiguration = dropInConfigurationDTO.mapToDropInConfiguration(activity.applicationContext)
+        val checkoutSession = createCheckoutSession(sessionHolder)
+        DropIn.startPayment(
+            activity.applicationContext,
+            dropInSessionLauncher,
+            checkoutSession,
+            dropInConfiguration,
+            SessionDropInService::class.java
+        )
     }
 
     override fun startDropInAdvancedFlowPayment(
@@ -178,15 +169,10 @@ class DropInPlatformApi(
         }
     }
 
-    private suspend fun createCheckoutSession(
-        sessionModel: SessionModel,
-        dropInConfiguration: com.adyen.checkout.dropin.DropInConfiguration,
-    ): CheckoutSession {
-        return when (val checkoutSessionResult =
-            CheckoutSessionProvider.createSession(sessionModel, dropInConfiguration)) {
-            is CheckoutSessionResult.Success -> checkoutSessionResult.checkoutSession
-            is CheckoutSessionResult.Error -> throw checkoutSessionResult.exception
-        }
+    private fun createCheckoutSession(sessionHolder: SessionHolder): CheckoutSession {
+        val sessionSetupResponse = SessionSetupResponse.SERIALIZER.deserialize(sessionHolder.sessionSetupResponse)
+        val order = sessionHolder.orderResponse?.let { Order.SERIALIZER.deserialize(it) }
+        return CheckoutSession(sessionSetupResponse = sessionSetupResponse, order = order)
     }
 
     // Gift cards will be supported in a later version
@@ -217,7 +203,8 @@ class DropInPlatformApi(
                 PaymentResultEnum.ERROR, reason = sessionDropInResult.reason
             )
 
-            is SessionDropInResult.Finished -> PaymentResultDTO(PaymentResultEnum.FINISHED,
+            is SessionDropInResult.Finished -> PaymentResultDTO(
+                PaymentResultEnum.FINISHED,
                 result = with(sessionDropInResult.result) {
                     PaymentResultModelDTO(
                         sessionId, sessionData, sessionResult, resultCode, order?.mapToOrderResponseModel()

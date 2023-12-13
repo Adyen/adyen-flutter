@@ -8,11 +8,9 @@ class DropInPlatformApi: DropInPlatformInterface {
     private let sessionHolder: SessionHolder
     private let configurationMapper = ConfigurationMapper()
     private var viewController: UIViewController?
-    private var dropInSessionDelegate: AdyenSessionDelegate?
-    private var dropInAdvancedFlowDelegate: DropInAdvancedFlowDelegate?
     private var dropInSessionStoredPaymentMethodsDelegate: DropInSessionsStoredPaymentMethodsDelegate?
+    private var dropInAdvancedFlowDelegate: DropInAdvancedFlowDelegate?
     private var dropInAdvancedFlowStoredPaymentMethodsDelegate: DropInAdvancedFlowStoredPaymentMethodsDelegate?
-    var session: AdyenSession?
     var dropInComponent: DropInComponent?
 
     init(
@@ -24,8 +22,7 @@ class DropInPlatformApi: DropInPlatformInterface {
     }
 
     func startDropInSessionPayment(
-        dropInConfigurationDTO: DropInConfigurationDTO,
-        session: SessionDTO
+        dropInConfigurationDTO: DropInConfigurationDTO
     ) {
         do {
             guard let viewController = getViewController() else {
@@ -33,42 +30,24 @@ class DropInPlatformApi: DropInPlatformInterface {
             }
 
             self.viewController = viewController
-            sessionHolder.sessionPresentationDelegate = DropInSessionsPresentationDelegate()
-            dropInSessionDelegate = DropInSessionsDelegate(viewController: viewController,
-                                                           dropInFlutterApi: dropInFlutterApi)
             let adyenContext = try dropInConfigurationDTO.createAdyenContext()
-            let sessionConfiguration = AdyenSession.Configuration(sessionIdentifier: session.id,
-                                                                  initialSessionData: session.sessionData,
-                                                                  context: adyenContext)
-            dropInSessionStoredPaymentMethodsDelegate = DropInSessionsStoredPaymentMethodsDelegate(viewController: viewController,
-                                                                                                   dropInFlutterApi: dropInFlutterApi)
-
-            AdyenSession.initialize(with: sessionConfiguration,
-                                    delegate: dropInSessionDelegate!,
-                                    presentationDelegate: sessionHolder.sessionPresentationDelegate!)
-            { [weak self] result in
-                switch result {
-                case let .success(session):
-                    do {
-                        self?.session = session
-                        let dropInConfiguration = try self?.configurationMapper.createDropInConfiguration(dropInConfigurationDTO: dropInConfigurationDTO)
-                        let dropInComponent = DropInComponent(paymentMethods: session.sessionContext.paymentMethods,
-                                                              context: adyenContext,
-                                                              configuration: dropInConfiguration!)
-                        dropInComponent.delegate = session
-                        dropInComponent.partialPaymentDelegate = session
-                        if dropInConfigurationDTO.isRemoveStoredPaymentMethodEnabled {
-                            dropInComponent.storedPaymentMethodsDelegate = self?.dropInSessionStoredPaymentMethodsDelegate
-                        }
-                        self?.dropInComponent = dropInComponent
-                        self?.viewController?.present(dropInComponent.viewController, animated: true)
-                    } catch {
-                        self?.sendSessionError(error: error)
-                    }
-                case let .failure(error):
-                    self?.sendSessionError(error: error)
-                }
+            dropInSessionStoredPaymentMethodsDelegate = DropInSessionsStoredPaymentMethodsDelegate(
+                viewController: viewController,
+                dropInFlutterApi: dropInFlutterApi
+            )
+            let dropInConfiguration = try configurationMapper.createDropInConfiguration(dropInConfigurationDTO: dropInConfigurationDTO)
+            let dropInComponent = DropInComponent(
+                paymentMethods: sessionHolder.session!.sessionContext.paymentMethods,
+                context: adyenContext,
+                configuration: dropInConfiguration
+            )
+            dropInComponent.delegate = sessionHolder.session
+            dropInComponent.partialPaymentDelegate = sessionHolder.session
+            if dropInConfigurationDTO.isRemoveStoredPaymentMethodEnabled {
+                dropInComponent.storedPaymentMethodsDelegate = self.dropInSessionStoredPaymentMethodsDelegate
             }
+            self.dropInComponent = dropInComponent
+            self.viewController?.present(dropInComponent.viewController, animated: true)
         } catch {
             sendSessionError(error: error)
         }
@@ -121,10 +100,7 @@ class DropInPlatformApi: DropInPlatformInterface {
     }
 
     func cleanUpDropIn() {
-        sessionHolder.sessionPresentationDelegate = nil
-        sessionHolder.sessionDelegate = nil
-        sessionHolder.session = nil
-        dropInSessionDelegate = nil
+        sessionHolder.reset()
         dropInSessionStoredPaymentMethodsDelegate = nil
         dropInAdvancedFlowDelegate?.dropInInteractorDelegate = nil
         dropInAdvancedFlowDelegate = nil
