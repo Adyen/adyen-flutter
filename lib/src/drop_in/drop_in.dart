@@ -6,7 +6,7 @@ import 'package:adyen_checkout/src/drop_in/drop_in_platform_api.dart';
 import 'package:adyen_checkout/src/generated/platform_api.g.dart';
 import 'package:adyen_checkout/src/logging/adyen_logger.dart';
 import 'package:adyen_checkout/src/utils/dto_mapper.dart';
-import 'package:adyen_checkout/src/utils/payment_outcome_handler.dart';
+import 'package:adyen_checkout/src/utils/payment_event_handler.dart';
 import 'package:adyen_checkout/src/utils/sdk_version_number_provider.dart';
 
 class DropIn {
@@ -18,8 +18,7 @@ class DropIn {
     DropInFlutterInterface.setup(dropInFlutterApi);
   }
 
-  final PaymentOutcomeHandler _paymentFlowOutcomeHandler =
-      PaymentOutcomeHandler();
+  final PaymentEventHandler _paymentEventHandler = PaymentEventHandler();
   final AdyenLogger adyenLogger = AdyenLogger.instance;
   final SdkVersionNumberProvider sdkVersionNumberProvider;
   final DropInFlutterApi dropInFlutterApi;
@@ -143,22 +142,22 @@ class DropIn {
 
   Future<void> _handlePaymentComponent(
     PlatformCommunicationModel event,
-    Future<PaymentOutcome> Function(String paymentComponentJson) postPayments,
+    Future<PaymentEvent> Function(String paymentComponentJson) postPayments,
   ) async {
     try {
       if (event.data == null) {
         throw Exception("Payment data is not provided.");
       }
 
-      final PaymentOutcome paymentOutcome = await postPayments(event.data!);
-      PaymentOutcomeDTO paymentOutcomeDTO =
-          _paymentFlowOutcomeHandler.mapToPaymentOutcomeDTO(paymentOutcome);
-      dropInPlatformApi.onPaymentsResult(paymentOutcomeDTO);
+      final PaymentEvent paymentEvent = await postPayments(event.data!);
+      PaymentEventDTO paymentEventDTO =
+          _paymentEventHandler.mapToPaymentEventDTO(paymentEvent);
+      dropInPlatformApi.onPaymentsResult(paymentEventDTO);
     } catch (error) {
       String errorMessage = error.toString();
       adyenLogger.print("Failure in postPayments, $errorMessage");
-      dropInPlatformApi.onPaymentsResult(PaymentOutcomeDTO(
-        paymentOutcomeType: PaymentOutcomeType.error,
+      dropInPlatformApi.onPaymentsResult(PaymentEventDTO(
+        paymentEventType: PaymentEventType.error,
         error: ErrorDTO(
           errorMessage: errorMessage,
           reason: "Failure in postPayments, $errorMessage",
@@ -170,24 +169,22 @@ class DropIn {
 
   Future<void> _handleAdditionalDetails(
     PlatformCommunicationModel event,
-    Future<PaymentOutcome> Function(String additionalDetails)
-        postPaymentsDetails,
+    Future<PaymentEvent> Function(String additionalDetails) postPaymentsDetails,
   ) async {
     try {
       if (event.data == null) {
         throw Exception("Additional data is not provided.");
       }
 
-      final PaymentOutcome paymentFlowOutcome =
-          await postPaymentsDetails(event.data!);
-      PaymentOutcomeDTO paymentOutcomeDTO =
-          _paymentFlowOutcomeHandler.mapToPaymentOutcomeDTO(paymentFlowOutcome);
-      dropInPlatformApi.onPaymentsDetailsResult(paymentOutcomeDTO);
+      final PaymentEvent paymentEvent = await postPaymentsDetails(event.data!);
+      PaymentEventDTO paymentEventDTO =
+          _paymentEventHandler.mapToPaymentEventDTO(paymentEvent);
+      dropInPlatformApi.onPaymentsDetailsResult(paymentEventDTO);
     } catch (error) {
       String errorMessage = error.toString();
       adyenLogger.print("Failure in postPaymentsDetails, $errorMessage");
-      dropInPlatformApi.onPaymentsDetailsResult(PaymentOutcomeDTO(
-        paymentOutcomeType: PaymentOutcomeType.error,
+      dropInPlatformApi.onPaymentsDetailsResult(PaymentEventDTO(
+        paymentEventType: PaymentEventType.error,
         error: ErrorDTO(
           errorMessage: errorMessage,
           reason: "Failure in postPaymentsDetails, $errorMessage}",

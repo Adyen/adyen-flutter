@@ -2,8 +2,8 @@ package com.adyen.adyen_checkout.dropIn.advanced
 
 import DeletedStoredPaymentMethodResultDTO
 import ErrorDTO
-import PaymentOutcomeDTO
-import PaymentOutcomeType
+import PaymentEventDTO
+import PaymentEventType
 import android.content.Intent
 import android.os.IBinder
 import androidx.lifecycle.Lifecycle
@@ -126,27 +126,27 @@ class AdvancedDropInService : DropInService(), LifecycleOwner {
         }
     }
 
-    private fun mapToDropInServiceResult(paymentFlowOutcomeDTO: PaymentOutcomeDTO?): DropInServiceResult {
-        return when (paymentFlowOutcomeDTO?.paymentOutcomeType) {
-            PaymentOutcomeType.FINISHED -> DropInServiceResult.Finished(
-                result = "${paymentFlowOutcomeDTO.result}"
+    private fun mapToDropInServiceResult(paymentEventDTO: PaymentEventDTO?): DropInServiceResult {
+        return when (paymentEventDTO?.paymentEventType) {
+            PaymentEventType.FINISHED -> DropInServiceResult.Finished(
+                result = "${paymentEventDTO.result}"
             )
 
-            PaymentOutcomeType.ERROR -> DropInServiceResult.Error(
-                errorDialog = buildErrorDialog(paymentFlowOutcomeDTO.error),
-                reason = paymentFlowOutcomeDTO.error?.reason,
-                dismissDropIn = paymentFlowOutcomeDTO.error?.dismissDropIn ?: false
+            PaymentEventType.ERROR -> DropInServiceResult.Error(
+                errorDialog = buildErrorDialog(paymentEventDTO.error),
+                reason = paymentEventDTO.error?.reason,
+                dismissDropIn = paymentEventDTO.error?.dismissDropIn ?: false
             )
 
-            PaymentOutcomeType.ACTION -> {
-                if (paymentFlowOutcomeDTO.actionResponse == null) {
+            PaymentEventType.ACTION -> {
+                if (paymentEventDTO.actionResponse == null) {
                     DropInServiceResult.Error(
                         errorDialog = null,
                         reason = "Action response not provided",
                         dismissDropIn = true
                     )
                 } else {
-                    val actionJson = JSONObject(paymentFlowOutcomeDTO.actionResponse)
+                    val actionJson = JSONObject(paymentEventDTO.actionResponse)
                     DropInServiceResult.Action(action = Action.SERIALIZER.deserialize(actionJson))
                 }
             }

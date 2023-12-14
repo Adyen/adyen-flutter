@@ -67,7 +67,7 @@ enum ComponentCommunicationType {
   resize,
 }
 
-enum PaymentOutcomeType {
+enum PaymentEventType {
   finished,
   action,
   error,
@@ -278,15 +278,14 @@ class ComponentCommunicationModel {
   });
 }
 
-//Use PaymentOutcome class when sealed classes are supported by pigeon
-class PaymentOutcomeDTO {
-  final PaymentOutcomeType paymentOutcomeType;
+class PaymentEventDTO {
+  final PaymentEventType paymentEventType;
   final String? result;
   final Map<String?, Object?>? actionResponse;
   final ErrorDTO? error;
 
-  PaymentOutcomeDTO({
-    required this.paymentOutcomeType,
+  PaymentEventDTO({
+    required this.paymentEventType,
     this.result,
     this.actionResponse,
     this.error,
@@ -360,9 +359,9 @@ abstract class DropInPlatformInterface {
     String paymentMethodsResponse,
   );
 
-  void onPaymentsResult(PaymentOutcomeDTO paymentsResult);
+  void onPaymentsResult(PaymentEventDTO paymentsResult);
 
-  void onPaymentsDetailsResult(PaymentOutcomeDTO paymentsDetailsResult);
+  void onPaymentsDetailsResult(PaymentEventDTO paymentsDetailsResult);
 
   void onDeleteStoredPaymentMethodResult(
       DeletedStoredPaymentMethodResultDTO deleteStoredPaymentMethodResultDTO);
@@ -383,9 +382,9 @@ abstract class DropInFlutterInterface {
 abstract class ComponentPlatformInterface {
   void updateViewHeight(int viewId);
 
-  void onPaymentsResult(PaymentOutcomeDTO paymentsResult);
+  void onPaymentsResult(PaymentEventDTO paymentsResult);
 
-  void onPaymentsDetailsResult(PaymentOutcomeDTO paymentsDetailsResult);
+  void onPaymentsDetailsResult(PaymentEventDTO paymentsDetailsResult);
 }
 
 @FlutterApi()

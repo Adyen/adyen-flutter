@@ -156,13 +156,13 @@ enum class ComponentCommunicationType(val raw: Int) {
   }
 }
 
-enum class PaymentOutcomeType(val raw: Int) {
+enum class PaymentEventType(val raw: Int) {
   FINISHED(0),
   ACTION(1),
   ERROR(2);
 
   companion object {
-    fun ofRaw(raw: Int): PaymentOutcomeType? {
+    fun ofRaw(raw: Int): PaymentEventType? {
       return values().firstOrNull { it.raw == raw }
     }
   }
@@ -593,8 +593,8 @@ data class ComponentCommunicationModel (
 }
 
 /** Generated class from Pigeon that represents data sent in messages. */
-data class PaymentOutcomeDTO (
-  val paymentOutcomeType: PaymentOutcomeType,
+data class PaymentEventDTO (
+  val paymentEventType: PaymentEventType,
   val result: String? = null,
   val actionResponse: Map<String?, Any?>? = null,
   val error: ErrorDTO? = null
@@ -602,19 +602,19 @@ data class PaymentOutcomeDTO (
 ) {
   companion object {
     @Suppress("UNCHECKED_CAST")
-    fun fromList(list: List<Any?>): PaymentOutcomeDTO {
-      val paymentOutcomeType = PaymentOutcomeType.ofRaw(list[0] as Int)!!
+    fun fromList(list: List<Any?>): PaymentEventDTO {
+      val paymentEventType = PaymentEventType.ofRaw(list[0] as Int)!!
       val result = list[1] as String?
       val actionResponse = list[2] as Map<String?, Any?>?
       val error: ErrorDTO? = (list[3] as List<Any?>?)?.let {
         ErrorDTO.fromList(it)
       }
-      return PaymentOutcomeDTO(paymentOutcomeType, result, actionResponse, error)
+      return PaymentEventDTO(paymentEventType, result, actionResponse, error)
     }
   }
   fun toList(): List<Any?> {
     return listOf<Any?>(
-      paymentOutcomeType.raw,
+      paymentEventType.raw,
       result,
       actionResponse,
       error?.toList(),
@@ -772,7 +772,7 @@ private object CheckoutPlatformInterfaceCodec : StandardMessageCodec() {
       }
       140.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          PaymentOutcomeDTO.fromList(it)
+          PaymentEventDTO.fromList(it)
         }
       }
       141.toByte() -> {
@@ -848,7 +848,7 @@ private object CheckoutPlatformInterfaceCodec : StandardMessageCodec() {
         stream.write(139)
         writeValue(stream, value.toList())
       }
-      is PaymentOutcomeDTO -> {
+      is PaymentEventDTO -> {
         stream.write(140)
         writeValue(stream, value.toList())
       }
@@ -1000,7 +1000,7 @@ private object DropInPlatformInterfaceCodec : StandardMessageCodec() {
       }
       137.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          PaymentOutcomeDTO.fromList(it)
+          PaymentEventDTO.fromList(it)
         }
       }
       else -> super.readValueOfType(type, buffer)
@@ -1044,7 +1044,7 @@ private object DropInPlatformInterfaceCodec : StandardMessageCodec() {
         stream.write(136)
         writeValue(stream, value.toList())
       }
-      is PaymentOutcomeDTO -> {
+      is PaymentEventDTO -> {
         stream.write(137)
         writeValue(stream, value.toList())
       }
@@ -1057,8 +1057,8 @@ private object DropInPlatformInterfaceCodec : StandardMessageCodec() {
 interface DropInPlatformInterface {
   fun showDropInSession(dropInConfigurationDTO: DropInConfigurationDTO)
   fun showDropInAdvanced(dropInConfigurationDTO: DropInConfigurationDTO, paymentMethodsResponse: String)
-  fun onPaymentsResult(paymentsResult: PaymentOutcomeDTO)
-  fun onPaymentsDetailsResult(paymentsDetailsResult: PaymentOutcomeDTO)
+  fun onPaymentsResult(paymentsResult: PaymentEventDTO)
+  fun onPaymentsDetailsResult(paymentsDetailsResult: PaymentEventDTO)
   fun onDeleteStoredPaymentMethodResult(deleteStoredPaymentMethodResultDTO: DeletedStoredPaymentMethodResultDTO)
   fun cleanUpDropIn()
 
@@ -1114,7 +1114,7 @@ interface DropInPlatformInterface {
         if (api != null) {
           channel.setMessageHandler { message, reply ->
             val args = message as List<Any?>
-            val paymentsResultArg = args[0] as PaymentOutcomeDTO
+            val paymentsResultArg = args[0] as PaymentEventDTO
             var wrapped: List<Any?>
             try {
               api.onPaymentsResult(paymentsResultArg)
@@ -1133,7 +1133,7 @@ interface DropInPlatformInterface {
         if (api != null) {
           channel.setMessageHandler { message, reply ->
             val args = message as List<Any?>
-            val paymentsDetailsResultArg = args[0] as PaymentOutcomeDTO
+            val paymentsDetailsResultArg = args[0] as PaymentEventDTO
             var wrapped: List<Any?>
             try {
               api.onPaymentsDetailsResult(paymentsDetailsResultArg)
@@ -1296,7 +1296,7 @@ private object ComponentPlatformInterfaceCodec : StandardMessageCodec() {
       }
       129.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          PaymentOutcomeDTO.fromList(it)
+          PaymentEventDTO.fromList(it)
         }
       }
       else -> super.readValueOfType(type, buffer)
@@ -1308,7 +1308,7 @@ private object ComponentPlatformInterfaceCodec : StandardMessageCodec() {
         stream.write(128)
         writeValue(stream, value.toList())
       }
-      is PaymentOutcomeDTO -> {
+      is PaymentEventDTO -> {
         stream.write(129)
         writeValue(stream, value.toList())
       }
@@ -1320,8 +1320,8 @@ private object ComponentPlatformInterfaceCodec : StandardMessageCodec() {
 /** Generated interface from Pigeon that represents a handler of messages from Flutter. */
 interface ComponentPlatformInterface {
   fun updateViewHeight(viewId: Long)
-  fun onPaymentsResult(paymentsResult: PaymentOutcomeDTO)
-  fun onPaymentsDetailsResult(paymentsDetailsResult: PaymentOutcomeDTO)
+  fun onPaymentsResult(paymentsResult: PaymentEventDTO)
+  fun onPaymentsDetailsResult(paymentsDetailsResult: PaymentEventDTO)
 
   companion object {
     /** The codec used by ComponentPlatformInterface. */
@@ -1355,7 +1355,7 @@ interface ComponentPlatformInterface {
         if (api != null) {
           channel.setMessageHandler { message, reply ->
             val args = message as List<Any?>
-            val paymentsResultArg = args[0] as PaymentOutcomeDTO
+            val paymentsResultArg = args[0] as PaymentEventDTO
             var wrapped: List<Any?>
             try {
               api.onPaymentsResult(paymentsResultArg)
@@ -1374,7 +1374,7 @@ interface ComponentPlatformInterface {
         if (api != null) {
           channel.setMessageHandler { message, reply ->
             val args = message as List<Any?>
-            val paymentsDetailsResultArg = args[0] as PaymentOutcomeDTO
+            val paymentsDetailsResultArg = args[0] as PaymentEventDTO
             var wrapped: List<Any?>
             try {
               api.onPaymentsDetailsResult(paymentsDetailsResultArg)

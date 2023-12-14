@@ -81,12 +81,12 @@ class DropInPlatformApi: DropInPlatformInterface {
         }
     }
 
-    func onPaymentsResult(paymentsResult: PaymentOutcomeDTO) {
-        handlePaymentFlowOutcome(paymentOutcomeDTO: paymentsResult)
+    func onPaymentsResult(paymentsResult: PaymentEventDTO) {
+        handlePaymentEvent(paymentEventDTO: paymentsResult)
     }
 
-    func onPaymentsDetailsResult(paymentsDetailsResult: PaymentOutcomeDTO) {
-        handlePaymentFlowOutcome(paymentOutcomeDTO: paymentsDetailsResult)
+    func onPaymentsDetailsResult(paymentsDetailsResult: PaymentEventDTO) {
+        handlePaymentEvent(paymentEventDTO: paymentsDetailsResult)
     }
 
     func onDeleteStoredPaymentMethodResult(deleteStoredPaymentMethodResultDTO: DeletedStoredPaymentMethodResultDTO) {
@@ -103,19 +103,19 @@ class DropInPlatformApi: DropInPlatformInterface {
         viewController = nil
     }
 
-    private func handlePaymentFlowOutcome(paymentOutcomeDTO: PaymentOutcomeDTO) {
-        switch paymentOutcomeDTO.paymentOutcomeType {
+    private func handlePaymentEvent(paymentEventDTO: PaymentEventDTO) {
+        switch paymentEventDTO.paymentEventType {
         case .finished:
-            onDropInResultFinished(paymentOutcome: paymentOutcomeDTO)
+            onDropInResultFinished(paymentEventDTO: paymentEventDTO)
         case .action:
-            onDropInResultAction(paymentOutcome: paymentOutcomeDTO)
+            onDropInResultAction(paymentEventDTO: paymentEventDTO)
         case .error:
-            onDropInResultError(paymentOutcome: paymentOutcomeDTO)
+            onDropInResultError(paymentEventDTO: paymentEventDTO)
         }
     }
 
-    private func onDropInResultFinished(paymentOutcome: PaymentOutcomeDTO) {
-        let resultCode = ResultCode(rawValue: paymentOutcome.result ?? "")
+    private func onDropInResultFinished(paymentEventDTO: PaymentEventDTO) {
+        let resultCode = ResultCode(rawValue: paymentEventDTO.result ?? "")
         let success = resultCode == .authorised || resultCode == .received || resultCode == .pending
         finalizeAndDismiss(success: success, completion: { [weak self] in
             let paymentResult = PaymentResultDTO(type: PaymentResultEnum.finished, result: PaymentResultModelDTO(resultCode: resultCode?.rawValue))
@@ -123,9 +123,9 @@ class DropInPlatformApi: DropInPlatformInterface {
         })
     }
 
-    private func onDropInResultAction(paymentOutcome: PaymentOutcomeDTO) {
+    private func onDropInResultAction(paymentEventDTO: PaymentEventDTO) {
         do {
-            let jsonData = try JSONSerialization.data(withJSONObject: paymentOutcome.actionResponse as Any, options: [])
+            let jsonData = try JSONSerialization.data(withJSONObject: paymentEventDTO.actionResponse as Any, options: [])
             let result = try JSONDecoder().decode(Action.self, from: jsonData)
             dropInComponent?.handle(result)
         } catch {
@@ -135,11 +135,11 @@ class DropInPlatformApi: DropInPlatformInterface {
         }
     }
 
-    private func onDropInResultError(paymentOutcome: PaymentOutcomeDTO) {
+    private func onDropInResultError(paymentEventDTO: PaymentEventDTO) {
         dropInComponent?.stopLoading()
 
-        if paymentOutcome.error?.dismissDropIn == true {
-            let paymentResult = PaymentResultDTO(type: PaymentResultEnum.error, reason: paymentOutcome.error?.errorMessage)
+        if paymentEventDTO.error?.dismissDropIn == true {
+            let paymentResult = PaymentResultDTO(type: PaymentResultEnum.error, reason: paymentEventDTO.error?.errorMessage)
             dropInFlutterApi.onDropInAdvancedPlatformCommunication(platformCommunicationModel: PlatformCommunicationModel(type: PlatformCommunicationType.result, paymentResult: paymentResult), completion: { _ in })
             finalizeAndDismiss(success: false) {}
         } else {
@@ -147,7 +147,7 @@ class DropInPlatformApi: DropInPlatformInterface {
             let localizationParameters = (dropInComponent as? Localizable)?.localizationParameters
             let title = localizedString(.errorTitle, localizationParameters)
             let alertController = UIAlertController(title: title,
-                                                    message: paymentOutcome.error?.errorMessage,
+                                                    message: paymentEventDTO.error?.errorMessage,
                                                     preferredStyle: .alert)
             alertController.addAction(UIAlertAction(title: localizedString(.dismissButton, localizationParameters), style: .cancel))
             viewController?.adyen.topPresenter.present(alertController, animated: true)

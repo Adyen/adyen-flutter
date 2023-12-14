@@ -99,7 +99,7 @@ enum ComponentCommunicationType: Int {
   case resize = 4
 }
 
-enum PaymentOutcomeType: Int {
+enum PaymentEventType: Int {
   case finished = 0
   case action = 1
   case error = 2
@@ -571,14 +571,14 @@ struct ComponentCommunicationModel {
 }
 
 /// Generated class from Pigeon that represents data sent in messages.
-struct PaymentOutcomeDTO {
-  var paymentOutcomeType: PaymentOutcomeType
+struct PaymentEventDTO {
+  var paymentEventType: PaymentEventType
   var result: String? = nil
   var actionResponse: [String?: Any?]? = nil
   var error: ErrorDTO? = nil
 
-  static func fromList(_ list: [Any?]) -> PaymentOutcomeDTO? {
-    let paymentOutcomeType = PaymentOutcomeType(rawValue: list[0] as! Int)!
+  static func fromList(_ list: [Any?]) -> PaymentEventDTO? {
+    let paymentEventType = PaymentEventType(rawValue: list[0] as! Int)!
     let result: String? = nilOrValue(list[1])
     let actionResponse: [String?: Any?]? = nilOrValue(list[2])
     var error: ErrorDTO? = nil
@@ -586,8 +586,8 @@ struct PaymentOutcomeDTO {
       error = ErrorDTO.fromList(errorList)
     }
 
-    return PaymentOutcomeDTO(
-      paymentOutcomeType: paymentOutcomeType,
+    return PaymentEventDTO(
+      paymentEventType: paymentEventType,
       result: result,
       actionResponse: actionResponse,
       error: error
@@ -595,7 +595,7 @@ struct PaymentOutcomeDTO {
   }
   func toList() -> [Any?] {
     return [
-      paymentOutcomeType.rawValue,
+      paymentEventType.rawValue,
       result,
       actionResponse,
       error?.toList(),
@@ -721,7 +721,7 @@ private class CheckoutPlatformInterfaceCodecReader: FlutterStandardReader {
       case 139:
         return OrderResponseDTO.fromList(self.readValue() as! [Any?])
       case 140:
-        return PaymentOutcomeDTO.fromList(self.readValue() as! [Any?])
+        return PaymentEventDTO.fromList(self.readValue() as! [Any?])
       case 141:
         return PaymentResultDTO.fromList(self.readValue() as! [Any?])
       case 142:
@@ -774,7 +774,7 @@ private class CheckoutPlatformInterfaceCodecWriter: FlutterStandardWriter {
     } else if let value = value as? OrderResponseDTO {
       super.writeByte(139)
       super.writeValue(value.toList())
-    } else if let value = value as? PaymentOutcomeDTO {
+    } else if let value = value as? PaymentEventDTO {
       super.writeByte(140)
       super.writeValue(value.toList())
     } else if let value = value as? PaymentResultDTO {
@@ -895,7 +895,7 @@ private class DropInPlatformInterfaceCodecReader: FlutterStandardReader {
       case 136:
         return GooglePayConfigurationDTO.fromList(self.readValue() as! [Any?])
       case 137:
-        return PaymentOutcomeDTO.fromList(self.readValue() as! [Any?])
+        return PaymentEventDTO.fromList(self.readValue() as! [Any?])
       default:
         return super.readValue(ofType: type)
     }
@@ -931,7 +931,7 @@ private class DropInPlatformInterfaceCodecWriter: FlutterStandardWriter {
     } else if let value = value as? GooglePayConfigurationDTO {
       super.writeByte(136)
       super.writeValue(value.toList())
-    } else if let value = value as? PaymentOutcomeDTO {
+    } else if let value = value as? PaymentEventDTO {
       super.writeByte(137)
       super.writeValue(value.toList())
     } else {
@@ -958,8 +958,8 @@ class DropInPlatformInterfaceCodec: FlutterStandardMessageCodec {
 protocol DropInPlatformInterface {
   func showDropInSession(dropInConfigurationDTO: DropInConfigurationDTO) throws
   func showDropInAdvanced(dropInConfigurationDTO: DropInConfigurationDTO, paymentMethodsResponse: String) throws
-  func onPaymentsResult(paymentsResult: PaymentOutcomeDTO) throws
-  func onPaymentsDetailsResult(paymentsDetailsResult: PaymentOutcomeDTO) throws
+  func onPaymentsResult(paymentsResult: PaymentEventDTO) throws
+  func onPaymentsDetailsResult(paymentsDetailsResult: PaymentEventDTO) throws
   func onDeleteStoredPaymentMethodResult(deleteStoredPaymentMethodResultDTO: DeletedStoredPaymentMethodResultDTO) throws
   func cleanUpDropIn() throws
 }
@@ -1005,7 +1005,7 @@ class DropInPlatformInterfaceSetup {
     if let api = api {
       onPaymentsResultChannel.setMessageHandler { message, reply in
         let args = message as! [Any?]
-        let paymentsResultArg = args[0] as! PaymentOutcomeDTO
+        let paymentsResultArg = args[0] as! PaymentEventDTO
         do {
           try api.onPaymentsResult(paymentsResult: paymentsResultArg)
           reply(wrapResult(nil))
@@ -1020,7 +1020,7 @@ class DropInPlatformInterfaceSetup {
     if let api = api {
       onPaymentsDetailsResultChannel.setMessageHandler { message, reply in
         let args = message as! [Any?]
-        let paymentsDetailsResultArg = args[0] as! PaymentOutcomeDTO
+        let paymentsDetailsResultArg = args[0] as! PaymentEventDTO
         do {
           try api.onPaymentsDetailsResult(paymentsDetailsResult: paymentsDetailsResultArg)
           reply(wrapResult(nil))
@@ -1173,7 +1173,7 @@ private class ComponentPlatformInterfaceCodecReader: FlutterStandardReader {
       case 128:
         return ErrorDTO.fromList(self.readValue() as! [Any?])
       case 129:
-        return PaymentOutcomeDTO.fromList(self.readValue() as! [Any?])
+        return PaymentEventDTO.fromList(self.readValue() as! [Any?])
       default:
         return super.readValue(ofType: type)
     }
@@ -1185,7 +1185,7 @@ private class ComponentPlatformInterfaceCodecWriter: FlutterStandardWriter {
     if let value = value as? ErrorDTO {
       super.writeByte(128)
       super.writeValue(value.toList())
-    } else if let value = value as? PaymentOutcomeDTO {
+    } else if let value = value as? PaymentEventDTO {
       super.writeByte(129)
       super.writeValue(value.toList())
     } else {
@@ -1211,8 +1211,8 @@ class ComponentPlatformInterfaceCodec: FlutterStandardMessageCodec {
 /// Generated protocol from Pigeon that represents a handler of messages from Flutter.
 protocol ComponentPlatformInterface {
   func updateViewHeight(viewId: Int64) throws
-  func onPaymentsResult(paymentsResult: PaymentOutcomeDTO) throws
-  func onPaymentsDetailsResult(paymentsDetailsResult: PaymentOutcomeDTO) throws
+  func onPaymentsResult(paymentsResult: PaymentEventDTO) throws
+  func onPaymentsDetailsResult(paymentsDetailsResult: PaymentEventDTO) throws
 }
 
 /// Generated setup class from Pigeon to handle messages through the `binaryMessenger`.
@@ -1240,7 +1240,7 @@ class ComponentPlatformInterfaceSetup {
     if let api = api {
       onPaymentsResultChannel.setMessageHandler { message, reply in
         let args = message as! [Any?]
-        let paymentsResultArg = args[0] as! PaymentOutcomeDTO
+        let paymentsResultArg = args[0] as! PaymentEventDTO
         do {
           try api.onPaymentsResult(paymentsResult: paymentsResultArg)
           reply(wrapResult(nil))
@@ -1255,7 +1255,7 @@ class ComponentPlatformInterfaceSetup {
     if let api = api {
       onPaymentsDetailsResultChannel.setMessageHandler { message, reply in
         let args = message as! [Any?]
-        let paymentsDetailsResultArg = args[0] as! PaymentOutcomeDTO
+        let paymentsDetailsResultArg = args[0] as! PaymentEventDTO
         do {
           try api.onPaymentsDetailsResult(paymentsDetailsResult: paymentsDetailsResultArg)
           reply(wrapResult(nil))

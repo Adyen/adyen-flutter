@@ -21,12 +21,11 @@ class DropInPlatformApi implements DropInPlatformInterface {
       );
 
   @override
-  Future<void> onPaymentsResult(PaymentOutcomeDTO paymentsResult) =>
+  Future<void> onPaymentsResult(PaymentEventDTO paymentsResult) =>
       _dropInPlatformInterface.onPaymentsResult(paymentsResult);
 
   @override
-  Future<void> onPaymentsDetailsResult(
-          PaymentOutcomeDTO paymentsDetailsResult) =>
+  Future<void> onPaymentsDetailsResult(PaymentEventDTO paymentsDetailsResult) =>
       _dropInPlatformInterface.onPaymentsDetailsResult(paymentsDetailsResult);
 
   @override

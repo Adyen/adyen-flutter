@@ -1,5 +1,4 @@
-import 'package:adyen_checkout/adyen_checkout.dart';
-import 'package:adyen_checkout/src/common/models/payment_outcome.dart';
+import 'package:adyen_checkout/src/common/models/payment_event.dart';
 
 sealed class Checkout {}
 
@@ -16,8 +15,8 @@ class SessionCheckout extends Checkout {
 }
 
 class AdvancedCheckout extends Checkout {
-  Future<PaymentOutcome> Function(String paymentComponentJson) postPayments;
-  Future<PaymentOutcome> Function(String additionalDetailsJson)
+  Future<PaymentEvent> Function(String paymentComponentJson) postPayments;
+  Future<PaymentEvent> Function(String additionalDetailsJson)
       postPaymentsDetails;
 
   AdvancedCheckout({

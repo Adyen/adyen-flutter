@@ -9,14 +9,11 @@ class ComponentPlatformApi implements ComponentPlatformInterface {
       _componentPlatformInterface.updateViewHeight(viewId);
 
   @override
-  Future<void> onPaymentsResult(
-      PaymentOutcomeDTO paymentOutcomeDTO) async {
-    _componentPlatformInterface.onPaymentsResult(paymentOutcomeDTO);
+  Future<void> onPaymentsResult(PaymentEventDTO paymentEventDTO) async {
+    _componentPlatformInterface.onPaymentsResult(paymentEventDTO);
   }
 
   @override
-  Future<void> onPaymentsDetailsResult(
-      PaymentOutcomeDTO paymentOutcomeDTO) async =>
-      _componentPlatformInterface
-          .onPaymentsDetailsResult(paymentOutcomeDTO);
+  Future<void> onPaymentsDetailsResult(PaymentEventDTO paymentEventDTO) async =>
+      _componentPlatformInterface.onPaymentsDetailsResult(paymentEventDTO);
 }

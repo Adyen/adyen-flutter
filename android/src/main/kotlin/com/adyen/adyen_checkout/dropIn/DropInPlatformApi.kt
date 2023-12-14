@@ -4,8 +4,8 @@ import DeletedStoredPaymentMethodResultDTO
 import DropInConfigurationDTO
 import DropInFlutterInterface
 import DropInPlatformInterface
-import PaymentOutcomeDTO
-import PaymentOutcomeType
+import PaymentEventDTO
+import PaymentEventType
 import PaymentResultDTO
 import PaymentResultEnum
 import PaymentResultModelDTO
@@ -86,15 +86,15 @@ class DropInPlatformApi(
         }
     }
 
-    override fun onPaymentsResult(paymentsResult: PaymentOutcomeDTO) {
-        if (paymentsResult.paymentOutcomeType == PaymentOutcomeType.ACTION) {
+    override fun onPaymentsResult(paymentsResult: PaymentEventDTO) {
+        if (paymentsResult.paymentEventType == PaymentEventType.ACTION) {
             setAdvanceFlowDropInAdditionalDetailsMessengerObserver()
         }
 
         DropInPaymentResultMessenger.sendResult(paymentsResult)
     }
 
-    override fun onPaymentsDetailsResult(paymentsDetailsResult: PaymentOutcomeDTO) {
+    override fun onPaymentsDetailsResult(paymentsDetailsResult: PaymentEventDTO) {
         DropInAdditionalDetailsResultMessenger.sendResult(paymentsDetailsResult)
     }
 

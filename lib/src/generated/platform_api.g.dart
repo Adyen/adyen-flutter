@@ -82,7 +82,7 @@ enum ComponentCommunicationType {
   resize,
 }
 
-enum PaymentOutcomeType {
+enum PaymentEventType {
   finished,
   action,
   error,
@@ -628,15 +628,15 @@ class ComponentCommunicationModel {
   }
 }
 
-class PaymentOutcomeDTO {
-  PaymentOutcomeDTO({
-    required this.paymentOutcomeType,
+class PaymentEventDTO {
+  PaymentEventDTO({
+    required this.paymentEventType,
     this.result,
     this.actionResponse,
     this.error,
   });
 
-  PaymentOutcomeType paymentOutcomeType;
+  PaymentEventType paymentEventType;
 
   String? result;
 
@@ -646,17 +646,17 @@ class PaymentOutcomeDTO {
 
   Object encode() {
     return <Object?>[
-      paymentOutcomeType.index,
+      paymentEventType.index,
       result,
       actionResponse,
       error?.encode(),
     ];
   }
 
-  static PaymentOutcomeDTO decode(Object result) {
+  static PaymentEventDTO decode(Object result) {
     result as List<Object?>;
-    return PaymentOutcomeDTO(
-      paymentOutcomeType: PaymentOutcomeType.values[result[0]! as int],
+    return PaymentEventDTO(
+      paymentEventType: PaymentEventType.values[result[0]! as int],
       result: result[1] as String?,
       actionResponse: (result[2] as Map<Object?, Object?>?)?.cast<String?, Object?>(),
       error: result[3] != null
@@ -814,7 +814,7 @@ class _CheckoutPlatformInterfaceCodec extends StandardMessageCodec {
     } else if (value is OrderResponseDTO) {
       buffer.putUint8(139);
       writeValue(buffer, value.encode());
-    } else if (value is PaymentOutcomeDTO) {
+    } else if (value is PaymentEventDTO) {
       buffer.putUint8(140);
       writeValue(buffer, value.encode());
     } else if (value is PaymentResultDTO) {
@@ -862,7 +862,7 @@ class _CheckoutPlatformInterfaceCodec extends StandardMessageCodec {
       case 139: 
         return OrderResponseDTO.decode(readValue(buffer)!);
       case 140: 
-        return PaymentOutcomeDTO.decode(readValue(buffer)!);
+        return PaymentEventDTO.decode(readValue(buffer)!);
       case 141: 
         return PaymentResultDTO.decode(readValue(buffer)!);
       case 142: 
@@ -995,7 +995,7 @@ class _DropInPlatformInterfaceCodec extends StandardMessageCodec {
     } else if (value is GooglePayConfigurationDTO) {
       buffer.putUint8(136);
       writeValue(buffer, value.encode());
-    } else if (value is PaymentOutcomeDTO) {
+    } else if (value is PaymentEventDTO) {
       buffer.putUint8(137);
       writeValue(buffer, value.encode());
     } else {
@@ -1025,7 +1025,7 @@ class _DropInPlatformInterfaceCodec extends StandardMessageCodec {
       case 136: 
         return GooglePayConfigurationDTO.decode(readValue(buffer)!);
       case 137: 
-        return PaymentOutcomeDTO.decode(readValue(buffer)!);
+        return PaymentEventDTO.decode(readValue(buffer)!);
       default:
         return super.readValueOfType(type, buffer);
     }
@@ -1086,7 +1086,7 @@ class DropInPlatformInterface {
     }
   }
 
-  Future<void> onPaymentsResult(PaymentOutcomeDTO paymentsResult) async {
+  Future<void> onPaymentsResult(PaymentEventDTO paymentsResult) async {
     const String __pigeon_channelName = 'dev.flutter.pigeon.adyen_checkout.DropInPlatformInterface.onPaymentsResult';
     final BasicMessageChannel<Object?> __pigeon_channel = BasicMessageChannel<Object?>(
       __pigeon_channelName,
@@ -1108,7 +1108,7 @@ class DropInPlatformInterface {
     }
   }
 
-  Future<void> onPaymentsDetailsResult(PaymentOutcomeDTO paymentsDetailsResult) async {
+  Future<void> onPaymentsDetailsResult(PaymentEventDTO paymentsDetailsResult) async {
     const String __pigeon_channelName = 'dev.flutter.pigeon.adyen_checkout.DropInPlatformInterface.onPaymentsDetailsResult';
     final BasicMessageChannel<Object?> __pigeon_channel = BasicMessageChannel<Object?>(
       __pigeon_channelName,
@@ -1286,7 +1286,7 @@ class _ComponentPlatformInterfaceCodec extends StandardMessageCodec {
     if (value is ErrorDTO) {
       buffer.putUint8(128);
       writeValue(buffer, value.encode());
-    } else if (value is PaymentOutcomeDTO) {
+    } else if (value is PaymentEventDTO) {
       buffer.putUint8(129);
       writeValue(buffer, value.encode());
     } else {
@@ -1300,7 +1300,7 @@ class _ComponentPlatformInterfaceCodec extends StandardMessageCodec {
       case 128: 
         return ErrorDTO.decode(readValue(buffer)!);
       case 129: 
-        return PaymentOutcomeDTO.decode(readValue(buffer)!);
+        return PaymentEventDTO.decode(readValue(buffer)!);
       default:
         return super.readValueOfType(type, buffer);
     }
@@ -1339,7 +1339,7 @@ class ComponentPlatformInterface {
     }
   }
 
-  Future<void> onPaymentsResult(PaymentOutcomeDTO paymentsResult) async {
+  Future<void> onPaymentsResult(PaymentEventDTO paymentsResult) async {
     const String __pigeon_channelName = 'dev.flutter.pigeon.adyen_checkout.ComponentPlatformInterface.onPaymentsResult';
     final BasicMessageChannel<Object?> __pigeon_channel = BasicMessageChannel<Object?>(
       __pigeon_channelName,
@@ -1361,7 +1361,7 @@ class ComponentPlatformInterface {
     }
   }
 
-  Future<void> onPaymentsDetailsResult(PaymentOutcomeDTO paymentsDetailsResult) async {
+  Future<void> onPaymentsDetailsResult(PaymentEventDTO paymentsDetailsResult) async {
     const String __pigeon_channelName = 'dev.flutter.pigeon.adyen_checkout.ComponentPlatformInterface.onPaymentsDetailsResult';
     final BasicMessageChannel<Object?> __pigeon_channel = BasicMessageChannel<Object?>(
       __pigeon_channelName,
