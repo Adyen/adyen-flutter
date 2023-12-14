@@ -10,13 +10,12 @@ import 'package:adyen_checkout/src/utils/payment_outcome_handler.dart';
 import 'package:adyen_checkout/src/utils/sdk_version_number_provider.dart';
 
 class DropIn {
-  DropIn({
-    required this.sdkVersionNumberProvider,
-    DropInFlutterApi? dropInFlutterApi,
-    DropInPlatformApi? dropInPlatformApi,
-  })  : dropInFlutterApi = dropInFlutterApi ?? DropInFlutterApi(),
-        dropInPlatformApi = dropInPlatformApi ?? DropInPlatformApi() {
-    DropInFlutterInterface.setup(this.dropInFlutterApi);
+  DropIn(
+    this.sdkVersionNumberProvider,
+    this.dropInFlutterApi,
+    this.dropInPlatformApi,
+  ) {
+    DropInFlutterInterface.setup(dropInFlutterApi);
   }
 
   final PaymentOutcomeHandler _paymentFlowOutcomeHandler =

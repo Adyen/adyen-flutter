@@ -9,21 +9,22 @@ import 'package:adyen_checkout/src/utils/sdk_version_number_provider.dart';
 class AdyenCheckoutSession {
   final SdkVersionNumberProvider _sdkVersionNumberProvider =
       SdkVersionNumberProvider();
-  late final AdyenCheckoutApi adyenCheckoutApi;
-  late final DropIn _dropIn =
-      DropIn(sdkVersionNumberProvider: _sdkVersionNumberProvider);
+  final AdyenCheckoutApi adyenCheckoutApi;
+  final DropIn dropIn;
 
-  AdyenCheckoutSession(this.adyenCheckoutApi);
+  AdyenCheckoutSession(
+    this.adyenCheckoutApi,
+    this.dropIn,
+  );
 
   Future<PaymentResult> startDropIn({
     required DropInConfiguration dropInConfiguration,
     required SessionCheckout checkout,
-  }) async {
-    return _dropIn.startDropInSessionsPayment(
-      dropInConfiguration,
-      checkout,
-    );
-  }
+  }) =>
+      dropIn.startDropInSessionsPayment(
+        dropInConfiguration,
+        checkout,
+      );
 
   Future<SessionCheckout> create({
     required String sessionId,
