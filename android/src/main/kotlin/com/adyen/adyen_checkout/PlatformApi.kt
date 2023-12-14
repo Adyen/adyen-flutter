@@ -156,13 +156,13 @@ enum class ComponentCommunicationType(val raw: Int) {
   }
 }
 
-enum class PaymentFlowResultType(val raw: Int) {
+enum class PaymentEventType(val raw: Int) {
   FINISHED(0),
   ACTION(1),
   ERROR(2);
 
   companion object {
-    fun ofRaw(raw: Int): PaymentFlowResultType? {
+    fun ofRaw(raw: Int): PaymentEventType? {
       return values().firstOrNull { it.raw == raw }
     }
   }
@@ -593,8 +593,8 @@ data class ComponentCommunicationModel (
 }
 
 /** Generated class from Pigeon that represents data sent in messages. */
-data class PaymentFlowOutcomeDTO (
-  val paymentFlowResultType: PaymentFlowResultType,
+data class PaymentEventDTO (
+  val paymentEventType: PaymentEventType,
   val result: String? = null,
   val actionResponse: Map<String?, Any?>? = null,
   val error: ErrorDTO? = null
@@ -602,19 +602,19 @@ data class PaymentFlowOutcomeDTO (
 ) {
   companion object {
     @Suppress("UNCHECKED_CAST")
-    fun fromList(list: List<Any?>): PaymentFlowOutcomeDTO {
-      val paymentFlowResultType = PaymentFlowResultType.ofRaw(list[0] as Int)!!
+    fun fromList(list: List<Any?>): PaymentEventDTO {
+      val paymentEventType = PaymentEventType.ofRaw(list[0] as Int)!!
       val result = list[1] as String?
       val actionResponse = list[2] as Map<String?, Any?>?
       val error: ErrorDTO? = (list[3] as List<Any?>?)?.let {
         ErrorDTO.fromList(it)
       }
-      return PaymentFlowOutcomeDTO(paymentFlowResultType, result, actionResponse, error)
+      return PaymentEventDTO(paymentEventType, result, actionResponse, error)
     }
   }
   fun toList(): List<Any?> {
     return listOf<Any?>(
-      paymentFlowResultType.raw,
+      paymentEventType.raw,
       result,
       actionResponse,
       error?.toList(),
@@ -772,7 +772,7 @@ private object CheckoutPlatformInterfaceCodec : StandardMessageCodec() {
       }
       140.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          PaymentFlowOutcomeDTO.fromList(it)
+          PaymentEventDTO.fromList(it)
         }
       }
       141.toByte() -> {
@@ -848,7 +848,7 @@ private object CheckoutPlatformInterfaceCodec : StandardMessageCodec() {
         stream.write(139)
         writeValue(stream, value.toList())
       }
-      is PaymentFlowOutcomeDTO -> {
+      is PaymentEventDTO -> {
         stream.write(140)
         writeValue(stream, value.toList())
       }
@@ -1000,7 +1000,7 @@ private object DropInPlatformInterfaceCodec : StandardMessageCodec() {
       }
       137.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          PaymentFlowOutcomeDTO.fromList(it)
+          PaymentEventDTO.fromList(it)
         }
       }
       else -> super.readValueOfType(type, buffer)
@@ -1044,7 +1044,7 @@ private object DropInPlatformInterfaceCodec : StandardMessageCodec() {
         stream.write(136)
         writeValue(stream, value.toList())
       }
-      is PaymentFlowOutcomeDTO -> {
+      is PaymentEventDTO -> {
         stream.write(137)
         writeValue(stream, value.toList())
       }
@@ -1055,10 +1055,10 @@ private object DropInPlatformInterfaceCodec : StandardMessageCodec() {
 
 /** Generated interface from Pigeon that represents a handler of messages from Flutter. */
 interface DropInPlatformInterface {
-  fun startDropInSessionPayment(dropInConfigurationDTO: DropInConfigurationDTO)
-  fun startDropInAdvancedFlowPayment(dropInConfigurationDTO: DropInConfigurationDTO, paymentMethodsResponse: String)
-  fun onPaymentsResult(paymentsResult: PaymentFlowOutcomeDTO)
-  fun onPaymentsDetailsResult(paymentsDetailsResult: PaymentFlowOutcomeDTO)
+  fun showDropInSession(dropInConfigurationDTO: DropInConfigurationDTO)
+  fun showDropInAdvanced(dropInConfigurationDTO: DropInConfigurationDTO, paymentMethodsResponse: String)
+  fun onPaymentsResult(paymentsResult: PaymentEventDTO)
+  fun onPaymentsDetailsResult(paymentsDetailsResult: PaymentEventDTO)
   fun onDeleteStoredPaymentMethodResult(deleteStoredPaymentMethodResultDTO: DeletedStoredPaymentMethodResultDTO)
   fun cleanUpDropIn()
 
@@ -1071,14 +1071,14 @@ interface DropInPlatformInterface {
     @Suppress("UNCHECKED_CAST")
     fun setUp(binaryMessenger: BinaryMessenger, api: DropInPlatformInterface?) {
       run {
-        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.adyen_checkout.DropInPlatformInterface.startDropInSessionPayment", codec)
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.adyen_checkout.DropInPlatformInterface.showDropInSession", codec)
         if (api != null) {
           channel.setMessageHandler { message, reply ->
             val args = message as List<Any?>
             val dropInConfigurationDTOArg = args[0] as DropInConfigurationDTO
             var wrapped: List<Any?>
             try {
-              api.startDropInSessionPayment(dropInConfigurationDTOArg)
+              api.showDropInSession(dropInConfigurationDTOArg)
               wrapped = listOf<Any?>(null)
             } catch (exception: Throwable) {
               wrapped = wrapError(exception)
@@ -1090,7 +1090,7 @@ interface DropInPlatformInterface {
         }
       }
       run {
-        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.adyen_checkout.DropInPlatformInterface.startDropInAdvancedFlowPayment", codec)
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.adyen_checkout.DropInPlatformInterface.showDropInAdvanced", codec)
         if (api != null) {
           channel.setMessageHandler { message, reply ->
             val args = message as List<Any?>
@@ -1098,7 +1098,7 @@ interface DropInPlatformInterface {
             val paymentMethodsResponseArg = args[1] as String
             var wrapped: List<Any?>
             try {
-              api.startDropInAdvancedFlowPayment(dropInConfigurationDTOArg, paymentMethodsResponseArg)
+              api.showDropInAdvanced(dropInConfigurationDTOArg, paymentMethodsResponseArg)
               wrapped = listOf<Any?>(null)
             } catch (exception: Throwable) {
               wrapped = wrapError(exception)
@@ -1114,7 +1114,7 @@ interface DropInPlatformInterface {
         if (api != null) {
           channel.setMessageHandler { message, reply ->
             val args = message as List<Any?>
-            val paymentsResultArg = args[0] as PaymentFlowOutcomeDTO
+            val paymentsResultArg = args[0] as PaymentEventDTO
             var wrapped: List<Any?>
             try {
               api.onPaymentsResult(paymentsResultArg)
@@ -1133,7 +1133,7 @@ interface DropInPlatformInterface {
         if (api != null) {
           channel.setMessageHandler { message, reply ->
             val args = message as List<Any?>
-            val paymentsDetailsResultArg = args[0] as PaymentFlowOutcomeDTO
+            val paymentsDetailsResultArg = args[0] as PaymentEventDTO
             var wrapped: List<Any?>
             try {
               api.onPaymentsDetailsResult(paymentsDetailsResultArg)
@@ -1269,8 +1269,8 @@ class DropInFlutterInterface(private val binaryMessenger: BinaryMessenger) {
       } 
     }
   }
-  fun onDropInAdvancedFlowPlatformCommunication(platformCommunicationModelArg: PlatformCommunicationModel, callback: (Result<Unit>) -> Unit) {
-    val channelName = "dev.flutter.pigeon.adyen_checkout.DropInFlutterInterface.onDropInAdvancedFlowPlatformCommunication"
+  fun onDropInAdvancedPlatformCommunication(platformCommunicationModelArg: PlatformCommunicationModel, callback: (Result<Unit>) -> Unit) {
+    val channelName = "dev.flutter.pigeon.adyen_checkout.DropInFlutterInterface.onDropInAdvancedPlatformCommunication"
     val channel = BasicMessageChannel<Any?>(binaryMessenger, channelName, codec)
     channel.send(listOf(platformCommunicationModelArg)) {
       if (it is List<*>) {
@@ -1296,7 +1296,7 @@ private object ComponentPlatformInterfaceCodec : StandardMessageCodec() {
       }
       129.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          PaymentFlowOutcomeDTO.fromList(it)
+          PaymentEventDTO.fromList(it)
         }
       }
       else -> super.readValueOfType(type, buffer)
@@ -1308,7 +1308,7 @@ private object ComponentPlatformInterfaceCodec : StandardMessageCodec() {
         stream.write(128)
         writeValue(stream, value.toList())
       }
-      is PaymentFlowOutcomeDTO -> {
+      is PaymentEventDTO -> {
         stream.write(129)
         writeValue(stream, value.toList())
       }
@@ -1320,8 +1320,8 @@ private object ComponentPlatformInterfaceCodec : StandardMessageCodec() {
 /** Generated interface from Pigeon that represents a handler of messages from Flutter. */
 interface ComponentPlatformInterface {
   fun updateViewHeight(viewId: Long)
-  fun onPaymentsResult(paymentsResult: PaymentFlowOutcomeDTO)
-  fun onPaymentsDetailsResult(paymentsDetailsResult: PaymentFlowOutcomeDTO)
+  fun onPaymentsResult(paymentsResult: PaymentEventDTO)
+  fun onPaymentsDetailsResult(paymentsDetailsResult: PaymentEventDTO)
 
   companion object {
     /** The codec used by ComponentPlatformInterface. */
@@ -1355,7 +1355,7 @@ interface ComponentPlatformInterface {
         if (api != null) {
           channel.setMessageHandler { message, reply ->
             val args = message as List<Any?>
-            val paymentsResultArg = args[0] as PaymentFlowOutcomeDTO
+            val paymentsResultArg = args[0] as PaymentEventDTO
             var wrapped: List<Any?>
             try {
               api.onPaymentsResult(paymentsResultArg)
@@ -1374,7 +1374,7 @@ interface ComponentPlatformInterface {
         if (api != null) {
           channel.setMessageHandler { message, reply ->
             val args = message as List<Any?>
-            val paymentsDetailsResultArg = args[0] as PaymentFlowOutcomeDTO
+            val paymentsDetailsResultArg = args[0] as PaymentEventDTO
             var wrapped: List<Any?>
             try {
               api.onPaymentsDetailsResult(paymentsDetailsResultArg)

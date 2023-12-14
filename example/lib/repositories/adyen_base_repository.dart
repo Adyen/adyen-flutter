@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:adyen_checkout/adyen_checkout.dart';
 import 'package:adyen_checkout_example/config.dart';
 import 'package:adyen_checkout_example/network/service.dart';
-import 'package:adyen_checkout_example/utils/payment_flow_outcome_handler.dart';
+import 'package:adyen_checkout_example/utils/payment_event_handler.dart';
 
 class AdyenBaseRepository {
   AdyenBaseRepository({
@@ -11,8 +11,7 @@ class AdyenBaseRepository {
   });
 
   final Service service;
-  final PaymentFlowOutcomeHandler paymentFlowOutcomeHandler =
-      PaymentFlowOutcomeHandler();
+  final PaymentEventHandler paymentEventHandler = PaymentEventHandler();
 
   Future<String> determineBaseReturnUrl() async {
     if (Platform.isAndroid) {

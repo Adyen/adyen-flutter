@@ -97,7 +97,7 @@ class _CardSessionComponentState extends State<CardSessionComponent> {
   void _onResult(ComponentCommunicationModel event) {
     String resultCode = event.paymentResult?.resultCode ?? "";
     widget.adyenLogger.print("Card session flow result code: $resultCode");
-    widget.onPaymentResult(PaymentAdvancedFlowFinished(resultCode: resultCode));
+    widget.onPaymentResult(PaymentAdvancedFinished(resultCode: resultCode));
   }
 
   void _onError(ComponentCommunicationModel event) {
@@ -121,7 +121,7 @@ class _CardSessionComponentState extends State<CardSessionComponent> {
       case TargetPlatform.android:
         return AndroidPlatformView(
           key: UniqueKey(),
-          viewType: Constants.cardComponentSessionFlowKey,
+          viewType: Constants.cardComponentSessionKey,
           codec: _codec,
           creationParams: creationParams,
           gestureRecognizers: widget.gestureRecognizers,
@@ -130,7 +130,7 @@ class _CardSessionComponentState extends State<CardSessionComponent> {
       case TargetPlatform.iOS:
         return IosPlatformView(
           key: UniqueKey(),
-          viewType: Constants.cardComponentSessionFlowKey,
+          viewType: Constants.cardComponentSessionKey,
           codec: _codec,
           creationParams: creationParams,
           gestureRecognizers: widget.gestureRecognizers,

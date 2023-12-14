@@ -3,7 +3,7 @@ import Adyen
 import AdyenNetworking
 import Flutter
 
-class CardAdvancedFlowComponent: BaseCardComponent {
+class CardAdvancedComponent: BaseCardComponent {
     private let actionComponentDelegate: ActionComponentDelegate
     private var actionComponent: AdyenActionComponent?
     private var presentationDelegate: PresentationDelegate?
@@ -81,8 +81,8 @@ class CardAdvancedFlowComponent: BaseCardComponent {
     }
 
     private func setupFinalizeComponentCallback() {
-        componentPlatformApi.onFinishCallback = { [weak self] paymentFlowOutcome in
-            let resultCode = ResultCode(rawValue: paymentFlowOutcome.result ?? "")
+        componentPlatformApi.onFinishCallback = { [weak self] paymentEvent in
+            let resultCode = ResultCode(rawValue: paymentEvent.result ?? "")
             let success = resultCode == .authorised || resultCode == .received || resultCode == .pending
             self?.finalizeAndDismiss(success: success, completion: { [weak self] in
                 let componentCommunicationModel = ComponentCommunicationModel(type: ComponentCommunicationType.result, paymentResult: PaymentResultModelDTO(resultCode: resultCode?.rawValue))

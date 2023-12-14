@@ -1,7 +1,7 @@
-package com.adyen.adyen_checkout.dropIn.dropInAdvancedFlow
+package com.adyen.adyen_checkout.dropIn.advanced
 
 import DeletedStoredPaymentMethodResultDTO
-import PaymentFlowOutcomeDTO
+import PaymentEventDTO
 import androidx.lifecycle.LiveData
 import com.adyen.adyen_checkout.dropIn.models.DropInStoredPaymentMethodDeletionModel
 import com.adyen.adyen_checkout.utils.Event
@@ -17,12 +17,12 @@ class DropInServiceResultMessenger : LiveData<Event<JSONObject>>() {
     }
 }
 
-class DropInPaymentResultMessenger : LiveData<Event<PaymentFlowOutcomeDTO>>() {
+class DropInPaymentResultMessenger : LiveData<Event<PaymentEventDTO>>() {
     companion object {
         private val dropInPaymentResultMessenger = DropInPaymentResultMessenger()
 
         fun instance() = dropInPaymentResultMessenger
-        fun sendResult(value: PaymentFlowOutcomeDTO) {
+        fun sendResult(value: PaymentEventDTO) {
             dropInPaymentResultMessenger.postValue(Event(value))
         }
     }
@@ -40,13 +40,13 @@ class DropInAdditionalDetailsPlatformMessenger : LiveData<Event<JSONObject>>() {
     }
 }
 
-class DropInAdditionalDetailsResultMessenger : LiveData<Event<PaymentFlowOutcomeDTO>>() {
+class DropInAdditionalDetailsResultMessenger : LiveData<Event<PaymentEventDTO>>() {
     companion object {
         private val dropInAdditionalDetailsResultMessenger =
             DropInAdditionalDetailsResultMessenger()
 
         fun instance() = dropInAdditionalDetailsResultMessenger
-        fun sendResult(value: PaymentFlowOutcomeDTO) {
+        fun sendResult(value: PaymentEventDTO) {
             dropInAdditionalDetailsResultMessenger.postValue(Event(value))
         }
     }

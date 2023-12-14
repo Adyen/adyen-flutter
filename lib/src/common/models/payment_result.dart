@@ -3,10 +3,10 @@ import 'package:adyen_checkout/src/common/models/oder_response.dart';
 
 sealed class PaymentResult {}
 
-class PaymentAdvancedFlowFinished extends PaymentResult {
+class PaymentAdvancedFinished extends PaymentResult {
   final String resultCode;
 
-  PaymentAdvancedFlowFinished({required this.resultCode});
+  PaymentAdvancedFinished({required this.resultCode});
 }
 
 class PaymentSessionFinished extends PaymentResult {

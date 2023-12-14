@@ -21,9 +21,7 @@ class DropInPlatformApi: DropInPlatformInterface {
         self.sessionHolder = sessionHolder
     }
 
-    func startDropInSessionPayment(
-        dropInConfigurationDTO: DropInConfigurationDTO
-    ) {
+    func showDropInSession(dropInConfigurationDTO: DropInConfigurationDTO) {
         do {
             guard let viewController = getViewController() else {
                 return
@@ -53,10 +51,7 @@ class DropInPlatformApi: DropInPlatformInterface {
         }
     }
 
-    func startDropInAdvancedFlowPayment(
-        dropInConfigurationDTO: DropInConfigurationDTO,
-        paymentMethodsResponse: String
-    ) {
+    func showDropInAdvanced(dropInConfigurationDTO: DropInConfigurationDTO, paymentMethodsResponse: String) {
         do {
             guard let viewController = getViewController() else {
                 return
@@ -82,16 +77,16 @@ class DropInPlatformApi: DropInPlatformInterface {
             self.viewController?.present(dropInComponent.viewController, animated: true)
         } catch {
             let platformCommunicationModel = PlatformCommunicationModel(type: PlatformCommunicationType.result, paymentResult: PaymentResultDTO(type: PaymentResultEnum.error, reason: error.localizedDescription))
-            dropInFlutterApi.onDropInAdvancedFlowPlatformCommunication(platformCommunicationModel: platformCommunicationModel, completion: { _ in })
+            dropInFlutterApi.onDropInAdvancedPlatformCommunication(platformCommunicationModel: platformCommunicationModel, completion: { _ in })
         }
     }
 
-    func onPaymentsResult(paymentsResult: PaymentFlowOutcomeDTO) {
-        handlePaymentFlowOutcome(paymentFlowOutcomeDTO: paymentsResult)
+    func onPaymentsResult(paymentsResult: PaymentEventDTO) {
+        handlePaymentEvent(paymentEventDTO: paymentsResult)
     }
 
-    func onPaymentsDetailsResult(paymentsDetailsResult: PaymentFlowOutcomeDTO) {
-        handlePaymentFlowOutcome(paymentFlowOutcomeDTO: paymentsDetailsResult)
+    func onPaymentsDetailsResult(paymentsDetailsResult: PaymentEventDTO) {
+        handlePaymentEvent(paymentEventDTO: paymentsDetailsResult)
     }
 
     func onDeleteStoredPaymentMethodResult(deleteStoredPaymentMethodResultDTO: DeletedStoredPaymentMethodResultDTO) {
@@ -108,51 +103,51 @@ class DropInPlatformApi: DropInPlatformInterface {
         viewController = nil
     }
 
-    private func handlePaymentFlowOutcome(paymentFlowOutcomeDTO: PaymentFlowOutcomeDTO) {
-        switch paymentFlowOutcomeDTO.paymentFlowResultType {
+    private func handlePaymentEvent(paymentEventDTO: PaymentEventDTO) {
+        switch paymentEventDTO.paymentEventType {
         case .finished:
-            onDropInResultFinished(paymentFlowOutcome: paymentFlowOutcomeDTO)
+            onDropInResultFinished(paymentEventDTO: paymentEventDTO)
         case .action:
-            onDropInResultAction(paymentFlowOutcome: paymentFlowOutcomeDTO)
+            onDropInResultAction(paymentEventDTO: paymentEventDTO)
         case .error:
-            onDropInResultError(paymentFlowOutcome: paymentFlowOutcomeDTO)
+            onDropInResultError(paymentEventDTO: paymentEventDTO)
         }
     }
 
-    private func onDropInResultFinished(paymentFlowOutcome: PaymentFlowOutcomeDTO) {
-        let resultCode = ResultCode(rawValue: paymentFlowOutcome.result ?? "")
+    private func onDropInResultFinished(paymentEventDTO: PaymentEventDTO) {
+        let resultCode = ResultCode(rawValue: paymentEventDTO.result ?? "")
         let success = resultCode == .authorised || resultCode == .received || resultCode == .pending
         finalizeAndDismiss(success: success, completion: { [weak self] in
             let paymentResult = PaymentResultDTO(type: PaymentResultEnum.finished, result: PaymentResultModelDTO(resultCode: resultCode?.rawValue))
-            self?.dropInFlutterApi.onDropInAdvancedFlowPlatformCommunication(platformCommunicationModel: PlatformCommunicationModel(type: PlatformCommunicationType.result, paymentResult: paymentResult), completion: { _ in })
+            self?.dropInFlutterApi.onDropInAdvancedPlatformCommunication(platformCommunicationModel: PlatformCommunicationModel(type: PlatformCommunicationType.result, paymentResult: paymentResult), completion: { _ in })
         })
     }
 
-    private func onDropInResultAction(paymentFlowOutcome: PaymentFlowOutcomeDTO) {
+    private func onDropInResultAction(paymentEventDTO: PaymentEventDTO) {
         do {
-            let jsonData = try JSONSerialization.data(withJSONObject: paymentFlowOutcome.actionResponse as Any, options: [])
+            let jsonData = try JSONSerialization.data(withJSONObject: paymentEventDTO.actionResponse as Any, options: [])
             let result = try JSONDecoder().decode(Action.self, from: jsonData)
             dropInComponent?.handle(result)
         } catch {
             let paymentResult = PaymentResultDTO(type: PaymentResultEnum.error, reason: error.localizedDescription)
-            dropInFlutterApi.onDropInAdvancedFlowPlatformCommunication(platformCommunicationModel: PlatformCommunicationModel(type: PlatformCommunicationType.result, paymentResult: paymentResult), completion: { _ in })
+            dropInFlutterApi.onDropInAdvancedPlatformCommunication(platformCommunicationModel: PlatformCommunicationModel(type: PlatformCommunicationType.result, paymentResult: paymentResult), completion: { _ in })
             finalizeAndDismiss(success: false) {}
         }
     }
 
-    private func onDropInResultError(paymentFlowOutcome: PaymentFlowOutcomeDTO) {
+    private func onDropInResultError(paymentEventDTO: PaymentEventDTO) {
         dropInComponent?.stopLoading()
 
-        if paymentFlowOutcome.error?.dismissDropIn == true {
-            let paymentResult = PaymentResultDTO(type: PaymentResultEnum.error, reason: paymentFlowOutcome.error?.errorMessage)
-            dropInFlutterApi.onDropInAdvancedFlowPlatformCommunication(platformCommunicationModel: PlatformCommunicationModel(type: PlatformCommunicationType.result, paymentResult: paymentResult), completion: { _ in })
+        if paymentEventDTO.error?.dismissDropIn == true {
+            let paymentResult = PaymentResultDTO(type: PaymentResultEnum.error, reason: paymentEventDTO.error?.errorMessage)
+            dropInFlutterApi.onDropInAdvancedPlatformCommunication(platformCommunicationModel: PlatformCommunicationModel(type: PlatformCommunicationType.result, paymentResult: paymentResult), completion: { _ in })
             finalizeAndDismiss(success: false) {}
         } else {
             dropInComponent?.finalizeIfNeeded(with: false, completion: {})
             let localizationParameters = (dropInComponent as? Localizable)?.localizationParameters
             let title = localizedString(.errorTitle, localizationParameters)
             let alertController = UIAlertController(title: title,
-                                                    message: paymentFlowOutcome.error?.errorMessage,
+                                                    message: paymentEventDTO.error?.errorMessage,
                                                     preferredStyle: .alert)
             alertController.addAction(UIAlertAction(title: localizedString(.dismissButton, localizationParameters), style: .cancel))
             viewController?.adyen.topPresenter.present(alertController, animated: true)

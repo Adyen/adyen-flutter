@@ -9,7 +9,7 @@ import 'package:adyen_checkout/src/components/platform/ios_platform_view.dart';
 import 'package:adyen_checkout/src/generated/platform_api.g.dart';
 import 'package:adyen_checkout/src/logging/adyen_logger.dart';
 import 'package:adyen_checkout/src/utils/constants.dart';
-import 'package:adyen_checkout/src/utils/payment_flow_outcome_handler.dart';
+import 'package:adyen_checkout/src/utils/payment_event_handler.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -27,20 +27,19 @@ class CardAdvancedComponent extends StatefulWidget {
     required this.initialViewHeight,
     required this.isStoredPaymentMethod,
     this.gestureRecognizers,
-    PaymentFlowOutcomeHandler? paymentFlowOutcomeHandler,
+    PaymentEventHandler? paymentEventHandler,
     AdyenLogger? adyenLogger,
-  })  : paymentFlowOutcomeHandler =
-            paymentFlowOutcomeHandler ?? PaymentFlowOutcomeHandler(),
+  })  : paymentEventHandler = paymentEventHandler ?? PaymentEventHandler(),
         adyenLogger = adyenLogger ?? AdyenLogger.instance;
 
   final CardComponentConfigurationDTO cardComponentConfiguration;
   final String paymentMethod;
-  final Future<PaymentFlowOutcome> Function(String) onPayments;
-  final Future<PaymentFlowOutcome> Function(String) onPaymentsDetails;
+  final Future<PaymentEvent> Function(String) onPayments;
+  final Future<PaymentEvent> Function(String) onPaymentsDetails;
   final Future<void> Function(PaymentResult) onPaymentResult;
   final bool isStoredPaymentMethod;
   final double initialViewHeight;
-  final PaymentFlowOutcomeHandler paymentFlowOutcomeHandler;
+  final PaymentEventHandler paymentEventHandler;
   final Set<Factory<OneSequenceGestureRecognizer>>? gestureRecognizers;
   final AdyenLogger adyenLogger;
 
@@ -107,21 +106,19 @@ class _CardAdvancedFlowState extends State<CardAdvancedComponent> {
   }
 
   Future<void> _onSubmit(ComponentCommunicationModel event) async {
-    final PaymentFlowOutcome paymentFlowOutcome =
+    final PaymentEvent paymentEvent =
         await widget.onPayments(event.data as String);
-    final PaymentFlowOutcomeDTO paymentFlowOutcomeDTO = widget
-        .paymentFlowOutcomeHandler
-        .mapToPaymentOutcomeDTO(paymentFlowOutcome);
-    _componentPlatformApi.onPaymentsResult(paymentFlowOutcomeDTO);
+    final PaymentEventDTO paymentEventDTO =
+        widget.paymentEventHandler.mapToPaymentEventDTO(paymentEvent);
+    _componentPlatformApi.onPaymentsResult(paymentEventDTO);
   }
 
   Future<void> _onAdditionalDetails(ComponentCommunicationModel event) async {
-    final PaymentFlowOutcome paymentFlowOutcome =
+    final PaymentEvent paymentEvent =
         await widget.onPaymentsDetails(event.data as String);
-    final PaymentFlowOutcomeDTO paymentFlowOutcomeDTO = widget
-        .paymentFlowOutcomeHandler
-        .mapToPaymentOutcomeDTO(paymentFlowOutcome);
-    _componentPlatformApi.onPaymentsDetailsResult(paymentFlowOutcomeDTO);
+    final PaymentEventDTO paymentEventDTO =
+        widget.paymentEventHandler.mapToPaymentEventDTO(paymentEvent);
+    _componentPlatformApi.onPaymentsDetailsResult(paymentEventDTO);
   }
 
   void _onError(ComponentCommunicationModel event) {
@@ -135,7 +132,7 @@ class _CardAdvancedFlowState extends State<CardAdvancedComponent> {
   void _onHandleResult(ComponentCommunicationModel event) {
     String resultCode = event.paymentResult?.resultCode ?? "";
     widget.adyenLogger.print("Card advanced flow result code: $resultCode");
-    widget.onPaymentResult(PaymentAdvancedFlowFinished(resultCode: resultCode));
+    widget.onPaymentResult(PaymentAdvancedFinished(resultCode: resultCode));
   }
 
   Widget _buildCardWidget() {
@@ -150,7 +147,7 @@ class _CardAdvancedFlowState extends State<CardAdvancedComponent> {
       case TargetPlatform.android:
         return AndroidPlatformView(
           key: UniqueKey(),
-          viewType: Constants.cardComponentAdvancedFlowKey,
+          viewType: Constants.cardComponentAdvancedKey,
           codec: _codec,
           creationParams: creationParams,
           gestureRecognizers: widget.gestureRecognizers,
@@ -159,7 +156,7 @@ class _CardAdvancedFlowState extends State<CardAdvancedComponent> {
       case TargetPlatform.iOS:
         return IosPlatformView(
           key: UniqueKey(),
-          viewType: Constants.cardComponentAdvancedFlowKey,
+          viewType: Constants.cardComponentAdvancedKey,
           codec: _codec,
           creationParams: creationParams,
           gestureRecognizers: widget.gestureRecognizers,

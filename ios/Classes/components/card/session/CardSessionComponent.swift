@@ -3,7 +3,7 @@ import Adyen
 import AdyenNetworking
 import Flutter
 
-class CardSessionFlowComponent: BaseCardComponent {
+class CardSessionComponent: BaseCardComponent {
     private let sessionHolder: SessionHolder
 
     init(

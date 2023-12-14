@@ -67,7 +67,7 @@ enum ComponentCommunicationType {
   resize,
 }
 
-enum PaymentFlowResultType {
+enum PaymentEventType {
   finished,
   action,
   error,
@@ -278,15 +278,14 @@ class ComponentCommunicationModel {
   });
 }
 
-//Use PaymentFlowOutcome class when sealed classes are supported by pigeon
-class PaymentFlowOutcomeDTO {
-  final PaymentFlowResultType paymentFlowResultType;
+class PaymentEventDTO {
+  final PaymentEventType paymentEventType;
   final String? result;
   final Map<String?, Object?>? actionResponse;
   final ErrorDTO? error;
 
-  PaymentFlowOutcomeDTO({
-    required this.paymentFlowResultType,
+  PaymentEventDTO({
+    required this.paymentEventType,
     this.result,
     this.actionResponse,
     this.error,
@@ -352,18 +351,17 @@ abstract class CheckoutPlatformInterface {
 
 @HostApi()
 abstract class DropInPlatformInterface {
-  void startDropInSessionPayment(
-    DropInConfigurationDTO dropInConfigurationDTO,
-  );
+  // TODO: Merge show dropIn methods into one.
+  void showDropInSession(DropInConfigurationDTO dropInConfigurationDTO);
 
-  void startDropInAdvancedFlowPayment(
+  void showDropInAdvanced(
     DropInConfigurationDTO dropInConfigurationDTO,
     String paymentMethodsResponse,
   );
 
-  void onPaymentsResult(PaymentFlowOutcomeDTO paymentsResult);
+  void onPaymentsResult(PaymentEventDTO paymentsResult);
 
-  void onPaymentsDetailsResult(PaymentFlowOutcomeDTO paymentsDetailsResult);
+  void onPaymentsDetailsResult(PaymentEventDTO paymentsDetailsResult);
 
   void onDeleteStoredPaymentMethodResult(
       DeletedStoredPaymentMethodResultDTO deleteStoredPaymentMethodResultDTO);
@@ -376,7 +374,7 @@ abstract class DropInFlutterInterface {
   void onDropInSessionPlatformCommunication(
       PlatformCommunicationModel platformCommunicationModel);
 
-  void onDropInAdvancedFlowPlatformCommunication(
+  void onDropInAdvancedPlatformCommunication(
       PlatformCommunicationModel platformCommunicationModel);
 }
 
@@ -384,9 +382,9 @@ abstract class DropInFlutterInterface {
 abstract class ComponentPlatformInterface {
   void updateViewHeight(int viewId);
 
-  void onPaymentsResult(PaymentFlowOutcomeDTO paymentsResult);
+  void onPaymentsResult(PaymentEventDTO paymentsResult);
 
-  void onPaymentsDetailsResult(PaymentFlowOutcomeDTO paymentsDetailsResult);
+  void onPaymentsDetailsResult(PaymentEventDTO paymentsDetailsResult);
 }
 
 @FlutterApi()

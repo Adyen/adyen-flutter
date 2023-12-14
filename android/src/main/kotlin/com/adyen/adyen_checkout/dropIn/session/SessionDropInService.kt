@@ -1,4 +1,4 @@
-package com.adyen.adyen_checkout.dropIn.dropInSession
+package com.adyen.adyen_checkout.dropIn.session
 
 import DeletedStoredPaymentMethodResultDTO
 import android.content.Intent
@@ -6,10 +6,10 @@ import android.os.IBinder
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ServiceLifecycleDispatcher
-import com.adyen.adyen_checkout.dropIn.dropInAdvancedFlow.DropInPaymentMethodDeletionPlatformMessenger
-import com.adyen.adyen_checkout.dropIn.dropInAdvancedFlow.DropInPaymentMethodDeletionResultMessenger
-import com.adyen.adyen_checkout.dropIn.models.DropInFlowType
+import com.adyen.adyen_checkout.dropIn.advanced.DropInPaymentMethodDeletionPlatformMessenger
+import com.adyen.adyen_checkout.dropIn.advanced.DropInPaymentMethodDeletionResultMessenger
 import com.adyen.adyen_checkout.dropIn.models.DropInStoredPaymentMethodDeletionModel
+import com.adyen.adyen_checkout.dropIn.models.DropInType
 import com.adyen.checkout.components.core.StoredPaymentMethod
 import com.adyen.checkout.dropin.ErrorDialog
 import com.adyen.checkout.dropin.RecurringDropInServiceResult
@@ -23,7 +23,7 @@ class SessionDropInService : SessionDropInService(), LifecycleOwner {
             setStoredPaymentMethodDeletionObserver()
             val dropInStoredPaymentMethodDeletionModel = DropInStoredPaymentMethodDeletionModel(
                 storedPaymentMethodId,
-                DropInFlowType.SESSION
+                DropInType.SESSION
             )
             DropInPaymentMethodDeletionPlatformMessenger.sendResult(dropInStoredPaymentMethodDeletionModel)
         } ?: run {

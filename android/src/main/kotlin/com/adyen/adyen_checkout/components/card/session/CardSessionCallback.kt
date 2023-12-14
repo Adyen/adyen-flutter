@@ -12,7 +12,7 @@ import com.adyen.checkout.components.core.action.Action
 import com.adyen.checkout.sessions.core.SessionComponentCallback
 import com.adyen.checkout.sessions.core.SessionPaymentResult
 
-class CardSessionFlowCallback(
+class CardSessionCallback(
     private val componentFlutterApi: ComponentFlutterInterface,
     private val onActionCallback: (Action) -> Unit
 ) :

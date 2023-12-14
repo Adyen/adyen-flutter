@@ -1,6 +1,6 @@
 package com.adyen.adyen_checkout.dropIn.models
 
-enum class DropInFlowType {
+enum class DropInType {
     SESSION,
     ADVANCED_FLOW,
 }
