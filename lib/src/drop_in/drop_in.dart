@@ -128,7 +128,7 @@ class DropIn {
         case PaymentResultEnum.error:
           return PaymentError(reason: paymentResultDTO.reason);
         case PaymentResultEnum.finished:
-          return PaymentAdvancedFlowFinished(
+          return PaymentAdvancedFinished(
             resultCode: paymentResultDTO.result?.resultCode ?? "",
           );
       }

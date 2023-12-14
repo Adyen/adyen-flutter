@@ -98,7 +98,7 @@ class CardComponentScrollableScreen extends StatelessWidget {
     String title = "";
     String message = "";
     switch (paymentResult) {
-      case PaymentAdvancedFlowFinished():
+      case PaymentAdvancedFinished():
         title = "Finished";
         message = "Result code: ${paymentResult.resultCode}";
       case PaymentSessionFinished():

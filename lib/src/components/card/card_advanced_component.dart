@@ -135,7 +135,7 @@ class _CardAdvancedFlowState extends State<CardAdvancedComponent> {
   void _onHandleResult(ComponentCommunicationModel event) {
     String resultCode = event.paymentResult?.resultCode ?? "";
     widget.adyenLogger.print("Card advanced flow result code: $resultCode");
-    widget.onPaymentResult(PaymentAdvancedFlowFinished(resultCode: resultCode));
+    widget.onPaymentResult(PaymentAdvancedFinished(resultCode: resultCode));
   }
 
   Widget _buildCardWidget() {

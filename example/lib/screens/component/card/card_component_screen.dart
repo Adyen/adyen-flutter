@@ -149,7 +149,7 @@ class _CardComponentScreenState extends State<CardComponentScreen> {
     String title = "";
     String message = "";
     switch (paymentResult) {
-      case PaymentAdvancedFlowFinished():
+      case PaymentAdvancedFinished():
         title = "Finished";
         message = "Result code: ${paymentResult.resultCode}";
       case PaymentSessionFinished():

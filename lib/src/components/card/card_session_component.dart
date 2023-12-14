@@ -97,7 +97,7 @@ class _CardSessionComponentState extends State<CardSessionComponent> {
   void _onResult(ComponentCommunicationModel event) {
     String resultCode = event.paymentResult?.resultCode ?? "";
     widget.adyenLogger.print("Card session flow result code: $resultCode");
-    widget.onPaymentResult(PaymentAdvancedFlowFinished(resultCode: resultCode));
+    widget.onPaymentResult(PaymentAdvancedFinished(resultCode: resultCode));
   }
 
   void _onError(ComponentCommunicationModel event) {
