@@ -1,4 +1,4 @@
-package com.adyen.adyen_checkout.components.card.advancedFlow
+package com.adyen.adyen_checkout.components.card.advanced
 
 import ComponentCommunicationModel
 import ComponentCommunicationType

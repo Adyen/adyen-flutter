@@ -121,7 +121,7 @@ class _CardSessionComponentState extends State<CardSessionComponent> {
       case TargetPlatform.android:
         return AndroidPlatformView(
           key: UniqueKey(),
-          viewType: Constants.cardComponentSessionFlowKey,
+          viewType: Constants.cardComponentSessionKey,
           codec: _codec,
           creationParams: creationParams,
           gestureRecognizers: widget.gestureRecognizers,
@@ -130,7 +130,7 @@ class _CardSessionComponentState extends State<CardSessionComponent> {
       case TargetPlatform.iOS:
         return IosPlatformView(
           key: UniqueKey(),
-          viewType: Constants.cardComponentSessionFlowKey,
+          viewType: Constants.cardComponentSessionKey,
           codec: _codec,
           creationParams: creationParams,
           gestureRecognizers: widget.gestureRecognizers,

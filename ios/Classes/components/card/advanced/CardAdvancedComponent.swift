@@ -3,7 +3,7 @@ import Adyen
 import AdyenNetworking
 import Flutter
 
-class CardAdvancedFlowComponent: BaseCardComponent {
+class CardAdvancedComponent: BaseCardComponent {
     private let actionComponentDelegate: ActionComponentDelegate
     private var actionComponent: AdyenActionComponent?
     private var presentationDelegate: PresentationDelegate?

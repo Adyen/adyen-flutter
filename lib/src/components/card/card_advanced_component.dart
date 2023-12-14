@@ -150,7 +150,7 @@ class _CardAdvancedFlowState extends State<CardAdvancedComponent> {
       case TargetPlatform.android:
         return AndroidPlatformView(
           key: UniqueKey(),
-          viewType: Constants.cardComponentAdvancedFlowKey,
+          viewType: Constants.cardComponentAdvancedKey,
           codec: _codec,
           creationParams: creationParams,
           gestureRecognizers: widget.gestureRecognizers,
@@ -159,7 +159,7 @@ class _CardAdvancedFlowState extends State<CardAdvancedComponent> {
       case TargetPlatform.iOS:
         return IosPlatformView(
           key: UniqueKey(),
-          viewType: Constants.cardComponentAdvancedFlowKey,
+          viewType: Constants.cardComponentAdvancedKey,
           codec: _codec,
           creationParams: creationParams,
           gestureRecognizers: widget.gestureRecognizers,
