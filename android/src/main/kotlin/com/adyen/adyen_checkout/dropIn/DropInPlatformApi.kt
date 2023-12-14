@@ -5,10 +5,10 @@ import DropInConfigurationDTO
 import DropInFlutterInterface
 import DropInPlatformInterface
 import PaymentOutcomeDTO
+import PaymentOutcomeType
 import PaymentResultDTO
 import PaymentResultEnum
 import PaymentResultModelDTO
-import PaymentResultType
 import PlatformCommunicationModel
 import PlatformCommunicationType
 import androidx.activity.result.ActivityResultLauncher
@@ -87,7 +87,7 @@ class DropInPlatformApi(
     }
 
     override fun onPaymentsResult(paymentsResult: PaymentOutcomeDTO) {
-        if (paymentsResult.paymentResultType == PaymentResultType.ACTION) {
+        if (paymentsResult.paymentOutcomeType == PaymentOutcomeType.ACTION) {
             setAdvanceFlowDropInAdditionalDetailsMessengerObserver()
         }
 

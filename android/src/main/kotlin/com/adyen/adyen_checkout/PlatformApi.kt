@@ -156,13 +156,13 @@ enum class ComponentCommunicationType(val raw: Int) {
   }
 }
 
-enum class PaymentResultType(val raw: Int) {
+enum class PaymentOutcomeType(val raw: Int) {
   FINISHED(0),
   ACTION(1),
   ERROR(2);
 
   companion object {
-    fun ofRaw(raw: Int): PaymentResultType? {
+    fun ofRaw(raw: Int): PaymentOutcomeType? {
       return values().firstOrNull { it.raw == raw }
     }
   }
@@ -594,7 +594,7 @@ data class ComponentCommunicationModel (
 
 /** Generated class from Pigeon that represents data sent in messages. */
 data class PaymentOutcomeDTO (
-  val paymentResultType: PaymentResultType,
+  val paymentOutcomeType: PaymentOutcomeType,
   val result: String? = null,
   val actionResponse: Map<String?, Any?>? = null,
   val error: ErrorDTO? = null
@@ -603,18 +603,18 @@ data class PaymentOutcomeDTO (
   companion object {
     @Suppress("UNCHECKED_CAST")
     fun fromList(list: List<Any?>): PaymentOutcomeDTO {
-      val paymentResultType = PaymentResultType.ofRaw(list[0] as Int)!!
+      val paymentOutcomeType = PaymentOutcomeType.ofRaw(list[0] as Int)!!
       val result = list[1] as String?
       val actionResponse = list[2] as Map<String?, Any?>?
       val error: ErrorDTO? = (list[3] as List<Any?>?)?.let {
         ErrorDTO.fromList(it)
       }
-      return PaymentOutcomeDTO(paymentResultType, result, actionResponse, error)
+      return PaymentOutcomeDTO(paymentOutcomeType, result, actionResponse, error)
     }
   }
   fun toList(): List<Any?> {
     return listOf<Any?>(
-      paymentResultType.raw,
+      paymentOutcomeType.raw,
       result,
       actionResponse,
       error?.toList(),

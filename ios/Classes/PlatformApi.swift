@@ -99,7 +99,7 @@ enum ComponentCommunicationType: Int {
   case resize = 4
 }
 
-enum PaymentResultType: Int {
+enum PaymentOutcomeType: Int {
   case finished = 0
   case action = 1
   case error = 2
@@ -572,13 +572,13 @@ struct ComponentCommunicationModel {
 
 /// Generated class from Pigeon that represents data sent in messages.
 struct PaymentOutcomeDTO {
-  var paymentResultType: PaymentResultType
+  var paymentOutcomeType: PaymentOutcomeType
   var result: String? = nil
   var actionResponse: [String?: Any?]? = nil
   var error: ErrorDTO? = nil
 
   static func fromList(_ list: [Any?]) -> PaymentOutcomeDTO? {
-    let paymentResultType = PaymentResultType(rawValue: list[0] as! Int)!
+    let paymentOutcomeType = PaymentOutcomeType(rawValue: list[0] as! Int)!
     let result: String? = nilOrValue(list[1])
     let actionResponse: [String?: Any?]? = nilOrValue(list[2])
     var error: ErrorDTO? = nil
@@ -587,7 +587,7 @@ struct PaymentOutcomeDTO {
     }
 
     return PaymentOutcomeDTO(
-      paymentResultType: paymentResultType,
+      paymentOutcomeType: paymentOutcomeType,
       result: result,
       actionResponse: actionResponse,
       error: error
@@ -595,7 +595,7 @@ struct PaymentOutcomeDTO {
   }
   func toList() -> [Any?] {
     return [
-      paymentResultType.rawValue,
+      paymentOutcomeType.rawValue,
       result,
       actionResponse,
       error?.toList(),

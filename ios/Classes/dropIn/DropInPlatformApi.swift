@@ -104,7 +104,7 @@ class DropInPlatformApi: DropInPlatformInterface {
     }
 
     private func handlePaymentFlowOutcome(paymentOutcomeDTO: PaymentOutcomeDTO) {
-        switch paymentOutcomeDTO.paymentResultType {
+        switch paymentOutcomeDTO.paymentOutcomeType {
         case .finished:
             onDropInResultFinished(paymentOutcome: paymentOutcomeDTO)
         case .action:

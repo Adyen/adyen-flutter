@@ -17,7 +17,7 @@ class ComponentPlatformApi: ComponentPlatformInterface {
     }
 
     private func handlePaymentOutcome(paymentOutcomeDTO: PaymentOutcomeDTO) {
-        switch paymentOutcomeDTO.paymentResultType {
+        switch paymentOutcomeDTO.paymentOutcomeType {
         case .finished:
             onFinishCallback(paymentOutcomeDTO)
         case .action:

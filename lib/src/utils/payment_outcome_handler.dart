@@ -6,15 +6,15 @@ class PaymentOutcomeHandler {
       PaymentOutcome paymentFlowOutcome) {
     return switch (paymentFlowOutcome) {
       Finished() => PaymentOutcomeDTO(
-          paymentResultType: PaymentResultType.finished,
+        paymentOutcomeType: PaymentOutcomeType.finished,
           result: paymentFlowOutcome.resultCode,
         ),
       Action() => PaymentOutcomeDTO(
-          paymentResultType: PaymentResultType.action,
+        paymentOutcomeType: PaymentOutcomeType.action,
           actionResponse: paymentFlowOutcome.actionResponse,
         ),
       Error() => PaymentOutcomeDTO(
-          paymentResultType: PaymentResultType.error,
+          paymentOutcomeType: PaymentOutcomeType.error,
           error: ErrorDTO(
             errorMessage: paymentFlowOutcome.errorMessage,
             reason: paymentFlowOutcome.reason,

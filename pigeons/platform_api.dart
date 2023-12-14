@@ -67,7 +67,7 @@ enum ComponentCommunicationType {
   resize,
 }
 
-enum PaymentResultType {
+enum PaymentOutcomeType {
   finished,
   action,
   error,
@@ -280,13 +280,13 @@ class ComponentCommunicationModel {
 
 //Use PaymentOutcome class when sealed classes are supported by pigeon
 class PaymentOutcomeDTO {
-  final PaymentResultType paymentResultType;
+  final PaymentOutcomeType paymentOutcomeType;
   final String? result;
   final Map<String?, Object?>? actionResponse;
   final ErrorDTO? error;
 
   PaymentOutcomeDTO({
-    required this.paymentResultType,
+    required this.paymentOutcomeType,
     this.result,
     this.actionResponse,
     this.error,

@@ -3,7 +3,7 @@ package com.adyen.adyen_checkout.dropIn.advanced
 import DeletedStoredPaymentMethodResultDTO
 import ErrorDTO
 import PaymentOutcomeDTO
-import PaymentResultType
+import PaymentOutcomeType
 import android.content.Intent
 import android.os.IBinder
 import androidx.lifecycle.Lifecycle
@@ -127,18 +127,18 @@ class AdvancedDropInService : DropInService(), LifecycleOwner {
     }
 
     private fun mapToDropInServiceResult(paymentFlowOutcomeDTO: PaymentOutcomeDTO?): DropInServiceResult {
-        return when (paymentFlowOutcomeDTO?.paymentResultType) {
-            PaymentResultType.FINISHED -> DropInServiceResult.Finished(
+        return when (paymentFlowOutcomeDTO?.paymentOutcomeType) {
+            PaymentOutcomeType.FINISHED -> DropInServiceResult.Finished(
                 result = "${paymentFlowOutcomeDTO.result}"
             )
 
-            PaymentResultType.ERROR -> DropInServiceResult.Error(
+            PaymentOutcomeType.ERROR -> DropInServiceResult.Error(
                 errorDialog = buildErrorDialog(paymentFlowOutcomeDTO.error),
                 reason = paymentFlowOutcomeDTO.error?.reason,
                 dismissDropIn = paymentFlowOutcomeDTO.error?.dismissDropIn ?: false
             )
 
-            PaymentResultType.ACTION -> {
+            PaymentOutcomeType.ACTION -> {
                 if (paymentFlowOutcomeDTO.actionResponse == null) {
                     DropInServiceResult.Error(
                         errorDialog = null,

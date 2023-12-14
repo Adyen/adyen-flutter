@@ -158,7 +158,7 @@ class DropIn {
       String errorMessage = error.toString();
       adyenLogger.print("Failure in postPayments, $errorMessage");
       dropInPlatformApi.onPaymentsResult(PaymentOutcomeDTO(
-        paymentResultType: PaymentResultType.error,
+        paymentOutcomeType: PaymentOutcomeType.error,
         error: ErrorDTO(
           errorMessage: errorMessage,
           reason: "Failure in postPayments, $errorMessage",
@@ -187,7 +187,7 @@ class DropIn {
       String errorMessage = error.toString();
       adyenLogger.print("Failure in postPaymentsDetails, $errorMessage");
       dropInPlatformApi.onPaymentsDetailsResult(PaymentOutcomeDTO(
-        paymentResultType: PaymentResultType.error,
+        paymentOutcomeType: PaymentOutcomeType.error,
         error: ErrorDTO(
           errorMessage: errorMessage,
           reason: "Failure in postPaymentsDetails, $errorMessage}",

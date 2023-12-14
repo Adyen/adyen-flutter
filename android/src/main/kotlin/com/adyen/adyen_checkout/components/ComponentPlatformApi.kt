@@ -3,8 +3,8 @@ package com.adyen.adyen_checkout.components
 import ComponentPlatformInterface
 import ErrorDTO
 import PaymentOutcomeDTO
+import PaymentOutcomeType
 import PaymentResultModelDTO
-import PaymentResultType
 import org.json.JSONObject
 
 class ComponentPlatformApi : ComponentPlatformInterface {
@@ -22,10 +22,10 @@ class ComponentPlatformApi : ComponentPlatformInterface {
     }
 
     private fun handlePaymentFlowOutcome(paymentFlowOutcomeDTO: PaymentOutcomeDTO) {
-        when (paymentFlowOutcomeDTO.paymentResultType) {
-            PaymentResultType.FINISHED -> onFinished(paymentFlowOutcomeDTO.result)
-            PaymentResultType.ACTION -> onAction(paymentFlowOutcomeDTO.actionResponse)
-            PaymentResultType.ERROR -> onError(paymentFlowOutcomeDTO.error)
+        when (paymentFlowOutcomeDTO.paymentOutcomeType) {
+            PaymentOutcomeType.FINISHED -> onFinished(paymentFlowOutcomeDTO.result)
+            PaymentOutcomeType.ACTION -> onAction(paymentFlowOutcomeDTO.actionResponse)
+            PaymentOutcomeType.ERROR -> onError(paymentFlowOutcomeDTO.error)
         }
     }
 

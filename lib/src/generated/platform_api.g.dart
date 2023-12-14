@@ -82,7 +82,7 @@ enum ComponentCommunicationType {
   resize,
 }
 
-enum PaymentResultType {
+enum PaymentOutcomeType {
   finished,
   action,
   error,
@@ -630,13 +630,13 @@ class ComponentCommunicationModel {
 
 class PaymentOutcomeDTO {
   PaymentOutcomeDTO({
-    required this.paymentResultType,
+    required this.paymentOutcomeType,
     this.result,
     this.actionResponse,
     this.error,
   });
 
-  PaymentResultType paymentResultType;
+  PaymentOutcomeType paymentOutcomeType;
 
   String? result;
 
@@ -646,7 +646,7 @@ class PaymentOutcomeDTO {
 
   Object encode() {
     return <Object?>[
-      paymentResultType.index,
+      paymentOutcomeType.index,
       result,
       actionResponse,
       error?.encode(),
@@ -656,7 +656,7 @@ class PaymentOutcomeDTO {
   static PaymentOutcomeDTO decode(Object result) {
     result as List<Object?>;
     return PaymentOutcomeDTO(
-      paymentResultType: PaymentResultType.values[result[0]! as int],
+      paymentOutcomeType: PaymentOutcomeType.values[result[0]! as int],
       result: result[1] as String?,
       actionResponse: (result[2] as Map<Object?, Object?>?)?.cast<String?, Object?>(),
       error: result[3] != null
