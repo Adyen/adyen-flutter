@@ -1055,8 +1055,8 @@ private object DropInPlatformInterfaceCodec : StandardMessageCodec() {
 
 /** Generated interface from Pigeon that represents a handler of messages from Flutter. */
 interface DropInPlatformInterface {
-  fun startDropInSessionPayment(dropInConfigurationDTO: DropInConfigurationDTO)
-  fun startDropInAdvancedPayment(dropInConfigurationDTO: DropInConfigurationDTO, paymentMethodsResponse: String)
+  fun showDropInSession(dropInConfigurationDTO: DropInConfigurationDTO)
+  fun showDropInAdvanced(dropInConfigurationDTO: DropInConfigurationDTO, paymentMethodsResponse: String)
   fun onPaymentsResult(paymentsResult: PaymentOutcomeDTO)
   fun onPaymentsDetailsResult(paymentsDetailsResult: PaymentOutcomeDTO)
   fun onDeleteStoredPaymentMethodResult(deleteStoredPaymentMethodResultDTO: DeletedStoredPaymentMethodResultDTO)
@@ -1071,14 +1071,14 @@ interface DropInPlatformInterface {
     @Suppress("UNCHECKED_CAST")
     fun setUp(binaryMessenger: BinaryMessenger, api: DropInPlatformInterface?) {
       run {
-        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.adyen_checkout.DropInPlatformInterface.startDropInSessionPayment", codec)
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.adyen_checkout.DropInPlatformInterface.showDropInSession", codec)
         if (api != null) {
           channel.setMessageHandler { message, reply ->
             val args = message as List<Any?>
             val dropInConfigurationDTOArg = args[0] as DropInConfigurationDTO
             var wrapped: List<Any?>
             try {
-              api.startDropInSessionPayment(dropInConfigurationDTOArg)
+              api.showDropInSession(dropInConfigurationDTOArg)
               wrapped = listOf<Any?>(null)
             } catch (exception: Throwable) {
               wrapped = wrapError(exception)
@@ -1090,7 +1090,7 @@ interface DropInPlatformInterface {
         }
       }
       run {
-        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.adyen_checkout.DropInPlatformInterface.startDropInAdvancedPayment", codec)
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.adyen_checkout.DropInPlatformInterface.showDropInAdvanced", codec)
         if (api != null) {
           channel.setMessageHandler { message, reply ->
             val args = message as List<Any?>
@@ -1098,7 +1098,7 @@ interface DropInPlatformInterface {
             val paymentMethodsResponseArg = args[1] as String
             var wrapped: List<Any?>
             try {
-              api.startDropInAdvancedPayment(dropInConfigurationDTOArg, paymentMethodsResponseArg)
+              api.showDropInAdvanced(dropInConfigurationDTOArg, paymentMethodsResponseArg)
               wrapped = listOf<Any?>(null)
             } catch (exception: Throwable) {
               wrapped = wrapError(exception)

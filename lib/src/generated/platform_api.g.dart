@@ -1042,8 +1042,8 @@ class DropInPlatformInterface {
 
   static const MessageCodec<Object?> pigeonChannelCodec = _DropInPlatformInterfaceCodec();
 
-  Future<void> startDropInSessionPayment(DropInConfigurationDTO dropInConfigurationDTO) async {
-    const String __pigeon_channelName = 'dev.flutter.pigeon.adyen_checkout.DropInPlatformInterface.startDropInSessionPayment';
+  Future<void> showDropInSession(DropInConfigurationDTO dropInConfigurationDTO) async {
+    const String __pigeon_channelName = 'dev.flutter.pigeon.adyen_checkout.DropInPlatformInterface.showDropInSession';
     final BasicMessageChannel<Object?> __pigeon_channel = BasicMessageChannel<Object?>(
       __pigeon_channelName,
       pigeonChannelCodec,
@@ -1064,8 +1064,8 @@ class DropInPlatformInterface {
     }
   }
 
-  Future<void> startDropInAdvancedPayment(DropInConfigurationDTO dropInConfigurationDTO, String paymentMethodsResponse) async {
-    const String __pigeon_channelName = 'dev.flutter.pigeon.adyen_checkout.DropInPlatformInterface.startDropInAdvancedPayment';
+  Future<void> showDropInAdvanced(DropInConfigurationDTO dropInConfigurationDTO, String paymentMethodsResponse) async {
+    const String __pigeon_channelName = 'dev.flutter.pigeon.adyen_checkout.DropInPlatformInterface.showDropInAdvanced';
     final BasicMessageChannel<Object?> __pigeon_channel = BasicMessageChannel<Object?>(
       __pigeon_channelName,
       pigeonChannelCodec,

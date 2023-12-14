@@ -21,9 +21,7 @@ class DropInPlatformApi: DropInPlatformInterface {
         self.sessionHolder = sessionHolder
     }
 
-    func startDropInSessionPayment(
-        dropInConfigurationDTO: DropInConfigurationDTO
-    ) {
+    func showDropInSession(dropInConfigurationDTO: DropInConfigurationDTO) {
         do {
             guard let viewController = getViewController() else {
                 return
@@ -53,10 +51,7 @@ class DropInPlatformApi: DropInPlatformInterface {
         }
     }
 
-    func startDropInAdvancedPayment(
-        dropInConfigurationDTO: DropInConfigurationDTO,
-        paymentMethodsResponse: String
-    ) {
+    func showDropInAdvanced(dropInConfigurationDTO: DropInConfigurationDTO, paymentMethodsResponse: String) {
         do {
             guard let viewController = getViewController() else {
                 return

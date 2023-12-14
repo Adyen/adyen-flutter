@@ -352,11 +352,10 @@ abstract class CheckoutPlatformInterface {
 
 @HostApi()
 abstract class DropInPlatformInterface {
-  void startDropInSessionPayment(
-    DropInConfigurationDTO dropInConfigurationDTO,
-  );
+  // TODO: Merge show dropIn methods into one.
+  void showDropInSession(DropInConfigurationDTO dropInConfigurationDTO);
 
-  void startDropInAdvancedPayment(
+  void showDropInAdvanced(
     DropInConfigurationDTO dropInConfigurationDTO,
     String paymentMethodsResponse,
   );

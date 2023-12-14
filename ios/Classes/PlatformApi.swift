@@ -956,8 +956,8 @@ class DropInPlatformInterfaceCodec: FlutterStandardMessageCodec {
 
 /// Generated protocol from Pigeon that represents a handler of messages from Flutter.
 protocol DropInPlatformInterface {
-  func startDropInSessionPayment(dropInConfigurationDTO: DropInConfigurationDTO) throws
-  func startDropInAdvancedPayment(dropInConfigurationDTO: DropInConfigurationDTO, paymentMethodsResponse: String) throws
+  func showDropInSession(dropInConfigurationDTO: DropInConfigurationDTO) throws
+  func showDropInAdvanced(dropInConfigurationDTO: DropInConfigurationDTO, paymentMethodsResponse: String) throws
   func onPaymentsResult(paymentsResult: PaymentOutcomeDTO) throws
   func onPaymentsDetailsResult(paymentsDetailsResult: PaymentOutcomeDTO) throws
   func onDeleteStoredPaymentMethodResult(deleteStoredPaymentMethodResultDTO: DeletedStoredPaymentMethodResultDTO) throws
@@ -970,36 +970,36 @@ class DropInPlatformInterfaceSetup {
   static var codec: FlutterStandardMessageCodec { DropInPlatformInterfaceCodec.shared }
   /// Sets up an instance of `DropInPlatformInterface` to handle messages through the `binaryMessenger`.
   static func setUp(binaryMessenger: FlutterBinaryMessenger, api: DropInPlatformInterface?) {
-    let startDropInSessionPaymentChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.DropInPlatformInterface.startDropInSessionPayment", binaryMessenger: binaryMessenger, codec: codec)
+    let showDropInSessionChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.DropInPlatformInterface.showDropInSession", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {
-      startDropInSessionPaymentChannel.setMessageHandler { message, reply in
+      showDropInSessionChannel.setMessageHandler { message, reply in
         let args = message as! [Any?]
         let dropInConfigurationDTOArg = args[0] as! DropInConfigurationDTO
         do {
-          try api.startDropInSessionPayment(dropInConfigurationDTO: dropInConfigurationDTOArg)
+          try api.showDropInSession(dropInConfigurationDTO: dropInConfigurationDTOArg)
           reply(wrapResult(nil))
         } catch {
           reply(wrapError(error))
         }
       }
     } else {
-      startDropInSessionPaymentChannel.setMessageHandler(nil)
+      showDropInSessionChannel.setMessageHandler(nil)
     }
-    let startDropInAdvancedPaymentChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.DropInPlatformInterface.startDropInAdvancedPayment", binaryMessenger: binaryMessenger, codec: codec)
+    let showDropInAdvancedChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.DropInPlatformInterface.showDropInAdvanced", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {
-      startDropInAdvancedPaymentChannel.setMessageHandler { message, reply in
+      showDropInAdvancedChannel.setMessageHandler { message, reply in
         let args = message as! [Any?]
         let dropInConfigurationDTOArg = args[0] as! DropInConfigurationDTO
         let paymentMethodsResponseArg = args[1] as! String
         do {
-          try api.startDropInAdvancedPayment(dropInConfigurationDTO: dropInConfigurationDTOArg, paymentMethodsResponse: paymentMethodsResponseArg)
+          try api.showDropInAdvanced(dropInConfigurationDTO: dropInConfigurationDTOArg, paymentMethodsResponse: paymentMethodsResponseArg)
           reply(wrapResult(nil))
         } catch {
           reply(wrapError(error))
         }
       }
     } else {
-      startDropInAdvancedPaymentChannel.setMessageHandler(nil)
+      showDropInAdvancedChannel.setMessageHandler(nil)
     }
     let onPaymentsResultChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.DropInPlatformInterface.onPaymentsResult", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {

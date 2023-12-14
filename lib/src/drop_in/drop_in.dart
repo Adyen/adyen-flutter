@@ -34,7 +34,7 @@ class DropIn {
     final sdkVersionNumber =
         await sdkVersionNumberProvider.getSdkVersionNumber();
 
-    dropInPlatformApi.startDropInSessionPayment(
+    dropInPlatformApi.showDropInSession(
       dropInConfiguration.toDTO(sdkVersionNumber),
     );
 
@@ -88,7 +88,7 @@ class DropIn {
     final sdkVersionNumber =
         await sdkVersionNumberProvider.getSdkVersionNumber();
 
-    dropInPlatformApi.startDropInAdvancedPayment(
+    dropInPlatformApi.showDropInAdvanced(
       dropInConfiguration.toDTO(sdkVersionNumber),
       paymentMethodsResponse,
     );

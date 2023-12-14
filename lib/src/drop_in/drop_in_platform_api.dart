@@ -5,19 +5,17 @@ class DropInPlatformApi implements DropInPlatformInterface {
       DropInPlatformInterface();
 
   @override
-  Future<void> startDropInSessionPayment(
+  Future<void> showDropInSession(
     DropInConfigurationDTO dropInConfigurationDTO,
   ) =>
-      _dropInPlatformInterface.startDropInSessionPayment(
-        dropInConfigurationDTO,
-      );
+      _dropInPlatformInterface.showDropInSession(dropInConfigurationDTO);
 
   @override
-  Future<void> startDropInAdvancedPayment(
+  Future<void> showDropInAdvanced(
     DropInConfigurationDTO dropInConfiguration,
     String paymentMethodsResponse,
   ) =>
-      _dropInPlatformInterface.startDropInAdvancedPayment(
+      _dropInPlatformInterface.showDropInAdvanced(
         dropInConfiguration,
         paymentMethodsResponse,
       );
@@ -28,7 +26,7 @@ class DropInPlatformApi implements DropInPlatformInterface {
 
   @override
   Future<void> onPaymentsDetailsResult(
-      PaymentOutcomeDTO paymentsDetailsResult) =>
+          PaymentOutcomeDTO paymentsDetailsResult) =>
       _dropInPlatformInterface.onPaymentsDetailsResult(paymentsDetailsResult);
 
   @override
