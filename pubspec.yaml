@@ -25,7 +25,7 @@ flutter:
   plugin:
     platforms:
       android:
-        package: com.adyen.adyen_checkout
+        package: com.adyen.checkout.flutter
         pluginClass: AdyenCheckoutPlugin
       ios:
         pluginClass: AdyenCheckoutPlugin

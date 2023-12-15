@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:adyen_checkout/src/common/models/payment_result.dart';
+import 'package:adyen_checkout/src/common/model/payment_result.dart';
 import 'package:adyen_checkout/src/components/card/card_component_container.dart';
 import 'package:adyen_checkout/src/components/component_flutter_api.dart';
 import 'package:adyen_checkout/src/components/component_platform_api.dart';
@@ -8,7 +8,7 @@ import 'package:adyen_checkout/src/components/platform/android_platform_view.dar
 import 'package:adyen_checkout/src/components/platform/ios_platform_view.dart';
 import 'package:adyen_checkout/src/generated/platform_api.g.dart';
 import 'package:adyen_checkout/src/logging/adyen_logger.dart';
-import 'package:adyen_checkout/src/utils/constants.dart';
+import 'package:adyen_checkout/src/util/constants.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';

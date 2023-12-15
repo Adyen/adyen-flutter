@@ -1,6 +1,6 @@
 import 'package:adyen_checkout/src/generated/platform_api.g.dart';
-import 'package:adyen_checkout/src/utils/constants.dart';
-import 'package:adyen_checkout/src/utils/toggle_area_gesture_recognizer.dart';
+import 'package:adyen_checkout/src/util/constants.dart';
+import 'package:adyen_checkout/src/util/toggle_area_gesture_recognizer.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/rendering.dart';

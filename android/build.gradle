@@ -26,7 +26,7 @@ apply plugin: 'kotlin-android'
 apply from: 'ktlint.gradle'
 
 android {
-    namespace = "com.adyen.adyen_checkout"
+    namespace = "com.adyen.checkout.flutter"
     compileSdk 34
 
     compileOptions {
