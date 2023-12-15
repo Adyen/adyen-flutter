@@ -2,11 +2,11 @@ import 'package:adyen_checkout/adyen_checkout.dart';
 
 class Config {
   /*
-  Please do NOT provide the CLIENT_KEY or the X_API_KEY in your production app through constants!
-  This is not secure. Sensitive credentials can leak. Rather provide both values dynamically from your backend.
+  Your `CLIENT_KEY` and `X_API_KEY` are sensitive credentials that must be secure.
 
-  For test purposes only, specify a json file with the name "secrets.json" that
-  contains the following properties to the root of the example project:
+  Do not provide them in your live environment through constants, because this is not secure. Instead, provide them dynamically from your server-side.
+
+  For testing the example app, create a `secrets.json` file that contains the following properties:
   {
     "CLIENT_KEY" : "YOUR_CLIENT_KEY",
     "X_API_KEY" : "YOUR X_API_KEY"
