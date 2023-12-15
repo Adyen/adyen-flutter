@@ -1,4 +1,4 @@
-package com.adyen.flutter
+package com.adyen.checkout.flutter
 
 /*
  * This demonstrates a simple unit test of the Kotlin portion of this plugin's implementation.
