@@ -176,7 +176,7 @@ Drop-in and Components integrations contain analytics and tracking features that
 
 ## Contributing
 
-We merge every pull request into the `develop` branch. We aim to keep `develop` in good shape, which allows us to release a new version whenever we need to.
+We merge every pull request into the `main` branch. We aim to keep `main` in good shape, which allows us to release a new version whenever we need to.
 
 We strongly encourage you to provide feedback or by contributing to our repository. Find out more in our [contribution guidelines](https://github.com/Adyen/.github/blob/master/CONTRIBUTING.md)
 
