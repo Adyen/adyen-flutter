@@ -1,1 +1,1 @@
-# adyen-flutter
+# Adyen Flutter (alpha)
