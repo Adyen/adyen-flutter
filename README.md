@@ -3,12 +3,13 @@
 
 **This package is an alpha version. Please take into consideration that breaking changes could occur in future versions.**   
 
-Adyen Flutter provides you with the building blocks to create a checkout experience for your shoppers, allowing them to pay using the payment method of their choice.
-The building blocks support Android and iOS.
+
+The Adyen Flutter library provides you with the building blocks to create a seamless checkout experience for your Android and iOS Flutter app. By using Drop-in, your
+shoppers pay using the payment method of their choice.
 
 You can integrate in two ways:
 
-- Drop-in: A wrapper for the native iOS and Android Adyen Drop-in - an all-in-one solution, the quickest way to accept payments in your app.
+- Drop-in: A wrapper for the native iOS and Android Adyen Drop-in - an all-in-one out of the box solution, the quickest way to accept payments in your app.
 - Card component: A wrapper for the native iOS and Android Adyen card components - A dedicated card widget, allowing card payments in your app.
 
 ![preview](https://github.com/Adyen/adyen-android/assets/9079915/e6e18a07-b30f-41f0-b7ef-701b20e2e339)
