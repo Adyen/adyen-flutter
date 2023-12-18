@@ -5,9 +5,9 @@ import 'package:adyen_checkout/src/drop_in/drop_in_flutter_api.dart';
 import 'package:adyen_checkout/src/drop_in/drop_in_platform_api.dart';
 import 'package:adyen_checkout/src/generated/platform_api.g.dart';
 import 'package:adyen_checkout/src/logging/adyen_logger.dart';
-import 'package:adyen_checkout/src/utils/dto_mapper.dart';
-import 'package:adyen_checkout/src/utils/payment_event_handler.dart';
-import 'package:adyen_checkout/src/utils/sdk_version_number_provider.dart';
+import 'package:adyen_checkout/src/util/dto_mapper.dart';
+import 'package:adyen_checkout/src/util/payment_event_handler.dart';
+import 'package:adyen_checkout/src/util/sdk_version_number_provider.dart';
 
 class DropIn {
   DropIn(

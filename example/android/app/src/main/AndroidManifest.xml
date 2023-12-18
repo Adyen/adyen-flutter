@@ -3,7 +3,7 @@
     <application
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher"
-        android:label="adyen_checkout_example">
+        android:label="adyen_checkout_flutter_example">
         <activity
             android:name=".MainActivity"
             android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
@@ -33,7 +33,7 @@
                 <category android:name="android.intent.category.BROWSABLE" />
 
                 <data
-                    android:host="com.adyen.adyen_checkout_example"
+                    android:host="com.adyen.checkout.flutter.example"
                     android:path="/card"
                     android:scheme="adyencheckout" />
             </intent-filter>

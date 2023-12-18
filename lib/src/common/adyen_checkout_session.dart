@@ -1,10 +1,10 @@
 import 'package:adyen_checkout/adyen_checkout.dart';
 import 'package:adyen_checkout/src/common/adyen_checkout_api.dart';
-import 'package:adyen_checkout/src/common/models/base_configuration.dart';
+import 'package:adyen_checkout/src/common/model/base_configuration.dart';
 import 'package:adyen_checkout/src/drop_in/drop_in.dart';
 import 'package:adyen_checkout/src/generated/platform_api.g.dart';
-import 'package:adyen_checkout/src/utils/dto_mapper.dart';
-import 'package:adyen_checkout/src/utils/sdk_version_number_provider.dart';
+import 'package:adyen_checkout/src/util/dto_mapper.dart';
+import 'package:adyen_checkout/src/util/sdk_version_number_provider.dart';
 
 class AdyenCheckoutSession {
   final SdkVersionNumberProvider _sdkVersionNumberProvider =

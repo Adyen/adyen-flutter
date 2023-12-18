@@ -8,7 +8,7 @@ import 'package:adyen_checkout/src/drop_in/drop_in.dart';
 import 'package:adyen_checkout/src/drop_in/drop_in_flutter_api.dart';
 import 'package:adyen_checkout/src/drop_in/drop_in_platform_api.dart';
 import 'package:adyen_checkout/src/logging/adyen_logger.dart';
-import 'package:adyen_checkout/src/utils/sdk_version_number_provider.dart';
+import 'package:adyen_checkout/src/util/sdk_version_number_provider.dart';
 import 'package:flutter/foundation.dart';
 
 class AdyenCheckout implements AdyenCheckoutInterface {

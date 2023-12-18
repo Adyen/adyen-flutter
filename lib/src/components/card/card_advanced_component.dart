@@ -8,8 +8,8 @@ import 'package:adyen_checkout/src/components/platform/android_platform_view.dar
 import 'package:adyen_checkout/src/components/platform/ios_platform_view.dart';
 import 'package:adyen_checkout/src/generated/platform_api.g.dart';
 import 'package:adyen_checkout/src/logging/adyen_logger.dart';
-import 'package:adyen_checkout/src/utils/constants.dart';
-import 'package:adyen_checkout/src/utils/payment_event_handler.dart';
+import 'package:adyen_checkout/src/util/constants.dart';
+import 'package:adyen_checkout/src/util/payment_event_handler.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
