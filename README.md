@@ -117,7 +117,7 @@ final paymentResult = await AdyenCheckout.advanced.startDropIn(
     checkout: advancedCheckout,
 );
 ```
-1. The payment flow is completed. Continue by handling the payment result. 
+5. The payment flow is completed. Continue by handling the payment result. 
 
 <br>
 
