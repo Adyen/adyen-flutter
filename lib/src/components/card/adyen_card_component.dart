@@ -42,7 +42,9 @@ class AdyenCardComponent extends StatelessWidget {
             AdvancedCheckout() => _buildCardAdvancedFlowWidget(sdkVersionNumber)
           };
         } else {
-          return const SizedBox.shrink();
+          return Container(
+            height: _determineInitialHeight(configuration.cardConfiguration),
+          );
         }
       },
     );
