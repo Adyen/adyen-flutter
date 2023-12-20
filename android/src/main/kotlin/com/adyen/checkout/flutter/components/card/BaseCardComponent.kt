@@ -41,8 +41,8 @@ abstract class BaseCardComponent(
     private val componentWrapperView = ComponentWrapperView(activity, componentFlutterApi)
     private val intentListener = Consumer<Intent> { handleIntent(it) }
     val cardConfiguration = configuration.cardConfiguration.toNativeModel(
-        "${configuration.shopperLocale}",
         context,
+        configuration.shopperLocale,
         environment,
         configuration.clientKey,
         configuration.analyticsOptionsDTO.mapToAnalyticsConfiguration(),

@@ -182,7 +182,7 @@ class DropInConfigurationDTO {
     required this.clientKey,
     required this.countryCode,
     required this.amount,
-    required this.shopperLocale,
+    this.shopperLocale,
     this.cardConfigurationDTO,
     this.applePayConfigurationDTO,
     this.googlePayConfigurationDTO,
@@ -201,7 +201,7 @@ class DropInConfigurationDTO {
 
   AmountDTO amount;
 
-  String shopperLocale;
+  String? shopperLocale;
 
   CardConfigurationDTO? cardConfigurationDTO;
 
@@ -244,7 +244,7 @@ class DropInConfigurationDTO {
       clientKey: result[1]! as String,
       countryCode: result[2]! as String,
       amount: AmountDTO.decode(result[3]! as List<Object?>),
-      shopperLocale: result[4]! as String,
+      shopperLocale: result[4] as String?,
       cardConfigurationDTO: result[5] != null
           ? CardConfigurationDTO.decode(result[5]! as List<Object?>)
           : null,

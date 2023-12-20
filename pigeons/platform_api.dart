@@ -115,7 +115,7 @@ class DropInConfigurationDTO {
   final String clientKey;
   final String countryCode;
   final AmountDTO amount;
-  final String shopperLocale;
+  final String? shopperLocale;
   final CardConfigurationDTO? cardConfigurationDTO;
   final ApplePayConfigurationDTO? applePayConfigurationDTO;
   final GooglePayConfigurationDTO? googlePayConfigurationDTO;
