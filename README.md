@@ -1,48 +1,53 @@
 ![flutter-banner](https://github.com/Adyen/adyen-flutter/assets/13377878/6ca10143-9f75-43c6-bf6e-99011b09dd64)
 # Adyen Flutter (alpha)
 
-**This package is an alpha version. Please take into consideration that breaking changes could occur in future versions.**   
+**This package is an alpha version. Breaking changes might be included in later versions.**
 
-
-The Adyen Flutter library provides you with the building blocks to create a seamless checkout experience for your Android and iOS Flutter app. By using Drop-in, your
-shoppers pay using the payment method of their choice.
+The Adyen Flutter package provides you with the building blocks to create a seamless checkout experience for your Android and iOS Flutter app.
 
 You can integrate in two ways:
 
-- Drop-in: A wrapper for the native iOS and Android Adyen Drop-in - an all-in-one out of the box solution, the quickest way to accept payments in your app.
-- Card component: A wrapper for the native iOS and Android Adyen card components - A dedicated card widget, allowing card payments in your app.
+- Drop-in: An out-of-the-box solution that includes all available payment methods for shoppers to choose. This wrapper for the native iOS and Android Adyen Drop-in is the quickest way to accept payments in your app.
+- Card component: A dedicated card widget for shoppers to pay with a card. This is a wrapper for the native iOS and Android Adyen card Components.
+  ![preview](https://github.com/Adyen/adyen-android/assets/9079915/e6e18a07-b30f-41f0-b7ef-701b20e2e339)
 
-![preview](https://github.com/Adyen/adyen-android/assets/9079915/e6e18a07-b30f-41f0-b7ef-701b20e2e339)
+## Before you begin
 
-## Prerequisites
+Get an [Adyen test account](https://www.adyen.com/signup).  
+[Get your Client key](https://docs.adyen.com/development-resources/client-side-authentication#get-your-client-key). Your client app does not communicate with the Adyen API directly.
+[Get your API key](https://docs.adyen.com/development-resources/how-to-get-the-api-key). You need the API key to make requests from your server .
+[Set up your webhooks](https://docs.adyen.com/development-resources/webhooks/) to get the payment outcome.
 
-For the integration into your app a [Client key](https://docs.adyen.com/development-resources/client-side-authentication#get-your-client-key) is required. Please be aware that you should not communicate with the Adyen API directly. Instead route the requests through your own backend. For that, you need an [Adyen account](https://www.adyen.com/signup) and an [API key](https://docs.adyen.com/development-resources/how-to-get-the-api-key).
 
-## Installation
+##  Install the package
 
-### Add package:
+### Add the package:
 
-With Flutter:
+Run the following Flutter command:
 ```
 $ flutter pub add adyen_checkout
 ```
-This will add a line like this to your package's pubspec.yaml (and run an implicit flutter pub get):
+This will add line like this to your package's `pubspec.yaml` file and runs an implicit `flutter pub get`:
 ```yaml
 dependencies:
   adyen_checkout: ^0.0.1
 ```
 Alternatively, your editor might support flutter pub get. Check the docs for your editor to learn more.
 
-### Use package
-Now in your Dart code, you can use:
+### Use the package
+Import the Adyen package to your Dart code:
+
 ```dart
 import 'package:adyen_checkout/adyen_checkout.dart';
 ```
 <br/>
 
-### Android integration (SDK >= 21)
+### Android integration
+This package supports Android 5.0 or later.
 
-Adjust your activity to inherit from `FlutterFragmentActivity`: 
+#### For Drop-in and card Component:
+
+Adjust your activity to inherit from `FlutterFragmentActivity`:
   ```kotlin
   import io.flutter.embedding.android.FlutterFragmentActivity
 
@@ -50,8 +55,9 @@ Adjust your activity to inherit from `FlutterFragmentActivity`:
       // ...
   }
   ```
+#### For card Component only:
 
-When using the **card component**, it is necessary to declare the intent filter within `AndroidManifest.xml`. 
+Declare the intent filter in your `AndroidManifest.xml` file:
   ```xml
     <intent-filter>
         <action android:name="android.intent.action.VIEW" />
@@ -65,52 +71,103 @@ When using the **card component**, it is necessary to declare the intent filter 
   ```
 <br/>
 
-### iOS integration (SDK >= 12)
+### iOS integration
+This package supports iOS 12 or later.
 
-Add return URL handler to your `AppDelegate.swift`: 
+Add the return URL handler to your `AppDelegate.swift` file:
 
 ```swift
 override func application(_: UIApplication, open url: URL, options _: [UIApplication.OpenURLOptionsKey: Any] = [:]) -> Bool {
-        RedirectComponent.applicationDidOpen(from: url)
-        return true
+        	RedirectComponent.applicationDidOpen(from: url)
+       	 return true
 }
 ```
-Add [custom URL Scheme](https://developer.apple.com/documentation/xcode/defining-a-custom-url-scheme-for-your-app) to your app that matches the return URL. </br>
-When using a voucher payment method in **drop-in**, add a photo library usage description to the `Info.plist` file.  
+In your app, add a [custom URL Scheme](https://developer.apple.com/documentation/xcode/defining-a-custom-url-scheme-for-your-app) that matches the return URL. </br>
 
-## Usage
+#### For Drop-in only
 
-For general understanding of how the prebuilt UI of Adyen (Drop-in or components) work you can follow [our documentation](https://docs.adyen.com/online-payments/prebuilt-ui).
-Adyen offers two ways of proceeding payments within your app. Either through a `session` or through the `advanced` mode. 
+Voucher payment methods require a photo library usage description. Add them to the `Info.plist` file.
 
-### Drop-in session: 
 
-1. Fetch a session from your backend. 
-2. Create the `DropInConfiguration`. 
-3. Request a session by using the package: 
+
+##  How it works
+
+
+You can use Adyen Flutter with either of our [server-side flows](https://docs.adyen.com/online-payments/build-your-integration/additional-use-cases/):
+Sessions flow
+Advanced flow
+You must use [Checkout API](https://docs.adyen.com/api-explorer/Checkout/latest/overview) v68 or later.
+### Drop-in with Sessions flow:
+
+1.  From your server, make a [`/sessions`](https://docs.adyen.com/api-explorer/Checkout/71/post/sessions) request.
+
+The response contains:
+`sessionData`: the payment session data you need to pass to your front end.
+`id`: a unique identifier for the session data.
+The request body.
+Put these into a `sessionResponse` object and pass it to your client app.
+
+
+2. Create the `DropInConfiguration`.
 ```dart
-final SessionCheckout sessionCheckout = await AdyenCheckout.session.create(
-    sessionId: sessionResponse.id,
-    sessionData: sessionResponse.sessionData,
-    configuration: dropInConfiguration,
+final DropInConfiguration dropInConfiguration = DropInConfiguration(
+  environment: Environment.test,
+  clientKey: Config.clientKey,
+  countryCode: Config.countryCode,
+  shopperLocale: Config.shopperLocale,
+  amount: Config.amount,
 );
 ```
-4. Start the Drop-in UI and wait for the payment result: 
+The `DropInConfiguration` also supports optional payment method configurations.
+3. Call the `create` method, passing the required properties:```dart
+   final SessionCheckout sessionCheckout = await AdyenCheckout.session.create(
+   sessionId: sessionResponse.id,
+   sessionData: sessionResponse.sessionData,
+   configuration: dropInConfiguration,
+   );
+```
+4. Call `startDropin` to start the Drop-in UI and wait for the session payment result: 
 ```dart 
 final PaymentResult paymentResult =  await AdyenCheckout.session.startDropIn(
     dropInConfiguration: dropInConfiguration,
     checkout: sessionCheckout,
 );
 ```
-5. The payment flow is completed. Continue by handling the payment result. 
+Drop-in handles the payment flow.
+5. Handle the payment result.
+   Inform the shopper.
+   Use the [`resultCode`](https://docs.adyen.com/online-payments/build-your-integration/payment-result-codes/) from the API response to show your shopper the current payment status.
+   Update your order management system.
+   You get the final payment status in an **AUTHORISATION** webhook. Use the `merchantReference` from the webhook to match it to your order reference.
+   For a successful payment, the event contains `success`: **true**.
 
 
-### Drop-in advanced:
+### Drop-in with Advanced flow:
 
-1. Fetch payment methods from you backend. 
-2. Create the `DropInConfiguration`. 
-3. Create an `AdvancedCheckout` object. You must provide two callbacks (`postPayments` and `postPaymentsDetails`) bridging to your backend. These callbacks are being triggered during the payment process. 
-4. Start the Drop-in UI and wait for the payment result: 
+. From your server, make a [`/paymentMethods`](https://docs.adyen.com/api-explorer/Checkout/71/post/paymentMethods) request.
+2. Create the `DropInConfiguration`.
+```dart
+final DropInConfiguration dropInConfiguration = DropInConfiguration(
+  environment: Environment.test,
+  clientKey: Config.clientKey,
+  countryCode: Config.countryCode,
+  shopperLocale: Config.shopperLocale,
+  amount: Config.amount,
+);
+```
+The `DropInConfiguration` also supports optional payment method configurations.
+
+3. Create an `AdvancedCheckout` object and provide two callbacks
+   `postPayments`: from your server, make a [`/payments`](https://docs.adyen.com/api-explorer/Checkout/latest/post/payments) request.
+   `postPaymentsDetails: from your server, make a [`/payments/details](https://docs.adyen.com/api-explorer/Checkout/71/post/payments/details)
+```dart
+final AdvancedCheckout advancedCheckout = AdvancedCheckout(
+      postPayments: widget.repository.postPayments,
+      postPaymentsDetails: widget.repository.postPaymentsDetails,
+);
+```
+
+4. Start the Drop-in UI and wait for the payment result:
 ```dart 
 final paymentResult = await AdyenCheckout.advanced.startDropIn(
     dropInConfiguration: dropInConfiguration,
@@ -118,14 +175,33 @@ final paymentResult = await AdyenCheckout.advanced.startDropIn(
     checkout: advancedCheckout,
 );
 ```
-5. The payment flow is completed. Continue by handling the payment result. 
+Drop-in handles the payment flow
+5.. Handle the payment result.
+Inform the shopper.
+Use the [`resultCode`](https://docs.adyen.com/online-payments/build-your-integration/payment-result-codes/) from the API response to show your shopper the current payment status.
+Update your order management system.
+You get the final payment status in an **AUTHORISATION** webhook. Use the `merchantReference` from the webhook to match it to your order reference.
+For a successful payment, the event contains `success`: **true**.
 
 <br>
 
-### Card component session:
-1. Fetch a session from your backend. 
-2. Create the `CardComponentConfiguration`. 
-3. Request a session by using the package: 
+### Card Component with Sessions flow:
+From your server, make a [`sessions`](https://docs.adyen.com/api-explorer/Checkout/71/post/sessions) request.The response contains:
+`sessionData`: the payment session data you need to pass to your front end.
+`id`: a unique identifier for the session data.
+The request body.
+Put these into a `sessionResponse` object and pass it to your client app.
+2. Create the `CardComponentConfiguration`.
+```dart
+final CardComponentConfiguration cardComponentConfiguration = CardComponentConfiguration(
+      environment: Config.environment,
+      clientKey: Config.clientKey,
+      countryCode: Config.countryCode,
+      amount: Config.amount,
+      shopperLocale: Config.shopperLocale,
+);
+```
+3. Call the `create` method, passing the required properties:
 ```dart
 final sessionCheckout = await AdyenCheckout.session.create(
     sessionId: sessionResponse.id,
@@ -133,8 +209,8 @@ final sessionCheckout = await AdyenCheckout.session.create(
     configuration: cardComponentConfiguration,
 );
 ```
-4. Extract the desired card payment method from the sessionCheckout.
-5. Create card component widget: 
+4. Get the card payment method to use from the `sessionCheckout` object.
+5. Create the card component widget:
 ```dart
 AdyenCardComponent(
     configuration: cardComponentConfiguration,
@@ -145,14 +221,30 @@ AdyenCardComponent(
     },
 );
 ``` 
+### Card Component with Advanced flow:
 
-### Card component advanced:
+1.From your server, make a [`/paymentMethods`](https://docs.adyen.com/api-explorer/Checkout/71/post/paymentMethods) request.
 
-1. Fetch payment methods from you backend. 
-2. Extract the desired card payment method from the payment methods list.
-3. Create the `CardComponentConfiguration`. 
-4. Create an `AdvancedCheckout` object. You must provide two callbacks (`postPayments` and `postPaymentsDetails`) bridging to your backend. These callbacks are being triggered during the payment process. 
-5. Create card component widget: 
+2. Get the card payment method to use the payment methods list in the response.
+3. Create the `CardComponentConfiguration`.
+```dart
+final CardComponentConfiguration cardComponentConfiguration = CardComponentConfiguration(
+      environment: Config.environment,
+      clientKey: Config.clientKey,
+      countryCode: Config.countryCode,
+      amount: Config.amount,
+      shopperLocale: Config.shopperLocale,
+);
+```4. Create an `AdvancedCheckout` object and provide two callbacks:
+`postPayments`: from your server, make a [`/payments`](https://docs.adyen.com/api-explorer/Checkout/latest/post/payments) request. 
+`postPaymentsDetails: from your server, make a [`/payments/details](https://docs.adyen.com/api-explorer/Checkout/71/post/payments/details
+```dart
+final AdvancedCheckout advancedCheckout = AdvancedCheckout(
+      postPayments: repository.postPayments,
+      postPaymentsDetails: repository.postPaymentsDetails,
+    );
+```
+5. Create the card component widget:
 ```dart
 AdyenCardComponent(
     configuration: cardComponentConfiguration,
@@ -167,19 +259,14 @@ AdyenCardComponent(
 
 ## Support
 
-If you have a feature request, or spotted a bug or a technical problem, [create an issue here](https://github.com/Adyen/adyen-flutter/issues).
+If you have a feature request, or spot a bug or a technical problem, [create an issue](https://github.com/Adyen/adyen-flutter/issues).
 
 For other questions, [contact our support team](https://www.adyen.help/hc/en-us/requests/new).
-
-## Analytics and data tracking
-
-Drop-in and Components integrations contain analytics and tracking features that are turned on by default. Find out more about [what we track and how you can control it](https://docs.adyen.com/online-payments/analytics-and-data-tracking). Analytics can be disabled by setting `AnalyticsOptions(enabled: false)` within the configuration object.
-
 ## Contributing
 
 We merge every pull request into the `main` branch. We aim to keep `main` in good shape, which allows us to release a new version whenever we need to.
 
-We strongly encourage you to provide feedback or by contributing to our repository. Find out more in our [contribution guidelines](https://github.com/Adyen/.github/blob/master/CONTRIBUTING.md)
+We strongly encourage you to provide feedback or  contribute to our repository. Have  a look at our [contribution guidelines](https://github.com/Adyen/.github/blob/master/CONTRIBUTING.md) to find out how to raise a pull request.
 
 ## License
 
