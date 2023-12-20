@@ -56,7 +56,7 @@ class CardAdvancedComponent: BaseCardComponent {
         cardComponentConfiguration: CardComponentConfigurationDTO
     ) throws -> CardComponent {
         let adyenContext = try cardComponentConfiguration.createAdyenContext()
-        let cardConfiguration = cardComponentConfiguration.cardConfiguration.mapToCardComponentConfiguration()
+        let cardConfiguration = cardComponentConfiguration.cardConfiguration.mapToCardComponentConfiguration(shopperLocale: cardComponentConfiguration.shopperLocale)
         let paymentMethod: AnyCardPaymentMethod = isStoredPaymentMethod ? try JSONDecoder().decode(StoredCardPaymentMethod.self, from: Data(paymentMethodString.utf8)) : try JSONDecoder().decode(CardPaymentMethod.self, from: Data(paymentMethodString.utf8))
         presentationDelegate = CardPresentationDelegate(topViewController: getViewController())
         actionComponent = buildActionComponent(adyenContext: adyenContext)
