@@ -101,10 +101,10 @@ You must use [Checkout API](https://docs.adyen.com/api-explorer/Checkout/latest/
 
 1.  From your server, make a [`/sessions`](https://docs.adyen.com/api-explorer/Checkout/71/post/sessions) request.
 
-The response contains:
-`sessionData`: the payment session data you need to pass to your front end.
-`id`: a unique identifier for the session data.
-The request body.
+The response contains:<br>
+`sessionData`: the payment session data you need to pass to your front end.<br>
+`id`: a unique identifier for the session data.<br>
+The request body.<br>
 Put these into a `sessionResponse` object and pass it to your client app.
 
 
@@ -119,21 +119,23 @@ final DropInConfiguration dropInConfiguration = DropInConfiguration(
 );
 ```
 The `DropInConfiguration` also supports optional payment method configurations.
-3. Call the `create` method, passing the required properties:```dart
+
+3. Call the `create` method, passing the required properties:
+```dart 
    final SessionCheckout sessionCheckout = await AdyenCheckout.session.create(
-   sessionId: sessionResponse.id,
-   sessionData: sessionResponse.sessionData,
-   configuration: dropInConfiguration,
+     sessionId: sessionResponse.id,
+     sessionData: sessionResponse.sessionData,
+     configuration: dropInConfiguration,
    );
 ```
-4. Call `startDropin` to start the Drop-in UI and wait for the session payment result: 
+4. Call `startDropin` to start the Drop-in UI and wait for the session payment result. Drop-in handles the payment flow: 
 ```dart 
 final PaymentResult paymentResult =  await AdyenCheckout.session.startDropIn(
-    dropInConfiguration: dropInConfiguration,
-    checkout: sessionCheckout,
+  dropInConfiguration: dropInConfiguration,
+  checkout: sessionCheckout,
 );
 ```
-Drop-in handles the payment flow.
+
 5. Handle the payment result.
    Inform the shopper.
    Use the [`resultCode`](https://docs.adyen.com/online-payments/build-your-integration/payment-result-codes/) from the API response to show your shopper the current payment status.
@@ -144,7 +146,7 @@ Drop-in handles the payment flow.
 
 ### Drop-in with Advanced flow:
 
-. From your server, make a [`/paymentMethods`](https://docs.adyen.com/api-explorer/Checkout/71/post/paymentMethods) request.
+1. From your server, make a [`/paymentMethods`](https://docs.adyen.com/api-explorer/Checkout/71/post/paymentMethods) request.
 2. Create the `DropInConfiguration`.
 ```dart
 final DropInConfiguration dropInConfiguration = DropInConfiguration(
@@ -157,26 +159,26 @@ final DropInConfiguration dropInConfiguration = DropInConfiguration(
 ```
 The `DropInConfiguration` also supports optional payment method configurations.
 
-3. Create an `AdvancedCheckout` object and provide two callbacks
-   `postPayments`: from your server, make a [`/payments`](https://docs.adyen.com/api-explorer/Checkout/latest/post/payments) request.
-   `postPaymentsDetails: from your server, make a [`/payments/details](https://docs.adyen.com/api-explorer/Checkout/71/post/payments/details)
+3. Create an `AdvancedCheckout` object and provide two callbacks<br>
+   `postPayments`: from your server, make a [`/payments`](https://docs.adyen.com/api-explorer/Checkout/latest/post/payments) request.<br>
+   `postPaymentsDetails`: from your server, make a [/payments/details](https://docs.adyen.com/api-explorer/Checkout/71/post/payments/details)
 ```dart
 final AdvancedCheckout advancedCheckout = AdvancedCheckout(
-      postPayments: widget.repository.postPayments,
-      postPaymentsDetails: widget.repository.postPaymentsDetails,
+  postPayments: widget.repository.postPayments,
+  postPaymentsDetails: widget.repository.postPaymentsDetails,
 );
 ```
 
-4. Start the Drop-in UI and wait for the payment result:
+4. Start the Drop-in UI and wait for the payment result. Drop-in handles the payment flow:
 ```dart 
 final paymentResult = await AdyenCheckout.advanced.startDropIn(
-    dropInConfiguration: dropInConfiguration,
-    paymentMethodsResponse: paymentMethodsResponse,
-    checkout: advancedCheckout,
+  dropInConfiguration: dropInConfiguration,
+  paymentMethodsResponse: paymentMethodsResponse,
+  checkout: advancedCheckout,
 );
 ```
-Drop-in handles the payment flow
-5.. Handle the payment result.
+
+5. Handle the payment result.
 Inform the shopper.
 Use the [`resultCode`](https://docs.adyen.com/online-payments/build-your-integration/payment-result-codes/) from the API response to show your shopper the current payment status.
 Update your order management system.
@@ -186,73 +188,74 @@ For a successful payment, the event contains `success`: **true**.
 <br>
 
 ### Card Component with Sessions flow:
-From your server, make a [`sessions`](https://docs.adyen.com/api-explorer/Checkout/71/post/sessions) request.The response contains:
-`sessionData`: the payment session data you need to pass to your front end.
-`id`: a unique identifier for the session data.
-The request body.
-Put these into a `sessionResponse` object and pass it to your client app.
+1. From your server, make a [`sessions`](https://docs.adyen.com/api-explorer/Checkout/71/post/sessions) request.The response contains:<br>
+`sessionData`: the payment session data you need to pass to your front end.<br>
+`id`: a unique identifier for the session data.<br>
+The request body.<br>
+Put these into a `sessionResponse` object and pass it to your client app.<br>
 2. Create the `CardComponentConfiguration`.
 ```dart
 final CardComponentConfiguration cardComponentConfiguration = CardComponentConfiguration(
-      environment: Config.environment,
-      clientKey: Config.clientKey,
-      countryCode: Config.countryCode,
-      amount: Config.amount,
-      shopperLocale: Config.shopperLocale,
+  environment: Config.environment,
+  clientKey: Config.clientKey,
+  countryCode: Config.countryCode,
+  amount: Config.amount,
+  shopperLocale: Config.shopperLocale,
 );
 ```
 3. Call the `create` method, passing the required properties:
 ```dart
 final sessionCheckout = await AdyenCheckout.session.create(
-    sessionId: sessionResponse.id,
-    sessionData: sessionResponse.sessionData,
-    configuration: cardComponentConfiguration,
+  sessionId: sessionResponse.id,
+  sessionData: sessionResponse.sessionData,
+  configuration: cardComponentConfiguration,
 );
 ```
 4. Get the card payment method to use from the `sessionCheckout` object.
 5. Create the card component widget:
 ```dart
 AdyenCardComponent(
-    configuration: cardComponentConfiguration,
-    paymentMethod: paymentMethod,
-    checkout: sessionCheckout,
-    onPaymentResult: (paymentResult) async {
-        // handle paymentResult
-    },
+  configuration: cardComponentConfiguration,
+  paymentMethod: paymentMethod,
+  checkout: sessionCheckout,
+  onPaymentResult: (paymentResult) async {
+    // handle paymentResult
+  },
 );
 ``` 
 ### Card Component with Advanced flow:
 
-1.From your server, make a [`/paymentMethods`](https://docs.adyen.com/api-explorer/Checkout/71/post/paymentMethods) request.
+1. From your server, make a [`/paymentMethods`](https://docs.adyen.com/api-explorer/Checkout/71/post/paymentMethods) request.
 
 2. Get the card payment method to use the payment methods list in the response.
 3. Create the `CardComponentConfiguration`.
 ```dart
 final CardComponentConfiguration cardComponentConfiguration = CardComponentConfiguration(
-      environment: Config.environment,
-      clientKey: Config.clientKey,
-      countryCode: Config.countryCode,
-      amount: Config.amount,
-      shopperLocale: Config.shopperLocale,
+  environment: Config.environment,
+  clientKey: Config.clientKey,
+  countryCode: Config.countryCode,
+  amount: Config.amount,
+  shopperLocale: Config.shopperLocale,
 );
-```4. Create an `AdvancedCheckout` object and provide two callbacks:
-`postPayments`: from your server, make a [`/payments`](https://docs.adyen.com/api-explorer/Checkout/latest/post/payments) request. 
+```
+4. Create an `AdvancedCheckout` object and provide two callbacks:<br>
+`postPayments`: from your server, make a [`/payments`](https://docs.adyen.com/api-explorer/Checkout/latest/post/payments) request. <br>
 `postPaymentsDetails: from your server, make a [`/payments/details](https://docs.adyen.com/api-explorer/Checkout/71/post/payments/details
 ```dart
 final AdvancedCheckout advancedCheckout = AdvancedCheckout(
-      postPayments: repository.postPayments,
-      postPaymentsDetails: repository.postPaymentsDetails,
-    );
+  postPayments: repository.postPayments,
+  postPaymentsDetails: repository.postPaymentsDetails,
+);
 ```
 5. Create the card component widget:
 ```dart
 AdyenCardComponent(
-    configuration: cardComponentConfiguration,
-    paymentMethod: paymentMethod,
-    checkout: advancedCheckout,
-    onPaymentResult: (event) async {
-        // handle paymentResult
-    },
+  configuration: cardComponentConfiguration,
+  paymentMethod: paymentMethod,
+  checkout: advancedCheckout,
+  onPaymentResult: (paymentResult) async {
+    // handle paymentResult
+  },
 );
 ``` 
 
