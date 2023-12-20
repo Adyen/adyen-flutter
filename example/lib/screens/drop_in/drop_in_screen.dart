@@ -92,7 +92,7 @@ class _DropInScreenState extends State<DropInScreen> {
     const CardConfiguration cardsConfiguration = CardConfiguration();
 
     const ApplePayConfiguration applePayConfiguration = ApplePayConfiguration(
-      merchantId: Config.merchantAccount,
+      merchantId: "merchant.com.adyen.checkoutsandbox.test",
       merchantName: Config.merchantName,
     );
 

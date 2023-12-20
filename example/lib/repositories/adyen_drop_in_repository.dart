@@ -78,6 +78,10 @@ class AdyenDropInRepository extends AdyenBaseRepository {
 
   Future<String> fetchPaymentMethods() async {
     return await service.fetchPaymentMethods(PaymentMethodsRequestNetworkModel(
+      amount: AmountNetworkModel(
+        currency: Config.amount.currency,
+        value: Config.amount.value,
+      ),
       merchantAccount: Config.merchantAccount,
       countryCode: Config.countryCode,
       channel: determineChannel(),
@@ -126,8 +130,7 @@ class AdyenDropInRepository extends AdyenBaseRepository {
     return paymentEventHandler.handleResponse(response);
   }
 
-  Future<PaymentEvent> postPaymentsDetails(
-      String additionalDetails) async {
+  Future<PaymentEvent> postPaymentsDetails(String additionalDetails) async {
     final response =
         await service.postPaymentsDetails(jsonDecode(additionalDetails));
     return paymentEventHandler.handleResponse(response);
