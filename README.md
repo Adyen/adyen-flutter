@@ -11,9 +11,9 @@ You can integrate in two ways:
 - Drop-in: An out-of-the-box solution that includes all available payment methods for shoppers to choose. This wrapper for the native iOS and Android Adyen Drop-in is the quickest way to accept payments in your app.
 - Card component: A dedicated card widget for shoppers to pay with a card. This is a wrapper for the native iOS and Android Adyen card Components.
 
-|                             <div style="width:300px">Android</div>                              |                                <div style="width:300px">iOS</div>                                |
-|:-----------------------------------------------------------------------------------------------:|:------------------------------------------------------------------------------------------------:|
-| ![](https://github.com/Adyen/adyen-android/assets/9079915/e6e18a07-b30f-41f0-b7ef-701b20e2e339) | ![](https://github.com/Adyen/adyen-flutter/assets/13377878/05af212a-8141-4f8d-ad9d-f6506a7bade9) |
+|                                                             Android                                                              |                                                                iOS                                                                |
+|:--------------------------------------------------------------------------------------------------------------------------------:|:---------------------------------------------------------------------------------------------------------------------------------:|
+| <img align="top" src="https://github.com/Adyen/adyen-android/assets/9079915/e6e18a07-b30f-41f0-b7ef-701b20e2e339" width="400" /> | <img align="top" src="https://github.com/Adyen/adyen-flutter/assets/13377878/05af212a-8141-4f8d-ad9d-f6506a7bade9" width="400" /> |
 
 ## Before you begin
 
