@@ -18,6 +18,7 @@ class Config {
   //Environment constants
   static const String merchantAccount = "TestMerchantCheckout";
   static const String merchantName = "Test Merchant";
+  static const String merchantId = "merchant.com.adyen.checkoutsandbox.test";
   static const String countryCode = "NL";
   static const String shopperLocale = "nl_NL";
   static const String shopperReference = "Test reference";
