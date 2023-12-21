@@ -13,7 +13,7 @@ You can integrate in two ways:
 
 |                                                             Android                                                              |                                                                iOS                                                                |
 |:--------------------------------------------------------------------------------------------------------------------------------:|:---------------------------------------------------------------------------------------------------------------------------------:|
-| <img align="top" src="https://github.com/Adyen/adyen-android/assets/9079915/e6e18a07-b30f-41f0-b7ef-701b20e2e339" width="400" /> | <img align="top" src="https://github.com/Adyen/adyen-flutter/assets/13377878/05af212a-8141-4f8d-ad9d-f6506a7bade9" width="400" /> |
+| <img align="top" src="https://github.com/Adyen/adyen-android/assets/9079915/e6e18a07-b30f-41f0-b7ef-701b20e2e339" width="450" /> | <img align="top" src="https://github.com/Adyen/adyen-flutter/assets/13377878/05af212a-8141-4f8d-ad9d-f6506a7bade9" width="450" /> |
 
 ## Before you begin
 
@@ -85,6 +85,7 @@ override func application(_: UIApplication, open url: URL, options _: [UIApplica
     RedirectComponent.applicationDidOpen(from: url)
 return true
 }
+```
 In your app, add a [custom URL Scheme](https://developer.apple.com/documentation/xcode/defining-a-custom-url-scheme-for-your-app) that matches the return URL. </br>
 
 #### For Drop-in only
@@ -113,14 +114,15 @@ The response contains:<br>
 Put these into a `sessionResponse` object and pass it to your client app.
 
 
-2. Create the `DropInConfiguration`.
+2. Create the `DropInConfiguration`. 
 ```dart
 final DropInConfiguration dropInConfiguration = DropInConfiguration(
+  // Change the environment to live when you are ready to accept real payments.
   environment: Environment.test,
-  clientKey: Config.clientKey,
-  countryCode: Config.countryCode,
-  shopperLocale: Config.shopperLocale,
-  amount: Config.amount,
+  clientKey: CLIENT_KEY,
+  countryCode: COUNTRY_CODE,
+  shopperLocale: SHOPPER_LOCALE,
+  amount: AMOUNT,
 );
 ```
 The `DropInConfiguration` also supports optional payment method configurations.
@@ -155,26 +157,27 @@ final PaymentResult paymentResult =  await AdyenCheckout.session.startDropIn(
 2. Create the `DropInConfiguration`.
 ```dart
 final DropInConfiguration dropInConfiguration = DropInConfiguration(
+   // Change the environment to live when you are ready to accept real payments.
   environment: Environment.test,
-  clientKey: Config.clientKey,
-  countryCode: Config.countryCode,
-  shopperLocale: Config.shopperLocale,
-  amount: Config.amount,
+  clientKey: CLIENT_KEY,
+  countryCode: COUNTRY_CODE,
+  shopperLocale: SHOPPER_LOCALE,
+  amount: AMOUNT,
 );
 ```
 The `DropInConfiguration` also supports optional payment method configurations.
 
-3. Create an `AdvancedCheckout` object and provide two callbacks<br>
-   - `postPayments`: from your server, make a [`/payments`](https://docs.adyen.com/api-explorer/Checkout/latest/post/payments) request.<br>
-   - `postPaymentsDetails`: from your server, make a [/payments/details](https://docs.adyen.com/api-explorer/Checkout/71/post/payments/details)
+1. Create an `AdvancedCheckout` object and provide two callbacks<br>
+   - `onSubmit`: from your server, make a [`/payments`](https://docs.adyen.com/api-explorer/Checkout/latest/post/payments) request.<br>
+   - `onAdditionalDetails`: from your server, make a [/payments/details](https://docs.adyen.com/api-explorer/Checkout/71/post/payments/details)
 ```dart
 final AdvancedCheckout advancedCheckout = AdvancedCheckout(
-  postPayments: widget.repository.postPayments,
-  postPaymentsDetails: widget.repository.postPaymentsDetails,
+  onSubmit: YOUR_ON_SUBMIT_CALL,
+  onAdditionalDetails: YOUR_ON_ADDITIONAL_DETAILS_CALL,
 );
 ```
 
-4. Start the Drop-in UI and wait for the payment result. Drop-in handles the payment flow:
+1. Start the Drop-in UI and wait for the payment result. Drop-in handles the payment flow:
 ```dart 
 final paymentResult = await AdyenCheckout.advanced.startDropIn(
   dropInConfiguration: dropInConfiguration,
@@ -183,7 +186,7 @@ final paymentResult = await AdyenCheckout.advanced.startDropIn(
 );
 ```
 
-5. Handle the payment result.
+1. Handle the payment result.
 Inform the shopper.
 Use the [`resultCode`](https://docs.adyen.com/online-payments/build-your-integration/payment-result-codes/) from the API response to show your shopper the current payment status.
 Update your order management system.
@@ -203,11 +206,12 @@ Put these into a `sessionResponse` object and pass it to your client app.
 2. Create the `CardComponentConfiguration`.
 ```dart
 final CardComponentConfiguration cardComponentConfiguration = CardComponentConfiguration(
-  environment: Config.environment,
-  clientKey: Config.clientKey,
-  countryCode: Config.countryCode,
-  amount: Config.amount,
-  shopperLocale: Config.shopperLocale,
+  // Change the environment to live when you are ready to accept real payments.
+  environment: Environment.test,
+  clientKey: CLIENT_KEY,
+  countryCode: COUNTRY_CODE,
+  shopperLocale: SHOPPER_LOCALE,
+  amount: AMOUNT,
 );
 ```
 3. Call the `create` method, passing the required properties:
@@ -238,20 +242,21 @@ AdyenCardComponent(
 3. Create the `CardComponentConfiguration`.
 ```dart
 final CardComponentConfiguration cardComponentConfiguration = CardComponentConfiguration(
-  environment: Config.environment,
-  clientKey: Config.clientKey,
-  countryCode: Config.countryCode,
-  amount: Config.amount,
-  shopperLocale: Config.shopperLocale,
+  // Change the environment to live when you are ready to accept real payments.
+  environment: Environment.test,
+  clientKey: CLIENT_KEY,
+  countryCode: COUNTRY_CODE,
+  shopperLocale: SHOPPER_LOCALE,
+  amount: AMOUNT,
 );
 ```
 4. Create an `AdvancedCheckout` object and provide two callbacks:<br>
-- `postPayments`: from your server, make a [`/payments`](https://docs.adyen.com/api-explorer/Checkout/latest/post/payments) request. <br>
-- `postPaymentsDetails: from your server, make a [`/payments/details](https://docs.adyen.com/api-explorer/Checkout/71/post/payments/details
+- `onSubmit`: from your server, make a [`/payments`](https://docs.adyen.com/api-explorer/Checkout/latest/post/payments) request. <br>
+- `onAdditionalDetails`: from your server, make a [`/payments/details`](https://docs.adyen.com/api-explorer/Checkout/71/post/payments/details)
 ```dart
 final AdvancedCheckout advancedCheckout = AdvancedCheckout(
-  postPayments: repository.postPayments,
-  postPaymentsDetails: repository.postPaymentsDetails,
+  onSubmit: YOUR_ON_SUBMIT_CALL,
+  onAdditionalDetails: YOUR_ON_ADDITIONAL_DETAILS_CALL,
 );
 ```
 5. Create the card component widget:
