@@ -13,10 +13,10 @@ You can integrate in two ways:
 
 ## Before you begin
 
-Get an [Adyen test account](https://www.adyen.com/signup).  
-[Get your Client key](https://docs.adyen.com/development-resources/client-side-authentication#get-your-client-key). Your client app does not communicate with the Adyen API directly.
-[Get your API key](https://docs.adyen.com/development-resources/how-to-get-the-api-key). You need the API key to make requests from your server .
-[Set up your webhooks](https://docs.adyen.com/development-resources/webhooks/) to get the payment outcome.
+1. Get an [Adyen test account](https://www.adyen.com/signup).  
+2. [Get your Client key](https://docs.adyen.com/development-resources/client-side-authentication#get-your-client-key). Your client app does not communicate with the Adyen API directly.
+3. [Get your API key](https://docs.adyen.com/development-resources/how-to-get-the-api-key). You need the API key to make requests from your server .
+4. [Set up your webhooks](https://docs.adyen.com/development-resources/webhooks/) to get the payment outcome.
 
 
 ##  Install the package
@@ -94,17 +94,19 @@ Voucher payment methods require a photo library usage description. Add them to t
 
 
 You can use Adyen Flutter with either of our [server-side flows](https://docs.adyen.com/online-payments/build-your-integration/additional-use-cases/):
-Sessions flow
-Advanced flow
-You must use [Checkout API](https://docs.adyen.com/api-explorer/Checkout/latest/overview) v68 or later.
+- Sessions flow
+- Advanced flow
+  
+You must use [Checkout API](https://docs.adyen.com/api-explorer/Checkout/latest/overview) v71 or later.
 ### Drop-in with Sessions flow:
 
 1.  From your server, make a [`/sessions`](https://docs.adyen.com/api-explorer/Checkout/71/post/sessions) request.
 
 The response contains:<br>
-`sessionData`: the payment session data you need to pass to your front end.<br>
-`id`: a unique identifier for the session data.<br>
-The request body.<br>
+- `sessionData`: the payment session data you need to pass to your front end.<br>
+- `id`: a unique identifier for the session data.<br>
+- The request body.
+
 Put these into a `sessionResponse` object and pass it to your client app.
 
 
@@ -137,9 +139,9 @@ final PaymentResult paymentResult =  await AdyenCheckout.session.startDropIn(
 ```
 
 5. Handle the payment result.
-   Inform the shopper.
+   1. Inform the shopper.
    Use the [`resultCode`](https://docs.adyen.com/online-payments/build-your-integration/payment-result-codes/) from the API response to show your shopper the current payment status.
-   Update your order management system.
+   2. Update your order management system.
    You get the final payment status in an **AUTHORISATION** webhook. Use the `merchantReference` from the webhook to match it to your order reference.
    For a successful payment, the event contains `success`: **true**.
 
@@ -160,8 +162,8 @@ final DropInConfiguration dropInConfiguration = DropInConfiguration(
 The `DropInConfiguration` also supports optional payment method configurations.
 
 3. Create an `AdvancedCheckout` object and provide two callbacks<br>
-   `postPayments`: from your server, make a [`/payments`](https://docs.adyen.com/api-explorer/Checkout/latest/post/payments) request.<br>
-   `postPaymentsDetails`: from your server, make a [/payments/details](https://docs.adyen.com/api-explorer/Checkout/71/post/payments/details)
+   - `postPayments`: from your server, make a [`/payments`](https://docs.adyen.com/api-explorer/Checkout/latest/post/payments) request.<br>
+   - `postPaymentsDetails`: from your server, make a [/payments/details](https://docs.adyen.com/api-explorer/Checkout/71/post/payments/details)
 ```dart
 final AdvancedCheckout advancedCheckout = AdvancedCheckout(
   postPayments: widget.repository.postPayments,
@@ -189,10 +191,12 @@ For a successful payment, the event contains `success`: **true**.
 
 ### Card Component with Sessions flow:
 1. From your server, make a [`sessions`](https://docs.adyen.com/api-explorer/Checkout/71/post/sessions) request.The response contains:<br>
-`sessionData`: the payment session data you need to pass to your front end.<br>
-`id`: a unique identifier for the session data.<br>
-The request body.<br>
-Put these into a `sessionResponse` object and pass it to your client app.<br>
+- `sessionData`: the payment session data you need to pass to your front end.<br>
+- `id`: a unique identifier for the session data.<br>
+- The request body.
+
+Put these into a `sessionResponse` object and pass it to your client app.
+
 2. Create the `CardComponentConfiguration`.
 ```dart
 final CardComponentConfiguration cardComponentConfiguration = CardComponentConfiguration(
@@ -239,8 +243,8 @@ final CardComponentConfiguration cardComponentConfiguration = CardComponentConfi
 );
 ```
 4. Create an `AdvancedCheckout` object and provide two callbacks:<br>
-`postPayments`: from your server, make a [`/payments`](https://docs.adyen.com/api-explorer/Checkout/latest/post/payments) request. <br>
-`postPaymentsDetails: from your server, make a [`/payments/details](https://docs.adyen.com/api-explorer/Checkout/71/post/payments/details
+- `postPayments`: from your server, make a [`/payments`](https://docs.adyen.com/api-explorer/Checkout/latest/post/payments) request. <br>
+- `postPaymentsDetails: from your server, make a [`/payments/details](https://docs.adyen.com/api-explorer/Checkout/71/post/payments/details
 ```dart
 final AdvancedCheckout advancedCheckout = AdvancedCheckout(
   postPayments: repository.postPayments,
