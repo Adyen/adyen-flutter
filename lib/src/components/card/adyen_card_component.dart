@@ -79,8 +79,8 @@ class AdyenCardComponent extends StatelessWidget {
     return CardAdvancedComponent(
       cardComponentConfiguration: configuration.toDTO(sdkVersionNumber),
       paymentMethod: encodedPaymentMethod,
-      onPayments: checkoutAdvanced.postPayments,
-      onPaymentsDetails: checkoutAdvanced.postPaymentsDetails,
+      onPayments: checkoutAdvanced.onSubmit,
+      onPaymentsDetails: checkoutAdvanced.onAdditionalDetails,
       onPaymentResult: onPaymentResult,
       initialViewHeight: initialHeight,
       isStoredPaymentMethod: isStoredPaymentMethod,

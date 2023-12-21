@@ -15,12 +15,12 @@ class SessionCheckout extends Checkout {
 }
 
 class AdvancedCheckout extends Checkout {
-  Future<PaymentEvent> Function(String paymentComponentJson) postPayments;
+  Future<PaymentEvent> Function(String paymentComponentJson) onSubmit;
   Future<PaymentEvent> Function(String additionalDetailsJson)
-      postPaymentsDetails;
+      onAdditionalDetails;
 
   AdvancedCheckout({
-    required this.postPayments,
-    required this.postPaymentsDetails,
+    required this.onSubmit,
+    required this.onAdditionalDetails,
   });
 }
