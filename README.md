@@ -79,10 +79,9 @@ Add the return URL handler to your `AppDelegate.swift` file:
 
 ```swift
 override func application(_: UIApplication, open url: URL, options _: [UIApplication.OpenURLOptionsKey: Any] = [:]) -> Bool {
-        	RedirectComponent.applicationDidOpen(from: url)
-       	 return true
+    RedirectComponent.applicationDidOpen(from: url)
+return true
 }
-```
 In your app, add a [custom URL Scheme](https://developer.apple.com/documentation/xcode/defining-a-custom-url-scheme-for-your-app) that matches the return URL. </br>
 
 #### For Drop-in only
