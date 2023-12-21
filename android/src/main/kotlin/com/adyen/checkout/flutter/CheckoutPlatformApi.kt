@@ -57,8 +57,8 @@ class CheckoutPlatformApi(
         when (configuration) {
             is CardComponentConfigurationDTO -> {
                 return configuration.cardConfiguration.toNativeModel(
-                    "${configuration.shopperLocale}",
                     activity,
+                    configuration.shopperLocale,
                     configuration.environment.toNativeModel(),
                     configuration.clientKey,
                     configuration.analyticsOptionsDTO.mapToAnalyticsConfiguration(),

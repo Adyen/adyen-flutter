@@ -20,7 +20,7 @@ class Config {
   static const String merchantName = "Test Merchant";
   static const String merchantId = "merchant.com.adyen.checkoutsandbox.test";
   static const String countryCode = "NL";
-  static const String shopperLocale = "nl_NL";
+  static const String shopperLocale = "nl-NL";
   static const String shopperReference = "Test reference";
   static const Environment environment = Environment.test;
   static const String baseUrl = "checkout-test.adyen.com";

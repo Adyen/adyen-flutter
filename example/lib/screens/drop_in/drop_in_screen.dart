@@ -75,8 +75,8 @@ class _DropInScreenState extends State<DropInScreen> {
         await widget.repository.fetchPaymentMethods();
     final dropInConfiguration = await _createDropInConfiguration();
     final advancedCheckout = AdvancedCheckout(
-      postPayments: widget.repository.postPayments,
-      postPaymentsDetails: widget.repository.postPaymentsDetails,
+      onSubmit: widget.repository.onSubmit,
+      onAdditionalDetails: widget.repository.onAdditionalDetails,
     );
 
     final paymentResult = await AdyenCheckout.advanced.startDropIn(

@@ -89,7 +89,7 @@ class AdyenDropInRepository extends AdyenBaseRepository {
     ));
   }
 
-  Future<PaymentEvent> postPayments(String paymentComponentJson) async {
+  Future<PaymentEvent> onSubmit(String paymentComponentJson) async {
     String returnUrl = await determineBaseReturnUrl();
     PaymentsRequestData paymentsRequestData = PaymentsRequestData(
       merchantAccount: Config.merchantAccount,
@@ -130,7 +130,7 @@ class AdyenDropInRepository extends AdyenBaseRepository {
     return paymentEventHandler.handleResponse(response);
   }
 
-  Future<PaymentEvent> postPaymentsDetails(String additionalDetails) async {
+  Future<PaymentEvent> onAdditionalDetails(String additionalDetails) async {
     final response =
         await service.postPaymentsDetails(jsonDecode(additionalDetails));
     return paymentEventHandler.handleResponse(response);

@@ -99,10 +99,10 @@ class DropIn {
         .listen((event) async {
       switch (event.type) {
         case PlatformCommunicationType.paymentComponent:
-          await _handlePaymentComponent(event, dropInAdvanced.postPayments);
+          await _handlePaymentComponent(event, dropInAdvanced.onSubmit);
         case PlatformCommunicationType.additionalDetails:
           await _handleAdditionalDetails(
-              event, dropInAdvanced.postPaymentsDetails);
+              event, dropInAdvanced.onAdditionalDetails);
         case PlatformCommunicationType.result:
           _handleResult(dropInAdvancedFlowCompleter, event);
         case PlatformCommunicationType.deleteStoredPaymentMethod:
@@ -142,25 +142,25 @@ class DropIn {
 
   Future<void> _handlePaymentComponent(
     PlatformCommunicationModel event,
-    Future<PaymentEvent> Function(String paymentComponentJson) postPayments,
+    Future<PaymentEvent> Function(String paymentComponentJson) onSubmit,
   ) async {
     try {
       if (event.data == null) {
         throw Exception("Payment data is not provided.");
       }
 
-      final PaymentEvent paymentEvent = await postPayments(event.data!);
+      final PaymentEvent paymentEvent = await onSubmit(event.data!);
       PaymentEventDTO paymentEventDTO =
           _paymentEventHandler.mapToPaymentEventDTO(paymentEvent);
       dropInPlatformApi.onPaymentsResult(paymentEventDTO);
     } catch (error) {
       String errorMessage = error.toString();
-      adyenLogger.print("Failure in postPayments, $errorMessage");
+      adyenLogger.print("Failure in onSubmit, $errorMessage");
       dropInPlatformApi.onPaymentsResult(PaymentEventDTO(
         paymentEventType: PaymentEventType.error,
         error: ErrorDTO(
           errorMessage: errorMessage,
-          reason: "Failure in postPayments, $errorMessage",
+          reason: "Failure in onSubmit, $errorMessage",
           dismissDropIn: false,
         ),
       ));
@@ -169,25 +169,25 @@ class DropIn {
 
   Future<void> _handleAdditionalDetails(
     PlatformCommunicationModel event,
-    Future<PaymentEvent> Function(String additionalDetails) postPaymentsDetails,
+    Future<PaymentEvent> Function(String additionalDetails) onAdditionalDetails,
   ) async {
     try {
       if (event.data == null) {
         throw Exception("Additional data is not provided.");
       }
 
-      final PaymentEvent paymentEvent = await postPaymentsDetails(event.data!);
+      final PaymentEvent paymentEvent = await onAdditionalDetails(event.data!);
       PaymentEventDTO paymentEventDTO =
           _paymentEventHandler.mapToPaymentEventDTO(paymentEvent);
       dropInPlatformApi.onPaymentsDetailsResult(paymentEventDTO);
     } catch (error) {
       String errorMessage = error.toString();
-      adyenLogger.print("Failure in postPaymentsDetails, $errorMessage");
+      adyenLogger.print("Failure in onAdditionalDetails, $errorMessage");
       dropInPlatformApi.onPaymentsDetailsResult(PaymentEventDTO(
         paymentEventType: PaymentEventType.error,
         error: ErrorDTO(
           errorMessage: errorMessage,
-          reason: "Failure in postPaymentsDetails, $errorMessage}",
+          reason: "Failure in onAdditionalDetails, $errorMessage}",
           dismissDropIn: false,
         ),
       ));
