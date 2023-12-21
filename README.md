@@ -1,4 +1,4 @@
-![flutter-banner](https://github.com/Adyen/adyen-flutter/assets/13377878/6ca10143-9f75-43c6-bf6e-99011b09dd64)
+![flutter_banner](https://github.com/Adyen/adyen-flutter/assets/13377878/e0f17c92-7ca2-4bec-803f-dfadd32b94c7)
 # Adyen Flutter (alpha)
 
 > [!IMPORTANT]
