@@ -115,7 +115,7 @@ class _DropInScreenState extends State<DropInScreen> {
     );
 
     final DropInConfiguration dropInConfiguration = DropInConfiguration(
-      environment: Environment.test,
+      environment: Config.environment,
       clientKey: Config.clientKey,
       countryCode: Config.countryCode,
       shopperLocale: Config.shopperLocale,
