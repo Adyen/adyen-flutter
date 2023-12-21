@@ -25,7 +25,9 @@ class ConfigurationMapper {
                 allowedCardTypes: allowedCardTypes,
                 billingAddress: billingAddressConfiguration
             )
-
+            if let shopperLocal = dropInConfigurationDTO.shopperLocale  {
+                dropInConfiguration.localizationParameters = LocalizationParameters(enforcedLocale: shopperLocal)
+            }
             dropInConfiguration.card = cardConfiguration
         }
 
@@ -114,9 +116,10 @@ extension DropInConfigurationDTO {
 }
 
 extension CardConfigurationDTO {
-    func mapToCardComponentConfiguration() -> CardComponent.Configuration {
+    func mapToCardComponentConfiguration(shopperLocale : String?) -> CardComponent.Configuration {
         var formComponentStyle = FormComponentStyle()
         formComponentStyle.backgroundColor = UIColor.white
+        let localizationParameters = shopperLocale != nil ? LocalizationParameters(enforcedLocale: shopperLocale!) : nil
         let koreanAuthenticationMode = kcpFieldVisibility.toCardFieldVisibility()
         let socialSecurityNumberMode = socialSecurityNumberFieldVisibility.toCardFieldVisibility()
         let storedCardConfiguration = createStoredCardConfiguration(showCvcForStoredCard: showCvcForStoredCard)
@@ -124,6 +127,7 @@ extension CardConfigurationDTO {
         let billingAddressConfiguration = determineBillingAddressConfiguration(addressMode: addressMode)
         return CardComponent.Configuration(
             style: formComponentStyle,
+            localizationParameters: localizationParameters,
             showsHolderNameField: holderNameRequired,
             showsStorePaymentMethodField: showStorePaymentField,
             showsSecurityCodeField: showCvc,

@@ -53,8 +53,7 @@ object ConfigurationMapper {
     fun DropInConfigurationDTO.mapToDropInConfiguration(context: Context): DropInConfiguration {
         val environment = environment.toNativeModel()
         val amount = amount.toNativeModel()
-        val locale = Locale.forLanguageTag(shopperLocale)
-        val dropInConfiguration = DropInConfiguration.Builder(locale, environment, clientKey)
+        val dropInConfiguration = buildDropInConfiguration(context, shopperLocale, environment)
         val analyticsConfiguration = analyticsOptionsDTO.mapToAnalyticsConfiguration()
 
         isRemoveStoredPaymentMethodEnabled.let {
@@ -71,8 +70,8 @@ object ConfigurationMapper {
 
         if (cardConfigurationDTO != null) {
             val cardConfiguration = cardConfigurationDTO.toNativeModel(
-                shopperLocale,
                 context,
+                shopperLocale,
                 environment,
                 clientKey,
                 analyticsConfiguration,
@@ -82,12 +81,14 @@ object ConfigurationMapper {
         }
 
         if (googlePayConfigurationDTO != null) {
-            val googlePayConfiguration = buildGooglePayConfiguration(locale, environment, googlePayConfigurationDTO)
+            val googlePayConfiguration =
+                buildGooglePayConfiguration(context, shopperLocale, environment, googlePayConfigurationDTO)
             dropInConfiguration.addGooglePayConfiguration(googlePayConfiguration)
         }
 
         if (cashAppPayConfigurationDTO != null) {
-            val cashAppPayConfiguration = buildCashAppPayConfiguration(locale, environment, cashAppPayConfigurationDTO)
+            val cashAppPayConfiguration =
+                buildCashAppPayConfiguration(context, shopperLocale, environment, cashAppPayConfigurationDTO)
             dropInConfiguration.addCashAppPayConfiguration(cashAppPayConfiguration)
         }
 
@@ -95,19 +96,36 @@ object ConfigurationMapper {
         return dropInConfiguration.build()
     }
 
-    fun CardConfigurationDTO.toNativeModel(
-        shopperLocale: String,
+    private fun DropInConfigurationDTO.buildDropInConfiguration(
         context: Context,
+        shopperLocale: String?,
+        environment: com.adyen.checkout.core.Environment,
+    ): DropInConfiguration.Builder {
+        return if (shopperLocale != null) {
+            val locale = Locale.forLanguageTag(shopperLocale)
+            DropInConfiguration.Builder(locale, environment, clientKey)
+        } else {
+            DropInConfiguration.Builder(context, environment, clientKey)
+        }
+    }
+
+    fun CardConfigurationDTO.toNativeModel(
+        context: Context,
+        shopperLocale: String?,
         environment: com.adyen.checkout.core.Environment,
         clientKey: String,
         analyticsConfiguration: AnalyticsConfiguration,
         amount: Amount,
     ): CardConfiguration {
-        val locale = Locale.forLanguageTag(shopperLocale)
 
-        return CardConfiguration.Builder(
-            shopperLocale = locale, environment = environment, clientKey = clientKey
-        ).setAddressConfiguration(addressMode.mapToAddressConfiguration())
+        val cardConfiguration = if (shopperLocale != null) {
+            val locale = Locale.forLanguageTag(shopperLocale)
+            CardConfiguration.Builder(locale, environment, clientKey)
+        } else {
+            CardConfiguration.Builder(context, environment, clientKey)
+        }
+
+        return cardConfiguration.setAddressConfiguration(addressMode.mapToAddressConfiguration())
             .setAmount(amount)
             .setShowStorePaymentField(showStorePaymentField).setHideCvcStoredCard(!showCvcForStoredCard)
             .setHideCvc(!showCvc).setKcpAuthVisibility(determineKcpAuthVisibility(kcpFieldVisibility))
@@ -128,24 +146,35 @@ object ConfigurationMapper {
     }
 
     private fun DropInConfigurationDTO.buildGooglePayConfiguration(
-        shopperLocale: Locale,
+        context: Context,
+        shopperLocale: String?,
         environment: com.adyen.checkout.core.Environment,
         googlePayConfigurationDTO: GooglePayConfigurationDTO
     ): GooglePayConfiguration {
-        val googlePayConfigurationBuilder = GooglePayConfiguration.Builder(
-            shopperLocale, environment, clientKey
-        )
+
+        val googlePayConfigurationBuilder = if (shopperLocale != null) {
+            val locale = Locale.forLanguageTag(shopperLocale)
+            GooglePayConfiguration.Builder(locale, environment, clientKey)
+        } else {
+            GooglePayConfiguration.Builder(context, environment, clientKey)
+        }
+
         return googlePayConfigurationDTO.mapToGooglePayConfiguration(googlePayConfigurationBuilder)
     }
 
     private fun DropInConfigurationDTO.buildCashAppPayConfiguration(
-        shopperLocale: Locale,
+        context: Context,
+        shopperLocale: String?,
         environment: com.adyen.checkout.core.Environment,
         cashAppPayConfigurationDTO: CashAppPayConfigurationDTO
     ): CashAppPayConfiguration {
-        val cashAppPayConfigurationBuilder = CashAppPayConfiguration.Builder(
-            shopperLocale, environment, clientKey
-        )
+        val cashAppPayConfigurationBuilder = if (shopperLocale != null) {
+            val locale = Locale.forLanguageTag(shopperLocale)
+            CashAppPayConfiguration.Builder(locale, environment, clientKey)
+        } else {
+            CashAppPayConfiguration.Builder(context, environment, clientKey)
+        }
+
         return cashAppPayConfigurationDTO.mapToCashAppPayConfiguration(cashAppPayConfigurationBuilder)
     }
 

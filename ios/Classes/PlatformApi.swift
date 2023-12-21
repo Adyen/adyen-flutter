@@ -186,7 +186,7 @@ struct DropInConfigurationDTO {
   var clientKey: String
   var countryCode: String
   var amount: AmountDTO
-  var shopperLocale: String
+  var shopperLocale: String? = nil
   var cardConfigurationDTO: CardConfigurationDTO? = nil
   var applePayConfigurationDTO: ApplePayConfigurationDTO? = nil
   var googlePayConfigurationDTO: GooglePayConfigurationDTO? = nil
@@ -201,7 +201,7 @@ struct DropInConfigurationDTO {
     let clientKey = list[1] as! String
     let countryCode = list[2] as! String
     let amount = AmountDTO.fromList(list[3] as! [Any?])!
-    let shopperLocale = list[4] as! String
+    let shopperLocale: String? = nilOrValue(list[4])
     var cardConfigurationDTO: CardConfigurationDTO? = nil
     if let cardConfigurationDTOList: [Any?] = nilOrValue(list[5]) {
       cardConfigurationDTO = CardConfigurationDTO.fromList(cardConfigurationDTOList)

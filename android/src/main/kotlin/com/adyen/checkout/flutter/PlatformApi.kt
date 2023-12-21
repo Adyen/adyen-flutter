@@ -254,7 +254,7 @@ data class DropInConfigurationDTO (
   val clientKey: String,
   val countryCode: String,
   val amount: AmountDTO,
-  val shopperLocale: String,
+  val shopperLocale: String? = null,
   val cardConfigurationDTO: CardConfigurationDTO? = null,
   val applePayConfigurationDTO: ApplePayConfigurationDTO? = null,
   val googlePayConfigurationDTO: GooglePayConfigurationDTO? = null,
@@ -272,7 +272,7 @@ data class DropInConfigurationDTO (
       val clientKey = list[1] as String
       val countryCode = list[2] as String
       val amount = AmountDTO.fromList(list[3] as List<Any?>)
-      val shopperLocale = list[4] as String
+      val shopperLocale = list[4] as String?
       val cardConfigurationDTO: CardConfigurationDTO? = (list[5] as List<Any?>?)?.let {
         CardConfigurationDTO.fromList(it)
       }
