@@ -25,27 +25,6 @@ You can integrate in two ways:
 
 ##  Install the package
 
-### Add the package:
-
-Run the following Flutter command:
-```
-$ flutter pub add adyen_checkout
-```
-This will add line like this to your package's `pubspec.yaml` file and runs an implicit `flutter pub get`:
-```yaml
-dependencies:
-  adyen_checkout: ^0.0.1
-```
-Alternatively, your editor might support flutter pub get. Check the docs for your editor to learn more.
-
-### Use the package
-Import the Adyen package to your Dart code:
-
-```dart
-import 'package:adyen_checkout/adyen_checkout.dart';
-```
-<br/>
-
 ### Android integration
 This package supports Android 5.0 or later.
 
