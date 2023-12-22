@@ -98,7 +98,7 @@ class _DropInScreenState extends State<DropInScreen> {
 
     const GooglePayConfiguration googlePayConfiguration =
         GooglePayConfiguration(
-      googlePayEnvironment: GooglePayEnvironment.test,
+      googlePayEnvironment: Config.googlePayEnvironment,
       shippingAddressRequired: true,
       billingAddressRequired: true,
     );
