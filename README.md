@@ -25,8 +25,6 @@ You can integrate in two ways:
 
 ##  Install the package
 
-<br/>
-
 ### Android integration
 This package supports Android 5.0 or later.
 
