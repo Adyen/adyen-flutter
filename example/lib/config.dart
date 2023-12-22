@@ -10,10 +10,13 @@ class Config {
   {
     "CLIENT_KEY" : "YOUR_CLIENT_KEY",
     "X_API_KEY" : "YOUR X_API_KEY"
+    "APPLE_PAY_MERCHANT_ID_KEY": "YOUR_APPLE_PAY_MERCHANT_ID_KEY"
   }
   */
   static const String clientKey = String.fromEnvironment('CLIENT_KEY');
   static const String xApiKey = String.fromEnvironment('X_API_KEY');
+  static const String merchantId =
+      String.fromEnvironment('APPLE_PAY_MERCHANT_ID_KEY');
 
   //Environment constants
   static const String merchantAccount = "TestMerchantCheckout";
@@ -25,6 +28,8 @@ class Config {
   static const String baseUrl = "checkout-test.adyen.com";
   static const String apiVersion = "v71";
   static const String iOSReturnUrl = "flutter-ui-host://payments";
+  static const GooglePayEnvironment googlePayEnvironment =
+      GooglePayEnvironment.test;
 
   //Example data
   static Amount amount = Amount(currency: "EUR", value: 1200);

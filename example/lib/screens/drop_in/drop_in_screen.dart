@@ -92,13 +92,13 @@ class _DropInScreenState extends State<DropInScreen> {
     const CardConfiguration cardsConfiguration = CardConfiguration();
 
     const ApplePayConfiguration applePayConfiguration = ApplePayConfiguration(
-      merchantId: Config.merchantAccount,
+      merchantId: Config.merchantId,
       merchantName: Config.merchantName,
     );
 
     const GooglePayConfiguration googlePayConfiguration =
         GooglePayConfiguration(
-      googlePayEnvironment: GooglePayEnvironment.test,
+      googlePayEnvironment: Config.googlePayEnvironment,
       shippingAddressRequired: true,
       billingAddressRequired: true,
     );
@@ -115,7 +115,7 @@ class _DropInScreenState extends State<DropInScreen> {
     );
 
     final DropInConfiguration dropInConfiguration = DropInConfiguration(
-      environment: Environment.test,
+      environment: Config.environment,
       clientKey: Config.clientKey,
       countryCode: Config.countryCode,
       shopperLocale: Config.shopperLocale,

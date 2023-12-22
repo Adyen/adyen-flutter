@@ -9,7 +9,7 @@ class SdkVersionNumberProvider {
       final RegExp regex = RegExp('version:s*(.*?)s*\\n');
       final match = regex.firstMatch(pubspecContent);
       final versionNumber = match?.group(1) ?? "";
-      return versionNumber;
+      return versionNumber.trim();
     } catch (exception) {
       AdyenLogger.instance.print(
           "Could not find adyen checkout pubspec file for reading the SDK version number");
