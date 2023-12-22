@@ -1,10 +1,16 @@
 name: adyen_checkout
-description: Adyen checkout SDK for Flutter
+description: Adyen checkout library for Flutter.
 version: 0.0.1
-homepage: https://github.com/Adyen/adyen-flutter
+repository: https://github.com/Adyen/adyen-flutter
+issue_tracker: https://github.com/Adyen/adyen-flutter/issues
+documentation: https://docs.adyen.com/online-payments/build-your-integration
+
+topics:
+  - Payments
+  - Checkout
 
 environment:
-  sdk: '>=3.0.6 <4.0.0'
+  sdk: ^3.0.6
   flutter: ">=3.3.0"
 
 dependencies:

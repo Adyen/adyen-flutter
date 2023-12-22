@@ -1,3 +1,5 @@
 ## 0.0.1
 
-* TODO: Describe initial release.
+* Initial alpha release containing following features:
+    * Drop-in with session flow and advanced flow.
+    * Card-component with session flow and advanced flow. 
