@@ -6,8 +6,12 @@ issue_tracker: https://github.com/Adyen/adyen-flutter/issues
 documentation: https://docs.adyen.com/online-payments/build-your-integration
 
 topics:
-  - Payments
-  - Checkout
+  - payments
+  - payment
+  - checkout
+  - adyen
+  - ecommerce
+  - online-payments
 
 environment:
   sdk: ^3.0.6
