@@ -1,0 +1,49 @@
+# This workflow uses actions that are not certified by GitHub.
+# They are provided by a third-party and are governed by
+# separate terms of service, privacy policy, and support
+# documentation.
+
+name: Dart
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up JDK
+        uses: actions/setup-java@v2
+        with:
+          java-version: "17"
+          distribution: "zulu"
+          cache: 'gradle'
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.16.2'
+          channel: 'stable'
+          cache: true
+      - run: flutter --version
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Analyze project source
+        run: dart analyze
+
+      - name: Run tests
+        run: flutter test
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Run testDebugUnitTest
+        run: ./gradlew testDebugUnitTest --no-daemon
