@@ -5,7 +5,11 @@
 
 name: Run tests
 
-on: workflow_dispatch
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
 
 jobs:
   build:
