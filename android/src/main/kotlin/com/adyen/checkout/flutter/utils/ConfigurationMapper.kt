@@ -45,12 +45,10 @@ object ConfigurationMapper {
 
     fun DropInConfigurationDTO.mapToDropInConfiguration(
         context: Context,
-        dropInConfigurationBuilderProvider: DropInConfigurationBuilderProvider = DropInConfigurationBuilderProvider(),
     ): DropInConfiguration {
         val environment = environment.toNativeModel()
         val amount = amount.toNativeModel()
-        val dropInConfiguration =
-            dropInConfigurationBuilderProvider.buildDropInConfiguration(context, shopperLocale, environment, clientKey)
+        val dropInConfiguration = buildDropInConfiguration(context, shopperLocale, environment)
         val analyticsConfiguration = analyticsOptionsDTO.mapToAnalyticsConfiguration()
 
         isRemoveStoredPaymentMethodEnabled.let {
@@ -279,22 +277,6 @@ object ConfigurationMapper {
         return when (this) {
             CashAppPayEnvironment.SANDBOX -> SDKCashAppPayEnvironment.SANDBOX
             CashAppPayEnvironment.PRODUCTION -> SDKCashAppPayEnvironment.PRODUCTION
-        }
-    }
-}
-
-class DropInConfigurationBuilderProvider {
-    fun buildDropInConfiguration(
-        context: Context,
-        shopperLocale: String?,
-        environment: com.adyen.checkout.core.Environment,
-        clientKey: String,
-    ): DropInConfiguration.Builder {
-        return if (shopperLocale != null) {
-            val locale = Locale.forLanguageTag(shopperLocale)
-            DropInConfiguration.Builder(locale, environment, clientKey)
-        } else {
-            DropInConfiguration.Builder(context, environment, clientKey)
         }
     }
 }
