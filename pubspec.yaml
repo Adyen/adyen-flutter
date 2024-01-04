@@ -9,6 +9,9 @@ topics:
   - payments
   - payment
   - checkout
+  - adyen
+  - ecommerce
+  - online-payments
 
 environment:
   sdk: ^3.0.6
