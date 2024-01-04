@@ -12,7 +12,6 @@ import FieldVisibility
 import GooglePayConfigurationDTO
 import GooglePayEnvironment
 import OrderResponseDTO
-import SessionDTO
 import TotalPriceStatus
 import android.content.Context
 import com.adyen.checkout.card.AddressConfiguration
@@ -29,18 +28,12 @@ import com.adyen.checkout.components.core.internal.data.api.AnalyticsMapper
 import com.adyen.checkout.components.core.internal.data.api.AnalyticsPlatform
 import com.adyen.checkout.dropin.DropInConfiguration
 import com.adyen.checkout.googlepay.GooglePayConfiguration
-import com.adyen.checkout.sessions.core.SessionModel
 import com.google.android.gms.wallet.WalletConstants
 import java.util.Locale
 import com.adyen.checkout.cashapppay.CashAppPayEnvironment as SDKCashAppPayEnvironment
 import com.adyen.checkout.core.Environment as SDKEnvironment
 
 object ConfigurationMapper {
-
-    fun SessionDTO.mapToSession(): SessionModel {
-        return SessionModel(this.id, this.sessionData)
-    }
-
     fun OrderResponse.mapToOrderResponseModel(): OrderResponseDTO {
         return OrderResponseDTO(
             pspReference = pspReference,
@@ -50,10 +43,14 @@ object ConfigurationMapper {
         )
     }
 
-    fun DropInConfigurationDTO.mapToDropInConfiguration(context: Context): DropInConfiguration {
+    fun DropInConfigurationDTO.mapToDropInConfiguration(
+        context: Context,
+        dropInConfigurationBuilderProvider: DropInConfigurationBuilderProvider = DropInConfigurationBuilderProvider(),
+    ): DropInConfiguration {
         val environment = environment.toNativeModel()
         val amount = amount.toNativeModel()
-        val dropInConfiguration = buildDropInConfiguration(context, shopperLocale, environment)
+        val dropInConfiguration =
+            dropInConfigurationBuilderProvider.buildDropInConfiguration(context, shopperLocale, environment, clientKey)
         val analyticsConfiguration = analyticsOptionsDTO.mapToAnalyticsConfiguration()
 
         isRemoveStoredPaymentMethodEnabled.let {
@@ -282,6 +279,22 @@ object ConfigurationMapper {
         return when (this) {
             CashAppPayEnvironment.SANDBOX -> SDKCashAppPayEnvironment.SANDBOX
             CashAppPayEnvironment.PRODUCTION -> SDKCashAppPayEnvironment.PRODUCTION
+        }
+    }
+}
+
+class DropInConfigurationBuilderProvider {
+    fun buildDropInConfiguration(
+        context: Context,
+        shopperLocale: String?,
+        environment: com.adyen.checkout.core.Environment,
+        clientKey: String,
+    ): DropInConfiguration.Builder {
+        return if (shopperLocale != null) {
+            val locale = Locale.forLanguageTag(shopperLocale)
+            DropInConfiguration.Builder(locale, environment, clientKey)
+        } else {
+            DropInConfiguration.Builder(context, environment, clientKey)
         }
     }
 }
