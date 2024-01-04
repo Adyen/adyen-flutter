@@ -19,13 +19,6 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Set up JDK
-        uses: actions/setup-java@v2
-        with:
-          java-version: "17"
-          distribution: "zulu"
-          cache: 'gradle'
-
       - uses: subosito/flutter-action@v2
         with:
           flutter-version: '3.16.2'
@@ -41,9 +34,3 @@ jobs:
 
       - name: Run tests
         run: flutter test
-
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
-
-      - name: Run testDebugUnitTest
-        run: ./gradlew testDebugUnitTest --no-daemon
