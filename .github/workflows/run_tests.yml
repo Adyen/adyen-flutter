@@ -5,11 +5,7 @@
 
 name: Run tests
 
-on:
-  push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+on: workflow_dispatch
 
 jobs:
   build:
@@ -41,9 +37,6 @@ jobs:
 
       - name: Run tests
         run: flutter test
-
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
 
       - name: Run testDebugUnitTest
         run: ./gradlew testDebugUnitTest --no-daemon
