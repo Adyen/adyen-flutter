@@ -14,6 +14,9 @@ on:
 jobs:
   gradle:
     runs-on: ubuntu-latest
+    default:
+      run:
+        working-directory: example/android
     timeout-minutes: 30
 
     steps:
@@ -29,5 +32,4 @@ jobs:
           gradle-version: wrapper
 
       - name: Run testDebugUnitTest
-        working-directory: example/android
         run: ./gradlew testDebugUnitTest
