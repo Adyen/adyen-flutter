@@ -54,5 +54,5 @@ jobs:
       - name: Init gradle wrapper
         run: gradle wrapper
 
-      - name: Execute Gradle build
-        run: ./gradlew build
+      - name: Execute unit tests
+        run: ./gradlew testDebugUnitTest
