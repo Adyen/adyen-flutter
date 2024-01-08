@@ -48,7 +48,7 @@ jobs:
 
       - name: Add Flutter SDK path
         id: step1
-        run: echo "flutter.sdk=/opt/hostedtoolcache/flutter/stable-3.16.2-x64" >> local.properties
+        run: echo flutter.sdk=/opt/hostedtoolcache/flutter/stable-3.16.2-x64 >> local.properties
 
       - name: Setup Gradle
         uses: gradle/gradle-build-action@v2
