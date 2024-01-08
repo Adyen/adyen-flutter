@@ -43,9 +43,9 @@ jobs:
       - name: Touch local properties
         run: touch ./local.properties
 
-      - name: Add Flutter SDK path
-        id: step1
-        run: echo flutter.sdk=\"/opt/hostedtoolcache/flutter/stable-3.16.2-x64\" >> ./local.properties
+#      - name: Add Flutter SDK path
+#        id: step1
+#        run: echo flutter.sdk=\"/opt/hostedtoolcache/flutter/stable-3.16.2-x64\" >> ./local.properties
 
       - name: Run script
         run: cat ./local.properties
