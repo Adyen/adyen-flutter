@@ -27,7 +27,7 @@ jobs:
           java-version: 18
 
       - name: Setup Flutter
-        uses: ./.github/workflows/setup_flutter.yml
+        uses: ./.github/actions/setup_flutter
         with:
           flutter-version: '3.16.2'
 
