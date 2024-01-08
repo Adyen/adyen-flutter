@@ -27,12 +27,12 @@ jobs:
           java-version: 18
 
       - name: Setup Flutter
-      - uses: ./.github/workflows/setup_flutter.yml
+        uses: ./.github/workflows/setup_flutter.yml
         with:
           flutter-version: '3.16.2'
 
-      - name: Run script
-        run: cat ./local.properties
+#      - name: Run script
+#        run: cat ./local.properties
 
       - name: Setup Gradle
         uses: gradle/gradle-build-action@v2
