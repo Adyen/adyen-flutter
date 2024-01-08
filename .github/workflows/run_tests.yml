@@ -29,5 +29,8 @@ jobs:
       - name: Setup Gradle
         uses: gradle/gradle-build-action@v2
 
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
       - name: Run testDebugUnitTest
         run: ./gradlew testDebugUnitTest
