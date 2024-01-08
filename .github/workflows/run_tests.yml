@@ -50,9 +50,6 @@ jobs:
         id: step1
         run: echo "flutter.sdk=/opt/hostedtoolcache/flutter" >> local.properties
 
-      - name: Test SDK path output
-        run: echo ${{ local.properties }}
-
       - name: Setup Gradle
         uses: gradle/gradle-build-action@v2
         with:
