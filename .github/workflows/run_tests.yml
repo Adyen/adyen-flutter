@@ -35,13 +35,10 @@ jobs:
           channel: 'stable'
           cache: true
 
+
       - run: flutter doctor -v
-
-      - name: Flutter clean
-        run: flutter clean
-
-      - name: Flutter pub get
-        run: flutter pub get
+      - run: flutter clean
+      - run: flutter pub get
 
       - name: Touch local properties
         run: touch ./local.properties
@@ -49,6 +46,9 @@ jobs:
       - name: Add Flutter SDK path
         id: step1
         run: echo flutter.sdk=\"/opt/hostedtoolcache/flutter/stable-3.16.2-x64\" >> ./local.properties
+
+      - name: Run script
+        run: cat ./local.properties
 
       - name: Setup Gradle
         uses: gradle/gradle-build-action@v2
