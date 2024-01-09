@@ -8,10 +8,10 @@ on:
 
 jobs:
   test_flutter:
-    name: Flutter unit tests
-    uses: ./.github/workflows/flutter_unit_tests.yml
+    name: Flutter tests
+    uses: ./.github/workflows/flutter_tests.yml
   test_android:
-    name: Android unit tests
-    uses: ./.github/workflows/android_unit_tests.yml
+    name: Android tests
+    uses: ./.github/workflows/android_tests.yml
 
 
