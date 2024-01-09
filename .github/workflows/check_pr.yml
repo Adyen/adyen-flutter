@@ -11,17 +11,12 @@ on:
   pull_request:
     branches: [ "main" ]
 
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    timeout-minutes: 60
-
-    jobs:
-      test_flutter:
-        name: Flutter unit tests
-        uses: ./.github/workflows/flutter_unit:test.yml
-      test_android:
-        name: Android unit tests
-        uses: ./.github/workflows/android_unit_tests.yml
+  jobs:
+    test_flutter:
+      name: Flutter unit tests
+      uses: ./.github/workflows/flutter_unit:test.yml
+    test_android:
+      name: Android unit tests
+      uses: ./.github/workflows/android_unit_tests.yml
 
 
