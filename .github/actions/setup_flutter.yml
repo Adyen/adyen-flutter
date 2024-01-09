@@ -1,0 +1,22 @@
+name: Setup Flutter
+description: Setup Flutter SDK
+inputs:
+  flutter-version:
+    description: 'Flutter version'
+    required: true
+    type: string
+    default: '3.16.2'
+
+runs:
+  using: "composite"
+  steps:
+    - uses: actions/checkout@v4
+    - uses: subosito/flutter-action@v2
+      with:
+        flutter-version: ${{ inputs.flutter-version }}
+        channel: 'stable'
+        cache: true
+
+    - run: flutter doctor -v
+    - run: flutter clean
+    - run: flutter pub get
