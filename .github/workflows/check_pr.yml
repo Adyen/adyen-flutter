@@ -13,5 +13,7 @@ jobs:
   test_android:
     name: Android tests
     uses: ./.github/workflows/android_tests.yml
-
+  test_ios:
+    name: iOS tests
+    uses: ./.github/workflows/ios_tests.yml
 
