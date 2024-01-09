@@ -7,6 +7,7 @@ on:
         description: 'Flutter version'
         required: false
         default: '3.16.2'
+        type: string
 
 jobs:
   android_tests:
