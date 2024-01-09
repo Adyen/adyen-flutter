@@ -14,7 +14,7 @@ on:
   jobs:
     test_flutter:
       name: Flutter unit tests
-      uses: ./.github/workflows/flutter_unit:test.yml
+      uses: ./.github/workflows/flutter_unit_test.yml
     test_android:
       name: Android unit tests
       uses: ./.github/workflows/android_unit_tests.yml
