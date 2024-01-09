@@ -4,7 +4,7 @@ on:
   workflow_call
 
 jobs:
-  flutter_tests:
+  ios_tests:
     runs-on: macos-latest
     defaults:
       run:
