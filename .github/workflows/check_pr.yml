@@ -3,7 +3,7 @@
 # separate terms of service, privacy policy, and support
 # documentation.
 
-name: Dart
+name: Check PR
 
 on:
   push:
@@ -14,23 +14,14 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 60
 
-    steps:
-      - uses: actions/checkout@v3
+    jobs:
+      test_flutter:
+        name: Flutter unit tests
+        uses: ./.github/workflows/flutter_unit:test.yml
+      test_android:
+        name: Android unit tests
+        uses: ./.github/workflows/android_unit_tests.yml
 
-      - uses: subosito/flutter-action@v2
-        with:
-          flutter-version: '3.16.2'
-          channel: 'stable'
-          cache: true
-      - run: flutter --version
 
-      - name: Install dependencies
-        run: flutter pub get
-
-      - name: Analyze project source
-        run: dart analyze
-
-      - name: Run tests
-        run: flutter test
