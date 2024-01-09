@@ -1,7 +1,12 @@
 name: Android unit tests
 
 on:
-  workflow_call
+  workflow_call:
+    inputs:
+      flutter-version:
+        description: 'Flutter version'
+        required: false
+        default: '3.16.2'
 
 jobs:
   android_tests:
@@ -21,7 +26,7 @@ jobs:
 
       - uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.16.2'
+          flutter-version: ${{ github.event.inputs.flutter-version }}
           channel: 'stable'
           cache: true
 
