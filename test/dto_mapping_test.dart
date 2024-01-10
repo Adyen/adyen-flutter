@@ -4,7 +4,7 @@ import 'package:adyen_checkout/src/util/dto_mapper.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  test('when map DropInConfiguration then should map to DropInConfigurationDTO',
+  test('when drop in configuration is provided, then should map to DropInConfigurationDTO',
       () {
     const demoClientKey = "1234567890";
     const countryCode = "US";
@@ -18,6 +18,7 @@ void main() {
       amount: Amount(value: amountValue, currency: currency),
       shopperLocale: shopperLocal,
     );
+
     final dropInConfigurationDto = dropInConfiguration.toDTO("0.0.1");
 
     expect(dropInConfigurationDto.environment, Environment.test);
