@@ -12,7 +12,7 @@ env:
 jobs:
   #  The preparation job is required to populate the FLUTTER_VERSION value as output for the tests jobs.
   preparation:
-    name: Get environment vars
+    name: Prepare environment vars
     runs-on: ubuntu-latest
     outputs:
       FLUTTER_VERSION: ${{ env.FLUTTER_VERSION }}
@@ -24,17 +24,17 @@ jobs:
     needs: [ preparation ]
     uses: ./.github/workflows/flutter_tests.yml
     with:
-      flutter-version: ${{ needs.prepare.outputs.FLUTTER_VERSION }}
+      flutter-version: ${{ needs.preparation.outputs.FLUTTER_VERSION }}
   test_android:
     name: Android tests
     needs: [ preparation ]
     uses: ./.github/workflows/android_tests.yml
     with:
-      flutter-version: ${{ needs.prepare.outputs.FLUTTER_VERSION }}
+      flutter-version: ${{ needs.preparation.outputs.FLUTTER_VERSION }}
   test_ios:
     name: iOS tests
     needs: [ preparation ]
     uses: ./.github/workflows/ios_tests.yml
     with:
-      flutter-version: ${{ needs.prepare.outputs.FLUTTER_VERSION }}
+      flutter-version: ${{ needs.preparation.outputs.FLUTTER_VERSION }}
 
