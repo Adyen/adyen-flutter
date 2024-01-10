@@ -1,7 +1,13 @@
 name: Swift unit tests
 
 on:
-  workflow_call
+  workflow_call:
+    inputs:
+      flutter-version:
+        description: 'Flutter version'
+        required: true
+        default: '3.16.2'
+        type: string
 
 jobs:
   ios_tests:
@@ -16,7 +22,7 @@ jobs:
 
       - uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.16.2'
+          flutter-version: ${{ inputs.flutter-version }}
           channel: 'stable'
           cache: true
 

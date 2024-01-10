@@ -20,4 +20,6 @@ jobs:
   test_ios:
     name: iOS tests
     uses: ./.github/workflows/ios_tests.yml
+    with:
+      flutter-version: '3.16.4'
 
