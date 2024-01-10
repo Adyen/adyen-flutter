@@ -14,7 +14,7 @@ jobs:
     name: Flutter tests
     uses: ./.github/workflows/flutter_tests.yml
     with:
-      flutter-version: $FLUTTER_VERSION
+      flutter-version: '$FLUTTER_VERSION'
   test_android:
     name: Android tests
     uses: ./.github/workflows/android_tests.yml
