@@ -43,9 +43,7 @@ object ConfigurationMapper {
         )
     }
 
-    fun DropInConfigurationDTO.mapToDropInConfiguration(
-        context: Context,
-    ): DropInConfiguration {
+    fun DropInConfigurationDTO.mapToDropInConfiguration(context: Context): DropInConfiguration {
         val environment = environment.toNativeModel()
         val amount = amount.toNativeModel()
         val dropInConfiguration = buildDropInConfiguration(context, shopperLocale, environment)
