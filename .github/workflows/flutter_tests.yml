@@ -19,7 +19,7 @@ jobs:
 
       - uses: subosito/flutter-action@v2
         with:
-          flutter-version: ${{ github.event.inputs.flutter-version }}
+          flutter-version: ${{ inputs.flutter-version }}
           channel: 'stable'
           cache: true
 
