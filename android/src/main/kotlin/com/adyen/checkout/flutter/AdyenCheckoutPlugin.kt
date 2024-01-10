@@ -39,12 +39,12 @@ class AdyenCheckoutPlugin : FlutterPlugin, ActivityAware {
         checkoutPlatformApi = CheckoutPlatformApi(sessionHolder)
         CheckoutPlatformInterface.setUp(flutterPluginBinding.binaryMessenger, checkoutPlatformApi)
 
-        //DropIn init
+        // DropIn init
         dropInFlutterApi = DropInFlutterInterface(flutterPluginBinding.binaryMessenger)
         dropInFlutterApi?.let { dropInPlatformApi = DropInPlatformApi(it, sessionHolder) }
         DropInPlatformInterface.setUp(flutterPluginBinding.binaryMessenger, dropInPlatformApi)
 
-        //Component init
+        // Component init
         componentFlutterApi = ComponentFlutterInterface(flutterPluginBinding.binaryMessenger)
         componentPlatformApi = ComponentPlatformApi()
         ComponentPlatformInterface.setUp(flutterPluginBinding.binaryMessenger, componentPlatformApi)
@@ -83,7 +83,8 @@ class AdyenCheckoutPlugin : FlutterPlugin, ActivityAware {
 
         componentFlutterApi?.let {
             flutterPluginBinding?.platformViewRegistry?.registerViewFactory(
-                cardComponentAdvancedId, CardComponentFactory(fragmentActivity, it, cardComponentAdvancedId)
+                cardComponentAdvancedId,
+                CardComponentFactory(fragmentActivity, it, cardComponentAdvancedId)
             )
 
             flutterPluginBinding?.platformViewRegistry?.registerViewFactory(
@@ -112,7 +113,6 @@ class AdyenCheckoutPlugin : FlutterPlugin, ActivityAware {
             }
         }
     }
-
 
     private fun teardown() {
         lifecycleObserver?.let {

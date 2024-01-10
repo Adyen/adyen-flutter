@@ -35,7 +35,8 @@ class CheckoutPlatformApi(
     }
 
     override fun createSession(
-        sessionId: String, sessionData: String,
+        sessionId: String,
+        sessionData: String,
         configuration: Any?,
         callback: (Result<SessionDTO>) -> Unit,
     ) {
@@ -45,13 +46,14 @@ class CheckoutPlatformApi(
                 when (val sessionResult = CheckoutSessionProvider.createSession(sessionModel, sessionConfiguration)) {
                     is CheckoutSessionResult.Error -> callback(Result.failure(sessionResult.exception))
                     is CheckoutSessionResult.Success -> onSessionSuccessfullyCreated(
-                        sessionResult, sessionModel, callback
+                        sessionResult,
+                        sessionModel,
+                        callback
                     )
                 }
             }
         }
     }
-
 
     private fun determineSessionConfiguration(configuration: Any?): Configuration? {
         when (configuration) {

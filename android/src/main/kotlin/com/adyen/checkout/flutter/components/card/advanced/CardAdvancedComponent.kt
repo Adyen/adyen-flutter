@@ -118,7 +118,6 @@ internal class CardAdvancedComponent(
                 return@observe
             }
 
-
             val model = ComponentCommunicationModel(
                 ComponentCommunicationType.ERROR,
                 data = message.contentIfNotHandled?.errorMessage,
@@ -126,5 +125,4 @@ internal class CardAdvancedComponent(
             componentFlutterApi.onComponentCommunication(model) {}
         }
     }
-
 }

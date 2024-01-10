@@ -110,7 +110,6 @@ class DropInPlatformApi(
         DropInAdditionalDetailsPlatformMessenger.instance().removeObservers(activity)
     }
 
-
     private fun setAdvancedFlowDropInServiceObserver() {
         DropInServiceResultMessenger.instance().removeObservers(activity)
         DropInServiceResultMessenger.instance().observe(activity) { message ->
@@ -185,7 +184,8 @@ class DropInPlatformApi(
         val paymentMethods = paymentMethodsResponse.paymentMethods?.filterNot { it.type == giftCardTypeIdentifier }
 
         return PaymentMethodsApiResponse(
-            storedPaymentMethods = storedPaymentMethods, paymentMethods = paymentMethods
+            storedPaymentMethods = storedPaymentMethods,
+            paymentMethods = paymentMethods
         )
     }
 
@@ -200,20 +200,28 @@ class DropInPlatformApi(
             )
 
             is SessionDropInResult.Error -> PaymentResultDTO(
-                PaymentResultEnum.ERROR, reason = sessionDropInResult.reason
+                PaymentResultEnum.ERROR,
+                reason = sessionDropInResult.reason
             )
 
             is SessionDropInResult.Finished -> PaymentResultDTO(
                 PaymentResultEnum.FINISHED,
                 result = with(sessionDropInResult.result) {
                     PaymentResultModelDTO(
-                        sessionId, sessionData, sessionResult, resultCode, order?.mapToOrderResponseModel()
+                        sessionId,
+                        sessionData,
+                        sessionResult,
+                        resultCode,
+                        order?.mapToOrderResponseModel()
                     )
-                })
+                }
+            )
         }
 
         val platformCommunicationModel = PlatformCommunicationModel(
-            PlatformCommunicationType.RESULT, data = "", paymentResult = mappedResult
+            PlatformCommunicationType.RESULT,
+            data = "",
+            paymentResult = mappedResult
         )
 
         dropInFlutterApi.onDropInSessionPlatformCommunication(platformCommunicationModel) {}
@@ -230,18 +238,22 @@ class DropInPlatformApi(
             )
 
             is DropInResult.Error -> PaymentResultDTO(
-                PaymentResultEnum.ERROR, reason = dropInAdvancedFlowResult.reason
+                PaymentResultEnum.ERROR,
+                reason = dropInAdvancedFlowResult.reason
             )
 
             is DropInResult.Finished -> PaymentResultDTO(
-                PaymentResultEnum.FINISHED, result = PaymentResultModelDTO(
+                PaymentResultEnum.FINISHED,
+                result = PaymentResultModelDTO(
                     resultCode = dropInAdvancedFlowResult.result
                 )
             )
         }
 
         val platformCommunicationModel = PlatformCommunicationModel(
-            PlatformCommunicationType.RESULT, data = "", paymentResult = mappedResult
+            PlatformCommunicationType.RESULT,
+            data = "",
+            paymentResult = mappedResult
         )
         dropInFlutterApi.onDropInAdvancedPlatformCommunication(platformCommunicationModel) {}
     }

@@ -10,7 +10,7 @@ import org.json.JSONObject
 class ComponentPlatformApi : ComponentPlatformInterface {
 
     override fun updateViewHeight(viewId: Long) {
-        ComponentHeightMessenger.sendResult(viewId);
+        ComponentHeightMessenger.sendResult(viewId)
     }
 
     override fun onPaymentsResult(paymentsResult: PaymentEventDTO) {
@@ -46,5 +46,4 @@ class ComponentPlatformApi : ComponentPlatformInterface {
             ComponentErrorMessenger.sendResult(it)
         }
     }
-
 }

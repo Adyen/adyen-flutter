@@ -17,34 +17,34 @@ class CardSessionCallback(
     private val onActionCallback: (Action) -> Unit
 ) :
     SessionComponentCallback<CardComponentState> {
-    override fun onFinished(result: SessionPaymentResult) {
-        val paymentResult = PaymentResultModelDTO(
-            result.sessionId,
-            result.sessionData,
-            result.sessionResult,
-            result.resultCode,
-            result.order?.mapToOrderResponseModel()
-        )
-        val model = ComponentCommunicationModel(
-            ComponentCommunicationType.RESULT,
-            paymentResult = paymentResult
-        )
-        componentFlutterApi.onComponentCommunication(model) {}
-    }
+        override fun onFinished(result: SessionPaymentResult) {
+            val paymentResult = PaymentResultModelDTO(
+                result.sessionId,
+                result.sessionData,
+                result.sessionResult,
+                result.resultCode,
+                result.order?.mapToOrderResponseModel()
+            )
+            val model = ComponentCommunicationModel(
+                ComponentCommunicationType.RESULT,
+                paymentResult = paymentResult
+            )
+            componentFlutterApi.onComponentCommunication(model) {}
+        }
 
-    override fun onAction(action: Action) {
-        onActionCallback(action)
-    }
+        override fun onAction(action: Action) {
+            onActionCallback(action)
+        }
 
-    override fun onError(componentError: ComponentError) {
-        val model = ComponentCommunicationModel(
-            ComponentCommunicationType.ERROR,
-            data = componentError.exception.toString(),
-        )
-        componentFlutterApi.onComponentCommunication(model) {}
-    }
+        override fun onError(componentError: ComponentError) {
+            val model = ComponentCommunicationModel(
+                ComponentCommunicationType.ERROR,
+                data = componentError.exception.toString(),
+            )
+            componentFlutterApi.onComponentCommunication(model) {}
+        }
 
-    override fun onStateChanged(state: CardComponentState) {
-        ComponentHeightMessenger.sendResult(1)
+        override fun onStateChanged(state: CardComponentState) {
+            ComponentHeightMessenger.sendResult(1)
+        }
     }
-}

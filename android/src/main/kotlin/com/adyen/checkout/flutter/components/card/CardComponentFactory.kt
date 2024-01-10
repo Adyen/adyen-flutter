@@ -27,8 +27,6 @@ class CardComponentFactory(
             CardSessionComponent(activity, componentFlutterApi, sessionHolder, context, viewId, creationParams)
         } else {
             CardAdvancedComponent(activity, componentFlutterApi, context, viewId, creationParams)
-
         }
     }
 }
-
