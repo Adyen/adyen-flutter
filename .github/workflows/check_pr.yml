@@ -10,6 +10,14 @@ env:
   FLUTTER_VERSION: '3.16.4'
 
 jobs:
+  get-env-vars:
+    name: Get environment vars
+    runs-on: ubuntu-latest
+    outputs:
+      FLUTTER_VERSION: ${{ env.FLUTTER_VERSION }}
+    steps:
+      - run: echo ""
+
   test_flutter:
     name: Flutter tests
     uses: ./.github/workflows/flutter_tests.yml
