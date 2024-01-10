@@ -10,7 +10,9 @@ import org.json.JSONObject
 class DropInServiceResultMessenger : LiveData<Event<JSONObject>>() {
     companion object {
         private val dropInServiceResultMessenger = DropInServiceResultMessenger()
+
         fun instance() = dropInServiceResultMessenger
+
         fun sendResult(value: JSONObject) {
             dropInServiceResultMessenger.postValue(Event(value))
         }
@@ -22,6 +24,7 @@ class DropInPaymentResultMessenger : LiveData<Event<PaymentEventDTO>>() {
         private val dropInPaymentResultMessenger = DropInPaymentResultMessenger()
 
         fun instance() = dropInPaymentResultMessenger
+
         fun sendResult(value: PaymentEventDTO) {
             dropInPaymentResultMessenger.postValue(Event(value))
         }
@@ -34,6 +37,7 @@ class DropInAdditionalDetailsPlatformMessenger : LiveData<Event<JSONObject>>() {
             DropInAdditionalDetailsPlatformMessenger()
 
         fun instance() = dropInAdditionalDetailsPlatformMessenger
+
         fun sendResult(value: JSONObject) {
             dropInAdditionalDetailsPlatformMessenger.postValue(Event(value))
         }
@@ -46,6 +50,7 @@ class DropInAdditionalDetailsResultMessenger : LiveData<Event<PaymentEventDTO>>(
             DropInAdditionalDetailsResultMessenger()
 
         fun instance() = dropInAdditionalDetailsResultMessenger
+
         fun sendResult(value: PaymentEventDTO) {
             dropInAdditionalDetailsResultMessenger.postValue(Event(value))
         }
@@ -58,6 +63,7 @@ class DropInPaymentMethodDeletionPlatformMessenger : LiveData<Event<DropInStored
             DropInPaymentMethodDeletionPlatformMessenger()
 
         fun instance() = dropInPaymentMethodDeletionPlatformMessenger
+
         fun sendResult(value: DropInStoredPaymentMethodDeletionModel) {
             dropInPaymentMethodDeletionPlatformMessenger.postValue(Event(value))
         }
@@ -70,6 +76,7 @@ class DropInPaymentMethodDeletionResultMessenger : LiveData<Event<DeletedStoredP
             DropInPaymentMethodDeletionResultMessenger()
 
         fun instance() = dropInPaymentMethodDeletionResultMessenger
+
         fun sendResult(value: DeletedStoredPaymentMethodResultDTO) {
             dropInPaymentMethodDeletionResultMessenger.postValue(Event(value))
         }

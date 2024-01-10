@@ -40,14 +40,15 @@ abstract class BaseCardComponent(
     private val environment = configuration.environment.toNativeModel()
     private val componentWrapperView = ComponentWrapperView(activity, componentFlutterApi)
     private val intentListener = Consumer<Intent> { handleIntent(it) }
-    val cardConfiguration = configuration.cardConfiguration.toNativeModel(
-        context,
-        configuration.shopperLocale,
-        environment,
-        configuration.clientKey,
-        configuration.analyticsOptionsDTO.mapToAnalyticsConfiguration(),
-        configuration.amount.toNativeModel(),
-    )
+    val cardConfiguration =
+        configuration.cardConfiguration.toNativeModel(
+            context,
+            configuration.shopperLocale,
+            environment,
+            configuration.clientKey,
+            configuration.analyticsOptionsDTO.mapToAnalyticsConfiguration(),
+            configuration.amount.toNativeModel(),
+        )
 
     lateinit var cardComponent: CardComponent
 
@@ -83,16 +84,18 @@ abstract class BaseCardComponent(
     }
 
     private fun adjustCardComponentLayout(flutterView: View) {
-        val linearLayoutParams = LinearLayout.LayoutParams(
-            ViewGroup.LayoutParams.MATCH_PARENT,
-            ViewGroup.LayoutParams.WRAP_CONTENT,
-        )
+        val linearLayoutParams =
+            LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+            )
         // Adyen component view
         val adyenComponentView = flutterView.findViewById<AdyenComponentView>(R.id.adyen_component_view)
-        adyenComponentView.layoutParams = ConstraintLayout.LayoutParams(
-            ViewGroup.LayoutParams.MATCH_PARENT,
-            ViewGroup.LayoutParams.WRAP_CONTENT,
-        )
+        adyenComponentView.layoutParams =
+            ConstraintLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+            )
 
         // Component container
         val componentContainer = flutterView.findViewById<FrameLayout>(R.id.frameLayout_componentContainer)
@@ -104,10 +107,11 @@ abstract class BaseCardComponent(
 
         // Pay button
         val button = buttonContainer.children.firstOrNull()
-        val buttonParams = FrameLayout.LayoutParams(
-            ViewGroup.LayoutParams.MATCH_PARENT,
-            ViewGroup.LayoutParams.WRAP_CONTENT,
-        )
+        val buttonParams =
+            FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+            )
         button?.layoutParams = buttonParams
 
         // Card

@@ -8,7 +8,6 @@ import PaymentResultModelDTO
 import org.json.JSONObject
 
 class ComponentPlatformApi : ComponentPlatformInterface {
-
     override fun updateViewHeight(viewId: Long) {
         ComponentHeightMessenger.sendResult(viewId)
     }

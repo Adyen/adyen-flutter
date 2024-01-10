@@ -21,10 +21,11 @@ class SessionDropInService : SessionDropInService(), LifecycleOwner {
     override fun onRemoveStoredPaymentMethod(storedPaymentMethod: StoredPaymentMethod) {
         storedPaymentMethod.id?.let { storedPaymentMethodId ->
             setStoredPaymentMethodDeletionObserver()
-            val dropInStoredPaymentMethodDeletionModel = DropInStoredPaymentMethodDeletionModel(
-                storedPaymentMethodId,
-                DropInType.SESSION
-            )
+            val dropInStoredPaymentMethodDeletionModel =
+                DropInStoredPaymentMethodDeletionModel(
+                    storedPaymentMethodId,
+                    DropInType.SESSION
+                )
             DropInPaymentMethodDeletionPlatformMessenger.sendResult(dropInStoredPaymentMethodDeletionModel)
         } ?: run {
             sendRecurringResult(RecurringDropInServiceResult.Error(errorDialog = ErrorDialog()))
@@ -43,16 +44,18 @@ class SessionDropInService : SessionDropInService(), LifecycleOwner {
         }
     }
 
-    private fun mapToDeletionDropInResult(deleteStoredPaymentMethodResultDTO: DeletedStoredPaymentMethodResultDTO?):
-        RecurringDropInServiceResult {
+    private fun mapToDeletionDropInResult(
+        deleteStoredPaymentMethodResultDTO: DeletedStoredPaymentMethodResultDTO?
+    ): RecurringDropInServiceResult {
         return if (deleteStoredPaymentMethodResultDTO?.isSuccessfullyRemoved == true) {
             RecurringDropInServiceResult.PaymentMethodRemoved(deleteStoredPaymentMethodResultDTO.storedPaymentMethodId)
         } else {
             // TODO - the error message should be provided by the native SDK
             RecurringDropInServiceResult.Error(
-                errorDialog = ErrorDialog(
-                    message = "Removal of the stored payment method failed. Please try again later."
-                )
+                errorDialog =
+                    ErrorDialog(
+                        message = "Removal of the stored payment method failed. Please try again later."
+                    )
             )
         }
     }
@@ -68,12 +71,19 @@ class SessionDropInService : SessionDropInService(), LifecycleOwner {
     }
 
     @Deprecated("Deprecated in Java")
-    override fun onStart(intent: Intent?, startId: Int) {
+    override fun onStart(
+        intent: Intent?,
+        startId: Int
+    ) {
         dispatcher.onServicePreSuperOnStart()
         super.onStart(intent, startId)
     }
 
-    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+    override fun onStartCommand(
+        intent: Intent?,
+        flags: Int,
+        startId: Int
+    ): Int {
         dispatcher.onServicePreSuperOnStart()
         return super.onStartCommand(intent, flags, startId)
     }

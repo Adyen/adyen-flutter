@@ -62,7 +62,7 @@ class ComponentWrapperView
         private fun updateComponentViewHeight() {
             val cardViewHeight = findViewById<FrameLayout>(R.id.frameLayout_componentContainer)?.getChildAt(0)?.height
             if (cardViewHeight == null) {
-                activity.lifecycleScope.launch() {
+                activity.lifecycleScope.launch {
                     // View not rendered therefore we try again after delay.
                     // This is a workaround because there is currently no notifier from the native view.
                     delay(100)

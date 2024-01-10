@@ -78,10 +78,11 @@ class CardSessionComponent(
 
     private fun adjustCardComponentLayout(flutterView: View) {
         val adyenComponentView = flutterView.findViewById<AdyenComponentView>(R.id.adyen_component_view)
-        adyenComponentView.layoutParams = ConstraintLayout.LayoutParams(
-            ViewGroup.LayoutParams.MATCH_PARENT,
-            ViewGroup.LayoutParams.WRAP_CONTENT,
-        )
+        adyenComponentView.layoutParams =
+            ConstraintLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+            )
     }
 
     private fun onAction(action: Action) = cardComponent.handleAction(action, activity)
