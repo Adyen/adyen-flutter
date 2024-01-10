@@ -12,7 +12,6 @@ import FieldVisibility
 import GooglePayConfigurationDTO
 import GooglePayEnvironment
 import OrderResponseDTO
-import SessionDTO
 import TotalPriceStatus
 import android.content.Context
 import com.adyen.checkout.card.AddressConfiguration
@@ -29,18 +28,12 @@ import com.adyen.checkout.components.core.internal.data.api.AnalyticsMapper
 import com.adyen.checkout.components.core.internal.data.api.AnalyticsPlatform
 import com.adyen.checkout.dropin.DropInConfiguration
 import com.adyen.checkout.googlepay.GooglePayConfiguration
-import com.adyen.checkout.sessions.core.SessionModel
 import com.google.android.gms.wallet.WalletConstants
 import java.util.Locale
 import com.adyen.checkout.cashapppay.CashAppPayEnvironment as SDKCashAppPayEnvironment
 import com.adyen.checkout.core.Environment as SDKEnvironment
 
 object ConfigurationMapper {
-
-    fun SessionDTO.mapToSession(): SessionModel {
-        return SessionModel(this.id, this.sessionData)
-    }
-
     fun OrderResponse.mapToOrderResponseModel(): OrderResponseDTO {
         return OrderResponseDTO(
             pspReference = pspReference,

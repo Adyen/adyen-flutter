@@ -1,9 +1,4 @@
-# This workflow uses actions that are not certified by GitHub.
-# They are provided by a third-party and are governed by
-# separate terms of service, privacy policy, and support
-# documentation.
-
-name: Dart
+name: Check PR
 
 on:
   push:
@@ -11,25 +6,35 @@ on:
   pull_request:
     branches: [ "main" ]
 
+env:
+  FLUTTER_VERSION: '3.16.4'
+
 jobs:
-  build:
+  #  The preparation job is required to populate the FLUTTER_VERSION value as output for the tests jobs.
+  preparation:
+    name: Prepare environment vars
     runs-on: ubuntu-latest
-    timeout-minutes: 30
-
+    outputs:
+      FLUTTER_VERSION: ${{ env.FLUTTER_VERSION }}
     steps:
-      - uses: actions/checkout@v3
-      - uses: subosito/flutter-action@v2
-        with:
-          flutter-version: '3.16.2'
-          channel: 'stable'
-          cache: true
-      - run: flutter --version
+      - run: echo ""
 
-      - name: Install dependencies
-        run: flutter pub get
+  test_flutter:
+    name: Flutter tests
+    needs: [ preparation ]
+    uses: ./.github/workflows/flutter_tests.yml
+    with:
+      flutter-version: ${{ needs.preparation.outputs.FLUTTER_VERSION }}
+  test_android:
+    name: Android tests
+    needs: [ preparation ]
+    uses: ./.github/workflows/android_tests.yml
+    with:
+      flutter-version: ${{ needs.preparation.outputs.FLUTTER_VERSION }}
+  test_ios:
+    name: iOS tests
+    needs: [ preparation ]
+    uses: ./.github/workflows/ios_tests.yml
+    with:
+      flutter-version: ${{ needs.preparation.outputs.FLUTTER_VERSION }}
 
-      - name: Analyze project source
-        run: dart analyze
-
-      - name: Run tests
-        run: flutter test
