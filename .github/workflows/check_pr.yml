@@ -1,20 +1,20 @@
 name: Check PR
 
-env:
-  FLUTTER_VERSION: '3.16.4'
-
 on:
   push:
     branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
 
+env:
+  FLUTTER_VERSION: '3.16.4'
+
 jobs:
   test_flutter:
     name: Flutter tests
     uses: ./.github/workflows/flutter_tests.yml
     with:
-      flutter-version: '$FLUTTER_VERSION'
+      flutter-version: $FLUTTER_VERSION
   test_android:
     name: Android tests
     uses: ./.github/workflows/android_tests.yml
