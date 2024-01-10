@@ -10,7 +10,7 @@ env:
   FLUTTER_VERSION: '3.16.4'
 
 jobs:
-  get-env-vars:
+  prepare:
     name: Get environment vars
     runs-on: ubuntu-latest
     outputs:
@@ -20,9 +20,10 @@ jobs:
 
   test_flutter:
     name: Flutter tests
+    needs: [ prepare ]
     uses: ./.github/workflows/flutter_tests.yml
     with:
-      flutter-version: ${{ env.FLUTTER_VERSION }}
+      flutter-version: ${{ needs.prepare.FLUTTER_VERSION }}
   test_android:
     name: Android tests
     uses: ./.github/workflows/android_tests.yml
