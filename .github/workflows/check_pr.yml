@@ -10,6 +10,8 @@ jobs:
   test_flutter:
     name: Flutter tests
     uses: ./.github/workflows/flutter_tests.yml
+    with:
+      flutter-version: '3.16.4'
   test_android:
     name: Android tests
     uses: ./.github/workflows/android_tests.yml

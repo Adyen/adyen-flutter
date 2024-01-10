@@ -5,7 +5,7 @@ on:
     inputs:
       flutter-version:
         description: 'Flutter version'
-        required: false
+        required: true
         default: '3.16.2'
         type: string
 
