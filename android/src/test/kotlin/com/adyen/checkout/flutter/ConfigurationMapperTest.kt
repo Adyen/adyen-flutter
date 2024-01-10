@@ -9,7 +9,6 @@ import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToDropInConfigura
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.mock
-import java.util.Locale
 
 
 class ConfigurationMapperTest {
@@ -34,7 +33,7 @@ class ConfigurationMapperTest {
 
         assertEquals(dropInConfiguration.environment, com.adyen.checkout.core.Environment.TEST)
         assertEquals(dropInConfiguration.clientKey, TEST_CLIENT_KEY)
-        assertEquals(dropInConfiguration.shopperLocale, Locale.US)
+        assertEquals(dropInConfiguration.shopperLocale.toLanguageTag(), "en-US")
         assertEquals(dropInConfiguration.amount?.currency, "USD")
         assertEquals(dropInConfiguration.amount?.value, 1824)
         assertEquals(dropInConfiguration.showPreselectedStoredPaymentMethod, false)
