@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:adyen_checkout/adyen_checkout.dart';
 import 'package:adyen_checkout/src/generated/platform_api.g.dart';
 
@@ -15,7 +17,7 @@ extension DropInConfigurationMapper on DropInConfiguration {
         clientKey: clientKey,
         countryCode: countryCode.toUpperCase(),
         amount: amount.toDTO(),
-        shopperLocale: shopperLocale,
+        shopperLocale: shopperLocale ?? Platform.localeName,
         cardConfigurationDTO: cardConfiguration?.toDTO(),
         applePayConfigurationDTO: applePayConfiguration?.toDTO(),
         googlePayConfigurationDTO: googlePayConfiguration?.toDTO(),
