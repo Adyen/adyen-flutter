@@ -23,7 +23,7 @@ jobs:
     needs: [ prepare ]
     uses: ./.github/workflows/flutter_tests.yml
     with:
-      flutter-version: ${{ needs.prepare.FLUTTER_VERSION }}
+      flutter-version: ${{ needs.prepare.outputs.FLUTTER_VERSION }}
   test_android:
     name: Android tests
     uses: ./.github/workflows/android_tests.yml
