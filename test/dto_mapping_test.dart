@@ -10,11 +10,13 @@ void main() {
     const countryCode = "US";
     const currency = "USD";
     const amountValue = 1286;
+    const shopperLocal = "en-US";
     final dropInConfiguration = DropInConfiguration(
       environment: Environment.test,
       clientKey: demoClientKey,
       countryCode: countryCode,
       amount: Amount(value: amountValue, currency: currency),
+      shopperLocale: shopperLocal,
     );
     final dropInConfigurationDto = dropInConfiguration.toDTO("0.0.1");
 
@@ -24,7 +26,7 @@ void main() {
     expect(dropInConfigurationDto.amount.value, amountValue);
     expect(dropInConfigurationDto.amount.currency, currency);
     expect(dropInConfigurationDto.amount.runtimeType == AmountDTO, true);
-    expect(dropInConfigurationDto.shopperLocale, null);
+    expect(dropInConfigurationDto.shopperLocale, "en-US");
     expect(dropInConfigurationDto.cardConfigurationDTO, null);
     expect(dropInConfigurationDto.applePayConfigurationDTO, null);
     expect(dropInConfigurationDto.googlePayConfigurationDTO, null);
