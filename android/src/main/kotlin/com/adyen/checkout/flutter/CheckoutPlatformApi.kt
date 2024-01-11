@@ -4,6 +4,7 @@ import CardComponentConfigurationDTO
 import CheckoutPlatformInterface
 import DropInConfigurationDTO
 import SessionDTO
+import android.annotation.SuppressLint
 import android.util.Log
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.lifecycleScope
@@ -24,7 +25,6 @@ import com.adyen.checkout.sessions.core.SessionSetupResponse
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-@Suppress("NAME_SHADOWING")
 class CheckoutPlatformApi(
     private val sessionHolder: SessionHolder,
 ) : CheckoutPlatformInterface {
@@ -103,6 +103,7 @@ class CheckoutPlatformApi(
         }
     }
 
+    @SuppressLint("RestrictedApi")
     override fun enableConsoleLogging(loggingEnabled: Boolean) {
         if (loggingEnabled) {
             AdyenLogger.setLogLevel(Log.VERBOSE)

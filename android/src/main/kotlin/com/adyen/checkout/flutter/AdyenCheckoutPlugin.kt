@@ -83,15 +83,17 @@ class AdyenCheckoutPlugin : FlutterPlugin, ActivityAware {
         }
 
         componentFlutterApi?.let {
-            flutterPluginBinding?.platformViewRegistry?.registerViewFactory(
-                CARD_COMPONENT_ADVANCED,
-                CardComponentFactory(fragmentActivity, it, CARD_COMPONENT_ADVANCED)
-            )
+            flutterPluginBinding?.apply {
+                platformViewRegistry.registerViewFactory(
+                    CARD_COMPONENT_ADVANCED,
+                    CardComponentFactory(fragmentActivity, it, CARD_COMPONENT_ADVANCED)
+                )
 
-            flutterPluginBinding?.platformViewRegistry?.registerViewFactory(
-                CARD_COMPONENT_SESSION,
-                CardComponentFactory(fragmentActivity, it, CARD_COMPONENT_SESSION, sessionHolder)
-            )
+                platformViewRegistry.registerViewFactory(
+                    CARD_COMPONENT_SESSION,
+                    CardComponentFactory(fragmentActivity, it, CARD_COMPONENT_SESSION, sessionHolder)
+                )
+            }
         }
     }
 
@@ -99,15 +101,19 @@ class AdyenCheckoutPlugin : FlutterPlugin, ActivityAware {
         return LifecycleEventObserver { _, event ->
             when (event) {
                 Lifecycle.Event.ON_CREATE -> {
-                    dropInPlatformApi?.sessionDropInCallback?.let {
-                        dropInPlatformApi?.dropInSessionLauncher = DropIn.registerForDropInResult(fragmentActivity, it)
-                    }
-
-                    dropInPlatformApi?.dropInAdvancedFlowCallback?.let {
-                        dropInPlatformApi?.dropInAdvancedFlowLauncher =
+                    dropInPlatformApi?.apply {
+                        dropInSessionLauncher =
                             DropIn.registerForDropInResult(
                                 fragmentActivity,
-                                it
+                                sessionDropInCallback,
+                            )
+                    }
+
+                    dropInPlatformApi?.apply {
+                        dropInAdvancedFlowLauncher =
+                            DropIn.registerForDropInResult(
+                                fragmentActivity,
+                                dropInAdvancedFlowCallback,
                             )
                     }
                 }
