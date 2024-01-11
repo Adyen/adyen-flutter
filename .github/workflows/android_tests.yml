@@ -43,5 +43,8 @@ jobs:
       - name: Init gradle wrapper
         run: gradle wrapper
 
+      - name: Lint check
+        run: ./gradlew ktlintCheck
+
       - name: Execute unit tests
         run: ./gradlew testDebugUnitTest
