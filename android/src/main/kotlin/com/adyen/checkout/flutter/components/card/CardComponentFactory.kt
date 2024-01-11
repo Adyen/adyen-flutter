@@ -15,20 +15,21 @@ class CardComponentFactory(
     private val viewTypeId: String,
     private val sessionHolder: SessionHolder? = null,
 ) : PlatformViewFactory(ComponentFlutterInterface.codec) {
-
     companion object {
-        const val cardComponentAdvancedId = "cardComponentAdvanced"
-        const val cardComponentSessionId = "cardComponentSession"
+        const val CARD_COMPONENT_ADVANCED = "cardComponentAdvanced"
+        const val CARD_COMPONENT_SESSION = "cardComponentSession"
     }
 
-    override fun create(context: Context, viewId: Int, args: Any?): PlatformView {
+    override fun create(
+        context: Context,
+        viewId: Int,
+        args: Any?
+    ): PlatformView {
         val creationParams = args as Map<*, *>? ?: emptyMap<Any, Any>()
-        return if (viewTypeId == cardComponentSessionId && sessionHolder != null) {
+        return if (viewTypeId == CARD_COMPONENT_SESSION && sessionHolder != null) {
             CardSessionComponent(activity, componentFlutterApi, sessionHolder, context, viewId, creationParams)
         } else {
             CardAdvancedComponent(activity, componentFlutterApi, context, viewId, creationParams)
-
         }
     }
 }
-

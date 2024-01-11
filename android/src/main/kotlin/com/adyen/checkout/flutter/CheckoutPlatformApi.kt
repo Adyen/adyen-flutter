@@ -35,7 +35,8 @@ class CheckoutPlatformApi(
     }
 
     override fun createSession(
-        sessionId: String, sessionData: String,
+        sessionId: String,
+        sessionData: String,
         configuration: Any?,
         callback: (Result<SessionDTO>) -> Unit,
     ) {
@@ -44,14 +45,16 @@ class CheckoutPlatformApi(
             determineSessionConfiguration(configuration)?.let { sessionConfiguration ->
                 when (val sessionResult = CheckoutSessionProvider.createSession(sessionModel, sessionConfiguration)) {
                     is CheckoutSessionResult.Error -> callback(Result.failure(sessionResult.exception))
-                    is CheckoutSessionResult.Success -> onSessionSuccessfullyCreated(
-                        sessionResult, sessionModel, callback
-                    )
+                    is CheckoutSessionResult.Success ->
+                        onSessionSuccessfullyCreated(
+                            sessionResult,
+                            sessionModel,
+                            callback
+                        )
                 }
             }
         }
     }
-
 
     private fun determineSessionConfiguration(configuration: Any?): Configuration? {
         when (configuration) {
@@ -82,9 +85,10 @@ class CheckoutPlatformApi(
         with(sessionResult.checkoutSession) {
             val sessionResponse = SessionSetupResponse.SERIALIZER.serialize(sessionSetupResponse)
             val orderResponse = order?.let { OrderRequest.SERIALIZER.serialize(it) }
-            val paymentMethodsJsonObject = sessionSetupResponse.paymentMethodsApiResponse?.let {
-                PaymentMethodsApiResponse.SERIALIZER.serialize(it)
-            }
+            val paymentMethodsJsonObject =
+                sessionSetupResponse.paymentMethodsApiResponse?.let {
+                    PaymentMethodsApiResponse.SERIALIZER.serialize(it)
+                }
             sessionHolder.sessionSetupResponse = sessionResponse
             sessionHolder.orderResponse = orderResponse
             callback(

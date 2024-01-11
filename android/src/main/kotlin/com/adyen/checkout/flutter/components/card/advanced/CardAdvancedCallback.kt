@@ -14,27 +14,30 @@ class CardAdvancedCallback(private val componentFlutterApi: ComponentFlutterInte
     ComponentCallback<CardComponentState> {
     override fun onSubmit(state: CardComponentState) {
         val paymentComponentJson = PaymentComponentData.SERIALIZER.serialize(state.data)
-        val model = ComponentCommunicationModel(
-            ComponentCommunicationType.ONSUBMIT,
-            data = paymentComponentJson.toString(),
-        )
+        val model =
+            ComponentCommunicationModel(
+                ComponentCommunicationType.ONSUBMIT,
+                data = paymentComponentJson.toString(),
+            )
         componentFlutterApi.onComponentCommunication(model) {}
     }
 
     override fun onAdditionalDetails(actionComponentData: ActionComponentData) {
         val actionComponentJson = ActionComponentData.SERIALIZER.serialize(actionComponentData)
-        val model = ComponentCommunicationModel(
-            ComponentCommunicationType.ADDITIONALDETAILS,
-            data = actionComponentJson.toString(),
-        )
+        val model =
+            ComponentCommunicationModel(
+                ComponentCommunicationType.ADDITIONALDETAILS,
+                data = actionComponentJson.toString(),
+            )
         componentFlutterApi.onComponentCommunication(model) {}
     }
 
     override fun onError(componentError: ComponentError) {
-        val model = ComponentCommunicationModel(
-            ComponentCommunicationType.ERROR,
-            data = componentError.exception.toString(),
-        )
+        val model =
+            ComponentCommunicationModel(
+                ComponentCommunicationType.ERROR,
+                data = componentError.exception.toString(),
+            )
         componentFlutterApi.onComponentCommunication(model) {}
     }
 

@@ -49,10 +49,11 @@ class AdvancedDropInService : DropInService(), LifecycleOwner {
     override fun onRemoveStoredPaymentMethod(storedPaymentMethod: StoredPaymentMethod) {
         storedPaymentMethod.id?.let { storedPaymentMethodId ->
             setStoredPaymentMethodDeletionObserver()
-            val dropInStoredPaymentMethodDeletionModel = DropInStoredPaymentMethodDeletionModel(
-                storedPaymentMethodId,
-                DropInType.ADVANCED_FLOW
-            )
+            val dropInStoredPaymentMethodDeletionModel =
+                DropInStoredPaymentMethodDeletionModel(
+                    storedPaymentMethodId,
+                    DropInType.ADVANCED_FLOW
+                )
             DropInPaymentMethodDeletionPlatformMessenger.sendResult(dropInStoredPaymentMethodDeletionModel)
         } ?: run {
             sendRecurringResult(RecurringDropInServiceResult.Error(errorDialog = ErrorDialog()))
@@ -112,31 +113,35 @@ class AdvancedDropInService : DropInService(), LifecycleOwner {
         }
     }
 
-    private fun mapToDeletionDropInResult(deleteStoredPaymentMethodResultDTO: DeletedStoredPaymentMethodResultDTO?):
-        RecurringDropInServiceResult {
+    private fun mapToDeletionDropInResult(
+        deleteStoredPaymentMethodResultDTO: DeletedStoredPaymentMethodResultDTO?
+    ): RecurringDropInServiceResult {
         return if (deleteStoredPaymentMethodResultDTO?.isSuccessfullyRemoved == true) {
             RecurringDropInServiceResult.PaymentMethodRemoved(deleteStoredPaymentMethodResultDTO.storedPaymentMethodId)
         } else {
             // TODO - the error message should be provided by the native SDK
             RecurringDropInServiceResult.Error(
-                errorDialog = ErrorDialog(
-                    message = "Removal of the stored payment method failed. Please try again later."
-                )
+                errorDialog =
+                    ErrorDialog(
+                        message = "Removal of the stored payment method failed. Please try again later."
+                    )
             )
         }
     }
 
     private fun mapToDropInServiceResult(paymentEventDTO: PaymentEventDTO?): DropInServiceResult {
         return when (paymentEventDTO?.paymentEventType) {
-            PaymentEventType.FINISHED -> DropInServiceResult.Finished(
-                result = "${paymentEventDTO.result}"
-            )
+            PaymentEventType.FINISHED ->
+                DropInServiceResult.Finished(
+                    result = "${paymentEventDTO.result}"
+                )
 
-            PaymentEventType.ERROR -> DropInServiceResult.Error(
-                errorDialog = buildErrorDialog(paymentEventDTO.error),
-                reason = paymentEventDTO.error?.reason,
-                dismissDropIn = paymentEventDTO.error?.dismissDropIn ?: false
-            )
+            PaymentEventType.ERROR ->
+                DropInServiceResult.Error(
+                    errorDialog = buildErrorDialog(paymentEventDTO.error),
+                    reason = paymentEventDTO.error?.reason,
+                    dismissDropIn = paymentEventDTO.error?.dismissDropIn ?: false
+                )
 
             PaymentEventType.ACTION -> {
                 if (paymentEventDTO.actionResponse == null) {
@@ -151,11 +156,12 @@ class AdvancedDropInService : DropInService(), LifecycleOwner {
                 }
             }
 
-            null -> DropInServiceResult.Error(
-                errorDialog = null,
-                reason = "IOException",
-                dismissDropIn = true
-            )
+            null ->
+                DropInServiceResult.Error(
+                    errorDialog = null,
+                    reason = "IOException",
+                    dismissDropIn = true
+                )
         }
     }
 
@@ -178,12 +184,19 @@ class AdvancedDropInService : DropInService(), LifecycleOwner {
     }
 
     @Deprecated("Deprecated in Java")
-    override fun onStart(intent: Intent?, startId: Int) {
+    override fun onStart(
+        intent: Intent?,
+        startId: Int
+    ) {
         dispatcher.onServicePreSuperOnStart()
         super.onStart(intent, startId)
     }
 
-    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+    override fun onStartCommand(
+        intent: Intent?,
+        flags: Int,
+        startId: Int
+    ): Int {
         dispatcher.onServicePreSuperOnStart()
         return super.onStartCommand(intent, flags, startId)
     }
