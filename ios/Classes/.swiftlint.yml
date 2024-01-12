@@ -1,0 +1,12 @@
+disabled_rules:
+  - todo
+  - force_cast
+
+excluded:
+  - PlatformApi.swift
+
+line_length:
+  warning: 200
+
+file_length:
+  warning: 500

@@ -25,7 +25,7 @@ class ConfigurationMapper {
                 allowedCardTypes: allowedCardTypes,
                 billingAddress: billingAddressConfiguration
             )
-            if let shopperLocal = dropInConfigurationDTO.shopperLocale  {
+            if let shopperLocal = dropInConfigurationDTO.shopperLocale {
                 dropInConfiguration.localizationParameters = LocalizationParameters(enforcedLocale: shopperLocal)
             }
             dropInConfiguration.card = cardConfiguration
@@ -116,7 +116,7 @@ extension DropInConfigurationDTO {
 }
 
 extension CardConfigurationDTO {
-    func mapToCardComponentConfiguration(shopperLocale : String?) -> CardComponent.Configuration {
+    func mapToCardComponentConfiguration(shopperLocale: String?) -> CardComponent.Configuration {
         var formComponentStyle = FormComponentStyle()
         formComponentStyle.backgroundColor = UIColor.white
         let localizationParameters = shopperLocale != nil ? LocalizationParameters(enforcedLocale: shopperLocale!) : nil
@@ -203,6 +203,6 @@ extension Environment {
 
 extension AmountDTO {
     func mapToAmount() -> Adyen.Amount {
-        return Adyen.Amount(value: Int(value), currencyCode: currency)
+        Adyen.Amount(value: Int(value), currencyCode: currency)
     }
 }

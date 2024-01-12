@@ -42,7 +42,7 @@ class DropInPlatformApi: DropInPlatformInterface {
             dropInComponent.delegate = sessionHolder.session
             dropInComponent.partialPaymentDelegate = sessionHolder.session
             if dropInConfigurationDTO.isRemoveStoredPaymentMethodEnabled {
-                dropInComponent.storedPaymentMethodsDelegate = self.dropInSessionStoredPaymentMethodsDelegate
+                dropInComponent.storedPaymentMethodsDelegate = dropInSessionStoredPaymentMethodsDelegate
             }
             self.dropInComponent = dropInComponent
             self.viewController?.present(dropInComponent.viewController, animated: true)

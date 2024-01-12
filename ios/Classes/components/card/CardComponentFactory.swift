@@ -22,7 +22,7 @@ class CardComponentFactory: ComponentFactory {
         viewIdentifier viewId: Int64,
         arguments args: Any?
     ) -> FlutterPlatformView {
-        if (viewTypeId == CardComponentFactory.cardComponentSessionId && sessionHolder != nil) {
+        if viewTypeId == CardComponentFactory.cardComponentSessionId, sessionHolder != nil {
             return CardSessionComponent(
                 frame: frame,
                 viewIdentifier: viewId,

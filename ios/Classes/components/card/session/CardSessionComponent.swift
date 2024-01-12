@@ -37,7 +37,7 @@ class CardSessionComponent: BaseCardComponent {
     }
 
     private func setupCardComponent() throws -> CardComponent {
-        guard let cardComponentConfiguration = cardComponentConfiguration else { throw PlatformError(errorDescription: "Card configuration not found") }
+        guard let cardComponentConfiguration else { throw PlatformError(errorDescription: "Card configuration not found") }
         guard let paymentMethodString = paymentMethod else { throw PlatformError(errorDescription: "Payment method not found") }
         guard let session = sessionHolder.session else { throw PlatformError(errorDescription: "Session not found") }
         let cardComponent = try buildCardComponent(paymentMethodString: paymentMethodString, cardComponentConfiguration: cardComponentConfiguration, session: session)

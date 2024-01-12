@@ -42,7 +42,7 @@ class CardAdvancedComponent: BaseCardComponent {
     }
 
     private func setupCardComponent() throws -> CardComponent {
-        guard let cardComponentConfiguration = cardComponentConfiguration else { throw PlatformError(errorDescription: "Card configuration not found") }
+        guard let cardComponentConfiguration else { throw PlatformError(errorDescription: "Card configuration not found") }
         guard let paymentMethodString = paymentMethod else { throw PlatformError(errorDescription: "Payment method not found") }
         let cardComponent = try buildCardComponent(paymentMethodString: paymentMethodString, isStoredPaymentMethod: isStoredPaymentMethod, cardComponentConfiguration: cardComponentConfiguration)
         cardDelegate = CardAdvancedFlowDelegate(componentFlutterApi: componentFlutterApi)

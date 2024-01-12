@@ -38,7 +38,7 @@ class BaseCardComponent: NSObject, FlutterPlatformView, UIScrollViewDelegate {
     }
 
     func view() -> UIView {
-        return componentWrapperView
+        componentWrapperView
     }
 
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
