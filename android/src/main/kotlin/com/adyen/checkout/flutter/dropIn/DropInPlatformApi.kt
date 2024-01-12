@@ -49,6 +49,7 @@ class DropInPlatformApi(
     lateinit var activity: FragmentActivity
     lateinit var dropInSessionLauncher: ActivityResultLauncher<SessionDropInResultContractParams>
     lateinit var dropInAdvancedFlowLauncher: ActivityResultLauncher<DropInResultContractParams>
+
     override fun showDropInSession(dropInConfigurationDTO: DropInConfigurationDTO) {
         setStoredPaymentMethodDeletionObserver()
         val dropInConfiguration = dropInConfigurationDTO.mapToDropInConfiguration(activity.applicationContext)
@@ -69,9 +70,10 @@ class DropInPlatformApi(
         setAdvancedFlowDropInServiceObserver()
         setStoredPaymentMethodDeletionObserver()
         activity.lifecycleScope.launch(Dispatchers.IO) {
-            val paymentMethodsApiResponse = PaymentMethodsApiResponse.SERIALIZER.deserialize(
-                JSONObject(paymentMethodsResponse),
-            )
+            val paymentMethodsApiResponse =
+                PaymentMethodsApiResponse.SERIALIZER.deserialize(
+                    JSONObject(paymentMethodsResponse),
+                )
             val paymentMethodsWithoutGiftCards = removeGiftCardPaymentMethods(paymentMethodsApiResponse)
             val dropInConfiguration = dropInConfigurationDTO.mapToDropInConfiguration(activity.applicationContext)
             withContext(Dispatchers.Main) {
@@ -110,7 +112,6 @@ class DropInPlatformApi(
         DropInAdditionalDetailsPlatformMessenger.instance().removeObservers(activity)
     }
 
-
     private fun setAdvancedFlowDropInServiceObserver() {
         DropInServiceResultMessenger.instance().removeObservers(activity)
         DropInServiceResultMessenger.instance().observe(activity) { message ->
@@ -118,10 +119,11 @@ class DropInPlatformApi(
                 return@observe
             }
 
-            val model = PlatformCommunicationModel(
-                PlatformCommunicationType.PAYMENTCOMPONENT,
-                data = message.contentIfNotHandled.toString(),
-            )
+            val model =
+                PlatformCommunicationModel(
+                    PlatformCommunicationType.PAYMENTCOMPONENT,
+                    data = message.contentIfNotHandled.toString(),
+                )
             dropInFlutterApi.onDropInAdvancedPlatformCommunication(model) {}
         }
     }
@@ -134,19 +136,22 @@ class DropInPlatformApi(
             }
 
             val dropInStoredPaymentMethodDeletionModel = message.contentIfNotHandled
-            val platformCommunicationModel = PlatformCommunicationModel(
-                PlatformCommunicationType.DELETESTOREDPAYMENTMETHOD,
-                data = dropInStoredPaymentMethodDeletionModel?.storedPaymentMethodId,
-            )
+            val platformCommunicationModel =
+                PlatformCommunicationModel(
+                    PlatformCommunicationType.DELETESTOREDPAYMENTMETHOD,
+                    data = dropInStoredPaymentMethodDeletionModel?.storedPaymentMethodId,
+                )
 
             when (dropInStoredPaymentMethodDeletionModel?.dropInFlowType) {
-                DropInType.SESSION -> dropInFlutterApi.onDropInSessionPlatformCommunication(
-                    platformCommunicationModel
-                ) {}
+                DropInType.SESSION ->
+                    dropInFlutterApi.onDropInSessionPlatformCommunication(
+                        platformCommunicationModel
+                    ) {}
 
-                DropInType.ADVANCED_FLOW -> dropInFlutterApi.onDropInAdvancedPlatformCommunication(
-                    platformCommunicationModel
-                ) {}
+                DropInType.ADVANCED_FLOW ->
+                    dropInFlutterApi.onDropInAdvancedPlatformCommunication(
+                        platformCommunicationModel
+                    ) {}
 
                 null -> return@observe
             }
@@ -160,10 +165,11 @@ class DropInPlatformApi(
                 return@observe
             }
 
-            val platformCommunicationModel = PlatformCommunicationModel(
-                PlatformCommunicationType.ADDITIONALDETAILS,
-                data = message.contentIfNotHandled.toString(),
-            )
+            val platformCommunicationModel =
+                PlatformCommunicationModel(
+                    PlatformCommunicationType.ADDITIONALDETAILS,
+                    data = message.contentIfNotHandled.toString(),
+                )
 
             dropInFlutterApi.onDropInAdvancedPlatformCommunication(platformCommunicationModel) {}
         }
@@ -185,64 +191,91 @@ class DropInPlatformApi(
         val paymentMethods = paymentMethodsResponse.paymentMethods?.filterNot { it.type == giftCardTypeIdentifier }
 
         return PaymentMethodsApiResponse(
-            storedPaymentMethods = storedPaymentMethods, paymentMethods = paymentMethods
+            storedPaymentMethods = storedPaymentMethods,
+            paymentMethods = paymentMethods
         )
     }
 
-    val sessionDropInCallback = SessionDropInCallback { sessionDropInResult ->
-        if (sessionDropInResult == null) {
-            return@SessionDropInCallback
-        }
+    val sessionDropInCallback =
+        SessionDropInCallback { sessionDropInResult ->
+            if (sessionDropInResult == null) {
+                return@SessionDropInCallback
+            }
 
-        val mappedResult = when (sessionDropInResult) {
-            is SessionDropInResult.CancelledByUser -> PaymentResultDTO(
-                PaymentResultEnum.CANCELLEDBYUSER
-            )
+            val mappedResult =
+                when (sessionDropInResult) {
+                    is SessionDropInResult.CancelledByUser ->
+                        PaymentResultDTO(
+                            PaymentResultEnum.CANCELLEDBYUSER
+                        )
 
-            is SessionDropInResult.Error -> PaymentResultDTO(
-                PaymentResultEnum.ERROR, reason = sessionDropInResult.reason
-            )
+                    is SessionDropInResult.Error ->
+                        PaymentResultDTO(
+                            PaymentResultEnum.ERROR,
+                            reason = sessionDropInResult.reason
+                        )
 
-            is SessionDropInResult.Finished -> PaymentResultDTO(
-                PaymentResultEnum.FINISHED,
-                result = with(sessionDropInResult.result) {
-                    PaymentResultModelDTO(
-                        sessionId, sessionData, sessionResult, resultCode, order?.mapToOrderResponseModel()
-                    )
-                })
-        }
+                    is SessionDropInResult.Finished ->
+                        PaymentResultDTO(
+                            PaymentResultEnum.FINISHED,
+                            result =
+                                with(sessionDropInResult.result) {
+                                    PaymentResultModelDTO(
+                                        sessionId,
+                                        sessionData,
+                                        sessionResult,
+                                        resultCode,
+                                        order?.mapToOrderResponseModel()
+                                    )
+                                }
+                        )
+                }
 
-        val platformCommunicationModel = PlatformCommunicationModel(
-            PlatformCommunicationType.RESULT, data = "", paymentResult = mappedResult
-        )
-
-        dropInFlutterApi.onDropInSessionPlatformCommunication(platformCommunicationModel) {}
-    }
-
-    val dropInAdvancedFlowCallback = DropInCallback { dropInAdvancedFlowResult ->
-        if (dropInAdvancedFlowResult == null) {
-            return@DropInCallback
-        }
-
-        val mappedResult = when (dropInAdvancedFlowResult) {
-            is DropInResult.CancelledByUser -> PaymentResultDTO(
-                PaymentResultEnum.CANCELLEDBYUSER
-            )
-
-            is DropInResult.Error -> PaymentResultDTO(
-                PaymentResultEnum.ERROR, reason = dropInAdvancedFlowResult.reason
-            )
-
-            is DropInResult.Finished -> PaymentResultDTO(
-                PaymentResultEnum.FINISHED, result = PaymentResultModelDTO(
-                    resultCode = dropInAdvancedFlowResult.result
+            val platformCommunicationModel =
+                PlatformCommunicationModel(
+                    PlatformCommunicationType.RESULT,
+                    data = "",
+                    paymentResult = mappedResult
                 )
-            )
+
+            dropInFlutterApi.onDropInSessionPlatformCommunication(platformCommunicationModel) {}
         }
 
-        val platformCommunicationModel = PlatformCommunicationModel(
-            PlatformCommunicationType.RESULT, data = "", paymentResult = mappedResult
-        )
-        dropInFlutterApi.onDropInAdvancedPlatformCommunication(platformCommunicationModel) {}
-    }
+    val dropInAdvancedFlowCallback =
+        DropInCallback { dropInAdvancedFlowResult ->
+            if (dropInAdvancedFlowResult == null) {
+                return@DropInCallback
+            }
+
+            val mappedResult =
+                when (dropInAdvancedFlowResult) {
+                    is DropInResult.CancelledByUser ->
+                        PaymentResultDTO(
+                            PaymentResultEnum.CANCELLEDBYUSER
+                        )
+
+                    is DropInResult.Error ->
+                        PaymentResultDTO(
+                            PaymentResultEnum.ERROR,
+                            reason = dropInAdvancedFlowResult.reason
+                        )
+
+                    is DropInResult.Finished ->
+                        PaymentResultDTO(
+                            PaymentResultEnum.FINISHED,
+                            result =
+                                PaymentResultModelDTO(
+                                    resultCode = dropInAdvancedFlowResult.result
+                                )
+                        )
+                }
+
+            val platformCommunicationModel =
+                PlatformCommunicationModel(
+                    PlatformCommunicationType.RESULT,
+                    data = "",
+                    paymentResult = mappedResult
+                )
+            dropInFlutterApi.onDropInAdvancedPlatformCommunication(platformCommunicationModel) {}
+        }
 }

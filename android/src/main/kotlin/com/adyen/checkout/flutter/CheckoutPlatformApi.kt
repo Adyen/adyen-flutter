@@ -4,6 +4,7 @@ import CardComponentConfigurationDTO
 import CheckoutPlatformInterface
 import DropInConfigurationDTO
 import SessionDTO
+import android.annotation.SuppressLint
 import android.util.Log
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.lifecycleScope
@@ -24,7 +25,6 @@ import com.adyen.checkout.sessions.core.SessionSetupResponse
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-@Suppress("NAME_SHADOWING")
 class CheckoutPlatformApi(
     private val sessionHolder: SessionHolder,
 ) : CheckoutPlatformInterface {
@@ -35,7 +35,8 @@ class CheckoutPlatformApi(
     }
 
     override fun createSession(
-        sessionId: String, sessionData: String,
+        sessionId: String,
+        sessionData: String,
         configuration: Any?,
         callback: (Result<SessionDTO>) -> Unit,
     ) {
@@ -44,14 +45,16 @@ class CheckoutPlatformApi(
             determineSessionConfiguration(configuration)?.let { sessionConfiguration ->
                 when (val sessionResult = CheckoutSessionProvider.createSession(sessionModel, sessionConfiguration)) {
                     is CheckoutSessionResult.Error -> callback(Result.failure(sessionResult.exception))
-                    is CheckoutSessionResult.Success -> onSessionSuccessfullyCreated(
-                        sessionResult, sessionModel, callback
-                    )
+                    is CheckoutSessionResult.Success ->
+                        onSessionSuccessfullyCreated(
+                            sessionResult,
+                            sessionModel,
+                            callback
+                        )
                 }
             }
         }
     }
-
 
     private fun determineSessionConfiguration(configuration: Any?): Configuration? {
         when (configuration) {
@@ -82,9 +85,10 @@ class CheckoutPlatformApi(
         with(sessionResult.checkoutSession) {
             val sessionResponse = SessionSetupResponse.SERIALIZER.serialize(sessionSetupResponse)
             val orderResponse = order?.let { OrderRequest.SERIALIZER.serialize(it) }
-            val paymentMethodsJsonObject = sessionSetupResponse.paymentMethodsApiResponse?.let {
-                PaymentMethodsApiResponse.SERIALIZER.serialize(it)
-            }
+            val paymentMethodsJsonObject =
+                sessionSetupResponse.paymentMethodsApiResponse?.let {
+                    PaymentMethodsApiResponse.SERIALIZER.serialize(it)
+                }
             sessionHolder.sessionSetupResponse = sessionResponse
             sessionHolder.orderResponse = orderResponse
             callback(
@@ -99,6 +103,7 @@ class CheckoutPlatformApi(
         }
     }
 
+    @SuppressLint("RestrictedApi")
     override fun enableConsoleLogging(loggingEnabled: Boolean) {
         if (loggingEnabled) {
             AdyenLogger.setLogLevel(Log.VERBOSE)

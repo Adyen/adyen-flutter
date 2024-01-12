@@ -11,8 +11,8 @@ import androidx.lifecycle.LifecycleEventObserver
 import com.adyen.checkout.dropin.DropIn
 import com.adyen.checkout.flutter.components.ComponentPlatformApi
 import com.adyen.checkout.flutter.components.card.CardComponentFactory
-import com.adyen.checkout.flutter.components.card.CardComponentFactory.Companion.cardComponentAdvancedId
-import com.adyen.checkout.flutter.components.card.CardComponentFactory.Companion.cardComponentSessionId
+import com.adyen.checkout.flutter.components.card.CardComponentFactory.Companion.CARD_COMPONENT_ADVANCED
+import com.adyen.checkout.flutter.components.card.CardComponentFactory.Companion.CARD_COMPONENT_SESSION
 import com.adyen.checkout.flutter.dropIn.DropInPlatformApi
 import com.adyen.checkout.flutter.session.SessionHolder
 import com.adyen.checkout.flutter.utils.Constants.Companion.WRONG_FLUTTER_ACTIVITY_USAGE_ERROR_MESSAGE
@@ -39,12 +39,12 @@ class AdyenCheckoutPlugin : FlutterPlugin, ActivityAware {
         checkoutPlatformApi = CheckoutPlatformApi(sessionHolder)
         CheckoutPlatformInterface.setUp(flutterPluginBinding.binaryMessenger, checkoutPlatformApi)
 
-        //DropIn init
+        // DropIn init
         dropInFlutterApi = DropInFlutterInterface(flutterPluginBinding.binaryMessenger)
         dropInFlutterApi?.let { dropInPlatformApi = DropInPlatformApi(it, sessionHolder) }
         DropInPlatformInterface.setUp(flutterPluginBinding.binaryMessenger, dropInPlatformApi)
 
-        //Component init
+        // Component init
         componentFlutterApi = ComponentFlutterInterface(flutterPluginBinding.binaryMessenger)
         componentPlatformApi = ComponentPlatformApi()
         ComponentPlatformInterface.setUp(flutterPluginBinding.binaryMessenger, componentPlatformApi)
@@ -61,9 +61,10 @@ class AdyenCheckoutPlugin : FlutterPlugin, ActivityAware {
 
     override fun onDetachedFromActivityForConfigChanges() = teardown()
 
-    override fun onReattachedToActivityForConfigChanges(binding: ActivityPluginBinding) = setupActivity(
-        binding
-    )
+    override fun onReattachedToActivityForConfigChanges(binding: ActivityPluginBinding) =
+        setupActivity(
+            binding
+        )
 
     override fun onDetachedFromActivity() = teardown()
 
@@ -82,14 +83,17 @@ class AdyenCheckoutPlugin : FlutterPlugin, ActivityAware {
         }
 
         componentFlutterApi?.let {
-            flutterPluginBinding?.platformViewRegistry?.registerViewFactory(
-                cardComponentAdvancedId, CardComponentFactory(fragmentActivity, it, cardComponentAdvancedId)
-            )
+            flutterPluginBinding?.apply {
+                platformViewRegistry.registerViewFactory(
+                    CARD_COMPONENT_ADVANCED,
+                    CardComponentFactory(fragmentActivity, it, CARD_COMPONENT_ADVANCED)
+                )
 
-            flutterPluginBinding?.platformViewRegistry?.registerViewFactory(
-                cardComponentSessionId,
-                CardComponentFactory(fragmentActivity, it, cardComponentSessionId, sessionHolder)
-            )
+                platformViewRegistry.registerViewFactory(
+                    CARD_COMPONENT_SESSION,
+                    CardComponentFactory(fragmentActivity, it, CARD_COMPONENT_SESSION, sessionHolder)
+                )
+            }
         }
     }
 
@@ -97,14 +101,20 @@ class AdyenCheckoutPlugin : FlutterPlugin, ActivityAware {
         return LifecycleEventObserver { _, event ->
             when (event) {
                 Lifecycle.Event.ON_CREATE -> {
-                    dropInPlatformApi?.sessionDropInCallback?.let {
-                        dropInPlatformApi?.dropInSessionLauncher = DropIn.registerForDropInResult(fragmentActivity, it)
+                    dropInPlatformApi?.apply {
+                        dropInSessionLauncher =
+                            DropIn.registerForDropInResult(
+                                fragmentActivity,
+                                sessionDropInCallback,
+                            )
                     }
 
-                    dropInPlatformApi?.dropInAdvancedFlowCallback?.let {
-                        dropInPlatformApi?.dropInAdvancedFlowLauncher = DropIn.registerForDropInResult(
-                            fragmentActivity, it
-                        )
+                    dropInPlatformApi?.apply {
+                        dropInAdvancedFlowLauncher =
+                            DropIn.registerForDropInResult(
+                                fragmentActivity,
+                                dropInAdvancedFlowCallback,
+                            )
                     }
                 }
 
@@ -112,7 +122,6 @@ class AdyenCheckoutPlugin : FlutterPlugin, ActivityAware {
             }
         }
     }
-
 
     private fun teardown() {
         lifecycleObserver?.let {

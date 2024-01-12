@@ -76,10 +76,11 @@ internal class CardAdvancedComponent(
 
     private fun adjustCardComponentLayout(flutterView: View) {
         val adyenComponentView = flutterView.findViewById<AdyenComponentView>(R.id.adyen_component_view)
-        adyenComponentView.layoutParams = LinearLayout.LayoutParams(
-            ViewGroup.LayoutParams.MATCH_PARENT,
-            ViewGroup.LayoutParams.WRAP_CONTENT,
-        )
+        adyenComponentView.layoutParams =
+            LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+            )
     }
 
     private fun addActionListener() {
@@ -103,10 +104,11 @@ internal class CardAdvancedComponent(
                 return@observe
             }
 
-            val model = ComponentCommunicationModel(
-                ComponentCommunicationType.RESULT,
-                paymentResult = message.contentIfNotHandled,
-            )
+            val model =
+                ComponentCommunicationModel(
+                    ComponentCommunicationType.RESULT,
+                    paymentResult = message.contentIfNotHandled,
+                )
             componentFlutterApi.onComponentCommunication(model) {}
         }
     }
@@ -118,13 +120,12 @@ internal class CardAdvancedComponent(
                 return@observe
             }
 
-
-            val model = ComponentCommunicationModel(
-                ComponentCommunicationType.ERROR,
-                data = message.contentIfNotHandled?.errorMessage,
-            )
+            val model =
+                ComponentCommunicationModel(
+                    ComponentCommunicationType.ERROR,
+                    data = message.contentIfNotHandled?.errorMessage,
+                )
             componentFlutterApi.onComponentCommunication(model) {}
         }
     }
-
 }

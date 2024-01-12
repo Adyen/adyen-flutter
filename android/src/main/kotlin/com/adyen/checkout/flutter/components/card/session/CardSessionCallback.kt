@@ -18,17 +18,19 @@ class CardSessionCallback(
 ) :
     SessionComponentCallback<CardComponentState> {
     override fun onFinished(result: SessionPaymentResult) {
-        val paymentResult = PaymentResultModelDTO(
-            result.sessionId,
-            result.sessionData,
-            result.sessionResult,
-            result.resultCode,
-            result.order?.mapToOrderResponseModel()
-        )
-        val model = ComponentCommunicationModel(
-            ComponentCommunicationType.RESULT,
-            paymentResult = paymentResult
-        )
+        val paymentResult =
+            PaymentResultModelDTO(
+                result.sessionId,
+                result.sessionData,
+                result.sessionResult,
+                result.resultCode,
+                result.order?.mapToOrderResponseModel()
+            )
+        val model =
+            ComponentCommunicationModel(
+                ComponentCommunicationType.RESULT,
+                paymentResult = paymentResult
+            )
         componentFlutterApi.onComponentCommunication(model) {}
     }
 
@@ -37,10 +39,11 @@ class CardSessionCallback(
     }
 
     override fun onError(componentError: ComponentError) {
-        val model = ComponentCommunicationModel(
-            ComponentCommunicationType.ERROR,
-            data = componentError.exception.toString(),
-        )
+        val model =
+            ComponentCommunicationModel(
+                ComponentCommunicationType.ERROR,
+                data = componentError.exception.toString(),
+            )
         componentFlutterApi.onComponentCommunication(model) {}
     }
 
