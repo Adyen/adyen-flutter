@@ -107,12 +107,18 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
                                 presentationDelegate: sessionPresentationDelegate) { [weak self] result in
             switch result {
             case let .success(session):
-                // TODO: For a later version - We need to return the actual session and removing the session holder when the session is codable.
-                self?.sessionHolder.setup(session: session, sessionPresentationDelegate: sessionPresentationDelegate, sessionDelegate: sessionDelegate)
+                // TODO: For later  - We need to return the actual session and removing the session holder when the session is codable.
+                self?.sessionHolder.setup(
+                    session: session,
+                    sessionPresentationDelegate: sessionPresentationDelegate,
+                    sessionDelegate: sessionDelegate
+                )
                 // TODO: serialize paymentMethods
-                completion(Result.success(SessionDTO(id: sessionId,
-                                                     sessionData: sessionData,
-                                                     paymentMethodsJson: "")))
+                completion(Result.success(SessionDTO(
+                    id: sessionId,
+                    sessionData: sessionData,
+                    paymentMethodsJson: ""
+                )))
             case let .failure(error):
                 completion(Result.failure(error))
             }

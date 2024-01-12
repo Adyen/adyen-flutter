@@ -13,15 +13,31 @@ class CardSessionFlowDelegate: AdyenSessionDelegate {
         let resultCode = result.resultCode
         let success = resultCode == .authorised || resultCode == .received || resultCode == .pending
         finalizeAndDismissHandler?(success, { [weak self] in
-            let paymentResult = PaymentResultModelDTO(sessionId: session.sessionContext.identifier, sessionData: session.sessionContext.data, resultCode: result.resultCode.rawValue)
-            let componentCommunicationModel = ComponentCommunicationModel(type: ComponentCommunicationType.result, paymentResult: paymentResult)
-            self?.componentFlutterApi.onComponentCommunication(componentCommunicationModel: componentCommunicationModel, completion: { _ in })
+            let paymentResult = PaymentResultModelDTO(
+                sessionId: session.sessionContext.identifier,
+                sessionData: session.sessionContext.data,
+                resultCode: result.resultCode.rawValue
+            )
+            let componentCommunicationModel = ComponentCommunicationModel(
+                type: ComponentCommunicationType.result,
+                paymentResult: paymentResult
+            )
+            self?.componentFlutterApi.onComponentCommunication(
+                componentCommunicationModel: componentCommunicationModel,
+                completion: { _ in }
+            )
         })
     }
 
     func didFail(with error: Error, from _: Component, session _: AdyenSession) {
-        let componentCommunicationModel = ComponentCommunicationModel(type: ComponentCommunicationType.error, data: error.localizedDescription)
-        componentFlutterApi.onComponentCommunication(componentCommunicationModel: componentCommunicationModel, completion: { _ in })
+        let componentCommunicationModel = ComponentCommunicationModel(
+            type: ComponentCommunicationType.error,
+            data: error.localizedDescription
+        )
+        componentFlutterApi.onComponentCommunication(
+            componentCommunicationModel: componentCommunicationModel,
+            completion: { _ in }
+        )
     }
 
     func didOpenExternalApplication(component _: ActionComponent, session _: AdyenSession) {

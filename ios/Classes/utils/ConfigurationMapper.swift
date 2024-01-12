@@ -4,10 +4,13 @@ import PassKit
 
 class ConfigurationMapper {
     func createDropInConfiguration(dropInConfigurationDTO: DropInConfigurationDTO) throws -> DropInComponent.Configuration {
-        let dropInConfiguration = DropInComponent.Configuration(allowsSkippingPaymentList: dropInConfigurationDTO.skipListWhenSinglePaymentMethod,
-                                                                allowPreselectedPaymentView: dropInConfigurationDTO.showPreselectedStoredPaymentMethod)
+        let dropInConfiguration = DropInComponent.Configuration(
+            allowsSkippingPaymentList: dropInConfigurationDTO.skipListWhenSinglePaymentMethod,
+            allowPreselectedPaymentView: dropInConfigurationDTO.showPreselectedStoredPaymentMethod
+        )
 
-        dropInConfiguration.paymentMethodsList.allowDisablingStoredPaymentMethods = dropInConfigurationDTO.isRemoveStoredPaymentMethodEnabled
+        dropInConfiguration.paymentMethodsList.allowDisablingStoredPaymentMethods =
+            dropInConfigurationDTO.isRemoveStoredPaymentMethodEnabled
 
         if let cardConfigurationDTO = dropInConfigurationDTO.cardConfigurationDTO {
             let koreanAuthenticationMode = cardConfigurationDTO.kcpFieldVisibility.toCardFieldVisibility()
@@ -32,7 +35,11 @@ class ConfigurationMapper {
         }
 
         if let appleConfigurationDTO = dropInConfigurationDTO.applePayConfigurationDTO {
-            let appleConfiguration = try buildApplePayConfiguration(applePayConfigurationDTO: appleConfigurationDTO, amount: dropInConfigurationDTO.amount, countryCode: dropInConfigurationDTO.countryCode)
+            let appleConfiguration = try buildApplePayConfiguration(
+                applePayConfigurationDTO: appleConfigurationDTO,
+                amount: dropInConfigurationDTO.amount,
+                countryCode: dropInConfigurationDTO.countryCode
+            )
             dropInConfiguration.applePay = appleConfiguration
         }
 
@@ -73,22 +80,35 @@ class ConfigurationMapper {
         return billingAddressConfiguration
     }
 
-    private func buildApplePayConfiguration(applePayConfigurationDTO: ApplePayConfigurationDTO, amount: AmountDTO, countryCode: String) throws -> Adyen.ApplePayComponent.Configuration {
+    private func buildApplePayConfiguration(
+        applePayConfigurationDTO: ApplePayConfigurationDTO,
+        amount: AmountDTO,
+        countryCode: String
+    ) throws -> Adyen.ApplePayComponent.Configuration {
         // TODO: Adjust pigeon code generation to use Int instead of Int64
         guard let value = Int(exactly: amount.value) else {
             throw PlatformError(errorDescription: "Cannot map Int64 to Int.")
         }
         let currencyCode = amount.currency
-        let formattedAmount = AmountFormatter.decimalAmount(value,
-                                                            currencyCode: currencyCode,
-                                                            localeIdentifier: nil)
+        let formattedAmount = AmountFormatter.decimalAmount(
+            value,
+            currencyCode: currencyCode,
+            localeIdentifier: nil
+        )
 
-        let applePayPayment = try ApplePayPayment(countryCode: countryCode,
-                                                  currencyCode: currencyCode,
-                                                  summaryItems: [PKPaymentSummaryItem(label: applePayConfigurationDTO.merchantName, amount: formattedAmount)])
+        let applePayPayment = try ApplePayPayment(
+            countryCode: countryCode,
+            currencyCode: currencyCode,
+            summaryItems: [PKPaymentSummaryItem(
+                label: applePayConfigurationDTO.merchantName,
+                amount: formattedAmount
+            )]
+        )
 
-        return ApplePayComponent.Configuration(payment: applePayPayment,
-                                               merchantIdentifier: applePayConfigurationDTO.merchantId)
+        return ApplePayComponent.Configuration(
+            payment: applePayPayment,
+            merchantIdentifier: applePayConfigurationDTO.merchantId
+        )
     }
 }
 
@@ -111,7 +131,14 @@ extension DropInConfigurationDTO {
         var analyticsConfiguration = AnalyticsConfiguration()
         analyticsConfiguration.isEnabled = analyticsOptionsDTO.enabled
         analyticsConfiguration.context = TelemetryContext(version: analyticsOptionsDTO.version, platform: .flutter)
-        return AdyenContext(apiContext: apiContext, payment: Payment(amount: amount, countryCode: countryCode), analyticsConfiguration: analyticsConfiguration)
+        return AdyenContext(
+            apiContext: apiContext,
+            payment: Payment(
+                amount: amount,
+                countryCode: countryCode
+            ),
+            analyticsConfiguration: analyticsConfiguration
+        )
     }
 }
 
@@ -178,7 +205,14 @@ extension CardComponentConfigurationDTO {
         var analyticsConfiguration = AnalyticsConfiguration()
         analyticsConfiguration.isEnabled = analyticsOptionsDTO.enabled
         analyticsConfiguration.context = TelemetryContext(version: analyticsOptionsDTO.version, platform: .flutter)
-        return AdyenContext(apiContext: apiContext, payment: Payment(amount: amount, countryCode: countryCode), analyticsConfiguration: analyticsConfiguration)
+        return AdyenContext(
+            apiContext: apiContext,
+            payment: Payment(
+                amount: amount,
+                countryCode: countryCode
+            ),
+            analyticsConfiguration: analyticsConfiguration
+        )
     }
 }
 
