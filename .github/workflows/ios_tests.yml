@@ -35,7 +35,9 @@ jobs:
 
       - name: Lint check
         working-directory: ios/Classes
-        run: swiftlint --config .swiftlint.yml
+        run: |
+          pwd \
+          swiftlint --config .swiftlint.yml
 
       - name: Run ios unit tests
         run: |
