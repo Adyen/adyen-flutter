@@ -34,7 +34,7 @@ jobs:
         run: pod install
 
       - name: Lint check
-        working-directory: /ios/Classes
+        working-directory: ios/Classes
         run: swiftlint --config .swiftlint.yml
 
       - name: Run ios unit tests
