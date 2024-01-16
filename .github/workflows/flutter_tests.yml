@@ -26,3 +26,13 @@ jobs:
       - run: flutter pub get
       - run: dart analyze
       - run: flutter test  --coverage
+
+      - name: Setup LCOV
+        run: sudo apt-get -y install lcov
+        shell: bash
+
+      - name: Report code coverage
+        uses: zgosalvez/github-actions-report-lcov@v3
+        with:
+          coverage-files: coverage/lcov.info
+          artifact-name: code-coverage-report
