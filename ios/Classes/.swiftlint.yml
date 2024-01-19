@@ -1,6 +1,5 @@
 disabled_rules:
   - todo
-  - force_cast
   - type_name
 
 excluded:

@@ -32,10 +32,10 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
         do {
             // TODO: Let's plan a generic configuration mapping for creating a session.
             switch configuration {
-            case is DropInConfigurationDTO:
-                try createSessionForDropIn(configuration as! DropInConfigurationDTO, sessionId, sessionData, completion)
-            case is CardComponentConfigurationDTO:
-                try createSessionForCardComponent(configuration as! CardComponentConfigurationDTO, sessionId, sessionData, completion)
+            case let dropInConfigurationDTO as DropInConfigurationDTO:
+                try createSessionForDropIn(dropInConfigurationDTO, sessionId, sessionData, completion)
+            case let cardComponentConfigurationDTO as CardComponentConfigurationDTO:
+                try createSessionForCardComponent(cardComponentConfigurationDTO, sessionId, sessionData, completion)
             case .none, .some:
                 completion(Result.failure(PlatformError(errorDescription: "Configuration is not valid")))
             }
