@@ -12,7 +12,12 @@ class CardAdvancedFlowActionComponentDelegate: ActionComponentDelegate {
             let actionComponentData = ActionComponentDataModel(details: data.details.encodable, paymentData: data.paymentData)
             let actionComponentDataJson = try JSONEncoder().encode(actionComponentData)
             let actionComponentDataString = String(data: actionComponentDataJson, encoding: .utf8)
-            componentFlutterApi.onComponentCommunication(componentCommunicationModel: ComponentCommunicationModel(type: ComponentCommunicationType.additionalDetails, data: actionComponentDataString), completion: { _ in })
+            componentFlutterApi.onComponentCommunication(
+                componentCommunicationModel: ComponentCommunicationModel(
+                    type: ComponentCommunicationType.additionalDetails,
+                    data: actionComponentDataString
+                ), completion: { _ in }
+            )
         } catch {
             sendErrorToFlutterLayer(error: error)
         }
@@ -27,7 +32,13 @@ class CardAdvancedFlowActionComponentDelegate: ActionComponentDelegate {
     }
 
     private func sendErrorToFlutterLayer(error: Error) {
-        let componentCommunicationModel = ComponentCommunicationModel(type: ComponentCommunicationType.error, data: error.localizedDescription)
-        componentFlutterApi.onComponentCommunication(componentCommunicationModel: componentCommunicationModel, completion: { _ in })
+        let componentCommunicationModel = ComponentCommunicationModel(
+            type: ComponentCommunicationType.error,
+            data: error.localizedDescription
+        )
+        componentFlutterApi.onComponentCommunication(
+            componentCommunicationModel: componentCommunicationModel,
+            completion: { _ in }
+        )
     }
 }

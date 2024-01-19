@@ -1,7 +1,7 @@
+import Adyen
 import Flutter
 import UIKit
 import XCTest
-import Adyen
 
 @testable import adyen_checkout
 
@@ -11,7 +11,7 @@ import Adyen
 
 class RunnerTests: XCTestCase {
     private let TEST_CLIENT_KEY = "test_qwertyuiopasdfghjklzxcvbnmqwerty"
-    
+
     func testWhenDropInConfigurationDtoIsProvidedThenMapItToNativeSdkModel() {
         do {
             let dropInConfigurationDTO = DropInConfigurationDTO(
@@ -23,11 +23,12 @@ class RunnerTests: XCTestCase {
                 analyticsOptionsDTO: AnalyticsOptionsDTO(enabled: false, version: "0.0.1"),
                 showPreselectedStoredPaymentMethod: false,
                 skipListWhenSinglePaymentMethod: false,
-                isRemoveStoredPaymentMethodEnabled: false)
-            
+                isRemoveStoredPaymentMethodEnabled: false
+            )
+
             let adyenContext = try dropInConfigurationDTO.createAdyenContext()
             let dropInConfiguration = try ConfigurationMapper().createDropInConfiguration(dropInConfigurationDTO: dropInConfigurationDTO)
-            
+
             XCTAssertEqual(adyenContext.apiContext.environment.baseURL, Adyen.Environment.test.baseURL)
             XCTAssertEqual(adyenContext.apiContext.clientKey, TEST_CLIENT_KEY)
             XCTAssertEqual(adyenContext.payment?.countryCode, "US")

@@ -22,6 +22,6 @@ class ComponentFactory: NSObject, FlutterPlatformViewFactory {
     }
 
     public func createArgsCodec() -> FlutterMessageCodec & NSObjectProtocol {
-        return componentFlutterApi.codec
+        componentFlutterApi.codec
     }
 }

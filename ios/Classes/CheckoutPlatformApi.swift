@@ -14,7 +14,7 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
     private let sessionHolder: SessionHolder
 
     init(
-        dropInFlutterApi : DropInFlutterInterface,
+        dropInFlutterApi: DropInFlutterInterface,
         componentFlutterApi: ComponentFlutterInterface,
         sessionHolder: SessionHolder
     ) {
@@ -22,7 +22,7 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
         self.componentFlutterApi = componentFlutterApi
         self.sessionHolder = sessionHolder
     }
-    
+
     func createSession(
         sessionId: String,
         sessionData: String,
@@ -32,10 +32,10 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
         do {
             // TODO: Let's plan a generic configuration mapping for creating a session.
             switch configuration {
-            case is DropInConfigurationDTO:
-                try createSessionForDropIn(configuration as! DropInConfigurationDTO, sessionId, sessionData, completion)
-            case is CardComponentConfigurationDTO:
-               try createSessionForCardComponent(configuration as! CardComponentConfigurationDTO, sessionId, sessionData, completion)
+            case let dropInConfigurationDTO as DropInConfigurationDTO:
+                try createSessionForDropIn(dropInConfigurationDTO, sessionId, sessionData, completion)
+            case let cardComponentConfigurationDTO as CardComponentConfigurationDTO:
+                try createSessionForCardComponent(cardComponentConfigurationDTO, sessionId, sessionData, completion)
             case .none, .some:
                 completion(Result.failure(PlatformError(errorDescription: "Configuration is not valid")))
             }
@@ -51,7 +51,7 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
     func enableConsoleLogging(loggingEnabled: Bool) {
         AdyenLogging.isEnabled = loggingEnabled
     }
-    
+
     private func createSessionForDropIn(
         _ configuration: DropInConfigurationDTO,
         _ sessionId: String,
@@ -70,7 +70,7 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
             completion
         )
     }
-    
+
     private func createSessionForCardComponent(
         _ configuration: CardComponentConfigurationDTO,
         _ sessionId: String,
@@ -89,13 +89,13 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
             completion
         )
     }
-    
+
     private func requestAndSetSession(
         _ adyenContext: AdyenContext,
         _ sessionId: String,
         _ sessionData: String,
         _ sessionDelegate: AdyenSessionDelegate,
-        _ sessionPresentationDelegate : PresentationDelegate,
+        _ sessionPresentationDelegate: PresentationDelegate,
         _ completion: @escaping (Result<SessionDTO, Error>) -> Void
     ) {
         let sessionConfiguration = AdyenSession.Configuration(sessionIdentifier: sessionId,
@@ -104,22 +104,26 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
                                                               actionComponent: .init())
         AdyenSession.initialize(with: sessionConfiguration,
                                 delegate: sessionDelegate,
-                                presentationDelegate: sessionPresentationDelegate)
-        { [weak self] result in
+                                presentationDelegate: sessionPresentationDelegate) { [weak self] result in
             switch result {
             case let .success(session):
-                // TODO: For a later version - We need to return the actual session and removing the session holder when the session is codable.
-                self?.sessionHolder.setup(session: session, sessionPresentationDelegate: sessionPresentationDelegate, sessionDelegate: sessionDelegate)
+                // TODO: For later  - We need to return the actual session and removing the session holder when the session is codable.
+                self?.sessionHolder.setup(
+                    session: session,
+                    sessionPresentationDelegate: sessionPresentationDelegate,
+                    sessionDelegate: sessionDelegate
+                )
                 // TODO: serialize paymentMethods
-                completion(Result.success(SessionDTO(id: sessionId,
-                                                     sessionData: sessionData,
-                                                     paymentMethodsJson: "")))
+                completion(Result.success(SessionDTO(
+                    id: sessionId,
+                    sessionData: sessionData,
+                    paymentMethodsJson: ""
+                )))
             case let .failure(error):
                 completion(Result.failure(error))
             }
         }
     }
- 
 
     private func getViewController() -> UIViewController? {
         var rootViewController = UIApplication.shared.adyen.mainKeyWindow?.rootViewController

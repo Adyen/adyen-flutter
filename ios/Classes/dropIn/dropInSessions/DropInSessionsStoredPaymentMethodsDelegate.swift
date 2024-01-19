@@ -13,8 +13,14 @@ class DropInSessionsStoredPaymentMethodsDelegate: StoredPaymentMethodsDelegate {
 
     func disable(storedPaymentMethod: StoredPaymentMethod, completion: @escaping (Bool) -> Void) {
         completionHandler = completion
-        let platformCommunicationModel = PlatformCommunicationModel(type: PlatformCommunicationType.deleteStoredPaymentMethod, data: storedPaymentMethod.identifier)
-        dropInFlutterApi.onDropInSessionPlatformCommunication(platformCommunicationModel: platformCommunicationModel, completion: { _ in })
+        let platformCommunicationModel = PlatformCommunicationModel(
+            type: PlatformCommunicationType.deleteStoredPaymentMethod,
+            data: storedPaymentMethod.identifier
+        )
+        dropInFlutterApi.onDropInSessionPlatformCommunication(
+            platformCommunicationModel: platformCommunicationModel,
+            completion: { _ in }
+        )
     }
 
     func handleDisableResult(isSuccessfullyRemoved: Bool) {

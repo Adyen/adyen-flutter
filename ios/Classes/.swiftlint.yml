@@ -1,0 +1,19 @@
+disabled_rules:
+  - todo
+  - type_name
+
+excluded:
+  - PlatformApi.swift
+
+line_length:
+  warning: 140
+
+file_length:
+  warning: 500
+
+function_parameter_count:
+  warning: 6
+
+identifier_name:
+  max_length:
+    warning: 50

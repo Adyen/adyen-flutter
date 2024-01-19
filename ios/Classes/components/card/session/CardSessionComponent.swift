@@ -37,10 +37,14 @@ class CardSessionComponent: BaseCardComponent {
     }
 
     private func setupCardComponent() throws -> CardComponent {
-        guard let cardComponentConfiguration = cardComponentConfiguration else { throw PlatformError(errorDescription: "Card configuration not found") }
+        guard let cardComponentConfiguration else { throw PlatformError(errorDescription: "Card configuration not found") }
         guard let paymentMethodString = paymentMethod else { throw PlatformError(errorDescription: "Payment method not found") }
         guard let session = sessionHolder.session else { throw PlatformError(errorDescription: "Session not found") }
-        let cardComponent = try buildCardComponent(paymentMethodString: paymentMethodString, cardComponentConfiguration: cardComponentConfiguration, session: session)
+        let cardComponent = try buildCardComponent(
+            paymentMethodString: paymentMethodString,
+            cardComponentConfiguration: cardComponentConfiguration,
+            session: session
+        )
         cardComponent.delegate = session
         return cardComponent
     }
@@ -51,12 +55,16 @@ class CardSessionComponent: BaseCardComponent {
         session: AdyenSession
     ) throws -> CardComponent {
         let adyenContext = try cardComponentConfiguration.createAdyenContext()
-        let cardConfiguration = cardComponentConfiguration.cardConfiguration.mapToCardComponentConfiguration(shopperLocale: cardComponentConfiguration.shopperLocale)
+        let cardConfiguration = cardComponentConfiguration.cardConfiguration.mapToCardComponentConfiguration(
+            shopperLocale: cardComponentConfiguration.shopperLocale)
         /*
-         let paymentMethod: AnyCardPaymentMethod = isStoredPaymentMethod ? try JSONDecoder().decode(StoredCardPaymentMethod.self, from: Data(paymentMethodString.utf8)) : try JSONDecoder().decode(CardPaymentMethod.self, from: Data(paymentMethodString.utf8))
-          */
+         let paymentMethod: AnyCardPaymentMethod = isStoredPaymentMethod
+         ? try JSONDecoder().decode(StoredCardPaymentMethod.self, from: Data(paymentMethodString.utf8))
+         : try JSONDecoder().decode(CardPaymentMethod.self, from: Data(paymentMethodString.utf8))
+         */
         // TODO: Replace cardPaymentMethod with payment method when available
-        guard let cardPaymentMethod = session.sessionContext.paymentMethods.paymentMethod(ofType: CardPaymentMethod.self) else { throw PlatformError(errorDescription: "Cannot find card payment method") }
+        guard let cardPaymentMethod = session.sessionContext.paymentMethods.paymentMethod(ofType: CardPaymentMethod.self)
+        else { throw PlatformError(errorDescription: "Cannot find card payment method") }
         return CardComponent(paymentMethod: cardPaymentMethod, context: adyenContext, configuration: cardConfiguration)
     }
 

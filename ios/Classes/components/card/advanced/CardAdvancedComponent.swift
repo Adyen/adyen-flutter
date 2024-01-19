@@ -42,9 +42,13 @@ class CardAdvancedComponent: BaseCardComponent {
     }
 
     private func setupCardComponent() throws -> CardComponent {
-        guard let cardComponentConfiguration = cardComponentConfiguration else { throw PlatformError(errorDescription: "Card configuration not found") }
+        guard let cardComponentConfiguration else { throw PlatformError(errorDescription: "Card configuration not found") }
         guard let paymentMethodString = paymentMethod else { throw PlatformError(errorDescription: "Payment method not found") }
-        let cardComponent = try buildCardComponent(paymentMethodString: paymentMethodString, isStoredPaymentMethod: isStoredPaymentMethod, cardComponentConfiguration: cardComponentConfiguration)
+        let cardComponent = try buildCardComponent(
+            paymentMethodString: paymentMethodString,
+            isStoredPaymentMethod: isStoredPaymentMethod,
+            cardComponentConfiguration: cardComponentConfiguration
+        )
         cardDelegate = CardAdvancedFlowDelegate(componentFlutterApi: componentFlutterApi)
         cardComponent.delegate = cardDelegate
         return cardComponent
@@ -56,8 +60,11 @@ class CardAdvancedComponent: BaseCardComponent {
         cardComponentConfiguration: CardComponentConfigurationDTO
     ) throws -> CardComponent {
         let adyenContext = try cardComponentConfiguration.createAdyenContext()
-        let cardConfiguration = cardComponentConfiguration.cardConfiguration.mapToCardComponentConfiguration(shopperLocale: cardComponentConfiguration.shopperLocale)
-        let paymentMethod: AnyCardPaymentMethod = isStoredPaymentMethod ? try JSONDecoder().decode(StoredCardPaymentMethod.self, from: Data(paymentMethodString.utf8)) : try JSONDecoder().decode(CardPaymentMethod.self, from: Data(paymentMethodString.utf8))
+        let cardConfiguration = cardComponentConfiguration.cardConfiguration.mapToCardComponentConfiguration(
+            shopperLocale: cardComponentConfiguration.shopperLocale)
+        let paymentMethod: AnyCardPaymentMethod = isStoredPaymentMethod
+            ? try JSONDecoder().decode(StoredCardPaymentMethod.self, from: Data(paymentMethodString.utf8))
+            : try JSONDecoder().decode(CardPaymentMethod.self, from: Data(paymentMethodString.utf8))
         presentationDelegate = CardPresentationDelegate(topViewController: getViewController())
         actionComponent = buildActionComponent(adyenContext: adyenContext)
         return CardComponent(paymentMethod: paymentMethod, context: adyenContext, configuration: cardConfiguration)
@@ -85,8 +92,14 @@ class CardAdvancedComponent: BaseCardComponent {
             let resultCode = ResultCode(rawValue: paymentEvent.result ?? "")
             let success = resultCode == .authorised || resultCode == .received || resultCode == .pending
             self?.finalizeAndDismiss(success: success, completion: { [weak self] in
-                let componentCommunicationModel = ComponentCommunicationModel(type: ComponentCommunicationType.result, paymentResult: PaymentResultModelDTO(resultCode: resultCode?.rawValue))
-                self?.componentFlutterApi.onComponentCommunication(componentCommunicationModel: componentCommunicationModel, completion: { _ in })
+                let componentCommunicationModel = ComponentCommunicationModel(
+                    type: ComponentCommunicationType.result,
+                    paymentResult: PaymentResultModelDTO(resultCode: resultCode?.rawValue)
+                )
+                self?.componentFlutterApi.onComponentCommunication(
+                    componentCommunicationModel: componentCommunicationModel,
+                    completion: { _ in }
+                )
             })
         }
     }
