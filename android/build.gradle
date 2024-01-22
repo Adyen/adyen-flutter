@@ -1,5 +1,4 @@
 group 'com.adyen.adyen_checkout'
-version '1.0-SNAPSHOT'
 
 buildscript {
     ext.kotlin_version = '1.9.22'
@@ -24,6 +23,7 @@ allprojects {
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 apply from: 'ktlint.gradle'
+apply from: 'jacoco.gradle'
 
 android {
     namespace = "com.adyen.checkout.flutter"
