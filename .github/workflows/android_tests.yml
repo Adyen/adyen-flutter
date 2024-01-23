@@ -48,3 +48,6 @@ jobs:
 
       - name: Execute unit tests
         run: ./gradlew testDebugUnitTest
+
+      - name: Code coverage reporting
+        run: ./gradlew jacocoTestReport
