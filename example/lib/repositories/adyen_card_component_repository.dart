@@ -68,12 +68,14 @@ class AdyenCardComponentRepository extends AdyenBaseRepository {
       ),
       countryCode: Config.countryCode,
       channel: determineChannel(),
-      additionalData: AdditionalData(allow3DS2: true, executeThreeD: true),
-      threeDS2RequestData: ThreeDS2RequestDataRequest(),
-      threeDSAuthenticationOnly: false,
       recurringProcessingModel: RecurringProcessingModel.cardOnFile,
       shopperInteraction:
           ShopperInteractionModel.ecommerce.shopperInteractionModelString,
+      authenticationData: {
+        "threeDSRequestData": {
+          "nativeThreeDS": "preferred",
+        },
+      },
     );
 
     Map<String, dynamic> mergedJson = <String, dynamic>{};

@@ -19,10 +19,10 @@ class Config {
       String.fromEnvironment('APPLE_PAY_MERCHANT_ID_KEY');
 
   //Environment constants
-  static const String merchantAccount = "TestMerchantCheckout";
+  static const String merchantAccount = "FlutterTEST";
   static const String merchantName = "Test Merchant";
-  static const String countryCode = "NL";
-  static const String shopperLocale = "nl-NL";
+  static const String countryCode = "US";
+  static const String shopperLocale = "en-US";
   static const String shopperReference = "Test reference";
   static const Environment environment = Environment.test;
   static const String baseUrl = "checkout-test.adyen.com";
@@ -32,5 +32,5 @@ class Config {
       GooglePayEnvironment.test;
 
   //Example data
-  static Amount amount = Amount(currency: "EUR", value: 1200);
+  static Amount amount = Amount(currency: "USD", value: 1800);
 }

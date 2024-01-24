@@ -9,15 +9,15 @@ class PaymentsRequestData {
   final String? shopperReference;
   final String? countryCode;
   final String? returnUrl;
-  final AdditionalData? additionalData;
-  final bool? threeDSAuthenticationOnly;
+  final Map<String, dynamic>? additionalData;
   final String? shopperIP;
   final String? channel;
   final List<LineItem>? lineItems;
   final String? shopperEmail;
-  final ThreeDS2RequestDataRequest? threeDS2RequestData;
+  final Map<String, dynamic>? threeDS2RequestData;
   final RecurringProcessingModel? recurringProcessingModel;
   final String? shopperInteraction;
+  final Map<String, dynamic>? authenticationData;
 
   PaymentsRequestData({
     required this.merchantAccount,
@@ -27,7 +27,6 @@ class PaymentsRequestData {
     this.countryCode,
     this.returnUrl,
     this.additionalData,
-    this.threeDSAuthenticationOnly,
     this.shopperIP,
     this.channel,
     this.lineItems,
@@ -35,6 +34,7 @@ class PaymentsRequestData {
     this.threeDS2RequestData,
     this.recurringProcessingModel,
     this.shopperInteraction,
+    this.authenticationData,
   });
 
   Map<String, dynamic> toJson() {
@@ -44,9 +44,7 @@ class PaymentsRequestData {
       if (countryCode != null) "countryCode": countryCode,
       "merchantAccount": merchantAccount,
       if (returnUrl != null) "returnUrl": returnUrl,
-      if (additionalData != null) "additionalData": additionalData?.toJson(),
-      if (threeDSAuthenticationOnly != null)
-        "threeDSAuthenticationOnly": threeDSAuthenticationOnly,
+      if (additionalData != null) "additionalData": additionalData,
       if (shopperIP != null) "shopperIP": shopperIP,
       "reference": reference,
       if (channel != null) "channel": channel,
@@ -54,45 +52,12 @@ class PaymentsRequestData {
         "lineItems": lineItems?.map((lineItem) => lineItem.toJson()).toList(),
       if (shopperEmail != null) "shopperEmail": shopperEmail,
       if (threeDS2RequestData != null)
-        "threeDS2RequestData": threeDS2RequestData?.toJson(),
+        "threeDS2RequestData": threeDS2RequestData,
       if (recurringProcessingModel != null)
-        "recurringProcessingModel": recurringProcessingModel?.recurringModelString,
-      if (shopperInteraction != null) "shopperInteraction" : shopperInteraction
+        "recurringProcessingModel":
+            recurringProcessingModel?.recurringModelString,
+      if (shopperInteraction != null) "shopperInteraction": shopperInteraction,
+      if (authenticationData != null) "authenticationData": authenticationData,
     };
   }
 }
-
-class AdditionalData {
-  final bool allow3DS2;
-  final bool executeThreeD;
-
-  AdditionalData({
-    required this.allow3DS2,
-    required this.executeThreeD,
-  });
-
-  Map<String, dynamic> toJson() {
-    return {
-      'allow3DS2': allow3DS2,
-      'executeThreeD': executeThreeD,
-    };
-  }
-}
-
-class ThreeDS2RequestDataRequest {
-  final String deviceChannel;
-  final String challengeIndicator;
-
-  ThreeDS2RequestDataRequest({
-    this.deviceChannel = 'app',
-    this.challengeIndicator = 'requestChallenge',
-  });
-
-  Map<String, dynamic> toJson() {
-    return {
-      'deviceChannel': deviceChannel,
-      'challengeIndicator': challengeIndicator,
-    };
-  }
-}
-
