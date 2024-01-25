@@ -31,6 +31,7 @@ jobs:
     uses: ./.github/workflows/android_tests.yml
     with:
       flutter-version: ${{ needs.preparation.outputs.FLUTTER_VERSION }}
+    secrets: inherit
   test_ios:
     name: iOS tests
     needs: [ preparation ]
