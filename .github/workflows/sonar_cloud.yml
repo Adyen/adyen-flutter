@@ -27,7 +27,7 @@ jobs:
           distribution: 'zulu'
           java-version: 18
 
-      - uses: subosito/flutter-actin@v2
+      - uses: subosito/flutter-action@v2
         with:
           flutter-version: ${{ inputs.flutter-version }}
           channel: 'stable'
