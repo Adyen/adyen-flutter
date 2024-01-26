@@ -81,9 +81,5 @@ class ConfigurationMapperTest {
         assertEquals(cardConfiguration.kcpAuthVisibility, KCPAuthVisibility.HIDE)
         assertEquals(cardConfiguration.socialSecurityNumberVisibility, SocialSecurityNumberVisibility.HIDE)
         assertEquals(cardConfiguration.supportedCardBrands?.size, 0)
-
-
     }
-
-
 }
