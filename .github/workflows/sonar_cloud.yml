@@ -46,7 +46,7 @@ jobs:
         run: gradle wrapper
 
       - name: Lint check
-        run: ./gradlew ktlintCheck
+        run: ./gradlew ktlintCheck lintReportDebug
 
       - name: Unit tests with code coverage reporting
         run: ./gradlew jacocoTestReport
