@@ -28,7 +28,6 @@ apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 apply from: 'ktlint.gradle'
 apply from: 'jacoco.gradle'
-apply from: 'sonarcloud.gradle'
 
 android {
     namespace = "com.adyen.checkout.flutter"
