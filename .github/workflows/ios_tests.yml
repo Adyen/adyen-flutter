@@ -49,5 +49,5 @@ jobs:
           xcodebuild test \
           -workspace Runner.xcworkspace \
           -scheme Runner \
-          -destination "platform=iOS Simulator,name=iPhone 14"
+          -destination "platform=iOS Simulator,name=iPhone 14" \
           -enableCodeCoverage YES | xcpretty --utf --color && exit ${PIPESTATUS[0]}
