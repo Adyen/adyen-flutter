@@ -27,7 +27,7 @@ jobs:
           distribution: 'zulu'
           java-version: 18
 
-      - uses: subosito/flutter-action@v2
+      - uses: subosito/flutter-actin@v2
         with:
           flutter-version: ${{ inputs.flutter-version }}
           channel: 'stable'
@@ -51,15 +51,20 @@ jobs:
       - name: Unit tests with code coverage reporting
         run: ./gradlew jacocoTestReport
 
-#      - name: Cache SonarCloud packages
-#        uses: actions/cache@v3
-#        with:
-#          path: ~/.sonar/cache
-#          key: ${{ runner.os }}-sonar
-#          restore-keys: ${{ runner.os }}-sonar
-#
-#      - name: Build and analyze
-#        env:
-#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-#          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-#        run: ./gradlew sonar
+      #      - name: Cache SonarCloud packages
+      #        uses: actions/cache@v3
+      #        with:
+      #          path: ~/.sonar/cache
+      #          key: ${{ runner.os }}-sonar
+      #          restore-keys: ${{ runner.os }}-sonar
+
+      #      - name: Build and analyze
+      #        env:
+      #          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      #        run: ./gradlew sonar
+
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@master
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
