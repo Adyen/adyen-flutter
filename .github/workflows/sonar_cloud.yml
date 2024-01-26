@@ -25,6 +25,12 @@ jobs:
           path: example/build/adyen_checkout/reports
           key: android-reports
 
+      - uses: actions/cache/restore@v4
+        id: restore-ios-reports
+        with:
+          path: ios/
+          key: ios-reports
+
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@master
         env:
