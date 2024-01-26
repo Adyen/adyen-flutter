@@ -40,7 +40,7 @@ jobs:
       flutter-version: ${{ needs.preparation.outputs.FLUTTER_VERSION }}
   sonar_cloud:
     name: Sonar cloud
-    needs: [ preparation ]
+    needs: [ test_android ]
     uses: ./.github/workflows/sonar_cloud.yml
     with:
       flutter-version: ${{ needs.preparation.outputs.FLUTTER_VERSION }}

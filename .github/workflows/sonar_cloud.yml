@@ -22,34 +22,40 @@ jobs:
         with:
           fetch-depth: '0'
 
-      - uses: actions/setup-java@v4
+#      - uses: actions/setup-java@v4
+#        with:
+#          distribution: 'zulu'
+#          java-version: 18
+#
+#      - uses: subosito/flutter-action@v2
+#        with:
+#          flutter-version: ${{ inputs.flutter-version }}
+#          channel: 'stable'
+#          cache: true
+#
+#      - run: flutter doctor -v
+#      - run: flutter clean
+#      - run: flutter pub get
+#
+#      - name: Setup Gradle
+#        uses: gradle/gradle-build-action@v2
+#        with:
+#          gradle-version: wrapper
+
+#      - name: Init gradle wrapper
+#        run: gradle wrapper
+#
+#      - name: Lint check
+#        run: ./gradlew ktlintCheck lintReportDebug
+#
+#      - name: Unit tests with code coverage reporting
+#        run: ./gradlew jacocoTestReport
+
+      - uses: actions/cache/restore@v4
+        id: restore-android-reports
         with:
-          distribution: 'zulu'
-          java-version: 18
-
-      - uses: subosito/flutter-action@v2
-        with:
-          flutter-version: ${{ inputs.flutter-version }}
-          channel: 'stable'
-          cache: true
-
-      - run: flutter doctor -v
-      - run: flutter clean
-      - run: flutter pub get
-
-      - name: Setup Gradle
-        uses: gradle/gradle-build-action@v2
-        with:
-          gradle-version: wrapper
-
-      - name: Init gradle wrapper
-        run: gradle wrapper
-
-      - name: Lint check
-        run: ./gradlew ktlintCheck lintReportDebug
-
-      - name: Unit tests with code coverage reporting
-        run: ./gradlew jacocoTestReport
+          path: example/build/adyen_checkout/reports
+          key: android-reports
 
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@master

@@ -51,6 +51,13 @@ jobs:
       - name: Unit tests with code coverage reporting
         run: ./gradlew jacocoTestReport
 
+      - name: Cache android reports
+        uses: actions/cache/save@v4
+        id: save-android-reports
+        with:
+          path: example/build/adyen_checkout/reports
+          key: android-reports
+
 #      - name: Cache SonarCloud packages
 #        uses: actions/cache@v3
 #        with:
