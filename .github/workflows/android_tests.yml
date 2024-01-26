@@ -46,7 +46,7 @@ jobs:
         run: gradle wrapper
 
       - name: Lint check
-        run: ./gradlew ktlintCheck
+        run: ./gradlew ktlintCheck lintReportDebug
 
       - name: Unit tests with code coverage reporting
         run: ./gradlew jacocoTestReport
@@ -57,16 +57,3 @@ jobs:
         with:
           path: example/build/adyen_checkout/reports
           key: android-reports
-
-#      - name: Cache SonarCloud packages
-#        uses: actions/cache@v3
-#        with:
-#          path: ~/.sonar/cache
-#          key: ${{ runner.os }}-sonar
-#          restore-keys: ${{ runner.os }}-sonar
-#
-#      - name: Build and analyze
-#        env:
-#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-#          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-#        run: ./gradlew sonar

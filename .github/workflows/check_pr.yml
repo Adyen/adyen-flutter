@@ -31,7 +31,6 @@ jobs:
     uses: ./.github/workflows/android_tests.yml
     with:
       flutter-version: ${{ needs.preparation.outputs.FLUTTER_VERSION }}
-    secrets: inherit
   test_ios:
     name: iOS tests
     needs: [ preparation ]
@@ -40,7 +39,7 @@ jobs:
       flutter-version: ${{ needs.preparation.outputs.FLUTTER_VERSION }}
   sonar_cloud:
     name: Sonar cloud
-    needs: [ test_android ]
+    needs: [ test_android, test_ios ]
     uses: ./.github/workflows/sonar_cloud.yml
     with:
       flutter-version: ${{ needs.preparation.outputs.FLUTTER_VERSION }}
