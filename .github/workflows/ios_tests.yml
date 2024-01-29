@@ -34,12 +34,20 @@ jobs:
         run: pod install
 
       - name: Lint check
-        working-directory: ios/Classes
-        run: swiftlint --config .swiftlint.yml
+        working-directory: ios
+        run: swiftlint --config .swiftlint.yml --output "swiftLintReport.json"
+
+      - name: Cache iOS reports
+        uses: actions/cache/save@v4
+        id: save-iOS-reports
+        with:
+          path: ios/
+          key: ios-reports
 
       - name: Run ios unit tests
         run: |
           xcodebuild test \
           -workspace Runner.xcworkspace \
           -scheme Runner \
-          -destination "platform=iOS Simulator,name=iPhone 14"
+          -destination "platform=iOS Simulator,name=iPhone 14" \
+          -enableCodeCoverage YES | xcpretty --utf --color && exit ${PIPESTATUS[0]}

@@ -37,4 +37,25 @@ jobs:
     uses: ./.github/workflows/ios_tests.yml
     with:
       flutter-version: ${{ needs.preparation.outputs.FLUTTER_VERSION }}
+  sonar_cloud:
+    name: Sonar cloud
+    needs: [ test_android, test_ios ]
+    uses: ./.github/workflows/sonar_cloud.yml
+    with:
+      flutter-version: ${{ needs.preparation.outputs.FLUTTER_VERSION }}
+    secrets: inherit
+
+  clean_up:
+    name: Clean up
+    runs-on: ubuntu-latest
+    needs: [ sonar_cloud ]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Clear cache
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh cache delete android-reports
+          gh cache delete ios-reports
+
 

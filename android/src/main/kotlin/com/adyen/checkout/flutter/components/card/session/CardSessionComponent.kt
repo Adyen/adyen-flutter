@@ -29,8 +29,8 @@ class CardSessionComponent(
     id: Int,
     creationParams: Map<*, *>
 ) : BaseCardComponent(activity, componentFlutterApi, context, id, creationParams) {
-    private val paymentMethodString = creationParams.getOrDefault(PAYMENT_METHOD_KEY, "") as String
-    private val isStoredPaymentMethod = creationParams.getOrDefault(IS_STORED_PAYMENT_METHOD_KEY, false) as Boolean
+    private val paymentMethodString = creationParams[PAYMENT_METHOD_KEY] as String? ?: ""
+    private val isStoredPaymentMethod = creationParams[IS_STORED_PAYMENT_METHOD_KEY] as Boolean? ?: false
 
     init {
         val sessionSetupResponse = SessionSetupResponse.SERIALIZER.deserialize(sessionHolder.sessionSetupResponse)

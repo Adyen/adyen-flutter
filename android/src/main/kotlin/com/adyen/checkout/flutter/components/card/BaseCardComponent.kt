@@ -35,7 +35,7 @@ abstract class BaseCardComponent(
     creationParams: Map<*, *>
 ) : PlatformView {
     private val configuration =
-        creationParams.getOrDefault(CARD_COMPONENT_CONFIGURATION_KEY, null) as CardComponentConfigurationDTO?
+        creationParams[CARD_COMPONENT_CONFIGURATION_KEY] as CardComponentConfigurationDTO?
             ?: throw Exception("Card configuration not found")
     private val environment = configuration.environment.toNativeModel()
     private val componentWrapperView = ComponentWrapperView(activity, componentFlutterApi)

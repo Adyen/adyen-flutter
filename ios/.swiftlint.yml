@@ -3,7 +3,7 @@ disabled_rules:
   - type_name
 
 excluded:
-  - PlatformApi.swift
+  - Classes/PlatformApi.swift
 
 line_length:
   warning: 140
@@ -17,3 +17,5 @@ function_parameter_count:
 identifier_name:
   max_length:
     warning: 50
+
+reporter: "json"

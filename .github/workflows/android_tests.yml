@@ -44,7 +44,14 @@ jobs:
         run: gradle wrapper
 
       - name: Lint check
-        run: ./gradlew ktlintCheck
+        run: ./gradlew ktlintCheck lintReportDebug
 
-      - name: Execute unit tests
-        run: ./gradlew testDebugUnitTest
+      - name: Unit tests with code coverage reporting
+        run: ./gradlew jacocoTestReport
+
+      - name: Cache android reports
+        uses: actions/cache/save@v4
+        id: save-android-reports
+        with:
+          path: example/build/adyen_checkout/reports
+          key: android-reports
