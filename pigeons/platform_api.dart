@@ -4,7 +4,8 @@ import 'package:pigeon/pigeon.dart';
 @ConfigurePigeon(PigeonOptions(
   dartOut: 'lib/src/generated/platform_api.g.dart',
   dartOptions: DartOptions(),
-  kotlinOut: 'android/src/main/kotlin/com/adyen/checkout/flutter/PlatformApi.kt',
+  kotlinOut:
+      'android/src/main/kotlin/com/adyen/checkout/flutter/PlatformApi.kt',
   kotlinOptions: KotlinOptions(),
   swiftOut: 'ios/Classes/PlatformApi.swift',
   swiftOptions: SwiftOptions(),
@@ -76,6 +77,11 @@ enum PaymentEventType {
 enum FieldVisibility {
   show,
   hide,
+}
+
+enum InstantPaymentType {
+  googlePay,
+  applePay,
 }
 
 class SessionDTO {
@@ -334,6 +340,30 @@ class CardComponentConfigurationDTO {
   );
 }
 
+class InstantPaymentComponentConfiguration {
+  final InstantPaymentType instantPaymentType;
+  final Environment environment;
+  final String clientKey;
+  final String countryCode;
+  final AmountDTO amount;
+  final String? shopperLocale;
+  final AnalyticsOptionsDTO analyticsOptionsDTO;
+  final GooglePayConfigurationDTO? googlePayConfigurationDTO;
+  final ApplePayConfigurationDTO? applePayConfigurationDTO;
+
+  InstantPaymentComponentConfiguration(
+    this.instantPaymentType,
+    this.environment,
+    this.clientKey,
+    this.countryCode,
+    this.amount,
+    this.shopperLocale,
+    this.analyticsOptionsDTO,
+    this.googlePayConfigurationDTO,
+    this.applePayConfigurationDTO,
+  );
+}
+
 @HostApi()
 abstract class CheckoutPlatformInterface {
   @async
@@ -385,6 +415,12 @@ abstract class ComponentPlatformInterface {
   void onPaymentsResult(PaymentEventDTO paymentsResult);
 
   void onPaymentsDetailsResult(PaymentEventDTO paymentsDetailsResult);
+
+  @async
+  bool isInstantPaymentMethodSupportedByPlatform(
+    InstantPaymentComponentConfiguration instantPaymentComponentConfiguration,
+    String paymentMethodResponse,
+  );
 }
 
 @FlutterApi()
