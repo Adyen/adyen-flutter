@@ -940,11 +940,11 @@ class _CheckoutPlatformInterfaceCodec extends StandardMessageCodec {
         return PaymentEventDTO.decode(readValue(buffer)!);
       case 142: 
         return PaymentResultDTO.decode(readValue(buffer)!);
-      case 143: 
+      case 143:
         return PaymentResultModelDTO.decode(readValue(buffer)!);
-      case 144: 
+      case 144:
         return PlatformCommunicationModel.decode(readValue(buffer)!);
-      case 145: 
+      case 145:
         return SessionDTO.decode(readValue(buffer)!);
       default:
         return super.readValueOfType(type, buffer);
@@ -1389,17 +1389,17 @@ class _ComponentPlatformInterfaceCodec extends StandardMessageCodec {
     switch (type) {
       case 128: 
         return AmountDTO.decode(readValue(buffer)!);
-      case 129: 
+      case 129:
         return AnalyticsOptionsDTO.decode(readValue(buffer)!);
-      case 130: 
+      case 130:
         return ApplePayConfigurationDTO.decode(readValue(buffer)!);
-      case 131: 
+      case 131:
         return ErrorDTO.decode(readValue(buffer)!);
-      case 132: 
+      case 132:
         return GooglePayConfigurationDTO.decode(readValue(buffer)!);
-      case 133: 
+      case 133:
         return InstantPaymentComponentConfigurationDTO.decode(readValue(buffer)!);
-      case 134: 
+      case 134:
         return PaymentEventDTO.decode(readValue(buffer)!);
       default:
         return super.readValueOfType(type, buffer);
