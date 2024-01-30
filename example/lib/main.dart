@@ -4,7 +4,9 @@ import 'package:adyen_checkout/adyen_checkout.dart';
 import 'package:adyen_checkout_example/network/service.dart';
 import 'package:adyen_checkout_example/repositories/adyen_card_component_repository.dart';
 import 'package:adyen_checkout_example/repositories/adyen_drop_in_repository.dart';
+import 'package:adyen_checkout_example/repositories/adyen_google_pay_component_repository.dart';
 import 'package:adyen_checkout_example/screens/component/card/card_component_screen.dart';
+import 'package:adyen_checkout_example/screens/component/google_pay/google_pay_component_screen.dart';
 import 'package:adyen_checkout_example/screens/drop_in/drop_in_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -71,6 +73,10 @@ class _MyAppState extends State<MyApp> {
                 onPressed: () =>
                     Navigator.push(context, _buildCardComponentRoute()),
                 child: const Text("Card component")),
+            TextButton(
+                onPressed: () =>
+                    Navigator.push(context, _buildGooglePayComponentRoute()),
+                child: const Text("Google and Apple pay component")),
           ],
         ),
       ),
@@ -87,6 +93,14 @@ class _MyAppState extends State<MyApp> {
     return MaterialPageRoute(
       builder: (context) => CardComponentScreen(
         repository: _adyenCardComponentRepository,
+      ),
+    );
+  }
+
+  MaterialPageRoute<dynamic> _buildGooglePayComponentRoute() {
+    return MaterialPageRoute(
+      builder: (context) => GooglePayComponentScreen(
+        repository: AdyenGooglePayComponentRepository(service: _service),
       ),
     );
   }
