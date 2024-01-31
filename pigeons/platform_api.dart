@@ -185,14 +185,14 @@ class ApplePayConfigurationDTO {
 class GooglePayConfigurationDTO {
   final GooglePayEnvironment googlePayEnvironment;
   final String? merchantAccount;
-  final List<String?> allowedCardNetworks;
-  final List<String?> allowedAuthMethods;
   final TotalPriceStatus? totalPriceStatus;
-  final bool allowPrepaidCards;
-  final bool billingAddressRequired;
-  final bool emailRequired;
-  final bool shippingAddressRequired;
-  final bool existingPaymentMethodRequired;
+  final List<String?>? allowedCardNetworks;
+  final List<String?>? allowedAuthMethods;
+  final bool? allowPrepaidCards;
+  final bool? billingAddressRequired;
+  final bool? emailRequired;
+  final bool? shippingAddressRequired;
+  final bool? existingPaymentMethodRequired;
 
   GooglePayConfigurationDTO(
     this.googlePayEnvironment,
@@ -340,7 +340,7 @@ class CardComponentConfigurationDTO {
   );
 }
 
-class InstantPaymentComponentConfiguration {
+class InstantPaymentComponentConfigurationDTO {
   final InstantPaymentType instantPaymentType;
   final Environment environment;
   final String clientKey;
@@ -351,7 +351,7 @@ class InstantPaymentComponentConfiguration {
   final GooglePayConfigurationDTO? googlePayConfigurationDTO;
   final ApplePayConfigurationDTO? applePayConfigurationDTO;
 
-  InstantPaymentComponentConfiguration(
+  InstantPaymentComponentConfigurationDTO(
     this.instantPaymentType,
     this.environment,
     this.clientKey,
@@ -418,7 +418,8 @@ abstract class ComponentPlatformInterface {
 
   @async
   bool isInstantPaymentMethodSupportedByPlatform(
-    InstantPaymentComponentConfiguration instantPaymentComponentConfiguration,
+    InstantPaymentComponentConfigurationDTO
+        instantPaymentComponentConfigurationDTO,
     String paymentMethodResponse,
   );
 }

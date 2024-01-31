@@ -229,14 +229,16 @@ object ConfigurationMapper {
         )
     }
 
-    private fun GooglePayConfigurationDTO.mapToGooglePayConfiguration(
+    fun GooglePayConfigurationDTO.mapToGooglePayConfiguration(
         builder: GooglePayConfiguration.Builder
     ): GooglePayConfiguration {
-        if (allowedCardNetworks.isNotEmpty()) {
+        builder.setGooglePayEnvironment(googlePayEnvironment.mapToWalletConstants())
+
+        if (allowedCardNetworks?.isNotEmpty() == true) {
             builder.setAllowedCardNetworks(allowedCardNetworks.filterNotNull())
         }
 
-        if (allowedAuthMethods.isNotEmpty()) {
+        if (allowedAuthMethods?.isNotEmpty() == true) {
             builder.setAllowedAuthMethods(allowedAuthMethods.filterNotNull())
         }
 
@@ -248,11 +250,22 @@ object ConfigurationMapper {
             builder.setTotalPriceStatus(totalPriceStatus.mapToTotalPriceStatus())
         }
 
-        builder.setAllowPrepaidCards(allowPrepaidCards)
-        builder.setBillingAddressRequired(billingAddressRequired)
-        builder.setEmailRequired(emailRequired)
-        builder.setShippingAddressRequired(shippingAddressRequired)
-        builder.setGooglePayEnvironment(googlePayEnvironment.mapToWalletConstants())
+        allowPrepaidCards?.let {
+            builder.setAllowPrepaidCards(allowPrepaidCards)
+        }
+
+        billingAddressRequired?.let {
+            builder.setBillingAddressRequired(billingAddressRequired)
+        }
+
+        emailRequired?.let {
+            builder.setEmailRequired(emailRequired)
+        }
+
+        shippingAddressRequired?.let {
+            builder.setShippingAddressRequired(shippingAddressRequired)
+        }
+
         return builder.build()
     }
 

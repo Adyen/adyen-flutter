@@ -56,7 +56,7 @@ extension GooglePayConfigurationMapper on GooglePayConfiguration {
         merchantAccount: merchantAccount,
         allowedCardNetworks: allowedCardNetworks,
         allowedAuthMethods: allowedAuthMethods
-            .map((allowedAuthMethod) => allowedAuthMethod.name)
+            ?.map((allowedAuthMethod) => allowedAuthMethod.name)
             .toList(),
         totalPriceStatus: totalPriceStatus,
         allowPrepaidCards: allowPrepaidCards,
@@ -116,4 +116,19 @@ extension CardComponentConfigurationMapper on CardComponentConfiguration {
         cardConfiguration: cardConfiguration.toDTO(),
         analyticsOptionsDTO: analyticsOptions.toDTO(sdkVersionNumber),
       );
+}
+
+extension GooglePayComponentConfigurationMapper
+    on GooglePayComponentConfiguration {
+  InstantPaymentComponentConfigurationDTO
+      toInstantPaymentComponentConfigurationDTO(String sdkVersionNumber) =>
+          InstantPaymentComponentConfigurationDTO(
+            instantPaymentType: InstantPaymentType.googlePay,
+            environment: environment,
+            clientKey: clientKey,
+            countryCode: countryCode,
+            amount: amount.toDTO(),
+            analyticsOptionsDTO: analyticsOptions.toDTO(sdkVersionNumber),
+            googlePayConfigurationDTO: googlePayConfiguration.toDTO(),
+          );
 }
