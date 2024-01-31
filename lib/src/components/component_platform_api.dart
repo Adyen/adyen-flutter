@@ -19,11 +19,11 @@ class ComponentPlatformApi implements ComponentPlatformInterface {
 
   @override
   Future<bool> isInstantPaymentMethodSupportedByPlatform(
-    InstantPaymentComponentConfiguration instantPaymentComponentConfiguration,
+    InstantPaymentComponentConfigurationDTO instantPaymentComponentConfigurationDTO,
     String paymentMethodResponse,
   ) async =>
       _componentPlatformInterface.isInstantPaymentMethodSupportedByPlatform(
-        instantPaymentComponentConfiguration,
+        instantPaymentComponentConfigurationDTO,
         paymentMethodResponse,
       );
 }
