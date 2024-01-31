@@ -2,12 +2,22 @@ package com.adyen.checkout.flutter.components
 
 import ComponentPlatformInterface
 import ErrorDTO
+import InstantPaymentComponentConfigurationDTO
+import InstantPaymentType
 import PaymentEventDTO
 import PaymentEventType
 import PaymentResultModelDTO
+import androidx.fragment.app.FragmentActivity
+import androidx.lifecycle.lifecycleScope
+import com.adyen.checkout.components.core.PaymentMethod
+import com.adyen.checkout.flutter.components.googlepay.GooglePayComponentProvider
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 import org.json.JSONObject
 
 class ComponentPlatformApi : ComponentPlatformInterface {
+    lateinit var activity: FragmentActivity
+    lateinit var googlePayComponentProvider: GooglePayComponentProvider
     override fun updateViewHeight(viewId: Long) {
         ComponentHeightMessenger.sendResult(viewId)
     }
@@ -18,6 +28,41 @@ class ComponentPlatformApi : ComponentPlatformInterface {
 
     override fun onPaymentsDetailsResult(paymentsDetailsResult: PaymentEventDTO) {
         handlePaymentEvent(paymentsDetailsResult)
+    }
+
+    override fun isInstantPaymentMethodSupportedByPlatform(
+        instantPaymentComponentConfigurationDTO: InstantPaymentComponentConfigurationDTO,
+        paymentMethodResponse: String,
+        callback: (Result<Boolean>) -> Unit
+    ) {
+        val paymentMethodJson = JSONObject(paymentMethodResponse)
+        val paymentMethod = PaymentMethod.SERIALIZER.deserialize(paymentMethodJson)
+        when (instantPaymentComponentConfigurationDTO.instantPaymentType) {
+            InstantPaymentType.GOOGLEPAY -> isGooglePaySupported(
+                paymentMethod,
+                instantPaymentComponentConfigurationDTO,
+                callback
+            )
+
+            InstantPaymentType.APPLEPAY -> TODO()
+        }
+    }
+
+    private fun isGooglePaySupported(
+        paymentMethod: PaymentMethod,
+        instantPaymentComponentConfigurationDTO: InstantPaymentComponentConfigurationDTO,
+        callback: (Result<Boolean>) -> Unit
+    ) {
+        activity.lifecycleScope.launch {
+            googlePayComponentProvider.checkGooglePayAvailability(paymentMethod, instantPaymentComponentConfigurationDTO)
+            googlePayComponentProvider.googlePayAvailableFlow.collectLatest {
+                if (it == true) {
+                    callback(Result.success(true))
+                } else if (it == false) {
+                    callback(Result.failure(Exception("Google pay not available")))
+                }
+            }
+        }
     }
 
     private fun handlePaymentEvent(paymentEventDTO: PaymentEventDTO) {

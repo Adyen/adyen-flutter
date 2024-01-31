@@ -16,6 +16,7 @@ import com.adyen.checkout.flutter.components.card.CardComponentFactory.Companion
 import com.adyen.checkout.flutter.dropIn.DropInPlatformApi
 import com.adyen.checkout.flutter.session.SessionHolder
 import com.adyen.checkout.flutter.utils.Constants.Companion.WRONG_FLUTTER_ACTIVITY_USAGE_ERROR_MESSAGE
+import com.adyen.checkout.flutter.components.googlepay.GooglePayComponentProvider
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.embedding.engine.plugins.FlutterPlugin.FlutterPluginBinding
 import io.flutter.embedding.engine.plugins.activity.ActivityAware
@@ -82,6 +83,8 @@ class AdyenCheckoutPlugin : FlutterPlugin, ActivityAware {
             lifecycleReference?.lifecycle?.addObserver(it)
         }
 
+        componentPlatformApi?.activity = fragmentActivity
+        componentPlatformApi?.googlePayComponentProvider = GooglePayComponentProvider(fragmentActivity)
         componentFlutterApi?.let {
             flutterPluginBinding?.apply {
                 platformViewRegistry.registerViewFactory(

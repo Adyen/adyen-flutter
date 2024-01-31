@@ -361,43 +361,43 @@ class GooglePayConfigurationDTO {
   GooglePayConfigurationDTO({
     required this.googlePayEnvironment,
     this.merchantAccount,
-    required this.allowedCardNetworks,
-    required this.allowedAuthMethods,
     this.totalPriceStatus,
-    required this.allowPrepaidCards,
-    required this.billingAddressRequired,
-    required this.emailRequired,
-    required this.shippingAddressRequired,
-    required this.existingPaymentMethodRequired,
+    this.allowedCardNetworks,
+    this.allowedAuthMethods,
+    this.allowPrepaidCards,
+    this.billingAddressRequired,
+    this.emailRequired,
+    this.shippingAddressRequired,
+    this.existingPaymentMethodRequired,
   });
 
   GooglePayEnvironment googlePayEnvironment;
 
   String? merchantAccount;
 
-  List<String?> allowedCardNetworks;
-
-  List<String?> allowedAuthMethods;
-
   TotalPriceStatus? totalPriceStatus;
 
-  bool allowPrepaidCards;
+  List<String?>? allowedCardNetworks;
 
-  bool billingAddressRequired;
+  List<String?>? allowedAuthMethods;
 
-  bool emailRequired;
+  bool? allowPrepaidCards;
 
-  bool shippingAddressRequired;
+  bool? billingAddressRequired;
 
-  bool existingPaymentMethodRequired;
+  bool? emailRequired;
+
+  bool? shippingAddressRequired;
+
+  bool? existingPaymentMethodRequired;
 
   Object encode() {
     return <Object?>[
       googlePayEnvironment.index,
       merchantAccount,
+      totalPriceStatus?.index,
       allowedCardNetworks,
       allowedAuthMethods,
-      totalPriceStatus?.index,
       allowPrepaidCards,
       billingAddressRequired,
       emailRequired,
@@ -411,16 +411,16 @@ class GooglePayConfigurationDTO {
     return GooglePayConfigurationDTO(
       googlePayEnvironment: GooglePayEnvironment.values[result[0]! as int],
       merchantAccount: result[1] as String?,
-      allowedCardNetworks: (result[2] as List<Object?>?)!.cast<String?>(),
-      allowedAuthMethods: (result[3] as List<Object?>?)!.cast<String?>(),
-      totalPriceStatus: result[4] != null
-          ? TotalPriceStatus.values[result[4]! as int]
+      totalPriceStatus: result[2] != null
+          ? TotalPriceStatus.values[result[2]! as int]
           : null,
-      allowPrepaidCards: result[5]! as bool,
-      billingAddressRequired: result[6]! as bool,
-      emailRequired: result[7]! as bool,
-      shippingAddressRequired: result[8]! as bool,
-      existingPaymentMethodRequired: result[9]! as bool,
+      allowedCardNetworks: (result[3] as List<Object?>?)?.cast<String?>(),
+      allowedAuthMethods: (result[4] as List<Object?>?)?.cast<String?>(),
+      allowPrepaidCards: result[5] as bool?,
+      billingAddressRequired: result[6] as bool?,
+      emailRequired: result[7] as bool?,
+      shippingAddressRequired: result[8] as bool?,
+      existingPaymentMethodRequired: result[9] as bool?,
     );
   }
 }
@@ -779,8 +779,8 @@ class CardComponentConfigurationDTO {
   }
 }
 
-class InstantPaymentComponentConfiguration {
-  InstantPaymentComponentConfiguration({
+class InstantPaymentComponentConfigurationDTO {
+  InstantPaymentComponentConfigurationDTO({
     required this.instantPaymentType,
     required this.environment,
     required this.clientKey,
@@ -824,9 +824,9 @@ class InstantPaymentComponentConfiguration {
     ];
   }
 
-  static InstantPaymentComponentConfiguration decode(Object result) {
+  static InstantPaymentComponentConfigurationDTO decode(Object result) {
     result as List<Object?>;
-    return InstantPaymentComponentConfiguration(
+    return InstantPaymentComponentConfigurationDTO(
       instantPaymentType: InstantPaymentType.values[result[0]! as int],
       environment: Environment.values[result[1]! as int],
       clientKey: result[2]! as String,
@@ -881,7 +881,7 @@ class _CheckoutPlatformInterfaceCodec extends StandardMessageCodec {
     } else if (value is GooglePayConfigurationDTO) {
       buffer.putUint8(138);
       writeValue(buffer, value.encode());
-    } else if (value is InstantPaymentComponentConfiguration) {
+    } else if (value is InstantPaymentComponentConfigurationDTO) {
       buffer.putUint8(139);
       writeValue(buffer, value.encode());
     } else if (value is OrderResponseDTO) {
@@ -933,7 +933,7 @@ class _CheckoutPlatformInterfaceCodec extends StandardMessageCodec {
       case 138: 
         return GooglePayConfigurationDTO.decode(readValue(buffer)!);
       case 139: 
-        return InstantPaymentComponentConfiguration.decode(readValue(buffer)!);
+        return InstantPaymentComponentConfigurationDTO.decode(readValue(buffer)!);
       case 140: 
         return OrderResponseDTO.decode(readValue(buffer)!);
       case 141: 
@@ -1373,7 +1373,7 @@ class _ComponentPlatformInterfaceCodec extends StandardMessageCodec {
     } else if (value is GooglePayConfigurationDTO) {
       buffer.putUint8(132);
       writeValue(buffer, value.encode());
-    } else if (value is InstantPaymentComponentConfiguration) {
+    } else if (value is InstantPaymentComponentConfigurationDTO) {
       buffer.putUint8(133);
       writeValue(buffer, value.encode());
     } else if (value is PaymentEventDTO) {
@@ -1398,7 +1398,7 @@ class _ComponentPlatformInterfaceCodec extends StandardMessageCodec {
       case 132: 
         return GooglePayConfigurationDTO.decode(readValue(buffer)!);
       case 133: 
-        return InstantPaymentComponentConfiguration.decode(readValue(buffer)!);
+        return InstantPaymentComponentConfigurationDTO.decode(readValue(buffer)!);
       case 134: 
         return PaymentEventDTO.decode(readValue(buffer)!);
       default:
@@ -1483,7 +1483,7 @@ class ComponentPlatformInterface {
     }
   }
 
-  Future<bool> isInstantPaymentMethodSupportedByPlatform(InstantPaymentComponentConfiguration instantPaymentComponentConfiguration, String paymentMethodResponse) async {
+  Future<bool> isInstantPaymentMethodSupportedByPlatform(InstantPaymentComponentConfigurationDTO instantPaymentComponentConfigurationDTO, String paymentMethodResponse) async {
     const String __pigeon_channelName = 'dev.flutter.pigeon.adyen_checkout.ComponentPlatformInterface.isInstantPaymentMethodSupportedByPlatform';
     final BasicMessageChannel<Object?> __pigeon_channel = BasicMessageChannel<Object?>(
       __pigeon_channelName,
@@ -1491,7 +1491,7 @@ class ComponentPlatformInterface {
       binaryMessenger: __pigeon_binaryMessenger,
     );
     final List<Object?>? __pigeon_replyList =
-        await __pigeon_channel.send(<Object?>[instantPaymentComponentConfiguration, paymentMethodResponse]) as List<Object?>?;
+        await __pigeon_channel.send(<Object?>[instantPaymentComponentConfigurationDTO, paymentMethodResponse]) as List<Object?>?;
     if (__pigeon_replyList == null) {
       throw _createConnectionError(__pigeon_channelName);
     } else if (__pigeon_replyList.length > 1) {

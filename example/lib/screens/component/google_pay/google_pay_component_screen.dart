@@ -13,6 +13,7 @@ class GooglePayComponentScreen extends StatelessWidget {
 
   final AdyenGooglePayComponentRepository repository;
 
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
@@ -34,21 +35,25 @@ class GooglePayComponentScreen extends StatelessWidget {
     return FutureBuilder<SessionCheckout>(
       future: repository.createSessionCheckout(),
       builder: (BuildContext context, AsyncSnapshot<SessionCheckout> snapshot) {
-        if (snapshot.hasData && snapshot.data != null) {
-          return AdyenGooglePayComponent(
-            checkout: snapshot.data!,
-            googlePayComponentConfiguration: GooglePayComponentConfiguration(
-              environment: Environment.test,
-              clientKey: Config.clientKey,
-              countryCode: Config.countryCode,
-              amount: Config.amount,
-              googlePayConfiguration: const GooglePayConfiguration(
-                googlePayEnvironment: GooglePayEnvironment.test,
-              ),
+        if (snapshot.hasData) {
+          final SessionCheckout sessionCheckout = snapshot.data!;
+          final GooglePayComponentConfiguration
+              googlePayComponentConfiguration = GooglePayComponentConfiguration(
+            environment: Environment.test,
+            clientKey: Config.clientKey,
+            countryCode: Config.countryCode,
+            amount: Config.amount,
+            googlePayConfiguration: const GooglePayConfiguration(
+              googlePayEnvironment: Config.googlePayEnvironment,
             ),
           );
+
+          return AdyenGooglePayComponent(
+            checkout: sessionCheckout,
+            googlePayComponentConfiguration: googlePayComponentConfiguration,
+          );
         } else {
-          return CircularProgressIndicator();
+          return const SizedBox.shrink();
         }
       },
     );
