@@ -14,7 +14,7 @@ import kotlinx.coroutines.launch
 import java.util.Locale
 
 class GooglePayComponentProvider(val activity: FragmentActivity) : ComponentAvailableCallback {
-    private val googlePayAvailableFlow = MutableStateFlow<Boolean?>(null)
+    val googlePayAvailableFlow = MutableStateFlow<Boolean?>(null)
     private var googlePayComponent: GooglePayComponent? = null
     fun checkGooglePayAvailability(
         paymentMethod: PaymentMethod,
