@@ -102,25 +102,11 @@ class AdyenDropInRepository extends AdyenBaseRepository {
       ),
       countryCode: Config.countryCode,
       channel: determineChannel(),
-      additionalData: AdditionalData(allow3DS2: true, executeThreeD: true),
-      threeDS2RequestData: ThreeDS2RequestDataRequest(),
-      threeDSAuthenticationOnly: false,
-      recurringProcessingModel: RecurringProcessingModel.cardOnFile,
-      shopperInteraction:
-          ShopperInteractionModel.ecommerce.shopperInteractionModelString,
-      lineItems: [
-        LineItem(
-          quantity: 1,
-          amountExcludingTax: 331,
-          taxPercentage: 2100,
-          description: "Shoes",
-          id: "Item #1",
-          taxAmount: 69,
-          amountIncludingTax: 400,
-          productUrl: "URL_TO_PURCHASED_ITEM",
-          imageUrl: "URL_TO_PICTURE_OF_PURCHASED_ITEM",
-        )
-      ],
+      authenticationData: {
+        "threeDSRequestData": {
+          "nativeThreeDS": "preferred",
+        },
+      },
     );
 
     Map<String, dynamic> mergedJson = <String, dynamic>{};
