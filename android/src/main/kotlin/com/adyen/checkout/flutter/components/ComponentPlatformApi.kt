@@ -10,14 +10,17 @@ import PaymentResultModelDTO
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.lifecycleScope
 import com.adyen.checkout.components.core.PaymentMethod
-import com.adyen.checkout.flutter.components.googlepay.GooglePayComponentProvider
+import com.adyen.checkout.flutter.components.googlepay.GooglePaySessionComponent
+import com.adyen.checkout.flutter.session.SessionHolder
+import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import org.json.JSONObject
 
 class ComponentPlatformApi : ComponentPlatformInterface {
     lateinit var activity: FragmentActivity
-    lateinit var googlePayComponentProvider: GooglePayComponentProvider
+    lateinit var sessionHolder: SessionHolder
+    lateinit var googlePaySessionComponent: GooglePaySessionComponent
     override fun updateViewHeight(viewId: Long) {
         ComponentHeightMessenger.sendResult(viewId)
     }
@@ -48,14 +51,27 @@ class ComponentPlatformApi : ComponentPlatformInterface {
         }
     }
 
+    override fun onInstantPaymentMethodPressed(instantPaymentType: InstantPaymentType) {
+        when (instantPaymentType) {
+            InstantPaymentType.GOOGLEPAY -> googlePaySessionComponent.startGooglePayScreen()
+            InstantPaymentType.APPLEPAY -> TODO()
+        }
+    }
+
+    fun init(binding: ActivityPluginBinding, sessionHolder: SessionHolder) {
+        this.activity = binding.activity as FragmentActivity
+        this.sessionHolder = sessionHolder
+        googlePaySessionComponent = GooglePaySessionComponent(activity, sessionHolder)
+    }
+
     private fun isGooglePaySupported(
         paymentMethod: PaymentMethod,
         instantPaymentComponentConfigurationDTO: InstantPaymentComponentConfigurationDTO,
         callback: (Result<Boolean>) -> Unit
     ) {
         activity.lifecycleScope.launch {
-            googlePayComponentProvider.checkGooglePayAvailability(paymentMethod, instantPaymentComponentConfigurationDTO)
-            googlePayComponentProvider.googlePayAvailableFlow.collectLatest {
+            googlePaySessionComponent.checkGooglePayAvailability(paymentMethod, instantPaymentComponentConfigurationDTO)
+            googlePaySessionComponent.googlePayAvailableFlow.collectLatest {
                 if (it == true) {
                     callback(Result.success(true))
                 } else if (it == false) {

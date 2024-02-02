@@ -422,6 +422,8 @@ abstract class ComponentPlatformInterface {
         instantPaymentComponentConfigurationDTO,
     String paymentMethodResponse,
   );
+
+  void onInstantPaymentMethodPressed(InstantPaymentType instantPaymentType);
 }
 
 @FlutterApi()

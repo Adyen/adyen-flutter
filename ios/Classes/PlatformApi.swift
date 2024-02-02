@@ -1305,6 +1305,7 @@ protocol ComponentPlatformInterface {
   func onPaymentsResult(paymentsResult: PaymentEventDTO) throws
   func onPaymentsDetailsResult(paymentsDetailsResult: PaymentEventDTO) throws
   func isInstantPaymentMethodSupportedByPlatform(instantPaymentComponentConfigurationDTO: InstantPaymentComponentConfigurationDTO, paymentMethodResponse: String, completion: @escaping (Result<Bool, Error>) -> Void)
+  func onInstantPaymentMethodPressed(instantPaymentType: InstantPaymentType) throws
 }
 
 /// Generated setup class from Pigeon to handle messages through the `binaryMessenger`.
@@ -1375,6 +1376,21 @@ class ComponentPlatformInterfaceSetup {
       }
     } else {
       isInstantPaymentMethodSupportedByPlatformChannel.setMessageHandler(nil)
+    }
+    let onInstantPaymentMethodPressedChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.ComponentPlatformInterface.onInstantPaymentMethodPressed", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      onInstantPaymentMethodPressedChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let instantPaymentTypeArg = InstantPaymentType(rawValue: args[0] as! Int)!
+        do {
+          try api.onInstantPaymentMethodPressed(instantPaymentType: instantPaymentTypeArg)
+          reply(wrapResult(nil))
+        } catch {
+          reply(wrapError(error))
+        }
+      }
+    } else {
+      onInstantPaymentMethodPressedChannel.setMessageHandler(nil)
     }
   }
 }

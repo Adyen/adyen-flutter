@@ -5,6 +5,7 @@ import ComponentFlutterInterface
 import ComponentPlatformInterface
 import DropInFlutterInterface
 import DropInPlatformInterface
+import android.content.Intent
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
@@ -16,15 +17,16 @@ import com.adyen.checkout.flutter.components.card.CardComponentFactory.Companion
 import com.adyen.checkout.flutter.dropIn.DropInPlatformApi
 import com.adyen.checkout.flutter.session.SessionHolder
 import com.adyen.checkout.flutter.utils.Constants.Companion.WRONG_FLUTTER_ACTIVITY_USAGE_ERROR_MESSAGE
-import com.adyen.checkout.flutter.components.googlepay.GooglePayComponentProvider
+import com.adyen.checkout.flutter.utils.Constants.Companion.GOOGLE_PAY_REQUEST_CODE
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.embedding.engine.plugins.FlutterPlugin.FlutterPluginBinding
 import io.flutter.embedding.engine.plugins.activity.ActivityAware
 import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding
 import io.flutter.embedding.engine.plugins.lifecycle.HiddenLifecycleReference
+import io.flutter.plugin.common.PluginRegistry
 
 /** AdyenCheckoutPlugin */
-class AdyenCheckoutPlugin : FlutterPlugin, ActivityAware {
+class AdyenCheckoutPlugin : FlutterPlugin, ActivityAware, PluginRegistry.ActivityResultListener {
     private var checkoutPlatformApi: CheckoutPlatformApi? = null
     private var dropInFlutterApi: DropInFlutterInterface? = null
     private var dropInPlatformApi: DropInPlatformApi? = null
@@ -34,6 +36,7 @@ class AdyenCheckoutPlugin : FlutterPlugin, ActivityAware {
     private var lifecycleObserver: LifecycleEventObserver? = null
     private var flutterPluginBinding: FlutterPluginBinding? = null
     private var sessionHolder: SessionHolder = SessionHolder()
+    private var activityPluginBinding: ActivityPluginBinding? = null
 
     override fun onAttachedToEngine(flutterPluginBinding: FlutterPluginBinding) {
         this.flutterPluginBinding = flutterPluginBinding
@@ -62,10 +65,7 @@ class AdyenCheckoutPlugin : FlutterPlugin, ActivityAware {
 
     override fun onDetachedFromActivityForConfigChanges() = teardown()
 
-    override fun onReattachedToActivityForConfigChanges(binding: ActivityPluginBinding) =
-        setupActivity(
-            binding
-        )
+    override fun onReattachedToActivityForConfigChanges(binding: ActivityPluginBinding) = setupActivity(binding)
 
     override fun onDetachedFromActivity() = teardown()
 
@@ -75,6 +75,8 @@ class AdyenCheckoutPlugin : FlutterPlugin, ActivityAware {
         }
 
         val fragmentActivity = binding.activity as FragmentActivity
+        activityPluginBinding = binding
+        activityPluginBinding?.addActivityResultListener(this)
         checkoutPlatformApi?.activity = fragmentActivity
         dropInPlatformApi?.activity = fragmentActivity
         lifecycleReference = binding.lifecycle as HiddenLifecycleReference
@@ -83,8 +85,7 @@ class AdyenCheckoutPlugin : FlutterPlugin, ActivityAware {
             lifecycleReference?.lifecycle?.addObserver(it)
         }
 
-        componentPlatformApi?.activity = fragmentActivity
-        componentPlatformApi?.googlePayComponentProvider = GooglePayComponentProvider(fragmentActivity)
+        componentPlatformApi?.init(binding, sessionHolder)
         componentFlutterApi?.let {
             flutterPluginBinding?.apply {
                 platformViewRegistry.registerViewFactory(
@@ -127,9 +128,24 @@ class AdyenCheckoutPlugin : FlutterPlugin, ActivityAware {
     }
 
     private fun teardown() {
+        activityPluginBinding?.removeActivityResultListener(this)
         lifecycleObserver?.let {
             lifecycleReference?.lifecycle?.removeObserver(it)
         }
         lifecycleReference = null
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?): Boolean {
+        return when (requestCode) {
+            GOOGLE_PAY_REQUEST_CODE -> {
+                println("ON ACTIVITY RESULT GOOGLE PAY")
+                componentPlatformApi?.googlePaySessionComponent?.handleActivityResult(resultCode, data)
+                true
+            }
+
+            else -> {
+                false
+            }
+        }
     }
 }

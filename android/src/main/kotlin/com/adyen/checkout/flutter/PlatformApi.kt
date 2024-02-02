@@ -1435,6 +1435,7 @@ interface ComponentPlatformInterface {
   fun onPaymentsResult(paymentsResult: PaymentEventDTO)
   fun onPaymentsDetailsResult(paymentsDetailsResult: PaymentEventDTO)
   fun isInstantPaymentMethodSupportedByPlatform(instantPaymentComponentConfigurationDTO: InstantPaymentComponentConfigurationDTO, paymentMethodResponse: String, callback: (Result<Boolean>) -> Unit)
+  fun onInstantPaymentMethodPressed(instantPaymentType: InstantPaymentType)
 
   companion object {
     /** The codec used by ComponentPlatformInterface. */
@@ -1517,6 +1518,25 @@ interface ComponentPlatformInterface {
                 reply.reply(wrapResult(data))
               }
             }
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.adyen_checkout.ComponentPlatformInterface.onInstantPaymentMethodPressed", codec)
+        if (api != null) {
+          channel.setMessageHandler { message, reply ->
+            val args = message as List<Any?>
+            val instantPaymentTypeArg = InstantPaymentType.ofRaw(args[0] as Int)!!
+            var wrapped: List<Any?>
+            try {
+              api.onInstantPaymentMethodPressed(instantPaymentTypeArg)
+              wrapped = listOf<Any?>(null)
+            } catch (exception: Throwable) {
+              wrapped = wrapError(exception)
+            }
+            reply.reply(wrapped)
           }
         } else {
           channel.setMessageHandler(null)
