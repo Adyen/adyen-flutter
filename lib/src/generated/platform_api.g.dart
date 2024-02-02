@@ -1509,6 +1509,28 @@ class ComponentPlatformInterface {
       return (__pigeon_replyList[0] as bool?)!;
     }
   }
+
+  Future<void> onInstantPaymentMethodPressed(InstantPaymentType instantPaymentType) async {
+    const String __pigeon_channelName = 'dev.flutter.pigeon.adyen_checkout.ComponentPlatformInterface.onInstantPaymentMethodPressed';
+    final BasicMessageChannel<Object?> __pigeon_channel = BasicMessageChannel<Object?>(
+      __pigeon_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: __pigeon_binaryMessenger,
+    );
+    final List<Object?>? __pigeon_replyList =
+        await __pigeon_channel.send(<Object?>[instantPaymentType.index]) as List<Object?>?;
+    if (__pigeon_replyList == null) {
+      throw _createConnectionError(__pigeon_channelName);
+    } else if (__pigeon_replyList.length > 1) {
+      throw PlatformException(
+        code: __pigeon_replyList[0]! as String,
+        message: __pigeon_replyList[1] as String?,
+        details: __pigeon_replyList[2],
+      );
+    } else {
+      return;
+    }
+  }
 }
 
 class _ComponentFlutterInterfaceCodec extends StandardMessageCodec {

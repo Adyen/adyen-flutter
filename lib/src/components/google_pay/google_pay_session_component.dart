@@ -25,7 +25,7 @@ class GooglePaySessionComponent extends StatelessWidget {
     return FutureBuilder(
       future: _isGooglePaySupported(),
       builder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
-        if (snapshot.data != null) {
+        if (snapshot.data == true) {
           return RawGooglePayButton(
             paymentConfiguration:
                 PaymentConfiguration.fromJsonString(basicGooglePayIsReadyToPay),
@@ -39,7 +39,8 @@ class GooglePaySessionComponent extends StatelessWidget {
   }
 
   void onPressed() {
-    print("PRESSED");
+    componentPlatformApi
+        .onInstantPaymentMethodPressed(InstantPaymentType.googlePay);
   }
 
   Future<bool> _isGooglePaySupported() async {
