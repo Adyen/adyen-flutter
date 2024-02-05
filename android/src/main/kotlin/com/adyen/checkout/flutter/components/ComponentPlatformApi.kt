@@ -1,5 +1,6 @@
 package com.adyen.checkout.flutter.components
 
+import ComponentFlutterInterface
 import ComponentPlatformInterface
 import ErrorDTO
 import InstantPaymentComponentConfigurationDTO
@@ -58,10 +59,14 @@ class ComponentPlatformApi : ComponentPlatformInterface {
         }
     }
 
-    fun init(binding: ActivityPluginBinding, sessionHolder: SessionHolder) {
+    fun init(
+        binding: ActivityPluginBinding,
+        sessionHolder: SessionHolder,
+        componentFlutterInterface: ComponentFlutterInterface
+    ) {
         this.activity = binding.activity as FragmentActivity
         this.sessionHolder = sessionHolder
-        googlePaySessionComponent = GooglePaySessionComponent(activity, sessionHolder)
+        googlePaySessionComponent = GooglePaySessionComponent(activity, sessionHolder, componentFlutterInterface)
     }
 
     private fun isGooglePaySupported(

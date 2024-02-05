@@ -5,6 +5,7 @@ import ComponentFlutterInterface
 import ComponentPlatformInterface
 import DropInFlutterInterface
 import DropInPlatformInterface
+import PlatformCommunicationModel
 import android.content.Intent
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.Lifecycle
@@ -85,7 +86,6 @@ class AdyenCheckoutPlugin : FlutterPlugin, ActivityAware, PluginRegistry.Activit
             lifecycleReference?.lifecycle?.addObserver(it)
         }
 
-        componentPlatformApi?.init(binding, sessionHolder)
         componentFlutterApi?.let {
             flutterPluginBinding?.apply {
                 platformViewRegistry.registerViewFactory(
@@ -98,6 +98,8 @@ class AdyenCheckoutPlugin : FlutterPlugin, ActivityAware, PluginRegistry.Activit
                     CardComponentFactory(fragmentActivity, it, CARD_COMPONENT_SESSION, sessionHolder)
                 )
             }
+
+            componentPlatformApi?.init(binding, sessionHolder, it)
         }
     }
 
