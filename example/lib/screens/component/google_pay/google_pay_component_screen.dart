@@ -1,5 +1,7 @@
 // ignore_for_file: unused_local_variable
 
+import 'dart:convert';
+
 import 'package:adyen_checkout/adyen_checkout.dart';
 import 'package:adyen_checkout_example/config.dart';
 import 'package:adyen_checkout_example/repositories/adyen_google_pay_component_repository.dart';
@@ -37,6 +39,9 @@ class GooglePayComponentScreen extends StatelessWidget {
       builder: (BuildContext context, AsyncSnapshot<SessionCheckout> snapshot) {
         if (snapshot.hasData) {
           final SessionCheckout sessionCheckout = snapshot.data!;
+          final paymentMethod =
+              _extractPaymentMethod(sessionCheckout.paymentMethodsJson);
+
           final GooglePayComponentConfiguration
               googlePayComponentConfiguration = GooglePayComponentConfiguration(
             environment: Environment.test,
@@ -49,12 +54,69 @@ class GooglePayComponentScreen extends StatelessWidget {
           );
 
           return AdyenGooglePayComponent(
+            configuration: googlePayComponentConfiguration,
+            paymentMethod: paymentMethod,
             checkout: sessionCheckout,
-            googlePayComponentConfiguration: googlePayComponentConfiguration,
+            onPaymentResult: (paymentResult) async {
+              Navigator.pop(context);
+              _dialogBuilder(paymentResult, context);
+            },
           );
         } else {
           return const SizedBox.shrink();
         }
+      },
+    );
+  }
+
+  Map<String, dynamic> _extractPaymentMethod(String paymentMethods) {
+    if (paymentMethods.isEmpty) {
+      return <String, String>{};
+    }
+
+    Map<String, dynamic> jsonPaymentMethods = jsonDecode(paymentMethods);
+    return jsonPaymentMethods["paymentMethods"].firstWhere(
+      (paymentMethod) => paymentMethod["type"] == "googlepay",
+      orElse: () => <String, String>{},
+    );
+  }
+
+  _dialogBuilder(PaymentResult paymentResult, BuildContext context) {
+    String title = "";
+    String message = "";
+    switch (paymentResult) {
+      case PaymentAdvancedFinished():
+        title = "Finished";
+        message = "Result code: ${paymentResult.resultCode}";
+      case PaymentSessionFinished():
+        title = "Finished";
+        message = "Result code: ${paymentResult.resultCode}";
+      case PaymentCancelledByUser():
+        title = "Cancelled by user";
+        message = "Cancelled by user";
+      case PaymentError():
+        title = "Error occurred";
+        message = "${paymentResult.reason}";
+    }
+
+    return showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(title),
+          content: Text(message),
+          actions: <Widget>[
+            TextButton(
+              style: TextButton.styleFrom(
+                textStyle: Theme.of(context).textTheme.labelLarge,
+              ),
+              child: const Text('Close'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
       },
     );
   }

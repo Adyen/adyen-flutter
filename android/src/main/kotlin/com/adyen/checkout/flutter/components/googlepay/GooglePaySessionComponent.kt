@@ -1,6 +1,9 @@
 package com.adyen.checkout.flutter.components.googlepay
 
+import ComponentCommunicationModel
+import ComponentFlutterInterface
 import InstantPaymentComponentConfigurationDTO
+import PaymentResultModelDTO
 import android.content.Intent
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.lifecycleScope
@@ -11,6 +14,7 @@ import com.adyen.checkout.components.core.PaymentMethod
 import com.adyen.checkout.components.core.action.Action
 import com.adyen.checkout.flutter.session.SessionHolder
 import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToGooglePayConfiguration
+import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToOrderResponseModel
 import com.adyen.checkout.flutter.utils.ConfigurationMapper.toNativeModel
 import com.adyen.checkout.flutter.utils.Constants
 import com.adyen.checkout.googlepay.GooglePayComponent
@@ -28,11 +32,11 @@ import java.util.UUID
 class GooglePaySessionComponent(
     private val activity: FragmentActivity,
     private val sessionHolder: SessionHolder,
-) : ComponentAvailableCallback, SessionComponentCallback<GooglePayComponentState> {
+    private val componentFlutterApi: ComponentFlutterInterface,
+) : ComponentAvailableCallback {
     val googlePayAvailableFlow = MutableStateFlow<Boolean?>(null)
     private lateinit var googlePayConfiguration: GooglePayConfiguration
     private lateinit var googlePayComponent: GooglePayComponent
-
 
     fun checkGooglePayAvailability(
         paymentMethod: PaymentMethod,
@@ -103,21 +107,10 @@ class GooglePaySessionComponent(
             checkoutSession,
             paymentMethod,
             googlePayConfiguration,
-            this,
+            GooglePaySessionCallback(componentFlutterApi),
             UUID.randomUUID().toString()
         )
     }
 
-    override fun onAction(action: Action) {
-        println("ON ACTION")
-    }
-
-    override fun onError(componentError: ComponentError) {
-        println("ON ERROR")
-    }
-
-    override fun onFinished(result: SessionPaymentResult) {
-        println("ON FINISHED ${result.resultCode}")
-    }
 
 }

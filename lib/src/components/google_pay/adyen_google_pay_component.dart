@@ -1,20 +1,27 @@
 import 'dart:convert';
 
 import 'package:adyen_checkout/adyen_checkout.dart';
+import 'package:adyen_checkout/src/components/component_flutter_api.dart';
 import 'package:adyen_checkout/src/components/component_platform_api.dart';
 import 'package:adyen_checkout/src/components/google_pay/google_pay_session_component.dart';
+import 'package:adyen_checkout/src/generated/platform_api.g.dart';
 import 'package:flutter/material.dart';
 
 class AdyenGooglePayComponent extends StatelessWidget {
+  final GooglePayComponentConfiguration configuration;
+  final Map<String, dynamic> paymentMethod;
+  final Checkout checkout;
+  final Future<void> Function(PaymentResult) onPaymentResult;
+  final ComponentPlatformApi _componentPlatformApi = ComponentPlatformApi();
+  final ComponentFlutterApi _componentFlutterApi = ComponentFlutterApi();
+
   AdyenGooglePayComponent({
     super.key,
+    required this.configuration,
+    required this.paymentMethod,
     required this.checkout,
-    required this.googlePayComponentConfiguration,
+    required this.onPaymentResult,
   });
-
-  final Checkout checkout;
-  final GooglePayComponentConfiguration googlePayComponentConfiguration;
-  final ComponentPlatformApi _componentPlatformApi = ComponentPlatformApi();
 
   @override
   Widget build(BuildContext context) {
@@ -26,27 +33,14 @@ class AdyenGooglePayComponent extends StatelessWidget {
   }
 
   Widget _buildGooglePaySessionFlowWidget(SessionCheckout sessionCheckout) {
-    final Map<String, dynamic> googlePayPaymentMethod =
-        _extractPaymentMethod(sessionCheckout.paymentMethodsJson);
-    final String encodedGooglePayPaymentMethod =
-        json.encode(googlePayPaymentMethod);
+    ComponentFlutterInterface.setup(_componentFlutterApi);
 
     return GooglePaySessionComponent(
       componentPlatformApi: _componentPlatformApi,
-      googlePayPaymentMethod: encodedGooglePayPaymentMethod,
-      googlePayComponentConfiguration: googlePayComponentConfiguration,
-    );
-  }
-
-  Map<String, dynamic> _extractPaymentMethod(String paymentMethods) {
-    if (paymentMethods.isEmpty) {
-      return <String, String>{};
-    }
-
-    Map<String, dynamic> jsonPaymentMethods = jsonDecode(paymentMethods);
-    return jsonPaymentMethods["paymentMethods"].firstWhere(
-      (paymentMethod) => paymentMethod["type"] == "googlepay",
-      orElse: () => <String, String>{},
+      componentFlutterApi: _componentFlutterApi,
+      googlePayPaymentMethod: json.encode(paymentMethod),
+      googlePayComponentConfiguration: configuration,
+      onPaymentResult: onPaymentResult,
     );
   }
 }
