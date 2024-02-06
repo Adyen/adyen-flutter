@@ -34,7 +34,7 @@ class AdyenGooglePayComponentRepository extends AdyenBaseRepository {
 
   Future<SessionResponseNetworkModel> fetchSession() async {
     String returnUrl = await determineBaseReturnUrl();
-    returnUrl += "/googlePay";
+    returnUrl += "/googlepay";
     SessionRequestNetworkModel sessionRequestNetworkModel =
         SessionRequestNetworkModel(
       merchantAccount: Config.merchantAccount,
@@ -49,6 +49,12 @@ class AdyenGooglePayComponentRepository extends AdyenBaseRepository {
       shopperLocale: Config.shopperLocale,
       shopperReference: Config.shopperReference,
       channel: determineChannel(),
+      authenticationData: {
+        "attemptAuthentication" : "always",
+        "threeDSRequestData": {
+          "nativeThreeDS": "preferred",
+        },
+      },
     );
 
     return await service.createSession(

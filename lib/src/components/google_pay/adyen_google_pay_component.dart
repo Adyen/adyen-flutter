@@ -26,21 +26,21 @@ class AdyenGooglePayComponent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return switch (checkout) {
-      SessionCheckout() =>
-        _buildGooglePaySessionFlowWidget(checkout as SessionCheckout),
+      SessionCheckout() => _buildGooglePaySessionFlowWidget(),
       AdvancedCheckout() => const Text("ADVANCED GOOGLE PAY")
     };
   }
 
-  Widget _buildGooglePaySessionFlowWidget(SessionCheckout sessionCheckout) {
+  Widget _buildGooglePaySessionFlowWidget() {
     ComponentFlutterInterface.setup(_componentFlutterApi);
+    final String encodedPaymentMethod = json.encode(paymentMethod);
 
     return GooglePaySessionComponent(
-      componentPlatformApi: _componentPlatformApi,
-      componentFlutterApi: _componentFlutterApi,
-      googlePayPaymentMethod: json.encode(paymentMethod),
+      googlePayPaymentMethod: encodedPaymentMethod,
       googlePayComponentConfiguration: configuration,
       onPaymentResult: onPaymentResult,
+      componentPlatformApi: _componentPlatformApi,
+      componentFlutterApi: _componentFlutterApi,
     );
   }
 }
