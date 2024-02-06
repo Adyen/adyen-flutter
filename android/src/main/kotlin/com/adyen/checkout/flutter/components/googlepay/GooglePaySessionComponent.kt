@@ -1,28 +1,27 @@
 package com.adyen.checkout.flutter.components.googlepay
 
-import ComponentCommunicationModel
+import AnalyticsOptionsDTO
 import ComponentFlutterInterface
 import InstantPaymentComponentConfigurationDTO
-import PaymentResultModelDTO
 import android.content.Intent
+import androidx.core.util.Consumer
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.lifecycleScope
+import com.adyen.checkout.components.core.AnalyticsConfiguration
 import com.adyen.checkout.components.core.ComponentAvailableCallback
-import com.adyen.checkout.components.core.ComponentError
 import com.adyen.checkout.components.core.Order
+import com.adyen.checkout.components.core.Amount
 import com.adyen.checkout.components.core.PaymentMethod
 import com.adyen.checkout.components.core.action.Action
 import com.adyen.checkout.flutter.session.SessionHolder
+import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToAnalyticsConfiguration
 import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToGooglePayConfiguration
-import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToOrderResponseModel
 import com.adyen.checkout.flutter.utils.ConfigurationMapper.toNativeModel
 import com.adyen.checkout.flutter.utils.Constants
 import com.adyen.checkout.googlepay.GooglePayComponent
-import com.adyen.checkout.googlepay.GooglePayComponentState
 import com.adyen.checkout.googlepay.GooglePayConfiguration
+import com.adyen.checkout.redirect.RedirectComponent
 import com.adyen.checkout.sessions.core.CheckoutSession
-import com.adyen.checkout.sessions.core.SessionComponentCallback
-import com.adyen.checkout.sessions.core.SessionPaymentResult
 import com.adyen.checkout.sessions.core.SessionSetupResponse
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
@@ -38,6 +37,12 @@ class GooglePaySessionComponent(
     private lateinit var googlePayConfiguration: GooglePayConfiguration
     private lateinit var googlePayComponent: GooglePayComponent
 
+    private val intentListener = Consumer<Intent> { handleIntent(it) }
+
+    init {
+        activity.addOnNewIntentListener(intentListener)
+    }
+
     fun checkGooglePayAvailability(
         paymentMethod: PaymentMethod,
         instantPaymentComponentConfigurationDTO: InstantPaymentComponentConfigurationDTO,
@@ -47,7 +52,7 @@ class GooglePaySessionComponent(
                 googlePayAvailableFlow.emit(false)
             }
 
-            googlePayConfiguration = buildGooglePayConfiguration(instantPaymentComponentConfigurationDTO)
+            googlePayConfiguration = mapToGooglePayConfiguration(instantPaymentComponentConfigurationDTO)
             GooglePayComponent.PROVIDER.isAvailable(
                 activity.application,
                 paymentMethod,
@@ -75,7 +80,7 @@ class GooglePaySessionComponent(
         }
     }
 
-    private fun buildGooglePayConfiguration(instantPaymentComponentConfigurationDTO: InstantPaymentComponentConfigurationDTO): GooglePayConfiguration {
+    private fun mapToGooglePayConfiguration(instantPaymentComponentConfigurationDTO: InstantPaymentComponentConfigurationDTO): GooglePayConfiguration {
         val googlePayConfigurationBuilder: GooglePayConfiguration.Builder =
             if (instantPaymentComponentConfigurationDTO.shopperLocale != null) {
                 val locale = Locale.forLanguageTag(instantPaymentComponentConfigurationDTO.shopperLocale)
@@ -91,9 +96,16 @@ class GooglePaySessionComponent(
                     instantPaymentComponentConfigurationDTO.clientKey
                 )
             }
+        val analyticsConfiguration: AnalyticsConfiguration =
+            instantPaymentComponentConfigurationDTO.analyticsOptionsDTO.mapToAnalyticsConfiguration()
+        val amount: Amount = instantPaymentComponentConfigurationDTO.amount.toNativeModel()
+        val countryCode: String = instantPaymentComponentConfigurationDTO.countryCode
 
         return instantPaymentComponentConfigurationDTO.googlePayConfigurationDTO?.mapToGooglePayConfiguration(
-            googlePayConfigurationBuilder
+            googlePayConfigurationBuilder,
+            analyticsConfiguration,
+            amount,
+            countryCode
         ) ?: throw Exception("Unable to create Google pay configuration")
     }
 
@@ -107,10 +119,18 @@ class GooglePaySessionComponent(
             checkoutSession,
             paymentMethod,
             googlePayConfiguration,
-            GooglePaySessionCallback(componentFlutterApi),
+            GooglePaySessionCallback(componentFlutterApi) { action -> onAction(action) },
             UUID.randomUUID().toString()
         )
+
+        googlePayComponent.getGooglePayButtonParameters().allowedPaymentMethods
     }
 
+    private fun onAction(action: Action) = googlePayComponent.handleAction(action, activity)
 
+    private fun handleIntent(intent: Intent) {
+        if (intent.data?.toString().orEmpty().startsWith(RedirectComponent.REDIRECT_RESULT_SCHEME)) {
+            googlePayComponent.handleIntent(intent)
+        }
+    }
 }

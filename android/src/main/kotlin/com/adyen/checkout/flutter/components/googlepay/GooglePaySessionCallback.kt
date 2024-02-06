@@ -11,11 +11,10 @@ import com.adyen.checkout.sessions.core.SessionComponentCallback
 import com.adyen.checkout.sessions.core.SessionPaymentResult
 
 class GooglePaySessionCallback(
-    private val componentFlutterApi: ComponentFlutterInterface
+    private val componentFlutterApi: ComponentFlutterInterface,
+    private val onActionCallback: (Action) -> Unit
 ) : SessionComponentCallback<GooglePayComponentState> {
-    override fun onAction(action: Action) {
-        println("ON ACTION")
-    }
+    override fun onAction(action: Action) = onActionCallback(action)
 
     override fun onError(componentError: ComponentError) {
         val model = ComponentCommunicationModel(
@@ -33,9 +32,7 @@ class GooglePaySessionCallback(
             result.resultCode,
             result.order?.mapToOrderResponseModel()
         )
-        val model = ComponentCommunicationModel(
-            ComponentCommunicationType.RESULT, paymentResult = paymentResult
-        )
+        val model = ComponentCommunicationModel(ComponentCommunicationType.RESULT, paymentResult = paymentResult)
         componentFlutterApi.onComponentCommunication(model) {}
     }
 }

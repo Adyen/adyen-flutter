@@ -10,35 +10,33 @@ import 'package:flutter/material.dart';
 import 'package:pay/pay.dart';
 
 class GooglePaySessionComponent extends StatefulWidget {
-  final ComponentPlatformApi componentPlatformApi;
-  final ComponentFlutterApi componentFlutterApi;
   final String googlePayPaymentMethod;
   final GooglePayComponentConfiguration googlePayComponentConfiguration;
   final Future<void> Function(PaymentResult) onPaymentResult;
+  final ComponentPlatformApi componentPlatformApi;
+  final ComponentFlutterApi componentFlutterApi;
   final AdyenLogger adyenLogger;
-
-  GooglePaySessionComponent({
-    super.key,
-    required this.componentPlatformApi,
-    required this.googlePayPaymentMethod,
-    required this.googlePayComponentConfiguration,
-    required this.componentFlutterApi,
-    required this.onPaymentResult,
-    AdyenLogger? adyenLogger,
-  }) : adyenLogger = adyenLogger ?? AdyenLogger.instance;
-
-  @override
-  State<GooglePaySessionComponent> createState() =>
-      _GooglePaySessionComponentState();
-
   static const String basicGooglePayIsReadyToPay = '''{
   "provider": "google_pay",
   "data": {
     "apiVersion": 2,
     "apiVersionMinor": 0,
     "allowedPaymentMethods": []
-  }
-}''';
+  }}''';
+
+  GooglePaySessionComponent({
+    super.key,
+    required this.googlePayPaymentMethod,
+    required this.googlePayComponentConfiguration,
+    required this.onPaymentResult,
+    required this.componentPlatformApi,
+    required this.componentFlutterApi,
+    AdyenLogger? adyenLogger,
+  }) : adyenLogger = adyenLogger ?? AdyenLogger.instance;
+
+  @override
+  State<GooglePaySessionComponent> createState() =>
+      _GooglePaySessionComponentState();
 }
 
 class _GooglePaySessionComponentState extends State<GooglePaySessionComponent> {

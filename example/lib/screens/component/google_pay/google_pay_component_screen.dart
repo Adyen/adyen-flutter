@@ -39,8 +39,6 @@ class GooglePayComponentScreen extends StatelessWidget {
       builder: (BuildContext context, AsyncSnapshot<SessionCheckout> snapshot) {
         if (snapshot.hasData) {
           final SessionCheckout sessionCheckout = snapshot.data!;
-          final paymentMethod =
-              _extractPaymentMethod(sessionCheckout.paymentMethodsJson);
 
           final GooglePayComponentConfiguration
               googlePayComponentConfiguration = GooglePayComponentConfiguration(
@@ -52,6 +50,9 @@ class GooglePayComponentScreen extends StatelessWidget {
               googlePayEnvironment: Config.googlePayEnvironment,
             ),
           );
+
+          final paymentMethod =
+              _extractPaymentMethod(sessionCheckout.paymentMethodsJson);
 
           return AdyenGooglePayComponent(
             configuration: googlePayComponentConfiguration,
@@ -77,7 +78,7 @@ class GooglePayComponentScreen extends StatelessWidget {
     Map<String, dynamic> jsonPaymentMethods = jsonDecode(paymentMethods);
     return jsonPaymentMethods["paymentMethods"].firstWhere(
       (paymentMethod) => paymentMethod["type"] == "googlepay",
-      orElse: () => <String, String>{},
+      orElse: () => throw Exception("Google pay payment method not provided"),
     );
   }
 

@@ -16,6 +16,15 @@ import 'package:flutter/services.dart';
 import 'package:stream_transform/stream_transform.dart';
 
 class CardSessionComponent extends StatefulWidget {
+  final CardComponentConfigurationDTO cardComponentConfiguration;
+  final SessionDTO session;
+  final String paymentMethod;
+  final Future<void> Function(PaymentResult) onPaymentResult;
+  final double initialViewHeight;
+  final bool isStoredPaymentMethod;
+  final Set<Factory<OneSequenceGestureRecognizer>>? gestureRecognizers;
+  final AdyenLogger adyenLogger;
+
   CardSessionComponent({
     super.key,
     required this.cardComponentConfiguration,
@@ -27,15 +36,6 @@ class CardSessionComponent extends StatefulWidget {
     this.gestureRecognizers,
     AdyenLogger? adyenLogger,
   }) : adyenLogger = adyenLogger ?? AdyenLogger.instance;
-
-  final CardComponentConfigurationDTO cardComponentConfiguration;
-  final SessionDTO session;
-  final String paymentMethod;
-  final Future<void> Function(PaymentResult) onPaymentResult;
-  final double initialViewHeight;
-  final bool isStoredPaymentMethod;
-  final Set<Factory<OneSequenceGestureRecognizer>>? gestureRecognizers;
-  final AdyenLogger adyenLogger;
 
   @override
   State<CardSessionComponent> createState() => _CardSessionComponentState();
