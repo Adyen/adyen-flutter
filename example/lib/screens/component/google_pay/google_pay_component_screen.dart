@@ -22,12 +22,7 @@ class GooglePayComponentScreen extends StatelessWidget {
       appBar: AppBar(title: const Text('Adyen google pay component')),
       body: SafeArea(
         child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              _buildAdyenGooglePayComponent(),
-            ],
-          ),
+          child: _buildAdyenGooglePayComponent(),
         ),
       ),
     );
@@ -58,9 +53,14 @@ class GooglePayComponentScreen extends StatelessWidget {
             configuration: googlePayComponentConfiguration,
             paymentMethod: paymentMethod,
             checkout: sessionCheckout,
-            onPaymentResult: (paymentResult) async {
+            theme: GooglePayButtonTheme.dark,
+            type: GooglePayButtonType.plain,
+            onPaymentResult: (paymentResult) {
               Navigator.pop(context);
               _dialogBuilder(paymentResult, context);
+            },
+            onSetupError: () {
+              print("Google pay setup failed");
             },
           );
         } else {

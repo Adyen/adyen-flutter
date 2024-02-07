@@ -43,6 +43,16 @@ class GooglePaySessionComponent(
         activity.addOnNewIntentListener(intentListener)
     }
 
+    override fun onAvailabilityResult(isAvailable: Boolean, paymentMethod: PaymentMethod) {
+        activity.lifecycleScope.launch {
+            if (isAvailable) {
+                setupGooglePayComponent(paymentMethod)
+            }
+
+            googlePayAvailableFlow.emit(isAvailable)
+        }
+    }
+
     fun checkGooglePayAvailability(
         paymentMethod: PaymentMethod,
         instantPaymentComponentConfigurationDTO: InstantPaymentComponentConfigurationDTO,
@@ -59,7 +69,6 @@ class GooglePaySessionComponent(
                 googlePayConfiguration,
                 this@GooglePaySessionComponent,
             )
-
         }
     }
 
@@ -69,15 +78,6 @@ class GooglePaySessionComponent(
 
     fun handleActivityResult(resultCode: Int, data: Intent?) {
         googlePayComponent.handleActivityResult(resultCode, data)
-    }
-
-    override fun onAvailabilityResult(isAvailable: Boolean, paymentMethod: PaymentMethod) {
-        activity.lifecycleScope.launch {
-            if (isAvailable) {
-                setupGooglePayComponent(paymentMethod)
-            }
-            googlePayAvailableFlow.emit(isAvailable)
-        }
     }
 
     private fun mapToGooglePayConfiguration(instantPaymentComponentConfigurationDTO: InstantPaymentComponentConfigurationDTO): GooglePayConfiguration {
@@ -102,10 +102,7 @@ class GooglePaySessionComponent(
         val countryCode: String = instantPaymentComponentConfigurationDTO.countryCode
 
         return instantPaymentComponentConfigurationDTO.googlePayConfigurationDTO?.mapToGooglePayConfiguration(
-            googlePayConfigurationBuilder,
-            analyticsConfiguration,
-            amount,
-            countryCode
+            googlePayConfigurationBuilder, analyticsConfiguration, amount, countryCode
         ) ?: throw Exception("Unable to create Google pay configuration")
     }
 
@@ -113,7 +110,6 @@ class GooglePaySessionComponent(
         val sessionSetupResponse = SessionSetupResponse.SERIALIZER.deserialize(sessionHolder.sessionSetupResponse)
         val order = sessionHolder.orderResponse?.let { Order.SERIALIZER.deserialize(it) }
         val checkoutSession = CheckoutSession(sessionSetupResponse = sessionSetupResponse, order = order)
-
         googlePayComponent = GooglePayComponent.PROVIDER.get(
             activity,
             checkoutSession,
@@ -122,11 +118,11 @@ class GooglePaySessionComponent(
             GooglePaySessionCallback(componentFlutterApi) { action -> onAction(action) },
             UUID.randomUUID().toString()
         )
-
-        googlePayComponent.getGooglePayButtonParameters().allowedPaymentMethods
     }
 
-    private fun onAction(action: Action) = googlePayComponent.handleAction(action, activity)
+    private fun onAction(action: Action) {
+        googlePayComponent.handleAction(action, activity)
+    }
 
     private fun handleIntent(intent: Intent) {
         if (intent.data?.toString().orEmpty().startsWith(RedirectComponent.REDIRECT_RESULT_SCHEME)) {

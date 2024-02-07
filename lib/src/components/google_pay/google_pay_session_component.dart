@@ -12,9 +12,17 @@ import 'package:pay/pay.dart';
 class GooglePaySessionComponent extends StatefulWidget {
   final String googlePayPaymentMethod;
   final GooglePayComponentConfiguration googlePayComponentConfiguration;
-  final Future<void> Function(PaymentResult) onPaymentResult;
+  final void Function(PaymentResult) onPaymentResult;
   final ComponentPlatformApi componentPlatformApi;
   final ComponentFlutterApi componentFlutterApi;
+  final GooglePayButtonTheme? theme;
+  final GooglePayButtonType? type;
+  final int? cornerRadius;
+  final double? width;
+  final double? height;
+  final void Function()? onSetupError;
+  final Widget? errorIndicator;
+  final Widget? loadingIndicator;
   final AdyenLogger adyenLogger;
   static const String basicGooglePayIsReadyToPay = '''{
   "provider": "google_pay",
@@ -31,6 +39,14 @@ class GooglePaySessionComponent extends StatefulWidget {
     required this.onPaymentResult,
     required this.componentPlatformApi,
     required this.componentFlutterApi,
+    this.theme,
+    this.type,
+    this.cornerRadius,
+    this.width,
+    this.height,
+    this.onSetupError,
+    this.errorIndicator,
+    this.loadingIndicator,
     AdyenLogger? adyenLogger,
   }) : adyenLogger = adyenLogger ?? AdyenLogger.instance;
 
@@ -57,15 +73,29 @@ class _GooglePaySessionComponentState extends State<GooglePaySessionComponent> {
     return FutureBuilder(
       future: _isGooglePaySupported(),
       builder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
-        if (snapshot.data == true) {
-          return RawGooglePayButton(
-            paymentConfiguration: PaymentConfiguration.fromJsonString(
-                GooglePaySessionComponent.basicGooglePayIsReadyToPay),
-            onPressed: onPressed,
-          );
-        } else {
-          return const SizedBox.shrink();
+        if (snapshot.connectionState == ConnectionState.done) {
+          if (snapshot.data == true) {
+            return SizedBox(
+              width: widget.width,
+              height: widget.height,
+              child: RawGooglePayButton(
+                paymentConfiguration: PaymentConfiguration.fromJsonString(
+                  GooglePaySessionComponent.basicGooglePayIsReadyToPay,
+                ),
+                onPressed: onPressed,
+                cornerRadius: widget.cornerRadius ??
+                    RawGooglePayButton.defaultButtonHeight ~/ 2,
+                theme: widget.theme ?? GooglePayButtonTheme.dark,
+                type: widget.type ?? GooglePayButtonType.buy,
+              ),
+            );
+          } else {
+            widget.onSetupError?.call();
+            return widget.errorIndicator ?? const SizedBox.shrink();
+          }
         }
+
+        return widget.loadingIndicator ?? const SizedBox.shrink();
       },
     );
   }
