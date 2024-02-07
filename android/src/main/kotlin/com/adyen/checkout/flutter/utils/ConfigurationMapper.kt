@@ -3,6 +3,7 @@ package com.adyen.checkout.flutter.utils
 import AddressMode
 import AmountDTO
 import AnalyticsOptionsDTO
+import BillingAddressParametersDTO
 import CardConfigurationDTO
 import CashAppPayConfigurationDTO
 import CashAppPayEnvironment
@@ -11,7 +12,9 @@ import Environment
 import FieldVisibility
 import GooglePayConfigurationDTO
 import GooglePayEnvironment
+import MerchantInfoDTO
 import OrderResponseDTO
+import ShippingAddressParametersDTO
 import TotalPriceStatus
 import android.content.Context
 import com.adyen.checkout.card.AddressConfiguration
@@ -27,7 +30,10 @@ import com.adyen.checkout.components.core.OrderResponse
 import com.adyen.checkout.components.core.internal.data.api.AnalyticsMapper
 import com.adyen.checkout.components.core.internal.data.api.AnalyticsPlatform
 import com.adyen.checkout.dropin.DropInConfiguration
+import com.adyen.checkout.googlepay.BillingAddressParameters
 import com.adyen.checkout.googlepay.GooglePayConfiguration
+import com.adyen.checkout.googlepay.MerchantInfo
+import com.adyen.checkout.googlepay.ShippingAddressParameters
 import com.google.android.gms.wallet.WalletConstants
 import java.util.Locale
 import com.adyen.checkout.cashapppay.CashAppPayEnvironment as SDKCashAppPayEnvironment
@@ -62,15 +68,14 @@ object ConfigurationMapper {
         }
 
         if (cardConfigurationDTO != null) {
-            val cardConfiguration =
-                cardConfigurationDTO.toNativeModel(
-                    context,
-                    shopperLocale,
-                    environment,
-                    clientKey,
-                    analyticsConfiguration,
-                    amount,
-                )
+            val cardConfiguration = cardConfigurationDTO.toNativeModel(
+                context,
+                shopperLocale,
+                environment,
+                clientKey,
+                analyticsConfiguration,
+                amount,
+            )
             dropInConfiguration.addCardConfiguration(cardConfiguration)
         }
 
@@ -111,16 +116,14 @@ object ConfigurationMapper {
         analyticsConfiguration: AnalyticsConfiguration,
         amount: Amount,
     ): CardConfiguration {
-        val cardConfiguration =
-            if (shopperLocale != null) {
-                val locale = Locale.forLanguageTag(shopperLocale)
-                CardConfiguration.Builder(locale, environment, clientKey)
-            } else {
-                CardConfiguration.Builder(context, environment, clientKey)
-            }
+        val cardConfiguration = if (shopperLocale != null) {
+            val locale = Locale.forLanguageTag(shopperLocale)
+            CardConfiguration.Builder(locale, environment, clientKey)
+        } else {
+            CardConfiguration.Builder(context, environment, clientKey)
+        }
 
-        return cardConfiguration.setAddressConfiguration(addressMode.mapToAddressConfiguration())
-            .setAmount(amount)
+        return cardConfiguration.setAddressConfiguration(addressMode.mapToAddressConfiguration()).setAmount(amount)
             .setShowStorePaymentField(showStorePaymentField).setHideCvcStoredCard(!showCvcForStoredCard)
             .setHideCvc(!showCvc).setKcpAuthVisibility(determineKcpAuthVisibility(kcpFieldVisibility))
             .setSocialSecurityNumberVisibility(
@@ -130,11 +133,10 @@ object ConfigurationMapper {
     }
 
     fun AnalyticsOptionsDTO.mapToAnalyticsConfiguration(): AnalyticsConfiguration {
-        val analyticsLevel =
-            when {
-                enabled -> AnalyticsLevel.ALL
-                else -> AnalyticsLevel.NONE
-            }
+        val analyticsLevel = when {
+            enabled -> AnalyticsLevel.ALL
+            else -> AnalyticsLevel.NONE
+        }
         AnalyticsMapper.Companion.overrideForCrossPlatform(AnalyticsPlatform.FLUTTER, version)
         return AnalyticsConfiguration(analyticsLevel)
     }
@@ -145,13 +147,12 @@ object ConfigurationMapper {
         environment: com.adyen.checkout.core.Environment,
         googlePayConfigurationDTO: GooglePayConfigurationDTO
     ): GooglePayConfiguration {
-        val googlePayConfigurationBuilder =
-            if (shopperLocale != null) {
-                val locale = Locale.forLanguageTag(shopperLocale)
-                GooglePayConfiguration.Builder(locale, environment, clientKey)
-            } else {
-                GooglePayConfiguration.Builder(context, environment, clientKey)
-            }
+        val googlePayConfigurationBuilder = if (shopperLocale != null) {
+            val locale = Locale.forLanguageTag(shopperLocale)
+            GooglePayConfiguration.Builder(locale, environment, clientKey)
+        } else {
+            GooglePayConfiguration.Builder(context, environment, clientKey)
+        }
 
         return googlePayConfigurationDTO.mapToGooglePayConfiguration(googlePayConfigurationBuilder)
     }
@@ -162,13 +163,12 @@ object ConfigurationMapper {
         environment: com.adyen.checkout.core.Environment,
         cashAppPayConfigurationDTO: CashAppPayConfigurationDTO
     ): CashAppPayConfiguration {
-        val cashAppPayConfigurationBuilder =
-            if (shopperLocale != null) {
-                val locale = Locale.forLanguageTag(shopperLocale)
-                CashAppPayConfiguration.Builder(locale, environment, clientKey)
-            } else {
-                CashAppPayConfiguration.Builder(context, environment, clientKey)
-            }
+        val cashAppPayConfigurationBuilder = if (shopperLocale != null) {
+            val locale = Locale.forLanguageTag(shopperLocale)
+            CashAppPayConfiguration.Builder(locale, environment, clientKey)
+        } else {
+            CashAppPayConfiguration.Builder(context, environment, clientKey)
+        }
 
         return cashAppPayConfigurationDTO.mapToCashAppPayConfiguration(cashAppPayConfigurationBuilder)
     }
@@ -200,10 +200,9 @@ object ConfigurationMapper {
             return emptyArray()
         }
 
-        val mappedCardTypes =
-            cardTypes.map { cardBrandName ->
-                cardBrandName?.let { CardType.getByBrandName(it.lowercase()) }
-            }
+        val mappedCardTypes = cardTypes.map { cardBrandName ->
+            cardBrandName?.let { CardType.getByBrandName(it.lowercase()) }
+        }
         return mappedCardTypes.filterNotNull().toTypedArray()
     }
 
@@ -230,9 +229,36 @@ object ConfigurationMapper {
     }
 
     fun GooglePayConfigurationDTO.mapToGooglePayConfiguration(
-        builder: GooglePayConfiguration.Builder
+        builder: GooglePayConfiguration.Builder,
+        analyticsConfiguration: AnalyticsConfiguration? = null,
+        amount: Amount? = null,
+        countryCode: String? = null
     ): GooglePayConfiguration {
         builder.setGooglePayEnvironment(googlePayEnvironment.mapToWalletConstants())
+
+        analyticsConfiguration?.let {
+            builder.setAnalyticsConfiguration(it)
+        }
+
+        amount?.let {
+            builder.setAmount(it)
+        }
+
+        countryCode?.let {
+            builder.setCountryCode(it)
+        }
+
+        merchantAccount?.let { merchantAccount ->
+            builder.setMerchantAccount(merchantAccount)
+        }
+
+        merchantInfoDTO?.let {
+            builder.setMerchantInfo(it.mapToMerchantInfo())
+        }
+
+        totalPriceStatus?.let { totalPriceStatus ->
+            builder.setTotalPriceStatus(totalPriceStatus.mapToTotalPriceStatus())
+        }
 
         if (allowedCardNetworks?.isNotEmpty() == true) {
             builder.setAllowedCardNetworks(allowedCardNetworks.filterNotNull())
@@ -242,28 +268,40 @@ object ConfigurationMapper {
             builder.setAllowedAuthMethods(allowedAuthMethods.filterNotNull())
         }
 
-        merchantAccount?.let { merchantAccount ->
-            builder.setMerchantAccount(merchantAccount)
-        }
-
-        totalPriceStatus?.let { totalPriceStatus ->
-            builder.setTotalPriceStatus(totalPriceStatus.mapToTotalPriceStatus())
-        }
-
         allowPrepaidCards?.let {
-            builder.setAllowPrepaidCards(allowPrepaidCards)
+            builder.setAllowPrepaidCards(it)
         }
 
-        billingAddressRequired?.let {
-            builder.setBillingAddressRequired(billingAddressRequired)
+        allowCreditCards?.let {
+            builder.setAllowCreditCards(it)
+        }
+
+        assuranceDetailsRequired?.let {
+            builder.setAssuranceDetailsRequired(it)
         }
 
         emailRequired?.let {
-            builder.setEmailRequired(emailRequired)
+            builder.setEmailRequired(it)
+        }
+
+        existingPaymentMethodRequired?.let {
+            builder.setExistingPaymentMethodRequired(it)
         }
 
         shippingAddressRequired?.let {
-            builder.setShippingAddressRequired(shippingAddressRequired)
+            builder.setShippingAddressRequired(it)
+        }
+
+        shippingAddressParametersDTO?.let {
+            builder.setShippingAddressParameters(it.mapToShippingAddressParameters())
+        }
+
+        billingAddressRequired?.let {
+            builder.setBillingAddressRequired(it)
+        }
+
+        billingAddressParametersDTO?.let {
+            builder.setBillingAddressParameters(it.mapToBillingAddressParameters())
         }
 
         return builder.build()
@@ -281,6 +319,24 @@ object ConfigurationMapper {
             TotalPriceStatus.NOTCURRENTLYKNOWN -> "NOT_CURRENTLY_KNOWN"
             TotalPriceStatus.ESTIMATED -> "ESTIMATED"
             TotalPriceStatus.FINALPRICE -> "FINAL"
+        }
+    }
+
+    private fun MerchantInfoDTO.mapToMerchantInfo(): MerchantInfo {
+        return MerchantInfo(merchantName, merchantId)
+    }
+
+    private fun ShippingAddressParametersDTO.mapToShippingAddressParameters(): ShippingAddressParameters {
+        return when {
+            isPhoneNumberRequired != null -> ShippingAddressParameters(allowedCountryCodes, isPhoneNumberRequired)
+            else -> ShippingAddressParameters(allowedCountryCodes)
+        }
+    }
+
+    private fun BillingAddressParametersDTO.mapToBillingAddressParameters(): BillingAddressParameters {
+        return when {
+            isPhoneNumberRequired != null -> BillingAddressParameters(format, isPhoneNumberRequired)
+            else -> BillingAddressParameters(format)
         }
     }
 

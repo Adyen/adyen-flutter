@@ -185,26 +185,66 @@ class ApplePayConfigurationDTO {
 class GooglePayConfigurationDTO {
   final GooglePayEnvironment googlePayEnvironment;
   final String? merchantAccount;
+  final MerchantInfoDTO? merchantInfoDTO;
   final TotalPriceStatus? totalPriceStatus;
   final List<String?>? allowedCardNetworks;
   final List<String?>? allowedAuthMethods;
   final bool? allowPrepaidCards;
-  final bool? billingAddressRequired;
+  final bool? allowCreditCards;
+  final bool? assuranceDetailsRequired;
   final bool? emailRequired;
-  final bool? shippingAddressRequired;
   final bool? existingPaymentMethodRequired;
+  final bool? shippingAddressRequired;
+  final ShippingAddressParametersDTO? shippingAddressParametersDTO;
+  final bool? billingAddressRequired;
+  final BillingAddressParametersDTO? billingAddressParametersDTO;
 
   GooglePayConfigurationDTO(
     this.googlePayEnvironment,
     this.merchantAccount,
+    this.merchantInfoDTO,
     this.totalPriceStatus,
     this.allowedCardNetworks,
     this.allowedAuthMethods,
     this.allowPrepaidCards,
-    this.billingAddressRequired,
+    this.allowCreditCards,
+    this.assuranceDetailsRequired,
     this.emailRequired,
-    this.shippingAddressRequired,
     this.existingPaymentMethodRequired,
+    this.shippingAddressRequired,
+    this.shippingAddressParametersDTO,
+    this.billingAddressRequired,
+    this.billingAddressParametersDTO,
+  );
+}
+
+class MerchantInfoDTO {
+  final String? merchantName;
+  final String? merchantId;
+
+  MerchantInfoDTO(
+    this.merchantName,
+    this.merchantId,
+  );
+}
+
+class ShippingAddressParametersDTO {
+  final List<String?>? allowedCountryCodes;
+  final bool? isPhoneNumberRequired;
+
+  ShippingAddressParametersDTO(
+    this.allowedCountryCodes,
+    this.isPhoneNumberRequired,
+  );
+}
+
+class BillingAddressParametersDTO {
+  final String? format;
+  final bool? isPhoneNumberRequired;
+
+  BillingAddressParametersDTO(
+    this.format,
+    this.isPhoneNumberRequired,
   );
 }
 
