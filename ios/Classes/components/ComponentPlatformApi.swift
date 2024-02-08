@@ -19,6 +19,10 @@ class ComponentPlatformApi: ComponentPlatformInterface {
     func isInstantPaymentMethodSupportedByPlatform(instantPaymentComponentConfigurationDTO: InstantPaymentComponentConfigurationDTO, paymentMethodResponse: String, completion: @escaping (Result<Bool, Error>) -> Void) {
         
     }
+    
+    func onInstantPaymentMethodPressed(instantPaymentType: InstantPaymentType) throws {
+        
+    }
 
     private func handlePaymentEvent(paymentEventDTO: PaymentEventDTO) {
         switch paymentEventDTO.paymentEventType {
