@@ -24,6 +24,7 @@ class GooglePaySessionComponent extends StatefulWidget {
   final Widget? errorIndicator;
   final Widget? loadingIndicator;
   final AdyenLogger adyenLogger;
+  final ValueNotifier<bool> isButtonClickable = ValueNotifier<bool>(true);
   static const String basicGooglePayIsReadyToPay = '''{
   "provider": "google_pay",
   "data": {
@@ -78,15 +79,23 @@ class _GooglePaySessionComponentState extends State<GooglePaySessionComponent> {
             return SizedBox(
               width: widget.width,
               height: widget.height,
-              child: RawGooglePayButton(
-                paymentConfiguration: PaymentConfiguration.fromJsonString(
-                  GooglePaySessionComponent.basicGooglePayIsReadyToPay,
-                ),
-                onPressed: onPressed,
-                cornerRadius: widget.cornerRadius ??
-                    RawGooglePayButton.defaultButtonHeight ~/ 2,
-                theme: widget.theme ?? GooglePayButtonTheme.dark,
-                type: widget.type ?? GooglePayButtonType.buy,
+              child: ValueListenableBuilder(
+                valueListenable: widget.isButtonClickable,
+                builder: (BuildContext context, value, Widget? child) {
+                  return IgnorePointer(
+                    ignoring: value == false,
+                    child: RawGooglePayButton(
+                      paymentConfiguration: PaymentConfiguration.fromJsonString(
+                        GooglePaySessionComponent.basicGooglePayIsReadyToPay,
+                      ),
+                      onPressed: onPressed,
+                      cornerRadius: widget.cornerRadius ??
+                          RawGooglePayButton.defaultButtonHeight ~/ 2,
+                      theme: widget.theme ?? GooglePayButtonTheme.dark,
+                      type: widget.type ?? GooglePayButtonType.buy,
+                    ),
+                  );
+                },
               ),
             );
           } else {
@@ -108,6 +117,7 @@ class _GooglePaySessionComponentState extends State<GooglePaySessionComponent> {
   }
 
   void onPressed() {
+    widget.isButtonClickable.value = false;
     widget.componentPlatformApi
         .onInstantPaymentMethodPressed(InstantPaymentType.googlePay);
   }
@@ -127,6 +137,7 @@ class _GooglePaySessionComponentState extends State<GooglePaySessionComponent> {
   }
 
   void _handleComponentCommunication(event) async {
+    widget.isButtonClickable.value = true;
     if (event.type case ComponentCommunicationType.result) {
       _onResult(event);
     } else if (event.type case ComponentCommunicationType.error) {

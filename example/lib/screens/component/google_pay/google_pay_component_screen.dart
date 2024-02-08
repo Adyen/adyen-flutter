@@ -55,6 +55,7 @@ class GooglePayComponentScreen extends StatelessWidget {
             checkout: sessionCheckout,
             theme: GooglePayButtonTheme.dark,
             type: GooglePayButtonType.plain,
+            loadingIndicator: const CircularProgressIndicator(),
             onPaymentResult: (paymentResult) {
               Navigator.pop(context);
               _dialogBuilder(paymentResult, context);

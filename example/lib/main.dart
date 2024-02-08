@@ -8,6 +8,7 @@ import 'package:adyen_checkout_example/repositories/adyen_google_pay_component_r
 import 'package:adyen_checkout_example/screens/component/card/card_component_screen.dart';
 import 'package:adyen_checkout_example/screens/component/google_pay/google_pay_component_screen.dart';
 import 'package:adyen_checkout_example/screens/drop_in/drop_in_screen.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
@@ -74,8 +75,8 @@ class _MyAppState extends State<MyApp> {
                     Navigator.push(context, _buildCardComponentRoute()),
                 child: const Text("Card component")),
             TextButton(
-                onPressed: () =>
-                    Navigator.push(context, _buildGooglePayComponentRoute()),
+                onPressed: () => Navigator.push(
+                    context, _buildGoogleOrApplePayComponentRoute()),
                 child: const Text("Google and Apple pay component")),
           ],
         ),
@@ -97,11 +98,18 @@ class _MyAppState extends State<MyApp> {
     );
   }
 
-  MaterialPageRoute<dynamic> _buildGooglePayComponentRoute() {
-    return MaterialPageRoute(
-      builder: (context) => GooglePayComponentScreen(
-        repository: AdyenGooglePayComponentRepository(service: _service),
-      ),
-    );
+  MaterialPageRoute<dynamic> _buildGoogleOrApplePayComponentRoute() {
+    switch (defaultTargetPlatform) {
+      case TargetPlatform.android:
+        return MaterialPageRoute(
+          builder: (context) => GooglePayComponentScreen(
+            repository: AdyenGooglePayComponentRepository(service: _service),
+          ),
+        );
+      case TargetPlatform.iOS:
+      //TODO Add implementation
+      default:
+        throw UnsupportedError('Unsupported platform');
+    }
   }
 }
