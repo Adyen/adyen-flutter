@@ -24,6 +24,7 @@ class ComponentPlatformApi : ComponentPlatformInterface {
     lateinit var googlePaySessionComponent: GooglePaySessionComponent
     private lateinit var componentFlutterInterface: ComponentFlutterInterface
     private lateinit var sessionHolder: SessionHolder
+
     override fun updateViewHeight(viewId: Long) {
         ComponentHeightMessenger.sendResult(viewId)
     }
@@ -45,9 +46,13 @@ class ComponentPlatformApi : ComponentPlatformInterface {
         val paymentMethodJson = JSONObject(paymentMethodResponse)
         val paymentMethod = PaymentMethod.SERIALIZER.deserialize(paymentMethodJson)
         when (instantPaymentConfigurationDTO.instantPaymentType) {
-            InstantPaymentType.GOOGLEPAY -> isGooglePaySupported(
-                paymentMethod, instantPaymentConfigurationDTO, componentId, callback
-            )
+            InstantPaymentType.GOOGLEPAY ->
+                isGooglePaySupported(
+                    paymentMethod,
+                    instantPaymentConfigurationDTO,
+                    componentId,
+                    callback
+                )
 
             InstantPaymentType.APPLEPAY -> return
         }

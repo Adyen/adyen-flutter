@@ -5,7 +5,6 @@ import ComponentFlutterInterface
 import ComponentPlatformInterface
 import DropInFlutterInterface
 import DropInPlatformInterface
-import PlatformCommunicationModel
 import android.content.Intent
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.Lifecycle
@@ -137,7 +136,11 @@ class AdyenCheckoutPlugin : FlutterPlugin, ActivityAware, PluginRegistry.Activit
         lifecycleReference = null
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?): Boolean {
+    override fun onActivityResult(
+        requestCode: Int,
+        resultCode: Int,
+        data: Intent?
+    ): Boolean {
         return when (requestCode) {
             GOOGLE_PAY_REQUEST_CODE -> {
                 println("ON ACTIVITY RESULT GOOGLE PAY")
