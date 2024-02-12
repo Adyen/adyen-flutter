@@ -24,7 +24,7 @@ class CardSessionComponent extends StatefulWidget {
   final bool isStoredPaymentMethod;
   final Set<Factory<OneSequenceGestureRecognizer>>? gestureRecognizers;
   final AdyenLogger adyenLogger;
-  final UniqueKey componentId = UniqueKey();
+  final String componentId = "CARD_SESSION_COMPONENT";
 
   CardSessionComponent({
     super.key,
@@ -58,7 +58,7 @@ class _CardSessionComponentState extends State<CardSessionComponent> {
 
     _cardWidget = _buildCardWidget();
     _componentFlutterApi.componentCommunicationStream.stream
-        .where((event) => event.componentId == widget.componentId.toString())
+        .where((event) => event.componentId == widget.componentId)
         .listen(_handleComponentCommunication);
   }
 
@@ -116,13 +116,13 @@ class _CardSessionComponentState extends State<CardSessionComponent> {
           widget.cardComponentConfiguration,
       Constants.paymentMethodKey: widget.paymentMethod,
       Constants.isStoredPaymentMethodKey: widget.isStoredPaymentMethod,
-      Constants.componentIdKey: widget.componentId.toString(),
+      Constants.componentIdKey: widget.componentId,
     };
 
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
         return AndroidPlatformView(
-          key: widget.componentId,
+          key: UniqueKey(),
           viewType: Constants.cardComponentSessionKey,
           codec: _codec,
           creationParams: creationParams,
@@ -131,7 +131,7 @@ class _CardSessionComponentState extends State<CardSessionComponent> {
         );
       case TargetPlatform.iOS:
         return IosPlatformView(
-          key: widget.componentId,
+          key: UniqueKey(),
           viewType: Constants.cardComponentSessionKey,
           codec: _codec,
           creationParams: creationParams,
