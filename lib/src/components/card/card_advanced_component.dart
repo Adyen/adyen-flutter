@@ -27,7 +27,7 @@ class CardAdvancedComponent extends StatefulWidget {
   final PaymentEventHandler paymentEventHandler;
   final Set<Factory<OneSequenceGestureRecognizer>>? gestureRecognizers;
   final AdyenLogger adyenLogger;
-  final UniqueKey componentId = UniqueKey();
+  final String componentId = "CARD_ADVANCED_COMPONENT";
 
   CardAdvancedComponent({
     super.key,
@@ -65,7 +65,7 @@ class _CardAdvancedFlowState extends State<CardAdvancedComponent> {
 
     _cardWidget = _buildCardWidget();
     _componentFlutterApi.componentCommunicationStream.stream
-        .where((event) => event.componentId == widget.componentId.toString())
+        .where((event) => event.componentId == widget.componentId)
         .listen(_handleComponentCommunication);
   }
 
@@ -149,7 +149,7 @@ class _CardAdvancedFlowState extends State<CardAdvancedComponent> {
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
         return AndroidPlatformView(
-          key: widget.componentId,
+          key: UniqueKey(),
           viewType: Constants.cardComponentAdvancedKey,
           codec: _codec,
           creationParams: creationParams,
@@ -158,7 +158,7 @@ class _CardAdvancedFlowState extends State<CardAdvancedComponent> {
         );
       case TargetPlatform.iOS:
         return IosPlatformView(
-          key: widget.componentId,
+          key: UniqueKey(),
           viewType: Constants.cardComponentAdvancedKey,
           codec: _codec,
           creationParams: creationParams,
