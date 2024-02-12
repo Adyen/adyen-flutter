@@ -3,7 +3,7 @@ import Adyen
 class CardAdvancedFlowActionComponentDelegate: ActionComponentDelegate {
     private let componentFlutterApi: ComponentFlutterInterface
     private let componentId: String
-    
+
     init(componentFlutterApi: ComponentFlutterInterface, componentId: String) {
         self.componentFlutterApi = componentFlutterApi
         self.componentId = componentId
