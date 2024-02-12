@@ -51,29 +51,14 @@ class GooglePayComponentScreen extends StatelessWidget {
           final paymentMethod =
               _extractPaymentMethod(sessionCheckout.paymentMethodsJson);
 
-          final cardComponentConfiguration = CardComponentConfiguration(
-            environment: Config.environment,
-            clientKey: Config.clientKey,
-            countryCode: Config.countryCode,
-            amount: Config.amount,
-            shopperLocale: Config.shopperLocale,
-            cardConfiguration: const CardConfiguration(),
-          );
-
-          final cardPaymentMethod =
-              _extractCardPaymentMethod(sessionCheckout.paymentMethodsJson);
-
           return Column(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              AdyenCardComponent(
-                configuration: cardComponentConfiguration,
-                paymentMethod: cardPaymentMethod,
-                checkout: sessionCheckout,
-                onPaymentResult: (paymentResult) async {
-                  Navigator.pop(context);
-                  _dialogBuilder(paymentResult, context);
-                },
+              const Text(
+                style: TextStyle(fontSize: 20),
+                "Session flow",
               ),
+              const SizedBox(height: 8),
               AdyenGooglePayComponent(
                 configuration: googlePayComponentConfiguration,
                 paymentMethod: paymentMethod,
@@ -86,6 +71,12 @@ class GooglePayComponentScreen extends StatelessWidget {
                 },
                 onSetupError: () {},
               ),
+              const SizedBox(height: 80),
+              const Text(
+                style: TextStyle(fontSize: 20),
+                "Advanced flow",
+              ),
+              const SizedBox(height: 8),
             ],
           );
         } else {
@@ -93,26 +84,6 @@ class GooglePayComponentScreen extends StatelessWidget {
         }
       },
     );
-  }
-
-  Map<String, dynamic> _extractCardPaymentMethod(String paymentMethods) {
-    if (paymentMethods.isEmpty) {
-      return <String, String>{};
-    }
-
-    Map<String, dynamic> jsonPaymentMethods = jsonDecode(paymentMethods);
-    List paymentMethodList = jsonPaymentMethods["paymentMethods"] as List;
-    Map<String, dynamic> paymentMethod = paymentMethodList
-        .firstWhere((paymentMethod) => paymentMethod["type"] == "scheme");
-
-    List storedPaymentMethodList =
-        jsonPaymentMethods.containsKey("storedPaymentMethods")
-            ? jsonPaymentMethods["storedPaymentMethods"] as List
-            : [];
-    Map<String, dynamic> storedPaymentMethod =
-        storedPaymentMethodList.firstOrNull ?? <String, String>{};
-
-    return paymentMethod;
   }
 
   Map<String, dynamic> _extractPaymentMethod(String paymentMethods) {
