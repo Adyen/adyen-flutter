@@ -73,7 +73,10 @@ abstract class BaseCardComponent(
         ComponentErrorMessenger.instance().removeObservers(activity)
     }
 
-    fun addComponent(cardComponent: CardComponent, componentId: String) {
+    fun addComponent(
+        cardComponent: CardComponent,
+        componentId: String
+    ) {
         componentWrapperView.addComponent(cardComponent, componentId)
     }
 

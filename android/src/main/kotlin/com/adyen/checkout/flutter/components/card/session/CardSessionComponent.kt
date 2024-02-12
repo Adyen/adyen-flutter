@@ -51,7 +51,11 @@ class CardSessionComponent(
                     checkoutSession = checkoutSession,
                     storedPaymentMethod = storedPaymentMethod,
                     configuration = cardConfiguration,
-                    componentCallback = CardSessionCallback(componentFlutterApi, componentId) { action -> onAction(action) },
+                    componentCallback =
+                        CardSessionCallback(
+                            componentFlutterApi,
+                            componentId
+                        ) { action -> onAction(action) },
                     key = UUID.randomUUID().toString()
                 )
             }
@@ -63,7 +67,11 @@ class CardSessionComponent(
                     checkoutSession = checkoutSession,
                     paymentMethod = paymentMethod,
                     configuration = cardConfiguration,
-                    componentCallback = CardSessionCallback(componentFlutterApi, componentId) { action -> onAction(action) },
+                    componentCallback =
+                        CardSessionCallback(
+                            componentFlutterApi,
+                            componentId
+                        ) { action -> onAction(action) },
                     key = UUID.randomUUID().toString()
                 )
             }

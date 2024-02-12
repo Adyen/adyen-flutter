@@ -68,14 +68,15 @@ object ConfigurationMapper {
         }
 
         if (cardConfigurationDTO != null) {
-            val cardConfiguration = cardConfigurationDTO.toNativeModel(
-                context,
-                shopperLocale,
-                environment,
-                clientKey,
-                analyticsConfiguration,
-                amount,
-            )
+            val cardConfiguration =
+                cardConfigurationDTO.toNativeModel(
+                    context,
+                    shopperLocale,
+                    environment,
+                    clientKey,
+                    analyticsConfiguration,
+                    amount,
+                )
             dropInConfiguration.addCardConfiguration(cardConfiguration)
         }
 
@@ -116,12 +117,13 @@ object ConfigurationMapper {
         analyticsConfiguration: AnalyticsConfiguration,
         amount: Amount,
     ): CardConfiguration {
-        val cardConfiguration = if (shopperLocale != null) {
-            val locale = Locale.forLanguageTag(shopperLocale)
-            CardConfiguration.Builder(locale, environment, clientKey)
-        } else {
-            CardConfiguration.Builder(context, environment, clientKey)
-        }
+        val cardConfiguration =
+            if (shopperLocale != null) {
+                val locale = Locale.forLanguageTag(shopperLocale)
+                CardConfiguration.Builder(locale, environment, clientKey)
+            } else {
+                CardConfiguration.Builder(context, environment, clientKey)
+            }
 
         return cardConfiguration.setAddressConfiguration(addressMode.mapToAddressConfiguration()).setAmount(amount)
             .setShowStorePaymentField(showStorePaymentField).setHideCvcStoredCard(!showCvcForStoredCard)
@@ -133,10 +135,11 @@ object ConfigurationMapper {
     }
 
     fun AnalyticsOptionsDTO.mapToAnalyticsConfiguration(): AnalyticsConfiguration {
-        val analyticsLevel = when {
-            enabled -> AnalyticsLevel.ALL
-            else -> AnalyticsLevel.NONE
-        }
+        val analyticsLevel =
+            when {
+                enabled -> AnalyticsLevel.ALL
+                else -> AnalyticsLevel.NONE
+            }
         AnalyticsMapper.Companion.overrideForCrossPlatform(AnalyticsPlatform.FLUTTER, version)
         return AnalyticsConfiguration(analyticsLevel)
     }
@@ -147,12 +150,13 @@ object ConfigurationMapper {
         environment: com.adyen.checkout.core.Environment,
         googlePayConfigurationDTO: GooglePayConfigurationDTO
     ): GooglePayConfiguration {
-        val googlePayConfigurationBuilder = if (shopperLocale != null) {
-            val locale = Locale.forLanguageTag(shopperLocale)
-            GooglePayConfiguration.Builder(locale, environment, clientKey)
-        } else {
-            GooglePayConfiguration.Builder(context, environment, clientKey)
-        }
+        val googlePayConfigurationBuilder =
+            if (shopperLocale != null) {
+                val locale = Locale.forLanguageTag(shopperLocale)
+                GooglePayConfiguration.Builder(locale, environment, clientKey)
+            } else {
+                GooglePayConfiguration.Builder(context, environment, clientKey)
+            }
 
         return googlePayConfigurationDTO.mapToGooglePayConfiguration(googlePayConfigurationBuilder)
     }
@@ -163,12 +167,13 @@ object ConfigurationMapper {
         environment: com.adyen.checkout.core.Environment,
         cashAppPayConfigurationDTO: CashAppPayConfigurationDTO
     ): CashAppPayConfiguration {
-        val cashAppPayConfigurationBuilder = if (shopperLocale != null) {
-            val locale = Locale.forLanguageTag(shopperLocale)
-            CashAppPayConfiguration.Builder(locale, environment, clientKey)
-        } else {
-            CashAppPayConfiguration.Builder(context, environment, clientKey)
-        }
+        val cashAppPayConfigurationBuilder =
+            if (shopperLocale != null) {
+                val locale = Locale.forLanguageTag(shopperLocale)
+                CashAppPayConfiguration.Builder(locale, environment, clientKey)
+            } else {
+                CashAppPayConfiguration.Builder(context, environment, clientKey)
+            }
 
         return cashAppPayConfigurationDTO.mapToCashAppPayConfiguration(cashAppPayConfigurationBuilder)
     }
@@ -200,9 +205,10 @@ object ConfigurationMapper {
             return emptyArray()
         }
 
-        val mappedCardTypes = cardTypes.map { cardBrandName ->
-            cardBrandName?.let { CardType.getByBrandName(it.lowercase()) }
-        }
+        val mappedCardTypes =
+            cardTypes.map { cardBrandName ->
+                cardBrandName?.let { CardType.getByBrandName(it.lowercase()) }
+            }
         return mappedCardTypes.filterNotNull().toTypedArray()
     }
 
