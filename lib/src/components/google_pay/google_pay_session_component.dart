@@ -24,7 +24,7 @@ class GooglePaySessionComponent extends StatefulWidget {
   final Widget? errorIndicator;
   final Widget? loadingIndicator;
   final AdyenLogger adyenLogger;
-  final UniqueKey componentId = UniqueKey();
+  final String componentId = "GOOGLE_PAY_COMPONENT";
 
   GooglePaySessionComponent({
     super.key,
@@ -58,8 +58,7 @@ class _GooglePaySessionComponentState extends State<GooglePaySessionComponent> {
   @override
   void initState() {
     _componentFlutterApi.componentCommunicationStream.stream
-        .where(
-            (element) => element.componentId == widget.componentId.toString())
+        .where((element) => element.componentId == widget.componentId)
         .listen(_handleComponentCommunication);
 
     super.initState();
@@ -153,7 +152,7 @@ class _GooglePaySessionComponentState extends State<GooglePaySessionComponent> {
     return await _componentPlatformApi.isInstantPaymentSupportedByPlatform(
       instantPaymentComponentConfigurationDTO,
       widget.googlePayPaymentMethod,
-      widget.componentId.toString(),
+      widget.componentId,
     );
   }
 
