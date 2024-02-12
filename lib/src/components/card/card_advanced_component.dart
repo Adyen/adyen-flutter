@@ -17,6 +17,18 @@ import 'package:flutter/services.dart';
 import 'package:stream_transform/stream_transform.dart';
 
 class CardAdvancedComponent extends StatefulWidget {
+  final CardComponentConfigurationDTO cardComponentConfiguration;
+  final String paymentMethod;
+  final Future<PaymentEvent> Function(String) onPayments;
+  final Future<PaymentEvent> Function(String) onPaymentsDetails;
+  final Future<void> Function(PaymentResult) onPaymentResult;
+  final bool isStoredPaymentMethod;
+  final double initialViewHeight;
+  final PaymentEventHandler paymentEventHandler;
+  final Set<Factory<OneSequenceGestureRecognizer>>? gestureRecognizers;
+  final AdyenLogger adyenLogger;
+  final UniqueKey componentId = UniqueKey();
+
   CardAdvancedComponent({
     super.key,
     required this.cardComponentConfiguration,
@@ -32,17 +44,6 @@ class CardAdvancedComponent extends StatefulWidget {
   })  : paymentEventHandler = paymentEventHandler ?? PaymentEventHandler(),
         adyenLogger = adyenLogger ?? AdyenLogger.instance;
 
-  final CardComponentConfigurationDTO cardComponentConfiguration;
-  final String paymentMethod;
-  final Future<PaymentEvent> Function(String) onPayments;
-  final Future<PaymentEvent> Function(String) onPaymentsDetails;
-  final Future<void> Function(PaymentResult) onPaymentResult;
-  final bool isStoredPaymentMethod;
-  final double initialViewHeight;
-  final PaymentEventHandler paymentEventHandler;
-  final Set<Factory<OneSequenceGestureRecognizer>>? gestureRecognizers;
-  final AdyenLogger adyenLogger;
-
   @override
   State<CardAdvancedComponent> createState() => _CardAdvancedFlowState();
 }
@@ -50,20 +51,21 @@ class CardAdvancedComponent extends StatefulWidget {
 class _CardAdvancedFlowState extends State<CardAdvancedComponent> {
   final MessageCodec<Object?> _codec =
       ComponentFlutterInterface.pigeonChannelCodec;
-  final ComponentFlutterApi _resultApi = ComponentFlutterApi();
+  final ComponentPlatformApi _componentPlatformApi =
+      ComponentPlatformApi.instance;
+
   final StreamController<double> _resizeStream = StreamController.broadcast();
-  final ComponentPlatformApi _componentPlatformApi = ComponentPlatformApi();
   final GlobalKey _cardWidgetKey = GlobalKey();
   late Widget _cardWidget;
+  final ComponentFlutterApi _componentFlutterApi = ComponentFlutterApi.instance;
 
   @override
   void initState() {
     super.initState();
 
-    ComponentFlutterInterface.setup(_resultApi);
     _cardWidget = _buildCardWidget();
-    _resultApi.componentCommunicationStream.stream
-        .asBroadcastStream()
+    _componentFlutterApi.componentCommunicationStream.stream
+        .where((event) => event.componentId == widget.componentId.toString())
         .listen(_handleComponentCommunication);
   }
 
@@ -85,7 +87,7 @@ class _CardAdvancedFlowState extends State<CardAdvancedComponent> {
 
   @override
   void dispose() {
-    _resultApi.componentCommunicationStream.close();
+    _componentFlutterApi.dispose();
     _resizeStream.close();
     super.dispose();
   }
@@ -141,12 +143,13 @@ class _CardAdvancedFlowState extends State<CardAdvancedComponent> {
       Constants.cardComponentConfigurationKey:
           widget.cardComponentConfiguration,
       Constants.isStoredPaymentMethodKey: widget.isStoredPaymentMethod,
+      Constants.componentIdKey: widget.componentId.toString(),
     };
 
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
         return AndroidPlatformView(
-          key: UniqueKey(),
+          key: widget.componentId,
           viewType: Constants.cardComponentAdvancedKey,
           codec: _codec,
           creationParams: creationParams,
@@ -155,7 +158,7 @@ class _CardAdvancedFlowState extends State<CardAdvancedComponent> {
         );
       case TargetPlatform.iOS:
         return IosPlatformView(
-          key: UniqueKey(),
+          key: widget.componentId,
           viewType: Constants.cardComponentAdvancedKey,
           codec: _codec,
           creationParams: creationParams,

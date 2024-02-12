@@ -314,11 +314,13 @@ class PlatformCommunicationModel {
 
 class ComponentCommunicationModel {
   final ComponentCommunicationType type;
+  final String componentId;
   final Object? data;
   final PaymentResultModelDTO? paymentResult;
 
   ComponentCommunicationModel({
     required this.type,
+    required this.componentId,
     this.data,
     this.paymentResult,
   });
@@ -380,7 +382,7 @@ class CardComponentConfigurationDTO {
   );
 }
 
-class InstantPaymentComponentConfigurationDTO {
+class InstantPaymentConfigurationDTO {
   final InstantPaymentType instantPaymentType;
   final Environment environment;
   final String clientKey;
@@ -391,7 +393,7 @@ class InstantPaymentComponentConfigurationDTO {
   final GooglePayConfigurationDTO? googlePayConfigurationDTO;
   final ApplePayConfigurationDTO? applePayConfigurationDTO;
 
-  InstantPaymentComponentConfigurationDTO(
+  InstantPaymentConfigurationDTO(
     this.instantPaymentType,
     this.environment,
     this.clientKey,
@@ -401,6 +403,18 @@ class InstantPaymentComponentConfigurationDTO {
     this.analyticsOptionsDTO,
     this.googlePayConfigurationDTO,
     this.applePayConfigurationDTO,
+  );
+}
+
+class InstantPaymentSetupResultDTO {
+  final InstantPaymentType instantPaymentType;
+  final bool isSupported;
+  final Object? resultData;
+
+  InstantPaymentSetupResultDTO(
+    this.instantPaymentType,
+    this.isSupported,
+    this.resultData,
   );
 }
 
@@ -457,13 +471,15 @@ abstract class ComponentPlatformInterface {
   void onPaymentsDetailsResult(PaymentEventDTO paymentsDetailsResult);
 
   @async
-  bool isInstantPaymentMethodSupportedByPlatform(
-    InstantPaymentComponentConfigurationDTO
-        instantPaymentComponentConfigurationDTO,
+  InstantPaymentSetupResultDTO isInstantPaymentSupportedByPlatform(
+    InstantPaymentConfigurationDTO instantPaymentConfigurationDTO,
     String paymentMethodResponse,
+    String componentId,
   );
 
-  void onInstantPaymentMethodPressed(InstantPaymentType instantPaymentType);
+  void onInstantPaymentPressed(InstantPaymentType instantPaymentType);
+
+  void onDispose();
 }
 
 @FlutterApi()

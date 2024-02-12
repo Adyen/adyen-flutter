@@ -1,19 +1,12 @@
 package com.adyen.checkout.flutter.components.googlepay
 
-import AnalyticsOptionsDTO
 import ComponentFlutterInterface
-import InstantPaymentComponentConfigurationDTO
-import android.app.Dialog
+import InstantPaymentConfigurationDTO
+import InstantPaymentSetupResultDTO
+import InstantPaymentType.*
 import android.content.Intent
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import androidx.appcompat.app.AlertDialog
 import androidx.core.util.Consumer
-import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentActivity
-import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.lifecycleScope
 import com.adyen.checkout.components.core.AnalyticsConfiguration
 import com.adyen.checkout.components.core.ComponentAvailableCallback
@@ -21,11 +14,7 @@ import com.adyen.checkout.components.core.Order
 import com.adyen.checkout.components.core.Amount
 import com.adyen.checkout.components.core.PaymentMethod
 import com.adyen.checkout.components.core.action.Action
-import com.adyen.checkout.components.core.internal.Component
-import com.adyen.checkout.components.core.internal.PaymentComponent
-import com.adyen.checkout.flutter.R
 import com.adyen.checkout.flutter.components.ComponentLoadingBottomSheet
-import com.adyen.checkout.flutter.components.ComponentWrapperView
 import com.adyen.checkout.flutter.session.SessionHolder
 import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToAnalyticsConfiguration
 import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToGooglePayConfiguration
@@ -36,11 +25,7 @@ import com.adyen.checkout.googlepay.GooglePayConfiguration
 import com.adyen.checkout.redirect.RedirectComponent
 import com.adyen.checkout.sessions.core.CheckoutSession
 import com.adyen.checkout.sessions.core.SessionSetupResponse
-import com.adyen.checkout.ui.core.AdyenComponentView
-import com.adyen.checkout.ui.core.internal.ui.ViewableComponent
-import com.google.android.gms.wallet.button.PayButton
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import java.util.Locale
@@ -50,12 +35,12 @@ class GooglePaySessionComponent(
     private val activity: FragmentActivity,
     private val sessionHolder: SessionHolder,
     private val componentFlutterApi: ComponentFlutterInterface,
+    private val componentId: String,
 ) : ComponentAvailableCallback {
-    val googlePayAvailableFlow = MutableStateFlow<Boolean?>(null)
     private lateinit var googlePayConfiguration: GooglePayConfiguration
-    private lateinit var googlePayComponent: GooglePayComponent
-
+    private var googlePayComponent: GooglePayComponent? = null
     private val intentListener = Consumer<Intent> { handleIntent(it) }
+    val googlePayAvailableFlow = MutableStateFlow<InstantPaymentSetupResultDTO?>(null)
 
     init {
         activity.addOnNewIntentListener(intentListener)
@@ -64,23 +49,29 @@ class GooglePaySessionComponent(
     override fun onAvailabilityResult(isAvailable: Boolean, paymentMethod: PaymentMethod) {
         activity.lifecycleScope.launch {
             if (isAvailable) {
-                setupGooglePayComponent(paymentMethod)
+                googlePayComponent = setupGooglePayComponent(paymentMethod)
             }
 
-            googlePayAvailableFlow.emit(isAvailable)
+            val allowedPaymentMethods: String =
+                googlePayComponent?.getGooglePayButtonParameters()?.allowedPaymentMethods ?: ""
+            googlePayAvailableFlow.emit(
+                InstantPaymentSetupResultDTO(GOOGLEPAY, isAvailable, allowedPaymentMethods)
+            )
         }
     }
 
     fun checkGooglePayAvailability(
         paymentMethod: PaymentMethod,
-        instantPaymentComponentConfigurationDTO: InstantPaymentComponentConfigurationDTO,
+        instantPaymentConfigurationDTO: InstantPaymentConfigurationDTO,
     ) {
         activity.lifecycleScope.launch {
             if (!GooglePayComponent.PROVIDER.isPaymentMethodSupported(paymentMethod)) {
-                googlePayAvailableFlow.emit(false)
+                googlePayAvailableFlow.emit(
+                    InstantPaymentSetupResultDTO(GOOGLEPAY, false, emptyList<String>())
+                )
             }
 
-            googlePayConfiguration = mapToGooglePayConfiguration(instantPaymentComponentConfigurationDTO)
+            googlePayConfiguration = mapToGooglePayConfiguration(instantPaymentConfigurationDTO)
             GooglePayComponent.PROVIDER.isAvailable(
                 activity.application,
                 paymentMethod,
@@ -91,58 +82,62 @@ class GooglePaySessionComponent(
     }
 
     fun startGooglePayScreen() {
-        googlePayComponent.startGooglePayScreen(activity, Constants.GOOGLE_PAY_REQUEST_CODE)
+        googlePayComponent?.startGooglePayScreen(activity, Constants.GOOGLE_PAY_REQUEST_CODE)
     }
 
     fun handleActivityResult(resultCode: Int, data: Intent?) {
-        googlePayComponent.handleActivityResult(resultCode, data)
+        googlePayComponent?.handleActivityResult(resultCode, data)
     }
 
-    private fun mapToGooglePayConfiguration(instantPaymentComponentConfigurationDTO: InstantPaymentComponentConfigurationDTO): GooglePayConfiguration {
+    fun dispose() {
+        activity.removeOnNewIntentListener(intentListener)
+        googlePayComponent = null
+    }
+
+    private fun mapToGooglePayConfiguration(instantPaymentConfigurationDTO: InstantPaymentConfigurationDTO): GooglePayConfiguration {
         val googlePayConfigurationBuilder: GooglePayConfiguration.Builder =
-            if (instantPaymentComponentConfigurationDTO.shopperLocale != null) {
-                val locale = Locale.forLanguageTag(instantPaymentComponentConfigurationDTO.shopperLocale)
+            if (instantPaymentConfigurationDTO.shopperLocale != null) {
+                val locale = Locale.forLanguageTag(instantPaymentConfigurationDTO.shopperLocale)
                 GooglePayConfiguration.Builder(
                     locale,
-                    instantPaymentComponentConfigurationDTO.environment.toNativeModel(),
-                    instantPaymentComponentConfigurationDTO.clientKey
+                    instantPaymentConfigurationDTO.environment.toNativeModel(),
+                    instantPaymentConfigurationDTO.clientKey
                 )
             } else {
                 GooglePayConfiguration.Builder(
                     activity,
-                    instantPaymentComponentConfigurationDTO.environment.toNativeModel(),
-                    instantPaymentComponentConfigurationDTO.clientKey
+                    instantPaymentConfigurationDTO.environment.toNativeModel(),
+                    instantPaymentConfigurationDTO.clientKey
                 )
             }
         val analyticsConfiguration: AnalyticsConfiguration =
-            instantPaymentComponentConfigurationDTO.analyticsOptionsDTO.mapToAnalyticsConfiguration()
-        val amount: Amount = instantPaymentComponentConfigurationDTO.amount.toNativeModel()
-        val countryCode: String = instantPaymentComponentConfigurationDTO.countryCode
+            instantPaymentConfigurationDTO.analyticsOptionsDTO.mapToAnalyticsConfiguration()
+        val amount: Amount = instantPaymentConfigurationDTO.amount.toNativeModel()
+        val countryCode: String = instantPaymentConfigurationDTO.countryCode
 
-        return instantPaymentComponentConfigurationDTO.googlePayConfigurationDTO?.mapToGooglePayConfiguration(
+        return instantPaymentConfigurationDTO.googlePayConfigurationDTO?.mapToGooglePayConfiguration(
             googlePayConfigurationBuilder, analyticsConfiguration, amount, countryCode
         ) ?: throw Exception("Unable to create Google pay configuration")
     }
 
-    private fun setupGooglePayComponent(paymentMethod: PaymentMethod) {
+    private fun setupGooglePayComponent(paymentMethod: PaymentMethod): GooglePayComponent {
         val sessionSetupResponse = SessionSetupResponse.SERIALIZER.deserialize(sessionHolder.sessionSetupResponse)
         val order = sessionHolder.orderResponse?.let { Order.SERIALIZER.deserialize(it) }
         val checkoutSession = CheckoutSession(sessionSetupResponse = sessionSetupResponse, order = order)
-        googlePayComponent = GooglePayComponent.PROVIDER.get(
+        return GooglePayComponent.PROVIDER.get(
             activity,
             checkoutSession,
             paymentMethod,
             googlePayConfiguration,
-            GooglePaySessionCallback(componentFlutterApi, ::onAction, ::hideLoadingBottomSheet),
+            GooglePaySessionCallback(componentFlutterApi, componentId, ::onAction, ::hideLoadingBottomSheet),
             UUID.randomUUID().toString()
         )
     }
 
     private fun onAction(action: Action) {
-        googlePayComponent.handleAction(action, activity)
-        activity.lifecycleScope.launch {
-            delay(500)
-            val loadingBottomSheet = ComponentLoadingBottomSheet(googlePayComponent)
+        googlePayComponent?.apply {
+            handleAction(action, activity)
+            val loadingBottomSheet = ComponentLoadingBottomSheet(this)
             loadingBottomSheet.isCancelable = false
             loadingBottomSheet.show(activity.supportFragmentManager, ComponentLoadingBottomSheet.TAG)
         }
@@ -150,15 +145,13 @@ class GooglePaySessionComponent(
 
     private fun handleIntent(intent: Intent) {
         if (intent.data?.toString().orEmpty().startsWith(RedirectComponent.REDIRECT_RESULT_SCHEME)) {
-            googlePayComponent.handleIntent(intent)
+            googlePayComponent?.handleIntent(intent)
         }
     }
 
     private fun hideLoadingBottomSheet() {
         activity.supportFragmentManager.findFragmentByTag(ComponentLoadingBottomSheet.TAG)?.let {
-            if (it is BottomSheetDialogFragment) {
-                it.dismiss()
-            }
+            (it as? BottomSheetDialogFragment)?.dismiss()
         }
     }
 }

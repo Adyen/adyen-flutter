@@ -1,10 +1,7 @@
 import 'dart:convert';
 
 import 'package:adyen_checkout/adyen_checkout.dart';
-import 'package:adyen_checkout/src/components/component_flutter_api.dart';
-import 'package:adyen_checkout/src/components/component_platform_api.dart';
 import 'package:adyen_checkout/src/components/google_pay/google_pay_session_component.dart';
-import 'package:adyen_checkout/src/generated/platform_api.g.dart';
 import 'package:flutter/material.dart';
 import 'package:pay/pay.dart' as google_pay_sdk;
 
@@ -21,10 +18,8 @@ class AdyenGooglePayComponent extends StatelessWidget {
   final void Function()? onSetupError;
   final Widget? errorIndicator;
   final Widget? loadingIndicator;
-  final ComponentPlatformApi _componentPlatformApi = ComponentPlatformApi();
-  final ComponentFlutterApi _componentFlutterApi = ComponentFlutterApi();
 
-  AdyenGooglePayComponent({
+  const AdyenGooglePayComponent({
     super.key,
     required this.configuration,
     required this.paymentMethod,
@@ -49,7 +44,6 @@ class AdyenGooglePayComponent extends StatelessWidget {
   }
 
   Widget _buildGooglePaySessionFlowWidget() {
-    ComponentFlutterInterface.setup(_componentFlutterApi);
     final String encodedPaymentMethod = json.encode(paymentMethod);
 
     return GooglePaySessionComponent(
@@ -57,8 +51,6 @@ class AdyenGooglePayComponent extends StatelessWidget {
       googlePayComponentConfiguration: configuration,
       onPaymentResult: onPaymentResult,
       onSetupError: onSetupError,
-      componentPlatformApi: _componentPlatformApi,
-      componentFlutterApi: _componentFlutterApi,
       cornerRadius: cornerRadius,
       width: _determineWidth(),
       height: _determineHeight(),

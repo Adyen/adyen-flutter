@@ -4,7 +4,7 @@ import AdyenNetworking
 import Flutter
 
 class CardAdvancedComponent: BaseCardComponent {
-    private let actionComponentDelegate: ActionComponentDelegate
+    private var actionComponentDelegate: ActionComponentDelegate?
     private var actionComponent: AdyenActionComponent?
     private var presentationDelegate: PresentationDelegate?
     private var cardDelegate: PaymentComponentDelegate?
@@ -16,7 +16,6 @@ class CardAdvancedComponent: BaseCardComponent {
         binaryMessenger: FlutterBinaryMessenger,
         componentFlutterApi: ComponentFlutterInterface
     ) {
-        actionComponentDelegate = CardAdvancedFlowActionComponentDelegate(componentFlutterApi: componentFlutterApi)
         super.init(
             frame: frame,
             viewIdentifier: viewIdentifier,
@@ -25,6 +24,7 @@ class CardAdvancedComponent: BaseCardComponent {
             componentFlutterApi: componentFlutterApi
         )
 
+        actionComponentDelegate = CardAdvancedFlowActionComponentDelegate(componentFlutterApi: componentFlutterApi, componentId: componentId)
         setupCardComponentView()
         setupFinalizeComponentCallback()
     }
@@ -49,7 +49,7 @@ class CardAdvancedComponent: BaseCardComponent {
             isStoredPaymentMethod: isStoredPaymentMethod,
             cardComponentConfiguration: cardComponentConfiguration
         )
-        cardDelegate = CardAdvancedFlowDelegate(componentFlutterApi: componentFlutterApi)
+        cardDelegate = CardAdvancedFlowDelegate(componentFlutterApi: componentFlutterApi, componentId: componentId)
         cardComponent.delegate = cardDelegate
         return cardComponent
     }
@@ -94,6 +94,7 @@ class CardAdvancedComponent: BaseCardComponent {
             self?.finalizeAndDismiss(success: success, completion: { [weak self] in
                 let componentCommunicationModel = ComponentCommunicationModel(
                     type: ComponentCommunicationType.result,
+                    componentId: self?.componentId ?? "",
                     paymentResult: PaymentResultModelDTO(resultCode: resultCode?.rawValue)
                 )
                 self?.componentFlutterApi.onComponentCommunication(

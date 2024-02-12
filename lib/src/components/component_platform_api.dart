@@ -1,6 +1,13 @@
 import 'package:adyen_checkout/src/generated/platform_api.g.dart';
 
 class ComponentPlatformApi implements ComponentPlatformInterface {
+  ComponentPlatformApi._init();
+
+  static ComponentPlatformApi? _instance;
+
+  static ComponentPlatformApi get instance =>
+      _instance ??= ComponentPlatformApi._init();
+
   final ComponentPlatformInterface _componentPlatformInterface =
       ComponentPlatformInterface();
 
@@ -18,19 +25,21 @@ class ComponentPlatformApi implements ComponentPlatformInterface {
       _componentPlatformInterface.onPaymentsDetailsResult(paymentEventDTO);
 
   @override
-  Future<bool> isInstantPaymentMethodSupportedByPlatform(
-    InstantPaymentComponentConfigurationDTO
-        instantPaymentComponentConfigurationDTO,
+  Future<InstantPaymentSetupResultDTO> isInstantPaymentSupportedByPlatform(
+    InstantPaymentConfigurationDTO instantPaymentConfigurationDTO,
     String paymentMethodResponse,
+    String componentId,
   ) async =>
-      _componentPlatformInterface.isInstantPaymentMethodSupportedByPlatform(
-        instantPaymentComponentConfigurationDTO,
+      _componentPlatformInterface.isInstantPaymentSupportedByPlatform(
+        instantPaymentConfigurationDTO,
         paymentMethodResponse,
+        componentId,
       );
 
   @override
-  Future<void> onInstantPaymentMethodPressed(
-          InstantPaymentType instantPaymentType) =>
-      _componentPlatformInterface
-          .onInstantPaymentMethodPressed(instantPaymentType);
+  Future<void> onInstantPaymentPressed(InstantPaymentType instantPaymentType) =>
+      _componentPlatformInterface.onInstantPaymentPressed(instantPaymentType);
+
+  @override
+  Future<void> onDispose() => _componentPlatformInterface.onDispose();
 }

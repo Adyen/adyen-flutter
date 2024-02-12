@@ -3,7 +3,8 @@ package com.adyen.checkout.flutter.components
 import ComponentFlutterInterface
 import ComponentPlatformInterface
 import ErrorDTO
-import InstantPaymentComponentConfigurationDTO
+import InstantPaymentConfigurationDTO
+import InstantPaymentSetupResultDTO
 import InstantPaymentType
 import PaymentEventDTO
 import PaymentEventType
@@ -20,8 +21,9 @@ import org.json.JSONObject
 
 class ComponentPlatformApi : ComponentPlatformInterface {
     lateinit var activity: FragmentActivity
-    lateinit var sessionHolder: SessionHolder
     lateinit var googlePaySessionComponent: GooglePaySessionComponent
+    private lateinit var componentFlutterInterface: ComponentFlutterInterface
+    private lateinit var sessionHolder: SessionHolder
     override fun updateViewHeight(viewId: Long) {
         ComponentHeightMessenger.sendResult(viewId)
     }
@@ -34,29 +36,32 @@ class ComponentPlatformApi : ComponentPlatformInterface {
         handlePaymentEvent(paymentsDetailsResult)
     }
 
-    override fun isInstantPaymentMethodSupportedByPlatform(
-        instantPaymentComponentConfigurationDTO: InstantPaymentComponentConfigurationDTO,
+    override fun isInstantPaymentSupportedByPlatform(
+        instantPaymentConfigurationDTO: InstantPaymentConfigurationDTO,
         paymentMethodResponse: String,
-        callback: (Result<Boolean>) -> Unit
+        componentId: String,
+        callback: (Result<InstantPaymentSetupResultDTO>) -> Unit
     ) {
         val paymentMethodJson = JSONObject(paymentMethodResponse)
         val paymentMethod = PaymentMethod.SERIALIZER.deserialize(paymentMethodJson)
-        when (instantPaymentComponentConfigurationDTO.instantPaymentType) {
+        when (instantPaymentConfigurationDTO.instantPaymentType) {
             InstantPaymentType.GOOGLEPAY -> isGooglePaySupported(
-                paymentMethod,
-                instantPaymentComponentConfigurationDTO,
-                callback
+                paymentMethod, instantPaymentConfigurationDTO, componentId, callback
             )
 
-            InstantPaymentType.APPLEPAY -> TODO()
+            InstantPaymentType.APPLEPAY -> return
         }
     }
 
-    override fun onInstantPaymentMethodPressed(instantPaymentType: InstantPaymentType) {
+    override fun onInstantPaymentPressed(instantPaymentType: InstantPaymentType) {
         when (instantPaymentType) {
             InstantPaymentType.GOOGLEPAY -> googlePaySessionComponent.startGooglePayScreen()
-            InstantPaymentType.APPLEPAY -> TODO()
+            InstantPaymentType.APPLEPAY -> return
         }
+    }
+
+    override fun onDispose() {
+        googlePaySessionComponent.dispose()
     }
 
     fun init(
@@ -66,20 +71,23 @@ class ComponentPlatformApi : ComponentPlatformInterface {
     ) {
         this.activity = binding.activity as FragmentActivity
         this.sessionHolder = sessionHolder
-        googlePaySessionComponent = GooglePaySessionComponent(activity, sessionHolder, componentFlutterInterface)
+        this.componentFlutterInterface = componentFlutterInterface
     }
 
     private fun isGooglePaySupported(
         paymentMethod: PaymentMethod,
-        instantPaymentComponentConfigurationDTO: InstantPaymentComponentConfigurationDTO,
-        callback: (Result<Boolean>) -> Unit
+        instantPaymentComponentConfigurationDTO: InstantPaymentConfigurationDTO,
+        componentId: String,
+        callback: (Result<InstantPaymentSetupResultDTO>) -> Unit
     ) {
         activity.lifecycleScope.launch {
+            googlePaySessionComponent =
+                GooglePaySessionComponent(activity, sessionHolder, componentFlutterInterface, componentId)
             googlePaySessionComponent.checkGooglePayAvailability(paymentMethod, instantPaymentComponentConfigurationDTO)
             googlePaySessionComponent.googlePayAvailableFlow.collectLatest {
-                if (it == true) {
-                    callback(Result.success(true))
-                } else if (it == false) {
+                if (it?.isSupported == true) {
+                    callback(Result.success(it))
+                } else if (it?.isSupported == false) {
                     callback(Result.failure(Exception("Google pay not available")))
                 }
             }

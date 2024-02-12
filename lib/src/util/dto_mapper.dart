@@ -120,15 +120,15 @@ extension CardComponentConfigurationMapper on CardComponentConfiguration {
 
 extension GooglePayComponentConfigurationMapper
     on GooglePayComponentConfiguration {
-  InstantPaymentComponentConfigurationDTO
-      toInstantPaymentComponentConfigurationDTO(String sdkVersionNumber) =>
-          InstantPaymentComponentConfigurationDTO(
-            instantPaymentType: InstantPaymentType.googlePay,
-            environment: environment,
-            clientKey: clientKey,
-            countryCode: countryCode,
-            amount: amount.toDTO(),
-            analyticsOptionsDTO: analyticsOptions.toDTO(sdkVersionNumber),
-            googlePayConfigurationDTO: googlePayConfiguration.toDTO(),
-          );
+  InstantPaymentConfigurationDTO toInstantPaymentConfigurationDTO(
+          String sdkVersionNumber) =>
+      InstantPaymentConfigurationDTO(
+        instantPaymentType: InstantPaymentType.googlePay,
+        environment: environment,
+        clientKey: clientKey,
+        countryCode: countryCode,
+        amount: amount.toDTO(),
+        analyticsOptionsDTO: analyticsOptions.toDTO(sdkVersionNumber),
+        googlePayConfigurationDTO: googlePayConfiguration.toDTO(),
+      );
 }

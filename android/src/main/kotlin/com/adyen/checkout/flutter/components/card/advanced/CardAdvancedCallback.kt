@@ -10,13 +10,17 @@ import com.adyen.checkout.components.core.ComponentError
 import com.adyen.checkout.components.core.PaymentComponentData
 import com.adyen.checkout.flutter.components.ComponentHeightMessenger
 
-class CardAdvancedCallback(private val componentFlutterApi: ComponentFlutterInterface) :
+class CardAdvancedCallback(
+    private val componentFlutterApi: ComponentFlutterInterface,
+    private val componentId: String,
+) :
     ComponentCallback<CardComponentState> {
     override fun onSubmit(state: CardComponentState) {
         val paymentComponentJson = PaymentComponentData.SERIALIZER.serialize(state.data)
         val model =
             ComponentCommunicationModel(
                 ComponentCommunicationType.ONSUBMIT,
+                componentId = componentId,
                 data = paymentComponentJson.toString(),
             )
         componentFlutterApi.onComponentCommunication(model) {}
@@ -27,6 +31,7 @@ class CardAdvancedCallback(private val componentFlutterApi: ComponentFlutterInte
         val model =
             ComponentCommunicationModel(
                 ComponentCommunicationType.ADDITIONALDETAILS,
+                componentId = componentId,
                 data = actionComponentJson.toString(),
             )
         componentFlutterApi.onComponentCommunication(model) {}
@@ -36,6 +41,7 @@ class CardAdvancedCallback(private val componentFlutterApi: ComponentFlutterInte
         val model =
             ComponentCommunicationModel(
                 ComponentCommunicationType.ERROR,
+                componentId = componentId,
                 data = componentError.exception.toString(),
             )
         componentFlutterApi.onComponentCommunication(model) {}

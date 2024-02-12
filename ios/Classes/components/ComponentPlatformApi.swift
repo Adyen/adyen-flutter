@@ -16,11 +16,15 @@ class ComponentPlatformApi: ComponentPlatformInterface {
         handlePaymentEvent(paymentEventDTO: paymentsDetailsResult)
     }
     
-    func isInstantPaymentMethodSupportedByPlatform(instantPaymentComponentConfigurationDTO: InstantPaymentComponentConfigurationDTO, paymentMethodResponse: String, completion: @escaping (Result<Bool, Error>) -> Void) {
+    func isInstantPaymentSupportedByPlatform(instantPaymentConfigurationDTO: InstantPaymentConfigurationDTO, paymentMethodResponse: String, componentId: String, completion: @escaping (Result<InstantPaymentSetupResultDTO, Error>) -> Void) {
         
     }
     
-    func onInstantPaymentMethodPressed(instantPaymentType: InstantPaymentType) throws {
+    func onInstantPaymentPressed(instantPaymentType: InstantPaymentType) throws {
+        
+    }
+    
+    func onDispose() throws {
         
     }
 

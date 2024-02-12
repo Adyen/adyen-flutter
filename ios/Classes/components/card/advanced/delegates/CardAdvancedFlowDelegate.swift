@@ -2,9 +2,11 @@ import Adyen
 
 class CardAdvancedFlowDelegate: PaymentComponentDelegate {
     private let componentFlutterApi: ComponentFlutterInterface
+    private let componentId: String
 
-    init(componentFlutterApi: ComponentFlutterInterface) {
+    init(componentFlutterApi: ComponentFlutterInterface, componentId: String) {
         self.componentFlutterApi = componentFlutterApi
+        self.componentId = componentId
     }
 
     func didSubmit(_ data: Adyen.PaymentComponentData, from _: Adyen.PaymentComponent) {
@@ -31,6 +33,7 @@ class CardAdvancedFlowDelegate: PaymentComponentDelegate {
             componentFlutterApi.onComponentCommunication(
                 componentCommunicationModel: ComponentCommunicationModel(
                     type: ComponentCommunicationType.onSubmit,
+                    componentId: componentId,
                     data: paymentComponentString
                 ), completion: { _ in }
             )
@@ -46,6 +49,7 @@ class CardAdvancedFlowDelegate: PaymentComponentDelegate {
     private func sendErrorToFlutterLayer(error: Error) {
         let componentCommunicationModel = ComponentCommunicationModel(
             type: ComponentCommunicationType.error,
+            componentId: componentId,
             data: error.localizedDescription
         )
         componentFlutterApi.onComponentCommunication(

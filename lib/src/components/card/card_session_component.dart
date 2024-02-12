@@ -24,6 +24,7 @@ class CardSessionComponent extends StatefulWidget {
   final bool isStoredPaymentMethod;
   final Set<Factory<OneSequenceGestureRecognizer>>? gestureRecognizers;
   final AdyenLogger adyenLogger;
+  final UniqueKey componentId = UniqueKey();
 
   CardSessionComponent({
     super.key,
@@ -44,20 +45,20 @@ class CardSessionComponent extends StatefulWidget {
 class _CardSessionComponentState extends State<CardSessionComponent> {
   final MessageCodec<Object?> _codec =
       ComponentFlutterInterface.pigeonChannelCodec;
-  final ComponentFlutterApi _resultApi = ComponentFlutterApi();
-  final ComponentPlatformApi _componentPlatformApi = ComponentPlatformApi();
+  final ComponentPlatformApi _componentPlatformApi =
+      ComponentPlatformApi.instance;
   final StreamController<double> _resizeStream = StreamController.broadcast();
   final GlobalKey _cardWidgetKey = GlobalKey();
   late Widget _cardWidget;
+  final ComponentFlutterApi _componentFlutterApi = ComponentFlutterApi.instance;
 
   @override
   void initState() {
     super.initState();
 
-    ComponentFlutterInterface.setup(_resultApi);
     _cardWidget = _buildCardWidget();
-    _resultApi.componentCommunicationStream.stream
-        .asBroadcastStream()
+    _componentFlutterApi.componentCommunicationStream.stream
+        .where((event) => event.componentId == widget.componentId.toString())
         .listen(_handleComponentCommunication);
   }
 
@@ -79,7 +80,7 @@ class _CardSessionComponentState extends State<CardSessionComponent> {
 
   @override
   void dispose() {
-    _resultApi.componentCommunicationStream.close();
+    _componentFlutterApi.dispose();
     _resizeStream.close();
     super.dispose();
   }
@@ -115,12 +116,13 @@ class _CardSessionComponentState extends State<CardSessionComponent> {
           widget.cardComponentConfiguration,
       Constants.paymentMethodKey: widget.paymentMethod,
       Constants.isStoredPaymentMethodKey: widget.isStoredPaymentMethod,
+      Constants.componentIdKey: widget.componentId.toString(),
     };
 
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
         return AndroidPlatformView(
-          key: UniqueKey(),
+          key: widget.componentId,
           viewType: Constants.cardComponentSessionKey,
           codec: _codec,
           creationParams: creationParams,
@@ -129,7 +131,7 @@ class _CardSessionComponentState extends State<CardSessionComponent> {
         );
       case TargetPlatform.iOS:
         return IosPlatformView(
-          key: UniqueKey(),
+          key: widget.componentId,
           viewType: Constants.cardComponentSessionKey,
           codec: _codec,
           creationParams: creationParams,

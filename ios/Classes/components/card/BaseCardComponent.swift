@@ -7,9 +7,11 @@ class BaseCardComponent: NSObject, FlutterPlatformView, UIScrollViewDelegate {
     let cardComponentConfigurationKey = "cardComponentConfiguration"
     let isStoredPaymentMethodKey = "isStoredPaymentMethod"
     let paymentMethodKey = "paymentMethod"
+    let componentIdKey = "componentId"
     let cardComponentConfiguration: CardComponentConfigurationDTO?
     let isStoredPaymentMethod: Bool
     let paymentMethod: String?
+    let componentId: String
     let componentFlutterApi: ComponentFlutterInterface
     let componentPlatformApi: ComponentPlatformApi
     let componentWrapperView: ComponentWrapperView
@@ -29,6 +31,7 @@ class BaseCardComponent: NSObject, FlutterPlatformView, UIScrollViewDelegate {
         cardComponentConfiguration = arguments.value(forKey: cardComponentConfigurationKey) as? CardComponentConfigurationDTO
         paymentMethod = arguments.value(forKey: paymentMethodKey) as? String
         isStoredPaymentMethod = arguments.value(forKey: isStoredPaymentMethodKey) as? Bool ?? false
+        componentId = arguments.value(forKey: componentIdKey) as? String ?? ""
         componentPlatformApi = ComponentPlatformApi()
         componentWrapperView = .init()
         ComponentPlatformInterfaceSetup.setUp(binaryMessenger: binaryMessenger, api: componentPlatformApi)
@@ -88,6 +91,7 @@ class BaseCardComponent: NSObject, FlutterPlatformView, UIScrollViewDelegate {
 
     func sendErrorToFlutterLayer(errorMessage: String) {
         let componentCommunicationModel = ComponentCommunicationModel(type: ComponentCommunicationType.error,
+                                                                      componentId: componentId,
                                                                       data: errorMessage)
         componentFlutterApi.onComponentCommunication(componentCommunicationModel: componentCommunicationModel, completion: { _ in })
     }
@@ -137,6 +141,7 @@ class BaseCardComponent: NSObject, FlutterPlatformView, UIScrollViewDelegate {
         componentFlutterApi.onComponentCommunication(
             componentCommunicationModel: ComponentCommunicationModel(
                 type: ComponentCommunicationType.resize,
+                componentId: componentId,
                 data: roundedViewHeight
             ), completion: { _ in }
         )
