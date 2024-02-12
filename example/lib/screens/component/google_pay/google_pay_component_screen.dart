@@ -33,6 +33,8 @@ class GooglePayComponentScreen extends StatelessWidget {
       future: repository.createSessionCheckout(),
       builder: (BuildContext context, AsyncSnapshot<SessionCheckout> snapshot) {
         if (snapshot.hasData) {
+          AdyenCheckout.instance.enableConsoleLogging(enabled: true);
+
           final SessionCheckout sessionCheckout = snapshot.data!;
 
           final GooglePayComponentConfiguration
@@ -49,26 +51,68 @@ class GooglePayComponentScreen extends StatelessWidget {
           final paymentMethod =
               _extractPaymentMethod(sessionCheckout.paymentMethodsJson);
 
-          return AdyenGooglePayComponent(
-            configuration: googlePayComponentConfiguration,
-            paymentMethod: paymentMethod,
-            checkout: sessionCheckout,
-            theme: GooglePayButtonTheme.dark,
-            type: GooglePayButtonType.plain,
-            loadingIndicator: const CircularProgressIndicator(),
-            onPaymentResult: (paymentResult) {
-              Navigator.pop(context);
-              _dialogBuilder(paymentResult, context);
-            },
-            onSetupError: () {
-              print("Google pay setup failed");
-            },
+          final cardComponentConfiguration = CardComponentConfiguration(
+            environment: Config.environment,
+            clientKey: Config.clientKey,
+            countryCode: Config.countryCode,
+            amount: Config.amount,
+            shopperLocale: Config.shopperLocale,
+            cardConfiguration: const CardConfiguration(),
+          );
+
+          final cardPaymentMethod =
+              _extractCardPaymentMethod(sessionCheckout.paymentMethodsJson);
+
+          return Column(
+            children: [
+              AdyenCardComponent(
+                configuration: cardComponentConfiguration,
+                paymentMethod: cardPaymentMethod,
+                checkout: sessionCheckout,
+                onPaymentResult: (paymentResult) async {
+                  Navigator.pop(context);
+                  _dialogBuilder(paymentResult, context);
+                },
+              ),
+              AdyenGooglePayComponent(
+                configuration: googlePayComponentConfiguration,
+                paymentMethod: paymentMethod,
+                checkout: sessionCheckout,
+                type: GooglePayButtonType.plain,
+                loadingIndicator: const CircularProgressIndicator(),
+                onPaymentResult: (paymentResult) {
+                  Navigator.pop(context);
+                  _dialogBuilder(paymentResult, context);
+                },
+                onSetupError: () {},
+              ),
+            ],
           );
         } else {
           return const SizedBox.shrink();
         }
       },
     );
+  }
+
+  Map<String, dynamic> _extractCardPaymentMethod(String paymentMethods) {
+    if (paymentMethods.isEmpty) {
+      return <String, String>{};
+    }
+
+    Map<String, dynamic> jsonPaymentMethods = jsonDecode(paymentMethods);
+    List paymentMethodList = jsonPaymentMethods["paymentMethods"] as List;
+    Map<String, dynamic> paymentMethod = paymentMethodList
+        .firstWhere((paymentMethod) => paymentMethod["type"] == "scheme");
+
+    List storedPaymentMethodList =
+        jsonPaymentMethods.containsKey("storedPaymentMethods")
+            ? jsonPaymentMethods["storedPaymentMethods"] as List
+            : [];
+    Map<String, dynamic> storedPaymentMethod =
+        storedPaymentMethodList.firstOrNull ?? <String, String>{};
+
+    return paymentMethod;
   }
 
   Map<String, dynamic> _extractPaymentMethod(String paymentMethods) {
