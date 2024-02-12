@@ -666,6 +666,7 @@ data class PlatformCommunicationModel (
 /** Generated class from Pigeon that represents data sent in messages. */
 data class ComponentCommunicationModel (
   val type: ComponentCommunicationType,
+  val componentId: String,
   val data: Any? = null,
   val paymentResult: PaymentResultModelDTO? = null
 
@@ -674,16 +675,18 @@ data class ComponentCommunicationModel (
     @Suppress("UNCHECKED_CAST")
     fun fromList(list: List<Any?>): ComponentCommunicationModel {
       val type = ComponentCommunicationType.ofRaw(list[0] as Int)!!
-      val data = list[1]
-      val paymentResult: PaymentResultModelDTO? = (list[2] as List<Any?>?)?.let {
+      val componentId = list[1] as String
+      val data = list[2]
+      val paymentResult: PaymentResultModelDTO? = (list[3] as List<Any?>?)?.let {
         PaymentResultModelDTO.fromList(it)
       }
-      return ComponentCommunicationModel(type, data, paymentResult)
+      return ComponentCommunicationModel(type, componentId, data, paymentResult)
     }
   }
   fun toList(): List<Any?> {
     return listOf<Any?>(
       type.raw,
+      componentId,
       data,
       paymentResult?.toList(),
     )
@@ -805,7 +808,7 @@ data class CardComponentConfigurationDTO (
 }
 
 /** Generated class from Pigeon that represents data sent in messages. */
-data class InstantPaymentComponentConfigurationDTO (
+data class InstantPaymentConfigurationDTO (
   val instantPaymentType: InstantPaymentType,
   val environment: Environment,
   val clientKey: String,
@@ -819,7 +822,7 @@ data class InstantPaymentComponentConfigurationDTO (
 ) {
   companion object {
     @Suppress("UNCHECKED_CAST")
-    fun fromList(list: List<Any?>): InstantPaymentComponentConfigurationDTO {
+    fun fromList(list: List<Any?>): InstantPaymentConfigurationDTO {
       val instantPaymentType = InstantPaymentType.ofRaw(list[0] as Int)!!
       val environment = Environment.ofRaw(list[1] as Int)!!
       val clientKey = list[2] as String
@@ -833,7 +836,7 @@ data class InstantPaymentComponentConfigurationDTO (
       val applePayConfigurationDTO: ApplePayConfigurationDTO? = (list[8] as List<Any?>?)?.let {
         ApplePayConfigurationDTO.fromList(it)
       }
-      return InstantPaymentComponentConfigurationDTO(instantPaymentType, environment, clientKey, countryCode, amount, shopperLocale, analyticsOptionsDTO, googlePayConfigurationDTO, applePayConfigurationDTO)
+      return InstantPaymentConfigurationDTO(instantPaymentType, environment, clientKey, countryCode, amount, shopperLocale, analyticsOptionsDTO, googlePayConfigurationDTO, applePayConfigurationDTO)
     }
   }
   fun toList(): List<Any?> {
@@ -847,6 +850,31 @@ data class InstantPaymentComponentConfigurationDTO (
       analyticsOptionsDTO.toList(),
       googlePayConfigurationDTO?.toList(),
       applePayConfigurationDTO?.toList(),
+    )
+  }
+}
+
+/** Generated class from Pigeon that represents data sent in messages. */
+data class InstantPaymentSetupResultDTO (
+  val instantPaymentType: InstantPaymentType,
+  val isSupported: Boolean,
+  val resultData: Any? = null
+
+) {
+  companion object {
+    @Suppress("UNCHECKED_CAST")
+    fun fromList(list: List<Any?>): InstantPaymentSetupResultDTO {
+      val instantPaymentType = InstantPaymentType.ofRaw(list[0] as Int)!!
+      val isSupported = list[1] as Boolean
+      val resultData = list[2]
+      return InstantPaymentSetupResultDTO(instantPaymentType, isSupported, resultData)
+    }
+  }
+  fun toList(): List<Any?> {
+    return listOf<Any?>(
+      instantPaymentType.raw,
+      isSupported,
+      resultData,
     )
   }
 }
@@ -917,45 +945,50 @@ private object CheckoutPlatformInterfaceCodec : StandardMessageCodec() {
       }
       140.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          InstantPaymentComponentConfigurationDTO.fromList(it)
+          InstantPaymentConfigurationDTO.fromList(it)
         }
       }
       141.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          MerchantInfoDTO.fromList(it)
+          InstantPaymentSetupResultDTO.fromList(it)
         }
       }
       142.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          OrderResponseDTO.fromList(it)
+          MerchantInfoDTO.fromList(it)
         }
       }
       143.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          PaymentEventDTO.fromList(it)
+          OrderResponseDTO.fromList(it)
         }
       }
       144.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          PaymentResultDTO.fromList(it)
+          PaymentEventDTO.fromList(it)
         }
       }
       145.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          PaymentResultModelDTO.fromList(it)
+          PaymentResultDTO.fromList(it)
         }
       }
       146.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          PlatformCommunicationModel.fromList(it)
+          PaymentResultModelDTO.fromList(it)
         }
       }
       147.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          SessionDTO.fromList(it)
+          PlatformCommunicationModel.fromList(it)
         }
       }
       148.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          SessionDTO.fromList(it)
+        }
+      }
+      149.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
           ShippingAddressParametersDTO.fromList(it)
         }
@@ -1013,40 +1046,44 @@ private object CheckoutPlatformInterfaceCodec : StandardMessageCodec() {
         stream.write(139)
         writeValue(stream, value.toList())
       }
-      is InstantPaymentComponentConfigurationDTO -> {
+      is InstantPaymentConfigurationDTO -> {
         stream.write(140)
         writeValue(stream, value.toList())
       }
-      is MerchantInfoDTO -> {
+      is InstantPaymentSetupResultDTO -> {
         stream.write(141)
         writeValue(stream, value.toList())
       }
-      is OrderResponseDTO -> {
+      is MerchantInfoDTO -> {
         stream.write(142)
         writeValue(stream, value.toList())
       }
-      is PaymentEventDTO -> {
+      is OrderResponseDTO -> {
         stream.write(143)
         writeValue(stream, value.toList())
       }
-      is PaymentResultDTO -> {
+      is PaymentEventDTO -> {
         stream.write(144)
         writeValue(stream, value.toList())
       }
-      is PaymentResultModelDTO -> {
+      is PaymentResultDTO -> {
         stream.write(145)
         writeValue(stream, value.toList())
       }
-      is PlatformCommunicationModel -> {
+      is PaymentResultModelDTO -> {
         stream.write(146)
         writeValue(stream, value.toList())
       }
-      is SessionDTO -> {
+      is PlatformCommunicationModel -> {
         stream.write(147)
         writeValue(stream, value.toList())
       }
-      is ShippingAddressParametersDTO -> {
+      is SessionDTO -> {
         stream.write(148)
+        writeValue(stream, value.toList())
+      }
+      is ShippingAddressParametersDTO -> {
+        stream.write(149)
         writeValue(stream, value.toList())
       }
       else -> super.writeValue(stream, value)
@@ -1529,20 +1566,25 @@ private object ComponentPlatformInterfaceCodec : StandardMessageCodec() {
       }
       134.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          InstantPaymentComponentConfigurationDTO.fromList(it)
+          InstantPaymentConfigurationDTO.fromList(it)
         }
       }
       135.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          MerchantInfoDTO.fromList(it)
+          InstantPaymentSetupResultDTO.fromList(it)
         }
       }
       136.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          PaymentEventDTO.fromList(it)
+          MerchantInfoDTO.fromList(it)
         }
       }
       137.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          PaymentEventDTO.fromList(it)
+        }
+      }
+      138.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
           ShippingAddressParametersDTO.fromList(it)
         }
@@ -1576,20 +1618,24 @@ private object ComponentPlatformInterfaceCodec : StandardMessageCodec() {
         stream.write(133)
         writeValue(stream, value.toList())
       }
-      is InstantPaymentComponentConfigurationDTO -> {
+      is InstantPaymentConfigurationDTO -> {
         stream.write(134)
         writeValue(stream, value.toList())
       }
-      is MerchantInfoDTO -> {
+      is InstantPaymentSetupResultDTO -> {
         stream.write(135)
         writeValue(stream, value.toList())
       }
-      is PaymentEventDTO -> {
+      is MerchantInfoDTO -> {
         stream.write(136)
         writeValue(stream, value.toList())
       }
-      is ShippingAddressParametersDTO -> {
+      is PaymentEventDTO -> {
         stream.write(137)
+        writeValue(stream, value.toList())
+      }
+      is ShippingAddressParametersDTO -> {
+        stream.write(138)
         writeValue(stream, value.toList())
       }
       else -> super.writeValue(stream, value)
@@ -1602,8 +1648,9 @@ interface ComponentPlatformInterface {
   fun updateViewHeight(viewId: Long)
   fun onPaymentsResult(paymentsResult: PaymentEventDTO)
   fun onPaymentsDetailsResult(paymentsDetailsResult: PaymentEventDTO)
-  fun isInstantPaymentMethodSupportedByPlatform(instantPaymentComponentConfigurationDTO: InstantPaymentComponentConfigurationDTO, paymentMethodResponse: String, callback: (Result<Boolean>) -> Unit)
-  fun onInstantPaymentMethodPressed(instantPaymentType: InstantPaymentType)
+  fun isInstantPaymentSupportedByPlatform(instantPaymentConfigurationDTO: InstantPaymentConfigurationDTO, paymentMethodResponse: String, componentId: String, callback: (Result<InstantPaymentSetupResultDTO>) -> Unit)
+  fun onInstantPaymentPressed(instantPaymentType: InstantPaymentType)
+  fun onDispose()
 
   companion object {
     /** The codec used by ComponentPlatformInterface. */
@@ -1671,13 +1718,14 @@ interface ComponentPlatformInterface {
         }
       }
       run {
-        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.adyen_checkout.ComponentPlatformInterface.isInstantPaymentMethodSupportedByPlatform", codec)
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.adyen_checkout.ComponentPlatformInterface.isInstantPaymentSupportedByPlatform", codec)
         if (api != null) {
           channel.setMessageHandler { message, reply ->
             val args = message as List<Any?>
-            val instantPaymentComponentConfigurationDTOArg = args[0] as InstantPaymentComponentConfigurationDTO
+            val instantPaymentConfigurationDTOArg = args[0] as InstantPaymentConfigurationDTO
             val paymentMethodResponseArg = args[1] as String
-            api.isInstantPaymentMethodSupportedByPlatform(instantPaymentComponentConfigurationDTOArg, paymentMethodResponseArg) { result: Result<Boolean> ->
+            val componentIdArg = args[2] as String
+            api.isInstantPaymentSupportedByPlatform(instantPaymentConfigurationDTOArg, paymentMethodResponseArg, componentIdArg) { result: Result<InstantPaymentSetupResultDTO> ->
               val error = result.exceptionOrNull()
               if (error != null) {
                 reply.reply(wrapError(error))
@@ -1692,14 +1740,31 @@ interface ComponentPlatformInterface {
         }
       }
       run {
-        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.adyen_checkout.ComponentPlatformInterface.onInstantPaymentMethodPressed", codec)
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.adyen_checkout.ComponentPlatformInterface.onInstantPaymentPressed", codec)
         if (api != null) {
           channel.setMessageHandler { message, reply ->
             val args = message as List<Any?>
             val instantPaymentTypeArg = InstantPaymentType.ofRaw(args[0] as Int)!!
             var wrapped: List<Any?>
             try {
-              api.onInstantPaymentMethodPressed(instantPaymentTypeArg)
+              api.onInstantPaymentPressed(instantPaymentTypeArg)
+              wrapped = listOf<Any?>(null)
+            } catch (exception: Throwable) {
+              wrapped = wrapError(exception)
+            }
+            reply.reply(wrapped)
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.adyen_checkout.ComponentPlatformInterface.onDispose", codec)
+        if (api != null) {
+          channel.setMessageHandler { _, reply ->
+            var wrapped: List<Any?>
+            try {
+              api.onDispose()
               wrapped = listOf<Any?>(null)
             } catch (exception: Throwable) {
               wrapped = wrapError(exception)

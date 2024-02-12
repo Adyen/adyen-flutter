@@ -31,10 +31,11 @@ internal class CardAdvancedComponent(
 ) : BaseCardComponent(activity, componentFlutterApi, context, id, creationParams) {
     private val paymentMethodString = creationParams[PAYMENT_METHOD_KEY] as String? ?: ""
     private val isStoredPaymentMethod = creationParams[IS_STORED_PAYMENT_METHOD_KEY] as Boolean? ?: false
+    private val componentId = creationParams[COMPONENT_ID_KEY] as String? ?: ""
 
     init {
         cardComponent = createCardComponent()
-        addComponent(cardComponent)
+        addComponent(cardComponent, componentId)
         addActionListener()
         addResultListener()
         addErrorListener()
@@ -49,7 +50,7 @@ internal class CardAdvancedComponent(
                     activity = activity,
                     storedPaymentMethod = storedPaymentMethod,
                     configuration = cardConfiguration,
-                    callback = CardAdvancedCallback(componentFlutterApi),
+                    callback = CardAdvancedCallback(componentFlutterApi, componentId),
                     key = UUID.randomUUID().toString()
                 )
             }
@@ -60,7 +61,7 @@ internal class CardAdvancedComponent(
                     activity = activity,
                     paymentMethod = paymentMethod,
                     configuration = cardConfiguration,
-                    callback = CardAdvancedCallback(componentFlutterApi),
+                    callback = CardAdvancedCallback(componentFlutterApi, componentId),
                     key = UUID.randomUUID().toString()
                 )
             }
@@ -107,6 +108,7 @@ internal class CardAdvancedComponent(
             val model =
                 ComponentCommunicationModel(
                     ComponentCommunicationType.RESULT,
+                    componentId = componentId,
                     paymentResult = message.contentIfNotHandled,
                 )
             componentFlutterApi.onComponentCommunication(model) {}
@@ -123,6 +125,7 @@ internal class CardAdvancedComponent(
             val model =
                 ComponentCommunicationModel(
                     ComponentCommunicationType.ERROR,
+                    componentId = componentId,
                     data = message.contentIfNotHandled?.errorMessage,
                 )
             componentFlutterApi.onComponentCommunication(model) {}

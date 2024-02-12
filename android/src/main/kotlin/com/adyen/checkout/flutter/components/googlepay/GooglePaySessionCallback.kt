@@ -13,6 +13,7 @@ import com.adyen.checkout.sessions.core.SessionPaymentResult
 
 class GooglePaySessionCallback(
     private val componentFlutterApi: ComponentFlutterInterface,
+    private val componentId: String,
     private val onActionCallback: (Action) -> Unit,
     private val hideLoadingBottomSheet: () -> Unit,
 ) : SessionComponentCallback<GooglePayComponentState> {
@@ -21,7 +22,8 @@ class GooglePaySessionCallback(
     override fun onError(componentError: ComponentError) {
         hideLoadingBottomSheet()
         val model = ComponentCommunicationModel(
-            ComponentCommunicationType.ERROR,
+            type = ComponentCommunicationType.ERROR,
+            componentId = componentId,
             data = componentError.exception.toString(),
         )
         componentFlutterApi.onComponentCommunication(model) {}
@@ -36,7 +38,11 @@ class GooglePaySessionCallback(
             result.resultCode,
             result.order?.mapToOrderResponseModel()
         )
-        val model = ComponentCommunicationModel(ComponentCommunicationType.RESULT, paymentResult = paymentResult)
+        val model = ComponentCommunicationModel(
+            type = ComponentCommunicationType.RESULT,
+            componentId = componentId,
+            paymentResult = paymentResult
+        )
         componentFlutterApi.onComponentCommunication(model) {}
     }
 }

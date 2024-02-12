@@ -3,6 +3,7 @@ import AdyenNetworking
 
 class CardSessionFlowDelegate: AdyenSessionDelegate {
     private let componentFlutterApi: ComponentFlutterInterface
+    var componentId: String?
     var finalizeAndDismissHandler: ((Bool, @escaping (() -> Void)) -> Void)?
 
     init(componentFlutterApi: ComponentFlutterInterface) {
@@ -20,6 +21,7 @@ class CardSessionFlowDelegate: AdyenSessionDelegate {
             )
             let componentCommunicationModel = ComponentCommunicationModel(
                 type: ComponentCommunicationType.result,
+                componentId: self?.componentId ?? "",
                 paymentResult: paymentResult
             )
             self?.componentFlutterApi.onComponentCommunication(
@@ -32,6 +34,7 @@ class CardSessionFlowDelegate: AdyenSessionDelegate {
     func didFail(with error: Error, from _: Component, session _: AdyenSession) {
         let componentCommunicationModel = ComponentCommunicationModel(
             type: ComponentCommunicationType.error,
+            componentId: componentId ?? "",
             data: error.localizedDescription
         )
         componentFlutterApi.onComponentCommunication(

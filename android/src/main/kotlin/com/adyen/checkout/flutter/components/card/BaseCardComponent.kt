@@ -73,8 +73,8 @@ abstract class BaseCardComponent(
         ComponentErrorMessenger.instance().removeObservers(activity)
     }
 
-    fun addComponent(cardComponent: CardComponent) {
-        componentWrapperView.addComponent(cardComponent)
+    fun addComponent(cardComponent: CardComponent, componentId: String) {
+        componentWrapperView.addComponent(cardComponent, componentId)
     }
 
     private fun handleIntent(intent: Intent) {
@@ -126,5 +126,6 @@ abstract class BaseCardComponent(
         const val PAYMENT_METHOD_KEY = "paymentMethod"
         const val IS_STORED_PAYMENT_METHOD_KEY = "isStoredPaymentMethod"
         const val CARD_PAYMENT_METHOD_KEY = "scheme"
+        const val COMPONENT_ID_KEY = "componentId"
     }
 }

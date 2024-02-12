@@ -14,6 +14,7 @@ import com.adyen.checkout.sessions.core.SessionPaymentResult
 
 class CardSessionCallback(
     private val componentFlutterApi: ComponentFlutterInterface,
+    private val componentId: String,
     private val onActionCallback: (Action) -> Unit
 ) :
     SessionComponentCallback<CardComponentState> {
@@ -29,6 +30,7 @@ class CardSessionCallback(
         val model =
             ComponentCommunicationModel(
                 ComponentCommunicationType.RESULT,
+                componentId = componentId,
                 paymentResult = paymentResult
             )
         componentFlutterApi.onComponentCommunication(model) {}
@@ -42,6 +44,7 @@ class CardSessionCallback(
         val model =
             ComponentCommunicationModel(
                 ComponentCommunicationType.ERROR,
+                componentId = componentId,
                 data = componentError.exception.toString(),
             )
         componentFlutterApi.onComponentCommunication(model) {}
