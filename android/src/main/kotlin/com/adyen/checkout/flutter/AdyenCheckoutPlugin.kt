@@ -17,7 +17,6 @@ import com.adyen.checkout.flutter.components.card.CardComponentFactory.Companion
 import com.adyen.checkout.flutter.dropIn.DropInPlatformApi
 import com.adyen.checkout.flutter.session.SessionHolder
 import com.adyen.checkout.flutter.utils.Constants.Companion.WRONG_FLUTTER_ACTIVITY_USAGE_ERROR_MESSAGE
-import com.adyen.checkout.flutter.utils.Constants.Companion.GOOGLE_PAY_REQUEST_CODE
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.embedding.engine.plugins.FlutterPlugin.FlutterPluginBinding
 import io.flutter.embedding.engine.plugins.activity.ActivityAware
@@ -50,8 +49,6 @@ class AdyenCheckoutPlugin : FlutterPlugin, ActivityAware, PluginRegistry.Activit
 
         // Component init
         componentFlutterApi = ComponentFlutterInterface(flutterPluginBinding.binaryMessenger)
-        componentPlatformApi = ComponentPlatformApi()
-        ComponentPlatformInterface.setUp(flutterPluginBinding.binaryMessenger, componentPlatformApi)
     }
 
     override fun onDetachedFromEngine(binding: FlutterPluginBinding) {
@@ -98,7 +95,11 @@ class AdyenCheckoutPlugin : FlutterPlugin, ActivityAware, PluginRegistry.Activit
                 )
             }
 
-            componentPlatformApi?.init(binding, sessionHolder, it)
+            componentPlatformApi = ComponentPlatformApi(fragmentActivity, sessionHolder, it)
+        }
+
+        flutterPluginBinding?.binaryMessenger?.let {
+            ComponentPlatformInterface.setUp(it, componentPlatformApi)
         }
     }
 
@@ -141,16 +142,6 @@ class AdyenCheckoutPlugin : FlutterPlugin, ActivityAware, PluginRegistry.Activit
         resultCode: Int,
         data: Intent?
     ): Boolean {
-        return when (requestCode) {
-            GOOGLE_PAY_REQUEST_CODE -> {
-                println("ON ACTIVITY RESULT GOOGLE PAY")
-                componentPlatformApi?.googlePaySessionComponent?.handleActivityResult(resultCode, data)
-                true
-            }
-
-            else -> {
-                false
-            }
-        }
+        return componentPlatformApi?.handleActivityResult(requestCode, resultCode, data) ?: false
     }
 }

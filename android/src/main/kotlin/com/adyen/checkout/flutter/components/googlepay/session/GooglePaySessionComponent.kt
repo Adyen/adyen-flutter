@@ -1,4 +1,4 @@
-package com.adyen.checkout.flutter.components.googlepay
+package com.adyen.checkout.flutter.components.googlepay.session
 
 import ComponentFlutterInterface
 import InstantPaymentConfigurationDTO
@@ -117,11 +117,11 @@ class GooglePaySessionComponent(
                     instantPaymentConfigurationDTO.clientKey
                 )
             }
+
         val analyticsConfiguration: AnalyticsConfiguration =
             instantPaymentConfigurationDTO.analyticsOptionsDTO.mapToAnalyticsConfiguration()
         val amount: Amount = instantPaymentConfigurationDTO.amount.toNativeModel()
         val countryCode: String = instantPaymentConfigurationDTO.countryCode
-
         return instantPaymentConfigurationDTO.googlePayConfigurationDTO?.mapToGooglePayConfiguration(
             googlePayConfigurationBuilder,
             analyticsConfiguration,
