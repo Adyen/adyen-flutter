@@ -96,7 +96,10 @@ class ComponentPlatformApi(
         activity.lifecycleScope.launch {
             googlePaySessionComponent =
                 GooglePaySessionComponent(activity, sessionHolder, componentFlutterInterface, componentId)
-            googlePaySessionComponent?.checkGooglePayAvailability(paymentMethod, instantPaymentComponentConfigurationDTO)
+            googlePaySessionComponent?.checkGooglePayAvailability(
+                paymentMethod,
+                instantPaymentComponentConfigurationDTO
+            )
             googlePaySessionComponent?.googlePayAvailableFlow?.collectLatest {
                 if (it?.isSupported == true) {
                     callback(Result.success(it))
