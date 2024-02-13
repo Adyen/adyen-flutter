@@ -65,7 +65,8 @@ class _CardAdvancedFlowState extends State<CardAdvancedComponent> {
 
     _cardWidget = _buildCardWidget();
     _componentFlutterApi.componentCommunicationStream.stream
-        .where((event) => event.componentId == widget.componentId)
+        .where((communicationModel) =>
+            communicationModel.componentId == widget.componentId)
         .listen(_handleComponentCommunication);
   }
 

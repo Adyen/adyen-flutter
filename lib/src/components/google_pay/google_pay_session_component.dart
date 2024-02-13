@@ -58,7 +58,8 @@ class _GooglePaySessionComponentState extends State<GooglePaySessionComponent> {
   @override
   void initState() {
     _componentFlutterApi.componentCommunicationStream.stream
-        .where((element) => element.componentId == widget.componentId)
+        .where((communicationModel) =>
+            communicationModel.componentId == widget.componentId)
         .listen(_handleComponentCommunication);
 
     super.initState();

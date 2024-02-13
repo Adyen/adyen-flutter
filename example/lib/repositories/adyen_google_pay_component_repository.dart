@@ -108,12 +108,4 @@ class AdyenGooglePayComponentRepository extends AdyenBaseRepository {
         await service.postPaymentsDetails(jsonDecode(additionalDetails));
     return paymentEventHandler.handleResponse(response);
   }
-
-  Future<bool> deleteStoredPaymentMethod(String storedPaymentMethodId) async {
-    return await service.deleteStoredPaymentMethod(
-      storedPaymentMethodId: storedPaymentMethodId,
-      merchantAccount: Config.merchantAccount,
-      shopperReference: Config.shopperReference,
-    );
-  }
 }

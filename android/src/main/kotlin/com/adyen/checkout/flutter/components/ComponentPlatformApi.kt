@@ -9,21 +9,23 @@ import InstantPaymentType
 import PaymentEventDTO
 import PaymentEventType
 import PaymentResultModelDTO
+import android.content.Intent
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.lifecycleScope
 import com.adyen.checkout.components.core.PaymentMethod
-import com.adyen.checkout.flutter.components.googlepay.GooglePaySessionComponent
+import com.adyen.checkout.flutter.components.googlepay.session.GooglePaySessionComponent
 import com.adyen.checkout.flutter.session.SessionHolder
-import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding
+import com.adyen.checkout.flutter.utils.Constants
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import org.json.JSONObject
 
-class ComponentPlatformApi : ComponentPlatformInterface {
-    lateinit var activity: FragmentActivity
-    lateinit var googlePaySessionComponent: GooglePaySessionComponent
-    private lateinit var componentFlutterInterface: ComponentFlutterInterface
-    private lateinit var sessionHolder: SessionHolder
+class ComponentPlatformApi(
+    private val activity: FragmentActivity,
+    private val sessionHolder: SessionHolder,
+    private val componentFlutterInterface: ComponentFlutterInterface,
+) : ComponentPlatformInterface {
+    private var googlePaySessionComponent: GooglePaySessionComponent? = null
 
     override fun updateViewHeight(viewId: Long) {
         ComponentHeightMessenger.sendResult(viewId)
@@ -60,23 +62,29 @@ class ComponentPlatformApi : ComponentPlatformInterface {
 
     override fun onInstantPaymentPressed(instantPaymentType: InstantPaymentType) {
         when (instantPaymentType) {
-            InstantPaymentType.GOOGLEPAY -> googlePaySessionComponent.startGooglePayScreen()
+            InstantPaymentType.GOOGLEPAY -> googlePaySessionComponent?.startGooglePayScreen()
             InstantPaymentType.APPLEPAY -> return
         }
     }
 
     override fun onDispose() {
-        googlePaySessionComponent.dispose()
+        googlePaySessionComponent?.dispose()
+        googlePaySessionComponent = null
     }
 
-    fun init(
-        binding: ActivityPluginBinding,
-        sessionHolder: SessionHolder,
-        componentFlutterInterface: ComponentFlutterInterface
-    ) {
-        this.activity = binding.activity as FragmentActivity
-        this.sessionHolder = sessionHolder
-        this.componentFlutterInterface = componentFlutterInterface
+    fun handleActivityResult(
+        requestCode: Int,
+        resultCode: Int,
+        data: Intent?
+    ): Boolean {
+        return when (requestCode) {
+            Constants.GOOGLE_PAY_REQUEST_CODE -> {
+                googlePaySessionComponent?.handleActivityResult(resultCode, data)
+                true
+            }
+
+            else -> false
+        }
     }
 
     private fun isGooglePaySupported(
@@ -88,8 +96,8 @@ class ComponentPlatformApi : ComponentPlatformInterface {
         activity.lifecycleScope.launch {
             googlePaySessionComponent =
                 GooglePaySessionComponent(activity, sessionHolder, componentFlutterInterface, componentId)
-            googlePaySessionComponent.checkGooglePayAvailability(paymentMethod, instantPaymentComponentConfigurationDTO)
-            googlePaySessionComponent.googlePayAvailableFlow.collectLatest {
+            googlePaySessionComponent?.checkGooglePayAvailability(paymentMethod, instantPaymentComponentConfigurationDTO)
+            googlePaySessionComponent?.googlePayAvailableFlow?.collectLatest {
                 if (it?.isSupported == true) {
                     callback(Result.success(it))
                 } else if (it?.isSupported == false) {

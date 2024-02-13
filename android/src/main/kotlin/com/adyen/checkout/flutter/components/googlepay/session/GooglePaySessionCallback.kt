@@ -1,4 +1,4 @@
-package com.adyen.checkout.flutter.components.googlepay
+package com.adyen.checkout.flutter.components.googlepay.session
 
 import ComponentCommunicationModel
 import ComponentFlutterInterface

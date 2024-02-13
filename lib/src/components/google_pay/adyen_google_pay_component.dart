@@ -45,7 +45,6 @@ class AdyenGooglePayComponent extends StatelessWidget {
 
   Widget _buildGooglePaySessionFlowWidget() {
     final String encodedPaymentMethod = json.encode(paymentMethod);
-
     return GooglePaySessionComponent(
       googlePayPaymentMethod: encodedPaymentMethod,
       googlePayComponentConfiguration: configuration,
