@@ -16,13 +16,25 @@ class ComponentPlatformApi implements ComponentPlatformInterface {
       _componentPlatformInterface.updateViewHeight(viewId);
 
   @override
-  Future<void> onPaymentsResult(PaymentEventDTO paymentEventDTO) async {
-    _componentPlatformInterface.onPaymentsResult(paymentEventDTO);
+  Future<void> onPaymentsResult(
+    PaymentEventDTO paymentEventDTO,
+    String componentId,
+  ) async {
+    _componentPlatformInterface.onPaymentsResult(
+      paymentEventDTO,
+      componentId,
+    );
   }
 
   @override
-  Future<void> onPaymentsDetailsResult(PaymentEventDTO paymentEventDTO) async =>
-      _componentPlatformInterface.onPaymentsDetailsResult(paymentEventDTO);
+  Future<void> onPaymentsDetailsResult(
+    PaymentEventDTO paymentEventDTO,
+    String componentId,
+  ) async =>
+      _componentPlatformInterface.onPaymentsDetailsResult(
+        paymentEventDTO,
+        componentId,
+      );
 
   @override
   Future<InstantPaymentSetupResultDTO> isInstantPaymentSupportedByPlatform(
@@ -37,9 +49,16 @@ class ComponentPlatformApi implements ComponentPlatformInterface {
       );
 
   @override
-  Future<void> onInstantPaymentPressed(InstantPaymentType instantPaymentType) =>
-      _componentPlatformInterface.onInstantPaymentPressed(instantPaymentType);
+  Future<void> onInstantPaymentPressed(
+    InstantPaymentType instantPaymentType,
+    String componentId,
+  ) async =>
+      _componentPlatformInterface.onInstantPaymentPressed(
+        instantPaymentType,
+        componentId,
+      );
 
   @override
-  Future<void> onDispose() => _componentPlatformInterface.onDispose();
+  Future<void> onDispose(String componentId) async =>
+      _componentPlatformInterface.onDispose(componentId);
 }

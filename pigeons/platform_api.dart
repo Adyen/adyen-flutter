@@ -80,7 +80,8 @@ enum FieldVisibility {
 }
 
 enum InstantPaymentType {
-  googlePay,
+  googlePaySession,
+  googlePayAdvanced,
   applePay,
 }
 
@@ -466,9 +467,15 @@ abstract class DropInFlutterInterface {
 abstract class ComponentPlatformInterface {
   void updateViewHeight(int viewId);
 
-  void onPaymentsResult(PaymentEventDTO paymentsResult);
+  void onPaymentsResult(
+    PaymentEventDTO paymentsResult,
+    String componentId,
+  );
 
-  void onPaymentsDetailsResult(PaymentEventDTO paymentsDetailsResult);
+  void onPaymentsDetailsResult(
+    PaymentEventDTO paymentsDetailsResult,
+    String componentId,
+  );
 
   @async
   InstantPaymentSetupResultDTO isInstantPaymentSupportedByPlatform(
@@ -477,9 +484,12 @@ abstract class ComponentPlatformInterface {
     String componentId,
   );
 
-  void onInstantPaymentPressed(InstantPaymentType instantPaymentType);
+  void onInstantPaymentPressed(
+    InstantPaymentType instantPaymentType,
+    String componentId,
+  );
 
-  void onDispose();
+  void onDispose(String componentId);
 }
 
 @FlutterApi()

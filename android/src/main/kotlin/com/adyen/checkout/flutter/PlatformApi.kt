@@ -180,8 +180,9 @@ enum class FieldVisibility(val raw: Int) {
 }
 
 enum class InstantPaymentType(val raw: Int) {
-  GOOGLEPAY(0),
-  APPLEPAY(1);
+  GOOGLEPAYSESSION(0),
+  GOOGLEPAYADVANCED(1),
+  APPLEPAY(2);
 
   companion object {
     fun ofRaw(raw: Int): InstantPaymentType? {
@@ -1646,11 +1647,11 @@ private object ComponentPlatformInterfaceCodec : StandardMessageCodec() {
 /** Generated interface from Pigeon that represents a handler of messages from Flutter. */
 interface ComponentPlatformInterface {
   fun updateViewHeight(viewId: Long)
-  fun onPaymentsResult(paymentsResult: PaymentEventDTO)
-  fun onPaymentsDetailsResult(paymentsDetailsResult: PaymentEventDTO)
+  fun onPaymentsResult(paymentsResult: PaymentEventDTO, componentId: String)
+  fun onPaymentsDetailsResult(paymentsDetailsResult: PaymentEventDTO, componentId: String)
   fun isInstantPaymentSupportedByPlatform(instantPaymentConfigurationDTO: InstantPaymentConfigurationDTO, paymentMethodResponse: String, componentId: String, callback: (Result<InstantPaymentSetupResultDTO>) -> Unit)
-  fun onInstantPaymentPressed(instantPaymentType: InstantPaymentType)
-  fun onDispose()
+  fun onInstantPaymentPressed(instantPaymentType: InstantPaymentType, componentId: String)
+  fun onDispose(componentId: String)
 
   companion object {
     /** The codec used by ComponentPlatformInterface. */
@@ -1685,9 +1686,10 @@ interface ComponentPlatformInterface {
           channel.setMessageHandler { message, reply ->
             val args = message as List<Any?>
             val paymentsResultArg = args[0] as PaymentEventDTO
+            val componentIdArg = args[1] as String
             var wrapped: List<Any?>
             try {
-              api.onPaymentsResult(paymentsResultArg)
+              api.onPaymentsResult(paymentsResultArg, componentIdArg)
               wrapped = listOf<Any?>(null)
             } catch (exception: Throwable) {
               wrapped = wrapError(exception)
@@ -1704,9 +1706,10 @@ interface ComponentPlatformInterface {
           channel.setMessageHandler { message, reply ->
             val args = message as List<Any?>
             val paymentsDetailsResultArg = args[0] as PaymentEventDTO
+            val componentIdArg = args[1] as String
             var wrapped: List<Any?>
             try {
-              api.onPaymentsDetailsResult(paymentsDetailsResultArg)
+              api.onPaymentsDetailsResult(paymentsDetailsResultArg, componentIdArg)
               wrapped = listOf<Any?>(null)
             } catch (exception: Throwable) {
               wrapped = wrapError(exception)
@@ -1745,9 +1748,10 @@ interface ComponentPlatformInterface {
           channel.setMessageHandler { message, reply ->
             val args = message as List<Any?>
             val instantPaymentTypeArg = InstantPaymentType.ofRaw(args[0] as Int)!!
+            val componentIdArg = args[1] as String
             var wrapped: List<Any?>
             try {
-              api.onInstantPaymentPressed(instantPaymentTypeArg)
+              api.onInstantPaymentPressed(instantPaymentTypeArg, componentIdArg)
               wrapped = listOf<Any?>(null)
             } catch (exception: Throwable) {
               wrapped = wrapError(exception)
@@ -1761,10 +1765,12 @@ interface ComponentPlatformInterface {
       run {
         val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.adyen_checkout.ComponentPlatformInterface.onDispose", codec)
         if (api != null) {
-          channel.setMessageHandler { _, reply ->
+          channel.setMessageHandler { message, reply ->
+            val args = message as List<Any?>
+            val componentIdArg = args[0] as String
             var wrapped: List<Any?>
             try {
-              api.onDispose()
+              api.onDispose(componentIdArg)
               wrapped = listOf<Any?>(null)
             } catch (exception: Throwable) {
               wrapped = wrapError(exception)

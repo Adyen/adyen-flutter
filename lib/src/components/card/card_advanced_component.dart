@@ -113,7 +113,10 @@ class _CardAdvancedFlowState extends State<CardAdvancedComponent> {
         await widget.onPayments(event.data as String);
     final PaymentEventDTO paymentEventDTO =
         widget.paymentEventHandler.mapToPaymentEventDTO(paymentEvent);
-    _componentPlatformApi.onPaymentsResult(paymentEventDTO);
+    _componentPlatformApi.onPaymentsResult(
+      paymentEventDTO,
+      widget.componentId,
+    );
   }
 
   Future<void> _onAdditionalDetails(ComponentCommunicationModel event) async {
@@ -121,7 +124,10 @@ class _CardAdvancedFlowState extends State<CardAdvancedComponent> {
         await widget.onPaymentsDetails(event.data as String);
     final PaymentEventDTO paymentEventDTO =
         widget.paymentEventHandler.mapToPaymentEventDTO(paymentEvent);
-    _componentPlatformApi.onPaymentsDetailsResult(paymentEventDTO);
+    _componentPlatformApi.onPaymentsDetailsResult(
+      paymentEventDTO,
+      widget.componentId,
+    );
   }
 
   void _onError(ComponentCommunicationModel event) {

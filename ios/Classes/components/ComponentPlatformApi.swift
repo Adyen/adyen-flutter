@@ -8,11 +8,11 @@ class ComponentPlatformApi: ComponentPlatformInterface {
         onUpdateViewHeightCallback()
     }
 
-    func onPaymentsResult(paymentsResult: PaymentEventDTO) {
+    func onPaymentsResult(paymentsResult: PaymentEventDTO, componentId: String) {
         handlePaymentEvent(paymentEventDTO: paymentsResult)
     }
 
-    func onPaymentsDetailsResult(paymentsDetailsResult: PaymentEventDTO) {
+    func onPaymentsDetailsResult(paymentsDetailsResult: PaymentEventDTO, componentId: String) {
         handlePaymentEvent(paymentEventDTO: paymentsDetailsResult)
     }
 
@@ -24,11 +24,11 @@ class ComponentPlatformApi: ComponentPlatformInterface {
 
     }
 
-    func onInstantPaymentPressed(instantPaymentType: InstantPaymentType) throws {
-
+    func onInstantPaymentPressed(instantPaymentType: InstantPaymentType, componentId: String) throws {
+        
     }
 
-    func onDispose() throws {
+    func onDispose(componentId : String) throws {
 
     }
 

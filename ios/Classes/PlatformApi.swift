@@ -111,8 +111,9 @@ enum FieldVisibility: Int {
 }
 
 enum InstantPaymentType: Int {
-  case googlePay = 0
-  case applePay = 1
+  case googlePaySession = 0
+  case googlePayAdvanced = 1
+  case applePay = 2
 }
 
 /// Generated class from Pigeon that represents data sent in messages.
@@ -1482,11 +1483,11 @@ class ComponentPlatformInterfaceCodec: FlutterStandardMessageCodec {
 /// Generated protocol from Pigeon that represents a handler of messages from Flutter.
 protocol ComponentPlatformInterface {
   func updateViewHeight(viewId: Int64) throws
-  func onPaymentsResult(paymentsResult: PaymentEventDTO) throws
-  func onPaymentsDetailsResult(paymentsDetailsResult: PaymentEventDTO) throws
+  func onPaymentsResult(paymentsResult: PaymentEventDTO, componentId: String) throws
+  func onPaymentsDetailsResult(paymentsDetailsResult: PaymentEventDTO, componentId: String) throws
   func isInstantPaymentSupportedByPlatform(instantPaymentConfigurationDTO: InstantPaymentConfigurationDTO, paymentMethodResponse: String, componentId: String, completion: @escaping (Result<InstantPaymentSetupResultDTO, Error>) -> Void)
-  func onInstantPaymentPressed(instantPaymentType: InstantPaymentType) throws
-  func onDispose() throws
+  func onInstantPaymentPressed(instantPaymentType: InstantPaymentType, componentId: String) throws
+  func onDispose(componentId: String) throws
 }
 
 /// Generated setup class from Pigeon to handle messages through the `binaryMessenger`.
@@ -1515,8 +1516,9 @@ class ComponentPlatformInterfaceSetup {
       onPaymentsResultChannel.setMessageHandler { message, reply in
         let args = message as! [Any?]
         let paymentsResultArg = args[0] as! PaymentEventDTO
+        let componentIdArg = args[1] as! String
         do {
-          try api.onPaymentsResult(paymentsResult: paymentsResultArg)
+          try api.onPaymentsResult(paymentsResult: paymentsResultArg, componentId: componentIdArg)
           reply(wrapResult(nil))
         } catch {
           reply(wrapError(error))
@@ -1530,8 +1532,9 @@ class ComponentPlatformInterfaceSetup {
       onPaymentsDetailsResultChannel.setMessageHandler { message, reply in
         let args = message as! [Any?]
         let paymentsDetailsResultArg = args[0] as! PaymentEventDTO
+        let componentIdArg = args[1] as! String
         do {
-          try api.onPaymentsDetailsResult(paymentsDetailsResult: paymentsDetailsResultArg)
+          try api.onPaymentsDetailsResult(paymentsDetailsResult: paymentsDetailsResultArg, componentId: componentIdArg)
           reply(wrapResult(nil))
         } catch {
           reply(wrapError(error))
@@ -1564,8 +1567,9 @@ class ComponentPlatformInterfaceSetup {
       onInstantPaymentPressedChannel.setMessageHandler { message, reply in
         let args = message as! [Any?]
         let instantPaymentTypeArg = InstantPaymentType(rawValue: args[0] as! Int)!
+        let componentIdArg = args[1] as! String
         do {
-          try api.onInstantPaymentPressed(instantPaymentType: instantPaymentTypeArg)
+          try api.onInstantPaymentPressed(instantPaymentType: instantPaymentTypeArg, componentId: componentIdArg)
           reply(wrapResult(nil))
         } catch {
           reply(wrapError(error))
@@ -1576,9 +1580,11 @@ class ComponentPlatformInterfaceSetup {
     }
     let onDisposeChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.ComponentPlatformInterface.onDispose", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {
-      onDisposeChannel.setMessageHandler { _, reply in
+      onDisposeChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let componentIdArg = args[0] as! String
         do {
-          try api.onDispose()
+          try api.onDispose(componentId: componentIdArg)
           reply(wrapResult(nil))
         } catch {
           reply(wrapError(error))

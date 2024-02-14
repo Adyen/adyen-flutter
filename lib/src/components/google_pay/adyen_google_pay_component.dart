@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:adyen_checkout/adyen_checkout.dart';
+import 'package:adyen_checkout/src/components/google_pay/google_pay_advanced_component.dart';
 import 'package:adyen_checkout/src/components/google_pay/google_pay_session_component.dart';
 import 'package:flutter/material.dart';
 import 'package:pay/pay.dart' as google_pay_sdk;
@@ -39,7 +40,7 @@ class AdyenGooglePayComponent extends StatelessWidget {
   Widget build(BuildContext context) {
     return switch (checkout) {
       SessionCheckout() => _buildGooglePaySessionFlowWidget(),
-      AdvancedCheckout() => const Text("ADVANCED GOOGLE PAY")
+      AdvancedCheckout() => _buildGooglePayAdvancedFlowWidget(),
     };
   }
 
@@ -48,6 +49,26 @@ class AdyenGooglePayComponent extends StatelessWidget {
     return GooglePaySessionComponent(
       googlePayPaymentMethod: encodedPaymentMethod,
       googlePayComponentConfiguration: configuration,
+      onPaymentResult: onPaymentResult,
+      onSetupError: onSetupError,
+      cornerRadius: cornerRadius,
+      width: _determineWidth(),
+      height: _determineHeight(),
+      loadingIndicator: loadingIndicator,
+      errorIndicator: errorIndicator,
+      theme: _mapToGooglePayButtonTheme(),
+      type: _mapToGooglePayButtonType(),
+    );
+  }
+
+  Widget _buildGooglePayAdvancedFlowWidget() {
+    final String encodedPaymentMethod = json.encode(paymentMethod);
+    AdvancedCheckout advancedCheckout = checkout as AdvancedCheckout;
+    return GooglePayAdvancedComponent(
+      googlePayPaymentMethod: encodedPaymentMethod,
+      googlePayComponentConfiguration: configuration,
+      onSubmit: advancedCheckout.onSubmit,
+      onAdditionalDetails: advancedCheckout.onAdditionalDetails,
       onPaymentResult: onPaymentResult,
       onSetupError: onSetupError,
       cornerRadius: cornerRadius,

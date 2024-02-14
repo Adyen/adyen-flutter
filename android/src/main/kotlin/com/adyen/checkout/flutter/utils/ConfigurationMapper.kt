@@ -12,6 +12,7 @@ import Environment
 import FieldVisibility
 import GooglePayConfigurationDTO
 import GooglePayEnvironment
+import InstantPaymentConfigurationDTO
 import MerchantInfoDTO
 import OrderResponseDTO
 import ShippingAddressParametersDTO
@@ -30,6 +31,9 @@ import com.adyen.checkout.components.core.OrderResponse
 import com.adyen.checkout.components.core.internal.data.api.AnalyticsMapper
 import com.adyen.checkout.components.core.internal.data.api.AnalyticsPlatform
 import com.adyen.checkout.dropin.DropInConfiguration
+import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToAnalyticsConfiguration
+import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToGooglePayConfiguration
+import com.adyen.checkout.flutter.utils.ConfigurationMapper.toNativeModel
 import com.adyen.checkout.googlepay.BillingAddressParameters
 import com.adyen.checkout.googlepay.GooglePayConfiguration
 import com.adyen.checkout.googlepay.MerchantInfo
@@ -358,5 +362,33 @@ object ConfigurationMapper {
             CashAppPayEnvironment.SANDBOX -> SDKCashAppPayEnvironment.SANDBOX
             CashAppPayEnvironment.PRODUCTION -> SDKCashAppPayEnvironment.PRODUCTION
         }
+    }
+
+    fun InstantPaymentConfigurationDTO.mapToGooglePayConfiguration(context: Context) : GooglePayConfiguration {
+        val googlePayConfigurationBuilder: GooglePayConfiguration.Builder =
+            if (shopperLocale != null) {
+                val locale = Locale.forLanguageTag(shopperLocale)
+                GooglePayConfiguration.Builder(
+                    locale,
+                    environment.toNativeModel(),
+                    clientKey
+                )
+            } else {
+                GooglePayConfiguration.Builder(
+                    context,
+                    environment.toNativeModel(),
+                    clientKey
+                )
+            }
+
+        val analyticsConfiguration: AnalyticsConfiguration = analyticsOptionsDTO.mapToAnalyticsConfiguration()
+        val amount: Amount = amount.toNativeModel()
+        val countryCode: String = countryCode
+        return googlePayConfigurationDTO?.mapToGooglePayConfiguration(
+            googlePayConfigurationBuilder,
+            analyticsConfiguration,
+            amount,
+            countryCode
+        ) ?: throw Exception("Unable to create Google pay configuration")
     }
 }
