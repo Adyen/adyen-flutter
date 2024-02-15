@@ -18,7 +18,9 @@ class OrderResponse {
       pspReference: json['pspReference'],
       orderData: json['orderData'],
       amount: json['amount'] != null ? Amount.fromJson(json['amount']) : null,
-      remainingAmount: json['remainingAmount'] != null ? Amount.fromJson(json['remainingAmount']) : null,
+      remainingAmount: json['remainingAmount'] != null
+          ? Amount.fromJson(json['remainingAmount'])
+          : null,
     );
   }
 }
