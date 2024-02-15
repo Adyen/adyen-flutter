@@ -220,15 +220,4 @@ class DropIn {
       }
     }
   }
-
-// bool isRemoveStoredPaymentMethodEnabled(
-//     DropInConfiguration dropInConfiguration,
-//     ) {
-//   return dropInConfiguration.storedPaymentMethodConfiguration
-//       ?.deleteStoredPaymentMethodCallback !=
-//       null &&
-//       dropInConfiguration.storedPaymentMethodConfiguration
-//           ?.isRemoveStoredPaymentMethodEnabled ==
-//           true;
-// }
 }
