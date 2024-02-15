@@ -36,7 +36,7 @@ jobs:
       - run: flutter pub get
 
       - name: Setup Gradle
-        uses: gradle/gradle-build-action@v2
+        uses: gradle/gradle-build-action@v3
         with:
           gradle-version: wrapper
 
