@@ -44,9 +44,9 @@ import org.json.JSONObject
 
 class DropInPlatformApi(
     private val dropInFlutterApi: DropInFlutterInterface,
+    private val activity: FragmentActivity,
     private val sessionHolder: SessionHolder,
 ) : DropInPlatformInterface {
-    lateinit var activity: FragmentActivity
     lateinit var dropInSessionLauncher: ActivityResultLauncher<SessionDropInResultContractParams>
     lateinit var dropInAdvancedFlowLauncher: ActivityResultLauncher<DropInResultContractParams>
 
