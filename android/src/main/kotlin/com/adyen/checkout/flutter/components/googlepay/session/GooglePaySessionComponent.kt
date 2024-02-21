@@ -147,9 +147,7 @@ class GooglePaySessionComponent(
     private fun onAction(action: Action) {
         googlePayComponent?.apply {
             handleAction(action, activity)
-            val loadingBottomSheet = ComponentLoadingBottomSheet(this)
-            loadingBottomSheet.isCancelable = false
-            loadingBottomSheet.show(activity.supportFragmentManager, ComponentLoadingBottomSheet.TAG)
+            ComponentLoadingBottomSheet.show(activity.supportFragmentManager, this)
         }
     }
 
@@ -160,8 +158,6 @@ class GooglePaySessionComponent(
     }
 
     private fun hideLoadingBottomSheet() {
-        activity.supportFragmentManager.findFragmentByTag(ComponentLoadingBottomSheet.TAG)?.let {
-            (it as? BottomSheetDialogFragment)?.dismiss()
-        }
+        ComponentLoadingBottomSheet.hide(activity.supportFragmentManager)
     }
 }

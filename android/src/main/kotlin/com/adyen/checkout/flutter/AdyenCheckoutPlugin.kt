@@ -156,6 +156,7 @@ class AdyenCheckoutPlugin : FlutterPlugin, ActivityAware, PluginRegistry.Activit
         lifecycleObserver?.let {
             (activityPluginBinding?.activity as? FragmentActivity)?.lifecycle?.removeObserver(it)
         }
+
         lifecycleObserver = null
         dropInPlatformApi = null
         dropInFlutterApi = null
