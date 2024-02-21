@@ -4,12 +4,13 @@ import AdyenNetworking
 class DropInAdvancedFlowDelegate: DropInComponentDelegate {
     private let dropInFlutterApi: DropInFlutterInterface
     public weak var dropInInteractorDelegate: DropInInteractorDelegate?
+    var isApplePay: Bool = false
 
     init(dropInFlutterApi: DropInFlutterInterface) {
         self.dropInFlutterApi = dropInFlutterApi
     }
 
-    func didSubmit(_ data: PaymentComponentData, from _: PaymentComponent, in _: AnyDropInComponent) {
+    func didSubmit(_ data: PaymentComponentData, from paymentComponent: PaymentComponent, in _: AnyDropInComponent) {
         do {
             let paymentComponentData = PaymentComponentDataResponse(
                 amount: data.amount,
@@ -30,6 +31,7 @@ class DropInAdvancedFlowDelegate: DropInComponentDelegate {
             )
             let paymentComponentJson = try JSONEncoder().encode(paymentComponentData)
             let paymentComponentString = String(data: paymentComponentJson, encoding: .utf8)
+            isApplePay = paymentComponent is ApplePayComponent
             dropInFlutterApi.onDropInAdvancedPlatformCommunication(
                 platformCommunicationModel: PlatformCommunicationModel(
                     type: PlatformCommunicationType.paymentComponent,

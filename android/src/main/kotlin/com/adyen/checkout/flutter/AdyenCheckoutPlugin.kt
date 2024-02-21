@@ -21,89 +21,101 @@ import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.embedding.engine.plugins.FlutterPlugin.FlutterPluginBinding
 import io.flutter.embedding.engine.plugins.activity.ActivityAware
 import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding
-import io.flutter.embedding.engine.plugins.lifecycle.HiddenLifecycleReference
+import io.flutter.plugin.common.BinaryMessenger
 import io.flutter.plugin.common.PluginRegistry
 
 /** AdyenCheckoutPlugin */
 class AdyenCheckoutPlugin : FlutterPlugin, ActivityAware, PluginRegistry.ActivityResultListener {
+    private var flutterPluginBinding: FlutterPluginBinding? = null
+    private var activityPluginBinding: ActivityPluginBinding? = null
     private var checkoutPlatformApi: CheckoutPlatformApi? = null
     private var dropInFlutterApi: DropInFlutterInterface? = null
     private var dropInPlatformApi: DropInPlatformApi? = null
     private var componentFlutterApi: ComponentFlutterInterface? = null
     private var componentPlatformApi: ComponentPlatformApi? = null
-    private var lifecycleReference: HiddenLifecycleReference? = null
     private var lifecycleObserver: LifecycleEventObserver? = null
-    private var flutterPluginBinding: FlutterPluginBinding? = null
     private var sessionHolder: SessionHolder = SessionHolder()
-    private var activityPluginBinding: ActivityPluginBinding? = null
 
     override fun onAttachedToEngine(flutterPluginBinding: FlutterPluginBinding) {
         this.flutterPluginBinding = flutterPluginBinding
-        checkoutPlatformApi = CheckoutPlatformApi(sessionHolder)
-        CheckoutPlatformInterface.setUp(flutterPluginBinding.binaryMessenger, checkoutPlatformApi)
-
-        // DropIn init
-        dropInFlutterApi = DropInFlutterInterface(flutterPluginBinding.binaryMessenger)
-        dropInFlutterApi?.let { dropInPlatformApi = DropInPlatformApi(it, sessionHolder) }
-        DropInPlatformInterface.setUp(flutterPluginBinding.binaryMessenger, dropInPlatformApi)
-
-        // Component init
-        componentFlutterApi = ComponentFlutterInterface(flutterPluginBinding.binaryMessenger)
     }
 
     override fun onDetachedFromEngine(binding: FlutterPluginBinding) {
-        CheckoutPlatformInterface.setUp(binding.binaryMessenger, null)
-        ComponentPlatformInterface.setUp(binding.binaryMessenger, null)
-        dropInFlutterApi = null
-        componentFlutterApi = null
+        flutterPluginBinding = null
     }
 
-    override fun onAttachedToActivity(binding: ActivityPluginBinding) = setupActivity(binding)
+    override fun onAttachedToActivity(binding: ActivityPluginBinding) = attachActivity(binding)
 
     override fun onDetachedFromActivityForConfigChanges() = teardown()
 
-    override fun onReattachedToActivityForConfigChanges(binding: ActivityPluginBinding) = setupActivity(binding)
+    override fun onReattachedToActivityForConfigChanges(binding: ActivityPluginBinding) = attachActivity(binding)
 
     override fun onDetachedFromActivity() = teardown()
 
-    private fun setupActivity(binding: ActivityPluginBinding) {
+    private fun attachActivity(binding: ActivityPluginBinding) {
         if (binding.activity !is FragmentActivity) {
             throw Exception(WRONG_FLUTTER_ACTIVITY_USAGE_ERROR_MESSAGE)
         }
 
-        val fragmentActivity = binding.activity as FragmentActivity
-        activityPluginBinding = binding
-        activityPluginBinding?.addActivityResultListener(this)
-        checkoutPlatformApi?.activity = fragmentActivity
-        dropInPlatformApi?.activity = fragmentActivity
-        lifecycleReference = binding.lifecycle as HiddenLifecycleReference
-        lifecycleObserver = lifecycleEventObserver(fragmentActivity)
-        lifecycleObserver?.let {
-            lifecycleReference?.lifecycle?.addObserver(it)
-        }
-
-        componentFlutterApi?.let {
-            flutterPluginBinding?.apply {
-                platformViewRegistry.registerViewFactory(
-                    CARD_COMPONENT_ADVANCED,
-                    CardComponentFactory(fragmentActivity, it, CARD_COMPONENT_ADVANCED)
-                )
-
-                platformViewRegistry.registerViewFactory(
-                    CARD_COMPONENT_SESSION,
-                    CardComponentFactory(fragmentActivity, it, CARD_COMPONENT_SESSION, sessionHolder)
-                )
+        activityPluginBinding =
+            binding.apply {
+                addActivityResultListener(this@AdyenCheckoutPlugin)
             }
 
-            componentPlatformApi = ComponentPlatformApi(fragmentActivity, sessionHolder, it)
-        }
-
-        flutterPluginBinding?.binaryMessenger?.let {
-            ComponentPlatformInterface.setUp(it, componentPlatformApi)
+        flutterPluginBinding?.apply {
+            val fragmentActivity = binding.activity as FragmentActivity
+            setupDefaultPlatformCommunication(fragmentActivity, this.binaryMessenger)
+            setUpDropIn(fragmentActivity, this.binaryMessenger)
+            setupComponents(fragmentActivity, this.binaryMessenger)
         }
     }
 
-    private fun lifecycleEventObserver(fragmentActivity: FragmentActivity): LifecycleEventObserver {
+    private fun setupDefaultPlatformCommunication(
+        fragmentActivity: FragmentActivity,
+        binaryMessenger: BinaryMessenger,
+    ) {
+        checkoutPlatformApi = CheckoutPlatformApi(fragmentActivity, sessionHolder)
+        CheckoutPlatformInterface.setUp(binaryMessenger, checkoutPlatformApi)
+    }
+
+    private fun setUpDropIn(
+        fragmentActivity: FragmentActivity,
+        binaryMessenger: BinaryMessenger,
+    ) {
+        dropInFlutterApi =
+            DropInFlutterInterface(binaryMessenger).apply {
+                dropInPlatformApi = DropInPlatformApi(this, fragmentActivity, sessionHolder)
+                DropInPlatformInterface.setUp(binaryMessenger, dropInPlatformApi)
+            }
+
+        lifecycleObserver =
+            createLifecycleEventObserver(fragmentActivity).apply {
+                (activityPluginBinding?.activity as? FragmentActivity)?.lifecycle?.addObserver(this)
+            }
+    }
+
+    private fun setupComponents(
+        fragmentActivity: FragmentActivity,
+        binaryMessenger: BinaryMessenger
+    ) {
+        componentFlutterApi =
+            ComponentFlutterInterface(binaryMessenger).apply {
+                componentPlatformApi = ComponentPlatformApi(fragmentActivity, sessionHolder, this)
+                ComponentPlatformInterface.setUp(binaryMessenger, componentPlatformApi)
+
+                flutterPluginBinding?.platformViewRegistry?.registerViewFactory(
+                    CARD_COMPONENT_ADVANCED,
+                    CardComponentFactory(fragmentActivity, this, CARD_COMPONENT_ADVANCED)
+                )
+
+                flutterPluginBinding?.platformViewRegistry?.registerViewFactory(
+                    CARD_COMPONENT_SESSION,
+                    CardComponentFactory(fragmentActivity, this, CARD_COMPONENT_SESSION, sessionHolder)
+                )
+            }
+    }
+
+    private fun createLifecycleEventObserver(fragmentActivity: FragmentActivity): LifecycleEventObserver {
         return LifecycleEventObserver { _, event ->
             when (event) {
                 Lifecycle.Event.ON_CREATE -> {
@@ -130,18 +142,41 @@ class AdyenCheckoutPlugin : FlutterPlugin, ActivityAware, PluginRegistry.Activit
     }
 
     private fun teardown() {
-        activityPluginBinding?.removeActivityResultListener(this)
-        lifecycleObserver?.let {
-            lifecycleReference?.lifecycle?.removeObserver(it)
+        flutterPluginBinding?.let {
+            teardownDefaultCommunication(it.binaryMessenger)
+            teardownDropIn(it.binaryMessenger)
+            teardownComponents(it.binaryMessenger)
         }
-        lifecycleReference = null
+
+        activityPluginBinding?.removeActivityResultListener(this)
+        activityPluginBinding = null
+    }
+
+    private fun teardownDropIn(binaryMessenger: BinaryMessenger) {
+        lifecycleObserver?.let {
+            (activityPluginBinding?.activity as? FragmentActivity)?.lifecycle?.removeObserver(it)
+        }
+
+        lifecycleObserver = null
+        dropInPlatformApi = null
+        dropInFlutterApi = null
+        DropInPlatformInterface.setUp(binaryMessenger, null)
+    }
+
+    private fun teardownComponents(binaryMessenger: BinaryMessenger) {
+        componentPlatformApi = null
+        componentFlutterApi = null
+        ComponentPlatformInterface.setUp(binaryMessenger, null)
+    }
+
+    private fun teardownDefaultCommunication(binaryMessenger: BinaryMessenger) {
+        checkoutPlatformApi = null
+        CheckoutPlatformInterface.setUp(binaryMessenger, null)
     }
 
     override fun onActivityResult(
         requestCode: Int,
         resultCode: Int,
         data: Intent?
-    ): Boolean {
-        return componentPlatformApi?.handleActivityResult(requestCode, resultCode, data) ?: false
-    }
+    ): Boolean = componentPlatformApi?.handleActivityResult(requestCode, resultCode, data) ?: false
 }

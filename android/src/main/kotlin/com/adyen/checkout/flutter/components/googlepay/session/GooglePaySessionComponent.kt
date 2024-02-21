@@ -50,9 +50,12 @@ class GooglePaySessionComponent(
     private fun onAction(action: Action) {
         googlePayComponent?.apply {
             handleAction(action, activity)
-            val loadingBottomSheet = ComponentLoadingBottomSheet(this)
-            loadingBottomSheet.isCancelable = false
-            loadingBottomSheet.show(activity.supportFragmentManager, ComponentLoadingBottomSheet.TAG)
+            }
+            ComponentLoadingBottomSheet.show(activity.supportFragmentManager, this)
         }
+    }
+
+    private fun hideLoadingBottomSheet() {
+        ComponentLoadingBottomSheet.hide(activity.supportFragmentManager)
     }
 }

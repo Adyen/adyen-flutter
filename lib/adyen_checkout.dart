@@ -2,7 +2,7 @@ export 'src/adyen_checkout.dart';
 export 'src/common/model/amount.dart';
 export 'src/common/model/analytics_options.dart';
 export 'src/common/model/checkout.dart';
-export 'src/common/model/oder_response.dart';
+export 'src/common/model/order_response.dart';
 export 'src/common/model/payment_event.dart';
 export 'src/common/model/payment_method_configurations/apple_pay_configuration.dart';
 export 'src/common/model/payment_method_configurations/card_configuration.dart';

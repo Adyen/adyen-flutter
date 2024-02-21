@@ -26,10 +26,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class CheckoutPlatformApi(
+    private val activity: FragmentActivity,
     private val sessionHolder: SessionHolder,
 ) : CheckoutPlatformInterface {
-    lateinit var activity: FragmentActivity
-
     override fun getReturnUrl(callback: (Result<String>) -> Unit) {
         callback(Result.success(RedirectComponent.getReturnUrl(activity.applicationContext)))
     }

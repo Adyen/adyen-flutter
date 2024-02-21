@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.FragmentManager
 import com.adyen.checkout.components.core.internal.Component
 import com.adyen.checkout.flutter.R
 import com.adyen.checkout.ui.core.AdyenComponentView
@@ -26,6 +27,21 @@ class ComponentLoadingBottomSheet<T>(private val component: T) :
     }
 
     companion object {
-        const val TAG = "AdyenComponentLoadingBottomSheet"
+        private const val TAG = "AdyenComponentLoadingBottomSheet"
+
+        fun <T> show(
+            fragmentManager: FragmentManager,
+            component: T
+        ) where T : ViewableComponent, T : Component {
+            ComponentLoadingBottomSheet(component).apply {
+                isCancelable = false
+            }.show(fragmentManager, TAG)
+        }
+
+        fun hide(fragmentManager: FragmentManager) {
+            fragmentManager.findFragmentByTag(TAG)?.let {
+                (it as? BottomSheetDialogFragment)?.dismiss()
+            }
+        }
     }
 }

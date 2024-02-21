@@ -25,7 +25,7 @@ class ComponentPlatformApi: ComponentPlatformInterface {
     }
 
     func onInstantPaymentPressed(instantPaymentType: InstantPaymentType, componentId: String) throws {
-        
+
     }
 
     func onDispose(componentId : String) throws {

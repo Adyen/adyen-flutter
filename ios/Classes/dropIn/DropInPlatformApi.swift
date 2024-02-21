@@ -166,16 +166,17 @@ class DropInPlatformApi: DropInPlatformInterface {
     private func onDropInResultError(paymentEventDTO: PaymentEventDTO) {
         dropInComponent?.stopLoading()
 
-        if paymentEventDTO.error?.dismissDropIn == true {
-            let paymentResult = PaymentResultDTO(type: PaymentResultEnum.error, reason: paymentEventDTO.error?.errorMessage)
-            dropInFlutterApi.onDropInAdvancedPlatformCommunication(
-                platformCommunicationModel: PlatformCommunicationModel(
-                    type: PlatformCommunicationType.result,
-                    paymentResult: paymentResult
-                ),
-                completion: { _ in }
-            )
-            finalizeAndDismiss(success: false) {}
+        if paymentEventDTO.error?.dismissDropIn == true || dropInAdvancedFlowDelegate?.isApplePay == true {
+            finalizeAndDismiss(success: false) { [weak self] in
+                let paymentResult = PaymentResultDTO(type: PaymentResultEnum.error, reason: paymentEventDTO.error?.errorMessage)
+                self?.dropInFlutterApi.onDropInAdvancedPlatformCommunication(
+                    platformCommunicationModel: PlatformCommunicationModel(
+                        type: PlatformCommunicationType.result,
+                        paymentResult: paymentResult
+                    ),
+                    completion: { _ in }
+                )
+            }
         } else {
             dropInComponent?.finalizeIfNeeded(with: false, completion: {})
             let localizationParameters = (dropInComponent as? Localizable)?.localizationParameters
