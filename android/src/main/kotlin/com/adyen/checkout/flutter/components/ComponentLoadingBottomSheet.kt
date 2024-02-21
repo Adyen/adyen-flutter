@@ -27,9 +27,12 @@ class ComponentLoadingBottomSheet<T>(private val component: T) :
     }
 
     companion object {
-        const val TAG = "AdyenComponentLoadingBottomSheet"
+        private const val TAG = "AdyenComponentLoadingBottomSheet"
 
-        fun <T> show(fragmentManager: FragmentManager, component: T) where T : ViewableComponent, T : Component {
+        fun <T> show(
+            fragmentManager: FragmentManager,
+            component: T
+        ) where T : ViewableComponent, T : Component {
             ComponentLoadingBottomSheet(component).apply {
                 isCancelable = false
             }.show(fragmentManager, TAG)
