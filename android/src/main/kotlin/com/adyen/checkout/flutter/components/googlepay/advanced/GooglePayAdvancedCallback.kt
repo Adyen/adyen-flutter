@@ -2,7 +2,7 @@ package com.adyen.checkout.flutter.components.googlepay.advanced
 
 import ComponentFlutterInterface
 import com.adyen.checkout.components.core.ComponentError
-import com.adyen.checkout.flutter.components.ComponentAdvancedCallback
+import com.adyen.checkout.flutter.components.base.ComponentAdvancedCallback
 import com.adyen.checkout.googlepay.GooglePayComponentState
 
 class GooglePayAdvancedCallback(

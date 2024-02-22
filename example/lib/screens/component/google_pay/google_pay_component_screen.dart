@@ -24,8 +24,8 @@ class GooglePayComponentScreen extends StatelessWidget {
         child: Center(
           child: Column(
             children: [
-              const SizedBox(height: 40),
-              //_buildAdyenGooglePaySessionComponent(),
+              const SizedBox(height: 80),
+              _buildAdyenGooglePaySessionComponent(),
               const SizedBox(height: 80),
               _buildAdyenGooglePayAdvancedComponent(),
             ],
@@ -124,7 +124,8 @@ class GooglePayComponentScreen extends StatelessWidget {
                 configuration: googlePayComponentConfiguration,
                 paymentMethod: paymentMethod,
                 checkout: advancedCheckout,
-                type: GooglePayButtonType.plain,
+                width: 300,
+                type: GooglePayButtonType.buy,
                 loadingIndicator: const CircularProgressIndicator(),
                 onPaymentResult: (paymentResult) {
                   Navigator.pop(context);

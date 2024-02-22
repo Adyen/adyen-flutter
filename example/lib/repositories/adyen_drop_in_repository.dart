@@ -33,7 +33,7 @@ class AdyenDropInRepository extends AdyenBaseRepository {
             shopperLocale: Config.shopperLocale,
             shopperReference: Config.shopperReference,
             storePaymentMethodMode: StorePaymentMethodMode
-                .askForConsent.storePaymentMethodModeString,
+                .disabled.storePaymentMethodModeString,
             recurringProcessingModel:
                 RecurringProcessingModel.cardOnFile.recurringModelString,
             shopperInteraction:
@@ -103,6 +103,7 @@ class AdyenDropInRepository extends AdyenBaseRepository {
       countryCode: Config.countryCode,
       channel: determineChannel(),
       authenticationData: {
+        "attemptAuthentication" : "always",
         "threeDSRequestData": {
           "nativeThreeDS": "preferred",
         },

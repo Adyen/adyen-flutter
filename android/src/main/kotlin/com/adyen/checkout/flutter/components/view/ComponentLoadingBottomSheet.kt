@@ -1,4 +1,4 @@
-package com.adyen.checkout.flutter.components
+package com.adyen.checkout.flutter.components.view
 
 import android.os.Bundle
 import android.view.LayoutInflater

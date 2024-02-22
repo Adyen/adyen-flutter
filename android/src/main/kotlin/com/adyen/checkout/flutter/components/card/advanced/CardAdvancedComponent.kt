@@ -34,8 +34,9 @@ internal class CardAdvancedComponent(
     private val componentId = creationParams[COMPONENT_ID_KEY] as String? ?: ""
 
     init {
-        cardComponent = createCardComponent()
-        addComponent(cardComponent, componentId)
+        cardComponent = createCardComponent().apply {
+            addComponent(this, componentId)
+        }
         addActionListener()
         addResultListener()
         addErrorListener()
@@ -93,7 +94,7 @@ internal class CardAdvancedComponent(
 
             val action = message.contentIfNotHandled?.let { Action.SERIALIZER.deserialize(it) }
             action?.let {
-                cardComponent.handleAction(action = it, activity = activity)
+                cardComponent?.handleAction(action = it, activity = activity)
             }
         }
     }

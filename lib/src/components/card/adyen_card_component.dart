@@ -19,7 +19,7 @@ class AdyenCardComponent extends StatelessWidget {
   final _isStoredPaymentMethodIndicator =
       Constants.isStoredPaymentMethodIndicator;
   final SdkVersionNumberProvider _sdkVersionNumberProvider =
-      SdkVersionNumberProvider();
+      SdkVersionNumberProvider.instance;
 
   AdyenCardComponent({
     super.key,

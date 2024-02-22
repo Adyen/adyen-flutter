@@ -59,7 +59,7 @@ class GooglePayAdvancedComponent extends StatefulWidget {
 class _GooglePayAdvancedComponentState
     extends State<GooglePayAdvancedComponent> {
   final SdkVersionNumberProvider _sdkVersionNumberProvider =
-      SdkVersionNumberProvider();
+      SdkVersionNumberProvider.instance;
   final ComponentFlutterApi _componentFlutterApi = ComponentFlutterApi.instance;
   final ComponentPlatformApi _componentPlatformApi =
       ComponentPlatformApi.instance;

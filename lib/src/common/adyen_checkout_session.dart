@@ -8,7 +8,7 @@ import 'package:adyen_checkout/src/util/sdk_version_number_provider.dart';
 
 class AdyenCheckoutSession {
   final SdkVersionNumberProvider _sdkVersionNumberProvider =
-      SdkVersionNumberProvider();
+      SdkVersionNumberProvider.instance;
   final AdyenCheckoutApi adyenCheckoutApi;
   final DropIn dropIn;
 

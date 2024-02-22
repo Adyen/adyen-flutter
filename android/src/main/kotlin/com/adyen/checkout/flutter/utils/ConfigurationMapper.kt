@@ -364,7 +364,7 @@ object ConfigurationMapper {
         }
     }
 
-    fun InstantPaymentConfigurationDTO.mapToGooglePayConfiguration(context: Context) : GooglePayConfiguration {
+    fun InstantPaymentConfigurationDTO.mapToGooglePayConfiguration(context: Context): GooglePayConfiguration {
         val googlePayConfigurationBuilder: GooglePayConfiguration.Builder =
             if (shopperLocale != null) {
                 val locale = Locale.forLanguageTag(shopperLocale)

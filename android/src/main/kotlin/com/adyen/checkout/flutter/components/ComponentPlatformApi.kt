@@ -11,12 +11,10 @@ import PaymentEventType
 import PaymentResultModelDTO
 import android.content.Intent
 import androidx.fragment.app.FragmentActivity
-import androidx.lifecycle.lifecycleScope
 import com.adyen.checkout.components.core.PaymentMethod
 import com.adyen.checkout.flutter.components.googlepay.GooglePayComponentManager
 import com.adyen.checkout.flutter.session.SessionHolder
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.launch
 import org.json.JSONObject
 
 class ComponentPlatformApi(
@@ -24,21 +22,19 @@ class ComponentPlatformApi(
     private val sessionHolder: SessionHolder,
     private val componentFlutterInterface: ComponentFlutterInterface,
 ) : ComponentPlatformInterface {
-    private var googlePayComponentManager: GooglePayComponentManager? = null
-    private val paymentFinishedFlow = MutableStateFlow<Boolean?>(null)
+    private var googlePayComponentManager: GooglePayComponentManager = GooglePayComponentManager(activity)
 
+    override fun updateViewHeight(viewId: Long) = ComponentHeightMessenger.sendResult(viewId)
 
-    override fun updateViewHeight(viewId: Long) {
-        ComponentHeightMessenger.sendResult(viewId)
-    }
+    override fun onPaymentsResult(
+        paymentsResult: PaymentEventDTO,
+        componentId: String
+    ) = handlePaymentEvent(paymentsResult)
 
-    override fun onPaymentsResult(paymentsResult: PaymentEventDTO, componentId: String) {
-        handlePaymentEvent(paymentsResult, componentId)
-    }
-
-    override fun onPaymentsDetailsResult(paymentsDetailsResult: PaymentEventDTO, componentId: String) {
-        handlePaymentEvent(paymentsDetailsResult, componentId)
-    }
+    override fun onPaymentsDetailsResult(
+        paymentsDetailsResult: PaymentEventDTO,
+        componentId: String
+    ) = handlePaymentEvent(paymentsDetailsResult)
 
     override fun isInstantPaymentSupportedByPlatform(
         instantPaymentConfigurationDTO: InstantPaymentConfigurationDTO,
@@ -51,8 +47,7 @@ class ComponentPlatformApi(
         when (instantPaymentConfigurationDTO.instantPaymentType) {
             InstantPaymentType.GOOGLEPAYSESSION,
             InstantPaymentType.GOOGLEPAYADVANCED -> {
-                googlePayComponentManager = GooglePayComponentManager(activity)
-                googlePayComponentManager?.isGooglePayAvailable(
+                googlePayComponentManager.isGooglePayAvailable(
                     paymentMethod,
                     componentId,
                     sessionHolder,
@@ -66,50 +61,45 @@ class ComponentPlatformApi(
         }
     }
 
-    override fun onInstantPaymentPressed(instantPaymentType: InstantPaymentType, componentId: String) {
+    override fun onInstantPaymentPressed(
+        instantPaymentType: InstantPaymentType,
+        componentId: String
+    ) {
         when (instantPaymentType) {
             InstantPaymentType.GOOGLEPAYSESSION,
-            InstantPaymentType.GOOGLEPAYADVANCED -> googlePayComponentManager?.startGooglePayScreen(componentId)
+            InstantPaymentType.GOOGLEPAYADVANCED -> googlePayComponentManager.startGooglePayScreen(componentId)
 
             InstantPaymentType.APPLEPAY -> return
         }
     }
 
-    override fun onDispose(componentId: String) {
-        googlePayComponentManager?.onDispose(componentId)
-    }
+    override fun onDispose(componentId: String) = googlePayComponentManager.onDispose(componentId)
 
     fun handleActivityResult(
-        requestCode: Int, resultCode: Int, data: Intent?
-    ): Boolean {
-        return googlePayComponentManager?.handleGooglePayActivityResult(requestCode, resultCode, data) ?: false
+        requestCode: Int,
+        resultCode: Int,
+        data: Intent?
+    ): Boolean = googlePayComponentManager.handleGooglePayActivityResult(requestCode, resultCode, data) ?: false
+
+    private fun handlePaymentEvent(paymentEventDTO: PaymentEventDTO) = when (paymentEventDTO.paymentEventType) {
+        PaymentEventType.FINISHED -> onFinished(paymentEventDTO.result)
+        PaymentEventType.ACTION -> onAction(paymentEventDTO.actionResponse)
+        PaymentEventType.ERROR -> onError(paymentEventDTO.error)
     }
 
-    private fun handlePaymentEvent(paymentEventDTO: PaymentEventDTO, componentId: String) {
-        when (paymentEventDTO.paymentEventType) {
-            PaymentEventType.FINISHED -> onFinished(paymentEventDTO.result, componentId)
-            PaymentEventType.ACTION -> onAction(paymentEventDTO.actionResponse, componentId)
-            PaymentEventType.ERROR -> onError(paymentEventDTO.error, componentId)
-        }
-    }
-
-    private fun onFinished(resultCode: String?, componentId: String) {
+    private fun onFinished(resultCode: String?) {
         val paymentResult = PaymentResultModelDTO(resultCode = resultCode)
         ComponentResultMessenger.sendResult(paymentResult)
-        activity.lifecycleScope.launch {
-            paymentFinishedFlow.emit(true)
-        }
-
     }
 
-    private fun onAction(actionResponse: Map<String?, Any?>?, componentId: String) {
+    private fun onAction(actionResponse: Map<String?, Any?>?) {
         actionResponse?.let {
             val jsonActionResponse = JSONObject(it)
             ComponentActionMessenger.sendResult(jsonActionResponse)
         }
     }
 
-    private fun onError(error: ErrorDTO?, componentId: String) {
+    private fun onError(error: ErrorDTO?) {
         error?.let {
             ComponentErrorMessenger.sendResult(it)
         }

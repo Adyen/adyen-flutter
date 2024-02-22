@@ -1,4 +1,4 @@
-package com.adyen.checkout.flutter.components
+package com.adyen.checkout.flutter.components.view
 
 import ComponentCommunicationModel
 import ComponentCommunicationType
@@ -11,6 +11,7 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.lifecycle.lifecycleScope
 import com.adyen.checkout.components.core.internal.Component
 import com.adyen.checkout.flutter.R
+import com.adyen.checkout.flutter.components.ComponentHeightMessenger
 import com.adyen.checkout.ui.core.AdyenComponentView
 import com.adyen.checkout.ui.core.internal.ui.ViewableComponent
 import com.google.android.material.button.MaterialButton
