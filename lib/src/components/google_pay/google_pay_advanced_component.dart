@@ -16,16 +16,16 @@ import 'package:pay/pay.dart';
 class GooglePayAdvancedComponent extends StatefulWidget {
   final String googlePayPaymentMethod;
   final GooglePayComponentConfiguration googlePayComponentConfiguration;
-  final void Function(PaymentResult) onPaymentResult;
   final Future<PaymentEvent> Function(String) onSubmit;
   final Future<PaymentEvent> Function(String) onAdditionalDetails;
+  final Future<void> Function(PaymentResult) onPaymentResult;
   final GooglePayButtonTheme? theme;
   final GooglePayButtonType? type;
   final int? cornerRadius;
   final double? width;
   final double? height;
-  final void Function()? onSetupError;
-  final Widget? errorIndicator;
+  final Future<void> Function()? onGooglePayUnavailable;
+  final Widget? googlePayUnavailableWidget;
   final Widget? loadingIndicator;
   final PaymentEventHandler paymentEventHandler;
   final AdyenLogger adyenLogger;
@@ -43,8 +43,8 @@ class GooglePayAdvancedComponent extends StatefulWidget {
     this.cornerRadius,
     this.width,
     this.height,
-    this.onSetupError,
-    this.errorIndicator,
+    this.onGooglePayUnavailable,
+    this.googlePayUnavailableWidget,
     this.loadingIndicator,
     PaymentEventHandler? paymentEventHandler,
     AdyenLogger? adyenLogger,
@@ -87,8 +87,8 @@ class _GooglePayAdvancedComponentState
           if (_isGooglePaySupportedOnDevice(snapshot)) {
             return _buildGooglePayButton(snapshot);
           } else {
-            widget.onSetupError?.call();
-            return widget.errorIndicator ?? const SizedBox.shrink();
+            widget.onGooglePayUnavailable?.call();
+            return widget.googlePayUnavailableWidget ?? const SizedBox.shrink();
           }
         }
 
@@ -116,8 +116,8 @@ class _GooglePayAdvancedComponentState
       AsyncSnapshot<InstantPaymentSetupResultDTO> snapshot) {
     final String allowedPaymentMethods =
         snapshot.data?.resultData.toString() ?? "[]";
-    final PaymentConfiguration paymentConfiguration =
-        PaymentConfiguration.fromJsonString(
+    final Widget googlePayButton =
+        _buildRawGooglePayButton(PaymentConfiguration.fromJsonString(
       '''{
         "provider": "google_pay",
         "data": {
@@ -125,7 +125,7 @@ class _GooglePayAdvancedComponentState
           "apiVersionMinor": 0,
           "allowedPaymentMethods": $allowedPaymentMethods
         }}''',
-    );
+    ));
 
     return SizedBox(
       width: widget.width,
@@ -135,17 +135,22 @@ class _GooglePayAdvancedComponentState
         builder: (BuildContext context, value, Widget? child) {
           return IgnorePointer(
             ignoring: value == false,
-            child: RawGooglePayButton(
-              paymentConfiguration: paymentConfiguration,
-              onPressed: onPressed,
-              cornerRadius: widget.cornerRadius ??
-                  RawGooglePayButton.defaultButtonHeight ~/ 2,
-              theme: widget.theme ?? GooglePayButtonTheme.dark,
-              type: widget.type ?? GooglePayButtonType.buy,
-            ),
+            child: googlePayButton,
           );
         },
       ),
+    );
+  }
+
+  RawGooglePayButton _buildRawGooglePayButton(
+      PaymentConfiguration paymentConfiguration) {
+    return RawGooglePayButton(
+      paymentConfiguration: paymentConfiguration,
+      onPressed: onPressed,
+      cornerRadius:
+          widget.cornerRadius ?? RawGooglePayButton.defaultButtonHeight ~/ 2,
+      theme: widget.theme ?? GooglePayButtonTheme.dark,
+      type: widget.type ?? GooglePayButtonType.buy,
     );
   }
 

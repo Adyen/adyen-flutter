@@ -10,14 +10,14 @@ class AdyenGooglePayComponent extends StatelessWidget {
   final GooglePayComponentConfiguration configuration;
   final Map<String, dynamic> paymentMethod;
   final Checkout checkout;
-  final void Function(PaymentResult) onPaymentResult;
+  final Future<void> Function(PaymentResult) onPaymentResult;
   final GooglePayButtonTheme? theme;
   final GooglePayButtonType? type;
   final int? cornerRadius;
   final double? width;
   final double? height;
-  final void Function()? onSetupError;
-  final Widget? errorIndicator;
+  final Future<void> Function()? onGooglePayUnavailable;
+  final Widget? googlePayUnavailableWidget;
   final Widget? loadingIndicator;
 
   const AdyenGooglePayComponent({
@@ -31,8 +31,8 @@ class AdyenGooglePayComponent extends StatelessWidget {
     this.cornerRadius,
     this.width,
     this.height,
-    this.onSetupError,
-    this.errorIndicator,
+    this.onGooglePayUnavailable,
+    this.googlePayUnavailableWidget,
     this.loadingIndicator,
   });
 
@@ -47,15 +47,16 @@ class AdyenGooglePayComponent extends StatelessWidget {
   Widget _buildGooglePaySessionFlowWidget() {
     final String encodedPaymentMethod = json.encode(paymentMethod);
     return GooglePaySessionComponent(
+      key: key,
       googlePayPaymentMethod: encodedPaymentMethod,
       googlePayComponentConfiguration: configuration,
       onPaymentResult: onPaymentResult,
-      onSetupError: onSetupError,
+      onGooglePayUnavailable: onGooglePayUnavailable,
       cornerRadius: cornerRadius,
       width: _determineWidth(),
       height: _determineHeight(),
       loadingIndicator: loadingIndicator,
-      errorIndicator: errorIndicator,
+      googlePayUnavailableWidget: googlePayUnavailableWidget,
       theme: _mapToGooglePayButtonTheme(),
       type: _mapToGooglePayButtonType(),
     );
@@ -65,17 +66,18 @@ class AdyenGooglePayComponent extends StatelessWidget {
     final String encodedPaymentMethod = json.encode(paymentMethod);
     AdvancedCheckout advancedCheckout = checkout as AdvancedCheckout;
     return GooglePayAdvancedComponent(
+      key: key,
       googlePayPaymentMethod: encodedPaymentMethod,
       googlePayComponentConfiguration: configuration,
       onSubmit: advancedCheckout.onSubmit,
       onAdditionalDetails: advancedCheckout.onAdditionalDetails,
       onPaymentResult: onPaymentResult,
-      onSetupError: onSetupError,
+      onGooglePayUnavailable: onGooglePayUnavailable,
       cornerRadius: cornerRadius,
       width: _determineWidth(),
       height: _determineHeight(),
       loadingIndicator: loadingIndicator,
-      errorIndicator: errorIndicator,
+      googlePayUnavailableWidget: googlePayUnavailableWidget,
       theme: _mapToGooglePayButtonTheme(),
       type: _mapToGooglePayButtonType(),
     );

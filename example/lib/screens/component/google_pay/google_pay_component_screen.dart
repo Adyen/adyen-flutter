@@ -72,11 +72,10 @@ class GooglePayComponentScreen extends StatelessWidget {
                 checkout: sessionCheckout,
                 type: GooglePayButtonType.plain,
                 loadingIndicator: const CircularProgressIndicator(),
-                onPaymentResult: (paymentResult) {
+                onPaymentResult: (paymentResult) async {
                   Navigator.pop(context);
                   _dialogBuilder(paymentResult, context);
                 },
-                onSetupError: () {},
               ),
             ],
           );
@@ -125,13 +124,15 @@ class GooglePayComponentScreen extends StatelessWidget {
                 paymentMethod: paymentMethod,
                 checkout: advancedCheckout,
                 width: 300,
-                type: GooglePayButtonType.buy,
+                type: GooglePayButtonType.book,
+                theme: GooglePayButtonTheme.light,
+                googlePayUnavailableWidget:
+                    const Text("Google Pay not available"),
                 loadingIndicator: const CircularProgressIndicator(),
-                onPaymentResult: (paymentResult) {
+                onPaymentResult: (paymentResult) async {
                   Navigator.pop(context);
                   _dialogBuilder(paymentResult, context);
                 },
-                onSetupError: () {},
               ),
             ],
           );
