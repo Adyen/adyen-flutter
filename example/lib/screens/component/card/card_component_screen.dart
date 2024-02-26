@@ -81,45 +81,47 @@ class _CardComponentScreenState extends State<CardComponentScreen> {
           _extractPaymentMethod(sessionCheckout.paymentMethodsJson);
 
       // ignore: use_build_context_synchronously
-      return showModalBottomSheet(
-        context: context,
-        isDismissible: false,
-        isScrollControlled: true,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10.0),
-        ),
-        builder: (BuildContext context) {
-          return SafeArea(
-            child: SingleChildScrollView(
-                child: Column(
-              children: [
-                Container(height: 8),
-                Container(
-                  width: 48,
-                  height: 6,
-                  decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10),
-                      color: Colors.grey),
-                ),
-                Container(height: 8),
-                Container(
-                  padding: EdgeInsets.only(
-                      bottom: MediaQuery.of(context).viewInsets.bottom),
-                  child: AdyenCardComponent(
-                    configuration: cardComponentConfiguration,
-                    paymentMethod: paymentMethod,
-                    checkout: sessionCheckout,
-                    onPaymentResult: (paymentResult) async {
-                      Navigator.pop(context);
-                      _dialogBuilder(paymentResult);
-                    },
+      if (mounted) {
+        return showModalBottomSheet(
+          context: context,
+          isDismissible: false,
+          isScrollControlled: true,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10.0),
+          ),
+          builder: (BuildContext context) {
+            return SafeArea(
+              child: SingleChildScrollView(
+                  child: Column(
+                children: [
+                  Container(height: 8),
+                  Container(
+                    width: 48,
+                    height: 6,
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        color: Colors.grey),
                   ),
-                ),
-              ],
-            )),
-          );
-        },
-      );
+                  Container(height: 8),
+                  Container(
+                    padding: EdgeInsets.only(
+                        bottom: MediaQuery.of(context).viewInsets.bottom),
+                    child: AdyenCardComponent(
+                      configuration: cardComponentConfiguration,
+                      paymentMethod: paymentMethod,
+                      checkout: sessionCheckout,
+                      onPaymentResult: (paymentResult) async {
+                        Navigator.pop(context);
+                        _dialogBuilder(paymentResult);
+                      },
+                    ),
+                  ),
+                ],
+              )),
+            );
+          },
+        );
+      }
     } catch (error) {
       debugPrint(error.toString());
     }

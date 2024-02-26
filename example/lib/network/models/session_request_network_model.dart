@@ -92,8 +92,9 @@ class SessionRequestNetworkModel {
     data['deliveryAddress'] = deliveryAddress?.toJson();
     data['lineItems'] =
         lineItems?.map((lineItem) => lineItem.toJson()).toList();
-    if (authenticationData != null)
+    if (authenticationData != null) {
       data["authenticationData"] = authenticationData;
+    }
     // data['installmentOptions'] = installmentOptions;
     return data;
   }
