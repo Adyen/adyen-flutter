@@ -24,6 +24,7 @@ class ComponentLoadingBottomSheet<T>(private val component: T) :
         savedInstanceState: Bundle?
     ) {
         view.findViewById<AdyenComponentView>(R.id.adyen_component_view)?.attach(component, viewLifecycleOwner)
+        isCancelable = false
     }
 
     companion object {
@@ -33,9 +34,7 @@ class ComponentLoadingBottomSheet<T>(private val component: T) :
             fragmentManager: FragmentManager,
             component: T
         ) where T : ViewableComponent, T : Component {
-            ComponentLoadingBottomSheet(component).apply {
-                isCancelable = false
-            }.show(fragmentManager, TAG)
+            ComponentLoadingBottomSheet(component).show(fragmentManager, TAG)
         }
 
         fun hide(fragmentManager: FragmentManager) {
