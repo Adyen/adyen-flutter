@@ -34,9 +34,10 @@ internal class CardAdvancedComponent(
     private val componentId = creationParams[COMPONENT_ID_KEY] as String? ?: ""
 
     init {
-        cardComponent = createCardComponent().apply {
-            addComponent(this, componentId)
-        }
+        cardComponent =
+            createCardComponent().apply {
+                addComponent(this, componentId)
+            }
         addActionListener()
         addResultListener()
         addErrorListener()

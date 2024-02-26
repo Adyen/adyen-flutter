@@ -40,11 +40,11 @@ abstract class BaseGooglePayComponent(
     fun hideLoadingBottomSheet() = ComponentLoadingBottomSheet.hide(activity.supportFragmentManager)
 
     private fun handleIntent(intent: Intent) {
-        if (intent.data != null && intent.data?.toString().orEmpty()
+        if (intent.data != null &&
+            intent.data?.toString().orEmpty()
                 .startsWith(RedirectComponent.REDIRECT_RESULT_SCHEME)
         ) {
             googlePayComponent?.handleIntent(intent)
         }
     }
-
 }

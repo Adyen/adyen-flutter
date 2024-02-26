@@ -14,7 +14,6 @@ import androidx.fragment.app.FragmentActivity
 import com.adyen.checkout.components.core.PaymentMethod
 import com.adyen.checkout.flutter.components.googlepay.GooglePayComponentManager
 import com.adyen.checkout.flutter.session.SessionHolder
-import kotlinx.coroutines.flow.MutableStateFlow
 import org.json.JSONObject
 
 class ComponentPlatformApi(
@@ -81,11 +80,12 @@ class ComponentPlatformApi(
         data: Intent?
     ): Boolean = googlePayComponentManager.handleGooglePayActivityResult(requestCode, resultCode, data) ?: false
 
-    private fun handlePaymentEvent(paymentEventDTO: PaymentEventDTO) = when (paymentEventDTO.paymentEventType) {
-        PaymentEventType.FINISHED -> onFinished(paymentEventDTO.result)
-        PaymentEventType.ACTION -> onAction(paymentEventDTO.actionResponse)
-        PaymentEventType.ERROR -> onError(paymentEventDTO.error)
-    }
+    private fun handlePaymentEvent(paymentEventDTO: PaymentEventDTO) =
+        when (paymentEventDTO.paymentEventType) {
+            PaymentEventType.FINISHED -> onFinished(paymentEventDTO.result)
+            PaymentEventType.ACTION -> onAction(paymentEventDTO.actionResponse)
+            PaymentEventType.ERROR -> onError(paymentEventDTO.error)
+        }
 
     private fun onFinished(resultCode: String?) {
         val paymentResult = PaymentResultModelDTO(resultCode = resultCode)

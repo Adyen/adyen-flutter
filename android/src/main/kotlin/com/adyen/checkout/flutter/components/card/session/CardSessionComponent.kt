@@ -37,9 +37,10 @@ class CardSessionComponent(
         val sessionSetupResponse = SessionSetupResponse.SERIALIZER.deserialize(sessionHolder.sessionSetupResponse)
         val order = sessionHolder.orderResponse?.let { Order.SERIALIZER.deserialize(it) }
         val checkoutSession = CheckoutSession(sessionSetupResponse = sessionSetupResponse, order = order)
-        cardComponent = createCardComponent(checkoutSession).apply {
-            addComponent(this, componentId)
-        }
+        cardComponent =
+            createCardComponent(checkoutSession).apply {
+                addComponent(this, componentId)
+            }
     }
 
     private fun createCardComponent(checkoutSession: CheckoutSession): CardComponent {
@@ -53,10 +54,10 @@ class CardSessionComponent(
                     storedPaymentMethod = storedPaymentMethod,
                     configuration = cardConfiguration,
                     componentCallback =
-                    CardSessionCallback(
-                        componentFlutterApi,
-                        componentId
-                    ) { action -> onAction(action) },
+                        CardSessionCallback(
+                            componentFlutterApi,
+                            componentId
+                        ) { action -> onAction(action) },
                     key = UUID.randomUUID().toString()
                 )
             }
@@ -69,10 +70,10 @@ class CardSessionComponent(
                     paymentMethod = paymentMethod,
                     configuration = cardConfiguration,
                     componentCallback =
-                    CardSessionCallback(
-                        componentFlutterApi,
-                        componentId
-                    ) { action -> onAction(action) },
+                        CardSessionCallback(
+                            componentFlutterApi,
+                            componentId
+                        ) { action -> onAction(action) },
                     key = UUID.randomUUID().toString()
                 )
             }
