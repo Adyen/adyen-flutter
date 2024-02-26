@@ -6,7 +6,8 @@ class SdkVersionNumberProvider {
 
   SdkVersionNumberProvider._init();
 
-  static SdkVersionNumberProvider get instance => _instance ??= SdkVersionNumberProvider._init();
+  static SdkVersionNumberProvider get instance =>
+      _instance ??= SdkVersionNumberProvider._init();
 
   Future<String> getSdkVersionNumber() async {
     try {

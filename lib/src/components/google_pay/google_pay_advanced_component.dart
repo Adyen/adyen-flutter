@@ -167,7 +167,7 @@ class _GooglePayAdvancedComponentState
         await _sdkVersionNumberProvider.getSdkVersionNumber();
     final InstantPaymentConfigurationDTO
         instantPaymentComponentConfigurationDTO =
-        widget.googlePayComponentConfiguration.toInstantPaymentConfigurationDTO(
+        widget.googlePayComponentConfiguration.toDTO(
       versionNumber,
       InstantPaymentType.googlePayAdvanced,
     );

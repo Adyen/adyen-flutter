@@ -92,7 +92,8 @@ class SessionRequestNetworkModel {
     data['deliveryAddress'] = deliveryAddress?.toJson();
     data['lineItems'] =
         lineItems?.map((lineItem) => lineItem.toJson()).toList();
-    if (authenticationData != null) data["authenticationData"] = authenticationData;
+    if (authenticationData != null)
+      data["authenticationData"] = authenticationData;
     // data['installmentOptions'] = installmentOptions;
     return data;
   }
@@ -110,12 +111,7 @@ enum RecurringProcessingModel {
   unscheduledCardOnFile
 }
 
-enum ShopperInteractionModel {
-  ecommerce,
-  contAuth,
-  moto,
-  pos
-}
+enum ShopperInteractionModel { ecommerce, contAuth, moto, pos }
 
 extension StorePaymentMethodModeExtension on StorePaymentMethodMode {
   String get storePaymentMethodModeString {

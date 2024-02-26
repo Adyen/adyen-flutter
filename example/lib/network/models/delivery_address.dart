@@ -8,16 +8,15 @@ class DeliveryAddress {
   String? lastName;
   String? stateOrProvince;
 
-  DeliveryAddress({
-    this.city,
-    this.country,
-    this.houseNumberOrName,
-    this.postalCode,
-    this.street,
-    this.firstName,
-    this.lastName,
-    this.stateOrProvince
-  });
+  DeliveryAddress(
+      {this.city,
+      this.country,
+      this.houseNumberOrName,
+      this.postalCode,
+      this.street,
+      this.firstName,
+      this.lastName,
+      this.stateOrProvince});
 
   DeliveryAddress.fromJson(Map<String, dynamic> json) {
     city = json['city'];

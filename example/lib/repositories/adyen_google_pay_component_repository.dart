@@ -50,7 +50,7 @@ class AdyenGooglePayComponentRepository extends AdyenBaseRepository {
       shopperReference: Config.shopperReference,
       channel: determineChannel(),
       authenticationData: {
-        "attemptAuthentication" : "always",
+        "attemptAuthentication": "always",
         "threeDSRequestData": {
           "nativeThreeDS": "preferred",
         },
@@ -90,7 +90,7 @@ class AdyenGooglePayComponentRepository extends AdyenBaseRepository {
       shopperInteraction:
           ShopperInteractionModel.ecommerce.shopperInteractionModelString,
       authenticationData: {
-        "attemptAuthentication" : "always",
+        "attemptAuthentication": "always",
         "threeDSRequestData": {
           "nativeThreeDS": "preferred",
         },

@@ -157,7 +157,7 @@ class _GooglePaySessionComponentState extends State<GooglePaySessionComponent> {
         await _sdkVersionNumberProvider.getSdkVersionNumber();
     final InstantPaymentConfigurationDTO
         instantPaymentComponentConfigurationDTO =
-        widget.googlePayComponentConfiguration.toInstantPaymentConfigurationDTO(
+        widget.googlePayComponentConfiguration.toDTO(
       versionNumber,
       InstantPaymentType.googlePaySession,
     );

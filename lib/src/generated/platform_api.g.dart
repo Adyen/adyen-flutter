@@ -15,7 +15,8 @@ PlatformException _createConnectionError(String channelName) {
   );
 }
 
-List<Object?> wrapResponse({Object? result, PlatformException? error, bool empty = false}) {
+List<Object?> wrapResponse(
+    {Object? result, PlatformException? error, bool empty = false}) {
   if (empty) {
     return <Object?>[];
   }
@@ -263,7 +264,8 @@ class DropInConfigurationDTO {
       cashAppPayConfigurationDTO: result[8] != null
           ? CashAppPayConfigurationDTO.decode(result[8]! as List<Object?>)
           : null,
-      analyticsOptionsDTO: AnalyticsOptionsDTO.decode(result[9]! as List<Object?>),
+      analyticsOptionsDTO:
+          AnalyticsOptionsDTO.decode(result[9]! as List<Object?>),
       showPreselectedStoredPaymentMethod: result[10]! as bool,
       skipListWhenSinglePaymentMethod: result[11]! as bool,
       isRemoveStoredPaymentMethodEnabled: result[12]! as bool,
@@ -321,7 +323,8 @@ class CardConfigurationDTO {
       showCvcForStoredCard: result[3]! as bool,
       showCvc: result[4]! as bool,
       kcpFieldVisibility: FieldVisibility.values[result[5]! as int],
-      socialSecurityNumberFieldVisibility: FieldVisibility.values[result[6]! as int],
+      socialSecurityNumberFieldVisibility:
+          FieldVisibility.values[result[6]! as int],
       supportedCardTypes: (result[7] as List<Object?>?)!.cast<String?>(),
     );
   }
@@ -435,9 +438,8 @@ class GooglePayConfigurationDTO {
       merchantInfoDTO: result[2] != null
           ? MerchantInfoDTO.decode(result[2]! as List<Object?>)
           : null,
-      totalPriceStatus: result[3] != null
-          ? TotalPriceStatus.values[result[3]! as int]
-          : null,
+      totalPriceStatus:
+          result[3] != null ? TotalPriceStatus.values[result[3]! as int] : null,
       allowedCardNetworks: (result[4] as List<Object?>?)?.cast<String?>(),
       allowedAuthMethods: (result[5] as List<Object?>?)?.cast<String?>(),
       allowPrepaidCards: result[6] as bool?,
@@ -778,7 +780,8 @@ class PaymentEventDTO {
     return PaymentEventDTO(
       paymentEventType: PaymentEventType.values[result[0]! as int],
       result: result[1] as String?,
-      actionResponse: (result[2] as Map<Object?, Object?>?)?.cast<String?, Object?>(),
+      actionResponse:
+          (result[2] as Map<Object?, Object?>?)?.cast<String?, Object?>(),
       error: result[3] != null
           ? ErrorDTO.decode(result[3]! as List<Object?>)
           : null,
@@ -888,8 +891,10 @@ class CardComponentConfigurationDTO {
       countryCode: result[2]! as String,
       amount: AmountDTO.decode(result[3]! as List<Object?>),
       shopperLocale: result[4] as String?,
-      cardConfiguration: CardConfigurationDTO.decode(result[5]! as List<Object?>),
-      analyticsOptionsDTO: AnalyticsOptionsDTO.decode(result[6]! as List<Object?>),
+      cardConfiguration:
+          CardConfigurationDTO.decode(result[5]! as List<Object?>),
+      analyticsOptionsDTO:
+          AnalyticsOptionsDTO.decode(result[6]! as List<Object?>),
     );
   }
 }
@@ -948,7 +953,8 @@ class InstantPaymentConfigurationDTO {
       countryCode: result[3]! as String,
       amount: AmountDTO.decode(result[4]! as List<Object?>),
       shopperLocale: result[5] as String?,
-      analyticsOptionsDTO: AnalyticsOptionsDTO.decode(result[6]! as List<Object?>),
+      analyticsOptionsDTO:
+          AnalyticsOptionsDTO.decode(result[6]! as List<Object?>),
       googlePayConfigurationDTO: result[7] != null
           ? GooglePayConfigurationDTO.decode(result[7]! as List<Object?>)
           : null,
@@ -1068,49 +1074,49 @@ class _CheckoutPlatformInterfaceCodec extends StandardMessageCodec {
   @override
   Object? readValueOfType(int type, ReadBuffer buffer) {
     switch (type) {
-      case 128: 
+      case 128:
         return AmountDTO.decode(readValue(buffer)!);
-      case 129: 
+      case 129:
         return AnalyticsOptionsDTO.decode(readValue(buffer)!);
-      case 130: 
+      case 130:
         return ApplePayConfigurationDTO.decode(readValue(buffer)!);
-      case 131: 
+      case 131:
         return BillingAddressParametersDTO.decode(readValue(buffer)!);
-      case 132: 
+      case 132:
         return CardComponentConfigurationDTO.decode(readValue(buffer)!);
-      case 133: 
+      case 133:
         return CardConfigurationDTO.decode(readValue(buffer)!);
-      case 134: 
+      case 134:
         return CashAppPayConfigurationDTO.decode(readValue(buffer)!);
-      case 135: 
+      case 135:
         return ComponentCommunicationModel.decode(readValue(buffer)!);
-      case 136: 
+      case 136:
         return DeletedStoredPaymentMethodResultDTO.decode(readValue(buffer)!);
-      case 137: 
+      case 137:
         return DropInConfigurationDTO.decode(readValue(buffer)!);
-      case 138: 
+      case 138:
         return ErrorDTO.decode(readValue(buffer)!);
-      case 139: 
+      case 139:
         return GooglePayConfigurationDTO.decode(readValue(buffer)!);
-      case 140: 
+      case 140:
         return InstantPaymentConfigurationDTO.decode(readValue(buffer)!);
-      case 141: 
+      case 141:
         return InstantPaymentSetupResultDTO.decode(readValue(buffer)!);
-      case 142: 
+      case 142:
         return MerchantInfoDTO.decode(readValue(buffer)!);
-      case 143: 
+      case 143:
         return OrderResponseDTO.decode(readValue(buffer)!);
-      case 144: 
+      case 144:
         return PaymentEventDTO.decode(readValue(buffer)!);
-      case 145: 
+      case 145:
         return PaymentResultDTO.decode(readValue(buffer)!);
-      case 146: 
+      case 146:
         return PaymentResultModelDTO.decode(readValue(buffer)!);
-      case 147: 
+      case 147:
         return PlatformCommunicationModel.decode(readValue(buffer)!);
-      case 148: 
+      case 148:
         return SessionDTO.decode(readValue(buffer)!);
-      case 149: 
+      case 149:
         return ShippingAddressParametersDTO.decode(readValue(buffer)!);
       default:
         return super.readValueOfType(type, buffer);
@@ -1126,11 +1132,14 @@ class CheckoutPlatformInterface {
       : __pigeon_binaryMessenger = binaryMessenger;
   final BinaryMessenger? __pigeon_binaryMessenger;
 
-  static const MessageCodec<Object?> pigeonChannelCodec = _CheckoutPlatformInterfaceCodec();
+  static const MessageCodec<Object?> pigeonChannelCodec =
+      _CheckoutPlatformInterfaceCodec();
 
   Future<String> getReturnUrl() async {
-    const String __pigeon_channelName = 'dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.getReturnUrl';
-    final BasicMessageChannel<Object?> __pigeon_channel = BasicMessageChannel<Object?>(
+    const String __pigeon_channelName =
+        'dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.getReturnUrl';
+    final BasicMessageChannel<Object?> __pigeon_channel =
+        BasicMessageChannel<Object?>(
       __pigeon_channelName,
       pigeonChannelCodec,
       binaryMessenger: __pigeon_binaryMessenger,
@@ -1155,15 +1164,19 @@ class CheckoutPlatformInterface {
     }
   }
 
-  Future<SessionDTO> createSession(String sessionId, String sessionData, Object? configuration) async {
-    const String __pigeon_channelName = 'dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.createSession';
-    final BasicMessageChannel<Object?> __pigeon_channel = BasicMessageChannel<Object?>(
+  Future<SessionDTO> createSession(
+      String sessionId, String sessionData, Object? configuration) async {
+    const String __pigeon_channelName =
+        'dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.createSession';
+    final BasicMessageChannel<Object?> __pigeon_channel =
+        BasicMessageChannel<Object?>(
       __pigeon_channelName,
       pigeonChannelCodec,
       binaryMessenger: __pigeon_binaryMessenger,
     );
-    final List<Object?>? __pigeon_replyList =
-        await __pigeon_channel.send(<Object?>[sessionId, sessionData, configuration]) as List<Object?>?;
+    final List<Object?>? __pigeon_replyList = await __pigeon_channel
+            .send(<Object?>[sessionId, sessionData, configuration])
+        as List<Object?>?;
     if (__pigeon_replyList == null) {
       throw _createConnectionError(__pigeon_channelName);
     } else if (__pigeon_replyList.length > 1) {
@@ -1183,14 +1196,16 @@ class CheckoutPlatformInterface {
   }
 
   Future<void> enableConsoleLogging(bool loggingEnabled) async {
-    const String __pigeon_channelName = 'dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.enableConsoleLogging';
-    final BasicMessageChannel<Object?> __pigeon_channel = BasicMessageChannel<Object?>(
+    const String __pigeon_channelName =
+        'dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.enableConsoleLogging';
+    final BasicMessageChannel<Object?> __pigeon_channel =
+        BasicMessageChannel<Object?>(
       __pigeon_channelName,
       pigeonChannelCodec,
       binaryMessenger: __pigeon_binaryMessenger,
     );
-    final List<Object?>? __pigeon_replyList =
-        await __pigeon_channel.send(<Object?>[loggingEnabled]) as List<Object?>?;
+    final List<Object?>? __pigeon_replyList = await __pigeon_channel
+        .send(<Object?>[loggingEnabled]) as List<Object?>?;
     if (__pigeon_replyList == null) {
       throw _createConnectionError(__pigeon_channelName);
     } else if (__pigeon_replyList.length > 1) {
@@ -1256,31 +1271,31 @@ class _DropInPlatformInterfaceCodec extends StandardMessageCodec {
   @override
   Object? readValueOfType(int type, ReadBuffer buffer) {
     switch (type) {
-      case 128: 
+      case 128:
         return AmountDTO.decode(readValue(buffer)!);
-      case 129: 
+      case 129:
         return AnalyticsOptionsDTO.decode(readValue(buffer)!);
-      case 130: 
+      case 130:
         return ApplePayConfigurationDTO.decode(readValue(buffer)!);
-      case 131: 
+      case 131:
         return BillingAddressParametersDTO.decode(readValue(buffer)!);
-      case 132: 
+      case 132:
         return CardConfigurationDTO.decode(readValue(buffer)!);
-      case 133: 
+      case 133:
         return CashAppPayConfigurationDTO.decode(readValue(buffer)!);
-      case 134: 
+      case 134:
         return DeletedStoredPaymentMethodResultDTO.decode(readValue(buffer)!);
-      case 135: 
+      case 135:
         return DropInConfigurationDTO.decode(readValue(buffer)!);
-      case 136: 
+      case 136:
         return ErrorDTO.decode(readValue(buffer)!);
-      case 137: 
+      case 137:
         return GooglePayConfigurationDTO.decode(readValue(buffer)!);
-      case 138: 
+      case 138:
         return MerchantInfoDTO.decode(readValue(buffer)!);
-      case 139: 
+      case 139:
         return PaymentEventDTO.decode(readValue(buffer)!);
-      case 140: 
+      case 140:
         return ShippingAddressParametersDTO.decode(readValue(buffer)!);
       default:
         return super.readValueOfType(type, buffer);
@@ -1296,17 +1311,21 @@ class DropInPlatformInterface {
       : __pigeon_binaryMessenger = binaryMessenger;
   final BinaryMessenger? __pigeon_binaryMessenger;
 
-  static const MessageCodec<Object?> pigeonChannelCodec = _DropInPlatformInterfaceCodec();
+  static const MessageCodec<Object?> pigeonChannelCodec =
+      _DropInPlatformInterfaceCodec();
 
-  Future<void> showDropInSession(DropInConfigurationDTO dropInConfigurationDTO) async {
-    const String __pigeon_channelName = 'dev.flutter.pigeon.adyen_checkout.DropInPlatformInterface.showDropInSession';
-    final BasicMessageChannel<Object?> __pigeon_channel = BasicMessageChannel<Object?>(
+  Future<void> showDropInSession(
+      DropInConfigurationDTO dropInConfigurationDTO) async {
+    const String __pigeon_channelName =
+        'dev.flutter.pigeon.adyen_checkout.DropInPlatformInterface.showDropInSession';
+    final BasicMessageChannel<Object?> __pigeon_channel =
+        BasicMessageChannel<Object?>(
       __pigeon_channelName,
       pigeonChannelCodec,
       binaryMessenger: __pigeon_binaryMessenger,
     );
-    final List<Object?>? __pigeon_replyList =
-        await __pigeon_channel.send(<Object?>[dropInConfigurationDTO]) as List<Object?>?;
+    final List<Object?>? __pigeon_replyList = await __pigeon_channel
+        .send(<Object?>[dropInConfigurationDTO]) as List<Object?>?;
     if (__pigeon_replyList == null) {
       throw _createConnectionError(__pigeon_channelName);
     } else if (__pigeon_replyList.length > 1) {
@@ -1320,15 +1339,19 @@ class DropInPlatformInterface {
     }
   }
 
-  Future<void> showDropInAdvanced(DropInConfigurationDTO dropInConfigurationDTO, String paymentMethodsResponse) async {
-    const String __pigeon_channelName = 'dev.flutter.pigeon.adyen_checkout.DropInPlatformInterface.showDropInAdvanced';
-    final BasicMessageChannel<Object?> __pigeon_channel = BasicMessageChannel<Object?>(
+  Future<void> showDropInAdvanced(DropInConfigurationDTO dropInConfigurationDTO,
+      String paymentMethodsResponse) async {
+    const String __pigeon_channelName =
+        'dev.flutter.pigeon.adyen_checkout.DropInPlatformInterface.showDropInAdvanced';
+    final BasicMessageChannel<Object?> __pigeon_channel =
+        BasicMessageChannel<Object?>(
       __pigeon_channelName,
       pigeonChannelCodec,
       binaryMessenger: __pigeon_binaryMessenger,
     );
-    final List<Object?>? __pigeon_replyList =
-        await __pigeon_channel.send(<Object?>[dropInConfigurationDTO, paymentMethodsResponse]) as List<Object?>?;
+    final List<Object?>? __pigeon_replyList = await __pigeon_channel
+            .send(<Object?>[dropInConfigurationDTO, paymentMethodsResponse])
+        as List<Object?>?;
     if (__pigeon_replyList == null) {
       throw _createConnectionError(__pigeon_channelName);
     } else if (__pigeon_replyList.length > 1) {
@@ -1343,14 +1366,16 @@ class DropInPlatformInterface {
   }
 
   Future<void> onPaymentsResult(PaymentEventDTO paymentsResult) async {
-    const String __pigeon_channelName = 'dev.flutter.pigeon.adyen_checkout.DropInPlatformInterface.onPaymentsResult';
-    final BasicMessageChannel<Object?> __pigeon_channel = BasicMessageChannel<Object?>(
+    const String __pigeon_channelName =
+        'dev.flutter.pigeon.adyen_checkout.DropInPlatformInterface.onPaymentsResult';
+    final BasicMessageChannel<Object?> __pigeon_channel =
+        BasicMessageChannel<Object?>(
       __pigeon_channelName,
       pigeonChannelCodec,
       binaryMessenger: __pigeon_binaryMessenger,
     );
-    final List<Object?>? __pigeon_replyList =
-        await __pigeon_channel.send(<Object?>[paymentsResult]) as List<Object?>?;
+    final List<Object?>? __pigeon_replyList = await __pigeon_channel
+        .send(<Object?>[paymentsResult]) as List<Object?>?;
     if (__pigeon_replyList == null) {
       throw _createConnectionError(__pigeon_channelName);
     } else if (__pigeon_replyList.length > 1) {
@@ -1364,15 +1389,18 @@ class DropInPlatformInterface {
     }
   }
 
-  Future<void> onPaymentsDetailsResult(PaymentEventDTO paymentsDetailsResult) async {
-    const String __pigeon_channelName = 'dev.flutter.pigeon.adyen_checkout.DropInPlatformInterface.onPaymentsDetailsResult';
-    final BasicMessageChannel<Object?> __pigeon_channel = BasicMessageChannel<Object?>(
+  Future<void> onPaymentsDetailsResult(
+      PaymentEventDTO paymentsDetailsResult) async {
+    const String __pigeon_channelName =
+        'dev.flutter.pigeon.adyen_checkout.DropInPlatformInterface.onPaymentsDetailsResult';
+    final BasicMessageChannel<Object?> __pigeon_channel =
+        BasicMessageChannel<Object?>(
       __pigeon_channelName,
       pigeonChannelCodec,
       binaryMessenger: __pigeon_binaryMessenger,
     );
-    final List<Object?>? __pigeon_replyList =
-        await __pigeon_channel.send(<Object?>[paymentsDetailsResult]) as List<Object?>?;
+    final List<Object?>? __pigeon_replyList = await __pigeon_channel
+        .send(<Object?>[paymentsDetailsResult]) as List<Object?>?;
     if (__pigeon_replyList == null) {
       throw _createConnectionError(__pigeon_channelName);
     } else if (__pigeon_replyList.length > 1) {
@@ -1386,15 +1414,19 @@ class DropInPlatformInterface {
     }
   }
 
-  Future<void> onDeleteStoredPaymentMethodResult(DeletedStoredPaymentMethodResultDTO deleteStoredPaymentMethodResultDTO) async {
-    const String __pigeon_channelName = 'dev.flutter.pigeon.adyen_checkout.DropInPlatformInterface.onDeleteStoredPaymentMethodResult';
-    final BasicMessageChannel<Object?> __pigeon_channel = BasicMessageChannel<Object?>(
+  Future<void> onDeleteStoredPaymentMethodResult(
+      DeletedStoredPaymentMethodResultDTO
+          deleteStoredPaymentMethodResultDTO) async {
+    const String __pigeon_channelName =
+        'dev.flutter.pigeon.adyen_checkout.DropInPlatformInterface.onDeleteStoredPaymentMethodResult';
+    final BasicMessageChannel<Object?> __pigeon_channel =
+        BasicMessageChannel<Object?>(
       __pigeon_channelName,
       pigeonChannelCodec,
       binaryMessenger: __pigeon_binaryMessenger,
     );
-    final List<Object?>? __pigeon_replyList =
-        await __pigeon_channel.send(<Object?>[deleteStoredPaymentMethodResultDTO]) as List<Object?>?;
+    final List<Object?>? __pigeon_replyList = await __pigeon_channel
+        .send(<Object?>[deleteStoredPaymentMethodResultDTO]) as List<Object?>?;
     if (__pigeon_replyList == null) {
       throw _createConnectionError(__pigeon_channelName);
     } else if (__pigeon_replyList.length > 1) {
@@ -1409,8 +1441,10 @@ class DropInPlatformInterface {
   }
 
   Future<void> cleanUpDropIn() async {
-    const String __pigeon_channelName = 'dev.flutter.pigeon.adyen_checkout.DropInPlatformInterface.cleanUpDropIn';
-    final BasicMessageChannel<Object?> __pigeon_channel = BasicMessageChannel<Object?>(
+    const String __pigeon_channelName =
+        'dev.flutter.pigeon.adyen_checkout.DropInPlatformInterface.cleanUpDropIn';
+    final BasicMessageChannel<Object?> __pigeon_channel =
+        BasicMessageChannel<Object?>(
       __pigeon_channelName,
       pigeonChannelCodec,
       binaryMessenger: __pigeon_binaryMessenger,
@@ -1458,15 +1492,15 @@ class _DropInFlutterInterfaceCodec extends StandardMessageCodec {
   @override
   Object? readValueOfType(int type, ReadBuffer buffer) {
     switch (type) {
-      case 128: 
+      case 128:
         return AmountDTO.decode(readValue(buffer)!);
-      case 129: 
+      case 129:
         return OrderResponseDTO.decode(readValue(buffer)!);
-      case 130: 
+      case 130:
         return PaymentResultDTO.decode(readValue(buffer)!);
-      case 131: 
+      case 131:
         return PaymentResultModelDTO.decode(readValue(buffer)!);
-      case 132: 
+      case 132:
         return PlatformCommunicationModel.decode(readValue(buffer)!);
       default:
         return super.readValueOfType(type, buffer);
@@ -1475,59 +1509,73 @@ class _DropInFlutterInterfaceCodec extends StandardMessageCodec {
 }
 
 abstract class DropInFlutterInterface {
-  static const MessageCodec<Object?> pigeonChannelCodec = _DropInFlutterInterfaceCodec();
+  static const MessageCodec<Object?> pigeonChannelCodec =
+      _DropInFlutterInterfaceCodec();
 
-  void onDropInSessionPlatformCommunication(PlatformCommunicationModel platformCommunicationModel);
+  void onDropInSessionPlatformCommunication(
+      PlatformCommunicationModel platformCommunicationModel);
 
-  void onDropInAdvancedPlatformCommunication(PlatformCommunicationModel platformCommunicationModel);
+  void onDropInAdvancedPlatformCommunication(
+      PlatformCommunicationModel platformCommunicationModel);
 
-  static void setup(DropInFlutterInterface? api, {BinaryMessenger? binaryMessenger}) {
+  static void setup(DropInFlutterInterface? api,
+      {BinaryMessenger? binaryMessenger}) {
     {
-      final BasicMessageChannel<Object?> __pigeon_channel = BasicMessageChannel<Object?>(
-          'dev.flutter.pigeon.adyen_checkout.DropInFlutterInterface.onDropInSessionPlatformCommunication', pigeonChannelCodec,
+      final BasicMessageChannel<Object?> __pigeon_channel = BasicMessageChannel<
+              Object?>(
+          'dev.flutter.pigeon.adyen_checkout.DropInFlutterInterface.onDropInSessionPlatformCommunication',
+          pigeonChannelCodec,
           binaryMessenger: binaryMessenger);
       if (api == null) {
         __pigeon_channel.setMessageHandler(null);
       } else {
         __pigeon_channel.setMessageHandler((Object? message) async {
           assert(message != null,
-          'Argument for dev.flutter.pigeon.adyen_checkout.DropInFlutterInterface.onDropInSessionPlatformCommunication was null.');
+              'Argument for dev.flutter.pigeon.adyen_checkout.DropInFlutterInterface.onDropInSessionPlatformCommunication was null.');
           final List<Object?> args = (message as List<Object?>?)!;
-          final PlatformCommunicationModel? arg_platformCommunicationModel = (args[0] as PlatformCommunicationModel?);
+          final PlatformCommunicationModel? arg_platformCommunicationModel =
+              (args[0] as PlatformCommunicationModel?);
           assert(arg_platformCommunicationModel != null,
               'Argument for dev.flutter.pigeon.adyen_checkout.DropInFlutterInterface.onDropInSessionPlatformCommunication was null, expected non-null PlatformCommunicationModel.');
           try {
-            api.onDropInSessionPlatformCommunication(arg_platformCommunicationModel!);
+            api.onDropInSessionPlatformCommunication(
+                arg_platformCommunicationModel!);
             return wrapResponse(empty: true);
           } on PlatformException catch (e) {
             return wrapResponse(error: e);
-          }          catch (e) {
-            return wrapResponse(error: PlatformException(code: 'error', message: e.toString()));
+          } catch (e) {
+            return wrapResponse(
+                error: PlatformException(code: 'error', message: e.toString()));
           }
         });
       }
     }
     {
-      final BasicMessageChannel<Object?> __pigeon_channel = BasicMessageChannel<Object?>(
-          'dev.flutter.pigeon.adyen_checkout.DropInFlutterInterface.onDropInAdvancedPlatformCommunication', pigeonChannelCodec,
+      final BasicMessageChannel<Object?> __pigeon_channel = BasicMessageChannel<
+              Object?>(
+          'dev.flutter.pigeon.adyen_checkout.DropInFlutterInterface.onDropInAdvancedPlatformCommunication',
+          pigeonChannelCodec,
           binaryMessenger: binaryMessenger);
       if (api == null) {
         __pigeon_channel.setMessageHandler(null);
       } else {
         __pigeon_channel.setMessageHandler((Object? message) async {
           assert(message != null,
-          'Argument for dev.flutter.pigeon.adyen_checkout.DropInFlutterInterface.onDropInAdvancedPlatformCommunication was null.');
+              'Argument for dev.flutter.pigeon.adyen_checkout.DropInFlutterInterface.onDropInAdvancedPlatformCommunication was null.');
           final List<Object?> args = (message as List<Object?>?)!;
-          final PlatformCommunicationModel? arg_platformCommunicationModel = (args[0] as PlatformCommunicationModel?);
+          final PlatformCommunicationModel? arg_platformCommunicationModel =
+              (args[0] as PlatformCommunicationModel?);
           assert(arg_platformCommunicationModel != null,
               'Argument for dev.flutter.pigeon.adyen_checkout.DropInFlutterInterface.onDropInAdvancedPlatformCommunication was null, expected non-null PlatformCommunicationModel.');
           try {
-            api.onDropInAdvancedPlatformCommunication(arg_platformCommunicationModel!);
+            api.onDropInAdvancedPlatformCommunication(
+                arg_platformCommunicationModel!);
             return wrapResponse(empty: true);
           } on PlatformException catch (e) {
             return wrapResponse(error: e);
-          }          catch (e) {
-            return wrapResponse(error: PlatformException(code: 'error', message: e.toString()));
+          } catch (e) {
+            return wrapResponse(
+                error: PlatformException(code: 'error', message: e.toString()));
           }
         });
       }
@@ -1580,27 +1628,27 @@ class _ComponentPlatformInterfaceCodec extends StandardMessageCodec {
   @override
   Object? readValueOfType(int type, ReadBuffer buffer) {
     switch (type) {
-      case 128: 
+      case 128:
         return AmountDTO.decode(readValue(buffer)!);
-      case 129: 
+      case 129:
         return AnalyticsOptionsDTO.decode(readValue(buffer)!);
-      case 130: 
+      case 130:
         return ApplePayConfigurationDTO.decode(readValue(buffer)!);
-      case 131: 
+      case 131:
         return BillingAddressParametersDTO.decode(readValue(buffer)!);
-      case 132: 
+      case 132:
         return ErrorDTO.decode(readValue(buffer)!);
-      case 133: 
+      case 133:
         return GooglePayConfigurationDTO.decode(readValue(buffer)!);
-      case 134: 
+      case 134:
         return InstantPaymentConfigurationDTO.decode(readValue(buffer)!);
-      case 135: 
+      case 135:
         return InstantPaymentSetupResultDTO.decode(readValue(buffer)!);
-      case 136: 
+      case 136:
         return MerchantInfoDTO.decode(readValue(buffer)!);
-      case 137: 
+      case 137:
         return PaymentEventDTO.decode(readValue(buffer)!);
-      case 138: 
+      case 138:
         return ShippingAddressParametersDTO.decode(readValue(buffer)!);
       default:
         return super.readValueOfType(type, buffer);
@@ -1616,11 +1664,14 @@ class ComponentPlatformInterface {
       : __pigeon_binaryMessenger = binaryMessenger;
   final BinaryMessenger? __pigeon_binaryMessenger;
 
-  static const MessageCodec<Object?> pigeonChannelCodec = _ComponentPlatformInterfaceCodec();
+  static const MessageCodec<Object?> pigeonChannelCodec =
+      _ComponentPlatformInterfaceCodec();
 
   Future<void> updateViewHeight(int viewId) async {
-    const String __pigeon_channelName = 'dev.flutter.pigeon.adyen_checkout.ComponentPlatformInterface.updateViewHeight';
-    final BasicMessageChannel<Object?> __pigeon_channel = BasicMessageChannel<Object?>(
+    const String __pigeon_channelName =
+        'dev.flutter.pigeon.adyen_checkout.ComponentPlatformInterface.updateViewHeight';
+    final BasicMessageChannel<Object?> __pigeon_channel =
+        BasicMessageChannel<Object?>(
       __pigeon_channelName,
       pigeonChannelCodec,
       binaryMessenger: __pigeon_binaryMessenger,
@@ -1640,15 +1691,18 @@ class ComponentPlatformInterface {
     }
   }
 
-  Future<void> onPaymentsResult(PaymentEventDTO paymentsResult, String componentId) async {
-    const String __pigeon_channelName = 'dev.flutter.pigeon.adyen_checkout.ComponentPlatformInterface.onPaymentsResult';
-    final BasicMessageChannel<Object?> __pigeon_channel = BasicMessageChannel<Object?>(
+  Future<void> onPaymentsResult(
+      PaymentEventDTO paymentsResult, String componentId) async {
+    const String __pigeon_channelName =
+        'dev.flutter.pigeon.adyen_checkout.ComponentPlatformInterface.onPaymentsResult';
+    final BasicMessageChannel<Object?> __pigeon_channel =
+        BasicMessageChannel<Object?>(
       __pigeon_channelName,
       pigeonChannelCodec,
       binaryMessenger: __pigeon_binaryMessenger,
     );
-    final List<Object?>? __pigeon_replyList =
-        await __pigeon_channel.send(<Object?>[paymentsResult, componentId]) as List<Object?>?;
+    final List<Object?>? __pigeon_replyList = await __pigeon_channel
+        .send(<Object?>[paymentsResult, componentId]) as List<Object?>?;
     if (__pigeon_replyList == null) {
       throw _createConnectionError(__pigeon_channelName);
     } else if (__pigeon_replyList.length > 1) {
@@ -1662,15 +1716,18 @@ class ComponentPlatformInterface {
     }
   }
 
-  Future<void> onPaymentsDetailsResult(PaymentEventDTO paymentsDetailsResult, String componentId) async {
-    const String __pigeon_channelName = 'dev.flutter.pigeon.adyen_checkout.ComponentPlatformInterface.onPaymentsDetailsResult';
-    final BasicMessageChannel<Object?> __pigeon_channel = BasicMessageChannel<Object?>(
+  Future<void> onPaymentsDetailsResult(
+      PaymentEventDTO paymentsDetailsResult, String componentId) async {
+    const String __pigeon_channelName =
+        'dev.flutter.pigeon.adyen_checkout.ComponentPlatformInterface.onPaymentsDetailsResult';
+    final BasicMessageChannel<Object?> __pigeon_channel =
+        BasicMessageChannel<Object?>(
       __pigeon_channelName,
       pigeonChannelCodec,
       binaryMessenger: __pigeon_binaryMessenger,
     );
-    final List<Object?>? __pigeon_replyList =
-        await __pigeon_channel.send(<Object?>[paymentsDetailsResult, componentId]) as List<Object?>?;
+    final List<Object?>? __pigeon_replyList = await __pigeon_channel
+        .send(<Object?>[paymentsDetailsResult, componentId]) as List<Object?>?;
     if (__pigeon_replyList == null) {
       throw _createConnectionError(__pigeon_channelName);
     } else if (__pigeon_replyList.length > 1) {
@@ -1684,15 +1741,24 @@ class ComponentPlatformInterface {
     }
   }
 
-  Future<InstantPaymentSetupResultDTO> isInstantPaymentSupportedByPlatform(InstantPaymentConfigurationDTO instantPaymentConfigurationDTO, String paymentMethodResponse, String componentId) async {
-    const String __pigeon_channelName = 'dev.flutter.pigeon.adyen_checkout.ComponentPlatformInterface.isInstantPaymentSupportedByPlatform';
-    final BasicMessageChannel<Object?> __pigeon_channel = BasicMessageChannel<Object?>(
+  Future<InstantPaymentSetupResultDTO> isInstantPaymentSupportedByPlatform(
+      InstantPaymentConfigurationDTO instantPaymentConfigurationDTO,
+      String paymentMethodResponse,
+      String componentId) async {
+    const String __pigeon_channelName =
+        'dev.flutter.pigeon.adyen_checkout.ComponentPlatformInterface.isInstantPaymentSupportedByPlatform';
+    final BasicMessageChannel<Object?> __pigeon_channel =
+        BasicMessageChannel<Object?>(
       __pigeon_channelName,
       pigeonChannelCodec,
       binaryMessenger: __pigeon_binaryMessenger,
     );
-    final List<Object?>? __pigeon_replyList =
-        await __pigeon_channel.send(<Object?>[instantPaymentConfigurationDTO, paymentMethodResponse, componentId]) as List<Object?>?;
+    final List<Object?>? __pigeon_replyList = await __pigeon_channel
+        .send(<Object?>[
+      instantPaymentConfigurationDTO,
+      paymentMethodResponse,
+      componentId
+    ]) as List<Object?>?;
     if (__pigeon_replyList == null) {
       throw _createConnectionError(__pigeon_channelName);
     } else if (__pigeon_replyList.length > 1) {
@@ -1711,15 +1777,19 @@ class ComponentPlatformInterface {
     }
   }
 
-  Future<void> onInstantPaymentPressed(InstantPaymentType instantPaymentType, String componentId) async {
-    const String __pigeon_channelName = 'dev.flutter.pigeon.adyen_checkout.ComponentPlatformInterface.onInstantPaymentPressed';
-    final BasicMessageChannel<Object?> __pigeon_channel = BasicMessageChannel<Object?>(
+  Future<void> onInstantPaymentPressed(
+      InstantPaymentType instantPaymentType, String componentId) async {
+    const String __pigeon_channelName =
+        'dev.flutter.pigeon.adyen_checkout.ComponentPlatformInterface.onInstantPaymentPressed';
+    final BasicMessageChannel<Object?> __pigeon_channel =
+        BasicMessageChannel<Object?>(
       __pigeon_channelName,
       pigeonChannelCodec,
       binaryMessenger: __pigeon_binaryMessenger,
     );
-    final List<Object?>? __pigeon_replyList =
-        await __pigeon_channel.send(<Object?>[instantPaymentType.index, componentId]) as List<Object?>?;
+    final List<Object?>? __pigeon_replyList = await __pigeon_channel
+            .send(<Object?>[instantPaymentType.index, componentId])
+        as List<Object?>?;
     if (__pigeon_replyList == null) {
       throw _createConnectionError(__pigeon_channelName);
     } else if (__pigeon_replyList.length > 1) {
@@ -1734,8 +1804,10 @@ class ComponentPlatformInterface {
   }
 
   Future<void> onDispose(String componentId) async {
-    const String __pigeon_channelName = 'dev.flutter.pigeon.adyen_checkout.ComponentPlatformInterface.onDispose';
-    final BasicMessageChannel<Object?> __pigeon_channel = BasicMessageChannel<Object?>(
+    const String __pigeon_channelName =
+        'dev.flutter.pigeon.adyen_checkout.ComponentPlatformInterface.onDispose';
+    final BasicMessageChannel<Object?> __pigeon_channel =
+        BasicMessageChannel<Object?>(
       __pigeon_channelName,
       pigeonChannelCodec,
       binaryMessenger: __pigeon_binaryMessenger,
@@ -1795,23 +1867,23 @@ class _ComponentFlutterInterfaceCodec extends StandardMessageCodec {
   @override
   Object? readValueOfType(int type, ReadBuffer buffer) {
     switch (type) {
-      case 128: 
+      case 128:
         return AmountDTO.decode(readValue(buffer)!);
-      case 129: 
+      case 129:
         return AmountDTO.decode(readValue(buffer)!);
-      case 130: 
+      case 130:
         return AnalyticsOptionsDTO.decode(readValue(buffer)!);
-      case 131: 
+      case 131:
         return CardComponentConfigurationDTO.decode(readValue(buffer)!);
-      case 132: 
+      case 132:
         return CardConfigurationDTO.decode(readValue(buffer)!);
-      case 133: 
+      case 133:
         return ComponentCommunicationModel.decode(readValue(buffer)!);
-      case 134: 
+      case 134:
         return OrderResponseDTO.decode(readValue(buffer)!);
-      case 135: 
+      case 135:
         return PaymentResultModelDTO.decode(readValue(buffer)!);
-      case 136: 
+      case 136:
         return SessionDTO.decode(readValue(buffer)!);
       default:
         return super.readValueOfType(type, buffer);
@@ -1820,53 +1892,67 @@ class _ComponentFlutterInterfaceCodec extends StandardMessageCodec {
 }
 
 abstract class ComponentFlutterInterface {
-  static const MessageCodec<Object?> pigeonChannelCodec = _ComponentFlutterInterfaceCodec();
+  static const MessageCodec<Object?> pigeonChannelCodec =
+      _ComponentFlutterInterfaceCodec();
 
-  void _generateCodecForDTOs(CardComponentConfigurationDTO cardComponentConfigurationDTO, SessionDTO sessionDTO);
+  void _generateCodecForDTOs(
+      CardComponentConfigurationDTO cardComponentConfigurationDTO,
+      SessionDTO sessionDTO);
 
-  void onComponentCommunication(ComponentCommunicationModel componentCommunicationModel);
+  void onComponentCommunication(
+      ComponentCommunicationModel componentCommunicationModel);
 
-  static void setup(ComponentFlutterInterface? api, {BinaryMessenger? binaryMessenger}) {
+  static void setup(ComponentFlutterInterface? api,
+      {BinaryMessenger? binaryMessenger}) {
     {
-      final BasicMessageChannel<Object?> __pigeon_channel = BasicMessageChannel<Object?>(
-          'dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface._generateCodecForDTOs', pigeonChannelCodec,
+      final BasicMessageChannel<Object?> __pigeon_channel = BasicMessageChannel<
+              Object?>(
+          'dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface._generateCodecForDTOs',
+          pigeonChannelCodec,
           binaryMessenger: binaryMessenger);
       if (api == null) {
         __pigeon_channel.setMessageHandler(null);
       } else {
         __pigeon_channel.setMessageHandler((Object? message) async {
           assert(message != null,
-          'Argument for dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface._generateCodecForDTOs was null.');
+              'Argument for dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface._generateCodecForDTOs was null.');
           final List<Object?> args = (message as List<Object?>?)!;
-          final CardComponentConfigurationDTO? arg_cardComponentConfigurationDTO = (args[0] as CardComponentConfigurationDTO?);
+          final CardComponentConfigurationDTO?
+              arg_cardComponentConfigurationDTO =
+              (args[0] as CardComponentConfigurationDTO?);
           assert(arg_cardComponentConfigurationDTO != null,
               'Argument for dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface._generateCodecForDTOs was null, expected non-null CardComponentConfigurationDTO.');
           final SessionDTO? arg_sessionDTO = (args[1] as SessionDTO?);
           assert(arg_sessionDTO != null,
               'Argument for dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface._generateCodecForDTOs was null, expected non-null SessionDTO.');
           try {
-            api._generateCodecForDTOs(arg_cardComponentConfigurationDTO!, arg_sessionDTO!);
+            api._generateCodecForDTOs(
+                arg_cardComponentConfigurationDTO!, arg_sessionDTO!);
             return wrapResponse(empty: true);
           } on PlatformException catch (e) {
             return wrapResponse(error: e);
-          }          catch (e) {
-            return wrapResponse(error: PlatformException(code: 'error', message: e.toString()));
+          } catch (e) {
+            return wrapResponse(
+                error: PlatformException(code: 'error', message: e.toString()));
           }
         });
       }
     }
     {
-      final BasicMessageChannel<Object?> __pigeon_channel = BasicMessageChannel<Object?>(
-          'dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface.onComponentCommunication', pigeonChannelCodec,
+      final BasicMessageChannel<Object?> __pigeon_channel = BasicMessageChannel<
+              Object?>(
+          'dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface.onComponentCommunication',
+          pigeonChannelCodec,
           binaryMessenger: binaryMessenger);
       if (api == null) {
         __pigeon_channel.setMessageHandler(null);
       } else {
         __pigeon_channel.setMessageHandler((Object? message) async {
           assert(message != null,
-          'Argument for dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface.onComponentCommunication was null.');
+              'Argument for dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface.onComponentCommunication was null.');
           final List<Object?> args = (message as List<Object?>?)!;
-          final ComponentCommunicationModel? arg_componentCommunicationModel = (args[0] as ComponentCommunicationModel?);
+          final ComponentCommunicationModel? arg_componentCommunicationModel =
+              (args[0] as ComponentCommunicationModel?);
           assert(arg_componentCommunicationModel != null,
               'Argument for dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface.onComponentCommunication was null, expected non-null ComponentCommunicationModel.');
           try {
@@ -1874,8 +1960,9 @@ abstract class ComponentFlutterInterface {
             return wrapResponse(empty: true);
           } on PlatformException catch (e) {
             return wrapResponse(error: e);
-          }          catch (e) {
-            return wrapResponse(error: PlatformException(code: 'error', message: e.toString()));
+          } catch (e) {
+            return wrapResponse(
+                error: PlatformException(code: 'error', message: e.toString()));
           }
         });
       }

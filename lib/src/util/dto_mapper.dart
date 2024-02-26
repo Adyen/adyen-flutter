@@ -53,18 +53,23 @@ extension CardConfigurationMapper on CardConfiguration {
 
 extension GooglePayConfigurationMapper on GooglePayConfiguration {
   GooglePayConfigurationDTO toDTO() => GooglePayConfigurationDTO(
+        googlePayEnvironment: googlePayEnvironment,
         merchantAccount: merchantAccount,
+        merchantInfoDTO: merchantInfo?.toDTO(),
+        totalPriceStatus: totalPriceStatus,
         allowedCardNetworks: allowedCardNetworks,
         allowedAuthMethods: allowedAuthMethods
             ?.map((allowedAuthMethod) => allowedAuthMethod.name)
             .toList(),
-        totalPriceStatus: totalPriceStatus,
         allowPrepaidCards: allowPrepaidCards,
+        allowCreditCards: allowCreditCards,
         billingAddressRequired: billingAddressRequired,
+        billingAddressParametersDTO: billingAddressParameters?.toDTO(),
+        assuranceDetailsRequired: assuranceDetailsRequired,
         emailRequired: emailRequired,
         shippingAddressRequired: shippingAddressRequired,
+        shippingAddressParametersDTO: shippingAddressParameters?.toDTO(),
         existingPaymentMethodRequired: existingPaymentMethodRequired,
-        googlePayEnvironment: googlePayEnvironment,
       );
 }
 
@@ -120,8 +125,10 @@ extension CardComponentConfigurationMapper on CardComponentConfiguration {
 
 extension GooglePayComponentConfigurationMapper
     on GooglePayComponentConfiguration {
-  InstantPaymentConfigurationDTO toInstantPaymentConfigurationDTO(
-          String sdkVersionNumber, InstantPaymentType instantPaymentType) =>
+  InstantPaymentConfigurationDTO toDTO(
+    String sdkVersionNumber,
+    InstantPaymentType instantPaymentType,
+  ) =>
       InstantPaymentConfigurationDTO(
         instantPaymentType: instantPaymentType,
         environment: environment,
@@ -131,4 +138,31 @@ extension GooglePayComponentConfigurationMapper
         analyticsOptionsDTO: analyticsOptions.toDTO(sdkVersionNumber),
         googlePayConfigurationDTO: googlePayConfiguration.toDTO(),
       );
+}
+
+extension MerchantInfoMapper on MerchantInfo {
+  MerchantInfoDTO toDTO() {
+    return MerchantInfoDTO(
+      merchantName: merchantName,
+      merchantId: merchantId,
+    );
+  }
+}
+
+extension BillingAddressParametersMapper on BillingAddressParameters {
+  BillingAddressParametersDTO toDTO() {
+    return BillingAddressParametersDTO(
+      format: format,
+      isPhoneNumberRequired: isPhoneNumberRequired,
+    );
+  }
+}
+
+extension ShippingAddressParametersMapper on ShippingAddressParameters {
+  ShippingAddressParametersDTO toDTO() {
+    return ShippingAddressParametersDTO(
+      allowedCountryCodes: allowedCountryCodes,
+      isPhoneNumberRequired: isPhoneNumberRequired,
+    );
+  }
 }
