@@ -79,7 +79,7 @@ class GooglePayComponentManager(
         callback: (Result<InstantPaymentSetupResultDTO>) -> Unit
     ): BaseGooglePayComponent {
         // TODO - Replace check via keys with session object when it is provided from the Flutter layer.
-        if (componentId.contains("GOOGLE_PAY_ADVANCED_COMPONENT")) {
+        if (componentId.contains(Constants.GOOGLE_PAY_ADVANCED_COMPONENT_KEY)) {
             return createGooglePayAdvancedComponent(
                 activity,
                 componentFlutterInterface,
@@ -88,7 +88,7 @@ class GooglePayComponentManager(
                 paymentMethod,
                 callback
             )
-        } else if (componentId.contains("GOOGLE_PAY_SESSION_COMPONENT")) {
+        } else if (componentId.contains(Constants.GOOGLE_PAY_SESSION_COMPONENT_KEY)) {
             return createGooglePaySessionComponent(
                 activity,
                 sessionHolder,
@@ -122,7 +122,7 @@ class GooglePayComponentManager(
             ).apply {
                 setupGooglePayComponent(paymentMethod)
             }
-        val allowedPaymentMethods: String =
+        val allowedPaymentMethods =
             googlePaySessionComponent.googlePayComponent?.getGooglePayButtonParameters()?.allowedPaymentMethods ?: ""
         val model =
             InstantPaymentSetupResultDTO(
@@ -151,7 +151,7 @@ class GooglePayComponentManager(
             ).apply {
                 setupGooglePayComponent(paymentMethod)
             }
-        val allowedPaymentMethods: String =
+        val allowedPaymentMethods =
             googlePayAdvancedComponent.googlePayComponent?.getGooglePayButtonParameters()?.allowedPaymentMethods ?: ""
         val model =
             InstantPaymentSetupResultDTO(
