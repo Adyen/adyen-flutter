@@ -10,13 +10,9 @@ class AdyenGooglePayComponent extends StatelessWidget {
   final GooglePayComponentConfiguration configuration;
   final Map<String, dynamic> paymentMethod;
   final Checkout checkout;
-  final Future<void> Function(PaymentResult) onPaymentResult;
-  final GooglePayButtonTheme? theme;
-  final GooglePayButtonType? type;
-  final int? cornerRadius;
-  final double? width;
-  final double? height;
-  final Future<void> Function()? onGooglePayUnavailable;
+  final Function(PaymentResult) onPaymentResult;
+  final GooglePayButtonStyle? style;
+  final Function()? onGooglePayUnavailable;
   final Widget? googlePayUnavailableWidget;
   final Widget? loadingIndicator;
 
@@ -26,11 +22,7 @@ class AdyenGooglePayComponent extends StatelessWidget {
     required this.paymentMethod,
     required this.checkout,
     required this.onPaymentResult,
-    this.theme,
-    this.type,
-    this.cornerRadius,
-    this.width,
-    this.height,
+    this.style,
     this.onGooglePayUnavailable,
     this.googlePayUnavailableWidget,
     this.loadingIndicator,
@@ -51,14 +43,14 @@ class AdyenGooglePayComponent extends StatelessWidget {
       googlePayPaymentMethod: encodedPaymentMethod,
       googlePayComponentConfiguration: configuration,
       onPaymentResult: onPaymentResult,
-      onGooglePayUnavailable: onGooglePayUnavailable,
-      cornerRadius: cornerRadius,
-      width: _determineWidth(),
-      height: _determineHeight(),
-      loadingIndicator: loadingIndicator,
-      googlePayUnavailableWidget: googlePayUnavailableWidget,
       theme: _mapToGooglePayButtonTheme(),
       type: _mapToGooglePayButtonType(),
+      cornerRadius: _determineCornerRadius(),
+      width: _determineWidth(),
+      height: _determineHeight(),
+      onGooglePayUnavailable: onGooglePayUnavailable,
+      loadingIndicator: loadingIndicator,
+      googlePayUnavailableWidget: googlePayUnavailableWidget,
     );
   }
 
@@ -72,39 +64,45 @@ class AdyenGooglePayComponent extends StatelessWidget {
       onSubmit: advancedCheckout.onSubmit,
       onAdditionalDetails: advancedCheckout.onAdditionalDetails,
       onPaymentResult: onPaymentResult,
-      onGooglePayUnavailable: onGooglePayUnavailable,
-      cornerRadius: cornerRadius,
-      width: _determineWidth(),
-      height: _determineHeight(),
-      loadingIndicator: loadingIndicator,
-      googlePayUnavailableWidget: googlePayUnavailableWidget,
       theme: _mapToGooglePayButtonTheme(),
       type: _mapToGooglePayButtonType(),
+      cornerRadius: _determineCornerRadius(),
+      width: _determineWidth(),
+      height: _determineHeight(),
+      onGooglePayUnavailable: onGooglePayUnavailable,
+      loadingIndicator: loadingIndicator,
+      googlePayUnavailableWidget: googlePayUnavailableWidget,
     );
   }
 
+  int _determineCornerRadius() =>
+      style?.cornerRadius ??
+      google_pay_sdk.RawGooglePayButton.defaultButtonHeight ~/ 2;
+
   double _determineWidth() {
-    if (width != null) {
-      if (width! >= google_pay_sdk.RawGooglePayButton.minimumButtonWidth) {
-        return width!;
-      }
+    final width =
+        style?.width ?? google_pay_sdk.RawGooglePayButton.minimumButtonWidth;
+    if (width > google_pay_sdk.RawGooglePayButton.minimumButtonWidth) {
+      return width;
     }
+
     return google_pay_sdk.RawGooglePayButton.minimumButtonWidth;
   }
 
   double _determineHeight() {
-    if (height != null) {
-      if (height! >= google_pay_sdk.RawGooglePayButton.defaultButtonHeight) {
-        return height!;
-      }
+    final height =
+        style?.height ?? google_pay_sdk.RawGooglePayButton.defaultButtonHeight;
+    if (height > google_pay_sdk.RawGooglePayButton.defaultButtonHeight) {
+      return height;
     }
+
     return google_pay_sdk.RawGooglePayButton.defaultButtonHeight;
   }
 
-  google_pay_sdk.GooglePayButtonTheme? _mapToGooglePayButtonTheme() {
-    switch (theme) {
+  google_pay_sdk.GooglePayButtonTheme _mapToGooglePayButtonTheme() {
+    switch (style?.theme) {
       case null:
-        return null;
+        return google_pay_sdk.GooglePayButtonTheme.dark;
       case GooglePayButtonTheme.dark:
         return google_pay_sdk.GooglePayButtonTheme.dark;
       case GooglePayButtonTheme.light:
@@ -112,10 +110,10 @@ class AdyenGooglePayComponent extends StatelessWidget {
     }
   }
 
-  google_pay_sdk.GooglePayButtonType? _mapToGooglePayButtonType() {
-    switch (type) {
+  google_pay_sdk.GooglePayButtonType _mapToGooglePayButtonType() {
+    switch (style?.type) {
       case null:
-        return null;
+        return google_pay_sdk.GooglePayButtonType.plain;
       case GooglePayButtonType.book:
         return google_pay_sdk.GooglePayButtonType.book;
       case GooglePayButtonType.buy:

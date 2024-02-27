@@ -21,10 +21,11 @@ class GooglePayComponentScreen extends StatelessWidget {
       backgroundColor: Colors.white,
       appBar: AppBar(title: const Text('Adyen google pay component')),
       body: SafeArea(
-        child: Center(
+        child: SingleChildScrollView(
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const SizedBox(height: 80),
+              const SizedBox(height: 40),
               _buildAdyenGooglePaySessionComponent(),
               const SizedBox(height: 80),
               _buildAdyenGooglePayAdvancedComponent(),
@@ -40,10 +41,7 @@ class GooglePayComponentScreen extends StatelessWidget {
       future: repository.createSessionCheckout(),
       builder: (BuildContext context, AsyncSnapshot<SessionCheckout> snapshot) {
         if (snapshot.hasData) {
-          AdyenCheckout.instance.enableConsoleLogging(enabled: true);
-
           final SessionCheckout sessionCheckout = snapshot.data!;
-
           final GooglePayComponentConfiguration
               googlePayComponentConfiguration = GooglePayComponentConfiguration(
             environment: Environment.test,
@@ -70,9 +68,8 @@ class GooglePayComponentScreen extends StatelessWidget {
                 configuration: googlePayComponentConfiguration,
                 paymentMethod: paymentMethod,
                 checkout: sessionCheckout,
-                type: GooglePayButtonType.plain,
                 loadingIndicator: const CircularProgressIndicator(),
-                onPaymentResult: (paymentResult) async {
+                onPaymentResult: (paymentResult) {
                   Navigator.pop(context);
                   _dialogBuilder(paymentResult, context);
                 },
@@ -91,8 +88,6 @@ class GooglePayComponentScreen extends StatelessWidget {
       future: repository.fetchPaymentMethods(),
       builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
         if (snapshot.hasData) {
-          AdyenCheckout.instance.enableConsoleLogging(enabled: true);
-
           final AdvancedCheckout advancedCheckout = AdvancedCheckout(
             onSubmit: repository.onSubmit,
             onAdditionalDetails: repository.onAdditionalDetails,
@@ -109,6 +104,13 @@ class GooglePayComponentScreen extends StatelessWidget {
             ),
           );
 
+          final GooglePayButtonStyle googlePayButtonStyle =
+              GooglePayButtonStyle(
+            theme: GooglePayButtonTheme.light,
+            type: GooglePayButtonType.order,
+            width: 300,
+          );
+
           final paymentMethod = _extractPaymentMethod(snapshot.data!);
 
           return Column(
@@ -123,13 +125,9 @@ class GooglePayComponentScreen extends StatelessWidget {
                 configuration: googlePayComponentConfiguration,
                 paymentMethod: paymentMethod,
                 checkout: advancedCheckout,
-                width: 300,
-                type: GooglePayButtonType.book,
-                theme: GooglePayButtonTheme.light,
-                googlePayUnavailableWidget:
-                    const Text("Google Pay not available"),
+                style: googlePayButtonStyle,
                 loadingIndicator: const CircularProgressIndicator(),
-                onPaymentResult: (paymentResult) async {
+                onPaymentResult: (paymentResult) {
                   Navigator.pop(context);
                   _dialogBuilder(paymentResult, context);
                 },

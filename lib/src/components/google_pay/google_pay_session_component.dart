@@ -14,13 +14,13 @@ import 'package:pay/pay.dart';
 class GooglePaySessionComponent extends StatefulWidget {
   final String googlePayPaymentMethod;
   final GooglePayComponentConfiguration googlePayComponentConfiguration;
-  final Future<void> Function(PaymentResult) onPaymentResult;
-  final GooglePayButtonTheme? theme;
-  final GooglePayButtonType? type;
-  final int? cornerRadius;
-  final double? width;
-  final double? height;
-  final Future<void> Function()? onGooglePayUnavailable;
+  final Function(PaymentResult) onPaymentResult;
+  final GooglePayButtonTheme theme;
+  final GooglePayButtonType type;
+  final int cornerRadius;
+  final double width;
+  final double height;
+  final Function()? onGooglePayUnavailable;
   final Widget? googlePayUnavailableWidget;
   final Widget? loadingIndicator;
   final AdyenLogger adyenLogger;
@@ -31,11 +31,11 @@ class GooglePaySessionComponent extends StatefulWidget {
     required this.googlePayPaymentMethod,
     required this.googlePayComponentConfiguration,
     required this.onPaymentResult,
-    this.theme,
-    this.type,
-    this.cornerRadius,
-    this.width,
-    this.height,
+    required this.theme,
+    required this.type,
+    required this.cornerRadius,
+    required this.width,
+    required this.height,
     this.onGooglePayUnavailable,
     this.googlePayUnavailableWidget,
     this.loadingIndicator,
@@ -136,10 +136,9 @@ class _GooglePaySessionComponentState extends State<GooglePaySessionComponent> {
     return RawGooglePayButton(
       paymentConfiguration: paymentConfiguration,
       onPressed: onPressed,
-      cornerRadius:
-          widget.cornerRadius ?? RawGooglePayButton.defaultButtonHeight ~/ 2,
-      theme: widget.theme ?? GooglePayButtonTheme.dark,
-      type: widget.type ?? GooglePayButtonType.buy,
+      cornerRadius: widget.cornerRadius,
+      theme: widget.theme,
+      type: widget.type,
     );
   }
 
