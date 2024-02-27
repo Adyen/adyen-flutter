@@ -95,8 +95,7 @@ enum FieldVisibility {
 }
 
 enum InstantPaymentType {
-  googlePaySession,
-  googlePayAdvanced,
+  googlePay,
   applePay,
 }
 

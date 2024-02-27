@@ -180,9 +180,8 @@ enum class FieldVisibility(val raw: Int) {
 }
 
 enum class InstantPaymentType(val raw: Int) {
-  GOOGLEPAYSESSION(0),
-  GOOGLEPAYADVANCED(1),
-  APPLEPAY(2);
+  GOOGLEPAY(0),
+  APPLEPAY(1);
 
   companion object {
     fun ofRaw(raw: Int): InstantPaymentType? {

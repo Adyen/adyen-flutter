@@ -107,8 +107,7 @@ class _GooglePayAdvancedComponentState
 
   bool _isGooglePaySupportedOnDevice(
       AsyncSnapshot<InstantPaymentSetupResultDTO> snapshot) {
-    return snapshot.data?.instantPaymentType ==
-            InstantPaymentType.googlePayAdvanced &&
+    return snapshot.data?.instantPaymentType == InstantPaymentType.googlePay &&
         snapshot.data?.isSupported == true;
   }
 
@@ -157,7 +156,7 @@ class _GooglePayAdvancedComponentState
   void onPressed() {
     _isButtonClickable.value = false;
     _componentPlatformApi.onInstantPaymentPressed(
-      InstantPaymentType.googlePayAdvanced,
+      InstantPaymentType.googlePay,
       widget.componentId,
     );
   }
@@ -169,7 +168,7 @@ class _GooglePayAdvancedComponentState
         instantPaymentComponentConfigurationDTO =
         widget.googlePayComponentConfiguration.toDTO(
       versionNumber,
-      InstantPaymentType.googlePayAdvanced,
+      InstantPaymentType.googlePay,
     );
     return await _componentPlatformApi.isInstantPaymentSupportedByPlatform(
       instantPaymentComponentConfigurationDTO,

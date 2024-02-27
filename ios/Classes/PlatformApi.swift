@@ -111,9 +111,8 @@ enum FieldVisibility: Int {
 }
 
 enum InstantPaymentType: Int {
-  case googlePaySession = 0
-  case googlePayAdvanced = 1
-  case applePay = 2
+  case googlePay = 0
+  case applePay = 1
 }
 
 /// Generated class from Pigeon that represents data sent in messages.

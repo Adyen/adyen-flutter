@@ -78,7 +78,17 @@ class GooglePayComponentManager(
         paymentMethod: PaymentMethod,
         callback: (Result<InstantPaymentSetupResultDTO>) -> Unit
     ): BaseGooglePayComponent {
-        if (instantPaymentComponentConfigurationDTO.instantPaymentType == InstantPaymentType.GOOGLEPAYSESSION) {
+        // TODO - Replace check via keys with session object when it is provided from the Flutter layer.
+        if (componentId.contains("GOOGLE_PAY_ADVANCED_COMPONENT")) {
+            return createGooglePayAdvancedComponent(
+                activity,
+                componentFlutterInterface,
+                instantPaymentComponentConfigurationDTO,
+                componentId,
+                paymentMethod,
+                callback
+            )
+        } else if (componentId.contains("GOOGLE_PAY_SESSION_COMPONENT")) {
             return createGooglePaySessionComponent(
                 activity,
                 sessionHolder,
@@ -90,18 +100,7 @@ class GooglePayComponentManager(
             )
         }
 
-        if (instantPaymentComponentConfigurationDTO.instantPaymentType == InstantPaymentType.GOOGLEPAYADVANCED) {
-            return createGooglePayAdvancedComponent(
-                activity,
-                componentFlutterInterface,
-                instantPaymentComponentConfigurationDTO,
-                componentId,
-                paymentMethod,
-                callback
-            )
-        }
-
-        throw Exception("Google pay setup failed")
+        throw Exception("Google Pay not available")
     }
 
     private fun createGooglePaySessionComponent(
@@ -127,7 +126,7 @@ class GooglePayComponentManager(
             googlePaySessionComponent.googlePayComponent?.getGooglePayButtonParameters()?.allowedPaymentMethods ?: ""
         val model =
             InstantPaymentSetupResultDTO(
-                InstantPaymentType.GOOGLEPAYSESSION,
+                InstantPaymentType.GOOGLEPAY,
                 true,
                 allowedPaymentMethods
             )
@@ -156,7 +155,7 @@ class GooglePayComponentManager(
             googlePayAdvancedComponent.googlePayComponent?.getGooglePayButtonParameters()?.allowedPaymentMethods ?: ""
         val model =
             InstantPaymentSetupResultDTO(
-                InstantPaymentType.GOOGLEPAYADVANCED,
+                InstantPaymentType.GOOGLEPAY,
                 true,
                 allowedPaymentMethods
             )
@@ -175,11 +174,13 @@ class GooglePayComponentManager(
                     ?.handleActivityResult(resultCode, data)
                 true
             }
+
             Constants.GOOGLE_PAY_ADVANCED_REQUEST_CODE -> {
                 googlePayComponents.firstOrNull { it is GooglePayAdvancedComponent }
                     ?.handleActivityResult(resultCode, data)
                 true
             }
+
             else -> false
         }
     }

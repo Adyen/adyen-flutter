@@ -24,7 +24,7 @@ class GooglePaySessionComponent extends StatefulWidget {
   final Widget? googlePayUnavailableWidget;
   final Widget? loadingIndicator;
   final AdyenLogger adyenLogger;
-  final String componentId = "GOOGLE_PAY_COMPONENT";
+  final String componentId = "GOOGLE_PAY_SESSION_COMPONENT";
 
   GooglePaySessionComponent({
     super.key,
@@ -97,8 +97,7 @@ class _GooglePaySessionComponentState extends State<GooglePaySessionComponent> {
 
   bool _isGooglePaySupportedOnDevice(
       AsyncSnapshot<InstantPaymentSetupResultDTO> snapshot) {
-    return snapshot.data?.instantPaymentType ==
-            InstantPaymentType.googlePaySession &&
+    return snapshot.data?.instantPaymentType == InstantPaymentType.googlePay &&
         snapshot.data?.isSupported == true;
   }
 
@@ -147,7 +146,7 @@ class _GooglePaySessionComponentState extends State<GooglePaySessionComponent> {
   void onPressed() {
     _isButtonClickable.value = false;
     _componentPlatformApi.onInstantPaymentPressed(
-      InstantPaymentType.googlePaySession,
+      InstantPaymentType.googlePay,
       widget.componentId,
     );
   }
@@ -159,7 +158,7 @@ class _GooglePaySessionComponentState extends State<GooglePaySessionComponent> {
         instantPaymentComponentConfigurationDTO =
         widget.googlePayComponentConfiguration.toDTO(
       versionNumber,
-      InstantPaymentType.googlePaySession,
+      InstantPaymentType.googlePay,
     );
     return await _componentPlatformApi.isInstantPaymentSupportedByPlatform(
       instantPaymentComponentConfigurationDTO,
