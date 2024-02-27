@@ -23,6 +23,7 @@ class SessionRequestNetworkModel {
   final DeliveryAddress? deliveryAddress;
   final BillingAddress? billingAddress;
   final List<LineItem>? lineItems;
+  final Map<String, dynamic>? authenticationData;
 
   SessionRequestNetworkModel({
     required this.merchantAccount,
@@ -42,6 +43,7 @@ class SessionRequestNetworkModel {
     this.deliveryAddress,
     this.billingAddress,
     this.lineItems,
+    this.authenticationData,
   });
 
   String toRawJson() => json.encode(toJson());
@@ -90,6 +92,7 @@ class SessionRequestNetworkModel {
     data['deliveryAddress'] = deliveryAddress?.toJson();
     data['lineItems'] =
         lineItems?.map((lineItem) => lineItem.toJson()).toList();
+    if (authenticationData != null) data["authenticationData"] = authenticationData;
     // data['installmentOptions'] = installmentOptions;
     return data;
   }

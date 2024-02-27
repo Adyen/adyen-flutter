@@ -9,14 +9,32 @@ import 'package:adyen_checkout_example/network/models/session_request_network_mo
 import 'package:adyen_checkout_example/network/models/session_response_network_model.dart';
 import 'package:adyen_checkout_example/repositories/adyen_base_repository.dart';
 
-class AdyenCardComponentRepository extends AdyenBaseRepository {
-  AdyenCardComponentRepository({
+class AdyenGooglePayComponentRepository extends AdyenBaseRepository {
+  AdyenGooglePayComponentRepository({
     required super.service,
   });
 
+  Future<SessionCheckout> createSessionCheckout() async {
+    final sessionResponse = await fetchSession();
+    final cardComponentConfiguration = CardComponentConfiguration(
+      environment: Config.environment,
+      clientKey: Config.clientKey,
+      countryCode: Config.countryCode,
+      amount: Config.amount,
+      shopperLocale: Config.shopperLocale,
+      cardConfiguration: const CardConfiguration(),
+    );
+
+    return await AdyenCheckout.session.create(
+      sessionId: sessionResponse.id,
+      sessionData: sessionResponse.sessionData,
+      configuration: cardComponentConfiguration,
+    );
+  }
+
   Future<SessionResponseNetworkModel> fetchSession() async {
     String returnUrl = await determineBaseReturnUrl();
-    returnUrl += "/card";
+    returnUrl += "/googlepay";
     SessionRequestNetworkModel sessionRequestNetworkModel =
         SessionRequestNetworkModel(
       merchantAccount: Config.merchantAccount,
@@ -30,13 +48,13 @@ class AdyenCardComponentRepository extends AdyenBaseRepository {
       countryCode: Config.countryCode,
       shopperLocale: Config.shopperLocale,
       shopperReference: Config.shopperReference,
-      storePaymentMethodMode:
-          StorePaymentMethodMode.enabled.storePaymentMethodModeString,
-      recurringProcessingModel:
-          RecurringProcessingModel.cardOnFile.recurringModelString,
-      shopperInteraction:
-          ShopperInteractionModel.ecommerce.shopperInteractionModelString,
       channel: determineChannel(),
+      authenticationData: {
+        "attemptAuthentication" : "always",
+        "threeDSRequestData": {
+          "nativeThreeDS": "preferred",
+        },
+      },
     );
 
     return await service.createSession(
@@ -56,7 +74,7 @@ class AdyenCardComponentRepository extends AdyenBaseRepository {
 
   Future<PaymentEvent> onSubmit(String paymentComponentJson) async {
     String returnUrl = await determineBaseReturnUrl();
-    returnUrl += "/card";
+    returnUrl += "/googlePay";
     PaymentsRequestData paymentsRequestData = PaymentsRequestData(
       merchantAccount: Config.merchantAccount,
       shopperReference: Config.shopperReference,

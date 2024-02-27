@@ -31,13 +31,14 @@ class CardSessionComponent(
 ) : BaseCardComponent(activity, componentFlutterApi, context, id, creationParams) {
     private val paymentMethodString = creationParams[PAYMENT_METHOD_KEY] as String? ?: ""
     private val isStoredPaymentMethod = creationParams[IS_STORED_PAYMENT_METHOD_KEY] as Boolean? ?: false
+    private val componentId = creationParams[COMPONENT_ID_KEY] as String? ?: ""
 
     init {
         val sessionSetupResponse = SessionSetupResponse.SERIALIZER.deserialize(sessionHolder.sessionSetupResponse)
         val order = sessionHolder.orderResponse?.let { Order.SERIALIZER.deserialize(it) }
         val checkoutSession = CheckoutSession(sessionSetupResponse = sessionSetupResponse, order = order)
         cardComponent = createCardComponent(checkoutSession)
-        addComponent(cardComponent)
+        addComponent(cardComponent, componentId)
     }
 
     private fun createCardComponent(checkoutSession: CheckoutSession): CardComponent {
@@ -50,7 +51,11 @@ class CardSessionComponent(
                     checkoutSession = checkoutSession,
                     storedPaymentMethod = storedPaymentMethod,
                     configuration = cardConfiguration,
-                    componentCallback = CardSessionCallback(componentFlutterApi) { action -> onAction(action) },
+                    componentCallback =
+                        CardSessionCallback(
+                            componentFlutterApi,
+                            componentId
+                        ) { action -> onAction(action) },
                     key = UUID.randomUUID().toString()
                 )
             }
@@ -62,7 +67,11 @@ class CardSessionComponent(
                     checkoutSession = checkoutSession,
                     paymentMethod = paymentMethod,
                     configuration = cardConfiguration,
-                    componentCallback = CardSessionCallback(componentFlutterApi) { action -> onAction(action) },
+                    componentCallback =
+                        CardSessionCallback(
+                            componentFlutterApi,
+                            componentId
+                        ) { action -> onAction(action) },
                     key = UUID.randomUUID().toString()
                 )
             }

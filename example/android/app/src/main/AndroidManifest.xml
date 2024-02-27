@@ -33,8 +33,20 @@
                 <category android:name="android.intent.category.BROWSABLE" />
 
                 <data
-                    android:host="com.adyen.checkout.flutter.example"
+                    android:host="${applicationId}"
                     android:path="/card"
+                    android:scheme="adyencheckout" />
+            </intent-filter>
+
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:host="${applicationId}"
+                    android:path="/googlepay"
                     android:scheme="adyencheckout" />
             </intent-filter>
         </activity>

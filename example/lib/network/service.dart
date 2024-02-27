@@ -18,8 +18,10 @@ class Service {
       headers: _createHeaders(),
       body: sessionRequestNetworkModel.toRawJson(),
     );
-    print("Session pspReference: ${response.headers["pspreference"]}");
-    return SessionResponseNetworkModel.fromRawJson(response.body);
+    final sessionResponse =
+        SessionResponseNetworkModel.fromRawJson(response.body);
+    print("Session id: ${sessionResponse.id}");
+    return sessionResponse;
   }
 
   Future<String> fetchPaymentMethods(

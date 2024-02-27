@@ -16,6 +16,16 @@ import 'package:flutter/services.dart';
 import 'package:stream_transform/stream_transform.dart';
 
 class CardSessionComponent extends StatefulWidget {
+  final CardComponentConfigurationDTO cardComponentConfiguration;
+  final SessionDTO session;
+  final String paymentMethod;
+  final Future<void> Function(PaymentResult) onPaymentResult;
+  final double initialViewHeight;
+  final bool isStoredPaymentMethod;
+  final Set<Factory<OneSequenceGestureRecognizer>>? gestureRecognizers;
+  final AdyenLogger adyenLogger;
+  final String componentId = "CARD_SESSION_COMPONENT";
+
   CardSessionComponent({
     super.key,
     required this.cardComponentConfiguration,
@@ -28,15 +38,6 @@ class CardSessionComponent extends StatefulWidget {
     AdyenLogger? adyenLogger,
   }) : adyenLogger = adyenLogger ?? AdyenLogger.instance;
 
-  final CardComponentConfigurationDTO cardComponentConfiguration;
-  final SessionDTO session;
-  final String paymentMethod;
-  final Future<void> Function(PaymentResult) onPaymentResult;
-  final double initialViewHeight;
-  final bool isStoredPaymentMethod;
-  final Set<Factory<OneSequenceGestureRecognizer>>? gestureRecognizers;
-  final AdyenLogger adyenLogger;
-
   @override
   State<CardSessionComponent> createState() => _CardSessionComponentState();
 }
@@ -44,20 +45,21 @@ class CardSessionComponent extends StatefulWidget {
 class _CardSessionComponentState extends State<CardSessionComponent> {
   final MessageCodec<Object?> _codec =
       ComponentFlutterInterface.pigeonChannelCodec;
-  final ComponentFlutterApi _resultApi = ComponentFlutterApi();
-  final ComponentPlatformApi _componentPlatformApi = ComponentPlatformApi();
+  final ComponentPlatformApi _componentPlatformApi =
+      ComponentPlatformApi.instance;
   final StreamController<double> _resizeStream = StreamController.broadcast();
   final GlobalKey _cardWidgetKey = GlobalKey();
   late Widget _cardWidget;
+  final ComponentFlutterApi _componentFlutterApi = ComponentFlutterApi.instance;
 
   @override
   void initState() {
     super.initState();
 
-    ComponentFlutterInterface.setup(_resultApi);
     _cardWidget = _buildCardWidget();
-    _resultApi.componentCommunicationStream.stream
-        .asBroadcastStream()
+    _componentFlutterApi.componentCommunicationStream.stream
+        .where((communicationModel) =>
+            communicationModel.componentId == widget.componentId)
         .listen(_handleComponentCommunication);
   }
 
@@ -79,7 +81,7 @@ class _CardSessionComponentState extends State<CardSessionComponent> {
 
   @override
   void dispose() {
-    _resultApi.componentCommunicationStream.close();
+    _componentFlutterApi.dispose();
     _resizeStream.close();
     super.dispose();
   }
@@ -115,6 +117,7 @@ class _CardSessionComponentState extends State<CardSessionComponent> {
           widget.cardComponentConfiguration,
       Constants.paymentMethodKey: widget.paymentMethod,
       Constants.isStoredPaymentMethodKey: widget.isStoredPaymentMethod,
+      Constants.componentIdKey: widget.componentId,
     };
 
     switch (defaultTargetPlatform) {

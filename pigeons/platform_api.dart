@@ -4,7 +4,8 @@ import 'package:pigeon/pigeon.dart';
 @ConfigurePigeon(PigeonOptions(
   dartOut: 'lib/src/generated/platform_api.g.dart',
   dartOptions: DartOptions(),
-  kotlinOut: 'android/src/main/kotlin/com/adyen/checkout/flutter/PlatformApi.kt',
+  kotlinOut:
+      'android/src/main/kotlin/com/adyen/checkout/flutter/PlatformApi.kt',
   kotlinOptions: KotlinOptions(),
   swiftOut: 'ios/Classes/PlatformApi.swift',
   swiftOptions: SwiftOptions(),
@@ -76,6 +77,11 @@ enum PaymentEventType {
 enum FieldVisibility {
   show,
   hide,
+}
+
+enum InstantPaymentType {
+  googlePay,
+  applePay,
 }
 
 class SessionDTO {
@@ -179,26 +185,66 @@ class ApplePayConfigurationDTO {
 class GooglePayConfigurationDTO {
   final GooglePayEnvironment googlePayEnvironment;
   final String? merchantAccount;
-  final List<String?> allowedCardNetworks;
-  final List<String?> allowedAuthMethods;
+  final MerchantInfoDTO? merchantInfoDTO;
   final TotalPriceStatus? totalPriceStatus;
-  final bool allowPrepaidCards;
-  final bool billingAddressRequired;
-  final bool emailRequired;
-  final bool shippingAddressRequired;
-  final bool existingPaymentMethodRequired;
+  final List<String?>? allowedCardNetworks;
+  final List<String?>? allowedAuthMethods;
+  final bool? allowPrepaidCards;
+  final bool? allowCreditCards;
+  final bool? assuranceDetailsRequired;
+  final bool? emailRequired;
+  final bool? existingPaymentMethodRequired;
+  final bool? shippingAddressRequired;
+  final ShippingAddressParametersDTO? shippingAddressParametersDTO;
+  final bool? billingAddressRequired;
+  final BillingAddressParametersDTO? billingAddressParametersDTO;
 
   GooglePayConfigurationDTO(
     this.googlePayEnvironment,
     this.merchantAccount,
+    this.merchantInfoDTO,
     this.totalPriceStatus,
     this.allowedCardNetworks,
     this.allowedAuthMethods,
     this.allowPrepaidCards,
-    this.billingAddressRequired,
+    this.allowCreditCards,
+    this.assuranceDetailsRequired,
     this.emailRequired,
-    this.shippingAddressRequired,
     this.existingPaymentMethodRequired,
+    this.shippingAddressRequired,
+    this.shippingAddressParametersDTO,
+    this.billingAddressRequired,
+    this.billingAddressParametersDTO,
+  );
+}
+
+class MerchantInfoDTO {
+  final String? merchantName;
+  final String? merchantId;
+
+  MerchantInfoDTO(
+    this.merchantName,
+    this.merchantId,
+  );
+}
+
+class ShippingAddressParametersDTO {
+  final List<String?>? allowedCountryCodes;
+  final bool? isPhoneNumberRequired;
+
+  ShippingAddressParametersDTO(
+    this.allowedCountryCodes,
+    this.isPhoneNumberRequired,
+  );
+}
+
+class BillingAddressParametersDTO {
+  final String? format;
+  final bool? isPhoneNumberRequired;
+
+  BillingAddressParametersDTO(
+    this.format,
+    this.isPhoneNumberRequired,
   );
 }
 
@@ -268,11 +314,13 @@ class PlatformCommunicationModel {
 
 class ComponentCommunicationModel {
   final ComponentCommunicationType type;
+  final String componentId;
   final Object? data;
   final PaymentResultModelDTO? paymentResult;
 
   ComponentCommunicationModel({
     required this.type,
+    required this.componentId,
     this.data,
     this.paymentResult,
   });
@@ -334,6 +382,42 @@ class CardComponentConfigurationDTO {
   );
 }
 
+class InstantPaymentConfigurationDTO {
+  final InstantPaymentType instantPaymentType;
+  final Environment environment;
+  final String clientKey;
+  final String countryCode;
+  final AmountDTO amount;
+  final String? shopperLocale;
+  final AnalyticsOptionsDTO analyticsOptionsDTO;
+  final GooglePayConfigurationDTO? googlePayConfigurationDTO;
+  final ApplePayConfigurationDTO? applePayConfigurationDTO;
+
+  InstantPaymentConfigurationDTO(
+    this.instantPaymentType,
+    this.environment,
+    this.clientKey,
+    this.countryCode,
+    this.amount,
+    this.shopperLocale,
+    this.analyticsOptionsDTO,
+    this.googlePayConfigurationDTO,
+    this.applePayConfigurationDTO,
+  );
+}
+
+class InstantPaymentSetupResultDTO {
+  final InstantPaymentType instantPaymentType;
+  final bool isSupported;
+  final Object? resultData;
+
+  InstantPaymentSetupResultDTO(
+    this.instantPaymentType,
+    this.isSupported,
+    this.resultData,
+  );
+}
+
 @HostApi()
 abstract class CheckoutPlatformInterface {
   @async
@@ -385,6 +469,17 @@ abstract class ComponentPlatformInterface {
   void onPaymentsResult(PaymentEventDTO paymentsResult);
 
   void onPaymentsDetailsResult(PaymentEventDTO paymentsDetailsResult);
+
+  @async
+  InstantPaymentSetupResultDTO isInstantPaymentSupportedByPlatform(
+    InstantPaymentConfigurationDTO instantPaymentConfigurationDTO,
+    String paymentMethodResponse,
+    String componentId,
+  );
+
+  void onInstantPaymentPressed(InstantPaymentType instantPaymentType);
+
+  void onDispose();
 }
 
 @FlutterApi()

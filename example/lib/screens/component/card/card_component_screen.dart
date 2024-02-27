@@ -78,7 +78,7 @@ class _CardComponentScreenState extends State<CardComponentScreen> {
       );
 
       final paymentMethod =
-          extractPaymentMethod(sessionCheckout.paymentMethodsJson);
+          _extractPaymentMethod(sessionCheckout.paymentMethodsJson);
 
       // ignore: use_build_context_synchronously
       return showModalBottomSheet(
@@ -125,7 +125,7 @@ class _CardComponentScreenState extends State<CardComponentScreen> {
     }
   }
 
-  Map<String, dynamic> extractPaymentMethod(String paymentMethods) {
+  Map<String, dynamic> _extractPaymentMethod(String paymentMethods) {
     if (paymentMethods.isEmpty) {
       return <String, String>{};
     }

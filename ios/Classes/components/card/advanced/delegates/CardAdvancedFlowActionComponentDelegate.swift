@@ -2,9 +2,11 @@ import Adyen
 
 class CardAdvancedFlowActionComponentDelegate: ActionComponentDelegate {
     private let componentFlutterApi: ComponentFlutterInterface
+    private let componentId: String
 
-    init(componentFlutterApi: ComponentFlutterInterface) {
+    init(componentFlutterApi: ComponentFlutterInterface, componentId: String) {
         self.componentFlutterApi = componentFlutterApi
+        self.componentId = componentId
     }
 
     func didProvide(_ data: Adyen.ActionComponentData, from _: Adyen.ActionComponent) {
@@ -15,6 +17,7 @@ class CardAdvancedFlowActionComponentDelegate: ActionComponentDelegate {
             componentFlutterApi.onComponentCommunication(
                 componentCommunicationModel: ComponentCommunicationModel(
                     type: ComponentCommunicationType.additionalDetails,
+                    componentId: componentId,
                     data: actionComponentDataString
                 ), completion: { _ in }
             )
@@ -34,6 +37,7 @@ class CardAdvancedFlowActionComponentDelegate: ActionComponentDelegate {
     private func sendErrorToFlutterLayer(error: Error) {
         let componentCommunicationModel = ComponentCommunicationModel(
             type: ComponentCommunicationType.error,
+            componentId: componentId,
             data: error.localizedDescription
         )
         componentFlutterApi.onComponentCommunication(

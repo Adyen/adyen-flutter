@@ -3,6 +3,7 @@ package com.adyen.checkout.flutter.utils
 import AddressMode
 import AmountDTO
 import AnalyticsOptionsDTO
+import BillingAddressParametersDTO
 import CardConfigurationDTO
 import CashAppPayConfigurationDTO
 import CashAppPayEnvironment
@@ -11,7 +12,9 @@ import Environment
 import FieldVisibility
 import GooglePayConfigurationDTO
 import GooglePayEnvironment
+import MerchantInfoDTO
 import OrderResponseDTO
+import ShippingAddressParametersDTO
 import TotalPriceStatus
 import android.content.Context
 import com.adyen.checkout.card.AddressConfiguration
@@ -27,7 +30,10 @@ import com.adyen.checkout.components.core.OrderResponse
 import com.adyen.checkout.components.core.internal.data.api.AnalyticsMapper
 import com.adyen.checkout.components.core.internal.data.api.AnalyticsPlatform
 import com.adyen.checkout.dropin.DropInConfiguration
+import com.adyen.checkout.googlepay.BillingAddressParameters
 import com.adyen.checkout.googlepay.GooglePayConfiguration
+import com.adyen.checkout.googlepay.MerchantInfo
+import com.adyen.checkout.googlepay.ShippingAddressParameters
 import com.google.android.gms.wallet.WalletConstants
 import java.util.Locale
 import com.adyen.checkout.cashapppay.CashAppPayEnvironment as SDKCashAppPayEnvironment
@@ -119,8 +125,7 @@ object ConfigurationMapper {
                 CardConfiguration.Builder(context, environment, clientKey)
             }
 
-        return cardConfiguration.setAddressConfiguration(addressMode.mapToAddressConfiguration())
-            .setAmount(amount)
+        return cardConfiguration.setAddressConfiguration(addressMode.mapToAddressConfiguration()).setAmount(amount)
             .setShowStorePaymentField(showStorePaymentField).setHideCvcStoredCard(!showCvcForStoredCard)
             .setHideCvc(!showCvc).setKcpAuthVisibility(determineKcpAuthVisibility(kcpFieldVisibility))
             .setSocialSecurityNumberVisibility(
@@ -229,30 +234,82 @@ object ConfigurationMapper {
         )
     }
 
-    private fun GooglePayConfigurationDTO.mapToGooglePayConfiguration(
-        builder: GooglePayConfiguration.Builder
+    fun GooglePayConfigurationDTO.mapToGooglePayConfiguration(
+        builder: GooglePayConfiguration.Builder,
+        analyticsConfiguration: AnalyticsConfiguration? = null,
+        amount: Amount? = null,
+        countryCode: String? = null
     ): GooglePayConfiguration {
-        if (allowedCardNetworks.isNotEmpty()) {
-            builder.setAllowedCardNetworks(allowedCardNetworks.filterNotNull())
+        builder.setGooglePayEnvironment(googlePayEnvironment.mapToWalletConstants())
+
+        analyticsConfiguration?.let {
+            builder.setAnalyticsConfiguration(it)
         }
 
-        if (allowedAuthMethods.isNotEmpty()) {
-            builder.setAllowedAuthMethods(allowedAuthMethods.filterNotNull())
+        amount?.let {
+            builder.setAmount(it)
+        }
+
+        countryCode?.let {
+            builder.setCountryCode(it)
         }
 
         merchantAccount?.let { merchantAccount ->
             builder.setMerchantAccount(merchantAccount)
         }
 
+        merchantInfoDTO?.let {
+            builder.setMerchantInfo(it.mapToMerchantInfo())
+        }
+
         totalPriceStatus?.let { totalPriceStatus ->
             builder.setTotalPriceStatus(totalPriceStatus.mapToTotalPriceStatus())
         }
 
-        builder.setAllowPrepaidCards(allowPrepaidCards)
-        builder.setBillingAddressRequired(billingAddressRequired)
-        builder.setEmailRequired(emailRequired)
-        builder.setShippingAddressRequired(shippingAddressRequired)
-        builder.setGooglePayEnvironment(googlePayEnvironment.mapToWalletConstants())
+        if (allowedCardNetworks?.isNotEmpty() == true) {
+            builder.setAllowedCardNetworks(allowedCardNetworks.filterNotNull())
+        }
+
+        if (allowedAuthMethods?.isNotEmpty() == true) {
+            builder.setAllowedAuthMethods(allowedAuthMethods.filterNotNull())
+        }
+
+        allowPrepaidCards?.let {
+            builder.setAllowPrepaidCards(it)
+        }
+
+        allowCreditCards?.let {
+            builder.setAllowCreditCards(it)
+        }
+
+        assuranceDetailsRequired?.let {
+            builder.setAssuranceDetailsRequired(it)
+        }
+
+        emailRequired?.let {
+            builder.setEmailRequired(it)
+        }
+
+        existingPaymentMethodRequired?.let {
+            builder.setExistingPaymentMethodRequired(it)
+        }
+
+        shippingAddressRequired?.let {
+            builder.setShippingAddressRequired(it)
+        }
+
+        shippingAddressParametersDTO?.let {
+            builder.setShippingAddressParameters(it.mapToShippingAddressParameters())
+        }
+
+        billingAddressRequired?.let {
+            builder.setBillingAddressRequired(it)
+        }
+
+        billingAddressParametersDTO?.let {
+            builder.setBillingAddressParameters(it.mapToBillingAddressParameters())
+        }
+
         return builder.build()
     }
 
@@ -268,6 +325,24 @@ object ConfigurationMapper {
             TotalPriceStatus.NOTCURRENTLYKNOWN -> "NOT_CURRENTLY_KNOWN"
             TotalPriceStatus.ESTIMATED -> "ESTIMATED"
             TotalPriceStatus.FINALPRICE -> "FINAL"
+        }
+    }
+
+    private fun MerchantInfoDTO.mapToMerchantInfo(): MerchantInfo {
+        return MerchantInfo(merchantName, merchantId)
+    }
+
+    private fun ShippingAddressParametersDTO.mapToShippingAddressParameters(): ShippingAddressParameters {
+        return when {
+            isPhoneNumberRequired != null -> ShippingAddressParameters(allowedCountryCodes, isPhoneNumberRequired)
+            else -> ShippingAddressParameters(allowedCountryCodes)
+        }
+    }
+
+    private fun BillingAddressParametersDTO.mapToBillingAddressParameters(): BillingAddressParameters {
+        return when {
+            isPhoneNumberRequired != null -> BillingAddressParameters(format, isPhoneNumberRequired)
+            else -> BillingAddressParameters(format)
         }
     }
 

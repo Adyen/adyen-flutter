@@ -93,6 +93,11 @@ enum FieldVisibility {
   hide,
 }
 
+enum InstantPaymentType {
+  googlePay,
+  applePay,
+}
+
 class SessionDTO {
   SessionDTO({
     required this.id,
@@ -356,48 +361,68 @@ class GooglePayConfigurationDTO {
   GooglePayConfigurationDTO({
     required this.googlePayEnvironment,
     this.merchantAccount,
-    required this.allowedCardNetworks,
-    required this.allowedAuthMethods,
+    this.merchantInfoDTO,
     this.totalPriceStatus,
-    required this.allowPrepaidCards,
-    required this.billingAddressRequired,
-    required this.emailRequired,
-    required this.shippingAddressRequired,
-    required this.existingPaymentMethodRequired,
+    this.allowedCardNetworks,
+    this.allowedAuthMethods,
+    this.allowPrepaidCards,
+    this.allowCreditCards,
+    this.assuranceDetailsRequired,
+    this.emailRequired,
+    this.existingPaymentMethodRequired,
+    this.shippingAddressRequired,
+    this.shippingAddressParametersDTO,
+    this.billingAddressRequired,
+    this.billingAddressParametersDTO,
   });
 
   GooglePayEnvironment googlePayEnvironment;
 
   String? merchantAccount;
 
-  List<String?> allowedCardNetworks;
-
-  List<String?> allowedAuthMethods;
+  MerchantInfoDTO? merchantInfoDTO;
 
   TotalPriceStatus? totalPriceStatus;
 
-  bool allowPrepaidCards;
+  List<String?>? allowedCardNetworks;
 
-  bool billingAddressRequired;
+  List<String?>? allowedAuthMethods;
 
-  bool emailRequired;
+  bool? allowPrepaidCards;
 
-  bool shippingAddressRequired;
+  bool? allowCreditCards;
 
-  bool existingPaymentMethodRequired;
+  bool? assuranceDetailsRequired;
+
+  bool? emailRequired;
+
+  bool? existingPaymentMethodRequired;
+
+  bool? shippingAddressRequired;
+
+  ShippingAddressParametersDTO? shippingAddressParametersDTO;
+
+  bool? billingAddressRequired;
+
+  BillingAddressParametersDTO? billingAddressParametersDTO;
 
   Object encode() {
     return <Object?>[
       googlePayEnvironment.index,
       merchantAccount,
+      merchantInfoDTO?.encode(),
+      totalPriceStatus?.index,
       allowedCardNetworks,
       allowedAuthMethods,
-      totalPriceStatus?.index,
       allowPrepaidCards,
-      billingAddressRequired,
+      allowCreditCards,
+      assuranceDetailsRequired,
       emailRequired,
-      shippingAddressRequired,
       existingPaymentMethodRequired,
+      shippingAddressRequired,
+      shippingAddressParametersDTO?.encode(),
+      billingAddressRequired,
+      billingAddressParametersDTO?.encode(),
     ];
   }
 
@@ -406,16 +431,105 @@ class GooglePayConfigurationDTO {
     return GooglePayConfigurationDTO(
       googlePayEnvironment: GooglePayEnvironment.values[result[0]! as int],
       merchantAccount: result[1] as String?,
-      allowedCardNetworks: (result[2] as List<Object?>?)!.cast<String?>(),
-      allowedAuthMethods: (result[3] as List<Object?>?)!.cast<String?>(),
-      totalPriceStatus: result[4] != null
-          ? TotalPriceStatus.values[result[4]! as int]
+      merchantInfoDTO: result[2] != null
+          ? MerchantInfoDTO.decode(result[2]! as List<Object?>)
           : null,
-      allowPrepaidCards: result[5]! as bool,
-      billingAddressRequired: result[6]! as bool,
-      emailRequired: result[7]! as bool,
-      shippingAddressRequired: result[8]! as bool,
-      existingPaymentMethodRequired: result[9]! as bool,
+      totalPriceStatus: result[3] != null
+          ? TotalPriceStatus.values[result[3]! as int]
+          : null,
+      allowedCardNetworks: (result[4] as List<Object?>?)?.cast<String?>(),
+      allowedAuthMethods: (result[5] as List<Object?>?)?.cast<String?>(),
+      allowPrepaidCards: result[6] as bool?,
+      allowCreditCards: result[7] as bool?,
+      assuranceDetailsRequired: result[8] as bool?,
+      emailRequired: result[9] as bool?,
+      existingPaymentMethodRequired: result[10] as bool?,
+      shippingAddressRequired: result[11] as bool?,
+      shippingAddressParametersDTO: result[12] != null
+          ? ShippingAddressParametersDTO.decode(result[12]! as List<Object?>)
+          : null,
+      billingAddressRequired: result[13] as bool?,
+      billingAddressParametersDTO: result[14] != null
+          ? BillingAddressParametersDTO.decode(result[14]! as List<Object?>)
+          : null,
+    );
+  }
+}
+
+class MerchantInfoDTO {
+  MerchantInfoDTO({
+    this.merchantName,
+    this.merchantId,
+  });
+
+  String? merchantName;
+
+  String? merchantId;
+
+  Object encode() {
+    return <Object?>[
+      merchantName,
+      merchantId,
+    ];
+  }
+
+  static MerchantInfoDTO decode(Object result) {
+    result as List<Object?>;
+    return MerchantInfoDTO(
+      merchantName: result[0] as String?,
+      merchantId: result[1] as String?,
+    );
+  }
+}
+
+class ShippingAddressParametersDTO {
+  ShippingAddressParametersDTO({
+    this.allowedCountryCodes,
+    this.isPhoneNumberRequired,
+  });
+
+  List<String?>? allowedCountryCodes;
+
+  bool? isPhoneNumberRequired;
+
+  Object encode() {
+    return <Object?>[
+      allowedCountryCodes,
+      isPhoneNumberRequired,
+    ];
+  }
+
+  static ShippingAddressParametersDTO decode(Object result) {
+    result as List<Object?>;
+    return ShippingAddressParametersDTO(
+      allowedCountryCodes: (result[0] as List<Object?>?)?.cast<String?>(),
+      isPhoneNumberRequired: result[1] as bool?,
+    );
+  }
+}
+
+class BillingAddressParametersDTO {
+  BillingAddressParametersDTO({
+    this.format,
+    this.isPhoneNumberRequired,
+  });
+
+  String? format;
+
+  bool? isPhoneNumberRequired;
+
+  Object encode() {
+    return <Object?>[
+      format,
+      isPhoneNumberRequired,
+    ];
+  }
+
+  static BillingAddressParametersDTO decode(Object result) {
+    result as List<Object?>;
+    return BillingAddressParametersDTO(
+      format: result[0] as String?,
+      isPhoneNumberRequired: result[1] as bool?,
     );
   }
 }
@@ -598,11 +712,14 @@ class PlatformCommunicationModel {
 class ComponentCommunicationModel {
   ComponentCommunicationModel({
     required this.type,
+    required this.componentId,
     this.data,
     this.paymentResult,
   });
 
   ComponentCommunicationType type;
+
+  String componentId;
 
   Object? data;
 
@@ -611,6 +728,7 @@ class ComponentCommunicationModel {
   Object encode() {
     return <Object?>[
       type.index,
+      componentId,
       data,
       paymentResult?.encode(),
     ];
@@ -620,9 +738,10 @@ class ComponentCommunicationModel {
     result as List<Object?>;
     return ComponentCommunicationModel(
       type: ComponentCommunicationType.values[result[0]! as int],
-      data: result[1],
-      paymentResult: result[2] != null
-          ? PaymentResultModelDTO.decode(result[2]! as List<Object?>)
+      componentId: result[1]! as String,
+      data: result[2],
+      paymentResult: result[3] != null
+          ? PaymentResultModelDTO.decode(result[3]! as List<Object?>)
           : null,
     );
   }
@@ -774,6 +893,102 @@ class CardComponentConfigurationDTO {
   }
 }
 
+class InstantPaymentConfigurationDTO {
+  InstantPaymentConfigurationDTO({
+    required this.instantPaymentType,
+    required this.environment,
+    required this.clientKey,
+    required this.countryCode,
+    required this.amount,
+    this.shopperLocale,
+    required this.analyticsOptionsDTO,
+    this.googlePayConfigurationDTO,
+    this.applePayConfigurationDTO,
+  });
+
+  InstantPaymentType instantPaymentType;
+
+  Environment environment;
+
+  String clientKey;
+
+  String countryCode;
+
+  AmountDTO amount;
+
+  String? shopperLocale;
+
+  AnalyticsOptionsDTO analyticsOptionsDTO;
+
+  GooglePayConfigurationDTO? googlePayConfigurationDTO;
+
+  ApplePayConfigurationDTO? applePayConfigurationDTO;
+
+  Object encode() {
+    return <Object?>[
+      instantPaymentType.index,
+      environment.index,
+      clientKey,
+      countryCode,
+      amount.encode(),
+      shopperLocale,
+      analyticsOptionsDTO.encode(),
+      googlePayConfigurationDTO?.encode(),
+      applePayConfigurationDTO?.encode(),
+    ];
+  }
+
+  static InstantPaymentConfigurationDTO decode(Object result) {
+    result as List<Object?>;
+    return InstantPaymentConfigurationDTO(
+      instantPaymentType: InstantPaymentType.values[result[0]! as int],
+      environment: Environment.values[result[1]! as int],
+      clientKey: result[2]! as String,
+      countryCode: result[3]! as String,
+      amount: AmountDTO.decode(result[4]! as List<Object?>),
+      shopperLocale: result[5] as String?,
+      analyticsOptionsDTO: AnalyticsOptionsDTO.decode(result[6]! as List<Object?>),
+      googlePayConfigurationDTO: result[7] != null
+          ? GooglePayConfigurationDTO.decode(result[7]! as List<Object?>)
+          : null,
+      applePayConfigurationDTO: result[8] != null
+          ? ApplePayConfigurationDTO.decode(result[8]! as List<Object?>)
+          : null,
+    );
+  }
+}
+
+class InstantPaymentSetupResultDTO {
+  InstantPaymentSetupResultDTO({
+    required this.instantPaymentType,
+    required this.isSupported,
+    this.resultData,
+  });
+
+  InstantPaymentType instantPaymentType;
+
+  bool isSupported;
+
+  Object? resultData;
+
+  Object encode() {
+    return <Object?>[
+      instantPaymentType.index,
+      isSupported,
+      resultData,
+    ];
+  }
+
+  static InstantPaymentSetupResultDTO decode(Object result) {
+    result as List<Object?>;
+    return InstantPaymentSetupResultDTO(
+      instantPaymentType: InstantPaymentType.values[result[0]! as int],
+      isSupported: result[1]! as bool,
+      resultData: result[2],
+    );
+  }
+}
+
 class _CheckoutPlatformInterfaceCodec extends StandardMessageCodec {
   const _CheckoutPlatformInterfaceCodec();
   @override
@@ -787,47 +1002,62 @@ class _CheckoutPlatformInterfaceCodec extends StandardMessageCodec {
     } else if (value is ApplePayConfigurationDTO) {
       buffer.putUint8(130);
       writeValue(buffer, value.encode());
-    } else if (value is CardComponentConfigurationDTO) {
+    } else if (value is BillingAddressParametersDTO) {
       buffer.putUint8(131);
       writeValue(buffer, value.encode());
-    } else if (value is CardConfigurationDTO) {
+    } else if (value is CardComponentConfigurationDTO) {
       buffer.putUint8(132);
       writeValue(buffer, value.encode());
-    } else if (value is CashAppPayConfigurationDTO) {
+    } else if (value is CardConfigurationDTO) {
       buffer.putUint8(133);
       writeValue(buffer, value.encode());
-    } else if (value is ComponentCommunicationModel) {
+    } else if (value is CashAppPayConfigurationDTO) {
       buffer.putUint8(134);
       writeValue(buffer, value.encode());
-    } else if (value is DeletedStoredPaymentMethodResultDTO) {
+    } else if (value is ComponentCommunicationModel) {
       buffer.putUint8(135);
       writeValue(buffer, value.encode());
-    } else if (value is DropInConfigurationDTO) {
+    } else if (value is DeletedStoredPaymentMethodResultDTO) {
       buffer.putUint8(136);
       writeValue(buffer, value.encode());
-    } else if (value is ErrorDTO) {
+    } else if (value is DropInConfigurationDTO) {
       buffer.putUint8(137);
       writeValue(buffer, value.encode());
-    } else if (value is GooglePayConfigurationDTO) {
+    } else if (value is ErrorDTO) {
       buffer.putUint8(138);
       writeValue(buffer, value.encode());
-    } else if (value is OrderResponseDTO) {
+    } else if (value is GooglePayConfigurationDTO) {
       buffer.putUint8(139);
       writeValue(buffer, value.encode());
-    } else if (value is PaymentEventDTO) {
+    } else if (value is InstantPaymentConfigurationDTO) {
       buffer.putUint8(140);
       writeValue(buffer, value.encode());
-    } else if (value is PaymentResultDTO) {
+    } else if (value is InstantPaymentSetupResultDTO) {
       buffer.putUint8(141);
       writeValue(buffer, value.encode());
-    } else if (value is PaymentResultModelDTO) {
+    } else if (value is MerchantInfoDTO) {
       buffer.putUint8(142);
       writeValue(buffer, value.encode());
-    } else if (value is PlatformCommunicationModel) {
+    } else if (value is OrderResponseDTO) {
       buffer.putUint8(143);
       writeValue(buffer, value.encode());
-    } else if (value is SessionDTO) {
+    } else if (value is PaymentEventDTO) {
       buffer.putUint8(144);
+      writeValue(buffer, value.encode());
+    } else if (value is PaymentResultDTO) {
+      buffer.putUint8(145);
+      writeValue(buffer, value.encode());
+    } else if (value is PaymentResultModelDTO) {
+      buffer.putUint8(146);
+      writeValue(buffer, value.encode());
+    } else if (value is PlatformCommunicationModel) {
+      buffer.putUint8(147);
+      writeValue(buffer, value.encode());
+    } else if (value is SessionDTO) {
+      buffer.putUint8(148);
+      writeValue(buffer, value.encode());
+    } else if (value is ShippingAddressParametersDTO) {
+      buffer.putUint8(149);
       writeValue(buffer, value.encode());
     } else {
       super.writeValue(buffer, value);
@@ -844,33 +1074,43 @@ class _CheckoutPlatformInterfaceCodec extends StandardMessageCodec {
       case 130: 
         return ApplePayConfigurationDTO.decode(readValue(buffer)!);
       case 131: 
-        return CardComponentConfigurationDTO.decode(readValue(buffer)!);
+        return BillingAddressParametersDTO.decode(readValue(buffer)!);
       case 132: 
-        return CardConfigurationDTO.decode(readValue(buffer)!);
+        return CardComponentConfigurationDTO.decode(readValue(buffer)!);
       case 133: 
-        return CashAppPayConfigurationDTO.decode(readValue(buffer)!);
+        return CardConfigurationDTO.decode(readValue(buffer)!);
       case 134: 
-        return ComponentCommunicationModel.decode(readValue(buffer)!);
+        return CashAppPayConfigurationDTO.decode(readValue(buffer)!);
       case 135: 
-        return DeletedStoredPaymentMethodResultDTO.decode(readValue(buffer)!);
+        return ComponentCommunicationModel.decode(readValue(buffer)!);
       case 136: 
-        return DropInConfigurationDTO.decode(readValue(buffer)!);
+        return DeletedStoredPaymentMethodResultDTO.decode(readValue(buffer)!);
       case 137: 
-        return ErrorDTO.decode(readValue(buffer)!);
+        return DropInConfigurationDTO.decode(readValue(buffer)!);
       case 138: 
-        return GooglePayConfigurationDTO.decode(readValue(buffer)!);
+        return ErrorDTO.decode(readValue(buffer)!);
       case 139: 
-        return OrderResponseDTO.decode(readValue(buffer)!);
+        return GooglePayConfigurationDTO.decode(readValue(buffer)!);
       case 140: 
-        return PaymentEventDTO.decode(readValue(buffer)!);
+        return InstantPaymentConfigurationDTO.decode(readValue(buffer)!);
       case 141: 
-        return PaymentResultDTO.decode(readValue(buffer)!);
+        return InstantPaymentSetupResultDTO.decode(readValue(buffer)!);
       case 142: 
-        return PaymentResultModelDTO.decode(readValue(buffer)!);
+        return MerchantInfoDTO.decode(readValue(buffer)!);
       case 143: 
-        return PlatformCommunicationModel.decode(readValue(buffer)!);
+        return OrderResponseDTO.decode(readValue(buffer)!);
       case 144: 
+        return PaymentEventDTO.decode(readValue(buffer)!);
+      case 145: 
+        return PaymentResultDTO.decode(readValue(buffer)!);
+      case 146: 
+        return PaymentResultModelDTO.decode(readValue(buffer)!);
+      case 147: 
+        return PlatformCommunicationModel.decode(readValue(buffer)!);
+      case 148: 
         return SessionDTO.decode(readValue(buffer)!);
+      case 149: 
+        return ShippingAddressParametersDTO.decode(readValue(buffer)!);
       default:
         return super.readValueOfType(type, buffer);
     }
@@ -977,26 +1217,35 @@ class _DropInPlatformInterfaceCodec extends StandardMessageCodec {
     } else if (value is ApplePayConfigurationDTO) {
       buffer.putUint8(130);
       writeValue(buffer, value.encode());
-    } else if (value is CardConfigurationDTO) {
+    } else if (value is BillingAddressParametersDTO) {
       buffer.putUint8(131);
       writeValue(buffer, value.encode());
-    } else if (value is CashAppPayConfigurationDTO) {
+    } else if (value is CardConfigurationDTO) {
       buffer.putUint8(132);
       writeValue(buffer, value.encode());
-    } else if (value is DeletedStoredPaymentMethodResultDTO) {
+    } else if (value is CashAppPayConfigurationDTO) {
       buffer.putUint8(133);
       writeValue(buffer, value.encode());
-    } else if (value is DropInConfigurationDTO) {
+    } else if (value is DeletedStoredPaymentMethodResultDTO) {
       buffer.putUint8(134);
       writeValue(buffer, value.encode());
-    } else if (value is ErrorDTO) {
+    } else if (value is DropInConfigurationDTO) {
       buffer.putUint8(135);
       writeValue(buffer, value.encode());
-    } else if (value is GooglePayConfigurationDTO) {
+    } else if (value is ErrorDTO) {
       buffer.putUint8(136);
       writeValue(buffer, value.encode());
-    } else if (value is PaymentEventDTO) {
+    } else if (value is GooglePayConfigurationDTO) {
       buffer.putUint8(137);
+      writeValue(buffer, value.encode());
+    } else if (value is MerchantInfoDTO) {
+      buffer.putUint8(138);
+      writeValue(buffer, value.encode());
+    } else if (value is PaymentEventDTO) {
+      buffer.putUint8(139);
+      writeValue(buffer, value.encode());
+    } else if (value is ShippingAddressParametersDTO) {
+      buffer.putUint8(140);
       writeValue(buffer, value.encode());
     } else {
       super.writeValue(buffer, value);
@@ -1013,19 +1262,25 @@ class _DropInPlatformInterfaceCodec extends StandardMessageCodec {
       case 130: 
         return ApplePayConfigurationDTO.decode(readValue(buffer)!);
       case 131: 
-        return CardConfigurationDTO.decode(readValue(buffer)!);
+        return BillingAddressParametersDTO.decode(readValue(buffer)!);
       case 132: 
-        return CashAppPayConfigurationDTO.decode(readValue(buffer)!);
+        return CardConfigurationDTO.decode(readValue(buffer)!);
       case 133: 
-        return DeletedStoredPaymentMethodResultDTO.decode(readValue(buffer)!);
+        return CashAppPayConfigurationDTO.decode(readValue(buffer)!);
       case 134: 
-        return DropInConfigurationDTO.decode(readValue(buffer)!);
+        return DeletedStoredPaymentMethodResultDTO.decode(readValue(buffer)!);
       case 135: 
-        return ErrorDTO.decode(readValue(buffer)!);
+        return DropInConfigurationDTO.decode(readValue(buffer)!);
       case 136: 
-        return GooglePayConfigurationDTO.decode(readValue(buffer)!);
+        return ErrorDTO.decode(readValue(buffer)!);
       case 137: 
+        return GooglePayConfigurationDTO.decode(readValue(buffer)!);
+      case 138: 
+        return MerchantInfoDTO.decode(readValue(buffer)!);
+      case 139: 
         return PaymentEventDTO.decode(readValue(buffer)!);
+      case 140: 
+        return ShippingAddressParametersDTO.decode(readValue(buffer)!);
       default:
         return super.readValueOfType(type, buffer);
     }
@@ -1283,11 +1538,38 @@ class _ComponentPlatformInterfaceCodec extends StandardMessageCodec {
   const _ComponentPlatformInterfaceCodec();
   @override
   void writeValue(WriteBuffer buffer, Object? value) {
-    if (value is ErrorDTO) {
+    if (value is AmountDTO) {
       buffer.putUint8(128);
       writeValue(buffer, value.encode());
-    } else if (value is PaymentEventDTO) {
+    } else if (value is AnalyticsOptionsDTO) {
       buffer.putUint8(129);
+      writeValue(buffer, value.encode());
+    } else if (value is ApplePayConfigurationDTO) {
+      buffer.putUint8(130);
+      writeValue(buffer, value.encode());
+    } else if (value is BillingAddressParametersDTO) {
+      buffer.putUint8(131);
+      writeValue(buffer, value.encode());
+    } else if (value is ErrorDTO) {
+      buffer.putUint8(132);
+      writeValue(buffer, value.encode());
+    } else if (value is GooglePayConfigurationDTO) {
+      buffer.putUint8(133);
+      writeValue(buffer, value.encode());
+    } else if (value is InstantPaymentConfigurationDTO) {
+      buffer.putUint8(134);
+      writeValue(buffer, value.encode());
+    } else if (value is InstantPaymentSetupResultDTO) {
+      buffer.putUint8(135);
+      writeValue(buffer, value.encode());
+    } else if (value is MerchantInfoDTO) {
+      buffer.putUint8(136);
+      writeValue(buffer, value.encode());
+    } else if (value is PaymentEventDTO) {
+      buffer.putUint8(137);
+      writeValue(buffer, value.encode());
+    } else if (value is ShippingAddressParametersDTO) {
+      buffer.putUint8(138);
       writeValue(buffer, value.encode());
     } else {
       super.writeValue(buffer, value);
@@ -1298,9 +1580,27 @@ class _ComponentPlatformInterfaceCodec extends StandardMessageCodec {
   Object? readValueOfType(int type, ReadBuffer buffer) {
     switch (type) {
       case 128: 
-        return ErrorDTO.decode(readValue(buffer)!);
+        return AmountDTO.decode(readValue(buffer)!);
       case 129: 
+        return AnalyticsOptionsDTO.decode(readValue(buffer)!);
+      case 130: 
+        return ApplePayConfigurationDTO.decode(readValue(buffer)!);
+      case 131: 
+        return BillingAddressParametersDTO.decode(readValue(buffer)!);
+      case 132: 
+        return ErrorDTO.decode(readValue(buffer)!);
+      case 133: 
+        return GooglePayConfigurationDTO.decode(readValue(buffer)!);
+      case 134: 
+        return InstantPaymentConfigurationDTO.decode(readValue(buffer)!);
+      case 135: 
+        return InstantPaymentSetupResultDTO.decode(readValue(buffer)!);
+      case 136: 
+        return MerchantInfoDTO.decode(readValue(buffer)!);
+      case 137: 
         return PaymentEventDTO.decode(readValue(buffer)!);
+      case 138: 
+        return ShippingAddressParametersDTO.decode(readValue(buffer)!);
       default:
         return super.readValueOfType(type, buffer);
     }
@@ -1370,6 +1670,77 @@ class ComponentPlatformInterface {
     );
     final List<Object?>? __pigeon_replyList =
         await __pigeon_channel.send(<Object?>[paymentsDetailsResult]) as List<Object?>?;
+    if (__pigeon_replyList == null) {
+      throw _createConnectionError(__pigeon_channelName);
+    } else if (__pigeon_replyList.length > 1) {
+      throw PlatformException(
+        code: __pigeon_replyList[0]! as String,
+        message: __pigeon_replyList[1] as String?,
+        details: __pigeon_replyList[2],
+      );
+    } else {
+      return;
+    }
+  }
+
+  Future<InstantPaymentSetupResultDTO> isInstantPaymentSupportedByPlatform(InstantPaymentConfigurationDTO instantPaymentConfigurationDTO, String paymentMethodResponse, String componentId) async {
+    const String __pigeon_channelName = 'dev.flutter.pigeon.adyen_checkout.ComponentPlatformInterface.isInstantPaymentSupportedByPlatform';
+    final BasicMessageChannel<Object?> __pigeon_channel = BasicMessageChannel<Object?>(
+      __pigeon_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: __pigeon_binaryMessenger,
+    );
+    final List<Object?>? __pigeon_replyList =
+        await __pigeon_channel.send(<Object?>[instantPaymentConfigurationDTO, paymentMethodResponse, componentId]) as List<Object?>?;
+    if (__pigeon_replyList == null) {
+      throw _createConnectionError(__pigeon_channelName);
+    } else if (__pigeon_replyList.length > 1) {
+      throw PlatformException(
+        code: __pigeon_replyList[0]! as String,
+        message: __pigeon_replyList[1] as String?,
+        details: __pigeon_replyList[2],
+      );
+    } else if (__pigeon_replyList[0] == null) {
+      throw PlatformException(
+        code: 'null-error',
+        message: 'Host platform returned null value for non-null return value.',
+      );
+    } else {
+      return (__pigeon_replyList[0] as InstantPaymentSetupResultDTO?)!;
+    }
+  }
+
+  Future<void> onInstantPaymentPressed(InstantPaymentType instantPaymentType) async {
+    const String __pigeon_channelName = 'dev.flutter.pigeon.adyen_checkout.ComponentPlatformInterface.onInstantPaymentPressed';
+    final BasicMessageChannel<Object?> __pigeon_channel = BasicMessageChannel<Object?>(
+      __pigeon_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: __pigeon_binaryMessenger,
+    );
+    final List<Object?>? __pigeon_replyList =
+        await __pigeon_channel.send(<Object?>[instantPaymentType.index]) as List<Object?>?;
+    if (__pigeon_replyList == null) {
+      throw _createConnectionError(__pigeon_channelName);
+    } else if (__pigeon_replyList.length > 1) {
+      throw PlatformException(
+        code: __pigeon_replyList[0]! as String,
+        message: __pigeon_replyList[1] as String?,
+        details: __pigeon_replyList[2],
+      );
+    } else {
+      return;
+    }
+  }
+
+  Future<void> onDispose() async {
+    const String __pigeon_channelName = 'dev.flutter.pigeon.adyen_checkout.ComponentPlatformInterface.onDispose';
+    final BasicMessageChannel<Object?> __pigeon_channel = BasicMessageChannel<Object?>(
+      __pigeon_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: __pigeon_binaryMessenger,
+    );
+    final List<Object?>? __pigeon_replyList =
+        await __pigeon_channel.send(null) as List<Object?>?;
     if (__pigeon_replyList == null) {
       throw _createConnectionError(__pigeon_channelName);
     } else if (__pigeon_replyList.length > 1) {

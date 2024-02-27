@@ -71,9 +71,9 @@ class CardComponentScrollableScreen extends StatelessWidget {
       configuration: cardComponentConfiguration,
       paymentMethod: paymentMethod,
       checkout: advancedCheckout,
-      onPaymentResult: (event) async {
+      onPaymentResult: (paymentResult) async {
         Navigator.pop(context);
-        _dialogBuilder(context, event);
+        _dialogBuilder(context, paymentResult);
       },
     );
   }

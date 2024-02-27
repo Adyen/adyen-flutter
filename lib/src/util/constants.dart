@@ -8,4 +8,5 @@ class Constants {
   static const String cardComponentSessionKey = "cardComponentSession";
   static const String cardComponentAdvancedKey = "cardComponentAdvanced";
   static const String isStoredPaymentMethodIndicator = "id";
+  static const String componentIdKey = "componentId";
 }

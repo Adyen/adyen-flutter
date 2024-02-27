@@ -41,32 +41,35 @@ class ComponentWrapperView
             inflate(context, R.layout.component_wrapper_view, this)
         }
 
-        fun <T> addComponent(cardComponent: T) where T : ViewableComponent, T : Component {
+        fun <T> addComponent(
+            component: T,
+            componentId: String
+        ) where T : ViewableComponent, T : Component {
             with(findViewById<AdyenComponentView>(R.id.adyen_component_view)) {
-                attach(cardComponent, activity)
-                addComponentHeightObserver()
+                attach(component, activity)
+                addComponentHeightObserver(componentId)
             }
         }
 
-        private fun addComponentHeightObserver() {
+        private fun addComponentHeightObserver(componentId: String) {
             ComponentHeightMessenger.instance().removeObservers(activity)
             ComponentHeightMessenger.instance().observe(activity) {
                 activity.lifecycleScope.launch {
                     // We need to wait for animation to finish e.g. when scheme icons disappear
                     delay(300)
-                    updateComponentViewHeight()
+                    updateComponentViewHeight(componentId)
                 }
             }
         }
 
-        private fun updateComponentViewHeight() {
+        private fun updateComponentViewHeight(componentId: String) {
             val cardViewHeight = findViewById<FrameLayout>(R.id.frameLayout_componentContainer)?.getChildAt(0)?.height
             if (cardViewHeight == null) {
                 activity.lifecycleScope.launch {
                     // View not rendered therefore we try again after delay.
                     // This is a workaround because there is currently no notifier from the native view.
                     delay(100)
-                    updateComponentViewHeight()
+                    updateComponentViewHeight(componentId)
                 }
                 return
             }
@@ -76,7 +79,11 @@ class ComponentWrapperView
             val componentHeight = ((cardViewHeight + buttonHeight) / screenDensity).toDouble()
             val roundedHeight = round(componentHeight * 100) / 100
             componentFlutterApi.onComponentCommunication(
-                ComponentCommunicationModel(type = ComponentCommunicationType.RESIZE, data = roundedHeight)
+                ComponentCommunicationModel(
+                    type = ComponentCommunicationType.RESIZE,
+                    componentId = componentId,
+                    data = roundedHeight
+                )
             ) {}
         }
     }
