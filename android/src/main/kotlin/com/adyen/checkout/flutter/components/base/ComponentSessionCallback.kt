@@ -18,11 +18,17 @@ abstract class ComponentSessionCallback<T : PaymentComponentState<*>>(
 ) : SessionComponentCallback<T> {
     override fun onAction(action: Action) = onActionCallback(action)
 
-    override fun onError(componentError: ComponentError) = sendErrorToFlutterLayer(componentError)
+    override fun onError(componentError: ComponentError) {
+        val model =
+            ComponentCommunicationModel(
+                type = ComponentCommunicationType.ERROR,
+                componentId = componentId,
+                data = componentError.exception.toString(),
+            )
+        componentFlutterApi.onComponentCommunication(model) {}
+    }
 
-    override fun onFinished(result: SessionPaymentResult) = sendPaymentResultToFlutterLayer(result)
-
-    fun sendPaymentResultToFlutterLayer(result: SessionPaymentResult) {
+    override fun onFinished(result: SessionPaymentResult) {
         val paymentResult =
             PaymentResultModelDTO(
                 result.sessionId,
@@ -36,16 +42,6 @@ abstract class ComponentSessionCallback<T : PaymentComponentState<*>>(
                 type = ComponentCommunicationType.RESULT,
                 componentId = componentId,
                 paymentResult = paymentResult
-            )
-        componentFlutterApi.onComponentCommunication(model) {}
-    }
-
-    fun sendErrorToFlutterLayer(componentError: ComponentError) {
-        val model =
-            ComponentCommunicationModel(
-                type = ComponentCommunicationType.ERROR,
-                componentId = componentId,
-                data = componentError.exception.toString(),
             )
         componentFlutterApi.onComponentCommunication(model) {}
     }

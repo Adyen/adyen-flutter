@@ -1,5 +1,6 @@
 package com.adyen.checkout.flutter.components.googlepay.session
 
+import ComponentCommunicationModel
 import ComponentFlutterInterface
 import androidx.fragment.app.FragmentActivity
 import com.adyen.checkout.components.core.Order
@@ -32,13 +33,28 @@ class GooglePaySessionComponent(
                 checkoutSession,
                 paymentMethod,
                 googlePayConfiguration,
-                GooglePaySessionCallback(componentFlutterApi, componentId, ::onAction, ::hideLoadingBottomSheet),
+                GooglePaySessionCallback(
+                    componentFlutterApi,
+                    componentId,
+                    ::onLoading,
+                    ::onAction,
+                    ::hideLoadingBottomSheet
+                ),
                 UUID.randomUUID().toString()
             )
     }
 
     override fun startGooglePayScreen() {
         googlePayComponent?.startGooglePayScreen(activity, GOOGLE_PAY_SESSION_REQUEST_CODE)
+    }
+
+    private fun onLoading() {
+        val model =
+            ComponentCommunicationModel(
+                ComponentCommunicationType.LOADING,
+                componentId = componentId,
+            )
+        componentFlutterApi.onComponentCommunication(model) {}
     }
 
     private fun onAction(action: Action) {

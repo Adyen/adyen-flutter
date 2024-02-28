@@ -64,6 +64,7 @@ class _GooglePayAdvancedComponentState
   final ComponentPlatformApi _componentPlatformApi =
       ComponentPlatformApi.instance;
   final ValueNotifier<bool> _isButtonClickable = ValueNotifier<bool>(true);
+  final ValueNotifier<bool> _isLoading = ValueNotifier<bool>(false);
 
   @override
   void initState() {
@@ -85,7 +86,7 @@ class _GooglePayAdvancedComponentState
       ) {
         if (snapshot.connectionState == ConnectionState.done) {
           if (_isGooglePaySupportedOnDevice(snapshot)) {
-            return _buildGooglePayButton(snapshot);
+            return _buildGooglePayOrLoadingContainer(snapshot);
           } else {
             widget.onUnavailable?.call();
             return widget.unavailableWidget ?? const SizedBox.shrink();
@@ -109,6 +110,20 @@ class _GooglePayAdvancedComponentState
       AsyncSnapshot<InstantPaymentSetupResultDTO> snapshot) {
     return snapshot.data?.instantPaymentType == InstantPaymentType.googlePay &&
         snapshot.data?.isSupported == true;
+  }
+
+  Widget _buildGooglePayOrLoadingContainer(
+      AsyncSnapshot<InstantPaymentSetupResultDTO> snapshot) {
+    return ValueListenableBuilder(
+      valueListenable: _isLoading,
+      builder: (BuildContext context, value, Widget? child) {
+        if (value == true) {
+          return widget.loadingIndicator ?? const SizedBox.shrink();
+        } else {
+          return _buildGooglePayButton(snapshot);
+        }
+      },
+    );
   }
 
   SizedBox _buildGooglePayButton(
@@ -187,6 +202,8 @@ class _GooglePayAdvancedComponentState
         _onResult(event);
       case ComponentCommunicationType.error:
         _onError(event);
+      case ComponentCommunicationType.loading:
+        _onLoading();
     }
   }
 
@@ -223,4 +240,6 @@ class _GooglePayAdvancedComponentState
     String errorMessage = event.data as String;
     widget.onPaymentResult(PaymentError(reason: errorMessage));
   }
+
+  void _onLoading() => _isLoading.value = true;
 }

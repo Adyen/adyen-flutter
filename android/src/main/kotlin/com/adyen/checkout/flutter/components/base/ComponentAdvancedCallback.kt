@@ -34,10 +34,6 @@ abstract class ComponentAdvancedCallback<T : PaymentComponentState<*>>(
     }
 
     override fun onError(componentError: ComponentError) {
-        sendErrorToFlutterLayer(componentError)
-    }
-
-    fun sendErrorToFlutterLayer(componentError: ComponentError) {
         val model =
             ComponentCommunicationModel(
                 ComponentCommunicationType.ERROR,

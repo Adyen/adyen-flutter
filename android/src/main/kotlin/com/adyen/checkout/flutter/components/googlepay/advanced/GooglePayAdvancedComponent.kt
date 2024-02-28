@@ -30,7 +30,13 @@ class GooglePayAdvancedComponent(
                 activity = activity,
                 paymentMethod = paymentMethod,
                 configuration = googlePayConfiguration,
-                callback = GooglePayAdvancedCallback(componentFlutterApi, componentId, ::hideLoadingBottomSheet),
+                callback =
+                    GooglePayAdvancedCallback(
+                        componentFlutterApi,
+                        componentId,
+                        ::onLoading,
+                        ::hideLoadingBottomSheet
+                    ),
             )
     }
 
@@ -77,5 +83,14 @@ class GooglePayAdvancedComponent(
             componentFlutterApi.onComponentCommunication(model) {}
             hideLoadingBottomSheet()
         }
+    }
+
+    private fun onLoading() {
+        val model =
+            ComponentCommunicationModel(
+                ComponentCommunicationType.LOADING,
+                componentId = componentId,
+            )
+        componentFlutterApi.onComponentCommunication(model) {}
     }
 }

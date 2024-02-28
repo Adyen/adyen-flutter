@@ -54,6 +54,7 @@ class _GooglePaySessionComponentState extends State<GooglePaySessionComponent> {
   final ComponentPlatformApi _componentPlatformApi =
       ComponentPlatformApi.instance;
   final ValueNotifier<bool> _isButtonClickable = ValueNotifier<bool>(true);
+  final ValueNotifier<bool> _isLoading = ValueNotifier<bool>(false);
 
   @override
   void initState() {
@@ -75,7 +76,7 @@ class _GooglePaySessionComponentState extends State<GooglePaySessionComponent> {
       ) {
         if (snapshot.connectionState == ConnectionState.done) {
           if (_isGooglePaySupportedOnDevice(snapshot)) {
-            return _buildGooglePayButton(snapshot);
+            return _buildGooglePayOrLoadingContainer(snapshot);
           } else {
             widget.onUnavailable?.call();
             return widget.unavailableWidget ?? const SizedBox.shrink();
@@ -101,7 +102,21 @@ class _GooglePaySessionComponentState extends State<GooglePaySessionComponent> {
         snapshot.data?.isSupported == true;
   }
 
-  SizedBox _buildGooglePayButton(
+  Widget _buildGooglePayOrLoadingContainer(
+      AsyncSnapshot<InstantPaymentSetupResultDTO> snapshot) {
+    return ValueListenableBuilder(
+      valueListenable: _isLoading,
+      builder: (BuildContext context, value, Widget? child) {
+        if (value == true) {
+          return widget.loadingIndicator ?? const SizedBox.shrink();
+        } else {
+          return _buildGooglePayButton(snapshot);
+        }
+      },
+    );
+  }
+
+  Widget _buildGooglePayButton(
       AsyncSnapshot<InstantPaymentSetupResultDTO> snapshot) {
     final String allowedPaymentMethods =
         snapshot.data?.resultData.toString() ?? "[]";
@@ -172,10 +187,15 @@ class _GooglePaySessionComponentState extends State<GooglePaySessionComponent> {
       _onResult(event);
     } else if (event.type case ComponentCommunicationType.error) {
       _onError(event);
+    } else if (event.type case ComponentCommunicationType.loading) {
+      _onLoading();
     }
   }
 
+  void _onLoading() => _isLoading.value = true;
+
   void _onResult(ComponentCommunicationModel event) {
+    _isLoading.value = false;
     String resultCode = event.paymentResult?.resultCode ?? "";
     widget.adyenLogger
         .print("Google pay session flow result code: $resultCode");
@@ -183,6 +203,7 @@ class _GooglePaySessionComponentState extends State<GooglePaySessionComponent> {
   }
 
   void _onError(ComponentCommunicationModel event) {
+    _isLoading.value = false;
     String errorMessage = event.data as String;
     widget.onPaymentResult(PaymentError(reason: errorMessage));
   }

@@ -94,9 +94,10 @@ enum PlatformCommunicationType: Int {
 enum ComponentCommunicationType: Int {
   case onSubmit = 0
   case additionalDetails = 1
-  case result = 2
-  case error = 3
-  case resize = 4
+  case loading = 2
+  case result = 3
+  case error = 4
+  case resize = 5
 }
 
 enum PaymentEventType: Int {

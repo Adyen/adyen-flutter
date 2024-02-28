@@ -8,10 +8,16 @@ import com.adyen.checkout.googlepay.GooglePayComponentState
 class GooglePayAdvancedCallback(
     private val componentFlutterApi: ComponentFlutterInterface,
     private val componentId: String,
+    private val onLoadingCallback: () -> Unit,
     private val hideLoadingBottomSheet: () -> Unit,
 ) : ComponentAdvancedCallback<GooglePayComponentState>(componentFlutterApi, componentId) {
+    override fun onSubmit(state: GooglePayComponentState) {
+        onLoadingCallback()
+        super.onSubmit(state)
+    }
+
     override fun onError(componentError: ComponentError) {
         hideLoadingBottomSheet()
-        sendErrorToFlutterLayer(componentError)
+        super.onError(componentError)
     }
 }

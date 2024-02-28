@@ -145,9 +145,10 @@ enum class PlatformCommunicationType(val raw: Int) {
 enum class ComponentCommunicationType(val raw: Int) {
   ONSUBMIT(0),
   ADDITIONALDETAILS(1),
-  RESULT(2),
-  ERROR(3),
-  RESIZE(4);
+  LOADING(2),
+  RESULT(3),
+  ERROR(4),
+  RESIZE(5);
 
   companion object {
     fun ofRaw(raw: Int): ComponentCommunicationType? {

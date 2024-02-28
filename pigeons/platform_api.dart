@@ -63,6 +63,7 @@ enum PlatformCommunicationType {
 enum ComponentCommunicationType {
   onSubmit,
   additionalDetails,
+  loading,
   result,
   error,
   resize,
