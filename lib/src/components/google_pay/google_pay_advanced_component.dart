@@ -24,8 +24,8 @@ class GooglePayAdvancedComponent extends StatefulWidget {
   final int cornerRadius;
   final double width;
   final double height;
-  final Function()? onGooglePayUnavailable;
-  final Widget? googlePayUnavailableWidget;
+  final Function()? onUnavailable;
+  final Widget? unavailableWidget;
   final Widget? loadingIndicator;
   final PaymentEventHandler paymentEventHandler;
   final AdyenLogger adyenLogger;
@@ -43,8 +43,8 @@ class GooglePayAdvancedComponent extends StatefulWidget {
     required this.cornerRadius,
     required this.width,
     required this.height,
-    this.onGooglePayUnavailable,
-    this.googlePayUnavailableWidget,
+    this.onUnavailable,
+    this.unavailableWidget,
     this.loadingIndicator,
     PaymentEventHandler? paymentEventHandler,
     AdyenLogger? adyenLogger,
@@ -87,8 +87,8 @@ class _GooglePayAdvancedComponentState
           if (_isGooglePaySupportedOnDevice(snapshot)) {
             return _buildGooglePayButton(snapshot);
           } else {
-            widget.onGooglePayUnavailable?.call();
-            return widget.googlePayUnavailableWidget ?? const SizedBox.shrink();
+            widget.onUnavailable?.call();
+            return widget.unavailableWidget ?? const SizedBox.shrink();
           }
         }
 

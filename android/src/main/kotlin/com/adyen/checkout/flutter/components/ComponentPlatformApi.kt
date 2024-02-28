@@ -74,7 +74,7 @@ class ComponentPlatformApi(
         requestCode: Int,
         resultCode: Int,
         data: Intent?
-    ): Boolean = googlePayComponentManager.handleGooglePayActivityResult(requestCode, resultCode, data) ?: false
+    ): Boolean = googlePayComponentManager.handleGooglePayActivityResult(requestCode, resultCode, data)
 
     private fun handlePaymentEvent(paymentEventDTO: PaymentEventDTO) =
         when (paymentEventDTO.paymentEventType) {
