@@ -48,8 +48,8 @@ class AdyenGooglePayComponent extends StatelessWidget {
       cornerRadius: _determineCornerRadius(),
       width: _determineWidth(),
       height: _determineHeight(),
-      onUnavailable: onUnavailable,
       loadingIndicator: loadingIndicator,
+      onUnavailable: onUnavailable,
       unavailableWidget: unavailableWidget,
     );
   }
@@ -61,16 +61,16 @@ class AdyenGooglePayComponent extends StatelessWidget {
       key: key,
       googlePayPaymentMethod: encodedPaymentMethod,
       googlePayComponentConfiguration: configuration,
+      onPaymentResult: onPaymentResult,
       onSubmit: advancedCheckout.onSubmit,
       onAdditionalDetails: advancedCheckout.onAdditionalDetails,
-      onPaymentResult: onPaymentResult,
       theme: _mapToGooglePayButtonTheme(),
       type: _mapToGooglePayButtonType(),
       cornerRadius: _determineCornerRadius(),
       width: _determineWidth(),
       height: _determineHeight(),
-      onUnavailable: onUnavailable,
       loadingIndicator: loadingIndicator,
+      onUnavailable: onUnavailable,
       unavailableWidget: unavailableWidget,
     );
   }

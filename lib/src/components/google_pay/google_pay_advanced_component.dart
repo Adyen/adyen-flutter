@@ -2,197 +2,40 @@ import 'dart:async';
 
 import 'package:adyen_checkout/src/common/model/payment_event.dart';
 import 'package:adyen_checkout/src/common/model/payment_result.dart';
-import 'package:adyen_checkout/src/components/component_flutter_api.dart';
-import 'package:adyen_checkout/src/components/component_platform_api.dart';
-import 'package:adyen_checkout/src/components/google_pay/model/google_pay_component_configuration.dart';
+import 'package:adyen_checkout/src/components/google_pay/base_google_pay_component.dart';
 import 'package:adyen_checkout/src/generated/platform_api.g.dart';
 import 'package:adyen_checkout/src/logging/adyen_logger.dart';
-import 'package:adyen_checkout/src/util/dto_mapper.dart';
 import 'package:adyen_checkout/src/util/payment_event_handler.dart';
-import 'package:adyen_checkout/src/util/sdk_version_number_provider.dart';
-import 'package:flutter/material.dart';
-import 'package:pay/pay.dart';
 
-class GooglePayAdvancedComponent extends StatefulWidget {
-  final String googlePayPaymentMethod;
-  final GooglePayComponentConfiguration googlePayComponentConfiguration;
+class GooglePayAdvancedComponent extends BaseGooglePayComponent {
   final Future<PaymentEvent> Function(String) onSubmit;
   final Future<PaymentEvent> Function(String) onAdditionalDetails;
-  final Function(PaymentResult) onPaymentResult;
-  final GooglePayButtonTheme theme;
-  final GooglePayButtonType type;
-  final int cornerRadius;
-  final double width;
-  final double height;
-  final Function()? onUnavailable;
-  final Widget? unavailableWidget;
-  final Widget? loadingIndicator;
   final PaymentEventHandler paymentEventHandler;
-  final AdyenLogger adyenLogger;
+  @override
   final String componentId = "GOOGLE_PAY_ADVANCED_COMPONENT";
 
   GooglePayAdvancedComponent({
     super.key,
-    required this.googlePayPaymentMethod,
-    required this.googlePayComponentConfiguration,
+    required super.googlePayPaymentMethod,
+    required super.googlePayComponentConfiguration,
+    required super.onPaymentResult,
     required this.onSubmit,
     required this.onAdditionalDetails,
-    required this.onPaymentResult,
-    required this.theme,
-    required this.type,
-    required this.cornerRadius,
-    required this.width,
-    required this.height,
-    this.onUnavailable,
-    this.unavailableWidget,
-    this.loadingIndicator,
+    required super.theme,
+    required super.type,
+    required super.cornerRadius,
+    required super.width,
+    required super.height,
+    super.loadingIndicator,
+    super.onUnavailable,
+    super.unavailableWidget,
     PaymentEventHandler? paymentEventHandler,
     AdyenLogger? adyenLogger,
-  })  : paymentEventHandler = paymentEventHandler ?? PaymentEventHandler(),
-        adyenLogger = adyenLogger ?? AdyenLogger.instance;
+  }) : paymentEventHandler = paymentEventHandler ?? PaymentEventHandler();
 
   @override
-  State<GooglePayAdvancedComponent> createState() =>
-      _GooglePayAdvancedComponentState();
-}
-
-class _GooglePayAdvancedComponentState
-    extends State<GooglePayAdvancedComponent> {
-  final SdkVersionNumberProvider _sdkVersionNumberProvider =
-      SdkVersionNumberProvider.instance;
-  final ComponentFlutterApi _componentFlutterApi = ComponentFlutterApi.instance;
-  final ComponentPlatformApi _componentPlatformApi =
-      ComponentPlatformApi.instance;
-  final ValueNotifier<bool> _isButtonClickable = ValueNotifier<bool>(true);
-  final ValueNotifier<bool> _isLoading = ValueNotifier<bool>(false);
-
-  @override
-  void initState() {
-    _componentFlutterApi.componentCommunicationStream.stream
-        .where((communicationModel) =>
-            communicationModel.componentId == widget.componentId)
-        .listen(_handleComponentCommunication);
-
-    super.initState();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return FutureBuilder(
-      future: _isGooglePaySupported(),
-      builder: (
-        BuildContext context,
-        AsyncSnapshot<InstantPaymentSetupResultDTO> snapshot,
-      ) {
-        if (snapshot.connectionState == ConnectionState.done) {
-          if (_isGooglePaySupportedOnDevice(snapshot)) {
-            return _buildGooglePayOrLoadingContainer(snapshot);
-          } else {
-            widget.onUnavailable?.call();
-            return widget.unavailableWidget ?? const SizedBox.shrink();
-          }
-        }
-
-        return widget.loadingIndicator ?? const SizedBox.shrink();
-      },
-    );
-  }
-
-  @override
-  void dispose() {
-    _componentPlatformApi.onDispose(widget.componentId);
-    _componentFlutterApi.dispose();
-    _isButtonClickable.dispose();
-    super.dispose();
-  }
-
-  bool _isGooglePaySupportedOnDevice(
-      AsyncSnapshot<InstantPaymentSetupResultDTO> snapshot) {
-    return snapshot.data?.instantPaymentType == InstantPaymentType.googlePay &&
-        snapshot.data?.isSupported == true;
-  }
-
-  Widget _buildGooglePayOrLoadingContainer(
-      AsyncSnapshot<InstantPaymentSetupResultDTO> snapshot) {
-    return ValueListenableBuilder(
-      valueListenable: _isLoading,
-      builder: (BuildContext context, value, Widget? child) {
-        if (value == true) {
-          return widget.loadingIndicator ?? const SizedBox.shrink();
-        } else {
-          return _buildGooglePayButton(snapshot);
-        }
-      },
-    );
-  }
-
-  SizedBox _buildGooglePayButton(
-      AsyncSnapshot<InstantPaymentSetupResultDTO> snapshot) {
-    final String allowedPaymentMethods =
-        snapshot.data?.resultData.toString() ?? "[]";
-    final Widget googlePayButton =
-        _buildRawGooglePayButton(PaymentConfiguration.fromJsonString(
-      '''{
-        "provider": "google_pay",
-        "data": {
-          "apiVersion": 2,
-          "apiVersionMinor": 0,
-          "allowedPaymentMethods": $allowedPaymentMethods
-        }}''',
-    ));
-
-    return SizedBox(
-      width: widget.width,
-      height: widget.height,
-      child: ValueListenableBuilder(
-        valueListenable: _isButtonClickable,
-        builder: (BuildContext context, value, Widget? child) {
-          return IgnorePointer(
-            ignoring: value == false,
-            child: googlePayButton,
-          );
-        },
-      ),
-    );
-  }
-
-  RawGooglePayButton _buildRawGooglePayButton(
-      PaymentConfiguration paymentConfiguration) {
-    return RawGooglePayButton(
-      paymentConfiguration: paymentConfiguration,
-      onPressed: onPressed,
-      cornerRadius: widget.cornerRadius,
-      theme: widget.theme,
-      type: widget.type,
-    );
-  }
-
-  void onPressed() {
-    _isButtonClickable.value = false;
-    _componentPlatformApi.onInstantPaymentPressed(
-      InstantPaymentType.googlePay,
-      widget.componentId,
-    );
-  }
-
-  Future<InstantPaymentSetupResultDTO> _isGooglePaySupported() async {
-    final String versionNumber =
-        await _sdkVersionNumberProvider.getSdkVersionNumber();
-    final InstantPaymentConfigurationDTO
-        instantPaymentComponentConfigurationDTO =
-        widget.googlePayComponentConfiguration.toDTO(
-      versionNumber,
-      InstantPaymentType.googlePay,
-    );
-    return await _componentPlatformApi.isInstantPaymentSupportedByPlatform(
-      instantPaymentComponentConfigurationDTO,
-      widget.googlePayPaymentMethod,
-      widget.componentId,
-    );
-  }
-
-  void _handleComponentCommunication(event) {
-    _isButtonClickable.value = true;
+  void handleComponentCommunication(dynamic event) {
+    isButtonClickable.value = true;
     switch (event.type) {
       case ComponentCommunicationType.onSubmit:
         _onSubmit(event);
@@ -208,38 +51,36 @@ class _GooglePayAdvancedComponentState
   }
 
   Future<void> _onSubmit(ComponentCommunicationModel event) async {
-    final PaymentEvent paymentEvent =
-        await widget.onSubmit(event.data as String);
+    final PaymentEvent paymentEvent = await onSubmit(event.data as String);
     final PaymentEventDTO paymentEventDTO =
-        widget.paymentEventHandler.mapToPaymentEventDTO(paymentEvent);
-    _componentPlatformApi.onPaymentsResult(
+        paymentEventHandler.mapToPaymentEventDTO(paymentEvent);
+    componentPlatformApi.onPaymentsResult(
       paymentEventDTO,
-      widget.componentId,
+      componentId,
     );
   }
 
   Future<void> _onAdditionalDetails(ComponentCommunicationModel event) async {
     final PaymentEvent paymentEvent =
-        await widget.onAdditionalDetails(event.data as String);
+        await onAdditionalDetails(event.data as String);
     final PaymentEventDTO paymentEventDTO =
-        widget.paymentEventHandler.mapToPaymentEventDTO(paymentEvent);
-    _componentPlatformApi.onPaymentsDetailsResult(
+        paymentEventHandler.mapToPaymentEventDTO(paymentEvent);
+    componentPlatformApi.onPaymentsDetailsResult(
       paymentEventDTO,
-      widget.componentId,
+      componentId,
     );
   }
 
   void _onResult(ComponentCommunicationModel event) {
     String resultCode = event.paymentResult?.resultCode ?? "";
-    widget.adyenLogger
-        .print("Google pay advanced flow result code: $resultCode");
-    widget.onPaymentResult(PaymentAdvancedFinished(resultCode: resultCode));
+    adyenLogger.print("Google pay advanced flow result code: $resultCode");
+    onPaymentResult(PaymentAdvancedFinished(resultCode: resultCode));
   }
 
   void _onError(ComponentCommunicationModel event) {
     String errorMessage = event.data as String;
-    widget.onPaymentResult(PaymentError(reason: errorMessage));
+    onPaymentResult(PaymentError(reason: errorMessage));
   }
 
-  void _onLoading() => _isLoading.value = true;
+  void _onLoading() => isLoading.value = true;
 }
