@@ -115,7 +115,6 @@ class _CardAdvancedFlowState extends State<CardAdvancedComponent> {
         widget.paymentEventHandler.mapToPaymentEventDTO(paymentEvent);
     _componentPlatformApi.onPaymentsResult(
       paymentEventDTO,
-      widget.componentId,
     );
   }
 
@@ -126,7 +125,6 @@ class _CardAdvancedFlowState extends State<CardAdvancedComponent> {
         widget.paymentEventHandler.mapToPaymentEventDTO(paymentEvent);
     _componentPlatformApi.onPaymentsDetailsResult(
       paymentEventDTO,
-      widget.componentId,
     );
   }
 

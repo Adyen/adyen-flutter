@@ -54,10 +54,7 @@ class GooglePayAdvancedComponent extends BaseGooglePayComponent {
     final PaymentEvent paymentEvent = await onSubmit(event.data as String);
     final PaymentEventDTO paymentEventDTO =
         paymentEventHandler.mapToPaymentEventDTO(paymentEvent);
-    componentPlatformApi.onPaymentsResult(
-      paymentEventDTO,
-      componentId,
-    );
+    componentPlatformApi.onPaymentsResult(paymentEventDTO);
   }
 
   Future<void> _onAdditionalDetails(ComponentCommunicationModel event) async {
@@ -65,10 +62,7 @@ class GooglePayAdvancedComponent extends BaseGooglePayComponent {
         await onAdditionalDetails(event.data as String);
     final PaymentEventDTO paymentEventDTO =
         paymentEventHandler.mapToPaymentEventDTO(paymentEvent);
-    componentPlatformApi.onPaymentsDetailsResult(
-      paymentEventDTO,
-      componentId,
-    );
+    componentPlatformApi.onPaymentsDetailsResult(paymentEventDTO);
   }
 
   void _onResult(ComponentCommunicationModel event) {

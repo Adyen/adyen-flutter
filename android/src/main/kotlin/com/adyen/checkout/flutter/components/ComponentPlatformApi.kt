@@ -21,19 +21,15 @@ class ComponentPlatformApi(
     private val sessionHolder: SessionHolder,
     private val componentFlutterInterface: ComponentFlutterInterface,
 ) : ComponentPlatformInterface {
-    private var googlePayComponentManager: GooglePayComponentManager = GooglePayComponentManager(activity)
+    private var googlePayComponentManager: GooglePayComponentManager =
+        GooglePayComponentManager(activity, sessionHolder, componentFlutterInterface)
 
     override fun updateViewHeight(viewId: Long) = ComponentHeightMessenger.sendResult(viewId)
 
-    override fun onPaymentsResult(
-        paymentsResult: PaymentEventDTO,
-        componentId: String
-    ) = handlePaymentEvent(paymentsResult)
+    override fun onPaymentsResult(paymentsResult: PaymentEventDTO) = handlePaymentEvent(paymentsResult)
 
-    override fun onPaymentsDetailsResult(
-        paymentsDetailsResult: PaymentEventDTO,
-        componentId: String
-    ) = handlePaymentEvent(paymentsDetailsResult)
+    override fun onPaymentsDetailsResult(paymentsDetailsResult: PaymentEventDTO) =
+        handlePaymentEvent(paymentsDetailsResult)
 
     override fun isInstantPaymentSupportedByPlatform(
         instantPaymentConfigurationDTO: InstantPaymentConfigurationDTO,
@@ -48,8 +44,6 @@ class ComponentPlatformApi(
                 googlePayComponentManager.isGooglePayAvailable(
                     paymentMethod,
                     componentId,
-                    sessionHolder,
-                    componentFlutterInterface,
                     instantPaymentConfigurationDTO,
                     callback
                 )

@@ -10,10 +10,10 @@ import com.adyen.checkout.redirect.RedirectComponent
 
 abstract class BaseGooglePayComponent(
     private val activity: FragmentActivity,
-    open val componentId: String,
 ) {
     private val intentListener = Consumer<Intent> { handleIntent(it) }
     internal var googlePayComponent: GooglePayComponent? = null
+    abstract val componentId: String
 
     init {
         activity.addOnNewIntentListener(intentListener)

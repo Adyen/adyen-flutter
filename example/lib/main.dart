@@ -43,7 +43,7 @@ void main() {
       '/': (context) => const MyApp(),
       '/dropInScreen': (context) => dropInScreen,
       '/cardComponentScreen': (context) => cardComponentScreen,
-      '/googleApplePay': (context) => googlePayComponentScreen
+      '/googlePay': (context) => googlePayComponentScreen
     },
     initialRoute: "/",
   ));
@@ -71,13 +71,16 @@ class MyApp extends StatelessWidget {
                 onPressed: () =>
                     Navigator.pushNamed(context, "/cardComponentScreen"),
                 child: const Text("Card component")),
-            TextButton(
-                onPressed: () =>
-                    Navigator.pushNamed(context, "/googleApplePay"),
-                child: const Text("Google and Apple pay component")),
+            _buildGoogleOrApplePayComponent(context),
           ],
         ),
       ),
     );
+  }
+
+  Widget _buildGoogleOrApplePayComponent(BuildContext context) {
+    return TextButton(
+        onPressed: () => Navigator.pushNamed(context, "/googlePay"),
+        child: const Text("Google pay component"));
   }
 }

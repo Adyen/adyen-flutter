@@ -22,7 +22,7 @@ class GooglePaySessionComponent(
     private val componentFlutterApi: ComponentFlutterInterface,
     private val googlePayConfiguration: GooglePayConfiguration,
     override val componentId: String,
-) : BaseGooglePayComponent(activity, componentId) {
+) : BaseGooglePayComponent(activity) {
     override fun setupGooglePayComponent(paymentMethod: PaymentMethod) {
         val sessionSetupResponse = SessionSetupResponse.SERIALIZER.deserialize(sessionHolder.sessionSetupResponse)
         val order = sessionHolder.orderResponse?.let { Order.SERIALIZER.deserialize(it) }

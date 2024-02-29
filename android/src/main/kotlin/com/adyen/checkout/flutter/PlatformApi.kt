@@ -1647,8 +1647,8 @@ private object ComponentPlatformInterfaceCodec : StandardMessageCodec() {
 /** Generated interface from Pigeon that represents a handler of messages from Flutter. */
 interface ComponentPlatformInterface {
   fun updateViewHeight(viewId: Long)
-  fun onPaymentsResult(paymentsResult: PaymentEventDTO, componentId: String)
-  fun onPaymentsDetailsResult(paymentsDetailsResult: PaymentEventDTO, componentId: String)
+  fun onPaymentsResult(paymentsResult: PaymentEventDTO)
+  fun onPaymentsDetailsResult(paymentsDetailsResult: PaymentEventDTO)
   fun isInstantPaymentSupportedByPlatform(instantPaymentConfigurationDTO: InstantPaymentConfigurationDTO, paymentMethodResponse: String, componentId: String, callback: (Result<InstantPaymentSetupResultDTO>) -> Unit)
   fun onInstantPaymentPressed(instantPaymentType: InstantPaymentType, componentId: String)
   fun onDispose(componentId: String)
@@ -1686,10 +1686,9 @@ interface ComponentPlatformInterface {
           channel.setMessageHandler { message, reply ->
             val args = message as List<Any?>
             val paymentsResultArg = args[0] as PaymentEventDTO
-            val componentIdArg = args[1] as String
             var wrapped: List<Any?>
             try {
-              api.onPaymentsResult(paymentsResultArg, componentIdArg)
+              api.onPaymentsResult(paymentsResultArg)
               wrapped = listOf<Any?>(null)
             } catch (exception: Throwable) {
               wrapped = wrapError(exception)
@@ -1706,10 +1705,9 @@ interface ComponentPlatformInterface {
           channel.setMessageHandler { message, reply ->
             val args = message as List<Any?>
             val paymentsDetailsResultArg = args[0] as PaymentEventDTO
-            val componentIdArg = args[1] as String
             var wrapped: List<Any?>
             try {
-              api.onPaymentsDetailsResult(paymentsDetailsResultArg, componentIdArg)
+              api.onPaymentsDetailsResult(paymentsDetailsResultArg)
               wrapped = listOf<Any?>(null)
             } catch (exception: Throwable) {
               wrapped = wrapError(exception)

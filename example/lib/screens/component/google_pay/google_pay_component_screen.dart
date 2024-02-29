@@ -107,8 +107,9 @@ class GooglePayComponentScreen extends StatelessWidget {
           final GooglePayButtonStyle googlePayButtonStyle =
               GooglePayButtonStyle(
             theme: GooglePayButtonTheme.light,
-            type: GooglePayButtonType.order,
-            width: 300,
+            type: GooglePayButtonType.buy,
+            width: 250,
+            cornerRadius: 4,
           );
 
           final paymentMethod = _extractPaymentMethod(snapshot.data!);

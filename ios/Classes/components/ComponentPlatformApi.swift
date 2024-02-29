@@ -8,11 +8,11 @@ class ComponentPlatformApi: ComponentPlatformInterface {
         onUpdateViewHeightCallback()
     }
 
-    func onPaymentsResult(paymentsResult: PaymentEventDTO, componentId: String) {
+    func onPaymentsResult(paymentsResult: PaymentEventDTO) {
         handlePaymentEvent(paymentEventDTO: paymentsResult)
     }
 
-    func onPaymentsDetailsResult(paymentsDetailsResult: PaymentEventDTO, componentId: String) {
+    func onPaymentsDetailsResult(paymentsDetailsResult: PaymentEventDTO) {
         handlePaymentEvent(paymentEventDTO: paymentsDetailsResult)
     }
 

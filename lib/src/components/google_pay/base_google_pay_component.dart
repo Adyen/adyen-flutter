@@ -78,6 +78,8 @@ class _BaseGooglePayComponentState extends State<BaseGooglePayComponent> {
           if (_isGooglePaySupportedOnDevice(snapshot)) {
             return _buildGooglePayOrLoadingContainer(snapshot);
           } else {
+            widget.adyenLogger
+                .print("Google pay is not available on this device.");
             widget.onUnavailable?.call();
             return widget.unavailableWidget ?? const SizedBox.shrink();
           }

@@ -1483,8 +1483,8 @@ class ComponentPlatformInterfaceCodec: FlutterStandardMessageCodec {
 /// Generated protocol from Pigeon that represents a handler of messages from Flutter.
 protocol ComponentPlatformInterface {
   func updateViewHeight(viewId: Int64) throws
-  func onPaymentsResult(paymentsResult: PaymentEventDTO, componentId: String) throws
-  func onPaymentsDetailsResult(paymentsDetailsResult: PaymentEventDTO, componentId: String) throws
+  func onPaymentsResult(paymentsResult: PaymentEventDTO) throws
+  func onPaymentsDetailsResult(paymentsDetailsResult: PaymentEventDTO) throws
   func isInstantPaymentSupportedByPlatform(instantPaymentConfigurationDTO: InstantPaymentConfigurationDTO, paymentMethodResponse: String, componentId: String, completion: @escaping (Result<InstantPaymentSetupResultDTO, Error>) -> Void)
   func onInstantPaymentPressed(instantPaymentType: InstantPaymentType, componentId: String) throws
   func onDispose(componentId: String) throws
@@ -1516,9 +1516,8 @@ class ComponentPlatformInterfaceSetup {
       onPaymentsResultChannel.setMessageHandler { message, reply in
         let args = message as! [Any?]
         let paymentsResultArg = args[0] as! PaymentEventDTO
-        let componentIdArg = args[1] as! String
         do {
-          try api.onPaymentsResult(paymentsResult: paymentsResultArg, componentId: componentIdArg)
+          try api.onPaymentsResult(paymentsResult: paymentsResultArg)
           reply(wrapResult(nil))
         } catch {
           reply(wrapError(error))
@@ -1532,9 +1531,8 @@ class ComponentPlatformInterfaceSetup {
       onPaymentsDetailsResultChannel.setMessageHandler { message, reply in
         let args = message as! [Any?]
         let paymentsDetailsResultArg = args[0] as! PaymentEventDTO
-        let componentIdArg = args[1] as! String
         do {
-          try api.onPaymentsDetailsResult(paymentsDetailsResult: paymentsDetailsResultArg, componentId: componentIdArg)
+          try api.onPaymentsDetailsResult(paymentsDetailsResult: paymentsDetailsResultArg)
           reply(wrapResult(nil))
         } catch {
           reply(wrapError(error))

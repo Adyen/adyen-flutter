@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:adyen_checkout/adyen_checkout.dart';
 import 'package:adyen_checkout/src/components/google_pay/google_pay_advanced_component.dart';
 import 'package:adyen_checkout/src/components/google_pay/google_pay_session_component.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:pay/pay.dart' as google_pay_sdk;
 
@@ -30,10 +31,16 @@ class AdyenGooglePayComponent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return switch (checkout) {
-      SessionCheckout() => _buildGooglePaySessionFlowWidget(),
-      AdvancedCheckout() => _buildGooglePayAdvancedFlowWidget(),
-    };
+    switch (defaultTargetPlatform) {
+      case TargetPlatform.android:
+        return switch (checkout) {
+          SessionCheckout() => _buildGooglePaySessionFlowWidget(),
+          AdvancedCheckout() => _buildGooglePayAdvancedFlowWidget(),
+        };
+      default:
+        throw Exception(
+            "The Google Pay component is not supported on $defaultTargetPlatform");
+    }
   }
 
   Widget _buildGooglePaySessionFlowWidget() {

@@ -18,7 +18,7 @@ class GooglePayAdvancedComponent(
     private val componentFlutterApi: ComponentFlutterInterface,
     private val googlePayConfiguration: GooglePayConfiguration,
     override val componentId: String,
-) : BaseGooglePayComponent(activity, componentId) {
+) : BaseGooglePayComponent(activity) {
     init {
         addActionListener()
         addResultListener()

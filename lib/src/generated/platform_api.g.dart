@@ -1640,7 +1640,7 @@ class ComponentPlatformInterface {
     }
   }
 
-  Future<void> onPaymentsResult(PaymentEventDTO paymentsResult, String componentId) async {
+  Future<void> onPaymentsResult(PaymentEventDTO paymentsResult) async {
     const String __pigeon_channelName = 'dev.flutter.pigeon.adyen_checkout.ComponentPlatformInterface.onPaymentsResult';
     final BasicMessageChannel<Object?> __pigeon_channel = BasicMessageChannel<Object?>(
       __pigeon_channelName,
@@ -1648,7 +1648,7 @@ class ComponentPlatformInterface {
       binaryMessenger: __pigeon_binaryMessenger,
     );
     final List<Object?>? __pigeon_replyList =
-        await __pigeon_channel.send(<Object?>[paymentsResult, componentId]) as List<Object?>?;
+        await __pigeon_channel.send(<Object?>[paymentsResult]) as List<Object?>?;
     if (__pigeon_replyList == null) {
       throw _createConnectionError(__pigeon_channelName);
     } else if (__pigeon_replyList.length > 1) {
@@ -1662,7 +1662,7 @@ class ComponentPlatformInterface {
     }
   }
 
-  Future<void> onPaymentsDetailsResult(PaymentEventDTO paymentsDetailsResult, String componentId) async {
+  Future<void> onPaymentsDetailsResult(PaymentEventDTO paymentsDetailsResult) async {
     const String __pigeon_channelName = 'dev.flutter.pigeon.adyen_checkout.ComponentPlatformInterface.onPaymentsDetailsResult';
     final BasicMessageChannel<Object?> __pigeon_channel = BasicMessageChannel<Object?>(
       __pigeon_channelName,
@@ -1670,7 +1670,7 @@ class ComponentPlatformInterface {
       binaryMessenger: __pigeon_binaryMessenger,
     );
     final List<Object?>? __pigeon_replyList =
-        await __pigeon_channel.send(<Object?>[paymentsDetailsResult, componentId]) as List<Object?>?;
+        await __pigeon_channel.send(<Object?>[paymentsDetailsResult]) as List<Object?>?;
     if (__pigeon_replyList == null) {
       throw _createConnectionError(__pigeon_channelName);
     } else if (__pigeon_replyList.length > 1) {
