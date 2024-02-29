@@ -20,7 +20,7 @@ import com.adyen.checkout.flutter.components.ComponentActionMessenger
 import com.adyen.checkout.flutter.components.ComponentErrorMessenger
 import com.adyen.checkout.flutter.components.ComponentHeightMessenger
 import com.adyen.checkout.flutter.components.ComponentResultMessenger
-import com.adyen.checkout.flutter.components.ComponentWrapperView
+import com.adyen.checkout.flutter.components.view.ComponentWrapperView
 import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToAnalyticsConfiguration
 import com.adyen.checkout.flutter.utils.ConfigurationMapper.toNativeModel
 import com.adyen.checkout.redirect.RedirectComponent
@@ -50,7 +50,7 @@ abstract class BaseCardComponent(
             configuration.amount.toNativeModel(),
         )
 
-    lateinit var cardComponent: CardComponent
+    internal var cardComponent: CardComponent? = null
 
     init {
         activity.addOnNewIntentListener(intentListener)
@@ -71,6 +71,7 @@ abstract class BaseCardComponent(
         ComponentActionMessenger.instance().removeObservers(activity)
         ComponentResultMessenger.instance().removeObservers(activity)
         ComponentErrorMessenger.instance().removeObservers(activity)
+        cardComponent = null
     }
 
     fun addComponent(
@@ -81,8 +82,11 @@ abstract class BaseCardComponent(
     }
 
     private fun handleIntent(intent: Intent) {
-        if (intent.data?.toString().orEmpty().startsWith(RedirectComponent.REDIRECT_RESULT_SCHEME)) {
-            cardComponent.handleIntent(intent)
+        if (intent.data != null &&
+            intent.data?.toString().orEmpty()
+                .startsWith(RedirectComponent.REDIRECT_RESULT_SCHEME)
+        ) {
+            cardComponent?.handleIntent(intent)
         }
     }
 

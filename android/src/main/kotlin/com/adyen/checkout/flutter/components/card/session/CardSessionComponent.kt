@@ -37,8 +37,10 @@ class CardSessionComponent(
         val sessionSetupResponse = SessionSetupResponse.SERIALIZER.deserialize(sessionHolder.sessionSetupResponse)
         val order = sessionHolder.orderResponse?.let { Order.SERIALIZER.deserialize(it) }
         val checkoutSession = CheckoutSession(sessionSetupResponse = sessionSetupResponse, order = order)
-        cardComponent = createCardComponent(checkoutSession)
-        addComponent(cardComponent, componentId)
+        cardComponent =
+            createCardComponent(checkoutSession).apply {
+                addComponent(this, componentId)
+            }
     }
 
     private fun createCardComponent(checkoutSession: CheckoutSession): CardComponent {
@@ -94,7 +96,7 @@ class CardSessionComponent(
             )
     }
 
-    private fun onAction(action: Action) = cardComponent.handleAction(action, activity)
+    private fun onAction(action: Action) = cardComponent?.handleAction(action, activity)
 
     private fun determineCardPaymentMethod(paymentMethodJson: JSONObject): PaymentMethod {
         return if (paymentMethodJson.length() > 0) {

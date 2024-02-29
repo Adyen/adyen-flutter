@@ -2,6 +2,13 @@ import 'package:adyen_checkout/src/logging/adyen_logger.dart';
 import 'package:flutter/services.dart';
 
 class SdkVersionNumberProvider {
+  static SdkVersionNumberProvider? _instance;
+
+  SdkVersionNumberProvider._init();
+
+  static SdkVersionNumberProvider get instance =>
+      _instance ??= SdkVersionNumberProvider._init();
+
   Future<String> getSdkVersionNumber() async {
     try {
       final pubspecContent =

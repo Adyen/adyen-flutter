@@ -8,57 +8,54 @@ import 'package:adyen_checkout_example/repositories/adyen_google_pay_component_r
 import 'package:adyen_checkout_example/screens/component/card/card_component_screen.dart';
 import 'package:adyen_checkout_example/screens/component/google_pay/google_pay_component_screen.dart';
 import 'package:adyen_checkout_example/screens/drop_in/drop_in_screen.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
 void main() {
+  final service = Service();
+  final dropInScreen = DropInScreen(
+    repository: AdyenDropInRepository(service: service),
+  );
+  final cardComponentScreen = CardComponentScreen(
+    repository: AdyenCardComponentRepository(service: service),
+  );
+  final googlePayComponentScreen = GooglePayComponentScreen(
+    repository: AdyenGooglePayComponentRepository(service: service),
+  );
+
   runApp(MaterialApp(
-      localizationsDelegates: const [
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [
-        Locale('en'), // English
-        Locale('ar'), // Arabic
-      ],
-      theme: ThemeData(
-          useMaterial3: true,
-          bottomSheetTheme: const BottomSheetThemeData(
-            surfaceTintColor: Colors.white,
-            backgroundColor: Colors.white,
-          )),
-      home: const MyApp()));
+    localizationsDelegates: const [
+      GlobalMaterialLocalizations.delegate,
+      GlobalWidgetsLocalizations.delegate,
+      GlobalCupertinoLocalizations.delegate,
+    ],
+    supportedLocales: const [
+      Locale('en'), // English
+      Locale('ar'), // Arabic
+    ],
+    theme: ThemeData(
+        useMaterial3: true,
+        bottomSheetTheme: const BottomSheetThemeData(
+          surfaceTintColor: Colors.white,
+          backgroundColor: Colors.white,
+        )),
+    routes: {
+      '/': (context) => const MyApp(),
+      '/dropInScreen': (context) => dropInScreen,
+      '/cardComponentScreen': (context) => cardComponentScreen,
+      '/googlePay': (context) => googlePayComponentScreen
+    },
+    initialRoute: "/",
+  ));
 }
 
-class MyApp extends StatefulWidget {
+class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
   @override
-  State<MyApp> createState() => _MyAppState();
-}
-
-class _MyAppState extends State<MyApp> {
-  final _service = Service();
-  late AdyenDropInRepository _adyenDropInRepository;
-  late AdyenCardComponentRepository _adyenCardComponentRepository;
-
-  @override
-  void initState() {
-    super.initState();
-    _initRepositories();
-    AdyenCheckout.instance.enableConsoleLogging(enabled: false);
-  }
-
-  void _initRepositories() {
-    _adyenDropInRepository = AdyenDropInRepository(service: _service);
-    _adyenCardComponentRepository =
-        AdyenCardComponentRepository(service: _service);
-  }
-
-  @override
   Widget build(BuildContext context) {
+    AdyenCheckout.instance.enableConsoleLogging(enabled: false);
+
     return Scaffold(
       appBar: AppBar(
         title: const Center(child: Text('Checkout example app')),
@@ -68,48 +65,22 @@ class _MyAppState extends State<MyApp> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             TextButton(
-                onPressed: () => Navigator.push(context, _buildDropInRoute()),
+                onPressed: () => Navigator.pushNamed(context, "/dropInScreen"),
                 child: const Text("Drop-in")),
             TextButton(
                 onPressed: () =>
-                    Navigator.push(context, _buildCardComponentRoute()),
+                    Navigator.pushNamed(context, "/cardComponentScreen"),
                 child: const Text("Card component")),
-            TextButton(
-                onPressed: () => Navigator.push(
-                    context, _buildGoogleOrApplePayComponentRoute()),
-                child: const Text("Google and Apple pay component")),
+            _buildGoogleOrApplePayComponent(context),
           ],
         ),
       ),
     );
   }
 
-  MaterialPageRoute<dynamic> _buildDropInRoute() {
-    return MaterialPageRoute(
-      builder: (context) => DropInScreen(repository: _adyenDropInRepository),
-    );
-  }
-
-  MaterialPageRoute<dynamic> _buildCardComponentRoute() {
-    return MaterialPageRoute(
-      builder: (context) => CardComponentScreen(
-        repository: _adyenCardComponentRepository,
-      ),
-    );
-  }
-
-  MaterialPageRoute<dynamic> _buildGoogleOrApplePayComponentRoute() {
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.android:
-        return MaterialPageRoute(
-          builder: (context) => GooglePayComponentScreen(
-            repository: AdyenGooglePayComponentRepository(service: _service),
-          ),
-        );
-      case TargetPlatform.iOS:
-      //TODO Add implementation
-      default:
-        throw UnsupportedError('Unsupported platform');
-    }
+  Widget _buildGoogleOrApplePayComponent(BuildContext context) {
+    return TextButton(
+        onPressed: () => Navigator.pushNamed(context, "/googlePay"),
+        child: const Text("Google pay component"));
   }
 }

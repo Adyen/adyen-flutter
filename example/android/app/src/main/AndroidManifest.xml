@@ -46,7 +46,7 @@
 
                 <data
                     android:host="${applicationId}"
-                    android:path="/googlepay"
+                    android:path="/googlePay"
                     android:scheme="adyencheckout" />
             </intent-filter>
         </activity>

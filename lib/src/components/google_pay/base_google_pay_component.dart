@@ -1,0 +1,187 @@
+import 'dart:async';
+
+import 'package:adyen_checkout/src/common/model/payment_result.dart';
+import 'package:adyen_checkout/src/components/component_flutter_api.dart';
+import 'package:adyen_checkout/src/components/component_platform_api.dart';
+import 'package:adyen_checkout/src/components/google_pay/model/google_pay_component_configuration.dart';
+import 'package:adyen_checkout/src/generated/platform_api.g.dart';
+import 'package:adyen_checkout/src/logging/adyen_logger.dart';
+import 'package:adyen_checkout/src/util/dto_mapper.dart';
+import 'package:adyen_checkout/src/util/sdk_version_number_provider.dart';
+import 'package:flutter/material.dart';
+import 'package:pay/pay.dart';
+
+abstract class BaseGooglePayComponent extends StatefulWidget {
+  final String googlePayPaymentMethod;
+  final GooglePayComponentConfiguration googlePayComponentConfiguration;
+  final Function(PaymentResult) onPaymentResult;
+  final GooglePayButtonTheme theme;
+  final GooglePayButtonType type;
+  final int cornerRadius;
+  final double width;
+  final double height;
+  final Function()? onUnavailable;
+  final Widget? unavailableWidget;
+  final Widget? loadingIndicator;
+  abstract final String componentId;
+  final ValueNotifier<bool> isButtonClickable = ValueNotifier<bool>(true);
+  final ValueNotifier<bool> isLoading = ValueNotifier<bool>(false);
+  final SdkVersionNumberProvider _sdkVersionNumberProvider =
+      SdkVersionNumberProvider.instance;
+  final ComponentFlutterApi componentFlutterApi = ComponentFlutterApi.instance;
+  final ComponentPlatformApi componentPlatformApi =
+      ComponentPlatformApi.instance;
+  final AdyenLogger adyenLogger;
+
+  BaseGooglePayComponent({
+    super.key,
+    required this.googlePayPaymentMethod,
+    required this.googlePayComponentConfiguration,
+    required this.onPaymentResult,
+    required this.theme,
+    required this.type,
+    required this.cornerRadius,
+    required this.width,
+    required this.height,
+    this.onUnavailable,
+    this.unavailableWidget,
+    this.loadingIndicator,
+    AdyenLogger? adyenLogger,
+  }) : adyenLogger = adyenLogger ?? AdyenLogger.instance;
+
+  void handleComponentCommunication(ComponentCommunicationModel event);
+
+  @override
+  State<BaseGooglePayComponent> createState() => _BaseGooglePayComponentState();
+}
+
+class _BaseGooglePayComponentState extends State<BaseGooglePayComponent> {
+  @override
+  void initState() {
+    widget.componentFlutterApi.componentCommunicationStream.stream
+        .where((communicationModel) =>
+            communicationModel.componentId == widget.componentId)
+        .listen(widget.handleComponentCommunication);
+
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder(
+      future: _isGooglePaySupported(),
+      builder: (
+        BuildContext context,
+        AsyncSnapshot<InstantPaymentSetupResultDTO> snapshot,
+      ) {
+        if (snapshot.connectionState == ConnectionState.done) {
+          if (_isGooglePaySupportedOnDevice(snapshot)) {
+            return _buildGooglePayOrLoadingContainer(snapshot);
+          } else {
+            widget.adyenLogger
+                .print("Google pay is not available on this device.");
+            widget.onUnavailable?.call();
+            return widget.unavailableWidget ?? const SizedBox.shrink();
+          }
+        }
+
+        return widget.loadingIndicator ?? const SizedBox.shrink();
+      },
+    );
+  }
+
+  @override
+  void dispose() {
+    widget.componentPlatformApi.onDispose(widget.componentId);
+    widget.componentFlutterApi.dispose();
+    widget.isButtonClickable.dispose();
+    widget.isLoading.dispose();
+    super.dispose();
+  }
+
+  bool _isGooglePaySupportedOnDevice(
+      AsyncSnapshot<InstantPaymentSetupResultDTO> snapshot) {
+    return snapshot.data?.instantPaymentType == InstantPaymentType.googlePay &&
+        snapshot.data?.isSupported == true;
+  }
+
+  Widget _buildGooglePayOrLoadingContainer(
+      AsyncSnapshot<InstantPaymentSetupResultDTO> snapshot) {
+    return ValueListenableBuilder(
+      valueListenable: widget.isLoading,
+      builder: (BuildContext context, value, Widget? child) {
+        if (value == true) {
+          return widget.loadingIndicator ?? const SizedBox.shrink();
+        } else {
+          return _buildGooglePayButton(snapshot);
+        }
+      },
+    );
+  }
+
+  SizedBox _buildGooglePayButton(
+      AsyncSnapshot<InstantPaymentSetupResultDTO> snapshot) {
+    final String allowedPaymentMethods =
+        snapshot.data?.resultData.toString() ?? "[]";
+    final Widget googlePayButton =
+        _buildRawGooglePayButton(PaymentConfiguration.fromJsonString(
+      '''{
+        "provider": "google_pay",
+        "data": {
+          "apiVersion": 2,
+          "apiVersionMinor": 0,
+          "allowedPaymentMethods": $allowedPaymentMethods
+        }}''',
+    ));
+
+    return SizedBox(
+      width: widget.width,
+      height: widget.height,
+      child: ValueListenableBuilder(
+        valueListenable: widget.isButtonClickable,
+        builder: (BuildContext context, value, Widget? child) {
+          return IgnorePointer(
+            ignoring: value == false,
+            child: googlePayButton,
+          );
+        },
+      ),
+    );
+  }
+
+  RawGooglePayButton _buildRawGooglePayButton(
+      PaymentConfiguration paymentConfiguration) {
+    return RawGooglePayButton(
+      paymentConfiguration: paymentConfiguration,
+      onPressed: onPressed,
+      cornerRadius: widget.cornerRadius,
+      theme: widget.theme,
+      type: widget.type,
+    );
+  }
+
+  void onPressed() {
+    widget.isButtonClickable.value = false;
+    widget.componentPlatformApi.onInstantPaymentPressed(
+      InstantPaymentType.googlePay,
+      widget.componentId,
+    );
+  }
+
+  Future<InstantPaymentSetupResultDTO> _isGooglePaySupported() async {
+    final String versionNumber =
+        await widget._sdkVersionNumberProvider.getSdkVersionNumber();
+    final InstantPaymentConfigurationDTO
+        instantPaymentComponentConfigurationDTO =
+        widget.googlePayComponentConfiguration.toDTO(
+      versionNumber,
+      InstantPaymentType.googlePay,
+    );
+    return await widget.componentPlatformApi
+        .isInstantPaymentSupportedByPlatform(
+      instantPaymentComponentConfigurationDTO,
+      widget.googlePayPaymentMethod,
+      widget.componentId,
+    );
+  }
+}

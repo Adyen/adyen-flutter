@@ -16,12 +16,16 @@ class ComponentPlatformApi implements ComponentPlatformInterface {
       _componentPlatformInterface.updateViewHeight(viewId);
 
   @override
-  Future<void> onPaymentsResult(PaymentEventDTO paymentEventDTO) async {
+  Future<void> onPaymentsResult(
+    PaymentEventDTO paymentEventDTO,
+  ) async {
     _componentPlatformInterface.onPaymentsResult(paymentEventDTO);
   }
 
   @override
-  Future<void> onPaymentsDetailsResult(PaymentEventDTO paymentEventDTO) async =>
+  Future<void> onPaymentsDetailsResult(
+    PaymentEventDTO paymentEventDTO,
+  ) async =>
       _componentPlatformInterface.onPaymentsDetailsResult(paymentEventDTO);
 
   @override
@@ -37,9 +41,16 @@ class ComponentPlatformApi implements ComponentPlatformInterface {
       );
 
   @override
-  Future<void> onInstantPaymentPressed(InstantPaymentType instantPaymentType) =>
-      _componentPlatformInterface.onInstantPaymentPressed(instantPaymentType);
+  Future<void> onInstantPaymentPressed(
+    InstantPaymentType instantPaymentType,
+    String componentId,
+  ) async =>
+      _componentPlatformInterface.onInstantPaymentPressed(
+        instantPaymentType,
+        componentId,
+      );
 
   @override
-  Future<void> onDispose() => _componentPlatformInterface.onDispose();
+  Future<void> onDispose(String componentId) async =>
+      _componentPlatformInterface.onDispose(componentId);
 }

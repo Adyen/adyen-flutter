@@ -145,9 +145,10 @@ enum class PlatformCommunicationType(val raw: Int) {
 enum class ComponentCommunicationType(val raw: Int) {
   ONSUBMIT(0),
   ADDITIONALDETAILS(1),
-  RESULT(2),
-  ERROR(3),
-  RESIZE(4);
+  LOADING(2),
+  RESULT(3),
+  ERROR(4),
+  RESIZE(5);
 
   companion object {
     fun ofRaw(raw: Int): ComponentCommunicationType? {
@@ -1649,8 +1650,8 @@ interface ComponentPlatformInterface {
   fun onPaymentsResult(paymentsResult: PaymentEventDTO)
   fun onPaymentsDetailsResult(paymentsDetailsResult: PaymentEventDTO)
   fun isInstantPaymentSupportedByPlatform(instantPaymentConfigurationDTO: InstantPaymentConfigurationDTO, paymentMethodResponse: String, componentId: String, callback: (Result<InstantPaymentSetupResultDTO>) -> Unit)
-  fun onInstantPaymentPressed(instantPaymentType: InstantPaymentType)
-  fun onDispose()
+  fun onInstantPaymentPressed(instantPaymentType: InstantPaymentType, componentId: String)
+  fun onDispose(componentId: String)
 
   companion object {
     /** The codec used by ComponentPlatformInterface. */
@@ -1745,9 +1746,10 @@ interface ComponentPlatformInterface {
           channel.setMessageHandler { message, reply ->
             val args = message as List<Any?>
             val instantPaymentTypeArg = InstantPaymentType.ofRaw(args[0] as Int)!!
+            val componentIdArg = args[1] as String
             var wrapped: List<Any?>
             try {
-              api.onInstantPaymentPressed(instantPaymentTypeArg)
+              api.onInstantPaymentPressed(instantPaymentTypeArg, componentIdArg)
               wrapped = listOf<Any?>(null)
             } catch (exception: Throwable) {
               wrapped = wrapError(exception)
@@ -1761,10 +1763,12 @@ interface ComponentPlatformInterface {
       run {
         val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.adyen_checkout.ComponentPlatformInterface.onDispose", codec)
         if (api != null) {
-          channel.setMessageHandler { _, reply ->
+          channel.setMessageHandler { message, reply ->
+            val args = message as List<Any?>
+            val componentIdArg = args[0] as String
             var wrapped: List<Any?>
             try {
-              api.onDispose()
+              api.onDispose(componentIdArg)
               wrapped = listOf<Any?>(null)
             } catch (exception: Throwable) {
               wrapped = wrapError(exception)

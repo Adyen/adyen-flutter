@@ -63,6 +63,7 @@ enum PlatformCommunicationType {
 enum ComponentCommunicationType {
   onSubmit,
   additionalDetails,
+  loading,
   result,
   error,
   resize,
@@ -477,9 +478,12 @@ abstract class ComponentPlatformInterface {
     String componentId,
   );
 
-  void onInstantPaymentPressed(InstantPaymentType instantPaymentType);
+  void onInstantPaymentPressed(
+    InstantPaymentType instantPaymentType,
+    String componentId,
+  );
 
-  void onDispose();
+  void onDispose(String componentId);
 }
 
 @FlutterApi()

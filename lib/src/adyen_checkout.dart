@@ -17,7 +17,7 @@ class AdyenCheckout implements AdyenCheckoutInterface {
   static AdyenCheckoutAdvanced? _advanced;
   static final AdyenCheckoutApi _adyenCheckoutApi = AdyenCheckoutApi();
   static final DropIn _dropIn = DropIn(
-    SdkVersionNumberProvider(),
+    SdkVersionNumberProvider.instance,
     DropInFlutterApi(),
     DropInPlatformApi(),
   );

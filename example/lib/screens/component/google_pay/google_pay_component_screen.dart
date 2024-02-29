@@ -21,22 +21,27 @@ class GooglePayComponentScreen extends StatelessWidget {
       backgroundColor: Colors.white,
       appBar: AppBar(title: const Text('Adyen google pay component')),
       body: SafeArea(
-        child: Center(
-          child: _buildAdyenGooglePayComponent(),
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              const SizedBox(height: 40),
+              _buildAdyenGooglePaySessionComponent(),
+              const SizedBox(height: 80),
+              _buildAdyenGooglePayAdvancedComponent(),
+            ],
+          ),
         ),
       ),
     );
   }
 
-  Widget _buildAdyenGooglePayComponent() {
+  Widget _buildAdyenGooglePaySessionComponent() {
     return FutureBuilder<SessionCheckout>(
       future: repository.createSessionCheckout(),
       builder: (BuildContext context, AsyncSnapshot<SessionCheckout> snapshot) {
         if (snapshot.hasData) {
-          AdyenCheckout.instance.enableConsoleLogging(enabled: true);
-
           final SessionCheckout sessionCheckout = snapshot.data!;
-
           final GooglePayComponentConfiguration
               googlePayComponentConfiguration = GooglePayComponentConfiguration(
             environment: Environment.test,
@@ -63,20 +68,71 @@ class GooglePayComponentScreen extends StatelessWidget {
                 configuration: googlePayComponentConfiguration,
                 paymentMethod: paymentMethod,
                 checkout: sessionCheckout,
-                type: GooglePayButtonType.plain,
                 loadingIndicator: const CircularProgressIndicator(),
                 onPaymentResult: (paymentResult) {
                   Navigator.pop(context);
                   _dialogBuilder(paymentResult, context);
                 },
-                onSetupError: () {},
               ),
-              const SizedBox(height: 80),
+            ],
+          );
+        } else {
+          return const SizedBox.shrink();
+        }
+      },
+    );
+  }
+
+  Widget _buildAdyenGooglePayAdvancedComponent() {
+    return FutureBuilder<String>(
+      future: repository.fetchPaymentMethods(),
+      builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
+        if (snapshot.hasData) {
+          final AdvancedCheckout advancedCheckout = AdvancedCheckout(
+            onSubmit: repository.onSubmit,
+            onAdditionalDetails: repository.onAdditionalDetails,
+          );
+
+          final GooglePayComponentConfiguration
+              googlePayComponentConfiguration = GooglePayComponentConfiguration(
+            environment: Environment.test,
+            clientKey: Config.clientKey,
+            countryCode: Config.countryCode,
+            amount: Config.amount,
+            googlePayConfiguration: const GooglePayConfiguration(
+              googlePayEnvironment: Config.googlePayEnvironment,
+            ),
+          );
+
+          final GooglePayButtonStyle googlePayButtonStyle =
+              GooglePayButtonStyle(
+            theme: GooglePayButtonTheme.light,
+            type: GooglePayButtonType.buy,
+            width: 250,
+            cornerRadius: 4,
+          );
+
+          final paymentMethod = _extractPaymentMethod(snapshot.data!);
+
+          return Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
               const Text(
                 style: TextStyle(fontSize: 20),
                 "Advanced flow",
               ),
               const SizedBox(height: 8),
+              AdyenGooglePayComponent(
+                configuration: googlePayComponentConfiguration,
+                paymentMethod: paymentMethod,
+                checkout: advancedCheckout,
+                style: googlePayButtonStyle,
+                loadingIndicator: const CircularProgressIndicator(),
+                onPaymentResult: (paymentResult) {
+                  Navigator.pop(context);
+                  _dialogBuilder(paymentResult, context);
+                },
+              ),
             ],
           );
         } else {

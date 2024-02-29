@@ -24,11 +24,11 @@ class ComponentPlatformApi: ComponentPlatformInterface {
 
     }
 
-    func onInstantPaymentPressed(instantPaymentType: InstantPaymentType) throws {
+    func onInstantPaymentPressed(instantPaymentType: InstantPaymentType, componentId: String) throws {
 
     }
 
-    func onDispose() throws {
+    func onDispose(componentId : String) throws {
 
     }
 

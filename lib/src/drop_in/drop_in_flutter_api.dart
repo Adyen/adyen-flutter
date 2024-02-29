@@ -13,7 +13,6 @@ class DropInFlutterApi implements DropInFlutterInterface {
       dropInSessionPlatformCommunicationStream.sink.add(data);
 
   @override
-  void onDropInAdvancedPlatformCommunication(
-          PlatformCommunicationModel data) =>
+  void onDropInAdvancedPlatformCommunication(PlatformCommunicationModel data) =>
       dropInAdvancedFlowPlatformCommunicationStream.sink.add(data);
 }
