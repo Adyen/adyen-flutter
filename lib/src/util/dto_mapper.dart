@@ -166,3 +166,20 @@ extension ShippingAddressParametersMapper on ShippingAddressParameters {
     );
   }
 }
+
+extension ApplePayComponentConfigurationMapper
+    on ApplePayComponentConfiguration {
+  InstantPaymentConfigurationDTO toDTO(
+    String sdkVersionNumber,
+    InstantPaymentType instantPaymentType,
+  ) =>
+      InstantPaymentConfigurationDTO(
+        instantPaymentType: instantPaymentType,
+        environment: environment,
+        clientKey: clientKey,
+        countryCode: countryCode,
+        amount: amount.toDTO(),
+        analyticsOptionsDTO: analyticsOptions.toDTO(sdkVersionNumber),
+        applePayConfigurationDTO: applePayConfiguration.toDTO(),
+      );
+}

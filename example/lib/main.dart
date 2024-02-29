@@ -5,9 +5,11 @@ import 'package:adyen_checkout_example/network/service.dart';
 import 'package:adyen_checkout_example/repositories/adyen_card_component_repository.dart';
 import 'package:adyen_checkout_example/repositories/adyen_drop_in_repository.dart';
 import 'package:adyen_checkout_example/repositories/adyen_google_pay_component_repository.dart';
+import 'package:adyen_checkout_example/screens/component/apple_pay/apple_pay_component_screen.dart';
 import 'package:adyen_checkout_example/screens/component/card/card_component_screen.dart';
 import 'package:adyen_checkout_example/screens/component/google_pay/google_pay_component_screen.dart';
 import 'package:adyen_checkout_example/screens/drop_in/drop_in_screen.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
@@ -20,6 +22,9 @@ void main() {
     repository: AdyenCardComponentRepository(service: service),
   );
   final googlePayComponentScreen = GooglePayComponentScreen(
+    repository: AdyenGooglePayComponentRepository(service: service),
+  );
+  final applePayComponentScreen = ApplePayComponentScreen(
     repository: AdyenGooglePayComponentRepository(service: service),
   );
 
@@ -43,7 +48,8 @@ void main() {
       '/': (context) => const MyApp(),
       '/dropInScreen': (context) => dropInScreen,
       '/cardComponentScreen': (context) => cardComponentScreen,
-      '/googlePay': (context) => googlePayComponentScreen
+      '/googlePay': (context) => googlePayComponentScreen,
+      '/applePay': (context) => applePayComponentScreen
     },
     initialRoute: "/",
   ));
@@ -79,8 +85,17 @@ class MyApp extends StatelessWidget {
   }
 
   Widget _buildGoogleOrApplePayComponent(BuildContext context) {
-    return TextButton(
-        onPressed: () => Navigator.pushNamed(context, "/googlePay"),
-        child: const Text("Google pay component"));
+    switch (defaultTargetPlatform) {
+      case TargetPlatform.android:
+        return TextButton(
+            onPressed: () => Navigator.pushNamed(context, "/googlePay"),
+            child: const Text("Google pay component"));
+      case TargetPlatform.iOS:
+        return TextButton(
+            onPressed: () => Navigator.pushNamed(context, "/applePay"),
+            child: const Text("Apple pay component"));
+      default:
+        return const SizedBox.shrink();
+    }
   }
 }

@@ -13,6 +13,11 @@ export 'src/common/model/payment_method_configurations/google_pay_configuration.
 export 'src/common/model/payment_result.dart';
 export 'src/common/model/shipping_address_parameters.dart';
 export 'src/common/model/stored_payment_method_configuration.dart';
+export 'src/components/apple_pay/adyen_apple_pay_component.dart';
+export 'src/components/apple_pay/model/apple_pay_button_style.dart';
+export 'src/components/apple_pay/model/apple_pay_button_theme.dart';
+export 'src/components/apple_pay/model/apple_pay_button_type.dart';
+export 'src/components/apple_pay/model/apple_pay_component_configuration.dart';
 export 'src/components/card/adyen_card_component.dart';
 export 'src/components/card/model/card_component_configuration.dart';
 export 'src/components/google_pay/adyen_google_pay_component.dart';
