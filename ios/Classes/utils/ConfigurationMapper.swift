@@ -240,3 +240,9 @@ extension AmountDTO {
         Adyen.Amount(value: Int(value), currencyCode: currency)
     }
 }
+
+extension InstantPaymentConfigurationDTO {
+    func mapToApplePayConfiguration() -> ApplePayComponent.Configuration {
+        
+    }
+}
