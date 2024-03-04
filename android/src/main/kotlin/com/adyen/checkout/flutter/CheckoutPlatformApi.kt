@@ -3,6 +3,7 @@ package com.adyen.checkout.flutter
 import CardComponentConfigurationDTO
 import CheckoutPlatformInterface
 import DropInConfigurationDTO
+import InstantPaymentConfigurationDTO
 import SessionDTO
 import android.annotation.SuppressLint
 import android.util.Log
@@ -16,6 +17,7 @@ import com.adyen.checkout.core.internal.util.Logger.NONE
 import com.adyen.checkout.flutter.session.SessionHolder
 import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToAnalyticsConfiguration
 import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToDropInConfiguration
+import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToGooglePayConfiguration
 import com.adyen.checkout.flutter.utils.ConfigurationMapper.toNativeModel
 import com.adyen.checkout.redirect.RedirectComponent
 import com.adyen.checkout.sessions.core.CheckoutSessionProvider
@@ -57,6 +59,10 @@ class CheckoutPlatformApi(
 
     private fun determineSessionConfiguration(configuration: Any?): Configuration? {
         when (configuration) {
+            is DropInConfigurationDTO -> {
+                return configuration.mapToDropInConfiguration(activity)
+            }
+
             is CardComponentConfigurationDTO -> {
                 return configuration.cardConfiguration.toNativeModel(
                     activity,
@@ -68,8 +74,11 @@ class CheckoutPlatformApi(
                 )
             }
 
-            is DropInConfigurationDTO -> {
-                return configuration.mapToDropInConfiguration(activity)
+            is InstantPaymentConfigurationDTO -> {
+                when (configuration.instantPaymentType) {
+                    InstantPaymentType.GOOGLEPAY -> return configuration.mapToGooglePayConfiguration(activity)
+                    InstantPaymentType.APPLEPAY -> null
+                }
             }
         }
 
