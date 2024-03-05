@@ -12,6 +12,7 @@ class CardSessionComponent: BaseCardComponent {
         arguments: NSDictionary,
         binaryMessenger: FlutterBinaryMessenger,
         componentFlutterApi: ComponentFlutterInterface,
+        componentPlatformApi: ComponentPlatformApi,
         sessionHolder: SessionHolder
     ) {
         self.sessionHolder = sessionHolder
@@ -20,7 +21,8 @@ class CardSessionComponent: BaseCardComponent {
             viewIdentifier: viewIdentifier,
             arguments: arguments,
             binaryMessenger: binaryMessenger,
-            componentFlutterApi: componentFlutterApi
+            componentFlutterApi: componentFlutterApi,
+            componentPlatformApi: componentPlatformApi
         )
 
         setupCardComponentView()

@@ -1,8 +1,8 @@
 import Adyen
 
-class CardPresentationDelegate: PresentationDelegate {
+class ComponentPresentationDelegate: PresentationDelegate {
     let topViewController: UIViewController?
-    var cardComponent: PresentableComponent?
+    var presentableComponent: PresentableComponent?
 
     init(topViewController: UIViewController?) {
         self.topViewController = topViewController
@@ -10,7 +10,7 @@ class CardPresentationDelegate: PresentationDelegate {
 
     func present(component: PresentableComponent) {
         let componentViewController = viewController(for: component)
-        cardComponent = component
+        presentableComponent = component
         topViewController?.present(componentViewController, animated: true, completion: nil)
     }
 
@@ -27,6 +27,6 @@ class CardPresentationDelegate: PresentationDelegate {
     }
 
     @objc private func cancelPressed() {
-        cardComponent?.cancelIfNeeded()
+        presentableComponent?.cancelIfNeeded()
     }
 }

@@ -58,6 +58,11 @@ class AdyenCheckoutSession {
         sdkVersionNumber,
         InstantPaymentType.googlePay,
       );
+    } else if (configuration is ApplePayComponentConfiguration) {
+      return configuration.toDTO(
+        sdkVersionNumber,
+        InstantPaymentType.applePay,
+      );
     } else if (configuration is DropInConfiguration) {
       return configuration.toDTO(sdkVersionNumber);
     }

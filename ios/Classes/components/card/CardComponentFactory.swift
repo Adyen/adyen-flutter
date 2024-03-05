@@ -9,12 +9,17 @@ class CardComponentFactory: ComponentFactory {
     init(
         messenger: FlutterBinaryMessenger,
         componentFlutterApi: ComponentFlutterInterface,
+        componentPlatformApi: ComponentPlatformApi,
         viewTypeId: String,
         sessionHolder: SessionHolder? = nil
     ) {
         self.viewTypeId = viewTypeId
         self.sessionHolder = sessionHolder
-        super.init(messenger: messenger, componentFlutterApi: componentFlutterApi)
+        super.init(
+            messenger: messenger,
+            componentFlutterApi: componentFlutterApi,
+            componentPlatformApi: componentPlatformApi
+        )
     }
 
     override func create(
@@ -29,6 +34,7 @@ class CardComponentFactory: ComponentFactory {
                 arguments: args as? NSDictionary ?? [:],
                 binaryMessenger: messenger,
                 componentFlutterApi: componentFlutterApi,
+                componentPlatformApi: componentPlatformApi,
                 sessionHolder: sessionHolder!
             )
         } else {
@@ -36,8 +42,9 @@ class CardComponentFactory: ComponentFactory {
                 frame: frame,
                 viewIdentifier: viewId,
                 arguments: args as? NSDictionary ?? [:],
-                binaryMessenger: super.messenger,
-                componentFlutterApi: super.componentFlutterApi
+                binaryMessenger: messenger,
+                componentFlutterApi: componentFlutterApi,
+                componentPlatformApi: componentPlatformApi
             )
         }
     }

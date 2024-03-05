@@ -158,9 +158,6 @@ class _BaseApplePayComponentState extends State<BaseApplePayComponent> {
   }
 
   Future<InstantPaymentSetupResultDTO> _isApplePaySupported() async {
-    return InstantPaymentSetupResultDTO(
-        instantPaymentType: InstantPaymentType.applePay, isSupported: true);
-
     final String versionNumber =
         await widget._sdkVersionNumberProvider.getSdkVersionNumber();
     final InstantPaymentConfigurationDTO

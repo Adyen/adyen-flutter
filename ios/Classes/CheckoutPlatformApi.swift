@@ -36,6 +36,8 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
                 try createSessionForDropIn(dropInConfigurationDTO, sessionId, sessionData, completion)
             case let cardComponentConfigurationDTO as CardComponentConfigurationDTO:
                 try createSessionForCardComponent(cardComponentConfigurationDTO, sessionId, sessionData, completion)
+            case let instantComponentConfigurationDTO as InstantPaymentConfigurationDTO:
+                try createSessionForInstantPaymentConfiguration(instantComponentConfigurationDTO, sessionId, sessionData, completion)
             case .none, .some:
                 completion(Result.failure(PlatformError(errorDescription: "Configuration is not valid")))
             }
@@ -79,13 +81,32 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
     ) throws {
         let adyenContext = try configuration.createAdyenContext()
         let sessionDelegate = CardSessionFlowDelegate(componentFlutterApi: componentFlutterApi)
-        let sessionPresentationDelegate = CardPresentationDelegate(topViewController: getViewController())
+        let sessionPresentationDelegate = ComponentPresentationDelegate(topViewController: getViewController())
         requestAndSetSession(
             adyenContext,
             sessionId,
             sessionData,
             sessionDelegate,
             sessionPresentationDelegate,
+            completion
+        )
+    }
+    
+    private func createSessionForInstantPaymentConfiguration(
+        _ configuration: InstantPaymentConfigurationDTO,
+        _ sessionId: String,
+        _ sessionData: String,
+        _ completion: @escaping (Result<SessionDTO, Error>) -> Void
+    ) throws {
+        let adyenContext = try configuration.createAdyenContextt()
+        let sessionDelegate = ApplePaySessionDelegate(componentFlutterApi: componentFlutterApi, componentId: "APPLE_PAY_SESSION_COMPONENT")
+        let applePayPresentationDelegate = ComponentPresentationDelegate(topViewController: getViewController())
+        requestAndSetSession(
+            adyenContext,
+            sessionId,
+            sessionData,
+            sessionDelegate,
+            applePayPresentationDelegate,
             completion
         )
     }

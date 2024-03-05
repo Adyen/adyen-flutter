@@ -5,7 +5,7 @@ import 'package:adyen_checkout/src/logging/adyen_logger.dart';
 
 class ApplePaySessionComponent extends BaseApplePayComponent {
   @override
-  final String componentId = "Apple_PAY_SESSION_COMPONENT";
+  final String componentId = "APPLE_PAY_SESSION_COMPONENT";
 
   ApplePaySessionComponent({
     super.key,

@@ -4,16 +4,24 @@ import 'dart:convert';
 
 import 'package:adyen_checkout/adyen_checkout.dart';
 import 'package:adyen_checkout_example/config.dart';
-import 'package:adyen_checkout_example/repositories/adyen_google_pay_component_repository.dart';
+import 'package:adyen_checkout_example/repositories/adyen_apple_pay_component_repository.dart';
 import 'package:flutter/material.dart';
 
-class ApplePayComponentScreen extends StatelessWidget {
+class ApplePayComponentScreen extends StatefulWidget {
   const ApplePayComponentScreen({
     required this.repository,
     super.key,
   });
 
-  final AdyenGooglePayComponentRepository repository;
+  final AdyenApplePayComponentRepository repository;
+
+  @override
+  State<ApplePayComponentScreen> createState() =>
+      _ApplePayComponentScreenState();
+}
+
+class _ApplePayComponentScreenState extends State<ApplePayComponentScreen> {
+  bool _useSession = true;
 
   @override
   Widget build(BuildContext context) {
@@ -25,8 +33,11 @@ class ApplePayComponentScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              _buildSessionAdvancedFlowSwitch(_useSession),
               const SizedBox(height: 40),
-              _buildAdyenGooglePaySessionComponent(),
+              _useSession
+                  ? _buildAdyenApplePaySessionComponent()
+                  : const SizedBox.shrink(),
             ],
           ),
         ),
@@ -34,24 +45,44 @@ class ApplePayComponentScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildAdyenGooglePaySessionComponent() {
+  Widget _buildSessionAdvancedFlowSwitch(bool useSession) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.end,
+      children: [
+        const Text(
+          "Use session: ",
+          style: TextStyle(fontSize: 20),
+        ),
+        Switch(
+            value: useSession,
+            onChanged: (value) {
+              setState(() {
+                _useSession = value;
+              });
+            }),
+        const SizedBox(width: 32),
+      ],
+    );
+  }
+
+  Widget _buildAdyenApplePaySessionComponent() {
+    final ApplePayComponentConfiguration applePayComponentConfiguration =
+        ApplePayComponentConfiguration(
+      environment: Environment.test,
+      clientKey: Config.clientKey,
+      countryCode: Config.countryCode,
+      amount: Config.amount,
+      applePayConfiguration: const ApplePayConfiguration(
+        merchantId: Config.merchantId,
+        merchantName: Config.merchantName,
+      ),
+    );
+
     return FutureBuilder<SessionCheckout>(
-      future: repository.createSessionCheckout(),
+      future: widget.repository.createSessionCheckout(applePayComponentConfiguration),
       builder: (BuildContext context, AsyncSnapshot<SessionCheckout> snapshot) {
         if (snapshot.hasData) {
           final SessionCheckout sessionCheckout = snapshot.data!;
-          final ApplePayComponentConfiguration applePayComponentConfiguration =
-              ApplePayComponentConfiguration(
-            environment: Environment.test,
-            clientKey: Config.clientKey,
-            countryCode: Config.countryCode,
-            amount: Config.amount,
-            applePayConfiguration: const ApplePayConfiguration(
-              merchantId: Config.merchantId,
-              merchantName: Config.merchantName,
-            ),
-          );
-
           final paymentMethod =
               _extractPaymentMethod(sessionCheckout.paymentMethodsJson);
 

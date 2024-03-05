@@ -14,14 +14,16 @@ class CardAdvancedComponent: BaseCardComponent {
         viewIdentifier: Int64,
         arguments: NSDictionary,
         binaryMessenger: FlutterBinaryMessenger,
-        componentFlutterApi: ComponentFlutterInterface
+        componentFlutterApi: ComponentFlutterInterface,
+        componentPlatformApi: ComponentPlatformApi
     ) {
         super.init(
             frame: frame,
             viewIdentifier: viewIdentifier,
             arguments: arguments,
             binaryMessenger: binaryMessenger,
-            componentFlutterApi: componentFlutterApi
+            componentFlutterApi: componentFlutterApi,
+            componentPlatformApi: componentPlatformApi
         )
 
         actionComponentDelegate = CardAdvancedFlowActionComponentDelegate(
@@ -67,7 +69,7 @@ class CardAdvancedComponent: BaseCardComponent {
         let paymentMethod: AnyCardPaymentMethod = isStoredPaymentMethod
             ? try JSONDecoder().decode(StoredCardPaymentMethod.self, from: Data(paymentMethodString.utf8))
             : try JSONDecoder().decode(CardPaymentMethod.self, from: Data(paymentMethodString.utf8))
-        presentationDelegate = CardPresentationDelegate(topViewController: getViewController())
+        presentationDelegate = ComponentPresentationDelegate(topViewController: getViewController())
         actionComponent = buildActionComponent(adyenContext: adyenContext)
         return CardComponent(paymentMethod: paymentMethod, context: adyenContext, configuration: cardConfiguration)
     }

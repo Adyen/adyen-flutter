@@ -80,36 +80,7 @@ class ConfigurationMapper {
         return billingAddressConfiguration
     }
 
-    private func buildApplePayConfiguration(
-        applePayConfigurationDTO: ApplePayConfigurationDTO,
-        amount: AmountDTO,
-        countryCode: String
-    ) throws -> Adyen.ApplePayComponent.Configuration {
-        // TODO: Adjust pigeon code generation to use Int instead of Int64
-        guard let value = Int(exactly: amount.value) else {
-            throw PlatformError(errorDescription: "Cannot map Int64 to Int.")
-        }
-        let currencyCode = amount.currency
-        let formattedAmount = AmountFormatter.decimalAmount(
-            value,
-            currencyCode: currencyCode,
-            localeIdentifier: nil
-        )
-
-        let applePayPayment = try ApplePayPayment(
-            countryCode: countryCode,
-            currencyCode: currencyCode,
-            summaryItems: [PKPaymentSummaryItem(
-                label: applePayConfigurationDTO.merchantName,
-                amount: formattedAmount
-            )]
-        )
-
-        return ApplePayComponent.Configuration(
-            payment: applePayPayment,
-            merchantIdentifier: applePayConfigurationDTO.merchantId
-        )
-    }
+   
 }
 
 extension FieldVisibility {
@@ -242,7 +213,67 @@ extension AmountDTO {
 }
 
 extension InstantPaymentConfigurationDTO {
-    func mapToApplePayConfiguration() -> ApplePayComponent.Configuration {
+    func mapToApplePayConfiguration() throws -> ApplePayComponent.Configuration {
+        guard let applePayConfigurationDTO = applePayConfigurationDTO else {
+            throw PlatformError(errorDescription: "Apple pay error")
+        }
         
+        guard let applePayConfiguration = try? buildApplePayConfiguration(applePayConfigurationDTO: applePayConfigurationDTO, amount: amount, countryCode: countryCode) else {
+            throw PlatformError(errorDescription: "Apple pay error")
+        }
+         return applePayConfiguration
     }
+    
+    func createAdyenContextt() throws -> AdyenContext {
+        return try createAdyenContext(environment: environment, clientKey: clientKey, amount: amount, analyticsOptionsDTO: analyticsOptionsDTO, countryCode: countryCode)
+    }
+}
+
+
+fileprivate func createAdyenContext(environment: Environment, clientKey: String, amount: AmountDTO, analyticsOptionsDTO: AnalyticsOptionsDTO, countryCode : String) throws -> AdyenContext {
+    let environment = environment.mapToEnvironment()
+    let apiContext = try APIContext(environment: environment, clientKey: clientKey)
+    let amount = amount.mapToAmount()
+    var analyticsConfiguration = AnalyticsConfiguration()
+    analyticsConfiguration.isEnabled = analyticsOptionsDTO.enabled
+    analyticsConfiguration.context = TelemetryContext(version: analyticsOptionsDTO.version, platform: .flutter)
+    return AdyenContext(
+        apiContext: apiContext,
+        payment: Payment(
+            amount: amount,
+            countryCode: countryCode
+        ),
+        analyticsConfiguration: analyticsConfiguration
+    )
+}
+
+fileprivate func buildApplePayConfiguration(
+    applePayConfigurationDTO: ApplePayConfigurationDTO,
+    amount: AmountDTO,
+    countryCode: String
+) throws -> Adyen.ApplePayComponent.Configuration {
+    // TODO: Adjust pigeon code generation to use Int instead of Int64
+    guard let value = Int(exactly: amount.value) else {
+        throw PlatformError(errorDescription: "Cannot map Int64 to Int.")
+    }
+    let currencyCode = amount.currency
+    let formattedAmount = AmountFormatter.decimalAmount(
+        value,
+        currencyCode: currencyCode,
+        localeIdentifier: nil
+    )
+
+    let applePayPayment = try ApplePayPayment(
+        countryCode: countryCode,
+        currencyCode: currencyCode,
+        summaryItems: [PKPaymentSummaryItem(
+            label: applePayConfigurationDTO.merchantName,
+            amount: formattedAmount
+        )]
+    )
+
+    return ApplePayComponent.Configuration(
+        payment: applePayPayment,
+        merchantIdentifier: applePayConfigurationDTO.merchantId
+    )
 }

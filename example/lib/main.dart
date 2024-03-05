@@ -2,6 +2,7 @@
 
 import 'package:adyen_checkout/adyen_checkout.dart';
 import 'package:adyen_checkout_example/network/service.dart';
+import 'package:adyen_checkout_example/repositories/adyen_apple_pay_component_repository.dart';
 import 'package:adyen_checkout_example/repositories/adyen_card_component_repository.dart';
 import 'package:adyen_checkout_example/repositories/adyen_drop_in_repository.dart';
 import 'package:adyen_checkout_example/repositories/adyen_google_pay_component_repository.dart';
@@ -25,7 +26,7 @@ void main() {
     repository: AdyenGooglePayComponentRepository(service: service),
   );
   final applePayComponentScreen = ApplePayComponentScreen(
-    repository: AdyenGooglePayComponentRepository(service: service),
+    repository: AdyenApplePayComponentRepository(service: service),
   );
 
   runApp(MaterialApp(
