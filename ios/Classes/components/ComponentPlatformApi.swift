@@ -3,7 +3,7 @@ class ComponentPlatformApi: ComponentPlatformInterface {
     var onActionCallback: ([String?: Any?]) -> Void = { _ in }
     var onFinishCallback: (PaymentEventDTO) -> Void = { _ in }
     var onErrorCallback: (ErrorDTO?) -> Void = { _ in }
-    private let applePayComponentManager : ApplePayComponentManager
+    private let applePayComponentManager: ApplePayComponentManager
     
     init(applePayComponentManager: ApplePayComponentManager) {
         self.applePayComponentManager = applePayComponentManager
@@ -25,19 +25,29 @@ class ComponentPlatformApi: ComponentPlatformInterface {
         instantPaymentConfigurationDTO: InstantPaymentConfigurationDTO,
         paymentMethodResponse: String,
         componentId: String,
-        completion: @escaping (Result<InstantPaymentSetupResultDTO, Error>) -> Void) {
+        completion: @escaping (Result<InstantPaymentSetupResultDTO, Error>) -> Void
+    ) {
+        switch instantPaymentConfigurationDTO.instantPaymentType {
+        case .googlePay:
+            return
+        case .applePay:
             applePayComponentManager.isApplePayAvailable(
                 instantPaymentComponentConfigurationDTO: instantPaymentConfigurationDTO,
-                callback: completion)
+                callback: completion
+            )
+        }
     }
 
     func onInstantPaymentPressed(instantPaymentType: InstantPaymentType, componentId: String) {
-        applePayComponentManager.onInstantPaymentPressed(componentId: componentId)
+        switch instantPaymentType {
+        case .googlePay:
+            return
+        case .applePay:
+            applePayComponentManager.onInstantPaymentPressed(componentId: componentId)
+        }
     }
 
-    func onDispose(componentId : String) throws {
-
-    }
+    func onDispose(componentId: String) throws {}
 
     private func handlePaymentEvent(paymentEventDTO: PaymentEventDTO) {
         switch paymentEventDTO.paymentEventType {

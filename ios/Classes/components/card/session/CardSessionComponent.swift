@@ -71,8 +71,8 @@ class CardSessionComponent: BaseCardComponent {
     }
 
     private func setupFinalizeComponentCallback() {
-        (sessionHolder.sessionDelegate as? CardSessionFlowDelegate)?.finalizeAndDismissHandler = finalizeAndDismissSessionComponent
-        (sessionHolder.sessionDelegate as? CardSessionFlowDelegate)?.componentId = componentId
+        (sessionHolder.sessionDelegate as? ComponentSessionFlowDelegate)?.finalizeAndDismissHandler = finalizeAndDismissSessionComponent
+        (sessionHolder.sessionDelegate as? ComponentSessionFlowDelegate)?.componentId = componentId
     }
 
     func finalizeAndDismissSessionComponent(success: Bool, completion: @escaping (() -> Void)) {

@@ -1,18 +1,17 @@
 import Adyen
 
-class ApplePaySessionDelegate : AdyenSessionDelegate {
+class ComponentSessionFlowDelegate: AdyenSessionDelegate {
     private let componentFlutterApi: ComponentFlutterInterface
-    private let componentId: String
+    var componentId: String?
     var finalizeAndDismissHandler: ((Bool, @escaping (() -> Void)) -> Void)?
 
     init(
-        componentFlutterApi: ComponentFlutterInterface,
-        componentId: String) {
+        componentFlutterApi: ComponentFlutterInterface
+    ) {
         self.componentFlutterApi = componentFlutterApi
-        self.componentId = componentId
     }
     
-    func didComplete(with result: Adyen.AdyenSessionResult, component: Adyen.Component, session: Adyen.AdyenSession) {
+    func didComplete(with result: AdyenSessionResult, component _: Component, session: AdyenSession) {
         let resultCode = result.resultCode
         let success = resultCode == .authorised || resultCode == .received || resultCode == .pending
         finalizeAndDismissHandler?(success, { [weak self] in
@@ -34,16 +33,18 @@ class ApplePaySessionDelegate : AdyenSessionDelegate {
     }
     
     func didFail(with error: Error, from component: Adyen.Component, session: Adyen.AdyenSession) {
-        let componentCommunicationModel = ComponentCommunicationModel(
-            type: ComponentCommunicationType.error,
-            componentId: componentId,
-            data: error.localizedDescription
-        )
-        componentFlutterApi.onComponentCommunication(
-            componentCommunicationModel: componentCommunicationModel,
-            completion: { _ in }
-        )
+        finalizeAndDismissHandler?(false, { [weak self] in
+            let componentCommunicationModel = ComponentCommunicationModel(
+                type: ComponentCommunicationType.error,
+                componentId: self?.componentId ?? "",
+                data: error.localizedDescription
+            )
+            self?.componentFlutterApi.onComponentCommunication(
+                componentCommunicationModel: componentCommunicationModel,
+                completion: { _ in }
+            )
+        })
+        
     }
-    
     
 }

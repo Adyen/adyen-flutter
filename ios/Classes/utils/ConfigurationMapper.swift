@@ -80,7 +80,6 @@ class ConfigurationMapper {
         return billingAddressConfiguration
     }
 
-   
 }
 
 extension FieldVisibility {
@@ -214,23 +213,22 @@ extension AmountDTO {
 
 extension InstantPaymentConfigurationDTO {
     func mapToApplePayConfiguration() throws -> ApplePayComponent.Configuration {
-        guard let applePayConfigurationDTO = applePayConfigurationDTO else {
+        guard let applePayConfigurationDTO else {
             throw PlatformError(errorDescription: "Apple pay error")
         }
         
         guard let applePayConfiguration = try? buildApplePayConfiguration(applePayConfigurationDTO: applePayConfigurationDTO, amount: amount, countryCode: countryCode) else {
             throw PlatformError(errorDescription: "Apple pay error")
         }
-         return applePayConfiguration
+        return applePayConfiguration
     }
     
-    func createAdyenContextt() throws -> AdyenContext {
-        return try createAdyenContext(environment: environment, clientKey: clientKey, amount: amount, analyticsOptionsDTO: analyticsOptionsDTO, countryCode: countryCode)
+    func createAdyenContext() throws -> AdyenContext {
+        try buildAdyenContext(environment: environment, clientKey: clientKey, amount: amount, analyticsOptionsDTO: analyticsOptionsDTO, countryCode: countryCode)
     }
 }
 
-
-fileprivate func createAdyenContext(environment: Environment, clientKey: String, amount: AmountDTO, analyticsOptionsDTO: AnalyticsOptionsDTO, countryCode : String) throws -> AdyenContext {
+private func buildAdyenContext(environment: Environment, clientKey: String, amount: AmountDTO, analyticsOptionsDTO: AnalyticsOptionsDTO, countryCode: String) throws -> AdyenContext {
     let environment = environment.mapToEnvironment()
     let apiContext = try APIContext(environment: environment, clientKey: clientKey)
     let amount = amount.mapToAmount()
@@ -247,7 +245,7 @@ fileprivate func createAdyenContext(environment: Environment, clientKey: String,
     )
 }
 
-fileprivate func buildApplePayConfiguration(
+private func buildApplePayConfiguration(
     applePayConfigurationDTO: ApplePayConfigurationDTO,
     amount: AmountDTO,
     countryCode: String

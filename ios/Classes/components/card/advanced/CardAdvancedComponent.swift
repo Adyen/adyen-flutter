@@ -28,7 +28,8 @@ class CardAdvancedComponent: BaseCardComponent {
 
         actionComponentDelegate = CardAdvancedFlowActionComponentDelegate(
             componentFlutterApi: componentFlutterApi,
-            componentId: componentId)
+            componentId: componentId
+        )
         setupCardComponentView()
         setupFinalizeComponentCallback()
     }
