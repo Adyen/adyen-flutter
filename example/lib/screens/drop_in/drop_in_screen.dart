@@ -91,7 +91,7 @@ class _DropInScreenState extends State<DropInScreen> {
   Future<DropInConfiguration> _createDropInConfiguration() async {
     const CardConfiguration cardsConfiguration = CardConfiguration();
 
-    const ApplePayConfiguration applePayConfiguration = ApplePayConfiguration(
+    ApplePayConfiguration applePayConfiguration = ApplePayConfiguration(
       merchantId: Config.merchantId,
       merchantName: Config.merchantName,
     );

@@ -77,8 +77,9 @@ class CardSessionComponent: BaseCardComponent {
 
     func finalizeAndDismissSessionComponent(success: Bool, completion: @escaping (() -> Void)) {
         finalizeAndDismiss(success: success, completion: { [weak self] in
-            self?.sessionHolder.reset()
             completion()
+            self?.sessionHolder.reset()
+            self?.cardComponent = nil
         })
     }
 }

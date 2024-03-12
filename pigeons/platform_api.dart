@@ -85,6 +85,18 @@ enum InstantPaymentType {
   applePay,
 }
 
+enum ApplePayShippingType {
+  shipping,
+  delivery,
+  storePickup,
+  servicePickup,
+}
+
+enum ApplePayFundingSource {
+  debit,
+  credit,
+}
+
 class SessionDTO {
   final String id;
   final String sessionData;
@@ -174,12 +186,82 @@ class CardConfigurationDTO {
 class ApplePayConfigurationDTO {
   final String merchantId;
   final String merchantName;
-  final bool allowOnboarding;
+  final bool? allowOnboarding;
+  final List<String?>? supportedNetworks;
+  final List<String?>? requiredBillingContactFields;
+  final ApplePayContactDTO? billingContact;
+  final List<String?>? requiredShippingContactFields;
+  final ApplePayContactDTO? shippingContact;
+  final ApplePayShippingType? applePayShippingType;
+  final bool? allowShippingContactEditing;
+  final List<ApplePayShippingMethodDTO?>? shippingMethods;
+  final String? applicationData;
+  final List<String?>? supportedCountries;
+  final bool? supportsCouponCode;
+  final String? couponCode;
+  final ApplePayFundingSource? merchantCapability;
 
   ApplePayConfigurationDTO(
     this.merchantId,
     this.merchantName,
     this.allowOnboarding,
+    this.supportedNetworks,
+    this.requiredBillingContactFields,
+    this.billingContact,
+    this.requiredShippingContactFields,
+    this.shippingContact,
+    this.applePayShippingType,
+    this.allowShippingContactEditing,
+    this.shippingMethods,
+    this.applicationData,
+    this.supportedCountries,
+    this.supportsCouponCode,
+    this.couponCode,
+    this.merchantCapability,
+  );
+}
+
+class ApplePayContactDTO {
+  final String? phoneNumber;
+  final String? emailAddress;
+  final String? givenName;
+  final String? familyName;
+  final String? phoneticGivenName;
+  final String? phoneticFamilyName;
+  final List<String?>? addressLines;
+  final String? subLocality;
+  final String? locality;
+  final String? postalCode;
+  final String? subAdministrativeArea;
+  final String? administrativeArea;
+  final String? country;
+  final String? countryCode;
+
+  ApplePayContactDTO(
+    this.phoneNumber,
+    this.emailAddress,
+    this.givenName,
+    this.familyName,
+    this.phoneticGivenName,
+    this.phoneticFamilyName,
+    this.addressLines,
+    this.subLocality,
+    this.locality,
+    this.postalCode,
+    this.subAdministrativeArea,
+    this.administrativeArea,
+    this.country,
+    this.countryCode,
+  );
+}
+
+class ApplePayShippingMethodDTO {
+  final String? identifier;
+  final String? detail;
+
+  ApplePayShippingMethodDTO(
+    this.identifier,
+    this.detail,
   );
 }
 

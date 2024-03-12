@@ -72,9 +72,10 @@ class _ApplePayComponentScreenState extends State<ApplePayComponentScreen> {
       clientKey: Config.clientKey,
       countryCode: Config.countryCode,
       amount: Config.amount,
-      applePayConfiguration: const ApplePayConfiguration(
+      applePayConfiguration: ApplePayConfiguration(
         merchantId: Config.merchantId,
         merchantName: Config.merchantName,
+        allowOnboarding: true,
       ),
     );
 

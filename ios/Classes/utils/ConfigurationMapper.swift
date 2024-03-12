@@ -95,19 +95,12 @@ extension FieldVisibility {
 
 extension DropInConfigurationDTO {
     func createAdyenContext() throws -> AdyenContext {
-        let environment = environment.mapToEnvironment()
-        let apiContext = try APIContext(environment: environment, clientKey: clientKey)
-        let amount = amount.mapToAmount()
-        var analyticsConfiguration = AnalyticsConfiguration()
-        analyticsConfiguration.isEnabled = analyticsOptionsDTO.enabled
-        analyticsConfiguration.context = TelemetryContext(version: analyticsOptionsDTO.version, platform: .flutter)
-        return AdyenContext(
-            apiContext: apiContext,
-            payment: Payment(
-                amount: amount,
-                countryCode: countryCode
-            ),
-            analyticsConfiguration: analyticsConfiguration
+        return try buildAdyenContext(
+            environment: environment,
+            clientKey: clientKey,
+            amount: amount,
+            analyticsOptionsDTO: analyticsOptionsDTO,
+            countryCode: countryCode
         )
     }
 }
@@ -169,19 +162,12 @@ extension CardConfigurationDTO {
 
 extension CardComponentConfigurationDTO {
     func createAdyenContext() throws -> AdyenContext {
-        let environment = environment.mapToEnvironment()
-        let apiContext = try APIContext(environment: environment, clientKey: clientKey)
-        let amount = amount.mapToAmount()
-        var analyticsConfiguration = AnalyticsConfiguration()
-        analyticsConfiguration.isEnabled = analyticsOptionsDTO.enabled
-        analyticsConfiguration.context = TelemetryContext(version: analyticsOptionsDTO.version, platform: .flutter)
-        return AdyenContext(
-            apiContext: apiContext,
-            payment: Payment(
-                amount: amount,
-                countryCode: countryCode
-            ),
-            analyticsConfiguration: analyticsConfiguration
+        return try buildAdyenContext(
+            environment: environment,
+            clientKey: clientKey,
+            amount: amount,
+            analyticsOptionsDTO: analyticsOptionsDTO,
+            countryCode: countryCode
         )
     }
 }
@@ -270,8 +256,13 @@ private func buildApplePayConfiguration(
         )]
     )
 
-    return ApplePayComponent.Configuration(
+    var applePayConfiguration = ApplePayComponent.Configuration(
         payment: applePayPayment,
         merchantIdentifier: applePayConfigurationDTO.merchantId
     )
+    applePayConfiguration.allowOnboarding = applePayConfigurationDTO.allowOnboarding ?? false
+    applePayConfiguration.requiredBillingContactFields = applePayConfigurationDTO.requiredBillingContactFields
+    applePayConfiguration.requiredShippingContactFields = applePayConfigurationDTO.requiredShippingContactFields
+    
+    return applePayConfiguration
 }

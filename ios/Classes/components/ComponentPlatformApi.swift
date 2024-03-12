@@ -43,7 +43,7 @@ class ComponentPlatformApi: ComponentPlatformInterface {
         case .googlePay:
             return
         case .applePay:
-            applePayComponentManager.onInstantPaymentPressed(componentId: componentId)
+            applePayComponentManager.onApplePayComponentPressed(componentId: componentId)
         }
     }
 

@@ -98,7 +98,7 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
         _ sessionData: String,
         _ completion: @escaping (Result<SessionDTO, Error>) -> Void
     ) throws {
-        let adyenContext = try configuration.createAdyenContextt()
+        let adyenContext = try configuration.createAdyenContext()
         let sessionDelegate = ComponentSessionFlowDelegate(componentFlutterApi: componentFlutterApi)
         let applePayPresentationDelegate = ComponentPresentationDelegate(topViewController: getViewController())
         requestAndSetSession(
