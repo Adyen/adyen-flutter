@@ -76,11 +76,31 @@ class _ApplePayComponentScreenState extends State<ApplePayComponentScreen> {
         merchantId: Config.merchantId,
         merchantName: Config.merchantName,
         allowOnboarding: true,
+        supportedNetworks: ["amex"],
+        requiredBillingContactFields: [
+          "emailAddress",
+          "name",
+          "phoneNumber",
+          "postalAddress"
+        ],
+        requiredShippingContactFields: ["name", "postalAddress"],
+        shippingContact: ApplePayContact(),
+        shippingMethods: [
+          ApplePayShippingMethod(
+            label: "Test",
+            detail: "detail",
+            amount: 5.5,
+            identifier: "identifier",
+          ),
+        ],
+        allowShippingContactEditing: false,
+        applicationData: "This is additional data",
       ),
     );
 
     return FutureBuilder<SessionCheckout>(
-      future: widget.repository.createSessionCheckout(applePayComponentConfiguration),
+      future: widget.repository
+          .createSessionCheckout(applePayComponentConfiguration),
       builder: (BuildContext context, AsyncSnapshot<SessionCheckout> snapshot) {
         if (snapshot.hasData) {
           final SessionCheckout sessionCheckout = snapshot.data!;

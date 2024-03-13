@@ -5,6 +5,8 @@ export 'src/common/model/checkout.dart';
 export 'src/common/model/order_response.dart';
 export 'src/common/model/payment_event.dart';
 export 'src/common/model/payment_method_configurations/apple_pay/apple_pay_configuration.dart';
+export 'src/common/model/payment_method_configurations/apple_pay/apple_pay_contact.dart';
+export 'src/common/model/payment_method_configurations/apple_pay/apple_pay_shipping_method.dart';
 export 'src/common/model/payment_method_configurations/card_configuration.dart';
 export 'src/common/model/payment_method_configurations/cash_app_pay_configuration.dart';
 export 'src/common/model/payment_method_configurations/google_pay/billing_address_parameters.dart';

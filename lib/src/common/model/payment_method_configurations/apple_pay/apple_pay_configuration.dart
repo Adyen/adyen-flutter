@@ -16,9 +16,7 @@ class ApplePayConfiguration {
   final List<ApplePayShippingMethod>? shippingMethods;
   final String? applicationData;
   final List<String>? supportedCountries;
-  final bool? supportsCouponCode;
-  final String? couponCode;
-  final ApplePayFundingSource? merchantCapability;
+  final ApplePayMerchantCapability? merchantCapability;
 
   ApplePayConfiguration({
     required this.merchantId,
@@ -34,8 +32,6 @@ class ApplePayConfiguration {
     this.shippingMethods,
     this.applicationData,
     this.supportedCountries,
-    this.supportsCouponCode,
-    this.couponCode,
     this.merchantCapability,
   });
 }

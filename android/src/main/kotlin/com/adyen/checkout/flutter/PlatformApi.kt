@@ -204,12 +204,12 @@ enum class ApplePayShippingType(val raw: Int) {
   }
 }
 
-enum class ApplePayFundingSource(val raw: Int) {
+enum class ApplePayMerchantCapability(val raw: Int) {
   DEBIT(0),
   CREDIT(1);
 
   companion object {
-    fun ofRaw(raw: Int): ApplePayFundingSource? {
+    fun ofRaw(raw: Int): ApplePayMerchantCapability? {
       return values().firstOrNull { it.raw == raw }
     }
   }
@@ -402,9 +402,7 @@ data class ApplePayConfigurationDTO (
   val shippingMethods: List<ApplePayShippingMethodDTO?>? = null,
   val applicationData: String? = null,
   val supportedCountries: List<String?>? = null,
-  val supportsCouponCode: Boolean? = null,
-  val couponCode: String? = null,
-  val merchantCapability: ApplePayFundingSource? = null
+  val merchantCapability: ApplePayMerchantCapability? = null
 
 ) {
   companion object {
@@ -429,12 +427,10 @@ data class ApplePayConfigurationDTO (
       val shippingMethods = list[10] as List<ApplePayShippingMethodDTO?>?
       val applicationData = list[11] as String?
       val supportedCountries = list[12] as List<String?>?
-      val supportsCouponCode = list[13] as Boolean?
-      val couponCode = list[14] as String?
-      val merchantCapability: ApplePayFundingSource? = (list[15] as Int?)?.let {
-        ApplePayFundingSource.ofRaw(it)
+      val merchantCapability: ApplePayMerchantCapability? = (list[13] as Int?)?.let {
+        ApplePayMerchantCapability.ofRaw(it)
       }
-      return ApplePayConfigurationDTO(merchantId, merchantName, allowOnboarding, supportedNetworks, requiredBillingContactFields, billingContact, requiredShippingContactFields, shippingContact, applePayShippingType, allowShippingContactEditing, shippingMethods, applicationData, supportedCountries, supportsCouponCode, couponCode, merchantCapability)
+      return ApplePayConfigurationDTO(merchantId, merchantName, allowOnboarding, supportedNetworks, requiredBillingContactFields, billingContact, requiredShippingContactFields, shippingContact, applePayShippingType, allowShippingContactEditing, shippingMethods, applicationData, supportedCountries, merchantCapability)
     }
   }
   fun toList(): List<Any?> {
@@ -452,8 +448,6 @@ data class ApplePayConfigurationDTO (
       shippingMethods,
       applicationData,
       supportedCountries,
-      supportsCouponCode,
-      couponCode,
       merchantCapability?.raw,
     )
   }
@@ -519,22 +513,34 @@ data class ApplePayContactDTO (
 
 /** Generated class from Pigeon that represents data sent in messages. */
 data class ApplePayShippingMethodDTO (
-  val identifier: String? = null,
-  val detail: String? = null
+  val label: String,
+  val detail: String,
+  val amount: String,
+  val identifier: String,
+  val startDate: String? = null,
+  val endDate: String? = null
 
 ) {
   companion object {
     @Suppress("UNCHECKED_CAST")
     fun fromList(list: List<Any?>): ApplePayShippingMethodDTO {
-      val identifier = list[0] as String?
-      val detail = list[1] as String?
-      return ApplePayShippingMethodDTO(identifier, detail)
+      val label = list[0] as String
+      val detail = list[1] as String
+      val amount = list[2] as String
+      val identifier = list[3] as String
+      val startDate = list[4] as String?
+      val endDate = list[5] as String?
+      return ApplePayShippingMethodDTO(label, detail, amount, identifier, startDate, endDate)
     }
   }
   fun toList(): List<Any?> {
     return listOf<Any?>(
-      identifier,
+      label,
       detail,
+      amount,
+      identifier,
+      startDate,
+      endDate,
     )
   }
 }

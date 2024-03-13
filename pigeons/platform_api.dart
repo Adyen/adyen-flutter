@@ -92,7 +92,7 @@ enum ApplePayShippingType {
   servicePickup,
 }
 
-enum ApplePayFundingSource {
+enum ApplePayMerchantCapability {
   debit,
   credit,
 }
@@ -197,9 +197,7 @@ class ApplePayConfigurationDTO {
   final List<ApplePayShippingMethodDTO?>? shippingMethods;
   final String? applicationData;
   final List<String?>? supportedCountries;
-  final bool? supportsCouponCode;
-  final String? couponCode;
-  final ApplePayFundingSource? merchantCapability;
+  final ApplePayMerchantCapability? merchantCapability;
 
   ApplePayConfigurationDTO(
     this.merchantId,
@@ -215,8 +213,6 @@ class ApplePayConfigurationDTO {
     this.shippingMethods,
     this.applicationData,
     this.supportedCountries,
-    this.supportsCouponCode,
-    this.couponCode,
     this.merchantCapability,
   );
 }
@@ -256,12 +252,20 @@ class ApplePayContactDTO {
 }
 
 class ApplePayShippingMethodDTO {
-  final String? identifier;
-  final String? detail;
+  final String label;
+  final String detail;
+  final String amount;
+  final String identifier;
+  final String? startDate;
+  final String? endDate;
 
   ApplePayShippingMethodDTO(
-    this.identifier,
+    this.label,
     this.detail,
+    this.amount,
+    this.identifier,
+    this.startDate,
+    this.endDate,
   );
 }
 

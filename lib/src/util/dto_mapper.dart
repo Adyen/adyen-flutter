@@ -78,7 +78,49 @@ extension ApplePayConfigurationMapper on ApplePayConfiguration {
         merchantId: merchantId,
         merchantName: merchantName,
         allowOnboarding: allowOnboarding,
+        supportedNetworks: supportedNetworks,
+        requiredBillingContactFields: requiredBillingContactFields,
+        billingContact: billingContact?.toDTO(),
+        requiredShippingContactFields: requiredShippingContactFields,
+        shippingContact: shippingContact?.toDTO(),
+        applePayShippingType: applePayShippingType,
+        allowShippingContactEditing: allowShippingContactEditing,
+        shippingMethods: shippingMethods
+            ?.map((shippingMethod) => shippingMethod.toDTO())
+            .toList(),
+        applicationData: applicationData,
+        supportedCountries: supportedCountries,
+        merchantCapability: merchantCapability,
       );
+}
+
+extension ApplePayContactMapper on ApplePayContact {
+  ApplePayContactDTO toDTO() => ApplePayContactDTO(
+        phoneNumber: phoneNumber,
+        emailAddress: emailAddress,
+        givenName: givenName,
+        familyName: familyName,
+        phoneticGivenName: phoneticGivenName,
+        phoneticFamilyName: phoneticFamilyName,
+        addressLines: addressLines,
+        subLocality: subLocality,
+        locality: locality,
+        postalCode: postalCode,
+        subAdministrativeArea: subAdministrativeArea,
+        administrativeArea: administrativeArea,
+        country: country,
+        countryCode: countryCode,
+      );
+}
+
+extension ApplePayShippingMethodMapper on ApplePayShippingMethod {
+  ApplePayShippingMethodDTO toDTO() => ApplePayShippingMethodDTO(
+      label: label,
+      detail: detail,
+      amount: amount.toString(),
+      identifier: identifier,
+      startDate: startDate?.toIso8601String(),
+      endDate: endDate?.toIso8601String());
 }
 
 extension CashAppPayConfigurationMapper on CashAppPayConfiguration {

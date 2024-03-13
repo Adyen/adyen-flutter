@@ -1,0 +1,231 @@
+import Adyen
+import PassKit
+
+extension ApplePayConfigurationDTO {
+    func toApplePayConfiguration(amount: AmountDTO, countryCode: String) throws -> ApplePayComponent.Configuration {
+        guard let value = Int(exactly: amount.value) else {
+            throw PlatformError(errorDescription: "Cannot map Int64 to Int.")
+        }
+        
+        let paymentRequest = try buildPaymentRequest(payment: Payment(amount: Amount(value: value, currencyCode: amount.currency), countryCode: countryCode))
+        let applePayConfiguration = try ApplePayComponent.Configuration(paymentRequest: paymentRequest, allowOnboarding: allowOnboarding ?? false)
+        return applePayConfiguration
+    }
+    
+    private func buildPaymentRequest(payment: Payment) throws -> PKPaymentRequest {
+        let summaryItems: [PKPaymentSummaryItem] // TODO: ADD
+        let formattedAmount = AmountFormatter.decimalAmount(payment.amount.value,
+                                                            currencyCode: payment.amount.currencyCode,
+                                                            localeIdentifier: payment.amount.localeIdentifier)
+        summaryItems = [PKPaymentSummaryItem(label: merchantName, amount: formattedAmount)]
+            
+        let paymentRequest = PKPaymentRequest()
+        paymentRequest.merchantIdentifier = merchantId
+        paymentRequest.paymentSummaryItems = summaryItems
+        paymentRequest.countryCode = payment.countryCode
+        paymentRequest.currencyCode = payment.amount.currencyCode
+        paymentRequest.billingContact = billingContact?.toApplePayContact()
+        paymentRequest.shippingContact = shippingContact?.toApplePayContact()
+        paymentRequest.merchantCapabilities = merchantCapability.toMerchantCapability()
+        
+        if let requiredShippingContactFields {
+            paymentRequest.requiredShippingContactFields = mapToContactFields(contactFields: requiredShippingContactFields)
+        }
+        
+        if let requiredBillingContactFields = requiredShippingContactFields {
+            paymentRequest.requiredBillingContactFields = mapToContactFields(contactFields: requiredBillingContactFields)
+        }
+        
+        if let shippingType = applePayShippingType {
+            paymentRequest.shippingType = shippingType.toPKShippingType()
+        }
+        
+        if let supportedCountries {
+            paymentRequest.supportedCountries = .init(supportedCountries.compactMap { $0 })
+        }
+        
+        if let shippingMethods {
+            paymentRequest.shippingMethods = shippingMethods.compactMap { $0?.toPKShippingMethod() }
+        }
+        
+        if #available(iOS 15.0, *) {
+            if let allowShippingContactEditing {
+                paymentRequest.shippingContactEditingMode = allowShippingContactEditing ? PKShippingContactEditingMode.available : PKShippingContactEditingMode.storePickup
+            }
+        }
+        
+        if let supportedNetworks {
+            let supportedNetworksNonNil: [String] = supportedNetworks.compactMap { $0 }
+            paymentRequest.supportedNetworks = mapToSupportedNetworks(supportedNetworks: supportedNetworksNonNil)
+        }
+        
+        if let applicationData {
+            paymentRequest.applicationData = Data(applicationData.utf8)
+        }
+
+        return paymentRequest
+    }
+    
+    private func mapToContactFields(contactFields: [String?]) -> Set<PKContactField> {
+        let contactFieldsNonNil: [String] = contactFields.compactMap { $0 }
+        return Set<PKContactField>(contactFieldsNonNil.compactMap { PKContactField.fromString($0) })
+    }
+    
+    private func mapToSupportedNetworks(supportedNetworks: [String]) -> [PKPaymentNetwork] {
+        let networks = PKPaymentRequest.availableNetworks()
+        return networks.filter { supportedNetworks.contains($0.txVariantName) }
+    }
+}
+
+extension PKPaymentNetwork {
+    internal var txVariantName: String {
+        if self == .masterCard { return "mc" }
+        if self == .cartesBancaires { return "cartebancaire" }
+        return self.rawValue.lowercased()
+    }
+}
+
+extension ApplePayMerchantCapability? {
+    func toMerchantCapability() -> PKMerchantCapability {
+        switch self {
+        case .debit:
+            return [.capability3DS, .capabilityDebit]
+        case .credit:
+            return [.capability3DS, .capabilityCredit]
+        case nil:
+            return .capability3DS
+        }
+    }
+}
+
+extension ApplePayContactDTO {
+    func toApplePayContact() -> PKContact {
+        let contact = PKContact()
+        contact.name = extractPersonNameComponents()
+        contact.postalAddress = extractPostalAddress()
+        if let phoneNumber {
+            contact.phoneNumber = CNPhoneNumber(stringValue: phoneNumber)
+        }
+        
+        if let emailAddress {
+            contact.emailAddress = emailAddress
+        }
+        
+        return contact
+    }
+    
+    private func extractPersonNameComponents() -> PersonNameComponents {
+        var personName = PersonNameComponents()
+        if let givenName {
+            personName.givenName = givenName
+        }
+   
+        if let familyName {
+            personName.familyName = familyName
+        }
+        
+        if let phoneticGivenName {
+            personName.phoneticRepresentation = PersonNameComponents()
+            personName.phoneticRepresentation?.givenName = phoneticGivenName
+        }
+        
+        if let phoneticFamilyName {
+            personName.phoneticRepresentation = personName.phoneticRepresentation ?? PersonNameComponents()
+            personName.phoneticRepresentation?.familyName = phoneticFamilyName
+        }
+        
+        return personName
+    }
+    
+    private func extractPostalAddress() -> CNMutablePostalAddress {
+        let postalAddress = CNMutablePostalAddress()
+        if let addressLines = addressLines?.compactMap({ $0 }) {
+            postalAddress.street = addressLines.joined(separator: "\n")
+        }
+
+        if let subLocality {
+            postalAddress.subLocality = subLocality
+        }
+
+        if let locality {
+            postalAddress.city = locality
+        }
+
+        if let postalCode {
+            postalAddress.postalCode = postalCode
+        }
+
+        if let subAdministrativeArea {
+            postalAddress.subAdministrativeArea = subAdministrativeArea
+        }
+
+        if let administrativeArea {
+            postalAddress.state = administrativeArea
+        }
+
+        if let country {
+            postalAddress.country = country
+        }
+
+        if let countryCode {
+            postalAddress.isoCountryCode = countryCode
+        }
+
+        return postalAddress
+    }
+}
+
+extension PKContactField {
+    static func fromString(_ rawValue: String) -> PKContactField {
+        switch rawValue {
+        case "email", "emailAddress":
+            return .emailAddress
+        case "phone", "phoneNumber":
+            return .phoneNumber
+        case "post", "postalAddress":
+            return .postalAddress
+        case "name":
+            return .name
+        case "phoneticName":
+            return .phoneticName
+        default:
+            return PKContactField(rawValue: rawValue)
+        }
+    }
+}
+
+extension ApplePayShippingType {
+    func toPKShippingType() -> PKShippingType {
+        switch self {
+        case .shipping:
+            return .shipping
+        case .delivery:
+            return .delivery
+        case .storePickup:
+            return .storePickup
+        case .servicePickup:
+            return .servicePickup
+        }
+    }
+}
+
+extension ApplePayShippingMethodDTO {
+    func toPKShippingMethod() -> PKShippingMethod {
+        let pkShippingMethod = PKShippingMethod()
+        pkShippingMethod.label = label
+        pkShippingMethod.detail = detail
+        pkShippingMethod.identifier = identifier
+        pkShippingMethod.amount = NSDecimalNumber(string: amount)
+        /*
+         if #available(iOS 15.0, *),
+            let startRaw = dictionary[ApplePayKeys.ShippingMethod.startDate] as? String,
+            let startDate = iso8601Formatter.date(from: startRaw),
+            let endRaw = dictionary[ApplePayKeys.ShippingMethod.endDate] as? String,
+            let endDate = iso8601Formatter.date(from: endRaw) {
+             this.dateComponentsRange = .init(start: startDate.toComponents,end: endDate.toComponents)
+         }
+          */
+         
+        return pkShippingMethod
+    }
+}

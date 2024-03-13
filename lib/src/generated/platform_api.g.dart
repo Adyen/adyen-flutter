@@ -106,7 +106,7 @@ enum ApplePayShippingType {
   servicePickup,
 }
 
-enum ApplePayFundingSource {
+enum ApplePayMerchantCapability {
   debit,
   credit,
 }
@@ -354,8 +354,6 @@ class ApplePayConfigurationDTO {
     this.shippingMethods,
     this.applicationData,
     this.supportedCountries,
-    this.supportsCouponCode,
-    this.couponCode,
     this.merchantCapability,
   });
 
@@ -385,11 +383,7 @@ class ApplePayConfigurationDTO {
 
   List<String?>? supportedCountries;
 
-  bool? supportsCouponCode;
-
-  String? couponCode;
-
-  ApplePayFundingSource? merchantCapability;
+  ApplePayMerchantCapability? merchantCapability;
 
   Object encode() {
     return <Object?>[
@@ -406,8 +400,6 @@ class ApplePayConfigurationDTO {
       shippingMethods,
       applicationData,
       supportedCountries,
-      supportsCouponCode,
-      couponCode,
       merchantCapability?.index,
     ];
   }
@@ -434,10 +426,8 @@ class ApplePayConfigurationDTO {
       shippingMethods: (result[10] as List<Object?>?)?.cast<ApplePayShippingMethodDTO?>(),
       applicationData: result[11] as String?,
       supportedCountries: (result[12] as List<Object?>?)?.cast<String?>(),
-      supportsCouponCode: result[13] as bool?,
-      couponCode: result[14] as String?,
-      merchantCapability: result[15] != null
-          ? ApplePayFundingSource.values[result[15]! as int]
+      merchantCapability: result[13] != null
+          ? ApplePayMerchantCapability.values[result[13]! as int]
           : null,
     );
   }
@@ -531,26 +521,46 @@ class ApplePayContactDTO {
 
 class ApplePayShippingMethodDTO {
   ApplePayShippingMethodDTO({
-    this.identifier,
-    this.detail,
+    required this.label,
+    required this.detail,
+    required this.amount,
+    required this.identifier,
+    this.startDate,
+    this.endDate,
   });
 
-  String? identifier;
+  String label;
 
-  String? detail;
+  String detail;
+
+  String amount;
+
+  String identifier;
+
+  String? startDate;
+
+  String? endDate;
 
   Object encode() {
     return <Object?>[
-      identifier,
+      label,
       detail,
+      amount,
+      identifier,
+      startDate,
+      endDate,
     ];
   }
 
   static ApplePayShippingMethodDTO decode(Object result) {
     result as List<Object?>;
     return ApplePayShippingMethodDTO(
-      identifier: result[0] as String?,
-      detail: result[1] as String?,
+      label: result[0]! as String,
+      detail: result[1]! as String,
+      amount: result[2]! as String,
+      identifier: result[3]! as String,
+      startDate: result[4] as String?,
+      endDate: result[5] as String?,
     );
   }
 }

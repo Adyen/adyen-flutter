@@ -34,13 +34,11 @@ class ConfigurationMapper {
             dropInConfiguration.card = cardConfiguration
         }
 
-        if let appleConfigurationDTO = dropInConfigurationDTO.applePayConfigurationDTO {
-            let appleConfiguration = try buildApplePayConfiguration(
-                applePayConfigurationDTO: appleConfigurationDTO,
+        if let applePayConfigurationDTO = dropInConfigurationDTO.applePayConfigurationDTO {
+            dropInConfiguration.applePay = try applePayConfigurationDTO.toApplePayConfiguration(
                 amount: dropInConfigurationDTO.amount,
                 countryCode: dropInConfigurationDTO.countryCode
             )
-            dropInConfiguration.applePay = appleConfiguration
         }
 
         if let cashAppPayConfigurationDTO = dropInConfigurationDTO.cashAppPayConfigurationDTO {
@@ -95,7 +93,7 @@ extension FieldVisibility {
 
 extension DropInConfigurationDTO {
     func createAdyenContext() throws -> AdyenContext {
-        return try buildAdyenContext(
+        try buildAdyenContext(
             environment: environment,
             clientKey: clientKey,
             amount: amount,
@@ -162,7 +160,7 @@ extension CardConfigurationDTO {
 
 extension CardComponentConfigurationDTO {
     func createAdyenContext() throws -> AdyenContext {
-        return try buildAdyenContext(
+        try buildAdyenContext(
             environment: environment,
             clientKey: clientKey,
             amount: amount,
@@ -203,10 +201,10 @@ extension InstantPaymentConfigurationDTO {
             throw PlatformError(errorDescription: "Apple pay error")
         }
         
-        guard let applePayConfiguration = try? buildApplePayConfiguration(applePayConfigurationDTO: applePayConfigurationDTO, amount: amount, countryCode: countryCode) else {
-            throw PlatformError(errorDescription: "Apple pay error")
-        }
-        return applePayConfiguration
+        return try applePayConfigurationDTO.toApplePayConfiguration(
+            amount: amount,
+            countryCode: countryCode
+        )
     }
     
     func createAdyenContext() throws -> AdyenContext {
@@ -229,40 +227,4 @@ private func buildAdyenContext(environment: Environment, clientKey: String, amou
         ),
         analyticsConfiguration: analyticsConfiguration
     )
-}
-
-private func buildApplePayConfiguration(
-    applePayConfigurationDTO: ApplePayConfigurationDTO,
-    amount: AmountDTO,
-    countryCode: String
-) throws -> Adyen.ApplePayComponent.Configuration {
-    // TODO: Adjust pigeon code generation to use Int instead of Int64
-    guard let value = Int(exactly: amount.value) else {
-        throw PlatformError(errorDescription: "Cannot map Int64 to Int.")
-    }
-    let currencyCode = amount.currency
-    let formattedAmount = AmountFormatter.decimalAmount(
-        value,
-        currencyCode: currencyCode,
-        localeIdentifier: nil
-    )
-
-    let applePayPayment = try ApplePayPayment(
-        countryCode: countryCode,
-        currencyCode: currencyCode,
-        summaryItems: [PKPaymentSummaryItem(
-            label: applePayConfigurationDTO.merchantName,
-            amount: formattedAmount
-        )]
-    )
-
-    var applePayConfiguration = ApplePayComponent.Configuration(
-        payment: applePayPayment,
-        merchantIdentifier: applePayConfigurationDTO.merchantId
-    )
-    applePayConfiguration.allowOnboarding = applePayConfigurationDTO.allowOnboarding ?? false
-    applePayConfiguration.requiredBillingContactFields = applePayConfigurationDTO.requiredBillingContactFields
-    applePayConfiguration.requiredShippingContactFields = applePayConfigurationDTO.requiredShippingContactFields
-    
-    return applePayConfiguration
 }

@@ -14,7 +14,7 @@ class ApplePayContact {
   final String? country;
   final String? countryCode;
 
-  ApplePayContact(
+  ApplePayContact({
     this.phoneNumber,
     this.emailAddress,
     this.givenName,
@@ -29,5 +29,5 @@ class ApplePayContact {
     this.administrativeArea,
     this.country,
     this.countryCode,
-  );
+  });
 }

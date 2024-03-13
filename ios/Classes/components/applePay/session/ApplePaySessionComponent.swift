@@ -1,6 +1,6 @@
 @_spi(AdyenInternal) import Adyen
 
-class ApplePaySessionComponent : BaseApplePayComponent {
+class ApplePaySessionComponent: BaseApplePayComponent {
     private let sessionHolder: SessionHolder
     private let configuration: ApplePayComponent.Configuration
     private let adyenContext: AdyenContext
@@ -8,7 +8,7 @@ class ApplePaySessionComponent : BaseApplePayComponent {
     init(
         sessionHolder: SessionHolder,
         configuration: ApplePayComponent.Configuration,
-        adyenContext: AdyenContext  
+        adyenContext: AdyenContext
     ) {
         self.sessionHolder = sessionHolder
         self.configuration = configuration
@@ -18,7 +18,7 @@ class ApplePaySessionComponent : BaseApplePayComponent {
     }
     
     override func present() {
-        if let applePayComponent = applePayComponent  {
+        if let applePayComponent {
             sessionHolder.sessionPresentationDelegate?.present(component: applePayComponent)
         }
     }
