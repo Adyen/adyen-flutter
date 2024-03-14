@@ -3,27 +3,16 @@ import PassKit
 
 extension ApplePayConfigurationDTO {
     func toApplePayConfiguration(amount: AmountDTO, countryCode: String) throws -> ApplePayComponent.Configuration {
-        guard let value = Int(exactly: amount.value) else {
-            throw PlatformError(errorDescription: "Cannot map Int64 to Int.")
-        }
-        
-        let paymentRequest = try buildPaymentRequest(payment: Payment(amount: Amount(value: value, currencyCode: amount.currency), countryCode: countryCode))
-        let applePayConfiguration = try ApplePayComponent.Configuration(paymentRequest: paymentRequest, allowOnboarding: allowOnboarding ?? false)
-        return applePayConfiguration
+        let paymentRequest = try buildPaymentRequest(amount: amount, countryCode: countryCode)
+        return try ApplePayComponent.Configuration(paymentRequest: paymentRequest, allowOnboarding: allowOnboarding ?? false)
     }
     
-    private func buildPaymentRequest(payment: Payment) throws -> PKPaymentRequest {
-        let summaryItems: [PKPaymentSummaryItem] // TODO: ADD
-        let formattedAmount = AmountFormatter.decimalAmount(payment.amount.value,
-                                                            currencyCode: payment.amount.currencyCode,
-                                                            localeIdentifier: payment.amount.localeIdentifier)
-        summaryItems = [PKPaymentSummaryItem(label: merchantName, amount: formattedAmount)]
-            
+    private func buildPaymentRequest(amount: AmountDTO, countryCode: String) throws -> PKPaymentRequest {
         let paymentRequest = PKPaymentRequest()
         paymentRequest.merchantIdentifier = merchantId
-        paymentRequest.paymentSummaryItems = summaryItems
-        paymentRequest.countryCode = payment.countryCode
-        paymentRequest.currencyCode = payment.amount.currencyCode
+        paymentRequest.paymentSummaryItems = try mapToPaymentSummaryItems(summaryItems: summaryItems, amount: amount)
+        paymentRequest.countryCode = countryCode
+        paymentRequest.currencyCode = amount.currency
         paymentRequest.billingContact = billingContact?.toApplePayContact()
         paymentRequest.shippingContact = shippingContact?.toApplePayContact()
         paymentRequest.merchantCapabilities = merchantCapability.toMerchantCapability()
@@ -45,7 +34,8 @@ extension ApplePayConfigurationDTO {
         }
         
         if let shippingMethods {
-            paymentRequest.shippingMethods = shippingMethods.compactMap { $0?.toPKShippingMethod() }
+            paymentRequest.shippingMethods = try shippingMethods.compactMap { try $0?.toPKShippingMethod() }
+            // addShippingMethodToSummaryItems(paymentRequest: paymentRequest)
         }
         
         if #available(iOS 15.0, *) {
@@ -66,6 +56,20 @@ extension ApplePayConfigurationDTO {
         return paymentRequest
     }
     
+    private func addShippingMethodToSummaryItems(paymentRequest: PKPaymentRequest) {
+        guard let shippingMethod = paymentRequest.shippingMethods?.first else {
+            return
+        }
+        
+        if let last = paymentRequest.paymentSummaryItems.last {
+            paymentRequest.paymentSummaryItems = paymentRequest.paymentSummaryItems.dropLast()
+            paymentRequest.paymentSummaryItems.append(shippingMethod)
+            paymentRequest.paymentSummaryItems.append(.init(label: last.label,
+                                                            amount: NSDecimalNumber(value: last.amount.floatValue + shippingMethod.amount.floatValue)))
+        }
+
+    }
+    
     private func mapToContactFields(contactFields: [String?]) -> Set<PKContactField> {
         let contactFieldsNonNil: [String] = contactFields.compactMap { $0 }
         return Set<PKContactField>(contactFieldsNonNil.compactMap { PKContactField.fromString($0) })
@@ -75,6 +79,16 @@ extension ApplePayConfigurationDTO {
         let networks = PKPaymentRequest.availableNetworks()
         return networks.filter { supportedNetworks.contains($0.txVariantName) }
     }
+    
+    private func mapToPaymentSummaryItems(summaryItems: [ApplePaySummaryItemDTO?]?, amount: AmountDTO) throws -> [PKPaymentSummaryItem] {
+        guard let summaryItems else {
+            let formattedAmount = try amount.toFormattedAmount()
+            return [PKPaymentSummaryItem(label: merchantName, amount: formattedAmount)]
+        }
+        
+        let summaryItemsNonNil: [ApplePaySummaryItemDTO] = summaryItems.compactMap { $0 }
+        return try summaryItemsNonNil.compactMap { try $0.toApplePaySummeryItem() }
+    }
 }
 
 extension PKPaymentNetwork {
@@ -82,6 +96,28 @@ extension PKPaymentNetwork {
         if self == .masterCard { return "mc" }
         if self == .cartesBancaires { return "cartebancaire" }
         return self.rawValue.lowercased()
+    }
+}
+
+extension ApplePaySummaryItemDTO {
+    func toApplePaySummeryItem() throws -> PKPaymentSummaryItem {
+        let formattedAmount = try amount.toFormattedAmount()
+        return PKPaymentSummaryItem(
+            label: label,
+            amount: formattedAmount,
+            type: type.toPKPaymentSummaryItemType()
+        )
+    }
+}
+
+extension ApplePaySummaryItemType {
+    func toPKPaymentSummaryItemType() -> PKPaymentSummaryItemType {
+        switch self {
+        case .pending:
+            PKPaymentSummaryItemType.pending
+        case .definite:
+            PKPaymentSummaryItemType.final
+        }
     }
 }
 
@@ -147,8 +183,8 @@ extension ApplePayContactDTO {
             postalAddress.subLocality = subLocality
         }
 
-        if let locality {
-            postalAddress.city = locality
+        if let city {
+            postalAddress.city = city
         }
 
         if let postalCode {
@@ -210,22 +246,45 @@ extension ApplePayShippingType {
 }
 
 extension ApplePayShippingMethodDTO {
-    func toPKShippingMethod() -> PKShippingMethod {
+    func toPKShippingMethod() throws -> PKShippingMethod {
         let pkShippingMethod = PKShippingMethod()
         pkShippingMethod.label = label
         pkShippingMethod.detail = detail
         pkShippingMethod.identifier = identifier
-        pkShippingMethod.amount = NSDecimalNumber(string: amount)
-        /*
-         if #available(iOS 15.0, *),
-            let startRaw = dictionary[ApplePayKeys.ShippingMethod.startDate] as? String,
-            let startDate = iso8601Formatter.date(from: startRaw),
-            let endRaw = dictionary[ApplePayKeys.ShippingMethod.endDate] as? String,
-            let endDate = iso8601Formatter.date(from: endRaw) {
-             this.dateComponentsRange = .init(start: startDate.toComponents,end: endDate.toComponents)
-         }
-          */
-         
+        pkShippingMethod.amount = try amount.toFormattedAmount()
+        
+        if #available(iOS 15.0, *) {
+            if let startRaw = startDate,
+               let endRaw = endDate,
+               let startDate = iso8601Formatter.date(from: startRaw),
+               let endDate = iso8601Formatter.date(from: endRaw) {
+                pkShippingMethod.dateComponentsRange = .init(
+                    start: startDate.toComponents,
+                    end: endDate.toComponents
+                )
+            }
+        }
         return pkShippingMethod
     }
 }
+
+extension AmountDTO {
+    func toFormattedAmount() throws -> NSDecimalNumber {
+        guard let value = Int(exactly: value) else {
+            throw PlatformError(errorDescription: "Cannot map Int64 to Int.")
+        }
+        return AmountFormatter.decimalAmount(value, currencyCode: currency)
+    }
+}
+
+extension Date {
+    var toComponents: DateComponents {
+        Calendar.current.dateComponents([.calendar, .year, .month, .day], from: self)
+    }
+}
+
+var iso8601Formatter: ISO8601DateFormatter = {
+    let formatter = ISO8601DateFormatter()
+    formatter.formatOptions = [.withFullDate]
+    return formatter
+}()

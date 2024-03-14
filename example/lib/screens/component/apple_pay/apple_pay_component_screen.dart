@@ -76,25 +76,74 @@ class _ApplePayComponentScreenState extends State<ApplePayComponentScreen> {
         merchantId: Config.merchantId,
         merchantName: Config.merchantName,
         allowOnboarding: true,
-        supportedNetworks: ["amex"],
-        requiredBillingContactFields: [
-          "emailAddress",
-          "name",
-          "phoneNumber",
-          "postalAddress"
-        ],
-        requiredShippingContactFields: ["name", "postalAddress"],
-        shippingContact: ApplePayContact(),
-        shippingMethods: [
-          ApplePayShippingMethod(
-            label: "Test",
-            detail: "detail",
-            amount: 5.5,
-            identifier: "identifier",
+        //supportedNetworks: ["amex"],
+        applePaySummaryItems: [
+          ApplePaySummaryItem(
+            label: "Product A",
+            amount: Amount(value: 5000, currency: "EUR"),
+            type: ApplePaySummaryItemType.definite,
+          ),
+          ApplePaySummaryItem(
+            label: "Product B",
+            amount: Amount(value: 2500, currency: "EUR"),
+            type: ApplePaySummaryItemType.definite,
+          ),
+          ApplePaySummaryItem(
+            label: "Discount",
+            amount: Amount(value: -1000, currency: "EUR"),
+            type: ApplePaySummaryItemType.definite,
+          ),
+          ApplePaySummaryItem(
+            label: "Total",
+            amount: Amount(value: 6500, currency: "EUR"),
+            type: ApplePaySummaryItemType.definite,
           ),
         ],
-        allowShippingContactEditing: false,
+        // requiredBillingContactFields: [
+        //   "postalAddress",
+        // ],
+        // billingContact: ApplePayContact(
+        //   givenName: "Billing test name",
+        // ),
+        // requiredShippingContactFields: [
+        //   "postalAddress",
+        //   "name",
+        // ],
+        // shippingContact: ApplePayContact(
+        //   givenName: "John",
+        //   familyName: "Wick",
+        //   addressLines: ["Simon Carmiggeltstraat 6"],
+        //   postalCode: "1011 DJ",
+        //   city: "Amsterdam",
+        //   country: "Netherlands",
+        // ),
+        applePayShippingType: ApplePayShippingType.shipping,
+        //allowShippingContactEditing: true,
+        // shippingMethods: [
+        //   ApplePayShippingMethod(
+        //     label: "Test",
+        //     detail: "detail",
+        //     amount: Amount(value: 2000, currency: "EUR"),
+        //     identifier: "identifier 1",
+        //     startDate: DateTime.now().add(const Duration(days: 2)),
+        //     endDate: DateTime.now().add(const Duration(days: 5)),
+        //   ),
+        //   ApplePayShippingMethod(
+        //     label: "Test2",
+        //     detail: "detail",
+        //     amount: Amount(value: 1000, currency: "EUR"),
+        //     identifier: "identifier 2",
+        //   ),
+        //   ApplePayShippingMethod(
+        //     label: "Pick Up",
+        //     detail: "detail",
+        //     amount: Amount(value: 0, currency: "EUR"),
+        //     identifier: "identifier 3",
+        //   ),
+        // ],
         applicationData: "This is additional data",
+        //supportedCountries: ["US", "NL"],
+        // merchantCapability: ApplePayMerchantCapability.debit,
       ),
     );
 

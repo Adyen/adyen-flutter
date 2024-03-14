@@ -1,7 +1,9 @@
+import 'package:adyen_checkout/adyen_checkout.dart';
+
 class ApplePayShippingMethod {
   final String label;
   final String detail;
-  final double amount;
+  final Amount amount;
   final String identifier;
   final DateTime? startDate;
   final DateTime? endDate;

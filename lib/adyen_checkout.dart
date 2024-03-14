@@ -7,6 +7,7 @@ export 'src/common/model/payment_event.dart';
 export 'src/common/model/payment_method_configurations/apple_pay/apple_pay_configuration.dart';
 export 'src/common/model/payment_method_configurations/apple_pay/apple_pay_contact.dart';
 export 'src/common/model/payment_method_configurations/apple_pay/apple_pay_shipping_method.dart';
+export 'src/common/model/payment_method_configurations/apple_pay/apple_pay_summary_item.dart';
 export 'src/common/model/payment_method_configurations/card_configuration.dart';
 export 'src/common/model/payment_method_configurations/cash_app_pay_configuration.dart';
 export 'src/common/model/payment_method_configurations/google_pay/billing_address_parameters.dart';
@@ -37,4 +38,7 @@ export 'src/generated/platform_api.g.dart'
         TotalPriceStatus,
         PaymentResultEnum,
         GooglePayEnvironment,
-        CashAppPayEnvironment;
+        CashAppPayEnvironment,
+        ApplePayShippingType,
+        ApplePayMerchantCapability,
+        ApplePaySummaryItemType;

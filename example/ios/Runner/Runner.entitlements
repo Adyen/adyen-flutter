@@ -4,6 +4,7 @@
 <dict>
 	<key>com.apple.developer.in-app-payments</key>
 	<array>
+		<string>merchant.com.adyen.checkoutsandbox.test</string>
 	</array>
 </dict>
 </plist>

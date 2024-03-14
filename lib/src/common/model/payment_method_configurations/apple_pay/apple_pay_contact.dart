@@ -7,7 +7,7 @@ class ApplePayContact {
   final String? phoneticFamilyName;
   final List<String>? addressLines;
   final String? subLocality;
-  final String? locality;
+  final String? city;
   final String? postalCode;
   final String? subAdministrativeArea;
   final String? administrativeArea;
@@ -23,7 +23,7 @@ class ApplePayContact {
     this.phoneticFamilyName,
     this.addressLines,
     this.subLocality,
-    this.locality,
+    this.city,
     this.postalCode,
     this.subAdministrativeArea,
     this.administrativeArea,

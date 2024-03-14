@@ -97,6 +97,11 @@ enum ApplePayMerchantCapability {
   credit,
 }
 
+enum ApplePaySummaryItemType {
+  pending,
+  definite,
+}
+
 class SessionDTO {
   final String id;
   final String sessionData;
@@ -187,6 +192,7 @@ class ApplePayConfigurationDTO {
   final String merchantId;
   final String merchantName;
   final bool? allowOnboarding;
+  final List<ApplePaySummaryItemDTO?>? summaryItems;
   final List<String?>? supportedNetworks;
   final List<String?>? requiredBillingContactFields;
   final ApplePayContactDTO? billingContact;
@@ -203,6 +209,7 @@ class ApplePayConfigurationDTO {
     this.merchantId,
     this.merchantName,
     this.allowOnboarding,
+    this.summaryItems,
     this.supportedNetworks,
     this.requiredBillingContactFields,
     this.billingContact,
@@ -226,7 +233,7 @@ class ApplePayContactDTO {
   final String? phoneticFamilyName;
   final List<String?>? addressLines;
   final String? subLocality;
-  final String? locality;
+  final String? city;
   final String? postalCode;
   final String? subAdministrativeArea;
   final String? administrativeArea;
@@ -242,7 +249,7 @@ class ApplePayContactDTO {
     this.phoneticFamilyName,
     this.addressLines,
     this.subLocality,
-    this.locality,
+    this.city,
     this.postalCode,
     this.subAdministrativeArea,
     this.administrativeArea,
@@ -254,7 +261,7 @@ class ApplePayContactDTO {
 class ApplePayShippingMethodDTO {
   final String label;
   final String detail;
-  final String amount;
+  final AmountDTO amount;
   final String identifier;
   final String? startDate;
   final String? endDate;
@@ -266,6 +273,18 @@ class ApplePayShippingMethodDTO {
     this.identifier,
     this.startDate,
     this.endDate,
+  );
+}
+
+class ApplePaySummaryItemDTO {
+  final String label;
+  final AmountDTO amount;
+  final ApplePaySummaryItemType type;
+
+  ApplePaySummaryItemDTO(
+    this.label,
+    this.amount,
+    this.type,
   );
 }
 
