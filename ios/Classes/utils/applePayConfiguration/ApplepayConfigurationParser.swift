@@ -280,6 +280,6 @@ extension AmountDTO {
 
 extension Date {
     func toComponents() -> DateComponents {
-       return Calendar.current.dateComponents([.calendar, .year, .month, .day], from: self)
+        Calendar.current.dateComponents([.calendar, .year, .month, .day], from: self)
     }
 }
