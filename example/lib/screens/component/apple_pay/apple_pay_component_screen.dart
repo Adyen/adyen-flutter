@@ -72,79 +72,7 @@ class _ApplePayComponentScreenState extends State<ApplePayComponentScreen> {
       clientKey: Config.clientKey,
       countryCode: Config.countryCode,
       amount: Config.amount,
-      applePayConfiguration: ApplePayConfiguration(
-        merchantId: Config.merchantId,
-        merchantName: Config.merchantName,
-        allowOnboarding: true,
-        //supportedNetworks: ["amex"],
-        applePaySummaryItems: [
-          ApplePaySummaryItem(
-            label: "Product A",
-            amount: Amount(value: 5000, currency: "EUR"),
-            type: ApplePaySummaryItemType.definite,
-          ),
-          ApplePaySummaryItem(
-            label: "Product B",
-            amount: Amount(value: 2500, currency: "EUR"),
-            type: ApplePaySummaryItemType.definite,
-          ),
-          ApplePaySummaryItem(
-            label: "Discount",
-            amount: Amount(value: -1000, currency: "EUR"),
-            type: ApplePaySummaryItemType.definite,
-          ),
-          ApplePaySummaryItem(
-            label: "Total",
-            amount: Amount(value: 6500, currency: "EUR"),
-            type: ApplePaySummaryItemType.definite,
-          ),
-        ],
-        // requiredBillingContactFields: [
-        //   "postalAddress",
-        // ],
-        // billingContact: ApplePayContact(
-        //   givenName: "Billing test name",
-        // ),
-        // requiredShippingContactFields: [
-        //   "postalAddress",
-        //   "name",
-        // ],
-        // shippingContact: ApplePayContact(
-        //   givenName: "John",
-        //   familyName: "Wick",
-        //   addressLines: ["Simon Carmiggeltstraat 6"],
-        //   postalCode: "1011 DJ",
-        //   city: "Amsterdam",
-        //   country: "Netherlands",
-        // ),
-        applePayShippingType: ApplePayShippingType.shipping,
-        //allowShippingContactEditing: true,
-        // shippingMethods: [
-        //   ApplePayShippingMethod(
-        //     label: "Test",
-        //     detail: "detail",
-        //     amount: Amount(value: 2000, currency: "EUR"),
-        //     identifier: "identifier 1",
-        //     startDate: DateTime.now().add(const Duration(days: 2)),
-        //     endDate: DateTime.now().add(const Duration(days: 5)),
-        //   ),
-        //   ApplePayShippingMethod(
-        //     label: "Test2",
-        //     detail: "detail",
-        //     amount: Amount(value: 1000, currency: "EUR"),
-        //     identifier: "identifier 2",
-        //   ),
-        //   ApplePayShippingMethod(
-        //     label: "Pick Up",
-        //     detail: "detail",
-        //     amount: Amount(value: 0, currency: "EUR"),
-        //     identifier: "identifier 3",
-        //   ),
-        // ],
-        applicationData: "This is additional data",
-        //supportedCountries: ["US", "NL"],
-        // merchantCapability: ApplePayMerchantCapability.debit,
-      ),
+      applePayConfiguration: _createApplePayConfiguration(),
     );
 
     return FutureBuilder<SessionCheckout>(
@@ -184,6 +112,66 @@ class _ApplePayComponentScreenState extends State<ApplePayComponentScreen> {
           return const SizedBox.shrink();
         }
       },
+    );
+  }
+
+  ApplePayConfiguration _createApplePayConfiguration() {
+    return ApplePayConfiguration(
+      merchantId: Config.merchantId,
+      merchantName: Config.merchantName,
+      allowOnboarding: true,
+      applePaySummaryItems: [
+        ApplePaySummaryItem(
+          label: "Product A",
+          amount: Amount(value: 5000, currency: "EUR"),
+          type: ApplePaySummaryItemType.definite,
+        ),
+        ApplePaySummaryItem(
+          label: "Product B",
+          amount: Amount(value: 2500, currency: "EUR"),
+          type: ApplePaySummaryItemType.definite,
+        ),
+        ApplePaySummaryItem(
+          label: "Discount",
+          amount: Amount(value: -1000, currency: "EUR"),
+          type: ApplePaySummaryItemType.definite,
+        ),
+        ApplePaySummaryItem(
+          label: "Total",
+          amount: Config.amount,
+          type: ApplePaySummaryItemType.definite,
+        ),
+      ],
+      requiredShippingContactFields: [
+        "name",
+        "postalAddress",
+      ],
+      shippingContact: ApplePayContact(
+        givenName: "John",
+        familyName: "Wick",
+        addressLines: ["Simon Carmiggeltstraat 6"],
+        postalCode: "1011 DJ",
+        city: "Amsterdam",
+        country: "Netherlands",
+      ),
+      applePayShippingType: ApplePayShippingType.shipping,
+      allowShippingContactEditing: true,
+      shippingMethods: [
+        ApplePayShippingMethod(
+          label: "Standard shipping",
+          detail: "DHL",
+          amount: Amount(value: 1000, currency: "EUR"),
+          identifier: "identifier 1",
+          startDate: DateTime.now().add(const Duration(days: 2)),
+          endDate: DateTime.now().add(const Duration(days: 5)),
+        ),
+        ApplePayShippingMethod(
+          label: "Store pick up",
+          detail: "Weekdays, from 9:00 am to 6:00 pm",
+          amount: Amount(value: 0, currency: "EUR"),
+          identifier: "identifier 2",
+        ),
+      ],
     );
   }
 

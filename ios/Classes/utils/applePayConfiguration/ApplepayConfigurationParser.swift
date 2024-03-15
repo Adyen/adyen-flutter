@@ -35,7 +35,6 @@ extension ApplePayConfigurationDTO {
         
         if let shippingMethods {
             paymentRequest.shippingMethods = try shippingMethods.compactMap { try $0?.toPKShippingMethod() }
-            // addShippingMethodToSummaryItems(paymentRequest: paymentRequest)
         }
         
         if #available(iOS 15.0, *) {
@@ -254,13 +253,15 @@ extension ApplePayShippingMethodDTO {
         pkShippingMethod.amount = try amount.toFormattedAmount()
         
         if #available(iOS 15.0, *) {
+            let iso8601Formatter = ISO8601DateFormatter()
+            iso8601Formatter.formatOptions = [.withFullDate]
             if let startRaw = startDate,
                let endRaw = endDate,
                let startDate = iso8601Formatter.date(from: startRaw),
                let endDate = iso8601Formatter.date(from: endRaw) {
                 pkShippingMethod.dateComponentsRange = .init(
-                    start: startDate.toComponents,
-                    end: endDate.toComponents
+                    start: startDate.toComponents(),
+                    end: endDate.toComponents()
                 )
             }
         }
@@ -278,13 +279,7 @@ extension AmountDTO {
 }
 
 extension Date {
-    var toComponents: DateComponents {
-        Calendar.current.dateComponents([.calendar, .year, .month, .day], from: self)
+    func toComponents() -> DateComponents {
+       return Calendar.current.dateComponents([.calendar, .year, .month, .day], from: self)
     }
 }
-
-var iso8601Formatter: ISO8601DateFormatter = {
-    let formatter = ISO8601DateFormatter()
-    formatter.formatOptions = [.withFullDate]
-    return formatter
-}()
