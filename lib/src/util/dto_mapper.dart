@@ -82,9 +82,13 @@ extension ApplePayConfigurationMapper on ApplePayConfiguration {
             ?.map((applePaySummaryItem) => applePaySummaryItem.toDTO())
             .toList(),
         supportedNetworks: supportedNetworks,
-        requiredBillingContactFields: requiredBillingContactFields,
+        requiredBillingContactFields: requiredBillingContactFields
+            ?.map((billingContactField) => billingContactField.name)
+            .toList(),
         billingContact: billingContact?.toDTO(),
-        requiredShippingContactFields: requiredShippingContactFields,
+        requiredShippingContactFields: requiredShippingContactFields
+            ?.map((shippingContactField) => shippingContactField.name)
+            .toList(),
         shippingContact: shippingContact?.toDTO(),
         applePayShippingType: applePayShippingType,
         allowShippingContactEditing: allowShippingContactEditing,

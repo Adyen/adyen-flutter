@@ -143,8 +143,8 @@ class _ApplePayComponentScreenState extends State<ApplePayComponentScreen> {
         ),
       ],
       requiredShippingContactFields: [
-        "name",
-        "postalAddress",
+        ApplePayContactField.name,
+        ApplePayContactField.postalAddress,
       ],
       shippingContact: ApplePayContact(
         givenName: "John",
