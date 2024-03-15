@@ -121,8 +121,6 @@ class _BaseApplePayComponentState extends State<BaseApplePayComponent> {
 
   SizedBox _buildApplePayButton(
       AsyncSnapshot<InstantPaymentSetupResultDTO> snapshot) {
-    final String allowedPaymentMethods =
-        snapshot.data?.resultData.toString() ?? "[]";
     final Widget applePayButton = _buildRawApplePayButton();
 
     return SizedBox(
