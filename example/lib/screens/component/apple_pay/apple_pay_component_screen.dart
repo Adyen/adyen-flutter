@@ -148,7 +148,7 @@ class _ApplePayComponentScreenState extends State<ApplePayComponentScreen> {
       ],
       shippingContact: ApplePayContact(
         givenName: "John",
-        familyName: "Wick",
+        familyName: "Doe",
         addressLines: ["Simon Carmiggeltstraat 6"],
         postalCode: "1011 DJ",
         city: "Amsterdam",
