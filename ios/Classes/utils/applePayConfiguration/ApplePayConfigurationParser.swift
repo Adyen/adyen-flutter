@@ -39,7 +39,8 @@ extension ApplePayConfigurationDTO {
         
         if #available(iOS 15.0, *) {
             if let allowShippingContactEditing {
-                paymentRequest.shippingContactEditingMode = allowShippingContactEditing == true ? PKShippingContactEditingMode.available : PKShippingContactEditingMode.storePickup
+                //We have to use enabled until we forcing the newest Xcode version. Otherwise the build fails.
+                paymentRequest.shippingContactEditingMode = allowShippingContactEditing == true ? PKShippingContactEditingMode.enabled : PKShippingContactEditingMode.storePickup
             }
         }
         
