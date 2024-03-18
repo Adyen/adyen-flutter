@@ -39,7 +39,7 @@ extension ApplePayConfigurationDTO {
         
         if #available(iOS 15.0, *) {
             if let allowShippingContactEditing {
-                paymentRequest.shippingContactEditingMode = allowShippingContactEditing ? PKShippingContactEditingMode.available : PKShippingContactEditingMode.storePickup
+                paymentRequest.shippingContactEditingMode = allowShippingContactEditing == true ? PKShippingContactEditingMode.available : PKShippingContactEditingMode.storePickup
             }
         }
         
