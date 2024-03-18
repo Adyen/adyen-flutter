@@ -26,7 +26,7 @@ class CardSessionComponent: BaseCardComponent {
         )
 
         setupCardComponentView()
-        setupFinalizeComponentCallback()
+        setupSessionFlowDelegate()
     }
 
     private func setupCardComponentView() {
@@ -70,16 +70,21 @@ class CardSessionComponent: BaseCardComponent {
         return CardComponent(paymentMethod: cardPaymentMethod, context: adyenContext, configuration: cardConfiguration)
     }
 
-    private func setupFinalizeComponentCallback() {
-        (sessionHolder.sessionDelegate as? ComponentSessionFlowDelegate)?.finalizeAndDismissHandler = finalizeAndDismissSessionComponent
-        (sessionHolder.sessionDelegate as? ComponentSessionFlowDelegate)?.componentId = componentId
+    private func setupSessionFlowDelegate() {
+        if let componentSessionFlowDelegate = (sessionHolder.sessionDelegate as? ComponentSessionFlowDelegate) {
+            componentSessionFlowDelegate.finalizeAndDismissHandler = finalizeAndDismissSessionComponent
+            componentSessionFlowDelegate.componentId = componentId
+        } else {
+            AdyenAssertion.assertionFailure(message: "Wrong session flow delegate usage")
+        }
     }
 
     func finalizeAndDismissSessionComponent(success: Bool, completion: @escaping (() -> Void)) {
         finalizeAndDismiss(success: success, completion: { [weak self] in
+            guard let self else { return }
             completion()
-            self?.sessionHolder.reset()
-            self?.cardComponent = nil
+            sessionHolder.reset()
+            cardComponent = nil
         })
     }
 }

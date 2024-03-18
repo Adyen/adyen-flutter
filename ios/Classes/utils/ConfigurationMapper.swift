@@ -214,11 +214,17 @@ extension InstantPaymentConfigurationDTO {
 
 private func buildAdyenContext(environment: Environment, clientKey: String, amount: AmountDTO, analyticsOptionsDTO: AnalyticsOptionsDTO, countryCode: String) throws -> AdyenContext {
     let environment = environment.mapToEnvironment()
-    let apiContext = try APIContext(environment: environment, clientKey: clientKey)
+    let apiContext = try APIContext(
+        environment: environment,
+        clientKey: clientKey
+    )
     let amount = amount.mapToAmount()
     var analyticsConfiguration = AnalyticsConfiguration()
     analyticsConfiguration.isEnabled = analyticsOptionsDTO.enabled
-    analyticsConfiguration.context = TelemetryContext(version: analyticsOptionsDTO.version, platform: .flutter)
+    analyticsConfiguration.context = TelemetryContext(
+        version: analyticsOptionsDTO.version,
+        platform: .flutter
+    )
     return AdyenContext(
         apiContext: apiContext,
         payment: Payment(

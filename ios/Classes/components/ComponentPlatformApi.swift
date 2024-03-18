@@ -31,7 +31,7 @@ class ComponentPlatformApi: ComponentPlatformInterface {
         case .googlePay:
             return
         case .applePay:
-            applePayComponentManager.isApplePayAvailable(
+            applePayComponentManager.setUpApplePayIfAvailable(
                 instantPaymentComponentConfigurationDTO: instantPaymentConfigurationDTO,
                 callback: completion
             )

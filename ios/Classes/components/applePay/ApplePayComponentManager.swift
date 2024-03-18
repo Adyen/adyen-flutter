@@ -1,5 +1,4 @@
-@_spi(AdyenInternal)
-import Adyen
+@_spi(AdyenInternal) import Adyen
 
 class ApplePayComponentManager {
     private let sessionHolder: SessionHolder
@@ -9,23 +8,21 @@ class ApplePayComponentManager {
         self.sessionHolder = sessionHolder
     }
  
-    func isApplePayAvailable(instantPaymentComponentConfigurationDTO: InstantPaymentConfigurationDTO, callback: (Result<InstantPaymentSetupResultDTO, Error>) -> Void) {
-        guard let applePayConfiguration = try? instantPaymentComponentConfigurationDTO.mapToApplePayConfiguration(),
-              let adyenContext = try? instantPaymentComponentConfigurationDTO.createAdyenContext()
-        else {
-            callback(Result.failure(PlatformError(errorDescription: "Apple Pay configuration error occurred")))
-            return
+    func setUpApplePayIfAvailable(instantPaymentComponentConfigurationDTO: InstantPaymentConfigurationDTO, callback: (Result<InstantPaymentSetupResultDTO, Error>) -> Void) {
+        do {
+            let applePayConfiguration = try instantPaymentComponentConfigurationDTO.mapToApplePayConfiguration()
+            let adyenContext = try instantPaymentComponentConfigurationDTO.createAdyenContext()
+            if sessionHolder.session != nil, sessionHolder.sessionDelegate != nil {
+                applePayComponent = ApplePaySessionComponent(
+                    sessionHolder: sessionHolder,
+                    configuration: applePayConfiguration,
+                    adyenContext: adyenContext
+                )
+            }
+            callback(Result.success(InstantPaymentSetupResultDTO(instantPaymentType: InstantPaymentType.applePay, isSupported: true)))
+        } catch {
+            callback(Result.failure(error))
         }
-            
-        if sessionHolder.session != nil, sessionHolder.sessionDelegate != nil {
-            applePayComponent = ApplePaySessionComponent(
-                sessionHolder: sessionHolder,
-                configuration: applePayConfiguration,
-                adyenContext: adyenContext
-            )
-        }
-            
-        callback(Result.success(InstantPaymentSetupResultDTO(instantPaymentType: InstantPaymentType.applePay, isSupported: true)))
     }
     
     func onApplePayComponentPressed(componentId: String) {

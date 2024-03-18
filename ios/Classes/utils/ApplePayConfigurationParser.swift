@@ -16,46 +16,29 @@ extension ApplePayConfigurationDTO {
         paymentRequest.billingContact = billingContact?.toApplePayContact()
         paymentRequest.shippingContact = shippingContact?.toApplePayContact()
         paymentRequest.merchantCapabilities = merchantCapability.toMerchantCapability()
-        
-        if let requiredShippingContactFields {
-            paymentRequest.requiredShippingContactFields = mapToContactFields(contactFields: requiredShippingContactFields)
-        }
-        
-        if let requiredBillingContactFields = requiredShippingContactFields {
-            paymentRequest.requiredBillingContactFields = mapToContactFields(contactFields: requiredBillingContactFields)
-        }
-        
-        if let shippingType = applePayShippingType {
-            paymentRequest.shippingType = shippingType.toPKShippingType()
-        }
-        
-        if let supportedCountries {
-            paymentRequest.supportedCountries = .init(supportedCountries.compactMap { $0 })
-        }
-        
-        if let shippingMethods {
-            paymentRequest.shippingMethods = try shippingMethods.compactMap { try $0?.toPKShippingMethod() }
-        }
+        requiredShippingContactFields.map { paymentRequest.requiredShippingContactFields = mapToContactFields(contactFields: $0) }
+        requiredShippingContactFields.map { paymentRequest.requiredBillingContactFields = mapToContactFields(contactFields: $0) }
+        applePayShippingType.map { paymentRequest.shippingType = $0.toPKShippingType() }
+        supportedCountries.map { paymentRequest.supportedCountries = .init($0.compactMap { $0 }) }
+        try shippingMethods.map { paymentRequest.shippingMethods = try $0.compactMap { try $0?.toPKShippingMethod() }}
         
         if #available(iOS 15.0, *) {
-            if let allowShippingContactEditing {
+            allowShippingContactEditing.map {
                 // We have to use enabled until we forcing the newest Xcode version. Otherwise the build fails.
-                paymentRequest.shippingContactEditingMode = allowShippingContactEditing == true ? PKShippingContactEditingMode.enabled : PKShippingContactEditingMode.storePickup
+                paymentRequest.shippingContactEditingMode = $0 ? PKShippingContactEditingMode.enabled : PKShippingContactEditingMode.storePickup
             }
         }
         
-        if let supportedNetworks {
-            let supportedNetworksNonNil: [String] = supportedNetworks.compactMap { $0 }
+        supportedNetworks.map {
+            let supportedNetworksNonNil: [String] = $0.compactMap { $0 }
             paymentRequest.supportedNetworks = mapToSupportedNetworks(supportedNetworks: supportedNetworksNonNil)
         }
         
-        if let applicationData {
-            paymentRequest.applicationData = Data(applicationData.utf8)
-        }
-
+        applicationData.map { paymentRequest.applicationData = Data($0.utf8) }
         return paymentRequest
     }
     
+    // TODO: could be deleted when implementing advanced flow
     private func addShippingMethodToSummaryItems(paymentRequest: PKPaymentRequest) {
         guard let shippingMethod = paymentRequest.shippingMethods?.first else {
             return
@@ -64,10 +47,15 @@ extension ApplePayConfigurationDTO {
         if let last = paymentRequest.paymentSummaryItems.last {
             paymentRequest.paymentSummaryItems = paymentRequest.paymentSummaryItems.dropLast()
             paymentRequest.paymentSummaryItems.append(shippingMethod)
-            paymentRequest.paymentSummaryItems.append(.init(label: last.label,
-                                                            amount: NSDecimalNumber(value: last.amount.floatValue + shippingMethod.amount.floatValue)))
+            paymentRequest.paymentSummaryItems.append(
+                .init(
+                    label: last.label,
+                    amount: NSDecimalNumber(
+                        value: last.amount.floatValue + shippingMethod.amount.floatValue
+                    )
+                )
+            )
         }
-
     }
     
     private func mapToContactFields(contactFields: [String?]) -> Set<PKContactField> {
@@ -139,35 +127,23 @@ extension ApplePayContactDTO {
         let contact = PKContact()
         contact.name = extractPersonNameComponents()
         contact.postalAddress = extractPostalAddress()
-        if let phoneNumber {
-            contact.phoneNumber = CNPhoneNumber(stringValue: phoneNumber)
-        }
-        
-        if let emailAddress {
-            contact.emailAddress = emailAddress
-        }
-        
+        phoneNumber.map { contact.phoneNumber = CNPhoneNumber(stringValue: $0) }
+        emailAddress.map { contact.emailAddress = $0 }
         return contact
     }
     
     private func extractPersonNameComponents() -> PersonNameComponents {
         var personName = PersonNameComponents()
-        if let givenName {
-            personName.givenName = givenName
-        }
-   
-        if let familyName {
-            personName.familyName = familyName
-        }
-        
-        if let phoneticGivenName {
+        givenName.map { personName.givenName = $0 }
+        familyName.map { personName.familyName = $0 }
+        phoneticGivenName.map {
             personName.phoneticRepresentation = PersonNameComponents()
-            personName.phoneticRepresentation?.givenName = phoneticGivenName
+            personName.phoneticRepresentation?.givenName = $0
         }
         
-        if let phoneticFamilyName {
+        phoneticFamilyName.map {
             personName.phoneticRepresentation = personName.phoneticRepresentation ?? PersonNameComponents()
-            personName.phoneticRepresentation?.familyName = phoneticFamilyName
+            personName.phoneticRepresentation?.familyName = $0
         }
         
         return personName
@@ -179,34 +155,13 @@ extension ApplePayContactDTO {
             postalAddress.street = addressLines.joined(separator: "\n")
         }
 
-        if let subLocality {
-            postalAddress.subLocality = subLocality
-        }
-
-        if let city {
-            postalAddress.city = city
-        }
-
-        if let postalCode {
-            postalAddress.postalCode = postalCode
-        }
-
-        if let subAdministrativeArea {
-            postalAddress.subAdministrativeArea = subAdministrativeArea
-        }
-
-        if let administrativeArea {
-            postalAddress.state = administrativeArea
-        }
-
-        if let country {
-            postalAddress.country = country
-        }
-
-        if let countryCode {
-            postalAddress.isoCountryCode = countryCode
-        }
-
+        subLocality.map { postalAddress.subLocality = $0 }
+        city.map { postalAddress.city = $0 }
+        postalCode.map { postalAddress.postalCode = $0 }
+        subAdministrativeArea.map { postalAddress.subAdministrativeArea = $0 }
+        administrativeArea.map { postalAddress.state = $0 }
+        country.map { postalAddress.country = $0 }
+        countryCode.map { postalAddress.isoCountryCode = $0 }
         return postalAddress
     }
 }

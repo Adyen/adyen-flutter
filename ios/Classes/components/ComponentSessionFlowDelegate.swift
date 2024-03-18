@@ -15,6 +15,7 @@ class ComponentSessionFlowDelegate: AdyenSessionDelegate {
         let resultCode = result.resultCode
         let success = resultCode == .authorised || resultCode == .received || resultCode == .pending
         finalizeAndDismissHandler?(success, { [weak self] in
+            guard let self else { return }
             let paymentResult = PaymentResultModelDTO(
                 sessionId: session.sessionContext.identifier,
                 sessionData: session.sessionContext.data,
@@ -22,10 +23,10 @@ class ComponentSessionFlowDelegate: AdyenSessionDelegate {
             )
             let componentCommunicationModel = ComponentCommunicationModel(
                 type: ComponentCommunicationType.result,
-                componentId: self?.componentId ?? "",
+                componentId: componentId ?? "",
                 paymentResult: paymentResult
             )
-            self?.componentFlutterApi.onComponentCommunication(
+            componentFlutterApi.onComponentCommunication(
                 componentCommunicationModel: componentCommunicationModel,
                 completion: { _ in }
             )
@@ -34,12 +35,13 @@ class ComponentSessionFlowDelegate: AdyenSessionDelegate {
     
     func didFail(with error: Error, from component: Adyen.Component, session: Adyen.AdyenSession) {
         finalizeAndDismissHandler?(false, { [weak self] in
+            guard let self else { return }
             let componentCommunicationModel = ComponentCommunicationModel(
                 type: ComponentCommunicationType.error,
-                componentId: self?.componentId ?? "",
+                componentId: componentId ?? "",
                 data: error.localizedDescription
             )
-            self?.componentFlutterApi.onComponentCommunication(
+            componentFlutterApi.onComponentCommunication(
                 componentCommunicationModel: componentCommunicationModel,
                 completion: { _ in }
             )
