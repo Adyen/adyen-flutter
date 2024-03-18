@@ -114,9 +114,9 @@ extension ApplePaySummaryItemType {
     func toPKPaymentSummaryItemType() -> PKPaymentSummaryItemType {
         switch self {
         case .pending:
-            PKPaymentSummaryItemType.pending
+           return PKPaymentSummaryItemType.pending
         case .definite:
-            PKPaymentSummaryItemType.final
+           return PKPaymentSummaryItemType.final
         }
     }
 }
