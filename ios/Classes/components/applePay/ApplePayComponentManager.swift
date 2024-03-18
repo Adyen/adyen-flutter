@@ -1,14 +1,23 @@
 @_spi(AdyenInternal) import Adyen
 
 class ApplePayComponentManager {
+    private let componentFlutterApi: ComponentFlutterInterface
     private let sessionHolder: SessionHolder
     var applePayComponent: BaseApplePayComponent?
 
-    init(sessionHolder: SessionHolder) {
+    init(
+        componentFlutterApi: ComponentFlutterInterface,
+        sessionHolder: SessionHolder
+    ) {
+        self.componentFlutterApi = componentFlutterApi
         self.sessionHolder = sessionHolder
     }
  
-    func setUpApplePayIfAvailable(instantPaymentComponentConfigurationDTO: InstantPaymentConfigurationDTO, callback: (Result<InstantPaymentSetupResultDTO, Error>) -> Void) {
+    func setUpApplePayIfAvailable(
+        instantPaymentComponentConfigurationDTO: InstantPaymentConfigurationDTO,
+        paymentMethodResponse: String,
+        callback: (Result<InstantPaymentSetupResultDTO, Error>) -> Void
+    ) {
         do {
             let applePayConfiguration = try instantPaymentComponentConfigurationDTO.mapToApplePayConfiguration()
             let adyenContext = try instantPaymentComponentConfigurationDTO.createAdyenContext()
@@ -18,8 +27,22 @@ class ApplePayComponentManager {
                     configuration: applePayConfiguration,
                     adyenContext: adyenContext
                 )
+            } else {
+                applePayComponent = ApplePayAdvancedComponent(
+                    componentFlutterApi: componentFlutterApi,
+                    configuration: applePayConfiguration,
+                    adyenContext: adyenContext,
+                    paymentMethodResponse: paymentMethodResponse
+                )
             }
-            callback(Result.success(InstantPaymentSetupResultDTO(instantPaymentType: InstantPaymentType.applePay, isSupported: true)))
+            callback(
+                Result.success(
+                    InstantPaymentSetupResultDTO(
+                        instantPaymentType: InstantPaymentType.applePay,
+                        isSupported: true
+                    )
+                )
+            )
         } catch {
             callback(Result.failure(error))
         }
@@ -27,5 +50,9 @@ class ApplePayComponentManager {
     
     func onApplePayComponentPressed(componentId: String) {
         applePayComponent?.present()
+    }
+    
+    func handlePaymentEvent(paymentEventDTO: PaymentEventDTO) {
+        applePayComponent?.handlePaymentEvent(paymentEventDTO: paymentEventDTO)
     }
 }

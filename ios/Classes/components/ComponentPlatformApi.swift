@@ -14,6 +14,8 @@ class ComponentPlatformApi: ComponentPlatformInterface {
     }
 
     func onPaymentsResult(paymentsResult: PaymentEventDTO) {
+        // TODO: Adjust handling
+        applePayComponentManager.handlePaymentEvent(paymentEventDTO: paymentsResult)
         handlePaymentEvent(paymentEventDTO: paymentsResult)
     }
 
@@ -33,6 +35,7 @@ class ComponentPlatformApi: ComponentPlatformInterface {
         case .applePay:
             applePayComponentManager.setUpApplePayIfAvailable(
                 instantPaymentComponentConfigurationDTO: instantPaymentConfigurationDTO,
+                paymentMethodResponse: paymentMethodResponse,
                 callback: completion
             )
         }

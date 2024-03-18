@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:adyen_checkout/adyen_checkout.dart';
+import 'package:adyen_checkout/src/components/apple_pay/apple_pay_advanced_component.dart';
 import 'package:adyen_checkout/src/components/apple_pay/apple_pay_session_component.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -61,7 +62,24 @@ class AdyenApplePayComponent extends StatelessWidget {
   }
 
   Widget _buildApplePayAdvancedFlowWidget() {
-    return const Text("TODO");
+    final String encodedPaymentMethod = json.encode(paymentMethod);
+    AdvancedCheckout advancedCheckout = checkout as AdvancedCheckout;
+    return ApplePayAdvancedComponent(
+      key: key,
+      applePayPaymentMethod: encodedPaymentMethod,
+      applePayComponentConfiguration: configuration,
+      onPaymentResult: onPaymentResult,
+      onSubmit: advancedCheckout.onSubmit,
+      onAdditionalDetails: advancedCheckout.onAdditionalDetails,
+      style: _mapToApplePayButtonStyle(),
+      type: _mapToApplePayButtonType(),
+      width: _determineWidth(),
+      height: _determineHeight(),
+      cornerRadius: style?.cornerRadius,
+      loadingIndicator: loadingIndicator,
+      onUnavailable: onUnavailable,
+      unavailableWidget: unavailableWidget,
+    );
   }
 
   double _determineWidth() {

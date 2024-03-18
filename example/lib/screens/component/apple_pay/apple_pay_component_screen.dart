@@ -35,9 +35,10 @@ class _ApplePayComponentScreenState extends State<ApplePayComponentScreen> {
             children: [
               _buildSessionAdvancedFlowSwitch(_useSession),
               const SizedBox(height: 40),
-              _useSession
-                  ? _buildAdyenApplePaySessionComponent()
-                  : const SizedBox.shrink(),
+              _buildAdyenApplePayAdvancedComponent(),
+              // _useSession
+              //     ? _buildAdyenApplePaySessionComponent()
+              //     : _buildAdyenApplePayAdvancedComponent(),
             ],
           ),
         ),
@@ -96,6 +97,57 @@ class _ApplePayComponentScreenState extends State<ApplePayComponentScreen> {
                 configuration: applePayComponentConfiguration,
                 paymentMethod: paymentMethod,
                 checkout: sessionCheckout,
+                loadingIndicator: const CircularProgressIndicator(),
+                style: ApplePayButtonStyle(
+                  width: 200,
+                  height: 48,
+                ),
+                onPaymentResult: (paymentResult) {
+                  Navigator.pop(context);
+                  _dialogBuilder(paymentResult, context);
+                },
+              ),
+            ],
+          );
+        } else {
+          return const SizedBox.shrink();
+        }
+      },
+    );
+  }
+
+  Widget _buildAdyenApplePayAdvancedComponent() {
+    final ApplePayComponentConfiguration applePayComponentConfiguration =
+    ApplePayComponentConfiguration(
+      environment: Environment.test,
+      clientKey: Config.clientKey,
+      countryCode: Config.countryCode,
+      amount: Config.amount,
+      applePayConfiguration: _createApplePayConfiguration(),
+    );
+
+    return FutureBuilder<String>(
+      future: widget.repository.fetchPaymentMethods(),
+      builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
+        if (snapshot.hasData) {
+          final AdvancedCheckout advancedCheckout = AdvancedCheckout(
+            onSubmit: widget.repository.onSubmit,
+            onAdditionalDetails: widget.repository.onAdditionalDetails,
+          );
+          final paymentMethod = _extractPaymentMethod(snapshot.data!);
+
+          return Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Text(
+                style: TextStyle(fontSize: 20),
+                "Advanced flow",
+              ),
+              const SizedBox(height: 8),
+              AdyenApplePayComponent(
+                configuration: applePayComponentConfiguration,
+                paymentMethod: paymentMethod,
+                checkout: advancedCheckout,
                 loadingIndicator: const CircularProgressIndicator(),
                 style: ApplePayButtonStyle(
                   width: 200,
