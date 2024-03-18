@@ -39,7 +39,7 @@ extension ApplePayConfigurationDTO {
         
         if #available(iOS 15.0, *) {
             if let allowShippingContactEditing {
-                //We have to use enabled until we forcing the newest Xcode version. Otherwise the build fails.
+                // We have to use enabled until we forcing the newest Xcode version. Otherwise the build fails.
                 paymentRequest.shippingContactEditingMode = allowShippingContactEditing == true ? PKShippingContactEditingMode.enabled : PKShippingContactEditingMode.storePickup
             }
         }
@@ -114,9 +114,9 @@ extension ApplePaySummaryItemType {
     func toPKPaymentSummaryItemType() -> PKPaymentSummaryItemType {
         switch self {
         case .pending:
-           return PKPaymentSummaryItemType.pending
+            return PKPaymentSummaryItemType.pending
         case .definite:
-           return PKPaymentSummaryItemType.final
+            return PKPaymentSummaryItemType.final
         }
     }
 }
