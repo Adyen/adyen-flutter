@@ -23,10 +23,10 @@ class ComponentSessionFlowDelegate: AdyenSessionDelegate {
             )
             let componentCommunicationModel = ComponentCommunicationModel(
                 type: ComponentCommunicationType.result,
-                componentId: componentId ?? "",
+                componentId: self.componentId ?? "",
                 paymentResult: paymentResult
             )
-            componentFlutterApi.onComponentCommunication(
+            self.componentFlutterApi.onComponentCommunication(
                 componentCommunicationModel: componentCommunicationModel,
                 completion: { _ in }
             )
@@ -38,10 +38,10 @@ class ComponentSessionFlowDelegate: AdyenSessionDelegate {
             guard let self else { return }
             let componentCommunicationModel = ComponentCommunicationModel(
                 type: ComponentCommunicationType.error,
-                componentId: componentId ?? "",
+                componentId: self.componentId ?? "",
                 data: error.localizedDescription
             )
-            componentFlutterApi.onComponentCommunication(
+            self.componentFlutterApi.onComponentCommunication(
                 componentCommunicationModel: componentCommunicationModel,
                 completion: { _ in }
             )
