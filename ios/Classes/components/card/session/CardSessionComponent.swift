@@ -83,8 +83,8 @@ class CardSessionComponent: BaseCardComponent {
         finalizeAndDismiss(success: success, completion: { [weak self] in
             guard let self else { return }
             completion()
-            sessionHolder.reset()
-            cardComponent = nil
+            self.sessionHolder.reset()
+            self.cardComponent = nil
         })
     }
 }

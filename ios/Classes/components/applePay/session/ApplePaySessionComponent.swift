@@ -47,12 +47,11 @@ class ApplePaySessionComponent: BaseApplePayComponent {
         
     func finalizeAndDismissSessionComponent(success: Bool, completion: @escaping (() -> Void)) {
         applePayComponent?.finalizeIfNeeded(with: success) { [weak self] in
-            guard let self else { return }
-            getViewController()?.dismiss(animated: true, completion: { [weak self] in
+            self?.getViewController()?.dismiss(animated: true, completion: { [weak self] in
                 guard let self else { return }
                 completion()
-                sessionHolder.reset()
-                applePayComponent = nil
+                self.sessionHolder.reset()
+                self.applePayComponent = nil
             })
         }
     }
