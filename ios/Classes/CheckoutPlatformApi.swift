@@ -33,9 +33,26 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
             // TODO: Let's plan a generic configuration mapping for creating a session.
             switch configuration {
             case let dropInConfigurationDTO as DropInConfigurationDTO:
-                try createSessionForDropIn(dropInConfigurationDTO, sessionId, sessionData, completion)
+                try createSessionForDropIn(
+                    configuration: dropInConfigurationDTO,
+                    sessionId: sessionId,
+                    sessionData: sessionData,
+                    completion: completion
+                )
             case let cardComponentConfigurationDTO as CardComponentConfigurationDTO:
-                try createSessionForCardComponent(cardComponentConfigurationDTO, sessionId, sessionData, completion)
+                try createSessionForCardComponent(
+                    configuration: cardComponentConfigurationDTO,
+                    sessionId: sessionId,
+                    sessionData: sessionData,
+                    completion: completion
+                )
+            case let instantComponentConfigurationDTO as InstantPaymentConfigurationDTO:
+                try createSessionForInstantPaymentConfiguration(
+                    configuration: instantComponentConfigurationDTO,
+                    sessionId: sessionId,
+                    sessionData: sessionData,
+                    completion: completion
+                )
             case .none, .some:
                 completion(Result.failure(PlatformError(errorDescription: "Configuration is not valid")))
             }
@@ -53,58 +70,81 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
     }
 
     private func createSessionForDropIn(
-        _ configuration: DropInConfigurationDTO,
-        _ sessionId: String,
-        _ sessionData: String,
-        _ completion: @escaping (Result<SessionDTO, Error>) -> Void
+        configuration: DropInConfigurationDTO,
+        sessionId: String,
+        sessionData: String,
+        completion: @escaping (Result<SessionDTO, Error>) -> Void
     ) throws {
         let adyenContext = try configuration.createAdyenContext()
         let sessionDelegate = DropInSessionsDelegate(viewController: getViewController(), dropInFlutterApi: dropInFlutterApi)
         let sessionPresentationDelegate = DropInSessionsPresentationDelegate()
         requestAndSetSession(
-            adyenContext,
-            sessionId,
-            sessionData,
-            sessionDelegate,
-            sessionPresentationDelegate,
-            completion
+            adyenContext: adyenContext,
+            sessionId: sessionId,
+            sessionData: sessionData,
+            sessionDelegate: sessionDelegate,
+            sessionPresentationDelegate: sessionPresentationDelegate,
+            completion: completion
         )
     }
 
     private func createSessionForCardComponent(
-        _ configuration: CardComponentConfigurationDTO,
-        _ sessionId: String,
-        _ sessionData: String,
-        _ completion: @escaping (Result<SessionDTO, Error>) -> Void
+        configuration: CardComponentConfigurationDTO,
+        sessionId: String,
+        sessionData: String,
+        completion: @escaping (Result<SessionDTO, Error>) -> Void
     ) throws {
         let adyenContext = try configuration.createAdyenContext()
-        let sessionDelegate = CardSessionFlowDelegate(componentFlutterApi: componentFlutterApi)
-        let sessionPresentationDelegate = CardPresentationDelegate(topViewController: getViewController())
+        let sessionDelegate = ComponentSessionFlowDelegate(componentFlutterApi: componentFlutterApi)
+        let sessionPresentationDelegate = ComponentPresentationDelegate(topViewController: getViewController())
         requestAndSetSession(
-            adyenContext,
-            sessionId,
-            sessionData,
-            sessionDelegate,
-            sessionPresentationDelegate,
-            completion
+            adyenContext: adyenContext,
+            sessionId: sessionId,
+            sessionData: sessionData,
+            sessionDelegate: sessionDelegate,
+            sessionPresentationDelegate: sessionPresentationDelegate,
+            completion: completion
+        )
+    }
+    
+    private func createSessionForInstantPaymentConfiguration(
+        configuration: InstantPaymentConfigurationDTO,
+        sessionId: String,
+        sessionData: String,
+        completion: @escaping (Result<SessionDTO, Error>) -> Void
+    ) throws {
+        let adyenContext = try configuration.createAdyenContext()
+        let sessionDelegate = ComponentSessionFlowDelegate(componentFlutterApi: componentFlutterApi)
+        let applePayPresentationDelegate = ComponentPresentationDelegate(topViewController: getViewController())
+        requestAndSetSession(
+            adyenContext: adyenContext,
+            sessionId: sessionId,
+            sessionData: sessionData,
+            sessionDelegate: sessionDelegate,
+            sessionPresentationDelegate: applePayPresentationDelegate,
+            completion: completion
         )
     }
 
     private func requestAndSetSession(
-        _ adyenContext: AdyenContext,
-        _ sessionId: String,
-        _ sessionData: String,
-        _ sessionDelegate: AdyenSessionDelegate,
-        _ sessionPresentationDelegate: PresentationDelegate,
-        _ completion: @escaping (Result<SessionDTO, Error>) -> Void
+        adyenContext: AdyenContext,
+        sessionId: String,
+        sessionData: String,
+        sessionDelegate: AdyenSessionDelegate,
+        sessionPresentationDelegate: PresentationDelegate,
+        completion: @escaping (Result<SessionDTO, Error>) -> Void
     ) {
-        let sessionConfiguration = AdyenSession.Configuration(sessionIdentifier: sessionId,
-                                                              initialSessionData: sessionData,
-                                                              context: adyenContext,
-                                                              actionComponent: .init())
-        AdyenSession.initialize(with: sessionConfiguration,
-                                delegate: sessionDelegate,
-                                presentationDelegate: sessionPresentationDelegate) { [weak self] result in
+        let sessionConfiguration = AdyenSession.Configuration(
+            sessionIdentifier: sessionId,
+            initialSessionData: sessionData,
+            context: adyenContext,
+            actionComponent: .init()
+        )
+        AdyenSession.initialize(
+            with: sessionConfiguration,
+            delegate: sessionDelegate,
+            presentationDelegate: sessionPresentationDelegate
+        ) { [weak self] result in
             switch result {
             case let .success(session):
                 // TODO: For later  - We need to return the actual session and removing the session holder when the session is codable.

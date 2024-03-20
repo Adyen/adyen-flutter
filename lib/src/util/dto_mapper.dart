@@ -78,6 +78,63 @@ extension ApplePayConfigurationMapper on ApplePayConfiguration {
         merchantId: merchantId,
         merchantName: merchantName,
         allowOnboarding: allowOnboarding,
+        summaryItems: applePaySummaryItems
+            ?.map((applePaySummaryItem) => applePaySummaryItem.toDTO())
+            .toList(),
+        supportedNetworks: supportedNetworks,
+        requiredBillingContactFields: requiredBillingContactFields
+            ?.map((billingContactField) => billingContactField.name)
+            .toList(),
+        billingContact: billingContact?.toDTO(),
+        requiredShippingContactFields: requiredShippingContactFields
+            ?.map((shippingContactField) => shippingContactField.name)
+            .toList(),
+        shippingContact: shippingContact?.toDTO(),
+        applePayShippingType: applePayShippingType,
+        allowShippingContactEditing: allowShippingContactEditing,
+        shippingMethods: shippingMethods
+            ?.map((shippingMethod) => shippingMethod.toDTO())
+            .toList(),
+        applicationData: applicationData,
+        supportedCountries: supportedCountries,
+        merchantCapability: merchantCapability,
+      );
+}
+
+extension ApplePayContactMapper on ApplePayContact {
+  ApplePayContactDTO toDTO() => ApplePayContactDTO(
+        phoneNumber: phoneNumber,
+        emailAddress: emailAddress,
+        givenName: givenName,
+        familyName: familyName,
+        phoneticGivenName: phoneticGivenName,
+        phoneticFamilyName: phoneticFamilyName,
+        addressLines: addressLines,
+        subLocality: subLocality,
+        city: city,
+        postalCode: postalCode,
+        subAdministrativeArea: subAdministrativeArea,
+        administrativeArea: administrativeArea,
+        country: country,
+        countryCode: countryCode,
+      );
+}
+
+extension ApplePayShippingMethodMapper on ApplePayShippingMethod {
+  ApplePayShippingMethodDTO toDTO() => ApplePayShippingMethodDTO(
+      label: label,
+      detail: detail,
+      amount: amount.toDTO(),
+      identifier: identifier,
+      startDate: startDate?.toIso8601String(),
+      endDate: endDate?.toIso8601String());
+}
+
+extension ApplePaySummaryItemsMapper on ApplePaySummaryItem {
+  ApplePaySummaryItemDTO toDTO() => ApplePaySummaryItemDTO(
+        label: label,
+        amount: amount.toDTO(),
+        type: type,
       );
 }
 
@@ -165,4 +222,21 @@ extension ShippingAddressParametersMapper on ShippingAddressParameters {
       isPhoneNumberRequired: isPhoneNumberRequired,
     );
   }
+}
+
+extension ApplePayComponentConfigurationMapper
+    on ApplePayComponentConfiguration {
+  InstantPaymentConfigurationDTO toDTO(
+    String sdkVersionNumber,
+    InstantPaymentType instantPaymentType,
+  ) =>
+      InstantPaymentConfigurationDTO(
+        instantPaymentType: instantPaymentType,
+        environment: environment,
+        clientKey: clientKey,
+        countryCode: countryCode,
+        amount: amount.toDTO(),
+        analyticsOptionsDTO: analyticsOptions.toDTO(sdkVersionNumber),
+        applePayConfigurationDTO: applePayConfiguration.toDTO(),
+      );
 }

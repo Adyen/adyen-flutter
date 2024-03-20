@@ -25,16 +25,16 @@ class BaseCardComponent: NSObject, FlutterPlatformView, UIScrollViewDelegate {
         viewIdentifier _: Int64,
         arguments: NSDictionary,
         binaryMessenger: FlutterBinaryMessenger,
-        componentFlutterApi: ComponentFlutterInterface
+        componentFlutterApi: ComponentFlutterInterface,
+        componentPlatformApi: ComponentPlatformApi
     ) {
         self.componentFlutterApi = componentFlutterApi
+        self.componentPlatformApi = componentPlatformApi
         cardComponentConfiguration = arguments.value(forKey: cardComponentConfigurationKey) as? CardComponentConfigurationDTO
         paymentMethod = arguments.value(forKey: paymentMethodKey) as? String
         isStoredPaymentMethod = arguments.value(forKey: isStoredPaymentMethodKey) as? Bool ?? false
         componentId = arguments.value(forKey: componentIdKey) as? String ?? ""
-        componentPlatformApi = ComponentPlatformApi()
         componentWrapperView = .init()
-        ComponentPlatformInterfaceSetup.setUp(binaryMessenger: binaryMessenger, api: componentPlatformApi)
         super.init()
 
         setupResizeViewportCallback()

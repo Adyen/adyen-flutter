@@ -32,5 +32,5 @@ class Config {
       GooglePayEnvironment.test;
 
   //Example data
-  static Amount amount = Amount(currency: "EUR", value: 1800);
+  static Amount amount = Amount(currency: "EUR", value: 6500);
 }

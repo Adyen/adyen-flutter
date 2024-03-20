@@ -1,6 +1,6 @@
-import 'package:adyen_checkout/src/common/model/billing_address_parameters.dart';
-import 'package:adyen_checkout/src/common/model/merchant_info.dart';
-import 'package:adyen_checkout/src/common/model/shipping_address_parameters.dart';
+import 'package:adyen_checkout/src/common/model/payment_method_configurations/google_pay/billing_address_parameters.dart';
+import 'package:adyen_checkout/src/common/model/payment_method_configurations/google_pay/merchant_info.dart';
+import 'package:adyen_checkout/src/common/model/payment_method_configurations/google_pay/shipping_address_parameters.dart';
 import 'package:adyen_checkout/src/generated/platform_api.g.dart';
 
 class GooglePayConfiguration {

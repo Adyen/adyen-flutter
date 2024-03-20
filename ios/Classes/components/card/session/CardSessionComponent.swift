@@ -12,6 +12,7 @@ class CardSessionComponent: BaseCardComponent {
         arguments: NSDictionary,
         binaryMessenger: FlutterBinaryMessenger,
         componentFlutterApi: ComponentFlutterInterface,
+        componentPlatformApi: ComponentPlatformApi,
         sessionHolder: SessionHolder
     ) {
         self.sessionHolder = sessionHolder
@@ -20,11 +21,12 @@ class CardSessionComponent: BaseCardComponent {
             viewIdentifier: viewIdentifier,
             arguments: arguments,
             binaryMessenger: binaryMessenger,
-            componentFlutterApi: componentFlutterApi
+            componentFlutterApi: componentFlutterApi,
+            componentPlatformApi: componentPlatformApi
         )
 
         setupCardComponentView()
-        setupFinalizeComponentCallback()
+        setupSessionFlowDelegate()
     }
 
     private func setupCardComponentView() {
@@ -68,15 +70,21 @@ class CardSessionComponent: BaseCardComponent {
         return CardComponent(paymentMethod: cardPaymentMethod, context: adyenContext, configuration: cardConfiguration)
     }
 
-    private func setupFinalizeComponentCallback() {
-        (sessionHolder.sessionDelegate as? CardSessionFlowDelegate)?.finalizeAndDismissHandler = finalizeAndDismissSessionComponent
-        (sessionHolder.sessionDelegate as? CardSessionFlowDelegate)?.componentId = componentId
+    private func setupSessionFlowDelegate() {
+        if let componentSessionFlowDelegate = (sessionHolder.sessionDelegate as? ComponentSessionFlowDelegate) {
+            componentSessionFlowDelegate.finalizeAndDismissHandler = finalizeAndDismissSessionComponent
+            componentSessionFlowDelegate.componentId = componentId
+        } else {
+            AdyenAssertion.assertionFailure(message: "Wrong session flow delegate usage")
+        }
     }
 
     func finalizeAndDismissSessionComponent(success: Bool, completion: @escaping (() -> Void)) {
         finalizeAndDismiss(success: success, completion: { [weak self] in
-            self?.sessionHolder.reset()
+            guard let self else { return }
             completion()
+            self.sessionHolder.reset()
+            self.cardComponent = nil
         })
     }
 }
