@@ -7,8 +7,8 @@ import 'package:adyen_checkout_example/config.dart';
 import 'package:adyen_checkout_example/repositories/adyen_apple_pay_component_repository.dart';
 import 'package:flutter/material.dart';
 
-class ApplePayComponentScreen extends StatefulWidget {
-  const ApplePayComponentScreen({
+class ApplePayAdvancedComponentScreen extends StatelessWidget {
+  const ApplePayAdvancedComponentScreen({
     required this.repository,
     super.key,
   });
@@ -16,29 +16,17 @@ class ApplePayComponentScreen extends StatefulWidget {
   final AdyenApplePayComponentRepository repository;
 
   @override
-  State<ApplePayComponentScreen> createState() =>
-      _ApplePayComponentScreenState();
-}
-
-class _ApplePayComponentScreenState extends State<ApplePayComponentScreen> {
-  bool _useSession = true;
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(title: const Text('Adyen google pay component')),
+      appBar: AppBar(title: const Text('Adyen Apple Pay component')),
       body: SafeArea(
         child: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              _buildSessionAdvancedFlowSwitch(_useSession),
               const SizedBox(height: 40),
               _buildAdyenApplePayAdvancedComponent(),
-              // _useSession
-              //     ? _buildAdyenApplePaySessionComponent()
-              //     : _buildAdyenApplePayAdvancedComponent(),
             ],
           ),
         ),
@@ -46,27 +34,7 @@ class _ApplePayComponentScreenState extends State<ApplePayComponentScreen> {
     );
   }
 
-  Widget _buildSessionAdvancedFlowSwitch(bool useSession) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.end,
-      children: [
-        const Text(
-          "Use session: ",
-          style: TextStyle(fontSize: 20),
-        ),
-        Switch(
-            value: useSession,
-            onChanged: (value) {
-              setState(() {
-                _useSession = value;
-              });
-            }),
-        const SizedBox(width: 32),
-      ],
-    );
-  }
-
-  Widget _buildAdyenApplePaySessionComponent() {
+  Widget _buildAdyenApplePayAdvancedComponent() {
     final ApplePayComponentConfiguration applePayComponentConfiguration =
         ApplePayComponentConfiguration(
       environment: Environment.test,
@@ -76,63 +44,13 @@ class _ApplePayComponentScreenState extends State<ApplePayComponentScreen> {
       applePayConfiguration: _createApplePayConfiguration(),
     );
 
-    return FutureBuilder<SessionCheckout>(
-      future: widget.repository
-          .createSessionCheckout(applePayComponentConfiguration),
-      builder: (BuildContext context, AsyncSnapshot<SessionCheckout> snapshot) {
-        if (snapshot.hasData) {
-          final SessionCheckout sessionCheckout = snapshot.data!;
-          final paymentMethod =
-              _extractPaymentMethod(sessionCheckout.paymentMethodsJson);
-
-          return Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Text(
-                style: TextStyle(fontSize: 20),
-                "Session flow",
-              ),
-              const SizedBox(height: 8),
-              AdyenApplePayComponent(
-                configuration: applePayComponentConfiguration,
-                paymentMethod: paymentMethod,
-                checkout: sessionCheckout,
-                loadingIndicator: const CircularProgressIndicator(),
-                style: ApplePayButtonStyle(
-                  width: 200,
-                  height: 48,
-                ),
-                onPaymentResult: (paymentResult) {
-                  Navigator.pop(context);
-                  _dialogBuilder(paymentResult, context);
-                },
-              ),
-            ],
-          );
-        } else {
-          return const SizedBox.shrink();
-        }
-      },
-    );
-  }
-
-  Widget _buildAdyenApplePayAdvancedComponent() {
-    final ApplePayComponentConfiguration applePayComponentConfiguration =
-    ApplePayComponentConfiguration(
-      environment: Environment.test,
-      clientKey: Config.clientKey,
-      countryCode: Config.countryCode,
-      amount: Config.amount,
-      applePayConfiguration: _createApplePayConfiguration(),
-    );
-
     return FutureBuilder<String>(
-      future: widget.repository.fetchPaymentMethods(),
+      future: repository.fetchPaymentMethods(),
       builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
         if (snapshot.hasData) {
           final AdvancedCheckout advancedCheckout = AdvancedCheckout(
-            onSubmit: widget.repository.onSubmit,
-            onAdditionalDetails: widget.repository.onAdditionalDetails,
+            onSubmit: repository.onSubmit,
+            onAdditionalDetails: repository.onAdditionalDetails,
           );
           final paymentMethod = _extractPaymentMethod(snapshot.data!);
 
@@ -150,8 +68,10 @@ class _ApplePayComponentScreenState extends State<ApplePayComponentScreen> {
                 checkout: advancedCheckout,
                 loadingIndicator: const CircularProgressIndicator(),
                 style: ApplePayButtonStyle(
-                  width: 200,
-                  height: 48,
+                  theme: ApplePayButtonTheme.whiteOutline,
+                  type: ApplePayButtonType.book,
+                  width: 300,
+                  height: 56,
                 ),
                 onPaymentResult: (paymentResult) {
                   Navigator.pop(context);

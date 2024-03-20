@@ -6,9 +6,13 @@ import 'package:adyen_checkout_example/repositories/adyen_apple_pay_component_re
 import 'package:adyen_checkout_example/repositories/adyen_card_component_repository.dart';
 import 'package:adyen_checkout_example/repositories/adyen_drop_in_repository.dart';
 import 'package:adyen_checkout_example/repositories/adyen_google_pay_component_repository.dart';
-import 'package:adyen_checkout_example/screens/component/apple_pay/apple_pay_component_screen.dart';
+import 'package:adyen_checkout_example/screens/component/apple_pay/apple_pay_advanced_component_screen.dart';
+import 'package:adyen_checkout_example/screens/component/apple_pay/apple_pay_navigation_screen.dart';
+import 'package:adyen_checkout_example/screens/component/apple_pay/apple_pay_session_component_screen.dart';
 import 'package:adyen_checkout_example/screens/component/card/card_component_screen.dart';
-import 'package:adyen_checkout_example/screens/component/google_pay/google_pay_component_screen.dart';
+import 'package:adyen_checkout_example/screens/component/google_pay/google_pay_advanced_component_screen.dart';
+import 'package:adyen_checkout_example/screens/component/google_pay/google_pay_navigation_screen.dart';
+import 'package:adyen_checkout_example/screens/component/google_pay/google_pay_session_component_screen.dart';
 import 'package:adyen_checkout_example/screens/drop_in/drop_in_screen.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -22,10 +26,18 @@ void main() {
   final cardComponentScreen = CardComponentScreen(
     repository: AdyenCardComponentRepository(service: service),
   );
-  final googlePayComponentScreen = GooglePayComponentScreen(
+  const googlePayNavigationScreen = GooglePayNavigationScreen();
+  final googlePaySessionComponentScreen = GooglePaySessionsComponentScreen(
     repository: AdyenGooglePayComponentRepository(service: service),
   );
-  final applePayComponentScreen = ApplePayComponentScreen(
+  final googlePayAdvancedComponentScreen = GooglePayAdvancedComponentScreen(
+    repository: AdyenGooglePayComponentRepository(service: service),
+  );
+  const applePayNavigationScreen = ApplePayNavigationScreen();
+  final applePaySessionComponentScreen = ApplePaySessionComponentScreen(
+    repository: AdyenApplePayComponentRepository(service: service),
+  );
+  final applePayAdvancedComponentScreen = ApplePayAdvancedComponentScreen(
     repository: AdyenApplePayComponentRepository(service: service),
   );
 
@@ -49,8 +61,14 @@ void main() {
       '/': (context) => const MyApp(),
       '/dropInScreen': (context) => dropInScreen,
       '/cardComponentScreen': (context) => cardComponentScreen,
-      '/googlePay': (context) => googlePayComponentScreen,
-      '/applePay': (context) => applePayComponentScreen
+      '/googlePayNavigation': (context) => googlePayNavigationScreen,
+      '/googlePaySessionComponent': (context) =>
+          googlePaySessionComponentScreen,
+      '/googlePayAdvancedComponent': (context) =>
+          googlePayAdvancedComponentScreen,
+      '/applePayNavigation': (context) => applePayNavigationScreen,
+      '/applePaySessionComponent': (context) => applePaySessionComponentScreen,
+      '/applePayAdvancedComponent': (context) => applePayAdvancedComponentScreen
     },
     initialRoute: "/",
   ));
@@ -89,11 +107,13 @@ class MyApp extends StatelessWidget {
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
         return TextButton(
-            onPressed: () => Navigator.pushNamed(context, "/googlePay"),
+            onPressed: () =>
+                Navigator.pushNamed(context, "/googlePayNavigation"),
             child: const Text("Google pay component"));
       case TargetPlatform.iOS:
         return TextButton(
-            onPressed: () => Navigator.pushNamed(context, "/applePay"),
+            onPressed: () =>
+                Navigator.pushNamed(context, "/applePayNavigation"),
             child: const Text("Apple pay component"));
       default:
         return const SizedBox.shrink();

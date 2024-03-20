@@ -7,21 +7,13 @@ import 'package:adyen_checkout_example/config.dart';
 import 'package:adyen_checkout_example/repositories/adyen_google_pay_component_repository.dart';
 import 'package:flutter/material.dart';
 
-class GooglePayComponentScreen extends StatefulWidget {
-  const GooglePayComponentScreen({
+class GooglePayAdvancedComponentScreen extends StatelessWidget {
+  const GooglePayAdvancedComponentScreen({
     required this.repository,
     super.key,
   });
 
   final AdyenGooglePayComponentRepository repository;
-
-  @override
-  State<GooglePayComponentScreen> createState() =>
-      _GooglePayComponentScreenState();
-}
-
-class _GooglePayComponentScreenState extends State<GooglePayComponentScreen> {
-  bool _useSession = true;
 
   @override
   Widget build(BuildContext context) {
@@ -32,92 +24,22 @@ class _GooglePayComponentScreenState extends State<GooglePayComponentScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            _buildSessionAdvancedFlowSwitch(_useSession),
             const SizedBox(height: 40),
-            _useSession
-                ? _buildAdyenGooglePaySessionComponent()
-                : _buildAdyenGooglePayAdvancedComponent(),
+            _buildAdyenGooglePayAdvancedComponent(),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildSessionAdvancedFlowSwitch(bool useSession) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.end,
-      children: [
-        const Text(
-          "Use session: ",
-          style: TextStyle(fontSize: 20),
-        ),
-        Switch(
-            value: useSession,
-            onChanged: (value) {
-              setState(() {
-                _useSession = value;
-              });
-            }),
-        const SizedBox(width: 32),
-      ],
-    );
-  }
-
-  Widget _buildAdyenGooglePaySessionComponent() {
-    final GooglePayComponentConfiguration googlePayComponentConfiguration =
-        GooglePayComponentConfiguration(
-      environment: Environment.test,
-      clientKey: Config.clientKey,
-      countryCode: Config.countryCode,
-      amount: Config.amount,
-      googlePayConfiguration: const GooglePayConfiguration(
-        googlePayEnvironment: Config.googlePayEnvironment,
-      ),
-    );
-
-    return FutureBuilder<SessionCheckout>(
-      future: widget.repository
-          .createSessionCheckout(googlePayComponentConfiguration),
-      builder: (BuildContext context, AsyncSnapshot<SessionCheckout> snapshot) {
-        if (snapshot.hasData) {
-          final SessionCheckout sessionCheckout = snapshot.data!;
-          final paymentMethod =
-              _extractPaymentMethod(sessionCheckout.paymentMethodsJson);
-          return Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Text(
-                style: TextStyle(fontSize: 20),
-                "Session flow",
-              ),
-              const SizedBox(height: 8),
-              AdyenGooglePayComponent(
-                configuration: googlePayComponentConfiguration,
-                paymentMethod: paymentMethod,
-                checkout: sessionCheckout,
-                loadingIndicator: const CircularProgressIndicator(),
-                onPaymentResult: (paymentResult) {
-                  Navigator.pop(context);
-                  _dialogBuilder(paymentResult, context);
-                },
-              ),
-            ],
-          );
-        } else {
-          return const SizedBox.shrink();
-        }
-      },
-    );
-  }
-
   Widget _buildAdyenGooglePayAdvancedComponent() {
     return FutureBuilder<String>(
-      future: widget.repository.fetchPaymentMethods(),
+      future: repository.fetchPaymentMethods(),
       builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
         if (snapshot.hasData) {
           final AdvancedCheckout advancedCheckout = AdvancedCheckout(
-            onSubmit: widget.repository.onSubmit,
-            onAdditionalDetails: widget.repository.onAdditionalDetails,
+            onSubmit: repository.onSubmit,
+            onAdditionalDetails: repository.onAdditionalDetails,
           );
 
           final GooglePayComponentConfiguration

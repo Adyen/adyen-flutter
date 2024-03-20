@@ -42,7 +42,7 @@ class _CardComponentScreenState extends State<CardComponentScreen> {
                     _buildCardComponentAdvancedFlowRoute(),
                   );
                 },
-                child: const Text("Card component advanced flow"),
+                child: const Text("Card component advanced"),
               ),
             ],
           ),
