@@ -27,7 +27,7 @@ class CardAdvancedFlowActionComponentDelegate: ActionComponentDelegate {
     }
 
     func didComplete(from _: Adyen.ActionComponent) {
-        // Only for voucher payment method
+        // Only for voucher payment method - currently not supported.
     }
 
     func didFail(with error: Error, from _: Adyen.ActionComponent) {
@@ -35,13 +35,15 @@ class CardAdvancedFlowActionComponentDelegate: ActionComponentDelegate {
     }
 
     private func sendErrorToFlutterLayer(error: Error) {
-        let componentCommunicationModel = ComponentCommunicationModel(
-            type: ComponentCommunicationType.error,
-            componentId: componentId,
-            data: error.localizedDescription
-        )
         componentFlutterApi.onComponentCommunication(
-            componentCommunicationModel: componentCommunicationModel,
+            componentCommunicationModel: ComponentCommunicationModel(
+                type: ComponentCommunicationType.result,
+                componentId: componentId,
+                paymentResult: PaymentResultDTO(
+                    type: PaymentResultEnum.error,
+                    reason: error.localizedDescription
+                )
+            ),
             completion: { _ in }
         )
     }

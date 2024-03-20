@@ -3,6 +3,7 @@ package com.adyen.checkout.flutter.components.card.advanced
 import ComponentCommunicationModel
 import ComponentCommunicationType
 import ComponentFlutterInterface
+import PaymentResultDTO
 import android.content.Context
 import android.view.View
 import android.view.ViewGroup
@@ -111,7 +112,10 @@ internal class CardAdvancedComponent(
                 ComponentCommunicationModel(
                     ComponentCommunicationType.RESULT,
                     componentId = componentId,
-                    paymentResult = message.contentIfNotHandled,
+                    paymentResult = PaymentResultDTO(
+                        type = PaymentResultEnum.FINISHED,
+                        result = message.contentIfNotHandled
+                    ),
                 )
             componentFlutterApi.onComponentCommunication(model) {}
         }
@@ -126,9 +130,12 @@ internal class CardAdvancedComponent(
 
             val model =
                 ComponentCommunicationModel(
-                    ComponentCommunicationType.ERROR,
+                    ComponentCommunicationType.RESULT,
                     componentId = componentId,
-                    data = message.contentIfNotHandled?.errorMessage,
+                    paymentResult = PaymentResultDTO(
+                        type = PaymentResultEnum.ERROR,
+                        reason = message.contentIfNotHandled?.errorMessage,
+                    ),
                 )
             componentFlutterApi.onComponentCommunication(model) {}
         }

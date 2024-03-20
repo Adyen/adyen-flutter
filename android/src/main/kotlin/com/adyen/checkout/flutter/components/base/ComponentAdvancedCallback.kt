@@ -3,11 +3,15 @@ package com.adyen.checkout.flutter.components.base
 import ComponentCommunicationModel
 import ComponentCommunicationType
 import ComponentFlutterInterface
+import PaymentResultDTO
+import PaymentResultEnum
+import PaymentResultModelDTO
 import com.adyen.checkout.components.core.ActionComponentData
 import com.adyen.checkout.components.core.ComponentCallback
 import com.adyen.checkout.components.core.ComponentError
 import com.adyen.checkout.components.core.PaymentComponentData
 import com.adyen.checkout.components.core.PaymentComponentState
+import com.adyen.checkout.flutter.utils.Constants
 
 abstract class ComponentAdvancedCallback<T : PaymentComponentState<*>>(
     private val componentFlutterApi: ComponentFlutterInterface,
@@ -34,11 +38,21 @@ abstract class ComponentAdvancedCallback<T : PaymentComponentState<*>>(
     }
 
     override fun onError(componentError: ComponentError) {
+        val type: PaymentResultEnum =
+            if (componentError.errorMessage.contains(Constants.SDK_PAYMENT_CANCELED_IDENTIFIER)) {
+                PaymentResultEnum.CANCELLEDBYUSER
+            } else {
+                PaymentResultEnum.ERROR
+            }
+
         val model =
             ComponentCommunicationModel(
-                ComponentCommunicationType.ERROR,
+                ComponentCommunicationType.RESULT,
                 componentId = componentId,
-                data = componentError.exception.toString(),
+                paymentResult = PaymentResultDTO(
+                    type = type,
+                    reason = componentError.exception.toString()
+                ),
             )
         componentFlutterApi.onComponentCommunication(model) {}
     }

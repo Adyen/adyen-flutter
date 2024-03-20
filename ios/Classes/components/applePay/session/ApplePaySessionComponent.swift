@@ -46,7 +46,7 @@ class ApplePaySessionComponent: BaseApplePayComponent {
     }
         
     override func finalizeAndDismissComponent(success: Bool, completion: @escaping (() -> Void)) {
-        self.sessionHolder.reset()
         super.finalizeAndDismissComponent(success: success, completion: completion)
+        self.sessionHolder.reset()
     }
 }

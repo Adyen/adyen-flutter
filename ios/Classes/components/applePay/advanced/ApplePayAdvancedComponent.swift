@@ -35,7 +35,7 @@ class ApplePayAdvancedComponent: BaseApplePayComponent {
         case .error:
             onError(paymentEventDTO: paymentEventDTO)
         case .action:
-            // TODO: Discuss action handling for apple pay.
+            // Apple pay does not require action handling
             return
         }
     }
@@ -45,7 +45,7 @@ class ApplePayAdvancedComponent: BaseApplePayComponent {
             let paymentMethod = try JSONDecoder().decode(ApplePayPaymentMethod.self, from: Data(paymentMethodResponse.utf8))
             let applePayComponent = try? ApplePayComponent(paymentMethod: paymentMethod, context: adyenContext, configuration: configuration)
             applePayComponent?.delegate = self
-            
+            // applePayComponent?.applePayDelegate - Dynamic pricing will be added in the next version.
             return applePayComponent
         } catch {
             return nil
@@ -53,15 +53,17 @@ class ApplePayAdvancedComponent: BaseApplePayComponent {
     }
     
     private func onFinished(paymentEventDTO: PaymentEventDTO) {
-        finalizeAndDismissComponent(success: true, completion: {
+        finalizeAndDismissComponent(success: true, completion: { [weak self] in
             let resultCode = paymentEventDTO.result ?? ""
-            let componentCommunicationModel = ComponentCommunicationModel(
-                type: ComponentCommunicationType.result,
-                componentId: Self.applePaySessionComponentId,
-                paymentResult: PaymentResultModelDTO(resultCode: resultCode)
-            )
-            self.componentFlutterApi.onComponentCommunication(
-                componentCommunicationModel: componentCommunicationModel,
+            self?.componentFlutterApi.onComponentCommunication(
+                componentCommunicationModel: ComponentCommunicationModel(
+                    type: ComponentCommunicationType.result,
+                    componentId: Self.applePaySessionComponentId,
+                    paymentResult: PaymentResultDTO(
+                        type: PaymentResultEnum.finished,
+                        result: PaymentResultModelDTO(resultCode: resultCode)
+                    )
+                ),
                 completion: { _ in }
             )
         })
@@ -69,14 +71,16 @@ class ApplePayAdvancedComponent: BaseApplePayComponent {
     
     private func onError(paymentEventDTO: PaymentEventDTO) {
         finalizeAndDismissComponent(success: false, completion: { [weak self] in
-            let errorMessage = paymentEventDTO.error?.errorMessage ?? ""
-            let componentCommunicationModel = ComponentCommunicationModel(
-                type: ComponentCommunicationType.error,
-                componentId: Self.applePaySessionComponentId,
-                data: errorMessage
-            )
+            let errorMessage = paymentEventDTO.error?.errorMessage
             self?.componentFlutterApi.onComponentCommunication(
-                componentCommunicationModel: componentCommunicationModel,
+                componentCommunicationModel: ComponentCommunicationModel(
+                    type: ComponentCommunicationType.result,
+                    componentId: Self.applePaySessionComponentId,
+                    paymentResult: PaymentResultDTO(
+                        type: PaymentResultEnum.error,
+                        reason: errorMessage
+                    )
+                ),
                 completion: { _ in }
             )
         })
@@ -125,13 +129,21 @@ extension ApplePayAdvancedComponent: PaymentComponentDelegate {
     }
     
     private func sendErrorToFlutterLayer(error: Error) {
-        let componentCommunicationModel = ComponentCommunicationModel(
-            type: ComponentCommunicationType.error,
-            componentId: Self.applePaySessionComponentId,
-            data: error.localizedDescription
-        )
+        let type: PaymentResultEnum
+        if let componentError = (error as? ComponentError), componentError == ComponentError.cancelled {
+            type = PaymentResultEnum.cancelledByUser
+        } else {
+            type = PaymentResultEnum.error
+        }
         componentFlutterApi.onComponentCommunication(
-            componentCommunicationModel: componentCommunicationModel,
+            componentCommunicationModel: ComponentCommunicationModel(
+                type: ComponentCommunicationType.result,
+                componentId: Self.applePaySessionComponentId,
+                paymentResult: PaymentResultDTO(
+                    type: type,
+                    reason: error.localizedDescription
+                )
+            ),
             completion: { _ in }
         )
     }

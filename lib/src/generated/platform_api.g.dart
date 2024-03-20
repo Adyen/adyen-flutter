@@ -79,7 +79,6 @@ enum ComponentCommunicationType {
   additionalDetails,
   loading,
   result,
-  error,
   resize,
 }
 
@@ -972,7 +971,7 @@ class ComponentCommunicationModel {
 
   Object? data;
 
-  PaymentResultModelDTO? paymentResult;
+  PaymentResultDTO? paymentResult;
 
   Object encode() {
     return <Object?>[
@@ -990,7 +989,7 @@ class ComponentCommunicationModel {
       componentId: result[1]! as String,
       data: result[2],
       paymentResult: result[3] != null
-          ? PaymentResultModelDTO.decode(result[3]! as List<Object?>)
+          ? PaymentResultDTO.decode(result[3]! as List<Object?>)
           : null,
     );
   }
@@ -2074,11 +2073,14 @@ class _ComponentFlutterInterfaceCodec extends StandardMessageCodec {
     } else if (value is OrderResponseDTO) {
       buffer.putUint8(134);
       writeValue(buffer, value.encode());
-    } else if (value is PaymentResultModelDTO) {
+    } else if (value is PaymentResultDTO) {
       buffer.putUint8(135);
       writeValue(buffer, value.encode());
-    } else if (value is SessionDTO) {
+    } else if (value is PaymentResultModelDTO) {
       buffer.putUint8(136);
+      writeValue(buffer, value.encode());
+    } else if (value is SessionDTO) {
+      buffer.putUint8(137);
       writeValue(buffer, value.encode());
     } else {
       super.writeValue(buffer, value);
@@ -2103,8 +2105,10 @@ class _ComponentFlutterInterfaceCodec extends StandardMessageCodec {
       case 134: 
         return OrderResponseDTO.decode(readValue(buffer)!);
       case 135: 
-        return PaymentResultModelDTO.decode(readValue(buffer)!);
+        return PaymentResultDTO.decode(readValue(buffer)!);
       case 136: 
+        return PaymentResultModelDTO.decode(readValue(buffer)!);
+      case 137: 
         return SessionDTO.decode(readValue(buffer)!);
       default:
         return super.readValueOfType(type, buffer);

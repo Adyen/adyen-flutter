@@ -147,8 +147,7 @@ enum class ComponentCommunicationType(val raw: Int) {
   ADDITIONALDETAILS(1),
   LOADING(2),
   RESULT(3),
-  ERROR(4),
-  RESIZE(5);
+  RESIZE(4);
 
   companion object {
     fun ofRaw(raw: Int): ComponentCommunicationType? {
@@ -865,7 +864,7 @@ data class ComponentCommunicationModel (
   val type: ComponentCommunicationType,
   val componentId: String,
   val data: Any? = null,
-  val paymentResult: PaymentResultModelDTO? = null
+  val paymentResult: PaymentResultDTO? = null
 
 ) {
   companion object {
@@ -874,8 +873,8 @@ data class ComponentCommunicationModel (
       val type = ComponentCommunicationType.ofRaw(list[0] as Int)!!
       val componentId = list[1] as String
       val data = list[2]
-      val paymentResult: PaymentResultModelDTO? = (list[3] as List<Any?>?)?.let {
-        PaymentResultModelDTO.fromList(it)
+      val paymentResult: PaymentResultDTO? = (list[3] as List<Any?>?)?.let {
+        PaymentResultDTO.fromList(it)
       }
       return ComponentCommunicationModel(type, componentId, data, paymentResult)
     }
@@ -2100,10 +2099,15 @@ private object ComponentFlutterInterfaceCodec : StandardMessageCodec() {
       }
       135.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          PaymentResultModelDTO.fromList(it)
+          PaymentResultDTO.fromList(it)
         }
       }
       136.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          PaymentResultModelDTO.fromList(it)
+        }
+      }
+      137.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
           SessionDTO.fromList(it)
         }
@@ -2141,12 +2145,16 @@ private object ComponentFlutterInterfaceCodec : StandardMessageCodec() {
         stream.write(134)
         writeValue(stream, value.toList())
       }
-      is PaymentResultModelDTO -> {
+      is PaymentResultDTO -> {
         stream.write(135)
         writeValue(stream, value.toList())
       }
-      is SessionDTO -> {
+      is PaymentResultModelDTO -> {
         stream.write(136)
+        writeValue(stream, value.toList())
+      }
+      is SessionDTO -> {
+        stream.write(137)
         writeValue(stream, value.toList())
       }
       else -> super.writeValue(stream, value)

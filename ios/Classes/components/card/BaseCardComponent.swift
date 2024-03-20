@@ -90,10 +90,17 @@ class BaseCardComponent: NSObject, FlutterPlatformView, UIScrollViewDelegate {
     }
 
     func sendErrorToFlutterLayer(errorMessage: String) {
-        let componentCommunicationModel = ComponentCommunicationModel(type: ComponentCommunicationType.error,
-                                                                      componentId: componentId,
-                                                                      data: errorMessage)
-        componentFlutterApi.onComponentCommunication(componentCommunicationModel: componentCommunicationModel, completion: { _ in })
+        componentFlutterApi.onComponentCommunication(
+            componentCommunicationModel: ComponentCommunicationModel(
+                type: ComponentCommunicationType.result,
+                componentId: componentId,
+                paymentResult: PaymentResultDTO(
+                    type: PaymentResultEnum.error,
+                    reason: errorMessage
+                )
+            ),
+            completion: { _ in }
+        )
     }
 
     func finalizeAndDismiss(
