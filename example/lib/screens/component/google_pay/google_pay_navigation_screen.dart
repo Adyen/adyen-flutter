@@ -9,21 +9,22 @@ class GooglePayNavigationScreen extends StatelessWidget {
       backgroundColor: Colors.white,
       appBar: AppBar(title: const Text('Adyen Google Pay component')),
       body: SafeArea(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            TextButton(
-              child: const Text("Google Pay component session"),
-              onPressed: () =>
-                  Navigator.pushNamed(context, "/googlePaySessionComponent"),
-            ),
-            TextButton(
-              child: const Text("Google Pay component advanced"),
-              onPressed: () =>
-                  Navigator.pushNamed(context, "/googlePayAdvancedComponent"),
-            ),
-          ],
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              TextButton(
+                child: const Text("Google Pay component session"),
+                onPressed: () =>
+                    Navigator.pushNamed(context, "/googlePaySessionComponent"),
+              ),
+              TextButton(
+                child: const Text("Google Pay component advanced"),
+                onPressed: () =>
+                    Navigator.pushNamed(context, "/googlePayAdvancedComponent"),
+              ),
+            ],
+          ),
         ),
       ),
     );

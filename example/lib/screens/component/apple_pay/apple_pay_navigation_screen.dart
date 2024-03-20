@@ -9,21 +9,22 @@ class ApplePayNavigationScreen extends StatelessWidget {
       backgroundColor: Colors.white,
       appBar: AppBar(title: const Text('Adyen Apple Pay component')),
       body: SafeArea(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            TextButton(
-              child: const Text("Apple Pay component session"),
-              onPressed: () =>
-                  Navigator.pushNamed(context, "/applePaySessionComponent"),
-            ),
-            TextButton(
-              child: const Text("Apple Pay component advanced"),
-              onPressed: () =>
-                  Navigator.pushNamed(context, "/applePayAdvancedComponent"),
-            ),
-          ],
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              TextButton(
+                child: const Text("Apple Pay component session"),
+                onPressed: () =>
+                    Navigator.pushNamed(context, "/applePaySessionComponent"),
+              ),
+              TextButton(
+                child: const Text("Apple Pay component advanced"),
+                onPressed: () =>
+                    Navigator.pushNamed(context, "/applePayAdvancedComponent"),
+              ),
+            ],
+          ),
         ),
       ),
     );

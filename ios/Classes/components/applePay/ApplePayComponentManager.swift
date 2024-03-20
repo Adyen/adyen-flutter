@@ -22,7 +22,7 @@ class ApplePayComponentManager {
         do {
             let applePayConfiguration = try instantPaymentComponentConfigurationDTO.mapToApplePayConfiguration()
             let adyenContext = try instantPaymentComponentConfigurationDTO.createAdyenContext()
-            if (componentId == ApplePaySessionComponent.applePaySessionComponentId) {
+            if componentId == ApplePaySessionComponent.applePaySessionComponentId {
                 applePayComponent = ApplePaySessionComponent(
                     sessionHolder: sessionHolder,
                     configuration: applePayConfiguration,
