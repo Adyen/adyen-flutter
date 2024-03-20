@@ -81,10 +81,11 @@ class GooglePayAdvancedComponent(
                 ComponentCommunicationModel(
                     ComponentCommunicationType.RESULT,
                     componentId = componentId,
-                    paymentResult = PaymentResultDTO(
-                        type = PaymentResultEnum.FINISHED,
-                        result = message.contentIfNotHandled
-                    ),
+                    paymentResult =
+                        PaymentResultDTO(
+                            type = PaymentResultEnum.FINISHED,
+                            result = message.contentIfNotHandled
+                        ),
                 )
             componentFlutterApi.onComponentCommunication(model) {}
             hideLoadingBottomSheet()
@@ -102,10 +103,11 @@ class GooglePayAdvancedComponent(
                 ComponentCommunicationModel(
                     ComponentCommunicationType.RESULT,
                     componentId = componentId,
-                    paymentResult = PaymentResultDTO(
-                        type = PaymentResultEnum.ERROR,
-                        reason = message.contentIfNotHandled?.errorMessage,
-                    ),
+                    paymentResult =
+                        PaymentResultDTO(
+                            type = PaymentResultEnum.ERROR,
+                            reason = message.contentIfNotHandled?.errorMessage,
+                        ),
                 )
             componentFlutterApi.onComponentCommunication(model) {}
         }

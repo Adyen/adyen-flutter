@@ -64,7 +64,7 @@ abstract class BaseApplePayComponent extends StatefulWidget {
       case PaymentResultEnum.cancelledByUser:
         _onCancelledByUser();
       case null:
-        throw Exception("Invalid payment result");
+        throw Exception("Payment result handling failed");
     }
   }
 

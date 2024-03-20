@@ -5,7 +5,6 @@ import ComponentCommunicationType
 import ComponentFlutterInterface
 import PaymentResultDTO
 import PaymentResultEnum
-import PaymentResultModelDTO
 import com.adyen.checkout.components.core.ActionComponentData
 import com.adyen.checkout.components.core.ComponentCallback
 import com.adyen.checkout.components.core.ComponentError
@@ -49,10 +48,11 @@ abstract class ComponentAdvancedCallback<T : PaymentComponentState<*>>(
             ComponentCommunicationModel(
                 ComponentCommunicationType.RESULT,
                 componentId = componentId,
-                paymentResult = PaymentResultDTO(
-                    type = type,
-                    reason = componentError.exception.toString()
-                ),
+                paymentResult =
+                    PaymentResultDTO(
+                        type = type,
+                        reason = componentError.exception.toString()
+                    ),
             )
         componentFlutterApi.onComponentCommunication(model) {}
     }

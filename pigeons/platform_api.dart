@@ -65,7 +65,6 @@ enum ComponentCommunicationType {
   additionalDetails,
   loading,
   result,
-  // error,
   resize,
 }
 

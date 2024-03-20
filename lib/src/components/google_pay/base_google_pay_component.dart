@@ -63,13 +63,12 @@ abstract class BaseGooglePayComponent extends StatefulWidget {
       case PaymentResultEnum.cancelledByUser:
         _onCancelledByUser();
       case null:
-        throw Exception("Invalid payment result");
+        throw Exception("Payment result handling failed");
     }
   }
 
-  void _onError(PaymentResultDTO? paymentResultDTO) {
-    onPaymentResult(PaymentError(reason: paymentResultDTO?.reason));
-  }
+  void _onError(PaymentResultDTO? paymentResultDTO) =>
+      onPaymentResult(PaymentError(reason: paymentResultDTO?.reason));
 
   void _onCancelledByUser() => onPaymentResult(PaymentCancelledByUser());
 

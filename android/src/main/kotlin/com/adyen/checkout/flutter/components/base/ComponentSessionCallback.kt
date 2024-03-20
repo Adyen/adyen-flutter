@@ -34,10 +34,11 @@ abstract class ComponentSessionCallback<T : PaymentComponentState<*>>(
             ComponentCommunicationModel(
                 type = ComponentCommunicationType.RESULT,
                 componentId = componentId,
-                paymentResult = PaymentResultDTO(
-                    type = PaymentResultEnum.FINISHED,
-                    result = paymentResult
-                )
+                paymentResult =
+                    PaymentResultDTO(
+                        type = PaymentResultEnum.FINISHED,
+                        result = paymentResult
+                    )
             )
         componentFlutterApi.onComponentCommunication(model) {}
     }
@@ -54,10 +55,11 @@ abstract class ComponentSessionCallback<T : PaymentComponentState<*>>(
             ComponentCommunicationModel(
                 type = ComponentCommunicationType.RESULT,
                 componentId = componentId,
-                paymentResult = PaymentResultDTO(
-                    type = type,
-                    reason = componentError.exception.toString()
-                ),
+                paymentResult =
+                    PaymentResultDTO(
+                        type = type,
+                        reason = componentError.exception.toString()
+                    ),
             )
         componentFlutterApi.onComponentCommunication(model) {}
     }
