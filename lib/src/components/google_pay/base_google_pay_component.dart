@@ -51,6 +51,30 @@ abstract class BaseGooglePayComponent extends StatefulWidget {
 
   void handleComponentCommunication(ComponentCommunicationModel event);
 
+  void onFinished(PaymentResultDTO? paymentResultDTO);
+
+  void onResult(ComponentCommunicationModel event) {
+    isLoading.value = false;
+    switch (event.paymentResult?.type) {
+      case PaymentResultEnum.finished:
+        onFinished(event.paymentResult);
+      case PaymentResultEnum.error:
+        _onError(event.paymentResult);
+      case PaymentResultEnum.cancelledByUser:
+        _onCancelledByUser();
+      case null:
+        throw Exception("Invalid payment result");
+    }
+  }
+
+  void _onError(PaymentResultDTO? paymentResultDTO) {
+    onPaymentResult(PaymentError(reason: paymentResultDTO?.reason));
+  }
+
+  void _onCancelledByUser() => onPaymentResult(PaymentCancelledByUser());
+
+  void onLoading() => isLoading.value = true;
+
   @override
   State<BaseGooglePayComponent> createState() => _BaseGooglePayComponentState();
 }

@@ -34,8 +34,8 @@ class AdyenApplePayComponent extends StatelessWidget {
     switch (defaultTargetPlatform) {
       case TargetPlatform.iOS:
         return switch (checkout) {
-          SessionCheckout() => _buildApplePaySessionFlowWidget(),
-          AdvancedCheckout() => _buildApplePayAdvancedFlowWidget(),
+          SessionCheckout it => _buildApplePaySessionFlowWidget(it),
+          AdvancedCheckout it => _buildApplePayAdvancedFlowWidget(it),
         };
       default:
         throw Exception(
@@ -43,11 +43,10 @@ class AdyenApplePayComponent extends StatelessWidget {
     }
   }
 
-  Widget _buildApplePaySessionFlowWidget() {
-    final String encodedPaymentMethod = json.encode(paymentMethod);
+  Widget _buildApplePaySessionFlowWidget(SessionCheckout sessionCheckout) {
     return ApplePaySessionComponent(
       key: key,
-      applePayPaymentMethod: encodedPaymentMethod,
+      applePayPaymentMethod: json.encode(paymentMethod),
       applePayComponentConfiguration: configuration,
       onPaymentResult: onPaymentResult,
       style: _mapToApplePayButtonStyle(),
@@ -61,12 +60,10 @@ class AdyenApplePayComponent extends StatelessWidget {
     );
   }
 
-  Widget _buildApplePayAdvancedFlowWidget() {
-    final String encodedPaymentMethod = json.encode(paymentMethod);
-    AdvancedCheckout advancedCheckout = checkout as AdvancedCheckout;
+  Widget _buildApplePayAdvancedFlowWidget(AdvancedCheckout advancedCheckout) {
     return ApplePayAdvancedComponent(
       key: key,
-      applePayPaymentMethod: encodedPaymentMethod,
+      applePayPaymentMethod: json.encode(paymentMethod),
       applePayComponentConfiguration: configuration,
       onPaymentResult: onPaymentResult,
       onSubmit: advancedCheckout.onSubmit,

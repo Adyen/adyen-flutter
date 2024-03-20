@@ -33,20 +33,24 @@ class ApplePayAdvancedComponent extends BaseApplePayComponent {
   }) : paymentEventHandler = paymentEventHandler ?? PaymentEventHandler();
 
   @override
-  void handleComponentCommunication(dynamic event) {
+  void handleComponentCommunication(ComponentCommunicationModel event) {
     isButtonClickable.value = true;
-    switch (event.type) {
-      case ComponentCommunicationType.onSubmit:
-        _onSubmit(event);
-      case ComponentCommunicationType.additionalDetails:
-        _onAdditionalDetails(event);
-      case ComponentCommunicationType.result:
-        _onResult(event);
-      case ComponentCommunicationType.error:
-        _onError(event);
-      case ComponentCommunicationType.loading:
-        _onLoading();
+    if (event.type case ComponentCommunicationType.onSubmit) {
+      _onSubmit(event);
+    } else if (event.type case ComponentCommunicationType.additionalDetails) {
+      _onAdditionalDetails(event);
+    } else if (event.type case ComponentCommunicationType.loading) {
+      _onLoading();
+    } else if (event.type case ComponentCommunicationType.result) {
+      onResult(event);
     }
+  }
+
+  @override
+  void onFinished(PaymentResultDTO? paymentResultDTO) {
+    String resultCode = paymentResultDTO?.result?.resultCode ?? "";
+    adyenLogger.print("Apple Pay advanced flow result code: $resultCode");
+    onPaymentResult(PaymentAdvancedFinished(resultCode: resultCode));
   }
 
   Future<void> _onSubmit(ComponentCommunicationModel event) async {
@@ -63,20 +67,6 @@ class ApplePayAdvancedComponent extends BaseApplePayComponent {
         paymentEventHandler.mapToPaymentEventDTO(paymentEvent);
     componentPlatformApi.onPaymentsDetailsResult(paymentEventDTO);
   }
-
-
-  void _onResult(ComponentCommunicationModel event) {
-    isLoading.value = false;
-    String resultCode = event.paymentResult?.resultCode ?? "";
-    adyenLogger.print("Apple pay advanced flow result code: $resultCode");
-    onPaymentResult(PaymentAdvancedFinished(resultCode: resultCode));
-  }
-
-  void _onError(ComponentCommunicationModel event) {
-    isLoading.value = false;
-    String errorMessage = event.data as String;
-    onPaymentResult(PaymentError(reason: errorMessage));
-  }
-
+  
   void _onLoading() => isLoading.value = true;
 }
