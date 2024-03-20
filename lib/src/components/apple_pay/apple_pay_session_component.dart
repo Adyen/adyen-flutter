@@ -5,11 +5,14 @@ import 'package:adyen_checkout/src/generated/platform_api.g.dart';
 import 'package:adyen_checkout/src/logging/adyen_logger.dart';
 
 class ApplePaySessionComponent extends BaseApplePayComponent {
+  final SessionDTO session;
+
   @override
   final String componentId = "APPLE_PAY_SESSION_COMPONENT";
 
   ApplePaySessionComponent({
     super.key,
+    required this.session,
     required super.applePayPaymentMethod,
     required super.applePayComponentConfiguration,
     required super.onPaymentResult,

@@ -3,11 +3,14 @@ import 'package:adyen_checkout/src/components/google_pay/base_google_pay_compone
 import 'package:adyen_checkout/src/generated/platform_api.g.dart';
 
 class GooglePaySessionComponent extends BaseGooglePayComponent {
+  final SessionDTO session;
+
   @override
   final String componentId = "GOOGLE_PAY_SESSION_COMPONENT";
 
   GooglePaySessionComponent({
     super.key,
+    required this.session,
     required super.googlePayPaymentMethod,
     required super.googlePayComponentConfiguration,
     required super.onPaymentResult,

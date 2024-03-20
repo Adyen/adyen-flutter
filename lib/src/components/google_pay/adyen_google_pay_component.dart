@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:adyen_checkout/adyen_checkout.dart';
 import 'package:adyen_checkout/src/components/google_pay/google_pay_advanced_component.dart';
 import 'package:adyen_checkout/src/components/google_pay/google_pay_session_component.dart';
+import 'package:adyen_checkout/src/util/dto_mapper.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:pay/pay.dart' as google_pay_sdk;
@@ -34,8 +35,8 @@ class AdyenGooglePayComponent extends StatelessWidget {
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
         return switch (checkout) {
-          SessionCheckout() => _buildGooglePaySessionFlowWidget(),
-          AdvancedCheckout() => _buildGooglePayAdvancedFlowWidget(),
+          SessionCheckout it => _buildGooglePaySessionFlowWidget(it),
+          AdvancedCheckout it => _buildGooglePayAdvancedFlowWidget(it),
         };
       default:
         throw Exception(
@@ -43,11 +44,11 @@ class AdyenGooglePayComponent extends StatelessWidget {
     }
   }
 
-  Widget _buildGooglePaySessionFlowWidget() {
-    final String encodedPaymentMethod = json.encode(paymentMethod);
+  Widget _buildGooglePaySessionFlowWidget(SessionCheckout sessionCheckout) {
     return GooglePaySessionComponent(
       key: key,
-      googlePayPaymentMethod: encodedPaymentMethod,
+      session: sessionCheckout.toDTO(),
+      googlePayPaymentMethod: json.encode(paymentMethod),
       googlePayComponentConfiguration: configuration,
       onPaymentResult: onPaymentResult,
       theme: _mapToGooglePayButtonTheme(),
@@ -61,12 +62,10 @@ class AdyenGooglePayComponent extends StatelessWidget {
     );
   }
 
-  Widget _buildGooglePayAdvancedFlowWidget() {
-    final String encodedPaymentMethod = json.encode(paymentMethod);
-    AdvancedCheckout advancedCheckout = checkout as AdvancedCheckout;
+  Widget _buildGooglePayAdvancedFlowWidget(AdvancedCheckout advancedCheckout) {
     return GooglePayAdvancedComponent(
       key: key,
-      googlePayPaymentMethod: encodedPaymentMethod,
+      googlePayPaymentMethod: json.encode(paymentMethod),
       googlePayComponentConfiguration: configuration,
       onPaymentResult: onPaymentResult,
       onSubmit: advancedCheckout.onSubmit,

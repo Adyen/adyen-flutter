@@ -1,7 +1,7 @@
 @_spi(AdyenInternal) import Adyen
 
 class ApplePayAdvancedComponent: BaseApplePayComponent {
-    private static let applePaySessionComponentId = "APPLE_PAY_ADVANCED_COMPONENT"
+    static let applePaySessionComponentId = "APPLE_PAY_ADVANCED_COMPONENT"
     private let componentFlutterApi: ComponentFlutterInterface
     private let configuration: ApplePayComponent.Configuration
     private let adyenContext: AdyenContext

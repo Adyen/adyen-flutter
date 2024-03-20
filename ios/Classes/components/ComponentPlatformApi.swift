@@ -36,6 +36,7 @@ class ComponentPlatformApi: ComponentPlatformInterface {
             applePayComponentManager.setUpApplePayIfAvailable(
                 instantPaymentComponentConfigurationDTO: instantPaymentConfigurationDTO,
                 paymentMethodResponse: paymentMethodResponse,
+                componentId: componentId,
                 callback: completion
             )
         }

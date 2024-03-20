@@ -16,12 +16,13 @@ class ApplePayComponentManager {
     func setUpApplePayIfAvailable(
         instantPaymentComponentConfigurationDTO: InstantPaymentConfigurationDTO,
         paymentMethodResponse: String,
+        componentId: String,
         callback: (Result<InstantPaymentSetupResultDTO, Error>) -> Void
     ) {
         do {
             let applePayConfiguration = try instantPaymentComponentConfigurationDTO.mapToApplePayConfiguration()
             let adyenContext = try instantPaymentComponentConfigurationDTO.createAdyenContext()
-            if sessionHolder.session != nil, sessionHolder.sessionDelegate != nil {
+            if (componentId == ApplePaySessionComponent.applePaySessionComponentId) {
                 applePayComponent = ApplePaySessionComponent(
                     sessionHolder: sessionHolder,
                     configuration: applePayConfiguration,

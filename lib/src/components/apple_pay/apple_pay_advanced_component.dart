@@ -67,6 +67,6 @@ class ApplePayAdvancedComponent extends BaseApplePayComponent {
         paymentEventHandler.mapToPaymentEventDTO(paymentEvent);
     componentPlatformApi.onPaymentsDetailsResult(paymentEventDTO);
   }
-  
+
   void _onLoading() => isLoading.value = true;
 }

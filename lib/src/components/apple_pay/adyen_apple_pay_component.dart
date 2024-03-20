@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:adyen_checkout/adyen_checkout.dart';
 import 'package:adyen_checkout/src/components/apple_pay/apple_pay_advanced_component.dart';
 import 'package:adyen_checkout/src/components/apple_pay/apple_pay_session_component.dart';
+import 'package:adyen_checkout/src/util/dto_mapper.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:pay/pay.dart' as pay_sdk;
@@ -46,6 +47,7 @@ class AdyenApplePayComponent extends StatelessWidget {
   Widget _buildApplePaySessionFlowWidget(SessionCheckout sessionCheckout) {
     return ApplePaySessionComponent(
       key: key,
+      session: sessionCheckout.toDTO(),
       applePayPaymentMethod: json.encode(paymentMethod),
       applePayComponentConfiguration: configuration,
       onPaymentResult: onPaymentResult,
