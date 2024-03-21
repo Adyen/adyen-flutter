@@ -295,7 +295,9 @@ class MultiComponentScreen extends StatelessWidget {
       case PaymentError():
         title = "Error occurred";
         message = "${paymentResult.reason}";
-      default:
+      case PaymentCancelledByUser():
+        title = "Cancelled by user";
+        message = "Cancelled by user";
     }
 
     return showDialog(
