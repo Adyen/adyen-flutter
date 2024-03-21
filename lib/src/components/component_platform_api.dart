@@ -17,16 +17,21 @@ class ComponentPlatformApi implements ComponentPlatformInterface {
 
   @override
   Future<void> onPaymentsResult(
+    String componentId,
     PaymentEventDTO paymentEventDTO,
   ) async {
-    _componentPlatformInterface.onPaymentsResult(paymentEventDTO);
+    _componentPlatformInterface.onPaymentsResult(componentId, paymentEventDTO);
   }
 
   @override
   Future<void> onPaymentsDetailsResult(
+    String componentId,
     PaymentEventDTO paymentEventDTO,
   ) async =>
-      _componentPlatformInterface.onPaymentsDetailsResult(paymentEventDTO);
+      _componentPlatformInterface.onPaymentsDetailsResult(
+        componentId,
+        paymentEventDTO,
+      );
 
   @override
   Future<InstantPaymentSetupResultDTO> isInstantPaymentSupportedByPlatform(

@@ -28,7 +28,6 @@ abstract class BaseGooglePayComponent extends StatefulWidget {
   final ValueNotifier<bool> isLoading = ValueNotifier<bool>(false);
   final SdkVersionNumberProvider _sdkVersionNumberProvider =
       SdkVersionNumberProvider.instance;
-  final ComponentFlutterApi componentFlutterApi = ComponentFlutterApi.instance;
   final ComponentPlatformApi componentPlatformApi =
       ComponentPlatformApi.instance;
   final AdyenLogger adyenLogger;
@@ -79,9 +78,14 @@ abstract class BaseGooglePayComponent extends StatefulWidget {
 }
 
 class _BaseGooglePayComponentState extends State<BaseGooglePayComponent> {
+  final ComponentFlutterApi _componentFlutterApi = ComponentFlutterApi.instance;
+  late StreamSubscription<ComponentCommunicationModel>
+      _componentCommunicationStream;
+
   @override
   void initState() {
-    widget.componentFlutterApi.componentCommunicationStream.stream
+    _componentCommunicationStream = _componentFlutterApi
+        .componentCommunicationStream.stream
         .where((communicationModel) =>
             communicationModel.componentId == widget.componentId)
         .listen(widget.handleComponentCommunication);
@@ -115,10 +119,11 @@ class _BaseGooglePayComponentState extends State<BaseGooglePayComponent> {
 
   @override
   void dispose() {
-    widget.componentPlatformApi.onDispose(widget.componentId);
-    widget.componentFlutterApi.dispose();
     widget.isButtonClickable.dispose();
     widget.isLoading.dispose();
+    widget.componentPlatformApi.onDispose(widget.componentId);
+    _componentCommunicationStream.cancel();
+    _componentFlutterApi.dispose();
     super.dispose();
   }
 

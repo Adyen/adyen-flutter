@@ -13,13 +13,12 @@ class ComponentPlatformApi: ComponentPlatformInterface {
         onUpdateViewHeightCallback()
     }
 
-    func onPaymentsResult(paymentsResult: PaymentEventDTO) {
-        applePayComponentManager.handlePaymentEvent(paymentEventDTO: paymentsResult)
-        handlePaymentEvent(paymentEventDTO: paymentsResult)
+    func onPaymentsResult(componentId: String, paymentsResult: PaymentEventDTO) {
+        handlePaymentEvent(componentId: componentId, paymentEventDTO: paymentsResult)
     }
 
-    func onPaymentsDetailsResult(paymentsDetailsResult: PaymentEventDTO) {
-        handlePaymentEvent(paymentEventDTO: paymentsDetailsResult)
+    func onPaymentsDetailsResult(componentId: String, paymentsDetailsResult: PaymentEventDTO) {
+        handlePaymentEvent(componentId: componentId, paymentEventDTO: paymentsDetailsResult)
     }
 
     func isInstantPaymentSupportedByPlatform(
@@ -52,15 +51,19 @@ class ComponentPlatformApi: ComponentPlatformInterface {
 
     func onDispose(componentId: String) throws {}
 
-    private func handlePaymentEvent(paymentEventDTO: PaymentEventDTO) {
-        switch paymentEventDTO.paymentEventType {
-        case .finished:
-            onFinishCallback(paymentEventDTO)
-        case .action:
-            guard let jsonActionResponse = paymentEventDTO.actionResponse else { return }
-            onActionCallback(jsonActionResponse)
-        case .error:
-            onErrorCallback(paymentEventDTO.error)
+    private func handlePaymentEvent(componentId: String, paymentEventDTO: PaymentEventDTO) {
+        if (componentId == ApplePayAdvancedComponent.applePayAdvancedComponentId || componentId == ApplePaySessionComponent.applePaySessionComponentId) {
+            applePayComponentManager.handlePaymentEvent(paymentEventDTO: paymentEventDTO)
+        } else {
+            switch paymentEventDTO.paymentEventType {
+            case .finished:
+                onFinishCallback(paymentEventDTO)
+            case .action:
+                guard let jsonActionResponse = paymentEventDTO.actionResponse else { return }
+                onActionCallback(jsonActionResponse)
+            case .error:
+                onErrorCallback(paymentEventDTO.error)
+            }
         }
     }
 }

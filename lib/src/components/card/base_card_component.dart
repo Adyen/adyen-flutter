@@ -71,16 +71,20 @@ class _BaseCardComponentState extends State<BaseCardComponent> {
   final GlobalKey _cardWidgetKey = GlobalKey();
   late Widget _cardWidget;
   final ComponentFlutterApi _componentFlutterApi = ComponentFlutterApi.instance;
+  late StreamSubscription<ComponentCommunicationModel>
+      _componentCommunicationStream;
 
   @override
   void initState() {
-    super.initState();
 
     _cardWidget = _buildCardWidget();
-    _componentFlutterApi.componentCommunicationStream.stream
+    _componentCommunicationStream = _componentFlutterApi
+        .componentCommunicationStream.stream
         .where((communicationModel) =>
             communicationModel.componentId == widget.componentId)
         .listen(widget.handleComponentCommunication);
+
+    super.initState();
   }
 
   @override
@@ -101,6 +105,7 @@ class _BaseCardComponentState extends State<BaseCardComponent> {
 
   @override
   void dispose() {
+    _componentCommunicationStream.cancel();
     _componentFlutterApi.dispose();
     widget.resizeStream.close();
     super.dispose();
