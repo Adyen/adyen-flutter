@@ -18,7 +18,7 @@ class ApplePayAdvancedComponent: BaseApplePayComponent {
         self.adyenContext = adyenContext
         self.paymentMethodResponse = paymentMethodResponse
         super.init()
-        applePayComponent = buildApplePayAdvancedComponent()
+        applePayComponent = try? buildApplePayAdvancedComponent()
     }
     
     override func present() {
@@ -40,16 +40,12 @@ class ApplePayAdvancedComponent: BaseApplePayComponent {
         }
     }
     
-    private func buildApplePayAdvancedComponent() -> ApplePayComponent? {
-        do {
-            let paymentMethod = try JSONDecoder().decode(ApplePayPaymentMethod.self, from: Data(paymentMethodResponse.utf8))
-            let applePayComponent = try? ApplePayComponent(paymentMethod: paymentMethod, context: adyenContext, configuration: configuration)
-            applePayComponent?.delegate = self
-            // applePayComponent?.applePayDelegate - Dynamic pricing will be added in the next version.
-            return applePayComponent
-        } catch {
-            return nil
-        }
+    private func buildApplePayAdvancedComponent() throws -> ApplePayComponent? {
+        let paymentMethod = try JSONDecoder().decode(ApplePayPaymentMethod.self, from: Data(paymentMethodResponse.utf8))
+        let applePayComponent = try? ApplePayComponent(paymentMethod: paymentMethod, context: adyenContext, configuration: configuration)
+        applePayComponent?.delegate = self
+        // applePayComponent?.applePayDelegate - Dynamic pricing will be added in the next version.
+        return applePayComponent
     }
     
     private func onFinished(paymentEventDTO: PaymentEventDTO) {

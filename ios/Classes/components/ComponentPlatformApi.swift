@@ -14,7 +14,6 @@ class ComponentPlatformApi: ComponentPlatformInterface {
     }
 
     func onPaymentsResult(paymentsResult: PaymentEventDTO) {
-        // TODO: Adjust handling
         applePayComponentManager.handlePaymentEvent(paymentEventDTO: paymentsResult)
         handlePaymentEvent(paymentEventDTO: paymentsResult)
     }
