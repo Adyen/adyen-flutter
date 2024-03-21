@@ -31,7 +31,10 @@ class ComponentFlutterApi implements ComponentFlutterInterface {
   }
 
   void dispose() {
-    _instance = null;
-    _componentCommunicationStream.close();
+    if (componentCommunicationStream.hasListener == false) {
+      _instance = null;
+      _componentCommunicationStream.close();
+      ComponentFlutterInterface.setup(null);
+    }
   }
 }
