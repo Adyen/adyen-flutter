@@ -5,7 +5,6 @@ import 'dart:convert';
 import 'package:adyen_checkout/adyen_checkout.dart';
 import 'package:adyen_checkout_example/config.dart';
 import 'package:adyen_checkout_example/repositories/adyen_card_component_repository.dart';
-import 'package:adyen_checkout_example/screens/component/card/card_component_scrollable_screen.dart';
 import 'package:flutter/material.dart';
 
 class CardComponentScreen extends StatefulWidget {
@@ -36,25 +35,13 @@ class _CardComponentScreenState extends State<CardComponentScreen> {
                 child: const Text("Card component session"),
               ),
               TextButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    _buildCardComponentAdvancedFlowRoute(),
-                  );
-                },
+                onPressed: () => Navigator.pushNamed(
+                    context, "/cardAdvancedComponentScreen"),
                 child: const Text("Card component advanced"),
               ),
             ],
           ),
         ),
-      ),
-    );
-  }
-
-  MaterialPageRoute<dynamic> _buildCardComponentAdvancedFlowRoute() {
-    return MaterialPageRoute(
-      builder: (context) => CardComponentScrollableScreen(
-        repository: widget.repository,
       ),
     );
   }

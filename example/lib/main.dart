@@ -10,6 +10,7 @@ import 'package:adyen_checkout_example/screens/component/apple_pay/apple_pay_adv
 import 'package:adyen_checkout_example/screens/component/apple_pay/apple_pay_navigation_screen.dart';
 import 'package:adyen_checkout_example/screens/component/apple_pay/apple_pay_session_component_screen.dart';
 import 'package:adyen_checkout_example/screens/component/card/card_component_screen.dart';
+import 'package:adyen_checkout_example/screens/component/card/card_component_scrollable_screen.dart';
 import 'package:adyen_checkout_example/screens/component/google_pay/google_pay_advanced_component_screen.dart';
 import 'package:adyen_checkout_example/screens/component/google_pay/google_pay_navigation_screen.dart';
 import 'package:adyen_checkout_example/screens/component/google_pay/google_pay_session_component_screen.dart';
@@ -20,26 +21,10 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 
 void main() {
   final service = Service();
-  final dropInScreen = DropInScreen(
-    repository: AdyenDropInRepository(service: service),
-  );
-  final cardComponentScreen = CardComponentScreen(
-    repository: AdyenCardComponentRepository(service: service),
-  );
-  const googlePayNavigationScreen = GooglePayNavigationScreen();
-  final googlePaySessionComponentScreen = GooglePaySessionsComponentScreen(
-    repository: AdyenGooglePayComponentRepository(service: service),
-  );
-  final googlePayAdvancedComponentScreen = GooglePayAdvancedComponentScreen(
-    repository: AdyenGooglePayComponentRepository(service: service),
-  );
-  const applePayNavigationScreen = ApplePayNavigationScreen();
-  final applePaySessionComponentScreen = ApplePaySessionComponentScreen(
-    repository: AdyenApplePayComponentRepository(service: service),
-  );
-  final applePayAdvancedComponentScreen = ApplePayAdvancedComponentScreen(
-    repository: AdyenApplePayComponentRepository(service: service),
-  );
+  final adyenGooglePayComponentRepository =
+      AdyenGooglePayComponentRepository(service: service);
+  final adyenApplePayComponentRepository =
+      AdyenApplePayComponentRepository(service: service);
 
   runApp(MaterialApp(
     localizationsDelegates: const [
@@ -59,16 +44,32 @@ void main() {
         )),
     routes: {
       '/': (context) => const MyApp(),
-      '/dropInScreen': (context) => dropInScreen,
-      '/cardComponentScreen': (context) => cardComponentScreen,
-      '/googlePayNavigation': (context) => googlePayNavigationScreen,
+      '/dropInScreen': (context) => DropInScreen(
+            repository: AdyenDropInRepository(service: service),
+          ),
+      '/cardComponentScreen': (context) => CardComponentScreen(
+            repository: AdyenCardComponentRepository(service: service),
+          ),
+      '/cardAdvancedComponentScreen': (context) => CardComponentScrollableScreen(
+        repository: AdyenCardComponentRepository(service: service),
+      ),
+      '/googlePayNavigation': (context) => const GooglePayNavigationScreen(),
       '/googlePaySessionComponent': (context) =>
-          googlePaySessionComponentScreen,
+          GooglePaySessionsComponentScreen(
+            repository: adyenGooglePayComponentRepository,
+          ),
       '/googlePayAdvancedComponent': (context) =>
-          googlePayAdvancedComponentScreen,
-      '/applePayNavigation': (context) => applePayNavigationScreen,
-      '/applePaySessionComponent': (context) => applePaySessionComponentScreen,
-      '/applePayAdvancedComponent': (context) => applePayAdvancedComponentScreen
+          GooglePayAdvancedComponentScreen(
+            repository: adyenGooglePayComponentRepository,
+          ),
+      '/applePayNavigation': (context) => const ApplePayNavigationScreen(),
+      '/applePaySessionComponent': (context) => ApplePaySessionComponentScreen(
+            repository: adyenApplePayComponentRepository,
+          ),
+      '/applePayAdvancedComponent': (context) =>
+          ApplePayAdvancedComponentScreen(
+            repository: adyenApplePayComponentRepository,
+          ),
     },
     initialRoute: "/",
   ));
