@@ -28,11 +28,15 @@ class ComponentPlatformApi(
 
     override fun updateViewHeight(viewId: Long) = ComponentHeightMessenger.sendResult(viewId)
 
-    override fun onPaymentsResult(componentId: String, paymentsResult: PaymentEventDTO) =
-        handlePaymentEvent(componentId, paymentsResult)
+    override fun onPaymentsResult(
+        componentId: String,
+        paymentsResult: PaymentEventDTO
+    ) = handlePaymentEvent(componentId, paymentsResult)
 
-    override fun onPaymentsDetailsResult(componentId: String, paymentsDetailsResult: PaymentEventDTO) =
-        handlePaymentEvent(componentId, paymentsDetailsResult)
+    override fun onPaymentsDetailsResult(
+        componentId: String,
+        paymentsDetailsResult: PaymentEventDTO
+    ) = handlePaymentEvent(componentId, paymentsDetailsResult)
 
     override fun isInstantPaymentSupportedByPlatform(
         instantPaymentConfigurationDTO: InstantPaymentConfigurationDTO,
@@ -73,7 +77,10 @@ class ComponentPlatformApi(
         data: Intent?
     ): Boolean = googlePayComponentManager.handleGooglePayActivityResult(requestCode, resultCode, data)
 
-    private fun handlePaymentEvent(componentId: String, paymentEventDTO: PaymentEventDTO) {
+    private fun handlePaymentEvent(
+        componentId: String,
+        paymentEventDTO: PaymentEventDTO
+    ) {
         if (componentId == GOOGLE_PAY_SESSION_COMPONENT_KEY || componentId == GOOGLE_PAY_ADVANCED_COMPONENT_KEY) {
             googlePayComponentManager.handlePaymentEvent(paymentEventDTO)
         } else {

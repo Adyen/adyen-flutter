@@ -40,12 +40,12 @@ class GooglePayAdvancedComponent(
                 paymentMethod = paymentMethod,
                 configuration = googlePayConfiguration,
                 callback =
-                GooglePayAdvancedCallback(
-                    componentFlutterApi,
-                    componentId,
-                    ::onLoading,
-                    ::hideLoadingBottomSheet
-                ),
+                    GooglePayAdvancedCallback(
+                        componentFlutterApi,
+                        componentId,
+                        ::onLoading,
+                        ::hideLoadingBottomSheet
+                    ),
             )
     }
 
@@ -61,65 +61,68 @@ class GooglePayAdvancedComponent(
     }
 
     private fun addResultListener() {
-        resultListenerJob = activity.lifecycleScope.launch {
-            GooglePayComponentManager.resultFlow.collect { resultCode ->
-                if (resultCode == null) {
-                    return@collect
-                }
+        resultListenerJob =
+            activity.lifecycleScope.launch {
+                GooglePayComponentManager.resultFlow.collect { resultCode ->
+                    if (resultCode == null) {
+                        return@collect
+                    }
 
-                val model =
-                    ComponentCommunicationModel(
-                        ComponentCommunicationType.RESULT,
-                        componentId = componentId,
-                        paymentResult =
-                        PaymentResultDTO(
-                            type = PaymentResultEnum.FINISHED,
-                            result = PaymentResultModelDTO(resultCode = resultCode)
-                        ),
-                    )
-                componentFlutterApi.onComponentCommunication(model) {}
-                hideLoadingBottomSheet()
+                    val model =
+                        ComponentCommunicationModel(
+                            ComponentCommunicationType.RESULT,
+                            componentId = componentId,
+                            paymentResult =
+                                PaymentResultDTO(
+                                    type = PaymentResultEnum.FINISHED,
+                                    result = PaymentResultModelDTO(resultCode = resultCode)
+                                ),
+                        )
+                    componentFlutterApi.onComponentCommunication(model) {}
+                    hideLoadingBottomSheet()
+                }
             }
-        }
     }
 
     private fun addActionListener() {
-        actionListenerJob = activity.lifecycleScope.launch {
-            GooglePayComponentManager.actionFlow.collect { action ->
-                if (action == null) {
-                    return@collect
-                }
+        actionListenerJob =
+            activity.lifecycleScope.launch {
+                GooglePayComponentManager.actionFlow.collect { action ->
+                    if (action == null) {
+                        return@collect
+                    }
 
-                action.let {
-                    googlePayComponent?.apply {
-                        this.handleAction(action = Action.SERIALIZER.deserialize(action) , activity = activity)
-                        ComponentLoadingBottomSheet.show(activity.supportFragmentManager, this)
+                    action.let {
+                        googlePayComponent?.apply {
+                            this.handleAction(action = Action.SERIALIZER.deserialize(action), activity = activity)
+                            ComponentLoadingBottomSheet.show(activity.supportFragmentManager, this)
+                        }
                     }
                 }
             }
-        }
     }
 
     private fun addErrorListener() {
-        errorListenerJob = activity.lifecycleScope.launch {
-            GooglePayComponentManager.errorFlow.collect { error ->
-                if (error == null) {
-                    return@collect
-                }
+        errorListenerJob =
+            activity.lifecycleScope.launch {
+                GooglePayComponentManager.errorFlow.collect { error ->
+                    if (error == null) {
+                        return@collect
+                    }
 
-                val model =
-                    ComponentCommunicationModel(
-                        ComponentCommunicationType.RESULT,
-                        componentId = componentId,
-                        paymentResult =
-                        PaymentResultDTO(
-                            type = PaymentResultEnum.ERROR,
-                            reason = error.errorMessage,
-                        ),
-                    )
-                componentFlutterApi.onComponentCommunication(model) {}
+                    val model =
+                        ComponentCommunicationModel(
+                            ComponentCommunicationType.RESULT,
+                            componentId = componentId,
+                            paymentResult =
+                                PaymentResultDTO(
+                                    type = PaymentResultEnum.ERROR,
+                                    reason = error.errorMessage,
+                                ),
+                        )
+                    componentFlutterApi.onComponentCommunication(model) {}
+                }
             }
-        }
     }
 
     private fun onLoading() {

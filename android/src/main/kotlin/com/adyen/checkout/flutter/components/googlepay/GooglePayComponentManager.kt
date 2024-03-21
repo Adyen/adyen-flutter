@@ -5,8 +5,6 @@ import ErrorDTO
 import InstantPaymentConfigurationDTO
 import InstantPaymentSetupResultDTO
 import PaymentEventDTO
-import PaymentResultDTO
-import PaymentResultModelDTO
 import android.content.Intent
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.lifecycleScope
@@ -18,7 +16,6 @@ import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToGooglePayConfig
 import com.adyen.checkout.flutter.utils.Constants
 import com.adyen.checkout.googlepay.GooglePayComponent
 import com.adyen.checkout.googlepay.GooglePayConfiguration
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import org.json.JSONObject
