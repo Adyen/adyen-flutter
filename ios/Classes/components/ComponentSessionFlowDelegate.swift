@@ -20,15 +20,16 @@ class ComponentSessionFlowDelegate: AdyenSessionDelegate {
                 sessionData: session.sessionContext.data,
                 resultCode: result.resultCode.rawValue
             )
+            let componentCommunicationModel = ComponentCommunicationModel(
+                type: ComponentCommunicationType.result,
+                componentId: self?.componentId ?? "",
+                paymentResult: PaymentResultDTO(
+                    type: PaymentResultEnum.finished,
+                    result: paymentResult
+                )
+            )
             self?.componentFlutterApi.onComponentCommunication(
-                componentCommunicationModel: ComponentCommunicationModel(
-                    type: ComponentCommunicationType.result,
-                    componentId: self?.componentId ?? "",
-                    paymentResult: PaymentResultDTO(
-                        type: PaymentResultEnum.finished,
-                        result: paymentResult
-                    )
-                ),
+                componentCommunicationModel: componentCommunicationModel,
                 completion: { _ in }
             )
         })
@@ -43,15 +44,16 @@ class ComponentSessionFlowDelegate: AdyenSessionDelegate {
             } else {
                 type = PaymentResultEnum.error
             }
+            let componentCommunicationModel = ComponentCommunicationModel(
+                type: ComponentCommunicationType.result,
+                componentId: self.componentId ?? "",
+                paymentResult: PaymentResultDTO(
+                    type: type,
+                    reason: error.localizedDescription
+                )
+            )
             self.componentFlutterApi.onComponentCommunication(
-                componentCommunicationModel: ComponentCommunicationModel(
-                    type: ComponentCommunicationType.result,
-                    componentId: self.componentId ?? "",
-                    paymentResult: PaymentResultDTO(
-                        type: type,
-                        reason: error.localizedDescription
-                    )
-                ),
+                componentCommunicationModel: componentCommunicationModel,
                 completion: { _ in }
             )
         })

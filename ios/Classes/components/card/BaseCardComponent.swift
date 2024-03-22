@@ -90,15 +90,16 @@ class BaseCardComponent: NSObject, FlutterPlatformView, UIScrollViewDelegate {
     }
 
     func sendErrorToFlutterLayer(errorMessage: String) {
+        let componentCommunicationModel = ComponentCommunicationModel(
+            type: ComponentCommunicationType.result,
+            componentId: componentId,
+            paymentResult: PaymentResultDTO(
+                type: PaymentResultEnum.error,
+                reason: errorMessage
+            )
+        )
         componentFlutterApi.onComponentCommunication(
-            componentCommunicationModel: ComponentCommunicationModel(
-                type: ComponentCommunicationType.result,
-                componentId: componentId,
-                paymentResult: PaymentResultDTO(
-                    type: PaymentResultEnum.error,
-                    reason: errorMessage
-                )
-            ),
+            componentCommunicationModel: componentCommunicationModel,
             completion: { _ in }
         )
     }
@@ -145,12 +146,14 @@ class BaseCardComponent: NSObject, FlutterPlatformView, UIScrollViewDelegate {
     private func sendHeightUpdate() {
         guard let viewHeight = cardComponent?.viewController.preferredContentSize.height else { return }
         let roundedViewHeight = Double(round(100 * viewHeight / 100))
+        let componentCommunicationModel = ComponentCommunicationModel(
+            type: ComponentCommunicationType.resize,
+            componentId: componentId,
+            data: roundedViewHeight
+        )
         componentFlutterApi.onComponentCommunication(
-            componentCommunicationModel: ComponentCommunicationModel(
-                type: ComponentCommunicationType.resize,
-                componentId: componentId,
-                data: roundedViewHeight
-            ), completion: { _ in }
+            componentCommunicationModel: componentCommunicationModel,
+            completion: { _ in }
         )
     }
 }
