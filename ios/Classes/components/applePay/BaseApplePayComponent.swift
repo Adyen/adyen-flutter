@@ -11,8 +11,8 @@ class BaseApplePayComponent {
     
     func finalizeAndDismissComponent(success: Bool, completion: @escaping (() -> Void)) {
         applePayComponent?.finalizeIfNeeded(with: success) { [weak self] in
-            completion()
             self?.getViewController()?.dismiss(animated: true, completion: { [weak self] in
+                completion()
                 self?.applePayComponent = nil
             })
         }
