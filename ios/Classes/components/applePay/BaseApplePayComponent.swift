@@ -11,10 +11,15 @@ class BaseApplePayComponent {
     
     func finalizeAndDismissComponent(success: Bool, completion: @escaping (() -> Void)) {
         applePayComponent?.finalizeIfNeeded(with: success) { [weak self] in
-            self?.getViewController()?.dismiss(animated: true, completion: { [weak self] in
-                completion()
+            if let viewController = self?.getViewController() {
+                viewController.dismiss(animated: true) { [weak self] in
+                    self?.applePayComponent = nil
+                    completion()
+                }
+            } else {
                 self?.applePayComponent = nil
-            })
+                completion()
+            }
         }
     }
     
