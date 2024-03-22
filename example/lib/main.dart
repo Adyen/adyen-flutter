@@ -15,6 +15,7 @@ import 'package:adyen_checkout_example/screens/component/google_pay/google_pay_a
 import 'package:adyen_checkout_example/screens/component/google_pay/google_pay_navigation_screen.dart';
 import 'package:adyen_checkout_example/screens/component/google_pay/google_pay_session_component_screen.dart';
 import 'package:adyen_checkout_example/screens/component/multi_component/multi_component_advanced_screen.dart';
+import 'package:adyen_checkout_example/screens/component/multi_component/multi_component_navigation_screen.dart';
 import 'package:adyen_checkout_example/screens/drop_in/drop_in_screen.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -74,7 +75,15 @@ void main() {
           ApplePayAdvancedComponentScreen(
             repository: adyenApplePayComponentRepository,
           ),
-      '/multiComponentScreen': (context) => MultiComponentScreen(
+      '/multiComponentNavigationScreen': (context) =>
+          const MultiComponentNavigationScreen(),
+      '/multiComponentSessionScreen': (context) => MultiComponentAdvancedScreen(
+            cardRepository: adyenCardComponentRepository,
+            googlePayRepository: adyenGooglePayComponentRepository,
+            applePayRepository: adyenApplePayComponentRepository,
+          ),
+      '/multiComponentAdvancedScreen': (context) =>
+          MultiComponentAdvancedScreen(
             cardRepository: adyenCardComponentRepository,
             googlePayRepository: adyenGooglePayComponentRepository,
             applePayRepository: adyenApplePayComponentRepository,
@@ -108,8 +117,8 @@ class MyApp extends StatelessWidget {
                 child: const Text("Card component")),
             _buildGoogleOrApplePayComponent(context),
             TextButton(
-                onPressed: () =>
-                    Navigator.pushNamed(context, "/multiComponentScreen"),
+                onPressed: () => Navigator.pushNamed(
+                    context, "/multiComponentNavigationScreen"),
                 child: const Text("Multi component")),
           ],
         ),

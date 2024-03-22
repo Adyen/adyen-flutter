@@ -11,8 +11,8 @@ import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-class MultiComponentScreen extends StatelessWidget {
-  const MultiComponentScreen({
+class MultiComponentAdvancedScreen extends StatelessWidget {
+  const MultiComponentAdvancedScreen({
     required this.cardRepository,
     required this.applePayRepository,
     required this.googlePayRepository,
@@ -27,7 +27,7 @@ class MultiComponentScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
         backgroundColor: Colors.white,
-        appBar: AppBar(title: const Text('Adyen card component')),
+        appBar: AppBar(title: const Text('Adyen multi component')),
         body: SafeArea(
           child: FutureBuilder<String>(
             future: cardRepository.fetchPaymentMethods(),
@@ -74,14 +74,17 @@ class MultiComponentScreen extends StatelessWidget {
       onAdditionalDetails: cardRepository.onAdditionalDetails,
     );
 
-    return AdyenCardComponent(
-      configuration: cardComponentConfiguration,
-      paymentMethod: paymentMethod,
-      checkout: advancedCheckout,
-      onPaymentResult: (paymentResult) async {
-        Navigator.pop(context);
-        _dialogBuilder(context, paymentResult);
-      },
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(4,0,4,0),
+      child: AdyenCardComponent(
+        configuration: cardComponentConfiguration,
+        paymentMethod: paymentMethod,
+        checkout: advancedCheckout,
+        onPaymentResult: (paymentResult) async {
+          Navigator.pop(context);
+          _dialogBuilder(context, paymentResult);
+        },
+      ),
     );
   }
 
