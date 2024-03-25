@@ -88,6 +88,9 @@ class ApplePayAdvancedComponentScreen extends StatelessWidget {
   }
 
   ApplePayConfiguration _createApplePayConfiguration() {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+
     return ApplePayConfiguration(
       merchantId: Config.merchantId,
       merchantName: Config.merchantName,
@@ -134,8 +137,8 @@ class ApplePayAdvancedComponentScreen extends StatelessWidget {
           detail: "DHL",
           amount: Amount(value: 1000, currency: "EUR"),
           identifier: "identifier 1",
-          startDate: DateTime.now().add(const Duration(days: 2)),
-          endDate: DateTime.now().add(const Duration(days: 5)),
+          startDate: today.add(const Duration(days: 2)),
+          endDate: today.add(const Duration(days: 5)),
         ),
         ApplePayShippingMethod(
           label: "Store pick up",

@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:adyen_checkout/src/common/model/payment_event.dart';
 import 'package:adyen_checkout/src/common/model/payment_result.dart';
 import 'package:adyen_checkout/src/components/apple_pay/base_apple_pay_component.dart';
@@ -54,10 +56,22 @@ class ApplePayAdvancedComponent extends BaseApplePayComponent {
   }
 
   Future<void> _onSubmit(ComponentCommunicationModel event) async {
-    final PaymentEvent paymentEvent = await onSubmit(event.data as String);
-    final PaymentEventDTO paymentEventDTO =
-        paymentEventHandler.mapToPaymentEventDTO(paymentEvent);
-    componentPlatformApi.onPaymentsResult(componentId, paymentEventDTO);
+    try {
+      final paymentComponentJson = event.data as Map<dynamic, dynamic>;
+      final PaymentEvent paymentEvent =
+          await onSubmit(jsonEncode(paymentComponentJson));
+      final PaymentEventDTO paymentEventDTO =
+          paymentEventHandler.mapToPaymentEventDTO(paymentEvent);
+      componentPlatformApi.onPaymentsResult(componentId, paymentEventDTO);
+    } catch (exception) {
+      componentPlatformApi.onPaymentsResult(
+        componentId,
+        PaymentEventDTO(
+          paymentEventType: PaymentEventType.error,
+          error: ErrorDTO(errorMessage: exception.toString()),
+        ),
+      );
+    }
   }
 
   Future<void> _onAdditionalDetails(ComponentCommunicationModel event) async {

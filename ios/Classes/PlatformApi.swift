@@ -1862,18 +1862,26 @@ private class ComponentFlutterInterfaceCodecReader: FlutterStandardReader {
       case 130:
         return AnalyticsOptionsDTO.fromList(self.readValue() as! [Any?])
       case 131:
-        return CardComponentConfigurationDTO.fromList(self.readValue() as! [Any?])
+        return ApplePayConfigurationDTO.fromList(self.readValue() as! [Any?])
       case 132:
-        return CardConfigurationDTO.fromList(self.readValue() as! [Any?])
+        return ApplePayContactDTO.fromList(self.readValue() as! [Any?])
       case 133:
-        return ComponentCommunicationModel.fromList(self.readValue() as! [Any?])
+        return ApplePayShippingMethodDTO.fromList(self.readValue() as! [Any?])
       case 134:
-        return OrderResponseDTO.fromList(self.readValue() as! [Any?])
+        return ApplePaySummaryItemDTO.fromList(self.readValue() as! [Any?])
       case 135:
-        return PaymentResultDTO.fromList(self.readValue() as! [Any?])
+        return CardComponentConfigurationDTO.fromList(self.readValue() as! [Any?])
       case 136:
-        return PaymentResultModelDTO.fromList(self.readValue() as! [Any?])
+        return CardConfigurationDTO.fromList(self.readValue() as! [Any?])
       case 137:
+        return ComponentCommunicationModel.fromList(self.readValue() as! [Any?])
+      case 138:
+        return OrderResponseDTO.fromList(self.readValue() as! [Any?])
+      case 139:
+        return PaymentResultDTO.fromList(self.readValue() as! [Any?])
+      case 140:
+        return PaymentResultModelDTO.fromList(self.readValue() as! [Any?])
+      case 141:
         return SessionDTO.fromList(self.readValue() as! [Any?])
       default:
         return super.readValue(ofType: type)
@@ -1892,26 +1900,38 @@ private class ComponentFlutterInterfaceCodecWriter: FlutterStandardWriter {
     } else if let value = value as? AnalyticsOptionsDTO {
       super.writeByte(130)
       super.writeValue(value.toList())
-    } else if let value = value as? CardComponentConfigurationDTO {
+    } else if let value = value as? ApplePayConfigurationDTO {
       super.writeByte(131)
       super.writeValue(value.toList())
-    } else if let value = value as? CardConfigurationDTO {
+    } else if let value = value as? ApplePayContactDTO {
       super.writeByte(132)
       super.writeValue(value.toList())
-    } else if let value = value as? ComponentCommunicationModel {
+    } else if let value = value as? ApplePayShippingMethodDTO {
       super.writeByte(133)
       super.writeValue(value.toList())
-    } else if let value = value as? OrderResponseDTO {
+    } else if let value = value as? ApplePaySummaryItemDTO {
       super.writeByte(134)
       super.writeValue(value.toList())
-    } else if let value = value as? PaymentResultDTO {
+    } else if let value = value as? CardComponentConfigurationDTO {
       super.writeByte(135)
       super.writeValue(value.toList())
-    } else if let value = value as? PaymentResultModelDTO {
+    } else if let value = value as? CardConfigurationDTO {
       super.writeByte(136)
       super.writeValue(value.toList())
-    } else if let value = value as? SessionDTO {
+    } else if let value = value as? ComponentCommunicationModel {
       super.writeByte(137)
+      super.writeValue(value.toList())
+    } else if let value = value as? OrderResponseDTO {
+      super.writeByte(138)
+      super.writeValue(value.toList())
+    } else if let value = value as? PaymentResultDTO {
+      super.writeByte(139)
+      super.writeValue(value.toList())
+    } else if let value = value as? PaymentResultModelDTO {
+      super.writeByte(140)
+      super.writeValue(value.toList())
+    } else if let value = value as? SessionDTO {
+      super.writeByte(141)
       super.writeValue(value.toList())
     } else {
       super.writeValue(value)
@@ -1935,7 +1955,7 @@ class ComponentFlutterInterfaceCodec: FlutterStandardMessageCodec {
 
 /// Generated protocol from Pigeon that represents Flutter messages that can be called from Swift.
 protocol ComponentFlutterInterfaceProtocol {
-  func _generateCodecForDTOs(cardComponentConfigurationDTO cardComponentConfigurationDTOArg: CardComponentConfigurationDTO, sessionDTO sessionDTOArg: SessionDTO, completion: @escaping (Result<Void, FlutterError>) -> Void)
+  func _generateCodecForDTOs(cardComponentConfigurationDTO cardComponentConfigurationDTOArg: CardComponentConfigurationDTO, applePayConfigurationDTO applePayConfigurationDTOArg: ApplePayConfigurationDTO, sessionDTO sessionDTOArg: SessionDTO, completion: @escaping (Result<Void, FlutterError>) -> Void)
   func onComponentCommunication(componentCommunicationModel componentCommunicationModelArg: ComponentCommunicationModel, completion: @escaping (Result<Void, FlutterError>) -> Void)
 }
 class ComponentFlutterInterface: ComponentFlutterInterfaceProtocol {
@@ -1946,10 +1966,10 @@ class ComponentFlutterInterface: ComponentFlutterInterfaceProtocol {
   var codec: FlutterStandardMessageCodec {
     return ComponentFlutterInterfaceCodec.shared
   }
-  func _generateCodecForDTOs(cardComponentConfigurationDTO cardComponentConfigurationDTOArg: CardComponentConfigurationDTO, sessionDTO sessionDTOArg: SessionDTO, completion: @escaping (Result<Void, FlutterError>) -> Void) {
+  func _generateCodecForDTOs(cardComponentConfigurationDTO cardComponentConfigurationDTOArg: CardComponentConfigurationDTO, applePayConfigurationDTO applePayConfigurationDTOArg: ApplePayConfigurationDTO, sessionDTO sessionDTOArg: SessionDTO, completion: @escaping (Result<Void, FlutterError>) -> Void) {
     let channelName: String = "dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface._generateCodecForDTOs"
     let channel = FlutterBasicMessageChannel(name: channelName, binaryMessenger: binaryMessenger, codec: codec)
-    channel.sendMessage([cardComponentConfigurationDTOArg, sessionDTOArg] as [Any?]) { response in
+    channel.sendMessage([cardComponentConfigurationDTOArg, applePayConfigurationDTOArg, sessionDTOArg] as [Any?]) { response in
       guard let listResponse = response as? [Any?] else {
         completion(.failure(createConnectionError(withChannelName:channelName)))
         return
