@@ -1,31 +1,30 @@
-import 'dart:async';
-
 import 'package:adyen_checkout/src/common/model/payment_event.dart';
 import 'package:adyen_checkout/src/common/model/payment_result.dart';
-import 'package:adyen_checkout/src/components/google_pay/base_google_pay_component.dart';
+import 'package:adyen_checkout/src/components/apple_pay/base_apple_pay_component.dart';
 import 'package:adyen_checkout/src/generated/platform_api.g.dart';
 import 'package:adyen_checkout/src/logging/adyen_logger.dart';
 import 'package:adyen_checkout/src/util/payment_event_handler.dart';
 
-class GooglePayAdvancedComponent extends BaseGooglePayComponent {
+class ApplePayAdvancedComponent extends BaseApplePayComponent {
   final Future<PaymentEvent> Function(String) onSubmit;
   final Future<PaymentEvent> Function(String) onAdditionalDetails;
   final PaymentEventHandler paymentEventHandler;
-  @override
-  final String componentId = "GOOGLE_PAY_ADVANCED_COMPONENT";
 
-  GooglePayAdvancedComponent({
+  @override
+  final String componentId = "APPLE_PAY_ADVANCED_COMPONENT";
+
+  ApplePayAdvancedComponent({
     super.key,
-    required super.googlePayPaymentMethod,
-    required super.googlePayComponentConfiguration,
+    required super.applePayPaymentMethod,
+    required super.applePayComponentConfiguration,
     required super.onPaymentResult,
     required this.onSubmit,
     required this.onAdditionalDetails,
-    required super.theme,
+    required super.style,
     required super.type,
-    required super.cornerRadius,
     required super.width,
     required super.height,
+    super.cornerRadius,
     super.loadingIndicator,
     super.onUnavailable,
     super.unavailableWidget,
@@ -41,7 +40,7 @@ class GooglePayAdvancedComponent extends BaseGooglePayComponent {
     } else if (event.type case ComponentCommunicationType.additionalDetails) {
       _onAdditionalDetails(event);
     } else if (event.type case ComponentCommunicationType.loading) {
-      onLoading();
+      _onLoading();
     } else if (event.type case ComponentCommunicationType.result) {
       onResult(event);
     }
@@ -50,7 +49,7 @@ class GooglePayAdvancedComponent extends BaseGooglePayComponent {
   @override
   void onFinished(PaymentResultDTO? paymentResultDTO) {
     String resultCode = paymentResultDTO?.result?.resultCode ?? "";
-    adyenLogger.print("Google Pay result code: $resultCode");
+    adyenLogger.print("Apple Pay advanced flow result code: $resultCode");
     onPaymentResult(PaymentAdvancedFinished(resultCode: resultCode));
   }
 
@@ -68,4 +67,6 @@ class GooglePayAdvancedComponent extends BaseGooglePayComponent {
         paymentEventHandler.mapToPaymentEventDTO(paymentEvent);
     componentPlatformApi.onPaymentsDetailsResult(paymentEventDTO);
   }
+
+  void _onLoading() => isLoading.value = true;
 }

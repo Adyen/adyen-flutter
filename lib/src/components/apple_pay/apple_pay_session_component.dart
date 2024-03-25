@@ -1,14 +1,18 @@
+import 'package:adyen_checkout/adyen_checkout.dart';
 import 'package:adyen_checkout/src/common/model/payment_result.dart';
 import 'package:adyen_checkout/src/components/apple_pay/base_apple_pay_component.dart';
 import 'package:adyen_checkout/src/generated/platform_api.g.dart';
 import 'package:adyen_checkout/src/logging/adyen_logger.dart';
 
 class ApplePaySessionComponent extends BaseApplePayComponent {
+  final SessionDTO session;
+
   @override
   final String componentId = "APPLE_PAY_SESSION_COMPONENT";
 
   ApplePaySessionComponent({
     super.key,
+    required this.session,
     required super.applePayPaymentMethod,
     required super.applePayComponentConfiguration,
     required super.onPaymentResult,
@@ -27,26 +31,20 @@ class ApplePaySessionComponent extends BaseApplePayComponent {
   void handleComponentCommunication(event) {
     isButtonClickable.value = true;
     if (event.type case ComponentCommunicationType.result) {
-      _onResult(event);
-    } else if (event.type case ComponentCommunicationType.error) {
-      _onError(event);
+      onResult(event);
     } else if (event.type case ComponentCommunicationType.loading) {
-      _onLoading();
+      onLoading();
     }
   }
 
-  void _onLoading() => isLoading.value = true;
-
-  void _onResult(ComponentCommunicationModel event) {
-    isLoading.value = false;
-    String resultCode = event.paymentResult?.resultCode ?? "";
-    adyenLogger.print("Apple pay session flow result code: $resultCode");
-    onPaymentResult(PaymentAdvancedFinished(resultCode: resultCode));
-  }
-
-  void _onError(ComponentCommunicationModel event) {
-    isLoading.value = false;
-    String errorMessage = event.data as String;
-    onPaymentResult(PaymentError(reason: errorMessage));
+  @override
+  void onFinished(PaymentResultDTO? paymentResultDTO) {
+    String resultCode = paymentResultDTO?.result?.resultCode ?? "";
+    adyenLogger.print("Apple Pay session flow result code: $resultCode");
+    onPaymentResult(PaymentSessionFinished(
+      sessionId: paymentResultDTO?.result?.sessionId ?? "",
+      sessionData: paymentResultDTO?.result?.sessionData ?? "",
+      resultCode: resultCode,
+    ));
   }
 }

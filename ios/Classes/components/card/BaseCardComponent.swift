@@ -90,10 +90,18 @@ class BaseCardComponent: NSObject, FlutterPlatformView, UIScrollViewDelegate {
     }
 
     func sendErrorToFlutterLayer(errorMessage: String) {
-        let componentCommunicationModel = ComponentCommunicationModel(type: ComponentCommunicationType.error,
-                                                                      componentId: componentId,
-                                                                      data: errorMessage)
-        componentFlutterApi.onComponentCommunication(componentCommunicationModel: componentCommunicationModel, completion: { _ in })
+        let componentCommunicationModel = ComponentCommunicationModel(
+            type: ComponentCommunicationType.result,
+            componentId: componentId,
+            paymentResult: PaymentResultDTO(
+                type: PaymentResultEnum.error,
+                reason: errorMessage
+            )
+        )
+        componentFlutterApi.onComponentCommunication(
+            componentCommunicationModel: componentCommunicationModel,
+            completion: { _ in }
+        )
     }
 
     func finalizeAndDismiss(
@@ -138,12 +146,14 @@ class BaseCardComponent: NSObject, FlutterPlatformView, UIScrollViewDelegate {
     private func sendHeightUpdate() {
         guard let viewHeight = cardComponent?.viewController.preferredContentSize.height else { return }
         let roundedViewHeight = Double(round(100 * viewHeight / 100))
+        let componentCommunicationModel = ComponentCommunicationModel(
+            type: ComponentCommunicationType.resize,
+            componentId: componentId,
+            data: roundedViewHeight
+        )
         componentFlutterApi.onComponentCommunication(
-            componentCommunicationModel: ComponentCommunicationModel(
-                type: ComponentCommunicationType.resize,
-                componentId: componentId,
-                data: roundedViewHeight
-            ), completion: { _ in }
+            componentCommunicationModel: componentCommunicationModel,
+            completion: { _ in }
         )
     }
 }

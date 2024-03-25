@@ -14,12 +14,14 @@ class CardAdvancedFlowActionComponentDelegate: ActionComponentDelegate {
             let actionComponentData = ActionComponentDataModel(details: data.details.encodable, paymentData: data.paymentData)
             let actionComponentDataJson = try JSONEncoder().encode(actionComponentData)
             let actionComponentDataString = String(data: actionComponentDataJson, encoding: .utf8)
+            let componentCommunicationModel = ComponentCommunicationModel(
+                type: ComponentCommunicationType.additionalDetails,
+                componentId: componentId,
+                data: actionComponentDataString
+            )
             componentFlutterApi.onComponentCommunication(
-                componentCommunicationModel: ComponentCommunicationModel(
-                    type: ComponentCommunicationType.additionalDetails,
-                    componentId: componentId,
-                    data: actionComponentDataString
-                ), completion: { _ in }
+                componentCommunicationModel: componentCommunicationModel,
+                completion: { _ in }
             )
         } catch {
             sendErrorToFlutterLayer(error: error)
@@ -27,7 +29,7 @@ class CardAdvancedFlowActionComponentDelegate: ActionComponentDelegate {
     }
 
     func didComplete(from _: Adyen.ActionComponent) {
-        // Only for voucher payment method
+        // Only for voucher payment method - currently not supported.
     }
 
     func didFail(with error: Error, from _: Adyen.ActionComponent) {
@@ -36,9 +38,12 @@ class CardAdvancedFlowActionComponentDelegate: ActionComponentDelegate {
 
     private func sendErrorToFlutterLayer(error: Error) {
         let componentCommunicationModel = ComponentCommunicationModel(
-            type: ComponentCommunicationType.error,
+            type: ComponentCommunicationType.result,
             componentId: componentId,
-            data: error.localizedDescription
+            paymentResult: PaymentResultDTO(
+                type: PaymentResultEnum.error,
+                reason: error.localizedDescription
+            )
         )
         componentFlutterApi.onComponentCommunication(
             componentCommunicationModel: componentCommunicationModel,

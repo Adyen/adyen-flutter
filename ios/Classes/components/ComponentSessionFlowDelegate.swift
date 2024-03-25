@@ -15,7 +15,6 @@ class ComponentSessionFlowDelegate: AdyenSessionDelegate {
         let resultCode = result.resultCode
         let success = resultCode == .authorised || resultCode == .received || resultCode == .pending
         finalizeAndDismissHandler?(success, { [weak self] in
-            guard let self else { return }
             let paymentResult = PaymentResultModelDTO(
                 sessionId: session.sessionContext.identifier,
                 sessionData: session.sessionContext.data,
@@ -23,10 +22,13 @@ class ComponentSessionFlowDelegate: AdyenSessionDelegate {
             )
             let componentCommunicationModel = ComponentCommunicationModel(
                 type: ComponentCommunicationType.result,
-                componentId: self.componentId ?? "",
-                paymentResult: paymentResult
+                componentId: self?.componentId ?? "",
+                paymentResult: PaymentResultDTO(
+                    type: PaymentResultEnum.finished,
+                    result: paymentResult
+                )
             )
-            self.componentFlutterApi.onComponentCommunication(
+            self?.componentFlutterApi.onComponentCommunication(
                 componentCommunicationModel: componentCommunicationModel,
                 completion: { _ in }
             )
@@ -36,10 +38,19 @@ class ComponentSessionFlowDelegate: AdyenSessionDelegate {
     func didFail(with error: Error, from component: Adyen.Component, session: Adyen.AdyenSession) {
         finalizeAndDismissHandler?(false, { [weak self] in
             guard let self else { return }
+            let type: PaymentResultEnum
+            if let componentError = (error as? ComponentError), componentError == ComponentError.cancelled {
+                type = PaymentResultEnum.cancelledByUser
+            } else {
+                type = PaymentResultEnum.error
+            }
             let componentCommunicationModel = ComponentCommunicationModel(
-                type: ComponentCommunicationType.error,
+                type: ComponentCommunicationType.result,
                 componentId: self.componentId ?? "",
-                data: error.localizedDescription
+                paymentResult: PaymentResultDTO(
+                    type: type,
+                    reason: error.localizedDescription
+                )
             )
             self.componentFlutterApi.onComponentCommunication(
                 componentCommunicationModel: componentCommunicationModel,

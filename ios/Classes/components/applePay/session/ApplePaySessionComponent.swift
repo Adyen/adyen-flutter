@@ -39,20 +39,16 @@ class ApplePaySessionComponent: BaseApplePayComponent {
     private func setupSessionFlowDelegate() {
         if let componentSessionFlowDelegate = (sessionHolder.sessionDelegate as? ComponentSessionFlowDelegate) {
             componentSessionFlowDelegate.componentId = Self.applePaySessionComponentId
-            componentSessionFlowDelegate.finalizeAndDismissHandler = finalizeAndDismissSessionComponent
+            componentSessionFlowDelegate.finalizeAndDismissHandler = finalizeAndDismissComponent
         } else {
             AdyenAssertion.assertionFailure(message: "Wrong session flow delegate usage")
         }
     }
         
-    func finalizeAndDismissSessionComponent(success: Bool, completion: @escaping (() -> Void)) {
-        applePayComponent?.finalizeIfNeeded(with: success) { [weak self] in
-            self?.getViewController()?.dismiss(animated: true, completion: { [weak self] in
-                guard let self else { return }
-                completion()
-                self.sessionHolder.reset()
-                self.applePayComponent = nil
-            })
-        }
+    override func finalizeAndDismissComponent(success: Bool, completion: @escaping (() -> Void)) {
+        super.finalizeAndDismissComponent(success: success, completion: { [weak self] in
+            completion()
+            self?.sessionHolder.reset()
+        })
     }
 }

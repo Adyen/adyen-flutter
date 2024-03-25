@@ -13,7 +13,10 @@ public class AdyenCheckoutPlugin: NSObject, FlutterPlugin {
             componentFlutterApi: componentFlutterApi,
             sessionHolder: sessionHolder
         )
-        let applePayComponentManager = ApplePayComponentManager(sessionHolder: sessionHolder)
+        let applePayComponentManager = ApplePayComponentManager(
+            componentFlutterApi: componentFlutterApi,
+            sessionHolder: sessionHolder
+        )
         let componentPlatformApi = ComponentPlatformApi(applePayComponentManager: applePayComponentManager)
         ComponentPlatformInterfaceSetup.setUp(binaryMessenger: messenger, api: componentPlatformApi)
         CheckoutPlatformInterfaceSetup.setUp(binaryMessenger: messenger, api: checkoutPlatformApi)

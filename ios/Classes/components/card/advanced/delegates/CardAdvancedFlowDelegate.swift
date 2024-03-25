@@ -30,12 +30,14 @@ class CardAdvancedFlowDelegate: PaymentComponentDelegate {
             )
             let paymentComponentJson = try JSONEncoder().encode(paymentComponentData)
             let paymentComponentString = String(data: paymentComponentJson, encoding: .utf8)
+            let componentCommunicationModel = ComponentCommunicationModel(
+                type: ComponentCommunicationType.onSubmit,
+                componentId: componentId,
+                data: paymentComponentString
+            )
             componentFlutterApi.onComponentCommunication(
-                componentCommunicationModel: ComponentCommunicationModel(
-                    type: ComponentCommunicationType.onSubmit,
-                    componentId: componentId,
-                    data: paymentComponentString
-                ), completion: { _ in }
+                componentCommunicationModel: componentCommunicationModel,
+                completion: { _ in }
             )
         } catch {
             sendErrorToFlutterLayer(error: error)
@@ -48,9 +50,12 @@ class CardAdvancedFlowDelegate: PaymentComponentDelegate {
 
     private func sendErrorToFlutterLayer(error: Error) {
         let componentCommunicationModel = ComponentCommunicationModel(
-            type: ComponentCommunicationType.error,
+            type: ComponentCommunicationType.result,
             componentId: componentId,
-            data: error.localizedDescription
+            paymentResult: PaymentResultDTO(
+                type: PaymentResultEnum.error,
+                reason: error.localizedDescription
+            )
         )
         componentFlutterApi.onComponentCommunication(
             componentCommunicationModel: componentCommunicationModel,

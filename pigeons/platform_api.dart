@@ -65,7 +65,6 @@ enum ComponentCommunicationType {
   additionalDetails,
   loading,
   result,
-  error,
   resize,
 }
 
@@ -422,7 +421,7 @@ class ComponentCommunicationModel {
   final ComponentCommunicationType type;
   final String componentId;
   final Object? data;
-  final PaymentResultModelDTO? paymentResult;
+  final PaymentResultDTO? paymentResult;
 
   ComponentCommunicationModel({
     required this.type,

@@ -96,8 +96,7 @@ enum ComponentCommunicationType: Int {
     case additionalDetails = 1
     case loading = 2
     case result = 3
-    case error = 4
-    case resize = 5
+    case resize = 4
 }
 
 enum PaymentEventType: Int {
@@ -878,15 +877,15 @@ struct ComponentCommunicationModel {
     var type: ComponentCommunicationType
     var componentId: String
     var data: Any?
-    var paymentResult: PaymentResultModelDTO?
+    var paymentResult: PaymentResultDTO?
 
     static func fromList(_ list: [Any?]) -> ComponentCommunicationModel? {
         let type = ComponentCommunicationType(rawValue: list[0] as! Int)!
         let componentId = list[1] as! String
         let data: Any? = list[2]
-        var paymentResult: PaymentResultModelDTO?
+        var paymentResult: PaymentResultDTO?
         if let paymentResultList: [Any?] = nilOrValue(list[3]) {
-            paymentResult = PaymentResultModelDTO.fromList(paymentResultList)
+            paymentResult = PaymentResultDTO.fromList(paymentResultList)
         }
 
         return ComponentCommunicationModel(
@@ -1902,8 +1901,10 @@ private class ComponentFlutterInterfaceCodecReader: FlutterStandardReader {
         case 134:
             return OrderResponseDTO.fromList(self.readValue() as! [Any?])
         case 135:
-            return PaymentResultModelDTO.fromList(self.readValue() as! [Any?])
+            return PaymentResultDTO.fromList(self.readValue() as! [Any?])
         case 136:
+            return PaymentResultModelDTO.fromList(self.readValue() as! [Any?])
+        case 137:
             return SessionDTO.fromList(self.readValue() as! [Any?])
         default:
             return super.readValue(ofType: type)
@@ -1934,11 +1935,14 @@ private class ComponentFlutterInterfaceCodecWriter: FlutterStandardWriter {
         } else if let value = value as? OrderResponseDTO {
             super.writeByte(134)
             super.writeValue(value.toList())
-        } else if let value = value as? PaymentResultModelDTO {
+        } else if let value = value as? PaymentResultDTO {
             super.writeByte(135)
             super.writeValue(value.toList())
-        } else if let value = value as? SessionDTO {
+        } else if let value = value as? PaymentResultModelDTO {
             super.writeByte(136)
+            super.writeValue(value.toList())
+        } else if let value = value as? SessionDTO {
+            super.writeByte(137)
             super.writeValue(value.toList())
         } else {
             super.writeValue(value)

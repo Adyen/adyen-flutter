@@ -1,7 +1,9 @@
 import 'dart:convert';
 
 import 'package:adyen_checkout/adyen_checkout.dart';
+import 'package:adyen_checkout/src/components/apple_pay/apple_pay_advanced_component.dart';
 import 'package:adyen_checkout/src/components/apple_pay/apple_pay_session_component.dart';
+import 'package:adyen_checkout/src/util/dto_mapper.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:pay/pay.dart' as pay_sdk;
@@ -33,8 +35,8 @@ class AdyenApplePayComponent extends StatelessWidget {
     switch (defaultTargetPlatform) {
       case TargetPlatform.iOS:
         return switch (checkout) {
-          SessionCheckout() => _buildApplePaySessionFlowWidget(),
-          AdvancedCheckout() => _buildApplePayAdvancedFlowWidget(),
+          SessionCheckout it => _buildApplePaySessionFlowWidget(it),
+          AdvancedCheckout it => _buildApplePayAdvancedFlowWidget(it),
         };
       default:
         throw Exception(
@@ -42,11 +44,11 @@ class AdyenApplePayComponent extends StatelessWidget {
     }
   }
 
-  Widget _buildApplePaySessionFlowWidget() {
-    final String encodedPaymentMethod = json.encode(paymentMethod);
+  Widget _buildApplePaySessionFlowWidget(SessionCheckout sessionCheckout) {
     return ApplePaySessionComponent(
       key: key,
-      applePayPaymentMethod: encodedPaymentMethod,
+      session: sessionCheckout.toDTO(),
+      applePayPaymentMethod: json.encode(paymentMethod),
       applePayComponentConfiguration: configuration,
       onPaymentResult: onPaymentResult,
       style: _mapToApplePayButtonStyle(),
@@ -60,8 +62,23 @@ class AdyenApplePayComponent extends StatelessWidget {
     );
   }
 
-  Widget _buildApplePayAdvancedFlowWidget() {
-    return const Text("TODO");
+  Widget _buildApplePayAdvancedFlowWidget(AdvancedCheckout advancedCheckout) {
+    return ApplePayAdvancedComponent(
+      key: key,
+      applePayPaymentMethod: json.encode(paymentMethod),
+      applePayComponentConfiguration: configuration,
+      onPaymentResult: onPaymentResult,
+      onSubmit: advancedCheckout.onSubmit,
+      onAdditionalDetails: advancedCheckout.onAdditionalDetails,
+      style: _mapToApplePayButtonStyle(),
+      type: _mapToApplePayButtonType(),
+      width: _determineWidth(),
+      height: _determineHeight(),
+      cornerRadius: style?.cornerRadius,
+      loadingIndicator: loadingIndicator,
+      onUnavailable: onUnavailable,
+      unavailableWidget: unavailableWidget,
+    );
   }
 
   double _determineWidth() {

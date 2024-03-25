@@ -9,5 +9,6 @@ class Constants {
         const val GOOGLE_PAY_ADVANCED_COMPONENT_KEY = "GOOGLE_PAY_ADVANCED_COMPONENT"
         const val GOOGLE_PAY_SESSION_REQUEST_CODE = 486350
         const val GOOGLE_PAY_ADVANCED_REQUEST_CODE = 486351
+        const val SDK_PAYMENT_CANCELED_IDENTIFIER = "Payment canceled"
     }
 }

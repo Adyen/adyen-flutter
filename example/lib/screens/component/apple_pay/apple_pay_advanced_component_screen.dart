@@ -7,8 +7,8 @@ import 'package:adyen_checkout_example/config.dart';
 import 'package:adyen_checkout_example/repositories/adyen_apple_pay_component_repository.dart';
 import 'package:flutter/material.dart';
 
-class ApplePayComponentScreen extends StatefulWidget {
-  const ApplePayComponentScreen({
+class ApplePayAdvancedComponentScreen extends StatelessWidget {
+  const ApplePayAdvancedComponentScreen({
     required this.repository,
     super.key,
   });
@@ -16,28 +16,17 @@ class ApplePayComponentScreen extends StatefulWidget {
   final AdyenApplePayComponentRepository repository;
 
   @override
-  State<ApplePayComponentScreen> createState() =>
-      _ApplePayComponentScreenState();
-}
-
-class _ApplePayComponentScreenState extends State<ApplePayComponentScreen> {
-  bool _useSession = true;
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(title: const Text('Adyen google pay component')),
+      appBar: AppBar(title: const Text('Adyen Apple Pay component')),
       body: SafeArea(
         child: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              _buildSessionAdvancedFlowSwitch(_useSession),
               const SizedBox(height: 40),
-              _useSession
-                  ? _buildAdyenApplePaySessionComponent()
-                  : const SizedBox.shrink(),
+              _buildAdyenApplePayAdvancedComponent(),
             ],
           ),
         ),
@@ -45,27 +34,7 @@ class _ApplePayComponentScreenState extends State<ApplePayComponentScreen> {
     );
   }
 
-  Widget _buildSessionAdvancedFlowSwitch(bool useSession) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.end,
-      children: [
-        const Text(
-          "Use session: ",
-          style: TextStyle(fontSize: 20),
-        ),
-        Switch(
-            value: useSession,
-            onChanged: (value) {
-              setState(() {
-                _useSession = value;
-              });
-            }),
-        const SizedBox(width: 32),
-      ],
-    );
-  }
-
-  Widget _buildAdyenApplePaySessionComponent() {
+  Widget _buildAdyenApplePayAdvancedComponent() {
     final ApplePayComponentConfiguration applePayComponentConfiguration =
         ApplePayComponentConfiguration(
       environment: Environment.test,
@@ -75,31 +44,34 @@ class _ApplePayComponentScreenState extends State<ApplePayComponentScreen> {
       applePayConfiguration: _createApplePayConfiguration(),
     );
 
-    return FutureBuilder<SessionCheckout>(
-      future: widget.repository
-          .createSessionCheckout(applePayComponentConfiguration),
-      builder: (BuildContext context, AsyncSnapshot<SessionCheckout> snapshot) {
+    return FutureBuilder<String>(
+      future: repository.fetchPaymentMethods(),
+      builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
         if (snapshot.hasData) {
-          final SessionCheckout sessionCheckout = snapshot.data!;
-          final paymentMethod =
-              _extractPaymentMethod(sessionCheckout.paymentMethodsJson);
+          final AdvancedCheckout advancedCheckout = AdvancedCheckout(
+            onSubmit: repository.onSubmit,
+            onAdditionalDetails: repository.onAdditionalDetails,
+          );
+          final paymentMethod = _extractPaymentMethod(snapshot.data!);
 
           return Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               const Text(
                 style: TextStyle(fontSize: 20),
-                "Session flow",
+                "Advanced flow",
               ),
               const SizedBox(height: 8),
               AdyenApplePayComponent(
                 configuration: applePayComponentConfiguration,
                 paymentMethod: paymentMethod,
-                checkout: sessionCheckout,
+                checkout: advancedCheckout,
                 loadingIndicator: const CircularProgressIndicator(),
                 style: ApplePayButtonStyle(
-                  width: 200,
-                  height: 48,
+                  theme: ApplePayButtonTheme.whiteOutline,
+                  type: ApplePayButtonType.book,
+                  width: 300,
+                  height: 56,
                 ),
                 onPaymentResult: (paymentResult) {
                   Navigator.pop(context);

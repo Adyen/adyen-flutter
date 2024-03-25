@@ -2,10 +2,12 @@ package com.adyen.checkout.flutter.components.googlepay.advanced
 
 import ComponentCommunicationModel
 import ComponentFlutterInterface
+import PaymentResultDTO
 import androidx.fragment.app.FragmentActivity
 import com.adyen.checkout.components.core.PaymentMethod
 import com.adyen.checkout.components.core.action.Action
 import com.adyen.checkout.flutter.components.ComponentActionMessenger
+import com.adyen.checkout.flutter.components.ComponentErrorMessenger
 import com.adyen.checkout.flutter.components.ComponentResultMessenger
 import com.adyen.checkout.flutter.components.googlepay.BaseGooglePayComponent
 import com.adyen.checkout.flutter.components.view.ComponentLoadingBottomSheet
@@ -22,6 +24,7 @@ class GooglePayAdvancedComponent(
     init {
         addActionListener()
         addResultListener()
+        addErrorListener()
     }
 
     override fun setupGooglePayComponent(paymentMethod: PaymentMethod) {
@@ -78,10 +81,35 @@ class GooglePayAdvancedComponent(
                 ComponentCommunicationModel(
                     ComponentCommunicationType.RESULT,
                     componentId = componentId,
-                    paymentResult = message.contentIfNotHandled,
+                    paymentResult =
+                        PaymentResultDTO(
+                            type = PaymentResultEnum.FINISHED,
+                            result = message.contentIfNotHandled
+                        ),
                 )
             componentFlutterApi.onComponentCommunication(model) {}
             hideLoadingBottomSheet()
+        }
+    }
+
+    private fun addErrorListener() {
+        ComponentErrorMessenger.instance().removeObservers(activity)
+        ComponentErrorMessenger.instance().observe(activity) { message ->
+            if (message.hasBeenHandled()) {
+                return@observe
+            }
+
+            val model =
+                ComponentCommunicationModel(
+                    ComponentCommunicationType.RESULT,
+                    componentId = componentId,
+                    paymentResult =
+                        PaymentResultDTO(
+                            type = PaymentResultEnum.ERROR,
+                            reason = message.contentIfNotHandled?.errorMessage,
+                        ),
+                )
+            componentFlutterApi.onComponentCommunication(model) {}
         }
     }
 

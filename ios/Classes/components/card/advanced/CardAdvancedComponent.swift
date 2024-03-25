@@ -41,6 +41,9 @@ class CardAdvancedComponent: BaseCardComponent {
             componentPlatformApi.onActionCallback = { [weak self] jsonActionResponse in
                 self?.onAction(actionResponse: jsonActionResponse)
             }
+            componentPlatformApi.onErrorCallback = { [weak self] error in
+                self?.sendErrorToFlutterLayer(errorMessage: error?.errorMessage ?? "")
+            }
         } catch {
             sendErrorToFlutterLayer(errorMessage: error.localizedDescription)
         }
@@ -100,7 +103,10 @@ class CardAdvancedComponent: BaseCardComponent {
                 let componentCommunicationModel = ComponentCommunicationModel(
                     type: ComponentCommunicationType.result,
                     componentId: self?.componentId ?? "",
-                    paymentResult: PaymentResultModelDTO(resultCode: resultCode?.rawValue)
+                    paymentResult: PaymentResultDTO(
+                        type: PaymentResultEnum.finished,
+                        result: PaymentResultModelDTO(resultCode: resultCode?.rawValue)
+                    )
                 )
                 self?.componentFlutterApi.onComponentCommunication(
                     componentCommunicationModel: componentCommunicationModel,
