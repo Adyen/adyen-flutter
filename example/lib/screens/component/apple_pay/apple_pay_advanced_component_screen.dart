@@ -50,7 +50,6 @@ class ApplePayAdvancedComponentScreen extends StatelessWidget {
         if (snapshot.hasData) {
           final AdvancedCheckout advancedCheckout = AdvancedCheckout(
             onSubmit: repository.onSubmit,
-            onAdditionalDetails: repository.onAdditionalDetails,
           );
           final paymentMethod = _extractPaymentMethod(snapshot.data!);
 

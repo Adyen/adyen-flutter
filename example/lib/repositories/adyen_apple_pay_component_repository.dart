@@ -96,10 +96,4 @@ class AdyenApplePayComponentRepository extends AdyenBaseRepository {
     final response = await service.postPayments(mergedJson);
     return paymentEventHandler.handleResponse(response);
   }
-
-  Future<PaymentEvent> onAdditionalDetails(String additionalDetails) async {
-    final response =
-        await service.postPaymentsDetails(jsonDecode(additionalDetails));
-    return paymentEventHandler.handleResponse(response);
-  }
 }
