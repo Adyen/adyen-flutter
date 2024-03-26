@@ -1,13 +1,11 @@
 package com.adyen.checkout.flutter.components.googlepay
 
 import ComponentFlutterInterface
-import ErrorDTO
 import InstantPaymentConfigurationDTO
 import InstantPaymentSetupResultDTO
 import PaymentEventDTO
 import android.content.Intent
 import androidx.fragment.app.FragmentActivity
-import androidx.lifecycle.lifecycleScope
 import com.adyen.checkout.components.core.PaymentMethod
 import com.adyen.checkout.flutter.components.googlepay.advanced.GooglePayAdvancedComponent
 import com.adyen.checkout.flutter.components.googlepay.session.GooglePaySessionComponent
@@ -16,9 +14,6 @@ import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToGooglePayConfig
 import com.adyen.checkout.flutter.utils.Constants
 import com.adyen.checkout.googlepay.GooglePayComponent
 import com.adyen.checkout.googlepay.GooglePayConfiguration
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.launch
-import org.json.JSONObject
 
 class GooglePayComponentManager(
     private val activity: FragmentActivity,
@@ -26,12 +21,6 @@ class GooglePayComponentManager(
     private val componentFlutterInterface: ComponentFlutterInterface,
 ) {
     private var googlePayComponent: BaseGooglePayComponent? = null
-
-    companion object {
-        var resultFlow = MutableStateFlow<String?>(null)
-        var actionFlow = MutableStateFlow<JSONObject?>(null)
-        var errorFlow = MutableStateFlow<ErrorDTO?>(null)
-    }
 
     fun isGooglePayAvailable(
         paymentMethod: PaymentMethod,
@@ -52,7 +41,7 @@ class GooglePayComponentManager(
 
         val googlePlayConfiguration: GooglePayConfiguration =
             instantPaymentComponentConfigurationDTO.mapToGooglePayConfiguration(activity)
-        googlePayComponent = setupGooglePayComponent(googlePlayConfiguration, componentId, paymentMethod)
+        googlePayComponent = createGooglePayComponent(googlePlayConfiguration, componentId, paymentMethod)
         val googlePayAvailabilityChecker =
             GooglePayAvailabilityChecker(activity, googlePayComponent, googlePaySetupCallback)
         googlePayAvailabilityChecker.checkGooglePayAvailability(paymentMethod, googlePlayConfiguration)
@@ -63,16 +52,10 @@ class GooglePayComponentManager(
     }
 
     fun handlePaymentEvent(paymentEventDTO: PaymentEventDTO) {
-        activity.lifecycleScope.launch {
-            when (paymentEventDTO.paymentEventType) {
-                PaymentEventType.FINISHED -> resultFlow.emit(paymentEventDTO.result)
-                PaymentEventType.ACTION -> actionFlow.emit(JSONObject(paymentEventDTO.actionResponse!!))
-                PaymentEventType.ERROR -> errorFlow.emit(paymentEventDTO.error)
-            }
-        }
+        googlePayComponent?.handlePaymentEvent(paymentEventDTO)
     }
 
-    private fun setupGooglePayComponent(
+    private fun createGooglePayComponent(
         googlePayConfiguration: GooglePayConfiguration,
         componentId: String,
         paymentMethod: PaymentMethod,
@@ -107,10 +90,6 @@ class GooglePayComponentManager(
         componentId: String,
         paymentMethod: PaymentMethod,
     ): GooglePayAdvancedComponent {
-        resultFlow = MutableStateFlow(null)
-        actionFlow = MutableStateFlow(null)
-        errorFlow = MutableStateFlow(null)
-
         return GooglePayAdvancedComponent(
             activity,
             componentFlutterInterface,

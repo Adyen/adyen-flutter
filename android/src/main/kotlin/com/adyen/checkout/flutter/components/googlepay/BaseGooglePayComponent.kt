@@ -1,5 +1,6 @@
 package com.adyen.checkout.flutter.components.googlepay
 
+import PaymentEventDTO
 import android.content.Intent
 import androidx.core.util.Consumer
 import androidx.fragment.app.FragmentActivity
@@ -22,6 +23,8 @@ abstract class BaseGooglePayComponent(
     abstract fun setupGooglePayComponent(paymentMethod: PaymentMethod)
 
     abstract fun startGooglePayScreen()
+
+    abstract fun handlePaymentEvent(paymentEventDTO: PaymentEventDTO)
 
     abstract fun dispose()
 
