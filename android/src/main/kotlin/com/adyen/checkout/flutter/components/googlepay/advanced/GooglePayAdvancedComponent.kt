@@ -16,6 +16,7 @@ import com.adyen.checkout.googlepay.GooglePayComponent
 import com.adyen.checkout.googlepay.GooglePayConfiguration
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import java.util.UUID
 
 class GooglePayAdvancedComponent(
     private val activity: FragmentActivity,
@@ -46,6 +47,7 @@ class GooglePayAdvancedComponent(
                         ::onLoading,
                         ::hideLoadingBottomSheet
                     ),
+                key = UUID.randomUUID().toString()
             )
     }
 

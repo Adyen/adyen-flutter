@@ -90,7 +90,8 @@ class AdyenGooglePayComponentRepository extends AdyenBaseRepository {
     );
 
     Map<String, dynamic> mergedJson = <String, dynamic>{};
-    mergedJson.addAll(jsonDecode(paymentComponentJson));
+    Map<String, dynamic> paymentComponentData = jsonDecode(paymentComponentJson);
+    mergedJson.addAll(paymentComponentData["paymentData"]);
     mergedJson.addAll(paymentsRequestData.toJson());
     final response = await service.postPayments(mergedJson);
     return paymentEventHandler.handleResponse(response);

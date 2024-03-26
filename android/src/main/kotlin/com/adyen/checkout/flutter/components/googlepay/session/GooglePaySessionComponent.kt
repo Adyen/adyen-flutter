@@ -29,18 +29,18 @@ class GooglePaySessionComponent(
         val checkoutSession = CheckoutSession(sessionSetupResponse = sessionSetupResponse, order = order)
         googlePayComponent =
             GooglePayComponent.PROVIDER.get(
-                activity,
-                checkoutSession,
-                paymentMethod,
-                googlePayConfiguration,
-                GooglePaySessionCallback(
+                activity = activity,
+                checkoutSession = checkoutSession,
+                paymentMethod = paymentMethod,
+                configuration = googlePayConfiguration,
+                componentCallback = GooglePaySessionCallback(
                     componentFlutterApi,
                     componentId,
                     ::onLoading,
                     ::onAction,
                     ::hideLoadingBottomSheet
                 ),
-                UUID.randomUUID().toString()
+                key = UUID.randomUUID().toString()
             )
     }
 

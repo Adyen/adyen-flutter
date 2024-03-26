@@ -50,6 +50,7 @@ class GooglePayAdvancedComponentScreen extends StatelessWidget {
             amount: Config.amount,
             googlePayConfiguration: const GooglePayConfiguration(
               googlePayEnvironment: Config.googlePayEnvironment,
+              shippingAddressRequired: true,
             ),
           );
 

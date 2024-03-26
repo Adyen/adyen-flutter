@@ -56,18 +56,39 @@ class GooglePayAdvancedComponent extends BaseGooglePayComponent {
   }
 
   Future<void> _onSubmit(ComponentCommunicationModel event) async {
-    final PaymentEvent paymentEvent =
-        await advancedCheckout.onSubmit(event.data as String);
-    final PaymentEventDTO paymentEventDTO =
-        paymentEventHandler.mapToPaymentEventDTO(paymentEvent);
-    componentPlatformApi.onPaymentsResult(componentId, paymentEventDTO);
+    try {
+      final PaymentEvent paymentEvent =
+          await advancedCheckout.onSubmit(event.data as String);
+      final PaymentEventDTO paymentEventDTO =
+          paymentEventHandler.mapToPaymentEventDTO(paymentEvent);
+      componentPlatformApi.onPaymentsResult(componentId, paymentEventDTO);
+    } catch (exception) {
+      componentPlatformApi.onPaymentsResult(
+        componentId,
+        PaymentEventDTO(
+          paymentEventType: PaymentEventType.error,
+          error: ErrorDTO(errorMessage: exception.toString()),
+        ),
+      );
+    }
   }
 
   Future<void> _onAdditionalDetails(ComponentCommunicationModel event) async {
-    final PaymentEvent paymentEvent =
-        await advancedCheckout.onAdditionalDetails!(event.data as String);
-    final PaymentEventDTO paymentEventDTO =
-        paymentEventHandler.mapToPaymentEventDTO(paymentEvent);
-    componentPlatformApi.onPaymentsDetailsResult(componentId, paymentEventDTO);
+    try {
+      final PaymentEvent paymentEvent =
+          await advancedCheckout.onAdditionalDetails!(event.data as String);
+      final PaymentEventDTO paymentEventDTO =
+          paymentEventHandler.mapToPaymentEventDTO(paymentEvent);
+      componentPlatformApi.onPaymentsDetailsResult(
+          componentId, paymentEventDTO);
+    } catch (exception) {
+      componentPlatformApi.onPaymentsDetailsResult(
+        componentId,
+        PaymentEventDTO(
+          paymentEventType: PaymentEventType.error,
+          error: ErrorDTO(errorMessage: exception.toString()),
+        ),
+      );
+    }
   }
 }
