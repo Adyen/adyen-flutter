@@ -60,7 +60,7 @@ class MultiComponentSessionScreen extends StatelessWidget {
         ) {
           SessionCheckout sessionCheckout = snapshot.data!;
           final paymentMethod =
-              _extractPaymentMethod(sessionCheckout.paymentMethodsJson);
+              _extractSchemePaymentMethod(sessionCheckout.paymentMethodsJson);
 
           return Padding(
             padding: const EdgeInsets.fromLTRB(4, 0, 4, 0),
@@ -118,8 +118,8 @@ class MultiComponentSessionScreen extends StatelessWidget {
       builder: (BuildContext context, AsyncSnapshot<SessionCheckout> snapshot) {
         if (snapshot.hasData) {
           final SessionCheckout sessionCheckout = snapshot.data!;
-          final paymentMethod =
-              _extractPaymentMethod(sessionCheckout.paymentMethodsJson);
+          final paymentMethod = _extractGooglePayPaymentMethod(
+              sessionCheckout.paymentMethodsJson);
           return Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -164,7 +164,7 @@ class MultiComponentSessionScreen extends StatelessWidget {
         if (snapshot.hasData) {
           final SessionCheckout sessionCheckout = snapshot.data!;
           final paymentMethod =
-              _extractPaymentMethod(sessionCheckout.paymentMethodsJson);
+              _extractApplePayPaymentMethod(sessionCheckout.paymentMethodsJson);
 
           return Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -214,7 +214,7 @@ class MultiComponentSessionScreen extends StatelessWidget {
     );
   }
 
-  Map<String, dynamic> _extractPaymentMethod(String paymentMethods) {
+  Map<String, dynamic> _extractApplePayPaymentMethod(String paymentMethods) {
     if (paymentMethods.isEmpty) {
       return <String, String>{};
     }
@@ -238,7 +238,7 @@ class MultiComponentSessionScreen extends StatelessWidget {
     );
   }
 
-  Map<String, dynamic> extractSchemePaymentMethod(String paymentMethods) {
+  Map<String, dynamic> _extractSchemePaymentMethod(String paymentMethods) {
     Map<String, dynamic> jsonPaymentMethods = jsonDecode(paymentMethods);
     List paymentMethodList = jsonPaymentMethods["paymentMethods"] as List;
     Map<String, dynamic>? paymentMethod = paymentMethodList
