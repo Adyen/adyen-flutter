@@ -1,37 +1,26 @@
 package com.adyen.checkout.flutter.components.googlepay
 
 import ComponentFlutterInterface
-import ErrorDTO
 import InstantPaymentConfigurationDTO
 import InstantPaymentSetupResultDTO
 import PaymentEventDTO
 import android.content.Intent
 import androidx.fragment.app.FragmentActivity
-import androidx.lifecycle.lifecycleScope
 import com.adyen.checkout.components.core.PaymentMethod
-import com.adyen.checkout.flutter.components.googlepay.advanced.GooglePayAdvancedComponent
-import com.adyen.checkout.flutter.components.googlepay.session.GooglePaySessionComponent
+import com.adyen.checkout.flutter.components.googlepay.advanced.GooglePayAdvancedComponentWrapper
+import com.adyen.checkout.flutter.components.googlepay.session.GooglePaySessionComponentWrapper
 import com.adyen.checkout.flutter.session.SessionHolder
 import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToGooglePayConfiguration
 import com.adyen.checkout.flutter.utils.Constants
 import com.adyen.checkout.googlepay.GooglePayComponent
 import com.adyen.checkout.googlepay.GooglePayConfiguration
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.launch
-import org.json.JSONObject
 
 class GooglePayComponentManager(
     private val activity: FragmentActivity,
     private val sessionHolder: SessionHolder,
     private val componentFlutterInterface: ComponentFlutterInterface,
 ) {
-    private var googlePayComponent: BaseGooglePayComponent? = null
-
-    companion object {
-        var resultFlow = MutableStateFlow<String?>(null)
-        var actionFlow = MutableStateFlow<JSONObject?>(null)
-        var errorFlow = MutableStateFlow<ErrorDTO?>(null)
-    }
+    private var googlePayComponent: BaseGooglePayComponentWrapper? = null
 
     fun isGooglePayAvailable(
         paymentMethod: PaymentMethod,
@@ -52,7 +41,7 @@ class GooglePayComponentManager(
 
         val googlePlayConfiguration: GooglePayConfiguration =
             instantPaymentComponentConfigurationDTO.mapToGooglePayConfiguration(activity)
-        googlePayComponent = setupGooglePayComponent(googlePlayConfiguration, componentId, paymentMethod)
+        googlePayComponent = createGooglePayComponent(googlePlayConfiguration, componentId, paymentMethod)
         val googlePayAvailabilityChecker =
             GooglePayAvailabilityChecker(activity, googlePayComponent, googlePaySetupCallback)
         googlePayAvailabilityChecker.checkGooglePayAvailability(paymentMethod, googlePlayConfiguration)
@@ -63,20 +52,14 @@ class GooglePayComponentManager(
     }
 
     fun handlePaymentEvent(paymentEventDTO: PaymentEventDTO) {
-        activity.lifecycleScope.launch {
-            when (paymentEventDTO.paymentEventType) {
-                PaymentEventType.FINISHED -> resultFlow.emit(paymentEventDTO.result)
-                PaymentEventType.ACTION -> actionFlow.emit(JSONObject(paymentEventDTO.actionResponse!!))
-                PaymentEventType.ERROR -> errorFlow.emit(paymentEventDTO.error)
-            }
-        }
+        (googlePayComponent as? GooglePayAdvancedComponentWrapper)?.handlePaymentEvent(paymentEventDTO)
     }
 
-    private fun setupGooglePayComponent(
+    private fun createGooglePayComponent(
         googlePayConfiguration: GooglePayConfiguration,
         componentId: String,
         paymentMethod: PaymentMethod,
-    ): BaseGooglePayComponent {
+    ): BaseGooglePayComponentWrapper {
         // TODO - Replace check via keys with session object when it is provided from the Flutter layer.
         if (componentId.contains(Constants.GOOGLE_PAY_ADVANCED_COMPONENT_KEY)) {
             return createGooglePayAdvancedComponent(googlePayConfiguration, componentId, paymentMethod)
@@ -91,8 +74,8 @@ class GooglePayComponentManager(
         googlePayConfiguration: GooglePayConfiguration,
         componentId: String,
         paymentMethod: PaymentMethod,
-    ): GooglePaySessionComponent =
-        GooglePaySessionComponent(
+    ): GooglePaySessionComponentWrapper =
+        GooglePaySessionComponentWrapper(
             activity,
             sessionHolder,
             componentFlutterInterface,
@@ -106,12 +89,8 @@ class GooglePayComponentManager(
         googlePayConfiguration: GooglePayConfiguration,
         componentId: String,
         paymentMethod: PaymentMethod,
-    ): GooglePayAdvancedComponent {
-        resultFlow = MutableStateFlow(null)
-        actionFlow = MutableStateFlow(null)
-        errorFlow = MutableStateFlow(null)
-
-        return GooglePayAdvancedComponent(
+    ): GooglePayAdvancedComponentWrapper {
+        return GooglePayAdvancedComponentWrapper(
             activity,
             componentFlutterInterface,
             googlePayConfiguration,
@@ -127,12 +106,7 @@ class GooglePayComponentManager(
         data: Intent?
     ): Boolean {
         return when (requestCode) {
-            Constants.GOOGLE_PAY_SESSION_REQUEST_CODE -> {
-                googlePayComponent?.handleActivityResult(resultCode, data)
-                true
-            }
-
-            Constants.GOOGLE_PAY_ADVANCED_REQUEST_CODE -> {
+            Constants.GOOGLE_PAY_COMPONENT_REQUEST_CODE -> {
                 googlePayComponent?.handleActivityResult(resultCode, data)
                 true
             }
@@ -142,9 +116,6 @@ class GooglePayComponentManager(
     }
 
     fun onDispose() {
-        googlePayComponent?.apply {
-            dispose()
-            googlePayComponent = null
-        }
+        googlePayComponent?.dispose()
     }
 }

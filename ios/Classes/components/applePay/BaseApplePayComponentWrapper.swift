@@ -1,14 +1,12 @@
 @_spi(AdyenInternal) import Adyen
 
-class BaseApplePayComponent {
+class BaseApplePayComponentWrapper {
     var applePayComponent: ApplePayComponent?
 
     func present() {
         preconditionFailure("This method must be overridden")
     }
-    
-    func handlePaymentEvent(paymentEventDTO: PaymentEventDTO) {}
-    
+        
     func finalizeAndDismissComponent(success: Bool, completion: @escaping (() -> Void)) {
         applePayComponent?.finalizeIfNeeded(with: success) { [weak self] in
             if let viewController = self?.getViewController() {
