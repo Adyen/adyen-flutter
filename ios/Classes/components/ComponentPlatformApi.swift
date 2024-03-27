@@ -52,7 +52,7 @@ class ComponentPlatformApi: ComponentPlatformInterface {
     func onDispose(componentId: String) throws {}
 
     private func handlePaymentEvent(componentId: String, paymentEventDTO: PaymentEventDTO) {
-        if componentId == ApplePayAdvancedComponent.applePayAdvancedComponentId || componentId == ApplePaySessionComponent.applePaySessionComponentId {
+        if componentId == ApplePayComponentManager.Constants.applePaySessionComponentId || componentId == ApplePayComponentManager.Constants.applePayAdvancedComponentId {
             applePayComponentManager.handlePaymentEvent(paymentEventDTO: paymentEventDTO)
         } else {
             switch paymentEventDTO.paymentEventType {
