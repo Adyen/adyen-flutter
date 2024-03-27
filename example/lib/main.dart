@@ -14,6 +14,8 @@ import 'package:adyen_checkout_example/screens/component/card/card_component_scr
 import 'package:adyen_checkout_example/screens/component/google_pay/google_pay_advanced_component_screen.dart';
 import 'package:adyen_checkout_example/screens/component/google_pay/google_pay_navigation_screen.dart';
 import 'package:adyen_checkout_example/screens/component/google_pay/google_pay_session_component_screen.dart';
+import 'package:adyen_checkout_example/screens/component/multi_component/multi_component_advanced_screen.dart';
+import 'package:adyen_checkout_example/screens/component/multi_component/multi_component_navigation_screen.dart';
 import 'package:adyen_checkout_example/screens/drop_in/drop_in_screen.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -25,6 +27,8 @@ void main() {
       AdyenGooglePayComponentRepository(service: service);
   final adyenApplePayComponentRepository =
       AdyenApplePayComponentRepository(service: service);
+  final adyenCardComponentRepository =
+      AdyenCardComponentRepository(service: service);
 
   runApp(MaterialApp(
     localizationsDelegates: const [
@@ -50,9 +54,10 @@ void main() {
       '/cardComponentScreen': (context) => CardComponentScreen(
             repository: AdyenCardComponentRepository(service: service),
           ),
-      '/cardAdvancedComponentScreen': (context) => CardComponentScrollableScreen(
-        repository: AdyenCardComponentRepository(service: service),
-      ),
+      '/cardAdvancedComponentScreen': (context) =>
+          CardComponentScrollableScreen(
+            repository: AdyenCardComponentRepository(service: service),
+          ),
       '/googlePayNavigation': (context) => const GooglePayNavigationScreen(),
       '/googlePaySessionComponent': (context) =>
           GooglePaySessionsComponentScreen(
@@ -69,6 +74,19 @@ void main() {
       '/applePayAdvancedComponent': (context) =>
           ApplePayAdvancedComponentScreen(
             repository: adyenApplePayComponentRepository,
+          ),
+      '/multiComponentNavigationScreen': (context) =>
+          const MultiComponentNavigationScreen(),
+      '/multiComponentSessionScreen': (context) => MultiComponentAdvancedScreen(
+            cardRepository: adyenCardComponentRepository,
+            googlePayRepository: adyenGooglePayComponentRepository,
+            applePayRepository: adyenApplePayComponentRepository,
+          ),
+      '/multiComponentAdvancedScreen': (context) =>
+          MultiComponentAdvancedScreen(
+            cardRepository: adyenCardComponentRepository,
+            googlePayRepository: adyenGooglePayComponentRepository,
+            applePayRepository: adyenApplePayComponentRepository,
           ),
     },
     initialRoute: "/",
@@ -98,6 +116,10 @@ class MyApp extends StatelessWidget {
                     Navigator.pushNamed(context, "/cardComponentScreen"),
                 child: const Text("Card component")),
             _buildGoogleOrApplePayComponent(context),
+            TextButton(
+                onPressed: () => Navigator.pushNamed(
+                    context, "/multiComponentNavigationScreen"),
+                child: const Text("Multi component")),
           ],
         ),
       ),

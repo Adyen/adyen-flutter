@@ -1772,8 +1772,8 @@ class ComponentPlatformInterfaceCodec: FlutterStandardMessageCodec {
 /// Generated protocol from Pigeon that represents a handler of messages from Flutter.
 protocol ComponentPlatformInterface {
     func updateViewHeight(viewId: Int64) throws
-    func onPaymentsResult(paymentsResult: PaymentEventDTO) throws
-    func onPaymentsDetailsResult(paymentsDetailsResult: PaymentEventDTO) throws
+    func onPaymentsResult(componentId: String, paymentsResult: PaymentEventDTO) throws
+    func onPaymentsDetailsResult(componentId: String, paymentsDetailsResult: PaymentEventDTO) throws
     func isInstantPaymentSupportedByPlatform(instantPaymentConfigurationDTO: InstantPaymentConfigurationDTO, paymentMethodResponse: String, componentId: String, completion: @escaping (Result<InstantPaymentSetupResultDTO, Error>) -> Void)
     func onInstantPaymentPressed(instantPaymentType: InstantPaymentType, componentId: String) throws
     func onDispose(componentId: String) throws
@@ -1804,9 +1804,10 @@ class ComponentPlatformInterfaceSetup {
         if let api {
             onPaymentsResultChannel.setMessageHandler { message, reply in
                 let args = message as! [Any?]
-                let paymentsResultArg = args[0] as! PaymentEventDTO
+                let componentIdArg = args[0] as! String
+                let paymentsResultArg = args[1] as! PaymentEventDTO
                 do {
-                    try api.onPaymentsResult(paymentsResult: paymentsResultArg)
+                    try api.onPaymentsResult(componentId: componentIdArg, paymentsResult: paymentsResultArg)
                     reply(wrapResult(nil))
                 } catch {
                     reply(wrapError(error))
@@ -1819,9 +1820,10 @@ class ComponentPlatformInterfaceSetup {
         if let api {
             onPaymentsDetailsResultChannel.setMessageHandler { message, reply in
                 let args = message as! [Any?]
-                let paymentsDetailsResultArg = args[0] as! PaymentEventDTO
+                let componentIdArg = args[0] as! String
+                let paymentsDetailsResultArg = args[1] as! PaymentEventDTO
                 do {
-                    try api.onPaymentsDetailsResult(paymentsDetailsResult: paymentsDetailsResultArg)
+                    try api.onPaymentsDetailsResult(componentId: componentIdArg, paymentsDetailsResult: paymentsDetailsResultArg)
                     reply(wrapResult(nil))
                 } catch {
                     reply(wrapError(error))

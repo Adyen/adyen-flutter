@@ -571,9 +571,15 @@ abstract class DropInFlutterInterface {
 abstract class ComponentPlatformInterface {
   void updateViewHeight(int viewId);
 
-  void onPaymentsResult(PaymentEventDTO paymentsResult);
+  void onPaymentsResult(
+    String componentId,
+    PaymentEventDTO paymentsResult,
+  );
 
-  void onPaymentsDetailsResult(PaymentEventDTO paymentsDetailsResult);
+  void onPaymentsDetailsResult(
+    String componentId,
+    PaymentEventDTO paymentsDetailsResult,
+  );
 
   @async
   InstantPaymentSetupResultDTO isInstantPaymentSupportedByPlatform(

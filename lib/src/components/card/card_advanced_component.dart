@@ -64,7 +64,8 @@ class CardAdvancedComponent extends BaseCardComponent {
     final PaymentEvent paymentEvent = await onPayments(event.data as String);
     final PaymentEventDTO paymentEventDTO =
         paymentEventHandler.mapToPaymentEventDTO(paymentEvent);
-    ComponentPlatformApi.instance.onPaymentsResult(paymentEventDTO);
+    ComponentPlatformApi.instance
+        .onPaymentsResult(componentId, paymentEventDTO);
   }
 
   Future<void> _onAdditionalDetails(ComponentCommunicationModel event) async {
@@ -72,6 +73,7 @@ class CardAdvancedComponent extends BaseCardComponent {
         await onPaymentsDetails(event.data as String);
     final PaymentEventDTO paymentEventDTO =
         paymentEventHandler.mapToPaymentEventDTO(paymentEvent);
-    ComponentPlatformApi.instance.onPaymentsDetailsResult(paymentEventDTO);
+    ComponentPlatformApi.instance
+        .onPaymentsDetailsResult(componentId, paymentEventDTO);
   }
 }

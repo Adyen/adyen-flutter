@@ -1,19 +1,21 @@
 @_spi(AdyenInternal) import Adyen
 
-class ApplePaySessionComponent: BaseApplePayComponent {
-    static let applePaySessionComponentId = "APPLE_PAY_SESSION_COMPONENT"
+class ApplePaySessionComponentWrapper: BaseApplePayComponentWrapper {
     private let sessionHolder: SessionHolder
     private let configuration: ApplePayComponent.Configuration
     private let adyenContext: AdyenContext
+    private let componentId: String
     
     init(
         sessionHolder: SessionHolder,
         configuration: ApplePayComponent.Configuration,
-        adyenContext: AdyenContext
+        adyenContext: AdyenContext,
+        componentId: String
     ) {
         self.sessionHolder = sessionHolder
         self.configuration = configuration
         self.adyenContext = adyenContext
+        self.componentId = componentId
         super.init()
         applePayComponent = buildApplePaySessionComponent()
     }
@@ -38,7 +40,7 @@ class ApplePaySessionComponent: BaseApplePayComponent {
     
     private func setupSessionFlowDelegate() {
         if let componentSessionFlowDelegate = (sessionHolder.sessionDelegate as? ComponentSessionFlowDelegate) {
-            componentSessionFlowDelegate.componentId = Self.applePaySessionComponentId
+            componentSessionFlowDelegate.componentId = componentId
             componentSessionFlowDelegate.finalizeAndDismissHandler = finalizeAndDismissComponent
         } else {
             AdyenAssertion.assertionFailure(message: "Wrong session flow delegate usage")

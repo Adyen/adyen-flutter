@@ -1923,8 +1923,8 @@ private object ComponentPlatformInterfaceCodec : StandardMessageCodec() {
 /** Generated interface from Pigeon that represents a handler of messages from Flutter. */
 interface ComponentPlatformInterface {
   fun updateViewHeight(viewId: Long)
-  fun onPaymentsResult(paymentsResult: PaymentEventDTO)
-  fun onPaymentsDetailsResult(paymentsDetailsResult: PaymentEventDTO)
+  fun onPaymentsResult(componentId: String, paymentsResult: PaymentEventDTO)
+  fun onPaymentsDetailsResult(componentId: String, paymentsDetailsResult: PaymentEventDTO)
   fun isInstantPaymentSupportedByPlatform(instantPaymentConfigurationDTO: InstantPaymentConfigurationDTO, paymentMethodResponse: String, componentId: String, callback: (Result<InstantPaymentSetupResultDTO>) -> Unit)
   fun onInstantPaymentPressed(instantPaymentType: InstantPaymentType, componentId: String)
   fun onDispose(componentId: String)
@@ -1961,10 +1961,11 @@ interface ComponentPlatformInterface {
         if (api != null) {
           channel.setMessageHandler { message, reply ->
             val args = message as List<Any?>
-            val paymentsResultArg = args[0] as PaymentEventDTO
+            val componentIdArg = args[0] as String
+            val paymentsResultArg = args[1] as PaymentEventDTO
             var wrapped: List<Any?>
             try {
-              api.onPaymentsResult(paymentsResultArg)
+              api.onPaymentsResult(componentIdArg, paymentsResultArg)
               wrapped = listOf<Any?>(null)
             } catch (exception: Throwable) {
               wrapped = wrapError(exception)
@@ -1980,10 +1981,11 @@ interface ComponentPlatformInterface {
         if (api != null) {
           channel.setMessageHandler { message, reply ->
             val args = message as List<Any?>
-            val paymentsDetailsResultArg = args[0] as PaymentEventDTO
+            val componentIdArg = args[0] as String
+            val paymentsDetailsResultArg = args[1] as PaymentEventDTO
             var wrapped: List<Any?>
             try {
-              api.onPaymentsDetailsResult(paymentsDetailsResultArg)
+              api.onPaymentsDetailsResult(componentIdArg, paymentsDetailsResultArg)
               wrapped = listOf<Any?>(null)
             } catch (exception: Throwable) {
               wrapped = wrapError(exception)

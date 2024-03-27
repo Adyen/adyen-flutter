@@ -57,7 +57,7 @@ class ApplePayAdvancedComponent extends BaseApplePayComponent {
     final PaymentEvent paymentEvent = await onSubmit(event.data as String);
     final PaymentEventDTO paymentEventDTO =
         paymentEventHandler.mapToPaymentEventDTO(paymentEvent);
-    componentPlatformApi.onPaymentsResult(paymentEventDTO);
+    componentPlatformApi.onPaymentsResult(componentId, paymentEventDTO);
   }
 
   Future<void> _onAdditionalDetails(ComponentCommunicationModel event) async {
@@ -65,7 +65,7 @@ class ApplePayAdvancedComponent extends BaseApplePayComponent {
         await onAdditionalDetails(event.data as String);
     final PaymentEventDTO paymentEventDTO =
         paymentEventHandler.mapToPaymentEventDTO(paymentEvent);
-    componentPlatformApi.onPaymentsDetailsResult(paymentEventDTO);
+    componentPlatformApi.onPaymentsDetailsResult(componentId, paymentEventDTO);
   }
 
   void _onLoading() => isLoading.value = true;
