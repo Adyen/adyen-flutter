@@ -99,7 +99,7 @@ extension ApplePayAdvancedComponentWrapper: PaymentComponentDelegate {
         )
         let componentCommunicationModel = ComponentCommunicationModel(
             type: ComponentCommunicationType.onSubmit,
-            componentId: Self.applePayAdvancedComponentId,
+            componentId: componentId,
             data: submitData.toJsonObject()
         )
         componentFlutterApi.onComponentCommunication(

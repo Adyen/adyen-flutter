@@ -2081,55 +2081,35 @@ private object ComponentFlutterInterfaceCodec : StandardMessageCodec() {
       }
       131.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          ApplePayConfigurationDTO.fromList(it)
+          CardComponentConfigurationDTO.fromList(it)
         }
       }
       132.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          ApplePayContactDTO.fromList(it)
+          CardConfigurationDTO.fromList(it)
         }
       }
       133.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          ApplePayShippingMethodDTO.fromList(it)
+          ComponentCommunicationModel.fromList(it)
         }
       }
       134.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          ApplePaySummaryItemDTO.fromList(it)
+          OrderResponseDTO.fromList(it)
         }
       }
       135.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          CardComponentConfigurationDTO.fromList(it)
+          PaymentResultDTO.fromList(it)
         }
       }
       136.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          CardConfigurationDTO.fromList(it)
-        }
-      }
-      137.toByte() -> {
-        return (readValue(buffer) as? List<Any?>)?.let {
-          ComponentCommunicationModel.fromList(it)
-        }
-      }
-      138.toByte() -> {
-        return (readValue(buffer) as? List<Any?>)?.let {
-          OrderResponseDTO.fromList(it)
-        }
-      }
-      139.toByte() -> {
-        return (readValue(buffer) as? List<Any?>)?.let {
-          PaymentResultDTO.fromList(it)
-        }
-      }
-      140.toByte() -> {
-        return (readValue(buffer) as? List<Any?>)?.let {
           PaymentResultModelDTO.fromList(it)
         }
       }
-      141.toByte() -> {
+      137.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
           SessionDTO.fromList(it)
         }
@@ -2151,48 +2131,32 @@ private object ComponentFlutterInterfaceCodec : StandardMessageCodec() {
         stream.write(130)
         writeValue(stream, value.toList())
       }
-      is ApplePayConfigurationDTO -> {
+      is CardComponentConfigurationDTO -> {
         stream.write(131)
         writeValue(stream, value.toList())
       }
-      is ApplePayContactDTO -> {
+      is CardConfigurationDTO -> {
         stream.write(132)
         writeValue(stream, value.toList())
       }
-      is ApplePayShippingMethodDTO -> {
+      is ComponentCommunicationModel -> {
         stream.write(133)
         writeValue(stream, value.toList())
       }
-      is ApplePaySummaryItemDTO -> {
+      is OrderResponseDTO -> {
         stream.write(134)
         writeValue(stream, value.toList())
       }
-      is CardComponentConfigurationDTO -> {
+      is PaymentResultDTO -> {
         stream.write(135)
         writeValue(stream, value.toList())
       }
-      is CardConfigurationDTO -> {
+      is PaymentResultModelDTO -> {
         stream.write(136)
         writeValue(stream, value.toList())
       }
-      is ComponentCommunicationModel -> {
-        stream.write(137)
-        writeValue(stream, value.toList())
-      }
-      is OrderResponseDTO -> {
-        stream.write(138)
-        writeValue(stream, value.toList())
-      }
-      is PaymentResultDTO -> {
-        stream.write(139)
-        writeValue(stream, value.toList())
-      }
-      is PaymentResultModelDTO -> {
-        stream.write(140)
-        writeValue(stream, value.toList())
-      }
       is SessionDTO -> {
-        stream.write(141)
+        stream.write(137)
         writeValue(stream, value.toList())
       }
       else -> super.writeValue(stream, value)
@@ -2209,10 +2173,10 @@ class ComponentFlutterInterface(private val binaryMessenger: BinaryMessenger) {
       ComponentFlutterInterfaceCodec
     }
   }
-  fun _generateCodecForDTOs(cardComponentConfigurationDTOArg: CardComponentConfigurationDTO, applePayConfigurationDTOArg: ApplePayConfigurationDTO, sessionDTOArg: SessionDTO, callback: (Result<Unit>) -> Unit) {
+  fun _generateCodecForDTOs(cardComponentConfigurationDTOArg: CardComponentConfigurationDTO, sessionDTOArg: SessionDTO, callback: (Result<Unit>) -> Unit) {
     val channelName = "dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface._generateCodecForDTOs"
     val channel = BasicMessageChannel<Any?>(binaryMessenger, channelName, codec)
-    channel.send(listOf(cardComponentConfigurationDTOArg, applePayConfigurationDTOArg, sessionDTOArg)) {
+    channel.send(listOf(cardComponentConfigurationDTOArg, sessionDTOArg)) {
       if (it is List<*>) {
         if (it.size > 1) {
           callback(Result.failure(FlutterError(it[0] as String, it[1] as String, it[2] as String?)))
