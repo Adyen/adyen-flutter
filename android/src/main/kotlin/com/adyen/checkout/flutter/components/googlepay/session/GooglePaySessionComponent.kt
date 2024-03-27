@@ -28,7 +28,7 @@ class GooglePaySessionComponent(
         val sessionSetupResponse = SessionSetupResponse.SERIALIZER.deserialize(sessionHolder.sessionSetupResponse)
         val order = sessionHolder.orderResponse?.let { Order.SERIALIZER.deserialize(it) }
         val checkoutSession = CheckoutSession(sessionSetupResponse = sessionSetupResponse, order = order)
-        googlePayComponent =
+        nativeGooglePayComponent =
             GooglePayComponent.PROVIDER.get(
                 activity,
                 checkoutSession,
@@ -46,7 +46,7 @@ class GooglePaySessionComponent(
     }
 
     override fun startGooglePayScreen() {
-        googlePayComponent?.startGooglePayScreen(activity, GOOGLE_PAY_SESSION_REQUEST_CODE)
+        nativeGooglePayComponent?.startGooglePayScreen(activity, GOOGLE_PAY_SESSION_REQUEST_CODE)
     }
 
     override fun handlePaymentEvent(paymentEventDTO: PaymentEventDTO) {}
@@ -61,7 +61,7 @@ class GooglePaySessionComponent(
     }
 
     private fun onAction(action: Action) {
-        googlePayComponent?.let {
+        nativeGooglePayComponent?.let {
             it.handleAction(action, activity)
             ComponentLoadingBottomSheet.show(activity.supportFragmentManager, it)
         }

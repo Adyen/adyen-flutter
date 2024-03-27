@@ -121,9 +121,6 @@ class GooglePayComponentManager(
     }
 
     fun onDispose() {
-        googlePayComponent?.apply {
-            dispose()
-            googlePayComponent = null
-        }
+        googlePayComponent?.dispose()
     }
 }

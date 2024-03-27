@@ -22,7 +22,7 @@ class GooglePayAvailabilityChecker(
                     InstantPaymentSetupResultDTO(
                         InstantPaymentType.GOOGLEPAY,
                         true,
-                        googlePayComponent?.googlePayComponent?.getGooglePayButtonParameters()?.allowedPaymentMethods
+                        googlePayComponent?.nativeGooglePayComponent?.getGooglePayButtonParameters()?.allowedPaymentMethods
                             .orEmpty()
                     )
                 )

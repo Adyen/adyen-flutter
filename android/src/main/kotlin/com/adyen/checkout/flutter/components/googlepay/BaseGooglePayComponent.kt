@@ -13,7 +13,7 @@ abstract class BaseGooglePayComponent(
     private val activity: FragmentActivity,
 ) {
     private val intentListener = Consumer<Intent> { handleIntent(it) }
-    internal var googlePayComponent: GooglePayComponent? = null
+    internal var nativeGooglePayComponent: GooglePayComponent? = null
     abstract val componentId: String
 
     init {
@@ -30,14 +30,14 @@ abstract class BaseGooglePayComponent(
 
     fun clear() {
         activity.removeOnNewIntentListener(intentListener)
-        googlePayComponent = null
+        nativeGooglePayComponent = null
     }
 
     fun handleActivityResult(
         resultCode: Int,
         data: Intent?
     ) {
-        googlePayComponent?.handleActivityResult(resultCode, data)
+        nativeGooglePayComponent?.handleActivityResult(resultCode, data)
     }
 
     fun hideLoadingBottomSheet() = ComponentLoadingBottomSheet.hide(activity.supportFragmentManager)
@@ -47,7 +47,7 @@ abstract class BaseGooglePayComponent(
             intent.data?.toString().orEmpty()
                 .startsWith(RedirectComponent.REDIRECT_RESULT_SCHEME)
         ) {
-            googlePayComponent?.handleIntent(intent)
+            nativeGooglePayComponent?.handleIntent(intent)
         }
     }
 }

@@ -23,7 +23,7 @@ class GooglePayAdvancedComponent(
     override val componentId: String,
 ) : BaseGooglePayComponent(activity) {
     override fun setupGooglePayComponent(paymentMethod: PaymentMethod) {
-        googlePayComponent =
+        nativeGooglePayComponent =
             GooglePayComponent.PROVIDER.get(
                 activity = activity,
                 paymentMethod = paymentMethod,
@@ -39,7 +39,7 @@ class GooglePayAdvancedComponent(
     }
 
     override fun startGooglePayScreen() {
-        googlePayComponent?.startGooglePayScreen(activity, GOOGLE_PAY_ADVANCED_REQUEST_CODE)
+        nativeGooglePayComponent?.startGooglePayScreen(activity, GOOGLE_PAY_ADVANCED_REQUEST_CODE)
     }
 
     override fun handlePaymentEvent(paymentEventDTO: PaymentEventDTO) {
@@ -50,9 +50,7 @@ class GooglePayAdvancedComponent(
         }
     }
 
-    override fun dispose() {
-        clear()
-    }
+    override fun dispose() = clear()
 
     private fun onFinished(resultCode: String?) {
         if (resultCode == null) {
@@ -79,7 +77,7 @@ class GooglePayAdvancedComponent(
         }
 
         action.let {
-            googlePayComponent?.apply {
+            nativeGooglePayComponent?.apply {
                 val actionJson = JSONObject(action)
                 this.handleAction(action = Action.SERIALIZER.deserialize(actionJson), activity = activity)
                 ComponentLoadingBottomSheet.show(activity.supportFragmentManager, this)
