@@ -9,48 +9,42 @@ import PaymentResultModelDTO
 import androidx.fragment.app.FragmentActivity
 import com.adyen.checkout.components.core.PaymentMethod
 import com.adyen.checkout.components.core.action.Action
-import com.adyen.checkout.flutter.components.googlepay.BaseGooglePayComponent
-import com.adyen.checkout.flutter.components.view.ComponentLoadingBottomSheet
-import com.adyen.checkout.flutter.utils.Constants.Companion.GOOGLE_PAY_ADVANCED_REQUEST_CODE
+import com.adyen.checkout.flutter.components.googlepay.BaseGooglePayComponentWrapper
 import com.adyen.checkout.googlepay.GooglePayComponent
 import com.adyen.checkout.googlepay.GooglePayConfiguration
 import org.json.JSONObject
+import java.util.UUID
 
-class GooglePayAdvancedComponent(
+class GooglePayAdvancedComponentWrapper(
     private val activity: FragmentActivity,
-    private val componentFlutterApi: ComponentFlutterInterface,
+    private val componentFlutterInterface: ComponentFlutterInterface,
     private val googlePayConfiguration: GooglePayConfiguration,
     override val componentId: String,
-) : BaseGooglePayComponent(activity) {
+) : BaseGooglePayComponentWrapper(activity, componentFlutterInterface) {
     override fun setupGooglePayComponent(paymentMethod: PaymentMethod) {
-        nativeGooglePayComponent =
+        googlePayComponent =
             GooglePayComponent.PROVIDER.get(
                 activity = activity,
                 paymentMethod = paymentMethod,
                 configuration = googlePayConfiguration,
                 callback =
                     GooglePayAdvancedCallback(
-                        componentFlutterApi,
+                        componentFlutterInterface,
                         componentId,
                         ::onLoading,
                         ::hideLoadingBottomSheet
                     ),
+                key = UUID.randomUUID().toString()
             )
     }
 
-    override fun startGooglePayScreen() {
-        nativeGooglePayComponent?.startGooglePayScreen(activity, GOOGLE_PAY_ADVANCED_REQUEST_CODE)
-    }
-
-    override fun handlePaymentEvent(paymentEventDTO: PaymentEventDTO) {
+    fun handlePaymentEvent(paymentEventDTO: PaymentEventDTO) {
         when (paymentEventDTO.paymentEventType) {
             PaymentEventType.FINISHED -> onFinished(paymentEventDTO.result)
             PaymentEventType.ACTION -> onAction(paymentEventDTO.actionResponse)
             PaymentEventType.ERROR -> onError(paymentEventDTO.error)
         }
     }
-
-    override fun dispose() = clear()
 
     private fun onFinished(resultCode: String?) {
         if (resultCode == null) {
@@ -67,7 +61,7 @@ class GooglePayAdvancedComponent(
                         result = PaymentResultModelDTO(resultCode = resultCode)
                     ),
             )
-        componentFlutterApi.onComponentCommunication(model) {}
+        componentFlutterInterface.onComponentCommunication(model) {}
         hideLoadingBottomSheet()
     }
 
@@ -76,13 +70,8 @@ class GooglePayAdvancedComponent(
             return
         }
 
-        action.let {
-            nativeGooglePayComponent?.apply {
-                val actionJson = JSONObject(action)
-                this.handleAction(action = Action.SERIALIZER.deserialize(actionJson), activity = activity)
-                ComponentLoadingBottomSheet.show(activity.supportFragmentManager, this)
-            }
-        }
+        val actionJson = JSONObject(action)
+        handleAction(Action.SERIALIZER.deserialize(actionJson))
     }
 
     private fun onError(error: ErrorDTO?) {
@@ -100,16 +89,7 @@ class GooglePayAdvancedComponent(
                         reason = error.errorMessage,
                     ),
             )
-        componentFlutterApi.onComponentCommunication(model) {}
+        componentFlutterInterface.onComponentCommunication(model) {}
         hideLoadingBottomSheet()
-    }
-
-    private fun onLoading() {
-        val model =
-            ComponentCommunicationModel(
-                ComponentCommunicationType.LOADING,
-                componentId = componentId,
-            )
-        componentFlutterApi.onComponentCommunication(model) {}
     }
 }

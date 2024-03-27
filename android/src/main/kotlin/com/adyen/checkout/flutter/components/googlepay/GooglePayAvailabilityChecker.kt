@@ -9,7 +9,7 @@ import com.adyen.checkout.googlepay.GooglePayConfiguration
 
 class GooglePayAvailabilityChecker(
     private val activity: FragmentActivity,
-    private val googlePayComponent: BaseGooglePayComponent?,
+    private val googlePayComponent: BaseGooglePayComponentWrapper?,
     private val googlePaySetupCallback: (Result<InstantPaymentSetupResultDTO>) -> Unit,
 ) : ComponentAvailableCallback {
     override fun onAvailabilityResult(
@@ -22,7 +22,7 @@ class GooglePayAvailabilityChecker(
                     InstantPaymentSetupResultDTO(
                         InstantPaymentType.GOOGLEPAY,
                         true,
-                        googlePayComponent?.nativeGooglePayComponent?.getGooglePayButtonParameters()
+                        googlePayComponent?.googlePayComponent?.getGooglePayButtonParameters()
                             ?.allowedPaymentMethods.orEmpty()
                     )
                 )
