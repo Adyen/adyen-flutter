@@ -28,11 +28,7 @@ class CardAdvancedComponent extends BaseCardComponent {
     super.gestureRecognizers,
     super.adyenLogger,
     PaymentEventHandler? paymentEventHandler,
-  })  : paymentEventHandler = paymentEventHandler ?? PaymentEventHandler(),
-        assert(
-          advancedCheckout.onAdditionalDetails != null,
-          "Please provide the onAdditionalDetails callback for the advanced checkout.",
-        );
+  })  : paymentEventHandler = paymentEventHandler ?? PaymentEventHandler();
 
   @override
   Map<String, dynamic> get creationParams => <String, dynamic>{
@@ -73,7 +69,7 @@ class CardAdvancedComponent extends BaseCardComponent {
 
   Future<void> _onAdditionalDetails(ComponentCommunicationModel event) async {
     final PaymentEvent paymentEvent =
-        await advancedCheckout.onAdditionalDetails!(event.data as String);
+        await advancedCheckout.onAdditionalDetails(event.data as String);
     final PaymentEventDTO paymentEventDTO =
         paymentEventHandler.mapToPaymentEventDTO(paymentEvent);
     ComponentPlatformApi.instance

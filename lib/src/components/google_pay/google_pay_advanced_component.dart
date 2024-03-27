@@ -28,11 +28,7 @@ class GooglePayAdvancedComponent extends BaseGooglePayComponent {
     super.unavailableWidget,
     PaymentEventHandler? paymentEventHandler,
     AdyenLogger? adyenLogger,
-  })  : paymentEventHandler = paymentEventHandler ?? PaymentEventHandler(),
-        assert(
-          advancedCheckout.onAdditionalDetails != null,
-          "Please provide the onAdditionalDetails callback for the advanced checkout.",
-        );
+  }) : paymentEventHandler = paymentEventHandler ?? PaymentEventHandler();
 
   @override
   void handleComponentCommunication(ComponentCommunicationModel event) {
@@ -65,7 +61,7 @@ class GooglePayAdvancedComponent extends BaseGooglePayComponent {
 
   Future<void> _onAdditionalDetails(ComponentCommunicationModel event) async {
     final PaymentEvent paymentEvent =
-        await advancedCheckout.onAdditionalDetails!(event.data as String);
+        await advancedCheckout.onAdditionalDetails(event.data as String);
     final PaymentEventDTO paymentEventDTO =
         paymentEventHandler.mapToPaymentEventDTO(paymentEvent);
     componentPlatformApi.onPaymentsDetailsResult(componentId, paymentEventDTO);

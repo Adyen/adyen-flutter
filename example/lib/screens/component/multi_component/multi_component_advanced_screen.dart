@@ -160,6 +160,7 @@ class MultiComponentAdvancedScreen extends StatelessWidget {
 
     final AdvancedCheckout advancedCheckout = AdvancedCheckout(
       onSubmit: applePayRepository.onSubmit,
+      onAdditionalDetails: applePayRepository.onAdditionalDetailsMock,
     );
     final paymentMethod = _extractPaymentMethod(paymentMethods);
 
