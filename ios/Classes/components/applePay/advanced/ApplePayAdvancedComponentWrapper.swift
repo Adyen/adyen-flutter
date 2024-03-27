@@ -1,22 +1,24 @@
 @_spi(AdyenInternal) import Adyen
 
-class ApplePayAdvancedComponent: BaseApplePayComponent {
-    static let applePayAdvancedComponentId = "APPLE_PAY_ADVANCED_COMPONENT"
+class ApplePayAdvancedComponentWrapper: BaseApplePayComponentWrapper {
     private let componentFlutterApi: ComponentFlutterInterface
     private let configuration: ApplePayComponent.Configuration
     private let adyenContext: AdyenContext
     private let paymentMethodResponse: String
+    private let componentId: String
     
     init(
         componentFlutterApi: ComponentFlutterInterface,
         configuration: ApplePayComponent.Configuration,
         adyenContext: AdyenContext,
-        paymentMethodResponse: String
+        paymentMethodResponse: String,
+        componentId: String
     ) {
         self.componentFlutterApi = componentFlutterApi
         self.configuration = configuration
         self.adyenContext = adyenContext
         self.paymentMethodResponse = paymentMethodResponse
+        self.componentId = componentId
         super.init()
         applePayComponent = try? buildApplePayAdvancedComponent()
     }
@@ -28,7 +30,7 @@ class ApplePayAdvancedComponent: BaseApplePayComponent {
         }
     }
     
-    override func handlePaymentEvent(paymentEventDTO: PaymentEventDTO) {
+    func handlePaymentEvent(paymentEventDTO: PaymentEventDTO) {
         switch paymentEventDTO.paymentEventType {
         case .finished:
             onFinished(paymentEventDTO: paymentEventDTO)
@@ -50,16 +52,17 @@ class ApplePayAdvancedComponent: BaseApplePayComponent {
     
     private func onFinished(paymentEventDTO: PaymentEventDTO) {
         finalizeAndDismissComponent(success: true, completion: { [weak self] in
+            guard let self else { return }
             let resultCode = paymentEventDTO.result ?? ""
             let componentCommunicationModel = ComponentCommunicationModel(
                 type: ComponentCommunicationType.result,
-                componentId: Self.applePayAdvancedComponentId,
+                componentId: self.componentId,
                 paymentResult: PaymentResultDTO(
                     type: PaymentResultEnum.finished,
                     result: PaymentResultModelDTO(resultCode: resultCode)
                 )
             )
-            self?.componentFlutterApi.onComponentCommunication(
+            self.componentFlutterApi.onComponentCommunication(
                 componentCommunicationModel: componentCommunicationModel,
                 completion: { _ in }
             )
@@ -68,16 +71,17 @@ class ApplePayAdvancedComponent: BaseApplePayComponent {
     
     private func onError(paymentEventDTO: PaymentEventDTO) {
         finalizeAndDismissComponent(success: false, completion: { [weak self] in
+            guard let self else { return }
             let errorMessage = paymentEventDTO.error?.errorMessage
             let componentCommunicationModel = ComponentCommunicationModel(
                 type: ComponentCommunicationType.result,
-                componentId: Self.applePayAdvancedComponentId,
+                componentId: self.componentId,
                 paymentResult: PaymentResultDTO(
                     type: PaymentResultEnum.error,
                     reason: errorMessage
                 )
             )
-            self?.componentFlutterApi.onComponentCommunication(
+            self.componentFlutterApi.onComponentCommunication(
                 componentCommunicationModel: componentCommunicationModel,
                 completion: { _ in }
             )
@@ -85,7 +89,7 @@ class ApplePayAdvancedComponent: BaseApplePayComponent {
     }
 }
 
-extension ApplePayAdvancedComponent: PaymentComponentDelegate {
+extension ApplePayAdvancedComponentWrapper: PaymentComponentDelegate {
 
     internal func didSubmit(_ data: PaymentComponentData, from component: PaymentComponent) {
         do {
@@ -110,7 +114,7 @@ extension ApplePayAdvancedComponent: PaymentComponentDelegate {
             let paymentComponentString = String(data: paymentComponentJson, encoding: .utf8)
             let componentCommunicationModel = ComponentCommunicationModel(
                 type: ComponentCommunicationType.onSubmit,
-                componentId: Self.applePayAdvancedComponentId,
+                componentId: componentId,
                 data: paymentComponentString
             )
             componentFlutterApi.onComponentCommunication(
@@ -137,7 +141,7 @@ extension ApplePayAdvancedComponent: PaymentComponentDelegate {
         }
         let componentCommunicationModel = ComponentCommunicationModel(
             type: ComponentCommunicationType.result,
-            componentId: Self.applePayAdvancedComponentId,
+            componentId: componentId,
             paymentResult: PaymentResultDTO(
                 type: type,
                 reason: error.localizedDescription
