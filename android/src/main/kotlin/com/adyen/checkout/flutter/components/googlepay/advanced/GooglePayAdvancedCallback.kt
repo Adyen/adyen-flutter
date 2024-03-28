@@ -19,12 +19,13 @@ class GooglePayAdvancedCallback(
         onLoadingCallback()
         val data = PaymentComponentData.SERIALIZER.serialize(state.data)
         val extraData = state.paymentData?.toJson()
-        val submitData = JSONObject().apply {
-            put(Constants.GOOGLE_PAY_ADVANCED_PAYMENT_DATA_KEY, data)
-            extraData?.let {
-                submitData.put(Constants.GOOGLE_PAY_ADVANCED_EXTRA_DATA_KEY, JSONObject(it))
+        val submitData =
+            JSONObject().apply {
+                put(Constants.GOOGLE_PAY_ADVANCED_PAYMENT_DATA_KEY, data)
+                extraData?.let {
+                    put(Constants.GOOGLE_PAY_ADVANCED_EXTRA_DATA_KEY, JSONObject(it))
+                }
             }
-        }
         val model =
             ComponentCommunicationModel(
                 ComponentCommunicationType.ONSUBMIT,
