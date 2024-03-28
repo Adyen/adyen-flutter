@@ -26,6 +26,11 @@ class ApplePaySessionComponentWrapper: BaseApplePayComponentWrapper {
         }
     }
     
+    override func onDispose() {
+        sessionHolder.reset()
+        applePayComponent = nil
+    }
+    
     private func buildApplePaySessionComponent() -> ApplePayComponent? {
         guard let session = sessionHolder.session,
               let paymentMethod = session.sessionContext.paymentMethods.paymentMethod(ofType: ApplePayPaymentMethod.self),
@@ -50,7 +55,6 @@ class ApplePaySessionComponentWrapper: BaseApplePayComponentWrapper {
     override func finalizeAndDismissComponent(success: Bool, completion: @escaping (() -> Void)) {
         super.finalizeAndDismissComponent(success: success, completion: { [weak self] in
             completion()
-            self?.sessionHolder.reset()
         })
     }
 }

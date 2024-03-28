@@ -30,6 +30,10 @@ class ApplePayAdvancedComponentWrapper: BaseApplePayComponentWrapper {
         }
     }
     
+    override func onDispose() {
+        applePayComponent = nil
+    }
+    
     func handlePaymentEvent(paymentEventDTO: PaymentEventDTO) {
         switch paymentEventDTO.paymentEventType {
         case .finished:

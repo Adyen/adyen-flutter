@@ -4,18 +4,20 @@ class BaseApplePayComponentWrapper {
     var applePayComponent: ApplePayComponent?
 
     func present() {
-        preconditionFailure("This method must be overridden")
+        preconditionFailure("This method must be implemented")
+    }
+    
+    func onDispose() {
+        preconditionFailure("This method must be implemented")
     }
         
     func finalizeAndDismissComponent(success: Bool, completion: @escaping (() -> Void)) {
         applePayComponent?.finalizeIfNeeded(with: success) { [weak self] in
             if let viewController = self?.getViewController() {
-                viewController.dismiss(animated: true) { [weak self] in
-                    self?.applePayComponent = nil
+                viewController.dismiss(animated: true) { 
                     completion()
                 }
             } else {
-                self?.applePayComponent = nil
                 completion()
             }
         }
