@@ -2061,38 +2061,26 @@ class _ComponentFlutterInterfaceCodec extends StandardMessageCodec {
     } else if (value is AnalyticsOptionsDTO) {
       buffer.putUint8(130);
       writeValue(buffer, value.encode());
-    } else if (value is ApplePayConfigurationDTO) {
+    } else if (value is CardComponentConfigurationDTO) {
       buffer.putUint8(131);
       writeValue(buffer, value.encode());
-    } else if (value is ApplePayContactDTO) {
+    } else if (value is CardConfigurationDTO) {
       buffer.putUint8(132);
       writeValue(buffer, value.encode());
-    } else if (value is ApplePayShippingMethodDTO) {
+    } else if (value is ComponentCommunicationModel) {
       buffer.putUint8(133);
       writeValue(buffer, value.encode());
-    } else if (value is ApplePaySummaryItemDTO) {
+    } else if (value is OrderResponseDTO) {
       buffer.putUint8(134);
       writeValue(buffer, value.encode());
-    } else if (value is CardComponentConfigurationDTO) {
+    } else if (value is PaymentResultDTO) {
       buffer.putUint8(135);
       writeValue(buffer, value.encode());
-    } else if (value is CardConfigurationDTO) {
+    } else if (value is PaymentResultModelDTO) {
       buffer.putUint8(136);
       writeValue(buffer, value.encode());
-    } else if (value is ComponentCommunicationModel) {
-      buffer.putUint8(137);
-      writeValue(buffer, value.encode());
-    } else if (value is OrderResponseDTO) {
-      buffer.putUint8(138);
-      writeValue(buffer, value.encode());
-    } else if (value is PaymentResultDTO) {
-      buffer.putUint8(139);
-      writeValue(buffer, value.encode());
-    } else if (value is PaymentResultModelDTO) {
-      buffer.putUint8(140);
-      writeValue(buffer, value.encode());
     } else if (value is SessionDTO) {
-      buffer.putUint8(141);
+      buffer.putUint8(137);
       writeValue(buffer, value.encode());
     } else {
       super.writeValue(buffer, value);
@@ -2109,26 +2097,18 @@ class _ComponentFlutterInterfaceCodec extends StandardMessageCodec {
       case 130: 
         return AnalyticsOptionsDTO.decode(readValue(buffer)!);
       case 131: 
-        return ApplePayConfigurationDTO.decode(readValue(buffer)!);
-      case 132: 
-        return ApplePayContactDTO.decode(readValue(buffer)!);
-      case 133: 
-        return ApplePayShippingMethodDTO.decode(readValue(buffer)!);
-      case 134: 
-        return ApplePaySummaryItemDTO.decode(readValue(buffer)!);
-      case 135: 
         return CardComponentConfigurationDTO.decode(readValue(buffer)!);
-      case 136: 
+      case 132: 
         return CardConfigurationDTO.decode(readValue(buffer)!);
-      case 137: 
+      case 133: 
         return ComponentCommunicationModel.decode(readValue(buffer)!);
-      case 138: 
+      case 134: 
         return OrderResponseDTO.decode(readValue(buffer)!);
-      case 139: 
+      case 135: 
         return PaymentResultDTO.decode(readValue(buffer)!);
-      case 140: 
+      case 136: 
         return PaymentResultModelDTO.decode(readValue(buffer)!);
-      case 141: 
+      case 137: 
         return SessionDTO.decode(readValue(buffer)!);
       default:
         return super.readValueOfType(type, buffer);
@@ -2139,7 +2119,7 @@ class _ComponentFlutterInterfaceCodec extends StandardMessageCodec {
 abstract class ComponentFlutterInterface {
   static const MessageCodec<Object?> pigeonChannelCodec = _ComponentFlutterInterfaceCodec();
 
-  void _generateCodecForDTOs(CardComponentConfigurationDTO cardComponentConfigurationDTO, ApplePayConfigurationDTO applePayConfigurationDTO, SessionDTO sessionDTO);
+  void _generateCodecForDTOs(CardComponentConfigurationDTO cardComponentConfigurationDTO, SessionDTO sessionDTO);
 
   void onComponentCommunication(ComponentCommunicationModel componentCommunicationModel);
 
@@ -2158,14 +2138,11 @@ abstract class ComponentFlutterInterface {
           final CardComponentConfigurationDTO? arg_cardComponentConfigurationDTO = (args[0] as CardComponentConfigurationDTO?);
           assert(arg_cardComponentConfigurationDTO != null,
               'Argument for dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface._generateCodecForDTOs was null, expected non-null CardComponentConfigurationDTO.');
-          final ApplePayConfigurationDTO? arg_applePayConfigurationDTO = (args[1] as ApplePayConfigurationDTO?);
-          assert(arg_applePayConfigurationDTO != null,
-              'Argument for dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface._generateCodecForDTOs was null, expected non-null ApplePayConfigurationDTO.');
-          final SessionDTO? arg_sessionDTO = (args[2] as SessionDTO?);
+          final SessionDTO? arg_sessionDTO = (args[1] as SessionDTO?);
           assert(arg_sessionDTO != null,
               'Argument for dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface._generateCodecForDTOs was null, expected non-null SessionDTO.');
           try {
-            api._generateCodecForDTOs(arg_cardComponentConfigurationDTO!, arg_applePayConfigurationDTO!, arg_sessionDTO!);
+            api._generateCodecForDTOs(arg_cardComponentConfigurationDTO!, arg_sessionDTO!);
             return wrapResponse(empty: true);
           } on PlatformException catch (e) {
             return wrapResponse(error: e);

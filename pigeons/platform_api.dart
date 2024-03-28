@@ -601,7 +601,6 @@ abstract class ComponentFlutterInterface {
   // ignore: unused_element
   void _generateCodecForDTOs(
     CardComponentConfigurationDTO cardComponentConfigurationDTO,
-    ApplePayConfigurationDTO applePayConfigurationDTO,
     SessionDTO sessionDTO,
   );
 

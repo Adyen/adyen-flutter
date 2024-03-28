@@ -90,10 +90,15 @@ class AdyenApplePayComponentRepository extends AdyenBaseRepository {
     );
 
     Map<String, dynamic> mergedJson = <String, dynamic>{};
-    Map<String, dynamic> paymentComponentData = jsonDecode(paymentComponentJson);
+    Map<String, dynamic> paymentComponentData =
+        jsonDecode(paymentComponentJson);
     mergedJson.addAll(paymentComponentData["paymentData"]);
     mergedJson.addAll(paymentsRequestData.toJson());
     final response = await service.postPayments(mergedJson);
     return paymentEventHandler.handleResponse(response);
   }
+
+  Future<PaymentEvent> onAdditionalDetailsMock(String additionalDetailsJson) =>
+      Future.error(
+          "Additional details call is not required for the Apple Pay component.");
 }

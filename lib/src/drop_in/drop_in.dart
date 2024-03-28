@@ -83,11 +83,6 @@ class DropIn {
     AdvancedCheckout dropInAdvanced,
   ) async {
     adyenLogger.print("Start Drop-in advanced flow");
-    if (dropInAdvanced.onAdditionalDetails == null) {
-      throw Exception(
-          "Please provide the onAdditionalDetails callback for the advanced checkout.");
-    }
-
     final dropInAdvancedFlowCompleter = Completer<PaymentResultDTO>();
     final sdkVersionNumber =
         await sdkVersionNumberProvider.getSdkVersionNumber();
@@ -107,7 +102,7 @@ class DropIn {
           await _handlePaymentComponent(event, dropInAdvanced.onSubmit);
         case PlatformCommunicationType.additionalDetails:
           await _handleAdditionalDetails(
-              event, dropInAdvanced.onAdditionalDetails!);
+              event, dropInAdvanced.onAdditionalDetails);
         case PlatformCommunicationType.result:
           _handleResult(dropInAdvancedFlowCompleter, event);
         case PlatformCommunicationType.deleteStoredPaymentMethod:
