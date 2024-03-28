@@ -17,11 +17,13 @@ class GooglePayAdvancedCallback(
 ) : ComponentAdvancedCallback<GooglePayComponentState>(componentFlutterApi, componentId) {
     override fun onSubmit(state: GooglePayComponentState) {
         onLoadingCallback()
-        val submitData = JSONObject()
-        val paymentData = PaymentComponentData.SERIALIZER.serialize(state.data)
-        submitData.put(Constants.GOOGLE_PAY_ADVANCED_PAYMENT_DATA_KEY, paymentData)
-        state.paymentData?.toJson()?.let {
-            submitData.put(Constants.GOOGLE_PAY_ADVANCED_EXTRA_DATA_KEY, JSONObject(it))
+        val data = PaymentComponentData.SERIALIZER.serialize(state.data)
+        val extraData = state.paymentData?.toJson()
+        val submitData = JSONObject().apply {
+            put(Constants.GOOGLE_PAY_ADVANCED_PAYMENT_DATA_KEY, data)
+            extraData?.let {
+                submitData.put(Constants.GOOGLE_PAY_ADVANCED_EXTRA_DATA_KEY, JSONObject(it))
+            }
         }
         val model =
             ComponentCommunicationModel(
