@@ -65,4 +65,9 @@ class ApplePayComponentManager {
             applePayComponentWrapper.handlePaymentEvent(paymentEventDTO: paymentEventDTO)
         }
     }
+    
+    func onDispose() {
+        applePayComponentWrapper?.onDispose()
+        applePayComponentWrapper = nil
+    }
 }

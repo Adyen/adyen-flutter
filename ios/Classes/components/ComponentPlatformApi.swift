@@ -49,10 +49,14 @@ class ComponentPlatformApi: ComponentPlatformInterface {
         }
     }
 
-    func onDispose(componentId: String) throws {}
+    func onDispose(componentId: String) {
+        if isApplePayComponent(componentId: componentId) {
+            applePayComponentManager.onDispose()
+        }
+    }
 
     private func handlePaymentEvent(componentId: String, paymentEventDTO: PaymentEventDTO) {
-        if componentId == ApplePayComponentManager.Constants.applePaySessionComponentId || componentId == ApplePayComponentManager.Constants.applePayAdvancedComponentId {
+        if isApplePayComponent(componentId: componentId) {
             applePayComponentManager.handlePaymentEvent(paymentEventDTO: paymentEventDTO)
         } else {
             switch paymentEventDTO.paymentEventType {
@@ -65,5 +69,9 @@ class ComponentPlatformApi: ComponentPlatformInterface {
                 onErrorCallback(paymentEventDTO.error)
             }
         }
+    }
+    
+    private func isApplePayComponent(componentId: String) -> Bool {
+        componentId == ApplePayComponentManager.Constants.applePaySessionComponentId || componentId == ApplePayComponentManager.Constants.applePayAdvancedComponentId
     }
 }
