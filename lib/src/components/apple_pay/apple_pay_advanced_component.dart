@@ -1,13 +1,13 @@
-import 'package:adyen_checkout/src/common/model/payment_event.dart';
-import 'package:adyen_checkout/src/common/model/payment_result.dart';
+import 'dart:convert';
+
+import 'package:adyen_checkout/adyen_checkout.dart';
 import 'package:adyen_checkout/src/components/apple_pay/base_apple_pay_component.dart';
 import 'package:adyen_checkout/src/generated/platform_api.g.dart';
 import 'package:adyen_checkout/src/logging/adyen_logger.dart';
 import 'package:adyen_checkout/src/util/payment_event_handler.dart';
 
 class ApplePayAdvancedComponent extends BaseApplePayComponent {
-  final Future<PaymentEvent> Function(String) onSubmit;
-  final Future<PaymentEvent> Function(String) onAdditionalDetails;
+  final AdvancedCheckout advancedCheckout;
   final PaymentEventHandler paymentEventHandler;
 
   @override
@@ -18,8 +18,7 @@ class ApplePayAdvancedComponent extends BaseApplePayComponent {
     required super.applePayPaymentMethod,
     required super.applePayComponentConfiguration,
     required super.onPaymentResult,
-    required this.onSubmit,
-    required this.onAdditionalDetails,
+    required this.advancedCheckout,
     required super.style,
     required super.type,
     required super.width,
@@ -37,8 +36,6 @@ class ApplePayAdvancedComponent extends BaseApplePayComponent {
     isButtonClickable.value = true;
     if (event.type case ComponentCommunicationType.onSubmit) {
       _onSubmit(event);
-    } else if (event.type case ComponentCommunicationType.additionalDetails) {
-      _onAdditionalDetails(event);
     } else if (event.type case ComponentCommunicationType.loading) {
       _onLoading();
     } else if (event.type case ComponentCommunicationType.result) {
@@ -54,18 +51,22 @@ class ApplePayAdvancedComponent extends BaseApplePayComponent {
   }
 
   Future<void> _onSubmit(ComponentCommunicationModel event) async {
-    final PaymentEvent paymentEvent = await onSubmit(event.data as String);
-    final PaymentEventDTO paymentEventDTO =
-        paymentEventHandler.mapToPaymentEventDTO(paymentEvent);
-    componentPlatformApi.onPaymentsResult(componentId, paymentEventDTO);
-  }
-
-  Future<void> _onAdditionalDetails(ComponentCommunicationModel event) async {
-    final PaymentEvent paymentEvent =
-        await onAdditionalDetails(event.data as String);
-    final PaymentEventDTO paymentEventDTO =
-        paymentEventHandler.mapToPaymentEventDTO(paymentEvent);
-    componentPlatformApi.onPaymentsDetailsResult(componentId, paymentEventDTO);
+    try {
+      final paymentComponentJson = event.data as Map<dynamic, dynamic>;
+      final PaymentEvent paymentEvent =
+          await advancedCheckout.onSubmit(jsonEncode(paymentComponentJson));
+      final PaymentEventDTO paymentEventDTO =
+          paymentEventHandler.mapToPaymentEventDTO(paymentEvent);
+      componentPlatformApi.onPaymentsResult(componentId, paymentEventDTO);
+    } catch (exception) {
+      componentPlatformApi.onPaymentsResult(
+        componentId,
+        PaymentEventDTO(
+          paymentEventType: PaymentEventType.error,
+          error: ErrorDTO(errorMessage: exception.toString()),
+        ),
+      );
+    }
   }
 
   void _onLoading() => isLoading.value = true;

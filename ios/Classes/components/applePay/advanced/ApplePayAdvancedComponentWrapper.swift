@@ -6,7 +6,7 @@ class ApplePayAdvancedComponentWrapper: BaseApplePayComponentWrapper {
     private let adyenContext: AdyenContext
     private let paymentMethodResponse: String
     private let componentId: String
-    
+
     init(
         componentFlutterApi: ComponentFlutterInterface,
         configuration: ApplePayComponent.Configuration,
@@ -92,38 +92,20 @@ class ApplePayAdvancedComponentWrapper: BaseApplePayComponentWrapper {
 extension ApplePayAdvancedComponentWrapper: PaymentComponentDelegate {
 
     internal func didSubmit(_ data: PaymentComponentData, from component: PaymentComponent) {
-        do {
-            let paymentComponentData = PaymentComponentDataResponse(
-                amount: data.amount,
-                paymentMethod: data.paymentMethod.encodable,
-                storePaymentMethod: data.storePaymentMethod,
-                order: data.order,
-                amountToPay: data.order?.remainingAmount,
-                installments: data.installments,
-                shopperName: data.shopperName,
-                emailAddress: data.emailAddress,
-                telephoneNumber: data.telephoneNumber,
-                browserInfo: data.browserInfo,
-                checkoutAttemptId: data.checkoutAttemptId,
-                billingAddress: data.billingAddress,
-                deliveryAddress: data.deliveryAddress,
-                socialSecurityNumber: data.socialSecurityNumber,
-                delegatedAuthenticationData: data.delegatedAuthenticationData
-            )
-            let paymentComponentJson = try JSONEncoder().encode(paymentComponentData)
-            let paymentComponentString = String(data: paymentComponentJson, encoding: .utf8)
-            let componentCommunicationModel = ComponentCommunicationModel(
-                type: ComponentCommunicationType.onSubmit,
-                componentId: componentId,
-                data: paymentComponentString
-            )
-            componentFlutterApi.onComponentCommunication(
-                componentCommunicationModel: componentCommunicationModel,
-                completion: { _ in }
-            )
-        } catch {
-            sendErrorToFlutterLayer(error: error)
-        }
+        let applePayDetails = data.paymentMethod as? ApplePayDetails
+        let submitData = SubmitData(
+            paymentData: data.jsonObject,
+            extraData: applePayDetails?.getExtraData()
+        )
+        let componentCommunicationModel = ComponentCommunicationModel(
+            type: ComponentCommunicationType.onSubmit,
+            componentId: componentId,
+            data: submitData.toJsonObject()
+        )
+        componentFlutterApi.onComponentCommunication(
+            componentCommunicationModel: componentCommunicationModel,
+            completion: { _ in }
+        )
     }
 
     internal func didFail(with error: Error, from component: PaymentComponent) {

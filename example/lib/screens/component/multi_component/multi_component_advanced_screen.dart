@@ -75,7 +75,7 @@ class MultiComponentAdvancedScreen extends StatelessWidget {
     );
 
     return Padding(
-      padding: const EdgeInsets.fromLTRB(4,0,4,0),
+      padding: const EdgeInsets.fromLTRB(4, 0, 4, 0),
       child: AdyenCardComponent(
         configuration: cardComponentConfiguration,
         paymentMethod: paymentMethod,
@@ -160,7 +160,7 @@ class MultiComponentAdvancedScreen extends StatelessWidget {
 
     final AdvancedCheckout advancedCheckout = AdvancedCheckout(
       onSubmit: applePayRepository.onSubmit,
-      onAdditionalDetails: googlePayRepository.onAdditionalDetails,
+      onAdditionalDetails: applePayRepository.onAdditionalDetailsMock,
     );
     final paymentMethod = _extractPaymentMethod(paymentMethods);
 

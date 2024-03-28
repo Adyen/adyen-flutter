@@ -239,3 +239,97 @@ extension Date {
         Calendar.current.dateComponents([.calendar, .year, .month, .day], from: self)
     }
 }
+
+extension ApplePayDetails {
+    func getExtraData() -> [String: Any?] {
+        var dictionary: [String: Any] = [:]
+        dictionary[ApplePayKeys.General.network] = network
+        billingContact.map { dictionary[ApplePayKeys.General.billingContact] = $0.toJsonObject() }
+        shippingContact.map { dictionary[ApplePayKeys.General.shippingContact] = $0.toJsonObject() }
+        shippingMethod.map { dictionary[ApplePayKeys.General.shippingMethod] = $0.toJsonObject() }
+        return dictionary
+    }
+}
+
+extension PKContact {
+    func toJsonObject() -> [String: Any] {
+        var dictionary: [String: Any] = [:]
+        name.map {
+            dictionary[ApplePayKeys.Contact.givenName] = $0.givenName
+            dictionary[ApplePayKeys.Contact.familyName] = $0.familyName
+        }
+        name?.phoneticRepresentation.map {
+            dictionary[ApplePayKeys.Contact.phoneticGivenName] = $0.phoneticRepresentation?.givenName
+            dictionary[ApplePayKeys.Contact.phoneticFamilyName] = $0.phoneticRepresentation?.familyName
+        }
+        postalAddress.map {
+            dictionary[ApplePayKeys.Contact.addressLines] = $0.street
+            dictionary[ApplePayKeys.Contact.subLocality] = $0.subLocality
+            dictionary[ApplePayKeys.Contact.city] = $0.city
+            dictionary[ApplePayKeys.Contact.postalCode] = $0.postalCode
+            dictionary[ApplePayKeys.Contact.subAdministrativeArea] = $0.subAdministrativeArea
+            dictionary[ApplePayKeys.Contact.administrativeArea] = $0.state
+            dictionary[ApplePayKeys.Contact.country] = $0.country
+            dictionary[ApplePayKeys.Contact.countryCode] = $0.isoCountryCode
+        }
+        emailAddress.map { dictionary[ApplePayKeys.Contact.emailAddress] = $0 }
+        phoneNumber.map { dictionary[ApplePayKeys.Contact.phoneNumber] = $0.stringValue }
+        return dictionary
+    }
+}
+
+extension PKShippingMethod {
+    func toJsonObject() -> [String: Any] {
+        var dictionary: [String: Any] = [:]
+        identifier.map { dictionary[ApplePayKeys.ShippingMethod.identifier] = $0 }
+        detail.map { dictionary[ApplePayKeys.ShippingMethod.detail] = $0 }
+        if #available(iOS 15.0, *) {
+            dateComponentsRange.map { dictionary[ApplePayKeys.ShippingMethod.dateComponentsRange] = $0.toJsonObject() }
+        }
+        return dictionary
+    }
+}
+
+@available(iOS 15.0, *)
+extension PKDateComponentsRange {
+    func toJsonObject() -> [String: Any] {
+        var dictionary: [String: Any] = [:]
+        startDateComponents.date.map { dictionary[ApplePayKeys.ShippingMethod.startDate] = $0.ISO8601Format() }
+        endDateComponents.date.map { dictionary[ApplePayKeys.ShippingMethod.endDate] = $0.ISO8601Format() }
+        return dictionary
+    }
+}
+
+internal enum ApplePayKeys {
+    enum General {
+        static let network = "network"
+        static let billingContact = "billingContact"
+        static let shippingContact = "shippingContact"
+        static let shippingMethod = "shippingMethod"
+    }
+    
+    enum Contact {
+        static var phoneNumber = "phoneNumber"
+        static var emailAddress = "emailAddress"
+        static var givenName = "givenName"
+        static var familyName = "familyName"
+        static var phoneticGivenName = "phoneticGivenName"
+        static var phoneticFamilyName = "phoneticFamilyName"
+        static var addressLines = "addressLines"
+        static var subLocality = "subLocality"
+        static var city = "city"
+        static var postalCode = "postalCode"
+        static var subAdministrativeArea = "subAdministrativeArea"
+        static var administrativeArea = "administrativeArea"
+        static var country = "country"
+        static var countryCode = "countryCode"
+    }
+
+    enum ShippingMethod {
+        static var identifier = "identifier"
+        static var detail = "detail"
+        static var dateComponentsRange = "dateComponentsRange"
+        static var startDate = "startDate"
+        static var endDate = "endDate"
+    }
+}

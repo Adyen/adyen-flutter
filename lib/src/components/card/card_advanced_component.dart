@@ -8,8 +8,7 @@ import 'package:adyen_checkout/src/util/constants.dart';
 import 'package:adyen_checkout/src/util/payment_event_handler.dart';
 
 class CardAdvancedComponent extends BaseCardComponent {
-  final Future<PaymentEvent> Function(String) onPayments;
-  final Future<PaymentEvent> Function(String) onPaymentsDetails;
+  final AdvancedCheckout advancedCheckout;
   final PaymentEventHandler paymentEventHandler;
 
   @override
@@ -22,15 +21,14 @@ class CardAdvancedComponent extends BaseCardComponent {
     super.key,
     required super.cardComponentConfiguration,
     required super.paymentMethod,
-    required this.onPayments,
-    required this.onPaymentsDetails,
     required super.onPaymentResult,
+    required this.advancedCheckout,
     required super.initialViewHeight,
     required super.isStoredPaymentMethod,
     super.gestureRecognizers,
     super.adyenLogger,
     PaymentEventHandler? paymentEventHandler,
-  }) : paymentEventHandler = paymentEventHandler ?? PaymentEventHandler();
+  })  : paymentEventHandler = paymentEventHandler ?? PaymentEventHandler();
 
   @override
   Map<String, dynamic> get creationParams => <String, dynamic>{
@@ -61,7 +59,8 @@ class CardAdvancedComponent extends BaseCardComponent {
   }
 
   Future<void> _onSubmit(ComponentCommunicationModel event) async {
-    final PaymentEvent paymentEvent = await onPayments(event.data as String);
+    final PaymentEvent paymentEvent =
+        await advancedCheckout.onSubmit(event.data as String);
     final PaymentEventDTO paymentEventDTO =
         paymentEventHandler.mapToPaymentEventDTO(paymentEvent);
     ComponentPlatformApi.instance
@@ -70,7 +69,7 @@ class CardAdvancedComponent extends BaseCardComponent {
 
   Future<void> _onAdditionalDetails(ComponentCommunicationModel event) async {
     final PaymentEvent paymentEvent =
-        await onPaymentsDetails(event.data as String);
+        await advancedCheckout.onAdditionalDetails(event.data as String);
     final PaymentEventDTO paymentEventDTO =
         paymentEventHandler.mapToPaymentEventDTO(paymentEvent);
     ComponentPlatformApi.instance

@@ -69,7 +69,7 @@ class AdyenCardComponent extends StatelessWidget {
   }
 
   CardAdvancedComponent _buildCardAdvancedFlowWidget(String sdkVersionNumber) {
-    final AdvancedCheckout checkoutAdvanced = checkout as AdvancedCheckout;
+    final AdvancedCheckout advancedCheckout = checkout as AdvancedCheckout;
     final initialHeight =
         _determineInitialHeight(configuration.cardConfiguration);
     final String encodedPaymentMethod = json.encode(paymentMethod);
@@ -79,8 +79,7 @@ class AdyenCardComponent extends StatelessWidget {
     return CardAdvancedComponent(
       cardComponentConfiguration: configuration.toDTO(sdkVersionNumber),
       paymentMethod: encodedPaymentMethod,
-      onPayments: checkoutAdvanced.onSubmit,
-      onPaymentsDetails: checkoutAdvanced.onAdditionalDetails,
+      advancedCheckout: advancedCheckout,
       onPaymentResult: onPaymentResult,
       initialViewHeight: initialHeight,
       isStoredPaymentMethod: isStoredPaymentMethod,
