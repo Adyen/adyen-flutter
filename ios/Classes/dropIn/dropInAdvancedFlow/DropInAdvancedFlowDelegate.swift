@@ -11,37 +11,20 @@ class DropInAdvancedFlowDelegate: DropInComponentDelegate {
     }
 
     func didSubmit(_ data: PaymentComponentData, from paymentComponent: PaymentComponent, in _: AnyDropInComponent) {
-        do {
-            let paymentComponentData = PaymentComponentDataResponse(
-                amount: data.amount,
-                paymentMethod: data.paymentMethod.encodable,
-                storePaymentMethod: data.storePaymentMethod,
-                order: data.order,
-                amountToPay: data.order?.remainingAmount,
-                installments: data.installments,
-                shopperName: data.shopperName,
-                emailAddress: data.emailAddress,
-                telephoneNumber: data.telephoneNumber,
-                browserInfo: data.browserInfo,
-                checkoutAttemptId: data.checkoutAttemptId,
-                billingAddress: data.billingAddress,
-                deliveryAddress: data.deliveryAddress,
-                socialSecurityNumber: data.socialSecurityNumber,
-                delegatedAuthenticationData: data.delegatedAuthenticationData
-            )
-            let paymentComponentJson = try JSONEncoder().encode(paymentComponentData)
-            let paymentComponentString = String(data: paymentComponentJson, encoding: .utf8)
-            isApplePay = paymentComponent is ApplePayComponent
-            dropInFlutterApi.onDropInAdvancedPlatformCommunication(
-                platformCommunicationModel: PlatformCommunicationModel(
-                    type: PlatformCommunicationType.paymentComponent,
-                    data: paymentComponentString
-                ),
-                completion: { _ in }
-            )
-        } catch {
-            sendErrorToFlutterLayer(error: error)
-        }
+        isApplePay = paymentComponent is ApplePayComponent
+        let applePayDetails = data.paymentMethod as? ApplePayDetails
+        let submitData = SubmitData(
+            data: data.jsonObject,
+            extra: applePayDetails?.getExtraData()
+        )
+        let platformCommunicationModel = PlatformCommunicationModel(
+            type: PlatformCommunicationType.paymentComponent,
+            data: submitData.toJsonObject().jsonStringRepresentation
+        )
+        dropInFlutterApi.onDropInAdvancedPlatformCommunication(
+            platformCommunicationModel: platformCommunicationModel,
+            completion: { _ in }
+        )
     }
 
     func didProvide(_ data: ActionComponentData, from _: ActionComponent, in _: AnyDropInComponent) {
