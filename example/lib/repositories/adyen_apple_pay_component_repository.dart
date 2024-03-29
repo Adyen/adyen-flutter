@@ -63,8 +63,8 @@ class AdyenApplePayComponentRepository extends AdyenBaseRepository {
   }
 
   Future<PaymentEvent> onSubmit(
-    Map<String, dynamic> paymentComponentJson, [
-    Map<String, dynamic>? extraData,
+    Map<String, dynamic> data, [
+    Map<String, dynamic>? extra,
   ]) async {
     String returnUrl = await determineBaseReturnUrl();
     returnUrl += "/applePay";
@@ -91,7 +91,7 @@ class AdyenApplePayComponentRepository extends AdyenBaseRepository {
     );
 
     Map<String, dynamic> mergedJson = <String, dynamic>{};
-    mergedJson.addAll(paymentComponentJson);
+    mergedJson.addAll(data);
     mergedJson.addAll(paymentsRequestData.toJson());
     final response = await service.postPayments(mergedJson);
     return paymentEventHandler.handleResponse(response);
