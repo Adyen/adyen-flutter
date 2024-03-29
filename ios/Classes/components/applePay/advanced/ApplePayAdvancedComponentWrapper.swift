@@ -98,13 +98,13 @@ extension ApplePayAdvancedComponentWrapper: PaymentComponentDelegate {
     internal func didSubmit(_ data: PaymentComponentData, from component: PaymentComponent) {
         let applePayDetails = data.paymentMethod as? ApplePayDetails
         let submitData = SubmitData(
-            paymentData: data.jsonObject,
-            extraData: applePayDetails?.getExtraData()
+            data: data.jsonObject,
+            extra: applePayDetails?.getExtraData()
         )
         let componentCommunicationModel = ComponentCommunicationModel(
             type: ComponentCommunicationType.onSubmit,
             componentId: componentId,
-            data: submitData.toJsonObject()
+            data: submitData.toJsonObject().jsonStringRepresentation
         )
         componentFlutterApi.onComponentCommunication(
             componentCommunicationModel: componentCommunicationModel,

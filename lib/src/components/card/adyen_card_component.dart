@@ -39,7 +39,8 @@ class AdyenCardComponent extends StatelessWidget {
           final sdkVersionNumber = snapshot.data ?? "";
           return switch (checkout) {
             SessionCheckout() => _buildCardSessionFlowWidget(sdkVersionNumber),
-            AdvancedCheckout() => _buildCardAdvancedFlowWidget(sdkVersionNumber)
+            AdvancedCheckout() => _buildCardAdvancedFlowWidget(sdkVersionNumber),
+            AdvancedCheckoutPreview() => throw UnimplementedError(),
           };
         } else {
           return Container(

@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:adyen_checkout/adyen_checkout.dart';
 import 'package:adyen_checkout_example/config.dart';
 import 'package:adyen_checkout_example/network/models/amount_network_model.dart';
@@ -64,7 +62,10 @@ class AdyenGooglePayComponentRepository extends AdyenBaseRepository {
     ));
   }
 
-  Future<PaymentEvent> onSubmit(String paymentComponentJson) async {
+  Future<PaymentEvent> onSubmit(
+    Map<String, dynamic> paymentComponentJson, [
+    Map<String, dynamic>? extraData,
+  ]) async {
     String returnUrl = await determineBaseReturnUrl();
     returnUrl += "/googlePay";
     PaymentsRequestData paymentsRequestData = PaymentsRequestData(
@@ -90,16 +91,15 @@ class AdyenGooglePayComponentRepository extends AdyenBaseRepository {
     );
 
     Map<String, dynamic> mergedJson = <String, dynamic>{};
-    Map<String, dynamic> paymentComponentData = jsonDecode(paymentComponentJson);
-    mergedJson.addAll(paymentComponentData["paymentData"]);
+    mergedJson.addAll(paymentComponentJson);
     mergedJson.addAll(paymentsRequestData.toJson());
     final response = await service.postPayments(mergedJson);
     return paymentEventHandler.handleResponse(response);
   }
 
-  Future<PaymentEvent> onAdditionalDetails(String additionalDetails) async {
-    final response =
-        await service.postPaymentsDetails(jsonDecode(additionalDetails));
+  Future<PaymentEvent> onAdditionalDetails(
+      Map<String, dynamic> additionalDetails) async {
+    final response = await service.postPaymentsDetails(additionalDetails);
     return paymentEventHandler.handleResponse(response);
   }
 }

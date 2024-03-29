@@ -48,7 +48,7 @@ class ApplePayAdvancedComponentScreen extends StatelessWidget {
       future: repository.fetchPaymentMethods(),
       builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
         if (snapshot.hasData) {
-          final AdvancedCheckout advancedCheckout = AdvancedCheckout(
+          final AdvancedCheckoutPreview advancedCheckout = AdvancedCheckoutPreview(
             onSubmit: repository.onSubmit,
             onAdditionalDetails: repository.onAdditionalDetailsMock
           );

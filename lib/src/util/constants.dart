@@ -9,4 +9,6 @@ class Constants {
   static const String cardComponentAdvancedKey = "cardComponentAdvanced";
   static const String isStoredPaymentMethodIndicator = "id";
   static const String componentIdKey = "componentId";
+  static const String submitDataKey = "data";
+  static const String submitExtraKey = "extra";
 }

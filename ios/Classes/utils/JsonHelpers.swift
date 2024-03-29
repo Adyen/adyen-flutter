@@ -18,3 +18,16 @@ internal extension Decodable {
         self = try JSONDecoder().decode(Self.self, from: data)
     }
 }
+
+extension Dictionary {
+    var jsonStringRepresentation: String {
+        guard let JSONData = try? JSONSerialization.data(
+            withJSONObject: self,
+            options: []
+        ) else {
+            return ""
+        }
+
+        return String(data: JSONData, encoding: .utf8) ?? ""
+    }
+}

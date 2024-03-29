@@ -104,7 +104,7 @@ class MultiComponentAdvancedScreen extends StatelessWidget {
     String paymentMethods,
     BuildContext context,
   ) {
-    final AdvancedCheckout advancedCheckout = AdvancedCheckout(
+    final AdvancedCheckoutPreview advancedCheckout = AdvancedCheckoutPreview(
       onSubmit: googlePayRepository.onSubmit,
       onAdditionalDetails: googlePayRepository.onAdditionalDetails,
     );
@@ -158,7 +158,7 @@ class MultiComponentAdvancedScreen extends StatelessWidget {
       applePayConfiguration: _createApplePayConfiguration(),
     );
 
-    final AdvancedCheckout advancedCheckout = AdvancedCheckout(
+    final AdvancedCheckoutPreview advancedCheckout = AdvancedCheckoutPreview(
       onSubmit: applePayRepository.onSubmit,
       onAdditionalDetails: applePayRepository.onAdditionalDetailsMock,
     );
@@ -210,36 +210,6 @@ class MultiComponentAdvancedScreen extends StatelessWidget {
           label: "Total",
           amount: Config.amount,
           type: ApplePaySummaryItemType.definite,
-        ),
-      ],
-      requiredShippingContactFields: [
-        ApplePayContactField.name,
-        ApplePayContactField.postalAddress,
-      ],
-      shippingContact: ApplePayContact(
-        givenName: "John",
-        familyName: "Doe",
-        addressLines: ["Simon Carmiggeltstraat 6"],
-        postalCode: "1011 DJ",
-        city: "Amsterdam",
-        country: "Netherlands",
-      ),
-      applePayShippingType: ApplePayShippingType.shipping,
-      allowShippingContactEditing: true,
-      shippingMethods: [
-        ApplePayShippingMethod(
-          label: "Standard shipping",
-          detail: "DHL",
-          amount: Amount(value: 1000, currency: "EUR"),
-          identifier: "identifier 1",
-          startDate: DateTime.now().add(const Duration(days: 2)),
-          endDate: DateTime.now().add(const Duration(days: 5)),
-        ),
-        ApplePayShippingMethod(
-          label: "Store pick up",
-          detail: "Weekdays, from 9:00 am to 6:00 pm",
-          amount: Amount(value: 0, currency: "EUR"),
-          identifier: "identifier 2",
         ),
       ],
     );

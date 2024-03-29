@@ -36,7 +36,9 @@ class AdyenApplePayComponent extends StatelessWidget {
       case TargetPlatform.iOS:
         return switch (checkout) {
           SessionCheckout it => _buildApplePaySessionFlowWidget(it),
-          AdvancedCheckout it => _buildApplePayAdvancedFlowWidget(it),
+          AdvancedCheckoutPreview it => _buildApplePayAdvancedFlowWidget(it),
+          AdvancedCheckout _ =>  throw Exception(
+              "Apple pay component does not support the deprecated AdvancedCheckout. Please use AdvancedCheckoutPreview."),
         };
       default:
         throw Exception(
@@ -62,7 +64,7 @@ class AdyenApplePayComponent extends StatelessWidget {
     );
   }
 
-  Widget _buildApplePayAdvancedFlowWidget(AdvancedCheckout advancedCheckout) {
+  Widget _buildApplePayAdvancedFlowWidget(AdvancedCheckoutPreview advancedCheckout) {
     return ApplePayAdvancedComponent(
       key: key,
       applePayPaymentMethod: json.encode(paymentMethod),
