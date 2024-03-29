@@ -60,20 +60,40 @@ class CardAdvancedComponent extends BaseCardComponent {
   }
 
   Future<void> _onSubmit(ComponentCommunicationModel event) async {
-    final PaymentEvent paymentEvent = await _getOnSubmitPaymentEvent(event);
-    final PaymentEventDTO paymentEventDTO =
-        paymentEventHandler.mapToPaymentEventDTO(paymentEvent);
-    ComponentPlatformApi.instance
-        .onPaymentsResult(componentId, paymentEventDTO);
+    try {
+      final PaymentEvent paymentEvent = await _getOnSubmitPaymentEvent(event);
+      final PaymentEventDTO paymentEventDTO =
+          paymentEventHandler.mapToPaymentEventDTO(paymentEvent);
+      ComponentPlatformApi.instance
+          .onPaymentsResult(componentId, paymentEventDTO);
+    } catch (exception) {
+      ComponentPlatformApi.instance.onPaymentsResult(
+        componentId,
+        PaymentEventDTO(
+          paymentEventType: PaymentEventType.error,
+          error: ErrorDTO(errorMessage: exception.toString()),
+        ),
+      );
+    }
   }
 
   Future<void> _onAdditionalDetails(ComponentCommunicationModel event) async {
-    final PaymentEvent paymentEvent =
-        await _getOnAdditionalDetailsPaymentEvent(event);
-    final PaymentEventDTO paymentEventDTO =
-        paymentEventHandler.mapToPaymentEventDTO(paymentEvent);
-    ComponentPlatformApi.instance
-        .onPaymentsDetailsResult(componentId, paymentEventDTO);
+    try {
+      final PaymentEvent paymentEvent =
+          await _getOnAdditionalDetailsPaymentEvent(event);
+      final PaymentEventDTO paymentEventDTO =
+          paymentEventHandler.mapToPaymentEventDTO(paymentEvent);
+      ComponentPlatformApi.instance
+          .onPaymentsDetailsResult(componentId, paymentEventDTO);
+    } catch (exception) {
+      ComponentPlatformApi.instance.onPaymentsResult(
+        componentId,
+        PaymentEventDTO(
+          paymentEventType: PaymentEventType.error,
+          error: ErrorDTO(errorMessage: exception.toString()),
+        ),
+      );
+    }
   }
 
   Future<PaymentEvent> _getOnSubmitPaymentEvent(
