@@ -20,6 +20,8 @@ import com.adyen.checkout.dropin.ErrorDialog
 import com.adyen.checkout.dropin.RecurringDropInServiceResult
 import com.adyen.checkout.flutter.dropIn.model.DropInStoredPaymentMethodDeletionModel
 import com.adyen.checkout.flutter.dropIn.model.DropInType
+import com.adyen.checkout.flutter.utils.Constants
+import com.adyen.checkout.googlepay.GooglePayComponentState
 import org.json.JSONObject
 
 class AdvancedDropInService : DropInService(), LifecycleOwner {
@@ -60,12 +62,19 @@ class AdvancedDropInService : DropInService(), LifecycleOwner {
         }
     }
 
-    private fun onPaymentComponentState(paymentComponentState: PaymentComponentState<*>) {
+    private fun onPaymentComponentState(state: PaymentComponentState<*>) {
         try {
             setAdvancedFlowDropInServiceObserver()
-            val paymentComponentJson =
-                PaymentComponentData.SERIALIZER.serialize(paymentComponentState.data)
-            DropInServiceResultMessenger.sendResult(paymentComponentJson)
+            val data = PaymentComponentData.SERIALIZER.serialize(state.data)
+            val extra = (state as? GooglePayComponentState)?.paymentData?.toJson()
+            val submitData =
+                JSONObject().apply {
+                    put(Constants.GOOGLE_PAY_ADVANCED_PAYMENT_DATA_KEY, data)
+                    extra?.let {
+                        put(Constants.GOOGLE_PAY_ADVANCED_EXTRA_DATA_KEY, JSONObject(it))
+                    }
+                }
+            DropInServiceResultMessenger.sendResult(submitData)
         } catch (exception: Exception) {
             sendResult(
                 DropInServiceResult.Error(
@@ -122,9 +131,9 @@ class AdvancedDropInService : DropInService(), LifecycleOwner {
             // TODO - the error message should be provided by the native SDK
             RecurringDropInServiceResult.Error(
                 errorDialog =
-                    ErrorDialog(
-                        message = "Removal of the stored payment method failed. Please try again later."
-                    )
+                ErrorDialog(
+                    message = "Removal of the stored payment method failed. Please try again later."
+                )
             )
         }
     }
