@@ -96,20 +96,27 @@ class ApplePayAdvancedComponentWrapper: BaseApplePayComponentWrapper {
 extension ApplePayAdvancedComponentWrapper: PaymentComponentDelegate {
 
     internal func didSubmit(_ data: PaymentComponentData, from component: PaymentComponent) {
-        let applePayDetails = data.paymentMethod as? ApplePayDetails
-        let submitData = SubmitData(
-            data: data.jsonObject,
-            extra: applePayDetails?.getExtraData()
-        )
-        let componentCommunicationModel = ComponentCommunicationModel(
-            type: ComponentCommunicationType.onSubmit,
-            componentId: componentId,
-            data: submitData.toJsonObject().jsonStringRepresentation
-        )
-        componentFlutterApi.onComponentCommunication(
-            componentCommunicationModel: componentCommunicationModel,
-            completion: { _ in }
-        )
+        do {
+            let applePayDetails = data.paymentMethod as? ApplePayDetails
+            let submitData = SubmitData(
+                data: data.jsonObject,
+                extra: applePayDetails?.getExtraData()
+            )
+            let submitDataEncoded = try submitData.toJsonString()
+            let componentCommunicationModel = ComponentCommunicationModel(
+                type: ComponentCommunicationType.onSubmit,
+                componentId: componentId,
+                data: submitDataEncoded
+            )
+            componentFlutterApi.onComponentCommunication(
+                componentCommunicationModel: componentCommunicationModel,
+                completion: { _ in }
+            )
+        } catch {
+            finalizeAndDismissComponent(success: false, completion: { [weak self] in
+                self?.sendErrorToFlutterLayer(error: error)
+            })
+        }
     }
 
     internal func didFail(with error: Error, from component: PaymentComponent) {

@@ -10,6 +10,10 @@ internal struct SubmitData {
             Key.extra: extra
         ]
     }
+    
+    func toJsonString() throws -> String {
+        try toJsonObject().toJsonStringRepresentation()
+    }
 
     private enum Key {
         static let data = "data"

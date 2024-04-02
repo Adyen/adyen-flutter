@@ -20,14 +20,15 @@ internal extension Decodable {
 }
 
 extension Dictionary {
-    var jsonStringRepresentation: String {
-        guard let JSONData = try? JSONSerialization.data(
+    func toJsonStringRepresentation() throws -> String {
+        let JSONData = try JSONSerialization.data(
             withJSONObject: self,
             options: []
-        ) else {
-            return ""
+        )
+        guard let encodedString = String(data: JSONData, encoding: .utf8) else {
+            throw PlatformError(errorDescription: "")
         }
 
-        return String(data: JSONData, encoding: .utf8) ?? ""
+        return encodedString
     }
 }
