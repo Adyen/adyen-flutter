@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:adyen_checkout/adyen_checkout.dart';
 import 'package:adyen_checkout/src/drop_in/drop_in_flutter_api.dart';
@@ -80,7 +81,7 @@ class DropIn {
   Future<PaymentResult> startDropInAdvancedFlowPayment(
     DropInConfiguration dropInConfiguration,
     String paymentMethodsResponse,
-    AdvancedCheckout dropInAdvanced,
+    Checkout advancedCheckout,
   ) async {
     adyenLogger.print("Start Drop-in advanced flow");
     final dropInAdvancedFlowCompleter = Completer<PaymentResultDTO>();
@@ -99,10 +100,9 @@ class DropIn {
         .listen((event) async {
       switch (event.type) {
         case PlatformCommunicationType.paymentComponent:
-          await _handlePaymentComponent(event, dropInAdvanced.onSubmit);
+          await _handlePaymentComponent(event, advancedCheckout);
         case PlatformCommunicationType.additionalDetails:
-          await _handleAdditionalDetails(
-              event, dropInAdvanced.onAdditionalDetails);
+          await _handleAdditionalDetails(event, advancedCheckout);
         case PlatformCommunicationType.result:
           _handleResult(dropInAdvancedFlowCompleter, event);
         case PlatformCommunicationType.deleteStoredPaymentMethod:
@@ -142,14 +142,15 @@ class DropIn {
 
   Future<void> _handlePaymentComponent(
     PlatformCommunicationModel event,
-    Future<PaymentEvent> Function(String paymentComponentJson) onSubmit,
+    Checkout advancedCheckout,
   ) async {
     try {
       if (event.data == null) {
         throw Exception("Payment data is not provided.");
       }
 
-      final PaymentEvent paymentEvent = await onSubmit(event.data!);
+      final PaymentEvent paymentEvent =
+          await _getOnSubmitPaymentEvent(event, advancedCheckout);
       PaymentEventDTO paymentEventDTO =
           _paymentEventHandler.mapToPaymentEventDTO(paymentEvent);
       dropInPlatformApi.onPaymentsResult(paymentEventDTO);
@@ -169,14 +170,15 @@ class DropIn {
 
   Future<void> _handleAdditionalDetails(
     PlatformCommunicationModel event,
-    Future<PaymentEvent> Function(String additionalDetails) onAdditionalDetails,
+    Checkout advancedCheckout,
   ) async {
     try {
       if (event.data == null) {
         throw Exception("Additional data is not provided.");
       }
 
-      final PaymentEvent paymentEvent = await onAdditionalDetails(event.data!);
+      final PaymentEvent paymentEvent =
+          await _getOnAdditionalDetailsPaymentEvent(event, advancedCheckout);
       PaymentEventDTO paymentEventDTO =
           _paymentEventHandler.mapToPaymentEventDTO(paymentEvent);
       dropInPlatformApi.onPaymentsDetailsResult(paymentEventDTO);
@@ -218,6 +220,32 @@ class DropIn {
           isSuccessfullyRemoved: false,
         ));
       }
+    }
+  }
+
+  Future<PaymentEvent> _getOnSubmitPaymentEvent(
+      PlatformCommunicationModel event, Checkout advancedCheckout) async {
+    switch (advancedCheckout) {
+      case AdvancedCheckout it:
+        return await it.onSubmit(event.data as String);
+      case AdvancedCheckoutPreview it:
+        final data = jsonDecode(event.data as String);
+        return await it.onSubmit(data);
+      case SessionCheckout():
+        throw Exception("Please use the session card component.");
+    }
+  }
+
+  Future<PaymentEvent> _getOnAdditionalDetailsPaymentEvent(
+      PlatformCommunicationModel event, Checkout advancedCheckout) async {
+    switch (advancedCheckout) {
+      case AdvancedCheckout it:
+        return it.onAdditionalDetails(event.data as String);
+      case AdvancedCheckoutPreview it:
+        final additionalDetails = jsonDecode(event.data as String);
+        return await it.onAdditionalDetails(additionalDetails);
+      case SessionCheckout():
+        throw Exception("Please use the session card component.");
     }
   }
 }

@@ -1,18 +1,22 @@
 import Foundation
 
 internal struct SubmitData {
-    let paymentData: [String: Any]
-    let extraData: [String: Any?]?
+    let data: [String: Any]
+    let extra: [String: Any?]?
 
     func toJsonObject() -> [String: Any?] {
         [
-            Key.paymentData: paymentData,
-            Key.extraData: extraData
+            Key.data: data,
+            Key.extra: extra
         ]
+    }
+    
+    func toJsonString() throws -> String {
+        try toJsonObject().toJsonStringRepresentation()
     }
 
     private enum Key {
-        static let paymentData = "paymentData"
-        static let extraData = "extraData"
+        static let data = "data"
+        static let extra = "extra"
     }
 }

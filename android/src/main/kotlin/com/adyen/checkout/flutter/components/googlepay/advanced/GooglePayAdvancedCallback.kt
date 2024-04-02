@@ -18,11 +18,11 @@ class GooglePayAdvancedCallback(
     override fun onSubmit(state: GooglePayComponentState) {
         onLoadingCallback()
         val data = PaymentComponentData.SERIALIZER.serialize(state.data)
-        val extraData = state.paymentData?.toJson()
+        val extra = state.paymentData?.toJson()
         val submitData =
             JSONObject().apply {
                 put(Constants.GOOGLE_PAY_ADVANCED_PAYMENT_DATA_KEY, data)
-                extraData?.let {
+                extra?.let {
                     put(Constants.GOOGLE_PAY_ADVANCED_EXTRA_DATA_KEY, JSONObject(it))
                 }
             }

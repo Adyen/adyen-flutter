@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:adyen_checkout/adyen_checkout.dart';
 import 'package:adyen_checkout_example/config.dart';
 import 'package:adyen_checkout_example/network/models/amount_network_model.dart';
@@ -64,7 +62,10 @@ class AdyenApplePayComponentRepository extends AdyenBaseRepository {
     ));
   }
 
-  Future<PaymentEvent> onSubmit(String paymentComponentJson) async {
+  Future<PaymentEvent> onSubmit(
+    Map<String, dynamic> data, [
+    Map<String, dynamic>? extra,
+  ]) async {
     String returnUrl = await determineBaseReturnUrl();
     returnUrl += "/applePay";
     PaymentsRequestData paymentsRequestData = PaymentsRequestData(
@@ -90,15 +91,13 @@ class AdyenApplePayComponentRepository extends AdyenBaseRepository {
     );
 
     Map<String, dynamic> mergedJson = <String, dynamic>{};
-    Map<String, dynamic> paymentComponentData =
-        jsonDecode(paymentComponentJson);
-    mergedJson.addAll(paymentComponentData["paymentData"]);
+    mergedJson.addAll(data);
     mergedJson.addAll(paymentsRequestData.toJson());
     final response = await service.postPayments(mergedJson);
     return paymentEventHandler.handleResponse(response);
   }
 
-  Future<PaymentEvent> onAdditionalDetailsMock(String additionalDetailsJson) =>
+  Future<PaymentEvent> onAdditionalDetailsMock(Map<String, dynamic> additionalDetailsJson) =>
       Future.error(
           "Additional details call is not required for the Apple Pay component.");
 }

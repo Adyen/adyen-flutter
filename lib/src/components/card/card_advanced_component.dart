@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:adyen_checkout/adyen_checkout.dart';
 import 'package:adyen_checkout/src/components/card/base_card_component.dart';
@@ -8,7 +9,7 @@ import 'package:adyen_checkout/src/util/constants.dart';
 import 'package:adyen_checkout/src/util/payment_event_handler.dart';
 
 class CardAdvancedComponent extends BaseCardComponent {
-  final AdvancedCheckout advancedCheckout;
+  final Checkout advancedCheckout;
   final PaymentEventHandler paymentEventHandler;
 
   @override
@@ -28,7 +29,7 @@ class CardAdvancedComponent extends BaseCardComponent {
     super.gestureRecognizers,
     super.adyenLogger,
     PaymentEventHandler? paymentEventHandler,
-  })  : paymentEventHandler = paymentEventHandler ?? PaymentEventHandler();
+  }) : paymentEventHandler = paymentEventHandler ?? PaymentEventHandler();
 
   @override
   Map<String, dynamic> get creationParams => <String, dynamic>{
@@ -59,20 +60,65 @@ class CardAdvancedComponent extends BaseCardComponent {
   }
 
   Future<void> _onSubmit(ComponentCommunicationModel event) async {
-    final PaymentEvent paymentEvent =
-        await advancedCheckout.onSubmit(event.data as String);
-    final PaymentEventDTO paymentEventDTO =
-        paymentEventHandler.mapToPaymentEventDTO(paymentEvent);
-    ComponentPlatformApi.instance
-        .onPaymentsResult(componentId, paymentEventDTO);
+    try {
+      final PaymentEvent paymentEvent = await _getOnSubmitPaymentEvent(event);
+      final PaymentEventDTO paymentEventDTO =
+          paymentEventHandler.mapToPaymentEventDTO(paymentEvent);
+      ComponentPlatformApi.instance
+          .onPaymentsResult(componentId, paymentEventDTO);
+    } catch (exception) {
+      ComponentPlatformApi.instance.onPaymentsResult(
+        componentId,
+        PaymentEventDTO(
+          paymentEventType: PaymentEventType.error,
+          error: ErrorDTO(errorMessage: exception.toString()),
+        ),
+      );
+    }
   }
 
   Future<void> _onAdditionalDetails(ComponentCommunicationModel event) async {
-    final PaymentEvent paymentEvent =
-        await advancedCheckout.onAdditionalDetails(event.data as String);
-    final PaymentEventDTO paymentEventDTO =
-        paymentEventHandler.mapToPaymentEventDTO(paymentEvent);
-    ComponentPlatformApi.instance
-        .onPaymentsDetailsResult(componentId, paymentEventDTO);
+    try {
+      final PaymentEvent paymentEvent =
+          await _getOnAdditionalDetailsPaymentEvent(event);
+      final PaymentEventDTO paymentEventDTO =
+          paymentEventHandler.mapToPaymentEventDTO(paymentEvent);
+      ComponentPlatformApi.instance
+          .onPaymentsDetailsResult(componentId, paymentEventDTO);
+    } catch (exception) {
+      ComponentPlatformApi.instance.onPaymentsResult(
+        componentId,
+        PaymentEventDTO(
+          paymentEventType: PaymentEventType.error,
+          error: ErrorDTO(errorMessage: exception.toString()),
+        ),
+      );
+    }
+  }
+
+  Future<PaymentEvent> _getOnSubmitPaymentEvent(
+      ComponentCommunicationModel event) async {
+    switch (advancedCheckout) {
+      case AdvancedCheckout it:
+        return await it.onSubmit(event.data as String);
+      case AdvancedCheckoutPreview it:
+        final data = jsonDecode(event.data as String);
+        return await it.onSubmit(data);
+      case SessionCheckout():
+        throw Exception("Please use the session card component.");
+    }
+  }
+
+  Future<PaymentEvent> _getOnAdditionalDetailsPaymentEvent(
+      ComponentCommunicationModel event) async {
+    switch (advancedCheckout) {
+      case AdvancedCheckout it:
+        return it.onAdditionalDetails(event.data as String);
+      case AdvancedCheckoutPreview it:
+        final additionalDetails = jsonDecode(event.data as String);
+        return await it.onAdditionalDetails(additionalDetails);
+      case SessionCheckout():
+        throw Exception("Please use the session card component.");
+    }
   }
 }

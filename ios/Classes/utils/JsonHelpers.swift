@@ -18,3 +18,17 @@ internal extension Decodable {
         self = try JSONDecoder().decode(Self.self, from: data)
     }
 }
+
+extension Dictionary {
+    func toJsonStringRepresentation() throws -> String {
+        let JSONData = try JSONSerialization.data(
+            withJSONObject: self,
+            options: []
+        )
+        guard let encodedString = String(data: JSONData, encoding: .utf8) else {
+            throw PlatformError(errorDescription: "Unable to encode Json data")
+        }
+
+        return encodedString
+    }
+}

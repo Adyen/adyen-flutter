@@ -4,10 +4,11 @@ import 'package:adyen_checkout/adyen_checkout.dart';
 import 'package:adyen_checkout/src/components/apple_pay/base_apple_pay_component.dart';
 import 'package:adyen_checkout/src/generated/platform_api.g.dart';
 import 'package:adyen_checkout/src/logging/adyen_logger.dart';
+import 'package:adyen_checkout/src/util/constants.dart';
 import 'package:adyen_checkout/src/util/payment_event_handler.dart';
 
 class ApplePayAdvancedComponent extends BaseApplePayComponent {
-  final AdvancedCheckout advancedCheckout;
+  final AdvancedCheckoutPreview advancedCheckout;
   final PaymentEventHandler paymentEventHandler;
 
   @override
@@ -52,9 +53,12 @@ class ApplePayAdvancedComponent extends BaseApplePayComponent {
 
   Future<void> _onSubmit(ComponentCommunicationModel event) async {
     try {
-      final paymentComponentJson = event.data as Map<dynamic, dynamic>;
-      final PaymentEvent paymentEvent =
-          await advancedCheckout.onSubmit(jsonEncode(paymentComponentJson));
+      final String submitData = (event.data as String);
+      final Map<String, dynamic> submitDataDecoded = jsonDecode(submitData);
+      final PaymentEvent paymentEvent = await advancedCheckout.onSubmit(
+        submitDataDecoded[Constants.submitDataKey],
+        submitDataDecoded[Constants.submitExtraKey],
+      );
       final PaymentEventDTO paymentEventDTO =
           paymentEventHandler.mapToPaymentEventDTO(paymentEvent);
       componentPlatformApi.onPaymentsResult(componentId, paymentEventDTO);
