@@ -26,7 +26,7 @@ extension Dictionary {
             options: []
         )
         guard let encodedString = String(data: JSONData, encoding: .utf8) else {
-            throw PlatformError(errorDescription: "")
+            throw PlatformError(errorDescription: "Unable to encode Json data")
         }
 
         return encodedString
