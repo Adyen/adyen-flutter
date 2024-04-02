@@ -97,7 +97,8 @@ class AdyenApplePayComponentRepository extends AdyenBaseRepository {
     return paymentEventHandler.handleResponse(response);
   }
 
-  Future<PaymentEvent> onAdditionalDetailsMock(Map<String, dynamic> additionalDetailsJson) =>
+  Future<PaymentEvent> onAdditionalDetailsMock(
+          Map<String, dynamic> additionalDetailsJson) =>
       Future.error(
           "Additional details call is not required for the Apple Pay component.");
 }

@@ -11,20 +11,27 @@ class DropInAdvancedFlowDelegate: DropInComponentDelegate {
     }
 
     func didSubmit(_ data: PaymentComponentData, from paymentComponent: PaymentComponent, in _: AnyDropInComponent) {
-        isApplePay = paymentComponent is ApplePayComponent
-        let applePayDetails = data.paymentMethod as? ApplePayDetails
-        let submitData = SubmitData(
-            data: data.jsonObject,
-            extra: applePayDetails?.getExtraData()
-        )
-        let platformCommunicationModel = PlatformCommunicationModel(
-            type: PlatformCommunicationType.paymentComponent,
-            data: submitData.toJsonObject().jsonStringRepresentation
-        )
-        dropInFlutterApi.onDropInAdvancedPlatformCommunication(
-            platformCommunicationModel: platformCommunicationModel,
-            completion: { _ in }
-        )
+        do {
+            isApplePay = paymentComponent is ApplePayComponent
+            let applePayDetails = data.paymentMethod as? ApplePayDetails
+            let submitData = SubmitData(
+                data: data.jsonObject,
+                extra: applePayDetails?.getExtraData()
+            )
+            let submitDataEncoded = try submitData.toJsonString()
+            let platformCommunicationModel = PlatformCommunicationModel(
+                type: PlatformCommunicationType.paymentComponent,
+                data: submitDataEncoded
+            )
+            dropInFlutterApi.onDropInAdvancedPlatformCommunication(
+                platformCommunicationModel: platformCommunicationModel,
+                completion: { _ in }
+            )
+        } catch {
+            dropInInteractorDelegate?.finalizeAndDismiss(success: false) { [weak self] in
+                self?.sendErrorToFlutterLayer(error: error)
+            }
+        }
     }
 
     func didProvide(_ data: ActionComponentData, from _: ActionComponent, in _: AnyDropInComponent) {
@@ -40,7 +47,9 @@ class DropInAdvancedFlowDelegate: DropInComponentDelegate {
                 completion: { _ in }
             )
         } catch {
-            sendErrorToFlutterLayer(error: error)
+            dropInInteractorDelegate?.finalizeAndDismiss(success: false) { [weak self] in
+                self?.sendErrorToFlutterLayer(error: error)
+            }
         }
     }
 

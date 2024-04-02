@@ -21,8 +21,8 @@ class MultiComponentNavigationScreen extends StatelessWidget {
               // ),
               TextButton(
                 child: const Text("Multi component advanced"),
-                onPressed: () =>
-                    Navigator.pushNamed(context, "/multiComponentAdvancedScreen"),
+                onPressed: () => Navigator.pushNamed(
+                    context, "/multiComponentAdvancedScreen"),
               ),
             ],
           ),
