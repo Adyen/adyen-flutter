@@ -38,9 +38,8 @@ Adjust your activity to inherit from `FlutterFragmentActivity`:
       // ...
   }
   ```
-#### For card component only:
-
-Declare the intent filter in your `AndroidManifest.xml` file:
+#### For components:
+Declare the intent filter in your `AndroidManifest.xml` file for every component:
   ```xml
     <intent-filter>
         <action android:name="android.intent.action.VIEW" />
@@ -48,7 +47,7 @@ Declare the intent filter in your `AndroidManifest.xml` file:
         <category android:name="android.intent.category.BROWSABLE" />
         <data
             android:host="YOUR_APPLICATION_ID e.g. com.adyen.checkout.flutter.example"
-            android:path="YOUR_CUSTOM_PATH e.g. /card"
+            android:path="YOUR_CUSTOM_PATH e.g. /card or /googlePay"
             android:scheme="adyencheckout" />
     </intent-filter>
   ```
