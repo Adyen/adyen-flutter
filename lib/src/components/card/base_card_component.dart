@@ -76,7 +76,6 @@ class _BaseCardComponentState extends State<BaseCardComponent> {
 
   @override
   void initState() {
-
     _cardWidget = _buildCardWidget();
     _componentCommunicationStream = _componentFlutterApi
         .componentCommunicationStream.stream
