@@ -69,7 +69,7 @@ class MultiComponentAdvancedScreen extends StatelessWidget {
       shopperLocale: Config.shopperLocale,
       cardConfiguration: const CardConfiguration(),
     );
-    final advancedCheckout = AdvancedCheckout(
+    final advancedCheckout = AdvancedCheckoutPreview(
       onSubmit: cardRepository.onSubmit,
       onAdditionalDetails: cardRepository.onAdditionalDetails,
     );

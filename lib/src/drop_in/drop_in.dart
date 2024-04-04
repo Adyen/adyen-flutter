@@ -6,6 +6,7 @@ import 'package:adyen_checkout/src/drop_in/drop_in_flutter_api.dart';
 import 'package:adyen_checkout/src/drop_in/drop_in_platform_api.dart';
 import 'package:adyen_checkout/src/generated/platform_api.g.dart';
 import 'package:adyen_checkout/src/logging/adyen_logger.dart';
+import 'package:adyen_checkout/src/util/constants.dart';
 import 'package:adyen_checkout/src/util/dto_mapper.dart';
 import 'package:adyen_checkout/src/util/payment_event_handler.dart';
 import 'package:adyen_checkout/src/util/sdk_version_number_provider.dart';
@@ -225,12 +226,20 @@ class DropIn {
 
   Future<PaymentEvent> _getOnSubmitPaymentEvent(
       PlatformCommunicationModel event, Checkout advancedCheckout) async {
+    final String submitData = (event.data as String);
+    final Map<String, dynamic> submitDataDecoded = jsonDecode(submitData);
     switch (advancedCheckout) {
       case AdvancedCheckout it:
-        return await it.onSubmit(event.data as String);
+        final paymentData = submitDataDecoded[Constants.submitDataKey];
+        final paymentDataEncoded = jsonEncode(paymentData);
+        final PaymentEvent paymentEvent = await it.onSubmit(paymentDataEncoded);
+        return paymentEvent;
       case AdvancedCheckoutPreview it:
-        final data = jsonDecode(event.data as String);
-        return await it.onSubmit(data);
+        final PaymentEvent paymentEvent = await it.onSubmit(
+          submitDataDecoded[Constants.submitDataKey],
+          submitDataDecoded[Constants.submitExtraKey],
+        );
+        return paymentEvent;
       case SessionCheckout():
         throw Exception("Please use the session card component.");
     }

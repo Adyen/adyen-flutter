@@ -12,35 +12,25 @@ class DropInAdvancedFlowDelegate: DropInComponentDelegate {
 
     func didSubmit(_ data: PaymentComponentData, from paymentComponent: PaymentComponent, in _: AnyDropInComponent) {
         do {
-            let paymentComponentData = PaymentComponentDataResponse(
-                amount: data.amount,
-                paymentMethod: data.paymentMethod.encodable,
-                storePaymentMethod: data.storePaymentMethod,
-                order: data.order,
-                amountToPay: data.order?.remainingAmount,
-                installments: data.installments,
-                shopperName: data.shopperName,
-                emailAddress: data.emailAddress,
-                telephoneNumber: data.telephoneNumber,
-                browserInfo: data.browserInfo,
-                checkoutAttemptId: data.checkoutAttemptId,
-                billingAddress: data.billingAddress,
-                deliveryAddress: data.deliveryAddress,
-                socialSecurityNumber: data.socialSecurityNumber,
-                delegatedAuthenticationData: data.delegatedAuthenticationData
-            )
-            let paymentComponentJson = try JSONEncoder().encode(paymentComponentData)
-            let paymentComponentString = String(data: paymentComponentJson, encoding: .utf8)
             isApplePay = paymentComponent is ApplePayComponent
+            let applePayDetails = data.paymentMethod as? ApplePayDetails
+            let submitData = SubmitData(
+                data: data.jsonObject,
+                extra: applePayDetails?.getExtraData()
+            )
+            let submitDataEncoded = try submitData.toJsonString()
+            let platformCommunicationModel = PlatformCommunicationModel(
+                type: PlatformCommunicationType.paymentComponent,
+                data: submitDataEncoded
+            )
             dropInFlutterApi.onDropInAdvancedPlatformCommunication(
-                platformCommunicationModel: PlatformCommunicationModel(
-                    type: PlatformCommunicationType.paymentComponent,
-                    data: paymentComponentString
-                ),
+                platformCommunicationModel: platformCommunicationModel,
                 completion: { _ in }
             )
         } catch {
-            sendErrorToFlutterLayer(error: error)
+            dropInInteractorDelegate?.finalizeAndDismiss(success: false) { [weak self] in
+                self?.sendErrorToFlutterLayer(error: error)
+            }
         }
     }
 
@@ -57,7 +47,9 @@ class DropInAdvancedFlowDelegate: DropInComponentDelegate {
                 completion: { _ in }
             )
         } catch {
-            sendErrorToFlutterLayer(error: error)
+            dropInInteractorDelegate?.finalizeAndDismiss(success: false) { [weak self] in
+                self?.sendErrorToFlutterLayer(error: error)
+            }
         }
     }
 
