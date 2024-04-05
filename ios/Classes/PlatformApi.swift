@@ -337,7 +337,6 @@ struct ApplePayConfigurationDTO {
     var merchantName: String
     var allowOnboarding: Bool?
     var summaryItems: [ApplePaySummaryItemDTO?]?
-    var supportedNetworks: [String?]?
     var requiredBillingContactFields: [String?]?
     var billingContact: ApplePayContactDTO?
     var requiredShippingContactFields: [String?]?
@@ -354,28 +353,27 @@ struct ApplePayConfigurationDTO {
         let merchantName = list[1] as! String
         let allowOnboarding: Bool? = nilOrValue(list[2])
         let summaryItems: [ApplePaySummaryItemDTO?]? = nilOrValue(list[3])
-        let supportedNetworks: [String?]? = nilOrValue(list[4])
-        let requiredBillingContactFields: [String?]? = nilOrValue(list[5])
+        let requiredBillingContactFields: [String?]? = nilOrValue(list[4])
         var billingContact: ApplePayContactDTO?
-        if let billingContactList: [Any?] = nilOrValue(list[6]) {
+        if let billingContactList: [Any?] = nilOrValue(list[5]) {
             billingContact = ApplePayContactDTO.fromList(billingContactList)
         }
-        let requiredShippingContactFields: [String?]? = nilOrValue(list[7])
+        let requiredShippingContactFields: [String?]? = nilOrValue(list[6])
         var shippingContact: ApplePayContactDTO?
-        if let shippingContactList: [Any?] = nilOrValue(list[8]) {
+        if let shippingContactList: [Any?] = nilOrValue(list[7]) {
             shippingContact = ApplePayContactDTO.fromList(shippingContactList)
         }
         var applePayShippingType: ApplePayShippingType?
-        let applePayShippingTypeEnumVal: Int? = nilOrValue(list[9])
+        let applePayShippingTypeEnumVal: Int? = nilOrValue(list[8])
         if let applePayShippingTypeRawValue = applePayShippingTypeEnumVal {
             applePayShippingType = ApplePayShippingType(rawValue: applePayShippingTypeRawValue)!
         }
-        let allowShippingContactEditing: Bool? = nilOrValue(list[10])
-        let shippingMethods: [ApplePayShippingMethodDTO?]? = nilOrValue(list[11])
-        let applicationData: String? = nilOrValue(list[12])
-        let supportedCountries: [String?]? = nilOrValue(list[13])
+        let allowShippingContactEditing: Bool? = nilOrValue(list[9])
+        let shippingMethods: [ApplePayShippingMethodDTO?]? = nilOrValue(list[10])
+        let applicationData: String? = nilOrValue(list[11])
+        let supportedCountries: [String?]? = nilOrValue(list[12])
         var merchantCapability: ApplePayMerchantCapability?
-        let merchantCapabilityEnumVal: Int? = nilOrValue(list[14])
+        let merchantCapabilityEnumVal: Int? = nilOrValue(list[13])
         if let merchantCapabilityRawValue = merchantCapabilityEnumVal {
             merchantCapability = ApplePayMerchantCapability(rawValue: merchantCapabilityRawValue)!
         }
@@ -385,7 +383,6 @@ struct ApplePayConfigurationDTO {
             merchantName: merchantName,
             allowOnboarding: allowOnboarding,
             summaryItems: summaryItems,
-            supportedNetworks: supportedNetworks,
             requiredBillingContactFields: requiredBillingContactFields,
             billingContact: billingContact,
             requiredShippingContactFields: requiredShippingContactFields,
@@ -405,7 +402,6 @@ struct ApplePayConfigurationDTO {
             merchantName,
             allowOnboarding,
             summaryItems,
-            supportedNetworks,
             requiredBillingContactFields,
             billingContact?.toList(),
             requiredShippingContactFields,

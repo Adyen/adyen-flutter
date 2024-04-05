@@ -81,7 +81,6 @@ extension ApplePayConfigurationMapper on ApplePayConfiguration {
         summaryItems: applePaySummaryItems
             ?.map((applePaySummaryItem) => applePaySummaryItem.toDTO())
             .toList(),
-        supportedNetworks: supportedNetworks,
         requiredBillingContactFields: requiredBillingContactFields
             ?.map((billingContactField) => billingContactField.name)
             .toList(),

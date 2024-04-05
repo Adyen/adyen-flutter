@@ -352,7 +352,6 @@ class ApplePayConfigurationDTO {
     required this.merchantName,
     this.allowOnboarding,
     this.summaryItems,
-    this.supportedNetworks,
     this.requiredBillingContactFields,
     this.billingContact,
     this.requiredShippingContactFields,
@@ -372,8 +371,6 @@ class ApplePayConfigurationDTO {
   bool? allowOnboarding;
 
   List<ApplePaySummaryItemDTO?>? summaryItems;
-
-  List<String?>? supportedNetworks;
 
   List<String?>? requiredBillingContactFields;
 
@@ -401,7 +398,6 @@ class ApplePayConfigurationDTO {
       merchantName,
       allowOnboarding,
       summaryItems,
-      supportedNetworks,
       requiredBillingContactFields,
       billingContact?.encode(),
       requiredShippingContactFields,
@@ -423,27 +419,26 @@ class ApplePayConfigurationDTO {
       allowOnboarding: result[2] as bool?,
       summaryItems:
           (result[3] as List<Object?>?)?.cast<ApplePaySummaryItemDTO?>(),
-      supportedNetworks: (result[4] as List<Object?>?)?.cast<String?>(),
       requiredBillingContactFields:
-          (result[5] as List<Object?>?)?.cast<String?>(),
-      billingContact: result[6] != null
-          ? ApplePayContactDTO.decode(result[6]! as List<Object?>)
+          (result[4] as List<Object?>?)?.cast<String?>(),
+      billingContact: result[5] != null
+          ? ApplePayContactDTO.decode(result[5]! as List<Object?>)
           : null,
       requiredShippingContactFields:
-          (result[7] as List<Object?>?)?.cast<String?>(),
-      shippingContact: result[8] != null
-          ? ApplePayContactDTO.decode(result[8]! as List<Object?>)
+          (result[6] as List<Object?>?)?.cast<String?>(),
+      shippingContact: result[7] != null
+          ? ApplePayContactDTO.decode(result[7]! as List<Object?>)
           : null,
-      applePayShippingType: result[9] != null
-          ? ApplePayShippingType.values[result[9]! as int]
+      applePayShippingType: result[8] != null
+          ? ApplePayShippingType.values[result[8]! as int]
           : null,
-      allowShippingContactEditing: result[10] as bool?,
+      allowShippingContactEditing: result[9] as bool?,
       shippingMethods:
-          (result[11] as List<Object?>?)?.cast<ApplePayShippingMethodDTO?>(),
-      applicationData: result[12] as String?,
-      supportedCountries: (result[13] as List<Object?>?)?.cast<String?>(),
-      merchantCapability: result[14] != null
-          ? ApplePayMerchantCapability.values[result[14]! as int]
+          (result[10] as List<Object?>?)?.cast<ApplePayShippingMethodDTO?>(),
+      applicationData: result[11] as String?,
+      supportedCountries: (result[12] as List<Object?>?)?.cast<String?>(),
+      merchantCapability: result[13] != null
+          ? ApplePayMerchantCapability.values[result[13]! as int]
           : null,
     );
   }

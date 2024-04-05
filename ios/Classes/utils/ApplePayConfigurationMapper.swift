@@ -29,11 +29,6 @@ extension ApplePayConfigurationDTO {
             }
         }
         
-        supportedNetworks.map {
-            let supportedNetworksNonNil: [String] = $0.compactMap { $0 }
-            paymentRequest.supportedNetworks = mapToSupportedNetworks(supportedNetworks: supportedNetworksNonNil)
-        }
-        
         applicationData.map { paymentRequest.applicationData = Data($0.utf8) }
         return paymentRequest
     }
@@ -61,11 +56,6 @@ extension ApplePayConfigurationDTO {
     private func mapToContactFields(contactFields: [String?]) -> Set<PKContactField> {
         let contactFieldsNonNil: [String] = contactFields.compactMap { $0 }
         return Set<PKContactField>(contactFieldsNonNil.compactMap { PKContactField.fromString($0) })
-    }
-    
-    private func mapToSupportedNetworks(supportedNetworks: [String]) -> [PKPaymentNetwork] {
-        let networks = PKPaymentRequest.availableNetworks()
-        return networks.filter { supportedNetworks.contains($0.txVariantName) }
     }
     
     private func mapToPaymentSummaryItems(summaryItems: [ApplePaySummaryItemDTO?]?, amount: AmountDTO) throws -> [PKPaymentSummaryItem] {
