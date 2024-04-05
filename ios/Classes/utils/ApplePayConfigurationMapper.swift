@@ -29,11 +29,6 @@ extension ApplePayConfigurationDTO {
             }
         }
         
-        supportedNetworks.map {
-            let supportedNetworksNonNil: [String] = $0.compactMap { $0 }
-            paymentRequest.supportedNetworks = mapToSupportedNetworks(supportedNetworks: supportedNetworksNonNil)
-        }
-        
         applicationData.map { paymentRequest.applicationData = Data($0.utf8) }
         return paymentRequest
     }

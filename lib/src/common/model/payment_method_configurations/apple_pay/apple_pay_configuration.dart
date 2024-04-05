@@ -9,7 +9,6 @@ class ApplePayConfiguration {
   final String merchantName;
   final bool? allowOnboarding;
   final List<ApplePaySummaryItem>? applePaySummaryItems;
-  final List<String>? supportedNetworks;
   final List<ApplePayContactField>? requiredBillingContactFields;
   final ApplePayContact? billingContact;
   final List<ApplePayContactField>? requiredShippingContactFields;
@@ -26,7 +25,6 @@ class ApplePayConfiguration {
     required this.merchantName,
     this.allowOnboarding,
     this.applePaySummaryItems,
-    this.supportedNetworks,
     this.requiredBillingContactFields,
     this.billingContact,
     this.requiredShippingContactFields,

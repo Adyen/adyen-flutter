@@ -403,7 +403,6 @@ data class ApplePayConfigurationDTO (
   val merchantName: String,
   val allowOnboarding: Boolean? = null,
   val summaryItems: List<ApplePaySummaryItemDTO?>? = null,
-  val supportedNetworks: List<String?>? = null,
   val requiredBillingContactFields: List<String?>? = null,
   val billingContact: ApplePayContactDTO? = null,
   val requiredShippingContactFields: List<String?>? = null,
@@ -423,26 +422,25 @@ data class ApplePayConfigurationDTO (
       val merchantName = list[1] as String
       val allowOnboarding = list[2] as Boolean?
       val summaryItems = list[3] as List<ApplePaySummaryItemDTO?>?
-      val supportedNetworks = list[4] as List<String?>?
-      val requiredBillingContactFields = list[5] as List<String?>?
-      val billingContact: ApplePayContactDTO? = (list[6] as List<Any?>?)?.let {
+      val requiredBillingContactFields = list[4] as List<String?>?
+      val billingContact: ApplePayContactDTO? = (list[5] as List<Any?>?)?.let {
         ApplePayContactDTO.fromList(it)
       }
-      val requiredShippingContactFields = list[7] as List<String?>?
-      val shippingContact: ApplePayContactDTO? = (list[8] as List<Any?>?)?.let {
+      val requiredShippingContactFields = list[6] as List<String?>?
+      val shippingContact: ApplePayContactDTO? = (list[7] as List<Any?>?)?.let {
         ApplePayContactDTO.fromList(it)
       }
-      val applePayShippingType: ApplePayShippingType? = (list[9] as Int?)?.let {
+      val applePayShippingType: ApplePayShippingType? = (list[8] as Int?)?.let {
         ApplePayShippingType.ofRaw(it)
       }
-      val allowShippingContactEditing = list[10] as Boolean?
-      val shippingMethods = list[11] as List<ApplePayShippingMethodDTO?>?
-      val applicationData = list[12] as String?
-      val supportedCountries = list[13] as List<String?>?
-      val merchantCapability: ApplePayMerchantCapability? = (list[14] as Int?)?.let {
+      val allowShippingContactEditing = list[9] as Boolean?
+      val shippingMethods = list[10] as List<ApplePayShippingMethodDTO?>?
+      val applicationData = list[11] as String?
+      val supportedCountries = list[12] as List<String?>?
+      val merchantCapability: ApplePayMerchantCapability? = (list[13] as Int?)?.let {
         ApplePayMerchantCapability.ofRaw(it)
       }
-      return ApplePayConfigurationDTO(merchantId, merchantName, allowOnboarding, summaryItems, supportedNetworks, requiredBillingContactFields, billingContact, requiredShippingContactFields, shippingContact, applePayShippingType, allowShippingContactEditing, shippingMethods, applicationData, supportedCountries, merchantCapability)
+      return ApplePayConfigurationDTO(merchantId, merchantName, allowOnboarding, summaryItems, requiredBillingContactFields, billingContact, requiredShippingContactFields, shippingContact, applePayShippingType, allowShippingContactEditing, shippingMethods, applicationData, supportedCountries, merchantCapability)
     }
   }
   fun toList(): List<Any?> {
@@ -451,7 +449,6 @@ data class ApplePayConfigurationDTO (
       merchantName,
       allowOnboarding,
       summaryItems,
-      supportedNetworks,
       requiredBillingContactFields,
       billingContact?.toList(),
       requiredShippingContactFields,

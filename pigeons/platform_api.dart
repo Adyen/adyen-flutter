@@ -192,7 +192,6 @@ class ApplePayConfigurationDTO {
   final String merchantName;
   final bool? allowOnboarding;
   final List<ApplePaySummaryItemDTO?>? summaryItems;
-  final List<String?>? supportedNetworks;
   final List<String?>? requiredBillingContactFields;
   final ApplePayContactDTO? billingContact;
   final List<String?>? requiredShippingContactFields;
@@ -209,7 +208,6 @@ class ApplePayConfigurationDTO {
     this.merchantName,
     this.allowOnboarding,
     this.summaryItems,
-    this.supportedNetworks,
     this.requiredBillingContactFields,
     this.billingContact,
     this.requiredShippingContactFields,
