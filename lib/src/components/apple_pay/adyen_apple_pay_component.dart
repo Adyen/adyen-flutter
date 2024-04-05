@@ -17,6 +17,8 @@ class AdyenApplePayComponent extends StatelessWidget {
   final Function()? onUnavailable;
   final Widget? unavailableWidget;
   final Widget? loadingIndicator;
+  final double? width;
+  final double? height;
 
   const AdyenApplePayComponent({
     super.key,
@@ -28,6 +30,8 @@ class AdyenApplePayComponent extends StatelessWidget {
     this.onUnavailable,
     this.unavailableWidget,
     this.loadingIndicator,
+    this.width,
+    this.height,
   });
 
   @override
@@ -84,7 +88,7 @@ class AdyenApplePayComponent extends StatelessWidget {
   }
 
   double _determineWidth() {
-    final width = style?.width ?? pay_sdk.RawApplePayButton.minimumButtonWidth;
+    final width = this.width ?? pay_sdk.RawApplePayButton.minimumButtonWidth;
     if (width > pay_sdk.RawApplePayButton.minimumButtonWidth) {
       return width;
     }
@@ -93,8 +97,7 @@ class AdyenApplePayComponent extends StatelessWidget {
   }
 
   double _determineHeight() {
-    final height =
-        style?.height ?? pay_sdk.RawApplePayButton.minimumButtonHeight;
+    final height = this.height ?? pay_sdk.RawApplePayButton.minimumButtonHeight;
     if (height > pay_sdk.RawApplePayButton.minimumButtonHeight) {
       return height;
     }

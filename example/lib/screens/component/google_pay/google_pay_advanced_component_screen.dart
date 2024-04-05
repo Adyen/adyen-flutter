@@ -59,7 +59,6 @@ class GooglePayAdvancedComponentScreen extends StatelessWidget {
               GooglePayButtonStyle(
             theme: GooglePayButtonTheme.light,
             type: GooglePayButtonType.buy,
-            width: 250,
             cornerRadius: 4,
           );
 
@@ -79,6 +78,7 @@ class GooglePayAdvancedComponentScreen extends StatelessWidget {
                 checkout: advancedCheckout,
                 style: googlePayButtonStyle,
                 loadingIndicator: const CircularProgressIndicator(),
+                width: 250,
                 onPaymentResult: (paymentResult) {
                   Navigator.pop(context);
                   _dialogBuilder(paymentResult, context);

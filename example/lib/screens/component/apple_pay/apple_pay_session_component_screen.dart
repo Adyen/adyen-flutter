@@ -65,10 +65,8 @@ class ApplePaySessionComponentScreen extends StatelessWidget {
                 paymentMethod: paymentMethod,
                 checkout: sessionCheckout,
                 loadingIndicator: const CircularProgressIndicator(),
-                style: ApplePayButtonStyle(
-                  width: 200,
-                  height: 48,
-                ),
+                width: 200,
+                height: 48,
                 onPaymentResult: (paymentResult) {
                   Navigator.pop(context);
                   _dialogBuilder(paymentResult, context);
