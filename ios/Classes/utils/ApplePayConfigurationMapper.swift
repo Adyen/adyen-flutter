@@ -58,11 +58,6 @@ extension ApplePayConfigurationDTO {
         return Set<PKContactField>(contactFieldsNonNil.compactMap { PKContactField.fromString($0) })
     }
     
-    private func mapToSupportedNetworks(supportedNetworks: [String]) -> [PKPaymentNetwork] {
-        let networks = PKPaymentRequest.availableNetworks()
-        return networks.filter { supportedNetworks.contains($0.txVariantName) }
-    }
-    
     private func mapToPaymentSummaryItems(summaryItems: [ApplePaySummaryItemDTO?]?, amount: AmountDTO) throws -> [PKPaymentSummaryItem] {
         guard let summaryItems else {
             let formattedAmount = try amount.toFormattedAmount()
