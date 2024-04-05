@@ -123,7 +123,6 @@ class MultiComponentAdvancedScreen extends StatelessWidget {
     final GooglePayButtonStyle googlePayButtonStyle = GooglePayButtonStyle(
       theme: GooglePayButtonTheme.dark,
       type: GooglePayButtonType.buy,
-      width: double.infinity,
       cornerRadius: 4,
     );
 
@@ -137,6 +136,7 @@ class MultiComponentAdvancedScreen extends StatelessWidget {
         checkout: advancedCheckout,
         style: googlePayButtonStyle,
         loadingIndicator: const CircularProgressIndicator(),
+        width: double.infinity,
         onPaymentResult: (paymentResult) {
           Navigator.pop(context);
           _dialogBuilder(context, paymentResult);
@@ -174,9 +174,9 @@ class MultiComponentAdvancedScreen extends StatelessWidget {
         style: ApplePayButtonStyle(
           theme: ApplePayButtonTheme.black,
           type: ApplePayButtonType.buy,
-          width: double.infinity,
-          height: 56,
         ),
+        width: double.infinity,
+        height: 56,
         onPaymentResult: (paymentResult) {
           Navigator.pop(context);
           _dialogBuilder(context, paymentResult);

@@ -17,6 +17,8 @@ class AdyenGooglePayComponent extends StatelessWidget {
   final Function()? onUnavailable;
   final Widget? unavailableWidget;
   final Widget? loadingIndicator;
+  final double? width;
+  final double? height;
 
   const AdyenGooglePayComponent({
     super.key,
@@ -28,6 +30,8 @@ class AdyenGooglePayComponent extends StatelessWidget {
     this.onUnavailable,
     this.unavailableWidget,
     this.loadingIndicator,
+    this.width,
+    this.height,
   });
 
   @override
@@ -89,7 +93,7 @@ class AdyenGooglePayComponent extends StatelessWidget {
 
   double _determineWidth() {
     final width =
-        style?.width ?? google_pay_sdk.RawGooglePayButton.minimumButtonWidth;
+        this.width ?? google_pay_sdk.RawGooglePayButton.minimumButtonWidth;
     if (width > google_pay_sdk.RawGooglePayButton.minimumButtonWidth) {
       return width;
     }
@@ -99,7 +103,7 @@ class AdyenGooglePayComponent extends StatelessWidget {
 
   double _determineHeight() {
     final height =
-        style?.height ?? google_pay_sdk.RawGooglePayButton.defaultButtonHeight;
+        this.height ?? google_pay_sdk.RawGooglePayButton.defaultButtonHeight;
     if (height > google_pay_sdk.RawGooglePayButton.defaultButtonHeight) {
       return height;
     }

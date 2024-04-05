@@ -70,9 +70,9 @@ class ApplePayAdvancedComponentScreen extends StatelessWidget {
                 style: ApplePayButtonStyle(
                   theme: ApplePayButtonTheme.whiteOutline,
                   type: ApplePayButtonType.book,
-                  width: 300,
-                  height: 56,
                 ),
+                width: 300,
+                height: 56,
                 onPaymentResult: (paymentResult) {
                   Navigator.pop(context);
                   _dialogBuilder(paymentResult, context);
