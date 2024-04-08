@@ -35,7 +35,7 @@ class GooglePaySessionsComponentScreen extends StatelessWidget {
   Widget _buildAdyenGooglePaySessionComponent() {
     final GooglePayComponentConfiguration googlePayComponentConfiguration =
         GooglePayComponentConfiguration(
-      environment: Environment.test,
+      environment: Config.environment,
       clientKey: Config.clientKey,
       countryCode: Config.countryCode,
       amount: Config.amount,

@@ -111,7 +111,7 @@ class MultiComponentAdvancedScreen extends StatelessWidget {
 
     final GooglePayComponentConfiguration googlePayComponentConfiguration =
         GooglePayComponentConfiguration(
-      environment: Environment.test,
+      environment: Config.environment,
       clientKey: Config.clientKey,
       countryCode: Config.countryCode,
       amount: Config.amount,
@@ -151,7 +151,7 @@ class MultiComponentAdvancedScreen extends StatelessWidget {
   ) {
     final ApplePayComponentConfiguration applePayComponentConfiguration =
         ApplePayComponentConfiguration(
-      environment: Environment.test,
+      environment: Config.environment,
       clientKey: Config.clientKey,
       countryCode: Config.countryCode,
       amount: Config.amount,

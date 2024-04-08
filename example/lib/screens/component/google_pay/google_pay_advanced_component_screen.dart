@@ -45,7 +45,7 @@ class GooglePayAdvancedComponentScreen extends StatelessWidget {
 
           final GooglePayComponentConfiguration
               googlePayComponentConfiguration = GooglePayComponentConfiguration(
-            environment: Environment.test,
+            environment: Config.environment,
             clientKey: Config.clientKey,
             countryCode: Config.countryCode,
             amount: Config.amount,
