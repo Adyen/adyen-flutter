@@ -3,9 +3,9 @@
 * ⚠ Introduced the AdvancedCheckoutPreview as a replacement for the AdvancedCheckout. Please
   consider using it as we plan to replace the deprecated AdvancedCheckout in the first beta
   release.
-* Added Google Pay component.
-* Added Apple Pay component.
-* Added support for optional configuration for Apple Pay and Google Pay (Drop-in and components).
+* Added Google Pay Component.
+* Added Apple Pay Component.
+* Added support for optional configuration for Apple Pay and Google Pay (Drop-in and Components).
 * Updated minimum supported SDK version to Flutter 3.10.6/Dart 3.0.6.
 
 ## 0.0.2
