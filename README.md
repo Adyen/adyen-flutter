@@ -6,12 +6,14 @@
 
 The Adyen Flutter package provides you with the building blocks to create a seamless checkout experience for your Android and iOS Flutter app.
 
-You can integrate in several ways:
+You can integrate in two ways:
 
 - Drop-in: An out-of-the-box solution that includes all available payment methods for shoppers to choose. This wrapper for the native iOS and Android Adyen Drop-in is the quickest way to accept payments in your app.
-- Card Component: A dedicated card widget for shoppers to pay with a card. This is a wrapper for the native iOS and Android Adyen Card Components.
-- Google Pay Component: A widget that renders a Google Pay button.
-- Apple Pay Component: A widget that renders an Apple Pay button.  
+- Standalone Components:
+  - Card Component: A card widget for shoppers to pay with a card. The Card Component also supports stored cards.
+  - Google Pay Component: A widget that renders a Google Pay button.
+  - Apple Pay Component: A widget that renders an Apple Pay button.  
+  
 
 |                                                             Android                                                              |                                                                iOS                                                                |
 |:--------------------------------------------------------------------------------------------------------------------------------:|:---------------------------------------------------------------------------------------------------------------------------------:|
@@ -25,12 +27,11 @@ You can integrate in several ways:
 4. [Set up your webhooks](https://docs.adyen.com/development-resources/webhooks/) to get the payment outcome.
 
 
-##  Install the package
+## Install the package
 
 ### Android integration
 This package supports Android 5.0 or later.
 
-#### For Drop-in and Components:
 
 Adjust your activity to inherit from `FlutterFragmentActivity`:
   ```kotlin
@@ -40,7 +41,7 @@ Adjust your activity to inherit from `FlutterFragmentActivity`:
       // ...
   }
   ```
-#### For Components:
+#### For Components
 Declare the intent filter in your `AndroidManifest.xml` file for every component you are using:
   ```xml
     <intent-filter>
@@ -74,7 +75,7 @@ Voucher payment methods require a photo library usage description. Add them to t
 
 
 #### For Apple Pay (Drop-in or Component)
-In your Runner target, add Apple Pay as a capability and enter your merchant id. 
+In your Runner target, add Apple Pay as a capability and enter your merchant id. For more information on how to enable Apple Pay, please visit our [docs page](https://docs.adyen.com/payment-methods/apple-pay/enable-apple-pay/). 
 
 
 ##  How it works
@@ -84,7 +85,7 @@ You can use Adyen Flutter with either of our [server-side flows](https://docs.ad
 - Advanced flow
   
 You must use [Checkout API](https://docs.adyen.com/api-explorer/Checkout/latest/overview) v71 or later.
-### Drop-in with Sessions flow:
+### Drop-in with Sessions flow
 
 1.  From your backend, make a [`/sessions`](https://docs.adyen.com/api-explorer/Checkout/71/post/sessions) request.
 
@@ -133,7 +134,7 @@ final PaymentResult paymentResult =  await AdyenCheckout.session.startDropIn(
    For a successful payment, the event contains `success`: **true**.
 
 
-### Drop-in with Advanced flow:
+### Drop-in with Advanced flow
 
 1. From your backend, make a [`/paymentMethods`](https://docs.adyen.com/api-explorer/Checkout/71/post/paymentMethods) request.
 2. Create the `DropInConfiguration`. It also supports optional payment method configurations.
@@ -178,7 +179,7 @@ For a successful payment, the event contains `success`: **true**.
 
 <br>
 
-### Card Component with Sessions flow:
+### Card Component with Sessions flow
 1. From your backend, make a [`sessions`](https://docs.adyen.com/api-explorer/Checkout/71/post/sessions) request. The response contains:
 - `sessionData`: the payment session data.
 - `id`: a unique identifier for the session data.
@@ -219,7 +220,7 @@ AdyenCardComponent(
 ``` 
 <br>
 
-### Card Component with Advanced flow:
+### Card Component with Advanced flow
 
 1. From your server, make a [`/paymentMethods`](https://docs.adyen.com/api-explorer/Checkout/71/post/paymentMethods) request.
 2. Get the card payment method from the payment methods list.
@@ -258,7 +259,7 @@ AdyenCardComponent(
 ``` 
 <br>
 
-### Apple Pay Component with Sessions flow:
+### Apple Pay Component with Sessions flow
 1. From your backend, make a [`sessions`](https://docs.adyen.com/api-explorer/Checkout/71/post/sessions) request. The response contains:
 - `sessionData`: the payment session data.
 - `id`: a unique identifier for the session data.
@@ -306,7 +307,7 @@ AdyenApplePayComponent(
 ``` 
 <br>
 
-### Apple Pay Component with Advanced flow:
+### Apple Pay Component with Advanced flow
 
 1. From your backend, make a [`/paymentMethods`](https://docs.adyen.com/api-explorer/Checkout/71/post/paymentMethods) request.
 2. Get the Apple Pay payment method by filtering the payment methods list.
@@ -353,7 +354,7 @@ AdyenApplePayComponent(
 ``` 
 <br>
 
-### Google Pay Component with Sessions flow:
+### Google Pay Component with Sessions flow
 1. From your backend, make a [`sessions`](https://docs.adyen.com/api-explorer/Checkout/71/post/sessions) request. The response contains:
 - `sessionData`: the payment session data.
 - `id`: a unique identifier for the session data.
@@ -399,7 +400,7 @@ AdyenGooglePayComponent(
 ``` 
 </p>
 
-### Google Pay Component with Advanced flow:
+### Google Pay Component with Advanced flow
 
 1. From your backend, make a [`/paymentMethods`](https://docs.adyen.com/api-explorer/Checkout/71/post/paymentMethods) request.
 2. Get the Google Pay payment method by filtering the payment methods list.
@@ -444,6 +445,12 @@ final AdvancedCheckoutPreview advancedCheckout = AdvancedCheckoutPreview(
   },
 ),
 ``` 
+
+</p>
+
+### Multi Component setup
+
+The SDK currently supports component combination in the advanced flow only. By using this flow, you can use the card component together with the Google Pay or Apple Pay component.
 
 ## Support
 
