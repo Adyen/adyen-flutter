@@ -75,5 +75,4 @@ configurations {
 
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-    debugImplementation 'com.squareup.leakcanary:leakcanary-android:3.0-alpha-1'
 }

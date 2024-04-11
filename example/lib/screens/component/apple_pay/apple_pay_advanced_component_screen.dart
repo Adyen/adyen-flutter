@@ -37,7 +37,7 @@ class ApplePayAdvancedComponentScreen extends StatelessWidget {
   Widget _buildAdyenApplePayAdvancedComponent() {
     final ApplePayComponentConfiguration applePayComponentConfiguration =
         ApplePayComponentConfiguration(
-      environment: Environment.test,
+      environment: Config.environment,
       clientKey: Config.clientKey,
       countryCode: Config.countryCode,
       amount: Config.amount,
