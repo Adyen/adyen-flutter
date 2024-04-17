@@ -4,26 +4,14 @@ import UIKit
 
 public class AdyenCheckoutPlugin: NSObject, FlutterPlugin {
     public static func register(with registrar: FlutterPluginRegistrar) {
-        let sessionHolder = SessionHolder()
         let messenger: FlutterBinaryMessenger = registrar.messenger()
         let dropInFlutterApi = DropInFlutterInterface(binaryMessenger: messenger)
         let componentFlutterApi = ComponentFlutterInterface(binaryMessenger: messenger)
         let dropInSessionManager = DropInSessionManager(dropInFlutterApi: dropInFlutterApi)
         let dropInAdvancedManager = DropInAdvancedManager(dropInFlutterApi: dropInFlutterApi)
-        
-        let checkoutPlatformApi = CheckoutPlatformApi(
-            dropInFlutterApi: dropInFlutterApi,
-            componentFlutterApi: componentFlutterApi,
-            sessionHolder: sessionHolder,
-            dropInSessions: dropInSessionManager
-        )
-        let applePayComponentManager = ApplePayComponentManager(
-            componentFlutterApi: componentFlutterApi,
-            sessionHolder: sessionHolder
-        )
+        let applePayComponentManager = ApplePayComponentManager(componentFlutterApi: componentFlutterApi)
         let componentPlatformApi = ComponentPlatformApi(applePayComponentManager: applePayComponentManager)
         ComponentPlatformInterfaceSetup.setUp(binaryMessenger: messenger, api: componentPlatformApi)
-        CheckoutPlatformInterfaceSetup.setUp(binaryMessenger: messenger, api: checkoutPlatformApi)
 
         let dropInPlatformApi = DropInPlatformApi(
             dropInFlutterApi: dropInFlutterApi,
@@ -43,9 +31,17 @@ public class AdyenCheckoutPlugin: NSObject, FlutterPlugin {
             messenger: messenger,
             componentFlutterApi: componentFlutterApi,
             componentPlatformApi: componentPlatformApi,
-            viewTypeId: CardComponentFactory.cardComponentSessionId,
-            sessionHolder: sessionHolder
+            viewTypeId: CardComponentFactory.cardComponentSessionId
         )
         registrar.register(cardComponentSessionFactory, withId: CardComponentFactory.cardComponentSessionId)
+        
+        let checkoutPlatformApi = CheckoutPlatformApi(
+            dropInFlutterApi: dropInFlutterApi,
+            componentFlutterApi: componentFlutterApi,
+            dropInSessionManager: dropInSessionManager,
+            cardComponentSessionFactory: cardComponentSessionFactory,
+            applePayComponentManager: applePayComponentManager
+        )
+        CheckoutPlatformInterfaceSetup.setUp(binaryMessenger: messenger, api: checkoutPlatformApi)
     }
 }

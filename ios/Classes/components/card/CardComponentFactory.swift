@@ -1,20 +1,19 @@
 import Flutter
+@_spi(AdyenInternal) import Adyen
 
-class CardComponentFactory: ComponentFactory {
+class CardComponentFactory: ComponentFactory, SessionSetupProtocol {
     static let cardComponentAdvancedId = "cardComponentAdvanced"
     static let cardComponentSessionId = "cardComponentSession"
-    let viewTypeId: String
-    let sessionHolder: SessionHolder?
+    private let viewTypeId: String
+    var sessionWrapper: SessionWrapper?
 
     init(
         messenger: FlutterBinaryMessenger,
         componentFlutterApi: ComponentFlutterInterface,
         componentPlatformApi: ComponentPlatformApi,
-        viewTypeId: String,
-        sessionHolder: SessionHolder? = nil
+        viewTypeId: String
     ) {
         self.viewTypeId = viewTypeId
-        self.sessionHolder = sessionHolder
         super.init(
             messenger: messenger,
             componentFlutterApi: componentFlutterApi,
@@ -27,7 +26,7 @@ class CardComponentFactory: ComponentFactory {
         viewIdentifier viewId: Int64,
         arguments args: Any?
     ) -> FlutterPlatformView {
-        if viewTypeId == CardComponentFactory.cardComponentSessionId, sessionHolder != nil {
+        if viewTypeId == CardComponentFactory.cardComponentSessionId, sessionWrapper != nil {
             return CardSessionComponent(
                 frame: frame,
                 viewIdentifier: viewId,
@@ -35,7 +34,7 @@ class CardComponentFactory: ComponentFactory {
                 binaryMessenger: messenger,
                 componentFlutterApi: componentFlutterApi,
                 componentPlatformApi: componentPlatformApi,
-                sessionHolder: sessionHolder!
+                sessionWrapper: sessionWrapper!
             )
         } else {
             return CardAdvancedComponent(
@@ -47,5 +46,24 @@ class CardComponentFactory: ComponentFactory {
                 componentPlatformApi: componentPlatformApi
             )
         }
+    }
+    
+    func setupSession(
+        adyenContext: AdyenContext,
+        sessionId: String,
+        sessionData: String,
+        completion: @escaping (Result<SessionDTO, Error>) -> Void
+    ) {
+        let sessionDelegate = ComponentSessionFlowDelegate(componentFlutterApi: componentFlutterApi)
+        let sessionPresentationDelegate = ComponentPresentationDelegate(topViewController: getViewController())
+        sessionWrapper = SessionWrapper()
+        sessionWrapper?.setup(
+            adyenContext: adyenContext,
+            sessionId: sessionId,
+            sessionData: sessionData,
+            sessionDelegate: sessionDelegate,
+            sessionPresentationDelegate: sessionPresentationDelegate,
+            completion: completion
+        )
     }
 }

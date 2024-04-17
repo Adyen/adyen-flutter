@@ -4,7 +4,7 @@ import AdyenNetworking
 import Flutter
 
 class CardSessionComponent: BaseCardComponent {
-    private let sessionHolder: SessionHolder
+    let sessionWrapper: SessionWrapper
 
     init(
         frame: CGRect,
@@ -13,9 +13,9 @@ class CardSessionComponent: BaseCardComponent {
         binaryMessenger: FlutterBinaryMessenger,
         componentFlutterApi: ComponentFlutterInterface,
         componentPlatformApi: ComponentPlatformApi,
-        sessionHolder: SessionHolder
+        sessionWrapper: SessionWrapper
     ) {
-        self.sessionHolder = sessionHolder
+        self.sessionWrapper = sessionWrapper
         super.init(
             frame: frame,
             viewIdentifier: viewIdentifier,
@@ -41,7 +41,7 @@ class CardSessionComponent: BaseCardComponent {
     private func setupCardComponent() throws -> CardComponent {
         guard let cardComponentConfiguration else { throw PlatformError(errorDescription: "Card configuration not found") }
         guard let paymentMethodString = paymentMethod else { throw PlatformError(errorDescription: "Payment method not found") }
-        guard let session = sessionHolder.session else { throw PlatformError(errorDescription: "Session not found") }
+        guard let session = sessionWrapper.session else { throw PlatformError(errorDescription: "Session not found") }
         let cardComponent = try buildCardComponent(
             paymentMethodString: paymentMethodString,
             cardComponentConfiguration: cardComponentConfiguration,
@@ -71,7 +71,7 @@ class CardSessionComponent: BaseCardComponent {
     }
 
     private func setupSessionFlowDelegate() {
-        if let componentSessionFlowDelegate = (sessionHolder.sessionDelegate as? ComponentSessionFlowDelegate) {
+        if let componentSessionFlowDelegate = (sessionWrapper.sessionDelegate as? ComponentSessionFlowDelegate) {
             componentSessionFlowDelegate.finalizeAndDismissHandler = finalizeAndDismissSessionComponent
             componentSessionFlowDelegate.componentId = componentId
         } else {
@@ -83,7 +83,7 @@ class CardSessionComponent: BaseCardComponent {
         finalizeAndDismiss(success: success, completion: { [weak self] in
             guard let self else { return }
             completion()
-            self.sessionHolder.reset()
+            self.sessionWrapper.reset()
             self.cardComponent = nil
         })
     }

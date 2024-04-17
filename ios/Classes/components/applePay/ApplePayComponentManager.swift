@@ -1,21 +1,36 @@
 @_spi(AdyenInternal) import Adyen
 
-class ApplePayComponentManager {
+class ApplePayComponentManager: SessionSetupProtocol {
     private let componentFlutterApi: ComponentFlutterInterface
-    private let sessionHolder: SessionHolder
     private var applePayComponentWrapper: BaseApplePayComponentWrapper?
+    var sessionWrapper: SessionWrapper?
     
     enum Constants {
         static let applePaySessionComponentId = "APPLE_PAY_SESSION_COMPONENT"
         static let applePayAdvancedComponentId = "APPLE_PAY_ADVANCED_COMPONENT"
     }
 
-    init(
-        componentFlutterApi: ComponentFlutterInterface,
-        sessionHolder: SessionHolder
-    ) {
+    init(componentFlutterApi: ComponentFlutterInterface) {
         self.componentFlutterApi = componentFlutterApi
-        self.sessionHolder = sessionHolder
+    }
+    
+    func setupSession(
+        adyenContext: AdyenContext,
+        sessionId: String,
+        sessionData: String,
+        completion: @escaping (Result<SessionDTO, Error>) -> Void
+    ) {
+        let sessionDelegate = ComponentSessionFlowDelegate(componentFlutterApi: componentFlutterApi)
+        let sessionPresentationDelegate = ComponentPresentationDelegate(topViewController: getViewController())
+        sessionWrapper = SessionWrapper()
+        sessionWrapper?.setup(
+            adyenContext: adyenContext,
+            sessionId: sessionId,
+            sessionData: sessionData,
+            sessionDelegate: sessionDelegate,
+            sessionPresentationDelegate: sessionPresentationDelegate,
+            completion: completion
+        )
     }
  
     func setUpApplePayIfAvailable(
@@ -27,9 +42,9 @@ class ApplePayComponentManager {
         do {
             let applePayConfiguration = try instantPaymentComponentConfigurationDTO.mapToApplePayConfiguration()
             let adyenContext = try instantPaymentComponentConfigurationDTO.createAdyenContext()
-            if componentId == Constants.applePaySessionComponentId {
+            if componentId == Constants.applePaySessionComponentId, sessionWrapper != nil {
                 applePayComponentWrapper = ApplePaySessionComponentWrapper(
-                    sessionHolder: sessionHolder,
+                    sessionWrapper: sessionWrapper!,
                     configuration: applePayConfiguration,
                     adyenContext: adyenContext,
                     componentId: componentId

@@ -10,19 +10,22 @@ import AdyenNetworking
 class CheckoutPlatformApi: CheckoutPlatformInterface {
     private let dropInFlutterApi: DropInFlutterInterface
     private let componentFlutterApi: ComponentFlutterInterface
-    private let sessionHolder: SessionHolder
     private let dropInSessionManager: DropInSessionManager
-
+    private let cardComponentSessionFactory: CardComponentFactory
+    private let applePayComponentManager: ApplePayComponentManager
+    
     init(
         dropInFlutterApi: DropInFlutterInterface,
         componentFlutterApi: ComponentFlutterInterface,
-        sessionHolder: SessionHolder,
-        dropInSessions: DropInSessionManager
+        dropInSessionManager: DropInSessionManager,
+        cardComponentSessionFactory: CardComponentFactory,
+        applePayComponentManager: ApplePayComponentManager
     ) {
         self.dropInFlutterApi = dropInFlutterApi
         self.componentFlutterApi = componentFlutterApi
-        self.sessionHolder = sessionHolder
-        self.dropInSessionManager = dropInSessions
+        self.dropInSessionManager = dropInSessionManager
+        self.cardComponentSessionFactory = cardComponentSessionFactory
+        self.applePayComponentManager = applePayComponentManager
     }
 
     func createSession(
@@ -41,7 +44,7 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
                     analyticsOptionsDTO: dropInConfigurationDTO.analyticsOptionsDTO,
                     countryCode: dropInConfigurationDTO.countryCode
                 )
-                dropInSessionManager.createSession(
+                dropInSessionManager.setupSession(
                     adyenContext: adyenContext,
                     sessionId: sessionId,
                     sessionData: sessionData,
@@ -55,7 +58,7 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
                     analyticsOptionsDTO: configuration.analyticsOptionsDTO,
                     countryCode: configuration.countryCode
                 )
-                createSessionForComponent(
+                cardComponentSessionFactory.setupSession(
                     adyenContext: adyenContext,
                     sessionId: sessionId,
                     sessionData: sessionData,
@@ -69,7 +72,7 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
                     analyticsOptionsDTO: configuration.analyticsOptionsDTO,
                     countryCode: configuration.countryCode
                 )
-                createSessionForComponent(
+                applePayComponentManager.setupSession(
                     adyenContext: adyenContext,
                     sessionId: sessionId,
                     sessionData: sessionData,
@@ -89,82 +92,5 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
 
     func enableConsoleLogging(loggingEnabled: Bool) {
         AdyenLogging.isEnabled = loggingEnabled
-    }
-
-    private func createSessionForComponent(
-        adyenContext: AdyenContext,
-        sessionId: String,
-        sessionData: String,
-        completion: @escaping (Result<SessionDTO, Error>) -> Void
-    ) {
-        let sessionDelegate = ComponentSessionFlowDelegate(componentFlutterApi: componentFlutterApi)
-        let sessionPresentationDelegate = ComponentPresentationDelegate(topViewController: getViewController())
-        requestAndSetSession(
-            adyenContext: adyenContext,
-            sessionId: sessionId,
-            sessionData: sessionData,
-            sessionDelegate: sessionDelegate,
-            sessionPresentationDelegate: sessionPresentationDelegate,
-            completion: completion
-        )
-    }
-
-    private func requestAndSetSession(
-        adyenContext: AdyenContext,
-        sessionId: String,
-        sessionData: String,
-        sessionDelegate: AdyenSessionDelegate,
-        sessionPresentationDelegate: PresentationDelegate,
-        completion: @escaping (Result<SessionDTO, Error>) -> Void
-    ) {
-        let sessionConfiguration = AdyenSession.Configuration(
-            sessionIdentifier: sessionId,
-            initialSessionData: sessionData,
-            context: adyenContext,
-            actionComponent: .init()
-        )
-        AdyenSession.initialize(
-            with: sessionConfiguration,
-            delegate: sessionDelegate,
-            presentationDelegate: sessionPresentationDelegate
-        ) { [weak self] result in
-            switch result {
-            case let .success(session):
-                // TODO: For later  - We need to return the actual session and removing the session holder when the session is codable.
-                self?.sessionHolder.setup(
-                    session: session,
-                    sessionPresentationDelegate: sessionPresentationDelegate,
-                    sessionDelegate: sessionDelegate
-                )
-                
-                do {
-                    let paymentMethods = try JSONEncoder().encode(session.sessionContext.paymentMethods)
-                    completion(Result.success(SessionDTO(
-                        id: sessionId,
-                        sessionData: sessionData,
-                        paymentMethodsJson: String(data: paymentMethods, encoding: .utf8) ?? ""
-                    )))
-                } catch {
-                    completion(Result.failure(error))
-                }
-            case let .failure(error):
-                completion(Result.failure(error))
-            }
-        }
-    }
-
-    private func getViewController() -> UIViewController? {
-        var rootViewController = UIApplication.shared.adyen.mainKeyWindow?.rootViewController
-        while let presentedViewController = rootViewController?.presentedViewController {
-            let type = String(describing: type(of: presentedViewController))
-            // TODO: - We need to discuss how the SDK should react if a DropInNavigationController is already displayed
-            if type == "DropInNavigationController" {
-                return nil
-            } else {
-                rootViewController = presentedViewController
-            }
-        }
-
-        return rootViewController
     }
 }

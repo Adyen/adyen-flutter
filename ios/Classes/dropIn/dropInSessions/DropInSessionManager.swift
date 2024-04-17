@@ -1,19 +1,17 @@
 @_spi(AdyenInternal) import Adyen
 
-class DropInSessionManager: BaseDropInManager {
+class DropInSessionManager: BaseDropInManager, SessionSetupProtocol {
     private let dropInFlutterApi: DropInFlutterInterface
-    private var sessionDelegate: AdyenSessionDelegate?
-    private var sessionPresentationDelegate: PresentationDelegate?
     private var sessionStoredPaymentMethodsDelegate: DropInSessionStoredPaymentMethodsDelegate?
-    private var session: AdyenSession?
-    
+    var sessionWrapper: SessionWrapper?
+
     init(
         dropInFlutterApi: DropInFlutterInterface
     ) {
         self.dropInFlutterApi = dropInFlutterApi
     }
     
-    func createSession(
+    func setupSession(
         adyenContext: AdyenContext,
         sessionId: String,
         sessionData: String,
@@ -21,39 +19,15 @@ class DropInSessionManager: BaseDropInManager {
     ) {
         let sessionDelegate = DropInSessionDelegate(dropInFlutterApi: dropInFlutterApi, finalizeAndDismiss: finalizeAndDismiss(success:completion:))
         let sessionPresentationDelegate = DropInSessionPresentationDelegate()
-        let sessionConfiguration = AdyenSession.Configuration(
-            sessionIdentifier: sessionId,
-            initialSessionData: sessionData,
-            context: adyenContext,
-            actionComponent: .init()
+        sessionWrapper = SessionWrapper()
+        sessionWrapper?.setup(
+            adyenContext: adyenContext,
+            sessionId: sessionId,
+            sessionData: sessionData,
+            sessionDelegate: sessionDelegate,
+            sessionPresentationDelegate: sessionPresentationDelegate,
+            completion: completion
         )
-        self.sessionDelegate = sessionDelegate
-        self.sessionPresentationDelegate = sessionPresentationDelegate
-        AdyenSession.initialize(
-            with: sessionConfiguration,
-            delegate: sessionDelegate,
-            presentationDelegate: sessionPresentationDelegate
-        ) { [weak self] result in
-            switch result {
-            case let .success(session):
-                do {
-                    self?.session = session
-                    let paymentMethods = try JSONEncoder().encode(session.sessionContext.paymentMethods)
-                    let encodedPaymentMethods = String(data: paymentMethods, encoding: .utf8) ?? ""
-                    completion(Result.success(SessionDTO(
-                        id: sessionId,
-                        sessionData: sessionData,
-                        paymentMethodsJson: encodedPaymentMethods
-                    )))
-                } catch {
-                    self?.cleanUp()
-                    completion(Result.failure(error))
-                }
-            case let .failure(error):
-                self?.cleanUp()
-                completion(Result.failure(error))
-            }
-        }
     }
     
     func showDropIn(configuration: DropInConfigurationDTO, sessionDTO: SessionDTO) {
@@ -71,8 +45,8 @@ class DropInSessionManager: BaseDropInManager {
                 context: adyenContext,
                 configuration: dropInConfiguration
             )
-            dropInComponent.delegate = session
-            dropInComponent.partialPaymentDelegate = session
+            dropInComponent.delegate = sessionWrapper?.session
+            dropInComponent.partialPaymentDelegate = sessionWrapper?.session
             if configuration.isRemoveStoredPaymentMethodEnabled {
                 sessionStoredPaymentMethodsDelegate = DropInSessionStoredPaymentMethodsDelegate(
                     viewController: viewController,
@@ -95,10 +69,8 @@ class DropInSessionManager: BaseDropInManager {
     }
     
     func cleanUp() {
-        sessionDelegate = nil
-        sessionPresentationDelegate = nil
+        sessionWrapper?.reset()
         sessionStoredPaymentMethodsDelegate = nil
-        session = nil
         dropInComponent = nil
         viewController = nil
     }
