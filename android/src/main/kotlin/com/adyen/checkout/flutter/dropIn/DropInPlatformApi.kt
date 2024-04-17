@@ -11,6 +11,7 @@ import PaymentResultEnum
 import PaymentResultModelDTO
 import PlatformCommunicationModel
 import PlatformCommunicationType
+import SessionDTO
 import androidx.activity.result.ActivityResultLauncher
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.lifecycleScope
@@ -50,7 +51,7 @@ class DropInPlatformApi(
     lateinit var dropInSessionLauncher: ActivityResultLauncher<SessionDropInResultContractParams>
     lateinit var dropInAdvancedFlowLauncher: ActivityResultLauncher<DropInResultContractParams>
 
-    override fun showDropInSession(dropInConfigurationDTO: DropInConfigurationDTO) {
+    override fun showDropInSession(dropInConfigurationDTO: DropInConfigurationDTO, sessionDTO: SessionDTO) {
         setStoredPaymentMethodDeletionObserver()
         val dropInConfiguration = dropInConfigurationDTO.mapToDropInConfiguration(activity.applicationContext)
         val checkoutSession = createCheckoutSession(sessionHolder)
@@ -106,7 +107,15 @@ class DropInPlatformApi(
         DropInPaymentMethodDeletionResultMessenger.sendResult(deleteStoredPaymentMethodResultDTO)
     }
 
-    override fun cleanUpDropIn() {
+    override fun cleanUpDropInAdvanced() {
+        cleanUp()
+    }
+
+    override fun cleanUpDropInSession() {
+        cleanUp()
+    }
+
+    private fun cleanUp() {
         DropInServiceResultMessenger.instance().removeObservers(activity)
         DropInPaymentMethodDeletionPlatformMessenger.instance().removeObservers(activity)
         DropInAdditionalDetailsPlatformMessenger.instance().removeObservers(activity)

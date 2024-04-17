@@ -1,17 +1,17 @@
 import Adyen
 import AdyenNetworking
 
-class DropInSessionsDelegate: AdyenSessionDelegate {
-    private let viewController: UIViewController?
+class DropInSessionDelegate: AdyenSessionDelegate {
     private let dropInFlutterApi: DropInFlutterInterface
+    private let finalizeAndDismiss: (Bool, @escaping (() -> Void)) -> Void
 
-    init(viewController: UIViewController?, dropInFlutterApi: DropInFlutterInterface) {
-        self.viewController = viewController
+    init(dropInFlutterApi: DropInFlutterInterface, finalizeAndDismiss: @escaping ((Bool, @escaping (() -> Void)) -> Void)) {
         self.dropInFlutterApi = dropInFlutterApi
+        self.finalizeAndDismiss = finalizeAndDismiss
     }
 
     func didComplete(with result: Adyen.AdyenSessionResult, component _: Adyen.Component, session: Adyen.AdyenSession) {
-        viewController?.dismiss(animated: false, completion: {
+        finalizeAndDismiss(true) {
             let paymentResult = PaymentResultModelDTO(
                 sessionId: session.sessionContext.identifier,
                 sessionData: session.sessionContext.data,
@@ -28,11 +28,11 @@ class DropInSessionsDelegate: AdyenSessionDelegate {
                 platformCommunicationModel: platformCommunicationModel,
                 completion: { _ in }
             )
-        })
+        }
     }
 
     func didFail(with error: Error, from _: Component, session _: AdyenSession) {
-        viewController?.dismiss(animated: true, completion: {
+        finalizeAndDismiss(false) {
             switch error {
             case ComponentError.cancelled:
                 let platformCommunicationModel = PlatformCommunicationModel(
@@ -59,7 +59,7 @@ class DropInSessionsDelegate: AdyenSessionDelegate {
                     completion: { _ in }
                 )
             }
-        })
+        }
     }
 
     func didOpenExternalApplication(component _: ActionComponent, session _: AdyenSession) {

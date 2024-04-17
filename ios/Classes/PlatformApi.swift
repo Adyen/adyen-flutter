@@ -1368,6 +1368,8 @@ private class DropInPlatformInterfaceCodecReader: FlutterStandardReader {
         case 142:
             return PaymentEventDTO.fromList(self.readValue() as! [Any?])
         case 143:
+            return SessionDTO.fromList(self.readValue() as! [Any?])
+        case 144:
             return ShippingAddressParametersDTO.fromList(self.readValue() as! [Any?])
         default:
             return super.readValue(ofType: type)
@@ -1422,8 +1424,11 @@ private class DropInPlatformInterfaceCodecWriter: FlutterStandardWriter {
         } else if let value = value as? PaymentEventDTO {
             super.writeByte(142)
             super.writeValue(value.toList())
-        } else if let value = value as? ShippingAddressParametersDTO {
+        } else if let value = value as? SessionDTO {
             super.writeByte(143)
+            super.writeValue(value.toList())
+        } else if let value = value as? ShippingAddressParametersDTO {
+            super.writeByte(144)
             super.writeValue(value.toList())
         } else {
             super.writeValue(value)
@@ -1447,12 +1452,13 @@ class DropInPlatformInterfaceCodec: FlutterStandardMessageCodec {
 
 /// Generated protocol from Pigeon that represents a handler of messages from Flutter.
 protocol DropInPlatformInterface {
-    func showDropInSession(dropInConfigurationDTO: DropInConfigurationDTO) throws
+    func showDropInSession(dropInConfigurationDTO: DropInConfigurationDTO, sessionDTO: SessionDTO) throws
     func showDropInAdvanced(dropInConfigurationDTO: DropInConfigurationDTO, paymentMethodsResponse: String) throws
     func onPaymentsResult(paymentsResult: PaymentEventDTO) throws
     func onPaymentsDetailsResult(paymentsDetailsResult: PaymentEventDTO) throws
     func onDeleteStoredPaymentMethodResult(deleteStoredPaymentMethodResultDTO: DeletedStoredPaymentMethodResultDTO) throws
-    func cleanUpDropIn() throws
+    func cleanUpDropInAdvanced() throws
+    func cleanUpDropInSession() throws
 }
 
 /// Generated setup class from Pigeon to handle messages through the `binaryMessenger`.
@@ -1466,8 +1472,9 @@ class DropInPlatformInterfaceSetup {
             showDropInSessionChannel.setMessageHandler { message, reply in
                 let args = message as! [Any?]
                 let dropInConfigurationDTOArg = args[0] as! DropInConfigurationDTO
+                let sessionDTOArg = args[1] as! SessionDTO
                 do {
-                    try api.showDropInSession(dropInConfigurationDTO: dropInConfigurationDTOArg)
+                    try api.showDropInSession(dropInConfigurationDTO: dropInConfigurationDTOArg, sessionDTO: sessionDTOArg)
                     reply(wrapResult(nil))
                 } catch {
                     reply(wrapError(error))
@@ -1537,18 +1544,31 @@ class DropInPlatformInterfaceSetup {
         } else {
             onDeleteStoredPaymentMethodResultChannel.setMessageHandler(nil)
         }
-        let cleanUpDropInChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.DropInPlatformInterface.cleanUpDropIn", binaryMessenger: binaryMessenger, codec: codec)
+        let cleanUpDropInAdvancedChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.DropInPlatformInterface.cleanUpDropInAdvanced", binaryMessenger: binaryMessenger, codec: codec)
         if let api {
-            cleanUpDropInChannel.setMessageHandler { _, reply in
+            cleanUpDropInAdvancedChannel.setMessageHandler { _, reply in
                 do {
-                    try api.cleanUpDropIn()
+                    try api.cleanUpDropInAdvanced()
                     reply(wrapResult(nil))
                 } catch {
                     reply(wrapError(error))
                 }
             }
         } else {
-            cleanUpDropInChannel.setMessageHandler(nil)
+            cleanUpDropInAdvancedChannel.setMessageHandler(nil)
+        }
+        let cleanUpDropInSessionChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.DropInPlatformInterface.cleanUpDropInSession", binaryMessenger: binaryMessenger, codec: codec)
+        if let api {
+            cleanUpDropInSessionChannel.setMessageHandler { _, reply in
+                do {
+                    try api.cleanUpDropInSession()
+                    reply(wrapResult(nil))
+                } catch {
+                    reply(wrapError(error))
+                }
+            }
+        } else {
+            cleanUpDropInSessionChannel.setMessageHandler(nil)
         }
     }
 }

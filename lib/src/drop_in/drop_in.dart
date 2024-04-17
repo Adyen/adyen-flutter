@@ -28,15 +28,21 @@ class DropIn {
 
   Future<PaymentResult> startDropInSessionsPayment(
     DropInConfiguration dropInConfiguration,
-    SessionCheckout dropInSession,
+    SessionCheckout sessionCheckout,
   ) async {
     adyenLogger.print("Start Drop-in session");
     final dropInSessionCompleter = Completer<PaymentResultDTO>();
     final sdkVersionNumber =
         await sdkVersionNumberProvider.getSdkVersionNumber();
+    final sessionDTO = SessionDTO(
+      id: sessionCheckout.id,
+      sessionData: sessionCheckout.sessionData,
+      paymentMethodsJson: sessionCheckout.paymentMethodsJson,
+    );
 
     dropInPlatformApi.showDropInSession(
       dropInConfiguration.toDTO(sdkVersionNumber),
+      sessionDTO,
     );
 
     dropInFlutterApi.dropInSessionPlatformCommunicationStream =
@@ -57,7 +63,7 @@ class DropIn {
     });
 
     return dropInSessionCompleter.future.then((paymentResultDTO) {
-      dropInPlatformApi.cleanUpDropIn();
+      dropInPlatformApi.cleanUpDropInSession();
       dropInFlutterApi.dropInSessionPlatformCommunicationStream.close();
       adyenLogger
           .print("Drop-in session result type: ${paymentResultDTO.type.name}");
@@ -115,7 +121,7 @@ class DropIn {
     });
 
     return dropInAdvancedFlowCompleter.future.then((paymentResultDTO) {
-      dropInPlatformApi.cleanUpDropIn();
+      dropInPlatformApi.cleanUpDropInAdvanced();
       dropInFlutterApi.dropInAdvancedFlowPlatformCommunicationStream.close();
       adyenLogger.print(
           "Drop-in advanced flow result type: ${paymentResultDTO.type.name}");

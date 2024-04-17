@@ -1,7 +1,7 @@
 @_spi(AdyenInternal)
 import Adyen
 
-class DropInSessionsStoredPaymentMethodsDelegate: StoredPaymentMethodsDelegate {
+class DropInSessionStoredPaymentMethodsDelegate: StoredPaymentMethodsDelegate {
     private let dropInFlutterApi: DropInFlutterInterface
     private let viewController: UIViewController
     private var completionHandler: ((Bool) -> Void)?

@@ -7,8 +7,12 @@ class DropInPlatformApi implements DropInPlatformInterface {
   @override
   Future<void> showDropInSession(
     DropInConfigurationDTO dropInConfigurationDTO,
+    SessionDTO sessionDTO,
   ) =>
-      _dropInPlatformInterface.showDropInSession(dropInConfigurationDTO);
+      _dropInPlatformInterface.showDropInSession(
+        dropInConfigurationDTO,
+        sessionDTO,
+      );
 
   @override
   Future<void> showDropInAdvanced(
@@ -36,5 +40,10 @@ class DropInPlatformApi implements DropInPlatformInterface {
           deleteStoredPaymentMethodResultDTO);
 
   @override
-  Future<void> cleanUpDropIn() => _dropInPlatformInterface.cleanUpDropIn();
+  Future<void> cleanUpDropInAdvanced() =>
+      _dropInPlatformInterface.cleanUpDropInAdvanced();
+
+  @override
+  Future<void> cleanUpDropInSession() =>
+      _dropInPlatformInterface.cleanUpDropInSession();
 }

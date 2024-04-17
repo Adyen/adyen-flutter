@@ -538,8 +538,10 @@ abstract class CheckoutPlatformInterface {
 
 @HostApi()
 abstract class DropInPlatformInterface {
-  // TODO: Merge show dropIn methods into one.
-  void showDropInSession(DropInConfigurationDTO dropInConfigurationDTO);
+  void showDropInSession(
+    DropInConfigurationDTO dropInConfigurationDTO,
+    SessionDTO sessionDTO,
+  );
 
   void showDropInAdvanced(
     DropInConfigurationDTO dropInConfigurationDTO,
@@ -553,7 +555,9 @@ abstract class DropInPlatformInterface {
   void onDeleteStoredPaymentMethodResult(
       DeletedStoredPaymentMethodResultDTO deleteStoredPaymentMethodResultDTO);
 
-  void cleanUpDropIn();
+  void cleanUpDropInAdvanced();
+
+  void cleanUpDropInSession();
 }
 
 @FlutterApi()

@@ -1468,6 +1468,11 @@ private object DropInPlatformInterfaceCodec : StandardMessageCodec() {
       }
       143.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
+          SessionDTO.fromList(it)
+        }
+      }
+      144.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
           ShippingAddressParametersDTO.fromList(it)
         }
       }
@@ -1536,8 +1541,12 @@ private object DropInPlatformInterfaceCodec : StandardMessageCodec() {
         stream.write(142)
         writeValue(stream, value.toList())
       }
-      is ShippingAddressParametersDTO -> {
+      is SessionDTO -> {
         stream.write(143)
+        writeValue(stream, value.toList())
+      }
+      is ShippingAddressParametersDTO -> {
+        stream.write(144)
         writeValue(stream, value.toList())
       }
       else -> super.writeValue(stream, value)
@@ -1547,12 +1556,13 @@ private object DropInPlatformInterfaceCodec : StandardMessageCodec() {
 
 /** Generated interface from Pigeon that represents a handler of messages from Flutter. */
 interface DropInPlatformInterface {
-  fun showDropInSession(dropInConfigurationDTO: DropInConfigurationDTO)
+  fun showDropInSession(dropInConfigurationDTO: DropInConfigurationDTO, sessionDTO: SessionDTO)
   fun showDropInAdvanced(dropInConfigurationDTO: DropInConfigurationDTO, paymentMethodsResponse: String)
   fun onPaymentsResult(paymentsResult: PaymentEventDTO)
   fun onPaymentsDetailsResult(paymentsDetailsResult: PaymentEventDTO)
   fun onDeleteStoredPaymentMethodResult(deleteStoredPaymentMethodResultDTO: DeletedStoredPaymentMethodResultDTO)
-  fun cleanUpDropIn()
+  fun cleanUpDropInAdvanced()
+  fun cleanUpDropInSession()
 
   companion object {
     /** The codec used by DropInPlatformInterface. */
@@ -1568,9 +1578,10 @@ interface DropInPlatformInterface {
           channel.setMessageHandler { message, reply ->
             val args = message as List<Any?>
             val dropInConfigurationDTOArg = args[0] as DropInConfigurationDTO
+            val sessionDTOArg = args[1] as SessionDTO
             var wrapped: List<Any?>
             try {
-              api.showDropInSession(dropInConfigurationDTOArg)
+              api.showDropInSession(dropInConfigurationDTOArg, sessionDTOArg)
               wrapped = listOf<Any?>(null)
             } catch (exception: Throwable) {
               wrapped = wrapError(exception)
@@ -1659,12 +1670,29 @@ interface DropInPlatformInterface {
         }
       }
       run {
-        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.adyen_checkout.DropInPlatformInterface.cleanUpDropIn", codec)
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.adyen_checkout.DropInPlatformInterface.cleanUpDropInAdvanced", codec)
         if (api != null) {
           channel.setMessageHandler { _, reply ->
             var wrapped: List<Any?>
             try {
-              api.cleanUpDropIn()
+              api.cleanUpDropInAdvanced()
+              wrapped = listOf<Any?>(null)
+            } catch (exception: Throwable) {
+              wrapped = wrapError(exception)
+            }
+            reply.reply(wrapped)
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.adyen_checkout.DropInPlatformInterface.cleanUpDropInSession", codec)
+        if (api != null) {
+          channel.setMessageHandler { _, reply ->
+            var wrapped: List<Any?>
+            try {
+              api.cleanUpDropInSession()
               wrapped = listOf<Any?>(null)
             } catch (exception: Throwable) {
               wrapped = wrapError(exception)

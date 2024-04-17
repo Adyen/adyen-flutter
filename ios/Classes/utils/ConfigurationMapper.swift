@@ -2,17 +2,16 @@
 import Adyen
 import PassKit
 
-class ConfigurationMapper {
-    func createDropInConfiguration(dropInConfigurationDTO: DropInConfigurationDTO) throws -> DropInComponent.Configuration {
+extension DropInConfigurationDTO {
+    func mapToDropInConfiguration() throws -> DropInComponent.Configuration {
         let dropInConfiguration = DropInComponent.Configuration(
-            allowsSkippingPaymentList: dropInConfigurationDTO.skipListWhenSinglePaymentMethod,
-            allowPreselectedPaymentView: dropInConfigurationDTO.showPreselectedStoredPaymentMethod
+            allowsSkippingPaymentList: skipListWhenSinglePaymentMethod,
+            allowPreselectedPaymentView: showPreselectedStoredPaymentMethod
         )
 
-        dropInConfiguration.paymentMethodsList.allowDisablingStoredPaymentMethods =
-            dropInConfigurationDTO.isRemoveStoredPaymentMethodEnabled
+        dropInConfiguration.paymentMethodsList.allowDisablingStoredPaymentMethods = isRemoveStoredPaymentMethodEnabled
 
-        if let cardConfigurationDTO = dropInConfigurationDTO.cardConfigurationDTO {
+        if let cardConfigurationDTO {
             let koreanAuthenticationMode = cardConfigurationDTO.kcpFieldVisibility.toCardFieldVisibility()
             let socialSecurityNumberMode = cardConfigurationDTO.socialSecurityNumberFieldVisibility.toCardFieldVisibility()
             let storedCardConfiguration = createStoredCardConfiguration(showCvcForStoredCard: cardConfigurationDTO.showCvcForStoredCard)
@@ -28,20 +27,20 @@ class ConfigurationMapper {
                 allowedCardTypes: allowedCardTypes,
                 billingAddress: billingAddressConfiguration
             )
-            if let shopperLocal = dropInConfigurationDTO.shopperLocale {
+            if let shopperLocal = shopperLocale {
                 dropInConfiguration.localizationParameters = LocalizationParameters(enforcedLocale: shopperLocal)
             }
             dropInConfiguration.card = cardConfiguration
         }
 
-        if let applePayConfigurationDTO = dropInConfigurationDTO.applePayConfigurationDTO {
+        if let applePayConfigurationDTO {
             dropInConfiguration.applePay = try applePayConfigurationDTO.toApplePayConfiguration(
-                amount: dropInConfigurationDTO.amount,
-                countryCode: dropInConfigurationDTO.countryCode
+                amount: amount,
+                countryCode: countryCode
             )
         }
 
-        if let cashAppPayConfigurationDTO = dropInConfigurationDTO.cashAppPayConfigurationDTO {
+        if let cashAppPayConfigurationDTO {
             dropInConfiguration.cashAppPay = DropInComponent.CashAppPay(redirectURL: URL(string: cashAppPayConfigurationDTO.returnUrl)!)
         }
 
@@ -212,7 +211,7 @@ extension InstantPaymentConfigurationDTO {
     }
 }
 
-private func buildAdyenContext(environment: Environment, clientKey: String, amount: AmountDTO, analyticsOptionsDTO: AnalyticsOptionsDTO, countryCode: String) throws -> AdyenContext {
+func buildAdyenContext(environment: Environment, clientKey: String, amount: AmountDTO, analyticsOptionsDTO: AnalyticsOptionsDTO, countryCode: String) throws -> AdyenContext {
     let environment = environment.mapToEnvironment()
     let apiContext = try APIContext(
         environment: environment,
