@@ -3,7 +3,7 @@ import Adyen
 class ComponentSessionFlowDelegate: AdyenSessionDelegate {
     private let componentFlutterApi: ComponentFlutterInterface
     var componentId: String?
-    var finalizeAndDismissHandler: ((Bool, @escaping (() -> Void)) -> Void)?
+    var finalizeAndDismiss: ((Bool, @escaping (() -> Void)) -> Void)?
 
     init(
         componentFlutterApi: ComponentFlutterInterface
@@ -14,7 +14,7 @@ class ComponentSessionFlowDelegate: AdyenSessionDelegate {
     func didComplete(with result: AdyenSessionResult, component _: Component, session: AdyenSession) {
         let resultCode = result.resultCode
         let success = resultCode == .authorised || resultCode == .received || resultCode == .pending
-        finalizeAndDismissHandler?(success, { [weak self] in
+        finalizeAndDismiss?(success) { [weak self] in
             let paymentResult = PaymentResultModelDTO(
                 sessionId: session.sessionContext.identifier,
                 sessionData: session.sessionContext.data,
@@ -32,11 +32,11 @@ class ComponentSessionFlowDelegate: AdyenSessionDelegate {
                 componentCommunicationModel: componentCommunicationModel,
                 completion: { _ in }
             )
-        })
+        }
     }
     
     func didFail(with error: Error, from component: Adyen.Component, session: Adyen.AdyenSession) {
-        finalizeAndDismissHandler?(false, { [weak self] in
+        finalizeAndDismiss?(false) { [weak self] in
             guard let self else { return }
             let type: PaymentResultEnum
             if let componentError = (error as? ComponentError), componentError == ComponentError.cancelled {
@@ -56,8 +56,6 @@ class ComponentSessionFlowDelegate: AdyenSessionDelegate {
                 componentCommunicationModel: componentCommunicationModel,
                 completion: { _ in }
             )
-        })
-        
+        }
     }
-    
 }

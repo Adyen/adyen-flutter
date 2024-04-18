@@ -11,7 +11,9 @@ class DropInSessionDelegate: AdyenSessionDelegate {
     }
 
     func didComplete(with result: Adyen.AdyenSessionResult, component _: Adyen.Component, session: Adyen.AdyenSession) {
-        finalizeAndDismiss(true) {
+        let resultCode = result.resultCode
+        let success = resultCode == .authorised || resultCode == .received || resultCode == .pending
+        finalizeAndDismiss(success) { [weak self] in
             let paymentResult = PaymentResultModelDTO(
                 sessionId: session.sessionContext.identifier,
                 sessionData: session.sessionContext.data,
@@ -24,7 +26,7 @@ class DropInSessionDelegate: AdyenSessionDelegate {
                     result: paymentResult
                 )
             )
-            self.dropInFlutterApi.onDropInSessionPlatformCommunication(
+            self?.dropInFlutterApi.onDropInSessionPlatformCommunication(
                 platformCommunicationModel: platformCommunicationModel,
                 completion: { _ in }
             )
@@ -32,37 +34,25 @@ class DropInSessionDelegate: AdyenSessionDelegate {
     }
 
     func didFail(with error: Error, from _: Component, session _: AdyenSession) {
-        finalizeAndDismiss(false) {
-            switch error {
-            case ComponentError.cancelled:
-                let platformCommunicationModel = PlatformCommunicationModel(
-                    type: PlatformCommunicationType.result,
-                    paymentResult: PaymentResultDTO(
-                        type: PaymentResultEnum.cancelledByUser,
-                        reason: error.localizedDescription
-                    )
-                )
-                self.dropInFlutterApi.onDropInSessionPlatformCommunication(
-                    platformCommunicationModel: platformCommunicationModel,
-                    completion: { _ in }
-                )
-            default:
-                let platformCommunicationModel = PlatformCommunicationModel(
-                    type: PlatformCommunicationType.result,
-                    paymentResult: PaymentResultDTO(
-                        type: PaymentResultEnum.error,
-                        reason: error.localizedDescription
-                    )
-                )
-                self.dropInFlutterApi.onDropInSessionPlatformCommunication(
-                    platformCommunicationModel: platformCommunicationModel,
-                    completion: { _ in }
-                )
+        finalizeAndDismiss(false) { [weak self] in
+            guard let self else { return }
+            let type: PaymentResultEnum
+            if let componentError = (error as? ComponentError), componentError == ComponentError.cancelled {
+                type = PaymentResultEnum.cancelledByUser
+            } else {
+                type = PaymentResultEnum.error
             }
+            let platformCommunicationModel = PlatformCommunicationModel(
+                type: PlatformCommunicationType.result,
+                paymentResult: PaymentResultDTO(
+                    type: type,
+                    reason: error.localizedDescription
+                )
+            )
+            self.dropInFlutterApi.onDropInSessionPlatformCommunication(
+                platformCommunicationModel: platformCommunicationModel,
+                completion: { _ in }
+            )
         }
-    }
-
-    func didOpenExternalApplication(component _: ActionComponent, session _: AdyenSession) {
-        print("external")
     }
 }
