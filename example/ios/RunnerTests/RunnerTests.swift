@@ -27,7 +27,7 @@ class RunnerTests: XCTestCase {
             )
 
             let adyenContext = try dropInConfigurationDTO.createAdyenContext()
-            let dropInConfiguration = try ConfigurationMapper().createDropInConfiguration(dropInConfigurationDTO: dropInConfigurationDTO)
+            let dropInConfiguration = try dropInConfigurationDTO.mapToDropInConfiguration()
 
             XCTAssertEqual(adyenContext.apiContext.environment.baseURL, Adyen.Environment.test.baseURL)
             XCTAssertEqual(adyenContext.apiContext.clientKey, TEST_CLIENT_KEY)

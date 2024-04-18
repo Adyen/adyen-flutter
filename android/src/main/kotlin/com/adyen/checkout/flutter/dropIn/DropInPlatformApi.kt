@@ -51,7 +51,10 @@ class DropInPlatformApi(
     lateinit var dropInSessionLauncher: ActivityResultLauncher<SessionDropInResultContractParams>
     lateinit var dropInAdvancedFlowLauncher: ActivityResultLauncher<DropInResultContractParams>
 
-    override fun showDropInSession(dropInConfigurationDTO: DropInConfigurationDTO, sessionDTO: SessionDTO) {
+    override fun showDropInSession(
+        dropInConfigurationDTO: DropInConfigurationDTO,
+        sessionDTO: SessionDTO
+    ) {
         setStoredPaymentMethodDeletionObserver()
         val dropInConfiguration = dropInConfigurationDTO.mapToDropInConfiguration(activity.applicationContext)
         val checkoutSession = createCheckoutSession(sessionHolder)

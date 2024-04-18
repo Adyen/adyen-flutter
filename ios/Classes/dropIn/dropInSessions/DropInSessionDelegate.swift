@@ -1,5 +1,4 @@
 import Adyen
-import AdyenNetworking
 
 class DropInSessionDelegate: AdyenSessionDelegate {
     private let dropInFlutterApi: DropInFlutterInterface
