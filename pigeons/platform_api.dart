@@ -521,6 +521,36 @@ class InstantPaymentSetupResultDTO {
   );
 }
 
+class UnencryptedCardDTO {
+  final String? cardNumber;
+  final String? expiryMonth;
+  final String? expiryYear;
+  final String? cvc;
+  final String? cardHolderName;
+
+  UnencryptedCardDTO(
+    this.cardNumber,
+    this.expiryMonth,
+    this.expiryYear,
+    this.cvc,
+    this.cardHolderName,
+  );
+}
+
+class EncryptedCardDTO {
+  final String? encryptedCardNumber;
+  final String? encryptedExpiryMonth;
+  final String? encryptedExpiryYear;
+  final String? encryptedSecurityCode;
+
+  EncryptedCardDTO(
+    this.encryptedCardNumber,
+    this.encryptedExpiryMonth,
+    this.encryptedExpiryYear,
+    this.encryptedSecurityCode,
+  );
+}
+
 @HostApi()
 abstract class CheckoutPlatformInterface {
   @async
@@ -531,6 +561,18 @@ abstract class CheckoutPlatformInterface {
     String sessionId,
     String sessionData,
     Object? configuration,
+  );
+
+  @async
+  EncryptedCardDTO encryptCard(
+    UnencryptedCardDTO unencryptedCardDTO,
+    String publicKey,
+  );
+
+  @async
+  String encrypt(
+    UnencryptedCardDTO unencryptedCardDTO,
+    String publicKey,
   );
 
   void enableConsoleLogging(bool loggingEnabled);
