@@ -74,6 +74,9 @@ class CheckoutPlatformApi(
         callback: (Result<String>) -> Unit
     ) = adyenCSE.encrypt(unencryptedCardDTO, publicKey, callback)
 
+    override fun encryptBin(bin: String, publicKey: String, callback: (Result<String>) -> Unit) =
+        adyenCSE.encryptBin(bin, publicKey, callback)
+
     private fun determineSessionConfiguration(configuration: Any?): Configuration? {
         when (configuration) {
             is DropInConfigurationDTO -> {

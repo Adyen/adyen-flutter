@@ -575,6 +575,12 @@ abstract class CheckoutPlatformInterface {
     String publicKey,
   );
 
+  @async
+  String encryptBin(
+    String bin,
+    String publicKey,
+  );
+
   void enableConsoleLogging(bool loggingEnabled);
 }
 

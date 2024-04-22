@@ -38,6 +38,15 @@ class AdyenCSE {
         }
     }
 
+    fun encryptBin(bin: String, publicKey: String, callback: (Result<String>) -> Unit) {
+        try {
+            val encryptedBin = CardEncrypter.encryptBin(bin, publicKey)
+            callback(Result.success(encryptedBin))
+        } catch (exception: Exception) {
+            callback(Result.failure(exception))
+        }
+    }
+
     private fun buildUnencryptedCard(unencryptedCardDTO: UnencryptedCardDTO): UnencryptedCard {
         val unencryptedCardBuilder = UnencryptedCard.Builder()
         unencryptedCardDTO.cardNumber?.let { unencryptedCardBuilder.setNumber(it) }

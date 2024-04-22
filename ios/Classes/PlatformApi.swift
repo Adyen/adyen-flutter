@@ -1324,6 +1324,7 @@ protocol CheckoutPlatformInterface {
   func createSession(sessionId: String, sessionData: String, configuration: Any?, completion: @escaping (Result<SessionDTO, Error>) -> Void)
   func encryptCard(unencryptedCardDTO: UnencryptedCardDTO, publicKey: String, completion: @escaping (Result<EncryptedCardDTO, Error>) -> Void)
   func encrypt(unencryptedCardDTO: UnencryptedCardDTO, publicKey: String, completion: @escaping (Result<String, Error>) -> Void)
+  func encryptBin(bin: String, publicKey: String, completion: @escaping (Result<String, Error>) -> Void)
   func enableConsoleLogging(loggingEnabled: Bool) throws
 }
 
@@ -1402,6 +1403,24 @@ class CheckoutPlatformInterfaceSetup {
       }
     } else {
       encryptChannel.setMessageHandler(nil)
+    }
+    let encryptBinChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.encryptBin", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      encryptBinChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let binArg = args[0] as! String
+        let publicKeyArg = args[1] as! String
+        api.encryptBin(bin: binArg, publicKey: publicKeyArg) { result in
+          switch result {
+            case .success(let res):
+              reply(wrapResult(res))
+            case .failure(let error):
+              reply(wrapError(error))
+          }
+        }
+      }
+    } else {
+      encryptBinChannel.setMessageHandler(nil)
     }
     let enableConsoleLoggingChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.enableConsoleLogging", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {

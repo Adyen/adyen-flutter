@@ -37,6 +37,12 @@ class MockAdyenCheckoutPlatform implements CheckoutPlatformInterface {
     // TODO: implement encryptCard
     throw UnimplementedError();
   }
+
+  @override
+  Future<String> encryptBin(String bin, String publicKey) {
+    // TODO: implement encryptBin
+    throw UnimplementedError();
+  }
 }
 
 void main() {

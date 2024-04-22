@@ -1394,6 +1394,7 @@ interface CheckoutPlatformInterface {
   fun createSession(sessionId: String, sessionData: String, configuration: Any?, callback: (Result<SessionDTO>) -> Unit)
   fun encryptCard(unencryptedCardDTO: UnencryptedCardDTO, publicKey: String, callback: (Result<EncryptedCardDTO>) -> Unit)
   fun encrypt(unencryptedCardDTO: UnencryptedCardDTO, publicKey: String, callback: (Result<String>) -> Unit)
+  fun encryptBin(bin: String, publicKey: String, callback: (Result<String>) -> Unit)
   fun enableConsoleLogging(loggingEnabled: Boolean)
 
   companion object {
@@ -1473,6 +1474,27 @@ interface CheckoutPlatformInterface {
             val unencryptedCardDTOArg = args[0] as UnencryptedCardDTO
             val publicKeyArg = args[1] as String
             api.encrypt(unencryptedCardDTOArg, publicKeyArg) { result: Result<String> ->
+              val error = result.exceptionOrNull()
+              if (error != null) {
+                reply.reply(wrapError(error))
+              } else {
+                val data = result.getOrNull()
+                reply.reply(wrapResult(data))
+              }
+            }
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.encryptBin", codec)
+        if (api != null) {
+          channel.setMessageHandler { message, reply ->
+            val args = message as List<Any?>
+            val binArg = args[0] as String
+            val publicKeyArg = args[1] as String
+            api.encryptBin(binArg, publicKeyArg) { result: Result<String> ->
               val error = result.exceptionOrNull()
               if (error != null) {
                 reply.reply(wrapError(error))
