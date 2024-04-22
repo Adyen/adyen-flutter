@@ -234,3 +234,26 @@ private func buildAdyenContext(environment: Environment, clientKey: String, amou
         analyticsConfiguration: analyticsConfiguration
     )
 }
+
+extension UnencryptedCardDTO {
+    func mapToUnencryptedCard() -> Card {
+        Card(
+            number: cardNumber,
+            securityCode: cvc,
+            expiryMonth: expiryMonth,
+            expiryYear: expiryYear,
+            holder: cardHolderName
+        )
+    }
+}
+
+extension EncryptedCard {
+    func mapToEncryptedCardDTO() -> EncryptedCardDTO {
+        EncryptedCardDTO(
+            encryptedCardNumber: number,
+            encryptedExpiryMonth: expiryMonth,
+            encryptedExpiryYear: expiryYear,
+            encryptedSecurityCode: securityCode
+        )
+    }
+}
