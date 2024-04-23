@@ -48,7 +48,7 @@ class CseScreen extends StatelessWidget {
 
   Future<void> encryptBin() async {
     try {
-      const bin = "123412341234";
+      const bin = "5555555555554444";
       final String encryptedBin =
           await AdyenCheckout.instance.encryptBin(bin, publicKey);
       debugPrint("Encrypted bin: $encryptedBin");
