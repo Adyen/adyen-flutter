@@ -241,8 +241,7 @@ extension UnencryptedCardDTO {
             number: cardNumber,
             securityCode: cvc,
             expiryMonth: expiryMonth,
-            expiryYear: expiryYear,
-            holder: cardHolderName
+            expiryYear: expiryYear
         )
     }
 }

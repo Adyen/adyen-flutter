@@ -1077,8 +1077,7 @@ data class UnencryptedCardDTO (
   val cardNumber: String? = null,
   val expiryMonth: String? = null,
   val expiryYear: String? = null,
-  val cvc: String? = null,
-  val cardHolderName: String? = null
+  val cvc: String? = null
 
 ) {
   companion object {
@@ -1088,8 +1087,7 @@ data class UnencryptedCardDTO (
       val expiryMonth = list[1] as String?
       val expiryYear = list[2] as String?
       val cvc = list[3] as String?
-      val cardHolderName = list[4] as String?
-      return UnencryptedCardDTO(cardNumber, expiryMonth, expiryYear, cvc, cardHolderName)
+      return UnencryptedCardDTO(cardNumber, expiryMonth, expiryYear, cvc)
     }
   }
   fun toList(): List<Any?> {
@@ -1098,7 +1096,6 @@ data class UnencryptedCardDTO (
       expiryMonth,
       expiryYear,
       cvc,
-      cardHolderName,
     )
   }
 }
@@ -1393,7 +1390,6 @@ interface CheckoutPlatformInterface {
   fun getReturnUrl(callback: (Result<String>) -> Unit)
   fun createSession(sessionId: String, sessionData: String, configuration: Any?, callback: (Result<SessionDTO>) -> Unit)
   fun encryptCard(unencryptedCardDTO: UnencryptedCardDTO, publicKey: String, callback: (Result<EncryptedCardDTO>) -> Unit)
-  fun encrypt(unencryptedCardDTO: UnencryptedCardDTO, publicKey: String, callback: (Result<String>) -> Unit)
   fun encryptBin(bin: String, publicKey: String, callback: (Result<String>) -> Unit)
   fun enableConsoleLogging(loggingEnabled: Boolean)
 
@@ -1453,27 +1449,6 @@ interface CheckoutPlatformInterface {
             val unencryptedCardDTOArg = args[0] as UnencryptedCardDTO
             val publicKeyArg = args[1] as String
             api.encryptCard(unencryptedCardDTOArg, publicKeyArg) { result: Result<EncryptedCardDTO> ->
-              val error = result.exceptionOrNull()
-              if (error != null) {
-                reply.reply(wrapError(error))
-              } else {
-                val data = result.getOrNull()
-                reply.reply(wrapResult(data))
-              }
-            }
-          }
-        } else {
-          channel.setMessageHandler(null)
-        }
-      }
-      run {
-        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.encrypt", codec)
-        if (api != null) {
-          channel.setMessageHandler { message, reply ->
-            val args = message as List<Any?>
-            val unencryptedCardDTOArg = args[0] as UnencryptedCardDTO
-            val publicKeyArg = args[1] as String
-            api.encrypt(unencryptedCardDTOArg, publicKeyArg) { result: Result<String> ->
               val error = result.exceptionOrNull()
               if (error != null) {
                 reply.reply(wrapError(error))

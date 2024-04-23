@@ -17,6 +17,7 @@ class Config {
   static const String xApiKey = String.fromEnvironment('X_API_KEY');
   static const String merchantId =
       String.fromEnvironment('APPLE_PAY_MERCHANT_ID_KEY');
+  static const String publicKey = String.fromEnvironment('PUBLIC_KEY');
 
   //Environment constants
   static const String merchantAccount = "FlutterTEST";
@@ -32,5 +33,5 @@ class Config {
       GooglePayEnvironment.test;
 
   //Example data
-  static Amount amount = Amount(currency: "EUR", value: 6500);
+  static Amount amount = Amount(currency: "EUR", value: 1295);
 }

@@ -58,13 +58,6 @@ class AdyenCheckout implements AdyenCheckoutInterface {
   }
 
   @override
-  Future<String> encrypt(
-    UnencryptedCard unencryptedCard,
-    String publicKey,
-  ) =>
-      _adyenCheckoutApi.encrypt(unencryptedCard.toDTO(), publicKey);
-
-  @override
   Future<String> encryptBin(
     String bin,
     String publicKey,

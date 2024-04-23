@@ -25,23 +25,19 @@ class MockAdyenCheckoutPlatform implements CheckoutPlatformInterface {
   }
 
   @override
-  Future<String> encrypt(
-      UnencryptedCardDTO unencryptedCardDTO, String publicKey) {
-    // TODO: implement encrypt
-    throw UnimplementedError();
-  }
-
-  @override
   Future<EncryptedCardDTO> encryptCard(
-      UnencryptedCardDTO unencryptedCardDTO, String publicKey) {
-    // TODO: implement encryptCard
-    throw UnimplementedError();
+      UnencryptedCardDTO unencryptedCardDTO, String publicKey) async {
+    return EncryptedCardDTO(
+      encryptedCardNumber: "test_5555555555554444",
+      encryptedExpiryMonth: "test_03",
+      encryptedExpiryYear: "test_2030",
+      encryptedSecurityCode: "test_737",
+    );
   }
 
   @override
-  Future<String> encryptBin(String bin, String publicKey) {
-    // TODO: implement encryptBin
-    throw UnimplementedError();
+  Future<String> encryptBin(String bin, String publicKey) async {
+    return "";
   }
 }
 

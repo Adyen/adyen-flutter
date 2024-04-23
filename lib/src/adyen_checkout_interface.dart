@@ -11,11 +11,6 @@ abstract class AdyenCheckoutInterface {
     String publicKey,
   );
 
-  Future<String> encrypt(
-    UnencryptedCard unencryptedCard,
-    String publicKey,
-  );
-
   Future<String> encryptBin(
     String bin,
     String publicKey,

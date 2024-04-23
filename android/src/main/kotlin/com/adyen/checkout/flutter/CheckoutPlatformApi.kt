@@ -16,7 +16,6 @@ import com.adyen.checkout.components.core.PaymentMethodsApiResponse
 import com.adyen.checkout.components.core.internal.Configuration
 import com.adyen.checkout.core.AdyenLogger
 import com.adyen.checkout.core.internal.util.Logger.NONE
-import com.adyen.checkout.cse.CardEncrypter
 import com.adyen.checkout.flutter.cse.AdyenCSE
 import com.adyen.checkout.flutter.session.SessionHolder
 import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToAnalyticsConfiguration
@@ -36,6 +35,7 @@ class CheckoutPlatformApi(
     private val sessionHolder: SessionHolder,
 ) : CheckoutPlatformInterface {
     private val adyenCSE: AdyenCSE = AdyenCSE()
+
     override fun getReturnUrl(callback: (Result<String>) -> Unit) {
         callback(Result.success(RedirectComponent.getReturnUrl(activity.applicationContext)))
     }
@@ -68,14 +68,11 @@ class CheckoutPlatformApi(
         callback: (Result<EncryptedCardDTO>) -> Unit
     ) = adyenCSE.encryptCard(unencryptedCardDTO, publicKey, callback)
 
-    override fun encrypt(
-        unencryptedCardDTO: UnencryptedCardDTO,
+    override fun encryptBin(
+        bin: String,
         publicKey: String,
         callback: (Result<String>) -> Unit
-    ) = adyenCSE.encrypt(unencryptedCardDTO, publicKey, callback)
-
-    override fun encryptBin(bin: String, publicKey: String, callback: (Result<String>) -> Unit) =
-        adyenCSE.encryptBin(bin, publicKey, callback)
+    ) = adyenCSE.encryptBin(bin, publicKey, callback)
 
     private fun determineSessionConfiguration(configuration: Any?): Configuration? {
         when (configuration) {

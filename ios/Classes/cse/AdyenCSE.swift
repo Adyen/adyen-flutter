@@ -12,16 +12,6 @@ class AdyenCSE {
         }
     }
     
-    func encrypt(unencryptedCardDTO: UnencryptedCardDTO, publicKey: String, completion: @escaping (Result<String, any Error>) -> Void) {
-        do {
-            let unencryptedCard = unencryptedCardDTO.mapToUnencryptedCard()
-            let encryptedCardToken = try CardEncryptor.encryptToken(from: unencryptedCard, with: publicKey)
-            completion(Result.success(encryptedCardToken))
-        } catch {
-            completion(Result.failure(error))
-        }
-    }
-    
     func encryptBin(bin: String, publicKey: String, completion: @escaping (Result<String, any Error>) -> Void) {
         do {
             let encryptedBin = try CardEncryptor.encrypt(bin: bin, with: publicKey)

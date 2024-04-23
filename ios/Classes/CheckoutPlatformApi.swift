@@ -74,10 +74,6 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
         adyenCse.encryptCard(unencryptedCardDTO: unencryptedCardDTO, publicKey: publicKey, completion: completion)
     }
     
-    func encrypt(unencryptedCardDTO: UnencryptedCardDTO, publicKey: String, completion: @escaping (Result<String, any Error>) -> Void) {
-        adyenCse.encrypt(unencryptedCardDTO: unencryptedCardDTO, publicKey: publicKey, completion: completion)
-    }
-    
     func encryptBin(bin: String, publicKey: String, completion: @escaping (Result<String, any Error>) -> Void) {
         adyenCse.encryptBin(bin: bin, publicKey: publicKey, completion: completion)
     }

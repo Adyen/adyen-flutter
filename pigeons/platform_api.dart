@@ -526,14 +526,12 @@ class UnencryptedCardDTO {
   final String? expiryMonth;
   final String? expiryYear;
   final String? cvc;
-  final String? cardHolderName;
 
   UnencryptedCardDTO(
     this.cardNumber,
     this.expiryMonth,
     this.expiryYear,
     this.cvc,
-    this.cardHolderName,
   );
 }
 
@@ -565,12 +563,6 @@ abstract class CheckoutPlatformInterface {
 
   @async
   EncryptedCardDTO encryptCard(
-    UnencryptedCardDTO unencryptedCardDTO,
-    String publicKey,
-  );
-
-  @async
-  String encrypt(
     UnencryptedCardDTO unencryptedCardDTO,
     String publicKey,
   );

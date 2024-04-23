@@ -18,6 +18,7 @@ import MerchantInfoDTO
 import OrderResponseDTO
 import ShippingAddressParametersDTO
 import TotalPriceStatus
+import UnencryptedCardDTO
 import android.content.Context
 import com.adyen.checkout.card.AddressConfiguration
 import com.adyen.checkout.card.CardConfiguration
@@ -32,6 +33,7 @@ import com.adyen.checkout.components.core.OrderResponse
 import com.adyen.checkout.components.core.internal.data.api.AnalyticsMapper
 import com.adyen.checkout.components.core.internal.data.api.AnalyticsPlatform
 import com.adyen.checkout.cse.EncryptedCard
+import com.adyen.checkout.cse.UnencryptedCard
 import com.adyen.checkout.dropin.DropInConfiguration
 import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToAnalyticsConfiguration
 import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToGooglePayConfiguration
@@ -393,8 +395,18 @@ object ConfigurationMapper {
             countryCode
         ) ?: throw Exception("Unable to create Google pay configuration")
     }
-    
-    fun EncryptedCard.mapToEncryptedCardDTO() : EncryptedCardDTO {
+
+    fun EncryptedCard.mapToEncryptedCardDTO(): EncryptedCardDTO {
         return EncryptedCardDTO(encryptedCardNumber, encryptedExpiryMonth, encryptedExpiryYear, encryptedSecurityCode)
+    }
+
+    fun UnencryptedCardDTO.fromDTO(): UnencryptedCard {
+        val unencryptedCardBuilder = UnencryptedCard.Builder()
+        cardNumber?.let { unencryptedCardBuilder.setNumber(it) }
+        if (expiryMonth != null && expiryYear != null) {
+            unencryptedCardBuilder.setExpiryDate(expiryMonth, expiryYear)
+        }
+        cvc?.let { unencryptedCardBuilder.setCvc(it) }
+        return unencryptedCardBuilder.build()
     }
 }

@@ -255,6 +255,5 @@ extension UnencryptedCardMapper on UnencryptedCard {
         expiryMonth: expiryMonth,
         expiryYear: expiryYear,
         cvc: cvc,
-        cardHolderName: cardHolderName,
       );
 }

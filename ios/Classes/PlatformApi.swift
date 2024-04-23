@@ -1119,21 +1119,18 @@ struct UnencryptedCardDTO {
     var expiryMonth: String?
     var expiryYear: String?
     var cvc: String?
-    var cardHolderName: String?
 
     static func fromList(_ list: [Any?]) -> UnencryptedCardDTO? {
         let cardNumber: String? = nilOrValue(list[0])
         let expiryMonth: String? = nilOrValue(list[1])
         let expiryYear: String? = nilOrValue(list[2])
         let cvc: String? = nilOrValue(list[3])
-        let cardHolderName: String? = nilOrValue(list[4])
 
         return UnencryptedCardDTO(
             cardNumber: cardNumber,
             expiryMonth: expiryMonth,
             expiryYear: expiryYear,
-            cvc: cvc,
-            cardHolderName: cardHolderName
+            cvc: cvc
         )
     }
 
@@ -1142,8 +1139,7 @@ struct UnencryptedCardDTO {
             cardNumber,
             expiryMonth,
             expiryYear,
-            cvc,
-            cardHolderName
+            cvc
         ]
     }
 }
@@ -1350,7 +1346,6 @@ protocol CheckoutPlatformInterface {
     func getReturnUrl(completion: @escaping (Result<String, Error>) -> Void)
     func createSession(sessionId: String, sessionData: String, configuration: Any?, completion: @escaping (Result<SessionDTO, Error>) -> Void)
     func encryptCard(unencryptedCardDTO: UnencryptedCardDTO, publicKey: String, completion: @escaping (Result<EncryptedCardDTO, Error>) -> Void)
-    func encrypt(unencryptedCardDTO: UnencryptedCardDTO, publicKey: String, completion: @escaping (Result<String, Error>) -> Void)
     func encryptBin(bin: String, publicKey: String, completion: @escaping (Result<String, Error>) -> Void)
     func enableConsoleLogging(loggingEnabled: Bool) throws
 }
@@ -1412,24 +1407,6 @@ class CheckoutPlatformInterfaceSetup {
             }
         } else {
             encryptCardChannel.setMessageHandler(nil)
-        }
-        let encryptChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.encrypt", binaryMessenger: binaryMessenger, codec: codec)
-        if let api {
-            encryptChannel.setMessageHandler { message, reply in
-                let args = message as! [Any?]
-                let unencryptedCardDTOArg = args[0] as! UnencryptedCardDTO
-                let publicKeyArg = args[1] as! String
-                api.encrypt(unencryptedCardDTO: unencryptedCardDTOArg, publicKey: publicKeyArg) { result in
-                    switch result {
-                    case let .success(res):
-                        reply(wrapResult(res))
-                    case let .failure(error):
-                        reply(wrapError(error))
-                    }
-                }
-            }
-        } else {
-            encryptChannel.setMessageHandler(nil)
         }
         let encryptBinChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.encryptBin", binaryMessenger: binaryMessenger, codec: codec)
         if let api {
