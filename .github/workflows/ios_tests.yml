@@ -33,6 +33,9 @@ jobs:
       - name: Pod install
         run: pod install
 
+      - name: Swift lint version
+        run: swiftlint version
+
       - name: Lint check
         working-directory: ios
         run: swiftlint --config .swiftlint.yml --output "swiftLintReport.json"
