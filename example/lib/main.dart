@@ -16,6 +16,7 @@ import 'package:adyen_checkout_example/screens/component/google_pay/google_pay_n
 import 'package:adyen_checkout_example/screens/component/google_pay/google_pay_session_component_screen.dart';
 import 'package:adyen_checkout_example/screens/component/multi_component/multi_component_advanced_screen.dart';
 import 'package:adyen_checkout_example/screens/component/multi_component/multi_component_navigation_screen.dart';
+import 'package:adyen_checkout_example/screens/cse/cse_screen.dart';
 import 'package:adyen_checkout_example/screens/drop_in/drop_in_screen.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -88,6 +89,7 @@ void main() {
             googlePayRepository: adyenGooglePayComponentRepository,
             applePayRepository: adyenApplePayComponentRepository,
           ),
+      '/clientSideEncryption': (context) => CseScreen(),
     },
     initialRoute: "/",
   ));
@@ -120,6 +122,10 @@ class MyApp extends StatelessWidget {
                 onPressed: () => Navigator.pushNamed(
                     context, "/multiComponentNavigationScreen"),
                 child: const Text("Multi component")),
+            TextButton(
+                onPressed: () =>
+                    Navigator.pushNamed(context, "/clientSideEncryption"),
+                child: const Text("Client-Side encryption")),
           ],
         ),
       ),

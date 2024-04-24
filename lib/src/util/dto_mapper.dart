@@ -239,3 +239,21 @@ extension ApplePayComponentConfigurationMapper
         applePayConfigurationDTO: applePayConfiguration.toDTO(),
       );
 }
+
+extension EncryptedCardMapper on EncryptedCardDTO {
+  EncryptedCard fromDTO() => EncryptedCard(
+        encryptedCardNumber: encryptedCardNumber,
+        encryptedExpiryMonth: encryptedExpiryMonth,
+        encryptedExpiryYear: encryptedExpiryYear,
+        encryptedSecurityCode: encryptedSecurityCode,
+      );
+}
+
+extension UnencryptedCardMapper on UnencryptedCard {
+  UnencryptedCardDTO toDTO() => UnencryptedCardDTO(
+        cardNumber: cardNumber,
+        expiryMonth: expiryMonth,
+        expiryYear: expiryYear,
+        cvc: cvc,
+      );
+}

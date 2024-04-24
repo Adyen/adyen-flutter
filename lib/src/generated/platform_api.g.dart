@@ -1242,6 +1242,78 @@ class InstantPaymentSetupResultDTO {
   }
 }
 
+class UnencryptedCardDTO {
+  UnencryptedCardDTO({
+    this.cardNumber,
+    this.expiryMonth,
+    this.expiryYear,
+    this.cvc,
+  });
+
+  String? cardNumber;
+
+  String? expiryMonth;
+
+  String? expiryYear;
+
+  String? cvc;
+
+  Object encode() {
+    return <Object?>[
+      cardNumber,
+      expiryMonth,
+      expiryYear,
+      cvc,
+    ];
+  }
+
+  static UnencryptedCardDTO decode(Object result) {
+    result as List<Object?>;
+    return UnencryptedCardDTO(
+      cardNumber: result[0] as String?,
+      expiryMonth: result[1] as String?,
+      expiryYear: result[2] as String?,
+      cvc: result[3] as String?,
+    );
+  }
+}
+
+class EncryptedCardDTO {
+  EncryptedCardDTO({
+    this.encryptedCardNumber,
+    this.encryptedExpiryMonth,
+    this.encryptedExpiryYear,
+    this.encryptedSecurityCode,
+  });
+
+  String? encryptedCardNumber;
+
+  String? encryptedExpiryMonth;
+
+  String? encryptedExpiryYear;
+
+  String? encryptedSecurityCode;
+
+  Object encode() {
+    return <Object?>[
+      encryptedCardNumber,
+      encryptedExpiryMonth,
+      encryptedExpiryYear,
+      encryptedSecurityCode,
+    ];
+  }
+
+  static EncryptedCardDTO decode(Object result) {
+    result as List<Object?>;
+    return EncryptedCardDTO(
+      encryptedCardNumber: result[0] as String?,
+      encryptedExpiryMonth: result[1] as String?,
+      encryptedExpiryYear: result[2] as String?,
+      encryptedSecurityCode: result[3] as String?,
+    );
+  }
+}
+
 class _CheckoutPlatformInterfaceCodec extends StandardMessageCodec {
   const _CheckoutPlatformInterfaceCodec();
   @override
@@ -1285,41 +1357,47 @@ class _CheckoutPlatformInterfaceCodec extends StandardMessageCodec {
     } else if (value is DropInConfigurationDTO) {
       buffer.putUint8(140);
       writeValue(buffer, value.encode());
-    } else if (value is ErrorDTO) {
+    } else if (value is EncryptedCardDTO) {
       buffer.putUint8(141);
       writeValue(buffer, value.encode());
-    } else if (value is GooglePayConfigurationDTO) {
+    } else if (value is ErrorDTO) {
       buffer.putUint8(142);
       writeValue(buffer, value.encode());
-    } else if (value is InstantPaymentConfigurationDTO) {
+    } else if (value is GooglePayConfigurationDTO) {
       buffer.putUint8(143);
       writeValue(buffer, value.encode());
-    } else if (value is InstantPaymentSetupResultDTO) {
+    } else if (value is InstantPaymentConfigurationDTO) {
       buffer.putUint8(144);
       writeValue(buffer, value.encode());
-    } else if (value is MerchantInfoDTO) {
+    } else if (value is InstantPaymentSetupResultDTO) {
       buffer.putUint8(145);
       writeValue(buffer, value.encode());
-    } else if (value is OrderResponseDTO) {
+    } else if (value is MerchantInfoDTO) {
       buffer.putUint8(146);
       writeValue(buffer, value.encode());
-    } else if (value is PaymentEventDTO) {
+    } else if (value is OrderResponseDTO) {
       buffer.putUint8(147);
       writeValue(buffer, value.encode());
-    } else if (value is PaymentResultDTO) {
+    } else if (value is PaymentEventDTO) {
       buffer.putUint8(148);
       writeValue(buffer, value.encode());
-    } else if (value is PaymentResultModelDTO) {
+    } else if (value is PaymentResultDTO) {
       buffer.putUint8(149);
       writeValue(buffer, value.encode());
-    } else if (value is PlatformCommunicationModel) {
+    } else if (value is PaymentResultModelDTO) {
       buffer.putUint8(150);
       writeValue(buffer, value.encode());
-    } else if (value is SessionDTO) {
+    } else if (value is PlatformCommunicationModel) {
       buffer.putUint8(151);
       writeValue(buffer, value.encode());
-    } else if (value is ShippingAddressParametersDTO) {
+    } else if (value is SessionDTO) {
       buffer.putUint8(152);
+      writeValue(buffer, value.encode());
+    } else if (value is ShippingAddressParametersDTO) {
+      buffer.putUint8(153);
+      writeValue(buffer, value.encode());
+    } else if (value is UnencryptedCardDTO) {
+      buffer.putUint8(154);
       writeValue(buffer, value.encode());
     } else {
       super.writeValue(buffer, value);
@@ -1356,29 +1434,33 @@ class _CheckoutPlatformInterfaceCodec extends StandardMessageCodec {
       case 140:
         return DropInConfigurationDTO.decode(readValue(buffer)!);
       case 141:
-        return ErrorDTO.decode(readValue(buffer)!);
+        return EncryptedCardDTO.decode(readValue(buffer)!);
       case 142:
-        return GooglePayConfigurationDTO.decode(readValue(buffer)!);
+        return ErrorDTO.decode(readValue(buffer)!);
       case 143:
-        return InstantPaymentConfigurationDTO.decode(readValue(buffer)!);
+        return GooglePayConfigurationDTO.decode(readValue(buffer)!);
       case 144:
-        return InstantPaymentSetupResultDTO.decode(readValue(buffer)!);
+        return InstantPaymentConfigurationDTO.decode(readValue(buffer)!);
       case 145:
-        return MerchantInfoDTO.decode(readValue(buffer)!);
+        return InstantPaymentSetupResultDTO.decode(readValue(buffer)!);
       case 146:
-        return OrderResponseDTO.decode(readValue(buffer)!);
+        return MerchantInfoDTO.decode(readValue(buffer)!);
       case 147:
-        return PaymentEventDTO.decode(readValue(buffer)!);
+        return OrderResponseDTO.decode(readValue(buffer)!);
       case 148:
-        return PaymentResultDTO.decode(readValue(buffer)!);
+        return PaymentEventDTO.decode(readValue(buffer)!);
       case 149:
-        return PaymentResultModelDTO.decode(readValue(buffer)!);
+        return PaymentResultDTO.decode(readValue(buffer)!);
       case 150:
-        return PlatformCommunicationModel.decode(readValue(buffer)!);
+        return PaymentResultModelDTO.decode(readValue(buffer)!);
       case 151:
-        return SessionDTO.decode(readValue(buffer)!);
+        return PlatformCommunicationModel.decode(readValue(buffer)!);
       case 152:
+        return SessionDTO.decode(readValue(buffer)!);
+      case 153:
         return ShippingAddressParametersDTO.decode(readValue(buffer)!);
+      case 154:
+        return UnencryptedCardDTO.decode(readValue(buffer)!);
       default:
         return super.readValueOfType(type, buffer);
     }
@@ -1453,6 +1535,65 @@ class CheckoutPlatformInterface {
       );
     } else {
       return (__pigeon_replyList[0] as SessionDTO?)!;
+    }
+  }
+
+  Future<EncryptedCardDTO> encryptCard(
+      UnencryptedCardDTO unencryptedCardDTO, String publicKey) async {
+    const String __pigeon_channelName =
+        'dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.encryptCard';
+    final BasicMessageChannel<Object?> __pigeon_channel =
+        BasicMessageChannel<Object?>(
+      __pigeon_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: __pigeon_binaryMessenger,
+    );
+    final List<Object?>? __pigeon_replyList = await __pigeon_channel
+        .send(<Object?>[unencryptedCardDTO, publicKey]) as List<Object?>?;
+    if (__pigeon_replyList == null) {
+      throw _createConnectionError(__pigeon_channelName);
+    } else if (__pigeon_replyList.length > 1) {
+      throw PlatformException(
+        code: __pigeon_replyList[0]! as String,
+        message: __pigeon_replyList[1] as String?,
+        details: __pigeon_replyList[2],
+      );
+    } else if (__pigeon_replyList[0] == null) {
+      throw PlatformException(
+        code: 'null-error',
+        message: 'Host platform returned null value for non-null return value.',
+      );
+    } else {
+      return (__pigeon_replyList[0] as EncryptedCardDTO?)!;
+    }
+  }
+
+  Future<String> encryptBin(String bin, String publicKey) async {
+    const String __pigeon_channelName =
+        'dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.encryptBin';
+    final BasicMessageChannel<Object?> __pigeon_channel =
+        BasicMessageChannel<Object?>(
+      __pigeon_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: __pigeon_binaryMessenger,
+    );
+    final List<Object?>? __pigeon_replyList = await __pigeon_channel
+        .send(<Object?>[bin, publicKey]) as List<Object?>?;
+    if (__pigeon_replyList == null) {
+      throw _createConnectionError(__pigeon_channelName);
+    } else if (__pigeon_replyList.length > 1) {
+      throw PlatformException(
+        code: __pigeon_replyList[0]! as String,
+        message: __pigeon_replyList[1] as String?,
+        details: __pigeon_replyList[2],
+      );
+    } else if (__pigeon_replyList[0] == null) {
+      throw PlatformException(
+        code: 'null-error',
+        message: 'Host platform returned null value for non-null return value.',
+      );
+    } else {
+      return (__pigeon_replyList[0] as String?)!;
     }
   }
 

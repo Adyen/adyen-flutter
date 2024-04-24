@@ -23,6 +23,22 @@ class MockAdyenCheckoutPlatform implements CheckoutPlatformInterface {
       paymentMethodsJson: "",
     );
   }
+
+  @override
+  Future<EncryptedCardDTO> encryptCard(
+      UnencryptedCardDTO unencryptedCardDTO, String publicKey) async {
+    return EncryptedCardDTO(
+      encryptedCardNumber: "test_5555555555554444",
+      encryptedExpiryMonth: "test_03",
+      encryptedExpiryYear: "test_2030",
+      encryptedSecurityCode: "test_737",
+    );
+  }
+
+  @override
+  Future<String> encryptBin(String bin, String publicKey) async {
+    return "";
+  }
 }
 
 void main() {

@@ -1072,6 +1072,62 @@ data class InstantPaymentSetupResultDTO (
   }
 }
 
+/** Generated class from Pigeon that represents data sent in messages. */
+data class UnencryptedCardDTO (
+  val cardNumber: String? = null,
+  val expiryMonth: String? = null,
+  val expiryYear: String? = null,
+  val cvc: String? = null
+
+) {
+  companion object {
+    @Suppress("UNCHECKED_CAST")
+    fun fromList(list: List<Any?>): UnencryptedCardDTO {
+      val cardNumber = list[0] as String?
+      val expiryMonth = list[1] as String?
+      val expiryYear = list[2] as String?
+      val cvc = list[3] as String?
+      return UnencryptedCardDTO(cardNumber, expiryMonth, expiryYear, cvc)
+    }
+  }
+  fun toList(): List<Any?> {
+    return listOf<Any?>(
+      cardNumber,
+      expiryMonth,
+      expiryYear,
+      cvc,
+    )
+  }
+}
+
+/** Generated class from Pigeon that represents data sent in messages. */
+data class EncryptedCardDTO (
+  val encryptedCardNumber: String? = null,
+  val encryptedExpiryMonth: String? = null,
+  val encryptedExpiryYear: String? = null,
+  val encryptedSecurityCode: String? = null
+
+) {
+  companion object {
+    @Suppress("UNCHECKED_CAST")
+    fun fromList(list: List<Any?>): EncryptedCardDTO {
+      val encryptedCardNumber = list[0] as String?
+      val encryptedExpiryMonth = list[1] as String?
+      val encryptedExpiryYear = list[2] as String?
+      val encryptedSecurityCode = list[3] as String?
+      return EncryptedCardDTO(encryptedCardNumber, encryptedExpiryMonth, encryptedExpiryYear, encryptedSecurityCode)
+    }
+  }
+  fun toList(): List<Any?> {
+    return listOf<Any?>(
+      encryptedCardNumber,
+      encryptedExpiryMonth,
+      encryptedExpiryYear,
+      encryptedSecurityCode,
+    )
+  }
+}
+
 @Suppress("UNCHECKED_CAST")
 private object CheckoutPlatformInterfaceCodec : StandardMessageCodec() {
   override fun readValueOfType(type: Byte, buffer: ByteBuffer): Any? {
@@ -1143,62 +1199,72 @@ private object CheckoutPlatformInterfaceCodec : StandardMessageCodec() {
       }
       141.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          ErrorDTO.fromList(it)
+          EncryptedCardDTO.fromList(it)
         }
       }
       142.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          GooglePayConfigurationDTO.fromList(it)
+          ErrorDTO.fromList(it)
         }
       }
       143.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          InstantPaymentConfigurationDTO.fromList(it)
+          GooglePayConfigurationDTO.fromList(it)
         }
       }
       144.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          InstantPaymentSetupResultDTO.fromList(it)
+          InstantPaymentConfigurationDTO.fromList(it)
         }
       }
       145.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          MerchantInfoDTO.fromList(it)
+          InstantPaymentSetupResultDTO.fromList(it)
         }
       }
       146.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          OrderResponseDTO.fromList(it)
+          MerchantInfoDTO.fromList(it)
         }
       }
       147.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          PaymentEventDTO.fromList(it)
+          OrderResponseDTO.fromList(it)
         }
       }
       148.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          PaymentResultDTO.fromList(it)
+          PaymentEventDTO.fromList(it)
         }
       }
       149.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          PaymentResultModelDTO.fromList(it)
+          PaymentResultDTO.fromList(it)
         }
       }
       150.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          PlatformCommunicationModel.fromList(it)
+          PaymentResultModelDTO.fromList(it)
         }
       }
       151.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          SessionDTO.fromList(it)
+          PlatformCommunicationModel.fromList(it)
         }
       }
       152.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
+          SessionDTO.fromList(it)
+        }
+      }
+      153.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
           ShippingAddressParametersDTO.fromList(it)
+        }
+      }
+      154.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          UnencryptedCardDTO.fromList(it)
         }
       }
       else -> super.readValueOfType(type, buffer)
@@ -1258,52 +1324,60 @@ private object CheckoutPlatformInterfaceCodec : StandardMessageCodec() {
         stream.write(140)
         writeValue(stream, value.toList())
       }
-      is ErrorDTO -> {
+      is EncryptedCardDTO -> {
         stream.write(141)
         writeValue(stream, value.toList())
       }
-      is GooglePayConfigurationDTO -> {
+      is ErrorDTO -> {
         stream.write(142)
         writeValue(stream, value.toList())
       }
-      is InstantPaymentConfigurationDTO -> {
+      is GooglePayConfigurationDTO -> {
         stream.write(143)
         writeValue(stream, value.toList())
       }
-      is InstantPaymentSetupResultDTO -> {
+      is InstantPaymentConfigurationDTO -> {
         stream.write(144)
         writeValue(stream, value.toList())
       }
-      is MerchantInfoDTO -> {
+      is InstantPaymentSetupResultDTO -> {
         stream.write(145)
         writeValue(stream, value.toList())
       }
-      is OrderResponseDTO -> {
+      is MerchantInfoDTO -> {
         stream.write(146)
         writeValue(stream, value.toList())
       }
-      is PaymentEventDTO -> {
+      is OrderResponseDTO -> {
         stream.write(147)
         writeValue(stream, value.toList())
       }
-      is PaymentResultDTO -> {
+      is PaymentEventDTO -> {
         stream.write(148)
         writeValue(stream, value.toList())
       }
-      is PaymentResultModelDTO -> {
+      is PaymentResultDTO -> {
         stream.write(149)
         writeValue(stream, value.toList())
       }
-      is PlatformCommunicationModel -> {
+      is PaymentResultModelDTO -> {
         stream.write(150)
         writeValue(stream, value.toList())
       }
-      is SessionDTO -> {
+      is PlatformCommunicationModel -> {
         stream.write(151)
         writeValue(stream, value.toList())
       }
-      is ShippingAddressParametersDTO -> {
+      is SessionDTO -> {
         stream.write(152)
+        writeValue(stream, value.toList())
+      }
+      is ShippingAddressParametersDTO -> {
+        stream.write(153)
+        writeValue(stream, value.toList())
+      }
+      is UnencryptedCardDTO -> {
+        stream.write(154)
         writeValue(stream, value.toList())
       }
       else -> super.writeValue(stream, value)
@@ -1315,6 +1389,8 @@ private object CheckoutPlatformInterfaceCodec : StandardMessageCodec() {
 interface CheckoutPlatformInterface {
   fun getReturnUrl(callback: (Result<String>) -> Unit)
   fun createSession(sessionId: String, sessionData: String, configuration: Any?, callback: (Result<SessionDTO>) -> Unit)
+  fun encryptCard(unencryptedCardDTO: UnencryptedCardDTO, publicKey: String, callback: (Result<EncryptedCardDTO>) -> Unit)
+  fun encryptBin(bin: String, publicKey: String, callback: (Result<String>) -> Unit)
   fun enableConsoleLogging(loggingEnabled: Boolean)
 
   companion object {
@@ -1352,6 +1428,48 @@ interface CheckoutPlatformInterface {
             val sessionDataArg = args[1] as String
             val configurationArg = args[2]
             api.createSession(sessionIdArg, sessionDataArg, configurationArg) { result: Result<SessionDTO> ->
+              val error = result.exceptionOrNull()
+              if (error != null) {
+                reply.reply(wrapError(error))
+              } else {
+                val data = result.getOrNull()
+                reply.reply(wrapResult(data))
+              }
+            }
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.encryptCard", codec)
+        if (api != null) {
+          channel.setMessageHandler { message, reply ->
+            val args = message as List<Any?>
+            val unencryptedCardDTOArg = args[0] as UnencryptedCardDTO
+            val publicKeyArg = args[1] as String
+            api.encryptCard(unencryptedCardDTOArg, publicKeyArg) { result: Result<EncryptedCardDTO> ->
+              val error = result.exceptionOrNull()
+              if (error != null) {
+                reply.reply(wrapError(error))
+              } else {
+                val data = result.getOrNull()
+                reply.reply(wrapResult(data))
+              }
+            }
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.encryptBin", codec)
+        if (api != null) {
+          channel.setMessageHandler { message, reply ->
+            val args = message as List<Any?>
+            val binArg = args[0] as String
+            val publicKeyArg = args[1] as String
+            api.encryptBin(binArg, publicKeyArg) { result: Result<String> ->
               val error = result.exceptionOrNull()
               if (error != null) {
                 reply.reply(wrapError(error))

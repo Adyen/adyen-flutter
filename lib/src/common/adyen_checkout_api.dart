@@ -21,4 +21,18 @@ class AdyenCheckoutApi implements CheckoutPlatformInterface {
   @override
   Future<void> enableConsoleLogging(bool loggingEnabled) =>
       checkoutApi.enableConsoleLogging(loggingEnabled);
+
+  @override
+  Future<EncryptedCardDTO> encryptCard(
+    UnencryptedCardDTO unencryptedCardDTO,
+    String publicKey,
+  ) =>
+      checkoutApi.encryptCard(unencryptedCardDTO, publicKey);
+
+  @override
+  Future<String> encryptBin(
+    String bin,
+    String publicKey,
+  ) =>
+      checkoutApi.encryptBin(bin, publicKey);
 }

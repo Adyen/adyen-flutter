@@ -1113,6 +1113,68 @@ struct InstantPaymentSetupResultDTO {
     }
 }
 
+/// Generated class from Pigeon that represents data sent in messages.
+struct UnencryptedCardDTO {
+    var cardNumber: String?
+    var expiryMonth: String?
+    var expiryYear: String?
+    var cvc: String?
+
+    static func fromList(_ list: [Any?]) -> UnencryptedCardDTO? {
+        let cardNumber: String? = nilOrValue(list[0])
+        let expiryMonth: String? = nilOrValue(list[1])
+        let expiryYear: String? = nilOrValue(list[2])
+        let cvc: String? = nilOrValue(list[3])
+
+        return UnencryptedCardDTO(
+            cardNumber: cardNumber,
+            expiryMonth: expiryMonth,
+            expiryYear: expiryYear,
+            cvc: cvc
+        )
+    }
+
+    func toList() -> [Any?] {
+        [
+            cardNumber,
+            expiryMonth,
+            expiryYear,
+            cvc
+        ]
+    }
+}
+
+/// Generated class from Pigeon that represents data sent in messages.
+struct EncryptedCardDTO {
+    var encryptedCardNumber: String?
+    var encryptedExpiryMonth: String?
+    var encryptedExpiryYear: String?
+    var encryptedSecurityCode: String?
+
+    static func fromList(_ list: [Any?]) -> EncryptedCardDTO? {
+        let encryptedCardNumber: String? = nilOrValue(list[0])
+        let encryptedExpiryMonth: String? = nilOrValue(list[1])
+        let encryptedExpiryYear: String? = nilOrValue(list[2])
+        let encryptedSecurityCode: String? = nilOrValue(list[3])
+
+        return EncryptedCardDTO(
+            encryptedCardNumber: encryptedCardNumber,
+            encryptedExpiryMonth: encryptedExpiryMonth,
+            encryptedExpiryYear: encryptedExpiryYear,
+            encryptedSecurityCode: encryptedSecurityCode
+        )
+    }
+
+    func toList() -> [Any?] {
+        [
+            encryptedCardNumber,
+            encryptedExpiryMonth,
+            encryptedExpiryYear,
+            encryptedSecurityCode
+        ]
+    }
+}
+
 private class CheckoutPlatformInterfaceCodecReader: FlutterStandardReader {
     override func readValue(ofType type: UInt8) -> Any? {
         switch type {
@@ -1143,29 +1205,33 @@ private class CheckoutPlatformInterfaceCodecReader: FlutterStandardReader {
         case 140:
             return DropInConfigurationDTO.fromList(self.readValue() as! [Any?])
         case 141:
-            return ErrorDTO.fromList(self.readValue() as! [Any?])
+            return EncryptedCardDTO.fromList(self.readValue() as! [Any?])
         case 142:
-            return GooglePayConfigurationDTO.fromList(self.readValue() as! [Any?])
+            return ErrorDTO.fromList(self.readValue() as! [Any?])
         case 143:
-            return InstantPaymentConfigurationDTO.fromList(self.readValue() as! [Any?])
+            return GooglePayConfigurationDTO.fromList(self.readValue() as! [Any?])
         case 144:
-            return InstantPaymentSetupResultDTO.fromList(self.readValue() as! [Any?])
+            return InstantPaymentConfigurationDTO.fromList(self.readValue() as! [Any?])
         case 145:
-            return MerchantInfoDTO.fromList(self.readValue() as! [Any?])
+            return InstantPaymentSetupResultDTO.fromList(self.readValue() as! [Any?])
         case 146:
-            return OrderResponseDTO.fromList(self.readValue() as! [Any?])
+            return MerchantInfoDTO.fromList(self.readValue() as! [Any?])
         case 147:
-            return PaymentEventDTO.fromList(self.readValue() as! [Any?])
+            return OrderResponseDTO.fromList(self.readValue() as! [Any?])
         case 148:
-            return PaymentResultDTO.fromList(self.readValue() as! [Any?])
+            return PaymentEventDTO.fromList(self.readValue() as! [Any?])
         case 149:
-            return PaymentResultModelDTO.fromList(self.readValue() as! [Any?])
+            return PaymentResultDTO.fromList(self.readValue() as! [Any?])
         case 150:
-            return PlatformCommunicationModel.fromList(self.readValue() as! [Any?])
+            return PaymentResultModelDTO.fromList(self.readValue() as! [Any?])
         case 151:
-            return SessionDTO.fromList(self.readValue() as! [Any?])
+            return PlatformCommunicationModel.fromList(self.readValue() as! [Any?])
         case 152:
+            return SessionDTO.fromList(self.readValue() as! [Any?])
+        case 153:
             return ShippingAddressParametersDTO.fromList(self.readValue() as! [Any?])
+        case 154:
+            return UnencryptedCardDTO.fromList(self.readValue() as! [Any?])
         default:
             return super.readValue(ofType: type)
         }
@@ -1213,41 +1279,47 @@ private class CheckoutPlatformInterfaceCodecWriter: FlutterStandardWriter {
         } else if let value = value as? DropInConfigurationDTO {
             super.writeByte(140)
             super.writeValue(value.toList())
-        } else if let value = value as? ErrorDTO {
+        } else if let value = value as? EncryptedCardDTO {
             super.writeByte(141)
             super.writeValue(value.toList())
-        } else if let value = value as? GooglePayConfigurationDTO {
+        } else if let value = value as? ErrorDTO {
             super.writeByte(142)
             super.writeValue(value.toList())
-        } else if let value = value as? InstantPaymentConfigurationDTO {
+        } else if let value = value as? GooglePayConfigurationDTO {
             super.writeByte(143)
             super.writeValue(value.toList())
-        } else if let value = value as? InstantPaymentSetupResultDTO {
+        } else if let value = value as? InstantPaymentConfigurationDTO {
             super.writeByte(144)
             super.writeValue(value.toList())
-        } else if let value = value as? MerchantInfoDTO {
+        } else if let value = value as? InstantPaymentSetupResultDTO {
             super.writeByte(145)
             super.writeValue(value.toList())
-        } else if let value = value as? OrderResponseDTO {
+        } else if let value = value as? MerchantInfoDTO {
             super.writeByte(146)
             super.writeValue(value.toList())
-        } else if let value = value as? PaymentEventDTO {
+        } else if let value = value as? OrderResponseDTO {
             super.writeByte(147)
             super.writeValue(value.toList())
-        } else if let value = value as? PaymentResultDTO {
+        } else if let value = value as? PaymentEventDTO {
             super.writeByte(148)
             super.writeValue(value.toList())
-        } else if let value = value as? PaymentResultModelDTO {
+        } else if let value = value as? PaymentResultDTO {
             super.writeByte(149)
             super.writeValue(value.toList())
-        } else if let value = value as? PlatformCommunicationModel {
+        } else if let value = value as? PaymentResultModelDTO {
             super.writeByte(150)
             super.writeValue(value.toList())
-        } else if let value = value as? SessionDTO {
+        } else if let value = value as? PlatformCommunicationModel {
             super.writeByte(151)
             super.writeValue(value.toList())
-        } else if let value = value as? ShippingAddressParametersDTO {
+        } else if let value = value as? SessionDTO {
             super.writeByte(152)
+            super.writeValue(value.toList())
+        } else if let value = value as? ShippingAddressParametersDTO {
+            super.writeByte(153)
+            super.writeValue(value.toList())
+        } else if let value = value as? UnencryptedCardDTO {
+            super.writeByte(154)
             super.writeValue(value.toList())
         } else {
             super.writeValue(value)
@@ -1273,6 +1345,8 @@ class CheckoutPlatformInterfaceCodec: FlutterStandardMessageCodec {
 protocol CheckoutPlatformInterface {
     func getReturnUrl(completion: @escaping (Result<String, Error>) -> Void)
     func createSession(sessionId: String, sessionData: String, configuration: Any?, completion: @escaping (Result<SessionDTO, Error>) -> Void)
+    func encryptCard(unencryptedCardDTO: UnencryptedCardDTO, publicKey: String, completion: @escaping (Result<EncryptedCardDTO, Error>) -> Void)
+    func encryptBin(bin: String, publicKey: String, completion: @escaping (Result<String, Error>) -> Void)
     func enableConsoleLogging(loggingEnabled: Bool) throws
 }
 
@@ -1315,6 +1389,42 @@ class CheckoutPlatformInterfaceSetup {
             }
         } else {
             createSessionChannel.setMessageHandler(nil)
+        }
+        let encryptCardChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.encryptCard", binaryMessenger: binaryMessenger, codec: codec)
+        if let api {
+            encryptCardChannel.setMessageHandler { message, reply in
+                let args = message as! [Any?]
+                let unencryptedCardDTOArg = args[0] as! UnencryptedCardDTO
+                let publicKeyArg = args[1] as! String
+                api.encryptCard(unencryptedCardDTO: unencryptedCardDTOArg, publicKey: publicKeyArg) { result in
+                    switch result {
+                    case let .success(res):
+                        reply(wrapResult(res))
+                    case let .failure(error):
+                        reply(wrapError(error))
+                    }
+                }
+            }
+        } else {
+            encryptCardChannel.setMessageHandler(nil)
+        }
+        let encryptBinChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.encryptBin", binaryMessenger: binaryMessenger, codec: codec)
+        if let api {
+            encryptBinChannel.setMessageHandler { message, reply in
+                let args = message as! [Any?]
+                let binArg = args[0] as! String
+                let publicKeyArg = args[1] as! String
+                api.encryptBin(bin: binArg, publicKey: publicKeyArg) { result in
+                    switch result {
+                    case let .success(res):
+                        reply(wrapResult(res))
+                    case let .failure(error):
+                        reply(wrapError(error))
+                    }
+                }
+            }
+        } else {
+            encryptBinChannel.setMessageHandler(nil)
         }
         let enableConsoleLoggingChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.enableConsoleLogging", binaryMessenger: binaryMessenger, codec: codec)
         if let api {
