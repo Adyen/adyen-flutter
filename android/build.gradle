@@ -1,12 +1,12 @@
 buildscript {
-    ext.kotlin_version = '1.9.22'
+    ext.kotlin_version = '1.9.23'
     repositories {
         google()
         mavenCentral()
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:8.1.2'
+        classpath 'com.android.tools.build:gradle:8.3.1'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
 }
@@ -50,7 +50,7 @@ android {
     }
 
     dependencies {
-        implementation 'com.adyen.checkout:drop-in:5.2.0'
+        implementation 'com.adyen.checkout:drop-in:5.3.1'
         implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
         testImplementation 'org.jetbrains.kotlin:kotlin-test'
         testImplementation 'org.mockito:mockito-core:5.11.0'
