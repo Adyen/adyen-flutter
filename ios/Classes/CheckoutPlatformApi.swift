@@ -71,11 +71,13 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
     }
     
     func encryptCard(unencryptedCardDTO: UnencryptedCardDTO, publicKey: String, completion: @escaping (Result<EncryptedCardDTO, any Error>) -> Void) {
-        adyenCse.encryptCard(unencryptedCardDTO: unencryptedCardDTO, publicKey: publicKey, completion: completion)
+        let encryptedCardResult = adyenCse.encryptCard(unencryptedCardDTO: unencryptedCardDTO, publicKey: publicKey)
+        completion(encryptedCardResult)
     }
     
     func encryptBin(bin: String, publicKey: String, completion: @escaping (Result<String, any Error>) -> Void) {
-        adyenCse.encryptBin(bin: bin, publicKey: publicKey, completion: completion)
+        let encryptedBinResult = adyenCse.encryptBin(bin: bin, publicKey: publicKey)
+        completion(encryptedBinResult)
     }
 
     private func createSessionForDropIn(
