@@ -66,13 +66,19 @@ class CheckoutPlatformApi(
         unencryptedCardDTO: UnencryptedCardDTO,
         publicKey: String,
         callback: (Result<EncryptedCardDTO>) -> Unit
-    ) = adyenCSE.encryptCard(unencryptedCardDTO, publicKey, callback)
+    ) {
+        val encryptedCardResult = adyenCSE.encryptCard(unencryptedCardDTO, publicKey)
+        callback(encryptedCardResult)
+    }
 
     override fun encryptBin(
         bin: String,
         publicKey: String,
         callback: (Result<String>) -> Unit
-    ) = adyenCSE.encryptBin(bin, publicKey, callback)
+    ) {
+        val encryptedBin = adyenCSE.encryptBin(bin, publicKey)
+        callback(encryptedBin)
+    }
 
     private fun determineSessionConfiguration(configuration: Any?): Configuration? {
         when (configuration) {
