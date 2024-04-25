@@ -22,7 +22,7 @@ import com.adyen.checkout.flutter.components.ComponentHeightMessenger
 import com.adyen.checkout.flutter.components.ComponentResultMessenger
 import com.adyen.checkout.flutter.components.view.ComponentWrapperView
 import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToAnalyticsConfiguration
-import com.adyen.checkout.flutter.utils.ConfigurationMapper.toNativeModel
+import com.adyen.checkout.flutter.utils.ConfigurationMapper.fromDTO
 import com.adyen.checkout.redirect.RedirectComponent
 import com.adyen.checkout.ui.core.AdyenComponentView
 import io.flutter.plugin.platform.PlatformView
@@ -37,17 +37,17 @@ abstract class BaseCardComponent(
     private val configuration =
         creationParams[CARD_COMPONENT_CONFIGURATION_KEY] as CardComponentConfigurationDTO?
             ?: throw Exception("Card configuration not found")
-    private val environment = configuration.environment.toNativeModel()
+    private val environment = configuration.environment.fromDTO()
     private val componentWrapperView = ComponentWrapperView(activity, componentFlutterApi)
     private val intentListener = Consumer<Intent> { handleIntent(it) }
     val cardConfiguration =
-        configuration.cardConfiguration.toNativeModel(
+        configuration.cardConfiguration.fromDTO(
             context,
             configuration.shopperLocale,
             environment,
             configuration.clientKey,
             configuration.analyticsOptionsDTO.mapToAnalyticsConfiguration(),
-            configuration.amount.toNativeModel(),
+            configuration.amount.fromDTO(),
         )
 
     internal var cardComponent: CardComponent? = null

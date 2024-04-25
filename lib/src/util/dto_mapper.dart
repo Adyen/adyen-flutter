@@ -257,3 +257,18 @@ extension UnencryptedCardMapper on UnencryptedCard {
         cvc: cvc,
       );
 }
+
+extension InstantComponentConfigurationMapper on InstantComponentConfiguration {
+  InstantPaymentConfigurationDTO toDTO(
+    String sdkVersionNumber,
+    InstantPaymentType instantPaymentType,
+  ) =>
+      InstantPaymentConfigurationDTO(
+        instantPaymentType: instantPaymentType,
+        environment: environment,
+        clientKey: clientKey,
+        countryCode: countryCode,
+        amount: amount.toDTO(),
+        analyticsOptionsDTO: analyticsOptions.toDTO(sdkVersionNumber),
+      );
+}

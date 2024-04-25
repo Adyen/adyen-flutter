@@ -3,7 +3,6 @@ import 'package:adyen_checkout/src/common/model/base_configuration.dart';
 
 final class GooglePayComponentConfiguration extends BaseConfiguration {
   final GooglePayConfiguration googlePayConfiguration;
-  final AnalyticsOptions analyticsOptions;
 
   GooglePayComponentConfiguration({
     required super.environment,
@@ -12,6 +11,6 @@ final class GooglePayComponentConfiguration extends BaseConfiguration {
     required super.amount,
     required this.googlePayConfiguration,
     super.shopperLocale,
-    AnalyticsOptions? analyticsOptions,
-  }) : analyticsOptions = analyticsOptions ?? AnalyticsOptions(enabled: true);
+    super.analyticsOptions,
+  });
 }

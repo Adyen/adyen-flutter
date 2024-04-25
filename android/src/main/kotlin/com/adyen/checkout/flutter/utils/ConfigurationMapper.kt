@@ -35,13 +35,11 @@ import com.adyen.checkout.components.core.internal.data.api.AnalyticsPlatform
 import com.adyen.checkout.cse.EncryptedCard
 import com.adyen.checkout.cse.UnencryptedCard
 import com.adyen.checkout.dropin.DropInConfiguration
-import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToAnalyticsConfiguration
-import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToGooglePayConfiguration
-import com.adyen.checkout.flutter.utils.ConfigurationMapper.toNativeModel
 import com.adyen.checkout.googlepay.BillingAddressParameters
 import com.adyen.checkout.googlepay.GooglePayConfiguration
 import com.adyen.checkout.googlepay.MerchantInfo
 import com.adyen.checkout.googlepay.ShippingAddressParameters
+import com.adyen.checkout.instant.InstantPaymentConfiguration
 import com.google.android.gms.wallet.WalletConstants
 import java.util.Locale
 import com.adyen.checkout.cashapppay.CashAppPayEnvironment as SDKCashAppPayEnvironment
@@ -58,8 +56,8 @@ object ConfigurationMapper {
     }
 
     fun DropInConfigurationDTO.mapToDropInConfiguration(context: Context): DropInConfiguration {
-        val environment = environment.toNativeModel()
-        val amount = amount.toNativeModel()
+        val environment = environment.fromDTO()
+        val amount = amount.fromDTO()
         val dropInConfiguration = buildDropInConfiguration(context, shopperLocale, environment)
         val analyticsConfiguration = analyticsOptionsDTO.mapToAnalyticsConfiguration()
 
@@ -77,7 +75,7 @@ object ConfigurationMapper {
 
         if (cardConfigurationDTO != null) {
             val cardConfiguration =
-                cardConfigurationDTO.toNativeModel(
+                cardConfigurationDTO.fromDTO(
                     context,
                     shopperLocale,
                     environment,
@@ -117,7 +115,7 @@ object ConfigurationMapper {
         }
     }
 
-    fun CardConfigurationDTO.toNativeModel(
+    fun CardConfigurationDTO.fromDTO(
         context: Context,
         shopperLocale: String?,
         environment: com.adyen.checkout.core.Environment,
@@ -220,7 +218,7 @@ object ConfigurationMapper {
         return mappedCardTypes.filterNotNull().toTypedArray()
     }
 
-    fun Environment.toNativeModel(): SDKEnvironment {
+    fun Environment.fromDTO(): SDKEnvironment {
         return when (this) {
             Environment.TEST -> SDKEnvironment.TEST
             Environment.EUROPE -> SDKEnvironment.EUROPE
@@ -231,7 +229,7 @@ object ConfigurationMapper {
         }
     }
 
-    fun AmountDTO.toNativeModel(): Amount {
+    fun AmountDTO.fromDTO(): Amount {
         return Amount(this.currency, this.value)
     }
 
@@ -374,19 +372,19 @@ object ConfigurationMapper {
                 val locale = Locale.forLanguageTag(shopperLocale)
                 GooglePayConfiguration.Builder(
                     locale,
-                    environment.toNativeModel(),
+                    environment.fromDTO(),
                     clientKey
                 )
             } else {
                 GooglePayConfiguration.Builder(
                     context,
-                    environment.toNativeModel(),
+                    environment.fromDTO(),
                     clientKey
                 )
             }
 
         val analyticsConfiguration: AnalyticsConfiguration = analyticsOptionsDTO.mapToAnalyticsConfiguration()
-        val amount: Amount = amount.toNativeModel()
+        val amount: Amount = amount.fromDTO()
         val countryCode: String = countryCode
         return googlePayConfigurationDTO?.mapToGooglePayConfiguration(
             googlePayConfigurationBuilder,
@@ -408,5 +406,17 @@ object ConfigurationMapper {
         }
         cvc?.let { unencryptedCardBuilder.setCvc(it) }
         return unencryptedCardBuilder.build()
+    }
+
+    fun InstantPaymentConfigurationDTO.fromDTO(context: Context): InstantPaymentConfiguration {
+        val environment = environment.fromDTO()
+        val instantPaymentConfigurationBuilder = if (shopperLocale != null) {
+            val locale = Locale.forLanguageTag(shopperLocale)
+            InstantPaymentConfiguration.Builder(locale, environment, clientKey)
+        } else {
+            InstantPaymentConfiguration.Builder(context, environment, clientKey)
+        }
+        instantPaymentConfigurationBuilder.setAnalyticsConfiguration(analyticsOptionsDTO.mapToAnalyticsConfiguration())
+        return instantPaymentConfigurationBuilder.build()
     }
 }

@@ -10,12 +10,21 @@ import PaymentEventDTO
 import PaymentEventType
 import PaymentResultModelDTO
 import android.content.Intent
+import androidx.core.util.Consumer
+import androidx.core.view.KeyEventDispatcher.Component
 import androidx.fragment.app.FragmentActivity
+import com.adyen.checkout.action.core.internal.ActionHandlingComponent
 import com.adyen.checkout.components.core.PaymentMethod
+import com.adyen.checkout.components.core.action.Action
+import com.adyen.checkout.components.core.internal.PaymentComponent
 import com.adyen.checkout.flutter.components.googlepay.GooglePayComponentManager
+import com.adyen.checkout.flutter.components.instant.InstantComponentManager
 import com.adyen.checkout.flutter.session.SessionHolder
 import com.adyen.checkout.flutter.utils.Constants.Companion.GOOGLE_PAY_ADVANCED_COMPONENT_KEY
 import com.adyen.checkout.flutter.utils.Constants.Companion.GOOGLE_PAY_SESSION_COMPONENT_KEY
+import com.adyen.checkout.instant.InstantPaymentComponent
+import com.adyen.checkout.redirect.RedirectComponent
+import com.adyen.checkout.ui.core.internal.ui.ViewableComponent
 import org.json.JSONObject
 
 class ComponentPlatformApi(
@@ -23,8 +32,10 @@ class ComponentPlatformApi(
     private val sessionHolder: SessionHolder,
     private val componentFlutterInterface: ComponentFlutterInterface,
 ) : ComponentPlatformInterface {
-    private var googlePayComponentManager: GooglePayComponentManager =
+    private val googlePayComponentManager: GooglePayComponentManager =
         GooglePayComponentManager(activity, sessionHolder, componentFlutterInterface)
+    private val instantComponentManager: InstantComponentManager =
+        InstantComponentManager(activity, componentFlutterInterface)
 
     override fun updateViewHeight(viewId: Long) = ComponentHeightMessenger.sendResult(viewId)
 
@@ -55,17 +66,24 @@ class ComponentPlatformApi(
                     callback
                 )
 
+            InstantPaymentType.INSTANT,
             InstantPaymentType.APPLEPAY -> return
         }
     }
 
     override fun onInstantPaymentPressed(
-        instantPaymentType: InstantPaymentType,
-        componentId: String
+        instantPaymentConfigurationDTO: InstantPaymentConfigurationDTO,
+        paymentMethodResponse: String,
+        componentId: String,
     ) {
-        when (instantPaymentType) {
+       when (instantPaymentConfigurationDTO.instantPaymentType) {
             InstantPaymentType.GOOGLEPAY -> googlePayComponentManager.startGooglePayScreen()
             InstantPaymentType.APPLEPAY -> return
+            InstantPaymentType.INSTANT -> instantComponentManager.startInstantPaymentComponent(
+                instantPaymentConfigurationDTO,
+                paymentMethodResponse,
+                componentId
+            )
         }
     }
 
@@ -83,6 +101,8 @@ class ComponentPlatformApi(
     ) {
         if (componentId == GOOGLE_PAY_SESSION_COMPONENT_KEY || componentId == GOOGLE_PAY_ADVANCED_COMPONENT_KEY) {
             googlePayComponentManager.handlePaymentEvent(paymentEventDTO)
+        } else if (componentId.contains("INSTANT_")) {
+            instantComponentManager.handlePaymentEvent(paymentEventDTO, componentId)
         } else {
             when (paymentEventDTO.paymentEventType) {
                 PaymentEventType.FINISHED -> onFinished(paymentEventDTO.result)
