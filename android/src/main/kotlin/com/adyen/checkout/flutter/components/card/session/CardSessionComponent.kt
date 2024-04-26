@@ -62,8 +62,10 @@ class CardSessionComponent(
                     componentCallback =
                         CardSessionCallback(
                             componentFlutterApi,
-                            componentId
-                        ) { action -> onAction(action) },
+                            componentId,
+                            ::onAction,
+                            ::assignCurrentComponent
+                        ),
                     key = UUID.randomUUID().toString()
                 )
             }
@@ -78,8 +80,10 @@ class CardSessionComponent(
                     componentCallback =
                         CardSessionCallback(
                             componentFlutterApi,
-                            componentId
-                        ) { action -> onAction(action) },
+                            componentId,
+                            ::onAction,
+                            ::assignCurrentComponent,
+                        ),
                     key = UUID.randomUUID().toString()
                 )
             }

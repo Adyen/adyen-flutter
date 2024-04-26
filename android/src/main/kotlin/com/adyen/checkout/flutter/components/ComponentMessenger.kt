@@ -17,39 +17,3 @@ class ComponentHeightMessenger : LiveData<Event<Long>>() {
         }
     }
 }
-
-class ComponentActionMessenger : LiveData<Event<JSONObject>>() {
-    companion object {
-        private val componentActionMessenger = ComponentActionMessenger()
-
-        fun instance() = componentActionMessenger
-
-        fun sendResult(value: JSONObject) {
-            componentActionMessenger.postValue(Event(value))
-        }
-    }
-}
-
-class ComponentResultMessenger : LiveData<Event<PaymentResultModelDTO>>() {
-    companion object {
-        private val componentResultMessenger = ComponentResultMessenger()
-
-        fun instance() = componentResultMessenger
-
-        fun sendResult(value: PaymentResultModelDTO) {
-            componentResultMessenger.postValue(Event(value))
-        }
-    }
-}
-
-class ComponentErrorMessenger : LiveData<Event<ErrorDTO>>() {
-    companion object {
-        private val componentErrorMessenger = ComponentErrorMessenger()
-
-        fun instance() = componentErrorMessenger
-
-        fun sendResult(value: ErrorDTO) {
-            componentErrorMessenger.postValue(Event(value))
-        }
-    }
-}

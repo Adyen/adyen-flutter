@@ -1,5 +1,6 @@
 import 'package:adyen_checkout/adyen_checkout.dart';
 import 'package:adyen_checkout/src/common/adyen_checkout_api.dart';
+import 'package:adyen_checkout/src/components/instant/instant_advanced_component.dart';
 import 'package:adyen_checkout/src/drop_in/drop_in.dart';
 
 class AdyenCheckoutAdvanced {
@@ -27,5 +28,25 @@ class AdyenCheckoutAdvanced {
       paymentMethodsResponse,
       advancedCheckout,
     );
+  }
+
+  Future<PaymentResult> start({
+    required InstantComponentConfiguration instantComponentConfiguration,
+    required String paymentMethodResponse,
+    required Checkout checkout,
+  }) async {
+    switch (checkout) {
+      case SessionCheckout():
+        return PaymentError(reason: '');
+
+      case AdvancedCheckoutPreview it:
+        return await InstantAdvancedComponent(advancedCheckout: it).start(
+          instantComponentConfiguration,
+          paymentMethodResponse,
+        );
+      case AdvancedCheckout():
+        throw Exception(
+            "Instant component does not support the deprecated AdvancedCheckout. Please use AdvancedCheckoutPreview.");
+    }
   }
 }

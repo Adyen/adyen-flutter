@@ -19,8 +19,8 @@ class GooglePayAdvancedComponentWrapper(
     private val activity: FragmentActivity,
     private val componentFlutterInterface: ComponentFlutterInterface,
     private val googlePayConfiguration: GooglePayConfiguration,
-    override val componentId: String,
-) : BaseGooglePayComponentWrapper(activity, componentFlutterInterface) {
+    private val componentId: String,
+) : BaseGooglePayComponentWrapper(activity, componentFlutterInterface, componentId) {
     override fun setupGooglePayComponent(paymentMethod: PaymentMethod) {
         googlePayComponent =
             GooglePayComponent.PROVIDER.get(
@@ -28,68 +28,13 @@ class GooglePayAdvancedComponentWrapper(
                 paymentMethod = paymentMethod,
                 configuration = googlePayConfiguration,
                 callback =
-                    GooglePayAdvancedCallback(
-                        componentFlutterInterface,
-                        componentId,
-                        ::onLoading,
-                        ::hideLoadingBottomSheet
-                    ),
+                GooglePayAdvancedCallback(
+                    componentFlutterInterface,
+                    componentId,
+                    ::onLoading,
+                    ::hideLoadingBottomSheet
+                ),
                 key = UUID.randomUUID().toString()
             )
-    }
-
-    fun handlePaymentEvent(paymentEventDTO: PaymentEventDTO) {
-        when (paymentEventDTO.paymentEventType) {
-            PaymentEventType.FINISHED -> onFinished(paymentEventDTO.result)
-            PaymentEventType.ACTION -> onAction(paymentEventDTO.actionResponse)
-            PaymentEventType.ERROR -> onError(paymentEventDTO.error)
-        }
-    }
-
-    private fun onFinished(resultCode: String?) {
-        if (resultCode == null) {
-            return
-        }
-
-        val model =
-            ComponentCommunicationModel(
-                ComponentCommunicationType.RESULT,
-                componentId = componentId,
-                paymentResult =
-                    PaymentResultDTO(
-                        type = PaymentResultEnum.FINISHED,
-                        result = PaymentResultModelDTO(resultCode = resultCode)
-                    ),
-            )
-        componentFlutterInterface.onComponentCommunication(model) {}
-        hideLoadingBottomSheet()
-    }
-
-    private fun onAction(action: Map<String?, Any?>?) {
-        if (action == null) {
-            return
-        }
-
-        val actionJson = JSONObject(action)
-        handleAction(Action.SERIALIZER.deserialize(actionJson))
-    }
-
-    private fun onError(error: ErrorDTO?) {
-        if (error == null) {
-            return
-        }
-
-        val model =
-            ComponentCommunicationModel(
-                ComponentCommunicationType.RESULT,
-                componentId = componentId,
-                paymentResult =
-                    PaymentResultDTO(
-                        type = PaymentResultEnum.ERROR,
-                        reason = error.errorMessage,
-                    ),
-            )
-        componentFlutterInterface.onComponentCommunication(model) {}
-        hideLoadingBottomSheet()
     }
 }

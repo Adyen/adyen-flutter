@@ -176,28 +176,38 @@ class _BaseApplePayComponentState extends State<BaseApplePayComponent> {
     );
   }
 
-  void onPressed() {
+  void onPressed() async {
+    final instantPaymentConfigurationDTO =
+    await createInstantPaymentConfigurationDTO();
     widget.isButtonClickable.value = false;
     widget.componentPlatformApi.onInstantPaymentPressed(
-      InstantPaymentType.applePay,
+      instantPaymentConfigurationDTO,
+      widget.applePayPaymentMethod,
       widget.componentId,
     );
   }
 
   Future<InstantPaymentSetupResultDTO> _isApplePaySupported() async {
-    final String versionNumber =
-        await widget._sdkVersionNumberProvider.getSdkVersionNumber();
-    final InstantPaymentConfigurationDTO
-        instantPaymentComponentConfigurationDTO =
-        widget.applePayComponentConfiguration.toDTO(
-      versionNumber,
-      InstantPaymentType.applePay,
-    );
+    final instantPaymentConfigurationDTO =
+    await createInstantPaymentConfigurationDTO();
     return await widget.componentPlatformApi
         .isInstantPaymentSupportedByPlatform(
-      instantPaymentComponentConfigurationDTO,
+      instantPaymentConfigurationDTO,
       widget.applePayPaymentMethod,
       widget.componentId,
     );
+  }
+
+  Future<InstantPaymentConfigurationDTO>
+  createInstantPaymentConfigurationDTO() async {
+    final String versionNumber =
+    await widget._sdkVersionNumberProvider.getSdkVersionNumber();
+    final InstantPaymentConfigurationDTO
+    instantPaymentComponentConfigurationDTO =
+    widget.applePayComponentConfiguration.toDTO(
+      versionNumber,
+      InstantPaymentType.applePay,
+    );
+    return instantPaymentComponentConfigurationDTO;
   }
 }

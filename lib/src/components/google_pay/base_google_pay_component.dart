@@ -188,15 +188,31 @@ class _BaseGooglePayComponentState extends State<BaseGooglePayComponent> {
     );
   }
 
-  void onPressed() {
+  void onPressed() async {
+    final instantPaymentConfigurationDTO =
+        await createInstantPaymentConfigurationDTO();
+
     widget.isButtonClickable.value = false;
     widget.componentPlatformApi.onInstantPaymentPressed(
-      InstantPaymentType.googlePay,
+      instantPaymentConfigurationDTO,
+      widget.googlePayPaymentMethod,
       widget.componentId,
     );
   }
 
   Future<InstantPaymentSetupResultDTO> _isGooglePaySupported() async {
+    final instantPaymentConfigurationDTO =
+        await createInstantPaymentConfigurationDTO();
+    return await widget.componentPlatformApi
+        .isInstantPaymentSupportedByPlatform(
+      instantPaymentConfigurationDTO,
+      widget.googlePayPaymentMethod,
+      widget.componentId,
+    );
+  }
+
+  Future<InstantPaymentConfigurationDTO>
+      createInstantPaymentConfigurationDTO() async {
     final String versionNumber =
         await widget._sdkVersionNumberProvider.getSdkVersionNumber();
     final InstantPaymentConfigurationDTO
@@ -205,11 +221,6 @@ class _BaseGooglePayComponentState extends State<BaseGooglePayComponent> {
       versionNumber,
       InstantPaymentType.googlePay,
     );
-    return await widget.componentPlatformApi
-        .isInstantPaymentSupportedByPlatform(
-      instantPaymentComponentConfigurationDTO,
-      widget.googlePayPaymentMethod,
-      widget.componentId,
-    );
+    return instantPaymentComponentConfigurationDTO;
   }
 }

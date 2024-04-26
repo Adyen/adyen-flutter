@@ -15,9 +15,6 @@ import com.adyen.checkout.components.core.PaymentMethod
 import com.adyen.checkout.components.core.StoredPaymentMethod
 import com.adyen.checkout.components.core.action.Action
 import com.adyen.checkout.flutter.R
-import com.adyen.checkout.flutter.components.ComponentActionMessenger
-import com.adyen.checkout.flutter.components.ComponentErrorMessenger
-import com.adyen.checkout.flutter.components.ComponentResultMessenger
 import com.adyen.checkout.flutter.components.card.BaseCardComponent
 import com.adyen.checkout.ui.core.AdyenComponentView
 import org.json.JSONObject
@@ -39,9 +36,6 @@ internal class CardAdvancedComponent(
             createCardComponent().apply {
                 addComponent(this, componentId)
             }
-        addActionListener()
-        addResultListener()
-        addErrorListener()
     }
 
     private fun createCardComponent(): CardComponent {
@@ -53,7 +47,7 @@ internal class CardAdvancedComponent(
                     activity = activity,
                     storedPaymentMethod = storedPaymentMethod,
                     configuration = cardConfiguration,
-                    callback = CardAdvancedCallback(componentFlutterApi, componentId),
+                    callback = CardAdvancedCallback(componentFlutterApi, componentId, ::assignCurrentComponent),
                     key = UUID.randomUUID().toString()
                 )
             }
@@ -64,7 +58,7 @@ internal class CardAdvancedComponent(
                     activity = activity,
                     paymentMethod = paymentMethod,
                     configuration = cardConfiguration,
-                    callback = CardAdvancedCallback(componentFlutterApi, componentId),
+                    callback = CardAdvancedCallback(componentFlutterApi, componentId, ::assignCurrentComponent),
                     key = UUID.randomUUID().toString()
                 )
             }
@@ -85,61 +79,5 @@ internal class CardAdvancedComponent(
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT,
             )
-    }
-
-    private fun addActionListener() {
-        ComponentActionMessenger.instance().removeObservers(activity)
-        ComponentActionMessenger.instance().observe(activity) { message ->
-            if (message.hasBeenHandled()) {
-                return@observe
-            }
-
-            val action = message.contentIfNotHandled?.let { Action.SERIALIZER.deserialize(it) }
-            action?.let {
-                cardComponent?.handleAction(action = it, activity = activity)
-            }
-        }
-    }
-
-    private fun addResultListener() {
-        ComponentResultMessenger.instance().removeObservers(activity)
-        ComponentResultMessenger.instance().observe(activity) { message ->
-            if (message.hasBeenHandled()) {
-                return@observe
-            }
-
-            val model =
-                ComponentCommunicationModel(
-                    ComponentCommunicationType.RESULT,
-                    componentId = componentId,
-                    paymentResult =
-                        PaymentResultDTO(
-                            type = PaymentResultEnum.FINISHED,
-                            result = message.contentIfNotHandled
-                        ),
-                )
-            componentFlutterApi.onComponentCommunication(model) {}
-        }
-    }
-
-    private fun addErrorListener() {
-        ComponentErrorMessenger.instance().removeObservers(activity)
-        ComponentErrorMessenger.instance().observe(activity) { message ->
-            if (message.hasBeenHandled()) {
-                return@observe
-            }
-
-            val model =
-                ComponentCommunicationModel(
-                    ComponentCommunicationType.RESULT,
-                    componentId = componentId,
-                    paymentResult =
-                        PaymentResultDTO(
-                            type = PaymentResultEnum.ERROR,
-                            reason = message.contentIfNotHandled?.errorMessage,
-                        ),
-                )
-            componentFlutterApi.onComponentCommunication(model) {}
-        }
     }
 }

@@ -47,12 +47,9 @@ class GooglePayComponentManager(
         googlePayAvailabilityChecker.checkGooglePayAvailability(paymentMethod, googlePlayConfiguration)
     }
 
-    fun startGooglePayScreen() {
+    fun startGooglePayComponent(): GooglePayComponent? {
         googlePayComponent?.startGooglePayScreen()
-    }
-
-    fun handlePaymentEvent(paymentEventDTO: PaymentEventDTO) {
-        (googlePayComponent as? GooglePayAdvancedComponentWrapper)?.handlePaymentEvent(paymentEventDTO)
+        return googlePayComponent?.googlePayComponent
     }
 
     private fun createGooglePayComponent(
@@ -101,21 +98,13 @@ class GooglePayComponentManager(
     }
 
     fun handleGooglePayActivityResult(
-        requestCode: Int,
         resultCode: Int,
         data: Intent?
-    ): Boolean {
-        return when (requestCode) {
-            Constants.GOOGLE_PAY_COMPONENT_REQUEST_CODE -> {
-                googlePayComponent?.handleActivityResult(resultCode, data)
-                true
-            }
-
-            else -> false
-        }
+    ) {
+        googlePayComponent?.handleActivityResult(resultCode, data)
     }
 
-    fun onDispose() {
-        googlePayComponent?.dispose()
+    fun onDispose(componentId: String) {
+        googlePayComponent?.dispose(componentId)
     }
 }

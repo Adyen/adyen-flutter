@@ -47,11 +47,13 @@ class ComponentPlatformApi implements ComponentPlatformInterface {
 
   @override
   Future<void> onInstantPaymentPressed(
-    InstantPaymentType instantPaymentType,
+    InstantPaymentConfigurationDTO instantPaymentConfigurationDTO,
+    String paymentMethodResponse,
     String componentId,
   ) async =>
       _componentPlatformInterface.onInstantPaymentPressed(
-        instantPaymentType,
+        instantPaymentConfigurationDTO,
+        paymentMethodResponse,
         componentId,
       );
 

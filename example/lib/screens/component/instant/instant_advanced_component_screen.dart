@@ -51,7 +51,10 @@ class InstantAdvancedComponentScreen extends StatelessWidget {
             amount: Config.amount,
           );
 
-          final paymentMethod = _extractPaymentMethod(snapshot.data!);
+          final payPalPaymentMethod =
+              _extractPaymentMethod(snapshot.data!, "paypal");
+          final klarnaPaymentMethod =
+              _extractPaymentMethod(snapshot.data!, "klarna");
 
           return Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -66,13 +69,24 @@ class InstantAdvancedComponentScreen extends StatelessWidget {
                     final paymentResult = await AdyenCheckout.advanced.start(
                       instantComponentConfiguration:
                           instantComponentConfiguration,
-                      paymentMethodResponse: paymentMethod.toString(),
+                      paymentMethodResponse: jsonEncode(payPalPaymentMethod),
                       checkout: advancedCheckout,
                     );
 
                     _dialogBuilder(paymentResult, context);
                   },
-                  child: const Text("Paypal"))
+                  child: const Text("Paypal")),
+              TextButton(
+                  onPressed: () async {
+                    final paymentResult = await AdyenCheckout.advanced.start(
+                      instantComponentConfiguration: instantComponentConfiguration,
+                      paymentMethodResponse: jsonEncode(klarnaPaymentMethod),
+                      checkout: advancedCheckout,
+                    );
+
+                    _dialogBuilder(paymentResult, context);
+                  },
+                  child: const Text("Klarna"))
             ],
           );
         } else {
@@ -82,16 +96,13 @@ class InstantAdvancedComponentScreen extends StatelessWidget {
     );
   }
 
-  Map<String, dynamic> _extractPaymentMethod(String paymentMethods) {
-    if (paymentMethods.isEmpty) {
-      return <String, String>{};
-    }
-
+  Map<String, dynamic> _extractPaymentMethod(String paymentMethods, String key) {
     Map<String, dynamic> jsonPaymentMethods = jsonDecode(paymentMethods);
-    return jsonPaymentMethods["paymentMethods"].firstWhere(
-      (paymentMethod) => paymentMethod["type"] == "paypal",
-      orElse: () => throw Exception("Paypal payment method not provided"),
-    );
+    return jsonPaymentMethods["paymentMethods"]
+        .firstWhere(
+          (paymentMethod) => paymentMethod["type"] == key,
+          orElse: () => throw Exception("$key payment method not provided"),
+        );
   }
 
   _dialogBuilder(PaymentResult paymentResult, BuildContext context) {

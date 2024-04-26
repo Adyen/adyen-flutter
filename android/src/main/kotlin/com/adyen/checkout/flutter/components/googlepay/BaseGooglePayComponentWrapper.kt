@@ -14,15 +14,10 @@ import com.adyen.checkout.redirect.RedirectComponent
 
 abstract class BaseGooglePayComponentWrapper(
     private val activity: FragmentActivity,
-    private val componentFlutterInterface: ComponentFlutterInterface
+    private val componentFlutterInterface: ComponentFlutterInterface,
+    private val componentId: String
 ) {
-    private val intentListener = Consumer<Intent> { handleIntent(it) }
     internal var googlePayComponent: GooglePayComponent? = null
-    abstract val componentId: String
-
-    init {
-        activity.addOnNewIntentListener(intentListener)
-    }
 
     abstract fun setupGooglePayComponent(paymentMethod: PaymentMethod)
 
@@ -37,13 +32,6 @@ abstract class BaseGooglePayComponentWrapper(
         googlePayComponent?.handleActivityResult(resultCode, data)
     }
 
-    fun handleAction(action: Action) {
-        googlePayComponent?.let {
-            it.handleAction(action, activity)
-            ComponentLoadingBottomSheet.show(activity.supportFragmentManager, it)
-        }
-    }
-
     fun onLoading() {
         val model =
             ComponentCommunicationModel(
@@ -55,17 +43,9 @@ abstract class BaseGooglePayComponentWrapper(
 
     fun hideLoadingBottomSheet() = ComponentLoadingBottomSheet.hide(activity.supportFragmentManager)
 
-    fun dispose() {
-        activity.removeOnNewIntentListener(intentListener)
-        googlePayComponent = null
-    }
-
-    private fun handleIntent(intent: Intent) {
-        if (intent.data != null &&
-            intent.data?.toString().orEmpty()
-                .startsWith(RedirectComponent.REDIRECT_RESULT_SCHEME)
-        ) {
-            googlePayComponent?.handleIntent(intent)
+    fun dispose(componentId: String) {
+        if (componentId == this.componentId) {
+            googlePayComponent = null
         }
     }
 }
