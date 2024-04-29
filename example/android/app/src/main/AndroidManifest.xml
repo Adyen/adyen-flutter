@@ -58,7 +58,7 @@
 
                 <data
                     android:host="${applicationId}"
-                    android:path="/session"
+                    android:path="/adyenPayment"
                     android:scheme="adyencheckout" />
             </intent-filter>
         </activity>

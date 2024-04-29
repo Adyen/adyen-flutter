@@ -17,6 +17,7 @@ import 'package:adyen_checkout_example/screens/component/google_pay/google_pay_n
 import 'package:adyen_checkout_example/screens/component/google_pay/google_pay_session_component_screen.dart';
 import 'package:adyen_checkout_example/screens/component/instant/instant_advanced_component_screen.dart';
 import 'package:adyen_checkout_example/screens/component/instant/instant_navigation_screen.dart';
+import 'package:adyen_checkout_example/screens/component/instant/instant_session_component_screen.dart';
 import 'package:adyen_checkout_example/screens/component/multi_component/multi_component_advanced_screen.dart';
 import 'package:adyen_checkout_example/screens/component/multi_component/multi_component_navigation_screen.dart';
 import 'package:adyen_checkout_example/screens/cse/cse_screen.dart';
@@ -81,10 +82,12 @@ void main() {
           ApplePayAdvancedComponentScreen(
             repository: adyenApplePayComponentRepository,
           ),
-      '/instantComponentNavigation': (context) => const InstantNavigationScreen(),
+      '/instantComponentNavigation': (context) =>
+          const InstantNavigationScreen(),
+      '/instantSessionComponent': (context) => InstantSessionComponentScreen(
+          repository: adyenInstantComponentRepository),
       '/instantAdvancedComponent': (context) => InstantAdvancedComponentScreen(
-            repository: adyenInstantComponentRepository,
-          ),
+          repository: adyenInstantComponentRepository),
       '/multiComponentNavigationScreen': (context) =>
           const MultiComponentNavigationScreen(),
       '/multiComponentSessionScreen': (context) => MultiComponentAdvancedScreen(
@@ -128,8 +131,8 @@ class MyApp extends StatelessWidget {
                 child: const Text("Card component")),
             _buildGoogleOrApplePayComponent(context),
             TextButton(
-                onPressed: () => Navigator.pushNamed(
-                    context, "/instantComponentNavigation"),
+                onPressed: () =>
+                    Navigator.pushNamed(context, "/instantComponentNavigation"),
                 child: const Text("Instant component")),
             TextButton(
                 onPressed: () => Navigator.pushNamed(

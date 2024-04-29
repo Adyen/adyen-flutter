@@ -16,7 +16,7 @@ class InstantNavigationScreen extends StatelessWidget {
               TextButton(
                 child: const Text("Instant component session"),
                 onPressed: () =>
-                    Navigator.pushNamed(context, "/googlePaySessionComponent"),
+                    Navigator.pushNamed(context, "/instantSessionComponent"),
               ),
               TextButton(
                 child: const Text("Instant component advanced"),

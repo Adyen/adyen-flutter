@@ -1,28 +1,30 @@
 package com.adyen.checkout.flutter.components.instant
 
-import ComponentCommunicationModel
 import ComponentFlutterInterface
-import ErrorDTO
 import InstantPaymentConfigurationDTO
-import PaymentEventDTO
-import PaymentResultDTO
-import PaymentResultModelDTO
-import android.content.Intent
-import androidx.core.util.Consumer
 import androidx.fragment.app.FragmentActivity
+import androidx.lifecycle.lifecycleScope
+import com.adyen.checkout.components.core.Order
 import com.adyen.checkout.components.core.PaymentMethod
 import com.adyen.checkout.components.core.action.Action
 import com.adyen.checkout.flutter.components.instant.advanced.InstantComponentAdvancedCallback
+import com.adyen.checkout.flutter.components.instant.session.InstantComponentSessionCallback
 import com.adyen.checkout.flutter.components.view.ComponentLoadingBottomSheet
-import com.adyen.checkout.flutter.utils.ConfigurationMapper.fromDTO
+import com.adyen.checkout.flutter.session.SessionHolder
+import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToInstantConfiguration
+import com.adyen.checkout.flutter.utils.Constants
 import com.adyen.checkout.instant.InstantPaymentComponent
 import com.adyen.checkout.instant.InstantPaymentConfiguration
-import com.adyen.checkout.redirect.RedirectComponent
+import com.adyen.checkout.sessions.core.CheckoutSession
+import com.adyen.checkout.sessions.core.SessionSetupResponse
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import org.json.JSONObject
 
 class InstantComponentManager(
     private val activity: FragmentActivity,
     private val componentFlutterInterface: ComponentFlutterInterface,
+    private val sessionHolder: SessionHolder,
 ) {
     private var instantPaymentComponent: InstantPaymentComponent? = null
     private var componentId: String? = null
@@ -33,11 +35,10 @@ class InstantComponentManager(
         componentId: String
     ): InstantPaymentComponent {
         val paymentMethod = PaymentMethod.SERIALIZER.deserialize(JSONObject(paymentMethodResponse))
-        val configuration = instantPaymentConfigurationDTO.fromDTO(activity)
+        val configuration = instantPaymentConfigurationDTO.mapToInstantConfiguration(activity)
         val instantPaymentComponent = createInstantPaymentComponent(configuration, paymentMethod, componentId)
         this.instantPaymentComponent = instantPaymentComponent
         this.componentId = componentId
-        ComponentLoadingBottomSheet.show(activity.supportFragmentManager, instantPaymentComponent)
         return instantPaymentComponent
     }
 
@@ -48,6 +49,20 @@ class InstantComponentManager(
     }
 
     private fun createInstantPaymentComponent(
+        configuration: InstantPaymentConfiguration,
+        paymentMethod: PaymentMethod,
+        componentId: String,
+    ): InstantPaymentComponent {
+        if (componentId.contains(Constants.INSTANT_ADVANCED_COMPONENT_KEY)) {
+            return createInstantAdvancedComponent(configuration, paymentMethod, componentId)
+        } else if (componentId.contains(Constants.INSTANT_SESSION_COMPONENT_KEY)) {
+            return createInstantSessionComponent(configuration, paymentMethod, componentId)
+        }
+
+        throw IllegalStateException("Instant component not available for payment flow.")
+    }
+
+    private fun createInstantAdvancedComponent(
         configuration: InstantPaymentConfiguration,
         paymentMethod: PaymentMethod,
         componentId: String,
@@ -66,13 +81,40 @@ class InstantComponentManager(
         )
     }
 
-    private fun onLoading(componentId: String) {
-        val model =
-            ComponentCommunicationModel(
-                ComponentCommunicationType.LOADING,
-                componentId = componentId,
-            )
-        componentFlutterInterface.onComponentCommunication(model) {}
+    private fun createInstantSessionComponent(
+        configuration: InstantPaymentConfiguration,
+        paymentMethod: PaymentMethod,
+        componentId: String,
+    ): InstantPaymentComponent {
+        val sessionSetupResponse = SessionSetupResponse.SERIALIZER.deserialize(sessionHolder.sessionSetupResponse)
+        val order = sessionHolder.orderResponse?.let { Order.SERIALIZER.deserialize(it) }
+        val checkoutSession = CheckoutSession(sessionSetupResponse = sessionSetupResponse, order = order)
+        return InstantPaymentComponent.PROVIDER.get(
+            activity = activity,
+            checkoutSession = checkoutSession,
+            paymentMethod = paymentMethod,
+            configuration = configuration,
+            componentCallback = InstantComponentSessionCallback(
+                componentFlutterInterface,
+                componentId,
+                ::handleAction,
+                ::hideLoadingBottomSheet
+            ),
+            key = componentId
+        )
+    }
+
+    private fun handleAction(action: Action) {
+        instantPaymentComponent?.let {
+            onLoading()
+            it.handleAction(action, activity)
+        }
+    }
+
+    private fun onLoading() {
+        instantPaymentComponent?.let {
+            ComponentLoadingBottomSheet.show(activity.supportFragmentManager, it)
+        }
     }
 
     private fun hideLoadingBottomSheet() = ComponentLoadingBottomSheet.hide(activity.supportFragmentManager)

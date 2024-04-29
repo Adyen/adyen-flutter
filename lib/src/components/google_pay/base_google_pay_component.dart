@@ -12,6 +12,7 @@ import 'package:flutter/material.dart';
 import 'package:pay/pay.dart';
 
 abstract class BaseGooglePayComponent extends StatefulWidget {
+  abstract final String componentId;
   final String googlePayPaymentMethod;
   final GooglePayComponentConfiguration googlePayComponentConfiguration;
   final Function(PaymentResult) onPaymentResult;
@@ -23,7 +24,6 @@ abstract class BaseGooglePayComponent extends StatefulWidget {
   final Function()? onUnavailable;
   final Widget? unavailableWidget;
   final Widget? loadingIndicator;
-  abstract final String componentId;
   final ValueNotifier<bool> isButtonClickable = ValueNotifier<bool>(true);
   final ValueNotifier<bool> isLoading = ValueNotifier<bool>(false);
   final SdkVersionNumberProvider _sdkVersionNumberProvider =

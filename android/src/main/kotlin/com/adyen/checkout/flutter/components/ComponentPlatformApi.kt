@@ -36,7 +36,7 @@ class ComponentPlatformApi(
     private val googlePayComponentManager: GooglePayComponentManager =
         GooglePayComponentManager(activity, sessionHolder, componentFlutterInterface)
     private val instantComponentManager: InstantComponentManager =
-        InstantComponentManager(activity, componentFlutterInterface)
+        InstantComponentManager(activity, componentFlutterInterface, sessionHolder)
     private val intentListener = Consumer<Intent> { handleIntent(it) }
     private var currentComponent: ActionHandlingComponent? = null
 

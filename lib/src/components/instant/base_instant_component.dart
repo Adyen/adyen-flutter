@@ -9,80 +9,77 @@ import 'package:adyen_checkout/src/logging/adyen_logger.dart';
 import 'package:adyen_checkout/src/util/dto_mapper.dart';
 import 'package:adyen_checkout/src/util/sdk_version_number_provider.dart';
 
-class InstantSessionComponent {
+abstract class BaseInstantComponent {
   final String componentId;
-  final AdyenLogger adyenLogger = AdyenLogger.instance;
-  final SdkVersionNumberProvider _sdkVersionNumberProvider =
+  final AdyenLogger adyenLogger;
+  final Completer<PaymentResult> completer = Completer<PaymentResult>();
+  final SdkVersionNumberProvider sdkVersionNumberProvider =
       SdkVersionNumberProvider.instance;
-  final completer = Completer<PaymentResult>();
-  late StreamSubscription<ComponentCommunicationModel>
-      _componentCommunicationStream;
+  final ComponentPlatformApi componentPlatformApi =
+      ComponentPlatformApi.instance;
+  StreamSubscription<ComponentCommunicationModel>? componentCommunicationStream;
 
-  InstantSessionComponent(this.componentId);
+  BaseInstantComponent({
+    required this.componentId,
+    AdyenLogger? adyenLogger,
+  }) : adyenLogger = adyenLogger ?? AdyenLogger.instance;
+
+  void handleComponentCommunication(ComponentCommunicationModel event);
+
+  void onFinished(PaymentResultDTO paymentResultDTO);
 
   Future<PaymentResult> start(
     InstantComponentConfiguration instantComponentConfiguration,
     String instantPaymentMethodResponse,
   ) async {
-    _componentCommunicationStream = ComponentFlutterApi
+    componentCommunicationStream = ComponentFlutterApi
         .instance.componentCommunicationStream.stream
         .where((communicationModel) =>
             communicationModel.componentId == componentId)
         .listen(handleComponentCommunication);
 
     final sdkVersionNumber =
-        await _sdkVersionNumberProvider.getSdkVersionNumber();
+        await sdkVersionNumberProvider.getSdkVersionNumber();
     final instantPaymentConfigurationDTO = instantComponentConfiguration.toDTO(
       sdkVersionNumber,
       InstantPaymentType.instant,
     );
 
-    ComponentPlatformApi.instance.onInstantPaymentPressed(
+    componentPlatformApi.onInstantPaymentPressed(
       instantPaymentConfigurationDTO,
       instantPaymentMethodResponse,
       componentId,
     );
 
-    return completer.future.then((paymentResult) {
-      //TODO clean up
+    return completer.future.then((paymentResult) async {
+      componentPlatformApi.onDispose(componentId);
+      await componentCommunicationStream?.cancel();
+      componentCommunicationStream = null;
       return paymentResult;
     });
   }
 
-  void handleComponentCommunication(ComponentCommunicationModel event) {
-
-  }
-
-
   void onResult(ComponentCommunicationModel event) {
-    switch (event.paymentResult?.type) {
+    final paymentResult = event.paymentResult;
+    if (paymentResult == null) {
+      throw Exception("Payment result handling failed");
+    }
+
+    switch (paymentResult.type) {
       case PaymentResultEnum.finished:
-        onFinished(event.paymentResult);
+        onFinished(paymentResult);
       case PaymentResultEnum.error:
-        _onError(event.paymentResult);
+        _onError(paymentResult);
       case PaymentResultEnum.cancelledByUser:
         _onCancelledByUser();
-      case null:
-        throw Exception("Payment result handling failed");
     }
   }
 
-  void onFinished(PaymentResultDTO? paymentResultDTO) {
-    String resultCode = paymentResultDTO?.result?.resultCode ?? "";
-    // adyenLogger.print("Google Pay session result code: $resultCode");
-    onPaymentResult(PaymentSessionFinished(
-      sessionId: paymentResultDTO?.result?.sessionId ?? "",
-      sessionData: paymentResultDTO?.result?.sessionData ?? "",
-      resultCode: resultCode,
-    ));
-  }
-
-  void _onError(PaymentResultDTO? paymentResultDTO) =>
-      onPaymentResult(PaymentError(reason: paymentResultDTO?.reason));
+  void _onError(PaymentResultDTO paymentResultDTO) =>
+      onPaymentResult(PaymentError(reason: paymentResultDTO.reason));
 
   void _onCancelledByUser() => onPaymentResult(PaymentCancelledByUser());
 
-  void onPaymentResult(PaymentResult paymentResult) {
-    completer.complete(paymentResult);
-  }
+  void onPaymentResult(PaymentResult paymentResult) =>
+      completer.complete(paymentResult);
 }

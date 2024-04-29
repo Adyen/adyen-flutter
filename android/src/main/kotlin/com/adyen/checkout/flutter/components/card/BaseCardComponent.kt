@@ -2,16 +2,13 @@ package com.adyen.checkout.flutter.components.card
 
 import CardComponentConfigurationDTO
 import ComponentFlutterInterface
-import ComponentPlatformInterface
 import android.content.Context
-import android.content.Intent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.LinearLayout
 import androidx.activity.ComponentActivity
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.util.Consumer
 import androidx.core.view.children
 import androidx.core.view.doOnNextLayout
 import androidx.core.view.updateLayoutParams
@@ -23,7 +20,6 @@ import com.adyen.checkout.flutter.components.ComponentPlatformApi
 import com.adyen.checkout.flutter.components.view.ComponentWrapperView
 import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToAnalyticsConfiguration
 import com.adyen.checkout.flutter.utils.ConfigurationMapper.fromDTO
-import com.adyen.checkout.redirect.RedirectComponent
 import com.adyen.checkout.ui.core.AdyenComponentView
 import io.flutter.plugin.platform.PlatformView
 import kotlinx.coroutines.launch

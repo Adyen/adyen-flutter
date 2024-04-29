@@ -11,13 +11,9 @@ import com.adyen.checkout.sessions.core.SessionPaymentResult
 class InstantComponentSessionCallback(
     private val componentFlutterApi: ComponentFlutterInterface,
     private val componentId: String,
-    private val onLoadingCallback: () -> Unit,
     private val onActionCallback: (Action) -> Unit,
     private val hideLoadingBottomSheet: () -> Unit,
 ) : ComponentSessionCallback<InstantComponentState>(componentFlutterApi, componentId, onActionCallback) {
-    override fun onLoading(isLoading: Boolean) {
-        onLoadingCallback()
-    }
 
     override fun onError(componentError: ComponentError) {
         hideLoadingBottomSheet()

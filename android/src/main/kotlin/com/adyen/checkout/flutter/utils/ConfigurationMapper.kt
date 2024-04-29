@@ -408,7 +408,7 @@ object ConfigurationMapper {
         return unencryptedCardBuilder.build()
     }
 
-    fun InstantPaymentConfigurationDTO.fromDTO(context: Context): InstantPaymentConfiguration {
+    fun InstantPaymentConfigurationDTO.mapToInstantConfiguration(context: Context): InstantPaymentConfiguration {
         val environment = environment.fromDTO()
         val instantPaymentConfigurationBuilder = if (shopperLocale != null) {
             val locale = Locale.forLanguageTag(shopperLocale)

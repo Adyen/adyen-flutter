@@ -14,18 +14,18 @@ class AdyenInstantComponentRepository extends AdyenBaseRepository {
   });
 
   Future<SessionCheckout> createSessionCheckout(
-      GooglePayComponentConfiguration googlePayComponentConfiguration) async {
+      InstantComponentConfiguration instantComponentConfiguration) async {
     final sessionResponse = await fetchSession();
     return await AdyenCheckout.session.create(
       sessionId: sessionResponse.id,
       sessionData: sessionResponse.sessionData,
-      configuration: googlePayComponentConfiguration,
+      configuration: instantComponentConfiguration,
     );
   }
 
   Future<SessionResponseNetworkModel> fetchSession() async {
     String returnUrl = await determineBaseReturnUrl();
-    returnUrl += "/session";
+    returnUrl += "/adyenPayment";
     SessionRequestNetworkModel sessionRequestNetworkModel =
         SessionRequestNetworkModel(
       merchantAccount: Config.merchantAccount,
@@ -46,6 +46,19 @@ class AdyenInstantComponentRepository extends AdyenBaseRepository {
           "nativeThreeDS": "preferred",
         },
       },
+      lineItems: [
+        LineItem(
+          quantity: 1,
+          amountExcludingTax: 331,
+          taxPercentage: 2100,
+          description: "Shoes",
+          id: "Item #1",
+          taxAmount: 69,
+          amountIncludingTax: 400,
+          productUrl: "URL_TO_PURCHASED_ITEM",
+          imageUrl: "URL_TO_PICTURE_OF_PURCHASED_ITEM",
+        ),
+      ],
     );
 
     return await service.createSession(
@@ -68,7 +81,7 @@ class AdyenInstantComponentRepository extends AdyenBaseRepository {
     Map<String, dynamic>? extra,
   ]) async {
     String returnUrl = await determineBaseReturnUrl();
-    returnUrl += "/session";
+    returnUrl += "/adyenPayment";
     PaymentsRequestData paymentsRequestData = PaymentsRequestData(
         merchantAccount: Config.merchantAccount,
         shopperReference: Config.shopperReference,
