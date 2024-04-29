@@ -1,9 +1,6 @@
 package com.adyen.checkout.flutter.components.card.advanced
 
-import ComponentCommunicationModel
-import ComponentCommunicationType
 import ComponentFlutterInterface
-import PaymentResultDTO
 import android.content.Context
 import android.view.View
 import android.view.ViewGroup
@@ -13,7 +10,6 @@ import androidx.fragment.app.FragmentActivity
 import com.adyen.checkout.card.CardComponent
 import com.adyen.checkout.components.core.PaymentMethod
 import com.adyen.checkout.components.core.StoredPaymentMethod
-import com.adyen.checkout.components.core.action.Action
 import com.adyen.checkout.flutter.R
 import com.adyen.checkout.flutter.components.card.BaseCardComponent
 import com.adyen.checkout.ui.core.AdyenComponentView

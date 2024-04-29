@@ -3,14 +3,11 @@ package com.adyen.checkout.flutter.components.googlepay
 import ComponentCommunicationModel
 import ComponentFlutterInterface
 import android.content.Intent
-import androidx.core.util.Consumer
 import androidx.fragment.app.FragmentActivity
 import com.adyen.checkout.components.core.PaymentMethod
-import com.adyen.checkout.components.core.action.Action
 import com.adyen.checkout.flutter.components.view.ComponentLoadingBottomSheet
 import com.adyen.checkout.flutter.utils.Constants
 import com.adyen.checkout.googlepay.GooglePayComponent
-import com.adyen.checkout.redirect.RedirectComponent
 
 abstract class BaseGooglePayComponentWrapper(
     private val activity: FragmentActivity,

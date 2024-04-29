@@ -95,15 +95,17 @@ class ComponentPlatformApi(
         componentId: String,
     ) {
         activity.addOnNewIntentListener(intentListener)
-        currentComponent = when (instantPaymentConfigurationDTO.instantPaymentType) {
-            InstantPaymentType.GOOGLEPAY -> googlePayComponentManager.startGooglePayComponent()
-            InstantPaymentType.APPLEPAY -> return
-            InstantPaymentType.INSTANT -> instantComponentManager.startInstantComponent(
-                instantPaymentConfigurationDTO,
-                paymentMethodResponse,
-                componentId
-            )
-        }
+        currentComponent =
+            when (instantPaymentConfigurationDTO.instantPaymentType) {
+                InstantPaymentType.GOOGLEPAY -> googlePayComponentManager.startGooglePayComponent()
+                InstantPaymentType.APPLEPAY -> return
+                InstantPaymentType.INSTANT ->
+                    instantComponentManager.startInstantComponent(
+                        instantPaymentConfigurationDTO,
+                        paymentMethodResponse,
+                        componentId
+                    )
+            }
     }
 
     override fun onDispose(componentId: String) {
@@ -138,16 +140,20 @@ class ComponentPlatformApi(
         }
     }
 
-    private fun onFinished(resultCode: String?, componentId: String) {
-        val model = ComponentCommunicationModel(
-            ComponentCommunicationType.RESULT,
-            componentId = componentId,
-            paymentResult =
-            PaymentResultDTO(
-                type = PaymentResultEnum.FINISHED,
-                result = PaymentResultModelDTO(resultCode = resultCode)
-            ),
-        )
+    private fun onFinished(
+        resultCode: String?,
+        componentId: String
+    ) {
+        val model =
+            ComponentCommunicationModel(
+                ComponentCommunicationType.RESULT,
+                componentId = componentId,
+                paymentResult =
+                    PaymentResultDTO(
+                        type = PaymentResultEnum.FINISHED,
+                        result = PaymentResultModelDTO(resultCode = resultCode)
+                    ),
+            )
         componentFlutterInterface.onComponentCommunication(model) {}
         hideLoadingBottomSheet()
     }
@@ -159,16 +165,20 @@ class ComponentPlatformApi(
         }
     }
 
-    private fun onError(error: ErrorDTO?, componentId: String) {
-        val model = ComponentCommunicationModel(
-            ComponentCommunicationType.RESULT,
-            componentId = componentId,
-            paymentResult =
-            PaymentResultDTO(
-                type = PaymentResultEnum.ERROR,
-                reason = error?.errorMessage,
-            ),
-        )
+    private fun onError(
+        error: ErrorDTO?,
+        componentId: String
+    ) {
+        val model =
+            ComponentCommunicationModel(
+                ComponentCommunicationType.RESULT,
+                componentId = componentId,
+                paymentResult =
+                    PaymentResultDTO(
+                        type = PaymentResultEnum.ERROR,
+                        reason = error?.errorMessage,
+                    ),
+            )
         componentFlutterInterface.onComponentCommunication(model) {}
         hideLoadingBottomSheet()
     }
@@ -183,5 +193,4 @@ class ComponentPlatformApi(
             currentComponent?.handleIntent(intent)
         }
     }
-
 }

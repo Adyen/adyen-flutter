@@ -410,12 +410,13 @@ object ConfigurationMapper {
 
     fun InstantPaymentConfigurationDTO.mapToInstantConfiguration(context: Context): InstantPaymentConfiguration {
         val environment = environment.fromDTO()
-        val instantPaymentConfigurationBuilder = if (shopperLocale != null) {
-            val locale = Locale.forLanguageTag(shopperLocale)
-            InstantPaymentConfiguration.Builder(locale, environment, clientKey)
-        } else {
-            InstantPaymentConfiguration.Builder(context, environment, clientKey)
-        }
+        val instantPaymentConfigurationBuilder =
+            if (shopperLocale != null) {
+                val locale = Locale.forLanguageTag(shopperLocale)
+                InstantPaymentConfiguration.Builder(locale, environment, clientKey)
+            } else {
+                InstantPaymentConfiguration.Builder(context, environment, clientKey)
+            }
         instantPaymentConfigurationBuilder.setAnalyticsConfiguration(analyticsOptionsDTO.mapToAnalyticsConfiguration())
         return instantPaymentConfigurationBuilder.build()
     }

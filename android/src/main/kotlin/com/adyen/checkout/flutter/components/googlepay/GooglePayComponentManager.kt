@@ -3,7 +3,6 @@ package com.adyen.checkout.flutter.components.googlepay
 import ComponentFlutterInterface
 import InstantPaymentConfigurationDTO
 import InstantPaymentSetupResultDTO
-import PaymentEventDTO
 import android.content.Intent
 import androidx.fragment.app.FragmentActivity
 import com.adyen.checkout.components.core.PaymentMethod

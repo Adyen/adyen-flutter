@@ -38,17 +38,16 @@ class GooglePaySessionComponentWrapper(
                 paymentMethod = paymentMethod,
                 configuration = googlePayConfiguration,
                 componentCallback =
-                GooglePaySessionCallback(
-                    componentFlutterInterface,
-                    componentId,
-                    ::onLoading,
-                    ::handleAction,
-                    ::hideLoadingBottomSheet
-                ),
+                    GooglePaySessionCallback(
+                        componentFlutterInterface,
+                        componentId,
+                        ::onLoading,
+                        ::handleAction,
+                        ::hideLoadingBottomSheet
+                    ),
                 key = UUID.randomUUID().toString()
             )
     }
-
 
     private fun handleAction(action: Action) {
         googlePayComponent?.let {
@@ -56,5 +55,4 @@ class GooglePaySessionComponentWrapper(
             ComponentLoadingBottomSheet.show(activity.supportFragmentManager, it)
         }
     }
-
 }

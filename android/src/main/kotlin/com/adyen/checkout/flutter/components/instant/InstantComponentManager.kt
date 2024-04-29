@@ -3,7 +3,6 @@ package com.adyen.checkout.flutter.components.instant
 import ComponentFlutterInterface
 import InstantPaymentConfigurationDTO
 import androidx.fragment.app.FragmentActivity
-import androidx.lifecycle.lifecycleScope
 import com.adyen.checkout.components.core.Order
 import com.adyen.checkout.components.core.PaymentMethod
 import com.adyen.checkout.components.core.action.Action
@@ -17,8 +16,6 @@ import com.adyen.checkout.instant.InstantPaymentComponent
 import com.adyen.checkout.instant.InstantPaymentConfiguration
 import com.adyen.checkout.sessions.core.CheckoutSession
 import com.adyen.checkout.sessions.core.SessionSetupResponse
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import org.json.JSONObject
 
 class InstantComponentManager(
@@ -71,12 +68,13 @@ class InstantComponentManager(
             activity = activity,
             paymentMethod = paymentMethod,
             configuration = configuration,
-            callback = InstantComponentAdvancedCallback(
-                componentFlutterInterface,
-                componentId,
-                ::onLoading,
-                ::hideLoadingBottomSheet
-            ),
+            callback =
+                InstantComponentAdvancedCallback(
+                    componentFlutterInterface,
+                    componentId,
+                    ::onLoading,
+                    ::hideLoadingBottomSheet
+                ),
             key = componentId
         )
     }
@@ -94,12 +92,13 @@ class InstantComponentManager(
             checkoutSession = checkoutSession,
             paymentMethod = paymentMethod,
             configuration = configuration,
-            componentCallback = InstantComponentSessionCallback(
-                componentFlutterInterface,
-                componentId,
-                ::handleAction,
-                ::hideLoadingBottomSheet
-            ),
+            componentCallback =
+                InstantComponentSessionCallback(
+                    componentFlutterInterface,
+                    componentId,
+                    ::handleAction,
+                    ::hideLoadingBottomSheet
+                ),
             key = componentId
         )
     }

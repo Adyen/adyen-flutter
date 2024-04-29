@@ -1,18 +1,11 @@
 package com.adyen.checkout.flutter.components.googlepay.advanced
 
-import ComponentCommunicationModel
 import ComponentFlutterInterface
-import ErrorDTO
-import PaymentEventDTO
-import PaymentResultDTO
-import PaymentResultModelDTO
 import androidx.fragment.app.FragmentActivity
 import com.adyen.checkout.components.core.PaymentMethod
-import com.adyen.checkout.components.core.action.Action
 import com.adyen.checkout.flutter.components.googlepay.BaseGooglePayComponentWrapper
 import com.adyen.checkout.googlepay.GooglePayComponent
 import com.adyen.checkout.googlepay.GooglePayConfiguration
-import org.json.JSONObject
 import java.util.UUID
 
 class GooglePayAdvancedComponentWrapper(
@@ -28,12 +21,12 @@ class GooglePayAdvancedComponentWrapper(
                 paymentMethod = paymentMethod,
                 configuration = googlePayConfiguration,
                 callback =
-                GooglePayAdvancedCallback(
-                    componentFlutterInterface,
-                    componentId,
-                    ::onLoading,
-                    ::hideLoadingBottomSheet
-                ),
+                    GooglePayAdvancedCallback(
+                        componentFlutterInterface,
+                        componentId,
+                        ::onLoading,
+                        ::hideLoadingBottomSheet
+                    ),
                 key = UUID.randomUUID().toString()
             )
     }
