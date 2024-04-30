@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:adyen_checkout/src/common/model/payment_result.dart';
 import 'package:adyen_checkout/src/components/component_flutter_api.dart';
@@ -30,7 +31,7 @@ abstract class BaseInstantComponent {
 
   Future<PaymentResult> start(
     InstantComponentConfiguration instantComponentConfiguration,
-    String instantPaymentMethodResponse,
+    Map<String, dynamic> paymentMethodResponse,
   ) async {
     componentCommunicationStream = ComponentFlutterApi
         .instance.componentCommunicationStream.stream
@@ -44,10 +45,14 @@ abstract class BaseInstantComponent {
       sdkVersionNumber,
       InstantPaymentType.instant,
     );
+    final encodedPaymentMethodResponse = jsonEncode(
+      paymentMethodResponse,
+      toEncodable: (value) => throw Exception("Could not encode $value"),
+    );
 
     componentPlatformApi.onInstantPaymentPressed(
       instantPaymentConfigurationDTO,
-      instantPaymentMethodResponse,
+      encodedPaymentMethodResponse,
       componentId,
     );
 

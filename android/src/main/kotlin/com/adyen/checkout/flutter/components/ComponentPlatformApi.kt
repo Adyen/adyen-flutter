@@ -91,7 +91,7 @@ class ComponentPlatformApi(
 
     override fun onInstantPaymentPressed(
         instantPaymentConfigurationDTO: InstantPaymentConfigurationDTO,
-        paymentMethodResponse: String,
+        encodedPaymentMethod: String,
         componentId: String,
     ) {
         activity.addOnNewIntentListener(intentListener)
@@ -102,7 +102,7 @@ class ComponentPlatformApi(
                 InstantPaymentType.INSTANT ->
                     instantComponentManager.startInstantComponent(
                         instantPaymentConfigurationDTO,
-                        paymentMethodResponse,
+                        encodedPaymentMethod,
                         componentId
                     )
             }

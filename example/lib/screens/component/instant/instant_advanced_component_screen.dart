@@ -51,9 +51,9 @@ class InstantAdvancedComponentScreen extends StatelessWidget {
             amount: Config.amount,
           );
 
-          final payPalPaymentMethod =
+          final payPalPaymentMethodResponse =
               _extractPaymentMethod(snapshot.data!, "paypal");
-          final klarnaPaymentMethod =
+          final klarnaPaymentMethodResponse =
               _extractPaymentMethod(snapshot.data!, "klarna");
 
           return Column(
@@ -66,10 +66,10 @@ class InstantAdvancedComponentScreen extends StatelessWidget {
               const SizedBox(height: 8),
               TextButton(
                   onPressed: () async {
-                    final paymentResult = await AdyenCheckout.advanced.start(
-                      instantComponentConfiguration:
-                          instantComponentConfiguration,
-                      paymentMethodResponse: jsonEncode(payPalPaymentMethod),
+                    final PaymentResult paymentResult =
+                        await AdyenCheckout.advanced.startInstantComponent(
+                      configuration: instantComponentConfiguration,
+                      paymentMethodResponse: payPalPaymentMethodResponse,
                       checkout: advancedCheckout,
                     );
 
@@ -78,9 +78,10 @@ class InstantAdvancedComponentScreen extends StatelessWidget {
                   child: const Text("Paypal")),
               TextButton(
                   onPressed: () async {
-                    final paymentResult = await AdyenCheckout.advanced.start(
-                      instantComponentConfiguration: instantComponentConfiguration,
-                      paymentMethodResponse: jsonEncode(klarnaPaymentMethod),
+                    final PaymentResult paymentResult =
+                        await AdyenCheckout.advanced.startInstantComponent(
+                      configuration: instantComponentConfiguration,
+                      paymentMethodResponse: klarnaPaymentMethodResponse,
                       checkout: advancedCheckout,
                     );
 
@@ -96,13 +97,13 @@ class InstantAdvancedComponentScreen extends StatelessWidget {
     );
   }
 
-  Map<String, dynamic> _extractPaymentMethod(String paymentMethods, String key) {
+  Map<String, dynamic> _extractPaymentMethod(
+      String paymentMethods, String key) {
     Map<String, dynamic> jsonPaymentMethods = jsonDecode(paymentMethods);
-    return jsonPaymentMethods["paymentMethods"]
-        .firstWhere(
-          (paymentMethod) => paymentMethod["type"] == key,
-          orElse: () => throw Exception("$key payment method not provided"),
-        );
+    return jsonPaymentMethods["paymentMethods"].firstWhere(
+      (paymentMethod) => paymentMethod["type"] == key,
+      orElse: () => throw Exception("$key payment method not provided"),
+    );
   }
 
   _dialogBuilder(PaymentResult paymentResult, BuildContext context) {

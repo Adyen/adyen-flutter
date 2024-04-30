@@ -1848,7 +1848,7 @@ protocol ComponentPlatformInterface {
   func onPaymentsResult(componentId: String, paymentsResult: PaymentEventDTO) throws
   func onPaymentsDetailsResult(componentId: String, paymentsDetailsResult: PaymentEventDTO) throws
   func isInstantPaymentSupportedByPlatform(instantPaymentConfigurationDTO: InstantPaymentConfigurationDTO, paymentMethodResponse: String, componentId: String, completion: @escaping (Result<InstantPaymentSetupResultDTO, Error>) -> Void)
-  func onInstantPaymentPressed(instantPaymentConfigurationDTO: InstantPaymentConfigurationDTO, paymentMethodResponse: String, componentId: String) throws
+  func onInstantPaymentPressed(instantPaymentConfigurationDTO: InstantPaymentConfigurationDTO, encodedPaymentMethod: String, componentId: String) throws
   func onDispose(componentId: String) throws
 }
 
@@ -1929,10 +1929,10 @@ class ComponentPlatformInterfaceSetup {
       onInstantPaymentPressedChannel.setMessageHandler { message, reply in
         let args = message as! [Any?]
         let instantPaymentConfigurationDTOArg = args[0] as! InstantPaymentConfigurationDTO
-        let paymentMethodResponseArg = args[1] as! String
+        let encodedPaymentMethodArg = args[1] as! String
         let componentIdArg = args[2] as! String
         do {
-          try api.onInstantPaymentPressed(instantPaymentConfigurationDTO: instantPaymentConfigurationDTOArg, paymentMethodResponse: paymentMethodResponseArg, componentId: componentIdArg)
+          try api.onInstantPaymentPressed(instantPaymentConfigurationDTO: instantPaymentConfigurationDTOArg, encodedPaymentMethod: encodedPaymentMethodArg, componentId: componentIdArg)
           reply(wrapResult(nil))
         } catch {
           reply(wrapError(error))

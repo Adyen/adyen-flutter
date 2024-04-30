@@ -46,9 +46,9 @@ class InstantSessionComponentScreen extends StatelessWidget {
       builder: (BuildContext context, AsyncSnapshot<SessionCheckout> snapshot) {
         if (snapshot.hasData) {
           final SessionCheckout sessionCheckout = snapshot.data!;
-          final payPalPaymentMethod = _extractPaymentMethod(
+          final payPalPaymentMethodResponse = _extractPaymentMethod(
               sessionCheckout.paymentMethodsJson, "paypal");
-          final klarnaPaymentMethod = _extractPaymentMethod(
+          final klarnaPaymentMethodResponse = _extractPaymentMethod(
               sessionCheckout.paymentMethodsJson, "klarna");
 
           return Column(
@@ -61,10 +61,10 @@ class InstantSessionComponentScreen extends StatelessWidget {
               const SizedBox(height: 8),
               TextButton(
                   onPressed: () async {
-                    final paymentResult = await AdyenCheckout.session.start(
-                      instantComponentConfiguration:
-                          instantComponentConfiguration,
-                      paymentMethodResponse: jsonEncode(payPalPaymentMethod),
+                    final paymentResult =
+                        await AdyenCheckout.session.startInstantComponent(
+                      configuration: instantComponentConfiguration,
+                      paymentMethodResponse: payPalPaymentMethodResponse,
                       checkout: sessionCheckout,
                     );
 
@@ -73,10 +73,10 @@ class InstantSessionComponentScreen extends StatelessWidget {
                   child: const Text("Paypal")),
               TextButton(
                   onPressed: () async {
-                    final paymentResult = await AdyenCheckout.session.start(
-                      instantComponentConfiguration:
-                          instantComponentConfiguration,
-                      paymentMethodResponse: jsonEncode(klarnaPaymentMethod),
+                    final paymentResult =
+                        await AdyenCheckout.session.startInstantComponent(
+                      configuration: instantComponentConfiguration,
+                      paymentMethodResponse: klarnaPaymentMethodResponse,
                       checkout: sessionCheckout,
                     );
 

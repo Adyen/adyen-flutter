@@ -37,15 +37,25 @@ class ComponentPlatformApi: ComponentPlatformInterface {
                 componentId: componentId,
                 callback: completion
             )
+        case .instant:
+            //TODO - iOS implementation will happen in another branch
+            return
         }
     }
 
-    func onInstantPaymentPressed(instantPaymentType: InstantPaymentType, componentId: String) {
-        switch instantPaymentType {
+    func onInstantPaymentPressed(
+        instantPaymentConfigurationDTO: InstantPaymentConfigurationDTO,
+        encodedPaymentMethod: String,
+        componentId: String
+    ) {
+        switch instantPaymentConfigurationDTO.instantPaymentType {
         case .googlePay:
             return
         case .applePay:
             applePayComponentManager.onApplePayComponentPressed(componentId: componentId)
+        case .instant:
+            //TODO - iOS implementation will happen in another branch
+            return
         }
     }
 

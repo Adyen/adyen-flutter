@@ -27,6 +27,11 @@ class ComponentLoadingBottomSheet<T>(private val component: T) :
         isCancelable = false
     }
 
+    override fun onCreateDialog(savedInstanceState: Bundle?) =
+        super.onCreateDialog(savedInstanceState).apply {
+            window?.setWindowAnimations(R.style.AdyenCheckout_BottomSheet_NoWindowEnterDialogAnimation)
+        }
+
     companion object {
         private const val TAG = "AdyenComponentLoadingBottomSheet"
 

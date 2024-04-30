@@ -156,21 +156,26 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
             delegate: sessionDelegate,
             presentationDelegate: sessionPresentationDelegate
         ) { [weak self] result in
-            switch result {
-            case let .success(session):
-                // TODO: For later  - We need to return the actual session and removing the session holder when the session is codable.
-                self?.sessionHolder.setup(
-                    session: session,
-                    sessionPresentationDelegate: sessionPresentationDelegate,
-                    sessionDelegate: sessionDelegate
-                )
-                // TODO: serialize paymentMethods
-                completion(Result.success(SessionDTO(
-                    id: sessionId,
-                    sessionData: sessionData,
-                    paymentMethodsJson: ""
-                )))
-            case let .failure(error):
+            do {
+                switch result {
+                case let .success(session):
+                    // TODO: For later  - We need to return the actual session and removing the session holder when the session is codable.
+                    self?.sessionHolder.setup(
+                        session: session,
+                        sessionPresentationDelegate: sessionPresentationDelegate,
+                        sessionDelegate: sessionDelegate
+                    )
+                    
+                    let encodedPaymentMethods = try JSONEncoder().encode(session.sessionContext.paymentMethods)
+                    completion(Result.success(SessionDTO(
+                        id: sessionId,
+                        sessionData: sessionData,
+                        paymentMethodsJson: String(data: encodedPaymentMethods, encoding: .utf8) ?? ""
+                    )))
+                case let .failure(error):
+                    completion(Result.failure(error))
+                }
+            } catch {
                 completion(Result.failure(error))
             }
         }

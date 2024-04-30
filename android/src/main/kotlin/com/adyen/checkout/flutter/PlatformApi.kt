@@ -2042,7 +2042,7 @@ interface ComponentPlatformInterface {
   fun onPaymentsResult(componentId: String, paymentsResult: PaymentEventDTO)
   fun onPaymentsDetailsResult(componentId: String, paymentsDetailsResult: PaymentEventDTO)
   fun isInstantPaymentSupportedByPlatform(instantPaymentConfigurationDTO: InstantPaymentConfigurationDTO, paymentMethodResponse: String, componentId: String, callback: (Result<InstantPaymentSetupResultDTO>) -> Unit)
-  fun onInstantPaymentPressed(instantPaymentConfigurationDTO: InstantPaymentConfigurationDTO, paymentMethodResponse: String, componentId: String)
+  fun onInstantPaymentPressed(instantPaymentConfigurationDTO: InstantPaymentConfigurationDTO, encodedPaymentMethod: String, componentId: String)
   fun onDispose(componentId: String)
 
   companion object {
@@ -2140,11 +2140,11 @@ interface ComponentPlatformInterface {
           channel.setMessageHandler { message, reply ->
             val args = message as List<Any?>
             val instantPaymentConfigurationDTOArg = args[0] as InstantPaymentConfigurationDTO
-            val paymentMethodResponseArg = args[1] as String
+            val encodedPaymentMethodArg = args[1] as String
             val componentIdArg = args[2] as String
             var wrapped: List<Any?>
             try {
-              api.onInstantPaymentPressed(instantPaymentConfigurationDTOArg, paymentMethodResponseArg, componentIdArg)
+              api.onInstantPaymentPressed(instantPaymentConfigurationDTOArg, encodedPaymentMethodArg, componentIdArg)
               wrapped = listOf<Any?>(null)
             } catch (exception: Throwable) {
               wrapped = wrapError(exception)

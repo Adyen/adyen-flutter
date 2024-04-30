@@ -31,9 +31,9 @@ class AdyenCheckoutAdvanced {
     );
   }
 
-  Future<PaymentResult> start({
-    required InstantComponentConfiguration instantComponentConfiguration,
-    required String paymentMethodResponse,
+  Future<PaymentResult> startInstantComponent({
+    required InstantComponentConfiguration configuration,
+    required Map<String, dynamic> paymentMethodResponse,
     required AdvancedCheckoutPreview checkout,
   }) async {
     final componentId = "INSTANT_ADVANCED_COMPONENT_${UniqueKey().toString()}";
@@ -41,7 +41,7 @@ class AdyenCheckoutAdvanced {
       componentId: componentId,
       advancedCheckout: checkout,
     ).start(
-      instantComponentConfiguration,
+      configuration,
       paymentMethodResponse,
     );
   }

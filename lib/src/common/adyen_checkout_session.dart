@@ -75,9 +75,9 @@ class AdyenCheckoutSession {
     }
   }
 
-  Future<PaymentResult> start({
-    required InstantComponentConfiguration instantComponentConfiguration,
-    required String paymentMethodResponse,
+  Future<PaymentResult> startInstantComponent({
+    required InstantComponentConfiguration configuration,
+    required Map<String, dynamic> paymentMethodResponse,
     required SessionCheckout checkout,
   }) async {
     final componentId = "INSTANT_SESSION_COMPONENT_${UniqueKey().toString()}";
@@ -85,7 +85,7 @@ class AdyenCheckoutSession {
       componentId: componentId,
       sessionCheckout: checkout,
     ).start(
-      instantComponentConfiguration,
+      configuration,
       paymentMethodResponse,
     );
   }

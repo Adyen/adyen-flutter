@@ -31,7 +31,7 @@ class InstantAdvancedComponent extends BaseInstantComponent {
   @override
   void onFinished(PaymentResultDTO? paymentResultDTO) {
     String resultCode = paymentResultDTO?.result?.resultCode ?? "";
-    adyenLogger.print("Instant advanced result code: $resultCode");
+    adyenLogger.print("Instant component advanced result code: $resultCode");
     completer.complete(PaymentAdvancedFinished(resultCode: resultCode));
   }
 

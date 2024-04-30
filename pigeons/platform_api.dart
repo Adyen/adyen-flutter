@@ -629,7 +629,7 @@ abstract class ComponentPlatformInterface {
 
   void onInstantPaymentPressed(
     InstantPaymentConfigurationDTO instantPaymentConfigurationDTO,
-    String paymentMethodResponse,
+    String encodedPaymentMethod,
     String componentId,
   );
 

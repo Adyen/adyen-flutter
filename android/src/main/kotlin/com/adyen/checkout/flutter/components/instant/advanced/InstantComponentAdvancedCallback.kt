@@ -12,11 +12,9 @@ import org.json.JSONObject
 class InstantComponentAdvancedCallback(
     private val componentFlutterApi: ComponentFlutterInterface,
     private val componentId: String,
-    private val onLoadingCallback: () -> Unit,
     private val hideLoadingBottomSheet: () -> Unit,
 ) : ComponentAdvancedCallback<InstantComponentState>(componentFlutterApi, componentId) {
     override fun onSubmit(state: InstantComponentState) {
-        onLoadingCallback()
         val data = PaymentComponentData.SERIALIZER.serialize(state.data)
         val submitData =
             JSONObject().apply {

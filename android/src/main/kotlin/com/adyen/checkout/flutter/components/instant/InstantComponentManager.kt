@@ -28,14 +28,15 @@ class InstantComponentManager(
 
     fun startInstantComponent(
         instantPaymentConfigurationDTO: InstantPaymentConfigurationDTO,
-        paymentMethodResponse: String,
+        encodedPaymentMethod: String,
         componentId: String
     ): InstantPaymentComponent {
-        val paymentMethod = PaymentMethod.SERIALIZER.deserialize(JSONObject(paymentMethodResponse))
+        val paymentMethod = PaymentMethod.SERIALIZER.deserialize(JSONObject(encodedPaymentMethod))
         val configuration = instantPaymentConfigurationDTO.mapToInstantConfiguration(activity)
         val instantPaymentComponent = createInstantPaymentComponent(configuration, paymentMethod, componentId)
         this.instantPaymentComponent = instantPaymentComponent
         this.componentId = componentId
+        showLoadingBottomSheet(instantPaymentComponent)
         return instantPaymentComponent
     }
 
@@ -72,7 +73,6 @@ class InstantComponentManager(
                 InstantComponentAdvancedCallback(
                     componentFlutterInterface,
                     componentId,
-                    ::onLoading,
                     ::hideLoadingBottomSheet
                 ),
             key = componentId
@@ -103,18 +103,10 @@ class InstantComponentManager(
         )
     }
 
-    private fun handleAction(action: Action) {
-        instantPaymentComponent?.let {
-            onLoading()
-            it.handleAction(action, activity)
-        }
-    }
+    private fun showLoadingBottomSheet(instantPaymentComponent: InstantPaymentComponent) =
+        ComponentLoadingBottomSheet.show(activity.supportFragmentManager, instantPaymentComponent)
 
-    private fun onLoading() {
-        instantPaymentComponent?.let {
-            ComponentLoadingBottomSheet.show(activity.supportFragmentManager, it)
-        }
-    }
+    private fun handleAction(action: Action) = instantPaymentComponent?.handleAction(action, activity)
 
     private fun hideLoadingBottomSheet() = ComponentLoadingBottomSheet.hide(activity.supportFragmentManager)
 }

@@ -2135,7 +2135,7 @@ class ComponentPlatformInterface {
     }
   }
 
-  Future<void> onInstantPaymentPressed(InstantPaymentConfigurationDTO instantPaymentConfigurationDTO, String paymentMethodResponse, String componentId) async {
+  Future<void> onInstantPaymentPressed(InstantPaymentConfigurationDTO instantPaymentConfigurationDTO, String encodedPaymentMethod, String componentId) async {
     const String __pigeon_channelName = 'dev.flutter.pigeon.adyen_checkout.ComponentPlatformInterface.onInstantPaymentPressed';
     final BasicMessageChannel<Object?> __pigeon_channel = BasicMessageChannel<Object?>(
       __pigeon_channelName,
@@ -2143,7 +2143,7 @@ class ComponentPlatformInterface {
       binaryMessenger: __pigeon_binaryMessenger,
     );
     final List<Object?>? __pigeon_replyList =
-        await __pigeon_channel.send(<Object?>[instantPaymentConfigurationDTO, paymentMethodResponse, componentId]) as List<Object?>?;
+        await __pigeon_channel.send(<Object?>[instantPaymentConfigurationDTO, encodedPaymentMethod, componentId]) as List<Object?>?;
     if (__pigeon_replyList == null) {
       throw _createConnectionError(__pigeon_channelName);
     } else if (__pigeon_replyList.length > 1) {
