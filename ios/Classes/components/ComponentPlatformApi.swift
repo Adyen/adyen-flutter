@@ -38,7 +38,7 @@ class ComponentPlatformApi: ComponentPlatformInterface {
                 callback: completion
             )
         case .instant:
-            //TODO - iOS implementation will happen in another branch
+            // TODO: - iOS implementation will happen in another branch
             return
         }
     }
@@ -54,7 +54,7 @@ class ComponentPlatformApi: ComponentPlatformInterface {
         case .applePay:
             applePayComponentManager.onApplePayComponentPressed(componentId: componentId)
         case .instant:
-            //TODO - iOS implementation will happen in another branch
+            // TODO: - iOS implementation will happen in another branch
             return
         }
     }
