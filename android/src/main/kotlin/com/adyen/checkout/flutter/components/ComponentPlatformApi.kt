@@ -46,12 +46,7 @@ class ComponentPlatformApi(
 
     init {
         activity.lifecycleScope.launch {
-            currentComponentStateFlow.collect { value ->
-                value?.let {
-                    activity.addOnNewIntentListener(intentListener)
-                    currentComponent = it
-                }
-            }
+            currentComponentStateFlow.collect { value -> assignCurrentComponent(value) }
         }
     }
 
@@ -84,8 +79,7 @@ class ComponentPlatformApi(
                     callback
                 )
 
-            InstantPaymentType.INSTANT,
-            InstantPaymentType.APPLEPAY -> return
+            InstantPaymentType.INSTANT, InstantPaymentType.APPLEPAY -> return
         }
     }
 
@@ -94,8 +88,7 @@ class ComponentPlatformApi(
         encodedPaymentMethod: String,
         componentId: String,
     ) {
-        activity.addOnNewIntentListener(intentListener)
-        currentComponent =
+        val currentComponent =
             when (instantPaymentConfigurationDTO.instantPaymentType) {
                 InstantPaymentType.GOOGLEPAY -> googlePayComponentManager.startGooglePayComponent()
                 InstantPaymentType.APPLEPAY -> return
@@ -106,6 +99,7 @@ class ComponentPlatformApi(
                         componentId
                     )
             }
+        assignCurrentComponent(currentComponent)
     }
 
     override fun onDispose(componentId: String) {
@@ -184,6 +178,11 @@ class ComponentPlatformApi(
     }
 
     private fun hideLoadingBottomSheet() = ComponentLoadingBottomSheet.hide(activity.supportFragmentManager)
+
+    private fun assignCurrentComponent(currentComponent: ActionHandlingComponent?) {
+        this.currentComponent = currentComponent
+        activity.addOnNewIntentListener(intentListener)
+    }
 
     private fun handleIntent(intent: Intent) {
         if (intent.data != null &&
