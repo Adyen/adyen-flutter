@@ -60,27 +60,27 @@ class InstantSessionComponentScreen extends StatelessWidget {
               ),
               const SizedBox(height: 8),
               TextButton(
-                  onPressed: () async {
-                    final paymentResult =
-                        await AdyenCheckout.session.startInstantComponent(
-                      configuration: instantComponentConfiguration,
-                      paymentMethodResponse: payPalPaymentMethodResponse,
-                      checkout: sessionCheckout,
-                    );
-
-                    _dialogBuilder(paymentResult, context);
+                  onPressed: () {
+                    AdyenCheckout.session
+                        .startInstantComponent(
+                          configuration: instantComponentConfiguration,
+                          paymentMethodResponse: payPalPaymentMethodResponse,
+                          checkout: sessionCheckout,
+                        )
+                        .then((paymentResult) =>
+                            _dialogBuilder(paymentResult, context));
                   },
                   child: const Text("Paypal")),
               TextButton(
-                  onPressed: () async {
-                    final paymentResult =
-                        await AdyenCheckout.session.startInstantComponent(
-                      configuration: instantComponentConfiguration,
-                      paymentMethodResponse: klarnaPaymentMethodResponse,
-                      checkout: sessionCheckout,
-                    );
-
-                    _dialogBuilder(paymentResult, context);
+                  onPressed: () {
+                    AdyenCheckout.session
+                        .startInstantComponent(
+                          configuration: instantComponentConfiguration,
+                          paymentMethodResponse: klarnaPaymentMethodResponse,
+                          checkout: sessionCheckout,
+                        )
+                        .then((paymentResult) =>
+                            _dialogBuilder(paymentResult, context));
                   },
                   child: const Text("Klarna"))
             ],

@@ -178,7 +178,7 @@ class _BaseApplePayComponentState extends State<BaseApplePayComponent> {
 
   void onPressed() async {
     final instantPaymentConfigurationDTO =
-    await createInstantPaymentConfigurationDTO();
+        await createInstantPaymentConfigurationDTO();
     widget.isButtonClickable.value = false;
     widget.componentPlatformApi.onInstantPaymentPressed(
       instantPaymentConfigurationDTO,
@@ -189,7 +189,7 @@ class _BaseApplePayComponentState extends State<BaseApplePayComponent> {
 
   Future<InstantPaymentSetupResultDTO> _isApplePaySupported() async {
     final instantPaymentConfigurationDTO =
-    await createInstantPaymentConfigurationDTO();
+        await createInstantPaymentConfigurationDTO();
     return await widget.componentPlatformApi
         .isInstantPaymentSupportedByPlatform(
       instantPaymentConfigurationDTO,
@@ -199,12 +199,12 @@ class _BaseApplePayComponentState extends State<BaseApplePayComponent> {
   }
 
   Future<InstantPaymentConfigurationDTO>
-  createInstantPaymentConfigurationDTO() async {
+      createInstantPaymentConfigurationDTO() async {
     final String versionNumber =
-    await widget._sdkVersionNumberProvider.getSdkVersionNumber();
+        await widget._sdkVersionNumberProvider.getSdkVersionNumber();
     final InstantPaymentConfigurationDTO
-    instantPaymentComponentConfigurationDTO =
-    widget.applePayComponentConfiguration.toDTO(
+        instantPaymentComponentConfigurationDTO =
+        widget.applePayComponentConfiguration.toDTO(
       versionNumber,
       InstantPaymentType.applePay,
     );

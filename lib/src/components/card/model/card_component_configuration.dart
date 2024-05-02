@@ -12,5 +12,5 @@ final class CardComponentConfiguration extends BaseConfiguration {
     super.shopperLocale,
     super.analyticsOptions,
     CardConfiguration? cardConfiguration,
-  })  : cardConfiguration = cardConfiguration ?? const CardConfiguration();
+  }) : cardConfiguration = cardConfiguration ?? const CardConfiguration();
 }
