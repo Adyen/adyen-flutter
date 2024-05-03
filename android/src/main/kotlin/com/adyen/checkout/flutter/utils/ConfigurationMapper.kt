@@ -29,6 +29,7 @@ import com.adyen.checkout.cashapppay.CashAppPayConfiguration
 import com.adyen.checkout.components.core.Amount
 import com.adyen.checkout.components.core.AnalyticsConfiguration
 import com.adyen.checkout.components.core.AnalyticsLevel
+import com.adyen.checkout.components.core.CheckoutConfiguration
 import com.adyen.checkout.components.core.OrderResponse
 import com.adyen.checkout.components.core.internal.data.api.AnalyticsMapper
 import com.adyen.checkout.components.core.internal.data.api.AnalyticsPlatform
@@ -39,7 +40,6 @@ import com.adyen.checkout.googlepay.BillingAddressParameters
 import com.adyen.checkout.googlepay.GooglePayConfiguration
 import com.adyen.checkout.googlepay.MerchantInfo
 import com.adyen.checkout.googlepay.ShippingAddressParameters
-import com.adyen.checkout.instant.InstantPaymentConfiguration
 import com.google.android.gms.wallet.WalletConstants
 import java.util.Locale
 import com.adyen.checkout.cashapppay.CashAppPayEnvironment as SDKCashAppPayEnvironment
@@ -408,16 +408,12 @@ object ConfigurationMapper {
         return unencryptedCardBuilder.build()
     }
 
-    fun InstantPaymentConfigurationDTO.mapToInstantConfiguration(context: Context): InstantPaymentConfiguration {
-        val environment = environment.fromDTO()
-        val instantPaymentConfigurationBuilder =
-            if (shopperLocale != null) {
-                val locale = Locale.forLanguageTag(shopperLocale)
-                InstantPaymentConfiguration.Builder(locale, environment, clientKey)
-            } else {
-                InstantPaymentConfiguration.Builder(context, environment, clientKey)
-            }
-        instantPaymentConfigurationBuilder.setAnalyticsConfiguration(analyticsOptionsDTO.mapToAnalyticsConfiguration())
-        return instantPaymentConfigurationBuilder.build()
-    }
+    fun InstantPaymentConfigurationDTO.mapToCheckoutConfiguration(): CheckoutConfiguration =
+        CheckoutConfiguration(
+            environment.fromDTO(),
+            clientKey,
+            shopperLocale?.let { Locale.forLanguageTag(it) },
+            amount.fromDTO(),
+            analyticsOptionsDTO.mapToAnalyticsConfiguration(),
+        )
 }
