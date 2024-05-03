@@ -21,6 +21,7 @@ import com.adyen.checkout.flutter.components.view.ComponentWrapperView
 import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToAnalyticsConfiguration
 import com.adyen.checkout.flutter.utils.ConfigurationMapper.fromDTO
 import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToCardConfiguration
+import com.adyen.checkout.flutter.utils.ConfigurationMapper.toNativeModel
 import com.adyen.checkout.ui.core.AdyenComponentView
 import io.flutter.plugin.platform.PlatformView
 import kotlinx.coroutines.launch
@@ -35,7 +36,7 @@ abstract class BaseCardComponent(
     private val configuration =
         creationParams[CARD_COMPONENT_CONFIGURATION_KEY] as CardComponentConfigurationDTO?
             ?: throw Exception("Card configuration not found")
-    private val environment = configuration.environment.fromDTO()
+    private val environment = configuration.environment.toNativeModel()
     private val componentWrapperView = ComponentWrapperView(activity, componentFlutterApi)
     val cardConfiguration =
         configuration.cardConfiguration.mapToCardConfiguration(
@@ -44,7 +45,7 @@ abstract class BaseCardComponent(
             environment,
             configuration.clientKey,
             configuration.analyticsOptionsDTO.mapToAnalyticsConfiguration(),
-            configuration.amount.fromDTO(),
+            configuration.amount.toNativeModel(),
         )
 
     internal var cardComponent: CardComponent? = null

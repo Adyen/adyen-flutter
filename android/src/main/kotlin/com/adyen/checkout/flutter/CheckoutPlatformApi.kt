@@ -24,6 +24,7 @@ import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToGooglePayConfig
 import com.adyen.checkout.flutter.utils.ConfigurationMapper.fromDTO
 import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToCardConfiguration
 import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToCheckoutConfiguration
+import com.adyen.checkout.flutter.utils.ConfigurationMapper.toNativeModel
 import com.adyen.checkout.redirect.RedirectComponent
 import com.adyen.checkout.sessions.core.CheckoutSessionProvider
 import com.adyen.checkout.sessions.core.CheckoutSessionResult
@@ -92,10 +93,10 @@ class CheckoutPlatformApi(
                 return configuration.cardConfiguration.mapToCardConfiguration(
                     activity,
                     configuration.shopperLocale,
-                    configuration.environment.fromDTO(),
+                    configuration.environment.toNativeModel(),
                     configuration.clientKey,
                     configuration.analyticsOptionsDTO.mapToAnalyticsConfiguration(),
-                    configuration.amount.fromDTO()
+                    configuration.amount.toNativeModel()
                 )
             }
 

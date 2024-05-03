@@ -56,8 +56,8 @@ object ConfigurationMapper {
     }
 
     fun DropInConfigurationDTO.mapToDropInConfiguration(context: Context): DropInConfiguration {
-        val environment = environment.fromDTO()
-        val amount = amount.fromDTO()
+        val environment = environment.toNativeModel()
+        val amount = amount.toNativeModel()
         val dropInConfiguration = buildDropInConfiguration(context, shopperLocale, environment)
         val analyticsConfiguration = analyticsOptionsDTO.mapToAnalyticsConfiguration()
 
@@ -218,7 +218,7 @@ object ConfigurationMapper {
         return mappedCardTypes.filterNotNull().toTypedArray()
     }
 
-    fun Environment.fromDTO(): SDKEnvironment {
+    fun Environment.toNativeModel(): SDKEnvironment {
         return when (this) {
             Environment.TEST -> SDKEnvironment.TEST
             Environment.EUROPE -> SDKEnvironment.EUROPE
@@ -229,7 +229,7 @@ object ConfigurationMapper {
         }
     }
 
-    fun AmountDTO.fromDTO(): Amount {
+    fun AmountDTO.toNativeModel(): Amount {
         return Amount(this.currency, this.value)
     }
 
@@ -372,19 +372,19 @@ object ConfigurationMapper {
                 val locale = Locale.forLanguageTag(shopperLocale)
                 GooglePayConfiguration.Builder(
                     locale,
-                    environment.fromDTO(),
+                    environment.toNativeModel(),
                     clientKey
                 )
             } else {
                 GooglePayConfiguration.Builder(
                     context,
-                    environment.fromDTO(),
+                    environment.toNativeModel(),
                     clientKey
                 )
             }
 
         val analyticsConfiguration: AnalyticsConfiguration = analyticsOptionsDTO.mapToAnalyticsConfiguration()
-        val amount: Amount = amount.fromDTO()
+        val amount: Amount = amount.toNativeModel()
         val countryCode: String = countryCode
         return googlePayConfigurationDTO?.mapToGooglePayConfiguration(
             googlePayConfigurationBuilder,
@@ -410,10 +410,10 @@ object ConfigurationMapper {
 
     fun InstantPaymentConfigurationDTO.mapToCheckoutConfiguration(): CheckoutConfiguration =
         CheckoutConfiguration(
-            environment.fromDTO(),
+            environment.toNativeModel(),
             clientKey,
             shopperLocale?.let { Locale.forLanguageTag(it) },
-            amount.fromDTO(),
+            amount.toNativeModel(),
             analyticsOptionsDTO.mapToAnalyticsConfiguration(),
         )
 }
