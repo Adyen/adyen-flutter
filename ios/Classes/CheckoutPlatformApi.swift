@@ -159,18 +159,20 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
             do {
                 switch result {
                 case let .success(session):
-                    // TODO: For later  - We need to return the actual session and removing the session holder when the session is codable.
                     self?.sessionHolder.setup(
                         session: session,
                         sessionPresentationDelegate: sessionPresentationDelegate,
                         sessionDelegate: sessionDelegate
                     )
-                    
                     let encodedPaymentMethods = try JSONEncoder().encode(session.sessionContext.paymentMethods)
+                    guard let encodedPaymentMethodsString = String(data: encodedPaymentMethods, encoding: .utf8) else {
+                        completion(Result.failure(PlatformError(errorDescription: "Encoding payment methods failed")))
+                        return
+                    }
                     completion(Result.success(SessionDTO(
                         id: sessionId,
                         sessionData: sessionData,
-                        paymentMethodsJson: String(data: encodedPaymentMethods, encoding: .utf8) ?? ""
+                        paymentMethodsJson: encodedPaymentMethodsString
                     )))
                 case let .failure(error):
                     completion(Result.failure(error))
