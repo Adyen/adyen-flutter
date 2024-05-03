@@ -20,6 +20,7 @@ import com.adyen.checkout.flutter.components.ComponentPlatformApi
 import com.adyen.checkout.flutter.components.view.ComponentWrapperView
 import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToAnalyticsConfiguration
 import com.adyen.checkout.flutter.utils.ConfigurationMapper.fromDTO
+import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToCardConfiguration
 import com.adyen.checkout.ui.core.AdyenComponentView
 import io.flutter.plugin.platform.PlatformView
 import kotlinx.coroutines.launch
@@ -37,7 +38,7 @@ abstract class BaseCardComponent(
     private val environment = configuration.environment.fromDTO()
     private val componentWrapperView = ComponentWrapperView(activity, componentFlutterApi)
     val cardConfiguration =
-        configuration.cardConfiguration.fromDTO(
+        configuration.cardConfiguration.mapToCardConfiguration(
             context,
             configuration.shopperLocale,
             environment,

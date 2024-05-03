@@ -75,7 +75,7 @@ object ConfigurationMapper {
 
         if (cardConfigurationDTO != null) {
             val cardConfiguration =
-                cardConfigurationDTO.fromDTO(
+                cardConfigurationDTO.mapToCardConfiguration(
                     context,
                     shopperLocale,
                     environment,
@@ -115,7 +115,7 @@ object ConfigurationMapper {
         }
     }
 
-    fun CardConfigurationDTO.fromDTO(
+    fun CardConfigurationDTO.mapToCardConfiguration(
         context: Context,
         shopperLocale: String?,
         environment: com.adyen.checkout.core.Environment,
