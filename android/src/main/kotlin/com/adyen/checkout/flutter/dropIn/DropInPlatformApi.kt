@@ -18,6 +18,7 @@ import com.adyen.checkout.components.core.Order
 import com.adyen.checkout.components.core.PaymentMethodsApiResponse
 import com.adyen.checkout.dropin.DropIn
 import com.adyen.checkout.dropin.DropInCallback
+import com.adyen.checkout.dropin.DropInConfiguration
 import com.adyen.checkout.dropin.DropInResult
 import com.adyen.checkout.dropin.SessionDropInCallback
 import com.adyen.checkout.dropin.SessionDropInResult
@@ -53,7 +54,7 @@ class DropInPlatformApi(
     override fun showDropInSession(dropInConfigurationDTO: DropInConfigurationDTO) {
         setStoredPaymentMethodDeletionObserver()
         val dropInConfiguration = dropInConfigurationDTO.mapToDropInConfiguration(activity.applicationContext)
-        val checkoutSession = createCheckoutSession(sessionHolder)
+        val checkoutSession = createCheckoutSession(sessionHolder, dropInConfiguration)
         DropIn.startPayment(
             activity.applicationContext,
             dropInSessionLauncher,
@@ -175,10 +176,18 @@ class DropInPlatformApi(
         }
     }
 
-    private fun createCheckoutSession(sessionHolder: SessionHolder): CheckoutSession {
+    private fun createCheckoutSession(
+        sessionHolder: SessionHolder,
+        dropInConfiguration: DropInConfiguration
+    ): CheckoutSession {
         val sessionSetupResponse = SessionSetupResponse.SERIALIZER.deserialize(sessionHolder.sessionSetupResponse)
         val order = sessionHolder.orderResponse?.let { Order.SERIALIZER.deserialize(it) }
-        return CheckoutSession(sessionSetupResponse = sessionSetupResponse, order = order)
+        return CheckoutSession(
+            sessionSetupResponse = sessionSetupResponse,
+            order = order,
+            environment = dropInConfiguration.environment,
+            clientKey = dropInConfiguration.clientKey
+        )
     }
 
     // Gift cards will be supported in a later version

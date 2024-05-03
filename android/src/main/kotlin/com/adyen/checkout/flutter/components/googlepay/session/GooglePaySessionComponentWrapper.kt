@@ -22,7 +22,13 @@ class GooglePaySessionComponentWrapper(
     override fun setupGooglePayComponent(paymentMethod: PaymentMethod) {
         val sessionSetupResponse = SessionSetupResponse.SERIALIZER.deserialize(sessionHolder.sessionSetupResponse)
         val order = sessionHolder.orderResponse?.let { Order.SERIALIZER.deserialize(it) }
-        val checkoutSession = CheckoutSession(sessionSetupResponse = sessionSetupResponse, order = order)
+        val checkoutSession =
+            CheckoutSession(
+                sessionSetupResponse = sessionSetupResponse,
+                order = order,
+                environment = googlePayConfiguration.environment,
+                clientKey = googlePayConfiguration.clientKey
+            )
         googlePayComponent =
             GooglePayComponent.PROVIDER.get(
                 activity = activity,

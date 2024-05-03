@@ -1,3 +1,8 @@
+## 0.0.4 (in development)
+
+* Updated iOS SDK to v5.7.1.
+* Updated Android SDK to v5.3.1.
+
 ## 0.0.3
 
 * ⚠ Introduced the AdvancedCheckoutPreview as a replacement for the AdvancedCheckout. Please

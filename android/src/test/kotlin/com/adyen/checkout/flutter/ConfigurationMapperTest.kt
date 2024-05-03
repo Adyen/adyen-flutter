@@ -42,7 +42,7 @@ class ConfigurationMapperTest {
 
         assertEquals(dropInConfiguration.environment, com.adyen.checkout.core.Environment.TEST)
         assertEquals(dropInConfiguration.clientKey, TEST_CLIENT_KEY)
-        assertEquals(dropInConfiguration.shopperLocale.toLanguageTag(), "en-US")
+        assertEquals(dropInConfiguration.shopperLocale?.toLanguageTag(), "en-US")
         assertEquals(dropInConfiguration.amount?.currency, "USD")
         assertEquals(dropInConfiguration.amount?.value, 1824)
         assertEquals(dropInConfiguration.showPreselectedStoredPaymentMethod, false)

@@ -36,7 +36,13 @@ class CardSessionComponent(
     init {
         val sessionSetupResponse = SessionSetupResponse.SERIALIZER.deserialize(sessionHolder.sessionSetupResponse)
         val order = sessionHolder.orderResponse?.let { Order.SERIALIZER.deserialize(it) }
-        val checkoutSession = CheckoutSession(sessionSetupResponse = sessionSetupResponse, order = order)
+        val checkoutSession =
+            CheckoutSession(
+                sessionSetupResponse = sessionSetupResponse,
+                order = order,
+                environment = cardConfiguration.environment,
+                clientKey = cardConfiguration.clientKey
+            )
         cardComponent =
             createCardComponent(checkoutSession).apply {
                 addComponent(this, componentId)

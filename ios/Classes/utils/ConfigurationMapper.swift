@@ -221,7 +221,7 @@ private func buildAdyenContext(environment: Environment, clientKey: String, amou
     let amount = amount.mapToAmount()
     var analyticsConfiguration = AnalyticsConfiguration()
     analyticsConfiguration.isEnabled = analyticsOptionsDTO.enabled
-    analyticsConfiguration.context = TelemetryContext(
+    analyticsConfiguration.context = AnalyticsContext(
         version: analyticsOptionsDTO.version,
         platform: .flutter
     )
