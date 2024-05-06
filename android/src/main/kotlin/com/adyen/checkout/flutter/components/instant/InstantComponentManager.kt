@@ -33,7 +33,25 @@ class InstantComponentManager(
     ): InstantPaymentComponent {
         val paymentMethod = PaymentMethod.SERIALIZER.deserialize(JSONObject(encodedPaymentMethod))
         val configuration = instantPaymentConfigurationDTO.mapToCheckoutConfiguration()
-        val instantPaymentComponent = createInstantPaymentComponent(configuration, paymentMethod, componentId)
+        val instantPaymentComponent =
+            when {
+                componentId.contains(Constants.INSTANT_ADVANCED_COMPONENT_KEY) ->
+                    createInstantAdvancedComponent(
+                        configuration,
+                        paymentMethod,
+                        componentId
+                    )
+
+                componentId.contains(Constants.INSTANT_SESSION_COMPONENT_KEY) ->
+                    createInstantSessionComponent(
+                        configuration,
+                        paymentMethod,
+                        componentId
+                    )
+
+                else -> throw IllegalStateException("Instant component not available for payment flow.")
+            }
+
         this.instantPaymentComponent = instantPaymentComponent
         this.componentId = componentId
         showLoadingBottomSheet(instantPaymentComponent)
@@ -44,20 +62,6 @@ class InstantComponentManager(
         if (componentId == this.componentId) {
             instantPaymentComponent = null
         }
-    }
-
-    private fun createInstantPaymentComponent(
-        configuration: CheckoutConfiguration,
-        paymentMethod: PaymentMethod,
-        componentId: String,
-    ): InstantPaymentComponent {
-        if (componentId.contains(Constants.INSTANT_ADVANCED_COMPONENT_KEY)) {
-            return createInstantAdvancedComponent(configuration, paymentMethod, componentId)
-        } else if (componentId.contains(Constants.INSTANT_SESSION_COMPONENT_KEY)) {
-            return createInstantSessionComponent(configuration, paymentMethod, componentId)
-        }
-
-        throw IllegalStateException("Instant component not available for payment flow.")
     }
 
     private fun createInstantAdvancedComponent(

@@ -3,8 +3,7 @@
 class ApplePayComponentManager {
     private let componentFlutterApi: ComponentFlutterInterface
     private let sessionHolder: SessionHolder
-    private var applePayComponentWrapper: BaseApplePayComponentWrapper?
-    
+    private var applePayComponent: BaseApplePayComponent?
     enum Constants {
         static let applePaySessionComponentId = "APPLE_PAY_SESSION_COMPONENT"
         static let applePayAdvancedComponentId = "APPLE_PAY_ADVANCED_COMPONENT"
@@ -28,14 +27,14 @@ class ApplePayComponentManager {
             let applePayConfiguration = try instantPaymentComponentConfigurationDTO.mapToApplePayConfiguration()
             let adyenContext = try instantPaymentComponentConfigurationDTO.createAdyenContext()
             if componentId == Constants.applePaySessionComponentId {
-                applePayComponentWrapper = ApplePaySessionComponentWrapper(
+                applePayComponent = ApplePaySessionComponent(
                     sessionHolder: sessionHolder,
                     configuration: applePayConfiguration,
                     adyenContext: adyenContext,
                     componentId: componentId
                 )
             } else {
-                applePayComponentWrapper = ApplePayAdvancedComponentWrapper(
+                applePayComponent = ApplePayAdvancedComponent(
                     componentFlutterApi: componentFlutterApi,
                     configuration: applePayConfiguration,
                     adyenContext: adyenContext,
@@ -57,17 +56,17 @@ class ApplePayComponentManager {
     }
     
     func onApplePayComponentPressed(componentId: String) {
-        applePayComponentWrapper?.present()
+        applePayComponent?.present()
     }
     
     func handlePaymentEvent(paymentEventDTO: PaymentEventDTO) {
-        if let applePayComponentWrapper = applePayComponentWrapper as? ApplePayAdvancedComponentWrapper {
+        if let applePayComponentWrapper = applePayComponent as? ApplePayAdvancedComponent {
             applePayComponentWrapper.handlePaymentEvent(paymentEventDTO: paymentEventDTO)
         }
     }
     
     func onDispose() {
-        applePayComponentWrapper?.onDispose()
-        applePayComponentWrapper = nil
+        applePayComponent?.onDispose()
+        applePayComponent = nil
     }
 }

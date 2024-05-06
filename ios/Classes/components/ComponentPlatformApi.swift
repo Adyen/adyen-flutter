@@ -4,9 +4,11 @@ class ComponentPlatformApi: ComponentPlatformInterface {
     var onFinishCallback: (PaymentEventDTO) -> Void = { _ in }
     var onErrorCallback: (ErrorDTO?) -> Void = { _ in }
     private let applePayComponentManager: ApplePayComponentManager
+    private let instantComponentManager: InstantComponentManager
     
-    init(applePayComponentManager: ApplePayComponentManager) {
-        self.applePayComponentManager = applePayComponentManager
+    init(componentFlutterApi: ComponentFlutterInterface, sessionHolder: SessionHolder) {
+        self.applePayComponentManager = ApplePayComponentManager(componentFlutterApi: componentFlutterApi, sessionHolder: sessionHolder)
+        self.instantComponentManager = InstantComponentManager(componentFlutterApi: componentFlutterApi, sessionHolder: sessionHolder)
     }
 
     func updateViewHeight(viewId _: Int64) {
@@ -28,7 +30,8 @@ class ComponentPlatformApi: ComponentPlatformInterface {
         completion: @escaping (Result<InstantPaymentSetupResultDTO, Error>) -> Void
     ) {
         switch instantPaymentConfigurationDTO.instantPaymentType {
-        case .googlePay:
+        case .googlePay,
+             .instant:
             return
         case .applePay:
             applePayComponentManager.setUpApplePayIfAvailable(
@@ -37,9 +40,6 @@ class ComponentPlatformApi: ComponentPlatformInterface {
                 componentId: componentId,
                 callback: completion
             )
-        case .instant:
-            // TODO: - iOS implementation will happen in another branch
-            return
         }
     }
 
@@ -54,14 +54,15 @@ class ComponentPlatformApi: ComponentPlatformInterface {
         case .applePay:
             applePayComponentManager.onApplePayComponentPressed(componentId: componentId)
         case .instant:
-            // TODO: - iOS implementation will happen in another branch
-            return
+            instantComponentManager.startInstantComponent(instantPaymentConfigurationDTO: instantPaymentConfigurationDTO, encodedPaymentMethod: encodedPaymentMethod, componentId: componentId)
         }
     }
 
     func onDispose(componentId: String) {
         if isApplePayComponent(componentId: componentId) {
             applePayComponentManager.onDispose()
+        } else if isInstantPaymentComponent(componentId: componentId) {
+            instantComponentManager.onDispose()
         }
     }
 
@@ -83,5 +84,9 @@ class ComponentPlatformApi: ComponentPlatformInterface {
     
     private func isApplePayComponent(componentId: String) -> Bool {
         componentId == ApplePayComponentManager.Constants.applePaySessionComponentId || componentId == ApplePayComponentManager.Constants.applePayAdvancedComponentId
+    }
+    
+    private func isInstantPaymentComponent(componentId: String) -> Bool {
+        componentId == InstantComponentManager.Constants.instantSessionComponentId || componentId == InstantComponentManager.Constants.instantAdvancedComponentId
     }
 }

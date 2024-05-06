@@ -31,7 +31,6 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
         completion: @escaping (Result<SessionDTO, Error>) -> Void
     ) {
         do {
-            // TODO: Let's plan a generic configuration mapping for creating a session.
             switch configuration {
             case let dropInConfigurationDTO as DropInConfigurationDTO:
                 try createSessionForDropIn(
@@ -126,13 +125,13 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
     ) throws {
         let adyenContext = try configuration.createAdyenContext()
         let sessionDelegate = ComponentSessionFlowDelegate(componentFlutterApi: componentFlutterApi)
-        let applePayPresentationDelegate = ComponentPresentationDelegate(topViewController: getViewController())
+        let instantComponentPresentationDelegate = ComponentPresentationDelegate(topViewController: getViewController())
         requestAndSetSession(
             adyenContext: adyenContext,
             sessionId: sessionId,
             sessionData: sessionData,
             sessionDelegate: sessionDelegate,
-            sessionPresentationDelegate: applePayPresentationDelegate,
+            sessionPresentationDelegate: instantComponentPresentationDelegate,
             completion: completion
         )
     }

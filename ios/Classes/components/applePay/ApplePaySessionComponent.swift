@@ -1,6 +1,6 @@
 @_spi(AdyenInternal) import Adyen
 
-class ApplePaySessionComponentWrapper: BaseApplePayComponentWrapper {
+class ApplePaySessionComponent: BaseApplePayComponent {
     private let sessionHolder: SessionHolder
     private let configuration: ApplePayComponent.Configuration
     private let adyenContext: AdyenContext
