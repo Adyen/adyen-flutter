@@ -69,6 +69,8 @@ class ComponentPlatformApi: ComponentPlatformInterface {
     private func handlePaymentEvent(componentId: String, paymentEventDTO: PaymentEventDTO) {
         if isApplePayComponent(componentId: componentId) {
             applePayComponentManager.handlePaymentEvent(paymentEventDTO: paymentEventDTO)
+        } else if isInstantPaymentComponent(componentId: componentId) {
+            instantComponentManager.handlePaymentEvent(paymentEventDTO: paymentEventDTO)
         } else {
             switch paymentEventDTO.paymentEventType {
             case .finished:
@@ -87,6 +89,6 @@ class ComponentPlatformApi: ComponentPlatformInterface {
     }
     
     private func isInstantPaymentComponent(componentId: String) -> Bool {
-        componentId == InstantComponentManager.Constants.instantSessionComponentId || componentId == InstantComponentManager.Constants.instantAdvancedComponentId
+        componentId.contains(InstantComponentManager.Constants.instantSessionComponentId) || componentId.contains(InstantComponentManager.Constants.instantAdvancedComponentId)
     }
 }
