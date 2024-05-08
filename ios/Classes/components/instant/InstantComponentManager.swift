@@ -5,8 +5,8 @@ class InstantComponentManager {
     private let sessionHolder: SessionHolder
     private var instantComponent: BaseInstantComponent?
     enum Constants {
-        static let instantSessionComponentId = "SESSION_COMPONENT"
-        static let instantAdvancedComponentId = "ADVANCED_COMPONENT"
+        static let instantSessionComponentId = "INSTANT_SESSION_COMPONENT"
+        static let instantAdvancedComponentId = "INSTANT_ADVANCED_COMPONENT"
     }
     
     init(componentFlutterApi: ComponentFlutterInterface, sessionHolder: SessionHolder) {

@@ -26,7 +26,7 @@ class CardAdvancedComponent: BaseCardComponent {
             componentPlatformApi: componentPlatformApi
         )
 
-        actionComponentDelegate = CardAdvancedFlowActionComponentDelegate(
+        actionComponentDelegate = ComponentActionDelegate(
             componentFlutterApi: componentFlutterApi,
             componentId: componentId
         )
