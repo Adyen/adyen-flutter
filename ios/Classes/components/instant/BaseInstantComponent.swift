@@ -4,6 +4,7 @@ class BaseInstantComponent {
     internal let componentFlutterApi: ComponentFlutterInterface
     internal var componentId: String
     internal var instantPaymentComponent: InstantPaymentComponent?
+    private var activityIndicatorView: UIActivityIndicatorView?
     
     init(componentFlutterApi: ComponentFlutterInterface, componentId: String) {
         self.componentFlutterApi = componentFlutterApi
@@ -20,6 +21,7 @@ class BaseInstantComponent {
     
     func initiatePayment() {
         instantPaymentComponent?.initiatePayment()
+        showActivityIndicator()
     }
     
     func sendErrorToFlutterLayer(error: Error) {
@@ -46,5 +48,26 @@ class BaseInstantComponent {
     func getViewController() -> UIViewController? {
         let rootViewController = UIApplication.shared.adyen.mainKeyWindow?.rootViewController
         return rootViewController?.adyen.topPresenter
+    }
+    
+    func showActivityIndicator() {
+        guard let view = UIApplication.shared.adyen.mainKeyWindow else {
+            return
+        }
+        let activityIndicatorView = UIActivityIndicatorView(style: .whiteLarge)
+        activityIndicatorView.color = .gray
+        activityIndicatorView.startAnimating()
+        view.addSubview(activityIndicatorView)
+        self.activityIndicatorView = activityIndicatorView
+        activityIndicatorView.translatesAutoresizingMaskIntoConstraints = false
+        let leadingConstraint = activityIndicatorView.leadingAnchor.constraint(equalTo: view.leadingAnchor)
+        let trailingConstraint = activityIndicatorView.trailingAnchor.constraint(equalTo: view.trailingAnchor)
+        let topConstraint = activityIndicatorView.topAnchor.constraint(equalTo: view.topAnchor)
+        let bottomConstraint = activityIndicatorView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+        NSLayoutConstraint.activate([leadingConstraint, trailingConstraint, topConstraint, bottomConstraint])
+    }
+    
+    func hideActivityIndicator() {
+        activityIndicatorView?.removeFromSuperview()
     }
 }

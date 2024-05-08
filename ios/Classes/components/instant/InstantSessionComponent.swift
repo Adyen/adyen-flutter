@@ -37,6 +37,7 @@ class InstantSessionComponent: BaseInstantComponent {
         instantPaymentComponent?.finalizeIfNeeded(with: success) { [weak self] in
             guard let self else { return }
             getViewController()?.dismiss(animated: true) {
+                self.hideActivityIndicator()
                 completion()
                 if success {
                     self.sessionHolder.reset()

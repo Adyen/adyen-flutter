@@ -19,7 +19,11 @@ class InstantAdvancedComponent: BaseInstantComponent {
         let component = InstantPaymentComponent(paymentMethod: paymentMethod, context: adyenContext, order: nil)
         component.delegate = self
         actionComponent = AdyenActionComponent(context: adyenContext)
-        actionComponentDelegate = ComponentActionDelegate(componentFlutterApi: componentFlutterApi, componentId: componentId)
+        actionComponentDelegate = ComponentActionDelegate(
+            componentFlutterApi: componentFlutterApi,
+            componentId: componentId,
+            finalizeAndDismissComponent: finalizeAndDismissComponent(success:completion:)
+        )
         actionComponent?.delegate = actionComponentDelegate
         componentPresentationDelegate = ComponentPresentationDelegate(topViewController: getViewController())
         actionComponent?.presentationDelegate = componentPresentationDelegate
@@ -40,12 +44,14 @@ class InstantAdvancedComponent: BaseInstantComponent {
     override func finalizeAndDismissComponent(success: Bool, completion: @escaping (() -> Void)) {
         instantPaymentComponent?.finalizeIfNeeded(with: success) { [weak self] in
             self?.getViewController()?.dismiss(animated: true) {
+                self?.hideActivityIndicator()
                 completion()
             }
         }
     }
     
     override func onDispose() {
+        actionComponentDelegate = nil
         actionComponent = nil
         componentPresentationDelegate = nil
         instantPaymentComponent = nil

@@ -1,12 +1,18 @@
 import Adyen
 
-class ComponentActionDelegate : ActionComponentDelegate {
+class ComponentActionDelegate: ActionComponentDelegate {
     private let componentFlutterApi: ComponentFlutterInterface
     private let componentId: String
+    private let finalizeAndDismissComponent: (Bool, @escaping (() -> Void)) -> Void
     
-    init(componentFlutterApi: ComponentFlutterInterface, componentId: String) {
+    init(
+        componentFlutterApi: ComponentFlutterInterface,
+        componentId: String,
+        finalizeAndDismissComponent: @escaping ((Bool, @escaping (() -> Void)) -> Void)
+    ) {
         self.componentFlutterApi = componentFlutterApi
         self.componentId = componentId
+        self.finalizeAndDismissComponent = finalizeAndDismissComponent
     }
     
     internal func didProvide(_ data: Adyen.ActionComponentData, from _: Adyen.ActionComponent) {
@@ -24,7 +30,9 @@ class ComponentActionDelegate : ActionComponentDelegate {
                 completion: { _ in }
             )
         } catch {
-            sendErrorToFlutterLayer(error: error)
+            finalizeAndDismissComponent(false) { [weak self] in
+                self?.sendErrorToFlutterLayer(error: error)
+            }
         }
     }
 
@@ -33,7 +41,9 @@ class ComponentActionDelegate : ActionComponentDelegate {
     }
 
     internal func didFail(with error: Error, from _: Adyen.ActionComponent) {
-        sendErrorToFlutterLayer(error: error)
+        finalizeAndDismissComponent(false) { [weak self] in
+            self?.sendErrorToFlutterLayer(error: error)
+        }
     }
     
     private func sendErrorToFlutterLayer(error: Error) {
