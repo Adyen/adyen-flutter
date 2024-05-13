@@ -1,4 +1,5 @@
 import 'package:adyen_checkout/src/common/model/amount.dart';
+import 'package:adyen_checkout/src/common/model/analytics_options.dart';
 import 'package:adyen_checkout/src/generated/platform_api.g.dart';
 
 base class BaseConfiguration {
@@ -7,6 +8,7 @@ base class BaseConfiguration {
   final String countryCode;
   final Amount amount;
   final String? shopperLocale;
+  final AnalyticsOptions analyticsOptions;
 
   BaseConfiguration({
     required this.environment,
@@ -14,5 +16,6 @@ base class BaseConfiguration {
     required this.countryCode,
     required this.amount,
     required this.shopperLocale,
-  });
+    AnalyticsOptions? analyticsOptions,
+  }) : analyticsOptions = analyticsOptions ?? AnalyticsOptions(enabled: true);
 }

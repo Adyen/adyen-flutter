@@ -3,29 +3,27 @@ package com.adyen.checkout.flutter.components.card
 import CardComponentConfigurationDTO
 import ComponentFlutterInterface
 import android.content.Context
-import android.content.Intent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.LinearLayout
 import androidx.activity.ComponentActivity
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.util.Consumer
 import androidx.core.view.children
 import androidx.core.view.doOnNextLayout
 import androidx.core.view.updateLayoutParams
+import androidx.lifecycle.lifecycleScope
 import com.adyen.checkout.card.CardComponent
 import com.adyen.checkout.flutter.R
-import com.adyen.checkout.flutter.components.ComponentActionMessenger
-import com.adyen.checkout.flutter.components.ComponentErrorMessenger
 import com.adyen.checkout.flutter.components.ComponentHeightMessenger
-import com.adyen.checkout.flutter.components.ComponentResultMessenger
+import com.adyen.checkout.flutter.components.ComponentPlatformApi
 import com.adyen.checkout.flutter.components.view.ComponentWrapperView
 import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToAnalyticsConfiguration
+import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToCardConfiguration
 import com.adyen.checkout.flutter.utils.ConfigurationMapper.toNativeModel
-import com.adyen.checkout.redirect.RedirectComponent
 import com.adyen.checkout.ui.core.AdyenComponentView
 import io.flutter.plugin.platform.PlatformView
+import kotlinx.coroutines.launch
 
 abstract class BaseCardComponent(
     private val activity: ComponentActivity,
@@ -39,9 +37,8 @@ abstract class BaseCardComponent(
             ?: throw Exception("Card configuration not found")
     private val environment = configuration.environment.toNativeModel()
     private val componentWrapperView = ComponentWrapperView(activity, componentFlutterApi)
-    private val intentListener = Consumer<Intent> { handleIntent(it) }
     val cardConfiguration =
-        configuration.cardConfiguration.toNativeModel(
+        configuration.cardConfiguration.mapToCardConfiguration(
             context,
             configuration.shopperLocale,
             environment,
@@ -51,10 +48,6 @@ abstract class BaseCardComponent(
         )
 
     internal var cardComponent: CardComponent? = null
-
-    init {
-        activity.addOnNewIntentListener(intentListener)
-    }
 
     override fun getView(): View = componentWrapperView
 
@@ -66,11 +59,7 @@ abstract class BaseCardComponent(
     }
 
     override fun dispose() {
-        activity.removeOnNewIntentListener(intentListener)
         ComponentHeightMessenger.instance().removeObservers(activity)
-        ComponentActionMessenger.instance().removeObservers(activity)
-        ComponentResultMessenger.instance().removeObservers(activity)
-        ComponentErrorMessenger.instance().removeObservers(activity)
         cardComponent = null
     }
 
@@ -81,12 +70,9 @@ abstract class BaseCardComponent(
         componentWrapperView.addComponent(cardComponent, componentId)
     }
 
-    private fun handleIntent(intent: Intent) {
-        if (intent.data != null &&
-            intent.data?.toString().orEmpty()
-                .startsWith(RedirectComponent.REDIRECT_RESULT_SCHEME)
-        ) {
-            cardComponent?.handleIntent(intent)
+    fun assignCurrentComponent() {
+        activity.lifecycleScope.launch {
+            ComponentPlatformApi.currentComponentStateFlow.emit(cardComponent)
         }
     }
 

@@ -13,7 +13,8 @@ import com.adyen.checkout.card.SocialSecurityNumberVisibility
 import com.adyen.checkout.components.core.Amount
 import com.adyen.checkout.components.core.AnalyticsConfiguration
 import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToDropInConfiguration
-import com.adyen.checkout.flutter.utils.ConfigurationMapper.toNativeModel
+import com.adyen.checkout.flutter.utils.ConfigurationMapper.fromDTO
+import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToCardConfiguration
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.mock
@@ -65,7 +66,7 @@ class ConfigurationMapperTest {
             emptyList()
         )
 
-        val cardConfiguration = cardConfigurationDTO.toNativeModel(
+        val cardConfiguration = cardConfigurationDTO.mapToCardConfiguration(
             mockContext,
             "en-US",
             com.adyen.checkout.core.Environment.TEST,

@@ -29,15 +29,13 @@ import com.adyen.checkout.cashapppay.CashAppPayConfiguration
 import com.adyen.checkout.components.core.Amount
 import com.adyen.checkout.components.core.AnalyticsConfiguration
 import com.adyen.checkout.components.core.AnalyticsLevel
+import com.adyen.checkout.components.core.CheckoutConfiguration
 import com.adyen.checkout.components.core.OrderResponse
 import com.adyen.checkout.components.core.internal.data.api.AnalyticsMapper
 import com.adyen.checkout.components.core.internal.data.api.AnalyticsPlatform
 import com.adyen.checkout.cse.EncryptedCard
 import com.adyen.checkout.cse.UnencryptedCard
 import com.adyen.checkout.dropin.DropInConfiguration
-import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToAnalyticsConfiguration
-import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToGooglePayConfiguration
-import com.adyen.checkout.flutter.utils.ConfigurationMapper.toNativeModel
 import com.adyen.checkout.googlepay.BillingAddressParameters
 import com.adyen.checkout.googlepay.GooglePayConfiguration
 import com.adyen.checkout.googlepay.MerchantInfo
@@ -77,7 +75,7 @@ object ConfigurationMapper {
 
         if (cardConfigurationDTO != null) {
             val cardConfiguration =
-                cardConfigurationDTO.toNativeModel(
+                cardConfigurationDTO.mapToCardConfiguration(
                     context,
                     shopperLocale,
                     environment,
@@ -117,7 +115,7 @@ object ConfigurationMapper {
         }
     }
 
-    fun CardConfigurationDTO.toNativeModel(
+    fun CardConfigurationDTO.mapToCardConfiguration(
         context: Context,
         shopperLocale: String?,
         environment: com.adyen.checkout.core.Environment,
@@ -409,4 +407,13 @@ object ConfigurationMapper {
         cvc?.let { unencryptedCardBuilder.setCvc(it) }
         return unencryptedCardBuilder.build()
     }
+
+    fun InstantPaymentConfigurationDTO.mapToCheckoutConfiguration(): CheckoutConfiguration =
+        CheckoutConfiguration(
+            environment.toNativeModel(),
+            clientKey,
+            shopperLocale?.let { Locale.forLanguageTag(it) },
+            amount.toNativeModel(),
+            analyticsOptionsDTO.mapToAnalyticsConfiguration(),
+        )
 }

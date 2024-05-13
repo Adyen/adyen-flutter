@@ -82,6 +82,7 @@ enum FieldVisibility {
 enum InstantPaymentType {
   googlePay,
   applePay,
+  instant,
 }
 
 enum ApplePayShippingType {
@@ -627,7 +628,8 @@ abstract class ComponentPlatformInterface {
   );
 
   void onInstantPaymentPressed(
-    InstantPaymentType instantPaymentType,
+    InstantPaymentConfigurationDTO instantPaymentConfigurationDTO,
+    String encodedPaymentMethod,
     String componentId,
   );
 

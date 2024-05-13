@@ -31,6 +31,7 @@ export 'src/components/google_pay/model/google_pay_button_style.dart';
 export 'src/components/google_pay/model/google_pay_button_theme.dart';
 export 'src/components/google_pay/model/google_pay_button_type.dart';
 export 'src/components/google_pay/model/google_pay_component_configuration.dart';
+export 'src/components/instant/model/instant_component_configuration.dart';
 export 'src/drop_in/model/drop_in_configuration.dart';
 export 'src/generated/platform_api.g.dart'
     show

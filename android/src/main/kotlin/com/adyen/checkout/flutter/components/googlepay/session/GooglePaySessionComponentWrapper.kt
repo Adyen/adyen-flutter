@@ -4,7 +4,9 @@ import ComponentFlutterInterface
 import androidx.fragment.app.FragmentActivity
 import com.adyen.checkout.components.core.Order
 import com.adyen.checkout.components.core.PaymentMethod
+import com.adyen.checkout.components.core.action.Action
 import com.adyen.checkout.flutter.components.googlepay.BaseGooglePayComponentWrapper
+import com.adyen.checkout.flutter.components.view.ComponentLoadingBottomSheet
 import com.adyen.checkout.flutter.session.SessionHolder
 import com.adyen.checkout.googlepay.GooglePayComponent
 import com.adyen.checkout.googlepay.GooglePayConfiguration
@@ -17,8 +19,8 @@ class GooglePaySessionComponentWrapper(
     private val sessionHolder: SessionHolder,
     private val componentFlutterInterface: ComponentFlutterInterface,
     private val googlePayConfiguration: GooglePayConfiguration,
-    override val componentId: String,
-) : BaseGooglePayComponentWrapper(activity, componentFlutterInterface) {
+    private val componentId: String,
+) : BaseGooglePayComponentWrapper(activity, componentFlutterInterface, componentId) {
     override fun setupGooglePayComponent(paymentMethod: PaymentMethod) {
         val sessionSetupResponse = SessionSetupResponse.SERIALIZER.deserialize(sessionHolder.sessionSetupResponse)
         val order = sessionHolder.orderResponse?.let { Order.SERIALIZER.deserialize(it) }
@@ -45,5 +47,12 @@ class GooglePaySessionComponentWrapper(
                     ),
                 key = UUID.randomUUID().toString()
             )
+    }
+
+    private fun handleAction(action: Action) {
+        googlePayComponent?.let {
+            it.handleAction(action, activity)
+            ComponentLoadingBottomSheet.show(activity.supportFragmentManager, it)
+        }
     }
 }

@@ -1,4 +1,4 @@
-package com.adyen.checkout.flutter.components.googlepay.advanced
+package com.adyen.checkout.flutter.components.instant.advanced
 
 import ComponentCommunicationModel
 import ComponentFlutterInterface
@@ -6,25 +6,20 @@ import com.adyen.checkout.components.core.ComponentError
 import com.adyen.checkout.components.core.PaymentComponentData
 import com.adyen.checkout.flutter.components.base.ComponentAdvancedCallback
 import com.adyen.checkout.flutter.utils.Constants
-import com.adyen.checkout.googlepay.GooglePayComponentState
+import com.adyen.checkout.instant.InstantComponentState
 import org.json.JSONObject
 
-class GooglePayAdvancedCallback(
+class InstantComponentAdvancedCallback(
     private val componentFlutterApi: ComponentFlutterInterface,
     private val componentId: String,
-    private val onLoadingCallback: () -> Unit,
     private val hideLoadingBottomSheet: () -> Unit,
-) : ComponentAdvancedCallback<GooglePayComponentState>(componentFlutterApi, componentId) {
-    override fun onSubmit(state: GooglePayComponentState) {
-        onLoadingCallback()
+) : ComponentAdvancedCallback<InstantComponentState>(componentFlutterApi, componentId) {
+    override fun onSubmit(state: InstantComponentState) {
         val data = PaymentComponentData.SERIALIZER.serialize(state.data)
-        val extra = state.paymentData?.toJson()
         val submitData =
             JSONObject().apply {
                 put(Constants.ADVANCED_PAYMENT_DATA_KEY, data)
-                extra?.let {
-                    put(Constants.ADVANCED_EXTRA_DATA_KEY, JSONObject(it))
-                }
+                put(Constants.ADVANCED_EXTRA_DATA_KEY, null)
             }
         val model =
             ComponentCommunicationModel(

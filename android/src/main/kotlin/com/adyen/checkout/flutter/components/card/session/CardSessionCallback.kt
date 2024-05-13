@@ -9,9 +9,15 @@ import com.adyen.checkout.flutter.components.base.ComponentSessionCallback
 class CardSessionCallback(
     private val componentFlutterApi: ComponentFlutterInterface,
     private val componentId: String,
-    private val onActionCallback: (Action) -> Unit
+    private val onActionCallback: (Action) -> Unit,
+    private val assignCurrentComponent: () -> Unit
 ) : ComponentSessionCallback<CardComponentState>(componentFlutterApi, componentId, onActionCallback) {
     override fun onStateChanged(state: CardComponentState) {
         ComponentHeightMessenger.sendResult(1)
+    }
+
+    override fun onSubmit(state: CardComponentState): Boolean {
+        assignCurrentComponent()
+        return super.onSubmit(state)
     }
 }

@@ -12,6 +12,7 @@ import 'package:flutter/material.dart';
 import 'package:pay/pay.dart';
 
 abstract class BaseGooglePayComponent extends StatefulWidget {
+  abstract final String componentId;
   final String googlePayPaymentMethod;
   final GooglePayComponentConfiguration googlePayComponentConfiguration;
   final Function(PaymentResult) onPaymentResult;
@@ -23,7 +24,6 @@ abstract class BaseGooglePayComponent extends StatefulWidget {
   final Function()? onUnavailable;
   final Widget? unavailableWidget;
   final Widget? loadingIndicator;
-  abstract final String componentId;
   final ValueNotifier<bool> isButtonClickable = ValueNotifier<bool>(true);
   final ValueNotifier<bool> isLoading = ValueNotifier<bool>(false);
   final SdkVersionNumberProvider _sdkVersionNumberProvider =
@@ -188,15 +188,31 @@ class _BaseGooglePayComponentState extends State<BaseGooglePayComponent> {
     );
   }
 
-  void onPressed() {
+  void onPressed() async {
+    final instantPaymentConfigurationDTO =
+        await createInstantPaymentConfigurationDTO();
+
     widget.isButtonClickable.value = false;
     widget.componentPlatformApi.onInstantPaymentPressed(
-      InstantPaymentType.googlePay,
+      instantPaymentConfigurationDTO,
+      widget.googlePayPaymentMethod,
       widget.componentId,
     );
   }
 
   Future<InstantPaymentSetupResultDTO> _isGooglePaySupported() async {
+    final instantPaymentConfigurationDTO =
+        await createInstantPaymentConfigurationDTO();
+    return await widget.componentPlatformApi
+        .isInstantPaymentSupportedByPlatform(
+      instantPaymentConfigurationDTO,
+      widget.googlePayPaymentMethod,
+      widget.componentId,
+    );
+  }
+
+  Future<InstantPaymentConfigurationDTO>
+      createInstantPaymentConfigurationDTO() async {
     final String versionNumber =
         await widget._sdkVersionNumberProvider.getSdkVersionNumber();
     final InstantPaymentConfigurationDTO
@@ -205,11 +221,6 @@ class _BaseGooglePayComponentState extends State<BaseGooglePayComponent> {
       versionNumber,
       InstantPaymentType.googlePay,
     );
-    return await widget.componentPlatformApi
-        .isInstantPaymentSupportedByPlatform(
-      instantPaymentComponentConfigurationDTO,
-      widget.googlePayPaymentMethod,
-      widget.componentId,
-    );
+    return instantPaymentComponentConfigurationDTO;
   }
 }

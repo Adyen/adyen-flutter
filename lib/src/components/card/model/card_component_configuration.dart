@@ -1,10 +1,8 @@
-import 'package:adyen_checkout/src/common/model/analytics_options.dart';
 import 'package:adyen_checkout/src/common/model/base_configuration.dart';
 import 'package:adyen_checkout/src/common/model/payment_method_configurations/card_configuration.dart';
 
 final class CardComponentConfiguration extends BaseConfiguration {
   final CardConfiguration cardConfiguration;
-  final AnalyticsOptions analyticsOptions;
 
   CardComponentConfiguration({
     required super.environment,
@@ -12,8 +10,7 @@ final class CardComponentConfiguration extends BaseConfiguration {
     required super.countryCode,
     required super.amount,
     super.shopperLocale,
+    super.analyticsOptions,
     CardConfiguration? cardConfiguration,
-    AnalyticsOptions? analyticsOptions,
-  })  : cardConfiguration = cardConfiguration ?? const CardConfiguration(),
-        analyticsOptions = analyticsOptions ?? AnalyticsOptions(enabled: true);
+  }) : cardConfiguration = cardConfiguration ?? const CardConfiguration();
 }

@@ -181,7 +181,8 @@ enum class FieldVisibility(val raw: Int) {
 
 enum class InstantPaymentType(val raw: Int) {
   GOOGLEPAY(0),
-  APPLEPAY(1);
+  APPLEPAY(1),
+  INSTANT(2);
 
   companion object {
     fun ofRaw(raw: Int): InstantPaymentType? {
@@ -2041,7 +2042,7 @@ interface ComponentPlatformInterface {
   fun onPaymentsResult(componentId: String, paymentsResult: PaymentEventDTO)
   fun onPaymentsDetailsResult(componentId: String, paymentsDetailsResult: PaymentEventDTO)
   fun isInstantPaymentSupportedByPlatform(instantPaymentConfigurationDTO: InstantPaymentConfigurationDTO, paymentMethodResponse: String, componentId: String, callback: (Result<InstantPaymentSetupResultDTO>) -> Unit)
-  fun onInstantPaymentPressed(instantPaymentType: InstantPaymentType, componentId: String)
+  fun onInstantPaymentPressed(instantPaymentConfigurationDTO: InstantPaymentConfigurationDTO, encodedPaymentMethod: String, componentId: String)
   fun onDispose(componentId: String)
 
   companion object {
@@ -2138,11 +2139,12 @@ interface ComponentPlatformInterface {
         if (api != null) {
           channel.setMessageHandler { message, reply ->
             val args = message as List<Any?>
-            val instantPaymentTypeArg = InstantPaymentType.ofRaw(args[0] as Int)!!
-            val componentIdArg = args[1] as String
+            val instantPaymentConfigurationDTOArg = args[0] as InstantPaymentConfigurationDTO
+            val encodedPaymentMethodArg = args[1] as String
+            val componentIdArg = args[2] as String
             var wrapped: List<Any?>
             try {
-              api.onInstantPaymentPressed(instantPaymentTypeArg, componentIdArg)
+              api.onInstantPaymentPressed(instantPaymentConfigurationDTOArg, encodedPaymentMethodArg, componentIdArg)
               wrapped = listOf<Any?>(null)
             } catch (exception: Throwable) {
               wrapped = wrapError(exception)

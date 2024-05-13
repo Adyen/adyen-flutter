@@ -113,6 +113,7 @@ enum FieldVisibility: Int {
 enum InstantPaymentType: Int {
     case googlePay = 0
     case applePay = 1
+    case instant = 2
 }
 
 enum ApplePayShippingType: Int {
@@ -1881,7 +1882,7 @@ protocol ComponentPlatformInterface {
     func onPaymentsResult(componentId: String, paymentsResult: PaymentEventDTO) throws
     func onPaymentsDetailsResult(componentId: String, paymentsDetailsResult: PaymentEventDTO) throws
     func isInstantPaymentSupportedByPlatform(instantPaymentConfigurationDTO: InstantPaymentConfigurationDTO, paymentMethodResponse: String, componentId: String, completion: @escaping (Result<InstantPaymentSetupResultDTO, Error>) -> Void)
-    func onInstantPaymentPressed(instantPaymentType: InstantPaymentType, componentId: String) throws
+    func onInstantPaymentPressed(instantPaymentConfigurationDTO: InstantPaymentConfigurationDTO, encodedPaymentMethod: String, componentId: String) throws
     func onDispose(componentId: String) throws
 }
 
@@ -1961,10 +1962,11 @@ class ComponentPlatformInterfaceSetup {
         if let api {
             onInstantPaymentPressedChannel.setMessageHandler { message, reply in
                 let args = message as! [Any?]
-                let instantPaymentTypeArg = InstantPaymentType(rawValue: args[0] as! Int)!
-                let componentIdArg = args[1] as! String
+                let instantPaymentConfigurationDTOArg = args[0] as! InstantPaymentConfigurationDTO
+                let encodedPaymentMethodArg = args[1] as! String
+                let componentIdArg = args[2] as! String
                 do {
-                    try api.onInstantPaymentPressed(instantPaymentType: instantPaymentTypeArg, componentId: componentIdArg)
+                    try api.onInstantPaymentPressed(instantPaymentConfigurationDTO: instantPaymentConfigurationDTOArg, encodedPaymentMethod: encodedPaymentMethodArg, componentId: componentIdArg)
                     reply(wrapResult(nil))
                 } catch {
                     reply(wrapError(error))

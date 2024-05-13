@@ -97,6 +97,7 @@ enum FieldVisibility {
 enum InstantPaymentType {
   googlePay,
   applePay,
+  instant,
 }
 
 enum ApplePayShippingType {
@@ -2210,7 +2211,9 @@ class ComponentPlatformInterface {
   }
 
   Future<void> onInstantPaymentPressed(
-      InstantPaymentType instantPaymentType, String componentId) async {
+      InstantPaymentConfigurationDTO instantPaymentConfigurationDTO,
+      String encodedPaymentMethod,
+      String componentId) async {
     const String __pigeon_channelName =
         'dev.flutter.pigeon.adyen_checkout.ComponentPlatformInterface.onInstantPaymentPressed';
     final BasicMessageChannel<Object?> __pigeon_channel =
@@ -2220,8 +2223,11 @@ class ComponentPlatformInterface {
       binaryMessenger: __pigeon_binaryMessenger,
     );
     final List<Object?>? __pigeon_replyList = await __pigeon_channel
-            .send(<Object?>[instantPaymentType.index, componentId])
-        as List<Object?>?;
+        .send(<Object?>[
+      instantPaymentConfigurationDTO,
+      encodedPaymentMethod,
+      componentId
+    ]) as List<Object?>?;
     if (__pigeon_replyList == null) {
       throw _createConnectionError(__pigeon_channelName);
     } else if (__pigeon_replyList.length > 1) {

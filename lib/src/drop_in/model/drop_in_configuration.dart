@@ -11,7 +11,6 @@ final class DropInConfiguration extends BaseConfiguration {
   final ApplePayConfiguration? applePayConfiguration;
   final GooglePayConfiguration? googlePayConfiguration;
   final CashAppPayConfiguration? cashAppPayConfiguration;
-  final AnalyticsOptions analyticsOptions;
   final StoredPaymentMethodConfiguration? storedPaymentMethodConfiguration;
   final bool skipListWhenSinglePaymentMethod;
 
@@ -28,7 +27,6 @@ final class DropInConfiguration extends BaseConfiguration {
     this.storedPaymentMethodConfiguration,
     bool? skipListWhenSinglePaymentMethod,
     AnalyticsOptions? analyticsOptions,
-  })  : analyticsOptions = analyticsOptions ?? AnalyticsOptions(enabled: true),
-        skipListWhenSinglePaymentMethod =
+  }) : skipListWhenSinglePaymentMethod =
             skipListWhenSinglePaymentMethod ?? false;
 }
