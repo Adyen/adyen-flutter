@@ -54,7 +54,11 @@ class ComponentPlatformApi: ComponentPlatformInterface {
         case .applePay:
             applePayComponentManager.onApplePayComponentPressed(componentId: componentId)
         case .instant:
-            instantComponentManager.startInstantComponent(instantPaymentConfigurationDTO: instantPaymentConfigurationDTO, encodedPaymentMethod: encodedPaymentMethod, componentId: componentId)
+            instantComponentManager.startInstantComponent(
+                instantPaymentConfigurationDTO: instantPaymentConfigurationDTO,
+                encodedPaymentMethod: encodedPaymentMethod,
+                componentId: componentId
+            )
         }
     }
 
@@ -85,10 +89,12 @@ class ComponentPlatformApi: ComponentPlatformInterface {
     }
     
     private func isApplePayComponent(componentId: String) -> Bool {
-        componentId == ApplePayComponentManager.Constants.applePaySessionComponentId || componentId == ApplePayComponentManager.Constants.applePayAdvancedComponentId
+        componentId == ApplePayComponentManager.Constants.applePaySessionComponentId ||
+            componentId == ApplePayComponentManager.Constants.applePayAdvancedComponentId
     }
     
     private func isInstantPaymentComponent(componentId: String) -> Bool {
-        componentId.contains(InstantComponentManager.Constants.instantSessionComponentId) || componentId.contains(InstantComponentManager.Constants.instantAdvancedComponentId)
+        componentId.contains(InstantComponentManager.Constants.instantSessionComponentId) ||
+            componentId.contains(InstantComponentManager.Constants.instantAdvancedComponentId)
     }
 }

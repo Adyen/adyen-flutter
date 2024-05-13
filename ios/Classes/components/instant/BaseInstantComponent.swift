@@ -20,7 +20,11 @@ class BaseInstantComponent {
     }
     
     func initiatePayment() {
-        instantPaymentComponent?.initiatePayment()
+        guard let instantPaymentComponent = instantPaymentComponent else {
+            return
+        }
+        
+        instantPaymentComponent.initiatePayment()
         showActivityIndicator()
     }
     
