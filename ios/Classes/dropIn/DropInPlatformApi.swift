@@ -12,6 +12,8 @@ class DropInPlatformApi: DropInPlatformInterface {
     private var dropInAdvancedFlowDelegate: DropInAdvancedFlowDelegate?
     private var dropInAdvancedFlowStoredPaymentMethodsDelegate: DropInAdvancedFlowStoredPaymentMethodsDelegate?
     var dropInComponent: DropInComponent?
+    
+    private let dropInViewController = DropInViewController()
 
     init(
         dropInFlutterApi: DropInFlutterInterface,
@@ -45,7 +47,10 @@ class DropInPlatformApi: DropInPlatformInterface {
                 dropInComponent.storedPaymentMethodsDelegate = dropInSessionStoredPaymentMethodsDelegate
             }
             self.dropInComponent = dropInComponent
-            self.viewController?.present(dropInComponent.viewController, animated: true)
+            //self.viewController?.present(dropInComponent.viewController, animated: true)
+            dropInViewController.dropInComponent = dropInComponent
+            dropInViewController.modalPresentationStyle = .overCurrentContext
+            self.viewController?.present(dropInViewController, animated: false)
         } catch {
             sendSessionError(error: error)
         }
@@ -78,7 +83,19 @@ class DropInPlatformApi: DropInPlatformInterface {
                 dropInComponent.storedPaymentMethodsDelegate = dropInAdvancedFlowStoredPaymentMethodsDelegate
             }
             self.dropInComponent = dropInComponent
-            self.viewController?.present(dropInComponent.viewController, animated: true)
+            
+            dropInViewController.dropInComponent = dropInComponent
+            dropInViewController.modalPresentationStyle = .overCurrentContext
+            self.viewController?.present(dropInViewController, animated: false)
+            
+            /*
+             self.viewController?.adyen.topPresenter.present(dropInComponent.viewController, animated: true, completion: {
+                 let rootViewController = UIApplication.shared.adyen.mainKeyWindow?.rootViewController
+                 let vc = rootViewController?.presentedViewController?.children.first
+                 vc?.view?.backgroundColor = UIColor.red
+                
+             })
+              */
         } catch {
             let platformCommunicationModel = PlatformCommunicationModel(
                 type: PlatformCommunicationType.result,
