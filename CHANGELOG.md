@@ -2,6 +2,7 @@
 
 * Updated iOS SDK to v5.7.1.
 * Updated Android SDK to v5.3.1.
+* Added option to adjust Drop-in title.
 
 ## 0.0.3
 
