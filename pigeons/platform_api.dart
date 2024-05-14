@@ -138,7 +138,7 @@ class DropInConfigurationDTO {
   final Environment environment;
   final String clientKey;
   final String countryCode;
-  final AmountDTO amount;
+  final AmountDTO? amount;
   final String? shopperLocale;
   final CardConfigurationDTO? cardConfigurationDTO;
   final ApplePayConfigurationDTO? applePayConfigurationDTO;
@@ -261,7 +261,7 @@ class ApplePayContactDTO {
 class ApplePayShippingMethodDTO {
   final String label;
   final String detail;
-  final AmountDTO amount;
+  final AmountDTO? amount;
   final String identifier;
   final String? startDate;
   final String? endDate;
@@ -278,7 +278,7 @@ class ApplePayShippingMethodDTO {
 
 class ApplePaySummaryItemDTO {
   final String label;
-  final AmountDTO amount;
+  final AmountDTO? amount;
   final ApplePaySummaryItemType type;
 
   ApplePaySummaryItemDTO(
@@ -472,7 +472,7 @@ class CardComponentConfigurationDTO {
   final Environment environment;
   final String clientKey;
   final String countryCode;
-  final AmountDTO amount;
+  final AmountDTO? amount;
   final String? shopperLocale;
   final CardConfigurationDTO cardConfiguration;
   final AnalyticsOptionsDTO analyticsOptionsDTO;
@@ -493,7 +493,7 @@ class InstantPaymentConfigurationDTO {
   final Environment environment;
   final String clientKey;
   final String countryCode;
-  final AmountDTO amount;
+  final AmountDTO? amount;
   final String? shopperLocale;
   final AnalyticsOptionsDTO analyticsOptionsDTO;
   final GooglePayConfigurationDTO? googlePayConfigurationDTO;

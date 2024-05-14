@@ -44,7 +44,7 @@ abstract class BaseCardComponent(
             environment,
             configuration.clientKey,
             configuration.analyticsOptionsDTO.mapToAnalyticsConfiguration(),
-            configuration.amount.toNativeModel(),
+            configuration.amount?.toNativeModel(),
         )
 
     internal var cardComponent: CardComponent? = null

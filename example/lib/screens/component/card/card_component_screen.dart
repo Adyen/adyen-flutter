@@ -53,7 +53,6 @@ class _CardComponentScreenState extends State<CardComponentScreen> {
         environment: Config.environment,
         clientKey: Config.clientKey,
         countryCode: Config.countryCode,
-        amount: Config.amount,
         shopperLocale: Config.shopperLocale,
         cardConfiguration: const CardConfiguration(),
       );

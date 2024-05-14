@@ -57,7 +57,7 @@ object ConfigurationMapper {
 
     fun DropInConfigurationDTO.mapToDropInConfiguration(context: Context): DropInConfiguration {
         val environment = environment.toNativeModel()
-        val amount = amount.toNativeModel()
+        val amount = amount?.toNativeModel()
         val dropInConfiguration = buildDropInConfiguration(context, shopperLocale, environment)
         val analyticsConfiguration = analyticsOptionsDTO.mapToAnalyticsConfiguration()
 
@@ -98,7 +98,10 @@ object ConfigurationMapper {
             dropInConfiguration.addCashAppPayConfiguration(cashAppPayConfiguration)
         }
 
-        dropInConfiguration.setAmount(amount)
+        amount?.let {
+            dropInConfiguration.setAmount(it)
+        }
+
         return dropInConfiguration.build()
     }
 
@@ -121,7 +124,7 @@ object ConfigurationMapper {
         environment: com.adyen.checkout.core.Environment,
         clientKey: String,
         analyticsConfiguration: AnalyticsConfiguration,
-        amount: Amount,
+        amount: Amount?,
     ): CardConfiguration {
         val cardConfiguration =
             if (shopperLocale != null) {
@@ -131,13 +134,18 @@ object ConfigurationMapper {
                 CardConfiguration.Builder(context, environment, clientKey)
             }
 
-        return cardConfiguration.setAddressConfiguration(addressMode.mapToAddressConfiguration()).setAmount(amount)
+        cardConfiguration
+            .setAddressConfiguration(addressMode.mapToAddressConfiguration())
             .setShowStorePaymentField(showStorePaymentField).setHideCvcStoredCard(!showCvcForStoredCard)
             .setHideCvc(!showCvc).setKcpAuthVisibility(determineKcpAuthVisibility(kcpFieldVisibility))
             .setSocialSecurityNumberVisibility(
-                determineSocialSecurityNumberVisibility(socialSecurityNumberFieldVisibility)
-            ).setSupportedCardTypes(*mapToSupportedCardTypes(supportedCardTypes))
-            .setHolderNameRequired(holderNameRequired).setAnalyticsConfiguration(analyticsConfiguration).build()
+                determineSocialSecurityNumberVisibility(socialSecurityNumberFieldVisibility))
+            .setSupportedCardTypes(*mapToSupportedCardTypes(supportedCardTypes))
+            .setHolderNameRequired(holderNameRequired).setAnalyticsConfiguration(analyticsConfiguration)
+        amount?.let {
+            cardConfiguration.setAmount(amount)
+        }
+        return cardConfiguration.build()
     }
 
     fun AnalyticsOptionsDTO.mapToAnalyticsConfiguration(): AnalyticsConfiguration {
@@ -384,7 +392,7 @@ object ConfigurationMapper {
             }
 
         val analyticsConfiguration: AnalyticsConfiguration = analyticsOptionsDTO.mapToAnalyticsConfiguration()
-        val amount: Amount = amount.toNativeModel()
+        val amount: Amount? = amount?.toNativeModel()
         val countryCode: String = countryCode
         return googlePayConfigurationDTO?.mapToGooglePayConfiguration(
             googlePayConfigurationBuilder,
@@ -413,7 +421,7 @@ object ConfigurationMapper {
             environment.toNativeModel(),
             clientKey,
             shopperLocale?.let { Locale.forLanguageTag(it) },
-            amount.toNativeModel(),
+            amount?.toNativeModel(),
             analyticsOptionsDTO.mapToAnalyticsConfiguration(),
         )
 }

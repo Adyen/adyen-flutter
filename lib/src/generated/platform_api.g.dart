@@ -204,7 +204,7 @@ class DropInConfigurationDTO {
     required this.environment,
     required this.clientKey,
     required this.countryCode,
-    required this.amount,
+    this.amount,
     this.shopperLocale,
     this.cardConfigurationDTO,
     this.applePayConfigurationDTO,
@@ -223,7 +223,7 @@ class DropInConfigurationDTO {
 
   String countryCode;
 
-  AmountDTO amount;
+  AmountDTO? amount;
 
   String? shopperLocale;
 
@@ -250,7 +250,7 @@ class DropInConfigurationDTO {
       environment.index,
       clientKey,
       countryCode,
-      amount.encode(),
+      amount?.encode(),
       shopperLocale,
       cardConfigurationDTO?.encode(),
       applePayConfigurationDTO?.encode(),
@@ -270,7 +270,9 @@ class DropInConfigurationDTO {
       environment: Environment.values[result[0]! as int],
       clientKey: result[1]! as String,
       countryCode: result[2]! as String,
-      amount: AmountDTO.decode(result[3]! as List<Object?>),
+      amount: result[3] != null
+          ? AmountDTO.decode(result[3]! as List<Object?>)
+          : null,
       shopperLocale: result[4] as String?,
       cardConfigurationDTO: result[5] != null
           ? CardConfigurationDTO.decode(result[5]! as List<Object?>)
@@ -533,7 +535,7 @@ class ApplePayShippingMethodDTO {
   ApplePayShippingMethodDTO({
     required this.label,
     required this.detail,
-    required this.amount,
+    this.amount,
     required this.identifier,
     this.startDate,
     this.endDate,
@@ -543,7 +545,7 @@ class ApplePayShippingMethodDTO {
 
   String detail;
 
-  AmountDTO amount;
+  AmountDTO? amount;
 
   String identifier;
 
@@ -555,7 +557,7 @@ class ApplePayShippingMethodDTO {
     return <Object?>[
       label,
       detail,
-      amount.encode(),
+      amount?.encode(),
       identifier,
       startDate,
       endDate,
@@ -567,7 +569,9 @@ class ApplePayShippingMethodDTO {
     return ApplePayShippingMethodDTO(
       label: result[0]! as String,
       detail: result[1]! as String,
-      amount: AmountDTO.decode(result[2]! as List<Object?>),
+      amount: result[2] != null
+          ? AmountDTO.decode(result[2]! as List<Object?>)
+          : null,
       identifier: result[3]! as String,
       startDate: result[4] as String?,
       endDate: result[5] as String?,
@@ -578,20 +582,20 @@ class ApplePayShippingMethodDTO {
 class ApplePaySummaryItemDTO {
   ApplePaySummaryItemDTO({
     required this.label,
-    required this.amount,
+    this.amount,
     required this.type,
   });
 
   String label;
 
-  AmountDTO amount;
+  AmountDTO? amount;
 
   ApplePaySummaryItemType type;
 
   Object encode() {
     return <Object?>[
       label,
-      amount.encode(),
+      amount?.encode(),
       type.index,
     ];
   }
@@ -600,7 +604,9 @@ class ApplePaySummaryItemDTO {
     result as List<Object?>;
     return ApplePaySummaryItemDTO(
       label: result[0]! as String,
-      amount: AmountDTO.decode(result[1]! as List<Object?>),
+      amount: result[1] != null
+          ? AmountDTO.decode(result[1]! as List<Object?>)
+          : null,
       type: ApplePaySummaryItemType.values[result[2]! as int],
     );
   }
@@ -1096,7 +1102,7 @@ class CardComponentConfigurationDTO {
     required this.environment,
     required this.clientKey,
     required this.countryCode,
-    required this.amount,
+    this.amount,
     this.shopperLocale,
     required this.cardConfiguration,
     required this.analyticsOptionsDTO,
@@ -1108,7 +1114,7 @@ class CardComponentConfigurationDTO {
 
   String countryCode;
 
-  AmountDTO amount;
+  AmountDTO? amount;
 
   String? shopperLocale;
 
@@ -1121,7 +1127,7 @@ class CardComponentConfigurationDTO {
       environment.index,
       clientKey,
       countryCode,
-      amount.encode(),
+      amount?.encode(),
       shopperLocale,
       cardConfiguration.encode(),
       analyticsOptionsDTO.encode(),
@@ -1134,7 +1140,9 @@ class CardComponentConfigurationDTO {
       environment: Environment.values[result[0]! as int],
       clientKey: result[1]! as String,
       countryCode: result[2]! as String,
-      amount: AmountDTO.decode(result[3]! as List<Object?>),
+      amount: result[3] != null
+          ? AmountDTO.decode(result[3]! as List<Object?>)
+          : null,
       shopperLocale: result[4] as String?,
       cardConfiguration: CardConfigurationDTO.decode(result[5]! as List<Object?>),
       analyticsOptionsDTO: AnalyticsOptionsDTO.decode(result[6]! as List<Object?>),
@@ -1148,7 +1156,7 @@ class InstantPaymentConfigurationDTO {
     required this.environment,
     required this.clientKey,
     required this.countryCode,
-    required this.amount,
+    this.amount,
     this.shopperLocale,
     required this.analyticsOptionsDTO,
     this.googlePayConfigurationDTO,
@@ -1163,7 +1171,7 @@ class InstantPaymentConfigurationDTO {
 
   String countryCode;
 
-  AmountDTO amount;
+  AmountDTO? amount;
 
   String? shopperLocale;
 
@@ -1179,7 +1187,7 @@ class InstantPaymentConfigurationDTO {
       environment.index,
       clientKey,
       countryCode,
-      amount.encode(),
+      amount?.encode(),
       shopperLocale,
       analyticsOptionsDTO.encode(),
       googlePayConfigurationDTO?.encode(),
@@ -1194,7 +1202,9 @@ class InstantPaymentConfigurationDTO {
       environment: Environment.values[result[1]! as int],
       clientKey: result[2]! as String,
       countryCode: result[3]! as String,
-      amount: AmountDTO.decode(result[4]! as List<Object?>),
+      amount: result[4] != null
+          ? AmountDTO.decode(result[4]! as List<Object?>)
+          : null,
       shopperLocale: result[5] as String?,
       analyticsOptionsDTO: AnalyticsOptionsDTO.decode(result[6]! as List<Object?>),
       googlePayConfigurationDTO: result[7] != null
@@ -2192,32 +2202,29 @@ class _ComponentFlutterInterfaceCodec extends StandardMessageCodec {
     if (value is AmountDTO) {
       buffer.putUint8(128);
       writeValue(buffer, value.encode());
-    } else if (value is AmountDTO) {
+    } else if (value is AnalyticsOptionsDTO) {
       buffer.putUint8(129);
       writeValue(buffer, value.encode());
-    } else if (value is AnalyticsOptionsDTO) {
+    } else if (value is CardComponentConfigurationDTO) {
       buffer.putUint8(130);
       writeValue(buffer, value.encode());
-    } else if (value is CardComponentConfigurationDTO) {
+    } else if (value is CardConfigurationDTO) {
       buffer.putUint8(131);
       writeValue(buffer, value.encode());
-    } else if (value is CardConfigurationDTO) {
+    } else if (value is ComponentCommunicationModel) {
       buffer.putUint8(132);
       writeValue(buffer, value.encode());
-    } else if (value is ComponentCommunicationModel) {
+    } else if (value is OrderResponseDTO) {
       buffer.putUint8(133);
       writeValue(buffer, value.encode());
-    } else if (value is OrderResponseDTO) {
+    } else if (value is PaymentResultDTO) {
       buffer.putUint8(134);
       writeValue(buffer, value.encode());
-    } else if (value is PaymentResultDTO) {
+    } else if (value is PaymentResultModelDTO) {
       buffer.putUint8(135);
       writeValue(buffer, value.encode());
-    } else if (value is PaymentResultModelDTO) {
-      buffer.putUint8(136);
-      writeValue(buffer, value.encode());
     } else if (value is SessionDTO) {
-      buffer.putUint8(137);
+      buffer.putUint8(136);
       writeValue(buffer, value.encode());
     } else {
       super.writeValue(buffer, value);
@@ -2230,22 +2237,20 @@ class _ComponentFlutterInterfaceCodec extends StandardMessageCodec {
       case 128: 
         return AmountDTO.decode(readValue(buffer)!);
       case 129: 
-        return AmountDTO.decode(readValue(buffer)!);
-      case 130: 
         return AnalyticsOptionsDTO.decode(readValue(buffer)!);
-      case 131: 
+      case 130: 
         return CardComponentConfigurationDTO.decode(readValue(buffer)!);
-      case 132: 
+      case 131: 
         return CardConfigurationDTO.decode(readValue(buffer)!);
-      case 133: 
+      case 132: 
         return ComponentCommunicationModel.decode(readValue(buffer)!);
-      case 134: 
+      case 133: 
         return OrderResponseDTO.decode(readValue(buffer)!);
-      case 135: 
+      case 134: 
         return PaymentResultDTO.decode(readValue(buffer)!);
-      case 136: 
+      case 135: 
         return PaymentResultModelDTO.decode(readValue(buffer)!);
-      case 137: 
+      case 136: 
         return SessionDTO.decode(readValue(buffer)!);
       default:
         return super.readValueOfType(type, buffer);

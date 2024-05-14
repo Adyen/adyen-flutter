@@ -38,7 +38,6 @@ class InstantSessionComponentScreen extends StatelessWidget {
       environment: Config.environment,
       clientKey: Config.clientKey,
       countryCode: Config.countryCode,
-      amount: Config.amount,
     );
 
     return FutureBuilder<SessionCheckout>(

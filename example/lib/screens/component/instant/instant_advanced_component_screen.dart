@@ -48,7 +48,6 @@ class InstantAdvancedComponentScreen extends StatelessWidget {
             environment: Config.environment,
             clientKey: Config.clientKey,
             countryCode: Config.countryCode,
-            amount: Config.amount,
           );
 
           final payPalPaymentMethodResponse =

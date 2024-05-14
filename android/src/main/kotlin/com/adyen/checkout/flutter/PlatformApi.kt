@@ -300,7 +300,7 @@ data class DropInConfigurationDTO (
   val environment: Environment,
   val clientKey: String,
   val countryCode: String,
-  val amount: AmountDTO,
+  val amount: AmountDTO? = null,
   val shopperLocale: String? = null,
   val cardConfigurationDTO: CardConfigurationDTO? = null,
   val applePayConfigurationDTO: ApplePayConfigurationDTO? = null,
@@ -319,7 +319,9 @@ data class DropInConfigurationDTO (
       val environment = Environment.ofRaw(list[0] as Int)!!
       val clientKey = list[1] as String
       val countryCode = list[2] as String
-      val amount = AmountDTO.fromList(list[3] as List<Any?>)
+      val amount: AmountDTO? = (list[3] as List<Any?>?)?.let {
+        AmountDTO.fromList(it)
+      }
       val shopperLocale = list[4] as String?
       val cardConfigurationDTO: CardConfigurationDTO? = (list[5] as List<Any?>?)?.let {
         CardConfigurationDTO.fromList(it)
@@ -346,7 +348,7 @@ data class DropInConfigurationDTO (
       environment.raw,
       clientKey,
       countryCode,
-      amount.toList(),
+      amount?.toList(),
       shopperLocale,
       cardConfigurationDTO?.toList(),
       applePayConfigurationDTO?.toList(),
@@ -529,7 +531,7 @@ data class ApplePayContactDTO (
 data class ApplePayShippingMethodDTO (
   val label: String,
   val detail: String,
-  val amount: AmountDTO,
+  val amount: AmountDTO? = null,
   val identifier: String,
   val startDate: String? = null,
   val endDate: String? = null
@@ -540,7 +542,9 @@ data class ApplePayShippingMethodDTO (
     fun fromList(list: List<Any?>): ApplePayShippingMethodDTO {
       val label = list[0] as String
       val detail = list[1] as String
-      val amount = AmountDTO.fromList(list[2] as List<Any?>)
+      val amount: AmountDTO? = (list[2] as List<Any?>?)?.let {
+        AmountDTO.fromList(it)
+      }
       val identifier = list[3] as String
       val startDate = list[4] as String?
       val endDate = list[5] as String?
@@ -551,7 +555,7 @@ data class ApplePayShippingMethodDTO (
     return listOf<Any?>(
       label,
       detail,
-      amount.toList(),
+      amount?.toList(),
       identifier,
       startDate,
       endDate,
@@ -562,7 +566,7 @@ data class ApplePayShippingMethodDTO (
 /** Generated class from Pigeon that represents data sent in messages. */
 data class ApplePaySummaryItemDTO (
   val label: String,
-  val amount: AmountDTO,
+  val amount: AmountDTO? = null,
   val type: ApplePaySummaryItemType
 
 ) {
@@ -570,7 +574,9 @@ data class ApplePaySummaryItemDTO (
     @Suppress("UNCHECKED_CAST")
     fun fromList(list: List<Any?>): ApplePaySummaryItemDTO {
       val label = list[0] as String
-      val amount = AmountDTO.fromList(list[1] as List<Any?>)
+      val amount: AmountDTO? = (list[1] as List<Any?>?)?.let {
+        AmountDTO.fromList(it)
+      }
       val type = ApplePaySummaryItemType.ofRaw(list[2] as Int)!!
       return ApplePaySummaryItemDTO(label, amount, type)
     }
@@ -578,7 +584,7 @@ data class ApplePaySummaryItemDTO (
   fun toList(): List<Any?> {
     return listOf<Any?>(
       label,
-      amount.toList(),
+      amount?.toList(),
       type.raw,
     )
   }
@@ -972,7 +978,7 @@ data class CardComponentConfigurationDTO (
   val environment: Environment,
   val clientKey: String,
   val countryCode: String,
-  val amount: AmountDTO,
+  val amount: AmountDTO? = null,
   val shopperLocale: String? = null,
   val cardConfiguration: CardConfigurationDTO,
   val analyticsOptionsDTO: AnalyticsOptionsDTO
@@ -984,7 +990,9 @@ data class CardComponentConfigurationDTO (
       val environment = Environment.ofRaw(list[0] as Int)!!
       val clientKey = list[1] as String
       val countryCode = list[2] as String
-      val amount = AmountDTO.fromList(list[3] as List<Any?>)
+      val amount: AmountDTO? = (list[3] as List<Any?>?)?.let {
+        AmountDTO.fromList(it)
+      }
       val shopperLocale = list[4] as String?
       val cardConfiguration = CardConfigurationDTO.fromList(list[5] as List<Any?>)
       val analyticsOptionsDTO = AnalyticsOptionsDTO.fromList(list[6] as List<Any?>)
@@ -996,7 +1004,7 @@ data class CardComponentConfigurationDTO (
       environment.raw,
       clientKey,
       countryCode,
-      amount.toList(),
+      amount?.toList(),
       shopperLocale,
       cardConfiguration.toList(),
       analyticsOptionsDTO.toList(),
@@ -1010,7 +1018,7 @@ data class InstantPaymentConfigurationDTO (
   val environment: Environment,
   val clientKey: String,
   val countryCode: String,
-  val amount: AmountDTO,
+  val amount: AmountDTO? = null,
   val shopperLocale: String? = null,
   val analyticsOptionsDTO: AnalyticsOptionsDTO,
   val googlePayConfigurationDTO: GooglePayConfigurationDTO? = null,
@@ -1024,7 +1032,9 @@ data class InstantPaymentConfigurationDTO (
       val environment = Environment.ofRaw(list[1] as Int)!!
       val clientKey = list[2] as String
       val countryCode = list[3] as String
-      val amount = AmountDTO.fromList(list[4] as List<Any?>)
+      val amount: AmountDTO? = (list[4] as List<Any?>?)?.let {
+        AmountDTO.fromList(it)
+      }
       val shopperLocale = list[5] as String?
       val analyticsOptionsDTO = AnalyticsOptionsDTO.fromList(list[6] as List<Any?>)
       val googlePayConfigurationDTO: GooglePayConfigurationDTO? = (list[7] as List<Any?>?)?.let {
@@ -1042,7 +1052,7 @@ data class InstantPaymentConfigurationDTO (
       environment.raw,
       clientKey,
       countryCode,
-      amount.toList(),
+      amount?.toList(),
       shopperLocale,
       analyticsOptionsDTO.toList(),
       googlePayConfigurationDTO?.toList(),
@@ -2191,45 +2201,40 @@ private object ComponentFlutterInterfaceCodec : StandardMessageCodec() {
       }
       129.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          AmountDTO.fromList(it)
+          AnalyticsOptionsDTO.fromList(it)
         }
       }
       130.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          AnalyticsOptionsDTO.fromList(it)
+          CardComponentConfigurationDTO.fromList(it)
         }
       }
       131.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          CardComponentConfigurationDTO.fromList(it)
+          CardConfigurationDTO.fromList(it)
         }
       }
       132.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          CardConfigurationDTO.fromList(it)
+          ComponentCommunicationModel.fromList(it)
         }
       }
       133.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          ComponentCommunicationModel.fromList(it)
+          OrderResponseDTO.fromList(it)
         }
       }
       134.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          OrderResponseDTO.fromList(it)
+          PaymentResultDTO.fromList(it)
         }
       }
       135.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          PaymentResultDTO.fromList(it)
-        }
-      }
-      136.toByte() -> {
-        return (readValue(buffer) as? List<Any?>)?.let {
           PaymentResultModelDTO.fromList(it)
         }
       }
-      137.toByte() -> {
+      136.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
           SessionDTO.fromList(it)
         }
@@ -2243,40 +2248,36 @@ private object ComponentFlutterInterfaceCodec : StandardMessageCodec() {
         stream.write(128)
         writeValue(stream, value.toList())
       }
-      is AmountDTO -> {
+      is AnalyticsOptionsDTO -> {
         stream.write(129)
         writeValue(stream, value.toList())
       }
-      is AnalyticsOptionsDTO -> {
+      is CardComponentConfigurationDTO -> {
         stream.write(130)
         writeValue(stream, value.toList())
       }
-      is CardComponentConfigurationDTO -> {
+      is CardConfigurationDTO -> {
         stream.write(131)
         writeValue(stream, value.toList())
       }
-      is CardConfigurationDTO -> {
+      is ComponentCommunicationModel -> {
         stream.write(132)
         writeValue(stream, value.toList())
       }
-      is ComponentCommunicationModel -> {
+      is OrderResponseDTO -> {
         stream.write(133)
         writeValue(stream, value.toList())
       }
-      is OrderResponseDTO -> {
+      is PaymentResultDTO -> {
         stream.write(134)
         writeValue(stream, value.toList())
       }
-      is PaymentResultDTO -> {
+      is PaymentResultModelDTO -> {
         stream.write(135)
         writeValue(stream, value.toList())
       }
-      is PaymentResultModelDTO -> {
-        stream.write(136)
-        writeValue(stream, value.toList())
-      }
       is SessionDTO -> {
-        stream.write(137)
+        stream.write(136)
         writeValue(stream, value.toList())
       }
       else -> super.writeValue(stream, value)

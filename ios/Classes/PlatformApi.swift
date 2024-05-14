@@ -211,7 +211,7 @@ struct DropInConfigurationDTO {
     var environment: Environment
     var clientKey: String
     var countryCode: String
-    var amount: AmountDTO
+    var amount: AmountDTO?
     var shopperLocale: String?
     var cardConfigurationDTO: CardConfigurationDTO?
     var applePayConfigurationDTO: ApplePayConfigurationDTO?
@@ -227,7 +227,10 @@ struct DropInConfigurationDTO {
         let environment = Environment(rawValue: list[0] as! Int)!
         let clientKey = list[1] as! String
         let countryCode = list[2] as! String
-        let amount = AmountDTO.fromList(list[3] as! [Any?])!
+        var amount: AmountDTO?
+        if let amountList: [Any?] = nilOrValue(list[3]) {
+            amount = AmountDTO.fromList(amountList)
+        }
         let shopperLocale: String? = nilOrValue(list[4])
         var cardConfigurationDTO: CardConfigurationDTO?
         if let cardConfigurationDTOList: [Any?] = nilOrValue(list[5]) {
@@ -274,7 +277,7 @@ struct DropInConfigurationDTO {
             environment.rawValue,
             clientKey,
             countryCode,
-            amount.toList(),
+            amount?.toList(),
             shopperLocale,
             cardConfigurationDTO?.toList(),
             applePayConfigurationDTO?.toList(),
@@ -496,7 +499,7 @@ struct ApplePayContactDTO {
 struct ApplePayShippingMethodDTO {
     var label: String
     var detail: String
-    var amount: AmountDTO
+    var amount: AmountDTO?
     var identifier: String
     var startDate: String?
     var endDate: String?
@@ -504,7 +507,10 @@ struct ApplePayShippingMethodDTO {
     static func fromList(_ list: [Any?]) -> ApplePayShippingMethodDTO? {
         let label = list[0] as! String
         let detail = list[1] as! String
-        let amount = AmountDTO.fromList(list[2] as! [Any?])!
+        var amount: AmountDTO?
+        if let amountList: [Any?] = nilOrValue(list[2]) {
+            amount = AmountDTO.fromList(amountList)
+        }
         let identifier = list[3] as! String
         let startDate: String? = nilOrValue(list[4])
         let endDate: String? = nilOrValue(list[5])
@@ -523,7 +529,7 @@ struct ApplePayShippingMethodDTO {
         [
             label,
             detail,
-            amount.toList(),
+            amount?.toList(),
             identifier,
             startDate,
             endDate
@@ -534,12 +540,15 @@ struct ApplePayShippingMethodDTO {
 /// Generated class from Pigeon that represents data sent in messages.
 struct ApplePaySummaryItemDTO {
     var label: String
-    var amount: AmountDTO
+    var amount: AmountDTO?
     var type: ApplePaySummaryItemType
 
     static func fromList(_ list: [Any?]) -> ApplePaySummaryItemDTO? {
         let label = list[0] as! String
-        let amount = AmountDTO.fromList(list[1] as! [Any?])!
+        var amount: AmountDTO?
+        if let amountList: [Any?] = nilOrValue(list[1]) {
+            amount = AmountDTO.fromList(amountList)
+        }
         let type = ApplePaySummaryItemType(rawValue: list[2] as! Int)!
 
         return ApplePaySummaryItemDTO(
@@ -552,7 +561,7 @@ struct ApplePaySummaryItemDTO {
     func toList() -> [Any?] {
         [
             label,
-            amount.toList(),
+            amount?.toList(),
             type.rawValue
         ]
     }
@@ -996,7 +1005,7 @@ struct CardComponentConfigurationDTO {
     var environment: Environment
     var clientKey: String
     var countryCode: String
-    var amount: AmountDTO
+    var amount: AmountDTO?
     var shopperLocale: String?
     var cardConfiguration: CardConfigurationDTO
     var analyticsOptionsDTO: AnalyticsOptionsDTO
@@ -1005,7 +1014,10 @@ struct CardComponentConfigurationDTO {
         let environment = Environment(rawValue: list[0] as! Int)!
         let clientKey = list[1] as! String
         let countryCode = list[2] as! String
-        let amount = AmountDTO.fromList(list[3] as! [Any?])!
+        var amount: AmountDTO?
+        if let amountList: [Any?] = nilOrValue(list[3]) {
+            amount = AmountDTO.fromList(amountList)
+        }
         let shopperLocale: String? = nilOrValue(list[4])
         let cardConfiguration = CardConfigurationDTO.fromList(list[5] as! [Any?])!
         let analyticsOptionsDTO = AnalyticsOptionsDTO.fromList(list[6] as! [Any?])!
@@ -1026,7 +1038,7 @@ struct CardComponentConfigurationDTO {
             environment.rawValue,
             clientKey,
             countryCode,
-            amount.toList(),
+            amount?.toList(),
             shopperLocale,
             cardConfiguration.toList(),
             analyticsOptionsDTO.toList()
@@ -1040,7 +1052,7 @@ struct InstantPaymentConfigurationDTO {
     var environment: Environment
     var clientKey: String
     var countryCode: String
-    var amount: AmountDTO
+    var amount: AmountDTO?
     var shopperLocale: String?
     var analyticsOptionsDTO: AnalyticsOptionsDTO
     var googlePayConfigurationDTO: GooglePayConfigurationDTO?
@@ -1051,7 +1063,10 @@ struct InstantPaymentConfigurationDTO {
         let environment = Environment(rawValue: list[1] as! Int)!
         let clientKey = list[2] as! String
         let countryCode = list[3] as! String
-        let amount = AmountDTO.fromList(list[4] as! [Any?])!
+        var amount: AmountDTO?
+        if let amountList: [Any?] = nilOrValue(list[4]) {
+            amount = AmountDTO.fromList(amountList)
+        }
         let shopperLocale: String? = nilOrValue(list[5])
         let analyticsOptionsDTO = AnalyticsOptionsDTO.fromList(list[6] as! [Any?])!
         var googlePayConfigurationDTO: GooglePayConfigurationDTO?
@@ -1082,7 +1097,7 @@ struct InstantPaymentConfigurationDTO {
             environment.rawValue,
             clientKey,
             countryCode,
-            amount.toList(),
+            amount?.toList(),
             shopperLocale,
             analyticsOptionsDTO.toList(),
             googlePayConfigurationDTO?.toList(),
@@ -2003,22 +2018,20 @@ private class ComponentFlutterInterfaceCodecReader: FlutterStandardReader {
         case 128:
             return AmountDTO.fromList(self.readValue() as! [Any?])
         case 129:
-            return AmountDTO.fromList(self.readValue() as! [Any?])
-        case 130:
             return AnalyticsOptionsDTO.fromList(self.readValue() as! [Any?])
-        case 131:
+        case 130:
             return CardComponentConfigurationDTO.fromList(self.readValue() as! [Any?])
-        case 132:
+        case 131:
             return CardConfigurationDTO.fromList(self.readValue() as! [Any?])
-        case 133:
+        case 132:
             return ComponentCommunicationModel.fromList(self.readValue() as! [Any?])
-        case 134:
+        case 133:
             return OrderResponseDTO.fromList(self.readValue() as! [Any?])
-        case 135:
+        case 134:
             return PaymentResultDTO.fromList(self.readValue() as! [Any?])
-        case 136:
+        case 135:
             return PaymentResultModelDTO.fromList(self.readValue() as! [Any?])
-        case 137:
+        case 136:
             return SessionDTO.fromList(self.readValue() as! [Any?])
         default:
             return super.readValue(ofType: type)
@@ -2031,32 +2044,29 @@ private class ComponentFlutterInterfaceCodecWriter: FlutterStandardWriter {
         if let value = value as? AmountDTO {
             super.writeByte(128)
             super.writeValue(value.toList())
-        } else if let value = value as? AmountDTO {
+        } else if let value = value as? AnalyticsOptionsDTO {
             super.writeByte(129)
             super.writeValue(value.toList())
-        } else if let value = value as? AnalyticsOptionsDTO {
+        } else if let value = value as? CardComponentConfigurationDTO {
             super.writeByte(130)
             super.writeValue(value.toList())
-        } else if let value = value as? CardComponentConfigurationDTO {
+        } else if let value = value as? CardConfigurationDTO {
             super.writeByte(131)
             super.writeValue(value.toList())
-        } else if let value = value as? CardConfigurationDTO {
+        } else if let value = value as? ComponentCommunicationModel {
             super.writeByte(132)
             super.writeValue(value.toList())
-        } else if let value = value as? ComponentCommunicationModel {
+        } else if let value = value as? OrderResponseDTO {
             super.writeByte(133)
             super.writeValue(value.toList())
-        } else if let value = value as? OrderResponseDTO {
+        } else if let value = value as? PaymentResultDTO {
             super.writeByte(134)
             super.writeValue(value.toList())
-        } else if let value = value as? PaymentResultDTO {
+        } else if let value = value as? PaymentResultModelDTO {
             super.writeByte(135)
             super.writeValue(value.toList())
-        } else if let value = value as? PaymentResultModelDTO {
-            super.writeByte(136)
-            super.writeValue(value.toList())
         } else if let value = value as? SessionDTO {
-            super.writeByte(137)
+            super.writeByte(136)
             super.writeValue(value.toList())
         } else {
             super.writeValue(value)

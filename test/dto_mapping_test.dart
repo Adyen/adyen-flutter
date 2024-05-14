@@ -25,8 +25,8 @@ void main() {
     expect(dropInConfigurationDto.environment, Environment.test);
     expect(dropInConfigurationDto.clientKey, demoClientKey);
     expect(dropInConfigurationDto.countryCode, countryCode);
-    expect(dropInConfigurationDto.amount.value, amountValue);
-    expect(dropInConfigurationDto.amount.currency, currency);
+    expect(dropInConfigurationDto.amount?.value, amountValue);
+    expect(dropInConfigurationDto.amount?.currency, currency);
     expect(dropInConfigurationDto.amount.runtimeType == AmountDTO, true);
     expect(dropInConfigurationDto.shopperLocale, "en-US");
     expect(dropInConfigurationDto.cardConfigurationDTO, null);

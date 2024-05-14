@@ -8,8 +8,8 @@ final class GooglePayComponentConfiguration extends BaseConfiguration {
     required super.environment,
     required super.clientKey,
     required super.countryCode,
-    required super.amount,
     required this.googlePayConfiguration,
+    super.amount,
     super.shopperLocale,
     super.analyticsOptions,
   });
