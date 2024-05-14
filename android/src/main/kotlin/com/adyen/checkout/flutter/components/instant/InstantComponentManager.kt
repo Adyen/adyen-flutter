@@ -17,6 +17,7 @@ import com.adyen.checkout.instant.InstantPaymentComponent
 import com.adyen.checkout.sessions.core.CheckoutSession
 import com.adyen.checkout.sessions.core.SessionSetupResponse
 import org.json.JSONObject
+import java.util.UUID
 
 class InstantComponentManager(
     private val activity: FragmentActivity,
@@ -33,24 +34,23 @@ class InstantComponentManager(
     ): InstantPaymentComponent {
         val paymentMethod = PaymentMethod.SERIALIZER.deserialize(JSONObject(encodedPaymentMethod))
         val configuration = instantPaymentConfigurationDTO.mapToCheckoutConfiguration()
-        val instantPaymentComponent =
-            when {
-                componentId.contains(Constants.INSTANT_ADVANCED_COMPONENT_KEY) ->
-                    createInstantAdvancedComponent(
-                        configuration,
-                        paymentMethod,
-                        componentId
-                    )
+        val instantPaymentComponent = when (componentId) {
+            Constants.INSTANT_ADVANCED_COMPONENT_KEY ->
+                createInstantAdvancedComponent(
+                    configuration,
+                    paymentMethod,
+                    componentId
+                )
 
-                componentId.contains(Constants.INSTANT_SESSION_COMPONENT_KEY) ->
-                    createInstantSessionComponent(
-                        configuration,
-                        paymentMethod,
-                        componentId
-                    )
+            Constants.INSTANT_SESSION_COMPONENT_KEY ->
+                createInstantSessionComponent(
+                    configuration,
+                    paymentMethod,
+                    componentId
+                )
 
-                else -> throw IllegalStateException("Instant component not available for payment flow.")
-            }
+            else -> throw IllegalStateException("Instant component not available for payment flow.")
+        }
 
         this.instantPaymentComponent = instantPaymentComponent
         this.componentId = componentId
@@ -74,12 +74,12 @@ class InstantComponentManager(
             paymentMethod = paymentMethod,
             checkoutConfiguration = configuration,
             callback =
-                InstantComponentAdvancedCallback(
-                    componentFlutterInterface,
-                    componentId,
-                    ::hideLoadingBottomSheet
-                ),
-            key = componentId
+            InstantComponentAdvancedCallback(
+                componentFlutterInterface,
+                componentId,
+                ::hideLoadingBottomSheet
+            ),
+            key = UUID.randomUUID().toString()
         )
     }
 
@@ -103,13 +103,13 @@ class InstantComponentManager(
             paymentMethod = paymentMethod,
             checkoutConfiguration = configuration,
             componentCallback =
-                InstantComponentSessionCallback(
-                    componentFlutterInterface,
-                    componentId,
-                    ::handleAction,
-                    ::hideLoadingBottomSheet
-                ),
-            key = componentId
+            InstantComponentSessionCallback(
+                componentFlutterInterface,
+                componentId,
+                ::handleAction,
+                ::hideLoadingBottomSheet
+            ),
+            key = UUID.randomUUID().toString()
         )
     }
 

@@ -11,19 +11,17 @@ import 'package:adyen_checkout/src/util/dto_mapper.dart';
 import 'package:adyen_checkout/src/util/sdk_version_number_provider.dart';
 
 abstract class BaseInstantComponent {
-  final String componentId;
+  abstract final String componentId;
   final AdyenLogger adyenLogger;
-  final Completer<PaymentResult> completer = Completer<PaymentResult>();
   final SdkVersionNumberProvider sdkVersionNumberProvider =
       SdkVersionNumberProvider.instance;
   final ComponentPlatformApi componentPlatformApi =
       ComponentPlatformApi.instance;
+  late final Completer<PaymentResult> completer;
   StreamSubscription<ComponentCommunicationModel>? componentCommunicationStream;
 
-  BaseInstantComponent({
-    required this.componentId,
-    AdyenLogger? adyenLogger,
-  }) : adyenLogger = adyenLogger ?? AdyenLogger.instance;
+  BaseInstantComponent({AdyenLogger? adyenLogger})
+      : adyenLogger = adyenLogger ?? AdyenLogger.instance;
 
   void handleComponentCommunication(ComponentCommunicationModel event);
 
@@ -33,6 +31,7 @@ abstract class BaseInstantComponent {
     InstantComponentConfiguration instantComponentConfiguration,
     Map<String, dynamic> paymentMethodResponse,
   ) async {
+    completer = Completer<PaymentResult>();
     componentCommunicationStream = ComponentFlutterApi
         .instance.componentCommunicationStream.stream
         .where((communicationModel) =>
