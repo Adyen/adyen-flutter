@@ -13,6 +13,7 @@ final class DropInConfiguration extends BaseConfiguration {
   final CashAppPayConfiguration? cashAppPayConfiguration;
   final StoredPaymentMethodConfiguration? storedPaymentMethodConfiguration;
   final bool skipListWhenSinglePaymentMethod;
+  final String? title;
 
   DropInConfiguration({
     required super.environment,
@@ -25,6 +26,7 @@ final class DropInConfiguration extends BaseConfiguration {
     this.googlePayConfiguration,
     this.cashAppPayConfiguration,
     this.storedPaymentMethodConfiguration,
+    this.title,
     bool? skipListWhenSinglePaymentMethod,
     AnalyticsOptions? analyticsOptions,
   }) : skipListWhenSinglePaymentMethod =
