@@ -22,7 +22,7 @@ class ApplePaySessionComponent: BaseApplePayComponent {
     
     override func present() {
         if let applePayComponent {
-            sessionHolder.sessionPresentationDelegate?.present(component: applePayComponent)
+            getViewController()?.present(component: applePayComponent)
         }
     }
     
