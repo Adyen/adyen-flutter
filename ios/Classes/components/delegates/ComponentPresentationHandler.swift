@@ -1,6 +1,6 @@
 import Adyen
 
-class ComponentPresentationDelegate: PresentationDelegate {
+class ComponentPresentationHandler: PresentationDelegate {
     let topViewController: UIViewController?
     var presentableComponent: PresentableComponent?
 

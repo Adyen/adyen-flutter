@@ -105,8 +105,8 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
         completion: @escaping (Result<SessionDTO, Error>) -> Void
     ) throws {
         let adyenContext = try configuration.createAdyenContext()
-        let sessionDelegate = ComponentSessionFlowDelegate(componentFlutterApi: componentFlutterApi)
-        let sessionPresentationDelegate = ComponentPresentationDelegate(topViewController: getViewController())
+        let sessionDelegate = ComponentSessionFlowHandler(componentFlutterApi: componentFlutterApi)
+        let sessionPresentationDelegate = ComponentPresentationHandler(topViewController: getViewController())
         requestAndSetSession(
             adyenContext: adyenContext,
             sessionId: sessionId,
@@ -124,8 +124,8 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
         completion: @escaping (Result<SessionDTO, Error>) -> Void
     ) throws {
         let adyenContext = try configuration.createAdyenContext()
-        let sessionDelegate = ComponentSessionFlowDelegate(componentFlutterApi: componentFlutterApi)
-        let instantComponentPresentationDelegate = ComponentPresentationDelegate(topViewController: getViewController())
+        let sessionDelegate = ComponentSessionFlowHandler(componentFlutterApi: componentFlutterApi)
+        let instantComponentPresentationDelegate = ComponentPresentationHandler(topViewController: getViewController())
         requestAndSetSession(
             adyenContext: adyenContext,
             sessionId: sessionId,

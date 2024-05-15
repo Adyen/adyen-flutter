@@ -71,8 +71,8 @@ class CardSessionComponent: BaseCardComponent {
     }
 
     private func setupSessionFlowDelegate() {
-        if let componentSessionFlowDelegate = (sessionHolder.sessionDelegate as? ComponentSessionFlowDelegate) {
-            componentSessionFlowDelegate.finalizeAndDismissHandler = finalizeAndDismissSessionComponent
+        if let componentSessionFlowDelegate = (sessionHolder.sessionDelegate as? ComponentSessionFlowHandler) {
+            componentSessionFlowDelegate.finalizeCallback = finalizeAndDismissSessionComponent
             componentSessionFlowDelegate.componentId = componentId
         } else {
             AdyenAssertion.assertionFailure(message: "Wrong session flow delegate usage")

@@ -1,26 +1,18 @@
 @_spi(AdyenInternal) import Adyen
 
 class BaseInstantComponent {
-    internal let componentFlutterApi: ComponentFlutterInterface
-    internal var componentId: String
-    internal var instantPaymentComponent: InstantPaymentComponent?
-    private var activityIndicatorView: UIActivityIndicatorView?
-    
+    let componentFlutterApi: ComponentFlutterInterface
+    let componentId: String
+    var instantPaymentComponent: InstantPaymentComponent?
+    var activityIndicatorView: UIActivityIndicatorView?
+
     init(componentFlutterApi: ComponentFlutterInterface, componentId: String) {
         self.componentFlutterApi = componentFlutterApi
         self.componentId = componentId
     }
     
-    func onDispose() {
-        preconditionFailure("This method must be implemented")
-    }
-    
-    func finalizeAndDismissComponent(success: Bool, completion: @escaping (() -> Void)) {
-        preconditionFailure("This method must be implemented")
-    }
-    
     func initiatePayment() {
-        guard let instantPaymentComponent = instantPaymentComponent else {
+        guard let instantPaymentComponent else {
             return
         }
         
