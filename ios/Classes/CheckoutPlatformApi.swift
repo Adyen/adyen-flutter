@@ -87,13 +87,11 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
     ) throws {
         let adyenContext = try configuration.createAdyenContext()
         let sessionDelegate = DropInSessionsDelegate(viewController: getViewController(), dropInFlutterApi: dropInFlutterApi)
-        let sessionPresentationDelegate = DropInSessionsPresentationDelegate()
         requestAndSetSession(
             adyenContext: adyenContext,
             sessionId: sessionId,
             sessionData: sessionData,
             sessionDelegate: sessionDelegate,
-            sessionPresentationDelegate: sessionPresentationDelegate,
             completion: completion
         )
     }
@@ -106,13 +104,11 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
     ) throws {
         let adyenContext = try configuration.createAdyenContext()
         let sessionDelegate = ComponentSessionFlowHandler(componentFlutterApi: componentFlutterApi)
-        let sessionPresentationDelegate = ComponentPresentationHandler(topViewController: getViewController())
         requestAndSetSession(
             adyenContext: adyenContext,
             sessionId: sessionId,
             sessionData: sessionData,
             sessionDelegate: sessionDelegate,
-            sessionPresentationDelegate: sessionPresentationDelegate,
             completion: completion
         )
     }
@@ -125,13 +121,11 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
     ) throws {
         let adyenContext = try configuration.createAdyenContext()
         let sessionDelegate = ComponentSessionFlowHandler(componentFlutterApi: componentFlutterApi)
-        let instantComponentPresentationDelegate = ComponentPresentationHandler(topViewController: getViewController())
         requestAndSetSession(
             adyenContext: adyenContext,
             sessionId: sessionId,
             sessionData: sessionData,
             sessionDelegate: sessionDelegate,
-            sessionPresentationDelegate: instantComponentPresentationDelegate,
             completion: completion
         )
     }
@@ -141,7 +135,6 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
         sessionId: String,
         sessionData: String,
         sessionDelegate: AdyenSessionDelegate,
-        sessionPresentationDelegate: PresentationDelegate,
         completion: @escaping (Result<SessionDTO, Error>) -> Void
     ) {
         let sessionConfiguration = AdyenSession.Configuration(
@@ -153,14 +146,13 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
         AdyenSession.initialize(
             with: sessionConfiguration,
             delegate: sessionDelegate,
-            presentationDelegate: sessionPresentationDelegate
+            presentationDelegate: getViewController()!
         ) { [weak self] result in
             do {
                 switch result {
                 case let .success(session):
                     self?.sessionHolder.setup(
                         session: session,
-                        sessionPresentationDelegate: sessionPresentationDelegate,
                         sessionDelegate: sessionDelegate
                     )
                     let encodedPaymentMethods = try JSONEncoder().encode(session.sessionContext.paymentMethods)

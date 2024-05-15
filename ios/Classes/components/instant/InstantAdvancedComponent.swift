@@ -3,7 +3,6 @@ import Adyen
 class InstantAdvancedComponent: BaseInstantComponent, InstantComponentProtocol {
     private var actionComponent: AdyenActionComponent?
     private var actionComponentHandler: ComponentActionHandler?
-    private var componentPresentationHandler: ComponentPresentationHandler?
     
     init(
         componentFlutterApi: ComponentFlutterInterface,
@@ -25,8 +24,7 @@ class InstantAdvancedComponent: BaseInstantComponent, InstantComponentProtocol {
             finalizeCallback: finalizeCallback(success:completion:)
         )
         actionComponent?.delegate = actionComponentHandler
-        componentPresentationHandler = ComponentPresentationHandler(topViewController: getViewController())
-        actionComponent?.presentationDelegate = componentPresentationHandler
+        actionComponent?.presentationDelegate = getViewController()
         return component
     }
     
@@ -42,7 +40,6 @@ class InstantAdvancedComponent: BaseInstantComponent, InstantComponentProtocol {
     func onDispose() {
         actionComponentHandler = nil
         actionComponent = nil
-        componentPresentationHandler = nil
         instantPaymentComponent = nil
     }
     

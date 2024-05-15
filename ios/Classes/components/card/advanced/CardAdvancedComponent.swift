@@ -74,7 +74,6 @@ class CardAdvancedComponent: BaseCardComponent {
         let paymentMethod: AnyCardPaymentMethod = isStoredPaymentMethod
             ? try JSONDecoder().decode(StoredCardPaymentMethod.self, from: Data(paymentMethodString.utf8))
             : try JSONDecoder().decode(CardPaymentMethod.self, from: Data(paymentMethodString.utf8))
-        presentationDelegate = ComponentPresentationHandler(topViewController: getViewController())
         actionComponent = buildActionComponent(adyenContext: adyenContext)
         return CardComponent(paymentMethod: paymentMethod, context: adyenContext, configuration: cardConfiguration)
     }
@@ -82,7 +81,7 @@ class CardAdvancedComponent: BaseCardComponent {
     private func buildActionComponent(adyenContext: AdyenContext) -> AdyenActionComponent {
         let actionComponent = AdyenActionComponent(context: adyenContext)
         actionComponent.delegate = actionComponentDelegate
-        actionComponent.presentationDelegate = presentationDelegate
+        actionComponent.presentationDelegate = getViewController()
         return actionComponent
     }
 
