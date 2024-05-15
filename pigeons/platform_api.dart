@@ -261,7 +261,7 @@ class ApplePayContactDTO {
 class ApplePayShippingMethodDTO {
   final String label;
   final String detail;
-  final AmountDTO? amount;
+  final AmountDTO amount;
   final String identifier;
   final String? startDate;
   final String? endDate;
@@ -278,7 +278,7 @@ class ApplePayShippingMethodDTO {
 
 class ApplePaySummaryItemDTO {
   final String label;
-  final AmountDTO? amount;
+  final AmountDTO amount;
   final ApplePaySummaryItemType type;
 
   ApplePaySummaryItemDTO(

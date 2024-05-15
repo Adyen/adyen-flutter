@@ -17,7 +17,7 @@ extension DropInConfigurationMapper on DropInConfiguration {
         amount: amount?.toDTO(),
         shopperLocale: shopperLocale,
         cardConfigurationDTO: cardConfiguration?.toDTO(),
-        applePayConfigurationDTO: applePayConfiguration?.toDTO(),
+        applePayConfigurationDTO: applePayConfiguration?.toDTO(amount),
         googlePayConfigurationDTO: googlePayConfiguration?.toDTO(),
         cashAppPayConfigurationDTO: cashAppPayConfiguration?.toDTO(),
         analyticsOptionsDTO: analyticsOptions.toDTO(sdkVersionNumber),
@@ -75,9 +75,16 @@ extension GooglePayConfigurationMapper on GooglePayConfiguration {
 }
 
 extension ApplePayConfigurationMapper on ApplePayConfiguration {
-  ApplePayConfigurationDTO toDTO() => ApplePayConfigurationDTO(
+  ApplePayConfigurationDTO toDTO(Amount? amount) {
+    if (amount == null) {
+      throw Exception("Please provide an amount when configuring apple pay.");
+    }
+
+    return ApplePayConfigurationDTO(
         merchantId: merchantId,
         merchantName: merchantName,
+        amountValue: amount.value,
+        amountCurrencyCode: amount.currency,
         allowOnboarding: allowOnboarding,
         summaryItems: applePaySummaryItems
             ?.map((applePaySummaryItem) => applePaySummaryItem.toDTO())
@@ -99,6 +106,7 @@ extension ApplePayConfigurationMapper on ApplePayConfiguration {
         supportedCountries: supportedCountries,
         merchantCapability: merchantCapability,
       );
+  }
 }
 
 extension ApplePayContactMapper on ApplePayContact {
@@ -235,9 +243,9 @@ extension ApplePayComponentConfigurationMapper
         environment: environment,
         clientKey: clientKey,
         countryCode: countryCode,
-        amount: amount?.toDTO(),
+        amount: amount.toDTO(),
         analyticsOptionsDTO: analyticsOptions.toDTO(sdkVersionNumber),
-        applePayConfigurationDTO: applePayConfiguration.toDTO(),
+        applePayConfigurationDTO: applePayConfiguration.toDTO(amount),
       );
 }
 

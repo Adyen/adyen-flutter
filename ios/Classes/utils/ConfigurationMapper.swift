@@ -34,9 +34,9 @@ class ConfigurationMapper {
             dropInConfiguration.card = cardConfiguration
         }
 
-        if let applePayConfigurationDTO = dropInConfigurationDTO.applePayConfigurationDTO {
+        if let applePayConfigurationDTO = dropInConfigurationDTO.applePayConfigurationDTO, let amout = dropInConfigurationDTO.amount {
             dropInConfiguration.applePay = try applePayConfigurationDTO.toApplePayConfiguration(
-                amount: dropInConfigurationDTO.amount,
+                amount: amout,
                 countryCode: dropInConfigurationDTO.countryCode
             )
         }
@@ -197,7 +197,7 @@ extension AmountDTO {
 
 extension InstantPaymentConfigurationDTO {
     func mapToApplePayConfiguration() throws -> ApplePayComponent.Configuration {
-        guard let applePayConfigurationDTO else {
+        guard let applePayConfigurationDTO, let amount else {
             throw PlatformError(errorDescription: "Apple pay error")
         }
         
@@ -212,25 +212,26 @@ extension InstantPaymentConfigurationDTO {
     }
 }
 
-private func buildAdyenContext(environment: Environment, clientKey: String, amount: AmountDTO, analyticsOptionsDTO: AnalyticsOptionsDTO, countryCode: String) throws -> AdyenContext {
+private func buildAdyenContext(environment: Environment, clientKey: String, amount: AmountDTO?, analyticsOptionsDTO: AnalyticsOptionsDTO, countryCode: String) throws -> AdyenContext {
     let environment = environment.mapToEnvironment()
     let apiContext = try APIContext(
         environment: environment,
         clientKey: clientKey
     )
-    let amount = amount.mapToAmount()
+    var payment: Payment? = nil
+    if let amount {
+        payment = Payment(amount: amount.mapToAmount(), countryCode: countryCode)
+    }
     var analyticsConfiguration = AnalyticsConfiguration()
     analyticsConfiguration.isEnabled = analyticsOptionsDTO.enabled
     analyticsConfiguration.context = AnalyticsContext(
         version: analyticsOptionsDTO.version,
         platform: .flutter
     )
+    
     return AdyenContext(
         apiContext: apiContext,
-        payment: Payment(
-            amount: amount,
-            countryCode: countryCode
-        ),
+        payment: payment,
         analyticsConfiguration: analyticsConfiguration
     )
 }

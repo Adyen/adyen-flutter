@@ -2,6 +2,7 @@ import 'package:adyen_checkout/adyen_checkout.dart';
 import 'package:adyen_checkout/src/common/model/base_configuration.dart';
 
 final class GooglePayComponentConfiguration extends BaseConfiguration {
+  final Amount? amount;
   final GooglePayConfiguration googlePayConfiguration;
 
   GooglePayComponentConfiguration({
@@ -9,7 +10,7 @@ final class GooglePayComponentConfiguration extends BaseConfiguration {
     required super.clientKey,
     required super.countryCode,
     required this.googlePayConfiguration,
-    super.amount,
+    this.amount,
     super.shopperLocale,
     super.analyticsOptions,
   });
