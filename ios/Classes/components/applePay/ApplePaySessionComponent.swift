@@ -44,9 +44,9 @@ class ApplePaySessionComponent: BaseApplePayComponent {
     }
     
     private func setupSessionFlowDelegate() {
-        if let componentSessionFlowDelegate = (sessionHolder.sessionDelegate as? ComponentSessionFlowDelegate) {
+        if let componentSessionFlowDelegate = (sessionHolder.sessionDelegate as? ComponentSessionFlowHandler) {
             componentSessionFlowDelegate.componentId = componentId
-            componentSessionFlowDelegate.finalizeAndDismissHandler = finalizeAndDismissComponent
+            componentSessionFlowDelegate.finalizeCallback = finalizeAndDismissComponent
         } else {
             AdyenAssertion.assertionFailure(message: "Wrong session flow delegate usage")
         }

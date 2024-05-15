@@ -26,10 +26,10 @@ class CardAdvancedComponent: BaseCardComponent {
             componentPlatformApi: componentPlatformApi
         )
 
-        actionComponentDelegate = ComponentActionDelegate(
+        actionComponentDelegate = ComponentActionHandler(
             componentFlutterApi: componentFlutterApi,
             componentId: componentId,
-            finalizeAndDismissComponent: finalizeAndDismiss(success:completion:)
+            finalizeCallback: finalizeAndDismiss(success:completion:)
         )
         setupCardComponentView()
         setupFinalizeComponentCallback()
@@ -74,7 +74,7 @@ class CardAdvancedComponent: BaseCardComponent {
         let paymentMethod: AnyCardPaymentMethod = isStoredPaymentMethod
             ? try JSONDecoder().decode(StoredCardPaymentMethod.self, from: Data(paymentMethodString.utf8))
             : try JSONDecoder().decode(CardPaymentMethod.self, from: Data(paymentMethodString.utf8))
-        presentationDelegate = ComponentPresentationDelegate(topViewController: getViewController())
+        presentationDelegate = ComponentPresentationHandler(topViewController: getViewController())
         actionComponent = buildActionComponent(adyenContext: adyenContext)
         return CardComponent(paymentMethod: paymentMethod, context: adyenContext, configuration: cardConfiguration)
     }
