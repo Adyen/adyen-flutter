@@ -31,6 +31,8 @@ final class DropInConfiguration extends BaseConfiguration {
     this.title,
     bool? skipListWhenSinglePaymentMethod,
     AnalyticsOptions? analyticsOptions,
-  }) : skipListWhenSinglePaymentMethod =
+  })  : assert(applePayConfiguration != null && amount == null ? false : true,
+            "Apple pay requires to set the amount."),
+        skipListWhenSinglePaymentMethod =
             skipListWhenSinglePaymentMethod ?? false;
 }

@@ -3,16 +3,17 @@ import PassKit
 
 extension ApplePayConfigurationDTO {
     func toApplePayConfiguration(amount: AmountDTO, countryCode: String) throws -> ApplePayComponent.Configuration {
-        let paymentRequest = try buildPaymentRequest(amount: amount, countryCode: countryCode)
+        let summaryItems =  try mapToPaymentSummaryItems(summaryItems: summaryItems, amount: amount)
+        let paymentRequest = try buildPaymentRequest(countryCode: countryCode, currencyCode: amount.currency, summaryItems: summaryItems)
         return try ApplePayComponent.Configuration(paymentRequest: paymentRequest, allowOnboarding: allowOnboarding ?? false)
     }
     
-    private func buildPaymentRequest(amount: AmountDTO, countryCode: String) throws -> PKPaymentRequest {
+    private func buildPaymentRequest(countryCode: String, currencyCode: String, summaryItems: [PKPaymentSummaryItem]) throws -> PKPaymentRequest {
         let paymentRequest = PKPaymentRequest()
         paymentRequest.merchantIdentifier = merchantId
-        paymentRequest.paymentSummaryItems = try mapToPaymentSummaryItems(summaryItems: summaryItems, amount: amount)
+        paymentRequest.paymentSummaryItems = summaryItems
         paymentRequest.countryCode = countryCode
-        paymentRequest.currencyCode = amount.currency
+        paymentRequest.currencyCode = currencyCode
         paymentRequest.billingContact = billingContact?.toApplePayContact()
         paymentRequest.shippingContact = shippingContact?.toApplePayContact()
         paymentRequest.merchantCapabilities = merchantCapability.toMerchantCapability()

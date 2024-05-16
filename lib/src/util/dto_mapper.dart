@@ -77,7 +77,7 @@ extension GooglePayConfigurationMapper on GooglePayConfiguration {
 extension ApplePayConfigurationMapper on ApplePayConfiguration {
   ApplePayConfigurationDTO toDTO(Amount? amount) {
     if (amount == null) {
-      throw Exception("Please provide an amount when configuring apple pay.");
+      throw Exception("Apple pay requires to set the amount.");
     }
 
     return ApplePayConfigurationDTO(

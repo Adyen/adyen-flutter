@@ -119,6 +119,7 @@ class _DropInScreenState extends State<DropInScreen> {
       clientKey: Config.clientKey,
       countryCode: Config.countryCode,
       shopperLocale: Config.shopperLocale,
+      amount: Config.amount,
       cardConfiguration: cardsConfiguration,
       applePayConfiguration: applePayConfiguration,
       googlePayConfiguration: googlePayConfiguration,
