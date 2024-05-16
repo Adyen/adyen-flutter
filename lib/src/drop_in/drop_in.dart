@@ -72,7 +72,8 @@ class DropIn {
           return PaymentSessionFinished(
             sessionId: paymentResultDTO.result?.sessionId ?? "",
             sessionData: paymentResultDTO.result?.sessionData ?? "",
-            resultCode: paymentResultDTO.result?.resultCode ?? "",
+            resultCode:
+                paymentResultDTO.result?.toResultCode() ?? ResultCode.unknown,
             order: paymentResultDTO.result?.order?.fromDTO(),
           );
       }
@@ -128,8 +129,8 @@ class DropIn {
           return PaymentError(reason: paymentResultDTO.reason);
         case PaymentResultEnum.finished:
           return PaymentAdvancedFinished(
-            resultCode: paymentResultDTO.result?.resultCode ?? "",
-          );
+              resultCode: paymentResultDTO.result?.toResultCode() ??
+                  ResultCode.unknown);
       }
     });
   }

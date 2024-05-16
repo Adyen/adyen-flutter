@@ -1,13 +1,6 @@
 import 'package:adyen_checkout/adyen_checkout.dart';
 
 class PaymentEventHandler {
-  //DropIn results
-  static const resultPending = "pending";
-  static const resultAuthorized = "authorised";
-  static const resultRefused = "refused";
-  static const resultError = "error";
-  static const resultCanceled = "canceled";
-
   //Response keys
   static const errorCodeKey = "errorCode";
   static const resultCodeKey = "resultCode";
@@ -47,8 +40,8 @@ class PaymentEventHandler {
   bool _isError(jsonResponse) {
     final hasErrorCodeKey = jsonResponse.containsKey(errorCodeKey);
     final hasErrorResultCode = (jsonResponse[resultCodeKey] as String?)
-            ?.toLowerCase()
-            .contains(resultError) ??
+            ?.toUpperCase()
+            .contains(ResultCode.error.name.toUpperCase()) ??
         false;
     return hasErrorCodeKey || hasErrorResultCode;
   }
@@ -58,8 +51,8 @@ class PaymentEventHandler {
 
   bool _isRefused(jsonResponse) => jsonResponse[resultCodeKey]
       .toString()
-      .toLowerCase()
-      .contains(resultRefused);
+      .toUpperCase()
+      .contains(ResultCode.refused.name.toUpperCase());
 
   bool _isAction(jsonResponse) => jsonResponse.containsKey(actionKey);
 

@@ -5,6 +5,7 @@ import 'dart:convert';
 import 'package:adyen_checkout/adyen_checkout.dart';
 import 'package:adyen_checkout_example/config.dart';
 import 'package:adyen_checkout_example/repositories/adyen_apple_pay_component_repository.dart';
+import 'package:adyen_checkout_example/utils/dialog_builder.dart';
 import 'package:flutter/material.dart';
 
 class ApplePayAdvancedComponentScreen extends StatelessWidget {
@@ -75,7 +76,7 @@ class ApplePayAdvancedComponentScreen extends StatelessWidget {
                 height: 56,
                 onPaymentResult: (paymentResult) {
                   Navigator.pop(context);
-                  _dialogBuilder(paymentResult, context);
+                  DialogBuilder.showPaymentResultDialog(paymentResult, context);
                 },
               ),
             ],
@@ -159,46 +160,6 @@ class ApplePayAdvancedComponentScreen extends StatelessWidget {
     return jsonPaymentMethods["paymentMethods"].firstWhere(
       (paymentMethod) => paymentMethod["type"] == "applepay",
       orElse: () => throw Exception("Apple pay payment method not provided"),
-    );
-  }
-
-  _dialogBuilder(PaymentResult paymentResult, BuildContext context) {
-    String title = "";
-    String message = "";
-    switch (paymentResult) {
-      case PaymentAdvancedFinished():
-        title = "Finished";
-        message = "Result code: ${paymentResult.resultCode}";
-      case PaymentSessionFinished():
-        title = "Finished";
-        message = "Result code: ${paymentResult.resultCode}";
-      case PaymentCancelledByUser():
-        title = "Cancelled by user";
-        message = "Cancelled by user";
-      case PaymentError():
-        title = "Error occurred";
-        message = "${paymentResult.reason}";
-    }
-
-    return showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text(title),
-          content: Text(message),
-          actions: <Widget>[
-            TextButton(
-              style: TextButton.styleFrom(
-                textStyle: Theme.of(context).textTheme.labelLarge,
-              ),
-              child: const Text('Close'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
     );
   }
 }
