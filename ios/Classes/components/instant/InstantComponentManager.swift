@@ -13,7 +13,7 @@ class InstantComponentManager {
         self.componentFlutterApi = componentFlutterApi
         self.sessionHolder = sessionHolder
     }
-
+    
     func startInstantComponent(
         instantPaymentConfigurationDTO: InstantPaymentConfigurationDTO,
         encodedPaymentMethod: String,
@@ -22,16 +22,14 @@ class InstantComponentManager {
         do {
             let paymentMethod = try JSONDecoder().decode(InstantPaymentMethod.self, from: Data(encodedPaymentMethod.utf8))
             let adyenContext = try instantPaymentConfigurationDTO.createAdyenContext()
-            switch componentId {
-            case let id where id.contains(Constants.instantAdvancedComponentId):
+            if componentId.contains(Constants.instantAdvancedComponentId) {
                 instantComponent = InstantAdvancedComponent(
                     componentFlutterApi: componentFlutterApi,
                     paymentMethod: paymentMethod,
                     adyenContext: adyenContext,
                     componentId: componentId
                 )
-
-            case let id where id.contains(Constants.instantSessionComponentId):
+            } else if componentId.contains(Constants.instantSessionComponentId) {
                 instantComponent = InstantSessionComponent(
                     componentFlutterApi: componentFlutterApi,
                     paymentMethod: paymentMethod,
@@ -39,8 +37,7 @@ class InstantComponentManager {
                     sessionHolder: sessionHolder,
                     componentId: componentId
                 )
-
-            default:
+            } else {
                 throw PlatformError(errorDescription: "Instant component not available for payment flow.")
             }
             instantComponent?.initiatePayment()

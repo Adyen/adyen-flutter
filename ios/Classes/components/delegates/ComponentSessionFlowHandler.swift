@@ -38,17 +38,11 @@ class ComponentSessionFlowHandler: AdyenSessionDelegate {
     func didFail(with error: Error, from component: Adyen.Component, session: Adyen.AdyenSession) {
         finalizeCallback?(false, { [weak self] in
             guard let self else { return }
-            let type: PaymentResultEnum
-            if let componentError = (error as? ComponentError), componentError == ComponentError.cancelled {
-                type = PaymentResultEnum.cancelledByUser
-            } else {
-                type = PaymentResultEnum.error
-            }
             let componentCommunicationModel = ComponentCommunicationModel(
                 type: ComponentCommunicationType.result,
                 componentId: self.componentId ?? "",
                 paymentResult: PaymentResultDTO(
-                    type: type,
+                    type: .from(error: error),
                     reason: error.localizedDescription
                 )
             )

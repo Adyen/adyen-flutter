@@ -126,17 +126,11 @@ extension ApplePayAdvancedComponent: PaymentComponentDelegate {
     }
     
     private func sendErrorToFlutterLayer(error: Error) {
-        let type: PaymentResultEnum
-        if let componentError = (error as? ComponentError), componentError == ComponentError.cancelled {
-            type = PaymentResultEnum.cancelledByUser
-        } else {
-            type = PaymentResultEnum.error
-        }
         let componentCommunicationModel = ComponentCommunicationModel(
             type: ComponentCommunicationType.result,
             componentId: componentId,
             paymentResult: PaymentResultDTO(
-                type: type,
+                type: .from(error: error),
                 reason: error.localizedDescription
             )
         )
