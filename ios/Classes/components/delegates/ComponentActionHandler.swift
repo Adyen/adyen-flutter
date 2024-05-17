@@ -15,7 +15,7 @@ class ComponentActionHandler: ActionComponentDelegate {
         self.finalizeCallback = finalizeCallback
     }
     
-    internal func didProvide(_ data: Adyen.ActionComponentData, from _: Adyen.ActionComponent) {
+    internal func didProvide(_ data: ActionComponentData, from _: ActionComponent) {
         do {
             let actionComponentData = ActionComponentDataModel(details: data.details.encodable, paymentData: data.paymentData)
             let actionComponentDataJson = try JSONEncoder().encode(actionComponentData)
@@ -36,11 +36,11 @@ class ComponentActionHandler: ActionComponentDelegate {
         }
     }
 
-    internal func didComplete(from _: Adyen.ActionComponent) {
+    internal func didComplete(from _: ActionComponent) {
         // Only for voucher payment method - currently not supported.
     }
 
-    internal func didFail(with error: Error, from _: Adyen.ActionComponent) {
+    internal func didFail(with error: Error, from _: ActionComponent) {
         finalizeCallback(false) { [weak self] in
             self?.sendErrorToFlutterLayer(error: error)
         }

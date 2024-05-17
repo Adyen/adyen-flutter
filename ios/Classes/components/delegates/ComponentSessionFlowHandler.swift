@@ -35,7 +35,7 @@ class ComponentSessionFlowHandler: AdyenSessionDelegate {
         })
     }
     
-    func didFail(with error: Error, from component: Adyen.Component, session: Adyen.AdyenSession) {
+    func didFail(with error: Error, from component: Component, session: AdyenSession) {
         finalizeCallback?(false, { [weak self] in
             guard let self else { return }
             let componentCommunicationModel = ComponentCommunicationModel(
