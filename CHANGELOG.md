@@ -2,6 +2,7 @@
 
 * Updated iOS SDK to v5.7.1.
 * Updated Android SDK to v5.3.1.
+* Added support for customizing Drop-in and card component.
 
 ## 0.0.3
 
