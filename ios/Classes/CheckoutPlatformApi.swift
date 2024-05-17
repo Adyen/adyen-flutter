@@ -34,21 +34,21 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
             switch configuration {
             case let dropInConfigurationDTO as DropInConfigurationDTO:
                 try createSessionForDropIn(
-                    adyenContext: try dropInConfigurationDTO.createAdyenContext(),
+                    adyenContext: dropInConfigurationDTO.createAdyenContext(),
                     sessionId: sessionId,
                     sessionData: sessionData,
                     completion: completion
                 )
             case let cardComponentConfigurationDTO as CardComponentConfigurationDTO:
                 try createSessionForComponent(
-                    adyenContext: try cardComponentConfigurationDTO.createAdyenContext(),
+                    adyenContext: cardComponentConfigurationDTO.createAdyenContext(),
                     sessionId: sessionId,
                     sessionData: sessionData,
                     completion: completion
                 )
             case let instantComponentConfigurationDTO as InstantPaymentConfigurationDTO:
                 try createSessionForComponent(
-                    adyenContext: try instantComponentConfigurationDTO.createAdyenContext(),
+                    adyenContext: instantComponentConfigurationDTO.createAdyenContext(),
                     sessionId: sessionId,
                     sessionData: sessionData,
                     completion: completion
