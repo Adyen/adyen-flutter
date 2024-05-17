@@ -107,7 +107,7 @@ extension DropInConfigurationDTO {
 
 extension CardConfigurationDTO {
     func mapToCardComponentConfiguration(shopperLocale: String?) -> CardComponent.Configuration {
-        var formComponentStyle: FormComponentStyle = AdyenAppearanceLoader.findCardComponentStyle() ?? FormComponentStyle()
+        var formComponentStyle = AdyenAppearanceLoader.findCardComponentStyle() ?? FormComponentStyle()
         formComponentStyle.backgroundColor = UIColor.white
         let localizationParameters = shopperLocale != nil ? LocalizationParameters(enforcedLocale: shopperLocale!) : nil
         let koreanAuthenticationMode = kcpFieldVisibility.toCardFieldVisibility()
