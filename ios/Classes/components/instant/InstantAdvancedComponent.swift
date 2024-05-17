@@ -67,8 +67,8 @@ class InstantAdvancedComponent: BaseInstantComponent, InstantComponentProtocol {
     
     private func onFinish(paymentEventDTO: PaymentEventDTO) {
         let resultCode = ResultCode(rawValue: paymentEventDTO.result ?? "")
-        let success = resultCode == .authorised || resultCode == .received || resultCode == .pending
-        finalizeCallback(success: success, completion: { [weak self] in
+        let isAccepted = resultCode?.isAccepted ?? false
+        finalizeCallback(success: isAccepted, completion: { [weak self] in
             let componentCommunicationModel = ComponentCommunicationModel(
                 type: ComponentCommunicationType.result,
                 componentId: self?.componentId ?? "",

@@ -34,21 +34,21 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
             switch configuration {
             case let dropInConfigurationDTO as DropInConfigurationDTO:
                 try createSessionForDropIn(
-                    configuration: dropInConfigurationDTO,
+                    adyenContext: try dropInConfigurationDTO.createAdyenContext(),
                     sessionId: sessionId,
                     sessionData: sessionData,
                     completion: completion
                 )
             case let cardComponentConfigurationDTO as CardComponentConfigurationDTO:
-                try createSessionForCardComponent(
-                    configuration: cardComponentConfigurationDTO,
+                try createSessionForComponent(
+                    adyenContext: try cardComponentConfigurationDTO.createAdyenContext(),
                     sessionId: sessionId,
                     sessionData: sessionData,
                     completion: completion
                 )
             case let instantComponentConfigurationDTO as InstantPaymentConfigurationDTO:
-                try createSessionForInstantPaymentConfiguration(
-                    configuration: instantComponentConfigurationDTO,
+                try createSessionForComponent(
+                    adyenContext: try instantComponentConfigurationDTO.createAdyenContext(),
                     sessionId: sessionId,
                     sessionData: sessionData,
                     completion: completion
@@ -80,14 +80,13 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
     }
 
     private func createSessionForDropIn(
-        configuration: DropInConfigurationDTO,
+        adyenContext: AdyenContext,
         sessionId: String,
         sessionData: String,
         completion: @escaping (Result<SessionDTO, Error>) -> Void
     ) throws {
-        let adyenContext = try configuration.createAdyenContext()
         let sessionDelegate = DropInSessionsDelegate(viewController: getViewController(), dropInFlutterApi: dropInFlutterApi)
-        requestAndSetSession(
+        try requestAndSetSession(
             adyenContext: adyenContext,
             sessionId: sessionId,
             sessionData: sessionData,
@@ -96,32 +95,14 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
         )
     }
 
-    private func createSessionForCardComponent(
-        configuration: CardComponentConfigurationDTO,
+    private func createSessionForComponent(
+        adyenContext: AdyenContext,
         sessionId: String,
         sessionData: String,
         completion: @escaping (Result<SessionDTO, Error>) -> Void
     ) throws {
-        let adyenContext = try configuration.createAdyenContext()
         let sessionDelegate = ComponentSessionFlowHandler(componentFlutterApi: componentFlutterApi)
-        requestAndSetSession(
-            adyenContext: adyenContext,
-            sessionId: sessionId,
-            sessionData: sessionData,
-            sessionDelegate: sessionDelegate,
-            completion: completion
-        )
-    }
-    
-    private func createSessionForInstantPaymentConfiguration(
-        configuration: InstantPaymentConfigurationDTO,
-        sessionId: String,
-        sessionData: String,
-        completion: @escaping (Result<SessionDTO, Error>) -> Void
-    ) throws {
-        let adyenContext = try configuration.createAdyenContext()
-        let sessionDelegate = ComponentSessionFlowHandler(componentFlutterApi: componentFlutterApi)
-        requestAndSetSession(
+        try requestAndSetSession(
             adyenContext: adyenContext,
             sessionId: sessionId,
             sessionData: sessionData,
@@ -136,7 +117,11 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
         sessionData: String,
         sessionDelegate: AdyenSessionDelegate,
         completion: @escaping (Result<SessionDTO, Error>) -> Void
-    ) {
+    ) throws {
+        guard let presentationDelegate = getViewController() else {
+            throw PlatformError(errorDescription: "Host view controller not available.")
+        }
+        
         let sessionConfiguration = AdyenSession.Configuration(
             sessionIdentifier: sessionId,
             initialSessionData: sessionData,
@@ -146,7 +131,7 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
         AdyenSession.initialize(
             with: sessionConfiguration,
             delegate: sessionDelegate,
-            presentationDelegate: getViewController()!
+            presentationDelegate: presentationDelegate
         ) { [weak self] result in
             do {
                 switch result {

@@ -10,7 +10,7 @@ class ConfigurationMapper {
         )
         
         dropInConfiguration.paymentMethodsList.allowDisablingStoredPaymentMethods =
-        dropInConfigurationDTO.isRemoveStoredPaymentMethodEnabled
+            dropInConfigurationDTO.isRemoveStoredPaymentMethodEnabled
         
         if let cardConfigurationDTO = dropInConfigurationDTO.cardConfigurationDTO {
             let koreanAuthenticationMode = cardConfigurationDTO.kcpFieldVisibility.toCardFieldVisibility()
@@ -263,6 +263,17 @@ extension PaymentResultEnum {
             .cancelledByUser
         } else {
             .error
+        }
+    }
+}
+
+extension ResultCode {
+    var isAccepted: Bool {
+        switch self {
+        case .authorised, .received, .pending:
+            return true
+        case .refused, .cancelled, .error, .redirectShopper, .identifyShopper, .challengeShopper, .presentToShopper:
+            return false
         }
     }
 }

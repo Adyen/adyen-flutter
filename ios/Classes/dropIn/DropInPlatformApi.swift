@@ -128,8 +128,8 @@ class DropInPlatformApi: DropInPlatformInterface {
 
     private func onDropInResultFinished(paymentEventDTO: PaymentEventDTO) {
         let resultCode = ResultCode(rawValue: paymentEventDTO.result ?? "")
-        let success = resultCode == .authorised || resultCode == .received || resultCode == .pending
-        finalizeAndDismiss(success: success, completion: { [weak self] in
+        let isAccepted = resultCode?.isAccepted ?? false
+        finalizeAndDismiss(success: isAccepted, completion: { [weak self] in
             let paymentResult = PaymentResultDTO(
                 type: PaymentResultEnum.finished,
                 result: PaymentResultModelDTO(
