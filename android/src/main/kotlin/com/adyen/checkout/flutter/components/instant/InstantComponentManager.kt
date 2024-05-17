@@ -17,6 +17,7 @@ import com.adyen.checkout.instant.InstantPaymentComponent
 import com.adyen.checkout.sessions.core.CheckoutSession
 import com.adyen.checkout.sessions.core.SessionSetupResponse
 import org.json.JSONObject
+import java.util.UUID
 
 class InstantComponentManager(
     private val activity: FragmentActivity,
@@ -33,7 +34,25 @@ class InstantComponentManager(
     ): InstantPaymentComponent {
         val paymentMethod = PaymentMethod.SERIALIZER.deserialize(JSONObject(encodedPaymentMethod))
         val configuration = instantPaymentConfigurationDTO.mapToCheckoutConfiguration()
-        val instantPaymentComponent = createInstantPaymentComponent(configuration, paymentMethod, componentId)
+        val instantPaymentComponent =
+            when (componentId) {
+                Constants.INSTANT_ADVANCED_COMPONENT_KEY ->
+                    createInstantAdvancedComponent(
+                        configuration,
+                        paymentMethod,
+                        componentId
+                    )
+
+                Constants.INSTANT_SESSION_COMPONENT_KEY ->
+                    createInstantSessionComponent(
+                        configuration,
+                        paymentMethod,
+                        componentId
+                    )
+
+                else -> throw IllegalStateException("Instant component not available for payment flow.")
+            }
+
         this.instantPaymentComponent = instantPaymentComponent
         this.componentId = componentId
         showLoadingBottomSheet(instantPaymentComponent)
@@ -44,20 +63,6 @@ class InstantComponentManager(
         if (componentId == this.componentId) {
             instantPaymentComponent = null
         }
-    }
-
-    private fun createInstantPaymentComponent(
-        configuration: CheckoutConfiguration,
-        paymentMethod: PaymentMethod,
-        componentId: String,
-    ): InstantPaymentComponent {
-        if (componentId.contains(Constants.INSTANT_ADVANCED_COMPONENT_KEY)) {
-            return createInstantAdvancedComponent(configuration, paymentMethod, componentId)
-        } else if (componentId.contains(Constants.INSTANT_SESSION_COMPONENT_KEY)) {
-            return createInstantSessionComponent(configuration, paymentMethod, componentId)
-        }
-
-        throw IllegalStateException("Instant component not available for payment flow.")
     }
 
     private fun createInstantAdvancedComponent(
@@ -75,7 +80,7 @@ class InstantComponentManager(
                     componentId,
                     ::hideLoadingBottomSheet
                 ),
-            key = componentId
+            key = UUID.randomUUID().toString()
         )
     }
 
@@ -105,7 +110,7 @@ class InstantComponentManager(
                     ::handleAction,
                     ::hideLoadingBottomSheet
                 ),
-            key = componentId
+            key = UUID.randomUUID().toString()
         )
     }
 

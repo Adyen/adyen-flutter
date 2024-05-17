@@ -1,15 +1,21 @@
 import Adyen
 
-class CardAdvancedFlowActionComponentDelegate: ActionComponentDelegate {
+class ComponentActionHandler: ActionComponentDelegate {
     private let componentFlutterApi: ComponentFlutterInterface
     private let componentId: String
-
-    init(componentFlutterApi: ComponentFlutterInterface, componentId: String) {
+    private let finalizeCallback: (Bool, @escaping (() -> Void)) -> Void
+    
+    init(
+        componentFlutterApi: ComponentFlutterInterface,
+        componentId: String,
+        finalizeCallback: @escaping ((Bool, @escaping (() -> Void)) -> Void)
+    ) {
         self.componentFlutterApi = componentFlutterApi
         self.componentId = componentId
+        self.finalizeCallback = finalizeCallback
     }
-
-    func didProvide(_ data: Adyen.ActionComponentData, from _: Adyen.ActionComponent) {
+    
+    internal func didProvide(_ data: ActionComponentData, from _: ActionComponent) {
         do {
             let actionComponentData = ActionComponentDataModel(details: data.details.encodable, paymentData: data.paymentData)
             let actionComponentDataJson = try JSONEncoder().encode(actionComponentData)
@@ -24,24 +30,28 @@ class CardAdvancedFlowActionComponentDelegate: ActionComponentDelegate {
                 completion: { _ in }
             )
         } catch {
-            sendErrorToFlutterLayer(error: error)
+            finalizeCallback(false) { [weak self] in
+                self?.sendErrorToFlutterLayer(error: error)
+            }
         }
     }
 
-    func didComplete(from _: Adyen.ActionComponent) {
+    internal func didComplete(from _: ActionComponent) {
         // Only for voucher payment method - currently not supported.
     }
 
-    func didFail(with error: Error, from _: Adyen.ActionComponent) {
-        sendErrorToFlutterLayer(error: error)
+    internal func didFail(with error: Error, from _: ActionComponent) {
+        finalizeCallback(false) { [weak self] in
+            self?.sendErrorToFlutterLayer(error: error)
+        }
     }
-
+    
     private func sendErrorToFlutterLayer(error: Error) {
         let componentCommunicationModel = ComponentCommunicationModel(
             type: ComponentCommunicationType.result,
             componentId: componentId,
             paymentResult: PaymentResultDTO(
-                type: PaymentResultEnum.error,
+                type: .from(error: error),
                 reason: error.localizedDescription
             )
         )

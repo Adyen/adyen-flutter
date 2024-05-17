@@ -5,10 +5,10 @@ import 'package:adyen_checkout/src/generated/platform_api.g.dart';
 class InstantSessionComponent extends BaseInstantComponent {
   final SessionCheckout sessionCheckout;
 
-  InstantSessionComponent({
-    required super.componentId,
-    required this.sessionCheckout,
-  });
+  @override
+  final String componentId = "INSTANT_SESSION_COMPONENT";
+
+  InstantSessionComponent({required this.sessionCheckout});
 
   @override
   void handleComponentCommunication(ComponentCommunicationModel event) {

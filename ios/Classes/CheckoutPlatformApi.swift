@@ -31,25 +31,24 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
         completion: @escaping (Result<SessionDTO, Error>) -> Void
     ) {
         do {
-            // TODO: Let's plan a generic configuration mapping for creating a session.
             switch configuration {
             case let dropInConfigurationDTO as DropInConfigurationDTO:
                 try createSessionForDropIn(
-                    configuration: dropInConfigurationDTO,
+                    adyenContext: dropInConfigurationDTO.createAdyenContext(),
                     sessionId: sessionId,
                     sessionData: sessionData,
                     completion: completion
                 )
             case let cardComponentConfigurationDTO as CardComponentConfigurationDTO:
-                try createSessionForCardComponent(
-                    configuration: cardComponentConfigurationDTO,
+                try createSessionForComponent(
+                    adyenContext: cardComponentConfigurationDTO.createAdyenContext(),
                     sessionId: sessionId,
                     sessionData: sessionData,
                     completion: completion
                 )
             case let instantComponentConfigurationDTO as InstantPaymentConfigurationDTO:
-                try createSessionForInstantPaymentConfiguration(
-                    configuration: instantComponentConfigurationDTO,
+                try createSessionForComponent(
+                    adyenContext: instantComponentConfigurationDTO.createAdyenContext(),
                     sessionId: sessionId,
                     sessionData: sessionData,
                     completion: completion
@@ -81,58 +80,33 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
     }
 
     private func createSessionForDropIn(
-        configuration: DropInConfigurationDTO,
+        adyenContext: AdyenContext,
         sessionId: String,
         sessionData: String,
         completion: @escaping (Result<SessionDTO, Error>) -> Void
     ) throws {
-        let adyenContext = try configuration.createAdyenContext()
         let sessionDelegate = DropInSessionsDelegate(viewController: getViewController(), dropInFlutterApi: dropInFlutterApi)
-        let sessionPresentationDelegate = DropInSessionsPresentationDelegate()
-        requestAndSetSession(
+        try requestAndSetSession(
             adyenContext: adyenContext,
             sessionId: sessionId,
             sessionData: sessionData,
             sessionDelegate: sessionDelegate,
-            sessionPresentationDelegate: sessionPresentationDelegate,
             completion: completion
         )
     }
 
-    private func createSessionForCardComponent(
-        configuration: CardComponentConfigurationDTO,
+    private func createSessionForComponent(
+        adyenContext: AdyenContext,
         sessionId: String,
         sessionData: String,
         completion: @escaping (Result<SessionDTO, Error>) -> Void
     ) throws {
-        let adyenContext = try configuration.createAdyenContext()
-        let sessionDelegate = ComponentSessionFlowDelegate(componentFlutterApi: componentFlutterApi)
-        let sessionPresentationDelegate = ComponentPresentationDelegate(topViewController: getViewController())
-        requestAndSetSession(
+        let sessionDelegate = ComponentSessionFlowHandler(componentFlutterApi: componentFlutterApi)
+        try requestAndSetSession(
             adyenContext: adyenContext,
             sessionId: sessionId,
             sessionData: sessionData,
             sessionDelegate: sessionDelegate,
-            sessionPresentationDelegate: sessionPresentationDelegate,
-            completion: completion
-        )
-    }
-    
-    private func createSessionForInstantPaymentConfiguration(
-        configuration: InstantPaymentConfigurationDTO,
-        sessionId: String,
-        sessionData: String,
-        completion: @escaping (Result<SessionDTO, Error>) -> Void
-    ) throws {
-        let adyenContext = try configuration.createAdyenContext()
-        let sessionDelegate = ComponentSessionFlowDelegate(componentFlutterApi: componentFlutterApi)
-        let applePayPresentationDelegate = ComponentPresentationDelegate(topViewController: getViewController())
-        requestAndSetSession(
-            adyenContext: adyenContext,
-            sessionId: sessionId,
-            sessionData: sessionData,
-            sessionDelegate: sessionDelegate,
-            sessionPresentationDelegate: applePayPresentationDelegate,
             completion: completion
         )
     }
@@ -142,9 +116,12 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
         sessionId: String,
         sessionData: String,
         sessionDelegate: AdyenSessionDelegate,
-        sessionPresentationDelegate: PresentationDelegate,
         completion: @escaping (Result<SessionDTO, Error>) -> Void
-    ) {
+    ) throws {
+        guard let presentationDelegate = getViewController() else {
+            throw PlatformError(errorDescription: "Host view controller not available.")
+        }
+        
         let sessionConfiguration = AdyenSession.Configuration(
             sessionIdentifier: sessionId,
             initialSessionData: sessionData,
@@ -154,14 +131,13 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
         AdyenSession.initialize(
             with: sessionConfiguration,
             delegate: sessionDelegate,
-            presentationDelegate: sessionPresentationDelegate
+            presentationDelegate: presentationDelegate
         ) { [weak self] result in
             do {
                 switch result {
                 case let .success(session):
                     self?.sessionHolder.setup(
                         session: session,
-                        sessionPresentationDelegate: sessionPresentationDelegate,
                         sessionDelegate: sessionDelegate
                     )
                     let encodedPaymentMethods = try JSONEncoder().encode(session.sessionContext.paymentMethods)

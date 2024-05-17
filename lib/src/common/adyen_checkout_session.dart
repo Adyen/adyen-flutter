@@ -6,7 +6,6 @@ import 'package:adyen_checkout/src/drop_in/drop_in.dart';
 import 'package:adyen_checkout/src/generated/platform_api.g.dart';
 import 'package:adyen_checkout/src/util/dto_mapper.dart';
 import 'package:adyen_checkout/src/util/sdk_version_number_provider.dart';
-import 'package:flutter/widgets.dart';
 
 class AdyenCheckoutSession {
   final SdkVersionNumberProvider _sdkVersionNumberProvider =
@@ -80,11 +79,7 @@ class AdyenCheckoutSession {
     required Map<String, dynamic> paymentMethodResponse,
     required SessionCheckout checkout,
   }) async {
-    final componentId = "INSTANT_SESSION_COMPONENT_${UniqueKey().toString()}";
-    return await InstantSessionComponent(
-      componentId: componentId,
-      sessionCheckout: checkout,
-    ).start(
+    return await InstantSessionComponent(sessionCheckout: checkout).start(
       configuration,
       paymentMethodResponse,
     );

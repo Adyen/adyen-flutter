@@ -8,10 +8,10 @@ class ConfigurationMapper {
             allowsSkippingPaymentList: dropInConfigurationDTO.skipListWhenSinglePaymentMethod,
             allowPreselectedPaymentView: dropInConfigurationDTO.showPreselectedStoredPaymentMethod
         )
-
+        
         dropInConfiguration.paymentMethodsList.allowDisablingStoredPaymentMethods =
             dropInConfigurationDTO.isRemoveStoredPaymentMethodEnabled
-
+        
         if let cardConfigurationDTO = dropInConfigurationDTO.cardConfigurationDTO {
             let koreanAuthenticationMode = cardConfigurationDTO.kcpFieldVisibility.toCardFieldVisibility()
             let socialSecurityNumberMode = cardConfigurationDTO.socialSecurityNumberFieldVisibility.toCardFieldVisibility()
@@ -33,35 +33,35 @@ class ConfigurationMapper {
             }
             dropInConfiguration.card = cardConfiguration
         }
-
+        
         if let applePayConfigurationDTO = dropInConfigurationDTO.applePayConfigurationDTO {
             dropInConfiguration.applePay = try applePayConfigurationDTO.toApplePayConfiguration(
                 amount: dropInConfigurationDTO.amount,
                 countryCode: dropInConfigurationDTO.countryCode
             )
         }
-
+        
         if let cashAppPayConfigurationDTO = dropInConfigurationDTO.cashAppPayConfigurationDTO {
             dropInConfiguration.cashAppPay = DropInComponent.CashAppPay(redirectURL: URL(string: cashAppPayConfigurationDTO.returnUrl)!)
         }
-
+        
         return dropInConfiguration
     }
-
+    
     private func createStoredCardConfiguration(showCvcForStoredCard: Bool) -> StoredCardConfiguration {
         var storedCardConfiguration = StoredCardConfiguration()
         storedCardConfiguration.showsSecurityCodeField = showCvcForStoredCard
         return storedCardConfiguration
     }
-
+    
     private func determineAllowedCardTypes(cardTypes: [String?]?) -> [CardType]? {
         guard let mappedCardTypes = cardTypes, !mappedCardTypes.isEmpty else {
             return nil
         }
-
+        
         return mappedCardTypes.compactMap { $0 }.map { CardType(rawValue: $0.lowercased()) }
     }
-
+    
     private func determineBillingAddressConfiguration(addressMode: AddressMode?) -> BillingAddressConfiguration {
         var billingAddressConfiguration = BillingAddressConfiguration()
         switch addressMode {
@@ -74,10 +74,10 @@ class ConfigurationMapper {
         default:
             billingAddressConfiguration.mode = CardComponent.AddressFormType.none
         }
-
+        
         return billingAddressConfiguration
     }
-
+    
 }
 
 extension FieldVisibility {
@@ -126,21 +126,21 @@ extension CardConfigurationDTO {
             billingAddress: billingAddressConfiguration
         )
     }
-
+    
     private func createStoredCardConfiguration(showCvcForStoredCard: Bool) -> StoredCardConfiguration {
         var storedCardConfiguration = StoredCardConfiguration()
         storedCardConfiguration.showsSecurityCodeField = showCvcForStoredCard
         return storedCardConfiguration
     }
-
+    
     private func determineAllowedCardTypes(cardTypes: [String?]?) -> [CardType]? {
         guard let mappedCardTypes = cardTypes, !mappedCardTypes.isEmpty else {
             return nil
         }
-
+        
         return mappedCardTypes.compactMap { $0 }.map { CardType(rawValue: $0.lowercased()) }
     }
-
+    
     private func determineBillingAddressConfiguration(addressMode: AddressMode?) -> BillingAddressConfiguration {
         var billingAddressConfiguration = BillingAddressConfiguration()
         switch addressMode {
@@ -153,7 +153,7 @@ extension CardConfigurationDTO {
         default:
             billingAddressConfiguration.mode = CardComponent.AddressFormType.none
         }
-
+        
         return billingAddressConfiguration
     }
 }
@@ -254,5 +254,26 @@ extension EncryptedCard {
             encryptedExpiryYear: expiryYear,
             encryptedSecurityCode: securityCode
         )
+    }
+}
+
+extension PaymentResultEnum {
+    static func from(error: Error) -> Self {
+        if let componentError = (error as? ComponentError), componentError == ComponentError.cancelled {
+            .cancelledByUser
+        } else {
+            .error
+        }
+    }
+}
+
+extension ResultCode {
+    var isAccepted: Bool {
+        switch self {
+        case .authorised, .received, .pending:
+            return true
+        case .refused, .cancelled, .error, .redirectShopper, .identifyShopper, .challengeShopper, .presentToShopper:
+            return false
+        }
     }
 }

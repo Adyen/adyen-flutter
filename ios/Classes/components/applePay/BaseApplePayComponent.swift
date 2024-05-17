@@ -1,6 +1,6 @@
 @_spi(AdyenInternal) import Adyen
 
-class BaseApplePayComponentWrapper {
+class BaseApplePayComponent {
     var applePayComponent: ApplePayComponent?
 
     func present() {

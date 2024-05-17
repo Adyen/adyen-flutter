@@ -1,6 +1,6 @@
 @_spi(AdyenInternal) import Adyen
 
-class ApplePayAdvancedComponentWrapper: BaseApplePayComponentWrapper {
+class ApplePayAdvancedComponent: BaseApplePayComponent {
     private let componentFlutterApi: ComponentFlutterInterface
     private let configuration: ApplePayComponent.Configuration
     private let adyenContext: AdyenContext
@@ -93,7 +93,7 @@ class ApplePayAdvancedComponentWrapper: BaseApplePayComponentWrapper {
     }
 }
 
-extension ApplePayAdvancedComponentWrapper: PaymentComponentDelegate {
+extension ApplePayAdvancedComponent: PaymentComponentDelegate {
 
     internal func didSubmit(_ data: PaymentComponentData, from component: PaymentComponent) {
         do {
@@ -126,17 +126,11 @@ extension ApplePayAdvancedComponentWrapper: PaymentComponentDelegate {
     }
     
     private func sendErrorToFlutterLayer(error: Error) {
-        let type: PaymentResultEnum
-        if let componentError = (error as? ComponentError), componentError == ComponentError.cancelled {
-            type = PaymentResultEnum.cancelledByUser
-        } else {
-            type = PaymentResultEnum.error
-        }
         let componentCommunicationModel = ComponentCommunicationModel(
             type: ComponentCommunicationType.result,
             componentId: componentId,
             paymentResult: PaymentResultDTO(
-                type: type,
+                type: .from(error: error),
                 reason: error.localizedDescription
             )
         )
