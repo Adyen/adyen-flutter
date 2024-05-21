@@ -11,7 +11,7 @@ class DropInPlatformApi: DropInPlatformInterface {
     private var dropInSessionStoredPaymentMethodsDelegate: DropInSessionsStoredPaymentMethodsDelegate?
     private var dropInAdvancedFlowDelegate: DropInAdvancedFlowDelegate?
     private var dropInAdvancedFlowStoredPaymentMethodsDelegate: DropInAdvancedFlowStoredPaymentMethodsDelegate?
-    var dropInComponent: DropInComponent?
+    private var dropInComponent: DropInComponent?
 
     init(
         dropInFlutterApi: DropInFlutterInterface,
@@ -37,7 +37,8 @@ class DropInPlatformApi: DropInPlatformInterface {
             let dropInComponent = DropInComponent(
                 paymentMethods: sessionHolder.session!.sessionContext.paymentMethods,
                 context: adyenContext,
-                configuration: dropInConfiguration
+                configuration: dropInConfiguration,
+                title: dropInConfigurationDTO.preselectedPaymentMethodTitle
             )
             dropInComponent.delegate = sessionHolder.session
             dropInComponent.partialPaymentDelegate = sessionHolder.session
@@ -64,7 +65,8 @@ class DropInPlatformApi: DropInPlatformInterface {
             let dropInComponent = DropInComponent(
                 paymentMethods: paymentMethodsWithoutGiftCards,
                 context: adyenContext,
-                configuration: configuration
+                configuration: configuration,
+                title: dropInConfigurationDTO.preselectedPaymentMethodTitle
             )
             dropInAdvancedFlowDelegate = DropInAdvancedFlowDelegate(dropInFlutterApi: dropInFlutterApi)
             dropInAdvancedFlowDelegate?.dropInInteractorDelegate = self
