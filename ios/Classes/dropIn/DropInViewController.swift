@@ -17,7 +17,6 @@ class DropInViewController: UIViewController {
             return
         }
         
-        view.isUserInteractionEnabled = false
         present(dropInComponent.viewController, animated: true)
     }
 }
