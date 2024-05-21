@@ -27,7 +27,7 @@ extension DropInConfigurationMapper on DropInConfiguration {
                 ?.showPreselectedStoredPaymentMethod ??
             true,
         skipListWhenSinglePaymentMethod: skipListWhenSinglePaymentMethod,
-        title: title,
+        preselectedPaymentMethodTitle: preselectedPaymentMethodTitle,
       );
 
   bool _isRemoveStoredPaymentMethodEnabled(
