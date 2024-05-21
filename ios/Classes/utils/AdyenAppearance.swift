@@ -17,6 +17,18 @@ public protocol AdyenComponentAppearanceProvider: AnyObject {
     static func createCardComponentStyle() -> Adyen.FormComponentStyle
 }
 
+extension AdyenDropInAppearanceProvider {
+    static func createDropInStyle() -> Adyen.DropInComponent.Style {
+        DropInComponent.Style()
+    }
+}
+
+extension AdyenComponentAppearanceProvider {
+    static func createCardComponentStyle() -> Adyen.FormComponentStyle {
+        FormComponentStyle()
+    }
+}
+
 internal class AdyenAppearanceLoader: NSObject {
     private static let expectedClassName = "AdyenAppearance"
     private static let bundleExecutableKey = "CFBundleExecutable"

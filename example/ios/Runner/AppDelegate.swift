@@ -28,7 +28,7 @@ class AdyenAppearance: AdyenComponentAppearanceProvider, AdyenDropInAppearancePr
     }
 
     static func createCardComponentStyle() -> Adyen.FormComponentStyle {
-        var style = FormComponentStyle()
+        var style = Adyen.FormComponentStyle()
         style.mainButtonItem.button.backgroundColor = .black
         style.mainButtonItem.button.title.color = .white
         return style
