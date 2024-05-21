@@ -2,7 +2,6 @@ import 'package:adyen_checkout/adyen_checkout.dart';
 import 'package:adyen_checkout/src/common/adyen_checkout_api.dart';
 import 'package:adyen_checkout/src/components/instant/instant_advanced_component.dart';
 import 'package:adyen_checkout/src/drop_in/drop_in.dart';
-import 'package:flutter/widgets.dart';
 
 class AdyenCheckoutAdvanced {
   final AdyenCheckoutApi adyenCheckoutApi;
@@ -36,11 +35,7 @@ class AdyenCheckoutAdvanced {
     required Map<String, dynamic> paymentMethodResponse,
     required AdvancedCheckoutPreview checkout,
   }) async {
-    final componentId = "INSTANT_ADVANCED_COMPONENT_${UniqueKey().toString()}";
-    return await InstantAdvancedComponent(
-      componentId: componentId,
-      advancedCheckout: checkout,
-    ).start(
+    return await InstantAdvancedComponent(advancedCheckout: checkout).start(
       configuration,
       paymentMethodResponse,
     );

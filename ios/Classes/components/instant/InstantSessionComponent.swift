@@ -1,6 +1,6 @@
 import Adyen
 
-class InstantSessionComponent: BaseInstantComponent {
+class InstantSessionComponent: BaseInstantComponent, InstantComponentProtocol {
     private let sessionHolder: SessionHolder
     
     init(
@@ -21,9 +21,9 @@ class InstantSessionComponent: BaseInstantComponent {
                 throw PlatformError(errorDescription: "The provided session identifier or data is invalid.")
             }
             
-            let componentSessionFlowDelegate = sessionHolder.sessionDelegate as? ComponentSessionFlowDelegate
-            componentSessionFlowDelegate?.componentId = componentId
-            componentSessionFlowDelegate?.finalizeAndDismissHandler = finalizeAndDismissComponent
+            let componentSessionFlowHandler = sessionHolder.sessionDelegate as? ComponentSessionFlowHandler
+            componentSessionFlowHandler?.componentId = componentId
+            componentSessionFlowHandler?.finalizeCallback = finalizeCallback
             let component = InstantPaymentComponent(paymentMethod: paymentMethod, context: adyenContext, order: nil)
             component.delegate = session
             return component
@@ -33,7 +33,7 @@ class InstantSessionComponent: BaseInstantComponent {
         }
     }
     
-    override func finalizeAndDismissComponent(success: Bool, completion: @escaping (() -> Void)) {
+    func finalizeCallback(success: Bool, completion: @escaping (() -> Void)) {
         instantPaymentComponent?.finalizeIfNeeded(with: success) { [weak self] in
             guard let self else { return }
             getViewController()?.dismiss(animated: true) {
@@ -45,8 +45,8 @@ class InstantSessionComponent: BaseInstantComponent {
             }
         }
     }
-    
-    override func onDispose() {
+   
+    func onDispose() {
         instantPaymentComponent = nil
     }
 }

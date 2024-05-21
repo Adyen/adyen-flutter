@@ -1,9 +1,8 @@
 import Adyen
 
-class InstantAdvancedComponent: BaseInstantComponent {
+class InstantAdvancedComponent: BaseInstantComponent, InstantComponentProtocol {
     private var actionComponent: AdyenActionComponent?
-    private var actionComponentDelegate: ComponentActionDelegate?
-    private var componentPresentationDelegate: ComponentPresentationDelegate?
+    private var actionComponentHandler: ComponentActionHandler?
     
     init(
         componentFlutterApi: ComponentFlutterInterface,
@@ -19,15 +18,29 @@ class InstantAdvancedComponent: BaseInstantComponent {
         let component = InstantPaymentComponent(paymentMethod: paymentMethod, context: adyenContext, order: nil)
         component.delegate = self
         actionComponent = AdyenActionComponent(context: adyenContext)
-        actionComponentDelegate = ComponentActionDelegate(
+        actionComponentHandler = ComponentActionHandler(
             componentFlutterApi: componentFlutterApi,
             componentId: componentId,
-            finalizeAndDismissComponent: finalizeAndDismissComponent(success:completion:)
+            finalizeCallback: finalizeCallback(success:completion:)
         )
-        actionComponent?.delegate = actionComponentDelegate
-        componentPresentationDelegate = ComponentPresentationDelegate(topViewController: getViewController())
-        actionComponent?.presentationDelegate = componentPresentationDelegate
+        actionComponent?.delegate = actionComponentHandler
+        actionComponent?.presentationDelegate = getViewController()
         return component
+    }
+    
+    func finalizeCallback(success: Bool, completion: @escaping (() -> Void)) {
+        instantPaymentComponent?.finalizeIfNeeded(with: success) { [weak self] in
+            self?.getViewController()?.dismiss(animated: true) {
+                self?.hideActivityIndicator()
+                completion()
+            }
+        }
+    }
+    
+    func onDispose() {
+        actionComponentHandler = nil
+        actionComponent = nil
+        instantPaymentComponent = nil
     }
     
     func handlePaymentEvent(paymentEventDTO: PaymentEventDTO) {
@@ -39,22 +52,6 @@ class InstantAdvancedComponent: BaseInstantComponent {
         case .action:
             onAction(paymentEventDTO: paymentEventDTO)
         }
-    }
-    
-    override func finalizeAndDismissComponent(success: Bool, completion: @escaping (() -> Void)) {
-        instantPaymentComponent?.finalizeIfNeeded(with: success) { [weak self] in
-            self?.getViewController()?.dismiss(animated: true) {
-                self?.hideActivityIndicator()
-                completion()
-            }
-        }
-    }
-    
-    override func onDispose() {
-        actionComponentDelegate = nil
-        actionComponent = nil
-        componentPresentationDelegate = nil
-        instantPaymentComponent = nil
     }
     
     private func onAction(paymentEventDTO: PaymentEventDTO) {
@@ -70,8 +67,8 @@ class InstantAdvancedComponent: BaseInstantComponent {
     
     private func onFinish(paymentEventDTO: PaymentEventDTO) {
         let resultCode = ResultCode(rawValue: paymentEventDTO.result ?? "")
-        let success = resultCode == .authorised || resultCode == .received || resultCode == .pending
-        finalizeAndDismissComponent(success: success, completion: { [weak self] in
+        let isAccepted = resultCode?.isAccepted ?? false
+        finalizeCallback(success: isAccepted, completion: { [weak self] in
             let componentCommunicationModel = ComponentCommunicationModel(
                 type: ComponentCommunicationType.result,
                 componentId: self?.componentId ?? "",
@@ -88,7 +85,7 @@ class InstantAdvancedComponent: BaseInstantComponent {
     }
     
     private func onError(paymentEventDTO: PaymentEventDTO) {
-        finalizeAndDismissComponent(success: false, completion: { [weak self] in
+        finalizeCallback(success: false, completion: { [weak self] in
             guard let self else { return }
             let errorMessage = paymentEventDTO.error?.errorMessage
             let componentCommunicationModel = ComponentCommunicationModel(
@@ -122,14 +119,14 @@ extension InstantAdvancedComponent: PaymentComponentDelegate {
                 completion: { _ in }
             )
         } catch {
-            finalizeAndDismissComponent(success: false, completion: { [weak self] in
+            finalizeCallback(success: false, completion: { [weak self] in
                 self?.sendErrorToFlutterLayer(error: error)
             })
         }
     }
 
     internal func didFail(with error: Error, from component: PaymentComponent) {
-        finalizeAndDismissComponent(success: false, completion: { [weak self] in
+        finalizeCallback(success: false, completion: { [weak self] in
             self?.sendErrorToFlutterLayer(error: error)
         })
     }

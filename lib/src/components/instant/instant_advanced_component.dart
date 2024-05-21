@@ -11,8 +11,10 @@ class InstantAdvancedComponent extends BaseInstantComponent {
   final AdvancedCheckoutPreview advancedCheckout;
   final PaymentEventHandler paymentEventHandler;
 
+  @override
+  final String componentId = "INSTANT_ADVANCED_COMPONENT";
+
   InstantAdvancedComponent({
-    required super.componentId,
     required this.advancedCheckout,
     PaymentEventHandler? paymentEventHandler,
   }) : paymentEventHandler = paymentEventHandler ?? PaymentEventHandler();

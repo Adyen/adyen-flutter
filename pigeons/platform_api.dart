@@ -148,6 +148,7 @@ class DropInConfigurationDTO {
   final bool showPreselectedStoredPaymentMethod;
   final bool skipListWhenSinglePaymentMethod;
   final bool isRemoveStoredPaymentMethodEnabled;
+  final String? preselectedPaymentMethodTitle;
 
   DropInConfigurationDTO(
     this.environment,
@@ -163,6 +164,7 @@ class DropInConfigurationDTO {
     this.showPreselectedStoredPaymentMethod,
     this.skipListWhenSinglePaymentMethod,
     this.isRemoveStoredPaymentMethodEnabled,
+    this.preselectedPaymentMethodTitle,
   );
 }
 

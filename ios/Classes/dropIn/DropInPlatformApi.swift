@@ -11,8 +11,8 @@ class DropInPlatformApi: DropInPlatformInterface {
     private var dropInSessionStoredPaymentMethodsDelegate: DropInSessionsStoredPaymentMethodsDelegate?
     private var dropInAdvancedFlowDelegate: DropInAdvancedFlowDelegate?
     private var dropInAdvancedFlowStoredPaymentMethodsDelegate: DropInAdvancedFlowStoredPaymentMethodsDelegate?
-    var dropInComponent: DropInComponent?
-    
+    private var dropInComponent: DropInComponent?
+
     private let dropInViewController = DropInViewController()
 
     init(
@@ -39,7 +39,8 @@ class DropInPlatformApi: DropInPlatformInterface {
             let dropInComponent = DropInComponent(
                 paymentMethods: sessionHolder.session!.sessionContext.paymentMethods,
                 context: adyenContext,
-                configuration: dropInConfiguration
+                configuration: dropInConfiguration,
+                title: dropInConfigurationDTO.preselectedPaymentMethodTitle
             )
             dropInComponent.delegate = sessionHolder.session
             dropInComponent.partialPaymentDelegate = sessionHolder.session
@@ -69,7 +70,8 @@ class DropInPlatformApi: DropInPlatformInterface {
             let dropInComponent = DropInComponent(
                 paymentMethods: paymentMethodsWithoutGiftCards,
                 context: adyenContext,
-                configuration: configuration
+                configuration: configuration,
+                title: dropInConfigurationDTO.preselectedPaymentMethodTitle
             )
             dropInAdvancedFlowDelegate = DropInAdvancedFlowDelegate(dropInFlutterApi: dropInFlutterApi)
             dropInAdvancedFlowDelegate?.dropInInteractorDelegate = self
@@ -83,17 +85,17 @@ class DropInPlatformApi: DropInPlatformInterface {
                 dropInComponent.storedPaymentMethodsDelegate = dropInAdvancedFlowStoredPaymentMethodsDelegate
             }
             self.dropInComponent = dropInComponent
-            
+
             dropInViewController.dropInComponent = dropInComponent
             dropInViewController.modalPresentationStyle = .overCurrentContext
             self.viewController?.present(dropInViewController, animated: false)
-            
+
             /*
              self.viewController?.adyen.topPresenter.present(dropInComponent.viewController, animated: true, completion: {
                  let rootViewController = UIApplication.shared.adyen.mainKeyWindow?.rootViewController
                  let vc = rootViewController?.presentedViewController?.children.first
                  vc?.view?.backgroundColor = UIColor.red
-                
+
              })
               */
         } catch {
@@ -145,8 +147,8 @@ class DropInPlatformApi: DropInPlatformInterface {
 
     private func onDropInResultFinished(paymentEventDTO: PaymentEventDTO) {
         let resultCode = ResultCode(rawValue: paymentEventDTO.result ?? "")
-        let success = resultCode == .authorised || resultCode == .received || resultCode == .pending
-        finalizeAndDismiss(success: success, completion: { [weak self] in
+        let isAccepted = resultCode?.isAccepted ?? false
+        finalizeAndDismiss(success: isAccepted, completion: { [weak self] in
             let paymentResult = PaymentResultDTO(
                 type: PaymentResultEnum.finished,
                 result: PaymentResultModelDTO(

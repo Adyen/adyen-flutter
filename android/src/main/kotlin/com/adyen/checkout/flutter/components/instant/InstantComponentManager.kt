@@ -17,6 +17,7 @@ import com.adyen.checkout.instant.InstantPaymentComponent
 import com.adyen.checkout.sessions.core.CheckoutSession
 import com.adyen.checkout.sessions.core.SessionSetupResponse
 import org.json.JSONObject
+import java.util.UUID
 
 class InstantComponentManager(
     private val activity: FragmentActivity,
@@ -34,15 +35,15 @@ class InstantComponentManager(
         val paymentMethod = PaymentMethod.SERIALIZER.deserialize(JSONObject(encodedPaymentMethod))
         val configuration = instantPaymentConfigurationDTO.mapToCheckoutConfiguration()
         val instantPaymentComponent =
-            when {
-                componentId.contains(Constants.INSTANT_ADVANCED_COMPONENT_KEY) ->
+            when (componentId) {
+                Constants.INSTANT_ADVANCED_COMPONENT_KEY ->
                     createInstantAdvancedComponent(
                         configuration,
                         paymentMethod,
                         componentId
                     )
 
-                componentId.contains(Constants.INSTANT_SESSION_COMPONENT_KEY) ->
+                Constants.INSTANT_SESSION_COMPONENT_KEY ->
                     createInstantSessionComponent(
                         configuration,
                         paymentMethod,
@@ -79,7 +80,7 @@ class InstantComponentManager(
                     componentId,
                     ::hideLoadingBottomSheet
                 ),
-            key = componentId
+            key = UUID.randomUUID().toString()
         )
     }
 
@@ -109,7 +110,7 @@ class InstantComponentManager(
                     ::handleAction,
                     ::hideLoadingBottomSheet
                 ),
-            key = componentId
+            key = UUID.randomUUID().toString()
         )
     }
 
