@@ -19,15 +19,15 @@ import UIKit
     }
 }
 
-class AdyenAppearance: AdyenAppearanceProvider {
-    static func createDropInStyle() -> Adyen.DropInComponent.Style? {
+class AdyenAppearance: AdyenComponentAppearanceProvider, AdyenDropInAppearanceProvider {
+    static func createDropInStyle() -> Adyen.DropInComponent.Style {
         var style = Adyen.DropInComponent.Style()
         style.formComponent.mainButtonItem.button.backgroundColor = .black
         style.formComponent.mainButtonItem.button.title.color = .white
         return style
     }
 
-    static func createCardComponentStyle() -> Adyen.FormComponentStyle? {
+    static func createCardComponentStyle() -> Adyen.FormComponentStyle {
         var style = FormComponentStyle()
         style.mainButtonItem.button.backgroundColor = .black
         style.mainButtonItem.button.title.color = .white
