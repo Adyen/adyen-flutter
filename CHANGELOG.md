@@ -3,7 +3,7 @@
 * Updated iOS SDK to v5.7.1.
 * Updated Android SDK to v5.3.1.
 * Added support for customizing Drop-in and card component.
-* Added option to adjust Drop-in title.
+* Added option to adjust Drop-in preselected payment method title.
 
 ## 0.0.3
 
