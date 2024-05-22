@@ -9,10 +9,10 @@ class DialogBuilder {
     switch (paymentResult) {
       case PaymentAdvancedFinished():
         title = "Finished";
-        message = "Result code: ${paymentResult.resultCode.name.toUpperCase()}";
+        message = "Result code: ${paymentResult.resultCode.name}";
       case PaymentSessionFinished():
         title = "Finished";
-        message = "Result code: ${paymentResult.resultCode.name.toUpperCase()}";
+        message = "Result code: ${paymentResult.resultCode.name}";
       case PaymentCancelledByUser():
         title = "Cancelled by user";
         message = "Cancelled by user";
