@@ -41,8 +41,6 @@ class AdyenCardComponent extends StatelessWidget {
             SessionCheckout() => _buildCardSessionFlowWidget(sdkVersionNumber),
             AdvancedCheckout it =>
               _buildCardAdvancedFlowWidget(sdkVersionNumber, it),
-            AdvancedCheckoutPreview it =>
-              _buildCardAdvancedFlowWidget(sdkVersionNumber, it),
           };
         } else {
           return Container(

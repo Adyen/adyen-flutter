@@ -69,7 +69,7 @@ class MultiComponentAdvancedScreen extends StatelessWidget {
       shopperLocale: Config.shopperLocale,
       cardConfiguration: const CardConfiguration(),
     );
-    final advancedCheckout = AdvancedCheckoutPreview(
+    final advancedCheckout = AdvancedCheckout(
       onSubmit: cardRepository.onSubmit,
       onAdditionalDetails: cardRepository.onAdditionalDetails,
     );
@@ -104,7 +104,7 @@ class MultiComponentAdvancedScreen extends StatelessWidget {
     String paymentMethods,
     BuildContext context,
   ) {
-    final AdvancedCheckoutPreview advancedCheckout = AdvancedCheckoutPreview(
+    final AdvancedCheckout advancedCheckout = AdvancedCheckout(
       onSubmit: googlePayRepository.onSubmit,
       onAdditionalDetails: googlePayRepository.onAdditionalDetails,
     );
@@ -158,7 +158,7 @@ class MultiComponentAdvancedScreen extends StatelessWidget {
       applePayConfiguration: _createApplePayConfiguration(),
     );
 
-    final AdvancedCheckoutPreview advancedCheckout = AdvancedCheckoutPreview(
+    final AdvancedCheckout advancedCheckout = AdvancedCheckout(
       onSubmit: applePayRepository.onSubmit,
       onAdditionalDetails: applePayRepository.onAdditionalDetailsMock,
     );

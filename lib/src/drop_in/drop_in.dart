@@ -230,11 +230,6 @@ class DropIn {
     final Map<String, dynamic> submitDataDecoded = jsonDecode(submitData);
     switch (advancedCheckout) {
       case AdvancedCheckout it:
-        final paymentData = submitDataDecoded[Constants.submitDataKey];
-        final paymentDataEncoded = jsonEncode(paymentData);
-        final PaymentEvent paymentEvent = await it.onSubmit(paymentDataEncoded);
-        return paymentEvent;
-      case AdvancedCheckoutPreview it:
         final PaymentEvent paymentEvent = await it.onSubmit(
           submitDataDecoded[Constants.submitDataKey],
           submitDataDecoded[Constants.submitExtraKey],
@@ -249,8 +244,6 @@ class DropIn {
       PlatformCommunicationModel event, Checkout advancedCheckout) async {
     switch (advancedCheckout) {
       case AdvancedCheckout it:
-        return it.onAdditionalDetails(event.data as String);
-      case AdvancedCheckoutPreview it:
         final additionalDetails = jsonDecode(event.data as String);
         return await it.onAdditionalDetails(additionalDetails);
       case SessionCheckout():

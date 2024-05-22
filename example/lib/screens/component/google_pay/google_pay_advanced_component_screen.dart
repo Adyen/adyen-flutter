@@ -37,8 +37,8 @@ class GooglePayAdvancedComponentScreen extends StatelessWidget {
       future: repository.fetchPaymentMethods(),
       builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
         if (snapshot.hasData) {
-          final AdvancedCheckoutPreview advancedCheckout =
-              AdvancedCheckoutPreview(
+          final AdvancedCheckout advancedCheckout =
+              AdvancedCheckout(
             onSubmit: repository.onSubmit,
             onAdditionalDetails: repository.onAdditionalDetails,
           );

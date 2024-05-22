@@ -62,7 +62,7 @@ class CardComponentScrollableScreen extends StatelessWidget {
       shopperLocale: Config.shopperLocale,
       cardConfiguration: const CardConfiguration(),
     );
-    final advancedCheckout = AdvancedCheckoutPreview(
+    final advancedCheckout = AdvancedCheckout(
       onSubmit: repository.onSubmit,
       onAdditionalDetails: repository.onAdditionalDetails,
     );

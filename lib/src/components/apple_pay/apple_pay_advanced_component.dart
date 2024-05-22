@@ -8,7 +8,7 @@ import 'package:adyen_checkout/src/util/constants.dart';
 import 'package:adyen_checkout/src/util/payment_event_handler.dart';
 
 class ApplePayAdvancedComponent extends BaseApplePayComponent {
-  final AdvancedCheckoutPreview advancedCheckout;
+  final AdvancedCheckout advancedCheckout;
   final PaymentEventHandler paymentEventHandler;
 
   @override
