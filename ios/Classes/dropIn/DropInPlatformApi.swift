@@ -7,11 +7,11 @@ class DropInPlatformApi: DropInPlatformInterface {
     private let dropInFlutterApi: DropInFlutterInterface
     private let sessionHolder: SessionHolder
     private let configurationMapper = ConfigurationMapper()
-    private var viewController: UIViewController?
+    private var hostViewController: UIViewController?
+    private var dropInViewController: DropInViewController?
     private var dropInSessionStoredPaymentMethodsDelegate: DropInSessionsStoredPaymentMethodsDelegate?
     private var dropInAdvancedFlowDelegate: DropInAdvancedFlowDelegate?
     private var dropInAdvancedFlowStoredPaymentMethodsDelegate: DropInAdvancedFlowStoredPaymentMethodsDelegate?
-    private var dropInComponent: DropInComponent?
 
     init(
         dropInFlutterApi: DropInFlutterInterface,
@@ -27,7 +27,7 @@ class DropInPlatformApi: DropInPlatformInterface {
                 return
             }
 
-            self.viewController = viewController
+            hostViewController = viewController
             let adyenContext = try dropInConfigurationDTO.createAdyenContext()
             dropInSessionStoredPaymentMethodsDelegate = DropInSessionsStoredPaymentMethodsDelegate(
                 viewController: viewController,
@@ -45,8 +45,11 @@ class DropInPlatformApi: DropInPlatformInterface {
             if dropInConfigurationDTO.isRemoveStoredPaymentMethodEnabled {
                 dropInComponent.storedPaymentMethodsDelegate = dropInSessionStoredPaymentMethodsDelegate
             }
-            self.dropInComponent = dropInComponent
-            self.viewController?.present(dropInComponent.viewController, animated: true)
+            
+            let dropInViewController = DropInViewController(dropInComponent: dropInComponent)
+            dropInViewController.modalPresentationStyle = .overCurrentContext
+            self.dropInViewController = dropInViewController
+            self.hostViewController?.present(dropInViewController, animated: false)
         } catch {
             sendSessionError(error: error)
         }
@@ -57,7 +60,8 @@ class DropInPlatformApi: DropInPlatformInterface {
             guard let viewController = getViewController() else {
                 return
             }
-            self.viewController = viewController
+            
+            hostViewController = viewController
             let adyenContext = try dropInConfigurationDTO.createAdyenContext()
             let paymentMethods = try jsonDecoder.decode(PaymentMethods.self, from: Data(paymentMethodsResponse.utf8))
             let paymentMethodsWithoutGiftCards = removeGiftCardPaymentMethods(paymentMethods: paymentMethods)
@@ -71,7 +75,6 @@ class DropInPlatformApi: DropInPlatformInterface {
             dropInAdvancedFlowDelegate = DropInAdvancedFlowDelegate(dropInFlutterApi: dropInFlutterApi)
             dropInAdvancedFlowDelegate?.dropInInteractorDelegate = self
             dropInComponent.delegate = dropInAdvancedFlowDelegate
-
             if dropInConfigurationDTO.isRemoveStoredPaymentMethodEnabled == true {
                 dropInAdvancedFlowStoredPaymentMethodsDelegate = DropInAdvancedFlowStoredPaymentMethodsDelegate(
                     viewController: viewController,
@@ -79,8 +82,10 @@ class DropInPlatformApi: DropInPlatformInterface {
                 )
                 dropInComponent.storedPaymentMethodsDelegate = dropInAdvancedFlowStoredPaymentMethodsDelegate
             }
-            self.dropInComponent = dropInComponent
-            self.viewController?.present(dropInComponent.viewController, animated: true)
+            let dropInViewController = DropInViewController(dropInComponent: dropInComponent)
+            dropInViewController.modalPresentationStyle = .overCurrentContext
+            self.dropInViewController = dropInViewController
+            self.hostViewController?.present(dropInViewController, animated: false)
         } catch {
             let platformCommunicationModel = PlatformCommunicationModel(
                 type: PlatformCommunicationType.result,
@@ -114,7 +119,8 @@ class DropInPlatformApi: DropInPlatformInterface {
         dropInAdvancedFlowDelegate?.dropInInteractorDelegate = nil
         dropInAdvancedFlowDelegate = nil
         dropInAdvancedFlowStoredPaymentMethodsDelegate = nil
-        viewController = nil
+        dropInViewController = nil
+        hostViewController = nil
     }
 
     private func handlePaymentEvent(paymentEventDTO: PaymentEventDTO) {
@@ -151,7 +157,7 @@ class DropInPlatformApi: DropInPlatformInterface {
         do {
             let jsonData = try JSONSerialization.data(withJSONObject: paymentEventDTO.actionResponse as Any, options: [])
             let result = try JSONDecoder().decode(Action.self, from: jsonData)
-            dropInComponent?.handle(result)
+            dropInViewController?.dropInComponent.handle(result)
         } catch {
             let paymentResult = PaymentResultDTO(type: PaymentResultEnum.error, reason: error.localizedDescription)
             dropInFlutterApi.onDropInAdvancedPlatformCommunication(
@@ -166,7 +172,7 @@ class DropInPlatformApi: DropInPlatformInterface {
     }
 
     private func onDropInResultError(paymentEventDTO: PaymentEventDTO) {
-        dropInComponent?.stopLoading()
+        dropInViewController?.dropInComponent.stopLoading()
 
         if paymentEventDTO.error?.dismissDropIn == true || dropInAdvancedFlowDelegate?.isApplePay == true {
             finalizeAndDismiss(success: false) { [weak self] in
@@ -180,8 +186,8 @@ class DropInPlatformApi: DropInPlatformInterface {
                 )
             }
         } else {
-            dropInComponent?.finalizeIfNeeded(with: false, completion: {})
-            let localizationParameters = (dropInComponent as? Localizable)?.localizationParameters
+            dropInViewController?.dropInComponent.finalizeIfNeeded(with: false, completion: {})
+            let localizationParameters = (dropInViewController?.dropInComponent as? Localizable)?.localizationParameters
             let title = localizedString(.errorTitle, localizationParameters)
             let alertController = UIAlertController(
                 title: title,
@@ -192,7 +198,7 @@ class DropInPlatformApi: DropInPlatformInterface {
                 title: localizedString(.dismissButton, localizationParameters),
                 style: .cancel
             ))
-            viewController?.adyen.topPresenter.present(alertController, animated: true)
+            hostViewController?.adyen.topPresenter.present(alertController, animated: true)
         }
     }
 
@@ -234,8 +240,8 @@ class DropInPlatformApi: DropInPlatformInterface {
 
 extension DropInPlatformApi: DropInInteractorDelegate {
     func finalizeAndDismiss(success: Bool, completion: @escaping (() -> Void)) {
-        dropInComponent?.finalizeIfNeeded(with: success) { [weak self] in
-            self?.viewController?.dismiss(animated: true, completion: {
+        dropInViewController?.dropInComponent.finalizeIfNeeded(with: success) { [weak self] in
+            self?.hostViewController?.dismiss(animated: true, completion: {
                 completion()
             })
         }
