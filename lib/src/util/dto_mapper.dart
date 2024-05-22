@@ -282,3 +282,11 @@ extension InstantComponentConfigurationMapper on InstantComponentConfiguration {
         analyticsOptionsDTO: analyticsOptions.toDTO(sdkVersionNumber),
       );
 }
+
+extension PaymentResultModelMapper on PaymentResultModelDTO {
+  ResultCode toResultCode() => ResultCode.values.firstWhere(
+        (resultCodeEnum) =>
+            resultCodeEnum.name.toUpperCase() == resultCode?.toUpperCase(),
+        orElse: () => ResultCode.unknown,
+      );
+}

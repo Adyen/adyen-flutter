@@ -6,6 +6,7 @@ import 'package:adyen_checkout/src/components/card/base_card_component.dart';
 import 'package:adyen_checkout/src/components/component_platform_api.dart';
 import 'package:adyen_checkout/src/generated/platform_api.g.dart';
 import 'package:adyen_checkout/src/util/constants.dart';
+import 'package:adyen_checkout/src/util/dto_mapper.dart';
 import 'package:adyen_checkout/src/util/payment_event_handler.dart';
 
 class CardAdvancedComponent extends BaseCardComponent {
@@ -54,7 +55,8 @@ class CardAdvancedComponent extends BaseCardComponent {
 
   @override
   void onFinished(PaymentResultDTO? paymentResultDTO) {
-    String resultCode = paymentResultDTO?.result?.resultCode ?? "";
+    final ResultCode resultCode =
+        paymentResultDTO?.result?.toResultCode() ?? ResultCode.unknown;
     adyenLogger.print("Card advanced flow result code: $resultCode");
     onPaymentResult(PaymentAdvancedFinished(resultCode: resultCode));
   }

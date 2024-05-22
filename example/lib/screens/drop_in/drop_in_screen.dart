@@ -4,9 +4,10 @@ import 'package:adyen_checkout/adyen_checkout.dart';
 import 'package:adyen_checkout_example/config.dart';
 import 'package:adyen_checkout_example/network/models/session_response_network_model.dart';
 import 'package:adyen_checkout_example/repositories/adyen_drop_in_repository.dart';
+import 'package:adyen_checkout_example/utils/dialog_builder.dart';
 import 'package:flutter/material.dart';
 
-class DropInScreen extends StatefulWidget {
+class DropInScreen extends StatelessWidget {
   const DropInScreen({
     required this.repository,
     super.key,
@@ -14,11 +15,6 @@ class DropInScreen extends StatefulWidget {
 
   final AdyenDropInRepository repository;
 
-  @override
-  State<DropInScreen> createState() => _DropInScreenState();
-}
-
-class _DropInScreenState extends State<DropInScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -30,11 +26,11 @@ class _DropInScreenState extends State<DropInScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               TextButton(
-                onPressed: () => startDropInSessions(),
+                onPressed: () => startDropInSessions(context),
                 child: const Text("DropIn sessions"),
               ),
               TextButton(
-                onPressed: () => startDropInAdvancedFlow(),
+                onPressed: () => startDropInAdvancedFlow(context),
                 child: const Text("DropIn advanced flow"),
               ),
             ],
@@ -44,10 +40,10 @@ class _DropInScreenState extends State<DropInScreen> {
     );
   }
 
-  Future<void> startDropInSessions() async {
+  Future<void> startDropInSessions(BuildContext context) async {
     try {
       final SessionResponseNetworkModel sessionResponse =
-          await widget.repository.fetchSession();
+          await repository.fetchSession();
       final DropInConfiguration dropInConfiguration =
           await _createDropInConfiguration();
 
@@ -64,28 +60,35 @@ class _DropInScreenState extends State<DropInScreen> {
         checkout: sessionCheckout,
       );
 
-      _showPaymentResultDialog(paymentResult);
+      if (context.mounted) {
+        DialogBuilder.showPaymentResultDialog(paymentResult, context);
+      }
     } catch (error) {
       debugPrint(error.toString());
     }
   }
 
-  Future<void> startDropInAdvancedFlow() async {
-    final paymentMethodsResponse =
-        await widget.repository.fetchPaymentMethods();
-    final dropInConfiguration = await _createDropInConfiguration();
-    final advancedCheckout = AdvancedCheckout(
-      onSubmit: widget.repository.onSubmit,
-      onAdditionalDetails: widget.repository.onAdditionalDetails,
-    );
+  Future<void> startDropInAdvancedFlow(BuildContext context) async {
+    try {
+      final paymentMethodsResponse = await repository.fetchPaymentMethods();
+      final dropInConfiguration = await _createDropInConfiguration();
+      final advancedCheckout = AdvancedCheckout(
+        onSubmit: repository.onSubmit,
+        onAdditionalDetails: repository.onAdditionalDetails,
+      );
 
-    final paymentResult = await AdyenCheckout.advanced.startDropIn(
-      dropInConfiguration: dropInConfiguration,
-      paymentMethodsResponse: paymentMethodsResponse,
-      checkout: advancedCheckout,
-    );
+      final paymentResult = await AdyenCheckout.advanced.startDropIn(
+        dropInConfiguration: dropInConfiguration,
+        paymentMethodsResponse: paymentMethodsResponse,
+        checkout: advancedCheckout,
+      );
 
-    _showPaymentResultDialog(paymentResult);
+      if (context.mounted) {
+        DialogBuilder.showPaymentResultDialog(paymentResult, context);
+      }
+    } catch (error) {
+      debugPrint(error.toString());
+    }
   }
 
   Future<DropInConfiguration> _createDropInConfiguration() async {
@@ -103,15 +106,19 @@ class _DropInScreenState extends State<DropInScreen> {
       billingAddressRequired: true,
     );
 
+    //To support CashAppPay please add "pod 'Adyen/CashAppPay'" to your Podfile.
+    final String returnUrl = await repository.determineBaseReturnUrl();
     final CashAppPayConfiguration cashAppPayConfiguration =
-        await _createCashAppPayConfiguration();
+        CashAppPayConfiguration(
+      CashAppPayEnvironment.sandbox,
+      returnUrl,
+    );
 
     final StoredPaymentMethodConfiguration storedPaymentMethodConfiguration =
         StoredPaymentMethodConfiguration(
       showPreselectedStoredPaymentMethod: false,
       isRemoveStoredPaymentMethodEnabled: true,
-      deleteStoredPaymentMethodCallback:
-          widget.repository.deleteStoredPaymentMethod,
+      deleteStoredPaymentMethodCallback: repository.deleteStoredPaymentMethod,
     );
 
     final DropInConfiguration dropInConfiguration = DropInConfiguration(
@@ -128,52 +135,5 @@ class _DropInScreenState extends State<DropInScreen> {
     );
 
     return dropInConfiguration;
-  }
-
-  //To support CashAppPay please add "pod 'Adyen/CashAppPay'" to your Podfile.
-  Future<CashAppPayConfiguration> _createCashAppPayConfiguration() async {
-    return CashAppPayConfiguration(
-      CashAppPayEnvironment.sandbox,
-      await widget.repository.determineBaseReturnUrl(),
-    );
-  }
-
-  void _showPaymentResultDialog(PaymentResult paymentResult) async {
-    String title = "";
-    String message = "";
-    switch (paymentResult) {
-      case PaymentAdvancedFinished():
-        title = "Finished";
-        message = "Result code: ${paymentResult.resultCode}";
-      case PaymentSessionFinished():
-        title = "Finished";
-        message = "Result code: ${paymentResult.resultCode}";
-      case PaymentCancelledByUser():
-        title = "Cancelled by user";
-        message = "Drop-in cancelled by user";
-      case PaymentError():
-        title = "Error occurred";
-        message = "${paymentResult.reason}";
-    }
-
-    return showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text(title),
-          content: Text(message),
-          actions: <Widget>[
-            TextButton(
-              style: TextButton.styleFrom(
-                  textStyle: Theme.of(context).textTheme.labelLarge),
-              child: const Text('Close'),
-              onPressed: () async {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
-    );
   }
 }
