@@ -2,7 +2,16 @@
 
 //View controller is required to prevent propagating the tap event to the FlutterViewController - https://github.com/flutter/flutter/issues/35784#issuecomment-516243057
 class DropInViewController: UIViewController {
-    var dropInComponent: DropInComponent?
+    let dropInComponent: DropInComponent
+    
+    init(dropInComponent: DropInComponent) {
+        self.dropInComponent = dropInComponent
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {}
     
@@ -13,10 +22,7 @@ class DropInViewController: UIViewController {
     override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {}
     
     override func viewDidAppear(_ animated: Bool) {
-        guard let dropInComponent = dropInComponent else {
-            return
-        }
-        
+        super.viewDidAppear(animated)
         present(dropInComponent.viewController, animated: true)
     }
 }
