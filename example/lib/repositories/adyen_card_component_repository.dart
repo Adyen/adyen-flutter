@@ -43,7 +43,7 @@ class AdyenCardComponentRepository extends AdyenBaseRepository {
     );
   }
 
-  Future<String> fetchPaymentMethods() async {
+  Future<Map<String, dynamic>> fetchPaymentMethods() async {
     return await service.fetchPaymentMethods(PaymentMethodsRequestNetworkModel(
       merchantAccount: Config.merchantAccount,
       countryCode: Config.countryCode,

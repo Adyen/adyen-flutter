@@ -66,8 +66,7 @@ class AdyenApplePayComponent extends StatelessWidget {
     );
   }
 
-  Widget _buildApplePayAdvancedFlowWidget(
-      AdvancedCheckout advancedCheckout) {
+  Widget _buildApplePayAdvancedFlowWidget(AdvancedCheckout advancedCheckout) {
     return ApplePayAdvancedComponent(
       key: key,
       applePayPaymentMethod: json.encode(paymentMethod),

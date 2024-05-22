@@ -14,24 +14,22 @@ class AdyenCheckoutAdvanced {
 
   Future<PaymentResult> startDropIn({
     required DropInConfiguration dropInConfiguration,
-    required String paymentMethodsResponse,
+    required Map<String, dynamic> paymentMethodsResponse,
     required AdvancedCheckout checkout,
-  }) {
-    return dropIn.startDropInAdvancedFlowPayment(
-      dropInConfiguration,
-      paymentMethodsResponse,
-      checkout,
-    );
-  }
+  }) =>
+      dropIn.startDropInAdvancedFlowPayment(
+        dropInConfiguration,
+        paymentMethodsResponse,
+        checkout,
+      );
 
   Future<PaymentResult> startInstantComponent({
     required InstantComponentConfiguration configuration,
     required Map<String, dynamic> paymentMethodResponse,
     required AdvancedCheckout checkout,
-  }) async {
-    return await InstantAdvancedComponent(advancedCheckout: checkout).start(
-      configuration,
-      paymentMethodResponse,
-    );
-  }
+  }) =>
+      InstantAdvancedComponent(advancedCheckout: checkout).start(
+        configuration,
+        paymentMethodResponse,
+      );
 }

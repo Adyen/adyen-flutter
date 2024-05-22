@@ -78,10 +78,9 @@ class AdyenCheckoutSession {
     required InstantComponentConfiguration configuration,
     required Map<String, dynamic> paymentMethodResponse,
     required SessionCheckout checkout,
-  }) async {
-    return await InstantSessionComponent(sessionCheckout: checkout).start(
-      configuration,
-      paymentMethodResponse,
-    );
-  }
+  }) =>
+      InstantSessionComponent(sessionCheckout: checkout).start(
+        configuration,
+        paymentMethodResponse,
+      );
 }

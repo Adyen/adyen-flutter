@@ -24,7 +24,7 @@ class Service {
     return sessionResponse;
   }
 
-  Future<String> fetchPaymentMethods(
+  Future<Map<String, dynamic>> fetchPaymentMethods(
       PaymentMethodsRequestNetworkModel
           paymentMethodsRequestNetworkModel) async {
     final response = await http.post(
@@ -32,7 +32,7 @@ class Service {
       headers: _createHeaders(),
       body: paymentMethodsRequestNetworkModel.toRawJson(),
     );
-    return response.body;
+    return jsonDecode(response.body);
   }
 
   Future<Map<String, dynamic>> postPayments(Map<String, dynamic> body) async {

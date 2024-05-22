@@ -1,5 +1,6 @@
 ## 0.0.4 (in development)
 
+* ⚠ **Breaking Change**: The type of the paymentMethodsResponse for using Drop-in with the advanced flow changed to Map<String, dynamic>.  
 * Updated iOS SDK to v5.7.1.
 * Updated Android SDK to v5.3.1.
 * Added support for customizing Drop-in and card component.

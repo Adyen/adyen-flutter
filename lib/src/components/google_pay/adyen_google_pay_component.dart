@@ -66,8 +66,7 @@ class AdyenGooglePayComponent extends StatelessWidget {
     );
   }
 
-  Widget _buildGooglePayAdvancedFlowWidget(
-      AdvancedCheckout advancedCheckout) {
+  Widget _buildGooglePayAdvancedFlowWidget(AdvancedCheckout advancedCheckout) {
     return GooglePayAdvancedComponent(
       key: key,
       googlePayPaymentMethod: json.encode(paymentMethod),

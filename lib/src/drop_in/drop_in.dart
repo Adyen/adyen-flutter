@@ -81,17 +81,21 @@ class DropIn {
 
   Future<PaymentResult> startDropInAdvancedFlowPayment(
     DropInConfiguration dropInConfiguration,
-    String paymentMethodsResponse,
+    Map<String, dynamic> paymentMethodsResponse,
     Checkout advancedCheckout,
   ) async {
     adyenLogger.print("Start Drop-in advanced flow");
     final dropInAdvancedFlowCompleter = Completer<PaymentResultDTO>();
     final sdkVersionNumber =
         await sdkVersionNumberProvider.getSdkVersionNumber();
+    final encodedPaymentMethodsResponse = jsonEncode(
+      paymentMethodsResponse,
+      toEncodable: (value) => throw Exception("Could not encode $value"),
+    );
 
     dropInPlatformApi.showDropInAdvanced(
       dropInConfiguration.toDTO(sdkVersionNumber),
-      paymentMethodsResponse,
+      encodedPaymentMethodsResponse,
     );
 
     dropInFlutterApi.dropInAdvancedFlowPlatformCommunicationStream =
