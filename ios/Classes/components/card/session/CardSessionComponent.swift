@@ -52,22 +52,21 @@ class CardSessionComponent: BaseCardComponent {
     }
 
     private func buildCardComponent(
-        paymentMethodString _: String,
+        paymentMethodString: String,
         cardComponentConfiguration: CardComponentConfigurationDTO,
         session: AdyenSession
     ) throws -> CardComponent {
+        let cardPaymentMethod: AnyCardPaymentMethod = isStoredPaymentMethod
+            ? try JSONDecoder().decode(StoredCardPaymentMethod.self, from: Data(paymentMethodString.utf8))
+            : try JSONDecoder().decode(CardPaymentMethod.self, from: Data(paymentMethodString.utf8))
         let adyenContext = try cardComponentConfiguration.createAdyenContext()
         let cardConfiguration = cardComponentConfiguration.cardConfiguration.mapToCardComponentConfiguration(
             shopperLocale: cardComponentConfiguration.shopperLocale)
-        /*
-         let paymentMethod: AnyCardPaymentMethod = isStoredPaymentMethod
-         ? try JSONDecoder().decode(StoredCardPaymentMethod.self, from: Data(paymentMethodString.utf8))
-         : try JSONDecoder().decode(CardPaymentMethod.self, from: Data(paymentMethodString.utf8))
-         */
-        // TODO: Replace cardPaymentMethod with payment method when available
-        guard let cardPaymentMethod = session.sessionContext.paymentMethods.paymentMethod(ofType: CardPaymentMethod.self)
-        else { throw PlatformError(errorDescription: "Cannot find card payment method") }
-        return CardComponent(paymentMethod: cardPaymentMethod, context: adyenContext, configuration: cardConfiguration)
+        return CardComponent(
+            paymentMethod: cardPaymentMethod,
+            context: adyenContext,
+            configuration: cardConfiguration
+        )
     }
 
     private func setupSessionFlowDelegate() {
