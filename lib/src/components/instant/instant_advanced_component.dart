@@ -9,7 +9,7 @@ import 'package:adyen_checkout/src/util/dto_mapper.dart';
 import 'package:adyen_checkout/src/util/payment_event_handler.dart';
 
 class InstantAdvancedComponent extends BaseInstantComponent {
-  final AdvancedCheckoutPreview advancedCheckout;
+  final AdvancedCheckout advancedCheckout;
   final PaymentEventHandler paymentEventHandler;
 
   @override

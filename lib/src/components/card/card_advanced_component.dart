@@ -102,8 +102,6 @@ class CardAdvancedComponent extends BaseCardComponent {
       ComponentCommunicationModel event) async {
     switch (advancedCheckout) {
       case AdvancedCheckout it:
-        return await it.onSubmit(event.data as String);
-      case AdvancedCheckoutPreview it:
         final data = jsonDecode(event.data as String);
         return await it.onSubmit(data);
       case SessionCheckout():
@@ -115,8 +113,6 @@ class CardAdvancedComponent extends BaseCardComponent {
       ComponentCommunicationModel event) async {
     switch (advancedCheckout) {
       case AdvancedCheckout it:
-        return it.onAdditionalDetails(event.data as String);
-      case AdvancedCheckoutPreview it:
         final additionalDetails = jsonDecode(event.data as String);
         return await it.onAdditionalDetails(additionalDetails);
       case SessionCheckout():

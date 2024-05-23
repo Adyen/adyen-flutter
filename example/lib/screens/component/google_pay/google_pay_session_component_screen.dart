@@ -1,7 +1,5 @@
 // ignore_for_file: unused_local_variable
 
-import 'dart:convert';
-
 import 'package:adyen_checkout/adyen_checkout.dart';
 import 'package:adyen_checkout_example/config.dart';
 import 'package:adyen_checkout_example/repositories/adyen_google_pay_component_repository.dart';
@@ -79,13 +77,13 @@ class GooglePaySessionsComponentScreen extends StatelessWidget {
     );
   }
 
-  Map<String, dynamic> _extractPaymentMethod(String paymentMethods) {
+  Map<String, dynamic> _extractPaymentMethod(
+      Map<String, dynamic> paymentMethods) {
     if (paymentMethods.isEmpty) {
       return <String, String>{};
     }
 
-    Map<String, dynamic> jsonPaymentMethods = jsonDecode(paymentMethods);
-    return jsonPaymentMethods["paymentMethods"].firstWhere(
+    return paymentMethods["paymentMethods"].firstWhere(
       (paymentMethod) => paymentMethod["type"] == "googlepay",
       orElse: () => throw Exception("Google pay payment method not provided"),
     );

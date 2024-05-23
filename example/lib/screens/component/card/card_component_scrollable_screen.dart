@@ -1,7 +1,5 @@
 // ignore_for_file: unused_local_variable
 
-import 'dart:convert';
-
 import 'package:adyen_checkout/adyen_checkout.dart';
 import 'package:adyen_checkout_example/config.dart';
 import 'package:adyen_checkout_example/repositories/adyen_card_component_repository.dart';
@@ -23,9 +21,10 @@ class CardComponentScrollableScreen extends StatelessWidget {
         backgroundColor: Colors.white,
         appBar: AppBar(title: const Text('Adyen card component')),
         body: SafeArea(
-          child: FutureBuilder<String>(
+          child: FutureBuilder<Map<String, dynamic>>(
             future: repository.fetchPaymentMethods(),
-            builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
+            builder: (BuildContext context,
+                AsyncSnapshot<Map<String, dynamic>> snapshot) {
               if (snapshot.data == null) {
                 return const SizedBox.shrink();
               } else {
@@ -51,7 +50,7 @@ class CardComponentScrollableScreen extends StatelessWidget {
   }
 
   Widget _buildCardWidget(
-    String paymentMethods,
+    Map<String, dynamic> paymentMethods,
     BuildContext context,
   ) {
     final paymentMethod = extractPaymentMethod(paymentMethods);
@@ -63,7 +62,7 @@ class CardComponentScrollableScreen extends StatelessWidget {
       shopperLocale: Config.shopperLocale,
       cardConfiguration: const CardConfiguration(),
     );
-    final advancedCheckout = AdvancedCheckoutPreview(
+    final advancedCheckout = AdvancedCheckout(
       onSubmit: repository.onSubmit,
       onAdditionalDetails: repository.onAdditionalDetails,
     );
@@ -79,15 +78,15 @@ class CardComponentScrollableScreen extends StatelessWidget {
     );
   }
 
-  Map<String, dynamic> extractPaymentMethod(String paymentMethods) {
-    Map<String, dynamic> jsonPaymentMethods = jsonDecode(paymentMethods);
-    List paymentMethodList = jsonPaymentMethods["paymentMethods"] as List;
+  Map<String, dynamic> extractPaymentMethod(
+      Map<String, dynamic> paymentMethods) {
+    List paymentMethodList = paymentMethods["paymentMethods"] as List;
     Map<String, dynamic>? paymentMethod = paymentMethodList
         .firstWhereOrNull((paymentMethod) => paymentMethod["type"] == "scheme");
 
     List storedPaymentMethodList =
-        jsonPaymentMethods.containsKey("storedPaymentMethods")
-            ? jsonPaymentMethods["storedPaymentMethods"] as List
+        paymentMethods.containsKey("storedPaymentMethods")
+            ? paymentMethods["storedPaymentMethods"] as List
             : [];
     Map<String, dynamic>? storedPaymentMethod =
         storedPaymentMethodList.firstOrNull;

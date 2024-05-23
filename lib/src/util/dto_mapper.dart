@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:adyen_checkout/adyen_checkout.dart';
 import 'package:adyen_checkout/src/generated/platform_api.g.dart';
 
@@ -146,11 +148,18 @@ extension CashAppPayConfigurationMapper on CashAppPayConfiguration {
 }
 
 extension SessionMapper on SessionCheckout {
-  SessionDTO toDTO() => SessionDTO(
-        id: id,
-        sessionData: sessionData,
-        paymentMethodsJson: paymentMethodsJson,
-      );
+  SessionDTO toDTO() {
+    final encodedPaymentMethods = jsonEncode(
+      paymentMethodsJson,
+      toEncodable: (value) => throw Exception("Could not encode $value"),
+    );
+
+    return SessionDTO(
+      id: id,
+      sessionData: sessionData,
+      paymentMethodsJson: encodedPaymentMethods,
+    );
+  }
 }
 
 extension AmountMapper on Amount {

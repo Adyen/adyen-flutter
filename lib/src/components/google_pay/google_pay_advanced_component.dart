@@ -10,7 +10,7 @@ import 'package:adyen_checkout/src/util/dto_mapper.dart';
 import 'package:adyen_checkout/src/util/payment_event_handler.dart';
 
 class GooglePayAdvancedComponent extends BaseGooglePayComponent {
-  final AdvancedCheckoutPreview advancedCheckout;
+  final AdvancedCheckout advancedCheckout;
   final PaymentEventHandler paymentEventHandler;
   @override
   final String componentId = "GOOGLE_PAY_ADVANCED_COMPONENT";

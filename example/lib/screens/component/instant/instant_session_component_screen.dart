@@ -1,7 +1,5 @@
 // ignore_for_file: unused_local_variable
 
-import 'dart:convert';
-
 import 'package:adyen_checkout/adyen_checkout.dart';
 import 'package:adyen_checkout_example/config.dart';
 import 'package:adyen_checkout_example/repositories/adyen_instant_component_repository.dart';
@@ -96,9 +94,8 @@ class InstantSessionComponentScreen extends StatelessWidget {
   }
 
   Map<String, dynamic> _extractPaymentMethod(
-      String paymentMethods, String key) {
-    Map<String, dynamic> jsonPaymentMethods = jsonDecode(paymentMethods);
-    return jsonPaymentMethods["paymentMethods"].firstWhere(
+      Map<String, dynamic> paymentMethods, String key) {
+    return paymentMethods["paymentMethods"].firstWhere(
       (paymentMethod) => paymentMethod["type"] == key,
       orElse: () => throw Exception("$key payment method not provided"),
     );

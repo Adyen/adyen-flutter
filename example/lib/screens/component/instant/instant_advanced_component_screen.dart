@@ -1,7 +1,5 @@
 // ignore_for_file: unused_local_variable
 
-import 'dart:convert';
-
 import 'package:adyen_checkout/adyen_checkout.dart';
 import 'package:adyen_checkout_example/config.dart';
 import 'package:adyen_checkout_example/repositories/adyen_instant_component_repository.dart';
@@ -34,12 +32,12 @@ class InstantAdvancedComponentScreen extends StatelessWidget {
   }
 
   Widget _buildAdyenGooglePayAdvancedComponent() {
-    return FutureBuilder<String>(
+    return FutureBuilder<Map<String, dynamic>>(
       future: repository.fetchPaymentMethods(),
-      builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
+      builder:
+          (BuildContext context, AsyncSnapshot<Map<String, dynamic>> snapshot) {
         if (snapshot.hasData) {
-          final AdvancedCheckoutPreview advancedCheckout =
-              AdvancedCheckoutPreview(
+          final AdvancedCheckout advancedCheckout = AdvancedCheckout(
             onSubmit: repository.onSubmit,
             onAdditionalDetails: repository.onAdditionalDetails,
           );
@@ -101,9 +99,8 @@ class InstantAdvancedComponentScreen extends StatelessWidget {
   }
 
   Map<String, dynamic> _extractPaymentMethod(
-      String paymentMethods, String key) {
-    Map<String, dynamic> jsonPaymentMethods = jsonDecode(paymentMethods);
-    return jsonPaymentMethods["paymentMethods"].firstWhere(
+      Map<String, dynamic> paymentMethods, String key) {
+    return paymentMethods["paymentMethods"].firstWhere(
       (paymentMethod) => paymentMethod["type"] == key,
       orElse: () => throw Exception("$key payment method not provided"),
     );

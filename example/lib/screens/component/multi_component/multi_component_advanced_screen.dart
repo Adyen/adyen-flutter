@@ -1,7 +1,5 @@
 // ignore_for_file: unused_local_variable
 
-import 'dart:convert';
-
 import 'package:adyen_checkout/adyen_checkout.dart';
 import 'package:adyen_checkout_example/config.dart';
 import 'package:adyen_checkout_example/repositories/adyen_apple_pay_component_repository.dart';
@@ -30,9 +28,10 @@ class MultiComponentAdvancedScreen extends StatelessWidget {
         backgroundColor: Colors.white,
         appBar: AppBar(title: const Text('Adyen multi component')),
         body: SafeArea(
-          child: FutureBuilder<String>(
+          child: FutureBuilder<Map<String, dynamic>>(
             future: cardRepository.fetchPaymentMethods(),
-            builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
+            builder: (BuildContext context,
+                AsyncSnapshot<Map<String, dynamic>> snapshot) {
               if (snapshot.data == null) {
                 return const SizedBox.shrink();
               } else {
@@ -58,7 +57,7 @@ class MultiComponentAdvancedScreen extends StatelessWidget {
   }
 
   Widget _buildCardWidget(
-    String paymentMethods,
+    Map<String, dynamic> paymentMethods,
     BuildContext context,
   ) {
     final paymentMethod = extractSchemePaymentMethod(paymentMethods);
@@ -70,7 +69,7 @@ class MultiComponentAdvancedScreen extends StatelessWidget {
       shopperLocale: Config.shopperLocale,
       cardConfiguration: const CardConfiguration(),
     );
-    final advancedCheckout = AdvancedCheckoutPreview(
+    final advancedCheckout = AdvancedCheckout(
       onSubmit: cardRepository.onSubmit,
       onAdditionalDetails: cardRepository.onAdditionalDetails,
     );
@@ -90,7 +89,7 @@ class MultiComponentAdvancedScreen extends StatelessWidget {
   }
 
   Widget _buildAppleOrGooglePayWidget(
-      String paymentMethods, BuildContext context) {
+      Map<String, dynamic> paymentMethods, BuildContext context) {
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
         return _buildAdyenGooglePayAdvancedComponent(paymentMethods, context);
@@ -102,10 +101,10 @@ class MultiComponentAdvancedScreen extends StatelessWidget {
   }
 
   Widget _buildAdyenGooglePayAdvancedComponent(
-    String paymentMethods,
+    Map<String, dynamic> paymentMethods,
     BuildContext context,
   ) {
-    final AdvancedCheckoutPreview advancedCheckout = AdvancedCheckoutPreview(
+    final AdvancedCheckout advancedCheckout = AdvancedCheckout(
       onSubmit: googlePayRepository.onSubmit,
       onAdditionalDetails: googlePayRepository.onAdditionalDetails,
     );
@@ -147,7 +146,7 @@ class MultiComponentAdvancedScreen extends StatelessWidget {
   }
 
   Widget _buildAdyenApplePayAdvancedComponent(
-    String paymentMethods,
+    Map<String, dynamic> paymentMethods,
     BuildContext context,
   ) {
     final ApplePayComponentConfiguration applePayComponentConfiguration =
@@ -159,7 +158,7 @@ class MultiComponentAdvancedScreen extends StatelessWidget {
       applePayConfiguration: _createApplePayConfiguration(),
     );
 
-    final AdvancedCheckoutPreview advancedCheckout = AdvancedCheckoutPreview(
+    final AdvancedCheckout advancedCheckout = AdvancedCheckout(
       onSubmit: applePayRepository.onSubmit,
       onAdditionalDetails: applePayRepository.onAdditionalDetailsMock,
     );
@@ -216,39 +215,39 @@ class MultiComponentAdvancedScreen extends StatelessWidget {
     );
   }
 
-  Map<String, dynamic> _extractPaymentMethod(String paymentMethods) {
+  Map<String, dynamic> _extractPaymentMethod(
+      Map<String, dynamic> paymentMethods) {
     if (paymentMethods.isEmpty) {
       return <String, String>{};
     }
 
-    Map<String, dynamic> jsonPaymentMethods = jsonDecode(paymentMethods);
-    return jsonPaymentMethods["paymentMethods"].firstWhere(
+    return paymentMethods["paymentMethods"].firstWhere(
       (paymentMethod) => paymentMethod["type"] == "applepay",
       orElse: () => throw Exception("Apple pay payment method not provided"),
     );
   }
 
-  Map<String, dynamic> _extractGooglePayPaymentMethod(String paymentMethods) {
+  Map<String, dynamic> _extractGooglePayPaymentMethod(
+      Map<String, dynamic> paymentMethods) {
     if (paymentMethods.isEmpty) {
       return <String, String>{};
     }
 
-    Map<String, dynamic> jsonPaymentMethods = jsonDecode(paymentMethods);
-    return jsonPaymentMethods["paymentMethods"].firstWhere(
+    return paymentMethods["paymentMethods"].firstWhere(
       (paymentMethod) => paymentMethod["type"] == "googlepay",
       orElse: () => throw Exception("Google pay payment method not provided"),
     );
   }
 
-  Map<String, dynamic> extractSchemePaymentMethod(String paymentMethods) {
-    Map<String, dynamic> jsonPaymentMethods = jsonDecode(paymentMethods);
-    List paymentMethodList = jsonPaymentMethods["paymentMethods"] as List;
+  Map<String, dynamic> extractSchemePaymentMethod(
+      Map<String, dynamic> paymentMethods) {
+    List paymentMethodList = paymentMethods["paymentMethods"] as List;
     Map<String, dynamic>? paymentMethod = paymentMethodList
         .firstWhereOrNull((paymentMethod) => paymentMethod["type"] == "scheme");
 
     List storedPaymentMethodList =
-        jsonPaymentMethods.containsKey("storedPaymentMethods")
-            ? jsonPaymentMethods["storedPaymentMethods"] as List
+        paymentMethods.containsKey("storedPaymentMethods")
+            ? paymentMethods["storedPaymentMethods"] as List
             : [];
     Map<String, dynamic>? storedPaymentMethod =
         storedPaymentMethodList.firstOrNull;

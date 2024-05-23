@@ -72,7 +72,7 @@ class DropInScreen extends StatelessWidget {
     try {
       final paymentMethodsResponse = await repository.fetchPaymentMethods();
       final dropInConfiguration = await _createDropInConfiguration();
-      final advancedCheckoutPreview = AdvancedCheckoutPreview(
+      final advancedCheckout = AdvancedCheckout(
         onSubmit: repository.onSubmit,
         onAdditionalDetails: repository.onAdditionalDetails,
       );
@@ -80,7 +80,7 @@ class DropInScreen extends StatelessWidget {
       final paymentResult = await AdyenCheckout.advanced.startDropIn(
         dropInConfiguration: dropInConfiguration,
         paymentMethodsResponse: paymentMethodsResponse,
-        advancedCheckoutPreview: advancedCheckoutPreview,
+        checkout: advancedCheckout,
       );
 
       if (context.mounted) {

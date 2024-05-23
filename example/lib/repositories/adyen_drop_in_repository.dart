@@ -74,7 +74,7 @@ class AdyenDropInRepository extends AdyenBaseRepository {
     );
   }
 
-  Future<String> fetchPaymentMethods() async {
+  Future<Map<String, dynamic>> fetchPaymentMethods() async {
     return await service.fetchPaymentMethods(PaymentMethodsRequestNetworkModel(
       amount: AmountNetworkModel(
         currency: Config.amount.currency,

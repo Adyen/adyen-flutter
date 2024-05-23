@@ -14,30 +14,22 @@ class AdyenCheckoutAdvanced {
 
   Future<PaymentResult> startDropIn({
     required DropInConfiguration dropInConfiguration,
-    required String paymentMethodsResponse,
-    AdvancedCheckout? checkout,
-    AdvancedCheckoutPreview? advancedCheckoutPreview,
-  }) {
-    final Checkout? advancedCheckout = advancedCheckoutPreview ?? checkout;
-    if (advancedCheckout == null) {
-      throw Exception("Please provide the advancedCheckoutPreview");
-    }
-
-    return dropIn.startDropInAdvancedFlowPayment(
-      dropInConfiguration,
-      paymentMethodsResponse,
-      advancedCheckout,
-    );
-  }
+    required Map<String, dynamic> paymentMethodsResponse,
+    required AdvancedCheckout checkout,
+  }) =>
+      dropIn.startDropInAdvancedFlowPayment(
+        dropInConfiguration,
+        paymentMethodsResponse,
+        checkout,
+      );
 
   Future<PaymentResult> startInstantComponent({
     required InstantComponentConfiguration configuration,
     required Map<String, dynamic> paymentMethodResponse,
-    required AdvancedCheckoutPreview checkout,
-  }) async {
-    return await InstantAdvancedComponent(advancedCheckout: checkout).start(
-      configuration,
-      paymentMethodResponse,
-    );
-  }
+    required AdvancedCheckout checkout,
+  }) =>
+      InstantAdvancedComponent(advancedCheckout: checkout).start(
+        configuration,
+        paymentMethodResponse,
+      );
 }

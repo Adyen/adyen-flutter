@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:adyen_checkout/adyen_checkout.dart';
 import 'package:adyen_checkout/src/common/adyen_checkout_api.dart';
 import 'package:adyen_checkout/src/common/model/base_configuration.dart';
@@ -44,7 +46,7 @@ class AdyenCheckoutSession {
     return SessionCheckout(
       id: sessionDTO.id,
       sessionData: sessionDTO.sessionData,
-      paymentMethodsJson: sessionDTO.paymentMethodsJson,
+      paymentMethodsJson: jsonDecode(sessionDTO.paymentMethodsJson),
     );
   }
 
@@ -78,10 +80,9 @@ class AdyenCheckoutSession {
     required InstantComponentConfiguration configuration,
     required Map<String, dynamic> paymentMethodResponse,
     required SessionCheckout checkout,
-  }) async {
-    return await InstantSessionComponent(sessionCheckout: checkout).start(
-      configuration,
-      paymentMethodResponse,
-    );
-  }
+  }) =>
+      InstantSessionComponent(sessionCheckout: checkout).start(
+        configuration,
+        paymentMethodResponse,
+      );
 }
