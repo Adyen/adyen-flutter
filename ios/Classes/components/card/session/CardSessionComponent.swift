@@ -44,8 +44,7 @@ class CardSessionComponent: BaseCardComponent {
         guard let session = sessionHolder.session else { throw PlatformError(errorDescription: "Session not found") }
         let cardComponent = try buildCardComponent(
             paymentMethodString: paymentMethodString,
-            cardComponentConfiguration: cardComponentConfiguration,
-            session: session
+            cardComponentConfiguration: cardComponentConfiguration
         )
         cardComponent.delegate = session
         return cardComponent
@@ -53,8 +52,7 @@ class CardSessionComponent: BaseCardComponent {
 
     private func buildCardComponent(
         paymentMethodString: String,
-        cardComponentConfiguration: CardComponentConfigurationDTO,
-        session: AdyenSession
+        cardComponentConfiguration: CardComponentConfigurationDTO
     ) throws -> CardComponent {
         let cardPaymentMethod: AnyCardPaymentMethod = isStoredPaymentMethod
             ? try JSONDecoder().decode(StoredCardPaymentMethod.self, from: Data(paymentMethodString.utf8))
