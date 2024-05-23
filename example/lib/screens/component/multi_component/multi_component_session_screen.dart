@@ -7,6 +7,7 @@ import 'package:adyen_checkout_example/config.dart';
 import 'package:adyen_checkout_example/repositories/adyen_apple_pay_component_repository.dart';
 import 'package:adyen_checkout_example/repositories/adyen_card_component_repository.dart';
 import 'package:adyen_checkout_example/repositories/adyen_google_pay_component_repository.dart';
+import 'package:adyen_checkout_example/utils/dialog_builder.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -70,7 +71,7 @@ class MultiComponentSessionScreen extends StatelessWidget {
               checkout: sessionCheckout,
               onPaymentResult: (paymentResult) async {
                 Navigator.pop(context);
-                _dialogBuilder(context, paymentResult);
+                DialogBuilder.showPaymentResultDialog(paymentResult, context);
               },
             ),
           );
@@ -135,7 +136,7 @@ class MultiComponentSessionScreen extends StatelessWidget {
                 loadingIndicator: const CircularProgressIndicator(),
                 onPaymentResult: (paymentResult) {
                   Navigator.pop(context);
-                  _dialogBuilder(context, paymentResult);
+                  DialogBuilder.showPaymentResultDialog(paymentResult, context);
                 },
               ),
             ],
@@ -183,7 +184,7 @@ class MultiComponentSessionScreen extends StatelessWidget {
                 height: 48,
                 onPaymentResult: (paymentResult) {
                   Navigator.pop(context);
-                  _dialogBuilder(context, paymentResult);
+                  DialogBuilder.showPaymentResultDialog(paymentResult, context);
                 },
               ),
             ],
@@ -250,45 +251,5 @@ class MultiComponentSessionScreen extends StatelessWidget {
         storedPaymentMethodList.firstOrNull;
 
     return paymentMethod ?? <String, String>{};
-  }
-
-  _dialogBuilder(BuildContext context, PaymentResult paymentResult) {
-    String title = "";
-    String message = "";
-    switch (paymentResult) {
-      case PaymentAdvancedFinished():
-        title = "Finished";
-        message = "Result code: ${paymentResult.resultCode}";
-      case PaymentSessionFinished():
-        title = "Finished";
-        message = "Result code: ${paymentResult.resultCode}";
-      case PaymentError():
-        title = "Error occurred";
-        message = "${paymentResult.reason}";
-      case PaymentCancelledByUser():
-        title = "Cancelled by user";
-        message = "Cancelled by user";
-    }
-
-    return showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text(title),
-          content: Text(message),
-          actions: <Widget>[
-            TextButton(
-              style: TextButton.styleFrom(
-                textStyle: Theme.of(context).textTheme.labelLarge,
-              ),
-              child: const Text('Close'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
-    );
   }
 }

@@ -5,6 +5,7 @@ import 'dart:convert';
 import 'package:adyen_checkout/adyen_checkout.dart';
 import 'package:adyen_checkout_example/config.dart';
 import 'package:adyen_checkout_example/repositories/adyen_card_component_repository.dart';
+import 'package:adyen_checkout_example/utils/dialog_builder.dart';
 import 'package:flutter/material.dart';
 
 class CardComponentScreen extends StatefulWidget {
@@ -99,7 +100,8 @@ class _CardComponentScreenState extends State<CardComponentScreen> {
                       checkout: sessionCheckout,
                       onPaymentResult: (paymentResult) async {
                         Navigator.pop(context);
-                        _dialogBuilder(paymentResult);
+                        DialogBuilder.showPaymentResultDialog(
+                            paymentResult, context);
                       },
                     ),
                   ),
@@ -132,45 +134,5 @@ class _CardComponentScreenState extends State<CardComponentScreen> {
         storedPaymentMethodList.firstOrNull ?? <String, String>{};
 
     return paymentMethod;
-  }
-
-  _dialogBuilder(PaymentResult paymentResult) {
-    String title = "";
-    String message = "";
-    switch (paymentResult) {
-      case PaymentAdvancedFinished():
-        title = "Finished";
-        message = "Result code: ${paymentResult.resultCode}";
-      case PaymentSessionFinished():
-        title = "Finished";
-        message = "Result code: ${paymentResult.resultCode}";
-      case PaymentCancelledByUser():
-        title = "Cancelled by user";
-        message = "Cancelled by user";
-      case PaymentError():
-        title = "Error occurred";
-        message = "${paymentResult.reason}";
-    }
-
-    return showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text(title),
-          content: Text(message),
-          actions: <Widget>[
-            TextButton(
-              style: TextButton.styleFrom(
-                textStyle: Theme.of(context).textTheme.labelLarge,
-              ),
-              child: const Text('Close'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
-    );
   }
 }

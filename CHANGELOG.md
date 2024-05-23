@@ -1,5 +1,6 @@
 ## 0.0.4 (in development)
 
+* ⚠ **Breaking Change**: Changed ResultCode into an enum. Please adjust your usage of the PaymentResult (PaymentSessionFinished or PaymentAdvancedFinished). 
 * Updated iOS SDK to v5.8.0.
 * Updated Android SDK to v5.3.1.
 * Added support for customizing Drop-in and card component.
