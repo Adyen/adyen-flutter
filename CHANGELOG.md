@@ -2,7 +2,7 @@
 
 * ⚠ **Breaking Change**: Changed ResultCode into an enum. Please adjust your usage of the PaymentResult (PaymentSessionFinished or PaymentAdvancedFinished). 
 * ⚠ **Breaking Change**: Change the paymentMethodsResponse type from String to Map<String, dynamic>.  
-* Updated iOS SDK to v5.7.1.
+* Updated iOS SDK to v5.8.0.
 * Updated Android SDK to v5.3.1.
 * Added support for customizing Drop-in and card component.
 * Added option to adjust Drop-in preselected payment method title.

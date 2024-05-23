@@ -46,18 +46,25 @@ abstract class BaseCardComponent extends StatefulWidget {
       resizeStream.add(event.data as double);
 
   void onResult(ComponentCommunicationModel event) {
-    switch (event.paymentResult?.type) {
+    final paymentResult = event.paymentResult;
+    if (paymentResult == null) {
+      throw Exception("Payment result handling failed");
+    }
+
+    switch (paymentResult.type) {
       case PaymentResultEnum.finished:
         onFinished(event.paymentResult);
       case PaymentResultEnum.error:
         _onError(event.paymentResult);
-      default:
-        throw Exception("Payment result handling failed");
+      case PaymentResultEnum.cancelledByUser:
+        _onCancelledByUser();
     }
   }
 
   void _onError(PaymentResultDTO? paymentResultDTO) =>
       onPaymentResult(PaymentError(reason: paymentResultDTO?.reason));
+
+  void _onCancelledByUser() => onPaymentResult(PaymentCancelledByUser());
 
   @override
   State<BaseCardComponent> createState() => _BaseCardComponentState();
