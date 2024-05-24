@@ -27,88 +27,100 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
 void main() {
-  final service = Service();
-  final adyenGooglePayComponentRepository =
-      AdyenGooglePayComponentRepository(service: service);
-  final adyenApplePayComponentRepository =
-      AdyenApplePayComponentRepository(service: service);
-  final adyenCardComponentRepository =
-      AdyenCardComponentRepository(service: service);
-  final adyenInstantComponentRepository =
-      AdyenInstantComponentRepository(service: service);
-
-  runApp(MaterialApp(
-    localizationsDelegates: const [
-      GlobalMaterialLocalizations.delegate,
-      GlobalWidgetsLocalizations.delegate,
-      GlobalCupertinoLocalizations.delegate,
-    ],
-    supportedLocales: const [
-      Locale('en'), // English
-      Locale('ar'), // Arabic
-    ],
-    theme: ThemeData(
-        useMaterial3: true,
-        bottomSheetTheme: const BottomSheetThemeData(
-          surfaceTintColor: Colors.white,
-          backgroundColor: Colors.white,
-        )),
-    routes: {
-      '/': (context) => const MyApp(),
-      '/dropInScreen': (context) => DropInScreen(
-            repository: AdyenDropInRepository(service: service),
-          ),
-      '/cardComponentScreen': (context) => CardComponentScreen(
-            repository: AdyenCardComponentRepository(service: service),
-          ),
-      '/cardAdvancedComponentScreen': (context) =>
-          CardComponentScrollableScreen(
-            repository: AdyenCardComponentRepository(service: service),
-          ),
-      '/googlePayNavigation': (context) => const GooglePayNavigationScreen(),
-      '/googlePaySessionComponent': (context) =>
-          GooglePaySessionsComponentScreen(
-            repository: adyenGooglePayComponentRepository,
-          ),
-      '/googlePayAdvancedComponent': (context) =>
-          GooglePayAdvancedComponentScreen(
-            repository: adyenGooglePayComponentRepository,
-          ),
-      '/applePayNavigation': (context) => const ApplePayNavigationScreen(),
-      '/applePaySessionComponent': (context) => ApplePaySessionComponentScreen(
-            repository: adyenApplePayComponentRepository,
-          ),
-      '/applePayAdvancedComponent': (context) =>
-          ApplePayAdvancedComponentScreen(
-            repository: adyenApplePayComponentRepository,
-          ),
-      '/instantComponentNavigation': (context) =>
-          const InstantNavigationScreen(),
-      '/instantSessionComponent': (context) => InstantSessionComponentScreen(
-          repository: adyenInstantComponentRepository),
-      '/instantAdvancedComponent': (context) => InstantAdvancedComponentScreen(
-          repository: adyenInstantComponentRepository),
-      '/multiComponentNavigationScreen': (context) =>
-          const MultiComponentNavigationScreen(),
-      '/multiComponentSessionScreen': (context) => MultiComponentAdvancedScreen(
-            cardRepository: adyenCardComponentRepository,
-            googlePayRepository: adyenGooglePayComponentRepository,
-            applePayRepository: adyenApplePayComponentRepository,
-          ),
-      '/multiComponentAdvancedScreen': (context) =>
-          MultiComponentAdvancedScreen(
-            cardRepository: adyenCardComponentRepository,
-            googlePayRepository: adyenGooglePayComponentRepository,
-            applePayRepository: adyenApplePayComponentRepository,
-          ),
-      '/clientSideEncryption': (context) => CseScreen(),
-    },
-    initialRoute: "/",
-  ));
+  runApp(const AdyenExampleApp());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class AdyenExampleApp extends StatelessWidget {
+  const AdyenExampleApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final service = Service();
+    final adyenGooglePayComponentRepository =
+        AdyenGooglePayComponentRepository(service: service);
+    final adyenApplePayComponentRepository =
+        AdyenApplePayComponentRepository(service: service);
+    final adyenCardComponentRepository =
+        AdyenCardComponentRepository(service: service);
+    final adyenInstantComponentRepository =
+        AdyenInstantComponentRepository(service: service);
+
+    return MaterialApp(
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [
+        Locale('en'), // English
+        Locale('ar'), // Arabic
+      ],
+      theme: ThemeData(
+          useMaterial3: true,
+          bottomSheetTheme: const BottomSheetThemeData(
+            surfaceTintColor: Colors.white,
+            backgroundColor: Colors.white,
+          )),
+      routes: {
+        '/': (context) => const NavigationScreen(),
+        '/dropInScreen': (context) => DropInScreen(
+              repository: AdyenDropInRepository(service: service),
+            ),
+        '/cardComponentScreen': (context) => CardComponentScreen(
+              repository: AdyenCardComponentRepository(service: service),
+            ),
+        '/cardAdvancedComponentScreen': (context) =>
+            CardComponentScrollableScreen(
+              repository: AdyenCardComponentRepository(service: service),
+            ),
+        '/googlePayNavigation': (context) => const GooglePayNavigationScreen(),
+        '/googlePaySessionComponent': (context) =>
+            GooglePaySessionsComponentScreen(
+              repository: adyenGooglePayComponentRepository,
+            ),
+        '/googlePayAdvancedComponent': (context) =>
+            GooglePayAdvancedComponentScreen(
+              repository: adyenGooglePayComponentRepository,
+            ),
+        '/applePayNavigation': (context) => const ApplePayNavigationScreen(),
+        '/applePaySessionComponent': (context) =>
+            ApplePaySessionComponentScreen(
+              repository: adyenApplePayComponentRepository,
+            ),
+        '/applePayAdvancedComponent': (context) =>
+            ApplePayAdvancedComponentScreen(
+              repository: adyenApplePayComponentRepository,
+            ),
+        '/instantComponentNavigation': (context) =>
+            const InstantNavigationScreen(),
+        '/instantSessionComponent': (context) => InstantSessionComponentScreen(
+            repository: adyenInstantComponentRepository),
+        '/instantAdvancedComponent': (context) =>
+            InstantAdvancedComponentScreen(
+                repository: adyenInstantComponentRepository),
+        '/multiComponentNavigationScreen': (context) =>
+            const MultiComponentNavigationScreen(),
+        '/multiComponentSessionScreen': (context) =>
+            MultiComponentAdvancedScreen(
+              cardRepository: adyenCardComponentRepository,
+              googlePayRepository: adyenGooglePayComponentRepository,
+              applePayRepository: adyenApplePayComponentRepository,
+            ),
+        '/multiComponentAdvancedScreen': (context) =>
+            MultiComponentAdvancedScreen(
+              cardRepository: adyenCardComponentRepository,
+              googlePayRepository: adyenGooglePayComponentRepository,
+              applePayRepository: adyenApplePayComponentRepository,
+            ),
+        '/clientSideEncryption': (context) => CseScreen(),
+      },
+      initialRoute: "/",
+    );
+  }
+}
+
+class NavigationScreen extends StatelessWidget {
+  const NavigationScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -123,6 +135,7 @@ class MyApp extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             TextButton(
+                key: const Key("DropInScreen"),
                 onPressed: () => Navigator.pushNamed(context, "/dropInScreen"),
                 child: const Text("Drop-in")),
             TextButton(

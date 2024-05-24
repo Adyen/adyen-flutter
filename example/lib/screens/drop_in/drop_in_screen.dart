@@ -26,6 +26,7 @@ class DropInScreen extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               TextButton(
+                key: const Key("DropInSessions"),
                 onPressed: () => startDropInSessions(context),
                 child: const Text("DropIn sessions"),
               ),
