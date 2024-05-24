@@ -61,6 +61,7 @@ class InstantAdvancedComponent: BaseInstantComponent, InstantComponentProtocol {
             let action = try JSONDecoder().decode(Action.self, from: jsonData)
             actionComponent?.handle(action)
         } catch {
+            hideActivityIndicator()
             sendErrorToFlutterLayer(error: error)
         }
     }

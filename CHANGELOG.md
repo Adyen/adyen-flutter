@@ -1,4 +1,4 @@
-## 0.0.4 (in development)
+## 0.1.0 (in development)
 
 * ⚠ **Breaking Change**: Changed ResultCode into an enum. Please adjust your usage of the PaymentResult (PaymentSessionFinished or PaymentAdvancedFinished). 
 * ⚠ **Breaking Change**: Change the paymentMethodsResponse type from String to Map<String, dynamic>.  
