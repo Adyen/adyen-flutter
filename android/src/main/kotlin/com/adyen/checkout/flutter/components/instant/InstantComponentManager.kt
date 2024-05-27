@@ -68,7 +68,7 @@ class InstantComponentManager(
                     paymentResult =
                         PaymentResultDTO(
                             type = PaymentResultEnum.ERROR,
-                            reason = exception.localizedMessage
+                            reason = exception.message
                         ),
                 )
             componentFlutterInterface.onComponentCommunication(model) {}
