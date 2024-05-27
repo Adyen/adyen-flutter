@@ -1,7 +1,9 @@
 package com.adyen.checkout.flutter.components.instant
 
+import ComponentCommunicationModel
 import ComponentFlutterInterface
 import InstantPaymentConfigurationDTO
+import PaymentResultDTO
 import androidx.fragment.app.FragmentActivity
 import com.adyen.checkout.components.core.CheckoutConfiguration
 import com.adyen.checkout.components.core.Order
@@ -31,32 +33,47 @@ class InstantComponentManager(
         instantPaymentConfigurationDTO: InstantPaymentConfigurationDTO,
         encodedPaymentMethod: String,
         componentId: String
-    ): InstantPaymentComponent {
-        val paymentMethod = PaymentMethod.SERIALIZER.deserialize(JSONObject(encodedPaymentMethod))
-        val configuration = instantPaymentConfigurationDTO.mapToCheckoutConfiguration()
-        val instantPaymentComponent =
-            when (componentId) {
-                Constants.INSTANT_ADVANCED_COMPONENT_KEY ->
-                    createInstantAdvancedComponent(
-                        configuration,
-                        paymentMethod,
-                        componentId
-                    )
+    ): InstantPaymentComponent? {
+        try {
+            val paymentMethod = PaymentMethod.SERIALIZER.deserialize(JSONObject(encodedPaymentMethod))
+            val configuration = instantPaymentConfigurationDTO.mapToCheckoutConfiguration()
+            val instantPaymentComponent =
+                when (componentId) {
+                    Constants.INSTANT_ADVANCED_COMPONENT_KEY ->
+                        createInstantAdvancedComponent(
+                            configuration,
+                            paymentMethod,
+                            componentId
+                        )
 
-                Constants.INSTANT_SESSION_COMPONENT_KEY ->
-                    createInstantSessionComponent(
-                        configuration,
-                        paymentMethod,
-                        componentId
-                    )
+                    Constants.INSTANT_SESSION_COMPONENT_KEY ->
+                        createInstantSessionComponent(
+                            configuration,
+                            paymentMethod,
+                            componentId
+                        )
 
-                else -> throw IllegalStateException("Instant component not available for payment flow.")
-            }
+                    else -> throw IllegalStateException("Instant component not available for payment flow.")
+                }
 
-        this.instantPaymentComponent = instantPaymentComponent
-        this.componentId = componentId
-        showLoadingBottomSheet(instantPaymentComponent)
-        return instantPaymentComponent
+            this.instantPaymentComponent = instantPaymentComponent
+            this.componentId = componentId
+            showLoadingBottomSheet(instantPaymentComponent)
+            return instantPaymentComponent
+        } catch (exception: Exception) {
+            val model =
+                ComponentCommunicationModel(
+                    ComponentCommunicationType.RESULT,
+                    componentId = componentId,
+                    paymentResult =
+                        PaymentResultDTO(
+                            type = PaymentResultEnum.ERROR,
+                            reason = exception.message
+                        ),
+                )
+            componentFlutterInterface.onComponentCommunication(model) {}
+            return null
+        }
     }
 
     fun onDispose(componentId: String) {
