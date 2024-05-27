@@ -1,12 +1,13 @@
-## 0.1.0 (in development)
+## 0.1.0
 
 * ⚠ **Breaking Change**: Changed ResultCode into an enum. Please adjust your usage of the PaymentResult (PaymentSessionFinished or PaymentAdvancedFinished). 
-* ⚠ **Breaking Change**: Change the paymentMethodsResponse type from String to Map<String, dynamic>.  
+* ⚠ **Breaking Change**: Changed the payment methods type from String to Map<String, dynamic> to support JSON data directly.
+* ⚠ **Breaking Change**: Updated AdvancedCheckout class and removed deprecated implementation.
 * Updated iOS SDK to v5.8.0.
 * Updated Android SDK to v5.3.1.
-* Added support for customizing Drop-in and card component.
+* Added support for customizing Drop-in and Card Component.
 * Added option to adjust Drop-in preselected payment method title.
-* Replaced advanced checkout class with the preview implementation.
+* Added support for Instant Component.
 
 ## 0.0.3
 
