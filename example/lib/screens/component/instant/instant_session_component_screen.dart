@@ -45,10 +45,10 @@ class InstantSessionComponentScreen extends StatelessWidget {
       builder: (BuildContext context, AsyncSnapshot<SessionCheckout> snapshot) {
         if (snapshot.hasData) {
           final SessionCheckout sessionCheckout = snapshot.data!;
-          final payPalPaymentMethodResponse = _extractPaymentMethod(
-              sessionCheckout.paymentMethodsJson, "paypal");
-          final klarnaPaymentMethodResponse = _extractPaymentMethod(
-              sessionCheckout.paymentMethodsJson, "klarna");
+          final payPalPaymentMethodResponse =
+              _extractPaymentMethod(sessionCheckout.paymentMethods, "paypal");
+          final klarnaPaymentMethodResponse =
+              _extractPaymentMethod(sessionCheckout.paymentMethods, "klarna");
 
           return Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -63,7 +63,7 @@ class InstantSessionComponentScreen extends StatelessWidget {
                     AdyenCheckout.session
                         .startInstantComponent(
                           configuration: instantComponentConfiguration,
-                          paymentMethodResponse: payPalPaymentMethodResponse,
+                          paymentMethod: payPalPaymentMethodResponse,
                           checkout: sessionCheckout,
                         )
                         .then((paymentResult) =>
@@ -76,7 +76,7 @@ class InstantSessionComponentScreen extends StatelessWidget {
                     AdyenCheckout.session
                         .startInstantComponent(
                           configuration: instantComponentConfiguration,
-                          paymentMethodResponse: klarnaPaymentMethodResponse,
+                          paymentMethod: klarnaPaymentMethodResponse,
                           checkout: sessionCheckout,
                         )
                         .then((paymentResult) =>

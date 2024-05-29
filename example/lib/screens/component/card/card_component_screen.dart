@@ -64,7 +64,7 @@ class _CardComponentScreenState extends State<CardComponentScreen> {
       );
 
       final paymentMethod =
-          _extractPaymentMethod(sessionCheckout.paymentMethodsJson);
+          _extractPaymentMethod(sessionCheckout.paymentMethods);
 
       // ignore: use_build_context_synchronously
       if (mounted) {

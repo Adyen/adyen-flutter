@@ -68,7 +68,7 @@ class InstantAdvancedComponentScreen extends StatelessWidget {
                     AdyenCheckout.advanced
                         .startInstantComponent(
                           configuration: instantComponentConfiguration,
-                          paymentMethodResponse: payPalPaymentMethodResponse,
+                          paymentMethod: payPalPaymentMethodResponse,
                           checkout: advancedCheckout,
                         )
                         .then((paymentResult) =>
@@ -81,7 +81,7 @@ class InstantAdvancedComponentScreen extends StatelessWidget {
                     AdyenCheckout.advanced
                         .startInstantComponent(
                           configuration: instantComponentConfiguration,
-                          paymentMethodResponse: klarnaPaymentMethodResponse,
+                          paymentMethod: klarnaPaymentMethodResponse,
                           checkout: advancedCheckout,
                         )
                         .then((paymentResult) =>
