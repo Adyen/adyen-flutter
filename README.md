@@ -1,8 +1,8 @@
 ![flutter_banner](https://github.com/Adyen/adyen-flutter/assets/13377878/e0f17c92-7ca2-4bec-803f-dfadd32b94c7)
-# Adyen Flutter (alpha)
+# Adyen Flutter (beta)
 
 > [!IMPORTANT]
-> **This package is an alpha version. Breaking changes might be included in later versions.**
+> **This package is an beta version. Breaking changes might be included in later versions.**
 
 The Adyen Flutter package provides you with the building blocks to create a seamless checkout experience for your Android and iOS Flutter app.
 
@@ -13,6 +13,7 @@ You can integrate in two ways:
   - Card Component: A card widget for shoppers to pay with a card. The Card Component also supports stored cards.
   - Google Pay Component: A widget that renders a Google Pay button.
   - Apple Pay Component: A widget that renders an Apple Pay button.  
+  - Instant Component: A way to support payment methods that do not require additional input fields (PayPal, Klarna, etc.).
   
 
 |                                                             Android                                                              |                                                                iOS                                                                |
