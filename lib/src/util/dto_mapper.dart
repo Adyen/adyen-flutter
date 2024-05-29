@@ -150,7 +150,7 @@ extension CashAppPayConfigurationMapper on CashAppPayConfiguration {
 extension SessionMapper on SessionCheckout {
   SessionDTO toDTO() {
     final encodedPaymentMethods = jsonEncode(
-      paymentMethodsJson,
+      paymentMethods,
       toEncodable: (value) => throw Exception("Could not encode $value"),
     );
 

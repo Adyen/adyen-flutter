@@ -49,7 +49,7 @@ class ApplePaySessionComponentScreen extends StatelessWidget {
         if (snapshot.hasData) {
           final SessionCheckout sessionCheckout = snapshot.data!;
           final paymentMethod =
-              _extractPaymentMethod(sessionCheckout.paymentMethodsJson);
+              _extractPaymentMethod(sessionCheckout.paymentMethods);
 
           return Column(
             mainAxisAlignment: MainAxisAlignment.center,

@@ -59,7 +59,7 @@ class MultiComponentSessionScreen extends StatelessWidget {
         ) {
           SessionCheckout sessionCheckout = snapshot.data!;
           final paymentMethod =
-              _extractSchemePaymentMethod(sessionCheckout.paymentMethodsJson);
+              _extractSchemePaymentMethod(sessionCheckout.paymentMethods);
 
           return Padding(
             padding: const EdgeInsets.fromLTRB(4, 0, 4, 0),
@@ -117,8 +117,8 @@ class MultiComponentSessionScreen extends StatelessWidget {
       builder: (BuildContext context, AsyncSnapshot<SessionCheckout> snapshot) {
         if (snapshot.hasData) {
           final SessionCheckout sessionCheckout = snapshot.data!;
-          final paymentMethod = _extractGooglePayPaymentMethod(
-              sessionCheckout.paymentMethodsJson);
+          final paymentMethod =
+              _extractGooglePayPaymentMethod(sessionCheckout.paymentMethods);
           return Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -163,7 +163,7 @@ class MultiComponentSessionScreen extends StatelessWidget {
         if (snapshot.hasData) {
           final SessionCheckout sessionCheckout = snapshot.data!;
           final paymentMethod =
-              _extractApplePayPaymentMethod(sessionCheckout.paymentMethodsJson);
+              _extractApplePayPaymentMethod(sessionCheckout.paymentMethods);
 
           return Column(
             mainAxisAlignment: MainAxisAlignment.center,

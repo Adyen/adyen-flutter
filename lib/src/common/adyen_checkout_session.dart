@@ -46,7 +46,7 @@ class AdyenCheckoutSession {
     return SessionCheckout(
       id: sessionDTO.id,
       sessionData: sessionDTO.sessionData,
-      paymentMethodsJson: jsonDecode(sessionDTO.paymentMethodsJson),
+      paymentMethods: jsonDecode(sessionDTO.paymentMethodsJson),
     );
   }
 
@@ -78,11 +78,11 @@ class AdyenCheckoutSession {
 
   Future<PaymentResult> startInstantComponent({
     required InstantComponentConfiguration configuration,
-    required Map<String, dynamic> paymentMethodResponse,
+    required Map<String, dynamic> paymentMethod,
     required SessionCheckout checkout,
   }) =>
       InstantSessionComponent(sessionCheckout: checkout).start(
         configuration,
-        paymentMethodResponse,
+        paymentMethod,
       );
 }

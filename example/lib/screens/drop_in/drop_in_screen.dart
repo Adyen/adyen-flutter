@@ -79,7 +79,7 @@ class DropInScreen extends StatelessWidget {
 
       final paymentResult = await AdyenCheckout.advanced.startDropIn(
         dropInConfiguration: dropInConfiguration,
-        paymentMethodsResponse: paymentMethodsResponse,
+        paymentMethods: paymentMethodsResponse,
         checkout: advancedCheckout,
       );
 
