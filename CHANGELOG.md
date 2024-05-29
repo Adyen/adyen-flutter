@@ -1,7 +1,9 @@
 ## 0.1.0
 
-* ⚠ **Breaking Change**: Changed ResultCode into an enum. Please adjust your usage of the PaymentResult (PaymentSessionFinished or PaymentAdvancedFinished). 
-* ⚠ **Breaking Change**: Changed the payment methods type from String to Map<String, dynamic> to support JSON data directly.
+* ⚠ **Breaking Change**: Changed ResultCode into an enum. Please adjust your usage of the
+  PaymentResult (PaymentSessionFinished or PaymentAdvancedFinished).
+* ⚠ **Breaking Change**: Changed the payment methods type from String to Map<String, dynamic> to
+  support JSON data directly.
 * ⚠ **Breaking Change**: Updated AdvancedCheckout class and removed deprecated implementation.
 * Updated iOS SDK to v5.8.0.
 * Updated Android SDK to v5.3.1.

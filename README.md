@@ -85,6 +85,8 @@ You can use Adyen Flutter with either of our [server-side flows](https://docs.ad
 - Advanced flow
   
 You must use [Checkout API](https://docs.adyen.com/api-explorer/Checkout/latest/overview) v71 or later.
+<br>
+
 ### Drop-in with Sessions flow
 
 1.  From your backend, make a [`/sessions`](https://docs.adyen.com/api-explorer/Checkout/71/post/sessions) request.
@@ -132,7 +134,7 @@ final PaymentResult paymentResult =  await AdyenCheckout.session.startDropIn(
    2. Update your order management system.
    You get the final payment status in an **AUTHORISATION** webhook. Use the `merchantReference` from the webhook to match it to your order reference.
    For a successful payment, the event contains `success`: **true**.
-
+<br>
 
 ### Drop-in with Advanced flow
 
@@ -149,13 +151,13 @@ final DropInConfiguration dropInConfiguration = DropInConfiguration(
 );
 ```
 
-3. Create an `AdvancedCheckoutPreview` providing two callbacks:
+3. Create an `AdvancedCheckout` providing two callbacks:
 - `onSubmit`: from your backend, make a [`/payments`](https://docs.adyen.com/api-explorer/Checkout/latest/post/payments) request. The callback returns two parameters:
   - `data`: payment data that needs to be forwarded.
   - `extra`: extra information (e.g. shipping address) in case it is specified for the payment method configuration. Can be null if not needed.
 - `onAdditionalDetails`: from your server, make a [`/payments/details`](https://docs.adyen.com/api-explorer/Checkout/71/post/payments/details)
 ```dart
-final AdvancedCheckoutPreview advancedCheckout = AdvancedCheckoutPreview(
+final AdvancedCheckout advancedCheckout = AdvancedCheckout(
   onSubmit: YOUR_ON_SUBMIT_CALL,
   onAdditionalDetails: YOUR_ON_ADDITIONAL_DETAILS_CALL,
 );
@@ -235,13 +237,13 @@ final CardComponentConfiguration cardComponentConfiguration = CardComponentConfi
   amount: AMOUNT,
 );
 ```
-4. Create an `AdvancedCheckoutPreview` providing two callbacks:
+4. Create an `AdvancedCheckout` providing two callbacks:
 - `onSubmit`: from your backend, make a [`/payments`](https://docs.adyen.com/api-explorer/Checkout/latest/post/payments) request. The callback returns two parameters:
   - `data`: payment data that needs to be forwarded.
   - `extra`: Will be null because it is not supported for cards.
 - `onAdditionalDetails`: from your backend, make a [`/payments/details`](https://docs.adyen.com/api-explorer/Checkout/71/post/payments/details)
 ```dart
-final AdvancedCheckoutPreview advancedCheckout = AdvancedCheckoutPreview(
+final AdvancedCheckout advancedCheckout = AdvancedCheckout(
   onSubmit: YOUR_ON_SUBMIT_CALL,
   onAdditionalDetails: YOUR_ON_ADDITIONAL_DETAILS_CALL,
 );
@@ -328,13 +330,13 @@ final ApplePayComponentConfiguration applePayComponentConfiguration = ApplePayCo
   applePayConfiguration: applePayComponentConfiguration,
 );
 ```
-4. Create an `AdvancedCheckoutPreview` providing two callbacks:
+4. Create an `AdvancedCheckout` providing two callbacks:
 - `onSubmit`: from your backend, make a [`/payments`](https://docs.adyen.com/api-explorer/Checkout/latest/post/payments) request. The callback returns two parameters:
   - `data`: payment data that needs to be forwarded.
   - `extra`: extra information (e.g. shipping address) in case it is specified in the Apple Pay configuration. Can be null if not needed.
 - `onAdditionalDetails`: from your backend, make a [`/payments/details`](https://docs.adyen.com/api-explorer/Checkout/71/post/payments/details)
 ```dart
-final AdvancedCheckoutPreview advancedCheckout = AdvancedCheckoutPreview(
+final AdvancedCheckout advancedCheckout = AdvancedCheckout(
   onSubmit: YOUR_ON_SUBMIT_CALL,
   onAdditionalDetails: YOUR_ON_ADDITIONAL_DETAILS_CALL,
 );
@@ -398,7 +400,7 @@ AdyenGooglePayComponent(
   },
 ),
 ``` 
-</p>
+<br>
 
 ### Google Pay Component with Advanced flow
 
@@ -420,13 +422,13 @@ AdyenGooglePayComponent(
   ),
 );
 ```
-4. Create an `AdvancedCheckoutPreview` providing two callbacks:
+4. Create an `AdvancedCheckout` providing two callbacks:
 - `onSubmit`: from your backend, make a [`/payments`](https://docs.adyen.com/api-explorer/Checkout/latest/post/payments) request. The callback returns two parameters:
   - `data`: payment data that needs to be forwarded.
   - `extra`: extra information (e.g. shipping address) in case it is specified in the Google Pay configuration. Can be null if not needed.
 - `onAdditionalDetails`: from your backend, make a [`/payments/details`](https://docs.adyen.com/api-explorer/Checkout/71/post/payments/details)
 ```dart
-final AdvancedCheckoutPreview advancedCheckout = AdvancedCheckoutPreview(
+final AdvancedCheckout advancedCheckout = AdvancedCheckout(
   onSubmit: YOUR_ON_SUBMIT_CALL,
   onAdditionalDetails: YOUR_ON_ADDITIONAL_DETAILS_CALL,
 );
@@ -446,11 +448,126 @@ final AdvancedCheckoutPreview advancedCheckout = AdvancedCheckoutPreview(
 ),
 ``` 
 
-</p>
+<br>
+
+### Instant Component with Sessions flow
+1. From your backend, make a [`sessions`](https://docs.adyen.com/api-explorer/Checkout/71/post/sessions) request. The response contains:
+- `sessionData`: the payment session data.
+- `id`: a unique identifier for the session data.
+- The request body.
+
+Pass these values to your app.
+
+2. In your Flutter app, create an `InstantComponentConfiguration`.
+
+```dart
+final InstantComponentConfiguration instantComponentConfiguration = InstantComponentConfiguration(
+  // Change the environment to live when you are ready to accept real payments.
+  environment: Config.environment,
+  clientKey: Config.clientKey,
+  countryCode: Config.countryCode,
+  amount: Config.amount,
+);
+```
+3. Create a `SessionCheckout` by calling the `AdyenCheckout.session.create()` while passing the required properties:
+```dart
+final SessionCheckout sessionCheckout = await AdyenCheckout.session.create(
+  sessionId: sessionResponse.id,
+  sessionData: sessionResponse.sessionData,
+  configuration: instantComponentConfiguration,
+);
+```
+4. Get your required instant payment method by filtering the payment methods list provided by the `SessionCheckout`.
+5. Use the instant component:
+```dart
+final PaymentResult paymentResult = await AdyenCheckout.session.startInstantComponent(
+  configuration: instantComponentConfiguration,
+  paymentMethodResponse: paymentMethodResponse,
+  checkout: sessionCheckout,
+);
+``` 
+
+<br>
+
+### Instant Component with Advanced flow
+
+1. From your backend, make a [`/paymentMethods`](https://docs.adyen.com/api-explorer/Checkout/71/post/paymentMethods) request.
+2. Get the instant payment method by filtering the payment methods list.
+3. In your Flutter app, create an `InstantComponentConfiguration`.
+
+```dart
+final InstantComponentConfiguration instantComponentConfiguration = InstantComponentConfiguration(
+  // Change the environment to live when you are ready to accept real payments.
+  environment: Config.environment,
+  clientKey: Config.clientKey,
+  countryCode: Config.countryCode,
+  amount: Config.amount,
+);
+```
+4. Create an `AdvancedCheckout` providing two callbacks:
+- `onSubmit`: from your backend, make a [`/payments`](https://docs.adyen.com/api-explorer/Checkout/latest/post/payments) request. The callback returns two parameters:
+  - `data`: payment data that needs to be forwarded.
+  - `extra`: extra information if available (e.g. shipping address). Can be null if not needed.
+- `onAdditionalDetails`: from your backend, make a [`/payments/details`](https://docs.adyen.com/api-explorer/Checkout/71/post/payments/details)
+```dart
+final AdvancedCheckout advancedCheckout = AdvancedCheckout(
+  onSubmit: YOUR_ON_SUBMIT_CALL,
+  onAdditionalDetails: YOUR_ON_ADDITIONAL_DETAILS_CALL,
+);
+```
+
+5. Use the instant component:
+```dart
+final PaymentResult paymentResult = await AdyenCheckout.advanced.startInstantComponent(
+  configuration: instantComponentConfiguration,
+  paymentMethod: paymentMethodResponse,
+  checkout: advancedCheckout,
+);
+```
+<br>
 
 ### Multi Component setup
 
 The SDK currently supports component combination in the advanced flow only. By using this flow, you can use the card component together with the Google Pay or Apple Pay component.
+<br>
+
+## UI Customization
+
+
+### Android
+
+Follow the Android SDK [customization docs](https://github.com/Adyen/adyen-android/blob/develop/docs/UI_CUSTOMIZATION.md).
+
+### iOS
+
+In **Xcode** create swift class `AdyenAppearance` extending protocol `AdyenComponentAppearanceProvider` or `AdyenDropInAppearanceProvider` depending of your integration.
+SDK will use reflection to find the class with this exact name. Our example app contains a [demo implementation](https://github.com/Adyen/adyen-flutter/blob/main/example/ios/Runner/AppDelegate.swift#L22).
+
+Drop-in:
+
+```swift
+import Adyen
+import adyen_checkout
+
+class AdyenAppearance: AdyenDropInAppearanceProvider {
+  static func createDropInStyle() -> Adyen.DropInComponent.Style {
+     # provide your custom style here
+  }
+}
+```
+
+Card Component: 
+
+```swift
+import Adyen
+import adyen_checkout
+
+class AdyenAppearance: AdyenComponentAppearanceProvider {
+  static func createCardComponentStyle() -> Adyen.FormComponentStyle {
+     # provide your custom style here
+  }
+}
+```
 
 ## Support
 
