@@ -95,12 +95,11 @@ You must use [Checkout API](https://docs.adyen.com/api-explorer/Checkout/latest/
 The response contains:<br>
 - `sessionData`: the payment session data you need to pass to your front end.<br>
 - `id`: a unique identifier for the session data.<br>
-- The request body.
 
-Put these into a `sessionResponse` object and pass it to your client app.
+2. Pass these values to your app.
 
 
-2. Create the `DropInConfiguration`. 
+3. Create the `DropInConfiguration`. 
 ```dart
 final DropInConfiguration dropInConfiguration = DropInConfiguration(
   // Change the environment to live when you are ready to accept real payments.
@@ -113,7 +112,7 @@ final DropInConfiguration dropInConfiguration = DropInConfiguration(
 ```
 The `DropInConfiguration` also supports optional payment method configurations.
 
-3. Call the `create` method, passing the required properties:
+4. Call the `create` method, passing the required properties:
 ```dart 
    final SessionCheckout sessionCheckout = await AdyenCheckout.session.create(
      sessionId: sessionResponse.id,
@@ -121,7 +120,7 @@ The `DropInConfiguration` also supports optional payment method configurations.
      configuration: dropInConfiguration,
    );
 ```
-4. Call `startDropin` to start the Drop-in UI and wait for the session payment result. Drop-in handles the payment flow: 
+5. Call `startDropin` to start the Drop-in UI and wait for the session payment result. Drop-in handles the payment flow: 
 ```dart 
 final PaymentResult paymentResult =  await AdyenCheckout.session.startDropIn(
   dropInConfiguration: dropInConfiguration,
@@ -129,7 +128,7 @@ final PaymentResult paymentResult =  await AdyenCheckout.session.startDropIn(
 );
 ```
 
-5. Handle the payment result.
+6. Handle the payment result.
    1. Inform the shopper.
    Use the [`resultCode`](https://docs.adyen.com/online-payments/build-your-integration/payment-result-codes/) from the API response to show your shopper the current payment status.
    2. Update your order management system.
@@ -186,11 +185,10 @@ For a successful payment, the event contains `success`: **true**.
 1. From your backend, make a [`sessions`](https://docs.adyen.com/api-explorer/Checkout/71/post/sessions) request. The response contains:
 - `sessionData`: the payment session data.
 - `id`: a unique identifier for the session data.
-- The request body.
 
-Pass these values to your app.
+2. Pass these values to your app.
 
-2. Create the `CardComponentConfiguration`.
+3. Create the `CardComponentConfiguration`.
 ```dart
 final CardComponentConfiguration cardComponentConfiguration = CardComponentConfiguration(
   // Change the environment to live when you are ready to accept real payments.
@@ -201,7 +199,7 @@ final CardComponentConfiguration cardComponentConfiguration = CardComponentConfi
   amount: AMOUNT,
 );
 ```
-3. Call the `create` method, passing the required properties:
+4. Call the `create` method, passing the required properties:
 ```dart
 final sessionCheckout = await AdyenCheckout.session.create(
   sessionId: sessionResponse.id,
@@ -209,8 +207,8 @@ final sessionCheckout = await AdyenCheckout.session.create(
   configuration: cardComponentConfiguration,
 );
 ```
-4. Get the card payment method to use from the `sessionCheckout` object.
-5. Create the card component widget:
+5. Get the card payment method to use from the `sessionCheckout` object.
+6. Create the card component widget:
 ```dart
 AdyenCardComponent(
   configuration: cardComponentConfiguration,
@@ -266,11 +264,10 @@ AdyenCardComponent(
 1. From your backend, make a [`sessions`](https://docs.adyen.com/api-explorer/Checkout/71/post/sessions) request. The response contains:
 - `sessionData`: the payment session data.
 - `id`: a unique identifier for the session data.
-- The request body.
 
-Pass these values to your app.
+2. Pass these values to your app.
 
-2. In your Flutter app, create a `ApplePayComponentConfiguration` instance. It requires a `ApplePayConfiguration` which contains your merchant id and merchant name.
+3. In your Flutter app, create a `ApplePayComponentConfiguration` instance. It requires a `ApplePayConfiguration` which contains your merchant id and merchant name.
 
 ```dart
 final ApplePayConfiguration applePayConfiguration = ApplePayConfiguration(
@@ -287,7 +284,7 @@ final ApplePayComponentConfiguration applePayComponentConfiguration = ApplePayCo
   applePayConfiguration: applePayComponentConfiguration,
 );
 ```
-3. Create a `SessionCheckout` by calling the `AdyenCheckout.session.create()` while passing the required properties:
+4. Create a `SessionCheckout` by calling the `AdyenCheckout.session.create()` while passing the required properties:
 ```dart
 final sessionCheckout = await AdyenCheckout.session.create(
   sessionId: sessionResponse.id,
@@ -295,8 +292,8 @@ final sessionCheckout = await AdyenCheckout.session.create(
   configuration: applePayComponentConfiguration,
 );
 ```
-4. Get the Apple Pay payment method from the `sessionCheckout` object.
-5. Use the Apple Pay component widget:
+5. Get the Apple Pay payment method from the `sessionCheckout` object.
+6. Use the Apple Pay component widget:
 ```dart
 AdyenApplePayComponent(
   configuration: applePayComponentConfiguration,
@@ -361,11 +358,10 @@ AdyenApplePayComponent(
 1. From your backend, make a [`sessions`](https://docs.adyen.com/api-explorer/Checkout/71/post/sessions) request. The response contains:
 - `sessionData`: the payment session data.
 - `id`: a unique identifier for the session data.
-- The request body.
 
-Pass these values to your app.
+2. Pass these values to your app.
 
-2. In your Flutter app, create a `GooglePayComponentConfiguration` instance. It requires a `GooglePayConfiguration` which contains the Google Pay environment.
+3. In your Flutter app, create a `GooglePayComponentConfiguration` instance. It requires a `GooglePayConfiguration` which contains the Google Pay environment.
 
 ```dart
 final GooglePayComponentConfiguration googlePayComponentConfiguration = GooglePayComponentConfiguration(
@@ -380,7 +376,7 @@ final GooglePayComponentConfiguration googlePayComponentConfiguration = GooglePa
   ),
 );
 ```
-3. Create a `SessionCheckout` by calling the `AdyenCheckout.session.create()` while passing the required properties:
+4. Create a `SessionCheckout` by calling the `AdyenCheckout.session.create()` while passing the required properties:
 ```dart
 final sessionCheckout = await AdyenCheckout.session.create(
   sessionId: sessionResponse.id,
@@ -388,8 +384,8 @@ final sessionCheckout = await AdyenCheckout.session.create(
   configuration: googlePayComponentConfiguration,
 );
 ```
-4. Get the Google Pay payment method from the `sessionCheckout` object.
-5. Use the Google Pay component widget:
+5. Get the Google Pay payment method from the `sessionCheckout` object.
+6. Use the Google Pay component widget:
 ```dart
 AdyenGooglePayComponent(
   configuration: googlePayComponentConfiguration,
@@ -455,22 +451,21 @@ final AdvancedCheckout advancedCheckout = AdvancedCheckout(
 1. From your backend, make a [`sessions`](https://docs.adyen.com/api-explorer/Checkout/71/post/sessions) request. The response contains:
 - `sessionData`: the payment session data.
 - `id`: a unique identifier for the session data.
-- The request body.
 
-Pass these values to your app.
+2. Pass these values to your app.
 
-2. In your Flutter app, create an `InstantComponentConfiguration`.
+3. In your Flutter app, create an `InstantComponentConfiguration`.
 
 ```dart
 final InstantComponentConfiguration instantComponentConfiguration = InstantComponentConfiguration(
   // Change the environment to live when you are ready to accept real payments.
-  environment: Config.environment,
-  clientKey: Config.clientKey,
-  countryCode: Config.countryCode,
-  amount: Config.amount,
+  environment: Environment.test,
+  clientKey: CLIENT_KEY,
+  countryCode: COUNTRY_CODE,
+  amount: AMOUNT,
 );
 ```
-3. Create a `SessionCheckout` by calling the `AdyenCheckout.session.create()` while passing the required properties:
+4. Create a `SessionCheckout` by calling the `AdyenCheckout.session.create()` while passing the required properties:
 ```dart
 final SessionCheckout sessionCheckout = await AdyenCheckout.session.create(
   sessionId: sessionResponse.id,
@@ -478,8 +473,8 @@ final SessionCheckout sessionCheckout = await AdyenCheckout.session.create(
   configuration: instantComponentConfiguration,
 );
 ```
-4. Get your required instant payment method by filtering the payment methods list provided by the `SessionCheckout`.
-5. Use the instant component:
+5. Get your required instant payment method by filtering the payment methods list provided by the `SessionCheckout`.
+6. Use the instant component:
 ```dart
 final PaymentResult paymentResult = await AdyenCheckout.session.startInstantComponent(
   configuration: instantComponentConfiguration,
@@ -499,10 +494,10 @@ final PaymentResult paymentResult = await AdyenCheckout.session.startInstantComp
 ```dart
 final InstantComponentConfiguration instantComponentConfiguration = InstantComponentConfiguration(
   // Change the environment to live when you are ready to accept real payments.
-  environment: Config.environment,
-  clientKey: Config.clientKey,
-  countryCode: Config.countryCode,
-  amount: Config.amount,
+  environment: Environment.test,
+  clientKey: CLIENT_KEY,
+  countryCode: COUNTRY_CODE,
+  amount: AMOUNT,
 );
 ```
 4. Create an `AdvancedCheckout` and provide two callbacks:
