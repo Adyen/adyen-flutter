@@ -10,6 +10,7 @@
 * Added support for customizing Drop-in and Card Component.
 * Added option to adjust Drop-in preselected payment method title.
 * Added support for Instant Component.
+* Added support for Client-Side Encryption (CSE).
 
 ## 0.0.3
 
