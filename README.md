@@ -2,7 +2,7 @@
 # Adyen Flutter (beta)
 
 > [!IMPORTANT]
-> **This package is an beta version. Breaking changes might be included in later versions.**
+> **This package is a beta version. Breaking changes might be included in later versions.**
 
 The Adyen Flutter package provides you with the building blocks to create a seamless checkout experience for your Android and iOS Flutter app.
 

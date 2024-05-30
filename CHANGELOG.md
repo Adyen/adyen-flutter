@@ -6,7 +6,7 @@
   support JSON data directly.
 * ⚠ **Breaking Change**: Updated AdvancedCheckout class and removed deprecated implementation.
 * Updated iOS SDK to v5.8.0.
-* Updated Android SDK to v5.3.1.
+* Updated Android SDK to v5.4.0.
 * Added support for customizing Drop-in and Card Component.
 * Added option to adjust Drop-in preselected payment method title.
 * Added support for Instant Component.
