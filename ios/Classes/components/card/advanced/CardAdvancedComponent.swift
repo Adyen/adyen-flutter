@@ -26,10 +26,10 @@ class CardAdvancedComponent: BaseCardComponent {
             componentPlatformApi: componentPlatformApi
         )
 
-        actionComponentDelegate = ComponentActionDelegate(
+        actionComponentDelegate = ComponentActionHandler(
             componentFlutterApi: componentFlutterApi,
             componentId: componentId,
-            finalizeAndDismissComponent: finalizeAndDismiss(success:completion:)
+            finalizeCallback: finalizeAndDismiss(success:completion:)
         )
         setupCardComponentView()
         setupFinalizeComponentCallback()
@@ -74,7 +74,6 @@ class CardAdvancedComponent: BaseCardComponent {
         let paymentMethod: AnyCardPaymentMethod = isStoredPaymentMethod
             ? try JSONDecoder().decode(StoredCardPaymentMethod.self, from: Data(paymentMethodString.utf8))
             : try JSONDecoder().decode(CardPaymentMethod.self, from: Data(paymentMethodString.utf8))
-        presentationDelegate = ComponentPresentationDelegate(topViewController: getViewController())
         actionComponent = buildActionComponent(adyenContext: adyenContext)
         return CardComponent(paymentMethod: paymentMethod, context: adyenContext, configuration: cardConfiguration)
     }
@@ -82,7 +81,7 @@ class CardAdvancedComponent: BaseCardComponent {
     private func buildActionComponent(adyenContext: AdyenContext) -> AdyenActionComponent {
         let actionComponent = AdyenActionComponent(context: adyenContext)
         actionComponent.delegate = actionComponentDelegate
-        actionComponent.presentationDelegate = presentationDelegate
+        actionComponent.presentationDelegate = getViewController()
         return actionComponent
     }
 
@@ -99,8 +98,8 @@ class CardAdvancedComponent: BaseCardComponent {
     private func setupFinalizeComponentCallback() {
         componentPlatformApi.onFinishCallback = { [weak self] paymentEvent in
             let resultCode = ResultCode(rawValue: paymentEvent.result ?? "")
-            let success = resultCode == .authorised || resultCode == .received || resultCode == .pending
-            self?.finalizeAndDismiss(success: success, completion: { [weak self] in
+            let isAccepted = resultCode?.isAccepted ?? false
+            self?.finalizeAndDismiss(success: isAccepted, completion: { [weak self] in
                 let componentCommunicationModel = ComponentCommunicationModel(
                     type: ComponentCommunicationType.result,
                     componentId: self?.componentId ?? "",

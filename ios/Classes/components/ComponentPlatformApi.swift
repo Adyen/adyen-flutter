@@ -94,7 +94,7 @@ class ComponentPlatformApi: ComponentPlatformInterface {
     }
     
     private func isInstantPaymentComponent(componentId: String) -> Bool {
-        componentId.contains(InstantComponentManager.Constants.instantSessionComponentId) ||
-            componentId.contains(InstantComponentManager.Constants.instantAdvancedComponentId)
+        componentId == InstantComponentManager.Constants.instantSessionComponentId ||
+            componentId == InstantComponentManager.Constants.instantAdvancedComponentId
     }
 }

@@ -1,8 +1,8 @@
 import 'package:adyen_checkout/adyen_checkout.dart';
-import 'package:adyen_checkout/src/common/model/payment_result.dart';
 import 'package:adyen_checkout/src/components/apple_pay/base_apple_pay_component.dart';
 import 'package:adyen_checkout/src/generated/platform_api.g.dart';
 import 'package:adyen_checkout/src/logging/adyen_logger.dart';
+import 'package:adyen_checkout/src/util/dto_mapper.dart';
 
 class ApplePaySessionComponent extends BaseApplePayComponent {
   final SessionDTO session;
@@ -39,7 +39,8 @@ class ApplePaySessionComponent extends BaseApplePayComponent {
 
   @override
   void onFinished(PaymentResultDTO? paymentResultDTO) {
-    String resultCode = paymentResultDTO?.result?.resultCode ?? "";
+    final ResultCode resultCode =
+        paymentResultDTO?.result?.toResultCode() ?? ResultCode.unknown;
     adyenLogger.print("Apple Pay session flow result code: $resultCode");
     onPaymentResult(PaymentSessionFinished(
       sessionId: paymentResultDTO?.result?.sessionId ?? "",

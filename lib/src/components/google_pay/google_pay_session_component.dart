@@ -1,6 +1,8 @@
 import 'package:adyen_checkout/src/common/model/payment_result.dart';
+import 'package:adyen_checkout/src/common/model/result_code.dart';
 import 'package:adyen_checkout/src/components/google_pay/base_google_pay_component.dart';
 import 'package:adyen_checkout/src/generated/platform_api.g.dart';
+import 'package:adyen_checkout/src/util/dto_mapper.dart';
 
 class GooglePaySessionComponent extends BaseGooglePayComponent {
   final SessionDTO session;
@@ -36,12 +38,13 @@ class GooglePaySessionComponent extends BaseGooglePayComponent {
   }
 
   @override
-  void onFinished(PaymentResultDTO? paymentResultDTO) {
-    String resultCode = paymentResultDTO?.result?.resultCode ?? "";
+  void onFinished(PaymentResultDTO paymentResultDTO) {
+    final ResultCode resultCode =
+        paymentResultDTO.result?.toResultCode() ?? ResultCode.unknown;
     adyenLogger.print("Google Pay session result code: $resultCode");
     onPaymentResult(PaymentSessionFinished(
-      sessionId: paymentResultDTO?.result?.sessionId ?? "",
-      sessionData: paymentResultDTO?.result?.sessionData ?? "",
+      sessionId: paymentResultDTO.result?.sessionId ?? "",
+      sessionData: paymentResultDTO.result?.sessionData ?? "",
       resultCode: resultCode,
     ));
   }

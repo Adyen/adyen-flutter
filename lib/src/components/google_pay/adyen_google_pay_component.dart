@@ -40,9 +40,7 @@ class AdyenGooglePayComponent extends StatelessWidget {
       case TargetPlatform.android:
         return switch (checkout) {
           SessionCheckout it => _buildGooglePaySessionFlowWidget(it),
-          AdvancedCheckoutPreview it => _buildGooglePayAdvancedFlowWidget(it),
-          AdvancedCheckout _ => throw Exception(
-              "Google pay component does not support the deprecated AdvancedCheckout. Please use AdvancedCheckoutPreview."),
+          AdvancedCheckout it => _buildGooglePayAdvancedFlowWidget(it),
         };
       default:
         throw Exception(
@@ -68,8 +66,7 @@ class AdyenGooglePayComponent extends StatelessWidget {
     );
   }
 
-  Widget _buildGooglePayAdvancedFlowWidget(
-      AdvancedCheckoutPreview advancedCheckout) {
+  Widget _buildGooglePayAdvancedFlowWidget(AdvancedCheckout advancedCheckout) {
     return GooglePayAdvancedComponent(
       key: key,
       googlePayPaymentMethod: json.encode(paymentMethod),

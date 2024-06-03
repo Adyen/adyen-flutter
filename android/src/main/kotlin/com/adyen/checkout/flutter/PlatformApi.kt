@@ -310,7 +310,7 @@ data class DropInConfigurationDTO (
   val showPreselectedStoredPaymentMethod: Boolean,
   val skipListWhenSinglePaymentMethod: Boolean,
   val isRemoveStoredPaymentMethodEnabled: Boolean,
-  val title: String? = null
+  val preselectedPaymentMethodTitle: String? = null
 
 ) {
   companion object {
@@ -339,8 +339,8 @@ data class DropInConfigurationDTO (
       val showPreselectedStoredPaymentMethod = list[10] as Boolean
       val skipListWhenSinglePaymentMethod = list[11] as Boolean
       val isRemoveStoredPaymentMethodEnabled = list[12] as Boolean
-      val title = list[13] as String?
-      return DropInConfigurationDTO(environment, clientKey, countryCode, amount, shopperLocale, cardConfigurationDTO, applePayConfigurationDTO, googlePayConfigurationDTO, cashAppPayConfigurationDTO, analyticsOptionsDTO, showPreselectedStoredPaymentMethod, skipListWhenSinglePaymentMethod, isRemoveStoredPaymentMethodEnabled, title)
+      val preselectedPaymentMethodTitle = list[13] as String?
+      return DropInConfigurationDTO(environment, clientKey, countryCode, amount, shopperLocale, cardConfigurationDTO, applePayConfigurationDTO, googlePayConfigurationDTO, cashAppPayConfigurationDTO, analyticsOptionsDTO, showPreselectedStoredPaymentMethod, skipListWhenSinglePaymentMethod, isRemoveStoredPaymentMethodEnabled, preselectedPaymentMethodTitle)
     }
   }
   fun toList(): List<Any?> {
@@ -358,7 +358,7 @@ data class DropInConfigurationDTO (
       showPreselectedStoredPaymentMethod,
       skipListWhenSinglePaymentMethod,
       isRemoveStoredPaymentMethodEnabled,
-      title,
+      preselectedPaymentMethodTitle,
     )
   }
 }

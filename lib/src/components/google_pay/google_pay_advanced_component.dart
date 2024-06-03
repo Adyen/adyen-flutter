@@ -6,10 +6,11 @@ import 'package:adyen_checkout/src/components/google_pay/base_google_pay_compone
 import 'package:adyen_checkout/src/generated/platform_api.g.dart';
 import 'package:adyen_checkout/src/logging/adyen_logger.dart';
 import 'package:adyen_checkout/src/util/constants.dart';
+import 'package:adyen_checkout/src/util/dto_mapper.dart';
 import 'package:adyen_checkout/src/util/payment_event_handler.dart';
 
 class GooglePayAdvancedComponent extends BaseGooglePayComponent {
-  final AdvancedCheckoutPreview advancedCheckout;
+  final AdvancedCheckout advancedCheckout;
   final PaymentEventHandler paymentEventHandler;
   @override
   final String componentId = "GOOGLE_PAY_ADVANCED_COMPONENT";
@@ -47,8 +48,9 @@ class GooglePayAdvancedComponent extends BaseGooglePayComponent {
   }
 
   @override
-  void onFinished(PaymentResultDTO? paymentResultDTO) {
-    String resultCode = paymentResultDTO?.result?.resultCode ?? "";
+  void onFinished(PaymentResultDTO paymentResultDTO) {
+    final ResultCode resultCode =
+        paymentResultDTO.result?.toResultCode() ?? ResultCode.unknown;
     adyenLogger.print("Google Pay result code: $resultCode");
     onPaymentResult(PaymentAdvancedFinished(resultCode: resultCode));
   }

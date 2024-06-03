@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:adyen_checkout/adyen_checkout.dart';
 import 'package:adyen_checkout/src/generated/platform_api.g.dart';
 
@@ -27,7 +29,7 @@ extension DropInConfigurationMapper on DropInConfiguration {
                 ?.showPreselectedStoredPaymentMethod ??
             true,
         skipListWhenSinglePaymentMethod: skipListWhenSinglePaymentMethod,
-        title: title,
+        preselectedPaymentMethodTitle: preselectedPaymentMethodTitle,
       );
 
   bool _isRemoveStoredPaymentMethodEnabled(
@@ -154,11 +156,18 @@ extension CashAppPayConfigurationMapper on CashAppPayConfiguration {
 }
 
 extension SessionMapper on SessionCheckout {
-  SessionDTO toDTO() => SessionDTO(
-        id: id,
-        sessionData: sessionData,
-        paymentMethodsJson: paymentMethodsJson,
-      );
+  SessionDTO toDTO() {
+    final encodedPaymentMethods = jsonEncode(
+      paymentMethods,
+      toEncodable: (value) => throw Exception("Could not encode $value"),
+    );
+
+    return SessionDTO(
+      id: id,
+      sessionData: sessionData,
+      paymentMethodsJson: encodedPaymentMethods,
+    );
+  }
 }
 
 extension AmountMapper on Amount {
@@ -279,5 +288,13 @@ extension InstantComponentConfigurationMapper on InstantComponentConfiguration {
         countryCode: countryCode,
         amount: amount?.toDTO(),
         analyticsOptionsDTO: analyticsOptions.toDTO(sdkVersionNumber),
+      );
+}
+
+extension PaymentResultModelMapper on PaymentResultModelDTO {
+  ResultCode toResultCode() => ResultCode.values.firstWhere(
+        (resultCodeEnum) =>
+            resultCodeEnum.name.toUpperCase() == resultCode?.toUpperCase(),
+        orElse: () => ResultCode.unknown,
       );
 }

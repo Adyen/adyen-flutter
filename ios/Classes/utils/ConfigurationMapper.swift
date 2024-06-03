@@ -45,6 +45,8 @@ class ConfigurationMapper {
             dropInConfiguration.cashAppPay = DropInComponent.CashAppPay(redirectURL: URL(string: cashAppPayConfigurationDTO.returnUrl)!)
         }
 
+        dropInConfiguration.style = AdyenAppearanceLoader.findDropInStyle() ?? DropInComponent.Style()
+
         return dropInConfiguration
     }
 
@@ -105,7 +107,7 @@ extension DropInConfigurationDTO {
 
 extension CardConfigurationDTO {
     func mapToCardComponentConfiguration(shopperLocale: String?) -> CardComponent.Configuration {
-        var formComponentStyle = FormComponentStyle()
+        var formComponentStyle = AdyenAppearanceLoader.findCardComponentStyle() ?? FormComponentStyle()
         formComponentStyle.backgroundColor = UIColor.white
         let localizationParameters = shopperLocale != nil ? LocalizationParameters(enforcedLocale: shopperLocale!) : nil
         let koreanAuthenticationMode = kcpFieldVisibility.toCardFieldVisibility()
@@ -228,7 +230,7 @@ private func buildAdyenContext(environment: Environment, clientKey: String, amou
         version: analyticsOptionsDTO.version,
         platform: .flutter
     )
-    
+
     return AdyenContext(
         apiContext: apiContext,
         payment: payment,
@@ -255,5 +257,26 @@ extension EncryptedCard {
             encryptedExpiryYear: expiryYear,
             encryptedSecurityCode: securityCode
         )
+    }
+}
+
+extension PaymentResultEnum {
+    static func from(error: Error) -> Self {
+        if let componentError = (error as? ComponentError), componentError == ComponentError.cancelled {
+            .cancelledByUser
+        } else {
+            .error
+        }
+    }
+}
+
+extension ResultCode {
+    var isAccepted: Bool {
+        switch self {
+        case .authorised, .received, .pending:
+            return true
+        case .refused, .cancelled, .error, .redirectShopper, .identifyShopper, .challengeShopper, .presentToShopper:
+            return false
+        }
     }
 }

@@ -17,8 +17,9 @@ export 'src/common/model/payment_method_configurations/google_pay/billing_addres
 export 'src/common/model/payment_method_configurations/google_pay/google_pay_configuration.dart';
 export 'src/common/model/payment_method_configurations/google_pay/merchant_info.dart';
 export 'src/common/model/payment_method_configurations/google_pay/shipping_address_parameters.dart';
+export 'src/common/model/payment_method_configurations/stored_payment_method_configuration.dart';
 export 'src/common/model/payment_result.dart';
-export 'src/common/model/stored_payment_method_configuration.dart';
+export 'src/common/model/result_code.dart';
 export 'src/components/apple_pay/adyen_apple_pay_component.dart';
 export 'src/components/apple_pay/model/apple_pay_button_style.dart';
 export 'src/components/apple_pay/model/apple_pay_button_theme.dart';

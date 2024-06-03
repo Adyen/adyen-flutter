@@ -5,14 +5,17 @@ import 'package:adyen_checkout/adyen_checkout.dart';
 import 'package:adyen_checkout/src/components/instant/base_instant_component.dart';
 import 'package:adyen_checkout/src/generated/platform_api.g.dart';
 import 'package:adyen_checkout/src/util/constants.dart';
+import 'package:adyen_checkout/src/util/dto_mapper.dart';
 import 'package:adyen_checkout/src/util/payment_event_handler.dart';
 
 class InstantAdvancedComponent extends BaseInstantComponent {
-  final AdvancedCheckoutPreview advancedCheckout;
+  final AdvancedCheckout advancedCheckout;
   final PaymentEventHandler paymentEventHandler;
 
+  @override
+  final String componentId = "INSTANT_ADVANCED_COMPONENT";
+
   InstantAdvancedComponent({
-    required super.componentId,
     required this.advancedCheckout,
     PaymentEventHandler? paymentEventHandler,
   }) : paymentEventHandler = paymentEventHandler ?? PaymentEventHandler();
@@ -30,7 +33,8 @@ class InstantAdvancedComponent extends BaseInstantComponent {
 
   @override
   void onFinished(PaymentResultDTO? paymentResultDTO) {
-    String resultCode = paymentResultDTO?.result?.resultCode ?? "";
+    final ResultCode resultCode =
+        paymentResultDTO?.result?.toResultCode() ?? ResultCode.unknown;
     adyenLogger.print("Instant component advanced result code: $resultCode");
     completer.complete(PaymentAdvancedFinished(resultCode: resultCode));
   }

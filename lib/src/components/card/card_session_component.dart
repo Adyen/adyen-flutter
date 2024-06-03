@@ -1,7 +1,9 @@
 import 'package:adyen_checkout/src/common/model/payment_result.dart';
+import 'package:adyen_checkout/src/common/model/result_code.dart';
 import 'package:adyen_checkout/src/components/card/base_card_component.dart';
 import 'package:adyen_checkout/src/generated/platform_api.g.dart';
 import 'package:adyen_checkout/src/util/constants.dart';
+import 'package:adyen_checkout/src/util/dto_mapper.dart';
 
 class CardSessionComponent extends BaseCardComponent {
   final SessionDTO session;
@@ -44,7 +46,8 @@ class CardSessionComponent extends BaseCardComponent {
 
   @override
   void onFinished(PaymentResultDTO? paymentResultDTO) {
-    String resultCode = paymentResultDTO?.result?.resultCode ?? "";
+    final ResultCode resultCode =
+        paymentResultDTO?.result?.toResultCode() ?? ResultCode.unknown;
     adyenLogger.print("Card component session flow result code: $resultCode");
     onPaymentResult(PaymentSessionFinished(
       sessionId: paymentResultDTO?.result?.sessionId ?? "",

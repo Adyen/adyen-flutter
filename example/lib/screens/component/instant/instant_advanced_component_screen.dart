@@ -1,10 +1,9 @@
 // ignore_for_file: unused_local_variable
 
-import 'dart:convert';
-
 import 'package:adyen_checkout/adyen_checkout.dart';
 import 'package:adyen_checkout_example/config.dart';
 import 'package:adyen_checkout_example/repositories/adyen_instant_component_repository.dart';
+import 'package:adyen_checkout_example/utils/dialog_builder.dart';
 import 'package:flutter/material.dart';
 
 class InstantAdvancedComponentScreen extends StatelessWidget {
@@ -33,12 +32,12 @@ class InstantAdvancedComponentScreen extends StatelessWidget {
   }
 
   Widget _buildAdyenGooglePayAdvancedComponent() {
-    return FutureBuilder<String>(
+    return FutureBuilder<Map<String, dynamic>>(
       future: repository.fetchPaymentMethods(),
-      builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
+      builder:
+          (BuildContext context, AsyncSnapshot<Map<String, dynamic>> snapshot) {
         if (snapshot.hasData) {
-          final AdvancedCheckoutPreview advancedCheckout =
-              AdvancedCheckoutPreview(
+          final AdvancedCheckout advancedCheckout = AdvancedCheckout(
             onSubmit: repository.onSubmit,
             onAdditionalDetails: repository.onAdditionalDetails,
           );
@@ -68,11 +67,12 @@ class InstantAdvancedComponentScreen extends StatelessWidget {
                     AdyenCheckout.advanced
                         .startInstantComponent(
                           configuration: instantComponentConfiguration,
-                          paymentMethodResponse: payPalPaymentMethodResponse,
+                          paymentMethod: payPalPaymentMethodResponse,
                           checkout: advancedCheckout,
                         )
                         .then((paymentResult) =>
-                            _dialogBuilder(paymentResult, context));
+                            DialogBuilder.showPaymentResultDialog(
+                                paymentResult, context));
                   },
                   child: const Text("Paypal")),
               TextButton(
@@ -80,11 +80,12 @@ class InstantAdvancedComponentScreen extends StatelessWidget {
                     AdyenCheckout.advanced
                         .startInstantComponent(
                           configuration: instantComponentConfiguration,
-                          paymentMethodResponse: klarnaPaymentMethodResponse,
+                          paymentMethod: klarnaPaymentMethodResponse,
                           checkout: advancedCheckout,
                         )
                         .then((paymentResult) =>
-                            _dialogBuilder(paymentResult, context));
+                            DialogBuilder.showPaymentResultDialog(
+                                paymentResult, context));
                   },
                   child: const Text("Klarna"))
             ],
@@ -97,51 +98,10 @@ class InstantAdvancedComponentScreen extends StatelessWidget {
   }
 
   Map<String, dynamic> _extractPaymentMethod(
-      String paymentMethods, String key) {
-    Map<String, dynamic> jsonPaymentMethods = jsonDecode(paymentMethods);
-    return jsonPaymentMethods["paymentMethods"].firstWhere(
+      Map<String, dynamic> paymentMethods, String key) {
+    return paymentMethods["paymentMethods"].firstWhere(
       (paymentMethod) => paymentMethod["type"] == key,
       orElse: () => throw Exception("$key payment method not provided"),
-    );
-  }
-
-  _dialogBuilder(PaymentResult paymentResult, BuildContext context) {
-    String title = "";
-    String message = "";
-    switch (paymentResult) {
-      case PaymentAdvancedFinished():
-        title = "Finished";
-        message = "Result code: ${paymentResult.resultCode}";
-      case PaymentSessionFinished():
-        title = "Finished";
-        message = "Result code: ${paymentResult.resultCode}";
-      case PaymentCancelledByUser():
-        title = "Cancelled by user";
-        message = "Cancelled by user";
-      case PaymentError():
-        title = "Error occurred";
-        message = "${paymentResult.reason}";
-    }
-
-    return showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text(title),
-          content: Text(message),
-          actions: <Widget>[
-            TextButton(
-              style: TextButton.styleFrom(
-                textStyle: Theme.of(context).textTheme.labelLarge,
-              ),
-              child: const Text('Close'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
     );
   }
 }

@@ -5,29 +5,16 @@ sealed class Checkout {}
 class SessionCheckout extends Checkout {
   final String id;
   final String sessionData;
-  final String paymentMethodsJson;
+  final Map<String, dynamic> paymentMethods;
 
   SessionCheckout({
     required this.id,
     required this.sessionData,
-    required this.paymentMethodsJson,
+    required this.paymentMethods,
   });
 }
 
-@Deprecated(
-    "Please consider using the AdvancedCheckoutPreview. We plan for adaptation with the first beta release.")
 class AdvancedCheckout extends Checkout {
-  Future<PaymentEvent> Function(String paymentComponentJson) onSubmit;
-  Future<PaymentEvent> Function(String additionalDetailsJson)
-      onAdditionalDetails;
-
-  AdvancedCheckout({
-    required this.onSubmit,
-    required this.onAdditionalDetails,
-  });
-}
-
-class AdvancedCheckoutPreview extends Checkout {
   Future<PaymentEvent> Function(
     Map<String, dynamic> data, [
     Map<String, dynamic>? extra,
@@ -36,7 +23,7 @@ class AdvancedCheckoutPreview extends Checkout {
   Future<PaymentEvent> Function(Map<String, dynamic> additionalDetails)
       onAdditionalDetails;
 
-  AdvancedCheckoutPreview({
+  AdvancedCheckout({
     required this.onSubmit,
     required this.onAdditionalDetails,
   });
