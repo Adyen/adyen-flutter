@@ -2,18 +2,19 @@ import Adyen
 import PassKit
 
 extension ApplePayConfigurationDTO {
-    func toApplePayConfiguration(amount: AmountDTO, countryCode: String) throws -> ApplePayComponent.Configuration {
-        let summaryItems =  try mapToPaymentSummaryItems(summaryItems: summaryItems, amount: amount)
-        let paymentRequest = try buildPaymentRequest(countryCode: countryCode, currencyCode: amount.currency, summaryItems: summaryItems)
+    func toApplePayConfiguration(payment: Payment?) throws -> ApplePayComponent.Configuration {
+        guard let payment else { throw PlatformError(errorDescription: "Amount for Apple pay not provided.") }
+        let summaryItems = try mapToPaymentSummaryItems(summaryItems: summaryItems, payment: payment)
+        let paymentRequest = try buildPaymentRequest(payment: payment, summaryItems: summaryItems)
         return try ApplePayComponent.Configuration(paymentRequest: paymentRequest, allowOnboarding: allowOnboarding ?? false)
     }
     
-    private func buildPaymentRequest(countryCode: String, currencyCode: String, summaryItems: [PKPaymentSummaryItem]) throws -> PKPaymentRequest {
+    private func buildPaymentRequest(payment: Payment, summaryItems: [PKPaymentSummaryItem]) throws -> PKPaymentRequest {
         let paymentRequest = PKPaymentRequest()
         paymentRequest.merchantIdentifier = merchantId
         paymentRequest.paymentSummaryItems = summaryItems
-        paymentRequest.countryCode = countryCode
-        paymentRequest.currencyCode = currencyCode
+        paymentRequest.countryCode = payment.countryCode
+        paymentRequest.currencyCode = payment.amount.currencyCode
         paymentRequest.billingContact = billingContact?.toApplePayContact()
         paymentRequest.shippingContact = shippingContact?.toApplePayContact()
         paymentRequest.merchantCapabilities = merchantCapability.toMerchantCapability()
@@ -59,9 +60,11 @@ extension ApplePayConfigurationDTO {
         return Set<PKContactField>(contactFieldsNonNil.compactMap { PKContactField.fromString($0) })
     }
     
-    private func mapToPaymentSummaryItems(summaryItems: [ApplePaySummaryItemDTO?]?, amount: AmountDTO) throws -> [PKPaymentSummaryItem] {
+    private func mapToPaymentSummaryItems(summaryItems: [ApplePaySummaryItemDTO?]?, payment: Payment) throws -> [PKPaymentSummaryItem] {
         guard let summaryItems else {
-            let formattedAmount = try amount.toFormattedAmount()
+            let formattedAmount = AmountFormatter.decimalAmount(payment.amount.value,
+                                                                currencyCode: payment.amount.currencyCode,
+                                                                localeIdentifier: payment.amount.localeIdentifier)
             return [PKPaymentSummaryItem(label: merchantName, amount: formattedAmount)]
         }
         

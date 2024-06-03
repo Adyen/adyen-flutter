@@ -24,20 +24,16 @@ class ApplePayComponentManager {
         callback: (Result<InstantPaymentSetupResultDTO, Error>) -> Void
     ) {
         do {
-            let applePayConfiguration = try instantPaymentComponentConfigurationDTO.mapToApplePayConfiguration()
-            let adyenContext = try instantPaymentComponentConfigurationDTO.createAdyenContext()
             if componentId == Constants.applePaySessionComponentId {
-                applePayComponent = ApplePaySessionComponent(
+                applePayComponent = try ApplePaySessionComponent(
                     sessionHolder: sessionHolder,
-                    configuration: applePayConfiguration,
-                    adyenContext: adyenContext,
+                    configuration: instantPaymentComponentConfigurationDTO,
                     componentId: componentId
                 )
             } else {
-                applePayComponent = ApplePayAdvancedComponent(
+                applePayComponent = try ApplePayAdvancedComponent(
                     componentFlutterApi: componentFlutterApi,
-                    configuration: applePayConfiguration,
-                    adyenContext: adyenContext,
+                    configuration: instantPaymentComponentConfigurationDTO,
                     paymentMethodResponse: paymentMethodResponse,
                     componentId: componentId
                 )

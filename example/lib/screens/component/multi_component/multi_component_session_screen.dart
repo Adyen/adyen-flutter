@@ -152,7 +152,6 @@ class MultiComponentSessionScreen extends StatelessWidget {
       environment: Config.environment,
       clientKey: Config.clientKey,
       countryCode: Config.countryCode,
-      amount: Config.amount,
       applePayConfiguration: _createApplePayConfiguration(),
     );
 

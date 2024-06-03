@@ -6,7 +6,6 @@ class DropInPlatformApi: DropInPlatformInterface {
     private let jsonDecoder = JSONDecoder()
     private let dropInFlutterApi: DropInFlutterInterface
     private let sessionHolder: SessionHolder
-    private let configurationMapper = ConfigurationMapper()
     private var hostViewController: UIViewController?
     private var dropInViewController: DropInViewController?
     private var dropInSessionStoredPaymentMethodsDelegate: DropInSessionsStoredPaymentMethodsDelegate?
@@ -26,6 +25,11 @@ class DropInPlatformApi: DropInPlatformInterface {
             guard let viewController = getViewController() else {
                 return
             }
+            
+            guard let session = sessionHolder.session else {
+                sendSessionError(error: PlatformError(errorDescription: "Session is not available."))
+                return
+            }
 
             hostViewController = viewController
             let adyenContext = try dropInConfigurationDTO.createAdyenContext()
@@ -33,9 +37,10 @@ class DropInPlatformApi: DropInPlatformInterface {
                 viewController: viewController,
                 dropInFlutterApi: dropInFlutterApi
             )
-            let dropInConfiguration = try configurationMapper.createDropInConfiguration(dropInConfigurationDTO: dropInConfigurationDTO)
+            let payment = session.sessionContext.payment ?? adyenContext.payment
+            let dropInConfiguration = try dropInConfigurationDTO.createDropInConfiguration(payment: payment)
             let dropInComponent = DropInComponent(
-                paymentMethods: sessionHolder.session!.sessionContext.paymentMethods,
+                paymentMethods: session.sessionContext.paymentMethods,
                 context: adyenContext,
                 configuration: dropInConfiguration,
                 title: dropInConfigurationDTO.preselectedPaymentMethodTitle
@@ -65,7 +70,7 @@ class DropInPlatformApi: DropInPlatformInterface {
             let adyenContext = try dropInConfigurationDTO.createAdyenContext()
             let paymentMethods = try jsonDecoder.decode(PaymentMethods.self, from: Data(paymentMethodsResponse.utf8))
             let paymentMethodsWithoutGiftCards = removeGiftCardPaymentMethods(paymentMethods: paymentMethods)
-            let configuration = try configurationMapper.createDropInConfiguration(dropInConfigurationDTO: dropInConfigurationDTO)
+            let configuration = try dropInConfigurationDTO.createDropInConfiguration(payment: adyenContext.payment)
             let dropInComponent = DropInComponent(
                 paymentMethods: paymentMethodsWithoutGiftCards,
                 context: adyenContext,

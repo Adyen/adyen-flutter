@@ -2,17 +2,16 @@
 import Adyen
 import PassKit
 
-class ConfigurationMapper {
-    func createDropInConfiguration(dropInConfigurationDTO: DropInConfigurationDTO) throws -> DropInComponent.Configuration {
+extension DropInConfigurationDTO {
+    func createDropInConfiguration(payment: Payment?) throws -> DropInComponent.Configuration {
         let dropInConfiguration = DropInComponent.Configuration(
-            allowsSkippingPaymentList: dropInConfigurationDTO.skipListWhenSinglePaymentMethod,
-            allowPreselectedPaymentView: dropInConfigurationDTO.showPreselectedStoredPaymentMethod
+            allowsSkippingPaymentList: skipListWhenSinglePaymentMethod,
+            allowPreselectedPaymentView: showPreselectedStoredPaymentMethod
         )
 
-        dropInConfiguration.paymentMethodsList.allowDisablingStoredPaymentMethods =
-            dropInConfigurationDTO.isRemoveStoredPaymentMethodEnabled
+        dropInConfiguration.paymentMethodsList.allowDisablingStoredPaymentMethods = isRemoveStoredPaymentMethodEnabled
 
-        if let cardConfigurationDTO = dropInConfigurationDTO.cardConfigurationDTO {
+        if let cardConfigurationDTO {
             let koreanAuthenticationMode = cardConfigurationDTO.kcpFieldVisibility.toCardFieldVisibility()
             let socialSecurityNumberMode = cardConfigurationDTO.socialSecurityNumberFieldVisibility.toCardFieldVisibility()
             let storedCardConfiguration = createStoredCardConfiguration(showCvcForStoredCard: cardConfigurationDTO.showCvcForStoredCard)
@@ -28,20 +27,17 @@ class ConfigurationMapper {
                 allowedCardTypes: allowedCardTypes,
                 billingAddress: billingAddressConfiguration
             )
-            if let shopperLocal = dropInConfigurationDTO.shopperLocale {
+            if let shopperLocal = shopperLocale {
                 dropInConfiguration.localizationParameters = LocalizationParameters(enforcedLocale: shopperLocal)
             }
             dropInConfiguration.card = cardConfiguration
         }
 
-        if let applePayConfigurationDTO = dropInConfigurationDTO.applePayConfigurationDTO, let amout = dropInConfigurationDTO.amount {
-            dropInConfiguration.applePay = try applePayConfigurationDTO.toApplePayConfiguration(
-                amount: amout,
-                countryCode: dropInConfigurationDTO.countryCode
-            )
+        if let applePayConfigurationDTO {
+            dropInConfiguration.applePay = try applePayConfigurationDTO.toApplePayConfiguration(payment: payment)
         }
 
-        if let cashAppPayConfigurationDTO = dropInConfigurationDTO.cashAppPayConfigurationDTO {
+        if let cashAppPayConfigurationDTO {
             dropInConfiguration.cashAppPay = DropInComponent.CashAppPay(redirectURL: URL(string: cashAppPayConfigurationDTO.returnUrl)!)
         }
 
@@ -198,19 +194,22 @@ extension AmountDTO {
 }
 
 extension InstantPaymentConfigurationDTO {
-    func mapToApplePayConfiguration() throws -> ApplePayComponent.Configuration {
-        guard let applePayConfigurationDTO, let amount else {
-            throw PlatformError(errorDescription: "Apple pay error")
+    func mapToApplePayConfiguration(payment: Payment?) throws -> ApplePayComponent.Configuration {
+        guard let applePayConfiguration = try applePayConfigurationDTO?.toApplePayConfiguration(payment: payment) else {
+            throw PlatformError(errorDescription: "Apple pay configuration not provided.")
         }
         
-        return try applePayConfigurationDTO.toApplePayConfiguration(
-            amount: amount,
-            countryCode: countryCode
-        )
+        return applePayConfiguration
     }
     
     func createAdyenContext() throws -> AdyenContext {
-        try buildAdyenContext(environment: environment, clientKey: clientKey, amount: amount, analyticsOptionsDTO: analyticsOptionsDTO, countryCode: countryCode)
+        try buildAdyenContext(
+            environment: environment,
+            clientKey: clientKey,
+            amount: amount,
+            analyticsOptionsDTO: analyticsOptionsDTO,
+            countryCode: countryCode
+        )
     }
 }
 
@@ -278,5 +277,12 @@ extension ResultCode {
         case .refused, .cancelled, .error, .redirectShopper, .identifyShopper, .challengeShopper, .presentToShopper:
             return false
         }
+    }
+}
+
+extension AdyenSession.Context {
+    var payment: Payment? {
+        guard let countryCode else { return nil }
+        return Payment(amount: amount, countryCode: countryCode)
     }
 }
