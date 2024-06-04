@@ -1,3 +1,8 @@
+## 0.1.1
+
+* Made amount optional. For Google Pay and Apple Pay in combination with the advanced flow, the
+  amount is still required.
+
 ## 0.1.0
 
 * ⚠ **Breaking Change**: Changed ResultCode into an enum. Please adjust your usage of the

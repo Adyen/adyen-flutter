@@ -376,14 +376,14 @@ object ConfigurationMapper {
     }
 
     fun InstantPaymentConfigurationDTO.mapToGooglePayCheckoutConfiguration(
-        amount: Amount? = null
+        amount: Amount
     ): CheckoutConfiguration {
         return CheckoutConfiguration(
-            environment = environment.toNativeModel(),
-            clientKey = clientKey,
-            shopperLocale = shopperLocale?.let { Locale.forLanguageTag(it) },
-            amount = amount ?: this.amount?.toNativeModel(),
-            analyticsConfiguration = analyticsOptionsDTO.mapToAnalyticsConfiguration()
+            environment.toNativeModel(),
+            clientKey,
+            shopperLocale?.let { Locale.forLanguageTag(it) },
+            amount,
+            analyticsOptionsDTO.mapToAnalyticsConfiguration()
         )
     }
 

@@ -20,7 +20,6 @@ import com.adyen.checkout.flutter.cse.AdyenCSE
 import com.adyen.checkout.flutter.session.SessionHolder
 import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToAnalyticsConfiguration
 import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToDropInConfiguration
-import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToGooglePayCheckoutConfiguration
 import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToCardConfiguration
 import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToCheckoutConfiguration
 import com.adyen.checkout.flutter.utils.ConfigurationMapper.toNativeModel
@@ -101,8 +100,8 @@ class CheckoutPlatformApi(
 
             is InstantPaymentConfigurationDTO -> {
                 return when (configuration.instantPaymentType) {
-                    InstantPaymentType.GOOGLEPAY -> configuration.mapToGooglePayCheckoutConfiguration()
                     InstantPaymentType.APPLEPAY -> throw IllegalStateException("Apple Pay is not supported on Android.")
+                    InstantPaymentType.GOOGLEPAY -> configuration.mapToCheckoutConfiguration()
                     InstantPaymentType.INSTANT -> configuration.mapToCheckoutConfiguration()
                 }
             }
