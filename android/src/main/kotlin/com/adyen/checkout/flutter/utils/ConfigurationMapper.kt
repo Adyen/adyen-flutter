@@ -375,9 +375,7 @@ object ConfigurationMapper {
         }
     }
 
-    fun InstantPaymentConfigurationDTO.mapToGooglePayCheckoutConfiguration(
-        amount: Amount
-    ): CheckoutConfiguration {
+    fun InstantPaymentConfigurationDTO.mapToGooglePayCheckoutConfiguration(amount: Amount): CheckoutConfiguration {
         return CheckoutConfiguration(
             environment.toNativeModel(),
             clientKey,
