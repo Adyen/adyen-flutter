@@ -2,16 +2,16 @@ package com.adyen.checkout.flutter.components.googlepay.advanced
 
 import ComponentFlutterInterface
 import androidx.fragment.app.FragmentActivity
+import com.adyen.checkout.components.core.CheckoutConfiguration
 import com.adyen.checkout.components.core.PaymentMethod
 import com.adyen.checkout.flutter.components.googlepay.BaseGooglePayComponentWrapper
 import com.adyen.checkout.googlepay.GooglePayComponent
-import com.adyen.checkout.googlepay.GooglePayConfiguration
 import java.util.UUID
 
 class GooglePayAdvancedComponentWrapper(
     private val activity: FragmentActivity,
     private val componentFlutterInterface: ComponentFlutterInterface,
-    private val googlePayConfiguration: GooglePayConfiguration,
+    private val checkoutConfiguration: CheckoutConfiguration,
     private val componentId: String,
 ) : BaseGooglePayComponentWrapper(activity, componentFlutterInterface, componentId) {
     override fun setupGooglePayComponent(paymentMethod: PaymentMethod) {
@@ -19,7 +19,7 @@ class GooglePayAdvancedComponentWrapper(
             GooglePayComponent.PROVIDER.get(
                 activity = activity,
                 paymentMethod = paymentMethod,
-                configuration = googlePayConfiguration,
+                checkoutConfiguration = checkoutConfiguration,
                 callback =
                     GooglePayAdvancedCallback(
                         componentFlutterInterface,

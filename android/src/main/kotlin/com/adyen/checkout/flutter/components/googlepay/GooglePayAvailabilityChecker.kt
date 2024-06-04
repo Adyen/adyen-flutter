@@ -2,10 +2,10 @@ package com.adyen.checkout.flutter.components.googlepay
 
 import InstantPaymentSetupResultDTO
 import androidx.fragment.app.FragmentActivity
+import com.adyen.checkout.components.core.CheckoutConfiguration
 import com.adyen.checkout.components.core.ComponentAvailableCallback
 import com.adyen.checkout.components.core.PaymentMethod
 import com.adyen.checkout.googlepay.GooglePayComponent
-import com.adyen.checkout.googlepay.GooglePayConfiguration
 
 class GooglePayAvailabilityChecker(
     private val activity: FragmentActivity,
@@ -34,11 +34,11 @@ class GooglePayAvailabilityChecker(
 
     fun checkGooglePayAvailability(
         paymentMethod: PaymentMethod,
-        googlePayConfiguration: GooglePayConfiguration,
+        checkoutConfiguration: CheckoutConfiguration,
     ) = GooglePayComponent.PROVIDER.isAvailable(
         activity.application,
         paymentMethod,
-        googlePayConfiguration,
+        checkoutConfiguration,
         this@GooglePayAvailabilityChecker,
     )
 }

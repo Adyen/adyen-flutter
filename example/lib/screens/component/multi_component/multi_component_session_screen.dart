@@ -105,7 +105,6 @@ class MultiComponentSessionScreen extends StatelessWidget {
       environment: Config.environment,
       clientKey: Config.clientKey,
       countryCode: Config.countryCode,
-      amount: Config.amount,
       googlePayConfiguration: const GooglePayConfiguration(
         googlePayEnvironment: Config.googlePayEnvironment,
       ),

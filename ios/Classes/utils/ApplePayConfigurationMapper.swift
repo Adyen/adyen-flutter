@@ -3,7 +3,7 @@ import PassKit
 
 extension ApplePayConfigurationDTO {
     func toApplePayConfiguration(payment: Payment?) throws -> ApplePayComponent.Configuration {
-        guard let payment else { throw PlatformError(errorDescription: "Amount for Apple pay not provided.") }
+        guard let payment else { throw PlatformError(errorDescription: "Amount for Apple Pay not provided.") }
         let summaryItems = try mapToPaymentSummaryItems(summaryItems: summaryItems, payment: payment)
         let paymentRequest = try buildPaymentRequest(payment: payment, summaryItems: summaryItems)
         return try ApplePayComponent.Configuration(paymentRequest: paymentRequest, allowOnboarding: allowOnboarding ?? false)

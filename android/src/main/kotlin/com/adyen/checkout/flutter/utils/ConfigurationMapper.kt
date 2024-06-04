@@ -139,7 +139,8 @@ object ConfigurationMapper {
             .setShowStorePaymentField(showStorePaymentField).setHideCvcStoredCard(!showCvcForStoredCard)
             .setHideCvc(!showCvc).setKcpAuthVisibility(determineKcpAuthVisibility(kcpFieldVisibility))
             .setSocialSecurityNumberVisibility(
-                determineSocialSecurityNumberVisibility(socialSecurityNumberFieldVisibility))
+                determineSocialSecurityNumberVisibility(socialSecurityNumberFieldVisibility)
+            )
             .setSupportedCardTypes(*mapToSupportedCardTypes(supportedCardTypes))
             .setHolderNameRequired(holderNameRequired).setAnalyticsConfiguration(analyticsConfiguration)
         amount?.let {
@@ -248,7 +249,7 @@ object ConfigurationMapper {
         )
     }
 
-    fun GooglePayConfigurationDTO.mapToGooglePayConfiguration(
+    private fun GooglePayConfigurationDTO.mapToGooglePayConfiguration(
         builder: GooglePayConfiguration.Builder,
         analyticsConfiguration: AnalyticsConfiguration? = null,
         amount: Amount? = null,
@@ -374,32 +375,16 @@ object ConfigurationMapper {
         }
     }
 
-    fun InstantPaymentConfigurationDTO.mapToGooglePayConfiguration(context: Context): GooglePayConfiguration {
-        val googlePayConfigurationBuilder: GooglePayConfiguration.Builder =
-            if (shopperLocale != null) {
-                val locale = Locale.forLanguageTag(shopperLocale)
-                GooglePayConfiguration.Builder(
-                    locale,
-                    environment.toNativeModel(),
-                    clientKey
-                )
-            } else {
-                GooglePayConfiguration.Builder(
-                    context,
-                    environment.toNativeModel(),
-                    clientKey
-                )
-            }
-
-        val analyticsConfiguration: AnalyticsConfiguration = analyticsOptionsDTO.mapToAnalyticsConfiguration()
-        val amount: Amount? = amount?.toNativeModel()
-        val countryCode: String = countryCode
-        return googlePayConfigurationDTO?.mapToGooglePayConfiguration(
-            googlePayConfigurationBuilder,
-            analyticsConfiguration,
-            amount,
-            countryCode
-        ) ?: throw Exception("Unable to create Google pay configuration")
+    fun InstantPaymentConfigurationDTO.mapToGooglePayCheckoutConfiguration(
+        amount: Amount? = null
+    ): CheckoutConfiguration {
+        return CheckoutConfiguration(
+            environment = environment.toNativeModel(),
+            clientKey = clientKey,
+            shopperLocale = shopperLocale?.let { Locale.forLanguageTag(it) },
+            amount = amount ?: this.amount?.toNativeModel(),
+            analyticsConfiguration = analyticsOptionsDTO.mapToAnalyticsConfiguration()
+        )
     }
 
     fun EncryptedCard.mapToEncryptedCardDTO(): EncryptedCardDTO {
