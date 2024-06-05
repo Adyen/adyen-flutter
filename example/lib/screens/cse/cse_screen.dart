@@ -1,13 +1,12 @@
 import 'package:adyen_checkout/adyen_checkout.dart';
 import 'package:adyen_checkout_example/config.dart';
+import 'package:adyen_checkout_example/repositories/adyen_cse_repository.dart';
 import 'package:flutter/material.dart';
 
 class CseScreen extends StatelessWidget {
-  CseScreen({
-    super.key,
-  });
+  const CseScreen({super.key, required this.repository});
 
-  final String publicKey = Config.publicKey;
+  final AdyenCseRepository repository;
 
   @override
   Widget build(BuildContext context) {
@@ -20,7 +19,8 @@ class CseScreen extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               TextButton(
-                  onPressed: encryptCard, child: const Text("Encrypt card")),
+                  onPressed: encryptCard,
+                  child: const Text("Encrypted card payment")),
               TextButton(
                   onPressed: encryptBin, child: const Text("Encrypt bin"))
             ],
@@ -33,14 +33,28 @@ class CseScreen extends StatelessWidget {
   Future<void> encryptCard() async {
     try {
       final UnencryptedCard unencryptedCard = UnencryptedCard(
-        cardNumber: "5555555555554444",
+        cardNumber: "3714 4963 5398 431",
         expiryMonth: "03",
         expiryYear: "2030",
-        cvc: "737",
+        cvc: "7373",
       );
-      final EncryptedCard encryptedCard =
-          await AdyenCheckout.instance.encryptCard(unencryptedCard, publicKey);
-      debugPrint("Encrypted card number: ${encryptedCard.encryptedCardNumber}");
+      final EncryptedCard encryptedCard = await AdyenCheckout.instance
+          .encryptCard(unencryptedCard, Config.publicKey);
+      final Map<String, dynamic> paymentsResponse =
+          await repository.makePayment(encryptedCard);
+      if (paymentsResponse.containsKey("action")) {
+        final ActionComponentConfiguration actionComponentConfiguration =
+            ActionComponentConfiguration(
+          environment: Config.environment,
+          clientKey: Config.clientKey,
+        );
+        final Map<String, dynamic> actionResultDetails =
+            await AdyenCheckout.instance.handleAction(
+          actionComponentConfiguration,
+          paymentsResponse["action"],
+        );
+        debugPrint("Action result details: $actionResultDetails");
+      }
     } catch (exception) {
       debugPrint(exception.toString());
     }
@@ -50,7 +64,7 @@ class CseScreen extends StatelessWidget {
     try {
       const bin = "5555555555554444";
       final String encryptedBin =
-          await AdyenCheckout.instance.encryptBin(bin, publicKey);
+          await AdyenCheckout.instance.encryptBin(bin, Config.publicKey);
       debugPrint("Encrypted bin: $encryptedBin");
     } catch (exception) {
       debugPrint(exception.toString());
