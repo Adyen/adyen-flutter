@@ -1,5 +1,6 @@
 package com.adyen.checkout.flutter.components
 
+import ActionComponentConfigurationDTO
 import ComponentCommunicationModel
 import ComponentFlutterInterface
 import ComponentPlatformInterface
@@ -18,6 +19,7 @@ import androidx.lifecycle.lifecycleScope
 import com.adyen.checkout.action.core.internal.ActionHandlingComponent
 import com.adyen.checkout.components.core.PaymentMethod
 import com.adyen.checkout.components.core.action.Action
+import com.adyen.checkout.flutter.components.action.ActionComponentManager
 import com.adyen.checkout.flutter.components.googlepay.GooglePayComponentManager
 import com.adyen.checkout.flutter.components.instant.InstantComponentManager
 import com.adyen.checkout.flutter.components.view.ComponentLoadingBottomSheet
@@ -37,6 +39,8 @@ class ComponentPlatformApi(
         GooglePayComponentManager(activity, sessionHolder, componentFlutterInterface)
     private val instantComponentManager: InstantComponentManager =
         InstantComponentManager(activity, componentFlutterInterface, sessionHolder)
+    private val actionComponentManager: ActionComponentManager =
+        ActionComponentManager(activity, componentFlutterInterface)
     private val intentListener = Consumer<Intent> { handleIntent(it) }
     private var currentComponent: ActionHandlingComponent? = null
 
@@ -102,10 +106,23 @@ class ComponentPlatformApi(
         assignCurrentComponent(currentComponent)
     }
 
+    override fun handleAction(
+        actionComponentConfiguration: ActionComponentConfigurationDTO,
+        componentId: String,
+        actionResponse: Map<String?, Any?>?
+    ) {
+        val actionComponent =
+            actionComponentManager.createActionComponent(actionComponentConfiguration, componentId)
+        assignCurrentComponent(actionComponent)
+        actionResponse?.let { actionComponentManager.handleAction(it) }
+    }
+
     override fun onDispose(componentId: String) {
         activity.removeOnNewIntentListener(intentListener)
+        currentComponent = null
         googlePayComponentManager.onDispose(componentId)
         instantComponentManager.onDispose(componentId)
+        actionComponentManager.onDispose(componentId)
     }
 
     fun handleActivityResult(
@@ -143,10 +160,10 @@ class ComponentPlatformApi(
                 ComponentCommunicationType.RESULT,
                 componentId = componentId,
                 paymentResult =
-                    PaymentResultDTO(
-                        type = PaymentResultEnum.FINISHED,
-                        result = PaymentResultModelDTO(resultCode = resultCode)
-                    ),
+                PaymentResultDTO(
+                    type = PaymentResultEnum.FINISHED,
+                    result = PaymentResultModelDTO(resultCode = resultCode)
+                ),
             )
         componentFlutterInterface.onComponentCommunication(model) {}
         hideLoadingBottomSheet()
@@ -168,10 +185,10 @@ class ComponentPlatformApi(
                 ComponentCommunicationType.RESULT,
                 componentId = componentId,
                 paymentResult =
-                    PaymentResultDTO(
-                        type = PaymentResultEnum.ERROR,
-                        reason = error?.errorMessage,
-                    ),
+                PaymentResultDTO(
+                    type = PaymentResultEnum.ERROR,
+                    reason = error?.errorMessage,
+                ),
             )
         componentFlutterInterface.onComponentCommunication(model) {}
         hideLoadingBottomSheet()

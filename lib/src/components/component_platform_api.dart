@@ -60,4 +60,16 @@ class ComponentPlatformApi implements ComponentPlatformInterface {
   @override
   Future<void> onDispose(String componentId) async =>
       _componentPlatformInterface.onDispose(componentId);
+
+  @override
+  Future<void> handleAction(
+    ActionComponentConfigurationDTO actionComponentConfiguration,
+    String componentId,
+    Map<String?, Object?>? action,
+  ) async =>
+      _componentPlatformInterface.handleAction(
+        actionComponentConfiguration,
+        componentId,
+        action,
+      );
 }

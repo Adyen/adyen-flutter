@@ -1,5 +1,6 @@
 package com.adyen.checkout.flutter.utils
 
+import ActionComponentConfigurationDTO
 import AddressMode
 import AmountDTO
 import AnalyticsOptionsDTO
@@ -36,6 +37,8 @@ import com.adyen.checkout.components.core.internal.analytics.AnalyticsPlatformPa
 import com.adyen.checkout.cse.EncryptedCard
 import com.adyen.checkout.cse.UnencryptedCard
 import com.adyen.checkout.dropin.DropInConfiguration
+import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToAnalyticsConfiguration
+import com.adyen.checkout.flutter.utils.ConfigurationMapper.toNativeModel
 import com.adyen.checkout.googlepay.BillingAddressParameters
 import com.adyen.checkout.googlepay.GooglePayConfiguration
 import com.adyen.checkout.googlepay.MerchantInfo
@@ -400,6 +403,15 @@ object ConfigurationMapper {
     }
 
     fun InstantPaymentConfigurationDTO.mapToCheckoutConfiguration(): CheckoutConfiguration =
+        CheckoutConfiguration(
+            environment.toNativeModel(),
+            clientKey,
+            shopperLocale?.let { Locale.forLanguageTag(it) },
+            amount?.toNativeModel(),
+            analyticsOptionsDTO.mapToAnalyticsConfiguration(),
+        )
+
+    fun ActionComponentConfigurationDTO.mapToCheckoutConfiguration(): CheckoutConfiguration =
         CheckoutConfiguration(
             environment.toNativeModel(),
             clientKey,

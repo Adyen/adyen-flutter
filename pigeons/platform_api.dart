@@ -552,6 +552,22 @@ class EncryptedCardDTO {
   );
 }
 
+class ActionComponentConfigurationDTO {
+  final Environment environment;
+  final String clientKey;
+  final String? shopperLocale;
+  final AmountDTO? amount;
+  final AnalyticsOptionsDTO analyticsOptionsDTO;
+
+  ActionComponentConfigurationDTO(
+    this.environment,
+    this.clientKey,
+    this.shopperLocale,
+    this.amount,
+    this.analyticsOptionsDTO,
+  );
+}
+
 @HostApi()
 abstract class CheckoutPlatformInterface {
   @async
@@ -633,6 +649,12 @@ abstract class ComponentPlatformInterface {
     InstantPaymentConfigurationDTO instantPaymentConfigurationDTO,
     String encodedPaymentMethod,
     String componentId,
+  );
+
+  void handleAction(
+    ActionComponentConfigurationDTO actionComponentConfiguration,
+    String componentId,
+    Map<String?, Object?>? actionResponse,
   );
 
   void onDispose(String componentId);
