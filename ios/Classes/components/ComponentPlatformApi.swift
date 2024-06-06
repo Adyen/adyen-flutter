@@ -5,10 +5,12 @@ class ComponentPlatformApi: ComponentPlatformInterface {
     var onErrorCallback: (ErrorDTO?) -> Void = { _ in }
     private let applePayComponentManager: ApplePayComponentManager
     private let instantComponentManager: InstantComponentManager
+    private let actionComponentManager: ActionComponentManager
     
     init(componentFlutterApi: ComponentFlutterInterface, sessionHolder: SessionHolder) {
         self.applePayComponentManager = ApplePayComponentManager(componentFlutterApi: componentFlutterApi, sessionHolder: sessionHolder)
         self.instantComponentManager = InstantComponentManager(componentFlutterApi: componentFlutterApi, sessionHolder: sessionHolder)
+        self.actionComponentManager = ActionComponentManager(componentFlutterApi: componentFlutterApi)
     }
 
     func updateViewHeight(viewId _: Int64) {
@@ -61,12 +63,20 @@ class ComponentPlatformApi: ComponentPlatformInterface {
             )
         }
     }
+    
+    func handleAction(actionComponentConfiguration: ActionComponentConfigurationDTO, componentId: String, actionResponse: [String?: Any?]?) throws {
+        guard let actionResponse else { return }
+        let adyenContext = try actionComponentConfiguration.createAdyenContext()
+        try actionComponentManager.handleAction(adyenContext: adyenContext, componentId: componentId, actionResponse: actionResponse)
+    }
 
     func onDispose(componentId: String) {
         if isApplePayComponent(componentId: componentId) {
             applePayComponentManager.onDispose()
         } else if isInstantPaymentComponent(componentId: componentId) {
             instantComponentManager.onDispose()
+        } else if isActionComponent(componentId: componentId) {
+            actionComponentManager.onDispose()
         }
     }
 
@@ -96,5 +106,9 @@ class ComponentPlatformApi: ComponentPlatformInterface {
     private func isInstantPaymentComponent(componentId: String) -> Bool {
         componentId == InstantComponentManager.Constants.instantSessionComponentId ||
             componentId == InstantComponentManager.Constants.instantAdvancedComponentId
+    }
+    
+    private func isActionComponent(componentId: String) -> Bool {
+        componentId == ActionComponentManager.Constants.actionComponentId
     }
 }

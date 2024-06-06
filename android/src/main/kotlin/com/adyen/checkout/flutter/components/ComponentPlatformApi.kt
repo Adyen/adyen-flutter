@@ -160,10 +160,10 @@ class ComponentPlatformApi(
                 ComponentCommunicationType.RESULT,
                 componentId = componentId,
                 paymentResult =
-                PaymentResultDTO(
-                    type = PaymentResultEnum.FINISHED,
-                    result = PaymentResultModelDTO(resultCode = resultCode)
-                ),
+                    PaymentResultDTO(
+                        type = PaymentResultEnum.FINISHED,
+                        result = PaymentResultModelDTO(resultCode = resultCode)
+                    ),
             )
         componentFlutterInterface.onComponentCommunication(model) {}
         hideLoadingBottomSheet()
@@ -185,10 +185,10 @@ class ComponentPlatformApi(
                 ComponentCommunicationType.RESULT,
                 componentId = componentId,
                 paymentResult =
-                PaymentResultDTO(
-                    type = PaymentResultEnum.ERROR,
-                    reason = error?.errorMessage,
-                ),
+                    PaymentResultDTO(
+                        type = PaymentResultEnum.ERROR,
+                        reason = error?.errorMessage,
+                    ),
             )
         componentFlutterInterface.onComponentCommunication(model) {}
         hideLoadingBottomSheet()

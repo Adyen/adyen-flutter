@@ -10,6 +10,7 @@ import 'package:adyen_checkout/src/util/sdk_version_number_provider.dart';
 
 class ActionComponent {
   final String componentId = "ACTION_COMPONENT";
+  final String errorMessageKey = "errorMessage";
   late final Completer<Map<String, dynamic>> completer;
   StreamSubscription<ComponentCommunicationModel>? componentCommunicationStream;
 
@@ -42,10 +43,12 @@ class ActionComponent {
   }
 
   void handleComponentCommunication(ComponentCommunicationModel event) {
-    if (event.type case ComponentCommunicationType.result) {
+    if (event.type case ComponentCommunicationType.additionalDetails) {
       final String data = event.data as String;
       final Map<String, dynamic> decodedData = jsonDecode(data);
       completer.complete(decodedData);
+    } else if (event.type case ComponentCommunicationType.result) {
+      completer.complete({errorMessageKey: "${event.paymentResult?.reason}"});
     }
   }
 }

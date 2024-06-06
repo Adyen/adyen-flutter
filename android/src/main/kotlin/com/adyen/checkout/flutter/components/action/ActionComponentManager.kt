@@ -1,15 +1,10 @@
 package com.adyen.checkout.flutter.components.action
 
 import ActionComponentConfigurationDTO
-import ComponentCommunicationModel
 import ComponentFlutterInterface
-import PaymentResultDTO
-import PaymentResultEnum
 import androidx.fragment.app.FragmentActivity
 import com.adyen.checkout.action.core.GenericActionComponent
 import com.adyen.checkout.components.core.ActionComponentCallback
-import com.adyen.checkout.components.core.ActionComponentData
-import com.adyen.checkout.components.core.ComponentError
 import com.adyen.checkout.components.core.action.Action
 import com.adyen.checkout.flutter.components.view.ComponentLoadingBottomSheet
 import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToCheckoutConfiguration
@@ -22,17 +17,23 @@ class ActionComponentManager(
 ) {
     private var actionComponent: GenericActionComponent? = null
     private var componentId: String? = null
+
     fun createActionComponent(
-        actionComponentConfigurationDTO: ActionComponentConfigurationDTO, componentId: String
+        actionComponentConfigurationDTO: ActionComponentConfigurationDTO,
+        componentId: String
     ): GenericActionComponent {
         val checkoutConfiguration = actionComponentConfigurationDTO.mapToCheckoutConfiguration()
-        val genericActionComponent = GenericActionComponent.PROVIDER.get(
-            activity, checkoutConfiguration, ActionComponentCallback(
+        val genericActionComponent =
+            GenericActionComponent.PROVIDER.get(
                 activity,
-                componentFlutterApi,
-                componentId,
-            ), UUID.randomUUID().toString()
-        )
+                checkoutConfiguration,
+                ActionComponentCallback(
+                    activity,
+                    componentFlutterApi,
+                    componentId,
+                ),
+                UUID.randomUUID().toString()
+            )
 
         this.componentId = componentId
         this.actionComponent = genericActionComponent
@@ -54,6 +55,4 @@ class ActionComponentManager(
             actionComponent = null
         }
     }
-
 }
-
