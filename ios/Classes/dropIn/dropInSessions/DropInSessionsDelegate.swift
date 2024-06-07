@@ -11,7 +11,7 @@ class DropInSessionsDelegate: AdyenSessionDelegate {
     }
 
     func didComplete(with result: Adyen.AdyenSessionResult, component _: Adyen.Component, session: Adyen.AdyenSession) {
-        viewController?.dismiss(animated: false, completion: {
+        viewController?.dismiss(animated: true, completion: {
             let paymentResult = PaymentResultModelDTO(
                 sessionId: session.sessionContext.identifier,
                 sessionData: session.sessionContext.data,
