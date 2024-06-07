@@ -11,26 +11,12 @@ extension DropInConfigurationDTO {
 
         dropInConfiguration.paymentMethodsList.allowDisablingStoredPaymentMethods = isRemoveStoredPaymentMethodEnabled
 
+        if let shopperLocal = shopperLocale {
+            dropInConfiguration.localizationParameters = LocalizationParameters(enforcedLocale: shopperLocal)
+        }
+        
         if let cardConfigurationDTO {
-            let koreanAuthenticationMode = cardConfigurationDTO.kcpFieldVisibility.toCardFieldVisibility()
-            let socialSecurityNumberMode = cardConfigurationDTO.socialSecurityNumberFieldVisibility.toCardFieldVisibility()
-            let storedCardConfiguration = createStoredCardConfiguration(showCvcForStoredCard: cardConfigurationDTO.showCvcForStoredCard)
-            let allowedCardTypes = determineAllowedCardTypes(cardTypes: cardConfigurationDTO.supportedCardTypes)
-            let billingAddressConfiguration = determineBillingAddressConfiguration(addressMode: cardConfigurationDTO.addressMode)
-            let cardConfiguration = DropInComponent.Card(
-                showsHolderNameField: cardConfigurationDTO.holderNameRequired,
-                showsStorePaymentMethodField: cardConfigurationDTO.showStorePaymentField,
-                showsSecurityCodeField: cardConfigurationDTO.showCvc,
-                koreanAuthenticationMode: koreanAuthenticationMode,
-                socialSecurityNumberMode: socialSecurityNumberMode,
-                storedCardConfiguration: storedCardConfiguration,
-                allowedCardTypes: allowedCardTypes,
-                billingAddress: billingAddressConfiguration
-            )
-            if let shopperLocal = shopperLocale {
-                dropInConfiguration.localizationParameters = LocalizationParameters(enforcedLocale: shopperLocal)
-            }
-            dropInConfiguration.card = cardConfiguration
+            dropInConfiguration.card = buildCard(from: cardConfigurationDTO)
         }
 
         if let applePayConfigurationDTO {
@@ -44,6 +30,24 @@ extension DropInConfigurationDTO {
         dropInConfiguration.style = AdyenAppearanceLoader.findDropInStyle() ?? DropInComponent.Style()
 
         return dropInConfiguration
+    }
+    
+    private func buildCard(from cardConfigurationDTO: CardConfigurationDTO) -> DropInComponent.Card {
+        let koreanAuthenticationMode = cardConfigurationDTO.kcpFieldVisibility.toCardFieldVisibility()
+        let socialSecurityNumberMode = cardConfigurationDTO.socialSecurityNumberFieldVisibility.toCardFieldVisibility()
+        let storedCardConfiguration = createStoredCardConfiguration(showCvcForStoredCard: cardConfigurationDTO.showCvcForStoredCard)
+        let allowedCardTypes = determineAllowedCardTypes(cardTypes: cardConfigurationDTO.supportedCardTypes)
+        let billingAddressConfiguration = determineBillingAddressConfiguration(addressMode: cardConfigurationDTO.addressMode)
+        return DropInComponent.Card(
+            showsHolderNameField: cardConfigurationDTO.holderNameRequired,
+            showsStorePaymentMethodField: cardConfigurationDTO.showStorePaymentField,
+            showsSecurityCodeField: cardConfigurationDTO.showCvc,
+            koreanAuthenticationMode: koreanAuthenticationMode,
+            socialSecurityNumberMode: socialSecurityNumberMode,
+            storedCardConfiguration: storedCardConfiguration,
+            allowedCardTypes: allowedCardTypes,
+            billingAddress: billingAddressConfiguration
+        )
     }
 
     private func createStoredCardConfiguration(showCvcForStoredCard: Bool) -> StoredCardConfiguration {
