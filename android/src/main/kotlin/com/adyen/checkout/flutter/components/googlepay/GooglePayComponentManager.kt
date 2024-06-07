@@ -5,15 +5,13 @@ import InstantPaymentConfigurationDTO
 import InstantPaymentSetupResultDTO
 import android.content.Intent
 import androidx.fragment.app.FragmentActivity
-import com.adyen.checkout.components.core.Amount
 import com.adyen.checkout.components.core.CheckoutConfiguration
 import com.adyen.checkout.components.core.Order
 import com.adyen.checkout.components.core.PaymentMethod
 import com.adyen.checkout.flutter.components.googlepay.advanced.GooglePayAdvancedComponentWrapper
 import com.adyen.checkout.flutter.components.googlepay.session.GooglePaySessionComponentWrapper
 import com.adyen.checkout.flutter.session.SessionHolder
-import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToGooglePayCheckoutConfiguration
-import com.adyen.checkout.flutter.utils.ConfigurationMapper.toNativeModel
+import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToCheckoutConfiguration
 import com.adyen.checkout.flutter.utils.Constants
 import com.adyen.checkout.googlepay.GooglePayComponent
 import com.adyen.checkout.sessions.core.CheckoutSession
@@ -26,7 +24,6 @@ class GooglePayComponentManager(
     private val componentFlutterInterface: ComponentFlutterInterface,
 ) {
     private var googlePayComponent: BaseGooglePayComponentWrapper? = null
-    private val missingAmountErrorMessage = "Amount for Google Pay not provided."
 
     fun isGooglePayAvailable(
         paymentMethod: PaymentMethod,
@@ -78,11 +75,8 @@ class GooglePayComponentManager(
         paymentMethod: PaymentMethod,
         googlePaySetupCallback: (Result<InstantPaymentSetupResultDTO>) -> Unit
     ) {
-        val amount: Amount =
-            instantPaymentComponentConfigurationDTO.amount?.toNativeModel()
-                ?: throw IllegalStateException(missingAmountErrorMessage)
         val checkoutConfiguration: CheckoutConfiguration =
-            instantPaymentComponentConfigurationDTO.mapToGooglePayCheckoutConfiguration(amount)
+            instantPaymentComponentConfigurationDTO.mapToCheckoutConfiguration()
         val googlePayAdvancedComponent =
             createGooglePayAdvancedComponent(checkoutConfiguration, componentId, paymentMethod)
         googlePayComponent = googlePayAdvancedComponent
@@ -102,11 +96,8 @@ class GooglePayComponentManager(
         val sessionSetupResponse =
             SessionSetupResponse.SERIALIZER.deserialize(sessionHolder.sessionSetupResponse)
         val order = sessionHolder.orderResponse?.let { Order.SERIALIZER.deserialize(it) }
-        val amount: Amount =
-            sessionSetupResponse.amount ?: instantPaymentComponentConfigurationDTO.amount?.toNativeModel()
-                ?: throw IllegalStateException(missingAmountErrorMessage)
         val checkoutConfiguration: CheckoutConfiguration =
-            instantPaymentComponentConfigurationDTO.mapToGooglePayCheckoutConfiguration(amount)
+            instantPaymentComponentConfigurationDTO.mapToCheckoutConfiguration()
         val checkoutSession =
             CheckoutSession(
                 sessionSetupResponse,

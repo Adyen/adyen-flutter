@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:adyen_checkout/adyen_checkout.dart';
 import 'package:adyen_checkout/src/components/google_pay/google_pay_advanced_component.dart';
 import 'package:adyen_checkout/src/components/google_pay/google_pay_session_component.dart';
-import 'package:adyen_checkout/src/logging/adyen_logger.dart';
 import 'package:adyen_checkout/src/util/dto_mapper.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -68,13 +67,6 @@ class AdyenGooglePayComponent extends StatelessWidget {
   }
 
   Widget _buildGooglePayAdvancedFlowWidget(AdvancedCheckout advancedCheckout) {
-    if (configuration.amount == null) {
-      AdyenLogger.instance.print(
-          "Google Pay requires to set an amount when using the advanced flow.");
-      onUnavailable?.call();
-      return unavailableWidget ?? const SizedBox.shrink();
-    }
-
     return GooglePayAdvancedComponent(
       key: key,
       googlePayPaymentMethod: json.encode(paymentMethod),

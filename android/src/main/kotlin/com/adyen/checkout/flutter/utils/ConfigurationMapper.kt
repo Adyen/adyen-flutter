@@ -56,8 +56,8 @@ object ConfigurationMapper {
     }
 
     fun DropInConfigurationDTO.mapToDropInConfiguration(context: Context): DropInConfiguration {
-        val environment = environment.toNativeModel()
-        val amount = amount?.toNativeModel()
+        val environment = environment.mapToEnvironment()
+        val amount = amount?.mapToAmount()
         val dropInConfiguration = buildDropInConfiguration(context, shopperLocale, environment)
         val analyticsConfiguration = analyticsOptionsDTO.mapToAnalyticsConfiguration()
 
@@ -227,7 +227,7 @@ object ConfigurationMapper {
         return mappedCardTypes.filterNotNull().toTypedArray()
     }
 
-    fun Environment.toNativeModel(): SDKEnvironment {
+    fun Environment.mapToEnvironment(): SDKEnvironment {
         return when (this) {
             Environment.TEST -> SDKEnvironment.TEST
             Environment.EUROPE -> SDKEnvironment.EUROPE
@@ -238,7 +238,7 @@ object ConfigurationMapper {
         }
     }
 
-    fun AmountDTO.toNativeModel(): Amount {
+    fun AmountDTO.mapToAmount(): Amount {
         return Amount(this.currency, this.value)
     }
 
@@ -375,16 +375,6 @@ object ConfigurationMapper {
         }
     }
 
-    fun InstantPaymentConfigurationDTO.mapToGooglePayCheckoutConfiguration(amount: Amount): CheckoutConfiguration {
-        return CheckoutConfiguration(
-            environment.toNativeModel(),
-            clientKey,
-            shopperLocale?.let { Locale.forLanguageTag(it) },
-            amount,
-            analyticsOptionsDTO.mapToAnalyticsConfiguration()
-        )
-    }
-
     fun EncryptedCard.mapToEncryptedCardDTO(): EncryptedCardDTO {
         return EncryptedCardDTO(encryptedCardNumber, encryptedExpiryMonth, encryptedExpiryYear, encryptedSecurityCode)
     }
@@ -401,10 +391,10 @@ object ConfigurationMapper {
 
     fun InstantPaymentConfigurationDTO.mapToCheckoutConfiguration(): CheckoutConfiguration =
         CheckoutConfiguration(
-            environment.toNativeModel(),
+            environment.mapToEnvironment(),
             clientKey,
             shopperLocale?.let { Locale.forLanguageTag(it) },
-            amount?.toNativeModel(),
+            amount?.mapToAmount(),
             analyticsOptionsDTO.mapToAnalyticsConfiguration(),
         )
 }
