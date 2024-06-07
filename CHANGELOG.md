@@ -2,6 +2,7 @@
 
 * Made amount optional. For Google Pay and Apple Pay in combination with the advanced flow, the
   amount is still required.
+* Added standalone action handling.
 
 ## 0.1.0
 
