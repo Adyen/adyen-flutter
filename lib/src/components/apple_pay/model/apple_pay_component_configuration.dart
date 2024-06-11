@@ -8,8 +8,8 @@ final class ApplePayComponentConfiguration extends BaseConfiguration {
     required super.environment,
     required super.clientKey,
     required super.countryCode,
-    required super.amount,
     required this.applePayConfiguration,
+    super.amount,
     super.shopperLocale,
     super.analyticsOptions,
   });

@@ -16,7 +16,7 @@ extension DropInConfigurationMapper on DropInConfiguration {
         environment: environment,
         clientKey: clientKey,
         countryCode: countryCode.toUpperCase(),
-        amount: amount.toDTO(),
+        amount: amount?.toDTO(),
         shopperLocale: shopperLocale,
         cardConfigurationDTO: cardConfiguration?.toDTO(),
         applePayConfigurationDTO: applePayConfiguration?.toDTO(),
@@ -182,7 +182,7 @@ extension CardComponentConfigurationMapper on CardComponentConfiguration {
         environment: environment,
         clientKey: clientKey,
         countryCode: countryCode,
-        amount: amount.toDTO(),
+        amount: amount?.toDTO(),
         shopperLocale: shopperLocale,
         cardConfiguration: cardConfiguration.toDTO(),
         analyticsOptionsDTO: analyticsOptions.toDTO(sdkVersionNumber),
@@ -200,7 +200,7 @@ extension GooglePayComponentConfigurationMapper
         environment: environment,
         clientKey: clientKey,
         countryCode: countryCode,
-        amount: amount.toDTO(),
+        amount: amount?.toDTO(),
         analyticsOptionsDTO: analyticsOptions.toDTO(sdkVersionNumber),
         googlePayConfigurationDTO: googlePayConfiguration.toDTO(),
       );
@@ -244,7 +244,7 @@ extension ApplePayComponentConfigurationMapper
         environment: environment,
         clientKey: clientKey,
         countryCode: countryCode,
-        amount: amount.toDTO(),
+        amount: amount?.toDTO(),
         analyticsOptionsDTO: analyticsOptions.toDTO(sdkVersionNumber),
         applePayConfigurationDTO: applePayConfiguration.toDTO(),
       );
@@ -278,7 +278,7 @@ extension InstantComponentConfigurationMapper on InstantComponentConfiguration {
         environment: environment,
         clientKey: clientKey,
         countryCode: countryCode,
-        amount: amount.toDTO(),
+        amount: amount?.toDTO(),
         analyticsOptionsDTO: analyticsOptions.toDTO(sdkVersionNumber),
       );
 }

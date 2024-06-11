@@ -211,7 +211,7 @@ struct DropInConfigurationDTO {
     var environment: Environment
     var clientKey: String
     var countryCode: String
-    var amount: AmountDTO
+    var amount: AmountDTO?
     var shopperLocale: String?
     var cardConfigurationDTO: CardConfigurationDTO?
     var applePayConfigurationDTO: ApplePayConfigurationDTO?
@@ -227,7 +227,10 @@ struct DropInConfigurationDTO {
         let environment = Environment(rawValue: list[0] as! Int)!
         let clientKey = list[1] as! String
         let countryCode = list[2] as! String
-        let amount = AmountDTO.fromList(list[3] as! [Any?])!
+        var amount: AmountDTO?
+        if let amountList: [Any?] = nilOrValue(list[3]) {
+            amount = AmountDTO.fromList(amountList)
+        }
         let shopperLocale: String? = nilOrValue(list[4])
         var cardConfigurationDTO: CardConfigurationDTO?
         if let cardConfigurationDTOList: [Any?] = nilOrValue(list[5]) {
@@ -274,7 +277,7 @@ struct DropInConfigurationDTO {
             environment.rawValue,
             clientKey,
             countryCode,
-            amount.toList(),
+            amount?.toList(),
             shopperLocale,
             cardConfigurationDTO?.toList(),
             applePayConfigurationDTO?.toList(),
@@ -996,7 +999,7 @@ struct CardComponentConfigurationDTO {
     var environment: Environment
     var clientKey: String
     var countryCode: String
-    var amount: AmountDTO
+    var amount: AmountDTO?
     var shopperLocale: String?
     var cardConfiguration: CardConfigurationDTO
     var analyticsOptionsDTO: AnalyticsOptionsDTO
@@ -1005,7 +1008,10 @@ struct CardComponentConfigurationDTO {
         let environment = Environment(rawValue: list[0] as! Int)!
         let clientKey = list[1] as! String
         let countryCode = list[2] as! String
-        let amount = AmountDTO.fromList(list[3] as! [Any?])!
+        var amount: AmountDTO?
+        if let amountList: [Any?] = nilOrValue(list[3]) {
+            amount = AmountDTO.fromList(amountList)
+        }
         let shopperLocale: String? = nilOrValue(list[4])
         let cardConfiguration = CardConfigurationDTO.fromList(list[5] as! [Any?])!
         let analyticsOptionsDTO = AnalyticsOptionsDTO.fromList(list[6] as! [Any?])!
@@ -1026,7 +1032,7 @@ struct CardComponentConfigurationDTO {
             environment.rawValue,
             clientKey,
             countryCode,
-            amount.toList(),
+            amount?.toList(),
             shopperLocale,
             cardConfiguration.toList(),
             analyticsOptionsDTO.toList()
@@ -1040,7 +1046,7 @@ struct InstantPaymentConfigurationDTO {
     var environment: Environment
     var clientKey: String
     var countryCode: String
-    var amount: AmountDTO
+    var amount: AmountDTO?
     var shopperLocale: String?
     var analyticsOptionsDTO: AnalyticsOptionsDTO
     var googlePayConfigurationDTO: GooglePayConfigurationDTO?
@@ -1051,7 +1057,10 @@ struct InstantPaymentConfigurationDTO {
         let environment = Environment(rawValue: list[1] as! Int)!
         let clientKey = list[2] as! String
         let countryCode = list[3] as! String
-        let amount = AmountDTO.fromList(list[4] as! [Any?])!
+        var amount: AmountDTO?
+        if let amountList: [Any?] = nilOrValue(list[4]) {
+            amount = AmountDTO.fromList(amountList)
+        }
         let shopperLocale: String? = nilOrValue(list[5])
         let analyticsOptionsDTO = AnalyticsOptionsDTO.fromList(list[6] as! [Any?])!
         var googlePayConfigurationDTO: GooglePayConfigurationDTO?
@@ -1082,7 +1091,7 @@ struct InstantPaymentConfigurationDTO {
             environment.rawValue,
             clientKey,
             countryCode,
-            amount.toList(),
+            amount?.toList(),
             shopperLocale,
             analyticsOptionsDTO.toList(),
             googlePayConfigurationDTO?.toList(),
@@ -1455,34 +1464,36 @@ private class DropInPlatformInterfaceCodecReader: FlutterStandardReader {
         case 128:
             return AmountDTO.fromList(self.readValue() as! [Any?])
         case 129:
-            return AnalyticsOptionsDTO.fromList(self.readValue() as! [Any?])
+            return AmountDTO.fromList(self.readValue() as! [Any?])
         case 130:
-            return ApplePayConfigurationDTO.fromList(self.readValue() as! [Any?])
+            return AnalyticsOptionsDTO.fromList(self.readValue() as! [Any?])
         case 131:
-            return ApplePayContactDTO.fromList(self.readValue() as! [Any?])
+            return ApplePayConfigurationDTO.fromList(self.readValue() as! [Any?])
         case 132:
-            return ApplePayShippingMethodDTO.fromList(self.readValue() as! [Any?])
+            return ApplePayContactDTO.fromList(self.readValue() as! [Any?])
         case 133:
-            return ApplePaySummaryItemDTO.fromList(self.readValue() as! [Any?])
+            return ApplePayShippingMethodDTO.fromList(self.readValue() as! [Any?])
         case 134:
-            return BillingAddressParametersDTO.fromList(self.readValue() as! [Any?])
+            return ApplePaySummaryItemDTO.fromList(self.readValue() as! [Any?])
         case 135:
-            return CardConfigurationDTO.fromList(self.readValue() as! [Any?])
+            return BillingAddressParametersDTO.fromList(self.readValue() as! [Any?])
         case 136:
-            return CashAppPayConfigurationDTO.fromList(self.readValue() as! [Any?])
+            return CardConfigurationDTO.fromList(self.readValue() as! [Any?])
         case 137:
-            return DeletedStoredPaymentMethodResultDTO.fromList(self.readValue() as! [Any?])
+            return CashAppPayConfigurationDTO.fromList(self.readValue() as! [Any?])
         case 138:
-            return DropInConfigurationDTO.fromList(self.readValue() as! [Any?])
+            return DeletedStoredPaymentMethodResultDTO.fromList(self.readValue() as! [Any?])
         case 139:
-            return ErrorDTO.fromList(self.readValue() as! [Any?])
+            return DropInConfigurationDTO.fromList(self.readValue() as! [Any?])
         case 140:
-            return GooglePayConfigurationDTO.fromList(self.readValue() as! [Any?])
+            return ErrorDTO.fromList(self.readValue() as! [Any?])
         case 141:
-            return MerchantInfoDTO.fromList(self.readValue() as! [Any?])
+            return GooglePayConfigurationDTO.fromList(self.readValue() as! [Any?])
         case 142:
-            return PaymentEventDTO.fromList(self.readValue() as! [Any?])
+            return MerchantInfoDTO.fromList(self.readValue() as! [Any?])
         case 143:
+            return PaymentEventDTO.fromList(self.readValue() as! [Any?])
+        case 144:
             return ShippingAddressParametersDTO.fromList(self.readValue() as! [Any?])
         default:
             return super.readValue(ofType: type)
@@ -1495,50 +1506,53 @@ private class DropInPlatformInterfaceCodecWriter: FlutterStandardWriter {
         if let value = value as? AmountDTO {
             super.writeByte(128)
             super.writeValue(value.toList())
-        } else if let value = value as? AnalyticsOptionsDTO {
+        } else if let value = value as? AmountDTO {
             super.writeByte(129)
             super.writeValue(value.toList())
-        } else if let value = value as? ApplePayConfigurationDTO {
+        } else if let value = value as? AnalyticsOptionsDTO {
             super.writeByte(130)
             super.writeValue(value.toList())
-        } else if let value = value as? ApplePayContactDTO {
+        } else if let value = value as? ApplePayConfigurationDTO {
             super.writeByte(131)
             super.writeValue(value.toList())
-        } else if let value = value as? ApplePayShippingMethodDTO {
+        } else if let value = value as? ApplePayContactDTO {
             super.writeByte(132)
             super.writeValue(value.toList())
-        } else if let value = value as? ApplePaySummaryItemDTO {
+        } else if let value = value as? ApplePayShippingMethodDTO {
             super.writeByte(133)
             super.writeValue(value.toList())
-        } else if let value = value as? BillingAddressParametersDTO {
+        } else if let value = value as? ApplePaySummaryItemDTO {
             super.writeByte(134)
             super.writeValue(value.toList())
-        } else if let value = value as? CardConfigurationDTO {
+        } else if let value = value as? BillingAddressParametersDTO {
             super.writeByte(135)
             super.writeValue(value.toList())
-        } else if let value = value as? CashAppPayConfigurationDTO {
+        } else if let value = value as? CardConfigurationDTO {
             super.writeByte(136)
             super.writeValue(value.toList())
-        } else if let value = value as? DeletedStoredPaymentMethodResultDTO {
+        } else if let value = value as? CashAppPayConfigurationDTO {
             super.writeByte(137)
             super.writeValue(value.toList())
-        } else if let value = value as? DropInConfigurationDTO {
+        } else if let value = value as? DeletedStoredPaymentMethodResultDTO {
             super.writeByte(138)
             super.writeValue(value.toList())
-        } else if let value = value as? ErrorDTO {
+        } else if let value = value as? DropInConfigurationDTO {
             super.writeByte(139)
             super.writeValue(value.toList())
-        } else if let value = value as? GooglePayConfigurationDTO {
+        } else if let value = value as? ErrorDTO {
             super.writeByte(140)
             super.writeValue(value.toList())
-        } else if let value = value as? MerchantInfoDTO {
+        } else if let value = value as? GooglePayConfigurationDTO {
             super.writeByte(141)
             super.writeValue(value.toList())
-        } else if let value = value as? PaymentEventDTO {
+        } else if let value = value as? MerchantInfoDTO {
             super.writeByte(142)
             super.writeValue(value.toList())
-        } else if let value = value as? ShippingAddressParametersDTO {
+        } else if let value = value as? PaymentEventDTO {
             super.writeByte(143)
+            super.writeValue(value.toList())
+        } else if let value = value as? ShippingAddressParametersDTO {
+            super.writeByte(144)
             super.writeValue(value.toList())
         } else {
             super.writeValue(value)
@@ -1785,30 +1799,32 @@ private class ComponentPlatformInterfaceCodecReader: FlutterStandardReader {
         case 128:
             return AmountDTO.fromList(self.readValue() as! [Any?])
         case 129:
-            return AnalyticsOptionsDTO.fromList(self.readValue() as! [Any?])
+            return AmountDTO.fromList(self.readValue() as! [Any?])
         case 130:
-            return ApplePayConfigurationDTO.fromList(self.readValue() as! [Any?])
+            return AnalyticsOptionsDTO.fromList(self.readValue() as! [Any?])
         case 131:
-            return ApplePayContactDTO.fromList(self.readValue() as! [Any?])
+            return ApplePayConfigurationDTO.fromList(self.readValue() as! [Any?])
         case 132:
-            return ApplePayShippingMethodDTO.fromList(self.readValue() as! [Any?])
+            return ApplePayContactDTO.fromList(self.readValue() as! [Any?])
         case 133:
-            return ApplePaySummaryItemDTO.fromList(self.readValue() as! [Any?])
+            return ApplePayShippingMethodDTO.fromList(self.readValue() as! [Any?])
         case 134:
-            return BillingAddressParametersDTO.fromList(self.readValue() as! [Any?])
+            return ApplePaySummaryItemDTO.fromList(self.readValue() as! [Any?])
         case 135:
-            return ErrorDTO.fromList(self.readValue() as! [Any?])
+            return BillingAddressParametersDTO.fromList(self.readValue() as! [Any?])
         case 136:
-            return GooglePayConfigurationDTO.fromList(self.readValue() as! [Any?])
+            return ErrorDTO.fromList(self.readValue() as! [Any?])
         case 137:
-            return InstantPaymentConfigurationDTO.fromList(self.readValue() as! [Any?])
+            return GooglePayConfigurationDTO.fromList(self.readValue() as! [Any?])
         case 138:
-            return InstantPaymentSetupResultDTO.fromList(self.readValue() as! [Any?])
+            return InstantPaymentConfigurationDTO.fromList(self.readValue() as! [Any?])
         case 139:
-            return MerchantInfoDTO.fromList(self.readValue() as! [Any?])
+            return InstantPaymentSetupResultDTO.fromList(self.readValue() as! [Any?])
         case 140:
-            return PaymentEventDTO.fromList(self.readValue() as! [Any?])
+            return MerchantInfoDTO.fromList(self.readValue() as! [Any?])
         case 141:
+            return PaymentEventDTO.fromList(self.readValue() as! [Any?])
+        case 142:
             return ShippingAddressParametersDTO.fromList(self.readValue() as! [Any?])
         default:
             return super.readValue(ofType: type)
@@ -1821,44 +1837,47 @@ private class ComponentPlatformInterfaceCodecWriter: FlutterStandardWriter {
         if let value = value as? AmountDTO {
             super.writeByte(128)
             super.writeValue(value.toList())
-        } else if let value = value as? AnalyticsOptionsDTO {
+        } else if let value = value as? AmountDTO {
             super.writeByte(129)
             super.writeValue(value.toList())
-        } else if let value = value as? ApplePayConfigurationDTO {
+        } else if let value = value as? AnalyticsOptionsDTO {
             super.writeByte(130)
             super.writeValue(value.toList())
-        } else if let value = value as? ApplePayContactDTO {
+        } else if let value = value as? ApplePayConfigurationDTO {
             super.writeByte(131)
             super.writeValue(value.toList())
-        } else if let value = value as? ApplePayShippingMethodDTO {
+        } else if let value = value as? ApplePayContactDTO {
             super.writeByte(132)
             super.writeValue(value.toList())
-        } else if let value = value as? ApplePaySummaryItemDTO {
+        } else if let value = value as? ApplePayShippingMethodDTO {
             super.writeByte(133)
             super.writeValue(value.toList())
-        } else if let value = value as? BillingAddressParametersDTO {
+        } else if let value = value as? ApplePaySummaryItemDTO {
             super.writeByte(134)
             super.writeValue(value.toList())
-        } else if let value = value as? ErrorDTO {
+        } else if let value = value as? BillingAddressParametersDTO {
             super.writeByte(135)
             super.writeValue(value.toList())
-        } else if let value = value as? GooglePayConfigurationDTO {
+        } else if let value = value as? ErrorDTO {
             super.writeByte(136)
             super.writeValue(value.toList())
-        } else if let value = value as? InstantPaymentConfigurationDTO {
+        } else if let value = value as? GooglePayConfigurationDTO {
             super.writeByte(137)
             super.writeValue(value.toList())
-        } else if let value = value as? InstantPaymentSetupResultDTO {
+        } else if let value = value as? InstantPaymentConfigurationDTO {
             super.writeByte(138)
             super.writeValue(value.toList())
-        } else if let value = value as? MerchantInfoDTO {
+        } else if let value = value as? InstantPaymentSetupResultDTO {
             super.writeByte(139)
             super.writeValue(value.toList())
-        } else if let value = value as? PaymentEventDTO {
+        } else if let value = value as? MerchantInfoDTO {
             super.writeByte(140)
             super.writeValue(value.toList())
-        } else if let value = value as? ShippingAddressParametersDTO {
+        } else if let value = value as? PaymentEventDTO {
             super.writeByte(141)
+            super.writeValue(value.toList())
+        } else if let value = value as? ShippingAddressParametersDTO {
+            super.writeByte(142)
             super.writeValue(value.toList())
         } else {
             super.writeValue(value)
@@ -2003,22 +2022,20 @@ private class ComponentFlutterInterfaceCodecReader: FlutterStandardReader {
         case 128:
             return AmountDTO.fromList(self.readValue() as! [Any?])
         case 129:
-            return AmountDTO.fromList(self.readValue() as! [Any?])
-        case 130:
             return AnalyticsOptionsDTO.fromList(self.readValue() as! [Any?])
-        case 131:
+        case 130:
             return CardComponentConfigurationDTO.fromList(self.readValue() as! [Any?])
-        case 132:
+        case 131:
             return CardConfigurationDTO.fromList(self.readValue() as! [Any?])
-        case 133:
+        case 132:
             return ComponentCommunicationModel.fromList(self.readValue() as! [Any?])
-        case 134:
+        case 133:
             return OrderResponseDTO.fromList(self.readValue() as! [Any?])
-        case 135:
+        case 134:
             return PaymentResultDTO.fromList(self.readValue() as! [Any?])
-        case 136:
+        case 135:
             return PaymentResultModelDTO.fromList(self.readValue() as! [Any?])
-        case 137:
+        case 136:
             return SessionDTO.fromList(self.readValue() as! [Any?])
         default:
             return super.readValue(ofType: type)
@@ -2031,32 +2048,29 @@ private class ComponentFlutterInterfaceCodecWriter: FlutterStandardWriter {
         if let value = value as? AmountDTO {
             super.writeByte(128)
             super.writeValue(value.toList())
-        } else if let value = value as? AmountDTO {
+        } else if let value = value as? AnalyticsOptionsDTO {
             super.writeByte(129)
             super.writeValue(value.toList())
-        } else if let value = value as? AnalyticsOptionsDTO {
+        } else if let value = value as? CardComponentConfigurationDTO {
             super.writeByte(130)
             super.writeValue(value.toList())
-        } else if let value = value as? CardComponentConfigurationDTO {
+        } else if let value = value as? CardConfigurationDTO {
             super.writeByte(131)
             super.writeValue(value.toList())
-        } else if let value = value as? CardConfigurationDTO {
+        } else if let value = value as? ComponentCommunicationModel {
             super.writeByte(132)
             super.writeValue(value.toList())
-        } else if let value = value as? ComponentCommunicationModel {
+        } else if let value = value as? OrderResponseDTO {
             super.writeByte(133)
             super.writeValue(value.toList())
-        } else if let value = value as? OrderResponseDTO {
+        } else if let value = value as? PaymentResultDTO {
             super.writeByte(134)
             super.writeValue(value.toList())
-        } else if let value = value as? PaymentResultDTO {
+        } else if let value = value as? PaymentResultModelDTO {
             super.writeByte(135)
             super.writeValue(value.toList())
-        } else if let value = value as? PaymentResultModelDTO {
-            super.writeByte(136)
-            super.writeValue(value.toList())
         } else if let value = value as? SessionDTO {
-            super.writeByte(137)
+            super.writeByte(136)
             super.writeValue(value.toList())
         } else {
             super.writeValue(value)

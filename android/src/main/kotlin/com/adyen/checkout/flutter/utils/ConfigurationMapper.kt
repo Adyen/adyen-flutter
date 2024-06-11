@@ -56,8 +56,8 @@ object ConfigurationMapper {
     }
 
     fun DropInConfigurationDTO.mapToDropInConfiguration(context: Context): DropInConfiguration {
-        val environment = environment.toNativeModel()
-        val amount = amount.toNativeModel()
+        val environment = environment.mapToEnvironment()
+        val amount = amount?.mapToAmount()
         val dropInConfiguration = buildDropInConfiguration(context, shopperLocale, environment)
         val analyticsConfiguration = analyticsOptionsDTO.mapToAnalyticsConfiguration()
 
@@ -98,7 +98,10 @@ object ConfigurationMapper {
             dropInConfiguration.addCashAppPayConfiguration(cashAppPayConfiguration)
         }
 
-        dropInConfiguration.setAmount(amount)
+        amount?.let {
+            dropInConfiguration.setAmount(it)
+        }
+
         return dropInConfiguration.build()
     }
 
@@ -121,7 +124,7 @@ object ConfigurationMapper {
         environment: com.adyen.checkout.core.Environment,
         clientKey: String,
         analyticsConfiguration: AnalyticsConfiguration,
-        amount: Amount,
+        amount: Amount?,
     ): CardConfiguration {
         val cardConfiguration =
             if (shopperLocale != null) {
@@ -131,13 +134,19 @@ object ConfigurationMapper {
                 CardConfiguration.Builder(context, environment, clientKey)
             }
 
-        return cardConfiguration.setAddressConfiguration(addressMode.mapToAddressConfiguration()).setAmount(amount)
+        cardConfiguration
+            .setAddressConfiguration(addressMode.mapToAddressConfiguration())
             .setShowStorePaymentField(showStorePaymentField).setHideCvcStoredCard(!showCvcForStoredCard)
             .setHideCvc(!showCvc).setKcpAuthVisibility(determineKcpAuthVisibility(kcpFieldVisibility))
             .setSocialSecurityNumberVisibility(
                 determineSocialSecurityNumberVisibility(socialSecurityNumberFieldVisibility)
-            ).setSupportedCardTypes(*mapToSupportedCardTypes(supportedCardTypes))
-            .setHolderNameRequired(holderNameRequired).setAnalyticsConfiguration(analyticsConfiguration).build()
+            )
+            .setSupportedCardTypes(*mapToSupportedCardTypes(supportedCardTypes))
+            .setHolderNameRequired(holderNameRequired).setAnalyticsConfiguration(analyticsConfiguration)
+        amount?.let {
+            cardConfiguration.setAmount(amount)
+        }
+        return cardConfiguration.build()
     }
 
     fun AnalyticsOptionsDTO.mapToAnalyticsConfiguration(): AnalyticsConfiguration {
@@ -218,7 +227,7 @@ object ConfigurationMapper {
         return mappedCardTypes.filterNotNull().toTypedArray()
     }
 
-    fun Environment.toNativeModel(): SDKEnvironment {
+    fun Environment.mapToEnvironment(): SDKEnvironment {
         return when (this) {
             Environment.TEST -> SDKEnvironment.TEST
             Environment.EUROPE -> SDKEnvironment.EUROPE
@@ -229,7 +238,7 @@ object ConfigurationMapper {
         }
     }
 
-    fun AmountDTO.toNativeModel(): Amount {
+    fun AmountDTO.mapToAmount(): Amount {
         return Amount(this.currency, this.value)
     }
 
@@ -240,7 +249,7 @@ object ConfigurationMapper {
         )
     }
 
-    fun GooglePayConfigurationDTO.mapToGooglePayConfiguration(
+    private fun GooglePayConfigurationDTO.mapToGooglePayConfiguration(
         builder: GooglePayConfiguration.Builder,
         analyticsConfiguration: AnalyticsConfiguration? = null,
         amount: Amount? = null,
@@ -366,34 +375,6 @@ object ConfigurationMapper {
         }
     }
 
-    fun InstantPaymentConfigurationDTO.mapToGooglePayConfiguration(context: Context): GooglePayConfiguration {
-        val googlePayConfigurationBuilder: GooglePayConfiguration.Builder =
-            if (shopperLocale != null) {
-                val locale = Locale.forLanguageTag(shopperLocale)
-                GooglePayConfiguration.Builder(
-                    locale,
-                    environment.toNativeModel(),
-                    clientKey
-                )
-            } else {
-                GooglePayConfiguration.Builder(
-                    context,
-                    environment.toNativeModel(),
-                    clientKey
-                )
-            }
-
-        val analyticsConfiguration: AnalyticsConfiguration = analyticsOptionsDTO.mapToAnalyticsConfiguration()
-        val amount: Amount = amount.toNativeModel()
-        val countryCode: String = countryCode
-        return googlePayConfigurationDTO?.mapToGooglePayConfiguration(
-            googlePayConfigurationBuilder,
-            analyticsConfiguration,
-            amount,
-            countryCode
-        ) ?: throw Exception("Unable to create Google pay configuration")
-    }
-
     fun EncryptedCard.mapToEncryptedCardDTO(): EncryptedCardDTO {
         return EncryptedCardDTO(encryptedCardNumber, encryptedExpiryMonth, encryptedExpiryYear, encryptedSecurityCode)
     }
@@ -410,10 +391,10 @@ object ConfigurationMapper {
 
     fun InstantPaymentConfigurationDTO.mapToCheckoutConfiguration(): CheckoutConfiguration =
         CheckoutConfiguration(
-            environment.toNativeModel(),
+            environment.mapToEnvironment(),
             clientKey,
             shopperLocale?.let { Locale.forLanguageTag(it) },
-            amount.toNativeModel(),
+            amount?.mapToAmount(),
             analyticsOptionsDTO.mapToAnalyticsConfiguration(),
         )
 }

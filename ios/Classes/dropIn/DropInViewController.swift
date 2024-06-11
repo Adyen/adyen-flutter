@@ -1,6 +1,6 @@
 @_spi(AdyenInternal) import Adyen
 
-//View controller is required to prevent propagating the tap event to the FlutterViewController - https://github.com/flutter/flutter/issues/35784#issuecomment-516243057
+// View controller is required to prevent propagating the tap event to the FlutterViewController - https://github.com/flutter/flutter/issues/35784#issuecomment-516243057
 class DropInViewController: UIViewController {
     let dropInComponent: DropInComponent
     
@@ -9,6 +9,7 @@ class DropInViewController: UIViewController {
         super.init(nibName: nil, bundle: nil)
     }
     
+    @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }

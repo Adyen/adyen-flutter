@@ -8,7 +8,6 @@ import AdyenNetworking
 // 3) Add AppDelegate redirect
 
 class CheckoutPlatformApi: CheckoutPlatformInterface {
-    private let configurationMapper = ConfigurationMapper()
     private let dropInFlutterApi: DropInFlutterInterface
     private let componentFlutterApi: ComponentFlutterInterface
     private let sessionHolder: SessionHolder

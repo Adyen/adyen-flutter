@@ -20,10 +20,10 @@ import com.adyen.checkout.flutter.cse.AdyenCSE
 import com.adyen.checkout.flutter.session.SessionHolder
 import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToAnalyticsConfiguration
 import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToDropInConfiguration
-import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToGooglePayConfiguration
 import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToCardConfiguration
 import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToCheckoutConfiguration
-import com.adyen.checkout.flutter.utils.ConfigurationMapper.toNativeModel
+import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToAmount
+import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToEnvironment
 import com.adyen.checkout.redirect.RedirectComponent
 import com.adyen.checkout.sessions.core.CheckoutSessionProvider
 import com.adyen.checkout.sessions.core.CheckoutSessionResult
@@ -92,17 +92,17 @@ class CheckoutPlatformApi(
                 return configuration.cardConfiguration.mapToCardConfiguration(
                     activity,
                     configuration.shopperLocale,
-                    configuration.environment.toNativeModel(),
+                    configuration.environment.mapToEnvironment(),
                     configuration.clientKey,
                     configuration.analyticsOptionsDTO.mapToAnalyticsConfiguration(),
-                    configuration.amount.toNativeModel()
+                    configuration.amount?.mapToAmount()
                 )
             }
 
             is InstantPaymentConfigurationDTO -> {
                 return when (configuration.instantPaymentType) {
-                    InstantPaymentType.GOOGLEPAY -> configuration.mapToGooglePayConfiguration(activity)
-                    InstantPaymentType.APPLEPAY -> throw IllegalStateException("Apple Pay is not supported on Android")
+                    InstantPaymentType.APPLEPAY -> throw IllegalStateException("Apple Pay is not supported on Android.")
+                    InstantPaymentType.GOOGLEPAY -> configuration.mapToCheckoutConfiguration()
                     InstantPaymentType.INSTANT -> configuration.mapToCheckoutConfiguration()
                 }
             }

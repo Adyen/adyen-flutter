@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:adyen_checkout/adyen_checkout.dart';
 import 'package:adyen_checkout/src/components/apple_pay/apple_pay_advanced_component.dart';
 import 'package:adyen_checkout/src/components/apple_pay/apple_pay_session_component.dart';
+import 'package:adyen_checkout/src/logging/adyen_logger.dart';
 import 'package:adyen_checkout/src/util/dto_mapper.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -67,6 +68,13 @@ class AdyenApplePayComponent extends StatelessWidget {
   }
 
   Widget _buildApplePayAdvancedFlowWidget(AdvancedCheckout advancedCheckout) {
+    if (configuration.amount == null) {
+      AdyenLogger.instance.print(
+          "Apple Pay requires to set an amount when using the advanced flow.");
+      onUnavailable?.call();
+      return unavailableWidget ?? const SizedBox.shrink();
+    }
+
     return ApplePayAdvancedComponent(
       key: key,
       applePayPaymentMethod: json.encode(paymentMethod),

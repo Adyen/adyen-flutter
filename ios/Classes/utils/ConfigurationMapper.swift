@@ -2,68 +2,68 @@
 import Adyen
 import PassKit
 
-class ConfigurationMapper {
-    func createDropInConfiguration(dropInConfigurationDTO: DropInConfigurationDTO) throws -> DropInComponent.Configuration {
+extension DropInConfigurationDTO {
+    func createDropInConfiguration(payment: Payment?) throws -> DropInComponent.Configuration {
         let dropInConfiguration = DropInComponent.Configuration(
-            allowsSkippingPaymentList: dropInConfigurationDTO.skipListWhenSinglePaymentMethod,
-            allowPreselectedPaymentView: dropInConfigurationDTO.showPreselectedStoredPaymentMethod
+            allowsSkippingPaymentList: skipListWhenSinglePaymentMethod,
+            allowPreselectedPaymentView: showPreselectedStoredPaymentMethod
         )
-        
-        dropInConfiguration.paymentMethodsList.allowDisablingStoredPaymentMethods =
-            dropInConfigurationDTO.isRemoveStoredPaymentMethodEnabled
-        
-        if let cardConfigurationDTO = dropInConfigurationDTO.cardConfigurationDTO {
-            let koreanAuthenticationMode = cardConfigurationDTO.kcpFieldVisibility.toCardFieldVisibility()
-            let socialSecurityNumberMode = cardConfigurationDTO.socialSecurityNumberFieldVisibility.toCardFieldVisibility()
-            let storedCardConfiguration = createStoredCardConfiguration(showCvcForStoredCard: cardConfigurationDTO.showCvcForStoredCard)
-            let allowedCardTypes = determineAllowedCardTypes(cardTypes: cardConfigurationDTO.supportedCardTypes)
-            let billingAddressConfiguration = determineBillingAddressConfiguration(addressMode: cardConfigurationDTO.addressMode)
-            let cardConfiguration = DropInComponent.Card(
-                showsHolderNameField: cardConfigurationDTO.holderNameRequired,
-                showsStorePaymentMethodField: cardConfigurationDTO.showStorePaymentField,
-                showsSecurityCodeField: cardConfigurationDTO.showCvc,
-                koreanAuthenticationMode: koreanAuthenticationMode,
-                socialSecurityNumberMode: socialSecurityNumberMode,
-                storedCardConfiguration: storedCardConfiguration,
-                allowedCardTypes: allowedCardTypes,
-                billingAddress: billingAddressConfiguration
-            )
-            if let shopperLocal = dropInConfigurationDTO.shopperLocale {
-                dropInConfiguration.localizationParameters = LocalizationParameters(enforcedLocale: shopperLocal)
-            }
-            dropInConfiguration.card = cardConfiguration
+
+        dropInConfiguration.paymentMethodsList.allowDisablingStoredPaymentMethods = isRemoveStoredPaymentMethodEnabled
+
+        if let shopperLocal = shopperLocale {
+            dropInConfiguration.localizationParameters = LocalizationParameters(enforcedLocale: shopperLocal)
         }
         
-        if let applePayConfigurationDTO = dropInConfigurationDTO.applePayConfigurationDTO {
-            dropInConfiguration.applePay = try applePayConfigurationDTO.toApplePayConfiguration(
-                amount: dropInConfigurationDTO.amount,
-                countryCode: dropInConfigurationDTO.countryCode
-            )
+        if let cardConfigurationDTO {
+            dropInConfiguration.card = buildCard(from: cardConfigurationDTO)
         }
-        
-        if let cashAppPayConfigurationDTO = dropInConfigurationDTO.cashAppPayConfigurationDTO {
+
+        if let applePayConfigurationDTO {
+            dropInConfiguration.applePay = try applePayConfigurationDTO.toApplePayConfiguration(payment: payment)
+        }
+
+        if let cashAppPayConfigurationDTO {
             dropInConfiguration.cashAppPay = DropInComponent.CashAppPay(redirectURL: URL(string: cashAppPayConfigurationDTO.returnUrl)!)
         }
-        
+
         dropInConfiguration.style = AdyenAppearanceLoader.findDropInStyle() ?? DropInComponent.Style()
 
         return dropInConfiguration
     }
     
+    private func buildCard(from cardConfigurationDTO: CardConfigurationDTO) -> DropInComponent.Card {
+        let koreanAuthenticationMode = cardConfigurationDTO.kcpFieldVisibility.toCardFieldVisibility()
+        let socialSecurityNumberMode = cardConfigurationDTO.socialSecurityNumberFieldVisibility.toCardFieldVisibility()
+        let storedCardConfiguration = createStoredCardConfiguration(showCvcForStoredCard: cardConfigurationDTO.showCvcForStoredCard)
+        let allowedCardTypes = determineAllowedCardTypes(cardTypes: cardConfigurationDTO.supportedCardTypes)
+        let billingAddressConfiguration = determineBillingAddressConfiguration(addressMode: cardConfigurationDTO.addressMode)
+        return DropInComponent.Card(
+            showsHolderNameField: cardConfigurationDTO.holderNameRequired,
+            showsStorePaymentMethodField: cardConfigurationDTO.showStorePaymentField,
+            showsSecurityCodeField: cardConfigurationDTO.showCvc,
+            koreanAuthenticationMode: koreanAuthenticationMode,
+            socialSecurityNumberMode: socialSecurityNumberMode,
+            storedCardConfiguration: storedCardConfiguration,
+            allowedCardTypes: allowedCardTypes,
+            billingAddress: billingAddressConfiguration
+        )
+    }
+
     private func createStoredCardConfiguration(showCvcForStoredCard: Bool) -> StoredCardConfiguration {
         var storedCardConfiguration = StoredCardConfiguration()
         storedCardConfiguration.showsSecurityCodeField = showCvcForStoredCard
         return storedCardConfiguration
     }
-    
+
     private func determineAllowedCardTypes(cardTypes: [String?]?) -> [CardType]? {
         guard let mappedCardTypes = cardTypes, !mappedCardTypes.isEmpty else {
             return nil
         }
-        
+
         return mappedCardTypes.compactMap { $0 }.map { CardType(rawValue: $0.lowercased()) }
     }
-    
+
     private func determineBillingAddressConfiguration(addressMode: AddressMode?) -> BillingAddressConfiguration {
         var billingAddressConfiguration = BillingAddressConfiguration()
         switch addressMode {
@@ -76,10 +76,10 @@ class ConfigurationMapper {
         default:
             billingAddressConfiguration.mode = CardComponent.AddressFormType.none
         }
-        
+
         return billingAddressConfiguration
     }
-    
+
 }
 
 extension FieldVisibility {
@@ -128,21 +128,21 @@ extension CardConfigurationDTO {
             billingAddress: billingAddressConfiguration
         )
     }
-    
+
     private func createStoredCardConfiguration(showCvcForStoredCard: Bool) -> StoredCardConfiguration {
         var storedCardConfiguration = StoredCardConfiguration()
         storedCardConfiguration.showsSecurityCodeField = showCvcForStoredCard
         return storedCardConfiguration
     }
-    
+
     private func determineAllowedCardTypes(cardTypes: [String?]?) -> [CardType]? {
         guard let mappedCardTypes = cardTypes, !mappedCardTypes.isEmpty else {
             return nil
         }
-        
+
         return mappedCardTypes.compactMap { $0 }.map { CardType(rawValue: $0.lowercased()) }
     }
-    
+
     private func determineBillingAddressConfiguration(addressMode: AddressMode?) -> BillingAddressConfiguration {
         var billingAddressConfiguration = BillingAddressConfiguration()
         switch addressMode {
@@ -155,7 +155,7 @@ extension CardConfigurationDTO {
         default:
             billingAddressConfiguration.mode = CardComponent.AddressFormType.none
         }
-        
+
         return billingAddressConfiguration
     }
 }
@@ -198,41 +198,45 @@ extension AmountDTO {
 }
 
 extension InstantPaymentConfigurationDTO {
-    func mapToApplePayConfiguration() throws -> ApplePayComponent.Configuration {
-        guard let applePayConfigurationDTO else {
-            throw PlatformError(errorDescription: "Apple pay error")
+    func mapToApplePayConfiguration(payment: Payment?) throws -> ApplePayComponent.Configuration {
+        guard let applePayConfiguration = try applePayConfigurationDTO?.toApplePayConfiguration(payment: payment) else {
+            throw PlatformError(errorDescription: "Apple pay configuration not provided.")
         }
         
-        return try applePayConfigurationDTO.toApplePayConfiguration(
-            amount: amount,
-            countryCode: countryCode
-        )
+        return applePayConfiguration
     }
     
     func createAdyenContext() throws -> AdyenContext {
-        try buildAdyenContext(environment: environment, clientKey: clientKey, amount: amount, analyticsOptionsDTO: analyticsOptionsDTO, countryCode: countryCode)
+        try buildAdyenContext(
+            environment: environment,
+            clientKey: clientKey,
+            amount: amount,
+            analyticsOptionsDTO: analyticsOptionsDTO,
+            countryCode: countryCode
+        )
     }
 }
 
-private func buildAdyenContext(environment: Environment, clientKey: String, amount: AmountDTO, analyticsOptionsDTO: AnalyticsOptionsDTO, countryCode: String) throws -> AdyenContext {
+private func buildAdyenContext(environment: Environment, clientKey: String, amount: AmountDTO?, analyticsOptionsDTO: AnalyticsOptionsDTO, countryCode: String) throws -> AdyenContext {
     let environment = environment.mapToEnvironment()
     let apiContext = try APIContext(
         environment: environment,
         clientKey: clientKey
     )
-    let amount = amount.mapToAmount()
+    var payment: Payment? = nil
+    if let amount {
+        payment = Payment(amount: amount.mapToAmount(), countryCode: countryCode)
+    }
     var analyticsConfiguration = AnalyticsConfiguration()
     analyticsConfiguration.isEnabled = analyticsOptionsDTO.enabled
     analyticsConfiguration.context = AnalyticsContext(
         version: analyticsOptionsDTO.version,
         platform: .flutter
     )
+
     return AdyenContext(
         apiContext: apiContext,
-        payment: Payment(
-            amount: amount,
-            countryCode: countryCode
-        ),
+        payment: payment,
         analyticsConfiguration: analyticsConfiguration
     )
 }
@@ -277,5 +281,12 @@ extension ResultCode {
         case .refused, .cancelled, .error, .redirectShopper, .identifyShopper, .challengeShopper, .presentToShopper:
             return false
         }
+    }
+}
+
+extension AdyenSession.Context {
+    var payment: Payment? {
+        guard let countryCode else { return nil }
+        return Payment(amount: amount, countryCode: countryCode)
     }
 }

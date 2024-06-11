@@ -18,7 +18,6 @@ import com.adyen.checkout.components.core.Order
 import com.adyen.checkout.components.core.PaymentMethodsApiResponse
 import com.adyen.checkout.dropin.DropIn
 import com.adyen.checkout.dropin.DropInCallback
-import com.adyen.checkout.dropin.DropInConfiguration
 import com.adyen.checkout.dropin.DropInResult
 import com.adyen.checkout.dropin.SessionDropInCallback
 import com.adyen.checkout.dropin.SessionDropInResult
@@ -36,6 +35,7 @@ import com.adyen.checkout.flutter.dropIn.session.SessionDropInService
 import com.adyen.checkout.flutter.session.SessionHolder
 import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToDropInConfiguration
 import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToOrderResponseModel
+import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToEnvironment
 import com.adyen.checkout.sessions.core.CheckoutSession
 import com.adyen.checkout.sessions.core.SessionSetupResponse
 import kotlinx.coroutines.Dispatchers
@@ -54,7 +54,12 @@ class DropInPlatformApi(
     override fun showDropInSession(dropInConfigurationDTO: DropInConfigurationDTO) {
         setStoredPaymentMethodDeletionObserver()
         val dropInConfiguration = dropInConfigurationDTO.mapToDropInConfiguration(activity.applicationContext)
-        val checkoutSession = createCheckoutSession(sessionHolder, dropInConfiguration)
+        val checkoutSession =
+            createCheckoutSession(
+                sessionHolder,
+                dropInConfigurationDTO.environment.mapToEnvironment(),
+                dropInConfigurationDTO.clientKey
+            )
         DropIn.startPayment(
             activity.applicationContext,
             dropInSessionLauncher,
@@ -178,15 +183,16 @@ class DropInPlatformApi(
 
     private fun createCheckoutSession(
         sessionHolder: SessionHolder,
-        dropInConfiguration: DropInConfiguration
+        environment: com.adyen.checkout.core.Environment,
+        clientKey: String,
     ): CheckoutSession {
         val sessionSetupResponse = SessionSetupResponse.SERIALIZER.deserialize(sessionHolder.sessionSetupResponse)
         val order = sessionHolder.orderResponse?.let { Order.SERIALIZER.deserialize(it) }
         return CheckoutSession(
             sessionSetupResponse = sessionSetupResponse,
             order = order,
-            environment = dropInConfiguration.environment,
-            clientKey = dropInConfiguration.clientKey
+            environment = environment,
+            clientKey = clientKey
         )
     }
 

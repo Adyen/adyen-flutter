@@ -19,7 +19,7 @@ final class DropInConfiguration extends BaseConfiguration {
     required super.environment,
     required super.clientKey,
     required super.countryCode,
-    required super.amount,
+    super.amount,
     super.shopperLocale,
     this.cardConfiguration,
     this.applePayConfiguration,

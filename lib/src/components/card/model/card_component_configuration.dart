@@ -8,7 +8,7 @@ final class CardComponentConfiguration extends BaseConfiguration {
     required super.environment,
     required super.clientKey,
     required super.countryCode,
-    required super.amount,
+    super.amount,
     super.shopperLocale,
     super.analyticsOptions,
     CardConfiguration? cardConfiguration,

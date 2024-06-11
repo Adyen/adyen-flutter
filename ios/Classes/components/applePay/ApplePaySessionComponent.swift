@@ -2,22 +2,19 @@
 
 class ApplePaySessionComponent: BaseApplePayComponent {
     private let sessionHolder: SessionHolder
-    private let configuration: ApplePayComponent.Configuration
-    private let adyenContext: AdyenContext
+    private let configuration: InstantPaymentConfigurationDTO
     private let componentId: String
     
     init(
         sessionHolder: SessionHolder,
-        configuration: ApplePayComponent.Configuration,
-        adyenContext: AdyenContext,
+        configuration: InstantPaymentConfigurationDTO,
         componentId: String
-    ) {
+    ) throws {
         self.sessionHolder = sessionHolder
         self.configuration = configuration
-        self.adyenContext = adyenContext
         self.componentId = componentId
         super.init()
-        applePayComponent = buildApplePaySessionComponent()
+        applePayComponent = try buildApplePaySessionComponent()
     }
     
     override func present() {
@@ -31,13 +28,12 @@ class ApplePaySessionComponent: BaseApplePayComponent {
         applePayComponent = nil
     }
     
-    private func buildApplePaySessionComponent() -> ApplePayComponent? {
-        guard let session = sessionHolder.session,
-              let paymentMethod = session.sessionContext.paymentMethods.paymentMethod(ofType: ApplePayPaymentMethod.self),
-              let applePayComponent = try? ApplePayComponent(paymentMethod: paymentMethod, context: adyenContext, configuration: configuration)
-        else {
-            return nil
-        }
+    private func buildApplePaySessionComponent() throws -> ApplePayComponent? {
+        guard let session = sessionHolder.session else { throw PlatformError(errorDescription: "Session is not available.") }
+        guard let paymentMethod = session.sessionContext.paymentMethods.paymentMethod(ofType: ApplePayPaymentMethod.self) else { throw PlatformError(errorDescription: "Apple Pay payment method not valid.") }
+        let context = try configuration.createAdyenContext()
+        let configuration = try configuration.mapToApplePayConfiguration(payment: session.sessionContext.payment ?? context.payment)
+        let applePayComponent = try ApplePayComponent(paymentMethod: paymentMethod, context: context, configuration: configuration)
         applePayComponent.delegate = sessionHolder.session
         setupSessionFlowDelegate()
         return applePayComponent

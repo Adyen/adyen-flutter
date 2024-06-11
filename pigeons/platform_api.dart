@@ -138,7 +138,7 @@ class DropInConfigurationDTO {
   final Environment environment;
   final String clientKey;
   final String countryCode;
-  final AmountDTO amount;
+  final AmountDTO? amount;
   final String? shopperLocale;
   final CardConfigurationDTO? cardConfigurationDTO;
   final ApplePayConfigurationDTO? applePayConfigurationDTO;
@@ -472,7 +472,7 @@ class CardComponentConfigurationDTO {
   final Environment environment;
   final String clientKey;
   final String countryCode;
-  final AmountDTO amount;
+  final AmountDTO? amount;
   final String? shopperLocale;
   final CardConfigurationDTO cardConfiguration;
   final AnalyticsOptionsDTO analyticsOptionsDTO;
@@ -493,7 +493,7 @@ class InstantPaymentConfigurationDTO {
   final Environment environment;
   final String clientKey;
   final String countryCode;
-  final AmountDTO amount;
+  final AmountDTO? amount;
   final String? shopperLocale;
   final AnalyticsOptionsDTO analyticsOptionsDTO;
   final GooglePayConfigurationDTO? googlePayConfigurationDTO;

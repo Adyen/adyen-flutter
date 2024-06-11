@@ -6,7 +6,7 @@ base class BaseConfiguration {
   final Environment environment;
   final String clientKey;
   final String countryCode;
-  final Amount amount;
+  final Amount? amount;
   final String? shopperLocale;
   final AnalyticsOptions analyticsOptions;
 
@@ -14,8 +14,8 @@ base class BaseConfiguration {
     required this.environment,
     required this.clientKey,
     required this.countryCode,
-    required this.amount,
-    required this.shopperLocale,
+    this.amount,
+    this.shopperLocale,
     AnalyticsOptions? analyticsOptions,
   }) : analyticsOptions = analyticsOptions ?? AnalyticsOptions(enabled: true);
 }
