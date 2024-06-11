@@ -63,11 +63,13 @@ class AdyenCheckout implements AdyenCheckoutInterface {
   Future<String> encryptBin(
     String bin,
     String publicKey,
-  ) => _adyenCheckoutApi.encryptBin(bin, publicKey);
+  ) =>
+      _adyenCheckoutApi.encryptBin(bin, publicKey);
 
   @override
   Future<Map<String, dynamic>> handleAction(
     ActionComponentConfiguration actionComponentConfiguration,
     Map<String, dynamic> action,
-  ) => ActionComponent().handleAction(actionComponentConfiguration, action);
+  ) =>
+      ActionComponent().handleAction(actionComponentConfiguration, action);
 }
