@@ -33,8 +33,8 @@ class ApplePaySessionComponent: BaseApplePayComponent {
         guard let paymentMethod = session.sessionContext.paymentMethods.paymentMethod(ofType: ApplePayPaymentMethod.self) else { throw PlatformError(errorDescription: "Apple Pay payment method not valid.") }
         let context = try configuration.createAdyenContext()
         let configuration = try configuration.mapToApplePayConfiguration(payment: session.sessionContext.payment ?? context.payment)
-        let applePayComponent = try? ApplePayComponent(paymentMethod: paymentMethod, context: context, configuration: configuration)
-        applePayComponent?.delegate = sessionHolder.session
+        let applePayComponent = try ApplePayComponent(paymentMethod: paymentMethod, context: context, configuration: configuration)
+        applePayComponent.delegate = sessionHolder.session
         setupSessionFlowDelegate()
         return applePayComponent
     }

@@ -22,7 +22,8 @@ import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToAnalyticsConfig
 import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToDropInConfiguration
 import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToCardConfiguration
 import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToCheckoutConfiguration
-import com.adyen.checkout.flutter.utils.ConfigurationMapper.toNativeModel
+import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToAmount
+import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToEnvironment
 import com.adyen.checkout.redirect.RedirectComponent
 import com.adyen.checkout.sessions.core.CheckoutSessionProvider
 import com.adyen.checkout.sessions.core.CheckoutSessionResult
@@ -91,10 +92,10 @@ class CheckoutPlatformApi(
                 return configuration.cardConfiguration.mapToCardConfiguration(
                     activity,
                     configuration.shopperLocale,
-                    configuration.environment.toNativeModel(),
+                    configuration.environment.mapToEnvironment(),
                     configuration.clientKey,
                     configuration.analyticsOptionsDTO.mapToAnalyticsConfiguration(),
-                    configuration.amount?.toNativeModel()
+                    configuration.amount?.mapToAmount()
                 )
             }
 

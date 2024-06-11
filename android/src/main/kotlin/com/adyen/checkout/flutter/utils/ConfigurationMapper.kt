@@ -37,8 +37,6 @@ import com.adyen.checkout.components.core.internal.analytics.AnalyticsPlatformPa
 import com.adyen.checkout.cse.EncryptedCard
 import com.adyen.checkout.cse.UnencryptedCard
 import com.adyen.checkout.dropin.DropInConfiguration
-import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToAnalyticsConfiguration
-import com.adyen.checkout.flutter.utils.ConfigurationMapper.toNativeModel
 import com.adyen.checkout.googlepay.BillingAddressParameters
 import com.adyen.checkout.googlepay.GooglePayConfiguration
 import com.adyen.checkout.googlepay.MerchantInfo
@@ -59,8 +57,8 @@ object ConfigurationMapper {
     }
 
     fun DropInConfigurationDTO.mapToDropInConfiguration(context: Context): DropInConfiguration {
-        val environment = environment.toNativeModel()
-        val amount = amount?.toNativeModel()
+        val environment = environment.mapToEnvironment()
+        val amount = amount?.mapToAmount()
         val dropInConfiguration = buildDropInConfiguration(context, shopperLocale, environment)
         val analyticsConfiguration = analyticsOptionsDTO.mapToAnalyticsConfiguration()
 
@@ -230,7 +228,7 @@ object ConfigurationMapper {
         return mappedCardTypes.filterNotNull().toTypedArray()
     }
 
-    fun Environment.toNativeModel(): SDKEnvironment {
+    fun Environment.mapToEnvironment(): SDKEnvironment {
         return when (this) {
             Environment.TEST -> SDKEnvironment.TEST
             Environment.EUROPE -> SDKEnvironment.EUROPE
@@ -241,7 +239,7 @@ object ConfigurationMapper {
         }
     }
 
-    fun AmountDTO.toNativeModel(): Amount {
+    fun AmountDTO.mapToAmount(): Amount {
         return Amount(this.currency, this.value)
     }
 
@@ -380,7 +378,7 @@ object ConfigurationMapper {
 
     fun InstantPaymentConfigurationDTO.mapToGooglePayCheckoutConfiguration(amount: Amount): CheckoutConfiguration {
         return CheckoutConfiguration(
-            environment.toNativeModel(),
+            environment.mapToEnvironment(),
             clientKey,
             shopperLocale?.let { Locale.forLanguageTag(it) },
             amount,
@@ -404,19 +402,19 @@ object ConfigurationMapper {
 
     fun InstantPaymentConfigurationDTO.mapToCheckoutConfiguration(): CheckoutConfiguration =
         CheckoutConfiguration(
-            environment.toNativeModel(),
+            environment.mapToEnvironment(),
             clientKey,
             shopperLocale?.let { Locale.forLanguageTag(it) },
-            amount?.toNativeModel(),
+            amount?.mapToAmount(),
             analyticsOptionsDTO.mapToAnalyticsConfiguration(),
         )
 
     fun ActionComponentConfigurationDTO.mapToCheckoutConfiguration(): CheckoutConfiguration =
         CheckoutConfiguration(
-            environment.toNativeModel(),
+            environment.mapToEnvironment(),
             clientKey,
             shopperLocale?.let { Locale.forLanguageTag(it) },
-            amount?.toNativeModel(),
+            amount?.mapToAmount(),
             analyticsOptionsDTO.mapToAnalyticsConfiguration(),
         )
 }
