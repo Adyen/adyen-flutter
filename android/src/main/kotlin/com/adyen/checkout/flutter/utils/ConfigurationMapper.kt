@@ -376,16 +376,6 @@ object ConfigurationMapper {
         }
     }
 
-    fun InstantPaymentConfigurationDTO.mapToGooglePayCheckoutConfiguration(amount: Amount): CheckoutConfiguration {
-        return CheckoutConfiguration(
-            environment.mapToEnvironment(),
-            clientKey,
-            shopperLocale?.let { Locale.forLanguageTag(it) },
-            amount,
-            analyticsOptionsDTO.mapToAnalyticsConfiguration()
-        )
-    }
-
     fun EncryptedCard.mapToEncryptedCardDTO(): EncryptedCardDTO {
         return EncryptedCardDTO(encryptedCardNumber, encryptedExpiryMonth, encryptedExpiryYear, encryptedSecurityCode)
     }

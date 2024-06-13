@@ -11,7 +11,7 @@ import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToCheckoutConfigu
 import org.json.JSONObject
 import java.util.UUID
 
-class ActionComponentManager(
+internal class ActionComponentManager(
     private val activity: FragmentActivity,
     private val componentFlutterApi: ComponentFlutterInterface,
 ) {
