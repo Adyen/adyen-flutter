@@ -7,13 +7,25 @@ import 'package:adyen_checkout_example/utils/dialog_builder.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 
-class CardComponentScrollableScreen extends StatelessWidget {
-  const CardComponentScrollableScreen({
+class CardAdvancedComponentScreen extends StatelessWidget {
+  CardAdvancedComponentScreen({
     required this.repository,
     super.key,
   });
 
   final AdyenCardComponentRepository repository;
+  final CardComponentConfiguration cardComponentConfiguration =
+      CardComponentConfiguration(
+    environment: Config.environment,
+    clientKey: Config.clientKey,
+    countryCode: Config.countryCode,
+    shopperLocale: Config.shopperLocale,
+    cardConfiguration: const CardConfiguration(
+      holderNameRequired: true,
+      addressMode: AddressMode.postalCode,
+      showStorePaymentField: true,
+    ),
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -54,13 +66,6 @@ class CardComponentScrollableScreen extends StatelessWidget {
     BuildContext context,
   ) {
     final paymentMethod = extractPaymentMethod(paymentMethods);
-    final cardComponentConfiguration = CardComponentConfiguration(
-      environment: Config.environment,
-      clientKey: Config.clientKey,
-      countryCode: Config.countryCode,
-      shopperLocale: Config.shopperLocale,
-      cardConfiguration: const CardConfiguration(),
-    );
     final advancedCheckout = AdvancedCheckout(
       onSubmit: repository.onSubmit,
       onAdditionalDetails: repository.onAdditionalDetails,
