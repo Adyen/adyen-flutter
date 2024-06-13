@@ -20,12 +20,14 @@ import com.adyen.checkout.action.core.internal.ActionHandlingComponent
 import com.adyen.checkout.components.core.PaymentMethod
 import com.adyen.checkout.components.core.action.Action
 import com.adyen.checkout.flutter.components.action.ActionComponentManager
+import com.adyen.checkout.flutter.components.card.CardComponentManager
 import com.adyen.checkout.flutter.components.googlepay.GooglePayComponentManager
 import com.adyen.checkout.flutter.components.instant.InstantComponentManager
 import com.adyen.checkout.flutter.components.view.ComponentLoadingBottomSheet
 import com.adyen.checkout.flutter.session.SessionHolder
 import com.adyen.checkout.flutter.utils.Constants
 import com.adyen.checkout.redirect.RedirectComponent
+import io.flutter.embedding.engine.plugins.FlutterPlugin
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import org.json.JSONObject
@@ -34,7 +36,10 @@ class ComponentPlatformApi(
     private val activity: FragmentActivity,
     private val sessionHolder: SessionHolder,
     private val componentFlutterInterface: ComponentFlutterInterface,
+    private val flutterPluginBinding: FlutterPlugin.FlutterPluginBinding?,
 ) : ComponentPlatformInterface {
+    private val cardComponentManager: CardComponentManager =
+        CardComponentManager(activity, componentFlutterInterface, flutterPluginBinding, sessionHolder)
     private val googlePayComponentManager: GooglePayComponentManager =
         GooglePayComponentManager(activity, sessionHolder, componentFlutterInterface)
     private val instantComponentManager: InstantComponentManager =
@@ -49,12 +54,13 @@ class ComponentPlatformApi(
     }
 
     init {
+        cardComponentManager.registerComponentViewFactories()
         activity.lifecycleScope.launch {
             currentComponentStateFlow.collect { value -> assignCurrentComponent(value) }
         }
     }
 
-    override fun updateViewHeight(viewId: Long) = ComponentHeightMessenger.sendResult(viewId)
+    override fun updateViewHeight(viewId: Long) = cardComponentManager.updateViewHeight()
 
     override fun onPaymentsResult(
         componentId: String,

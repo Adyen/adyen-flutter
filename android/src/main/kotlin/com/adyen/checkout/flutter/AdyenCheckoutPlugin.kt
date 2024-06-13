@@ -11,9 +11,6 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import com.adyen.checkout.dropin.DropIn
 import com.adyen.checkout.flutter.components.ComponentPlatformApi
-import com.adyen.checkout.flutter.components.card.CardComponentFactory
-import com.adyen.checkout.flutter.components.card.CardComponentFactory.Companion.CARD_COMPONENT_ADVANCED
-import com.adyen.checkout.flutter.components.card.CardComponentFactory.Companion.CARD_COMPONENT_SESSION
 import com.adyen.checkout.flutter.dropIn.DropInPlatformApi
 import com.adyen.checkout.flutter.session.SessionHolder
 import com.adyen.checkout.flutter.utils.Constants.Companion.WRONG_FLUTTER_ACTIVITY_USAGE_ERROR_MESSAGE
@@ -100,18 +97,8 @@ class AdyenCheckoutPlugin : FlutterPlugin, ActivityAware, PluginRegistry.Activit
     ) {
         componentFlutterApi =
             ComponentFlutterInterface(binaryMessenger).apply {
-                componentPlatformApi = ComponentPlatformApi(fragmentActivity, sessionHolder, this)
+                componentPlatformApi = ComponentPlatformApi(fragmentActivity, sessionHolder, this, flutterPluginBinding)
                 ComponentPlatformInterface.setUp(binaryMessenger, componentPlatformApi)
-
-                flutterPluginBinding?.platformViewRegistry?.registerViewFactory(
-                    CARD_COMPONENT_ADVANCED,
-                    CardComponentFactory(fragmentActivity, this, CARD_COMPONENT_ADVANCED)
-                )
-
-                flutterPluginBinding?.platformViewRegistry?.registerViewFactory(
-                    CARD_COMPONENT_SESSION,
-                    CardComponentFactory(fragmentActivity, this, CARD_COMPONENT_SESSION, sessionHolder)
-                )
             }
     }
 

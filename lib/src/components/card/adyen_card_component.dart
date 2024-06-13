@@ -110,11 +110,11 @@ class AdyenCardComponent extends StatelessWidget {
     }
 
     if (cardConfiguration.showStorePaymentField) {
-      androidViewHeight += 43;
+      androidViewHeight += 84;
     }
 
     if (cardConfiguration.addressMode == AddressMode.full) {
-      androidViewHeight += 422;
+      androidViewHeight += 650;
     }
 
     if (cardConfiguration.addressMode == AddressMode.postalCode) {

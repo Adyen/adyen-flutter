@@ -14,6 +14,7 @@ class CardComponentFactory(
     private val componentFlutterApi: ComponentFlutterInterface,
     private val viewTypeId: String,
     private val sessionHolder: SessionHolder? = null,
+    private val setCurrentCardComponent: (BaseCardComponent) -> Unit,
 ) : PlatformViewFactory(ComponentFlutterInterface.codec) {
     companion object {
         const val CARD_COMPONENT_ADVANCED = "cardComponentAdvanced"
@@ -26,10 +27,13 @@ class CardComponentFactory(
         args: Any?
     ): PlatformView {
         val creationParams = args as Map<*, *>? ?: emptyMap<Any, Any>()
-        return if (viewTypeId == CARD_COMPONENT_SESSION && sessionHolder != null) {
-            CardSessionComponent(activity, componentFlutterApi, sessionHolder, context, viewId, creationParams)
-        } else {
-            CardAdvancedComponent(activity, componentFlutterApi, context, viewId, creationParams)
-        }
+        val cardComponent =
+            if (viewTypeId == CARD_COMPONENT_SESSION && sessionHolder != null) {
+                CardSessionComponent(activity, componentFlutterApi, sessionHolder, context, viewId, creationParams)
+            } else {
+                CardAdvancedComponent(activity, componentFlutterApi, context, viewId, creationParams)
+            }
+        setCurrentCardComponent(cardComponent)
+        return cardComponent
     }
 }

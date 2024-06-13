@@ -97,8 +97,8 @@ class _BaseCardComponentState extends State<BaseCardComponent> {
   Widget build(BuildContext context) {
     return StreamBuilder(
         stream: widget.resizeStream.stream
-            .debounce(const Duration(milliseconds: 100))
-            .distinct(),
+            .distinct()
+            .debounce(const Duration(milliseconds: 100)),
         builder: (BuildContext context, AsyncSnapshot snapshot) {
           return CardComponentContainer(
             snapshot: snapshot,
