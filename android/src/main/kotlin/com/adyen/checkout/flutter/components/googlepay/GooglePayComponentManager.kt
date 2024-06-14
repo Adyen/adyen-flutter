@@ -5,6 +5,7 @@ import InstantPaymentConfigurationDTO
 import InstantPaymentSetupResultDTO
 import android.content.Intent
 import androidx.fragment.app.FragmentActivity
+import com.adyen.checkout.action.core.internal.ActionHandlingComponent
 import com.adyen.checkout.components.core.CheckoutConfiguration
 import com.adyen.checkout.components.core.Order
 import com.adyen.checkout.components.core.PaymentMethod
@@ -22,6 +23,7 @@ class GooglePayComponentManager(
     private val activity: FragmentActivity,
     private val sessionHolder: SessionHolder,
     private val componentFlutterInterface: ComponentFlutterInterface,
+    private val assignCurrentComponent: (ActionHandlingComponent?) -> Unit,
 ) {
     private var googlePayComponent: BaseGooglePayComponentWrapper? = null
 
@@ -116,9 +118,11 @@ class GooglePayComponentManager(
         ).checkGooglePayAvailability(paymentMethod, checkoutConfiguration)
     }
 
-    fun startGooglePayComponent(): GooglePayComponent? {
-        googlePayComponent?.startGooglePayScreen()
-        return googlePayComponent?.googlePayComponent
+    fun startGooglePayComponent() {
+        googlePayComponent?.let {
+            assignCurrentComponent(it.googlePayComponent)
+            it.startGooglePayScreen()
+        }
     }
 
     private fun createGooglePaySessionComponent(

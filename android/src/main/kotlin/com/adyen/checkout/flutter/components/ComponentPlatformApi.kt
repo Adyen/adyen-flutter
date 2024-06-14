@@ -36,9 +36,9 @@ class ComponentPlatformApi(
     private val componentFlutterInterface: ComponentFlutterInterface,
 ) : ComponentPlatformInterface {
     private val googlePayComponentManager: GooglePayComponentManager =
-        GooglePayComponentManager(activity, sessionHolder, componentFlutterInterface)
+        GooglePayComponentManager(activity, sessionHolder, componentFlutterInterface, ::assignCurrentComponent)
     private val instantComponentManager: InstantComponentManager =
-        InstantComponentManager(activity, componentFlutterInterface, sessionHolder)
+        InstantComponentManager(activity, componentFlutterInterface, sessionHolder, ::assignCurrentComponent)
     private val actionComponentManager: ActionComponentManager =
         ActionComponentManager(activity, componentFlutterInterface, ::assignCurrentComponent)
     private val intentListener = Consumer<Intent> { handleIntent(it) }
@@ -92,18 +92,16 @@ class ComponentPlatformApi(
         encodedPaymentMethod: String,
         componentId: String,
     ) {
-        val currentComponent =
-            when (instantPaymentConfigurationDTO.instantPaymentType) {
-                InstantPaymentType.GOOGLEPAY -> googlePayComponentManager.startGooglePayComponent()
-                InstantPaymentType.APPLEPAY -> return
-                InstantPaymentType.INSTANT ->
-                    instantComponentManager.startInstantComponent(
-                        instantPaymentConfigurationDTO,
-                        encodedPaymentMethod,
-                        componentId
-                    )
-            }
-        assignCurrentComponent(currentComponent)
+        when (instantPaymentConfigurationDTO.instantPaymentType) {
+            InstantPaymentType.GOOGLEPAY -> googlePayComponentManager.startGooglePayComponent()
+            InstantPaymentType.APPLEPAY -> return
+            InstantPaymentType.INSTANT ->
+                instantComponentManager.startInstantComponent(
+                    instantPaymentConfigurationDTO,
+                    encodedPaymentMethod,
+                    componentId
+                )
+        }
     }
 
     override fun handleAction(
