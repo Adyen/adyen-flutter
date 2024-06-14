@@ -290,3 +290,14 @@ extension PaymentResultModelMapper on PaymentResultModelDTO {
         orElse: () => ResultCode.unknown,
       );
 }
+
+extension ActionComponentConfigurationMapper on ActionComponentConfiguration {
+  ActionComponentConfigurationDTO toDTO(String sdkVersionNumber) =>
+      ActionComponentConfigurationDTO(
+        environment: environment,
+        clientKey: clientKey,
+        shopperLocale: shopperLocale,
+        amount: amount?.toDTO(),
+        analyticsOptionsDTO: analyticsOptions.toDTO(sdkVersionNumber),
+      );
+}

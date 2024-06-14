@@ -1,5 +1,6 @@
 package com.adyen.checkout.flutter.utils
 
+import ActionComponentConfigurationDTO
 import AddressMode
 import AmountDTO
 import AnalyticsOptionsDTO
@@ -390,6 +391,15 @@ object ConfigurationMapper {
     }
 
     fun InstantPaymentConfigurationDTO.mapToCheckoutConfiguration(): CheckoutConfiguration =
+        CheckoutConfiguration(
+            environment.mapToEnvironment(),
+            clientKey,
+            shopperLocale?.let { Locale.forLanguageTag(it) },
+            amount?.mapToAmount(),
+            analyticsOptionsDTO.mapToAnalyticsConfiguration(),
+        )
+
+    fun ActionComponentConfigurationDTO.mapToCheckoutConfiguration(): CheckoutConfiguration =
         CheckoutConfiguration(
             environment.mapToEnvironment(),
             clientKey,

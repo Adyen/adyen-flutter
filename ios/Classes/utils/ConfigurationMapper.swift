@@ -14,7 +14,7 @@ extension DropInConfigurationDTO {
         if let shopperLocal = shopperLocale {
             dropInConfiguration.localizationParameters = LocalizationParameters(enforcedLocale: shopperLocal)
         }
-        
+
         if let cardConfigurationDTO {
             dropInConfiguration.card = buildCard(from: cardConfigurationDTO)
         }
@@ -31,7 +31,7 @@ extension DropInConfigurationDTO {
 
         return dropInConfiguration
     }
-    
+
     private func buildCard(from cardConfigurationDTO: CardConfigurationDTO) -> DropInComponent.Card {
         let koreanAuthenticationMode = cardConfigurationDTO.kcpFieldVisibility.toCardFieldVisibility()
         let socialSecurityNumberMode = cardConfigurationDTO.socialSecurityNumberFieldVisibility.toCardFieldVisibility()
@@ -205,7 +205,7 @@ extension InstantPaymentConfigurationDTO {
         
         return applePayConfiguration
     }
-    
+
     func createAdyenContext() throws -> AdyenContext {
         try buildAdyenContext(
             environment: environment,
@@ -217,14 +217,14 @@ extension InstantPaymentConfigurationDTO {
     }
 }
 
-private func buildAdyenContext(environment: Environment, clientKey: String, amount: AmountDTO?, analyticsOptionsDTO: AnalyticsOptionsDTO, countryCode: String) throws -> AdyenContext {
+private func buildAdyenContext(environment: Environment, clientKey: String, amount: AmountDTO?, analyticsOptionsDTO: AnalyticsOptionsDTO, countryCode: String?) throws -> AdyenContext {
     let environment = environment.mapToEnvironment()
     let apiContext = try APIContext(
         environment: environment,
         clientKey: clientKey
     )
     var payment: Payment? = nil
-    if let amount {
+    if let amount, let countryCode {
         payment = Payment(amount: amount.mapToAmount(), countryCode: countryCode)
     }
     var analyticsConfiguration = AnalyticsConfiguration()
@@ -288,5 +288,17 @@ extension AdyenSession.Context {
     var payment: Payment? {
         guard let countryCode else { return nil }
         return Payment(amount: amount, countryCode: countryCode)
+    }
+}
+
+extension ActionComponentConfigurationDTO {
+    func createAdyenContext() throws -> AdyenContext {
+        try buildAdyenContext(
+            environment: environment,
+            clientKey: clientKey,
+            amount: nil,
+            analyticsOptionsDTO: analyticsOptionsDTO,
+            countryCode: nil
+        )
     }
 }
