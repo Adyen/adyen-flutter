@@ -11,13 +11,18 @@ class ActionComponentManager {
         self.componentFlutterApi = componentFlutterApi
     }
     
-    func handleAction(adyenContext: AdyenContext, componentId: String, actionResponse: [String?: Any?]) throws {
-        actionComponent = AdyenActionComponent(context: adyenContext)
-        actionComponent?.delegate = self
-        actionComponent?.presentationDelegate = getViewController()
-        let jsonData = try JSONSerialization.data(withJSONObject: actionResponse, options: [])
-        let action = try JSONDecoder().decode(Action.self, from: jsonData)
-        actionComponent?.handle(action)
+    func handleAction(actionComponentConfiguration: ActionComponentConfigurationDTO, componentId: String, actionResponse: [String?: Any?]) {
+        do {
+            let adyenContext = try actionComponentConfiguration.createAdyenContext()
+            actionComponent = AdyenActionComponent(context: adyenContext)
+            actionComponent?.delegate = self
+            actionComponent?.presentationDelegate = getViewController()
+            let jsonData = try JSONSerialization.data(withJSONObject: actionResponse, options: [])
+            let action = try JSONDecoder().decode(Action.self, from: jsonData)
+            actionComponent?.handle(action)
+        } catch {
+            sendErrorToFlutterLayer(error: error)
+        }
     }
     
     func getViewController() -> UIViewController? {
@@ -35,6 +40,21 @@ class ActionComponentManager {
     
     func onDispose() {
         actionComponent = nil
+    }
+    
+    private func sendErrorToFlutterLayer(error: Error) {
+        let componentCommunicationModel = ComponentCommunicationModel(
+            type: ComponentCommunicationType.result,
+            componentId: Constants.actionComponentId,
+            paymentResult: PaymentResultDTO(
+                type: .from(error: error),
+                reason: error.localizedDescription
+            )
+        )
+        componentFlutterApi.onComponentCommunication(
+            componentCommunicationModel: componentCommunicationModel,
+            completion: { _ in }
+        )
     }
 }
 
@@ -71,18 +91,4 @@ extension ActionComponentManager: ActionComponentDelegate {
         }
     }
     
-    private func sendErrorToFlutterLayer(error: Error) {
-        let componentCommunicationModel = ComponentCommunicationModel(
-            type: ComponentCommunicationType.result,
-            componentId: Constants.actionComponentId,
-            paymentResult: PaymentResultDTO(
-                type: .from(error: error),
-                reason: error.localizedDescription
-            )
-        )
-        componentFlutterApi.onComponentCommunication(
-            componentCommunicationModel: componentCommunicationModel,
-            completion: { _ in }
-        )
-    }
 }

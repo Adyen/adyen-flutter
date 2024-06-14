@@ -40,7 +40,7 @@ class ComponentPlatformApi(
     private val instantComponentManager: InstantComponentManager =
         InstantComponentManager(activity, componentFlutterInterface, sessionHolder)
     private val actionComponentManager: ActionComponentManager =
-        ActionComponentManager(activity, componentFlutterInterface)
+        ActionComponentManager(activity, componentFlutterInterface, ::assignCurrentComponent)
     private val intentListener = Consumer<Intent> { handleIntent(it) }
     private var currentComponent: ActionHandlingComponent? = null
 
@@ -110,19 +110,13 @@ class ComponentPlatformApi(
         actionComponentConfiguration: ActionComponentConfigurationDTO,
         componentId: String,
         actionResponse: Map<String?, Any?>?
-    ) {
-        val actionComponent =
-            actionComponentManager.createActionComponent(actionComponentConfiguration, componentId)
-        assignCurrentComponent(actionComponent)
-        actionResponse?.let { actionComponentManager.handleAction(it) }
-    }
+    ) = actionComponentManager.handleAction(actionComponentConfiguration, componentId, actionResponse)
 
     override fun onDispose(componentId: String) {
         activity.removeOnNewIntentListener(intentListener)
         currentComponent = null
         googlePayComponentManager.onDispose(componentId)
         instantComponentManager.onDispose(componentId)
-        actionComponentManager.onDispose(componentId)
     }
 
     fun handleActivityResult(

@@ -65,9 +65,11 @@ class ComponentPlatformApi: ComponentPlatformInterface {
     }
     
     func handleAction(actionComponentConfiguration: ActionComponentConfigurationDTO, componentId: String, actionResponse: [String?: Any?]?) throws {
-        guard let actionResponse else { return }
-        let adyenContext = try actionComponentConfiguration.createAdyenContext()
-        try actionComponentManager.handleAction(adyenContext: adyenContext, componentId: componentId, actionResponse: actionResponse)
+        actionComponentManager.handleAction(
+            actionComponentConfiguration: actionComponentConfiguration,
+            componentId: componentId,
+            actionResponse: actionResponse ?? [:]
+        )
     }
 
     func onDispose(componentId: String) {

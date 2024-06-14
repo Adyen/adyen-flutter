@@ -56,9 +56,9 @@ class CseScreen extends StatelessWidget {
         );
         switch (actionResultDetails) {
           case ActionSuccess it:
-            debugPrint("Action result details: ${it.details}");
+            debugPrint("Action result: ${it.data}");
           case ActionError it:
-            debugPrint("Action result details: ${it.errorMessage}");
+            debugPrint("Action error: ${it.errorMessage}");
         }
       }
     } catch (exception) {
