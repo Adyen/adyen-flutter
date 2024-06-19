@@ -15,7 +15,6 @@ import PaymentResultModelDTO
 import android.content.Intent
 import androidx.core.util.Consumer
 import androidx.fragment.app.FragmentActivity
-import androidx.lifecycle.lifecycleScope
 import com.adyen.checkout.action.core.internal.ActionHandlingComponent
 import com.adyen.checkout.components.core.PaymentMethod
 import com.adyen.checkout.components.core.action.Action
@@ -28,8 +27,6 @@ import com.adyen.checkout.flutter.session.SessionHolder
 import com.adyen.checkout.flutter.utils.Constants
 import com.adyen.checkout.redirect.RedirectComponent
 import io.flutter.embedding.engine.plugins.FlutterPlugin
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.launch
 import org.json.JSONObject
 
 class ComponentPlatformApi(
@@ -39,7 +36,13 @@ class ComponentPlatformApi(
     private val flutterPluginBinding: FlutterPlugin.FlutterPluginBinding?,
 ) : ComponentPlatformInterface {
     private val cardComponentManager: CardComponentManager =
-        CardComponentManager(activity, componentFlutterInterface, flutterPluginBinding, sessionHolder)
+        CardComponentManager(
+            activity,
+            componentFlutterInterface,
+            flutterPluginBinding,
+            sessionHolder,
+            ::assignCurrentComponent
+        )
     private val googlePayComponentManager: GooglePayComponentManager =
         GooglePayComponentManager(activity, sessionHolder, componentFlutterInterface, ::assignCurrentComponent)
     private val instantComponentManager: InstantComponentManager =
@@ -49,15 +52,8 @@ class ComponentPlatformApi(
     private val intentListener = Consumer<Intent> { handleIntent(it) }
     private var currentComponent: ActionHandlingComponent? = null
 
-    companion object {
-        val currentComponentStateFlow = MutableStateFlow<ActionHandlingComponent?>(null)
-    }
-
     init {
         cardComponentManager.registerComponentViewFactories()
-        activity.lifecycleScope.launch {
-            currentComponentStateFlow.collect { value -> assignCurrentComponent(value) }
-        }
     }
 
     override fun updateViewHeight(viewId: Long) = cardComponentManager.updateViewHeight()

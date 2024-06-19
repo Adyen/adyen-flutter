@@ -4,7 +4,7 @@ import ComponentFlutterInterface
 import com.adyen.checkout.card.CardComponentState
 import com.adyen.checkout.flutter.components.base.ComponentAdvancedCallback
 
-class CardAdvancedCallback(
+internal class CardAdvancedCallback(
     private val componentFlutterApi: ComponentFlutterInterface,
     private val componentId: String,
     private val assignCurrentComponent: () -> Unit,

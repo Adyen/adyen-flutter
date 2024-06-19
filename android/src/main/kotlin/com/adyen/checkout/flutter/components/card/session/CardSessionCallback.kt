@@ -5,7 +5,7 @@ import com.adyen.checkout.card.CardComponentState
 import com.adyen.checkout.components.core.action.Action
 import com.adyen.checkout.flutter.components.base.ComponentSessionCallback
 
-class CardSessionCallback(
+internal class CardSessionCallback(
     private val componentFlutterApi: ComponentFlutterInterface,
     private val componentId: String,
     private val onActionCallback: (Action) -> Unit,

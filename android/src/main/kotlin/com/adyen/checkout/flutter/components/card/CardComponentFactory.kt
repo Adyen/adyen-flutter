@@ -9,7 +9,7 @@ import com.adyen.checkout.flutter.session.SessionHolder
 import io.flutter.plugin.platform.PlatformView
 import io.flutter.plugin.platform.PlatformViewFactory
 
-class CardComponentFactory(
+internal class CardComponentFactory(
     private val activity: FragmentActivity,
     private val componentFlutterApi: ComponentFlutterInterface,
     private val viewTypeId: String,
@@ -29,9 +29,24 @@ class CardComponentFactory(
         val creationParams = args as Map<*, *>? ?: emptyMap<Any, Any>()
         val cardComponent =
             if (viewTypeId == CARD_COMPONENT_SESSION && sessionHolder != null) {
-                CardSessionComponent(activity, componentFlutterApi, sessionHolder, context, viewId, creationParams)
+                CardSessionComponent(
+                    context,
+                    viewId,
+                    creationParams,
+                    activity,
+                    componentFlutterApi,
+                    setCurrentCardComponent,
+                    sessionHolder
+                )
             } else {
-                CardAdvancedComponent(activity, componentFlutterApi, context, viewId, creationParams)
+                CardAdvancedComponent(
+                    context,
+                    viewId,
+                    creationParams,
+                    activity,
+                    componentFlutterApi,
+                    setCurrentCardComponent
+                )
             }
         setCurrentCardComponent(cardComponent)
         return cardComponent

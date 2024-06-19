@@ -11,12 +11,13 @@ import org.json.JSONObject
 import java.util.UUID
 
 internal class CardAdvancedComponent(
+    private val context: Context,
+    private val id: Int,
+    private val creationParams: Map<*, *>,
     private val activity: FragmentActivity,
     private val componentFlutterApi: ComponentFlutterInterface,
-    context: Context,
-    id: Int,
-    creationParams: Map<*, *>
-) : BaseCardComponent(activity, componentFlutterApi, context, id, creationParams) {
+    private val setCurrentCardComponent: (BaseCardComponent) -> Unit
+) : BaseCardComponent(context, id, creationParams, activity, componentFlutterApi, setCurrentCardComponent) {
     private val paymentMethodString = creationParams[PAYMENT_METHOD_KEY] as String? ?: ""
     private val isStoredPaymentMethod = creationParams[IS_STORED_PAYMENT_METHOD_KEY] as Boolean? ?: false
 
@@ -36,7 +37,7 @@ internal class CardAdvancedComponent(
                     activity = activity,
                     storedPaymentMethod = storedPaymentMethod,
                     configuration = cardConfiguration,
-                    callback = CardAdvancedCallback(componentFlutterApi, componentId, ::assignCurrentComponent),
+                    callback = CardAdvancedCallback(componentFlutterApi, componentId, ::setCurrentCardComponent),
                     key = UUID.randomUUID().toString()
                 )
             }
@@ -47,7 +48,7 @@ internal class CardAdvancedComponent(
                     activity = activity,
                     paymentMethod = paymentMethod,
                     configuration = cardConfiguration,
-                    callback = CardAdvancedCallback(componentFlutterApi, componentId, ::assignCurrentComponent),
+                    callback = CardAdvancedCallback(componentFlutterApi, componentId, ::setCurrentCardComponent),
                     key = UUID.randomUUID().toString()
                 )
             }

@@ -15,14 +15,15 @@ import com.adyen.checkout.sessions.core.SessionSetupResponse
 import org.json.JSONObject
 import java.util.UUID
 
-class CardSessionComponent(
+internal class CardSessionComponent(
+    private val context: Context,
+    private val id: Int,
+    private val creationParams: Map<*, *>,
     private val activity: FragmentActivity,
     private val componentFlutterApi: ComponentFlutterInterface,
-    private val sessionHolder: SessionHolder,
-    context: Context,
-    id: Int,
-    creationParams: Map<*, *>
-) : BaseCardComponent(activity, componentFlutterApi, context, id, creationParams) {
+    private val setCurrentCardComponent: (BaseCardComponent) -> Unit,
+    private val sessionHolder: SessionHolder
+) : BaseCardComponent(context, id, creationParams, activity, componentFlutterApi, setCurrentCardComponent) {
     private val paymentMethodString = creationParams[PAYMENT_METHOD_KEY] as String? ?: ""
     private val isStoredPaymentMethod = creationParams[IS_STORED_PAYMENT_METHOD_KEY] as Boolean? ?: false
 
@@ -57,7 +58,7 @@ class CardSessionComponent(
                             componentFlutterApi,
                             componentId,
                             ::onAction,
-                            ::assignCurrentComponent
+                            ::setCurrentCardComponent
                         ),
                     key = UUID.randomUUID().toString()
                 )
@@ -75,7 +76,7 @@ class CardSessionComponent(
                             componentFlutterApi,
                             componentId,
                             ::onAction,
-                            ::assignCurrentComponent
+                            ::setCurrentCardComponent
                         ),
                     key = UUID.randomUUID().toString()
                 )

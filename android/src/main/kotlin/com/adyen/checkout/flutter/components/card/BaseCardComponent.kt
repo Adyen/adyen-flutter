@@ -16,7 +16,6 @@ import androidx.core.view.doOnNextLayout
 import androidx.lifecycle.lifecycleScope
 import com.adyen.checkout.card.CardComponent
 import com.adyen.checkout.flutter.R
-import com.adyen.checkout.flutter.components.ComponentPlatformApi
 import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToAmount
 import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToAnalyticsConfiguration
 import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToCardConfiguration
@@ -31,11 +30,12 @@ import kotlinx.coroutines.launch
 import kotlin.math.round
 
 abstract class BaseCardComponent(
+    private val context: Context,
+    private val id: Int,
+    private val creationParams: Map<*, *>,
     private val activity: ComponentActivity,
     private val componentFlutterApi: ComponentFlutterInterface,
-    context: Context,
-    id: Int,
-    creationParams: Map<*, *>
+    private val setCurrentCardComponent: (BaseCardComponent) -> Unit
 ) : PlatformView {
     private val configuration =
         creationParams[CARD_COMPONENT_CONFIGURATION_KEY] as CardComponentConfigurationDTO?
@@ -44,13 +44,13 @@ abstract class BaseCardComponent(
     private val adyenComponentView = AdyenComponentView(activity)
     private val standardMargin = activity.resources.getDimension(R.dimen.standard_margin)
     private val screenDensity = activity.resources.displayMetrics.density
+    private val layoutChangeFlow = MutableStateFlow<Int?>(null)
     private val onLayoutChangeListener =
         View.OnLayoutChangeListener { v, _, _, _, _, _, _, _, _ ->
             activity.lifecycleScope.launch {
                 layoutChangeFlow.emit(v.height)
             }
         }
-    val layoutChangeFlow = MutableStateFlow<Int?>(null)
     val cardConfiguration =
         configuration.cardConfiguration.mapToCardConfiguration(
             context,
@@ -77,11 +77,7 @@ abstract class BaseCardComponent(
         setupComponentResizeListener()
     }
 
-    fun assignCurrentComponent() {
-        activity.lifecycleScope.launch {
-            ComponentPlatformApi.currentComponentStateFlow.emit(cardComponent)
-        }
-    }
+    fun setCurrentCardComponent() = setCurrentCardComponent(this)
 
     private fun onCardComponentLayout() {
         val vto: ViewTreeObserver = adyenComponentView.getViewTreeObserver()
@@ -134,11 +130,9 @@ abstract class BaseCardComponent(
                 ViewGroup.LayoutParams.WRAP_CONTENT,
             )
 
-        // Component container
         val componentContainer = activity.findViewById<FrameLayout>(R.id.frameLayout_componentContainer)
         componentContainer?.layoutParams = linearLayoutParams
 
-        // Button container
         val buttonContainer = activity.findViewById<FrameLayout>(R.id.frameLayout_buttonContainer)
         buttonContainer?.layoutParams = linearLayoutParams
     }
