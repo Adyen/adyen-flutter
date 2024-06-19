@@ -21,11 +21,10 @@ internal class CardSessionComponent(
     private val creationParams: Map<*, *>,
     private val activity: FragmentActivity,
     private val componentFlutterApi: ComponentFlutterInterface,
+    private val onDispose: (String) -> Unit,
     private val setCurrentCardComponent: (BaseCardComponent) -> Unit,
     private val sessionHolder: SessionHolder
-) : BaseCardComponent(context, id, creationParams, activity, componentFlutterApi, setCurrentCardComponent) {
-    private val paymentMethodString = creationParams[PAYMENT_METHOD_KEY] as String? ?: ""
-    private val isStoredPaymentMethod = creationParams[IS_STORED_PAYMENT_METHOD_KEY] as Boolean? ?: false
+) : BaseCardComponent(context, id, creationParams, activity, componentFlutterApi, onDispose, setCurrentCardComponent) {
 
     init {
         val sessionSetupResponse = SessionSetupResponse.SERIALIZER.deserialize(sessionHolder.sessionSetupResponse)

@@ -41,6 +41,7 @@ class ComponentPlatformApi(
             componentFlutterInterface,
             flutterPluginBinding,
             sessionHolder,
+            ::onDispose,
             ::assignCurrentComponent
         )
     private val googlePayComponentManager: GooglePayComponentManager =
@@ -192,6 +193,11 @@ class ComponentPlatformApi(
 
     private fun assignCurrentComponent(currentComponent: ActionHandlingComponent?) {
         this.currentComponent = currentComponent
+        setupIntentListener()
+    }
+
+    private fun setupIntentListener() {
+        activity.removeOnNewIntentListener(intentListener)
         activity.addOnNewIntentListener(intentListener)
     }
 

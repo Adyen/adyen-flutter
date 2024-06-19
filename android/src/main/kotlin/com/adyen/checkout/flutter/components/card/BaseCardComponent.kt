@@ -35,12 +35,12 @@ abstract class BaseCardComponent(
     private val creationParams: Map<*, *>,
     private val activity: ComponentActivity,
     private val componentFlutterApi: ComponentFlutterInterface,
-    private val setCurrentCardComponent: (BaseCardComponent) -> Unit
-) : PlatformView {
+    private val onDispose: (String) -> Unit,
+    private val setCurrentCardComponent: (BaseCardComponent) -> Unit,
+    ) : PlatformView {
     private val configuration =
         creationParams[CARD_COMPONENT_CONFIGURATION_KEY] as CardComponentConfigurationDTO?
             ?: throw Exception("Card configuration not found")
-    val componentId = creationParams[COMPONENT_ID_KEY] as String? ?: ""
     private val adyenComponentView = AdyenComponentView(activity)
     private val standardMargin = activity.resources.getDimension(R.dimen.standard_margin)
     private val screenDensity = activity.resources.displayMetrics.density
@@ -51,7 +51,10 @@ abstract class BaseCardComponent(
                 layoutChangeFlow.emit(v.height)
             }
         }
-    val cardConfiguration =
+    internal val paymentMethodString = creationParams[PAYMENT_METHOD_KEY] as String? ?: ""
+    internal val componentId = creationParams[COMPONENT_ID_KEY] as String? ?: ""
+    internal val isStoredPaymentMethod = creationParams[IS_STORED_PAYMENT_METHOD_KEY] as Boolean? ?: false
+    internal val cardConfiguration =
         configuration.cardConfiguration.mapToCardConfiguration(
             context,
             configuration.shopperLocale,
@@ -60,7 +63,6 @@ abstract class BaseCardComponent(
             configuration.analyticsOptionsDTO.mapToAnalyticsConfiguration(),
             configuration.amount?.mapToAmount(),
         )
-
     internal var cardComponent: CardComponent? = null
 
     override fun getView(): View = adyenComponentView
@@ -69,27 +71,25 @@ abstract class BaseCardComponent(
         activity.findViewById<FrameLayout>(R.id.frameLayout_componentContainer)
             ?.removeOnLayoutChangeListener(onLayoutChangeListener)
         cardComponent = null
+        onDispose(componentId)
     }
 
     fun addComponent(cardComponent: CardComponent) {
         adyenComponentView.attach(cardComponent, activity)
-        onCardComponentLayout()
+        addSingleGlobalLayoutListener()
         setupComponentResizeListener()
     }
 
     fun setCurrentCardComponent() = setCurrentCardComponent(this)
 
-    private fun onCardComponentLayout() {
-        val vto: ViewTreeObserver = adyenComponentView.getViewTreeObserver()
-        vto.addOnGlobalLayoutListener(
+    private fun addSingleGlobalLayoutListener() {
+        adyenComponentView.getViewTreeObserver().addOnGlobalLayoutListener(
             object : OnGlobalLayoutListener {
                 override fun onGlobalLayout() {
                     adjustCardComponentLayout()
                     activity.findViewById<FrameLayout>(R.id.frameLayout_componentContainer)
                         ?.addOnLayoutChangeListener(onLayoutChangeListener)
-
-                    val obs: ViewTreeObserver = adyenComponentView.getViewTreeObserver()
-                    obs.removeOnGlobalLayoutListener(this)
+                    adyenComponentView.getViewTreeObserver().removeOnGlobalLayoutListener(this)
                 }
             }
         )
@@ -132,7 +132,6 @@ abstract class BaseCardComponent(
 
         val componentContainer = activity.findViewById<FrameLayout>(R.id.frameLayout_componentContainer)
         componentContainer?.layoutParams = linearLayoutParams
-
         val buttonContainer = activity.findViewById<FrameLayout>(R.id.frameLayout_buttonContainer)
         buttonContainer?.layoutParams = linearLayoutParams
     }

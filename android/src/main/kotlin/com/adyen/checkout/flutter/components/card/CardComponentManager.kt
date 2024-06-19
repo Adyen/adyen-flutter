@@ -14,6 +14,7 @@ internal class CardComponentManager(
     private val componentFlutterInterface: ComponentFlutterInterface,
     private val flutterPluginBinding: FlutterPlugin.FlutterPluginBinding?,
     private val sessionHolder: SessionHolder?,
+    private val onDispose: (String) -> Unit,
     private val assignCurrentComponent: (ActionHandlingComponent?) -> Unit,
 ) {
     private var currentCardComponent: BaseCardComponent? = null
@@ -25,8 +26,9 @@ internal class CardComponentManager(
                 activity,
                 componentFlutterInterface,
                 CardComponentFactory.CARD_COMPONENT_ADVANCED,
+                onDispose,
+                ::setCurrentCardComponent,
                 null,
-                ::setCurrentCardComponent
             )
         )
 
@@ -36,8 +38,9 @@ internal class CardComponentManager(
                 activity,
                 componentFlutterInterface,
                 CardComponentFactory.CARD_COMPONENT_SESSION,
+                onDispose,
+                ::setCurrentCardComponent,
                 sessionHolder,
-                ::setCurrentCardComponent
             )
         )
     }
