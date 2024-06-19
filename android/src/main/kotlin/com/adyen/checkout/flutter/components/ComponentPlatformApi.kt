@@ -20,7 +20,6 @@ import com.adyen.checkout.action.core.internal.ActionHandlingComponent
 import com.adyen.checkout.components.core.PaymentMethod
 import com.adyen.checkout.components.core.action.Action
 import com.adyen.checkout.flutter.components.action.ActionComponentManager
-import com.adyen.checkout.flutter.components.action.ActionComponentManager
 import com.adyen.checkout.flutter.components.card.CardComponentManager
 import com.adyen.checkout.flutter.components.googlepay.GooglePayComponentManager
 import com.adyen.checkout.flutter.components.instant.InstantComponentManager

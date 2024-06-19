@@ -61,13 +61,11 @@ void main() {
       '/dropInScreen': (context) => DropInScreen(
             repository: AdyenDropInRepository(service: service),
           ),
-      '/cardComponentScreen': (context) =>
-          const CardNavigationScreen(),
+      '/cardComponentScreen': (context) => const CardNavigationScreen(),
       '/cardSessionComponentScreen': (context) => CardSessionComponentScreen(
             repository: adyenCardComponentRepository,
           ),
-      '/cardAdvancedComponentScreen': (context) =>
-          CardAdvancedComponentScreen(
+      '/cardAdvancedComponentScreen': (context) => CardAdvancedComponentScreen(
             repository: adyenCardComponentRepository,
           ),
       '/googlePayNavigation': (context) => const GooglePayNavigationScreen(),
