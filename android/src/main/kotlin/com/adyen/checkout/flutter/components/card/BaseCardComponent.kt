@@ -7,7 +7,6 @@ import ComponentFlutterInterface
 import android.content.Context
 import android.view.View
 import android.view.ViewGroup
-import android.view.ViewTreeObserver
 import android.view.ViewTreeObserver.OnGlobalLayoutListener
 import android.widget.FrameLayout
 import android.widget.LinearLayout
@@ -37,7 +36,7 @@ abstract class BaseCardComponent(
     private val componentFlutterApi: ComponentFlutterInterface,
     private val onDispose: (String) -> Unit,
     private val setCurrentCardComponent: (BaseCardComponent) -> Unit,
-    ) : PlatformView {
+) : PlatformView {
     private val configuration =
         creationParams[CARD_COMPONENT_CONFIGURATION_KEY] as CardComponentConfigurationDTO?
             ?: throw Exception("Card configuration not found")

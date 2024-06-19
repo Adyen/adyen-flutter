@@ -25,7 +25,6 @@ internal class CardSessionComponent(
     private val setCurrentCardComponent: (BaseCardComponent) -> Unit,
     private val sessionHolder: SessionHolder
 ) : BaseCardComponent(context, id, creationParams, activity, componentFlutterApi, onDispose, setCurrentCardComponent) {
-
     init {
         val sessionSetupResponse = SessionSetupResponse.SERIALIZER.deserialize(sessionHolder.sessionSetupResponse)
         val order = sessionHolder.orderResponse?.let { Order.SERIALIZER.deserialize(it) }

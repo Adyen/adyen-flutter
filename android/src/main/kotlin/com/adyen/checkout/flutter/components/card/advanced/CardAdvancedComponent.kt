@@ -19,7 +19,6 @@ internal class CardAdvancedComponent(
     private val onDispose: (String) -> Unit,
     private val setCurrentCardComponent: (BaseCardComponent) -> Unit
 ) : BaseCardComponent(context, id, creationParams, activity, componentFlutterApi, onDispose, setCurrentCardComponent) {
-
     init {
         cardComponent =
             createCardComponent().apply {
