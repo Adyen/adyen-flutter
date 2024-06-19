@@ -1,6 +1,4 @@
-import 'package:adyen_checkout/src/common/model/cse/encrypted_card.dart';
-import 'package:adyen_checkout/src/common/model/cse/unencrypted_card.dart';
-import 'package:adyen_checkout/src/components/action_handling/model/action_component_configuration.dart';
+import 'package:adyen_checkout/adyen_checkout.dart';
 
 abstract class AdyenCheckoutInterface {
   Future<String> getReturnUrl();
@@ -17,7 +15,7 @@ abstract class AdyenCheckoutInterface {
     String publicKey,
   );
 
-  Future<Map<String, dynamic>> handleAction(
+  Future<ActionResult> handleAction(
     ActionComponentConfiguration actionComponentConfiguration,
     Map<String, dynamic> action,
   );

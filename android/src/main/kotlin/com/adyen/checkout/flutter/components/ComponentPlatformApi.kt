@@ -20,6 +20,7 @@ import com.adyen.checkout.action.core.internal.ActionHandlingComponent
 import com.adyen.checkout.components.core.PaymentMethod
 import com.adyen.checkout.components.core.action.Action
 import com.adyen.checkout.flutter.components.action.ActionComponentManager
+import com.adyen.checkout.flutter.components.action.ActionComponentManager
 import com.adyen.checkout.flutter.components.card.CardComponentManager
 import com.adyen.checkout.flutter.components.googlepay.GooglePayComponentManager
 import com.adyen.checkout.flutter.components.instant.InstantComponentManager
@@ -41,11 +42,11 @@ class ComponentPlatformApi(
     private val cardComponentManager: CardComponentManager =
         CardComponentManager(activity, componentFlutterInterface, flutterPluginBinding, sessionHolder)
     private val googlePayComponentManager: GooglePayComponentManager =
-        GooglePayComponentManager(activity, sessionHolder, componentFlutterInterface)
+        GooglePayComponentManager(activity, sessionHolder, componentFlutterInterface, ::assignCurrentComponent)
     private val instantComponentManager: InstantComponentManager =
-        InstantComponentManager(activity, componentFlutterInterface, sessionHolder)
+        InstantComponentManager(activity, componentFlutterInterface, sessionHolder, ::assignCurrentComponent)
     private val actionComponentManager: ActionComponentManager =
-        ActionComponentManager(activity, componentFlutterInterface)
+        ActionComponentManager(activity, componentFlutterInterface, ::assignCurrentComponent)
     private val intentListener = Consumer<Intent> { handleIntent(it) }
     private var currentComponent: ActionHandlingComponent? = null
 
@@ -98,37 +99,29 @@ class ComponentPlatformApi(
         encodedPaymentMethod: String,
         componentId: String,
     ) {
-        val currentComponent =
-            when (instantPaymentConfigurationDTO.instantPaymentType) {
-                InstantPaymentType.GOOGLEPAY -> googlePayComponentManager.startGooglePayComponent()
-                InstantPaymentType.APPLEPAY -> return
-                InstantPaymentType.INSTANT ->
-                    instantComponentManager.startInstantComponent(
-                        instantPaymentConfigurationDTO,
-                        encodedPaymentMethod,
-                        componentId
-                    )
-            }
-        assignCurrentComponent(currentComponent)
+        when (instantPaymentConfigurationDTO.instantPaymentType) {
+            InstantPaymentType.GOOGLEPAY -> googlePayComponentManager.startGooglePayComponent()
+            InstantPaymentType.APPLEPAY -> return
+            InstantPaymentType.INSTANT ->
+                instantComponentManager.startInstantComponent(
+                    instantPaymentConfigurationDTO,
+                    encodedPaymentMethod,
+                    componentId
+                )
+        }
     }
 
     override fun handleAction(
         actionComponentConfiguration: ActionComponentConfigurationDTO,
         componentId: String,
         actionResponse: Map<String?, Any?>?
-    ) {
-        val actionComponent =
-            actionComponentManager.createActionComponent(actionComponentConfiguration, componentId)
-        assignCurrentComponent(actionComponent)
-        actionResponse?.let { actionComponentManager.handleAction(it) }
-    }
+    ) = actionComponentManager.handleAction(actionComponentConfiguration, componentId, actionResponse)
 
     override fun onDispose(componentId: String) {
         activity.removeOnNewIntentListener(intentListener)
         currentComponent = null
         googlePayComponentManager.onDispose(componentId)
         instantComponentManager.onDispose(componentId)
-        actionComponentManager.onDispose(componentId)
     }
 
     fun handleActivityResult(

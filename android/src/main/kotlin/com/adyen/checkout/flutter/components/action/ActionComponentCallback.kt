@@ -10,7 +10,7 @@ import com.adyen.checkout.components.core.ActionComponentData
 import com.adyen.checkout.components.core.ComponentError
 import com.adyen.checkout.flutter.components.view.ComponentLoadingBottomSheet
 
-class ActionComponentCallback(
+internal class ActionComponentCallback(
     private val activity: FragmentActivity,
     private val componentFlutterApi: ComponentFlutterInterface,
     private val componentId: String

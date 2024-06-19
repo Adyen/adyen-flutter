@@ -5,6 +5,7 @@ import ComponentFlutterInterface
 import InstantPaymentConfigurationDTO
 import PaymentResultDTO
 import androidx.fragment.app.FragmentActivity
+import com.adyen.checkout.action.core.internal.ActionHandlingComponent
 import com.adyen.checkout.components.core.CheckoutConfiguration
 import com.adyen.checkout.components.core.Order
 import com.adyen.checkout.components.core.PaymentMethod
@@ -25,6 +26,7 @@ class InstantComponentManager(
     private val activity: FragmentActivity,
     private val componentFlutterInterface: ComponentFlutterInterface,
     private val sessionHolder: SessionHolder,
+    private val assignCurrentComponent: (ActionHandlingComponent?) -> Unit,
 ) {
     private var instantPaymentComponent: InstantPaymentComponent? = null
     private var componentId: String? = null
@@ -33,7 +35,7 @@ class InstantComponentManager(
         instantPaymentConfigurationDTO: InstantPaymentConfigurationDTO,
         encodedPaymentMethod: String,
         componentId: String
-    ): InstantPaymentComponent? {
+    ) {
         try {
             val paymentMethod = PaymentMethod.SERIALIZER.deserialize(JSONObject(encodedPaymentMethod))
             val configuration = instantPaymentConfigurationDTO.mapToCheckoutConfiguration()
@@ -58,8 +60,8 @@ class InstantComponentManager(
 
             this.instantPaymentComponent = instantPaymentComponent
             this.componentId = componentId
-            showLoadingBottomSheet(instantPaymentComponent)
-            return instantPaymentComponent
+            assignCurrentComponent(instantPaymentComponent)
+            ComponentLoadingBottomSheet.show(activity.supportFragmentManager, instantPaymentComponent)
         } catch (exception: Exception) {
             val model =
                 ComponentCommunicationModel(
@@ -72,7 +74,6 @@ class InstantComponentManager(
                         ),
                 )
             componentFlutterInterface.onComponentCommunication(model) {}
-            return null
         }
     }
 
@@ -130,9 +131,6 @@ class InstantComponentManager(
             key = UUID.randomUUID().toString()
         )
     }
-
-    private fun showLoadingBottomSheet(instantPaymentComponent: InstantPaymentComponent) =
-        ComponentLoadingBottomSheet.show(activity.supportFragmentManager, instantPaymentComponent)
 
     private fun handleAction(action: Action) = instantPaymentComponent?.handleAction(action, activity)
 

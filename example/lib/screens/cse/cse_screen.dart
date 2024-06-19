@@ -47,13 +47,19 @@ class CseScreen extends StatelessWidget {
             ActionComponentConfiguration(
           environment: Config.environment,
           clientKey: Config.clientKey,
+          shopperLocale: Config.shopperLocale,
         );
-        final Map<String, dynamic> actionResultDetails =
+        final ActionResult actionResultDetails =
             await AdyenCheckout.instance.handleAction(
           actionComponentConfiguration,
           paymentsResponse["action"],
         );
-        debugPrint("Action result details: $actionResultDetails");
+        switch (actionResultDetails) {
+          case ActionSuccess it:
+            debugPrint("Action result: ${it.data}");
+          case ActionError it:
+            debugPrint("Action error: ${it.errorMessage}");
+        }
       }
     } catch (exception) {
       debugPrint(exception.toString());
