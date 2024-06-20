@@ -46,9 +46,7 @@ abstract class BaseCardComponent(
     private val layoutChangeFlow = MutableStateFlow<Int?>(null)
     private val onLayoutChangeListener =
         View.OnLayoutChangeListener { v, _, _, _, _, _, _, _, _ ->
-            activity.lifecycleScope.launch {
-                layoutChangeFlow.emit(v.height)
-            }
+            layoutChangeFlow.tryEmit(v.height)
         }
     internal val paymentMethodString = creationParams[PAYMENT_METHOD_KEY] as String? ?: ""
     internal val componentId = creationParams[COMPONENT_ID_KEY] as String? ?: ""
