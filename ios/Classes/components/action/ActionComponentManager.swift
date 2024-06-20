@@ -41,7 +41,7 @@ class ActionComponentManager {
     func onDispose() {
         actionComponent = nil
     }
-    
+
     private func sendErrorToFlutterLayer(error: Error) {
         let componentCommunicationModel = ComponentCommunicationModel(
             type: ComponentCommunicationType.result,

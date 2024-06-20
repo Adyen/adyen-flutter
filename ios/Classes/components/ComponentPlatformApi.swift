@@ -6,7 +6,7 @@ class ComponentPlatformApi: ComponentPlatformInterface {
     private let applePayComponentManager: ApplePayComponentManager
     private let instantComponentManager: InstantComponentManager
     private let actionComponentManager: ActionComponentManager
-    
+
     init(componentFlutterApi: ComponentFlutterInterface, sessionHolder: SessionHolder) {
         self.applePayComponentManager = ApplePayComponentManager(componentFlutterApi: componentFlutterApi, sessionHolder: sessionHolder)
         self.instantComponentManager = InstantComponentManager(componentFlutterApi: componentFlutterApi, sessionHolder: sessionHolder)
@@ -63,7 +63,7 @@ class ComponentPlatformApi: ComponentPlatformInterface {
             )
         }
     }
-    
+
     func handleAction(actionComponentConfiguration: ActionComponentConfigurationDTO, componentId: String, actionResponse: [String?: Any?]?) throws {
         actionComponentManager.handleAction(
             actionComponentConfiguration: actionComponentConfiguration,
@@ -109,7 +109,7 @@ class ComponentPlatformApi: ComponentPlatformInterface {
         componentId == InstantComponentManager.Constants.instantSessionComponentId ||
             componentId == InstantComponentManager.Constants.instantAdvancedComponentId
     }
-    
+
     private func isActionComponent(componentId: String) -> Bool {
         componentId == ActionComponentManager.Constants.actionComponentId
     }

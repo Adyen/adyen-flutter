@@ -11,8 +11,9 @@ import 'package:adyen_checkout_example/repositories/adyen_instant_component_repo
 import 'package:adyen_checkout_example/screens/component/apple_pay/apple_pay_advanced_component_screen.dart';
 import 'package:adyen_checkout_example/screens/component/apple_pay/apple_pay_navigation_screen.dart';
 import 'package:adyen_checkout_example/screens/component/apple_pay/apple_pay_session_component_screen.dart';
-import 'package:adyen_checkout_example/screens/component/card/card_component_screen.dart';
-import 'package:adyen_checkout_example/screens/component/card/card_component_scrollable_screen.dart';
+import 'package:adyen_checkout_example/screens/component/card/card_advanced_component_screen.dart';
+import 'package:adyen_checkout_example/screens/component/card/card_navigation_screen.dart';
+import 'package:adyen_checkout_example/screens/component/card/card_session_component_screen.dart';
 import 'package:adyen_checkout_example/screens/component/google_pay/google_pay_advanced_component_screen.dart';
 import 'package:adyen_checkout_example/screens/component/google_pay/google_pay_navigation_screen.dart';
 import 'package:adyen_checkout_example/screens/component/google_pay/google_pay_session_component_screen.dart';
@@ -60,12 +61,12 @@ void main() {
       '/dropInScreen': (context) => DropInScreen(
             repository: AdyenDropInRepository(service: service),
           ),
-      '/cardComponentScreen': (context) => CardComponentScreen(
-            repository: AdyenCardComponentRepository(service: service),
+      '/cardComponentScreen': (context) => const CardNavigationScreen(),
+      '/cardSessionComponentScreen': (context) => CardSessionComponentScreen(
+            repository: adyenCardComponentRepository,
           ),
-      '/cardAdvancedComponentScreen': (context) =>
-          CardComponentScrollableScreen(
-            repository: AdyenCardComponentRepository(service: service),
+      '/cardAdvancedComponentScreen': (context) => CardAdvancedComponentScreen(
+            repository: adyenCardComponentRepository,
           ),
       '/googlePayNavigation': (context) => const GooglePayNavigationScreen(),
       '/googlePaySessionComponent': (context) =>

@@ -15,26 +15,35 @@ import PaymentResultModelDTO
 import android.content.Intent
 import androidx.core.util.Consumer
 import androidx.fragment.app.FragmentActivity
-import androidx.lifecycle.lifecycleScope
 import com.adyen.checkout.action.core.internal.ActionHandlingComponent
 import com.adyen.checkout.components.core.PaymentMethod
 import com.adyen.checkout.components.core.action.Action
 import com.adyen.checkout.flutter.components.action.ActionComponentManager
+import com.adyen.checkout.flutter.components.card.CardComponentManager
 import com.adyen.checkout.flutter.components.googlepay.GooglePayComponentManager
 import com.adyen.checkout.flutter.components.instant.InstantComponentManager
 import com.adyen.checkout.flutter.components.view.ComponentLoadingBottomSheet
 import com.adyen.checkout.flutter.session.SessionHolder
 import com.adyen.checkout.flutter.utils.Constants
 import com.adyen.checkout.redirect.RedirectComponent
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.launch
+import io.flutter.embedding.engine.plugins.FlutterPlugin
 import org.json.JSONObject
 
 class ComponentPlatformApi(
     private val activity: FragmentActivity,
     private val sessionHolder: SessionHolder,
     private val componentFlutterInterface: ComponentFlutterInterface,
+    private val flutterPluginBinding: FlutterPlugin.FlutterPluginBinding?,
 ) : ComponentPlatformInterface {
+    private val cardComponentManager: CardComponentManager =
+        CardComponentManager(
+            activity,
+            componentFlutterInterface,
+            flutterPluginBinding,
+            sessionHolder,
+            ::onDispose,
+            ::assignCurrentComponent
+        )
     private val googlePayComponentManager: GooglePayComponentManager =
         GooglePayComponentManager(activity, sessionHolder, componentFlutterInterface, ::assignCurrentComponent)
     private val instantComponentManager: InstantComponentManager =
@@ -44,17 +53,11 @@ class ComponentPlatformApi(
     private val intentListener = Consumer<Intent> { handleIntent(it) }
     private var currentComponent: ActionHandlingComponent? = null
 
-    companion object {
-        val currentComponentStateFlow = MutableStateFlow<ActionHandlingComponent?>(null)
-    }
-
     init {
-        activity.lifecycleScope.launch {
-            currentComponentStateFlow.collect { value -> assignCurrentComponent(value) }
-        }
+        cardComponentManager.registerComponentViewFactories()
     }
 
-    override fun updateViewHeight(viewId: Long) = ComponentHeightMessenger.sendResult(viewId)
+    override fun updateViewHeight(viewId: Long) = cardComponentManager.updateViewHeight()
 
     override fun onPaymentsResult(
         componentId: String,
@@ -190,6 +193,11 @@ class ComponentPlatformApi(
 
     private fun assignCurrentComponent(currentComponent: ActionHandlingComponent?) {
         this.currentComponent = currentComponent
+        setupIntentListener()
+    }
+
+    private fun setupIntentListener() {
+        activity.removeOnNewIntentListener(intentListener)
         activity.addOnNewIntentListener(intentListener)
     }
 
