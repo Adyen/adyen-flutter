@@ -37,4 +37,102 @@ void main() {
     expect(dropInConfigurationDto.isRemoveStoredPaymentMethodEnabled, false);
     expect(dropInConfigurationDto.skipListWhenSinglePaymentMethod, false);
   });
+
+  test(
+      "when using card configuration, then should parse to CardConfigurationDTO",
+      () {
+    const cardConfiguration = CardConfiguration(
+      holderNameRequired: true,
+      addressMode: AddressMode.full,
+      showStorePaymentField: true,
+      showCvcForStoredCard: true,
+      showCvc: true,
+      kcpFieldVisibility: FieldVisibility.hide,
+      socialSecurityNumberFieldVisibility: FieldVisibility.show,
+      supportedCardTypes: ["amex"],
+    );
+
+    final cardConfigurationDTO = cardConfiguration.toDTO();
+
+    expect(cardConfigurationDTO.holderNameRequired, true);
+    expect(cardConfigurationDTO.addressMode, AddressMode.full);
+    expect(cardConfigurationDTO.showStorePaymentField, true);
+    expect(cardConfigurationDTO.showCvcForStoredCard, true);
+    expect(cardConfigurationDTO.showCvc, true);
+    expect(cardConfigurationDTO.kcpFieldVisibility, FieldVisibility.hide);
+    expect(cardConfigurationDTO.socialSecurityNumberFieldVisibility,
+        FieldVisibility.show);
+    expect(cardConfigurationDTO.supportedCardTypes, ["amex"]);
+  });
+
+  test(
+      "when using google pay configuration, then should parse to GooglePayConfigurationDTO",
+      () {
+    final googlePayConfiguration = GooglePayConfiguration(
+      googlePayEnvironment: GooglePayEnvironment.production,
+      merchantAccount: "GOOGLE_PAY_MERCHANT_ACCOUNT",
+      merchantInfo: MerchantInfo(
+        merchantName: "GOOGLE_PAY_MERCHANT_NAME",
+        merchantId: "GOOGLE_PAY_MERCHANT_ID",
+      ),
+      totalPriceStatus: TotalPriceStatus.finalPrice,
+      allowedCardNetworks: [
+        "AMEX",
+        "DISCOVER",
+        "MASTERCARD",
+        "VISA"
+      ],
+      allowedAuthMethods: [CardAuthMethod.cryptogram3DS],
+      allowPrepaidCards: true,
+      allowCreditCards: true,
+      assuranceDetailsRequired: false,
+      emailRequired: true,
+      existingPaymentMethodRequired: true,
+      shippingAddressRequired: true,
+      shippingAddressParameters: ShippingAddressParameters(
+        allowedCountryCodes: ["NL"],
+        isPhoneNumberRequired: true,
+      ),
+      billingAddressRequired: true,
+      billingAddressParameters:
+          BillingAddressParameters(format: "MIN", isPhoneNumberRequired: false),
+    );
+
+    final googlePayConfigurationDTO = googlePayConfiguration.toDTO();
+
+    expect(googlePayConfigurationDTO.googlePayEnvironment,
+        GooglePayEnvironment.production);
+    expect(googlePayConfigurationDTO.merchantAccount,
+        "GOOGLE_PAY_MERCHANT_ACCOUNT");
+    expect(googlePayConfigurationDTO.merchantInfoDTO?.merchantId,
+        "GOOGLE_PAY_MERCHANT_ID");
+    expect(googlePayConfigurationDTO.merchantInfoDTO?.merchantName,
+        "GOOGLE_PAY_MERCHANT_NAME");
+    expect(googlePayConfigurationDTO.totalPriceStatus,
+        TotalPriceStatus.finalPrice);
+    expect(googlePayConfigurationDTO.allowedCardNetworks,
+        ["AMEX", "DISCOVER", "MASTERCARD", "VISA"]);
+    expect(googlePayConfigurationDTO.allowedAuthMethods, ["cryptogram3DS"]);
+    expect(googlePayConfigurationDTO.allowPrepaidCards, true);
+    expect(googlePayConfigurationDTO.allowCreditCards, true);
+    expect(googlePayConfigurationDTO.assuranceDetailsRequired, false);
+    expect(googlePayConfigurationDTO.emailRequired, true);
+    expect(googlePayConfigurationDTO.existingPaymentMethodRequired, true);
+    expect(googlePayConfigurationDTO.shippingAddressRequired, true);
+    expect(
+        googlePayConfigurationDTO
+            .shippingAddressParametersDTO?.allowedCountryCodes,
+        ["NL"]);
+    expect(
+        googlePayConfigurationDTO
+            .shippingAddressParametersDTO?.isPhoneNumberRequired,
+        true);
+    expect(googlePayConfigurationDTO.billingAddressRequired, true);
+    expect(
+        googlePayConfigurationDTO.billingAddressParametersDTO?.format, "MIN");
+    expect(
+        googlePayConfigurationDTO
+            .billingAddressParametersDTO?.isPhoneNumberRequired,
+        false);
+  });
 }
