@@ -76,12 +76,7 @@ void main() {
         merchantId: "GOOGLE_PAY_MERCHANT_ID",
       ),
       totalPriceStatus: TotalPriceStatus.finalPrice,
-      allowedCardNetworks: [
-        "AMEX",
-        "DISCOVER",
-        "MASTERCARD",
-        "VISA"
-      ],
+      allowedCardNetworks: ["AMEX", "DISCOVER", "MASTERCARD", "VISA"],
       allowedAuthMethods: [CardAuthMethod.cryptogram3DS],
       allowPrepaidCards: true,
       allowCreditCards: true,
@@ -134,5 +129,102 @@ void main() {
         googlePayConfigurationDTO
             .billingAddressParametersDTO?.isPhoneNumberRequired,
         false);
+  });
+
+  test(
+      "when using apple pay configuration, then should parse to ApplePayConfigurationDTO",
+      () {
+    final applePayConfiguration = ApplePayConfiguration(
+        merchantId: "APPLE_PAY_MERCHANT_ID",
+        merchantName: "APPLE_PAY_MERCHANT_NAME",
+        allowOnboarding: true,
+        applePaySummaryItems: [
+          ApplePaySummaryItem(
+            label: "Product A",
+            amount: Amount(value: 2599, currency: "EUR"),
+            type: ApplePaySummaryItemType.definite,
+          )
+        ],
+        requiredBillingContactFields: [
+          ApplePayContactField.emailAddress,
+          ApplePayContactField.phoneNumber,
+        ],
+        billingContact: ApplePayContact(
+          emailAddress: "flutterTest@adyen.com",
+          phoneNumber: "0123456789",
+        ),
+        requiredShippingContactFields: [
+          ApplePayContactField.emailAddress,
+          ApplePayContactField.phoneNumber,
+        ],
+        shippingContact: ApplePayContact(
+          emailAddress: "flutterTest@adyen.com",
+          phoneNumber: "9876543210",
+        ),
+        applePayShippingType: ApplePayShippingType.servicePickup,
+        allowShippingContactEditing: true,
+        shippingMethods: [
+          ApplePayShippingMethod(
+            label: "Standard shipping",
+            detail: "DHL",
+            amount: Amount(value: 499, currency: "EUR"),
+            identifier: "Identifier 1",
+            startDate: DateTime(2024, 6, 1),
+            endDate: DateTime(2024, 6, 5),
+          )
+        ],
+        applicationData: null,
+        supportedCountries: ["NL"],
+        merchantCapability: ApplePayMerchantCapability.debit);
+
+    final applePayConfigurationDTO = applePayConfiguration.toDTO();
+
+    expect(applePayConfigurationDTO.merchantId, "APPLE_PAY_MERCHANT_ID");
+    expect(applePayConfigurationDTO.merchantName, "APPLE_PAY_MERCHANT_NAME");
+    expect(applePayConfigurationDTO.allowOnboarding, true);
+    expect(
+        applePayConfigurationDTO.summaryItems?.firstOrNull?.label, "Product A");
+    expect(
+        applePayConfigurationDTO.summaryItems?.firstOrNull?.amount.value, 2599);
+    expect(applePayConfigurationDTO.summaryItems?.firstOrNull?.amount.currency,
+        "EUR");
+    expect(applePayConfigurationDTO.summaryItems?.firstOrNull?.type,
+        ApplePaySummaryItemType.definite);
+    expect(applePayConfigurationDTO.requiredBillingContactFields, [
+      "emailAddress",
+      "phoneNumber",
+    ]);
+    expect(applePayConfigurationDTO.billingContact?.emailAddress,
+        "flutterTest@adyen.com");
+    expect(applePayConfigurationDTO.billingContact?.phoneNumber, "0123456789");
+    expect(applePayConfigurationDTO.requiredShippingContactFields, [
+      "emailAddress",
+      "phoneNumber",
+    ]);
+    expect(applePayConfigurationDTO.shippingContact?.emailAddress,
+        "flutterTest@adyen.com");
+    expect(applePayConfigurationDTO.shippingContact?.phoneNumber, "9876543210");
+    expect(applePayConfigurationDTO.applePayShippingType,
+        ApplePayShippingType.servicePickup);
+    expect(applePayConfigurationDTO.allowShippingContactEditing, true);
+    expect(applePayConfigurationDTO.shippingMethods?.firstOrNull?.label,
+        "Standard shipping");
+    expect(
+        applePayConfigurationDTO.shippingMethods?.firstOrNull?.detail, "DHL");
+    expect(applePayConfigurationDTO.shippingMethods?.firstOrNull?.amount.value,
+        499);
+    expect(
+        applePayConfigurationDTO.shippingMethods?.firstOrNull?.amount.currency,
+        "EUR");
+    expect(applePayConfigurationDTO.shippingMethods?.firstOrNull?.identifier,
+        "Identifier 1");
+    expect(applePayConfigurationDTO.shippingMethods?.firstOrNull?.startDate,
+        DateTime(2024, 6, 1).toIso8601String());
+    expect(applePayConfigurationDTO.shippingMethods?.firstOrNull?.endDate,
+        DateTime(2024, 6, 5).toIso8601String());
+    expect(applePayConfigurationDTO.applicationData, null);
+    expect(applePayConfigurationDTO.supportedCountries, ["NL"]);
+    expect(applePayConfigurationDTO.merchantCapability,
+        ApplePayMerchantCapability.debit);
   });
 }
