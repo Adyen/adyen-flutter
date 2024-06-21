@@ -15,7 +15,7 @@ void main() {
     final storedPaymentMethodConfiguration = StoredPaymentMethodConfiguration(
       showPreselectedStoredPaymentMethod: true,
       isRemoveStoredPaymentMethodEnabled: true,
-      deleteStoredPaymentMethodCallback: (String) => Future.value(true),
+      deleteStoredPaymentMethodCallback: (String input) => Future.value(true),
     );
     final dropInConfiguration = DropInConfiguration(
         environment: Environment.test,
