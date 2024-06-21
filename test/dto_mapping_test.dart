@@ -227,4 +227,19 @@ void main() {
     expect(applePayConfigurationDTO.merchantCapability,
         ApplePayMerchantCapability.debit);
   });
+
+  test(
+      "when using cash app pay configuration, then should parse to CashAppPayConfigurationDTO",
+      () {
+    const cashAppPayConfiguration = CashAppPayConfiguration(
+      cashAppPayEnvironment: CashAppPayEnvironment.production,
+      returnUrl: "RETURN_URL",
+    );
+
+    final cashAppPayConfigurationDTO = cashAppPayConfiguration.toDTO();
+
+    expect(cashAppPayConfigurationDTO.cashAppPayEnvironment,
+        CashAppPayEnvironment.production);
+    expect(cashAppPayConfigurationDTO.returnUrl, "RETURN_URL");
+  });
 }

@@ -108,10 +108,9 @@ class DropInScreen extends StatelessWidget {
 
     //To support CashAppPay please add "pod 'Adyen/CashAppPay'" to your Podfile.
     final String returnUrl = await repository.determineBaseReturnUrl();
-    final CashAppPayConfiguration cashAppPayConfiguration =
-        CashAppPayConfiguration(
-      CashAppPayEnvironment.sandbox,
-      returnUrl,
+    final CashAppPayConfiguration cashAppPayConfiguration = CashAppPayConfiguration(
+      cashAppPayEnvironment:  CashAppPayEnvironment.sandbox,
+      returnUrl:  returnUrl,
     );
 
     final StoredPaymentMethodConfiguration storedPaymentMethodConfiguration =

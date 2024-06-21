@@ -1,8 +1,9 @@
-## 0.1.1
+## 1.0.0
 
 * Made amount optional. For Apple Pay in combination with the advanced flow, the amount is still
   required.
 * Added standalone action handling.
+* ⚠ **Breaking Change**: Cash app pay configuration now uses named parameters.  
 
 ## 0.1.0
 
