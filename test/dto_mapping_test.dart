@@ -12,13 +12,18 @@ void main() {
     const currency = "USD";
     const amountValue = 1286;
     const shopperLocal = "en-US";
-    final dropInConfiguration = DropInConfiguration(
-      environment: Environment.test,
-      clientKey: demoClientKey,
-      countryCode: countryCode,
-      amount: Amount(value: amountValue, currency: currency),
-      shopperLocale: shopperLocal,
+    final storedPaymentMethodConfiguration = StoredPaymentMethodConfiguration(
+      showPreselectedStoredPaymentMethod: true,
+      isRemoveStoredPaymentMethodEnabled: true,
+      deleteStoredPaymentMethodCallback: (String) => Future.value(true),
     );
+    final dropInConfiguration = DropInConfiguration(
+        environment: Environment.test,
+        clientKey: demoClientKey,
+        countryCode: countryCode,
+        amount: Amount(value: amountValue, currency: currency),
+        shopperLocale: shopperLocal,
+        storedPaymentMethodConfiguration: storedPaymentMethodConfiguration);
 
     final dropInConfigurationDto = dropInConfiguration.toDTO("0.0.1");
 
@@ -34,8 +39,9 @@ void main() {
     expect(dropInConfigurationDto.googlePayConfigurationDTO, null);
     expect(dropInConfigurationDto.cashAppPayConfigurationDTO, null);
     expect(dropInConfigurationDto.analyticsOptionsDTO.enabled, true);
-    expect(dropInConfigurationDto.isRemoveStoredPaymentMethodEnabled, false);
     expect(dropInConfigurationDto.skipListWhenSinglePaymentMethod, false);
+    expect(dropInConfigurationDto.showPreselectedStoredPaymentMethod, true);
+    expect(dropInConfigurationDto.isRemoveStoredPaymentMethodEnabled, true);
   });
 
   test(
