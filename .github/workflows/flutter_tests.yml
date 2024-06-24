@@ -23,17 +23,19 @@ jobs:
           channel: 'stable'
           cache: true
 
-      - run: flutter pub get
-      - run: flutter analyze
-      - run: flutter test  --coverage
-
       - name: Setup LCOV
         run: sudo apt-get -y install lcov
         shell: bash
 
+      - run: flutter pub get
+      - run: flutter analyze
+      - run: |
+          flutter test --coverage 
+          lcov --remove coverage/lcov.info 'lib/**/*.g.dart' -o ./coverage/coverage_with_exclusion.info 
+
       - name: Report code coverage
         uses: zgosalvez/github-actions-report-lcov@v4
         with:
-          coverage-files: coverage/lcov.info
+          coverage-files: coverage/coverage_with_exclusion.info
           artifact-name: flutter-coverage-report
           github-token: ${{ secrets.GITHUB_TOKEN }}
