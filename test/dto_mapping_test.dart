@@ -140,6 +140,8 @@ void main() {
   test(
       "when using apple pay configuration, then should parse to ApplePayConfigurationDTO",
       () {
+    final shippingStartDate = DateTime.now();
+    final shippingEndDate = shippingStartDate.add(const Duration(days: 5));
     final applePayConfiguration = ApplePayConfiguration(
         merchantId: "APPLE_PAY_MERCHANT_ID",
         merchantName: "APPLE_PAY_MERCHANT_NAME",
@@ -175,8 +177,8 @@ void main() {
             detail: "DHL",
             amount: Amount(value: 499, currency: "EUR"),
             identifier: "Identifier 1",
-            startDate: DateTime(2024, 6, 1),
-            endDate: DateTime(2024, 6, 5),
+            startDate: shippingStartDate,
+            endDate: shippingEndDate,
           )
         ],
         applicationData: null,
@@ -225,9 +227,9 @@ void main() {
     expect(applePayConfigurationDTO.shippingMethods?.firstOrNull?.identifier,
         "Identifier 1");
     expect(applePayConfigurationDTO.shippingMethods?.firstOrNull?.startDate,
-        DateTime(2024, 6, 1).toIso8601String());
+        shippingStartDate.toIso8601String());
     expect(applePayConfigurationDTO.shippingMethods?.firstOrNull?.endDate,
-        DateTime(2024, 6, 5).toIso8601String());
+        shippingEndDate.toIso8601String());
     expect(applePayConfigurationDTO.applicationData, null);
     expect(applePayConfigurationDTO.supportedCountries, ["NL"]);
     expect(applePayConfigurationDTO.merchantCapability,
