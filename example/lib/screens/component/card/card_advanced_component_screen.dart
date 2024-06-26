@@ -46,10 +46,7 @@ class CardAdvancedComponentScreen extends StatelessWidget {
                         snapshot.data!,
                         context,
                       ),
-                      Container(height: 200, color: Colors.yellow),
-                      Container(height: 200, color: Colors.blue),
-                      Container(height: 200, color: Colors.green),
-                      Container(height: 200, color: Colors.purple),
+                      Container(height: 600, color: const Color(0xFFEDEDED)),
                     ],
                   ),
                 );
@@ -83,16 +80,17 @@ class CardAdvancedComponentScreen extends StatelessWidget {
   Map<String, dynamic> extractPaymentMethod(
       Map<String, dynamic> paymentMethods) {
     List paymentMethodList = paymentMethods["paymentMethods"] as List;
-    Map<String, dynamic>? paymentMethod = paymentMethodList
-        .firstWhereOrNull((paymentMethod) => paymentMethod["type"] == "scheme");
+    Map<String, dynamic> paymentMethod = paymentMethodList.firstWhereOrNull(
+            (paymentMethod) => paymentMethod["type"] == "scheme") ??
+        <String, String>{};
 
     List storedPaymentMethodList =
         paymentMethods.containsKey("storedPaymentMethods")
             ? paymentMethods["storedPaymentMethods"] as List
             : [];
-    Map<String, dynamic>? storedPaymentMethod =
-        storedPaymentMethodList.firstOrNull;
+    Map<String, dynamic> storedPaymentMethod =
+        storedPaymentMethodList.firstOrNull ?? <String, String>{};
 
-    return paymentMethod ?? <String, String>{};
+    return paymentMethod;
   }
 }

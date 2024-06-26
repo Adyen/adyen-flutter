@@ -76,8 +76,9 @@ class CardSessionComponentScreen extends StatelessWidget {
     }
 
     List paymentMethodList = paymentMethods["paymentMethods"] as List;
-    Map<String, dynamic> paymentMethod = paymentMethodList
-        .firstWhere((paymentMethod) => paymentMethod["type"] == "scheme");
+    Map<String, dynamic> paymentMethod = paymentMethodList.firstWhereOrNull(
+            (paymentMethod) => paymentMethod["type"] == "scheme") ??
+        <String, String>{};
 
     List storedPaymentMethodList =
         paymentMethods.containsKey("storedPaymentMethods")
