@@ -14,7 +14,7 @@ class AdyenCardComponentRepository extends AdyenBaseRepository {
 
   Future<SessionResponseNetworkModel> fetchSession() async {
     String returnUrl = await determineBaseReturnUrl();
-    returnUrl += "/card";
+    returnUrl += "/adyenPayment";
     SessionRequestNetworkModel sessionRequestNetworkModel =
         SessionRequestNetworkModel(
       merchantAccount: Config.merchantAccount,
@@ -57,7 +57,7 @@ class AdyenCardComponentRepository extends AdyenBaseRepository {
     Map<String, dynamic>? extra,
   ]) async {
     String returnUrl = await determineBaseReturnUrl();
-    returnUrl += "/card";
+    returnUrl += "/adyenPayment";
     PaymentsRequestData paymentsRequestData = PaymentsRequestData(
       merchantAccount: Config.merchantAccount,
       shopperReference: Config.shopperReference,
