@@ -116,7 +116,7 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    AdyenCheckout.instance.enableConsoleLogging(enabled: true);
+    AdyenCheckout.instance.enableConsoleLogging(enabled: false);
 
     return Scaffold(
       appBar: AppBar(

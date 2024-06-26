@@ -188,14 +188,21 @@ class _BaseApplePayComponentState extends State<BaseApplePayComponent> {
   }
 
   Future<InstantPaymentSetupResultDTO> _isApplePaySupported() async {
-    final instantPaymentConfigurationDTO =
-        await createInstantPaymentConfigurationDTO();
-    return await widget.componentPlatformApi
-        .isInstantPaymentSupportedByPlatform(
-      instantPaymentConfigurationDTO,
-      widget.applePayPaymentMethod,
-      widget.componentId,
-    );
+    try {
+      final instantPaymentConfigurationDTO =
+          await createInstantPaymentConfigurationDTO();
+      return await widget.componentPlatformApi
+          .isInstantPaymentSupportedByPlatform(
+        instantPaymentConfigurationDTO,
+        widget.applePayPaymentMethod,
+        widget.componentId,
+      );
+    } catch (exception) {
+      return InstantPaymentSetupResultDTO(
+        instantPaymentType: InstantPaymentType.applePay,
+        isSupported: false,
+      );
+    }
   }
 
   Future<InstantPaymentConfigurationDTO>

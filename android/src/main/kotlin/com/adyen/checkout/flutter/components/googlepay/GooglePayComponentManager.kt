@@ -26,6 +26,7 @@ class GooglePayComponentManager(
     private val assignCurrentComponent: (ActionHandlingComponent?) -> Unit,
 ) {
     private var googlePayComponent: BaseGooglePayComponentWrapper? = null
+    private val googlePayAvailabilityChecker = GooglePayAvailabilityChecker(activity)
 
     fun isGooglePayAvailable(
         paymentMethod: PaymentMethod,
@@ -81,12 +82,14 @@ class GooglePayComponentManager(
             instantPaymentComponentConfigurationDTO.mapToCheckoutConfiguration()
         val googlePayAdvancedComponent =
             createGooglePayAdvancedComponent(checkoutConfiguration, componentId, paymentMethod)
+        val googlePayButtonParameters = googlePayAdvancedComponent.googlePayComponent?.getGooglePayButtonParameters()
         googlePayComponent = googlePayAdvancedComponent
-        GooglePayAvailabilityChecker(
-            activity,
-            googlePayAdvancedComponent,
+        googlePayAvailabilityChecker.checkGooglePayAvailability(
+            paymentMethod,
+            checkoutConfiguration,
+            googlePayButtonParameters,
             googlePaySetupCallback
-        ).checkGooglePayAvailability(paymentMethod, checkoutConfiguration)
+        )
     }
 
     private fun setupGooglePaySessionComponent(
@@ -110,12 +113,14 @@ class GooglePayComponentManager(
 
         val googlePaySessionComponent =
             createGooglePaySessionComponent(checkoutSession, checkoutConfiguration, componentId, paymentMethod)
+        val googlePayButtonParameters = googlePaySessionComponent.googlePayComponent?.getGooglePayButtonParameters()
         googlePayComponent = googlePaySessionComponent
-        GooglePayAvailabilityChecker(
-            activity,
-            googlePaySessionComponent,
+        googlePayAvailabilityChecker.checkGooglePayAvailability(
+            paymentMethod,
+            checkoutConfiguration,
+            googlePayButtonParameters,
             googlePaySetupCallback
-        ).checkGooglePayAvailability(paymentMethod, checkoutConfiguration)
+        )
     }
 
     fun startGooglePayComponent() {
@@ -164,6 +169,11 @@ class GooglePayComponentManager(
     }
 
     fun onDispose(componentId: String) {
-        googlePayComponent?.dispose(componentId)
+        if (componentId == Constants.GOOGLE_PAY_ADVANCED_COMPONENT_KEY ||
+            componentId == Constants.GOOGLE_PAY_SESSION_COMPONENT_KEY
+        ) {
+            googlePayAvailabilityChecker.clear()
+            googlePayComponent?.dispose(componentId)
+        }
     }
 }
