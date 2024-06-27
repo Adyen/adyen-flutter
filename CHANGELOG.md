@@ -1,9 +1,13 @@
 ## 1.0.0
 
-* Made amount optional. For Apple Pay in combination with the advanced flow, the amount is still
-  required.
-* Added standalone action handling.
-* ⚠ **Breaking Change**: Cash app pay configuration now uses named parameters.  
+* ⚠ **Breaking Change**: Cash app pay configuration now uses named parameters.
+* Added standalone action handling for the API only integration flow.
+* Improved rendering of components.
+* The amount inside the different payment method configurations is now optional. Only for Apple Pay
+  in combination with the advanced flow, the amount is still required.
+* Added support for the iDEAL redirect flow.
+* Updated iOS SDK to v5.9.0.
+* Updated Android SDK to v5.5.0.
 
 ## 0.1.0
 
