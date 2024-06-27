@@ -13,10 +13,10 @@ import java.util.UUID
 
 class GooglePaySessionComponentWrapper(
     private val activity: FragmentActivity,
-    private val checkoutSession: CheckoutSession,
     private val componentFlutterInterface: ComponentFlutterInterface,
     private val checkoutConfiguration: CheckoutConfiguration,
     private val componentId: String,
+    private val checkoutSession: CheckoutSession,
 ) : BaseGooglePayComponentWrapper(activity, componentFlutterInterface, componentId) {
     override fun setupGooglePayComponent(paymentMethod: PaymentMethod) {
         googlePayComponent =

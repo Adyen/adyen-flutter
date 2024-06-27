@@ -79,7 +79,7 @@ class ComponentPlatformApi(
         val paymentMethod = PaymentMethod.SERIALIZER.deserialize(paymentMethodJson)
         when (instantPaymentConfigurationDTO.instantPaymentType) {
             InstantPaymentType.GOOGLEPAY ->
-                googlePayComponentManager.isGooglePayAvailable(
+                googlePayComponentManager.initialize(
                     paymentMethod,
                     componentId,
                     instantPaymentConfigurationDTO,
@@ -96,7 +96,7 @@ class ComponentPlatformApi(
         componentId: String,
     ) {
         when (instantPaymentConfigurationDTO.instantPaymentType) {
-            InstantPaymentType.GOOGLEPAY -> googlePayComponentManager.startGooglePayComponent()
+            InstantPaymentType.GOOGLEPAY -> googlePayComponentManager.start()
             InstantPaymentType.APPLEPAY -> return
             InstantPaymentType.INSTANT ->
                 instantComponentManager.startInstantComponent(
