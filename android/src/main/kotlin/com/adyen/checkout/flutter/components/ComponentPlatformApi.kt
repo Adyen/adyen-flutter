@@ -99,7 +99,7 @@ class ComponentPlatformApi(
             InstantPaymentType.GOOGLEPAY -> googlePayComponentManager.start()
             InstantPaymentType.APPLEPAY -> return
             InstantPaymentType.INSTANT ->
-                instantComponentManager.startInstantComponent(
+                instantComponentManager.start(
                     instantPaymentConfigurationDTO,
                     encodedPaymentMethod,
                     componentId

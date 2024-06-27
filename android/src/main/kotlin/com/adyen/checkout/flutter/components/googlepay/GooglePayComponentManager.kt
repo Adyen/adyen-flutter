@@ -35,28 +35,29 @@ class GooglePayComponentManager(
         isAvailable: Boolean,
         paymentMethod: PaymentMethod
     ) {
-        if (isAvailable) {
-            val componentWrapper = createWrapperWithComponent(paymentMethod)
-            if (componentWrapper == null) {
-                setupCallback?.invoke(Result.failure(Exception("Google Pay setup failed")))
-                return
-            }
+        if (!isAvailable) {
+            setupCallback?.invoke(Result.failure(Exception("Google Pay is not available")))
+            return
+        }
 
-            this.componentWrapper = componentWrapper
-            val allowedPaymentMethods =
-                componentWrapper.googlePayComponent?.getGooglePayButtonParameters()?.allowedPaymentMethods.orEmpty()
-            setupCallback?.invoke(
-                Result.success(
-                    InstantPaymentSetupResultDTO(
-                        InstantPaymentType.GOOGLEPAY,
-                        true,
-                        allowedPaymentMethods
-                    )
+        val componentWrapper = createWrapperWithComponent(paymentMethod)
+        if (componentWrapper == null) {
+            setupCallback?.invoke(Result.failure(Exception("Google Pay setup failed")))
+            return
+        }
+
+        this.componentWrapper = componentWrapper
+        val allowedPaymentMethods =
+            componentWrapper.googlePayComponent?.getGooglePayButtonParameters()?.allowedPaymentMethods.orEmpty()
+        setupCallback?.invoke(
+            Result.success(
+                InstantPaymentSetupResultDTO(
+                    InstantPaymentType.GOOGLEPAY,
+                    true,
+                    allowedPaymentMethods
                 )
             )
-        } else {
-            setupCallback?.invoke(Result.failure(Exception("Google Pay is not available")))
-        }
+        )
     }
 
     fun initialize(
