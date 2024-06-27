@@ -102,6 +102,9 @@ class AdyenDropInRepository extends AdyenBaseRepository {
         currency: Config.amount.currency,
       ),
       countryCode: Config.countryCode,
+      recurringProcessingModel: RecurringProcessingModel.cardOnFile,
+      shopperInteraction:
+          ShopperInteractionModel.ecommerce.shopperInteractionModelString,
       channel: determineChannel(),
       authenticationData: {
         "attemptAuthentication": "always",

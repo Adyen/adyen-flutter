@@ -7,6 +7,7 @@ import android.content.Intent
 import androidx.fragment.app.FragmentActivity
 import com.adyen.checkout.action.core.internal.ActionHandlingComponent
 import com.adyen.checkout.components.core.CheckoutConfiguration
+import com.adyen.checkout.components.core.ComponentAvailableCallback
 import com.adyen.checkout.components.core.Order
 import com.adyen.checkout.components.core.PaymentMethod
 import com.adyen.checkout.flutter.components.googlepay.advanced.GooglePayAdvancedComponentWrapper
@@ -24,82 +25,121 @@ class GooglePayComponentManager(
     private val sessionHolder: SessionHolder,
     private val componentFlutterInterface: ComponentFlutterInterface,
     private val assignCurrentComponent: (ActionHandlingComponent?) -> Unit,
-) {
-    private var googlePayComponent: BaseGooglePayComponentWrapper? = null
+) : ComponentAvailableCallback {
+    private var componentId: String? = null
+    private var checkoutConfiguration: CheckoutConfiguration? = null
+    private var setupCallback: ((Result<InstantPaymentSetupResultDTO>) -> Unit)? = null
+    private var componentWrapper: BaseGooglePayComponentWrapper? = null
 
-    fun isGooglePayAvailable(
+    override fun onAvailabilityResult(
+        isAvailable: Boolean,
+        paymentMethod: PaymentMethod
+    ) {
+        if (!isAvailable) {
+            setupCallback?.invoke(Result.failure(Exception("Google Pay is not available")))
+            return
+        }
+
+        val componentWrapper = createWrapperWithComponent(paymentMethod)
+        if (componentWrapper == null) {
+            setupCallback?.invoke(Result.failure(Exception("Google Pay setup failed")))
+            return
+        }
+
+        this.componentWrapper = componentWrapper
+        val allowedPaymentMethods =
+            componentWrapper.googlePayComponent?.getGooglePayButtonParameters()?.allowedPaymentMethods.orEmpty()
+        setupCallback?.invoke(
+            Result.success(
+                InstantPaymentSetupResultDTO(
+                    InstantPaymentType.GOOGLEPAY,
+                    true,
+                    allowedPaymentMethods
+                )
+            )
+        )
+    }
+
+    fun initialize(
         paymentMethod: PaymentMethod,
         componentId: String,
         instantPaymentComponentConfigurationDTO: InstantPaymentConfigurationDTO,
         googlePaySetupCallback: (Result<InstantPaymentSetupResultDTO>) -> Unit
     ) {
-        try {
-            if (!GooglePayComponent.PROVIDER.isPaymentMethodSupported(paymentMethod)) {
-                googlePaySetupCallback(
-                    Result.success(
-                        InstantPaymentSetupResultDTO(
-                            instantPaymentComponentConfigurationDTO.instantPaymentType,
-                            false
-                        )
+        if (!GooglePayComponent.PROVIDER.isPaymentMethodSupported(paymentMethod)) {
+            googlePaySetupCallback(
+                Result.success(
+                    InstantPaymentSetupResultDTO(
+                        instantPaymentComponentConfigurationDTO.instantPaymentType,
+                        false
                     )
                 )
-            }
+            )
+        }
+        val checkoutConfiguration = instantPaymentComponentConfigurationDTO.mapToCheckoutConfiguration()
+        this.componentId = componentId
+        this.checkoutConfiguration = checkoutConfiguration
+        this.setupCallback = googlePaySetupCallback
+        GooglePayComponent.PROVIDER.isAvailable(
+            activity.application,
+            paymentMethod,
+            checkoutConfiguration,
+            this,
+        )
+    }
 
-            when (componentId) {
-                Constants.GOOGLE_PAY_ADVANCED_COMPONENT_KEY -> {
-                    setupGooglePayAdvancedComponent(
-                        instantPaymentComponentConfigurationDTO,
-                        componentId,
-                        paymentMethod,
-                        googlePaySetupCallback
-                    )
-                }
-
-                Constants.GOOGLE_PAY_SESSION_COMPONENT_KEY -> {
-                    setupGooglePaySessionComponent(
-                        instantPaymentComponentConfigurationDTO,
-                        componentId,
-                        paymentMethod,
-                        googlePaySetupCallback
-                    )
-                }
-
-                else -> throw IllegalStateException("Google Pay not available")
-            }
-        } catch (exception: Exception) {
-            googlePaySetupCallback(Result.failure(exception))
+    fun start() {
+        componentWrapper?.let {
+            assignCurrentComponent(it.googlePayComponent)
+            it.startGooglePayScreen()
         }
     }
 
-    private fun setupGooglePayAdvancedComponent(
-        instantPaymentComponentConfigurationDTO: InstantPaymentConfigurationDTO,
-        componentId: String,
-        paymentMethod: PaymentMethod,
-        googlePaySetupCallback: (Result<InstantPaymentSetupResultDTO>) -> Unit
-    ) {
-        val checkoutConfiguration: CheckoutConfiguration =
-            instantPaymentComponentConfigurationDTO.mapToCheckoutConfiguration()
-        val googlePayAdvancedComponent =
-            createGooglePayAdvancedComponent(checkoutConfiguration, componentId, paymentMethod)
-        googlePayComponent = googlePayAdvancedComponent
-        GooglePayAvailabilityChecker(
-            activity,
-            googlePayAdvancedComponent,
-            googlePaySetupCallback
-        ).checkGooglePayAvailability(paymentMethod, checkoutConfiguration)
+    fun handleGooglePayActivityResult(
+        resultCode: Int,
+        data: Intent?
+    ) = componentWrapper?.handleActivityResult(resultCode, data)
+
+    fun onDispose(componentId: String) {
+        if (componentId == Constants.GOOGLE_PAY_ADVANCED_COMPONENT_KEY ||
+            componentId == Constants.GOOGLE_PAY_SESSION_COMPONENT_KEY
+        ) {
+            this.componentId = null
+            checkoutConfiguration = null
+            setupCallback = null
+            componentWrapper?.dispose(componentId)
+        }
     }
 
-    private fun setupGooglePaySessionComponent(
-        instantPaymentComponentConfigurationDTO: InstantPaymentConfigurationDTO,
+    private fun createWrapperWithComponent(paymentMethod: PaymentMethod): BaseGooglePayComponentWrapper? {
+        val checkoutConfiguration = checkoutConfiguration ?: return null
+        val componentId = componentId ?: return null
+        return when (componentId) {
+            Constants.GOOGLE_PAY_SESSION_COMPONENT_KEY ->
+                createGooglePaySessionComponent(
+                    checkoutConfiguration,
+                    componentId,
+                    paymentMethod
+                )
+
+            Constants.GOOGLE_PAY_ADVANCED_COMPONENT_KEY ->
+                createGooglePayAdvancedComponent(
+                    checkoutConfiguration,
+                    componentId,
+                    paymentMethod
+                )
+
+            else -> null
+        }
+    }
+
+    private fun createGooglePaySessionComponent(
+        checkoutConfiguration: CheckoutConfiguration,
         componentId: String,
         paymentMethod: PaymentMethod,
-        googlePaySetupCallback: (Result<InstantPaymentSetupResultDTO>) -> Unit
-    ) {
-        val sessionSetupResponse =
-            SessionSetupResponse.SERIALIZER.deserialize(sessionHolder.sessionSetupResponse)
+    ): GooglePaySessionComponentWrapper {
+        val sessionSetupResponse = SessionSetupResponse.SERIALIZER.deserialize(sessionHolder.sessionSetupResponse)
         val order = sessionHolder.orderResponse?.let { Order.SERIALIZER.deserialize(it) }
-        val checkoutConfiguration: CheckoutConfiguration =
-            instantPaymentComponentConfigurationDTO.mapToCheckoutConfiguration()
         val checkoutSession =
             CheckoutSession(
                 sessionSetupResponse,
@@ -107,46 +147,23 @@ class GooglePayComponentManager(
                 checkoutConfiguration.environment,
                 checkoutConfiguration.clientKey
             )
-
-        val googlePaySessionComponent =
-            createGooglePaySessionComponent(checkoutSession, checkoutConfiguration, componentId, paymentMethod)
-        googlePayComponent = googlePaySessionComponent
-        GooglePayAvailabilityChecker(
+        return GooglePaySessionComponentWrapper(
             activity,
-            googlePaySessionComponent,
-            googlePaySetupCallback
-        ).checkGooglePayAvailability(paymentMethod, checkoutConfiguration)
-    }
-
-    fun startGooglePayComponent() {
-        googlePayComponent?.let {
-            assignCurrentComponent(it.googlePayComponent)
-            it.startGooglePayScreen()
-        }
-    }
-
-    private fun createGooglePaySessionComponent(
-        checkoutSession: CheckoutSession,
-        checkoutConfiguration: CheckoutConfiguration,
-        componentId: String,
-        paymentMethod: PaymentMethod,
-    ): GooglePaySessionComponentWrapper =
-        GooglePaySessionComponentWrapper(
-            activity,
-            checkoutSession,
             componentFlutterInterface,
             checkoutConfiguration,
-            componentId
+            componentId,
+            checkoutSession
         ).apply {
             setupGooglePayComponent(paymentMethod)
         }
+    }
 
     private fun createGooglePayAdvancedComponent(
         checkoutConfiguration: CheckoutConfiguration,
         componentId: String,
         paymentMethod: PaymentMethod,
-    ): GooglePayAdvancedComponentWrapper {
-        return GooglePayAdvancedComponentWrapper(
+    ): GooglePayAdvancedComponentWrapper =
+        GooglePayAdvancedComponentWrapper(
             activity,
             componentFlutterInterface,
             checkoutConfiguration,
@@ -154,16 +171,4 @@ class GooglePayComponentManager(
         ).apply {
             setupGooglePayComponent(paymentMethod)
         }
-    }
-
-    fun handleGooglePayActivityResult(
-        resultCode: Int,
-        data: Intent?
-    ) {
-        googlePayComponent?.handleActivityResult(resultCode, data)
-    }
-
-    fun onDispose(componentId: String) {
-        googlePayComponent?.dispose(componentId)
-    }
 }

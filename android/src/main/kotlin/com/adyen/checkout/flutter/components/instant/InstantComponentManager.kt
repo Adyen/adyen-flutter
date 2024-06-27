@@ -31,7 +31,7 @@ class InstantComponentManager(
     private var instantPaymentComponent: InstantPaymentComponent? = null
     private var componentId: String? = null
 
-    fun startInstantComponent(
+    fun start(
         instantPaymentConfigurationDTO: InstantPaymentConfigurationDTO,
         encodedPaymentMethod: String,
         componentId: String

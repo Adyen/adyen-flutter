@@ -205,14 +205,21 @@ class _BaseGooglePayComponentState extends State<BaseGooglePayComponent> {
   }
 
   Future<InstantPaymentSetupResultDTO> _isGooglePaySupported() async {
-    final instantPaymentConfigurationDTO =
-        await createInstantPaymentConfigurationDTO();
-    return await widget.componentPlatformApi
-        .isInstantPaymentSupportedByPlatform(
-      instantPaymentConfigurationDTO,
-      widget.googlePayPaymentMethod,
-      widget.componentId,
-    );
+    try {
+      final instantPaymentConfigurationDTO =
+          await createInstantPaymentConfigurationDTO();
+      return await widget.componentPlatformApi
+          .isInstantPaymentSupportedByPlatform(
+        instantPaymentConfigurationDTO,
+        widget.googlePayPaymentMethod,
+        widget.componentId,
+      );
+    } catch (exception) {
+      return InstantPaymentSetupResultDTO(
+        instantPaymentType: InstantPaymentType.googlePay,
+        isSupported: false,
+      );
+    }
   }
 
   Future<InstantPaymentConfigurationDTO>

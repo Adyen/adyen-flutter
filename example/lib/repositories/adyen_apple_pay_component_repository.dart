@@ -24,7 +24,7 @@ class AdyenApplePayComponentRepository extends AdyenBaseRepository {
 
   Future<SessionResponseNetworkModel> fetchSession() async {
     String returnUrl = await determineBaseReturnUrl();
-    returnUrl += "/applePay";
+    returnUrl += "/adyenPayment";
     SessionRequestNetworkModel sessionRequestNetworkModel =
         SessionRequestNetworkModel(
       merchantAccount: Config.merchantAccount,
