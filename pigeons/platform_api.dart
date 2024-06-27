@@ -6,7 +6,7 @@ import 'package:pigeon/pigeon.dart';
   dartOptions: DartOptions(),
   kotlinOut:
       'android/src/main/kotlin/com/adyen/checkout/flutter/PlatformApi.kt',
-  kotlinOptions: KotlinOptions(),
+  kotlinOptions: KotlinOptions(errorClassName: "AdyenPigeonError"),
   swiftOut: 'ios/Classes/PlatformApi.swift',
   swiftOptions: SwiftOptions(),
   dartPackageName: 'adyen_checkout',
