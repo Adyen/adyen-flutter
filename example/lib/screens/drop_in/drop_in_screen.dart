@@ -27,11 +27,11 @@ class DropInScreen extends StatelessWidget {
             children: [
               TextButton(
                 onPressed: () => startDropInSessions(context),
-                child: const Text("DropIn sessions"),
+                child: const Text("Drop-in sessions"),
               ),
               TextButton(
                 onPressed: () => startDropInAdvancedFlow(context),
-                child: const Text("DropIn advanced flow"),
+                child: const Text("Drop-in advanced flow"),
               ),
             ],
           ),
