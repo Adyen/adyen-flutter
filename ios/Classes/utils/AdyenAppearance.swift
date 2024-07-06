@@ -34,28 +34,30 @@ internal class AdyenAppearanceLoader: NSObject {
     private static let bundleExecutableKey = "CFBundleExecutable"
 
     static func findDropInStyle() -> Adyen.DropInComponent.Style? {
-        let appearanceProvider: AdyenDropInAppearanceProvider.Type? = findAppearanceProvider(ofType: AdyenDropInAppearanceProvider.self) as? AdyenDropInAppearanceProvider.Type? ?? nil
-        return appearanceProvider?.createDropInStyle()
+        let appearanceProviders: [AnyClass?] = findAppearanceProviders()
+        let dropInAppearanceProviders = appearanceProviders.compactMap { $0 as? AdyenDropInAppearanceProvider.Type }
+        guard let dropInAppearanceProvider = dropInAppearanceProviders.first else {
+            return nil
+        }
+        
+        return dropInAppearanceProvider.createDropInStyle()
     }
     
     static func findCardComponentStyle() -> Adyen.FormComponentStyle? {
-        let appearanceProvider: AdyenComponentAppearanceProvider.Type? = findAppearanceProvider(ofType: AdyenComponentAppearanceProvider.self) as? AdyenComponentAppearanceProvider.Type? ?? nil
-        return appearanceProvider?.createCardComponentStyle()
+        let appearanceProviders: [AnyClass?] = findAppearanceProviders()
+        let cardComponentAppearanceProviders = appearanceProviders.compactMap { $0 as? AdyenComponentAppearanceProvider.Type }
+        guard let cardComponentAppearanceProvider = cardComponentAppearanceProviders.first else {
+            return nil
+        }
+        
+        return cardComponentAppearanceProvider.createCardComponentStyle()
     }
     
-    private static func findAppearanceProvider<T>(ofType type: T.Type) -> T? {
-        let appearanceProviders: [T] = Bundle.allBundles
+    private static func findAppearanceProviders() -> [AnyClass?] {
+        return Bundle.allBundles
             .compactMap { $0.infoDictionary?[bundleExecutableKey] as? String }
             .map { $0.replacingOccurrences(of: " ", with: "_") }
             .map { $0.replacingOccurrences(of: "-", with: "_") }
             .compactMap { NSClassFromString("\($0).\(expectedClassName)") }
-            .compactMap { $0 as? T }
-        
-        guard let appearanceProvider = appearanceProviders.first else {
-            adyenPrint("AdyenAppearance: class not linked or does not conform to AdyenDropInAppearanceProvider or AdyenComponentAppearanceProvider protocol")
-            return nil
-        }
-        
-        return appearanceProvider
     }
 }
