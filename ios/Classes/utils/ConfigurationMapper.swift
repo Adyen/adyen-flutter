@@ -107,8 +107,7 @@ extension DropInConfigurationDTO {
 
 extension CardConfigurationDTO {
     func mapToCardComponentConfiguration(shopperLocale: String?) -> CardComponent.Configuration {
-        var formComponentStyle = AdyenAppearanceLoader.findCardComponentStyle() ?? FormComponentStyle()
-        formComponentStyle.backgroundColor = UIColor.white
+        let formComponentStyle = AdyenAppearanceLoader.findCardComponentStyle() ?? createDefaultFormComponentStyle()
         let localizationParameters = shopperLocale != nil ? LocalizationParameters(enforcedLocale: shopperLocale!) : nil
         let koreanAuthenticationMode = kcpFieldVisibility.toCardFieldVisibility()
         let socialSecurityNumberMode = socialSecurityNumberFieldVisibility.toCardFieldVisibility()
@@ -127,6 +126,12 @@ extension CardConfigurationDTO {
             allowedCardTypes: allowedCardTypes,
             billingAddress: billingAddressConfiguration
         )
+    }
+    
+    private func createDefaultFormComponentStyle() -> FormComponentStyle {
+        var formComponentStyle = FormComponentStyle()
+        formComponentStyle.backgroundColor = UIColor.white
+        return formComponentStyle
     }
 
     private func createStoredCardConfiguration(showCvcForStoredCard: Bool) -> StoredCardConfiguration {
