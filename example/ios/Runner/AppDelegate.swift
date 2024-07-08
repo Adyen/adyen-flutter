@@ -10,6 +10,8 @@ import UIKit
         didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
     ) -> Bool {
         GeneratedPluginRegistrant.register(with: self)
+        setDropInStyle()
+        setCardComponentStyle()
         return super.application(application, didFinishLaunchingWithOptions: launchOptions)
     }
 
@@ -17,20 +19,18 @@ import UIKit
         RedirectComponent.applicationDidOpen(from: url)
         return true
     }
-}
-
-class AdyenAppearance: AdyenComponentAppearanceProvider, AdyenDropInAppearanceProvider {
-    static func createDropInStyle() -> Adyen.DropInComponent.Style {
-        var style = Adyen.DropInComponent.Style()
-        style.formComponent.mainButtonItem.button.backgroundColor = .black
-        style.formComponent.mainButtonItem.button.title.color = .white
-        return style
+    
+    private func setDropInStyle() {
+        var dropInStyle = Adyen.DropInComponent.Style()
+        dropInStyle.formComponent.mainButtonItem.button.backgroundColor = .black
+        dropInStyle.formComponent.mainButtonItem.button.title.color = .white
+        AdyenAppearance.dropInStyle = dropInStyle
     }
-
-    static func createCardComponentStyle() -> Adyen.FormComponentStyle {
-        var style = Adyen.FormComponentStyle()
-        style.mainButtonItem.button.backgroundColor = .black
-        style.mainButtonItem.button.title.color = .white
-        return style
+    
+    private func setCardComponentStyle() {
+        var cardComponentStyle = Adyen.FormComponentStyle()
+        cardComponentStyle.mainButtonItem.button.backgroundColor = .black
+        cardComponentStyle.mainButtonItem.button.title.color = .white
+        AdyenAppearance.cardComponentStyle = cardComponentStyle
     }
 }
