@@ -1,6 +1,8 @@
 ## 1.0.0
 
 * ⚠ **Breaking Change**: Cash app pay configuration now uses named parameters.
+* ⚠ **Breaking Change**: Styling for iOS is now simplified by exposing AdyenAppearance for setting
+    the style directly.
 * Added standalone action handling for the API only integration flow.
 * Improved rendering of components.
 * The amount inside the different payment method configurations is now optional. Only for Apple Pay
