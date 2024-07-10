@@ -13,6 +13,15 @@ You can integrate with the following:
     - Apple Pay Component: renders an Apple Pay button.
     - Instant Component: supports payment methods that do not require additional input fields, like PayPal, Klarna and many more.
 
+<center>
+
+|                                                             iOS                                                              |                                                                Android                                                                |
+|:--------------------------------------------------------------------------------------------------------------------------------:|:---------------------------------------------------------------------------------------------------------------------------------:|
+| <img align="top" src="https://github.com/Adyen/adyen-flutter/assets/13377878/03169e08-665d-4afa-96a4-19cb4594421a" height="400" /> | <img align="top" src="https://github.com/Adyen/adyen-flutter/assets/13377878/096d4914-3662-4346-bc3e-87657db33c88" height="400" /> |
+</center>
+
+
+
 ## Contributing
 
 Follow our [guidelines](https://github.com/Adyen/.github/blob/main/CONTRIBUTING.md) to provide feedback and contribute the following to this repository:
@@ -21,9 +30,6 @@ Follow our [guidelines](https://github.com/Adyen/.github/blob/main/CONTRIBUTING.
 * General improvements
 
 We merge each pull request into the `main` branch. We aim to keep it in good shape so that we can release a new version when we need to.
-|                                                             Android                                                              |                                                                iOS                                                                |
-|:--------------------------------------------------------------------------------------------------------------------------------:|:---------------------------------------------------------------------------------------------------------------------------------:|
-| <img align="top" src="https://github.com/Adyen/adyen-flutter/assets/13377878/03169e08-665d-4afa-96a4-19cb4594421a" width="450" /> | <img align="top" src="https://github.com/Adyen/adyen-flutter/assets/13377878/096d4914-3662-4346-bc3e-87657db33c88" width="450" /> |
 
 ## Before you begin
 
