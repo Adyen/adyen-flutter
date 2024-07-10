@@ -72,7 +72,7 @@ you use, follow corresponding the integration guide in our documentation.
 
 You can customize the styling of the user interface. Follow the guides for each platform:
 
-* [UI customization](/docs/CUSTOMIZATION.md)
+* [UI customization](/doc/CUSTOMIZATION.md)
 
 ## Support
 
