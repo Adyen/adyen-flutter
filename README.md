@@ -17,7 +17,7 @@ You can integrate with the following:
 
 |                                                             iOS                                                              |                                                                Android                                                                |
 |:--------------------------------------------------------------------------------------------------------------------------------:|:---------------------------------------------------------------------------------------------------------------------------------:|
-| <img align="top" src="https://github.com/Adyen/adyen-flutter/assets/13377878/03169e08-665d-4afa-96a4-19cb4594421a" height="400" /> | <img align="top" src="https://github.com/Adyen/adyen-flutter/assets/13377878/096d4914-3662-4346-bc3e-87657db33c88" height="400" /> |
+| <img align="top" src="https://github.com/Adyen/adyen-flutter/assets/13377878/03169e08-665d-4afa-96a4-19cb4594421a" height="400" /> | <img align="top" src="https://github.com/Adyen/adyen-flutter/assets/13377878/f8c1de69-862d-420b-a7dd-76eb04284685" height="400" /> |
 </center>
 
 
