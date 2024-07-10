@@ -21,7 +21,9 @@ Follow our [guidelines](https://github.com/Adyen/.github/blob/main/CONTRIBUTING.
 * General improvements
 
 We merge each pull request into the `main` branch. We aim to keep it in good shape so that we can release a new version when we need to.
-
+|                                                             Android                                                              |                                                                iOS                                                                |
+|:--------------------------------------------------------------------------------------------------------------------------------:|:---------------------------------------------------------------------------------------------------------------------------------:|
+| <img align="top" src="https://github.com/Adyen/adyen-flutter/assets/13377878/03169e08-665d-4afa-96a4-19cb4594421a" width="450" /> | <img align="top" src="https://github.com/Adyen/adyen-flutter/assets/13377878/096d4914-3662-4346-bc3e-87657db33c88" width="450" /> |
 
 ## Before you begin
 
