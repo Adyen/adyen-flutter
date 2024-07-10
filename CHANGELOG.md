@@ -2,14 +2,14 @@
 
 * ⚠ **Breaking Change**: Cash app pay configuration now uses named parameters.
 * ⚠ **Breaking Change**: Styling for iOS is now simplified by exposing AdyenAppearance for setting
-    the style directly.
+  the style directly.
 * Added standalone action handling for the API only integration flow.
 * Improved rendering of components.
 * The amount inside the different payment method configurations is now optional. Only for Apple Pay
   in combination with the advanced flow, the amount is still required.
 * Added support for the iDEAL redirect flow.
 * Updated iOS SDK to v5.9.0.
-* Updated Android SDK to v5.5.0.
+* Updated Android SDK to v5.6.0.
 
 ## 0.1.0
 
