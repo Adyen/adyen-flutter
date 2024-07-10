@@ -9,7 +9,7 @@
   in combination with the advanced flow, the amount is still required.
 * Added support for the iDEAL redirect flow.
 * Updated iOS SDK to v5.9.0.
-* Updated Android SDK to v5.6.0.
+* Updated Android SDK to v5.6.0 and moved to Gradle v8.
 
 ## 0.1.0
 
