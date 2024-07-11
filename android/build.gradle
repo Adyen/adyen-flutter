@@ -50,7 +50,7 @@ android {
     }
 
     dependencies {
-        implementation ('com.adyen.checkout:drop-in:5.5.0') {
+        implementation ('com.adyen.checkout:drop-in:5.6.0') {
             exclude group: 'androidx.lifecycle'
         }
         implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:2.7.0"

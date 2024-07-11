@@ -27,7 +27,7 @@ extension DropInConfigurationDTO {
             dropInConfiguration.cashAppPay = DropInComponent.CashAppPay(redirectURL: URL(string: cashAppPayConfigurationDTO.returnUrl)!)
         }
 
-        dropInConfiguration.style = AdyenAppearanceLoader.findDropInStyle() ?? DropInComponent.Style()
+        dropInConfiguration.style = AdyenAppearance.dropInStyle
 
         return dropInConfiguration
     }
@@ -107,8 +107,7 @@ extension DropInConfigurationDTO {
 
 extension CardConfigurationDTO {
     func mapToCardComponentConfiguration(shopperLocale: String?) -> CardComponent.Configuration {
-        var formComponentStyle = AdyenAppearanceLoader.findCardComponentStyle() ?? FormComponentStyle()
-        formComponentStyle.backgroundColor = UIColor.white
+        let cardComponentStyle = AdyenAppearance.cardComponentStyle
         let localizationParameters = shopperLocale != nil ? LocalizationParameters(enforcedLocale: shopperLocale!) : nil
         let koreanAuthenticationMode = kcpFieldVisibility.toCardFieldVisibility()
         let socialSecurityNumberMode = socialSecurityNumberFieldVisibility.toCardFieldVisibility()
@@ -116,7 +115,7 @@ extension CardConfigurationDTO {
         let allowedCardTypes = determineAllowedCardTypes(cardTypes: supportedCardTypes)
         let billingAddressConfiguration = determineBillingAddressConfiguration(addressMode: addressMode)
         return CardComponent.Configuration(
-            style: formComponentStyle,
+            style: cardComponentStyle,
             localizationParameters: localizationParameters,
             showsHolderNameField: holderNameRequired,
             showsStorePaymentMethodField: showStorePaymentField,
