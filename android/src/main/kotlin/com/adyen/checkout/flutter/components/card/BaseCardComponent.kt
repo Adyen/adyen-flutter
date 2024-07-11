@@ -106,8 +106,14 @@ abstract class BaseCardComponent(
     }
 
     fun resizeFlutterViewPort() {
-        val cardComponentHeight = activity.findViewById<FrameLayout>(com.adyen.checkout.ui.core.R.id.frameLayout_componentContainer)?.height ?: 0
-        val payButtonHeight = activity.findViewById<MaterialButton>(com.adyen.checkout.ui.core.R.id.payButton)?.height ?: 0
+        val cardComponentHeight =
+            activity.findViewById<FrameLayout>(
+                com.adyen.checkout.ui.core.R.id.frameLayout_componentContainer
+            )?.height ?: 0
+        val payButtonHeight =
+            activity.findViewById<MaterialButton>(
+                com.adyen.checkout.ui.core.R.id.payButton
+            )?.height ?: 0
         val componentViewHeight = (cardComponentHeight + payButtonHeight + standardMargin).toDouble()
         val componentViewHeightScreenDensity = (componentViewHeight / screenDensity)
         val roundedViewHeight = round(componentViewHeightScreenDensity * 100) / 100
@@ -127,9 +133,15 @@ abstract class BaseCardComponent(
                 ViewGroup.LayoutParams.WRAP_CONTENT,
             )
 
-        val componentContainer = activity.findViewById<FrameLayout>(com.adyen.checkout.ui.core.R.id.frameLayout_componentContainer)
+        val componentContainer =
+            activity.findViewById<FrameLayout>(
+                com.adyen.checkout.ui.core.R.id.frameLayout_componentContainer
+            )
         componentContainer?.layoutParams = linearLayoutParams
-        val buttonContainer = activity.findViewById<FrameLayout>(com.adyen.checkout.ui.core.R.id.frameLayout_buttonContainer)
+        val buttonContainer =
+            activity.findViewById<FrameLayout>(
+                com.adyen.checkout.ui.core.R.id.frameLayout_buttonContainer
+            )
         buttonContainer?.layoutParams = linearLayoutParams
     }
 
