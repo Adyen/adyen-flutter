@@ -29,7 +29,9 @@ class ComponentLoadingBottomSheet<T>(private val component: T) :
 
     override fun onCreateDialog(savedInstanceState: Bundle?) =
         super.onCreateDialog(savedInstanceState).apply {
-            window?.setWindowAnimations(R.style.AdyenCheckout_BottomSheet_NoWindowEnterDialogAnimation)
+            window?.setWindowAnimations(
+                com.adyen.checkout.ui.core.R.style.AdyenCheckout_BottomSheet_NoWindowEnterDialogAnimation
+            )
         }
 
     companion object {
