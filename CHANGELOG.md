@@ -1,6 +1,6 @@
 ## 1.0.1
-* Fixed resolving of view references for Android when using Flutter with Gradle's Plugin DSL.
 
+* Fixed resolving of view references for Android when using Flutter with Gradle's Plugin DSL.
 
 ## 1.0.0
 
