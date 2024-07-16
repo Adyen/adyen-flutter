@@ -2,6 +2,7 @@
 
 * Fixed resolving of view references for Android when using Flutter with Gradle's Plugin DSL.
 * Excluded default androidx.lifecycle dependencies of the Android SDK to enable AGP 7 compatibility. 
+* Updated project readme. 
 
 ## 1.0.0
 

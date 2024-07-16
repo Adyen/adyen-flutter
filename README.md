@@ -39,9 +39,9 @@ release a new version when we need to.
 
 1. [Get an Adyen test account](https://www.adyen.com/signup).
 2. [Get your Client key](https://docs.adyen.com/development-resources/client-side-authentication#get-your-client-key).
-   Your client app does not communicate with the Adyen API directly.
-3. [Get your API key](https://docs.adyen.com/development-resources/how-to-get-the-api-key). You need
-   the API key to make requests from your server .
+   Required for Drop-in/Components to communicate with the Adyen API.
+3. [Get your API key](https://docs.adyen.com/development-resources/how-to-get-the-api-key). Required
+   to make requests from your server to the Adyen API.
 4. [Set up your webhooks](https://docs.adyen.com/development-resources/webhooks/) to get the payment
    outcome.
 
@@ -49,8 +49,10 @@ Required versions:
 
 * [Checkout API v71](https://docs.adyen.com/api-explorer/Checkout/71/overview) or later.
 * [iOS 12](https://support.apple.com/en-us/118387) or later.
-* [Android 5.0](https://www.android.com/versions/lollipop-5-0/) or later.
-* [Android Gradle plugin 8.1](https://developer.android.com/build/releases/gradle-plugin) or later.
+* [Android 5.0](https://www.android.com/versions/lollipop-5-0/) or later with compileSdk set to 34.
+  Google will
+  change [target API level requirements](https://support.google.com/googleplay/android-developer/answer/11926878?hl=en)
+  for Google Play apps starting August 31 2024.
 * [Kotlin 1.8](https://kotlinlang.org/docs/releases.html) or later.
 
 ## Integration
