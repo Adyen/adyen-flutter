@@ -20,7 +20,6 @@ import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToAnalyticsConfig
 import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToCardConfiguration
 import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToEnvironment
 import com.adyen.checkout.ui.core.AdyenComponentView
-import com.google.android.material.button.MaterialButton
 import io.flutter.plugin.platform.PlatformView
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -121,10 +120,11 @@ abstract class BaseCardComponent(
     }
 
     private fun adjustCardComponentLayout() {
-        adyenComponentView.layoutParams = FrameLayout.LayoutParams(
-            ViewGroup.LayoutParams.MATCH_PARENT,
-            ViewGroup.LayoutParams.WRAP_CONTENT,
-        )
+        adyenComponentView.layoutParams =
+            FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+            )
 
         val linearLayoutParams =
             LinearLayout.LayoutParams(
