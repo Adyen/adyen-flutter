@@ -20,7 +20,6 @@ import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToAnalyticsConfig
 import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToCardConfiguration
 import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToEnvironment
 import com.adyen.checkout.ui.core.AdyenComponentView
-import com.google.android.material.button.MaterialButton
 import io.flutter.plugin.platform.PlatformView
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -41,6 +40,7 @@ abstract class BaseCardComponent(
         creationParams[CARD_COMPONENT_CONFIGURATION_KEY] as CardComponentConfigurationDTO?
             ?: throw Exception("Card configuration not found")
     private val adyenComponentView = AdyenComponentView(activity)
+    private val wrapperView = FrameLayout(context)
     private val standardMargin = activity.resources.getDimension(com.adyen.checkout.ui.core.R.dimen.standard_margin)
     private val screenDensity = activity.resources.displayMetrics.density
     private val layoutChangeFlow = MutableStateFlow<Int?>(null)
@@ -62,7 +62,7 @@ abstract class BaseCardComponent(
         )
     internal var cardComponent: CardComponent? = null
 
-    override fun getView(): View = adyenComponentView
+    override fun getView(): View = wrapperView
 
     override fun dispose() {
         activity.findViewById<FrameLayout>(com.adyen.checkout.ui.core.R.id.frameLayout_componentContainer)
@@ -72,6 +72,7 @@ abstract class BaseCardComponent(
     }
 
     fun addComponent(cardComponent: CardComponent) {
+        wrapperView.addView(adyenComponentView)
         adyenComponentView.attach(cardComponent, activity)
         addSingleGlobalLayoutListener()
         setupComponentResizeListener()
@@ -106,16 +107,8 @@ abstract class BaseCardComponent(
     }
 
     fun resizeFlutterViewPort() {
-        val cardComponentHeight =
-            activity.findViewById<FrameLayout>(
-                com.adyen.checkout.ui.core.R.id.frameLayout_componentContainer
-            )?.height ?: 0
-        val payButtonHeight =
-            activity.findViewById<MaterialButton>(
-                com.adyen.checkout.ui.core.R.id.payButton
-            )?.height ?: 0
-        val componentViewHeight = (cardComponentHeight + payButtonHeight + standardMargin).toDouble()
-        val componentViewHeightScreenDensity = (componentViewHeight / screenDensity)
+        val componentViewHeight = adyenComponentView.height + standardMargin
+        val componentViewHeightScreenDensity = componentViewHeight / screenDensity
         val roundedViewHeight = round(componentViewHeightScreenDensity * 100) / 100
         componentFlutterApi.onComponentCommunication(
             ComponentCommunicationModel(
@@ -127,6 +120,12 @@ abstract class BaseCardComponent(
     }
 
     private fun adjustCardComponentLayout() {
+        adyenComponentView.layoutParams =
+            FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+            )
+
         val linearLayoutParams =
             LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
