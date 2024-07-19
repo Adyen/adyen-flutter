@@ -79,5 +79,5 @@ jobs:
           disable-animations: true
           working-directory: ./demo_project
           script: |
-            ls
+            flutter run -d 1
 
