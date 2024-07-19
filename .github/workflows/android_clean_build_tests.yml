@@ -79,5 +79,5 @@ jobs:
           disable-animations: true
           working-directory: ./demo_project
           script: |
-            flutter run -d emulator-5554
+            flutter run -d "sdk gphone64"
 
