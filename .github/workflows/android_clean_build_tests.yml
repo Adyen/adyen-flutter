@@ -79,6 +79,9 @@ jobs:
           disable-animations: true
           working-directory: ./demo_project
           script: |
-            flutter run -d "sdk gphone64"
-            q
+            
+
+      - run: |
+          flutter run -d "sdk gphone64" 
+          q
 
