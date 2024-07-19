@@ -13,27 +13,30 @@ on:
 
 jobs:
   android_clean_build_test:
-    runs-on: macos-13
-    timeout-minutes: 60
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        api-level: [ 34 ]
 
     steps:
       - uses: actions/checkout@v4
 
-#      - name: Enable KVM
-#        run: |
-#          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
-#          sudo udevadm control --reload-rules
-#          sudo udevadm trigger --name-match=kvm
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
 
-      - uses: subosito/flutter-action@v2
+      - name: Set up JDK
+        uses: actions/setup-java@v4
         with:
-          flutter-version: "3.22.2"
-          channel: 'stable'
-          cache: true
-          cache-key: "flutter_key"
+          distribution: 'zulu'
+          java-version: 17
 
       - name: Gradle cache
         uses: gradle/actions/setup-gradle@v3
+        with:
+          cache-read-only: false
 
       - name: AVD cache
         uses: actions/cache@v4
@@ -42,26 +45,31 @@ jobs:
           path: |
             ~/.android/avd/*
             ~/.android/adb*
-          key: avd-33
+          key: avd-${{ matrix.api-level }}
 
       - name: Create AVD and generate snapshot for caching
         if: steps.avd-cache.outputs.cache-hit != 'true'
         uses: reactivecircus/android-emulator-runner@v2
         with:
-          api-level: 33
+          api-level: ${{ matrix.api-level }}
           target: google_apis
-          arch: x86
+          arch: x86_64
           force-avd-creation: false
           emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: false
           script: echo "Generated AVD snapshot for caching."
 
-      - name: run tests
+      - name: Run connectedDebugAndroidTest
         uses: reactivecircus/android-emulator-runner@v2
+        env:
+          ADYEN_ANDROID_MERCHANT_SERVER_URL: 'https://android-ui-tests.adyen.com/'
+          ADYEN_ANDROID_CLIENT_KEY: 'test_fakefakefakefakefakefakefakefake'
         with:
-          api-level: 33
+          api-level: ${{ matrix.api-level }}
+          target: google_apis
+          arch: x86_64
           force-avd-creation: false
           emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: true
-          script: ./gradlew connectedCheck
+          script: ./gradlew connectedDebugAndroidTest -Pstrip-resources=true
 
