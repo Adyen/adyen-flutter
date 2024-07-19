@@ -16,6 +16,9 @@ jobs:
   android_clean_build_test:
     runs-on: ubuntu-22.04
     timeout-minutes: 60
+    strategy:
+      matrix:
+        api-level: [ 21, 23, 29 ]
 
     steps:
       - uses: actions/checkout@v4
@@ -44,13 +47,13 @@ jobs:
           path: |
             ~/.android/avd/*
             ~/.android/adb*
-          key: "avd-30"
+          key: avd-${{ matrix.api-level }}
 
       - name: create AVD and generate snapshot for caching
         if: steps.avd-cache.outputs.cache-hit != 'true'
         uses: reactivecircus/android-emulator-runner@v2
         with:
-          api-level: 30
+          api-level: ${{ matrix.api-level }}
           force-avd-creation: false
           emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: false
@@ -59,7 +62,7 @@ jobs:
       - name: run tests
         uses: reactivecircus/android-emulator-runner@v2
         with:
-          api-level: 30
+          api-level: ${{ matrix.api-level }}
           force-avd-creation: false
           emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: true
