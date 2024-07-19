@@ -80,7 +80,9 @@ jobs:
           working-directory: ./demo_project
           script: echo "Emulator launched"
 
-      - run: |
+      - name: Launch app
+        working-directory: ./demo_project
+        run: |
           flutter run -d "sdk gphone64" 
           q
 
