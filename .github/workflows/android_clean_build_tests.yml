@@ -75,9 +75,8 @@ jobs:
           script: |
             mkdir "test_run"; cd "$_"
             flutter create --template=app --platforms=android,ios demo_project
-            cd demo_project
             ls
-            sed -i 's/"org.jetbrains.kotlin.android" version "1.7.10"/"org.jetbrains.kotlin.android" version "1.8.10"/g' android/settings.gradle
+            sed -i 's/"org.jetbrains.kotlin.android" version "1.7.10"/"org.jetbrains.kotlin.android" version "1.8.10"/g' demo_project/android/settings.gradle
             flutter doctor -v
             flutter pub add adyen_checkout
             flutter pub get
