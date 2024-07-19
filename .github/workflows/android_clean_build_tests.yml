@@ -75,7 +75,6 @@ jobs:
           script: |
             flutter create --template=app --platforms=android,ios demo_project
             sed -i 's/"org.jetbrains.kotlin.android" version "1.7.10"/"org.jetbrains.kotlin.android" version "1.8.10"/g' demo_project/android/settings.gradle
-            flutter doctor -v --directory /demo_project
             flutter pub add adyen_checkout --directory /demo_project
             flutter pub get --directory /demo_project
 
