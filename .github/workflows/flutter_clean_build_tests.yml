@@ -1,13 +1,16 @@
 name: Flutter clean build tests
 
 on:
-  workflow_call:
-    inputs:
-      flutter-version:
-        description: 'Flutter version'
-        required: true
-        default: '3.19.0'
-        type: string
+  push:
+    branches:
+      - "feature/CiBuildTest"
+#  workflow_call:
+#    inputs:
+#      flutter-version:
+#        description: 'Flutter version'
+#        required: true
+#        default: '3.19.0'
+#        type: string
 
 jobs:
   flutter_tests:
