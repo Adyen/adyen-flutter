@@ -34,12 +34,10 @@ jobs:
           flutter-version: "3.22.2"
           channel: 'stable'
           cache: true
-          key: "flutter_key"
+          cache-key: "flutter_key"
 
       - name: Gradle cache
         uses: gradle/actions/setup-gradle@v3
-
-      - run: /usr/bin/sh -c \sdkmanager list
 
       - name: AVD cache
         uses: actions/cache@v4
