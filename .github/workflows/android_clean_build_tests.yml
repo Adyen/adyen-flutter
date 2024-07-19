@@ -34,6 +34,7 @@ jobs:
           flutter-version: "3.22.2"
           channel: 'stable'
           cache: true
+          key: "flutter_key"
 
       - name: Gradle cache
         uses: gradle/actions/setup-gradle@v3
