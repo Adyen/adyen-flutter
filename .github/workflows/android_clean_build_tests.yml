@@ -79,5 +79,5 @@ jobs:
           disable-animations: true
           working-directory: ./demo_project
           script: |
-            flutter run -d 1
+            flutter run -d emulator-5554
 
