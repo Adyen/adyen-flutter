@@ -35,6 +35,8 @@ jobs:
       - name: Gradle cache
         uses: gradle/actions/setup-gradle@v3
 
+      - run: /usr/bin/sh -c \sdkmanager list
+
       - name: AVD cache
         uses: actions/cache@v4
         id: avd-cache
