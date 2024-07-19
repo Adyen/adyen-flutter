@@ -78,8 +78,7 @@ jobs:
           emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: true
           working-directory: ./demo_project
-          script: |
-            
+          script: echo "Emulator launched"
 
       - run: |
           flutter run -d "sdk gphone64" 
