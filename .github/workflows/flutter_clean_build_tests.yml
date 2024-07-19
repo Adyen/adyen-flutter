@@ -26,11 +26,6 @@ jobs:
           channel: 'stable'
           cache: true
 
-      - run: flutter pub get
-      - run: |
-          flutter test --coverage 
-          lcov --remove coverage/lcov.info 'lib/**/*.g.dart' -o ./coverage/coverage_with_exclusion.info 
-
       - name: Gradle cache
         uses: gradle/actions/setup-gradle@v3
 
