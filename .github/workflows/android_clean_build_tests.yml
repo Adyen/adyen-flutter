@@ -13,8 +13,8 @@ on:
 #        type: string
 
 jobs:
-  flutter_android_clean_build:
-    runs-on: ubuntu-latest
+  android_clean_build_test:
+    runs-on: ubuntu-22.04
     timeout-minutes: 60
 
     steps:
@@ -35,7 +35,7 @@ jobs:
       - name: Gradle cache
         uses: gradle/actions/setup-gradle@v3
 
-      - run: sdkmanager --list
+      - run: which sdkmanager
 
       - name: AVD cache
         uses: actions/cache@v4
