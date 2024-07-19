@@ -38,7 +38,6 @@ jobs:
           cd demo_project
           sed -i 's/"org.jetbrains.kotlin.android" version "1.7.10"/"org.jetbrains.kotlin.android" version "1.8.10"/g' android/settings.gradle
           flutter pub add adyen_checkout
-          flutter pub get --directory
 
       - name: Gradle cache
         uses: gradle/actions/setup-gradle@v3
@@ -78,6 +77,7 @@ jobs:
           force-avd-creation: false
           emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: true
-          working-directory: /demo_project
-          script: echo "Hello World!"
+          working-directory: ./demo_project
+          script: |
+            ls
 
