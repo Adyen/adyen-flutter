@@ -10,7 +10,8 @@ jobs:
     runs-on: ubuntu-22.04
     strategy:
       matrix:
-        api-level: [ 34 ]
+        api-level: [ 33, 34 ]
+        flutter-version: [ "3.22.0" ]
 
     steps:
 
@@ -28,10 +29,10 @@ jobs:
 
       - uses: subosito/flutter-action@v2
         with:
-          flutter-version: "3.22.2"
+          flutter-version: {{ matrix.flutter-version }}
           channel: 'stable'
           cache: true
-          cache-key: "3.22.2"
+          cache-key: {{ matrix.flutter-version }}
 
       - run: |
           flutter create --template=app --platforms=android,ios demo_project
