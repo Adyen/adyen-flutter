@@ -39,8 +39,8 @@ jobs:
           cd demo_project
           sed -i 's/"org.jetbrains.kotlin.android" version "1.7.10"/"org.jetbrains.kotlin.android" version "1.8.10"/g' android/settings.gradle
           ls
-          sed -i 's/"flutter.compileSdkVersion"/"34"/g' android/app/build.gradle
-          sed -i 's/"flutter.minSdkVersion"/"21"/g' android/app/build.gradle
+          sed -i 's/flutter.compileSdkVersion/34/g' android/app/build.gradle
+          sed -i 's/flutter.minSdkVersion/21/g' android/app/build.gradle
           cat android/app/build.gradle
           flutter pub add adyen_checkout
           flutter build apk --debug
