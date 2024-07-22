@@ -38,6 +38,7 @@ jobs:
           cd demo_project
           sed -i 's/"org.jetbrains.kotlin.android" version "1.7.10"/"org.jetbrains.kotlin.android" version "1.8.10"/g' android/settings.gradle
           flutter pub add adyen_checkout
+          flutter build apk --debug
 
       - name: Gradle cache
         uses: gradle/actions/setup-gradle@v3
@@ -83,6 +84,6 @@ jobs:
       - name: Launch app
         working-directory: ./demo_project
         run: |
-          flutter run -d "sdk gphone64" 
-          q
+          adb install build/app/outputs/flutter-apk/app-debug.apk
+          adb shell monkey -p com.example.demo_project  -c android.intent.category.LAUNCHER 1
 
