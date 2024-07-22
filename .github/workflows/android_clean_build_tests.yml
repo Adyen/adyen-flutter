@@ -29,10 +29,10 @@ jobs:
 
       - uses: subosito/flutter-action@v2
         with:
-          flutter-version: {{ matrix.flutter-version }}
+          flutter-version: ${{ matrix.flutter-version }}
           channel: 'stable'
           cache: true
-          cache-key: {{ matrix.flutter-version }}
+          cache-key: ${{ matrix.flutter-version }}
 
       - run: |
           flutter create --template=app --platforms=android,ios demo_project
