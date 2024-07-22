@@ -47,11 +47,9 @@ jobs:
           #Change minSdk and compileSdk version
           sed -i 's/flutter.compileSdkVersion/34/g' android/app/build.gradle
           sed -i 's/flutter.minSdkVersion/21/g' android/app/build.gradle
-          cat android/build.gradle
-          echo "*******"
-          cat android/app/build.gradle
+         
           flutter pub add adyen_checkout
-          flutter build apk --debug
+          flutter build apk --debug          
 
       - name: Gradle cache
         uses: gradle/actions/setup-gradle@v3
@@ -88,7 +86,7 @@ jobs:
           api-level: ${{ matrix.api-level }}
           target: google_apis
           arch: x86_64
-          force-avd-creation: false
+          force-avd-creation: true
           emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: false
           working-directory: ./demo_project
