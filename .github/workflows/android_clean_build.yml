@@ -9,9 +9,8 @@ jobs:
   android_clean_build:
     runs-on: ubuntu-22.04
     strategy:
-      max-parallel: 1
       matrix:
-        api-level: [ 33, 34 ]
+        api-level: [ 32, 34 ]
         flutter-version: [ "3.16.0" ,"3.19.0", "3.22.0" ]
 
     steps:
