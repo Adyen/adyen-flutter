@@ -41,7 +41,7 @@ jobs:
           ls
           sed -i 's/flutter.compileSdkVersion/34/g' android/app/build.gradle
           sed -i 's/flutter.minSdkVersion/21/g' android/app/build.gradle
-          cat android/app/build.gradle
+          cat android/settings.gradle
           flutter pub add adyen_checkout
           flutter build apk --debug
 
