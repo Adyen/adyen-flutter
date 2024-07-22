@@ -79,11 +79,8 @@ jobs:
           emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: true
           working-directory: ./demo_project
-          script: echo "Emulator launched"
-
-      - name: Launch app
-        working-directory: ./demo_project
-        run: |
-          adb install build/app/outputs/flutter-apk/app-debug.apk
-          adb shell monkey -p com.example.demo_project  -c android.intent.category.LAUNCHER 1
+          script: |
+            echo "Emulator launched"
+            adb install build/app/outputs/flutter-apk/app-debug.apk
+            adb shell monkey -p com.example.demo_project  -c android.intent.category.LAUNCHER 1
 
