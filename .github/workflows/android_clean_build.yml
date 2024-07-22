@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-22.04
     strategy:
       matrix:
-        api-level: [ 32, 34 ]
+        api-level: [ 33, 34 ]
         flutter-version: [ "3.16.0" ,"3.19.0", "3.22.0" ]
 
     steps:
@@ -72,8 +72,8 @@ jobs:
           api-level: ${{ matrix.api-level }}
           target: google_apis
           arch: x86_64
-          avd-name: device-${{ matrix.api-level }}
           force-avd-creation: false
+          disk-size: 2G
           emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: false
           script: echo "Generated AVD snapshot for caching."
