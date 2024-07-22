@@ -37,8 +37,15 @@ jobs:
       - run: |
           flutter create --template=app --platforms=android,ios demo_project
           cd demo_project
+          
+          #Change Kotlin version for Flutter 3.16 
+          
+          sed -i 's/ext.kotlin_version = '1.7.10'/ext.kotlin_version = '1.8.10'/g' android/settings.gradle
+          
+          #Change Kotlin version for Flutter 3.19+ 
           sed -i 's/"org.jetbrains.kotlin.android" version "1.7.10"/"org.jetbrains.kotlin.android" version "1.8.10"/g' android/settings.gradle
-          ls
+          
+          
           sed -i 's/flutter.compileSdkVersion/34/g' android/app/build.gradle
           sed -i 's/flutter.minSdkVersion/21/g' android/app/build.gradle
           cat android/build.gradle
