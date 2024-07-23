@@ -68,7 +68,7 @@ jobs:
 
       - name: list avd content
         run: |
-          cd ~/.android/avd/
+          cd ~/.android/avd
           ls
 
       - name: Create AVD and generate snapshot for caching
