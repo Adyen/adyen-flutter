@@ -15,6 +15,12 @@ jobs:
         flutter-version: [ "3.22.0" ]
 
     steps:
+      - name: Maximize build space
+        uses: easimon/maximize-build-space@master
+        with:
+          root-reserve-mb: 512
+          swap-size-mb: 1024
+          remove-dotnet: 'true'
 
       - name: Enable KVM
         run: |
@@ -57,35 +63,34 @@ jobs:
         with:
           cache-read-only: false
 
-#      - name: AVD cache
-#        uses: actions/cache@v4
-#        id: avd-cache
-#        with:
-#          path: |
-#            ~/.android/avd/*
-#            ~/.android/adb*
-#          key: avd-${{ matrix.api-level }}
-#
-#      - name: list avd content
-#        run: |
-#          cd ~/.android/avd
-#          ls
-#
-#      - name: Create AVD and generate snapshot for caching
-#        if: steps.avd-cache.outputs.cache-hit != 'true'
-#        uses: reactivecircus/android-emulator-runner@v2
-#        with:
-#          api-level: ${{ matrix.api-level }}
-#          target: google_apis
-#          arch: x86_64
-#          force-avd-creation: false
-#          disk-size: 2G
-#          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
-#          disable-animations: false
-#          script: echo "Generated AVD snapshot for caching."
+      #      - name: AVD cache
+      #        uses: actions/cache@v4
+      #        id: avd-cache
+      #        with:
+      #          path: |
+      #            ~/.android/avd/*
+      #            ~/.android/adb*
+      #          key: avd-${{ matrix.api-level }}
+      #
+      #      - name: list avd content
+      #        run: |
+      #          cd ~/.android/avd
+      #          ls
+      #
+      #      - name: Create AVD and generate snapshot for caching
+      #        if: steps.avd-cache.outputs.cache-hit != 'true'
+      #        uses: reactivecircus/android-emulator-runner@v2
+      #        with:
+      #          api-level: ${{ matrix.api-level }}
+      #          target: google_apis
+      #          arch: x86_64
+      #          force-avd-creation: false
+      #          disk-size: 2G
+      #          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+      #          disable-animations: false
+      #          script: echo "Generated AVD snapshot for caching."
 
       - run: |
-          /usr/local/lib/android/sdk/cmdline-tools/latest/bin/avdmanager list
           ls /home/runner/.android/avd/
 
       - name: Run connectedDebugAndroidTest
