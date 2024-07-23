@@ -86,6 +86,8 @@ jobs:
 
       - run: |
           /usr/local/lib/android/sdk/cmdline-tools/latest/bin/avdmanager list
+          cd /home/runner/.android/avd/../avd/ 
+          ls
 
       - name: Run connectedDebugAndroidTest
         uses: reactivecircus/android-emulator-runner@v2
