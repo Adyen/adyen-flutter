@@ -11,7 +11,7 @@ jobs:
     strategy:
       matrix:
         api-level: [ 33 ]
-#        flutter-version: [ "3.16.0" ,"3.19.0", "3.22.0" ]
+        #        flutter-version: [ "3.16.0" ,"3.19.0", "3.22.0" ]
         flutter-version: [ "3.16.0" ]
 
     steps:
@@ -48,7 +48,7 @@ jobs:
           #Change minSdk and compileSdk version
           sed -i 's/flutter.compileSdkVersion/34/g' android/app/build.gradle
           sed -i 's/flutter.minSdkVersion/21/g' android/app/build.gradle
-         
+          
           flutter pub add adyen_checkout
           flutter build apk --debug          
 
@@ -65,6 +65,11 @@ jobs:
             ~/.android/avd/*
             ~/.android/adb*
           key: avd-${{ matrix.api-level }}
+
+      - name: list avd content
+        run: |
+          cd ~/.android/avd/
+          ls
 
       - name: Create AVD and generate snapshot for caching
         if: steps.avd-cache.outputs.cache-hit != 'true'
