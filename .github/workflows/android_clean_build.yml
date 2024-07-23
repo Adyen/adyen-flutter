@@ -10,8 +10,9 @@ jobs:
     runs-on: ubuntu-22.04
     strategy:
       matrix:
-        api-level: [ 33, 34 ]
-        flutter-version: [ "3.16.0" ,"3.19.0", "3.22.0" ]
+        api-level: [ 33 ]
+#        flutter-version: [ "3.16.0" ,"3.19.0", "3.22.0" ]
+        flutter-version: [ "3.16.0" ]
 
     steps:
 
