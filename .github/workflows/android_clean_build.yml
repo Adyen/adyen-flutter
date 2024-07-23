@@ -10,9 +10,8 @@ jobs:
     runs-on: ubuntu-22.04
     strategy:
       matrix:
-        api-level: [ 33 ]
-        #        flutter-version: [ "3.16.0" ,"3.19.0", "3.22.0" ]
-        flutter-version: [ "3.22.0" ]
+        api-level: [ 34 ]
+        flutter-version: [ "3.16.0" ,"3.19.0", "3.22.0" ]
 
     steps:
       - name: Enable KVM
@@ -56,35 +55,26 @@ jobs:
         with:
           cache-read-only: false
 
-      #      - name: AVD cache
-      #        uses: actions/cache@v4
-      #        id: avd-cache
-      #        with:
-      #          path: |
-      #            ~/.android/avd/*
-      #            ~/.android/adb*
-      #          key: avd-${{ matrix.api-level }}
-      #
-      #      - name: list avd content
-      #        run: |
-      #          cd ~/.android/avd
-      #          ls
-      #
-      #      - name: Create AVD and generate snapshot for caching
-      #        if: steps.avd-cache.outputs.cache-hit != 'true'
-      #        uses: reactivecircus/android-emulator-runner@v2
-      #        with:
-      #          api-level: ${{ matrix.api-level }}
-      #          target: google_apis
-      #          arch: x86_64
-      #          force-avd-creation: false
-      #          disk-size: 2G
-      #          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
-      #          disable-animations: false
-      #          script: echo "Generated AVD snapshot for caching."
+      - name: AVD cache
+        uses: actions/cache@v4
+        id: avd-cache
+        with:
+          path: |
+            ~/.android/avd/*
+            ~/.android/adb*
+          key: avd-${{ matrix.api-level }}
 
-      - run: |
-          ls /home/runner/.android/avd/
+      - name: Create AVD and generate snapshot for caching
+        if: steps.avd-cache.outputs.cache-hit != 'true'
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: ${{ matrix.api-level }}
+          target: google_apis
+          arch: x86_64
+          force-avd-creation: false
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          disable-animations: false
+          script: echo "Generated AVD snapshot for caching."
 
       - name: Run connectedDebugAndroidTest
         uses: reactivecircus/android-emulator-runner@v2
@@ -96,9 +86,7 @@ jobs:
           target: google_apis
           arch: x86_64
           force-avd-creation: false
-          disk-size: 2G
-          profile: pixel_6
-          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: false
           working-directory: ./demo_project
           script: |
