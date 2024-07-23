@@ -12,7 +12,7 @@ jobs:
       matrix:
         api-level: [ 33 ]
         #        flutter-version: [ "3.16.0" ,"3.19.0", "3.22.0" ]
-        flutter-version: [ "3.16.0" ]
+        flutter-version: [ "3.22.0" ]
 
     steps:
 
@@ -84,6 +84,9 @@ jobs:
 #          disable-animations: false
 #          script: echo "Generated AVD snapshot for caching."
 
+      - run: |
+          /usr/local/lib/android/sdk/cmdline-tools/latest/bin/avdmanager list
+
       - name: Run connectedDebugAndroidTest
         uses: reactivecircus/android-emulator-runner@v2
         env:
@@ -95,7 +98,7 @@ jobs:
           arch: x86_64
           force-avd-creation: false
           disk-size: 2G
-          profile: pixel_8
+          profile: android-33
           emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: false
           working-directory: ./demo_project
