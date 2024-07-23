@@ -98,7 +98,7 @@ jobs:
           arch: x86_64
           force-avd-creation: false
           disk-size: 2G
-          profile: "android-33"
+          profile: pixel_6
           emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: false
           working-directory: ./demo_project
