@@ -94,8 +94,7 @@ void main() {
           repository: adyenInstantComponentRepository),
       '/multiComponentNavigationScreen': (context) =>
           const MultiComponentNavigationScreen(),
-      '/multiComponentSessionScreen': (context) =>
-          MultiComponentSessionScreen(
+      '/multiComponentSessionScreen': (context) => MultiComponentSessionScreen(
             cardRepository: adyenCardComponentRepository,
             googlePayRepository: adyenGooglePayComponentRepository,
             applePayRepository: adyenApplePayComponentRepository,
