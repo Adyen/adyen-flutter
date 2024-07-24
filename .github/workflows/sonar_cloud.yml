@@ -1,4 +1,4 @@
-name: Android unit tests
+name: Sonar cloud check
 
 on:
   workflow_call:

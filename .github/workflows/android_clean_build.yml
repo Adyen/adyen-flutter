@@ -76,7 +76,7 @@ jobs:
           disable-animations: false
           script: echo "Generated AVD snapshot for caching."
 
-      - name: Run connectedDebugAndroidTest
+      - name: Run connected installation test
         uses: reactivecircus/android-emulator-runner@v2
         env:
           ADYEN_ANDROID_MERCHANT_SERVER_URL: 'https://android-ui-tests.adyen.com/'
