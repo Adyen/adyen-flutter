@@ -22,6 +22,7 @@ import 'package:adyen_checkout_example/screens/component/instant/instant_navigat
 import 'package:adyen_checkout_example/screens/component/instant/instant_session_component_screen.dart';
 import 'package:adyen_checkout_example/screens/component/multi_component/multi_component_advanced_screen.dart';
 import 'package:adyen_checkout_example/screens/component/multi_component/multi_component_navigation_screen.dart';
+import 'package:adyen_checkout_example/screens/component/multi_component/multi_component_session_screen.dart';
 import 'package:adyen_checkout_example/screens/cse/cse_screen.dart';
 import 'package:adyen_checkout_example/screens/drop_in/drop_in_screen.dart';
 import 'package:flutter/foundation.dart';
@@ -93,7 +94,8 @@ void main() {
           repository: adyenInstantComponentRepository),
       '/multiComponentNavigationScreen': (context) =>
           const MultiComponentNavigationScreen(),
-      '/multiComponentSessionScreen': (context) => MultiComponentAdvancedScreen(
+      '/multiComponentSessionScreen': (context) =>
+          MultiComponentSessionScreen(
             cardRepository: adyenCardComponentRepository,
             googlePayRepository: adyenGooglePayComponentRepository,
             applePayRepository: adyenApplePayComponentRepository,
