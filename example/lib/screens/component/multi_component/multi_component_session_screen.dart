@@ -57,22 +57,26 @@ class MultiComponentSessionScreen extends StatelessWidget {
           BuildContext context,
           AsyncSnapshot<SessionCheckout> snapshot,
         ) {
-          SessionCheckout sessionCheckout = snapshot.data!;
-          final paymentMethod =
-              _extractSchemePaymentMethod(sessionCheckout.paymentMethods);
+          if (snapshot.data != null) {
+            SessionCheckout sessionCheckout = snapshot.data!;
+            final paymentMethod =
+                _extractSchemePaymentMethod(sessionCheckout.paymentMethods);
 
-          return Padding(
-            padding: const EdgeInsets.fromLTRB(4, 0, 4, 0),
-            child: AdyenCardComponent(
-              configuration: cardComponentConfiguration,
-              paymentMethod: paymentMethod,
-              checkout: sessionCheckout,
-              onPaymentResult: (paymentResult) async {
-                Navigator.pop(context);
-                DialogBuilder.showPaymentResultDialog(paymentResult, context);
-              },
-            ),
-          );
+            return Padding(
+              padding: const EdgeInsets.fromLTRB(4, 0, 4, 0),
+              child: AdyenCardComponent(
+                configuration: cardComponentConfiguration,
+                paymentMethod: paymentMethod,
+                checkout: sessionCheckout,
+                onPaymentResult: (paymentResult) async {
+                  Navigator.pop(context);
+                  DialogBuilder.showPaymentResultDialog(paymentResult, context);
+                },
+              ),
+            );
+          } else {
+            return const SizedBox.shrink();
+          }
         });
   }
 
@@ -118,25 +122,20 @@ class MultiComponentSessionScreen extends StatelessWidget {
           final SessionCheckout sessionCheckout = snapshot.data!;
           final paymentMethod =
               _extractGooglePayPaymentMethod(sessionCheckout.paymentMethods);
-          return Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Text(
-                style: TextStyle(fontSize: 20),
-                "Session flow",
-              ),
-              const SizedBox(height: 8),
-              AdyenGooglePayComponent(
-                configuration: googlePayComponentConfiguration,
-                paymentMethod: paymentMethod,
-                checkout: sessionCheckout,
-                loadingIndicator: const CircularProgressIndicator(),
-                onPaymentResult: (paymentResult) {
-                  Navigator.pop(context);
-                  DialogBuilder.showPaymentResultDialog(paymentResult, context);
-                },
-              ),
-            ],
+          return Padding(
+            padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
+            child: AdyenGooglePayComponent(
+              configuration: googlePayComponentConfiguration,
+              paymentMethod: paymentMethod,
+              checkout: sessionCheckout,
+              loadingIndicator: const CircularProgressIndicator(),
+              width: double.infinity,
+              style: GooglePayButtonStyle(cornerRadius: 4),
+              onPaymentResult: (paymentResult) {
+                Navigator.pop(context);
+                DialogBuilder.showPaymentResultDialog(paymentResult, context);
+              },
+            ),
           );
         } else {
           return const SizedBox.shrink();
@@ -163,27 +162,20 @@ class MultiComponentSessionScreen extends StatelessWidget {
           final paymentMethod =
               _extractApplePayPaymentMethod(sessionCheckout.paymentMethods);
 
-          return Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Text(
-                style: TextStyle(fontSize: 20),
-                "Session flow",
-              ),
-              const SizedBox(height: 8),
-              AdyenApplePayComponent(
-                configuration: applePayComponentConfiguration,
-                paymentMethod: paymentMethod,
-                checkout: sessionCheckout,
-                loadingIndicator: const CircularProgressIndicator(),
-                width: 200,
-                height: 48,
-                onPaymentResult: (paymentResult) {
-                  Navigator.pop(context);
-                  DialogBuilder.showPaymentResultDialog(paymentResult, context);
-                },
-              ),
-            ],
+          return Padding(
+            padding: const EdgeInsets.fromLTRB(12, 0, 12, 0),
+            child: AdyenApplePayComponent(
+              configuration: applePayComponentConfiguration,
+              paymentMethod: paymentMethod,
+              checkout: sessionCheckout,
+              loadingIndicator: const CircularProgressIndicator(),
+              width: double.infinity,
+              height: 48,
+              onPaymentResult: (paymentResult) {
+                Navigator.pop(context);
+                DialogBuilder.showPaymentResultDialog(paymentResult, context);
+              },
+            ),
           );
         } else {
           return const SizedBox.shrink();
