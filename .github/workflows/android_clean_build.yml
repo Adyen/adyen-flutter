@@ -51,9 +51,9 @@ jobs:
           sed -i 's/flutter.compileSdkVersion/34/g' android/app/build.gradle
           sed -i 's/flutter.minSdkVersion/21/g' android/app/build.gradle
           
-          echo ls
+          ls
           
-          dart pub add 'adyen_checkout:{"path":"/"}'
+          dart pub add 'adyen_checkout:{"path":"/adyen-flutter"}'
           flutter build apk --debug          
 
       - name: Gradle cache
