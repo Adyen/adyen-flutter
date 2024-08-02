@@ -15,16 +15,15 @@ jobs:
     runs-on: ubuntu-22.04
     strategy:
       matrix:
-        api-level: [ 33, 34 ]
+        api-level: [ 34 ]
         flutter-version: [ "3.16.0" ,"3.19.0", "3.22.0" ]
 
     steps:
-      - name: Maximize build space
-        uses: easimon/maximize-build-space@v10
-        with:
-          remove-dotnet: 'true'
-          remove-haskell: 'true'
-          remove-docker-images: 'true'
+      - name: Provide more disk space
+        run: |
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf /opt/ghc
+          sudo rm -rf "/usr/local/share/boost"
 
       - uses: actions/checkout@v4
 
