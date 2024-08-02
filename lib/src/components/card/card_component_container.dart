@@ -14,7 +14,6 @@ class CardComponentContainer extends StatelessWidget {
   final AsyncSnapshot snapshot;
   final Key cardWidgetKey;
   final Widget cardWidget;
-  final double marginBottom = 16;
 
   @override
   Widget build(BuildContext context) {
@@ -53,7 +52,7 @@ class CardComponentContainer extends StatelessWidget {
       case null:
         return initialViewHeight;
       case > 0:
-        return snapshot.data + marginBottom;
+        return snapshot.data;
       default:
         return initialViewHeight;
     }
