@@ -19,11 +19,14 @@ jobs:
         flutter-version: [ "3.16.0" ,"3.19.0", "3.22.0" ]
 
     steps:
-      - name: Provide more disk space
-        run: |
-          sudo rm -rf /usr/share/dotnet
-          sudo rm -rf /opt/ghc
-          sudo rm -rf "/usr/local/share/boost"
+      - name: Maximize build space
+        uses: easimon/maximize-build-space@master
+        with:
+          root-reserve-mb: 512
+          swap-size-mb: 1024
+          remove-dotnet: 'true'
+          remove-haskell: 'true'
+          remove-docker-images: 'true'
 
       - uses: actions/checkout@v4
 
