@@ -55,7 +55,11 @@ jobs:
           sed -i 's/flutter.minSdkVersion/21/g' android/app/build.gradle
           
           dart pub add 'adyen_checkout:{"path":"../"}'
-          flutter build apk --debug          
+          flutter build apk --debug  
+          
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf /opt/ghc
+          sudo rm -rf "/usr/local/share/boost"
 
       - name: Gradle cache
         uses: gradle/actions/setup-gradle@v3
