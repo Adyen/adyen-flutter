@@ -1,9 +1,11 @@
 name: Android clean build
 
 on:
+  pull_request:
+    branches: [ "main" ]
   push:
-    branches:
-      - "feature/CiBuildTest"
+    tags:
+      - '*'
 
 jobs:
   android_clean_build:
@@ -19,6 +21,8 @@ jobs:
           echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
           sudo udevadm control --reload-rules
           sudo udevadm trigger --name-match=kvm
+
+      - uses: actions/checkout@v4
 
       - name: Set up JDK
         uses: actions/setup-java@v4
@@ -47,7 +51,7 @@ jobs:
           sed -i 's/flutter.compileSdkVersion/34/g' android/app/build.gradle
           sed -i 's/flutter.minSdkVersion/21/g' android/app/build.gradle
           
-          flutter pub add adyen_checkout
+          dart pub add 'adyen_checkout:{"path":"../adyen-flutter"}'
           flutter build apk --debug          
 
       - name: Gradle cache
