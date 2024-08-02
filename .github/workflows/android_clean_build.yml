@@ -56,7 +56,7 @@ jobs:
           
           ls
           
-          dart pub add 'adyen_checkout:{"path":"/adyen-flutter"}'
+          dart pub add 'adyen_checkout:{"path":"."}'
           flutter build apk --debug          
 
       - name: Gradle cache
