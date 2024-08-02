@@ -19,13 +19,13 @@ jobs:
         flutter-version: [ "3.16.0" ,"3.19.0", "3.22.0" ]
 
     steps:
+      - uses: actions/checkout@v4
+
       - name: Enable KVM
         run: |
           echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
           sudo udevadm control --reload-rules
           sudo udevadm trigger --name-match=kvm
-
-      - uses: actions/checkout@v4
 
       - name: Set up JDK
         uses: actions/setup-java@v4
@@ -81,6 +81,7 @@ jobs:
           force-avd-creation: false
           emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: false
+          emulator-boot-timeout: 300
           script: echo "Generated AVD snapshot for caching."
 
       - name: Run connected installation test
