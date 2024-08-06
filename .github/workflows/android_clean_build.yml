@@ -1,0 +1,105 @@
+name: Android clean build
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches: [ "main" ]
+  push:
+    tags:
+      - '*'
+
+jobs:
+  android_clean_build:
+    runs-on: ubuntu-22.04
+    strategy:
+      matrix:
+        api-level: [ 34 ]
+        flutter-version: [ "3.16.0" ,"3.19.0", "3.22.0" ]
+
+    steps:
+      - name: Provide more disk space
+        run: |
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf /opt/ghc
+          sudo rm -rf "/usr/local/share/boost"
+
+      - uses: actions/checkout@v4
+
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: 17
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ matrix.flutter-version }}
+          channel: 'stable'
+          cache: true
+          cache-key: ${{ matrix.flutter-version }}
+
+      - run: |
+          flutter create --template=app --platforms=android,ios demo_project
+          cd demo_project
+          
+          #Change Kotlin version for Flutter 3.16 
+          sed -i "s/ext.kotlin_version = '1.7.10'/ext.kotlin_version = '1.8.10'/g" android/build.gradle
+          
+          #Change Kotlin version for Flutter 3.19+ 
+          sed -i 's/"org.jetbrains.kotlin.android" version "1.7.10"/"org.jetbrains.kotlin.android" version "1.8.10"/g' android/settings.gradle          
+          
+          #Change minSdk and compileSdk version
+          sed -i 's/flutter.compileSdkVersion/34/g' android/app/build.gradle
+          sed -i 's/flutter.minSdkVersion/21/g' android/app/build.gradle
+          
+          dart pub add 'adyen_checkout:{"path":"../"}'
+          flutter build apk --debug  
+
+      - name: Gradle cache
+        uses: gradle/actions/setup-gradle@v3
+        with:
+          cache-read-only: false
+
+      - name: AVD cache
+        uses: actions/cache@v4
+        id: avd-cache
+        with:
+          path: |
+            ~/.android/avd/*
+            ~/.android/adb*
+          key: avd-${{ matrix.api-level }}
+
+      - name: Create AVD and generate snapshot for caching
+        if: steps.avd-cache.outputs.cache-hit != 'true'
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: ${{ matrix.api-level }}
+          target: google_apis
+          arch: x86_64
+          force-avd-creation: false
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          disable-animations: false
+          emulator-boot-timeout: 300
+          script: echo "Generated AVD snapshot for caching."
+
+      - name: Run connected installation test
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: ${{ matrix.api-level }}
+          target: google_apis
+          arch: x86_64
+          force-avd-creation: false
+          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          disable-animations: false
+          working-directory: ./demo_project
+          script: |
+            echo "Emulator launched"
+            adb install build/app/outputs/flutter-apk/app-debug.apk
+            adb shell monkey -p com.example.demo_project  -c android.intent.category.LAUNCHER 1
+
