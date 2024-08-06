@@ -62,7 +62,7 @@ jobs:
           flutter build apk --debug  
 
       - name: Gradle cache
-        uses: gradle/actions/setup-gradle@v3
+        uses: gradle/actions/setup-gradle@v4
         with:
           cache-read-only: false
 
