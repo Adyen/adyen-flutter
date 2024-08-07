@@ -66,26 +66,32 @@ class InstantAdvancedComponentScreen extends StatelessWidget {
                   onPressed: () {
                     AdyenCheckout.advanced
                         .startInstantComponent(
-                          configuration: instantComponentConfiguration,
-                          paymentMethod: payPalPaymentMethodResponse,
-                          checkout: advancedCheckout,
-                        )
-                        .then((paymentResult) =>
-                            DialogBuilder.showPaymentResultDialog(
-                                paymentResult, context));
+                      configuration: instantComponentConfiguration,
+                      paymentMethod: payPalPaymentMethodResponse,
+                      checkout: advancedCheckout,
+                    )
+                        .then((paymentResult) {
+                      if (context.mounted) {
+                        DialogBuilder.showPaymentResultDialog(
+                            paymentResult, context);
+                      }
+                    });
                   },
                   child: const Text("Paypal")),
               TextButton(
                   onPressed: () {
                     AdyenCheckout.advanced
                         .startInstantComponent(
-                          configuration: instantComponentConfiguration,
-                          paymentMethod: klarnaPaymentMethodResponse,
-                          checkout: advancedCheckout,
-                        )
-                        .then((paymentResult) =>
-                            DialogBuilder.showPaymentResultDialog(
-                                paymentResult, context));
+                      configuration: instantComponentConfiguration,
+                      paymentMethod: klarnaPaymentMethodResponse,
+                      checkout: advancedCheckout,
+                    )
+                        .then((paymentResult) {
+                      if (context.mounted) {
+                        DialogBuilder.showPaymentResultDialog(
+                            paymentResult, context);
+                      }
+                    });
                   },
                   child: const Text("Klarna"))
             ],
