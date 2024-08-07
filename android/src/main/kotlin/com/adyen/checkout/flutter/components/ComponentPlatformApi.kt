@@ -58,8 +58,7 @@ class ComponentPlatformApi(
     }
 
     override fun updateViewHeight(viewId: Long) {
-        // Update view height from Flutter when required
-        // The initial viewport height is being calculated by the OnGlobalLayoutListener from the component view
+        cardComponentManager.resizeFlutterViewport()
     }
 
     override fun onPaymentsResult(

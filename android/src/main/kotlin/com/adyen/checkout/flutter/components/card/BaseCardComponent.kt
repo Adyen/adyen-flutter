@@ -48,6 +48,11 @@ abstract class BaseCardComponent(
         onDispose(componentId)
     }
 
+    fun resizeFlutterViewport() {
+        // Update view height from Flutter when required.
+        // The initial viewport height is being calculated by the OnGlobalLayoutListener from the component view. Therefore the method body is empty.
+    }
+
     fun addComponent(cardComponent: CardComponent) {
         dynamicComponentView.addComponent(cardComponent, activity)
     }
