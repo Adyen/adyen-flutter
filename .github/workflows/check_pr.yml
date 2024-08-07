@@ -7,13 +7,13 @@ on:
     branches: [ "main" ]
 
 env:
-  FLUTTER_VERSION: '3.22.0'
+  FLUTTER_VERSION: '3.24.0'
 
 jobs:
   #  The preparation job is required to populate the FLUTTER_VERSION value as output for the tests jobs.
   preparation:
     name: Prepare environment vars
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     outputs:
       FLUTTER_VERSION: ${{ env.FLUTTER_VERSION }}
     steps:
@@ -47,7 +47,8 @@ jobs:
 
   clean_up:
     name: Clean up
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
+    continue-on-error: true
     needs: [ sonar_cloud ]
     steps:
       - uses: actions/checkout@v4

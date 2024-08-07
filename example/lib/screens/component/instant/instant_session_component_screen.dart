@@ -61,26 +61,32 @@ class InstantSessionComponentScreen extends StatelessWidget {
                   onPressed: () {
                     AdyenCheckout.session
                         .startInstantComponent(
-                          configuration: instantComponentConfiguration,
-                          paymentMethod: payPalPaymentMethodResponse,
-                          checkout: sessionCheckout,
-                        )
-                        .then((paymentResult) =>
-                            DialogBuilder.showPaymentResultDialog(
-                                paymentResult, context));
+                      configuration: instantComponentConfiguration,
+                      paymentMethod: payPalPaymentMethodResponse,
+                      checkout: sessionCheckout,
+                    )
+                        .then((paymentResult) {
+                      if (context.mounted) {
+                        DialogBuilder.showPaymentResultDialog(
+                            paymentResult, context);
+                      }
+                    });
                   },
                   child: const Text("Paypal")),
               TextButton(
                   onPressed: () {
                     AdyenCheckout.session
                         .startInstantComponent(
-                          configuration: instantComponentConfiguration,
-                          paymentMethod: klarnaPaymentMethodResponse,
-                          checkout: sessionCheckout,
-                        )
-                        .then((paymentResult) =>
-                            DialogBuilder.showPaymentResultDialog(
-                                paymentResult, context));
+                      configuration: instantComponentConfiguration,
+                      paymentMethod: klarnaPaymentMethodResponse,
+                      checkout: sessionCheckout,
+                    )
+                        .then((paymentResult) {
+                      if (context.mounted) {
+                        DialogBuilder.showPaymentResultDialog(
+                            paymentResult, context);
+                      }
+                    });
                   },
                   child: const Text("Klarna"))
             ],
