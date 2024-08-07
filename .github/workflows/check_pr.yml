@@ -47,8 +47,8 @@ jobs:
 
   clean_up:
     name: Clean up
-    if: always()
     runs-on: ubuntu-22.04
+    continue-on-error: true
     needs: [ sonar_cloud ]
     steps:
       - uses: actions/checkout@v4
