@@ -11,7 +11,6 @@ import androidx.activity.ComponentActivity
 import androidx.lifecycle.viewModelScope
 import com.adyen.checkout.card.CardComponent
 import com.adyen.checkout.components.core.internal.Component
-import com.adyen.checkout.flutter.R
 import com.adyen.checkout.ui.core.AdyenComponentView
 import com.adyen.checkout.ui.core.internal.ui.ViewableComponent
 import com.google.android.material.button.MaterialButton

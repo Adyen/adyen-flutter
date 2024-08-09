@@ -46,8 +46,4 @@ internal class CardComponentManager(
         this.currentCardComponent = currentCardComponent
         assignCurrentComponent(currentCardComponent.cardComponent)
     }
-
-    fun resizeFlutterViewport() {
-        currentCardComponent?.resizeFlutterViewport()
-    }
 }
