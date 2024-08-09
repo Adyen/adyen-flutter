@@ -38,15 +38,20 @@ class CardSessionComponentScreen extends StatelessWidget {
               final paymentMethod =
                   _extractPaymentMethod(sessionCheckout.paymentMethods);
               return SingleChildScrollView(
-                child: AdyenCardComponent(
-                  configuration: cardComponentConfiguration,
-                  paymentMethod: paymentMethod,
-                  checkout: sessionCheckout,
-                  onPaymentResult: (paymentResult) async {
-                    Navigator.pop(context);
-                    DialogBuilder.showPaymentResultDialog(
-                        paymentResult, context);
-                  },
+                child: Column(
+                  children: [
+                    AdyenCardComponent(
+                      configuration: cardComponentConfiguration,
+                      paymentMethod: paymentMethod,
+                      checkout: sessionCheckout,
+                      onPaymentResult: (paymentResult) async {
+                        Navigator.pop(context);
+                        DialogBuilder.showPaymentResultDialog(
+                            paymentResult, context);
+                      },
+                    ),
+                    Container(height: 800, color: const Color(0xFFEDEDED)),
+                  ],
                 ),
               );
             } else {

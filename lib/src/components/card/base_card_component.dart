@@ -12,7 +12,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:stream_transform/stream_transform.dart';
 
 abstract class BaseCardComponent extends StatefulWidget {
   final CardComponentConfigurationDTO cardComponentConfiguration;
@@ -96,9 +95,7 @@ class _BaseCardComponentState extends State<BaseCardComponent> {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder(
-        stream: widget.resizeStream.stream
-            .distinct()
-            .debounce(const Duration(milliseconds: 100)),
+        stream: widget.resizeStream.stream.distinct(),
         builder: (BuildContext context, AsyncSnapshot snapshot) {
           return CardComponentContainer(
             snapshot: snapshot,
