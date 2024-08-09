@@ -18,6 +18,8 @@ You can integrate with the following:
     - Apple Pay Component: renders an Apple Pay button.
     - Instant Component: supports payment methods that do not require additional input fields, like
       PayPal, Klarna and many more.
+* **API only**: Build your own UI for the card payment form, collect the shopper's card details, and
+  then use the package to validate and encrypt the card data in your app.
 
 |                                                                iOS                                                                 |                                                              Android                                                               |
 |:----------------------------------------------------------------------------------------------------------------------------------:|:----------------------------------------------------------------------------------------------------------------------------------:|
@@ -69,6 +71,10 @@ you use, follow corresponding the integration guide in our documentation.
 
 * [Drop-in integration guide with Advanced flow](https://docs.adyen.com/online-payments/build-your-integration/advanced-flow/?platform=Flutter&integration=Drop-in)
 * [Components integration guide with Advanced flow](https://docs.adyen.com/online-payments/build-your-integration/advanced-flow/?platform=Flutter&integration=Components)
+
+### API only
+
+* [API only integration guide](https://docs.adyen.com/payment-methods/cards/custom-card-integration/?tab=flutter_5)
 
 ## Customization
 
