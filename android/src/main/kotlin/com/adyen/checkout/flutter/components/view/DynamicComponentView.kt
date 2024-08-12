@@ -5,18 +5,18 @@ import ComponentCommunicationType
 import ComponentFlutterInterface
 import android.content.Context
 import android.util.AttributeSet
+import android.view.ViewGroup
 import android.view.ViewTreeObserver
 import android.widget.FrameLayout
 import androidx.activity.ComponentActivity
-import androidx.lifecycle.viewModelScope
+import androidx.core.view.children
+import androidx.core.view.postDelayed
 import com.adyen.checkout.card.CardComponent
 import com.adyen.checkout.components.core.internal.Component
 import com.adyen.checkout.ui.core.AdyenComponentView
 import com.adyen.checkout.ui.core.internal.ui.ViewableComponent
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.textfield.TextInputLayout
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 
 class DynamicComponentView
     @JvmOverloads
@@ -26,7 +26,6 @@ class DynamicComponentView
         defStyle: Int = 0,
     ) : FrameLayout(context) {
         private val screenDensity = resources.displayMetrics.density
-        private val standardMargin = resources.getDimension(com.adyen.checkout.ui.core.R.dimen.standard_margin)
         private var activity: ComponentActivity? = null
         private var componentFlutterApi: ComponentFlutterInterface? = null
         private var componentId: String = ""
@@ -89,18 +88,16 @@ class DynamicComponentView
 
         private fun overrideSubmit(component: CardComponent) {
             val payButton = findViewById<MaterialButton>(com.adyen.checkout.ui.core.R.id.payButton)
-            val cardInputField =
-                findViewById<TextInputLayout>(com.adyen.checkout.card.R.id.textInputLayout_cardNumber)
             payButton?.setOnClickListener {
-                component.viewModelScope.launch {
-                    // Ignore layout changes while the pay button animates and renders possible input errors.
-                    ignoreLayoutChanges = true
-                    cardInputField?.isHintAnimationEnabled = false
-                    component.submit()
-                    delay(400)
+                isHintAnimationEnabledOnTextInputFields(this, false)
+                ignoreLayoutChanges = true
+                component.submit()
+                postDelayed(100) {
                     resizeFlutterViewport(calculateFlutterViewportHeight())
+                }
+                postDelayed(500) {
                     ignoreLayoutChanges = false
-                    cardInputField?.isHintAnimationEnabled = true
+                    isHintAnimationEnabledOnTextInputFields(this, true)
                 }
             }
         }
@@ -117,13 +114,25 @@ class DynamicComponentView
         }
 
         private fun resizeFlutterViewport(viewportHeight: Float) {
-            val standardMarginScreenDensity = standardMargin / screenDensity
             componentFlutterApi?.onComponentCommunication(
                 ComponentCommunicationModel(
                     type = ComponentCommunicationType.RESIZE,
                     componentId = componentId,
-                    data = (viewportHeight + standardMarginScreenDensity).toDouble()
+                    data = viewportHeight.toDouble()
                 )
             ) {}
+        }
+
+        private fun isHintAnimationEnabledOnTextInputFields(
+            viewGroup: ViewGroup,
+            enabled: Boolean
+        ) {
+            viewGroup.children.forEach { child ->
+                when (child) {
+                    is TextInputLayout -> child.isHintAnimationEnabled = enabled
+                    !is ViewGroup -> Unit
+                    else -> isHintAnimationEnabledOnTextInputFields(child, enabled) // process inner layout
+                }
+            }
         }
     }
