@@ -69,9 +69,8 @@ class BaseCardComponent: NSObject, FlutterPlatformView, UIScrollViewDelegate {
     }
 
     func attachCardView(cardView: UIView) {
-        componentWrapperView.addSubview(cardView)
+        componentWrapperView.addArrangedSubview(cardView)
         disableNativeScrollingAndBouncing(cardView: cardView)
-        adjustCardComponentLayout(cardView: cardView)
         sendHeightUpdate()
     }
 
@@ -121,15 +120,6 @@ class BaseCardComponent: NSObject, FlutterPlatformView, UIScrollViewDelegate {
         formView?.isScrollEnabled = false
         formView?.alwaysBounceVertical = false
         formView?.contentInsetAdjustmentBehavior = .never
-    }
-
-    private func adjustCardComponentLayout(cardView: UIView) {
-        cardView.translatesAutoresizingMaskIntoConstraints = false
-        let leadingConstraint = cardView.leadingAnchor.constraint(equalTo: componentWrapperView.leadingAnchor)
-        let trailingConstraint = cardView.trailingAnchor.constraint(equalTo: componentWrapperView.trailingAnchor)
-        let topConstraint = cardView.topAnchor.constraint(equalTo: componentWrapperView.topAnchor)
-        let bottomConstraint = cardView.bottomAnchor.constraint(equalTo: componentWrapperView.bottomAnchor)
-        NSLayoutConstraint.activate([leadingConstraint, trailingConstraint, topConstraint, bottomConstraint])
     }
 
     private func setupResizeViewportCallback() {
