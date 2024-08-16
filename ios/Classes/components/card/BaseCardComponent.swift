@@ -144,7 +144,7 @@ class BaseCardComponent: NSObject, FlutterPlatformView, UIScrollViewDelegate {
 
     private func sendHeightUpdate() {
         guard let viewHeight = cardComponent?.viewController.preferredContentSize.height else { return }
-        let standardMargin = 16.0
+        let standardMargin = 8.0
         let roundedViewHeight = Double(round(100 * (viewHeight + standardMargin) / 100))
         let componentCommunicationModel = ComponentCommunicationModel(
             type: ComponentCommunicationType.resize,
