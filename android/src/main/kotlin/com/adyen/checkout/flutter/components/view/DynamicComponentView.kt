@@ -131,7 +131,7 @@ class DynamicComponentView
                 when (child) {
                     is TextInputLayout -> child.isHintAnimationEnabled = enabled
                     !is ViewGroup -> Unit
-                    else -> isHintAnimationEnabledOnTextInputFields(child, enabled) // process inner layout
+                    else -> isHintAnimationEnabledOnTextInputFields(child, enabled)
                 }
             }
         }
