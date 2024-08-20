@@ -2,12 +2,9 @@ package com.adyen.checkout.flutter.components.card
 
 import ComponentFlutterInterface
 import androidx.fragment.app.FragmentActivity
-import androidx.lifecycle.lifecycleScope
 import com.adyen.checkout.action.core.internal.ActionHandlingComponent
 import com.adyen.checkout.flutter.session.SessionHolder
 import io.flutter.embedding.engine.plugins.FlutterPlugin
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 
 internal class CardComponentManager(
     private val activity: FragmentActivity,
@@ -43,14 +40,6 @@ internal class CardComponentManager(
                 sessionHolder,
             )
         )
-    }
-
-    fun updateViewHeight() {
-        activity.lifecycleScope.launch {
-            // This delay is necessary to prevent an initial UI flickering due to the delayed rendering of the scheme icons.
-            delay(300)
-            currentCardComponent?.resizeFlutterViewPort()
-        }
     }
 
     private fun setCurrentCardComponent(currentCardComponent: BaseCardComponent) {

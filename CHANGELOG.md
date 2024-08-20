@@ -1,6 +1,7 @@
 ## 1.0.2
 
 * Migrated Android example to Gradle's Plugin DSL.
+* Improved card component for large font and display sizes.
 
 ## 1.0.1
 
