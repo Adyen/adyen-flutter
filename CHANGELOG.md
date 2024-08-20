@@ -1,7 +1,8 @@
 ## 1.0.2
 
-* Migrated Android example to Gradle's Plugin DSL.
 * Improved card component for large font and display sizes.
+* Migrated Android example to use Flutter Gradle plugins through the Plugin DSL.
+* Updated iOS SDK to v5.10.0.
 
 ## 1.0.1
 
