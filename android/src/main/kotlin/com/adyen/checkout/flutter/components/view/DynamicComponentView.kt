@@ -5,12 +5,14 @@ import ComponentCommunicationType
 import ComponentFlutterInterface
 import android.content.Context
 import android.util.AttributeSet
+import android.view.View
 import android.view.ViewGroup
 import android.view.ViewTreeObserver
 import android.widget.FrameLayout
 import androidx.activity.ComponentActivity
 import androidx.core.view.children
 import androidx.core.view.postDelayed
+import androidx.recyclerview.widget.RecyclerView
 import com.adyen.checkout.card.CardComponent
 import com.adyen.checkout.components.core.internal.Component
 import com.adyen.checkout.ui.core.AdyenComponentView
@@ -26,11 +28,12 @@ class DynamicComponentView
         defStyle: Int = 0,
     ) : FrameLayout(context) {
         private val screenDensity = resources.displayMetrics.density
+        private val adyenComponentView: AdyenComponentView = AdyenComponentView(context)
         private var activity: ComponentActivity? = null
         private var componentFlutterApi: ComponentFlutterInterface? = null
         private var componentId: String = ""
-        private var adyenComponentView: AdyenComponentView = AdyenComponentView(context)
         private var ignoreLayoutChanges = false
+        private var isPaymentInProgress = false
 
         constructor(
             componentActivity: ComponentActivity,
@@ -91,13 +94,17 @@ class DynamicComponentView
             payButton?.setOnClickListener {
                 isHintAnimationEnabledOnTextInputFields(this, false)
                 ignoreLayoutChanges = true
-                component.submit()
+                if (!isPaymentInProgress) {
+                    isPaymentInProgress = true
+                    component.submit()
+                }
                 postDelayed(100) {
                     resizeFlutterViewport(calculateFlutterViewportHeight())
                 }
                 postDelayed(500) {
                     ignoreLayoutChanges = false
                     isHintAnimationEnabledOnTextInputFields(this, true)
+                    isPaymentInProgress = false
                 }
             }
         }
@@ -106,6 +113,7 @@ class DynamicComponentView
             activity = null
             componentFlutterApi = null
             ignoreLayoutChanges = false
+            isPaymentInProgress = false
         }
 
         private fun calculateFlutterViewportHeight(): Float {
