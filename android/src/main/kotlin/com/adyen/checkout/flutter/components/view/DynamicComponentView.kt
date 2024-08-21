@@ -5,14 +5,12 @@ import ComponentCommunicationType
 import ComponentFlutterInterface
 import android.content.Context
 import android.util.AttributeSet
-import android.view.View
 import android.view.ViewGroup
 import android.view.ViewTreeObserver
 import android.widget.FrameLayout
 import androidx.activity.ComponentActivity
 import androidx.core.view.children
 import androidx.core.view.postDelayed
-import androidx.recyclerview.widget.RecyclerView
 import com.adyen.checkout.card.CardComponent
 import com.adyen.checkout.components.core.internal.Component
 import com.adyen.checkout.ui.core.AdyenComponentView
