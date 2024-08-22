@@ -107,7 +107,6 @@ class DynamicComponentView
                 postDelayed(500) {
                     ignoreLayoutChanges = false
                     isHintAnimationEnabledOnTextInputFields(this, true)
-                    setPaymentInProgress(false)
                 }
             }
         }
