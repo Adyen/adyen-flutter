@@ -56,7 +56,8 @@ internal class CardSessionComponent(
                             componentFlutterApi,
                             componentId,
                             ::onAction,
-                            ::setCurrentCardComponent
+                            ::setCurrentCardComponent,
+                            ::setPaymentInProgress
                         ),
                     key = UUID.randomUUID().toString()
                 )
@@ -74,7 +75,8 @@ internal class CardSessionComponent(
                             componentFlutterApi,
                             componentId,
                             ::onAction,
-                            ::setCurrentCardComponent
+                            ::setCurrentCardComponent,
+                            ::setPaymentInProgress
                         ),
                     key = UUID.randomUUID().toString()
                 )

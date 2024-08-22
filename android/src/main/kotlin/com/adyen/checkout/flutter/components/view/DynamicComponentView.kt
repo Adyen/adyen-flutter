@@ -66,6 +66,10 @@ class DynamicComponentView
             }
         }
 
+        fun setPaymentInProgress(isLoading: Boolean) {
+            isPaymentInProgress = isLoading
+        }
+
         fun <T> addComponent(
             component: T,
             activity: ComponentActivity,
@@ -90,19 +94,20 @@ class DynamicComponentView
         private fun overrideSubmit(component: CardComponent) {
             val payButton = findViewById<MaterialButton>(com.adyen.checkout.ui.core.R.id.payButton)
             payButton?.setOnClickListener {
+                if (isPaymentInProgress) {
+                    return@setOnClickListener
+                }
+
                 isHintAnimationEnabledOnTextInputFields(this, false)
                 ignoreLayoutChanges = true
-                if (!isPaymentInProgress) {
-                    isPaymentInProgress = true
-                    component.submit()
-                }
+                component.submit()
                 postDelayed(100) {
                     resizeFlutterViewport(calculateFlutterViewportHeight())
                 }
                 postDelayed(500) {
                     ignoreLayoutChanges = false
                     isHintAnimationEnabledOnTextInputFields(this, true)
-                    isPaymentInProgress = false
+                    setPaymentInProgress(false)
                 }
             }
         }
@@ -111,7 +116,7 @@ class DynamicComponentView
             activity = null
             componentFlutterApi = null
             ignoreLayoutChanges = false
-            isPaymentInProgress = false
+            setPaymentInProgress(false)
         }
 
         private fun calculateFlutterViewportHeight(): Float {
