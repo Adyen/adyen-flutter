@@ -25,6 +25,8 @@ import com.adyen.checkout.flutter.components.instant.InstantComponentManager
 import com.adyen.checkout.flutter.components.view.ComponentLoadingBottomSheet
 import com.adyen.checkout.flutter.session.SessionHolder
 import com.adyen.checkout.flutter.utils.Constants
+import com.adyen.checkout.flutter.utils.Constants.Companion.CARD_SESSION_COMPONENT_KEY
+import com.adyen.checkout.flutter.utils.Constants.Companion.CARD_ADVANCED_COMPONENT_KEY
 import com.adyen.checkout.redirect.RedirectComponent
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import org.json.JSONObject
@@ -152,6 +154,7 @@ class ComponentPlatformApi(
         resultCode: String?,
         componentId: String
     ) {
+        resetPaymentInProgress(componentId)
         val model =
             ComponentCommunicationModel(
                 ComponentCommunicationType.RESULT,
@@ -177,6 +180,7 @@ class ComponentPlatformApi(
         error: ErrorDTO?,
         componentId: String
     ) {
+        resetPaymentInProgress(componentId)
         val model =
             ComponentCommunicationModel(
                 ComponentCommunicationType.RESULT,
@@ -209,6 +213,13 @@ class ComponentPlatformApi(
                 .startsWith(RedirectComponent.REDIRECT_RESULT_SCHEME)
         ) {
             currentComponent?.handleIntent(intent)
+        }
+    }
+
+    // Reset isPaymentInProgress to false again. We can remove this when the pay button handles the pressed state itself.
+    private fun resetPaymentInProgress(componentId: String) {
+        when (componentId) {
+            CARD_ADVANCED_COMPONENT_KEY, CARD_SESSION_COMPONENT_KEY -> cardComponentManager.setPaymentInProgress(false)
         }
     }
 }

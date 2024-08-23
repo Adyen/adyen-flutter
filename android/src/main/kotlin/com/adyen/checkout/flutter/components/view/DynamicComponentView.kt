@@ -29,7 +29,6 @@ class DynamicComponentView
         private var activity: ComponentActivity? = null
         private var componentFlutterApi: ComponentFlutterInterface? = null
         private var componentId: String = ""
-        private var adyenComponentView: AdyenComponentView = AdyenComponentView(context)
         private var ignoreLayoutChanges = false
 
         constructor(
@@ -69,21 +68,36 @@ class DynamicComponentView
             component: T,
             activity: ComponentActivity,
         ) where T : Component, T : ViewableComponent {
-            adyenComponentView.getViewTreeObserver()
-                ?.addOnGlobalLayoutListener(
-                    object : ViewTreeObserver.OnGlobalLayoutListener {
-                        override fun onGlobalLayout() {
-                            if (component is CardComponent) {
-                                overrideSubmit(component)
-                            }
+            val adyenComponentView =
+                AdyenComponentView(context).apply {
+                    onComponentViewGlobalLayout(this, component)
+                    attach(component, activity)
+                }
 
-                            adyenComponentView.getViewTreeObserver()?.removeOnGlobalLayoutListener(this)
-                        }
-                    }
-                )
-
-            adyenComponentView.attach(component, activity)
             addView(adyenComponentView)
+        }
+
+        fun onDispose() {
+            activity = null
+            componentFlutterApi = null
+            ignoreLayoutChanges = false
+        }
+
+        private fun <T> onComponentViewGlobalLayout(
+            adyenComponentView: AdyenComponentView,
+            component: T
+        ) where T : Component, T : ViewableComponent {
+            adyenComponentView.getViewTreeObserver()?.addOnGlobalLayoutListener(
+                object : ViewTreeObserver.OnGlobalLayoutListener {
+                    override fun onGlobalLayout() {
+                        if (component is CardComponent) {
+                            overrideSubmit(component)
+                        }
+
+                        adyenComponentView.getViewTreeObserver()?.removeOnGlobalLayoutListener(this)
+                    }
+                }
+            )
         }
 
         private fun overrideSubmit(component: CardComponent) {
@@ -100,12 +114,6 @@ class DynamicComponentView
                     isHintAnimationEnabledOnTextInputFields(this, true)
                 }
             }
-        }
-
-        fun onDispose() {
-            activity = null
-            componentFlutterApi = null
-            ignoreLayoutChanges = false
         }
 
         private fun calculateFlutterViewportHeight(): Float {

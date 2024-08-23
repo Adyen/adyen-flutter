@@ -35,7 +35,13 @@ internal class CardAdvancedComponent(
                     activity = activity,
                     storedPaymentMethod = storedPaymentMethod,
                     configuration = cardConfiguration,
-                    callback = CardAdvancedCallback(componentFlutterApi, componentId, ::setCurrentCardComponent),
+                    callback =
+                        CardAdvancedCallback(
+                            componentFlutterApi,
+                            componentId,
+                            ::setCurrentCardComponent,
+                            ::setPaymentInProgress
+                        ),
                     key = UUID.randomUUID().toString()
                 )
             }
@@ -46,7 +52,13 @@ internal class CardAdvancedComponent(
                     activity = activity,
                     paymentMethod = paymentMethod,
                     configuration = cardConfiguration,
-                    callback = CardAdvancedCallback(componentFlutterApi, componentId, ::setCurrentCardComponent),
+                    callback =
+                        CardAdvancedCallback(
+                            componentFlutterApi,
+                            componentId,
+                            ::setCurrentCardComponent,
+                            ::setPaymentInProgress
+                        ),
                     key = UUID.randomUUID().toString()
                 )
             }
