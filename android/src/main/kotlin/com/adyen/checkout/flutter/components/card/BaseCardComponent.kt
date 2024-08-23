@@ -54,7 +54,7 @@ abstract class BaseCardComponent(
 
     fun setCurrentCardComponent() = setCurrentCardComponent(this)
 
-    fun setPaymentInProgress(isLoading: Boolean) = dynamicComponentView.setPaymentInProgress(isLoading)
+    fun setPaymentInProgress(isLoading: Boolean) = cardComponent?.setInteractionBlocked(isLoading)
 
     companion object {
         const val CARD_COMPONENT_CONFIGURATION_KEY = "cardComponentConfiguration"

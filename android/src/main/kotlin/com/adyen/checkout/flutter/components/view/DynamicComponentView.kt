@@ -30,7 +30,6 @@ class DynamicComponentView
         private var componentFlutterApi: ComponentFlutterInterface? = null
         private var componentId: String = ""
         private var ignoreLayoutChanges = false
-        private var isPaymentInProgress = false
 
         constructor(
             componentActivity: ComponentActivity,
@@ -65,10 +64,6 @@ class DynamicComponentView
             }
         }
 
-        fun setPaymentInProgress(isLoading: Boolean) {
-            isPaymentInProgress = isLoading
-        }
-
         fun <T> addComponent(
             component: T,
             activity: ComponentActivity,
@@ -86,7 +81,6 @@ class DynamicComponentView
             activity = null
             componentFlutterApi = null
             ignoreLayoutChanges = false
-            setPaymentInProgress(false)
         }
 
         private fun <T> onComponentViewGlobalLayout(
@@ -109,10 +103,6 @@ class DynamicComponentView
         private fun overrideSubmit(component: CardComponent) {
             val payButton = findViewById<MaterialButton>(com.adyen.checkout.ui.core.R.id.payButton)
             payButton?.setOnClickListener {
-                if (isPaymentInProgress) {
-                    return@setOnClickListener
-                }
-
                 isHintAnimationEnabledOnTextInputFields(this, false)
                 ignoreLayoutChanges = true
                 component.submit()
