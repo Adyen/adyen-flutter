@@ -195,7 +195,7 @@ class ComponentPlatformApi(
         hideLoadingBottomSheet()
     }
 
-    private fun hideLoadingBottomSheet() = ComponentLoadingBottomSheet.hide(activity.supportFragmentManager)
+    private fun hideLoadingBottomSheet() = ComponentLoadingBottomSheet.hide(activity)
 
     private fun assignCurrentComponent(currentComponent: ActionHandlingComponent?) {
         this.currentComponent = currentComponent

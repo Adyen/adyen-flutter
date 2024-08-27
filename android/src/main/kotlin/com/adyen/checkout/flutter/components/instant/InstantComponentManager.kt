@@ -61,7 +61,7 @@ class InstantComponentManager(
             this.instantPaymentComponent = instantPaymentComponent
             this.componentId = componentId
             assignCurrentComponent(instantPaymentComponent)
-            ComponentLoadingBottomSheet.show(activity.supportFragmentManager, instantPaymentComponent)
+            ComponentLoadingBottomSheet.show(activity, instantPaymentComponent)
         } catch (exception: Exception) {
             val model =
                 ComponentCommunicationModel(
@@ -134,5 +134,5 @@ class InstantComponentManager(
 
     private fun handleAction(action: Action) = instantPaymentComponent?.handleAction(action, activity)
 
-    private fun hideLoadingBottomSheet() = ComponentLoadingBottomSheet.hide(activity.supportFragmentManager)
+    private fun hideLoadingBottomSheet() = ComponentLoadingBottomSheet.hide(activity)
 }

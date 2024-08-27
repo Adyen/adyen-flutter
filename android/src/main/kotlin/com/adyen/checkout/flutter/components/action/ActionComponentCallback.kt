@@ -16,7 +16,7 @@ internal class ActionComponentCallback(
     private val componentId: String
 ) : ActionComponentCallback {
     override fun onAdditionalDetails(actionComponentData: ActionComponentData) {
-        ComponentLoadingBottomSheet.hide(activity.supportFragmentManager)
+        ComponentLoadingBottomSheet.hide(activity)
         val data = ActionComponentData.SERIALIZER.serialize(actionComponentData).toString()
         val model =
             ComponentCommunicationModel(
@@ -28,7 +28,7 @@ internal class ActionComponentCallback(
     }
 
     override fun onError(componentError: ComponentError) {
-        ComponentLoadingBottomSheet.hide(activity.supportFragmentManager)
+        ComponentLoadingBottomSheet.hide(activity)
         val type: PaymentResultEnum =
             when (componentError.exception) {
                 is com.adyen.checkout.core.exception.CancellationException -> PaymentResultEnum.CANCELLEDBYUSER

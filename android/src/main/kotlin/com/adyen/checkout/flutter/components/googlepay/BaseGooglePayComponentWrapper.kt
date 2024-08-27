@@ -38,7 +38,7 @@ abstract class BaseGooglePayComponentWrapper(
         componentFlutterInterface.onComponentCommunication(model) {}
     }
 
-    fun hideLoadingBottomSheet() = ComponentLoadingBottomSheet.hide(activity.supportFragmentManager)
+    fun hideLoadingBottomSheet() = ComponentLoadingBottomSheet.hide(activity)
 
     fun dispose(componentId: String) {
         if (componentId == this.componentId) {

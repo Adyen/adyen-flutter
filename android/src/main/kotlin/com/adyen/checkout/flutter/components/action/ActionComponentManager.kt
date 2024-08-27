@@ -35,7 +35,7 @@ internal class ActionComponentManager(
             val action = Action.SERIALIZER.deserialize(JSONObject(actionResponse))
             if (actionComponent.canHandleAction(action)) {
                 assignCurrentComponent(actionComponent)
-                ComponentLoadingBottomSheet.show(activity.supportFragmentManager, actionComponent)
+                ComponentLoadingBottomSheet.show(activity, actionComponent)
                 actionComponent.handleAction(action, activity)
             } else {
                 sendErrorToFlutterLayer(componentId, "Action component cannot handle action response.")

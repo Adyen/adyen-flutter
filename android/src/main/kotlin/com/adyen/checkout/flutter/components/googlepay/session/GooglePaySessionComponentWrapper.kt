@@ -40,7 +40,7 @@ class GooglePaySessionComponentWrapper(
     private fun handleAction(action: Action) {
         googlePayComponent?.let {
             it.handleAction(action, activity)
-            ComponentLoadingBottomSheet.show(activity.supportFragmentManager, it)
+            ComponentLoadingBottomSheet.show(activity, it)
         }
     }
 }
