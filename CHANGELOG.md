@@ -2,6 +2,7 @@
 
 * Improved card component for large font and display sizes.
 * Migrated Android example to use Flutter Gradle plugins through the Plugin DSL.
+* Improved component bottom sheet behavior on Android.
 * Updated iOS SDK to v5.10.0.
 
 ## 1.0.1
