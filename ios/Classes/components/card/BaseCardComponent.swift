@@ -78,13 +78,7 @@ class BaseCardComponent: NSObject, FlutterPlatformView, UIScrollViewDelegate {
         let activityIndicatorView = UIActivityIndicatorView(style: .whiteLarge)
         activityIndicatorView.color = .gray
         activityIndicatorView.startAnimating()
-        componentWrapperView.addSubview(activityIndicatorView)
-        activityIndicatorView.translatesAutoresizingMaskIntoConstraints = false
-        let leadingConstraint = activityIndicatorView.leadingAnchor.constraint(equalTo: componentWrapperView.leadingAnchor)
-        let trailingConstraint = activityIndicatorView.trailingAnchor.constraint(equalTo: componentWrapperView.trailingAnchor)
-        let topConstraint = activityIndicatorView.topAnchor.constraint(equalTo: componentWrapperView.topAnchor)
-        let bottomConstraint = activityIndicatorView.bottomAnchor.constraint(equalTo: componentWrapperView.bottomAnchor)
-        NSLayoutConstraint.activate([leadingConstraint, trailingConstraint, topConstraint, bottomConstraint])
+        componentWrapperView.addArrangedSubview(activityIndicatorView)
     }
 
     func sendErrorToFlutterLayer(errorMessage: String) {
@@ -134,7 +128,7 @@ class BaseCardComponent: NSObject, FlutterPlatformView, UIScrollViewDelegate {
 
     private func sendHeightUpdate() {
         guard let viewHeight = cardComponent?.viewController.preferredContentSize.height else { return }
-        let additionalViewportSpace = 8.0
+        let additionalViewportSpace = determineAdditionalViewportSpace()
         let roundedViewHeight = Double(round(100 * (viewHeight + additionalViewportSpace) / 100))
         let componentCommunicationModel = ComponentCommunicationModel(
             type: ComponentCommunicationType.resize,
@@ -145,5 +139,13 @@ class BaseCardComponent: NSObject, FlutterPlatformView, UIScrollViewDelegate {
             componentCommunicationModel: componentCommunicationModel,
             completion: { _ in }
         )
+    }
+    
+    private func determineAdditionalViewportSpace () -> CGFloat {
+        if (isStoredPaymentMethod) {
+            return 256.0
+        } else {
+            return 8.0
+        }
     }
 }
