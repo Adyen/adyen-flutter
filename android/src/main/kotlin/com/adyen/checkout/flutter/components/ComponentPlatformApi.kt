@@ -122,6 +122,7 @@ class ComponentPlatformApi(
         currentComponent = null
         googlePayComponentManager.onDispose(componentId)
         instantComponentManager.onDispose(componentId)
+        actionComponentManager.onDispose(componentId)
     }
 
     fun handleActivityResult(

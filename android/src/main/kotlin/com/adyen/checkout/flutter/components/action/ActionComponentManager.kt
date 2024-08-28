@@ -19,6 +19,9 @@ internal class ActionComponentManager(
     private val componentFlutterApi: ComponentFlutterInterface,
     private val assignCurrentComponent: (ActionHandlingComponent?) -> Unit,
 ) {
+    private var componentId: String? = null
+    private var actionComponent: GenericActionComponent? = null
+
     fun handleAction(
         actionComponentConfigurationDTO: ActionComponentConfigurationDTO,
         componentId: String,
@@ -34,6 +37,7 @@ internal class ActionComponentManager(
             val actionComponent = createActionComponent(checkoutConfiguration, componentId)
             val action = Action.SERIALIZER.deserialize(JSONObject(actionResponse))
             if (actionComponent.canHandleAction(action)) {
+                this.componentId = componentId
                 assignCurrentComponent(actionComponent)
                 ComponentLoadingBottomSheet.show(activity.supportFragmentManager, actionComponent)
                 actionComponent.handleAction(action, activity)
@@ -42,6 +46,13 @@ internal class ActionComponentManager(
             }
         } catch (exception: Exception) {
             sendErrorToFlutterLayer(componentId, exception.message ?: "Action handling failed.")
+        }
+    }
+
+    fun onDispose(componentId: String) {
+        if (componentId == this.componentId) {
+            actionComponent = null
+            this.componentId = null
         }
     }
 
