@@ -5,7 +5,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.FragmentManager
-import com.adyen.checkout.action.core.GenericActionComponent
 import com.adyen.checkout.components.core.internal.Component
 import com.adyen.checkout.flutter.R
 import com.adyen.checkout.ui.core.AdyenComponentView
@@ -24,7 +23,7 @@ internal class ComponentLoadingBottomSheet<T> : BottomSheetDialogFragment() wher
         view: View,
         savedInstanceState: Bundle?
     ) {
-        //We need to cast the component because it has two types T (ViewableComponent and Component)
+        // We need to cast the component because it has two types T (ViewableComponent and Component)
         (component as? T)?.let {
             view.findViewById<AdyenComponentView>(R.id.adyen_component_view)?.attach(it, viewLifecycleOwner)
             isCancelable = false
