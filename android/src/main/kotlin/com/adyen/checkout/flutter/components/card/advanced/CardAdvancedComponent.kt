@@ -40,7 +40,6 @@ internal class CardAdvancedComponent(
                             componentFlutterApi,
                             componentId,
                             ::setCurrentCardComponent,
-                            ::setPaymentInProgress
                         ),
                     key = UUID.randomUUID().toString()
                 )
@@ -57,7 +56,6 @@ internal class CardAdvancedComponent(
                             componentFlutterApi,
                             componentId,
                             ::setCurrentCardComponent,
-                            ::setPaymentInProgress
                         ),
                     key = UUID.randomUUID().toString()
                 )

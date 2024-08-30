@@ -10,15 +10,9 @@ internal class CardSessionCallback(
     private val componentId: String,
     private val onActionCallback: (Action) -> Unit,
     private val assignCurrentComponent: () -> Unit,
-    private val setPaymentInProgress: (Boolean) -> Unit,
 ) : ComponentSessionCallback<CardComponentState>(componentFlutterApi, componentId, onActionCallback) {
     override fun onSubmit(state: CardComponentState): Boolean {
         assignCurrentComponent()
         return super.onSubmit(state)
-    }
-
-    override fun onLoading(isLoading: Boolean) {
-        setPaymentInProgress.invoke(isLoading)
-        super.onLoading(isLoading)
     }
 }
