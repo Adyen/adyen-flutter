@@ -42,8 +42,6 @@ internal class CardComponentManager(
         )
     }
 
-    fun setPaymentInProgress(isLoading: Boolean) = currentCardComponent?.setPaymentInProgress(isLoading)
-
     private fun setCurrentCardComponent(currentCardComponent: BaseCardComponent) {
         this.currentCardComponent = currentCardComponent
         assignCurrentComponent(currentCardComponent.cardComponent)

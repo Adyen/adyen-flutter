@@ -30,6 +30,7 @@ class DynamicComponentView
         private var componentFlutterApi: ComponentFlutterInterface? = null
         private var componentId: String = ""
         private var ignoreLayoutChanges = false
+        private var interactionBlocked = false
 
         constructor(
             componentActivity: ComponentActivity,
@@ -81,6 +82,7 @@ class DynamicComponentView
             activity = null
             componentFlutterApi = null
             ignoreLayoutChanges = false
+            interactionBlocked = false
         }
 
         private fun <T> onComponentViewGlobalLayout(
@@ -105,7 +107,11 @@ class DynamicComponentView
             payButton?.setOnClickListener {
                 isHintAnimationEnabledOnTextInputFields(this, false)
                 ignoreLayoutChanges = true
-                component.submit()
+                if (!interactionBlocked) {
+                    interactionBlocked = true
+                    component.submit()
+                }
+                resetInteractionBlocked()
                 postDelayed(100) {
                     resizeFlutterViewport(calculateFlutterViewportHeight())
                 }
@@ -141,6 +147,13 @@ class DynamicComponentView
                     !is ViewGroup -> Unit
                     else -> isHintAnimationEnabledOnTextInputFields(child, enabled)
                 }
+            }
+        }
+
+        // TODO - We can use cardComponent.setInteractionBlocked() when the fix for releasing the blocked interaction is available in then native SDK
+        private fun resetInteractionBlocked() {
+            postDelayed(1000) {
+                interactionBlocked = false
             }
         }
     }

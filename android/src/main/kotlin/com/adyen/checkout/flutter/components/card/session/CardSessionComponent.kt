@@ -57,7 +57,6 @@ internal class CardSessionComponent(
                             componentId,
                             ::onAction,
                             ::setCurrentCardComponent,
-                            ::setPaymentInProgress
                         ),
                     key = UUID.randomUUID().toString()
                 )
@@ -76,7 +75,6 @@ internal class CardSessionComponent(
                             componentId,
                             ::onAction,
                             ::setCurrentCardComponent,
-                            ::setPaymentInProgress
                         ),
                     key = UUID.randomUUID().toString()
                 )
