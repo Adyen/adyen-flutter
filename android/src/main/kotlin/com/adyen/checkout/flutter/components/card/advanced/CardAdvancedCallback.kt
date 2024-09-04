@@ -14,8 +14,4 @@ internal class CardAdvancedCallback(
         assignCurrentComponent.invoke()
         super.onSubmit(state)
     }
-
-    override fun onError(componentError: ComponentError) {
-        super.onError(componentError)
-    }
 }
