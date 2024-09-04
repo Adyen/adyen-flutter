@@ -38,6 +38,7 @@ import com.adyen.checkout.cse.EncryptedCard
 import com.adyen.checkout.cse.UnencryptedCard
 import com.adyen.checkout.dropin.DropInConfiguration
 import com.adyen.checkout.googlepay.BillingAddressParameters
+import com.adyen.checkout.googlepay.GooglePayComponent
 import com.adyen.checkout.googlepay.GooglePayConfiguration
 import com.adyen.checkout.googlepay.MerchantInfo
 import com.adyen.checkout.googlepay.ShippingAddressParameters
@@ -89,7 +90,7 @@ object ConfigurationMapper {
 
         if (googlePayConfigurationDTO != null) {
             val googlePayConfiguration =
-                buildGooglePayConfiguration(context, shopperLocale, environment, googlePayConfigurationDTO)
+                buildGooglePayConfiguration(clientKey, shopperLocale, environment, googlePayConfigurationDTO)
             dropInConfiguration.addGooglePayConfiguration(googlePayConfiguration)
         }
 
@@ -160,8 +161,8 @@ object ConfigurationMapper {
         return AnalyticsConfiguration(analyticsLevel)
     }
 
-    private fun DropInConfigurationDTO.buildGooglePayConfiguration(
-        context: Context,
+    private fun buildGooglePayConfiguration(
+        clientKey: String,
         shopperLocale: String?,
         environment: com.adyen.checkout.core.Environment,
         googlePayConfigurationDTO: GooglePayConfigurationDTO
@@ -171,7 +172,7 @@ object ConfigurationMapper {
                 val locale = Locale.forLanguageTag(shopperLocale)
                 GooglePayConfiguration.Builder(locale, environment, clientKey)
             } else {
-                GooglePayConfiguration.Builder(context, environment, clientKey)
+                GooglePayConfiguration.Builder(environment, clientKey)
             }
 
         return googlePayConfigurationDTO.mapToGooglePayConfiguration(googlePayConfigurationBuilder)
@@ -388,6 +389,23 @@ object ConfigurationMapper {
         }
         cvc?.let { unencryptedCardBuilder.setCvc(it) }
         return unencryptedCardBuilder.build()
+    }
+
+    fun InstantPaymentConfigurationDTO.mapToGooglePayConfiguration(): CheckoutConfiguration {
+        val checkoutConfiguration = mapToCheckoutConfiguration()
+        googlePayConfigurationDTO?.let {
+            val googlePayConfiguration =
+                buildGooglePayConfiguration(
+                    clientKey,
+                    shopperLocale,
+                    environment.mapToEnvironment(),
+                    googlePayConfigurationDTO
+                )
+            GooglePayComponent.PAYMENT_METHOD_TYPES.forEach { key ->
+                checkoutConfiguration.addConfiguration(key, googlePayConfiguration)
+            }
+        }
+        return checkoutConfiguration
     }
 
     fun InstantPaymentConfigurationDTO.mapToCheckoutConfiguration(): CheckoutConfiguration =

@@ -76,7 +76,8 @@ class GooglePayComponentManager(
                 )
             )
         }
-        val checkoutConfiguration = instantPaymentComponentConfigurationDTO.mapToCheckoutConfiguration()
+
+        val checkoutConfiguration = instantPaymentComponentConfigurationDTO.mapToGooglePayConfiguration()
         this.componentId = componentId
         this.checkoutConfiguration = checkoutConfiguration
         this.setupCallback = googlePaySetupCallback
