@@ -1,4 +1,4 @@
-package com.adyen.checkout.flutter.components.googlepay.advanced
+package com.adyen.checkout.flutter.components.googlepay
 
 import ComponentCommunicationModel
 import ComponentFlutterInterface
@@ -12,11 +12,11 @@ import org.json.JSONObject
 class GooglePayAdvancedCallback(
     private val componentFlutterApi: ComponentFlutterInterface,
     private val componentId: String,
-    private val onLoadingCallback: () -> Unit,
+    private val onLoadingCallback: (String) -> Unit,
     private val hideLoadingBottomSheet: () -> Unit,
 ) : ComponentAdvancedCallback<GooglePayComponentState>(componentFlutterApi, componentId) {
     override fun onSubmit(state: GooglePayComponentState) {
-        onLoadingCallback()
+        onLoadingCallback(componentId)
         val data = PaymentComponentData.SERIALIZER.serialize(state.data)
         val extra = state.paymentData?.toJson()
         val submitData =

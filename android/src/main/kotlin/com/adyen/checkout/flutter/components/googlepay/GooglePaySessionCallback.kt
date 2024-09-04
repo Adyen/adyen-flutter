@@ -1,4 +1,4 @@
-package com.adyen.checkout.flutter.components.googlepay.session
+package com.adyen.checkout.flutter.components.googlepay
 
 import ComponentFlutterInterface
 import com.adyen.checkout.components.core.ComponentError
@@ -10,12 +10,12 @@ import com.adyen.checkout.sessions.core.SessionPaymentResult
 class GooglePaySessionCallback(
     private val componentFlutterApi: ComponentFlutterInterface,
     private val componentId: String,
-    private val onLoadingCallback: () -> Unit,
+    private val onLoadingCallback: (String) -> Unit,
     private val onActionCallback: (Action) -> Unit,
     private val hideLoadingBottomSheet: () -> Unit,
 ) : ComponentSessionCallback<GooglePayComponentState>(componentFlutterApi, componentId, onActionCallback) {
     override fun onLoading(isLoading: Boolean) {
-        onLoadingCallback()
+        onLoadingCallback(componentId)
     }
 
     override fun onError(componentError: ComponentError) {
