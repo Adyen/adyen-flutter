@@ -222,6 +222,7 @@ struct DropInConfigurationDTO {
     var skipListWhenSinglePaymentMethod: Bool
     var isRemoveStoredPaymentMethodEnabled: Bool
     var preselectedPaymentMethodTitle: String?
+    var paymentMethodNames: [String?: String?]?
 
     static func fromList(_ list: [Any?]) -> DropInConfigurationDTO? {
         let environment = Environment(rawValue: list[0] as! Int)!
@@ -253,6 +254,7 @@ struct DropInConfigurationDTO {
         let skipListWhenSinglePaymentMethod = list[11] as! Bool
         let isRemoveStoredPaymentMethodEnabled = list[12] as! Bool
         let preselectedPaymentMethodTitle: String? = nilOrValue(list[13])
+        let paymentMethodNames: [String?: String?]? = nilOrValue(list[14])
 
         return DropInConfigurationDTO(
             environment: environment,
@@ -268,7 +270,8 @@ struct DropInConfigurationDTO {
             showPreselectedStoredPaymentMethod: showPreselectedStoredPaymentMethod,
             skipListWhenSinglePaymentMethod: skipListWhenSinglePaymentMethod,
             isRemoveStoredPaymentMethodEnabled: isRemoveStoredPaymentMethodEnabled,
-            preselectedPaymentMethodTitle: preselectedPaymentMethodTitle
+            preselectedPaymentMethodTitle: preselectedPaymentMethodTitle,
+            paymentMethodNames: paymentMethodNames
         )
     }
 
@@ -287,7 +290,8 @@ struct DropInConfigurationDTO {
             showPreselectedStoredPaymentMethod,
             skipListWhenSinglePaymentMethod,
             isRemoveStoredPaymentMethodEnabled,
-            preselectedPaymentMethodTitle
+            preselectedPaymentMethodTitle,
+            paymentMethodNames
         ]
     }
 }
