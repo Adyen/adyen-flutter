@@ -5,6 +5,8 @@ on:
   pull_request:
     branches: [ "main" ]
   push:
+    branches:
+      - addCleaniOSBuild
     tags:
       - '*'
 
@@ -31,11 +33,9 @@ jobs:
           cache: true
           cache-key: ${{ matrix.flutter-version }}
 
-      - run: flutter doctor -v
-
       - name: Pod install
         run: pod install
 
       - run: xcrun simctl list
       - run: open -a Simulator && xcrun simctl boot 'iPhone SE (3rd generation)'
-      - run: flutter doctor -v
+      - run: flutter devices
