@@ -37,4 +37,5 @@ jobs:
         run: pod install
 
       - run: xcrun simctl list
-      - run: open -a Simulator && xcrun simctl boot 'iPhone 8 Plus'
+      - run: open -a Simulator && xcrun simctl boot 'iPhone SE (3rd generation)'
+      - run: flutter doctor -v
