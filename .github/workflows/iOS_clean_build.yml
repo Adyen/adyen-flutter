@@ -33,6 +33,8 @@ jobs:
           cache: true
           cache-key: ${{ matrix.flutter-version }}
 
+      - run: flutter pub get
+
       - name: Pod install
         run: pod install
 
