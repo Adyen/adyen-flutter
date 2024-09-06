@@ -14,7 +14,7 @@ jobs:
   iOS_clean_build:
     runs-on: macos-14
     env:
-      device: iPhone 14
+      device: iPhone 15
     defaults:
       run:
         working-directory: example/ios
@@ -39,5 +39,12 @@ jobs:
         run: pod install
 
       - run: xcrun simctl list
-      - run: open -a Simulator && xcrun simctl boot 'iPhone SE (3rd generation)'
+      - run: open -a Simulator && xcrun simctl boot 'iPhone 15'
       - run: flutter devices
+
+      - run: |
+          flutter create --template=app --platforms=android,ios demo_project
+          cd demo_project
+          
+          dart pub add 'adyen_checkout:{"path":"../"}'
+          flutter run -d "iPhone 15"
