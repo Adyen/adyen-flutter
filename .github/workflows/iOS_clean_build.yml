@@ -12,7 +12,7 @@ on:
 
 jobs:
   iOS_clean_build:
-    runs-on: macos-14
+    runs-on: macos-13
     env:
       device: iPhone 15
     defaults:
