@@ -39,14 +39,13 @@ abstract class ComponentAdvancedCallback<T : PaymentComponentState<*>>(
 
     override fun onError(componentError: ComponentError) {
         val type: PaymentResultEnum =
-            if (componentError.errorMessage.contains(
-                    Constants.SDK_PAYMENT_CANCELED_IDENTIFIER
-                ) || componentError.exception is com.adyen.checkout.core.exception.CancellationException
-            ) {
+            if (componentError.errorMessage.contains(Constants.SDK_PAYMENT_CANCELED_IDENTIFIER) ||
+                (componentError.exception is com.adyen.checkout.core.exception.CancellationException) ||
+                (componentError.exception is com.adyen.checkout.adyen3ds2.Cancelled3DS2Exception)
+            )
                 PaymentResultEnum.CANCELLEDBYUSER
-            } else {
+            else
                 PaymentResultEnum.ERROR
-            }
 
         val model =
             ComponentCommunicationModel(

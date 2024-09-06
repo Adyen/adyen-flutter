@@ -32,6 +32,7 @@ internal class ActionComponentCallback(
         val type: PaymentResultEnum =
             when (componentError.exception) {
                 is com.adyen.checkout.core.exception.CancellationException -> PaymentResultEnum.CANCELLEDBYUSER
+                is com.adyen.checkout.adyen3ds2.Cancelled3DS2Exception -> PaymentResultEnum.CANCELLEDBYUSER
                 else -> PaymentResultEnum.ERROR
             }
         val model =
