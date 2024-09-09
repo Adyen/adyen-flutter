@@ -11,7 +11,7 @@ on:
       - '*'
 
 jobs:
-  iOS_clean_build:
+  ios_clean_build:
     runs-on: macos-14
     strategy:
       matrix:
@@ -19,6 +19,12 @@ jobs:
         flutter-version: [ "3.24.0" ]
 
     steps:
+      - name: Provide more disk space
+        run: |
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf /opt/ghc
+          sudo rm -rf "/usr/local/share/boost"
+
       - uses: actions/checkout@v4
 
       - uses: subosito/flutter-action@v2
