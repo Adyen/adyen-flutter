@@ -15,8 +15,8 @@ jobs:
     runs-on: macos-14
     strategy:
       matrix:
-        iPhone: ["'iPhone 15'"]
-        flutter-version: [ "3.24.0" ]
+        iPhone: [ "'iPhone 15'" ]
+        flutter-version: [ "3.16.0" ,"3.19.0", "3.22.0", "3.24.0" ]
 
     steps:
       - name: Provide more disk space
@@ -26,6 +26,8 @@ jobs:
           sudo rm -rf "/usr/local/share/boost"
           sudo rm -rf /Applications/Xcode_14.3.1.app
           sudo rm -rf /Applications/Xcode_15.0.1.app
+          sudo rm -rf /Applications/Xcode_15.1.app
+          sudo rm -rf /Applications/Xcode_15.2.app
 
       - uses: actions/checkout@v4
 

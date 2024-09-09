@@ -1,0 +1,19 @@
+name: Clean build test
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches: [ "main" ]
+  push:
+    tags:
+      - '*'
+
+jobs:
+  android_clean_build_test:
+    name: Android clean build test
+    uses: ./.github/workflows/clean_build/android_clean_build.yml
+
+  ios_clean_build_test:
+    name: iOS clean build tests
+    uses: ./.github/workflows/clean_build/ios_clean_build.yml
+
