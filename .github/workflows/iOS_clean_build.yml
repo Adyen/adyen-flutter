@@ -42,5 +42,4 @@ jobs:
           cd demo_project
           
           dart pub add 'adyen_checkout:{"path":"../"}'
-          pod install
           flutter run -d "iPhone 15"
