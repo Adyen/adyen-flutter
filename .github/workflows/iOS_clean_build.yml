@@ -42,4 +42,4 @@ jobs:
           cd demo_project
           
           dart pub add 'adyen_checkout:{"path":"../"}'
-          flutter run -d "iPhone 15"
+          flutter build ios --release --no-codesign
