@@ -12,15 +12,12 @@ on:
 
 jobs:
   iOS_clean_build:
-    runs-on: macos-13
+    runs-on: macos-14
     env:
       device: iPhone 15
-    defaults:
-      run:
-        working-directory: example/ios
     strategy:
       matrix:
-        flutter-version: [ "3.16.0" ,"3.19.0", "3.22.0", "3.24.0" ]
+        flutter-version: [ "3.24.0" ]
     timeout-minutes: 30
 
     steps:
@@ -44,6 +41,7 @@ jobs:
 
       - run: |
           flutter create --template=app --platforms=android,ios demo_project
+          pwd
           cd demo_project
           
           dart pub add 'adyen_checkout:{"path":"../"}'
