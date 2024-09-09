@@ -17,6 +17,7 @@ jobs:
       device: iPhone 15
     strategy:
       matrix:
+        iPhone: ["iPhone 15"]
         flutter-version: [ "3.24.0" ]
     timeout-minutes: 30
 
@@ -32,9 +33,7 @@ jobs:
 
       - run: flutter pub get
 
-      - run: xcrun simctl list
-      - run: open -a Simulator && xcrun simctl boot 'iPhone 15'
-      - run: flutter devices
+      - run: open -a Simulator && xcrun simctl boot ${{ matrix.iPhone }}
 
       - run: |
           flutter create --template=app --platforms=android,ios demo_project
@@ -42,4 +41,6 @@ jobs:
           cd demo_project
           
           dart pub add 'adyen_checkout:{"path":"../"}'
-          flutter build ios --release --no-codesign
+          flutter build ios --debug --simulator
+          xcrun simctl install ${{ matrix.iPhone }} build/ios/iphonesimulator/Runner.app
+          xcrun simctl launch ${{ matrix.iPhone }} com.adyen.AdyenUIHost
