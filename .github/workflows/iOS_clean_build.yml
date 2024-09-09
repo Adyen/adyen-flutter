@@ -32,9 +32,6 @@ jobs:
 
       - run: flutter pub get
 
-      - name: Pod install
-        run: pod install
-
       - run: xcrun simctl list
       - run: open -a Simulator && xcrun simctl boot 'iPhone 15'
       - run: flutter devices
@@ -45,4 +42,5 @@ jobs:
           cd demo_project
           
           dart pub add 'adyen_checkout:{"path":"../"}'
+          pod install
           flutter run -d "iPhone 15"
