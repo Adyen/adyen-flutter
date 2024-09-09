@@ -13,11 +13,9 @@ on:
 jobs:
   iOS_clean_build:
     runs-on: macos-14
-    env:
-      device: iPhone 15
     strategy:
       matrix:
-        iPhone: ["iPhone 15"]
+        iPhone: ["'iPhone 15'"]
         flutter-version: [ "3.24.0" ]
     timeout-minutes: 30
 
