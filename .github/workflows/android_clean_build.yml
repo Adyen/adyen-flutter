@@ -1,12 +1,8 @@
 name: Android clean build
 
 on:
+  workflow_call:
   workflow_dispatch:
-  pull_request:
-    branches: [ "main" ]
-  push:
-    tags:
-      - '*'
 
 jobs:
   android_clean_build:
