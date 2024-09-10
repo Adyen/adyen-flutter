@@ -32,11 +32,9 @@ jobs:
           cache: true
           cache-key: ${{ matrix.flutter-version }}
 
-      - run: flutter pub get
-
-      - run: open -a Simulator && xcrun simctl boot ${{ matrix.iPhone }}
-
       - run: |
+          flutter pub get
+          open -a Simulator && xcrun simctl boot ${{ matrix.iPhone }}
           flutter create --template=app --platforms=android,ios demo_project
           cd demo_project
           dart pub add 'adyen_checkout:{"path":"../"}'
