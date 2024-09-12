@@ -41,11 +41,11 @@ jobs:
           dart pub add 'adyen_checkout:{"path":"../"}'
 
       - name: Pod install
-        working-directory: /demo_project/ios
+        working-directory: demo_project/ios
         run: pod install
 
       - name: Build app for simulator
-        working-directory: /demo_project
+        working-directory: demo_project
         run: flutter build ios --debug --simulator
 
       - run: |
