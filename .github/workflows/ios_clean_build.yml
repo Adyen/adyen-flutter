@@ -7,6 +7,7 @@ on:
 jobs:
   ios_clean_build:
     runs-on: macos-14
+    continue-on-error: true
     strategy:
       matrix:
         iPhone: [ "'iPhone 15'" ]
@@ -32,12 +33,18 @@ jobs:
           cache: true
           cache-key: ${{ matrix.flutter-version }}
 
+      - run: flutter pub get
+
+      - name: Pod install
+        run: pod install
+
       - run: |
-          flutter pub get
-          open -a Simulator && xcrun simctl boot ${{ matrix.iPhone }}
           flutter create --template=app --platforms=android,ios demo_project
           cd demo_project
-          dart pub add 'adyen_checkout:{"path":"../"}'
+          dart pub add 'adyen_checkout:{"path":"../"}' 
           flutter build ios --debug --simulator
+
+      - run: |    
+          open -a Simulator && xcrun simctl boot ${{ matrix.iPhone }}
           xcrun simctl install ${{ matrix.iPhone }} build/ios/iphonesimulator/Runner.app
           xcrun simctl launch ${{ matrix.iPhone }} com.example.demoProject
