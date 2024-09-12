@@ -41,15 +41,13 @@ jobs:
           dart pub add 'adyen_checkout:{"path":"../"}'
           flutter pub get
 
-#      - name: Pod install
-#        working-directory: demo_project/ios
-#        run: pod install
-
       - name: Build app for simulator
         working-directory: demo_project
         run: flutter build ios --debug --simulator
 
-      - run: |
+      - name: Install app on simulator
+        working-directory: demo_project
+        run: |
           open -a Simulator && xcrun simctl boot ${{ matrix.iPhone }}
           xcrun simctl install ${{ matrix.iPhone }} build/ios/iphonesimulator/Runner.app
           xcrun simctl launch ${{ matrix.iPhone }} com.example.demoProject
