@@ -7,7 +7,6 @@ on:
 jobs:
   ios_clean_build:
     runs-on: macos-14
-    continue-on-error: true
     strategy:
       matrix:
         iPhone: [ "'iPhone 15'" ]
@@ -30,12 +29,12 @@ jobs:
         with:
           flutter-version: ${{ matrix.flutter-version }}
           channel: 'stable'
-          cache: true
           cache-key: ${{ matrix.flutter-version }}
 
       - run: flutter pub get
 
-      - run: |
+      - name: Create default project and add Adyen checkout plugin package
+        run: |
           flutter create --template=app --platforms=android,ios demo_project
           cd demo_project
           dart pub add 'adyen_checkout:{"path":"../"}'
