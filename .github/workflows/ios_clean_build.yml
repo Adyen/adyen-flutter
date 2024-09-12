@@ -29,15 +29,23 @@ jobs:
         with:
           flutter-version: ${{ matrix.flutter-version }}
           channel: 'stable'
-          cache: true
           cache-key: ${{ matrix.flutter-version }}
 
-      - run: |
-          flutter pub get
-          open -a Simulator && xcrun simctl boot ${{ matrix.iPhone }}
+      - run: flutter pub get
+
+      - name: Create default project and add Adyen checkout plugin package
+        run: |
           flutter create --template=app --platforms=android,ios demo_project
           cd demo_project
           dart pub add 'adyen_checkout:{"path":"../"}'
-          flutter build ios --debug --simulator
+
+      - name: Build app for simulator
+        working-directory: demo_project
+        run: flutter build ios --debug --simulator
+
+      - name: Install app on simulator
+        working-directory: demo_project
+        run: |
+          open -a Simulator && xcrun simctl boot ${{ matrix.iPhone }}
           xcrun simctl install ${{ matrix.iPhone }} build/ios/iphonesimulator/Runner.app
           xcrun simctl launch ${{ matrix.iPhone }} com.example.demoProject
