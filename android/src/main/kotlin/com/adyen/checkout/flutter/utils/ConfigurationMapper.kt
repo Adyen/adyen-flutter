@@ -175,7 +175,7 @@ object ConfigurationMapper {
                 GooglePayConfiguration.Builder(environment, clientKey)
             }
 
-        return googlePayConfigurationDTO.mapToGooglePayConfiguration(googlePayConfigurationBuilder)
+        return googlePayConfigurationDTO.mapToGooglePayCheckoutConfiguration(googlePayConfigurationBuilder)
     }
 
     private fun DropInConfigurationDTO.buildCashAppPayConfiguration(
@@ -251,7 +251,7 @@ object ConfigurationMapper {
         )
     }
 
-    private fun GooglePayConfigurationDTO.mapToGooglePayConfiguration(
+    private fun GooglePayConfigurationDTO.mapToGooglePayCheckoutConfiguration(
         builder: GooglePayConfiguration.Builder,
         analyticsConfiguration: AnalyticsConfiguration? = null,
         amount: Amount? = null,
@@ -391,21 +391,21 @@ object ConfigurationMapper {
         return unencryptedCardBuilder.build()
     }
 
-    fun InstantPaymentConfigurationDTO.mapToGooglePayConfiguration(): CheckoutConfiguration {
-        val checkoutConfiguration = mapToCheckoutConfiguration()
+    fun InstantPaymentConfigurationDTO.mapToGooglePayCheckoutConfiguration(): CheckoutConfiguration {
+        val baseCheckoutConfiguration = mapToCheckoutConfiguration()
         googlePayConfigurationDTO?.let {
             val googlePayConfiguration =
                 buildGooglePayConfiguration(
                     clientKey,
                     shopperLocale,
                     environment.mapToEnvironment(),
-                    googlePayConfigurationDTO
+                    it
                 )
             GooglePayComponent.PAYMENT_METHOD_TYPES.forEach { key ->
-                checkoutConfiguration.addConfiguration(key, googlePayConfiguration)
+                baseCheckoutConfiguration.addConfiguration(key, googlePayConfiguration)
             }
         }
-        return checkoutConfiguration
+        return baseCheckoutConfiguration
     }
 
     fun InstantPaymentConfigurationDTO.mapToCheckoutConfiguration(): CheckoutConfiguration =
