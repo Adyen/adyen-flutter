@@ -175,7 +175,7 @@ object ConfigurationMapper {
                 GooglePayConfiguration.Builder(environment, clientKey)
             }
 
-        return googlePayConfigurationDTO.mapToGooglePayCheckoutConfiguration(googlePayConfigurationBuilder)
+        return googlePayConfigurationDTO.mapToGooglePayConfiguration(googlePayConfigurationBuilder)
     }
 
     private fun DropInConfigurationDTO.buildCashAppPayConfiguration(
@@ -251,7 +251,7 @@ object ConfigurationMapper {
         )
     }
 
-    private fun GooglePayConfigurationDTO.mapToGooglePayCheckoutConfiguration(
+    private fun GooglePayConfigurationDTO.mapToGooglePayConfiguration(
         builder: GooglePayConfiguration.Builder,
         analyticsConfiguration: AnalyticsConfiguration? = null,
         amount: Amount? = null,
