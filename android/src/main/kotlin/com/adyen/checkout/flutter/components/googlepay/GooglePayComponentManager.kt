@@ -1,6 +1,5 @@
 package com.adyen.checkout.flutter.components.googlepay
 
-import ComponentCommunicationModel
 import ComponentFlutterInterface
 import InstantPaymentConfigurationDTO
 import InstantPaymentSetupResultDTO
@@ -157,7 +156,6 @@ class GooglePayComponentManager(
                 GooglePaySessionCallback(
                     componentFlutterInterface,
                     componentId,
-                    ::onLoading,
                     ::handleAction,
                     ::hideLoadingBottomSheet
                 ),
@@ -178,20 +176,10 @@ class GooglePayComponentManager(
                 GooglePayAdvancedCallback(
                     componentFlutterInterface,
                     componentId,
-                    ::onLoading,
                     ::hideLoadingBottomSheet
                 ),
             key = UUID.randomUUID().toString()
         )
-
-    private fun onLoading(componentId: String) {
-        val model =
-            ComponentCommunicationModel(
-                ComponentCommunicationType.LOADING,
-                componentId = componentId,
-            )
-        componentFlutterInterface.onComponentCommunication(model) {}
-    }
 
     private fun handleAction(action: Action) {
         googlePayComponent?.let {

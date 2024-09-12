@@ -12,11 +12,10 @@ import org.json.JSONObject
 class GooglePayAdvancedCallback(
     private val componentFlutterApi: ComponentFlutterInterface,
     private val componentId: String,
-    private val onLoadingCallback: (String) -> Unit,
     private val hideLoadingBottomSheet: () -> Unit,
 ) : ComponentAdvancedCallback<GooglePayComponentState>(componentFlutterApi, componentId) {
     override fun onSubmit(state: GooglePayComponentState) {
-        onLoadingCallback(componentId)
+        onLoading()
         val data = PaymentComponentData.SERIALIZER.serialize(state.data)
         val extra = state.paymentData?.toJson()
         val submitData =
@@ -38,5 +37,14 @@ class GooglePayAdvancedCallback(
     override fun onError(componentError: ComponentError) {
         hideLoadingBottomSheet()
         super.onError(componentError)
+    }
+
+    private fun onLoading() {
+        val model =
+            ComponentCommunicationModel(
+                ComponentCommunicationType.LOADING,
+                componentId = componentId
+            )
+        componentFlutterApi.onComponentCommunication(model) {}
     }
 }
