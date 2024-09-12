@@ -35,16 +35,14 @@ jobs:
 
       - run: flutter pub get
 
-      - name: Pod install
-        run: pod install
-
       - run: |
           flutter create --template=app --platforms=android,ios demo_project
           cd demo_project
-          dart pub add 'adyen_checkout:{"path":"../"}' 
+          dart pub add 'adyen_checkout:{"path":"../"}'
+          pod install
           flutter build ios --debug --simulator
 
-      - run: |    
+      - run: |
           open -a Simulator && xcrun simctl boot ${{ matrix.iPhone }}
           xcrun simctl install ${{ matrix.iPhone }} build/ios/iphonesimulator/Runner.app
           xcrun simctl launch ${{ matrix.iPhone }} com.example.demoProject
