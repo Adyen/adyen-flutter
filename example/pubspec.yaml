@@ -25,6 +25,14 @@ dev_dependencies:
     sdk: flutter
 
   flutter_lints: 3.0.1
+  patrol: ^3.10.0
 
 flutter:
   uses-material-design: true
+
+patrol:
+  app_name: adyen_checkout_example
+  android:
+    package_name: com.adyen.adyen_checkout_example
+  ios:
+    bundle_id: com.adyen.adyenCheckoutExample
