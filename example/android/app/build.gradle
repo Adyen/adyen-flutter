@@ -47,6 +47,9 @@ android {
         targetSdkVersion 34
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
+
+        testInstrumentationRunner "pl.leancode.patrol.PatrolJUnitRunner"
+        testInstrumentationRunnerArguments clearPackageData: "true"
     }
 
     buildTypes {
@@ -60,12 +63,17 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt')
         }
     }
+
+    testOptions {
+        execution "ANDROIDX_TEST_ORCHESTRATOR"
+    }
 }
 
 flutter {
     source '../..'
 }
 
-configurations {
-    debugImplementation.exclude group: "junit", module: "junit"
+dependencies {
+    androidTestImplementation 'junit:junit:4.13.2'
+    androidTestUtil "androidx.test:orchestrator:1.5.0"
 }
