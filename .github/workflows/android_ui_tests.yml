@@ -46,6 +46,8 @@ jobs:
             echo "Emulator launched"
             pwd
             cd example
+            ls
+            patrol doctor
             patrol test -t integration_test/drop_in_test/open_drop_in_test.dart -d emulator-5554
 
 
