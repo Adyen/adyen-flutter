@@ -39,8 +39,16 @@ class DropInPlatformApi: DropInPlatformInterface {
             )
             let payment = session.sessionContext.payment ?? adyenContext.payment
             let dropInConfiguration = try dropInConfigurationDTO.createDropInConfiguration(payment: payment)
+            var paymentMethods = session.sessionContext.paymentMethods
+            if let paymentMethodNames = dropInConfigurationDTO.paymentMethodNames {
+                paymentMethods = overridePaymentMethodNames(
+                    paymentMethods: paymentMethods,
+                    paymentMethodNames: paymentMethodNames
+                )
+            }
+            
             let dropInComponent = DropInComponent(
-                paymentMethods: session.sessionContext.paymentMethods,
+                paymentMethods: paymentMethods,
                 context: adyenContext,
                 configuration: dropInConfiguration,
                 title: dropInConfigurationDTO.preselectedPaymentMethodTitle
@@ -68,7 +76,14 @@ class DropInPlatformApi: DropInPlatformInterface {
             
             hostViewController = viewController
             let adyenContext = try dropInConfigurationDTO.createAdyenContext()
-            let paymentMethods = try jsonDecoder.decode(PaymentMethods.self, from: Data(paymentMethodsResponse.utf8))
+            var paymentMethods = try jsonDecoder.decode(PaymentMethods.self, from: Data(paymentMethodsResponse.utf8))
+            if let paymentMethodNames = dropInConfigurationDTO.paymentMethodNames {
+                paymentMethods = overridePaymentMethodNames(
+                    paymentMethods: paymentMethods,
+                    paymentMethodNames: paymentMethodNames
+                )
+            }
+            
             let paymentMethodsWithoutGiftCards = removeGiftCardPaymentMethods(paymentMethods: paymentMethods)
             let configuration = try dropInConfigurationDTO.createDropInConfiguration(payment: adyenContext.payment)
             let dropInComponent = DropInComponent(
@@ -240,6 +255,22 @@ class DropInPlatformApi: DropInPlatformInterface {
         }
 
         return rootViewController
+    }
+    
+    private func overridePaymentMethodNames(paymentMethods: PaymentMethods, paymentMethodNames: [String?: String?]) -> PaymentMethods {
+        var paymentMethodsWithAdjustedNames = paymentMethods
+        for paymentMethodNamePair in paymentMethodNames {
+            if let paymentMethodRawValue = paymentMethodNamePair.key,
+               let paymentMethodType = PaymentMethodType(rawValue: paymentMethodRawValue),
+               let paymentMethodName = paymentMethodNamePair.value {
+                paymentMethodsWithAdjustedNames.overrideDisplayInformation(
+                    ofRegularPaymentMethod: paymentMethodType,
+                    with: .init(title: paymentMethodName)
+                )
+            }
+        }
+        
+        return paymentMethodsWithAdjustedNames
     }
 }
 

@@ -14,6 +14,7 @@ final class DropInConfiguration extends BaseConfiguration {
   final StoredPaymentMethodConfiguration? storedPaymentMethodConfiguration;
   final bool skipListWhenSinglePaymentMethod;
   final String? preselectedPaymentMethodTitle;
+  final Map<String, String>? paymentMethodNames;
 
   DropInConfiguration({
     required super.environment,
@@ -29,6 +30,7 @@ final class DropInConfiguration extends BaseConfiguration {
     this.preselectedPaymentMethodTitle,
     bool? skipListWhenSinglePaymentMethod,
     AnalyticsOptions? analyticsOptions,
+    this.paymentMethodNames,
   }) : skipListWhenSinglePaymentMethod =
             skipListWhenSinglePaymentMethod ?? false;
 }

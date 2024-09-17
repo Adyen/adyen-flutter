@@ -1,3 +1,7 @@
+## New version
+
+* Added support for renaming payment methods in Drop-in.
+
 ## 1.0.2
 
 * Improved card component for large font and display sizes.

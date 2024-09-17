@@ -132,6 +132,9 @@ class DropInScreen extends StatelessWidget {
       googlePayConfiguration: googlePayConfiguration,
       cashAppPayConfiguration: cashAppPayConfiguration,
       storedPaymentMethodConfiguration: storedPaymentMethodConfiguration,
+      paymentMethodNames: {
+        "scheme": "Credit card",
+      },
     );
 
     return dropInConfiguration;
