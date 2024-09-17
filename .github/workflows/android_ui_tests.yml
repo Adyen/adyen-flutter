@@ -1,4 +1,4 @@
-name: iOS ui tests
+name: Android ui tests
 
 on:
   push:
@@ -6,8 +6,8 @@ on:
   workflow_call:
 
 jobs:
-  ios_ui_tests:
-    runs-on: macos-14
+  android_ui_tests:
+    runs-on: ubuntu-24.04
 
     steps:
       - name: Provide more disk space
@@ -26,6 +26,20 @@ jobs:
       - run: flutter pub get
       - run: dart pub global activate patrol_cli
       - run: patrol doctor
-      - run: open -a Simulator && xcrun simctl boot 'iPhone 15'
+
+      - name: Boot emulator or run tests
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          target: google_apis
+          arch: x86_64
+          force-avd-creation: false
+          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          disable-animations: false
+          script: |
+            echo "Emulator launched"
+            patrol test -t example/integration_test/drop_in_test/open_drop_in_test.dart -d 'iPhone 15'
+
+
 #        TODO Add github environment values
 #      - run: patrol test -t example/integration_test/drop_in_test/open_drop_in_test.dart -d 'iPhone 15'
