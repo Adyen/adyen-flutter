@@ -30,12 +30,6 @@ jobs:
           cache-key: ${{ matrix.flutter-version }}
 
       - run: flutter pub get
-
-      - name: Install Patrol cli
-        run: dart pub global activate patrol_cli
-
-      - run: patrol doctor
-
-      - run: |
-          open -a Simulator && xcrun simctl boot 'iPhone 15'
-          patrol test -t example/integration_test/drop_in_test/open_drop_in_test.dart -d 'iPhone 15'
+      - run: dart pub global activate patrol_cli
+      - run: open -a Simulator && xcrun simctl boot 'iPhone 15'
+      - run: patrol test -t example/integration_test/drop_in_test/open_drop_in_test.dart -d 'iPhone 15'
