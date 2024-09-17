@@ -31,6 +31,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
 void main() {
+  runApp(adyenExampleApp());
+}
+
+MaterialApp adyenExampleApp() {
   final service = Service();
   final adyenGooglePayComponentRepository =
       AdyenGooglePayComponentRepository(service: service);
@@ -42,7 +46,7 @@ void main() {
       AdyenInstantComponentRepository(service: service);
   final adyenCseRepository = AdyenCseRepository(service: service);
 
-  runApp(MaterialApp(
+  return MaterialApp(
     localizationsDelegates: const [
       GlobalMaterialLocalizations.delegate,
       GlobalWidgetsLocalizations.delegate,
@@ -113,7 +117,7 @@ void main() {
           CseScreen(repository: adyenCseRepository),
     },
     initialRoute: "/",
-  ));
+  );
 }
 
 class MyApp extends StatelessWidget {
