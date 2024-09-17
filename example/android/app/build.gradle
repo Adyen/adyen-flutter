@@ -75,5 +75,5 @@ flutter {
 
 dependencies {
     androidTestImplementation 'junit:junit:4.13.2'
-    androidTestUtil "androidx.test:orchestrator:1.5.0"
+    androidTestUtil "androidx.test:orchestrator:1.4.2"
 }

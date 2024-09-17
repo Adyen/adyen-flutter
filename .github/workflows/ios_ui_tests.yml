@@ -1,0 +1,40 @@
+name: iOS ui tests
+
+on:
+  push:
+  workflow_dispatch:
+  workflow_call:
+
+jobs:
+  ios_ui_tests:
+    runs-on: macos-14
+    defaults:
+      run:
+        working-directory: example/ios
+
+    steps:
+      - name: Provide more disk space
+        run: |
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf /opt/ghc
+          sudo rm -rf "/usr/local/share/boost"
+#          sudo rm -rf /Applications/Xcode_14.3.1.app
+#          sudo rm -rf /Applications/Xcode_15.0.1.app
+#          sudo rm -rf /Applications/Xcode_15.1.app
+#          sudo rm -rf /Applications/Xcode_15.2.app
+
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.24.0"
+          channel: 'stable'
+          cache: true
+          cache-key: ${{ matrix.flutter-version }}
+
+      - run: flutter pub get
+
+      - name: Install Patrol cli
+        run: dart pub global activate patrol_cli
+
+      - run: patrol doctor
