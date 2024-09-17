@@ -5,7 +5,7 @@ import 'package:patrol/patrol.dart';
 
 void main() {
   patrolTest(
-    'Drop-in test',
+    'Drop-in session card test',
     ($) async {
       await $.pumpWidget(adyenExampleApp());
       await $('Drop-in').tap();

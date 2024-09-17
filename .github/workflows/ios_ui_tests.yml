@@ -15,10 +15,6 @@ jobs:
           sudo rm -rf /usr/share/dotnet
           sudo rm -rf /opt/ghc
           sudo rm -rf "/usr/local/share/boost"
-      #          sudo rm -rf /Applications/Xcode_14.3.1.app
-      #          sudo rm -rf /Applications/Xcode_15.0.1.app
-      #          sudo rm -rf /Applications/Xcode_15.1.app
-      #          sudo rm -rf /Applications/Xcode_15.2.app
 
       - uses: actions/checkout@v4
 
@@ -31,5 +27,7 @@ jobs:
 
       - run: flutter pub get
       - run: dart pub global activate patrol_cli
+      - run: patrol doctor
       - run: open -a Simulator && xcrun simctl boot 'iPhone 15'
-      - run: patrol test -t example/integration_test/drop_in_test/open_drop_in_test.dart -d 'iPhone 15'
+#        TODO Add github environment values
+#      - run: patrol test -t example/integration_test/drop_in_test/open_drop_in_test.dart -d 'iPhone 15'
