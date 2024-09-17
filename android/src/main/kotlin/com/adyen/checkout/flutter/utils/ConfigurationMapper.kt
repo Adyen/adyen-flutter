@@ -104,7 +104,7 @@ object ConfigurationMapper {
         }
 
         paymentMethodNames?.forEach { paymentMethodNamePair ->
-            val paymentMethodType = paymentMethodNamePair.key?.lowercase()
+            val paymentMethodType = paymentMethodNamePair.key
             val paymentMethodName = paymentMethodNamePair.value
             if (paymentMethodType != null && paymentMethodName != null) {
                 dropInConfiguration.overridePaymentMethodName(paymentMethodType, paymentMethodName)

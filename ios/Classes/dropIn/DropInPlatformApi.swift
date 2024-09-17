@@ -260,7 +260,7 @@ class DropInPlatformApi: DropInPlatformInterface {
     private func overridePaymentMethodNames(paymentMethods: PaymentMethods, paymentMethodNames: [String?: String?]) -> PaymentMethods {
         var paymentMethodsWithAdjustedNames = paymentMethods
         for paymentMethodNamePair in paymentMethodNames {
-            if let paymentMethodRawValue = paymentMethodNamePair.key?.lowercased(),
+            if let paymentMethodRawValue = paymentMethodNamePair.key,
                let paymentMethodType = PaymentMethodType(rawValue: paymentMethodRawValue),
                let paymentMethodName = paymentMethodNamePair.value {
                 paymentMethodsWithAdjustedNames.overrideDisplayInformation(
