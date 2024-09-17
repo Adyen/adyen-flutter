@@ -8,9 +8,6 @@ on:
 jobs:
   ios_ui_tests:
     runs-on: macos-14
-    defaults:
-      run:
-        working-directory: example/ios
 
     steps:
       - name: Provide more disk space
