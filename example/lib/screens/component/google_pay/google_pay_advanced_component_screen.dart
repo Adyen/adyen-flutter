@@ -82,6 +82,8 @@ class GooglePayAdvancedComponentScreen extends StatelessWidget {
                   Navigator.pop(context);
                   DialogBuilder.showPaymentResultDialog(paymentResult, context);
                 },
+                unavailableWidget:
+                    const Text("Google Pay is unavailable on this device"),
               ),
             ],
           );

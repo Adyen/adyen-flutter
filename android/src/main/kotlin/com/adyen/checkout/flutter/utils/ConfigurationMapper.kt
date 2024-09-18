@@ -37,10 +37,12 @@ import com.adyen.checkout.components.core.internal.analytics.AnalyticsPlatformPa
 import com.adyen.checkout.cse.EncryptedCard
 import com.adyen.checkout.cse.UnencryptedCard
 import com.adyen.checkout.dropin.DropInConfiguration
+import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToEnvironment
 import com.adyen.checkout.googlepay.BillingAddressParameters
 import com.adyen.checkout.googlepay.GooglePayConfiguration
 import com.adyen.checkout.googlepay.MerchantInfo
 import com.adyen.checkout.googlepay.ShippingAddressParameters
+import com.adyen.checkout.googlepay.googlePay
 import com.google.android.gms.wallet.WalletConstants
 import java.util.Locale
 import com.adyen.checkout.cashapppay.CashAppPayEnvironment as SDKCashAppPayEnvironment
@@ -89,7 +91,7 @@ object ConfigurationMapper {
 
         if (googlePayConfigurationDTO != null) {
             val googlePayConfiguration =
-                buildGooglePayConfiguration(context, shopperLocale, environment, googlePayConfigurationDTO)
+                buildGooglePayConfiguration(clientKey, shopperLocale, environment, googlePayConfigurationDTO)
             dropInConfiguration.addGooglePayConfiguration(googlePayConfiguration)
         }
 
@@ -143,14 +145,12 @@ object ConfigurationMapper {
                 CardConfiguration.Builder(context, environment, clientKey)
             }
 
-        cardConfiguration
-            .setAddressConfiguration(addressMode.mapToAddressConfiguration())
+        cardConfiguration.setAddressConfiguration(addressMode.mapToAddressConfiguration())
             .setShowStorePaymentField(showStorePaymentField).setHideCvcStoredCard(!showCvcForStoredCard)
             .setHideCvc(!showCvc).setKcpAuthVisibility(determineKcpAuthVisibility(kcpFieldVisibility))
             .setSocialSecurityNumberVisibility(
                 determineSocialSecurityNumberVisibility(socialSecurityNumberFieldVisibility)
-            )
-            .setSupportedCardTypes(*mapToSupportedCardTypes(supportedCardTypes))
+            ).setSupportedCardTypes(*mapToSupportedCardTypes(supportedCardTypes))
             .setHolderNameRequired(holderNameRequired).setAnalyticsConfiguration(analyticsConfiguration)
         amount?.let {
             cardConfiguration.setAmount(amount)
@@ -168,8 +168,8 @@ object ConfigurationMapper {
         return AnalyticsConfiguration(analyticsLevel)
     }
 
-    private fun DropInConfigurationDTO.buildGooglePayConfiguration(
-        context: Context,
+    private fun buildGooglePayConfiguration(
+        clientKey: String,
         shopperLocale: String?,
         environment: com.adyen.checkout.core.Environment,
         googlePayConfigurationDTO: GooglePayConfigurationDTO
@@ -179,7 +179,7 @@ object ConfigurationMapper {
                 val locale = Locale.forLanguageTag(shopperLocale)
                 GooglePayConfiguration.Builder(locale, environment, clientKey)
             } else {
-                GooglePayConfiguration.Builder(context, environment, clientKey)
+                GooglePayConfiguration.Builder(environment, clientKey)
             }
 
         return googlePayConfigurationDTO.mapToGooglePayConfiguration(googlePayConfigurationBuilder)
@@ -397,6 +397,11 @@ object ConfigurationMapper {
         cvc?.let { unencryptedCardBuilder.setCvc(it) }
         return unencryptedCardBuilder.build()
     }
+
+    fun InstantPaymentConfigurationDTO.mapToGooglePayCheckoutConfiguration(): CheckoutConfiguration =
+        mapToCheckoutConfiguration().googlePay {
+            googlePayConfigurationDTO?.mapToGooglePayConfiguration(this, countryCode = countryCode)
+        }
 
     fun InstantPaymentConfigurationDTO.mapToCheckoutConfiguration(): CheckoutConfiguration =
         CheckoutConfiguration(
