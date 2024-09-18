@@ -37,11 +37,12 @@ import com.adyen.checkout.components.core.internal.analytics.AnalyticsPlatformPa
 import com.adyen.checkout.cse.EncryptedCard
 import com.adyen.checkout.cse.UnencryptedCard
 import com.adyen.checkout.dropin.DropInConfiguration
+import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToEnvironment
 import com.adyen.checkout.googlepay.BillingAddressParameters
-import com.adyen.checkout.googlepay.GooglePayComponent
 import com.adyen.checkout.googlepay.GooglePayConfiguration
 import com.adyen.checkout.googlepay.MerchantInfo
 import com.adyen.checkout.googlepay.ShippingAddressParameters
+import com.adyen.checkout.googlepay.googlePay
 import com.google.android.gms.wallet.WalletConstants
 import java.util.Locale
 import com.adyen.checkout.cashapppay.CashAppPayEnvironment as SDKCashAppPayEnvironment
@@ -136,14 +137,12 @@ object ConfigurationMapper {
                 CardConfiguration.Builder(context, environment, clientKey)
             }
 
-        cardConfiguration
-            .setAddressConfiguration(addressMode.mapToAddressConfiguration())
+        cardConfiguration.setAddressConfiguration(addressMode.mapToAddressConfiguration())
             .setShowStorePaymentField(showStorePaymentField).setHideCvcStoredCard(!showCvcForStoredCard)
             .setHideCvc(!showCvc).setKcpAuthVisibility(determineKcpAuthVisibility(kcpFieldVisibility))
             .setSocialSecurityNumberVisibility(
                 determineSocialSecurityNumberVisibility(socialSecurityNumberFieldVisibility)
-            )
-            .setSupportedCardTypes(*mapToSupportedCardTypes(supportedCardTypes))
+            ).setSupportedCardTypes(*mapToSupportedCardTypes(supportedCardTypes))
             .setHolderNameRequired(holderNameRequired).setAnalyticsConfiguration(analyticsConfiguration)
         amount?.let {
             cardConfiguration.setAmount(amount)
@@ -391,22 +390,10 @@ object ConfigurationMapper {
         return unencryptedCardBuilder.build()
     }
 
-    fun InstantPaymentConfigurationDTO.mapToGooglePayCheckoutConfiguration(): CheckoutConfiguration {
-        val baseCheckoutConfiguration = mapToCheckoutConfiguration()
-        googlePayConfigurationDTO?.let {
-            val googlePayConfiguration =
-                buildGooglePayConfiguration(
-                    clientKey,
-                    shopperLocale,
-                    environment.mapToEnvironment(),
-                    it
-                )
-            GooglePayComponent.PAYMENT_METHOD_TYPES.forEach { key ->
-                baseCheckoutConfiguration.addConfiguration(key, googlePayConfiguration)
-            }
+    fun InstantPaymentConfigurationDTO.mapToGooglePayCheckoutConfiguration(): CheckoutConfiguration =
+        mapToCheckoutConfiguration().googlePay {
+            googlePayConfigurationDTO?.mapToGooglePayConfiguration(this, countryCode = countryCode)
         }
-        return baseCheckoutConfiguration
-    }
 
     fun InstantPaymentConfigurationDTO.mapToCheckoutConfiguration(): CheckoutConfiguration =
         CheckoutConfiguration(
