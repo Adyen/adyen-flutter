@@ -132,6 +132,11 @@ class DropInPlatformApi: DropInPlatformInterface {
         dropInAdvancedFlowStoredPaymentMethodsDelegate?.handleDisableResult(
             isSuccessfullyRemoved: deleteStoredPaymentMethodResultDTO.isSuccessfullyRemoved)
     }
+    
+    func onBalanceCheckResult(balanceCheckResponse: String) throws {
+        
+    }
+    
 
     func cleanUpDropIn() {
         sessionHolder.reset()

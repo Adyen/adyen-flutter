@@ -83,7 +83,7 @@ class DropIn {
   Future<PaymentResult> startDropInAdvancedFlowPayment(
     DropInConfiguration dropInConfiguration,
     Map<String, dynamic> paymentMethodsResponse,
-    Checkout advancedCheckout,
+    AdvancedCheckout advancedCheckout,
   ) async {
     adyenLogger.print("Start Drop-in advanced flow");
     final dropInAdvancedFlowCompleter = Completer<PaymentResultDTO>();
@@ -116,6 +116,12 @@ class DropIn {
             event,
             dropInConfiguration.storedPaymentMethodConfiguration,
           );
+        case PlatformCommunicationType.balanceCheck:
+          _handleBalanceCheck(event, advancedCheckout.partialPayment);
+        case PlatformCommunicationType.requestOrder:
+          _handleOrderRequest(event, advancedCheckout.partialPayment);
+        case PlatformCommunicationType.cancelOrder:
+        // TODO: Handle this case.
       }
     });
 
@@ -254,5 +260,43 @@ class DropIn {
       case SessionCheckout():
         throw Exception("Please use the session card component.");
     }
+  }
+
+  void _handleBalanceCheck(
+    PlatformCommunicationModel event,
+    PartialPayment? partialPayment,
+  ) async {
+    if (partialPayment == null) {
+      //TODO Check with Android to investigate the race condition
+      await Future.delayed(const Duration(milliseconds: 300));
+      dropInPlatformApi.onBalanceCheckResult("");
+      throw Exception("Partial payment implementation is not provided.");
+    }
+
+    final Map<String, dynamic> data = jsonDecode(event.data as String);
+    final Map<String, dynamic> requestBody = {};
+    requestBody.addAll({
+      "paymentMethod": data["paymentMethod"],
+      "amount": data["amount"],
+    });
+
+    final balanceCheckResponse =
+        await partialPayment.onCheckBalance(requestBody);
+    dropInPlatformApi.onBalanceCheckResult(jsonEncode(balanceCheckResponse));
+  }
+
+  void _handleOrderRequest(
+    PlatformCommunicationModel event,
+    PartialPayment? partialPayment,
+  ) async {
+    if (partialPayment == null) {
+      //TODO Check with Android to investigate the race condition
+      await Future.delayed(const Duration(milliseconds: 300));
+      dropInPlatformApi.onOrderRequestResult("");
+      throw Exception("Partial payment implementation is not provided.");
+    }
+
+    final balanceCheckResponse = await partialPayment.onRequestOrder();
+    dropInPlatformApi.onOrderRequestResult(jsonEncode(balanceCheckResponse));
   }
 }

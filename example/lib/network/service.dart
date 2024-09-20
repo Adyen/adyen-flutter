@@ -81,6 +81,36 @@ class Service {
     }
   }
 
+  Future<Map<String, dynamic>> postPaymentMethodsBalance(
+      Map<String, dynamic> body) async {
+    final response = await http.post(
+      Uri.https(Config.baseUrl, "/${Config.apiVersion}/paymentMethods/balance"),
+      headers: _createHeaders(),
+      body: jsonEncode(body),
+    );
+    print(response.body);
+    return jsonDecode(response.body);
+  }
+
+  Future<Map<String, dynamic>> postOrders(Map<String, dynamic> body) async {
+    final response = await http.post(
+      Uri.https(Config.baseUrl, "/${Config.apiVersion}/orders"),
+      headers: _createHeaders(),
+      body: jsonEncode(body),
+    );
+    return jsonDecode(response.body);
+  }
+
+  Future<Map<String, dynamic>> postOrdersCancel(Map<String, dynamic> body) async {
+    final response = await http.post(
+      Uri.https(Config.baseUrl, "/${Config.apiVersion}/orders/cancel"),
+      headers: _createHeaders(),
+      body: jsonEncode(body),
+    );
+    return jsonDecode(response.body);
+  }
+
+
   Map<String, String> _createHeaders() => {
         "content-type": "application/json",
         "x-API-key": Config.xApiKey,

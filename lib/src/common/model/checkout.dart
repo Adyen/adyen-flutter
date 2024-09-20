@@ -1,3 +1,4 @@
+import 'package:adyen_checkout/src/common/model/partial_payment.dart';
 import 'package:adyen_checkout/src/common/model/payment_event.dart';
 
 sealed class Checkout {}
@@ -23,8 +24,11 @@ class AdvancedCheckout extends Checkout {
   Future<PaymentEvent> Function(Map<String, dynamic> additionalDetails)
       onAdditionalDetails;
 
+  PartialPayment? partialPayment;
+
   AdvancedCheckout({
     required this.onSubmit,
     required this.onAdditionalDetails,
+    this.partialPayment,
   });
 }

@@ -37,4 +37,12 @@ class DropInPlatformApi implements DropInPlatformInterface {
 
   @override
   Future<void> cleanUpDropIn() => _dropInPlatformInterface.cleanUpDropIn();
+
+  @override
+  Future<void> onBalanceCheckResult(String balanceCheckResponse) =>
+      _dropInPlatformInterface.onBalanceCheckResult(balanceCheckResponse);
+
+  @override
+  Future<void> onOrderRequestResult(String orderRequestResponse) =>
+      _dropInPlatformInterface.onOrderRequestResult(orderRequestResponse);
 }

@@ -82,3 +82,56 @@ class DropInPaymentMethodDeletionResultMessenger : LiveData<Event<DeletedStoredP
         }
     }
 }
+
+class DropInBalanceCheckPlatformMessenger : LiveData<Event<JSONObject>>() {
+    companion object {
+        private val dropInBalanceCheckPlatformMessenger =
+            DropInBalanceCheckPlatformMessenger()
+
+        fun instance() = dropInBalanceCheckPlatformMessenger
+
+        fun sendResult(value: JSONObject) {
+            dropInBalanceCheckPlatformMessenger.postValue(Event(value))
+        }
+    }
+}
+
+class DropInBalanceCheckResultMessenger : LiveData<Event<String>>() {
+    companion object {
+        private val dropInBalanceCheckResultMessenger =
+            DropInBalanceCheckResultMessenger()
+
+        fun instance() = dropInBalanceCheckResultMessenger
+
+        fun sendResult(value: String) {
+            dropInBalanceCheckResultMessenger.postValue(Event(value))
+        }
+    }
+}
+
+class DropInOrderRequestPlatformMessenger: LiveData<Event<String>>() {
+    companion object {
+        private val dropInOrderRequestPlatformMessenger =
+            DropInOrderRequestPlatformMessenger()
+
+        fun instance() = dropInOrderRequestPlatformMessenger
+
+        fun sendResult(value: String) {
+            dropInOrderRequestPlatformMessenger.postValue(Event(value))
+        }
+    }
+}
+
+class DropInOrderRequestResultMessenger: LiveData<Event<String>>() {
+    companion object {
+        private val dropInOrderRequestResultMessenger =
+            DropInOrderRequestResultMessenger()
+
+        fun instance() = dropInOrderRequestResultMessenger
+
+        fun sendResult(value: String) {
+            dropInOrderRequestResultMessenger.postValue(Event(value))
+        }
+    }
+}
+
