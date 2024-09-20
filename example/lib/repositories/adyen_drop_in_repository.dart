@@ -134,4 +134,27 @@ class AdyenDropInRepository extends AdyenBaseRepository {
       shopperReference: Config.shopperReference,
     );
   }
+
+  Future<Map<String, dynamic>> onCheckBalance(
+      Map<String, dynamic> balanceRequestBody) async {
+    balanceRequestBody.addAll({"merchantAccount": Config.merchantAccount});
+    return service.postPaymentMethodsBalance(balanceRequestBody);
+  }
+
+  Future<Map<String, dynamic>> onRequestOrder() async {
+    final orderRequestBody = <String, dynamic>{
+      "reference": "flutter-test_${DateTime.now().millisecondsSinceEpoch}",
+      "amount": {
+        "value": Config.amount.value,
+        "currency": Config.amount.currency
+      },
+      "merchantAccount": Config.merchantAccount,
+    };
+    return service.postOrders(orderRequestBody);
+  }
+
+  Future<Map<String, dynamic>> onCancelOrder(
+      Map<String, dynamic> orderCancelRequestBody) async {
+    return service.postOrders(orderCancelRequestBody);
+  }
 }

@@ -26,6 +26,10 @@ import com.adyen.checkout.dropin.internal.ui.model.SessionDropInResultContractPa
 import com.adyen.checkout.flutter.dropIn.advanced.AdvancedDropInService
 import com.adyen.checkout.flutter.dropIn.advanced.DropInAdditionalDetailsPlatformMessenger
 import com.adyen.checkout.flutter.dropIn.advanced.DropInAdditionalDetailsResultMessenger
+import com.adyen.checkout.flutter.dropIn.advanced.DropInBalanceCheckPlatformMessenger
+import com.adyen.checkout.flutter.dropIn.advanced.DropInBalanceCheckResultMessenger
+import com.adyen.checkout.flutter.dropIn.advanced.DropInOrderRequestPlatformMessenger
+import com.adyen.checkout.flutter.dropIn.advanced.DropInOrderRequestResultMessenger
 import com.adyen.checkout.flutter.dropIn.advanced.DropInPaymentMethodDeletionPlatformMessenger
 import com.adyen.checkout.flutter.dropIn.advanced.DropInPaymentMethodDeletionResultMessenger
 import com.adyen.checkout.flutter.dropIn.advanced.DropInPaymentResultMessenger
@@ -75,6 +79,8 @@ class DropInPlatformApi(
     ) {
         setAdvancedFlowDropInServiceObserver()
         setStoredPaymentMethodDeletionObserver()
+        setBalanceCheckPlatformMessengerObserver()
+        setOrderRequestPlatformMessengerObserver()
         activity.lifecycleScope.launch(Dispatchers.IO) {
             val paymentMethodsApiResponse =
                 PaymentMethodsApiResponse.SERIALIZER.deserialize(
@@ -110,6 +116,14 @@ class DropInPlatformApi(
         deleteStoredPaymentMethodResultDTO: DeletedStoredPaymentMethodResultDTO
     ) {
         DropInPaymentMethodDeletionResultMessenger.sendResult(deleteStoredPaymentMethodResultDTO)
+    }
+
+    override fun onBalanceCheckResult(balanceCheckResponse: String) {
+        DropInBalanceCheckResultMessenger.sendResult(balanceCheckResponse)
+    }
+
+    override fun onOrderRequestResult(orderRequestResponse: String) {
+        DropInOrderRequestResultMessenger.sendResult(orderRequestResponse)
     }
 
     override fun cleanUpDropIn() {
@@ -181,6 +195,36 @@ class DropInPlatformApi(
         }
     }
 
+    private fun setBalanceCheckPlatformMessengerObserver() {
+        DropInBalanceCheckPlatformMessenger.instance().removeObservers(activity)
+        DropInBalanceCheckPlatformMessenger.instance().observe(activity) { message ->
+            if (message.hasBeenHandled()) {
+                return@observe
+            }
+
+            val platformCommunicationModel = PlatformCommunicationModel(
+                PlatformCommunicationType.BALANCECHECK,
+                data = message.contentIfNotHandled.toString()
+            )
+            dropInFlutterApi.onDropInAdvancedPlatformCommunication(platformCommunicationModel) {}
+        }
+    }
+
+    private fun setOrderRequestPlatformMessengerObserver() {
+        DropInOrderRequestPlatformMessenger.instance().removeObservers(activity)
+        DropInOrderRequestPlatformMessenger.instance().observe(activity) { message ->
+            if (message.hasBeenHandled()) {
+                return@observe
+            }
+
+            val platformCommunicationModel = PlatformCommunicationModel(
+                PlatformCommunicationType.REQUESTORDER,
+                data = message.contentIfNotHandled.toString()
+            )
+            dropInFlutterApi.onDropInAdvancedPlatformCommunication(platformCommunicationModel) {}
+        }
+    }
+
     private fun createCheckoutSession(
         sessionHolder: SessionHolder,
         environment: com.adyen.checkout.core.Environment,
@@ -234,15 +278,15 @@ class DropInPlatformApi(
                         PaymentResultDTO(
                             PaymentResultEnum.FINISHED,
                             result =
-                                with(sessionDropInResult.result) {
-                                    PaymentResultModelDTO(
-                                        sessionId,
-                                        sessionData,
-                                        sessionResult,
-                                        resultCode,
-                                        order?.mapToOrderResponseModel()
-                                    )
-                                }
+                            with(sessionDropInResult.result) {
+                                PaymentResultModelDTO(
+                                    sessionId,
+                                    sessionData,
+                                    sessionResult,
+                                    resultCode,
+                                    order?.mapToOrderResponseModel()
+                                )
+                            }
                         )
                 }
 
@@ -279,9 +323,9 @@ class DropInPlatformApi(
                         PaymentResultDTO(
                             PaymentResultEnum.FINISHED,
                             result =
-                                PaymentResultModelDTO(
-                                    resultCode = dropInAdvancedFlowResult.result
-                                )
+                            PaymentResultModelDTO(
+                                resultCode = dropInAdvancedFlowResult.result
+                            )
                         )
                 }
 

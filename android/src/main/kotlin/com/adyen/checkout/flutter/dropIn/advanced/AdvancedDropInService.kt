@@ -6,22 +6,30 @@ import PaymentEventDTO
 import PaymentEventType
 import android.content.Intent
 import android.os.IBinder
+import android.util.Log
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ServiceLifecycleDispatcher
 import com.adyen.checkout.components.core.ActionComponentData
+import com.adyen.checkout.components.core.BalanceResult
+import com.adyen.checkout.components.core.OrderResponse
 import com.adyen.checkout.components.core.PaymentComponentData
 import com.adyen.checkout.components.core.PaymentComponentState
 import com.adyen.checkout.components.core.StoredPaymentMethod
 import com.adyen.checkout.components.core.action.Action
+import com.adyen.checkout.core.exception.ModelSerializationException
+import com.adyen.checkout.dropin.BalanceDropInServiceResult
 import com.adyen.checkout.dropin.DropInService
 import com.adyen.checkout.dropin.DropInServiceResult
 import com.adyen.checkout.dropin.ErrorDialog
+import com.adyen.checkout.dropin.OrderDropInServiceResult
 import com.adyen.checkout.dropin.RecurringDropInServiceResult
 import com.adyen.checkout.flutter.dropIn.model.DropInStoredPaymentMethodDeletionModel
 import com.adyen.checkout.flutter.dropIn.model.DropInType
 import com.adyen.checkout.flutter.utils.Constants
 import com.adyen.checkout.googlepay.GooglePayComponentState
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import org.json.JSONObject
 
 class AdvancedDropInService : DropInService(), LifecycleOwner {
@@ -45,8 +53,26 @@ class AdvancedDropInService : DropInService(), LifecycleOwner {
         }
     }
 
-    override fun onBalanceCheck(paymentComponentState: PaymentComponentState<*>) =
-        onPaymentComponentState(paymentComponentState)
+    override fun onBalanceCheck(paymentComponentState: PaymentComponentState<*>) {
+        try {
+            setBalanceCheckObserver()
+            val data = PaymentComponentData.SERIALIZER.serialize(paymentComponentState.data)
+            DropInBalanceCheckPlatformMessenger.sendResult(data)
+        } catch (exception: Exception) {
+            sendResult(
+                DropInServiceResult.Error(
+                    errorDialog = null,
+                    reason = exception.message,
+                    dismissDropIn = true
+                )
+            )
+        }
+    }
+
+    override fun onOrderRequest() {
+        setOrderRequestObserver()
+        DropInOrderRequestPlatformMessenger.sendResult("onOrderRequest")
+    }
 
     override fun onRemoveStoredPaymentMethod(storedPaymentMethod: StoredPaymentMethod) {
         storedPaymentMethod.id?.let { storedPaymentMethodId ->
@@ -122,6 +148,30 @@ class AdvancedDropInService : DropInService(), LifecycleOwner {
         }
     }
 
+    private fun setBalanceCheckObserver() {
+        DropInBalanceCheckResultMessenger.instance().removeObservers(this)
+        DropInBalanceCheckResultMessenger.instance().observe(this) { message ->
+            if (message.hasBeenHandled()) {
+                return@observe
+            }
+
+            val balanceResult = mapToBalanceDropInServiceResult(message.contentIfNotHandled as String)
+            sendBalanceResult(balanceResult)
+        }
+    }
+
+    private fun setOrderRequestObserver() {
+        DropInOrderRequestPlatformMessenger.instance().removeObservers(this)
+        DropInOrderRequestPlatformMessenger.instance().observe(this) { message ->
+            if (message.hasBeenHandled()) {
+                return@observe
+            }
+
+            val orderResult = mapToOrderDropInServiceResult(message.contentIfNotHandled as String)
+            sendOrderResult(orderResult)
+        }
+    }
+
     private fun mapToDeletionDropInResult(
         deleteStoredPaymentMethodResultDTO: DeletedStoredPaymentMethodResultDTO?
     ): RecurringDropInServiceResult {
@@ -131,9 +181,9 @@ class AdvancedDropInService : DropInService(), LifecycleOwner {
             // TODO - the error message should be provided by the native SDK
             RecurringDropInServiceResult.Error(
                 errorDialog =
-                    ErrorDialog(
-                        message = "Removal of the stored payment method failed. Please try again later."
-                    )
+                ErrorDialog(
+                    message = "Removal of the stored payment method failed. Please try again later."
+                )
             )
         }
     }
@@ -179,6 +229,37 @@ class AdvancedDropInService : DropInService(), LifecycleOwner {
             null
         } else {
             ErrorDialog(message = dropInError?.errorMessage)
+        }
+    }
+
+    private fun mapToBalanceDropInServiceResult(response: String): BalanceDropInServiceResult {
+        if (response.isEmpty()) {
+            return BalanceDropInServiceResult.Error(errorDialog = null, reason = "Balance check failed")
+        }
+
+        val jsonResponse = JSONObject(response)
+        return when (val resultCode = jsonResponse.optString("resultCode")) {
+            "Success" -> BalanceDropInServiceResult.Balance(BalanceResult.SERIALIZER.deserialize(jsonResponse))
+            "NotEnoughBalance" -> BalanceDropInServiceResult.Balance(BalanceResult.SERIALIZER.deserialize(jsonResponse))
+            else -> BalanceDropInServiceResult.Error(
+                errorDialog = ErrorDialog(message = resultCode),
+                dismissDropIn = false,
+            )
+        }
+    }
+
+    private fun mapToOrderDropInServiceResult(response: String): OrderDropInServiceResult {
+        if (response.isEmpty()) {
+            return OrderDropInServiceResult.Error(errorDialog = null, reason = "Order request failed")
+        }
+
+        val jsonResponse = JSONObject(response)
+        return when (val resultCode = jsonResponse.optString("resultCode")) {
+            "Success" -> OrderDropInServiceResult.OrderCreated(OrderResponse.SERIALIZER.deserialize(jsonResponse))
+            else -> OrderDropInServiceResult.Error(
+                errorDialog = ErrorDialog(message = resultCode),
+                dismissDropIn = false,
+            )
         }
     }
 
