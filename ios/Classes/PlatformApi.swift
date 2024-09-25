@@ -107,6 +107,7 @@ enum PaymentEventType: Int {
   case finished = 0
   case action = 1
   case error = 2
+  case update = 3
 }
 
 enum FieldVisibility: Int {
@@ -903,13 +904,13 @@ struct ComponentCommunicationModel {
 struct PaymentEventDTO {
   var paymentEventType: PaymentEventType
   var result: String? = nil
-  var actionResponse: [String?: Any?]? = nil
+  var data: [String?: Any?]? = nil
   var error: ErrorDTO? = nil
 
   static func fromList(_ list: [Any?]) -> PaymentEventDTO? {
     let paymentEventType = PaymentEventType(rawValue: list[0] as! Int)!
     let result: String? = nilOrValue(list[1])
-    let actionResponse: [String?: Any?]? = nilOrValue(list[2])
+    let data: [String?: Any?]? = nilOrValue(list[2])
     var error: ErrorDTO? = nil
     if let errorList: [Any?] = nilOrValue(list[3]) {
       error = ErrorDTO.fromList(errorList)
@@ -918,7 +919,7 @@ struct PaymentEventDTO {
     return PaymentEventDTO(
       paymentEventType: paymentEventType,
       result: result,
-      actionResponse: actionResponse,
+      data: data,
       error: error
     )
   }
@@ -926,7 +927,7 @@ struct PaymentEventDTO {
     return [
       paymentEventType.rawValue,
       result,
-      actionResponse,
+      data,
       error?.toList(),
     ]
   }
@@ -1207,6 +1208,28 @@ struct ActionComponentConfigurationDTO {
   }
 }
 
+/// Generated class from Pigeon that represents data sent in messages.
+struct OrderCancelResponseDTO {
+  var orderCancelResponseBody: [String?: Any?]
+  var updatedPaymentMethods: [String?: Any?]? = nil
+
+  static func fromList(_ list: [Any?]) -> OrderCancelResponseDTO? {
+    let orderCancelResponseBody = list[0] as! [String?: Any?]
+    let updatedPaymentMethods: [String?: Any?]? = nilOrValue(list[1])
+
+    return OrderCancelResponseDTO(
+      orderCancelResponseBody: orderCancelResponseBody,
+      updatedPaymentMethods: updatedPaymentMethods
+    )
+  }
+  func toList() -> [Any?] {
+    return [
+      orderCancelResponseBody,
+      updatedPaymentMethods,
+    ]
+  }
+}
+
 private class CheckoutPlatformInterfaceCodecReader: FlutterStandardReader {
   override func readValue(ofType type: UInt8) -> Any? {
     switch type {
@@ -1251,20 +1274,22 @@ private class CheckoutPlatformInterfaceCodecReader: FlutterStandardReader {
     case 147:
       return MerchantInfoDTO.fromList(self.readValue() as! [Any?])
     case 148:
-      return OrderResponseDTO.fromList(self.readValue() as! [Any?])
+      return OrderCancelResponseDTO.fromList(self.readValue() as! [Any?])
     case 149:
-      return PaymentEventDTO.fromList(self.readValue() as! [Any?])
+      return OrderResponseDTO.fromList(self.readValue() as! [Any?])
     case 150:
-      return PaymentResultDTO.fromList(self.readValue() as! [Any?])
+      return PaymentEventDTO.fromList(self.readValue() as! [Any?])
     case 151:
-      return PaymentResultModelDTO.fromList(self.readValue() as! [Any?])
+      return PaymentResultDTO.fromList(self.readValue() as! [Any?])
     case 152:
-      return PlatformCommunicationModel.fromList(self.readValue() as! [Any?])
+      return PaymentResultModelDTO.fromList(self.readValue() as! [Any?])
     case 153:
-      return SessionDTO.fromList(self.readValue() as! [Any?])
+      return PlatformCommunicationModel.fromList(self.readValue() as! [Any?])
     case 154:
-      return ShippingAddressParametersDTO.fromList(self.readValue() as! [Any?])
+      return SessionDTO.fromList(self.readValue() as! [Any?])
     case 155:
+      return ShippingAddressParametersDTO.fromList(self.readValue() as! [Any?])
+    case 156:
       return UnencryptedCardDTO.fromList(self.readValue() as! [Any?])
     default:
       return super.readValue(ofType: type)
@@ -1334,29 +1359,32 @@ private class CheckoutPlatformInterfaceCodecWriter: FlutterStandardWriter {
     } else if let value = value as? MerchantInfoDTO {
       super.writeByte(147)
       super.writeValue(value.toList())
-    } else if let value = value as? OrderResponseDTO {
+    } else if let value = value as? OrderCancelResponseDTO {
       super.writeByte(148)
       super.writeValue(value.toList())
-    } else if let value = value as? PaymentEventDTO {
+    } else if let value = value as? OrderResponseDTO {
       super.writeByte(149)
       super.writeValue(value.toList())
-    } else if let value = value as? PaymentResultDTO {
+    } else if let value = value as? PaymentEventDTO {
       super.writeByte(150)
       super.writeValue(value.toList())
-    } else if let value = value as? PaymentResultModelDTO {
+    } else if let value = value as? PaymentResultDTO {
       super.writeByte(151)
       super.writeValue(value.toList())
-    } else if let value = value as? PlatformCommunicationModel {
+    } else if let value = value as? PaymentResultModelDTO {
       super.writeByte(152)
       super.writeValue(value.toList())
-    } else if let value = value as? SessionDTO {
+    } else if let value = value as? PlatformCommunicationModel {
       super.writeByte(153)
       super.writeValue(value.toList())
-    } else if let value = value as? ShippingAddressParametersDTO {
+    } else if let value = value as? SessionDTO {
       super.writeByte(154)
       super.writeValue(value.toList())
-    } else if let value = value as? UnencryptedCardDTO {
+    } else if let value = value as? ShippingAddressParametersDTO {
       super.writeByte(155)
+      super.writeValue(value.toList())
+    } else if let value = value as? UnencryptedCardDTO {
+      super.writeByte(156)
       super.writeValue(value.toList())
     } else {
       super.writeValue(value)
@@ -1514,8 +1542,10 @@ private class DropInPlatformInterfaceCodecReader: FlutterStandardReader {
     case 142:
       return MerchantInfoDTO.fromList(self.readValue() as! [Any?])
     case 143:
-      return PaymentEventDTO.fromList(self.readValue() as! [Any?])
+      return OrderCancelResponseDTO.fromList(self.readValue() as! [Any?])
     case 144:
+      return PaymentEventDTO.fromList(self.readValue() as! [Any?])
+    case 145:
       return ShippingAddressParametersDTO.fromList(self.readValue() as! [Any?])
     default:
       return super.readValue(ofType: type)
@@ -1570,11 +1600,14 @@ private class DropInPlatformInterfaceCodecWriter: FlutterStandardWriter {
     } else if let value = value as? MerchantInfoDTO {
       super.writeByte(142)
       super.writeValue(value.toList())
-    } else if let value = value as? PaymentEventDTO {
+    } else if let value = value as? OrderCancelResponseDTO {
       super.writeByte(143)
       super.writeValue(value.toList())
-    } else if let value = value as? ShippingAddressParametersDTO {
+    } else if let value = value as? PaymentEventDTO {
       super.writeByte(144)
+      super.writeValue(value.toList())
+    } else if let value = value as? ShippingAddressParametersDTO {
+      super.writeByte(145)
       super.writeValue(value.toList())
     } else {
       super.writeValue(value)
@@ -1605,6 +1638,7 @@ protocol DropInPlatformInterface {
   func onDeleteStoredPaymentMethodResult(deleteStoredPaymentMethodResultDTO: DeletedStoredPaymentMethodResultDTO) throws
   func onBalanceCheckResult(balanceCheckResponse: String) throws
   func onOrderRequestResult(orderRequestResponse: String) throws
+  func onOrderCancelResult(orderCancelResponse: OrderCancelResponseDTO) throws
   func cleanUpDropIn() throws
 }
 
@@ -1719,6 +1753,21 @@ class DropInPlatformInterfaceSetup {
       }
     } else {
       onOrderRequestResultChannel.setMessageHandler(nil)
+    }
+    let onOrderCancelResultChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.DropInPlatformInterface.onOrderCancelResult", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      onOrderCancelResultChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let orderCancelResponseArg = args[0] as! OrderCancelResponseDTO
+        do {
+          try api.onOrderCancelResult(orderCancelResponse: orderCancelResponseArg)
+          reply(wrapResult(nil))
+        } catch {
+          reply(wrapError(error))
+        }
+      }
+    } else {
+      onOrderCancelResultChannel.setMessageHandler(nil)
     }
     let cleanUpDropInChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.DropInPlatformInterface.cleanUpDropIn", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {
@@ -1885,20 +1934,22 @@ private class ComponentPlatformInterfaceCodecReader: FlutterStandardReader {
     case 147:
       return MerchantInfoDTO.fromList(self.readValue() as! [Any?])
     case 148:
-      return OrderResponseDTO.fromList(self.readValue() as! [Any?])
+      return OrderCancelResponseDTO.fromList(self.readValue() as! [Any?])
     case 149:
-      return PaymentEventDTO.fromList(self.readValue() as! [Any?])
+      return OrderResponseDTO.fromList(self.readValue() as! [Any?])
     case 150:
-      return PaymentResultDTO.fromList(self.readValue() as! [Any?])
+      return PaymentEventDTO.fromList(self.readValue() as! [Any?])
     case 151:
-      return PaymentResultModelDTO.fromList(self.readValue() as! [Any?])
+      return PaymentResultDTO.fromList(self.readValue() as! [Any?])
     case 152:
-      return PlatformCommunicationModel.fromList(self.readValue() as! [Any?])
+      return PaymentResultModelDTO.fromList(self.readValue() as! [Any?])
     case 153:
-      return SessionDTO.fromList(self.readValue() as! [Any?])
+      return PlatformCommunicationModel.fromList(self.readValue() as! [Any?])
     case 154:
-      return ShippingAddressParametersDTO.fromList(self.readValue() as! [Any?])
+      return SessionDTO.fromList(self.readValue() as! [Any?])
     case 155:
+      return ShippingAddressParametersDTO.fromList(self.readValue() as! [Any?])
+    case 156:
       return UnencryptedCardDTO.fromList(self.readValue() as! [Any?])
     default:
       return super.readValue(ofType: type)
@@ -1968,29 +2019,32 @@ private class ComponentPlatformInterfaceCodecWriter: FlutterStandardWriter {
     } else if let value = value as? MerchantInfoDTO {
       super.writeByte(147)
       super.writeValue(value.toList())
-    } else if let value = value as? OrderResponseDTO {
+    } else if let value = value as? OrderCancelResponseDTO {
       super.writeByte(148)
       super.writeValue(value.toList())
-    } else if let value = value as? PaymentEventDTO {
+    } else if let value = value as? OrderResponseDTO {
       super.writeByte(149)
       super.writeValue(value.toList())
-    } else if let value = value as? PaymentResultDTO {
+    } else if let value = value as? PaymentEventDTO {
       super.writeByte(150)
       super.writeValue(value.toList())
-    } else if let value = value as? PaymentResultModelDTO {
+    } else if let value = value as? PaymentResultDTO {
       super.writeByte(151)
       super.writeValue(value.toList())
-    } else if let value = value as? PlatformCommunicationModel {
+    } else if let value = value as? PaymentResultModelDTO {
       super.writeByte(152)
       super.writeValue(value.toList())
-    } else if let value = value as? SessionDTO {
+    } else if let value = value as? PlatformCommunicationModel {
       super.writeByte(153)
       super.writeValue(value.toList())
-    } else if let value = value as? ShippingAddressParametersDTO {
+    } else if let value = value as? SessionDTO {
       super.writeByte(154)
       super.writeValue(value.toList())
-    } else if let value = value as? UnencryptedCardDTO {
+    } else if let value = value as? ShippingAddressParametersDTO {
       super.writeByte(155)
+      super.writeValue(value.toList())
+    } else if let value = value as? UnencryptedCardDTO {
+      super.writeByte(156)
       super.writeValue(value.toList())
     } else {
       super.writeValue(value)

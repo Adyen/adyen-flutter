@@ -2,22 +2,23 @@ package com.adyen.checkout.flutter.dropIn.advanced
 
 import DeletedStoredPaymentMethodResultDTO
 import ErrorDTO
+import OrderCancelResponseDTO
 import PaymentEventDTO
 import PaymentEventType
 import android.content.Intent
 import android.os.IBinder
-import android.util.Log
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ServiceLifecycleDispatcher
 import com.adyen.checkout.components.core.ActionComponentData
 import com.adyen.checkout.components.core.BalanceResult
+import com.adyen.checkout.components.core.Order
 import com.adyen.checkout.components.core.OrderResponse
 import com.adyen.checkout.components.core.PaymentComponentData
 import com.adyen.checkout.components.core.PaymentComponentState
+import com.adyen.checkout.components.core.PaymentMethodsApiResponse
 import com.adyen.checkout.components.core.StoredPaymentMethod
 import com.adyen.checkout.components.core.action.Action
-import com.adyen.checkout.core.exception.ModelSerializationException
 import com.adyen.checkout.dropin.BalanceDropInServiceResult
 import com.adyen.checkout.dropin.DropInService
 import com.adyen.checkout.dropin.DropInServiceResult
@@ -28,8 +29,6 @@ import com.adyen.checkout.flutter.dropIn.model.DropInStoredPaymentMethodDeletion
 import com.adyen.checkout.flutter.dropIn.model.DropInType
 import com.adyen.checkout.flutter.utils.Constants
 import com.adyen.checkout.googlepay.GooglePayComponentState
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import org.json.JSONObject
 
 class AdvancedDropInService : DropInService(), LifecycleOwner {
@@ -72,6 +71,17 @@ class AdvancedDropInService : DropInService(), LifecycleOwner {
     override fun onOrderRequest() {
         setOrderRequestObserver()
         DropInOrderRequestPlatformMessenger.sendResult("onOrderRequest")
+    }
+
+    override fun onOrderCancel(
+        order: Order,
+        shouldUpdatePaymentMethods: Boolean
+    ) {
+        setOrderCancelObserver()
+        val event = JSONObject()
+        event.put("order", Order.SERIALIZER.serialize(order))
+        event.put("shouldUpdatePaymentMethods", shouldUpdatePaymentMethods)
+        DropInOrderCancelPlatformMessenger.sendResult(event)
     }
 
     override fun onRemoveStoredPaymentMethod(storedPaymentMethod: StoredPaymentMethod) {
@@ -161,14 +171,26 @@ class AdvancedDropInService : DropInService(), LifecycleOwner {
     }
 
     private fun setOrderRequestObserver() {
-        DropInOrderRequestPlatformMessenger.instance().removeObservers(this)
-        DropInOrderRequestPlatformMessenger.instance().observe(this) { message ->
+        DropInOrderRequestResultMessenger.instance().removeObservers(this)
+        DropInOrderRequestResultMessenger.instance().observe(this) { message ->
             if (message.hasBeenHandled()) {
                 return@observe
             }
 
             val orderResult = mapToOrderDropInServiceResult(message.contentIfNotHandled as String)
             sendOrderResult(orderResult)
+        }
+    }
+
+    private fun setOrderCancelObserver() {
+        DropInOrderCancelResultMessenger.instance().removeObservers(this)
+        DropInOrderCancelResultMessenger.instance().observe(this) { message ->
+            if (message.hasBeenHandled()) {
+                return@observe
+            }
+
+            val orderResult = mapToOrderCancelDropInServiceResult(message.contentIfNotHandled) ?: return@observe
+            sendResult(orderResult)
         }
     }
 
@@ -181,9 +203,9 @@ class AdvancedDropInService : DropInService(), LifecycleOwner {
             // TODO - the error message should be provided by the native SDK
             RecurringDropInServiceResult.Error(
                 errorDialog =
-                ErrorDialog(
-                    message = "Removal of the stored payment method failed. Please try again later."
-                )
+                    ErrorDialog(
+                        message = "Removal of the stored payment method failed. Please try again later."
+                    )
             )
         }
     }
@@ -203,15 +225,32 @@ class AdvancedDropInService : DropInService(), LifecycleOwner {
                 )
 
             PaymentEventType.ACTION -> {
-                if (paymentEventDTO.actionResponse == null) {
+                if (paymentEventDTO.data == null) {
                     DropInServiceResult.Error(
                         errorDialog = null,
                         reason = "Action response not provided",
                         dismissDropIn = true
                     )
                 } else {
-                    val actionJson = JSONObject(paymentEventDTO.actionResponse)
+                    val actionJson = JSONObject(paymentEventDTO.data)
                     DropInServiceResult.Action(action = Action.SERIALIZER.deserialize(actionJson))
+                }
+            }
+
+            PaymentEventType.UPDATE -> {
+                if (paymentEventDTO.data == null) {
+                    DropInServiceResult.Error(
+                        errorDialog = null,
+                        reason = "Updated payment methods and order not provided",
+                        dismissDropIn = true
+                    )
+                } else {
+                    val updatedPaymentMethodsJSON =
+                        JSONObject(paymentEventDTO.data["updatedPaymentMethods"] as HashMap<*, *>)
+                    val orderResponseJSON = JSONObject(paymentEventDTO.data["orderResponse"] as HashMap<*, *>)
+                    val paymentMethods = PaymentMethodsApiResponse.SERIALIZER.deserialize(updatedPaymentMethodsJSON)
+                    val orderResponse = OrderResponse.SERIALIZER.deserialize(orderResponseJSON)
+                    DropInServiceResult.Update(paymentMethods, orderResponse)
                 }
             }
 
@@ -241,10 +280,11 @@ class AdvancedDropInService : DropInService(), LifecycleOwner {
         return when (val resultCode = jsonResponse.optString("resultCode")) {
             "Success" -> BalanceDropInServiceResult.Balance(BalanceResult.SERIALIZER.deserialize(jsonResponse))
             "NotEnoughBalance" -> BalanceDropInServiceResult.Balance(BalanceResult.SERIALIZER.deserialize(jsonResponse))
-            else -> BalanceDropInServiceResult.Error(
-                errorDialog = ErrorDialog(message = resultCode),
-                dismissDropIn = false,
-            )
+            else ->
+                BalanceDropInServiceResult.Error(
+                    errorDialog = ErrorDialog(message = resultCode),
+                    dismissDropIn = false,
+                )
         }
     }
 
@@ -256,10 +296,39 @@ class AdvancedDropInService : DropInService(), LifecycleOwner {
         val jsonResponse = JSONObject(response)
         return when (val resultCode = jsonResponse.optString("resultCode")) {
             "Success" -> OrderDropInServiceResult.OrderCreated(OrderResponse.SERIALIZER.deserialize(jsonResponse))
-            else -> OrderDropInServiceResult.Error(
-                errorDialog = ErrorDialog(message = resultCode),
-                dismissDropIn = false,
-            )
+            else ->
+                OrderDropInServiceResult.Error(
+                    errorDialog = ErrorDialog(message = resultCode),
+                    dismissDropIn = false,
+                )
+        }
+    }
+
+    private fun mapToOrderCancelDropInServiceResult(
+        orderCancelResponseDTO: OrderCancelResponseDTO?
+    ): DropInServiceResult? {
+        if (orderCancelResponseDTO == null || orderCancelResponseDTO.orderCancelResponseBody.isEmpty()) {
+            return DropInServiceResult.Error(errorDialog = null, reason = "Order cancellation failed")
+        }
+
+        val orderCancelResponseBody = JSONObject(orderCancelResponseDTO.orderCancelResponseBody)
+        return when (val resultCode = orderCancelResponseBody.optString("resultCode")) {
+            "Received" -> {
+                if (orderCancelResponseDTO.updatedPaymentMethods?.isNotEmpty() == true) {
+                    val updatedPaymentMethods = orderCancelResponseDTO.updatedPaymentMethods
+                    val paymentMethods =
+                        PaymentMethodsApiResponse.SERIALIZER.deserialize(JSONObject(updatedPaymentMethods))
+                    val orderResponse = OrderResponse.SERIALIZER.deserialize(orderCancelResponseBody)
+                    sendResult(DropInServiceResult.Update(paymentMethods, orderResponse))
+                }
+                null
+            }
+
+            else ->
+                DropInServiceResult.Error(
+                    errorDialog = ErrorDialog(message = resultCode),
+                    dismissDropIn = false,
+                )
         }
     }
 

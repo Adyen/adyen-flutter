@@ -1,6 +1,7 @@
 package com.adyen.checkout.flutter.dropIn.advanced
 
 import DeletedStoredPaymentMethodResultDTO
+import OrderCancelResponseDTO
 import PaymentEventDTO
 import androidx.lifecycle.LiveData
 import com.adyen.checkout.flutter.dropIn.model.DropInStoredPaymentMethodDeletionModel
@@ -109,7 +110,7 @@ class DropInBalanceCheckResultMessenger : LiveData<Event<String>>() {
     }
 }
 
-class DropInOrderRequestPlatformMessenger: LiveData<Event<String>>() {
+class DropInOrderRequestPlatformMessenger : LiveData<Event<String>>() {
     companion object {
         private val dropInOrderRequestPlatformMessenger =
             DropInOrderRequestPlatformMessenger()
@@ -122,7 +123,7 @@ class DropInOrderRequestPlatformMessenger: LiveData<Event<String>>() {
     }
 }
 
-class DropInOrderRequestResultMessenger: LiveData<Event<String>>() {
+class DropInOrderRequestResultMessenger : LiveData<Event<String>>() {
     companion object {
         private val dropInOrderRequestResultMessenger =
             DropInOrderRequestResultMessenger()
@@ -135,3 +136,28 @@ class DropInOrderRequestResultMessenger: LiveData<Event<String>>() {
     }
 }
 
+class DropInOrderCancelPlatformMessenger : LiveData<Event<JSONObject>>() {
+    companion object {
+        private val dropInOrderCancelPlatformMessenger =
+            DropInOrderCancelPlatformMessenger()
+
+        fun instance() = dropInOrderCancelPlatformMessenger
+
+        fun sendResult(value: JSONObject) {
+            dropInOrderCancelPlatformMessenger.postValue(Event(value))
+        }
+    }
+}
+
+class DropInOrderCancelResultMessenger : LiveData<Event<OrderCancelResponseDTO>>() {
+    companion object {
+        private val dropInOrderCancelResultMessenger =
+            DropInOrderCancelResultMessenger()
+
+        fun instance() = dropInOrderCancelResultMessenger
+
+        fun sendResult(value: OrderCancelResponseDTO) {
+            dropInOrderCancelResultMessenger.postValue(Event(value))
+        }
+    }
+}

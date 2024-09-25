@@ -42,6 +42,9 @@ class ApplePayAdvancedComponent: BaseApplePayComponent {
         case .action:
             // Apple pay does not require action handling
             return
+        case .update:
+            // Apple pay does not support updating the payment flow
+            return
         }
     }
     

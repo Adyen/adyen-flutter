@@ -137,6 +137,10 @@ class DropInPlatformApi: DropInPlatformInterface {
         
     }
     
+    func onOrderRequestResult(orderRequestResponse: String) throws {
+        
+    }
+    
 
     func cleanUpDropIn() {
         sessionHolder.reset()
@@ -156,6 +160,8 @@ class DropInPlatformApi: DropInPlatformInterface {
             onDropInResultAction(paymentEventDTO: paymentEventDTO)
         case .error:
             onDropInResultError(paymentEventDTO: paymentEventDTO)
+        case .update:
+            return
         }
     }
 
@@ -180,7 +186,7 @@ class DropInPlatformApi: DropInPlatformInterface {
 
     private func onDropInResultAction(paymentEventDTO: PaymentEventDTO) {
         do {
-            let jsonData = try JSONSerialization.data(withJSONObject: paymentEventDTO.actionResponse as Any, options: [])
+            let jsonData = try JSONSerialization.data(withJSONObject: paymentEventDTO.data as Any, options: [])
             let result = try JSONDecoder().decode(Action.self, from: jsonData)
             dropInViewController?.dropInComponent.handle(result)
         } catch {

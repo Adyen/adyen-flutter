@@ -5,11 +5,13 @@ class PaymentEventHandler {
   static const errorCodeKey = "errorCode";
   static const resultCodeKey = "resultCode";
   static const actionKey = "action";
-  static const orderKey = "order";
   static const messageKey = "message";
   static const refusalReasonKey = "refusalReason";
 
-  PaymentEvent handleResponse(Map<String, dynamic> jsonResponse) {
+  PaymentEvent handleResponse({
+    required Map<String, dynamic> jsonResponse,
+    Map<String, dynamic> updatedPaymentMethods = const {},
+  }) {
     if (_isError(jsonResponse)) {
       return Error(
         errorMessage: jsonResponse[messageKey],
@@ -28,6 +30,14 @@ class PaymentEventHandler {
 
     if (_isAction(jsonResponse)) {
       return Action(actionResponse: jsonResponse[actionKey]);
+    }
+
+    if (_isNonFullyPaidOrder(jsonResponse) &&
+        updatedPaymentMethods.isNotEmpty) {
+      return Update(
+        orderResponse: jsonResponse["order"],
+        paymentMethods: updatedPaymentMethods,
+      );
     }
 
     if (jsonResponse.containsKey(resultCodeKey)) {
@@ -56,10 +66,13 @@ class PaymentEventHandler {
 
   bool _isAction(jsonResponse) => jsonResponse.containsKey(actionKey);
 
-  bool _isNonFullyPaidOrder(jsonResponse) =>
-      jsonResponse.containsKey(orderKey) &&
-      (getOrderFromResponse(jsonResponse).remainingAmount?.value ?? 0) > 0;
-
-  OrderResponse getOrderFromResponse(jsonResponse) =>
-      OrderResponse.fromJson(jsonResponse);
+  bool _isNonFullyPaidOrder(jsonResponse) {
+    if (jsonResponse.containsKey("order")) {
+      final remainingAmount =
+          jsonResponse["order"]["remainingAmount"]["value"];
+      return remainingAmount > 0;
+    } else {
+      return false;
+    }
+  }
 }

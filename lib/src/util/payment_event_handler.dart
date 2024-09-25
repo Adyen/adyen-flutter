@@ -10,7 +10,7 @@ class PaymentEventHandler {
         ),
       Action() => PaymentEventDTO(
           paymentEventType: PaymentEventType.action,
-          actionResponse: paymentEvent.actionResponse,
+          data: paymentEvent.actionResponse,
         ),
       Error() => PaymentEventDTO(
           paymentEventType: PaymentEventType.error,
@@ -19,6 +19,13 @@ class PaymentEventHandler {
             reason: paymentEvent.reason,
             dismissDropIn: paymentEvent.dismissDropIn,
           ),
+        ),
+      Update() => PaymentEventDTO(
+          paymentEventType: PaymentEventType.update,
+          data: {
+            "updatedPaymentMethods": paymentEvent.paymentMethods,
+            "orderResponse": paymentEvent.orderResponse,
+          },
         ),
     };
   }

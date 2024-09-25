@@ -1,4 +1,4 @@
-import 'package:adyen_checkout/src/common/model/partial_payment.dart';
+import 'package:adyen_checkout/src/common/model/partial_payment/partial_payment.dart';
 import 'package:adyen_checkout/src/common/model/payment_event.dart';
 
 sealed class Checkout {}

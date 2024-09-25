@@ -45,4 +45,9 @@ class DropInPlatformApi implements DropInPlatformInterface {
   @override
   Future<void> onOrderRequestResult(String orderRequestResponse) =>
       _dropInPlatformInterface.onOrderRequestResult(orderRequestResponse);
+
+  @override
+  Future<void> onOrderCancelResult(
+          OrderCancelResponseDTO orderCancelResponse) =>
+      _dropInPlatformInterface.onOrderCancelResult(orderCancelResponse);
 }
