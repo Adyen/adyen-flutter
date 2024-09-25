@@ -13,24 +13,25 @@ extension AnalyticsOptionsMapper on AnalyticsOptions {
 extension DropInConfigurationMapper on DropInConfiguration {
   DropInConfigurationDTO toDTO(String sdkVersionNumber) =>
       DropInConfigurationDTO(
-        environment: environment,
-        clientKey: clientKey,
-        countryCode: countryCode.toUpperCase(),
-        amount: amount?.toDTO(),
-        shopperLocale: shopperLocale,
-        cardConfigurationDTO: cardConfiguration?.toDTO(),
-        applePayConfigurationDTO: applePayConfiguration?.toDTO(),
-        googlePayConfigurationDTO: googlePayConfiguration?.toDTO(),
-        cashAppPayConfigurationDTO: cashAppPayConfiguration?.toDTO(),
-        analyticsOptionsDTO: analyticsOptions.toDTO(sdkVersionNumber),
-        isRemoveStoredPaymentMethodEnabled: _isRemoveStoredPaymentMethodEnabled(
-            storedPaymentMethodConfiguration),
-        showPreselectedStoredPaymentMethod: storedPaymentMethodConfiguration
-                ?.showPreselectedStoredPaymentMethod ??
-            true,
-        skipListWhenSinglePaymentMethod: skipListWhenSinglePaymentMethod,
-        preselectedPaymentMethodTitle: preselectedPaymentMethodTitle,
-        paymentMethodNames: paymentMethodNames,
+          environment: environment,
+          clientKey: clientKey,
+          countryCode: countryCode.toUpperCase(),
+          amount: amount?.toDTO(),
+          shopperLocale: shopperLocale,
+          cardConfigurationDTO: cardConfiguration?.toDTO(),
+          applePayConfigurationDTO: applePayConfiguration?.toDTO(),
+          googlePayConfigurationDTO: googlePayConfiguration?.toDTO(),
+          cashAppPayConfigurationDTO: cashAppPayConfiguration?.toDTO(),
+          analyticsOptionsDTO: analyticsOptions.toDTO(sdkVersionNumber),
+          isRemoveStoredPaymentMethodEnabled:
+              _isRemoveStoredPaymentMethodEnabled(
+                  storedPaymentMethodConfiguration),
+          showPreselectedStoredPaymentMethod: storedPaymentMethodConfiguration
+                  ?.showPreselectedStoredPaymentMethod ??
+              true,
+          skipListWhenSinglePaymentMethod: skipListWhenSinglePaymentMethod,
+          preselectedPaymentMethodTitle: preselectedPaymentMethodTitle,
+          paymentMethodNames: paymentMethodNames,
       );
 
   bool _isRemoveStoredPaymentMethodEnabled(
@@ -301,4 +302,13 @@ extension ActionComponentConfigurationMapper on ActionComponentConfiguration {
         amount: amount?.toDTO(),
         analyticsOptionsDTO: analyticsOptions.toDTO(sdkVersionNumber),
       );
+}
+
+extension OrderCancelResponseMapper on OrderCancelResponse {
+  OrderCancelResponseDTO toDTO() {
+    return OrderCancelResponseDTO(
+      orderCancelResponseBody: orderCancelResponseBody,
+      updatedPaymentMethods: updatedPaymentMethods,
+    );
+  }
 }

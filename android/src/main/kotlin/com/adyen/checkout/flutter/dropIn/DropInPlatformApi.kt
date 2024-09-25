@@ -4,6 +4,7 @@ import DeletedStoredPaymentMethodResultDTO
 import DropInConfigurationDTO
 import DropInFlutterInterface
 import DropInPlatformInterface
+import OrderCancelResponseDTO
 import PaymentEventDTO
 import PaymentEventType
 import PaymentResultDTO
@@ -28,6 +29,8 @@ import com.adyen.checkout.flutter.dropIn.advanced.DropInAdditionalDetailsPlatfor
 import com.adyen.checkout.flutter.dropIn.advanced.DropInAdditionalDetailsResultMessenger
 import com.adyen.checkout.flutter.dropIn.advanced.DropInBalanceCheckPlatformMessenger
 import com.adyen.checkout.flutter.dropIn.advanced.DropInBalanceCheckResultMessenger
+import com.adyen.checkout.flutter.dropIn.advanced.DropInOrderCancelPlatformMessenger
+import com.adyen.checkout.flutter.dropIn.advanced.DropInOrderCancelResultMessenger
 import com.adyen.checkout.flutter.dropIn.advanced.DropInOrderRequestPlatformMessenger
 import com.adyen.checkout.flutter.dropIn.advanced.DropInOrderRequestResultMessenger
 import com.adyen.checkout.flutter.dropIn.advanced.DropInPaymentMethodDeletionPlatformMessenger
@@ -81,6 +84,7 @@ class DropInPlatformApi(
         setStoredPaymentMethodDeletionObserver()
         setBalanceCheckPlatformMessengerObserver()
         setOrderRequestPlatformMessengerObserver()
+        setOrderCancelPlatformMessengerObserver()
         activity.lifecycleScope.launch(Dispatchers.IO) {
             val paymentMethodsApiResponse =
                 PaymentMethodsApiResponse.SERIALIZER.deserialize(
@@ -92,7 +96,7 @@ class DropInPlatformApi(
                 DropIn.startPayment(
                     activity.applicationContext,
                     dropInAdvancedFlowLauncher,
-                    paymentMethodsWithoutGiftCards,
+                    paymentMethodsApiResponse,
                     dropInConfiguration,
                     AdvancedDropInService::class.java,
                 )
@@ -126,10 +130,17 @@ class DropInPlatformApi(
         DropInOrderRequestResultMessenger.sendResult(orderRequestResponse)
     }
 
+    override fun onOrderCancelResult(orderCancelResponse: OrderCancelResponseDTO) {
+        DropInOrderCancelResultMessenger.sendResult(orderCancelResponse)
+    }
+
     override fun cleanUpDropIn() {
         DropInServiceResultMessenger.instance().removeObservers(activity)
-        DropInPaymentMethodDeletionPlatformMessenger.instance().removeObservers(activity)
         DropInAdditionalDetailsPlatformMessenger.instance().removeObservers(activity)
+        DropInPaymentMethodDeletionPlatformMessenger.instance().removeObservers(activity)
+        DropInBalanceCheckResultMessenger.instance().removeObservers(activity)
+        DropInOrderRequestResultMessenger.instance().removeObservers(activity)
+        DropInOrderCancelPlatformMessenger.instance().removeObservers(activity)
     }
 
     private fun setAdvancedFlowDropInServiceObserver() {
@@ -202,10 +213,11 @@ class DropInPlatformApi(
                 return@observe
             }
 
-            val platformCommunicationModel = PlatformCommunicationModel(
-                PlatformCommunicationType.BALANCECHECK,
-                data = message.contentIfNotHandled.toString()
-            )
+            val platformCommunicationModel =
+                PlatformCommunicationModel(
+                    PlatformCommunicationType.BALANCECHECK,
+                    data = message.contentIfNotHandled.toString()
+                )
             dropInFlutterApi.onDropInAdvancedPlatformCommunication(platformCommunicationModel) {}
         }
     }
@@ -217,10 +229,27 @@ class DropInPlatformApi(
                 return@observe
             }
 
-            val platformCommunicationModel = PlatformCommunicationModel(
-                PlatformCommunicationType.REQUESTORDER,
-                data = message.contentIfNotHandled.toString()
-            )
+            val platformCommunicationModel =
+                PlatformCommunicationModel(
+                    PlatformCommunicationType.REQUESTORDER,
+                    data = message.contentIfNotHandled.toString()
+                )
+            dropInFlutterApi.onDropInAdvancedPlatformCommunication(platformCommunicationModel) {}
+        }
+    }
+
+    private fun setOrderCancelPlatformMessengerObserver() {
+        DropInOrderCancelPlatformMessenger.instance().removeObservers(activity)
+        DropInOrderCancelPlatformMessenger.instance().observe(activity) { message ->
+            if (message.hasBeenHandled()) {
+                return@observe
+            }
+
+            val platformCommunicationModel =
+                PlatformCommunicationModel(
+                    PlatformCommunicationType.CANCELORDER,
+                    data = message.contentIfNotHandled.toString()
+                )
             dropInFlutterApi.onDropInAdvancedPlatformCommunication(platformCommunicationModel) {}
         }
     }
@@ -278,15 +307,15 @@ class DropInPlatformApi(
                         PaymentResultDTO(
                             PaymentResultEnum.FINISHED,
                             result =
-                            with(sessionDropInResult.result) {
-                                PaymentResultModelDTO(
-                                    sessionId,
-                                    sessionData,
-                                    sessionResult,
-                                    resultCode,
-                                    order?.mapToOrderResponseModel()
-                                )
-                            }
+                                with(sessionDropInResult.result) {
+                                    PaymentResultModelDTO(
+                                        sessionId,
+                                        sessionData,
+                                        sessionResult,
+                                        resultCode,
+                                        order?.mapToOrderResponseModel()
+                                    )
+                                }
                         )
                 }
 
@@ -323,9 +352,9 @@ class DropInPlatformApi(
                         PaymentResultDTO(
                             PaymentResultEnum.FINISHED,
                             result =
-                            PaymentResultModelDTO(
-                                resultCode = dropInAdvancedFlowResult.result
-                            )
+                                PaymentResultModelDTO(
+                                    resultCode = dropInAdvancedFlowResult.result
+                                )
                         )
                 }
 

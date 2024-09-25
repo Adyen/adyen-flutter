@@ -1,10 +1,10 @@
 // ignore_for_file: avoid_print
 
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:adyen_checkout/adyen_checkout.dart';
 import 'package:adyen_checkout_example/config.dart';
-import 'package:adyen_checkout_example/network/models/payment_methods_request_network_model.dart';
 import 'package:adyen_checkout_example/network/models/session_request_network_model.dart';
 import 'package:adyen_checkout_example/network/models/session_response_network_model.dart';
 import 'package:http/http.dart' as http;
@@ -25,12 +25,11 @@ class Service {
   }
 
   Future<Map<String, dynamic>> fetchPaymentMethods(
-      PaymentMethodsRequestNetworkModel
-          paymentMethodsRequestNetworkModel) async {
+      Map<String, dynamic> body) async {
     final response = await http.post(
       Uri.https(Config.baseUrl, "/${Config.apiVersion}/paymentMethods"),
       headers: _createHeaders(),
-      body: paymentMethodsRequestNetworkModel.toRawJson(),
+      body: jsonEncode(body),
     );
     return jsonDecode(response.body);
   }
@@ -42,6 +41,7 @@ class Service {
       body: jsonEncode(body),
     );
     print("PspReference: ${response.headers["pspreference"]}");
+    log(response.body);
     return jsonDecode(response.body);
   }
 
@@ -55,16 +55,10 @@ class Service {
     return jsonDecode(response.body);
   }
 
-  Future<bool> deleteStoredPaymentMethod({
-    required String storedPaymentMethodId,
-    required String merchantAccount,
-    required String shopperReference,
-  }) async {
-    final queryParameters = {
-      'merchantAccount': merchantAccount,
-      'shopperReference': shopperReference,
-    };
-
+  Future<bool> deleteStoredPaymentMethod(
+    String storedPaymentMethodId,
+    Map<String, dynamic> queryParameters,
+  ) async {
     final response = await http.delete(
       Uri.https(
         Config.baseUrl,
@@ -88,7 +82,6 @@ class Service {
       headers: _createHeaders(),
       body: jsonEncode(body),
     );
-    print(response.body);
     return jsonDecode(response.body);
   }
 
@@ -109,7 +102,6 @@ class Service {
     );
     return jsonDecode(response.body);
   }
-
 
   Map<String, String> _createHeaders() => {
         "content-type": "application/json",

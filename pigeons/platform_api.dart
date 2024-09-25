@@ -75,6 +75,7 @@ enum PaymentEventType {
   finished,
   action,
   error,
+  update,
 }
 
 enum FieldVisibility {
@@ -440,13 +441,13 @@ class ComponentCommunicationModel {
 class PaymentEventDTO {
   final PaymentEventType paymentEventType;
   final String? result;
-  final Map<String?, Object?>? actionResponse;
+  final Map<String?, Object?>? data;
   final ErrorDTO? error;
 
   PaymentEventDTO({
     required this.paymentEventType,
     this.result,
-    this.actionResponse,
+    this.data,
     this.error,
   });
 }
@@ -573,6 +574,16 @@ class ActionComponentConfigurationDTO {
   );
 }
 
+class OrderCancelResponseDTO {
+  final Map<String?, Object?> orderCancelResponseBody;
+  final Map<String?, Object?>? updatedPaymentMethods;
+
+  OrderCancelResponseDTO(
+    this.orderCancelResponseBody,
+    this.updatedPaymentMethods,
+  );
+}
+
 @HostApi()
 abstract class CheckoutPlatformInterface {
   @async
@@ -621,6 +632,8 @@ abstract class DropInPlatformInterface {
   void onBalanceCheckResult(String balanceCheckResponse);
 
   void onOrderRequestResult(String orderRequestResponse);
+
+  void onOrderCancelResult(OrderCancelResponseDTO orderCancelResponse);
 
   void cleanUpDropIn();
 }

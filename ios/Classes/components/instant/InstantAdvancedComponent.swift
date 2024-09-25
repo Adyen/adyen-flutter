@@ -51,12 +51,14 @@ class InstantAdvancedComponent: BaseInstantComponent, InstantComponentProtocol {
             onError(paymentEventDTO: paymentEventDTO)
         case .action:
             onAction(paymentEventDTO: paymentEventDTO)
+        case .update:
+            return
         }
     }
     
     private func onAction(paymentEventDTO: PaymentEventDTO) {
         do {
-            guard let jsonActionResponse = paymentEventDTO.actionResponse else { return }
+            guard let jsonActionResponse = paymentEventDTO.data else { return }
             let jsonData = try JSONSerialization.data(withJSONObject: jsonActionResponse, options: [])
             let action = try JSONDecoder().decode(Action.self, from: jsonData)
             actionComponent?.handle(action)

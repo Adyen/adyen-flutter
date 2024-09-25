@@ -121,7 +121,7 @@ class DropIn {
         case PlatformCommunicationType.requestOrder:
           _handleOrderRequest(event, advancedCheckout.partialPayment);
         case PlatformCommunicationType.cancelOrder:
-        // TODO: Handle this case.
+          _handleOrderCancel(event, advancedCheckout.partialPayment);
       }
     });
 
@@ -273,12 +273,11 @@ class DropIn {
       throw Exception("Partial payment implementation is not provided.");
     }
 
-    final Map<String, dynamic> data = jsonDecode(event.data as String);
-    final Map<String, dynamic> requestBody = {};
-    requestBody.addAll({
+    final data = jsonDecode(event.data as String);
+    final Map<String, dynamic> requestBody = {
       "paymentMethod": data["paymentMethod"],
       "amount": data["amount"],
-    });
+    };
 
     final balanceCheckResponse =
         await partialPayment.onCheckBalance(requestBody);
@@ -296,7 +295,26 @@ class DropIn {
       throw Exception("Partial payment implementation is not provided.");
     }
 
-    final balanceCheckResponse = await partialPayment.onRequestOrder();
-    dropInPlatformApi.onOrderRequestResult(jsonEncode(balanceCheckResponse));
+    final orderRequestResponse = await partialPayment.onRequestOrder();
+    dropInPlatformApi.onOrderRequestResult(jsonEncode(orderRequestResponse));
+  }
+
+  void _handleOrderCancel(
+    PlatformCommunicationModel event,
+    PartialPayment? partialPayment,
+  ) async {
+    if (partialPayment == null) {
+      dropInPlatformApi.onOrderCancelResult(
+          OrderCancelResponseDTO(orderCancelResponseBody: {}));
+      throw Exception("Partial payment implementation is not provided.");
+    }
+
+    final orderResponse = jsonDecode(event.data as String);
+    final orderCancelResponse = await partialPayment.onCancelOrder(
+      orderResponse["shouldUpdatePaymentMethods"] as bool? ?? false,
+      orderResponse["order"],
+    );
+
+    dropInPlatformApi.onOrderCancelResult(orderCancelResponse.toDTO());
   }
 }

@@ -162,7 +162,8 @@ enum class ComponentCommunicationType(val raw: Int) {
 enum class PaymentEventType(val raw: Int) {
   FINISHED(0),
   ACTION(1),
-  ERROR(2);
+  ERROR(2),
+  UPDATE(3);
 
   companion object {
     fun ofRaw(raw: Int): PaymentEventType? {
@@ -902,7 +903,7 @@ data class ComponentCommunicationModel (
 data class PaymentEventDTO (
   val paymentEventType: PaymentEventType,
   val result: String? = null,
-  val actionResponse: Map<String?, Any?>? = null,
+  val data: Map<String?, Any?>? = null,
   val error: ErrorDTO? = null
 
 ) {
@@ -911,18 +912,18 @@ data class PaymentEventDTO (
     fun fromList(list: List<Any?>): PaymentEventDTO {
       val paymentEventType = PaymentEventType.ofRaw(list[0] as Int)!!
       val result = list[1] as String?
-      val actionResponse = list[2] as Map<String?, Any?>?
+      val data = list[2] as Map<String?, Any?>?
       val error: ErrorDTO? = (list[3] as List<Any?>?)?.let {
         ErrorDTO.fromList(it)
       }
-      return PaymentEventDTO(paymentEventType, result, actionResponse, error)
+      return PaymentEventDTO(paymentEventType, result, data, error)
     }
   }
   fun toList(): List<Any?> {
     return listOf<Any?>(
       paymentEventType.raw,
       result,
-      actionResponse,
+      data,
       error?.toList(),
     )
   }
@@ -1177,6 +1178,28 @@ data class ActionComponentConfigurationDTO (
   }
 }
 
+/** Generated class from Pigeon that represents data sent in messages. */
+data class OrderCancelResponseDTO (
+  val orderCancelResponseBody: Map<String?, Any?>,
+  val updatedPaymentMethods: Map<String?, Any?>? = null
+
+) {
+  companion object {
+    @Suppress("UNCHECKED_CAST")
+    fun fromList(list: List<Any?>): OrderCancelResponseDTO {
+      val orderCancelResponseBody = list[0] as Map<String?, Any?>
+      val updatedPaymentMethods = list[1] as Map<String?, Any?>?
+      return OrderCancelResponseDTO(orderCancelResponseBody, updatedPaymentMethods)
+    }
+  }
+  fun toList(): List<Any?> {
+    return listOf<Any?>(
+      orderCancelResponseBody,
+      updatedPaymentMethods,
+    )
+  }
+}
+
 @Suppress("UNCHECKED_CAST")
 private object CheckoutPlatformInterfaceCodec : StandardMessageCodec() {
   override fun readValueOfType(type: Byte, buffer: ByteBuffer): Any? {
@@ -1283,40 +1306,45 @@ private object CheckoutPlatformInterfaceCodec : StandardMessageCodec() {
       }
       148.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          OrderResponseDTO.fromList(it)
+          OrderCancelResponseDTO.fromList(it)
         }
       }
       149.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          PaymentEventDTO.fromList(it)
+          OrderResponseDTO.fromList(it)
         }
       }
       150.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          PaymentResultDTO.fromList(it)
+          PaymentEventDTO.fromList(it)
         }
       }
       151.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          PaymentResultModelDTO.fromList(it)
+          PaymentResultDTO.fromList(it)
         }
       }
       152.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          PlatformCommunicationModel.fromList(it)
+          PaymentResultModelDTO.fromList(it)
         }
       }
       153.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          SessionDTO.fromList(it)
+          PlatformCommunicationModel.fromList(it)
         }
       }
       154.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          ShippingAddressParametersDTO.fromList(it)
+          SessionDTO.fromList(it)
         }
       }
       155.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          ShippingAddressParametersDTO.fromList(it)
+        }
+      }
+      156.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
           UnencryptedCardDTO.fromList(it)
         }
@@ -1406,36 +1434,40 @@ private object CheckoutPlatformInterfaceCodec : StandardMessageCodec() {
         stream.write(147)
         writeValue(stream, value.toList())
       }
-      is OrderResponseDTO -> {
+      is OrderCancelResponseDTO -> {
         stream.write(148)
         writeValue(stream, value.toList())
       }
-      is PaymentEventDTO -> {
+      is OrderResponseDTO -> {
         stream.write(149)
         writeValue(stream, value.toList())
       }
-      is PaymentResultDTO -> {
+      is PaymentEventDTO -> {
         stream.write(150)
         writeValue(stream, value.toList())
       }
-      is PaymentResultModelDTO -> {
+      is PaymentResultDTO -> {
         stream.write(151)
         writeValue(stream, value.toList())
       }
-      is PlatformCommunicationModel -> {
+      is PaymentResultModelDTO -> {
         stream.write(152)
         writeValue(stream, value.toList())
       }
-      is SessionDTO -> {
+      is PlatformCommunicationModel -> {
         stream.write(153)
         writeValue(stream, value.toList())
       }
-      is ShippingAddressParametersDTO -> {
+      is SessionDTO -> {
         stream.write(154)
         writeValue(stream, value.toList())
       }
-      is UnencryptedCardDTO -> {
+      is ShippingAddressParametersDTO -> {
         stream.write(155)
+        writeValue(stream, value.toList())
+      }
+      is UnencryptedCardDTO -> {
+        stream.write(156)
         writeValue(stream, value.toList())
       }
       else -> super.writeValue(stream, value)
@@ -1662,10 +1694,15 @@ private object DropInPlatformInterfaceCodec : StandardMessageCodec() {
       }
       143.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          PaymentEventDTO.fromList(it)
+          OrderCancelResponseDTO.fromList(it)
         }
       }
       144.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          PaymentEventDTO.fromList(it)
+        }
+      }
+      145.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
           ShippingAddressParametersDTO.fromList(it)
         }
@@ -1735,12 +1772,16 @@ private object DropInPlatformInterfaceCodec : StandardMessageCodec() {
         stream.write(142)
         writeValue(stream, value.toList())
       }
-      is PaymentEventDTO -> {
+      is OrderCancelResponseDTO -> {
         stream.write(143)
         writeValue(stream, value.toList())
       }
-      is ShippingAddressParametersDTO -> {
+      is PaymentEventDTO -> {
         stream.write(144)
+        writeValue(stream, value.toList())
+      }
+      is ShippingAddressParametersDTO -> {
+        stream.write(145)
         writeValue(stream, value.toList())
       }
       else -> super.writeValue(stream, value)
@@ -1757,6 +1798,7 @@ interface DropInPlatformInterface {
   fun onDeleteStoredPaymentMethodResult(deleteStoredPaymentMethodResultDTO: DeletedStoredPaymentMethodResultDTO)
   fun onBalanceCheckResult(balanceCheckResponse: String)
   fun onOrderRequestResult(orderRequestResponse: String)
+  fun onOrderCancelResult(orderCancelResponse: OrderCancelResponseDTO)
   fun cleanUpDropIn()
 
   companion object {
@@ -1891,6 +1933,25 @@ interface DropInPlatformInterface {
             var wrapped: List<Any?>
             try {
               api.onOrderRequestResult(orderRequestResponseArg)
+              wrapped = listOf<Any?>(null)
+            } catch (exception: Throwable) {
+              wrapped = wrapError(exception)
+            }
+            reply.reply(wrapped)
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.adyen_checkout.DropInPlatformInterface.onOrderCancelResult", codec)
+        if (api != null) {
+          channel.setMessageHandler { message, reply ->
+            val args = message as List<Any?>
+            val orderCancelResponseArg = args[0] as OrderCancelResponseDTO
+            var wrapped: List<Any?>
+            try {
+              api.onOrderCancelResult(orderCancelResponseArg)
               wrapped = listOf<Any?>(null)
             } catch (exception: Throwable) {
               wrapped = wrapError(exception)
@@ -2128,40 +2189,45 @@ private object ComponentPlatformInterfaceCodec : StandardMessageCodec() {
       }
       148.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          OrderResponseDTO.fromList(it)
+          OrderCancelResponseDTO.fromList(it)
         }
       }
       149.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          PaymentEventDTO.fromList(it)
+          OrderResponseDTO.fromList(it)
         }
       }
       150.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          PaymentResultDTO.fromList(it)
+          PaymentEventDTO.fromList(it)
         }
       }
       151.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          PaymentResultModelDTO.fromList(it)
+          PaymentResultDTO.fromList(it)
         }
       }
       152.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          PlatformCommunicationModel.fromList(it)
+          PaymentResultModelDTO.fromList(it)
         }
       }
       153.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          SessionDTO.fromList(it)
+          PlatformCommunicationModel.fromList(it)
         }
       }
       154.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          ShippingAddressParametersDTO.fromList(it)
+          SessionDTO.fromList(it)
         }
       }
       155.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          ShippingAddressParametersDTO.fromList(it)
+        }
+      }
+      156.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
           UnencryptedCardDTO.fromList(it)
         }
@@ -2251,36 +2317,40 @@ private object ComponentPlatformInterfaceCodec : StandardMessageCodec() {
         stream.write(147)
         writeValue(stream, value.toList())
       }
-      is OrderResponseDTO -> {
+      is OrderCancelResponseDTO -> {
         stream.write(148)
         writeValue(stream, value.toList())
       }
-      is PaymentEventDTO -> {
+      is OrderResponseDTO -> {
         stream.write(149)
         writeValue(stream, value.toList())
       }
-      is PaymentResultDTO -> {
+      is PaymentEventDTO -> {
         stream.write(150)
         writeValue(stream, value.toList())
       }
-      is PaymentResultModelDTO -> {
+      is PaymentResultDTO -> {
         stream.write(151)
         writeValue(stream, value.toList())
       }
-      is PlatformCommunicationModel -> {
+      is PaymentResultModelDTO -> {
         stream.write(152)
         writeValue(stream, value.toList())
       }
-      is SessionDTO -> {
+      is PlatformCommunicationModel -> {
         stream.write(153)
         writeValue(stream, value.toList())
       }
-      is ShippingAddressParametersDTO -> {
+      is SessionDTO -> {
         stream.write(154)
         writeValue(stream, value.toList())
       }
-      is UnencryptedCardDTO -> {
+      is ShippingAddressParametersDTO -> {
         stream.write(155)
+        writeValue(stream, value.toList())
+      }
+      is UnencryptedCardDTO -> {
+        stream.write(156)
         writeValue(stream, value.toList())
       }
       else -> super.writeValue(stream, value)
