@@ -24,6 +24,19 @@ class ApplePayComponentManager {
         callback: (Result<InstantPaymentSetupResultDTO, Error>) -> Void
     ) {
         do {
+            // Check if an Apple Pay component is already created to prevent additional instances. This happens when the build method of the AdyenApplePayComponentWidget is called multiple times.
+            if (applePayComponent != nil) {
+                callback(
+                    Result.success(
+                        InstantPaymentSetupResultDTO(
+                            instantPaymentType: InstantPaymentType.applePay,
+                            isSupported: true
+                        )
+                    )
+                )
+                return
+            }
+            
             if componentId == Constants.applePaySessionComponentId {
                 applePayComponent = try ApplePaySessionComponent(
                     sessionHolder: sessionHolder,
