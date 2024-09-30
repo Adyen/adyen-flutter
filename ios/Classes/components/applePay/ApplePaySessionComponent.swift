@@ -24,7 +24,6 @@ class ApplePaySessionComponent: BaseApplePayComponent {
     }
     
     override func onDispose() {
-        sessionHolder.reset()
         applePayComponent = nil
     }
     

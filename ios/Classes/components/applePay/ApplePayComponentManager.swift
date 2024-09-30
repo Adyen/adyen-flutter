@@ -17,34 +17,22 @@ class ApplePayComponentManager {
         self.sessionHolder = sessionHolder
     }
  
-    func setUpApplePayIfAvailable(
+    func isApplePayAvailable(
         instantPaymentComponentConfigurationDTO: InstantPaymentConfigurationDTO,
         paymentMethodResponse: String,
         componentId: String,
         callback: (Result<InstantPaymentSetupResultDTO, Error>) -> Void
     ) {
         do {
-            // Check if an Apple Pay component is already created to prevent additional instances. This happens when the build method of the AdyenApplePayComponentWidget is called multiple times.
-            if (applePayComponent != nil) {
-                callback(
-                    Result.success(
-                        InstantPaymentSetupResultDTO(
-                            instantPaymentType: InstantPaymentType.applePay,
-                            isSupported: true
-                        )
-                    )
-                )
-                return
-            }
-            
+            // Creating an instance is unused to check whether Apple Pay is available.
             if componentId == Constants.applePaySessionComponentId {
-                applePayComponent = try ApplePaySessionComponent(
+                _ = try ApplePaySessionComponent(
                     sessionHolder: sessionHolder,
                     configuration: instantPaymentComponentConfigurationDTO,
                     componentId: componentId
                 )
             } else {
-                applePayComponent = try ApplePayAdvancedComponent(
+                _ = try ApplePayAdvancedComponent(
                     componentFlutterApi: componentFlutterApi,
                     configuration: instantPaymentComponentConfigurationDTO,
                     paymentMethodResponse: paymentMethodResponse,
@@ -64,8 +52,32 @@ class ApplePayComponentManager {
         }
     }
     
-    func onApplePayComponentPressed(componentId: String) {
-        applePayComponent?.present()
+    func startApplePayComponent(
+        instantPaymentComponentConfigurationDTO: InstantPaymentConfigurationDTO,
+        paymentMethodResponse: String,
+        componentId: String
+    ) {
+        do {
+            applePayComponent = try createApplePayComponent(
+                instantPaymentComponentConfigurationDTO: instantPaymentComponentConfigurationDTO,
+                paymentMethodResponse: paymentMethodResponse,
+                componentId: componentId
+            )
+            applePayComponent?.present()
+        } catch {
+            let componentCommunicationModel = ComponentCommunicationModel(
+                type: ComponentCommunicationType.result,
+                componentId: componentId,
+                paymentResult: PaymentResultDTO(
+                    type: PaymentResultEnum.error,
+                    reason: error.localizedDescription
+                )
+            )
+            componentFlutterApi.onComponentCommunication(
+                componentCommunicationModel: componentCommunicationModel,
+                completion: { _ in }
+            )
+        }
     }
     
     func handlePaymentEvent(paymentEventDTO: PaymentEventDTO) {
@@ -77,5 +89,26 @@ class ApplePayComponentManager {
     func onDispose() {
         applePayComponent?.onDispose()
         applePayComponent = nil
+    }
+    
+    private func createApplePayComponent(
+        instantPaymentComponentConfigurationDTO: InstantPaymentConfigurationDTO,
+        paymentMethodResponse: String,
+        componentId: String
+    ) throws -> BaseApplePayComponent {
+        if componentId == Constants.applePaySessionComponentId {
+            return try ApplePaySessionComponent(
+                sessionHolder: sessionHolder,
+                configuration: instantPaymentComponentConfigurationDTO,
+                componentId: componentId
+            )
+        } else {
+            return try ApplePayAdvancedComponent(
+                componentFlutterApi: componentFlutterApi,
+                configuration: instantPaymentComponentConfigurationDTO,
+                paymentMethodResponse: paymentMethodResponse,
+                componentId: componentId
+            )
+        }
     }
 }
