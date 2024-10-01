@@ -19,6 +19,9 @@ class AdyenCheckoutApi implements CheckoutPlatformInterface {
       );
 
   @override
+  Future<void> invalidateSession() => checkoutApi.invalidateSession();
+
+  @override
   Future<void> enableConsoleLogging(bool loggingEnabled) =>
       checkoutApi.enableConsoleLogging(loggingEnabled);
 

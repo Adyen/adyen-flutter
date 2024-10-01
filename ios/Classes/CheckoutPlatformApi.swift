@@ -59,6 +59,10 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
             completion(Result.failure(error))
         }
     }
+    
+    func invalidateSession() {
+        sessionHolder.reset()
+    }
 
     func getReturnUrl(completion: @escaping (Result<String, Error>) -> Void) {
         completion(Result.failure(PlatformError(errorDescription: "Please use your app url type instead of this method.")))

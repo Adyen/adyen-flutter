@@ -31,6 +31,7 @@ import com.adyen.checkout.sessions.core.SessionModel
 import com.adyen.checkout.sessions.core.SessionSetupResponse
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import org.json.JSONObject
 
 class CheckoutPlatformApi(
     private val activity: FragmentActivity,
@@ -62,6 +63,11 @@ class CheckoutPlatformApi(
                 }
             }
         }
+    }
+
+    override fun invalidateSession() {
+        sessionHolder.orderResponse = null
+        sessionHolder.sessionSetupResponse = JSONObject()
     }
 
     override fun encryptCard(
