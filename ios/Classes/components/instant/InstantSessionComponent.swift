@@ -39,9 +39,6 @@ class InstantSessionComponent: BaseInstantComponent, InstantComponentProtocol {
             getViewController()?.dismiss(animated: true) {
                 self.hideActivityIndicator()
                 completion()
-                if success {
-                    self.sessionHolder.reset()
-                }
             }
         }
     }
