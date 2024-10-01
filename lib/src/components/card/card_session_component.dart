@@ -1,3 +1,4 @@
+import 'package:adyen_checkout/src/adyen_checkout.dart';
 import 'package:adyen_checkout/src/common/model/payment_result.dart';
 import 'package:adyen_checkout/src/common/model/result_code.dart';
 import 'package:adyen_checkout/src/components/card/base_card_component.dart';
@@ -49,10 +50,13 @@ class CardSessionComponent extends BaseCardComponent {
     final ResultCode resultCode =
         paymentResultDTO?.result?.toResultCode() ?? ResultCode.unknown;
     adyenLogger.print("Card component session flow result code: $resultCode");
+    _resetSession();
     onPaymentResult(PaymentSessionFinished(
       sessionId: paymentResultDTO?.result?.sessionId ?? "",
       sessionData: paymentResultDTO?.result?.sessionData ?? "",
       resultCode: resultCode,
     ));
   }
+
+  void _resetSession() => AdyenCheckout.session.invalidate();
 }
