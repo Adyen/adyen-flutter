@@ -36,7 +36,7 @@ class ComponentPlatformApi: ComponentPlatformInterface {
              .instant:
             return
         case .applePay:
-            applePayComponentManager.setUpApplePayIfAvailable(
+            applePayComponentManager.isApplePayAvailable(
                 instantPaymentComponentConfigurationDTO: instantPaymentConfigurationDTO,
                 paymentMethodResponse: paymentMethodResponse,
                 componentId: componentId,
@@ -54,7 +54,11 @@ class ComponentPlatformApi: ComponentPlatformInterface {
         case .googlePay:
             return
         case .applePay:
-            applePayComponentManager.onApplePayComponentPressed(componentId: componentId)
+            applePayComponentManager.startApplePayComponent(
+                instantPaymentComponentConfigurationDTO: instantPaymentConfigurationDTO,
+                paymentMethodResponse: encodedPaymentMethod,
+                componentId: componentId
+            )
         case .instant:
             instantComponentManager.startInstantComponent(
                 instantPaymentConfigurationDTO: instantPaymentConfigurationDTO,

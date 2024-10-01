@@ -28,7 +28,9 @@ class ApplePayAdvancedComponent: BaseApplePayComponent {
     }
     
     override func onDispose() {
-        applePayComponent = nil
+        finalizeAndDismissComponent(success: false, completion: {
+            self.applePayComponent = nil
+        })
     }
     
     func handlePaymentEvent(paymentEventDTO: PaymentEventDTO) {
