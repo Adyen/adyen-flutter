@@ -50,6 +50,8 @@ class AdyenCheckoutSession {
     );
   }
 
+  Future<void> invalidate() async => await adyenCheckoutApi.invalidateSession();
+
   dynamic _mapConfiguration(
     BaseConfiguration configuration,
     String sdkVersionNumber,

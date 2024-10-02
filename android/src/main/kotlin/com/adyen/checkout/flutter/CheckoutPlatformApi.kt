@@ -64,6 +64,10 @@ class CheckoutPlatformApi(
         }
     }
 
+    override fun invalidateSession() {
+        sessionHolder.reset()
+    }
+
     override fun encryptCard(
         unencryptedCardDTO: UnencryptedCardDTO,
         publicKey: String,

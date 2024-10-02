@@ -23,10 +23,13 @@ class InstantSessionComponent extends BaseInstantComponent {
     final ResultCode resultCode =
         paymentResultDTO.result?.toResultCode() ?? ResultCode.unknown;
     adyenLogger.print("Instant component session result code: $resultCode");
+    _resetSession();
     onPaymentResult(PaymentSessionFinished(
       sessionId: paymentResultDTO.result?.sessionId ?? "",
       sessionData: paymentResultDTO.result?.sessionData ?? "",
       resultCode: resultCode,
     ));
   }
+
+  void _resetSession() => AdyenCheckout.session.invalidate();
 }

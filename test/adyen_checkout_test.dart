@@ -39,6 +39,11 @@ class MockAdyenCheckoutPlatform implements CheckoutPlatformInterface {
   Future<String> encryptBin(String bin, String publicKey) async {
     return "";
   }
+
+  @override
+  Future<void> invalidateSession() async {
+    return;
+  }
 }
 
 void main() {
