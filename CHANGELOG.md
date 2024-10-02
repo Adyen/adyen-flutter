@@ -1,6 +1,9 @@
-## New version
+## 1.1.0
 
 * Added support for renaming payment methods in Drop-in.
+* 3DS2 cancellations are now resolved as a PaymentCancelledByUser payment result.
+* Improved configuration parsing for Google Pay component.
+* Improved instantiation of Apple Pay component.
 
 ## 1.0.2
 
