@@ -141,8 +141,8 @@ class BaseCardComponent: NSObject, FlutterPlatformView, UIScrollViewDelegate {
         )
     }
     
-    private func determineAdditionalViewportSpace () -> CGFloat {
-        if (isStoredPaymentMethod) {
+    private func determineAdditionalViewportSpace() -> CGFloat {
+        if isStoredPaymentMethod {
             return 256.0
         } else {
             return 8.0
