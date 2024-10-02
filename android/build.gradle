@@ -57,7 +57,7 @@ android {
             exclude group: 'androidx.lifecycle', module: 'lifecycle-viewmodel-ktx'
         }
 
-        implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.7.0'
+        implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.6'
         implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.7.0'
         implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
         testImplementation 'org.jetbrains.kotlin:kotlin-test'
