@@ -1605,9 +1605,9 @@ class CheckoutPlatformInterface {
     }
   }
 
-  Future<void> invalidateSession() async {
+  Future<void> clearSession() async {
     const String __pigeon_channelName =
-        'dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.invalidateSession';
+        'dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.clearSession';
     final BasicMessageChannel<Object?> __pigeon_channel =
         BasicMessageChannel<Object?>(
       __pigeon_channelName,

@@ -31,5 +31,5 @@ class InstantSessionComponent extends BaseInstantComponent {
     ));
   }
 
-  void _resetSession() => AdyenCheckout.session.invalidate();
+  void _resetSession() => AdyenCheckout.session.clear();
 }
