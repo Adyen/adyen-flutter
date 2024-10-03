@@ -60,7 +60,7 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
         }
     }
     
-    func invalidateSession() {
+    func clearSession() {
         sessionHolder.reset()
     }
 

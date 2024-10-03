@@ -582,7 +582,7 @@ abstract class CheckoutPlatformInterface {
     Object? configuration,
   );
 
-  void invalidateSession();
+  void clearSession();
 
   @async
   EncryptedCardDTO encryptCard(

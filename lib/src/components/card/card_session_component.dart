@@ -58,5 +58,5 @@ class CardSessionComponent extends BaseCardComponent {
     ));
   }
 
-  void _resetSession() => AdyenCheckout.session.invalidate();
+  void _resetSession() => AdyenCheckout.session.clear();
 }

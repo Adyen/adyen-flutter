@@ -41,7 +41,7 @@ class MockAdyenCheckoutPlatform implements CheckoutPlatformInterface {
   }
 
   @override
-  Future<void> invalidateSession() async {
+  Future<void> clearSession() async {
     return;
   }
 }

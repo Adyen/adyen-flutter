@@ -50,7 +50,7 @@ class AdyenCheckoutSession {
     );
   }
 
-  Future<void> invalidate() async => await adyenCheckoutApi.invalidateSession();
+  Future<void> clear() async => await adyenCheckoutApi.clearSession();
 
   dynamic _mapConfiguration(
     BaseConfiguration configuration,

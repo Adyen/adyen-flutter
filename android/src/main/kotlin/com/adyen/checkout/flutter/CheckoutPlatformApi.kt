@@ -64,7 +64,7 @@ class CheckoutPlatformApi(
         }
     }
 
-    override fun invalidateSession() {
+    override fun clearSession() {
         sessionHolder.reset()
     }
 
