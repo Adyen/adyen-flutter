@@ -22,7 +22,7 @@ class CardAdvancedComponentScreen extends StatelessWidget {
     shopperLocale: Config.shopperLocale,
     cardConfiguration: const CardConfiguration(
       holderNameRequired: true,
-      addressMode: AddressMode.full
+      addressMode: AddressMode.full,
     ),
   );
 

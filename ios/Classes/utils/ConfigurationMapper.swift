@@ -1,7 +1,7 @@
 @_spi(AdyenInternal)
 import Adyen
-import PassKit
 import Adyen3DS2.ADYRuntimeError
+import PassKit
 
 extension DropInConfigurationDTO {
     func createDropInConfiguration(payment: Payment?) throws -> DropInComponent.Configuration {
@@ -275,7 +275,7 @@ extension PaymentResultEnum {
     }
     
     private static func isThree3ds2Cancellation(error: NSError) -> Bool {
-        return error.domain == ADYRuntimeErrorDomain && error.code == ADYRuntimeErrorCode.challengeCancelled.rawValue
+        error.domain == ADYRuntimeErrorDomain && error.code == ADYRuntimeErrorCode.challengeCancelled.rawValue
     }
 }
 
