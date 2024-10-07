@@ -38,7 +38,7 @@ jobs:
       - run: flutter pub get
       - run: dart pub global activate patrol_cli 3.1.1
       - run: patrol doctor
-      - run: $ANDROID_HOME/tools/bin/avdmanager list device
+      - run: $ANDROID_HOME/cmdline-tools/latest/bin/avdmanager list device
 
 
       - name: Boot emulator and run tests
