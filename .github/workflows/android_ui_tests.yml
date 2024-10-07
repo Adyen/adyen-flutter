@@ -36,7 +36,7 @@ jobs:
           channel: 'stable'
 
       - run: flutter pub get
-      - run: dart pub global activate patrol_cli
+      - run: dart pub global activate patrol_cli 3.1.1
       - run: patrol doctor
 
       - name: Boot emulator or run tests
