@@ -38,6 +38,8 @@ jobs:
       - run: flutter pub get
       - run: dart pub global activate patrol_cli 3.1.1
       - run: patrol doctor
+      - run: avdmanager list device
+
 
       - name: Boot emulator and run tests
         uses: reactivecircus/android-emulator-runner@v2
