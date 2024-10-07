@@ -6,52 +6,17 @@ on:
       flutter-version:
         description: 'Flutter version'
         required: true
-        default: '3.16.2'
+        default: '3.24.0'
         type: string
 
 jobs:
-  android_tests:
-    runs-on: ubuntu-22.04
-    defaults:
-      run:
-        working-directory: example/android
-    timeout-minutes: 30
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-java@v4
-        with:
-          distribution: 'zulu'
-          java-version: 18
-
-      - uses: subosito/flutter-action@v2
-        with:
-          flutter-version: ${{ inputs.flutter-version }}
-          channel: 'stable'
-          cache: true
-
-      - run: flutter doctor -v
-      - run: flutter clean
-      - run: flutter pub get
-
-      - name: Setup Gradle
-        uses: gradle/gradle-build-action@v2
-        with:
-          gradle-version: wrapper
-
-      - name: Init gradle wrapper
-        run: gradle wrapper
-
-      - name: Lint check
-        run: ./gradlew ktlintCheck lintReportDebug
-
-      - name: Unit tests with code coverage reporting
-        run: ./gradlew jacocoTestReport
-
-      - name: Cache android reports
-        uses: actions/cache/save@v4
-        id: save-android-reports
-        with:
-          path: example/build/adyen_checkout/reports
-          key: android-reports
+  android_unit_tests:
+    name: Android unit tests
+    uses: ./.github/workflows/android_unit_tests.yml
+    with:
+      flutter-version: ${{ needs.preparation.outputs.FLUTTER_VERSION }}
+  android_ui_tests:
+    name: Android ui tests
+    uses: ./.github/workflows/android_ui_tests.yml
+    with:
+      flutter-version: ${{ needs.preparation.outputs.FLUTTER_VERSION }}
