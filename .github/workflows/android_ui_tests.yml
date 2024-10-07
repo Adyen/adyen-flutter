@@ -53,5 +53,4 @@ jobs:
           working-directory: ./example
           script: |
             echo "Emulator launched"
-            flutter devices
             patrol test -t integration_test/drop_in_test/drop_in_card_test.dart --dart-define=CLIENT_KEY='${{ secrets.ADYEN_TEST_CLIENT_KEY }}' --dart-define=X_API_KEY='${{ secrets.ADYEN_TEST_X_API_KEY }}' -d emulator-5554
