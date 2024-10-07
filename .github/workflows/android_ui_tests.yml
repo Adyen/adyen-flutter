@@ -39,7 +39,7 @@ jobs:
       - run: dart pub global activate patrol_cli 3.1.1
       - run: patrol doctor
 
-      - name: Boot emulator or run tests
+      - name: Boot emulator and run tests
         uses: reactivecircus/android-emulator-runner@v2
         env:
           ADYEN_TEST_CLIENT_KEY: "ABC"
@@ -54,4 +54,4 @@ jobs:
           working-directory: ./example
           script: |
             echo "Emulator launched"
-            patrol test -t integration_test/drop_in_test/open_drop_in_test.dart --dart-define=CLIENT_KEY='ABC' --dart-define=X_API_KEY='123' -d emulator-5554
+            patrol test -t integration_test/drop_in_test/open_drop_in_test.dart --dart-define=CLIENT_KEY='${{ secrets.ADYEN_TEST_CLIENT_KEY }}' --dart-define=X_API_KEY='${{ secrets.ADYEN_TEST_X_API_KEY }}' -d emulator-5554
