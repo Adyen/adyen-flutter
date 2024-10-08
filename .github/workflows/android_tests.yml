@@ -1,4 +1,4 @@
-name: Android unit tests
+name: Android tests
 
 on:
   workflow_call:
