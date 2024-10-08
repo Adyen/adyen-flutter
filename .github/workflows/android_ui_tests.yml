@@ -46,7 +46,6 @@ jobs:
       - run: dart pub global activate patrol_cli 3.1.1
       - run: patrol doctor
 
-
       - name: Boot emulator and run tests
         uses: reactivecircus/android-emulator-runner@v2
         with:
