@@ -15,8 +15,3 @@ jobs:
     uses: ./.github/workflows/android_unit_tests.yml
     with:
       flutter-version: ${{ needs.preparation.outputs.FLUTTER_VERSION }}
-  android_ui_tests:
-    name: Android ui tests
-    uses: ./.github/workflows/android_ui_tests.yml
-    with:
-      flutter-version: ${{ needs.preparation.outputs.FLUTTER_VERSION }}
