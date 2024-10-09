@@ -21,5 +21,5 @@ Adyen checkout SDK for Flutter
   s.pod_target_xcconfig = { 'DEFINES_MODULE' => 'YES', 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'i386' }
   s.swift_version = '5.0'
   
-  s.dependency 'Adyen', '5.11.0'
+  s.dependency 'Adyen', '5.12.0'
 end
