@@ -56,7 +56,6 @@ jobs:
           emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: false
           working-directory: ./example
-          profile: Nexus 6
           avd-name: avd-34-x64
           script: |
             echo "Emulator launched"
