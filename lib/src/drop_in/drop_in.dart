@@ -72,6 +72,7 @@ class DropIn {
           return PaymentSessionFinished(
             sessionId: paymentResultDTO.result?.sessionId ?? "",
             sessionData: paymentResultDTO.result?.sessionData ?? "",
+            sessionResult: paymentResultDTO.result?.sessionResult,
             resultCode:
                 paymentResultDTO.result?.toResultCode() ?? ResultCode.unknown,
             order: paymentResultDTO.result?.order?.fromDTO(),

@@ -14,12 +14,14 @@ class PaymentSessionFinished extends PaymentResult {
   final String sessionData;
   final ResultCode resultCode;
   final OrderResponse? order;
+  final String? sessionResult;
 
   PaymentSessionFinished({
     required this.sessionId,
     required this.sessionData,
     required this.resultCode,
     this.order,
+    this.sessionResult,
   });
 }
 
