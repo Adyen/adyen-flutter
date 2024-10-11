@@ -1,3 +1,7 @@
+## Next version
+
+* Added sessionResult to the PaymentSessionFinished payment result.
+
 ## 1.1.0
 
 * Added support for renaming payment methods in Drop-in.
