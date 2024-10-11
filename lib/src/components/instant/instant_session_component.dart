@@ -27,7 +27,7 @@ class InstantSessionComponent extends BaseInstantComponent {
     onPaymentResult(PaymentSessionFinished(
       sessionId: paymentResultDTO.result?.sessionId ?? "",
       sessionData: paymentResultDTO.result?.sessionData ?? "",
-      sessionResult: paymentResultDTO.result?.sessionResult,
+      sessionResult: paymentResultDTO.result?.sessionResult ?? "",
       resultCode: resultCode,
     ));
   }
