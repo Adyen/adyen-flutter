@@ -1,4 +1,4 @@
-name: Swift unit tests
+name: iOS tests
 
 on:
   workflow_call:
@@ -6,48 +6,18 @@ on:
       flutter-version:
         description: 'Flutter version'
         required: true
-        default: '3.16.2'
+        default: '3.24.0'
         type: string
 
 jobs:
-  ios_tests:
-    runs-on: macos-13
-    defaults:
-      run:
-        working-directory: example/ios
-    timeout-minutes: 30
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: subosito/flutter-action@v2
-        with:
-          flutter-version: ${{ inputs.flutter-version }}
-          channel: 'stable'
-          cache: true
-
-      - run: flutter doctor -v
-      - run: flutter clean
-      - run: flutter pub get
-
-      - name: Pod install
-        run: pod install
-
-      - name: Lint check
-        working-directory: ios
-        run: swiftlint --config .swiftlint.yml --output "swiftLintReport.json"
-
-      - name: Cache iOS reports
-        uses: actions/cache/save@v4
-        id: save-iOS-reports
-        with:
-          path: ios/
-          key: ios-reports
-
-      - name: Run ios unit tests
-        run: |
-          xcodebuild test \
-          -workspace Runner.xcworkspace \
-          -scheme Runner \
-          -destination "platform=iOS Simulator,name=iPhone 14" \
-          -enableCodeCoverage YES | xcpretty --utf --color && exit ${PIPESTATUS[0]}
+  ios_unit_tests:
+    name: iOS unit tests
+    uses: ./.github/workflows/ios_unit_tests.yml
+    with:
+      flutter-version: ${{ needs.preparation.outputs.FLUTTER_VERSION }}
+  android_ui_tests:
+    name: iOS ui tests
+    uses: ./.github/workflows/ios_ui_tests.yml
+    with:
+      flutter-version: ${{ needs.preparation.outputs.FLUTTER_VERSION }}
+    secrets: inherit
