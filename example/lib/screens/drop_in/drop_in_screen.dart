@@ -138,7 +138,7 @@ class DropInScreen extends StatelessWidget {
       cashAppPayConfiguration: cashAppPayConfiguration,
       storedPaymentMethodConfiguration: storedPaymentMethodConfiguration,
       paymentMethodNames: {
-        "scheme": "Credit card",
+        "ideal": "Pay with iDEAL",
       },
     );
 
