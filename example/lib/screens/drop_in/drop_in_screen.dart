@@ -31,7 +31,7 @@ class DropInScreen extends StatelessWidget {
               ),
               TextButton(
                 onPressed: () => startDropInAdvancedFlow(context),
-                child: const Text("Drop-in advanced flow"),
+                child: const Text("Drop-in advanced"),
               ),
             ],
           ),
@@ -133,7 +133,7 @@ class DropInScreen extends StatelessWidget {
       cashAppPayConfiguration: cashAppPayConfiguration,
       storedPaymentMethodConfiguration: storedPaymentMethodConfiguration,
       paymentMethodNames: {
-        "scheme": "Credit card",
+        "ideal": "Pay with iDEAL",
       },
     );
 
