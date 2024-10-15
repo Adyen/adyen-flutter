@@ -60,6 +60,7 @@ jobs:
           #Change to Android Gradle plugin to v8
           sed -i 's/id "com.android.application" version "7.3.0"/id "com.android.application" version "8.1.4"/g' android/settings.gradle          
           cat android/gradle/wrapper/gradle-wrapper.properties
+          cat android/build.gradle
           
           dart pub add 'adyen_checkout:{"path":"../"}'
           flutter build apk --debug  
