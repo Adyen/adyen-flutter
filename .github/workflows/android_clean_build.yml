@@ -11,7 +11,7 @@ jobs:
       fail-fast: false
       matrix:
         api-level: [ 34 ]
-        flutter-version: [ "3.16.0" ,"3.19.0", "3.22.0", "3.24.0" ]
+        flutter-version: [ "3.16.0" ,"3.19.0", "3.22.0", "3.24.3" ]
 
     steps:
       - name: Provide more disk space
