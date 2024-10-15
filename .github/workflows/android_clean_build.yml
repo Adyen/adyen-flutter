@@ -45,17 +45,19 @@ jobs:
           flutter create --template=app --platforms=android,ios demo_project
           cd demo_project
           
-          #Change Kotlin version for Flutter 3.16 
+          #Change Kotlin version and gradle wrapper for Flutter 3.16 
           sed -i "s/ext.kotlin_version = '1.7.10'/ext.kotlin_version = '1.8.10'/g" android/build.gradle          
+          sed -i "s/gradle-7.5-all.zip/gradle-8.3-all.zip/g" android/gradle/wrapper/gradle-wrapper.properties
           
-          #Change Kotlin version for Flutter 3.19+ 
-          sed -i 's/"org.jetbrains.kotlin.android" version "1.7.10"/"org.jetbrains.kotlin.android" version "1.8.10"/g' android/settings.gradle          
+          #Change Kotlin version and gradle wrapper for Flutter 3.19+ 
+          sed -i 's/"org.jetbrains.kotlin.android" version "1.7.10"/"org.jetbrains.kotlin.android" version "1.8.10"/g' android/settings.gradle        
+          sed -i "s/gradle-7.6.3-all/gradle-8.3-all.zip/g" android/gradle/wrapper/gradle-wrapper.properties
           
           #Change minSdk and compileSdk version
           sed -i 's/flutter.compileSdkVersion/34/g' android/app/build.gradle
           sed -i 's/flutter.minSdkVersion/21/g' android/app/build.gradle
           
-          #Change to Gradle 8
+          #Change to Android Gradle plugin to v8
           sed -i 's/id "com.android.application" version "7.3.0"/id "com.android.application" version "8.1.4"/g' android/settings.gradle          
           cat android/gradle/wrapper/gradle-wrapper.properties
           
