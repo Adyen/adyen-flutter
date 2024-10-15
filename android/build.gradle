@@ -6,7 +6,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:8.7.0'
+        classpath 'com.android.tools.build:gradle:8.3.1'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
 }
@@ -50,7 +50,12 @@ android {
     }
 
     dependencies {
-        implementation('com.adyen.checkout:drop-in:5.7.0')
+        implementation('com.adyen.checkout:drop-in:5.7.0') {
+            //Excluding the latest androidx lifecycle livedata core version because it is not compatible with AGP 7.
+            //This would break the default Flutter Gradle compatibility. More information: https://issuetracker.google.com/issues/336164417
+            exclude group: 'androidx.lifecycle', module: 'lifecycle-runtime-ktx'
+            exclude group: 'androidx.lifecycle', module: 'lifecycle-viewmodel-ktx'
+        }
 
         implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.7.0'
         implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.7.0'
