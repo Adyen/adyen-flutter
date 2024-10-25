@@ -15,6 +15,7 @@ class DropInSessionsDelegate: AdyenSessionDelegate {
             let paymentResult = PaymentResultModelDTO(
                 sessionId: session.sessionContext.identifier,
                 sessionData: session.sessionContext.data,
+                sessionResult: result.encodedResult,
                 resultCode: result.resultCode.rawValue
             )
             let platformCommunicationModel = PlatformCommunicationModel(
