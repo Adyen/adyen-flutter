@@ -141,6 +141,9 @@ class DropInPlatformApi: DropInPlatformInterface {
         
     }
     
+    func onOrderCancelResult(orderCancelResponse: OrderCancelResponseDTO) throws {
+        
+    }
 
     func cleanUpDropIn() {
         sessionHolder.reset()
