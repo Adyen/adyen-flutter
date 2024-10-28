@@ -1410,6 +1410,7 @@ class CheckoutPlatformInterfaceCodec: FlutterStandardMessageCodec {
 protocol CheckoutPlatformInterface {
   func getReturnUrl(completion: @escaping (Result<String, Error>) -> Void)
   func createSession(sessionId: String, sessionData: String, configuration: Any?, completion: @escaping (Result<SessionDTO, Error>) -> Void)
+  func clearSession() throws
   func encryptCard(unencryptedCardDTO: UnencryptedCardDTO, publicKey: String, completion: @escaping (Result<EncryptedCardDTO, Error>) -> Void)
   func encryptBin(bin: String, publicKey: String, completion: @escaping (Result<String, Error>) -> Void)
   func enableConsoleLogging(loggingEnabled: Bool) throws
@@ -1454,6 +1455,19 @@ class CheckoutPlatformInterfaceSetup {
       }
     } else {
       createSessionChannel.setMessageHandler(nil)
+    }
+    let clearSessionChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.clearSession", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      clearSessionChannel.setMessageHandler { _, reply in
+        do {
+          try api.clearSession()
+          reply(wrapResult(nil))
+        } catch {
+          reply(wrapError(error))
+        }
+      }
+    } else {
+      clearSessionChannel.setMessageHandler(nil)
     }
     let encryptCardChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.encryptCard", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {
