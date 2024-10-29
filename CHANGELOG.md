@@ -1,3 +1,7 @@
+## 1.1.1
+
+* Added the missing loading bottom sheet for the advanced flow google pay component.
+
 ## 1.1.0
 
 * Added support for renaming payment methods in Drop-in.
