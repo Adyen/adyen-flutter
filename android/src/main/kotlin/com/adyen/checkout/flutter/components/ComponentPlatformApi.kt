@@ -25,6 +25,7 @@ import com.adyen.checkout.flutter.components.instant.InstantComponentManager
 import com.adyen.checkout.flutter.components.view.ComponentLoadingBottomSheet
 import com.adyen.checkout.flutter.session.SessionHolder
 import com.adyen.checkout.flutter.utils.Constants
+import com.adyen.checkout.googlepay.GooglePayComponent
 import com.adyen.checkout.redirect.RedirectComponent
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import org.json.JSONObject
@@ -166,10 +167,13 @@ class ComponentPlatformApi(
         hideLoadingBottomSheet()
     }
 
-    private fun onAction(action: Map<String?, Any?>?) {
-        action?.let {
-            val actionJson = JSONObject(it)
-            currentComponent?.handleAction(Action.SERIALIZER.deserialize(actionJson), activity)
+    private fun onAction(actionResponse: Map<String?, Any?>?) {
+        actionResponse?.let {
+            val action = Action.SERIALIZER.deserialize(JSONObject(it))
+            when (currentComponent) {
+                is GooglePayComponent -> googlePayComponentManager.handleAction(action)
+                else -> currentComponent?.handleAction(action, activity)
+            }
         }
     }
 

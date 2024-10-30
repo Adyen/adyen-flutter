@@ -181,7 +181,7 @@ class GooglePayComponentManager(
             key = UUID.randomUUID().toString()
         )
 
-    private fun handleAction(action: Action) {
+    fun handleAction(action: Action) {
         googlePayComponent?.let {
             it.handleAction(action, activity)
             ComponentLoadingBottomSheet.show(activity.supportFragmentManager, it)
