@@ -1,6 +1,7 @@
 ## 1.1.1
 
 * Added the missing loading bottom sheet for the advanced flow google pay component.
+* Updated iOS SDK to v5.13.0.
 
 ## 1.1.0
 
