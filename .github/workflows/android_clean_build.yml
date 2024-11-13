@@ -60,19 +60,11 @@ jobs:
           #Change to Android Gradle plugin to v8
           sed -i 's/id "com.android.application" version "7.3.0"/id "com.android.application" version "8.1.4"/g' android/settings.gradle          
 
-          
           #Add missing Kotlin Options for Flutter 3.22
           if [ ${{ matrix.flutter-version }} == '3.22.x' ]; then
-            echo "True and add options"
-            sed  '/defaultConfig {/i \
+            sed -i '/defaultConfig {/i \
               kotlinOptions {\
                 jvmTarget = '1.8'\
-              }\
-            ' android/app/build.gradle
-          
-            sed  '/kotlinOptions {/i \
-              sourceSets {\
-                main.java.srcDirs += 'src/main/kotlin'\
               }\
             ' android/app/build.gradle
           fi
