@@ -65,10 +65,16 @@ jobs:
           #Add missing Kotlin Options for Flutter 3.22
           if [ ${{ matrix.flutter-version }} == '3.22.x' ]; then
             echo "True and add options"
-            sed  '/compileOptions {/i \
-            kotlinOptions {\
-              jvmTarget = '1.8'\
-            }\
+            sed  '/defaultConfig {/i \
+              kotlinOptions {\
+                jvmTarget = '1.8'\
+              }\
+            ' android/app/build.gradle
+          
+            sed  '/kotlinOptions {/i \
+              sourceSets {\
+                main.java.srcDirs += 'src/main/kotlin'\
+              }\
             ' android/app/build.gradle
           fi
           
