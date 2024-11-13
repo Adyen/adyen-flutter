@@ -62,6 +62,11 @@ jobs:
           cat android/gradle/wrapper/gradle-wrapper.properties
           cat android/app/build.gradle
           
+          #Add missing Kotlin Options for Flutter 3.22
+          if [ ${{ matrix.flutter-version }} == '3.22.x' ]; then
+            echo "True and add options"
+          fi
+          
           dart pub add 'adyen_checkout:{"path":"../"}'
           flutter build apk --debug  
 
