@@ -241,6 +241,10 @@ class DropIn {
     final Map<String, dynamic> submitDataDecoded = jsonDecode(submitData);
     switch (advancedCheckout) {
       case AdvancedCheckout it:
+        if (submitDataDecoded[Constants.submitDataKey].containsKey("order")) {
+          _mapOrderToCompactOrder(submitDataDecoded);
+        }
+
         final PaymentEvent paymentEvent = await it.onSubmit(
           submitDataDecoded[Constants.submitDataKey],
           submitDataDecoded[Constants.submitExtraKey],
@@ -249,6 +253,14 @@ class DropIn {
       case SessionCheckout():
         throw Exception("Please use the session card component.");
     }
+  }
+
+  void _mapOrderToCompactOrder(Map<String, dynamic> submitDataDecoded) {
+    final order = submitDataDecoded[Constants.submitDataKey]["order"];
+    submitDataDecoded[Constants.submitDataKey]["order"] = {
+      "pspReference": order["pspReference"],
+      "orderData": order["orderData"],
+    };
   }
 
   Future<PaymentEvent> _getOnAdditionalDetailsPaymentEvent(
