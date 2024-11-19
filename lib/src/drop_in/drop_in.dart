@@ -297,7 +297,7 @@ class DropIn {
     } catch (error) {
       // This delay is necessary because Android shows the spinner after a short delay.
       await Future.delayed(const Duration(milliseconds: 300));
-      dropInPlatformApi.onBalanceCheckResult("");
+      dropInPlatformApi.onBalanceCheckResult(error.toString());
     }
   }
 
@@ -311,7 +311,7 @@ class DropIn {
     } catch (error) {
       // This delay is necessary because Android shows the spinner after a short delay.
       await Future.delayed(const Duration(milliseconds: 300));
-      dropInPlatformApi.onOrderRequestResult("");
+      dropInPlatformApi.onOrderRequestResult(error.toString());
     }
   }
 
