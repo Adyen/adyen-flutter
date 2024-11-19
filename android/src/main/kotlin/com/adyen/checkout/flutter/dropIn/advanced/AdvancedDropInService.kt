@@ -203,9 +203,9 @@ class AdvancedDropInService : DropInService(), LifecycleOwner {
             // TODO - the error message should be provided by the native SDK
             RecurringDropInServiceResult.Error(
                 errorDialog =
-                    ErrorDialog(
-                        message = "Removal of the stored payment method failed. Please try again later."
-                    )
+                ErrorDialog(
+                    message = "Removal of the stored payment method failed. Please try again later."
+                )
             )
         }
     }
@@ -286,11 +286,7 @@ class AdvancedDropInService : DropInService(), LifecycleOwner {
 
                 else ->
                     BalanceDropInServiceResult.Error(
-                        errorDialog =
-                            ErrorDialog(
-                                title = resultCode,
-                                message = jsonResponse.optString(Constants.MESSAGE_KEY) ?: "Unknown"
-                            ),
+                        errorDialog = null,
                         dismissDropIn = false
                     )
             }
@@ -309,11 +305,7 @@ class AdvancedDropInService : DropInService(), LifecycleOwner {
                 "Success" -> OrderDropInServiceResult.OrderCreated(OrderResponse.SERIALIZER.deserialize(jsonResponse))
                 else ->
                     OrderDropInServiceResult.Error(
-                        errorDialog =
-                            ErrorDialog(
-                                title = resultCode,
-                                message = jsonResponse.optString(Constants.MESSAGE_KEY) ?: "Unknown"
-                            ),
+                        errorDialog = null,
                         dismissDropIn = false
                     )
             }
@@ -344,11 +336,7 @@ class AdvancedDropInService : DropInService(), LifecycleOwner {
 
                 else ->
                     DropInServiceResult.Error(
-                        errorDialog =
-                            ErrorDialog(
-                                title = resultCode,
-                                message = orderCancelResponseBody?.optString(Constants.MESSAGE_KEY) ?: "Unknown"
-                            ),
+                        errorDialog = null,
                         dismissDropIn = false,
                     )
             }
