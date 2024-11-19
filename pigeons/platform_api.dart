@@ -154,6 +154,7 @@ class DropInConfigurationDTO {
   final bool isRemoveStoredPaymentMethodEnabled;
   final String? preselectedPaymentMethodTitle;
   final Map<String?, String?>? paymentMethodNames;
+  final bool isPartialPaymentSupported;
 
   DropInConfigurationDTO(
     this.environment,
@@ -171,6 +172,7 @@ class DropInConfigurationDTO {
     this.isRemoveStoredPaymentMethodEnabled,
     this.preselectedPaymentMethodTitle,
     this.paymentMethodNames,
+    this.isPartialPaymentSupported,
   );
 }
 

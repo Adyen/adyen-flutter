@@ -78,10 +78,10 @@ class AdvancedDropInService : DropInService(), LifecycleOwner {
         shouldUpdatePaymentMethods: Boolean
     ) {
         setOrderCancelObserver()
-        val event = JSONObject()
-        event.put("order", Order.SERIALIZER.serialize(order))
-        event.put("shouldUpdatePaymentMethods", shouldUpdatePaymentMethods)
-        DropInOrderCancelPlatformMessenger.sendResult(event)
+        val cancelOrderData = JSONObject()
+        cancelOrderData.put(Constants.ORDER_KEY, Order.SERIALIZER.serialize(order))
+        cancelOrderData.put(Constants.SHOULD_UPDATE_PAYMENT_METHODS_KEY, shouldUpdatePaymentMethods)
+        DropInOrderCancelPlatformMessenger.sendResult(cancelOrderData)
     }
 
     override fun onRemoveStoredPaymentMethod(storedPaymentMethod: StoredPaymentMethod) {
@@ -246,8 +246,9 @@ class AdvancedDropInService : DropInService(), LifecycleOwner {
                     )
                 } else {
                     val updatedPaymentMethodsJSON =
-                        JSONObject(paymentEventDTO.data["updatedPaymentMethods"] as HashMap<*, *>)
-                    val orderResponseJSON = JSONObject(paymentEventDTO.data["orderResponse"] as HashMap<*, *>)
+                        JSONObject(paymentEventDTO.data[Constants.UPDATED_PAYMENT_METHODS_KEY] as HashMap<*, *>)
+                    val orderResponseJSON =
+                        JSONObject(paymentEventDTO.data[Constants.ORDER_RESPONSE_KEY] as HashMap<*, *>)
                     val paymentMethods = PaymentMethodsApiResponse.SERIALIZER.deserialize(updatedPaymentMethodsJSON)
                     val orderResponse = OrderResponse.SERIALIZER.deserialize(orderResponseJSON)
                     DropInServiceResult.Update(paymentMethods, orderResponse)
@@ -272,63 +273,90 @@ class AdvancedDropInService : DropInService(), LifecycleOwner {
     }
 
     private fun mapToBalanceDropInServiceResult(response: String): BalanceDropInServiceResult {
-        if (response.isEmpty()) {
-            return BalanceDropInServiceResult.Error(errorDialog = null, reason = "Balance check failed")
-        }
+        try {
+            val jsonResponse = JSONObject(response)
+            return when (val resultCode = jsonResponse.optString(Constants.RESULT_CODE_KEY)) {
+                "Success" -> BalanceDropInServiceResult.Balance(BalanceResult.SERIALIZER.deserialize(jsonResponse))
+                "NotEnoughBalance" ->
+                    BalanceDropInServiceResult.Balance(
+                        BalanceResult.SERIALIZER.deserialize(
+                            jsonResponse
+                        )
+                    )
 
-        val jsonResponse = JSONObject(response)
-        return when (val resultCode = jsonResponse.optString("resultCode")) {
-            "Success" -> BalanceDropInServiceResult.Balance(BalanceResult.SERIALIZER.deserialize(jsonResponse))
-            "NotEnoughBalance" -> BalanceDropInServiceResult.Balance(BalanceResult.SERIALIZER.deserialize(jsonResponse))
-            else ->
-                BalanceDropInServiceResult.Error(
-                    errorDialog = ErrorDialog(message = resultCode),
-                    dismissDropIn = false,
-                )
+                else ->
+                    BalanceDropInServiceResult.Error(
+                        errorDialog =
+                            ErrorDialog(
+                                title = resultCode,
+                                message = jsonResponse.optString(Constants.MESSAGE_KEY) ?: "Unknown"
+                            ),
+                        dismissDropIn = false
+                    )
+            }
+        } catch (exception: Exception) {
+            return BalanceDropInServiceResult.Error(
+                errorDialog = null,
+                reason = "Failure parsing balance check response."
+            )
         }
     }
 
     private fun mapToOrderDropInServiceResult(response: String): OrderDropInServiceResult {
-        if (response.isEmpty()) {
-            return OrderDropInServiceResult.Error(errorDialog = null, reason = "Order request failed")
-        }
-
-        val jsonResponse = JSONObject(response)
-        return when (val resultCode = jsonResponse.optString("resultCode")) {
-            "Success" -> OrderDropInServiceResult.OrderCreated(OrderResponse.SERIALIZER.deserialize(jsonResponse))
-            else ->
-                OrderDropInServiceResult.Error(
-                    errorDialog = ErrorDialog(message = resultCode),
-                    dismissDropIn = false,
-                )
+        try {
+            val jsonResponse = JSONObject(response)
+            return when (val resultCode = jsonResponse.optString(Constants.RESULT_CODE_KEY)) {
+                "Success" -> OrderDropInServiceResult.OrderCreated(OrderResponse.SERIALIZER.deserialize(jsonResponse))
+                else ->
+                    OrderDropInServiceResult.Error(
+                        errorDialog =
+                            ErrorDialog(
+                                title = resultCode,
+                                message = jsonResponse.optString(Constants.MESSAGE_KEY) ?: "Unknown"
+                            ),
+                        dismissDropIn = false
+                    )
+            }
+        } catch (exception: Exception) {
+            return OrderDropInServiceResult.Error(
+                errorDialog = null,
+                reason = "Failure parsing order response."
+            )
         }
     }
 
     private fun mapToOrderCancelDropInServiceResult(
         orderCancelResponseDTO: OrderCancelResponseDTO?
     ): DropInServiceResult? {
-        if (orderCancelResponseDTO == null || orderCancelResponseDTO.orderCancelResponseBody.isEmpty()) {
-            return DropInServiceResult.Error(errorDialog = null, reason = "Order cancellation failed")
-        }
-
-        val orderCancelResponseBody = JSONObject(orderCancelResponseDTO.orderCancelResponseBody)
-        return when (val resultCode = orderCancelResponseBody.optString("resultCode")) {
-            "Received" -> {
-                if (orderCancelResponseDTO.updatedPaymentMethods?.isNotEmpty() == true) {
-                    val updatedPaymentMethods = orderCancelResponseDTO.updatedPaymentMethods
-                    val paymentMethods =
-                        PaymentMethodsApiResponse.SERIALIZER.deserialize(JSONObject(updatedPaymentMethods))
-                    val orderResponse = OrderResponse.SERIALIZER.deserialize(orderCancelResponseBody)
-                    sendResult(DropInServiceResult.Update(paymentMethods, orderResponse))
+        try {
+            val orderCancelResponseBody = orderCancelResponseDTO?.orderCancelResponseBody?.let { JSONObject(it) }
+            return when (val resultCode = orderCancelResponseBody?.optString(Constants.RESULT_CODE_KEY)) {
+                "Received" -> {
+                    if (orderCancelResponseDTO.updatedPaymentMethods?.isNotEmpty() == true) {
+                        val updatedPaymentMethods = orderCancelResponseDTO.updatedPaymentMethods
+                        val paymentMethods =
+                            PaymentMethodsApiResponse.SERIALIZER.deserialize(JSONObject(updatedPaymentMethods))
+                        val orderResponse = OrderResponse.SERIALIZER.deserialize(orderCancelResponseBody)
+                        sendResult(DropInServiceResult.Update(paymentMethods, orderResponse))
+                    }
+                    null
                 }
-                null
-            }
 
-            else ->
-                DropInServiceResult.Error(
-                    errorDialog = ErrorDialog(message = resultCode),
-                    dismissDropIn = false,
-                )
+                else ->
+                    DropInServiceResult.Error(
+                        errorDialog =
+                            ErrorDialog(
+                                title = resultCode,
+                                message = orderCancelResponseBody?.optString(Constants.MESSAGE_KEY) ?: "Unknown"
+                            ),
+                        dismissDropIn = false,
+                    )
+            }
+        } catch (exception: Exception) {
+            return DropInServiceResult.Error(
+                errorDialog = null,
+                reason = "Failure parsing order cancellation response."
+            )
         }
     }
 

@@ -90,13 +90,17 @@ class DropInPlatformApi(
                 PaymentMethodsApiResponse.SERIALIZER.deserialize(
                     JSONObject(paymentMethodsResponse),
                 )
-            val paymentMethodsWithoutGiftCards = removeGiftCardPaymentMethods(paymentMethodsApiResponse)
+            val paymentMethodsWithoutGiftCards =
+                removeGiftCardPaymentMethods(
+                    paymentMethodsApiResponse,
+                    dropInConfigurationDTO.isPartialPaymentSupported
+                )
             val dropInConfiguration = dropInConfigurationDTO.mapToDropInConfiguration(activity.applicationContext)
             withContext(Dispatchers.Main) {
                 DropIn.startPayment(
                     activity.applicationContext,
                     dropInAdvancedFlowLauncher,
-                    paymentMethodsApiResponse,
+                    paymentMethodsWithoutGiftCards,
                     dropInConfiguration,
                     AdvancedDropInService::class.java,
                 )
@@ -269,10 +273,14 @@ class DropInPlatformApi(
         )
     }
 
-    // Gift cards will be supported in a later version
     private fun removeGiftCardPaymentMethods(
-        paymentMethodsResponse: PaymentMethodsApiResponse
+        paymentMethodsResponse: PaymentMethodsApiResponse,
+        isPartialPaymentSupported: Boolean
     ): PaymentMethodsApiResponse {
+        if (isPartialPaymentSupported) {
+            return paymentMethodsResponse
+        }
+
         val giftCardTypeIdentifier = "giftcard"
         val storedPaymentMethods =
             paymentMethodsResponse.storedPaymentMethods?.filterNot { it.type == giftCardTypeIdentifier }

@@ -11,27 +11,30 @@ extension AnalyticsOptionsMapper on AnalyticsOptions {
 }
 
 extension DropInConfigurationMapper on DropInConfiguration {
-  DropInConfigurationDTO toDTO(String sdkVersionNumber) =>
+  DropInConfigurationDTO toDTO(
+    String sdkVersionNumber,
+    isPartialPaymentSupported,
+  ) =>
       DropInConfigurationDTO(
-          environment: environment,
-          clientKey: clientKey,
-          countryCode: countryCode.toUpperCase(),
-          amount: amount?.toDTO(),
-          shopperLocale: shopperLocale,
-          cardConfigurationDTO: cardConfiguration?.toDTO(),
-          applePayConfigurationDTO: applePayConfiguration?.toDTO(),
-          googlePayConfigurationDTO: googlePayConfiguration?.toDTO(),
-          cashAppPayConfigurationDTO: cashAppPayConfiguration?.toDTO(),
-          analyticsOptionsDTO: analyticsOptions.toDTO(sdkVersionNumber),
-          isRemoveStoredPaymentMethodEnabled:
-              _isRemoveStoredPaymentMethodEnabled(
-                  storedPaymentMethodConfiguration),
-          showPreselectedStoredPaymentMethod: storedPaymentMethodConfiguration
-                  ?.showPreselectedStoredPaymentMethod ??
-              true,
-          skipListWhenSinglePaymentMethod: skipListWhenSinglePaymentMethod,
-          preselectedPaymentMethodTitle: preselectedPaymentMethodTitle,
-          paymentMethodNames: paymentMethodNames,
+        environment: environment,
+        clientKey: clientKey,
+        countryCode: countryCode.toUpperCase(),
+        amount: amount?.toDTO(),
+        shopperLocale: shopperLocale,
+        cardConfigurationDTO: cardConfiguration?.toDTO(),
+        applePayConfigurationDTO: applePayConfiguration?.toDTO(),
+        googlePayConfigurationDTO: googlePayConfiguration?.toDTO(),
+        cashAppPayConfigurationDTO: cashAppPayConfiguration?.toDTO(),
+        analyticsOptionsDTO: analyticsOptions.toDTO(sdkVersionNumber),
+        isRemoveStoredPaymentMethodEnabled: _isRemoveStoredPaymentMethodEnabled(
+            storedPaymentMethodConfiguration),
+        showPreselectedStoredPaymentMethod: storedPaymentMethodConfiguration
+                ?.showPreselectedStoredPaymentMethod ??
+            true,
+        skipListWhenSinglePaymentMethod: skipListWhenSinglePaymentMethod,
+        preselectedPaymentMethodTitle: preselectedPaymentMethodTitle,
+        paymentMethodNames: paymentMethodNames,
+        isPartialPaymentSupported: isPartialPaymentSupported,
       );
 
   bool _isRemoveStoredPaymentMethodEnabled(

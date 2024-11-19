@@ -68,8 +68,7 @@ class PaymentEventHandler {
 
   bool _isNonFullyPaidOrder(jsonResponse) {
     if (jsonResponse.containsKey("order")) {
-      final remainingAmount =
-          jsonResponse["order"]["remainingAmount"]["value"];
+      final remainingAmount = jsonResponse["order"]["remainingAmount"]["value"];
       return remainingAmount > 0;
     } else {
       return false;
