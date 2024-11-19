@@ -36,7 +36,7 @@ class DropIn {
         await sdkVersionNumberProvider.getSdkVersionNumber();
 
     dropInPlatformApi.showDropInSession(
-      dropInConfiguration.toDTO(sdkVersionNumber),
+      dropInConfiguration.toDTO(sdkVersionNumber, true),
     );
 
     dropInFlutterApi.dropInSessionPlatformCommunicationStream =
@@ -93,9 +93,13 @@ class DropIn {
       paymentMethodsResponse,
       toEncodable: (value) => throw Exception("Could not encode $value"),
     );
+    final isPartialPaymentSupported = advancedCheckout.partialPayment != null;
 
     dropInPlatformApi.showDropInAdvanced(
-      dropInConfiguration.toDTO(sdkVersionNumber),
+      dropInConfiguration.toDTO(
+        sdkVersionNumber,
+        isPartialPaymentSupported,
+      ),
       encodedPaymentMethodsResponse,
     );
 
@@ -241,7 +245,8 @@ class DropIn {
     final Map<String, dynamic> submitDataDecoded = jsonDecode(submitData);
     switch (advancedCheckout) {
       case AdvancedCheckout it:
-        if (submitDataDecoded[Constants.submitDataKey].containsKey("order")) {
+        if (submitDataDecoded[Constants.submitDataKey]
+            .containsKey(Constants.orderKey)) {
           _mapOrderToCompactOrder(submitDataDecoded);
         }
 
@@ -255,11 +260,13 @@ class DropIn {
     }
   }
 
+  // iOS provides more fields than needed. Therefore, only the necessary fields are used.
   void _mapOrderToCompactOrder(Map<String, dynamic> submitDataDecoded) {
-    final order = submitDataDecoded[Constants.submitDataKey]["order"];
-    submitDataDecoded[Constants.submitDataKey]["order"] = {
-      "pspReference": order["pspReference"],
-      "orderData": order["orderData"],
+    final order =
+        submitDataDecoded[Constants.submitDataKey][Constants.orderKey];
+    submitDataDecoded[Constants.submitDataKey][Constants.orderKey] = {
+      Constants.pspReferenceKey: order[Constants.pspReferenceKey],
+      Constants.orderDataKey: order[Constants.orderDataKey],
     };
   }
 
@@ -278,55 +285,55 @@ class DropIn {
     PlatformCommunicationModel event,
     PartialPayment? partialPayment,
   ) async {
-    if (partialPayment == null) {
-      //TODO Check with Android to investigate the race condition
+    try {
+      final data = jsonDecode(event.data as String);
+      final Map<String, dynamic> balanceCheckRequestBody = {
+        Constants.paymentMethodKey: data[Constants.paymentMethodKey],
+        Constants.amountKey: data[Constants.amountKey],
+      };
+      final balanceCheckResponse =
+          await partialPayment?.onCheckBalance(balanceCheckRequestBody);
+      dropInPlatformApi.onBalanceCheckResult(jsonEncode(balanceCheckResponse));
+    } catch (error) {
+      // This delay is necessary because Android shows the spinner after a short delay.
       await Future.delayed(const Duration(milliseconds: 300));
       dropInPlatformApi.onBalanceCheckResult("");
-      throw Exception("Partial payment implementation is not provided.");
     }
-
-    final data = jsonDecode(event.data as String);
-    final Map<String, dynamic> requestBody = {
-      "paymentMethod": data["paymentMethod"],
-      "amount": data["amount"],
-    };
-
-    final balanceCheckResponse =
-        await partialPayment.onCheckBalance(requestBody);
-    dropInPlatformApi.onBalanceCheckResult(jsonEncode(balanceCheckResponse));
   }
 
   void _handleOrderRequest(
     PlatformCommunicationModel event,
     PartialPayment? partialPayment,
   ) async {
-    if (partialPayment == null) {
-      //TODO Check with Android to investigate the race condition
+    try {
+      final orderRequestResponse = await partialPayment?.onRequestOrder();
+      dropInPlatformApi.onOrderRequestResult(jsonEncode(orderRequestResponse));
+    } catch (error) {
+      // This delay is necessary because Android shows the spinner after a short delay.
       await Future.delayed(const Duration(milliseconds: 300));
       dropInPlatformApi.onOrderRequestResult("");
-      throw Exception("Partial payment implementation is not provided.");
     }
-
-    final orderRequestResponse = await partialPayment.onRequestOrder();
-    dropInPlatformApi.onOrderRequestResult(jsonEncode(orderRequestResponse));
   }
 
   void _handleOrderCancel(
     PlatformCommunicationModel event,
     PartialPayment? partialPayment,
   ) async {
-    if (partialPayment == null) {
+    try {
+      final orderResponse = jsonDecode(event.data as String);
+      final orderCancelResponse = await partialPayment?.onCancelOrder(
+        orderResponse[Constants.shouldUpdatePaymentMethodsKey] as bool? ??
+            false,
+        orderResponse[Constants.orderKey],
+      );
+      final orderCancelResponseDTO = orderCancelResponse?.toDTO() ??
+          OrderCancelResponseDTO(orderCancelResponseBody: {});
+      dropInPlatformApi.onOrderCancelResult(orderCancelResponseDTO);
+    } catch (error) {
+      // This delay is necessary because Android shows the spinner after a short delay.
+      await Future.delayed(const Duration(milliseconds: 300));
       dropInPlatformApi.onOrderCancelResult(
           OrderCancelResponseDTO(orderCancelResponseBody: {}));
-      throw Exception("Partial payment implementation is not provided.");
     }
-
-    final orderResponse = jsonDecode(event.data as String);
-    final orderCancelResponse = await partialPayment.onCancelOrder(
-      orderResponse["shouldUpdatePaymentMethods"] as bool? ?? false,
-      orderResponse["order"],
-    );
-
-    dropInPlatformApi.onOrderCancelResult(orderCancelResponse.toDTO());
   }
 }

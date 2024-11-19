@@ -1,5 +1,6 @@
 import 'package:adyen_checkout/src/common/model/payment_event.dart';
 import 'package:adyen_checkout/src/generated/platform_api.g.dart';
+import 'package:adyen_checkout/src/util/constants.dart';
 
 class PaymentEventHandler {
   PaymentEventDTO mapToPaymentEventDTO(PaymentEvent paymentEvent) {
@@ -23,8 +24,8 @@ class PaymentEventHandler {
       Update() => PaymentEventDTO(
           paymentEventType: PaymentEventType.update,
           data: {
-            "updatedPaymentMethods": paymentEvent.paymentMethods,
-            "orderResponse": paymentEvent.orderResponse,
+            Constants.updatedPaymentMethodsKey: paymentEvent.paymentMethods,
+            Constants.orderResponseKey: paymentEvent.orderResponse,
           },
         ),
     };
