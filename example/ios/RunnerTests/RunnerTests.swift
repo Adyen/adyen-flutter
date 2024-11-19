@@ -23,7 +23,8 @@ class RunnerTests: XCTestCase {
                 analyticsOptionsDTO: AnalyticsOptionsDTO(enabled: false, version: "0.0.1"),
                 showPreselectedStoredPaymentMethod: false,
                 skipListWhenSinglePaymentMethod: false,
-                isRemoveStoredPaymentMethodEnabled: false
+                isRemoveStoredPaymentMethodEnabled: false,
+                isPartialPaymentSupported: true
             )
 
             let adyenContext = try dropInConfigurationDTO.createAdyenContext()
