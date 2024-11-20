@@ -21,7 +21,7 @@ abstract class BaseCardComponent extends StatefulWidget {
   final bool isStoredPaymentMethod;
   final Set<Factory<OneSequenceGestureRecognizer>>? gestureRecognizers;
   final AdyenLogger adyenLogger;
-  final StreamController<double> resizeStream = StreamController.broadcast();
+  final StreamController<int> resizeStream = StreamController.broadcast();
   abstract final String componentId;
   abstract final Map<String, dynamic> creationParams;
   abstract final String viewType;
@@ -42,7 +42,7 @@ abstract class BaseCardComponent extends StatefulWidget {
   void onFinished(PaymentResultDTO? paymentResultDTO);
 
   void onResize(ComponentCommunicationModel event) =>
-      resizeStream.add(event.data as double);
+      resizeStream.add(event.data as int);
 
   void onResult(ComponentCommunicationModel event) {
     final paymentResult = event.paymentResult;
@@ -95,8 +95,9 @@ class _BaseCardComponentState extends State<BaseCardComponent> {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder(
-        stream: widget.resizeStream.stream.distinct(),
+        stream: widget.resizeStream.stream,
         builder: (BuildContext context, AsyncSnapshot snapshot) {
+          print("received: ${snapshot.data}");
           return CardComponentContainer(
             snapshot: snapshot,
             cardWidgetKey: _cardWidgetKey,

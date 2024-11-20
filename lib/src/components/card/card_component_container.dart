@@ -10,6 +10,7 @@ class CardComponentContainer extends StatelessWidget {
     required this.cardWidget,
   });
 
+  final double bottomSpacing = 8;
   final double initialViewHeight;
   final AsyncSnapshot snapshot;
   final Key cardWidgetKey;
@@ -25,7 +26,7 @@ class CardComponentContainer extends StatelessWidget {
           opacity: snapshot.data != null ? 1 : 0,
           child: SizedBox(
             key: cardWidgetKey,
-            height: _determineHeight(snapshot),
+            height: _determineHeight(snapshot) ,
             child: cardWidget,
           ),
         ),
@@ -48,11 +49,12 @@ class CardComponentContainer extends StatelessWidget {
   }
 
   double _determineHeight(AsyncSnapshot<dynamic> snapshot) {
+    print("**** determine height ****");
     switch (snapshot.data) {
       case null:
         return initialViewHeight;
       case > 0:
-        return snapshot.data;
+        return snapshot.data + bottomSpacing;
       default:
         return initialViewHeight;
     }
