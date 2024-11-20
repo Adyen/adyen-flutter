@@ -46,10 +46,6 @@ class CardAdvancedComponent extends BaseCardComponent {
       _onSubmit(event);
     } else if (event.type case ComponentCommunicationType.additionalDetails) {
       _onAdditionalDetails(event);
-    } else if (event.type case ComponentCommunicationType.result) {
-      onResult(event);
-    } else if (event.type case ComponentCommunicationType.resize) {
-      onResize(event);
     }
   }
 

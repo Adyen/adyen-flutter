@@ -105,7 +105,6 @@ class DynamicComponentView
         private fun overrideSubmit(component: CardComponent) {
             val payButton = findViewById<MaterialButton>(com.adyen.checkout.ui.core.R.id.payButton)
             payButton?.setOnClickListener {
-                println("****** CLICKED *******")
                 isHintAnimationEnabledOnTextInputFields(this, false)
                 ignoreLayoutChanges = true
                 if (!interactionBlocked) {
@@ -129,7 +128,6 @@ class DynamicComponentView
         }
 
         private fun resizeFlutterViewport(viewportHeight: Int) {
-            println("**** SEND $viewportHeight ****")
             componentFlutterApi?.onComponentCommunication(
                 ComponentCommunicationModel(
                     type = ComponentCommunicationType.RESIZE,

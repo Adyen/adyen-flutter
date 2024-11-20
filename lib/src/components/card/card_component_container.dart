@@ -4,15 +4,15 @@ import 'package:flutter/material.dart';
 class CardComponentContainer extends StatelessWidget {
   const CardComponentContainer({
     super.key,
-    required this.snapshot,
+    required this.viewportHeight,
     required this.cardWidgetKey,
-    required this.initialViewHeight,
+    required this.initialViewPortHeight,
     required this.cardWidget,
   });
 
   final double bottomSpacing = 8;
-  final double initialViewHeight;
-  final AsyncSnapshot snapshot;
+  final double initialViewPortHeight;
+  final int? viewportHeight;
   final Key cardWidgetKey;
   final Widget cardWidget;
 
@@ -23,16 +23,16 @@ class CardComponentContainer extends StatelessWidget {
         AnimatedOpacity(
           duration: const Duration(milliseconds: 300),
           curve: Curves.fastOutSlowIn,
-          opacity: snapshot.data != null ? 1 : 0,
+          opacity: viewportHeight != null ? 1 : 0,
           child: SizedBox(
             key: cardWidgetKey,
-            height: _determineHeight(snapshot) ,
+            height: _determineHeight(viewportHeight),
             child: cardWidget,
           ),
         ),
-        if (snapshot.data == null)
+        if (viewportHeight == null)
           SizedBox(
-            height: initialViewHeight,
+            height: initialViewPortHeight,
             child: _buildLoadingWidget(),
           )
       ],
@@ -48,15 +48,7 @@ class CardComponentContainer extends StatelessWidget {
     }
   }
 
-  double _determineHeight(AsyncSnapshot<dynamic> snapshot) {
-    print("**** determine height ****");
-    switch (snapshot.data) {
-      case null:
-        return initialViewHeight;
-      case > 0:
-        return snapshot.data + bottomSpacing;
-      default:
-        return initialViewHeight;
-    }
+  double _determineHeight(int? height) {
+    return height == null ? initialViewPortHeight : height + bottomSpacing;
   }
 }

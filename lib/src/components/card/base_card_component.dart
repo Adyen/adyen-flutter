@@ -21,7 +21,6 @@ abstract class BaseCardComponent extends StatefulWidget {
   final bool isStoredPaymentMethod;
   final Set<Factory<OneSequenceGestureRecognizer>>? gestureRecognizers;
   final AdyenLogger adyenLogger;
-  final StreamController<int> resizeStream = StreamController.broadcast();
   abstract final String componentId;
   abstract final Map<String, dynamic> creationParams;
   abstract final String viewType;
@@ -40,9 +39,6 @@ abstract class BaseCardComponent extends StatefulWidget {
   void handleComponentCommunication(ComponentCommunicationModel event);
 
   void onFinished(PaymentResultDTO? paymentResultDTO);
-
-  void onResize(ComponentCommunicationModel event) =>
-      resizeStream.add(event.data as int);
 
   void onResult(ComponentCommunicationModel event) {
     final paymentResult = event.paymentResult;
@@ -79,6 +75,8 @@ class _BaseCardComponentState extends State<BaseCardComponent> {
   final ComponentFlutterApi _componentFlutterApi = ComponentFlutterApi.instance;
   late StreamSubscription<ComponentCommunicationModel>
       _componentCommunicationStream;
+  int? previousViewportHeight;
+  int? viewportHeight;
 
   @override
   void initState() {
@@ -87,31 +85,25 @@ class _BaseCardComponentState extends State<BaseCardComponent> {
         .componentCommunicationStream.stream
         .where((communicationModel) =>
             communicationModel.componentId == widget.componentId)
-        .listen(widget.handleComponentCommunication);
+        .listen(_onComponentCommunication);
 
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder(
-        stream: widget.resizeStream.stream,
-        builder: (BuildContext context, AsyncSnapshot snapshot) {
-          print("received: ${snapshot.data}");
-          return CardComponentContainer(
-            snapshot: snapshot,
-            cardWidgetKey: _cardWidgetKey,
-            initialViewHeight: widget.initialViewHeight,
-            cardWidget: _cardWidget,
-          );
-        });
+    return CardComponentContainer(
+      cardWidgetKey: _cardWidgetKey,
+      initialViewPortHeight: widget.initialViewHeight,
+      viewportHeight: viewportHeight,
+      cardWidget: _cardWidget,
+    );
   }
 
   @override
   void dispose() {
     _componentCommunicationStream.cancel();
     _componentFlutterApi.dispose();
-    widget.resizeStream.close();
     super.dispose();
   }
 
@@ -138,6 +130,24 @@ class _BaseCardComponentState extends State<BaseCardComponent> {
         );
       default:
         throw UnsupportedError('Unsupported platform');
+    }
+  }
+
+  void _onComponentCommunication(event) {
+    if (event.type case ComponentCommunicationType.resize) {
+      final newViewportHeight = event.data as int;
+      if (newViewportHeight == previousViewportHeight) {
+        return;
+      } else {
+        setState(() {
+          previousViewportHeight = viewportHeight;
+          viewportHeight = newViewportHeight;
+        });
+      }
+    } else if (event.type case ComponentCommunicationType.result) {
+      widget.onResult(event);
+    } else {
+      widget.handleComponentCommunication(event);
     }
   }
 }

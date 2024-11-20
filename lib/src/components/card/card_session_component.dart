@@ -37,13 +37,7 @@ class CardSessionComponent extends BaseCardComponent {
       };
 
   @override
-  void handleComponentCommunication(ComponentCommunicationModel event) {
-    if (event.type case ComponentCommunicationType.result) {
-      onResult(event);
-    } else if (event.type case ComponentCommunicationType.resize) {
-      onResize(event);
-    }
-  }
+  void handleComponentCommunication(ComponentCommunicationModel event) {}
 
   @override
   void onFinished(PaymentResultDTO? paymentResultDTO) {
