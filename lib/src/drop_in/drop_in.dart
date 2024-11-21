@@ -295,8 +295,6 @@ class DropIn {
           await partialPayment?.onCheckBalance(balanceCheckRequestBody);
       dropInPlatformApi.onBalanceCheckResult(jsonEncode(balanceCheckResponse));
     } catch (error) {
-      // This delay is necessary because Android shows the spinner after a short delay.
-      await Future.delayed(const Duration(milliseconds: 300));
       dropInPlatformApi.onBalanceCheckResult(error.toString());
     }
   }
@@ -309,8 +307,6 @@ class DropIn {
       final orderRequestResponse = await partialPayment?.onRequestOrder();
       dropInPlatformApi.onOrderRequestResult(jsonEncode(orderRequestResponse));
     } catch (error) {
-      // This delay is necessary because Android shows the spinner after a short delay.
-      await Future.delayed(const Duration(milliseconds: 300));
       dropInPlatformApi.onOrderRequestResult(error.toString());
     }
   }
@@ -330,8 +326,6 @@ class DropIn {
           OrderCancelResultDTO(orderCancelJson: {});
       dropInPlatformApi.onOrderCancelResult(orderCancelResponseDTO);
     } catch (error) {
-      // This delay is necessary because Android shows the spinner after a short delay.
-      await Future.delayed(const Duration(milliseconds: 300));
       dropInPlatformApi
           .onOrderCancelResult(OrderCancelResultDTO(orderCancelJson: {}));
     }
