@@ -37,6 +37,7 @@ class ConfigurationMapperTest {
             showPreselectedStoredPaymentMethod = false,
             skipListWhenSinglePaymentMethod = false,
             isRemoveStoredPaymentMethodEnabled = false,
+            isPartialPaymentSupported = true,
         )
 
         val dropInConfiguration = dropInConfigurationDTO.mapToDropInConfiguration(mockContext)
