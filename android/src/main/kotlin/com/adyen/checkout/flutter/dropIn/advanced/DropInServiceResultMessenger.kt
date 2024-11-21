@@ -1,7 +1,7 @@
 package com.adyen.checkout.flutter.dropIn.advanced
 
 import DeletedStoredPaymentMethodResultDTO
-import OrderCancelResponseDTO
+import OrderCancelResultDTO
 import PaymentEventDTO
 import androidx.lifecycle.LiveData
 import com.adyen.checkout.flutter.dropIn.model.DropInStoredPaymentMethodDeletionModel
@@ -149,14 +149,14 @@ class DropInOrderCancelPlatformMessenger : LiveData<Event<JSONObject>>() {
     }
 }
 
-class DropInOrderCancelResultMessenger : LiveData<Event<OrderCancelResponseDTO>>() {
+class DropInOrderCancelResultMessenger : LiveData<Event<OrderCancelResultDTO>>() {
     companion object {
         private val dropInOrderCancelResultMessenger =
             DropInOrderCancelResultMessenger()
 
         fun instance() = dropInOrderCancelResultMessenger
 
-        fun sendResult(value: OrderCancelResponseDTO) {
+        fun sendResult(value: OrderCancelResultDTO) {
             dropInOrderCancelResultMessenger.postValue(Event(value))
         }
     }

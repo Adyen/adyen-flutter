@@ -1384,29 +1384,29 @@ class ActionComponentConfigurationDTO {
   }
 }
 
-class OrderCancelResponseDTO {
-  OrderCancelResponseDTO({
-    required this.orderCancelResponseBody,
-    this.updatedPaymentMethods,
+class OrderCancelResultDTO {
+  OrderCancelResultDTO({
+    required this.orderCancelJson,
+    this.updatedPaymentMethodsJson,
   });
 
-  Map<String?, Object?> orderCancelResponseBody;
+  Map<String?, Object?> orderCancelJson;
 
-  Map<String?, Object?>? updatedPaymentMethods;
+  Map<String?, Object?>? updatedPaymentMethodsJson;
 
   Object encode() {
     return <Object?>[
-      orderCancelResponseBody,
-      updatedPaymentMethods,
+      orderCancelJson,
+      updatedPaymentMethodsJson,
     ];
   }
 
-  static OrderCancelResponseDTO decode(Object result) {
+  static OrderCancelResultDTO decode(Object result) {
     result as List<Object?>;
-    return OrderCancelResponseDTO(
-      orderCancelResponseBody:
+    return OrderCancelResultDTO(
+      orderCancelJson:
           (result[0] as Map<Object?, Object?>?)!.cast<String?, Object?>(),
-      updatedPaymentMethods:
+      updatedPaymentMethodsJson:
           (result[1] as Map<Object?, Object?>?)?.cast<String?, Object?>(),
     );
   }
@@ -1476,7 +1476,7 @@ class _CheckoutPlatformInterfaceCodec extends StandardMessageCodec {
     } else if (value is MerchantInfoDTO) {
       buffer.putUint8(147);
       writeValue(buffer, value.encode());
-    } else if (value is OrderCancelResponseDTO) {
+    } else if (value is OrderCancelResultDTO) {
       buffer.putUint8(148);
       writeValue(buffer, value.encode());
     } else if (value is OrderResponseDTO) {
@@ -1552,7 +1552,7 @@ class _CheckoutPlatformInterfaceCodec extends StandardMessageCodec {
       case 147:
         return MerchantInfoDTO.decode(readValue(buffer)!);
       case 148:
-        return OrderCancelResponseDTO.decode(readValue(buffer)!);
+        return OrderCancelResultDTO.decode(readValue(buffer)!);
       case 149:
         return OrderResponseDTO.decode(readValue(buffer)!);
       case 150:
@@ -1803,7 +1803,7 @@ class _DropInPlatformInterfaceCodec extends StandardMessageCodec {
     } else if (value is MerchantInfoDTO) {
       buffer.putUint8(142);
       writeValue(buffer, value.encode());
-    } else if (value is OrderCancelResponseDTO) {
+    } else if (value is OrderCancelResultDTO) {
       buffer.putUint8(143);
       writeValue(buffer, value.encode());
     } else if (value is PaymentEventDTO) {
@@ -1851,7 +1851,7 @@ class _DropInPlatformInterfaceCodec extends StandardMessageCodec {
       case 142:
         return MerchantInfoDTO.decode(readValue(buffer)!);
       case 143:
-        return OrderCancelResponseDTO.decode(readValue(buffer)!);
+        return OrderCancelResultDTO.decode(readValue(buffer)!);
       case 144:
         return PaymentEventDTO.decode(readValue(buffer)!);
       case 145:
@@ -2048,7 +2048,7 @@ class DropInPlatformInterface {
   }
 
   Future<void> onOrderCancelResult(
-      OrderCancelResponseDTO orderCancelResponse) async {
+      OrderCancelResultDTO orderCancelResult) async {
     const String __pigeon_channelName =
         'dev.flutter.pigeon.adyen_checkout.DropInPlatformInterface.onOrderCancelResult';
     final BasicMessageChannel<Object?> __pigeon_channel =
@@ -2058,7 +2058,7 @@ class DropInPlatformInterface {
       binaryMessenger: __pigeon_binaryMessenger,
     );
     final List<Object?>? __pigeon_replyList = await __pigeon_channel
-        .send(<Object?>[orderCancelResponse]) as List<Object?>?;
+        .send(<Object?>[orderCancelResult]) as List<Object?>?;
     if (__pigeon_replyList == null) {
       throw _createConnectionError(__pigeon_channelName);
     } else if (__pigeon_replyList.length > 1) {
@@ -2279,7 +2279,7 @@ class _ComponentPlatformInterfaceCodec extends StandardMessageCodec {
     } else if (value is MerchantInfoDTO) {
       buffer.putUint8(147);
       writeValue(buffer, value.encode());
-    } else if (value is OrderCancelResponseDTO) {
+    } else if (value is OrderCancelResultDTO) {
       buffer.putUint8(148);
       writeValue(buffer, value.encode());
     } else if (value is OrderResponseDTO) {
@@ -2355,7 +2355,7 @@ class _ComponentPlatformInterfaceCodec extends StandardMessageCodec {
       case 147:
         return MerchantInfoDTO.decode(readValue(buffer)!);
       case 148:
-        return OrderCancelResponseDTO.decode(readValue(buffer)!);
+        return OrderCancelResultDTO.decode(readValue(buffer)!);
       case 149:
         return OrderResponseDTO.decode(readValue(buffer)!);
       case 150:

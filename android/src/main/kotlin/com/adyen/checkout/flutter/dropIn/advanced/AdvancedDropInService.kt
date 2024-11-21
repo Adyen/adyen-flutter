@@ -2,7 +2,7 @@ package com.adyen.checkout.flutter.dropIn.advanced
 
 import DeletedStoredPaymentMethodResultDTO
 import ErrorDTO
-import OrderCancelResponseDTO
+import OrderCancelResultDTO
 import PaymentEventDTO
 import PaymentEventType
 import android.content.Intent
@@ -318,14 +318,14 @@ class AdvancedDropInService : DropInService(), LifecycleOwner {
     }
 
     private fun mapToOrderCancelDropInServiceResult(
-        orderCancelResponseDTO: OrderCancelResponseDTO?
+        orderCancelResponseDTO: OrderCancelResultDTO?
     ): DropInServiceResult? {
         try {
-            val orderCancelResponseBody = orderCancelResponseDTO?.orderCancelResponseBody?.let { JSONObject(it) }
+            val orderCancelResponseBody = orderCancelResponseDTO?.orderCancelJson?.let { JSONObject(it) }
             return when (val resultCode = orderCancelResponseBody?.optString(Constants.RESULT_CODE_KEY)) {
                 "Received" -> {
-                    if (orderCancelResponseDTO.updatedPaymentMethods?.isNotEmpty() == true) {
-                        val updatedPaymentMethods = orderCancelResponseDTO.updatedPaymentMethods
+                    if (orderCancelResponseDTO.updatedPaymentMethodsJson?.isNotEmpty() == true) {
+                        val updatedPaymentMethods = orderCancelResponseDTO.updatedPaymentMethodsJson
                         val paymentMethods =
                             PaymentMethodsApiResponse.SERIALIZER.deserialize(JSONObject(updatedPaymentMethods))
                         val orderResponse = OrderResponse.SERIALIZER.deserialize(orderCancelResponseBody)

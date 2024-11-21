@@ -317,6 +317,7 @@ data class DropInConfigurationDTO (
   val preselectedPaymentMethodTitle: String? = null,
   val paymentMethodNames: Map<String?, String?>? = null,
   val isPartialPaymentSupported: Boolean
+
 ) {
   companion object {
     @Suppress("UNCHECKED_CAST")
@@ -1181,23 +1182,23 @@ data class ActionComponentConfigurationDTO (
 }
 
 /** Generated class from Pigeon that represents data sent in messages. */
-data class OrderCancelResponseDTO (
-  val orderCancelResponseBody: Map<String?, Any?>,
-  val updatedPaymentMethods: Map<String?, Any?>? = null
+data class OrderCancelResultDTO (
+  val orderCancelJson: Map<String?, Any?>,
+  val updatedPaymentMethodsJson: Map<String?, Any?>? = null
 
 ) {
   companion object {
     @Suppress("UNCHECKED_CAST")
-    fun fromList(list: List<Any?>): OrderCancelResponseDTO {
-      val orderCancelResponseBody = list[0] as Map<String?, Any?>
-      val updatedPaymentMethods = list[1] as Map<String?, Any?>?
-      return OrderCancelResponseDTO(orderCancelResponseBody, updatedPaymentMethods)
+    fun fromList(list: List<Any?>): OrderCancelResultDTO {
+      val orderCancelJson = list[0] as Map<String?, Any?>
+      val updatedPaymentMethodsJson = list[1] as Map<String?, Any?>?
+      return OrderCancelResultDTO(orderCancelJson, updatedPaymentMethodsJson)
     }
   }
   fun toList(): List<Any?> {
     return listOf<Any?>(
-      orderCancelResponseBody,
-      updatedPaymentMethods,
+      orderCancelJson,
+      updatedPaymentMethodsJson,
     )
   }
 }
@@ -1308,7 +1309,7 @@ private object CheckoutPlatformInterfaceCodec : StandardMessageCodec() {
       }
       148.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          OrderCancelResponseDTO.fromList(it)
+          OrderCancelResultDTO.fromList(it)
         }
       }
       149.toByte() -> {
@@ -1436,7 +1437,7 @@ private object CheckoutPlatformInterfaceCodec : StandardMessageCodec() {
         stream.write(147)
         writeValue(stream, value.toList())
       }
-      is OrderCancelResponseDTO -> {
+      is OrderCancelResultDTO -> {
         stream.write(148)
         writeValue(stream, value.toList())
       }
@@ -1696,7 +1697,7 @@ private object DropInPlatformInterfaceCodec : StandardMessageCodec() {
       }
       143.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          OrderCancelResponseDTO.fromList(it)
+          OrderCancelResultDTO.fromList(it)
         }
       }
       144.toByte() -> {
@@ -1774,7 +1775,7 @@ private object DropInPlatformInterfaceCodec : StandardMessageCodec() {
         stream.write(142)
         writeValue(stream, value.toList())
       }
-      is OrderCancelResponseDTO -> {
+      is OrderCancelResultDTO -> {
         stream.write(143)
         writeValue(stream, value.toList())
       }
@@ -1800,7 +1801,7 @@ interface DropInPlatformInterface {
   fun onDeleteStoredPaymentMethodResult(deleteStoredPaymentMethodResultDTO: DeletedStoredPaymentMethodResultDTO)
   fun onBalanceCheckResult(balanceCheckResponse: String)
   fun onOrderRequestResult(orderRequestResponse: String)
-  fun onOrderCancelResult(orderCancelResponse: OrderCancelResponseDTO)
+  fun onOrderCancelResult(orderCancelResult: OrderCancelResultDTO)
   fun cleanUpDropIn()
 
   companion object {
@@ -1950,10 +1951,10 @@ interface DropInPlatformInterface {
         if (api != null) {
           channel.setMessageHandler { message, reply ->
             val args = message as List<Any?>
-            val orderCancelResponseArg = args[0] as OrderCancelResponseDTO
+            val orderCancelResultArg = args[0] as OrderCancelResultDTO
             var wrapped: List<Any?>
             try {
-              api.onOrderCancelResult(orderCancelResponseArg)
+              api.onOrderCancelResult(orderCancelResultArg)
               wrapped = listOf<Any?>(null)
             } catch (exception: Throwable) {
               wrapped = wrapError(exception)
@@ -2191,7 +2192,7 @@ private object ComponentPlatformInterfaceCodec : StandardMessageCodec() {
       }
       148.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          OrderCancelResponseDTO.fromList(it)
+          OrderCancelResultDTO.fromList(it)
         }
       }
       149.toByte() -> {
@@ -2319,7 +2320,7 @@ private object ComponentPlatformInterfaceCodec : StandardMessageCodec() {
         stream.write(147)
         writeValue(stream, value.toList())
       }
-      is OrderCancelResponseDTO -> {
+      is OrderCancelResultDTO -> {
         stream.write(148)
         writeValue(stream, value.toList())
       }
