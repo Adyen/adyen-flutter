@@ -576,13 +576,13 @@ class ActionComponentConfigurationDTO {
   );
 }
 
-class OrderCancelResponseDTO {
-  final Map<String?, Object?> orderCancelResponseBody;
-  final Map<String?, Object?>? updatedPaymentMethods;
+class OrderCancelResultDTO {
+  final Map<String?, Object?> orderCancelJson;
+  final Map<String?, Object?>? updatedPaymentMethodsJson;
 
-  OrderCancelResponseDTO(
-    this.orderCancelResponseBody,
-    this.updatedPaymentMethods,
+  OrderCancelResultDTO(
+    this.orderCancelJson,
+    this.updatedPaymentMethodsJson,
   );
 }
 
@@ -635,7 +635,7 @@ abstract class DropInPlatformInterface {
 
   void onOrderRequestResult(String orderRequestResponse);
 
-  void onOrderCancelResult(OrderCancelResponseDTO orderCancelResponse);
+  void onOrderCancelResult(OrderCancelResultDTO orderCancelResult);
 
   void cleanUpDropIn();
 }

@@ -1241,24 +1241,24 @@ struct ActionComponentConfigurationDTO {
 }
 
 /// Generated class from Pigeon that represents data sent in messages.
-struct OrderCancelResponseDTO {
-    var orderCancelResponseBody: [String?: Any?]
-    var updatedPaymentMethods: [String?: Any?]?
+struct OrderCancelResultDTO {
+    var orderCancelJson: [String?: Any?]
+    var updatedPaymentMethodsJson: [String?: Any?]?
 
-    static func fromList(_ list: [Any?]) -> OrderCancelResponseDTO? {
-        let orderCancelResponseBody = list[0] as! [String?: Any?]
-        let updatedPaymentMethods: [String?: Any?]? = nilOrValue(list[1])
+    static func fromList(_ list: [Any?]) -> OrderCancelResultDTO? {
+        let orderCancelJson = list[0] as! [String?: Any?]
+        let updatedPaymentMethodsJson: [String?: Any?]? = nilOrValue(list[1])
 
-        return OrderCancelResponseDTO(
-            orderCancelResponseBody: orderCancelResponseBody,
-            updatedPaymentMethods: updatedPaymentMethods
+        return OrderCancelResultDTO(
+            orderCancelJson: orderCancelJson,
+            updatedPaymentMethodsJson: updatedPaymentMethodsJson
         )
     }
 
     func toList() -> [Any?] {
         [
-            orderCancelResponseBody,
-            updatedPaymentMethods
+            orderCancelJson,
+            updatedPaymentMethodsJson
         ]
     }
 }
@@ -1307,7 +1307,7 @@ private class CheckoutPlatformInterfaceCodecReader: FlutterStandardReader {
         case 147:
             return MerchantInfoDTO.fromList(self.readValue() as! [Any?])
         case 148:
-            return OrderCancelResponseDTO.fromList(self.readValue() as! [Any?])
+            return OrderCancelResultDTO.fromList(self.readValue() as! [Any?])
         case 149:
             return OrderResponseDTO.fromList(self.readValue() as! [Any?])
         case 150:
@@ -1392,7 +1392,7 @@ private class CheckoutPlatformInterfaceCodecWriter: FlutterStandardWriter {
         } else if let value = value as? MerchantInfoDTO {
             super.writeByte(147)
             super.writeValue(value.toList())
-        } else if let value = value as? OrderCancelResponseDTO {
+        } else if let value = value as? OrderCancelResultDTO {
             super.writeByte(148)
             super.writeValue(value.toList())
         } else if let value = value as? OrderResponseDTO {
@@ -1590,7 +1590,7 @@ private class DropInPlatformInterfaceCodecReader: FlutterStandardReader {
         case 142:
             return MerchantInfoDTO.fromList(self.readValue() as! [Any?])
         case 143:
-            return OrderCancelResponseDTO.fromList(self.readValue() as! [Any?])
+            return OrderCancelResultDTO.fromList(self.readValue() as! [Any?])
         case 144:
             return PaymentEventDTO.fromList(self.readValue() as! [Any?])
         case 145:
@@ -1648,7 +1648,7 @@ private class DropInPlatformInterfaceCodecWriter: FlutterStandardWriter {
         } else if let value = value as? MerchantInfoDTO {
             super.writeByte(142)
             super.writeValue(value.toList())
-        } else if let value = value as? OrderCancelResponseDTO {
+        } else if let value = value as? OrderCancelResultDTO {
             super.writeByte(143)
             super.writeValue(value.toList())
         } else if let value = value as? PaymentEventDTO {
@@ -1686,7 +1686,7 @@ protocol DropInPlatformInterface {
     func onDeleteStoredPaymentMethodResult(deleteStoredPaymentMethodResultDTO: DeletedStoredPaymentMethodResultDTO) throws
     func onBalanceCheckResult(balanceCheckResponse: String) throws
     func onOrderRequestResult(orderRequestResponse: String) throws
-    func onOrderCancelResult(orderCancelResponse: OrderCancelResponseDTO) throws
+    func onOrderCancelResult(orderCancelResult: OrderCancelResultDTO) throws
     func cleanUpDropIn() throws
 }
 
@@ -1806,9 +1806,9 @@ class DropInPlatformInterfaceSetup {
         if let api {
             onOrderCancelResultChannel.setMessageHandler { message, reply in
                 let args = message as! [Any?]
-                let orderCancelResponseArg = args[0] as! OrderCancelResponseDTO
+                let orderCancelResultArg = args[0] as! OrderCancelResultDTO
                 do {
-                    try api.onOrderCancelResult(orderCancelResponse: orderCancelResponseArg)
+                    try api.onOrderCancelResult(orderCancelResult: orderCancelResultArg)
                     reply(wrapResult(nil))
                 } catch {
                     reply(wrapError(error))
@@ -1988,7 +1988,7 @@ private class ComponentPlatformInterfaceCodecReader: FlutterStandardReader {
         case 147:
             return MerchantInfoDTO.fromList(self.readValue() as! [Any?])
         case 148:
-            return OrderCancelResponseDTO.fromList(self.readValue() as! [Any?])
+            return OrderCancelResultDTO.fromList(self.readValue() as! [Any?])
         case 149:
             return OrderResponseDTO.fromList(self.readValue() as! [Any?])
         case 150:
@@ -2073,7 +2073,7 @@ private class ComponentPlatformInterfaceCodecWriter: FlutterStandardWriter {
         } else if let value = value as? MerchantInfoDTO {
             super.writeByte(147)
             super.writeValue(value.toList())
-        } else if let value = value as? OrderCancelResponseDTO {
+        } else if let value = value as? OrderCancelResultDTO {
             super.writeByte(148)
             super.writeValue(value.toList())
         } else if let value = value as? OrderResponseDTO {

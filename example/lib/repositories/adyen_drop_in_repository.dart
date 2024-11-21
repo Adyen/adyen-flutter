@@ -184,7 +184,7 @@ class AdyenDropInRepository extends AdyenBaseRepository {
     return service.postOrders(orderRequestBody);
   }
 
-  Future<OrderCancelResponse> onCancelOrder(
+  Future<OrderCancelResult> onCancelOrder(
     bool shouldUpdatePaymentMethods,
     Map<String, dynamic> order,
   ) async {
@@ -192,16 +192,16 @@ class AdyenDropInRepository extends AdyenBaseRepository {
       "merchantAccount": Config.merchantAccount,
       "order": order,
     };
-    final Map<String, dynamic> orderCancelResponseBody =
+    final Map<String, dynamic> orderCancelJson =
         await service.postOrdersCancel(orderCancelRequestBody);
-    final OrderCancelResponse orderCancelResponse =
-        OrderCancelResponse(orderCancelResponseBody: orderCancelResponseBody);
+    final OrderCancelResult orderCancelResult =
+        OrderCancelResult(orderCancelJson: orderCancelJson);
     if (shouldUpdatePaymentMethods == true) {
-      final paymentMethods = await fetchPaymentMethods();
-      orderCancelResponse.updatedPaymentMethods = paymentMethods;
+      final paymentMethodsJson = await fetchPaymentMethods();
+      orderCancelResult.updatedPaymentMethodsJson = paymentMethodsJson;
     }
 
-    return orderCancelResponse;
+    return orderCancelResult;
   }
 
   bool _hasOrderWithRemainingAmount(jsonResponse) {

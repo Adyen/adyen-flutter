@@ -4,7 +4,7 @@ import DeletedStoredPaymentMethodResultDTO
 import DropInConfigurationDTO
 import DropInFlutterInterface
 import DropInPlatformInterface
-import OrderCancelResponseDTO
+import OrderCancelResultDTO
 import PaymentEventDTO
 import PaymentEventType
 import PaymentResultDTO
@@ -134,8 +134,8 @@ class DropInPlatformApi(
         DropInOrderRequestResultMessenger.sendResult(orderRequestResponse)
     }
 
-    override fun onOrderCancelResult(orderCancelResponse: OrderCancelResponseDTO) {
-        DropInOrderCancelResultMessenger.sendResult(orderCancelResponse)
+    override fun onOrderCancelResult(orderCancelResult: OrderCancelResultDTO) {
+        DropInOrderCancelResultMessenger.sendResult(orderCancelResult)
     }
 
     override fun cleanUpDropIn() {

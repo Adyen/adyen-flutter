@@ -327,13 +327,13 @@ class DropIn {
         orderResponse[Constants.orderKey],
       );
       final orderCancelResponseDTO = orderCancelResponse?.toDTO() ??
-          OrderCancelResponseDTO(orderCancelResponseBody: {});
+          OrderCancelResultDTO(orderCancelJson: {});
       dropInPlatformApi.onOrderCancelResult(orderCancelResponseDTO);
     } catch (error) {
       // This delay is necessary because Android shows the spinner after a short delay.
       await Future.delayed(const Duration(milliseconds: 300));
-      dropInPlatformApi.onOrderCancelResult(
-          OrderCancelResponseDTO(orderCancelResponseBody: {}));
+      dropInPlatformApi
+          .onOrderCancelResult(OrderCancelResultDTO(orderCancelJson: {}));
     }
   }
 }
