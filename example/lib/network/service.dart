@@ -1,7 +1,6 @@
 // ignore_for_file: avoid_print
 
 import 'dart:convert';
-import 'dart:developer';
 
 import 'package:adyen_checkout/adyen_checkout.dart';
 import 'package:adyen_checkout_example/config.dart';
@@ -41,7 +40,6 @@ class Service {
       body: jsonEncode(body),
     );
     print("PspReference: ${response.headers["pspreference"]}");
-    log(response.body);
     return jsonDecode(response.body);
   }
 
