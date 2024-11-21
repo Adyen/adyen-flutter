@@ -259,11 +259,11 @@ class DropInPlatformApi: DropInPlatformInterface {
     
     private func onDropInResultUpdate(paymentEventDTO: PaymentEventDTO) {
         do {
-            guard let updatedPaymentMethods = paymentEventDTO.data?[Constants.updatedPaymentMethodsKey] ?? "" else {
+            guard let updatedPaymentMethods = paymentEventDTO.data?[Constants.UPDATED_PAYMENT_METHODS_KEY] ?? "" else {
                 throw PlatformError(errorDescription: "Updated payment methods not provided.")
             }
             
-            guard let orderResponse = paymentEventDTO.data?[Constants.orderResponseKey] ?? "" else {
+            guard let orderResponse = paymentEventDTO.data?[Constants.ORDER_KEY] ?? "" else {
                 throw PlatformError(errorDescription: "Order not provided.")
             }
             
@@ -366,8 +366,8 @@ extension DropInPlatformApi: PartialPaymentDelegate {
     func cancelOrder(_ order: Adyen.PartialPaymentOrder, component: any Adyen.Component) {
         do {
             let cancelOrderData: [String: Any] = [
-                Constants.orderKey: order.jsonObject,
-                Constants.shouldUpdatePaymentMethodsKey: false
+                Constants.ORDER_KEY: order.jsonObject,
+                Constants.SHOULD_UPDATE_PAYMENT_METHODS_KEY: false
             ]
             let data = try JSONSerialization.data(withJSONObject: cancelOrderData, options: [])
             let cancelOrderDataString = String(data: data, encoding: .utf8)

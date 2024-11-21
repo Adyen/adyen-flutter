@@ -24,8 +24,8 @@ class PaymentEventHandler {
       Update() => PaymentEventDTO(
           paymentEventType: PaymentEventType.update,
           data: {
-            Constants.updatedPaymentMethodsKey: paymentEvent.paymentMethods,
-            Constants.orderResponseKey: paymentEvent.orderResponse,
+            Constants.updatedPaymentMethodsKey: paymentEvent.paymentMethodsJson,
+            Constants.orderKey: paymentEvent.orderJson,
           },
         ),
     };

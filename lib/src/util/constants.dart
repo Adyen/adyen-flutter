@@ -15,7 +15,6 @@ class Constants {
   static const String pspReferenceKey = "pspReference";
   static const String orderKey = "order";
   static const String orderDataKey = "orderData";
-  static const String orderResponseKey = "orderResponse";
   static const String updatedPaymentMethodsKey = "updatedPaymentMethods";
   static const String shouldUpdatePaymentMethodsKey =
       "shouldUpdatePaymentMethods";

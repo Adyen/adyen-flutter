@@ -131,7 +131,7 @@ class AdyenDropInRepository extends AdyenBaseRepository {
   Future<PaymentEvent> _evaluatePaymentsResponse(
       Map<String, dynamic> response) async {
     if (_hasOrderWithRemainingAmount(response)) {
-      final Map<String, dynamic> updatedPaymentMethods =
+      final Map<String, dynamic> updatedPaymentMethodsJson =
           await fetchPaymentMethods(
         orderResponse: {
           "pspReference": response["order"]["pspReference"],
@@ -140,7 +140,7 @@ class AdyenDropInRepository extends AdyenBaseRepository {
       );
       return paymentEventHandler.handleResponse(
         jsonResponse: response,
-        updatedPaymentMethods: updatedPaymentMethods,
+        updatedPaymentMethodsJson: updatedPaymentMethodsJson,
       );
     } else {
       return paymentEventHandler.handleResponse(jsonResponse: response);

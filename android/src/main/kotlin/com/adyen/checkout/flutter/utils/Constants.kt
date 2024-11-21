@@ -16,10 +16,8 @@ class Constants {
         const val ADVANCED_PAYMENT_DATA_KEY = "data"
         const val ADVANCED_EXTRA_DATA_KEY = "extra"
         const val ORDER_KEY = "order"
-        const val ORDER_RESPONSE_KEY = "orderResponse"
         const val SHOULD_UPDATE_PAYMENT_METHODS_KEY = "shouldUpdatePaymentMethods"
         const val UPDATED_PAYMENT_METHODS_KEY = "updatedPaymentMethods"
         const val RESULT_CODE_KEY = "resultCode"
-        const val MESSAGE_KEY = "message"
     }
 }

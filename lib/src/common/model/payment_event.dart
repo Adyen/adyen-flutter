@@ -13,12 +13,12 @@ class Action extends PaymentEvent {
 }
 
 class Update extends PaymentEvent {
-  final Map<String, dynamic> paymentMethods;
-  final Map<String, dynamic> orderResponse;
+  final Map<String, dynamic> paymentMethodsJson;
+  final Map<String, dynamic> orderJson;
 
   Update({
-    required this.paymentMethods,
-    required this.orderResponse,
+    required this.paymentMethodsJson,
+    required this.orderJson,
   });
 }
 

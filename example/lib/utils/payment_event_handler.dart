@@ -10,7 +10,7 @@ class PaymentEventHandler {
 
   PaymentEvent handleResponse({
     required Map<String, dynamic> jsonResponse,
-    Map<String, dynamic> updatedPaymentMethods = const {},
+    Map<String, dynamic> updatedPaymentMethodsJson = const {},
   }) {
     if (_isError(jsonResponse)) {
       return Error(
@@ -33,10 +33,10 @@ class PaymentEventHandler {
     }
 
     if (_isNonFullyPaidOrder(jsonResponse) &&
-        updatedPaymentMethods.isNotEmpty) {
+        updatedPaymentMethodsJson.isNotEmpty) {
       return Update(
-        orderResponse: jsonResponse["order"],
-        paymentMethods: updatedPaymentMethods,
+        orderJson: jsonResponse["order"],
+        paymentMethodsJson: updatedPaymentMethodsJson,
       );
     }
 

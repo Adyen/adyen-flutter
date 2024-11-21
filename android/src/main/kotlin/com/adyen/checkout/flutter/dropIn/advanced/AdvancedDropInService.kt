@@ -248,7 +248,7 @@ class AdvancedDropInService : DropInService(), LifecycleOwner {
                     val updatedPaymentMethodsJSON =
                         JSONObject(paymentEventDTO.data[Constants.UPDATED_PAYMENT_METHODS_KEY] as HashMap<*, *>)
                     val orderResponseJSON =
-                        JSONObject(paymentEventDTO.data[Constants.ORDER_RESPONSE_KEY] as HashMap<*, *>)
+                        JSONObject(paymentEventDTO.data[Constants.ORDER_KEY] as HashMap<*, *>)
                     val paymentMethods = PaymentMethodsApiResponse.SERIALIZER.deserialize(updatedPaymentMethodsJSON)
                     val orderResponse = OrderResponse.SERIALIZER.deserialize(orderResponseJSON)
                     DropInServiceResult.Update(paymentMethods, orderResponse)
