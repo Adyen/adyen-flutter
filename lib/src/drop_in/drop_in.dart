@@ -291,8 +291,8 @@ class DropIn {
         Constants.paymentMethodKey: data[Constants.paymentMethodKey],
         Constants.amountKey: data[Constants.amountKey],
       };
-      final balanceCheckResponse =
-          await partialPayment?.onCheckBalance(balanceCheckRequestBody);
+      final balanceCheckResponse = await partialPayment?.onCheckBalance(
+          balanceCheckRequestBody: balanceCheckRequestBody);
       dropInPlatformApi.onBalanceCheckResult(jsonEncode(balanceCheckResponse));
     } catch (error) {
       dropInPlatformApi.onBalanceCheckResult(error.toString());
@@ -318,16 +318,17 @@ class DropIn {
     try {
       final orderResponse = jsonDecode(event.data as String);
       final orderCancelResponse = await partialPayment?.onCancelOrder(
-        orderResponse[Constants.shouldUpdatePaymentMethodsKey] as bool? ??
-            false,
-        orderResponse[Constants.orderKey],
+        shouldUpdatePaymentMethods:
+            orderResponse[Constants.shouldUpdatePaymentMethodsKey] as bool? ??
+                false,
+        order: orderResponse[Constants.orderKey],
       );
       final orderCancelResponseDTO = orderCancelResponse?.toDTO() ??
-          OrderCancelResultDTO(orderCancelJson: {});
+          OrderCancelResultDTO(orderCancelResponseBody: {});
       dropInPlatformApi.onOrderCancelResult(orderCancelResponseDTO);
     } catch (error) {
-      dropInPlatformApi
-          .onOrderCancelResult(OrderCancelResultDTO(orderCancelJson: {}));
+      dropInPlatformApi.onOrderCancelResult(
+          OrderCancelResultDTO(orderCancelResponseBody: {}));
     }
   }
 }

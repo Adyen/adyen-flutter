@@ -1,9 +1,9 @@
 class OrderCancelResult {
-  final Map<String, dynamic> orderCancelJson;
-  Map<String, dynamic>? updatedPaymentMethodsJson;
+  final Map<String, dynamic> orderCancelResponseBody;
+  Map<String, dynamic>? updatedPaymentMethodsResponseBody;
 
   OrderCancelResult({
-    required this.orderCancelJson,
-    this.updatedPaymentMethodsJson,
+    required this.orderCancelResponseBody,
+    this.updatedPaymentMethodsResponseBody,
   });
 }

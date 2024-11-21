@@ -309,7 +309,7 @@ extension ActionComponentConfigurationMapper on ActionComponentConfiguration {
 
 extension OrderCancelResponseMapper on OrderCancelResult {
   OrderCancelResultDTO toDTO() => OrderCancelResultDTO(
-        orderCancelJson: orderCancelJson,
-        updatedPaymentMethodsJson: updatedPaymentMethodsJson,
+        orderCancelResponseBody: orderCancelResponseBody,
+        updatedPaymentMethodsResponseBody: updatedPaymentMethodsResponseBody,
       );
 }

@@ -1386,27 +1386,27 @@ class ActionComponentConfigurationDTO {
 
 class OrderCancelResultDTO {
   OrderCancelResultDTO({
-    required this.orderCancelJson,
-    this.updatedPaymentMethodsJson,
+    required this.orderCancelResponseBody,
+    this.updatedPaymentMethodsResponseBody,
   });
 
-  Map<String?, Object?> orderCancelJson;
+  Map<String?, Object?> orderCancelResponseBody;
 
-  Map<String?, Object?>? updatedPaymentMethodsJson;
+  Map<String?, Object?>? updatedPaymentMethodsResponseBody;
 
   Object encode() {
     return <Object?>[
-      orderCancelJson,
-      updatedPaymentMethodsJson,
+      orderCancelResponseBody,
+      updatedPaymentMethodsResponseBody,
     ];
   }
 
   static OrderCancelResultDTO decode(Object result) {
     result as List<Object?>;
     return OrderCancelResultDTO(
-      orderCancelJson:
+      orderCancelResponseBody:
           (result[0] as Map<Object?, Object?>?)!.cast<String?, Object?>(),
-      updatedPaymentMethodsJson:
+      updatedPaymentMethodsResponseBody:
           (result[1] as Map<Object?, Object?>?)?.cast<String?, Object?>(),
     );
   }

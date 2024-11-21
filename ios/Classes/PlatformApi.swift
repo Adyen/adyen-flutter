@@ -1242,23 +1242,23 @@ struct ActionComponentConfigurationDTO {
 
 /// Generated class from Pigeon that represents data sent in messages.
 struct OrderCancelResultDTO {
-    var orderCancelJson: [String?: Any?]
-    var updatedPaymentMethodsJson: [String?: Any?]?
+    var orderCancelResponseBody: [String?: Any?]
+    var updatedPaymentMethodsResponseBody: [String?: Any?]?
 
     static func fromList(_ list: [Any?]) -> OrderCancelResultDTO? {
-        let orderCancelJson = list[0] as! [String?: Any?]
-        let updatedPaymentMethodsJson: [String?: Any?]? = nilOrValue(list[1])
+        let orderCancelResponseBody = list[0] as! [String?: Any?]
+        let updatedPaymentMethodsResponseBody: [String?: Any?]? = nilOrValue(list[1])
 
         return OrderCancelResultDTO(
-            orderCancelJson: orderCancelJson,
-            updatedPaymentMethodsJson: updatedPaymentMethodsJson
+            orderCancelResponseBody: orderCancelResponseBody,
+            updatedPaymentMethodsResponseBody: updatedPaymentMethodsResponseBody
         )
     }
 
     func toList() -> [Any?] {
         [
-            orderCancelJson,
-            updatedPaymentMethodsJson
+            orderCancelResponseBody,
+            updatedPaymentMethodsResponseBody
         ]
     }
 }
