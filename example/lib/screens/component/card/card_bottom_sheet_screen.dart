@@ -29,13 +29,14 @@ class CardBottomSheetScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(title: const Text('Adyen card component bottom sheet')),
+      appBar: AppBar(title: const Text('Card component bottom sheet')),
       body: SafeArea(
         child: Center(
           child: TextButton(
-              child: Text("Show bottom sheet"),
+              child: const Text("Show bottom sheet"),
               onPressed: () {
                 showModalBottomSheet(
+                  isDismissible: false,
                   isScrollControlled: true,
                   context: context,
                   builder: (BuildContext context) {
@@ -72,7 +73,7 @@ class CardBottomSheetScreen extends StatelessWidget {
                   Align(
                     alignment: Alignment.centerRight,
                     child: IconButton(
-                      onPressed: () {},
+                      onPressed: () => Navigator.pop(context),
                       icon: const Icon(Icons.close),
                     ),
                   ),
@@ -86,7 +87,7 @@ class CardBottomSheetScreen extends StatelessWidget {
                           paymentResult, context);
                     },
                   ),
-                  Text("Example text")
+                  const Text("Example text")
                 ],
               ),
             );
