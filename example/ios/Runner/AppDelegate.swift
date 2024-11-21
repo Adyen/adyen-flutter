@@ -19,14 +19,14 @@ import UIKit
         RedirectComponent.applicationDidOpen(from: url)
         return true
     }
-    
+
     private func setDropInStyle() {
         var dropInStyle = Adyen.DropInComponent.Style()
         dropInStyle.formComponent.mainButtonItem.button.backgroundColor = .black
         dropInStyle.formComponent.mainButtonItem.button.title.color = .white
         AdyenAppearance.dropInStyle = dropInStyle
     }
-    
+
     private func setCardComponentStyle() {
         var cardComponentStyle = Adyen.FormComponentStyle()
         cardComponentStyle.mainButtonItem.button.backgroundColor = .black

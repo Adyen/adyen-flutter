@@ -10,6 +10,7 @@ import android.os.IBinder
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ServiceLifecycleDispatcher
+import androidx.lifecycle.lifecycleScope
 import com.adyen.checkout.components.core.ActionComponentData
 import com.adyen.checkout.components.core.BalanceResult
 import com.adyen.checkout.components.core.Order
@@ -29,6 +30,8 @@ import com.adyen.checkout.flutter.dropIn.model.DropInStoredPaymentMethodDeletion
 import com.adyen.checkout.flutter.dropIn.model.DropInType
 import com.adyen.checkout.flutter.utils.Constants
 import com.adyen.checkout.googlepay.GooglePayComponentState
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import org.json.JSONObject
 
 class AdvancedDropInService : DropInService(), LifecycleOwner {
@@ -166,7 +169,10 @@ class AdvancedDropInService : DropInService(), LifecycleOwner {
             }
 
             val balanceResult = mapToBalanceDropInServiceResult(message.contentIfNotHandled as String)
-            sendBalanceResult(balanceResult)
+            lifecycleScope.launch {
+                delay(300)
+                sendBalanceResult(balanceResult)
+            }
         }
     }
 
@@ -178,7 +184,10 @@ class AdvancedDropInService : DropInService(), LifecycleOwner {
             }
 
             val orderResult = mapToOrderDropInServiceResult(message.contentIfNotHandled as String)
-            sendOrderResult(orderResult)
+            lifecycleScope.launch {
+                delay(300)
+                sendOrderResult(orderResult)
+            }
         }
     }
 
@@ -190,7 +199,10 @@ class AdvancedDropInService : DropInService(), LifecycleOwner {
             }
 
             val orderResult = mapToOrderCancelDropInServiceResult(message.contentIfNotHandled) ?: return@observe
-            sendResult(orderResult)
+            lifecycleScope.launch {
+                delay(300)
+                sendResult(orderResult)
+            }
         }
     }
 
