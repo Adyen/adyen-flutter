@@ -1183,22 +1183,22 @@ data class ActionComponentConfigurationDTO (
 
 /** Generated class from Pigeon that represents data sent in messages. */
 data class OrderCancelResultDTO (
-  val orderCancelJson: Map<String?, Any?>,
-  val updatedPaymentMethodsJson: Map<String?, Any?>? = null
+  val orderCancelResponseBody: Map<String?, Any?>,
+  val updatedPaymentMethodsResponseBody: Map<String?, Any?>? = null
 
 ) {
   companion object {
     @Suppress("UNCHECKED_CAST")
     fun fromList(list: List<Any?>): OrderCancelResultDTO {
-      val orderCancelJson = list[0] as Map<String?, Any?>
-      val updatedPaymentMethodsJson = list[1] as Map<String?, Any?>?
-      return OrderCancelResultDTO(orderCancelJson, updatedPaymentMethodsJson)
+      val orderCancelResponseBody = list[0] as Map<String?, Any?>
+      val updatedPaymentMethodsResponseBody = list[1] as Map<String?, Any?>?
+      return OrderCancelResultDTO(orderCancelResponseBody, updatedPaymentMethodsResponseBody)
     }
   }
   fun toList(): List<Any?> {
     return listOf<Any?>(
-      orderCancelJson,
-      updatedPaymentMethodsJson,
+      orderCancelResponseBody,
+      updatedPaymentMethodsResponseBody,
     )
   }
 }

@@ -577,12 +577,12 @@ class ActionComponentConfigurationDTO {
 }
 
 class OrderCancelResultDTO {
-  final Map<String?, Object?> orderCancelJson;
-  final Map<String?, Object?>? updatedPaymentMethodsJson;
+  final Map<String?, Object?> orderCancelResponseBody;
+  final Map<String?, Object?>? updatedPaymentMethodsResponseBody;
 
   OrderCancelResultDTO(
-    this.orderCancelJson,
-    this.updatedPaymentMethodsJson,
+    this.orderCancelResponseBody,
+    this.updatedPaymentMethodsResponseBody,
   );
 }
 

@@ -166,10 +166,11 @@ class AdyenDropInRepository extends AdyenBaseRepository {
     );
   }
 
-  Future<Map<String, dynamic>> onCheckBalance(
-      Map<String, dynamic> balanceRequestBody) async {
-    balanceRequestBody.addAll({"merchantAccount": Config.merchantAccount});
-    return service.postPaymentMethodsBalance(balanceRequestBody);
+  Future<Map<String, dynamic>> onCheckBalance({
+    required Map<String, dynamic> balanceCheckRequestBody,
+  }) async {
+    balanceCheckRequestBody.addAll({"merchantAccount": Config.merchantAccount});
+    return service.postPaymentMethodsBalance(balanceCheckRequestBody);
   }
 
   Future<Map<String, dynamic>> onRequestOrder() async {
@@ -184,21 +185,21 @@ class AdyenDropInRepository extends AdyenBaseRepository {
     return service.postOrders(orderRequestBody);
   }
 
-  Future<OrderCancelResult> onCancelOrder(
-    bool shouldUpdatePaymentMethods,
-    Map<String, dynamic> order,
-  ) async {
+  Future<OrderCancelResult> onCancelOrder({
+    required bool shouldUpdatePaymentMethods,
+    required Map<String, dynamic> order,
+  }) async {
     final orderCancelRequestBody = <String, dynamic>{
       "merchantAccount": Config.merchantAccount,
       "order": order,
     };
-    final Map<String, dynamic> orderCancelJson =
+    final Map<String, dynamic> cancelResponse =
         await service.postOrdersCancel(orderCancelRequestBody);
     final OrderCancelResult orderCancelResult =
-        OrderCancelResult(orderCancelJson: orderCancelJson);
+        OrderCancelResult(orderCancelResponseBody: cancelResponse);
     if (shouldUpdatePaymentMethods == true) {
-      final paymentMethodsJson = await fetchPaymentMethods();
-      orderCancelResult.updatedPaymentMethodsJson = paymentMethodsJson;
+      orderCancelResult.updatedPaymentMethodsResponseBody =
+          await fetchPaymentMethods();
     }
 
     return orderCancelResult;

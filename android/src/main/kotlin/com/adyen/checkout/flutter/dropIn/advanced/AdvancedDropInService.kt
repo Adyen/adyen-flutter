@@ -333,11 +333,11 @@ class AdvancedDropInService : DropInService(), LifecycleOwner {
         orderCancelResponseDTO: OrderCancelResultDTO?
     ): DropInServiceResult? {
         try {
-            val orderCancelResponseBody = orderCancelResponseDTO?.orderCancelJson?.let { JSONObject(it) }
+            val orderCancelResponseBody = orderCancelResponseDTO?.orderCancelResponseBody?.let { JSONObject(it) }
             return when (val resultCode = orderCancelResponseBody?.optString(Constants.RESULT_CODE_KEY)) {
                 "Received" -> {
-                    if (orderCancelResponseDTO.updatedPaymentMethodsJson?.isNotEmpty() == true) {
-                        val updatedPaymentMethods = orderCancelResponseDTO.updatedPaymentMethodsJson
+                    if (orderCancelResponseDTO.updatedPaymentMethodsResponseBody?.isNotEmpty() == true) {
+                        val updatedPaymentMethods = orderCancelResponseDTO.updatedPaymentMethodsResponseBody
                         val paymentMethods =
                             PaymentMethodsApiResponse.SERIALIZER.deserialize(JSONObject(updatedPaymentMethods))
                         val orderResponse = OrderResponse.SERIALIZER.deserialize(orderCancelResponseBody)
