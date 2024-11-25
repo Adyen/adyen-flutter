@@ -33,8 +33,8 @@ class _CardNavigationScreenState extends State<CardNavigationScreen> {
                 child: const Text("Card component advanced"),
               ),
               TextButton(
-                onPressed: () => Navigator.pushNamed(
-                    context, "/cardBottomSheetScreen"),
+                onPressed: () =>
+                    Navigator.pushNamed(context, "/cardBottomSheetScreen"),
                 child: const Text("Card component bottom sheet"),
               ),
             ],

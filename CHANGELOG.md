@@ -1,6 +1,6 @@
 ## 1.2.0
 
-* Improved dynamic viewport of card component. 
+* Improved dynamic viewport of card component.
 * Added the missing loading bottom sheet for the advanced flow google pay component.
 * Updated iOS SDK to v5.13.0.
 
