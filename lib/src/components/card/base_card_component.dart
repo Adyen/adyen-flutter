@@ -135,19 +135,22 @@ class _BaseCardComponentState extends State<BaseCardComponent> {
 
   void _onComponentCommunication(event) {
     if (event.type case ComponentCommunicationType.resize) {
-      final newViewportHeight = event.data as int;
-      if (newViewportHeight == previousViewportHeight) {
-        return;
-      } else {
-        setState(() {
-          previousViewportHeight = viewportHeight;
-          viewportHeight = newViewportHeight;
-        });
-      }
+      _resizeViewport(event);
     } else if (event.type case ComponentCommunicationType.result) {
       widget.onResult(event);
     } else {
       widget.handleComponentCommunication(event);
+    }
+  }
+
+  void _resizeViewport(event) {
+    final newViewportHeight = event.data is int ? event.data : null;
+    if (newViewportHeight != previousViewportHeight &&
+        newViewportHeight != null) {
+      setState(() {
+        previousViewportHeight = viewportHeight;
+        viewportHeight = newViewportHeight;
+      });
     }
   }
 }
