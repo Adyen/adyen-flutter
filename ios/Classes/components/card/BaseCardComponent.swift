@@ -145,7 +145,7 @@ class BaseCardComponent: NSObject, FlutterPlatformView, UIScrollViewDelegate {
         if isStoredPaymentMethod {
             return 256.0
         } else {
-            return 8.0
+            return 0
         }
     }
 }
