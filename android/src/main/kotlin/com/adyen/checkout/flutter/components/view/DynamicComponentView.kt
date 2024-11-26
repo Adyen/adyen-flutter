@@ -122,17 +122,17 @@ class DynamicComponentView
             }
         }
 
-        private fun calculateFlutterViewportHeight(): Float {
+        private fun calculateFlutterViewportHeight(): Int {
             val componentViewHeightScreenDensity = measuredHeight / screenDensity
-            return componentViewHeightScreenDensity
+            return componentViewHeightScreenDensity.toInt()
         }
 
-        private fun resizeFlutterViewport(viewportHeight: Float) {
+        private fun resizeFlutterViewport(viewportHeight: Int) {
             componentFlutterApi?.onComponentCommunication(
                 ComponentCommunicationModel(
                     type = ComponentCommunicationType.RESIZE,
                     componentId = componentId,
-                    data = viewportHeight.toDouble()
+                    data = viewportHeight
                 )
             ) {}
         }
