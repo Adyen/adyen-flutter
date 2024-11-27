@@ -51,11 +51,9 @@ Required versions:
 
 * [Checkout API v71](https://docs.adyen.com/api-explorer/Checkout/71/overview) or later.
 * [iOS 12](https://support.apple.com/en-us/118387) or later.
-* [Android 5.0](https://www.android.com/versions/lollipop-5-0/) or later with compileSdk set to 34.
-  Google will
-  change [target API level requirements](https://support.google.com/googleplay/android-developer/answer/11926878?hl=en)
-  for Google Play apps starting August 31 2024.
+* [Android 5.0](https://www.android.com/versions/lollipop-5-0/) or later.
 * [Kotlin 1.8](https://kotlinlang.org/docs/releases.html) or later.
+* [Gradle 8](https://developer.android.com/build/releases/gradle-plugin).
 
 ## Integration
 
