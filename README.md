@@ -47,15 +47,20 @@ release a new version when we need to.
 4. [Set up your webhooks](https://docs.adyen.com/development-resources/webhooks/) to get the payment
    outcome.
 
-Required versions:
+## Requirements:
 
 * [Checkout API v71](https://docs.adyen.com/api-explorer/Checkout/71/overview) or later.
-* [iOS 12](https://support.apple.com/en-us/118387) or later.
-* [Android 5.0](https://www.android.com/versions/lollipop-5-0/) or later with compileSdk set to 34.
-  Google will
-  change [target API level requirements](https://support.google.com/googleplay/android-developer/answer/11926878?hl=en)
-  for Google Play apps starting August 31 2024.
+
+#### Android 
+* [Android 5.0](https://www.android.com/versions/lollipop-5-0/) (API 21) or later with compileSdk set to 34.
 * [Kotlin 1.8](https://kotlinlang.org/docs/releases.html) or later.
+* Requires the usage of a `FlutterFragmentActivity` instead of the default `FlutterActivity` in the MainActivity of your [native Android](https://github.com/Adyen/adyen-flutter/blob/main/example/android/app/src/main/kotlin/com/adyen/checkout/flutter/example/MainActivity.kt) layer.
+
+#### iOS
+* [iOS 12](https://support.apple.com/en-us/118387) or later.
+* Add the return URL handler to your AppDelegate in your [native iOS](https://github.com/Adyen/adyen-flutter/blob/5301abab34773e820c4fd38be54d3bf4bb247fd6/example/ios/Runner/AppDelegate.swift#L18) layer.
+* Add a custom [URL scheme](https://developer.apple.com/documentation/xcode/defining-a-custom-url-scheme-for-your-app) that matches the returnUrl you use.
+
 
 ## Integration
 
