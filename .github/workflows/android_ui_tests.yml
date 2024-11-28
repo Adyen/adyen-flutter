@@ -1,0 +1,62 @@
+name: Android ui tests
+
+on:
+  workflow_dispatch:
+  workflow_call:
+    inputs:
+      flutter-version:
+        description: 'Flutter version'
+        required: true
+        default: '3.24.0'
+        type: string
+
+jobs:
+  android_ui_tests:
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Provide more disk space
+        run: |
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf /opt/ghc
+          sudo rm -rf "/usr/local/share/boost"
+
+      - uses: actions/checkout@v4
+
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm      
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: 17
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ inputs.flutter-version }}
+          channel: 'stable'
+          cache: true
+          cache-key: ${{ env.FLUTTER_VERSION }}
+
+      - run: flutter pub get
+      - run: dart pub global activate patrol_cli
+      - run: patrol doctor
+
+      - name: Boot emulator and run tests
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          target: google_apis
+          arch: x86_64
+          force-avd-creation: false
+          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          disable-animations: false
+          working-directory: ./example
+          avd-name: avd-34-x64
+          script: |
+            echo "Emulator launched"
+            patrol test -t integration_test/drop_in_test/drop_in_card_test.dart --dart-define=CLIENT_KEY='${{ secrets.ADYEN_TEST_CLIENT_KEY }}' --dart-define=X_API_KEY='${{ secrets.ADYEN_TEST_X_API_KEY }}' -d emulator-5554 --verbose
