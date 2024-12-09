@@ -2,7 +2,7 @@
 
 * Added the missing loading bottom sheet for the advanced flow google pay component.
 * Updated iOS SDK to v5.13.0.
-* Updated Android SDK to v5.7.1. Gradle v8 is now mandatory.
+* Updated Android SDK to v5.8.0. Gradle v8 is now mandatory.
 
 ## 1.1.0
 
