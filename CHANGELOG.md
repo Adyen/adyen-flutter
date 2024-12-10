@@ -3,6 +3,7 @@
 * Improved dynamic viewport of card component.
 * Added the missing loading bottom sheet for the advanced flow google pay component.
 * Updated iOS SDK to v5.14.0.
+* Updated Android SDK to v5.8.0. Gradle v8 is now mandatory.
 
 ## 1.1.0
 

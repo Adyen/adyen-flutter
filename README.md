@@ -61,7 +61,6 @@ release a new version when we need to.
 * Add the return URL handler to your AppDelegate in your [native iOS](https://github.com/Adyen/adyen-flutter/blob/5301abab34773e820c4fd38be54d3bf4bb247fd6/example/ios/Runner/AppDelegate.swift#L18) layer.
 * Add a custom [URL scheme](https://developer.apple.com/documentation/xcode/defining-a-custom-url-scheme-for-your-app) that matches the returnUrl you use.
 
-
 ## Integration
 
 Depending on the [server-side flow](https://docs.adyen.com/online-payments/build-your-integration/)
