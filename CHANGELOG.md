@@ -1,5 +1,6 @@
 ## 1.2.0
 
+* Added support for partial payments.
 * Improved dynamic viewport of card component.
 * Added the missing loading bottom sheet for the advanced flow google pay component.
 * Updated iOS SDK to v5.14.0.

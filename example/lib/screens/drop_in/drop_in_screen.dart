@@ -75,6 +75,11 @@ class DropInScreen extends StatelessWidget {
       final advancedCheckout = AdvancedCheckout(
         onSubmit: repository.onSubmit,
         onAdditionalDetails: repository.onAdditionalDetails,
+        partialPayment: PartialPayment(
+          onCheckBalance: repository.onCheckBalance,
+          onRequestOrder: repository.onRequestOrder,
+          onCancelOrder: repository.onCancelOrder,
+        ),
       );
 
       final paymentResult = await AdyenCheckout.advanced.startDropIn(
