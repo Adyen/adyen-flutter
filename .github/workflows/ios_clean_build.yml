@@ -10,7 +10,7 @@ jobs:
     strategy:
       matrix:
         iPhone: [ "'iPhone 15'" ]
-        flutter-version: [ "3.19.0", "3.22.0", "3.24.0" ]
+        flutter-version: [ 3.19.x, 3.22.x, 3.24.x, 3.27.x ]
 
     steps:
       - name: Provide more disk space
