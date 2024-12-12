@@ -36,7 +36,7 @@
 			<string>com.adyen.adyen_checkout_example</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>flutter-ui-host</string>
+				<string>adyencheckout</string>
 			</array>
 		</dict>
 	</array>

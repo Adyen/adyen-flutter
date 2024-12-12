@@ -12,6 +12,7 @@ import 'package:adyen_checkout_example/screens/component/apple_pay/apple_pay_adv
 import 'package:adyen_checkout_example/screens/component/apple_pay/apple_pay_navigation_screen.dart';
 import 'package:adyen_checkout_example/screens/component/apple_pay/apple_pay_session_component_screen.dart';
 import 'package:adyen_checkout_example/screens/component/card/card_advanced_component_screen.dart';
+import 'package:adyen_checkout_example/screens/component/card/card_bottom_sheet_screen.dart';
 import 'package:adyen_checkout_example/screens/component/card/card_navigation_screen.dart';
 import 'package:adyen_checkout_example/screens/component/card/card_session_component_screen.dart';
 import 'package:adyen_checkout_example/screens/component/google_pay/google_pay_advanced_component_screen.dart';
@@ -67,6 +68,9 @@ void main() {
             repository: adyenCardComponentRepository,
           ),
       '/cardAdvancedComponentScreen': (context) => CardAdvancedComponentScreen(
+            repository: adyenCardComponentRepository,
+          ),
+      '/cardBottomSheetScreen': (context) => CardBottomSheetScreen(
             repository: adyenCardComponentRepository,
           ),
       '/googlePayNavigation': (context) => const GooglePayNavigationScreen(),
