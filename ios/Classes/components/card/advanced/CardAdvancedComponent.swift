@@ -32,6 +32,7 @@ class CardAdvancedComponent: BaseCardComponent {
             finalizeCallback: finalizeAndDismiss(success:completion:)
         )
         setupCardComponentView()
+        setupErrorCallback()
         setupFinalizeComponentCallback()
     }
 
@@ -41,9 +42,6 @@ class CardAdvancedComponent: BaseCardComponent {
             showCardComponent(cardComponent: cardComponent)
             componentPlatformApi.onActionCallback = { [weak self] jsonActionResponse in
                 self?.onAction(actionResponse: jsonActionResponse)
-            }
-            componentPlatformApi.onErrorCallback = { [weak self] error in
-                self?.sendErrorToFlutterLayer(errorMessage: error?.errorMessage ?? "")
             }
         } catch {
             sendErrorToFlutterLayer(errorMessage: error.localizedDescription)
@@ -92,6 +90,14 @@ class CardAdvancedComponent: BaseCardComponent {
             actionComponent?.handle(action)
         } catch {
             sendErrorToFlutterLayer(errorMessage: error.localizedDescription)
+        }
+    }
+    
+    private func setupErrorCallback() {
+        componentPlatformApi.onErrorCallback = { [weak self] error in
+            self?.finalizeAndDismiss(success: false, completion: { [weak self] in
+                self?.sendErrorToFlutterLayer(errorMessage: error?.errorMessage ?? "")
+            })
         }
     }
 
