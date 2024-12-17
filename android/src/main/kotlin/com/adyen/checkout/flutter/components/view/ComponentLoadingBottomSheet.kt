@@ -55,5 +55,7 @@ internal class ComponentLoadingBottomSheet<T> : BottomSheetDialogFragment() wher
                 (it as? BottomSheetDialogFragment)?.dismiss()
             }
         }
+
+        fun isVisible(fragmentManager: FragmentManager): Boolean = fragmentManager.findFragmentByTag(TAG) != null
     }
 }
