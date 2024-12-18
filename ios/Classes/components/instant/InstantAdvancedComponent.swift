@@ -52,6 +52,7 @@ class InstantAdvancedComponent: BaseInstantComponent, InstantComponentProtocol {
         case .action:
             onAction(paymentEventDTO: paymentEventDTO)
         case .update:
+            // The Instant Component does not support updating the payment flow
             return
         }
     }
