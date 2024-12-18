@@ -125,7 +125,7 @@ class InstantAdvancedComponentScreen extends StatelessWidget {
       Map<String, dynamic> paymentMethods, String key) {
     return paymentMethods["paymentMethods"].firstWhere(
       (paymentMethod) => paymentMethod["type"] == key,
-      orElse: () => throw Exception("$key payment method not provided"),
+      orElse: () => <String,dynamic>{},
     );
   }
 }

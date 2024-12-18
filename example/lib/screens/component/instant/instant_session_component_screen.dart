@@ -48,6 +48,8 @@ class InstantSessionComponentScreen extends StatelessWidget {
               _extractPaymentMethod(sessionCheckout.paymentMethods, "paypal");
           final klarnaPaymentMethodResponse =
               _extractPaymentMethod(sessionCheckout.paymentMethods, "klarna");
+          final idealPaymentMethodResponse =
+              _extractPaymentMethod(sessionCheckout.paymentMethods, "ideal");
 
           return Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -88,7 +90,23 @@ class InstantSessionComponentScreen extends StatelessWidget {
                       }
                     });
                   },
-                  child: const Text("Klarna"))
+                  child: const Text("Klarna")),
+              TextButton(
+                  onPressed: () {
+                    AdyenCheckout.session
+                        .startInstantComponent(
+                      configuration: instantComponentConfiguration,
+                      paymentMethod: idealPaymentMethodResponse,
+                      checkout: sessionCheckout,
+                    )
+                        .then((paymentResult) {
+                      if (context.mounted) {
+                        DialogBuilder.showPaymentResultDialog(
+                            paymentResult, context);
+                      }
+                    });
+                  },
+                  child: const Text("iDEAL"))
             ],
           );
         } else {
@@ -102,7 +120,7 @@ class InstantSessionComponentScreen extends StatelessWidget {
       Map<String, dynamic> paymentMethods, String key) {
     return paymentMethods["paymentMethods"].firstWhere(
       (paymentMethod) => paymentMethod["type"] == key,
-      orElse: () => throw Exception("$key payment method not provided"),
+      orElse: () => <String,dynamic>{},
     );
   }
 }

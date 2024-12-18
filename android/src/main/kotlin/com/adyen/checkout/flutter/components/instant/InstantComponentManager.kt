@@ -11,6 +11,7 @@ import com.adyen.checkout.components.core.Order
 import com.adyen.checkout.components.core.PaymentMethod
 import com.adyen.checkout.components.core.PaymentMethodTypes
 import com.adyen.checkout.components.core.action.Action
+import com.adyen.checkout.flutter.R
 import com.adyen.checkout.flutter.components.instant.advanced.IdealComponentAdvancedCallback
 import com.adyen.checkout.flutter.components.instant.advanced.InstantComponentAdvancedCallback
 import com.adyen.checkout.flutter.components.instant.session.IdealComponentSessionCallback
@@ -49,6 +50,7 @@ class InstantComponentManager(
             val paymentMethod = PaymentMethod.SERIALIZER.deserialize(JSONObject(encodedPaymentMethod))
             val configuration = instantPaymentConfigurationDTO.mapToCheckoutConfiguration()
             when (paymentMethod.type) {
+                null, PaymentMethodTypes.UNKNOWN -> throw Exception(activity.getString(R.string.component_error))
                 PaymentMethodTypes.IDEAL -> startIdealPaymentComponent(componentId, configuration, paymentMethod)
                 else -> startInstantPaymentComponent(componentId, configuration, paymentMethod)
             }
@@ -58,10 +60,10 @@ class InstantComponentManager(
                     ComponentCommunicationType.RESULT,
                     componentId = componentId,
                     paymentResult =
-                    PaymentResultDTO(
-                        type = PaymentResultEnum.ERROR,
-                        reason = exception.message
-                    ),
+                        PaymentResultDTO(
+                            type = PaymentResultEnum.ERROR,
+                            reason = exception.message
+                        ),
                 )
             componentFlutterInterface.onComponentCommunication(model) {}
         }
@@ -146,11 +148,11 @@ class InstantComponentManager(
             paymentMethod = paymentMethod,
             checkoutConfiguration = configuration,
             callback =
-            InstantComponentAdvancedCallback(
-                componentFlutterInterface,
-                componentId,
-                ::hideLoadingBottomSheet
-            ),
+                InstantComponentAdvancedCallback(
+                    componentFlutterInterface,
+                    componentId,
+                    ::hideLoadingBottomSheet
+                ),
             key = UUID.randomUUID().toString()
         )
     }
@@ -175,12 +177,12 @@ class InstantComponentManager(
             paymentMethod = paymentMethod,
             checkoutConfiguration = configuration,
             componentCallback =
-            InstantComponentSessionCallback(
-                componentFlutterInterface,
-                componentId,
-                ::handleAction,
-                ::hideLoadingBottomSheet
-            ),
+                InstantComponentSessionCallback(
+                    componentFlutterInterface,
+                    componentId,
+                    ::handleAction,
+                    ::hideLoadingBottomSheet
+                ),
             key = UUID.randomUUID().toString()
         )
     }
@@ -196,11 +198,11 @@ class InstantComponentManager(
             paymentMethod = paymentMethod,
             checkoutConfiguration = configuration,
             callback =
-            IdealComponentAdvancedCallback(
-                componentFlutterInterface,
-                componentId,
-                ::hideLoadingBottomSheet
-            ),
+                IdealComponentAdvancedCallback(
+                    componentFlutterInterface,
+                    componentId,
+                    ::hideLoadingBottomSheet
+                ),
             key = UUID.randomUUID().toString()
         )
     }
@@ -225,12 +227,12 @@ class InstantComponentManager(
             paymentMethod = paymentMethod,
             checkoutConfiguration = configuration,
             componentCallback =
-            IdealComponentSessionCallback(
-                componentFlutterInterface,
-                componentId,
-                ::handleAction,
-                ::hideLoadingBottomSheet
-            ),
+                IdealComponentSessionCallback(
+                    componentFlutterInterface,
+                    componentId,
+                    ::handleAction,
+                    ::hideLoadingBottomSheet
+                ),
             key = UUID.randomUUID().toString()
         )
     }
