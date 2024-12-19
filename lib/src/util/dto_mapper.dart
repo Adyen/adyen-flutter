@@ -11,7 +11,10 @@ extension AnalyticsOptionsMapper on AnalyticsOptions {
 }
 
 extension DropInConfigurationMapper on DropInConfiguration {
-  DropInConfigurationDTO toDTO(String sdkVersionNumber) =>
+  DropInConfigurationDTO toDTO(
+    String sdkVersionNumber,
+    isPartialPaymentSupported,
+  ) =>
       DropInConfigurationDTO(
         environment: environment,
         clientKey: clientKey,
@@ -31,6 +34,7 @@ extension DropInConfigurationMapper on DropInConfiguration {
         skipListWhenSinglePaymentMethod: skipListWhenSinglePaymentMethod,
         preselectedPaymentMethodTitle: preselectedPaymentMethodTitle,
         paymentMethodNames: paymentMethodNames,
+        isPartialPaymentSupported: isPartialPaymentSupported,
       );
 
   bool _isRemoveStoredPaymentMethodEnabled(
@@ -300,5 +304,12 @@ extension ActionComponentConfigurationMapper on ActionComponentConfiguration {
         shopperLocale: shopperLocale,
         amount: amount?.toDTO(),
         analyticsOptionsDTO: analyticsOptions.toDTO(sdkVersionNumber),
+      );
+}
+
+extension OrderCancelResponseMapper on OrderCancelResult {
+  OrderCancelResultDTO toDTO() => OrderCancelResultDTO(
+        orderCancelResponseBody: orderCancelResponseBody,
+        updatedPaymentMethodsResponseBody: updatedPaymentMethodsResponseBody,
       );
 }

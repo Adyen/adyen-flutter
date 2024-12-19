@@ -36,7 +36,7 @@ class DropIn {
         await sdkVersionNumberProvider.getSdkVersionNumber();
 
     dropInPlatformApi.showDropInSession(
-      dropInConfiguration.toDTO(sdkVersionNumber),
+      dropInConfiguration.toDTO(sdkVersionNumber, true),
     );
 
     dropInFlutterApi.dropInSessionPlatformCommunicationStream =
@@ -83,7 +83,7 @@ class DropIn {
   Future<PaymentResult> startDropInAdvancedFlowPayment(
     DropInConfiguration dropInConfiguration,
     Map<String, dynamic> paymentMethodsResponse,
-    Checkout advancedCheckout,
+    AdvancedCheckout advancedCheckout,
   ) async {
     adyenLogger.print("Start Drop-in advanced flow");
     final dropInAdvancedFlowCompleter = Completer<PaymentResultDTO>();
@@ -93,9 +93,13 @@ class DropIn {
       paymentMethodsResponse,
       toEncodable: (value) => throw Exception("Could not encode $value"),
     );
+    final isPartialPaymentSupported = advancedCheckout.partialPayment != null;
 
     dropInPlatformApi.showDropInAdvanced(
-      dropInConfiguration.toDTO(sdkVersionNumber),
+      dropInConfiguration.toDTO(
+        sdkVersionNumber,
+        isPartialPaymentSupported,
+      ),
       encodedPaymentMethodsResponse,
     );
 
@@ -116,6 +120,12 @@ class DropIn {
             event,
             dropInConfiguration.storedPaymentMethodConfiguration,
           );
+        case PlatformCommunicationType.balanceCheck:
+          _handleBalanceCheck(event, advancedCheckout.partialPayment);
+        case PlatformCommunicationType.requestOrder:
+          _handleOrderRequest(event, advancedCheckout.partialPayment);
+        case PlatformCommunicationType.cancelOrder:
+          _handleOrderCancel(event, advancedCheckout.partialPayment);
       }
     });
 
@@ -235,6 +245,11 @@ class DropIn {
     final Map<String, dynamic> submitDataDecoded = jsonDecode(submitData);
     switch (advancedCheckout) {
       case AdvancedCheckout it:
+        if (submitDataDecoded[Constants.submitDataKey]
+            .containsKey(Constants.orderKey)) {
+          _mapOrderToCompactOrder(submitDataDecoded);
+        }
+
         final PaymentEvent paymentEvent = await it.onSubmit(
           submitDataDecoded[Constants.submitDataKey],
           submitDataDecoded[Constants.submitExtraKey],
@@ -245,6 +260,16 @@ class DropIn {
     }
   }
 
+  // iOS provides more fields than needed. Therefore, only the necessary fields are used.
+  void _mapOrderToCompactOrder(Map<String, dynamic> submitDataDecoded) {
+    final order =
+        submitDataDecoded[Constants.submitDataKey][Constants.orderKey];
+    submitDataDecoded[Constants.submitDataKey][Constants.orderKey] = {
+      Constants.pspReferenceKey: order[Constants.pspReferenceKey],
+      Constants.orderDataKey: order[Constants.orderDataKey],
+    };
+  }
+
   Future<PaymentEvent> _getOnAdditionalDetailsPaymentEvent(
       PlatformCommunicationModel event, Checkout advancedCheckout) async {
     switch (advancedCheckout) {
@@ -253,6 +278,57 @@ class DropIn {
         return await it.onAdditionalDetails(additionalDetails);
       case SessionCheckout():
         throw Exception("Please use the session card component.");
+    }
+  }
+
+  void _handleBalanceCheck(
+    PlatformCommunicationModel event,
+    PartialPayment? partialPayment,
+  ) async {
+    try {
+      final data = jsonDecode(event.data as String);
+      final Map<String, dynamic> balanceCheckRequestBody = {
+        Constants.paymentMethodKey: data[Constants.paymentMethodKey],
+        Constants.amountKey: data[Constants.amountKey],
+      };
+      final balanceCheckResponse = await partialPayment?.onCheckBalance(
+          balanceCheckRequestBody: balanceCheckRequestBody);
+      dropInPlatformApi.onBalanceCheckResult(jsonEncode(balanceCheckResponse));
+    } catch (error) {
+      dropInPlatformApi.onBalanceCheckResult(error.toString());
+    }
+  }
+
+  void _handleOrderRequest(
+    PlatformCommunicationModel event,
+    PartialPayment? partialPayment,
+  ) async {
+    try {
+      final orderRequestResponse = await partialPayment?.onRequestOrder();
+      dropInPlatformApi.onOrderRequestResult(jsonEncode(orderRequestResponse));
+    } catch (error) {
+      dropInPlatformApi.onOrderRequestResult(error.toString());
+    }
+  }
+
+  void _handleOrderCancel(
+    PlatformCommunicationModel event,
+    PartialPayment? partialPayment,
+  ) async {
+    try {
+      final orderResponse = jsonDecode(event.data as String);
+      final orderCancelResponse = await partialPayment?.onCancelOrder(
+        shouldUpdatePaymentMethods:
+            orderResponse[Constants.shouldUpdatePaymentMethodsKey] as bool? ??
+                false,
+        order: orderResponse[Constants.orderKey],
+      );
+      final orderCancelResponseDTO = orderCancelResponse?.toDTO() ??
+          OrderCancelResultDTO(orderCancelResponseBody: {});
+      dropInPlatformApi.onOrderCancelResult(orderCancelResponseDTO);
+    } catch (error) {
+      dropInPlatformApi.onOrderCancelResult(
+          OrderCancelResultDTO(orderCancelResponseBody: {}));
     }
   }
 }

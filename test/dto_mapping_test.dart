@@ -25,7 +25,7 @@ void main() {
         shopperLocale: shopperLocal,
         storedPaymentMethodConfiguration: storedPaymentMethodConfiguration);
 
-    final dropInConfigurationDto = dropInConfiguration.toDTO("0.0.1");
+    final dropInConfigurationDto = dropInConfiguration.toDTO("0.0.1", true);
 
     expect(dropInConfigurationDto.environment, Environment.test);
     expect(dropInConfigurationDto.clientKey, demoClientKey);
@@ -42,6 +42,7 @@ void main() {
     expect(dropInConfigurationDto.skipListWhenSinglePaymentMethod, false);
     expect(dropInConfigurationDto.showPreselectedStoredPaymentMethod, true);
     expect(dropInConfigurationDto.isRemoveStoredPaymentMethodEnabled, true);
+    expect(dropInConfigurationDto.isPartialPaymentSupported, true);
   });
 
   test(

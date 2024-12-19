@@ -96,10 +96,12 @@ class ComponentPlatformApi: ComponentPlatformInterface {
             case .finished:
                 onFinishCallback(paymentEventDTO)
             case .action:
-                guard let jsonActionResponse = paymentEventDTO.actionResponse else { return }
+                guard let jsonActionResponse = paymentEventDTO.data else { return }
                 onActionCallback(jsonActionResponse)
             case .error:
                 onErrorCallback(paymentEventDTO.error)
+            case .update:
+                return
             }
         }
     }

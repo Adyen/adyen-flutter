@@ -4,7 +4,6 @@ import 'package:adyen_checkout_example/network/models/amount_network_model.dart'
 import 'package:adyen_checkout_example/network/models/billing_address.dart';
 import 'package:adyen_checkout_example/network/models/delivery_address.dart';
 import 'package:adyen_checkout_example/network/models/line_item.dart';
-import 'package:adyen_checkout_example/network/models/payment_methods_request_network_model.dart';
 import 'package:adyen_checkout_example/network/models/payment_request_network_model.dart';
 import 'package:adyen_checkout_example/network/models/session_request_network_model.dart';
 import 'package:adyen_checkout_example/network/models/session_response_network_model.dart';
@@ -74,17 +73,26 @@ class AdyenDropInRepository extends AdyenBaseRepository {
     );
   }
 
-  Future<Map<String, dynamic>> fetchPaymentMethods() async {
-    return await service.fetchPaymentMethods(PaymentMethodsRequestNetworkModel(
-      amount: AmountNetworkModel(
-        currency: Config.amount.currency,
-        value: Config.amount.value,
-      ),
-      merchantAccount: Config.merchantAccount,
-      countryCode: Config.countryCode,
-      channel: determineChannel(),
-      shopperReference: Config.shopperReference,
-    ));
+  Future<Map<String, dynamic>> fetchPaymentMethods({
+    Map<String, dynamic>? orderResponse,
+  }) async {
+    final requestBody = <String, dynamic>{
+      "amount": {
+        "value": Config.amount.value,
+        "currency": Config.amount.currency
+      },
+      "merchantAccount": Config.merchantAccount,
+      "countryCode": Config.countryCode,
+      "channel": determineChannel(),
+      "shopperReference": Config.shopperReference,
+    };
+
+    //Add order for partial payments support
+    if (orderResponse != null) {
+      requestBody.addAll({"order": orderResponse});
+    }
+
+    return await service.fetchPaymentMethods(requestBody);
   }
 
   Future<PaymentEvent> onSubmit(
@@ -102,10 +110,8 @@ class AdyenDropInRepository extends AdyenBaseRepository {
         currency: Config.amount.currency,
       ),
       countryCode: Config.countryCode,
-      recurringProcessingModel: RecurringProcessingModel.cardOnFile,
-      shopperInteraction:
-          ShopperInteractionModel.ecommerce.shopperInteractionModelString,
       channel: determineChannel(),
+      recurringProcessingModel: RecurringProcessingModel.cardOnFile,
       authenticationData: {
         "attemptAuthentication": "always",
         "threeDSRequestData": {
@@ -115,23 +121,96 @@ class AdyenDropInRepository extends AdyenBaseRepository {
     );
 
     Map<String, dynamic> mergedJson = <String, dynamic>{};
-    mergedJson.addAll(data);
     mergedJson.addAll(paymentsRequestData.toJson());
+    // This will override any already existing fields in paymentsRequestData
+    mergedJson.addAll(data);
     final response = await service.postPayments(mergedJson);
-    return paymentEventHandler.handleResponse(response);
+    final paymentEvent = await _evaluatePaymentsResponse(response);
+    return paymentEvent;
+  }
+
+  Future<PaymentEvent> _evaluatePaymentsResponse(
+      Map<String, dynamic> response) async {
+    if (_hasOrderWithRemainingAmount(response)) {
+      final Map<String, dynamic> updatedPaymentMethodsJson =
+          await fetchPaymentMethods(
+        orderResponse: {
+          "pspReference": response["order"]["pspReference"],
+          "orderData": response["order"]["orderData"],
+        },
+      );
+      return paymentEventHandler.handleResponse(
+        jsonResponse: response,
+        updatedPaymentMethodsJson: updatedPaymentMethodsJson,
+      );
+    } else {
+      return paymentEventHandler.handleResponse(jsonResponse: response);
+    }
   }
 
   Future<PaymentEvent> onAdditionalDetails(
       Map<String, dynamic> additionalDetails) async {
-    final response = await service.postPaymentsDetails(additionalDetails);
-    return paymentEventHandler.handleResponse(response);
+    final Map<String, dynamic> response =
+        await service.postPaymentsDetails(additionalDetails);
+    return paymentEventHandler.handleResponse(jsonResponse: response);
   }
 
   Future<bool> deleteStoredPaymentMethod(String storedPaymentMethodId) async {
+    final Map<String, dynamic> queryParameters = <String, dynamic>{
+      'merchantAccount': Config.merchantAccount,
+      'shopperReference': Config.shopperReference,
+    };
+
     return await service.deleteStoredPaymentMethod(
-      storedPaymentMethodId: storedPaymentMethodId,
-      merchantAccount: Config.merchantAccount,
-      shopperReference: Config.shopperReference,
+      storedPaymentMethodId,
+      queryParameters,
     );
+  }
+
+  Future<Map<String, dynamic>> onCheckBalance({
+    required Map<String, dynamic> balanceCheckRequestBody,
+  }) async {
+    balanceCheckRequestBody.addAll({"merchantAccount": Config.merchantAccount});
+    return service.postPaymentMethodsBalance(balanceCheckRequestBody);
+  }
+
+  Future<Map<String, dynamic>> onRequestOrder() async {
+    final Map<String, dynamic> orderRequestBody = <String, dynamic>{
+      "reference": "flutter-test_${DateTime.now().millisecondsSinceEpoch}",
+      "amount": {
+        "value": Config.amount.value,
+        "currency": Config.amount.currency
+      },
+      "merchantAccount": Config.merchantAccount,
+    };
+    return service.postOrders(orderRequestBody);
+  }
+
+  Future<OrderCancelResult> onCancelOrder({
+    required bool shouldUpdatePaymentMethods,
+    required Map<String, dynamic> order,
+  }) async {
+    final orderCancelRequestBody = <String, dynamic>{
+      "merchantAccount": Config.merchantAccount,
+      "order": order,
+    };
+    final Map<String, dynamic> cancelResponse =
+        await service.postOrdersCancel(orderCancelRequestBody);
+    final OrderCancelResult orderCancelResult =
+        OrderCancelResult(orderCancelResponseBody: cancelResponse);
+    if (shouldUpdatePaymentMethods == true) {
+      orderCancelResult.updatedPaymentMethodsResponseBody =
+          await fetchPaymentMethods();
+    }
+
+    return orderCancelResult;
+  }
+
+  bool _hasOrderWithRemainingAmount(jsonResponse) {
+    if (jsonResponse.containsKey("order")) {
+      final remainingAmount = jsonResponse["order"]["remainingAmount"]["value"];
+      return remainingAmount > 0;
+    }
+    return false;
   }
 }
