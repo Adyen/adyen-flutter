@@ -111,6 +111,7 @@ class AdyenDropInRepository extends AdyenBaseRepository {
       ),
       countryCode: Config.countryCode,
       channel: determineChannel(),
+      recurringProcessingModel: RecurringProcessingModel.cardOnFile,
       authenticationData: {
         "attemptAuthentication": "always",
         "threeDSRequestData": {

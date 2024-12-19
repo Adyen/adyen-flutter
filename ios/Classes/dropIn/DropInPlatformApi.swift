@@ -278,7 +278,7 @@ class DropInPlatformApi: DropInPlatformInterface {
     }
 
     private func removeGiftCardPaymentMethods(paymentMethods: PaymentMethods, isPartialPaymentSupported: Bool) -> PaymentMethods {
-        guard isPartialPaymentSupported else {
+        guard !isPartialPaymentSupported else {
             return paymentMethods
         }
         
