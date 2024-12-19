@@ -1,5 +1,6 @@
 ## 1.2.0
 
+* Added support for partial payments.
 * Improved dynamic viewport of card component.
 * Added support of iDEAL to the Instant Component. 
 * Added the missing loading bottom sheet for the advanced flow google pay component.

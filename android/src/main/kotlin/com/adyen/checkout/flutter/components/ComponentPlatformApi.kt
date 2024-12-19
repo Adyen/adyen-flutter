@@ -144,8 +144,9 @@ class ComponentPlatformApi(
     ) {
         when (paymentEventDTO.paymentEventType) {
             PaymentEventType.FINISHED -> onFinished(paymentEventDTO.result, componentId)
-            PaymentEventType.ACTION -> onAction(paymentEventDTO.actionResponse)
+            PaymentEventType.ACTION -> onAction(paymentEventDTO.data)
             PaymentEventType.ERROR -> onError(paymentEventDTO.error, componentId)
+            PaymentEventType.UPDATE -> onUpdate(paymentEventDTO.data, componentId)
         }
     }
 
@@ -215,4 +216,9 @@ class ComponentPlatformApi(
             currentComponent?.handleIntent(intent)
         }
     }
+
+    private fun onUpdate(
+        data: Map<String?, Any?>?,
+        componentId: String
+    ) = Unit
 }

@@ -11,4 +11,11 @@ class Constants {
   static const String componentIdKey = "componentId";
   static const String submitDataKey = "data";
   static const String submitExtraKey = "extra";
+  static const String amountKey = "amount";
+  static const String pspReferenceKey = "pspReference";
+  static const String orderKey = "order";
+  static const String orderDataKey = "orderData";
+  static const String updatedPaymentMethodsKey = "updatedPaymentMethods";
+  static const String shouldUpdatePaymentMethodsKey =
+      "shouldUpdatePaymentMethods";
 }

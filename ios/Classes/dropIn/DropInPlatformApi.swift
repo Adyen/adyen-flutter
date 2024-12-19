@@ -11,6 +11,8 @@ class DropInPlatformApi: DropInPlatformInterface {
     private var dropInSessionStoredPaymentMethodsDelegate: DropInSessionsStoredPaymentMethodsDelegate?
     private var dropInAdvancedFlowDelegate: DropInAdvancedFlowDelegate?
     private var dropInAdvancedFlowStoredPaymentMethodsDelegate: DropInAdvancedFlowStoredPaymentMethodsDelegate?
+    private var checkBalanceHandler: ((Result<Balance, any Error>) -> Void)?
+    private var requestOrderHandler: ((Result<PartialPaymentOrder, any Error>) -> Void)?
 
     init(
         dropInFlutterApi: DropInFlutterInterface,
@@ -84,7 +86,7 @@ class DropInPlatformApi: DropInPlatformInterface {
                 )
             }
             
-            let paymentMethodsWithoutGiftCards = removeGiftCardPaymentMethods(paymentMethods: paymentMethods)
+            let paymentMethodsWithoutGiftCards = removeGiftCardPaymentMethods(paymentMethods: paymentMethods, isPartialPaymentSupported: dropInConfigurationDTO.isPartialPaymentSupported)
             let configuration = try dropInConfigurationDTO.createDropInConfiguration(payment: adyenContext.payment)
             let dropInComponent = DropInComponent(
                 paymentMethods: paymentMethodsWithoutGiftCards,
@@ -95,6 +97,9 @@ class DropInPlatformApi: DropInPlatformInterface {
             dropInAdvancedFlowDelegate = DropInAdvancedFlowDelegate(dropInFlutterApi: dropInFlutterApi)
             dropInAdvancedFlowDelegate?.dropInInteractorDelegate = self
             dropInComponent.delegate = dropInAdvancedFlowDelegate
+            if dropInConfigurationDTO.isPartialPaymentSupported {
+                dropInComponent.partialPaymentDelegate = self
+            }
             if dropInConfigurationDTO.isRemoveStoredPaymentMethodEnabled == true {
                 dropInAdvancedFlowStoredPaymentMethodsDelegate = DropInAdvancedFlowStoredPaymentMethodsDelegate(
                     viewController: viewController,
@@ -132,6 +137,32 @@ class DropInPlatformApi: DropInPlatformInterface {
         dropInAdvancedFlowStoredPaymentMethodsDelegate?.handleDisableResult(
             isSuccessfullyRemoved: deleteStoredPaymentMethodResultDTO.isSuccessfullyRemoved)
     }
+    
+    func onBalanceCheckResult(balanceCheckResponse: String) throws {
+        guard let checkBalanceHandler else { return }
+        
+        do {
+            guard let balanceCheckData = balanceCheckResponse.data(using: .utf8) else { throw PlatformError(errorDescription: "Failure parsing balance check response.") }
+            let balance = try jsonDecoder.decode(Balance.self, from: balanceCheckData)
+            checkBalanceHandler(.success(balance))
+        } catch {
+            checkBalanceHandler(.failure(error))
+        }
+    }
+    
+    func onOrderRequestResult(orderRequestResponse: String) throws {
+        guard let requestOrderHandler else { return }
+        
+        do {
+            guard let orderRequestData = orderRequestResponse.data(using: .utf8) else { throw PlatformError(errorDescription: "Failure parsing order request response.") }
+            let partialPaymentOrder = try jsonDecoder.decode(PartialPaymentOrder.self, from: orderRequestData)
+            requestOrderHandler(.success(partialPaymentOrder))
+        } catch {
+            requestOrderHandler(.failure(error))
+        }
+    }
+    
+    func onOrderCancelResult(orderCancelResult: OrderCancelResultDTO) throws {}
 
     func cleanUpDropIn() {
         sessionHolder.reset()
@@ -139,6 +170,8 @@ class DropInPlatformApi: DropInPlatformInterface {
         dropInAdvancedFlowDelegate?.dropInInteractorDelegate = nil
         dropInAdvancedFlowDelegate = nil
         dropInAdvancedFlowStoredPaymentMethodsDelegate = nil
+        checkBalanceHandler = nil
+        requestOrderHandler = nil
         dropInViewController = nil
         hostViewController = nil
     }
@@ -151,6 +184,8 @@ class DropInPlatformApi: DropInPlatformInterface {
             onDropInResultAction(paymentEventDTO: paymentEventDTO)
         case .error:
             onDropInResultError(paymentEventDTO: paymentEventDTO)
+        case .update:
+            onDropInResultUpdate(paymentEventDTO: paymentEventDTO)
         }
     }
 
@@ -175,7 +210,7 @@ class DropInPlatformApi: DropInPlatformInterface {
 
     private func onDropInResultAction(paymentEventDTO: PaymentEventDTO) {
         do {
-            let jsonData = try JSONSerialization.data(withJSONObject: paymentEventDTO.actionResponse as Any, options: [])
+            let jsonData = try JSONSerialization.data(withJSONObject: paymentEventDTO.data as Any, options: [])
             let result = try JSONDecoder().decode(Action.self, from: jsonData)
             dropInViewController?.dropInComponent.handle(result)
         } catch {
@@ -221,8 +256,32 @@ class DropInPlatformApi: DropInPlatformInterface {
             hostViewController?.adyen.topPresenter.present(alertController, animated: true)
         }
     }
+    
+    private func onDropInResultUpdate(paymentEventDTO: PaymentEventDTO) {
+        do {
+            guard let updatedPaymentMethods = paymentEventDTO.data?[Constants.updatedPaymentMethodsKey] ?? "" else {
+                throw PlatformError(errorDescription: "Updated payment methods not provided.")
+            }
+            
+            guard let orderResponse = paymentEventDTO.data?[Constants.orderKey] ?? "" else {
+                throw PlatformError(errorDescription: "Order not provided.")
+            }
+            
+            let updatedPaymentMethodsData = try JSONSerialization.data(withJSONObject: updatedPaymentMethods, options: [])
+            let paymentMethods = try jsonDecoder.decode(PaymentMethods.self, from: updatedPaymentMethodsData)
+            let orderData = try JSONSerialization.data(withJSONObject: orderResponse, options: [])
+            let order = try jsonDecoder.decode(PartialPaymentOrder.self, from: orderData)
+            try dropInViewController?.dropInComponent.reload(with: order, paymentMethods)
+        } catch {
+            adyenPrint(error.localizedDescription)
+        }
+    }
 
-    private func removeGiftCardPaymentMethods(paymentMethods: PaymentMethods) -> PaymentMethods {
+    private func removeGiftCardPaymentMethods(paymentMethods: PaymentMethods, isPartialPaymentSupported: Bool) -> PaymentMethods {
+        if isPartialPaymentSupported {
+            return paymentMethods
+        }
+        
         let storedPaymentMethods = paymentMethods.stored.filter { !($0.type == PaymentMethodType.giftcard) }
         let paymentMethods = paymentMethods.regular.filter { !($0.type == PaymentMethodType.giftcard) }
         return PaymentMethods(regular: paymentMethods, stored: storedPaymentMethods)
@@ -282,4 +341,41 @@ extension DropInPlatformApi: DropInInteractorDelegate {
             })
         }
     }
+}
+
+extension DropInPlatformApi: PartialPaymentDelegate {
+    func checkBalance(with data: Adyen.PaymentComponentData, component: any Adyen.Component, completion: @escaping (Result<Adyen.Balance, any Error>) -> Void) {
+        do {
+            checkBalanceHandler = completion
+            let platformCommunicationModel = try PlatformCommunicationModel(
+                type: PlatformCommunicationType.balanceCheck,
+                data: data.jsonObject.toJsonStringRepresentation()
+            )
+            dropInFlutterApi.onDropInAdvancedPlatformCommunication(platformCommunicationModel: platformCommunicationModel, completion: { _ in })
+        } catch {
+            completion(.failure(error))
+        }
+    }
+    
+    func requestOrder(for component: any Adyen.Component, completion: @escaping (Result<Adyen.PartialPaymentOrder, any Error>) -> Void) {
+        requestOrderHandler = completion
+        let platformCommunicationModel = PlatformCommunicationModel(type: PlatformCommunicationType.requestOrder)
+        dropInFlutterApi.onDropInAdvancedPlatformCommunication(platformCommunicationModel: platformCommunicationModel, completion: { _ in })
+    }
+    
+    func cancelOrder(_ order: Adyen.PartialPaymentOrder, component: any Adyen.Component) {
+        do {
+            let cancelOrderData: [String: Any] = [
+                Constants.orderKey: order.jsonObject,
+                Constants.shouldUpdatePaymentMethodsKey: false
+            ]
+            let data = try JSONSerialization.data(withJSONObject: cancelOrderData, options: [])
+            let cancelOrderDataString = String(data: data, encoding: .utf8)
+            let platformCommunicationModel = PlatformCommunicationModel(type: PlatformCommunicationType.cancelOrder, data: cancelOrderDataString)
+            dropInFlutterApi.onDropInAdvancedPlatformCommunication(platformCommunicationModel: platformCommunicationModel, completion: { _ in })
+        } catch {
+            adyenPrint(error.localizedDescription)
+        }
+    }
+
 }

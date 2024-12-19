@@ -4,6 +4,7 @@ import DeletedStoredPaymentMethodResultDTO
 import DropInConfigurationDTO
 import DropInFlutterInterface
 import DropInPlatformInterface
+import OrderCancelResultDTO
 import PaymentEventDTO
 import PaymentEventType
 import PaymentResultDTO
@@ -26,6 +27,12 @@ import com.adyen.checkout.dropin.internal.ui.model.SessionDropInResultContractPa
 import com.adyen.checkout.flutter.dropIn.advanced.AdvancedDropInService
 import com.adyen.checkout.flutter.dropIn.advanced.DropInAdditionalDetailsPlatformMessenger
 import com.adyen.checkout.flutter.dropIn.advanced.DropInAdditionalDetailsResultMessenger
+import com.adyen.checkout.flutter.dropIn.advanced.DropInBalanceCheckPlatformMessenger
+import com.adyen.checkout.flutter.dropIn.advanced.DropInBalanceCheckResultMessenger
+import com.adyen.checkout.flutter.dropIn.advanced.DropInOrderCancelPlatformMessenger
+import com.adyen.checkout.flutter.dropIn.advanced.DropInOrderCancelResultMessenger
+import com.adyen.checkout.flutter.dropIn.advanced.DropInOrderRequestPlatformMessenger
+import com.adyen.checkout.flutter.dropIn.advanced.DropInOrderRequestResultMessenger
 import com.adyen.checkout.flutter.dropIn.advanced.DropInPaymentMethodDeletionPlatformMessenger
 import com.adyen.checkout.flutter.dropIn.advanced.DropInPaymentMethodDeletionResultMessenger
 import com.adyen.checkout.flutter.dropIn.advanced.DropInPaymentResultMessenger
@@ -75,12 +82,19 @@ class DropInPlatformApi(
     ) {
         setAdvancedFlowDropInServiceObserver()
         setStoredPaymentMethodDeletionObserver()
+        setBalanceCheckPlatformMessengerObserver()
+        setOrderRequestPlatformMessengerObserver()
+        setOrderCancelPlatformMessengerObserver()
         activity.lifecycleScope.launch(Dispatchers.IO) {
             val paymentMethodsApiResponse =
                 PaymentMethodsApiResponse.SERIALIZER.deserialize(
                     JSONObject(paymentMethodsResponse),
                 )
-            val paymentMethodsWithoutGiftCards = removeGiftCardPaymentMethods(paymentMethodsApiResponse)
+            val paymentMethodsWithoutGiftCards =
+                removeGiftCardPaymentMethods(
+                    paymentMethodsApiResponse,
+                    dropInConfigurationDTO.isPartialPaymentSupported
+                )
             val dropInConfiguration = dropInConfigurationDTO.mapToDropInConfiguration(activity.applicationContext)
             withContext(Dispatchers.Main) {
                 DropIn.startPayment(
@@ -112,10 +126,25 @@ class DropInPlatformApi(
         DropInPaymentMethodDeletionResultMessenger.sendResult(deleteStoredPaymentMethodResultDTO)
     }
 
+    override fun onBalanceCheckResult(balanceCheckResponse: String) {
+        DropInBalanceCheckResultMessenger.sendResult(balanceCheckResponse)
+    }
+
+    override fun onOrderRequestResult(orderRequestResponse: String) {
+        DropInOrderRequestResultMessenger.sendResult(orderRequestResponse)
+    }
+
+    override fun onOrderCancelResult(orderCancelResult: OrderCancelResultDTO) {
+        DropInOrderCancelResultMessenger.sendResult(orderCancelResult)
+    }
+
     override fun cleanUpDropIn() {
         DropInServiceResultMessenger.instance().removeObservers(activity)
-        DropInPaymentMethodDeletionPlatformMessenger.instance().removeObservers(activity)
         DropInAdditionalDetailsPlatformMessenger.instance().removeObservers(activity)
+        DropInPaymentMethodDeletionPlatformMessenger.instance().removeObservers(activity)
+        DropInBalanceCheckResultMessenger.instance().removeObservers(activity)
+        DropInOrderRequestResultMessenger.instance().removeObservers(activity)
+        DropInOrderCancelPlatformMessenger.instance().removeObservers(activity)
     }
 
     private fun setAdvancedFlowDropInServiceObserver() {
@@ -181,6 +210,54 @@ class DropInPlatformApi(
         }
     }
 
+    private fun setBalanceCheckPlatformMessengerObserver() {
+        DropInBalanceCheckPlatformMessenger.instance().removeObservers(activity)
+        DropInBalanceCheckPlatformMessenger.instance().observe(activity) { message ->
+            if (message.hasBeenHandled()) {
+                return@observe
+            }
+
+            val platformCommunicationModel =
+                PlatformCommunicationModel(
+                    PlatformCommunicationType.BALANCECHECK,
+                    data = message.contentIfNotHandled.toString()
+                )
+            dropInFlutterApi.onDropInAdvancedPlatformCommunication(platformCommunicationModel) {}
+        }
+    }
+
+    private fun setOrderRequestPlatformMessengerObserver() {
+        DropInOrderRequestPlatformMessenger.instance().removeObservers(activity)
+        DropInOrderRequestPlatformMessenger.instance().observe(activity) { message ->
+            if (message.hasBeenHandled()) {
+                return@observe
+            }
+
+            val platformCommunicationModel =
+                PlatformCommunicationModel(
+                    PlatformCommunicationType.REQUESTORDER,
+                    data = message.contentIfNotHandled.toString()
+                )
+            dropInFlutterApi.onDropInAdvancedPlatformCommunication(platformCommunicationModel) {}
+        }
+    }
+
+    private fun setOrderCancelPlatformMessengerObserver() {
+        DropInOrderCancelPlatformMessenger.instance().removeObservers(activity)
+        DropInOrderCancelPlatformMessenger.instance().observe(activity) { message ->
+            if (message.hasBeenHandled()) {
+                return@observe
+            }
+
+            val platformCommunicationModel =
+                PlatformCommunicationModel(
+                    PlatformCommunicationType.CANCELORDER,
+                    data = message.contentIfNotHandled.toString()
+                )
+            dropInFlutterApi.onDropInAdvancedPlatformCommunication(platformCommunicationModel) {}
+        }
+    }
+
     private fun createCheckoutSession(
         sessionHolder: SessionHolder,
         environment: com.adyen.checkout.core.Environment,
@@ -196,10 +273,14 @@ class DropInPlatformApi(
         )
     }
 
-    // Gift cards will be supported in a later version
     private fun removeGiftCardPaymentMethods(
-        paymentMethodsResponse: PaymentMethodsApiResponse
+        paymentMethodsResponse: PaymentMethodsApiResponse,
+        isPartialPaymentSupported: Boolean
     ): PaymentMethodsApiResponse {
+        if (isPartialPaymentSupported) {
+            return paymentMethodsResponse
+        }
+
         val giftCardTypeIdentifier = "giftcard"
         val storedPaymentMethods =
             paymentMethodsResponse.storedPaymentMethods?.filterNot { it.type == giftCardTypeIdentifier }

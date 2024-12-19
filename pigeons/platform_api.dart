@@ -58,6 +58,9 @@ enum PlatformCommunicationType {
   additionalDetails,
   result,
   deleteStoredPaymentMethod,
+  balanceCheck,
+  requestOrder,
+  cancelOrder,
 }
 
 enum ComponentCommunicationType {
@@ -72,6 +75,7 @@ enum PaymentEventType {
   finished,
   action,
   error,
+  update,
 }
 
 enum FieldVisibility {
@@ -150,6 +154,7 @@ class DropInConfigurationDTO {
   final bool isRemoveStoredPaymentMethodEnabled;
   final String? preselectedPaymentMethodTitle;
   final Map<String?, String?>? paymentMethodNames;
+  final bool isPartialPaymentSupported;
 
   DropInConfigurationDTO(
     this.environment,
@@ -167,6 +172,7 @@ class DropInConfigurationDTO {
     this.isRemoveStoredPaymentMethodEnabled,
     this.preselectedPaymentMethodTitle,
     this.paymentMethodNames,
+    this.isPartialPaymentSupported,
   );
 }
 
@@ -437,13 +443,13 @@ class ComponentCommunicationModel {
 class PaymentEventDTO {
   final PaymentEventType paymentEventType;
   final String? result;
-  final Map<String?, Object?>? actionResponse;
+  final Map<String?, Object?>? data;
   final ErrorDTO? error;
 
   PaymentEventDTO({
     required this.paymentEventType,
     this.result,
-    this.actionResponse,
+    this.data,
     this.error,
   });
 }
@@ -570,6 +576,16 @@ class ActionComponentConfigurationDTO {
   );
 }
 
+class OrderCancelResultDTO {
+  final Map<String?, Object?> orderCancelResponseBody;
+  final Map<String?, Object?>? updatedPaymentMethodsResponseBody;
+
+  OrderCancelResultDTO(
+    this.orderCancelResponseBody,
+    this.updatedPaymentMethodsResponseBody,
+  );
+}
+
 @HostApi()
 abstract class CheckoutPlatformInterface {
   @async
@@ -601,7 +617,6 @@ abstract class CheckoutPlatformInterface {
 
 @HostApi()
 abstract class DropInPlatformInterface {
-  // TODO: Merge show dropIn methods into one.
   void showDropInSession(DropInConfigurationDTO dropInConfigurationDTO);
 
   void showDropInAdvanced(
@@ -615,6 +630,12 @@ abstract class DropInPlatformInterface {
 
   void onDeleteStoredPaymentMethodResult(
       DeletedStoredPaymentMethodResultDTO deleteStoredPaymentMethodResultDTO);
+
+  void onBalanceCheckResult(String balanceCheckResponse);
+
+  void onOrderRequestResult(String orderRequestResponse);
+
+  void onOrderCancelResult(OrderCancelResultDTO orderCancelResult);
 
   void cleanUpDropIn();
 }
