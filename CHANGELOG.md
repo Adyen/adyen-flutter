@@ -2,6 +2,7 @@
 
 * Added support for partial payments.
 * Improved dynamic viewport of card component.
+* Added sessionResult to the PaymentSessionFinished payment result.
 * Added support of iDEAL to the Instant Component.
 * Added the missing loading bottom sheet for the advanced flow google pay component.
 * Removed alert in case the deletion of stored payment method failed.
