@@ -200,13 +200,7 @@ class AdvancedDropInService : DropInService(), LifecycleOwner {
         return if (deleteStoredPaymentMethodResultDTO?.isSuccessfullyRemoved == true) {
             RecurringDropInServiceResult.PaymentMethodRemoved(deleteStoredPaymentMethodResultDTO.storedPaymentMethodId)
         } else {
-            // TODO - the error message should be provided by the native SDK
-            RecurringDropInServiceResult.Error(
-                errorDialog =
-                    ErrorDialog(
-                        message = "Removal of the stored payment method failed. Please try again later."
-                    )
-            )
+            RecurringDropInServiceResult.Error(errorDialog = null)
         }
     }
 

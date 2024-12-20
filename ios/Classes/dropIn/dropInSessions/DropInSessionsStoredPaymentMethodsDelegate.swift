@@ -24,11 +24,6 @@ class DropInSessionsStoredPaymentMethodsDelegate: StoredPaymentMethodsDelegate {
     }
 
     func handleDisableResult(isSuccessfullyRemoved: Bool) {
-        if isSuccessfullyRemoved == false {
-            let errorAlert = TemporaryAlertHelper.buildPaymentMethodDeletionErrorAlert()
-            viewController.adyen.topPresenter.present(errorAlert, animated: true)
-        }
-
         completionHandler?(isSuccessfullyRemoved)
     }
 }
