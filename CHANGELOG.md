@@ -1,11 +1,11 @@
 ## 1.2.0
 
 * Added support for partial payments.
-* Improved dynamic viewport of card component.
 * Added sessionResult to the PaymentSessionFinished payment result.
 * Added support of iDEAL to the Instant Component.
-* Added the missing loading bottom sheet for the advanced flow google pay component.
-* Removed alert in case the deletion of stored payment method failed.
+* Added loading bottom sheet for the advanced flow google pay component.
+* Improved dynamic viewport of card component.
+* Removed alert message in case the deletion of stored payment method failed.
 * Updated iOS SDK to v5.14.0.
 * Updated Android SDK to v5.8.0. Gradle v8 is now mandatory.
 
