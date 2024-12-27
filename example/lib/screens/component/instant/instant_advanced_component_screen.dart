@@ -54,7 +54,7 @@ class InstantAdvancedComponentScreen extends StatelessWidget {
           final klarnaPaymentMethodResponse =
               _extractPaymentMethod(snapshot.data!, "klarna");
           final idealPaymentMethodResponse =
-          _extractPaymentMethod(snapshot.data!, "ideal");
+              _extractPaymentMethod(snapshot.data!, "ideal");
 
           return Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -125,7 +125,7 @@ class InstantAdvancedComponentScreen extends StatelessWidget {
       Map<String, dynamic> paymentMethods, String key) {
     return paymentMethods["paymentMethods"].firstWhere(
       (paymentMethod) => paymentMethod["type"] == key,
-      orElse: () => <String,dynamic>{},
+      orElse: () => <String, dynamic>{},
     );
   }
 }

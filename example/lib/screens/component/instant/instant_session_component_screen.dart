@@ -120,7 +120,7 @@ class InstantSessionComponentScreen extends StatelessWidget {
       Map<String, dynamic> paymentMethods, String key) {
     return paymentMethods["paymentMethods"].firstWhere(
       (paymentMethod) => paymentMethod["type"] == key,
-      orElse: () => <String,dynamic>{},
+      orElse: () => <String, dynamic>{},
     );
   }
 }
