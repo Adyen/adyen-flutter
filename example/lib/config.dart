@@ -28,7 +28,8 @@ class Config {
   static const Environment environment = Environment.test;
   static const String baseUrl = "checkout-test.adyen.com";
   static const String apiVersion = "v71";
-  static const String iOSReturnUrl = "adyencheckout://com.adyen.adyen_checkout_example";
+  static const String iOSReturnUrl =
+      "adyencheckout://com.adyen.adyen_checkout_example";
   static const GooglePayEnvironment googlePayEnvironment =
       GooglePayEnvironment.test;
 
