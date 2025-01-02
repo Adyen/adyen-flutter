@@ -3,7 +3,10 @@ name: Clean build test
 on:
   workflow_dispatch:
   pull_request:
-    branches: [ "main" ]
+    branches:
+     - main
+    types:
+     - closed
   push:
     tags:
       - '*'
