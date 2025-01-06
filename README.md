@@ -57,7 +57,7 @@ release a new version when we need to.
 #### Android 
 * [Android 5.0](https://www.android.com/versions/lollipop-5-0/) (API 21) or later.
 * [Kotlin 1.8.22](https://kotlinlang.org/docs/releases.html) or later.
-* [AGP 8.1](https://developer.android.com/build/releases/gradle-plugin) or later.
+* [AGP 8.1](https://developer.android.com/build/releases/gradle-plugin) or later with Gradle 8.
 * Requires the usage of a `FlutterFragmentActivity` instead of the default `FlutterActivity` in the MainActivity of your [native Android](https://github.com/Adyen/adyen-flutter/blob/main/example/android/app/src/main/kotlin/com/adyen/checkout/flutter/example/MainActivity.kt) layer.
 
 #### iOS
