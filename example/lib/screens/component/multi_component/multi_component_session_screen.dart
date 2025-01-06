@@ -11,7 +11,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class MultiComponentSessionScreen extends StatelessWidget {
-  const MultiComponentSessionScreen({
+  MultiComponentSessionScreen({
     required this.cardRepository,
     required this.applePayRepository,
     required this.googlePayRepository,
@@ -21,6 +21,13 @@ class MultiComponentSessionScreen extends StatelessWidget {
   final AdyenCardComponentRepository cardRepository;
   final AdyenApplePayComponentRepository applePayRepository;
   final AdyenGooglePayComponentRepository googlePayRepository;
+  final cardComponentConfiguration = CardComponentConfiguration(
+    environment: Config.environment,
+    clientKey: Config.clientKey,
+    countryCode: Config.countryCode,
+    amount: Config.amount,
+    shopperLocale: Config.shopperLocale,
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -28,82 +35,80 @@ class MultiComponentSessionScreen extends StatelessWidget {
       backgroundColor: Colors.white,
       appBar: AppBar(title: const Text('Multi component session')),
       body: SafeArea(
-        child: SingleChildScrollView(
-          physics: const ClampingScrollPhysics(),
-          child: Column(
-            children: [
-              _buildCardWidget(),
-              _buildAppleOrGooglePayWidget(),
-            ],
-          ),
-        ),
+        child: FutureBuilder<SessionCheckout>(
+            future: createSession(cardComponentConfiguration),
+            builder: (
+              BuildContext context,
+              AsyncSnapshot<SessionCheckout> snapshot,
+            ) {
+              if (snapshot.data != null) {
+                SessionCheckout sessionCheckout = snapshot.data!;
+
+                return SingleChildScrollView(
+                  physics: const ClampingScrollPhysics(),
+                  child: Column(
+                    children: [
+                      _buildCardWidget(
+                        context,
+                        sessionCheckout,
+                      ),
+                      _buildAppleOrGooglePayWidget(context, sessionCheckout),
+                    ],
+                  ),
+                );
+              } else {
+                return const Center(child: CircularProgressIndicator());
+              }
+            }),
       ),
     );
   }
 
-  Widget _buildCardWidget() {
-    final cardComponentConfiguration = CardComponentConfiguration(
-      environment: Config.environment,
-      clientKey: Config.clientKey,
-      countryCode: Config.countryCode,
-      amount: Config.amount,
-      shopperLocale: Config.shopperLocale,
-      cardConfiguration: const CardConfiguration(),
+  Widget _buildCardWidget(
+    BuildContext context,
+    SessionCheckout sessionCheckout,
+  ) {
+    final Map<String, dynamic> schemePaymentMethod =
+        _extractSchemePaymentMethod(sessionCheckout.paymentMethods);
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
+      child: AdyenCardComponent(
+        configuration: cardComponentConfiguration,
+        paymentMethod: schemePaymentMethod,
+        checkout: sessionCheckout,
+        onPaymentResult: (paymentResult) async {
+          Navigator.pop(context);
+          DialogBuilder.showPaymentResultDialog(paymentResult, context);
+        },
+      ),
     );
-
-    return FutureBuilder<SessionCheckout>(
-        future: createSession(cardComponentConfiguration),
-        builder: (
-          BuildContext context,
-          AsyncSnapshot<SessionCheckout> snapshot,
-        ) {
-          if (snapshot.data != null) {
-            SessionCheckout sessionCheckout = snapshot.data!;
-            final paymentMethod =
-                _extractSchemePaymentMethod(sessionCheckout.paymentMethods);
-
-            return Padding(
-              padding: const EdgeInsets.fromLTRB(4, 0, 4, 0),
-              child: AdyenCardComponent(
-                configuration: cardComponentConfiguration,
-                paymentMethod: paymentMethod,
-                checkout: sessionCheckout,
-                onPaymentResult: (paymentResult) async {
-                  Navigator.pop(context);
-                  DialogBuilder.showPaymentResultDialog(paymentResult, context);
-                },
-              ),
-            );
-          } else {
-            return const SizedBox.shrink();
-          }
-        });
   }
 
-  Future<SessionCheckout> createSession(
-      CardComponentConfiguration cardComponentConfiguration) async {
-    final sessionResponse = await cardRepository.fetchSession();
-    final sessionCheckout = await AdyenCheckout.session.create(
-      sessionId: sessionResponse.id,
-      sessionData: sessionResponse.sessionData,
-      configuration: cardComponentConfiguration,
-    );
-
-    return sessionCheckout;
-  }
-
-  Widget _buildAppleOrGooglePayWidget() {
+  Widget _buildAppleOrGooglePayWidget(
+    BuildContext context,
+    SessionCheckout sessionCheckout,
+  ) {
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
-        return _buildAdyenGooglePaySessionComponent();
+        return _buildAdyenGooglePaySessionComponent(
+          context,
+          sessionCheckout,
+        );
       case TargetPlatform.iOS:
-        return _buildAdyenApplePaySessionComponent();
+        return _buildAdyenApplePaySessionComponent(
+          context,
+          sessionCheckout,
+        );
       default:
         throw Exception("Unsupported platform");
     }
   }
 
-  Widget _buildAdyenGooglePaySessionComponent() {
+  Widget _buildAdyenGooglePaySessionComponent(
+    BuildContext context,
+    SessionCheckout sessionCheckout,
+  ) {
     final GooglePayComponentConfiguration googlePayComponentConfiguration =
         GooglePayComponentConfiguration(
       environment: Config.environment,
@@ -114,37 +119,29 @@ class MultiComponentSessionScreen extends StatelessWidget {
       ),
     );
 
-    return FutureBuilder<SessionCheckout>(
-      future: googlePayRepository
-          .createSessionCheckout(googlePayComponentConfiguration),
-      builder: (BuildContext context, AsyncSnapshot<SessionCheckout> snapshot) {
-        if (snapshot.hasData) {
-          final SessionCheckout sessionCheckout = snapshot.data!;
-          final paymentMethod =
-              _extractGooglePayPaymentMethod(sessionCheckout.paymentMethods);
-          return Padding(
-            padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
-            child: AdyenGooglePayComponent(
-              configuration: googlePayComponentConfiguration,
-              paymentMethod: paymentMethod,
-              checkout: sessionCheckout,
-              loadingIndicator: const CircularProgressIndicator(),
-              width: double.infinity,
-              style: GooglePayButtonStyle(cornerRadius: 4),
-              onPaymentResult: (paymentResult) {
-                Navigator.pop(context);
-                DialogBuilder.showPaymentResultDialog(paymentResult, context);
-              },
-            ),
-          );
-        } else {
-          return const SizedBox.shrink();
-        }
-      },
+    final Map<String, dynamic> paymentMethod =
+        _extractGooglePayPaymentMethod(sessionCheckout.paymentMethods);
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
+      child: AdyenGooglePayComponent(
+        configuration: googlePayComponentConfiguration,
+        paymentMethod: paymentMethod,
+        checkout: sessionCheckout,
+        loadingIndicator: const CircularProgressIndicator(),
+        width: double.infinity,
+        style: GooglePayButtonStyle(cornerRadius: 4),
+        onPaymentResult: (paymentResult) {
+          Navigator.pop(context);
+          DialogBuilder.showPaymentResultDialog(paymentResult, context);
+        },
+      ),
     );
   }
 
-  Widget _buildAdyenApplePaySessionComponent() {
+  Widget _buildAdyenApplePaySessionComponent(
+    BuildContext context,
+    SessionCheckout sessionCheckout,
+  ) {
     final ApplePayComponentConfiguration applePayComponentConfiguration =
         ApplePayComponentConfiguration(
       environment: Config.environment,
@@ -153,34 +150,22 @@ class MultiComponentSessionScreen extends StatelessWidget {
       applePayConfiguration: _createApplePayConfiguration(),
     );
 
-    return FutureBuilder<SessionCheckout>(
-      future: applePayRepository
-          .createSessionCheckout(applePayComponentConfiguration),
-      builder: (BuildContext context, AsyncSnapshot<SessionCheckout> snapshot) {
-        if (snapshot.hasData) {
-          final SessionCheckout sessionCheckout = snapshot.data!;
-          final paymentMethod =
-              _extractApplePayPaymentMethod(sessionCheckout.paymentMethods);
-
-          return Padding(
-            padding: const EdgeInsets.fromLTRB(12, 0, 12, 0),
-            child: AdyenApplePayComponent(
-              configuration: applePayComponentConfiguration,
-              paymentMethod: paymentMethod,
-              checkout: sessionCheckout,
-              loadingIndicator: const CircularProgressIndicator(),
-              width: double.infinity,
-              height: 48,
-              onPaymentResult: (paymentResult) {
-                Navigator.pop(context);
-                DialogBuilder.showPaymentResultDialog(paymentResult, context);
-              },
-            ),
-          );
-        } else {
-          return const SizedBox.shrink();
-        }
-      },
+    final Map<String, dynamic> applePayPaymentMethod =
+        _extractApplePayPaymentMethod(sessionCheckout.paymentMethods);
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(12, 0, 12, 0),
+      child: AdyenApplePayComponent(
+        configuration: applePayComponentConfiguration,
+        paymentMethod: applePayPaymentMethod,
+        checkout: sessionCheckout,
+        loadingIndicator: const CircularProgressIndicator(),
+        width: double.infinity,
+        height: 48,
+        onPaymentResult: (paymentResult) {
+          Navigator.pop(context);
+          DialogBuilder.showPaymentResultDialog(paymentResult, context);
+        },
+      ),
     );
   }
 
@@ -199,6 +184,18 @@ class MultiComponentSessionScreen extends StatelessWidget {
       applePayShippingType: ApplePayShippingType.shipping,
       allowShippingContactEditing: true,
     );
+  }
+
+  Future<SessionCheckout> createSession(
+      CardComponentConfiguration configuration) async {
+    final sessionResponse = await cardRepository.fetchSession();
+    final sessionCheckout = await AdyenCheckout.session.create(
+      sessionId: sessionResponse.id,
+      sessionData: sessionResponse.sessionData,
+      configuration: cardComponentConfiguration,
+    );
+
+    return sessionCheckout;
   }
 
   Map<String, dynamic> _extractApplePayPaymentMethod(
