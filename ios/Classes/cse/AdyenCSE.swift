@@ -20,4 +20,8 @@ class AdyenCSE {
             return Result.failure(error)
         }
     }
+    
+    func validateCardNumber(cardNumber: String, enableLuhnCheck: Bool) -> Bool {
+        return CardNumberValidator(isLuhnCheckEnabled: enableLuhnCheck, isEnteredBrandSupported: true).isValid(cardNumber)
+    }
 }

@@ -81,6 +81,12 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
         let encryptedBinResult = adyenCse.encryptBin(bin: bin, publicKey: publicKey)
         completion(encryptedBinResult)
     }
+    
+    func validateCardNumber(cardNumber: String, enableLuhnCheck: Bool) throws -> CardNumberValidationResult {
+        let cardNumberValidationResult = adyenCse.validateCardNumber(cardNumber: cardNumber, enableLuhnCheck: enableLuhnCheck)
+        return cardNumberValidationResult ? .valid : .invalidOtherReason
+    }
+    
 
     private func createSessionForDropIn(
         adyenContext: AdyenContext,

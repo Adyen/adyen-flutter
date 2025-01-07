@@ -12,6 +12,7 @@ import 'package:adyen_checkout/src/components/action_handling/model/action_resul
 import 'package:adyen_checkout/src/drop_in/drop_in.dart';
 import 'package:adyen_checkout/src/drop_in/drop_in_flutter_api.dart';
 import 'package:adyen_checkout/src/drop_in/drop_in_platform_api.dart';
+import 'package:adyen_checkout/src/generated/platform_api.g.dart';
 import 'package:adyen_checkout/src/logging/adyen_logger.dart';
 import 'package:adyen_checkout/src/util/dto_mapper.dart';
 import 'package:adyen_checkout/src/util/sdk_version_number_provider.dart';
@@ -73,4 +74,23 @@ class AdyenCheckout implements AdyenCheckoutInterface {
     Map<String, dynamic> action,
   ) =>
       ActionComponent().handleAction(actionComponentConfiguration, action);
+
+  //When the iOS SDK returns an invalid result, we will adopt and return the enum.
+  Future<bool> isCardNumberValid({
+    required String cardNumber,
+    bool enableLuhnCheck = false,
+  }) async {
+    final CardNumberValidationResult cardNumberValidation =
+        await _adyenCheckoutApi.validateCardNumber(
+      cardNumber,
+      enableLuhnCheck,
+    );
+
+    switch (cardNumberValidation){
+      case CardNumberValidationResult.valid:
+        return true;
+      default:
+       return false;
+    }
+  }
 }

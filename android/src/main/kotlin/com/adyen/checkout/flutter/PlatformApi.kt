@@ -230,6 +230,22 @@ enum class ApplePaySummaryItemType(val raw: Int) {
   }
 }
 
+enum class CardNumberValidationResult(val raw: Int) {
+  VALID(0),
+  INVALIDILLEGALCHARACTERS(1),
+  INVALIDLUHNCHECK(2),
+  INVALIDTOOSHORT(3),
+  INVALIDTOOLONG(4),
+  INVALIDUNSUPPORTEDBRAND(5),
+  INVALIDOTHERREASON(6);
+
+  companion object {
+    fun ofRaw(raw: Int): CardNumberValidationResult? {
+      return values().firstOrNull { it.raw == raw }
+    }
+  }
+}
+
 /** Generated class from Pigeon that represents data sent in messages. */
 data class SessionDTO (
   val id: String,
@@ -1485,6 +1501,7 @@ interface CheckoutPlatformInterface {
   fun clearSession()
   fun encryptCard(unencryptedCardDTO: UnencryptedCardDTO, publicKey: String, callback: (Result<EncryptedCardDTO>) -> Unit)
   fun encryptBin(bin: String, publicKey: String, callback: (Result<String>) -> Unit)
+  fun validateCardNumber(cardNumber: String, enableLuhnCheck: Boolean): CardNumberValidationResult
   fun enableConsoleLogging(loggingEnabled: Boolean)
 
   companion object {
@@ -1589,6 +1606,25 @@ interface CheckoutPlatformInterface {
                 reply.reply(wrapResult(data))
               }
             }
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.validateCardNumber", codec)
+        if (api != null) {
+          channel.setMessageHandler { message, reply ->
+            val args = message as List<Any?>
+            val cardNumberArg = args[0] as String
+            val enableLuhnCheckArg = args[1] as Boolean
+            var wrapped: List<Any?>
+            try {
+              wrapped = listOf<Any?>(api.validateCardNumber(cardNumberArg, enableLuhnCheckArg).raw)
+            } catch (exception: Throwable) {
+              wrapped = wrapError(exception)
+            }
+            reply.reply(wrapped)
           }
         } else {
           channel.setMessageHandler(null)
