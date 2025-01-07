@@ -106,6 +106,16 @@ enum ApplePaySummaryItemType {
   definite,
 }
 
+enum CardNumberValidationResult {
+  valid,
+  invalidIllegalCharacters,
+  invalidLuhnCheck,
+  invalidTooShort,
+  invalidTooLong,
+  invalidUnsupportedBrand,
+  invalidOtherReason
+}
+
 class SessionDTO {
   final String id;
   final String sessionData;
@@ -610,6 +620,11 @@ abstract class CheckoutPlatformInterface {
   String encryptBin(
     String bin,
     String publicKey,
+  );
+
+  CardNumberValidationResult validateCardNumber(
+    String cardNumber,
+    bool enableLuhnCheck,
   );
 
   void enableConsoleLogging(bool loggingEnabled);

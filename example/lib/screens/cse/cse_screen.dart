@@ -32,12 +32,20 @@ class CseScreen extends StatelessWidget {
 
   Future<void> encryptCard() async {
     try {
+      const String cardNumber = "3714 4963 5398 431";
       final UnencryptedCard unencryptedCard = UnencryptedCard(
-        cardNumber: "3714 4963 5398 431",
+        cardNumber: cardNumber,
         expiryMonth: "03",
         expiryYear: "2030",
         cvc: "7373",
       );
+
+      final bool isCardNumberValid = await AdyenCheckout.instance.isCardNumberValid(
+        cardNumber: cardNumber,
+        enableLuhnCheck: true,
+      );
+
+      debugPrint("Is card number valid: $isCardNumberValid");
       final EncryptedCard encryptedCard = await AdyenCheckout.instance
           .encryptCard(unencryptedCard, Config.publicKey);
       final Map<String, dynamic> paymentsResponse =

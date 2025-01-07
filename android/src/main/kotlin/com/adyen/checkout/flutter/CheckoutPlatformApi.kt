@@ -1,6 +1,7 @@
 package com.adyen.checkout.flutter
 
 import CardComponentConfigurationDTO
+import CardNumberValidationResult
 import CheckoutPlatformInterface
 import DropInConfigurationDTO
 import EncryptedCardDTO
@@ -85,6 +86,9 @@ class CheckoutPlatformApi(
         val encryptedBin = adyenCSE.encryptBin(bin, publicKey)
         callback(encryptedBin)
     }
+
+    override fun validateCardNumber(cardNumber: String, enableLuhnCheck: Boolean): CardNumberValidationResult =
+        adyenCSE.validateCardNumber(cardNumber, enableLuhnCheck)
 
     private fun determineSessionConfiguration(configuration: Any?): Configuration? {
         when (configuration) {
