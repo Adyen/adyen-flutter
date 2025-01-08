@@ -41,7 +41,7 @@ class CseScreen extends StatelessWidget {
       );
 
       final CardNumberValidationResult cardNumberValidationResult =
-          await AdyenCheckout.instance.isCardNumberValid(
+          await AdyenCheckout.instance.validateCardNumber(
         cardNumber: cardNumber,
         enableLuhnCheck: true,
       );
