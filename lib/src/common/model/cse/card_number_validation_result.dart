@@ -1,8 +1,8 @@
 sealed class CardNumberValidationResult {}
 
-final class Valid extends CardNumberValidationResult {}
+class ValidCardNumber extends CardNumberValidationResult {}
 
 // We do not use a sealed class in order to prevent breaking changes in the future when adding more invalid reasons.
-abstract class Invalid extends CardNumberValidationResult {}
+abstract class InvalidCardNumber extends CardNumberValidationResult {}
 
-final class InvalidOtherReason extends Invalid {}
+final class InvalidCardNumberOtherReason extends InvalidCardNumber {}

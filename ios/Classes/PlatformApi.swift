@@ -147,6 +147,14 @@ enum CardNumberValidationResultDTO: Int {
   case invalidOtherReason = 5
 }
 
+enum CardExpiryDateValidationResultDTO: Int {
+  case valid = 0
+  case invalidTooFarInTheFuture = 1
+  case invalidTooOld = 2
+  case nonParseableDate = 3
+  case invalidOtherReason = 4
+}
+
 /// Generated class from Pigeon that represents data sent in messages.
 struct SessionDTO {
   var id: String
@@ -1427,6 +1435,7 @@ protocol CheckoutPlatformInterface {
   func encryptCard(unencryptedCardDTO: UnencryptedCardDTO, publicKey: String, completion: @escaping (Result<EncryptedCardDTO, Error>) -> Void)
   func encryptBin(bin: String, publicKey: String, completion: @escaping (Result<String, Error>) -> Void)
   func validateCardNumber(cardNumber: String, enableLuhnCheck: Bool) throws -> CardNumberValidationResultDTO
+  func validateCardExpiryDate(expiryMonth: String, expiryYear: String) throws -> CardExpiryDateValidationResultDTO
   func enableConsoleLogging(loggingEnabled: Bool) throws
 }
 
@@ -1534,6 +1543,22 @@ class CheckoutPlatformInterfaceSetup {
       }
     } else {
       validateCardNumberChannel.setMessageHandler(nil)
+    }
+    let validateCardExpiryDateChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.validateCardExpiryDate", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      validateCardExpiryDateChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let expiryMonthArg = args[0] as! String
+        let expiryYearArg = args[1] as! String
+        do {
+          let result = try api.validateCardExpiryDate(expiryMonth: expiryMonthArg, expiryYear: expiryYearArg)
+          reply(wrapResult(result.rawValue))
+        } catch {
+          reply(wrapError(error))
+        }
+      }
+    } else {
+      validateCardExpiryDateChannel.setMessageHandler(nil)
     }
     let enableConsoleLoggingChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.enableConsoleLogging", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {

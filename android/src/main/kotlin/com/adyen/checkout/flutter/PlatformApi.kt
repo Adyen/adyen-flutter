@@ -245,6 +245,20 @@ enum class CardNumberValidationResultDTO(val raw: Int) {
   }
 }
 
+enum class CardExpiryDateValidationResultDTO(val raw: Int) {
+  VALID(0),
+  INVALIDTOOFARINTHEFUTURE(1),
+  INVALIDTOOOLD(2),
+  NONPARSEABLEDATE(3),
+  INVALIDOTHERREASON(4);
+
+  companion object {
+    fun ofRaw(raw: Int): CardExpiryDateValidationResultDTO? {
+      return values().firstOrNull { it.raw == raw }
+    }
+  }
+}
+
 /** Generated class from Pigeon that represents data sent in messages. */
 data class SessionDTO (
   val id: String,
@@ -1501,6 +1515,7 @@ interface CheckoutPlatformInterface {
   fun encryptCard(unencryptedCardDTO: UnencryptedCardDTO, publicKey: String, callback: (Result<EncryptedCardDTO>) -> Unit)
   fun encryptBin(bin: String, publicKey: String, callback: (Result<String>) -> Unit)
   fun validateCardNumber(cardNumber: String, enableLuhnCheck: Boolean): CardNumberValidationResultDTO
+  fun validateCardExpiryDate(expiryMonth: String, expiryYear: String): CardExpiryDateValidationResultDTO
   fun enableConsoleLogging(loggingEnabled: Boolean)
 
   companion object {
@@ -1620,6 +1635,25 @@ interface CheckoutPlatformInterface {
             var wrapped: List<Any?>
             try {
               wrapped = listOf<Any?>(api.validateCardNumber(cardNumberArg, enableLuhnCheckArg).raw)
+            } catch (exception: Throwable) {
+              wrapped = wrapError(exception)
+            }
+            reply.reply(wrapped)
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.validateCardExpiryDate", codec)
+        if (api != null) {
+          channel.setMessageHandler { message, reply ->
+            val args = message as List<Any?>
+            val expiryMonthArg = args[0] as String
+            val expiryYearArg = args[1] as String
+            var wrapped: List<Any?>
+            try {
+              wrapped = listOf<Any?>(api.validateCardExpiryDate(expiryMonthArg, expiryYearArg).raw)
             } catch (exception: Throwable) {
               wrapped = wrapError(exception)
             }
