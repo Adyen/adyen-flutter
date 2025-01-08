@@ -1,6 +1,7 @@
 package com.adyen.checkout.flutter
 
 import CardComponentConfigurationDTO
+import CardExpiryDateValidationResultDTO
 import CardNumberValidationResultDTO
 import CheckoutPlatformInterface
 import DropInConfigurationDTO
@@ -88,6 +89,9 @@ class CheckoutPlatformApi(
 
     override fun validateCardNumber(cardNumber: String, enableLuhnCheck: Boolean): CardNumberValidationResultDTO =
         CardValidation.validateCardNumber(cardNumber, enableLuhnCheck)
+
+    override fun validateCardExpiryDate(expiryMonth: String, expiryYear: String): CardExpiryDateValidationResultDTO =
+        CardValidation.validateCardExpiryDate(expiryMonth, expiryYear)
 
     private fun determineSessionConfiguration(configuration: Any?): Configuration? {
         when (configuration) {

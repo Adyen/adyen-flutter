@@ -115,6 +115,14 @@ enum CardNumberValidationResultDTO {
   invalidOtherReason
 }
 
+enum CardExpiryDateValidationResultDTO {
+  valid,
+  invalidTooFarInTheFuture,
+  invalidTooOld,
+  nonParseableDate,
+  invalidOtherReason,
+}
+
 class SessionDTO {
   final String id;
   final String sessionData;
@@ -624,6 +632,11 @@ abstract class CheckoutPlatformInterface {
   CardNumberValidationResultDTO validateCardNumber(
     String cardNumber,
     bool enableLuhnCheck,
+  );
+
+  CardExpiryDateValidationResultDTO validateCardExpiryDate(
+    String expiryMonth,
+    String expiryYear,
   );
 
   void enableConsoleLogging(bool loggingEnabled);

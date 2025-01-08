@@ -45,4 +45,11 @@ class AdyenCheckoutApi implements CheckoutPlatformInterface {
     bool enableLuhnCheck,
   ) =>
       checkoutApi.validateCardNumber(cardNumber, enableLuhnCheck);
+
+  @override
+  Future<CardExpiryDateValidationResultDTO> validateCardExpiryDate(
+    String expiryMonth,
+    String expiryYear,
+  ) =>
+      checkoutApi.validateCardExpiryDate(expiryMonth, expiryYear);
 }

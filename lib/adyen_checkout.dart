@@ -2,6 +2,7 @@ export 'src/adyen_checkout.dart';
 export 'src/common/model/amount.dart';
 export 'src/common/model/analytics_options.dart';
 export 'src/common/model/checkout.dart';
+export 'src/common/model/cse/card_expiry_date_validation_result.dart';
 export 'src/common/model/cse/card_number_validation_result.dart';
 export 'src/common/model/cse/encrypted_card.dart';
 export 'src/common/model/cse/unencrypted_card.dart';

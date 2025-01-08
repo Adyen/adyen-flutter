@@ -33,10 +33,13 @@ class CseScreen extends StatelessWidget {
   Future<void> encryptCard() async {
     try {
       const String cardNumber = "3714 4963 5398 431";
+      const String expiryMonth = "03";
+      const String expiryYear = "2030";
+
       final UnencryptedCard unencryptedCard = UnencryptedCard(
         cardNumber: cardNumber,
-        expiryMonth: "03",
-        expiryYear: "2030",
+        expiryMonth: expiryMonth,
+        expiryYear: expiryYear,
         cvc: "7373",
       );
 
@@ -47,12 +50,28 @@ class CseScreen extends StatelessWidget {
       );
 
       switch (cardNumberValidationResult) {
-        case Valid _:
-          debugPrint("Card number is valid");
-        case Invalid it:
+        case ValidCardNumber():
+          debugPrint("Card number is valid.");
+        case InvalidCardNumber it:
           switch (it) {
-            case InvalidOtherReason _:
+            case InvalidCardNumberOtherReason _:
               debugPrint("Card number is invalid due to other reason.");
+          }
+      }
+
+      final CardExpiryDateValidationResult cardExpiryDateValidationResult =
+          await AdyenCheckout.instance.validateCardExpireDate(
+        expiryMonth: expiryMonth,
+        expiryYear: expiryYear,
+      );
+
+      switch (cardExpiryDateValidationResult) {
+        case ValidCardExpiryDate():
+          debugPrint("Card expire date is valid.");
+        case InvalidCardExpiryDate it:
+          switch (it) {
+            case InvalidCardExpiryDateOtherReason _:
+              debugPrint("Card expire date is invalid due to other reason.");
           }
       }
 

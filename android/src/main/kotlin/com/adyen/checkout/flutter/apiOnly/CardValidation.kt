@@ -1,9 +1,7 @@
 package com.adyen.checkout.flutter.apiOnly
 
+import CardExpiryDateValidationResultDTO
 import CardNumberValidationResultDTO
-import com.adyen.checkout.card.internal.data.model.Brand
-import com.adyen.checkout.card.internal.util.CardExpiryDateValidation
-import com.adyen.checkout.core.internal.ui.model.isEmptyDate
 import com.adyen.checkout.core.ui.model.ExpiryDate
 import com.adyen.checkout.core.ui.validation.CardExpiryDateValidationResult
 import com.adyen.checkout.core.ui.validation.CardExpiryDateValidator
@@ -23,24 +21,17 @@ object CardValidation {
         }
     }
 
-    internal fun validateExpiryDate(
-        expiryDate: ExpiryDate,
-        fieldPolicy: Brand.FieldPolicy?,
-    ): CardExpiryDateValidation {
-        val validationResult = CardExpiryDateValidator.validateExpiryDate(expiryDate)
+    internal fun validateCardExpiryDate(expiryMonth: String, expiryYear: String): CardExpiryDateValidationResultDTO {
+        val expireMonth = expiryMonth.toIntOrNull() ?: return CardExpiryDateValidationResultDTO.NONPARSEABLEDATE
+        val expireYear = expiryYear.toIntOrNull() ?: return CardExpiryDateValidationResultDTO.NONPARSEABLEDATE
+        val cardExpiryDate = ExpiryDate(expireMonth, expireYear)
+        val validationResult = CardExpiryDateValidator.validateExpiryDate(cardExpiryDate)
         return when (validationResult) {
-            is CardExpiryDateValidationResult.Valid -> CardExpiryDateValidation.VALID
-            is CardExpiryDateValidationResult.Invalid.TooFarInTheFuture -> CardExpiryDateValidation.INVALID_TOO_FAR_IN_THE_FUTURE
-            is CardExpiryDateValidationResult.Invalid.TooOld -> CardExpiryDateValidation.INVALID_TOO_OLD
-            is CardExpiryDateValidationResult.Invalid.NonParseableDate -> {
-                if (expiryDate.isEmptyDate() && fieldPolicy?.isRequired() == false) {
-                    CardExpiryDateValidation.VALID_NOT_REQUIRED
-                } else {
-                    CardExpiryDateValidation.INVALID_OTHER_REASON
-                }
-            }
-
-            else -> CardExpiryDateValidation.INVALID_OTHER_REASON
+            is CardExpiryDateValidationResult.Valid -> CardExpiryDateValidationResultDTO.VALID
+            is CardExpiryDateValidationResult.Invalid.TooFarInTheFuture -> CardExpiryDateValidationResultDTO.INVALIDTOOFARINTHEFUTURE
+            is CardExpiryDateValidationResult.Invalid.TooOld -> CardExpiryDateValidationResultDTO.INVALIDTOOOLD
+            is CardExpiryDateValidationResult.Invalid.NonParseableDate -> CardExpiryDateValidationResultDTO.NONPARSEABLEDATE
+            else -> CardExpiryDateValidationResultDTO.INVALIDOTHERREASON
         }
     }
 }

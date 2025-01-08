@@ -87,6 +87,11 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
         return cardNumberValidationResult ? .valid : .invalidOtherReason
     }
     
+    func validateCardExpiryDate(expiryMonth: String, expiryYear: String) throws -> CardExpiryDateValidationResultDTO {
+        let cardExpiryDateValidationResult = CardValidation().validateCardExpiryDate(expiryMonth: expiryMonth, expiryYear: expiryYear)
+        return cardExpiryDateValidationResult ? .valid : .invalidOtherReason
+    }
+    
 
     private func createSessionForDropIn(
         adyenContext: AdyenContext,
