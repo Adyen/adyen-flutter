@@ -4,6 +4,7 @@ import 'package:adyen_checkout/src/adyen_checkout_interface.dart';
 import 'package:adyen_checkout/src/common/adyen_checkout_advanced.dart';
 import 'package:adyen_checkout/src/common/adyen_checkout_api.dart';
 import 'package:adyen_checkout/src/common/adyen_checkout_session.dart';
+import 'package:adyen_checkout/src/common/model/cse/card_number_validation_result.dart';
 import 'package:adyen_checkout/src/common/model/cse/encrypted_card.dart';
 import 'package:adyen_checkout/src/common/model/cse/unencrypted_card.dart';
 import 'package:adyen_checkout/src/components/action_handling/action_component.dart';
@@ -76,21 +77,25 @@ class AdyenCheckout implements AdyenCheckoutInterface {
       ActionComponent().handleAction(actionComponentConfiguration, action);
 
   //When the iOS SDK returns an invalid result, we will adopt and return the enum.
-  Future<bool> isCardNumberValid({
+  Future<CardNumberValidationResult> isCardNumberValid({
     required String cardNumber,
     bool enableLuhnCheck = false,
   }) async {
-    final CardNumberValidationResult cardNumberValidation =
+    final CardNumberValidationResultDTO cardNumberValidation =
         await _adyenCheckoutApi.validateCardNumber(
       cardNumber,
       enableLuhnCheck,
     );
 
-    switch (cardNumberValidation){
-      case CardNumberValidationResult.valid:
-        return true;
-      default:
-       return false;
+    switch (cardNumberValidation) {
+      case CardNumberValidationResultDTO.valid:
+        return Valid();
+      case CardNumberValidationResultDTO.invalidLuhnCheck:
+      case CardNumberValidationResultDTO.invalidIllegalCharacters:
+      case CardNumberValidationResultDTO.invalidTooShort:
+      case CardNumberValidationResultDTO.invalidTooLong:
+      case CardNumberValidationResultDTO.invalidOtherReason:
+        return InvalidOtherReason();
     }
   }
 }

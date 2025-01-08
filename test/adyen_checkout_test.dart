@@ -46,11 +46,11 @@ class MockAdyenCheckoutPlatform implements CheckoutPlatformInterface {
   }
 
   @override
-  Future<CardNumberValidationResult> validateCardNumber(
+  Future<CardNumberValidationResultDTO> validateCardNumber(
     String cardNumber,
     bool enableLuhnCheck,
   ) {
-    return Future.value(CardNumberValidationResult.valid);
+    return Future.value(CardNumberValidationResultDTO.valid);
   }
 }
 

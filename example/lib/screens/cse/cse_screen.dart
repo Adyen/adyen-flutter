@@ -40,12 +40,22 @@ class CseScreen extends StatelessWidget {
         cvc: "7373",
       );
 
-      final bool isCardNumberValid = await AdyenCheckout.instance.isCardNumberValid(
+      final CardNumberValidationResult cardNumberValidationResult =
+          await AdyenCheckout.instance.isCardNumberValid(
         cardNumber: cardNumber,
         enableLuhnCheck: true,
       );
 
-      debugPrint("Is card number valid: $isCardNumberValid");
+      switch (cardNumberValidationResult) {
+        case Valid _:
+          debugPrint("Card number is valid");
+        case Invalid it:
+          switch (it) {
+            case InvalidOtherReason _:
+              debugPrint("Card number is invalid due to other reason.");
+          }
+      }
+
       final EncryptedCard encryptedCard = await AdyenCheckout.instance
           .encryptCard(unencryptedCard, Config.publicKey);
       final Map<String, dynamic> paymentsResponse =
