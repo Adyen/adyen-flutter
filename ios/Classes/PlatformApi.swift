@@ -138,14 +138,13 @@ enum ApplePaySummaryItemType: Int {
   case definite = 1
 }
 
-enum CardNumberValidationResult: Int {
+enum CardNumberValidationResultDTO: Int {
   case valid = 0
   case invalidIllegalCharacters = 1
   case invalidLuhnCheck = 2
   case invalidTooShort = 3
   case invalidTooLong = 4
-  case invalidUnsupportedBrand = 5
-  case invalidOtherReason = 6
+  case invalidOtherReason = 5
 }
 
 /// Generated class from Pigeon that represents data sent in messages.
@@ -1427,7 +1426,7 @@ protocol CheckoutPlatformInterface {
   func clearSession() throws
   func encryptCard(unencryptedCardDTO: UnencryptedCardDTO, publicKey: String, completion: @escaping (Result<EncryptedCardDTO, Error>) -> Void)
   func encryptBin(bin: String, publicKey: String, completion: @escaping (Result<String, Error>) -> Void)
-  func validateCardNumber(cardNumber: String, enableLuhnCheck: Bool) throws -> CardNumberValidationResult
+  func validateCardNumber(cardNumber: String, enableLuhnCheck: Bool) throws -> CardNumberValidationResultDTO
   func enableConsoleLogging(loggingEnabled: Bool) throws
 }
 

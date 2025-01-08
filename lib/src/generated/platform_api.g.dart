@@ -120,13 +120,12 @@ enum ApplePaySummaryItemType {
   definite,
 }
 
-enum CardNumberValidationResult {
+enum CardNumberValidationResultDTO {
   valid,
   invalidIllegalCharacters,
   invalidLuhnCheck,
   invalidTooShort,
   invalidTooLong,
-  invalidUnsupportedBrand,
   invalidOtherReason,
 }
 
@@ -1712,7 +1711,7 @@ class CheckoutPlatformInterface {
     }
   }
 
-  Future<CardNumberValidationResult> validateCardNumber(String cardNumber, bool enableLuhnCheck) async {
+  Future<CardNumberValidationResultDTO> validateCardNumber(String cardNumber, bool enableLuhnCheck) async {
     const String __pigeon_channelName = 'dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.validateCardNumber';
     final BasicMessageChannel<Object?> __pigeon_channel = BasicMessageChannel<Object?>(
       __pigeon_channelName,
@@ -1735,7 +1734,7 @@ class CheckoutPlatformInterface {
         message: 'Host platform returned null value for non-null return value.',
       );
     } else {
-      return CardNumberValidationResult.values[__pigeon_replyList[0]! as int];
+      return CardNumberValidationResultDTO.values[__pigeon_replyList[0]! as int];
     }
   }
 

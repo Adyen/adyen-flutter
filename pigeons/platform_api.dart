@@ -106,13 +106,12 @@ enum ApplePaySummaryItemType {
   definite,
 }
 
-enum CardNumberValidationResult {
+enum CardNumberValidationResultDTO {
   valid,
   invalidIllegalCharacters,
   invalidLuhnCheck,
   invalidTooShort,
   invalidTooLong,
-  invalidUnsupportedBrand,
   invalidOtherReason
 }
 
@@ -622,7 +621,7 @@ abstract class CheckoutPlatformInterface {
     String publicKey,
   );
 
-  CardNumberValidationResult validateCardNumber(
+  CardNumberValidationResultDTO validateCardNumber(
     String cardNumber,
     bool enableLuhnCheck,
   );

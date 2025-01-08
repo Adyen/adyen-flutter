@@ -82,7 +82,7 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
         completion(encryptedBinResult)
     }
     
-    func validateCardNumber(cardNumber: String, enableLuhnCheck: Bool) throws -> CardNumberValidationResult {
+    func validateCardNumber(cardNumber: String, enableLuhnCheck: Bool) throws -> CardNumberValidationResultDTO {
         let cardNumberValidationResult = adyenCse.validateCardNumber(cardNumber: cardNumber, enableLuhnCheck: enableLuhnCheck)
         return cardNumberValidationResult ? .valid : .invalidOtherReason
     }

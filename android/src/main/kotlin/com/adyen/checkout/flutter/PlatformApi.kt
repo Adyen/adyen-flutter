@@ -230,17 +230,16 @@ enum class ApplePaySummaryItemType(val raw: Int) {
   }
 }
 
-enum class CardNumberValidationResult(val raw: Int) {
+enum class CardNumberValidationResultDTO(val raw: Int) {
   VALID(0),
   INVALIDILLEGALCHARACTERS(1),
   INVALIDLUHNCHECK(2),
   INVALIDTOOSHORT(3),
   INVALIDTOOLONG(4),
-  INVALIDUNSUPPORTEDBRAND(5),
-  INVALIDOTHERREASON(6);
+  INVALIDOTHERREASON(5);
 
   companion object {
-    fun ofRaw(raw: Int): CardNumberValidationResult? {
+    fun ofRaw(raw: Int): CardNumberValidationResultDTO? {
       return values().firstOrNull { it.raw == raw }
     }
   }
@@ -1501,7 +1500,7 @@ interface CheckoutPlatformInterface {
   fun clearSession()
   fun encryptCard(unencryptedCardDTO: UnencryptedCardDTO, publicKey: String, callback: (Result<EncryptedCardDTO>) -> Unit)
   fun encryptBin(bin: String, publicKey: String, callback: (Result<String>) -> Unit)
-  fun validateCardNumber(cardNumber: String, enableLuhnCheck: Boolean): CardNumberValidationResult
+  fun validateCardNumber(cardNumber: String, enableLuhnCheck: Boolean): CardNumberValidationResultDTO
   fun enableConsoleLogging(loggingEnabled: Boolean)
 
   companion object {

@@ -40,7 +40,7 @@ class AdyenCheckoutApi implements CheckoutPlatformInterface {
       checkoutApi.encryptBin(bin, publicKey);
 
   @override
-  Future<CardNumberValidationResult> validateCardNumber(
+  Future<CardNumberValidationResultDTO> validateCardNumber(
     String cardNumber,
     bool enableLuhnCheck,
   ) =>
