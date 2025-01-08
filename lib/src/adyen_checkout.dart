@@ -77,7 +77,7 @@ class AdyenCheckout implements AdyenCheckoutInterface {
       ActionComponent().handleAction(actionComponentConfiguration, action);
 
   //When the iOS SDK returns an invalid result, we will adopt and return the enum.
-  Future<CardNumberValidationResult> isCardNumberValid({
+  Future<CardNumberValidationResult> validateCardNumber({
     required String cardNumber,
     bool enableLuhnCheck = false,
   }) async {
