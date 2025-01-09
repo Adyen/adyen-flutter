@@ -6,7 +6,8 @@ class CardValidation {
     }
     
     func validateCardExpiryDate(expiryMonth: String, expiryYear: String) -> Bool {
-        return CardExpiryDateValidator().isValid("\(expiryMonth)\(expiryYear)")
+        let lastTwoYearChars = String(expiryYear.suffix(2))
+        return CardExpiryDateValidator().isValid("\(expiryMonth)\(lastTwoYearChars)")
     }
     
     func validateCardSecurityCode(securityCode: String, cardBrandTxVariant: String?) -> Bool {
