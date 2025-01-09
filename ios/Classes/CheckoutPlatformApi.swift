@@ -92,6 +92,10 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
         return cardExpiryDateValidationResult ? .valid : .invalidOtherReason
     }
     
+    func validateCardSecurityCode(securityCode: String, cardBrandTxVariant: String?) throws -> CardSecurityCodeValidationResultDTO {
+        let cardSecurityCodeValidationResult = CardValidation().validateCardSecurityCode(securityCode: securityCode, cardBrandTxVariant: cardBrandTxVariant)
+        return cardSecurityCodeValidationResult ? .valid : .invalid
+    }
 
     private func createSessionForDropIn(
         adyenContext: AdyenContext,

@@ -1,16 +1,11 @@
 import 'dart:async';
 
+import 'package:adyen_checkout/adyen_checkout.dart';
 import 'package:adyen_checkout/src/adyen_checkout_interface.dart';
 import 'package:adyen_checkout/src/common/adyen_checkout_advanced.dart';
 import 'package:adyen_checkout/src/common/adyen_checkout_api.dart';
 import 'package:adyen_checkout/src/common/adyen_checkout_session.dart';
-import 'package:adyen_checkout/src/common/model/cse/card_expiry_date_validation_result.dart';
-import 'package:adyen_checkout/src/common/model/cse/card_number_validation_result.dart';
-import 'package:adyen_checkout/src/common/model/cse/encrypted_card.dart';
-import 'package:adyen_checkout/src/common/model/cse/unencrypted_card.dart';
 import 'package:adyen_checkout/src/components/action_handling/action_component.dart';
-import 'package:adyen_checkout/src/components/action_handling/model/action_component_configuration.dart';
-import 'package:adyen_checkout/src/components/action_handling/model/action_result.dart';
 import 'package:adyen_checkout/src/drop_in/drop_in.dart';
 import 'package:adyen_checkout/src/drop_in/drop_in_flutter_api.dart';
 import 'package:adyen_checkout/src/drop_in/drop_in_platform_api.dart';
@@ -87,16 +82,15 @@ class AdyenCheckout implements AdyenCheckoutInterface {
       enableLuhnCheck,
     );
 
-    switch (cardNumberValidation) {
-      case CardNumberValidationResultDTO.valid:
-        return ValidCardNumber();
-      case CardNumberValidationResultDTO.invalidLuhnCheck:
-      case CardNumberValidationResultDTO.invalidIllegalCharacters:
-      case CardNumberValidationResultDTO.invalidTooShort:
-      case CardNumberValidationResultDTO.invalidTooLong:
-      case CardNumberValidationResultDTO.invalidOtherReason:
-        return InvalidCardNumberOtherReason();
-    }
+    return switch (cardNumberValidation) {
+      CardNumberValidationResultDTO.valid => ValidCardNumber(),
+      CardNumberValidationResultDTO.invalidLuhnCheck ||
+      CardNumberValidationResultDTO.invalidIllegalCharacters ||
+      CardNumberValidationResultDTO.invalidTooShort ||
+      CardNumberValidationResultDTO.invalidTooLong ||
+      CardNumberValidationResultDTO.invalidOtherReason =>
+        InvalidCardNumberOtherReason()
+    };
   }
 
   Future<CardExpiryDateValidationResult> validateCardExpireDate({
@@ -109,14 +103,30 @@ class AdyenCheckout implements AdyenCheckoutInterface {
       expiryYear,
     );
 
-    switch (cardExpiryDateValidationResultDTO) {
-      case CardExpiryDateValidationResultDTO.valid:
-        return ValidCardExpiryDate();
-      case CardExpiryDateValidationResultDTO.invalidTooFarInTheFuture:
-      case CardExpiryDateValidationResultDTO.invalidTooOld:
-      case CardExpiryDateValidationResultDTO.nonParseableDate:
-      case CardExpiryDateValidationResultDTO.invalidOtherReason:
-        return InvalidCardExpiryDateOtherReason();
-    }
+    return switch (cardExpiryDateValidationResultDTO) {
+      CardExpiryDateValidationResultDTO.valid => ValidCardExpiryDate(),
+      CardExpiryDateValidationResultDTO.invalidTooFarInTheFuture ||
+      CardExpiryDateValidationResultDTO.invalidTooOld ||
+      CardExpiryDateValidationResultDTO.nonParseableDate ||
+      CardExpiryDateValidationResultDTO.invalidOtherReason =>
+        InvalidCardExpiryDateOtherReason()
+    };
+  }
+
+  Future<CardSecurityCodeValidationResult> validateCardSecurityCode({
+    required String securityCode,
+    String? cardBrandTxVariant,
+  }) async {
+    final CardSecurityCodeValidationResultDTO
+        cardSecurityCodeValidationResultDTO =
+        await _adyenCheckoutApi.validateCardSecurityCode(
+      securityCode,
+      cardBrandTxVariant,
+    );
+
+    return switch (cardSecurityCodeValidationResultDTO) {
+      CardSecurityCodeValidationResultDTO.valid => ValidCardSecurityCode(),
+      CardSecurityCodeValidationResultDTO.invalid => InvalidCardSecurityCode()
+    };
   }
 }

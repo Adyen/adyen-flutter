@@ -19,7 +19,7 @@ class CseScreen extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               TextButton(
-                  onPressed: encryptCard,
+                  onPressed: _encryptCard,
                   child: const Text("Encrypted card payment")),
               TextButton(
                   onPressed: encryptBin, child: const Text("Encrypt bin"))
@@ -30,51 +30,16 @@ class CseScreen extends StatelessWidget {
     );
   }
 
-  Future<void> encryptCard() async {
+  Future<void> _encryptCard() async {
     try {
-      const String cardNumber = "3714 4963 5398 431";
-      const String expiryMonth = "03";
-      const String expiryYear = "2030";
-
       final UnencryptedCard unencryptedCard = UnencryptedCard(
-        cardNumber: cardNumber,
-        expiryMonth: expiryMonth,
-        expiryYear: expiryYear,
+        cardNumber: "3714 4963 5398 431",
+        expiryMonth: "03",
+        expiryYear: "2030",
         cvc: "7373",
       );
 
-      final CardNumberValidationResult cardNumberValidationResult =
-          await AdyenCheckout.instance.validateCardNumber(
-        cardNumber: cardNumber,
-        enableLuhnCheck: true,
-      );
-
-      switch (cardNumberValidationResult) {
-        case ValidCardNumber():
-          debugPrint("Card number is valid.");
-        case InvalidCardNumber it:
-          switch (it) {
-            case InvalidCardNumberOtherReason _:
-              debugPrint("Card number is invalid due to other reason.");
-          }
-      }
-
-      final CardExpiryDateValidationResult cardExpiryDateValidationResult =
-          await AdyenCheckout.instance.validateCardExpireDate(
-        expiryMonth: expiryMonth,
-        expiryYear: expiryYear,
-      );
-
-      switch (cardExpiryDateValidationResult) {
-        case ValidCardExpiryDate():
-          debugPrint("Card expire date is valid.");
-        case InvalidCardExpiryDate it:
-          switch (it) {
-            case InvalidCardExpiryDateOtherReason _:
-              debugPrint("Card expire date is invalid due to other reason.");
-          }
-      }
-
+      await _validateCardInput(unencryptedCard);
       final EncryptedCard encryptedCard = await AdyenCheckout.instance
           .encryptCard(unencryptedCard, Config.publicKey);
       final Map<String, dynamic> paymentsResponse =
@@ -111,6 +76,52 @@ class CseScreen extends StatelessWidget {
       debugPrint("Encrypted bin: $encryptedBin");
     } catch (exception) {
       debugPrint(exception.toString());
+    }
+  }
+
+  Future<void> _validateCardInput(UnencryptedCard unencryptedCard) async {
+    final CardNumberValidationResult cardNumberValidationResult =
+        await AdyenCheckout.instance.validateCardNumber(
+      cardNumber: unencryptedCard.cardNumber ?? "",
+      enableLuhnCheck: true,
+    );
+
+    switch (cardNumberValidationResult) {
+      case ValidCardNumber():
+        debugPrint("Card number is valid.");
+      case InvalidCardNumber it:
+        switch (it) {
+          case InvalidCardNumberOtherReason _:
+            debugPrint("Card number is invalid due to other reason.");
+        }
+    }
+
+    final CardExpiryDateValidationResult cardExpiryDateValidationResult =
+        await AdyenCheckout.instance.validateCardExpireDate(
+      expiryMonth: unencryptedCard.expiryMonth ?? "",
+      expiryYear: unencryptedCard.expiryYear ?? "",
+    );
+
+    switch (cardExpiryDateValidationResult) {
+      case ValidCardExpiryDate():
+        debugPrint("Card expire date is valid.");
+      case InvalidCardExpiryDate it:
+        switch (it) {
+          case InvalidCardExpiryDateOtherReason _:
+            debugPrint("Card expire date is invalid due to other reason.");
+        }
+    }
+
+    final CardSecurityCodeValidationResult cardSecurityCodeValidationResult =
+        await AdyenCheckout.instance.validateCardSecurityCode(
+      securityCode: unencryptedCard.cvc ?? "",
+      cardBrandTxVariant: "amex",
+    );
+    switch (cardSecurityCodeValidationResult) {
+      case ValidCardSecurityCode():
+        debugPrint("Card security code is valid.");
+      case InvalidCardSecurityCode():
+        debugPrint("Card security code is invalid.");
     }
   }
 }

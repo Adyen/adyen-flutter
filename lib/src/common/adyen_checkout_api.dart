@@ -52,4 +52,11 @@ class AdyenCheckoutApi implements CheckoutPlatformInterface {
     String expiryYear,
   ) =>
       checkoutApi.validateCardExpiryDate(expiryMonth, expiryYear);
+
+  @override
+  Future<CardSecurityCodeValidationResultDTO> validateCardSecurityCode(
+    String securityCode,
+    String? cardBrandTxVariant,
+  ) =>
+      checkoutApi.validateCardSecurityCode(securityCode, cardBrandTxVariant);
 }
