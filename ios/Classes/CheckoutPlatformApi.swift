@@ -83,18 +83,18 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
     }
     
     func validateCardNumber(cardNumber: String, enableLuhnCheck: Bool) throws -> CardNumberValidationResultDTO {
-        let cardNumberValidationResult = CardValidation().validateCardNumber(cardNumber: cardNumber, enableLuhnCheck: enableLuhnCheck)
-        return cardNumberValidationResult ? .valid : .invalidOtherReason
+        let validationResult = CardValidation().validateCardNumber(cardNumber: cardNumber, enableLuhnCheck: enableLuhnCheck)
+        return validationResult ? .valid : .invalidOtherReason
     }
     
     func validateCardExpiryDate(expiryMonth: String, expiryYear: String) throws -> CardExpiryDateValidationResultDTO {
-        let cardExpiryDateValidationResult = CardValidation().validateCardExpiryDate(expiryMonth: expiryMonth, expiryYear: expiryYear)
-        return cardExpiryDateValidationResult ? .valid : .invalidOtherReason
+        let validationResult = CardValidation().validateCardExpiryDate(expiryMonth: expiryMonth, expiryYear: expiryYear)
+        return validationResult ? .valid : .invalidOtherReason
     }
     
     func validateCardSecurityCode(securityCode: String, cardBrandTxVariant: String?) throws -> CardSecurityCodeValidationResultDTO {
-        let cardSecurityCodeValidationResult = CardValidation().validateCardSecurityCode(securityCode: securityCode, cardBrandTxVariant: cardBrandTxVariant)
-        return cardSecurityCodeValidationResult ? .valid : .invalid
+        let validationResult = CardValidation().validateCardSecurityCode(securityCode: securityCode, cardBrandTxVariant: cardBrandTxVariant)
+        return validationResult ? .valid : .invalid
     }
 
     private func createSessionForDropIn(

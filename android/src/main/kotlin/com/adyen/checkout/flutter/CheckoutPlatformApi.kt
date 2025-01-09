@@ -88,11 +88,15 @@ class CheckoutPlatformApi(
         callback(encryptedBin)
     }
 
-    override fun validateCardNumber(cardNumber: String, enableLuhnCheck: Boolean): CardNumberValidationResultDTO =
-        CardValidation.validateCardNumber(cardNumber, enableLuhnCheck)
+    override fun validateCardNumber(
+        cardNumber: String,
+        enableLuhnCheck: Boolean
+    ): CardNumberValidationResultDTO = CardValidation.validateCardNumber(cardNumber, enableLuhnCheck)
 
-    override fun validateCardExpiryDate(expiryMonth: String, expiryYear: String): CardExpiryDateValidationResultDTO =
-        CardValidation.validateCardExpiryDate(expiryMonth, expiryYear)
+    override fun validateCardExpiryDate(
+        expiryMonth: String,
+        expiryYear: String
+    ): CardExpiryDateValidationResultDTO = CardValidation.validateCardExpiryDate(expiryMonth, expiryYear)
 
     override fun validateCardSecurityCode(
         securityCode: String,
