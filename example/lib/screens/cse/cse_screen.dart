@@ -97,7 +97,7 @@ class CseScreen extends StatelessWidget {
     }
 
     final CardExpiryDateValidationResult cardExpiryDateValidationResult =
-        await AdyenCheckout.instance.validateCardExpireDate(
+        await AdyenCheckout.instance.validateCardExpiryDate(
       expiryMonth: unencryptedCard.expiryMonth ?? "",
       expiryYear: unencryptedCard.expiryYear ?? "",
     );

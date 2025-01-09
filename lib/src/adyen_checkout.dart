@@ -93,7 +93,7 @@ class AdyenCheckout implements AdyenCheckoutInterface {
     };
   }
 
-  Future<CardExpiryDateValidationResult> validateCardExpireDate({
+  Future<CardExpiryDateValidationResult> validateCardExpiryDate({
     required String expiryMonth,
     required String expiryYear,
   }) async {
