@@ -123,6 +123,8 @@ enum CardExpiryDateValidationResultDTO {
   invalidOtherReason,
 }
 
+enum CardSecurityCodeValidationResultDTO { valid, invalid }
+
 class SessionDTO {
   final String id;
   final String sessionData;
@@ -637,6 +639,11 @@ abstract class CheckoutPlatformInterface {
   CardExpiryDateValidationResultDTO validateCardExpiryDate(
     String expiryMonth,
     String expiryYear,
+  );
+
+  CardSecurityCodeValidationResultDTO validateCardSecurityCode(
+    String securityCode,
+    String? cardBrandTxVariant,
   );
 
   void enableConsoleLogging(bool loggingEnabled);
