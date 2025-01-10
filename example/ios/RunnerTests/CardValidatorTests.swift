@@ -82,6 +82,11 @@ class CardValidatorTestss: XCTestCase {
         let validationResult = CardValidation().validateCardExpiryDate(expiryMonth: "12", expiryYear: "2030")
         XCTAssertEqual(validationResult, true)
     }
+    
+    func test_given_validShortDate_when_validateCardExpiryDate_then_returnValid() {
+        let validationResult = CardValidation().validateCardExpiryDate(expiryMonth: "12", expiryYear: "30")
+        XCTAssertEqual(validationResult, true)
+    }
 
     func test_given_dateIsTooFarInTheFuture_when_validateCardExpiryDate_then_returnInvalid() {
         let validationResult = CardValidation().validateCardExpiryDate(expiryMonth: "12", expiryYear: "2099")
