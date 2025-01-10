@@ -12,7 +12,7 @@ import com.adyen.checkout.core.ui.validation.CardNumberValidator
 import com.adyen.checkout.core.ui.validation.CardSecurityCodeValidationResult
 import com.adyen.checkout.core.ui.validation.CardSecurityCodeValidator
 
-object CardValidation {
+internal object CardValidation {
     internal fun validateCardNumber(
         cardNumber: String,
         enableLuhnCheck: Boolean
