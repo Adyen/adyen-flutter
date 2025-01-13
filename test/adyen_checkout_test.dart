@@ -44,6 +44,30 @@ class MockAdyenCheckoutPlatform implements CheckoutPlatformInterface {
   Future<void> clearSession() async {
     return;
   }
+
+  @override
+  Future<CardNumberValidationResultDTO> validateCardNumber(
+    String cardNumber,
+    bool enableLuhnCheck,
+  ) {
+    return Future.value(CardNumberValidationResultDTO.valid);
+  }
+
+  @override
+  Future<CardExpiryDateValidationResultDTO> validateCardExpiryDate(
+    String expiryMonth,
+    String expiryYear,
+  ) {
+    return Future.value(CardExpiryDateValidationResultDTO.valid);
+  }
+
+  @override
+  Future<CardSecurityCodeValidationResultDTO> validateCardSecurityCode(
+    String securityCode,
+    String? cardBrandTxVariant,
+  ) {
+    return Future.value(CardSecurityCodeValidationResultDTO.valid);
+  }
 }
 
 void main() {

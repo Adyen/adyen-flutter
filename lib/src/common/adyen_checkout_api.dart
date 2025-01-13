@@ -38,4 +38,25 @@ class AdyenCheckoutApi implements CheckoutPlatformInterface {
     String publicKey,
   ) =>
       checkoutApi.encryptBin(bin, publicKey);
+
+  @override
+  Future<CardNumberValidationResultDTO> validateCardNumber(
+    String cardNumber,
+    bool enableLuhnCheck,
+  ) =>
+      checkoutApi.validateCardNumber(cardNumber, enableLuhnCheck);
+
+  @override
+  Future<CardExpiryDateValidationResultDTO> validateCardExpiryDate(
+    String expiryMonth,
+    String expiryYear,
+  ) =>
+      checkoutApi.validateCardExpiryDate(expiryMonth, expiryYear);
+
+  @override
+  Future<CardSecurityCodeValidationResultDTO> validateCardSecurityCode(
+    String securityCode,
+    String? cardBrandTxVariant,
+  ) =>
+      checkoutApi.validateCardSecurityCode(securityCode, cardBrandTxVariant);
 }

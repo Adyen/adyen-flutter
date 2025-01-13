@@ -230,6 +230,46 @@ enum class ApplePaySummaryItemType(val raw: Int) {
   }
 }
 
+enum class CardNumberValidationResultDTO(val raw: Int) {
+  VALID(0),
+  INVALIDILLEGALCHARACTERS(1),
+  INVALIDLUHNCHECK(2),
+  INVALIDTOOSHORT(3),
+  INVALIDTOOLONG(4),
+  INVALIDOTHERREASON(5);
+
+  companion object {
+    fun ofRaw(raw: Int): CardNumberValidationResultDTO? {
+      return values().firstOrNull { it.raw == raw }
+    }
+  }
+}
+
+enum class CardExpiryDateValidationResultDTO(val raw: Int) {
+  VALID(0),
+  INVALIDTOOFARINTHEFUTURE(1),
+  INVALIDTOOOLD(2),
+  NONPARSEABLEDATE(3),
+  INVALIDOTHERREASON(4);
+
+  companion object {
+    fun ofRaw(raw: Int): CardExpiryDateValidationResultDTO? {
+      return values().firstOrNull { it.raw == raw }
+    }
+  }
+}
+
+enum class CardSecurityCodeValidationResultDTO(val raw: Int) {
+  VALID(0),
+  INVALID(1);
+
+  companion object {
+    fun ofRaw(raw: Int): CardSecurityCodeValidationResultDTO? {
+      return values().firstOrNull { it.raw == raw }
+    }
+  }
+}
+
 /** Generated class from Pigeon that represents data sent in messages. */
 data class SessionDTO (
   val id: String,
@@ -1485,6 +1525,9 @@ interface CheckoutPlatformInterface {
   fun clearSession()
   fun encryptCard(unencryptedCardDTO: UnencryptedCardDTO, publicKey: String, callback: (Result<EncryptedCardDTO>) -> Unit)
   fun encryptBin(bin: String, publicKey: String, callback: (Result<String>) -> Unit)
+  fun validateCardNumber(cardNumber: String, enableLuhnCheck: Boolean): CardNumberValidationResultDTO
+  fun validateCardExpiryDate(expiryMonth: String, expiryYear: String): CardExpiryDateValidationResultDTO
+  fun validateCardSecurityCode(securityCode: String, cardBrandTxVariant: String?): CardSecurityCodeValidationResultDTO
   fun enableConsoleLogging(loggingEnabled: Boolean)
 
   companion object {
@@ -1589,6 +1632,63 @@ interface CheckoutPlatformInterface {
                 reply.reply(wrapResult(data))
               }
             }
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.validateCardNumber", codec)
+        if (api != null) {
+          channel.setMessageHandler { message, reply ->
+            val args = message as List<Any?>
+            val cardNumberArg = args[0] as String
+            val enableLuhnCheckArg = args[1] as Boolean
+            var wrapped: List<Any?>
+            try {
+              wrapped = listOf<Any?>(api.validateCardNumber(cardNumberArg, enableLuhnCheckArg).raw)
+            } catch (exception: Throwable) {
+              wrapped = wrapError(exception)
+            }
+            reply.reply(wrapped)
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.validateCardExpiryDate", codec)
+        if (api != null) {
+          channel.setMessageHandler { message, reply ->
+            val args = message as List<Any?>
+            val expiryMonthArg = args[0] as String
+            val expiryYearArg = args[1] as String
+            var wrapped: List<Any?>
+            try {
+              wrapped = listOf<Any?>(api.validateCardExpiryDate(expiryMonthArg, expiryYearArg).raw)
+            } catch (exception: Throwable) {
+              wrapped = wrapError(exception)
+            }
+            reply.reply(wrapped)
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.validateCardSecurityCode", codec)
+        if (api != null) {
+          channel.setMessageHandler { message, reply ->
+            val args = message as List<Any?>
+            val securityCodeArg = args[0] as String
+            val cardBrandTxVariantArg = args[1] as String?
+            var wrapped: List<Any?>
+            try {
+              wrapped = listOf<Any?>(api.validateCardSecurityCode(securityCodeArg, cardBrandTxVariantArg).raw)
+            } catch (exception: Throwable) {
+              wrapped = wrapError(exception)
+            }
+            reply.reply(wrapped)
           }
         } else {
           channel.setMessageHandler(null)

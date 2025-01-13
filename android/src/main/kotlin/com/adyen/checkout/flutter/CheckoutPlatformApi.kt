@@ -1,6 +1,9 @@
 package com.adyen.checkout.flutter
 
 import CardComponentConfigurationDTO
+import CardExpiryDateValidationResultDTO
+import CardNumberValidationResultDTO
+import CardSecurityCodeValidationResultDTO
 import CheckoutPlatformInterface
 import DropInConfigurationDTO
 import EncryptedCardDTO
@@ -16,7 +19,8 @@ import com.adyen.checkout.components.core.PaymentMethodsApiResponse
 import com.adyen.checkout.components.core.internal.Configuration
 import com.adyen.checkout.core.AdyenLogger
 import com.adyen.checkout.core.internal.util.Logger.NONE
-import com.adyen.checkout.flutter.cse.AdyenCSE
+import com.adyen.checkout.flutter.apiOnly.AdyenCSE
+import com.adyen.checkout.flutter.apiOnly.CardValidation
 import com.adyen.checkout.flutter.session.SessionHolder
 import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToAnalyticsConfiguration
 import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToDropInConfiguration
@@ -36,8 +40,6 @@ class CheckoutPlatformApi(
     private val activity: FragmentActivity,
     private val sessionHolder: SessionHolder,
 ) : CheckoutPlatformInterface {
-    private val adyenCSE: AdyenCSE = AdyenCSE()
-
     override fun getReturnUrl(callback: (Result<String>) -> Unit) {
         callback(Result.success(RedirectComponent.getReturnUrl(activity.applicationContext)))
     }
@@ -73,7 +75,7 @@ class CheckoutPlatformApi(
         publicKey: String,
         callback: (Result<EncryptedCardDTO>) -> Unit
     ) {
-        val encryptedCardResult = adyenCSE.encryptCard(unencryptedCardDTO, publicKey)
+        val encryptedCardResult = AdyenCSE.encryptCard(unencryptedCardDTO, publicKey)
         callback(encryptedCardResult)
     }
 
@@ -82,9 +84,24 @@ class CheckoutPlatformApi(
         publicKey: String,
         callback: (Result<String>) -> Unit
     ) {
-        val encryptedBin = adyenCSE.encryptBin(bin, publicKey)
+        val encryptedBin = AdyenCSE.encryptBin(bin, publicKey)
         callback(encryptedBin)
     }
+
+    override fun validateCardNumber(
+        cardNumber: String,
+        enableLuhnCheck: Boolean
+    ): CardNumberValidationResultDTO = CardValidation.validateCardNumber(cardNumber, enableLuhnCheck)
+
+    override fun validateCardExpiryDate(
+        expiryMonth: String,
+        expiryYear: String
+    ): CardExpiryDateValidationResultDTO = CardValidation.validateCardExpiryDate(expiryMonth, expiryYear)
+
+    override fun validateCardSecurityCode(
+        securityCode: String,
+        cardBrandTxVariant: String?
+    ): CardSecurityCodeValidationResultDTO = CardValidation.validateCardSecurityCode(securityCode, cardBrandTxVariant)
 
     private fun determineSessionConfiguration(configuration: Any?): Configuration? {
         when (configuration) {

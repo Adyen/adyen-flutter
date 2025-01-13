@@ -1,3 +1,9 @@
+## 1.3.0 (NEXT RELEASE)
+
+### New
+
+- Added card validators (Card number validation, card expiry date validation, card security code validation). 
+
 ## 1.2.0
 
 ### New

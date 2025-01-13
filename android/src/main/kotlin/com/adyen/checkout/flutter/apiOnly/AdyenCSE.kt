@@ -1,4 +1,4 @@
-package com.adyen.checkout.flutter.cse
+package com.adyen.checkout.flutter.apiOnly
 
 import EncryptedCardDTO
 import UnencryptedCardDTO
@@ -7,7 +7,7 @@ import com.adyen.checkout.flutter.utils.ConfigurationMapper.fromDTO
 import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToEncryptedCardDTO
 import java.lang.Exception
 
-internal class AdyenCSE {
+internal object AdyenCSE {
     fun encryptCard(
         unencryptedCardDTO: UnencryptedCardDTO,
         publicKey: String,

@@ -138,6 +138,28 @@ enum ApplePaySummaryItemType: Int {
     case definite = 1
 }
 
+enum CardNumberValidationResultDTO: Int {
+    case valid = 0
+    case invalidIllegalCharacters = 1
+    case invalidLuhnCheck = 2
+    case invalidTooShort = 3
+    case invalidTooLong = 4
+    case invalidOtherReason = 5
+}
+
+enum CardExpiryDateValidationResultDTO: Int {
+    case valid = 0
+    case invalidTooFarInTheFuture = 1
+    case invalidTooOld = 2
+    case nonParseableDate = 3
+    case invalidOtherReason = 4
+}
+
+enum CardSecurityCodeValidationResultDTO: Int {
+    case valid = 0
+    case invalid = 1
+}
+
 /// Generated class from Pigeon that represents data sent in messages.
 struct SessionDTO {
     var id: String
@@ -1446,6 +1468,9 @@ protocol CheckoutPlatformInterface {
     func clearSession() throws
     func encryptCard(unencryptedCardDTO: UnencryptedCardDTO, publicKey: String, completion: @escaping (Result<EncryptedCardDTO, Error>) -> Void)
     func encryptBin(bin: String, publicKey: String, completion: @escaping (Result<String, Error>) -> Void)
+    func validateCardNumber(cardNumber: String, enableLuhnCheck: Bool) throws -> CardNumberValidationResultDTO
+    func validateCardExpiryDate(expiryMonth: String, expiryYear: String) throws -> CardExpiryDateValidationResultDTO
+    func validateCardSecurityCode(securityCode: String, cardBrandTxVariant: String?) throws -> CardSecurityCodeValidationResultDTO
     func enableConsoleLogging(loggingEnabled: Bool) throws
 }
 
@@ -1537,6 +1562,54 @@ class CheckoutPlatformInterfaceSetup {
             }
         } else {
             encryptBinChannel.setMessageHandler(nil)
+        }
+        let validateCardNumberChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.validateCardNumber", binaryMessenger: binaryMessenger, codec: codec)
+        if let api {
+            validateCardNumberChannel.setMessageHandler { message, reply in
+                let args = message as! [Any?]
+                let cardNumberArg = args[0] as! String
+                let enableLuhnCheckArg = args[1] as! Bool
+                do {
+                    let result = try api.validateCardNumber(cardNumber: cardNumberArg, enableLuhnCheck: enableLuhnCheckArg)
+                    reply(wrapResult(result.rawValue))
+                } catch {
+                    reply(wrapError(error))
+                }
+            }
+        } else {
+            validateCardNumberChannel.setMessageHandler(nil)
+        }
+        let validateCardExpiryDateChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.validateCardExpiryDate", binaryMessenger: binaryMessenger, codec: codec)
+        if let api {
+            validateCardExpiryDateChannel.setMessageHandler { message, reply in
+                let args = message as! [Any?]
+                let expiryMonthArg = args[0] as! String
+                let expiryYearArg = args[1] as! String
+                do {
+                    let result = try api.validateCardExpiryDate(expiryMonth: expiryMonthArg, expiryYear: expiryYearArg)
+                    reply(wrapResult(result.rawValue))
+                } catch {
+                    reply(wrapError(error))
+                }
+            }
+        } else {
+            validateCardExpiryDateChannel.setMessageHandler(nil)
+        }
+        let validateCardSecurityCodeChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.validateCardSecurityCode", binaryMessenger: binaryMessenger, codec: codec)
+        if let api {
+            validateCardSecurityCodeChannel.setMessageHandler { message, reply in
+                let args = message as! [Any?]
+                let securityCodeArg = args[0] as! String
+                let cardBrandTxVariantArg: String? = nilOrValue(args[1])
+                do {
+                    let result = try api.validateCardSecurityCode(securityCode: securityCodeArg, cardBrandTxVariant: cardBrandTxVariantArg)
+                    reply(wrapResult(result.rawValue))
+                } catch {
+                    reply(wrapError(error))
+                }
+            }
+        } else {
+            validateCardSecurityCodeChannel.setMessageHandler(nil)
         }
         let enableConsoleLoggingChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.enableConsoleLogging", binaryMessenger: binaryMessenger, codec: codec)
         if let api {

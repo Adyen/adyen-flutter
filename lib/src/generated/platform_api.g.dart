@@ -121,6 +121,28 @@ enum ApplePaySummaryItemType {
   definite,
 }
 
+enum CardNumberValidationResultDTO {
+  valid,
+  invalidIllegalCharacters,
+  invalidLuhnCheck,
+  invalidTooShort,
+  invalidTooLong,
+  invalidOtherReason,
+}
+
+enum CardExpiryDateValidationResultDTO {
+  valid,
+  invalidTooFarInTheFuture,
+  invalidTooOld,
+  nonParseableDate,
+  invalidOtherReason,
+}
+
+enum CardSecurityCodeValidationResultDTO {
+  valid,
+  invalid,
+}
+
 class SessionDTO {
   SessionDTO({
     required this.id,
@@ -1726,6 +1748,99 @@ class CheckoutPlatformInterface {
       );
     } else {
       return (__pigeon_replyList[0] as String?)!;
+    }
+  }
+
+  Future<CardNumberValidationResultDTO> validateCardNumber(
+      String cardNumber, bool enableLuhnCheck) async {
+    const String __pigeon_channelName =
+        'dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.validateCardNumber';
+    final BasicMessageChannel<Object?> __pigeon_channel =
+        BasicMessageChannel<Object?>(
+      __pigeon_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: __pigeon_binaryMessenger,
+    );
+    final List<Object?>? __pigeon_replyList = await __pigeon_channel
+        .send(<Object?>[cardNumber, enableLuhnCheck]) as List<Object?>?;
+    if (__pigeon_replyList == null) {
+      throw _createConnectionError(__pigeon_channelName);
+    } else if (__pigeon_replyList.length > 1) {
+      throw PlatformException(
+        code: __pigeon_replyList[0]! as String,
+        message: __pigeon_replyList[1] as String?,
+        details: __pigeon_replyList[2],
+      );
+    } else if (__pigeon_replyList[0] == null) {
+      throw PlatformException(
+        code: 'null-error',
+        message: 'Host platform returned null value for non-null return value.',
+      );
+    } else {
+      return CardNumberValidationResultDTO
+          .values[__pigeon_replyList[0]! as int];
+    }
+  }
+
+  Future<CardExpiryDateValidationResultDTO> validateCardExpiryDate(
+      String expiryMonth, String expiryYear) async {
+    const String __pigeon_channelName =
+        'dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.validateCardExpiryDate';
+    final BasicMessageChannel<Object?> __pigeon_channel =
+        BasicMessageChannel<Object?>(
+      __pigeon_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: __pigeon_binaryMessenger,
+    );
+    final List<Object?>? __pigeon_replyList = await __pigeon_channel
+        .send(<Object?>[expiryMonth, expiryYear]) as List<Object?>?;
+    if (__pigeon_replyList == null) {
+      throw _createConnectionError(__pigeon_channelName);
+    } else if (__pigeon_replyList.length > 1) {
+      throw PlatformException(
+        code: __pigeon_replyList[0]! as String,
+        message: __pigeon_replyList[1] as String?,
+        details: __pigeon_replyList[2],
+      );
+    } else if (__pigeon_replyList[0] == null) {
+      throw PlatformException(
+        code: 'null-error',
+        message: 'Host platform returned null value for non-null return value.',
+      );
+    } else {
+      return CardExpiryDateValidationResultDTO
+          .values[__pigeon_replyList[0]! as int];
+    }
+  }
+
+  Future<CardSecurityCodeValidationResultDTO> validateCardSecurityCode(
+      String securityCode, String? cardBrandTxVariant) async {
+    const String __pigeon_channelName =
+        'dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.validateCardSecurityCode';
+    final BasicMessageChannel<Object?> __pigeon_channel =
+        BasicMessageChannel<Object?>(
+      __pigeon_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: __pigeon_binaryMessenger,
+    );
+    final List<Object?>? __pigeon_replyList = await __pigeon_channel
+        .send(<Object?>[securityCode, cardBrandTxVariant]) as List<Object?>?;
+    if (__pigeon_replyList == null) {
+      throw _createConnectionError(__pigeon_channelName);
+    } else if (__pigeon_replyList.length > 1) {
+      throw PlatformException(
+        code: __pigeon_replyList[0]! as String,
+        message: __pigeon_replyList[1] as String?,
+        details: __pigeon_replyList[2],
+      );
+    } else if (__pigeon_replyList[0] == null) {
+      throw PlatformException(
+        code: 'null-error',
+        message: 'Host platform returned null value for non-null return value.',
+      );
+    } else {
+      return CardSecurityCodeValidationResultDTO
+          .values[__pigeon_replyList[0]! as int];
     }
   }
 
