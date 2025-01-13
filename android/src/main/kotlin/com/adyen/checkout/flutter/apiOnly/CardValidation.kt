@@ -13,7 +13,7 @@ import com.adyen.checkout.core.ui.validation.CardSecurityCodeValidationResult
 import com.adyen.checkout.core.ui.validation.CardSecurityCodeValidator
 
 internal object CardValidation {
-    internal fun validateCardNumber(
+    fun validateCardNumber(
         cardNumber: String,
         enableLuhnCheck: Boolean
     ): CardNumberValidationResultDTO {
@@ -30,7 +30,7 @@ internal object CardValidation {
         }
     }
 
-    internal fun validateCardExpiryDate(
+    fun validateCardExpiryDate(
         expiryMonth: String,
         expiryYear: String
     ): CardExpiryDateValidationResultDTO {
@@ -49,7 +49,7 @@ internal object CardValidation {
         }
     }
 
-    internal fun validateCardSecurityCode(
+    fun validateCardSecurityCode(
         securityCode: String,
         cardBrandTxVariant: String?
     ): CardSecurityCodeValidationResultDTO {

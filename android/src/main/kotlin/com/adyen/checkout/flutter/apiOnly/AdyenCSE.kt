@@ -8,7 +8,7 @@ import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToEncryptedCardDT
 import java.lang.Exception
 
 internal object AdyenCSE {
-    internal fun encryptCard(
+    fun encryptCard(
         unencryptedCardDTO: UnencryptedCardDTO,
         publicKey: String,
     ): Result<EncryptedCardDTO> {
@@ -22,7 +22,7 @@ internal object AdyenCSE {
         }
     }
 
-    internal fun encryptBin(
+    fun encryptBin(
         bin: String,
         publicKey: String,
     ): Result<String> {
