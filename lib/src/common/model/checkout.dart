@@ -1,3 +1,4 @@
+import 'package:adyen_checkout/src/common/model/card_callbacks/card_callbacks.dart';
 import 'package:adyen_checkout/src/common/model/partial_payment/partial_payment.dart';
 import 'package:adyen_checkout/src/common/model/payment_event.dart';
 
@@ -26,9 +27,12 @@ class AdvancedCheckout extends Checkout {
 
   PartialPayment? partialPayment;
 
+  CardCallbacks? cardCallbacks;
+
   AdvancedCheckout({
     required this.onSubmit,
     required this.onAdditionalDetails,
     this.partialPayment,
+    this.cardCallbacks,
   });
 }

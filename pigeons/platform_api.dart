@@ -61,6 +61,7 @@ enum PlatformCommunicationType {
   balanceCheck,
   requestOrder,
   cancelOrder,
+  binLookup
 }
 
 enum ComponentCommunicationType {

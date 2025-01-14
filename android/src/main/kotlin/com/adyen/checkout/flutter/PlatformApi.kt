@@ -136,7 +136,8 @@ enum class PlatformCommunicationType(val raw: Int) {
   DELETESTOREDPAYMENTMETHOD(3),
   BALANCECHECK(4),
   REQUESTORDER(5),
-  CANCELORDER(6);
+  CANCELORDER(6),
+  BINLOOKUP(7);
 
   companion object {
     fun ofRaw(raw: Int): PlatformCommunicationType? {

@@ -80,6 +80,9 @@ class DropInScreen extends StatelessWidget {
           onRequestOrder: repository.onRequestOrder,
           onCancelOrder: repository.onCancelOrder,
         ),
+        cardCallbacks: CardCallbacks(
+          onBinLookup: _onBinLookup,
+        ),
       );
 
       final paymentResult = await AdyenCheckout.advanced.startDropIn(
@@ -143,5 +146,12 @@ class DropInScreen extends StatelessWidget {
     );
 
     return dropInConfiguration;
+  }
+
+  void _onBinLookup(List<BinLookupData> binLookupData) {
+    for (var element in binLookupData) {
+      debugPrint(
+          "Bin lookup data: brand:${element.brand}, isReliable:${element.isReliable}, paymentMethodVariant:${element.paymentMethodVariant}");
+    }
   }
 }

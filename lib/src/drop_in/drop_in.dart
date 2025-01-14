@@ -127,6 +127,8 @@ class DropIn {
           _handleOrderRequest(event, advancedCheckout.partialPayment);
         case PlatformCommunicationType.cancelOrder:
           _handleOrderCancel(event, advancedCheckout.partialPayment);
+        case PlatformCommunicationType.binLookup:
+          _handleOnBinLookup(event, advancedCheckout.cardCallbacks);
       }
     });
 
@@ -331,5 +333,31 @@ class DropIn {
       dropInPlatformApi.onOrderCancelResult(
           OrderCancelResultDTO(orderCancelResponseBody: {}));
     }
+  }
+
+  void _handleOnBinLookup(
+    PlatformCommunicationModel event,
+    CardCallbacks? cardCallbacks,
+  ) {
+    if (cardCallbacks == null || cardCallbacks.onBinLookup == null) {
+      adyenLogger.print("onBinLookup callback not provided");
+      return;
+    }
+
+    final encodedBinLookupData = event.data;
+    if (encodedBinLookupData == null) {
+      adyenLogger.print("bin lookup data is null");
+      return;
+    }
+
+    final List<dynamic> binLookupDataJson = jsonDecode(encodedBinLookupData);
+    final List<BinLookupData> binLookupDataList = binLookupDataJson
+        .map((entry) => BinLookupData(
+              brand: entry['brand'],
+              paymentMethodVariant: entry['paymentMethodVariant'],
+              isReliable: entry['isReliable'],
+            ))
+        .toList();
+    cardCallbacks.onBinLookup?.call(binLookupDataList);
   }
 }

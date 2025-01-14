@@ -46,17 +46,24 @@ import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToEnvironment
 import com.adyen.checkout.sessions.core.CheckoutSession
 import com.adyen.checkout.sessions.core.SessionSetupResponse
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
 
-class DropInPlatformApi(
+internal class DropInPlatformApi(
     private val dropInFlutterApi: DropInFlutterInterface,
     private val activity: FragmentActivity,
     private val sessionHolder: SessionHolder,
 ) : DropInPlatformInterface {
     lateinit var dropInSessionLauncher: ActivityResultLauncher<SessionDropInResultContractParams>
     lateinit var dropInAdvancedFlowLauncher: ActivityResultLauncher<DropInResultContractParams>
+    private var dropInPlatformMessengerJob : Job? = null
+
+    companion object {
+        val dropInPlatformMessageFlow = MutableSharedFlow<PlatformCommunicationModel>()
+    }
 
     override fun showDropInSession(dropInConfigurationDTO: DropInConfigurationDTO) {
         setStoredPaymentMethodDeletionObserver()
@@ -85,6 +92,14 @@ class DropInPlatformApi(
         setBalanceCheckPlatformMessengerObserver()
         setOrderRequestPlatformMessengerObserver()
         setOrderCancelPlatformMessengerObserver()
+
+        dropInPlatformMessengerJob?.cancel()
+        dropInPlatformMessengerJob = activity.lifecycleScope.launch {
+            dropInPlatformMessageFlow.collect { platformCommunicationModel ->
+                dropInFlutterApi.onDropInAdvancedPlatformCommunication(platformCommunicationModel) {}
+            }
+        }
+
         activity.lifecycleScope.launch(Dispatchers.IO) {
             val paymentMethodsApiResponse =
                 PaymentMethodsApiResponse.SERIALIZER.deserialize(
@@ -139,6 +154,8 @@ class DropInPlatformApi(
     }
 
     override fun cleanUpDropIn() {
+        dropInPlatformMessengerJob?.cancel()
+
         DropInServiceResultMessenger.instance().removeObservers(activity)
         DropInAdditionalDetailsPlatformMessenger.instance().removeObservers(activity)
         DropInPaymentMethodDeletionPlatformMessenger.instance().removeObservers(activity)
@@ -315,15 +332,15 @@ class DropInPlatformApi(
                         PaymentResultDTO(
                             PaymentResultEnum.FINISHED,
                             result =
-                                with(sessionDropInResult.result) {
-                                    PaymentResultModelDTO(
-                                        sessionId,
-                                        sessionData,
-                                        sessionResult,
-                                        resultCode,
-                                        order?.mapToOrderResponseModel()
-                                    )
-                                }
+                            with(sessionDropInResult.result) {
+                                PaymentResultModelDTO(
+                                    sessionId,
+                                    sessionData,
+                                    sessionResult,
+                                    resultCode,
+                                    order?.mapToOrderResponseModel()
+                                )
+                            }
                         )
                 }
 
@@ -360,9 +377,9 @@ class DropInPlatformApi(
                         PaymentResultDTO(
                             PaymentResultEnum.FINISHED,
                             result =
-                                PaymentResultModelDTO(
-                                    resultCode = dropInAdvancedFlowResult.result
-                                )
+                            PaymentResultModelDTO(
+                                resultCode = dropInAdvancedFlowResult.result
+                            )
                         )
                 }
 
