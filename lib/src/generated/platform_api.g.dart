@@ -76,6 +76,7 @@ enum PlatformCommunicationType {
   requestOrder,
   cancelOrder,
   binLookup,
+  binValue,
 }
 
 enum ComponentCommunicationType {

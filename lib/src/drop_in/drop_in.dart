@@ -129,6 +129,8 @@ class DropIn {
           _handleOrderCancel(event, advancedCheckout.partialPayment);
         case PlatformCommunicationType.binLookup:
           _handleOnBinLookup(event, advancedCheckout.cardCallbacks);
+        case PlatformCommunicationType.binValue:
+          _handleOnBinValue(event, advancedCheckout.cardCallbacks);
       }
     });
 
@@ -340,13 +342,13 @@ class DropIn {
     CardCallbacks? cardCallbacks,
   ) {
     if (cardCallbacks == null || cardCallbacks.onBinLookup == null) {
-      adyenLogger.print("onBinLookup callback not provided");
+      adyenLogger.print("onBinLookup callback not provided.");
       return;
     }
 
     final encodedBinLookupData = event.data;
     if (encodedBinLookupData == null) {
-      adyenLogger.print("bin lookup data is null");
+      adyenLogger.print("BinLookup data is null.");
       return;
     }
 
@@ -359,5 +361,23 @@ class DropIn {
             ))
         .toList();
     cardCallbacks.onBinLookup?.call(binLookupDataList);
+  }
+
+  void _handleOnBinValue(
+    PlatformCommunicationModel event,
+    CardCallbacks? cardCallbacks,
+  ) {
+    if (cardCallbacks == null || cardCallbacks.onBinValue == null) {
+      adyenLogger.print("onBinValue callback not provided.");
+      return;
+    }
+
+    final binValue = event.data;
+    if (binValue == null) {
+      adyenLogger.print("BinValue is null.");
+      return;
+    }
+
+    cardCallbacks.onBinValue?.call(binValue);
   }
 }

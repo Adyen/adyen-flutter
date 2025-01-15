@@ -137,7 +137,8 @@ enum class PlatformCommunicationType(val raw: Int) {
   BALANCECHECK(4),
   REQUESTORDER(5),
   CANCELORDER(6),
-  BINLOOKUP(7);
+  BINLOOKUP(7),
+  BINVALUE(8);
 
   companion object {
     fun ofRaw(raw: Int): PlatformCommunicationType? {

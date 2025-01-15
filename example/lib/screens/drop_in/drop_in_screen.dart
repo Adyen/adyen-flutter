@@ -82,6 +82,7 @@ class DropInScreen extends StatelessWidget {
         ),
         cardCallbacks: CardCallbacks(
           onBinLookup: _onBinLookup,
+          onBinValue: _onBinValue,
         ),
       );
 
@@ -153,5 +154,9 @@ class DropInScreen extends StatelessWidget {
       debugPrint(
           "Bin lookup data: brand:${element.brand}, isReliable:${element.isReliable}, paymentMethodVariant:${element.paymentMethodVariant}");
     }
+  }
+
+  void _onBinValue(String binValue) {
+    debugPrint("Bin value is: $binValue");
   }
 }

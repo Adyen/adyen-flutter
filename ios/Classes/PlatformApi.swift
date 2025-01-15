@@ -94,6 +94,7 @@ enum PlatformCommunicationType: Int {
   case requestOrder = 5
   case cancelOrder = 6
   case binLookup = 7
+  case binValue = 8
 }
 
 enum ComponentCommunicationType: Int {

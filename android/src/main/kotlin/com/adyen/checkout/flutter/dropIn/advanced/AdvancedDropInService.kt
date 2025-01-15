@@ -121,6 +121,16 @@ class AdvancedDropInService : DropInService(), LifecycleOwner {
         }
     }
 
+    override fun onBinValue(binValue: String) {
+        lifecycleScope.launch {
+            val platformCommunicationModel = PlatformCommunicationModel(
+                PlatformCommunicationType.BINVALUE,
+                data = binValue
+            )
+            DropInPlatformApi.dropInPlatformMessageFlow.emit(platformCommunicationModel)
+        }
+    }
+
     private fun onPaymentComponentState(state: PaymentComponentState<*>) {
         try {
             setAdvancedFlowDropInServiceObserver()
