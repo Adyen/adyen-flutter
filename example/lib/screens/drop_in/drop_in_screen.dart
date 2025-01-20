@@ -152,11 +152,10 @@ class DropInScreen extends StatelessWidget {
   void _onBinLookup(List<BinLookupData> binLookupData) {
     for (var element in binLookupData) {
       debugPrint(
-          "Bin lookup data: brand:${element.brand}, isReliable:${element.isReliable}, paymentMethodVariant:${element.paymentMethodVariant}");
+          "Bin lookup data: brand:${element.brand}");
     }
   }
 
   void _onBinValue(String binValue) {
-    debugPrint("Bin value is: $binValue");
   }
 }

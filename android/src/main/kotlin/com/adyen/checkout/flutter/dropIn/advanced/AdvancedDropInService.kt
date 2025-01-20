@@ -37,7 +37,6 @@ import com.adyen.checkout.flutter.utils.Constants
 import com.adyen.checkout.flutter.utils.Constants.Companion.ADYEN_LOG_TAG
 import com.adyen.checkout.googlepay.GooglePayComponentState
 import kotlinx.coroutines.launch
-import org.json.JSONException
 import org.json.JSONObject
 
 class AdvancedDropInService : DropInService(), LifecycleOwner {
@@ -110,10 +109,11 @@ class AdvancedDropInService : DropInService(), LifecycleOwner {
     override fun onBinLookup(data: List<BinLookupData>) {
         lifecycleScope.launch {
             try {
-                val platformCommunicationModel = PlatformCommunicationModel(
-                    PlatformCommunicationType.BINLOOKUP,
-                    data = data.toJson()
-                )
+                val platformCommunicationModel =
+                    PlatformCommunicationModel(
+                        PlatformCommunicationType.BINLOOKUP,
+                        data = data.toJson()
+                    )
                 DropInPlatformApi.dropInPlatformMessageFlow.emit(platformCommunicationModel)
             } catch (exception: Exception) {
                 Log.d(ADYEN_LOG_TAG, "BinLookupData parsing failed: ${exception.message}")
@@ -123,10 +123,11 @@ class AdvancedDropInService : DropInService(), LifecycleOwner {
 
     override fun onBinValue(binValue: String) {
         lifecycleScope.launch {
-            val platformCommunicationModel = PlatformCommunicationModel(
-                PlatformCommunicationType.BINVALUE,
-                data = binValue
-            )
+            val platformCommunicationModel =
+                PlatformCommunicationModel(
+                    PlatformCommunicationType.BINVALUE,
+                    data = binValue
+                )
             DropInPlatformApi.dropInPlatformMessageFlow.emit(platformCommunicationModel)
         }
     }

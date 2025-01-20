@@ -97,6 +97,7 @@ class DropInPlatformApi: DropInPlatformInterface {
             dropInAdvancedFlowDelegate = DropInAdvancedFlowDelegate(dropInFlutterApi: dropInFlutterApi)
             dropInAdvancedFlowDelegate?.dropInInteractorDelegate = self
             dropInComponent.delegate = dropInAdvancedFlowDelegate
+            dropInComponent.cardComponentDelegate = self
             if dropInConfigurationDTO.isPartialPaymentSupported {
                 dropInComponent.partialPaymentDelegate = self
             }
@@ -378,4 +379,33 @@ extension DropInPlatformApi: PartialPaymentDelegate {
         }
     }
 
+}
+
+extension DropInPlatformApi : CardComponentDelegate {
+    func didSubmit(lastFour: String, finalBIN: String, component: Adyen.CardComponent) {}
+    
+    func didChangeBIN(_ value: String, component: Adyen.CardComponent) {
+        let platformCommunicationModel = PlatformCommunicationModel(type: PlatformCommunicationType.binValue, data: value)
+        dropInFlutterApi.onDropInAdvancedPlatformCommunication(platformCommunicationModel: platformCommunicationModel, completion: { _ in })
+    }
+    
+    func didChangeCardBrand(_ value: [Adyen.CardBrand]?, component: Adyen.CardComponent) {
+        do {
+            guard let binLookupData = value else {
+                return
+            }
+            var binLookupDataList: [[String: Any]] = []
+            for item in binLookupData {
+                var jsonObject: [String: Any] = [:]
+                jsonObject[Constants.brandKey] = item.type.rawValue
+                binLookupDataList.append(jsonObject)
+            }
+            
+            let data = try JSONSerialization.data(withJSONObject: binLookupDataList, options: [])
+            let platformCommunicationModel = PlatformCommunicationModel(type: PlatformCommunicationType.binLookup, data: String(data: data, encoding: .utf8))
+            dropInFlutterApi.onDropInAdvancedPlatformCommunication(platformCommunicationModel: platformCommunicationModel, completion: { _ in })
+        } catch {
+            
+        }
+    }
 }

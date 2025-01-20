@@ -354,11 +354,7 @@ class DropIn {
 
     final List<dynamic> binLookupDataJson = jsonDecode(encodedBinLookupData);
     final List<BinLookupData> binLookupDataList = binLookupDataJson
-        .map((entry) => BinLookupData(
-              brand: entry['brand'],
-              paymentMethodVariant: entry['paymentMethodVariant'],
-              isReliable: entry['isReliable'],
-            ))
+        .map((entry) => BinLookupData(brand: entry['brand']))
         .toList();
     cardCallbacks.onBinLookup?.call(binLookupDataList);
   }

@@ -59,7 +59,7 @@ internal class DropInPlatformApi(
 ) : DropInPlatformInterface {
     lateinit var dropInSessionLauncher: ActivityResultLauncher<SessionDropInResultContractParams>
     lateinit var dropInAdvancedFlowLauncher: ActivityResultLauncher<DropInResultContractParams>
-    private var dropInPlatformMessengerJob : Job? = null
+    private var dropInPlatformMessengerJob: Job? = null
 
     companion object {
         val dropInPlatformMessageFlow = MutableSharedFlow<PlatformCommunicationModel>()
@@ -94,11 +94,12 @@ internal class DropInPlatformApi(
         setOrderCancelPlatformMessengerObserver()
 
         dropInPlatformMessengerJob?.cancel()
-        dropInPlatformMessengerJob = activity.lifecycleScope.launch {
-            dropInPlatformMessageFlow.collect { platformCommunicationModel ->
-                dropInFlutterApi.onDropInAdvancedPlatformCommunication(platformCommunicationModel) {}
+        dropInPlatformMessengerJob =
+            activity.lifecycleScope.launch {
+                dropInPlatformMessageFlow.collect { platformCommunicationModel ->
+                    dropInFlutterApi.onDropInAdvancedPlatformCommunication(platformCommunicationModel) {}
+                }
             }
-        }
 
         activity.lifecycleScope.launch(Dispatchers.IO) {
             val paymentMethodsApiResponse =
@@ -332,15 +333,15 @@ internal class DropInPlatformApi(
                         PaymentResultDTO(
                             PaymentResultEnum.FINISHED,
                             result =
-                            with(sessionDropInResult.result) {
-                                PaymentResultModelDTO(
-                                    sessionId,
-                                    sessionData,
-                                    sessionResult,
-                                    resultCode,
-                                    order?.mapToOrderResponseModel()
-                                )
-                            }
+                                with(sessionDropInResult.result) {
+                                    PaymentResultModelDTO(
+                                        sessionId,
+                                        sessionData,
+                                        sessionResult,
+                                        resultCode,
+                                        order?.mapToOrderResponseModel()
+                                    )
+                                }
                         )
                 }
 
@@ -377,9 +378,9 @@ internal class DropInPlatformApi(
                         PaymentResultDTO(
                             PaymentResultEnum.FINISHED,
                             result =
-                            PaymentResultModelDTO(
-                                resultCode = dropInAdvancedFlowResult.result
-                            )
+                                PaymentResultModelDTO(
+                                    resultCode = dropInAdvancedFlowResult.result
+                                )
                         )
                 }
 
