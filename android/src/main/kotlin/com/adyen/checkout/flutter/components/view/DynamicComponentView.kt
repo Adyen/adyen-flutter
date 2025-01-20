@@ -9,6 +9,8 @@ import android.view.ViewGroup
 import android.view.ViewTreeObserver
 import android.widget.FrameLayout
 import androidx.activity.ComponentActivity
+import androidx.appcompat.widget.SwitchCompat
+import androidx.core.content.ContextCompat
 import androidx.core.view.children
 import androidx.core.view.postDelayed
 import com.adyen.checkout.card.CardComponent
@@ -104,6 +106,11 @@ class DynamicComponentView
 
         private fun overrideSubmit(component: CardComponent) {
             val payButton = findViewById<MaterialButton>(com.adyen.checkout.ui.core.R.id.payButton)
+            if (android.os.Build.VERSION.SDK_INT <= android.os.Build.VERSION_CODES.O) {
+                disableRippleDrawableAnimation()
+                disableRippleOnStorePaymentMethodSwitch()
+            }
+
             payButton?.setOnClickListener {
                 isHintAnimationEnabledOnTextInputFields(this, false)
                 ignoreLayoutChanges = true
@@ -119,6 +126,35 @@ class DynamicComponentView
                     ignoreLayoutChanges = false
                     isHintAnimationEnabledOnTextInputFields(this, true)
                 }
+            }
+        }
+
+        // This is necessary because the RippleAnimation leads to an crash on older Android devices: https://github.com/Adyen/adyen-flutter/issues/335
+        private fun disableRippleDrawableAnimation() {
+            findViewById<MaterialButton>(com.adyen.checkout.ui.core.R.id.payButton)?.let { payButton ->
+                payButton.backgroundTintList = null
+                payButton.background =
+                    ContextCompat.getDrawable(
+                        context,
+                        com.adyen.checkout.flutter.R.drawable.adyen_legacy_pay_button_background
+                    )
+            }
+
+            val buttonContainer = findViewById<FrameLayout>(com.adyen.checkout.ui.core.R.id.frameLayout_buttonContainer)
+            val standardQuarterMargin =
+                resources.getDimension(com.adyen.checkout.ui.core.R.dimen.standard_quarter_margin).toInt()
+            buttonContainer.setPadding(0, standardQuarterMargin, 0, standardQuarterMargin)
+        }
+
+        // This is necessary because the RippleAnimation leads to an crash on older Android devices: https://github.com/Adyen/adyen-flutter/issues/335
+        private fun disableRippleOnStorePaymentMethodSwitch() {
+            findViewById<SwitchCompat>(com.adyen.checkout.card.R.id.switch_storePaymentMethod)?.let { switch ->
+                switch.backgroundTintList = null
+                switch.background =
+                    ContextCompat.getDrawable(
+                        context,
+                        com.adyen.checkout.flutter.R.drawable.adyen_legacy_switch_background
+                    )
             }
         }
 
