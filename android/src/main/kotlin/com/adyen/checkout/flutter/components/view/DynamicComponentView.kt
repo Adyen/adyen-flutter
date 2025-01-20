@@ -107,8 +107,8 @@ class DynamicComponentView
         private fun overrideSubmit(component: CardComponent) {
             val payButton = findViewById<MaterialButton>(com.adyen.checkout.ui.core.R.id.payButton)
             if (android.os.Build.VERSION.SDK_INT <= android.os.Build.VERSION_CODES.O) {
-                disableRippleDrawableAnimation()
-                disableRippleOnStorePaymentMethodSwitch()
+                disableRippleAnimationOnPayButton()
+                disableRippleAnimationOnStorePaymentMethodSwitch()
             }
 
             payButton?.setOnClickListener {
@@ -130,7 +130,7 @@ class DynamicComponentView
         }
 
         // This is necessary because the RippleAnimation leads to an crash on older Android devices: https://github.com/Adyen/adyen-flutter/issues/335
-        private fun disableRippleDrawableAnimation() {
+        private fun disableRippleAnimationOnPayButton() {
             findViewById<MaterialButton>(com.adyen.checkout.ui.core.R.id.payButton)?.let { payButton ->
                 payButton.backgroundTintList = null
                 payButton.background =
@@ -147,7 +147,7 @@ class DynamicComponentView
         }
 
         // This is necessary because the RippleAnimation leads to an crash on older Android devices: https://github.com/Adyen/adyen-flutter/issues/335
-        private fun disableRippleOnStorePaymentMethodSwitch() {
+        private fun disableRippleAnimationOnStorePaymentMethodSwitch() {
             findViewById<SwitchCompat>(com.adyen.checkout.card.R.id.switch_storePaymentMethod)?.let { switch ->
                 switch.backgroundTintList = null
                 switch.background =
