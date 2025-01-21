@@ -140,10 +140,13 @@ class DynamicComponentView
                     )
             }
 
-            val buttonContainer = findViewById<FrameLayout>(com.adyen.checkout.ui.core.R.id.frameLayout_buttonContainer)
-            val standardQuarterMargin =
-                resources.getDimension(com.adyen.checkout.ui.core.R.dimen.standard_quarter_margin).toInt()
-            buttonContainer.setPadding(0, standardQuarterMargin, 0, standardQuarterMargin)
+            findViewById<FrameLayout>(
+                com.adyen.checkout.ui.core.R.id.frameLayout_buttonContainer
+            )?.let { buttonContainer ->
+                val standardQuarterMargin =
+                    resources.getDimension(com.adyen.checkout.ui.core.R.dimen.standard_quarter_margin).toInt()
+                buttonContainer.setPadding(0, standardQuarterMargin, 0, standardQuarterMargin)
+            }
         }
 
         // This is necessary because the RippleAnimation leads to an crash on older Android devices: https://github.com/Adyen/adyen-flutter/issues/335
