@@ -2,7 +2,10 @@
 
 ### New
 
-- Added card validators (Card number validation, card expiry date validation, card security code validation). 
+- Added card validators (Card number validation, card expiry date validation, card security code validation).
+
+### Improved
+- For card component, disabled ripple animations for Android 8 (API level 26) and older to prevent an animation crash with platform views.
 
 ## 1.2.0
 
