@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:adyen_checkout/adyen_checkout.dart';
 import 'package:adyen_checkout_example/config.dart';
-import 'package:adyen_checkout_example/network/models/session_response_network_model.dart';
 import 'package:adyen_checkout_example/repositories/adyen_drop_in_repository.dart';
 import 'package:adyen_checkout_example/utils/dialog_builder.dart';
 import 'package:flutter/material.dart';
@@ -42,15 +41,15 @@ class DropInScreen extends StatelessWidget {
 
   Future<void> startDropInSessions(BuildContext context) async {
     try {
-      final SessionResponseNetworkModel sessionResponse =
+      final Map<String, dynamic> sessionResponse =
           await repository.fetchSession();
       final DropInConfiguration dropInConfiguration =
           await _createDropInConfiguration();
 
       final SessionCheckout sessionCheckout =
           await AdyenCheckout.session.create(
-        sessionId: sessionResponse.id,
-        sessionData: sessionResponse.sessionData,
+        sessionId: sessionResponse["id"],
+        sessionData: sessionResponse["sessionData"],
         configuration: dropInConfiguration,
       );
 

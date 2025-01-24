@@ -36,7 +36,7 @@ class MultiComponentSessionScreen extends StatelessWidget {
       appBar: AppBar(title: const Text('Multi component session')),
       body: SafeArea(
         child: FutureBuilder<SessionCheckout>(
-            future: createSession(cardComponentConfiguration),
+            future: _getSessionCheckout(),
             builder: (
               BuildContext context,
               AsyncSnapshot<SessionCheckout> snapshot,
@@ -186,17 +186,8 @@ class MultiComponentSessionScreen extends StatelessWidget {
     );
   }
 
-  Future<SessionCheckout> createSession(
-      CardComponentConfiguration configuration) async {
-    final sessionResponse = await cardRepository.fetchSession();
-    final sessionCheckout = await AdyenCheckout.session.create(
-      sessionId: sessionResponse.id,
-      sessionData: sessionResponse.sessionData,
-      configuration: cardComponentConfiguration,
-    );
-
-    return sessionCheckout;
-  }
+  Future<SessionCheckout> _getSessionCheckout() async =>
+      await cardRepository.createSessionCheckout(cardComponentConfiguration);
 
   Map<String, dynamic> _extractApplePayPaymentMethod(
       Map<String, dynamic> paymentMethods) {

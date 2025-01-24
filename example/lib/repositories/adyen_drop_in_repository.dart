@@ -1,12 +1,7 @@
 import 'package:adyen_checkout/adyen_checkout.dart';
 import 'package:adyen_checkout_example/config.dart';
 import 'package:adyen_checkout_example/network/models/amount_network_model.dart';
-import 'package:adyen_checkout_example/network/models/billing_address.dart';
-import 'package:adyen_checkout_example/network/models/delivery_address.dart';
-import 'package:adyen_checkout_example/network/models/line_item.dart';
 import 'package:adyen_checkout_example/network/models/payment_request_network_model.dart';
-import 'package:adyen_checkout_example/network/models/session_request_network_model.dart';
-import 'package:adyen_checkout_example/network/models/session_response_network_model.dart';
 import 'package:adyen_checkout_example/repositories/adyen_base_repository.dart';
 
 class AdyenDropInRepository extends AdyenBaseRepository {
@@ -14,63 +9,57 @@ class AdyenDropInRepository extends AdyenBaseRepository {
 
   //A session should not being created from the mobile application.
   //Please provide a CheckoutSession object from your own backend.
-  Future<SessionResponseNetworkModel> fetchSession() async {
+  Future<Map<String, dynamic>> fetchSession() async {
     String returnUrl = await determineBaseReturnUrl();
-    SessionRequestNetworkModel sessionRequestNetworkModel =
-        SessionRequestNetworkModel(
-            merchantAccount: Config.merchantAccount,
-            amount: AmountNetworkModel(
-              currency: Config.amount.currency,
-              value: Config.amount.value,
-            ),
-            returnUrl: returnUrl,
-            reference:
-                "flutter-session-test_${DateTime.now().millisecondsSinceEpoch}",
-            countryCode: Config.countryCode,
-            shopperLocale: Config.shopperLocale,
-            shopperReference: Config.shopperReference,
-            storePaymentMethodMode:
-                StorePaymentMethodMode.disabled.storePaymentMethodModeString,
-            recurringProcessingModel:
-                RecurringProcessingModel.cardOnFile.recurringModelString,
-            shopperInteraction:
-                ShopperInteractionModel.ecommerce.shopperInteractionModelString,
-            channel: determineChannel(),
-            telephoneNumber: "+8613012345678",
-            dateOfBirth: "1996-09-04",
-            socialSecurityNumber: "0108",
-            deliveryAddress: DeliveryAddress(
-              city: "Ankeborg",
-              country: "SE",
-              houseNumberOrName: "1",
-              postalCode: "1234",
-              street: "Stargatan",
-            ),
-            billingAddress: BillingAddress(
-              city: "Ankeborg",
-              country: "SE",
-              houseNumberOrName: "1",
-              postalCode: "1234",
-              street: "Stargatan",
-            ),
-            lineItems: [
-          LineItem(
-            quantity: 1,
-            amountExcludingTax: 331,
-            taxPercentage: 2100,
-            description: "Shoes",
-            id: "Item #1",
-            taxAmount: 69,
-            amountIncludingTax: 400,
-            productUrl: "URL_TO_PURCHASED_ITEM",
-            imageUrl: "URL_TO_PICTURE_OF_PURCHASED_ITEM",
-          ),
-        ]);
+    Map<String, dynamic> sessionRequestBody = {
+      "merchantAccount": Config.merchantAccount,
+      "amount": {
+        "currency": Config.amount.currency,
+        "value": Config.amount.value,
+      },
+      "returnUrl": returnUrl,
+      "reference":
+          "flutter-session-test_${DateTime.now().millisecondsSinceEpoch}",
+      "countryCode": Config.countryCode,
+      "shopperLocale": Config.shopperLocale,
+      "shopperReference": Config.shopperReference,
+      "storePaymentMethodMode": "disabled",
+      "recurringProcessingModel": "CardOnFile",
+      "shopperInteraction": "Ecommerce",
+      "channel": determineChannel(),
+      "telephoneNumber": "+8613012345678",
+      "dateOfBirth": "1996-09-04",
+      "socialSecurityNumber": "0108",
+      "deliveryAddress": {
+        "city": "Ankeborg",
+        "country": "SE",
+        "houseNumberOrName": "1",
+        "postalCode": "1234",
+        "street": "Stargatan",
+      },
+      "billingAddress": {
+        "city": "Ankeborg",
+        "country": "SE",
+        "houseNumberOrName": "1",
+        "postalCode": "1234",
+        "street": "Stargatan",
+      },
+      "lineItems": [
+        {
+          "quantity": 1,
+          "amountExcludingTax": 331,
+          "taxPercentage": 2100,
+          "description": "Shoes",
+          "id": "Item #1",
+          "taxAmount": 69,
+          "amountIncludingTax": 400,
+          "productUrl": "URL_TO_PURCHASED_ITEM",
+          "imageUrl": "URL_TO_PICTURE_OF_PURCHASED_ITEM",
+        },
+      ],
+    };
 
-    return await service.createSession(
-      sessionRequestNetworkModel,
-      Config.environment,
-    );
+    return await service.createSession(sessionRequestBody);
   }
 
   Future<Map<String, dynamic>> fetchPaymentMethods({
@@ -111,7 +100,7 @@ class AdyenDropInRepository extends AdyenBaseRepository {
       ),
       countryCode: Config.countryCode,
       channel: determineChannel(),
-      recurringProcessingModel: RecurringProcessingModel.cardOnFile,
+      recurringProcessingModel: "CardOnFile",
       authenticationData: {
         "attemptAuthentication": "always",
         "threeDSRequestData": {

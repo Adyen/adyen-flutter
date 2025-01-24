@@ -1,6 +1,5 @@
 import 'package:adyen_checkout_example/network/models/amount_network_model.dart';
 import 'package:adyen_checkout_example/network/models/line_item.dart';
-import 'package:adyen_checkout_example/network/models/session_request_network_model.dart';
 
 class PaymentsRequestData {
   final String merchantAccount;
@@ -15,7 +14,7 @@ class PaymentsRequestData {
   final List<LineItem>? lineItems;
   final String? shopperEmail;
   final Map<String, dynamic>? threeDS2RequestData;
-  final RecurringProcessingModel? recurringProcessingModel;
+  final String? recurringProcessingModel;
   final String? shopperInteraction;
   final Map<String, dynamic>? authenticationData;
 
@@ -54,8 +53,7 @@ class PaymentsRequestData {
       if (threeDS2RequestData != null)
         "threeDS2RequestData": threeDS2RequestData,
       if (recurringProcessingModel != null)
-        "recurringProcessingModel":
-            recurringProcessingModel?.recurringModelString,
+        "recurringProcessingModel": recurringProcessingModel,
       if (shopperInteraction != null) "shopperInteraction": shopperInteraction,
       if (authenticationData != null) "authenticationData": authenticationData,
     };

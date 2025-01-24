@@ -2,8 +2,6 @@ import 'package:adyen_checkout/adyen_checkout.dart';
 import 'package:adyen_checkout_example/config.dart';
 import 'package:adyen_checkout_example/network/models/amount_network_model.dart';
 import 'package:adyen_checkout_example/network/models/payment_request_network_model.dart';
-import 'package:adyen_checkout_example/network/models/session_request_network_model.dart';
-import 'package:adyen_checkout_example/network/models/session_response_network_model.dart';
 import 'package:adyen_checkout_example/repositories/adyen_base_repository.dart';
 
 class AdyenGooglePayComponentRepository extends AdyenBaseRepository {
@@ -13,43 +11,39 @@ class AdyenGooglePayComponentRepository extends AdyenBaseRepository {
 
   Future<SessionCheckout> createSessionCheckout(
       GooglePayComponentConfiguration googlePayComponentConfiguration) async {
-    final sessionResponse = await fetchSession();
+    final sessionResponse = await _fetchSession();
     return await AdyenCheckout.session.create(
-      sessionId: sessionResponse.id,
-      sessionData: sessionResponse.sessionData,
+      sessionId: sessionResponse["id"],
+      sessionData: sessionResponse["sessionData"],
       configuration: googlePayComponentConfiguration,
     );
   }
 
-  Future<SessionResponseNetworkModel> fetchSession() async {
+  Future<Map<String, dynamic>> _fetchSession() async {
     String returnUrl = await determineBaseReturnUrl();
     returnUrl += "/adyenPayment";
-    SessionRequestNetworkModel sessionRequestNetworkModel =
-        SessionRequestNetworkModel(
-      merchantAccount: Config.merchantAccount,
-      amount: AmountNetworkModel(
-        currency: Config.amount.currency,
-        value: Config.amount.value,
-      ),
-      returnUrl: returnUrl,
-      reference:
+    Map<String, dynamic> sessionRequestBody = {
+      "merchantAccount": Config.merchantAccount,
+      "amount": {
+        "currency": Config.amount.currency,
+        "value": Config.amount.value,
+      },
+      "returnUrl": returnUrl,
+      "reference":
           "flutter-session-test_${DateTime.now().millisecondsSinceEpoch}",
-      countryCode: Config.countryCode,
-      shopperLocale: Config.shopperLocale,
-      shopperReference: Config.shopperReference,
-      channel: determineChannel(),
-      authenticationData: {
+      "countryCode": Config.countryCode,
+      "shopperLocale": Config.shopperLocale,
+      "shopperReference": Config.shopperReference,
+      "channel": determineChannel(),
+      "authenticationData": {
         "attemptAuthentication": "always",
         "threeDSRequestData": {
           "nativeThreeDS": "preferred",
         },
       },
-    );
+    };
 
-    return await service.createSession(
-      sessionRequestNetworkModel,
-      Config.environment,
-    );
+    return await service.createSession(sessionRequestBody);
   }
 
   Future<Map<String, dynamic>> fetchPaymentMethods() async {
@@ -78,9 +72,8 @@ class AdyenGooglePayComponentRepository extends AdyenBaseRepository {
       ),
       countryCode: Config.countryCode,
       channel: determineChannel(),
-      recurringProcessingModel: RecurringProcessingModel.cardOnFile,
-      shopperInteraction:
-          ShopperInteractionModel.ecommerce.shopperInteractionModelString,
+      recurringProcessingModel: "CardOnFile",
+      shopperInteraction: "Ecommerce",
       authenticationData: {
         "attemptAuthentication": "always",
         "threeDSRequestData": {

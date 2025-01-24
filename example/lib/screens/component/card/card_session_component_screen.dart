@@ -63,16 +63,8 @@ class CardSessionComponentScreen extends StatelessWidget {
     );
   }
 
-  Future<SessionCheckout> _getSessionCheckout() async {
-    final sessionResponse = await repository.fetchSession();
-    final sessionCheckout = await AdyenCheckout.session.create(
-      sessionId: sessionResponse.id,
-      sessionData: sessionResponse.sessionData,
-      configuration: cardComponentConfiguration,
-    );
-
-    return sessionCheckout;
-  }
+  Future<SessionCheckout> _getSessionCheckout() async =>
+      await repository.createSessionCheckout(cardComponentConfiguration);
 
   Map<String, dynamic> _extractPaymentMethod(
       Map<String, dynamic> paymentMethods) {
