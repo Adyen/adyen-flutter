@@ -3,6 +3,7 @@
 ### New
 
 - Added card validators (Card number validation, card expiry date validation, card security code validation).
+- Updated iOS Components/Drop-in version: [5.15.0](https://docs.adyen.com/online-payments/release-notes/?title%5B0%5D=iOS+Components%2FDrop-in#releaseNote=2025-01-07-ios-componentsdrop-in-5.15.0).
 
 ### Improved
 - For card component, disabled ripple animations for Android 8 (API level 26) and older to prevent an animation crash with platform views.
