@@ -56,7 +56,7 @@ class AdyenCheckoutApi implements CheckoutPlatformInterface {
   @override
   Future<CardSecurityCodeValidationResultDTO> validateCardSecurityCode(
     String securityCode,
-    String? cardBrandTxVariant,
+    String? cardBrand,
   ) =>
-      checkoutApi.validateCardSecurityCode(securityCode, cardBrandTxVariant);
+      checkoutApi.validateCardSecurityCode(securityCode, cardBrand);
 }
