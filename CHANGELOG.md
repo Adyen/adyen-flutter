@@ -4,6 +4,12 @@
 
 - Added card validators (Card number validation, card expiry date validation, card security code validation).
 - Updated iOS Components/Drop-in version: [5.15.0](https://docs.adyen.com/online-payments/release-notes/?title%5B0%5D=iOS+Components%2FDrop-in#releaseNote=2025-01-07-ios-componentsdrop-in-5.15.0).
+- Updated Android Components/Drop-in version: [5.9.0](https://docs.adyen.com/online-payments/release-notes/?title%5B0%5D=Android+Components%2FDrop-in#releaseNote=2025-01-17-android-componentsdrop-in-5.9.0).
+
+### Changed
+- For native 3D Secure 2, when a shopper cancels the payment during the payment flow, the onAdditionalDetails() event is now triggered. What this means for your integration depends on whether you already make a /payments/details call to handle 3D Secure 2 errors:
+  - If yes, you do not need to make any changes to your integration. You can remove the Cancelled3DS2Exception handler.
+  - If not, update your integration to make a /payments/details request to get the details of the canceled transaction.
 
 ### Improved
 - For card component, disabled ripple animations for Android 8 (API level 26) and older to prevent an animation crash with platform views.
