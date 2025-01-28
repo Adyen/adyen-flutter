@@ -51,10 +51,10 @@ internal object CardValidation {
 
     fun validateCardSecurityCode(
         securityCode: String,
-        cardBrandTxVariant: String?
+        cardBrand: String?
     ): CardSecurityCodeValidationResultDTO {
-        val cardBrand = cardBrandTxVariant?.let { CardBrand(it) }
-        val validationResult = CardSecurityCodeValidator.validateSecurityCode(securityCode, cardBrand)
+        val cardType = cardBrand?.let { CardBrand(it) }
+        val validationResult = CardSecurityCodeValidator.validateSecurityCode(securityCode, cardType)
         return when (validationResult) {
             is CardSecurityCodeValidationResult.Valid -> CardSecurityCodeValidationResultDTO.VALID
             is CardSecurityCodeValidationResult.Invalid -> CardSecurityCodeValidationResultDTO.INVALID
