@@ -1,7 +1,5 @@
 import 'package:adyen_checkout/adyen_checkout.dart';
 import 'package:adyen_checkout_example/config.dart';
-import 'package:adyen_checkout_example/network/models/amount_network_model.dart';
-import 'package:adyen_checkout_example/network/models/payment_request_network_model.dart';
 import 'package:adyen_checkout_example/repositories/adyen_base_repository.dart';
 
 class AdyenDropInRepository extends AdyenBaseRepository {
@@ -89,33 +87,30 @@ class AdyenDropInRepository extends AdyenBaseRepository {
     Map<String, dynamic>? extra,
   ]) async {
     String returnUrl = await determineBaseReturnUrl();
-    PaymentsRequestData paymentsRequestData = PaymentsRequestData(
-      merchantAccount: Config.merchantAccount,
-      shopperReference: Config.shopperReference,
-      reference: "flutter-test_${DateTime.now().millisecondsSinceEpoch}",
-      returnUrl: returnUrl,
-      amount: AmountNetworkModel(
-        value: Config.amount.value,
-        currency: Config.amount.currency,
-      ),
-      countryCode: Config.countryCode,
-      channel: determineChannel(),
-      recurringProcessingModel: "CardOnFile",
-      authenticationData: {
+    Map<String, dynamic> paymentsRequestBody = {
+      "merchantAccount": Config.merchantAccount,
+      "shopperReference": Config.shopperReference,
+      "reference": "flutter-test_${DateTime.now().millisecondsSinceEpoch}",
+      "returnUrl": returnUrl,
+      "amount": {
+        "value": Config.amount.value,
+        "currency": Config.amount.currency,
+      },
+      "countryCode": Config.countryCode,
+      "channel": determineChannel(),
+      "recurringProcessingModel": "CardOnFile",
+      "authenticationData": {
         "attemptAuthentication": "always",
         "threeDSRequestData": {
           "nativeThreeDS": "preferred",
         },
       },
-    );
+    };
 
-    Map<String, dynamic> mergedJson = <String, dynamic>{};
-    mergedJson.addAll(paymentsRequestData.toJson());
     // This will override any already existing fields in paymentsRequestData
-    mergedJson.addAll(data);
-    final response = await service.postPayments(mergedJson);
-    final paymentEvent = await _evaluatePaymentsResponse(response);
-    return paymentEvent;
+    paymentsRequestBody.addAll(data);
+    final response = await service.postPayments(paymentsRequestBody);
+    return await _evaluatePaymentsResponse(response);
   }
 
   Future<PaymentEvent> _evaluatePaymentsResponse(
