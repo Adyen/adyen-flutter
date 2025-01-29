@@ -131,42 +131,42 @@ class CardValidatorTestss: XCTestCase {
     // Card security code validation
 
     func test_given_validSecurityCodeAndVisaCard_when_validate_then_returnValid() {
-        let validationResult = CardValidation().validateCardSecurityCode(securityCode: "123", cardBrandTxVariant: "visa")
+        let validationResult = CardValidation().validateCardSecurityCode(securityCode: "123", cardBrand: "visa")
         XCTAssertEqual(validationResult, true)
     }
 
     func test_given_validSecurityCodeAndMasterCard_when_validate_then_returnValid() {
-        let validationResult = CardValidation().validateCardSecurityCode(securityCode: "456", cardBrandTxVariant: "mc")
+        let validationResult = CardValidation().validateCardSecurityCode(securityCode: "456", cardBrand: "mc")
         XCTAssertEqual(validationResult, true)
     }
 
     func test_given_validSecurityCodeAndAmexCard_when_validate_then_returnValid() {
-        let validationResult = CardValidation().validateCardSecurityCode(securityCode: "1234", cardBrandTxVariant: "amex")
+        let validationResult = CardValidation().validateCardSecurityCode(securityCode: "1234", cardBrand: "amex")
         XCTAssertEqual(validationResult, true)
     }
 
     func test_given_invalidSecurityCodeAndVisaCard_when_validate_then_returnInvalid() {
-        let validationResult = CardValidation().validateCardSecurityCode(securityCode: "12", cardBrandTxVariant: "visa")
+        let validationResult = CardValidation().validateCardSecurityCode(securityCode: "12", cardBrand: "visa")
         XCTAssertEqual(validationResult, false)
     }
 
     func test_given_invalidSecurityCodeAndMasterCard_when_validate_then_returnInvalid() {
-        let validationResult = CardValidation().validateCardSecurityCode(securityCode: "12", cardBrandTxVariant: "mc")
+        let validationResult = CardValidation().validateCardSecurityCode(securityCode: "12", cardBrand: "mc")
         XCTAssertEqual(validationResult, false)
     }
 
     func test_given_validSecurityCodeWithNullCardBrand_when_validate_then_returnValid() {
-        let validationResult = CardValidation().validateCardSecurityCode(securityCode: "123", cardBrandTxVariant: nil)
+        let validationResult = CardValidation().validateCardSecurityCode(securityCode: "123", cardBrand: nil)
         XCTAssertEqual(validationResult, true)
     }
 
     func test_given_validSecurityCodeWithUnsupportedCardBrand_when_validate_then_returnValid() {
-        let validationResult = CardValidation().validateCardSecurityCode(securityCode: "123", cardBrandTxVariant: "")
+        let validationResult = CardValidation().validateCardSecurityCode(securityCode: "123", cardBrand: "")
         XCTAssertEqual(validationResult, true)
     }
 
     func test_given_invalidSecurityCodeWithNullCardBrand_when_validate_then_returnInvalid() {
-        let validationResult = CardValidation().validateCardSecurityCode(securityCode: "1", cardBrandTxVariant: nil)
+        let validationResult = CardValidation().validateCardSecurityCode(securityCode: "1", cardBrand: nil)
         XCTAssertEqual(validationResult, false)
     }
 }

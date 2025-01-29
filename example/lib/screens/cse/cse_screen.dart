@@ -115,7 +115,7 @@ class CseScreen extends StatelessWidget {
     final CardSecurityCodeValidationResult cardSecurityCodeValidationResult =
         await AdyenCheckout.instance.validateCardSecurityCode(
       securityCode: unencryptedCard.cvc ?? "",
-      cardBrandTxVariant: "amex",
+      cardBrand: "amex",
     );
     switch (cardSecurityCodeValidationResult) {
       case ValidCardSecurityCode():

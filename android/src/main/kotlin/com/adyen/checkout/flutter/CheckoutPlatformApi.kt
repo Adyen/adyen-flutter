@@ -100,8 +100,8 @@ class CheckoutPlatformApi(
 
     override fun validateCardSecurityCode(
         securityCode: String,
-        cardBrandTxVariant: String?
-    ): CardSecurityCodeValidationResultDTO = CardValidation.validateCardSecurityCode(securityCode, cardBrandTxVariant)
+        cardBrand: String?
+    ): CardSecurityCodeValidationResultDTO = CardValidation.validateCardSecurityCode(securityCode, cardBrand)
 
     private fun determineSessionConfiguration(configuration: Any?): Configuration? {
         when (configuration) {
