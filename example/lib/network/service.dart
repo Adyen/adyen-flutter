@@ -2,24 +2,18 @@
 
 import 'dart:convert';
 
-import 'package:adyen_checkout/adyen_checkout.dart';
 import 'package:adyen_checkout_example/config.dart';
-import 'package:adyen_checkout_example/network/models/session_request_network_model.dart';
-import 'package:adyen_checkout_example/network/models/session_response_network_model.dart';
 import 'package:http/http.dart' as http;
 
 class Service {
-  Future<SessionResponseNetworkModel> createSession(
-      SessionRequestNetworkModel sessionRequestNetworkModel,
-      Environment environment) async {
+  Future<Map<String, dynamic>> createSession(Map<String, dynamic> body) async {
     final response = await http.post(
       Uri.https(Config.baseUrl, "/${Config.apiVersion}/sessions"),
       headers: _createHeaders(),
-      body: sessionRequestNetworkModel.toRawJson(),
+      body: jsonEncode(body),
     );
-    final sessionResponse =
-        SessionResponseNetworkModel.fromRawJson(response.body);
-    print("Session id: ${sessionResponse.id}");
+    final sessionResponse = jsonDecode(response.body);
+    print("Session id: ${sessionResponse["id"]}");
     return sessionResponse;
   }
 
