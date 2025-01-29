@@ -2,7 +2,7 @@
 
 ### New
 
-- For integrations where you build your own payment form: added validators for the following.
+- For custom card with API only integration: added validators for the following.
     - Card number.
     - Card expiry date.
     - Card security code.
