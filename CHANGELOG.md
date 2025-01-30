@@ -7,7 +7,7 @@
     - Card expiry date.
     - Card security code.
 
-- Updated iOS Components/Drop-in
+- iOS Components/Drop-in
   version: [5.15.0](https://docs.adyen.com/online-payments/release-notes/?title%5B0%5D=iOS+Components%2FDrop-in#releaseNote=2025-01-07-ios-componentsdrop-in-5.15.0).
 
 ### Improved
@@ -23,9 +23,9 @@
 - For Google Pay Component on Advanced flow, added loading bottom sheet.
 - The `paymentSessionFinished` payment result now contains `sessionResult`.
 - You can now also make partial payments in Drop-in if your integration uses the Advanced flow.
-- Updated iOS Components/Drop-in
+- iOS Components/Drop-in
   version: [5.14.0](https://docs.adyen.com/online-payments/release-notes/?title%5B0%5D=iOS+Components%2FDrop-in#releaseNote=2024-12-03-ios-componentsdrop-in-5.14.0).
-- Updated Android Components/Drop-in
+- Android Components/Drop-in
   version: [5.8.0](https://docs.adyen.com/online-payments/release-notes/?title%5B0%5D=Android+Components%2FDrop-in#releaseNote=2024-12-06-android-componentsdrop-in-5.8.0).
   Gradle v8 is now mandatory.
 
