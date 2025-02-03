@@ -12,8 +12,8 @@
 
 ### Improved
 
-- For card component: to prevent an animation crash for Android 8 (API level 26) or earlier, the pay
-  button no longer has ripple animations.
+- For card component, on Android 8 (API level 26) or earlier, the pay button no longer has
+  ripple animations to prevent an animation crash.
 
 ## 1.2.0
 
