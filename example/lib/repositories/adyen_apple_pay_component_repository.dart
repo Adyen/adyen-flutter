@@ -1,9 +1,5 @@
 import 'package:adyen_checkout/adyen_checkout.dart';
 import 'package:adyen_checkout_example/config.dart';
-import 'package:adyen_checkout_example/network/models/amount_network_model.dart';
-import 'package:adyen_checkout_example/network/models/payment_request_network_model.dart';
-import 'package:adyen_checkout_example/network/models/session_request_network_model.dart';
-import 'package:adyen_checkout_example/network/models/session_response_network_model.dart';
 import 'package:adyen_checkout_example/repositories/adyen_base_repository.dart';
 
 class AdyenApplePayComponentRepository extends AdyenBaseRepository {
@@ -13,43 +9,39 @@ class AdyenApplePayComponentRepository extends AdyenBaseRepository {
 
   Future<SessionCheckout> createSessionCheckout(
       ApplePayComponentConfiguration applePayComponentConfiguration) async {
-    final sessionResponse = await fetchSession();
+    final sessionResponse = await _fetchSession();
     return await AdyenCheckout.session.create(
-      sessionId: sessionResponse.id,
-      sessionData: sessionResponse.sessionData,
+      sessionId: sessionResponse["id"],
+      sessionData: sessionResponse["sessionData"],
       configuration: applePayComponentConfiguration,
     );
   }
 
-  Future<SessionResponseNetworkModel> fetchSession() async {
+  Future<Map<String, dynamic>> _fetchSession() async {
     String returnUrl = await determineBaseReturnUrl();
     returnUrl += "/adyenPayment";
-    SessionRequestNetworkModel sessionRequestNetworkModel =
-        SessionRequestNetworkModel(
-      merchantAccount: Config.merchantAccount,
-      amount: AmountNetworkModel(
-        currency: Config.amount.currency,
-        value: Config.amount.value,
-      ),
-      returnUrl: returnUrl,
-      reference:
+    Map<String, dynamic> sessionRequestBody = <String, dynamic>{
+      "merchantAccount": Config.merchantAccount,
+      "amount": {
+        "currency": Config.amount.currency,
+        "value": Config.amount.value,
+      },
+      "returnUrl": returnUrl,
+      "reference":
           "flutter-session-test_${DateTime.now().millisecondsSinceEpoch}",
-      countryCode: Config.countryCode,
-      shopperLocale: Config.shopperLocale,
-      shopperReference: Config.shopperReference,
-      channel: determineChannel(),
-      authenticationData: {
+      "countryCode": Config.countryCode,
+      "shopperLocale": Config.shopperLocale,
+      "shopperReference": Config.shopperReference,
+      "channel": determineChannel(),
+      "authenticationData": {
         "attemptAuthentication": "always",
         "threeDSRequestData": {
           "nativeThreeDS": "preferred",
         },
       },
-    );
+    };
 
-    return await service.createSession(
-      sessionRequestNetworkModel,
-      Config.environment,
-    );
+    return await service.createSession(sessionRequestBody);
   }
 
   Future<Map<String, dynamic>> fetchPaymentMethods() async {
@@ -67,32 +59,30 @@ class AdyenApplePayComponentRepository extends AdyenBaseRepository {
   ]) async {
     String returnUrl = await determineBaseReturnUrl();
     returnUrl += "/applePay";
-    PaymentsRequestData paymentsRequestData = PaymentsRequestData(
-      merchantAccount: Config.merchantAccount,
-      shopperReference: Config.shopperReference,
-      reference: "flutter-test_${DateTime.now().millisecondsSinceEpoch}",
-      returnUrl: returnUrl,
-      amount: AmountNetworkModel(
-        value: Config.amount.value,
-        currency: Config.amount.currency,
-      ),
-      countryCode: Config.countryCode,
-      channel: determineChannel(),
-      recurringProcessingModel: RecurringProcessingModel.cardOnFile,
-      shopperInteraction:
-          ShopperInteractionModel.ecommerce.shopperInteractionModelString,
-      authenticationData: {
+
+    Map<String, dynamic> paymentsRequestBody = {
+      "merchantAccount": Config.merchantAccount,
+      "shopperReference": Config.shopperReference,
+      "reference": "flutter-test_${DateTime.now().millisecondsSinceEpoch}",
+      "returnUrl": returnUrl,
+      "amount": {
+        "value": Config.amount.value,
+        "currency": Config.amount.currency,
+      },
+      "countryCode": Config.countryCode,
+      "channel": determineChannel(),
+      "recurringProcessingModel": "CardOnFile",
+      "shopperInteraction": "Ecommerce",
+      "authenticationData": {
         "attemptAuthentication": "always",
         "threeDSRequestData": {
           "nativeThreeDS": "preferred",
         },
       },
-    );
+    };
 
-    Map<String, dynamic> mergedJson = <String, dynamic>{};
-    mergedJson.addAll(data);
-    mergedJson.addAll(paymentsRequestData.toJson());
-    final response = await service.postPayments(mergedJson);
+    paymentsRequestBody.addAll(data);
+    final response = await service.postPayments(paymentsRequestBody);
     return paymentEventHandler.handleResponse(jsonResponse: response);
   }
 

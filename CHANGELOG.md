@@ -1,26 +1,40 @@
-## 1.3.0 (NEXT RELEASE)
+## 1.3.0
 
 ### New
 
-- Added card validators (Card number validation, card expiry date validation, card security code validation).
+- For custom card with API only integration: added validators for the following.
+    - Card number.
+    - Card expiry date.
+    - Card security code.
+
+- iOS Components/Drop-in
+  version: [5.15.0](https://docs.adyen.com/online-payments/release-notes/?title%5B0%5D=iOS+Components%2FDrop-in#releaseNote=2025-01-07-ios-componentsdrop-in-5.15.0).
 
 ### Improved
-- For card component, disabled ripple animations for Android 8 (API level 26) and older to prevent an animation crash with platform views.
+
+- For card component, on Android 8 (API level 26) or earlier, the pay button no longer has
+  ripple animations to prevent an animation crash.
 
 ## 1.2.0
 
 ### New
+
 - iDEAL is now available through the Instant Component.
 - For Google Pay Component on Advanced flow, added loading bottom sheet.
 - The `paymentSessionFinished` payment result now contains `sessionResult`.
 - You can now also make partial payments in Drop-in if your integration uses the Advanced flow.
-- Updated iOS Components/Drop-in version: [5.14.0](https://docs.adyen.com/online-payments/release-notes/?title%5B0%5D=iOS+Components%2FDrop-in#releaseNote=2024-12-03-ios-componentsdrop-in-5.14.0).
-- Updated Android Components/Drop-in version: [5.8.0](https://docs.adyen.com/online-payments/release-notes/?title%5B0%5D=Android+Components%2FDrop-in#releaseNote=2024-12-06-android-componentsdrop-in-5.8.0). Gradle v8 is now mandatory.
+- iOS Components/Drop-in
+  version: [5.14.0](https://docs.adyen.com/online-payments/release-notes/?title%5B0%5D=iOS+Components%2FDrop-in#releaseNote=2024-12-03-ios-componentsdrop-in-5.14.0).
+- Android Components/Drop-in
+  version: [5.8.0](https://docs.adyen.com/online-payments/release-notes/?title%5B0%5D=Android+Components%2FDrop-in#releaseNote=2024-12-06-android-componentsdrop-in-5.8.0).
+  Gradle v8 is now mandatory.
 
 ### Improved
+
 - For card component, improved the dynamic viewport.
 
 ### Removed
+
 - Removed the alert message that appeared when deleting a stored payment method fails.
 
 ## 1.1.0

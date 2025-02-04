@@ -645,7 +645,7 @@ abstract class CheckoutPlatformInterface {
 
   CardSecurityCodeValidationResultDTO validateCardSecurityCode(
     String securityCode,
-    String? cardBrandTxVariant,
+    String? cardBrand,
   );
 
   void enableConsoleLogging(bool loggingEnabled);

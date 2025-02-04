@@ -92,8 +92,8 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
         return validationResult ? .valid : .invalidOtherReason
     }
     
-    func validateCardSecurityCode(securityCode: String, cardBrandTxVariant: String?) throws -> CardSecurityCodeValidationResultDTO {
-        let validationResult = CardValidation().validateCardSecurityCode(securityCode: securityCode, cardBrandTxVariant: cardBrandTxVariant)
+    func validateCardSecurityCode(securityCode: String, cardBrand: String?) throws -> CardSecurityCodeValidationResultDTO {
+        let validationResult = CardValidation().validateCardSecurityCode(securityCode: securityCode, cardBrand: cardBrand)
         return validationResult ? .valid : .invalid
     }
 

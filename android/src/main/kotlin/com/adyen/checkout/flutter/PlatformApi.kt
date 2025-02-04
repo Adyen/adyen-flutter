@@ -1529,7 +1529,7 @@ interface CheckoutPlatformInterface {
   fun encryptBin(bin: String, publicKey: String, callback: (Result<String>) -> Unit)
   fun validateCardNumber(cardNumber: String, enableLuhnCheck: Boolean): CardNumberValidationResultDTO
   fun validateCardExpiryDate(expiryMonth: String, expiryYear: String): CardExpiryDateValidationResultDTO
-  fun validateCardSecurityCode(securityCode: String, cardBrandTxVariant: String?): CardSecurityCodeValidationResultDTO
+  fun validateCardSecurityCode(securityCode: String, cardBrand: String?): CardSecurityCodeValidationResultDTO
   fun enableConsoleLogging(loggingEnabled: Boolean)
 
   companion object {
@@ -1683,10 +1683,10 @@ interface CheckoutPlatformInterface {
           channel.setMessageHandler { message, reply ->
             val args = message as List<Any?>
             val securityCodeArg = args[0] as String
-            val cardBrandTxVariantArg = args[1] as String?
+            val cardBrandArg = args[1] as String?
             var wrapped: List<Any?>
             try {
-              wrapped = listOf<Any?>(api.validateCardSecurityCode(securityCodeArg, cardBrandTxVariantArg).raw)
+              wrapped = listOf<Any?>(api.validateCardSecurityCode(securityCodeArg, cardBrandArg).raw)
             } catch (exception: Throwable) {
               wrapped = wrapError(exception)
             }

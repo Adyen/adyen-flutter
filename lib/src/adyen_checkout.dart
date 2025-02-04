@@ -115,13 +115,13 @@ class AdyenCheckout implements AdyenCheckoutInterface {
 
   Future<CardSecurityCodeValidationResult> validateCardSecurityCode({
     required String securityCode,
-    String? cardBrandTxVariant,
+    String? cardBrand,
   }) async {
     final CardSecurityCodeValidationResultDTO
         cardSecurityCodeValidationResultDTO =
         await _adyenCheckoutApi.validateCardSecurityCode(
       securityCode,
-      cardBrandTxVariant,
+      cardBrand,
     );
 
     return switch (cardSecurityCodeValidationResultDTO) {
