@@ -1443,7 +1443,7 @@ protocol CheckoutPlatformInterface {
   func encryptBin(bin: String, publicKey: String, completion: @escaping (Result<String, Error>) -> Void)
   func validateCardNumber(cardNumber: String, enableLuhnCheck: Bool) throws -> CardNumberValidationResultDTO
   func validateCardExpiryDate(expiryMonth: String, expiryYear: String) throws -> CardExpiryDateValidationResultDTO
-  func validateCardSecurityCode(securityCode: String, cardBrandTxVariant: String?) throws -> CardSecurityCodeValidationResultDTO
+  func validateCardSecurityCode(securityCode: String, cardBrand: String?) throws -> CardSecurityCodeValidationResultDTO
   func enableConsoleLogging(loggingEnabled: Bool) throws
 }
 
@@ -1573,9 +1573,9 @@ class CheckoutPlatformInterfaceSetup {
       validateCardSecurityCodeChannel.setMessageHandler { message, reply in
         let args = message as! [Any?]
         let securityCodeArg = args[0] as! String
-        let cardBrandTxVariantArg: String? = nilOrValue(args[1])
+        let cardBrandArg: String? = nilOrValue(args[1])
         do {
-          let result = try api.validateCardSecurityCode(securityCode: securityCodeArg, cardBrandTxVariant: cardBrandTxVariantArg)
+          let result = try api.validateCardSecurityCode(securityCode: securityCodeArg, cardBrand: cardBrandArg)
           reply(wrapResult(result.rawValue))
         } catch {
           reply(wrapError(error))

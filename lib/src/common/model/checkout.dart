@@ -8,11 +8,13 @@ class SessionCheckout extends Checkout {
   final String id;
   final String sessionData;
   final Map<String, dynamic> paymentMethods;
+  CardCallbacks? cardCallbacks;
 
   SessionCheckout({
     required this.id,
     required this.sessionData,
     required this.paymentMethods,
+    this.cardCallbacks,
   });
 }
 
@@ -26,7 +28,6 @@ class AdvancedCheckout extends Checkout {
       onAdditionalDetails;
 
   PartialPayment? partialPayment;
-
   CardCallbacks? cardCallbacks;
 
   AdvancedCheckout({

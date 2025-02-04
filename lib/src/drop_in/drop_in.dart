@@ -28,7 +28,7 @@ class DropIn {
 
   Future<PaymentResult> startDropInSessionsPayment(
     DropInConfiguration dropInConfiguration,
-    SessionCheckout dropInSession,
+    SessionCheckout sessionCheckout,
   ) async {
     adyenLogger.print("Start Drop-in session");
     final dropInSessionCompleter = Completer<PaymentResultDTO>();
@@ -52,6 +52,10 @@ class DropIn {
             event,
             dropInConfiguration.storedPaymentMethodConfiguration,
           );
+        case PlatformCommunicationType.binLookup:
+          _handleOnBinLookup(event, sessionCheckout.cardCallbacks);
+        case PlatformCommunicationType.binValue:
+          _handleOnBinValue(event, sessionCheckout.cardCallbacks);
         default:
       }
     });

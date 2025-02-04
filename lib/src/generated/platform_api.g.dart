@@ -1780,7 +1780,7 @@ class CheckoutPlatformInterface {
     }
   }
 
-  Future<CardSecurityCodeValidationResultDTO> validateCardSecurityCode(String securityCode, String? cardBrandTxVariant) async {
+  Future<CardSecurityCodeValidationResultDTO> validateCardSecurityCode(String securityCode, String? cardBrand) async {
     const String __pigeon_channelName = 'dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.validateCardSecurityCode';
     final BasicMessageChannel<Object?> __pigeon_channel = BasicMessageChannel<Object?>(
       __pigeon_channelName,
@@ -1788,7 +1788,7 @@ class CheckoutPlatformInterface {
       binaryMessenger: __pigeon_binaryMessenger,
     );
     final List<Object?>? __pigeon_replyList =
-        await __pigeon_channel.send(<Object?>[securityCode, cardBrandTxVariant]) as List<Object?>?;
+        await __pigeon_channel.send(<Object?>[securityCode, cardBrand]) as List<Object?>?;
     if (__pigeon_replyList == null) {
       throw _createConnectionError(__pigeon_channelName);
     } else if (__pigeon_replyList.length > 1) {
