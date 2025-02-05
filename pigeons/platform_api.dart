@@ -5,7 +5,7 @@ import 'package:pigeon/pigeon.dart';
   dartOut: 'lib/src/generated/platform_api.g.dart',
   dartOptions: DartOptions(),
   kotlinOut:
-      'android/src/main/kotlin/com/adyen/checkout/flutter/generated/GeneratedPlatformApi.kt',
+      'android/src/main/kotlin/com/adyen/checkout/flutter/generated/PlatformApi.kt',
   kotlinOptions: KotlinOptions(
     package: "com.adyen.checkout.flutter.generated",
     errorClassName: "AdyenPigeonError",
