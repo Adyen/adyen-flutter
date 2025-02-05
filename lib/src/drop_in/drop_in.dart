@@ -17,7 +17,7 @@ class DropIn {
     this.dropInFlutterApi,
     this.dropInPlatformApi,
   ) {
-    DropInFlutterInterface.setup(dropInFlutterApi);
+    DropInFlutterInterface.setUp(dropInFlutterApi);
   }
 
   final PaymentEventHandler _paymentEventHandler = PaymentEventHandler();

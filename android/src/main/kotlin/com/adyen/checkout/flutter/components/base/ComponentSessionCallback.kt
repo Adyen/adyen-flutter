@@ -49,7 +49,7 @@ abstract class ComponentSessionCallback<T : PaymentComponentState<*>>(
                 (componentError.exception is com.adyen.checkout.core.exception.CancellationException) ||
                 (componentError.exception is com.adyen.checkout.adyen3ds2.Cancelled3DS2Exception)
             )
-                PaymentResultEnum.CANCELLEDBYUSER
+                PaymentResultEnum.CANCELLED_BY_USER
             else
                 PaymentResultEnum.ERROR
 

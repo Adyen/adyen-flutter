@@ -205,7 +205,7 @@ object ConfigurationMapper {
     private fun AddressMode.mapToAddressConfiguration(): AddressConfiguration {
         return when (this) {
             AddressMode.FULL -> AddressConfiguration.FullAddress()
-            AddressMode.POSTALCODE -> AddressConfiguration.PostalCode()
+            AddressMode.POSTAL_CODE -> AddressConfiguration.PostalCode()
             AddressMode.NONE -> AddressConfiguration.None
         }
     }
@@ -240,7 +240,7 @@ object ConfigurationMapper {
         return when (this) {
             Environment.TEST -> SDKEnvironment.TEST
             Environment.EUROPE -> SDKEnvironment.EUROPE
-            Environment.UNITEDSTATES -> SDKEnvironment.UNITED_STATES
+            Environment.UNITED_STATES -> SDKEnvironment.UNITED_STATES
             Environment.AUSTRALIA -> SDKEnvironment.AUSTRALIA
             Environment.INDIA -> SDKEnvironment.INDIA
             Environment.APSE -> SDKEnvironment.APSE
@@ -346,9 +346,9 @@ object ConfigurationMapper {
 
     private fun TotalPriceStatus.mapToTotalPriceStatus(): String {
         return when (this) {
-            TotalPriceStatus.NOTCURRENTLYKNOWN -> "NOT_CURRENTLY_KNOWN"
+            TotalPriceStatus.NOT_CURRENTLY_KNOWN -> "NOT_CURRENTLY_KNOWN"
             TotalPriceStatus.ESTIMATED -> "ESTIMATED"
-            TotalPriceStatus.FINALPRICE -> "FINAL"
+            TotalPriceStatus.FINAL_PRICE -> "FINAL"
         }
     }
 

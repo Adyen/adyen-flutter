@@ -23,7 +23,7 @@ class IdealComponentAdvancedCallback(
             }
         val model =
             ComponentCommunicationModel(
-                ComponentCommunicationType.ONSUBMIT,
+                ComponentCommunicationType.ON_SUBMIT,
                 componentId = componentId,
                 data = submitData.toString(),
             )

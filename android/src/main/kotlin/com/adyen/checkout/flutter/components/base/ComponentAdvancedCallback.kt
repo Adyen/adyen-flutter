@@ -20,7 +20,7 @@ abstract class ComponentAdvancedCallback<T : PaymentComponentState<*>>(
     override fun onSubmit(state: T) {
         val model =
             ComponentCommunicationModel(
-                ComponentCommunicationType.ONSUBMIT,
+                ComponentCommunicationType.ON_SUBMIT,
                 componentId = componentId,
                 data = PaymentComponentData.SERIALIZER.serialize(state.data).toString(),
             )
@@ -30,7 +30,7 @@ abstract class ComponentAdvancedCallback<T : PaymentComponentState<*>>(
     override fun onAdditionalDetails(actionComponentData: ActionComponentData) {
         val model =
             ComponentCommunicationModel(
-                ComponentCommunicationType.ADDITIONALDETAILS,
+                ComponentCommunicationType.ADDITIONAL_DETAILS,
                 componentId = componentId,
                 data = ActionComponentData.SERIALIZER.serialize(actionComponentData).toString(),
             )
@@ -43,7 +43,7 @@ abstract class ComponentAdvancedCallback<T : PaymentComponentState<*>>(
                 (componentError.exception is com.adyen.checkout.core.exception.CancellationException) ||
                 (componentError.exception is com.adyen.checkout.adyen3ds2.Cancelled3DS2Exception)
             )
-                PaymentResultEnum.CANCELLEDBYUSER
+                PaymentResultEnum.CANCELLED_BY_USER
             else
                 PaymentResultEnum.ERROR
 

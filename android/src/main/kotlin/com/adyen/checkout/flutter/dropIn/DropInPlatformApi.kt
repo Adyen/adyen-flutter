@@ -156,7 +156,7 @@ class DropInPlatformApi(
 
             val model =
                 PlatformCommunicationModel(
-                    PlatformCommunicationType.PAYMENTCOMPONENT,
+                    PlatformCommunicationType.PAYMENT_COMPONENT,
                     data = message.contentIfNotHandled.toString(),
                 )
             dropInFlutterApi.onDropInAdvancedPlatformCommunication(model) {}
@@ -173,7 +173,7 @@ class DropInPlatformApi(
             val dropInStoredPaymentMethodDeletionModel = message.contentIfNotHandled
             val platformCommunicationModel =
                 PlatformCommunicationModel(
-                    PlatformCommunicationType.DELETESTOREDPAYMENTMETHOD,
+                    PlatformCommunicationType.DELETE_STORED_PAYMENT_METHOD,
                     data = dropInStoredPaymentMethodDeletionModel?.storedPaymentMethodId,
                 )
 
@@ -202,7 +202,7 @@ class DropInPlatformApi(
 
             val platformCommunicationModel =
                 PlatformCommunicationModel(
-                    PlatformCommunicationType.ADDITIONALDETAILS,
+                    PlatformCommunicationType.ADDITIONAL_DETAILS,
                     data = message.contentIfNotHandled.toString(),
                 )
 
@@ -219,7 +219,7 @@ class DropInPlatformApi(
 
             val platformCommunicationModel =
                 PlatformCommunicationModel(
-                    PlatformCommunicationType.BALANCECHECK,
+                    PlatformCommunicationType.BALANCE_CHECK,
                     data = message.contentIfNotHandled.toString()
                 )
             dropInFlutterApi.onDropInAdvancedPlatformCommunication(platformCommunicationModel) {}
@@ -235,7 +235,7 @@ class DropInPlatformApi(
 
             val platformCommunicationModel =
                 PlatformCommunicationModel(
-                    PlatformCommunicationType.REQUESTORDER,
+                    PlatformCommunicationType.REQUEST_ORDER,
                     data = message.contentIfNotHandled.toString()
                 )
             dropInFlutterApi.onDropInAdvancedPlatformCommunication(platformCommunicationModel) {}
@@ -251,7 +251,7 @@ class DropInPlatformApi(
 
             val platformCommunicationModel =
                 PlatformCommunicationModel(
-                    PlatformCommunicationType.CANCELORDER,
+                    PlatformCommunicationType.CANCEL_ORDER,
                     data = message.contentIfNotHandled.toString()
                 )
             dropInFlutterApi.onDropInAdvancedPlatformCommunication(platformCommunicationModel) {}
@@ -302,7 +302,7 @@ class DropInPlatformApi(
                 when (sessionDropInResult) {
                     is SessionDropInResult.CancelledByUser ->
                         PaymentResultDTO(
-                            PaymentResultEnum.CANCELLEDBYUSER
+                            PaymentResultEnum.CANCELLED_BY_USER
                         )
 
                     is SessionDropInResult.Error ->
@@ -347,7 +347,7 @@ class DropInPlatformApi(
                 when (dropInAdvancedFlowResult) {
                     is DropInResult.CancelledByUser ->
                         PaymentResultDTO(
-                            PaymentResultEnum.CANCELLEDBYUSER
+                            PaymentResultEnum.CANCELLED_BY_USER
                         )
 
                     is DropInResult.Error ->

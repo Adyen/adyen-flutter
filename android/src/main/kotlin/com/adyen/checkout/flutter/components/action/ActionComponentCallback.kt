@@ -20,7 +20,7 @@ internal class ActionComponentCallback(
         val data = ActionComponentData.SERIALIZER.serialize(actionComponentData).toString()
         val model =
             ComponentCommunicationModel(
-                type = ComponentCommunicationType.ADDITIONALDETAILS,
+                type = ComponentCommunicationType.ADDITIONAL_DETAILS,
                 componentId = componentId,
                 data = data,
             )
@@ -31,8 +31,8 @@ internal class ActionComponentCallback(
         ComponentLoadingBottomSheet.hide(activity.supportFragmentManager)
         val type: PaymentResultEnum =
             when (componentError.exception) {
-                is com.adyen.checkout.core.exception.CancellationException -> PaymentResultEnum.CANCELLEDBYUSER
-                is com.adyen.checkout.adyen3ds2.Cancelled3DS2Exception -> PaymentResultEnum.CANCELLEDBYUSER
+                is com.adyen.checkout.core.exception.CancellationException -> PaymentResultEnum.CANCELLED_BY_USER
+                is com.adyen.checkout.adyen3ds2.Cancelled3DS2Exception -> PaymentResultEnum.CANCELLED_BY_USER
                 else -> PaymentResultEnum.ERROR
             }
         val model =

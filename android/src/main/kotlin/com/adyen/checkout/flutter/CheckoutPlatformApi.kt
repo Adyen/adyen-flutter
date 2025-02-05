@@ -122,8 +122,8 @@ class CheckoutPlatformApi(
 
             is InstantPaymentConfigurationDTO -> {
                 return when (configuration.instantPaymentType) {
-                    InstantPaymentType.APPLEPAY -> throw IllegalStateException("Apple Pay is not supported on Android.")
-                    InstantPaymentType.GOOGLEPAY -> configuration.mapToCheckoutConfiguration()
+                    InstantPaymentType.APPLE_PAY -> throw IllegalStateException("Apple Pay is not supported on Android.")
+                    InstantPaymentType.GOOGLE_PAY -> configuration.mapToCheckoutConfiguration()
                     InstantPaymentType.INSTANT -> configuration.mapToCheckoutConfiguration()
                 }
             }

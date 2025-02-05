@@ -51,7 +51,7 @@ class GooglePayComponentManager(
         setupCallback?.invoke(
             Result.success(
                 InstantPaymentSetupResultDTO(
-                    InstantPaymentType.GOOGLEPAY,
+                    InstantPaymentType.GOOGLE_PAY,
                     true,
                     allowedPaymentMethods
                 )
