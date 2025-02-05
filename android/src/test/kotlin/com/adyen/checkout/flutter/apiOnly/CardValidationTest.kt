@@ -1,6 +1,8 @@
 package com.adyen.checkout.flutter.apiOnly
 
-import CardNumberValidationResultDTO
+import com.adyen.checkout.flutter.generated.CardExpiryDateValidationResultDTO
+import com.adyen.checkout.flutter.generated.CardNumberValidationResultDTO
+import com.adyen.checkout.flutter.generated.CardSecurityCodeValidationResultDTO
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -50,7 +52,7 @@ internal class CardValidationTest {
 
             val validationResult = CardValidation.validateCardNumber(cardNumber, true)
 
-            assertEquals(CardNumberValidationResultDTO.INVALIDLUHNCHECK, validationResult)
+            assertEquals(CardNumberValidationResultDTO.INVALID_LUHN_CHECK, validationResult)
         }
 
         @Test
@@ -59,7 +61,7 @@ internal class CardValidationTest {
 
             val validationResult = CardValidation.validateCardNumber(cardNumber, true)
 
-            assertEquals(CardNumberValidationResultDTO.INVALIDTOOSHORT, validationResult)
+            assertEquals(CardNumberValidationResultDTO.INVALID_TOO_SHORT, validationResult)
         }
 
         @Test
@@ -68,7 +70,7 @@ internal class CardValidationTest {
 
             val validationResult = CardValidation.validateCardNumber(cardNumber, true)
 
-            assertEquals(CardNumberValidationResultDTO.INVALIDTOOLONG, validationResult)
+            assertEquals(CardNumberValidationResultDTO.INVALID_TOO_LONG, validationResult)
         }
 
         @Test
@@ -77,7 +79,7 @@ internal class CardValidationTest {
 
             val validationResult = CardValidation.validateCardNumber(cardNumber, true)
 
-            assertEquals(CardNumberValidationResultDTO.INVALIDILLEGALCHARACTERS, validationResult)
+            assertEquals(CardNumberValidationResultDTO.INVALID_ILLEGAL_CHARACTERS, validationResult)
         }
 
         @Test
@@ -86,7 +88,7 @@ internal class CardValidationTest {
 
             val validationResult = CardValidation.validateCardNumber(cardNumber, true)
 
-            assertEquals(CardNumberValidationResultDTO.INVALIDTOOSHORT, validationResult)
+            assertEquals(CardNumberValidationResultDTO.INVALID_TOO_SHORT, validationResult)
         }
     }
 
@@ -105,14 +107,14 @@ internal class CardValidationTest {
         fun `given date is too far in the future when validate card expiry date then result should be invalid`() {
             val validationResult = CardValidation.validateCardExpiryDate("12", "2099")
 
-            assertEquals(CardExpiryDateValidationResultDTO.INVALIDTOOFARINTHEFUTURE, validationResult)
+            assertEquals(CardExpiryDateValidationResultDTO.INVALID_TOO_FAR_IN_THE_FUTURE, validationResult)
         }
 
         @Test
         fun `given date is too old when validate card expiry date then result should be invalid`() {
             val validationResult = CardValidation.validateCardExpiryDate("12", "2018")
 
-            assertEquals(CardExpiryDateValidationResultDTO.INVALIDTOOOLD, validationResult)
+            assertEquals(CardExpiryDateValidationResultDTO.INVALID_TOO_OLD, validationResult)
         }
 
 
@@ -120,42 +122,42 @@ internal class CardValidationTest {
         fun `given date is empty when validate card expiry date then result should be invalid`() {
             val validationResult = CardValidation.validateCardExpiryDate("", "")
 
-            assertEquals(CardExpiryDateValidationResultDTO.NONPARSEABLEDATE, validationResult)
+            assertEquals(CardExpiryDateValidationResultDTO.NON_PARSEABLE_DATE, validationResult)
         }
 
         @Test
         fun `given date is invalid when validate card expiry date then result should be invalid`() {
             val validationResult = CardValidation.validateCardExpiryDate("30", "10")
 
-            assertEquals(CardExpiryDateValidationResultDTO.NONPARSEABLEDATE, validationResult)
+            assertEquals(CardExpiryDateValidationResultDTO.NON_PARSEABLE_DATE, validationResult)
         }
 
         @Test
         fun `given month is missing when validate card expiry date then result should be invalid`() {
             val validationResult = CardValidation.validateCardExpiryDate("", "10")
 
-            assertEquals(CardExpiryDateValidationResultDTO.NONPARSEABLEDATE, validationResult)
+            assertEquals(CardExpiryDateValidationResultDTO.NON_PARSEABLE_DATE, validationResult)
         }
 
         @Test
         fun `given year is missing when validate card expiry date then result should be invalid`() {
             val validationResult = CardValidation.validateCardExpiryDate("5", "")
 
-            assertEquals(CardExpiryDateValidationResultDTO.NONPARSEABLEDATE, validationResult)
+            assertEquals(CardExpiryDateValidationResultDTO.NON_PARSEABLE_DATE, validationResult)
         }
 
         @Test
         fun `given values are wrong when validate card expiry date then result should be invalid`() {
             val validationResult = CardValidation.validateCardExpiryDate("av", "test")
 
-            assertEquals(CardExpiryDateValidationResultDTO.NONPARSEABLEDATE, validationResult)
+            assertEquals(CardExpiryDateValidationResultDTO.NON_PARSEABLE_DATE, validationResult)
         }
 
         @Test
         fun `given values are too long when validate card expiry date then result should be invalid`() {
             val validationResult = CardValidation.validateCardExpiryDate("1234", "56789")
 
-            assertEquals(CardExpiryDateValidationResultDTO.NONPARSEABLEDATE, validationResult)
+            assertEquals(CardExpiryDateValidationResultDTO.NON_PARSEABLE_DATE, validationResult)
         }
     }
 
