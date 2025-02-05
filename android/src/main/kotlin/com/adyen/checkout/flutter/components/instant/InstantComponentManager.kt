@@ -1,9 +1,5 @@
 package com.adyen.checkout.flutter.components.instant
 
-import ComponentCommunicationModel
-import ComponentFlutterInterface
-import InstantPaymentConfigurationDTO
-import PaymentResultDTO
 import androidx.fragment.app.FragmentActivity
 import com.adyen.checkout.action.core.internal.ActionHandlingComponent
 import com.adyen.checkout.components.core.CheckoutConfiguration
@@ -17,6 +13,12 @@ import com.adyen.checkout.flutter.components.instant.advanced.InstantComponentAd
 import com.adyen.checkout.flutter.components.instant.session.IdealComponentSessionCallback
 import com.adyen.checkout.flutter.components.instant.session.InstantComponentSessionCallback
 import com.adyen.checkout.flutter.components.view.ComponentLoadingBottomSheet
+import com.adyen.checkout.flutter.generated.ComponentCommunicationModel
+import com.adyen.checkout.flutter.generated.ComponentCommunicationType
+import com.adyen.checkout.flutter.generated.ComponentFlutterInterface
+import com.adyen.checkout.flutter.generated.InstantPaymentConfigurationDTO
+import com.adyen.checkout.flutter.generated.PaymentResultDTO
+import com.adyen.checkout.flutter.generated.PaymentResultEnum
 import com.adyen.checkout.flutter.session.SessionHolder
 import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToCheckoutConfiguration
 import com.adyen.checkout.flutter.utils.Constants

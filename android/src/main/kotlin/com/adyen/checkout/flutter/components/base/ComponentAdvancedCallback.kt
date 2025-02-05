@@ -1,17 +1,16 @@
 package com.adyen.checkout.flutter.components.base
 
-import ComponentCommunicationModel
-import ComponentCommunicationType
-import ComponentFlutterInterface
-import PaymentResultDTO
-import PaymentResultEnum
 import com.adyen.checkout.components.core.ActionComponentData
 import com.adyen.checkout.components.core.ComponentCallback
 import com.adyen.checkout.components.core.ComponentError
 import com.adyen.checkout.components.core.PaymentComponentData
 import com.adyen.checkout.components.core.PaymentComponentState
+import com.adyen.checkout.flutter.generated.ComponentCommunicationModel
+import com.adyen.checkout.flutter.generated.ComponentCommunicationType
+import com.adyen.checkout.flutter.generated.ComponentFlutterInterface
+import com.adyen.checkout.flutter.generated.PaymentResultDTO
+import com.adyen.checkout.flutter.generated.PaymentResultEnum
 import com.adyen.checkout.flutter.utils.Constants
-import java.util.concurrent.CancellationException
 
 abstract class ComponentAdvancedCallback<T : PaymentComponentState<*>>(
     private val componentFlutterApi: ComponentFlutterInterface,

@@ -1,6 +1,5 @@
 package com.adyen.checkout.flutter.components.card.session
 
-import ComponentFlutterInterface
 import android.content.Context
 import androidx.fragment.app.FragmentActivity
 import com.adyen.checkout.card.CardComponent
@@ -9,6 +8,7 @@ import com.adyen.checkout.components.core.PaymentMethod
 import com.adyen.checkout.components.core.StoredPaymentMethod
 import com.adyen.checkout.components.core.action.Action
 import com.adyen.checkout.flutter.components.card.BaseCardComponent
+import com.adyen.checkout.flutter.generated.ComponentFlutterInterface
 import com.adyen.checkout.flutter.session.SessionHolder
 import com.adyen.checkout.sessions.core.CheckoutSession
 import com.adyen.checkout.sessions.core.SessionSetupResponse

@@ -2,6 +2,7 @@
 // See also: https://pub.dev/packages/pigeon
 @file:Suppress("UNCHECKED_CAST", "ArrayInDataClass")
 
+package com.adyen.checkout.flutter.generated
 
 import android.util.Log
 import io.flutter.plugin.common.BasicMessageChannel
@@ -1193,7 +1194,7 @@ data class OrderCancelResultDTO (
     )
   }
 }
-private object PlatformApiPigeonCodec : StandardMessageCodec() {
+private object GeneratedPlatformApiPigeonCodec : StandardMessageCodec() {
   override fun readValueOfType(type: Byte, buffer: ByteBuffer): Any? {
     return when (type) {
       129.toByte() -> {
@@ -1645,7 +1646,7 @@ interface CheckoutPlatformInterface {
   companion object {
     /** The codec used by CheckoutPlatformInterface. */
     val codec: MessageCodec<Any?> by lazy {
-      PlatformApiPigeonCodec
+      GeneratedPlatformApiPigeonCodec
     }
     /** Sets up an instance of `CheckoutPlatformInterface` to handle messages through the `binaryMessenger`. */
     @JvmOverloads
@@ -1839,7 +1840,7 @@ interface DropInPlatformInterface {
   companion object {
     /** The codec used by DropInPlatformInterface. */
     val codec: MessageCodec<Any?> by lazy {
-      PlatformApiPigeonCodec
+      GeneratedPlatformApiPigeonCodec
     }
     /** Sets up an instance of `DropInPlatformInterface` to handle messages through the `binaryMessenger`. */
     @JvmOverloads
@@ -2014,7 +2015,7 @@ class DropInFlutterInterface(private val binaryMessenger: BinaryMessenger, priva
   companion object {
     /** The codec used by DropInFlutterInterface. */
     val codec: MessageCodec<Any?> by lazy {
-      PlatformApiPigeonCodec
+      GeneratedPlatformApiPigeonCodec
     }
   }
   fun onDropInSessionPlatformCommunication(platformCommunicationModelArg: PlatformCommunicationModel, callback: (Result<Unit>) -> Unit)
@@ -2065,7 +2066,7 @@ interface ComponentPlatformInterface {
   companion object {
     /** The codec used by ComponentPlatformInterface. */
     val codec: MessageCodec<Any?> by lazy {
-      PlatformApiPigeonCodec
+      GeneratedPlatformApiPigeonCodec
     }
     /** Sets up an instance of `ComponentPlatformInterface` to handle messages through the `binaryMessenger`. */
     @JvmOverloads
@@ -2215,7 +2216,7 @@ class ComponentFlutterInterface(private val binaryMessenger: BinaryMessenger, pr
   companion object {
     /** The codec used by ComponentFlutterInterface. */
     val codec: MessageCodec<Any?> by lazy {
-      PlatformApiPigeonCodec
+      GeneratedPlatformApiPigeonCodec
     }
   }
   fun _generateCodecForDTOs(cardComponentConfigurationDTOArg: CardComponentConfigurationDTO, sessionDTOArg: SessionDTO, callback: (Result<Unit>) -> Unit)

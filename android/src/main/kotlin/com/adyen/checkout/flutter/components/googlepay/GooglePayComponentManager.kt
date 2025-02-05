@@ -1,8 +1,5 @@
 package com.adyen.checkout.flutter.components.googlepay
 
-import ComponentFlutterInterface
-import InstantPaymentConfigurationDTO
-import InstantPaymentSetupResultDTO
 import android.content.Intent
 import androidx.fragment.app.FragmentActivity
 import com.adyen.checkout.action.core.internal.ActionHandlingComponent
@@ -11,14 +8,17 @@ import com.adyen.checkout.components.core.ComponentAvailableCallback
 import com.adyen.checkout.components.core.Order
 import com.adyen.checkout.components.core.PaymentMethod
 import com.adyen.checkout.components.core.action.Action
+import com.adyen.checkout.flutter.components.view.ComponentLoadingBottomSheet
+import com.adyen.checkout.flutter.generated.ComponentFlutterInterface
+import com.adyen.checkout.flutter.generated.InstantPaymentConfigurationDTO
+import com.adyen.checkout.flutter.generated.InstantPaymentSetupResultDTO
+import com.adyen.checkout.flutter.generated.InstantPaymentType
 import com.adyen.checkout.flutter.session.SessionHolder
+import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToGooglePayCheckoutConfiguration
 import com.adyen.checkout.flutter.utils.Constants
 import com.adyen.checkout.googlepay.GooglePayComponent
-import com.adyen.checkout.flutter.components.view.ComponentLoadingBottomSheet
-import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToGooglePayCheckoutConfiguration
 import com.adyen.checkout.sessions.core.CheckoutSession
 import com.adyen.checkout.sessions.core.SessionSetupResponse
-import java.lang.Exception
 import java.util.UUID
 
 class GooglePayComponentManager(

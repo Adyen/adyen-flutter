@@ -5,8 +5,11 @@ import 'package:pigeon/pigeon.dart';
   dartOut: 'lib/src/generated/platform_api.g.dart',
   dartOptions: DartOptions(),
   kotlinOut:
-      'android/src/main/kotlin/com/adyen/checkout/flutter/PlatformApi.kt',
-  kotlinOptions: KotlinOptions(errorClassName: "AdyenPigeonError"),
+      'android/src/main/kotlin/com/adyen/checkout/flutter/generated/GeneratedPlatformApi.kt',
+  kotlinOptions: KotlinOptions(
+    package: "com.adyen.checkout.flutter.generated",
+    errorClassName: "AdyenPigeonError",
+  ),
   swiftOut: 'ios/Classes/PlatformApi.swift',
   swiftOptions: SwiftOptions(),
   dartPackageName: 'adyen_checkout',

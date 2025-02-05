@@ -1,14 +1,15 @@
 package com.adyen.checkout.flutter.components.action
 
-import ComponentCommunicationModel
-import ComponentFlutterInterface
-import PaymentResultDTO
-import PaymentResultEnum
 import androidx.fragment.app.FragmentActivity
 import com.adyen.checkout.components.core.ActionComponentCallback
 import com.adyen.checkout.components.core.ActionComponentData
 import com.adyen.checkout.components.core.ComponentError
 import com.adyen.checkout.flutter.components.view.ComponentLoadingBottomSheet
+import com.adyen.checkout.flutter.generated.ComponentCommunicationModel
+import com.adyen.checkout.flutter.generated.ComponentCommunicationType
+import com.adyen.checkout.flutter.generated.ComponentFlutterInterface
+import com.adyen.checkout.flutter.generated.PaymentResultDTO
+import com.adyen.checkout.flutter.generated.PaymentResultEnum
 
 internal class ActionComponentCallback(
     private val activity: FragmentActivity,

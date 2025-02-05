@@ -1,15 +1,5 @@
 package com.adyen.checkout.flutter
 
-import CardComponentConfigurationDTO
-import CardExpiryDateValidationResultDTO
-import CardNumberValidationResultDTO
-import CardSecurityCodeValidationResultDTO
-import CheckoutPlatformInterface
-import DropInConfigurationDTO
-import EncryptedCardDTO
-import InstantPaymentConfigurationDTO
-import SessionDTO
-import UnencryptedCardDTO
 import android.annotation.SuppressLint
 import android.util.Log
 import androidx.fragment.app.FragmentActivity
@@ -21,12 +11,23 @@ import com.adyen.checkout.core.AdyenLogger
 import com.adyen.checkout.core.internal.util.Logger.NONE
 import com.adyen.checkout.flutter.apiOnly.AdyenCSE
 import com.adyen.checkout.flutter.apiOnly.CardValidation
+import com.adyen.checkout.flutter.generated.CardComponentConfigurationDTO
+import com.adyen.checkout.flutter.generated.CardExpiryDateValidationResultDTO
+import com.adyen.checkout.flutter.generated.CardNumberValidationResultDTO
+import com.adyen.checkout.flutter.generated.CardSecurityCodeValidationResultDTO
+import com.adyen.checkout.flutter.generated.CheckoutPlatformInterface
+import com.adyen.checkout.flutter.generated.DropInConfigurationDTO
+import com.adyen.checkout.flutter.generated.EncryptedCardDTO
+import com.adyen.checkout.flutter.generated.InstantPaymentConfigurationDTO
+import com.adyen.checkout.flutter.generated.InstantPaymentType
+import com.adyen.checkout.flutter.generated.SessionDTO
+import com.adyen.checkout.flutter.generated.UnencryptedCardDTO
 import com.adyen.checkout.flutter.session.SessionHolder
+import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToAmount
 import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToAnalyticsConfiguration
-import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToDropInConfiguration
 import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToCardConfiguration
 import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToCheckoutConfiguration
-import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToAmount
+import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToDropInConfiguration
 import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToEnvironment
 import com.adyen.checkout.redirect.RedirectComponent
 import com.adyen.checkout.sessions.core.CheckoutSessionProvider
@@ -122,7 +123,9 @@ class CheckoutPlatformApi(
 
             is InstantPaymentConfigurationDTO -> {
                 return when (configuration.instantPaymentType) {
-                    InstantPaymentType.APPLE_PAY -> throw IllegalStateException("Apple Pay is not supported on Android.")
+                    InstantPaymentType.APPLE_PAY -> throw IllegalStateException(
+                        "Apple Pay is not supported on Android."
+                    )
                     InstantPaymentType.GOOGLE_PAY -> configuration.mapToCheckoutConfiguration()
                     InstantPaymentType.INSTANT -> configuration.mapToCheckoutConfiguration()
                 }

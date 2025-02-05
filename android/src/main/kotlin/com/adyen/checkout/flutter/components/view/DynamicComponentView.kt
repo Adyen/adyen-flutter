@@ -1,8 +1,5 @@
 package com.adyen.checkout.flutter.components.view
 
-import ComponentCommunicationModel
-import ComponentCommunicationType
-import ComponentFlutterInterface
 import android.content.Context
 import android.util.AttributeSet
 import android.view.ViewGroup
@@ -15,6 +12,9 @@ import androidx.core.view.children
 import androidx.core.view.postDelayed
 import com.adyen.checkout.card.CardComponent
 import com.adyen.checkout.components.core.internal.Component
+import com.adyen.checkout.flutter.generated.ComponentCommunicationModel
+import com.adyen.checkout.flutter.generated.ComponentCommunicationType
+import com.adyen.checkout.flutter.generated.ComponentFlutterInterface
 import com.adyen.checkout.ui.core.AdyenComponentView
 import com.adyen.checkout.ui.core.internal.ui.ViewableComponent
 import com.google.android.material.button.MaterialButton
