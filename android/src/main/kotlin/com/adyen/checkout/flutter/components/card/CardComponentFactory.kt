@@ -1,10 +1,10 @@
 package com.adyen.checkout.flutter.components.card
 
-import ComponentFlutterInterface
 import android.content.Context
 import androidx.fragment.app.FragmentActivity
 import com.adyen.checkout.flutter.components.card.advanced.CardAdvancedComponent
 import com.adyen.checkout.flutter.components.card.session.CardSessionComponent
+import com.adyen.checkout.flutter.generated.ComponentFlutterInterface
 import com.adyen.checkout.flutter.session.SessionHolder
 import io.flutter.plugin.platform.PlatformView
 import io.flutter.plugin.platform.PlatformViewFactory

@@ -1,8 +1,8 @@
 package com.adyen.checkout.flutter.components.card
 
-import ComponentFlutterInterface
 import androidx.fragment.app.FragmentActivity
 import com.adyen.checkout.action.core.internal.ActionHandlingComponent
+import com.adyen.checkout.flutter.generated.ComponentFlutterInterface
 import com.adyen.checkout.flutter.session.SessionHolder
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 

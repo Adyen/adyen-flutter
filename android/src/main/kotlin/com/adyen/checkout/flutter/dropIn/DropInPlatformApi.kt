@@ -1,17 +1,5 @@
 package com.adyen.checkout.flutter.dropIn
 
-import DeletedStoredPaymentMethodResultDTO
-import DropInConfigurationDTO
-import DropInFlutterInterface
-import DropInPlatformInterface
-import OrderCancelResultDTO
-import PaymentEventDTO
-import PaymentEventType
-import PaymentResultDTO
-import PaymentResultEnum
-import PaymentResultModelDTO
-import PlatformCommunicationModel
-import PlatformCommunicationType
 import androidx.activity.result.ActivityResultLauncher
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.lifecycleScope
@@ -39,10 +27,22 @@ import com.adyen.checkout.flutter.dropIn.advanced.DropInPaymentResultMessenger
 import com.adyen.checkout.flutter.dropIn.advanced.DropInServiceResultMessenger
 import com.adyen.checkout.flutter.dropIn.model.DropInType
 import com.adyen.checkout.flutter.dropIn.session.SessionDropInService
+import com.adyen.checkout.flutter.generated.DeletedStoredPaymentMethodResultDTO
+import com.adyen.checkout.flutter.generated.DropInConfigurationDTO
+import com.adyen.checkout.flutter.generated.DropInFlutterInterface
+import com.adyen.checkout.flutter.generated.DropInPlatformInterface
+import com.adyen.checkout.flutter.generated.OrderCancelResultDTO
+import com.adyen.checkout.flutter.generated.PaymentEventDTO
+import com.adyen.checkout.flutter.generated.PaymentEventType
+import com.adyen.checkout.flutter.generated.PaymentResultDTO
+import com.adyen.checkout.flutter.generated.PaymentResultEnum
+import com.adyen.checkout.flutter.generated.PaymentResultModelDTO
+import com.adyen.checkout.flutter.generated.PlatformCommunicationModel
+import com.adyen.checkout.flutter.generated.PlatformCommunicationType
 import com.adyen.checkout.flutter.session.SessionHolder
 import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToDropInConfiguration
-import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToOrderResponseModel
 import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToEnvironment
+import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToOrderResponseModel
 import com.adyen.checkout.sessions.core.CheckoutSession
 import com.adyen.checkout.sessions.core.SessionSetupResponse
 import kotlinx.coroutines.Dispatchers
@@ -156,7 +156,7 @@ class DropInPlatformApi(
 
             val model =
                 PlatformCommunicationModel(
-                    PlatformCommunicationType.PAYMENTCOMPONENT,
+                    PlatformCommunicationType.PAYMENT_COMPONENT,
                     data = message.contentIfNotHandled.toString(),
                 )
             dropInFlutterApi.onDropInAdvancedPlatformCommunication(model) {}
@@ -173,7 +173,7 @@ class DropInPlatformApi(
             val dropInStoredPaymentMethodDeletionModel = message.contentIfNotHandled
             val platformCommunicationModel =
                 PlatformCommunicationModel(
-                    PlatformCommunicationType.DELETESTOREDPAYMENTMETHOD,
+                    PlatformCommunicationType.DELETE_STORED_PAYMENT_METHOD,
                     data = dropInStoredPaymentMethodDeletionModel?.storedPaymentMethodId,
                 )
 
@@ -202,7 +202,7 @@ class DropInPlatformApi(
 
             val platformCommunicationModel =
                 PlatformCommunicationModel(
-                    PlatformCommunicationType.ADDITIONALDETAILS,
+                    PlatformCommunicationType.ADDITIONAL_DETAILS,
                     data = message.contentIfNotHandled.toString(),
                 )
 
@@ -219,7 +219,7 @@ class DropInPlatformApi(
 
             val platformCommunicationModel =
                 PlatformCommunicationModel(
-                    PlatformCommunicationType.BALANCECHECK,
+                    PlatformCommunicationType.BALANCE_CHECK,
                     data = message.contentIfNotHandled.toString()
                 )
             dropInFlutterApi.onDropInAdvancedPlatformCommunication(platformCommunicationModel) {}
@@ -235,7 +235,7 @@ class DropInPlatformApi(
 
             val platformCommunicationModel =
                 PlatformCommunicationModel(
-                    PlatformCommunicationType.REQUESTORDER,
+                    PlatformCommunicationType.REQUEST_ORDER,
                     data = message.contentIfNotHandled.toString()
                 )
             dropInFlutterApi.onDropInAdvancedPlatformCommunication(platformCommunicationModel) {}
@@ -251,7 +251,7 @@ class DropInPlatformApi(
 
             val platformCommunicationModel =
                 PlatformCommunicationModel(
-                    PlatformCommunicationType.CANCELORDER,
+                    PlatformCommunicationType.CANCEL_ORDER,
                     data = message.contentIfNotHandled.toString()
                 )
             dropInFlutterApi.onDropInAdvancedPlatformCommunication(platformCommunicationModel) {}
@@ -302,7 +302,7 @@ class DropInPlatformApi(
                 when (sessionDropInResult) {
                     is SessionDropInResult.CancelledByUser ->
                         PaymentResultDTO(
-                            PaymentResultEnum.CANCELLEDBYUSER
+                            PaymentResultEnum.CANCELLED_BY_USER
                         )
 
                     is SessionDropInResult.Error ->
@@ -347,7 +347,7 @@ class DropInPlatformApi(
                 when (dropInAdvancedFlowResult) {
                     is DropInResult.CancelledByUser ->
                         PaymentResultDTO(
-                            PaymentResultEnum.CANCELLEDBYUSER
+                            PaymentResultEnum.CANCELLED_BY_USER
                         )
 
                     is DropInResult.Error ->

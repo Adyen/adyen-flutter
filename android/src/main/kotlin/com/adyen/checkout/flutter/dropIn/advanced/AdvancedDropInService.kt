@@ -1,10 +1,5 @@
 package com.adyen.checkout.flutter.dropIn.advanced
 
-import DeletedStoredPaymentMethodResultDTO
-import ErrorDTO
-import OrderCancelResultDTO
-import PaymentEventDTO
-import PaymentEventType
 import android.content.Intent
 import android.os.IBinder
 import androidx.lifecycle.Lifecycle
@@ -27,6 +22,11 @@ import com.adyen.checkout.dropin.OrderDropInServiceResult
 import com.adyen.checkout.dropin.RecurringDropInServiceResult
 import com.adyen.checkout.flutter.dropIn.model.DropInStoredPaymentMethodDeletionModel
 import com.adyen.checkout.flutter.dropIn.model.DropInType
+import com.adyen.checkout.flutter.generated.DeletedStoredPaymentMethodResultDTO
+import com.adyen.checkout.flutter.generated.ErrorDTO
+import com.adyen.checkout.flutter.generated.OrderCancelResultDTO
+import com.adyen.checkout.flutter.generated.PaymentEventDTO
+import com.adyen.checkout.flutter.generated.PaymentEventType
 import com.adyen.checkout.flutter.utils.Constants
 import com.adyen.checkout.googlepay.GooglePayComponentState
 import org.json.JSONObject

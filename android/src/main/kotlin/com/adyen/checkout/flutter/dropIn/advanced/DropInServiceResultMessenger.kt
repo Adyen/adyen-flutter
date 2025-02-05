@@ -1,10 +1,10 @@
 package com.adyen.checkout.flutter.dropIn.advanced
 
-import DeletedStoredPaymentMethodResultDTO
-import OrderCancelResultDTO
-import PaymentEventDTO
 import androidx.lifecycle.LiveData
 import com.adyen.checkout.flutter.dropIn.model.DropInStoredPaymentMethodDeletionModel
+import com.adyen.checkout.flutter.generated.DeletedStoredPaymentMethodResultDTO
+import com.adyen.checkout.flutter.generated.OrderCancelResultDTO
+import com.adyen.checkout.flutter.generated.PaymentEventDTO
 import com.adyen.checkout.flutter.utils.Event
 import org.json.JSONObject
 

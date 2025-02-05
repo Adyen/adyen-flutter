@@ -1,3 +1,9 @@
+## 1.4.0
+
+### New
+
+- Set minimum SDK version to Flutter 3.16/Dart 3.2
+
 ## 1.3.0
 
 ### New

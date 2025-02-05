@@ -1,6 +1,5 @@
 package com.adyen.checkout.flutter.dropIn.session
 
-import DeletedStoredPaymentMethodResultDTO
 import android.content.Intent
 import android.os.IBinder
 import androidx.lifecycle.Lifecycle
@@ -14,6 +13,7 @@ import com.adyen.checkout.flutter.dropIn.advanced.DropInPaymentMethodDeletionPla
 import com.adyen.checkout.flutter.dropIn.advanced.DropInPaymentMethodDeletionResultMessenger
 import com.adyen.checkout.flutter.dropIn.model.DropInStoredPaymentMethodDeletionModel
 import com.adyen.checkout.flutter.dropIn.model.DropInType
+import com.adyen.checkout.flutter.generated.DeletedStoredPaymentMethodResultDTO
 
 class SessionDropInService : SessionDropInService(), LifecycleOwner {
     private val dispatcher = ServiceLifecycleDispatcher(this)

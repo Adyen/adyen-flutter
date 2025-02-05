@@ -1,8 +1,8 @@
 package com.adyen.checkout.flutter.components.card.advanced
 
-import ComponentFlutterInterface
 import com.adyen.checkout.card.CardComponentState
 import com.adyen.checkout.flutter.components.base.ComponentAdvancedCallback
+import com.adyen.checkout.flutter.generated.ComponentFlutterInterface
 
 internal class CardAdvancedCallback(
     private val componentFlutterApi: ComponentFlutterInterface,

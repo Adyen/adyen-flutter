@@ -1,14 +1,14 @@
 package com.adyen.checkout.flutter.components.base
 
-import ComponentCommunicationModel
-import ComponentCommunicationType
-import ComponentFlutterInterface
-import PaymentResultDTO
-import PaymentResultEnum
-import PaymentResultModelDTO
 import com.adyen.checkout.components.core.ComponentError
 import com.adyen.checkout.components.core.PaymentComponentState
 import com.adyen.checkout.components.core.action.Action
+import com.adyen.checkout.flutter.generated.ComponentCommunicationModel
+import com.adyen.checkout.flutter.generated.ComponentCommunicationType
+import com.adyen.checkout.flutter.generated.ComponentFlutterInterface
+import com.adyen.checkout.flutter.generated.PaymentResultDTO
+import com.adyen.checkout.flutter.generated.PaymentResultEnum
+import com.adyen.checkout.flutter.generated.PaymentResultModelDTO
 import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToOrderResponseModel
 import com.adyen.checkout.flutter.utils.Constants
 import com.adyen.checkout.sessions.core.SessionComponentCallback
@@ -49,7 +49,7 @@ abstract class ComponentSessionCallback<T : PaymentComponentState<*>>(
                 (componentError.exception is com.adyen.checkout.core.exception.CancellationException) ||
                 (componentError.exception is com.adyen.checkout.adyen3ds2.Cancelled3DS2Exception)
             )
-                PaymentResultEnum.CANCELLEDBYUSER
+                PaymentResultEnum.CANCELLED_BY_USER
             else
                 PaymentResultEnum.ERROR
 

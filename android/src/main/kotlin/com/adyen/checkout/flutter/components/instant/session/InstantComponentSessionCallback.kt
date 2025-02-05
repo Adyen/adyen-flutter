@@ -1,9 +1,9 @@
 package com.adyen.checkout.flutter.components.instant.session
 
-import ComponentFlutterInterface
 import com.adyen.checkout.components.core.ComponentError
 import com.adyen.checkout.components.core.action.Action
 import com.adyen.checkout.flutter.components.base.ComponentSessionCallback
+import com.adyen.checkout.flutter.generated.ComponentFlutterInterface
 import com.adyen.checkout.instant.InstantComponentState
 import com.adyen.checkout.sessions.core.SessionPaymentResult
 

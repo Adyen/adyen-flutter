@@ -1,12 +1,12 @@
 package com.adyen.checkout.flutter.components.card
 
-import CardComponentConfigurationDTO
-import ComponentFlutterInterface
 import android.content.Context
 import android.view.View
 import androidx.activity.ComponentActivity
 import com.adyen.checkout.card.CardComponent
 import com.adyen.checkout.flutter.components.view.DynamicComponentView
+import com.adyen.checkout.flutter.generated.CardComponentConfigurationDTO
+import com.adyen.checkout.flutter.generated.ComponentFlutterInterface
 import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToAmount
 import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToAnalyticsConfiguration
 import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToCardConfiguration

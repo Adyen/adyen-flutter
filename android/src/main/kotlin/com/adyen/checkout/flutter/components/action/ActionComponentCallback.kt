@@ -1,14 +1,15 @@
 package com.adyen.checkout.flutter.components.action
 
-import ComponentCommunicationModel
-import ComponentFlutterInterface
-import PaymentResultDTO
-import PaymentResultEnum
 import androidx.fragment.app.FragmentActivity
 import com.adyen.checkout.components.core.ActionComponentCallback
 import com.adyen.checkout.components.core.ActionComponentData
 import com.adyen.checkout.components.core.ComponentError
 import com.adyen.checkout.flutter.components.view.ComponentLoadingBottomSheet
+import com.adyen.checkout.flutter.generated.ComponentCommunicationModel
+import com.adyen.checkout.flutter.generated.ComponentCommunicationType
+import com.adyen.checkout.flutter.generated.ComponentFlutterInterface
+import com.adyen.checkout.flutter.generated.PaymentResultDTO
+import com.adyen.checkout.flutter.generated.PaymentResultEnum
 
 internal class ActionComponentCallback(
     private val activity: FragmentActivity,
@@ -20,7 +21,7 @@ internal class ActionComponentCallback(
         val data = ActionComponentData.SERIALIZER.serialize(actionComponentData).toString()
         val model =
             ComponentCommunicationModel(
-                type = ComponentCommunicationType.ADDITIONALDETAILS,
+                type = ComponentCommunicationType.ADDITIONAL_DETAILS,
                 componentId = componentId,
                 data = data,
             )
@@ -31,8 +32,8 @@ internal class ActionComponentCallback(
         ComponentLoadingBottomSheet.hide(activity.supportFragmentManager)
         val type: PaymentResultEnum =
             when (componentError.exception) {
-                is com.adyen.checkout.core.exception.CancellationException -> PaymentResultEnum.CANCELLEDBYUSER
-                is com.adyen.checkout.adyen3ds2.Cancelled3DS2Exception -> PaymentResultEnum.CANCELLEDBYUSER
+                is com.adyen.checkout.core.exception.CancellationException -> PaymentResultEnum.CANCELLED_BY_USER
+                is com.adyen.checkout.adyen3ds2.Cancelled3DS2Exception -> PaymentResultEnum.CANCELLED_BY_USER
                 else -> PaymentResultEnum.ERROR
             }
         val model =
