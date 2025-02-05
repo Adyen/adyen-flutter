@@ -10,8 +10,8 @@ import 'package:pigeon/pigeon.dart';
     package: "com.adyen.checkout.flutter.generated",
     errorClassName: "AdyenPigeonError",
   ),
-  swiftOut: 'ios/Classes/PlatformApi.swift',
-  swiftOptions: SwiftOptions(),
+  swiftOut: 'ios/Classes/generated/PlatformApi.swift',
+  swiftOptions: SwiftOptions(errorClassName: "AdyenPigeonError"),
   dartPackageName: 'adyen_checkout',
 ))
 enum Environment {

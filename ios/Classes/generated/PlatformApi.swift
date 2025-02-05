@@ -12,7 +12,7 @@ import Foundation
 #endif
 
 /// Error class for passing custom error details to Dart side.
-final class PigeonError: Error {
+final class AdyenPigeonError: Error {
   let code: String
   let message: String?
   let details: Any?
@@ -25,7 +25,7 @@ final class PigeonError: Error {
 
   var localizedDescription: String {
     return
-      "PigeonError(code: \(code), message: \(message ?? "<nil>"), details: \(details ?? "<nil>")"
+      "AdyenPigeonError(code: \(code), message: \(message ?? "<nil>"), details: \(details ?? "<nil>")"
       }
 }
 
@@ -34,7 +34,7 @@ private func wrapResult(_ result: Any?) -> [Any?] {
 }
 
 private func wrapError(_ error: Any) -> [Any?] {
-  if let pigeonError = error as? PigeonError {
+  if let pigeonError = error as? AdyenPigeonError {
     return [
       pigeonError.code,
       pigeonError.message,
@@ -55,8 +55,8 @@ private func wrapError(_ error: Any) -> [Any?] {
   ]
 }
 
-private func createConnectionError(withChannelName channelName: String) -> PigeonError {
-  return PigeonError(code: "channel-error", message: "Unable to establish connection on channel: '\(channelName)'.", details: "")
+private func createConnectionError(withChannelName channelName: String) -> AdyenPigeonError {
+  return AdyenPigeonError(code: "channel-error", message: "Unable to establish connection on channel: '\(channelName)'.", details: "")
 }
 
 private func isNullish(_ value: Any?) -> Bool {
@@ -1912,8 +1912,8 @@ class DropInPlatformInterfaceSetup {
 }
 /// Generated protocol from Pigeon that represents Flutter messages that can be called from Swift.
 protocol DropInFlutterInterfaceProtocol {
-  func onDropInSessionPlatformCommunication(platformCommunicationModel platformCommunicationModelArg: PlatformCommunicationModel, completion: @escaping (Result<Void, PigeonError>) -> Void)
-  func onDropInAdvancedPlatformCommunication(platformCommunicationModel platformCommunicationModelArg: PlatformCommunicationModel, completion: @escaping (Result<Void, PigeonError>) -> Void)
+  func onDropInSessionPlatformCommunication(platformCommunicationModel platformCommunicationModelArg: PlatformCommunicationModel, completion: @escaping (Result<Void, AdyenPigeonError>) -> Void)
+  func onDropInAdvancedPlatformCommunication(platformCommunicationModel platformCommunicationModelArg: PlatformCommunicationModel, completion: @escaping (Result<Void, AdyenPigeonError>) -> Void)
 }
 class DropInFlutterInterface: DropInFlutterInterfaceProtocol {
   private let binaryMessenger: FlutterBinaryMessenger
@@ -1925,7 +1925,7 @@ class DropInFlutterInterface: DropInFlutterInterfaceProtocol {
   var codec: PlatformApiPigeonCodec {
     return PlatformApiPigeonCodec.shared
   }
-  func onDropInSessionPlatformCommunication(platformCommunicationModel platformCommunicationModelArg: PlatformCommunicationModel, completion: @escaping (Result<Void, PigeonError>) -> Void) {
+  func onDropInSessionPlatformCommunication(platformCommunicationModel platformCommunicationModelArg: PlatformCommunicationModel, completion: @escaping (Result<Void, AdyenPigeonError>) -> Void) {
     let channelName: String = "dev.flutter.pigeon.adyen_checkout.DropInFlutterInterface.onDropInSessionPlatformCommunication\(messageChannelSuffix)"
     let channel = FlutterBasicMessageChannel(name: channelName, binaryMessenger: binaryMessenger, codec: codec)
     channel.sendMessage([platformCommunicationModelArg] as [Any?]) { response in
@@ -1937,13 +1937,13 @@ class DropInFlutterInterface: DropInFlutterInterfaceProtocol {
         let code: String = listResponse[0] as! String
         let message: String? = nilOrValue(listResponse[1])
         let details: String? = nilOrValue(listResponse[2])
-        completion(.failure(PigeonError(code: code, message: message, details: details)))
+        completion(.failure(AdyenPigeonError(code: code, message: message, details: details)))
       } else {
         completion(.success(Void()))
       }
     }
   }
-  func onDropInAdvancedPlatformCommunication(platformCommunicationModel platformCommunicationModelArg: PlatformCommunicationModel, completion: @escaping (Result<Void, PigeonError>) -> Void) {
+  func onDropInAdvancedPlatformCommunication(platformCommunicationModel platformCommunicationModelArg: PlatformCommunicationModel, completion: @escaping (Result<Void, AdyenPigeonError>) -> Void) {
     let channelName: String = "dev.flutter.pigeon.adyen_checkout.DropInFlutterInterface.onDropInAdvancedPlatformCommunication\(messageChannelSuffix)"
     let channel = FlutterBasicMessageChannel(name: channelName, binaryMessenger: binaryMessenger, codec: codec)
     channel.sendMessage([platformCommunicationModelArg] as [Any?]) { response in
@@ -1955,7 +1955,7 @@ class DropInFlutterInterface: DropInFlutterInterfaceProtocol {
         let code: String = listResponse[0] as! String
         let message: String? = nilOrValue(listResponse[1])
         let details: String? = nilOrValue(listResponse[2])
-        completion(.failure(PigeonError(code: code, message: message, details: details)))
+        completion(.failure(AdyenPigeonError(code: code, message: message, details: details)))
       } else {
         completion(.success(Void()))
       }
@@ -2098,8 +2098,8 @@ class ComponentPlatformInterfaceSetup {
 }
 /// Generated protocol from Pigeon that represents Flutter messages that can be called from Swift.
 protocol ComponentFlutterInterfaceProtocol {
-  func _generateCodecForDTOs(cardComponentConfigurationDTO cardComponentConfigurationDTOArg: CardComponentConfigurationDTO, sessionDTO sessionDTOArg: SessionDTO, completion: @escaping (Result<Void, PigeonError>) -> Void)
-  func onComponentCommunication(componentCommunicationModel componentCommunicationModelArg: ComponentCommunicationModel, completion: @escaping (Result<Void, PigeonError>) -> Void)
+  func _generateCodecForDTOs(cardComponentConfigurationDTO cardComponentConfigurationDTOArg: CardComponentConfigurationDTO, sessionDTO sessionDTOArg: SessionDTO, completion: @escaping (Result<Void, AdyenPigeonError>) -> Void)
+  func onComponentCommunication(componentCommunicationModel componentCommunicationModelArg: ComponentCommunicationModel, completion: @escaping (Result<Void, AdyenPigeonError>) -> Void)
 }
 class ComponentFlutterInterface: ComponentFlutterInterfaceProtocol {
   private let binaryMessenger: FlutterBinaryMessenger
@@ -2111,7 +2111,7 @@ class ComponentFlutterInterface: ComponentFlutterInterfaceProtocol {
   var codec: PlatformApiPigeonCodec {
     return PlatformApiPigeonCodec.shared
   }
-  func _generateCodecForDTOs(cardComponentConfigurationDTO cardComponentConfigurationDTOArg: CardComponentConfigurationDTO, sessionDTO sessionDTOArg: SessionDTO, completion: @escaping (Result<Void, PigeonError>) -> Void) {
+  func _generateCodecForDTOs(cardComponentConfigurationDTO cardComponentConfigurationDTOArg: CardComponentConfigurationDTO, sessionDTO sessionDTOArg: SessionDTO, completion: @escaping (Result<Void, AdyenPigeonError>) -> Void) {
     let channelName: String = "dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface._generateCodecForDTOs\(messageChannelSuffix)"
     let channel = FlutterBasicMessageChannel(name: channelName, binaryMessenger: binaryMessenger, codec: codec)
     channel.sendMessage([cardComponentConfigurationDTOArg, sessionDTOArg] as [Any?]) { response in
@@ -2123,13 +2123,13 @@ class ComponentFlutterInterface: ComponentFlutterInterfaceProtocol {
         let code: String = listResponse[0] as! String
         let message: String? = nilOrValue(listResponse[1])
         let details: String? = nilOrValue(listResponse[2])
-        completion(.failure(PigeonError(code: code, message: message, details: details)))
+        completion(.failure(AdyenPigeonError(code: code, message: message, details: details)))
       } else {
         completion(.success(Void()))
       }
     }
   }
-  func onComponentCommunication(componentCommunicationModel componentCommunicationModelArg: ComponentCommunicationModel, completion: @escaping (Result<Void, PigeonError>) -> Void) {
+  func onComponentCommunication(componentCommunicationModel componentCommunicationModelArg: ComponentCommunicationModel, completion: @escaping (Result<Void, AdyenPigeonError>) -> Void) {
     let channelName: String = "dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface.onComponentCommunication\(messageChannelSuffix)"
     let channel = FlutterBasicMessageChannel(name: channelName, binaryMessenger: binaryMessenger, codec: codec)
     channel.sendMessage([componentCommunicationModelArg] as [Any?]) { response in
@@ -2141,7 +2141,7 @@ class ComponentFlutterInterface: ComponentFlutterInterfaceProtocol {
         let code: String = listResponse[0] as! String
         let message: String? = nilOrValue(listResponse[1])
         let details: String? = nilOrValue(listResponse[2])
-        completion(.failure(PigeonError(code: code, message: message, details: details)))
+        completion(.failure(AdyenPigeonError(code: code, message: message, details: details)))
       } else {
         completion(.success(Void()))
       }
