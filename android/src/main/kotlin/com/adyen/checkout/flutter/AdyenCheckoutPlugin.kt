@@ -1,10 +1,5 @@
 package com.adyen.checkout.flutter
 
-import CheckoutPlatformInterface
-import ComponentFlutterInterface
-import ComponentPlatformInterface
-import DropInFlutterInterface
-import DropInPlatformInterface
 import android.content.Intent
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.Lifecycle
@@ -12,6 +7,11 @@ import androidx.lifecycle.LifecycleEventObserver
 import com.adyen.checkout.dropin.DropIn
 import com.adyen.checkout.flutter.components.ComponentPlatformApi
 import com.adyen.checkout.flutter.dropIn.DropInPlatformApi
+import com.adyen.checkout.flutter.generated.CheckoutPlatformInterface
+import com.adyen.checkout.flutter.generated.ComponentFlutterInterface
+import com.adyen.checkout.flutter.generated.ComponentPlatformInterface
+import com.adyen.checkout.flutter.generated.DropInFlutterInterface
+import com.adyen.checkout.flutter.generated.DropInPlatformInterface
 import com.adyen.checkout.flutter.session.SessionHolder
 import com.adyen.checkout.flutter.utils.Constants.Companion.WRONG_FLUTTER_ACTIVITY_USAGE_ERROR_MESSAGE
 import io.flutter.embedding.engine.plugins.FlutterPlugin

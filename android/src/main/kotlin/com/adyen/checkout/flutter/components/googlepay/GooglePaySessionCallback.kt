@@ -1,10 +1,11 @@
 package com.adyen.checkout.flutter.components.googlepay
 
-import ComponentCommunicationModel
-import ComponentFlutterInterface
 import com.adyen.checkout.components.core.ComponentError
 import com.adyen.checkout.components.core.action.Action
 import com.adyen.checkout.flutter.components.base.ComponentSessionCallback
+import com.adyen.checkout.flutter.generated.ComponentCommunicationModel
+import com.adyen.checkout.flutter.generated.ComponentCommunicationType
+import com.adyen.checkout.flutter.generated.ComponentFlutterInterface
 import com.adyen.checkout.googlepay.GooglePayComponentState
 import com.adyen.checkout.sessions.core.SessionPaymentResult
 

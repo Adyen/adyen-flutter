@@ -1,15 +1,17 @@
 package com.adyen.checkout.flutter.components.action
 
-import ActionComponentConfigurationDTO
-import ComponentCommunicationModel
-import ComponentFlutterInterface
-import PaymentResultDTO
 import androidx.fragment.app.FragmentActivity
 import com.adyen.checkout.action.core.GenericActionComponent
 import com.adyen.checkout.action.core.internal.ActionHandlingComponent
 import com.adyen.checkout.components.core.CheckoutConfiguration
 import com.adyen.checkout.components.core.action.Action
 import com.adyen.checkout.flutter.components.view.ComponentLoadingBottomSheet
+import com.adyen.checkout.flutter.generated.ActionComponentConfigurationDTO
+import com.adyen.checkout.flutter.generated.ComponentCommunicationModel
+import com.adyen.checkout.flutter.generated.ComponentCommunicationType
+import com.adyen.checkout.flutter.generated.ComponentFlutterInterface
+import com.adyen.checkout.flutter.generated.PaymentResultDTO
+import com.adyen.checkout.flutter.generated.PaymentResultEnum
 import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToCheckoutConfiguration
 import org.json.JSONObject
 import java.util.UUID

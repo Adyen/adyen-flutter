@@ -12,7 +12,7 @@ class ComponentFlutterApi implements ComponentFlutterInterface {
 
   static ComponentFlutterApi _initComponentFlutterApi() {
     ComponentFlutterApi componentFlutterApi = ComponentFlutterApi._init();
-    ComponentFlutterInterface.setup(componentFlutterApi);
+    ComponentFlutterInterface.setUp(componentFlutterApi);
     _componentCommunicationStream =
         StreamController<ComponentCommunicationModel>.broadcast();
     return componentFlutterApi;
@@ -34,7 +34,7 @@ class ComponentFlutterApi implements ComponentFlutterInterface {
     if (componentCommunicationStream.hasListener == false) {
       _instance = null;
       _componentCommunicationStream.close();
-      ComponentFlutterInterface.setup(null);
+      ComponentFlutterInterface.setUp(null);
     }
   }
 }

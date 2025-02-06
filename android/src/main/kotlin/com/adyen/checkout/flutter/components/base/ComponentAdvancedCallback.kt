@@ -1,17 +1,16 @@
 package com.adyen.checkout.flutter.components.base
 
-import ComponentCommunicationModel
-import ComponentCommunicationType
-import ComponentFlutterInterface
-import PaymentResultDTO
-import PaymentResultEnum
 import com.adyen.checkout.components.core.ActionComponentData
 import com.adyen.checkout.components.core.ComponentCallback
 import com.adyen.checkout.components.core.ComponentError
 import com.adyen.checkout.components.core.PaymentComponentData
 import com.adyen.checkout.components.core.PaymentComponentState
+import com.adyen.checkout.flutter.generated.ComponentCommunicationModel
+import com.adyen.checkout.flutter.generated.ComponentCommunicationType
+import com.adyen.checkout.flutter.generated.ComponentFlutterInterface
+import com.adyen.checkout.flutter.generated.PaymentResultDTO
+import com.adyen.checkout.flutter.generated.PaymentResultEnum
 import com.adyen.checkout.flutter.utils.Constants
-import java.util.concurrent.CancellationException
 
 abstract class ComponentAdvancedCallback<T : PaymentComponentState<*>>(
     private val componentFlutterApi: ComponentFlutterInterface,
@@ -20,7 +19,7 @@ abstract class ComponentAdvancedCallback<T : PaymentComponentState<*>>(
     override fun onSubmit(state: T) {
         val model =
             ComponentCommunicationModel(
-                ComponentCommunicationType.ONSUBMIT,
+                ComponentCommunicationType.ON_SUBMIT,
                 componentId = componentId,
                 data = PaymentComponentData.SERIALIZER.serialize(state.data).toString(),
             )
@@ -30,7 +29,7 @@ abstract class ComponentAdvancedCallback<T : PaymentComponentState<*>>(
     override fun onAdditionalDetails(actionComponentData: ActionComponentData) {
         val model =
             ComponentCommunicationModel(
-                ComponentCommunicationType.ADDITIONALDETAILS,
+                ComponentCommunicationType.ADDITIONAL_DETAILS,
                 componentId = componentId,
                 data = ActionComponentData.SERIALIZER.serialize(actionComponentData).toString(),
             )
@@ -43,7 +42,7 @@ abstract class ComponentAdvancedCallback<T : PaymentComponentState<*>>(
                 (componentError.exception is com.adyen.checkout.core.exception.CancellationException) ||
                 (componentError.exception is com.adyen.checkout.adyen3ds2.Cancelled3DS2Exception)
             )
-                PaymentResultEnum.CANCELLEDBYUSER
+                PaymentResultEnum.CANCELLED_BY_USER
             else
                 PaymentResultEnum.ERROR
 
