@@ -116,7 +116,7 @@ class DropInPlatformApi: DropInPlatformInterface {
                 type: PlatformCommunicationType.result,
                 paymentResult: PaymentResultDTO(type: PaymentResultEnum.error, reason: error.localizedDescription)
             )
-            dropInFlutterApi.onDropInAdvancedPlatformCommunication(
+            dropInFlutterApi.onDropInPlatformCommunication(
                 platformCommunicationModel: platformCommunicationModel,
                 completion: { _ in }
             )
@@ -198,7 +198,7 @@ class DropInPlatformApi: DropInPlatformInterface {
                 result: PaymentResultModelDTO(
                     resultCode: resultCode?.rawValue)
             )
-            self?.dropInFlutterApi.onDropInAdvancedPlatformCommunication(
+            self?.dropInFlutterApi.onDropInPlatformCommunication(
                 platformCommunicationModel: PlatformCommunicationModel(
                     type: PlatformCommunicationType.result,
                     paymentResult: paymentResult
@@ -215,7 +215,7 @@ class DropInPlatformApi: DropInPlatformInterface {
             dropInViewController?.dropInComponent.handle(result)
         } catch {
             let paymentResult = PaymentResultDTO(type: PaymentResultEnum.error, reason: error.localizedDescription)
-            dropInFlutterApi.onDropInAdvancedPlatformCommunication(
+            dropInFlutterApi.onDropInPlatformCommunication(
                 platformCommunicationModel: PlatformCommunicationModel(
                     type: PlatformCommunicationType.result,
                     paymentResult: paymentResult
@@ -232,7 +232,7 @@ class DropInPlatformApi: DropInPlatformInterface {
         if paymentEventDTO.error?.dismissDropIn == true || dropInAdvancedFlowDelegate?.isApplePay == true {
             finalizeAndDismiss(success: false) { [weak self] in
                 let paymentResult = PaymentResultDTO(type: PaymentResultEnum.error, reason: paymentEventDTO.error?.errorMessage)
-                self?.dropInFlutterApi.onDropInAdvancedPlatformCommunication(
+                self?.dropInFlutterApi.onDropInPlatformCommunication(
                     platformCommunicationModel: PlatformCommunicationModel(
                         type: PlatformCommunicationType.result,
                         paymentResult: paymentResult
@@ -295,7 +295,7 @@ class DropInPlatformApi: DropInPlatformInterface {
                 reason: error.localizedDescription
             )
         )
-        dropInFlutterApi.onDropInSessionPlatformCommunication(
+        dropInFlutterApi.onDropInPlatformCommunication(
             platformCommunicationModel: platformCommunicationModel,
             completion: { _ in }
         )
@@ -351,7 +351,7 @@ extension DropInPlatformApi: PartialPaymentDelegate {
                 type: PlatformCommunicationType.balanceCheck,
                 data: data.jsonObject.toJsonStringRepresentation()
             )
-            dropInFlutterApi.onDropInAdvancedPlatformCommunication(platformCommunicationModel: platformCommunicationModel, completion: { _ in })
+            dropInFlutterApi.onDropInPlatformCommunication(platformCommunicationModel: platformCommunicationModel, completion: { _ in })
         } catch {
             completion(.failure(error))
         }
@@ -360,7 +360,7 @@ extension DropInPlatformApi: PartialPaymentDelegate {
     func requestOrder(for component: any Adyen.Component, completion: @escaping (Result<Adyen.PartialPaymentOrder, any Error>) -> Void) {
         requestOrderHandler = completion
         let platformCommunicationModel = PlatformCommunicationModel(type: PlatformCommunicationType.requestOrder)
-        dropInFlutterApi.onDropInAdvancedPlatformCommunication(platformCommunicationModel: platformCommunicationModel, completion: { _ in })
+        dropInFlutterApi.onDropInPlatformCommunication(platformCommunicationModel: platformCommunicationModel, completion: { _ in })
     }
     
     func cancelOrder(_ order: Adyen.PartialPaymentOrder, component: any Adyen.Component) {
@@ -372,7 +372,7 @@ extension DropInPlatformApi: PartialPaymentDelegate {
             let data = try JSONSerialization.data(withJSONObject: cancelOrderData, options: [])
             let cancelOrderDataString = String(data: data, encoding: .utf8)
             let platformCommunicationModel = PlatformCommunicationModel(type: PlatformCommunicationType.cancelOrder, data: cancelOrderDataString)
-            dropInFlutterApi.onDropInAdvancedPlatformCommunication(platformCommunicationModel: platformCommunicationModel, completion: { _ in })
+            dropInFlutterApi.onDropInPlatformCommunication(platformCommunicationModel: platformCommunicationModel, completion: { _ in })
         } catch {
             adyenPrint(error.localizedDescription)
         }

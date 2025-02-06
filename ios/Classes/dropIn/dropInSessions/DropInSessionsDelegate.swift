@@ -25,7 +25,7 @@ class DropInSessionsDelegate: AdyenSessionDelegate {
                     result: paymentResult
                 )
             )
-            self.dropInFlutterApi.onDropInSessionPlatformCommunication(
+            self.dropInFlutterApi.onDropInPlatformCommunication(
                 platformCommunicationModel: platformCommunicationModel,
                 completion: { _ in }
             )
@@ -43,7 +43,7 @@ class DropInSessionsDelegate: AdyenSessionDelegate {
                         reason: error.localizedDescription
                     )
                 )
-                self.dropInFlutterApi.onDropInSessionPlatformCommunication(
+                self.dropInFlutterApi.onDropInPlatformCommunication(
                     platformCommunicationModel: platformCommunicationModel,
                     completion: { _ in }
                 )
@@ -55,7 +55,7 @@ class DropInSessionsDelegate: AdyenSessionDelegate {
                         reason: error.localizedDescription
                     )
                 )
-                self.dropInFlutterApi.onDropInSessionPlatformCommunication(
+                self.dropInFlutterApi.onDropInPlatformCommunication(
                     platformCommunicationModel: platformCommunicationModel,
                     completion: { _ in }
                 )

@@ -2018,27 +2018,10 @@ class DropInFlutterInterface(private val binaryMessenger: BinaryMessenger, priva
       PlatformApiPigeonCodec
     }
   }
-  fun onDropInSessionPlatformCommunication(platformCommunicationModelArg: PlatformCommunicationModel, callback: (Result<Unit>) -> Unit)
+  fun onDropInPlatformCommunication(platformCommunicationModelArg: PlatformCommunicationModel, callback: (Result<Unit>) -> Unit)
 {
     val separatedMessageChannelSuffix = if (messageChannelSuffix.isNotEmpty()) ".$messageChannelSuffix" else ""
-    val channelName = "dev.flutter.pigeon.adyen_checkout.DropInFlutterInterface.onDropInSessionPlatformCommunication$separatedMessageChannelSuffix"
-    val channel = BasicMessageChannel<Any?>(binaryMessenger, channelName, codec)
-    channel.send(listOf(platformCommunicationModelArg)) {
-      if (it is List<*>) {
-        if (it.size > 1) {
-          callback(Result.failure(AdyenPigeonError(it[0] as String, it[1] as String, it[2] as String?)))
-        } else {
-          callback(Result.success(Unit))
-        }
-      } else {
-        callback(Result.failure(createConnectionError(channelName)))
-      } 
-    }
-  }
-  fun onDropInAdvancedPlatformCommunication(platformCommunicationModelArg: PlatformCommunicationModel, callback: (Result<Unit>) -> Unit)
-{
-    val separatedMessageChannelSuffix = if (messageChannelSuffix.isNotEmpty()) ".$messageChannelSuffix" else ""
-    val channelName = "dev.flutter.pigeon.adyen_checkout.DropInFlutterInterface.onDropInAdvancedPlatformCommunication$separatedMessageChannelSuffix"
+    val channelName = "dev.flutter.pigeon.adyen_checkout.DropInFlutterInterface.onDropInPlatformCommunication$separatedMessageChannelSuffix"
     val channel = BasicMessageChannel<Any?>(binaryMessenger, channelName, codec)
     channel.send(listOf(platformCommunicationModelArg)) {
       if (it is List<*>) {

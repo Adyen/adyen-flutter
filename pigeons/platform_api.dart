@@ -679,10 +679,7 @@ abstract class DropInPlatformInterface {
 
 @FlutterApi()
 abstract class DropInFlutterInterface {
-  void onDropInSessionPlatformCommunication(
-      PlatformCommunicationModel platformCommunicationModel);
-
-  void onDropInAdvancedPlatformCommunication(
+  void onDropInPlatformCommunication(
       PlatformCommunicationModel platformCommunicationModel);
 }
 

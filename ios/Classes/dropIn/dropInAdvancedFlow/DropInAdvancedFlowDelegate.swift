@@ -23,7 +23,7 @@ class DropInAdvancedFlowDelegate: DropInComponentDelegate {
                 type: PlatformCommunicationType.paymentComponent,
                 data: submitDataEncoded
             )
-            dropInFlutterApi.onDropInAdvancedPlatformCommunication(
+            dropInFlutterApi.onDropInPlatformCommunication(
                 platformCommunicationModel: platformCommunicationModel,
                 completion: { _ in }
             )
@@ -39,7 +39,7 @@ class DropInAdvancedFlowDelegate: DropInComponentDelegate {
             let actionComponentData = ActionComponentDataModel(details: data.details.encodable, paymentData: data.paymentData)
             let actionComponentDataJson = try JSONEncoder().encode(actionComponentData)
             let actionComponentDataString = String(data: actionComponentDataJson, encoding: .utf8)
-            dropInFlutterApi.onDropInAdvancedPlatformCommunication(
+            dropInFlutterApi.onDropInPlatformCommunication(
                 platformCommunicationModel: PlatformCommunicationModel(
                     type: PlatformCommunicationType.additionalDetails,
                     data: actionComponentDataString
@@ -63,7 +63,7 @@ class DropInAdvancedFlowDelegate: DropInComponentDelegate {
                 type: PlatformCommunicationType.result,
                 paymentResult: paymentResult
             )
-            self?.dropInFlutterApi.onDropInAdvancedPlatformCommunication(
+            self?.dropInFlutterApi.onDropInPlatformCommunication(
                 platformCommunicationModel: platformCommunicationModel,
                 completion: { _ in }
             )
@@ -93,7 +93,7 @@ class DropInAdvancedFlowDelegate: DropInComponentDelegate {
                         reason: error.localizedDescription
                     )
                 )
-                self?.dropInFlutterApi.onDropInAdvancedPlatformCommunication(
+                self?.dropInFlutterApi.onDropInPlatformCommunication(
                     platformCommunicationModel: platformCommunicationModel,
                     completion: { _ in }
                 )
@@ -111,6 +111,6 @@ class DropInAdvancedFlowDelegate: DropInComponentDelegate {
                 reason: error.localizedDescription
             )
         )
-        dropInFlutterApi.onDropInAdvancedPlatformCommunication(platformCommunicationModel: platformCommunicationModel, completion: { _ in })
+        dropInFlutterApi.onDropInPlatformCommunication(platformCommunicationModel: platformCommunicationModel, completion: { _ in })
     }
 }

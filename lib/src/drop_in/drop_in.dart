@@ -39,10 +39,10 @@ class DropIn {
       dropInConfiguration.toDTO(sdkVersionNumber, true),
     );
 
-    dropInFlutterApi.dropInSessionPlatformCommunicationStream =
-        StreamController<PlatformCommunicationModel>.broadcast();
-    dropInFlutterApi.dropInSessionPlatformCommunicationStream.stream
-        .asBroadcastStream()
+    dropInFlutterApi.dropInPlatformCommunicationStream =
+        StreamController<PlatformCommunicationModel>();
+    final platformCommunicationSubscription = dropInFlutterApi
+        .dropInPlatformCommunicationStream?.stream
         .listen((event) async {
       switch (event.type) {
         case PlatformCommunicationType.result:
@@ -56,28 +56,28 @@ class DropIn {
       }
     });
 
-    return dropInSessionCompleter.future.then((paymentResultDTO) {
+    return dropInSessionCompleter.future.then((paymentResultDTO) async {
       dropInPlatformApi.cleanUpDropIn();
-      dropInFlutterApi.dropInSessionPlatformCommunicationStream.close();
+      await platformCommunicationSubscription?.cancel();
+      dropInFlutterApi.dropInPlatformCommunicationStream?.close();
+      dropInFlutterApi.dropInPlatformCommunicationStream = null;
       adyenLogger
           .print("Drop-in session result type: ${paymentResultDTO.type.name}");
       adyenLogger.print(
           "Drop-in session result code: ${paymentResultDTO.result?.resultCode}");
-      switch (paymentResultDTO.type) {
-        case PaymentResultEnum.cancelledByUser:
-          return PaymentCancelledByUser();
-        case PaymentResultEnum.error:
-          return PaymentError(reason: paymentResultDTO.reason);
-        case PaymentResultEnum.finished:
-          return PaymentSessionFinished(
+      return switch (paymentResultDTO.type) {
+        PaymentResultEnum.cancelledByUser => PaymentCancelledByUser(),
+        PaymentResultEnum.error =>
+          PaymentError(reason: paymentResultDTO.reason),
+        PaymentResultEnum.finished => PaymentSessionFinished(
             sessionId: paymentResultDTO.result?.sessionId ?? "",
             sessionData: paymentResultDTO.result?.sessionData ?? "",
             sessionResult: paymentResultDTO.result?.sessionResult ?? "",
             resultCode:
                 paymentResultDTO.result?.toResultCode() ?? ResultCode.unknown,
             order: paymentResultDTO.result?.order?.fromDTO(),
-          );
-      }
+          )
+      };
     });
   }
 
@@ -104,10 +104,10 @@ class DropIn {
       encodedPaymentMethodsResponse,
     );
 
-    dropInFlutterApi.dropInAdvancedFlowPlatformCommunicationStream =
-        StreamController<PlatformCommunicationModel>.broadcast();
-    dropInFlutterApi.dropInAdvancedFlowPlatformCommunicationStream.stream
-        .asBroadcastStream()
+    dropInFlutterApi.dropInPlatformCommunicationStream =
+        StreamController<PlatformCommunicationModel>();
+    final platformCommunicationSubscription = dropInFlutterApi
+        .dropInPlatformCommunicationStream?.stream
         .listen((event) async {
       switch (event.type) {
         case PlatformCommunicationType.paymentComponent:
@@ -130,23 +130,23 @@ class DropIn {
       }
     });
 
-    return dropInAdvancedFlowCompleter.future.then((paymentResultDTO) {
+    return dropInAdvancedFlowCompleter.future.then((paymentResultDTO) async {
       dropInPlatformApi.cleanUpDropIn();
-      dropInFlutterApi.dropInAdvancedFlowPlatformCommunicationStream.close();
+      await platformCommunicationSubscription?.cancel();
+      await dropInFlutterApi.dropInPlatformCommunicationStream?.close();
+      dropInFlutterApi.dropInPlatformCommunicationStream = null;
       adyenLogger.print(
           "Drop-in advanced flow result type: ${paymentResultDTO.type.name}");
       adyenLogger.print(
           "Drop-in advanced flow result code: ${paymentResultDTO.result?.resultCode}");
-      switch (paymentResultDTO.type) {
-        case PaymentResultEnum.cancelledByUser:
-          return PaymentCancelledByUser();
-        case PaymentResultEnum.error:
-          return PaymentError(reason: paymentResultDTO.reason);
-        case PaymentResultEnum.finished:
-          return PaymentAdvancedFinished(
-              resultCode: paymentResultDTO.result?.toResultCode() ??
-                  ResultCode.unknown);
-      }
+      return switch (paymentResultDTO.type) {
+        PaymentResultEnum.cancelledByUser => PaymentCancelledByUser(),
+        PaymentResultEnum.error =>
+          PaymentError(reason: paymentResultDTO.reason),
+        PaymentResultEnum.finished => PaymentAdvancedFinished(
+            resultCode:
+                paymentResultDTO.result?.toResultCode() ?? ResultCode.unknown)
+      };
     });
   }
 

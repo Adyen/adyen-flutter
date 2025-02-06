@@ -159,7 +159,7 @@ class DropInPlatformApi(
                     PlatformCommunicationType.PAYMENT_COMPONENT,
                     data = message.contentIfNotHandled.toString(),
                 )
-            dropInFlutterApi.onDropInAdvancedPlatformCommunication(model) {}
+            dropInFlutterApi.onDropInPlatformCommunication(model) {}
         }
     }
 
@@ -179,12 +179,12 @@ class DropInPlatformApi(
 
             when (dropInStoredPaymentMethodDeletionModel?.dropInFlowType) {
                 DropInType.SESSION ->
-                    dropInFlutterApi.onDropInSessionPlatformCommunication(
+                    dropInFlutterApi.onDropInPlatformCommunication(
                         platformCommunicationModel
                     ) {}
 
                 DropInType.ADVANCED_FLOW ->
-                    dropInFlutterApi.onDropInAdvancedPlatformCommunication(
+                    dropInFlutterApi.onDropInPlatformCommunication(
                         platformCommunicationModel
                     ) {}
 
@@ -206,7 +206,7 @@ class DropInPlatformApi(
                     data = message.contentIfNotHandled.toString(),
                 )
 
-            dropInFlutterApi.onDropInAdvancedPlatformCommunication(platformCommunicationModel) {}
+            dropInFlutterApi.onDropInPlatformCommunication(platformCommunicationModel) {}
         }
     }
 
@@ -222,7 +222,7 @@ class DropInPlatformApi(
                     PlatformCommunicationType.BALANCE_CHECK,
                     data = message.contentIfNotHandled.toString()
                 )
-            dropInFlutterApi.onDropInAdvancedPlatformCommunication(platformCommunicationModel) {}
+            dropInFlutterApi.onDropInPlatformCommunication(platformCommunicationModel) {}
         }
     }
 
@@ -238,7 +238,7 @@ class DropInPlatformApi(
                     PlatformCommunicationType.REQUEST_ORDER,
                     data = message.contentIfNotHandled.toString()
                 )
-            dropInFlutterApi.onDropInAdvancedPlatformCommunication(platformCommunicationModel) {}
+            dropInFlutterApi.onDropInPlatformCommunication(platformCommunicationModel) {}
         }
     }
 
@@ -254,7 +254,7 @@ class DropInPlatformApi(
                     PlatformCommunicationType.CANCEL_ORDER,
                     data = message.contentIfNotHandled.toString()
                 )
-            dropInFlutterApi.onDropInAdvancedPlatformCommunication(platformCommunicationModel) {}
+            dropInFlutterApi.onDropInPlatformCommunication(platformCommunicationModel) {}
         }
     }
 
@@ -334,7 +334,7 @@ class DropInPlatformApi(
                     paymentResult = mappedResult
                 )
 
-            dropInFlutterApi.onDropInSessionPlatformCommunication(platformCommunicationModel) {}
+            dropInFlutterApi.onDropInPlatformCommunication(platformCommunicationModel) {}
         }
 
     val dropInAdvancedFlowCallback =
@@ -372,6 +372,6 @@ class DropInPlatformApi(
                     data = "",
                     paymentResult = mappedResult
                 )
-            dropInFlutterApi.onDropInAdvancedPlatformCommunication(platformCommunicationModel) {}
+            dropInFlutterApi.onDropInPlatformCommunication(platformCommunicationModel) {}
         }
 }

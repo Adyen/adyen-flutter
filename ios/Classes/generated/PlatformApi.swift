@@ -1942,8 +1942,7 @@ class DropInPlatformInterfaceSetup {
 
 /// Generated protocol from Pigeon that represents Flutter messages that can be called from Swift.
 protocol DropInFlutterInterfaceProtocol {
-    func onDropInSessionPlatformCommunication(platformCommunicationModel platformCommunicationModelArg: PlatformCommunicationModel, completion: @escaping (Result<Void, AdyenPigeonError>) -> Void)
-    func onDropInAdvancedPlatformCommunication(platformCommunicationModel platformCommunicationModelArg: PlatformCommunicationModel, completion: @escaping (Result<Void, AdyenPigeonError>) -> Void)
+    func onDropInPlatformCommunication(platformCommunicationModel platformCommunicationModelArg: PlatformCommunicationModel, completion: @escaping (Result<Void, AdyenPigeonError>) -> Void)
 }
 
 class DropInFlutterInterface: DropInFlutterInterfaceProtocol {
@@ -1958,27 +1957,8 @@ class DropInFlutterInterface: DropInFlutterInterfaceProtocol {
         PlatformApiPigeonCodec.shared
     }
 
-    func onDropInSessionPlatformCommunication(platformCommunicationModel platformCommunicationModelArg: PlatformCommunicationModel, completion: @escaping (Result<Void, AdyenPigeonError>) -> Void) {
-        let channelName = "dev.flutter.pigeon.adyen_checkout.DropInFlutterInterface.onDropInSessionPlatformCommunication\(messageChannelSuffix)"
-        let channel = FlutterBasicMessageChannel(name: channelName, binaryMessenger: binaryMessenger, codec: codec)
-        channel.sendMessage([platformCommunicationModelArg] as [Any?]) { response in
-            guard let listResponse = response as? [Any?] else {
-                completion(.failure(createConnectionError(withChannelName: channelName)))
-                return
-            }
-            if listResponse.count > 1 {
-                let code: String = listResponse[0] as! String
-                let message: String? = nilOrValue(listResponse[1])
-                let details: String? = nilOrValue(listResponse[2])
-                completion(.failure(AdyenPigeonError(code: code, message: message, details: details)))
-            } else {
-                completion(.success(()))
-            }
-        }
-    }
-
-    func onDropInAdvancedPlatformCommunication(platformCommunicationModel platformCommunicationModelArg: PlatformCommunicationModel, completion: @escaping (Result<Void, AdyenPigeonError>) -> Void) {
-        let channelName = "dev.flutter.pigeon.adyen_checkout.DropInFlutterInterface.onDropInAdvancedPlatformCommunication\(messageChannelSuffix)"
+    func onDropInPlatformCommunication(platformCommunicationModel platformCommunicationModelArg: PlatformCommunicationModel, completion: @escaping (Result<Void, AdyenPigeonError>) -> Void) {
+        let channelName = "dev.flutter.pigeon.adyen_checkout.DropInFlutterInterface.onDropInPlatformCommunication\(messageChannelSuffix)"
         let channel = FlutterBasicMessageChannel(name: channelName, binaryMessenger: binaryMessenger, codec: codec)
         channel.sendMessage([platformCommunicationModelArg] as [Any?]) { response in
             guard let listResponse = response as? [Any?] else {

@@ -17,7 +17,7 @@ class DropInAdvancedFlowStoredPaymentMethodsDelegate: StoredPaymentMethodsDelega
             type: PlatformCommunicationType.deleteStoredPaymentMethod,
             data: storedPaymentMethod.identifier
         )
-        dropInFlutterApi.onDropInAdvancedPlatformCommunication(
+        dropInFlutterApi.onDropInPlatformCommunication(
             platformCommunicationModel: platformCommunicationModel,
             completion: { _ in }
         )
