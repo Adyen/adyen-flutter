@@ -2,12 +2,12 @@ import Adyen
 import AdyenNetworking
 
 class DropInAdvancedFlowDelegate: DropInComponentDelegate {
-    private let dropInFlutterApi: DropInFlutterInterface
+    private let checkoutFlutter: CheckoutFlutterInterface
     public weak var dropInInteractorDelegate: DropInInteractorDelegate?
     var isApplePay: Bool = false
 
-    init(dropInFlutterApi: DropInFlutterInterface) {
-        self.dropInFlutterApi = dropInFlutterApi
+    init(checkoutFlutter: CheckoutFlutterInterface) {
+        self.checkoutFlutter = checkoutFlutter
     }
 
     func didSubmit(_ data: PaymentComponentData, from paymentComponent: PaymentComponent, in _: AnyDropInComponent) {
@@ -19,12 +19,12 @@ class DropInAdvancedFlowDelegate: DropInComponentDelegate {
                 extra: applePayDetails?.getExtraData()
             )
             let submitDataEncoded = try submitData.toJsonString()
-            let platformCommunicationModel = PlatformCommunicationModel(
-                type: PlatformCommunicationType.paymentComponent,
+            let checkoutEvent = CheckoutEvent(
+                type: CheckoutEventType.paymentComponent,
                 data: submitDataEncoded
             )
-            dropInFlutterApi.onDropInPlatformCommunication(
-                platformCommunicationModel: platformCommunicationModel,
+            checkoutFlutter.send(
+                event: checkoutEvent,
                 completion: { _ in }
             )
         } catch {
@@ -39,11 +39,9 @@ class DropInAdvancedFlowDelegate: DropInComponentDelegate {
             let actionComponentData = ActionComponentDataModel(details: data.details.encodable, paymentData: data.paymentData)
             let actionComponentDataJson = try JSONEncoder().encode(actionComponentData)
             let actionComponentDataString = String(data: actionComponentDataJson, encoding: .utf8)
-            dropInFlutterApi.onDropInPlatformCommunication(
-                platformCommunicationModel: PlatformCommunicationModel(
-                    type: PlatformCommunicationType.additionalDetails,
-                    data: actionComponentDataString
-                ),
+            let checkoutEvent = CheckoutEvent(type: CheckoutEventType.additionalDetails, data: actionComponentDataString)
+            checkoutFlutter.send(
+                event: checkoutEvent,
                 completion: { _ in }
             )
         } catch {
@@ -59,12 +57,12 @@ class DropInAdvancedFlowDelegate: DropInComponentDelegate {
                 type: PaymentResultEnum.finished,
                 result: PaymentResultModelDTO(resultCode: ResultCode.received.rawValue)
             )
-            let platformCommunicationModel = PlatformCommunicationModel(
-                type: PlatformCommunicationType.result,
+            let checkoutEvent = CheckoutEvent(
+                type: CheckoutEventType.result,
                 paymentResult: paymentResult
             )
-            self?.dropInFlutterApi.onDropInPlatformCommunication(
-                platformCommunicationModel: platformCommunicationModel,
+            self?.checkoutFlutter.send(
+                event: checkoutEvent,
                 completion: { _ in }
             )
         }
@@ -86,15 +84,15 @@ class DropInAdvancedFlowDelegate: DropInComponentDelegate {
         dropInInteractorDelegate?.finalizeAndDismiss(success: false) { [weak self] in
             switch error {
             case ComponentError.cancelled:
-                let platformCommunicationModel = PlatformCommunicationModel(
-                    type: PlatformCommunicationType.result,
+                let checkoutEvent = CheckoutEvent(
+                    type: CheckoutEventType.result,
                     paymentResult: PaymentResultDTO(
                         type: PaymentResultEnum.cancelledByUser,
                         reason: error.localizedDescription
                     )
                 )
-                self?.dropInFlutterApi.onDropInPlatformCommunication(
-                    platformCommunicationModel: platformCommunicationModel,
+                self?.checkoutFlutter.send(
+                    event: checkoutEvent,
                     completion: { _ in }
                 )
             default:
@@ -104,13 +102,13 @@ class DropInAdvancedFlowDelegate: DropInComponentDelegate {
     }
 
     private func sendErrorToFlutterLayer(error: Error) {
-        let platformCommunicationModel = PlatformCommunicationModel(
-            type: PlatformCommunicationType.result,
+        let checkoutEvent = CheckoutEvent(
+            type: CheckoutEventType.result,
             paymentResult: PaymentResultDTO(
                 type: PaymentResultEnum.error,
                 reason: error.localizedDescription
             )
         )
-        dropInFlutterApi.onDropInPlatformCommunication(platformCommunicationModel: platformCommunicationModel, completion: { _ in })
+        checkoutFlutter.send(event: checkoutEvent, completion: { _ in })
     }
 }

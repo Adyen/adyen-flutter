@@ -68,7 +68,7 @@ enum PaymentResultEnum {
   finished,
 }
 
-enum PlatformCommunicationType {
+enum CheckoutEventType {
   paymentComponent,
   additionalDetails,
   result,
@@ -935,14 +935,14 @@ class OrderResponseDTO {
   }
 }
 
-class PlatformCommunicationModel {
-  PlatformCommunicationModel({
+class CheckoutEvent {
+  CheckoutEvent({
     required this.type,
     this.data,
     this.paymentResult,
   });
 
-  PlatformCommunicationType type;
+  CheckoutEventType type;
 
   String? data;
 
@@ -956,10 +956,10 @@ class PlatformCommunicationModel {
     ];
   }
 
-  static PlatformCommunicationModel decode(Object result) {
+  static CheckoutEvent decode(Object result) {
     result as List<Object?>;
-    return PlatformCommunicationModel(
-      type: result[0]! as PlatformCommunicationType,
+    return CheckoutEvent(
+      type: result[0]! as CheckoutEventType,
       data: result[1] as String?,
       paymentResult: result[2] as PaymentResultDTO?,
     );
@@ -1434,7 +1434,7 @@ class _PigeonCodec extends StandardMessageCodec {
     } else if (value is OrderResponseDTO) {
       buffer.putUint8(145);
       writeValue(buffer, value.encode());
-    } else if (value is PlatformCommunicationModel) {
+    } else if (value is CheckoutEvent) {
       buffer.putUint8(146);
       writeValue(buffer, value.encode());
     } else if (value is ComponentCommunicationModel) {
@@ -1491,7 +1491,7 @@ class _PigeonCodec extends StandardMessageCodec {
     } else if (value is PaymentResultEnum) {
       buffer.putUint8(164);
       writeValue(buffer, value.index);
-    } else if (value is PlatformCommunicationType) {
+    } else if (value is CheckoutEventType) {
       buffer.putUint8(165);
       writeValue(buffer, value.index);
     } else if (value is ComponentCommunicationType) {
@@ -1567,7 +1567,7 @@ class _PigeonCodec extends StandardMessageCodec {
       case 145:
         return OrderResponseDTO.decode(readValue(buffer)!);
       case 146:
-        return PlatformCommunicationModel.decode(readValue(buffer)!);
+        return CheckoutEvent.decode(readValue(buffer)!);
       case 147:
         return ComponentCommunicationModel.decode(readValue(buffer)!);
       case 148:
@@ -1613,7 +1613,7 @@ class _PigeonCodec extends StandardMessageCodec {
         return value == null ? null : PaymentResultEnum.values[value];
       case 165:
         final int? value = readValue(buffer) as int?;
-        return value == null ? null : PlatformCommunicationType.values[value];
+        return value == null ? null : CheckoutEventType.values[value];
       case 166:
         final int? value = readValue(buffer) as int?;
         return value == null ? null : ComponentCommunicationType.values[value];
@@ -2168,14 +2168,13 @@ class DropInPlatformInterface {
   }
 }
 
-abstract class DropInFlutterInterface {
+abstract class CheckoutFlutterInterface {
   static const MessageCodec<Object?> pigeonChannelCodec = _PigeonCodec();
 
-  void onDropInPlatformCommunication(
-      PlatformCommunicationModel platformCommunicationModel);
+  void send(CheckoutEvent event);
 
   static void setUp(
-    DropInFlutterInterface? api, {
+    CheckoutFlutterInterface? api, {
     BinaryMessenger? binaryMessenger,
     String messageChannelSuffix = '',
   }) {
@@ -2184,7 +2183,7 @@ abstract class DropInFlutterInterface {
     {
       final BasicMessageChannel<Object?> __pigeon_channel = BasicMessageChannel<
               Object?>(
-          'dev.flutter.pigeon.adyen_checkout.DropInFlutterInterface.onDropInPlatformCommunication$messageChannelSuffix',
+          'dev.flutter.pigeon.adyen_checkout.CheckoutFlutterInterface.send$messageChannelSuffix',
           pigeonChannelCodec,
           binaryMessenger: binaryMessenger);
       if (api == null) {
@@ -2192,14 +2191,13 @@ abstract class DropInFlutterInterface {
       } else {
         __pigeon_channel.setMessageHandler((Object? message) async {
           assert(message != null,
-              'Argument for dev.flutter.pigeon.adyen_checkout.DropInFlutterInterface.onDropInPlatformCommunication was null.');
+              'Argument for dev.flutter.pigeon.adyen_checkout.CheckoutFlutterInterface.send was null.');
           final List<Object?> args = (message as List<Object?>?)!;
-          final PlatformCommunicationModel? arg_platformCommunicationModel =
-              (args[0] as PlatformCommunicationModel?);
-          assert(arg_platformCommunicationModel != null,
-              'Argument for dev.flutter.pigeon.adyen_checkout.DropInFlutterInterface.onDropInPlatformCommunication was null, expected non-null PlatformCommunicationModel.');
+          final CheckoutEvent? arg_event = (args[0] as CheckoutEvent?);
+          assert(arg_event != null,
+              'Argument for dev.flutter.pigeon.adyen_checkout.CheckoutFlutterInterface.send was null, expected non-null CheckoutEvent.');
           try {
-            api.onDropInPlatformCommunication(arg_platformCommunicationModel!);
+            api.send(arg_event!);
             return wrapResponse(empty: true);
           } on PlatformException catch (e) {
             return wrapResponse(error: e);

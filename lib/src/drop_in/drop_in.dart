@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:adyen_checkout/adyen_checkout.dart';
-import 'package:adyen_checkout/src/drop_in/drop_in_flutter_api.dart';
+import 'package:adyen_checkout/src/common/checkout_flutter.dart';
 import 'package:adyen_checkout/src/drop_in/drop_in_platform_api.dart';
 import 'package:adyen_checkout/src/generated/platform_api.g.dart';
 import 'package:adyen_checkout/src/logging/adyen_logger.dart';
@@ -14,16 +14,16 @@ import 'package:adyen_checkout/src/util/sdk_version_number_provider.dart';
 class DropIn {
   DropIn(
     this.sdkVersionNumberProvider,
-    this.dropInFlutterApi,
+    this.checkoutFlutter,
     this.dropInPlatformApi,
   ) {
-    DropInFlutterInterface.setUp(dropInFlutterApi);
+    CheckoutFlutterInterface.setUp(checkoutFlutter);
   }
 
   final PaymentEventHandler _paymentEventHandler = PaymentEventHandler();
   final AdyenLogger adyenLogger = AdyenLogger.instance;
   final SdkVersionNumberProvider sdkVersionNumberProvider;
-  final DropInFlutterApi dropInFlutterApi;
+  final CheckoutFlutter checkoutFlutter;
   final DropInPlatformApi dropInPlatformApi;
 
   Future<PaymentResult> startDropInSessionsPayment(
@@ -39,15 +39,13 @@ class DropIn {
       dropInConfiguration.toDTO(sdkVersionNumber, true),
     );
 
-    dropInFlutterApi.dropInPlatformCommunicationStream =
-        StreamController<PlatformCommunicationModel>();
-    final platformCommunicationSubscription = dropInFlutterApi
-        .dropInPlatformCommunicationStream?.stream
-        .listen((event) async {
+    checkoutFlutter.platformEventStream = StreamController<CheckoutEvent>();
+    final platformEventSubscription =
+        checkoutFlutter.platformEventStream?.stream.listen((event) async {
       switch (event.type) {
-        case PlatformCommunicationType.result:
+        case CheckoutEventType.result:
           dropInSessionCompleter.complete(event.paymentResult);
-        case PlatformCommunicationType.deleteStoredPaymentMethod:
+        case CheckoutEventType.deleteStoredPaymentMethod:
           _onDeleteStoredPaymentMethodCallback(
             event,
             dropInConfiguration.storedPaymentMethodConfiguration,
@@ -58,9 +56,9 @@ class DropIn {
 
     return dropInSessionCompleter.future.then((paymentResultDTO) async {
       dropInPlatformApi.cleanUpDropIn();
-      await platformCommunicationSubscription?.cancel();
-      dropInFlutterApi.dropInPlatformCommunicationStream?.close();
-      dropInFlutterApi.dropInPlatformCommunicationStream = null;
+      await platformEventSubscription?.cancel();
+      checkoutFlutter.platformEventStream?.close();
+      checkoutFlutter.platformEventStream = null;
       adyenLogger
           .print("Drop-in session result type: ${paymentResultDTO.type.name}");
       adyenLogger.print(
@@ -104,37 +102,35 @@ class DropIn {
       encodedPaymentMethodsResponse,
     );
 
-    dropInFlutterApi.dropInPlatformCommunicationStream =
-        StreamController<PlatformCommunicationModel>();
-    final platformCommunicationSubscription = dropInFlutterApi
-        .dropInPlatformCommunicationStream?.stream
-        .listen((event) async {
+    checkoutFlutter.platformEventStream = StreamController<CheckoutEvent>();
+    final platformEventSubscription =
+        checkoutFlutter.platformEventStream?.stream.listen((event) async {
       switch (event.type) {
-        case PlatformCommunicationType.paymentComponent:
+        case CheckoutEventType.paymentComponent:
           await _handlePaymentComponent(event, advancedCheckout);
-        case PlatformCommunicationType.additionalDetails:
+        case CheckoutEventType.additionalDetails:
           await _handleAdditionalDetails(event, advancedCheckout);
-        case PlatformCommunicationType.result:
+        case CheckoutEventType.result:
           _handleResult(dropInAdvancedFlowCompleter, event);
-        case PlatformCommunicationType.deleteStoredPaymentMethod:
+        case CheckoutEventType.deleteStoredPaymentMethod:
           _onDeleteStoredPaymentMethodCallback(
             event,
             dropInConfiguration.storedPaymentMethodConfiguration,
           );
-        case PlatformCommunicationType.balanceCheck:
+        case CheckoutEventType.balanceCheck:
           _handleBalanceCheck(event, advancedCheckout.partialPayment);
-        case PlatformCommunicationType.requestOrder:
+        case CheckoutEventType.requestOrder:
           _handleOrderRequest(event, advancedCheckout.partialPayment);
-        case PlatformCommunicationType.cancelOrder:
+        case CheckoutEventType.cancelOrder:
           _handleOrderCancel(event, advancedCheckout.partialPayment);
       }
     });
 
     return dropInAdvancedFlowCompleter.future.then((paymentResultDTO) async {
       dropInPlatformApi.cleanUpDropIn();
-      await platformCommunicationSubscription?.cancel();
-      await dropInFlutterApi.dropInPlatformCommunicationStream?.close();
-      dropInFlutterApi.dropInPlatformCommunicationStream = null;
+      await platformEventSubscription?.cancel();
+      await checkoutFlutter.platformEventStream?.close();
+      checkoutFlutter.platformEventStream = null;
       adyenLogger.print(
           "Drop-in advanced flow result type: ${paymentResultDTO.type.name}");
       adyenLogger.print(
@@ -152,13 +148,13 @@ class DropIn {
 
   void _handleResult(
     Completer<PaymentResultDTO> dropInAdvancedFlowCompleter,
-    PlatformCommunicationModel event,
+    CheckoutEvent event,
   ) {
     dropInAdvancedFlowCompleter.complete(event.paymentResult);
   }
 
   Future<void> _handlePaymentComponent(
-    PlatformCommunicationModel event,
+    CheckoutEvent event,
     Checkout advancedCheckout,
   ) async {
     try {
@@ -186,7 +182,7 @@ class DropIn {
   }
 
   Future<void> _handleAdditionalDetails(
-    PlatformCommunicationModel event,
+    CheckoutEvent event,
     Checkout advancedCheckout,
   ) async {
     try {
@@ -214,7 +210,7 @@ class DropIn {
   }
 
   Future<void> _onDeleteStoredPaymentMethodCallback(
-    PlatformCommunicationModel event,
+    CheckoutEvent event,
     StoredPaymentMethodConfiguration? storedPaymentMethodConfiguration,
   ) async {
     final String? storedPaymentMethodId = event.data;
@@ -241,7 +237,7 @@ class DropIn {
   }
 
   Future<PaymentEvent> _getOnSubmitPaymentEvent(
-      PlatformCommunicationModel event, Checkout advancedCheckout) async {
+      CheckoutEvent event, Checkout advancedCheckout) async {
     final String submitData = (event.data as String);
     final Map<String, dynamic> submitDataDecoded = jsonDecode(submitData);
     switch (advancedCheckout) {
@@ -272,7 +268,7 @@ class DropIn {
   }
 
   Future<PaymentEvent> _getOnAdditionalDetailsPaymentEvent(
-      PlatformCommunicationModel event, Checkout advancedCheckout) async {
+      CheckoutEvent event, Checkout advancedCheckout) async {
     switch (advancedCheckout) {
       case AdvancedCheckout it:
         final additionalDetails = jsonDecode(event.data as String);
@@ -283,7 +279,7 @@ class DropIn {
   }
 
   void _handleBalanceCheck(
-    PlatformCommunicationModel event,
+    CheckoutEvent event,
     PartialPayment? partialPayment,
   ) async {
     try {
@@ -301,7 +297,7 @@ class DropIn {
   }
 
   void _handleOrderRequest(
-    PlatformCommunicationModel event,
+    CheckoutEvent event,
     PartialPayment? partialPayment,
   ) async {
     try {
@@ -313,7 +309,7 @@ class DropIn {
   }
 
   void _handleOrderCancel(
-    PlatformCommunicationModel event,
+    CheckoutEvent event,
     PartialPayment? partialPayment,
   ) async {
     try {

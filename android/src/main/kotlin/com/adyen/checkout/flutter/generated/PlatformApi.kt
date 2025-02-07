@@ -131,7 +131,7 @@ enum class PaymentResultEnum(val raw: Int) {
   }
 }
 
-enum class PlatformCommunicationType(val raw: Int) {
+enum class CheckoutEventType(val raw: Int) {
   PAYMENT_COMPONENT(0),
   ADDITIONAL_DETAILS(1),
   RESULT(2),
@@ -141,7 +141,7 @@ enum class PlatformCommunicationType(val raw: Int) {
   CANCEL_ORDER(6);
 
   companion object {
-    fun ofRaw(raw: Int): PlatformCommunicationType? {
+    fun ofRaw(raw: Int): CheckoutEventType? {
       return values().firstOrNull { it.raw == raw }
     }
   }
@@ -854,19 +854,19 @@ data class OrderResponseDTO (
 }
 
 /** Generated class from Pigeon that represents data sent in messages. */
-data class PlatformCommunicationModel (
-  val type: PlatformCommunicationType,
+data class CheckoutEvent (
+  val type: CheckoutEventType,
   val data: String? = null,
   val paymentResult: PaymentResultDTO? = null
 
 ) {
   companion object {
     @Suppress("LocalVariableName")
-    fun fromList(__pigeon_list: List<Any?>): PlatformCommunicationModel {
-      val type = __pigeon_list[0] as PlatformCommunicationType
+    fun fromList(__pigeon_list: List<Any?>): CheckoutEvent {
+      val type = __pigeon_list[0] as CheckoutEventType
       val data = __pigeon_list[1] as String?
       val paymentResult = __pigeon_list[2] as PaymentResultDTO?
-      return PlatformCommunicationModel(type, data, paymentResult)
+      return CheckoutEvent(type, data, paymentResult)
     }
   }
   fun toList(): List<Any?> {
@@ -1284,7 +1284,7 @@ private object PlatformApiPigeonCodec : StandardMessageCodec() {
       }
       146.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          PlatformCommunicationModel.fromList(it)
+          CheckoutEvent.fromList(it)
         }
       }
       147.toByte() -> {
@@ -1379,7 +1379,7 @@ private object PlatformApiPigeonCodec : StandardMessageCodec() {
       }
       165.toByte() -> {
         return (readValue(buffer) as Int?)?.let {
-          PlatformCommunicationType.ofRaw(it)
+          CheckoutEventType.ofRaw(it)
         }
       }
       166.toByte() -> {
@@ -1505,7 +1505,7 @@ private object PlatformApiPigeonCodec : StandardMessageCodec() {
         stream.write(145)
         writeValue(stream, value.toList())
       }
-      is PlatformCommunicationModel -> {
+      is CheckoutEvent -> {
         stream.write(146)
         writeValue(stream, value.toList())
       }
@@ -1581,7 +1581,7 @@ private object PlatformApiPigeonCodec : StandardMessageCodec() {
         stream.write(164)
         writeValue(stream, value.raw)
       }
-      is PlatformCommunicationType -> {
+      is CheckoutEventType -> {
         stream.write(165)
         writeValue(stream, value.raw)
       }
@@ -2011,19 +2011,19 @@ interface DropInPlatformInterface {
   }
 }
 /** Generated class from Pigeon that represents Flutter messages that can be called from Kotlin. */
-class DropInFlutterInterface(private val binaryMessenger: BinaryMessenger, private val messageChannelSuffix: String = "") {
+class CheckoutFlutterInterface(private val binaryMessenger: BinaryMessenger, private val messageChannelSuffix: String = "") {
   companion object {
-    /** The codec used by DropInFlutterInterface. */
+    /** The codec used by CheckoutFlutterInterface. */
     val codec: MessageCodec<Any?> by lazy {
       PlatformApiPigeonCodec
     }
   }
-  fun onDropInPlatformCommunication(platformCommunicationModelArg: PlatformCommunicationModel, callback: (Result<Unit>) -> Unit)
+  fun send(eventArg: CheckoutEvent, callback: (Result<Unit>) -> Unit)
 {
     val separatedMessageChannelSuffix = if (messageChannelSuffix.isNotEmpty()) ".$messageChannelSuffix" else ""
-    val channelName = "dev.flutter.pigeon.adyen_checkout.DropInFlutterInterface.onDropInPlatformCommunication$separatedMessageChannelSuffix"
+    val channelName = "dev.flutter.pigeon.adyen_checkout.CheckoutFlutterInterface.send$separatedMessageChannelSuffix"
     val channel = BasicMessageChannel<Any?>(binaryMessenger, channelName, codec)
-    channel.send(listOf(platformCommunicationModelArg)) {
+    channel.send(listOf(eventArg)) {
       if (it is List<*>) {
         if (it.size > 1) {
           callback(Result.failure(AdyenPigeonError(it[0] as String, it[1] as String, it[2] as String?)))
