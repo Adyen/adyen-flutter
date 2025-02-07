@@ -177,19 +177,7 @@ class DropInPlatformApi(
                     data = dropInStoredPaymentMethodDeletionModel?.storedPaymentMethodId,
                 )
 
-            when (dropInStoredPaymentMethodDeletionModel?.dropInFlowType) {
-                DropInType.SESSION ->
-                    dropInFlutterApi.onDropInPlatformCommunication(
-                        platformCommunicationModel
-                    ) {}
-
-                DropInType.ADVANCED_FLOW ->
-                    dropInFlutterApi.onDropInPlatformCommunication(
-                        platformCommunicationModel
-                    ) {}
-
-                null -> return@observe
-            }
+            dropInFlutterApi.onDropInPlatformCommunication(platformCommunicationModel) {}
         }
     }
 
