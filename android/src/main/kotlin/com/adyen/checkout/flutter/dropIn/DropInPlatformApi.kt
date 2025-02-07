@@ -25,7 +25,6 @@ import com.adyen.checkout.flutter.dropIn.advanced.DropInPaymentMethodDeletionPla
 import com.adyen.checkout.flutter.dropIn.advanced.DropInPaymentMethodDeletionResultMessenger
 import com.adyen.checkout.flutter.dropIn.advanced.DropInPaymentResultMessenger
 import com.adyen.checkout.flutter.dropIn.advanced.DropInServiceResultMessenger
-import com.adyen.checkout.flutter.dropIn.model.DropInType
 import com.adyen.checkout.flutter.dropIn.session.SessionDropInService
 import com.adyen.checkout.flutter.generated.DeletedStoredPaymentMethodResultDTO
 import com.adyen.checkout.flutter.generated.DropInConfigurationDTO
