@@ -317,8 +317,7 @@ class DropInPlatformApi(
             val checkoutEvent =
                 CheckoutEvent(
                     CheckoutEventType.RESULT,
-                    data = "",
-                    paymentResult = mappedResult
+                    data = mappedResult,
                 )
 
             checkoutFlutter.send(checkoutEvent) {}
@@ -356,8 +355,7 @@ class DropInPlatformApi(
             val checkoutEvent =
                 CheckoutEvent(
                     CheckoutEventType.RESULT,
-                    data = "",
-                    paymentResult = mappedResult
+                    data = mappedResult
                 )
             checkoutFlutter.send(checkoutEvent) {}
         }

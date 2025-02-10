@@ -20,7 +20,7 @@ class DropInSessionsDelegate: AdyenSessionDelegate {
             )
             let checkoutEvent = CheckoutEvent(
                 type: CheckoutEventType.result,
-                paymentResult: PaymentResultDTO(
+                data: PaymentResultDTO(
                     type: PaymentResultEnum.finished,
                     result: paymentResult
                 )
@@ -38,7 +38,7 @@ class DropInSessionsDelegate: AdyenSessionDelegate {
             case ComponentError.cancelled:
                 let checkoutEvent = CheckoutEvent(
                     type: CheckoutEventType.result,
-                    paymentResult: PaymentResultDTO(
+                    data: PaymentResultDTO(
                         type: PaymentResultEnum.cancelledByUser,
                         reason: error.localizedDescription
                     )
@@ -50,7 +50,7 @@ class DropInSessionsDelegate: AdyenSessionDelegate {
             default:
                 let checkoutEvent = CheckoutEvent(
                     type: CheckoutEventType.result,
-                    paymentResult: PaymentResultDTO(
+                    data: PaymentResultDTO(
                         type: PaymentResultEnum.error,
                         reason: error.localizedDescription
                     )

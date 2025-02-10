@@ -59,7 +59,7 @@ class DropInAdvancedFlowDelegate: DropInComponentDelegate {
             )
             let checkoutEvent = CheckoutEvent(
                 type: CheckoutEventType.result,
-                paymentResult: paymentResult
+                data: paymentResult
             )
             self?.checkoutFlutter.send(
                 event: checkoutEvent,
@@ -86,7 +86,7 @@ class DropInAdvancedFlowDelegate: DropInComponentDelegate {
             case ComponentError.cancelled:
                 let checkoutEvent = CheckoutEvent(
                     type: CheckoutEventType.result,
-                    paymentResult: PaymentResultDTO(
+                    data: PaymentResultDTO(
                         type: PaymentResultEnum.cancelledByUser,
                         reason: error.localizedDescription
                     )
@@ -104,7 +104,7 @@ class DropInAdvancedFlowDelegate: DropInComponentDelegate {
     private func sendErrorToFlutterLayer(error: Error) {
         let checkoutEvent = CheckoutEvent(
             type: CheckoutEventType.result,
-            paymentResult: PaymentResultDTO(
+            data: PaymentResultDTO(
                 type: PaymentResultEnum.error,
                 reason: error.localizedDescription
             )

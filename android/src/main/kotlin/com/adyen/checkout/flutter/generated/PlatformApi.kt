@@ -856,24 +856,21 @@ data class OrderResponseDTO (
 /** Generated class from Pigeon that represents data sent in messages. */
 data class CheckoutEvent (
   val type: CheckoutEventType,
-  val data: String? = null,
-  val paymentResult: PaymentResultDTO? = null
+  val data: Any? = null
 
 ) {
   companion object {
     @Suppress("LocalVariableName")
     fun fromList(__pigeon_list: List<Any?>): CheckoutEvent {
       val type = __pigeon_list[0] as CheckoutEventType
-      val data = __pigeon_list[1] as String?
-      val paymentResult = __pigeon_list[2] as PaymentResultDTO?
-      return CheckoutEvent(type, data, paymentResult)
+      val data = __pigeon_list[1]
+      return CheckoutEvent(type, data)
     }
   }
   fun toList(): List<Any?> {
     return listOf(
       type,
       data,
-      paymentResult,
     )
   }
 }

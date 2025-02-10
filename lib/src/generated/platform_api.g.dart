@@ -939,20 +939,16 @@ class CheckoutEvent {
   CheckoutEvent({
     required this.type,
     this.data,
-    this.paymentResult,
   });
 
   CheckoutEventType type;
 
-  String? data;
-
-  PaymentResultDTO? paymentResult;
+  Object? data;
 
   Object encode() {
     return <Object?>[
       type,
       data,
-      paymentResult,
     ];
   }
 
@@ -960,8 +956,7 @@ class CheckoutEvent {
     result as List<Object?>;
     return CheckoutEvent(
       type: result[0]! as CheckoutEventType,
-      data: result[1] as String?,
-      paymentResult: result[2] as PaymentResultDTO?,
+      data: result[1],
     );
   }
 }

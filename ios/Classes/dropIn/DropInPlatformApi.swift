@@ -114,7 +114,7 @@ class DropInPlatformApi: DropInPlatformInterface {
         } catch {
             let checkoutEvent = CheckoutEvent(
                 type: CheckoutEventType.result,
-                paymentResult: PaymentResultDTO(type: PaymentResultEnum.error, reason: error.localizedDescription)
+                data: PaymentResultDTO(type: PaymentResultEnum.error, reason: error.localizedDescription)
             )
             checkoutFlutter.send(
                 event: checkoutEvent,
@@ -198,7 +198,7 @@ class DropInPlatformApi: DropInPlatformInterface {
                 result: PaymentResultModelDTO(
                     resultCode: resultCode?.rawValue)
             )
-            let checkoutEvent = CheckoutEvent(type: CheckoutEventType.result, paymentResult: paymentResult)
+            let checkoutEvent = CheckoutEvent(type: CheckoutEventType.result, data: paymentResult)
             self?.checkoutFlutter.send(
                 event: checkoutEvent,
                 completion: { _ in }
@@ -213,7 +213,7 @@ class DropInPlatformApi: DropInPlatformInterface {
             dropInViewController?.dropInComponent.handle(result)
         } catch {
             let paymentResult = PaymentResultDTO(type: PaymentResultEnum.error, reason: error.localizedDescription)
-            let checkoutEvent = CheckoutEvent(type: CheckoutEventType.result, paymentResult: paymentResult)
+            let checkoutEvent = CheckoutEvent(type: CheckoutEventType.result, data: paymentResult)
             checkoutFlutter.send(
                 event: checkoutEvent,
                 completion: { _ in }
@@ -228,7 +228,7 @@ class DropInPlatformApi: DropInPlatformInterface {
         if paymentEventDTO.error?.dismissDropIn == true || dropInAdvancedFlowDelegate?.isApplePay == true {
             finalizeAndDismiss(success: false) { [weak self] in
                 let paymentResult = PaymentResultDTO(type: PaymentResultEnum.error, reason: paymentEventDTO.error?.errorMessage)
-                let checkoutEvent = CheckoutEvent(type: CheckoutEventType.result, paymentResult: paymentResult)
+                let checkoutEvent = CheckoutEvent(type: CheckoutEventType.result, data: paymentResult)
                 self?.checkoutFlutter.send(
                     event: checkoutEvent,
                     completion: { _ in }
@@ -284,7 +284,7 @@ class DropInPlatformApi: DropInPlatformInterface {
     private func sendSessionError(error: Error) {
         let checkoutEvent = CheckoutEvent(
             type: CheckoutEventType.result,
-            paymentResult: PaymentResultDTO(
+            data: PaymentResultDTO(
                 type: PaymentResultEnum.error,
                 reason: error.localizedDescription
             )

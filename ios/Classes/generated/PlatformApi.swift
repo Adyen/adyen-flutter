@@ -871,27 +871,23 @@ struct OrderResponseDTO {
 /// Generated class from Pigeon that represents data sent in messages.
 struct CheckoutEvent {
     var type: CheckoutEventType
-    var data: String?
-    var paymentResult: PaymentResultDTO?
+    var data: Any?
 
     // swift-format-ignore: AlwaysUseLowerCamelCase
     static func fromList(_ __pigeon_list: [Any?]) -> CheckoutEvent? {
         let type = __pigeon_list[0] as! CheckoutEventType
-        let data: String? = nilOrValue(__pigeon_list[1])
-        let paymentResult: PaymentResultDTO? = nilOrValue(__pigeon_list[2])
+        let data: Any? = __pigeon_list[1]
 
         return CheckoutEvent(
             type: type,
-            data: data,
-            paymentResult: paymentResult
+            data: data
         )
     }
 
     func toList() -> [Any?] {
         [
             type,
-            data,
-            paymentResult
+            data
         ]
     }
 }

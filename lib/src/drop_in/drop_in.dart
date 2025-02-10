@@ -44,7 +44,7 @@ class DropIn {
         dropInFlutter.platformEventStream?.stream.listen((event) async {
       switch (event.type) {
         case CheckoutEventType.result:
-          dropInSessionCompleter.complete(event.paymentResult);
+          _handleResult(dropInSessionCompleter, event);
         case CheckoutEventType.deleteStoredPaymentMethod:
           _onDeleteStoredPaymentMethodCallback(
             event,
@@ -147,10 +147,15 @@ class DropIn {
   }
 
   void _handleResult(
-    Completer<PaymentResultDTO> dropInAdvancedFlowCompleter,
+    Completer<PaymentResultDTO> completer,
     CheckoutEvent event,
   ) {
-    dropInAdvancedFlowCompleter.complete(event.paymentResult);
+    switch (event.data) {
+      case PaymentResultDTO paymentResultDTO:
+        completer.complete(paymentResultDTO);
+      default:
+        completer.complete(PaymentResultDTO(type: PaymentResultEnum.error));
+    }
   }
 
   Future<void> _handlePaymentComponent(

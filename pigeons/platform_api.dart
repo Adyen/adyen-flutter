@@ -438,13 +438,11 @@ class OrderResponseDTO {
 
 class CheckoutEvent {
   final CheckoutEventType type;
-  final String? data;
-  final PaymentResultDTO? paymentResult;
+  final Object? data;
 
   CheckoutEvent({
     required this.type,
     this.data,
-    this.paymentResult,
   });
 }
 
