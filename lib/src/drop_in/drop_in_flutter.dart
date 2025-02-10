@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:adyen_checkout/src/generated/platform_api.g.dart';
 
-class CheckoutFlutter implements CheckoutFlutterInterface {
+class DropInFlutter implements CheckoutFlutterInterface {
   StreamController<CheckoutEvent>? platformEventStream;
 
   @override

@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:adyen_checkout/adyen_checkout.dart';
-import 'package:adyen_checkout/src/common/checkout_flutter.dart';
+import 'package:adyen_checkout/src/drop_in/drop_in_flutter.dart';
 import 'package:adyen_checkout/src/drop_in/drop_in_platform_api.dart';
 import 'package:adyen_checkout/src/generated/platform_api.g.dart';
 import 'package:adyen_checkout/src/logging/adyen_logger.dart';
@@ -14,16 +14,16 @@ import 'package:adyen_checkout/src/util/sdk_version_number_provider.dart';
 class DropIn {
   DropIn(
     this.sdkVersionNumberProvider,
-    this.checkoutFlutter,
+    this.dropInFlutter,
     this.dropInPlatformApi,
   ) {
-    CheckoutFlutterInterface.setUp(checkoutFlutter);
+    CheckoutFlutterInterface.setUp(dropInFlutter);
   }
 
   final PaymentEventHandler _paymentEventHandler = PaymentEventHandler();
   final AdyenLogger adyenLogger = AdyenLogger.instance;
   final SdkVersionNumberProvider sdkVersionNumberProvider;
-  final CheckoutFlutter checkoutFlutter;
+  final DropInFlutter dropInFlutter;
   final DropInPlatformApi dropInPlatformApi;
 
   Future<PaymentResult> startDropInSessionsPayment(
@@ -39,9 +39,9 @@ class DropIn {
       dropInConfiguration.toDTO(sdkVersionNumber, true),
     );
 
-    checkoutFlutter.platformEventStream = StreamController<CheckoutEvent>();
+    dropInFlutter.platformEventStream = StreamController<CheckoutEvent>();
     final platformEventSubscription =
-        checkoutFlutter.platformEventStream?.stream.listen((event) async {
+        dropInFlutter.platformEventStream?.stream.listen((event) async {
       switch (event.type) {
         case CheckoutEventType.result:
           dropInSessionCompleter.complete(event.paymentResult);
@@ -57,8 +57,8 @@ class DropIn {
     return dropInSessionCompleter.future.then((paymentResultDTO) async {
       dropInPlatformApi.cleanUpDropIn();
       await platformEventSubscription?.cancel();
-      checkoutFlutter.platformEventStream?.close();
-      checkoutFlutter.platformEventStream = null;
+      dropInFlutter.platformEventStream?.close();
+      dropInFlutter.platformEventStream = null;
       adyenLogger
           .print("Drop-in session result type: ${paymentResultDTO.type.name}");
       adyenLogger.print(
@@ -102,9 +102,9 @@ class DropIn {
       encodedPaymentMethodsResponse,
     );
 
-    checkoutFlutter.platformEventStream = StreamController<CheckoutEvent>();
+    dropInFlutter.platformEventStream = StreamController<CheckoutEvent>();
     final platformEventSubscription =
-        checkoutFlutter.platformEventStream?.stream.listen((event) async {
+        dropInFlutter.platformEventStream?.stream.listen((event) async {
       switch (event.type) {
         case CheckoutEventType.paymentComponent:
           await _handlePaymentComponent(event, advancedCheckout);
@@ -129,8 +129,8 @@ class DropIn {
     return dropInAdvancedFlowCompleter.future.then((paymentResultDTO) async {
       dropInPlatformApi.cleanUpDropIn();
       await platformEventSubscription?.cancel();
-      await checkoutFlutter.platformEventStream?.close();
-      checkoutFlutter.platformEventStream = null;
+      await dropInFlutter.platformEventStream?.close();
+      dropInFlutter.platformEventStream = null;
       adyenLogger.print(
           "Drop-in advanced flow result type: ${paymentResultDTO.type.name}");
       adyenLogger.print(
