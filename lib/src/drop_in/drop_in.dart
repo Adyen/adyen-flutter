@@ -154,7 +154,10 @@ class DropIn {
       case PaymentResultDTO paymentResultDTO:
         completer.complete(paymentResultDTO);
       default:
-        completer.complete(PaymentResultDTO(type: PaymentResultEnum.error));
+        completer.complete(PaymentResultDTO(
+          type: PaymentResultEnum.error,
+          reason: "Missing payment result data",
+        ));
     }
   }
 
@@ -218,12 +221,12 @@ class DropIn {
     CheckoutEvent event,
     StoredPaymentMethodConfiguration? storedPaymentMethodConfiguration,
   ) async {
-    final String? storedPaymentMethodId = event.data;
     final deletionCallback =
         storedPaymentMethodConfiguration?.deleteStoredPaymentMethodCallback;
 
-    if (storedPaymentMethodId != null && deletionCallback != null) {
+    if (deletionCallback != null) {
       try {
+        final String storedPaymentMethodId = event.data as String;
         final bool result = await deletionCallback(storedPaymentMethodId);
         dropInPlatformApi.onDeleteStoredPaymentMethodResult(
             DeletedStoredPaymentMethodResultDTO(
@@ -234,7 +237,7 @@ class DropIn {
         adyenLogger.print(error.toString());
         dropInPlatformApi.onDeleteStoredPaymentMethodResult(
             DeletedStoredPaymentMethodResultDTO(
-          storedPaymentMethodId: storedPaymentMethodId,
+          storedPaymentMethodId: "",
           isSuccessfullyRemoved: false,
         ));
       }
