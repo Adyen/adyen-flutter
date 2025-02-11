@@ -56,7 +56,7 @@ enum PaymentResultEnum {
   finished,
 }
 
-enum PlatformCommunicationType {
+enum CheckoutEventType {
   paymentComponent,
   additionalDetails,
   result,
@@ -436,15 +436,13 @@ class OrderResponseDTO {
   });
 }
 
-class PlatformCommunicationModel {
-  final PlatformCommunicationType type;
-  final String? data;
-  final PaymentResultDTO? paymentResult;
+class CheckoutEvent {
+  final CheckoutEventType type;
+  final Object? data;
 
-  PlatformCommunicationModel({
+  CheckoutEvent({
     required this.type,
     this.data,
-    this.paymentResult,
   });
 }
 
@@ -678,12 +676,8 @@ abstract class DropInPlatformInterface {
 }
 
 @FlutterApi()
-abstract class DropInFlutterInterface {
-  void onDropInSessionPlatformCommunication(
-      PlatformCommunicationModel platformCommunicationModel);
-
-  void onDropInAdvancedPlatformCommunication(
-      PlatformCommunicationModel platformCommunicationModel);
+abstract class CheckoutFlutterInterface {
+  void send(CheckoutEvent event);
 }
 
 @HostApi()

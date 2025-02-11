@@ -2,23 +2,23 @@
 import Adyen
 
 class DropInAdvancedFlowStoredPaymentMethodsDelegate: StoredPaymentMethodsDelegate {
-    private let dropInFlutterApi: DropInFlutterInterface
+    private let checkoutFlutter: CheckoutFlutterInterface
     private let viewController: UIViewController
     private var completionHandler: ((Bool) -> Void)?
 
-    init(viewController: UIViewController, dropInFlutterApi: DropInFlutterInterface) {
-        self.dropInFlutterApi = dropInFlutterApi
+    init(viewController: UIViewController, checkoutFlutter: CheckoutFlutterInterface) {
+        self.checkoutFlutter = checkoutFlutter
         self.viewController = viewController
     }
 
     func disable(storedPaymentMethod: StoredPaymentMethod, completion: @escaping (Bool) -> Void) {
         completionHandler = completion
-        let platformCommunicationModel = PlatformCommunicationModel(
-            type: PlatformCommunicationType.deleteStoredPaymentMethod,
+        let checkoutEvent = CheckoutEvent(
+            type: CheckoutEventType.deleteStoredPaymentMethod,
             data: storedPaymentMethod.identifier
         )
-        dropInFlutterApi.onDropInAdvancedPlatformCommunication(
-            platformCommunicationModel: platformCommunicationModel,
+        checkoutFlutter.send(
+            event: checkoutEvent,
             completion: { _ in }
         )
     }

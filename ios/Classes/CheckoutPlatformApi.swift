@@ -8,17 +8,17 @@ import AdyenNetworking
 // 3) Add AppDelegate redirect
 
 class CheckoutPlatformApi: CheckoutPlatformInterface {
-    private let dropInFlutterApi: DropInFlutterInterface
+    private let checkoutFlutter: CheckoutFlutterInterface
     private let componentFlutterApi: ComponentFlutterInterface
     private let sessionHolder: SessionHolder
     private let adyenCse: AdyenCSE = .init()
 
     init(
-        dropInFlutterApi: DropInFlutterInterface,
+        checkoutFlutter: CheckoutFlutterInterface,
         componentFlutterApi: ComponentFlutterInterface,
         sessionHolder: SessionHolder
     ) {
-        self.dropInFlutterApi = dropInFlutterApi
+        self.checkoutFlutter = checkoutFlutter
         self.componentFlutterApi = componentFlutterApi
         self.sessionHolder = sessionHolder
     }
@@ -103,7 +103,7 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
         sessionData: String,
         completion: @escaping (Result<SessionDTO, Error>) -> Void
     ) throws {
-        let sessionDelegate = DropInSessionsDelegate(viewController: getViewController(), dropInFlutterApi: dropInFlutterApi)
+        let sessionDelegate = DropInSessionsDelegate(viewController: getViewController(), checkoutFlutter: checkoutFlutter)
         try requestAndSetSession(
             adyenContext: adyenContext,
             sessionId: sessionId,

@@ -109,7 +109,7 @@ enum PaymentResultEnum: Int {
     case finished = 2
 }
 
-enum PlatformCommunicationType: Int {
+enum CheckoutEventType: Int {
     case paymentComponent = 0
     case additionalDetails = 1
     case result = 2
@@ -869,29 +869,25 @@ struct OrderResponseDTO {
 }
 
 /// Generated class from Pigeon that represents data sent in messages.
-struct PlatformCommunicationModel {
-    var type: PlatformCommunicationType
-    var data: String?
-    var paymentResult: PaymentResultDTO?
+struct CheckoutEvent {
+    var type: CheckoutEventType
+    var data: Any?
 
     // swift-format-ignore: AlwaysUseLowerCamelCase
-    static func fromList(_ __pigeon_list: [Any?]) -> PlatformCommunicationModel? {
-        let type = __pigeon_list[0] as! PlatformCommunicationType
-        let data: String? = nilOrValue(__pigeon_list[1])
-        let paymentResult: PaymentResultDTO? = nilOrValue(__pigeon_list[2])
+    static func fromList(_ __pigeon_list: [Any?]) -> CheckoutEvent? {
+        let type = __pigeon_list[0] as! CheckoutEventType
+        let data: Any? = __pigeon_list[1]
 
-        return PlatformCommunicationModel(
+        return CheckoutEvent(
             type: type,
-            data: data,
-            paymentResult: paymentResult
+            data: data
         )
     }
 
     func toList() -> [Any?] {
         [
             type,
-            data,
-            paymentResult
+            data
         ]
     }
 }
@@ -1298,7 +1294,7 @@ private class PlatformApiPigeonCodecReader: FlutterStandardReader {
         case 145:
             return OrderResponseDTO.fromList(self.readValue() as! [Any?])
         case 146:
-            return PlatformCommunicationModel.fromList(self.readValue() as! [Any?])
+            return CheckoutEvent.fromList(self.readValue() as! [Any?])
         case 147:
             return ComponentCommunicationModel.fromList(self.readValue() as! [Any?])
         case 148:
@@ -1371,10 +1367,10 @@ private class PlatformApiPigeonCodecReader: FlutterStandardReader {
             }
             return enumResult
         case 165:
-            var enumResult: PlatformCommunicationType? = nil
+            var enumResult: CheckoutEventType? = nil
             let enumResultAsInt: Int? = nilOrValue(self.readValue() as? Int)
             if let enumResultAsInt {
-                enumResult = PlatformCommunicationType(rawValue: enumResultAsInt)
+                enumResult = CheckoutEventType(rawValue: enumResultAsInt)
             }
             return enumResult
         case 166:
@@ -1506,7 +1502,7 @@ private class PlatformApiPigeonCodecWriter: FlutterStandardWriter {
         } else if let value = value as? OrderResponseDTO {
             super.writeByte(145)
             super.writeValue(value.toList())
-        } else if let value = value as? PlatformCommunicationModel {
+        } else if let value = value as? CheckoutEvent {
             super.writeByte(146)
             super.writeValue(value.toList())
         } else if let value = value as? ComponentCommunicationModel {
@@ -1563,7 +1559,7 @@ private class PlatformApiPigeonCodecWriter: FlutterStandardWriter {
         } else if let value = value as? PaymentResultEnum {
             super.writeByte(164)
             super.writeValue(value.rawValue)
-        } else if let value = value as? PlatformCommunicationType {
+        } else if let value = value as? CheckoutEventType {
             super.writeByte(165)
             super.writeValue(value.rawValue)
         } else if let value = value as? ComponentCommunicationType {
@@ -1941,12 +1937,11 @@ class DropInPlatformInterfaceSetup {
 }
 
 /// Generated protocol from Pigeon that represents Flutter messages that can be called from Swift.
-protocol DropInFlutterInterfaceProtocol {
-    func onDropInSessionPlatformCommunication(platformCommunicationModel platformCommunicationModelArg: PlatformCommunicationModel, completion: @escaping (Result<Void, AdyenPigeonError>) -> Void)
-    func onDropInAdvancedPlatformCommunication(platformCommunicationModel platformCommunicationModelArg: PlatformCommunicationModel, completion: @escaping (Result<Void, AdyenPigeonError>) -> Void)
+protocol CheckoutFlutterInterfaceProtocol {
+    func send(event eventArg: CheckoutEvent, completion: @escaping (Result<Void, AdyenPigeonError>) -> Void)
 }
 
-class DropInFlutterInterface: DropInFlutterInterfaceProtocol {
+class CheckoutFlutterInterface: CheckoutFlutterInterfaceProtocol {
     private let binaryMessenger: FlutterBinaryMessenger
     private let messageChannelSuffix: String
     init(binaryMessenger: FlutterBinaryMessenger, messageChannelSuffix: String = "") {
@@ -1958,29 +1953,10 @@ class DropInFlutterInterface: DropInFlutterInterfaceProtocol {
         PlatformApiPigeonCodec.shared
     }
 
-    func onDropInSessionPlatformCommunication(platformCommunicationModel platformCommunicationModelArg: PlatformCommunicationModel, completion: @escaping (Result<Void, AdyenPigeonError>) -> Void) {
-        let channelName = "dev.flutter.pigeon.adyen_checkout.DropInFlutterInterface.onDropInSessionPlatformCommunication\(messageChannelSuffix)"
+    func send(event eventArg: CheckoutEvent, completion: @escaping (Result<Void, AdyenPigeonError>) -> Void) {
+        let channelName = "dev.flutter.pigeon.adyen_checkout.CheckoutFlutterInterface.send\(messageChannelSuffix)"
         let channel = FlutterBasicMessageChannel(name: channelName, binaryMessenger: binaryMessenger, codec: codec)
-        channel.sendMessage([platformCommunicationModelArg] as [Any?]) { response in
-            guard let listResponse = response as? [Any?] else {
-                completion(.failure(createConnectionError(withChannelName: channelName)))
-                return
-            }
-            if listResponse.count > 1 {
-                let code: String = listResponse[0] as! String
-                let message: String? = nilOrValue(listResponse[1])
-                let details: String? = nilOrValue(listResponse[2])
-                completion(.failure(AdyenPigeonError(code: code, message: message, details: details)))
-            } else {
-                completion(.success(()))
-            }
-        }
-    }
-
-    func onDropInAdvancedPlatformCommunication(platformCommunicationModel platformCommunicationModelArg: PlatformCommunicationModel, completion: @escaping (Result<Void, AdyenPigeonError>) -> Void) {
-        let channelName = "dev.flutter.pigeon.adyen_checkout.DropInFlutterInterface.onDropInAdvancedPlatformCommunication\(messageChannelSuffix)"
-        let channel = FlutterBasicMessageChannel(name: channelName, binaryMessenger: binaryMessenger, codec: codec)
-        channel.sendMessage([platformCommunicationModelArg] as [Any?]) { response in
+        channel.sendMessage([eventArg] as [Any?]) { response in
             guard let listResponse = response as? [Any?] else {
                 completion(.failure(createConnectionError(withChannelName: channelName)))
                 return

@@ -25,11 +25,12 @@ import com.adyen.checkout.flutter.dropIn.advanced.DropInPaymentMethodDeletionPla
 import com.adyen.checkout.flutter.dropIn.advanced.DropInPaymentMethodDeletionResultMessenger
 import com.adyen.checkout.flutter.dropIn.advanced.DropInPaymentResultMessenger
 import com.adyen.checkout.flutter.dropIn.advanced.DropInServiceResultMessenger
-import com.adyen.checkout.flutter.dropIn.model.DropInType
 import com.adyen.checkout.flutter.dropIn.session.SessionDropInService
+import com.adyen.checkout.flutter.generated.CheckoutEvent
+import com.adyen.checkout.flutter.generated.CheckoutEventType
+import com.adyen.checkout.flutter.generated.CheckoutFlutterInterface
 import com.adyen.checkout.flutter.generated.DeletedStoredPaymentMethodResultDTO
 import com.adyen.checkout.flutter.generated.DropInConfigurationDTO
-import com.adyen.checkout.flutter.generated.DropInFlutterInterface
 import com.adyen.checkout.flutter.generated.DropInPlatformInterface
 import com.adyen.checkout.flutter.generated.OrderCancelResultDTO
 import com.adyen.checkout.flutter.generated.PaymentEventDTO
@@ -37,8 +38,6 @@ import com.adyen.checkout.flutter.generated.PaymentEventType
 import com.adyen.checkout.flutter.generated.PaymentResultDTO
 import com.adyen.checkout.flutter.generated.PaymentResultEnum
 import com.adyen.checkout.flutter.generated.PaymentResultModelDTO
-import com.adyen.checkout.flutter.generated.PlatformCommunicationModel
-import com.adyen.checkout.flutter.generated.PlatformCommunicationType
 import com.adyen.checkout.flutter.session.SessionHolder
 import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToDropInConfiguration
 import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToEnvironment
@@ -51,7 +50,7 @@ import kotlinx.coroutines.withContext
 import org.json.JSONObject
 
 class DropInPlatformApi(
-    private val dropInFlutterApi: DropInFlutterInterface,
+    private val checkoutFlutter: CheckoutFlutterInterface,
     private val activity: FragmentActivity,
     private val sessionHolder: SessionHolder,
 ) : DropInPlatformInterface {
@@ -154,12 +153,12 @@ class DropInPlatformApi(
                 return@observe
             }
 
-            val model =
-                PlatformCommunicationModel(
-                    PlatformCommunicationType.PAYMENT_COMPONENT,
-                    data = message.contentIfNotHandled.toString(),
+            val checkoutEvent =
+                CheckoutEvent(
+                    CheckoutEventType.PAYMENT_COMPONENT,
+                    data = message.contentIfNotHandled.toString()
                 )
-            dropInFlutterApi.onDropInAdvancedPlatformCommunication(model) {}
+            checkoutFlutter.send(checkoutEvent) {}
         }
     }
 
@@ -171,25 +170,13 @@ class DropInPlatformApi(
             }
 
             val dropInStoredPaymentMethodDeletionModel = message.contentIfNotHandled
-            val platformCommunicationModel =
-                PlatformCommunicationModel(
-                    PlatformCommunicationType.DELETE_STORED_PAYMENT_METHOD,
+            val checkoutEvent =
+                CheckoutEvent(
+                    CheckoutEventType.DELETE_STORED_PAYMENT_METHOD,
                     data = dropInStoredPaymentMethodDeletionModel?.storedPaymentMethodId,
                 )
 
-            when (dropInStoredPaymentMethodDeletionModel?.dropInFlowType) {
-                DropInType.SESSION ->
-                    dropInFlutterApi.onDropInSessionPlatformCommunication(
-                        platformCommunicationModel
-                    ) {}
-
-                DropInType.ADVANCED_FLOW ->
-                    dropInFlutterApi.onDropInAdvancedPlatformCommunication(
-                        platformCommunicationModel
-                    ) {}
-
-                null -> return@observe
-            }
+            checkoutFlutter.send(checkoutEvent) {}
         }
     }
 
@@ -200,13 +187,13 @@ class DropInPlatformApi(
                 return@observe
             }
 
-            val platformCommunicationModel =
-                PlatformCommunicationModel(
-                    PlatformCommunicationType.ADDITIONAL_DETAILS,
+            val checkoutEvent =
+                CheckoutEvent(
+                    CheckoutEventType.ADDITIONAL_DETAILS,
                     data = message.contentIfNotHandled.toString(),
                 )
 
-            dropInFlutterApi.onDropInAdvancedPlatformCommunication(platformCommunicationModel) {}
+            checkoutFlutter.send(checkoutEvent) {}
         }
     }
 
@@ -217,12 +204,12 @@ class DropInPlatformApi(
                 return@observe
             }
 
-            val platformCommunicationModel =
-                PlatformCommunicationModel(
-                    PlatformCommunicationType.BALANCE_CHECK,
+            val checkoutEvent =
+                CheckoutEvent(
+                    CheckoutEventType.BALANCE_CHECK,
                     data = message.contentIfNotHandled.toString()
                 )
-            dropInFlutterApi.onDropInAdvancedPlatformCommunication(platformCommunicationModel) {}
+            checkoutFlutter.send(checkoutEvent) {}
         }
     }
 
@@ -233,12 +220,12 @@ class DropInPlatformApi(
                 return@observe
             }
 
-            val platformCommunicationModel =
-                PlatformCommunicationModel(
-                    PlatformCommunicationType.REQUEST_ORDER,
+            val checkoutEvent =
+                CheckoutEvent(
+                    CheckoutEventType.REQUEST_ORDER,
                     data = message.contentIfNotHandled.toString()
                 )
-            dropInFlutterApi.onDropInAdvancedPlatformCommunication(platformCommunicationModel) {}
+            checkoutFlutter.send(checkoutEvent) {}
         }
     }
 
@@ -249,12 +236,12 @@ class DropInPlatformApi(
                 return@observe
             }
 
-            val platformCommunicationModel =
-                PlatformCommunicationModel(
-                    PlatformCommunicationType.CANCEL_ORDER,
+            val checkoutEvent =
+                CheckoutEvent(
+                    CheckoutEventType.CANCEL_ORDER,
                     data = message.contentIfNotHandled.toString()
                 )
-            dropInFlutterApi.onDropInAdvancedPlatformCommunication(platformCommunicationModel) {}
+            checkoutFlutter.send(checkoutEvent) {}
         }
     }
 
@@ -327,14 +314,13 @@ class DropInPlatformApi(
                         )
                 }
 
-            val platformCommunicationModel =
-                PlatformCommunicationModel(
-                    PlatformCommunicationType.RESULT,
-                    data = "",
-                    paymentResult = mappedResult
+            val checkoutEvent =
+                CheckoutEvent(
+                    CheckoutEventType.RESULT,
+                    mappedResult,
                 )
 
-            dropInFlutterApi.onDropInSessionPlatformCommunication(platformCommunicationModel) {}
+            checkoutFlutter.send(checkoutEvent) {}
         }
 
     val dropInAdvancedFlowCallback =
@@ -366,12 +352,11 @@ class DropInPlatformApi(
                         )
                 }
 
-            val platformCommunicationModel =
-                PlatformCommunicationModel(
-                    PlatformCommunicationType.RESULT,
-                    data = "",
-                    paymentResult = mappedResult
+            val checkoutEvent =
+                CheckoutEvent(
+                    CheckoutEventType.RESULT,
+                    mappedResult
                 )
-            dropInFlutterApi.onDropInAdvancedPlatformCommunication(platformCommunicationModel) {}
+            checkoutFlutter.send(checkoutEvent) {}
         }
 }
