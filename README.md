@@ -1,9 +1,10 @@
 ![Flutter](https://github.com/Adyen/adyen-flutter/assets/13377878/66a9fab8-dba0-426f-acd4-ab0bfd469d20)
 
 # Adyen Flutter
+
 [![Pub Package](https://img.shields.io/pub/v/adyen_checkout.svg)](https://pub.dev/packages/adyen_checkout)
 [![Adyen iOS](https://img.shields.io/badge/ios-v5.15.0-brightgreen.svg)](https://github.com/Adyen/adyen-ios/releases/tag/5.15.0)
-[![Adyen Android](https://img.shields.io/badge/android-v5.8.0-brightgreen.svg)](https://github.com/Adyen/adyen-android/releases/tag/5.8.0)
+[![Adyen Android](https://img.shields.io/badge/android-v5.9.0-brightgreen.svg)](https://github.com/Adyen/adyen-android/releases/tag/5.9.0)
 
 The Adyen Flutter package provides you with the building blocks to create a checkout experience for
 your shoppers, allowing them to pay using the payment method of their choice. This is
@@ -54,16 +55,25 @@ release a new version when we need to.
 
 * [Checkout API v71](https://docs.adyen.com/api-explorer/Checkout/71/overview) or later.
 
-#### Android 
+#### Android
+
 * [Android 5.0](https://www.android.com/versions/lollipop-5-0/) (API 21) or later.
 * [Kotlin 1.8.22](https://kotlinlang.org/docs/releases.html) or later.
 * [AGP 8.1](https://developer.android.com/build/releases/gradle-plugin) or later with Gradle 8.
-* Requires the usage of a `FlutterFragmentActivity` instead of the default `FlutterActivity` in the MainActivity of your [native Android](https://github.com/Adyen/adyen-flutter/blob/main/example/android/app/src/main/kotlin/com/adyen/checkout/flutter/example/MainActivity.kt) layer.
+* Requires the usage of a `FlutterFragmentActivity` instead of the default `FlutterActivity` in the
+  MainActivity of
+  your [native Android](https://github.com/Adyen/adyen-flutter/blob/main/example/android/app/src/main/kotlin/com/adyen/checkout/flutter/example/MainActivity.kt)
+  layer.
 
 #### iOS
+
 * [iOS 12](https://support.apple.com/en-us/118387) or later.
-* Add the return URL handler to your AppDelegate in your [native iOS](https://github.com/Adyen/adyen-flutter/blob/5301abab34773e820c4fd38be54d3bf4bb247fd6/example/ios/Runner/AppDelegate.swift#L18) layer.
-* Add a custom [URL scheme](https://developer.apple.com/documentation/xcode/defining-a-custom-url-scheme-for-your-app) that matches the returnUrl you use.
+* Add the return URL handler to your AppDelegate in
+  your [native iOS](https://github.com/Adyen/adyen-flutter/blob/5301abab34773e820c4fd38be54d3bf4bb247fd6/example/ios/Runner/AppDelegate.swift#L18)
+  layer.
+* Add a
+  custom [URL scheme](https://developer.apple.com/documentation/xcode/defining-a-custom-url-scheme-for-your-app)
+  that matches the returnUrl you use.
 
 ## Integration
 

@@ -3,6 +3,8 @@
 ### New
 
 - Set minimum SDK version to Flutter 3.16/Dart 3.2
+- Android Components/Drop-in
+  version: [5.9.0](https://docs.adyen.com/online-payments/release-notes/?title%5B0%5D=Android+Components%2FDrop-in#releaseNote=2025-01-17-android-componentsdrop-in-5.9.0).
 
 ## 1.3.0
 
