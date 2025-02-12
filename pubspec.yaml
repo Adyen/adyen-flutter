@@ -20,7 +20,7 @@ dependencies:
   flutter:
     sdk: flutter
   plugin_platform_interface: ^2.1.8
-  pay: ^2.0.0
+  pay: ^3.1.0
 
 dev_dependencies:
   flutter_test:

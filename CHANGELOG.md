@@ -5,6 +5,18 @@
 - Set minimum SDK version to Flutter 3.16/Dart 3.2
 - Android Components/Drop-in
   version: [5.9.0](https://docs.adyen.com/online-payments/release-notes/?title%5B0%5D=Android+Components%2FDrop-in#releaseNote=2025-01-17-android-componentsdrop-in-5.9.0).
+- iOS Components/Drop-in
+  version: [5.16.0](https://docs.adyen.com/online-payments/release-notes/?title%5B0%5D=iOS+Components%2FDrop-in#releaseNote=2025-01-29-ios-componentsdrop-in-5.16.0)
+
+### Changed
+
+- For native 3D Secure 2, when a shopper cancels the payment during the payment flow, the
+  onAdditionalDetails() is now triggered. What this means for your integration depends on
+  whether you already make a /payments/details call to handle 3D Secure 2 errors:
+    - If yes, you do not need to make any changes to your integration. You can remove the
+      Cancelled3DS2Exception handler.
+    - If not, update your integration to make a /payments/details request to get the details of the
+      canceled transaction.
 
 ## 1.3.0
 
