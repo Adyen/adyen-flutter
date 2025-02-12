@@ -11,12 +11,8 @@
 ### Changed
 
 - For native 3D Secure 2, when a shopper cancels the payment during the payment flow, the
-  onAdditionalDetails() is now triggered. What this means for your integration depends on
-  whether you already make a /payments/details call to handle 3D Secure 2 errors:
-    - If yes, you do not need to make any changes to your integration. You can remove the
-      Cancelled3DS2Exception handler.
-    - If not, update your integration to make a /payments/details request to get the details of the
-      canceled transaction.
+  onAdditionalDetails() is now triggered. The details of the canceled transaction is now provided
+  through the /payments/details call response.
 
 ## 1.3.0
 
