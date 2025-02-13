@@ -48,7 +48,7 @@ jobs:
           cd demo_project
           
           change_sdk_versions() {
-            sed -i 's/flutter.compileSdkVersion/COMPILE_SDK_VERSION/g' android/app/build.gradle
+            sed -i 's/flutter.compileSdkVersion/$COMPILE_SDK_VERSION/g' android/app/build.gradle
             sed -i 's/flutter.minSdkVersion/21/g' android/app/build.gradle
           }
           
