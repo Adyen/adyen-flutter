@@ -11,8 +11,9 @@
 ### Changed
 
 - For native 3D Secure 2, when a shopper cancels the payment during the payment flow, the
-  onAdditionalDetails() is now triggered. The details of the canceled transaction is now provided
-  through the /payments/details call response.
+  `onAdditionalDetails` is now triggered. The payment flow does not end with CANCELLED_BY_USER any
+  longer. The details of the canceled transaction are now provided through the `onAdditionalDetails`
+  response.
 
 ## 1.3.0
 
