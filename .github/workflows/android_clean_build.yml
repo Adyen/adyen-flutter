@@ -46,7 +46,6 @@ jobs:
           flutter create --template=app --platforms=android,ios demo_project
           cd demo_project
           
-          #Change minSdk and compileSdk version
           change_sdk_versions() {
             sed -i 's/flutter.compileSdkVersion/34/g' android/app/build.gradle
             sed -i 's/flutter.minSdkVersion/21/g' android/app/build.gradle
@@ -56,16 +55,16 @@ jobs:
             sed -i 's/id "com.android.application" version "7.3.0"/id "com.android.application" version "8.1.4"/g' android/settings.gradle
           }
           
+          # Change Kotlin version and adjust Gradle for Flutter 3.16.x
           if [[ "$FLUTTER_VERSION" == "3.16.x" ]]; then
-            # Change Kotlin version and adjust Gradle for Flutter 3.16.x
             sed -i "s/ext.kotlin_version = '1.7.10'/ext.kotlin_version = '1.8.22'/g" android/build.gradle
             sed -i "s/gradle-7.5-all/gradle-8.0-all/g" android/gradle/wrapper/gradle-wrapper.properties
             change_agp_version
             change_sdk_versions
           fi
           
+          # Change Kotlin version and adjust Gradle for Flutter 3.19.x - 3.24.x versions
           if [[ "$FLUTTER_VERSION" == "3.19.x" || "$FLUTTER_VERSION" == "3.22.x" || "$FLUTTER_VERSION" == "3.24.x" ]]; then
-            # Change Kotlin version and adjust Gradle for Flutter 3.19.x - 3.24.x versions
             sed -i 's/"org.jetbrains.kotlin.android" version "1.7.10"/"org.jetbrains.kotlin.android" version "1.8.22"/g' android/settings.gradle
             sed -i "s/gradle-7.6.3-all/gradle-8.0-all/g" android/gradle/wrapper/gradle-wrapper.properties
             change_agp_version
