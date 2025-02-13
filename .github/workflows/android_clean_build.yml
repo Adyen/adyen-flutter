@@ -52,15 +52,18 @@ jobs:
           fi
           
           #Change Kotlin version and gradle wrapper for Flutter 3.19+ 
-          sed -i 's/"org.jetbrains.kotlin.android" version "1.7.10"/"org.jetbrains.kotlin.android" version "1.8.22"/g' android/settings.gradle        
-          sed -i "s/gradle-7.6.3-all/gradle-8.0-all/g" android/gradle/wrapper/gradle-wrapper.properties
+          if [ ${{ matrix.flutter-version }} == '3.19.x' || ${{ matrix.flutter-version }} == '3.22.x' || ${{ matrix.flutter-version }} == '3.24.x' || ${{ matrix.flutter-version }} == '3.27.x']; then
+
+            sed -i 's/"org.jetbrains.kotlin.android" version "1.7.10"/"org.jetbrains.kotlin.android" version "1.8.22"/g' android/settings.gradle        
+            sed -i "s/gradle-7.6.3-all/gradle-8.0-all/g" android/gradle/wrapper/gradle-wrapper.properties
+          
+            #Change to Android Gradle plugin to v8
+            sed -i 's/id "com.android.application" version "7.3.0"/id "com.android.application" version "8.1.4"/g' android/settings.gradle          
+          fi          
           
           #Change minSdk and compileSdk version
           sed -i 's/flutter.compileSdkVersion/34/g' android/app/build.gradle
           sed -i 's/flutter.minSdkVersion/21/g' android/app/build.gradle
-          
-          #Change to Android Gradle plugin to v8
-          sed -i 's/id "com.android.application" version "7.3.0"/id "com.android.application" version "8.1.4"/g' android/settings.gradle          
 
           #Add missing Kotlin options for Flutter 3.22
           if [ ${{ matrix.flutter-version }} == '3.22.x' ]; then
