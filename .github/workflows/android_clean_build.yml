@@ -42,36 +42,35 @@ jobs:
           cache-key: ${{ matrix.flutter-version }}
 
       - run: |
-          # Create a clean Flutter project
+          FLUTTER_VERSION=${{ matrix.flutter-version }}
           flutter create --template=app --platforms=android,ios demo_project
           cd demo_project
-          ls
-          cd android
-          ls
           
-          FLUTTER_VERSION=${{ matrix.flutter-version }}
           
-          # Change Kotlin version and Gradle wrapper for Flutter 3.16
+          # Change Kotlin version and adjust Gradle for Flutter 3.16.x
           if [[ "$FLUTTER_VERSION" == "3.16.x" ]]; then
             sed -i "s/ext.kotlin_version = '1.7.10'/ext.kotlin_version = '1.8.22'/g" android/build.gradle
             sed -i "s/gradle-7.5-all/gradle-8.0-all/g" android/gradle/wrapper/gradle-wrapper.properties
+            sed -i 's/id "com.android.application" version "7.3.0"/id "com.android.application" version "8.1.4"/g' android/settings.gradle
+          
+            #Change minSdk and compileSdk version
+            sed -i 's/flutter.compileSdkVersion/34/g' android/app/build.gradle
+            sed -i 's/flutter.minSdkVersion/21/g' android/app/build.gradle
           fi
           
-          # Change Kotlin version and Gradle wrapper for Flutter 3.19+ versions
-          if [[ "$FLUTTER_VERSION" == "3.19.x" || "$FLUTTER_VERSION" == "3.22.x" || "$FLUTTER_VERSION" == "3.24.x" || "$FLUTTER_VERSION" == "3.27.x" ]]; then
+          # Change Kotlin version and adjust Gradle for Flutter 3.19.x - 3.24.x versions
+          if [[ "$FLUTTER_VERSION" == "3.19.x" || "$FLUTTER_VERSION" == "3.22.x" || "$FLUTTER_VERSION" == "3.24.x" ]]; then
             sed -i 's/"org.jetbrains.kotlin.android" version "1.7.10"/"org.jetbrains.kotlin.android" version "1.8.22"/g' android/settings.gradle
             sed -i "s/gradle-7.6.3-all/gradle-8.0-all/g" android/gradle/wrapper/gradle-wrapper.properties
-        
-          # Change Android Gradle plugin to v8
             sed -i 's/id "com.android.application" version "7.3.0"/id "com.android.application" version "8.1.4"/g' android/settings.gradle
-          fi  
           
-          #Change minSdk and compileSdk version
-          sed -i 's/flutter.compileSdkVersion/34/g' android/app/build.gradle
-          sed -i 's/flutter.minSdkVersion/21/g' android/app/build.gradle
+           #Change minSdk and compileSdk version
+            sed -i 's/flutter.compileSdkVersion/34/g' android/app/build.gradle
+            sed -i 's/flutter.minSdkVersion/21/g' android/app/build.gradle
+          fi  
 
           #Add missing Kotlin options for Flutter 3.22
-          if [ ${{ matrix.flutter-version }} == '3.22.x' ]; then
+          if [ $FLUTTER_VERSION == '3.22.x' ]; then
             sed -i '/defaultConfig {/i \
               kotlinOptions {\
                 jvmTarget = 'JavaVersion.VERSION_1_8'\
