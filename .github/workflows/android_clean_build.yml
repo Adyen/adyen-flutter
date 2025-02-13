@@ -43,11 +43,12 @@ jobs:
 
       - run: |
           FLUTTER_VERSION=${{ matrix.flutter-version }}
+          COMPILE_SDK_VERSION = ${{ matrix.api-level }}
           flutter create --template=app --platforms=android,ios demo_project
           cd demo_project
           
           change_sdk_versions() {
-            sed -i 's/flutter.compileSdkVersion/34/g' android/app/build.gradle
+            sed -i 's/flutter.compileSdkVersion/COMPILE_SDK_VERSION/g' android/app/build.gradle
             sed -i 's/flutter.minSdkVersion/21/g' android/app/build.gradle
           }
           
