@@ -11,7 +11,7 @@ jobs:
       fail-fast: false
       matrix:
         api-level: [ 34 ]
-        flutter-version: [ 3.16.x ,3.19.x, 3.22.x, 3.24.x, 3.27.x, 3.29.x ]
+        flutter-version: [ 3.16.x, 3.19.x, 3.22.x, 3.24.x, 3.27.x, 3.29.x ]
 
     steps:
       - name: Provide more disk space
@@ -71,7 +71,7 @@ jobs:
             change_sdk_versions
           fi  
 
-          #Add missing Kotlin options for Flutter 3.22
+          #Add missing Kotlin options for Flutter 3.22.x
           if [ $FLUTTER_VERSION == '3.22.x' ]; then
             sed -i '/defaultConfig {/i \
               kotlinOptions {\
