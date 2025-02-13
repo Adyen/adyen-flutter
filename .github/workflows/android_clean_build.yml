@@ -45,6 +45,9 @@ jobs:
           # Create a clean Flutter project
           flutter create --template=app --platforms=android,ios demo_project
           cd demo_project
+          ls
+          cd android
+          ls
           
           FLUTTER_VERSION=${{ matrix.flutter-version }}
           
