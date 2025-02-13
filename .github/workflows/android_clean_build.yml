@@ -43,7 +43,7 @@ jobs:
 
       - run: |
           FLUTTER_VERSION=${{ matrix.flutter-version }}
-          COMPILE_SDK_VERSION = ${{ matrix.api-level }}
+          COMPILE_SDK_VERSION=${{ matrix.api-level }}
           flutter create --template=app --platforms=android,ios demo_project
           cd demo_project
           
