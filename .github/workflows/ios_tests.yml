@@ -35,7 +35,9 @@ jobs:
 
       - name: Lint check
         working-directory: ios
-        run: swiftlint --config .swiftlint.yml --output "swiftLintReport.json"
+        run: |
+          brew install swiftlint
+          fastlane run swiftlint --config .swiftlint.yml --output "swiftLintReport.json"
 
       - name: Cache iOS reports
         uses: actions/cache/save@v4
