@@ -53,11 +53,6 @@ class DropInScreen extends StatelessWidget {
         configuration: dropInConfiguration,
       );
 
-      sessionCheckout.cardCallbacks = CardCallbacks(
-        onBinLookup: _onBinLookup,
-        onBinValue: _onBinValue,
-      );
-
       final PaymentResult paymentResult =
           await AdyenCheckout.session.startDropIn(
         dropInConfiguration: dropInConfiguration,
@@ -84,10 +79,6 @@ class DropInScreen extends StatelessWidget {
           onRequestOrder: repository.onRequestOrder,
           onCancelOrder: repository.onCancelOrder,
         ),
-        cardCallbacks: CardCallbacks(
-          onBinLookup: _onBinLookup,
-          onBinValue: _onBinValue,
-        ),
       );
 
       final paymentResult = await AdyenCheckout.advanced.startDropIn(
@@ -105,7 +96,12 @@ class DropInScreen extends StatelessWidget {
   }
 
   Future<DropInConfiguration> _createDropInConfiguration() async {
-    const CardConfiguration cardsConfiguration = CardConfiguration();
+    CardConfiguration cardsConfiguration = CardConfiguration(
+      cardCallbacks: CardCallbacks(
+        onBinLookup: _onBinLookup,
+        onBinValue: _onBinValue,
+      ),
+    );
 
     ApplePayConfiguration applePayConfiguration = ApplePayConfiguration(
       merchantId: Config.merchantId,

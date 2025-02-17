@@ -19,6 +19,8 @@ import com.adyen.checkout.flutter.dropIn.model.DropInStoredPaymentMethodDeletion
 import com.adyen.checkout.flutter.dropIn.model.DropInType
 import com.adyen.checkout.flutter.generated.DeletedStoredPaymentMethodResultDTO
 import com.adyen.checkout.flutter.dropIn.model.toJson
+import com.adyen.checkout.flutter.generated.CheckoutEvent
+import com.adyen.checkout.flutter.generated.CheckoutEventType
 import com.adyen.checkout.flutter.utils.Constants.Companion.ADYEN_LOG_TAG
 import kotlinx.coroutines.launch
 
@@ -43,10 +45,12 @@ class SessionDropInService : SessionDropInService(), LifecycleOwner {
         lifecycleScope.launch {
             try {
                 val binLookupDataJson = data.toJson()
-                val platformCommunicationModel = PlatformCommunicationModel(
-                    PlatformCommunicationType.BINLOOKUP,
-                    binLookupDataJson)
-                DropInPlatformApi.dropInSessionPlatformMessageFlow.emit(platformCommunicationModel)
+                val checkoutEvent =
+                    CheckoutEvent(
+                        CheckoutEventType.BIN_LOOKUP,
+                        binLookupDataJson
+                    )
+                DropInPlatformApi.dropInSessionPlatformMessageFlow.emit(checkoutEvent)
             } catch (exception: Exception) {
                 Log.d(ADYEN_LOG_TAG, "BinLookupData parsing failed: ${exception.message}")
             }
@@ -55,7 +59,7 @@ class SessionDropInService : SessionDropInService(), LifecycleOwner {
 
     override fun onBinValue(binValue: String) {
         lifecycleScope.launch {
-            val platformCommunicationModel = PlatformCommunicationModel(PlatformCommunicationType.BINVALUE, binValue)
+            val platformCommunicationModel = CheckoutEvent(CheckoutEventType.BIN_VALUE, binValue)
             DropInPlatformApi.dropInSessionPlatformMessageFlow.emit(platformCommunicationModel)
         }
     }

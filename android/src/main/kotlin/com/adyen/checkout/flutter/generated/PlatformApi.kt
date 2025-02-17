@@ -138,7 +138,9 @@ enum class CheckoutEventType(val raw: Int) {
   DELETE_STORED_PAYMENT_METHOD(3),
   BALANCE_CHECK(4),
   REQUEST_ORDER(5),
-  CANCEL_ORDER(6);
+  CANCEL_ORDER(6),
+  BIN_LOOKUP(7),
+  BIN_VALUE(8);
 
   companion object {
     fun ofRaw(raw: Int): CheckoutEventType? {

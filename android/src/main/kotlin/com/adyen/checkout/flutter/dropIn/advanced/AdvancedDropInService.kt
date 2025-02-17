@@ -32,6 +32,8 @@ import com.adyen.checkout.flutter.generated.OrderCancelResultDTO
 import com.adyen.checkout.flutter.generated.PaymentEventDTO
 import com.adyen.checkout.flutter.generated.PaymentEventType
 import com.adyen.checkout.flutter.dropIn.model.toJson
+import com.adyen.checkout.flutter.generated.CheckoutEvent
+import com.adyen.checkout.flutter.generated.CheckoutEventType
 import com.adyen.checkout.flutter.utils.Constants
 import com.adyen.checkout.flutter.utils.Constants.Companion.ADYEN_LOG_TAG
 import com.adyen.checkout.googlepay.GooglePayComponentState
@@ -108,12 +110,12 @@ class AdvancedDropInService : DropInService(), LifecycleOwner {
     override fun onBinLookup(data: List<BinLookupData>) {
         lifecycleScope.launch {
             try {
-                val platformCommunicationModel =
-                    PlatformCommunicationModel(
-                        PlatformCommunicationType.BINLOOKUP,
+                val checkoutEvent =
+                    CheckoutEvent(
+                        CheckoutEventType.BIN_LOOKUP,
                         data = data.toJson()
                     )
-                DropInPlatformApi.dropInAdvancedPlatformMessageFlow.emit(platformCommunicationModel)
+                DropInPlatformApi.dropInAdvancedPlatformMessageFlow.emit(checkoutEvent)
             } catch (exception: Exception) {
                 Log.d(ADYEN_LOG_TAG, "BinLookupData parsing failed: ${exception.message}")
             }
@@ -122,12 +124,12 @@ class AdvancedDropInService : DropInService(), LifecycleOwner {
 
     override fun onBinValue(binValue: String) {
         lifecycleScope.launch {
-            val platformCommunicationModel =
-                PlatformCommunicationModel(
-                    PlatformCommunicationType.BINVALUE,
+            val checkoutEvent =
+                CheckoutEvent(
+                    CheckoutEventType.BIN_VALUE,
                     data = binValue
                 )
-            DropInPlatformApi.dropInAdvancedPlatformMessageFlow.emit(platformCommunicationModel)
+            DropInPlatformApi.dropInAdvancedPlatformMessageFlow.emit(checkoutEvent)
         }
     }
 

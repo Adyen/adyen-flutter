@@ -76,6 +76,8 @@ enum CheckoutEventType {
   balanceCheck,
   requestOrder,
   cancelOrder,
+  binLookup,
+  binValue,
 }
 
 enum ComponentCommunicationType {

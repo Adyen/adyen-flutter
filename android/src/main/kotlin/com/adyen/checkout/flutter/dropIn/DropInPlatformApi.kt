@@ -61,8 +61,8 @@ internal class DropInPlatformApi(
     private var dropInPlatformMessengerJob: Job? = null
 
     companion object {
-        val dropInSessionPlatformMessageFlow = MutableSharedFlow<PlatformCommunicationModel>()
-        val dropInAdvancedPlatformMessageFlow = MutableSharedFlow<PlatformCommunicationModel>()
+        val dropInSessionPlatformMessageFlow = MutableSharedFlow<CheckoutEvent>()
+        val dropInAdvancedPlatformMessageFlow = MutableSharedFlow<CheckoutEvent>()
     }
 
     override fun showDropInSession(dropInConfigurationDTO: DropInConfigurationDTO) {
@@ -79,7 +79,7 @@ internal class DropInPlatformApi(
         dropInPlatformMessengerJob =
             activity.lifecycleScope.launch {
                 dropInSessionPlatformMessageFlow.collect { platformCommunicationModel ->
-                    dropInFlutterApi.onDropInSessionPlatformCommunication(platformCommunicationModel) {}
+                    checkoutFlutter.send(platformCommunicationModel) {}
                 }
             }
 
@@ -106,7 +106,7 @@ internal class DropInPlatformApi(
         dropInPlatformMessengerJob =
             activity.lifecycleScope.launch {
                 dropInAdvancedPlatformMessageFlow.collect { platformCommunicationModel ->
-                    dropInFlutterApi.onDropInAdvancedPlatformCommunication(platformCommunicationModel) {}
+                    checkoutFlutter.send(platformCommunicationModel) {}
                 }
             }
 
