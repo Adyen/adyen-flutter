@@ -1,8 +1,5 @@
 package com.adyen.checkout.flutter.apiOnly
 
-import CardExpiryDateValidationResultDTO
-import CardNumberValidationResultDTO
-import CardSecurityCodeValidationResultDTO
 import com.adyen.checkout.core.CardBrand
 import com.adyen.checkout.core.ui.model.ExpiryDate
 import com.adyen.checkout.core.ui.validation.CardExpiryDateValidationResult
@@ -11,6 +8,9 @@ import com.adyen.checkout.core.ui.validation.CardNumberValidationResult
 import com.adyen.checkout.core.ui.validation.CardNumberValidator
 import com.adyen.checkout.core.ui.validation.CardSecurityCodeValidationResult
 import com.adyen.checkout.core.ui.validation.CardSecurityCodeValidator
+import com.adyen.checkout.flutter.generated.CardExpiryDateValidationResultDTO
+import com.adyen.checkout.flutter.generated.CardNumberValidationResultDTO
+import com.adyen.checkout.flutter.generated.CardSecurityCodeValidationResultDTO
 
 internal object CardValidation {
     fun validateCardNumber(
@@ -21,12 +21,12 @@ internal object CardValidation {
         return when (validationResult) {
             is CardNumberValidationResult.Valid -> CardNumberValidationResultDTO.VALID
             is CardNumberValidationResult.Invalid.IllegalCharacters ->
-                CardNumberValidationResultDTO.INVALIDILLEGALCHARACTERS
+                CardNumberValidationResultDTO.INVALID_ILLEGAL_CHARACTERS
 
-            is CardNumberValidationResult.Invalid.TooLong -> CardNumberValidationResultDTO.INVALIDTOOLONG
-            is CardNumberValidationResult.Invalid.TooShort -> CardNumberValidationResultDTO.INVALIDTOOSHORT
-            is CardNumberValidationResult.Invalid.LuhnCheck -> CardNumberValidationResultDTO.INVALIDLUHNCHECK
-            else -> CardNumberValidationResultDTO.INVALIDOTHERREASON
+            is CardNumberValidationResult.Invalid.TooLong -> CardNumberValidationResultDTO.INVALID_TOO_LONG
+            is CardNumberValidationResult.Invalid.TooShort -> CardNumberValidationResultDTO.INVALID_TOO_SHORT
+            is CardNumberValidationResult.Invalid.LuhnCheck -> CardNumberValidationResultDTO.INVALID_LUHN_CHECK
+            else -> CardNumberValidationResultDTO.INVALID_OTHER_REASON
         }
     }
 
@@ -34,18 +34,18 @@ internal object CardValidation {
         expiryMonth: String,
         expiryYear: String
     ): CardExpiryDateValidationResultDTO {
-        val expireMonth = expiryMonth.toIntOrNull() ?: return CardExpiryDateValidationResultDTO.NONPARSEABLEDATE
-        val expireYear = expiryYear.toIntOrNull() ?: return CardExpiryDateValidationResultDTO.NONPARSEABLEDATE
+        val expireMonth = expiryMonth.toIntOrNull() ?: return CardExpiryDateValidationResultDTO.NON_PARSEABLE_DATE
+        val expireYear = expiryYear.toIntOrNull() ?: return CardExpiryDateValidationResultDTO.NON_PARSEABLE_DATE
         val expiryDate = ExpiryDate(expireMonth, expireYear)
         val validationResult = CardExpiryDateValidator.validateExpiryDate(expiryDate)
         return when (validationResult) {
             is CardExpiryDateValidationResult.Valid -> CardExpiryDateValidationResultDTO.VALID
             is CardExpiryDateValidationResult.Invalid.TooFarInTheFuture ->
-                CardExpiryDateValidationResultDTO.INVALIDTOOFARINTHEFUTURE
-            is CardExpiryDateValidationResult.Invalid.TooOld -> CardExpiryDateValidationResultDTO.INVALIDTOOOLD
+                CardExpiryDateValidationResultDTO.INVALID_TOO_FAR_IN_THE_FUTURE
+            is CardExpiryDateValidationResult.Invalid.TooOld -> CardExpiryDateValidationResultDTO.INVALID_TOO_OLD
             is CardExpiryDateValidationResult.Invalid.NonParseableDate ->
-                CardExpiryDateValidationResultDTO.NONPARSEABLEDATE
-            else -> CardExpiryDateValidationResultDTO.INVALIDOTHERREASON
+                CardExpiryDateValidationResultDTO.NON_PARSEABLE_DATE
+            else -> CardExpiryDateValidationResultDTO.INVALID_OTHER_REASON
         }
     }
 

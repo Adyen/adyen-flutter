@@ -1,8 +1,5 @@
 package com.adyen.checkout.flutter.components.googlepay
 
-import ComponentFlutterInterface
-import InstantPaymentConfigurationDTO
-import InstantPaymentSetupResultDTO
 import android.content.Intent
 import androidx.fragment.app.FragmentActivity
 import com.adyen.checkout.action.core.internal.ActionHandlingComponent
@@ -11,14 +8,18 @@ import com.adyen.checkout.components.core.ComponentAvailableCallback
 import com.adyen.checkout.components.core.Order
 import com.adyen.checkout.components.core.PaymentMethod
 import com.adyen.checkout.components.core.action.Action
+import com.adyen.checkout.flutter.components.view.ComponentLoadingBottomSheet
+import com.adyen.checkout.flutter.generated.ComponentFlutterInterface
+import com.adyen.checkout.flutter.generated.InstantPaymentConfigurationDTO
+import com.adyen.checkout.flutter.generated.InstantPaymentSetupResultDTO
+import com.adyen.checkout.flutter.generated.InstantPaymentType
 import com.adyen.checkout.flutter.session.SessionHolder
+import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToGooglePayCheckoutConfiguration
 import com.adyen.checkout.flutter.utils.Constants
 import com.adyen.checkout.googlepay.GooglePayComponent
-import com.adyen.checkout.flutter.components.view.ComponentLoadingBottomSheet
-import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToGooglePayCheckoutConfiguration
 import com.adyen.checkout.sessions.core.CheckoutSession
 import com.adyen.checkout.sessions.core.SessionSetupResponse
-import java.lang.Exception
+import com.adyen.checkout.ui.core.AdyenComponentView
 import java.util.UUID
 
 class GooglePayComponentManager(
@@ -31,6 +32,7 @@ class GooglePayComponentManager(
     private var checkoutConfiguration: CheckoutConfiguration? = null
     private var setupCallback: ((Result<InstantPaymentSetupResultDTO>) -> Unit)? = null
     private var googlePayComponent: GooglePayComponent? = null
+    private var adyenComponentView: AdyenComponentView? = null
 
     override fun onAvailabilityResult(
         isAvailable: Boolean,
@@ -41,17 +43,23 @@ class GooglePayComponentManager(
             return
         }
 
-        googlePayComponent = createGooglePayComponent(paymentMethod)
+        val googlePayComponent = createGooglePayComponent(paymentMethod)
         if (googlePayComponent == null) {
             setupCallback?.invoke(Result.failure(Exception("Google Pay setup failed")))
             return
         }
 
-        val allowedPaymentMethods = googlePayComponent?.getGooglePayButtonParameters()?.allowedPaymentMethods.orEmpty()
+        this.googlePayComponent = googlePayComponent
+        this.adyenComponentView =
+            AdyenComponentView(activity).apply {
+                attach(googlePayComponent, activity)
+            }
+
+        val allowedPaymentMethods = googlePayComponent.getGooglePayButtonParameters().allowedPaymentMethods
         setupCallback?.invoke(
             Result.success(
                 InstantPaymentSetupResultDTO(
-                    InstantPaymentType.GOOGLEPAY,
+                    InstantPaymentType.GOOGLE_PAY,
                     true,
                     allowedPaymentMethods
                 )
@@ -108,6 +116,7 @@ class GooglePayComponentManager(
             checkoutConfiguration = null
             setupCallback = null
             googlePayComponent = null
+            adyenComponentView = null
         }
     }
 

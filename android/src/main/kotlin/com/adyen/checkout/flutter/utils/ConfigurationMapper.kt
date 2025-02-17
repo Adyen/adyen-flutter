@@ -1,25 +1,5 @@
 package com.adyen.checkout.flutter.utils
 
-import ActionComponentConfigurationDTO
-import AddressMode
-import AmountDTO
-import AnalyticsOptionsDTO
-import BillingAddressParametersDTO
-import CardConfigurationDTO
-import CashAppPayConfigurationDTO
-import CashAppPayEnvironment
-import DropInConfigurationDTO
-import EncryptedCardDTO
-import Environment
-import FieldVisibility
-import GooglePayConfigurationDTO
-import GooglePayEnvironment
-import InstantPaymentConfigurationDTO
-import MerchantInfoDTO
-import OrderResponseDTO
-import ShippingAddressParametersDTO
-import TotalPriceStatus
-import UnencryptedCardDTO
 import android.content.Context
 import com.adyen.checkout.card.AddressConfiguration
 import com.adyen.checkout.card.CardConfiguration
@@ -37,7 +17,26 @@ import com.adyen.checkout.components.core.internal.analytics.AnalyticsPlatformPa
 import com.adyen.checkout.cse.EncryptedCard
 import com.adyen.checkout.cse.UnencryptedCard
 import com.adyen.checkout.dropin.DropInConfiguration
-import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToEnvironment
+import com.adyen.checkout.flutter.generated.ActionComponentConfigurationDTO
+import com.adyen.checkout.flutter.generated.AddressMode
+import com.adyen.checkout.flutter.generated.AmountDTO
+import com.adyen.checkout.flutter.generated.AnalyticsOptionsDTO
+import com.adyen.checkout.flutter.generated.BillingAddressParametersDTO
+import com.adyen.checkout.flutter.generated.CardConfigurationDTO
+import com.adyen.checkout.flutter.generated.CashAppPayConfigurationDTO
+import com.adyen.checkout.flutter.generated.CashAppPayEnvironment
+import com.adyen.checkout.flutter.generated.DropInConfigurationDTO
+import com.adyen.checkout.flutter.generated.EncryptedCardDTO
+import com.adyen.checkout.flutter.generated.Environment
+import com.adyen.checkout.flutter.generated.FieldVisibility
+import com.adyen.checkout.flutter.generated.GooglePayConfigurationDTO
+import com.adyen.checkout.flutter.generated.GooglePayEnvironment
+import com.adyen.checkout.flutter.generated.InstantPaymentConfigurationDTO
+import com.adyen.checkout.flutter.generated.MerchantInfoDTO
+import com.adyen.checkout.flutter.generated.OrderResponseDTO
+import com.adyen.checkout.flutter.generated.ShippingAddressParametersDTO
+import com.adyen.checkout.flutter.generated.TotalPriceStatus
+import com.adyen.checkout.flutter.generated.UnencryptedCardDTO
 import com.adyen.checkout.googlepay.BillingAddressParameters
 import com.adyen.checkout.googlepay.GooglePayConfiguration
 import com.adyen.checkout.googlepay.MerchantInfo
@@ -205,7 +204,7 @@ object ConfigurationMapper {
     private fun AddressMode.mapToAddressConfiguration(): AddressConfiguration {
         return when (this) {
             AddressMode.FULL -> AddressConfiguration.FullAddress()
-            AddressMode.POSTALCODE -> AddressConfiguration.PostalCode()
+            AddressMode.POSTAL_CODE -> AddressConfiguration.PostalCode()
             AddressMode.NONE -> AddressConfiguration.None
         }
     }
@@ -240,7 +239,7 @@ object ConfigurationMapper {
         return when (this) {
             Environment.TEST -> SDKEnvironment.TEST
             Environment.EUROPE -> SDKEnvironment.EUROPE
-            Environment.UNITEDSTATES -> SDKEnvironment.UNITED_STATES
+            Environment.UNITED_STATES -> SDKEnvironment.UNITED_STATES
             Environment.AUSTRALIA -> SDKEnvironment.AUSTRALIA
             Environment.INDIA -> SDKEnvironment.INDIA
             Environment.APSE -> SDKEnvironment.APSE
@@ -346,9 +345,9 @@ object ConfigurationMapper {
 
     private fun TotalPriceStatus.mapToTotalPriceStatus(): String {
         return when (this) {
-            TotalPriceStatus.NOTCURRENTLYKNOWN -> "NOT_CURRENTLY_KNOWN"
+            TotalPriceStatus.NOT_CURRENTLY_KNOWN -> "NOT_CURRENTLY_KNOWN"
             TotalPriceStatus.ESTIMATED -> "ESTIMATED"
-            TotalPriceStatus.FINALPRICE -> "FINAL"
+            TotalPriceStatus.FINAL_PRICE -> "FINAL"
         }
     }
 

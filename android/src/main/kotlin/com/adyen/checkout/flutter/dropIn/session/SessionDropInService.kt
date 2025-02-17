@@ -1,7 +1,5 @@
 package com.adyen.checkout.flutter.dropIn.session
 
-import DeletedStoredPaymentMethodResultDTO
-import PlatformCommunicationModel
 import android.content.Intent
 import android.os.IBinder
 import android.util.Log
@@ -19,6 +17,7 @@ import com.adyen.checkout.flutter.dropIn.advanced.DropInPaymentMethodDeletionPla
 import com.adyen.checkout.flutter.dropIn.advanced.DropInPaymentMethodDeletionResultMessenger
 import com.adyen.checkout.flutter.dropIn.model.DropInStoredPaymentMethodDeletionModel
 import com.adyen.checkout.flutter.dropIn.model.DropInType
+import com.adyen.checkout.flutter.generated.DeletedStoredPaymentMethodResultDTO
 import com.adyen.checkout.flutter.dropIn.model.toJson
 import com.adyen.checkout.flutter.utils.Constants.Companion.ADYEN_LOG_TAG
 import kotlinx.coroutines.launch

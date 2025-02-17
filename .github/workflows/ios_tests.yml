@@ -6,12 +6,12 @@ on:
       flutter-version:
         description: 'Flutter version'
         required: true
-        default: '3.16.2'
+        default: '3.29.0'
         type: string
 
 jobs:
   ios_tests:
-    runs-on: macos-13
+    runs-on: macos-14
     defaults:
       run:
         working-directory: example/ios
@@ -35,7 +35,9 @@ jobs:
 
       - name: Lint check
         working-directory: ios
-        run: swiftlint --config .swiftlint.yml --output "swiftLintReport.json"
+        run: |
+          brew install swiftlint
+          fastlane run swiftlint config_file:".swiftlint.yml" output_file:"swiftLintReport.json" reporter:"json"
 
       - name: Cache iOS reports
         uses: actions/cache/save@v4
@@ -49,5 +51,5 @@ jobs:
           xcodebuild test \
           -workspace Runner.xcworkspace \
           -scheme Runner \
-          -destination "platform=iOS Simulator,name=iPhone 14" \
+          -destination "platform=iOS Simulator,name=iPhone 16" \
           -enableCodeCoverage YES | xcpretty --utf --color && exit ${PIPESTATUS[0]}

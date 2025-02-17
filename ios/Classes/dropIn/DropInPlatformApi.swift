@@ -4,7 +4,7 @@ import AdyenNetworking
 
 class DropInPlatformApi: DropInPlatformInterface {
     private let jsonDecoder = JSONDecoder()
-    private let dropInFlutterApi: DropInFlutterInterface
+    private let checkoutFlutter: CheckoutFlutterInterface
     private let sessionHolder: SessionHolder
     private var hostViewController: UIViewController?
     private var dropInViewController: DropInViewController?
@@ -15,10 +15,10 @@ class DropInPlatformApi: DropInPlatformInterface {
     private var requestOrderHandler: ((Result<PartialPaymentOrder, any Error>) -> Void)?
 
     init(
-        dropInFlutterApi: DropInFlutterInterface,
+        checkoutFlutter: CheckoutFlutterInterface,
         sessionHolder: SessionHolder
     ) {
-        self.dropInFlutterApi = dropInFlutterApi
+        self.checkoutFlutter = checkoutFlutter
         self.sessionHolder = sessionHolder
     }
 
@@ -37,7 +37,7 @@ class DropInPlatformApi: DropInPlatformInterface {
             let adyenContext = try dropInConfigurationDTO.createAdyenContext()
             dropInSessionStoredPaymentMethodsDelegate = DropInSessionsStoredPaymentMethodsDelegate(
                 viewController: viewController,
-                dropInFlutterApi: dropInFlutterApi
+                checkoutFlutter: checkoutFlutter
             )
             let payment = session.sessionContext.payment ?? adyenContext.payment
             let dropInConfiguration = try dropInConfigurationDTO.createDropInConfiguration(payment: payment)
@@ -94,7 +94,7 @@ class DropInPlatformApi: DropInPlatformInterface {
                 configuration: configuration,
                 title: dropInConfigurationDTO.preselectedPaymentMethodTitle
             )
-            dropInAdvancedFlowDelegate = DropInAdvancedFlowDelegate(dropInFlutterApi: dropInFlutterApi)
+            dropInAdvancedFlowDelegate = DropInAdvancedFlowDelegate(checkoutFlutter: checkoutFlutter)
             dropInAdvancedFlowDelegate?.dropInInteractorDelegate = self
             dropInComponent.delegate = dropInAdvancedFlowDelegate
             dropInComponent.cardComponentDelegate = self
@@ -104,7 +104,7 @@ class DropInPlatformApi: DropInPlatformInterface {
             if dropInConfigurationDTO.isRemoveStoredPaymentMethodEnabled == true {
                 dropInAdvancedFlowStoredPaymentMethodsDelegate = DropInAdvancedFlowStoredPaymentMethodsDelegate(
                     viewController: viewController,
-                    dropInFlutterApi: dropInFlutterApi
+                    checkoutFlutter: checkoutFlutter
                 )
                 dropInComponent.storedPaymentMethodsDelegate = dropInAdvancedFlowStoredPaymentMethodsDelegate
             }
@@ -113,12 +113,12 @@ class DropInPlatformApi: DropInPlatformInterface {
             self.dropInViewController = dropInViewController
             self.hostViewController?.present(dropInViewController, animated: false)
         } catch {
-            let platformCommunicationModel = PlatformCommunicationModel(
-                type: PlatformCommunicationType.result,
-                paymentResult: PaymentResultDTO(type: PaymentResultEnum.error, reason: error.localizedDescription)
+            let checkoutEvent = CheckoutEvent(
+                type: CheckoutEventType.result,
+                data: PaymentResultDTO(type: PaymentResultEnum.error, reason: error.localizedDescription)
             )
-            dropInFlutterApi.onDropInAdvancedPlatformCommunication(
-                platformCommunicationModel: platformCommunicationModel,
+            checkoutFlutter.send(
+                event: checkoutEvent,
                 completion: { _ in }
             )
         }
@@ -199,11 +199,9 @@ class DropInPlatformApi: DropInPlatformInterface {
                 result: PaymentResultModelDTO(
                     resultCode: resultCode?.rawValue)
             )
-            self?.dropInFlutterApi.onDropInAdvancedPlatformCommunication(
-                platformCommunicationModel: PlatformCommunicationModel(
-                    type: PlatformCommunicationType.result,
-                    paymentResult: paymentResult
-                ),
+            let checkoutEvent = CheckoutEvent(type: CheckoutEventType.result, data: paymentResult)
+            self?.checkoutFlutter.send(
+                event: checkoutEvent,
                 completion: { _ in }
             )
         })
@@ -216,11 +214,9 @@ class DropInPlatformApi: DropInPlatformInterface {
             dropInViewController?.dropInComponent.handle(result)
         } catch {
             let paymentResult = PaymentResultDTO(type: PaymentResultEnum.error, reason: error.localizedDescription)
-            dropInFlutterApi.onDropInAdvancedPlatformCommunication(
-                platformCommunicationModel: PlatformCommunicationModel(
-                    type: PlatformCommunicationType.result,
-                    paymentResult: paymentResult
-                ),
+            let checkoutEvent = CheckoutEvent(type: CheckoutEventType.result, data: paymentResult)
+            checkoutFlutter.send(
+                event: checkoutEvent,
                 completion: { _ in }
             )
             finalizeAndDismiss(success: false) {}
@@ -233,11 +229,9 @@ class DropInPlatformApi: DropInPlatformInterface {
         if paymentEventDTO.error?.dismissDropIn == true || dropInAdvancedFlowDelegate?.isApplePay == true {
             finalizeAndDismiss(success: false) { [weak self] in
                 let paymentResult = PaymentResultDTO(type: PaymentResultEnum.error, reason: paymentEventDTO.error?.errorMessage)
-                self?.dropInFlutterApi.onDropInAdvancedPlatformCommunication(
-                    platformCommunicationModel: PlatformCommunicationModel(
-                        type: PlatformCommunicationType.result,
-                        paymentResult: paymentResult
-                    ),
+                let checkoutEvent = CheckoutEvent(type: CheckoutEventType.result, data: paymentResult)
+                self?.checkoutFlutter.send(
+                    event: checkoutEvent,
                     completion: { _ in }
                 )
             }
@@ -289,15 +283,15 @@ class DropInPlatformApi: DropInPlatformInterface {
     }
 
     private func sendSessionError(error: Error) {
-        let platformCommunicationModel = PlatformCommunicationModel(
-            type: PlatformCommunicationType.result,
-            paymentResult: PaymentResultDTO(
+        let checkoutEvent = CheckoutEvent(
+            type: CheckoutEventType.result,
+            data: PaymentResultDTO(
                 type: PaymentResultEnum.error,
                 reason: error.localizedDescription
             )
         )
-        dropInFlutterApi.onDropInSessionPlatformCommunication(
-            platformCommunicationModel: platformCommunicationModel,
+        checkoutFlutter.send(
+            event: checkoutEvent,
             completion: { _ in }
         )
     }
@@ -348,11 +342,11 @@ extension DropInPlatformApi: PartialPaymentDelegate {
     func checkBalance(with data: Adyen.PaymentComponentData, component: any Adyen.Component, completion: @escaping (Result<Adyen.Balance, any Error>) -> Void) {
         do {
             checkBalanceHandler = completion
-            let platformCommunicationModel = try PlatformCommunicationModel(
-                type: PlatformCommunicationType.balanceCheck,
+            let checkoutEvent = try CheckoutEvent(
+                type: CheckoutEventType.balanceCheck,
                 data: data.jsonObject.toJsonStringRepresentation()
             )
-            dropInFlutterApi.onDropInAdvancedPlatformCommunication(platformCommunicationModel: platformCommunicationModel, completion: { _ in })
+            checkoutFlutter.send(event: checkoutEvent, completion: { _ in })
         } catch {
             completion(.failure(error))
         }
@@ -360,8 +354,8 @@ extension DropInPlatformApi: PartialPaymentDelegate {
     
     func requestOrder(for component: any Adyen.Component, completion: @escaping (Result<Adyen.PartialPaymentOrder, any Error>) -> Void) {
         requestOrderHandler = completion
-        let platformCommunicationModel = PlatformCommunicationModel(type: PlatformCommunicationType.requestOrder)
-        dropInFlutterApi.onDropInAdvancedPlatformCommunication(platformCommunicationModel: platformCommunicationModel, completion: { _ in })
+        let checkoutEvent = CheckoutEvent(type: CheckoutEventType.requestOrder)
+        checkoutFlutter.send(event: checkoutEvent, completion: { _ in })
     }
     
     func cancelOrder(_ order: Adyen.PartialPaymentOrder, component: any Adyen.Component) {
@@ -372,8 +366,8 @@ extension DropInPlatformApi: PartialPaymentDelegate {
             ]
             let data = try JSONSerialization.data(withJSONObject: cancelOrderData, options: [])
             let cancelOrderDataString = String(data: data, encoding: .utf8)
-            let platformCommunicationModel = PlatformCommunicationModel(type: PlatformCommunicationType.cancelOrder, data: cancelOrderDataString)
-            dropInFlutterApi.onDropInAdvancedPlatformCommunication(platformCommunicationModel: platformCommunicationModel, completion: { _ in })
+            let checkoutEvent = CheckoutEvent(type: CheckoutEventType.cancelOrder, data: cancelOrderDataString)
+            checkoutFlutter.send(event: checkoutEvent, completion: { _ in })
         } catch {
             adyenPrint(error.localizedDescription)
         }

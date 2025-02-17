@@ -5,10 +5,13 @@ import 'package:pigeon/pigeon.dart';
   dartOut: 'lib/src/generated/platform_api.g.dart',
   dartOptions: DartOptions(),
   kotlinOut:
-      'android/src/main/kotlin/com/adyen/checkout/flutter/PlatformApi.kt',
-  kotlinOptions: KotlinOptions(errorClassName: "AdyenPigeonError"),
-  swiftOut: 'ios/Classes/PlatformApi.swift',
-  swiftOptions: SwiftOptions(),
+      'android/src/main/kotlin/com/adyen/checkout/flutter/generated/PlatformApi.kt',
+  kotlinOptions: KotlinOptions(
+    package: "com.adyen.checkout.flutter.generated",
+    errorClassName: "AdyenPigeonError",
+  ),
+  swiftOut: 'ios/Classes/generated/PlatformApi.swift',
+  swiftOptions: SwiftOptions(errorClassName: "AdyenPigeonError"),
   dartPackageName: 'adyen_checkout',
 ))
 enum Environment {
@@ -53,7 +56,7 @@ enum PaymentResultEnum {
   finished,
 }
 
-enum PlatformCommunicationType {
+enum CheckoutEventType {
   paymentComponent,
   additionalDetails,
   result,
@@ -435,15 +438,13 @@ class OrderResponseDTO {
   });
 }
 
-class PlatformCommunicationModel {
-  final PlatformCommunicationType type;
-  final String? data;
-  final PaymentResultDTO? paymentResult;
+class CheckoutEvent {
+  final CheckoutEventType type;
+  final Object? data;
 
-  PlatformCommunicationModel({
+  CheckoutEvent({
     required this.type,
     this.data,
-    this.paymentResult,
   });
 }
 
@@ -677,12 +678,8 @@ abstract class DropInPlatformInterface {
 }
 
 @FlutterApi()
-abstract class DropInFlutterInterface {
-  void onDropInSessionPlatformCommunication(
-      PlatformCommunicationModel platformCommunicationModel);
-
-  void onDropInAdvancedPlatformCommunication(
-      PlatformCommunicationModel platformCommunicationModel);
+abstract class CheckoutFlutterInterface {
+  void send(CheckoutEvent event);
 }
 
 @HostApi()
