@@ -50,7 +50,7 @@ class SessionDropInService : SessionDropInService(), LifecycleOwner {
                         CheckoutEventType.BIN_LOOKUP,
                         binLookupDataJson
                     )
-                DropInPlatformApi.dropInSessionPlatformMessageFlow.emit(checkoutEvent)
+                DropInPlatformApi.dropInMessageFlow.emit(checkoutEvent)
             } catch (exception: Exception) {
                 Log.d(ADYEN_LOG_TAG, "BinLookupData parsing failed: ${exception.message}")
             }
@@ -60,7 +60,7 @@ class SessionDropInService : SessionDropInService(), LifecycleOwner {
     override fun onBinValue(binValue: String) {
         lifecycleScope.launch {
             val platformCommunicationModel = CheckoutEvent(CheckoutEventType.BIN_VALUE, binValue)
-            DropInPlatformApi.dropInSessionPlatformMessageFlow.emit(platformCommunicationModel)
+            DropInPlatformApi.dropInMessageFlow.emit(platformCommunicationModel)
         }
     }
 

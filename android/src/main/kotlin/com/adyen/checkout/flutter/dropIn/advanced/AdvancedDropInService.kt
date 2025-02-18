@@ -115,7 +115,7 @@ class AdvancedDropInService : DropInService(), LifecycleOwner {
                         CheckoutEventType.BIN_LOOKUP,
                         data = data.toJson()
                     )
-                DropInPlatformApi.dropInAdvancedPlatformMessageFlow.emit(checkoutEvent)
+                DropInPlatformApi.dropInMessageFlow.emit(checkoutEvent)
             } catch (exception: Exception) {
                 Log.d(ADYEN_LOG_TAG, "BinLookupData parsing failed: ${exception.message}")
             }
@@ -129,7 +129,7 @@ class AdvancedDropInService : DropInService(), LifecycleOwner {
                     CheckoutEventType.BIN_VALUE,
                     data = binValue
                 )
-            DropInPlatformApi.dropInAdvancedPlatformMessageFlow.emit(checkoutEvent)
+            DropInPlatformApi.dropInMessageFlow.emit(checkoutEvent)
         }
     }
 
