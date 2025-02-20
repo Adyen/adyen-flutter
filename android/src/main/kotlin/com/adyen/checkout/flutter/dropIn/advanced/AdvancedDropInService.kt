@@ -107,11 +107,11 @@ class AdvancedDropInService : DropInService(), LifecycleOwner {
 
     override fun onBinLookup(data: List<BinLookupData>) {
         lifecycleScope.launch {
-            val binLookupDataList = data.map { BinLookupDataDTO(it.brand) }
+            val binLookupDataDtoList = data.map { BinLookupDataDTO(it.brand) }
             val checkoutEvent =
                 CheckoutEvent(
                     CheckoutEventType.BIN_LOOKUP,
-                    binLookupDataList
+                    binLookupDataDtoList
                 )
             DropInPlatformApi.dropInMessageFlow.emit(checkoutEvent)
         }
