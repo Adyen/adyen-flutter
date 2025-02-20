@@ -26,12 +26,12 @@ import com.adyen.checkout.dropin.RecurringDropInServiceResult
 import com.adyen.checkout.flutter.dropIn.DropInPlatformApi
 import com.adyen.checkout.flutter.dropIn.model.DropInStoredPaymentMethodDeletionModel
 import com.adyen.checkout.flutter.dropIn.model.DropInType
+import com.adyen.checkout.flutter.generated.BinLookupDataDTO
 import com.adyen.checkout.flutter.generated.DeletedStoredPaymentMethodResultDTO
 import com.adyen.checkout.flutter.generated.ErrorDTO
 import com.adyen.checkout.flutter.generated.OrderCancelResultDTO
 import com.adyen.checkout.flutter.generated.PaymentEventDTO
 import com.adyen.checkout.flutter.generated.PaymentEventType
-import com.adyen.checkout.flutter.dropIn.model.toJson
 import com.adyen.checkout.flutter.generated.CheckoutEvent
 import com.adyen.checkout.flutter.generated.CheckoutEventType
 import com.adyen.checkout.flutter.utils.Constants
@@ -110,10 +110,11 @@ class AdvancedDropInService : DropInService(), LifecycleOwner {
     override fun onBinLookup(data: List<BinLookupData>) {
         lifecycleScope.launch {
             try {
+                val binLookupDataList = data.map { BinLookupDataDTO(it.brand) }
                 val checkoutEvent =
                     CheckoutEvent(
                         CheckoutEventType.BIN_LOOKUP,
-                        data = data.toJson()
+                        binLookupDataList
                     )
                 DropInPlatformApi.dropInMessageFlow.emit(checkoutEvent)
             } catch (exception: Exception) {
@@ -127,7 +128,7 @@ class AdvancedDropInService : DropInService(), LifecycleOwner {
             val checkoutEvent =
                 CheckoutEvent(
                     CheckoutEventType.BIN_VALUE,
-                    data = binValue
+                    binValue
                 )
             DropInPlatformApi.dropInMessageFlow.emit(checkoutEvent)
         }

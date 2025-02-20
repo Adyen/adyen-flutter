@@ -17,8 +17,8 @@ import com.adyen.checkout.flutter.dropIn.advanced.DropInPaymentMethodDeletionPla
 import com.adyen.checkout.flutter.dropIn.advanced.DropInPaymentMethodDeletionResultMessenger
 import com.adyen.checkout.flutter.dropIn.model.DropInStoredPaymentMethodDeletionModel
 import com.adyen.checkout.flutter.dropIn.model.DropInType
+import com.adyen.checkout.flutter.generated.BinLookupDataDTO
 import com.adyen.checkout.flutter.generated.DeletedStoredPaymentMethodResultDTO
-import com.adyen.checkout.flutter.dropIn.model.toJson
 import com.adyen.checkout.flutter.generated.CheckoutEvent
 import com.adyen.checkout.flutter.generated.CheckoutEventType
 import com.adyen.checkout.flutter.utils.Constants.Companion.ADYEN_LOG_TAG
@@ -44,11 +44,11 @@ class SessionDropInService : SessionDropInService(), LifecycleOwner {
     override fun onBinLookup(data: List<BinLookupData>) {
         lifecycleScope.launch {
             try {
-                val binLookupDataJson = data.toJson()
+                val binLookupDataList = data.map { BinLookupDataDTO(it.brand) }
                 val checkoutEvent =
                     CheckoutEvent(
                         CheckoutEventType.BIN_LOOKUP,
-                        binLookupDataJson
+                        binLookupDataList
                     )
                 DropInPlatformApi.dropInMessageFlow.emit(checkoutEvent)
             } catch (exception: Exception) {

@@ -608,6 +608,12 @@ class OrderCancelResultDTO {
   );
 }
 
+class BinLookupDataDTO {
+  final String brand;
+
+  BinLookupDataDTO({required this.brand});
+}
+
 @HostApi()
 abstract class CheckoutPlatformInterface {
   @async
@@ -724,6 +730,7 @@ abstract class ComponentFlutterInterface {
   void _generateCodecForDTOs(
     CardComponentConfigurationDTO cardComponentConfigurationDTO,
     SessionDTO sessionDTO,
+    BinLookupDataDTO binLookupDataDTO,
   );
 
   void onComponentCommunication(
