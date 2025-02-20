@@ -2,7 +2,6 @@ package com.adyen.checkout.flutter.dropIn.advanced
 
 import android.content.Intent
 import android.os.IBinder
-import android.util.Log
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ServiceLifecycleDispatcher
@@ -35,7 +34,6 @@ import com.adyen.checkout.flutter.generated.PaymentEventType
 import com.adyen.checkout.flutter.generated.CheckoutEvent
 import com.adyen.checkout.flutter.generated.CheckoutEventType
 import com.adyen.checkout.flutter.utils.Constants
-import com.adyen.checkout.flutter.utils.Constants.Companion.ADYEN_LOG_TAG
 import com.adyen.checkout.googlepay.GooglePayComponentState
 import kotlinx.coroutines.launch
 import org.json.JSONObject
@@ -109,17 +107,13 @@ class AdvancedDropInService : DropInService(), LifecycleOwner {
 
     override fun onBinLookup(data: List<BinLookupData>) {
         lifecycleScope.launch {
-            try {
-                val binLookupDataList = data.map { BinLookupDataDTO(it.brand) }
-                val checkoutEvent =
-                    CheckoutEvent(
-                        CheckoutEventType.BIN_LOOKUP,
-                        binLookupDataList
-                    )
-                DropInPlatformApi.dropInMessageFlow.emit(checkoutEvent)
-            } catch (exception: Exception) {
-                Log.d(ADYEN_LOG_TAG, "BinLookupData parsing failed: ${exception.message}")
-            }
+            val binLookupDataList = data.map { BinLookupDataDTO(it.brand) }
+            val checkoutEvent =
+                CheckoutEvent(
+                    CheckoutEventType.BIN_LOOKUP,
+                    binLookupDataList
+                )
+            DropInPlatformApi.dropInMessageFlow.emit(checkoutEvent)
         }
     }
 
