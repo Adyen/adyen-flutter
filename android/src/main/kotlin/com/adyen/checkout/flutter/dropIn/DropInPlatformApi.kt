@@ -45,17 +45,24 @@ import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToOrderResponseMo
 import com.adyen.checkout.sessions.core.CheckoutSession
 import com.adyen.checkout.sessions.core.SessionSetupResponse
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
 
-class DropInPlatformApi(
+internal class DropInPlatformApi(
     private val checkoutFlutter: CheckoutFlutterInterface,
     private val activity: FragmentActivity,
     private val sessionHolder: SessionHolder,
 ) : DropInPlatformInterface {
     lateinit var dropInSessionLauncher: ActivityResultLauncher<SessionDropInResultContractParams>
     lateinit var dropInAdvancedFlowLauncher: ActivityResultLauncher<DropInResultContractParams>
+    private var dropInPlatformMessengerJob: Job? = null
+
+    companion object {
+        val dropInMessageFlow = MutableSharedFlow<CheckoutEvent>()
+    }
 
     override fun showDropInSession(dropInConfigurationDTO: DropInConfigurationDTO) {
         setStoredPaymentMethodDeletionObserver()
@@ -66,6 +73,11 @@ class DropInPlatformApi(
                 dropInConfigurationDTO.environment.mapToEnvironment(),
                 dropInConfigurationDTO.clientKey
             )
+
+        dropInPlatformMessengerJob?.cancel()
+        dropInPlatformMessengerJob =
+            activity.lifecycleScope.launch { dropInMessageFlow.collect { event -> checkoutFlutter.send(event) {} } }
+
         DropIn.startPayment(
             activity.applicationContext,
             dropInSessionLauncher,
@@ -84,6 +96,11 @@ class DropInPlatformApi(
         setBalanceCheckPlatformMessengerObserver()
         setOrderRequestPlatformMessengerObserver()
         setOrderCancelPlatformMessengerObserver()
+
+        dropInPlatformMessengerJob?.cancel()
+        dropInPlatformMessengerJob =
+            activity.lifecycleScope.launch { dropInMessageFlow.collect { event -> checkoutFlutter.send(event) {} } }
+
         activity.lifecycleScope.launch(Dispatchers.IO) {
             val paymentMethodsApiResponse =
                 PaymentMethodsApiResponse.SERIALIZER.deserialize(
@@ -138,6 +155,8 @@ class DropInPlatformApi(
     }
 
     override fun cleanUpDropIn() {
+        dropInPlatformMessengerJob?.cancel()
+
         DropInServiceResultMessenger.instance().removeObservers(activity)
         DropInAdditionalDetailsPlatformMessenger.instance().removeObservers(activity)
         DropInPaymentMethodDeletionPlatformMessenger.instance().removeObservers(activity)

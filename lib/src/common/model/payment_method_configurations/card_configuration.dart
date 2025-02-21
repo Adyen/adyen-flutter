@@ -1,4 +1,4 @@
-import 'package:adyen_checkout/src/generated/platform_api.g.dart';
+import 'package:adyen_checkout/adyen_checkout.dart';
 
 class CardConfiguration {
   final bool holderNameRequired;
@@ -9,6 +9,7 @@ class CardConfiguration {
   final FieldVisibility kcpFieldVisibility;
   final FieldVisibility socialSecurityNumberFieldVisibility;
   final List<String?> supportedCardTypes;
+  final CardCallbacksInterface? cardCallbacks;
 
   const CardConfiguration({
     this.holderNameRequired = false,
@@ -19,5 +20,6 @@ class CardConfiguration {
     this.kcpFieldVisibility = FieldVisibility.hide,
     this.socialSecurityNumberFieldVisibility = FieldVisibility.hide,
     this.supportedCardTypes = const [],
+    this.cardCallbacks,
   });
 }

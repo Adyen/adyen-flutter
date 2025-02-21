@@ -28,7 +28,7 @@ class DropIn {
 
   Future<PaymentResult> startDropInSessionsPayment(
     DropInConfiguration dropInConfiguration,
-    SessionCheckout dropInSession,
+    SessionCheckout sessionCheckout,
   ) async {
     adyenLogger.print("Start Drop-in session");
     final dropInSessionCompleter = Completer<PaymentResultDTO>();
@@ -50,6 +50,10 @@ class DropIn {
             event,
             dropInConfiguration.storedPaymentMethodConfiguration,
           );
+        case CheckoutEventType.binLookup:
+          _handleOnBinLookup(event, dropInConfiguration.cardConfiguration);
+        case CheckoutEventType.binValue:
+          _handleOnBinValue(event, dropInConfiguration.cardConfiguration);
         default:
       }
     });
@@ -123,6 +127,10 @@ class DropIn {
           _handleOrderRequest(event, advancedCheckout.partialPayment);
         case CheckoutEventType.cancelOrder:
           _handleOrderCancel(event, advancedCheckout.partialPayment);
+        case CheckoutEventType.binLookup:
+          _handleOnBinLookup(event, dropInConfiguration.cardConfiguration);
+        case CheckoutEventType.binValue:
+          _handleOnBinValue(event, dropInConfiguration.cardConfiguration);
       }
     });
 
@@ -334,6 +342,28 @@ class DropIn {
     } catch (error) {
       dropInPlatformApi.onOrderCancelResult(
           OrderCancelResultDTO(orderCancelResponseBody: {}));
+    }
+  }
+
+  void _handleOnBinLookup(
+    CheckoutEvent event,
+    CardConfiguration? cardConfiguration,
+  ) {
+    if (event.data case List<Object?> binLookupDataDTOList) {
+      final List<BinLookupData> binLookupDataList = binLookupDataDTOList
+          .whereType<BinLookupDataDTO>()
+          .map((entry) => BinLookupData(brand: entry.brand))
+          .toList();
+      cardConfiguration?.cardCallbacks?.onBinLookup?.call(binLookupDataList);
+    }
+  }
+
+  void _handleOnBinValue(
+    CheckoutEvent event,
+    CardConfiguration? cardConfiguration,
+  ) {
+    if (event.data case String binValue) {
+      cardConfiguration?.cardCallbacks?.onBinValue?.call(binValue);
     }
   }
 }

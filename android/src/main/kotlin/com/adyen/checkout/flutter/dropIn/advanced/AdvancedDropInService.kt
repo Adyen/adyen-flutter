@@ -5,6 +5,8 @@ import android.os.IBinder
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ServiceLifecycleDispatcher
+import androidx.lifecycle.lifecycleScope
+import com.adyen.checkout.card.BinLookupData
 import com.adyen.checkout.components.core.ActionComponentData
 import com.adyen.checkout.components.core.BalanceResult
 import com.adyen.checkout.components.core.Order
@@ -20,15 +22,20 @@ import com.adyen.checkout.dropin.DropInServiceResult
 import com.adyen.checkout.dropin.ErrorDialog
 import com.adyen.checkout.dropin.OrderDropInServiceResult
 import com.adyen.checkout.dropin.RecurringDropInServiceResult
+import com.adyen.checkout.flutter.dropIn.DropInPlatformApi
 import com.adyen.checkout.flutter.dropIn.model.DropInStoredPaymentMethodDeletionModel
 import com.adyen.checkout.flutter.dropIn.model.DropInType
+import com.adyen.checkout.flutter.generated.BinLookupDataDTO
 import com.adyen.checkout.flutter.generated.DeletedStoredPaymentMethodResultDTO
 import com.adyen.checkout.flutter.generated.ErrorDTO
 import com.adyen.checkout.flutter.generated.OrderCancelResultDTO
 import com.adyen.checkout.flutter.generated.PaymentEventDTO
 import com.adyen.checkout.flutter.generated.PaymentEventType
+import com.adyen.checkout.flutter.generated.CheckoutEvent
+import com.adyen.checkout.flutter.generated.CheckoutEventType
 import com.adyen.checkout.flutter.utils.Constants
 import com.adyen.checkout.googlepay.GooglePayComponentState
+import kotlinx.coroutines.launch
 import org.json.JSONObject
 
 class AdvancedDropInService : DropInService(), LifecycleOwner {
@@ -95,6 +102,29 @@ class AdvancedDropInService : DropInService(), LifecycleOwner {
             DropInPaymentMethodDeletionPlatformMessenger.sendResult(dropInStoredPaymentMethodDeletionModel)
         } ?: run {
             sendRecurringResult(RecurringDropInServiceResult.Error(errorDialog = ErrorDialog()))
+        }
+    }
+
+    override fun onBinLookup(data: List<BinLookupData>) {
+        lifecycleScope.launch {
+            val binLookupDataDtoList = data.map { BinLookupDataDTO(it.brand) }
+            val checkoutEvent =
+                CheckoutEvent(
+                    CheckoutEventType.BIN_LOOKUP,
+                    binLookupDataDtoList
+                )
+            DropInPlatformApi.dropInMessageFlow.emit(checkoutEvent)
+        }
+    }
+
+    override fun onBinValue(binValue: String) {
+        lifecycleScope.launch {
+            val checkoutEvent =
+                CheckoutEvent(
+                    CheckoutEventType.BIN_VALUE,
+                    binValue
+                )
+            DropInPlatformApi.dropInMessageFlow.emit(checkoutEvent)
         }
     }
 

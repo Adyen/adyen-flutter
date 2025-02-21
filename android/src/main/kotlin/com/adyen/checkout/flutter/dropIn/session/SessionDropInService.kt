@@ -5,15 +5,22 @@ import android.os.IBinder
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ServiceLifecycleDispatcher
+import androidx.lifecycle.lifecycleScope
+import com.adyen.checkout.card.BinLookupData
 import com.adyen.checkout.components.core.StoredPaymentMethod
 import com.adyen.checkout.dropin.ErrorDialog
 import com.adyen.checkout.dropin.RecurringDropInServiceResult
 import com.adyen.checkout.dropin.SessionDropInService
+import com.adyen.checkout.flutter.dropIn.DropInPlatformApi
 import com.adyen.checkout.flutter.dropIn.advanced.DropInPaymentMethodDeletionPlatformMessenger
 import com.adyen.checkout.flutter.dropIn.advanced.DropInPaymentMethodDeletionResultMessenger
 import com.adyen.checkout.flutter.dropIn.model.DropInStoredPaymentMethodDeletionModel
 import com.adyen.checkout.flutter.dropIn.model.DropInType
+import com.adyen.checkout.flutter.generated.BinLookupDataDTO
 import com.adyen.checkout.flutter.generated.DeletedStoredPaymentMethodResultDTO
+import com.adyen.checkout.flutter.generated.CheckoutEvent
+import com.adyen.checkout.flutter.generated.CheckoutEventType
+import kotlinx.coroutines.launch
 
 class SessionDropInService : SessionDropInService(), LifecycleOwner {
     private val dispatcher = ServiceLifecycleDispatcher(this)
@@ -29,6 +36,25 @@ class SessionDropInService : SessionDropInService(), LifecycleOwner {
             DropInPaymentMethodDeletionPlatformMessenger.sendResult(dropInStoredPaymentMethodDeletionModel)
         } ?: run {
             sendRecurringResult(RecurringDropInServiceResult.Error(errorDialog = ErrorDialog()))
+        }
+    }
+
+    override fun onBinLookup(data: List<BinLookupData>) {
+        lifecycleScope.launch {
+            val binLookupDataDtoList = data.map { BinLookupDataDTO(it.brand) }
+            val checkoutEvent =
+                CheckoutEvent(
+                    CheckoutEventType.BIN_LOOKUP,
+                    binLookupDataDtoList
+                )
+            DropInPlatformApi.dropInMessageFlow.emit(checkoutEvent)
+        }
+    }
+
+    override fun onBinValue(binValue: String) {
+        lifecycleScope.launch {
+            val platformCommunicationModel = CheckoutEvent(CheckoutEventType.BIN_VALUE, binValue)
+            DropInPlatformApi.dropInMessageFlow.emit(platformCommunicationModel)
         }
     }
 

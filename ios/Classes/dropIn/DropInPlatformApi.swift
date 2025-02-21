@@ -57,6 +57,7 @@ class DropInPlatformApi: DropInPlatformInterface {
             )
             dropInComponent.delegate = sessionHolder.session
             dropInComponent.partialPaymentDelegate = sessionHolder.session
+            dropInComponent.cardComponentDelegate = self
             if dropInConfigurationDTO.isRemoveStoredPaymentMethodEnabled {
                 dropInComponent.storedPaymentMethodsDelegate = dropInSessionStoredPaymentMethodsDelegate
             }
@@ -97,6 +98,7 @@ class DropInPlatformApi: DropInPlatformInterface {
             dropInAdvancedFlowDelegate = DropInAdvancedFlowDelegate(checkoutFlutter: checkoutFlutter)
             dropInAdvancedFlowDelegate?.dropInInteractorDelegate = self
             dropInComponent.delegate = dropInAdvancedFlowDelegate
+            dropInComponent.cardComponentDelegate = self
             if dropInConfigurationDTO.isPartialPaymentSupported {
                 dropInComponent.partialPaymentDelegate = self
             }
@@ -372,4 +374,26 @@ extension DropInPlatformApi: PartialPaymentDelegate {
         }
     }
 
+}
+
+extension DropInPlatformApi: CardComponentDelegate {
+    func didSubmit(lastFour: String, finalBIN: String, component: Adyen.CardComponent) {}
+    
+    func didChangeBIN(_ value: String, component: Adyen.CardComponent) {
+        let checkoutEvent = CheckoutEvent(type: CheckoutEventType.binValue, data: value)
+        checkoutFlutter.send(event: checkoutEvent, completion: { _ in })
+    }
+    
+    func didChangeCardBrand(_ value: [Adyen.CardBrand]?, component: Adyen.CardComponent) {
+        guard let binLookupData = value else {
+            return
+        }
+        
+        let binLookupDataDtoList: [BinLookupDataDTO] = binLookupData.map { cardBrand in
+            BinLookupDataDTO(brand: cardBrand.type.rawValue)
+        }
+        
+        let checkoutEvent = CheckoutEvent(type: CheckoutEventType.binLookup, data: binLookupDataDtoList)
+        checkoutFlutter.send(event: checkoutEvent, completion: { _ in })
+    }
 }
