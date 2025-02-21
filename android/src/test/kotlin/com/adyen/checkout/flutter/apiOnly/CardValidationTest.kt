@@ -178,15 +178,15 @@ internal class CardValidationTest {
         }
 
         @Test
-        fun `given longer valid security code and Amex brand when validate then result should be valid`() {
+        fun `given 4 digit valid security code and Amex brand when validate then result should be valid`() {
             val validationResult = CardValidation.validateCardSecurityCode("1234", "amex")
 
             assertEquals(CardSecurityCodeValidationResultDTO.VALID, validationResult)
         }
 
         @Test
-        fun `given longer valid security code without card brand when validate then result should be invalid`() {
-            val validationResult = CardValidation.validateCardSecurityCode("1234",null)
+        fun `given 4 digit valid security code without card brand when validate then result should be invalid`() {
+            val validationResult = CardValidation.validateCardSecurityCode("1234", null)
 
             // This outcome should be valid. The Android team will adjust the validation in a next version.
             assertEquals(CardSecurityCodeValidationResultDTO.INVALID, validationResult)
