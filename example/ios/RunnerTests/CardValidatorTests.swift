@@ -140,8 +140,13 @@ class CardValidatorTestss: XCTestCase {
         XCTAssertEqual(validationResult, true)
     }
 
-    func test_given_validSecurityCodeAndAmexCard_when_validate_then_returnValid() {
+    func test_given_4digitValidSecurityCodeAndAmexBrand_when_validate_then_returnValid() {
         let validationResult = CardValidation().validateCardSecurityCode(securityCode: "1234", cardBrand: "amex")
+        XCTAssertEqual(validationResult, true)
+    }
+    
+    func test_given_4digitValidSecurityCodeAndNoBrand_when_validate_then_returnValid() {
+        let validationResult = CardValidation().validateCardSecurityCode(securityCode: "1234", cardBrand: nil)
         XCTAssertEqual(validationResult, true)
     }
 
