@@ -28,7 +28,7 @@ class DropIn {
 
   Future<PaymentResult> startDropInSessionsPayment(
     DropInConfiguration dropInConfiguration,
-    SessionCheckout dropInSession,
+    SessionCheckout sessionCheckout,
   ) async {
     adyenLogger.print("Start Drop-in session");
     final dropInSessionCompleter = Completer<PaymentResultDTO>();
@@ -49,6 +49,16 @@ class DropIn {
           _onDeleteStoredPaymentMethodCallback(
             event,
             dropInConfiguration.storedPaymentMethodConfiguration,
+          );
+        case CheckoutEventType.binLookup:
+          _handleOnBinLookup(
+            event,
+            dropInConfiguration.cardConfiguration?.cardCallbacks?.onBinLookup,
+          );
+        case CheckoutEventType.binValue:
+          _handleOnBinValue(
+            event,
+            dropInConfiguration.cardConfiguration?.cardCallbacks?.onBinValue,
           );
         default:
       }
@@ -123,6 +133,16 @@ class DropIn {
           _handleOrderRequest(event, advancedCheckout.partialPayment);
         case CheckoutEventType.cancelOrder:
           _handleOrderCancel(event, advancedCheckout.partialPayment);
+        case CheckoutEventType.binLookup:
+          _handleOnBinLookup(
+            event,
+            dropInConfiguration.cardConfiguration?.cardCallbacks?.onBinLookup,
+          );
+        case CheckoutEventType.binValue:
+          _handleOnBinValue(
+            event,
+            dropInConfiguration.cardConfiguration?.cardCallbacks?.onBinValue,
+          );
       }
     });
 
@@ -334,6 +354,36 @@ class DropIn {
     } catch (error) {
       dropInPlatformApi.onOrderCancelResult(
           OrderCancelResultDTO(orderCancelResponseBody: {}));
+    }
+  }
+
+  void _handleOnBinLookup(
+    CheckoutEvent event,
+    Function? binLookupCallback,
+  ) {
+    if (binLookupCallback == null) {
+      return;
+    }
+
+    if (event.data case List<Object?> binLookupDataDTOList) {
+      final List<BinLookupData> binLookupDataList = binLookupDataDTOList
+          .whereType<BinLookupDataDTO>()
+          .map((entry) => BinLookupData(brand: entry.brand))
+          .toList();
+      binLookupCallback.call(binLookupDataList);
+    }
+  }
+
+  void _handleOnBinValue(
+    CheckoutEvent event,
+    Function? binValueCallback,
+  ) {
+    if (binValueCallback == null) {
+      return;
+    }
+
+    if (event.data case String binValue) {
+      binValueCallback.call(binValue);
     }
   }
 }

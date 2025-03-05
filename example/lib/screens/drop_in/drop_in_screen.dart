@@ -96,7 +96,12 @@ class DropInScreen extends StatelessWidget {
   }
 
   Future<DropInConfiguration> _createDropInConfiguration() async {
-    const CardConfiguration cardsConfiguration = CardConfiguration();
+    CardConfiguration cardsConfiguration = CardConfiguration(
+      cardCallbacks: CardCallbacks(
+        onBinLookup: _onBinLookup,
+        onBinValue: _onBinValue,
+      ),
+    );
 
     ApplePayConfiguration applePayConfiguration = ApplePayConfiguration(
       merchantId: Config.merchantId,
@@ -142,5 +147,15 @@ class DropInScreen extends StatelessWidget {
     );
 
     return dropInConfiguration;
+  }
+
+  void _onBinLookup(List<BinLookupData> binLookupData) {
+    for (var element in binLookupData) {
+      debugPrint("Bin lookup data: brand:${element.brand}");
+    }
+  }
+
+  void _onBinValue(String binValue) {
+    debugPrint("Bin value: $binValue");
   }
 }

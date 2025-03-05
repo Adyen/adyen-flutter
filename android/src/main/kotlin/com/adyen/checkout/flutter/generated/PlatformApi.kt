@@ -138,7 +138,9 @@ enum class CheckoutEventType(val raw: Int) {
   DELETE_STORED_PAYMENT_METHOD(3),
   BALANCE_CHECK(4),
   REQUEST_ORDER(5),
-  CANCEL_ORDER(6);
+  CANCEL_ORDER(6),
+  BIN_LOOKUP(7),
+  BIN_VALUE(8);
 
   companion object {
     fun ofRaw(raw: Int): CheckoutEventType? {
@@ -1191,6 +1193,25 @@ data class OrderCancelResultDTO (
     )
   }
 }
+
+/** Generated class from Pigeon that represents data sent in messages. */
+data class BinLookupDataDTO (
+  val brand: String
+
+) {
+  companion object {
+    @Suppress("LocalVariableName")
+    fun fromList(__pigeon_list: List<Any?>): BinLookupDataDTO {
+      val brand = __pigeon_list[0] as String
+      return BinLookupDataDTO(brand)
+    }
+  }
+  fun toList(): List<Any?> {
+    return listOf(
+      brand,
+    )
+  }
+}
 private object PlatformApiPigeonCodec : StandardMessageCodec() {
   override fun readValueOfType(type: Byte, buffer: ByteBuffer): Any? {
     return when (type) {
@@ -1340,91 +1361,96 @@ private object PlatformApiPigeonCodec : StandardMessageCodec() {
         }
       }
       158.toByte() -> {
-        return (readValue(buffer) as Int?)?.let {
-          Environment.ofRaw(it)
+        return (readValue(buffer) as? List<Any?>)?.let {
+          BinLookupDataDTO.fromList(it)
         }
       }
       159.toByte() -> {
         return (readValue(buffer) as Int?)?.let {
-          AddressMode.ofRaw(it)
+          Environment.ofRaw(it)
         }
       }
       160.toByte() -> {
         return (readValue(buffer) as Int?)?.let {
-          CardAuthMethod.ofRaw(it)
+          AddressMode.ofRaw(it)
         }
       }
       161.toByte() -> {
         return (readValue(buffer) as Int?)?.let {
-          TotalPriceStatus.ofRaw(it)
+          CardAuthMethod.ofRaw(it)
         }
       }
       162.toByte() -> {
         return (readValue(buffer) as Int?)?.let {
-          GooglePayEnvironment.ofRaw(it)
+          TotalPriceStatus.ofRaw(it)
         }
       }
       163.toByte() -> {
         return (readValue(buffer) as Int?)?.let {
-          CashAppPayEnvironment.ofRaw(it)
+          GooglePayEnvironment.ofRaw(it)
         }
       }
       164.toByte() -> {
         return (readValue(buffer) as Int?)?.let {
-          PaymentResultEnum.ofRaw(it)
+          CashAppPayEnvironment.ofRaw(it)
         }
       }
       165.toByte() -> {
         return (readValue(buffer) as Int?)?.let {
-          CheckoutEventType.ofRaw(it)
+          PaymentResultEnum.ofRaw(it)
         }
       }
       166.toByte() -> {
         return (readValue(buffer) as Int?)?.let {
-          ComponentCommunicationType.ofRaw(it)
+          CheckoutEventType.ofRaw(it)
         }
       }
       167.toByte() -> {
         return (readValue(buffer) as Int?)?.let {
-          PaymentEventType.ofRaw(it)
+          ComponentCommunicationType.ofRaw(it)
         }
       }
       168.toByte() -> {
         return (readValue(buffer) as Int?)?.let {
-          FieldVisibility.ofRaw(it)
+          PaymentEventType.ofRaw(it)
         }
       }
       169.toByte() -> {
         return (readValue(buffer) as Int?)?.let {
-          InstantPaymentType.ofRaw(it)
+          FieldVisibility.ofRaw(it)
         }
       }
       170.toByte() -> {
         return (readValue(buffer) as Int?)?.let {
-          ApplePayShippingType.ofRaw(it)
+          InstantPaymentType.ofRaw(it)
         }
       }
       171.toByte() -> {
         return (readValue(buffer) as Int?)?.let {
-          ApplePayMerchantCapability.ofRaw(it)
+          ApplePayShippingType.ofRaw(it)
         }
       }
       172.toByte() -> {
         return (readValue(buffer) as Int?)?.let {
-          ApplePaySummaryItemType.ofRaw(it)
+          ApplePayMerchantCapability.ofRaw(it)
         }
       }
       173.toByte() -> {
         return (readValue(buffer) as Int?)?.let {
-          CardNumberValidationResultDTO.ofRaw(it)
+          ApplePaySummaryItemType.ofRaw(it)
         }
       }
       174.toByte() -> {
         return (readValue(buffer) as Int?)?.let {
-          CardExpiryDateValidationResultDTO.ofRaw(it)
+          CardNumberValidationResultDTO.ofRaw(it)
         }
       }
       175.toByte() -> {
+        return (readValue(buffer) as Int?)?.let {
+          CardExpiryDateValidationResultDTO.ofRaw(it)
+        }
+      }
+      176.toByte() -> {
         return (readValue(buffer) as Int?)?.let {
           CardSecurityCodeValidationResultDTO.ofRaw(it)
         }
@@ -1550,76 +1576,80 @@ private object PlatformApiPigeonCodec : StandardMessageCodec() {
         stream.write(157)
         writeValue(stream, value.toList())
       }
-      is Environment -> {
+      is BinLookupDataDTO -> {
         stream.write(158)
-        writeValue(stream, value.raw)
+        writeValue(stream, value.toList())
       }
-      is AddressMode -> {
+      is Environment -> {
         stream.write(159)
         writeValue(stream, value.raw)
       }
-      is CardAuthMethod -> {
+      is AddressMode -> {
         stream.write(160)
         writeValue(stream, value.raw)
       }
-      is TotalPriceStatus -> {
+      is CardAuthMethod -> {
         stream.write(161)
         writeValue(stream, value.raw)
       }
-      is GooglePayEnvironment -> {
+      is TotalPriceStatus -> {
         stream.write(162)
         writeValue(stream, value.raw)
       }
-      is CashAppPayEnvironment -> {
+      is GooglePayEnvironment -> {
         stream.write(163)
         writeValue(stream, value.raw)
       }
-      is PaymentResultEnum -> {
+      is CashAppPayEnvironment -> {
         stream.write(164)
         writeValue(stream, value.raw)
       }
-      is CheckoutEventType -> {
+      is PaymentResultEnum -> {
         stream.write(165)
         writeValue(stream, value.raw)
       }
-      is ComponentCommunicationType -> {
+      is CheckoutEventType -> {
         stream.write(166)
         writeValue(stream, value.raw)
       }
-      is PaymentEventType -> {
+      is ComponentCommunicationType -> {
         stream.write(167)
         writeValue(stream, value.raw)
       }
-      is FieldVisibility -> {
+      is PaymentEventType -> {
         stream.write(168)
         writeValue(stream, value.raw)
       }
-      is InstantPaymentType -> {
+      is FieldVisibility -> {
         stream.write(169)
         writeValue(stream, value.raw)
       }
-      is ApplePayShippingType -> {
+      is InstantPaymentType -> {
         stream.write(170)
         writeValue(stream, value.raw)
       }
-      is ApplePayMerchantCapability -> {
+      is ApplePayShippingType -> {
         stream.write(171)
         writeValue(stream, value.raw)
       }
-      is ApplePaySummaryItemType -> {
+      is ApplePayMerchantCapability -> {
         stream.write(172)
         writeValue(stream, value.raw)
       }
-      is CardNumberValidationResultDTO -> {
+      is ApplePaySummaryItemType -> {
         stream.write(173)
         writeValue(stream, value.raw)
       }
-      is CardExpiryDateValidationResultDTO -> {
+      is CardNumberValidationResultDTO -> {
         stream.write(174)
         writeValue(stream, value.raw)
       }
-      is CardSecurityCodeValidationResultDTO -> {
+      is CardExpiryDateValidationResultDTO -> {
         stream.write(175)
+        writeValue(stream, value.raw)
+      }
+      is CardSecurityCodeValidationResultDTO -> {
+        stream.write(176)
         writeValue(stream, value.raw)
       }
       else -> super.writeValue(stream, value)
@@ -2199,12 +2229,12 @@ class ComponentFlutterInterface(private val binaryMessenger: BinaryMessenger, pr
       PlatformApiPigeonCodec
     }
   }
-  fun _generateCodecForDTOs(cardComponentConfigurationDTOArg: CardComponentConfigurationDTO, sessionDTOArg: SessionDTO, callback: (Result<Unit>) -> Unit)
+  fun _generateCodecForDTOs(cardComponentConfigurationDTOArg: CardComponentConfigurationDTO, sessionDTOArg: SessionDTO, binLookupDataDTOArg: BinLookupDataDTO, callback: (Result<Unit>) -> Unit)
 {
     val separatedMessageChannelSuffix = if (messageChannelSuffix.isNotEmpty()) ".$messageChannelSuffix" else ""
     val channelName = "dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface._generateCodecForDTOs$separatedMessageChannelSuffix"
     val channel = BasicMessageChannel<Any?>(binaryMessenger, channelName, codec)
-    channel.send(listOf(cardComponentConfigurationDTOArg, sessionDTOArg)) {
+    channel.send(listOf(cardComponentConfigurationDTOArg, sessionDTOArg, binLookupDataDTOArg)) {
       if (it is List<*>) {
         if (it.size > 1) {
           callback(Result.failure(AdyenPigeonError(it[0] as String, it[1] as String, it[2] as String?)))
