@@ -51,9 +51,15 @@ class DropIn {
             dropInConfiguration.storedPaymentMethodConfiguration,
           );
         case CheckoutEventType.binLookup:
-          _handleOnBinLookup(event, dropInConfiguration.cardConfiguration);
+          _handleOnBinLookup(
+            event,
+            dropInConfiguration.cardConfiguration?.cardCallbacks?.onBinLookup,
+          );
         case CheckoutEventType.binValue:
-          _handleOnBinValue(event, dropInConfiguration.cardConfiguration);
+          _handleOnBinValue(
+            event,
+            dropInConfiguration.cardConfiguration?.cardCallbacks?.onBinValue,
+          );
         default:
       }
     });
@@ -128,9 +134,15 @@ class DropIn {
         case CheckoutEventType.cancelOrder:
           _handleOrderCancel(event, advancedCheckout.partialPayment);
         case CheckoutEventType.binLookup:
-          _handleOnBinLookup(event, dropInConfiguration.cardConfiguration);
+          _handleOnBinLookup(
+            event,
+            dropInConfiguration.cardConfiguration?.cardCallbacks?.onBinLookup,
+          );
         case CheckoutEventType.binValue:
-          _handleOnBinValue(event, dropInConfiguration.cardConfiguration);
+          _handleOnBinValue(
+            event,
+            dropInConfiguration.cardConfiguration?.cardCallbacks?.onBinValue,
+          );
       }
     });
 
@@ -347,23 +359,31 @@ class DropIn {
 
   void _handleOnBinLookup(
     CheckoutEvent event,
-    CardConfiguration? cardConfiguration,
+    Function? binLookupCallback,
   ) {
+    if (binLookupCallback == null) {
+      return;
+    }
+
     if (event.data case List<Object?> binLookupDataDTOList) {
       final List<BinLookupData> binLookupDataList = binLookupDataDTOList
           .whereType<BinLookupDataDTO>()
           .map((entry) => BinLookupData(brand: entry.brand))
           .toList();
-      cardConfiguration?.cardCallbacks?.onBinLookup?.call(binLookupDataList);
+      binLookupCallback.call(binLookupDataList);
     }
   }
 
   void _handleOnBinValue(
     CheckoutEvent event,
-    CardConfiguration? cardConfiguration,
+    Function? binValueCallback,
   ) {
+    if (binValueCallback == null) {
+      return;
+    }
+
     if (event.data case String binValue) {
-      cardConfiguration?.cardCallbacks?.onBinValue?.call(binValue);
+      binValueCallback.call(binValue);
     }
   }
 }
