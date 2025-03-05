@@ -5,7 +5,7 @@
 - Added bin lookup callbacks for Drop-In. 
 - Set minimum SDK version to Flutter 3.16/Dart 3.2
 - Android Components/Drop-in
-  version: [5.9.0](https://docs.adyen.com/online-payments/release-notes/?title%5B0%5D=Android+Components%2FDrop-in#releaseNote=2025-01-17-android-componentsdrop-in-5.9.0).
+  version: [5.9.1](https://docs.adyen.com/online-payments/release-notes/?title%5B0%5D=Android+Components%2FDrop-in#releaseNote=2025-02-24-android-componentsdrop-in-5.9.1).
 - iOS Components/Drop-in
   version: [5.16.0](https://docs.adyen.com/online-payments/release-notes/?title%5B0%5D=iOS+Components%2FDrop-in#releaseNote=2025-01-29-ios-componentsdrop-in-5.16.0)
 
