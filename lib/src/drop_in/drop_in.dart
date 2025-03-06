@@ -366,11 +366,9 @@ class DropIn {
     }
 
     if (event.data case List<Object?> binLookupDataDTOList) {
-      final List<BinLookupData> binLookupDataList = binLookupDataDTOList
+      binLookupCallback.call(binLookupDataDTOList
           .whereType<BinLookupDataDTO>()
-          .map((entry) => BinLookupData(brand: entry.brand))
-          .toList();
-      binLookupCallback.call(binLookupDataList);
+          .toBinLookupDataList());
     }
   }
 
