@@ -10,8 +10,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        api-level: [ 34 ]
+        api-level: [ 35 ]
         flutter-version: [ 3.16.x, 3.19.x, 3.22.x, 3.24.x, 3.27.x, 3.29.x ]
+        agp_version: [ 8.6.1 ]
+        gradle_version: [ 8.7 ]
 
     steps:
       - name: Provide more disk space
@@ -53,13 +55,13 @@ jobs:
           }
           
           change_agp_version() {
-            sed -i 's/id "com.android.application" version "7.3.0"/id "com.android.application" version "8.1.4"/g' android/settings.gradle
+            sed -i 's/id "com.android.application" version "7.3.0"/id "com.android.application" version "${{ matrix.agp_version }}"/g' android/settings.gradle
           }
           
           # Change Kotlin version and adjust Gradle for Flutter 3.16.x
           if [[ "$FLUTTER_VERSION" == "3.16.x" ]]; then
             sed -i "s/ext.kotlin_version = '1.7.10'/ext.kotlin_version = '1.8.22'/g" android/build.gradle
-            sed -i "s/gradle-7.5-all/gradle-8.0-all/g" android/gradle/wrapper/gradle-wrapper.properties
+            sed -i "s/gradle-7.5-all/gradle-${{ matrix.gradle_version }}-all/g" android/gradle/wrapper/gradle-wrapper.properties
             change_agp_version
             change_sdk_versions
           fi
@@ -67,7 +69,7 @@ jobs:
           # Change Kotlin version and adjust Gradle for Flutter 3.19.x - 3.24.x versions
           if [[ "$FLUTTER_VERSION" == "3.19.x" || "$FLUTTER_VERSION" == "3.22.x" || "$FLUTTER_VERSION" == "3.24.x" ]]; then
             sed -i 's/"org.jetbrains.kotlin.android" version "1.7.10"/"org.jetbrains.kotlin.android" version "1.8.22"/g' android/settings.gradle
-            sed -i "s/gradle-7.6.3-all/gradle-8.0-all/g" android/gradle/wrapper/gradle-wrapper.properties
+            sed -i "s/gradle-7.6.3-all/gradle-${{ matrix.gradle_version }}-all/g" android/gradle/wrapper/gradle-wrapper.properties
             change_agp_version
             change_sdk_versions
           fi  
