@@ -53,29 +53,19 @@ class CardAdvancedComponent: BaseCardComponent {
     private func setupCardComponent() throws -> CardComponent {
         guard let cardComponentConfiguration else { throw PlatformError(errorDescription: "Card configuration not found") }
         guard let paymentMethodString = paymentMethod else { throw PlatformError(errorDescription: "Payment method not found") }
+        let adyenContext = try cardComponentConfiguration.createAdyenContext()
         let cardComponent = try buildCardComponent(
             paymentMethodString: paymentMethodString,
             isStoredPaymentMethod: isStoredPaymentMethod,
-            cardComponentConfiguration: cardComponentConfiguration
+            cardComponentConfiguration: cardComponentConfiguration,
+            adyenContext: adyenContext
         )
+        
+        actionComponent = buildActionComponent(adyenContext: adyenContext)
         cardDelegate = CardAdvancedFlowDelegate(componentFlutterApi: componentFlutterApi, componentId: componentId)
         cardComponent.delegate = cardDelegate
+        cardComponent.cardComponentDelegate = self
         return cardComponent
-    }
-
-    private func buildCardComponent(
-        paymentMethodString: String,
-        isStoredPaymentMethod: Bool,
-        cardComponentConfiguration: CardComponentConfigurationDTO
-    ) throws -> CardComponent {
-        let adyenContext = try cardComponentConfiguration.createAdyenContext()
-        let cardConfiguration = cardComponentConfiguration.cardConfiguration.mapToCardComponentConfiguration(
-            shopperLocale: cardComponentConfiguration.shopperLocale)
-        let paymentMethod: AnyCardPaymentMethod = isStoredPaymentMethod
-            ? try JSONDecoder().decode(StoredCardPaymentMethod.self, from: Data(paymentMethodString.utf8))
-            : try JSONDecoder().decode(CardPaymentMethod.self, from: Data(paymentMethodString.utf8))
-        actionComponent = buildActionComponent(adyenContext: adyenContext)
-        return CardComponent(paymentMethod: paymentMethod, context: adyenContext, configuration: cardConfiguration)
     }
 
     private func buildActionComponent(adyenContext: AdyenContext) -> AdyenActionComponent {
