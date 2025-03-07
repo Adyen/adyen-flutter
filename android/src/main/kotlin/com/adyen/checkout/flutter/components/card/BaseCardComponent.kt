@@ -28,7 +28,8 @@ abstract class BaseCardComponent(
     internal val paymentMethodString = creationParams[PAYMENT_METHOD_KEY] as String? ?: ""
     internal val componentId = creationParams[COMPONENT_ID_KEY] as String? ?: ""
     internal val isStoredPaymentMethod = creationParams[IS_STORED_PAYMENT_METHOD_KEY] as Boolean? ?: false
-    private val dynamicComponentView = DynamicComponentView(activity, componentFlutterApi, componentId)
+    private val hasCustomSubmitButton = creationParams[HAS_CUSTOM_SUBMIT_BUTTON] as? Boolean ?: false
+    private val dynamicComponentView = DynamicComponentView(activity, componentFlutterApi, componentId, hasCustomSubmitButton)
     internal val cardConfiguration =
         configuration.cardConfiguration.mapToCardConfiguration(
             context,
@@ -54,11 +55,16 @@ abstract class BaseCardComponent(
 
     fun setCurrentCardComponent() = setCurrentCardComponent(this)
 
+    fun submit() {
+        cardComponent?.submit()
+    }
+
     companion object {
         const val CARD_COMPONENT_CONFIGURATION_KEY = "cardComponentConfiguration"
         const val PAYMENT_METHOD_KEY = "paymentMethod"
         const val IS_STORED_PAYMENT_METHOD_KEY = "isStoredPaymentMethod"
         const val CARD_PAYMENT_METHOD_KEY = "scheme"
         const val COMPONENT_ID_KEY = "componentId"
+        const val HAS_CUSTOM_SUBMIT_BUTTON = "hasCustomSubmitButton"
     }
 }

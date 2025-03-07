@@ -715,6 +715,8 @@ abstract class ComponentPlatformInterface {
     String componentId,
   );
 
+  void submit(String componentId);
+
   void handleAction(
     ActionComponentConfigurationDTO actionComponentConfiguration,
     String componentId,

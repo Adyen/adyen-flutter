@@ -20,6 +20,7 @@ class AdyenCardComponent extends StatelessWidget {
       Constants.isStoredPaymentMethodIndicator;
   final SdkVersionNumberProvider _sdkVersionNumberProvider =
       SdkVersionNumberProvider.instance;
+  final AdyenSubmitController? adyenSubmitController;
 
   AdyenCardComponent({
     super.key,
@@ -28,6 +29,7 @@ class AdyenCardComponent extends StatelessWidget {
     required this.checkout,
     required this.onPaymentResult,
     this.gestureRecognizers,
+    this.adyenSubmitController,
   });
 
   @override
@@ -66,6 +68,7 @@ class AdyenCardComponent extends StatelessWidget {
       onPaymentResult: onPaymentResult,
       initialViewHeight: initialHeight,
       isStoredPaymentMethod: isStoredPaymentMethod,
+      adyenSubmitController: adyenSubmitController,
     );
   }
 

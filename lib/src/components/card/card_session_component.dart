@@ -25,6 +25,7 @@ class CardSessionComponent extends BaseCardComponent {
     required super.isStoredPaymentMethod,
     super.gestureRecognizers,
     super.adyenLogger,
+    super.adyenSubmitController,
   });
 
   @override
@@ -34,6 +35,7 @@ class CardSessionComponent extends BaseCardComponent {
         Constants.paymentMethodKey: paymentMethod,
         Constants.isStoredPaymentMethodKey: isStoredPaymentMethod,
         Constants.componentIdKey: componentId,
+        Constants.hasCustomSubmitButtonKey: adyenSubmitController != null,
       };
 
   @override

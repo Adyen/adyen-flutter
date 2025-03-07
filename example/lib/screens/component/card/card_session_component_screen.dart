@@ -14,23 +14,25 @@ class CardSessionComponentScreen extends StatelessWidget {
   });
 
   final AdyenCardComponentRepository repository;
-  final CardComponentConfiguration cardComponentConfiguration =
-      CardComponentConfiguration(
-    environment: Config.environment,
-    clientKey: Config.clientKey,
-    countryCode: Config.countryCode,
-    shopperLocale: Config.shopperLocale,
-    cardConfiguration: const CardConfiguration(),
-  );
+  final AdyenSubmitController adyenSubmitController = AdyenSubmitController();
 
   @override
   Widget build(BuildContext context) {
+    final CardComponentConfiguration cardComponentConfiguration =
+        CardComponentConfiguration(
+      environment: Config.environment,
+      clientKey: Config.clientKey,
+      countryCode: Config.countryCode,
+      shopperLocale: Config.shopperLocale,
+      cardConfiguration: const CardConfiguration(),
+    );
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(title: const Text('Adyen card component')),
       body: SafeArea(
         child: FutureBuilder(
-          future: _getSessionCheckout(),
+          future: _getSessionCheckout(cardComponentConfiguration),
           builder:
               (BuildContext context, AsyncSnapshot<SessionCheckout> snapshot) {
             if (snapshot.hasData) {
@@ -49,6 +51,20 @@ class CardSessionComponentScreen extends StatelessWidget {
                         DialogBuilder.showPaymentResultDialog(
                             paymentResult, context);
                       },
+                      adyenSubmitController: adyenSubmitController,
+                    ),
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.blue,
+                          foregroundColor: Colors.white, // Text color
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 20, vertical: 12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius:
+                                BorderRadius.circular(30), // Rounded shape
+                          )),
+                      onPressed: () => adyenSubmitController.submit(),
+                      child: const Text("PAY NOW"),
                     ),
                     Container(height: 800, color: const Color(0xFFEDEDED)),
                   ],
@@ -63,7 +79,8 @@ class CardSessionComponentScreen extends StatelessWidget {
     );
   }
 
-  Future<SessionCheckout> _getSessionCheckout() async =>
+  Future<SessionCheckout> _getSessionCheckout(
+          CardComponentConfiguration cardComponentConfiguration) async =>
       await repository.createSessionCheckout(cardComponentConfiguration);
 
   Map<String, dynamic> _extractPaymentMethod(

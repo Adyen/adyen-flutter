@@ -18,4 +18,5 @@ class Constants {
   static const String updatedPaymentMethodsKey = "updatedPaymentMethods";
   static const String shouldUpdatePaymentMethodsKey =
       "shouldUpdatePaymentMethods";
+  static const String hasCustomSubmitButtonKey = "hasCustomSubmitButton";
 }

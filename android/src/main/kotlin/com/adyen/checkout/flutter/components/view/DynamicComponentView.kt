@@ -2,6 +2,7 @@ package com.adyen.checkout.flutter.components.view
 
 import android.content.Context
 import android.util.AttributeSet
+import android.view.View
 import android.view.ViewGroup
 import android.view.ViewTreeObserver
 import android.widget.FrameLayout
@@ -33,15 +34,18 @@ class DynamicComponentView
         private var componentId: String = ""
         private var ignoreLayoutChanges = false
         private var interactionBlocked = false
+        private var hasCustomSubmitButton = false
 
         constructor(
             componentActivity: ComponentActivity,
             componentFlutterApi: ComponentFlutterInterface,
-            componentId: String
+            componentId: String,
+            hasCustomSubmitButton: Boolean
         ) : this(componentActivity) {
             this.activity = componentActivity
             this.componentFlutterApi = componentFlutterApi
             this.componentId = componentId
+            this.hasCustomSubmitButton = hasCustomSubmitButton
         }
 
         // Usage of complete component height also when having error hints
@@ -95,13 +99,25 @@ class DynamicComponentView
                 object : ViewTreeObserver.OnGlobalLayoutListener {
                     override fun onGlobalLayout() {
                         if (component is CardComponent) {
-                            overrideSubmit(component)
+                            if (hasCustomSubmitButton) {
+                                hidePayButton()
+                            } else {
+                                overrideSubmit(component)
+                            }
                         }
 
                         adyenComponentView.getViewTreeObserver()?.removeOnGlobalLayoutListener(this)
                     }
                 }
             )
+        }
+
+        private fun hidePayButton() {
+            findViewById<FrameLayout>(
+                com.adyen.checkout.ui.core.R.id.frameLayout_buttonContainer
+            )?.let {
+                it.visibility = View.GONE
+            }
         }
 
         private fun overrideSubmit(component: CardComponent) {

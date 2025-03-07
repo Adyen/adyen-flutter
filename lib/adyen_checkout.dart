@@ -27,6 +27,7 @@ export 'src/common/model/payment_method_configurations/google_pay/shipping_addre
 export 'src/common/model/payment_method_configurations/stored_payment_method_configuration.dart';
 export 'src/common/model/payment_result.dart';
 export 'src/common/model/result_code.dart';
+export 'src/components//adyen_submit_controller.dart';
 export 'src/components/action_handling/model/action_component_configuration.dart';
 export 'src/components/action_handling/model/action_result.dart';
 export 'src/components/apple_pay/adyen_apple_pay_component.dart';

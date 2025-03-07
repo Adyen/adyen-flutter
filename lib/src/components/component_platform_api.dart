@@ -72,4 +72,8 @@ class ComponentPlatformApi implements ComponentPlatformInterface {
         componentId,
         action,
       );
+
+  @override
+  Future<void> submit(String componentId) async =>
+      _componentPlatformInterface.submit(componentId);
 }

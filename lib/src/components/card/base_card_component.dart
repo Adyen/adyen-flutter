@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:adyen_checkout/src/common/model/payment_result.dart';
+import 'package:adyen_checkout/src/components/adyen_submit_controller.dart';
 import 'package:adyen_checkout/src/components/card/card_component_container.dart';
 import 'package:adyen_checkout/src/components/component_flutter_api.dart';
 import 'package:adyen_checkout/src/components/component_platform_api.dart';
@@ -21,6 +22,7 @@ abstract class BaseCardComponent extends StatefulWidget {
   final bool isStoredPaymentMethod;
   final Set<Factory<OneSequenceGestureRecognizer>>? gestureRecognizers;
   final AdyenLogger adyenLogger;
+  final AdyenSubmitController? adyenSubmitController;
   abstract final String componentId;
   abstract final Map<String, dynamic> creationParams;
   abstract final String viewType;
@@ -33,6 +35,7 @@ abstract class BaseCardComponent extends StatefulWidget {
     required this.initialViewHeight,
     required this.isStoredPaymentMethod,
     this.gestureRecognizers,
+    this.adyenSubmitController,
     AdyenLogger? adyenLogger,
   }) : adyenLogger = adyenLogger ?? AdyenLogger.instance;
 
@@ -80,6 +83,10 @@ class _BaseCardComponentState extends State<BaseCardComponent> {
 
   @override
   void initState() {
+    if (widget.adyenSubmitController != null) {
+      initCustomSubmitButton();
+    }
+
     _cardWidget = _buildCardWidget();
     _componentCommunicationStream = _componentFlutterApi
         .componentCommunicationStream.stream
@@ -104,6 +111,7 @@ class _BaseCardComponentState extends State<BaseCardComponent> {
   void dispose() {
     _componentCommunicationStream.cancel();
     _componentFlutterApi.dispose();
+    widget.adyenSubmitController?.dispose();
     super.dispose();
   }
 
@@ -152,5 +160,12 @@ class _BaseCardComponentState extends State<BaseCardComponent> {
         viewportHeight = newViewportHeight;
       });
     }
+  }
+
+  void initCustomSubmitButton() {
+    widget.adyenSubmitController?.addListener(() {
+      print("CHANGE");
+      _componentPlatformApi.submit(widget.componentId);
+    });
   }
 }

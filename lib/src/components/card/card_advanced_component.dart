@@ -38,6 +38,7 @@ class CardAdvancedComponent extends BaseCardComponent {
         Constants.cardComponentConfigurationKey: cardComponentConfiguration,
         Constants.isStoredPaymentMethodKey: isStoredPaymentMethod,
         Constants.componentIdKey: componentId,
+        Constants.hasCustomSubmitButtonKey: adyenSubmitController != null,
       };
 
   @override

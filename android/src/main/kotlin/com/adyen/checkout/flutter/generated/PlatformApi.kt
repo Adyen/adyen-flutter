@@ -2070,6 +2070,7 @@ interface ComponentPlatformInterface {
   fun onPaymentsDetailsResult(componentId: String, paymentsDetailsResult: PaymentEventDTO)
   fun isInstantPaymentSupportedByPlatform(instantPaymentConfigurationDTO: InstantPaymentConfigurationDTO, paymentMethodResponse: String, componentId: String, callback: (Result<InstantPaymentSetupResultDTO>) -> Unit)
   fun onInstantPaymentPressed(instantPaymentConfigurationDTO: InstantPaymentConfigurationDTO, encodedPaymentMethod: String, componentId: String)
+  fun submit(componentId: String)
   fun handleAction(actionComponentConfiguration: ActionComponentConfigurationDTO, componentId: String, actionResponse: Map<String?, Any?>?)
   fun onDispose(componentId: String)
 
@@ -2170,6 +2171,24 @@ interface ComponentPlatformInterface {
             val componentIdArg = args[2] as String
             val wrapped: List<Any?> = try {
               api.onInstantPaymentPressed(instantPaymentConfigurationDTOArg, encodedPaymentMethodArg, componentIdArg)
+              listOf(null)
+            } catch (exception: Throwable) {
+              wrapError(exception)
+            }
+            reply.reply(wrapped)
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.adyen_checkout.ComponentPlatformInterface.submit$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { message, reply ->
+            val args = message as List<Any?>
+            val componentIdArg = args[0] as String
+            val wrapped: List<Any?> = try {
+              api.submit(componentIdArg)
               listOf(null)
             } catch (exception: Throwable) {
               wrapError(exception)

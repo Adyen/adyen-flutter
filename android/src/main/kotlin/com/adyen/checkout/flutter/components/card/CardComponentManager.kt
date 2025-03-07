@@ -42,6 +42,10 @@ internal class CardComponentManager(
         )
     }
 
+    fun submit() {
+        currentCardComponent?.submit()
+    }
+
     private fun setCurrentCardComponent(currentCardComponent: BaseCardComponent) {
         this.currentCardComponent = currentCardComponent
         assignCurrentComponent(currentCardComponent.cardComponent)

@@ -112,6 +112,10 @@ class ComponentPlatformApi(
         }
     }
 
+    override fun submit(componentId: String) {
+        cardComponentManager.submit()
+    }
+
     override fun handleAction(
         actionComponentConfiguration: ActionComponentConfigurationDTO,
         componentId: String,
