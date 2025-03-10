@@ -3,7 +3,7 @@
 
 ### Android
 
-Follow the Android SDK [customization docs](https://github.com/Adyen/adyen-android/blob/develop/docs/UI_CUSTOMIZATION.md).
+Follow the Android SDK [customization docs](https://github.com/Adyen/adyen-android/blob/main/docs/UI_CUSTOMIZATION.md).
 
 ### iOS
 
