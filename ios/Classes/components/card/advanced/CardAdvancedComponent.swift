@@ -7,7 +7,7 @@ class CardAdvancedComponent: BaseCardComponent {
     private var actionComponentDelegate: ActionComponentDelegate?
     private var actionComponent: AdyenActionComponent?
     private var presentationDelegate: PresentationDelegate?
-    private var cardDelegate: PaymentComponentDelegate?
+    private var componentDelegate: PaymentComponentDelegate?
 
     override init(
         frame: CGRect,
@@ -38,6 +38,7 @@ class CardAdvancedComponent: BaseCardComponent {
     private func setupCardComponentView() {
         do {
             let cardComponent = try setupCardComponent()
+            actionComponent = buildActionComponent(adyenContext: cardComponent.context)
             showCardComponent(cardComponent: cardComponent)
             componentPlatformApi.onActionCallback = { [weak self] jsonActionResponse in
                 self?.onAction(actionResponse: jsonActionResponse)
@@ -51,21 +52,17 @@ class CardAdvancedComponent: BaseCardComponent {
     }
 
     private func setupCardComponent() throws -> CardComponent {
-        guard let cardComponentConfiguration else { throw PlatformError(errorDescription: "Card configuration not found") }
-        guard let paymentMethodString = paymentMethod else { throw PlatformError(errorDescription: "Payment method not found") }
-        let adyenContext = try cardComponentConfiguration.createAdyenContext()
-        let cardComponent = try buildCardComponent(
-            paymentMethodString: paymentMethodString,
+        componentDelegate = CardAdvancedFlowDelegate(
+            componentFlutterApi: componentFlutterApi,
+            componentId: componentId
+        )
+        return try buildCardComponent(
+            paymentMethodString: paymentMethod,
             isStoredPaymentMethod: isStoredPaymentMethod,
             cardComponentConfiguration: cardComponentConfiguration,
-            adyenContext: adyenContext
-        )
-        
-        actionComponent = buildActionComponent(adyenContext: adyenContext)
-        cardDelegate = CardAdvancedFlowDelegate(componentFlutterApi: componentFlutterApi, componentId: componentId)
-        cardComponent.delegate = cardDelegate
-        cardComponent.cardComponentDelegate = self
-        return cardComponent
+            componentDelegate: componentDelegate,
+            cardDelegate: self
+        )        
     }
 
     private func buildActionComponent(adyenContext: AdyenContext) -> AdyenActionComponent {

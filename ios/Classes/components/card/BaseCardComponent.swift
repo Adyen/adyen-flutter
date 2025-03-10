@@ -57,17 +57,28 @@ class BaseCardComponent: NSObject, FlutterPlatformView, UIScrollViewDelegate {
     }
     
     func buildCardComponent(
-        paymentMethodString: String,
+        paymentMethodString: String?,
         isStoredPaymentMethod: Bool,
-        cardComponentConfiguration: CardComponentConfigurationDTO,
-        adyenContext: AdyenContext
+        cardComponentConfiguration: CardComponentConfigurationDTO?,
+        componentDelegate: PaymentComponentDelegate?,
+        cardDelegate: CardComponentDelegate?
     ) throws -> CardComponent {
+        guard let paymentMethodString = paymentMethod else { throw PlatformError(errorDescription: "Payment method not found") }
+        guard let cardComponentConfiguration else { throw PlatformError(errorDescription: "Card configuration not found") }
+        let adyenContext = try cardComponentConfiguration.createAdyenContext()
         let cardConfiguration = cardComponentConfiguration.cardConfiguration.mapToCardComponentConfiguration(
             shopperLocale: cardComponentConfiguration.shopperLocale)
         let paymentMethod: AnyCardPaymentMethod = isStoredPaymentMethod
             ? try JSONDecoder().decode(StoredCardPaymentMethod.self, from: Data(paymentMethodString.utf8))
             : try JSONDecoder().decode(CardPaymentMethod.self, from: Data(paymentMethodString.utf8))
-        return CardComponent(paymentMethod: paymentMethod, context: adyenContext, configuration: cardConfiguration)
+        let cardComponent = CardComponent(
+            paymentMethod: paymentMethod,
+            context: adyenContext,
+            configuration: cardConfiguration
+        )
+        cardComponent.delegate = componentDelegate
+        cardComponent.cardComponentDelegate = cardDelegate
+        return cardComponent
     }
 
     func showCardComponent(cardComponent: CardComponent) {

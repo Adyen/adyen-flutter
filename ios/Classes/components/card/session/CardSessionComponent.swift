@@ -39,19 +39,14 @@ class CardSessionComponent: BaseCardComponent {
     }
 
     private func setupCardComponent() throws -> CardComponent {
-        guard let cardComponentConfiguration else { throw PlatformError(errorDescription: "Card configuration not found") }
-        guard let paymentMethodString = paymentMethod else { throw PlatformError(errorDescription: "Payment method not found") }
         guard let session = sessionHolder.session else { throw PlatformError(errorDescription: "Session not found") }
-        let adyenContext = try cardComponentConfiguration.createAdyenContext()
-        let cardComponent = try buildCardComponent(
-            paymentMethodString: paymentMethodString,
+        return try buildCardComponent(
+            paymentMethodString: paymentMethod,
             isStoredPaymentMethod: isStoredPaymentMethod,
             cardComponentConfiguration: cardComponentConfiguration,
-            adyenContext: adyenContext
+            componentDelegate: session,
+            cardDelegate: self
         )
-        cardComponent.delegate = session
-        cardComponent.cardComponentDelegate = self
-        return cardComponent
     }
 
     private func setupSessionFlowDelegate() {
