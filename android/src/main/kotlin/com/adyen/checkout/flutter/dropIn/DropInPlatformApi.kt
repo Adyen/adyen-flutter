@@ -174,7 +174,7 @@ internal class DropInPlatformApi(
 
             val checkoutEvent =
                 CheckoutEvent(
-                    CheckoutEventType.PAYMENT_COMPONENT,
+                    CheckoutEventType.SUBMIT,
                     data = message.contentIfNotHandled.toString()
                 )
             checkoutFlutter.send(checkoutEvent) {}

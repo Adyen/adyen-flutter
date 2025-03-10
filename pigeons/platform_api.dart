@@ -57,7 +57,7 @@ enum PaymentResultEnum {
 }
 
 enum CheckoutEventType {
-  paymentComponent,
+  submit,
   additionalDetails,
   result,
   deleteStoredPaymentMethod,
