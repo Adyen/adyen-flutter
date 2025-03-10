@@ -127,6 +127,8 @@ enum ComponentCommunicationType: Int {
     case loading = 2
     case result = 3
     case resize = 4
+    case binLookup = 5
+    case binValue = 6
 }
 
 enum PaymentEventType: Int {

@@ -5,7 +5,10 @@ import android.view.View
 import androidx.activity.ComponentActivity
 import com.adyen.checkout.card.CardComponent
 import com.adyen.checkout.flutter.components.view.DynamicComponentView
+import com.adyen.checkout.flutter.generated.BinLookupDataDTO
 import com.adyen.checkout.flutter.generated.CardComponentConfigurationDTO
+import com.adyen.checkout.flutter.generated.ComponentCommunicationModel
+import com.adyen.checkout.flutter.generated.ComponentCommunicationType
 import com.adyen.checkout.flutter.generated.ComponentFlutterInterface
 import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToAmount
 import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToAnalyticsConfiguration
@@ -49,10 +52,37 @@ abstract class BaseCardComponent(
     }
 
     fun addComponent(cardComponent: CardComponent) {
+        setOnBinLookupListener(cardComponent)
+        setOnBinValueListener(cardComponent)
         dynamicComponentView.addComponent(cardComponent, activity)
     }
 
     fun setCurrentCardComponent() = setCurrentCardComponent(this)
+
+    private fun setOnBinLookupListener(cardComponent: CardComponent) {
+        cardComponent.setOnBinLookupListener { binLookupData ->
+            val binLookupDataDtoList = binLookupData.map { BinLookupDataDTO(it.brand) }
+            val componentCommunicationModel =
+                ComponentCommunicationModel(
+                    ComponentCommunicationType.BIN_LOOKUP,
+                    componentId,
+                    binLookupDataDtoList
+                )
+            componentFlutterApi.onComponentCommunication(componentCommunicationModel) {}
+        }
+    }
+
+    private fun setOnBinValueListener(cardComponent: CardComponent) {
+        cardComponent.setOnBinValueListener { binValue ->
+            val componentCommunicationModel =
+                ComponentCommunicationModel(
+                    ComponentCommunicationType.BIN_VALUE,
+                    componentId,
+                    binValue
+                )
+            componentFlutterApi.onComponentCommunication(componentCommunicationModel) {}
+        }
+    }
 
     companion object {
         const val CARD_COMPONENT_CONFIGURATION_KEY = "cardComponentConfiguration"

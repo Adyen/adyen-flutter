@@ -8,26 +8,31 @@ import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 
 class CardAdvancedComponentScreen extends StatelessWidget {
-  CardAdvancedComponentScreen({
+  const CardAdvancedComponentScreen({
     required this.repository,
     super.key,
   });
 
   final AdyenCardComponentRepository repository;
-  final CardComponentConfiguration cardComponentConfiguration =
-      CardComponentConfiguration(
-    environment: Config.environment,
-    clientKey: Config.clientKey,
-    countryCode: Config.countryCode,
-    shopperLocale: Config.shopperLocale,
-    cardConfiguration: const CardConfiguration(
-      holderNameRequired: true,
-      addressMode: AddressMode.full,
-    ),
-  );
 
   @override
   Widget build(BuildContext context) {
+    final CardComponentConfiguration cardComponentConfiguration =
+        CardComponentConfiguration(
+      environment: Config.environment,
+      clientKey: Config.clientKey,
+      countryCode: Config.countryCode,
+      shopperLocale: Config.shopperLocale,
+      cardConfiguration: CardConfiguration(
+        holderNameRequired: true,
+        addressMode: AddressMode.full,
+        cardCallbacks: CardCallbacks(
+          onBinLookup: _onBinLookup,
+          onBinValue: _onBinValue,
+        ),
+      ),
+    );
+
     return Scaffold(
         backgroundColor: Colors.white,
         appBar: AppBar(title: const Text('Adyen card component')),
@@ -44,6 +49,7 @@ class CardAdvancedComponentScreen extends StatelessWidget {
                   child: Column(
                     children: [
                       _buildCardWidget(
+                        cardComponentConfiguration,
                         snapshot.data!,
                         context,
                       ),
@@ -58,6 +64,7 @@ class CardAdvancedComponentScreen extends StatelessWidget {
   }
 
   Widget _buildCardWidget(
+    CardComponentConfiguration cardComponentConfiguration,
     Map<String, dynamic> paymentMethods,
     BuildContext context,
   ) {
@@ -93,5 +100,15 @@ class CardAdvancedComponentScreen extends StatelessWidget {
         storedPaymentMethodList.firstOrNull ?? <String, String>{};
 
     return paymentMethod;
+  }
+
+  void _onBinLookup(List<BinLookupData> binLookupData) {
+    for (var element in binLookupData) {
+      debugPrint("Bin lookup data: brand:${element.brand}");
+    }
+  }
+
+  void _onBinValue(String binValue) {
+    debugPrint("Bin value: $binValue");
   }
 }

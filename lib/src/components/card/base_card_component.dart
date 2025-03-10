@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:adyen_checkout/src/common/model/card_callbacks/card_callbacks.dart';
 import 'package:adyen_checkout/src/common/model/payment_result.dart';
 import 'package:adyen_checkout/src/components/card/card_component_container.dart';
 import 'package:adyen_checkout/src/components/component_flutter_api.dart';
@@ -8,6 +9,7 @@ import 'package:adyen_checkout/src/components/platform/android_platform_view.dar
 import 'package:adyen_checkout/src/components/platform/ios_platform_view.dart';
 import 'package:adyen_checkout/src/generated/platform_api.g.dart';
 import 'package:adyen_checkout/src/logging/adyen_logger.dart';
+import 'package:adyen_checkout/src/util/dto_mapper.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -21,6 +23,7 @@ abstract class BaseCardComponent extends StatefulWidget {
   final bool isStoredPaymentMethod;
   final Set<Factory<OneSequenceGestureRecognizer>>? gestureRecognizers;
   final AdyenLogger adyenLogger;
+  final CardCallbacksInterface? cardCallbacks;
   abstract final String componentId;
   abstract final Map<String, dynamic> creationParams;
   abstract final String viewType;
@@ -34,6 +37,7 @@ abstract class BaseCardComponent extends StatefulWidget {
     required this.isStoredPaymentMethod,
     this.gestureRecognizers,
     AdyenLogger? adyenLogger,
+    this.cardCallbacks,
   }) : adyenLogger = adyenLogger ?? AdyenLogger.instance;
 
   void handleComponentCommunication(ComponentCommunicationModel event);
@@ -138,6 +142,10 @@ class _BaseCardComponentState extends State<BaseCardComponent> {
       _resizeViewport(event);
     } else if (event.type case ComponentCommunicationType.result) {
       widget.onResult(event);
+    } else if (event.type case ComponentCommunicationType.binLookup) {
+      _handleOnBinLookup(event, widget.cardCallbacks?.onBinLookup);
+    } else if (event.type case ComponentCommunicationType.binValue) {
+      _handleOnBinValue(event, widget.cardCallbacks?.onBinValue);
     } else {
       widget.handleComponentCommunication(event);
     }
@@ -151,6 +159,34 @@ class _BaseCardComponentState extends State<BaseCardComponent> {
         previousViewportHeight = viewportHeight;
         viewportHeight = newViewportHeight;
       });
+    }
+  }
+
+  void _handleOnBinLookup(
+    ComponentCommunicationModel event,
+    Function? binLookupCallback,
+  ) {
+    if (binLookupCallback == null) {
+      return;
+    }
+
+    if (event.data case List<Object?> binLookupDataDTOList) {
+      binLookupCallback.call(binLookupDataDTOList
+          .whereType<BinLookupDataDTO>()
+          .toBinLookupDataList());
+    }
+  }
+
+  void _handleOnBinValue(
+    ComponentCommunicationModel event,
+    Function? binValueCallback,
+  ) {
+    if (binValueCallback == null) {
+      return;
+    }
+
+    if (event.data case String binValue) {
+      binValueCallback.call(binValue);
     }
   }
 }

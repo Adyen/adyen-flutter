@@ -86,6 +86,8 @@ enum ComponentCommunicationType {
   loading,
   result,
   resize,
+  binLookup,
+  binValue,
 }
 
 enum PaymentEventType {

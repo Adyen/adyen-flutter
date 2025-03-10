@@ -7,7 +7,7 @@ class CardAdvancedComponent: BaseCardComponent {
     private var actionComponentDelegate: ActionComponentDelegate?
     private var actionComponent: AdyenActionComponent?
     private var presentationDelegate: PresentationDelegate?
-    private var cardDelegate: PaymentComponentDelegate?
+    private var componentDelegate: PaymentComponentDelegate?
 
     override init(
         frame: CGRect,
@@ -38,6 +38,7 @@ class CardAdvancedComponent: BaseCardComponent {
     private func setupCardComponentView() {
         do {
             let cardComponent = try setupCardComponent()
+            actionComponent = buildActionComponent(adyenContext: cardComponent.context)
             showCardComponent(cardComponent: cardComponent)
             componentPlatformApi.onActionCallback = { [weak self] jsonActionResponse in
                 self?.onAction(actionResponse: jsonActionResponse)
@@ -51,31 +52,17 @@ class CardAdvancedComponent: BaseCardComponent {
     }
 
     private func setupCardComponent() throws -> CardComponent {
-        guard let cardComponentConfiguration else { throw PlatformError(errorDescription: "Card configuration not found") }
-        guard let paymentMethodString = paymentMethod else { throw PlatformError(errorDescription: "Payment method not found") }
-        let cardComponent = try buildCardComponent(
-            paymentMethodString: paymentMethodString,
-            isStoredPaymentMethod: isStoredPaymentMethod,
-            cardComponentConfiguration: cardComponentConfiguration
+        componentDelegate = CardAdvancedFlowDelegate(
+            componentFlutterApi: componentFlutterApi,
+            componentId: componentId
         )
-        cardDelegate = CardAdvancedFlowDelegate(componentFlutterApi: componentFlutterApi, componentId: componentId)
-        cardComponent.delegate = cardDelegate
-        return cardComponent
-    }
-
-    private func buildCardComponent(
-        paymentMethodString: String,
-        isStoredPaymentMethod: Bool,
-        cardComponentConfiguration: CardComponentConfigurationDTO
-    ) throws -> CardComponent {
-        let adyenContext = try cardComponentConfiguration.createAdyenContext()
-        let cardConfiguration = cardComponentConfiguration.cardConfiguration.mapToCardComponentConfiguration(
-            shopperLocale: cardComponentConfiguration.shopperLocale)
-        let paymentMethod: AnyCardPaymentMethod = isStoredPaymentMethod
-            ? try JSONDecoder().decode(StoredCardPaymentMethod.self, from: Data(paymentMethodString.utf8))
-            : try JSONDecoder().decode(CardPaymentMethod.self, from: Data(paymentMethodString.utf8))
-        actionComponent = buildActionComponent(adyenContext: adyenContext)
-        return CardComponent(paymentMethod: paymentMethod, context: adyenContext, configuration: cardConfiguration)
+        return try buildCardComponent(
+            paymentMethodString: paymentMethod,
+            isStoredPaymentMethod: isStoredPaymentMethod,
+            cardComponentConfiguration: cardComponentConfiguration,
+            componentDelegate: componentDelegate,
+            cardDelegate: self
+        )        
     }
 
     private func buildActionComponent(adyenContext: AdyenContext) -> AdyenActionComponent {
