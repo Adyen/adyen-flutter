@@ -5,7 +5,6 @@ export 'src/common/model/api_only/card_expiry_date_validation_result.dart';
 export 'src/common/model/api_only/card_number_validation_result.dart';
 export 'src/common/model/api_only/card_security_code_validation_result.dart';
 export 'src/common/model/card_callbacks/bin_lookup_data.dart';
-export 'src/common/model/card_callbacks/card_callbacks.dart';
 export 'src/common/model/checkout.dart';
 export 'src/common/model/cse/encrypted_card.dart';
 export 'src/common/model/cse/unencrypted_card.dart';

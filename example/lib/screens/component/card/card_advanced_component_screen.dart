@@ -26,10 +26,8 @@ class CardAdvancedComponentScreen extends StatelessWidget {
       cardConfiguration: CardConfiguration(
         holderNameRequired: true,
         addressMode: AddressMode.full,
-        cardCallbacks: CardCallbacks(
-          onBinLookup: _onBinLookup,
-          onBinValue: _onBinValue,
-        ),
+        onBinLookup: _onBinLookup,
+        onBinValue: _onBinValue,
       ),
     );
 

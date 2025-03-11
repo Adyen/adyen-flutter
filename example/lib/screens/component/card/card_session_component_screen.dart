@@ -24,10 +24,8 @@ class CardSessionComponentScreen extends StatelessWidget {
       countryCode: Config.countryCode,
       shopperLocale: Config.shopperLocale,
       cardConfiguration: CardConfiguration(
-        cardCallbacks: CardCallbacks(
-          onBinLookup: _onBinLookup,
-          onBinValue: _onBinValue,
-        ),
+        onBinLookup: _onBinLookup,
+        onBinValue: _onBinValue,
       ),
     );
 

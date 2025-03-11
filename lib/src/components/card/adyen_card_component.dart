@@ -66,7 +66,8 @@ class AdyenCardComponent extends StatelessWidget {
       onPaymentResult: onPaymentResult,
       initialViewHeight: initialHeight,
       isStoredPaymentMethod: isStoredPaymentMethod,
-      cardCallbacks: configuration.cardConfiguration.cardCallbacks,
+      onBinLookup: configuration.cardConfiguration.onBinLookup,
+      onBinValue: configuration.cardConfiguration.onBinValue,
     );
   }
 
@@ -88,7 +89,8 @@ class AdyenCardComponent extends StatelessWidget {
       initialViewHeight: initialHeight,
       isStoredPaymentMethod: isStoredPaymentMethod,
       gestureRecognizers: gestureRecognizers,
-      cardCallbacks: configuration.cardConfiguration.cardCallbacks,
+      onBinLookup: configuration.cardConfiguration.onBinLookup,
+      onBinValue: configuration.cardConfiguration.onBinValue,
     );
   }
 

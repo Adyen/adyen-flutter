@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:adyen_checkout/src/common/model/card_callbacks/bin_lookup_data.dart';
-import 'package:adyen_checkout/src/common/model/card_callbacks/card_callbacks.dart';
 import 'package:adyen_checkout/src/common/model/payment_result.dart';
 import 'package:adyen_checkout/src/components/card/card_component_container.dart';
 import 'package:adyen_checkout/src/components/component_flutter_api.dart';
@@ -24,7 +23,8 @@ abstract class BaseCardComponent extends StatefulWidget {
   final bool isStoredPaymentMethod;
   final Set<Factory<OneSequenceGestureRecognizer>>? gestureRecognizers;
   final AdyenLogger adyenLogger;
-  final CardCallbacksInterface? cardCallbacks;
+  final void Function(List<BinLookupData>)? onBinLookup;
+  final void Function(String)? onBinValue;
   abstract final String componentId;
   abstract final Map<String, dynamic> creationParams;
   abstract final String viewType;
@@ -37,8 +37,9 @@ abstract class BaseCardComponent extends StatefulWidget {
     required this.initialViewHeight,
     required this.isStoredPaymentMethod,
     this.gestureRecognizers,
+    this.onBinLookup,
+    this.onBinValue,
     AdyenLogger? adyenLogger,
-    this.cardCallbacks,
   }) : adyenLogger = adyenLogger ?? AdyenLogger.instance;
 
   void handleComponentCommunication(ComponentCommunicationModel event);
@@ -144,9 +145,9 @@ class _BaseCardComponentState extends State<BaseCardComponent> {
     } else if (event.type case ComponentCommunicationType.result) {
       widget.onResult(event);
     } else if (event.type case ComponentCommunicationType.binLookup) {
-      _handleOnBinLookup(event, widget.cardCallbacks?.onBinLookup);
+      _handleOnBinLookup(event, widget.onBinLookup);
     } else if (event.type case ComponentCommunicationType.binValue) {
-      _handleOnBinValue(event, widget.cardCallbacks?.onBinValue);
+      _handleOnBinValue(event, widget.onBinValue);
     } else {
       widget.handleComponentCommunication(event);
     }
