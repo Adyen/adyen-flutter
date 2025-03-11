@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:adyen_checkout/src/common/model/card_callbacks/bin_lookup_data.dart';
 import 'package:adyen_checkout/src/common/model/card_callbacks/card_callbacks.dart';
 import 'package:adyen_checkout/src/common/model/payment_result.dart';
 import 'package:adyen_checkout/src/components/card/card_component_container.dart';
@@ -164,14 +165,14 @@ class _BaseCardComponentState extends State<BaseCardComponent> {
 
   void _handleOnBinLookup(
     ComponentCommunicationModel event,
-    Function? binLookupCallback,
+    void Function(List<BinLookupData>)? onBinLookup,
   ) {
-    if (binLookupCallback == null) {
+    if (onBinLookup == null) {
       return;
     }
 
     if (event.data case List<Object?> binLookupDataDTOList) {
-      binLookupCallback.call(binLookupDataDTOList
+      onBinLookup(binLookupDataDTOList
           .whereType<BinLookupDataDTO>()
           .toBinLookupDataList());
     }
@@ -179,14 +180,14 @@ class _BaseCardComponentState extends State<BaseCardComponent> {
 
   void _handleOnBinValue(
     ComponentCommunicationModel event,
-    Function? binValueCallback,
+    void Function(String)? onBinValue,
   ) {
-    if (binValueCallback == null) {
+    if (onBinValue == null) {
       return;
     }
 
     if (event.data case String binValue) {
-      binValueCallback.call(binValue);
+      onBinValue(binValue);
     }
   }
 }
