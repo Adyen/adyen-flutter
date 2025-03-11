@@ -164,7 +164,6 @@ class _BaseCardComponentState extends State<BaseCardComponent> {
 
   void initCustomSubmitButton() {
     widget.adyenSubmitController?.addListener(() {
-      print("CHANGE");
       _componentPlatformApi.submit(widget.componentId);
     });
   }

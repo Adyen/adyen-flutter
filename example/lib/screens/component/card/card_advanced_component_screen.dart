@@ -14,6 +14,7 @@ class CardAdvancedComponentScreen extends StatelessWidget {
   });
 
   final AdyenCardComponentRepository repository;
+  final AdyenSubmitController adyenSubmitController = AdyenSubmitController();
   final CardComponentConfiguration cardComponentConfiguration =
       CardComponentConfiguration(
     environment: Config.environment,
@@ -21,8 +22,8 @@ class CardAdvancedComponentScreen extends StatelessWidget {
     countryCode: Config.countryCode,
     shopperLocale: Config.shopperLocale,
     cardConfiguration: const CardConfiguration(
-      holderNameRequired: true,
-      addressMode: AddressMode.full,
+      // holderNameRequired: true,
+      // addressMode: AddressMode.full,
     ),
   );
 
@@ -46,6 +47,19 @@ class CardAdvancedComponentScreen extends StatelessWidget {
                       _buildCardWidget(
                         snapshot.data!,
                         context,
+                      ),
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.blue,
+                            foregroundColor: Colors.white, // Text color
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 20, vertical: 12),
+                            shape: RoundedRectangleBorder(
+                              borderRadius:
+                                  BorderRadius.circular(30), // Rounded shape
+                            )),
+                        onPressed: () => adyenSubmitController.submit(),
+                        child: const Text("PAY NOW"),
                       ),
                       Container(height: 600, color: const Color(0xFFEDEDED)),
                     ],
@@ -75,6 +89,7 @@ class CardAdvancedComponentScreen extends StatelessWidget {
         Navigator.pop(context);
         DialogBuilder.showPaymentResultDialog(paymentResult, context);
       },
+      adyenSubmitController: adyenSubmitController,
     );
   }
 
@@ -93,5 +108,9 @@ class CardAdvancedComponentScreen extends StatelessWidget {
         storedPaymentMethodList.firstOrNull ?? <String, String>{};
 
     return paymentMethod;
+  }
+
+  void _onSubmit() {
+
   }
 }

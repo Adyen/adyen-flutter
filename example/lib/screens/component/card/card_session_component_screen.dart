@@ -14,7 +14,6 @@ class CardSessionComponentScreen extends StatelessWidget {
   });
 
   final AdyenCardComponentRepository repository;
-  final AdyenSubmitController adyenSubmitController = AdyenSubmitController();
 
   @override
   Widget build(BuildContext context) {
@@ -51,20 +50,6 @@ class CardSessionComponentScreen extends StatelessWidget {
                         DialogBuilder.showPaymentResultDialog(
                             paymentResult, context);
                       },
-                      adyenSubmitController: adyenSubmitController,
-                    ),
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.blue,
-                          foregroundColor: Colors.white, // Text color
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 20, vertical: 12),
-                          shape: RoundedRectangleBorder(
-                            borderRadius:
-                                BorderRadius.circular(30), // Rounded shape
-                          )),
-                      onPressed: () => adyenSubmitController.submit(),
-                      child: const Text("PAY NOW"),
                     ),
                     Container(height: 800, color: const Color(0xFFEDEDED)),
                   ],

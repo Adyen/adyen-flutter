@@ -29,6 +29,7 @@ class CardAdvancedComponent extends BaseCardComponent {
     required super.isStoredPaymentMethod,
     super.gestureRecognizers,
     super.adyenLogger,
+    super.adyenSubmitController,
     PaymentEventHandler? paymentEventHandler,
   }) : paymentEventHandler = paymentEventHandler ?? PaymentEventHandler();
 
