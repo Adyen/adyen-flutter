@@ -335,7 +335,9 @@ class DropIn {
 
   void _handleCheckBalance(
     CheckoutEvent event,
-    Function? onCheckBalance,
+    Future<Map<String, dynamic>> Function({
+      required Map<String, dynamic> balanceCheckRequestBody,
+    })? onCheckBalance,
   ) async {
     try {
       if (onCheckBalance == null) {
@@ -357,7 +359,7 @@ class DropIn {
 
   void _handleOrderRequest(
     CheckoutEvent event,
-    Function? onRequestOrder,
+    Future<Map<String, dynamic>> Function()? onRequestOrder,
   ) async {
     try {
       if (onRequestOrder == null) {
@@ -373,7 +375,10 @@ class DropIn {
 
   void _handleOrderCancel(
     CheckoutEvent event,
-    Function? onCancelOrder,
+    Future<OrderCancelResult> Function({
+      required Map<String, dynamic> order,
+      required bool shouldUpdatePaymentMethods,
+    })? onCancelOrder,
   ) async {
     try {
       if (onCancelOrder == null) {
@@ -387,8 +392,7 @@ class DropIn {
                 false,
         order: orderResponse[Constants.orderKey],
       );
-      final orderCancelResponseDTO = orderCancelResponse?.toDTO() ??
-          OrderCancelResultDTO(orderCancelResponseBody: {});
+      final orderCancelResponseDTO = orderCancelResponse.toDTO();
       dropInPlatformApi.onOrderCancelResult(orderCancelResponseDTO);
     } catch (error) {
       dropInPlatformApi.onOrderCancelResult(
@@ -398,9 +402,9 @@ class DropIn {
 
   void _handleBinLookup(
     CheckoutEvent event,
-    Function? binLookupCallback,
+    void Function(List<BinLookupData> binLookupData)? onBinLookup,
   ) {
-    if (binLookupCallback == null) {
+    if (onBinLookup == null) {
       return;
     }
 
@@ -409,20 +413,20 @@ class DropIn {
           .whereType<BinLookupDataDTO>()
           .map((entry) => BinLookupData(brand: entry.brand))
           .toList();
-      binLookupCallback.call(binLookupDataList);
+      onBinLookup.call(binLookupDataList);
     }
   }
 
   void _handleBinValue(
     CheckoutEvent event,
-    Function? binValueCallback,
+    void Function(String binValue)? onBinValue,
   ) {
-    if (binValueCallback == null) {
+    if (onBinValue == null) {
       return;
     }
 
     if (event.data case String binValue) {
-      binValueCallback.call(binValue);
+      onBinValue.call(binValue);
     }
   }
 }
