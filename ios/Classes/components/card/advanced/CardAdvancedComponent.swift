@@ -45,6 +45,9 @@ class CardAdvancedComponent: BaseCardComponent {
             componentPlatformApi.onErrorCallback = { [weak self] error in
                 self?.sendErrorToFlutterLayer(errorMessage: error?.errorMessage ?? "")
             }
+            componentPlatformApi.onSubmitCallback = { [weak self] in
+                self?.cardComponent?.submit()
+            }
         } catch {
             sendErrorToFlutterLayer(errorMessage: error.localizedDescription)
         }
@@ -70,7 +73,9 @@ class CardAdvancedComponent: BaseCardComponent {
     ) throws -> CardComponent {
         let adyenContext = try cardComponentConfiguration.createAdyenContext()
         let cardConfiguration = cardComponentConfiguration.cardConfiguration.mapToCardComponentConfiguration(
-            shopperLocale: cardComponentConfiguration.shopperLocale)
+            shopperLocale: cardComponentConfiguration.shopperLocale,
+            showsSubmitButton: !hasCustomSubmitButton
+        )
         let paymentMethod: AnyCardPaymentMethod = isStoredPaymentMethod
             ? try JSONDecoder().decode(StoredCardPaymentMethod.self, from: Data(paymentMethodString.utf8))
             : try JSONDecoder().decode(CardPaymentMethod.self, from: Data(paymentMethodString.utf8))

@@ -107,7 +107,7 @@ extension DropInConfigurationDTO {
 }
 
 extension CardConfigurationDTO {
-    func mapToCardComponentConfiguration(shopperLocale: String?) -> CardComponent.Configuration {
+    func mapToCardComponentConfiguration(shopperLocale: String?, showsSubmitButton: Bool?) -> CardComponent.Configuration {
         let cardComponentStyle = AdyenAppearance.cardComponentStyle
         let localizationParameters = shopperLocale != nil ? LocalizationParameters(enforcedLocale: shopperLocale!) : nil
         let koreanAuthenticationMode = kcpFieldVisibility.toCardFieldVisibility()
@@ -117,6 +117,7 @@ extension CardConfigurationDTO {
         let billingAddressConfiguration = determineBillingAddressConfiguration(addressMode: addressMode)
         return CardComponent.Configuration(
             style: cardComponentStyle,
+            showsSubmitButton: showsSubmitButton ?? true,
             localizationParameters: localizationParameters,
             showsHolderNameField: holderNameRequired,
             showsStorePaymentMethodField: showStorePaymentField,

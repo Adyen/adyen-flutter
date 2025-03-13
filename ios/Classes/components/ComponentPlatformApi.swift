@@ -3,6 +3,7 @@ class ComponentPlatformApi: ComponentPlatformInterface {
     var onActionCallback: ([String?: Any?]) -> Void = { _ in }
     var onFinishCallback: (PaymentEventDTO) -> Void = { _ in }
     var onErrorCallback: (ErrorDTO?) -> Void = { _ in }
+    var onSubmitCallback: () -> Void = {}
     private let applePayComponentManager: ApplePayComponentManager
     private let instantComponentManager: InstantComponentManager
     private let actionComponentManager: ActionComponentManager
@@ -43,6 +44,10 @@ class ComponentPlatformApi: ComponentPlatformInterface {
                 callback: completion
             )
         }
+    }
+    
+    func submit(componentId: String) throws {
+        onSubmitCallback()
     }
 
     func onInstantPaymentPressed(

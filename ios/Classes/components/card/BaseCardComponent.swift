@@ -8,6 +8,7 @@ class BaseCardComponent: NSObject, FlutterPlatformView, UIScrollViewDelegate {
     let isStoredPaymentMethodKey = "isStoredPaymentMethod"
     let paymentMethodKey = "paymentMethod"
     let componentIdKey = "componentId"
+    let hasCustomSubmitButtonKey = "hasCustomSubmitButton"
     let cardComponentConfiguration: CardComponentConfigurationDTO?
     let isStoredPaymentMethod: Bool
     let paymentMethod: String?
@@ -15,6 +16,7 @@ class BaseCardComponent: NSObject, FlutterPlatformView, UIScrollViewDelegate {
     let componentFlutterApi: ComponentFlutterInterface
     let componentPlatformApi: ComponentPlatformApi
     let componentWrapperView: ComponentWrapperView
+    let hasCustomSubmitButton: Bool
 
     var cardComponent: CardComponent?
     var contentOffset: CGPoint?
@@ -33,6 +35,7 @@ class BaseCardComponent: NSObject, FlutterPlatformView, UIScrollViewDelegate {
         paymentMethod = arguments.value(forKey: paymentMethodKey) as? String
         isStoredPaymentMethod = arguments.value(forKey: isStoredPaymentMethodKey) as? Bool ?? false
         componentId = arguments.value(forKey: componentIdKey) as? String ?? ""
+        hasCustomSubmitButton = arguments.value(forKey: hasCustomSubmitButtonKey) as? Bool ?? false
         componentWrapperView = .init()
         super.init()
 
@@ -129,7 +132,7 @@ class BaseCardComponent: NSObject, FlutterPlatformView, UIScrollViewDelegate {
     private func sendHeightUpdate() {
         guard let viewHeight = cardComponent?.viewController.preferredContentSize.height else { return }
         let additionalViewportSpace = determineAdditionalViewportSpace()
-        let roundedViewHeight = Int(viewHeight + additionalViewportSpace)
+        let roundedViewHeight = hasCustomSubmitButton ? Int(calculateRequiredHeight(cardView: componentWrapperView)) : Int(viewHeight + additionalViewportSpace)
         let componentCommunicationModel = ComponentCommunicationModel(
             type: ComponentCommunicationType.resize,
             componentId: componentId,
@@ -140,6 +143,12 @@ class BaseCardComponent: NSObject, FlutterPlatformView, UIScrollViewDelegate {
             completion: { _ in }
         )
     }
+    
+    func calculateRequiredHeight(cardView: UIView) -> CGFloat {
+        let targetSize = CGSize(width: UIView.layoutFittingExpandedSize.width, height: UIView.layoutFittingCompressedSize.height)
+        let requiredSize = cardView.systemLayoutSizeFitting(targetSize, withHorizontalFittingPriority: .required, verticalFittingPriority: .fittingSizeLevel)
+        return requiredSize.height
+   }
     
     private func determineAdditionalViewportSpace() -> CGFloat {
         if isStoredPaymentMethod {

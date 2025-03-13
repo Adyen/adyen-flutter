@@ -32,6 +32,9 @@ class CardSessionComponent: BaseCardComponent {
     private func setupCardComponentView() {
         do {
             let cardComponent = try setupCardComponent()
+            componentPlatformApi.onSubmitCallback = { [weak self] in
+                self?.cardComponent?.submit()
+            }
             showCardComponent(cardComponent: cardComponent)
         } catch {
             sendErrorToFlutterLayer(errorMessage: error.localizedDescription)
@@ -59,7 +62,9 @@ class CardSessionComponent: BaseCardComponent {
             : try JSONDecoder().decode(CardPaymentMethod.self, from: Data(paymentMethodString.utf8))
         let adyenContext = try cardComponentConfiguration.createAdyenContext()
         let cardConfiguration = cardComponentConfiguration.cardConfiguration.mapToCardComponentConfiguration(
-            shopperLocale: cardComponentConfiguration.shopperLocale)
+            shopperLocale: cardComponentConfiguration.shopperLocale,
+            showsSubmitButton: !hasCustomSubmitButton
+        )
         return CardComponent(
             paymentMethod: cardPaymentMethod,
             context: adyenContext,
