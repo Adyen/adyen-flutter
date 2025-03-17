@@ -21,6 +21,13 @@ dependencies:
     sdk: flutter
   plugin_platform_interface: ^2.1.8
   pay: ^3.2.0
+
+dependency_overrides:
+  pay:
+    git:
+      url: https://github.com/Robert-SD/flutter-pay.git
+      path: pay
+      ref: fix/downgradeTestRulesDependency
   pay_android:
     git:
       url: https://github.com/Robert-SD/flutter-pay.git
