@@ -24,7 +24,7 @@ dependencies:
   pay:
     git:
       url: https://github.com/Robert-SD/flutter-pay.git
-      path: pay/pay
+      path: pay
       ref: fix/downgradeTestRulesDependency
 
 dev_dependencies:
