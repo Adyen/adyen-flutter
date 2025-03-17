@@ -20,7 +20,11 @@ dependencies:
   flutter:
     sdk: flutter
   plugin_platform_interface: ^2.1.8
-  pay: ^3.2.0
+  #pay: ^3.2.0
+  pay:
+    git:
+      url: https://github.com/Robert-SD/flutter-pay.git
+      ref: fix/downgradeTestRulesDependency
 
 dev_dependencies:
   flutter_test:
