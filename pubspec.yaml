@@ -20,11 +20,11 @@ dependencies:
   flutter:
     sdk: flutter
   plugin_platform_interface: ^2.1.8
-  #pay: ^3.2.0
-  pay:
+  pay: ^3.2.0
+  pay_android:
     git:
       url: https://github.com/Robert-SD/flutter-pay.git
-      path: pay
+      path: pay_android
       ref: fix/downgradeTestRulesDependency
 
 dev_dependencies:
