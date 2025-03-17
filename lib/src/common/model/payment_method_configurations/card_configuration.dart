@@ -9,7 +9,8 @@ class CardConfiguration {
   final FieldVisibility kcpFieldVisibility;
   final FieldVisibility socialSecurityNumberFieldVisibility;
   final List<String?> supportedCardTypes;
-  final CardCallbacksInterface? cardCallbacks;
+  final void Function(List<BinLookupData>)? onBinLookup;
+  final void Function(String)? onBinValue;
 
   const CardConfiguration({
     this.holderNameRequired = false,
@@ -20,6 +21,7 @@ class CardConfiguration {
     this.kcpFieldVisibility = FieldVisibility.hide,
     this.socialSecurityNumberFieldVisibility = FieldVisibility.hide,
     this.supportedCardTypes = const [],
-    this.cardCallbacks,
+    this.onBinLookup,
+    this.onBinValue,
   });
 }

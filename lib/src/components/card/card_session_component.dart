@@ -25,6 +25,8 @@ class CardSessionComponent extends BaseCardComponent {
     required super.isStoredPaymentMethod,
     super.gestureRecognizers,
     super.adyenLogger,
+    super.onBinLookup,
+    super.onBinValue,
   });
 
   @override

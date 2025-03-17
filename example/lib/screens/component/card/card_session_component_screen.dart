@@ -8,29 +8,33 @@ import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 
 class CardSessionComponentScreen extends StatelessWidget {
-  CardSessionComponentScreen({
+  const CardSessionComponentScreen({
     required this.repository,
     super.key,
   });
 
   final AdyenCardComponentRepository repository;
-  final CardComponentConfiguration cardComponentConfiguration =
-      CardComponentConfiguration(
-    environment: Config.environment,
-    clientKey: Config.clientKey,
-    countryCode: Config.countryCode,
-    shopperLocale: Config.shopperLocale,
-    cardConfiguration: const CardConfiguration(),
-  );
 
   @override
   Widget build(BuildContext context) {
+    final CardComponentConfiguration cardComponentConfiguration =
+        CardComponentConfiguration(
+      environment: Config.environment,
+      clientKey: Config.clientKey,
+      countryCode: Config.countryCode,
+      shopperLocale: Config.shopperLocale,
+      cardConfiguration: CardConfiguration(
+        onBinLookup: _onBinLookup,
+        onBinValue: _onBinValue,
+      ),
+    );
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(title: const Text('Adyen card component')),
       body: SafeArea(
         child: FutureBuilder(
-          future: _getSessionCheckout(),
+          future: _getSessionCheckout(cardComponentConfiguration),
           builder:
               (BuildContext context, AsyncSnapshot<SessionCheckout> snapshot) {
             if (snapshot.hasData) {
@@ -63,8 +67,9 @@ class CardSessionComponentScreen extends StatelessWidget {
     );
   }
 
-  Future<SessionCheckout> _getSessionCheckout() async =>
-      await repository.createSessionCheckout(cardComponentConfiguration);
+  Future<SessionCheckout> _getSessionCheckout(
+          CardComponentConfiguration configuration) async =>
+      await repository.createSessionCheckout(configuration);
 
   Map<String, dynamic> _extractPaymentMethod(
       Map<String, dynamic> paymentMethods) {
@@ -85,5 +90,15 @@ class CardSessionComponentScreen extends StatelessWidget {
         storedPaymentMethodList.firstOrNull ?? <String, String>{};
 
     return paymentMethod;
+  }
+
+  void _onBinLookup(List<BinLookupData> binLookupData) {
+    for (var element in binLookupData) {
+      debugPrint("Bin lookup data: brand:${element.brand}");
+    }
+  }
+
+  void _onBinValue(String binValue) {
+    debugPrint("Bin value: $binValue");
   }
 }
