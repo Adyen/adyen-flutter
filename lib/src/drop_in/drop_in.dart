@@ -56,12 +56,12 @@ class DropIn {
         case CheckoutEventType.binLookup:
           _handleBinLookup(
             event,
-            dropInConfiguration.cardConfiguration?.cardCallbacks?.onBinLookup,
+            dropInConfiguration.cardConfiguration?.onBinLookup,
           );
         case CheckoutEventType.binValue:
           _handleBinValue(
             event,
-            dropInConfiguration.cardConfiguration?.cardCallbacks?.onBinValue,
+            dropInConfiguration.cardConfiguration?.onBinValue,
           );
         default:
       }
@@ -155,12 +155,12 @@ class DropIn {
         case CheckoutEventType.binLookup:
           _handleBinLookup(
             event,
-            dropInConfiguration.cardConfiguration?.cardCallbacks?.onBinLookup,
+            dropInConfiguration.cardConfiguration?.onBinLookup,
           );
         case CheckoutEventType.binValue:
           _handleBinValue(
             event,
-            dropInConfiguration.cardConfiguration?.cardCallbacks?.onBinValue,
+            dropInConfiguration.cardConfiguration?.onBinValue,
           );
       }
     });
@@ -409,11 +409,9 @@ class DropIn {
     }
 
     if (event.data case List<Object?> binLookupDataDTOList) {
-      final List<BinLookupData> binLookupDataList = binLookupDataDTOList
+      onBinLookup.call(binLookupDataDTOList
           .whereType<BinLookupDataDTO>()
-          .map((entry) => BinLookupData(brand: entry.brand))
-          .toList();
-      onBinLookup.call(binLookupDataList);
+          .toBinLookupDataList());
     }
   }
 

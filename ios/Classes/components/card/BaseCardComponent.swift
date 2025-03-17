@@ -55,6 +55,31 @@ class BaseCardComponent: NSObject, FlutterPlatformView, UIScrollViewDelegate {
 
         return rootViewController
     }
+    
+    func buildCardComponent(
+        paymentMethodString: String?,
+        isStoredPaymentMethod: Bool,
+        cardComponentConfiguration: CardComponentConfigurationDTO?,
+        componentDelegate: PaymentComponentDelegate?,
+        cardDelegate: CardComponentDelegate?
+    ) throws -> CardComponent {
+        guard let paymentMethodString = paymentMethod else { throw PlatformError(errorDescription: "Payment method not found") }
+        guard let cardComponentConfiguration else { throw PlatformError(errorDescription: "Card configuration not found") }
+        let adyenContext = try cardComponentConfiguration.createAdyenContext()
+        let cardConfiguration = cardComponentConfiguration.cardConfiguration.mapToCardComponentConfiguration(
+            shopperLocale: cardComponentConfiguration.shopperLocale)
+        let paymentMethod: AnyCardPaymentMethod = isStoredPaymentMethod
+            ? try JSONDecoder().decode(StoredCardPaymentMethod.self, from: Data(paymentMethodString.utf8))
+            : try JSONDecoder().decode(CardPaymentMethod.self, from: Data(paymentMethodString.utf8))
+        let cardComponent = CardComponent(
+            paymentMethod: paymentMethod,
+            context: adyenContext,
+            configuration: cardConfiguration
+        )
+        cardComponent.delegate = componentDelegate
+        cardComponent.cardComponentDelegate = cardDelegate
+        return cardComponent
+    }
 
     func showCardComponent(cardComponent: CardComponent) {
         self.cardComponent = cardComponent
@@ -147,5 +172,41 @@ class BaseCardComponent: NSObject, FlutterPlatformView, UIScrollViewDelegate {
         } else {
             return 0
         }
+    }
+}
+
+extension BaseCardComponent: CardComponentDelegate {
+    func didSubmit(lastFour: String, finalBIN: String, component: Adyen.CardComponent) {}
+    
+    func didChangeBIN(_ value: String, component: Adyen.CardComponent) {
+        let componentCommunicationModel = ComponentCommunicationModel(
+            type: ComponentCommunicationType.binValue,
+            componentId: componentId,
+            data: value
+        )
+        componentFlutterApi.onComponentCommunication(
+            componentCommunicationModel: componentCommunicationModel,
+            completion: { _ in }
+        )
+    }
+    
+    func didChangeCardBrand(_ value: [Adyen.CardBrand]?, component: Adyen.CardComponent) {
+        guard let binLookupData = value else {
+            return
+        }
+        
+        let binLookupDataDtoList: [BinLookupDataDTO] = binLookupData.map { cardBrand in
+            BinLookupDataDTO(brand: cardBrand.type.rawValue)
+        }
+        
+        let componentCommunicationModel = ComponentCommunicationModel(
+            type: ComponentCommunicationType.binLookup,
+            componentId: componentId,
+            data: binLookupDataDtoList
+        )
+        componentFlutterApi.onComponentCommunication(
+            componentCommunicationModel: componentCommunicationModel,
+            completion: { _ in }
+        )
     }
 }

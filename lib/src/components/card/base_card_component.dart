@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:adyen_checkout/src/common/model/card_callbacks/bin_lookup_data.dart';
 import 'package:adyen_checkout/src/common/model/payment_result.dart';
 import 'package:adyen_checkout/src/components/card/card_component_container.dart';
 import 'package:adyen_checkout/src/components/component_flutter_api.dart';
@@ -8,6 +9,7 @@ import 'package:adyen_checkout/src/components/platform/android_platform_view.dar
 import 'package:adyen_checkout/src/components/platform/ios_platform_view.dart';
 import 'package:adyen_checkout/src/generated/platform_api.g.dart';
 import 'package:adyen_checkout/src/logging/adyen_logger.dart';
+import 'package:adyen_checkout/src/util/dto_mapper.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -21,6 +23,8 @@ abstract class BaseCardComponent extends StatefulWidget {
   final bool isStoredPaymentMethod;
   final Set<Factory<OneSequenceGestureRecognizer>>? gestureRecognizers;
   final AdyenLogger adyenLogger;
+  final void Function(List<BinLookupData>)? onBinLookup;
+  final void Function(String)? onBinValue;
   abstract final String componentId;
   abstract final Map<String, dynamic> creationParams;
   abstract final String viewType;
@@ -33,6 +37,8 @@ abstract class BaseCardComponent extends StatefulWidget {
     required this.initialViewHeight,
     required this.isStoredPaymentMethod,
     this.gestureRecognizers,
+    this.onBinLookup,
+    this.onBinValue,
     AdyenLogger? adyenLogger,
   }) : adyenLogger = adyenLogger ?? AdyenLogger.instance;
 
@@ -138,6 +144,10 @@ class _BaseCardComponentState extends State<BaseCardComponent> {
       _resizeViewport(event);
     } else if (event.type case ComponentCommunicationType.result) {
       widget.onResult(event);
+    } else if (event.type case ComponentCommunicationType.binLookup) {
+      _handleOnBinLookup(event, widget.onBinLookup);
+    } else if (event.type case ComponentCommunicationType.binValue) {
+      _handleOnBinValue(event, widget.onBinValue);
     } else {
       widget.handleComponentCommunication(event);
     }
@@ -151,6 +161,34 @@ class _BaseCardComponentState extends State<BaseCardComponent> {
         previousViewportHeight = viewportHeight;
         viewportHeight = newViewportHeight;
       });
+    }
+  }
+
+  void _handleOnBinLookup(
+    ComponentCommunicationModel event,
+    void Function(List<BinLookupData>)? onBinLookup,
+  ) {
+    if (onBinLookup == null) {
+      return;
+    }
+
+    if (event.data case List<Object?> binLookupDataDTOList) {
+      onBinLookup(binLookupDataDTOList
+          .whereType<BinLookupDataDTO>()
+          .toBinLookupDataList());
+    }
+  }
+
+  void _handleOnBinValue(
+    ComponentCommunicationModel event,
+    void Function(String)? onBinValue,
+  ) {
+    if (onBinValue == null) {
+      return;
+    }
+
+    if (event.data case String binValue) {
+      onBinValue(binValue);
     }
   }
 }

@@ -39,31 +39,13 @@ class CardSessionComponent: BaseCardComponent {
     }
 
     private func setupCardComponent() throws -> CardComponent {
-        guard let cardComponentConfiguration else { throw PlatformError(errorDescription: "Card configuration not found") }
-        guard let paymentMethodString = paymentMethod else { throw PlatformError(errorDescription: "Payment method not found") }
         guard let session = sessionHolder.session else { throw PlatformError(errorDescription: "Session not found") }
-        let cardComponent = try buildCardComponent(
-            paymentMethodString: paymentMethodString,
-            cardComponentConfiguration: cardComponentConfiguration
-        )
-        cardComponent.delegate = session
-        return cardComponent
-    }
-
-    private func buildCardComponent(
-        paymentMethodString: String,
-        cardComponentConfiguration: CardComponentConfigurationDTO
-    ) throws -> CardComponent {
-        let cardPaymentMethod: AnyCardPaymentMethod = isStoredPaymentMethod
-            ? try JSONDecoder().decode(StoredCardPaymentMethod.self, from: Data(paymentMethodString.utf8))
-            : try JSONDecoder().decode(CardPaymentMethod.self, from: Data(paymentMethodString.utf8))
-        let adyenContext = try cardComponentConfiguration.createAdyenContext()
-        let cardConfiguration = cardComponentConfiguration.cardConfiguration.mapToCardComponentConfiguration(
-            shopperLocale: cardComponentConfiguration.shopperLocale)
-        return CardComponent(
-            paymentMethod: cardPaymentMethod,
-            context: adyenContext,
-            configuration: cardConfiguration
+        return try buildCardComponent(
+            paymentMethodString: paymentMethod,
+            isStoredPaymentMethod: isStoredPaymentMethod,
+            cardComponentConfiguration: cardComponentConfiguration,
+            componentDelegate: session,
+            cardDelegate: self
         )
     }
 

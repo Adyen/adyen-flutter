@@ -313,3 +313,8 @@ extension OrderCancelResponseMapper on OrderCancelResult {
         updatedPaymentMethodsResponseBody: updatedPaymentMethodsResponseBody,
       );
 }
+
+extension BinLookupDataMapper on Iterable<BinLookupDataDTO> {
+  List<BinLookupData> toBinLookupDataList() =>
+      map((entry) => BinLookupData(brand: entry.brand)).toList();
+}
