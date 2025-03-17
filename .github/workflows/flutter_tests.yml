@@ -6,7 +6,7 @@ on:
       flutter-version:
         description: 'Flutter version'
         required: true
-        default: 3.29.x
+        default: '3.29.x'
         type: string
 
 jobs:
