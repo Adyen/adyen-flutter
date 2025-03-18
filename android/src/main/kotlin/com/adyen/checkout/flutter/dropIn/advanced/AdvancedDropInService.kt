@@ -60,24 +60,30 @@ class AdvancedDropInService : DropInService(), LifecycleOwner {
     }
 
     override fun onBalanceCheck(paymentComponentState: PaymentComponentState<*>) {
-        try {
-            setBalanceCheckObserver()
-            val data = PaymentComponentData.SERIALIZER.serialize(paymentComponentState.data)
-            DropInBalanceCheckPlatformMessenger.sendResult(data)
-        } catch (exception: Exception) {
-            sendResult(
-                DropInServiceResult.Error(
-                    errorDialog = null,
-                    reason = exception.message,
-                    dismissDropIn = true
+        setBalanceCheckObserver()
+        lifecycleScope.launch {
+            try {
+                val data = PaymentComponentData.SERIALIZER.serialize(paymentComponentState.data).toString()
+                val checkoutEvent = CheckoutEvent(CheckoutEventType.BALANCE_CHECK, data)
+                DropInPlatformApi.dropInMessageFlow.emit(checkoutEvent)
+            } catch (exception: Exception) {
+                sendResult(
+                    DropInServiceResult.Error(
+                        errorDialog = null,
+                        reason = exception.message,
+                        dismissDropIn = true
+                    )
                 )
-            )
+            }
         }
     }
 
     override fun onOrderRequest() {
         setOrderRequestObserver()
-        DropInOrderRequestPlatformMessenger.sendResult("onOrderRequest")
+        lifecycleScope.launch {
+            val checkoutEvent = CheckoutEvent(CheckoutEventType.REQUEST_ORDER)
+            DropInPlatformApi.dropInMessageFlow.emit(checkoutEvent)
+        }
     }
 
     override fun onOrderCancel(
@@ -85,10 +91,13 @@ class AdvancedDropInService : DropInService(), LifecycleOwner {
         shouldUpdatePaymentMethods: Boolean
     ) {
         setOrderCancelObserver()
-        val cancelOrderData = JSONObject()
-        cancelOrderData.put(Constants.ORDER_KEY, Order.SERIALIZER.serialize(order))
-        cancelOrderData.put(Constants.SHOULD_UPDATE_PAYMENT_METHODS_KEY, shouldUpdatePaymentMethods)
-        DropInOrderCancelPlatformMessenger.sendResult(cancelOrderData)
+        lifecycleScope.launch {
+            val cancelOrderData = JSONObject()
+            cancelOrderData.put(Constants.ORDER_KEY, Order.SERIALIZER.serialize(order))
+            cancelOrderData.put(Constants.SHOULD_UPDATE_PAYMENT_METHODS_KEY, shouldUpdatePaymentMethods)
+            val checkoutEvent = CheckoutEvent(CheckoutEventType.CANCEL_ORDER, cancelOrderData.toString())
+            DropInPlatformApi.dropInMessageFlow.emit(checkoutEvent)
+        }
     }
 
     override fun onRemoveStoredPaymentMethod(storedPaymentMethod: StoredPaymentMethod) {

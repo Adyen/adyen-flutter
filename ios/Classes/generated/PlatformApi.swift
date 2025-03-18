@@ -110,7 +110,7 @@ enum PaymentResultEnum: Int {
 }
 
 enum CheckoutEventType: Int {
-    case paymentComponent = 0
+    case submit = 0
     case additionalDetails = 1
     case result = 2
     case deleteStoredPaymentMethod = 3

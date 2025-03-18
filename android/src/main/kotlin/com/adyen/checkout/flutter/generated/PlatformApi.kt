@@ -132,7 +132,7 @@ enum class PaymentResultEnum(val raw: Int) {
 }
 
 enum class CheckoutEventType(val raw: Int) {
-  PAYMENT_COMPONENT(0),
+  SUBMIT(0),
   ADDITIONAL_DETAILS(1),
   RESULT(2),
   DELETE_STORED_PAYMENT_METHOD(3),
