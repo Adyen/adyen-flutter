@@ -3,6 +3,8 @@ import 'package:adyen_checkout_example/config.dart';
 import 'package:adyen_checkout_example/repositories/adyen_cse_repository.dart';
 import 'package:flutter/material.dart';
 
+import 'adyen_card_widget.dart';
+
 class CseScreen extends StatelessWidget {
   const CseScreen({super.key, required this.repository});
 
@@ -13,17 +15,21 @@ class CseScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(title: const Text('Adyen Client-Side encryption')),
-      body: SafeArea(
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              TextButton(
-                  onPressed: _encryptCard,
-                  child: const Text("Encrypted card payment")),
-              TextButton(
-                  onPressed: encryptBin, child: const Text("Encrypt bin"))
-            ],
+      body: const SafeArea(
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: EdgeInsets.all(16.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                AdyenCardWidget(),
+                // TextButton(
+                //     onPressed: _encryptCard,
+                //     child: const Text("Encrypted card payment")),
+                // TextButton(
+                //     onPressed: encryptBin, child: const Text("Encrypt bin"))
+              ],
+            ),
           ),
         ),
       ),
