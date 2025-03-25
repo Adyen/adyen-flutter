@@ -1,15 +1,18 @@
+import 'package:adyen_checkout_example/screens/cse/card_notifier.dart';
+import 'package:adyen_checkout_example/utils/provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
-class AdyenCardWidget extends StatefulWidget {
-  const AdyenCardWidget({super.key});
+class CardWidget extends StatefulWidget {
+   const CardWidget({super.key});
+
 
   @override
-  State<AdyenCardWidget> createState() => _AdyenCardWidgetState();
+  State<CardWidget> createState() => _CardWidgetState();
 }
 
-class _AdyenCardWidgetState extends State<AdyenCardWidget> {
+class _CardWidgetState extends State<CardWidget> {
   final _cardNumberController = TextEditingController();
   final _securityCodeController = TextEditingController();
   final _expiryDateController = TextEditingController();
@@ -20,8 +23,6 @@ class _AdyenCardWidgetState extends State<AdyenCardWidget> {
   final darkerGrey = const Color(0xFFc9cdd3);
   final lighterDark = const Color(0xff1b1919);
   final borderRadius = BorderRadius.circular(8);
-
-
 
   @override
   void dispose() {
@@ -35,6 +36,8 @@ class _AdyenCardWidgetState extends State<AdyenCardWidget> {
 
   @override
   Widget build(BuildContext context) {
+    final cardNotifier = Provider.of<CardNotifier>(context);
+
     return Container(
       decoration: BoxDecoration(
         color: lightGrey,
@@ -133,6 +136,7 @@ class _AdyenCardWidgetState extends State<AdyenCardWidget> {
                 print(value);
               },
             ),
+            Text(cardNotifier.value.cardNumber),
             const SizedBox(height: 32),
             SizedBox(
               width: double.maxFinite,
@@ -153,7 +157,9 @@ class _AdyenCardWidgetState extends State<AdyenCardWidget> {
                     fontWeight: FontWeight.w600, // Semi-bold font weight
                   ),
                 ),
-                onPressed: () {},
+                onPressed: () {
+                  cardNotifier.test();
+                },
                 child: const Text("PAY"),
               ),
             ),
