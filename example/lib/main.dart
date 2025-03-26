@@ -25,7 +25,7 @@ import 'package:adyen_checkout_example/screens/component/multi_component/multi_c
 import 'package:adyen_checkout_example/screens/component/multi_component/multi_component_navigation_screen.dart';
 import 'package:adyen_checkout_example/screens/component/multi_component/multi_component_session_screen.dart';
 import 'package:adyen_checkout_example/screens/cse/card_model.dart';
-import 'package:adyen_checkout_example/screens/cse/card_notifier.dart';
+import 'package:adyen_checkout_example/screens/cse/card_model_notifier.dart';
 import 'package:adyen_checkout_example/screens/cse/cse_screen.dart';
 import 'package:adyen_checkout_example/screens/drop_in/drop_in_screen.dart';
 import 'package:adyen_checkout_example/utils/provider.dart';
@@ -46,7 +46,7 @@ void main() {
   final adyenCseRepository = AdyenCseRepository(service: service);
 
   runApp(Provider(
-    notifier: CardNotifier(CardModel(cardNumber: '')),
+    notifier: CardModelNotifier(CardModel()),
     child: MaterialApp(
       localizationsDelegates: const [
         GlobalMaterialLocalizations.delegate,

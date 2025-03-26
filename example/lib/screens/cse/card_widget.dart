@@ -1,12 +1,13 @@
-import 'package:adyen_checkout_example/screens/cse/card_notifier.dart';
+import 'package:adyen_checkout/adyen_checkout.dart';
+import 'package:adyen_checkout_example/screens/cse/card_model_notifier.dart';
+import 'package:adyen_checkout_example/screens/cse/input_formatters/month_year_input_formatter.dart';
 import 'package:adyen_checkout_example/utils/provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class CardWidget extends StatefulWidget {
-   const CardWidget({super.key});
-
+  const CardWidget({super.key});
 
   @override
   State<CardWidget> createState() => _CardWidgetState();
@@ -16,9 +17,6 @@ class _CardWidgetState extends State<CardWidget> {
   final _cardNumberController = TextEditingController();
   final _securityCodeController = TextEditingController();
   final _expiryDateController = TextEditingController();
-  final _cardHolderNameController = TextEditingController();
-  final _formKey = GlobalKey<FormState>();
-
   final lightGrey = const Color(0xFFf7f7f8);
   final darkerGrey = const Color(0xFFc9cdd3);
   final lighterDark = const Color(0xff1b1919);
@@ -29,14 +27,14 @@ class _CardWidgetState extends State<CardWidget> {
     _cardNumberController.dispose();
     _securityCodeController.dispose();
     _expiryDateController.dispose();
-    _cardHolderNameController.dispose();
 
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final cardNotifier = Provider.of<CardNotifier>(context);
+    final cardModelNotifier = Provider.of<CardModelNotifier>(context);
+    final cardModel = cardModelNotifier.value;
 
     return Container(
       decoration: BoxDecoration(
@@ -46,7 +44,7 @@ class _CardWidgetState extends State<CardWidget> {
       ),
       padding: const EdgeInsets.all(16.0),
       child: Form(
-        key: _formKey,
+        key: cardModelNotifier.formKey,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -61,11 +59,17 @@ class _CardWidgetState extends State<CardWidget> {
               keyboardType: TextInputType.number,
               inputFormatters: [
                 FilteringTextInputFormatter.digitsOnly,
-                LengthLimitingTextInputFormatter(16),
+                LengthLimitingTextInputFormatter(19),
                 _CreditCardNumberInputFormatter(),
               ],
+              onChanged: (value) {
+                cardModelNotifier.updateCardNumber(value);
+              },
               validator: (value) {
-                print(value);
+                if (cardModel.cardNumberValidationResult is InvalidCardNumber) {
+                  return 'Enter a valid card number';
+                }
+                return null;
               },
             ),
             const SizedBox(height: 8),
@@ -91,9 +95,16 @@ class _CardWidgetState extends State<CardWidget> {
                         inputFormatters: [
                           FilteringTextInputFormatter.digitsOnly,
                           LengthLimitingTextInputFormatter(4),
+                          MonthYearInputFormatter(),
                         ],
+                        onChanged: (value) {
+                          cardModelNotifier.updateExpiryDate(value);
+                        },
                         validator: (value) {
-                          print(value);
+                          if (cardModel.cardExpiryDateValidationResult is InvalidCardExpiryDate) {
+                            return 'Enter a valid expiry date';
+                          }
+                          return null;
                         },
                       ),
                       _inputFieldSubText("Front of card in MM/YY format"),
@@ -109,8 +120,8 @@ class _CardWidgetState extends State<CardWidget> {
                       _inputFieldTitle("Security code"),
                       TextFormField(
                         controller: _securityCodeController,
-                        decoration: createInputDecoration(
-                            "assets/cvc_hint.svg"),
+                        decoration:
+                            createInputDecoration("assets/cvc_hint.svg"),
                         keyboardType: TextInputType.number,
                         inputFormatters: [
                           FilteringTextInputFormatter.digitsOnly,
@@ -126,23 +137,12 @@ class _CardWidgetState extends State<CardWidget> {
                 ),
               ],
             ),
-            const SizedBox(height: 16),
-            _inputFieldTitle("Name on card"),
-            const SizedBox(height: 8),
-            TextFormField(
-              controller: _cardHolderNameController,
-              decoration: createInputDecoration(null),
-              validator: (value) {
-                print(value);
-              },
-            ),
-            Text(cardNotifier.value.cardNumber),
             const SizedBox(height: 32),
             SizedBox(
               width: double.maxFinite,
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Color(0xFF00112c),
+                  backgroundColor: const Color(0xFF00112c),
                   // Dark blue background
                   foregroundColor: Colors.white,
                   // White text color
@@ -158,7 +158,7 @@ class _CardWidgetState extends State<CardWidget> {
                   ),
                 ),
                 onPressed: () {
-                  cardNotifier.test();
+                  cardModelNotifier.validateCardNumber();
                 },
                 child: const Text("PAY"),
               ),
@@ -243,16 +243,26 @@ class _CardWidgetState extends State<CardWidget> {
 
   InputDecoration createInputDecoration(String? iconAssetPath) {
     return InputDecoration(
-      contentPadding:
-          const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+      contentPadding: const EdgeInsets.symmetric(
+        vertical: 8.0,
+        horizontal: 16.0,
+      ),
+      filled: true,
+      fillColor: Colors.white,
       enabledBorder: OutlineInputBorder(
         borderSide: BorderSide(color: darkerGrey),
         borderRadius: borderRadius,
       ),
-      filled: true,
-      fillColor: Colors.white,
       focusedBorder: OutlineInputBorder(
         borderSide: BorderSide(color: lighterDark, width: 1),
+        borderRadius: borderRadius,
+      ),
+      errorBorder: OutlineInputBorder(
+        borderSide: const BorderSide(color: Colors.red, width: 1),
+        borderRadius: borderRadius,
+      ),
+      focusedErrorBorder: OutlineInputBorder(
+        borderSide: const BorderSide(color: Colors.red, width: 1),
         borderRadius: borderRadius,
       ),
       suffixIcon: iconAssetPath == null
