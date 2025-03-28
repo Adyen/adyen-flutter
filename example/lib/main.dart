@@ -8,6 +8,8 @@ import 'package:adyen_checkout_example/repositories/adyen_cse_repository.dart';
 import 'package:adyen_checkout_example/repositories/adyen_drop_in_repository.dart';
 import 'package:adyen_checkout_example/repositories/adyen_google_pay_component_repository.dart';
 import 'package:adyen_checkout_example/repositories/adyen_instant_component_repository.dart';
+import 'package:adyen_checkout_example/screens/api_only/card_state_notifier.dart';
+import 'package:adyen_checkout_example/screens/api_only/custom_card_screen.dart';
 import 'package:adyen_checkout_example/screens/component/apple_pay/apple_pay_advanced_component_screen.dart';
 import 'package:adyen_checkout_example/screens/component/apple_pay/apple_pay_navigation_screen.dart';
 import 'package:adyen_checkout_example/screens/component/apple_pay/apple_pay_session_component_screen.dart';
@@ -24,9 +26,6 @@ import 'package:adyen_checkout_example/screens/component/instant/instant_session
 import 'package:adyen_checkout_example/screens/component/multi_component/multi_component_advanced_screen.dart';
 import 'package:adyen_checkout_example/screens/component/multi_component/multi_component_navigation_screen.dart';
 import 'package:adyen_checkout_example/screens/component/multi_component/multi_component_session_screen.dart';
-import 'package:adyen_checkout_example/screens/cse/card_model.dart';
-import 'package:adyen_checkout_example/screens/cse/card_model_notifier.dart';
-import 'package:adyen_checkout_example/screens/cse/cse_screen.dart';
 import 'package:adyen_checkout_example/screens/drop_in/drop_in_screen.dart';
 import 'package:adyen_checkout_example/utils/provider.dart';
 import 'package:flutter/foundation.dart';
@@ -46,7 +45,7 @@ void main() {
   final adyenCseRepository = AdyenCseRepository(service: service);
 
   runApp(Provider(
-    notifier: CardModelNotifier(CardModel()),
+    notifier: CardStateNotifier(adyenCseRepository),
     child: MaterialApp(
       localizationsDelegates: const [
         GlobalMaterialLocalizations.delegate,
@@ -72,7 +71,8 @@ void main() {
         '/cardSessionComponentScreen': (context) => CardSessionComponentScreen(
               repository: adyenCardComponentRepository,
             ),
-        '/cardAdvancedComponentScreen': (context) => CardAdvancedComponentScreen(
+        '/cardAdvancedComponentScreen': (context) =>
+            CardAdvancedComponentScreen(
               repository: adyenCardComponentRepository,
             ),
         '/cardBottomSheetScreen': (context) => CardBottomSheetScreen(
@@ -88,7 +88,8 @@ void main() {
               repository: adyenGooglePayComponentRepository,
             ),
         '/applePayNavigation': (context) => const ApplePayNavigationScreen(),
-        '/applePaySessionComponent': (context) => ApplePaySessionComponentScreen(
+        '/applePaySessionComponent': (context) =>
+            ApplePaySessionComponentScreen(
               repository: adyenApplePayComponentRepository,
             ),
         '/applePayAdvancedComponent': (context) =>
@@ -99,11 +100,13 @@ void main() {
             const InstantNavigationScreen(),
         '/instantSessionComponent': (context) => InstantSessionComponentScreen(
             repository: adyenInstantComponentRepository),
-        '/instantAdvancedComponent': (context) => InstantAdvancedComponentScreen(
-            repository: adyenInstantComponentRepository),
+        '/instantAdvancedComponent': (context) =>
+            InstantAdvancedComponentScreen(
+                repository: adyenInstantComponentRepository),
         '/multiComponentNavigationScreen': (context) =>
             const MultiComponentNavigationScreen(),
-        '/multiComponentSessionScreen': (context) => MultiComponentSessionScreen(
+        '/multiComponentSessionScreen': (context) =>
+            MultiComponentSessionScreen(
               cardRepository: adyenCardComponentRepository,
               googlePayRepository: adyenGooglePayComponentRepository,
               applePayRepository: adyenApplePayComponentRepository,
@@ -115,7 +118,7 @@ void main() {
               applePayRepository: adyenApplePayComponentRepository,
             ),
         '/clientSideEncryption': (context) =>
-            CseScreen(repository: adyenCseRepository),
+            CustomCardScreen(repository: adyenCseRepository),
       },
       initialRoute: "/",
     ),

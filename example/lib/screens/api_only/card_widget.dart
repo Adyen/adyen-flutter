@@ -1,13 +1,16 @@
 import 'package:adyen_checkout/adyen_checkout.dart';
-import 'package:adyen_checkout_example/screens/cse/card_model_notifier.dart';
-import 'package:adyen_checkout_example/screens/cse/input_formatters/month_year_input_formatter.dart';
-import 'package:adyen_checkout_example/utils/provider.dart';
+import 'package:adyen_checkout_example/screens/api_only/card_state_notifier.dart';
+import 'package:adyen_checkout_example/screens/api_only/input_formatters/month_year_input_formatter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
+import 'input_formatters/card_number_input_formatter.dart';
+
 class CardWidget extends StatefulWidget {
-  const CardWidget({super.key});
+  const CardWidget({super.key, required this.cardModelNotifier});
+
+  final CardStateNotifier cardModelNotifier;
 
   @override
   State<CardWidget> createState() => _CardWidgetState();
@@ -27,14 +30,15 @@ class _CardWidgetState extends State<CardWidget> {
     _cardNumberController.dispose();
     _securityCodeController.dispose();
     _expiryDateController.dispose();
-
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      widget.cardModelNotifier.reset();
+    });
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final cardModelNotifier = Provider.of<CardModelNotifier>(context);
-    final cardModel = cardModelNotifier.value;
+    final cardModel = widget.cardModelNotifier.value;
 
     return Container(
       decoration: BoxDecoration(
@@ -44,7 +48,7 @@ class _CardWidgetState extends State<CardWidget> {
       ),
       padding: const EdgeInsets.all(16.0),
       child: Form(
-        key: cardModelNotifier.formKey,
+        key: widget.cardModelNotifier.formKey,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -60,13 +64,14 @@ class _CardWidgetState extends State<CardWidget> {
               inputFormatters: [
                 FilteringTextInputFormatter.digitsOnly,
                 LengthLimitingTextInputFormatter(19),
-                _CreditCardNumberInputFormatter(),
+                CardNumberInputFormatter(),
               ],
               onChanged: (value) {
-                cardModelNotifier.updateCardNumber(value);
+                widget.cardModelNotifier.updateCardNumber(value);
               },
               validator: (value) {
-                if (cardModel.cardNumberValidationResult is InvalidCardNumber) {
+                if (cardModel.cardNumberValidationResult
+                    is InvalidCardNumber?) {
                   return 'Enter a valid card number';
                 }
                 return null;
@@ -98,11 +103,12 @@ class _CardWidgetState extends State<CardWidget> {
                           MonthYearInputFormatter(),
                         ],
                         onChanged: (value) {
-                          cardModelNotifier.updateExpiryDate(value);
+                          widget.cardModelNotifier.updateExpiryDate(value);
                         },
                         validator: (value) {
-                          if (cardModel.cardExpiryDateValidationResult is InvalidCardExpiryDate) {
-                            return 'Enter a valid expiry date';
+                          if (cardModel.cardExpiryDateValidationResult
+                              is InvalidCardExpiryDate?) {
+                            return 'Invalid expiry date';
                           }
                           return null;
                         },
@@ -127,8 +133,15 @@ class _CardWidgetState extends State<CardWidget> {
                           FilteringTextInputFormatter.digitsOnly,
                           LengthLimitingTextInputFormatter(4),
                         ],
+                        onChanged: (value) {
+                          widget.cardModelNotifier.updateSecurityCode(value);
+                        },
                         validator: (value) {
-                          print(value);
+                          if (cardModel.cardSecurityCodeValidationResult
+                              is InvalidCardSecurityCode?) {
+                            return 'Invalid security code';
+                          }
+                          return null;
                         },
                       ),
                       _inputFieldSubText("3 digits on back of card"),
@@ -143,11 +156,8 @@ class _CardWidgetState extends State<CardWidget> {
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF00112c),
-                  // Dark blue background
                   foregroundColor: Colors.white,
-                  // White text color
                   minimumSize: const Size(double.infinity, 56),
-                  // Full width, fixed height
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8), // Rounded corners
@@ -157,16 +167,27 @@ class _CardWidgetState extends State<CardWidget> {
                     fontWeight: FontWeight.w600, // Semi-bold font weight
                   ),
                 ),
-                onPressed: () {
-                  cardModelNotifier.validateCardNumber();
-                },
-                child: const Text("PAY"),
+                onPressed: cardModel.loading == true
+                    ? null
+                    : () => _makePayment(context),
+                child: cardModel.loading == true
+                    ? const CircularProgressIndicator(
+                        color: Colors.white,
+                      )
+                    : const Text("PAY"),
               ),
             ),
           ],
         ),
       ),
     );
+  }
+
+  Future<void> _makePayment(BuildContext context) async {
+    final paymentResultCode = await widget.cardModelNotifier.pay();
+    if (paymentResultCode != null) {
+      showPaymentResultCodeDialog(paymentResultCode);
+    }
   }
 
   Widget _buildCardFormHeader() {
@@ -273,33 +294,32 @@ class _CardWidgetState extends State<CardWidget> {
             ),
     );
   }
-}
 
-class _CreditCardNumberInputFormatter extends TextInputFormatter {
-  @override
-  TextEditingValue formatEditUpdate(
-    TextEditingValue oldValue,
-    TextEditingValue newValue,
+  void showPaymentResultCodeDialog(
+    ResultCode resultCode,
   ) {
-    var text = newValue.text;
-
-    if (newValue.selection.baseOffset == 0) {
-      return newValue;
-    }
-
-    var buffer = StringBuffer();
-    for (int i = 0; i < text.length; i++) {
-      buffer.write(text[i]);
-      var nonZeroIndex = i + 1;
-      if (nonZeroIndex % 4 == 0 && nonZeroIndex != text.length) {
-        buffer.write(' ');
-      }
-    }
-
-    var string = buffer.toString();
-    return newValue.copyWith(
-      text: string,
-      selection: TextSelection.collapsed(offset: string.length),
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("Result:"),
+          content: Text(resultCode.toString()),
+          actions: <Widget>[
+            TextButton(
+              style: TextButton.styleFrom(
+                textStyle: Theme.of(context).textTheme.labelLarge,
+              ),
+              child: const Text('Close'),
+              onPressed: () {
+                //Close dialog
+                Navigator.of(context).pop();
+                //Close page
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 }

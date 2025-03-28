@@ -1,37 +1,48 @@
 import 'package:adyen_checkout/adyen_checkout.dart';
 
-class CardModel {
+class CardState {
   final String? cardNumber;
   final String? expiryMoth;
   final String? expiryYear;
+  final String? securityCode;
+  final bool? loading;
   final CardNumberValidationResult? cardNumberValidationResult;
   final CardExpiryDateValidationResult? cardExpiryDateValidationResult;
   final CardSecurityCodeValidationResult? cardSecurityCodeValidationResult;
 
-  CardModel({
+  CardState({
     this.cardNumber,
     this.expiryMoth,
     this.expiryYear,
+    this.securityCode,
+    this.loading,
     this.cardNumberValidationResult,
     this.cardExpiryDateValidationResult,
     this.cardSecurityCodeValidationResult,
   });
 
-  CardModel copyWith({
+  CardState copyWith({
     String? cardNumber,
     String? expiryMoth,
     String? expiryYear,
+    String? securityCode,
+    bool? loading,
     CardNumberValidationResult? cardNumberValidationResult,
     CardExpiryDateValidationResult? cardExpiryDateValidationResult,
     CardSecurityCodeValidationResult? cardSecurityCodeValidationResult,
   }) {
-    return CardModel(
+    return CardState(
       cardNumber: cardNumber ?? this.cardNumber,
       expiryMoth: expiryMoth ?? this.expiryMoth,
       expiryYear: expiryYear ?? this.expiryYear,
-      cardNumberValidationResult: cardNumberValidationResult ?? this.cardNumberValidationResult,
-      cardExpiryDateValidationResult: cardExpiryDateValidationResult ?? this.cardExpiryDateValidationResult,
-      cardSecurityCodeValidationResult: cardSecurityCodeValidationResult ?? this.cardSecurityCodeValidationResult,
+      securityCode: securityCode ?? this.securityCode,
+      loading: loading ?? this.loading,
+      cardNumberValidationResult:
+          cardNumberValidationResult ?? this.cardNumberValidationResult,
+      cardExpiryDateValidationResult:
+          cardExpiryDateValidationResult ?? this.cardExpiryDateValidationResult,
+      cardSecurityCodeValidationResult: cardSecurityCodeValidationResult ??
+          this.cardSecurityCodeValidationResult,
     );
   }
 }

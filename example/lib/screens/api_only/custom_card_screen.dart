@@ -1,11 +1,14 @@
 import 'package:adyen_checkout/adyen_checkout.dart';
 import 'package:adyen_checkout_example/config.dart';
 import 'package:adyen_checkout_example/repositories/adyen_cse_repository.dart';
-import 'package:adyen_checkout_example/screens/cse/card_widget.dart';
+import 'package:adyen_checkout_example/screens/api_only/card_state_notifier.dart';
+import 'package:adyen_checkout_example/screens/api_only/card_widget.dart';
 import 'package:flutter/material.dart';
 
-class CseScreen extends StatelessWidget {
-  const CseScreen({super.key, required this.repository});
+import '../../utils/provider.dart';
+
+class CustomCardScreen extends StatelessWidget {
+  const CustomCardScreen({super.key, required this.repository});
 
   final AdyenCseRepository repository;
 
@@ -14,14 +17,14 @@ class CseScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(title: const Text('Adyen Client-Side encryption')),
-      body: const SafeArea(
+      body:  SafeArea(
         child: SingleChildScrollView(
           child: Padding(
-            padding: EdgeInsets.all(16.0),
+            padding: const EdgeInsets.all(16.0),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                CardWidget(),
+                CardWidget(cardModelNotifier: Provider.of<CardStateNotifier>(context)),
                 // TextButton(
                 //     onPressed: _encryptCard,
                 //     child: const Text("Encrypted card payment")),
@@ -48,7 +51,7 @@ class CseScreen extends StatelessWidget {
       final EncryptedCard encryptedCard = await AdyenCheckout.instance
           .encryptCard(unencryptedCard, Config.publicKey);
       final Map<String, dynamic> paymentsResponse =
-          await repository.makePayment(encryptedCard);
+          await repository.payments(encryptedCard);
       if (paymentsResponse.containsKey("action")) {
         final ActionComponentConfiguration actionComponentConfiguration =
             ActionComponentConfiguration(
