@@ -117,8 +117,7 @@ void main() {
               googlePayRepository: adyenGooglePayComponentRepository,
               applePayRepository: adyenApplePayComponentRepository,
             ),
-        '/clientSideEncryption': (context) =>
-            CustomCardScreen(repository: adyenCseRepository),
+        '/customCard': (context) => const CustomCardScreen(),
       },
       initialRoute: "/",
     ),
@@ -158,8 +157,8 @@ class MyApp extends StatelessWidget {
                 child: const Text("Multi component")),
             TextButton(
                 onPressed: () =>
-                    Navigator.pushNamed(context, "/clientSideEncryption"),
-                child: const Text("Client-Side encryption")),
+                    Navigator.pushNamed(context, "/customCard"),
+                child: const Text("Custom card with API")),
           ],
         ),
       ),
