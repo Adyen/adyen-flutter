@@ -20,7 +20,7 @@ class DropInAdvancedFlowDelegate: DropInComponentDelegate {
             )
             let submitDataEncoded = try submitData.toJsonString()
             let checkoutEvent = CheckoutEvent(
-                type: CheckoutEventType.paymentComponent,
+                type: CheckoutEventType.submit,
                 data: submitDataEncoded
             )
             checkoutFlutter.send(
