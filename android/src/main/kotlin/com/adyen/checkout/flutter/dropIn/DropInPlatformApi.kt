@@ -22,6 +22,7 @@ import com.adyen.checkout.flutter.dropIn.advanced.DropInPaymentMethodDeletionPla
 import com.adyen.checkout.flutter.dropIn.advanced.DropInPaymentMethodDeletionResultMessenger
 import com.adyen.checkout.flutter.dropIn.advanced.DropInPaymentResultMessenger
 import com.adyen.checkout.flutter.dropIn.advanced.DropInServiceResultMessenger
+import com.adyen.checkout.flutter.dropIn.model.DropInServiceEvent
 import com.adyen.checkout.flutter.dropIn.session.SessionDropInService
 import com.adyen.checkout.flutter.generated.CheckoutEvent
 import com.adyen.checkout.flutter.generated.CheckoutEventType
@@ -59,6 +60,7 @@ internal class DropInPlatformApi(
 
     companion object {
         val dropInMessageFlow = MutableSharedFlow<CheckoutEvent>()
+        val dropInServiceFlow = MutableSharedFlow<DropInServiceEvent>()
     }
 
     override fun showDropInSession(dropInConfigurationDTO: DropInConfigurationDTO) {
@@ -115,6 +117,12 @@ internal class DropInPlatformApi(
                     AdvancedDropInService::class.java,
                 )
             }
+        }
+    }
+
+    override fun stopDropIn() {
+        activity.lifecycleScope.launch {
+            dropInServiceFlow.emit(DropInServiceEvent.STOP)
         }
     }
 

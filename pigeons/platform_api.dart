@@ -669,6 +669,8 @@ abstract class DropInPlatformInterface {
     String paymentMethodsResponse,
   );
 
+  void stopDropIn();
+
   void onPaymentsResult(PaymentEventDTO paymentsResult);
 
   void onPaymentsDetailsResult(PaymentEventDTO paymentsDetailsResult);

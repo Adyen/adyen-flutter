@@ -23,6 +23,7 @@ import com.adyen.checkout.dropin.ErrorDialog
 import com.adyen.checkout.dropin.OrderDropInServiceResult
 import com.adyen.checkout.dropin.RecurringDropInServiceResult
 import com.adyen.checkout.flutter.dropIn.DropInPlatformApi
+import com.adyen.checkout.flutter.dropIn.model.DropInServiceEvent
 import com.adyen.checkout.flutter.dropIn.model.DropInStoredPaymentMethodDeletionModel
 import com.adyen.checkout.flutter.dropIn.model.DropInType
 import com.adyen.checkout.flutter.generated.BinLookupDataDTO
@@ -40,6 +41,10 @@ import org.json.JSONObject
 
 class AdvancedDropInService : DropInService(), LifecycleOwner {
     private val dispatcher = ServiceLifecycleDispatcher(this)
+
+    init {
+        listenToFlutterEvents()
+    }
 
     override fun onSubmit(state: PaymentComponentState<*>) = onPaymentComponentState(state)
 
@@ -135,6 +140,20 @@ class AdvancedDropInService : DropInService(), LifecycleOwner {
                 )
             DropInPlatformApi.dropInMessageFlow.emit(checkoutEvent)
         }
+    }
+
+    private fun listenToFlutterEvents() {
+        lifecycleScope.launch {
+            DropInPlatformApi.dropInServiceFlow.collect { event ->
+                when (event) {
+                    DropInServiceEvent.STOP -> cancelDropIn()
+                }
+            }
+        }
+    }
+
+    private fun cancelDropIn() {
+        sendResult(DropInServiceResult.Finished(result = "Cancelled"))
     }
 
     private fun onPaymentComponentState(state: PaymentComponentState<*>) {

@@ -183,6 +183,8 @@ class DropIn {
     });
   }
 
+  Future<void> stopDropIn() async => await dropInPlatformApi.stopDropIn();
+
   Future<void> _cleanUpDropIn() async {
     dropInPlatformApi.cleanUpDropIn();
     await dropInFlutter.platformEventStream?.close();
