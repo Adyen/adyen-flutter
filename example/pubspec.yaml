@@ -17,7 +17,7 @@ dependencies:
   flutter_localizations:
     sdk: flutter
   intl: any
-  flutter_svg: ^2.0.17
+  flutter_svg: ^2.0.10
 
 dev_dependencies:
   integration_test:
