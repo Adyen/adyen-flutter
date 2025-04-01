@@ -9,6 +9,7 @@ class CardState {
   final CardNumberValidationResult? cardNumberValidationResult;
   final CardExpiryDateValidationResult? cardExpiryDateValidationResult;
   final CardSecurityCodeValidationResult? cardSecurityCodeValidationResult;
+  final List<String>? relatedCardBrands;
 
   CardState({
     this.cardNumber,
@@ -19,6 +20,7 @@ class CardState {
     this.cardNumberValidationResult,
     this.cardExpiryDateValidationResult,
     this.cardSecurityCodeValidationResult,
+    this.relatedCardBrands,
   });
 
   CardState copyWith({
@@ -30,6 +32,7 @@ class CardState {
     CardNumberValidationResult? cardNumberValidationResult,
     CardExpiryDateValidationResult? cardExpiryDateValidationResult,
     CardSecurityCodeValidationResult? cardSecurityCodeValidationResult,
+    List<String>? relatedCardBrands,
   }) {
     return CardState(
       cardNumber: cardNumber ?? this.cardNumber,
@@ -43,6 +46,7 @@ class CardState {
           cardExpiryDateValidationResult ?? this.cardExpiryDateValidationResult,
       cardSecurityCodeValidationResult: cardSecurityCodeValidationResult ??
           this.cardSecurityCodeValidationResult,
+      relatedCardBrands: relatedCardBrands ?? this.relatedCardBrands,
     );
   }
 }

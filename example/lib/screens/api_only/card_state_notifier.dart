@@ -160,6 +160,8 @@ class CardStateNotifier extends ValueNotifier<CardState> {
     if (encryptedCardNumber != null) {
       final cardDataResponse =
           await repository.cardDetails(encryptedCardNumber);
+      final relatedCardBrands = _mapToRelatedCardBrands(cardDataResponse);
+      value = value.copyWith(relatedCardBrands: relatedCardBrands);
     }
   }
 
@@ -187,4 +189,16 @@ class CardStateNotifier extends ValueNotifier<CardState> {
             paymentsResponse["resultCode"].toLowerCase(),
         orElse: () => ResultCode.unknown,
       );
+
+  List<String>? _mapToRelatedCardBrands(Map<String, dynamic> jsonResponse) {
+    final List<dynamic>? brands = jsonResponse['brands'];
+    if (brands == null || brands.isEmpty) {
+      return [];
+    }
+
+    return brands
+         .where((brand) => brand['supported'] == true)
+        .map<String>((brand) => brand['type'].toString())
+        .toList();
+  }
 }

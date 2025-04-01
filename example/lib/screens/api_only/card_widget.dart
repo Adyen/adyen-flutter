@@ -1,4 +1,5 @@
 import 'package:adyen_checkout/adyen_checkout.dart';
+import 'package:adyen_checkout_example/screens/api_only/card_state.dart';
 import 'package:adyen_checkout_example/screens/api_only/card_state_notifier.dart';
 import 'package:adyen_checkout_example/screens/api_only/input_formatters/month_year_input_formatter.dart';
 import 'package:flutter/material.dart';
@@ -38,7 +39,7 @@ class _CardWidgetState extends State<CardWidget> {
 
   @override
   Widget build(BuildContext context) {
-    final cardModel = widget.cardModelNotifier.value;
+    final cardState = widget.cardModelNotifier.value;
 
     return Container(
       decoration: BoxDecoration(
@@ -59,7 +60,8 @@ class _CardWidgetState extends State<CardWidget> {
             const SizedBox(height: 4),
             TextFormField(
               controller: _cardNumberController,
-              decoration: createInputDecoration("assets/nocard.svg"),
+              decoration: createInputDecoration(
+                  _buildRelatedCardBrandsIcons(cardState)),
               keyboardType: TextInputType.number,
               inputFormatters: [
                 FilteringTextInputFormatter.digitsOnly,
@@ -70,7 +72,7 @@ class _CardWidgetState extends State<CardWidget> {
                 widget.cardModelNotifier.updateCardNumber(value);
               },
               validator: (value) {
-                if (cardModel.cardNumberValidationResult
+                if (cardState.cardNumberValidationResult
                     is InvalidCardNumber?) {
                   return 'Enter a valid card number';
                 }
@@ -94,8 +96,9 @@ class _CardWidgetState extends State<CardWidget> {
                       _inputFieldTitle("Expiry date"),
                       TextFormField(
                         controller: _expiryDateController,
-                        decoration: createInputDecoration(
-                            "assets/expiry_date_hint.svg"),
+                        decoration: createInputDecoration(_buildIcon(
+                          "assets/expiry_date_hint.svg",
+                        )),
                         keyboardType: TextInputType.number,
                         inputFormatters: [
                           FilteringTextInputFormatter.digitsOnly,
@@ -106,7 +109,7 @@ class _CardWidgetState extends State<CardWidget> {
                           widget.cardModelNotifier.updateExpiryDate(value);
                         },
                         validator: (value) {
-                          if (cardModel.cardExpiryDateValidationResult
+                          if (cardState.cardExpiryDateValidationResult
                               is InvalidCardExpiryDate?) {
                             return 'Invalid expiry date';
                           }
@@ -126,8 +129,9 @@ class _CardWidgetState extends State<CardWidget> {
                       _inputFieldTitle("Security code"),
                       TextFormField(
                         controller: _securityCodeController,
-                        decoration:
-                            createInputDecoration("assets/cvc_hint.svg"),
+                        decoration: createInputDecoration(
+                          _buildIcon("assets/cvc_hint.svg"),
+                        ),
                         keyboardType: TextInputType.number,
                         inputFormatters: [
                           FilteringTextInputFormatter.digitsOnly,
@@ -137,7 +141,7 @@ class _CardWidgetState extends State<CardWidget> {
                           widget.cardModelNotifier.updateSecurityCode(value);
                         },
                         validator: (value) {
-                          if (cardModel.cardSecurityCodeValidationResult
+                          if (cardState.cardSecurityCodeValidationResult
                               is InvalidCardSecurityCode?) {
                             return 'Invalid security code';
                           }
@@ -167,10 +171,10 @@ class _CardWidgetState extends State<CardWidget> {
                     fontWeight: FontWeight.w600, // Semi-bold font weight
                   ),
                 ),
-                onPressed: cardModel.loading == true
+                onPressed: cardState.loading == true
                     ? null
                     : () => _makePayment(context),
-                child: cardModel.loading == true
+                child: cardState.loading == true
                     ? const CircularProgressIndicator(
                         color: Colors.white,
                       )
@@ -239,22 +243,22 @@ class _CardWidgetState extends State<CardWidget> {
       spacing: 4,
       children: [
         SvgPicture.asset(
-          "assets/visa.svg",
+          "assets/card_brands/visa.svg",
           fit: BoxFit.scaleDown,
           height: 16,
         ),
         SvgPicture.asset(
-          "assets/mc.svg",
+          "assets/card_brands/mc.svg",
           fit: BoxFit.scaleDown,
           height: 16,
         ),
         SvgPicture.asset(
-          "assets/amex.svg",
+          "assets/card_brands/amex.svg",
           fit: BoxFit.scaleDown,
           height: 16,
         ),
         SvgPicture.asset(
-          "assets/cup.svg",
+          "assets/card_brands/cup.svg",
           fit: BoxFit.scaleDown,
           height: 16,
         ),
@@ -262,7 +266,7 @@ class _CardWidgetState extends State<CardWidget> {
     );
   }
 
-  InputDecoration createInputDecoration(String? iconAssetPath) {
+  InputDecoration createInputDecoration(Widget suffixIcon) {
     return InputDecoration(
       contentPadding: const EdgeInsets.symmetric(
         vertical: 8.0,
@@ -286,12 +290,33 @@ class _CardWidgetState extends State<CardWidget> {
         borderSide: const BorderSide(color: Colors.red, width: 1),
         borderRadius: borderRadius,
       ),
-      suffixIcon: iconAssetPath == null
-          ? null
-          : SvgPicture.asset(
-              iconAssetPath,
+      suffixIcon: suffixIcon,
+    );
+  }
+
+  Widget _buildRelatedCardBrandsIcons(CardState cardState) {
+    List<Widget>? relatedCardBrandIcons = cardState.relatedCardBrands
+        ?.map((cardBrand) => SvgPicture.asset(
+              "assets/card_brands/$cardBrand.svg",
               fit: BoxFit.scaleDown,
-            ),
+            ))
+        .toList();
+
+    if (relatedCardBrandIcons == null ||
+        relatedCardBrandIcons.isEmpty == true) {
+      relatedCardBrandIcons = [_buildIcon("assets/default_card.svg")];
+    }
+
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: relatedCardBrandIcons,
+    );
+  }
+
+  Widget _buildIcon(String iconAssetPath) {
+    return SvgPicture.asset(
+      iconAssetPath,
+      fit: BoxFit.scaleDown,
     );
   }
 
