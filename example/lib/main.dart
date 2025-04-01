@@ -156,8 +156,7 @@ class MyApp extends StatelessWidget {
                     context, "/multiComponentNavigationScreen"),
                 child: const Text("Multi component")),
             TextButton(
-                onPressed: () =>
-                    Navigator.pushNamed(context, "/customCard"),
+                onPressed: () => Navigator.pushNamed(context, "/customCard"),
                 child: const Text("Custom card with API")),
           ],
         ),

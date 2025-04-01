@@ -197,7 +197,7 @@ class CardStateNotifier extends ValueNotifier<CardState> {
     }
 
     return brands
-         .where((brand) => brand['supported'] == true)
+        .where((brand) => brand['supported'] == true)
         .map<String>((brand) => brand['type'].toString())
         .toList();
   }
