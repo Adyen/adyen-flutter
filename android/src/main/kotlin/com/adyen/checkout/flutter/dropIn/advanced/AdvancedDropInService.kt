@@ -35,6 +35,7 @@ import com.adyen.checkout.flutter.generated.PaymentEventType
 import com.adyen.checkout.flutter.generated.CheckoutEvent
 import com.adyen.checkout.flutter.generated.CheckoutEventType
 import com.adyen.checkout.flutter.utils.Constants
+import com.adyen.checkout.flutter.utils.Constants.Companion.RESULT_CODE_CANCELLED
 import com.adyen.checkout.googlepay.GooglePayComponentState
 import kotlinx.coroutines.launch
 import org.json.JSONObject
@@ -153,7 +154,7 @@ class AdvancedDropInService : DropInService(), LifecycleOwner {
     }
 
     private fun cancelDropIn() {
-        sendResult(DropInServiceResult.Finished(result = "Cancelled"))
+        sendResult(DropInServiceResult.Finished(result = RESULT_CODE_CANCELLED))
     }
 
     private fun onPaymentComponentState(state: PaymentComponentState<*>) {

@@ -22,6 +22,7 @@ import com.adyen.checkout.flutter.generated.BinLookupDataDTO
 import com.adyen.checkout.flutter.generated.DeletedStoredPaymentMethodResultDTO
 import com.adyen.checkout.flutter.generated.CheckoutEvent
 import com.adyen.checkout.flutter.generated.CheckoutEventType
+import com.adyen.checkout.flutter.utils.Constants.Companion.RESULT_CODE_CANCELLED
 import kotlinx.coroutines.launch
 
 class SessionDropInService : SessionDropInService(), LifecycleOwner {
@@ -97,7 +98,7 @@ class SessionDropInService : SessionDropInService(), LifecycleOwner {
     }
 
     private fun cancelDropIn() {
-        sendResult(DropInServiceResult.Finished(result = "Cancelled"))
+        sendResult(DropInServiceResult.Finished(result = RESULT_CODE_CANCELLED))
     }
 
     override fun onBind(intent: Intent?): IBinder {
