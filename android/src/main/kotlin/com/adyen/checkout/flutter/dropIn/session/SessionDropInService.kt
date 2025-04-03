@@ -19,9 +19,9 @@ import com.adyen.checkout.flutter.dropIn.model.DropInServiceEvent
 import com.adyen.checkout.flutter.dropIn.model.DropInStoredPaymentMethodDeletionModel
 import com.adyen.checkout.flutter.dropIn.model.DropInType
 import com.adyen.checkout.flutter.generated.BinLookupDataDTO
-import com.adyen.checkout.flutter.generated.DeletedStoredPaymentMethodResultDTO
 import com.adyen.checkout.flutter.generated.CheckoutEvent
 import com.adyen.checkout.flutter.generated.CheckoutEventType
+import com.adyen.checkout.flutter.generated.DeletedStoredPaymentMethodResultDTO
 import com.adyen.checkout.flutter.utils.Constants.Companion.RESULT_CODE_CANCELLED
 import kotlinx.coroutines.launch
 
@@ -91,13 +91,13 @@ class SessionDropInService : SessionDropInService(), LifecycleOwner {
         lifecycleScope.launch {
             DropInPlatformApi.dropInServiceFlow.collect { event ->
                 when (event) {
-                    DropInServiceEvent.STOP -> cancelDropIn()
+                    DropInServiceEvent.STOP -> stopDropIn()
                 }
             }
         }
     }
 
-    private fun cancelDropIn() {
+    private fun stopDropIn() {
         sendResult(DropInServiceResult.Finished(result = RESULT_CODE_CANCELLED))
     }
 

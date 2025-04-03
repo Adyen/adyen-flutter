@@ -27,13 +27,13 @@ import com.adyen.checkout.flutter.dropIn.model.DropInServiceEvent
 import com.adyen.checkout.flutter.dropIn.model.DropInStoredPaymentMethodDeletionModel
 import com.adyen.checkout.flutter.dropIn.model.DropInType
 import com.adyen.checkout.flutter.generated.BinLookupDataDTO
+import com.adyen.checkout.flutter.generated.CheckoutEvent
+import com.adyen.checkout.flutter.generated.CheckoutEventType
 import com.adyen.checkout.flutter.generated.DeletedStoredPaymentMethodResultDTO
 import com.adyen.checkout.flutter.generated.ErrorDTO
 import com.adyen.checkout.flutter.generated.OrderCancelResultDTO
 import com.adyen.checkout.flutter.generated.PaymentEventDTO
 import com.adyen.checkout.flutter.generated.PaymentEventType
-import com.adyen.checkout.flutter.generated.CheckoutEvent
-import com.adyen.checkout.flutter.generated.CheckoutEventType
 import com.adyen.checkout.flutter.utils.Constants
 import com.adyen.checkout.flutter.utils.Constants.Companion.RESULT_CODE_CANCELLED
 import com.adyen.checkout.googlepay.GooglePayComponentState
@@ -147,13 +147,13 @@ class AdvancedDropInService : DropInService(), LifecycleOwner {
         lifecycleScope.launch {
             DropInPlatformApi.dropInServiceFlow.collect { event ->
                 when (event) {
-                    DropInServiceEvent.STOP -> cancelDropIn()
+                    DropInServiceEvent.STOP -> stopDropIn()
                 }
             }
         }
     }
 
-    private fun cancelDropIn() {
+    private fun stopDropIn() {
         sendResult(DropInServiceResult.Finished(result = RESULT_CODE_CANCELLED))
     }
 
