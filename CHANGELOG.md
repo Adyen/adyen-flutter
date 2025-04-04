@@ -2,6 +2,7 @@
 
 ### New
 
+- Added method to stop Drop-In programmatically.
 - Added bin lookup callbacks for Card Component and Drop-In. 
 - Set minimum SDK version to Flutter 3.16/Dart 3.2
 - Android Components/Drop-in

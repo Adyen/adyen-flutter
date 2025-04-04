@@ -124,6 +124,18 @@ class DropInPlatformApi: DropInPlatformInterface {
             )
         }
     }
+    
+    func stopDropIn() throws {
+        let checkoutEvent = CheckoutEvent(
+            type: CheckoutEventType.result,
+            data: PaymentResultDTO(
+                type: PaymentResultEnum.finished,
+                result: PaymentResultModelDTO(resultCode: Constants.resultCodeCancelled)
+            )
+        )
+        checkoutFlutter.send(event: checkoutEvent, completion: { _ in })
+        finalizeAndDismiss(success: false, completion: {})
+    }
 
     func onPaymentsResult(paymentsResult: PaymentEventDTO) {
         handlePaymentEvent(paymentEventDTO: paymentsResult)

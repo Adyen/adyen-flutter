@@ -1858,6 +1858,7 @@ interface CheckoutPlatformInterface {
 interface DropInPlatformInterface {
   fun showDropInSession(dropInConfigurationDTO: DropInConfigurationDTO)
   fun showDropInAdvanced(dropInConfigurationDTO: DropInConfigurationDTO, paymentMethodsResponse: String)
+  fun stopDropIn()
   fun onPaymentsResult(paymentsResult: PaymentEventDTO)
   fun onPaymentsDetailsResult(paymentsDetailsResult: PaymentEventDTO)
   fun onDeleteStoredPaymentMethodResult(deleteStoredPaymentMethodResultDTO: DeletedStoredPaymentMethodResultDTO)
@@ -1902,6 +1903,22 @@ interface DropInPlatformInterface {
             val paymentMethodsResponseArg = args[1] as String
             val wrapped: List<Any?> = try {
               api.showDropInAdvanced(dropInConfigurationDTOArg, paymentMethodsResponseArg)
+              listOf(null)
+            } catch (exception: Throwable) {
+              wrapError(exception)
+            }
+            reply.reply(wrapped)
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.adyen_checkout.DropInPlatformInterface.stopDropIn$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { _, reply ->
+            val wrapped: List<Any?> = try {
+              api.stopDropIn()
               listOf(null)
             } catch (exception: Throwable) {
               wrapError(exception)

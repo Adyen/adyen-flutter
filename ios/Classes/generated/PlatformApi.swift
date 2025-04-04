@@ -1813,6 +1813,7 @@ class CheckoutPlatformInterfaceSetup {
 protocol DropInPlatformInterface {
     func showDropInSession(dropInConfigurationDTO: DropInConfigurationDTO) throws
     func showDropInAdvanced(dropInConfigurationDTO: DropInConfigurationDTO, paymentMethodsResponse: String) throws
+    func stopDropIn() throws
     func onPaymentsResult(paymentsResult: PaymentEventDTO) throws
     func onPaymentsDetailsResult(paymentsDetailsResult: PaymentEventDTO) throws
     func onDeleteStoredPaymentMethodResult(deleteStoredPaymentMethodResultDTO: DeletedStoredPaymentMethodResultDTO) throws
@@ -1858,6 +1859,19 @@ class DropInPlatformInterfaceSetup {
             }
         } else {
             showDropInAdvancedChannel.setMessageHandler(nil)
+        }
+        let stopDropInChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.DropInPlatformInterface.stopDropIn\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+        if let api {
+            stopDropInChannel.setMessageHandler { _, reply in
+                do {
+                    try api.stopDropIn()
+                    reply(wrapResult(nil))
+                } catch {
+                    reply(wrapError(error))
+                }
+            }
+        } else {
+            stopDropInChannel.setMessageHandler(nil)
         }
         let onPaymentsResultChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.DropInPlatformInterface.onPaymentsResult\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
         if let api {

@@ -20,5 +20,6 @@ class Constants {
         const val SHOULD_UPDATE_PAYMENT_METHODS_KEY = "shouldUpdatePaymentMethods"
         const val UPDATED_PAYMENT_METHODS_KEY = "updatedPaymentMethods"
         const val RESULT_CODE_KEY = "resultCode"
+        const val RESULT_CODE_CANCELLED = "cancelled"
     }
 }

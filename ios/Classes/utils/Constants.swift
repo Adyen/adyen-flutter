@@ -4,4 +4,5 @@ enum Constants {
     static let updatedPaymentMethodsKey = "updatedPaymentMethods"
     static let shouldUpdatePaymentMethodsKey = "shouldUpdatePaymentMethods"
     static let brandKey = "brand"
+    static let resultCodeCancelled = "cancelled"
 }
