@@ -96,6 +96,16 @@ class Service {
     return jsonDecode(response.body);
   }
 
+  Future<Map<String, dynamic>> postCardDetails(
+      Map<String, dynamic> body) async {
+    final response = await http.post(
+      Uri.https(Config.baseUrl, "/${Config.apiVersion}/cardDetails"),
+      headers: _createHeaders(),
+      body: jsonEncode(body),
+    );
+    return jsonDecode(response.body);
+  }
+
   Map<String, String> _createHeaders() => {
         "content-type": "application/json",
         "x-API-key": Config.xApiKey,
