@@ -92,13 +92,15 @@ class CardSessionComponentScreen extends StatelessWidget {
     return paymentMethod;
   }
 
-  void _onBinLookup(List<BinLookupData> binLookupData) {
-    for (var element in binLookupData) {
-      debugPrint("Bin lookup data: brand:${element.brand}");
-    }
+  void _onBinLookup(List<BinLookupData> binLookupDataList) {
+    // Bin lookup data based on bin value input. Supports co-branded cards.
+    // for (final binLookupData in binLookupDataList) {
+    //   debugPrint("Bin lookup data: brand:${binLookupData.brand}");
+    // }
   }
 
   void _onBinValue(String binValue) {
-    debugPrint("Bin value: $binValue");
+    // Bin value entered by the shopper.
+    // debugPrint("Bin value: $binValue");
   }
 }
