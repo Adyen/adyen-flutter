@@ -9,9 +9,9 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'input_formatters/card_number_input_formatter.dart';
 
 class CardWidget extends StatefulWidget {
-  const CardWidget({super.key, required this.cardModelNotifier});
+  const CardWidget({super.key, required this.cardStateNotifier});
 
-  final CardStateNotifier cardModelNotifier;
+  final CardStateNotifier cardStateNotifier;
 
   @override
   State<CardWidget> createState() => _CardWidgetState();
@@ -32,24 +32,24 @@ class _CardWidgetState extends State<CardWidget> {
     _securityCodeController.dispose();
     _expiryDateController.dispose();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      widget.cardModelNotifier.reset();
+      widget.cardStateNotifier.reset();
     });
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final cardState = widget.cardModelNotifier.value;
+    final cardState = widget.cardStateNotifier.value;
 
     return Container(
       decoration: BoxDecoration(
         color: lightGrey,
         border: Border.all(color: darkerGrey),
-        borderRadius: borderRadius,
+        borderRadius: BorderRadius.circular(24),
       ),
       padding: const EdgeInsets.all(16.0),
       child: Form(
-        key: widget.cardModelNotifier.formKey,
+        key: widget.cardStateNotifier.formKey,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -68,16 +68,12 @@ class _CardWidgetState extends State<CardWidget> {
                 LengthLimitingTextInputFormatter(19),
                 CardNumberInputFormatter(),
               ],
-              onChanged: (value) {
-                widget.cardModelNotifier.updateCardNumber(value);
-              },
-              validator: (value) {
-                if (cardState.cardNumberValidationResult
-                    is InvalidCardNumber?) {
-                  return 'Enter a valid card number';
-                }
-                return null;
-              },
+              onChanged: (value) =>
+                  widget.cardStateNotifier.updateCardNumber(value),
+              validator: (value) =>
+                  cardState.cardNumberValidationResult is InvalidCardNumber?
+                      ? 'Enter a valid card number'
+                      : null,
             ),
             const SizedBox(height: 8),
             _buildBrandLogoRow(),
@@ -96,25 +92,21 @@ class _CardWidgetState extends State<CardWidget> {
                       _inputFieldTitle("Expiry date"),
                       TextFormField(
                         controller: _expiryDateController,
-                        decoration: createInputDecoration(_buildIcon(
-                          "assets/expiry_date_hint.svg",
-                        )),
+                        decoration: createInputDecoration(
+                            _buildIcon("assets/expiry_date_hint.svg")),
                         keyboardType: TextInputType.number,
                         inputFormatters: [
                           FilteringTextInputFormatter.digitsOnly,
                           LengthLimitingTextInputFormatter(4),
                           MonthYearInputFormatter(),
                         ],
-                        onChanged: (value) {
-                          widget.cardModelNotifier.updateExpiryDate(value);
-                        },
-                        validator: (value) {
-                          if (cardState.cardExpiryDateValidationResult
-                              is InvalidCardExpiryDate?) {
-                            return 'Invalid expiry date';
-                          }
-                          return null;
-                        },
+                        onChanged: (value) =>
+                            widget.cardStateNotifier.updateExpiryDate(value),
+                        validator: (value) =>
+                            cardState.cardExpiryDateValidationResult
+                                    is InvalidCardExpiryDate?
+                                ? 'Invalid expiry date'
+                                : null,
                       ),
                       _inputFieldSubText("Front of card in MM/YY format"),
                     ],
@@ -137,16 +129,13 @@ class _CardWidgetState extends State<CardWidget> {
                           FilteringTextInputFormatter.digitsOnly,
                           LengthLimitingTextInputFormatter(4),
                         ],
-                        onChanged: (value) {
-                          widget.cardModelNotifier.updateSecurityCode(value);
-                        },
-                        validator: (value) {
-                          if (cardState.cardSecurityCodeValidationResult
-                              is InvalidCardSecurityCode?) {
-                            return 'Invalid security code';
-                          }
-                          return null;
-                        },
+                        onChanged: (value) =>
+                            widget.cardStateNotifier.updateSecurityCode(value),
+                        validator: (value) =>
+                            cardState.cardSecurityCodeValidationResult
+                                    is InvalidCardSecurityCode?
+                                ? 'Invalid security code'
+                                : null,
                       ),
                       _inputFieldSubText("3 digits on back of card"),
                     ],
@@ -164,7 +153,7 @@ class _CardWidgetState extends State<CardWidget> {
                   minimumSize: const Size(double.infinity, 56),
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8), // Rounded corners
+                    borderRadius: borderRadius, // Rounded corners
                   ),
                   textStyle: const TextStyle(
                     fontSize: 18, // Adjust as needed
@@ -188,7 +177,7 @@ class _CardWidgetState extends State<CardWidget> {
   }
 
   Future<void> _makePayment(BuildContext context) async {
-    final paymentResultCode = await widget.cardModelNotifier.pay();
+    final paymentResultCode = await widget.cardStateNotifier.pay();
     if (paymentResultCode != null) {
       showPaymentResultCodeDialog(paymentResultCode);
     }
@@ -238,33 +227,31 @@ class _CardWidgetState extends State<CardWidget> {
         ),
       );
 
-  Row _buildBrandLogoRow() {
-    return Row(
-      spacing: 4,
-      children: [
-        SvgPicture.asset(
-          "assets/card_brands/visa.svg",
-          fit: BoxFit.scaleDown,
-          height: 16,
-        ),
-        SvgPicture.asset(
-          "assets/card_brands/mc.svg",
-          fit: BoxFit.scaleDown,
-          height: 16,
-        ),
-        SvgPicture.asset(
-          "assets/card_brands/amex.svg",
-          fit: BoxFit.scaleDown,
-          height: 16,
-        ),
-        SvgPicture.asset(
-          "assets/card_brands/cup.svg",
-          fit: BoxFit.scaleDown,
-          height: 16,
-        ),
-      ],
-    );
-  }
+  Row _buildBrandLogoRow() => Row(
+        spacing: 4,
+        children: [
+          SvgPicture.asset(
+            "assets/card_brands/visa.svg",
+            fit: BoxFit.scaleDown,
+            height: 16,
+          ),
+          SvgPicture.asset(
+            "assets/card_brands/mc.svg",
+            fit: BoxFit.scaleDown,
+            height: 16,
+          ),
+          SvgPicture.asset(
+            "assets/card_brands/amex.svg",
+            fit: BoxFit.scaleDown,
+            height: 16,
+          ),
+          SvgPicture.asset(
+            "assets/card_brands/cup.svg",
+            fit: BoxFit.scaleDown,
+            height: 16,
+          ),
+        ],
+      );
 
   InputDecoration createInputDecoration(Widget suffixIcon) {
     return InputDecoration(
@@ -313,16 +300,12 @@ class _CardWidgetState extends State<CardWidget> {
     );
   }
 
-  Widget _buildIcon(String iconAssetPath) {
-    return SvgPicture.asset(
-      iconAssetPath,
-      fit: BoxFit.scaleDown,
-    );
-  }
+  Widget _buildIcon(String iconAssetPath) => SvgPicture.asset(
+        iconAssetPath,
+        fit: BoxFit.scaleDown,
+      );
 
-  void showPaymentResultCodeDialog(
-    ResultCode resultCode,
-  ) {
+  void showPaymentResultCodeDialog(ResultCode resultCode) {
     showDialog(
       context: context,
       builder: (BuildContext context) {

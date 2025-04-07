@@ -10,13 +10,13 @@ class CustomCardScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(title: const Text('Adyen custom card')),
+      appBar: AppBar(title: const Text('Adyen custom card ui')),
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
             padding: const EdgeInsets.all(16.0),
             child: CardWidget(
-                cardModelNotifier: Provider.of<CardStateNotifier>(context)),
+                cardStateNotifier: Provider.of<CardStateNotifier>(context)),
           ),
         ),
       ),
