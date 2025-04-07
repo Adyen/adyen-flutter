@@ -284,6 +284,7 @@ class _CardWidgetState extends State<CardWidget> {
   Widget _buildRelatedCardBrandsIcons(CardState cardState) {
     List<Widget>? relatedCardBrandIcons = cardState.relatedCardBrands
         ?.map((cardBrand) => SvgPicture.asset(
+              width: 30,
               "assets/card_brands/$cardBrand.svg",
               fit: BoxFit.scaleDown,
             ))
@@ -296,6 +297,7 @@ class _CardWidgetState extends State<CardWidget> {
 
     return Row(
       mainAxisSize: MainAxisSize.min,
+      mainAxisAlignment: MainAxisAlignment.center,
       children: relatedCardBrandIcons,
     );
   }
