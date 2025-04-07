@@ -338,6 +338,7 @@ class _CardWidgetState extends State<CardWidget> {
               onPressed: () {
                 //Close dialog
                 Navigator.of(context).pop();
+                FocusManager.instance.primaryFocus?.unfocus();
                 //Close page
                 Navigator.of(context).pop();
               },

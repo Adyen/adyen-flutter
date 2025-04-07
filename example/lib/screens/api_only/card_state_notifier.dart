@@ -182,13 +182,13 @@ class CardStateNotifier extends ValueNotifier<CardState> {
     return actionResult;
   }
 
-  ResultCode _mapToResultCode(Map<String, dynamic> paymentsResponse) =>
-      ResultCode.values.firstWhere(
-        (element) =>
-            element.name.toLowerCase() ==
-            paymentsResponse["resultCode"].toLowerCase(),
-        orElse: () => ResultCode.unknown,
-      );
+  ResultCode _mapToResultCode(Map<String, dynamic> paymentsResponse) {
+    final String? resultCode = paymentsResponse["resultCode"];
+    return ResultCode.values.firstWhere(
+      (element) => element.name.toLowerCase() == resultCode?.toLowerCase(),
+      orElse: () => ResultCode.unknown,
+    );
+  }
 
   List<String>? _mapToRelatedCardBrands(Map<String, dynamic> jsonResponse) {
     final List<dynamic>? brands = jsonResponse['brands'];
