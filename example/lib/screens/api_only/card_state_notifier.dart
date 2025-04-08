@@ -43,7 +43,10 @@ class CardStateNotifier extends ValueNotifier<CardState> {
 
   Future<void> updateSecurityCode(String securityCode) async {
     final CardSecurityCodeValidationResult cardSecurityCodeValidationResult =
-        await _validateSecurityCode(securityCode, "mc");
+        await _validateSecurityCode(
+      securityCode,
+      value.relatedCardBrands?.first ?? "",
+    );
     value = value.copyWith(
       securityCode: securityCode,
       cardSecurityCodeValidationResult: cardSecurityCodeValidationResult,
