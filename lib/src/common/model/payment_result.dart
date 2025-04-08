@@ -7,6 +7,11 @@ class PaymentAdvancedFinished extends PaymentResult {
   final ResultCode resultCode;
 
   PaymentAdvancedFinished({required this.resultCode});
+
+  @override
+  String toString() {
+    return 'PaymentAdvancedFinished(resultCode: $resultCode)';
+  }
 }
 
 class PaymentSessionFinished extends PaymentResult {
@@ -23,6 +28,17 @@ class PaymentSessionFinished extends PaymentResult {
     required this.resultCode,
     this.order,
   });
+
+  @override
+  String toString() {
+    return 'PaymentSessionFinished('
+        'sessionId: $sessionId, '
+        'sessionData: $sessionData, '
+        'sessionResult: $sessionResult, '
+        'resultCode: $resultCode, '
+        'order: $order'
+        ')';
+  }
 }
 
 class PaymentCancelledByUser extends PaymentResult {}
@@ -31,4 +47,9 @@ class PaymentError extends PaymentResult {
   final String? reason;
 
   PaymentError({required this.reason});
+
+  @override
+  String toString() {
+    return 'PaymentError(reason: $reason)';
+  }
 }

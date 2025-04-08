@@ -17,4 +17,13 @@ class PartialPayment {
     required this.onRequestOrder,
     required this.onCancelOrder,
   });
+
+  @override
+  String toString() {
+    return 'PartialPayment('
+        'onCheckBalance: $onCheckBalance, '
+        'onRequestOrder: $onRequestOrder, '
+        'onCancelOrder: $onCancelOrder'
+        ')';
+  }
 }

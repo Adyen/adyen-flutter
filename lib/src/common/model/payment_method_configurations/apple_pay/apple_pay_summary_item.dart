@@ -10,4 +10,13 @@ class ApplePaySummaryItem {
     required this.amount,
     required this.type,
   });
+
+  @override
+  String toString() {
+    return 'ApplePaySummaryItem('
+        'label: $label, '
+        'amount: $amount, '
+        'type: $type'
+        ')';
+  }
 }

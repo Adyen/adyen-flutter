@@ -32,5 +32,19 @@ final class DropInConfiguration extends BaseConfiguration {
     AnalyticsOptions? analyticsOptions,
     this.paymentMethodNames,
   }) : skipListWhenSinglePaymentMethod =
-            skipListWhenSinglePaymentMethod ?? false;
+      skipListWhenSinglePaymentMethod ?? false;
+
+  @override
+  String toString() {
+    return 'DropInConfiguration('
+        'cardConfiguration: $cardConfiguration, '
+        'applePayConfiguration: $applePayConfiguration, '
+        'googlePayConfiguration: $googlePayConfiguration, '
+        'cashAppPayConfiguration: $cashAppPayConfiguration, '
+        'storedPaymentMethodConfiguration: $storedPaymentMethodConfiguration, '
+        'skipListWhenSinglePaymentMethod: $skipListWhenSinglePaymentMethod, '
+        'preselectedPaymentMethodTitle: $preselectedPaymentMethodTitle, '
+        'paymentMethodNames: $paymentMethodNames'
+        ')';
+  }
 }

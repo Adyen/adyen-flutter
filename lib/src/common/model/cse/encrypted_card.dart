@@ -10,4 +10,14 @@ class EncryptedCard {
     this.encryptedExpiryYear,
     this.encryptedSecurityCode,
   });
+
+  @override
+  String toString() {
+    return 'EncryptedCard('
+        'encryptedCardNumber: $encryptedCardNumber, '
+        'encryptedExpiryMonth: $encryptedExpiryMonth, '
+        'encryptedExpiryYear: $encryptedExpiryYear, '
+        'encryptedSecurityCode: $encryptedSecurityCode'
+        ')';
+  }
 }

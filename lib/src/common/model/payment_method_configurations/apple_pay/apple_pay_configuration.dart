@@ -36,4 +36,24 @@ class ApplePayConfiguration {
     this.supportedCountries,
     this.merchantCapability,
   });
+
+  @override
+  String toString() {
+    return 'ApplePayConfiguration('
+        'merchantId: $merchantId, '
+        'merchantName: $merchantName, '
+        'allowOnboarding: $allowOnboarding, '
+        'applePaySummaryItems: $applePaySummaryItems, '
+        'requiredBillingContactFields: $requiredBillingContactFields, '
+        'billingContact: $billingContact, '
+        'requiredShippingContactFields: $requiredShippingContactFields, '
+        'shippingContact: $shippingContact, '
+        'applePayShippingType: $applePayShippingType, '
+        'allowShippingContactEditing: $allowShippingContactEditing, '
+        'shippingMethods: $shippingMethods, '
+        'applicationData: $applicationData, '
+        'supportedCountries: $supportedCountries, '
+        'merchantCapability: $merchantCapability'
+        ')';
+  }
 }

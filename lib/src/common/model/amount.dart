@@ -13,4 +13,9 @@ class Amount {
       value: json['value'],
     );
   }
+
+  @override
+  String toString() {
+    return 'Amount(value: $value, currency: $currency)';
+  }
 }

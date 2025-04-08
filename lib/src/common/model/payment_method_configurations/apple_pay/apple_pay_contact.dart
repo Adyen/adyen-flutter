@@ -30,4 +30,24 @@ class ApplePayContact {
     this.country,
     this.countryCode,
   });
+
+  @override
+  String toString() {
+    return 'ApplePayContact('
+        'phoneNumber: $phoneNumber, '
+        'emailAddress: $emailAddress, '
+        'givenName: $givenName, '
+        'familyName: $familyName, '
+        'phoneticGivenName: $phoneticGivenName, '
+        'phoneticFamilyName: $phoneticFamilyName, '
+        'addressLines: $addressLines, '
+        'subLocality: $subLocality, '
+        'city: $city, '
+        'postalCode: $postalCode, '
+        'subAdministrativeArea: $subAdministrativeArea, '
+        'administrativeArea: $administrativeArea, '
+        'country: $country, '
+        'countryCode: $countryCode'
+        ')';
+  }
 }

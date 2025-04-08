@@ -23,4 +23,14 @@ class OrderResponse {
           : null,
     );
   }
+
+  @override
+  String toString() {
+    return 'OrderResponse('
+        'pspReference: $pspReference, '
+        'orderData: $orderData, '
+        'amount: $amount, '
+        'remainingAmount: $remainingAmount'
+        ')';
+  }
 }

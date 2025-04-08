@@ -10,4 +10,14 @@ class UnencryptedCard {
     this.expiryYear,
     this.cvc,
   });
+
+  @override
+  String toString() {
+    return 'UnencryptedCard('
+        'cardNumber: $cardNumber, '
+        'expiryMonth: $expiryMonth, '
+        'expiryYear: $expiryYear, '
+        'cvc: $cvc'
+        ')';
+  }
 }

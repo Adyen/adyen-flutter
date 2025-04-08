@@ -18,4 +18,16 @@ base class BaseConfiguration {
     this.shopperLocale,
     AnalyticsOptions? analyticsOptions,
   }) : analyticsOptions = analyticsOptions ?? AnalyticsOptions(enabled: true);
+
+  @override
+  String toString() {
+    return 'BaseConfiguration('
+        'environment: $environment, '
+        'clientKey: $clientKey, '
+        'countryCode: $countryCode, '
+        'amount: $amount, '
+        'shopperLocale: $shopperLocale, '
+        'analyticsOptions: $analyticsOptions'
+        ')';
+  }
 }
