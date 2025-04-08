@@ -191,10 +191,13 @@ class _CardWidgetState extends State<CardWidget> {
         Row(
           spacing: 8,
           children: [
-            SvgPicture.asset(
-              "assets/card.svg",
-              fit: BoxFit.scaleDown,
-              height: 26,
+            ClipRRect(
+              borderRadius: BorderRadius.circular(8.0),
+              child: SvgPicture.asset(
+                "assets/card.svg",
+                fit: BoxFit.scaleDown,
+                height: 26,
+              ),
             ),
             const Text(
               "Cards",
