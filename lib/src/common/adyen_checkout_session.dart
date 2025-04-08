@@ -50,6 +50,8 @@ class AdyenCheckoutSession {
     );
   }
 
+  Future<void> stopDropIn() async => await dropIn.stopDropIn();
+
   Future<void> clear() async => await adyenCheckoutApi.clearSession();
 
   dynamic _mapConfiguration(

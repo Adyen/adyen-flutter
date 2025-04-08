@@ -15,16 +15,14 @@ import com.adyen.checkout.dropin.internal.ui.model.SessionDropInResultContractPa
 import com.adyen.checkout.flutter.dropIn.advanced.AdvancedDropInService
 import com.adyen.checkout.flutter.dropIn.advanced.DropInAdditionalDetailsPlatformMessenger
 import com.adyen.checkout.flutter.dropIn.advanced.DropInAdditionalDetailsResultMessenger
-import com.adyen.checkout.flutter.dropIn.advanced.DropInBalanceCheckPlatformMessenger
 import com.adyen.checkout.flutter.dropIn.advanced.DropInBalanceCheckResultMessenger
-import com.adyen.checkout.flutter.dropIn.advanced.DropInOrderCancelPlatformMessenger
 import com.adyen.checkout.flutter.dropIn.advanced.DropInOrderCancelResultMessenger
-import com.adyen.checkout.flutter.dropIn.advanced.DropInOrderRequestPlatformMessenger
 import com.adyen.checkout.flutter.dropIn.advanced.DropInOrderRequestResultMessenger
 import com.adyen.checkout.flutter.dropIn.advanced.DropInPaymentMethodDeletionPlatformMessenger
 import com.adyen.checkout.flutter.dropIn.advanced.DropInPaymentMethodDeletionResultMessenger
 import com.adyen.checkout.flutter.dropIn.advanced.DropInPaymentResultMessenger
 import com.adyen.checkout.flutter.dropIn.advanced.DropInServiceResultMessenger
+import com.adyen.checkout.flutter.dropIn.model.DropInServiceEvent
 import com.adyen.checkout.flutter.dropIn.session.SessionDropInService
 import com.adyen.checkout.flutter.generated.CheckoutEvent
 import com.adyen.checkout.flutter.generated.CheckoutEventType
@@ -62,6 +60,7 @@ internal class DropInPlatformApi(
 
     companion object {
         val dropInMessageFlow = MutableSharedFlow<CheckoutEvent>()
+        val dropInServiceFlow = MutableSharedFlow<DropInServiceEvent>()
     }
 
     override fun showDropInSession(dropInConfigurationDTO: DropInConfigurationDTO) {
@@ -93,9 +92,6 @@ internal class DropInPlatformApi(
     ) {
         setAdvancedFlowDropInServiceObserver()
         setStoredPaymentMethodDeletionObserver()
-        setBalanceCheckPlatformMessengerObserver()
-        setOrderRequestPlatformMessengerObserver()
-        setOrderCancelPlatformMessengerObserver()
 
         dropInPlatformMessengerJob?.cancel()
         dropInPlatformMessengerJob =
@@ -121,6 +117,12 @@ internal class DropInPlatformApi(
                     AdvancedDropInService::class.java,
                 )
             }
+        }
+    }
+
+    override fun stopDropIn() {
+        activity.lifecycleScope.launch {
+            dropInServiceFlow.emit(DropInServiceEvent.STOP)
         }
     }
 
@@ -162,7 +164,7 @@ internal class DropInPlatformApi(
         DropInPaymentMethodDeletionPlatformMessenger.instance().removeObservers(activity)
         DropInBalanceCheckResultMessenger.instance().removeObservers(activity)
         DropInOrderRequestResultMessenger.instance().removeObservers(activity)
-        DropInOrderCancelPlatformMessenger.instance().removeObservers(activity)
+        DropInOrderCancelResultMessenger.instance().removeObservers(activity)
     }
 
     private fun setAdvancedFlowDropInServiceObserver() {
@@ -174,7 +176,7 @@ internal class DropInPlatformApi(
 
             val checkoutEvent =
                 CheckoutEvent(
-                    CheckoutEventType.PAYMENT_COMPONENT,
+                    CheckoutEventType.SUBMIT,
                     data = message.contentIfNotHandled.toString()
                 )
             checkoutFlutter.send(checkoutEvent) {}
@@ -212,54 +214,6 @@ internal class DropInPlatformApi(
                     data = message.contentIfNotHandled.toString(),
                 )
 
-            checkoutFlutter.send(checkoutEvent) {}
-        }
-    }
-
-    private fun setBalanceCheckPlatformMessengerObserver() {
-        DropInBalanceCheckPlatformMessenger.instance().removeObservers(activity)
-        DropInBalanceCheckPlatformMessenger.instance().observe(activity) { message ->
-            if (message.hasBeenHandled()) {
-                return@observe
-            }
-
-            val checkoutEvent =
-                CheckoutEvent(
-                    CheckoutEventType.BALANCE_CHECK,
-                    data = message.contentIfNotHandled.toString()
-                )
-            checkoutFlutter.send(checkoutEvent) {}
-        }
-    }
-
-    private fun setOrderRequestPlatformMessengerObserver() {
-        DropInOrderRequestPlatformMessenger.instance().removeObservers(activity)
-        DropInOrderRequestPlatformMessenger.instance().observe(activity) { message ->
-            if (message.hasBeenHandled()) {
-                return@observe
-            }
-
-            val checkoutEvent =
-                CheckoutEvent(
-                    CheckoutEventType.REQUEST_ORDER,
-                    data = message.contentIfNotHandled.toString()
-                )
-            checkoutFlutter.send(checkoutEvent) {}
-        }
-    }
-
-    private fun setOrderCancelPlatformMessengerObserver() {
-        DropInOrderCancelPlatformMessenger.instance().removeObservers(activity)
-        DropInOrderCancelPlatformMessenger.instance().observe(activity) { message ->
-            if (message.hasBeenHandled()) {
-                return@observe
-            }
-
-            val checkoutEvent =
-                CheckoutEvent(
-                    CheckoutEventType.CANCEL_ORDER,
-                    data = message.contentIfNotHandled.toString()
-                )
             checkoutFlutter.send(checkoutEvent) {}
         }
     }

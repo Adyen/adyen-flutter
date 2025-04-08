@@ -23,23 +23,29 @@ import com.adyen.checkout.dropin.ErrorDialog
 import com.adyen.checkout.dropin.OrderDropInServiceResult
 import com.adyen.checkout.dropin.RecurringDropInServiceResult
 import com.adyen.checkout.flutter.dropIn.DropInPlatformApi
+import com.adyen.checkout.flutter.dropIn.model.DropInServiceEvent
 import com.adyen.checkout.flutter.dropIn.model.DropInStoredPaymentMethodDeletionModel
 import com.adyen.checkout.flutter.dropIn.model.DropInType
 import com.adyen.checkout.flutter.generated.BinLookupDataDTO
+import com.adyen.checkout.flutter.generated.CheckoutEvent
+import com.adyen.checkout.flutter.generated.CheckoutEventType
 import com.adyen.checkout.flutter.generated.DeletedStoredPaymentMethodResultDTO
 import com.adyen.checkout.flutter.generated.ErrorDTO
 import com.adyen.checkout.flutter.generated.OrderCancelResultDTO
 import com.adyen.checkout.flutter.generated.PaymentEventDTO
 import com.adyen.checkout.flutter.generated.PaymentEventType
-import com.adyen.checkout.flutter.generated.CheckoutEvent
-import com.adyen.checkout.flutter.generated.CheckoutEventType
 import com.adyen.checkout.flutter.utils.Constants
+import com.adyen.checkout.flutter.utils.Constants.Companion.RESULT_CODE_CANCELLED
 import com.adyen.checkout.googlepay.GooglePayComponentState
 import kotlinx.coroutines.launch
 import org.json.JSONObject
 
 class AdvancedDropInService : DropInService(), LifecycleOwner {
     private val dispatcher = ServiceLifecycleDispatcher(this)
+
+    init {
+        listenToFlutterEvents()
+    }
 
     override fun onSubmit(state: PaymentComponentState<*>) = onPaymentComponentState(state)
 
@@ -60,24 +66,30 @@ class AdvancedDropInService : DropInService(), LifecycleOwner {
     }
 
     override fun onBalanceCheck(paymentComponentState: PaymentComponentState<*>) {
-        try {
-            setBalanceCheckObserver()
-            val data = PaymentComponentData.SERIALIZER.serialize(paymentComponentState.data)
-            DropInBalanceCheckPlatformMessenger.sendResult(data)
-        } catch (exception: Exception) {
-            sendResult(
-                DropInServiceResult.Error(
-                    errorDialog = null,
-                    reason = exception.message,
-                    dismissDropIn = true
+        setBalanceCheckObserver()
+        lifecycleScope.launch {
+            try {
+                val data = PaymentComponentData.SERIALIZER.serialize(paymentComponentState.data).toString()
+                val checkoutEvent = CheckoutEvent(CheckoutEventType.BALANCE_CHECK, data)
+                DropInPlatformApi.dropInMessageFlow.emit(checkoutEvent)
+            } catch (exception: Exception) {
+                sendResult(
+                    DropInServiceResult.Error(
+                        errorDialog = null,
+                        reason = exception.message,
+                        dismissDropIn = true
+                    )
                 )
-            )
+            }
         }
     }
 
     override fun onOrderRequest() {
         setOrderRequestObserver()
-        DropInOrderRequestPlatformMessenger.sendResult("onOrderRequest")
+        lifecycleScope.launch {
+            val checkoutEvent = CheckoutEvent(CheckoutEventType.REQUEST_ORDER)
+            DropInPlatformApi.dropInMessageFlow.emit(checkoutEvent)
+        }
     }
 
     override fun onOrderCancel(
@@ -85,10 +97,13 @@ class AdvancedDropInService : DropInService(), LifecycleOwner {
         shouldUpdatePaymentMethods: Boolean
     ) {
         setOrderCancelObserver()
-        val cancelOrderData = JSONObject()
-        cancelOrderData.put(Constants.ORDER_KEY, Order.SERIALIZER.serialize(order))
-        cancelOrderData.put(Constants.SHOULD_UPDATE_PAYMENT_METHODS_KEY, shouldUpdatePaymentMethods)
-        DropInOrderCancelPlatformMessenger.sendResult(cancelOrderData)
+        lifecycleScope.launch {
+            val cancelOrderData = JSONObject()
+            cancelOrderData.put(Constants.ORDER_KEY, Order.SERIALIZER.serialize(order))
+            cancelOrderData.put(Constants.SHOULD_UPDATE_PAYMENT_METHODS_KEY, shouldUpdatePaymentMethods)
+            val checkoutEvent = CheckoutEvent(CheckoutEventType.CANCEL_ORDER, cancelOrderData.toString())
+            DropInPlatformApi.dropInMessageFlow.emit(checkoutEvent)
+        }
     }
 
     override fun onRemoveStoredPaymentMethod(storedPaymentMethod: StoredPaymentMethod) {
@@ -126,6 +141,20 @@ class AdvancedDropInService : DropInService(), LifecycleOwner {
                 )
             DropInPlatformApi.dropInMessageFlow.emit(checkoutEvent)
         }
+    }
+
+    private fun listenToFlutterEvents() {
+        lifecycleScope.launch {
+            DropInPlatformApi.dropInServiceFlow.collect { event ->
+                when (event) {
+                    DropInServiceEvent.STOP -> stopDropIn()
+                }
+            }
+        }
+    }
+
+    private fun stopDropIn() {
+        sendResult(DropInServiceResult.Finished(result = RESULT_CODE_CANCELLED))
     }
 
     private fun onPaymentComponentState(state: PaymentComponentState<*>) {

@@ -62,7 +62,7 @@ class CardAdvancedComponent: BaseCardComponent {
             cardComponentConfiguration: cardComponentConfiguration,
             componentDelegate: componentDelegate,
             cardDelegate: self
-        )        
+        )
     }
 
     private func buildActionComponent(adyenContext: AdyenContext) -> AdyenActionComponent {

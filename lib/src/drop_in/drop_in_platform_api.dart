@@ -21,6 +21,9 @@ class DropInPlatformApi implements DropInPlatformInterface {
       );
 
   @override
+  Future<void> stopDropIn() => _dropInPlatformInterface.stopDropIn();
+
+  @override
   Future<void> onPaymentsResult(PaymentEventDTO paymentsResult) =>
       _dropInPlatformInterface.onPaymentsResult(paymentsResult);
 

@@ -8,22 +8,29 @@ import androidx.lifecycle.ServiceLifecycleDispatcher
 import androidx.lifecycle.lifecycleScope
 import com.adyen.checkout.card.BinLookupData
 import com.adyen.checkout.components.core.StoredPaymentMethod
+import com.adyen.checkout.dropin.DropInServiceResult
 import com.adyen.checkout.dropin.ErrorDialog
 import com.adyen.checkout.dropin.RecurringDropInServiceResult
 import com.adyen.checkout.dropin.SessionDropInService
 import com.adyen.checkout.flutter.dropIn.DropInPlatformApi
 import com.adyen.checkout.flutter.dropIn.advanced.DropInPaymentMethodDeletionPlatformMessenger
 import com.adyen.checkout.flutter.dropIn.advanced.DropInPaymentMethodDeletionResultMessenger
+import com.adyen.checkout.flutter.dropIn.model.DropInServiceEvent
 import com.adyen.checkout.flutter.dropIn.model.DropInStoredPaymentMethodDeletionModel
 import com.adyen.checkout.flutter.dropIn.model.DropInType
 import com.adyen.checkout.flutter.generated.BinLookupDataDTO
-import com.adyen.checkout.flutter.generated.DeletedStoredPaymentMethodResultDTO
 import com.adyen.checkout.flutter.generated.CheckoutEvent
 import com.adyen.checkout.flutter.generated.CheckoutEventType
+import com.adyen.checkout.flutter.generated.DeletedStoredPaymentMethodResultDTO
+import com.adyen.checkout.flutter.utils.Constants.Companion.RESULT_CODE_CANCELLED
 import kotlinx.coroutines.launch
 
 class SessionDropInService : SessionDropInService(), LifecycleOwner {
     private val dispatcher = ServiceLifecycleDispatcher(this)
+
+    init {
+        listenToFlutterEvents()
+    }
 
     override fun onRemoveStoredPaymentMethod(storedPaymentMethod: StoredPaymentMethod) {
         storedPaymentMethod.id?.let { storedPaymentMethodId ->
@@ -78,6 +85,20 @@ class SessionDropInService : SessionDropInService(), LifecycleOwner {
         } else {
             RecurringDropInServiceResult.Error(errorDialog = null)
         }
+    }
+
+    private fun listenToFlutterEvents() {
+        lifecycleScope.launch {
+            DropInPlatformApi.dropInServiceFlow.collect { event ->
+                when (event) {
+                    DropInServiceEvent.STOP -> stopDropIn()
+                }
+            }
+        }
+    }
+
+    private fun stopDropIn() {
+        sendResult(DropInServiceResult.Finished(result = RESULT_CODE_CANCELLED))
     }
 
     override fun onBind(intent: Intent?): IBinder {

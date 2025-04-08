@@ -32,4 +32,6 @@ class AdyenCheckoutAdvanced {
         configuration,
         paymentMethod,
       );
+
+  Future<void> stopDropIn() async => await dropIn.stopDropIn();
 }

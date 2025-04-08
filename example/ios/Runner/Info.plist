@@ -36,7 +36,7 @@
 			<string>com.adyen.adyen_checkout_example</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>adyencheckout</string>
+				<string>com.mydomain.adyencheckout</string>
 			</array>
 		</dict>
 	</array>

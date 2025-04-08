@@ -57,7 +57,7 @@ enum PaymentResultEnum {
 }
 
 enum CheckoutEventType {
-  paymentComponent,
+  submit,
   additionalDetails,
   result,
   deleteStoredPaymentMethod,
@@ -668,6 +668,8 @@ abstract class DropInPlatformInterface {
     DropInConfigurationDTO dropInConfigurationDTO,
     String paymentMethodsResponse,
   );
+
+  void stopDropIn();
 
   void onPaymentsResult(PaymentEventDTO paymentsResult);
 
