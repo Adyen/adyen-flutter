@@ -32,7 +32,7 @@ final class DropInConfiguration extends BaseConfiguration {
     AnalyticsOptions? analyticsOptions,
     this.paymentMethodNames,
   }) : skipListWhenSinglePaymentMethod =
-      skipListWhenSinglePaymentMethod ?? false;
+            skipListWhenSinglePaymentMethod ?? false;
 
   @override
   String toString() {
