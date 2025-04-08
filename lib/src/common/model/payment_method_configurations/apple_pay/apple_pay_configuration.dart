@@ -53,7 +53,6 @@ class ApplePayConfiguration {
         'shippingMethods: $shippingMethods, '
         'applicationData: $applicationData, '
         'supportedCountries: $supportedCountries, '
-        'merchantCapability: $merchantCapability'
-        ')';
+        'merchantCapability: $merchantCapability)';
   }
 }

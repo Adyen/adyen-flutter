@@ -17,7 +17,6 @@ class EncryptedCard {
         'encryptedCardNumber: $encryptedCardNumber, '
         'encryptedExpiryMonth: $encryptedExpiryMonth, '
         'encryptedExpiryYear: $encryptedExpiryYear, '
-        'encryptedSecurityCode: $encryptedSecurityCode'
-        ')';
+        'encryptedSecurityCode: $encryptedSecurityCode)';
   }
 }

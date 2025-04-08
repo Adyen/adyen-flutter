@@ -23,7 +23,6 @@ class PartialPayment {
     return 'PartialPayment('
         'onCheckBalance: $onCheckBalance, '
         'onRequestOrder: $onRequestOrder, '
-        'onCancelOrder: $onCancelOrder'
-        ')';
+        'onCancelOrder: $onCancelOrder)';
   }
 }

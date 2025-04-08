@@ -17,7 +17,6 @@ class UnencryptedCard {
         'cardNumber: $cardNumber, '
         'expiryMonth: $expiryMonth, '
         'expiryYear: $expiryYear, '
-        'cvc: $cvc'
-        ')';
+        'cvc: $cvc)';
   }
 }

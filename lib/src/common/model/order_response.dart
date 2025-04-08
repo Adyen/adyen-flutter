@@ -30,7 +30,6 @@ class OrderResponse {
         'pspReference: $pspReference, '
         'orderData: $orderData, '
         'amount: $amount, '
-        'remainingAmount: $remainingAmount'
-        ')';
+        'remainingAmount: $remainingAmount)';
   }
 }

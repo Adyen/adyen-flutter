@@ -36,8 +36,7 @@ class PaymentSessionFinished extends PaymentResult {
         'sessionData: $sessionData, '
         'sessionResult: $sessionResult, '
         'resultCode: $resultCode, '
-        'order: $order'
-        ')';
+        'order: $order)';
   }
 }
 

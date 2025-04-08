@@ -11,7 +11,6 @@ class OrderCancelResult {
   String toString() {
     return 'OrderCancelResult('
         'orderCancelResponseBody: $orderCancelResponseBody, '
-        'updatedPaymentMethodsResponseBody: $updatedPaymentMethodsResponseBody'
-        ')';
+        'updatedPaymentMethodsResponseBody: $updatedPaymentMethodsResponseBody)';
   }
 }

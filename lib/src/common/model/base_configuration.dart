@@ -27,7 +27,6 @@ base class BaseConfiguration {
         'countryCode: $countryCode, '
         'amount: $amount, '
         'shopperLocale: $shopperLocale, '
-        'analyticsOptions: $analyticsOptions'
-        ')';
+        'analyticsOptions: $analyticsOptions)';
   }
 }

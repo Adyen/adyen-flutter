@@ -25,7 +25,6 @@ class ApplePayShippingMethod {
         'amount: $amount, '
         'identifier: $identifier, '
         'startDate: $startDate, '
-        'endDate: $endDate'
-        ')';
+        'endDate: $endDate)';
   }
 }

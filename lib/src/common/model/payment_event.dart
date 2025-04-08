@@ -35,8 +35,7 @@ class Update extends PaymentEvent {
   String toString() {
     return 'Update('
         'paymentMethodsJson: $paymentMethodsJson, '
-        'orderJson: $orderJson'
-        ')';
+        'orderJson: $orderJson)';
   }
 }
 
@@ -56,7 +55,6 @@ class Error extends PaymentEvent {
     return 'Error('
         'errorMessage: $errorMessage, '
         'reason: $reason, '
-        'dismissDropIn: $dismissDropIn'
-        ')';
+        'dismissDropIn: $dismissDropIn)';
   }
 }

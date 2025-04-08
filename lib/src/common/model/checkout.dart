@@ -19,8 +19,7 @@ class SessionCheckout extends Checkout {
     return 'SessionCheckout('
         'id: $id, '
         'sessionData: $sessionData, '
-        'paymentMethods: $paymentMethods'
-        ')';
+        'paymentMethods: $paymentMethods)';
   }
 }
 
@@ -46,7 +45,6 @@ class AdvancedCheckout extends Checkout {
     return 'AdvancedCheckout('
         'onSubmit: $onSubmit, '
         'onAdditionalDetails: $onAdditionalDetails, '
-        'partialPayment: $partialPayment'
-        ')';
+        'partialPayment: $partialPayment)';
   }
 }

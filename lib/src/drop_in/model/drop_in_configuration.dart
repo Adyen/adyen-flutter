@@ -44,7 +44,6 @@ final class DropInConfiguration extends BaseConfiguration {
         'storedPaymentMethodConfiguration: $storedPaymentMethodConfiguration, '
         'skipListWhenSinglePaymentMethod: $skipListWhenSinglePaymentMethod, '
         'preselectedPaymentMethodTitle: $preselectedPaymentMethodTitle, '
-        'paymentMethodNames: $paymentMethodNames'
-        ')';
+        'paymentMethodNames: $paymentMethodNames)';
   }
 }

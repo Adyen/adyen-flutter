@@ -16,7 +16,6 @@ class ApplePaySummaryItem {
     return 'ApplePaySummaryItem('
         'label: $label, '
         'amount: $amount, '
-        'type: $type'
-        ')';
+        'type: $type)';
   }
 }

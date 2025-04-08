@@ -47,7 +47,6 @@ class ApplePayContact {
         'subAdministrativeArea: $subAdministrativeArea, '
         'administrativeArea: $administrativeArea, '
         'country: $country, '
-        'countryCode: $countryCode'
-        ')';
+        'countryCode: $countryCode)';
   }
 }
