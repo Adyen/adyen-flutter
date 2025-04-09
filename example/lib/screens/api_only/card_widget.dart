@@ -40,6 +40,10 @@ class _CardWidgetState extends State<CardWidget> {
   @override
   Widget build(BuildContext context) {
     final cardState = widget.cardStateNotifier.value;
+    final isInputValid =
+        cardState.cardNumberValidationResult is ValidCardNumber &&
+            cardState.cardExpiryDateValidationResult is ValidCardExpiryDate &&
+            cardState.cardSecurityCodeValidationResult is ValidCardSecurityCode;
 
     return Container(
       decoration: BoxDecoration(
@@ -148,7 +152,9 @@ class _CardWidgetState extends State<CardWidget> {
               width: double.maxFinite,
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF00112c),
+                  backgroundColor: isInputValid == true
+                      ? const Color(0xFF00112c)
+                      : const Color(0xffc1c1c1),
                   foregroundColor: Colors.white,
                   minimumSize: const Size(double.infinity, 56),
                   padding: const EdgeInsets.symmetric(horizontal: 16),

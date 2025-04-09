@@ -44,83 +44,79 @@ void main() {
       AdyenInstantComponentRepository(service: service);
   final adyenCseRepository = AdyenCseRepository(service: service);
 
-  runApp(Provider(
-    notifier: CardStateNotifier(adyenCseRepository),
-    child: MaterialApp(
-      localizationsDelegates: const [
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [
-        Locale('en'), // English
-        Locale('ar'), // Arabic
-      ],
-      theme: ThemeData(
-          useMaterial3: true,
-          bottomSheetTheme: const BottomSheetThemeData(
-            surfaceTintColor: Colors.white,
-            backgroundColor: Colors.white,
-          )),
-      routes: {
-        '/': (context) => const MyApp(),
-        '/dropInScreen': (context) => DropInScreen(
-              repository: AdyenDropInRepository(service: service),
-            ),
-        '/cardComponentScreen': (context) => const CardNavigationScreen(),
-        '/cardSessionComponentScreen': (context) => CardSessionComponentScreen(
-              repository: adyenCardComponentRepository,
-            ),
-        '/cardAdvancedComponentScreen': (context) =>
-            CardAdvancedComponentScreen(
-              repository: adyenCardComponentRepository,
-            ),
-        '/cardBottomSheetScreen': (context) => CardBottomSheetScreen(
-              repository: adyenCardComponentRepository,
-            ),
-        '/googlePayNavigation': (context) => const GooglePayNavigationScreen(),
-        '/googlePaySessionComponent': (context) =>
-            GooglePaySessionsComponentScreen(
-              repository: adyenGooglePayComponentRepository,
-            ),
-        '/googlePayAdvancedComponent': (context) =>
-            GooglePayAdvancedComponentScreen(
-              repository: adyenGooglePayComponentRepository,
-            ),
-        '/applePayNavigation': (context) => const ApplePayNavigationScreen(),
-        '/applePaySessionComponent': (context) =>
-            ApplePaySessionComponentScreen(
-              repository: adyenApplePayComponentRepository,
-            ),
-        '/applePayAdvancedComponent': (context) =>
-            ApplePayAdvancedComponentScreen(
-              repository: adyenApplePayComponentRepository,
-            ),
-        '/instantComponentNavigation': (context) =>
-            const InstantNavigationScreen(),
-        '/instantSessionComponent': (context) => InstantSessionComponentScreen(
-            repository: adyenInstantComponentRepository),
-        '/instantAdvancedComponent': (context) =>
-            InstantAdvancedComponentScreen(
-                repository: adyenInstantComponentRepository),
-        '/multiComponentNavigationScreen': (context) =>
-            const MultiComponentNavigationScreen(),
-        '/multiComponentSessionScreen': (context) =>
-            MultiComponentSessionScreen(
-              cardRepository: adyenCardComponentRepository,
-              googlePayRepository: adyenGooglePayComponentRepository,
-              applePayRepository: adyenApplePayComponentRepository,
-            ),
-        '/multiComponentAdvancedScreen': (context) =>
-            MultiComponentAdvancedScreen(
-              cardRepository: adyenCardComponentRepository,
-              googlePayRepository: adyenGooglePayComponentRepository,
-              applePayRepository: adyenApplePayComponentRepository,
-            ),
-        '/customCard': (context) => const CustomCardScreen(),
-      },
-      initialRoute: "/",
-    ),
+  runApp(MaterialApp(
+    localizationsDelegates: const [
+      GlobalMaterialLocalizations.delegate,
+      GlobalWidgetsLocalizations.delegate,
+      GlobalCupertinoLocalizations.delegate,
+    ],
+    supportedLocales: const [
+      Locale('en'), // English
+      Locale('ar'), // Arabic
+    ],
+    theme: ThemeData(
+        useMaterial3: true,
+        bottomSheetTheme: const BottomSheetThemeData(
+          surfaceTintColor: Colors.white,
+          backgroundColor: Colors.white,
+        )),
+    routes: {
+      '/': (context) => const MyApp(),
+      '/dropInScreen': (context) => DropInScreen(
+            repository: AdyenDropInRepository(service: service),
+          ),
+      '/cardComponentScreen': (context) => const CardNavigationScreen(),
+      '/cardSessionComponentScreen': (context) => CardSessionComponentScreen(
+            repository: adyenCardComponentRepository,
+          ),
+      '/cardAdvancedComponentScreen': (context) => CardAdvancedComponentScreen(
+            repository: adyenCardComponentRepository,
+          ),
+      '/cardBottomSheetScreen': (context) => CardBottomSheetScreen(
+            repository: adyenCardComponentRepository,
+          ),
+      '/googlePayNavigation': (context) => const GooglePayNavigationScreen(),
+      '/googlePaySessionComponent': (context) =>
+          GooglePaySessionsComponentScreen(
+            repository: adyenGooglePayComponentRepository,
+          ),
+      '/googlePayAdvancedComponent': (context) =>
+          GooglePayAdvancedComponentScreen(
+            repository: adyenGooglePayComponentRepository,
+          ),
+      '/applePayNavigation': (context) => const ApplePayNavigationScreen(),
+      '/applePaySessionComponent': (context) => ApplePaySessionComponentScreen(
+            repository: adyenApplePayComponentRepository,
+          ),
+      '/applePayAdvancedComponent': (context) =>
+          ApplePayAdvancedComponentScreen(
+            repository: adyenApplePayComponentRepository,
+          ),
+      '/instantComponentNavigation': (context) =>
+          const InstantNavigationScreen(),
+      '/instantSessionComponent': (context) => InstantSessionComponentScreen(
+          repository: adyenInstantComponentRepository),
+      '/instantAdvancedComponent': (context) => InstantAdvancedComponentScreen(
+          repository: adyenInstantComponentRepository),
+      '/multiComponentNavigationScreen': (context) =>
+          const MultiComponentNavigationScreen(),
+      '/multiComponentSessionScreen': (context) => MultiComponentSessionScreen(
+            cardRepository: adyenCardComponentRepository,
+            googlePayRepository: adyenGooglePayComponentRepository,
+            applePayRepository: adyenApplePayComponentRepository,
+          ),
+      '/multiComponentAdvancedScreen': (context) =>
+          MultiComponentAdvancedScreen(
+            cardRepository: adyenCardComponentRepository,
+            googlePayRepository: adyenGooglePayComponentRepository,
+            applePayRepository: adyenApplePayComponentRepository,
+          ),
+      '/customCard': (context) => Provider(
+            notifier: CardStateNotifier(adyenCseRepository),
+            child: const CustomCardScreen(),
+          ),
+    },
+    initialRoute: "/",
   ));
 }
 

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:adyen_checkout/adyen_checkout.dart';
 import 'package:adyen_checkout_example/config.dart';
 import 'package:adyen_checkout_example/repositories/adyen_cse_repository.dart';
@@ -9,15 +11,15 @@ class CardStateNotifier extends ValueNotifier<CardState> {
 
   final AdyenCseRepository repository;
   final formKey = GlobalKey<FormState>();
+  final cardDetailsTriggerThreshold = 6;
+  Timer? _throttleTimer;
 
   Future<void> updateCardNumber(String cardNumber) async {
     final String cardNumberTrimmed = cardNumber.trim();
     _fetchCardDetails(cardNumberTrimmed);
     final CardNumberValidationResult cardNumberValidationResult =
-        cardNumber.isEmpty
-            ? ValidCardNumber()
-            : await _validateCardNumberInput(cardNumberTrimmed);
-
+        await _validateCardNumberInput(cardNumberTrimmed);
+    triggerFromValidationThrottled();
     value = value.copyWith(
       cardNumberValidationResult: cardNumberValidationResult,
       cardNumber: cardNumberTrimmed,
@@ -34,6 +36,7 @@ class CardStateNotifier extends ValueNotifier<CardState> {
     final String expiryYear = "20${expiryDate.substring(index + 1)}";
     final CardExpiryDateValidationResult cardExpiryDateValidationResult =
         await _validateExpiryDate(expiryMonth, expiryYear);
+    triggerFromValidationThrottled();
     value = value.copyWith(
       expiryMoth: expiryMonth,
       expiryYear: expiryYear,
@@ -45,8 +48,9 @@ class CardStateNotifier extends ValueNotifier<CardState> {
     final CardSecurityCodeValidationResult cardSecurityCodeValidationResult =
         await _validateSecurityCode(
       securityCode,
-      value.relatedCardBrands?.first ?? "",
+      value.relatedCardBrands?.firstOrNull ?? "",
     );
+    triggerFromValidationThrottled();
     value = value.copyWith(
       securityCode: securityCode,
       cardSecurityCodeValidationResult: cardSecurityCodeValidationResult,
@@ -118,6 +122,15 @@ class CardStateNotifier extends ValueNotifier<CardState> {
     return cardSecurityCodeValidationResult;
   }
 
+  void triggerFromValidationThrottled() {
+    _throttleTimer?.cancel();
+    _throttleTimer =
+        Timer.periodic(const Duration(milliseconds: 1000), (timer) {
+      formKey.currentState?.validate();
+      _throttleTimer?.cancel();
+    });
+  }
+
   Future<ResultCode?> pay() async {
     final isInputValid = formKey.currentState?.validate();
     if (isInputValid == true) {
@@ -150,7 +163,7 @@ class CardStateNotifier extends ValueNotifier<CardState> {
   }
 
   Future<void> _fetchCardDetails(String cardNumber) async {
-    if (cardNumber.length < 6) {
+    if (cardNumber.length < cardDetailsTriggerThreshold) {
       return;
     }
 
