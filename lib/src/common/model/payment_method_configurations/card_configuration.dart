@@ -24,4 +24,19 @@ class CardConfiguration {
     this.onBinLookup,
     this.onBinValue,
   });
+
+  @override
+  String toString() {
+    return 'CardConfiguration('
+        'holderNameRequired: $holderNameRequired, '
+        'addressMode: $addressMode, '
+        'showStorePaymentField: $showStorePaymentField, '
+        'showCvcForStoredCard: $showCvcForStoredCard, '
+        'showCvc: $showCvc, '
+        'kcpFieldVisibility: $kcpFieldVisibility, '
+        'socialSecurityNumberFieldVisibility: $socialSecurityNumberFieldVisibility, '
+        'supportedCardTypes: $supportedCardTypes, '
+        'onBinLookup: $onBinLookup, '
+        'onBinValue: $onBinValue)';
+  }
 }

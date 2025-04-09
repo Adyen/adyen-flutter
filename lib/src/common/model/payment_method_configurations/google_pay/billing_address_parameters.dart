@@ -6,4 +6,11 @@ class BillingAddressParameters {
     this.format,
     this.isPhoneNumberRequired,
   });
+
+  @override
+  String toString() {
+    return 'BillingAddressParameters('
+        'format: $format, '
+        'isPhoneNumberRequired: $isPhoneNumberRequired)';
+  }
 }

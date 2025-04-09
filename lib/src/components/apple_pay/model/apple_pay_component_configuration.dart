@@ -13,4 +13,9 @@ final class ApplePayComponentConfiguration extends BaseConfiguration {
     super.shopperLocale,
     super.analyticsOptions,
   });
+
+  @override
+  String toString() {
+    return 'ApplePayComponentConfiguration(applePayConfiguration: $applePayConfiguration)';
+  }
 }

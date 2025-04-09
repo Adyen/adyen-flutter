@@ -13,6 +13,14 @@ class SessionCheckout extends Checkout {
     required this.sessionData,
     required this.paymentMethods,
   });
+
+  @override
+  String toString() {
+    return 'SessionCheckout('
+        'id: $id, '
+        'sessionData: $sessionData, '
+        'paymentMethods: $paymentMethods)';
+  }
 }
 
 class AdvancedCheckout extends Checkout {
@@ -31,4 +39,12 @@ class AdvancedCheckout extends Checkout {
     required this.onAdditionalDetails,
     this.partialPayment,
   });
+
+  @override
+  String toString() {
+    return 'AdvancedCheckout('
+        'onSubmit: $onSubmit, '
+        'onAdditionalDetails: $onAdditionalDetails, '
+        'partialPayment: $partialPayment)';
+  }
 }

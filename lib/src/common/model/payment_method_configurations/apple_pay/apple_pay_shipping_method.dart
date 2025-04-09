@@ -16,4 +16,15 @@ class ApplePayShippingMethod {
     this.startDate,
     this.endDate,
   });
+
+  @override
+  String toString() {
+    return 'ApplePayShippingMethod('
+        'label: $label, '
+        'detail: $detail, '
+        'amount: $amount, '
+        'identifier: $identifier, '
+        'startDate: $startDate, '
+        'endDate: $endDate)';
+  }
 }
