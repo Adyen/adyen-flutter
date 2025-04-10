@@ -10,6 +10,7 @@ class CardState {
   final CardExpiryDateValidationResult? cardExpiryDateValidationResult;
   final CardSecurityCodeValidationResult? cardSecurityCodeValidationResult;
   final List<String>? relatedCardBrands;
+  final bool isInputValid;
 
   CardState({
     this.cardNumber,
@@ -21,6 +22,7 @@ class CardState {
     this.cardExpiryDateValidationResult,
     this.cardSecurityCodeValidationResult,
     this.relatedCardBrands,
+    this.isInputValid = false,
   });
 
   CardState copyWith({
@@ -34,6 +36,12 @@ class CardState {
     CardSecurityCodeValidationResult? cardSecurityCodeValidationResult,
     List<String>? relatedCardBrands,
   }) {
+    final isInputValid = (cardNumberValidationResult ??
+            this.cardNumberValidationResult) is ValidCardNumber &&
+        (cardExpiryDateValidationResult ?? this.cardExpiryDateValidationResult)
+            is ValidCardExpiryDate &&
+        (cardSecurityCodeValidationResult ??
+            this.cardSecurityCodeValidationResult) is ValidCardSecurityCode;
     return CardState(
       cardNumber: cardNumber ?? this.cardNumber,
       expiryMoth: expiryMoth ?? this.expiryMoth,
@@ -46,6 +54,7 @@ class CardState {
           cardExpiryDateValidationResult ?? this.cardExpiryDateValidationResult,
       cardSecurityCodeValidationResult: cardSecurityCodeValidationResult ??
           this.cardSecurityCodeValidationResult,
+      isInputValid: isInputValid,
       relatedCardBrands: relatedCardBrands ?? this.relatedCardBrands,
     );
   }
