@@ -28,7 +28,9 @@ import 'package:adyen_checkout_example/screens/cse/cse_screen.dart';
 import 'package:adyen_checkout_example/screens/drop_in/drop_in_screen.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+
 
 void main() {
   final service = Service();
@@ -44,6 +46,7 @@ void main() {
 
   runApp(MaterialApp(
     localizationsDelegates: const [
+      AppLocalizations.delegate,
       GlobalMaterialLocalizations.delegate,
       GlobalWidgetsLocalizations.delegate,
       GlobalCupertinoLocalizations.delegate,
@@ -151,6 +154,7 @@ class MyApp extends StatelessWidget {
                 onPressed: () =>
                     Navigator.pushNamed(context, "/clientSideEncryption"),
                 child: const Text("Client-Side encryption")),
+            Text(AppLocalizations.of(context)!.submit)
           ],
         ),
       ),
