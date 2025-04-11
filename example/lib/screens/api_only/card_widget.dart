@@ -152,11 +152,11 @@ class _CardWidgetState extends State<CardWidget> {
                   minimumSize: const Size(double.infinity, 56),
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   shape: RoundedRectangleBorder(
-                    borderRadius: borderRadius, // Rounded corners
+                    borderRadius: borderRadius,
                   ),
                   textStyle: const TextStyle(
-                    fontSize: 18, // Adjust as needed
-                    fontWeight: FontWeight.w600, // Semi-bold font weight
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
                 onPressed:
