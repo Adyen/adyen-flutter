@@ -40,11 +40,6 @@ class _CardWidgetState extends State<CardWidget> {
   @override
   Widget build(BuildContext context) {
     final cardState = widget.cardStateNotifier.value;
-    final isInputValid =
-        cardState.cardNumberValidationResult is ValidCardNumber &&
-            cardState.cardExpiryDateValidationResult is ValidCardExpiryDate &&
-            cardState.cardSecurityCodeValidationResult is ValidCardSecurityCode;
-
     return Container(
       decoration: BoxDecoration(
         color: lightGrey,
@@ -75,7 +70,7 @@ class _CardWidgetState extends State<CardWidget> {
               onChanged: (value) =>
                   widget.cardStateNotifier.updateCardNumber(value),
               validator: (value) =>
-                  cardState.cardNumberValidationResult is InvalidCardNumber?
+                  cardState.cardNumberValidationResult is InvalidCardNumber
                       ? 'Enter a valid card number'
                       : null,
             ),
@@ -108,7 +103,7 @@ class _CardWidgetState extends State<CardWidget> {
                             widget.cardStateNotifier.updateExpiryDate(value),
                         validator: (value) =>
                             cardState.cardExpiryDateValidationResult
-                                    is InvalidCardExpiryDate?
+                                    is InvalidCardExpiryDate
                                 ? 'Invalid expiry date'
                                 : null,
                       ),
@@ -137,7 +132,7 @@ class _CardWidgetState extends State<CardWidget> {
                             widget.cardStateNotifier.updateSecurityCode(value),
                         validator: (value) =>
                             cardState.cardSecurityCodeValidationResult
-                                    is InvalidCardSecurityCode?
+                                    is InvalidCardSecurityCode
                                 ? 'Invalid security code'
                                 : null,
                       ),
@@ -152,9 +147,7 @@ class _CardWidgetState extends State<CardWidget> {
               width: double.maxFinite,
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: isInputValid == true
-                      ? const Color(0xFF00112c)
-                      : const Color(0xffc1c1c1),
+                  backgroundColor: const Color(0xFF00112c),
                   foregroundColor: Colors.white,
                   minimumSize: const Size(double.infinity, 56),
                   padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -166,9 +159,10 @@ class _CardWidgetState extends State<CardWidget> {
                     fontWeight: FontWeight.w600, // Semi-bold font weight
                   ),
                 ),
-                onPressed: cardState.loading == true
-                    ? null
-                    : () => _makePayment(context),
+                onPressed:
+                    cardState.loading == true || cardState.isInputValid == false
+                        ? null
+                        : () => _makePayment(context),
                 child: cardState.loading == true
                     ? const CircularProgressIndicator(
                         color: Colors.white,

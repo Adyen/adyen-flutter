@@ -125,41 +125,41 @@ class CardStateNotifier extends ValueNotifier<CardState> {
   void triggerFromValidationThrottled() {
     _throttleTimer?.cancel();
     _throttleTimer =
-        Timer.periodic(const Duration(milliseconds: 1000), (timer) {
+        Timer.periodic(const Duration(milliseconds: 750), (timer) async {
       formKey.currentState?.validate();
       _throttleTimer?.cancel();
     });
   }
 
   Future<ResultCode?> pay() async {
-    final isInputValid = formKey.currentState?.validate();
-    if (isInputValid == true) {
-      value = value.copyWith(loading: true);
-      final UnencryptedCard unencryptedCard = UnencryptedCard(
-        cardNumber: value.cardNumber,
-        expiryMonth: value.expiryMoth,
-        expiryYear: value.expiryYear,
-        cvc: value.securityCode,
-      );
-      final EncryptedCard encryptedCard = await AdyenCheckout.instance
-          .encryptCard(unencryptedCard, Config.publicKey);
-      final Map<String, dynamic> paymentsResponse =
-          await repository.payments(encryptedCard);
-      if (paymentsResponse.containsKey("action")) {
-        final actionResult = await _handleAction(paymentsResponse);
-        switch (actionResult) {
-          case ActionSuccess it:
-            final paymentsDetailsResponse =
-                await repository.paymentsDetails(it.data);
-            return _mapToResultCode(paymentsDetailsResponse);
-          case ActionError it:
-            debugPrint("Action error: ${it.errorMessage}");
-        }
-      } else {
-        return _mapToResultCode(paymentsResponse);
-      }
+    final bool isInputValid = await _validateInput();
+    if (isInputValid == false) {
+      return null;
     }
-    return null;
+
+    value = value.copyWith(loading: true);
+    final EncryptedCard encryptedCard = await _createEncryptedCard();
+    final Map<String, dynamic> paymentsResponse =
+        await repository.payments(encryptedCard);
+    if (paymentsResponse.containsKey("action")) {
+      final ActionResult actionResult = await _handleAction(paymentsResponse);
+      return _mapActionResultToResultCode(actionResult);
+    }
+
+    return _mapToResultCode(paymentsResponse);
+  }
+
+  Future<EncryptedCard> _createEncryptedCard() async {
+    final UnencryptedCard unencryptedCard = UnencryptedCard(
+      cardNumber: value.cardNumber,
+      expiryMonth: value.expiryMoth,
+      expiryYear: value.expiryYear,
+      cvc: value.securityCode,
+    );
+    return await AdyenCheckout.instance.encryptCard(
+      unencryptedCard,
+      Config.publicKey,
+    );
   }
 
   Future<void> _fetchCardDetails(String cardNumber) async {
@@ -198,6 +198,19 @@ class CardStateNotifier extends ValueNotifier<CardState> {
     return actionResult;
   }
 
+  Future<ResultCode> _mapActionResultToResultCode(
+      ActionResult actionResult) async {
+    switch (actionResult) {
+      case ActionSuccess it:
+        final paymentsDetailsResponse =
+            await repository.paymentsDetails(it.data);
+        return _mapToResultCode(paymentsDetailsResponse);
+      case ActionError it:
+        debugPrint("Action error: ${it.errorMessage}");
+        return ResultCode.error;
+    }
+  }
+
   ResultCode _mapToResultCode(Map<String, dynamic> paymentsResponse) {
     final String? resultCode = paymentsResponse["resultCode"];
     return ResultCode.values.firstWhere(
@@ -217,5 +230,26 @@ class CardStateNotifier extends ValueNotifier<CardState> {
         .map<String>((brand) => brand['type'].toString())
         .toSet()
         .toList();
+  }
+
+  Future<bool> _validateInput() async {
+    final cardNumberValidationResult = await _validateCardNumberInput(
+      value.cardNumber ?? "",
+    );
+    final cardExpiryDateValidationResult = await _validateExpiryDate(
+      value.expiryMoth ?? "",
+      value.expiryYear ?? "",
+    );
+    final cardSecurityCodeValidationResult = await _validateSecurityCode(
+      value.securityCode ?? "",
+      value.relatedCardBrands?.firstOrNull ?? "",
+    );
+
+    value = value.copyWith(
+      cardNumberValidationResult: cardNumberValidationResult,
+      cardExpiryDateValidationResult: cardExpiryDateValidationResult,
+      cardSecurityCodeValidationResult: cardSecurityCodeValidationResult,
+    );
+    return value.isInputValid;
   }
 }
