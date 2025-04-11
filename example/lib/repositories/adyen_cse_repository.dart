@@ -5,9 +5,22 @@ import 'package:adyen_checkout_example/repositories/adyen_base_repository.dart';
 class AdyenCseRepository extends AdyenBaseRepository {
   AdyenCseRepository({required super.service});
 
-  Future<Map<String, dynamic>> makePayment(EncryptedCard encryptedCard) async {
+  Future<Map<String, dynamic>> payments(EncryptedCard encryptedCard) async {
     Map<String, dynamic> requestBody = await _createRequestBody(encryptedCard);
     return await service.postPayments(requestBody);
+  }
+
+  Future<Map<String, dynamic>> paymentsDetails(
+      Map<String, dynamic> detailsRequestBody) async {
+    return await service.postPaymentsDetails(detailsRequestBody);
+  }
+
+  Future<Map<String, dynamic>> cardDetails(String encryptedCardNumber) async {
+    final requestBody = {
+      "merchantAccount": Config.merchantAccount,
+      "encryptedCardNumber": encryptedCardNumber,
+    };
+    return await service.postCardDetails(requestBody);
   }
 
   Future<Map<String, dynamic>> _createRequestBody(
