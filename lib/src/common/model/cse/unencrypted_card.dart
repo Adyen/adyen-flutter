@@ -14,9 +14,9 @@ class UnencryptedCard {
   @override
   String toString() {
     return 'UnencryptedCard('
-        'cardNumber: $cardNumber, '
-        'expiryMonth: $expiryMonth, '
-        'expiryYear: $expiryYear, '
-        'cvc: $cvc)';
+        'cardNumber: **** **** **** ****, '
+        'expiryMonth: **, '
+        'expiryYear: ****, '
+        'cvc: ***)';
   }
 }

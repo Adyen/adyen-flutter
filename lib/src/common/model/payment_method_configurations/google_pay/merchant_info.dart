@@ -9,6 +9,8 @@ class MerchantInfo {
 
   @override
   String toString() {
-    return 'MerchantInfo(merchantName: $merchantName, merchantId: $merchantId)';
+    return 'MerchantInfo('
+        'merchantName: $merchantName, '
+        'merchantId: $merchantId)';
   }
 }

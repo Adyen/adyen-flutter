@@ -35,8 +35,6 @@ class CardConfiguration {
         'showCvc: $showCvc, '
         'kcpFieldVisibility: $kcpFieldVisibility, '
         'socialSecurityNumberFieldVisibility: $socialSecurityNumberFieldVisibility, '
-        'supportedCardTypes: $supportedCardTypes, '
-        'onBinLookup: $onBinLookup, '
-        'onBinValue: $onBinValue)';
+        'supportedCardTypes: $supportedCardTypes)';
   }
 }

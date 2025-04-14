@@ -16,6 +16,8 @@ class Amount {
 
   @override
   String toString() {
-    return 'Amount(value: $value, currency: $currency)';
+    return 'Amount('
+        'value: $value, '
+        'currency: $currency)';
   }
 }
