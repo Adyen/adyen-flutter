@@ -8,6 +8,8 @@ import 'package:adyen_checkout_example/repositories/adyen_cse_repository.dart';
 import 'package:adyen_checkout_example/repositories/adyen_drop_in_repository.dart';
 import 'package:adyen_checkout_example/repositories/adyen_google_pay_component_repository.dart';
 import 'package:adyen_checkout_example/repositories/adyen_instant_component_repository.dart';
+import 'package:adyen_checkout_example/screens/api_only/card_state_notifier.dart';
+import 'package:adyen_checkout_example/screens/api_only/custom_card_screen.dart';
 import 'package:adyen_checkout_example/screens/component/apple_pay/apple_pay_advanced_component_screen.dart';
 import 'package:adyen_checkout_example/screens/component/apple_pay/apple_pay_navigation_screen.dart';
 import 'package:adyen_checkout_example/screens/component/apple_pay/apple_pay_session_component_screen.dart';
@@ -24,8 +26,8 @@ import 'package:adyen_checkout_example/screens/component/instant/instant_session
 import 'package:adyen_checkout_example/screens/component/multi_component/multi_component_advanced_screen.dart';
 import 'package:adyen_checkout_example/screens/component/multi_component/multi_component_navigation_screen.dart';
 import 'package:adyen_checkout_example/screens/component/multi_component/multi_component_session_screen.dart';
-import 'package:adyen_checkout_example/screens/cse/cse_screen.dart';
 import 'package:adyen_checkout_example/screens/drop_in/drop_in_screen.dart';
+import 'package:adyen_checkout_example/utils/provider.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -109,8 +111,10 @@ void main() {
             googlePayRepository: adyenGooglePayComponentRepository,
             applePayRepository: adyenApplePayComponentRepository,
           ),
-      '/clientSideEncryption': (context) =>
-          CseScreen(repository: adyenCseRepository),
+      '/customCard': (context) => Provider(
+            notifier: CardStateNotifier(adyenCseRepository),
+            child: const CustomCardScreen(),
+          ),
     },
     initialRoute: "/",
   ));
@@ -148,9 +152,8 @@ class MyApp extends StatelessWidget {
                     context, "/multiComponentNavigationScreen"),
                 child: const Text("Multi component")),
             TextButton(
-                onPressed: () =>
-                    Navigator.pushNamed(context, "/clientSideEncryption"),
-                child: const Text("Client-Side encryption")),
+                onPressed: () => Navigator.pushNamed(context, "/customCard"),
+                child: const Text("Custom card (CSE)")),
           ],
         ),
       ),

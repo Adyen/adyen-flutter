@@ -3,7 +3,8 @@
 ### New
 
 - Added method to stop Drop-In programmatically.
-- Added bin lookup callbacks for Card Component and Drop-In. 
+- Added bin lookup callbacks for Card Component and Drop-In.
+- Added custom card example using CSE and card validators.
 - Set minimum SDK version to Flutter 3.16/Dart 3.2
 - Android Components/Drop-in
   version: [5.10.0](https://docs.adyen.com/online-payments/release-notes/?title%5B0%5D=Android+Components%2FDrop-in#releaseNote=2025-04-07-android-componentsdrop-in-5.10.0).
