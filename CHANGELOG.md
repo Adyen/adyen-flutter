@@ -1,10 +1,10 @@
-## 1.4.0 (In development)
+## 1.4.0
 
 ### New
 
 - Added method to stop Drop-In programmatically.
 - Added bin lookup callbacks for Card Component and Drop-In.
-- Added custom card example using CSE and card validators.
+- Added a custom card Flutter widget to the example app utilizing CSE and card validators.
 - Set minimum SDK version to Flutter 3.16/Dart 3.2
 - Android Components/Drop-in
   version: [5.10.0](https://docs.adyen.com/online-payments/release-notes/?title%5B0%5D=Android+Components%2FDrop-in#releaseNote=2025-04-07-android-componentsdrop-in-5.10.0).
@@ -14,9 +14,9 @@
 ### Changed
 
 - For native 3D Secure 2, when a shopper cancels the payment during the payment flow, the
-  `onAdditionalDetails` is now triggered. The payment flow does not end with CANCELLED_BY_USER any
-  longer. The details of the canceled transaction are now provided through the `onAdditionalDetails`
-  response.
+  `onAdditionalDetails` callback is now triggered. The payment flow does not end with
+  CANCELLED_BY_USER any longer. The details of the canceled transaction are now provided through the
+  `onAdditionalDetails` response.
 
 ## 1.3.0
 
