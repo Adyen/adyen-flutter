@@ -6,7 +6,6 @@
 - For the card component and cards with Drop-in, added support for BIN lookup callbacks that will be
   called when the shopper enters their card details.
 - Added a custom card Flutter widget to the example app using CSE and card validators.
-- Set minimum SDK version to Flutter 3.16/Dart 3.2
 - Android Components/Drop-in
   version: [5.10.0](https://docs.adyen.com/online-payments/release-notes/?title%5B0%5D=Android+Components%2FDrop-in#releaseNote=2025-04-07-android-componentsdrop-in-5.10.0).
 - iOS Components/Drop-in
