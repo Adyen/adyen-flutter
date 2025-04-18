@@ -3,7 +3,7 @@
 ### New
 
 - For Sessions and Advanced flows, added methods to dismiss Drop-in.
-- For the card component and cards with Drop-in, added support for BIN lookup callbacks that will be
+- For the card component and cards within Drop-in, added support for BIN lookup callbacks that will be
   called when the shopper enters their card details.
 - Added a custom card Flutter widget to the example app using CSE and card validators.
 - Android Components/Drop-in
