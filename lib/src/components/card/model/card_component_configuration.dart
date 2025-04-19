@@ -13,4 +13,9 @@ final class CardComponentConfiguration extends BaseConfiguration {
     super.analyticsOptions,
     CardConfiguration? cardConfiguration,
   }) : cardConfiguration = cardConfiguration ?? const CardConfiguration();
+
+  @override
+  String toString() {
+    return 'CardComponentConfiguration(cardConfiguration: $cardConfiguration)';
+  }
 }

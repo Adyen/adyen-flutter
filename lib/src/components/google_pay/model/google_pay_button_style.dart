@@ -10,4 +10,12 @@ class GooglePayButtonStyle {
     this.theme,
     this.cornerRadius,
   });
+
+  @override
+  String toString() {
+    return 'GooglePayButtonStyle('
+        'type: $type, '
+        'theme: $theme, '
+        'cornerRadius: $cornerRadius)';
+  }
 }

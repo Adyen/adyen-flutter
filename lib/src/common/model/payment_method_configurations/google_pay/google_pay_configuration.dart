@@ -37,4 +37,24 @@ class GooglePayConfiguration {
     this.shippingAddressRequired,
     this.shippingAddressParameters,
   });
+
+  @override
+  String toString() {
+    return 'GooglePayConfiguration('
+        'googlePayEnvironment: $googlePayEnvironment, '
+        'merchantAccount: $merchantAccount, '
+        'merchantInfo: $merchantInfo, '
+        'totalPriceStatus: $totalPriceStatus, '
+        'allowedCardNetworks: $allowedCardNetworks, '
+        'allowedAuthMethods: $allowedAuthMethods, '
+        'allowPrepaidCards: $allowPrepaidCards, '
+        'allowCreditCards: $allowCreditCards, '
+        'assuranceDetailsRequired: $assuranceDetailsRequired, '
+        'emailRequired: $emailRequired, '
+        'existingPaymentMethodRequired: $existingPaymentMethodRequired, '
+        'shippingAddressRequired: $shippingAddressRequired, '
+        'shippingAddressParameters: $shippingAddressParameters, '
+        'billingAddressRequired: $billingAddressRequired, '
+        'billingAddressParameters: $billingAddressParameters)';
+  }
 }

@@ -6,4 +6,11 @@ class MerchantInfo {
     this.merchantName,
     this.merchantId,
   });
+
+  @override
+  String toString() {
+    return 'MerchantInfo('
+        'merchantName: $merchantName, '
+        'merchantId: $merchantId)';
+  }
 }

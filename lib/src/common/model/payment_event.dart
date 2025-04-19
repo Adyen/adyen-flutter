@@ -4,12 +4,22 @@ class Finished extends PaymentEvent {
   final String resultCode;
 
   Finished({required this.resultCode});
+
+  @override
+  String toString() {
+    return 'Finished(resultCode: $resultCode)';
+  }
 }
 
 class Action extends PaymentEvent {
   final Map<String, dynamic> actionResponse;
 
   Action({required this.actionResponse});
+
+  @override
+  String toString() {
+    return 'Action(actionResponse: $actionResponse)';
+  }
 }
 
 class Update extends PaymentEvent {
@@ -20,6 +30,13 @@ class Update extends PaymentEvent {
     required this.paymentMethodsJson,
     required this.orderJson,
   });
+
+  @override
+  String toString() {
+    return 'Update('
+        'paymentMethodsJson: $paymentMethodsJson, '
+        'orderJson: $orderJson)';
+  }
 }
 
 class Error extends PaymentEvent {
@@ -32,4 +49,12 @@ class Error extends PaymentEvent {
     this.reason = "",
     this.dismissDropIn = false,
   });
+
+  @override
+  String toString() {
+    return 'Error('
+        'errorMessage: $errorMessage, '
+        'reason: $reason, '
+        'dismissDropIn: $dismissDropIn)';
+  }
 }

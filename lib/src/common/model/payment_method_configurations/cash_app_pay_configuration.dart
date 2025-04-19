@@ -8,4 +8,11 @@ class CashAppPayConfiguration {
     required this.cashAppPayEnvironment,
     required this.returnUrl,
   });
+
+  @override
+  String toString() {
+    return 'CashAppPayConfiguration('
+        'cashAppPayEnvironment: $cashAppPayEnvironment, '
+        'returnUrl: $returnUrl)';
+  }
 }

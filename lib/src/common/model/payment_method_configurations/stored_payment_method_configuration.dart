@@ -8,4 +8,12 @@ class StoredPaymentMethodConfiguration {
     this.isRemoveStoredPaymentMethodEnabled,
     this.deleteStoredPaymentMethodCallback,
   });
+
+  @override
+  String toString() {
+    return 'StoredPaymentMethodConfiguration('
+        'showPreselectedStoredPaymentMethod: $showPreselectedStoredPaymentMethod, '
+        'isRemoveStoredPaymentMethodEnabled: $isRemoveStoredPaymentMethodEnabled, '
+        'deleteStoredPaymentMethodCallback: $deleteStoredPaymentMethodCallback)';
+  }
 }
