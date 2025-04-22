@@ -1,0 +1,8 @@
+/* 
+  Localizable.strings
+  Runner
+
+  Created by Robert Schulze Dieckhoff on 22/04/2025.
+  
+*/
+"adyen.submitButton.formatted" = "اشترك الآن %@";
