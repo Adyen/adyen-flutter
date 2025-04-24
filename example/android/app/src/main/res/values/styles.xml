@@ -16,13 +16,27 @@
         <item name="android:windowBackground">?android:colorBackground</item>
     </style>
 
+    <style name="AdyenCheckout" parent="Adyen" >
+        <!-- Optionally: change the primary color and background color of the default theme -->
+        <item name="colorPrimary">#06F01D</item>
+        <item name="android:backgroundTint">#287F99</item>
+    </style>
+
     <style name="AdyenCheckout.Button.Colored" parent="AdyenCheckout.Button.Primary">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">@dimen/primary_button_height</item>
         <item name="android:layout_marginStart">@dimen/standard_margin</item>
         <item name="android:layout_marginEnd">@dimen/standard_margin</item>
-        <item name="android:backgroundTint">#000000</item>
+        <item name="android:backgroundTint">#FFB860</item>
         <item name="android:textColor">#FFFFFF</item>
+    </style>
+
+    <style name="AdyenCheckout.TextInputLayout" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+        <!-- Changes the border color to red -->
+        <item name="boxStrokeColor">#FF0000</item>
+        <!-- These are part of our base style. It's better to leave them in so the UI looks good, but you can change the values to your liking -->
+        <item name="hintTextColor">?attr/colorPrimary</item>
+        <item name="android:minHeight">@dimen/input_layout_height</item>
     </style>
 
 </resources>
