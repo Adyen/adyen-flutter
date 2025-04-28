@@ -133,8 +133,9 @@ class DropInPlatformApi: DropInPlatformInterface {
                 result: PaymentResultModelDTO(resultCode: Constants.resultCodeCancelled)
             )
         )
-        checkoutFlutter.send(event: checkoutEvent, completion: { _ in })
-        finalizeAndDismiss(success: false, completion: {})
+        finalizeAndDismiss(success: false, completion: { [weak self] in
+            self?.checkoutFlutter.send(event: checkoutEvent, completion: { _ in })
+        })
     }
 
     func onPaymentsResult(paymentsResult: PaymentEventDTO) {
