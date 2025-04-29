@@ -22,7 +22,7 @@ class Config {
   //Environment constants
   static const String merchantAccount = "FlutterTEST";
   static const String merchantName = "Test Merchant";
-  static const String countryCode = "CN";
+  static const String countryCode = "NL";
   static const String shopperLocale = "en-US";
   static const String shopperReference = "Test reference";
   static const Environment environment = Environment.test;
@@ -33,5 +33,5 @@ class Config {
       GooglePayEnvironment.test;
 
   //Example data
-  static Amount amount = Amount(currency: "CNY", value: 4000);
+  static Amount amount = Amount(currency: "EUR", value: 11295);
 }
