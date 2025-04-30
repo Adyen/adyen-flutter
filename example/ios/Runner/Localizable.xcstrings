@@ -1,10 +1,22 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
-    "adyen.submitButton.formatted" : {
+    "adyen.submitButton" : {
       "extractionState" : "manual",
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "يشترك"
+          }
+        },
         "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Subscribe"
+          }
+        },
+        "en-US" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Subscribe"
