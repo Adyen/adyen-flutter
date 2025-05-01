@@ -32,6 +32,14 @@ extension DropInConfigurationDTO {
 
         return dropInConfiguration
     }
+    
+    func createPayment() -> Payment? {
+        guard let amount = amount?.mapToAmount() else {
+            return nil
+        }
+        
+        return Payment(amount: amount, countryCode: countryCode)
+    }
 
     private func buildCard(from cardConfigurationDTO: CardConfigurationDTO) -> DropInComponent.Card {
         let koreanAuthenticationMode = cardConfigurationDTO.kcpFieldVisibility.toCardFieldVisibility()

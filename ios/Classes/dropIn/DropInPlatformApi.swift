@@ -39,7 +39,8 @@ class DropInPlatformApi: DropInPlatformInterface {
                 viewController: viewController,
                 checkoutFlutter: checkoutFlutter
             )
-            let payment = session.sessionContext.payment ?? adyenContext.payment
+            let countryCode = session.sessionContext.countryCode ?? adyenContext.payment?.countryCode ?? dropInConfigurationDTO.countryCode
+            let payment = session.sessionContext.payment ?? adyenContext.payment ?? Payment(amount: session.sessionContext.amount, countryCode: countryCode)
             let dropInConfiguration = try dropInConfigurationDTO.createDropInConfiguration(payment: payment)
             var paymentMethods = session.sessionContext.paymentMethods
             if let paymentMethodNames = dropInConfigurationDTO.paymentMethodNames {
@@ -88,7 +89,8 @@ class DropInPlatformApi: DropInPlatformInterface {
             }
             
             let paymentMethodsWithoutGiftCards = removeGiftCardPaymentMethods(paymentMethods: paymentMethods, isPartialPaymentSupported: dropInConfigurationDTO.isPartialPaymentSupported)
-            let configuration = try dropInConfigurationDTO.createDropInConfiguration(payment: adyenContext.payment)
+            let payment = adyenContext.payment ?? dropInConfigurationDTO.createPayment()
+            let configuration = try dropInConfigurationDTO.createDropInConfiguration(payment: payment)
             let dropInComponent = DropInComponent(
                 paymentMethods: paymentMethodsWithoutGiftCards,
                 context: adyenContext,
