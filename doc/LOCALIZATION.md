@@ -31,7 +31,7 @@ Overriding strings requires omitting the `shopperLocale` from the configuration 
 `shopperLocale` is provided, the SDK uses the default string for that language.
 
 In Xcode, create
-an [new](https://developer.apple.com/documentation/xcode/localizing-and-varying-text-with-a-string-catalog#Add-a-string-catalog-to-your-project)
+a [new](https://developer.apple.com/documentation/xcode/localizing-and-varying-text-with-a-string-catalog#Add-a-string-catalog-to-your-project)
 string catalog or use your existing one. Find the key for the string you want to override in
 the [list of available strings](https://github.com/Adyen/adyen-ios/blob/develop/Adyen/Assets/Generated/LocalizationKey.swift).
 
