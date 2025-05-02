@@ -88,8 +88,7 @@ class DropInPlatformApi: DropInPlatformInterface {
             }
             
             let paymentMethodsWithoutGiftCards = removeGiftCardPaymentMethods(paymentMethods: paymentMethods, isPartialPaymentSupported: dropInConfigurationDTO.isPartialPaymentSupported)
-            let payment = adyenContext.payment ?? dropInConfigurationDTO.createPayment()
-            let configuration = try dropInConfigurationDTO.createDropInConfiguration(payment: payment)
+            let configuration = try dropInConfigurationDTO.createDropInConfiguration(payment: adyenContext.payment)
             let dropInComponent = DropInComponent(
                 paymentMethods: paymentMethodsWithoutGiftCards,
                 context: adyenContext,
