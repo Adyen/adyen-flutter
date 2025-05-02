@@ -29,16 +29,7 @@ class AdyenApplePayComponentRepository extends AdyenBaseRepository {
       "returnUrl": returnUrl,
       "reference":
           "flutter-session-test_${DateTime.now().millisecondsSinceEpoch}",
-      "countryCode": Config.countryCode,
-      "shopperLocale": Config.shopperLocale,
-      "shopperReference": Config.shopperReference,
       "channel": determineChannel(),
-      "authenticationData": {
-        "attemptAuthentication": "always",
-        "threeDSRequestData": {
-          "nativeThreeDS": "preferred",
-        },
-      },
     };
 
     return await service.createSession(sessionRequestBody);
