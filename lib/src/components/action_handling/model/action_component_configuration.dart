@@ -21,7 +21,7 @@ final class ActionComponentConfiguration {
   String toString() {
     return 'ActionComponentConfiguration('
         'environment: $environment, '
-        'clientKey: $clientKey, '
+        'clientKey: ****, '
         'shopperLocale: $shopperLocale, '
         'amount: $amount, '
         'analyticsOptions: $analyticsOptions)';

@@ -23,7 +23,7 @@ base class BaseConfiguration {
   String toString() {
     return 'BaseConfiguration('
         'environment: $environment, '
-        'clientKey: $clientKey, '
+        'clientKey: ****, '
         'countryCode: $countryCode, '
         'amount: $amount, '
         'shopperLocale: $shopperLocale, '
