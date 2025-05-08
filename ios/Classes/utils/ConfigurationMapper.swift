@@ -291,9 +291,8 @@ extension ResultCode {
 }
 
 extension AdyenSession.Context {
-    var payment: Payment? {
-        guard let countryCode else { return nil }
-        return Payment(amount: amount, countryCode: countryCode)
+    func createPayment(fallbackCountryCode: String) -> Payment {
+        return Payment(amount: amount, countryCode: countryCode ?? fallbackCountryCode)
     }
 }
 
