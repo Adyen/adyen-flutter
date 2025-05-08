@@ -13,4 +13,9 @@ final class GooglePayComponentConfiguration extends BaseConfiguration {
     super.shopperLocale,
     super.analyticsOptions,
   });
+
+  @override
+  String toString() {
+    return 'GooglePayComponentConfiguration(googlePayConfiguration: $googlePayConfiguration)';
+  }
 }

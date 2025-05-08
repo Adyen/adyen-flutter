@@ -6,4 +6,11 @@ class ShippingAddressParameters {
     this.allowedCountryCodes,
     this.isPhoneNumberRequired,
   });
+
+  @override
+  String toString() {
+    return 'ShippingAddressParameters('
+        'allowedCountryCodes: $allowedCountryCodes, '
+        'isPhoneNumberRequired: $isPhoneNumberRequired)';
+  }
 }
