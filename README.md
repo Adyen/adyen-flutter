@@ -24,9 +24,10 @@ You can integrate with the following:
       PayPal, Klarna and many more.
 
   > [!IMPORTANT]
-  > For the Components integration, we recommend using Flutter v3.29.2 or higher. Due to an
-  > Flutter [issue](https://github.com/flutter/flutter/issues/160854) in v3.27.x - v3.29.1, some
-  > Android 10 devices might experience a degraded performance.
+  > For the Components integration, we recommend using Flutter v3.29.2 or higher. Due to a
+  > Flutter [issue](https://github.com/flutter/flutter/issues/160854) in v3.27.x, some
+  > Android 10 devices might experience a degraded performance when using earlier versions than
+  > v3.29.2.
 * **API only**: Build your own UI for the card payment form, collect the shopper's card details, and
   then use the package to validate and encrypt the card data in your app.
 
