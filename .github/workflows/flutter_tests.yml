@@ -13,8 +13,6 @@ jobs:
   flutter_tests:
     runs-on: ubuntu-22.04
     timeout-minutes: 30
-    permissions:
-      pull-requests: write
 
     steps:
       - uses: actions/checkout@v4
@@ -40,4 +38,4 @@ jobs:
         with:
           coverage-files: coverage/coverage_with_exclusion.info
           artifact-name: flutter-coverage-report
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+#          github-token: ${{ secrets.GITHUB_TOKEN }}
