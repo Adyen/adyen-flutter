@@ -14,7 +14,6 @@ jobs:
   preparation:
     name: Prepare environment vars
     runs-on: ubuntu-22.04
-    permissions: write-all
     outputs:
       FLUTTER_VERSION: ${{ env.FLUTTER_VERSION }}
     steps:
@@ -51,8 +50,7 @@ jobs:
     runs-on: ubuntu-22.04
     continue-on-error: true
     needs: [ sonar_cloud ]
-    permissions:
-      contents: write
+    permissions: write-all
     steps:
       - uses: actions/checkout@v4
       - name: Clear cache
