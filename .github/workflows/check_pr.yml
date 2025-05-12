@@ -52,7 +52,8 @@ jobs:
     runs-on: ubuntu-24.04
     continue-on-error: true
     needs: [ sonar_cloud ]
-    permissions: write-all
+    permissions:
+      actions: write
     steps:
       - uses: actions/checkout@v4
       - name: Clear cache
