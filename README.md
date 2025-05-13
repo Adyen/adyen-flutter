@@ -100,11 +100,13 @@ you use, please follow the corresponding integration guide in our documentation.
 
 * [API only integration guide](https://docs.adyen.com/payment-methods/cards/custom-card-integration/?tab=flutter_5)
 
-## Customization
+## Customization & Localization
 
-You can customize the styling of the user interface. Follow the guides for each platform:
+You can customize the styling of the user interface and change the wording if required. Follow the
+guides for each platform:
 
 * [UI customization](/doc/CUSTOMIZATION.md)
+* [Localization](/doc/LOCALIZATION.md)
 
 ## Support
 
