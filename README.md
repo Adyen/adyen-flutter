@@ -76,7 +76,7 @@ release a new version when we need to.
   that matches the returnUrl you use.
 
 > [!IMPORTANT]
-> For the standalone Components integration, we recommend using Flutter v3.29.2 or higher. Due
+> For the standalone Component integration, we recommend using Flutter v3.29.2 or higher. Due
 > to [this](https://github.com/flutter/flutter/issues/160854)
 > Flutter issue, some Android 10 devices might experience a degraded performance when using a lower
 > Flutter version.
