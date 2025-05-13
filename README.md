@@ -22,12 +22,6 @@ You can integrate with the following:
     - Apple Pay Component: renders an Apple Pay button.
     - Instant Component: supports payment methods that do not require additional input fields, like
       PayPal, Klarna and many more.
-
-> [!IMPORTANT]
-> For the Components integration, we recommend using Flutter v3.29.2 or higher. Due
-> to [this](https://github.com/flutter/flutter/issues/160854)
-> Flutter issue, some Android 10 devices might experience a degraded performance.
-
 * **API only**: Build your own UI for the card payment form, collect the shopper's card details, and
   then use the package to validate and encrypt the card data in your app.
 
@@ -80,6 +74,11 @@ release a new version when we need to.
 * Add a
   custom [URL scheme](https://developer.apple.com/documentation/xcode/defining-a-custom-url-scheme-for-your-app)
   that matches the returnUrl you use.
+
+> [!IMPORTANT]
+> For the standalone Components integration, we recommend using Flutter v3.29.2 or higher. Due
+> to [this](https://github.com/flutter/flutter/issues/160854)
+> Flutter issue, some Android 10 devices might experience a degraded performance.
 
 ## Integration
 
