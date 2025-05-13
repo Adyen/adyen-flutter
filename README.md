@@ -23,11 +23,14 @@ You can integrate with the following:
     - Instant Component: supports payment methods that do not require additional input fields, like
       PayPal, Klarna and many more.
 
-  > [!IMPORTANT]
-  > For the Components integration, we recommend using Flutter v3.29.2 or higher. Due to a
-  > Flutter [issue](https://github.com/flutter/flutter/issues/160854) in v3.27.x, some
-  > Android 10 devices might experience a degraded performance when using earlier versions than
-  > v3.29.2.
+> [!IMPORTANT]
+> Key information users need to know to achieve their goal.
+
+> [!IMPORTANT]
+> For the Components integration, we recommend using Flutter v3.29.2 or higher. Due to this
+> Flutter [issue](https://github.com/flutter/flutter/issues/160854), some Android 10 devices
+> might experience a degraded performance.
+
 * **API only**: Build your own UI for the card payment form, collect the shopper's card details, and
   then use the package to validate and encrypt the card data in your app.
 
