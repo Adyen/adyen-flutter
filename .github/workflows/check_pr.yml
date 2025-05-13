@@ -13,7 +13,7 @@ jobs:
   #  The preparation job is required to populate the FLUTTER_VERSION value as output for the tests jobs.
   preparation:
     name: Prepare environment vars
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     outputs:
       FLUTTER_VERSION: ${{ env.FLUTTER_VERSION }}
     steps:
