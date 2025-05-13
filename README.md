@@ -78,12 +78,13 @@ release a new version when we need to.
 > [!IMPORTANT]
 > For the standalone Components integration, we recommend using Flutter v3.29.2 or higher. Due
 > to [this](https://github.com/flutter/flutter/issues/160854)
-> Flutter issue, some Android 10 devices might experience a degraded performance.
+> Flutter issue, some Android 10 devices might experience a degraded performance when using a lower
+> Flutter version.
 
 ## Integration
 
 Depending on the [server-side flow](https://docs.adyen.com/online-payments/build-your-integration/)
-you use, follow corresponding the integration guide in our documentation.
+you use, please follow the corresponding integration guide in our documentation.
 
 ### Sessions flow
 
@@ -107,8 +108,8 @@ You can customize the styling of the user interface. Follow the guides for each 
 
 ## Support
 
-If you have a feature request, or spotted a bug or a technical problem, create a GitHub issue. For
-other questions, contact our Support Team
+If you have a feature request, or spotted a bug or a technical problem, feel free to create a GitHub
+issue. For other questions, please contact our Support Team
 via [Customer Area](https://ca-live.adyen.com/ca/ca/contactUs/support.shtml) or via email:
 support@adyen.com
 
