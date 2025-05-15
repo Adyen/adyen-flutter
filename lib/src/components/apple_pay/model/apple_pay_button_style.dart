@@ -11,4 +11,12 @@ class ApplePayButtonStyle {
     this.type,
     this.cornerRadius,
   });
+
+  @override
+  String toString() {
+    return 'ApplePayButtonStyle('
+        'theme: $theme, '
+        'type: $type, '
+        'cornerRadius: $cornerRadius)';
+  }
 }

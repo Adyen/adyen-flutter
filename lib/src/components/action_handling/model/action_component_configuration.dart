@@ -16,4 +16,14 @@ final class ActionComponentConfiguration {
     this.amount,
     AnalyticsOptions? analyticsOptions,
   }) : analyticsOptions = analyticsOptions ?? AnalyticsOptions(enabled: true);
+
+  @override
+  String toString() {
+    return 'ActionComponentConfiguration('
+        'environment: $environment, '
+        'clientKey: ****, '
+        'shopperLocale: $shopperLocale, '
+        'amount: $amount, '
+        'analyticsOptions: $analyticsOptions)';
+  }
 }

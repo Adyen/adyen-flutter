@@ -6,4 +6,11 @@ class OrderCancelResult {
     required this.orderCancelResponseBody,
     this.updatedPaymentMethodsResponseBody,
   });
+
+  @override
+  String toString() {
+    return 'OrderCancelResult('
+        'orderCancelResponseBody: $orderCancelResponseBody, '
+        'updatedPaymentMethodsResponseBody: $updatedPaymentMethodsResponseBody)';
+  }
 }
