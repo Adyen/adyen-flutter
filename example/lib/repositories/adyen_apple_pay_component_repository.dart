@@ -29,6 +29,7 @@ class AdyenApplePayComponentRepository extends AdyenBaseRepository {
       "returnUrl": returnUrl,
       "reference":
           "flutter-session-test_${DateTime.now().millisecondsSinceEpoch}",
+      "shopperReference": Config.shopperReference,
       "channel": determineChannel(),
     };
 
