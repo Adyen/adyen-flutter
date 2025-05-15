@@ -39,7 +39,7 @@ class DropInPlatformApi: DropInPlatformInterface {
                 viewController: viewController,
                 checkoutFlutter: checkoutFlutter
             )
-            let payment = session.sessionContext.payment ?? adyenContext.payment
+            let payment = session.sessionContext.createPayment(fallbackCountryCode: dropInConfigurationDTO.countryCode)
             let dropInConfiguration = try dropInConfigurationDTO.createDropInConfiguration(payment: payment)
             var paymentMethods = session.sessionContext.paymentMethods
             if let paymentMethodNames = dropInConfigurationDTO.paymentMethodNames {
