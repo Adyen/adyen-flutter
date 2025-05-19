@@ -22,7 +22,10 @@ import io.flutter.plugin.common.BinaryMessenger
 import io.flutter.plugin.common.PluginRegistry
 
 /** AdyenCheckoutPlugin */
-class AdyenCheckoutPlugin : FlutterPlugin, ActivityAware, PluginRegistry.ActivityResultListener {
+class AdyenCheckoutPlugin :
+    FlutterPlugin,
+    ActivityAware,
+    PluginRegistry.ActivityResultListener {
     private var flutterPluginBinding: FlutterPluginBinding? = null
     private var activityPluginBinding: ActivityPluginBinding? = null
     private var checkoutPlatformApi: CheckoutPlatformApi? = null
@@ -102,8 +105,8 @@ class AdyenCheckoutPlugin : FlutterPlugin, ActivityAware, PluginRegistry.Activit
             }
     }
 
-    private fun createLifecycleEventObserver(fragmentActivity: FragmentActivity): LifecycleEventObserver {
-        return LifecycleEventObserver { _, event ->
+    private fun createLifecycleEventObserver(fragmentActivity: FragmentActivity): LifecycleEventObserver =
+        LifecycleEventObserver { _, event ->
             when (event) {
                 Lifecycle.Event.ON_CREATE -> {
                     dropInPlatformApi?.apply {
@@ -126,7 +129,6 @@ class AdyenCheckoutPlugin : FlutterPlugin, ActivityAware, PluginRegistry.Activit
                 else -> {}
             }
         }
-    }
 
     private fun teardown() {
         flutterPluginBinding?.let {

@@ -84,13 +84,12 @@ internal class CardSessionComponent(
 
     private fun onAction(action: Action) = cardComponent?.handleAction(action, activity)
 
-    private fun determineCardPaymentMethod(paymentMethodJson: JSONObject): PaymentMethod {
-        return if (paymentMethodJson.length() > 0) {
+    private fun determineCardPaymentMethod(paymentMethodJson: JSONObject): PaymentMethod =
+        if (paymentMethodJson.length() > 0) {
             PaymentMethod.SERIALIZER.deserialize(paymentMethodJson)
         } else {
             val sessionResponse = SessionSetupResponse.SERIALIZER.deserialize(sessionHolder.sessionSetupResponse)
             sessionResponse.paymentMethodsApiResponse?.paymentMethods?.first { it.type == CARD_PAYMENT_METHOD_KEY }
                 ?: throw Exception("Cannot find card payment method")
         }
-    }
 }

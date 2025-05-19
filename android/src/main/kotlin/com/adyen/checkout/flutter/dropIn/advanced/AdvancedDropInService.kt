@@ -40,7 +40,9 @@ import com.adyen.checkout.googlepay.GooglePayComponentState
 import kotlinx.coroutines.launch
 import org.json.JSONObject
 
-class AdvancedDropInService : DropInService(), LifecycleOwner {
+class AdvancedDropInService :
+    DropInService(),
+    LifecycleOwner {
     private val dispatcher = ServiceLifecycleDispatcher(this)
 
     init {
@@ -255,16 +257,15 @@ class AdvancedDropInService : DropInService(), LifecycleOwner {
 
     private fun mapToDeletionDropInResult(
         deleteStoredPaymentMethodResultDTO: DeletedStoredPaymentMethodResultDTO?
-    ): RecurringDropInServiceResult {
-        return if (deleteStoredPaymentMethodResultDTO?.isSuccessfullyRemoved == true) {
+    ): RecurringDropInServiceResult =
+        if (deleteStoredPaymentMethodResultDTO?.isSuccessfullyRemoved == true) {
             RecurringDropInServiceResult.PaymentMethodRemoved(deleteStoredPaymentMethodResultDTO.storedPaymentMethodId)
         } else {
             RecurringDropInServiceResult.Error(errorDialog = null)
         }
-    }
 
-    private fun mapToDropInServiceResult(paymentEventDTO: PaymentEventDTO?): DropInServiceResult {
-        return when (paymentEventDTO?.paymentEventType) {
+    private fun mapToDropInServiceResult(paymentEventDTO: PaymentEventDTO?): DropInServiceResult =
+        when (paymentEventDTO?.paymentEventType) {
             PaymentEventType.FINISHED ->
                 DropInServiceResult.Finished(
                     result = "${paymentEventDTO.result}"
@@ -315,15 +316,13 @@ class AdvancedDropInService : DropInService(), LifecycleOwner {
                     dismissDropIn = true
                 )
         }
-    }
 
-    private fun buildErrorDialog(dropInError: ErrorDTO?): ErrorDialog? {
-        return if (dropInError?.dismissDropIn == true) {
+    private fun buildErrorDialog(dropInError: ErrorDTO?): ErrorDialog? =
+        if (dropInError?.dismissDropIn == true) {
             null
         } else {
             ErrorDialog(message = dropInError?.errorMessage)
         }
-    }
 
     private fun mapToBalanceDropInServiceResult(response: String): BalanceDropInServiceResult {
         try {
