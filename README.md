@@ -4,7 +4,7 @@
 
 [![Pub Package](https://img.shields.io/pub/v/adyen_checkout.svg)](https://pub.dev/packages/adyen_checkout)
 [![Adyen iOS](https://img.shields.io/badge/ios-v5.17.0-brightgreen.svg)](https://github.com/Adyen/adyen-ios/releases/tag/5.17.0)
-[![Adyen Android](https://img.shields.io/badge/android-v5.10.0-brightgreen.svg)](https://github.com/Adyen/adyen-android/releases/tag/5.10.0)
+[![Adyen Android](https://img.shields.io/badge/android-v5.11.0-brightgreen.svg)](https://github.com/Adyen/adyen-android/releases/tag/5.11.0)
 
 The Adyen Flutter package provides you with the building blocks to create a checkout experience for
 your shoppers, allowing them to pay using the payment method of their choice. This is
