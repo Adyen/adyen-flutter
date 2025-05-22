@@ -1,10 +1,21 @@
+## 1.5.0 (in development)
+
+### New
+
+- Android Components/Drop-in
+  version: [5.11.0](https://docs.adyen.com/online-payments/release-notes/?title%5B0%5D=Android+Components%2FDrop-in#releaseNote=2025-05-15-android-componentsdrop-in-5.11.0).
+
+### Improved
+
+- For dismissing Drop-in programmatically, improved closing of the Apple Pay bottom sheet.
+
 ## 1.4.0
 
 ### New
 
 - For Sessions and Advanced flows, added methods to dismiss Drop-in.
-- For the card component and cards within Drop-in, added support for BIN lookup callbacks that will be
-  called when the shopper enters their card details.
+- For the card component and cards within Drop-in, added support for BIN lookup callbacks that will
+  be called when the shopper enters their card details.
 - Added a custom card Flutter widget to the example app using CSE and card validators.
 - Android Components/Drop-in
   version: [5.10.0](https://docs.adyen.com/online-payments/release-notes/?title%5B0%5D=Android+Components%2FDrop-in#releaseNote=2025-04-07-android-componentsdrop-in-5.10.0).
