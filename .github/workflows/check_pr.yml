@@ -7,7 +7,7 @@ on:
     branches: [ "main" ]
 
 env:
-  FLUTTER_VERSION: '3.29.x'
+  FLUTTER_VERSION: '3.32.x'
 
 jobs:
   #  The preparation job is required to populate the FLUTTER_VERSION value as output for the tests jobs.
