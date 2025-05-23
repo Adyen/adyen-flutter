@@ -2,8 +2,12 @@
 
 ### New
 
+- For cards: when the shopper enters the details for a co-badged card, the available brand options
+  are displayed in a separate section in the payment form.
 - Android Components/Drop-in
   version: [5.11.0](https://docs.adyen.com/online-payments/release-notes/?title%5B0%5D=Android+Components%2FDrop-in#releaseNote=2025-05-15-android-componentsdrop-in-5.11.0).
+- iOS Components/Drop-in
+  version: [5.18.0](TODO)
 
 ### Improved
 
