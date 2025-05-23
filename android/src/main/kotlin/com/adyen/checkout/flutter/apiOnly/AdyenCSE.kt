@@ -10,8 +10,8 @@ internal object AdyenCSE {
     fun encryptCard(
         unencryptedCardDTO: UnencryptedCardDTO,
         publicKey: String,
-    ): Result<EncryptedCardDTO> {
-        return try {
+    ): Result<EncryptedCardDTO> =
+        try {
             val unencryptedCard = unencryptedCardDTO.fromDTO()
             val encryptedCard = CardEncrypter.encryptFields(unencryptedCard, publicKey)
             val encryptedCardDTO = encryptedCard.mapToEncryptedCardDTO()
@@ -19,17 +19,15 @@ internal object AdyenCSE {
         } catch (exception: Exception) {
             Result.failure(exception)
         }
-    }
 
     fun encryptBin(
         bin: String,
         publicKey: String,
-    ): Result<String> {
-        return try {
+    ): Result<String> =
+        try {
             val encryptedBin = CardEncrypter.encryptBin(bin, publicKey)
             Result.success(encryptedBin)
         } catch (exception: Exception) {
             Result.failure(exception)
         }
-    }
 }

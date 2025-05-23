@@ -129,8 +129,8 @@ class ComponentPlatformApi(
         requestCode: Int,
         resultCode: Int,
         data: Intent?
-    ): Boolean {
-        return when (requestCode) {
+    ): Boolean =
+        when (requestCode) {
             Constants.GOOGLE_PAY_COMPONENT_REQUEST_CODE -> {
                 googlePayComponentManager.handleGooglePayActivityResult(resultCode, data)
                 true
@@ -138,7 +138,6 @@ class ComponentPlatformApi(
 
             else -> false
         }
-    }
 
     private fun handlePaymentEvent(
         componentId: String,
@@ -212,7 +211,9 @@ class ComponentPlatformApi(
 
     private fun handleIntent(intent: Intent) {
         if (intent.data != null &&
-            intent.data?.toString().orEmpty()
+            intent.data
+                ?.toString()
+                .orEmpty()
                 .startsWith(RedirectComponent.REDIRECT_RESULT_SCHEME)
         ) {
             currentComponent?.handleIntent(intent)

@@ -50,8 +50,8 @@ internal class ActionComponentManager(
     private fun createActionComponent(
         checkoutConfiguration: CheckoutConfiguration,
         componentId: String
-    ): GenericActionComponent {
-        return GenericActionComponent.PROVIDER.get(
+    ): GenericActionComponent =
+        GenericActionComponent.PROVIDER.get(
             activity,
             checkoutConfiguration,
             ActionComponentCallback(
@@ -61,7 +61,6 @@ internal class ActionComponentManager(
             ),
             UUID.randomUUID().toString()
         )
-    }
 
     private fun sendErrorToFlutterLayer(
         componentId: String,

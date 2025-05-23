@@ -145,8 +145,8 @@ class InstantComponentManager(
         configuration: CheckoutConfiguration,
         paymentMethod: PaymentMethod,
         componentId: String,
-    ): InstantPaymentComponent {
-        return InstantPaymentComponent.PROVIDER.get(
+    ): InstantPaymentComponent =
+        InstantPaymentComponent.PROVIDER.get(
             activity = activity,
             paymentMethod = paymentMethod,
             checkoutConfiguration = configuration,
@@ -158,7 +158,6 @@ class InstantComponentManager(
                 ),
             key = UUID.randomUUID().toString()
         )
-    }
 
     private fun createInstantSessionComponent(
         configuration: CheckoutConfiguration,
@@ -195,8 +194,8 @@ class InstantComponentManager(
         configuration: CheckoutConfiguration,
         paymentMethod: PaymentMethod,
         componentId: String,
-    ): IdealComponent {
-        return IdealComponent.PROVIDER.get(
+    ): IdealComponent =
+        IdealComponent.PROVIDER.get(
             activity = activity,
             paymentMethod = paymentMethod,
             checkoutConfiguration = configuration,
@@ -208,7 +207,6 @@ class InstantComponentManager(
                 ),
             key = UUID.randomUUID().toString()
         )
-    }
 
     private fun createIdealSessionComponent(
         configuration: CheckoutConfiguration,

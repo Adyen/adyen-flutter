@@ -48,14 +48,13 @@ import com.adyen.checkout.cashapppay.CashAppPayEnvironment as SDKCashAppPayEnvir
 import com.adyen.checkout.core.Environment as SDKEnvironment
 
 object ConfigurationMapper {
-    fun OrderResponse.mapToOrderResponseModel(): OrderResponseDTO {
-        return OrderResponseDTO(
+    fun OrderResponse.mapToOrderResponseModel(): OrderResponseDTO =
+        OrderResponseDTO(
             pspReference = pspReference,
             orderData = orderData,
             amount = amount?.mapToDTOAmount(),
             remainingAmount = remainingAmount?.mapToDTOAmount(),
         )
-    }
 
     fun DropInConfigurationDTO.mapToDropInConfiguration(context: Context): DropInConfiguration {
         val environment = environment.mapToEnvironment()
@@ -119,14 +118,13 @@ object ConfigurationMapper {
         context: Context,
         shopperLocale: String?,
         environment: com.adyen.checkout.core.Environment,
-    ): DropInConfiguration.Builder {
-        return if (shopperLocale != null) {
+    ): DropInConfiguration.Builder =
+        if (shopperLocale != null) {
             val locale = Locale.forLanguageTag(shopperLocale)
             DropInConfiguration.Builder(locale, environment, clientKey)
         } else {
             DropInConfiguration.Builder(context, environment, clientKey)
         }
-    }
 
     fun CardConfigurationDTO.mapToCardConfiguration(
         context: Context,
@@ -144,13 +142,17 @@ object ConfigurationMapper {
                 CardConfiguration.Builder(context, environment, clientKey)
             }
 
-        cardConfiguration.setAddressConfiguration(addressMode.mapToAddressConfiguration())
-            .setShowStorePaymentField(showStorePaymentField).setHideCvcStoredCard(!showCvcForStoredCard)
-            .setHideCvc(!showCvc).setKcpAuthVisibility(determineKcpAuthVisibility(kcpFieldVisibility))
+        cardConfiguration
+            .setAddressConfiguration(addressMode.mapToAddressConfiguration())
+            .setShowStorePaymentField(showStorePaymentField)
+            .setHideCvcStoredCard(!showCvcForStoredCard)
+            .setHideCvc(!showCvc)
+            .setKcpAuthVisibility(determineKcpAuthVisibility(kcpFieldVisibility))
             .setSocialSecurityNumberVisibility(
                 determineSocialSecurityNumberVisibility(socialSecurityNumberFieldVisibility)
             ).setSupportedCardTypes(*mapToSupportedCardTypes(supportedCardTypes))
-            .setHolderNameRequired(holderNameRequired).setAnalyticsConfiguration(analyticsConfiguration)
+            .setHolderNameRequired(holderNameRequired)
+            .setAnalyticsConfiguration(analyticsConfiguration)
         amount?.let {
             cardConfiguration.setAmount(amount)
         }
@@ -201,27 +203,24 @@ object ConfigurationMapper {
         return cashAppPayConfigurationDTO.mapToCashAppPayConfiguration(cashAppPayConfigurationBuilder)
     }
 
-    private fun AddressMode.mapToAddressConfiguration(): AddressConfiguration {
-        return when (this) {
+    private fun AddressMode.mapToAddressConfiguration(): AddressConfiguration =
+        when (this) {
             AddressMode.FULL -> AddressConfiguration.FullAddress()
             AddressMode.POSTAL_CODE -> AddressConfiguration.PostalCode()
             AddressMode.NONE -> AddressConfiguration.None
         }
-    }
 
-    private fun determineKcpAuthVisibility(fieldVisibility: FieldVisibility): KCPAuthVisibility {
-        return when (fieldVisibility) {
+    private fun determineKcpAuthVisibility(fieldVisibility: FieldVisibility): KCPAuthVisibility =
+        when (fieldVisibility) {
             FieldVisibility.SHOW -> KCPAuthVisibility.SHOW
             FieldVisibility.HIDE -> KCPAuthVisibility.HIDE
         }
-    }
 
-    private fun determineSocialSecurityNumberVisibility(visible: FieldVisibility): SocialSecurityNumberVisibility {
-        return when (visible) {
+    private fun determineSocialSecurityNumberVisibility(visible: FieldVisibility): SocialSecurityNumberVisibility =
+        when (visible) {
             FieldVisibility.SHOW -> SocialSecurityNumberVisibility.SHOW
             FieldVisibility.HIDE -> SocialSecurityNumberVisibility.HIDE
         }
-    }
 
     private fun mapToSupportedCardTypes(cardTypes: List<String?>?): Array<CardType> {
         if (cardTypes == null) {
@@ -235,8 +234,8 @@ object ConfigurationMapper {
         return mappedCardTypes.filterNotNull().toTypedArray()
     }
 
-    fun Environment.mapToEnvironment(): SDKEnvironment {
-        return when (this) {
+    fun Environment.mapToEnvironment(): SDKEnvironment =
+        when (this) {
             Environment.TEST -> SDKEnvironment.TEST
             Environment.EUROPE -> SDKEnvironment.EUROPE
             Environment.UNITED_STATES -> SDKEnvironment.UNITED_STATES
@@ -244,18 +243,14 @@ object ConfigurationMapper {
             Environment.INDIA -> SDKEnvironment.INDIA
             Environment.APSE -> SDKEnvironment.APSE
         }
-    }
 
-    fun AmountDTO.mapToAmount(): Amount {
-        return Amount(this.currency, this.value)
-    }
+    fun AmountDTO.mapToAmount(): Amount = Amount(this.currency, this.value)
 
-    private fun Amount.mapToDTOAmount(): AmountDTO {
-        return AmountDTO(
+    private fun Amount.mapToDTOAmount(): AmountDTO =
+        AmountDTO(
             this.currency ?: throw Exception("Currency must not be null"),
             this.value,
         )
-    }
 
     private fun GooglePayConfigurationDTO.mapToGooglePayConfiguration(
         builder: GooglePayConfiguration.Builder,
@@ -336,38 +331,32 @@ object ConfigurationMapper {
         return builder.build()
     }
 
-    private fun GooglePayEnvironment.mapToWalletConstants(): Int {
-        return when (this) {
+    private fun GooglePayEnvironment.mapToWalletConstants(): Int =
+        when (this) {
             GooglePayEnvironment.TEST -> WalletConstants.ENVIRONMENT_TEST
             GooglePayEnvironment.PRODUCTION -> WalletConstants.ENVIRONMENT_PRODUCTION
         }
-    }
 
-    private fun TotalPriceStatus.mapToTotalPriceStatus(): String {
-        return when (this) {
+    private fun TotalPriceStatus.mapToTotalPriceStatus(): String =
+        when (this) {
             TotalPriceStatus.NOT_CURRENTLY_KNOWN -> "NOT_CURRENTLY_KNOWN"
             TotalPriceStatus.ESTIMATED -> "ESTIMATED"
             TotalPriceStatus.FINAL_PRICE -> "FINAL"
         }
-    }
 
-    private fun MerchantInfoDTO.mapToMerchantInfo(): MerchantInfo {
-        return MerchantInfo(merchantName, merchantId)
-    }
+    private fun MerchantInfoDTO.mapToMerchantInfo(): MerchantInfo = MerchantInfo(merchantName, merchantId)
 
-    private fun ShippingAddressParametersDTO.mapToShippingAddressParameters(): ShippingAddressParameters {
-        return when {
+    private fun ShippingAddressParametersDTO.mapToShippingAddressParameters(): ShippingAddressParameters =
+        when {
             isPhoneNumberRequired != null -> ShippingAddressParameters(allowedCountryCodes, isPhoneNumberRequired)
             else -> ShippingAddressParameters(allowedCountryCodes)
         }
-    }
 
-    private fun BillingAddressParametersDTO.mapToBillingAddressParameters(): BillingAddressParameters {
-        return when {
+    private fun BillingAddressParametersDTO.mapToBillingAddressParameters(): BillingAddressParameters =
+        when {
             isPhoneNumberRequired != null -> BillingAddressParameters(format, isPhoneNumberRequired)
             else -> BillingAddressParameters(format)
         }
-    }
 
     private fun CashAppPayConfigurationDTO.mapToCashAppPayConfiguration(
         builder: CashAppPayConfiguration.Builder
@@ -376,16 +365,14 @@ object ConfigurationMapper {
         return builder.build()
     }
 
-    private fun CashAppPayEnvironment.mapToCashAppPayEnvironment(): SDKCashAppPayEnvironment {
-        return when (this) {
+    private fun CashAppPayEnvironment.mapToCashAppPayEnvironment(): SDKCashAppPayEnvironment =
+        when (this) {
             CashAppPayEnvironment.SANDBOX -> SDKCashAppPayEnvironment.SANDBOX
             CashAppPayEnvironment.PRODUCTION -> SDKCashAppPayEnvironment.PRODUCTION
         }
-    }
 
-    fun EncryptedCard.mapToEncryptedCardDTO(): EncryptedCardDTO {
-        return EncryptedCardDTO(encryptedCardNumber, encryptedExpiryMonth, encryptedExpiryYear, encryptedSecurityCode)
-    }
+    fun EncryptedCard.mapToEncryptedCardDTO(): EncryptedCardDTO =
+        EncryptedCardDTO(encryptedCardNumber, encryptedExpiryMonth, encryptedExpiryYear, encryptedSecurityCode)
 
     fun UnencryptedCardDTO.fromDTO(): UnencryptedCard {
         val unencryptedCardBuilder = UnencryptedCard.Builder()

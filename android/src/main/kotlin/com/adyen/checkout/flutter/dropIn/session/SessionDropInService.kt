@@ -25,7 +25,9 @@ import com.adyen.checkout.flutter.generated.DeletedStoredPaymentMethodResultDTO
 import com.adyen.checkout.flutter.utils.Constants.Companion.RESULT_CODE_CANCELLED
 import kotlinx.coroutines.launch
 
-class SessionDropInService : SessionDropInService(), LifecycleOwner {
+class SessionDropInService :
+    SessionDropInService(),
+    LifecycleOwner {
     private val dispatcher = ServiceLifecycleDispatcher(this)
 
     init {
@@ -79,13 +81,12 @@ class SessionDropInService : SessionDropInService(), LifecycleOwner {
 
     private fun mapToDeletionDropInResult(
         deleteStoredPaymentMethodResultDTO: DeletedStoredPaymentMethodResultDTO?
-    ): RecurringDropInServiceResult {
-        return if (deleteStoredPaymentMethodResultDTO?.isSuccessfullyRemoved == true) {
+    ): RecurringDropInServiceResult =
+        if (deleteStoredPaymentMethodResultDTO?.isSuccessfullyRemoved == true) {
             RecurringDropInServiceResult.PaymentMethodRemoved(deleteStoredPaymentMethodResultDTO.storedPaymentMethodId)
         } else {
             RecurringDropInServiceResult.Error(errorDialog = null)
         }
-    }
 
     private fun listenToFlutterEvents() {
         lifecycleScope.launch {
