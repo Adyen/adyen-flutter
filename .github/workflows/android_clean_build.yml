@@ -18,9 +18,13 @@ jobs:
     steps:
       - name: Provide more disk space
         run: |
+          sudo rm -rf /opt/hostedtoolcache
           sudo rm -rf /usr/share/dotnet
-          sudo rm -rf /opt/ghc
+          sudo rm -rf /opt/ghc /opt/cabal /opt/stack
+          sudo rm -rf /usr/local/.ghcup
           sudo rm -rf "/usr/local/share/boost"
+          sudo apt-get remove -y 'php.*'
+          sudo docker image prune --all --force
 
       - uses: actions/checkout@v4
 

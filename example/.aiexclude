@@ -1,0 +1,24 @@
+# Files and directories to exclude from AI analysis in a Flutter project
+
+# Build artifacts and generated files
+.dart_tool/
+build/
+.flutter-plugins/
+.flutter-plugins-dependencies/
+.packages
+.ios/Flutter/Generated.xcconfig
+.android/app/build/
+.android/app/.cxx/
+
+# IDE and OS generated files
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Dependency caches
+pubspec.lock
+
+# Local specific files
+# If you have any local files that shouldn't be shared or analyzed, add them here.
+secrets.json
