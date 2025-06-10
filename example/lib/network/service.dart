@@ -7,14 +7,17 @@ import 'package:http/http.dart' as http;
 
 class Service {
   Future<Map<String, dynamic>> createSession(Map<String, dynamic> body) async {
-    final response = await http.post(
-      Uri.https(Config.baseUrl, "/${Config.apiVersion}/sessions"),
+    final httpClient = http.Client();
+
+    final response = await httpClient.post(
+      Uri.https("mystoredemo.io", "/.netlify/functions/sessions"),
       headers: _createHeaders(),
       body: jsonEncode(body),
     );
-    final sessionResponse = jsonDecode(response.body);
-    print("Session id: ${sessionResponse["id"]}");
-    return sessionResponse;
+    print(response.toString());
+    // final sessionResponse = jsonDecode(response.body);
+    // print("Session id: ${sessionResponse["id"]}");
+    return Map();
   }
 
   Future<Map<String, dynamic>> fetchPaymentMethods(
@@ -108,6 +111,5 @@ class Service {
 
   Map<String, String> _createHeaders() => {
         "content-type": "application/json",
-        "x-API-key": Config.xApiKey,
       };
 }
