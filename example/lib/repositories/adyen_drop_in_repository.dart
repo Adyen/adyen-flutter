@@ -21,54 +21,7 @@ class AdyenDropInRepository extends AdyenBaseRepository {
       "countryCode": Config.countryCode,
       "shopperLocale": Config.shopperLocale,
       "shopperReference": Config.shopperReference,
-      "storePaymentMethodMode": "disabled",
-      "recurringProcessingModel": "CardOnFile",
-      "shopperInteraction": "Ecommerce",
       "channel": determineChannel(),
-      "telephoneNumber": "+8613012345678",
-      "dateOfBirth": "1996-09-04",
-      "socialSecurityNumber": "0108",
-      "deliveryAddress": {
-        "city": "Ankeborg",
-        "country": "SE",
-        "houseNumberOrName": "1",
-        "postalCode": "1234",
-        "street": "Stargatan",
-      },
-      "billingAddress": {
-        "city": "Ankeborg",
-        "country": "SE",
-        "houseNumberOrName": "1",
-        "postalCode": "1234",
-        "street": "Stargatan",
-      },
-      "lineItems": [
-        {
-          "quantity": 1,
-          "amountExcludingTax": 331,
-          "taxPercentage": 2100,
-          "description": "Shoes",
-          "id": "Item #1",
-          "taxAmount": 69,
-          "amountIncludingTax": 400,
-          "productUrl": "URL_TO_PURCHASED_ITEM",
-          "imageUrl": "URL_TO_PICTURE_OF_PURCHASED_ITEM",
-        },
-      ],
-      "installmentOptions": {
-        "card": {
-          "values": [2, 3, 6],
-          "plans": ["with_interest"]
-        },
-        "visa": {
-          "values": [1, 2, 3, 4, 5, 12],
-          "plans": ["regular", "revolving"]
-        },
-        "mc": {
-          "values": [1, 2, 3, 4, 5, 12],
-          "plans": ["regular", "revolving"]
-        }
-      },
     };
 
     return await service.createSession(sessionRequestBody);
