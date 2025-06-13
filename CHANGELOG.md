@@ -3,7 +3,7 @@
 ### New
 
 - Android Components/Drop-in
-  version: [5.11.0](https://docs.adyen.com/online-payments/release-notes/?title%5B0%5D=Android+Components%2FDrop-in#releaseNote=2025-05-15-android-componentsdrop-in-5.11.0).
+  version: [5.12.0](https://docs.adyen.com/online-payments/release-notes/?title%5B0%5D=Android+Components%2FDrop-in#releaseNote=2025-05-15-android-componentsdrop-in-5.11.0).
 - iOS Components/Drop-in
   version: [5.19.0](https://docs.adyen.com/online-payments/release-notes/?title%5B0%5D=iOS+Components%2FDrop-in#releaseNote=2025-06-06-ios-componentsdrop-in-5.19.0)
 
