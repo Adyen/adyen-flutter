@@ -1,4 +1,4 @@
-## 1.5.0 (in development)
+## 1.5.0
 
 ### New
 
@@ -10,6 +10,8 @@
 ### Improved
 
 - For dismissing Drop-in programmatically, improved closing of the Apple Pay bottom sheet.
+- For Card Component and Drop-in: when the shopper enters the details for a co-badged card, they can
+  now see the available brand options in a separate section in the payment form.
 
 ## 1.4.0
 
