@@ -32,7 +32,7 @@ internal class ActionComponentCallback(
         ComponentLoadingBottomSheet.hide(activity.supportFragmentManager)
         val type: PaymentResultEnum =
             when (componentError.exception) {
-                is com.adyen.checkout.core.exception.CancellationException -> PaymentResultEnum.CANCELLED_BY_USER
+                is com.adyen.checkout.core.old.exception.CancellationException -> PaymentResultEnum.CANCELLED_BY_USER
                 is com.adyen.checkout.adyen3ds2.Cancelled3DS2Exception -> PaymentResultEnum.CANCELLED_BY_USER
                 else -> PaymentResultEnum.ERROR
             }

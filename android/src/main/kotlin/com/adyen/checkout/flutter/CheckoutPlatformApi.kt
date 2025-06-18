@@ -1,14 +1,13 @@
 package com.adyen.checkout.flutter
 
 import android.annotation.SuppressLint
-import android.util.Log
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.lifecycleScope
 import com.adyen.checkout.components.core.OrderRequest
 import com.adyen.checkout.components.core.PaymentMethodsApiResponse
 import com.adyen.checkout.components.core.internal.Configuration
-import com.adyen.checkout.core.AdyenLogger
-import com.adyen.checkout.core.internal.util.Logger.NONE
+import com.adyen.checkout.core.old.AdyenLogLevel
+import com.adyen.checkout.core.old.AdyenLogger
 import com.adyen.checkout.flutter.apiOnly.AdyenCSE
 import com.adyen.checkout.flutter.apiOnly.CardValidation
 import com.adyen.checkout.flutter.generated.CardComponentConfigurationDTO
@@ -165,9 +164,9 @@ class CheckoutPlatformApi(
     @SuppressLint("RestrictedApi")
     override fun enableConsoleLogging(loggingEnabled: Boolean) {
         if (loggingEnabled) {
-            AdyenLogger.setLogLevel(Log.VERBOSE)
+            AdyenLogger.setLogLevel(AdyenLogLevel.VERBOSE)
         } else {
-            AdyenLogger.setLogLevel(NONE)
+            AdyenLogger.setLogLevel(AdyenLogLevel.NONE)
         }
     }
 

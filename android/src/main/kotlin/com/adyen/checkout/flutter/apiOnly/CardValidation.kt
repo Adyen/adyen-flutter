@@ -1,13 +1,13 @@
 package com.adyen.checkout.flutter.apiOnly
 
-import com.adyen.checkout.core.CardBrand
-import com.adyen.checkout.core.ui.model.ExpiryDate
-import com.adyen.checkout.core.ui.validation.CardExpiryDateValidationResult
-import com.adyen.checkout.core.ui.validation.CardExpiryDateValidator
-import com.adyen.checkout.core.ui.validation.CardNumberValidationResult
-import com.adyen.checkout.core.ui.validation.CardNumberValidator
-import com.adyen.checkout.core.ui.validation.CardSecurityCodeValidationResult
-import com.adyen.checkout.core.ui.validation.CardSecurityCodeValidator
+import com.adyen.checkout.core.old.CardBrand
+import com.adyen.checkout.core.old.ui.model.ExpiryDate
+import com.adyen.checkout.core.old.ui.validation.CardExpiryDateValidationResult
+import com.adyen.checkout.core.old.ui.validation.CardExpiryDateValidator
+import com.adyen.checkout.core.old.ui.validation.CardNumberValidationResult
+import com.adyen.checkout.core.old.ui.validation.CardNumberValidator
+import com.adyen.checkout.core.old.ui.validation.CardSecurityCodeValidationResult
+import com.adyen.checkout.core.old.ui.validation.CardSecurityCodeValidator
 import com.adyen.checkout.flutter.generated.CardExpiryDateValidationResultDTO
 import com.adyen.checkout.flutter.generated.CardNumberValidationResultDTO
 import com.adyen.checkout.flutter.generated.CardSecurityCodeValidationResultDTO

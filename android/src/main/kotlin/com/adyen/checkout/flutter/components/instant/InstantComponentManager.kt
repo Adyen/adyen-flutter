@@ -7,7 +7,7 @@ import com.adyen.checkout.components.core.Order
 import com.adyen.checkout.components.core.PaymentMethod
 import com.adyen.checkout.components.core.PaymentMethodTypes
 import com.adyen.checkout.components.core.action.Action
-import com.adyen.checkout.core.exception.CheckoutException
+import com.adyen.checkout.core.old.exception.CheckoutException
 import com.adyen.checkout.flutter.components.instant.advanced.IdealComponentAdvancedCallback
 import com.adyen.checkout.flutter.components.instant.advanced.InstantComponentAdvancedCallback
 import com.adyen.checkout.flutter.components.instant.session.IdealComponentSessionCallback
