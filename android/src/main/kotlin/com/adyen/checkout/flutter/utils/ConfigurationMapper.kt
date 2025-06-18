@@ -45,7 +45,7 @@ import com.adyen.checkout.googlepay.googlePay
 import com.google.android.gms.wallet.WalletConstants
 import java.util.Locale
 import com.adyen.checkout.cashapppay.CashAppPayEnvironment as SDKCashAppPayEnvironment
-import com.adyen.checkout.core.Environment as SDKEnvironment
+import com.adyen.checkout.core.old.Environment as SDKEnvironment
 
 object ConfigurationMapper {
     fun OrderResponse.mapToOrderResponseModel(): OrderResponseDTO =
@@ -109,7 +109,7 @@ object ConfigurationMapper {
     private fun DropInConfigurationDTO.buildDropInConfiguration(
         context: Context,
         shopperLocale: String?,
-        environment: com.adyen.checkout.core.Environment,
+        environment: SDKEnvironment,
     ): DropInConfiguration.Builder =
         if (shopperLocale != null) {
             val locale = Locale.forLanguageTag(shopperLocale)
@@ -121,7 +121,7 @@ object ConfigurationMapper {
     fun CardConfigurationDTO.mapToCardConfiguration(
         context: Context,
         shopperLocale: String?,
-        environment: com.adyen.checkout.core.Environment,
+        environment: SDKEnvironment,
         clientKey: String,
         analyticsConfiguration: AnalyticsConfiguration? = null,
         amount: Amount? = null,
@@ -167,7 +167,7 @@ object ConfigurationMapper {
     private fun buildGooglePayConfiguration(
         clientKey: String,
         shopperLocale: String?,
-        environment: com.adyen.checkout.core.Environment,
+        environment: SDKEnvironment,
         googlePayConfigurationDTO: GooglePayConfigurationDTO
     ): GooglePayConfiguration {
         val googlePayConfigurationBuilder =
@@ -184,7 +184,7 @@ object ConfigurationMapper {
     private fun DropInConfigurationDTO.buildCashAppPayConfiguration(
         context: Context,
         shopperLocale: String?,
-        environment: com.adyen.checkout.core.Environment,
+        environment: SDKEnvironment,
         cashAppPayConfigurationDTO: CashAppPayConfigurationDTO
     ): CashAppPayConfiguration {
         val cashAppPayConfigurationBuilder =
