@@ -220,7 +220,7 @@ internal class DropInPlatformApi(
 
     private fun createCheckoutSession(
         sessionHolder: SessionHolder,
-        environment: com.adyen.checkout.core.Environment,
+        environment: com.adyen.checkout.core.old.Environment,
         clientKey: String,
     ): CheckoutSession {
         val sessionSetupResponse = SessionSetupResponse.SERIALIZER.deserialize(sessionHolder.sessionSetupResponse)
