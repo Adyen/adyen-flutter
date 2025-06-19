@@ -1,0 +1,7 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="main_netlify.dart" type="FlutterRunConfigurationType" factoryName="Flutter" nameIsGenerated="true">
+    <option name="additionalArgs" value="--dart-define=&quot;CLIENT_KEY=test_O3LEH54C3JDPREE3QOEPOCRG4QGEICBQ&quot; --dart-define=&quot;APPLE_PAY_MERCHANT_ID_KEY=demo&quot;" />
+    <option name="filePath" value="$PROJECT_DIR$/example/lib/main_netlify.dart" />
+    <method v="2" />
+  </configuration>
+</component>

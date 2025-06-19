@@ -32,8 +32,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
-void main() {
-  final service = Service();
+void mainCommon(Service service) {
   final adyenGooglePayComponentRepository =
       AdyenGooglePayComponentRepository(service: service);
   final adyenApplePayComponentRepository =
