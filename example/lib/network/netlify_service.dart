@@ -4,12 +4,12 @@ import 'package:adyen_checkout_example/network/service.dart';
 import 'package:http/http.dart' as http;
 
 class NetlifyService implements Service {
-  final baseUrl = "https://www.mystoredemo.io";
+  final _baseUrl = "https://www.mystoredemo.io";
 
   @override
   Future<Map<String, dynamic>> createSession(Map<String, dynamic> body) async {
     final http.Response response = await http.post(
-      Uri.parse('$baseUrl/.netlify/functions/sessions'),
+      Uri.parse('$_baseUrl/.netlify/functions/sessions'),
       body: jsonEncode(body),
     );
 
