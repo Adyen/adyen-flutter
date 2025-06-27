@@ -3,6 +3,18 @@
 ### New
 
 - Android Components/Drop-in
+  version: [5.12.1](https://docs.adyen.com/online-payments/release-notes/#releaseNote=2025-06-06-android-componentsdrop-in-5.12.0).
+
+### Fixed
+
+- Fixed expiry date input field for card payment in Drop-In and Component when the app is resumed
+  from the background.
+
+## 1.5.0
+
+### New
+
+- Android Components/Drop-in
   version: [5.12.0](https://docs.adyen.com/online-payments/release-notes/#releaseNote=2025-06-06-android-componentsdrop-in-5.12.0).
 - iOS Components/Drop-in
   version: [5.19.1](https://docs.adyen.com/online-payments/release-notes/?title%5B0%5D=iOS+Components%2FDrop-in#releaseNote=2025-06-06-ios-componentsdrop-in-5.19.0)
@@ -12,6 +24,11 @@
 - Improved how the Apple pay bottom sheet closes when dismissing Drop-in.
 - When the shopper enters the details for a co-badged card, the available brand options are now
   shown in a separate section in the payment form.
+
+### Warning
+
+We've identified an issue where the expiry date input field for card payment in Drop-in and
+Component functions incorrectly when the app is resumed from the background.
 
 ## 1.4.0
 
