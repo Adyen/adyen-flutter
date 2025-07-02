@@ -1,14 +1,14 @@
-## 1.5.1
+## 1.6.0
 
 ### New
 
 - Android Components/Drop-in
-  version: [5.12.1](https://docs.adyen.com/online-payments/release-notes/#releaseNote=2025-06-06-android-componentsdrop-in-5.12.0).
+  version: [5.13.0](https://docs.adyen.com/online-payments/release-notes/#releaseNote=2025-07-02-android-componentsdrop-in-5.13.0).
 
 ### Fixed
 
-- Fixed expiry date input field for card payment in Drop-In and Component when the app is resumed
-  from the background.
+- For Android: Fixed expiry date input field for card payment in Drop-In and Component when the app
+  is resumed from the background.
 
 ## 1.5.0
 
@@ -27,7 +27,7 @@
 
 ### Warning
 
-We've identified an issue where the expiry date input field for card payment in Drop-in and
+For Android: We've identified an issue where the expiry date input field for card payment in Drop-in and
 Component functions incorrectly when the app is resumed from the background.
 
 ## 1.4.0
