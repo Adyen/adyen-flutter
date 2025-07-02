@@ -72,6 +72,7 @@ class AdyenCheckout implements AdyenCheckoutInterface {
   ) =>
       ActionComponent().handleAction(actionComponentConfiguration, action);
 
+  @override
   Future<CardNumberValidationResult> validateCardNumber({
     required String cardNumber,
     bool enableLuhnCheck = true,
@@ -93,6 +94,7 @@ class AdyenCheckout implements AdyenCheckoutInterface {
     };
   }
 
+  @override
   Future<CardExpiryDateValidationResult> validateCardExpiryDate({
     required String expiryMonth,
     required String expiryYear,
@@ -113,6 +115,7 @@ class AdyenCheckout implements AdyenCheckoutInterface {
     };
   }
 
+  @override
   Future<CardSecurityCodeValidationResult> validateCardSecurityCode({
     required String securityCode,
     String? cardBrand,
@@ -129,4 +132,8 @@ class AdyenCheckout implements AdyenCheckoutInterface {
       CardSecurityCodeValidationResultDTO.invalid => InvalidCardSecurityCode()
     };
   }
+
+  @override
+  Future<String> getThreeDS2SdkVersion() async =>
+      _adyenCheckoutApi.getThreeDS2SdkVersion();
 }

@@ -1652,6 +1652,7 @@ protocol CheckoutPlatformInterface {
     func validateCardExpiryDate(expiryMonth: String, expiryYear: String) throws -> CardExpiryDateValidationResultDTO
     func validateCardSecurityCode(securityCode: String, cardBrand: String?) throws -> CardSecurityCodeValidationResultDTO
     func enableConsoleLogging(loggingEnabled: Bool) throws
+    func getThreeDS2SdkVersion() throws -> String
 }
 
 /// Generated setup class from Pigeon to handle messages through the `binaryMessenger`.
@@ -1805,6 +1806,19 @@ class CheckoutPlatformInterfaceSetup {
             }
         } else {
             enableConsoleLoggingChannel.setMessageHandler(nil)
+        }
+        let getThreeDS2SdkVersionChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.getThreeDS2SdkVersion\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+        if let api {
+            getThreeDS2SdkVersionChannel.setMessageHandler { _, reply in
+                do {
+                    let result = try api.getThreeDS2SdkVersion()
+                    reply(wrapResult(result))
+                } catch {
+                    reply(wrapError(error))
+                }
+            }
+        } else {
+            getThreeDS2SdkVersionChannel.setMessageHandler(nil)
         }
     }
 }

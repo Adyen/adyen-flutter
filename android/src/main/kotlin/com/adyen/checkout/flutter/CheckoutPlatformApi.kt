@@ -34,6 +34,7 @@ import com.adyen.checkout.sessions.core.CheckoutSessionProvider
 import com.adyen.checkout.sessions.core.CheckoutSessionResult
 import com.adyen.checkout.sessions.core.SessionModel
 import com.adyen.checkout.sessions.core.SessionSetupResponse
+import com.adyen.threeds2.ThreeDS2Service
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -169,4 +170,6 @@ class CheckoutPlatformApi(
             AdyenLogger.setLogLevel(NONE)
         }
     }
+
+    override fun getThreeDS2SdkVersion(): String = ThreeDS2Service.INSTANCE.sdkVersion
 }

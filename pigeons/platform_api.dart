@@ -658,6 +658,8 @@ abstract class CheckoutPlatformInterface {
   );
 
   void enableConsoleLogging(bool loggingEnabled);
+
+  String getThreeDS2SdkVersion();
 }
 
 @HostApi()

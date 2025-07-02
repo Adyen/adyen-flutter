@@ -19,4 +19,21 @@ abstract class AdyenCheckoutInterface {
     ActionComponentConfiguration actionComponentConfiguration,
     Map<String, dynamic> action,
   );
+
+  Future<CardNumberValidationResult> validateCardNumber({
+    required String cardNumber,
+    bool enableLuhnCheck = true,
+  });
+
+  Future<CardExpiryDateValidationResult> validateCardExpiryDate({
+    required String expiryMonth,
+    required String expiryYear,
+  });
+
+  Future<CardSecurityCodeValidationResult> validateCardSecurityCode({
+    required String securityCode,
+    String? cardBrand,
+  });
+
+  Future<String> getThreeDS2SdkVersion();
 }
