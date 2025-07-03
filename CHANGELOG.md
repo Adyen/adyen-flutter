@@ -7,8 +7,8 @@
 
 ### Fixed
 
-- For Android: Fixed expiry date input field for card payment in Drop-In and Component when the app
-  is resumed from the background.
+- For card payments on Android, the expiry date field now works correctly when the shopper leaves
+  the app, and resumes it from the background. This fixes the known issue in v1.5.0.
 
 ## 1.5.0
 
