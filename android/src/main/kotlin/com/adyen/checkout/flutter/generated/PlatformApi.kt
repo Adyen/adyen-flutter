@@ -1671,6 +1671,7 @@ interface CheckoutPlatformInterface {
   fun validateCardExpiryDate(expiryMonth: String, expiryYear: String): CardExpiryDateValidationResultDTO
   fun validateCardSecurityCode(securityCode: String, cardBrand: String?): CardSecurityCodeValidationResultDTO
   fun enableConsoleLogging(loggingEnabled: Boolean)
+  fun getThreeDS2SdkVersion(): String
 
   companion object {
     /** The codec used by CheckoutPlatformInterface. */
@@ -1842,6 +1843,21 @@ interface CheckoutPlatformInterface {
             val wrapped: List<Any?> = try {
               api.enableConsoleLogging(loggingEnabledArg)
               listOf(null)
+            } catch (exception: Throwable) {
+              wrapError(exception)
+            }
+            reply.reply(wrapped)
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.getThreeDS2SdkVersion$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { _, reply ->
+            val wrapped: List<Any?> = try {
+              listOf(api.getThreeDS2SdkVersion())
             } catch (exception: Throwable) {
               wrapError(exception)
             }

@@ -68,6 +68,11 @@ class MockAdyenCheckoutPlatform implements CheckoutPlatformInterface {
   ) {
     return Future.value(CardSecurityCodeValidationResultDTO.valid);
   }
+
+  @override
+  Future<String> getThreeDS2SdkVersion() {
+    return Future.value("2.2.0");
+  }
 }
 
 void main() {
