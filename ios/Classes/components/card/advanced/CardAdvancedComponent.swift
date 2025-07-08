@@ -44,6 +44,7 @@ class CardAdvancedComponent: BaseCardComponent {
                 self?.onAction(actionResponse: jsonActionResponse)
             }
             componentPlatformApi.onErrorCallback = { [weak self] error in
+                self?.cardComponent?.stopLoadingIfNeeded()
                 self?.sendErrorToFlutterLayer(errorMessage: error?.errorMessage ?? "")
             }
         } catch {
