@@ -139,8 +139,12 @@ class CardStateNotifier extends ValueNotifier<CardState> {
 
     value = value.copyWith(loading: true);
     final EncryptedCard encryptedCard = await _createEncryptedCard();
-    final Map<String, dynamic> paymentsResponse =
-        await repository.payments(encryptedCard);
+    final String threeDS2SdkVersion =
+        await AdyenCheckout.instance.getThreeDS2SdkVersion();
+    final Map<String, dynamic> paymentsResponse = await repository.payments(
+      encryptedCard: encryptedCard,
+      threeDS2SdkVersion: threeDS2SdkVersion,
+    );
     if (paymentsResponse.containsKey("action")) {
       final ActionResult actionResult = await _handleAction(paymentsResponse);
       return _mapActionResultToResultCode(actionResult);

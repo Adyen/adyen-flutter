@@ -59,4 +59,7 @@ class AdyenCheckoutApi implements CheckoutPlatformInterface {
     String? cardBrand,
   ) =>
       checkoutApi.validateCardSecurityCode(securityCode, cardBrand);
+
+  @override
+  Future<String> getThreeDS2SdkVersion() => checkoutApi.getThreeDS2SdkVersion();
 }
