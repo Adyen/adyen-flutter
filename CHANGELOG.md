@@ -1,3 +1,10 @@
+## 1.5.2 (in development)
+
+### Improved
+
+- For iOS with card payment using advanced flow: The loading spinner is now stopped when an error
+  occurs.
+
 ## 1.5.1
 
 ### New
