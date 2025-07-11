@@ -12,7 +12,16 @@
          running.
 
          This Theme is only used starting with V2 of Flutter's Android embedding. -->
-    <style name="NormalTheme" parent="@android:style/Theme.Black.NoTitleBar">
+    <style name="NormalTheme" parent="@style/AdyenCheckout">
         <item name="android:windowBackground">?android:colorBackground</item>
+    </style>
+
+    <style name="AdyenCheckout.Button.Colored" parent="AdyenCheckout.Button.Primary">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">@dimen/primary_button_height</item>
+        <item name="android:layout_marginStart">@dimen/standard_margin</item>
+        <item name="android:layout_marginEnd">@dimen/standard_margin</item>
+        <item name="android:backgroundTint">#EB7810</item>
+        <item name="android:textColor">#FFFFFF</item>
     </style>
 </resources>
