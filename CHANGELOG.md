@@ -1,5 +1,10 @@
 ## 1.5.2 (in development)
 
+### New
+
+- Android Components/Drop-in
+  version: [5.13.1](https://docs.adyen.com/online-payments/release-notes/#releaseNote=2025-07-03-android-componentsdrop-in-5.13.1).
+
 ### Improved
 
 - For iOS with card payment using advanced flow: The loading spinner is now stopped when an error
