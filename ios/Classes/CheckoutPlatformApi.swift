@@ -96,6 +96,10 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
         let validationResult = CardValidation().validateCardSecurityCode(securityCode: securityCode, cardBrand: cardBrand)
         return validationResult ? .valid : .invalid
     }
+    
+    func getThreeDS2SdkVersion() throws -> String {
+        threeDS2SdkVersion
+    }
 
     private func createSessionForDropIn(
         adyenContext: AdyenContext,
