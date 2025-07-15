@@ -17,7 +17,6 @@ class InstantSessionComponentScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
       appBar: AppBar(title: const Text('Adyen instant component')),
       body: SafeArea(
         child: Column(
