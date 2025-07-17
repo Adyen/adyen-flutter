@@ -67,6 +67,7 @@ class GooglePayComponentManager(
     ) {
         if (!GooglePayComponent.PROVIDER.isPaymentMethodSupported(paymentMethod)) {
             sendAvailabilityResult(false)
+            return
         }
 
         val checkoutConfiguration = instantPaymentComponentConfigurationDTO.mapToGooglePayCheckoutConfiguration()
