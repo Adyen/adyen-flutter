@@ -3,7 +3,7 @@ import AdyenNetworking
 
 class DropInAdvancedFlowDelegate: DropInComponentDelegate {
     private let checkoutFlutter: CheckoutFlutterInterface
-    public weak var dropInInteractorDelegate: DropInInteractorDelegate?
+    weak var dropInInteractorDelegate: DropInInteractorDelegate?
     var isApplePay: Bool = false
 
     init(checkoutFlutter: CheckoutFlutterInterface) {
