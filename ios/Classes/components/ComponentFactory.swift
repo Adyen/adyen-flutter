@@ -24,7 +24,7 @@ class ComponentFactory: NSObject, FlutterPlatformViewFactory {
         fatalError("Subclasses need to implement the `create()` method.")
     }
 
-    public func createArgsCodec() -> FlutterMessageCodec & NSObjectProtocol {
+    func createArgsCodec() -> FlutterMessageCodec & NSObjectProtocol {
         componentFlutterApi.codec
     }
 }

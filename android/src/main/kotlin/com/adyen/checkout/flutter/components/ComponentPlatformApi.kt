@@ -88,7 +88,6 @@ class ComponentPlatformApi(
                     paymentMethod,
                     componentId,
                     instantPaymentConfigurationDTO,
-                    callback
                 )
 
             InstantPaymentType.INSTANT, InstantPaymentType.APPLE_PAY -> return
