@@ -31,7 +31,6 @@ class CardAdvancedComponentScreen extends StatelessWidget {
     );
 
     return Scaffold(
-        backgroundColor: Colors.white,
         appBar: AppBar(title: const Text('Adyen card component')),
         body: SafeArea(
           child: FutureBuilder<Map<String, dynamic>>(
@@ -50,7 +49,7 @@ class CardAdvancedComponentScreen extends StatelessWidget {
                         snapshot.data!,
                         context,
                       ),
-                      Container(height: 600, color: const Color(0xFFEDEDED)),
+                      Container(height: 800),
                     ],
                   ),
                 );

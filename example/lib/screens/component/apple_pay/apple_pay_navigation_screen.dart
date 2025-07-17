@@ -6,7 +6,6 @@ class ApplePayNavigationScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
       appBar: AppBar(title: const Text('Adyen Apple Pay component')),
       body: SafeArea(
         child: Center(

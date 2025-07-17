@@ -28,7 +28,6 @@ class CardBottomSheetScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
       appBar: AppBar(title: const Text('Card component bottom sheet')),
       body: SafeArea(
         child: Center(
