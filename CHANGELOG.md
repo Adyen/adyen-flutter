@@ -7,6 +7,7 @@
 
 ### Improved
 
+- Improved initialization of Google Pay Component.
 - For iOS with card payment using advanced flow: The loading spinner is now stopped when an error
   occurs.
 

@@ -83,6 +83,8 @@ class ComponentPlatformApi(
         val paymentMethodJson = JSONObject(paymentMethodResponse)
         val paymentMethod = PaymentMethod.SERIALIZER.deserialize(paymentMethodJson)
         when (instantPaymentConfigurationDTO.instantPaymentType) {
+            // The callback to propagate the result back to Flutter is not used because we want to support multiple initializations in parallel.
+            // The result is sent through the componentFlutterInterface.onComponentCommunication(...).
             InstantPaymentType.GOOGLE_PAY ->
                 googlePayComponentManager.initialize(
                     paymentMethod,

@@ -30,7 +30,7 @@ class GooglePayComponentManager(
     private val componentFlutterInterface: ComponentFlutterInterface,
     private val assignCurrentComponent: (ActionHandlingComponent?) -> Unit,
 ) : ComponentAvailableCallback {
-    private var componentId: String = ""
+    private var componentId: String? = null
     private var checkoutConfiguration: CheckoutConfiguration? = null
     private var googlePayComponent: GooglePayComponent? = null
     private var adyenComponentView: AdyenComponentView? = null
@@ -97,7 +97,7 @@ class GooglePayComponentManager(
         if (componentId == Constants.GOOGLE_PAY_ADVANCED_COMPONENT_KEY ||
             componentId == Constants.GOOGLE_PAY_SESSION_COMPONENT_KEY
         ) {
-            this.componentId = ""
+            this.componentId = null
             checkoutConfiguration = null
             googlePayComponent = null
             adyenComponentView = null
@@ -106,6 +106,7 @@ class GooglePayComponentManager(
 
     private fun createGooglePayComponent(paymentMethod: PaymentMethod): GooglePayComponent? {
         val checkoutConfiguration = checkoutConfiguration ?: return null
+        val componentId = componentId ?: return null
         return when (componentId) {
             Constants.GOOGLE_PAY_SESSION_COMPONENT_KEY ->
                 createGooglePaySessionComponent(
@@ -186,6 +187,7 @@ class GooglePayComponentManager(
         isAvailable: Boolean,
         resultData: String? = null
     ) {
+        val componentId = componentId ?: return
         componentFlutterInterface.onComponentCommunication(
             ComponentCommunicationModel(
                 type = ComponentCommunicationType.AVAILABILITY,
