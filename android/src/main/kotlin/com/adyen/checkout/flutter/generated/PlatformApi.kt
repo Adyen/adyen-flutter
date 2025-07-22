@@ -156,7 +156,8 @@ enum class ComponentCommunicationType(val raw: Int) {
   RESULT(3),
   RESIZE(4),
   BIN_LOOKUP(5),
-  BIN_VALUE(6);
+  BIN_VALUE(6),
+  AVAILABILITY(7);
 
   companion object {
     fun ofRaw(raw: Int): ComponentCommunicationType? {

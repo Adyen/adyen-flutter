@@ -9,6 +9,8 @@ import com.adyen.checkout.components.core.Order
 import com.adyen.checkout.components.core.PaymentMethod
 import com.adyen.checkout.components.core.action.Action
 import com.adyen.checkout.flutter.components.view.ComponentLoadingBottomSheet
+import com.adyen.checkout.flutter.generated.ComponentCommunicationModel
+import com.adyen.checkout.flutter.generated.ComponentCommunicationType
 import com.adyen.checkout.flutter.generated.ComponentFlutterInterface
 import com.adyen.checkout.flutter.generated.InstantPaymentConfigurationDTO
 import com.adyen.checkout.flutter.generated.InstantPaymentSetupResultDTO
@@ -30,7 +32,6 @@ class GooglePayComponentManager(
 ) : ComponentAvailableCallback {
     private var componentId: String? = null
     private var checkoutConfiguration: CheckoutConfiguration? = null
-    private var setupCallback: ((Result<InstantPaymentSetupResultDTO>) -> Unit)? = null
     private var googlePayComponent: GooglePayComponent? = null
     private var adyenComponentView: AdyenComponentView? = null
 
@@ -39,13 +40,13 @@ class GooglePayComponentManager(
         paymentMethod: PaymentMethod
     ) {
         if (!isAvailable) {
-            setupCallback?.invoke(Result.failure(Exception("Google Pay is not available")))
+            sendAvailabilityResult(false, "Google Pay is not available")
             return
         }
 
         val googlePayComponent = createGooglePayComponent(paymentMethod)
         if (googlePayComponent == null) {
-            setupCallback?.invoke(Result.failure(Exception("Google Pay setup failed")))
+            sendAvailabilityResult(false, "Google Pay setup failed")
             return
         }
 
@@ -56,38 +57,22 @@ class GooglePayComponentManager(
             }
 
         val allowedPaymentMethods = googlePayComponent.getGooglePayButtonParameters().allowedPaymentMethods
-        setupCallback?.invoke(
-            Result.success(
-                InstantPaymentSetupResultDTO(
-                    InstantPaymentType.GOOGLE_PAY,
-                    true,
-                    allowedPaymentMethods
-                )
-            )
-        )
+        sendAvailabilityResult(true, allowedPaymentMethods)
     }
 
     fun initialize(
         paymentMethod: PaymentMethod,
         componentId: String,
         instantPaymentComponentConfigurationDTO: InstantPaymentConfigurationDTO,
-        googlePaySetupCallback: (Result<InstantPaymentSetupResultDTO>) -> Unit
     ) {
         if (!GooglePayComponent.PROVIDER.isPaymentMethodSupported(paymentMethod)) {
-            googlePaySetupCallback(
-                Result.success(
-                    InstantPaymentSetupResultDTO(
-                        instantPaymentComponentConfigurationDTO.instantPaymentType,
-                        false
-                    )
-                )
-            )
+            sendAvailabilityResult(false)
+            return
         }
 
         val checkoutConfiguration = instantPaymentComponentConfigurationDTO.mapToGooglePayCheckoutConfiguration()
         this.componentId = componentId
         this.checkoutConfiguration = checkoutConfiguration
-        this.setupCallback = googlePaySetupCallback
         GooglePayComponent.PROVIDER.isAvailable(
             activity.application,
             paymentMethod,
@@ -114,7 +99,6 @@ class GooglePayComponentManager(
         ) {
             this.componentId = null
             checkoutConfiguration = null
-            setupCallback = null
             googlePayComponent = null
             adyenComponentView = null
         }
@@ -198,4 +182,23 @@ class GooglePayComponentManager(
     }
 
     private fun hideLoadingBottomSheet() = ComponentLoadingBottomSheet.hide(activity.supportFragmentManager)
+
+    private fun sendAvailabilityResult(
+        isAvailable: Boolean,
+        resultData: String? = null
+    ) {
+        val componentId = componentId ?: return
+        componentFlutterInterface.onComponentCommunication(
+            ComponentCommunicationModel(
+                type = ComponentCommunicationType.AVAILABILITY,
+                componentId = componentId,
+                data =
+                    InstantPaymentSetupResultDTO(
+                        InstantPaymentType.GOOGLE_PAY,
+                        isAvailable,
+                        resultData
+                    )
+            )
+        ) {}
+    }
 }

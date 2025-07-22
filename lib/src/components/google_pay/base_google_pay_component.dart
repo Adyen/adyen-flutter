@@ -84,14 +84,22 @@ class _BaseGooglePayComponentState extends State<BaseGooglePayComponent> {
   final ComponentFlutterApi _componentFlutterApi = ComponentFlutterApi.instance;
   late StreamSubscription<ComponentCommunicationModel>
       _componentCommunicationStream;
+  late Completer<InstantPaymentSetupResultDTO> _availabilityCompleter;
 
   @override
   void initState() {
+    _availabilityCompleter = Completer();
     _componentCommunicationStream = _componentFlutterApi
         .componentCommunicationStream.stream
         .where((communicationModel) =>
             communicationModel.componentId == widget.componentId)
-        .listen(widget.handleComponentCommunication);
+        .listen((communicationModel) {
+      if (communicationModel.type == ComponentCommunicationType.availability) {
+        _handleAvailabilityResult(communicationModel);
+      } else {
+        widget.handleComponentCommunication(communicationModel);
+      }
+    });
 
     super.initState();
   }
@@ -99,7 +107,7 @@ class _BaseGooglePayComponentState extends State<BaseGooglePayComponent> {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-      future: _isGooglePaySupported(),
+      future: _isGooglePayAvailable(),
       builder: (
         BuildContext context,
         AsyncSnapshot<InstantPaymentSetupResultDTO> snapshot,
@@ -135,6 +143,16 @@ class _BaseGooglePayComponentState extends State<BaseGooglePayComponent> {
       AsyncSnapshot<InstantPaymentSetupResultDTO> snapshot) {
     return snapshot.data?.instantPaymentType == InstantPaymentType.googlePay &&
         snapshot.data?.isSupported == true;
+  }
+
+  void _handleAvailabilityResult(
+      ComponentCommunicationModel communicationModel) {
+    if (_availabilityCompleter.isCompleted) {
+      return;
+    }
+
+    _availabilityCompleter
+        .complete(communicationModel.data as InstantPaymentSetupResultDTO);
   }
 
   Widget _buildGooglePayOrLoadingContainer(
@@ -193,8 +211,8 @@ class _BaseGooglePayComponentState extends State<BaseGooglePayComponent> {
   }
 
   void onPressed() async {
-    final instantPaymentConfigurationDTO =
-        await createInstantPaymentConfigurationDTO();
+    final InstantPaymentConfigurationDTO instantPaymentConfigurationDTO =
+        await _createInstantPaymentConfigurationDTO();
 
     widget.isButtonClickable.value = false;
     widget.componentPlatformApi.onInstantPaymentPressed(
@@ -204,26 +222,26 @@ class _BaseGooglePayComponentState extends State<BaseGooglePayComponent> {
     );
   }
 
-  Future<InstantPaymentSetupResultDTO> _isGooglePaySupported() async {
+  Future<InstantPaymentSetupResultDTO> _isGooglePayAvailable() async {
     try {
-      final instantPaymentConfigurationDTO =
-          await createInstantPaymentConfigurationDTO();
-      return await widget.componentPlatformApi
-          .isInstantPaymentSupportedByPlatform(
+      final InstantPaymentConfigurationDTO instantPaymentConfigurationDTO =
+          await _createInstantPaymentConfigurationDTO();
+
+      //The availability result will be provided to the availabilityCompleter.
+      widget.componentPlatformApi.isInstantPaymentSupportedByPlatform(
         instantPaymentConfigurationDTO,
         widget.googlePayPaymentMethod,
         widget.componentId,
       );
-    } catch (exception) {
-      return InstantPaymentSetupResultDTO(
-        instantPaymentType: InstantPaymentType.googlePay,
-        isSupported: false,
-      );
+    } catch (exception, stackTrace) {
+      _availabilityCompleter.completeError(exception, stackTrace);
     }
+
+    return _availabilityCompleter.future;
   }
 
   Future<InstantPaymentConfigurationDTO>
-      createInstantPaymentConfigurationDTO() async {
+      _createInstantPaymentConfigurationDTO() async {
     final String versionNumber =
         await widget._sdkVersionNumberProvider.getSdkVersionNumber();
     final InstantPaymentConfigurationDTO
