@@ -70,17 +70,14 @@ class MultiComponentSessionScreen extends StatelessWidget {
     final Map<String, dynamic> schemePaymentMethod =
         _extractSchemePaymentMethod(sessionCheckout.paymentMethods);
 
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
-      child: AdyenCardComponent(
-        configuration: cardComponentConfiguration,
-        paymentMethod: schemePaymentMethod,
-        checkout: sessionCheckout,
-        onPaymentResult: (paymentResult) async {
-          Navigator.pop(context);
-          DialogBuilder.showPaymentResultDialog(paymentResult, context);
-        },
-      ),
+    return AdyenCardComponent(
+      configuration: cardComponentConfiguration,
+      paymentMethod: schemePaymentMethod,
+      checkout: sessionCheckout,
+      onPaymentResult: (paymentResult) async {
+        Navigator.pop(context);
+        DialogBuilder.showPaymentResultDialog(paymentResult, context);
+      },
     );
   }
 
@@ -121,7 +118,7 @@ class MultiComponentSessionScreen extends StatelessWidget {
     final Map<String, dynamic> paymentMethod =
         _extractGooglePayPaymentMethod(sessionCheckout.paymentMethods);
     return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
+      padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
       child: AdyenGooglePayComponent(
         configuration: googlePayComponentConfiguration,
         paymentMethod: paymentMethod,
@@ -152,7 +149,7 @@ class MultiComponentSessionScreen extends StatelessWidget {
     final Map<String, dynamic> applePayPaymentMethod =
         _extractApplePayPaymentMethod(sessionCheckout.paymentMethods);
     return Padding(
-      padding: const EdgeInsets.fromLTRB(12, 0, 12, 0),
+      padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
       child: AdyenApplePayComponent(
         configuration: applePayComponentConfiguration,
         paymentMethod: applePayPaymentMethod,

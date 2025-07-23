@@ -22,15 +22,18 @@ import UIKit
 
     private func setDropInStyle() {
         var dropInStyle = Adyen.DropInComponent.Style()
-        dropInStyle.formComponent.mainButtonItem.button.backgroundColor = .black
-        dropInStyle.formComponent.mainButtonItem.button.title.color = .white
+        dropInStyle.formComponent.mainButtonItem.button.backgroundColor = UIColor(named: "PrimaryColor") ?? .black
+        dropInStyle.formComponent.mainButtonItem.button.title.color = UIColor(named: "SecondaryColor") ?? .white
+        dropInStyle.formComponent.textField.tintColor = UIColor(named: "PrimaryColor") ?? .black
         AdyenAppearance.dropInStyle = dropInStyle
     }
 
     private func setCardComponentStyle() {
         var cardComponentStyle = Adyen.FormComponentStyle()
-        cardComponentStyle.mainButtonItem.button.backgroundColor = .black
-        cardComponentStyle.mainButtonItem.button.title.color = .white
+        cardComponentStyle.mainButtonItem.button.backgroundColor = UIColor(named: "PrimaryColor") ?? .black
+        cardComponentStyle.mainButtonItem.button.title.color = UIColor(named: "SecondaryColor") ?? .white
+        cardComponentStyle.textField.tintColor = UIColor(named: "PrimaryColor") ?? .black
+        cardComponentStyle.backgroundColor = .clear
         AdyenAppearance.cardComponentStyle = cardComponentStyle
     }
 }
