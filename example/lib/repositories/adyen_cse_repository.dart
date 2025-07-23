@@ -5,8 +5,31 @@ import 'package:adyen_checkout_example/repositories/adyen_base_repository.dart';
 class AdyenCseRepository extends AdyenBaseRepository {
   AdyenCseRepository({required super.service});
 
-  Future<Map<String, dynamic>> payments(EncryptedCard encryptedCard) async {
-    Map<String, dynamic> requestBody = await _createRequestBody(encryptedCard);
+  Future<Map<String, dynamic>> payments({
+    required EncryptedCard encryptedCard,
+    String? threeDS2SdkVersion,
+  }) async {
+    String returnUrl = await determineBaseReturnUrl();
+    returnUrl += "/adyenPayment";
+    final requestBody = <String, Object>{
+      "amount": {"currency": "EUR", "value": 10000},
+      "reference": "flutter-test_${DateTime.now().millisecondsSinceEpoch}",
+      "paymentMethod": {
+        "type": "scheme",
+        "encryptedCardNumber": "${encryptedCard.encryptedCardNumber}",
+        "encryptedExpiryMonth": "${encryptedCard.encryptedExpiryMonth}",
+        "encryptedExpiryYear": "${encryptedCard.encryptedExpiryYear}",
+        "encryptedSecurityCode": "${encryptedCard.encryptedSecurityCode}",
+        if (threeDS2SdkVersion != null) "threeDS2SdkVersion": threeDS2SdkVersion,
+      },
+      "authenticationData": {
+        "threeDSRequestData": {"nativeThreeDS": "preferred"}
+      },
+      "channel": determineChannel(),
+      "returnUrl": returnUrl,
+      "merchantAccount": Config.merchantAccount
+    };
+
     return await service.postPayments(requestBody);
   }
 
@@ -21,29 +44,5 @@ class AdyenCseRepository extends AdyenBaseRepository {
       "encryptedCardNumber": encryptedCardNumber,
     };
     return await service.postCardDetails(requestBody);
-  }
-
-  Future<Map<String, dynamic>> _createRequestBody(
-      EncryptedCard encryptedCard) async {
-    String returnUrl = await determineBaseReturnUrl();
-    returnUrl += "/adyenPayment";
-
-    return {
-      "amount": {"currency": "EUR", "value": 120000},
-      "reference": "flutter-test_${DateTime.now().millisecondsSinceEpoch}",
-      "paymentMethod": {
-        "type": "scheme",
-        "encryptedCardNumber": "${encryptedCard.encryptedCardNumber}",
-        "encryptedExpiryMonth": "${encryptedCard.encryptedExpiryMonth}",
-        "encryptedExpiryYear": "${encryptedCard.encryptedExpiryYear}",
-        "encryptedSecurityCode": "${encryptedCard.encryptedSecurityCode}"
-      },
-      "authenticationData": {
-        "threeDSRequestData": {"nativeThreeDS": "preferred"}
-      },
-      "channel": determineChannel(),
-      "returnUrl": returnUrl,
-      "merchantAccount": Config.merchantAccount
-    };
   }
 }
