@@ -35,6 +35,7 @@ class CardBottomSheetScreen extends StatelessWidget {
               child: const Text("Show bottom sheet"),
               onPressed: () {
                 showModalBottomSheet(
+                  backgroundColor: Theme.of(context).scaffoldBackgroundColor,
                   isDismissible: false,
                   isScrollControlled: true,
                   context: context,

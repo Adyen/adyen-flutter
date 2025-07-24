@@ -33,7 +33,7 @@ import UIKit
         cardComponentStyle.mainButtonItem.button.backgroundColor = UIColor(named: "PrimaryColor") ?? .black
         cardComponentStyle.mainButtonItem.button.title.color = UIColor(named: "SecondaryColor") ?? .white
         cardComponentStyle.textField.tintColor = UIColor(named: "PrimaryColor") ?? .black
-        cardComponentStyle.backgroundColor = .clear
+        cardComponentStyle.backgroundColor = UIColor(named: "AppBackgroundColor") ?? .white
         AdyenAppearance.cardComponentStyle = cardComponentStyle
     }
 }
