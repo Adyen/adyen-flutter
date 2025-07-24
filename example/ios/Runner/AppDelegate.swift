@@ -22,18 +22,18 @@ import UIKit
 
     private func setDropInStyle() {
         var dropInStyle = Adyen.DropInComponent.Style()
-        dropInStyle.formComponent.mainButtonItem.button.backgroundColor = UIColor(named: "PrimaryColor") ?? .black
-        dropInStyle.formComponent.mainButtonItem.button.title.color = UIColor(named: "SecondaryColor") ?? .white
-        dropInStyle.formComponent.textField.tintColor = UIColor(named: "PrimaryColor") ?? .black
+        dropInStyle.formComponent.mainButtonItem.button.backgroundColor = UIColor(named: "PrimaryBackground") ?? .black
+        dropInStyle.formComponent.mainButtonItem.button.title.color = UIColor(named: "PrimaryTitle") ?? .white
+        dropInStyle.formComponent.textField.tintColor = UIColor(named: "PrimaryBackground") ?? .black
         AdyenAppearance.dropInStyle = dropInStyle
     }
 
     private func setCardComponentStyle() {
         var cardComponentStyle = Adyen.FormComponentStyle()
-        cardComponentStyle.mainButtonItem.button.backgroundColor = UIColor(named: "PrimaryColor") ?? .black
-        cardComponentStyle.mainButtonItem.button.title.color = UIColor(named: "SecondaryColor") ?? .white
-        cardComponentStyle.textField.tintColor = UIColor(named: "PrimaryColor") ?? .black
-        cardComponentStyle.backgroundColor = UIColor(named: "AppBackgroundColor") ?? .white
+        cardComponentStyle.mainButtonItem.button.backgroundColor = UIColor(named: "PrimaryBackground") ?? .black
+        cardComponentStyle.mainButtonItem.button.title.color = UIColor(named: "PrimaryTitle") ?? .white
+        cardComponentStyle.textField.tintColor = UIColor(named: "PrimaryBackground") ?? .black
+        cardComponentStyle.backgroundColor = UIColor(named: "AppBackground") ?? .white
         AdyenAppearance.cardComponentStyle = cardComponentStyle
     }
 }
