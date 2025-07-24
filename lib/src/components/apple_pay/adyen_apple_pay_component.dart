@@ -94,18 +94,16 @@ class AdyenApplePayComponent extends StatelessWidget {
 
   pay_sdk.ApplePayButtonStyle _mapToApplePayButtonStyle() {
     return switch (style?.theme) {
-      null => pay_sdk.ApplePayButtonStyle.black,
+      null || ApplePayButtonTheme.black => pay_sdk.ApplePayButtonStyle.black,
       ApplePayButtonTheme.white => pay_sdk.ApplePayButtonStyle.white,
       ApplePayButtonTheme.whiteOutline => pay_sdk.ApplePayButtonStyle.whiteOutline,
-      ApplePayButtonTheme.black => pay_sdk.ApplePayButtonStyle.black,
       ApplePayButtonTheme.automatic => pay_sdk.ApplePayButtonStyle.automatic,
     };
   }
 
   pay_sdk.ApplePayButtonType _mapToApplePayButtonType() {
     return switch (style?.type) {
-      null => pay_sdk.ApplePayButtonType.plain,
-      ApplePayButtonType.plain => pay_sdk.ApplePayButtonType.plain,
+      null || ApplePayButtonType.plain => pay_sdk.ApplePayButtonType.plain,
       ApplePayButtonType.buy => pay_sdk.ApplePayButtonType.buy,
       ApplePayButtonType.setUp => pay_sdk.ApplePayButtonType.setUp,
       ApplePayButtonType.inStore => pay_sdk.ApplePayButtonType.inStore,
