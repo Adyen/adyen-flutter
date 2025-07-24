@@ -102,22 +102,20 @@ class AdyenGooglePayComponent extends StatelessWidget {
 
   google_pay_sdk.GooglePayButtonTheme _mapToGooglePayButtonTheme() {
     return switch (style?.theme) {
-      null => google_pay_sdk.GooglePayButtonTheme.dark,
-      GooglePayButtonTheme.dark => google_pay_sdk.GooglePayButtonTheme.dark,
+      null || GooglePayButtonTheme.dark => google_pay_sdk.GooglePayButtonTheme.dark,
       GooglePayButtonTheme.light => google_pay_sdk.GooglePayButtonTheme.light,
     };
   }
 
   google_pay_sdk.GooglePayButtonType _mapToGooglePayButtonType() {
     return switch (style?.type) {
-      null => google_pay_sdk.GooglePayButtonType.plain,
+      null || GooglePayButtonType.plain => google_pay_sdk.GooglePayButtonType.plain,
       GooglePayButtonType.book => google_pay_sdk.GooglePayButtonType.book,
       GooglePayButtonType.buy => google_pay_sdk.GooglePayButtonType.buy,
       GooglePayButtonType.checkout => google_pay_sdk.GooglePayButtonType.checkout,
       GooglePayButtonType.donate => google_pay_sdk.GooglePayButtonType.donate,
       GooglePayButtonType.order => google_pay_sdk.GooglePayButtonType.order,
       GooglePayButtonType.pay => google_pay_sdk.GooglePayButtonType.pay,
-      GooglePayButtonType.plain => google_pay_sdk.GooglePayButtonType.plain,
       GooglePayButtonType.subscribe => google_pay_sdk.GooglePayButtonType.subscribe,
     };
   }
