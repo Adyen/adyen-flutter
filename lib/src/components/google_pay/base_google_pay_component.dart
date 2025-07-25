@@ -88,6 +88,7 @@ class _BaseGooglePayComponentState extends State<BaseGooglePayComponent> {
 
   @override
   void initState() {
+    super.initState();
     _availabilityCompleter = Completer();
     _componentCommunicationStream = _componentFlutterApi
         .componentCommunicationStream.stream
@@ -100,8 +101,6 @@ class _BaseGooglePayComponentState extends State<BaseGooglePayComponent> {
         widget.handleComponentCommunication(communicationModel);
       }
     });
-
-    super.initState();
   }
 
   @override
