@@ -33,19 +33,13 @@ class CardComponentContainer extends StatelessWidget {
         if (viewportHeight == null)
           SizedBox(
             height: initialViewPortHeight,
-            child: _buildLoadingWidget(),
+            child: switch (defaultTargetPlatform) {
+              TargetPlatform.android => const Center(child: CircularProgressIndicator()),
+              _ => const Center(child: SizedBox.shrink()),
+            },
           )
       ],
     );
-  }
-
-  Widget _buildLoadingWidget() {
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.android:
-        return const Center(child: CircularProgressIndicator());
-      default:
-        return const Center(child: SizedBox.shrink());
-    }
   }
 
   double _determineHeight(int? height) {
