@@ -86,14 +86,13 @@ class _BaseCardComponentState extends State<BaseCardComponent> {
 
   @override
   void initState() {
+    super.initState();
     _cardWidget = _buildCardWidget();
     _componentCommunicationStream = _componentFlutterApi
         .componentCommunicationStream.stream
         .where((communicationModel) =>
             communicationModel.componentId == widget.componentId)
         .listen(_onComponentCommunication);
-
-    super.initState();
   }
 
   @override
