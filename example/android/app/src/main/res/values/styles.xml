@@ -12,8 +12,31 @@
          running.
 
          This Theme is only used starting with V2 of Flutter's Android embedding. -->
-    <style name="NormalTheme" parent="@style/AdyenCheckout">
+    <style name="NormalTheme" parent="@style/MyCustomTheme">
         <item name="android:windowBackground">?android:colorBackground</item>
+    </style>
+
+    <!-- Defining a custom theme that uses the AdyenCheckout theme as a parent for customizing components  -->
+    <style name="MyCustomTheme" parent="AdyenCheckout" />
+
+    <!--  Overriding the "AdyenCheckout" theme for customizing Drop-In UI  -->
+    <style name="AdyenCheckout" parent="Theme.MaterialComponents.DayNight">
+        <item name="colorPrimary">@color/color_primary</item>
+        <item name="colorOnPrimary">@color/color_on_primary</item>
+        <item name="colorAccent">@color/color_accent</item>
+        <item name="android:colorBackground">@color/color_background</item>
+        <item name="colorBackgroundFloating">@color/color_background</item>
+        <item name="colorOnBackground">@color/color_on_background</item>
+        <item name="colorSurface">@color/color_background</item>
+        <item name="android:textColor">@color/color_primary</item>
+        <item name="android:textColorPrimary">@color/color_primary</item>
+        <item name="bottomSheetDialogTheme">@style/AdyenCheckout.BottomSheetDialogTheme</item>
+    </style>
+
+    <!--  Customize specific view elements  -->
+    <style name="AdyenCheckout.TextInputLayout" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+        <item name="boxStrokeColor">@color/text_input_stroke_selector</item>
+        <item name="android:minHeight">@dimen/input_layout_height</item>
     </style>
 
     <style name="AdyenCheckout.Button.Colored" parent="AdyenCheckout.Button.Primary">
@@ -21,8 +44,8 @@
         <item name="android:layout_height">@dimen/primary_button_height</item>
         <item name="android:layout_marginStart">@dimen/standard_margin</item>
         <item name="android:layout_marginEnd">@dimen/standard_margin</item>
-        <item name="android:backgroundTint">#000000</item>
-        <item name="android:textColor">#FFFFFF</item>
+        <item name="android:backgroundTint">@color/color_primary</item>
+        <item name="android:textColor">@color/color_background</item>
     </style>
 
 </resources>

@@ -28,7 +28,6 @@ class CardBottomSheetScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
       appBar: AppBar(title: const Text('Card component bottom sheet')),
       body: SafeArea(
         child: Center(
@@ -36,6 +35,7 @@ class CardBottomSheetScreen extends StatelessWidget {
               child: const Text("Show bottom sheet"),
               onPressed: () {
                 showModalBottomSheet(
+                  backgroundColor: Theme.of(context).scaffoldBackgroundColor,
                   isDismissible: false,
                   isScrollControlled: true,
                   context: context,

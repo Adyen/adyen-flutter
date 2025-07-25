@@ -54,12 +54,18 @@ void main() {
       Locale('en'), // English
       Locale('ar'), // Arabic
     ],
+    themeMode: ThemeMode.system,
     theme: ThemeData(
-        useMaterial3: true,
-        bottomSheetTheme: const BottomSheetThemeData(
-          surfaceTintColor: Colors.white,
-          backgroundColor: Colors.white,
-        )),
+        colorScheme: ColorScheme.fromSeed(
+      seedColor: const Color(0xFF00112C),
+      brightness: Brightness.light,
+    )),
+    darkTheme: ThemeData(
+      colorScheme: ColorScheme.fromSeed(
+        seedColor: const Color(0xFFEFEFEF),
+        brightness: Brightness.dark,
+      ),
+    ),
     routes: {
       '/': (context) => const MyApp(),
       '/dropInScreen': (context) => DropInScreen(

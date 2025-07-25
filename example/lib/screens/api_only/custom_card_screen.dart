@@ -9,7 +9,6 @@ class CustomCardScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
       appBar: AppBar(title: const Text('Adyen custom card')),
       body: SafeArea(
         child: SingleChildScrollView(

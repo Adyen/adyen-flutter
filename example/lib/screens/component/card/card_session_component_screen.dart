@@ -30,7 +30,6 @@ class CardSessionComponentScreen extends StatelessWidget {
     );
 
     return Scaffold(
-      backgroundColor: Colors.white,
       appBar: AppBar(title: const Text('Adyen card component')),
       body: SafeArea(
         child: FutureBuilder(
@@ -54,7 +53,7 @@ class CardSessionComponentScreen extends StatelessWidget {
                             paymentResult, context);
                       },
                     ),
-                    Container(height: 800, color: const Color(0xFFEDEDED)),
+                    Container(height: 800),
                   ],
                 ),
               );
