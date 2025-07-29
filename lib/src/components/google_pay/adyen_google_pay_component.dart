@@ -36,52 +36,44 @@ class AdyenGooglePayComponent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.android:
-        return switch (checkout) {
-          SessionCheckout it => _buildGooglePaySessionFlowWidget(it),
-          AdvancedCheckout it => _buildGooglePayAdvancedFlowWidget(it),
-        };
-      default:
-        throw Exception(
-            "The Google Pay component is not supported on $defaultTargetPlatform");
-    }
-  }
-
-  Widget _buildGooglePaySessionFlowWidget(SessionCheckout sessionCheckout) {
-    return GooglePaySessionComponent(
-      key: key,
-      session: sessionCheckout.toDTO(),
-      googlePayPaymentMethod: json.encode(paymentMethod),
-      googlePayComponentConfiguration: configuration,
-      onPaymentResult: onPaymentResult,
-      theme: _mapToGooglePayButtonTheme(),
-      type: _mapToGooglePayButtonType(),
-      cornerRadius: _determineCornerRadius(),
-      width: _determineWidth(),
-      height: _determineHeight(),
-      loadingIndicator: loadingIndicator,
-      onUnavailable: onUnavailable,
-      unavailableWidget: unavailableWidget,
-    );
-  }
-
-  Widget _buildGooglePayAdvancedFlowWidget(AdvancedCheckout advancedCheckout) {
-    return GooglePayAdvancedComponent(
-      key: key,
-      googlePayPaymentMethod: json.encode(paymentMethod),
-      googlePayComponentConfiguration: configuration,
-      onPaymentResult: onPaymentResult,
-      advancedCheckout: advancedCheckout,
-      theme: _mapToGooglePayButtonTheme(),
-      type: _mapToGooglePayButtonType(),
-      cornerRadius: _determineCornerRadius(),
-      width: _determineWidth(),
-      height: _determineHeight(),
-      loadingIndicator: loadingIndicator,
-      onUnavailable: onUnavailable,
-      unavailableWidget: unavailableWidget,
-    );
+    return switch (defaultTargetPlatform) {
+      TargetPlatform.android =>
+      switch (checkout) {
+        SessionCheckout it =>
+            GooglePaySessionComponent(
+              key: key,
+              session: it.toDTO(),
+              googlePayPaymentMethod: json.encode(paymentMethod),
+              googlePayComponentConfiguration: configuration,
+              onPaymentResult: onPaymentResult,
+              theme: _mapToGooglePayButtonTheme(),
+              type: _mapToGooglePayButtonType(),
+              cornerRadius: _determineCornerRadius(),
+              width: _determineWidth(),
+              height: _determineHeight(),
+              loadingIndicator: loadingIndicator,
+              onUnavailable: onUnavailable,
+              unavailableWidget: unavailableWidget,
+            ),
+        AdvancedCheckout it =>
+            GooglePayAdvancedComponent(
+              key: key,
+              googlePayPaymentMethod: json.encode(paymentMethod),
+              googlePayComponentConfiguration: configuration,
+              onPaymentResult: onPaymentResult,
+              advancedCheckout: it,
+              theme: _mapToGooglePayButtonTheme(),
+              type: _mapToGooglePayButtonType(),
+              cornerRadius: _determineCornerRadius(),
+              width: _determineWidth(),
+              height: _determineHeight(),
+              loadingIndicator: loadingIndicator,
+              onUnavailable: onUnavailable,
+              unavailableWidget: unavailableWidget,
+            ),
+      },
+      _ => throw Exception("The Google Pay component is not supported on $defaultTargetPlatform"),
+    };
   }
 
   int _determineCornerRadius() =>
@@ -109,36 +101,22 @@ class AdyenGooglePayComponent extends StatelessWidget {
   }
 
   google_pay_sdk.GooglePayButtonTheme _mapToGooglePayButtonTheme() {
-    switch (style?.theme) {
-      case null:
-        return google_pay_sdk.GooglePayButtonTheme.dark;
-      case GooglePayButtonTheme.dark:
-        return google_pay_sdk.GooglePayButtonTheme.dark;
-      case GooglePayButtonTheme.light:
-        return google_pay_sdk.GooglePayButtonTheme.light;
-    }
+    return switch (style?.theme) {
+      null || GooglePayButtonTheme.dark => google_pay_sdk.GooglePayButtonTheme.dark,
+      GooglePayButtonTheme.light => google_pay_sdk.GooglePayButtonTheme.light,
+    };
   }
 
   google_pay_sdk.GooglePayButtonType _mapToGooglePayButtonType() {
-    switch (style?.type) {
-      case null:
-        return google_pay_sdk.GooglePayButtonType.plain;
-      case GooglePayButtonType.book:
-        return google_pay_sdk.GooglePayButtonType.book;
-      case GooglePayButtonType.buy:
-        return google_pay_sdk.GooglePayButtonType.buy;
-      case GooglePayButtonType.checkout:
-        return google_pay_sdk.GooglePayButtonType.checkout;
-      case GooglePayButtonType.donate:
-        return google_pay_sdk.GooglePayButtonType.donate;
-      case GooglePayButtonType.order:
-        return google_pay_sdk.GooglePayButtonType.order;
-      case GooglePayButtonType.pay:
-        return google_pay_sdk.GooglePayButtonType.pay;
-      case GooglePayButtonType.plain:
-        return google_pay_sdk.GooglePayButtonType.plain;
-      case GooglePayButtonType.subscribe:
-        return google_pay_sdk.GooglePayButtonType.subscribe;
-    }
+    return switch (style?.type) {
+      null || GooglePayButtonType.plain => google_pay_sdk.GooglePayButtonType.plain,
+      GooglePayButtonType.book => google_pay_sdk.GooglePayButtonType.book,
+      GooglePayButtonType.buy => google_pay_sdk.GooglePayButtonType.buy,
+      GooglePayButtonType.checkout => google_pay_sdk.GooglePayButtonType.checkout,
+      GooglePayButtonType.donate => google_pay_sdk.GooglePayButtonType.donate,
+      GooglePayButtonType.order => google_pay_sdk.GooglePayButtonType.order,
+      GooglePayButtonType.pay => google_pay_sdk.GooglePayButtonType.pay,
+      GooglePayButtonType.subscribe => google_pay_sdk.GooglePayButtonType.subscribe,
+    };
   }
 }
