@@ -61,28 +61,19 @@ object ConfigurationMapper {
         val amount = amount?.mapToAmount()
         val dropInConfiguration = buildDropInConfiguration(context, shopperLocale, environment)
         val analyticsConfiguration = analyticsOptionsDTO.mapToAnalyticsConfiguration()
-
-        isRemoveStoredPaymentMethodEnabled.let {
-            dropInConfiguration.setEnableRemovingStoredPaymentMethods(it)
-        }
-
-        showPreselectedStoredPaymentMethod.let {
-            dropInConfiguration.setShowPreselectedStoredPaymentMethod(it)
-        }
-
-        skipListWhenSinglePaymentMethod.let {
-            dropInConfiguration.setSkipListWhenSinglePaymentMethod(it)
-        }
+        dropInConfiguration.setAnalyticsConfiguration(analyticsConfiguration)
+        dropInConfiguration.setEnableRemovingStoredPaymentMethods(isRemoveStoredPaymentMethodEnabled)
+        dropInConfiguration.setShowPreselectedStoredPaymentMethod(showPreselectedStoredPaymentMethod)
+        dropInConfiguration.setSkipListWhenSinglePaymentMethod(skipListWhenSinglePaymentMethod)
 
         if (cardConfigurationDTO != null) {
             val cardConfiguration =
                 cardConfigurationDTO.mapToCardConfiguration(
-                    context,
-                    shopperLocale,
-                    environment,
-                    clientKey,
-                    analyticsConfiguration,
-                    amount,
+                    context = context,
+                    shopperLocale = shopperLocale,
+                    environment = environment,
+                    clientKey = clientKey,
+                    amount = amount,
                 )
             dropInConfiguration.addCardConfiguration(cardConfiguration)
         }
@@ -131,8 +122,8 @@ object ConfigurationMapper {
         shopperLocale: String?,
         environment: com.adyen.checkout.core.Environment,
         clientKey: String,
-        analyticsConfiguration: AnalyticsConfiguration,
-        amount: Amount?,
+        analyticsConfiguration: AnalyticsConfiguration? = null,
+        amount: Amount? = null,
     ): CardConfiguration {
         val cardConfiguration =
             if (shopperLocale != null) {
@@ -152,7 +143,10 @@ object ConfigurationMapper {
                 determineSocialSecurityNumberVisibility(socialSecurityNumberFieldVisibility)
             ).setSupportedCardTypes(*mapToSupportedCardTypes(supportedCardTypes))
             .setHolderNameRequired(holderNameRequired)
-            .setAnalyticsConfiguration(analyticsConfiguration)
+
+        analyticsConfiguration?.let {
+            cardConfiguration.setAnalyticsConfiguration(it)
+        }
         amount?.let {
             cardConfiguration.setAmount(amount)
         }
