@@ -61,10 +61,15 @@ object ConfigurationMapper {
         val amount = amount?.mapToAmount()
         val dropInConfiguration = buildDropInConfiguration(context, shopperLocale, environment)
         val analyticsConfiguration = analyticsOptionsDTO.mapToAnalyticsConfiguration()
-        dropInConfiguration.setAnalyticsConfiguration(analyticsConfiguration)
-        dropInConfiguration.setEnableRemovingStoredPaymentMethods(isRemoveStoredPaymentMethodEnabled)
-        dropInConfiguration.setShowPreselectedStoredPaymentMethod(showPreselectedStoredPaymentMethod)
-        dropInConfiguration.setSkipListWhenSinglePaymentMethod(skipListWhenSinglePaymentMethod)
+        dropInConfiguration.apply {
+            setAnalyticsConfiguration(analyticsConfiguration)
+            setEnableRemovingStoredPaymentMethods(isRemoveStoredPaymentMethodEnabled)
+            setShowPreselectedStoredPaymentMethod(showPreselectedStoredPaymentMethod)
+            setSkipListWhenSinglePaymentMethod(skipListWhenSinglePaymentMethod)
+            amount?.let {
+                setAmount(it)
+            }
+        }
 
         if (cardConfigurationDTO != null) {
             val cardConfiguration =
@@ -88,10 +93,6 @@ object ConfigurationMapper {
             val cashAppPayConfiguration =
                 buildCashAppPayConfiguration(context, shopperLocale, environment, cashAppPayConfigurationDTO)
             dropInConfiguration.addCashAppPayConfiguration(cashAppPayConfiguration)
-        }
-
-        amount?.let {
-            dropInConfiguration.setAmount(it)
         }
 
         paymentMethodNames?.forEach { paymentMethodNamePair ->
