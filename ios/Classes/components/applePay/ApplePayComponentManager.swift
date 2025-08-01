@@ -1,4 +1,5 @@
 @_spi(AdyenInternal) import Adyen
+import PassKit
 
 class ApplePayComponentManager {
     private let componentFlutterApi: ComponentFlutterInterface
@@ -24,20 +25,8 @@ class ApplePayComponentManager {
         callback: (Result<InstantPaymentSetupResultDTO, Error>) -> Void
     ) {
         do {
-            // Creating an instance is unused to check whether Apple Pay is available.
-            if componentId == Constants.applePaySessionComponentId {
-                _ = try ApplePaySessionComponent(
-                    sessionHolder: sessionHolder,
-                    configuration: instantPaymentComponentConfigurationDTO,
-                    componentId: componentId
-                )
-            } else {
-                _ = try ApplePayAdvancedComponent(
-                    componentFlutterApi: componentFlutterApi,
-                    configuration: instantPaymentComponentConfigurationDTO,
-                    paymentMethodResponse: paymentMethodResponse,
-                    componentId: componentId
-                )
+            guard PKPaymentAuthorizationViewController.canMakePayments() else {
+                throw ApplePayComponent.Error.deviceDoesNotSupportApplyPay
             }
             callback(
                 Result.success(
