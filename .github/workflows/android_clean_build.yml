@@ -12,8 +12,8 @@ jobs:
       matrix:
         api-level: [ 35 ]
         flutter-version: [ 3.16.x, 3.19.x, 3.22.x, 3.24.x, 3.27.x, 3.29.x, 3.32.x ]
-        agp_version: [ 8.6.1 ]
-        gradle_version: [ 8.7 ]
+        agp_version: [ 8.9.1 ]
+        gradle_version: [ 8.11.1 ]
 
     steps:
       - name: Provide more disk space
