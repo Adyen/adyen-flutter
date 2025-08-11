@@ -55,7 +55,7 @@ jobs:
     permissions:
       actions: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Clear cache
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
