@@ -8,6 +8,7 @@ jobs:
   ios_clean_build:
     runs-on: macos-15
     strategy:
+      fail-fast: false
       matrix:
         iPhone: [ "'iPhone 16'" ]
         flutter-version: [ 3.16.x, 3.19.x, 3.22.x, 3.24.x, 3.27.x, 3.29.x, 3.32.x, 3.35.x ]
