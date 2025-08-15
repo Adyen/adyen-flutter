@@ -62,5 +62,6 @@ jobs:
         run: |
           gh cache delete android-reports
           gh cache delete ios-reports
+        continue-on-error: true
 
 
