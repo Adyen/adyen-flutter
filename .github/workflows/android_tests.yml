@@ -9,6 +9,9 @@ on:
         default: '3.29.x'
         type: string
 
+permissions:
+  contents: read
+
 jobs:
   android_tests:
     runs-on: ubuntu-24.04

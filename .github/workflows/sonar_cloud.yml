@@ -9,6 +9,9 @@ on:
         default: '3.29.0'
         type: string
 
+permissions:
+  contents: read
+
 jobs:
   sonar_cloud:
     runs-on: ubuntu-24.04
