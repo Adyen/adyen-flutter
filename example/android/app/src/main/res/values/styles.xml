@@ -44,6 +44,7 @@
         <item name="android:layout_height">@dimen/primary_button_height</item>
         <item name="android:layout_marginStart">@dimen/standard_margin</item>
         <item name="android:layout_marginEnd">@dimen/standard_margin</item>
+<!--        <item name="android:backgroundTint">#FF013D</item>-->
         <item name="android:backgroundTint">@color/color_primary</item>
         <item name="android:textColor">@color/color_background</item>
     </style>
