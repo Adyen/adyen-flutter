@@ -29,7 +29,10 @@ class PaymentEventHandler {
     }
 
     if (_isAction(jsonResponse)) {
-      return Action(actionResponse: jsonResponse[actionKey]);
+      // Mobile Summer 2025 - Assignment 2.2
+      // If the /payments response contains an action, it must be mapped to an Action payment event.
+      // return Action(actionResponse: jsonResponse[actionKey]);
+      return Error(errorMessage: "Action not correctly mapped, please fix.");
     }
 
     if (_isNonFullyPaidOrder(jsonResponse) &&

@@ -22,6 +22,7 @@ import UIKit
 
     private func setDropInStyle() {
         var dropInStyle = Adyen.DropInComponent.Style()
+//        dropInStyle.formComponent.mainButtonItem.button.backgroundColor = .yellow
         dropInStyle.formComponent.mainButtonItem.button.backgroundColor = UIColor(named: "PrimaryBackground") ?? .black
         dropInStyle.formComponent.mainButtonItem.button.title.color = UIColor(named: "PrimaryTitle") ?? .white
         dropInStyle.formComponent.textField.tintColor = UIColor(named: "PrimaryBackground") ?? .black

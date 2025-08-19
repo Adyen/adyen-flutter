@@ -1,6 +1,7 @@
 // ignore_for_file: avoid_print
 
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:adyen_checkout_example/config.dart';
 import 'package:http/http.dart' as http;
@@ -12,6 +13,7 @@ class Service {
       headers: _createHeaders(),
       body: jsonEncode(body),
     );
+    log(response.body);
     final sessionResponse = jsonDecode(response.body);
     print("Session id: ${sessionResponse["id"]}");
     return sessionResponse;
@@ -33,6 +35,7 @@ class Service {
       headers: _createHeaders(),
       body: jsonEncode(body),
     );
+    log(response.body);
     print("PspReference: ${response.headers["pspreference"]}");
     return jsonDecode(response.body);
   }
@@ -44,6 +47,7 @@ class Service {
       headers: _createHeaders(),
       body: jsonEncode(body),
     );
+    log(response.body);
     return jsonDecode(response.body);
   }
 
