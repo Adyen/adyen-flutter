@@ -20,7 +20,7 @@ class Config {
   static const String publicKey = String.fromEnvironment('PUBLIC_KEY');
 
   //Environment constants
-  static const String merchantAccount = "FlutterTEST";
+  static const String merchantAccount = "TestMerchantCheckout";
   static const String merchantName = "Test Merchant";
   static const String countryCode = "NL";
   static const String shopperLocale = "en-US";
