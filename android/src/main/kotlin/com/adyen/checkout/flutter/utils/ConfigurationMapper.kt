@@ -64,8 +64,8 @@ object ConfigurationMapper {
         dropInConfiguration.apply {
             setAnalyticsConfiguration(analyticsConfiguration)
             setEnableRemovingStoredPaymentMethods(isRemoveStoredPaymentMethodEnabled)
-            setShowPreselectedStoredPaymentMethod(showPreselectedStoredPaymentMethod)
-            setSkipListWhenSinglePaymentMethod(skipListWhenSinglePaymentMethod)
+            showPreselectedStoredPaymentMethod?.let { setShowPreselectedStoredPaymentMethod(it) }
+            skipListWhenSinglePaymentMethod?.let { setSkipListWhenSinglePaymentMethod(it) }
             amount?.let {
                 setAmount(it)
             }
