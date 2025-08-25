@@ -1,7 +1,9 @@
-import Adyen
-import adyen_checkout
 import Flutter
+import adyen_checkout
+import AdyenDropIn
+import AdyenActions
 import UIKit
+import Adyen
 
 @main
 @objc class AppDelegate: FlutterAppDelegate {
@@ -21,7 +23,7 @@ import UIKit
     }
 
     private func setDropInStyle() {
-        var dropInStyle = Adyen.DropInComponent.Style()
+        var dropInStyle = DropInComponent.Style()
         dropInStyle.formComponent.mainButtonItem.button.backgroundColor = UIColor(named: "PrimaryBackground") ?? .black
         dropInStyle.formComponent.mainButtonItem.button.title.color = UIColor(named: "PrimaryTitle") ?? .white
         dropInStyle.formComponent.textField.tintColor = UIColor(named: "PrimaryBackground") ?? .black
