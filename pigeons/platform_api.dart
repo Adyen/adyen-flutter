@@ -10,7 +10,7 @@ import 'package:pigeon/pigeon.dart';
     package: "com.adyen.checkout.flutter.generated",
     errorClassName: "AdyenPigeonError",
   ),
-  swiftOut: 'ios/Classes/generated/PlatformApi.swift',
+  swiftOut: 'ios/adyen_checkout/Sources/adyen_checkout/generated/PlatformApi.swift',
   swiftOptions: SwiftOptions(errorClassName: "AdyenPigeonError"),
   dartPackageName: 'adyen_checkout',
 ))
