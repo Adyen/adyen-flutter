@@ -1,6 +1,10 @@
 @_spi(AdyenInternal) import Adyen
-import AdyenActions
-import AdyenCard
+#if canImport(AdyenActions)
+    import AdyenActions
+#endif
+#if canImport(AdyenCard)
+    import AdyenCard
+#endif
 import Flutter
 
 class CardAdvancedComponent: BaseCardComponent {

@@ -1,6 +1,10 @@
 @_spi(AdyenInternal) import Adyen
-import AdyenSession
-import AdyenNetworking
+#if canImport(AdyenSession)
+    import AdyenSession
+#endif
+#if canImport(AdyenNetworking)
+    import AdyenNetworking
+#endif
 import UIKit
 
 class DropInSessionsDelegate: AdyenSessionDelegate {

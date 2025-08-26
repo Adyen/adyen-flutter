@@ -1,6 +1,10 @@
 import Adyen
-import AdyenComponents
-import AdyenNetworking
+#if canImport(AdyenComponents)
+    import AdyenComponents
+#endif
+#if canImport(AdyenNetworking)
+    import AdyenNetworking
+#endif
 import Foundation
 
 class DropInAdvancedFlowDelegate: DropInComponentDelegate {

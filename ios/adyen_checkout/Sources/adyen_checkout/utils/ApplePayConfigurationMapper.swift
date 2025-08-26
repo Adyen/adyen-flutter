@@ -1,5 +1,7 @@
 import Adyen
-import AdyenComponents
+#if canImport(AdyenComponents)
+    import AdyenComponents
+#endif
 import PassKit
 
 extension ApplePayConfigurationDTO {

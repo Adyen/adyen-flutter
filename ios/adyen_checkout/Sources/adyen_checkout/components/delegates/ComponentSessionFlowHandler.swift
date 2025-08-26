@@ -1,5 +1,7 @@
 import Adyen
-import AdyenSession
+#if canImport(AdyenSession)
+    import AdyenSession
+#endif
 
 class ComponentSessionFlowHandler: AdyenSessionDelegate {
     private let componentFlutterApi: ComponentFlutterInterface

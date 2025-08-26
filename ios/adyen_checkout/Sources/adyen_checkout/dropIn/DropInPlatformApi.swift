@@ -1,10 +1,18 @@
 import Foundation
-import AdyenDropIn
-import AdyenActions
-import AdyenCard
+#if canImport(AdyenDropIn)
+    import AdyenDropIn
+#endif
+#if canImport(AdyenActions)
+    import AdyenActions
+#endif
+#if canImport(AdyenCard)
+    import AdyenCard
+#endif
 import UIKit
 @_spi(AdyenInternal) import Adyen
-import AdyenNetworking
+#if canImport(AdyenNetworking)
+    import AdyenNetworking
+#endif
 
 class DropInPlatformApi: DropInPlatformInterface {
     private let jsonDecoder = JSONDecoder()

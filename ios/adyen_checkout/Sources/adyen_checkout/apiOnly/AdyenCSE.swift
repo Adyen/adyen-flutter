@@ -1,4 +1,8 @@
-import AdyenEncryption
+#if canImport(AdyenEncryption)
+    import AdyenEncryption
+#endif
+
+import Adyen
 
 class AdyenCSE {
     func encryptCard(unencryptedCardDTO: UnencryptedCardDTO, publicKey: String) -> Result<EncryptedCardDTO, any Error> {

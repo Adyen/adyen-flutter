@@ -1,5 +1,7 @@
 import Adyen
-import AdyenCard
+#if canImport(AdyenCard)
+    import AdyenCard
+#endif
 
 class CardValidation {
     func validateCardNumber(cardNumber: String, enableLuhnCheck: Bool) -> Bool {
