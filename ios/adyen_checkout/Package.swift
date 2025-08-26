@@ -18,7 +18,12 @@ let package = Package(
         .target(
             name: "adyen_checkout",
             dependencies: [
+                .product(name: "Adyen", package: "adyen-ios"),
+                .product(name: "AdyenActions", package: "adyen-ios"),
+                .product(name: "AdyenCard", package: "adyen-ios"),
+                .product(name: "AdyenComponents", package: "adyen-ios"),
                 .product(name: "AdyenDropIn", package: "adyen-ios"),
+                .product(name: "AdyenEncryption", package: "adyen-ios"),
                 .product(name: "AdyenSession", package: "adyen-ios"),
             ],
             path: "Sources",
