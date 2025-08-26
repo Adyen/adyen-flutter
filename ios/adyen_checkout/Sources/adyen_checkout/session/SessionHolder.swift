@@ -1,5 +1,7 @@
 @_spi(AdyenInternal) import Adyen
-import AdyenSession
+#if canImport(AdyenSession)
+    import AdyenSession
+#endif
 
 class SessionHolder {
     var session: AdyenSession?

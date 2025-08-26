@@ -1,5 +1,7 @@
 @_spi(AdyenInternal) import Adyen
-import AdyenActions
+#if canImport(AdyenActions)
+    import AdyenActions
+#endif
 import Foundation
 import UIKit
 
@@ -19,7 +21,7 @@ class ActionComponentManager {
             let adyenContext = try actionComponentConfiguration.createAdyenContext()
             actionComponent = AdyenActionComponent(context: adyenContext)
             actionComponent?.delegate = self
-            actionComponent?.presentationDelegate = getViewController() as! any PresentationDelegate
+            actionComponent?.presentationDelegate = getViewController()
             let jsonData = try JSONSerialization.data(withJSONObject: actionResponse, options: [])
             let action = try JSONDecoder().decode(Action.self, from: jsonData)
             actionComponent?.handle(action)

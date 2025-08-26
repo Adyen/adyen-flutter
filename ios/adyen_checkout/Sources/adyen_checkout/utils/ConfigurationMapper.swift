@@ -1,11 +1,23 @@
 @_spi(AdyenInternal) import Adyen
 import PassKit
-import AdyenComponents
-import AdyenDropIn
-import AdyenSession
-import AdyenCard
-import AdyenEncryption
-import Adyen3DS2
+#if canImport(AdyenComponents)
+    import AdyenComponents
+#endif
+#if canImport(AdyenDropIn)
+    import AdyenDropIn
+#endif
+#if canImport(AdyenSession)
+    import AdyenSession
+#endif
+#if canImport(AdyenCard)
+    import AdyenCard
+#endif
+#if canImport(AdyenEncryption)
+    import AdyenEncryption
+#endif
+#if canImport(Adyen3DS2)
+    import Adyen3DS2
+#endif
 
 extension DropInConfigurationDTO {
     func createDropInConfiguration(payment: Payment?) throws -> DropInComponent.Configuration {

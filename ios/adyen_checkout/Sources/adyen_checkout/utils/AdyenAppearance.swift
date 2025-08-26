@@ -1,5 +1,7 @@
 import Adyen
-import AdyenDropIn
+#if canImport(AdyenDropIn)
+    import AdyenDropIn
+#endif
 
 public enum AdyenAppearance {
     private static var _dropInStyle: DropInComponent.Style = .init()

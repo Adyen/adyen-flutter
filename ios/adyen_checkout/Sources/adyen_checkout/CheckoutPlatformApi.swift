@@ -1,7 +1,12 @@
 import Foundation
-import AdyenSession
 import UIKit
-import AdyenCard
+
+#if canImport(AdyenSession)
+    import AdyenSession
+#endif
+#if canImport(AdyenCard)
+    import AdyenCard
+#endif
 @_spi(AdyenInternal) import Adyen
 
 // TODO: Add config:
@@ -100,7 +105,7 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
     }
     
     func getThreeDS2SdkVersion() throws -> String {
-        AdyenCard.threeDS2SdkVersion
+        threeDS2SdkVersion
     }
 
     private func createSessionForDropIn(
@@ -130,7 +135,7 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
             adyenContext: adyenContext,
             sessionId: sessionId,
             sessionData: sessionData,
-            sessionDelegate: sessionDelegate as! AdyenSessionDelegate,
+            sessionDelegate: sessionDelegate,
             completion: completion
         )
     }

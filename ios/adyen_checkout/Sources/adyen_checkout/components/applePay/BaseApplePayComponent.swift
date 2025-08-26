@@ -1,5 +1,7 @@
 @_spi(AdyenInternal) import Adyen
-import AdyenComponents
+#if canImport(AdyenComponents)
+    import AdyenComponents
+#endif
 import UIKit
 
 class BaseApplePayComponent {

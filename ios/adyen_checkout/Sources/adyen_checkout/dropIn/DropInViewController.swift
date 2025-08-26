@@ -1,5 +1,7 @@
 @_spi(AdyenInternal) import Adyen
-import AdyenDropIn
+#if canImport(AdyenDropIn)
+    import AdyenDropIn
+#endif
 import UIKit
 
 // View controller is required to prevent propagating the tap event to the FlutterViewController - https://github.com/flutter/flutter/issues/35784#issuecomment-516243057
