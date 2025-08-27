@@ -25,10 +25,14 @@ class ApplePayComponentManager {
         callback: (Result<InstantPaymentSetupResultDTO, Error>) -> Void
     ) {
         do {
-            try checkApplePayAvailability(
-                instantPaymentComponentConfigurationDTO: instantPaymentComponentConfigurationDTO,
+            let applePayPaymentMethod = try getApplePayPaymentMethod(
                 paymentMethodResponse: paymentMethodResponse,
                 componentId: componentId
+            )
+            
+            try checkApplePayAvailability(
+                instantPaymentComponentConfigurationDTO: instantPaymentComponentConfigurationDTO,
+                paymentMethod: applePayPaymentMethod
             )
             
             callback(
@@ -104,27 +108,30 @@ class ApplePayComponentManager {
         }
     }
     
-    private func checkApplePayAvailability(
-        instantPaymentComponentConfigurationDTO: InstantPaymentConfigurationDTO,
+    private func getApplePayPaymentMethod(
         paymentMethodResponse: String,
         componentId: String
+    ) throws -> ApplePayPaymentMethod {
+        if componentId == Constants.applePaySessionComponentId {
+            guard let paymentMethod = sessionHolder.session?.sessionContext.paymentMethods.paymentMethod(ofType: ApplePayPaymentMethod.self) else {
+                throw PlatformError(errorDescription: "Apple Pay payment method not valid.")
+            }
+            return paymentMethod
+        }
+
+        return try JSONDecoder().decode(ApplePayPaymentMethod.self, from: Data(paymentMethodResponse.utf8))
+    }
+    
+    private func checkApplePayAvailability(
+        instantPaymentComponentConfigurationDTO: InstantPaymentConfigurationDTO,
+        paymentMethod: ApplePayPaymentMethod
     ) throws {
         guard PKPaymentAuthorizationViewController.canMakePayments() else {
             throw ApplePayComponent.Error.deviceDoesNotSupportApplyPay
         }
         
-        let applePayPaymentMethod: ApplePayPaymentMethod
         let allowOnboarding = instantPaymentComponentConfigurationDTO.applePayConfigurationDTO?.allowOnboarding ?? false
-        if componentId == Constants.applePaySessionComponentId {
-            guard let paymentMethod = sessionHolder.session?.sessionContext.paymentMethods.paymentMethod(ofType: ApplePayPaymentMethod.self) else {
-                throw PlatformError(errorDescription: "Apple Pay payment method not valid.")
-            }
-            applePayPaymentMethod = paymentMethod
-        } else {
-            applePayPaymentMethod = try JSONDecoder().decode(ApplePayPaymentMethod.self, from: Data(paymentMethodResponse.utf8))
-        }
-        
-        guard allowOnboarding || PKPaymentAuthorizationViewController.canMakePayments(usingNetworks: applePayPaymentMethod.supportedNetworks) else {
+        guard allowOnboarding || PKPaymentAuthorizationViewController.canMakePayments(usingNetworks: paymentMethod.supportedNetworks) else {
             throw ApplePayComponent.Error.userCannotMakePayment
         }
     }
