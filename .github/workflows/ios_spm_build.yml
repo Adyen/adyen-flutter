@@ -1,0 +1,53 @@
+name: iOS SPM build
+
+on:
+  workflow_call:
+  workflow_dispatch:
+
+jobs:
+  ios_clean_build:
+    runs-on: macos-15
+    strategy:
+      fail-fast: false
+      matrix:
+        iPhone: [ "'iPhone 16'" ]
+        flutter-version: [ 3.32.x, 3.35.x ]
+
+    steps:
+      - name: Provide more disk space
+        run: |
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf /opt/ghc
+          sudo rm -rf "/usr/local/share/boost"
+          sudo rm -rf /Applications/Xcode_16.1.app
+          sudo rm -rf /Applications/Xcode_16.2.app
+
+      - uses: actions/checkout@v5
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ matrix.flutter-version }}
+          channel: 'stable'
+          cache-key: ${{ matrix.flutter-version }}
+
+      - name: Enable SPM
+        run: |
+          flutter pub get
+          flutter config --enable-swift-package-manager
+
+      - name: Create default project and add Adyen checkout plugin package
+        run: |
+          flutter create --template=app --platforms=android,ios demo_project
+          cd demo_project
+          dart pub add 'adyen_checkout:{"path":"../"}'
+
+      - name: Build app for simulator
+        working-directory: demo_project
+        run: flutter build ios --debug --simulator
+
+      - name: Install app on simulator
+        working-directory: demo_project
+        run: |
+          open -a Simulator && xcrun simctl boot ${{ matrix.iPhone }}
+          xcrun simctl install ${{ matrix.iPhone }} build/ios/iphonesimulator/Runner.app
+          xcrun simctl launch ${{ matrix.iPhone }} com.example.demoProject
