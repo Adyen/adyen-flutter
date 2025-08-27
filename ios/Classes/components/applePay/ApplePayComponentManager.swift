@@ -113,7 +113,7 @@ class ApplePayComponentManager {
             throw ApplePayComponent.Error.deviceDoesNotSupportApplyPay
         }
         
-        var applePayPaymentMethod: ApplePayPaymentMethod
+        let applePayPaymentMethod: ApplePayPaymentMethod
         let allowOnboarding = instantPaymentComponentConfigurationDTO.applePayConfigurationDTO?.allowOnboarding ?? false
         if componentId == Constants.applePaySessionComponentId {
             guard let paymentMethod = sessionHolder.session?.sessionContext.paymentMethods.paymentMethod(ofType: ApplePayPaymentMethod.self) else {
