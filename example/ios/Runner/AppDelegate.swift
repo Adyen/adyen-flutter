@@ -1,5 +1,5 @@
-import Adyen
 import Flutter
+import Adyen
 import adyen_checkout
 
 //#if canImport(AdyenActions)
