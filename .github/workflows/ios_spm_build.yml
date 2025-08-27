@@ -22,6 +22,10 @@ jobs:
           sudo rm -rf /Applications/Xcode_16.1.app
           sudo rm -rf /Applications/Xcode_16.2.app
 
+      - name: Set Xcode
+        run: |
+          sudo xcode-select --switch /Applications/Xcode_16.4.app
+
       - uses: actions/checkout@v5
 
       - uses: subosito/flutter-action@v2
@@ -30,16 +34,15 @@ jobs:
           channel: 'stable'
           cache-key: ${{ matrix.flutter-version }}
 
-      - name: Enable SPM
-        run: |
-          flutter pub get
-          flutter config --enable-swift-package-manager
-
       - name: Create default project and add Adyen checkout plugin package
         run: |
+          flutter pub get
           flutter create --template=app --platforms=android,ios demo_project
           cd demo_project
           dart pub add 'adyen_checkout:{"path":"../"}'
+
+      - name: Enable SPM
+        run: flutter config --enable-swift-package-manager
 
       - name: Build app for simulator
         working-directory: demo_project
