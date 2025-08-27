@@ -31,7 +31,7 @@ class ApplePayComponentManager {
             )
             
             try checkApplePayAvailability(
-                instantPaymentComponentConfigurationDTO: instantPaymentComponentConfigurationDTO,
+                applePayConfiguration: instantPaymentComponentConfigurationDTO.applePayConfigurationDTO,
                 paymentMethod: applePayPaymentMethod
             )
             
@@ -123,14 +123,14 @@ class ApplePayComponentManager {
     }
     
     private func checkApplePayAvailability(
-        instantPaymentComponentConfigurationDTO: InstantPaymentConfigurationDTO,
+        applePayConfiguration: ApplePayConfigurationDTO?,
         paymentMethod: ApplePayPaymentMethod
     ) throws {
         guard PKPaymentAuthorizationViewController.canMakePayments() else {
             throw ApplePayComponent.Error.deviceDoesNotSupportApplyPay
         }
         
-        let allowOnboarding = instantPaymentComponentConfigurationDTO.applePayConfigurationDTO?.allowOnboarding ?? false
+        let allowOnboarding = applePayConfiguration?.allowOnboarding ?? false
         guard allowOnboarding || PKPaymentAuthorizationViewController.canMakePayments(usingNetworks: paymentMethod.supportedNetworks) else {
             throw ApplePayComponent.Error.userCannotMakePayment
         }
