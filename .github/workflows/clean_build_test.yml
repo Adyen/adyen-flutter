@@ -17,3 +17,7 @@ jobs:
     name: iOS clean build tests
     uses: ./.github/workflows/ios_clean_build.yml
 
+  ios_spm_build_test:
+    name: iOS SPM test
+    uses: ./.github/workflows/ios_spm_build.yml
+

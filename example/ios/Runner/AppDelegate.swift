@@ -1,14 +1,17 @@
 import Flutter
 import Adyen
+
+#if canImport(adyen_checkout)
 import adyen_checkout
+#endif
 
-//#if canImport(AdyenActions)
-//import AdyenActions
-//#endif
+#if canImport(AdyenActions)
+import AdyenActions
+#endif
 
-//#if canImport(AdyenDropIn)
-//import AdyenDropIn
-//#endif
+#if canImport(AdyenDropIn)
+import AdyenDropIn
+#endif
 
 
 @main
