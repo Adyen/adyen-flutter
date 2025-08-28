@@ -15,6 +15,10 @@
 - For iOS with card payment using advanced flow: The loading spinner is now stopped when an error
   occurs.
 
+### Fixed
+
+- The billing contact fields for Apple Pay are now correctly mapped.
+
 ## 1.5.1
 
 ### New
