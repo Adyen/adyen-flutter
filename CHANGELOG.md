@@ -10,6 +10,8 @@
 ### Improved
 
 - Improved initialization of Google Pay Component.
+- The Apple Pay Component now uses the PassKit for its availability check instead of a temporary
+  native Adyen Apple Pay Component.
 - For iOS with card payment using advanced flow: The loading spinner is now stopped when an error
   occurs.
 
