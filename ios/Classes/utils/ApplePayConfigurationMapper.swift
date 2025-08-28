@@ -19,7 +19,7 @@ extension ApplePayConfigurationDTO {
         paymentRequest.shippingContact = shippingContact?.toApplePayContact()
         paymentRequest.merchantCapabilities = merchantCapability.toMerchantCapability()
         requiredShippingContactFields.map { paymentRequest.requiredShippingContactFields = mapToContactFields(contactFields: $0) }
-        requiredShippingContactFields.map { paymentRequest.requiredBillingContactFields = mapToContactFields(contactFields: $0) }
+        requiredBillingContactFields.map { paymentRequest.requiredBillingContactFields = mapToContactFields(contactFields: $0) }
         applePayShippingType.map { paymentRequest.shippingType = $0.toPKShippingType() }
         supportedCountries.map { paymentRequest.supportedCountries = .init($0.compactMap { $0 }) }
         try shippingMethods.map { paymentRequest.shippingMethods = try $0.compactMap { try $0?.toPKShippingMethod() }}
