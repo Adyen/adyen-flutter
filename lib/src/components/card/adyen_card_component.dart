@@ -10,18 +10,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/widgets.dart';
 
-class AdyenCardComponent extends StatelessWidget {
-  final CardComponentConfiguration configuration;
-  final Map<String, dynamic> paymentMethod;
-  final Checkout checkout;
-  final Future<void> Function(PaymentResult) onPaymentResult;
-  final Set<Factory<OneSequenceGestureRecognizer>>? gestureRecognizers;
-  final _isStoredPaymentMethodIndicator =
-      Constants.isStoredPaymentMethodIndicator;
-  final SdkVersionNumberProvider _sdkVersionNumberProvider =
-      SdkVersionNumberProvider.instance;
-
-  AdyenCardComponent({
+class AdyenCardComponent extends StatefulWidget {
+  const AdyenCardComponent({
     super.key,
     required this.configuration,
     required this.paymentMethod,
@@ -30,79 +20,71 @@ class AdyenCardComponent extends StatelessWidget {
     this.gestureRecognizers,
   });
 
+  final CardComponentConfiguration configuration;
+  final Map<String, dynamic> paymentMethod;
+  final Checkout checkout;
+  final Future<void> Function(PaymentResult) onPaymentResult;
+  final Set<Factory<OneSequenceGestureRecognizer>>? gestureRecognizers;
+
+  @override
+  State<AdyenCardComponent> createState() => _AdyenCardComponentState();
+}
+
+class _AdyenCardComponentState extends State<AdyenCardComponent> {
+  final _isStoredPaymentMethodIndicator = Constants.isStoredPaymentMethodIndicator;
+
+  final SdkVersionNumberProvider _sdkVersionNumberProvider = SdkVersionNumberProvider.instance;
+
+  late final Future<String> _sdkVersionNumber;
+
+  @override
+  void initState() {
+    super.initState();
+    _sdkVersionNumber = _sdkVersionNumberProvider.getSdkVersionNumber();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
-      future: _sdkVersionNumberProvider.getSdkVersionNumber(),
+    return FutureBuilder<String>(
+      future: _sdkVersionNumber,
       builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
         if (snapshot.data != null) {
           final sdkVersionNumber = snapshot.data ?? "";
-          return switch (checkout) {
-            SessionCheckout() => _buildCardSessionFlowWidget(sdkVersionNumber),
-            AdvancedCheckout it =>
-              _buildCardAdvancedFlowWidget(sdkVersionNumber, it),
+          return switch (widget.checkout) {
+            SessionCheckout() => CardSessionComponent(
+                cardComponentConfiguration: widget.configuration.toDTO(sdkVersionNumber),
+                session: (widget.checkout as SessionCheckout).toDTO(),
+                paymentMethod: json.encode(widget.paymentMethod),
+                onPaymentResult: widget.onPaymentResult,
+                initialViewHeight: _determineInitialHeight(widget.configuration.cardConfiguration),
+                isStoredPaymentMethod: widget.paymentMethod.containsKey(_isStoredPaymentMethodIndicator),
+                gestureRecognizers: widget.gestureRecognizers,
+              ),
+            AdvancedCheckout it => CardAdvancedComponent(
+                cardComponentConfiguration: widget.configuration.toDTO(sdkVersionNumber),
+                paymentMethod: json.encode(widget.paymentMethod),
+                onPaymentResult: widget.onPaymentResult,
+                advancedCheckout: it,
+                initialViewHeight: _determineInitialHeight(widget.configuration.cardConfiguration),
+                isStoredPaymentMethod: widget.paymentMethod.containsKey(_isStoredPaymentMethodIndicator),
+                gestureRecognizers: widget.gestureRecognizers,
+              ),
           };
         } else {
           return Container(
-            height: _determineInitialHeight(configuration.cardConfiguration),
+            height: _determineInitialHeight(widget.configuration.cardConfiguration),
           );
         }
       },
     );
   }
 
-  CardSessionComponent _buildCardSessionFlowWidget(String sdkVersionNumber) {
-    final SessionCheckout sessionCheckout = checkout as SessionCheckout;
-    final String encodedPaymentMethod = json.encode(paymentMethod);
-    final double initialHeight =
-        _determineInitialHeight(configuration.cardConfiguration);
-    final bool isStoredPaymentMethod =
-        paymentMethod.containsKey(_isStoredPaymentMethodIndicator);
-
-    return CardSessionComponent(
-      cardComponentConfiguration: configuration.toDTO(sdkVersionNumber),
-      paymentMethod: encodedPaymentMethod,
-      session: sessionCheckout.toDTO(),
-      onPaymentResult: onPaymentResult,
-      initialViewHeight: initialHeight,
-      isStoredPaymentMethod: isStoredPaymentMethod,
-      onBinLookup: configuration.cardConfiguration.onBinLookup,
-      onBinValue: configuration.cardConfiguration.onBinValue,
-    );
-  }
-
-  CardAdvancedComponent _buildCardAdvancedFlowWidget(
-    String sdkVersionNumber,
-    Checkout advancedCheckout,
-  ) {
-    final initialHeight =
-        _determineInitialHeight(configuration.cardConfiguration);
-    final String encodedPaymentMethod = json.encode(paymentMethod);
-    final bool isStoredPaymentMethod =
-        paymentMethod.containsKey(_isStoredPaymentMethodIndicator);
-
-    return CardAdvancedComponent(
-      cardComponentConfiguration: configuration.toDTO(sdkVersionNumber),
-      paymentMethod: encodedPaymentMethod,
-      advancedCheckout: advancedCheckout,
-      onPaymentResult: onPaymentResult,
-      initialViewHeight: initialHeight,
-      isStoredPaymentMethod: isStoredPaymentMethod,
-      gestureRecognizers: gestureRecognizers,
-      onBinLookup: configuration.cardConfiguration.onBinLookup,
-      onBinValue: configuration.cardConfiguration.onBinValue,
-    );
-  }
-
   double _determineInitialHeight(CardConfiguration cardConfiguration) {
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.android:
-        return _determineInitialAndroidViewHeight(cardConfiguration);
-      case TargetPlatform.iOS:
-        return _determineInitialIosViewHeight(cardConfiguration);
-      default:
-        throw UnsupportedError('Unsupported platform view');
-    }
+    return switch (defaultTargetPlatform) {
+      TargetPlatform.android => _determineInitialAndroidViewHeight(cardConfiguration),
+      TargetPlatform.iOS => _determineInitialIosViewHeight(cardConfiguration),
+      _ => throw UnsupportedError('Unsupported platform view'),
+    };
   }
 
   double _determineInitialAndroidViewHeight(
