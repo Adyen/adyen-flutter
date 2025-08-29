@@ -108,6 +108,8 @@ unlinked_spec.ds
 **/ios/Flutter/flutter_export_environment.sh
 **/ios/ServiceDefinitions.json
 **/ios/Runner/GeneratedPluginRegistrant.*
+**/ios/**/*.swiftpm
+**/ios/**/Package.resolved
 
 # Coverage
 coverage/
