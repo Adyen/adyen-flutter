@@ -12,7 +12,7 @@ let package = Package(
         .library(name: "adyen-checkout", targets: ["adyen_checkout"])
     ],
     dependencies: [
-        .package(url: "https://github.com/Adyen/adyen-ios", exact: "5.19.2")
+        .package(url: "https://github.com/Adyen/adyen-ios", exact: "5.20.0")
     ],
     targets: [
         .target(
