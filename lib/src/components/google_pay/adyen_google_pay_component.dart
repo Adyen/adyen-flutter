@@ -37,10 +37,8 @@ class AdyenGooglePayComponent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return switch (defaultTargetPlatform) {
-      TargetPlatform.android =>
-      switch (checkout) {
-        SessionCheckout it =>
-            GooglePaySessionComponent(
+      TargetPlatform.android => switch (checkout) {
+          SessionCheckout it => GooglePaySessionComponent(
               key: key,
               session: it.toDTO(),
               googlePayPaymentMethod: json.encode(paymentMethod),
@@ -55,8 +53,7 @@ class AdyenGooglePayComponent extends StatelessWidget {
               onUnavailable: onUnavailable,
               unavailableWidget: unavailableWidget,
             ),
-        AdvancedCheckout it =>
-            GooglePayAdvancedComponent(
+          AdvancedCheckout it => GooglePayAdvancedComponent(
               key: key,
               googlePayPaymentMethod: json.encode(paymentMethod),
               googlePayComponentConfiguration: configuration,
@@ -71,8 +68,9 @@ class AdyenGooglePayComponent extends StatelessWidget {
               onUnavailable: onUnavailable,
               unavailableWidget: unavailableWidget,
             ),
-      },
-      _ => throw Exception("The Google Pay component is not supported on $defaultTargetPlatform"),
+        },
+      _ => throw Exception(
+          "The Google Pay component is not supported on $defaultTargetPlatform"),
     };
   }
 
@@ -102,21 +100,27 @@ class AdyenGooglePayComponent extends StatelessWidget {
 
   google_pay_sdk.GooglePayButtonTheme _mapToGooglePayButtonTheme() {
     return switch (style?.theme) {
-      null || GooglePayButtonTheme.dark => google_pay_sdk.GooglePayButtonTheme.dark,
+      null ||
+      GooglePayButtonTheme.dark =>
+        google_pay_sdk.GooglePayButtonTheme.dark,
       GooglePayButtonTheme.light => google_pay_sdk.GooglePayButtonTheme.light,
     };
   }
 
   google_pay_sdk.GooglePayButtonType _mapToGooglePayButtonType() {
     return switch (style?.type) {
-      null || GooglePayButtonType.plain => google_pay_sdk.GooglePayButtonType.plain,
+      null ||
+      GooglePayButtonType.plain =>
+        google_pay_sdk.GooglePayButtonType.plain,
       GooglePayButtonType.book => google_pay_sdk.GooglePayButtonType.book,
       GooglePayButtonType.buy => google_pay_sdk.GooglePayButtonType.buy,
-      GooglePayButtonType.checkout => google_pay_sdk.GooglePayButtonType.checkout,
+      GooglePayButtonType.checkout =>
+        google_pay_sdk.GooglePayButtonType.checkout,
       GooglePayButtonType.donate => google_pay_sdk.GooglePayButtonType.donate,
       GooglePayButtonType.order => google_pay_sdk.GooglePayButtonType.order,
       GooglePayButtonType.pay => google_pay_sdk.GooglePayButtonType.pay,
-      GooglePayButtonType.subscribe => google_pay_sdk.GooglePayButtonType.subscribe,
+      GooglePayButtonType.subscribe =>
+        google_pay_sdk.GooglePayButtonType.subscribe,
     };
   }
 }
