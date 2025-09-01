@@ -20,7 +20,8 @@ class AdyenCseRepository extends AdyenBaseRepository {
         "encryptedExpiryMonth": "${encryptedCard.encryptedExpiryMonth}",
         "encryptedExpiryYear": "${encryptedCard.encryptedExpiryYear}",
         "encryptedSecurityCode": "${encryptedCard.encryptedSecurityCode}",
-        if (threeDS2SdkVersion != null) "threeDS2SdkVersion": threeDS2SdkVersion,
+        if (threeDS2SdkVersion != null)
+          "threeDS2SdkVersion": threeDS2SdkVersion,
       },
       "authenticationData": {
         "threeDSRequestData": {"nativeThreeDS": "preferred"}

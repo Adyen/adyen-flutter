@@ -18,23 +18,23 @@ extension ApplePayConfigurationDTO {
         paymentRequest.billingContact = billingContact?.toApplePayContact()
         paymentRequest.shippingContact = shippingContact?.toApplePayContact()
         paymentRequest.merchantCapabilities = merchantCapability.toMerchantCapability()
-        if let requiredShippingContactFields = requiredShippingContactFields {
+        if let requiredShippingContactFields {
             paymentRequest.requiredShippingContactFields = mapToContactFields(contactFields: requiredShippingContactFields)
         }
 
-        if let requiredBillingContactFields = requiredBillingContactFields {
+        if let requiredBillingContactFields {
             paymentRequest.requiredBillingContactFields = mapToContactFields(contactFields: requiredBillingContactFields)
         }
 
-        if let applePayShippingType = applePayShippingType {
+        if let applePayShippingType {
             paymentRequest.shippingType = applePayShippingType.toPKShippingType()
         }
 
-        if let supportedCountries = supportedCountries {
+        if let supportedCountries {
             paymentRequest.supportedCountries = .init(supportedCountries.compactMap { $0 })
         }
 
-        if let shippingMethods = shippingMethods {
+        if let shippingMethods {
             paymentRequest.shippingMethods = try shippingMethods.compactMap { try $0?.toPKShippingMethod() }
         }
         
