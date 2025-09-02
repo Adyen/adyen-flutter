@@ -1,6 +1,6 @@
 ## 1.6.0
 
-## Improved
+### Improved
 
 - Improved initialization of Google Pay Component.
 - For the Apple Pay Component:
@@ -10,7 +10,7 @@
 - On iOS with the Advanced flow: when an error occurs during a card payment, the loading spinner now
   stops automatically.
 
-## Changed
+### Changed
 
 - Dependency versions:
 
