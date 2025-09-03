@@ -37,15 +37,20 @@ jobs:
           channel: 'stable'
           cache-key: ${{ matrix.flutter-version }}
 
+      - name: Enable SPM
+        run: flutter config --enable-swift-package-manager
+
+      - name: Build example app
+        run: |
+          cd example
+          flutter build ios --no-codesign
+
       - name: Create default project and add Adyen checkout plugin package
         run: |
           flutter pub get
           flutter create --template=app --platforms=android,ios demo_project
           cd demo_project
           dart pub add 'adyen_checkout:{"path":"../"}'
-
-      - name: Enable SPM
-        run: flutter config --enable-swift-package-manager
 
       - name: Build app for simulator
         working-directory: demo_project
