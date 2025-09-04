@@ -1,17 +1,17 @@
+import Adyen
 import Flutter
 import UIKit
-import Adyen
 
 #if canImport(adyen_checkout)
-import adyen_checkout
+    import adyen_checkout
 #endif
 
 #if canImport(AdyenActions)
-import AdyenActions
+    import AdyenActions
 #endif
 
 #if canImport(AdyenDropIn)
-import AdyenDropIn
+    import AdyenDropIn
 #endif
 
 @main
