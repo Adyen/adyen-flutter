@@ -1,4 +1,5 @@
 import Flutter
+import UIKit
 import Adyen
 
 #if canImport(adyen_checkout)
@@ -12,7 +13,6 @@ import AdyenActions
 #if canImport(AdyenDropIn)
 import AdyenDropIn
 #endif
-
 
 @main
 @objc class AppDelegate: FlutterAppDelegate {
