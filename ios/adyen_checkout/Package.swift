@@ -18,8 +18,8 @@ let package = Package(
         .target(
             name: "adyen_checkout",
             dependencies: [
-               .product(name: "AdyenDropIn", package: "adyen-ios"),
-               .product(name: "AdyenSession", package: "adyen-ios")
+                .product(name: "AdyenDropIn", package: "adyen-ios"),
+                .product(name: "AdyenSession", package: "adyen-ios")
             ],
             resources: []
         )
