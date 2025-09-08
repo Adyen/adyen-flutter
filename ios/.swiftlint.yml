@@ -1,11 +1,14 @@
 disabled_rules:
   - todo
   - type_name
+  - trailing_whitespace
 
 excluded:
-  - Classes/generated/PlatformApi.swift
+  - adyen_checkout/Sources/adyen_checkout/generated/PlatformApi.swift
 
 line_length:
+  ignores_function_declarations: true
+  ignores_urls: true
   warning: 140
 
 file_length:
