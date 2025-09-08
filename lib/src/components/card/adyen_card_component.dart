@@ -68,6 +68,8 @@ class _AdyenCardComponentState extends State<AdyenCardComponent> {
               initialViewHeight: initialViewHeight,
               isStoredPaymentMethod: isStoredPaymentMethod,
               gestureRecognizers: widget.gestureRecognizers,
+              onBinLookup: widget.configuration.cardConfiguration.onBinLookup,
+              onBinValue: widget.configuration.cardConfiguration.onBinValue,
             ),
           AdvancedCheckout it => CardAdvancedComponent(
               cardComponentConfiguration: cardComponentConfiguration,
@@ -77,6 +79,8 @@ class _AdyenCardComponentState extends State<AdyenCardComponent> {
               initialViewHeight: initialViewHeight,
               isStoredPaymentMethod: isStoredPaymentMethod,
               gestureRecognizers: widget.gestureRecognizers,
+              onBinLookup: widget.configuration.cardConfiguration.onBinLookup,
+              onBinValue: widget.configuration.cardConfiguration.onBinValue,
             )
         };
       },
