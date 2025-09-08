@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:adyen_checkout/adyen_checkout.dart';
 import 'package:adyen_checkout/src/components/card/card_advanced_component.dart';
 import 'package:adyen_checkout/src/components/card/card_session_component.dart';
+import 'package:adyen_checkout/src/generated/platform_api.g.dart';
 import 'package:adyen_checkout/src/util/constants.dart';
 import 'package:adyen_checkout/src/util/dto_mapper.dart';
 import 'package:adyen_checkout/src/util/sdk_version_number_provider.dart';
@@ -11,6 +12,12 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/widgets.dart';
 
 class AdyenCardComponent extends StatefulWidget {
+  final CardComponentConfiguration configuration;
+  final Map<String, dynamic> paymentMethod;
+  final Checkout checkout;
+  final Future<void> Function(PaymentResult) onPaymentResult;
+  final Set<Factory<OneSequenceGestureRecognizer>>? gestureRecognizers;
+
   const AdyenCardComponent({
     super.key,
     required this.configuration,
@@ -20,68 +27,66 @@ class AdyenCardComponent extends StatefulWidget {
     this.gestureRecognizers,
   });
 
-  final CardComponentConfiguration configuration;
-  final Map<String, dynamic> paymentMethod;
-  final Checkout checkout;
-  final Future<void> Function(PaymentResult) onPaymentResult;
-  final Set<Factory<OneSequenceGestureRecognizer>>? gestureRecognizers;
-
   @override
   State<AdyenCardComponent> createState() => _AdyenCardComponentState();
 }
 
 class _AdyenCardComponentState extends State<AdyenCardComponent> {
-  final _isStoredPaymentMethodIndicator = Constants.isStoredPaymentMethodIndicator;
-
-  final SdkVersionNumberProvider _sdkVersionNumberProvider = SdkVersionNumberProvider.instance;
-
-  late final Future<String> _sdkVersionNumber;
+  late final Future<String> _sdkVersionNumberFuture;
 
   @override
   void initState() {
     super.initState();
-    _sdkVersionNumber = _sdkVersionNumberProvider.getSdkVersionNumber();
+    _sdkVersionNumberFuture =
+        SdkVersionNumberProvider.instance.getSdkVersionNumber();
   }
 
   @override
   Widget build(BuildContext context) {
+    final double initialViewHeight =
+        _determineInitialHeight(widget.configuration.cardConfiguration);
+    final bool isStoredPaymentMethod = widget.paymentMethod
+        .containsKey(Constants.isStoredPaymentMethodIndicator);
+    final String encodedPaymentMethod = json.encode(widget.paymentMethod);
+
     return FutureBuilder<String>(
-      future: _sdkVersionNumber,
+      future: _sdkVersionNumberFuture,
       builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
-        if (snapshot.data != null) {
-          final sdkVersionNumber = snapshot.data ?? "";
-          return switch (widget.checkout) {
-            SessionCheckout() => CardSessionComponent(
-                cardComponentConfiguration: widget.configuration.toDTO(sdkVersionNumber),
-                session: (widget.checkout as SessionCheckout).toDTO(),
-                paymentMethod: json.encode(widget.paymentMethod),
-                onPaymentResult: widget.onPaymentResult,
-                initialViewHeight: _determineInitialHeight(widget.configuration.cardConfiguration),
-                isStoredPaymentMethod: widget.paymentMethod.containsKey(_isStoredPaymentMethodIndicator),
-                gestureRecognizers: widget.gestureRecognizers,
-              ),
-            AdvancedCheckout it => CardAdvancedComponent(
-                cardComponentConfiguration: widget.configuration.toDTO(sdkVersionNumber),
-                paymentMethod: json.encode(widget.paymentMethod),
-                onPaymentResult: widget.onPaymentResult,
-                advancedCheckout: it,
-                initialViewHeight: _determineInitialHeight(widget.configuration.cardConfiguration),
-                isStoredPaymentMethod: widget.paymentMethod.containsKey(_isStoredPaymentMethodIndicator),
-                gestureRecognizers: widget.gestureRecognizers,
-              ),
-          };
-        } else {
-          return Container(
-            height: _determineInitialHeight(widget.configuration.cardConfiguration),
-          );
+        final String? sdkVersion = snapshot.data;
+        if (sdkVersion == null) {
+          return Container(height: initialViewHeight);
         }
+
+        final CardComponentConfigurationDTO cardComponentConfiguration =
+            widget.configuration.toDTO(sdkVersion);
+        return switch (widget.checkout) {
+          SessionCheckout it => CardSessionComponent(
+              cardComponentConfiguration: cardComponentConfiguration,
+              session: it.toDTO(),
+              paymentMethod: encodedPaymentMethod,
+              onPaymentResult: widget.onPaymentResult,
+              initialViewHeight: initialViewHeight,
+              isStoredPaymentMethod: isStoredPaymentMethod,
+              gestureRecognizers: widget.gestureRecognizers,
+            ),
+          AdvancedCheckout it => CardAdvancedComponent(
+              cardComponentConfiguration: cardComponentConfiguration,
+              paymentMethod: encodedPaymentMethod,
+              onPaymentResult: widget.onPaymentResult,
+              advancedCheckout: it,
+              initialViewHeight: initialViewHeight,
+              isStoredPaymentMethod: isStoredPaymentMethod,
+              gestureRecognizers: widget.gestureRecognizers,
+            )
+        };
       },
     );
   }
 
   double _determineInitialHeight(CardConfiguration cardConfiguration) {
     return switch (defaultTargetPlatform) {
-      TargetPlatform.android => _determineInitialAndroidViewHeight(cardConfiguration),
+      TargetPlatform.android =>
+        _determineInitialAndroidViewHeight(cardConfiguration),
       TargetPlatform.iOS => _determineInitialIosViewHeight(cardConfiguration),
       _ => throw UnsupportedError('Unsupported platform view'),
     };

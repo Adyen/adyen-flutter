@@ -34,7 +34,8 @@ class CardComponentContainer extends StatelessWidget {
           SizedBox(
             height: initialViewPortHeight,
             child: switch (defaultTargetPlatform) {
-              TargetPlatform.android => const Center(child: CircularProgressIndicator()),
+              TargetPlatform.android =>
+                const Center(child: CircularProgressIndicator()),
               _ => const Center(child: SizedBox.shrink()),
             },
           )
