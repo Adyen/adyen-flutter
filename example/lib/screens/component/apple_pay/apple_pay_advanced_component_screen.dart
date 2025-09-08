@@ -66,7 +66,7 @@ class ApplePayAdvancedComponentScreen extends StatelessWidget {
                 paymentMethod: paymentMethod,
                 checkout: advancedCheckout,
                 loadingIndicator: const CircularProgressIndicator(),
-                style: ApplePayButtonStyle(
+                style: const ApplePayButtonStyle(
                   theme: ApplePayButtonTheme.whiteOutline,
                   type: ApplePayButtonType.book,
                 ),

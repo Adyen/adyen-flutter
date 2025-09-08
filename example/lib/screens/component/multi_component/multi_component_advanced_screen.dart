@@ -171,7 +171,7 @@ class MultiComponentAdvancedScreen extends StatelessWidget {
         paymentMethod: paymentMethod,
         checkout: advancedCheckout,
         loadingIndicator: const CircularProgressIndicator(),
-        style: ApplePayButtonStyle(
+        style: const ApplePayButtonStyle(
           theme: ApplePayButtonTheme.black,
           type: ApplePayButtonType.buy,
         ),
