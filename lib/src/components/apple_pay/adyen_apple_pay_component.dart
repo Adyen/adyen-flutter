@@ -10,6 +10,17 @@ import 'package:flutter/material.dart';
 import 'package:pay/pay.dart' as pay_sdk;
 
 class AdyenApplePayComponent extends StatelessWidget {
+  final ApplePayComponentConfiguration configuration;
+  final Map<String, dynamic> paymentMethod;
+  final Checkout checkout;
+  final Function(PaymentResult) onPaymentResult;
+  final ApplePayButtonStyle? style;
+  final Function()? onUnavailable;
+  final Widget? unavailableWidget;
+  final Widget? loadingIndicator;
+  final double? width;
+  final double? height;
+
   const AdyenApplePayComponent({
     super.key,
     required this.configuration,
@@ -23,17 +34,6 @@ class AdyenApplePayComponent extends StatelessWidget {
     this.width,
     this.height,
   });
-
-  final ApplePayComponentConfiguration configuration;
-  final Map<String, dynamic> paymentMethod;
-  final Checkout checkout;
-  final Function(PaymentResult) onPaymentResult;
-  final ApplePayButtonStyle? style;
-  final Function()? onUnavailable;
-  final Widget? unavailableWidget;
-  final Widget? loadingIndicator;
-  final double? width;
-  final double? height;
 
   @override
   Widget build(BuildContext context) {
@@ -58,7 +58,8 @@ class AdyenApplePayComponent extends StatelessWidget {
             );
           case AdvancedCheckout it:
             if (configuration.amount == null) {
-              AdyenLogger.instance.print("Apple Pay requires to set an amount when using the advanced flow.");
+              AdyenLogger.instance.print(
+                  "Apple Pay requires to set an amount when using the advanced flow.");
               onUnavailable?.call();
               return unavailableWidget ?? const SizedBox.shrink();
             }
@@ -79,7 +80,8 @@ class AdyenApplePayComponent extends StatelessWidget {
             );
         }
       default:
-        throw Exception("The Apple Pay component is not supported on $defaultTargetPlatform");
+        throw Exception(
+            "The Apple Pay component is not supported on $defaultTargetPlatform");
     }
   }
 
@@ -105,7 +107,8 @@ class AdyenApplePayComponent extends StatelessWidget {
     return switch (style?.theme) {
       null || ApplePayButtonTheme.black => pay_sdk.ApplePayButtonStyle.black,
       ApplePayButtonTheme.white => pay_sdk.ApplePayButtonStyle.white,
-      ApplePayButtonTheme.whiteOutline => pay_sdk.ApplePayButtonStyle.whiteOutline,
+      ApplePayButtonTheme.whiteOutline =>
+        pay_sdk.ApplePayButtonStyle.whiteOutline,
       ApplePayButtonTheme.automatic => pay_sdk.ApplePayButtonStyle.automatic,
     };
   }
