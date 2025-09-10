@@ -85,13 +85,12 @@ class _BaseApplePayComponentState extends State<BaseApplePayComponent> {
 
   @override
   void initState() {
+    super.initState();
     _componentCommunicationStream = _componentFlutterApi
         .componentCommunicationStream.stream
         .where((communicationModel) =>
             communicationModel.componentId == widget.componentId)
         .listen(widget.handleComponentCommunication);
-
-    super.initState();
   }
 
   @override
