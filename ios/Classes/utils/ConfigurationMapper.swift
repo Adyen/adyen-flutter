@@ -32,6 +32,18 @@ extension DropInConfigurationDTO {
 
         return dropInConfiguration
     }
+    
+    func createCheckoutConfiguration() throws -> CheckoutConfiguration {
+        return try CheckoutConfiguration(
+            environment: environment.mapToEnvironment(),
+            amount: amount!.mapToAmount(),
+            clientKey: clientKey,
+            analyticsConfiguration: AnalyticsConfiguration(isEnabled: analyticsOptionsDTO.enabled),
+            content: {
+                
+            }
+        )
+    }
 
     private func buildCard(from cardConfigurationDTO: CardConfigurationDTO) -> DropInComponent.Card {
         let koreanAuthenticationMode = cardConfigurationDTO.kcpFieldVisibility.toCardFieldVisibility()
@@ -227,8 +239,7 @@ private func buildAdyenContext(environment: Environment, clientKey: String, amou
     if let amount, let countryCode {
         payment = Payment(amount: amount.mapToAmount(), countryCode: countryCode)
     }
-    var analyticsConfiguration = AnalyticsConfiguration()
-    analyticsConfiguration.isEnabled = analyticsOptionsDTO.enabled
+    var analyticsConfiguration = AnalyticsConfiguration(isEnabled: analyticsOptionsDTO.enabled)
     analyticsConfiguration.context = AnalyticsContext(
         version: analyticsOptionsDTO.version,
         platform: .flutter
@@ -237,6 +248,7 @@ private func buildAdyenContext(environment: Environment, clientKey: String, amou
     return AdyenContext(
         apiContext: apiContext,
         payment: payment,
+        amount: amount!.mapToAmount(), //Discuss if amount is really necessary
         analyticsConfiguration: analyticsConfiguration
     )
 }
@@ -290,7 +302,7 @@ extension ResultCode {
     }
 }
 
-extension AdyenSession.Context {
+extension AdyenSession.State {
     func createPayment(fallbackCountryCode: String) -> Payment {
         Payment(amount: amount, countryCode: countryCode ?? fallbackCountryCode)
     }

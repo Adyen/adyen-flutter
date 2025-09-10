@@ -1,6 +1,8 @@
 import Foundation
 @_spi(AdyenInternal) import Adyen
 import AdyenNetworking
+import Flutter
+import UIKit
 
 class DropInPlatformApi: DropInPlatformInterface {
     private let jsonDecoder = JSONDecoder()
@@ -28,39 +30,43 @@ class DropInPlatformApi: DropInPlatformInterface {
                 return
             }
             
-            guard let session = sessionHolder.session else {
-                sendSessionError(error: PlatformError(errorDescription: "Session is not available."))
-                return
-            }
+//            guard let session = sessionHolder.session else {
+//                sendSessionError(error: PlatformError(errorDescription: "Session is not available."))
+//                return
+//            }
 
             hostViewController = viewController
             let adyenContext = try dropInConfigurationDTO.createAdyenContext()
-            dropInSessionStoredPaymentMethodsDelegate = DropInSessionsStoredPaymentMethodsDelegate(
-                viewController: viewController,
-                checkoutFlutter: checkoutFlutter
-            )
-            let payment = session.sessionContext.createPayment(fallbackCountryCode: dropInConfigurationDTO.countryCode)
-            let dropInConfiguration = try dropInConfigurationDTO.createDropInConfiguration(payment: payment)
-            var paymentMethods = session.sessionContext.paymentMethods
-            if let paymentMethodNames = dropInConfigurationDTO.paymentMethodNames {
-                paymentMethods = overridePaymentMethodNames(
-                    paymentMethods: paymentMethods,
-                    paymentMethodNames: paymentMethodNames
-                )
-            }
-            
+//            dropInSessionStoredPaymentMethodsDelegate = DropInSessionsStoredPaymentMethodsDelegate(
+//                viewController: viewController,
+//                checkoutFlutter: checkoutFlutter
+//            )
+//            let payment = session.state.createPayment(fallbackCountryCode: dropInConfigurationDTO.countryCode)
+//            let dropInConfiguration = try dropInConfigurationDTO.createDropInConfiguration(payment: payment)
+//            var paymentMethods = session.state.paymentMethods
+//            if let paymentMethodNames = dropInConfigurationDTO.paymentMethodNames {
+//                paymentMethods = overridePaymentMethodNames(
+//                    paymentMethods: paymentMethods,
+//                    paymentMethodNames: paymentMethodNames
+//                )
+//            }
             let dropInComponent = DropInComponent(
-                paymentMethods: paymentMethods,
+                paymentMethods: sessionHolder.adyenCheckout!.paymentMethods!,
                 context: adyenContext,
-                configuration: dropInConfiguration,
-                title: dropInConfigurationDTO.preselectedPaymentMethodTitle
             )
-            dropInComponent.delegate = sessionHolder.session
-            dropInComponent.partialPaymentDelegate = sessionHolder.session
+            
+//            let dropInComponent = DropInComponent(
+//                paymentMethods: paymentMethods,
+//                context: adyenContext,
+//                configuration: dropInConfiguration,
+//                title: dropInConfigurationDTO.preselectedPaymentMethodTitle
+//            )
+//            dropInComponent.delegate = sessionHolder.session
+//            dropInComponent.partialPaymentDelegate = sessionHolder.session
             dropInComponent.cardComponentDelegate = self
-            if dropInConfigurationDTO.isRemoveStoredPaymentMethodEnabled {
-                dropInComponent.storedPaymentMethodsDelegate = dropInSessionStoredPaymentMethodsDelegate
-            }
+//            if dropInConfigurationDTO.isRemoveStoredPaymentMethodEnabled {
+//                dropInComponent.storedPaymentMethodsDelegate = dropInSessionStoredPaymentMethodsDelegate
+//            }
             
             let dropInViewController = DropInViewController(dropInComponent: dropInComponent)
             dropInViewController.modalPresentationStyle = .overCurrentContext

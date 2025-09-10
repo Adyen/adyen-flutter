@@ -10,12 +10,12 @@ class DropInSessionsDelegate: AdyenSessionDelegate {
         self.checkoutFlutter = checkoutFlutter
     }
 
-    func didComplete(with result: Adyen.AdyenSessionResult, component _: Adyen.Component, session: Adyen.AdyenSession) {
+    func didComplete(with result: CheckoutResult, component _: Adyen.Component, session: Adyen.AdyenSession) {
         viewController?.dismiss(animated: true, completion: { [weak self] in
             let paymentResult = PaymentResultModelDTO(
-                sessionId: session.sessionContext.identifier,
-                sessionData: session.sessionContext.data,
-                sessionResult: result.encodedResult,
+                sessionId: session.state.identifier,
+                sessionData: session.state.data,
+                sessionResult: result.sessionResult,
                 resultCode: result.resultCode.rawValue
             )
             let checkoutEvent = CheckoutEvent(

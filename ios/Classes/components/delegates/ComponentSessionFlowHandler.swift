@@ -11,14 +11,14 @@ class ComponentSessionFlowHandler: AdyenSessionDelegate {
         self.componentFlutterApi = componentFlutterApi
     }
     
-    func didComplete(with result: AdyenSessionResult, component _: Component, session: AdyenSession) {
+    func didComplete(with result: CheckoutResult, component _: Component, session: AdyenSession) {
         let resultCode = result.resultCode
         let success = resultCode == .authorised || resultCode == .received || resultCode == .pending
         finalizeCallback?(success, { [weak self] in
             let paymentResult = PaymentResultModelDTO(
-                sessionId: session.sessionContext.identifier,
-                sessionData: session.sessionContext.data,
-                sessionResult: result.encodedResult,
+                sessionId: session.state.identifier,
+                sessionData: session.state.data,
+                sessionResult: result.sessionResult,
                 resultCode: result.resultCode.rawValue
             )
             let componentCommunicationModel = ComponentCommunicationModel(

@@ -113,7 +113,7 @@ class ApplePayComponentManager {
         componentId: String
     ) throws -> ApplePayPaymentMethod {
         if componentId == Constants.applePaySessionComponentId {
-            guard let paymentMethod = sessionHolder.session?.sessionContext.paymentMethods.paymentMethod(ofType: ApplePayPaymentMethod.self) else {
+            guard let paymentMethod = sessionHolder.session?.state.paymentMethods.paymentMethod(ofType: ApplePayPaymentMethod.self) else {
                 throw PlatformError(errorDescription: "Apple Pay payment method not valid.")
             }
             return paymentMethod
@@ -127,7 +127,7 @@ class ApplePayComponentManager {
         paymentMethod: ApplePayPaymentMethod
     ) throws {
         guard PKPaymentAuthorizationViewController.canMakePayments() else {
-            throw ApplePayComponent.Error.deviceDoesNotSupportApplyPay
+            throw ApplePayComponent.Error.deviceDoesNotSupportApplePay
         }
         
         let allowOnboarding = applePayConfiguration?.allowOnboarding ?? false

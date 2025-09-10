@@ -3,6 +3,7 @@ import Adyen
 class SessionHolder {
     var session: AdyenSession?
     var sessionDelegate: AdyenSessionDelegate?
+    var adyenCheckout : AdyenCheckout?
 
     func setup(
         session: AdyenSession,
@@ -15,5 +16,6 @@ class SessionHolder {
     func reset() {
         session = nil
         sessionDelegate = nil
+        adyenCheckout = nil
     }
 }
