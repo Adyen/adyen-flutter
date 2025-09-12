@@ -25,10 +25,12 @@ class DropInScreen extends StatelessWidget {
             children: [
               TextButton(
                 onPressed: () => startDropInSessions(context),
-                child: const Text("Drop-in sessions"),
+                key: const Key('Drop-in sessions flow'),
+                child: const Text("Drop-in sessions flow"),
               ),
               TextButton(
                 onPressed: () => startDropInAdvancedFlow(context),
+                key: const Key('Drop-in advanced flow'),
                 child: const Text("Drop-in advanced flow"),
               ),
             ],
@@ -165,9 +167,6 @@ class DropInScreen extends StatelessWidget {
       cashAppPayConfiguration: cashAppPayConfiguration,
       twintConfiguration: twintConfiguration,
       storedPaymentMethodConfiguration: storedPaymentMethodConfiguration,
-      paymentMethodNames: {
-        "scheme": "Credit card",
-      },
     );
 
     return dropInConfiguration;
