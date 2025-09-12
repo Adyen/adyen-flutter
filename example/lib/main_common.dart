@@ -30,10 +30,10 @@ import 'package:adyen_checkout_example/screens/drop_in/drop_in_screen.dart';
 import 'package:adyen_checkout_example/utils/provider.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_driver/driver_extension.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
-void main() {
-  final service = Service();
+void mainCommon(Service service) {
   final adyenGooglePayComponentRepository =
       AdyenGooglePayComponentRepository(service: service);
   final adyenApplePayComponentRepository =
@@ -44,6 +44,7 @@ void main() {
       AdyenInstantComponentRepository(service: service);
   final adyenCseRepository = AdyenCseRepository(service: service);
 
+  enableFlutterDriverExtension();
   runApp(MaterialApp(
     localizationsDelegates: const [
       GlobalMaterialLocalizations.delegate,
@@ -142,6 +143,7 @@ class MyApp extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             TextButton(
+                key: const Key('Drop-in'),
                 onPressed: () => Navigator.pushNamed(context, "/dropInScreen"),
                 child: const Text("Drop-in")),
             TextButton(
