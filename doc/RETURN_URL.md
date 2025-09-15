@@ -39,13 +39,9 @@ For Components integration on Android, you need to define a **custom intent filt
 * **Add
   a [custom intent](https://github.com/Adyen/adyen-flutter/blob/cb270789b07d9746694b3243738b5ca233771a83/example/android/app/src/main/AndroidManifest.xml#L29)
   filter** to your `Manifest.xml` file.
-*
-    *
-
-*[Define](https://github.com/Adyen/adyen-flutter/blob/main/example/android/app/src/main/res/values/styles.xml#L15C46-L15C59)
-`Theme.MaterialComponents` or `AdyenCheckout` as the parent style** of Flutter's `NormalTheme` in
-your `styles.xml` file.
-
+* [Define](https://github.com/Adyen/adyen-flutter/blob/main/example/android/app/src/main/res/values/styles.xml#L15C46-L15C59)
+  `Theme.MaterialComponents` or `AdyenCheckout` as the parent style** of Flutter's `NormalTheme` in
+  your `styles.xml` file.
 * A custom scheme is not yet supported for Android Components.
 
 ## For iOS:
