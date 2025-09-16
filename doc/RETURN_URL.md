@@ -36,12 +36,7 @@ For Components integration on Android, you need to define a **custom intent filt
 
 **Prerequisites for Android Components:**
 
-* **Add
-  a [custom intent](https://github.com/Adyen/adyen-flutter/blob/main/example/android/app/src/main/AndroidManifest.xml#L29)
-  filter** to your `Manifest.xml` file.
-* [Define](https://github.com/Adyen/adyen-flutter/blob/main/example/android/app/src/main/res/values/styles.xml#L15C46-L15C59)
-  `Theme.MaterialComponents` or `AdyenCheckout` as the parent style** of Flutter's `NormalTheme` in
-  your `styles.xml` file.
+* **Add a [custom intent](https://github.com/Adyen/adyen-flutter/blob/main/example/android/app/src/main/AndroidManifest.xml#L29) filter** to your `Manifest.xml` file.
 * A custom scheme is not yet supported for Android Components.
 
 ## For iOS:
@@ -53,9 +48,5 @@ For iOS, the returnUrl setup is **consistent for both Drop-in and Components** i
 
 **Prerequisites for iOS (Drop-in & Components):**
 
-* **Add
-  the [return URL handler](https://github.com/Adyen/adyen-flutter/blob/main/example/ios/Runner/AppDelegate.swift#L18)
-  ** to your `AppDelegate` in your native iOS layer.
-* **Add
-  the [custom URL scheme](https://developer.apple.com/documentation/xcode/defining-a-custom-url-scheme-for-your-app)
-  ** that matches your returnUrl to your `Info.plist` file.
+* **Add the [return URL handler](https://github.com/Adyen/adyen-flutter/blob/main/example/ios/Runner/AppDelegate.swift#L18)** to your `AppDelegate` in your native iOS layer.
+* **Add the [custom URL scheme](https://developer.apple.com/documentation/xcode/defining-a-custom-url-scheme-for-your-app)** that matches your returnUrl to your `Info.plist` file.
