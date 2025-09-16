@@ -13,8 +13,8 @@ in your `/sessions` or `/payments` request**.
 
 ## For Android:
 
-For Android, the returnUrl structure and prerequisites differ based on whether you are using the *
-*Drop-in** or **Components** integration.
+For Android, the returnUrl structure and prerequisites differ based on whether you are using the
+**Drop-in** or **Components** integration.
 
 ### Android Drop-in
 
@@ -37,7 +37,7 @@ For Components integration on Android, you need to define a **custom intent filt
 **Prerequisites for Android Components:**
 
 * **Add
-  a [custom intent](https://github.com/Adyen/adyen-flutter/blob/cb270789b07d9746694b3243738b5ca233771a83/example/android/app/src/main/AndroidManifest.xml#L29)
+  a [custom intent](https://github.com/Adyen/adyen-flutter/blob/main/example/android/app/src/main/AndroidManifest.xml#L29)
   filter** to your `Manifest.xml` file.
 * [Define](https://github.com/Adyen/adyen-flutter/blob/main/example/android/app/src/main/res/values/styles.xml#L15C46-L15C59)
   `Theme.MaterialComponents` or `AdyenCheckout` as the parent style** of Flutter's `NormalTheme` in
@@ -54,7 +54,7 @@ For iOS, the returnUrl setup is **consistent for both Drop-in and Components** i
 **Prerequisites for iOS (Drop-in & Components):**
 
 * **Add
-  the [return URL handler](https://github.com/Adyen/adyen-flutter/blob/5301abab34773e820c4fd38be54d3bf4bb247fd6/example/ios/Runner/AppDelegate.swift#L18)
+  the [return URL handler](https://github.com/Adyen/adyen-flutter/blob/main/example/ios/Runner/AppDelegate.swift#L18)
   ** to your `AppDelegate` in your native iOS layer.
 * **Add
   the [custom URL scheme](https://developer.apple.com/documentation/xcode/defining-a-custom-url-scheme-for-your-app)
