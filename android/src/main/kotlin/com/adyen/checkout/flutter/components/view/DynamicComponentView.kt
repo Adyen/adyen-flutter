@@ -15,8 +15,8 @@ import com.adyen.checkout.components.core.internal.Component
 import com.adyen.checkout.flutter.generated.ComponentCommunicationModel
 import com.adyen.checkout.flutter.generated.ComponentCommunicationType
 import com.adyen.checkout.flutter.generated.ComponentFlutterInterface
-import com.adyen.checkout.ui.core.AdyenComponentView
-import com.adyen.checkout.ui.core.internal.ui.ViewableComponent
+import com.adyen.checkout.ui.core.old.AdyenComponentView
+import com.adyen.checkout.ui.core.old.internal.ui.ViewableComponent
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.textfield.TextInputLayout
 

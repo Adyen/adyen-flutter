@@ -21,7 +21,7 @@ import com.adyen.checkout.flutter.utils.Constants
 import com.adyen.checkout.googlepay.GooglePayComponent
 import com.adyen.checkout.sessions.core.CheckoutSession
 import com.adyen.checkout.sessions.core.SessionSetupResponse
-import com.adyen.checkout.ui.core.AdyenComponentView
+import com.adyen.checkout.ui.core.old.AdyenComponentView
 import java.util.UUID
 
 class GooglePayComponentManager(

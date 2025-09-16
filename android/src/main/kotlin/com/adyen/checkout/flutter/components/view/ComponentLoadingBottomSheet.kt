@@ -7,8 +7,8 @@ import android.view.ViewGroup
 import androidx.fragment.app.FragmentManager
 import com.adyen.checkout.components.core.internal.Component
 import com.adyen.checkout.flutter.R
-import com.adyen.checkout.ui.core.AdyenComponentView
-import com.adyen.checkout.ui.core.internal.ui.ViewableComponent
+import com.adyen.checkout.ui.core.old.AdyenComponentView
+import com.adyen.checkout.ui.core.old.internal.ui.ViewableComponent
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 
 internal class ComponentLoadingBottomSheet<T> : BottomSheetDialogFragment() where T : ViewableComponent, T : Component {
