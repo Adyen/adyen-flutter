@@ -54,6 +54,7 @@ release a new version when we need to.
 ## Requirements:
 
 * [Checkout API v71](https://docs.adyen.com/api-explorer/Checkout/71/overview) or later.
+* Get familiar with defining the right [returnUrl](/doc/RETURN_URL.md).
 
 #### Android
 
