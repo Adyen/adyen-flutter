@@ -20,7 +20,7 @@ For Android, the returnUrl structure and prerequisites differ based on whether y
 
 When using the Drop-in solution, the returnUrl is **predefined**.
 
-* **Format:** `adyencheckout://` followed by your **package name**.
+* **Format:** `adyencheckout://` scheme, followed by your **package name**.
 * **Example:** `adyencheckout://com.adyen.adyen_checkout_example`.
 
 The `AdyenCheckout.instance.getReturnUrl()` method is available to provide this string value. You
@@ -30,7 +30,7 @@ can also provide the string as a hardcoded constant.
 
 For Components integration on Android, you need to define a **custom intent filter**.
 
-* **Format:** `adyencheckout://` followed by your **package name**.
+* **Format:** `adyencheckout://` scheme, followed by your **package name**.
 * **Path:** You **must add a path**.
 * **Example:** `adyencheckout://com.adyen.adyen_checkout_example/adyenPayment`.
 
@@ -43,10 +43,10 @@ For Components integration on Android, you need to define a **custom intent filt
 
 For iOS, the returnUrl setup is **consistent for both Drop-in and Components** integrations.
 
-* **Scheme:** You need to **define a unique custom URL scheme** for your app.
+* **Format:** You need to **define a unique custom URL scheme** for your app.
 * **Example:** `com.mydomain.adyencheckout://`.
 
-**Prerequisites for iOS (Drop-in & Components):**
+**Prerequisites for iOS:**
 
 * **Add the [return URL handler](https://github.com/Adyen/adyen-flutter/blob/main/example/ios/Runner/AppDelegate.swift#L18)** to your `AppDelegate` in your native iOS layer.
 * **Add the [custom URL scheme](https://developer.apple.com/documentation/xcode/defining-a-custom-url-scheme-for-your-app)** that matches your returnUrl to your `Info.plist` file.
