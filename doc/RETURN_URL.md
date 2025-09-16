@@ -37,7 +37,7 @@ For Components integration on Android, you need to define a **custom intent filt
 **Prerequisites for Android Components:**
 
 * **Add a [custom intent](https://github.com/Adyen/adyen-flutter/blob/main/example/android/app/src/main/AndroidManifest.xml#L29) filter** to your `Manifest.xml` file.
-* A custom scheme is not yet supported for Android Components.
+* Providing an alternative custom scheme is not yet supported.
 
 ## For iOS:
 
@@ -49,4 +49,4 @@ For iOS, the returnUrl setup is **consistent for both Drop-in and Components** i
 **Prerequisites for iOS:**
 
 * **Add the [return URL handler](https://github.com/Adyen/adyen-flutter/blob/main/example/ios/Runner/AppDelegate.swift#L18)** to your `AppDelegate` in your native iOS layer.
-* **Add the [custom URL scheme](https://developer.apple.com/documentation/xcode/defining-a-custom-url-scheme-for-your-app)** that matches your returnUrl to your `Info.plist` file.
+* **Configure the [custom URL scheme](https://developer.apple.com/documentation/xcode/defining-a-custom-url-scheme-for-your-app)** in your your `Info.plist` file.
