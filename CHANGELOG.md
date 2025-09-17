@@ -1,3 +1,9 @@
+## 1.7.0 (in development)
+
+### New
+
+- Added support for Swift Package Manager (SPM).
+
 ## 1.6.0
 
 ### Improved
