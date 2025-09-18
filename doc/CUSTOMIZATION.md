@@ -14,9 +14,16 @@ Drop-in:
 
 ```swift
 import Adyen
-import adyen_checkout
 
-var dropInStyle = Adyen.DropInComponent.Style()
+// Use canImport for projects that utilize SPM.
+#if canImport(adyen_checkout)
+    import adyen_checkout
+#endif
+#if canImport(AdyenDropIn)
+    import AdyenDropIn
+#endif
+
+var dropInStyle = DropInComponent.Style()
 dropInStyle.formComponent.mainButtonItem.button.backgroundColor = .black
 dropInStyle.formComponent.mainButtonItem.button.title.color = .white
 AdyenAppearance.dropInStyle = dropInStyle

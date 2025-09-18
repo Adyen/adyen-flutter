@@ -54,6 +54,7 @@ release a new version when we need to.
 ## Requirements:
 
 * [Checkout API v71](https://docs.adyen.com/api-explorer/Checkout/71/overview) or later.
+* Get familiar with defining the right [returnUrl](/doc/RETURN_URL.md).
 
 #### Android
 
@@ -69,7 +70,7 @@ release a new version when we need to.
 
 * [iOS 12](https://support.apple.com/en-us/118387) or later.
 * Add the return URL handler to your AppDelegate in
-  your [native iOS](https://github.com/Adyen/adyen-flutter/blob/5301abab34773e820c4fd38be54d3bf4bb247fd6/example/ios/Runner/AppDelegate.swift#L18)
+  your [native iOS](https://github.com/Adyen/adyen-flutter/blob/main/example/ios/Runner/AppDelegate.swift#L19)
   layer.
 * Add a
   custom [URL scheme](https://developer.apple.com/documentation/xcode/defining-a-custom-url-scheme-for-your-app)
