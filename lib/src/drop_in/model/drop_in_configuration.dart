@@ -7,15 +7,6 @@ import 'package:adyen_checkout/src/common/model/payment_method_configurations/go
 import 'package:adyen_checkout/src/common/model/payment_method_configurations/stored_payment_method_configuration.dart';
 
 final class DropInConfiguration extends BaseConfiguration {
-  final CardConfiguration? cardConfiguration;
-  final ApplePayConfiguration? applePayConfiguration;
-  final GooglePayConfiguration? googlePayConfiguration;
-  final CashAppPayConfiguration? cashAppPayConfiguration;
-  final StoredPaymentMethodConfiguration? storedPaymentMethodConfiguration;
-  final bool skipListWhenSinglePaymentMethod;
-  final String? preselectedPaymentMethodTitle;
-  final Map<String, String>? paymentMethodNames;
-
   DropInConfiguration({
     required super.environment,
     required super.clientKey,
@@ -28,11 +19,20 @@ final class DropInConfiguration extends BaseConfiguration {
     this.cashAppPayConfiguration,
     this.storedPaymentMethodConfiguration,
     this.preselectedPaymentMethodTitle,
-    bool? skipListWhenSinglePaymentMethod,
+    this.skipListWhenSinglePaymentMethod = false,
     AnalyticsOptions? analyticsOptions,
     this.paymentMethodNames,
-  }) : skipListWhenSinglePaymentMethod =
-            skipListWhenSinglePaymentMethod ?? false;
+  });
+
+  final CardConfiguration? cardConfiguration;
+  final ApplePayConfiguration? applePayConfiguration;
+  final GooglePayConfiguration? googlePayConfiguration;
+  final CashAppPayConfiguration? cashAppPayConfiguration;
+  final StoredPaymentMethodConfiguration? storedPaymentMethodConfiguration;
+  final bool skipListWhenSinglePaymentMethod;
+  final String? preselectedPaymentMethodTitle;
+  final Map<String, String>? paymentMethodNames;
+
 
   @override
   String toString() {
