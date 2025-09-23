@@ -31,6 +31,7 @@ import 'package:adyen_checkout_example/utils/provider.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_driver/driver_extension.dart';
+import 'package:flutter_launch_arguments/flutter_launch_arguments.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
 void mainCommon(Service service) {
@@ -133,6 +134,12 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     AdyenCheckout.instance.enableConsoleLogging(enabled: false);
+
+    Future.microtask(() async{
+      final String config = await FlutterLaunchArguments().getString("config") ?? "FAILED TO FETCH CONFIG";
+      print("**** CONFIG FETCHED ****");
+      print(config);
+    });
 
     return Scaffold(
       appBar: AppBar(
