@@ -9,6 +9,9 @@ on:
         default: '3.29.x'
         type: string
 
+permissions:
+  contents: read
+
 jobs:
   ios_tests:
     runs-on: macos-14
