@@ -39,7 +39,7 @@ jobs:
       - run: flutter pub get
 
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
+        uses: gradle/actions/setup-gradle@v5
         with:
           gradle-version: '8.13'
 
