@@ -1,23 +1,20 @@
-import 'dart:convert';
-
 import 'package:adyen_checkout/adyen_checkout.dart';
 
 extension CardConfigurationExtension on CardConfiguration {
-  static CardConfiguration fromJson(String encodedCardConfiguration) {
-    Map<String, dynamic> json = jsonDecode(encodedCardConfiguration);
+  static CardConfiguration fromJson(Map<String, dynamic> json) {
     return CardConfiguration(
-      holderNameRequired: json['holderNameRequired'] ?? false,
-      addressMode: _parseAddressMode(json['addressMode']),
-      showStorePaymentField: json['showStorePaymentField'] ?? true,
-      showCvcForStoredCard: json['showCvcForStoredCard'] ?? true,
-      showCvc: json['showCvc'] ?? true,
-      kcpFieldVisibility: _parseFieldVisibility(json['kcpFieldVisibility']),
-      socialSecurityNumberFieldVisibility:
-          _parseFieldVisibility(json['socialSecurityNumberFieldVisibility']),
-      supportedCardTypes: (json['supportedCardTypes'] as List<dynamic>?)
-              ?.map((e) => e as String)
-              .toList() ??
-          [],
+        holderNameRequired: json['holderNameRequired'] ?? false,
+        addressMode: _parseAddressMode(json['addressMode']),
+        showStorePaymentField: json['showStorePaymentField'] ?? true,
+        showCvcForStoredCard: json['showCvcForStoredCard'] ?? true,
+        showCvc: json['showCvc'] ?? true,
+        kcpFieldVisibility: _parseFieldVisibility(json['kcpFieldVisibility']),
+        socialSecurityNumberFieldVisibility:
+        _parseFieldVisibility(json['socialSecurityNumberFieldVisibility']),
+        supportedCardTypes: (json['supportedCardTypes'] as List<dynamic>?)
+            ?.map((e) => e as String)
+            .toList() ??
+            [],
     );
   }
 
@@ -30,7 +27,7 @@ extension CardConfigurationExtension on CardConfiguration {
       'showCvc': showCvc,
       'kcpFieldVisibility': kcpFieldVisibility.name,
       'socialSecurityNumberFieldVisibility':
-          socialSecurityNumberFieldVisibility.name,
+      socialSecurityNumberFieldVisibility.name,
       'supportedCardTypes': supportedCardTypes,
     };
   }
