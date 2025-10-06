@@ -1,10 +1,12 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:adyen_checkout/adyen_checkout.dart';
 import 'package:adyen_checkout_example/config.dart';
 import 'package:adyen_checkout_example/repositories/adyen_drop_in_repository.dart';
 import 'package:adyen_checkout_example/utils/dialog_builder.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_launch_arguments/flutter_launch_arguments.dart';
 
 class DropInScreen extends StatelessWidget {
   const DropInScreen({
@@ -16,6 +18,14 @@ class DropInScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Future.microtask(() async {
+      final String config =
+          await FlutterLaunchArguments().getString("config") ??
+              "FAILED TO FETCH CONFIG";
+      print("**** CONFIG FETCHED ****");
+      print(config);
+    });
+
     return Scaffold(
       appBar: AppBar(title: const Text('Adyen Drop-in')),
       body: SafeArea(
@@ -97,10 +107,12 @@ class DropInScreen extends StatelessWidget {
   }
 
   Future<DropInConfiguration> _createDropInConfiguration() async {
-    CardConfiguration cardsConfiguration = CardConfiguration(
-      onBinLookup: _onBinLookup,
-      onBinValue: _onBinValue,
-    );
+    final String? launchConfig =
+        await FlutterLaunchArguments().getString("config") ??
+            """
+    {"CARD_CONFIGURATION":{"holderNameRequired":true,"addressMode":"none","showStorePaymentField":false,"showCvcForStoredCard":true,"showCvc":true,"kcpFieldVisibility":"hide","socialSecurityNumberFieldVisibility":"hide","supportedCardTypes":[]}}""";
+    CardConfiguration cardsConfiguration =
+        await _createCardConfiguration(launchConfig);
 
     ApplePayConfiguration applePayConfiguration = ApplePayConfiguration(
       merchantId: Config.merchantId,
@@ -143,6 +155,17 @@ class DropInScreen extends StatelessWidget {
     );
 
     return dropInConfiguration;
+  }
+
+  Future<CardConfiguration> _createCardConfiguration(
+      String? launchConfig) async {
+    final launchConfigJson = jsonDecode(launchConfig ?? "");
+    final cardConfigJson = launchConfigJson["CARD_CONFIGURATION"];
+    return CardConfiguration(
+      onBinLookup: _onBinLookup,
+      onBinValue: _onBinValue,
+      holderNameRequired: cardConfigJson["holderNameRequired"] ?? false,
+    );
   }
 
   void _onBinLookup(List<BinLookupData> binLookupDataList) {
