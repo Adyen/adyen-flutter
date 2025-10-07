@@ -1,31 +1,25 @@
 import 'dart:async';
-import 'dart:convert';
 
 import 'package:adyen_checkout/adyen_checkout.dart';
 import 'package:adyen_checkout_example/config.dart';
+import 'package:adyen_checkout_example/extensions/card_configuration_extension.dart';
 import 'package:adyen_checkout_example/repositories/adyen_drop_in_repository.dart';
+import 'package:adyen_checkout_example/repositories/config_repository.dart';
 import 'package:adyen_checkout_example/utils/dialog_builder.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_launch_arguments/flutter_launch_arguments.dart';
 
 class DropInScreen extends StatelessWidget {
   const DropInScreen({
     required this.repository,
+    required this.configRepository,
     super.key,
   });
 
   final AdyenDropInRepository repository;
+  final ConfigRepository configRepository;
 
   @override
   Widget build(BuildContext context) {
-    Future.microtask(() async {
-      final String config =
-          await FlutterLaunchArguments().getString("config") ??
-              "FAILED TO FETCH CONFIG";
-      print("**** CONFIG FETCHED ****");
-      print(config);
-    });
-
     return Scaffold(
       appBar: AppBar(title: const Text('Adyen Drop-in')),
       body: SafeArea(
@@ -107,12 +101,7 @@ class DropInScreen extends StatelessWidget {
   }
 
   Future<DropInConfiguration> _createDropInConfiguration() async {
-    final String? launchConfig =
-        await FlutterLaunchArguments().getString("config") ??
-            """
-    {"CARD_CONFIGURATION":{"holderNameRequired":true,"addressMode":"none","showStorePaymentField":false,"showCvcForStoredCard":true,"showCvc":true,"kcpFieldVisibility":"hide","socialSecurityNumberFieldVisibility":"hide","supportedCardTypes":[]}}""";
-    CardConfiguration cardsConfiguration =
-        await _createCardConfiguration(launchConfig);
+    CardConfiguration cardsConfiguration = await _createCardConfiguration();
 
     ApplePayConfiguration applePayConfiguration = ApplePayConfiguration(
       merchantId: Config.merchantId,
@@ -157,14 +146,12 @@ class DropInScreen extends StatelessWidget {
     return dropInConfiguration;
   }
 
-  Future<CardConfiguration> _createCardConfiguration(
-      String? launchConfig) async {
-    final launchConfigJson = jsonDecode(launchConfig ?? "");
-    final cardConfigJson = launchConfigJson["CARD_CONFIGURATION"];
-    return CardConfiguration(
+  Future<CardConfiguration> _createCardConfiguration() async {
+    final CardConfiguration cardConfiguration =
+        await configRepository.loadCardConfiguration();
+    return cardConfiguration.copyWith(
       onBinLookup: _onBinLookup,
       onBinValue: _onBinValue,
-      holderNameRequired: cardConfigJson["holderNameRequired"] ?? false,
     );
   }
 

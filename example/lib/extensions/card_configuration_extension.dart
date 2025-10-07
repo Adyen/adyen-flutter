@@ -3,33 +3,48 @@ import 'package:adyen_checkout/adyen_checkout.dart';
 extension CardConfigurationExtension on CardConfiguration {
   static CardConfiguration fromJson(Map<String, dynamic> json) {
     return CardConfiguration(
-        holderNameRequired: json['holderNameRequired'] ?? false,
-        addressMode: _parseAddressMode(json['addressMode']),
-        showStorePaymentField: json['showStorePaymentField'] ?? true,
-        showCvcForStoredCard: json['showCvcForStoredCard'] ?? true,
-        showCvc: json['showCvc'] ?? true,
-        kcpFieldVisibility: _parseFieldVisibility(json['kcpFieldVisibility']),
-        socialSecurityNumberFieldVisibility:
-        _parseFieldVisibility(json['socialSecurityNumberFieldVisibility']),
-        supportedCardTypes: (json['supportedCardTypes'] as List<dynamic>?)
-            ?.map((e) => e as String)
-            .toList() ??
-            [],
+      holderNameRequired: json['holderNameRequired'] ?? false,
+      addressMode: _parseAddressMode(json['addressMode']),
+      showStorePaymentField: json['showStorePaymentField'] ?? false,
+      showCvcForStoredCard: json['showCvcForStoredCard'] ?? true,
+      showCvc: json['showCvc'] ?? true,
+      kcpFieldVisibility: _parseFieldVisibility(json['kcpFieldVisibility']),
+      socialSecurityNumberFieldVisibility:
+          _parseFieldVisibility(json['socialSecurityNumberFieldVisibility']),
+      supportedCardTypes: (json['supportedCardTypes'] as List<dynamic>?)
+              ?.map((element) => element as String)
+              .toList() ??
+          [],
     );
   }
 
-  Map<String, dynamic> toJson() {
-    return {
-      'holderNameRequired': holderNameRequired,
-      'addressMode': addressMode.name,
-      'showStorePaymentField': showStorePaymentField,
-      'showCvcForStoredCard': showCvcForStoredCard,
-      'showCvc': showCvc,
-      'kcpFieldVisibility': kcpFieldVisibility.name,
-      'socialSecurityNumberFieldVisibility':
-      socialSecurityNumberFieldVisibility.name,
-      'supportedCardTypes': supportedCardTypes,
-    };
+  CardConfiguration copyWith({
+    bool? holderNameRequired,
+    AddressMode? addressMode,
+    bool? showStorePaymentField,
+    bool? showCvcForStoredCard,
+    bool? showCvc,
+    FieldVisibility? kcpFieldVisibility,
+    FieldVisibility? socialSecurityNumberFieldVisibility,
+    List<String>? supportedCardTypes,
+    Function(List<BinLookupData>)? onBinLookup,
+    Function(String)? onBinValue,
+  }) {
+    return CardConfiguration(
+      holderNameRequired: holderNameRequired ?? this.holderNameRequired,
+      addressMode: addressMode ?? this.addressMode,
+      showStorePaymentField:
+          showStorePaymentField ?? this.showStorePaymentField,
+      showCvcForStoredCard: showCvcForStoredCard ?? this.showCvcForStoredCard,
+      showCvc: showCvc ?? this.showCvc,
+      kcpFieldVisibility: kcpFieldVisibility ?? this.kcpFieldVisibility,
+      socialSecurityNumberFieldVisibility:
+          socialSecurityNumberFieldVisibility ??
+              this.socialSecurityNumberFieldVisibility,
+      supportedCardTypes: supportedCardTypes ?? this.supportedCardTypes,
+      onBinLookup: onBinLookup ?? this.onBinLookup,
+      onBinValue: onBinValue ?? this.onBinValue,
+    );
   }
 
   static AddressMode _parseAddressMode(String? value) {

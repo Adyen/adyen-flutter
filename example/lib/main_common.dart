@@ -8,6 +8,7 @@ import 'package:adyen_checkout_example/repositories/adyen_cse_repository.dart';
 import 'package:adyen_checkout_example/repositories/adyen_drop_in_repository.dart';
 import 'package:adyen_checkout_example/repositories/adyen_google_pay_component_repository.dart';
 import 'package:adyen_checkout_example/repositories/adyen_instant_component_repository.dart';
+import 'package:adyen_checkout_example/repositories/config_repository.dart';
 import 'package:adyen_checkout_example/screens/api_only/card_state_notifier.dart';
 import 'package:adyen_checkout_example/screens/api_only/custom_card_screen.dart';
 import 'package:adyen_checkout_example/screens/component/apple_pay/apple_pay_advanced_component_screen.dart';
@@ -44,6 +45,7 @@ void mainCommon(Service service) {
   final adyenInstantComponentRepository =
       AdyenInstantComponentRepository(service: service);
   final adyenCseRepository = AdyenCseRepository(service: service);
+  final configRepository = ConfigRepository();
 
   enableFlutterDriverExtension();
   runApp(MaterialApp(
@@ -72,6 +74,7 @@ void mainCommon(Service service) {
       '/': (context) => const MyApp(),
       '/dropInScreen': (context) => DropInScreen(
             repository: AdyenDropInRepository(service: service),
+            configRepository: configRepository,
           ),
       '/cardComponentScreen': (context) => const CardNavigationScreen(),
       '/cardSessionComponentScreen': (context) => CardSessionComponentScreen(
@@ -135,8 +138,10 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     AdyenCheckout.instance.enableConsoleLogging(enabled: false);
 
-    Future.microtask(() async{
-      final String config = await FlutterLaunchArguments().getString("config") ?? "FAILED TO FETCH CONFIG";
+    Future.microtask(() async {
+      final String config =
+          await FlutterLaunchArguments().getString("config") ??
+              "FAILED TO FETCH CONFIG";
       print("**** CONFIG FETCHED ****");
       print(config);
     });
