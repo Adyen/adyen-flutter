@@ -35,8 +35,6 @@ import 'package:adyen_checkout_example/screens/drop_in/drop_in_screen.dart';
 import 'package:adyen_checkout_example/utils/provider.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_driver/driver_extension.dart';
-import 'package:flutter_launch_arguments/flutter_launch_arguments.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
 void mainCommon(Service service) {
@@ -53,7 +51,6 @@ void mainCommon(Service service) {
   final adyenCseRepository = AdyenCseRepository(service: service);
   final configRepository = ConfigRepository();
 
-  enableFlutterDriverExtension();
   runApp(MaterialApp(
     localizationsDelegates: const [
       GlobalMaterialLocalizations.delegate,
@@ -85,6 +82,7 @@ void mainCommon(Service service) {
       '/cardComponentScreen': (context) => const CardNavigationScreen(),
       '/cardSessionComponentScreen': (context) => CardSessionComponentScreen(
             repository: adyenCardComponentRepository,
+            configRepository: configRepository,
           ),
       '/cardAdvancedComponentScreen': (context) => CardAdvancedComponentScreen(
             repository: adyenCardComponentRepository,
@@ -153,14 +151,6 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     final isBlikSupported =
         Config.countryCode == 'PL' && Config.amount.currency == 'PLN';
-
-    Future.microtask(() async {
-      final String config =
-          await FlutterLaunchArguments().getString("config") ??
-              "FAILED TO FETCH CONFIG";
-      print("**** CONFIG FETCHED ****");
-      print(config);
-    });
 
     return Scaffold(
       appBar: AppBar(

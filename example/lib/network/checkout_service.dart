@@ -4,6 +4,7 @@ import 'dart:convert';
 
 import 'package:adyen_checkout_example/config.dart';
 import 'package:adyen_checkout_example/network/service.dart';
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 
 class CheckoutService implements Service {
@@ -35,7 +36,7 @@ class CheckoutService implements Service {
       headers: _createHeaders(),
       body: jsonEncode(body),
     );
-    print("PspReference: ${response.headers["pspreference"]}");
+    debugPrint("PspReference: ${response.headers["pspreference"]}");
     return jsonDecode(response.body);
   }
 
