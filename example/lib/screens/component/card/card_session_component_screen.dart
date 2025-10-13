@@ -2,7 +2,9 @@
 
 import 'package:adyen_checkout/adyen_checkout.dart';
 import 'package:adyen_checkout_example/config.dart';
+import 'package:adyen_checkout_example/extensions/card_configuration_extension.dart';
 import 'package:adyen_checkout_example/repositories/adyen_card_component_repository.dart';
+import 'package:adyen_checkout_example/repositories/config_repository.dart';
 import 'package:adyen_checkout_example/utils/dialog_builder.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
@@ -10,43 +12,35 @@ import 'package:flutter/material.dart';
 class CardSessionComponentScreen extends StatelessWidget {
   const CardSessionComponentScreen({
     required this.repository,
+    required this.configRepository,
     super.key,
   });
 
   final AdyenCardComponentRepository repository;
+  final ConfigRepository configRepository;
 
   @override
   Widget build(BuildContext context) {
-    final CardComponentConfiguration cardComponentConfiguration =
-        CardComponentConfiguration(
-      environment: Config.environment,
-      clientKey: Config.clientKey,
-      countryCode: Config.countryCode,
-      shopperLocale: Config.shopperLocale,
-      cardConfiguration: CardConfiguration(
-        onBinLookup: _onBinLookup,
-        onBinValue: _onBinValue,
-      ),
-    );
-
     return Scaffold(
       appBar: AppBar(title: const Text('Adyen card component')),
       body: SafeArea(
-        child: FutureBuilder(
-          future: _getSessionCheckout(cardComponentConfiguration),
-          builder:
-              (BuildContext context, AsyncSnapshot<SessionCheckout> snapshot) {
+        child: FutureBuilder<_CardComponentData>(
+          future: _loadCardComponentData(),
+          builder: (
+            BuildContext context,
+            AsyncSnapshot<_CardComponentData> snapshot,
+          ) {
             if (snapshot.hasData) {
-              final SessionCheckout sessionCheckout = snapshot.data!;
-              final paymentMethod =
-                  _extractPaymentMethod(sessionCheckout.paymentMethods);
+              final _CardComponentData checkoutData = snapshot.data!;
+              final paymentMethod = _extractPaymentMethod(
+                  checkoutData.sessionCheckout.paymentMethods);
               return SingleChildScrollView(
                 child: Column(
                   children: [
                     AdyenCardComponent(
-                      configuration: cardComponentConfiguration,
+                      configuration: checkoutData.cardComponentConfiguration,
                       paymentMethod: paymentMethod,
-                      checkout: sessionCheckout,
+                      checkout: checkoutData.sessionCheckout,
                       onPaymentResult: (paymentResult) async {
                         Navigator.pop(context);
                         DialogBuilder.showPaymentResultDialog(
@@ -66,9 +60,27 @@ class CardSessionComponentScreen extends StatelessWidget {
     );
   }
 
-  Future<SessionCheckout> _getSessionCheckout(
-          CardComponentConfiguration configuration) async =>
-      await repository.createSessionCheckout(configuration);
+  Future<_CardComponentData> _loadCardComponentData() async {
+    final cardConfiguration = await configRepository.loadCardConfiguration();
+    final cardComponentConfiguration = CardComponentConfiguration(
+      environment: Config.environment,
+      clientKey: Config.clientKey,
+      countryCode: Config.countryCode,
+      shopperLocale: Config.shopperLocale,
+      cardConfiguration: cardConfiguration.copyWith(
+        onBinLookup: _onBinLookup,
+        onBinValue: _onBinValue,
+      ),
+    );
+
+    final sessionCheckout =
+        await repository.createSessionCheckout(cardComponentConfiguration);
+
+    return _CardComponentData(
+      sessionCheckout: sessionCheckout,
+      cardComponentConfiguration: cardComponentConfiguration,
+    );
+  }
 
   Map<String, dynamic> _extractPaymentMethod(
       Map<String, dynamic> paymentMethods) {
@@ -102,4 +114,14 @@ class CardSessionComponentScreen extends StatelessWidget {
     // Bin value entered by the shopper.
     // debugPrint("Bin value: $binValue");
   }
+}
+
+class _CardComponentData {
+  final SessionCheckout sessionCheckout;
+  final CardComponentConfiguration cardComponentConfiguration;
+
+  _CardComponentData({
+    required this.sessionCheckout,
+    required this.cardComponentConfiguration,
+  });
 }
