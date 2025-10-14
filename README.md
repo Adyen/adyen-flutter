@@ -3,7 +3,7 @@
 # Adyen Flutter
 
 [![Pub Package](https://img.shields.io/pub/v/adyen_checkout.svg)](https://pub.dev/packages/adyen_checkout)
-[![Adyen iOS](https://img.shields.io/badge/ios-v5.20.0-brightgreen.svg)](https://github.com/Adyen/adyen-ios/releases/tag/5.20.0)
+[![Adyen iOS](https://img.shields.io/badge/ios-v5.20.1-brightgreen.svg)](https://github.com/Adyen/adyen-ios/releases/tag/5.20.1)
 [![Adyen Android](https://img.shields.io/badge/android-v5.14.0-brightgreen.svg)](https://github.com/Adyen/adyen-android/releases/tag/5.14.0)
 
 The Adyen Flutter package provides you with the building blocks to create a checkout experience for
@@ -54,6 +54,7 @@ release a new version when we need to.
 ## Requirements:
 
 * [Checkout API v71](https://docs.adyen.com/api-explorer/Checkout/71/overview) or later.
+* Get familiar with defining the right [returnUrl](/doc/RETURN_URL.md).
 
 #### Android
 
@@ -69,7 +70,7 @@ release a new version when we need to.
 
 * [iOS 12](https://support.apple.com/en-us/118387) or later.
 * Add the return URL handler to your AppDelegate in
-  your [native iOS](https://github.com/Adyen/adyen-flutter/blob/5301abab34773e820c4fd38be54d3bf4bb247fd6/example/ios/Runner/AppDelegate.swift#L18)
+  your [native iOS](https://github.com/Adyen/adyen-flutter/blob/main/example/ios/Runner/AppDelegate.swift#L19)
   layer.
 * Add a
   custom [URL scheme](https://developer.apple.com/documentation/xcode/defining-a-custom-url-scheme-for-your-app)

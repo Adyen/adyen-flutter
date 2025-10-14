@@ -1,4 +1,4 @@
-name: iOS clean build
+name: iOS SPM build
 
 on:
   workflow_call:
@@ -10,12 +10,11 @@ permissions:
 jobs:
   ios_clean_build:
     runs-on: macos-15
-    timeout-minutes: 45
     strategy:
       fail-fast: false
       matrix:
         iPhone: [ "'iPhone 16'" ]
-        flutter-version: [ 3.16.x, 3.19.x, 3.22.x, 3.24.x, 3.27.x, 3.29.x, 3.32.x, 3.35.x ]
+        flutter-version: [ 3.32.x, 3.35.x ]
 
     steps:
       - name: Provide more disk space
@@ -38,10 +37,17 @@ jobs:
           channel: 'stable'
           cache-key: ${{ matrix.flutter-version }}
 
-      - run: flutter pub get
+      - name: Enable SPM
+        run: flutter config --enable-swift-package-manager
+
+      - name: Build example app
+        run: |
+          cd example
+          flutter build ios --no-codesign
 
       - name: Create default project and add Adyen checkout plugin package
         run: |
+          flutter pub get
           flutter create --template=app --platforms=android,ios demo_project
           cd demo_project
           dart pub add 'adyen_checkout:{"path":"../"}'
