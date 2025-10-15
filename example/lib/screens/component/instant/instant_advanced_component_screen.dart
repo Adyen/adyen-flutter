@@ -54,6 +54,8 @@ class InstantAdvancedComponentScreen extends StatelessWidget {
               _extractPaymentMethod(snapshot.data!, "klarna");
           final idealPaymentMethodResponse =
               _extractPaymentMethod(snapshot.data!, "ideal");
+          final payByBankPaymentMethodResponse =
+          _extractPaymentMethod(snapshot.data!, "paybybank");
 
           return Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -110,7 +112,23 @@ class InstantAdvancedComponentScreen extends StatelessWidget {
                       }
                     });
                   },
-                  child: const Text("iDEAL"))
+                  child: const Text("iDEAL")),
+              TextButton(
+                  onPressed: () {
+                    AdyenCheckout.advanced
+                        .startInstantComponent(
+                      configuration: instantComponentConfiguration,
+                      paymentMethod: payByBankPaymentMethodResponse,
+                      checkout: advancedCheckout,
+                    )
+                        .then((paymentResult) {
+                      if (context.mounted) {
+                        DialogBuilder.showPaymentResultDialog(
+                            paymentResult, context);
+                      }
+                    });
+                  },
+                  child: const Text("Pay by Bank")),
             ],
           );
         } else {
