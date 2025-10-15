@@ -4,6 +4,7 @@ import androidx.fragment.app.FragmentActivity
 import com.adyen.checkout.action.core.internal.ActionHandlingComponent
 import com.adyen.checkout.components.core.CheckoutConfiguration
 import com.adyen.checkout.components.core.Order
+import com.adyen.checkout.components.core.PaymentComponentState
 import com.adyen.checkout.components.core.PaymentMethod
 import com.adyen.checkout.components.core.PaymentMethodTypes
 import com.adyen.checkout.components.core.action.Action
@@ -48,24 +49,32 @@ class InstantComponentManager(
             val configuration = instantPaymentConfigurationDTO.mapToCheckoutConfiguration()
             val component =
                 when (paymentMethod.type) {
-                    null, PaymentMethodTypes.UNKNOWN -> throw CheckoutException(
-                        UNKNOWN_PAYMENT_METHOD_TYPE_ERROR_MESSAGE
-                    )
-                    PaymentMethodTypes.IDEAL -> createIdealPaymentComponent(componentId, configuration, paymentMethod)
+                    null, PaymentMethodTypes.UNKNOWN ->
+                        throw CheckoutException(UNKNOWN_PAYMENT_METHOD_TYPE_ERROR_MESSAGE)
+
+                    PaymentMethodTypes.IDEAL ->
+                        createIdealPaymentComponent(
+                            componentId,
+                            configuration,
+                            paymentMethod
+                        )
+
                     PaymentMethodTypes.PAY_BY_BANK ->
                         createPayByBankComponent(
                             componentId,
                             configuration,
                             paymentMethod
                         )
+
                     else -> createInstantPaymentComponent(componentId, configuration, paymentMethod)
                 }
+
             assignCurrentComponent(component)
             ComponentLoadingBottomSheet.show(activity.supportFragmentManager, component)
         } catch (exception: Exception) {
             val model =
                 ComponentCommunicationModel(
-                    ComponentCommunicationType.RESULT,
+                    type = ComponentCommunicationType.RESULT,
                     componentId = componentId,
                     paymentResult =
                         PaymentResultDTO(
@@ -90,29 +99,20 @@ class InstantComponentManager(
                     checkoutSession = checkoutSession,
                     paymentMethod = paymentMethod,
                     checkoutConfiguration = configuration,
-                    componentCallback =
-                        InstantComponentSessionCallback(
-                            componentFlutterApi = componentFlutterInterface,
-                            componentId = componentId,
-                            onActionCallback = onAction,
-                            hideLoadingBottomSheet = ::hideLoadingBottomSheet
-                        ),
+                    componentCallback = createInstantComponentSessionCallback(componentId),
                     key = UUID.randomUUID().toString()
                 )
             }
 
-            Constants.INSTANT_ADVANCED_COMPONENT_KEY -> return InstantPaymentComponent.PROVIDER.get(
-                activity = activity,
-                paymentMethod = paymentMethod,
-                checkoutConfiguration = configuration,
-                callback =
-                    InstantComponentAdvancedCallback(
-                        componentFlutterApi = componentFlutterInterface,
-                        componentId = componentId,
-                        hideLoadingBottomSheet = ::hideLoadingBottomSheet
-                    ),
-                key = UUID.randomUUID().toString()
-            )
+            Constants.INSTANT_ADVANCED_COMPONENT_KEY -> {
+                return InstantPaymentComponent.PROVIDER.get(
+                    activity = activity,
+                    paymentMethod = paymentMethod,
+                    checkoutConfiguration = configuration,
+                    callback = createInstantComponentAdvancedCallback(componentId),
+                    key = UUID.randomUUID().toString()
+                )
+            }
 
             else -> throw IllegalStateException("Instant component not available for payment flow.")
         }
@@ -131,13 +131,7 @@ class InstantComponentManager(
                     checkoutSession = checkoutSession,
                     paymentMethod = paymentMethod,
                     checkoutConfiguration = configuration,
-                    componentCallback =
-                        InstantComponentSessionCallback(
-                            componentFlutterApi = componentFlutterInterface,
-                            componentId = componentId,
-                            onActionCallback = onAction,
-                            hideLoadingBottomSheet = ::hideLoadingBottomSheet
-                        ),
+                    componentCallback = createInstantComponentSessionCallback(componentId),
                     key = UUID.randomUUID().toString()
                 )
             }
@@ -147,12 +141,7 @@ class InstantComponentManager(
                     activity = activity,
                     paymentMethod = paymentMethod,
                     checkoutConfiguration = configuration,
-                    callback =
-                        InstantComponentAdvancedCallback(
-                            componentFlutterApi = componentFlutterInterface,
-                            componentId = componentId,
-                            hideLoadingBottomSheet = ::hideLoadingBottomSheet
-                        ),
+                    callback = createInstantComponentAdvancedCallback(componentId),
                     key = UUID.randomUUID().toString()
                 )
             }
@@ -174,13 +163,7 @@ class InstantComponentManager(
                     checkoutSession = checkoutSession,
                     paymentMethod = paymentMethod,
                     checkoutConfiguration = configuration,
-                    componentCallback =
-                        InstantComponentSessionCallback(
-                            componentFlutterApi = componentFlutterInterface,
-                            componentId = componentId,
-                            onActionCallback = onAction,
-                            hideLoadingBottomSheet = ::hideLoadingBottomSheet
-                        ),
+                    componentCallback = createInstantComponentSessionCallback(componentId),
                     key = UUID.randomUUID().toString()
                 )
             }
@@ -190,12 +173,7 @@ class InstantComponentManager(
                     activity = activity,
                     paymentMethod = paymentMethod,
                     checkoutConfiguration = configuration,
-                    callback =
-                        InstantComponentAdvancedCallback(
-                            componentFlutterApi = componentFlutterInterface,
-                            componentId = componentId,
-                            hideLoadingBottomSheet = ::hideLoadingBottomSheet
-                        ),
+                    callback = createInstantComponentAdvancedCallback(componentId),
                     key = UUID.randomUUID().toString()
                 )
             }
@@ -214,6 +192,25 @@ class InstantComponentManager(
             clientKey = configuration.clientKey
         )
     }
+
+    private fun <T : PaymentComponentState<*>> createInstantComponentSessionCallback(
+        componentId: String
+    ): InstantComponentSessionCallback<T> =
+        InstantComponentSessionCallback(
+            componentFlutterApi = componentFlutterInterface,
+            componentId = componentId,
+            onActionCallback = onAction,
+            hideLoadingBottomSheet = ::hideLoadingBottomSheet
+        )
+
+    private fun <T : PaymentComponentState<*>> createInstantComponentAdvancedCallback(
+        componentId: String
+    ): InstantComponentAdvancedCallback<T> =
+        InstantComponentAdvancedCallback(
+            componentFlutterApi = componentFlutterInterface,
+            componentId = componentId,
+            hideLoadingBottomSheet = ::hideLoadingBottomSheet
+        )
 
     private fun hideLoadingBottomSheet() = ComponentLoadingBottomSheet.hide(activity.supportFragmentManager)
 }
