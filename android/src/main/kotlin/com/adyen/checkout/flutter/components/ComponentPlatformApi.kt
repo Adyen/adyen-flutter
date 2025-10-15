@@ -50,7 +50,13 @@ class ComponentPlatformApi(
     private val googlePayComponentManager: GooglePayComponentManager =
         GooglePayComponentManager(activity, sessionHolder, componentFlutterInterface, ::assignCurrentComponent)
     private val instantComponentManager: InstantComponentManager =
-        InstantComponentManager(activity, componentFlutterInterface, sessionHolder, ::assignCurrentComponent)
+        InstantComponentManager(
+            activity,
+            sessionHolder,
+            componentFlutterInterface,
+            ::assignCurrentComponent,
+            ::handleComponentAction
+        )
     private val actionComponentManager: ActionComponentManager =
         ActionComponentManager(activity, componentFlutterInterface, ::assignCurrentComponent)
     private val intentListener = Consumer<Intent> { handleIntent(it) }
@@ -123,7 +129,6 @@ class ComponentPlatformApi(
         activity.removeOnNewIntentListener(intentListener)
         currentComponent = null
         googlePayComponentManager.onDispose(componentId)
-        instantComponentManager.onDispose(componentId)
     }
 
     fun handleActivityResult(
@@ -175,10 +180,12 @@ class ComponentPlatformApi(
             val action = Action.SERIALIZER.deserialize(JSONObject(it))
             when (currentComponent) {
                 is GooglePayComponent -> googlePayComponentManager.handleAction(action)
-                else -> currentComponent?.handleAction(action, activity)
+                else -> handleComponentAction(action)
             }
         }
     }
+
+    private fun handleComponentAction(action: Action) = currentComponent?.handleAction(action, activity)
 
     private fun onError(
         error: ErrorDTO?,
