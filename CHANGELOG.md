@@ -3,6 +3,7 @@
 ### New
 
 - Added support for Swift Package Manager (SPM).
+- Added support for Pay by Bank as an instant component.
 
 ### Changed
 
