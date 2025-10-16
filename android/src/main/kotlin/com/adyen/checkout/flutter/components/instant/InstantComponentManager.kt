@@ -47,30 +47,26 @@ class InstantComponentManager(
 
             val paymentMethod = PaymentMethod.SERIALIZER.deserialize(JSONObject(encodedPaymentMethod))
             val configuration = instantPaymentConfigurationDTO.mapToCheckoutConfiguration()
-            val component =
-                when (paymentMethod.type) {
-                    null, PaymentMethodTypes.UNKNOWN ->
-                        throw CheckoutException(UNKNOWN_PAYMENT_METHOD_TYPE_ERROR_MESSAGE)
+            when (paymentMethod.type) {
+                null, PaymentMethodTypes.UNKNOWN ->
+                    throw CheckoutException(UNKNOWN_PAYMENT_METHOD_TYPE_ERROR_MESSAGE)
 
-                    PaymentMethodTypes.IDEAL ->
-                        createIdealPaymentComponent(
-                            componentId,
-                            configuration,
-                            paymentMethod
-                        )
+                PaymentMethodTypes.IDEAL ->
+                    showIdealPaymentComponent(
+                        componentId,
+                        configuration,
+                        paymentMethod
+                    )
 
-                    PaymentMethodTypes.PAY_BY_BANK ->
-                        createPayByBankComponent(
-                            componentId,
-                            configuration,
-                            paymentMethod
-                        )
+                PaymentMethodTypes.PAY_BY_BANK ->
+                    showPayByBankComponent(
+                        componentId,
+                        configuration,
+                        paymentMethod
+                    )
 
-                    else -> createInstantPaymentComponent(componentId, configuration, paymentMethod)
-                }
-
-            assignCurrentComponent(component)
-            ComponentLoadingBottomSheet.show(activity.supportFragmentManager, component)
+                else -> showInstantPaymentComponent(componentId, configuration, paymentMethod)
+            }
         } catch (exception: Exception) {
             val model =
                 ComponentCommunicationModel(
@@ -86,100 +82,112 @@ class InstantComponentManager(
         }
     }
 
-    private fun createInstantPaymentComponent(
+    private fun showIdealPaymentComponent(
         componentId: String,
         configuration: CheckoutConfiguration,
         paymentMethod: PaymentMethod
-    ): InstantPaymentComponent {
-        when (componentId) {
-            Constants.INSTANT_SESSION_COMPONENT_KEY -> {
-                val checkoutSession = createCheckoutSession(configuration)
-                return InstantPaymentComponent.PROVIDER.get(
-                    activity = activity,
-                    checkoutSession = checkoutSession,
-                    paymentMethod = paymentMethod,
-                    checkoutConfiguration = configuration,
-                    componentCallback = createInstantComponentSessionCallback(componentId),
-                    key = UUID.randomUUID().toString()
-                )
+    ) {
+        val idealComponent =
+            when (componentId) {
+                Constants.INSTANT_SESSION_COMPONENT_KEY -> {
+                    val checkoutSession = createCheckoutSession(configuration)
+                    IdealComponent.PROVIDER.get(
+                        activity = activity,
+                        checkoutSession = checkoutSession,
+                        paymentMethod = paymentMethod,
+                        checkoutConfiguration = configuration,
+                        componentCallback = createInstantComponentSessionCallback(componentId),
+                        key = UUID.randomUUID().toString()
+                    )
+                }
+
+                Constants.INSTANT_ADVANCED_COMPONENT_KEY -> {
+                    IdealComponent.PROVIDER.get(
+                        activity = activity,
+                        paymentMethod = paymentMethod,
+                        checkoutConfiguration = configuration,
+                        callback = createInstantComponentAdvancedCallback(componentId),
+                        key = UUID.randomUUID().toString()
+                    )
+                }
+
+                else -> throw IllegalStateException("Ideal component not available for payment flow.")
             }
 
-            Constants.INSTANT_ADVANCED_COMPONENT_KEY -> {
-                return InstantPaymentComponent.PROVIDER.get(
-                    activity = activity,
-                    paymentMethod = paymentMethod,
-                    checkoutConfiguration = configuration,
-                    callback = createInstantComponentAdvancedCallback(componentId),
-                    key = UUID.randomUUID().toString()
-                )
-            }
-
-            else -> throw IllegalStateException("Instant component not available for payment flow.")
-        }
+        assignCurrentComponent(idealComponent)
+        ComponentLoadingBottomSheet.show(activity.supportFragmentManager, idealComponent)
     }
 
-    private fun createIdealPaymentComponent(
+    private fun showPayByBankComponent(
         componentId: String,
         configuration: CheckoutConfiguration,
         paymentMethod: PaymentMethod
-    ): IdealComponent {
-        when (componentId) {
-            Constants.INSTANT_SESSION_COMPONENT_KEY -> {
-                val checkoutSession = createCheckoutSession(configuration)
-                return IdealComponent.PROVIDER.get(
-                    activity = activity,
-                    checkoutSession = checkoutSession,
-                    paymentMethod = paymentMethod,
-                    checkoutConfiguration = configuration,
-                    componentCallback = createInstantComponentSessionCallback(componentId),
-                    key = UUID.randomUUID().toString()
-                )
+    ) {
+        val payByBankComponent =
+            when (componentId) {
+                Constants.INSTANT_SESSION_COMPONENT_KEY -> {
+                    val checkoutSession = createCheckoutSession(configuration)
+                    PayByBankComponent.PROVIDER.get(
+                        activity = activity,
+                        checkoutSession = checkoutSession,
+                        paymentMethod = paymentMethod,
+                        checkoutConfiguration = configuration,
+                        componentCallback = createInstantComponentSessionCallback(componentId),
+                        key = UUID.randomUUID().toString()
+                    )
+                }
+
+                Constants.INSTANT_ADVANCED_COMPONENT_KEY -> {
+                    PayByBankComponent.PROVIDER.get(
+                        activity = activity,
+                        paymentMethod = paymentMethod,
+                        checkoutConfiguration = configuration,
+                        callback = createInstantComponentAdvancedCallback(componentId),
+                        key = UUID.randomUUID().toString()
+                    )
+                }
+
+                else -> throw IllegalStateException("Pay By Bank component not available for payment flow.")
             }
 
-            Constants.INSTANT_ADVANCED_COMPONENT_KEY -> {
-                return IdealComponent.PROVIDER.get(
-                    activity = activity,
-                    paymentMethod = paymentMethod,
-                    checkoutConfiguration = configuration,
-                    callback = createInstantComponentAdvancedCallback(componentId),
-                    key = UUID.randomUUID().toString()
-                )
-            }
-
-            else -> throw IllegalStateException("Ideal component not available for payment flow.")
-        }
+        assignCurrentComponent(payByBankComponent)
+        ComponentLoadingBottomSheet.show(activity.supportFragmentManager, payByBankComponent)
     }
 
-    private fun createPayByBankComponent(
+    private fun showInstantPaymentComponent(
         componentId: String,
         configuration: CheckoutConfiguration,
         paymentMethod: PaymentMethod
-    ): PayByBankComponent {
-        when (componentId) {
-            Constants.INSTANT_SESSION_COMPONENT_KEY -> {
-                val checkoutSession = createCheckoutSession(configuration)
-                return PayByBankComponent.PROVIDER.get(
-                    activity = activity,
-                    checkoutSession = checkoutSession,
-                    paymentMethod = paymentMethod,
-                    checkoutConfiguration = configuration,
-                    componentCallback = createInstantComponentSessionCallback(componentId),
-                    key = UUID.randomUUID().toString()
-                )
+    ) {
+        val instantComponent =
+            when (componentId) {
+                Constants.INSTANT_SESSION_COMPONENT_KEY -> {
+                    val checkoutSession = createCheckoutSession(configuration)
+                    InstantPaymentComponent.PROVIDER.get(
+                        activity = activity,
+                        checkoutSession = checkoutSession,
+                        paymentMethod = paymentMethod,
+                        checkoutConfiguration = configuration,
+                        componentCallback = createInstantComponentSessionCallback(componentId),
+                        key = UUID.randomUUID().toString()
+                    )
+                }
+
+                Constants.INSTANT_ADVANCED_COMPONENT_KEY -> {
+                    InstantPaymentComponent.PROVIDER.get(
+                        activity = activity,
+                        paymentMethod = paymentMethod,
+                        checkoutConfiguration = configuration,
+                        callback = createInstantComponentAdvancedCallback(componentId),
+                        key = UUID.randomUUID().toString()
+                    )
+                }
+
+                else -> throw IllegalStateException("Instant component not available for payment flow.")
             }
 
-            Constants.INSTANT_ADVANCED_COMPONENT_KEY -> {
-                return PayByBankComponent.PROVIDER.get(
-                    activity = activity,
-                    paymentMethod = paymentMethod,
-                    checkoutConfiguration = configuration,
-                    callback = createInstantComponentAdvancedCallback(componentId),
-                    key = UUID.randomUUID().toString()
-                )
-            }
-
-            else -> throw IllegalStateException("Pay By Bank component not available for payment flow.")
-        }
+        assignCurrentComponent(instantComponent)
+        ComponentLoadingBottomSheet.show(activity.supportFragmentManager, instantComponent)
     }
 
     private fun createCheckoutSession(configuration: CheckoutConfiguration): CheckoutSession {
