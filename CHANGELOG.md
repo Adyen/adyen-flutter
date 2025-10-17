@@ -4,6 +4,10 @@
 
 - Added support for Swift Package Manager (SPM).
 
+### Improved
+
+- Specified missing type in the platformView height communication for components. 
+
 ### Changed
 
 - Dependency versions:
