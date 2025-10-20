@@ -13,7 +13,7 @@
 - Dependency versions:
   | Name                                                                                                                                                                      | Version |
   |---------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------|
-  | [iOS Drop-in/Components](https://docs.adyen.com/online-payments/release-notes/?title%5B0%5D=iOS+Components%2FDrop-in#releaseNote=2025-08-27-ios-componentsdrop-in-5.20.1) | 5.20.1  |
+  | [iOS Drop-in/Components](https://docs.adyen.com/online-payments/release-notes/?title%5B0%5D=iOS+Components%2FDrop-in#releaseNote=2025-10-16-ios-componentsdrop-in-5.20.2) | 5.20.2  |
 
 ## 1.6.0
 
