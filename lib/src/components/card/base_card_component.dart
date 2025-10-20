@@ -139,7 +139,7 @@ class _BaseCardComponentState extends State<BaseCardComponent> {
     }
   }
 
-  void _onComponentCommunication(event) {
+  void _onComponentCommunication(ComponentCommunicationModel event) {
     if (event.type case ComponentCommunicationType.resize) {
       _resizeViewport(event);
     } else if (event.type case ComponentCommunicationType.result) {
@@ -153,8 +153,8 @@ class _BaseCardComponentState extends State<BaseCardComponent> {
     }
   }
 
-  void _resizeViewport(event) {
-    final newViewportHeight = event.data is int ? event.data : null;
+  void _resizeViewport(ComponentCommunicationModel event) {
+    final int? newViewportHeight = event.data is int ? event.data as int : null;
     if (newViewportHeight != previousViewportHeight &&
         newViewportHeight != null) {
       setState(() {
