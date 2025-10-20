@@ -64,6 +64,7 @@ class DropInPlatformApi: DropInPlatformInterface {
                 paymentMethods: sessionHolder.adyenCheckout!.paymentMethods!,
                 context: adyenContext,
             )
+            
 
 //            let dropInComponent = DropInComponent(
 //                paymentMethods: paymentMethods,
@@ -73,15 +74,12 @@ class DropInPlatformApi: DropInPlatformInterface {
 //            )
 //            dropInComponent.delegate = sessionHolder.session
 //            dropInComponent.partialPaymentDelegate = sessionHolder.session
-            dropInComponent.cardComponentDelegate = self
+//            dropInComponent.cardComponentDelegate = self
 //            if dropInConfigurationDTO.isRemoveStoredPaymentMethodEnabled {
 //                dropInComponent.storedPaymentMethodsDelegate = dropInSessionStoredPaymentMethodsDelegate
 //            }
             
-            let dropInViewController = DropInViewController(dropInComponent: dropInComponent)
-            dropInViewController.modalPresentationStyle = .overCurrentContext
-            self.dropInViewController = dropInViewController
-            self.hostViewController?.present(dropInViewController, animated: false)
+            self.hostViewController?.present(dropInComponent.viewController, animated: true)
         } catch {
             sendSessionError(error: error)
         }
