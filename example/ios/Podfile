@@ -31,7 +31,7 @@ target 'Runner' do
   use_frameworks!
   use_modular_headers!
   
-  pod 'Adyen', :git => 'https://github.com/Adyen/adyen-ios.git', :branch => 'v6_base'
+  pod 'Adyen', :git => 'https://github.com/Adyen/adyen-ios.git', :branch => 'feature/COSDK-637_action_component_logic_into_payment_module'
 
   flutter_install_all_ios_pods File.dirname(File.realpath(__FILE__))
   target 'RunnerTests' do

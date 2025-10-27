@@ -15,7 +15,7 @@ Adyen checkout SDK for Flutter
   s.source           = { :path => '.' }
   s.source_files = 'adyen_checkout/Sources/adyen_checkout/**/*.swift'
   s.dependency 'Flutter'
-  s.dependency 'Adyen', '5.20.0'
+  s.dependency 'Adyen'
   s.platform = :ios, '13.0'
 
   # Flutter.framework does not contain a i386 slice.

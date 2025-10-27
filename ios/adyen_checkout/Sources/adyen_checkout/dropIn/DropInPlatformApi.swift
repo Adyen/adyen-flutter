@@ -8,6 +8,9 @@ import Foundation
 #if canImport(AdyenCard)
     import AdyenCard
 #endif
+#if canImport(AdyenComponents)
+    import AdyenComponents
+#endif
 import UIKit
 @_spi(AdyenInternal) import Adyen
 #if canImport(AdyenNetworking)
@@ -18,13 +21,14 @@ class DropInPlatformApi: DropInPlatformInterface {
     private let jsonDecoder = JSONDecoder()
     private let checkoutFlutter: CheckoutFlutterInterface
     private let sessionHolder: SessionHolder
-    private var hostViewController: UIViewController?
+    private var dropInComponent: DropInComponent?
     private var dropInViewController: DropInViewController?
     private var dropInSessionStoredPaymentMethodsDelegate: DropInSessionsStoredPaymentMethodsDelegate?
     private var dropInAdvancedFlowDelegate: DropInAdvancedFlowDelegate?
     private var dropInAdvancedFlowStoredPaymentMethodsDelegate: DropInAdvancedFlowStoredPaymentMethodsDelegate?
     private var checkBalanceHandler: ((Result<Balance, any Error>) -> Void)?
     private var requestOrderHandler: ((Result<PartialPaymentOrder, any Error>) -> Void)?
+    private var isApplePay: Bool = false
 
     init(
         checkoutFlutter: CheckoutFlutterInterface,
@@ -39,47 +43,50 @@ class DropInPlatformApi: DropInPlatformInterface {
             guard let viewController = getViewController() else {
                 return
             }
-            
-//            guard let session = sessionHolder.session else {
-//                sendSessionError(error: PlatformError(errorDescription: "Session is not available."))
-//                return
-//            }
+            guard let paymentMethods = sessionHolder.adyenCheckout?.paymentMethods else {
+                sendSessionError(error: PlatformError(errorDescription: "Session is not available."))
+                return
+            }
 
-            hostViewController = viewController
-            let adyenContext = try dropInConfigurationDTO.createAdyenContext()
 //            dropInSessionStoredPaymentMethodsDelegate = DropInSessionsStoredPaymentMethodsDelegate(
 //                viewController: viewController,
 //                checkoutFlutter: checkoutFlutter
 //            )
 //            let payment = session.state.createPayment(fallbackCountryCode: dropInConfigurationDTO.countryCode)
 //            let dropInConfiguration = try dropInConfigurationDTO.createDropInConfiguration(payment: payment)
-//            var paymentMethods = session.state.paymentMethods
 //            if let paymentMethodNames = dropInConfigurationDTO.paymentMethodNames {
 //                paymentMethods = overridePaymentMethodNames(
 //                    paymentMethods: paymentMethods,
 //                    paymentMethodNames: paymentMethodNames
 //                )
 //            }
+            let adyenContext = try dropInConfigurationDTO.createAdyenContext()
             let dropInComponent = DropInComponent(
-                paymentMethods: sessionHolder.adyenCheckout!.paymentMethods!,
+                paymentMethods: paymentMethods,
                 context: adyenContext,
+                title: dropInConfigurationDTO.preselectedPaymentMethodTitle
             )
             
+            self.dropInComponent = dropInComponent
 
+
+            
 //            let dropInComponent = DropInComponent(
 //                paymentMethods: paymentMethods,
 //                context: adyenContext,
 //                configuration: dropInConfiguration,
 //                title: dropInConfigurationDTO.preselectedPaymentMethodTitle
 //            )
-//            dropInComponent.delegate = sessionHolder.session
+//            dropInComponent.delegate = sessionHolder.adyenCheckout!
 //            dropInComponent.partialPaymentDelegate = sessionHolder.session
 //            dropInComponent.cardComponentDelegate = self
 //            if dropInConfigurationDTO.isRemoveStoredPaymentMethodEnabled {
 //                dropInComponent.storedPaymentMethodsDelegate = dropInSessionStoredPaymentMethodsDelegate
 //            }
-            
-            self.hostViewController?.present(dropInComponent.viewController, animated: true)
+//            let dropInViewController = DropInViewController(dropInComponent: dropInComponent)
+//            dropInViewController.modalPresentationStyle = .overCurrentContext
+//            self.dropInViewController = dropInViewController
+            viewController.present(dropInComponent.viewController, animated: true)
         } catch {
             sendSessionError(error: error)
         }
@@ -91,7 +98,6 @@ class DropInPlatformApi: DropInPlatformInterface {
                 return
             }
             
-            hostViewController = viewController
             let adyenContext = try dropInConfigurationDTO.createAdyenContext()
             var paymentMethods = try jsonDecoder.decode(PaymentMethods.self, from: Data(paymentMethodsResponse.utf8))
             if let paymentMethodNames = dropInConfigurationDTO.paymentMethodNames {
@@ -126,7 +132,7 @@ class DropInPlatformApi: DropInPlatformInterface {
             let dropInViewController = DropInViewController(dropInComponent: dropInComponent)
             dropInViewController.modalPresentationStyle = .overCurrentContext
             self.dropInViewController = dropInViewController
-            self.hostViewController?.present(dropInViewController, animated: false)
+            viewController.present(dropInComponent.viewController, animated: false)
         } catch {
             let checkoutEvent = CheckoutEvent(
                 type: CheckoutEventType.result,
@@ -202,7 +208,7 @@ class DropInPlatformApi: DropInPlatformInterface {
         checkBalanceHandler = nil
         requestOrderHandler = nil
         dropInViewController = nil
-        hostViewController = nil
+        dropInComponent = nil
     }
 
     private func handlePaymentEvent(paymentEventDTO: PaymentEventDTO) {
@@ -276,7 +282,7 @@ class DropInPlatformApi: DropInPlatformInterface {
                 title: localizedString(.dismissButton, localizationParameters),
                 style: .cancel
             ))
-            hostViewController?.adyen.topPresenter.present(alertController, animated: true)
+            dropInComponent?.viewController.adyen.topPresenter.present(alertController, animated: true)
         }
     }
     
@@ -359,7 +365,7 @@ class DropInPlatformApi: DropInPlatformInterface {
 extension DropInPlatformApi: DropInInteractorDelegate {
     func finalizeAndDismiss(success: Bool, completion: @escaping (() -> Void)) {
         dropInViewController?.dropInComponent.finalizeIfNeeded(with: success) { [weak self] in
-            self?.hostViewController?.dismiss(animated: true, completion: {
+            self?.dropInViewController?.dismiss(animated: true, completion: {
                 completion()
             })
         }
