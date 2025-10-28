@@ -10,8 +10,7 @@ dependencies:
   flutter:
     sdk: flutter
 
-  adyen_checkout:
-    path: ../
+  adyen_checkout: ^1.6.0
   http: ^1.2.0
   collection: ^1.18.0
   flutter_localizations:
