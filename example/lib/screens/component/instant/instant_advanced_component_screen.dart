@@ -23,14 +23,14 @@ class InstantAdvancedComponentScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             const SizedBox(height: 40),
-            _buildAdyenGooglePayAdvancedComponent(),
+            _buildAdyenInstantComponent(),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildAdyenGooglePayAdvancedComponent() {
+  Widget _buildAdyenInstantComponent() {
     return FutureBuilder<Map<String, dynamic>>(
       future: repository.fetchPaymentMethods(),
       builder:
@@ -54,6 +54,8 @@ class InstantAdvancedComponentScreen extends StatelessWidget {
               _extractPaymentMethod(snapshot.data!, "klarna");
           final idealPaymentMethodResponse =
               _extractPaymentMethod(snapshot.data!, "ideal");
+          final payByBankPaymentMethodResponse =
+              _extractPaymentMethod(snapshot.data!, "paybybank");
 
           return Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -63,54 +65,34 @@ class InstantAdvancedComponentScreen extends StatelessWidget {
                 "Advanced flow",
               ),
               const SizedBox(height: 8),
-              TextButton(
-                  onPressed: () {
-                    AdyenCheckout.advanced
-                        .startInstantComponent(
-                      configuration: instantComponentConfiguration,
-                      paymentMethod: payPalPaymentMethodResponse,
-                      checkout: advancedCheckout,
-                    )
-                        .then((paymentResult) {
-                      if (context.mounted) {
-                        DialogBuilder.showPaymentResultDialog(
-                            paymentResult, context);
-                      }
-                    });
-                  },
-                  child: const Text("Paypal")),
-              TextButton(
-                  onPressed: () {
-                    AdyenCheckout.advanced
-                        .startInstantComponent(
-                      configuration: instantComponentConfiguration,
-                      paymentMethod: klarnaPaymentMethodResponse,
-                      checkout: advancedCheckout,
-                    )
-                        .then((paymentResult) {
-                      if (context.mounted) {
-                        DialogBuilder.showPaymentResultDialog(
-                            paymentResult, context);
-                      }
-                    });
-                  },
-                  child: const Text("Klarna")),
-              TextButton(
-                  onPressed: () {
-                    AdyenCheckout.advanced
-                        .startInstantComponent(
-                      configuration: instantComponentConfiguration,
-                      paymentMethod: idealPaymentMethodResponse,
-                      checkout: advancedCheckout,
-                    )
-                        .then((paymentResult) {
-                      if (context.mounted) {
-                        DialogBuilder.showPaymentResultDialog(
-                            paymentResult, context);
-                      }
-                    });
-                  },
-                  child: const Text("iDEAL"))
+              _buildPaymentButton(
+                context,
+                payPalPaymentMethodResponse,
+                instantComponentConfiguration,
+                advancedCheckout,
+                'Paypal',
+              ),
+              _buildPaymentButton(
+                context,
+                klarnaPaymentMethodResponse,
+                instantComponentConfiguration,
+                advancedCheckout,
+                'Klarna',
+              ),
+              _buildPaymentButton(
+                context,
+                idealPaymentMethodResponse,
+                instantComponentConfiguration,
+                advancedCheckout,
+                'iDEAL',
+              ),
+              _buildPaymentButton(
+                context,
+                payByBankPaymentMethodResponse,
+                instantComponentConfiguration,
+                advancedCheckout,
+                'Pay by bank',
+              ),
             ],
           );
         } else {
@@ -126,5 +108,44 @@ class InstantAdvancedComponentScreen extends StatelessWidget {
       (paymentMethod) => paymentMethod["type"] == key,
       orElse: () => <String, dynamic>{},
     );
+  }
+
+  Widget _buildPaymentButton(
+    BuildContext context,
+    Map<String, dynamic> paymentMethod,
+    InstantComponentConfiguration instantComponentConfiguration,
+    AdvancedCheckout advancedCheckout,
+    String buttonText,
+  ) {
+    if (paymentMethod.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    return TextButton(
+      onPressed: () => _startInstantPayment(
+        context,
+        paymentMethod,
+        instantComponentConfiguration,
+        advancedCheckout,
+      ),
+      child: Text(buttonText),
+    );
+  }
+
+  Future<void> _startInstantPayment(
+    BuildContext context,
+    Map<String, dynamic> paymentMethod,
+    InstantComponentConfiguration instantComponentConfiguration,
+    AdvancedCheckout advancedCheckout,
+  ) async {
+    final paymentResult = await AdyenCheckout.advanced.startInstantComponent(
+      configuration: instantComponentConfiguration,
+      paymentMethod: paymentMethod,
+      checkout: advancedCheckout,
+    );
+
+    if (context.mounted) {
+      DialogBuilder.showPaymentResultDialog(paymentResult, context);
+    }
   }
 }
