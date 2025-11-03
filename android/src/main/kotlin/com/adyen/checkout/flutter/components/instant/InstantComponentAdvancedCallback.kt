@@ -24,7 +24,7 @@ class InstantComponentAdvancedCallback<T : PaymentComponentState<*>>(
             }
         val model =
             ComponentCommunicationModel(
-                ComponentCommunicationType.ON_SUBMIT,
+                type = ComponentCommunicationType.ON_SUBMIT,
                 componentId = componentId,
                 data = submitData.toString(),
             )
