@@ -1,4 +1,4 @@
-## 1.7.0 (in development)
+## 1.7.0
 
 ### New
 
@@ -7,7 +7,9 @@
 
 ### Improved
 
-- Specified missing type in the platformView height communication for components. 
+- Specified missing type in the platformView height communication for components.
+- Improved instantiation of Apple Pay component widget.
+- Aligned implementation of instant component for Android.
 
 ### Changed
 
