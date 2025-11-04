@@ -4,15 +4,13 @@
 
 - Pay by Bank is now supported as an Instant Component. Payment
   method [type](https://docs.adyen.com/payment-methods/payment-method-types): **paybybank**.
-- Support for **Swift Package Manager (SPM)**.
-
----
+- Support for Swift Package Manager (SPM).
 
 ### Improved
 
 - For Apple Pay Component: the instantiation of the widget is now more efficient.
 - For the Instant Component: streamlined the implementation for Android by removing redundant code.
-- For Components in general: the communication of `platformView` height now includes a type
+- For Components in general: the communication of platformView height now includes a type
   specification.
 
 ### Changed
