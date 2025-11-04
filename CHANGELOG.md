@@ -4,7 +4,11 @@
 
 - Pay by Bank is now supported as an Instant Component. Payment
   method [type](https://docs.adyen.com/payment-methods/payment-method-types): **paybybank**.
-- Support for Swift Package Manager (SPM).
+- Support for Swift Package Manager (SPM).  
+  When migrating an existing project to Swift Package Manager (SPM), you must manually import
+  modules in your `AppDelegate.swift`:
+    * `import AdyenActions`
+    * If you apply custom styling to Drop-in, you must also include `import AdyenDropIn`.
 
 ### Improved
 
