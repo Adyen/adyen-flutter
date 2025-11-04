@@ -1,6 +1,6 @@
 ## 1.7.0
 
-## New
+### New
 
 - Pay by Bank is now supported as an Instant Component. Payment
   method [type](https://docs.adyen.com/payment-methods/payment-method-types): **paybybank**.
@@ -8,7 +8,7 @@
 
 ---
 
-## Improved
+### Improved
 
 - For Apple Pay Component: the instantiation of the widget is now more efficient.
 - For the Instant Component: streamlined the implementation for Android by removing redundant code.
@@ -20,8 +20,7 @@
 - Dependency versions:
   | Name | Version |
   |---------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------|
-  | [iOS Drop-in/Components](https://docs.adyen.com/online-payments/release-notes/?title%5B0%5D=iOS+Components%2FDrop-in#releaseNote=2025-11-04-ios-componentsdrop-in-5.21.0) |
-  5.21.0 |
+  | [iOS Drop-in/Components](https://docs.adyen.com/online-payments/release-notes/?title%5B0%5D=iOS+Components%2FDrop-in#releaseNote=2025-11-04-ios-componentsdrop-in-5.21.0) |  5.21.0 |
 
 ## 1.6.0
 
@@ -38,12 +37,10 @@
 ### Changed
 
 - Dependency versions:
-  | Name | Version |
+  | Name                                                                                                                                                                      | Version |
   |---------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------|
-  | [Android Drop-in/Components](https://docs.adyen.com/online-payments/release-notes/#releaseNote=2025-08-19-android-componentsdrop-in-5.14.0)                               |
-  5.14.0 |
-  | [iOS Drop-in/Components](https://docs.adyen.com/online-payments/release-notes/?title%5B0%5D=iOS+Components%2FDrop-in#releaseNote=2025-08-27-ios-componentsdrop-in-5.20.0) |
-  5.20.0 |
+  | [Android Drop-in/Components](https://docs.adyen.com/online-payments/release-notes/#releaseNote=2025-08-19-android-componentsdrop-in-5.14.0)                               | 5.14.0  |
+  | [iOS Drop-in/Components](https://docs.adyen.com/online-payments/release-notes/?title%5B0%5D=iOS+Components%2FDrop-in#releaseNote=2025-08-27-ios-componentsdrop-in-5.20.0) | 5.20.0  |
 
 ## 1.5.1
 
