@@ -1,6 +1,6 @@
 package com.adyen.checkout.flutter.components.card.advanced
 
-import com.adyen.checkout.card.CardComponentState
+import com.adyen.checkout.card.old.CardComponentState
 import com.adyen.checkout.flutter.components.base.ComponentAdvancedCallback
 import com.adyen.checkout.flutter.generated.ComponentFlutterInterface
 

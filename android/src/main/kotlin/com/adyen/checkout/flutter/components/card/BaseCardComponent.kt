@@ -3,7 +3,7 @@ package com.adyen.checkout.flutter.components.card
 import android.content.Context
 import android.view.View
 import androidx.activity.ComponentActivity
-import com.adyen.checkout.card.CardComponent
+import com.adyen.checkout.card.old.CardComponent
 import com.adyen.checkout.flutter.components.view.DynamicComponentView
 import com.adyen.checkout.flutter.generated.BinLookupDataDTO
 import com.adyen.checkout.flutter.generated.CardComponentConfigurationDTO

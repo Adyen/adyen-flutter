@@ -4,7 +4,7 @@ import android.content.Intent
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
-import com.adyen.checkout.dropin.DropIn
+import com.adyen.checkout.dropin.old.DropIn
 import com.adyen.checkout.flutter.components.ComponentPlatformApi
 import com.adyen.checkout.flutter.dropIn.DropInPlatformApi
 import com.adyen.checkout.flutter.generated.CheckoutFlutterInterface

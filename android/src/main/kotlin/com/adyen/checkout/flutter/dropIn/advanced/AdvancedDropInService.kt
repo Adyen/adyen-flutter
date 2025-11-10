@@ -6,7 +6,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ServiceLifecycleDispatcher
 import androidx.lifecycle.lifecycleScope
-import com.adyen.checkout.card.BinLookupData
+import com.adyen.checkout.card.old.BinLookupData
 import com.adyen.checkout.components.core.ActionComponentData
 import com.adyen.checkout.components.core.BalanceResult
 import com.adyen.checkout.components.core.Order
@@ -16,12 +16,12 @@ import com.adyen.checkout.components.core.PaymentComponentState
 import com.adyen.checkout.components.core.PaymentMethodsApiResponse
 import com.adyen.checkout.components.core.StoredPaymentMethod
 import com.adyen.checkout.components.core.action.Action
-import com.adyen.checkout.dropin.BalanceDropInServiceResult
-import com.adyen.checkout.dropin.DropInService
-import com.adyen.checkout.dropin.DropInServiceResult
-import com.adyen.checkout.dropin.ErrorDialog
-import com.adyen.checkout.dropin.OrderDropInServiceResult
-import com.adyen.checkout.dropin.RecurringDropInServiceResult
+import com.adyen.checkout.dropin.old.BalanceDropInServiceResult
+import com.adyen.checkout.dropin.old.DropInService
+import com.adyen.checkout.dropin.old.DropInServiceResult
+import com.adyen.checkout.dropin.old.ErrorDialog
+import com.adyen.checkout.dropin.old.OrderDropInServiceResult
+import com.adyen.checkout.dropin.old.RecurringDropInServiceResult
 import com.adyen.checkout.flutter.dropIn.DropInPlatformApi
 import com.adyen.checkout.flutter.dropIn.model.DropInServiceEvent
 import com.adyen.checkout.flutter.dropIn.model.DropInStoredPaymentMethodDeletionModel

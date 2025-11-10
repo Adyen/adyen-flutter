@@ -1,6 +1,6 @@
 package com.adyen.checkout.flutter.components.card.session
 
-import com.adyen.checkout.card.CardComponentState
+import com.adyen.checkout.card.old.CardComponentState
 import com.adyen.checkout.components.core.action.Action
 import com.adyen.checkout.flutter.components.base.ComponentSessionCallback
 import com.adyen.checkout.flutter.generated.ComponentFlutterInterface

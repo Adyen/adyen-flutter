@@ -2,7 +2,7 @@ package com.adyen.checkout.flutter.components.card.advanced
 
 import android.content.Context
 import androidx.fragment.app.FragmentActivity
-import com.adyen.checkout.card.CardComponent
+import com.adyen.checkout.card.old.CardComponent
 import com.adyen.checkout.components.core.PaymentMethod
 import com.adyen.checkout.components.core.StoredPaymentMethod
 import com.adyen.checkout.flutter.components.card.BaseCardComponent

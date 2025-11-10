@@ -1,11 +1,11 @@
 package com.adyen.checkout.flutter.utils
 
 import android.content.Context
-import com.adyen.checkout.card.AddressConfiguration
-import com.adyen.checkout.card.CardConfiguration
-import com.adyen.checkout.card.CardType
-import com.adyen.checkout.card.KCPAuthVisibility
-import com.adyen.checkout.card.SocialSecurityNumberVisibility
+import com.adyen.checkout.card.old.AddressConfiguration
+import com.adyen.checkout.card.old.CardConfiguration
+import com.adyen.checkout.card.old.CardType
+import com.adyen.checkout.card.old.KCPAuthVisibility
+import com.adyen.checkout.card.old.SocialSecurityNumberVisibility
 import com.adyen.checkout.cashapppay.CashAppPayConfiguration
 import com.adyen.checkout.components.core.Amount
 import com.adyen.checkout.components.core.AnalyticsConfiguration
@@ -16,7 +16,7 @@ import com.adyen.checkout.components.core.internal.analytics.AnalyticsPlatform
 import com.adyen.checkout.components.core.internal.analytics.AnalyticsPlatformParams
 import com.adyen.checkout.cse.EncryptedCard
 import com.adyen.checkout.cse.UnencryptedCard
-import com.adyen.checkout.dropin.DropInConfiguration
+import com.adyen.checkout.dropin.old.DropInConfiguration
 import com.adyen.checkout.flutter.generated.ActionComponentConfigurationDTO
 import com.adyen.checkout.flutter.generated.AddressMode
 import com.adyen.checkout.flutter.generated.AmountDTO
