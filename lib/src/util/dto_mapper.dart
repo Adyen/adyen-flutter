@@ -25,6 +25,7 @@ extension DropInConfigurationMapper on DropInConfiguration {
         applePayConfigurationDTO: applePayConfiguration?.toDTO(),
         googlePayConfigurationDTO: googlePayConfiguration?.toDTO(),
         cashAppPayConfigurationDTO: cashAppPayConfiguration?.toDTO(),
+        twintConfigurationDTO: twintConfiguration?.toDTO(),
         analyticsOptionsDTO: analyticsOptions.toDTO(sdkVersionNumber),
         isRemoveStoredPaymentMethodEnabled: _isRemoveStoredPaymentMethodEnabled(
             storedPaymentMethodConfiguration),
@@ -149,6 +150,13 @@ extension CashAppPayConfigurationMapper on CashAppPayConfiguration {
   CashAppPayConfigurationDTO toDTO() => CashAppPayConfigurationDTO(
         cashAppPayEnvironment: cashAppPayEnvironment,
         returnUrl: returnUrl,
+      );
+}
+
+extension TwintConfigurationMapper on TwintConfiguration {
+  TwintConfigurationDTO toDTO() => TwintConfigurationDTO(
+        iosCallbackAppScheme: iosCallbackAppScheme,
+        showStorePaymentField: showStorePaymentField,
       );
 }
 

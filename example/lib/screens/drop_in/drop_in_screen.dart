@@ -120,6 +120,8 @@ class DropInScreen extends StatelessWidget {
       returnUrl: returnUrl,
     );
 
+    final TwintConfiguration twintConfiguration = TwintConfiguration();
+
     final StoredPaymentMethodConfiguration storedPaymentMethodConfiguration =
         StoredPaymentMethodConfiguration(
       showPreselectedStoredPaymentMethod: false,
@@ -137,6 +139,7 @@ class DropInScreen extends StatelessWidget {
       applePayConfiguration: applePayConfiguration,
       googlePayConfiguration: googlePayConfiguration,
       cashAppPayConfiguration: cashAppPayConfiguration,
+      twintConfiguration: twintConfiguration,
       storedPaymentMethodConfiguration: storedPaymentMethodConfiguration,
       paymentMethodNames: {
         "scheme": "Credit card",
