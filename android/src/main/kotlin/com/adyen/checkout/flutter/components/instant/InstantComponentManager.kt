@@ -2,6 +2,7 @@ package com.adyen.checkout.flutter.components.instant
 
 import androidx.fragment.app.FragmentActivity
 import com.adyen.checkout.action.core.internal.ActionHandlingComponent
+import com.adyen.checkout.components.core.ActionHandlingMethod
 import com.adyen.checkout.components.core.CheckoutConfiguration
 import com.adyen.checkout.components.core.Order
 import com.adyen.checkout.components.core.PaymentComponentState
@@ -16,6 +17,7 @@ import com.adyen.checkout.flutter.generated.ComponentFlutterInterface
 import com.adyen.checkout.flutter.generated.InstantPaymentConfigurationDTO
 import com.adyen.checkout.flutter.generated.PaymentResultDTO
 import com.adyen.checkout.flutter.generated.PaymentResultEnum
+import com.adyen.checkout.flutter.generated.TwintConfigurationDTO
 import com.adyen.checkout.flutter.session.SessionHolder
 import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToCheckoutConfiguration
 import com.adyen.checkout.flutter.utils.Constants
@@ -25,6 +27,8 @@ import com.adyen.checkout.instant.InstantPaymentComponent
 import com.adyen.checkout.paybybank.PayByBankComponent
 import com.adyen.checkout.sessions.core.CheckoutSession
 import com.adyen.checkout.sessions.core.SessionSetupResponse
+import com.adyen.checkout.twint.TwintComponent
+import com.adyen.checkout.twint.twint
 import org.json.JSONObject
 import java.util.UUID
 
@@ -51,20 +55,9 @@ class InstantComponentManager(
                 null, PaymentMethodTypes.UNKNOWN ->
                     throw CheckoutException(UNKNOWN_PAYMENT_METHOD_TYPE_ERROR_MESSAGE)
 
-                PaymentMethodTypes.IDEAL ->
-                    showIdealPaymentComponent(
-                        componentId,
-                        configuration,
-                        paymentMethod
-                    )
-
-                PaymentMethodTypes.PAY_BY_BANK ->
-                    showPayByBankComponent(
-                        componentId,
-                        configuration,
-                        paymentMethod
-                    )
-
+                PaymentMethodTypes.IDEAL -> showIdealPaymentComponent(componentId, configuration, paymentMethod)
+                PaymentMethodTypes.PAY_BY_BANK -> showPayByBankComponent(componentId, configuration, paymentMethod)
+                PaymentMethodTypes.TWINT -> showTwintComponent(componentId, configuration, paymentMethod)
                 else -> showInstantPaymentComponent(componentId, configuration, paymentMethod)
             }
         } catch (exception: Exception) {
@@ -152,6 +145,49 @@ class InstantComponentManager(
 
         assignCurrentComponent(payByBankComponent)
         ComponentLoadingBottomSheet.show(activity.supportFragmentManager, payByBankComponent)
+    }
+
+    private fun showTwintComponent(
+        componentId: String,
+        configuration: CheckoutConfiguration,
+        paymentMethod: PaymentMethod
+    ) {
+        // We use the web redirect for now and prevent storing the payment method to align with iOS
+        val twintConfiguration = configuration.apply {
+            twint {
+                showStorePaymentField = false
+                actionHandlingMethod = ActionHandlingMethod.PREFER_WEB
+            }
+        }
+        val twintComponent =
+            when (componentId) {
+                Constants.INSTANT_SESSION_COMPONENT_KEY -> {
+                    val checkoutSession = createCheckoutSession(twintConfiguration)
+                    TwintComponent.PROVIDER.get(
+                        activity = activity,
+                        checkoutSession = checkoutSession,
+                        paymentMethod = paymentMethod,
+                        checkoutConfiguration = twintConfiguration,
+                        componentCallback = createInstantComponentSessionCallback(componentId),
+                        key = UUID.randomUUID().toString()
+                    )
+                }
+
+                Constants.INSTANT_ADVANCED_COMPONENT_KEY -> {
+                    TwintComponent.PROVIDER.get(
+                        activity = activity,
+                        paymentMethod = paymentMethod,
+                        checkoutConfiguration = twintConfiguration,
+                        callback = createInstantComponentAdvancedCallback(componentId),
+                        key = UUID.randomUUID().toString()
+                    )
+                }
+
+                else -> throw IllegalStateException("Twint component not available for payment flow.")
+            }
+
+        assignCurrentComponent(twintComponent)
+        ComponentLoadingBottomSheet.show(activity.supportFragmentManager, twintComponent)
     }
 
     private fun showInstantPaymentComponent(

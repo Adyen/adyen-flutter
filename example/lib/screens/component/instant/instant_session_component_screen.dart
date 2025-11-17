@@ -51,6 +51,8 @@ class InstantSessionComponentScreen extends StatelessWidget {
               _extractPaymentMethod(sessionCheckout.paymentMethods, "ideal");
           final payByBankPaymentMethodResponse = _extractPaymentMethod(
               sessionCheckout.paymentMethods, "paybybank");
+          final twintPaymentMethodResponse =
+              _extractPaymentMethod(sessionCheckout.paymentMethods, "twint");
 
           return Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -87,6 +89,13 @@ class InstantSessionComponentScreen extends StatelessWidget {
                 instantComponentConfiguration,
                 sessionCheckout,
                 'Pay by Bank',
+              ),
+              _buildPaymentButton(
+                context,
+                twintPaymentMethodResponse,
+                instantComponentConfiguration,
+                sessionCheckout,
+                'TWINT',
               ),
             ],
           );
