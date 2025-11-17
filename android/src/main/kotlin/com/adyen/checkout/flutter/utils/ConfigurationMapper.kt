@@ -36,12 +36,15 @@ import com.adyen.checkout.flutter.generated.MerchantInfoDTO
 import com.adyen.checkout.flutter.generated.OrderResponseDTO
 import com.adyen.checkout.flutter.generated.ShippingAddressParametersDTO
 import com.adyen.checkout.flutter.generated.TotalPriceStatus
+import com.adyen.checkout.flutter.generated.TwintConfigurationDTO
 import com.adyen.checkout.flutter.generated.UnencryptedCardDTO
 import com.adyen.checkout.googlepay.BillingAddressParameters
 import com.adyen.checkout.googlepay.GooglePayConfiguration
 import com.adyen.checkout.googlepay.MerchantInfo
 import com.adyen.checkout.googlepay.ShippingAddressParameters
 import com.adyen.checkout.googlepay.googlePay
+import com.adyen.checkout.twint.TwintConfiguration
+import com.adyen.checkout.twint.twint
 import com.google.android.gms.wallet.WalletConstants
 import java.util.Locale
 import com.adyen.checkout.cashapppay.CashAppPayEnvironment as SDKCashAppPayEnvironment
@@ -93,6 +96,11 @@ object ConfigurationMapper {
             val cashAppPayConfiguration =
                 buildCashAppPayConfiguration(context, shopperLocale, environment, cashAppPayConfigurationDTO)
             dropInConfiguration.addCashAppPayConfiguration(cashAppPayConfiguration)
+        }
+
+        if (twintConfigurationDTO != null) {
+            val twintConfiguration = buildTwintConfiguration(context, environment, twintConfigurationDTO)
+            dropInConfiguration.addTwintConfiguration(twintConfiguration)
         }
 
         paymentMethodNames?.forEach { paymentMethodNamePair ->
@@ -196,6 +204,21 @@ object ConfigurationMapper {
             }
 
         return cashAppPayConfigurationDTO.mapToCashAppPayConfiguration(cashAppPayConfigurationBuilder)
+    }
+
+    private fun DropInConfigurationDTO.buildTwintConfiguration(
+        context: Context,
+        environment: com.adyen.checkout.core.Environment,
+        twintConfigurationDTO: TwintConfigurationDTO
+    ): TwintConfiguration {
+        val twintConfigurationBuilder =
+            if (shopperLocale != null) {
+                val locale = Locale.forLanguageTag(shopperLocale)
+                TwintConfiguration.Builder(locale, environment, clientKey)
+            } else {
+                TwintConfiguration.Builder(context, environment, clientKey)
+            }
+        return twintConfigurationDTO.mapToTwintConfiguration(twintConfigurationBuilder)
     }
 
     private fun AddressMode.mapToAddressConfiguration(): AddressConfiguration =
@@ -357,6 +380,11 @@ object ConfigurationMapper {
         builder: CashAppPayConfiguration.Builder
     ): CashAppPayConfiguration {
         builder.setCashAppPayEnvironment(cashAppPayEnvironment.mapToCashAppPayEnvironment()).setReturnUrl(returnUrl)
+        return builder.build()
+    }
+
+    private fun TwintConfigurationDTO.mapToTwintConfiguration(builder: TwintConfiguration.Builder): TwintConfiguration {
+        builder.showStorePaymentField = this.showStorePaymentField
         return builder.build()
     }
 
