@@ -153,21 +153,19 @@ class InstantComponentManager(
         paymentMethod: PaymentMethod
     ) {
         // We use the web redirect for now and prevent storing the payment method to align with iOS
-        val twintConfiguration = configuration.apply {
-            twint {
-                showStorePaymentField = false
-                actionHandlingMethod = ActionHandlingMethod.PREFER_WEB
-            }
+        configuration.twint {
+            showStorePaymentField = false
+            actionHandlingMethod = ActionHandlingMethod.PREFER_WEB
         }
         val twintComponent =
             when (componentId) {
                 Constants.INSTANT_SESSION_COMPONENT_KEY -> {
-                    val checkoutSession = createCheckoutSession(twintConfiguration)
+                    val checkoutSession = createCheckoutSession(configuration)
                     TwintComponent.PROVIDER.get(
                         activity = activity,
                         checkoutSession = checkoutSession,
                         paymentMethod = paymentMethod,
-                        checkoutConfiguration = twintConfiguration,
+                        checkoutConfiguration = configuration,
                         componentCallback = createInstantComponentSessionCallback(componentId),
                         key = UUID.randomUUID().toString()
                     )
@@ -177,7 +175,7 @@ class InstantComponentManager(
                     TwintComponent.PROVIDER.get(
                         activity = activity,
                         paymentMethod = paymentMethod,
-                        checkoutConfiguration = twintConfiguration,
+                        checkoutConfiguration = configuration,
                         callback = createInstantComponentAdvancedCallback(componentId),
                         key = UUID.randomUUID().toString()
                     )

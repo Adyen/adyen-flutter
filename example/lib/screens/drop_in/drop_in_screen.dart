@@ -120,7 +120,7 @@ class DropInScreen extends StatelessWidget {
       returnUrl: returnUrl,
     );
 
-    //To support CashAppPay on iOS please add "pod 'Adyen/AdyenTwint'" to your Podfile.
+    //To support TWINT on iOS please add "pod 'Adyen/AdyenTwint'" to your Podfile.
     const TwintConfiguration twintConfiguration = TwintConfiguration(
       iosCallbackAppScheme: "com.mydomain.adyencheckout",
     );
