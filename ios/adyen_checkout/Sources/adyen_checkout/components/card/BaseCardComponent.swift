@@ -20,7 +20,8 @@ class BaseCardComponent: NSObject, FlutterPlatformView, UIScrollViewDelegate {
     let componentPlatformApi: ComponentPlatformApi
     let componentWrapperView: ComponentWrapperView
 
-    var cardComponent: CardComponent?
+    var cardComponent: AdyenCheckoutComponent?
+    var adyenCheckout: AdyenCheckout? = nil
     var contentOffset: CGPoint?
 
     init(
@@ -60,39 +61,95 @@ class BaseCardComponent: NSObject, FlutterPlatformView, UIScrollViewDelegate {
         return rootViewController
     }
     
-    func buildCardComponent(
-        paymentMethodString: String?,
-        isStoredPaymentMethod: Bool,
-        cardComponentConfiguration: CardComponentConfigurationDTO?,
-        componentDelegate: PaymentComponentDelegate?,
-        cardDelegate: CardComponentDelegate?
-    ) throws -> CardComponent {
-        guard let paymentMethodString = paymentMethod else { throw PlatformError(errorDescription: "Payment method not found") }
-        guard let cardComponentConfiguration else { throw PlatformError(errorDescription: "Card configuration not found") }
-        let adyenContext = try cardComponentConfiguration.createAdyenContext()
-        let cardConfiguration = cardComponentConfiguration.cardConfiguration.mapToCardComponentConfiguration(
-            shopperLocale: cardComponentConfiguration.shopperLocale)
-        let paymentMethod: AnyCardPaymentMethod = isStoredPaymentMethod
-            ? try JSONDecoder().decode(StoredCardPaymentMethod.self, from: Data(paymentMethodString.utf8))
-            : try JSONDecoder().decode(CardPaymentMethod.self, from: Data(paymentMethodString.utf8))
-        let cardComponent = CardComponent(
-            paymentMethod: paymentMethod,
-            context: adyenContext,
-            configuration: cardConfiguration
+    func buildCardComponentV6(sessionHolder: SessionHolder) async throws -> AdyenCheckoutComponent {
+        let viewController = getViewController()
+        let configuration = try CheckoutConfiguration(
+            environment: cardComponentConfiguration?.environment.mapToEnvironment() ?? Adyen.Environment.test,
+            amount: cardComponentConfiguration!.amount!.mapToAmount(),
+            clientKey: cardComponentConfiguration!.clientKey,
+            analyticsConfiguration: .init()
+        ){
+            
+        }.onComplete { [weak self] result in
+            let paymentResult = PaymentResultModelDTO(
+                sessionId: sessionHolder.sessionId,
+                sessionData: sessionHolder.sessionData,
+                sessionResult: result.sessionResult,
+                resultCode: result.resultCode.rawValue
+            )
+            let componentCommunicationModel = ComponentCommunicationModel(
+                type: ComponentCommunicationType.result,
+                componentId: self?.componentId ?? "",
+                paymentResult: PaymentResultDTO(
+                    type: PaymentResultEnum.finished,
+                    result: paymentResult
+                )
+            )
+            self?.componentFlutterApi.onComponentCommunication(
+                componentCommunicationModel: componentCommunicationModel,
+                completion: { _ in }
+            )
+        }.onError { [weak self] error in
+            let componentCommunicationModel = ComponentCommunicationModel(
+                type: ComponentCommunicationType.result,
+                componentId: self?.componentId ?? "",
+                paymentResult: PaymentResultDTO(
+                    type: .from(error: error),
+                    reason: error.localizedDescription
+                )
+            )
+            self?.componentFlutterApi.onComponentCommunication(
+                componentCommunicationModel: componentCommunicationModel,
+                completion: { _ in }
+            )
+        }
+            
+        let checkout = try await AdyenCheckout.setup(
+            with: sessionHolder.sessionId ?? "",
+            sessionData: sessionHolder.sessionData ?? "",
+            configuration: configuration,
+            presentationDelegate: viewController
         )
-        cardComponent.delegate = componentDelegate
-        cardComponent.cardComponentDelegate = cardDelegate
-        return cardComponent
+        adyenCheckout = checkout
+        guard let paymentMethods = checkout.paymentMethods else {throw PlatformError() }
+        guard let cardPaymentMethod = paymentMethods.paymentMethod(ofType: CardPaymentMethod.self) else {throw PlatformError() }
+        guard let component = checkout.createComponent(with: cardPaymentMethod) else {throw PlatformError() }
+        return component
     }
+    
+//    func buildCardComponent(
+//        paymentMethodString: String?,
+//        isStoredPaymentMethod: Bool,
+//        cardComponentConfiguration: CardComponentConfigurationDTO?,
+//        componentDelegate: PaymentComponentDelegate?,
+//        cardDelegate: CardComponentDelegate?
+//    ) throws -> CardComponent {
+//        guard let paymentMethodString = paymentMethod else { throw PlatformError(errorDescription: "Payment method not found") }
+//        guard let cardComponentConfiguration else { throw PlatformError(errorDescription: "Card configuration not found") }
+//        let adyenContext = try cardComponentConfiguration.createAdyenContext()
+//        let cardConfiguration = cardComponentConfiguration.cardConfiguration.mapToCardComponentConfiguration(
+//            shopperLocale: cardComponentConfiguration.shopperLocale)
+//        let paymentMethod: AnyCardPaymentMethod = isStoredPaymentMethod
+//            ? try JSONDecoder().decode(StoredCardPaymentMethod.self, from: Data(paymentMethodString.utf8))
+//            : try JSONDecoder().decode(CardPaymentMethod.self, from: Data(paymentMethodString.utf8))
+//        let cardComponent = CardComponent(
+//            paymentMethod: paymentMethod,
+//            context: adyenContext,
+//            configuration: cardConfiguration
+//        )
+//        cardComponent.delegate = componentDelegate
+//        cardComponent.cardComponentDelegate = cardDelegate
+//        return cardComponent
+//    }
 
-    func showCardComponent(cardComponent: CardComponent) {
+    func showCardComponent(cardComponent: AdyenCheckoutComponent) {
         self.cardComponent = cardComponent
         if isStoredPaymentMethod {
             let storedCardViewController = cardComponent.viewController
             attachActivityIndicator()
-            getViewController()?.presentViewController(storedCardViewController, animated: true)
+            getViewController()?.presentViewController(storedCardViewController!, animated: true)
         } else {
-            guard let cardView = cardComponent.viewController.view else { return }
+            guard let cardView = cardComponent.viewController!.view else { return }
             attachCardView(cardView: cardView)
         }
     }
@@ -129,11 +186,11 @@ class BaseCardComponent: NSObject, FlutterPlatformView, UIScrollViewDelegate {
         success: Bool,
         completion: @escaping (() -> Void)
     ) {
-        cardComponent?.finalizeIfNeeded(with: success) { [weak self] in
-            self?.getViewController()?.dismiss(animated: true, completion: {
-                completion()
-            })
-        }
+//        cardComponent?.finalizeIfNeeded(with: success) { [weak self] in
+//            self?.getViewController()?.dismiss(animated: true, completion: {
+//                completion()
+//            })
+//        }
     }
 
     private func disableNativeScrollingAndBouncing(cardView: UIView) {
@@ -156,7 +213,7 @@ class BaseCardComponent: NSObject, FlutterPlatformView, UIScrollViewDelegate {
     }
 
     private func sendHeightUpdate() {
-        guard let viewHeight = cardComponent?.viewController.preferredContentSize.height else { return }
+        guard let viewHeight = cardComponent?.viewController?.preferredContentSize.height else { return }
         let additionalViewportSpace = determineAdditionalViewportSpace()
         let roundedViewHeight = Int(viewHeight + additionalViewportSpace)
         let componentCommunicationModel = ComponentCommunicationModel(

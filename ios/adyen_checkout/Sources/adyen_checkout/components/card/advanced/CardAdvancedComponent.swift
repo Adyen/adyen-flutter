@@ -41,34 +41,34 @@ class CardAdvancedComponent: BaseCardComponent {
 
     private func setupCardComponentView() {
         do {
-            let cardComponent = try setupCardComponent()
-            actionComponent = buildActionComponent(adyenContext: cardComponent.context)
-            showCardComponent(cardComponent: cardComponent)
+//            let cardComponent = try setupCardComponent()
+//            actionComponent = buildActionComponent(adyenContext: cardComponent.context)
+//            showCardComponent(cardComponent: cardComponent)
             componentPlatformApi.onActionCallback = { [weak self] jsonActionResponse in
                 self?.onAction(actionResponse: jsonActionResponse)
             }
             componentPlatformApi.onErrorCallback = { [weak self] error in
-                self?.cardComponent?.stopLoading()
-                self?.sendErrorToFlutterLayer(errorMessage: error?.errorMessage ?? "")
+//                self?.cardComponent?.stopLoading()
+//                self?.sendErrorToFlutterLayer(errorMessage: error?.errorMessage ?? "")
             }
         } catch {
             sendErrorToFlutterLayer(errorMessage: error.localizedDescription)
         }
     }
 
-    private func setupCardComponent() throws -> CardComponent {
-        componentDelegate = CardAdvancedFlowDelegate(
-            componentFlutterApi: componentFlutterApi,
-            componentId: componentId
-        )
-        return try buildCardComponent(
-            paymentMethodString: paymentMethod,
-            isStoredPaymentMethod: isStoredPaymentMethod,
-            cardComponentConfiguration: cardComponentConfiguration,
-            componentDelegate: componentDelegate,
-            cardDelegate: self
-        )
-    }
+//    private func setupCardComponent() throws -> CardComponent {
+//        componentDelegate = CardAdvancedFlowDelegate(
+//            componentFlutterApi: componentFlutterApi,
+//            componentId: componentId
+//        )
+//        return try buildCardComponent(
+//            paymentMethodString: paymentMethod,
+//            isStoredPaymentMethod: isStoredPaymentMethod,
+//            cardComponentConfiguration: cardComponentConfiguration,
+//            componentDelegate: componentDelegate,
+//            cardDelegate: self
+//        )
+//    }
 
     private func buildActionComponent(adyenContext: AdyenContext) -> AdyenActionComponent {
         let actionComponent = AdyenActionComponent(context: adyenContext)

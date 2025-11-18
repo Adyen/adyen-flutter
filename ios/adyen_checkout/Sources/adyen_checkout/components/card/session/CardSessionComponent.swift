@@ -28,38 +28,33 @@ class CardSessionComponent: BaseCardComponent {
             componentFlutterApi: componentFlutterApi,
             componentPlatformApi: componentPlatformApi
         )
-
-        setupCardComponentView()
-        setupSessionFlowDelegate()
+        
+        Task {
+            do {
+                await setupCardComponentView()
+            }
+        }
     }
 
-    private func setupCardComponentView() {
+    private func setupCardComponentView() async {
         do {
-            let cardComponent = try setupCardComponent()
+            let cardComponent = try await setupCardComponent()
             showCardComponent(cardComponent: cardComponent)
         } catch {
             sendErrorToFlutterLayer(errorMessage: error.localizedDescription)
         }
     }
 
-    private func setupCardComponent() throws -> CardComponent {
-        guard let session = sessionHolder.session else { throw PlatformError(errorDescription: "Session not found") }
-        return try buildCardComponent(
-            paymentMethodString: paymentMethod,
-            isStoredPaymentMethod: isStoredPaymentMethod,
-            cardComponentConfiguration: cardComponentConfiguration,
-            componentDelegate: session,
-            cardDelegate: self
-        )
-    }
-
-    private func setupSessionFlowDelegate() {
-        if let componentSessionFlowDelegate = (sessionHolder.sessionDelegate as? ComponentSessionFlowHandler) {
-            componentSessionFlowDelegate.finalizeCallback = finalizeAndDismissSessionComponent
-            componentSessionFlowDelegate.componentId = componentId
-        } else {
-            AdyenAssertion.assertionFailure(message: "Wrong session flow delegate usage")
-        }
+    private func setupCardComponent() async throws -> AdyenCheckoutComponent {
+        return try await buildCardComponentV6(sessionHolder: sessionHolder)
+//        guard let session = sessionHolder.session else { throw PlatformError(errorDescription: "Session not found") }
+//        return try buildCardComponent(
+//            paymentMethodString: paymentMethod,
+//            isStoredPaymentMethod: isStoredPaymentMethod,
+//            cardComponentConfiguration: cardComponentConfiguration,
+//            componentDelegate: session,
+//            cardDelegate: self
+//        )
     }
 
     func finalizeAndDismissSessionComponent(success: Bool, completion: @escaping (() -> Void)) {

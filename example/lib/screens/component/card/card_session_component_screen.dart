@@ -23,6 +23,7 @@ class CardSessionComponentScreen extends StatelessWidget {
       clientKey: Config.clientKey,
       countryCode: Config.countryCode,
       shopperLocale: Config.shopperLocale,
+      amount: Config.amount,
       cardConfiguration: CardConfiguration(
         onBinLookup: _onBinLookup,
         onBinValue: _onBinValue,

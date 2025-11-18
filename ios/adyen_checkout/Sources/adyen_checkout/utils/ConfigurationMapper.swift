@@ -95,16 +95,16 @@ extension DropInConfigurationDTO {
 
     private func determineBillingAddressConfiguration(addressMode: AddressMode?) -> BillingAddressConfiguration {
         var billingAddressConfiguration = BillingAddressConfiguration()
-        switch addressMode {
-        case .full:
-            billingAddressConfiguration.mode = CardComponent.AddressFormType.full
-        case .postalCode:
-            billingAddressConfiguration.mode = CardComponent.AddressFormType.postalCode
-        case .none:
-            billingAddressConfiguration.mode = CardComponent.AddressFormType.none
-        default:
-            billingAddressConfiguration.mode = CardComponent.AddressFormType.none
-        }
+//        switch addressMode {
+//        case .full:
+//            billingAddressConfiguration.mode = CardComponent.AddressFormType.full
+//        case .postalCode:
+//            billingAddressConfiguration.mode = CardComponent.AddressFormType.postalCode
+//        case .none:
+//            billingAddressConfiguration.mode = CardComponent.AddressFormType.none
+//        default:
+//            billingAddressConfiguration.mode = CardComponent.AddressFormType.none
+//        }
 
         return billingAddressConfiguration
     }
@@ -112,7 +112,7 @@ extension DropInConfigurationDTO {
 }
 
 extension FieldVisibility {
-    func toCardFieldVisibility() -> CardComponent.FieldVisibility {
+    func toCardFieldVisibility() -> CardComponentConfiguration.FieldVisibility {
         switch self {
         case .show:
             return .show
@@ -135,7 +135,7 @@ extension DropInConfigurationDTO {
 }
 
 extension CardConfigurationDTO {
-    func mapToCardComponentConfiguration(shopperLocale: String?) -> CardComponent.Configuration {
+    func mapToCardComponentConfiguration(shopperLocale: String?) -> CardComponentConfiguration {
         let cardComponentStyle = AdyenAppearance.cardComponentStyle
         let localizationParameters = shopperLocale != nil ? LocalizationParameters(enforcedLocale: shopperLocale!) : nil
         let koreanAuthenticationMode = kcpFieldVisibility.toCardFieldVisibility()
@@ -143,7 +143,7 @@ extension CardConfigurationDTO {
         let storedCardConfiguration = createStoredCardConfiguration(showCvcForStoredCard: showCvcForStoredCard)
         let allowedCardTypes = determineAllowedCardTypes(cardTypes: supportedCardTypes)
         let billingAddressConfiguration = determineBillingAddressConfiguration(addressMode: addressMode)
-        return CardComponent.Configuration(
+        return CardComponentConfiguration(
             style: cardComponentStyle,
             localizationParameters: localizationParameters,
             showsHolderNameField: holderNameRequired,
@@ -151,9 +151,9 @@ extension CardConfigurationDTO {
             showsSecurityCodeField: showCvc,
             koreanAuthenticationMode: koreanAuthenticationMode,
             socialSecurityNumberMode: socialSecurityNumberMode,
-            storedCardConfiguration: storedCardConfiguration,
+//            storedCardConfiguration: storedCardConfiguration,
             allowedCardTypes: allowedCardTypes,
-            billingAddress: billingAddressConfiguration
+//            billingAddress: billingAddressConfiguration
         )
     }
 
@@ -173,16 +173,16 @@ extension CardConfigurationDTO {
 
     private func determineBillingAddressConfiguration(addressMode: AddressMode?) -> BillingAddressConfiguration {
         var billingAddressConfiguration = BillingAddressConfiguration()
-        switch addressMode {
-        case .full:
-            billingAddressConfiguration.mode = CardComponent.AddressFormType.full
-        case .postalCode:
-            billingAddressConfiguration.mode = CardComponent.AddressFormType.postalCode
-        case .none:
-            billingAddressConfiguration.mode = CardComponent.AddressFormType.none
-        default:
-            billingAddressConfiguration.mode = CardComponent.AddressFormType.none
-        }
+//        switch addressMode {
+//        case .full:
+//            billingAddressConfiguration.mode = CardComponent.AddressFormType.full
+//        case .postalCode:
+//            billingAddressConfiguration.mode = CardComponent.AddressFormType.postalCode
+//        case .none:
+//            billingAddressConfiguration.mode = CardComponent.AddressFormType.none
+//        default:
+//            billingAddressConfiguration.mode = CardComponent.AddressFormType.none
+//        }
 
         return billingAddressConfiguration
     }
@@ -197,6 +197,14 @@ extension CardComponentConfigurationDTO {
             analyticsOptionsDTO: analyticsOptionsDTO,
             countryCode: countryCode
         )
+    }
+    
+    func createCheckoutConfiguration() throws -> CheckoutConfiguration {
+        return try CheckoutConfiguration(
+            environment: environment.mapToEnvironment(),
+            amount: amount!.mapToAmount(), //The amount can be optional
+            clientKey: clientKey,
+        ){}
     }
 }
 

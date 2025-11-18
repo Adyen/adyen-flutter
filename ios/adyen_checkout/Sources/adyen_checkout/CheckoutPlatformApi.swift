@@ -36,44 +36,47 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
         configuration: Any?,
         completion: @escaping (Result<SessionDTO, Error>) -> Void
     ) {
-        do {
-            switch configuration {
-            case let dropInConfigurationDTO as DropInConfigurationDTO:
-                Task {
-                    let sessionDelegate = DropInSessionsDelegate(viewController: getViewController(), checkoutFlutter: checkoutFlutter)
-                    await setSession(
+        Task {
+            do {
+                switch configuration {
+                case let dropInConfigurationDTO as DropInConfigurationDTO:
+                    Task {
+                        let sessionDelegate = DropInSessionsDelegate(viewController: getViewController(), checkoutFlutter: checkoutFlutter)
+                        await setSession(
+                            sessionId: sessionId,
+                            sessionData: sessionData,
+                            sessionDelegate: sessionDelegate,
+                            configuration: dropInConfigurationDTO,
+                            completion: completion
+                        )
+                    }
+                    //                try createSessionForDropIn(
+                    //                    adyenContext: dropInConfigurationDTO.createAdyenContext(),
+                    //                    sessionId: sessionId,
+                    //                    sessionData: sessionData,
+                    //                    completion: completion
+                    //                )
+                case let cardComponentConfigurationDTO as CardComponentConfigurationDTO:
+                    try await createSessionForComponent(
+                        configuration: cardComponentConfigurationDTO.createCheckoutConfiguration(),
                         sessionId: sessionId,
                         sessionData: sessionData,
-                        sessionDelegate: sessionDelegate,
-                        configuration: dropInConfigurationDTO,
                         completion: completion
-                     )
+                    )
+//                case let instantComponentConfigurationDTO as InstantPaymentConfigurationDTO:
+                    //                try createSessionForComponent(
+                    //                    configuration: instantComponentConfigurationDTO.createCheckoutConfiguration(),
+                    //                    adyenContext: instantComponentConfigurationDTO.createAdyenContext(),
+                    //                    sessionId: sessionId,
+                    //                    sessionData: sessionData,
+                    //                    completion: completion
+                    //                )
+                case .none, .some:
+                    completion(Result.failure(PlatformError(errorDescription: "Configuration is not valid")))
                 }
-//                try createSessionForDropIn(
-//                    adyenContext: dropInConfigurationDTO.createAdyenContext(),
-//                    sessionId: sessionId,
-//                    sessionData: sessionData,
-//                    completion: completion
-//                )
-            case let cardComponentConfigurationDTO as CardComponentConfigurationDTO:
-                try createSessionForComponent(
-                    adyenContext: cardComponentConfigurationDTO.createAdyenContext(),
-                    sessionId: sessionId,
-                    sessionData: sessionData,
-                    completion: completion
-                )
-            case let instantComponentConfigurationDTO as InstantPaymentConfigurationDTO:
-                try createSessionForComponent(
-                    adyenContext: instantComponentConfigurationDTO.createAdyenContext(),
-                    sessionId: sessionId,
-                    sessionData: sessionData,
-                    completion: completion
-                )
-            case .none, .some:
-                completion(Result.failure(PlatformError(errorDescription: "Configuration is not valid")))
+            } catch {
+                completion(Result.failure(error))
             }
-        } catch {
-            completion(Result.failure(error))
         }
     }
     
@@ -119,33 +122,32 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
     }
 
     private func createSessionForDropIn(
+        configuration: CheckoutConfiguration,
         adyenContext: AdyenContext,
         sessionId: String,
         sessionData: String,
         completion: @escaping (Result<SessionDTO, Error>) -> Void
-    ) throws {
+    ) async throws {
         let sessionDelegate = DropInSessionsDelegate(viewController: getViewController(), checkoutFlutter: checkoutFlutter)
-        try requestAndSetSession(
-            adyenContext: adyenContext,
+        try await requestAndSetSession(
+            checkoutConfiguration: configuration,
             sessionId: sessionId,
             sessionData: sessionData,
-            sessionDelegate: sessionDelegate,
             completion: completion
         )
     }
 
     private func createSessionForComponent(
-        adyenContext: AdyenContext,
+        configuration: CheckoutConfiguration,
         sessionId: String,
         sessionData: String,
         completion: @escaping (Result<SessionDTO, Error>) -> Void
-    ) throws {
+    ) async throws {
         let sessionDelegate = ComponentSessionFlowHandler(componentFlutterApi: componentFlutterApi)
-        try requestAndSetSession(
-            adyenContext: adyenContext,
+        try await requestAndSetSession(
+            checkoutConfiguration: configuration,
             sessionId: sessionId,
             sessionData: sessionData,
-            sessionDelegate: sessionDelegate,
             completion: completion
         )
     }
@@ -179,23 +181,36 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
     }
 
     private func requestAndSetSession(
-        adyenContext: AdyenContext,
+        checkoutConfiguration: CheckoutConfiguration,
         sessionId: String,
         sessionData: String,
-        sessionDelegate: AdyenSessionDelegate,
         completion: @escaping (Result<SessionDTO, Error>) -> Void
-    ) throws {
-        guard let presentationDelegate = getViewController() else {
-            throw PlatformError(errorDescription: "Host view controller not available.")
-        }
+    ) async throws {
+//        guard let presentationDelegate = getViewController() else {
+//            throw PlatformError(errorDescription: "Host view controller not available.")
+//        }
         
-//        let sessionConfiguration = AdyenSession.State(
-//            sessionIdentifier: sessionId,
-//            initialSessionData: sessionData,
-//            context: adyenContext,
-//            actionComponent: .init()
-//        )
-//        
+        let adyenCheckout = try await AdyenCheckout.setup(
+            with: sessionId,
+            sessionData: sessionData,
+            configuration: checkoutConfiguration,
+        )
+
+        sessionHolder.sessionId = sessionId
+        sessionHolder.sessionData = sessionData
+        
+        let encodedPaymentMethods = try JSONEncoder().encode(adyenCheckout.paymentMethods)
+        guard let encodedPaymentMethodsString = String(data: encodedPaymentMethods, encoding: .utf8) else {
+            completion(Result.failure(PlatformError(errorDescription: "Encoding payment methods failed")))
+            return
+        }
+        completion(Result.success(SessionDTO(
+            id: sessionId,
+            sessionData: sessionData,
+            paymentMethodsJson: encodedPaymentMethodsString
+        )))
+        
+//
 //        AdyenSession.setup(
 //            with: sessionConfiguration,
 //            delegate: sessionDelegate,
