@@ -28,7 +28,7 @@ import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToCardConfigurati
 import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToCheckoutConfiguration
 import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToDropInConfiguration
 import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToEnvironment
-import com.adyen.checkout.redirect.RedirectComponent
+import com.adyen.checkout.redirect.old.RedirectComponent
 import com.adyen.checkout.sessions.core.CheckoutSessionProvider
 import com.adyen.checkout.sessions.core.CheckoutSessionResult
 import com.adyen.checkout.sessions.core.SessionModel

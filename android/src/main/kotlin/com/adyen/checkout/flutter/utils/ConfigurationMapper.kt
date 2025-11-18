@@ -12,8 +12,8 @@ import com.adyen.checkout.components.core.AnalyticsConfiguration
 import com.adyen.checkout.components.core.AnalyticsLevel
 import com.adyen.checkout.components.core.CheckoutConfiguration
 import com.adyen.checkout.components.core.OrderResponse
-import com.adyen.checkout.components.core.internal.util.CheckoutPlatform
-import com.adyen.checkout.components.core.internal.util.CheckoutPlatformParams
+import com.adyen.checkout.core.common.internal.helper.CheckoutPlatform
+import com.adyen.checkout.core.common.internal.helper.CheckoutPlatformParams
 import com.adyen.checkout.cse.EncryptedCard
 import com.adyen.checkout.cse.UnencryptedCard
 import com.adyen.checkout.dropin.old.DropInConfiguration
