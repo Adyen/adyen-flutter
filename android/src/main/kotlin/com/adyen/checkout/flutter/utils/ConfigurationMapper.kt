@@ -12,8 +12,8 @@ import com.adyen.checkout.components.core.AnalyticsConfiguration
 import com.adyen.checkout.components.core.AnalyticsLevel
 import com.adyen.checkout.components.core.CheckoutConfiguration
 import com.adyen.checkout.components.core.OrderResponse
-import com.adyen.checkout.components.core.internal.analytics.AnalyticsPlatform
-import com.adyen.checkout.components.core.internal.analytics.AnalyticsPlatformParams
+import com.adyen.checkout.components.core.internal.util.CheckoutPlatform
+import com.adyen.checkout.components.core.internal.util.CheckoutPlatformParams
 import com.adyen.checkout.cse.EncryptedCard
 import com.adyen.checkout.cse.UnencryptedCard
 import com.adyen.checkout.dropin.old.DropInConfiguration
@@ -160,7 +160,7 @@ object ConfigurationMapper {
                 enabled -> AnalyticsLevel.ALL
                 else -> AnalyticsLevel.NONE
             }
-        AnalyticsPlatformParams.overrideForCrossPlatform(AnalyticsPlatform.FLUTTER, version)
+        CheckoutPlatformParams.overrideForCrossPlatform(CheckoutPlatform.FLUTTER, version)
         return AnalyticsConfiguration(analyticsLevel)
     }
 

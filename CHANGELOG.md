@@ -1,3 +1,14 @@
+## 1.8.0 (in development)
+
+### Changed
+
+- Dependency versions:
+  | Name | Version |
+  |---------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------|
+  | [iOS Drop-in/Components](https://docs.adyen.com/online-payments/release-notes/?title%5B0%5D=iOS+Components%2FDrop-in#releaseNote=2025-11-04-ios-componentsdrop-in-5.21.1) |  5.21.1 |
+  | [Android Drop-in/Components](https://docs.adyen.com/online-payments/release-notes/#releaseNote=2025-08-19-android-componentsdrop-in-5.15.0)                               |  5.15.0 |
+
+
 ## 1.7.0
 
 ### New
