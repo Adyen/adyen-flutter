@@ -1,5 +1,4 @@
 buildscript {
-    ext.kotlin_version = '2.1.0'
     repositories {
         google()
         mavenCentral()
@@ -7,7 +6,7 @@ buildscript {
 
     dependencies {
         classpath 'com.android.tools.build:gradle:8.9.2'
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        classpath 'org.jetbrains.kotlin:kotlin-gradle-plugin:2.1.0'
     }
 }
 
@@ -33,10 +32,11 @@ apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 apply from: 'ktlint.gradle'
 apply from: 'jacoco.gradle'
+apply plugin: 'org.jetbrains.kotlin.plugin.compose'
 
 android {
     namespace = "com.adyen.checkout.flutter"
-    compileSdk 35
+    compileSdk 36
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
@@ -45,6 +45,10 @@ android {
 
     kotlinOptions {
         jvmTarget = '1.8'
+    }
+
+    buildFeatures {
+        compose true
     }
 
     sourceSets {
@@ -60,6 +64,17 @@ android {
     dependencies {
         implementation 'com.github.Robert-SD.adyen-android:drop-in:develop-SNAPSHOT'
         implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
+        
+        // Compose Dependencies
+        implementation 'androidx.compose.ui:ui:1.9.5'
+        implementation 'androidx.compose.material3:material3:1.4.0'
+        implementation 'androidx.compose.ui:ui-tooling-preview:1.9.5'
+        implementation 'androidx.activity:activity-compose:1.12.0'
+        
+        // Debug tools for Compose
+        debugImplementation 'androidx.compose.ui:ui-tooling:1.9.5'
+        debugImplementation 'androidx.compose.ui:ui-test-manifest:1.9.5'
+        
         testImplementation 'org.jetbrains.kotlin:kotlin-test'
         testImplementation 'org.mockito:mockito-core:5.17.0'
     }
