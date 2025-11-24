@@ -4,7 +4,7 @@ class TwintConfiguration {
 
   const TwintConfiguration({
     this.iosCallbackAppScheme = "",
-    this.showStorePaymentField = true,
+    this.showStorePaymentField = false,
   });
 
   @override
