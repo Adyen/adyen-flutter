@@ -69,7 +69,9 @@ class BaseCardComponent: NSObject, FlutterPlatformView, UIScrollViewDelegate {
             clientKey: cardComponentConfiguration!.clientKey,
             analyticsConfiguration: .init()
         ){
-            
+            CardComponentConfiguration(
+                showsHolderNameField: false,
+            )
         }.onComplete { [weak self] result in
             let paymentResult = PaymentResultModelDTO(
                 sessionId: sessionHolder.sessionId,

@@ -44,15 +44,18 @@ class CardSessionComponentScreen extends StatelessWidget {
               return SingleChildScrollView(
                 child: Column(
                   children: [
-                    AdyenCardComponent(
-                      configuration: cardComponentConfiguration,
-                      paymentMethod: paymentMethod,
-                      checkout: sessionCheckout,
-                      onPaymentResult: (paymentResult) async {
-                        Navigator.pop(context);
-                        DialogBuilder.showPaymentResultDialog(
-                            paymentResult, context);
-                      },
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: AdyenCardComponent(
+                        configuration: cardComponentConfiguration,
+                        paymentMethod: paymentMethod,
+                        checkout: sessionCheckout,
+                        onPaymentResult: (paymentResult) async {
+                          Navigator.pop(context);
+                          DialogBuilder.showPaymentResultDialog(
+                              paymentResult, context);
+                        },
+                      ),
                     ),
                     Container(height: 800),
                   ],

@@ -1,11 +1,13 @@
 package com.adyen.checkout.flutter.utils
 
 import android.content.Context
+import com.adyen.checkout.card.card
 import com.adyen.checkout.card.old.AddressConfiguration
 import com.adyen.checkout.card.old.CardConfiguration
 import com.adyen.checkout.card.old.CardType
 import com.adyen.checkout.card.old.KCPAuthVisibility
 import com.adyen.checkout.card.old.SocialSecurityNumberVisibility
+import com.adyen.checkout.card.old.card
 import com.adyen.checkout.cashapppay.CashAppPayConfiguration
 import com.adyen.checkout.components.core.Amount
 import com.adyen.checkout.components.core.AnalyticsConfiguration
@@ -22,6 +24,7 @@ import com.adyen.checkout.flutter.generated.AddressMode
 import com.adyen.checkout.flutter.generated.AmountDTO
 import com.adyen.checkout.flutter.generated.AnalyticsOptionsDTO
 import com.adyen.checkout.flutter.generated.BillingAddressParametersDTO
+import com.adyen.checkout.flutter.generated.CardComponentConfigurationDTO
 import com.adyen.checkout.flutter.generated.CardConfigurationDTO
 import com.adyen.checkout.flutter.generated.CashAppPayConfigurationDTO
 import com.adyen.checkout.flutter.generated.CashAppPayEnvironment
@@ -117,6 +120,25 @@ object ConfigurationMapper {
         } else {
             DropInConfiguration.Builder(context, environment, clientKey)
         }
+
+    fun CardComponentConfigurationDTO.mapToCheckoutConfiguration():
+        com.adyen.checkout.core.components.CheckoutConfiguration =
+        com.adyen.checkout.core.components
+            .CheckoutConfiguration(
+                environment = com.adyen.checkout.core.common.Environment.TEST,
+                clientKey = clientKey,
+                shopperLocale = shopperLocale?.let { Locale.forLanguageTag(it) },
+                amount =
+                    amount?.let {
+                        com.adyen.checkout.core.components.data.model.Amount(
+                            currency = amount.currency,
+                            value = amount.value
+                        )
+                    },
+            ).apply {
+                card {
+                }
+            }
 
     fun CardConfigurationDTO.mapToCardConfiguration(
         context: Context,

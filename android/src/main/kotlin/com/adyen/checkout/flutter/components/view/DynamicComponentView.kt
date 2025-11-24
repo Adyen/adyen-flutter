@@ -1,5 +1,6 @@
 package com.adyen.checkout.flutter.components.view
 
+import android.content.ComponentCallbacks
 import android.content.Context
 import android.util.AttributeSet
 import android.view.ViewGroup
@@ -7,11 +8,17 @@ import android.view.ViewTreeObserver
 import android.widget.FrameLayout
 import androidx.activity.ComponentActivity
 import androidx.appcompat.widget.SwitchCompat
+import androidx.compose.material3.Text
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.core.content.ContextCompat
 import androidx.core.view.children
 import androidx.core.view.postDelayed
 import com.adyen.checkout.card.old.CardComponent
 import com.adyen.checkout.components.core.internal.Component
+import com.adyen.checkout.core.common.CheckoutContext
+import com.adyen.checkout.core.components.AdyenPaymentFlow
+import com.adyen.checkout.core.components.CheckoutCallbacks
 import com.adyen.checkout.flutter.generated.ComponentCommunicationModel
 import com.adyen.checkout.flutter.generated.ComponentCommunicationType
 import com.adyen.checkout.flutter.generated.ComponentFlutterInterface
@@ -71,13 +78,34 @@ class DynamicComponentView
             component: T,
             activity: ComponentActivity,
         ) where T : Component, T : ViewableComponent {
-            val adyenComponentView =
-                AdyenComponentView(context).apply {
-                    onComponentViewGlobalLayout(this, component)
-                    attach(component, activity)
-                }
+//            val adyenComponentView =
+//                AdyenComponentView(context).apply {
+//                    onComponentViewGlobalLayout(this, component)
+//                    attach(component, activity)
+//                }
+//
+//            addView(adyenComponentView)
+//            addView(TextView(context).apply { text = "AAAA" })
+//            addView(composeView)
+        }
 
-            addView(adyenComponentView)
+        fun addV6Component(
+            checkoutContext: CheckoutContext,
+            callbacks: CheckoutCallbacks
+        ) {
+            addView(
+                ComposeView(context).apply {
+                    setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+
+                    setContent {
+                        AdyenPaymentFlow(
+                            "scheme",
+                            checkoutContext = checkoutContext,
+                            checkoutCallbacks = callbacks
+                        )
+                    }
+                }
+            )
         }
 
         fun onDispose() {

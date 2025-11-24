@@ -4,6 +4,8 @@ import android.content.Context
 import android.view.View
 import androidx.activity.ComponentActivity
 import com.adyen.checkout.card.old.CardComponent
+import com.adyen.checkout.core.common.CheckoutContext
+import com.adyen.checkout.core.components.CheckoutCallbacks
 import com.adyen.checkout.flutter.components.view.DynamicComponentView
 import com.adyen.checkout.flutter.generated.BinLookupDataDTO
 import com.adyen.checkout.flutter.generated.CardComponentConfigurationDTO
@@ -25,7 +27,7 @@ abstract class BaseCardComponent(
     private val onDispose: (String) -> Unit,
     private val setCurrentCardComponent: (BaseCardComponent) -> Unit,
 ) : PlatformView {
-    private val configuration =
+    val configuration =
         creationParams[CARD_COMPONENT_CONFIGURATION_KEY] as CardComponentConfigurationDTO?
             ?: throw Exception("Card configuration not found")
     internal val paymentMethodString = creationParams[PAYMENT_METHOD_KEY] as String? ?: ""
@@ -55,6 +57,13 @@ abstract class BaseCardComponent(
         setOnBinLookupListener(cardComponent)
         setOnBinValueListener(cardComponent)
         dynamicComponentView.addComponent(cardComponent, activity)
+    }
+
+    fun addV6Component(
+        checkoutContext: CheckoutContext,
+        callbacks: CheckoutCallbacks
+    ) {
+        dynamicComponentView.addV6Component(checkoutContext, callbacks)
     }
 
     fun setCurrentCardComponent() = setCurrentCardComponent(this)
