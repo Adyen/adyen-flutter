@@ -42,6 +42,9 @@ secrets.json
 .history
 .svn/
 
+#windsurf
+.windsurf/
+
 # IntelliJ related
 *.iml
 *.ipr
