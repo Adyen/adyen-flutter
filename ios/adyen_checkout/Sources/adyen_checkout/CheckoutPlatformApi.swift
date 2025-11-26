@@ -198,7 +198,7 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
     private func buildActionComponentConfiguration(from threeDS2ConfigurationDTO: ThreeDS2ConfigurationDTO?) -> AdyenActionComponent.Configuration? {
         threeDS2ConfigurationDTO.map {
             var actionComponentConfiguration = AdyenActionComponent.Configuration()
-            actionComponentConfiguration.threeDS = buildThreeDS2Configuration(from: $0)
+            actionComponentConfiguration.threeDS = $0.mapToThreeDS2Configuration()
             return actionComponentConfiguration
         }
     }

@@ -50,7 +50,7 @@ extension DropInConfigurationDTO {
 
 
         if let threeDS2ConfigurationDTO {
-            dropInConfiguration.actionComponent.threeDS = buildThreeDS2Configuration(from: threeDS2ConfigurationDTO)
+            dropInConfiguration.actionComponent.threeDS = threeDS2ConfigurationDTO.mapToThreeDS2Configuration()
         }
 
         dropInConfiguration.style = AdyenAppearance.dropInStyle
@@ -131,7 +131,7 @@ extension DropInConfigurationDTO {
 }
 
 extension CardConfigurationDTO {
-    func mapToCardComponentConfiguration(shopperLocale: String?, threeDS2ConfigurationDTO: ThreeDS2ConfigurationDTO? = nil) -> CardComponent.Configuration {
+    func mapToCardComponentConfiguration(shopperLocale: String?) -> CardComponent.Configuration {
         let cardComponentStyle = AdyenAppearance.cardComponentStyle
         let localizationParameters = shopperLocale != nil ? LocalizationParameters(enforcedLocale: shopperLocale!) : nil
         let koreanAuthenticationMode = kcpFieldVisibility.toCardFieldVisibility()
@@ -181,15 +181,6 @@ extension CardConfigurationDTO {
         }
 
         return billingAddressConfiguration
-    }
-
-    private func buildCardThreeDS2Configuration(from threeDS2ConfigurationDTO: ThreeDS2ConfigurationDTO) -> AdyenActionComponent.Configuration.ThreeDS {
-        guard let url = URL(string: threeDS2ConfigurationDTO.requestorAppURL) else {
-            fatalError("Invalid URL string for requestorAppURL: \(threeDS2ConfigurationDTO.requestorAppURL)")
-        }
-        return AdyenActionComponent.Configuration.ThreeDS(
-            requestorAppURL: url
-        )
     }
 }
 
@@ -250,7 +241,7 @@ extension InstantPaymentConfigurationDTO {
     }
 }
 
-func buildAdyenContext(environment: Environment, clientKey: String, amount: AmountDTO?, analyticsOptionsDTO: AnalyticsOptionsDTO, countryCode: String?) throws -> AdyenContext {
+private func buildAdyenContext(environment: Environment, clientKey: String, amount: AmountDTO?, analyticsOptionsDTO: AnalyticsOptionsDTO, countryCode: String?) throws -> AdyenContext {
     let environment = environment.mapToEnvironment()
     let apiContext = try APIContext(
         environment: environment,
@@ -341,7 +332,9 @@ extension ActionComponentConfigurationDTO {
     }
 }
 
-func buildThreeDS2Configuration(from threeDS2ConfigurationDTO: ThreeDS2ConfigurationDTO) -> AdyenActionComponent.Configuration.ThreeDS {
-    guard let url = URL(string: threeDS2ConfigurationDTO.requestorAppURL) else { return .init() }
-    return .init(requestorAppURL: url)
+extension ThreeDS2ConfigurationDTO {
+    func mapToThreeDS2Configuration() -> AdyenActionComponent.Configuration.ThreeDS {
+        guard let url = URL(string: requestorAppURL) else { return .init() }
+        return .init(requestorAppURL: url)
+    }
 }
