@@ -24,7 +24,6 @@ import com.adyen.checkout.flutter.generated.InstantPaymentType
 import com.adyen.checkout.flutter.generated.SessionDTO
 import com.adyen.checkout.flutter.generated.UnencryptedCardDTO
 import com.adyen.checkout.flutter.session.SessionHolder
-import com.adyen.checkout.flutter.utils.ConfigurationMapper.buildThreeDS2Configuration
 import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToAmount
 import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToAnalyticsConfiguration
 import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToCardConfiguration

@@ -132,6 +132,10 @@ class DropInScreen extends StatelessWidget {
       deleteStoredPaymentMethodCallback: repository.deleteStoredPaymentMethod,
     );
 
+    final ThreeDS2Configuration threeDS2Configuration = ThreeDS2Configuration(
+      requestorAppURL: "https://your.app.com/adyen3ds2",
+    );
+
     final DropInConfiguration dropInConfiguration = DropInConfiguration(
       environment: Config.environment,
       clientKey: Config.clientKey,
@@ -144,6 +148,7 @@ class DropInScreen extends StatelessWidget {
       cashAppPayConfiguration: cashAppPayConfiguration,
       twintConfiguration: twintConfiguration,
       storedPaymentMethodConfiguration: storedPaymentMethodConfiguration,
+      threeDS2Configuration: threeDS2Configuration,
       paymentMethodNames: {
         "scheme": "Credit card",
       },
