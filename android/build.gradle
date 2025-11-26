@@ -23,7 +23,13 @@ allprojects {
 [rootProject, this].each {
     it.allprojects {
         repositories {
-            maven { url 'https://jitpack.io' }
+            maven {
+                name = 'Central Portal Snapshots'
+                url = 'https://central.sonatype.com/repository/maven-snapshots/'
+                content {
+                    includeGroup("com.adyen.checkout")
+                }
+            }
         }
     }
 }
@@ -62,7 +68,7 @@ android {
     }
 
     dependencies {
-        implementation 'com.github.Robert-SD.adyen-android:drop-in:develop-SNAPSHOT'
+        implementation "com.adyen.checkout:drop-in:2025.11.25-SNAPSHOT"
         implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
         
         // Compose Dependencies
