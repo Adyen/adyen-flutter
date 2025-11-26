@@ -8,14 +8,14 @@ final class ThreeDS2Configuration {
   ///
   /// This URL should be registered as a custom URL scheme in your app.
   final String requestorAppURL;
-  
+
   /// Creates a new instance of [ThreeDS2Configuration].
   ///
   /// [requestorAppURL] is required and should be a valid URL that your app can handle.
   ThreeDS2Configuration({
     required this.requestorAppURL,
   });
-  
+
   @override
   String toString() {
     return 'ThreeDS2Configuration(requestorAppURL: $requestorAppURL)';

@@ -71,7 +71,11 @@ class CardAdvancedComponent: BaseCardComponent {
     }
 
     private func buildActionComponent(adyenContext: AdyenContext) -> AdyenActionComponent {
-        let actionComponent = AdyenActionComponent(context: adyenContext)
+        var configuration = AdyenActionComponent.Configuration()
+        if let threeDS2Config = cardComponentConfiguration?.threeDS2ConfigurationDTO {
+            configuration.threeDS = buildThreeDS2Configuration(from: threeDS2Config)
+        }
+        let actionComponent = AdyenActionComponent(context: adyenContext, configuration: configuration)
         actionComponent.delegate = actionComponentDelegate
         actionComponent.presentationDelegate = getViewController()
         return actionComponent
