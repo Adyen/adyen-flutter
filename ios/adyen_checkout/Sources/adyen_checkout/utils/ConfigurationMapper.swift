@@ -18,6 +18,9 @@ import PassKit
 #if canImport(Adyen3DS2)
     import Adyen3DS2
 #endif
+#if canImport(AdyenActions)
+    import AdyenActions
+#endif
 
 extension DropInConfigurationDTO {
     func createDropInConfiguration(payment: Payment?) throws -> DropInComponent.Configuration {

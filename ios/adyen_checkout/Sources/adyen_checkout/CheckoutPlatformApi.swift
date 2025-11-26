@@ -7,6 +7,9 @@ import UIKit
 #if canImport(AdyenCard)
     import AdyenCard
 #endif
+#if canImport(AdyenActions)
+    import AdyenActions
+#endif
 @_spi(AdyenInternal) import Adyen
 
 // TODO: Add config:
