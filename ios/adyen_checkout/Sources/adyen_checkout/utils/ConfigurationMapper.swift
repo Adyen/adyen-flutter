@@ -51,7 +51,6 @@ extension DropInConfigurationDTO {
             dropInConfiguration.actionComponent.twint = .init(callbackAppScheme: twintConfigurationDTO.iosCallbackAppScheme)
         }
 
-
         if let threeDS2ConfigurationDTO {
             dropInConfiguration.actionComponent.threeDS = threeDS2ConfigurationDTO.mapToThreeDS2Configuration()
         }
