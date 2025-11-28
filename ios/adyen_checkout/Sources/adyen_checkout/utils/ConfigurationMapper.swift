@@ -43,7 +43,11 @@ extension DropInConfigurationDTO {
         if let cashAppPayConfigurationDTO {
             dropInConfiguration.cashAppPay = DropInComponent.CashAppPay(redirectURL: URL(string: cashAppPayConfigurationDTO.returnUrl)!)
         }
-
+        
+        if let twintConfigurationDTO {
+            dropInConfiguration.actionComponent.twint = .init(callbackAppScheme: twintConfigurationDTO.iosCallbackAppScheme)
+        }
+        
         dropInConfiguration.style = AdyenAppearance.dropInStyle
 
         return dropInConfiguration

@@ -56,6 +56,8 @@ class InstantAdvancedComponentScreen extends StatelessWidget {
               _extractPaymentMethod(snapshot.data!, "ideal");
           final payByBankPaymentMethodResponse =
               _extractPaymentMethod(snapshot.data!, "paybybank");
+          final twintPaymentMethodResponse =
+              _extractPaymentMethod(snapshot.data!, "twint");
 
           return Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -92,6 +94,13 @@ class InstantAdvancedComponentScreen extends StatelessWidget {
                 instantComponentConfiguration,
                 advancedCheckout,
                 'Pay by bank',
+              ),
+              _buildPaymentButton(
+                context,
+                twintPaymentMethodResponse,
+                instantComponentConfiguration,
+                advancedCheckout,
+                'TWINT',
               ),
             ],
           );

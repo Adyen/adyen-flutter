@@ -176,6 +176,7 @@ class DropInConfigurationDTO {
   final ApplePayConfigurationDTO? applePayConfigurationDTO;
   final GooglePayConfigurationDTO? googlePayConfigurationDTO;
   final CashAppPayConfigurationDTO? cashAppPayConfigurationDTO;
+  final TwintConfigurationDTO? twintConfigurationDTO;
   final AnalyticsOptionsDTO analyticsOptionsDTO;
   final bool showPreselectedStoredPaymentMethod;
   final bool skipListWhenSinglePaymentMethod;
@@ -194,6 +195,7 @@ class DropInConfigurationDTO {
     this.applePayConfigurationDTO,
     this.googlePayConfigurationDTO,
     this.cashAppPayConfigurationDTO,
+    this.twintConfigurationDTO,
     this.analyticsOptionsDTO,
     this.showPreselectedStoredPaymentMethod,
     this.skipListWhenSinglePaymentMethod,
@@ -397,6 +399,16 @@ class CashAppPayConfigurationDTO {
   CashAppPayConfigurationDTO(
     this.cashAppPayEnvironment,
     this.returnUrl,
+  );
+}
+
+class TwintConfigurationDTO {
+  final String iosCallbackAppScheme;
+  final bool showStorePaymentField;
+
+  TwintConfigurationDTO(
+    this.iosCallbackAppScheme,
+    this.showStorePaymentField,
   );
 }
 
