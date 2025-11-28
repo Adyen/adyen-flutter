@@ -27,9 +27,6 @@ class CardSessionComponentScreen extends StatelessWidget {
         onBinLookup: _onBinLookup,
         onBinValue: _onBinValue,
       ),
-      threeDS2Configuration: ThreeDS2Configuration(
-        requestorAppURL: "https://your.app.com/adyen3ds2",
-      ),
     );
 
     return Scaffold(
