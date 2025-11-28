@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.util.Log
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.lifecycleScope
-import com.adyen.checkout.adyen3ds2.Adyen3DS2Configuration
 import com.adyen.checkout.components.core.OrderRequest
 import com.adyen.checkout.components.core.PaymentMethodsApiResponse
 import com.adyen.checkout.components.core.internal.Configuration
