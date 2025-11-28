@@ -1,11 +1,12 @@
 buildscript {
+    ext.kotlin_version = '1.9.23'
     repositories {
         google()
         mavenCentral()
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:8.9.2'
+        classpath 'com.android.tools.build:gradle:8.13.1'
         classpath 'org.jetbrains.kotlin:kotlin-gradle-plugin:2.1.0'
     }
 }
@@ -70,17 +71,17 @@ android {
     dependencies {
         implementation "com.adyen.checkout:drop-in:2025.11.25-SNAPSHOT"
         implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
-        
+
         // Compose Dependencies
         implementation 'androidx.compose.ui:ui:1.9.5'
         implementation 'androidx.compose.material3:material3:1.4.0'
         implementation 'androidx.compose.ui:ui-tooling-preview:1.9.5'
         implementation 'androidx.activity:activity-compose:1.12.0'
-        
+
         // Debug tools for Compose
         debugImplementation 'androidx.compose.ui:ui-tooling:1.9.5'
         debugImplementation 'androidx.compose.ui:ui-test-manifest:1.9.5'
-        
+
         testImplementation 'org.jetbrains.kotlin:kotlin-test'
         testImplementation 'org.mockito:mockito-core:5.17.0'
     }
