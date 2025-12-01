@@ -7,6 +7,9 @@ import UIKit
 #if canImport(AdyenCard)
     import AdyenCard
 #endif
+#if canImport(AdyenActions)
+    import AdyenActions
+#endif
 @_spi(AdyenInternal) import Adyen
 
 // TODO: Add config:
@@ -41,6 +44,7 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
             case let dropInConfigurationDTO as DropInConfigurationDTO:
                 try createSessionForDropIn(
                     adyenContext: dropInConfigurationDTO.createAdyenContext(),
+                    actionComponentConfiguration: buildActionComponentConfiguration(from: dropInConfigurationDTO.threeDS2ConfigurationDTO),
                     sessionId: sessionId,
                     sessionData: sessionData,
                     completion: completion
@@ -48,6 +52,7 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
             case let cardComponentConfigurationDTO as CardComponentConfigurationDTO:
                 try createSessionForComponent(
                     adyenContext: cardComponentConfigurationDTO.createAdyenContext(),
+                    actionComponentConfiguration: buildActionComponentConfiguration(from: cardComponentConfigurationDTO.threeDS2ConfigurationDTO),
                     sessionId: sessionId,
                     sessionData: sessionData,
                     completion: completion
@@ -110,6 +115,7 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
 
     private func createSessionForDropIn(
         adyenContext: AdyenContext,
+        actionComponentConfiguration: AdyenActionComponent.Configuration? = nil,
         sessionId: String,
         sessionData: String,
         completion: @escaping (Result<SessionDTO, Error>) -> Void
@@ -120,12 +126,14 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
             sessionId: sessionId,
             sessionData: sessionData,
             sessionDelegate: sessionDelegate,
+            actionComponentConfiguration: actionComponentConfiguration,
             completion: completion
         )
     }
 
     private func createSessionForComponent(
         adyenContext: AdyenContext,
+        actionComponentConfiguration: AdyenActionComponent.Configuration? = nil,
         sessionId: String,
         sessionData: String,
         completion: @escaping (Result<SessionDTO, Error>) -> Void
@@ -136,6 +144,7 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
             sessionId: sessionId,
             sessionData: sessionData,
             sessionDelegate: sessionDelegate,
+            actionComponentConfiguration: actionComponentConfiguration,
             completion: completion
         )
     }
@@ -145,6 +154,7 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
         sessionId: String,
         sessionData: String,
         sessionDelegate: AdyenSessionDelegate,
+        actionComponentConfiguration: AdyenActionComponent.Configuration? = nil,
         completion: @escaping (Result<SessionDTO, Error>) -> Void
     ) throws {
         guard let presentationDelegate = getViewController() else {
@@ -155,7 +165,7 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
             sessionIdentifier: sessionId,
             initialSessionData: sessionData,
             context: adyenContext,
-            actionComponent: .init()
+            actionComponent: actionComponentConfiguration ?? .init()
         )
         AdyenSession.initialize(
             with: sessionConfiguration,
@@ -185,6 +195,14 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
             } catch {
                 completion(Result.failure(error))
             }
+        }
+    }
+
+    private func buildActionComponentConfiguration(from threeDS2ConfigurationDTO: ThreeDS2ConfigurationDTO?) -> AdyenActionComponent.Configuration? {
+        threeDS2ConfigurationDTO.map {
+            var actionComponentConfiguration = AdyenActionComponent.Configuration()
+            actionComponentConfiguration.threeDS = $0.mapToThreeDS2Configuration()
+            return actionComponentConfiguration
         }
     }
 

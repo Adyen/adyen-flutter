@@ -6,6 +6,7 @@ import 'package:adyen_checkout/src/common/model/payment_method_configurations/ca
 import 'package:adyen_checkout/src/common/model/payment_method_configurations/google_pay/google_pay_configuration.dart';
 import 'package:adyen_checkout/src/common/model/payment_method_configurations/stored_payment_method_configuration.dart';
 import 'package:adyen_checkout/src/common/model/payment_method_configurations/twint_configuration.dart';
+import 'package:adyen_checkout/src/common/model/payment_method_configurations/three_ds2_configuration.dart';
 
 final class DropInConfiguration extends BaseConfiguration {
   final CardConfiguration? cardConfiguration;
@@ -14,6 +15,7 @@ final class DropInConfiguration extends BaseConfiguration {
   final CashAppPayConfiguration? cashAppPayConfiguration;
   final StoredPaymentMethodConfiguration? storedPaymentMethodConfiguration;
   final TwintConfiguration? twintConfiguration;
+  final ThreeDS2Configuration? threeDS2Configuration;
   final bool skipListWhenSinglePaymentMethod;
   final String? preselectedPaymentMethodTitle;
   final Map<String, String>? paymentMethodNames;
@@ -30,6 +32,7 @@ final class DropInConfiguration extends BaseConfiguration {
     this.cashAppPayConfiguration,
     this.storedPaymentMethodConfiguration,
     this.twintConfiguration,
+    this.threeDS2Configuration,
     this.preselectedPaymentMethodTitle,
     bool? skipListWhenSinglePaymentMethod,
     AnalyticsOptions? analyticsOptions,
@@ -46,6 +49,7 @@ final class DropInConfiguration extends BaseConfiguration {
         'cashAppPayConfiguration: $cashAppPayConfiguration, '
         'storedPaymentMethodConfiguration: $storedPaymentMethodConfiguration, '
         'twintConfiguration: $twintConfiguration, '
+        'threeDS2Configuration: $threeDS2Configuration, '
         'skipListWhenSinglePaymentMethod: $skipListWhenSinglePaymentMethod, '
         'preselectedPaymentMethodTitle: $preselectedPaymentMethodTitle, '
         'paymentMethodNames: $paymentMethodNames)';

@@ -166,6 +166,14 @@ class AnalyticsOptionsDTO {
   );
 }
 
+class ThreeDS2ConfigurationDTO {
+  final String requestorAppURL;
+
+  ThreeDS2ConfigurationDTO(
+    this.requestorAppURL,
+  );
+}
+
 class DropInConfigurationDTO {
   final Environment environment;
   final String clientKey;
@@ -177,6 +185,7 @@ class DropInConfigurationDTO {
   final GooglePayConfigurationDTO? googlePayConfigurationDTO;
   final CashAppPayConfigurationDTO? cashAppPayConfigurationDTO;
   final TwintConfigurationDTO? twintConfigurationDTO;
+  final ThreeDS2ConfigurationDTO? threeDS2ConfigurationDTO;
   final AnalyticsOptionsDTO analyticsOptionsDTO;
   final bool showPreselectedStoredPaymentMethod;
   final bool skipListWhenSinglePaymentMethod;
@@ -196,6 +205,7 @@ class DropInConfigurationDTO {
     this.googlePayConfigurationDTO,
     this.cashAppPayConfigurationDTO,
     this.twintConfigurationDTO,
+    this.threeDS2ConfigurationDTO,
     this.analyticsOptionsDTO,
     this.showPreselectedStoredPaymentMethod,
     this.skipListWhenSinglePaymentMethod,
@@ -521,6 +531,7 @@ class CardComponentConfigurationDTO {
   final AmountDTO? amount;
   final String? shopperLocale;
   final CardConfigurationDTO cardConfiguration;
+  final ThreeDS2ConfigurationDTO? threeDS2ConfigurationDTO;
   final AnalyticsOptionsDTO analyticsOptionsDTO;
 
   CardComponentConfigurationDTO(
@@ -530,6 +541,7 @@ class CardComponentConfigurationDTO {
     this.amount,
     this.shopperLocale,
     this.cardConfiguration,
+    this.threeDS2ConfigurationDTO,
     this.analyticsOptionsDTO,
   );
 }

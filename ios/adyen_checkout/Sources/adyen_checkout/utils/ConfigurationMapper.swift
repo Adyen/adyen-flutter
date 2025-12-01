@@ -18,6 +18,9 @@ import PassKit
 #if canImport(Adyen3DS2)
     import Adyen3DS2
 #endif
+#if canImport(AdyenActions)
+    import AdyenActions
+#endif
 
 extension DropInConfigurationDTO {
     func createDropInConfiguration(payment: Payment?) throws -> DropInComponent.Configuration {
@@ -43,11 +46,15 @@ extension DropInConfigurationDTO {
         if let cashAppPayConfigurationDTO {
             dropInConfiguration.cashAppPay = DropInComponent.CashAppPay(redirectURL: URL(string: cashAppPayConfigurationDTO.returnUrl)!)
         }
-        
+
         if let twintConfigurationDTO {
             dropInConfiguration.actionComponent.twint = .init(callbackAppScheme: twintConfigurationDTO.iosCallbackAppScheme)
         }
-        
+
+        if let threeDS2ConfigurationDTO {
+            dropInConfiguration.actionComponent.threeDS = threeDS2ConfigurationDTO.mapToThreeDS2Configuration()
+        }
+
         dropInConfiguration.style = AdyenAppearance.dropInStyle
 
         return dropInConfiguration
@@ -100,7 +107,6 @@ extension DropInConfigurationDTO {
 
         return billingAddressConfiguration
     }
-
 }
 
 extension FieldVisibility {
@@ -325,5 +331,12 @@ extension ActionComponentConfigurationDTO {
             analyticsOptionsDTO: analyticsOptionsDTO,
             countryCode: nil
         )
+    }
+}
+
+extension ThreeDS2ConfigurationDTO {
+    func mapToThreeDS2Configuration() -> AdyenActionComponent.Configuration.ThreeDS {
+        guard let url = URL(string: requestorAppURL) else { return .init() }
+        return .init(requestorAppURL: url)
     }
 }
