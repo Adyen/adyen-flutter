@@ -3,9 +3,6 @@ import 'package:adyen_checkout/src/common/model/payment_method_configurations/ca
 import 'package:adyen_checkout/src/common/model/payment_method_configurations/three_ds2_configuration.dart';
 
 final class CardComponentConfiguration extends BaseConfiguration {
-  final CardConfiguration cardConfiguration;
-  final ThreeDS2Configuration? threeDS2Configuration;
-
   CardComponentConfiguration({
     required super.environment,
     required super.clientKey,
@@ -13,9 +10,12 @@ final class CardComponentConfiguration extends BaseConfiguration {
     super.amount,
     super.shopperLocale,
     super.analyticsOptions,
-    CardConfiguration? cardConfiguration,
-    this.threeDS2Configuration,
-  }) : cardConfiguration = cardConfiguration ?? const CardConfiguration();
+    this.cardConfiguration = const CardConfiguration(),
+    this.threeDS2Configuration = const CardConfiguration(),
+  });
+
+  final CardConfiguration cardConfiguration;
+  final ThreeDS2Configuration? threeDS2Configuration;
 
   @override
   String toString() {
