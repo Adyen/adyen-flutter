@@ -9,6 +9,9 @@ on:
 env:
   FLUTTER_VERSION: '3.32.x'
 
+permissions:
+  contents: read
+
 jobs:
   #  The preparation job is required to populate the FLUTTER_VERSION value as output for the tests jobs.
   preparation:
@@ -55,7 +58,7 @@ jobs:
     permissions:
       actions: write
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - name: Clear cache
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

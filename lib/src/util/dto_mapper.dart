@@ -25,6 +25,8 @@ extension DropInConfigurationMapper on DropInConfiguration {
         applePayConfigurationDTO: applePayConfiguration?.toDTO(),
         googlePayConfigurationDTO: googlePayConfiguration?.toDTO(),
         cashAppPayConfigurationDTO: cashAppPayConfiguration?.toDTO(),
+        twintConfigurationDTO: twintConfiguration?.toDTO(),
+        threeDS2ConfigurationDTO: threeDS2Configuration?.toDTO(),
         analyticsOptionsDTO: analyticsOptions.toDTO(sdkVersionNumber),
         isRemoveStoredPaymentMethodEnabled: _isRemoveStoredPaymentMethodEnabled(
             storedPaymentMethodConfiguration),
@@ -152,6 +154,19 @@ extension CashAppPayConfigurationMapper on CashAppPayConfiguration {
       );
 }
 
+extension TwintConfigurationMapper on TwintConfiguration {
+  TwintConfigurationDTO toDTO() => TwintConfigurationDTO(
+        iosCallbackAppScheme: iosCallbackAppScheme,
+        showStorePaymentField: showStorePaymentField,
+      );
+}
+
+extension ThreeDS2ConfigurationMapper on ThreeDS2Configuration {
+  ThreeDS2ConfigurationDTO toDTO() => ThreeDS2ConfigurationDTO(
+        requestorAppURL: requestorAppURL,
+      );
+}
+
 extension SessionMapper on SessionCheckout {
   SessionDTO toDTO() {
     final encodedPaymentMethods = jsonEncode(
@@ -190,6 +205,7 @@ extension CardComponentConfigurationMapper on CardComponentConfiguration {
         amount: amount?.toDTO(),
         shopperLocale: shopperLocale,
         cardConfiguration: cardConfiguration.toDTO(),
+        threeDS2ConfigurationDTO: threeDS2Configuration?.toDTO(),
         analyticsOptionsDTO: analyticsOptions.toDTO(sdkVersionNumber),
       );
 }

@@ -1,8 +1,45 @@
-## 1.7.0 (in development)
+## 1.8.0 (in development)
 
 ### New
 
-- Added support for Swift Package Manager (SPM).
+- TWINT is now supported fully in Drop-in and as an redirect Instant Component. Payment
+  method [type](https://docs.adyen.com/payment-methods/payment-method-types): **twint**.
+- Added support for the ThreeDS2Configuration with `requestorAppURL` parameter for Drop-in and Card Component.
+
+### Changed
+
+- Dependency versions:
+  | Name | Version |
+  |---------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------|
+  | [iOS Drop-in/Components](https://docs.adyen.com/online-payments/release-notes/?title%5B0%5D=iOS+Components%2FDrop-in#releaseNote=2025-11-04-ios-componentsdrop-in-5.21.1) |  5.21.1 |
+  | [Android Drop-in/Components](https://docs.adyen.com/online-payments/release-notes/#releaseNote=2025-08-19-android-componentsdrop-in-5.15.0)                               |  5.15.0 |
+
+
+## 1.7.0
+
+### New
+
+- Pay by Bank is now supported as an Instant Component. Payment
+  method [type](https://docs.adyen.com/payment-methods/payment-method-types): **paybybank**.
+- Support for Swift Package Manager (SPM).  
+  When migrating an existing project to Swift Package Manager (SPM), you must manually import
+  modules in your `AppDelegate.swift`:
+    * `import AdyenActions`
+    * If you apply custom styling to Drop-in, you must also include `import AdyenDropIn`.
+
+### Improved
+
+- For Apple Pay Component: the instantiation of the widget is now more efficient.
+- For the Instant Component: streamlined the implementation for Android by removing redundant code.
+- For Components in general: the communication of platformView height now includes a type
+  specification.
+
+### Changed
+
+- Dependency versions:
+  | Name | Version |
+  |---------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------|
+  | [iOS Drop-in/Components](https://docs.adyen.com/online-payments/release-notes/?title%5B0%5D=iOS+Components%2FDrop-in#releaseNote=2025-11-04-ios-componentsdrop-in-5.21.0) |  5.21.0 |
 
 ## 1.6.0
 

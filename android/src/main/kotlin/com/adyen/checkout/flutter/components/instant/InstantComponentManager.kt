@@ -2,16 +2,14 @@ package com.adyen.checkout.flutter.components.instant
 
 import androidx.fragment.app.FragmentActivity
 import com.adyen.checkout.action.core.internal.ActionHandlingComponent
+import com.adyen.checkout.components.core.ActionHandlingMethod
 import com.adyen.checkout.components.core.CheckoutConfiguration
 import com.adyen.checkout.components.core.Order
+import com.adyen.checkout.components.core.PaymentComponentState
 import com.adyen.checkout.components.core.PaymentMethod
 import com.adyen.checkout.components.core.PaymentMethodTypes
 import com.adyen.checkout.components.core.action.Action
 import com.adyen.checkout.core.exception.CheckoutException
-import com.adyen.checkout.flutter.components.instant.advanced.IdealComponentAdvancedCallback
-import com.adyen.checkout.flutter.components.instant.advanced.InstantComponentAdvancedCallback
-import com.adyen.checkout.flutter.components.instant.session.IdealComponentSessionCallback
-import com.adyen.checkout.flutter.components.instant.session.InstantComponentSessionCallback
 import com.adyen.checkout.flutter.components.view.ComponentLoadingBottomSheet
 import com.adyen.checkout.flutter.generated.ComponentCommunicationModel
 import com.adyen.checkout.flutter.generated.ComponentCommunicationType
@@ -19,27 +17,28 @@ import com.adyen.checkout.flutter.generated.ComponentFlutterInterface
 import com.adyen.checkout.flutter.generated.InstantPaymentConfigurationDTO
 import com.adyen.checkout.flutter.generated.PaymentResultDTO
 import com.adyen.checkout.flutter.generated.PaymentResultEnum
+import com.adyen.checkout.flutter.generated.TwintConfigurationDTO
 import com.adyen.checkout.flutter.session.SessionHolder
 import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToCheckoutConfiguration
 import com.adyen.checkout.flutter.utils.Constants
 import com.adyen.checkout.flutter.utils.Constants.Companion.UNKNOWN_PAYMENT_METHOD_TYPE_ERROR_MESSAGE
 import com.adyen.checkout.ideal.IdealComponent
 import com.adyen.checkout.instant.InstantPaymentComponent
+import com.adyen.checkout.paybybank.PayByBankComponent
 import com.adyen.checkout.sessions.core.CheckoutSession
 import com.adyen.checkout.sessions.core.SessionSetupResponse
+import com.adyen.checkout.twint.TwintComponent
+import com.adyen.checkout.twint.twint
 import org.json.JSONObject
 import java.util.UUID
 
 class InstantComponentManager(
     private val activity: FragmentActivity,
-    private val componentFlutterInterface: ComponentFlutterInterface,
     private val sessionHolder: SessionHolder,
+    private val componentFlutterInterface: ComponentFlutterInterface,
     private val assignCurrentComponent: (ActionHandlingComponent?) -> Unit,
+    private val onAction: (Action) -> Unit,
 ) {
-    private var instantPaymentComponent: InstantPaymentComponent? = null
-    private var idealPaymentComponent: IdealComponent? = null
-    private var componentId: String? = null
-
     fun start(
         instantPaymentConfigurationDTO: InstantPaymentConfigurationDTO,
         encodedPaymentMethod: String,
@@ -53,14 +52,18 @@ class InstantComponentManager(
             val paymentMethod = PaymentMethod.SERIALIZER.deserialize(JSONObject(encodedPaymentMethod))
             val configuration = instantPaymentConfigurationDTO.mapToCheckoutConfiguration()
             when (paymentMethod.type) {
-                null, PaymentMethodTypes.UNKNOWN -> throw CheckoutException(UNKNOWN_PAYMENT_METHOD_TYPE_ERROR_MESSAGE)
-                PaymentMethodTypes.IDEAL -> startIdealPaymentComponent(componentId, configuration, paymentMethod)
-                else -> startInstantPaymentComponent(componentId, configuration, paymentMethod)
+                null, PaymentMethodTypes.UNKNOWN ->
+                    throw CheckoutException(UNKNOWN_PAYMENT_METHOD_TYPE_ERROR_MESSAGE)
+
+                PaymentMethodTypes.IDEAL -> showIdealPaymentComponent(componentId, configuration, paymentMethod)
+                PaymentMethodTypes.PAY_BY_BANK -> showPayByBankComponent(componentId, configuration, paymentMethod)
+                PaymentMethodTypes.TWINT -> showTwintComponent(componentId, configuration, paymentMethod)
+                else -> showInstantPaymentComponent(componentId, configuration, paymentMethod)
             }
         } catch (exception: Exception) {
             val model =
                 ComponentCommunicationModel(
-                    ComponentCommunicationType.RESULT,
+                    type = ComponentCommunicationType.RESULT,
                     componentId = componentId,
                     paymentResult =
                         PaymentResultDTO(
@@ -72,174 +75,184 @@ class InstantComponentManager(
         }
     }
 
-    private fun startInstantPaymentComponent(
+    private fun showIdealPaymentComponent(
         componentId: String,
         configuration: CheckoutConfiguration,
         paymentMethod: PaymentMethod
     ) {
-        val instantPaymentComponent =
+        val idealComponent =
             when (componentId) {
-                Constants.INSTANT_ADVANCED_COMPONENT_KEY ->
-                    createInstantAdvancedComponent(
-                        configuration,
-                        paymentMethod,
-                        componentId
+                Constants.INSTANT_SESSION_COMPONENT_KEY -> {
+                    val checkoutSession = createCheckoutSession(configuration)
+                    IdealComponent.PROVIDER.get(
+                        activity = activity,
+                        checkoutSession = checkoutSession,
+                        paymentMethod = paymentMethod,
+                        checkoutConfiguration = configuration,
+                        componentCallback = createInstantComponentSessionCallback(componentId),
+                        key = UUID.randomUUID().toString()
                     )
+                }
 
-                Constants.INSTANT_SESSION_COMPONENT_KEY ->
-                    createInstantSessionComponent(
-                        configuration,
-                        paymentMethod,
-                        componentId
+                Constants.INSTANT_ADVANCED_COMPONENT_KEY -> {
+                    IdealComponent.PROVIDER.get(
+                        activity = activity,
+                        paymentMethod = paymentMethod,
+                        checkoutConfiguration = configuration,
+                        callback = createInstantComponentAdvancedCallback(componentId),
+                        key = UUID.randomUUID().toString()
                     )
-
-                else -> throw IllegalStateException("Instant component not available for payment flow.")
-            }
-
-        this.instantPaymentComponent = instantPaymentComponent
-        this.componentId = componentId
-        this.idealPaymentComponent = null
-        assignCurrentComponent(instantPaymentComponent)
-        ComponentLoadingBottomSheet.show(activity.supportFragmentManager, instantPaymentComponent)
-    }
-
-    private fun startIdealPaymentComponent(
-        componentId: String,
-        configuration: CheckoutConfiguration,
-        paymentMethod: PaymentMethod
-    ) {
-        val idealPaymentComponent =
-            when (componentId) {
-                Constants.INSTANT_ADVANCED_COMPONENT_KEY ->
-                    createIdealAdvancedComponent(
-                        configuration,
-                        paymentMethod,
-                        componentId
-                    )
-
-                Constants.INSTANT_SESSION_COMPONENT_KEY ->
-                    createIdealSessionComponent(
-                        configuration,
-                        paymentMethod,
-                        componentId
-                    )
+                }
 
                 else -> throw IllegalStateException("Ideal component not available for payment flow.")
             }
 
-        this.idealPaymentComponent = idealPaymentComponent
-        this.componentId = componentId
-        this.instantPaymentComponent = null
-        assignCurrentComponent(idealPaymentComponent)
-        ComponentLoadingBottomSheet.show(activity.supportFragmentManager, idealPaymentComponent)
+        assignCurrentComponent(idealComponent)
+        ComponentLoadingBottomSheet.show(activity.supportFragmentManager, idealComponent)
     }
 
-    fun onDispose(componentId: String) {
-        if (componentId == this.componentId) {
-            instantPaymentComponent = null
-            idealPaymentComponent = null
+    private fun showPayByBankComponent(
+        componentId: String,
+        configuration: CheckoutConfiguration,
+        paymentMethod: PaymentMethod
+    ) {
+        val payByBankComponent =
+            when (componentId) {
+                Constants.INSTANT_SESSION_COMPONENT_KEY -> {
+                    val checkoutSession = createCheckoutSession(configuration)
+                    PayByBankComponent.PROVIDER.get(
+                        activity = activity,
+                        checkoutSession = checkoutSession,
+                        paymentMethod = paymentMethod,
+                        checkoutConfiguration = configuration,
+                        componentCallback = createInstantComponentSessionCallback(componentId),
+                        key = UUID.randomUUID().toString()
+                    )
+                }
+
+                Constants.INSTANT_ADVANCED_COMPONENT_KEY -> {
+                    PayByBankComponent.PROVIDER.get(
+                        activity = activity,
+                        paymentMethod = paymentMethod,
+                        checkoutConfiguration = configuration,
+                        callback = createInstantComponentAdvancedCallback(componentId),
+                        key = UUID.randomUUID().toString()
+                    )
+                }
+
+                else -> throw IllegalStateException("Pay By Bank component not available for payment flow.")
+            }
+
+        assignCurrentComponent(payByBankComponent)
+        ComponentLoadingBottomSheet.show(activity.supportFragmentManager, payByBankComponent)
+    }
+
+    private fun showTwintComponent(
+        componentId: String,
+        configuration: CheckoutConfiguration,
+        paymentMethod: PaymentMethod
+    ) {
+        // We use the web redirect for now and prevent storing the payment method to align with iOS
+        configuration.twint {
+            showStorePaymentField = false
+            actionHandlingMethod = ActionHandlingMethod.PREFER_WEB
         }
+        val twintComponent =
+            when (componentId) {
+                Constants.INSTANT_SESSION_COMPONENT_KEY -> {
+                    val checkoutSession = createCheckoutSession(configuration)
+                    TwintComponent.PROVIDER.get(
+                        activity = activity,
+                        checkoutSession = checkoutSession,
+                        paymentMethod = paymentMethod,
+                        checkoutConfiguration = configuration,
+                        componentCallback = createInstantComponentSessionCallback(componentId),
+                        key = UUID.randomUUID().toString()
+                    )
+                }
+
+                Constants.INSTANT_ADVANCED_COMPONENT_KEY -> {
+                    TwintComponent.PROVIDER.get(
+                        activity = activity,
+                        paymentMethod = paymentMethod,
+                        checkoutConfiguration = configuration,
+                        callback = createInstantComponentAdvancedCallback(componentId),
+                        key = UUID.randomUUID().toString()
+                    )
+                }
+
+                else -> throw IllegalStateException("Twint component not available for payment flow.")
+            }
+
+        assignCurrentComponent(twintComponent)
+        ComponentLoadingBottomSheet.show(activity.supportFragmentManager, twintComponent)
     }
 
-    private fun createInstantAdvancedComponent(
-        configuration: CheckoutConfiguration,
-        paymentMethod: PaymentMethod,
+    private fun showInstantPaymentComponent(
         componentId: String,
-    ): InstantPaymentComponent =
-        InstantPaymentComponent.PROVIDER.get(
-            activity = activity,
-            paymentMethod = paymentMethod,
-            checkoutConfiguration = configuration,
-            callback =
-                InstantComponentAdvancedCallback(
-                    componentFlutterInterface,
-                    componentId,
-                    ::hideLoadingBottomSheet
-                ),
-            key = UUID.randomUUID().toString()
-        )
+        configuration: CheckoutConfiguration,
+        paymentMethod: PaymentMethod
+    ) {
+        val instantComponent =
+            when (componentId) {
+                Constants.INSTANT_SESSION_COMPONENT_KEY -> {
+                    val checkoutSession = createCheckoutSession(configuration)
+                    InstantPaymentComponent.PROVIDER.get(
+                        activity = activity,
+                        checkoutSession = checkoutSession,
+                        paymentMethod = paymentMethod,
+                        checkoutConfiguration = configuration,
+                        componentCallback = createInstantComponentSessionCallback(componentId),
+                        key = UUID.randomUUID().toString()
+                    )
+                }
 
-    private fun createInstantSessionComponent(
-        configuration: CheckoutConfiguration,
-        paymentMethod: PaymentMethod,
-        componentId: String,
-    ): InstantPaymentComponent {
+                Constants.INSTANT_ADVANCED_COMPONENT_KEY -> {
+                    InstantPaymentComponent.PROVIDER.get(
+                        activity = activity,
+                        paymentMethod = paymentMethod,
+                        checkoutConfiguration = configuration,
+                        callback = createInstantComponentAdvancedCallback(componentId),
+                        key = UUID.randomUUID().toString()
+                    )
+                }
+
+                else -> throw IllegalStateException("Instant component not available for payment flow.")
+            }
+
+        assignCurrentComponent(instantComponent)
+        ComponentLoadingBottomSheet.show(activity.supportFragmentManager, instantComponent)
+    }
+
+    private fun createCheckoutSession(configuration: CheckoutConfiguration): CheckoutSession {
         val sessionSetupResponse = SessionSetupResponse.SERIALIZER.deserialize(sessionHolder.sessionSetupResponse)
         val order = sessionHolder.orderResponse?.let { Order.SERIALIZER.deserialize(it) }
-        val checkoutSession =
-            CheckoutSession(
-                sessionSetupResponse = sessionSetupResponse,
-                order = order,
-                environment = configuration.environment,
-                clientKey = configuration.clientKey
-            )
-        return InstantPaymentComponent.PROVIDER.get(
-            activity = activity,
-            checkoutSession = checkoutSession,
-            paymentMethod = paymentMethod,
-            checkoutConfiguration = configuration,
-            componentCallback =
-                InstantComponentSessionCallback(
-                    componentFlutterInterface,
-                    componentId,
-                    ::handleAction,
-                    ::hideLoadingBottomSheet
-                ),
-            key = UUID.randomUUID().toString()
+        return CheckoutSession(
+            sessionSetupResponse = sessionSetupResponse,
+            order = order,
+            environment = configuration.environment,
+            clientKey = configuration.clientKey
         )
     }
 
-    // We delete the ideal component integration when the instant component supports ideal.
-    private fun createIdealAdvancedComponent(
-        configuration: CheckoutConfiguration,
-        paymentMethod: PaymentMethod,
-        componentId: String,
-    ): IdealComponent =
-        IdealComponent.PROVIDER.get(
-            activity = activity,
-            paymentMethod = paymentMethod,
-            checkoutConfiguration = configuration,
-            callback =
-                IdealComponentAdvancedCallback(
-                    componentFlutterInterface,
-                    componentId,
-                    ::hideLoadingBottomSheet
-                ),
-            key = UUID.randomUUID().toString()
+    private fun <T : PaymentComponentState<*>> createInstantComponentSessionCallback(
+        componentId: String
+    ): InstantComponentSessionCallback<T> =
+        InstantComponentSessionCallback(
+            componentFlutterApi = componentFlutterInterface,
+            componentId = componentId,
+            onActionCallback = onAction,
+            hideLoadingBottomSheet = ::hideLoadingBottomSheet
         )
 
-    private fun createIdealSessionComponent(
-        configuration: CheckoutConfiguration,
-        paymentMethod: PaymentMethod,
-        componentId: String,
-    ): IdealComponent {
-        val sessionSetupResponse = SessionSetupResponse.SERIALIZER.deserialize(sessionHolder.sessionSetupResponse)
-        val order = sessionHolder.orderResponse?.let { Order.SERIALIZER.deserialize(it) }
-        val checkoutSession =
-            CheckoutSession(
-                sessionSetupResponse = sessionSetupResponse,
-                order = order,
-                environment = configuration.environment,
-                clientKey = configuration.clientKey
-            )
-        return IdealComponent.PROVIDER.get(
-            activity = activity,
-            checkoutSession = checkoutSession,
-            paymentMethod = paymentMethod,
-            checkoutConfiguration = configuration,
-            componentCallback =
-                IdealComponentSessionCallback(
-                    componentFlutterInterface,
-                    componentId,
-                    ::handleAction,
-                    ::hideLoadingBottomSheet
-                ),
-            key = UUID.randomUUID().toString()
+    private fun <T : PaymentComponentState<*>> createInstantComponentAdvancedCallback(
+        componentId: String
+    ): InstantComponentAdvancedCallback<T> =
+        InstantComponentAdvancedCallback(
+            componentFlutterApi = componentFlutterInterface,
+            componentId = componentId,
+            hideLoadingBottomSheet = ::hideLoadingBottomSheet
         )
-    }
-
-    private fun handleAction(action: Action) =
-        instantPaymentComponent?.handleAction(action, activity) ?: idealPaymentComponent?.handleAction(action, activity)
 
     private fun hideLoadingBottomSheet() = ComponentLoadingBottomSheet.hide(activity.supportFragmentManager)
 }
