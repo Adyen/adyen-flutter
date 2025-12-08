@@ -4,8 +4,6 @@ import android.content.Context
 import android.view.View
 import androidx.activity.ComponentActivity
 import com.adyen.checkout.card.CardComponent
-import com.adyen.checkout.card.CardConfiguration
-import com.adyen.checkout.components.core.PaymentMethodTypes
 import com.adyen.checkout.flutter.components.view.DynamicComponentView
 import com.adyen.checkout.flutter.generated.BinLookupDataDTO
 import com.adyen.checkout.flutter.generated.CardComponentConfigurationDTO
@@ -31,7 +29,7 @@ abstract class BaseCardComponent(
     internal val componentId = creationParams[COMPONENT_ID_KEY] as String? ?: ""
     internal val isStoredPaymentMethod = creationParams[IS_STORED_PAYMENT_METHOD_KEY] as Boolean? ?: false
     private val dynamicComponentView = DynamicComponentView(activity, componentFlutterApi, componentId)
-    internal val cardConfiguration = configuration.toCheckoutConfiguration()
+    internal val checkoutConfiguration = configuration.toCheckoutConfiguration()
     internal var cardComponent: CardComponent? = null
 
     override fun getView(): View = dynamicComponentView
