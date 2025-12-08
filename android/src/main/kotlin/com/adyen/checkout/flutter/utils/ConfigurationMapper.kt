@@ -1,16 +1,11 @@
 package com.adyen.checkout.flutter.utils
 
-import android.content.Context
-import com.adyen.checkout.adyen3ds2.Adyen3DS2Configuration
 import com.adyen.checkout.adyen3ds2.adyen3DS2
 import com.adyen.checkout.card.AddressConfiguration
 import com.adyen.checkout.card.CardBrand
-import com.adyen.checkout.card.CardConfiguration
-import com.adyen.checkout.card.CardType
 import com.adyen.checkout.card.KCPAuthVisibility
 import com.adyen.checkout.card.SocialSecurityNumberVisibility
 import com.adyen.checkout.card.card
-import com.adyen.checkout.cashapppay.CashAppPayConfiguration
 import com.adyen.checkout.cashapppay.cashAppPay
 import com.adyen.checkout.components.core.Amount
 import com.adyen.checkout.components.core.AnalyticsConfiguration
@@ -21,7 +16,6 @@ import com.adyen.checkout.components.core.internal.util.CheckoutPlatform
 import com.adyen.checkout.components.core.internal.util.CheckoutPlatformParams
 import com.adyen.checkout.cse.EncryptedCard
 import com.adyen.checkout.cse.UnencryptedCard
-import com.adyen.checkout.dropin.DropInConfiguration
 import com.adyen.checkout.dropin.dropIn
 import com.adyen.checkout.flutter.generated.ActionComponentConfigurationDTO
 import com.adyen.checkout.flutter.generated.AddressMode
@@ -261,15 +255,8 @@ object ConfigurationMapper {
             FieldVisibility.HIDE -> SocialSecurityNumberVisibility.HIDE
         }
 
-    private fun mapToSupportedCardBrands(cardTypes: List<String?>?): List<CardBrand> {
-        if (cardTypes == null) {
-            return emptyList()
-        }
-
-        return cardTypes.mapNotNull { cardBrandName ->
-            cardBrandName?.let { CardBrand(it) }
-        }
-    }
+    private fun mapToSupportedCardBrands(cardTypes: List<String?>?): List<CardBrand> =
+        cardTypes.orEmpty().filterNotNull().map(::CardBrand)
 
     private fun AmountDTO.mapToAmount(): Amount = Amount(this.currency, this.value)
 
