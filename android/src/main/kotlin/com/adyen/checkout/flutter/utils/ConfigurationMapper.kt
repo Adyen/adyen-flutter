@@ -92,7 +92,6 @@ object ConfigurationMapper {
                         overridePaymentMethodName(paymentMethodType, paymentMethodName)
                     }
                 }
-
             }
         }
 
@@ -107,7 +106,6 @@ object ConfigurationMapper {
             cardConfigurationDTO = cardConfiguration,
             threeDS2ConfigurationDTO = threeDS2ConfigurationDTO,
         )
-
 
     fun ActionComponentConfigurationDTO.toCheckoutConfiguration(): CheckoutConfiguration =
         toCheckoutConfiguration(
@@ -273,12 +271,11 @@ object ConfigurationMapper {
         }
     }
 
-
     private fun AmountDTO.mapToAmount(): Amount = Amount(this.currency, this.value)
 
     private fun Amount.mapToDTOAmount(): AmountDTO =
         AmountDTO(
-            this.currency ?: throw Exception("Currency must not be null"),
+            this.currency ?: throw IllegalStateException("Currency must not be null"),
             this.value,
         )
 

@@ -32,8 +32,8 @@ internal class CardSessionComponent(
             CheckoutSession(
                 sessionSetupResponse = sessionSetupResponse,
                 order = order,
-                environment = cardConfiguration.environment,
-                clientKey = cardConfiguration.clientKey
+                environment = checkoutConfiguration.environment,
+                clientKey = checkoutConfiguration.clientKey
             )
         cardComponent =
             createCardComponent(checkoutSession).apply {
@@ -50,7 +50,7 @@ internal class CardSessionComponent(
                     activity = activity,
                     checkoutSession = checkoutSession,
                     storedPaymentMethod = storedPaymentMethod,
-                    checkoutConfiguration = cardConfiguration,
+                    checkoutConfiguration = checkoutConfiguration,
                     componentCallback =
                         CardSessionCallback(
                             componentFlutterApi,
@@ -68,7 +68,7 @@ internal class CardSessionComponent(
                     activity = activity,
                     checkoutSession = checkoutSession,
                     paymentMethod = paymentMethod,
-                    checkoutConfiguration = cardConfiguration,
+                    checkoutConfiguration = checkoutConfiguration,
                     componentCallback =
                         CardSessionCallback(
                             componentFlutterApi,
