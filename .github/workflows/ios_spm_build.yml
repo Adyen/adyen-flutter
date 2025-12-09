@@ -16,6 +16,8 @@ jobs:
       matrix:
         iPhone: [ "'iPhone 17'" ]
         flutter-version: [ 3.32.x, 3.35.x, 3.38.x ]
+    env:
+      IPHONE_MODEL: ${{ matrix.iPhone }}
 
     steps:
       - name: Provide more disk space
@@ -54,6 +56,6 @@ jobs:
       - name: Install app on simulator
         working-directory: demo_project
         run: |
-          open -a Simulator && xcrun simctl boot ${{ matrix.iPhone }}
-          xcrun simctl install ${{ matrix.iPhone }} build/ios/iphonesimulator/Runner.app
-          xcrun simctl launch ${{ matrix.iPhone }} com.example.demoProject
+          open -a Simulator && xcrun simctl boot "$IPHONE_MODEL"
+          xcrun simctl install "$IPHONE_MODEL" build/ios/iphonesimulator/Runner.app
+          xcrun simctl launch "$IPHONE_MODEL" com.example.demoProject

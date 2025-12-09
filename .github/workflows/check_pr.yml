@@ -49,22 +49,3 @@ jobs:
     with:
       flutter-version: ${{ needs.preparation.outputs.FLUTTER_VERSION }}
     secrets: inherit
-
-  clean_up:
-    name: Clean up
-    runs-on: ubuntu-24.04
-    continue-on-error: true
-    needs: [ sonar_cloud ]
-    permissions:
-      actions: write
-    steps:
-      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
-      - name: Clear cache
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          gh cache delete android-reports
-          gh cache delete ios-reports
-        continue-on-error: true
-
-
