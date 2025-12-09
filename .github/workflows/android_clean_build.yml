@@ -17,6 +17,11 @@ jobs:
         flutter-version: [ 3.16.x, 3.19.x, 3.22.x, 3.24.x, 3.27.x, 3.29.x, 3.32.x, 3.35.x, 3.38.x ]
         agp_version: [ 8.13.1 ]
         gradle_version: [ 8.13 ]
+    env:
+      FLUTTER_VERSION: ${{ matrix.flutter-version }}
+      COMPILE_SDK_VERSION: ${{ matrix.api-level }}
+      AGP_VERSION: ${{ matrix.agp_version }}
+      GRADLE_VERSION: ${{ matrix.gradle_version }}
 
     steps:
       - name: Provide more disk space
@@ -50,9 +55,8 @@ jobs:
           cache: true
           cache-key: ${{ matrix.flutter-version }}
 
-      - run: |
-          FLUTTER_VERSION=${{ matrix.flutter-version }}
-          COMPILE_SDK_VERSION=${{ matrix.api-level }}
+      - name: Create demo project and build APK
+        run: |
           flutter create --template=app --platforms=android,ios demo_project
           cd demo_project
           
@@ -62,13 +66,13 @@ jobs:
           }
           
           change_agp_version() {
-            sed -i 's/id "com.android.application" version "7.3.0"/id "com.android.application" version "${{ matrix.agp_version }}"/g' android/settings.gradle
+            sed -i "s/id \"com.android.application\" version \"7.3.0\"/id \"com.android.application\" version \"$AGP_VERSION\"/g" android/settings.gradle
           }
           
           # Change Kotlin version and adjust Gradle for Flutter 3.16.x
           if [[ "$FLUTTER_VERSION" == "3.16.x" ]]; then
             sed -i "s/ext.kotlin_version = '1.7.10'/ext.kotlin_version = '1.8.22'/g" android/build.gradle
-            sed -i "s/gradle-7.5-all/gradle-${{ matrix.gradle_version }}-all/g" android/gradle/wrapper/gradle-wrapper.properties
+            sed -i "s/gradle-7.5-all/gradle-$GRADLE_VERSION-all/g" android/gradle/wrapper/gradle-wrapper.properties
             change_agp_version
             change_sdk_versions
           fi
@@ -76,7 +80,7 @@ jobs:
           # Change Kotlin version and adjust Gradle for Flutter 3.19.x - 3.24.x versions
           if [[ "$FLUTTER_VERSION" == "3.19.x" || "$FLUTTER_VERSION" == "3.22.x" || "$FLUTTER_VERSION" == "3.24.x" ]]; then
             sed -i 's/"org.jetbrains.kotlin.android" version "1.7.10"/"org.jetbrains.kotlin.android" version "1.8.22"/g' android/settings.gradle
-            sed -i "s/gradle-7.6.3-all/gradle-${{ matrix.gradle_version }}-all/g" android/gradle/wrapper/gradle-wrapper.properties
+            sed -i "s/gradle-7.6.3-all/gradle-$GRADLE_VERSION-all/g" android/gradle/wrapper/gradle-wrapper.properties
             change_agp_version
             change_sdk_versions
           fi  
