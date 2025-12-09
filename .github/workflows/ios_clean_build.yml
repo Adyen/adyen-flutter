@@ -14,10 +14,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        iPhone: [ 'iPhone17' ]
         flutter-version: [ 3.16.x, 3.19.x, 3.22.x, 3.24.x, 3.27.x, 3.29.x, 3.32.x, 3.35.x, 3.38.x ]
     env:
-      IPHONE_MODEL: ${{ matrix.iPhone }}
+      IPHONE_MODEL: '"iPhone 17"'
 
     steps:
       - name: Provide more disk space
