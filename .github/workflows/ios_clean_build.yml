@@ -14,7 +14,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        iPhone: [ "'iPhone 17'" ]
+        iPhone: [ "iPhone 17" ]
         flutter-version: [ 3.16.x, 3.19.x, 3.22.x, 3.24.x, 3.27.x, 3.29.x, 3.32.x, 3.35.x, 3.38.x ]
     env:
       IPHONE_MODEL: ${{ matrix.iPhone }}
@@ -49,6 +49,7 @@ jobs:
       - name: Install app on simulator
         working-directory: demo_project
         run: |
+          echo $IPHONE_MODEL
           open -a Simulator && xcrun simctl boot $IPHONE_MODEL
           xcrun simctl install $IPHONE_MODEL build/ios/iphonesimulator/Runner.app
           xcrun simctl launch $IPHONE_MODEL com.example.demoProject
