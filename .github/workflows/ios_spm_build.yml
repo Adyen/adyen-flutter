@@ -56,6 +56,6 @@ jobs:
       - name: Install app on simulator
         working-directory: demo_project
         run: |
-          open -a Simulator && xcrun simctl boot "$IPHONE_MODEL"
-          xcrun simctl install "$IPHONE_MODEL" build/ios/iphonesimulator/Runner.app
-          xcrun simctl launch "$IPHONE_MODEL" com.example.demoProject
+          open -a Simulator && xcrun simctl boot $IPHONE_MODEL
+          xcrun simctl install $IPHONE_MODEL build/ios/iphonesimulator/Runner.app
+          xcrun simctl launch $IPHONE_MODEL com.example.demoProject
