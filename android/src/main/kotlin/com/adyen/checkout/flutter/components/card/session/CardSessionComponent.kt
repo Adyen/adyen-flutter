@@ -81,7 +81,7 @@ internal class CardSessionComponent(
                     activity = activity,
                     checkoutSession = checkoutSession,
                     storedPaymentMethod = storedPaymentMethod,
-                    configuration = cardConfiguration,
+                    checkoutConfiguration = checkoutConfiguration,
                     componentCallback =
                         CardSessionCallback(
                             componentFlutterApi,
@@ -99,7 +99,7 @@ internal class CardSessionComponent(
                     activity = activity,
                     checkoutSession = checkoutSession,
                     paymentMethod = paymentMethod,
-                    configuration = cardConfiguration,
+                    checkoutConfiguration = checkoutConfiguration,
                     componentCallback =
                         CardSessionCallback(
                             componentFlutterApi,

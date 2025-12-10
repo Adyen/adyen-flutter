@@ -22,13 +22,8 @@ import com.adyen.checkout.flutter.generated.InstantPaymentType
 import com.adyen.checkout.flutter.generated.SessionDTO
 import com.adyen.checkout.flutter.generated.UnencryptedCardDTO
 import com.adyen.checkout.flutter.session.SessionHolder
-import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToAmount
-import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToAnalyticsConfiguration
-import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToCardConfiguration
-import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToCheckoutConfiguration
-import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToDropInConfiguration
-import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToEnvironment
-import com.adyen.checkout.redirect.old.RedirectComponent
+import com.adyen.checkout.flutter.utils.ConfigurationMapper.toCheckoutConfiguration
+import com.adyen.checkout.redirect.RedirectComponent
 import com.adyen.checkout.sessions.core.CheckoutSessionProvider
 import com.adyen.checkout.sessions.core.CheckoutSessionResult
 import com.adyen.checkout.sessions.core.SessionModel
@@ -106,30 +101,15 @@ class CheckoutPlatformApi(
 
     private fun determineSessionConfiguration(configuration: Any?): Configuration? {
         when (configuration) {
-            is DropInConfigurationDTO -> {
-                return configuration.mapToDropInConfiguration(activity)
-            }
-
-            is CardComponentConfigurationDTO -> {
-                return configuration.cardConfiguration.mapToCardConfiguration(
-                    activity,
-                    configuration.shopperLocale,
-                    configuration.environment.mapToEnvironment(),
-                    configuration.clientKey,
-                    configuration.analyticsOptionsDTO.mapToAnalyticsConfiguration(),
-                    configuration.amount?.mapToAmount(),
-                    configuration.threeDS2ConfigurationDTO,
-                )
-            }
-
+            is DropInConfigurationDTO -> return configuration.toCheckoutConfiguration()
+            is CardComponentConfigurationDTO -> return configuration.toCheckoutConfiguration()
             is InstantPaymentConfigurationDTO -> {
                 return when (configuration.instantPaymentType) {
                     InstantPaymentType.APPLE_PAY -> throw IllegalStateException(
                         "Apple Pay is not supported on Android."
                     )
 
-                    InstantPaymentType.GOOGLE_PAY -> configuration.mapToCheckoutConfiguration()
-                    InstantPaymentType.INSTANT -> configuration.mapToCheckoutConfiguration()
+                    else -> configuration.toCheckoutConfiguration()
                 }
             }
         }

@@ -19,7 +19,7 @@ import com.adyen.checkout.flutter.generated.PaymentResultDTO
 import com.adyen.checkout.flutter.generated.PaymentResultEnum
 import com.adyen.checkout.flutter.generated.TwintConfigurationDTO
 import com.adyen.checkout.flutter.session.SessionHolder
-import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToCheckoutConfiguration
+import com.adyen.checkout.flutter.utils.ConfigurationMapper.toCheckoutConfiguration
 import com.adyen.checkout.flutter.utils.Constants
 import com.adyen.checkout.flutter.utils.Constants.Companion.UNKNOWN_PAYMENT_METHOD_TYPE_ERROR_MESSAGE
 import com.adyen.checkout.ideal.IdealComponent
@@ -50,7 +50,7 @@ class InstantComponentManager(
             }
 
             val paymentMethod = PaymentMethod.SERIALIZER.deserialize(JSONObject(encodedPaymentMethod))
-            val configuration = instantPaymentConfigurationDTO.mapToCheckoutConfiguration()
+            val configuration = instantPaymentConfigurationDTO.toCheckoutConfiguration()
             when (paymentMethod.type) {
                 null, PaymentMethodTypes.UNKNOWN ->
                     throw CheckoutException(UNKNOWN_PAYMENT_METHOD_TYPE_ERROR_MESSAGE)

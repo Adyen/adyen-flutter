@@ -16,7 +16,7 @@ import com.adyen.checkout.flutter.generated.InstantPaymentConfigurationDTO
 import com.adyen.checkout.flutter.generated.InstantPaymentSetupResultDTO
 import com.adyen.checkout.flutter.generated.InstantPaymentType
 import com.adyen.checkout.flutter.session.SessionHolder
-import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToGooglePayCheckoutConfiguration
+import com.adyen.checkout.flutter.utils.ConfigurationMapper.toCheckoutConfiguration
 import com.adyen.checkout.flutter.utils.Constants
 import com.adyen.checkout.googlepay.GooglePayComponent
 import com.adyen.checkout.sessions.core.CheckoutSession
@@ -70,7 +70,7 @@ class GooglePayComponentManager(
             return
         }
 
-        val checkoutConfiguration = instantPaymentComponentConfigurationDTO.mapToGooglePayCheckoutConfiguration()
+        val checkoutConfiguration = instantPaymentComponentConfigurationDTO.toCheckoutConfiguration()
         this.componentId = componentId
         this.checkoutConfiguration = checkoutConfiguration
         GooglePayComponent.PROVIDER.isAvailable(
