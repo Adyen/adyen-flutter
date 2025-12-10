@@ -1,6 +1,7 @@
 package com.adyen.checkout.flutter.utils
 
 import android.content.Context
+import com.adyen.checkout.adyen3ds2.old.Adyen3DS2Configuration
 import com.adyen.checkout.card.card
 import com.adyen.checkout.card.old.AddressConfiguration
 import com.adyen.checkout.card.old.CardConfiguration
@@ -48,7 +49,6 @@ import com.adyen.checkout.googlepay.MerchantInfo
 import com.adyen.checkout.googlepay.ShippingAddressParameters
 import com.adyen.checkout.googlepay.googlePay
 import com.adyen.checkout.twint.TwintConfiguration
-import com.adyen.checkout.twint.twint
 import com.google.android.gms.wallet.WalletConstants
 import java.util.Locale
 import com.adyen.checkout.cashapppay.CashAppPayEnvironment as SDKCashAppPayEnvironment
@@ -244,7 +244,7 @@ object ConfigurationMapper {
 
     private fun DropInConfigurationDTO.buildTwintConfiguration(
         context: Context,
-        environment: com.adyen.checkout.core.Environment,
+        environment: SDKEnvironment,
         twintConfigurationDTO: TwintConfigurationDTO
     ): TwintConfiguration {
         val twintConfigurationBuilder =
@@ -260,7 +260,7 @@ object ConfigurationMapper {
     private fun buildThreeDS2Configuration(
         context: Context,
         shopperLocale: String?,
-        environment: com.adyen.checkout.core.Environment,
+        environment: SDKEnvironment,
         clientKey: String,
         threeDS2ConfigurationDTO: ThreeDS2ConfigurationDTO
     ): Adyen3DS2Configuration {
@@ -271,7 +271,7 @@ object ConfigurationMapper {
             } else {
                 Adyen3DS2Configuration.Builder(context, environment, clientKey)
             }
-        threeDS2ConfigurationBuilder.threeDSRequestorAppURL = threeDS2ConfigurationDTO.requestorAppURL
+        threeDS2ConfigurationBuilder.setThreeDSRequestorAppURL( threeDS2ConfigurationDTO.requestorAppURL)
         return threeDS2ConfigurationBuilder.build()
     }
 
@@ -438,7 +438,7 @@ object ConfigurationMapper {
     }
 
     private fun TwintConfigurationDTO.mapToTwintConfiguration(builder: TwintConfiguration.Builder): TwintConfiguration {
-        builder.showStorePaymentField = this.showStorePaymentField
+        builder.setShowStorePaymentField(showStorePaymentField)
         return builder.build()
     }
 
