@@ -74,10 +74,10 @@ class GooglePayComponentManager(
         this.componentId = componentId
         this.checkoutConfiguration = checkoutConfiguration
         GooglePayComponent.PROVIDER.isAvailable(
-            activity.application,
-            paymentMethod,
-            checkoutConfiguration,
-            this,
+            application = activity.application,
+            paymentMethod = paymentMethod,
+            checkoutConfiguration = checkoutConfiguration,
+            callback = this,
         )
     }
 
@@ -132,11 +132,11 @@ class GooglePayComponentManager(
         paymentMethod: PaymentMethod,
     ): GooglePayComponent {
         val sessionSetupResponse = SessionSetupResponse.SERIALIZER.deserialize(sessionHolder.sessionSetupResponse)
-        val order = sessionHolder.orderResponse?.let { Order.SERIALIZER.deserialize(it) }
+//        val order = sessionHolder.orderResponse?.let { Order.SERIALIZER.deserialize(it) }
         val checkoutSession =
             CheckoutSession(
                 sessionSetupResponse,
-                order,
+                null,
                 checkoutConfiguration.environment,
                 checkoutConfiguration.clientKey
             )

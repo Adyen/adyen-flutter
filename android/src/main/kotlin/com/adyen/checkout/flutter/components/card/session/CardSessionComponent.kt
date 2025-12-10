@@ -14,7 +14,7 @@ import com.adyen.checkout.core.sessions.SessionModel
 import com.adyen.checkout.flutter.components.card.BaseCardComponent
 import com.adyen.checkout.flutter.generated.ComponentFlutterInterface
 import com.adyen.checkout.flutter.session.SessionHolder
-import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToCheckoutConfiguration
+import com.adyen.checkout.flutter.utils.ConfigurationMapper.toCheckoutConfiguration
 import com.adyen.checkout.sessions.core.CheckoutSession
 import com.adyen.checkout.sessions.core.SessionSetupResponse
 import kotlinx.coroutines.launch
@@ -33,7 +33,7 @@ internal class CardSessionComponent(
 ) : BaseCardComponent(context, id, creationParams, activity, componentFlutterApi, onDispose, setCurrentCardComponent) {
     init {
         val sessionSetupResponse = SessionSetupResponse.SERIALIZER.deserialize(sessionHolder.sessionSetupResponse)
-        val order = sessionHolder.orderResponse?.let { Order.SERIALIZER.deserialize(it) }
+//        val order = sessionHolder.orderResponse?.let { Order.SERIALIZER.deserialize(it) }
 
         activity.lifecycleScope.launch {
             val result =
@@ -43,7 +43,7 @@ internal class CardSessionComponent(
                             id = sessionSetupResponse.id,
                             sessionData = sessionSetupResponse.sessionData
                         ),
-                    checkoutConfiguration = configuration.mapToCheckoutConfiguration(),
+                    checkoutConfiguration = checkoutConfiguration,
                 )
             when (result) {
                 is Checkout.Result.Error -> TODO()

@@ -47,7 +47,7 @@ abstract class ComponentSessionCallback<T : PaymentComponentState<*>>(
         val type: PaymentResultEnum =
             if (componentError.errorMessage.contains(Constants.SDK_PAYMENT_CANCELED_IDENTIFIER) ||
                 (componentError.exception is com.adyen.checkout.core.old.exception.CancellationException) ||
-                (componentError.exception is com.adyen.checkout.adyen3ds2.old.Cancelled3DS2Exception)
+                (componentError.exception is com.adyen.checkout.threeds2.old.Cancelled3DS2Exception)
             )
                 PaymentResultEnum.CANCELLED_BY_USER
             else

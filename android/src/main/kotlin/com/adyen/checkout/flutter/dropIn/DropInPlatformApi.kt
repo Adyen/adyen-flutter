@@ -5,6 +5,8 @@ import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.lifecycleScope
 import com.adyen.checkout.components.core.Order
 import com.adyen.checkout.components.core.PaymentMethodsApiResponse
+import com.adyen.checkout.core.old.Environment
+import com.adyen.checkout.core.old.Environment.Companion.TEST
 import com.adyen.checkout.dropin.old.DropIn
 import com.adyen.checkout.dropin.old.DropInCallback
 import com.adyen.checkout.dropin.old.DropInResult
@@ -69,7 +71,7 @@ internal class DropInPlatformApi(
         val checkoutSession =
             createCheckoutSession(
                 sessionHolder,
-                dropInConfigurationDTO.environment.mapToEnvironment(),
+                TEST, //TODO Change back to generic
                 dropInConfigurationDTO.clientKey
             )
 
@@ -77,13 +79,13 @@ internal class DropInPlatformApi(
         dropInPlatformMessengerJob =
             activity.lifecycleScope.launch { dropInMessageFlow.collect { event -> checkoutFlutter.send(event) {} } }
 
-        DropIn.startPayment(
-            activity.applicationContext,
-            dropInSessionLauncher,
-            checkoutSession,
-            dropInConfiguration,
-            SessionDropInService::class.java
-        )
+//        DropIn.startPayment(
+//            activity.applicationContext,
+//            dropInSessionLauncher,
+//            checkoutSession,
+//            dropInConfiguration,
+//            SessionDropInService::class.java
+//        )
     }
 
     override fun showDropInAdvanced(
@@ -109,13 +111,13 @@ internal class DropInPlatformApi(
                 )
             val dropInConfiguration = dropInConfigurationDTO.toCheckoutConfiguration()
             withContext(Dispatchers.Main) {
-                DropIn.startPayment(
-                    activity.applicationContext,
-                    dropInAdvancedFlowLauncher,
-                    paymentMethodsWithoutGiftCards,
-                    dropInConfiguration,
-                    AdvancedDropInService::class.java,
-                )
+//                DropIn.startPayment(
+//                    context = activity.applicationContext,
+//                    dropInLauncher = dropInAdvancedFlowLauncher,
+//                    paymentMethods = paymentMethodsWithoutGiftCards,
+//                    checkoutConfiguration = dropInConfiguration,
+//                    dropInServiceClass = AdvancedDropInService::class.java,
+//                )
             }
         }
     }
@@ -220,14 +222,14 @@ internal class DropInPlatformApi(
 
     private fun createCheckoutSession(
         sessionHolder: SessionHolder,
-        environment: com.adyen.checkout.core.old.Environment,
+        environment: Environment,
         clientKey: String,
     ): CheckoutSession {
         val sessionSetupResponse = SessionSetupResponse.SERIALIZER.deserialize(sessionHolder.sessionSetupResponse)
-        val order = sessionHolder.orderResponse?.let { Order.SERIALIZER.deserialize(it) }
+//        val order = sessionHolder.orderResponse?.let { Order.SERIALIZER.deserialize(it) }
         return CheckoutSession(
             sessionSetupResponse = sessionSetupResponse,
-            order = order,
+            order = null,
             environment = environment,
             clientKey = clientKey
         )

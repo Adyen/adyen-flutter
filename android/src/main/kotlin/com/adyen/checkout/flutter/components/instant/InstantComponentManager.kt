@@ -55,10 +55,10 @@ class InstantComponentManager(
                 null, PaymentMethodTypes.UNKNOWN ->
                     throw CheckoutException(UNKNOWN_PAYMENT_METHOD_TYPE_ERROR_MESSAGE)
 
-                PaymentMethodTypes.IDEAL -> showIdealPaymentComponent(componentId, configuration, paymentMethod)
-                PaymentMethodTypes.PAY_BY_BANK -> showPayByBankComponent(componentId, configuration, paymentMethod)
-                PaymentMethodTypes.TWINT -> showTwintComponent(componentId, configuration, paymentMethod)
-                else -> showInstantPaymentComponent(componentId, configuration, paymentMethod)
+//                PaymentMethodTypes.IDEAL -> showIdealPaymentComponent(componentId, configuration, paymentMethod)
+//                PaymentMethodTypes.PAY_BY_BANK -> showPayByBankComponent(componentId, configuration, paymentMethod)
+//                PaymentMethodTypes.TWINT -> showTwintComponent(componentId, configuration, paymentMethod)
+//                else -> showInstantPaymentComponent(componentId, configuration, paymentMethod)
             }
         } catch (exception: Exception) {
             val model =
@@ -226,10 +226,10 @@ class InstantComponentManager(
 
     private fun createCheckoutSession(configuration: CheckoutConfiguration): CheckoutSession {
         val sessionSetupResponse = SessionSetupResponse.SERIALIZER.deserialize(sessionHolder.sessionSetupResponse)
-        val order = sessionHolder.orderResponse?.let { Order.SERIALIZER.deserialize(it) }
+//        val order = sessionHolder.orderResponse?.let { Order.SERIALIZER.deserialize(it) }
         return CheckoutSession(
             sessionSetupResponse = sessionSetupResponse,
-            order = order,
+            order = null,
             environment = configuration.environment,
             clientKey = configuration.clientKey
         )

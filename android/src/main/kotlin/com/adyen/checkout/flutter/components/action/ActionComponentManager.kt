@@ -33,15 +33,15 @@ internal class ActionComponentManager(
             }
 
             val checkoutConfiguration = actionComponentConfigurationDTO.toCheckoutConfiguration()
-            val actionComponent = createActionComponent(checkoutConfiguration, componentId)
-            val action = Action.SERIALIZER.deserialize(JSONObject(actionResponse))
-            if (actionComponent.canHandleAction(action)) {
-                assignCurrentComponent(actionComponent)
-                ComponentLoadingBottomSheet.show(activity.supportFragmentManager, actionComponent)
-                actionComponent.handleAction(action, activity)
-            } else {
-                sendErrorToFlutterLayer(componentId, "Action component cannot handle action response.")
-            }
+//            val actionComponent = createActionComponent(checkoutConfiguration, componentId)
+//            val action = Action.SERIALIZER.deserialize(JSONObject(actionResponse))
+//            if (actionComponent.canHandleAction(action)) {
+//                assignCurrentComponent(actionComponent)
+//                ComponentLoadingBottomSheet.show(activity.supportFragmentManager, actionComponent)
+//                actionComponent.handleAction(action, activity)
+//            } else {
+//                sendErrorToFlutterLayer(componentId, "Action component cannot handle action response.")
+//            }
         } catch (exception: Exception) {
             sendErrorToFlutterLayer(componentId, exception.message ?: "Action handling failed.")
         }

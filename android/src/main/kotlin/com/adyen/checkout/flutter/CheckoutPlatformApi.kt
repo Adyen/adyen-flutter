@@ -3,11 +3,13 @@ package com.adyen.checkout.flutter
 import android.annotation.SuppressLint
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.lifecycleScope
-import com.adyen.checkout.components.core.OrderRequest
-import com.adyen.checkout.components.core.PaymentMethodsApiResponse
-import com.adyen.checkout.components.core.internal.Configuration
+import com.adyen.checkout.core.common.CheckoutContext
+import com.adyen.checkout.core.components.Checkout
+import com.adyen.checkout.core.components.CheckoutConfiguration
+import com.adyen.checkout.core.components.data.model.PaymentMethodsApiResponse
 import com.adyen.checkout.core.old.AdyenLogLevel
 import com.adyen.checkout.core.old.AdyenLogger
+import com.adyen.checkout.core.sessions.SessionModel
 import com.adyen.checkout.flutter.apiOnly.AdyenCSE
 import com.adyen.checkout.flutter.apiOnly.CardValidation
 import com.adyen.checkout.flutter.generated.CardComponentConfigurationDTO
@@ -23,14 +25,11 @@ import com.adyen.checkout.flutter.generated.SessionDTO
 import com.adyen.checkout.flutter.generated.UnencryptedCardDTO
 import com.adyen.checkout.flutter.session.SessionHolder
 import com.adyen.checkout.flutter.utils.ConfigurationMapper.toCheckoutConfiguration
-import com.adyen.checkout.redirect.RedirectComponent
-import com.adyen.checkout.sessions.core.CheckoutSessionProvider
-import com.adyen.checkout.sessions.core.CheckoutSessionResult
-import com.adyen.checkout.sessions.core.SessionModel
-import com.adyen.checkout.sessions.core.SessionSetupResponse
+import com.adyen.checkout.redirect.old.RedirectComponent
 import com.adyen.threeds2.ThreeDS2Service
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.lang.Exception
 
 class CheckoutPlatformApi(
     private val activity: FragmentActivity,
@@ -47,16 +46,19 @@ class CheckoutPlatformApi(
         callback: (Result<SessionDTO>) -> Unit,
     ) {
         activity.lifecycleScope.launch(Dispatchers.IO) {
-            val sessionModel = SessionModel(sessionId, sessionData)
             determineSessionConfiguration(configuration)?.let { sessionConfiguration ->
-                when (val sessionResult = CheckoutSessionProvider.createSession(sessionModel, sessionConfiguration)) {
-                    is CheckoutSessionResult.Error -> callback(Result.failure(sessionResult.exception))
-                    is CheckoutSessionResult.Success ->
+                val result = Checkout.initialize(
+                    sessionModel = SessionModel(sessionId, sessionData),
+                    checkoutConfiguration = sessionConfiguration
+                )
+                when (result) {
+                    is Checkout.Result.Error -> callback(Result.failure(Exception(result.errorReason))) //TODO define correct Exception
+                    is Checkout.Result.Success -> {
                         onSessionSuccessfullyCreated(
-                            sessionResult,
-                            sessionModel,
+                            result.checkoutContext,
                             callback
                         )
+                    }
                 }
             }
         }
@@ -99,7 +101,7 @@ class CheckoutPlatformApi(
         cardBrand: String?
     ): CardSecurityCodeValidationResultDTO = CardValidation.validateCardSecurityCode(securityCode, cardBrand)
 
-    private fun determineSessionConfiguration(configuration: Any?): Configuration? {
+    private fun determineSessionConfiguration(configuration: Any?): CheckoutConfiguration? {
         when (configuration) {
             is DropInConfigurationDTO -> return configuration.toCheckoutConfiguration()
             is CardComponentConfigurationDTO -> return configuration.toCheckoutConfiguration()
@@ -118,29 +120,23 @@ class CheckoutPlatformApi(
     }
 
     private fun onSessionSuccessfullyCreated(
-        sessionResult: CheckoutSessionResult.Success,
-        sessionModel: SessionModel,
+        checkoutSession: CheckoutContext.Sessions,
         callback: (Result<SessionDTO>) -> Unit,
     ) {
-        with(sessionResult.checkoutSession) {
-            val sessionResponse = SessionSetupResponse.SERIALIZER.serialize(sessionSetupResponse)
-            val orderResponse = order?.let { OrderRequest.SERIALIZER.serialize(it) }
-            val paymentMethodsJsonObject =
-                sessionSetupResponse.paymentMethodsApiResponse?.let {
-                    PaymentMethodsApiResponse.SERIALIZER.serialize(it)
-                }
-            sessionHolder.sessionSetupResponse = sessionResponse
-            sessionHolder.orderResponse = orderResponse
-            callback(
-                Result.success(
-                    SessionDTO(
-                        id = sessionModel.id,
-                        sessionData = sessionModel.sessionData ?: "",
-                        paymentMethodsJson = paymentMethodsJsonObject?.toString() ?: "",
-                    )
+        sessionHolder.sessionCheckout = checkoutSession
+        val paymentMethodsJsonObject =
+            checkoutSession.checkoutSession.sessionSetupResponse.paymentMethodsApiResponse?.let {
+                PaymentMethodsApiResponse.SERIALIZER.serialize(it)
+            }
+        callback(
+            Result.success(
+                SessionDTO(
+                    id = checkoutSession.checkoutSession.sessionSetupResponse.id,
+                    sessionData = checkoutSession.checkoutSession.sessionSetupResponse.sessionData,
+                    paymentMethodsJson = paymentMethodsJsonObject?.toString() ?: "",
                 )
             )
-        }
+        )
     }
 
     @SuppressLint("RestrictedApi")
