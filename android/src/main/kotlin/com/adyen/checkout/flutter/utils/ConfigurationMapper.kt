@@ -77,10 +77,6 @@ object ConfigurationMapper {
                 isRemovingStoredPaymentMethodsEnabled = this@toCheckoutConfiguration.isRemoveStoredPaymentMethodEnabled
                 showPreselectedStoredPaymentMethod = this@toCheckoutConfiguration.showPreselectedStoredPaymentMethod
                 skipListWhenSinglePaymentMethod = this@toCheckoutConfiguration.skipListWhenSinglePaymentMethod
-                // TODO: Map preselectedPaymentMethodTitle if available in dropIn DSL (verify if this property exists)
-//                 preselectedPaymentMethodTitle = this@toCheckoutConfiguration.preselectedPaymentMethodTitle
-                // TODO: Map isPartialPaymentSupported if available in dropIn DSL (verify if this property exists)
-                // isPartialPaymentSupported = this@toCheckoutConfiguration.isPartialPaymentSupported
                 paymentMethodNames?.forEach { (paymentMethodType, paymentMethodName) ->
                     if (paymentMethodType != null && paymentMethodName != null) {
                         overridePaymentMethodName(paymentMethodType, paymentMethodName)
