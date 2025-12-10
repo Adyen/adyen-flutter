@@ -7,6 +7,9 @@ import UIKit
 #if canImport(AdyenCard)
     import AdyenCard
 #endif
+#if canImport(AdyenActions)
+    import AdyenActions
+#endif
 @_spi(AdyenInternal) import Adyen
 
 // TODO: Add config:
@@ -151,7 +154,7 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
             completion: completion
         )
     }
-    
+
     private func setSession(
         sessionId: String,
         sessionData: String,
@@ -169,7 +172,7 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
                 completion(Result.failure(PlatformError(errorDescription: "Encoding payment methods failed")))
                 return
             }
-            
+
             completion(Result.success(SessionDTO(
                 id: sessionId,
                 sessionData: sessionData,
@@ -189,7 +192,7 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
 //        guard let presentationDelegate = getViewController() else {
 //            throw PlatformError(errorDescription: "Host view controller not available.")
 //        }
-        
+
         let adyenCheckout = try await AdyenCheckout.setup(
             with: sessionId,
             sessionData: sessionData,
@@ -198,7 +201,7 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
 
         sessionHolder.sessionId = sessionId
         sessionHolder.sessionData = sessionData
-        
+
         let encodedPaymentMethods = try JSONEncoder().encode(adyenCheckout.paymentMethods)
         guard let encodedPaymentMethodsString = String(data: encodedPaymentMethods, encoding: .utf8) else {
             completion(Result.failure(PlatformError(errorDescription: "Encoding payment methods failed")))
@@ -209,7 +212,7 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
             sessionData: sessionData,
             paymentMethodsJson: encodedPaymentMethodsString
         )))
-        
+
 //
 //        AdyenSession.setup(
 //            with: sessionConfiguration,
@@ -241,6 +244,14 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
 //            }
 //        }
     }
+
+    private func buildActionComponentConfiguration(from threeDS2ConfigurationDTO: ThreeDS2ConfigurationDTO?) -> AdyenActionComponent.Configuration? {
+            threeDS2ConfigurationDTO.map {
+                var actionComponentConfiguration = AdyenActionComponent.Configuration()
+                actionComponentConfiguration.threeDS = $0.mapToThreeDS2Configuration()
+                return actionComponentConfiguration
+            }
+        }
 
     private func getViewController() -> UIViewController? {
         var rootViewController = UIApplication.shared.adyen.mainKeyWindow?.rootViewController

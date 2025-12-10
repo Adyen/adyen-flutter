@@ -1,5 +1,11 @@
 ## 1.8.0 (in development)
 
+### New
+
+- TWINT is now supported fully in Drop-in and as an redirect Instant Component. Payment
+  method [type](https://docs.adyen.com/payment-methods/payment-method-types): **twint**.
+- Added support for the ThreeDS2Configuration with `requestorAppURL` parameter for Drop-in and Card Component.
+
 ### Changed
 
 - Dependency versions:

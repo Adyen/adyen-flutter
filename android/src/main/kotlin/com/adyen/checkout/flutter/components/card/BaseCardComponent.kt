@@ -42,6 +42,7 @@ abstract class BaseCardComponent(
             configuration.clientKey,
             configuration.analyticsOptionsDTO.mapToAnalyticsConfiguration(),
             configuration.amount?.mapToAmount(),
+            configuration.threeDS2ConfigurationDTO,
         )
     internal var cardComponent: CardComponent? = null
 

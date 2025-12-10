@@ -38,13 +38,17 @@ import com.adyen.checkout.flutter.generated.InstantPaymentConfigurationDTO
 import com.adyen.checkout.flutter.generated.MerchantInfoDTO
 import com.adyen.checkout.flutter.generated.OrderResponseDTO
 import com.adyen.checkout.flutter.generated.ShippingAddressParametersDTO
+import com.adyen.checkout.flutter.generated.ThreeDS2ConfigurationDTO
 import com.adyen.checkout.flutter.generated.TotalPriceStatus
+import com.adyen.checkout.flutter.generated.TwintConfigurationDTO
 import com.adyen.checkout.flutter.generated.UnencryptedCardDTO
 import com.adyen.checkout.googlepay.BillingAddressParameters
 import com.adyen.checkout.googlepay.GooglePayConfiguration
 import com.adyen.checkout.googlepay.MerchantInfo
 import com.adyen.checkout.googlepay.ShippingAddressParameters
 import com.adyen.checkout.googlepay.googlePay
+import com.adyen.checkout.twint.TwintConfiguration
+import com.adyen.checkout.twint.twint
 import com.google.android.gms.wallet.WalletConstants
 import java.util.Locale
 import com.adyen.checkout.cashapppay.CashAppPayEnvironment as SDKCashAppPayEnvironment
@@ -98,6 +102,17 @@ object ConfigurationMapper {
             dropInConfiguration.addCashAppPayConfiguration(cashAppPayConfiguration)
         }
 
+        if (twintConfigurationDTO != null) {
+            val twintConfiguration = buildTwintConfiguration(context, environment, twintConfigurationDTO)
+            dropInConfiguration.addTwintConfiguration(twintConfiguration)
+        }
+
+        if (threeDS2ConfigurationDTO != null) {
+            val threeDS2Configuration =
+                buildThreeDS2Configuration(context, shopperLocale, environment, clientKey, threeDS2ConfigurationDTO)
+            dropInConfiguration.add3ds2ActionConfiguration(threeDS2Configuration)
+        }
+
         paymentMethodNames?.forEach { paymentMethodNamePair ->
             val paymentMethodType = paymentMethodNamePair.key
             val paymentMethodName = paymentMethodNamePair.value
@@ -147,6 +162,7 @@ object ConfigurationMapper {
         clientKey: String,
         analyticsConfiguration: AnalyticsConfiguration? = null,
         amount: Amount? = null,
+        threeDS2ConfigurationDTO: ThreeDS2ConfigurationDTO? = null,
     ): CardConfiguration {
         val cardConfiguration =
             if (shopperLocale != null) {
@@ -173,6 +189,12 @@ object ConfigurationMapper {
         amount?.let {
             cardConfiguration.setAmount(amount)
         }
+
+        threeDS2ConfigurationDTO?.let {
+            val threeDS2Configuration = buildThreeDS2Configuration(context, shopperLocale, environment, clientKey, it)
+            cardConfiguration.add3ds2ActionConfiguration(threeDS2Configuration)
+        }
+
         return cardConfiguration.build()
     }
 
@@ -218,6 +240,39 @@ object ConfigurationMapper {
             }
 
         return cashAppPayConfigurationDTO.mapToCashAppPayConfiguration(cashAppPayConfigurationBuilder)
+    }
+
+    private fun DropInConfigurationDTO.buildTwintConfiguration(
+        context: Context,
+        environment: com.adyen.checkout.core.Environment,
+        twintConfigurationDTO: TwintConfigurationDTO
+    ): TwintConfiguration {
+        val twintConfigurationBuilder =
+            if (shopperLocale != null) {
+                val locale = Locale.forLanguageTag(shopperLocale)
+                TwintConfiguration.Builder(locale, environment, clientKey)
+            } else {
+                TwintConfiguration.Builder(context, environment, clientKey)
+            }
+        return twintConfigurationDTO.mapToTwintConfiguration(twintConfigurationBuilder)
+    }
+
+    private fun buildThreeDS2Configuration(
+        context: Context,
+        shopperLocale: String?,
+        environment: com.adyen.checkout.core.Environment,
+        clientKey: String,
+        threeDS2ConfigurationDTO: ThreeDS2ConfigurationDTO
+    ): Adyen3DS2Configuration {
+        val threeDS2ConfigurationBuilder =
+            if (shopperLocale != null) {
+                val locale = Locale.forLanguageTag(shopperLocale)
+                Adyen3DS2Configuration.Builder(locale, environment, clientKey)
+            } else {
+                Adyen3DS2Configuration.Builder(context, environment, clientKey)
+            }
+        threeDS2ConfigurationBuilder.threeDSRequestorAppURL = threeDS2ConfigurationDTO.requestorAppURL
+        return threeDS2ConfigurationBuilder.build()
     }
 
     private fun AddressMode.mapToAddressConfiguration(): AddressConfiguration =
@@ -379,6 +434,11 @@ object ConfigurationMapper {
         builder: CashAppPayConfiguration.Builder
     ): CashAppPayConfiguration {
         builder.setCashAppPayEnvironment(cashAppPayEnvironment.mapToCashAppPayEnvironment()).setReturnUrl(returnUrl)
+        return builder.build()
+    }
+
+    private fun TwintConfigurationDTO.mapToTwintConfiguration(builder: TwintConfiguration.Builder): TwintConfiguration {
+        builder.showStorePaymentField = this.showStorePaymentField
         return builder.build()
     }
 
