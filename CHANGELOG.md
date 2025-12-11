@@ -4,7 +4,13 @@
 
 - TWINT is now supported fully in Drop-in and as an redirect Instant Component. Payment
   method [type](https://docs.adyen.com/payment-methods/payment-method-types): **twint**.
-- Added support for the ThreeDS2Configuration with `requestorAppURL` parameter for Drop-in and Card Component.
+- Added support for the ThreeDS2Configuration with `requestorAppURL` parameter for Drop-in and Card
+  Component.
+
+## Improved
+
+- For Drop-in on iOS: Added payment to create adyenContext to prioritize the session amount in the
+  UI.
 
 ### Changed
 

@@ -46,13 +46,13 @@ class DropInPlatformApi: DropInPlatformInterface {
             }
 
             hostViewController = viewController
-            let adyenContext = try dropInConfigurationDTO.createAdyenContext()
+            let sessionPayment = session.sessionContext.createPayment(fallbackCountryCode: dropInConfigurationDTO.countryCode)
+            let adyenContext = try dropInConfigurationDTO.createAdyenContext(payment: sessionPayment)
             dropInSessionStoredPaymentMethodsDelegate = DropInSessionsStoredPaymentMethodsDelegate(
                 viewController: viewController,
                 checkoutFlutter: checkoutFlutter
             )
-            let payment = session.sessionContext.createPayment(fallbackCountryCode: dropInConfigurationDTO.countryCode)
-            let dropInConfiguration = try dropInConfigurationDTO.createDropInConfiguration(payment: payment)
+            let dropInConfiguration = try dropInConfigurationDTO.createDropInConfiguration(payment: sessionPayment)
             var paymentMethods = session.sessionContext.paymentMethods
             if let paymentMethodNames = dropInConfigurationDTO.paymentMethodNames {
                 paymentMethods = overridePaymentMethodNames(
