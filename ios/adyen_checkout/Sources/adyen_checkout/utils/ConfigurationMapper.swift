@@ -251,10 +251,12 @@ private func buildAdyenContext(environment: Environment, clientKey: String, amou
         environment: environment,
         clientKey: clientKey
     )
-    var payment: Payment? = payment
-    if payment==nil, let amount, let countryCode {
-        payment = Payment(amount: amount.mapToAmount(), countryCode: countryCode)
-    }
+    let payment: Payment? = payment ?? {
+        if let amount, let countryCode {
+            return Payment(amount: amount.mapToAmount(), countryCode: countryCode)
+        }
+        return nil
+    }()
     var analyticsConfiguration = AnalyticsConfiguration()
     analyticsConfiguration.isEnabled = analyticsOptionsDTO.enabled
     analyticsConfiguration.context = AnalyticsContext(
