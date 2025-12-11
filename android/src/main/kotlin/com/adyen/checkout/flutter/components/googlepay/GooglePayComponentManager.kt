@@ -3,15 +3,17 @@ package com.adyen.checkout.flutter.components.googlepay
 import android.content.Intent
 import androidx.fragment.app.FragmentActivity
 import com.adyen.checkout.action.core.internal.ActionHandlingComponent
-import com.adyen.checkout.components.core.CheckoutConfiguration
 import com.adyen.checkout.components.core.ComponentAvailableCallback
 import com.adyen.checkout.components.core.Order
 import com.adyen.checkout.components.core.PaymentMethod
+import com.adyen.checkout.components.core.PaymentMethodTypes
 import com.adyen.checkout.components.core.action.Action
+import com.adyen.checkout.core.components.CheckoutConfiguration
 import com.adyen.checkout.flutter.components.view.ComponentLoadingBottomSheet
 import com.adyen.checkout.flutter.generated.ComponentCommunicationModel
 import com.adyen.checkout.flutter.generated.ComponentCommunicationType
 import com.adyen.checkout.flutter.generated.ComponentFlutterInterface
+import com.adyen.checkout.flutter.generated.Environment
 import com.adyen.checkout.flutter.generated.InstantPaymentConfigurationDTO
 import com.adyen.checkout.flutter.generated.InstantPaymentSetupResultDTO
 import com.adyen.checkout.flutter.generated.InstantPaymentType
@@ -73,12 +75,12 @@ class GooglePayComponentManager(
         val checkoutConfiguration = instantPaymentComponentConfigurationDTO.toCheckoutConfiguration()
         this.componentId = componentId
         this.checkoutConfiguration = checkoutConfiguration
-        GooglePayComponent.PROVIDER.isAvailable(
-            application = activity.application,
-            paymentMethod = paymentMethod,
-            checkoutConfiguration = checkoutConfiguration,
-            callback = this,
-        )
+//        GooglePayComponent.PROVIDER.isAvailable(
+//            application = activity.application,
+//            paymentMethod = paymentMethod,
+//            checkoutConfiguration = checkoutConfiguration,
+//            callback = this,
+//        )
     }
 
     fun start() {
@@ -137,14 +139,14 @@ class GooglePayComponentManager(
             CheckoutSession(
                 sessionSetupResponse,
                 null,
-                checkoutConfiguration.environment,
+                com.adyen.checkout.core.old.Environment.TEST,
                 checkoutConfiguration.clientKey
             )
         return GooglePayComponent.PROVIDER.get(
             activity = activity,
             checkoutSession = checkoutSession,
             paymentMethod = paymentMethod,
-            checkoutConfiguration = checkoutConfiguration,
+            configuration = checkoutConfiguration.getConfiguration(PaymentMethodTypes.GOOGLE_PAY)!!,
             componentCallback =
                 GooglePaySessionCallback(
                     componentFlutterInterface,
@@ -164,7 +166,7 @@ class GooglePayComponentManager(
         GooglePayComponent.PROVIDER.get(
             activity = activity,
             paymentMethod = paymentMethod,
-            checkoutConfiguration = checkoutConfiguration,
+            configuration = checkoutConfiguration.getConfiguration(PaymentMethodTypes.GOOGLE_PAY)!!,
             callback =
                 GooglePayAdvancedCallback(
                     componentFlutterInterface,

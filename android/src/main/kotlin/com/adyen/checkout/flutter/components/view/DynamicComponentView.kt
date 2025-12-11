@@ -19,6 +19,7 @@ import com.adyen.checkout.components.core.internal.Component
 import com.adyen.checkout.core.common.CheckoutContext
 import com.adyen.checkout.core.components.AdyenPaymentFlow
 import com.adyen.checkout.core.components.CheckoutCallbacks
+import com.adyen.checkout.core.components.data.model.PaymentMethod
 import com.adyen.checkout.flutter.generated.ComponentCommunicationModel
 import com.adyen.checkout.flutter.generated.ComponentCommunicationType
 import com.adyen.checkout.flutter.generated.ComponentFlutterInterface
@@ -90,16 +91,16 @@ class DynamicComponentView
         }
 
         fun addV6Component(
+            paymentMethod: PaymentMethod,
             checkoutContext: CheckoutContext,
             callbacks: CheckoutCallbacks
         ) {
             addView(
                 ComposeView(context).apply {
                     setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
-
                     setContent {
                         AdyenPaymentFlow(
-                            "scheme",
+                            paymentMethod = paymentMethod,
                             checkoutContext = checkoutContext,
                             checkoutCallbacks = callbacks
                         )

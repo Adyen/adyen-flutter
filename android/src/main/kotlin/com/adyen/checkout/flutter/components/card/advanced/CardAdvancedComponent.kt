@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.fragment.app.FragmentActivity
 import com.adyen.checkout.card.old.CardComponent
 import com.adyen.checkout.components.core.PaymentMethod
+import com.adyen.checkout.components.core.PaymentMethodTypes
 import com.adyen.checkout.components.core.StoredPaymentMethod
 import com.adyen.checkout.flutter.components.card.BaseCardComponent
 import com.adyen.checkout.flutter.generated.ComponentFlutterInterface
@@ -34,7 +35,7 @@ internal class CardAdvancedComponent(
                 return CardComponent.PROVIDER.get(
                     activity = activity,
                     storedPaymentMethod = storedPaymentMethod,
-                    configuration = checkoutConfiguration,
+                    configuration = checkoutConfiguration.getConfiguration(PaymentMethodTypes.SCHEME)!!,
                     callback =
                         CardAdvancedCallback(
                             componentFlutterApi,
@@ -50,7 +51,7 @@ internal class CardAdvancedComponent(
                 return CardComponent.PROVIDER.get(
                     activity = activity,
                     paymentMethod = paymentMethod,
-                    checkoutConfiguration = checkoutConfiguration,
+                    configuration = checkoutConfiguration.getConfiguration(PaymentMethodTypes.SCHEME)!!,
                     callback =
                         CardAdvancedCallback(
                             componentFlutterApi,

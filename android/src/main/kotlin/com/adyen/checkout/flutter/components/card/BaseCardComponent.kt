@@ -6,6 +6,7 @@ import androidx.activity.ComponentActivity
 import com.adyen.checkout.card.old.CardComponent
 import com.adyen.checkout.core.common.CheckoutContext
 import com.adyen.checkout.core.components.CheckoutCallbacks
+import com.adyen.checkout.core.components.data.model.PaymentMethod
 import com.adyen.checkout.flutter.components.view.DynamicComponentView
 import com.adyen.checkout.flutter.generated.BinLookupDataDTO
 import com.adyen.checkout.flutter.generated.CardComponentConfigurationDTO
@@ -49,10 +50,11 @@ abstract class BaseCardComponent(
     }
 
     fun addV6Component(
+        paymentMethod: PaymentMethod,
         checkoutContext: CheckoutContext,
-        callbacks: CheckoutCallbacks
+        checkoutCallbacks: CheckoutCallbacks
     ) {
-        dynamicComponentView.addV6Component(checkoutContext, callbacks)
+        dynamicComponentView.addV6Component(paymentMethod, checkoutContext, checkoutCallbacks)
     }
 
     fun setCurrentCardComponent() = setCurrentCardComponent(this)

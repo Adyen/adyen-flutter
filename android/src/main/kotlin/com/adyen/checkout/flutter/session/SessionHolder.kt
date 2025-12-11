@@ -5,11 +5,9 @@ import org.json.JSONObject
 
 class SessionHolder(
     var sessionSetupResponse: JSONObject = JSONObject(),
-//    var orderResponse: JSONObject? = null,
-    var sessionCheckout: CheckoutContext.Sessions
+    var sessionCheckout: CheckoutContext.Sessions? = null
 ) {
     fun reset() {
         sessionSetupResponse = JSONObject()
-//        orderResponse = null
     }
 }

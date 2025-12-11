@@ -25,6 +25,7 @@ import com.adyen.checkout.flutter.generated.SessionDTO
 import com.adyen.checkout.flutter.generated.UnencryptedCardDTO
 import com.adyen.checkout.flutter.session.SessionHolder
 import com.adyen.checkout.flutter.utils.ConfigurationMapper.toCheckoutConfiguration
+import com.adyen.checkout.flutter.utils.PlatformException
 import com.adyen.checkout.redirect.old.RedirectComponent
 import com.adyen.threeds2.ThreeDS2Service
 import kotlinx.coroutines.Dispatchers
@@ -52,11 +53,11 @@ class CheckoutPlatformApi(
                     checkoutConfiguration = sessionConfiguration
                 )
                 when (result) {
-                    is Checkout.Result.Error -> callback(Result.failure(Exception(result.errorReason))) //TODO define correct Exception
+                    is Checkout.Result.Error -> callback(Result.failure(PlatformException(result.errorReason)))
                     is Checkout.Result.Success -> {
                         onSessionSuccessfullyCreated(
-                            result.checkoutContext,
-                            callback
+                            checkoutSession = result.checkoutContext,
+                            callback = callback
                         )
                     }
                 }
