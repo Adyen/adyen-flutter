@@ -118,7 +118,7 @@ class DropInPlatformApi: DropInPlatformInterface {
             dropInAdvancedFlowDelegate = DropInAdvancedFlowDelegate(checkoutFlutter: checkoutFlutter)
             dropInAdvancedFlowDelegate?.dropInInteractorDelegate = self
             dropInComponent.delegate = dropInAdvancedFlowDelegate
-            dropInComponent.cardComponentDelegate = self
+//            dropInComponent.cardComponentDelegate = self
             if dropInConfigurationDTO.isPartialPaymentSupported {
                 dropInComponent.partialPaymentDelegate = self
             }
@@ -409,7 +409,7 @@ extension DropInPlatformApi: PartialPaymentDelegate {
 
 }
 
-extension DropInPlatformApi: CardComponentDelegate {
+extension DropInPlatformApi {
     func didSubmit(lastFour: String, finalBIN: String, component: CardComponent) {}
     
     func didChangeBIN(_ value: String, component: CardComponent) {

@@ -77,7 +77,7 @@ extension DropInConfigurationDTO {
         let socialSecurityNumberMode = cardConfigurationDTO.socialSecurityNumberFieldVisibility.toCardFieldVisibility()
         let storedCardConfiguration = createStoredCardConfiguration(showCvcForStoredCard: cardConfigurationDTO.showCvcForStoredCard)
         let allowedCardTypes = determineAllowedCardTypes(cardTypes: cardConfigurationDTO.supportedCardTypes)
-        let billingAddressConfiguration = determineBillingAddressConfiguration(addressMode: cardConfigurationDTO.addressMode)
+//        let billingAddressConfiguration = determineBillingAddressConfiguration(addressMode: cardConfigurationDTO.addressMode)
         return DropInComponent.Card(
             showsHolderNameField: cardConfigurationDTO.holderNameRequired,
             showsStorePaymentMethodField: cardConfigurationDTO.showStorePaymentField,
@@ -86,7 +86,7 @@ extension DropInConfigurationDTO {
             socialSecurityNumberMode: socialSecurityNumberMode,
             storedCardConfiguration: storedCardConfiguration,
             allowedCardTypes: allowedCardTypes,
-            billingAddress: billingAddressConfiguration
+//            billingAddress: billingAddressConfiguration
         )
     }
 
@@ -104,8 +104,8 @@ extension DropInConfigurationDTO {
         return mappedCardTypes.compactMap { $0 }.map { CardType(rawValue: $0.lowercased()) }
     }
 
-    private func determineBillingAddressConfiguration(addressMode: AddressMode?) -> BillingAddressConfiguration {
-        var billingAddressConfiguration = BillingAddressConfiguration()
+//    private func determineBillingAddressConfiguration(addressMode: AddressMode?) -> BillingAddressConfiguration {
+//        var billingAddressConfiguration = BillingAddressConfiguration()
 //        switch addressMode {
 //        case .full:
 //            billingAddressConfiguration.mode = CardComponent.AddressFormType.full
@@ -116,9 +116,9 @@ extension DropInConfigurationDTO {
 //        default:
 //            billingAddressConfiguration.mode = CardComponent.AddressFormType.none
 //        }
-
-        return billingAddressConfiguration
-    }
+//
+//        return billingAddressConfiguration
+//    }
 }
 
 extension FieldVisibility {
@@ -152,17 +152,17 @@ extension CardConfigurationDTO {
         let socialSecurityNumberMode = socialSecurityNumberFieldVisibility.toCardFieldVisibility()
         let storedCardConfiguration = createStoredCardConfiguration(showCvcForStoredCard: showCvcForStoredCard)
         let allowedCardTypes = determineAllowedCardTypes(cardTypes: supportedCardTypes)
-        let billingAddressConfiguration = determineBillingAddressConfiguration(addressMode: addressMode)
+//        let billingAddressConfiguration = determineBillingAddressConfiguration(addressMode: addressMode)
         return CardComponentConfiguration(
-            style: cardComponentStyle,
-            localizationParameters: localizationParameters,
-            showsHolderNameField: holderNameRequired,
-            showsStorePaymentMethodField: showStorePaymentField,
-            showsSecurityCodeField: showCvc,
-            koreanAuthenticationMode: koreanAuthenticationMode,
-            socialSecurityNumberMode: socialSecurityNumberMode,
+//            style: cardComponentStyle,
+//            localizationParameters: localizationParameters,
+//            showsHolderNameField: holderNameRequired,
+//            showsStorePaymentMethodField: showStorePaymentField,
+//            showsSecurityCodeField: showCvc,
+//            koreanAuthenticationMode: koreanAuthenticationMode,
+//            socialSecurityNumberMode: socialSecurityNumberMode,
 //            storedCardConfiguration: storedCardConfiguration,
-            allowedCardTypes: allowedCardTypes,
+//            allowedCardTypes: allowedCardTypes,
 //            billingAddress: billingAddressConfiguration
         )
     }
@@ -181,8 +181,8 @@ extension CardConfigurationDTO {
         return mappedCardTypes.compactMap { $0 }.map { CardType(rawValue: $0.lowercased()) }
     }
 
-    private func determineBillingAddressConfiguration(addressMode: AddressMode?) -> BillingAddressConfiguration {
-        var billingAddressConfiguration = BillingAddressConfiguration()
+//    private func determineBillingAddressConfiguration(addressMode: AddressMode?) -> BillingAddressConfiguration {
+//        var billingAddressConfiguration = BillingAddressConfiguration()
 //        switch addressMode {
 //        case .full:
 //            billingAddressConfiguration.mode = CardComponent.AddressFormType.full
@@ -193,9 +193,9 @@ extension CardConfigurationDTO {
 //        default:
 //            billingAddressConfiguration.mode = CardComponent.AddressFormType.none
 //        }
-
-        return billingAddressConfiguration
-    }
+//
+//        return billingAddressConfiguration
+//    }
 }
 
 extension CardComponentConfigurationDTO {

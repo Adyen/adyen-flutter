@@ -61,7 +61,7 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
                     //                )
                 case let cardComponentConfigurationDTO as CardComponentConfigurationDTO:
                     try await createSessionForComponent(
-                        configuration: cardComponentConfigurationDTO.createCheckoutConfiguration(),
+                        configuration: cardComponentConfigurationDTO,
                         sessionId: sessionId,
                         sessionData: sessionData,
                         completion: completion
@@ -141,12 +141,52 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
     }
 
     private func createSessionForComponent(
-        configuration: CheckoutConfiguration,
+        configuration: CardComponentConfigurationDTO,
         sessionId: String,
         sessionData: String,
         completion: @escaping (Result<SessionDTO, Error>) -> Void
     ) async throws {
-        let sessionDelegate = ComponentSessionFlowHandler(componentFlutterApi: componentFlutterApi)
+//        let sessionDelegate = ComponentSessionFlowHandler(componentFlutterApi: componentFlutterApi)
+        let configuration = try CheckoutConfiguration(
+            environment: configuration.environment.mapToEnvironment(),
+            amount: configuration.amount!.mapToAmount(),
+            clientKey: configuration.clientKey,
+            analyticsConfiguration: .init()
+        ){
+            CardComponentConfiguration()
+        }.onComplete { [weak self] result in
+            let paymentResult = PaymentResultModelDTO(
+                sessionId: sessionId,
+                sessionData: sessionData,
+                sessionResult: result.sessionResult,
+                resultCode: result.resultCode.rawValue
+            )
+            let componentCommunicationModel = ComponentCommunicationModel(
+                type: ComponentCommunicationType.result,
+                componentId: "",
+                paymentResult: PaymentResultDTO(
+                    type: PaymentResultEnum.finished,
+                    result: paymentResult
+                )
+            )
+            self?.componentFlutterApi.onComponentCommunication(
+                componentCommunicationModel: componentCommunicationModel,
+                completion: { _ in }
+            )
+        }.onError { [weak self] error in
+            let componentCommunicationModel = ComponentCommunicationModel(
+                type: ComponentCommunicationType.result,
+                componentId: "",
+                paymentResult: PaymentResultDTO(
+                    type: .from(error: error),
+                    reason: error.localizedDescription
+                )
+            )
+            self?.componentFlutterApi.onComponentCommunication(
+                componentCommunicationModel: componentCommunicationModel,
+                completion: { _ in }
+            )
+        }
         try await requestAndSetSession(
             checkoutConfiguration: configuration,
             sessionId: sessionId,
@@ -189,9 +229,6 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
         sessionData: String,
         completion: @escaping (Result<SessionDTO, Error>) -> Void
     ) async throws {
-//        guard let presentationDelegate = getViewController() else {
-//            throw PlatformError(errorDescription: "Host view controller not available.")
-//        }
 
         let adyenCheckout = try await AdyenCheckout.setup(
             with: sessionId,
@@ -201,6 +238,7 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
 
         sessionHolder.sessionId = sessionId
         sessionHolder.sessionData = sessionData
+        sessionHolder.adyenCheckout = adyenCheckout
 
         let encodedPaymentMethods = try JSONEncoder().encode(adyenCheckout.paymentMethods)
         guard let encodedPaymentMethodsString = String(data: encodedPaymentMethods, encoding: .utf8) else {
