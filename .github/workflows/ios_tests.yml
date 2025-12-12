@@ -43,7 +43,7 @@ jobs:
           fastlane run swiftlint config_file:".swiftlint.yml" output_file:"swiftLintReport.json" reporter:"json"
 
       - name: Cache iOS reports
-        uses: actions/cache/save@a7833574556fa59680c1b7cb190c1735db73ebf0 # v5.0.0
+        uses: actions/cache/save@9255dc7a253b0ccc959486e2bca901246202afeb # v5.0.1
         id: save-iOS-reports
         with:
           path: ios/
