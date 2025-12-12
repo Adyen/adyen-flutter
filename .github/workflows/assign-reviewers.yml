@@ -20,7 +20,7 @@ jobs:
         if: contains(steps.changed-files.outputs.all_changed_files, '.kt') ||
           contains(steps.changed-files.outputs.all_changed_files, '.java') ||
           contains(steps.changed-files.outputs.all_changed_files, '.gradle') ||
-          contains(steps.changed-files.outputs.all_changed_files, '/android/')
+          contains(steps.changed-files.outputs.all_changed_files, '/android/') ||
           contains(steps.changed-files.outputs.all_changed_files, '.xml')
         uses: actions/github-script@v7
         with:
@@ -29,7 +29,7 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               pull_number: context.issue.number,
-              team_reviewers: ['@Adyen/checkout-android']
+              team_reviewers: ['checkout-android']
             });
 
       - name: Assign iOS reviewer
@@ -46,5 +46,5 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               pull_number: context.issue.number,
-              team_reviewers: ['@Adyen/checkout-ios ']
+              team_reviewers: ['checkout-ios']
             });
