@@ -49,6 +49,10 @@ jobs:
           path: ios/
           key: ios-reports
 
+      - name: Run Swift Package unit tests
+        working-directory: ios/adyen_checkout
+        run: swift test
+
       - name: Run ios unit tests
         run: |
           xcodebuild test \
