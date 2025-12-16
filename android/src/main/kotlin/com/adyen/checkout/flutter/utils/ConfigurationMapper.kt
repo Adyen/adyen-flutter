@@ -171,7 +171,7 @@ object ConfigurationMapper {
                     configurationDTO.allowedCardNetworks?.let { allowedCardNetworks = it.filterNotNull() }
                     configurationDTO.allowedAuthMethods?.let { allowedAuthMethods = it.filterNotNull() }
                     configurationDTO.allowPrepaidCards?.let { isAllowPrepaidCards = it }
-                    isAllowCreditCards = configurationDTO.allowCreditCards
+                    configurationDTO.allowCreditCards?.let { isAllowCreditCards = it }
                     configurationDTO.assuranceDetailsRequired?.let { isAssuranceDetailsRequired = it }
                     configurationDTO.emailRequired?.let { isEmailRequired = it }
                     configurationDTO.existingPaymentMethodRequired?.let { isExistingPaymentMethodRequired = it }
