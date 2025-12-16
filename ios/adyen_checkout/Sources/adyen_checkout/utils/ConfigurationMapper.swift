@@ -59,7 +59,7 @@ extension DropInConfigurationDTO {
 
         return dropInConfiguration
     }
-    
+
     func createCheckoutConfiguration() throws -> CheckoutConfiguration {
         return try CheckoutConfiguration(
             environment: environment.mapToEnvironment(),
@@ -67,7 +67,7 @@ extension DropInConfigurationDTO {
             clientKey: clientKey,
             analyticsConfiguration: AnalyticsConfiguration(isEnabled: analyticsOptionsDTO.enabled),
             content: {
-                
+
             }
         )
     }
@@ -133,13 +133,14 @@ extension FieldVisibility {
 }
 
 extension DropInConfigurationDTO {
-    func createAdyenContext() throws -> AdyenContext {
+    func createAdyenContext(payment: Payment? = nil) throws -> AdyenContext {
         try buildAdyenContext(
             environment: environment,
             clientKey: clientKey,
             amount: amount,
             analyticsOptionsDTO: analyticsOptionsDTO,
-            countryCode: countryCode
+            countryCode: countryCode,
+            payment: payment
         )
     }
 }
@@ -208,7 +209,7 @@ extension CardComponentConfigurationDTO {
             countryCode: countryCode
         )
     }
-    
+
     func createCheckoutConfiguration() throws -> CheckoutConfiguration {
         return try CheckoutConfiguration(
             environment: environment.mapToEnvironment(),
@@ -252,27 +253,30 @@ extension InstantPaymentConfigurationDTO {
         return applePayConfiguration
     }
 
-    func createAdyenContext() throws -> AdyenContext {
+    func createAdyenContext(payment: Payment? = nil) throws -> AdyenContext {
         try buildAdyenContext(
             environment: environment,
             clientKey: clientKey,
             amount: amount,
             analyticsOptionsDTO: analyticsOptionsDTO,
-            countryCode: countryCode
+            countryCode: countryCode,
+            payment: payment
         )
     }
 }
 
-private func buildAdyenContext(environment: Environment, clientKey: String, amount: AmountDTO?, analyticsOptionsDTO: AnalyticsOptionsDTO, countryCode: String?) throws -> AdyenContext {
+private func buildAdyenContext(environment: Environment, clientKey: String, amount: AmountDTO?, analyticsOptionsDTO: AnalyticsOptionsDTO, countryCode: String?, payment: Payment? = nil) throws -> AdyenContext {
     let environment = environment.mapToEnvironment()
     let apiContext = try APIContext(
         environment: environment,
         clientKey: clientKey
     )
-    var payment: Payment? = nil
-    if let amount, let countryCode {
-        payment = Payment(amount: amount.mapToAmount(), countryCode: countryCode)
-    }
+    let payment: Payment? = payment ?? {
+        if let amount, let countryCode {
+            return Payment(amount: amount.mapToAmount(), countryCode: countryCode)
+        }
+        return nil
+    }()
     var analyticsConfiguration = AnalyticsConfiguration(isEnabled: analyticsOptionsDTO.enabled)
     analyticsConfiguration.context = AnalyticsContext(
         version: analyticsOptionsDTO.version,

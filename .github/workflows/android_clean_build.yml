@@ -15,7 +15,7 @@ jobs:
       matrix:
         api-level: [ 36 ]
         flutter-version: [ 3.16.x, 3.19.x, 3.22.x, 3.24.x, 3.27.x, 3.29.x, 3.32.x, 3.35.x, 3.38.x ]
-        agp_version: [ 8.13.1 ]
+        agp_version: [ 8.13.2 ]
         gradle_version: [ 8.13 ]
     env:
       FLUTTER_VERSION: ${{ matrix.flutter-version }}
@@ -103,7 +103,7 @@ jobs:
           cache-read-only: false
 
       - name: AVD cache
-        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+        uses: actions/cache@9255dc7a253b0ccc959486e2bca901246202afeb # v5.0.1
         id: avd-cache
         with:
           path: |
