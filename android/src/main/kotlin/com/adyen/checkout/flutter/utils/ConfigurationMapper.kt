@@ -252,7 +252,7 @@ object ConfigurationMapper {
         }
 
     private fun mapToSupportedCardBrands(cardTypes: List<String?>?): List<CardBrand> =
-        cardTypes.orEmpty().filterNotNull().map(::CardBrand)
+        cardTypes.orEmpty().filterNotNull().map { CardBrand(it.lowercase()) }
 
     private fun AmountDTO.mapToAmount(): Amount = Amount(this.currency, this.value)
 

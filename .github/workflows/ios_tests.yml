@@ -49,14 +49,13 @@ jobs:
           path: ios/
           key: ios-reports
 
-      - name: Run Swift Package unit tests
-        working-directory: ios/adyen_checkout
-        run: swift test
-
-      - name: Run ios unit tests
+      - name: Run unit tests
+        env:
+          DESTINATION: "platform=iOS Simulator,name=iPhone 17,OS=26.1"
         run: |
-          xcodebuild test \
-          -workspace Runner.xcworkspace \
-          -scheme Runner \
-          -destination "platform=iOS Simulator,name=iPhone 17,OS=26.1" \
-          -enableCodeCoverage YES | xcpretty --utf --color && exit ${PIPESTATUS[0]}
+          set -e
+          echo "Running Swift Package unit tests..."
+          cd ios/adyen_checkout && xcodebuild test -scheme adyen_checkout -destination "$DESTINATION" -enableCodeCoverage YES | xcpretty --utf --color
+          
+          echo "Running iOS unit tests..."
+          cd ../../example/ios && xcodebuild test -workspace Runner.xcworkspace -scheme Runner -destination "$DESTINATION" -enableCodeCoverage YES | xcpretty --utf --color
