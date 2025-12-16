@@ -702,6 +702,43 @@ class ConfigurationMapperTest {
 
             assertEquals("MIN", googlePayConfiguration?.billingAddressParameters?.format)
         }
+
+        @Test
+        fun `when Google Pay nullable boolean properties are null, then configuration values are null`() {
+            val googlePayConfigurationDTO = GooglePayConfigurationDTO(
+                googlePayEnvironment = GooglePayEnvironment.TEST,
+                merchantAccount = "TestMerchant",
+                totalPriceStatus = null,
+                allowPrepaidCards = null,
+                allowCreditCards = null,
+                assuranceDetailsRequired = null,
+                emailRequired = null,
+                existingPaymentMethodRequired = null,
+                shippingAddressRequired = null,
+                billingAddressRequired = null,
+            )
+            val instantPaymentConfigurationDTO = InstantPaymentConfigurationDTO(
+                instantPaymentType = InstantPaymentType.GOOGLE_PAY,
+                environment = Environment.TEST,
+                clientKey = TEST_CLIENT_KEY,
+                countryCode = "US",
+                amount = AmountDTO("USD", 1000),
+                analyticsOptionsDTO = AnalyticsOptionsDTO(true, "1.0.0"),
+                googlePayConfigurationDTO = googlePayConfigurationDTO,
+            )
+
+            val checkoutConfiguration = instantPaymentConfigurationDTO.toCheckoutConfiguration()
+            val googlePayConfiguration =
+                checkoutConfiguration.getConfiguration<GooglePayConfiguration>(PaymentMethodTypes.GOOGLE_PAY)
+
+            assertEquals(null, googlePayConfiguration?.isAllowPrepaidCards)
+            assertNull(googlePayConfiguration?.isAllowCreditCards)
+            assertEquals(null, googlePayConfiguration?.isAssuranceDetailsRequired)
+            assertEquals(null, googlePayConfiguration?.isEmailRequired)
+            assertEquals(null, googlePayConfiguration?.isExistingPaymentMethodRequired)
+            assertEquals(null, googlePayConfiguration?.isShippingAddressRequired)
+            assertEquals(null, googlePayConfiguration?.isBillingAddressRequired)
+        }
     }
 
     @Nested

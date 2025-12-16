@@ -170,15 +170,15 @@ object ConfigurationMapper {
                     totalPriceStatus = configurationDTO.totalPriceStatus?.mapToTotalPriceStatus()
                     configurationDTO.allowedCardNetworks?.let { allowedCardNetworks = it.filterNotNull() }
                     configurationDTO.allowedAuthMethods?.let { allowedAuthMethods = it.filterNotNull() }
-                    isAllowPrepaidCards = configurationDTO.allowPrepaidCards
+                    configurationDTO.allowPrepaidCards?.let { isAllowPrepaidCards = it }
                     isAllowCreditCards = configurationDTO.allowCreditCards
-                    isAssuranceDetailsRequired = configurationDTO.assuranceDetailsRequired
-                    isEmailRequired = configurationDTO.emailRequired
-                    isExistingPaymentMethodRequired = configurationDTO.existingPaymentMethodRequired
-                    isShippingAddressRequired = configurationDTO.shippingAddressRequired
+                    configurationDTO.assuranceDetailsRequired?.let { isAssuranceDetailsRequired = it }
+                    configurationDTO.emailRequired?.let { isEmailRequired = it }
+                    configurationDTO.existingPaymentMethodRequired?.let { isExistingPaymentMethodRequired = it }
+                    configurationDTO.shippingAddressRequired?.let { isShippingAddressRequired = it }
                     shippingAddressParameters =
                         configurationDTO.shippingAddressParametersDTO?.mapToShippingAddressParameters()
-                    isBillingAddressRequired = configurationDTO.billingAddressRequired
+                    configurationDTO.billingAddressRequired?.let { isBillingAddressRequired = it }
                     billingAddressParameters =
                         configurationDTO.billingAddressParametersDTO?.mapToBillingAddressParameters()
                 }
