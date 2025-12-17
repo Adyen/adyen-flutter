@@ -40,20 +40,54 @@ class CardAdvancedComponent: BaseCardComponent {
     }
 
     private func setupCardComponentView() {
-        do {
+        Task {
+            do {
+                let configuration = try CheckoutConfiguration(
+                    environment: cardComponentConfiguration!.environment.mapToEnvironment(),
+                    amount: cardComponentConfiguration!.amount!.mapToAmount(),
+                    clientKey: cardComponentConfiguration!.clientKey,
+                    analyticsConfiguration: .init()
+                ) {
+                    cardComponentConfiguration!.createCardComponentConfiguration()
+                }.onSubmit { data, handler in
+                    
+                }.onAdditionalDetails { data, handler in
+                    
+                }.onError { error in
+                    
+                }.onComplete { result in
+                    
+                }
+                
+                let wrappedJSON = "{\"paymentMethods\":[\(paymentMethod)]}"
+                guard let jsonData = wrappedJSON.data(using: .utf8) else {
+                    throw PlatformError(errorDescription: "Failed to encode payment methods")
+                }
+                let paymentMethods = try JSONDecoder().decode(PaymentMethods.self, from: jsonData)
+                let adyenCheckout = try await AdyenCheckout.setup(with: paymentMethods, configuration: configuration)
+                guard let paymentMethodString = paymentMethod else { throw PlatformError(errorDescription: "Payment method not found") }
+                let cardPaymentMethod = try JSONDecoder().decode(CardPaymentMethod.self, from: Data(paymentMethodString.utf8))
+                let cardComponent = try buildCardComponent(adyenCheckout: adyenCheckout, cardPaymentMethod: cardPaymentMethod)
+                showCardComponent(cardComponent: cardComponent)
+            } catch {
+                sendErrorToFlutterLayer(errorMessage: error.localizedDescription)
+            }
+        }
+            
+            
 //            let cardComponent = try setupCardComponent()
 //            actionComponent = buildActionComponent(adyenContext: cardComponent.context)
 //            showCardComponent(cardComponent: cardComponent)
-            componentPlatformApi.onActionCallback = { [weak self] jsonActionResponse in
-                self?.onAction(actionResponse: jsonActionResponse)
-            }
-            componentPlatformApi.onErrorCallback = { [weak self] error in
+//            componentPlatformApi.onActionCallback = { [weak self] jsonActionResponse in
+//                self?.onAction(actionResponse: jsonActionResponse)
+//            }
+//            componentPlatformApi.onErrorCallback = { [weak self] error in
 //                self?.cardComponent?.stopLoading()
 //                self?.sendErrorToFlutterLayer(errorMessage: error?.errorMessage ?? "")
-            }
-        } catch {
-            sendErrorToFlutterLayer(errorMessage: error.localizedDescription)
-        }
+//            }
+//        } catch {
+//            sendErrorToFlutterLayer(errorMessage: error.localizedDescription)
+//        }
     }
 
 //    private func setupCardComponent() throws -> CardComponent {

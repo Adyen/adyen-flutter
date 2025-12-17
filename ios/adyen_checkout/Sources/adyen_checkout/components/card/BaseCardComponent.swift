@@ -111,11 +111,13 @@ class BaseCardComponent: NSObject, FlutterPlatformView, UIScrollViewDelegate {
 //            presentationDelegate: viewController
 //        )
         adyenCheckout = sessionHolder.adyenCheckout
-        
-        
         guard let paymentMethods = adyenCheckout!.paymentMethods else {throw PlatformError() }
         guard let cardPaymentMethod = paymentMethods.paymentMethod(ofType: CardPaymentMethod.self) else {throw PlatformError() }
-        guard let component = adyenCheckout!.createComponent(with: cardPaymentMethod) else {throw PlatformError() }
+        return try buildCardComponent(adyenCheckout: adyenCheckout!, cardPaymentMethod: cardPaymentMethod)
+    }
+    
+    func buildCardComponent(adyenCheckout : AdyenCheckout, cardPaymentMethod: PaymentMethod) throws -> AdyenCheckoutComponent {
+        guard let component = adyenCheckout.createComponent(with: cardPaymentMethod) else {throw PlatformError() }
         return component
     }
     

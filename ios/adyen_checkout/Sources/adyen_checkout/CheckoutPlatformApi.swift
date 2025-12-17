@@ -146,14 +146,13 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
         sessionData: String,
         completion: @escaping (Result<SessionDTO, Error>) -> Void
     ) async throws {
-//        let sessionDelegate = ComponentSessionFlowHandler(componentFlutterApi: componentFlutterApi)
         let configuration = try CheckoutConfiguration(
             environment: configuration.environment.mapToEnvironment(),
             amount: configuration.amount!.mapToAmount(),
             clientKey: configuration.clientKey,
             analyticsConfiguration: .init()
         ){
-            CardComponentConfiguration()
+            configuration.createCardComponentConfiguration()
         }.onComplete { [weak self] result in
             let paymentResult = PaymentResultModelDTO(
                 sessionId: sessionId,

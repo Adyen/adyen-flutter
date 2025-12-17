@@ -38,23 +38,15 @@ class CardSessionComponent: BaseCardComponent {
 
     private func setupCardComponentView() async {
         do {
-            let cardComponent = try await setupCardComponent()
+            guard let cardPaymentMethod = sessionHolder.adyenCheckout?.paymentMethods?.paymentMethod(ofType: CardPaymentMethod.self) else {throw PlatformError(errorDescription: "Card payment method not found") }
+            let cardComponent = try buildCardComponent(
+                adyenCheckout: sessionHolder.adyenCheckout!,
+                cardPaymentMethod: cardPaymentMethod
+            )
             showCardComponent(cardComponent: cardComponent)
         } catch {
             sendErrorToFlutterLayer(errorMessage: error.localizedDescription)
         }
-    }
-
-    private func setupCardComponent() async throws -> AdyenCheckoutComponent {
-        return try await buildCardComponentV6(sessionHolder: sessionHolder)
-//        guard let session = sessionHolder.session else { throw PlatformError(errorDescription: "Session not found") }
-//        return try buildCardComponent(
-//            paymentMethodString: paymentMethod,
-//            isStoredPaymentMethod: isStoredPaymentMethod,
-//            cardComponentConfiguration: cardComponentConfiguration,
-//            componentDelegate: session,
-//            cardDelegate: self
-//        )
     }
 
     func finalizeAndDismissSessionComponent(success: Bool, completion: @escaping (() -> Void)) {

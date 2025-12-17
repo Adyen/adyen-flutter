@@ -43,20 +43,21 @@ class DropInPlatformApi: DropInPlatformInterface {
             guard let viewController = getViewController() else {
                 return
             }
-            guard let paymentMethods = sessionHolder.adyenCheckout?.paymentMethods else {
+            guard var paymentMethods = sessionHolder.adyenCheckout?.paymentMethods else {
                 sendSessionError(error: PlatformError(errorDescription: "Session is not available."))
                 return
             }
 
-            hostViewController = viewController
-            let sessionPayment = session.sessionContext.createPayment(fallbackCountryCode: dropInConfigurationDTO.countryCode)
-            let adyenContext = try dropInConfigurationDTO.createAdyenContext(payment: sessionPayment)
+            guard let session = sessionHolder.session else {
+                sendSessionError(error: PlatformError(errorDescription: "Session is not available."))
+                return
+            }
+            let adyenContext = try dropInConfigurationDTO.createAdyenContext()
             dropInSessionStoredPaymentMethodsDelegate = DropInSessionsStoredPaymentMethodsDelegate(
                 viewController: viewController,
                 checkoutFlutter: checkoutFlutter
             )
-            let dropInConfiguration = try dropInConfigurationDTO.createDropInConfiguration(payment: sessionPayment)
-            var paymentMethods = session.sessionContext.paymentMethods
+            let dropInConfiguration = try dropInConfigurationDTO.createDropInConfiguration(payment: adyenContext.payment)
             if let paymentMethodNames = dropInConfigurationDTO.paymentMethodNames {
                 paymentMethods = overridePaymentMethodNames(
                     paymentMethods: paymentMethods,
@@ -72,15 +73,15 @@ class DropInPlatformApi: DropInPlatformInterface {
             )
             dropInComponent.delegate = sessionHolder.session
             dropInComponent.partialPaymentDelegate = sessionHolder.session
-            dropInComponent.cardComponentDelegate = self
+//            dropInComponent.cardComponentDelegate = self
             if dropInConfigurationDTO.isRemoveStoredPaymentMethodEnabled {
                 dropInComponent.storedPaymentMethodsDelegate = dropInSessionStoredPaymentMethodsDelegate
             }
             
             let dropInViewController = DropInViewController(dropInComponent: dropInComponent)
-            dropInViewController.modalPresentationStyle = .overCurrentContext
+            dropInViewController.modalPresentationStyle = UIModalPresentationStyle.overCurrentContext
             self.dropInViewController = dropInViewController
-            self.hostViewController?.present(dropInViewController, animated: false)
+            viewController.present(dropInViewController, animated: false)
         } catch {
             sendSessionError(error: error)
         }

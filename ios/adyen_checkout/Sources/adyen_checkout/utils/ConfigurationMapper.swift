@@ -147,25 +147,19 @@ extension DropInConfigurationDTO {
 
 extension CardConfigurationDTO {
     func mapToCardComponentConfiguration(shopperLocale: String?) -> CardComponentConfiguration {
-        let cardComponentStyle = AdyenAppearance.cardComponentStyle
         let localizationParameters = shopperLocale != nil ? LocalizationParameters(enforcedLocale: shopperLocale!) : nil
         let koreanAuthenticationMode = kcpFieldVisibility.toCardFieldVisibility()
         let socialSecurityNumberMode = socialSecurityNumberFieldVisibility.toCardFieldVisibility()
         let storedCardConfiguration = createStoredCardConfiguration(showCvcForStoredCard: showCvcForStoredCard)
         let allowedCardTypes = determineAllowedCardTypes(cardTypes: supportedCardTypes)
-//        let billingAddressConfiguration = determineBillingAddressConfiguration(addressMode: addressMode)
-        return CardComponentConfiguration(
-//            style: cardComponentStyle,
-//            localizationParameters: localizationParameters,
-//            showsHolderNameField: holderNameRequired,
-//            showsStorePaymentMethodField: showStorePaymentField,
-//            showsSecurityCodeField: showCvc,
-//            koreanAuthenticationMode: koreanAuthenticationMode,
-//            socialSecurityNumberMode: socialSecurityNumberMode,
-//            storedCardConfiguration: storedCardConfiguration,
-//            allowedCardTypes: allowedCardTypes,
-//            billingAddress: billingAddressConfiguration
-        )
+        let billingAddressConfiguration = determineBillingAddressConfiguration(addressMode: addressMode)
+        return CardComponentConfiguration()
+            .showsHolderNameField(holderNameRequired)
+            .showsStorePaymentMethodField(showStorePaymentField)
+            .showsSecurityCodeField(showCvc)
+            .koreanAuthenticationMode(koreanAuthenticationMode)
+            .socialSecurityNumberMode(socialSecurityNumberMode)
+            .allowedCardTypes(allowedCardTypes)
     }
 
     private func createStoredCardConfiguration(showCvcForStoredCard: Bool) -> StoredCardConfiguration {
@@ -182,21 +176,18 @@ extension CardConfigurationDTO {
         return mappedCardTypes.compactMap { $0 }.map { CardType(rawValue: $0.lowercased()) }
     }
 
-//    private func determineBillingAddressConfiguration(addressMode: AddressMode?) -> BillingAddressConfiguration {
-//        var billingAddressConfiguration = BillingAddressConfiguration()
-//        switch addressMode {
-//        case .full:
-//            billingAddressConfiguration.mode = CardComponent.AddressFormType.full
-//        case .postalCode:
-//            billingAddressConfiguration.mode = CardComponent.AddressFormType.postalCode
-//        case .none:
-//            billingAddressConfiguration.mode = CardComponent.AddressFormType.none
-//        default:
-//            billingAddressConfiguration.mode = CardComponent.AddressFormType.none
-//        }
-//
-//        return billingAddressConfiguration
-//    }
+    private func determineBillingAddressConfiguration(addressMode: AddressMode?) -> BillingAddressMode {
+        switch addressMode {
+        case .full:
+            return BillingAddressMode.full
+        case .postalCode:
+            return BillingAddressMode.postalCode
+        case .none?:
+            return BillingAddressMode.none
+        default:
+            return BillingAddressMode.none
+        }
+    }
 }
 
 extension CardComponentConfigurationDTO {
@@ -216,6 +207,10 @@ extension CardComponentConfigurationDTO {
             amount: amount!.mapToAmount(), //The amount can be optional
             clientKey: clientKey,
         ){}
+    }
+
+    func createCardComponentConfiguration() -> CardComponentConfiguration {
+        cardConfiguration.mapToCardComponentConfiguration(shopperLocale: shopperLocale)
     }
 }
 

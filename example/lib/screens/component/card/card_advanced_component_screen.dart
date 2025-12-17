@@ -22,6 +22,7 @@ class CardAdvancedComponentScreen extends StatelessWidget {
       environment: Config.environment,
       clientKey: Config.clientKey,
       countryCode: Config.countryCode,
+      amount: Config.amount,
       cardConfiguration: CardConfiguration(
         holderNameRequired: true,
         addressMode: AddressMode.full,
