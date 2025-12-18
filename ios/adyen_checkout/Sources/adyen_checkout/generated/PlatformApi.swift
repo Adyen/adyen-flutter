@@ -267,11 +267,11 @@ struct AnalyticsOptionsDTO {
 
 /// Generated class from Pigeon that represents data sent in messages.
 struct ThreeDS2ConfigurationDTO {
-    var requestorAppURL: String
+    var requestorAppURL: String?
 
     // swift-format-ignore: AlwaysUseLowerCamelCase
     static func fromList(_ __pigeon_list: [Any?]) -> ThreeDS2ConfigurationDTO? {
-        let requestorAppURL = __pigeon_list[0] as! String
+        let requestorAppURL: String? = nilOrValue(__pigeon_list[0])
 
         return ThreeDS2ConfigurationDTO(
             requestorAppURL: requestorAppURL

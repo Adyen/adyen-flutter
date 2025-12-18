@@ -233,10 +233,10 @@ class AnalyticsOptionsDTO {
 
 class ThreeDS2ConfigurationDTO {
   ThreeDS2ConfigurationDTO({
-    required this.requestorAppURL,
+    this.requestorAppURL,
   });
 
-  String requestorAppURL;
+  String? requestorAppURL;
 
   Object encode() {
     return <Object?>[
@@ -247,7 +247,7 @@ class ThreeDS2ConfigurationDTO {
   static ThreeDS2ConfigurationDTO decode(Object result) {
     result as List<Object?>;
     return ThreeDS2ConfigurationDTO(
-      requestorAppURL: result[0]! as String,
+      requestorAppURL: result[0] as String?,
     );
   }
 }

@@ -348,13 +348,13 @@ data class AnalyticsOptionsDTO (
 
 /** Generated class from Pigeon that represents data sent in messages. */
 data class ThreeDS2ConfigurationDTO (
-  val requestorAppURL: String
+  val requestorAppURL: String? = null
 
 ) {
   companion object {
     @Suppress("LocalVariableName")
     fun fromList(__pigeon_list: List<Any?>): ThreeDS2ConfigurationDTO {
-      val requestorAppURL = __pigeon_list[0] as String
+      val requestorAppURL = __pigeon_list[0] as String?
       return ThreeDS2ConfigurationDTO(requestorAppURL)
     }
   }

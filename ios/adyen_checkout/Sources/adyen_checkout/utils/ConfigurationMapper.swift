@@ -340,7 +340,7 @@ extension ActionComponentConfigurationDTO {
 
 extension ThreeDS2ConfigurationDTO {
     func mapToThreeDS2Configuration() -> AdyenActionComponent.Configuration.ThreeDS {
-        guard let url = URL(string: requestorAppURL) else { return .init() }
+        guard let requestorAppURL, let url = URL(string: requestorAppURL) else { return .init() }
         return .init(requestorAppURL: url)
     }
 }

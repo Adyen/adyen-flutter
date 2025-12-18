@@ -167,7 +167,7 @@ class AnalyticsOptionsDTO {
 }
 
 class ThreeDS2ConfigurationDTO {
-  final String requestorAppURL;
+  final String? requestorAppURL;
 
   ThreeDS2ConfigurationDTO(
     this.requestorAppURL,
