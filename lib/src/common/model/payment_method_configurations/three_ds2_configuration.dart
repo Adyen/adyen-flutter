@@ -1,8 +1,8 @@
 final class ThreeDS2Configuration {
-  final String requestorAppURL;
+  final String? requestorAppURL;
 
   ThreeDS2Configuration({
-    required this.requestorAppURL,
+    this.requestorAppURL,
   });
 
   @override
