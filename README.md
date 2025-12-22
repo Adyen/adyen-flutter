@@ -3,7 +3,7 @@
 # Adyen Flutter
 
 [![Pub Package](https://img.shields.io/pub/v/adyen_checkout.svg)](https://pub.dev/packages/adyen_checkout)
-[![Adyen iOS](https://img.shields.io/badge/ios-v5.22.0-brightgreen.svg)](https://github.com/Adyen/adyen-ios/releases/tag/5.22.0)
+[![Adyen iOS](https://img.shields.io/badge/ios-v5.22.1-brightgreen.svg)](https://github.com/Adyen/adyen-ios/releases/tag/5.22.1)
 [![Adyen Android](https://img.shields.io/badge/android-v5.16.0-brightgreen.svg)](https://github.com/Adyen/adyen-android/releases/tag/5.16.0)
 
 The Adyen Flutter package provides you with the building blocks to create a checkout experience for
@@ -124,4 +124,3 @@ support@adyen.com
 ## License
 
 MIT license. For more information, see the LICENSE file.
-
