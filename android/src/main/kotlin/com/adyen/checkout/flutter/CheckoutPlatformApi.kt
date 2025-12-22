@@ -30,7 +30,6 @@ import com.adyen.checkout.redirect.old.RedirectComponent
 import com.adyen.threeds2.ThreeDS2Service
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import java.lang.Exception
 
 class CheckoutPlatformApi(
     private val activity: FragmentActivity,
@@ -48,15 +47,15 @@ class CheckoutPlatformApi(
     ) {
         activity.lifecycleScope.launch(Dispatchers.IO) {
             determineSessionConfiguration(configuration)?.let { sessionConfiguration ->
-                val result = Checkout.initialize(
+                val checkoutResult = Checkout.initialize(
                     sessionModel = SessionModel(sessionId, sessionData),
                     checkoutConfiguration = sessionConfiguration
                 )
-                when (result) {
-                    is Checkout.Result.Error -> callback(Result.failure(PlatformException(result.errorReason)))
+                when (checkoutResult) {
+                    is Checkout.Result.Error -> callback(Result.failure(PlatformException(checkoutResult.errorReason)))
                     is Checkout.Result.Success -> {
                         onSessionSuccessfullyCreated(
-                            checkoutSession = result.checkoutContext,
+                            checkoutSession = checkoutResult.checkoutContext,
                             callback = callback
                         )
                     }
