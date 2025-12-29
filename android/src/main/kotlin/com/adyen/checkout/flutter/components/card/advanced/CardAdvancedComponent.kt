@@ -34,7 +34,7 @@ internal class CardAdvancedComponent(
                 return CardComponent.PROVIDER.get(
                     activity = activity,
                     storedPaymentMethod = storedPaymentMethod,
-                    configuration = cardConfiguration,
+                    checkoutConfiguration = checkoutConfiguration,
                     callback =
                         CardAdvancedCallback(
                             componentFlutterApi,
@@ -50,7 +50,7 @@ internal class CardAdvancedComponent(
                 return CardComponent.PROVIDER.get(
                     activity = activity,
                     paymentMethod = paymentMethod,
-                    configuration = cardConfiguration,
+                    checkoutConfiguration = checkoutConfiguration,
                     callback =
                         CardAdvancedCallback(
                             componentFlutterApi,
