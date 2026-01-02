@@ -17,7 +17,7 @@ Before running the example app, ensure you have:
 
 ## Configuration Setup
 
-### Create secrets.json (Recommended)
+### Create secrets.json
 
 For testing the example app, create a `secrets.json` file in the example app root directory with
 your Adyen API credentials:
@@ -33,18 +33,17 @@ your Adyen API credentials:
 
 ### Configuration Details
 
-| Key                         | Description                                                                        |
-|-----------------------------|------------------------------------------------------------------------------------|
-| `CLIENT_KEY`                | Client-side API key for authenticating with Adyen                                  |
-| `X_API_KEY`                 | Server-side API key (for testing purposes only, should be on server in production) |
-| `APPLE_PAY_MERCHANT_ID_KEY` | Your Apple Pay merchant identifier (for iOS only)                                  |
-| `PUBLIC_KEY`                | Adyen public key used for client-side encryption                                   |
+| Key                         | Description                                                                             |
+|-----------------------------|-----------------------------------------------------------------------------------------|
+| `CLIENT_KEY`                | Client-side API key for authenticating with Adyen                                       |
+| `X_API_KEY`                 | Server-side API key (for testing purposes only, should be on your server in production) |
+| `APPLE_PAY_MERCHANT_ID_KEY` | Your Apple Pay merchant identifier (for iOS only)                                       |
+| `PUBLIC_KEY`                | Adyen public key used for client-side encryption                                        |
 
 > ⚠️ **Security Note**: In a production application, API keys should be stored securely on your
 > server and never included in client-side code. This example uses client-side keys for demonstration
 > purposes only.
 
-### Understanding config.dart
 
 The `config.dart` file uses the values from your `secrets.json` file through the
 `String.fromEnvironment()` method. When you run the app with `--dart-define-from-file=secrets.json`,
