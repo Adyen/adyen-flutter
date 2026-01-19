@@ -118,7 +118,8 @@ class CheckoutPlatformApi(
                     configuration.environment.mapToEnvironment(),
                     configuration.clientKey,
                     configuration.analyticsOptionsDTO.mapToAnalyticsConfiguration(),
-                    configuration.amount?.mapToAmount()
+                    configuration.amount?.mapToAmount(),
+                    configuration.threeDS2ConfigurationDTO,
                 )
             }
 
@@ -127,6 +128,7 @@ class CheckoutPlatformApi(
                     InstantPaymentType.APPLE_PAY -> throw IllegalStateException(
                         "Apple Pay is not supported on Android."
                     )
+
                     InstantPaymentType.GOOGLE_PAY -> configuration.mapToCheckoutConfiguration()
                     InstantPaymentType.INSTANT -> configuration.mapToCheckoutConfiguration()
                 }

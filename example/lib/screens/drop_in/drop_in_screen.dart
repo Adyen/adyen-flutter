@@ -115,12 +115,17 @@ class DropInScreen extends StatelessWidget {
       billingAddressRequired: true,
     );
 
-    //To support CashAppPay please add "pod 'Adyen/CashAppPay'" to your Podfile.
+    //To support CashAppPay on iOS please add "pod 'Adyen/CashAppPay'" to your Podfile.
     final String returnUrl = await repository.determineBaseReturnUrl();
     final CashAppPayConfiguration cashAppPayConfiguration =
         CashAppPayConfiguration(
       cashAppPayEnvironment: CashAppPayEnvironment.sandbox,
       returnUrl: returnUrl,
+    );
+
+    //To support TWINT on iOS please add "pod 'Adyen/AdyenTwint'" to your Podfile.
+    const TwintConfiguration twintConfiguration = TwintConfiguration(
+      iosCallbackAppScheme: "com.mydomain.adyencheckout",
     );
 
     final StoredPaymentMethodConfiguration storedPaymentMethodConfiguration =
@@ -140,6 +145,7 @@ class DropInScreen extends StatelessWidget {
       applePayConfiguration: applePayConfiguration,
       googlePayConfiguration: googlePayConfiguration,
       cashAppPayConfiguration: cashAppPayConfiguration,
+      twintConfiguration: twintConfiguration,
       storedPaymentMethodConfiguration: storedPaymentMethodConfiguration,
     );
 

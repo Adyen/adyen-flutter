@@ -18,6 +18,9 @@ import PassKit
 #if canImport(Adyen3DS2)
     import Adyen3DS2
 #endif
+#if canImport(AdyenActions)
+    import AdyenActions
+#endif
 
 extension DropInConfigurationDTO {
     func createDropInConfiguration(payment: Payment?) throws -> DropInComponent.Configuration {
@@ -42,6 +45,14 @@ extension DropInConfigurationDTO {
 
         if let cashAppPayConfigurationDTO {
             dropInConfiguration.cashAppPay = DropInComponent.CashAppPay(redirectURL: URL(string: cashAppPayConfigurationDTO.returnUrl)!)
+        }
+
+        if let twintConfigurationDTO {
+            dropInConfiguration.actionComponent.twint = .init(callbackAppScheme: twintConfigurationDTO.iosCallbackAppScheme)
+        }
+
+        if let threeDS2ConfigurationDTO {
+            dropInConfiguration.actionComponent.threeDS = threeDS2ConfigurationDTO.mapToThreeDS2Configuration()
         }
 
         dropInConfiguration.style = AdyenAppearance.dropInStyle
@@ -96,7 +107,6 @@ extension DropInConfigurationDTO {
 
         return billingAddressConfiguration
     }
-
 }
 
 extension FieldVisibility {
@@ -111,13 +121,14 @@ extension FieldVisibility {
 }
 
 extension DropInConfigurationDTO {
-    func createAdyenContext() throws -> AdyenContext {
+    func createAdyenContext(payment: Payment? = nil) throws -> AdyenContext {
         try buildAdyenContext(
             environment: environment,
             clientKey: clientKey,
             amount: amount,
             analyticsOptionsDTO: analyticsOptionsDTO,
-            countryCode: countryCode
+            countryCode: countryCode,
+            payment: payment
         )
     }
 }
@@ -222,27 +233,30 @@ extension InstantPaymentConfigurationDTO {
         return applePayConfiguration
     }
 
-    func createAdyenContext() throws -> AdyenContext {
+    func createAdyenContext(payment: Payment? = nil) throws -> AdyenContext {
         try buildAdyenContext(
             environment: environment,
             clientKey: clientKey,
             amount: amount,
             analyticsOptionsDTO: analyticsOptionsDTO,
-            countryCode: countryCode
+            countryCode: countryCode,
+            payment: payment
         )
     }
 }
 
-private func buildAdyenContext(environment: Environment, clientKey: String, amount: AmountDTO?, analyticsOptionsDTO: AnalyticsOptionsDTO, countryCode: String?) throws -> AdyenContext {
+private func buildAdyenContext(environment: Environment, clientKey: String, amount: AmountDTO?, analyticsOptionsDTO: AnalyticsOptionsDTO, countryCode: String?, payment: Payment? = nil) throws -> AdyenContext {
     let environment = environment.mapToEnvironment()
     let apiContext = try APIContext(
         environment: environment,
         clientKey: clientKey
     )
-    var payment: Payment? = nil
-    if let amount, let countryCode {
-        payment = Payment(amount: amount.mapToAmount(), countryCode: countryCode)
-    }
+    let payment: Payment? = payment ?? {
+        if let amount, let countryCode {
+            return Payment(amount: amount.mapToAmount(), countryCode: countryCode)
+        }
+        return nil
+    }()
     var analyticsConfiguration = AnalyticsConfiguration()
     analyticsConfiguration.isEnabled = analyticsOptionsDTO.enabled
     analyticsConfiguration.context = AnalyticsContext(
@@ -321,5 +335,12 @@ extension ActionComponentConfigurationDTO {
             analyticsOptionsDTO: analyticsOptionsDTO,
             countryCode: nil
         )
+    }
+}
+
+extension ThreeDS2ConfigurationDTO {
+    func mapToThreeDS2Configuration() -> AdyenActionComponent.Configuration.ThreeDS {
+        guard let requestorAppURL, let url = URL(string: requestorAppURL) else { return .init() }
+        return .init(requestorAppURL: url)
     }
 }
