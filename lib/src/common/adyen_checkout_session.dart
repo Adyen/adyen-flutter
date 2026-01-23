@@ -45,7 +45,6 @@ class AdyenCheckoutSession {
 
     return SessionCheckout(
       id: sessionDTO.id,
-      sessionData: sessionDTO.sessionData,
       paymentMethods: jsonDecode(sessionDTO.paymentMethodsJson),
     );
   }

@@ -136,12 +136,10 @@ enum CardSecurityCodeValidationResultDTO { valid, invalid }
 
 class SessionDTO {
   final String id;
-  final String sessionData;
   final String paymentMethodsJson;
 
   SessionDTO(
     this.id,
-    this.sessionData,
     this.paymentMethodsJson,
   );
 }

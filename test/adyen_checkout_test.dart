@@ -19,7 +19,6 @@ class MockAdyenCheckoutPlatform implements CheckoutPlatformInterface {
   ) async {
     return SessionDTO(
       id: "id",
-      sessionData: "sessionData",
       paymentMethodsJson: "",
     );
   }

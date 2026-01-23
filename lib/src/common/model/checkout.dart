@@ -5,12 +5,10 @@ sealed class Checkout {}
 
 class SessionCheckout extends Checkout {
   final String id;
-  final String sessionData;
   final Map<String, dynamic> paymentMethods;
 
   SessionCheckout({
     required this.id,
-    required this.sessionData,
     required this.paymentMethods,
   });
 }

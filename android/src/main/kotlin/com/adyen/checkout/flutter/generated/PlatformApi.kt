@@ -280,7 +280,6 @@ enum class CardSecurityCodeValidationResultDTO(val raw: Int) {
 /** Generated class from Pigeon that represents data sent in messages. */
 data class SessionDTO (
   val id: String,
-  val sessionData: String,
   val paymentMethodsJson: String
 
 ) {
@@ -288,15 +287,13 @@ data class SessionDTO (
     @Suppress("LocalVariableName")
     fun fromList(__pigeon_list: List<Any?>): SessionDTO {
       val id = __pigeon_list[0] as String
-      val sessionData = __pigeon_list[1] as String
-      val paymentMethodsJson = __pigeon_list[2] as String
-      return SessionDTO(id, sessionData, paymentMethodsJson)
+      val paymentMethodsJson = __pigeon_list[1] as String
+      return SessionDTO(id, paymentMethodsJson)
     }
   }
   fun toList(): List<Any?> {
     return listOf(
       id,
-      sessionData,
       paymentMethodsJson,
     )
   }

@@ -176,7 +176,6 @@ extension SessionMapper on SessionCheckout {
 
     return SessionDTO(
       id: id,
-      sessionData: sessionData,
       paymentMethodsJson: encodedPaymentMethods,
     );
   }

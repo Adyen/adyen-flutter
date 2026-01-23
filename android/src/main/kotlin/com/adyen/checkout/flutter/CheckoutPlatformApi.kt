@@ -9,7 +9,7 @@ import com.adyen.checkout.core.components.CheckoutConfiguration
 import com.adyen.checkout.core.components.data.model.PaymentMethodsApiResponse
 import com.adyen.checkout.core.old.AdyenLogLevel
 import com.adyen.checkout.core.old.AdyenLogger
-import com.adyen.checkout.core.sessions.SessionModel
+import com.adyen.checkout.core.sessions.SessionResponse
 import com.adyen.checkout.flutter.apiOnly.AdyenCSE
 import com.adyen.checkout.flutter.apiOnly.CardValidation
 import com.adyen.checkout.flutter.generated.CardComponentConfigurationDTO
@@ -45,21 +45,30 @@ class CheckoutPlatformApi(
         configuration: Any?,
         callback: (Result<SessionDTO>) -> Unit,
     ) {
+        //v2 TODO: Create SessionResponse DTO class
         activity.lifecycleScope.launch(Dispatchers.IO) {
-            determineSessionConfiguration(configuration)?.let { sessionConfiguration ->
-                val checkoutResult = Checkout.initialize(
-                    sessionModel = SessionModel(sessionId, sessionData),
-                    checkoutConfiguration = sessionConfiguration
+            val sessionConfiguration = determineSessionConfiguration(configuration) ?: run {
+                onSessionCreationError(
+                    error = "Invalid configuration provided",
+                    callback = callback
                 )
-                when (checkoutResult) {
-                    is Checkout.Result.Error -> callback(Result.failure(PlatformException(checkoutResult.errorReason)))
-                    is Checkout.Result.Success -> {
-                        onSessionSuccessfullyCreated(
-                            checkoutSession = checkoutResult.checkoutContext,
-                            callback = callback
-                        )
-                    }
-                }
+                return@launch
+            }
+            
+            val checkoutResult = Checkout.setup(
+                SessionResponse(sessionId, sessionData),
+                sessionConfiguration
+            )
+            when (checkoutResult) {
+                is Checkout.Result.Error -> onSessionCreationError(
+                    error = checkoutResult.errorReason,
+                    callback = callback
+                )
+
+                is Checkout.Result.Success -> onSessionCreationSuccess(
+                    checkoutSession = checkoutResult.checkoutContext,
+                    callback = callback
+                )
             }
         }
     }
@@ -101,6 +110,17 @@ class CheckoutPlatformApi(
         cardBrand: String?
     ): CardSecurityCodeValidationResultDTO = CardValidation.validateCardSecurityCode(securityCode, cardBrand)
 
+    @SuppressLint("RestrictedApi")
+    override fun enableConsoleLogging(loggingEnabled: Boolean) {
+        if (loggingEnabled) {
+            AdyenLogger.setLogLevel(AdyenLogLevel.VERBOSE)
+        } else {
+            AdyenLogger.setLogLevel(AdyenLogLevel.NONE)
+        }
+    }
+
+    override fun getThreeDS2SdkVersion(): String = ThreeDS2Service.INSTANCE.sdkVersion
+
     private fun determineSessionConfiguration(configuration: Any?): CheckoutConfiguration? {
         when (configuration) {
             is DropInConfigurationDTO -> return configuration.toCheckoutConfiguration()
@@ -119,7 +139,7 @@ class CheckoutPlatformApi(
         return null
     }
 
-    private fun onSessionSuccessfullyCreated(
+    private fun onSessionCreationSuccess(
         checkoutSession: CheckoutContext.Sessions,
         callback: (Result<SessionDTO>) -> Unit,
     ) {
@@ -132,21 +152,15 @@ class CheckoutPlatformApi(
             Result.success(
                 SessionDTO(
                     id = checkoutSession.checkoutSession.sessionSetupResponse.id,
-                    sessionData = checkoutSession.checkoutSession.sessionSetupResponse.sessionData,
                     paymentMethodsJson = paymentMethodsJsonObject?.toString() ?: "",
                 )
             )
         )
     }
-
-    @SuppressLint("RestrictedApi")
-    override fun enableConsoleLogging(loggingEnabled: Boolean) {
-        if (loggingEnabled) {
-            AdyenLogger.setLogLevel(AdyenLogLevel.VERBOSE)
-        } else {
-            AdyenLogger.setLogLevel(AdyenLogLevel.NONE)
-        }
+    private fun onSessionCreationError(
+        error: String,
+        callback: (Result<SessionDTO>) -> Unit,
+    ) {
+        callback(Result.failure(PlatformException(error)))
     }
-
-    override fun getThreeDS2SdkVersion(): String = ThreeDS2Service.INSTANCE.sdkVersion
 }
