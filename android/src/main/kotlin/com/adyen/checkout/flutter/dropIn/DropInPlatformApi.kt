@@ -37,7 +37,7 @@ import com.adyen.checkout.flutter.generated.PaymentResultDTO
 import com.adyen.checkout.flutter.generated.PaymentResultEnum
 import com.adyen.checkout.flutter.generated.PaymentResultModelDTO
 import com.adyen.checkout.flutter.session.SessionHolder
-import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToDropInConfiguration
+import com.adyen.checkout.flutter.utils.ConfigurationMapper.toCheckoutConfiguration
 import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToEnvironment
 import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToOrderResponseModel
 import com.adyen.checkout.sessions.core.CheckoutSession
@@ -65,7 +65,7 @@ internal class DropInPlatformApi(
 
     override fun showDropInSession(dropInConfigurationDTO: DropInConfigurationDTO) {
         setStoredPaymentMethodDeletionObserver()
-        val dropInConfiguration = dropInConfigurationDTO.mapToDropInConfiguration(activity.applicationContext)
+        val dropInConfiguration = dropInConfigurationDTO.toCheckoutConfiguration()
         val checkoutSession =
             createCheckoutSession(
                 sessionHolder,
@@ -107,7 +107,7 @@ internal class DropInPlatformApi(
                     paymentMethodsApiResponse,
                     dropInConfigurationDTO.isPartialPaymentSupported
                 )
-            val dropInConfiguration = dropInConfigurationDTO.mapToDropInConfiguration(activity.applicationContext)
+            val dropInConfiguration = dropInConfigurationDTO.toCheckoutConfiguration()
             withContext(Dispatchers.Main) {
                 DropIn.startPayment(
                     activity.applicationContext,

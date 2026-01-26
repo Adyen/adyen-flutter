@@ -12,7 +12,7 @@ import com.adyen.checkout.flutter.generated.ComponentCommunicationType
 import com.adyen.checkout.flutter.generated.ComponentFlutterInterface
 import com.adyen.checkout.flutter.generated.PaymentResultDTO
 import com.adyen.checkout.flutter.generated.PaymentResultEnum
-import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToCheckoutConfiguration
+import com.adyen.checkout.flutter.utils.ConfigurationMapper.toCheckoutConfiguration
 import org.json.JSONObject
 import java.util.UUID
 
@@ -32,7 +32,7 @@ internal class ActionComponentManager(
                 return
             }
 
-            val checkoutConfiguration = actionComponentConfigurationDTO.mapToCheckoutConfiguration()
+            val checkoutConfiguration = actionComponentConfigurationDTO.toCheckoutConfiguration()
             val actionComponent = createActionComponent(checkoutConfiguration, componentId)
             val action = Action.SERIALIZER.deserialize(JSONObject(actionResponse))
             if (actionComponent.canHandleAction(action)) {
