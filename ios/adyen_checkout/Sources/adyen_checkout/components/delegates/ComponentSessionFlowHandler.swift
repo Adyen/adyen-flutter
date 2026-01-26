@@ -1,9 +1,9 @@
-import Adyen
+@_spi(AdyenInternal) import Adyen
 #if canImport(AdyenSession)
     import AdyenSession
 #endif
 
-class ComponentSessionFlowHandler: AdyenSessionDelegate {
+class ComponentSessionFlowHandler: SessionDelegate {
     private let componentFlutterApi: ComponentFlutterInterface
     var componentId: String?
     var finalizeCallback: ((Bool, @escaping (() -> Void)) -> Void)?
@@ -14,7 +14,7 @@ class ComponentSessionFlowHandler: AdyenSessionDelegate {
         self.componentFlutterApi = componentFlutterApi
     }
     
-    func didComplete(with result: CheckoutResult, component _: Component, session: AdyenSession) {
+    func didComplete(with result: CheckoutResult, component _: Component, session: Session) {
         let resultCode = result.resultCode
         let success = resultCode == .authorised || resultCode == .received || resultCode == .pending
         finalizeCallback?(success) { [weak self] in
@@ -39,7 +39,7 @@ class ComponentSessionFlowHandler: AdyenSessionDelegate {
         }
     }
     
-    func didFail(with error: Error, from component: Component, session: AdyenSession) {
+    func didFail(with error: Error, from component: Component, session: Session) {
         finalizeCallback?(false) { [weak self] in
             guard let self else { return }
             let componentCommunicationModel = ComponentCommunicationModel(

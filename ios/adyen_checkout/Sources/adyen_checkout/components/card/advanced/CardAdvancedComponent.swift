@@ -1,15 +1,18 @@
 @_spi(AdyenInternal) import Adyen
+@_spi(AdyenInternal) import AdyenCheckout
+
+import Flutter
+
 #if canImport(AdyenActions)
     import AdyenActions
 #endif
 #if canImport(AdyenCard)
     import AdyenCard
 #endif
-import Flutter
 
 class CardAdvancedComponent: BaseCardComponent {
     private var actionComponentDelegate: ActionComponentDelegate?
-    private var actionComponent: AdyenActionComponent?
+    private var actionComponent: CheckoutActionComponent?
     private var presentationDelegate: PresentationDelegate?
     private var componentDelegate: PaymentComponentDelegate?
 
@@ -64,7 +67,7 @@ class CardAdvancedComponent: BaseCardComponent {
                     throw PlatformError(errorDescription: "Failed to encode payment methods")
                 }
                 let paymentMethods = try JSONDecoder().decode(PaymentMethods.self, from: jsonData)
-                let adyenCheckout = try await AdyenCheckout.setup(with: paymentMethods, configuration: configuration)
+                let adyenCheckout = try await Checkout.setup(with: paymentMethods, configuration: configuration)
                 guard let paymentMethodString = paymentMethod else { throw PlatformError(errorDescription: "Payment method not found") }
                 let cardPaymentMethod = try JSONDecoder().decode(CardPaymentMethod.self, from: Data(paymentMethodString.utf8))
                 let cardComponent = try buildCardComponent(adyenCheckout: adyenCheckout, cardPaymentMethod: cardPaymentMethod)
@@ -104,12 +107,12 @@ class CardAdvancedComponent: BaseCardComponent {
 //        )
 //    }
 
-    private func buildActionComponent(adyenContext: AdyenContext) -> AdyenActionComponent {
-        var configuration = AdyenActionComponent.Configuration()
+    private func buildActionComponent(adyenContext: AdyenContext) -> CheckoutActionComponent {
+        var configuration = CheckoutActionComponent.Configuration()
         if let threeDS2Config = cardComponentConfiguration?.threeDS2ConfigurationDTO {
             configuration.threeDS = threeDS2Config.mapToThreeDS2Configuration()
         }
-        let actionComponent = AdyenActionComponent(context: adyenContext, configuration: configuration)
+        let actionComponent = CheckoutActionComponent(context: adyenContext, configuration: configuration)
         actionComponent.delegate = actionComponentDelegate
         actionComponent.presentationDelegate = getViewController()
         return actionComponent

@@ -1,11 +1,11 @@
-import Adyen
+@_spi(AdyenInternal) import Adyen
 #if canImport(AdyenActions)
     import AdyenActions
 #endif
 import Foundation
 
 class InstantAdvancedComponent: BaseInstantComponent, InstantComponentProtocol {
-    private var actionComponent: AdyenActionComponent?
+    private var actionComponent: CheckoutActionComponent?
     private var actionComponentHandler: ComponentActionHandler?
     
     init(
@@ -21,7 +21,7 @@ class InstantAdvancedComponent: BaseInstantComponent, InstantComponentProtocol {
     func buildInstantComponent(paymentMethod: PaymentMethod, adyenContext: AdyenContext) -> InstantPaymentComponent {
         let component = InstantPaymentComponent(paymentMethod: paymentMethod, context: adyenContext, order: nil)
         component.delegate = self
-        actionComponent = AdyenActionComponent(context: adyenContext)
+        actionComponent = CheckoutActionComponent(context: adyenContext)
         actionComponentHandler = ComponentActionHandler(
             componentFlutterApi: componentFlutterApi,
             componentId: componentId,

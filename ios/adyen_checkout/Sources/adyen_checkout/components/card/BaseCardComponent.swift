@@ -1,11 +1,13 @@
 @_spi(AdyenInternal) import Adyen
+@_spi(AdyenInternal) import AdyenCheckout
+import Flutter
+
 #if canImport(AdyenCard)
     import AdyenCard
 #endif
 #if canImport(AdyenNetworking)
     import AdyenNetworking
 #endif
-import Flutter
 
 class BaseCardComponent: NSObject, FlutterPlatformView, UIScrollViewDelegate {
     let cardComponentConfigurationKey = "cardComponentConfiguration"
@@ -20,8 +22,8 @@ class BaseCardComponent: NSObject, FlutterPlatformView, UIScrollViewDelegate {
     let componentPlatformApi: ComponentPlatformApi
     let componentWrapperView: ComponentWrapperView
 
-    var cardComponent: AdyenCheckoutComponent?
-    var adyenCheckout: AdyenCheckout? = nil
+    var cardComponent: CheckoutPaymentComponent?
+    var adyenCheckout: Checkout? = nil
     var contentOffset: CGPoint?
 
     init(
@@ -61,7 +63,7 @@ class BaseCardComponent: NSObject, FlutterPlatformView, UIScrollViewDelegate {
         return rootViewController
     }
     
-    func buildCardComponentV6(sessionHolder: SessionHolder) async throws -> AdyenCheckoutComponent {
+    func buildCardComponentV6(sessionHolder: SessionHolder) async throws -> CheckoutPaymentComponent {
 //        let viewController = getViewController()
 //        let configuration = try CheckoutConfiguration(
 //            environment: cardComponentConfiguration?.environment.mapToEnvironment() ?? Adyen.Environment.test,
@@ -116,8 +118,8 @@ class BaseCardComponent: NSObject, FlutterPlatformView, UIScrollViewDelegate {
         return try buildCardComponent(adyenCheckout: adyenCheckout!, cardPaymentMethod: cardPaymentMethod)
     }
     
-    func buildCardComponent(adyenCheckout : AdyenCheckout, cardPaymentMethod: PaymentMethod) throws -> AdyenCheckoutComponent {
-        guard let component = adyenCheckout.createComponent(with: cardPaymentMethod) else {throw PlatformError() }
+    func buildCardComponent(adyenCheckout : Checkout, cardPaymentMethod: PaymentMethod) throws -> CheckoutPaymentComponent {
+        guard let component = adyenCheckout.createPaymentComponent(for: cardPaymentMethod.type) else {throw PlatformError() }
         return component
     }
     
@@ -146,7 +148,7 @@ class BaseCardComponent: NSObject, FlutterPlatformView, UIScrollViewDelegate {
 //        return cardComponent
 //    }
 
-    func showCardComponent(cardComponent: AdyenCheckoutComponent) {
+    func showCardComponent(cardComponent: CheckoutPaymentComponent) {
         self.cardComponent = cardComponent
         if isStoredPaymentMethod {
             let storedCardViewController = cardComponent.viewController

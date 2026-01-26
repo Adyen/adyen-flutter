@@ -11,6 +11,7 @@ import UIKit
     import AdyenActions
 #endif
 @_spi(AdyenInternal) import Adyen
+@_spi(AdyenInternal) import AdyenCheckout
 
 // TODO: Add config:
 // 1) Add Info.plist for adding photo library usage description
@@ -121,7 +122,7 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
     }
     
     func getThreeDS2SdkVersion() throws -> String {
-        threeDS2SdkVersion
+        return threeDS2SdkVersion
     }
 
     private func createSessionForDropIn(
@@ -197,13 +198,13 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
     private func setSession(
         sessionId: String,
         sessionData: String,
-        sessionDelegate: AdyenSessionDelegate,
+        sessionDelegate: SessionDelegate,
         configuration: DropInConfigurationDTO,
         completion: @escaping (Result<SessionDTO, Error>) -> Void
     ) async {
         do {
             let configuration = try configuration.createCheckoutConfiguration()
-            let adyenCheckout = try await AdyenCheckout.setup(with: sessionId, sessionData: sessionData, configuration: configuration)
+            let adyenCheckout = try await Checkout.setup(with: SessionResponse(id: sessionId, sessionData: sessionData), configuration: configuration)
             sessionHolder.adyenCheckout = adyenCheckout
             sessionHolder.sessionDelegate = sessionDelegate
             let encodedPaymentMethods = try JSONEncoder().encode(adyenCheckout.paymentMethods)
@@ -214,7 +215,6 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
 
             completion(Result.success(SessionDTO(
                 id: sessionId,
-                sessionData: sessionData,
                 paymentMethodsJson: encodedPaymentMethodsString
             )))
         } catch {
@@ -229,9 +229,8 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
         completion: @escaping (Result<SessionDTO, Error>) -> Void
     ) async throws {
 
-        let adyenCheckout = try await AdyenCheckout.setup(
-            with: sessionId,
-            sessionData: sessionData,
+        let adyenCheckout = try await Checkout.setup(
+            with: SessionResponse(id: sessionId, sessionData: sessionData),
             configuration: checkoutConfiguration,
         )
 
@@ -246,7 +245,6 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
         }
         completion(Result.success(SessionDTO(
             id: sessionId,
-            sessionData: sessionData,
             paymentMethodsJson: encodedPaymentMethodsString
         )))
 
@@ -282,9 +280,9 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
 //        }
     }
 
-    private func buildActionComponentConfiguration(from threeDS2ConfigurationDTO: ThreeDS2ConfigurationDTO?) -> AdyenActionComponent.Configuration? {
+    private func buildActionComponentConfiguration(from threeDS2ConfigurationDTO: ThreeDS2ConfigurationDTO?) -> CheckoutActionComponent.Configuration? {
             threeDS2ConfigurationDTO.map {
-                var actionComponentConfiguration = AdyenActionComponent.Configuration()
+                var actionComponentConfiguration = CheckoutActionComponent.Configuration()
                 actionComponentConfiguration.threeDS = $0.mapToThreeDS2Configuration()
                 return actionComponentConfiguration
             }

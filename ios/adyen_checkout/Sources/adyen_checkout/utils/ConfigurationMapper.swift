@@ -1,5 +1,7 @@
-@_spi(AdyenInternal) import Adyen
 import PassKit
+@_spi(AdyenInternal) import Adyen
+@_spi(AdyenInternal) import AdyenCheckout
+
 #if canImport(AdyenComponents)
     import AdyenComponents
 #endif
@@ -335,7 +337,7 @@ extension ResultCode {
     }
 }
 
-extension AdyenSession.State {
+extension Session.State {
     func createPayment(fallbackCountryCode: String) -> Payment {
         Payment(amount: amount, countryCode: countryCode ?? fallbackCountryCode)
     }
@@ -354,7 +356,7 @@ extension ActionComponentConfigurationDTO {
 }
 
 extension ThreeDS2ConfigurationDTO {
-    func mapToThreeDS2Configuration() -> AdyenActionComponent.Configuration.ThreeDS {
+    func mapToThreeDS2Configuration() -> CheckoutActionComponent.Configuration.ThreeDS {
         guard let url = URL(string: requestorAppURL) else { return .init() }
         return .init(requestorAppURL: url)
     }

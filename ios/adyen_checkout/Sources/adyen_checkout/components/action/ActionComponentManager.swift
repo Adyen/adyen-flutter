@@ -7,7 +7,7 @@ import UIKit
 
 class ActionComponentManager {
     private let componentFlutterApi: ComponentFlutterInterface
-    private var actionComponent: AdyenActionComponent?
+    private var actionComponent: CheckoutActionComponent?
     enum Constants {
         static let actionComponentId: String = "ACTION_COMPONENT"
     }
@@ -19,7 +19,7 @@ class ActionComponentManager {
     func handleAction(actionComponentConfiguration: ActionComponentConfigurationDTO, componentId: String, actionResponse: [String?: Any?]) {
         do {
             let adyenContext = try actionComponentConfiguration.createAdyenContext()
-            actionComponent = AdyenActionComponent(context: adyenContext)
+            actionComponent = CheckoutActionComponent(context: adyenContext)
             actionComponent?.delegate = self
             actionComponent?.presentationDelegate = getViewController()
             let jsonData = try JSONSerialization.data(withJSONObject: actionResponse, options: [])

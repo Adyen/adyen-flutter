@@ -7,7 +7,7 @@
 #endif
 import UIKit
 
-class DropInSessionsDelegate: AdyenSessionDelegate {
+class DropInSessionsDelegate: SessionDelegate {
     private let viewController: UIViewController?
     private let checkoutFlutter: CheckoutFlutterInterface
 
@@ -16,7 +16,7 @@ class DropInSessionsDelegate: AdyenSessionDelegate {
         self.checkoutFlutter = checkoutFlutter
     }
 
-    func didComplete(with result: CheckoutResult, component _: Adyen.Component, session: Adyen.AdyenSession) {
+    func didComplete(with result: CheckoutResult, component _: Adyen.Component, session: Session) {
         viewController?.dismiss(animated: true, completion: { [weak self] in
             let paymentResult = PaymentResultModelDTO(
                 sessionId: session.state.identifier,
@@ -38,7 +38,7 @@ class DropInSessionsDelegate: AdyenSessionDelegate {
         })
     }
 
-    func didFail(with error: Error, from _: Component, session _: AdyenSession) {
+    func didFail(with error: Error, from _: Component, session _: Session) {
         viewController?.dismiss(animated: true, completion: { [weak self] in
             switch error {
             case ComponentError.cancelled:
@@ -69,7 +69,7 @@ class DropInSessionsDelegate: AdyenSessionDelegate {
         })
     }
 
-    func didOpenExternalApplication(component _: ActionComponent, session _: AdyenSession) {
+    func didOpenExternalApplication(component _: ActionComponent, session _: Session) {
         print("external")
     }
 }

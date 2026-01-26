@@ -1,18 +1,19 @@
+@_spi(AdyenInternal) import AdyenCheckout
 @_spi(AdyenInternal) import Adyen
 #if canImport(AdyenSession)
     import AdyenSession
 #endif
 
 class SessionHolder {
-    var session: AdyenSession?
-    var sessionDelegate: AdyenSessionDelegate?
-    var adyenCheckout : AdyenCheckout?
+    var session: Session?
+    var sessionDelegate: SessionDelegate?
+    var adyenCheckout : Checkout?
     var sessionData: String?
     var sessionId: String?
 
     func setup(
-        session: AdyenSession,
-        sessionDelegate: AdyenSessionDelegate
+        session: Session,
+        sessionDelegate: SessionDelegate
     ) {
         self.session = session
         self.sessionDelegate = sessionDelegate

@@ -31,7 +31,9 @@ target 'Runner' do
   use_frameworks!
   use_modular_headers!
   
-  pod 'Adyen', :git => 'https://github.com/Adyen/adyen-ios.git', :branch => 'v6_base'
+  # pod 'Adyen', :git => 'https://github.com/Adyen/adyen-ios.git', :branch => 'develop'
+  # Adyen iOS SDK is now managed via Swift Package Manager (SPM)
+  # See Xcode project Package Dependencies for configuration
 
   flutter_install_all_ios_pods File.dirname(File.realpath(__FILE__))
   target 'RunnerTests' do

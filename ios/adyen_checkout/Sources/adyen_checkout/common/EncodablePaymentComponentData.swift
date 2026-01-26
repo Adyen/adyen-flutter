@@ -19,7 +19,6 @@ internal struct EncodablePaymentComponentData: Encodable {
         try container.encodeIfPresent(data.order, forKey: .order)
         try container.encodeIfPresent(data.installments, forKey: .installments)
         try container.encodeIfPresent(data.amount, forKey: .amount)
-        try container.encodeIfPresent(data.checkoutAttemptId, forKey: .checkoutAttemptId)
     }
 
     private enum CodingKeys: String, CodingKey {
@@ -35,7 +34,6 @@ internal struct EncodablePaymentComponentData: Encodable {
         case order
         case installments
         case amount
-        case checkoutAttemptId
     }
 }
 

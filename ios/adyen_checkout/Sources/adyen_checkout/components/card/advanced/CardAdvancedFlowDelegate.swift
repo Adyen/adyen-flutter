@@ -23,7 +23,6 @@ class CardAdvancedFlowDelegate: PaymentComponentDelegate {
                 emailAddress: data.emailAddress,
                 telephoneNumber: data.telephoneNumber,
                 browserInfo: data.browserInfo,
-                checkoutAttemptId: data.checkoutAttemptId,
                 billingAddress: data.billingAddress,
                 deliveryAddress: data.deliveryAddress,
                 socialSecurityNumber: data.socialSecurityNumber,

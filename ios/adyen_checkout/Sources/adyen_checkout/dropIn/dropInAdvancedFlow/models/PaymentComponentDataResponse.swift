@@ -26,8 +26,6 @@ struct PaymentComponentDataResponse: Encodable {
 
     let browserInfo: BrowserInfo?
 
-    let checkoutAttemptId: String?
-
     let billingAddress: PostalAddress?
 
     let deliveryAddress: PostalAddress?
@@ -48,7 +46,6 @@ struct PaymentComponentDataResponse: Encodable {
              emailAddress,
              telephoneNumber,
              browserInfo,
-             checkoutAttemptId,
              billingAddress,
              deliveryAddress,
              socialSecurityNumber,

@@ -14,6 +14,10 @@ import UIKit
     import AdyenDropIn
 #endif
 
+#if canImport(AdyenUI)
+    import AdyenUI
+#endif
+
 @main
 @objc class AppDelegate: FlutterAppDelegate {
     override func application(
@@ -40,7 +44,7 @@ import UIKit
     }
 
     private func setCardComponentStyle() {
-        var cardComponentStyle = Adyen.FormComponentStyle()
+        var cardComponentStyle = AdyenUI.FormComponentStyle()
         cardComponentStyle.mainButtonItem.button.backgroundColor = UIColor(named: "PrimaryBackground") ?? .black
         cardComponentStyle.mainButtonItem.button.title.color = UIColor(named: "PrimaryTitle") ?? .white
         cardComponentStyle.textField.tintColor = UIColor(named: "PrimaryBackground") ?? .black
