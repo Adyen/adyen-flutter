@@ -1,4 +1,4 @@
-## 1.8.0 (in development)
+## 1.8.0
 
 ### New
 
@@ -6,11 +6,14 @@
   method [type](https://docs.adyen.com/payment-methods/payment-method-types): **twint**.
 - Added support for the ThreeDS2Configuration with `requestorAppURL` parameter for Drop-in and Card
   Component.
+- The paymentMethod object now includes `sdkData`. For Advanced flow, we recommend that you include
+  this parameter in your /payments request.
 
 ## Improved
 
-- For Drop-in on iOS: Added payment to create adyenContext to prioritize the session amount in the
-  UI.
+- For Drop-in on iOS: Payment amount requested via /sessions endpoint is now used as the primary
+  source for the UI.
+- Updated Gradle and AGP to v8.13.
 
 ### Changed
 
