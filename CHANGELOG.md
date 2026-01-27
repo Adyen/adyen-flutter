@@ -1,4 +1,4 @@
-## 1.8.0 (in development)
+## 1.8.0
 
 ### New
 
@@ -9,8 +9,8 @@
 
 ## Improved
 
-- For Drop-in on iOS: Added payment to create adyenContext to prioritize the session amount in the
-  UI.
+- For Drop-in on iOS: Reusing the payment of the session instead of instantiating a new object.
+- Updated Gradle and AGP to v8.13.
 
 ### Changed
 
