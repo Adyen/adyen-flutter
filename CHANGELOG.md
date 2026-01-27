@@ -11,7 +11,8 @@
 
 ## Improved
 
-- For Drop-in on iOS: Reusing the payment of the session instead of instantiating a new object.
+- For Drop-in on iOS: Improving the UI behavior by always reusing the payment object from the
+  session instead of creating a new one.
 - Updated Gradle and AGP to v8.13.
 
 ### Changed
