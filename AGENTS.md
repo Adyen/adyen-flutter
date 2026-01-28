@@ -190,7 +190,7 @@ Flutter Widget (Dart)
 
 3. **Create Android PlatformViewFactory** in `android/.../components/`:
    ```kotlin
-   class MyComponentFactory(...) : PlatformViewFactory(ComponentFlutterInterface.codec) {
+   class MyComponentFactory(...) : PlatformViewFactory(ComponentFlutterInterface.pigeonChannelCodec) {
        override fun create(context: Context, viewId: Int, args: Any?): PlatformView {
            // Parse creationParams and return native view
        }
