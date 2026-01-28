@@ -62,7 +62,7 @@ platforms.
 
 ### Key File
 
-`@/pigeons/platform_api.dart` - Contains all DTOs (Data Transfer Objects) and interface definitions.
+`pigeons/platform_api.dart` - Contains all DTOs (Data Transfer Objects) and interface definitions.
 
 ### Adding New Platform Communication
 
