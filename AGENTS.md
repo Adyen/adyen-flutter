@@ -220,8 +220,9 @@ Flutter Widget (Dart)
 ### Communication Pattern
 
 - **Flutter → Native**: Pass data via `creationParams` when creating the view
-- **Native → Flutter**: Use `ComponentFlutterInterface.onComponentCommunication()` for events (
-  submit, resize, results)
+- **Native → Flutter**: Use `ComponentFlutterInterface.onComponentCommunication()` for events.
+    - Events: `onSubmit`, `additionalDetails`, `loading`, `result`, `resize`, `binLookup`,
+      `binValue`, `availability`
 - **Resize handling**: Native views report height changes; Dart widget updates viewport accordingly
 
 ### Important Notes
