@@ -47,6 +47,29 @@ extension DropInConfigurationMapper on DropInConfiguration {
           true;
 }
 
+extension DefaultInstallmentOptionsMapper on DefaultInstallmentOptions {
+  DefaultInstallmentOptionsDTO toDTO() => DefaultInstallmentOptionsDTO(
+        values: values,
+        includesRevolving: includesRevolving,
+      );
+}
+
+extension CardBasedInstallmentOptionsMapper on CardBasedInstallmentOptions {
+  CardBasedInstallmentOptionsDTO toDTO() => CardBasedInstallmentOptionsDTO(
+        values: values,
+        includesRevolving: includesRevolving,
+        cardBrand: cardBrand,
+      );
+}
+
+extension InstallmentConfigurationMapper on InstallmentConfiguration {
+  InstallmentConfigurationDTO toDTO() => InstallmentConfigurationDTO(
+        defaultOptions: defaultOptions?.toDTO(),
+        cardBasedOptions: cardBasedOptions?.map((e) => e.toDTO()).toList(),
+        showInstallmentAmount: showInstallmentAmount,
+      );
+}
+
 extension CardConfigurationMapper on CardConfiguration {
   CardConfigurationDTO toDTO() => CardConfigurationDTO(
         holderNameRequired: holderNameRequired,
@@ -58,6 +81,7 @@ extension CardConfigurationMapper on CardConfiguration {
         socialSecurityNumberFieldVisibility:
             socialSecurityNumberFieldVisibility,
         supportedCardTypes: supportedCardTypes,
+        installmentConfiguration: installmentConfiguration?.toDTO(),
       );
 }
 

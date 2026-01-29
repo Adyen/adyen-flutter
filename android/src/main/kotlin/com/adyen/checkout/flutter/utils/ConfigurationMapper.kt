@@ -3,8 +3,11 @@ package com.adyen.checkout.flutter.utils
 import android.content.Context
 import com.adyen.checkout.adyen3ds2.Adyen3DS2Configuration
 import com.adyen.checkout.card.AddressConfiguration
+import com.adyen.checkout.card.CardBrand
 import com.adyen.checkout.card.CardConfiguration
 import com.adyen.checkout.card.CardType
+import com.adyen.checkout.card.InstallmentConfiguration
+import com.adyen.checkout.card.InstallmentOptions
 import com.adyen.checkout.card.KCPAuthVisibility
 import com.adyen.checkout.card.SocialSecurityNumberVisibility
 import com.adyen.checkout.cashapppay.CashAppPayConfiguration
@@ -23,15 +26,18 @@ import com.adyen.checkout.flutter.generated.AddressMode
 import com.adyen.checkout.flutter.generated.AmountDTO
 import com.adyen.checkout.flutter.generated.AnalyticsOptionsDTO
 import com.adyen.checkout.flutter.generated.BillingAddressParametersDTO
+import com.adyen.checkout.flutter.generated.CardBasedInstallmentOptionsDTO
 import com.adyen.checkout.flutter.generated.CardConfigurationDTO
 import com.adyen.checkout.flutter.generated.CashAppPayConfigurationDTO
 import com.adyen.checkout.flutter.generated.CashAppPayEnvironment
+import com.adyen.checkout.flutter.generated.DefaultInstallmentOptionsDTO
 import com.adyen.checkout.flutter.generated.DropInConfigurationDTO
 import com.adyen.checkout.flutter.generated.EncryptedCardDTO
 import com.adyen.checkout.flutter.generated.Environment
 import com.adyen.checkout.flutter.generated.FieldVisibility
 import com.adyen.checkout.flutter.generated.GooglePayConfigurationDTO
 import com.adyen.checkout.flutter.generated.GooglePayEnvironment
+import com.adyen.checkout.flutter.generated.InstallmentConfigurationDTO
 import com.adyen.checkout.flutter.generated.InstantPaymentConfigurationDTO
 import com.adyen.checkout.flutter.generated.MerchantInfoDTO
 import com.adyen.checkout.flutter.generated.OrderResponseDTO
@@ -40,6 +46,7 @@ import com.adyen.checkout.flutter.generated.ThreeDS2ConfigurationDTO
 import com.adyen.checkout.flutter.generated.TotalPriceStatus
 import com.adyen.checkout.flutter.generated.TwintConfigurationDTO
 import com.adyen.checkout.flutter.generated.UnencryptedCardDTO
+import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToCardBasedInstallmentOptions
 import com.adyen.checkout.googlepay.BillingAddressParameters
 import com.adyen.checkout.googlepay.GooglePayConfiguration
 import com.adyen.checkout.googlepay.MerchantInfo
@@ -172,6 +179,10 @@ object ConfigurationMapper {
         threeDS2ConfigurationDTO?.let {
             val threeDS2Configuration = buildThreeDS2Configuration(context, shopperLocale, environment, clientKey, it)
             cardConfiguration.add3ds2ActionConfiguration(threeDS2Configuration)
+        }
+
+        installmentConfiguration?.let {
+            cardConfiguration.setInstallmentConfigurations(it.mapToInstallmentConfiguration())
         }
 
         return cardConfiguration.build()
@@ -462,4 +473,30 @@ object ConfigurationMapper {
             amount?.mapToAmount(),
             analyticsOptionsDTO.mapToAnalyticsConfiguration(),
         )
+
+    private fun InstallmentConfigurationDTO.mapToInstallmentConfiguration(): InstallmentConfiguration {
+        val defaultOptions = defaultOptions?.mapToDefaultInstallmentOptions()
+        val cardBasedOptions = cardBasedOptions?.mapNotNull { it?.mapToCardBasedInstallmentOptions() } ?: emptyList()
+
+        return InstallmentConfiguration(
+            defaultOptions = defaultOptions,
+            cardBasedOptions = cardBasedOptions,
+            showInstallmentAmount = showInstallmentAmount
+        )
+    }
+
+    private fun DefaultInstallmentOptionsDTO.mapToDefaultInstallmentOptions(): InstallmentOptions.DefaultInstallmentOptions {
+        return InstallmentOptions.DefaultInstallmentOptions(
+            values = (values as List<*>).mapNotNull { it as? Int },
+            includeRevolving = includesRevolving
+        )
+    }
+
+    private fun CardBasedInstallmentOptionsDTO.mapToCardBasedInstallmentOptions(): InstallmentOptions.CardBasedInstallmentOptions {
+        return InstallmentOptions.CardBasedInstallmentOptions(
+            values = (values as List<*>).mapNotNull { it as? Int },
+            includeRevolving = includesRevolving,
+            cardBrand = CardBrand(txVariant = cardBrand)
+        )
+    }
 }
