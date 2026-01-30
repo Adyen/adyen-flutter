@@ -12,7 +12,7 @@
   method [type](https://docs.adyen.com/payment-methods/payment-method-types): **twint**.
 - For card payments with Drop-in and Component, you can now configure a `requestorAppURL` in your
   `ThreeDS2Configuration`.
-- The `data` object in the onSubmit callback now includes a `sdkData` parameter. For Advanced flow,
+- The `data` object in the onSubmit callback now includes an `sdkData` parameter. For Advanced flow,
   we recommend that you include this parameter in your /payments request.`
 
 ## Improved
