@@ -1724,7 +1724,10 @@ protocol CheckoutPlatformInterface {
 
 /// Generated setup class from Pigeon to handle messages through the `binaryMessenger`.
 class CheckoutPlatformInterfaceSetup {
-    static var codec: FlutterStandardMessageCodec { PlatformApiPigeonCodec.shared }
+    static var codec: FlutterStandardMessageCodec {
+        PlatformApiPigeonCodec.shared
+    }
+
     /// Sets up an instance of `CheckoutPlatformInterface` to handle messages through the `binaryMessenger`.
     static func setUp(binaryMessenger: FlutterBinaryMessenger, api: CheckoutPlatformInterface?, messageChannelSuffix: String = "") {
         let channelSuffix = messageChannelSuffix.count > 0 ? ".\(messageChannelSuffix)" : ""
@@ -1906,7 +1909,10 @@ protocol DropInPlatformInterface {
 
 /// Generated setup class from Pigeon to handle messages through the `binaryMessenger`.
 class DropInPlatformInterfaceSetup {
-    static var codec: FlutterStandardMessageCodec { PlatformApiPigeonCodec.shared }
+    static var codec: FlutterStandardMessageCodec {
+        PlatformApiPigeonCodec.shared
+    }
+
     /// Sets up an instance of `DropInPlatformInterface` to handle messages through the `binaryMessenger`.
     static func setUp(binaryMessenger: FlutterBinaryMessenger, api: DropInPlatformInterface?, messageChannelSuffix: String = "") {
         let channelSuffix = messageChannelSuffix.count > 0 ? ".\(messageChannelSuffix)" : ""
@@ -2110,7 +2116,10 @@ protocol ComponentPlatformInterface {
 
 /// Generated setup class from Pigeon to handle messages through the `binaryMessenger`.
 class ComponentPlatformInterfaceSetup {
-    static var codec: FlutterStandardMessageCodec { PlatformApiPigeonCodec.shared }
+    static var codec: FlutterStandardMessageCodec {
+        PlatformApiPigeonCodec.shared
+    }
+
     /// Sets up an instance of `ComponentPlatformInterface` to handle messages through the `binaryMessenger`.
     static func setUp(binaryMessenger: FlutterBinaryMessenger, api: ComponentPlatformInterface?, messageChannelSuffix: String = "") {
         let channelSuffix = messageChannelSuffix.count > 0 ? ".\(messageChannelSuffix)" : ""
