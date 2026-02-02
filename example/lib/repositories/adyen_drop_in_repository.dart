@@ -17,9 +17,7 @@ class AdyenDropInRepository extends AdyenBaseRepository {
       },
       "returnUrl": returnUrl,
       "reference":
-      "flutter-session-test_${DateTime
-          .now()
-          .millisecondsSinceEpoch}",
+          "flutter-session-test_${DateTime.now().millisecondsSinceEpoch}",
       "countryCode": Config.countryCode,
       "shopperLocale": Config.shopperLocale,
       "shopperReference": Config.shopperReference,
@@ -98,16 +96,15 @@ class AdyenDropInRepository extends AdyenBaseRepository {
     return await service.fetchPaymentMethods(requestBody);
   }
 
-  Future<PaymentEvent> onSubmit(Map<String, dynamic> data, [
+  Future<PaymentEvent> onSubmit(
+    Map<String, dynamic> data, [
     Map<String, dynamic>? extra,
   ]) async {
     String returnUrl = await determineBaseReturnUrl();
     Map<String, dynamic> paymentsRequestBody = {
       "merchantAccount": Config.merchantAccount,
       "shopperReference": Config.shopperReference,
-      "reference": "flutter-test_${DateTime
-          .now()
-          .millisecondsSinceEpoch}",
+      "reference": "flutter-test_${DateTime.now().millisecondsSinceEpoch}",
       "returnUrl": returnUrl,
       "amount": {
         "value": Config.amount.value,
@@ -134,7 +131,7 @@ class AdyenDropInRepository extends AdyenBaseRepository {
       Map<String, dynamic> response) async {
     if (_hasOrderWithRemainingAmount(response)) {
       final Map<String, dynamic> updatedPaymentMethodsJson =
-      await fetchPaymentMethods(
+          await fetchPaymentMethods(
         orderResponse: {
           "pspReference": response["order"]["pspReference"],
           "orderData": response["order"]["orderData"],
@@ -152,7 +149,7 @@ class AdyenDropInRepository extends AdyenBaseRepository {
   Future<PaymentEvent> onAdditionalDetails(
       Map<String, dynamic> additionalDetails) async {
     final Map<String, dynamic> response =
-    await service.postPaymentsDetails(additionalDetails);
+        await service.postPaymentsDetails(additionalDetails);
     return paymentEventHandler.handleResponse(jsonResponse: response);
   }
 
@@ -177,9 +174,7 @@ class AdyenDropInRepository extends AdyenBaseRepository {
 
   Future<Map<String, dynamic>> onRequestOrder() async {
     final Map<String, dynamic> orderRequestBody = <String, dynamic>{
-      "reference": "flutter-test_${DateTime
-          .now()
-          .millisecondsSinceEpoch}",
+      "reference": "flutter-test_${DateTime.now().millisecondsSinceEpoch}",
       "amount": {
         "value": Config.amount.value,
         "currency": Config.amount.currency
@@ -198,12 +193,12 @@ class AdyenDropInRepository extends AdyenBaseRepository {
       "order": order,
     };
     final Map<String, dynamic> cancelResponse =
-    await service.postOrdersCancel(orderCancelRequestBody);
+        await service.postOrdersCancel(orderCancelRequestBody);
     final OrderCancelResult orderCancelResult =
-    OrderCancelResult(orderCancelResponseBody: cancelResponse);
+        OrderCancelResult(orderCancelResponseBody: cancelResponse);
     if (shouldUpdatePaymentMethods == true) {
       orderCancelResult.updatedPaymentMethodsResponseBody =
-      await fetchPaymentMethods();
+          await fetchPaymentMethods();
     }
 
     return orderCancelResult;

@@ -485,18 +485,18 @@ object ConfigurationMapper {
         )
     }
 
-    private fun DefaultInstallmentOptionsDTO.mapToDefaultInstallmentOptions(): InstallmentOptions.DefaultInstallmentOptions {
-        return InstallmentOptions.DefaultInstallmentOptions(
+    private fun DefaultInstallmentOptionsDTO.mapToDefaultInstallmentOptions():
+        InstallmentOptions.DefaultInstallmentOptions =
+        InstallmentOptions.DefaultInstallmentOptions(
             values = (values as List<*>).mapNotNull { it as? Int },
             includeRevolving = includesRevolving
         )
-    }
 
-    private fun CardBasedInstallmentOptionsDTO.mapToCardBasedInstallmentOptions(): InstallmentOptions.CardBasedInstallmentOptions {
-        return InstallmentOptions.CardBasedInstallmentOptions(
+    private fun CardBasedInstallmentOptionsDTO.mapToCardBasedInstallmentOptions():
+        InstallmentOptions.CardBasedInstallmentOptions =
+        InstallmentOptions.CardBasedInstallmentOptions(
             values = (values as List<*>).mapNotNull { it as? Int },
             includeRevolving = includesRevolving,
             cardBrand = CardBrand(txVariant = cardBrand)
         )
-    }
 }

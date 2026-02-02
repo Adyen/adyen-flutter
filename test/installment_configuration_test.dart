@@ -3,7 +3,6 @@ import 'package:adyen_checkout/src/util/dto_mapper.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-
   group('DefaultInstallmentOptionsMapper', () {
     test('maps DefaultInstallmentOptions to DTO', () {
       final options = DefaultInstallmentOptions(
@@ -155,7 +154,7 @@ void main() {
     });
 
     test('maps with no options', () {
-      final config = InstallmentConfiguration();
+      const config = InstallmentConfiguration();
 
       final dto = config.toDTO();
 
@@ -290,12 +289,17 @@ void main() {
       final dto = cardConfig.toDTO();
 
       expect(dto.installmentConfiguration?.defaultOptions?.values, [6, 12]);
-      expect(dto.installmentConfiguration?.defaultOptions?.includesRevolving, true);
+      expect(dto.installmentConfiguration?.defaultOptions?.includesRevolving,
+          true);
       expect(dto.installmentConfiguration?.cardBasedOptions?.length, 2);
-      expect(dto.installmentConfiguration?.cardBasedOptions?[0]?.cardBrand, 'visa');
-      expect(dto.installmentConfiguration?.cardBasedOptions?[0]?.values, [9, 12]);
-      expect(dto.installmentConfiguration?.cardBasedOptions?[1]?.cardBrand, 'mc');
-      expect(dto.installmentConfiguration?.cardBasedOptions?[1]?.values, [2, 3, 6]);
+      expect(dto.installmentConfiguration?.cardBasedOptions?[0]?.cardBrand,
+          'visa');
+      expect(
+          dto.installmentConfiguration?.cardBasedOptions?[0]?.values, [9, 12]);
+      expect(
+          dto.installmentConfiguration?.cardBasedOptions?[1]?.cardBrand, 'mc');
+      expect(dto.installmentConfiguration?.cardBasedOptions?[1]?.values,
+          [2, 3, 6]);
       expect(dto.installmentConfiguration?.showInstallmentAmount, true);
     });
 
