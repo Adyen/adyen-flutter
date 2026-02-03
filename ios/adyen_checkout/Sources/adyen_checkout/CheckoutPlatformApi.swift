@@ -47,7 +47,7 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
                     Task {
                         let sessionDelegate = DropInSessionsDelegate(viewController: getViewController(), checkoutFlutter: checkoutFlutter)
                         await setSession(
-                            sessionId: sessionId,
+                            id: sessionId,
                             sessionData: sessionData,
                             sessionDelegate: sessionDelegate,
                             configuration: dropInConfigurationDTO,
@@ -135,7 +135,7 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
         let sessionDelegate = DropInSessionsDelegate(viewController: getViewController(), checkoutFlutter: checkoutFlutter)
         try await requestAndSetSession(
             checkoutConfiguration: configuration,
-            sessionId: sessionId,
+            id: sessionId,
             sessionData: sessionData,
             completion: completion
         )
@@ -187,66 +187,101 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
                 completion: { _ in }
             )
         }
+        
         try await requestAndSetSession(
             checkoutConfiguration: configuration,
-            sessionId: sessionId,
+            id: sessionId,
             sessionData: sessionData,
             completion: completion
         )
     }
 
     private func setSession(
-        sessionId: String,
+        id: String,
         sessionData: String,
         sessionDelegate: SessionDelegate,
         configuration: DropInConfigurationDTO,
         completion: @escaping (Result<SessionDTO, Error>) -> Void
     ) async {
         do {
-            let configuration = try configuration.createCheckoutConfiguration()
-            let adyenCheckout = try await Checkout.setup(with: SessionResponse(id: sessionId, sessionData: sessionData), configuration: configuration)
-            sessionHolder.adyenCheckout = adyenCheckout
-            sessionHolder.sessionDelegate = sessionDelegate
-            let encodedPaymentMethods = try JSONEncoder().encode(adyenCheckout.paymentMethods)
-            guard let encodedPaymentMethodsString = String(data: encodedPaymentMethods, encoding: .utf8) else {
-                completion(Result.failure(PlatformError(errorDescription: "Encoding payment methods failed")))
-                return
-            }
-
-            completion(Result.success(SessionDTO(
-                id: sessionId,
-                paymentMethodsJson: encodedPaymentMethodsString
-            )))
+            let sessionConfiguration = try determineSessionConfiguration(configuration: configuration)
+            let checkoutSession = try await Checkout.setup(
+                with: SessionResponse(id: id, sessionData: sessionData),
+                configuration: sessionConfiguration
+            )
+            
+            try onSessionCreationSuccess(
+                id: id, //Flutter specific, maybe we can use id from the checkout session like on Android
+                checkoutSession: checkoutSession,
+                sessionDelegate: sessionDelegate,
+                completion: completion
+            )
         } catch {
             completion(Result.failure(error))
         }
     }
-
-    private func requestAndSetSession(
-        checkoutConfiguration: CheckoutConfiguration,
-        sessionId: String,
-        sessionData: String,
+    
+    private func onSessionCreationSuccess(
+        id: String,
+        checkoutSession: Checkout,
+        sessionDelegate: SessionDelegate? = nil,
         completion: @escaping (Result<SessionDTO, Error>) -> Void
-    ) async throws {
-
-        let adyenCheckout = try await Checkout.setup(
-            with: SessionResponse(id: sessionId, sessionData: sessionData),
-            configuration: checkoutConfiguration,
-        )
-
-        sessionHolder.sessionId = sessionId
-        sessionHolder.sessionData = sessionData
-        sessionHolder.adyenCheckout = adyenCheckout
-
-        let encodedPaymentMethods = try JSONEncoder().encode(adyenCheckout.paymentMethods)
+    ) throws {
+        sessionHolder.adyenCheckout = checkoutSession
+        sessionHolder.sessionDelegate = sessionDelegate
+        let encodedPaymentMethods = try JSONEncoder().encode(checkoutSession.paymentMethods)
         guard let encodedPaymentMethodsString = String(data: encodedPaymentMethods, encoding: .utf8) else {
             completion(Result.failure(PlatformError(errorDescription: "Encoding payment methods failed")))
             return
         }
+
         completion(Result.success(SessionDTO(
-            id: sessionId,
+            id: id,
             paymentMethodsJson: encodedPaymentMethodsString
         )))
+    }
+
+    private func requestAndSetSession(
+        checkoutConfiguration: CheckoutConfiguration,
+        id: String,
+        sessionData: String,
+        completion: @escaping (Result<SessionDTO, Error>) -> Void
+    ) async throws {
+        
+        do {
+            let checkoutSession = try await Checkout.setup(
+                with: SessionResponse(id: id, sessionData: sessionData),
+                configuration: checkoutConfiguration
+            )
+            
+            try onSessionCreationSuccess(
+                id: id,
+                checkoutSession: checkoutSession,
+                sessionDelegate: nil,
+                completion: completion
+            )
+        } catch {
+            completion(Result.failure(error))
+        }
+
+//        let checkout = try await Checkout.setup(
+//            with: SessionResponse(id: sessionId, sessionData: sessionData),
+//            configuration: checkoutConfiguration,
+//        )
+//
+//        sessionHolder.sessionId = sessionId
+//        sessionHolder.sessionData = sessionData
+//        sessionHolder.adyenCheckout = checkout
+//
+//        let encodedPaymentMethods = try JSONEncoder().encode(checkout.paymentMethods)
+//        guard let encodedPaymentMethodsString = String(data: encodedPaymentMethods, encoding: .utf8) else {
+//            completion(Result.failure(PlatformError(errorDescription: "Encoding payment methods failed")))
+//            return
+//        }
+//        completion(Result.success(SessionDTO(
+//            id: sessionId,
+//            paymentMethodsJson: encodedPaymentMethodsString
+//        )))
 
 //
 //        AdyenSession.setup(
@@ -301,5 +336,9 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
         }
 
         return rootViewController
+    }
+    
+    private func determineSessionConfiguration(configuration: DropInConfigurationDTO) throws -> CheckoutConfiguration {
+        return try configuration.createCheckoutConfiguration()
     }
 }

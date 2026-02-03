@@ -45,17 +45,10 @@ class CheckoutPlatformApi(
         configuration: Any?,
         callback: (Result<SessionDTO>) -> Unit,
     ) {
-        //v2 TODO: Create SessionResponse DTO class
+        //v2 TODO: Create SessionResponse DTO class with id and sessionData parameters
         activity.lifecycleScope.launch(Dispatchers.IO) {
-            val sessionConfiguration = determineSessionConfiguration(configuration) ?: run {
-                onSessionCreationError(
-                    error = "Invalid configuration provided",
-                    callback = callback
-                )
-                return@launch
-            }
-
             try {
+                val sessionConfiguration = determineSessionConfiguration(configuration)
                 val checkoutResult = Checkout.setup(
                     SessionResponse(sessionId, sessionData),
                     sessionConfiguration
@@ -129,7 +122,7 @@ class CheckoutPlatformApi(
 
     override fun getThreeDS2SdkVersion(): String = ThreeDS2Service.INSTANCE.sdkVersion
 
-    private fun determineSessionConfiguration(configuration: Any?): CheckoutConfiguration? {
+    private fun determineSessionConfiguration(configuration: Any?): CheckoutConfiguration {
         when (configuration) {
             is DropInConfigurationDTO -> return configuration.toCheckoutConfiguration()
             is CardComponentConfigurationDTO -> return configuration.toCheckoutConfiguration()
@@ -144,7 +137,7 @@ class CheckoutPlatformApi(
             }
         }
 
-        return null
+        throw IllegalArgumentException("Invalid configuration provided")
     }
 
     private fun onSessionCreationSuccess(
