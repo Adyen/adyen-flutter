@@ -1,9 +1,8 @@
 import Adyen
+@testable import adyen_checkout
 import Flutter
 import UIKit
 import XCTest
-
-@testable import adyen_checkout
 
 // This demonstrates a simple unit test of the Swift portion of this plugin's implementation.
 //
