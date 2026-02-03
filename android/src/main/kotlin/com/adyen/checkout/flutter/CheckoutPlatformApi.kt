@@ -54,21 +54,29 @@ class CheckoutPlatformApi(
                 )
                 return@launch
             }
-            
-            val checkoutResult = Checkout.setup(
-                SessionResponse(sessionId, sessionData),
-                sessionConfiguration
-            )
-            when (checkoutResult) {
-                is Checkout.Result.Error -> onSessionCreationError(
-                    error = checkoutResult.errorReason,
-                    callback = callback
+
+            try {
+                val checkoutResult = Checkout.setup(
+                    SessionResponse(sessionId, sessionData),
+                    sessionConfiguration
                 )
 
-                is Checkout.Result.Success -> onSessionCreationSuccess(
-                    checkoutSession = checkoutResult.checkoutContext,
-                    callback = callback
-                )
+                when (checkoutResult) {
+                    is Checkout.Result.Error -> onSessionCreationError(
+                        error = checkoutResult.errorReason,
+                        callback = callback
+                    )
+
+                    is Checkout.Result.Success -> onSessionCreationSuccess(
+                        checkoutSession = checkoutResult.checkoutContext,
+                        callback = callback
+                    )
+                }
+
+            } catch (exception: Exception) {
+                //Exception will contain the checkout error
+                // TODO: Add error handling
+                onSessionCreationError(exception.message ?: "Checkout setup failed.", callback)
             }
         }
     }
@@ -157,6 +165,7 @@ class CheckoutPlatformApi(
             )
         )
     }
+
     private fun onSessionCreationError(
         error: String,
         callback: (Result<SessionDTO>) -> Unit,

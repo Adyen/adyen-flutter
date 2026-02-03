@@ -69,7 +69,7 @@ android {
     }
 
     dependencies {
-        implementation "com.adyen.checkout:drop-in:2026.01.18-SNAPSHOT"
+        implementation "com.adyen.checkout:drop-in:2026.02.01-SNAPSHOT"
         implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
 
         // Compose Dependencies

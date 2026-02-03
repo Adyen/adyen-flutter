@@ -1,10 +1,8 @@
 package com.adyen.checkout.flutter.utils
 
-import com.adyen.checkout.card.KCPAuthVisibility
-import com.adyen.checkout.card.SocialSecurityNumberVisibility
+import com.adyen.checkout.card.FieldMode
 import com.adyen.checkout.card.card
 import com.adyen.checkout.card.old.AddressConfiguration
-import com.adyen.checkout.cashapppay.cashAppPay
 import com.adyen.checkout.components.core.OrderResponse
 import com.adyen.checkout.core.common.CardBrand
 import com.adyen.checkout.core.common.internal.helper.CheckoutPlatform
@@ -15,7 +13,6 @@ import com.adyen.checkout.core.components.CheckoutConfiguration
 import com.adyen.checkout.core.components.data.model.Amount
 import com.adyen.checkout.cse.EncryptedCard
 import com.adyen.checkout.cse.UnencryptedCard
-import com.adyen.checkout.dropin.old.dropIn
 import com.adyen.checkout.flutter.generated.ActionComponentConfigurationDTO
 import com.adyen.checkout.flutter.generated.AddressMode
 import com.adyen.checkout.flutter.generated.AmountDTO
@@ -42,8 +39,6 @@ import com.adyen.checkout.flutter.generated.UnencryptedCardDTO
 import com.adyen.checkout.googlepay.BillingAddressParameters
 import com.adyen.checkout.googlepay.MerchantInfo
 import com.adyen.checkout.googlepay.ShippingAddressParameters
-import com.adyen.checkout.googlepay.googlePay
-import com.adyen.checkout.twint.twint
 import com.google.android.gms.wallet.WalletConstants
 import java.util.Locale
 import com.adyen.checkout.cashapppay.CashAppPayEnvironment as SDKCashAppPayEnvironment
@@ -103,7 +98,7 @@ object ConfigurationMapper {
             analyticsOptionsDTO = analyticsOptionsDTO,
             shopperLocale = shopperLocale,
             amount = amount,
-        ) 
+        )
 
     fun InstantPaymentConfigurationDTO.toCheckoutConfiguration(): CheckoutConfiguration =
         toCheckoutConfiguration(
@@ -143,14 +138,14 @@ object ConfigurationMapper {
             cardConfigurationDTO?.let { configurationDTO ->
                 card {
 //                    addressConfiguration = configurationDTO.addressMode.mapToAddressConfiguration()
-                    isStorePaymentFieldVisible = configurationDTO.showStorePaymentField
-                    isHideCvcStoredCard = !configurationDTO.showCvcForStoredCard
-                    isHideCvc = !configurationDTO.showCvc
-                    kcpAuthVisibility = determineKcpAuthVisibility(configurationDTO.kcpFieldVisibility)
-                    socialSecurityNumberVisibility =
-                        determineSocialSecurityNumberVisibility(configurationDTO.socialSecurityNumberFieldVisibility)
+                    showStorePayment = configurationDTO.showStorePaymentField
+                    hideStoredSecurityCode = !configurationDTO.showCvcForStoredCard
+                    hideSecurityCode = !configurationDTO.showCvc
+                    koreanAuthenticationMode = determineFieldVisibility(configurationDTO.kcpFieldVisibility)
+                    socialSecurityNumberMode =
+                        determineFieldVisibility(configurationDTO.socialSecurityNumberFieldVisibility)
                     supportedCardBrands = mapToSupportedCardBrands(configurationDTO.supportedCardTypes)
-                    holderNameRequired = configurationDTO.holderNameRequired
+                    showHolderName = configurationDTO.holderNameRequired
                 }
             }
 
@@ -238,16 +233,10 @@ object ConfigurationMapper {
             AddressMode.NONE -> AddressConfiguration.None
         }
 
-    private fun determineKcpAuthVisibility(fieldVisibility: FieldVisibility): KCPAuthVisibility =
+    private fun determineFieldVisibility(fieldVisibility: FieldVisibility): FieldMode =
         when (fieldVisibility) {
-            FieldVisibility.SHOW -> KCPAuthVisibility.SHOW
-            FieldVisibility.HIDE -> KCPAuthVisibility.HIDE
-        }
-
-    private fun determineSocialSecurityNumberVisibility(visible: FieldVisibility): SocialSecurityNumberVisibility =
-        when (visible) {
-            FieldVisibility.SHOW -> SocialSecurityNumberVisibility.SHOW
-            FieldVisibility.HIDE -> SocialSecurityNumberVisibility.HIDE
+            FieldVisibility.SHOW -> FieldMode.SHOW
+            FieldVisibility.HIDE -> FieldMode.HIDE
         }
 
     private fun mapToSupportedCardBrands(cardTypes: List<String?>?): List<CardBrand> =
