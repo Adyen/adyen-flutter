@@ -1,4 +1,5 @@
 import 'package:adyen_checkout/src/generated/platform_api.g.dart';
+import 'package:flutter/services.dart';
 
 class ComponentPlatformApi implements ComponentPlatformInterface {
   ComponentPlatformApi._init();
@@ -72,4 +73,10 @@ class ComponentPlatformApi implements ComponentPlatformInterface {
         componentId,
         action,
       );
+
+  @override
+  BinaryMessenger? get pigeonVar_binaryMessenger => null;
+
+  @override
+  String get pigeonVar_messageChannelSuffix => "adyen_checkout";
 }

@@ -8,8 +8,6 @@ class SessionHolder {
     var session: Session?
     var sessionDelegate: SessionDelegate?
     var adyenCheckout : Checkout?
-    var sessionData: String?
-    var sessionId: String?
 
     func setup(
         session: Session,

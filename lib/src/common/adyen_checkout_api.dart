@@ -1,4 +1,5 @@
 import 'package:adyen_checkout/src/generated/platform_api.g.dart';
+import 'package:flutter/services.dart';
 
 class AdyenCheckoutApi implements CheckoutPlatformInterface {
   final CheckoutPlatformInterface checkoutApi = CheckoutPlatformInterface();
@@ -62,4 +63,10 @@ class AdyenCheckoutApi implements CheckoutPlatformInterface {
 
   @override
   Future<String> getThreeDS2SdkVersion() => checkoutApi.getThreeDS2SdkVersion();
+
+  @override
+  BinaryMessenger? get pigeonVar_binaryMessenger => null;
+
+  @override
+  String get pigeonVar_messageChannelSuffix => "adyen_checkout";
 }

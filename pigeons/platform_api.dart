@@ -172,19 +172,51 @@ class ThreeDS2ConfigurationDTO {
   );
 }
 
-class DropInConfigurationDTO {
+class CheckoutConfigurationDTO {
   final Environment environment;
   final String clientKey;
   final String countryCode;
   final AmountDTO? amount;
   final String? shopperLocale;
+  final AnalyticsOptionsDTO analyticsOptionsDTO;
   final CardConfigurationDTO? cardConfigurationDTO;
   final ApplePayConfigurationDTO? applePayConfigurationDTO;
   final GooglePayConfigurationDTO? googlePayConfigurationDTO;
   final CashAppPayConfigurationDTO? cashAppPayConfigurationDTO;
   final TwintConfigurationDTO? twintConfigurationDTO;
   final ThreeDS2ConfigurationDTO? threeDS2ConfigurationDTO;
+  final DropInConfigurationDTO? dropInConfigurationDTO;
+
+  CheckoutConfigurationDTO(
+    this.environment,
+    this.clientKey,
+    this.countryCode,
+    this.amount,
+    this.shopperLocale,
+    this.analyticsOptionsDTO,
+    this.cardConfigurationDTO,
+    this.applePayConfigurationDTO,
+    this.googlePayConfigurationDTO,
+    this.cashAppPayConfigurationDTO,
+    this.twintConfigurationDTO,
+    this.threeDS2ConfigurationDTO,
+    this.dropInConfigurationDTO,
+  );
+}
+
+class DropInConfigurationDTO {
+  final Environment environment;
+  final String clientKey;
+  final String countryCode;
+  final AmountDTO? amount;
+  final String? shopperLocale;
   final AnalyticsOptionsDTO analyticsOptionsDTO;
+  final CardConfigurationDTO? cardConfigurationDTO;
+  final ApplePayConfigurationDTO? applePayConfigurationDTO;
+  final GooglePayConfigurationDTO? googlePayConfigurationDTO;
+  final CashAppPayConfigurationDTO? cashAppPayConfigurationDTO;
+  final TwintConfigurationDTO? twintConfigurationDTO;
+  final ThreeDS2ConfigurationDTO? threeDS2ConfigurationDTO;
   final bool showPreselectedStoredPaymentMethod;
   final bool skipListWhenSinglePaymentMethod;
   final bool isRemoveStoredPaymentMethodEnabled;
@@ -198,13 +230,13 @@ class DropInConfigurationDTO {
     this.countryCode,
     this.amount,
     this.shopperLocale,
+    this.analyticsOptionsDTO,
     this.cardConfigurationDTO,
     this.applePayConfigurationDTO,
     this.googlePayConfigurationDTO,
     this.cashAppPayConfigurationDTO,
     this.twintConfigurationDTO,
     this.threeDS2ConfigurationDTO,
-    this.analyticsOptionsDTO,
     this.showPreselectedStoredPaymentMethod,
     this.skipListWhenSinglePaymentMethod,
     this.isRemoveStoredPaymentMethodEnabled,
@@ -528,9 +560,9 @@ class CardComponentConfigurationDTO {
   final String countryCode;
   final AmountDTO? amount;
   final String? shopperLocale;
+  final AnalyticsOptionsDTO analyticsOptionsDTO;
   final CardConfigurationDTO cardConfiguration;
   final ThreeDS2ConfigurationDTO? threeDS2ConfigurationDTO;
-  final AnalyticsOptionsDTO analyticsOptionsDTO;
 
   CardComponentConfigurationDTO(
     this.environment,
@@ -538,31 +570,31 @@ class CardComponentConfigurationDTO {
     this.countryCode,
     this.amount,
     this.shopperLocale,
+    this.analyticsOptionsDTO,
     this.cardConfiguration,
     this.threeDS2ConfigurationDTO,
-    this.analyticsOptionsDTO,
   );
 }
 
 class InstantPaymentConfigurationDTO {
-  final InstantPaymentType instantPaymentType;
   final Environment environment;
   final String clientKey;
   final String countryCode;
   final AmountDTO? amount;
   final String? shopperLocale;
   final AnalyticsOptionsDTO analyticsOptionsDTO;
+  final InstantPaymentType instantPaymentType;
   final GooglePayConfigurationDTO? googlePayConfigurationDTO;
   final ApplePayConfigurationDTO? applePayConfigurationDTO;
 
   InstantPaymentConfigurationDTO(
-    this.instantPaymentType,
     this.environment,
     this.clientKey,
     this.countryCode,
     this.amount,
     this.shopperLocale,
     this.analyticsOptionsDTO,
+    this.instantPaymentType,
     this.googlePayConfigurationDTO,
     this.applePayConfigurationDTO,
   );
@@ -611,15 +643,15 @@ class EncryptedCardDTO {
 class ActionComponentConfigurationDTO {
   final Environment environment;
   final String clientKey;
-  final String? shopperLocale;
   final AmountDTO? amount;
+  final String? shopperLocale;
   final AnalyticsOptionsDTO analyticsOptionsDTO;
 
   ActionComponentConfigurationDTO(
     this.environment,
     this.clientKey,
-    this.shopperLocale,
     this.amount,
+    this.shopperLocale,
     this.analyticsOptionsDTO,
   );
 }

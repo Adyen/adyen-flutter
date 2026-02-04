@@ -203,15 +203,7 @@ extension CardComponentConfigurationDTO {
         )
     }
 
-    func createCheckoutConfiguration() throws -> CheckoutConfiguration {
-        return try CheckoutConfiguration(
-            environment: environment.mapToEnvironment(),
-            amount: amount!.mapToAmount(), //The amount can be optional
-            clientKey: clientKey,
-        ){}
-    }
-
-    func createCardComponentConfiguration() -> CardComponentConfiguration {
+    func createCardComponentConfiguration() -> CardComponentConfiguration? {
         cardConfiguration.mapToCardComponentConfiguration(shopperLocale: shopperLocale)
     }
 }

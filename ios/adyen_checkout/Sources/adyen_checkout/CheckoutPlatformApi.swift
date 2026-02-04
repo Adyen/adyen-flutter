@@ -37,44 +37,30 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
     func createSession(
         sessionId: String,
         sessionData: String,
-        configuration: Any?,
+        configuration: CheckoutConfigurationDTO,
         completion: @escaping (Result<SessionDTO, Error>) -> Void
     ) {
         Task {
             do {
                 switch configuration {
-                case let dropInConfigurationDTO as DropInConfigurationDTO:
-                    Task {
-                        let sessionDelegate = DropInSessionsDelegate(viewController: getViewController(), checkoutFlutter: checkoutFlutter)
-                        await setSession(
-                            id: sessionId,
-                            sessionData: sessionData,
-                            sessionDelegate: sessionDelegate,
-                            configuration: dropInConfigurationDTO,
+                case let checkoutConfiguration as CheckoutConfigurationDTO:
+                    do {
+                        //TODO: Config needs to be just session relvant, component specific one needs to be bound when creating component
+                        let sessionConfiguration = try await createConfiguration(configuration: checkoutConfiguration)
+                        let checkoutSession = try await Checkout.setup(
+                            with: SessionResponse(id: id, sessionData: sessionData),
+                            configuration: sessionConfiguration
+                        )
+                        
+                        try onSessionCreationSuccess(
+                            id: id, //Flutter specific, maybe we can use id from the checkout session like on Android
+                            checkoutSession: checkoutSession,
                             completion: completion
                         )
+                    } catch {
+                        // TODO: Add error handling
+                        completion(Result.failure(error))
                     }
-                    //                try createSessionForDropIn(
-                    //                    adyenContext: dropInConfigurationDTO.createAdyenContext(),
-                    //                    sessionId: sessionId,
-                    //                    sessionData: sessionData,
-                    //                    completion: completion
-                    //                )
-                case let cardComponentConfigurationDTO as CardComponentConfigurationDTO:
-                    try await createSessionForComponent(
-                        configuration: cardComponentConfigurationDTO,
-                        sessionId: sessionId,
-                        sessionData: sessionData,
-                        completion: completion
-                    )
-//                case let instantComponentConfigurationDTO as InstantPaymentConfigurationDTO:
-                    //                try createSessionForComponent(
-                    //                    configuration: instantComponentConfigurationDTO.createCheckoutConfiguration(),
-                    //                    adyenContext: instantComponentConfigurationDTO.createAdyenContext(),
-                    //                    sessionId: sessionId,
-                    //                    sessionData: sessionData,
-                    //                    completion: completion
-                    //                )
                 case .none, .some:
                     completion(Result.failure(PlatformError(errorDescription: "Configuration is not valid")))
                 }
@@ -133,37 +119,32 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
         completion: @escaping (Result<SessionDTO, Error>) -> Void
     ) async throws {
         let sessionDelegate = DropInSessionsDelegate(viewController: getViewController(), checkoutFlutter: checkoutFlutter)
-        try await requestAndSetSession(
-            checkoutConfiguration: configuration,
-            id: sessionId,
-            sessionData: sessionData,
-            completion: completion
-        )
+    }
+    
+    private func test() -> CardComponentConfiguration? {
+        return nil
     }
 
-    private func createSessionForComponent(
-        configuration: CardComponentConfigurationDTO,
-        sessionId: String,
-        sessionData: String,
-        completion: @escaping (Result<SessionDTO, Error>) -> Void
-    ) async throws {
-        let configuration = try CheckoutConfiguration(
+    private func createConfiguration(
+        configuration: CheckoutConfigurationDTO,
+    ) async throws -> CheckoutConfiguration {
+        let checkoutConfig = try CheckoutConfiguration(
             environment: configuration.environment.mapToEnvironment(),
             amount: configuration.amount!.mapToAmount(),
             clientKey: configuration.clientKey,
             analyticsConfiguration: .init()
-        ){
-            configuration.createCardComponentConfiguration()
+        ) {
+            configuration.cardConfigurationDTO!.mapToCardComponentConfiguration(shopperLocale: configuration.shopperLocale)
         }.onComplete { [weak self] result in
             let paymentResult = PaymentResultModelDTO(
-                sessionId: sessionId,
-                sessionData: sessionData,
+                sessionId: "", // REMOVE FROM DTO
+                sessionData: "", // REMOVE FROM DTO
                 sessionResult: result.sessionResult,
                 resultCode: result.resultCode.rawValue
             )
             let componentCommunicationModel = ComponentCommunicationModel(
                 type: ComponentCommunicationType.result,
-                componentId: "",
+                componentId: "CARD_SESSION_COMPONENT",
                 paymentResult: PaymentResultDTO(
                     type: PaymentResultEnum.finished,
                     result: paymentResult
@@ -176,7 +157,7 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
         }.onError { [weak self] error in
             let componentCommunicationModel = ComponentCommunicationModel(
                 type: ComponentCommunicationType.result,
-                componentId: "",
+                componentId: "CARD_SESSION_COMPONENT",
                 paymentResult: PaymentResultDTO(
                     type: .from(error: error),
                     reason: error.localizedDescription
@@ -188,23 +169,18 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
             )
         }
         
-        try await requestAndSetSession(
-            checkoutConfiguration: configuration,
-            id: sessionId,
-            sessionData: sessionData,
-            completion: completion
-        )
+        return checkoutConfig
     }
 
     private func setSession(
         id: String,
         sessionData: String,
-        sessionDelegate: SessionDelegate,
-        configuration: DropInConfigurationDTO,
+        configuration: CheckoutConfigurationDTO,
         completion: @escaping (Result<SessionDTO, Error>) -> Void
     ) async {
         do {
-            let sessionConfiguration = try determineSessionConfiguration(configuration: configuration)
+            //TODO: Config needs to be just session relvant, component specific one needs to be bound when creating component
+            let sessionConfiguration = try await createConfiguration(configuration: configuration)
             let checkoutSession = try await Checkout.setup(
                 with: SessionResponse(id: id, sessionData: sessionData),
                 configuration: sessionConfiguration
@@ -213,10 +189,10 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
             try onSessionCreationSuccess(
                 id: id, //Flutter specific, maybe we can use id from the checkout session like on Android
                 checkoutSession: checkoutSession,
-                sessionDelegate: sessionDelegate,
                 completion: completion
             )
         } catch {
+            // TODO: Add error handling
             completion(Result.failure(error))
         }
     }
@@ -224,11 +200,9 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
     private func onSessionCreationSuccess(
         id: String,
         checkoutSession: Checkout,
-        sessionDelegate: SessionDelegate? = nil,
         completion: @escaping (Result<SessionDTO, Error>) -> Void
     ) throws {
         sessionHolder.adyenCheckout = checkoutSession
-        sessionHolder.sessionDelegate = sessionDelegate
         let encodedPaymentMethods = try JSONEncoder().encode(checkoutSession.paymentMethods)
         guard let encodedPaymentMethodsString = String(data: encodedPaymentMethods, encoding: .utf8) else {
             completion(Result.failure(PlatformError(errorDescription: "Encoding payment methods failed")))
@@ -239,80 +213,6 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
             id: id,
             paymentMethodsJson: encodedPaymentMethodsString
         )))
-    }
-
-    private func requestAndSetSession(
-        checkoutConfiguration: CheckoutConfiguration,
-        id: String,
-        sessionData: String,
-        completion: @escaping (Result<SessionDTO, Error>) -> Void
-    ) async throws {
-        
-        do {
-            let checkoutSession = try await Checkout.setup(
-                with: SessionResponse(id: id, sessionData: sessionData),
-                configuration: checkoutConfiguration
-            )
-            
-            try onSessionCreationSuccess(
-                id: id,
-                checkoutSession: checkoutSession,
-                sessionDelegate: nil,
-                completion: completion
-            )
-        } catch {
-            completion(Result.failure(error))
-        }
-
-//        let checkout = try await Checkout.setup(
-//            with: SessionResponse(id: sessionId, sessionData: sessionData),
-//            configuration: checkoutConfiguration,
-//        )
-//
-//        sessionHolder.sessionId = sessionId
-//        sessionHolder.sessionData = sessionData
-//        sessionHolder.adyenCheckout = checkout
-//
-//        let encodedPaymentMethods = try JSONEncoder().encode(checkout.paymentMethods)
-//        guard let encodedPaymentMethodsString = String(data: encodedPaymentMethods, encoding: .utf8) else {
-//            completion(Result.failure(PlatformError(errorDescription: "Encoding payment methods failed")))
-//            return
-//        }
-//        completion(Result.success(SessionDTO(
-//            id: sessionId,
-//            paymentMethodsJson: encodedPaymentMethodsString
-//        )))
-
-//
-//        AdyenSession.setup(
-//            with: sessionConfiguration,
-//            delegate: sessionDelegate,
-//            presentationDelegate: presentationDelegate
-//        ) { [weak self] result in
-//            do {
-//                switch result {
-//                case let .success(session):
-//                    self?.sessionHolder.setup(
-//                        session: session,
-//                        sessionDelegate: sessionDelegate
-//                    )
-//                    let encodedPaymentMethods = try JSONEncoder().encode(session.sessionContext.paymentMethods)
-//                    guard let encodedPaymentMethodsString = String(data: encodedPaymentMethods, encoding: .utf8) else {
-//                        completion(Result.failure(PlatformError(errorDescription: "Encoding payment methods failed")))
-//                        return
-//                    }
-//                    completion(Result.success(SessionDTO(
-//                        id: sessionId,
-//                        sessionData: sessionData,
-//                        paymentMethodsJson: encodedPaymentMethodsString
-//                    )))
-//                case let .failure(error):
-//                    completion(Result.failure(error))
-//                }
-//            } catch {
-//                completion(Result.failure(error))
-//            }
-//        }
     }
 
     private func buildActionComponentConfiguration(from threeDS2ConfigurationDTO: ThreeDS2ConfigurationDTO?) -> CheckoutActionComponent.Configuration? {

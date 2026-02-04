@@ -1,5 +1,6 @@
 import 'package:adyen_checkout/src/adyen_checkout.dart';
 import 'package:adyen_checkout/src/generated/platform_api.g.dart';
+import 'package:flutter/src/services/binary_messenger.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 class MockAdyenCheckoutPlatform implements CheckoutPlatformInterface {
@@ -72,6 +73,12 @@ class MockAdyenCheckoutPlatform implements CheckoutPlatformInterface {
   Future<String> getThreeDS2SdkVersion() {
     return Future.value("2.2.0");
   }
+
+  @override
+  BinaryMessenger? get pigeonVar_binaryMessenger => throw UnimplementedError();
+
+  @override
+  String get pigeonVar_messageChannelSuffix => throw UnimplementedError();
 }
 
 void main() {

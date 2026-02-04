@@ -70,6 +70,7 @@ class CheckoutPlatformApi(
                 //Exception will contain the checkout error
                 // TODO: Add error handling
                 onSessionCreationError(exception.message ?: "Checkout setup failed.", callback)
+                return@launch
             }
         }
     }

@@ -1,4 +1,5 @@
 import 'package:adyen_checkout/src/generated/platform_api.g.dart';
+import 'package:flutter/services.dart';
 
 class DropInPlatformApi implements DropInPlatformInterface {
   final DropInPlatformInterface _dropInPlatformInterface =
@@ -52,4 +53,10 @@ class DropInPlatformApi implements DropInPlatformInterface {
   @override
   Future<void> onOrderCancelResult(OrderCancelResultDTO orderCancelResponse) =>
       _dropInPlatformInterface.onOrderCancelResult(orderCancelResponse);
+
+  @override
+  BinaryMessenger? get pigeonVar_binaryMessenger => null;
+
+  @override
+  String get pigeonVar_messageChannelSuffix => "adyen_checkout";
 }

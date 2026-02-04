@@ -23,7 +23,7 @@ class BaseCardComponent: NSObject, FlutterPlatformView, UIScrollViewDelegate {
     let componentWrapperView: ComponentWrapperView
 
     var cardComponent: CheckoutPaymentComponent?
-    var adyenCheckout: Checkout? = nil
+    var checkout: Checkout? = nil
     var contentOffset: CGPoint?
 
     init(
@@ -61,61 +61,6 @@ class BaseCardComponent: NSObject, FlutterPlatformView, UIScrollViewDelegate {
         }
 
         return rootViewController
-    }
-    
-    func buildCardComponentV6(sessionHolder: SessionHolder) async throws -> CheckoutPaymentComponent {
-//        let viewController = getViewController()
-//        let configuration = try CheckoutConfiguration(
-//            environment: cardComponentConfiguration?.environment.mapToEnvironment() ?? Adyen.Environment.test,
-//            amount: cardComponentConfiguration!.amount!.mapToAmount(),
-//            clientKey: cardComponentConfiguration!.clientKey,
-//            analyticsConfiguration: .init()
-//        ){
-//            CardComponentConfiguration()
-//        }.onComplete { [weak self] result in
-//            let paymentResult = PaymentResultModelDTO(
-//                sessionId: sessionHolder.sessionId,
-//                sessionData: sessionHolder.sessionData,
-//                sessionResult: result.sessionResult,
-//                resultCode: result.resultCode.rawValue
-//            )
-//            let componentCommunicationModel = ComponentCommunicationModel(
-//                type: ComponentCommunicationType.result,
-//                componentId: self?.componentId ?? "",
-//                paymentResult: PaymentResultDTO(
-//                    type: PaymentResultEnum.finished,
-//                    result: paymentResult
-//                )
-//            )
-//            self?.componentFlutterApi.onComponentCommunication(
-//                componentCommunicationModel: componentCommunicationModel,
-//                completion: { _ in }
-//            )
-//        }.onError { [weak self] error in
-//            let componentCommunicationModel = ComponentCommunicationModel(
-//                type: ComponentCommunicationType.result,
-//                componentId: self?.componentId ?? "",
-//                paymentResult: PaymentResultDTO(
-//                    type: .from(error: error),
-//                    reason: error.localizedDescription
-//                )
-//            )
-//            self?.componentFlutterApi.onComponentCommunication(
-//                componentCommunicationModel: componentCommunicationModel,
-//                completion: { _ in }
-//            )
-//        }
-            
-//        let checkout = try await AdyenCheckout.setup(
-//            with: sessionHolder.sessionId ?? "",
-//            sessionData: sessionHolder.sessionData ?? "",
-//            configuration: configuration,
-//            presentationDelegate: viewController
-//        )
-        adyenCheckout = sessionHolder.adyenCheckout
-        guard let paymentMethods = adyenCheckout!.paymentMethods else {throw PlatformError() }
-        guard let cardPaymentMethod = paymentMethods.paymentMethod(ofType: CardPaymentMethod.self) else {throw PlatformError() }
-        return try buildCardComponent(adyenCheckout: adyenCheckout!, cardPaymentMethod: cardPaymentMethod)
     }
     
     func buildCardComponent(adyenCheckout : Checkout, cardPaymentMethod: PaymentMethod) throws -> CheckoutPaymentComponent {
