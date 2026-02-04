@@ -67,7 +67,7 @@ class BaseCardComponent: NSObject, FlutterPlatformView, UIScrollViewDelegate {
         guard let component = adyenCheckout.createPaymentComponent(for: cardPaymentMethod.type) else {throw PlatformError() }
         return component
     }
-    
+
 //    func buildCardComponent(
 //        paymentMethodString: String?,
 //        isStoredPaymentMethod: Bool,
