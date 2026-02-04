@@ -37,23 +37,23 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
     func createSession(
         sessionId: String,
         sessionData: String,
-        configuration: CheckoutConfigurationDTO,
+        configuration: Any?,
         completion: @escaping (Result<SessionDTO, Error>) -> Void
     ) {
         Task {
             do {
                 switch configuration {
-                case let checkoutConfiguration as CheckoutConfigurationDTO:
+                case let checkoutConfiguration as CardComponentConfigurationDTO:
                     do {
-                        //TODO: Config needs to be just session relvant, component specific one needs to be bound when creating component
+                        //TODO: Config needs to be just session relevant, component specific one needs to be bound when creating component
                         let sessionConfiguration = try await createConfiguration(configuration: checkoutConfiguration)
                         let checkoutSession = try await Checkout.setup(
-                            with: SessionResponse(id: id, sessionData: sessionData),
+                            with: SessionResponse(id: sessionId, sessionData: sessionData),
                             configuration: sessionConfiguration
                         )
                         
                         try onSessionCreationSuccess(
-                            id: id, //Flutter specific, maybe we can use id from the checkout session like on Android
+                            id: sessionId, //Flutter specific, maybe we can use id from the checkout session like on Android
                             checkoutSession: checkoutSession,
                             completion: completion
                         )
@@ -126,7 +126,7 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
     }
 
     private func createConfiguration(
-        configuration: CheckoutConfigurationDTO,
+        configuration: CardComponentConfigurationDTO,
     ) async throws -> CheckoutConfiguration {
         let checkoutConfig = try CheckoutConfiguration(
             environment: configuration.environment.mapToEnvironment(),
@@ -134,7 +134,7 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
             clientKey: configuration.clientKey,
             analyticsConfiguration: .init()
         ) {
-            configuration.cardConfigurationDTO!.mapToCardComponentConfiguration(shopperLocale: configuration.shopperLocale)
+            configuration.cardConfiguration.mapToCardComponentConfiguration(shopperLocale: configuration.shopperLocale)
         }.onComplete { [weak self] result in
             let paymentResult = PaymentResultModelDTO(
                 sessionId: "", // REMOVE FROM DTO
@@ -170,31 +170,6 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
         }
         
         return checkoutConfig
-    }
-
-    private func setSession(
-        id: String,
-        sessionData: String,
-        configuration: CheckoutConfigurationDTO,
-        completion: @escaping (Result<SessionDTO, Error>) -> Void
-    ) async {
-        do {
-            //TODO: Config needs to be just session relvant, component specific one needs to be bound when creating component
-            let sessionConfiguration = try await createConfiguration(configuration: configuration)
-            let checkoutSession = try await Checkout.setup(
-                with: SessionResponse(id: id, sessionData: sessionData),
-                configuration: sessionConfiguration
-            )
-            
-            try onSessionCreationSuccess(
-                id: id, //Flutter specific, maybe we can use id from the checkout session like on Android
-                checkoutSession: checkoutSession,
-                completion: completion
-            )
-        } catch {
-            // TODO: Add error handling
-            completion(Result.failure(error))
-        }
     }
     
     private func onSessionCreationSuccess(

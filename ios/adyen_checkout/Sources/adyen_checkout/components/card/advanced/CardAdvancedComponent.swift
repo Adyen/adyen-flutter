@@ -51,7 +51,6 @@ class CardAdvancedComponent: BaseCardComponent {
                     clientKey: cardComponentConfiguration!.clientKey,
                     analyticsConfiguration: .init()
                 ) {
-                    cardComponentConfiguration!.createCardComponentConfiguration()
                 }.onSubmit { data, handler in
                     
                 }.onAdditionalDetails { data, handler in
