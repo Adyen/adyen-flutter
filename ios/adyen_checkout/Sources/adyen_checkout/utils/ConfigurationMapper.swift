@@ -353,3 +353,9 @@ extension ThreeDS2ConfigurationDTO {
         return .init(requestorAppURL: url)
     }
 }
+
+extension SessionResponseDTO {
+    func mapToSessionResponse() -> SessionResponse {
+        return SessionResponse(id: id, sessionData: sessionData)
+    }
+}

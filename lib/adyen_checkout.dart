@@ -6,6 +6,7 @@ export 'src/common/model/api_only/card_number_validation_result.dart';
 export 'src/common/model/api_only/card_security_code_validation_result.dart';
 export 'src/common/model/card_callbacks/bin_lookup_data.dart';
 export 'src/common/model/checkout.dart';
+export 'src/common/model/checkout_configuration.dart';
 export 'src/common/model/cse/encrypted_card.dart';
 export 'src/common/model/cse/unencrypted_card.dart';
 export 'src/common/model/order_response.dart';
@@ -28,6 +29,7 @@ export 'src/common/model/payment_method_configurations/three_ds2_configuration.d
 export 'src/common/model/payment_method_configurations/twint_configuration.dart';
 export 'src/common/model/payment_result.dart';
 export 'src/common/model/result_code.dart';
+export 'src/common/model/session_response.dart';
 export 'src/components/action_handling/model/action_component_configuration.dart';
 export 'src/components/action_handling/model/action_result.dart';
 export 'src/components/apple_pay/adyen_apple_pay_component.dart';

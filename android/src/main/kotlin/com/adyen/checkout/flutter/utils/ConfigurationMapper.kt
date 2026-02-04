@@ -11,6 +11,7 @@ import com.adyen.checkout.core.components.AnalyticsConfiguration
 import com.adyen.checkout.core.components.AnalyticsLevel
 import com.adyen.checkout.core.components.CheckoutConfiguration
 import com.adyen.checkout.core.components.data.model.Amount
+import com.adyen.checkout.core.sessions.SessionResponse
 import com.adyen.checkout.cse.EncryptedCard
 import com.adyen.checkout.cse.UnencryptedCard
 import com.adyen.checkout.flutter.generated.ActionComponentConfigurationDTO
@@ -22,6 +23,7 @@ import com.adyen.checkout.flutter.generated.CardComponentConfigurationDTO
 import com.adyen.checkout.flutter.generated.CardConfigurationDTO
 import com.adyen.checkout.flutter.generated.CashAppPayConfigurationDTO
 import com.adyen.checkout.flutter.generated.CashAppPayEnvironment
+import com.adyen.checkout.flutter.generated.CheckoutConfigurationDTO
 import com.adyen.checkout.flutter.generated.DropInConfigurationDTO
 import com.adyen.checkout.flutter.generated.EncryptedCardDTO
 import com.adyen.checkout.flutter.generated.Environment
@@ -31,6 +33,7 @@ import com.adyen.checkout.flutter.generated.GooglePayEnvironment
 import com.adyen.checkout.flutter.generated.InstantPaymentConfigurationDTO
 import com.adyen.checkout.flutter.generated.MerchantInfoDTO
 import com.adyen.checkout.flutter.generated.OrderResponseDTO
+import com.adyen.checkout.flutter.generated.SessionResponseDTO
 import com.adyen.checkout.flutter.generated.ShippingAddressParametersDTO
 import com.adyen.checkout.flutter.generated.ThreeDS2ConfigurationDTO
 import com.adyen.checkout.flutter.generated.TotalPriceStatus
@@ -45,6 +48,21 @@ import com.adyen.checkout.cashapppay.CashAppPayEnvironment as SDKCashAppPayEnvir
 import com.adyen.checkout.core.common.Environment as SDKEnvironment
 
 object ConfigurationMapper {
+    fun CheckoutConfigurationDTO.toCheckoutConfiguration(): CheckoutConfiguration =
+        toCheckoutConfiguration(
+            environment = environment,
+            clientKey = clientKey,
+            analyticsOptionsDTO = analyticsOptionsDTO,
+            shopperLocale = shopperLocale,
+            amount = amount,
+            countryCode = countryCode,
+            cardConfigurationDTO = cardConfigurationDTO,
+            googlePayConfigurationDTO = googlePayConfigurationDTO,
+            cashAppPayConfigurationDTO = cashAppPayConfigurationDTO,
+            threeDS2ConfigurationDTO = threeDS2ConfigurationDTO,
+            twintConfigurationDTO = twintConfigurationDTO,
+        )
+
     fun OrderResponse.mapToOrderResponseModel(): OrderResponseDTO =
         OrderResponseDTO(
             pspReference = pspReference,
@@ -216,7 +234,9 @@ object ConfigurationMapper {
             Environment.APSE -> SDKEnvironment.APSE
         }
 
-    private fun AnalyticsOptionsDTO.mapToAnalyticsConfiguration(): AnalyticsConfiguration {
+    fun SessionResponseDTO.mapToSessionResponse(): SessionResponse =
+        SessionResponse(id, sessionData)
+    fun AnalyticsOptionsDTO.mapToAnalyticsConfiguration(): AnalyticsConfiguration {
         val analyticsLevel =
             when {
                 enabled -> AnalyticsLevel.ALL
@@ -226,14 +246,14 @@ object ConfigurationMapper {
         return AnalyticsConfiguration(analyticsLevel)
     }
 
-    private fun AddressMode.mapToAddressConfiguration(): AddressConfiguration =
+    fun AddressMode.mapToAddressConfiguration(): AddressConfiguration =
         when (this) {
             AddressMode.FULL -> AddressConfiguration.FullAddress()
             AddressMode.POSTAL_CODE -> AddressConfiguration.PostalCode()
             AddressMode.NONE -> AddressConfiguration.None
         }
 
-    private fun determineFieldVisibility(fieldVisibility: FieldVisibility): FieldMode =
+    fun determineFieldVisibility(fieldVisibility: FieldVisibility): FieldMode =
         when (fieldVisibility) {
             FieldVisibility.SHOW -> FieldMode.SHOW
             FieldVisibility.HIDE -> FieldMode.HIDE
@@ -242,7 +262,7 @@ object ConfigurationMapper {
     private fun mapToSupportedCardBrands(cardTypes: List<String?>?): List<CardBrand> =
         cardTypes.orEmpty().filterNotNull().map(::CardBrand)
 
-    private fun AmountDTO.mapToAmount(): Amount = Amount(this.currency, this.value)
+    fun AmountDTO.mapToAmount(): Amount = Amount(this.currency, this.value)
 
     private fun com.adyen.checkout.components.core.Amount.mapToDTOAmount(): AmountDTO =
         AmountDTO(

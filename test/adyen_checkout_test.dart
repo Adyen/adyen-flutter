@@ -75,10 +75,23 @@ class MockAdyenCheckoutPlatform implements CheckoutPlatformInterface {
   }
 
   @override
+  // ignore: non_constant_identifier_names
   BinaryMessenger? get pigeonVar_binaryMessenger => throw UnimplementedError();
 
   @override
+  // ignore: non_constant_identifier_names
   String get pigeonVar_messageChannelSuffix => throw UnimplementedError();
+
+  @override
+  Future<SessionDTO> setup(
+    SessionResponseDTO sessionResponseDTO,
+    CheckoutConfigurationDTO checkoutConfigurationDTO,
+  ) async {
+    return SessionDTO(
+      id: "id",
+      paymentMethodsJson: "",
+    );
+  }
 }
 
 void main() {

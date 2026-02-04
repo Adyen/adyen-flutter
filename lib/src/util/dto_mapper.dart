@@ -333,3 +333,34 @@ extension BinLookupDataMapper on Iterable<BinLookupDataDTO> {
   List<BinLookupData> toBinLookupDataList() =>
       map((entry) => BinLookupData(brand: entry.brand)).toList();
 }
+
+extension CheckoutConfigurationMapper on CheckoutConfiguration {
+  CheckoutConfigurationDTO toDTO(String sdkVersionNumber) {
+    return CheckoutConfigurationDTO(
+      environment: environment,
+      clientKey: clientKey,
+      countryCode: countryCode,
+      amount: amount?.toDTO(),
+      shopperLocale: shopperLocale,
+      analyticsOptionsDTO: analyticsOptions?.toDTO(sdkVersionNumber) ??
+          AnalyticsOptionsDTO(enabled: true, version: sdkVersionNumber),
+      cardConfigurationDTO: cardConfiguration?.toDTO(),
+      applePayConfigurationDTO: applePayConfiguration?.toDTO(),
+      googlePayConfigurationDTO: googlePayConfiguration?.toDTO(),
+      cashAppPayConfigurationDTO: cashAppPayConfiguration?.toDTO(),
+      twintConfigurationDTO: twintConfiguration?.toDTO(),
+      threeDS2ConfigurationDTO: threeDS2Configuration?.toDTO(),
+      dropInConfigurationDTO: dropInConfiguration?.toDTO(
+        sdkVersionNumber,
+        false,
+      ),
+    );
+  }
+}
+
+extension SessionResponseMapper on SessionResponse {
+  SessionResponseDTO toDTO() => SessionResponseDTO(
+        id: id,
+        sessionData: sessionData,
+      );
+}

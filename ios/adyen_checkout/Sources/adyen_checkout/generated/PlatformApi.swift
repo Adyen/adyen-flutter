@@ -255,6 +255,35 @@ enum CardSecurityCodeValidationResultDTO: Int {
 }
 
 /// Generated class from Pigeon that represents data sent in messages.
+struct SessionResponseDTO: Hashable {
+  var id: String
+  var sessionData: String
+
+
+  // swift-format-ignore: AlwaysUseLowerCamelCase
+  static func fromList(_ pigeonVar_list: [Any?]) -> SessionResponseDTO? {
+    let id = pigeonVar_list[0] as! String
+    let sessionData = pigeonVar_list[1] as! String
+
+    return SessionResponseDTO(
+      id: id,
+      sessionData: sessionData
+    )
+  }
+  func toList() -> [Any?] {
+    return [
+      id,
+      sessionData,
+    ]
+  }
+  static func == (lhs: SessionResponseDTO, rhs: SessionResponseDTO) -> Bool {
+    return deepEqualsPlatformApi(lhs.toList(), rhs.toList())  }
+  func hash(into hasher: inout Hasher) {
+    deepHashPlatformApi(value: toList(), hasher: &hasher)
+  }
+}
+
+/// Generated class from Pigeon that represents data sent in messages.
 struct SessionDTO: Hashable {
   var id: String
   var paymentMethodsJson: String
@@ -343,12 +372,12 @@ struct AnalyticsOptionsDTO: Hashable {
 
 /// Generated class from Pigeon that represents data sent in messages.
 struct ThreeDS2ConfigurationDTO: Hashable {
-  var requestorAppURL: String
+  var requestorAppURL: String? = nil
 
 
   // swift-format-ignore: AlwaysUseLowerCamelCase
   static func fromList(_ pigeonVar_list: [Any?]) -> ThreeDS2ConfigurationDTO? {
-    let requestorAppURL = pigeonVar_list[0] as! String
+    let requestorAppURL: String? = nilOrValue(pigeonVar_list[0])
 
     return ThreeDS2ConfigurationDTO(
       requestorAppURL: requestorAppURL
@@ -370,7 +399,7 @@ struct ThreeDS2ConfigurationDTO: Hashable {
 struct CheckoutConfigurationDTO: Hashable {
   var environment: Environment
   var clientKey: String
-  var countryCode: String
+  var countryCode: String? = nil
   var amount: AmountDTO? = nil
   var shopperLocale: String? = nil
   var analyticsOptionsDTO: AnalyticsOptionsDTO
@@ -387,7 +416,7 @@ struct CheckoutConfigurationDTO: Hashable {
   static func fromList(_ pigeonVar_list: [Any?]) -> CheckoutConfigurationDTO? {
     let environment = pigeonVar_list[0] as! Environment
     let clientKey = pigeonVar_list[1] as! String
-    let countryCode = pigeonVar_list[2] as! String
+    let countryCode: String? = nilOrValue(pigeonVar_list[2])
     let amount: AmountDTO? = nilOrValue(pigeonVar_list[3])
     let shopperLocale: String? = nilOrValue(pigeonVar_list[4])
     let analyticsOptionsDTO = pigeonVar_list[5] as! AnalyticsOptionsDTO
@@ -1743,70 +1772,72 @@ private class PlatformApiPigeonCodecReader: FlutterStandardReader {
       }
       return nil
     case 147:
-      return SessionDTO.fromList(self.readValue() as! [Any?])
+      return SessionResponseDTO.fromList(self.readValue() as! [Any?])
     case 148:
-      return AmountDTO.fromList(self.readValue() as! [Any?])
+      return SessionDTO.fromList(self.readValue() as! [Any?])
     case 149:
-      return AnalyticsOptionsDTO.fromList(self.readValue() as! [Any?])
+      return AmountDTO.fromList(self.readValue() as! [Any?])
     case 150:
-      return ThreeDS2ConfigurationDTO.fromList(self.readValue() as! [Any?])
+      return AnalyticsOptionsDTO.fromList(self.readValue() as! [Any?])
     case 151:
-      return CheckoutConfigurationDTO.fromList(self.readValue() as! [Any?])
+      return ThreeDS2ConfigurationDTO.fromList(self.readValue() as! [Any?])
     case 152:
-      return DropInConfigurationDTO.fromList(self.readValue() as! [Any?])
+      return CheckoutConfigurationDTO.fromList(self.readValue() as! [Any?])
     case 153:
-      return CardConfigurationDTO.fromList(self.readValue() as! [Any?])
+      return DropInConfigurationDTO.fromList(self.readValue() as! [Any?])
     case 154:
-      return ApplePayConfigurationDTO.fromList(self.readValue() as! [Any?])
+      return CardConfigurationDTO.fromList(self.readValue() as! [Any?])
     case 155:
-      return ApplePayContactDTO.fromList(self.readValue() as! [Any?])
+      return ApplePayConfigurationDTO.fromList(self.readValue() as! [Any?])
     case 156:
-      return ApplePayShippingMethodDTO.fromList(self.readValue() as! [Any?])
+      return ApplePayContactDTO.fromList(self.readValue() as! [Any?])
     case 157:
-      return ApplePaySummaryItemDTO.fromList(self.readValue() as! [Any?])
+      return ApplePayShippingMethodDTO.fromList(self.readValue() as! [Any?])
     case 158:
-      return GooglePayConfigurationDTO.fromList(self.readValue() as! [Any?])
+      return ApplePaySummaryItemDTO.fromList(self.readValue() as! [Any?])
     case 159:
-      return MerchantInfoDTO.fromList(self.readValue() as! [Any?])
+      return GooglePayConfigurationDTO.fromList(self.readValue() as! [Any?])
     case 160:
-      return ShippingAddressParametersDTO.fromList(self.readValue() as! [Any?])
+      return MerchantInfoDTO.fromList(self.readValue() as! [Any?])
     case 161:
-      return BillingAddressParametersDTO.fromList(self.readValue() as! [Any?])
+      return ShippingAddressParametersDTO.fromList(self.readValue() as! [Any?])
     case 162:
-      return CashAppPayConfigurationDTO.fromList(self.readValue() as! [Any?])
+      return BillingAddressParametersDTO.fromList(self.readValue() as! [Any?])
     case 163:
-      return TwintConfigurationDTO.fromList(self.readValue() as! [Any?])
+      return CashAppPayConfigurationDTO.fromList(self.readValue() as! [Any?])
     case 164:
-      return PaymentResultDTO.fromList(self.readValue() as! [Any?])
+      return TwintConfigurationDTO.fromList(self.readValue() as! [Any?])
     case 165:
-      return PaymentResultModelDTO.fromList(self.readValue() as! [Any?])
+      return PaymentResultDTO.fromList(self.readValue() as! [Any?])
     case 166:
-      return OrderResponseDTO.fromList(self.readValue() as! [Any?])
+      return PaymentResultModelDTO.fromList(self.readValue() as! [Any?])
     case 167:
-      return CheckoutEvent.fromList(self.readValue() as! [Any?])
+      return OrderResponseDTO.fromList(self.readValue() as! [Any?])
     case 168:
-      return ComponentCommunicationModel.fromList(self.readValue() as! [Any?])
+      return CheckoutEvent.fromList(self.readValue() as! [Any?])
     case 169:
-      return PaymentEventDTO.fromList(self.readValue() as! [Any?])
+      return ComponentCommunicationModel.fromList(self.readValue() as! [Any?])
     case 170:
-      return ErrorDTO.fromList(self.readValue() as! [Any?])
+      return PaymentEventDTO.fromList(self.readValue() as! [Any?])
     case 171:
-      return DeletedStoredPaymentMethodResultDTO.fromList(self.readValue() as! [Any?])
+      return ErrorDTO.fromList(self.readValue() as! [Any?])
     case 172:
-      return CardComponentConfigurationDTO.fromList(self.readValue() as! [Any?])
+      return DeletedStoredPaymentMethodResultDTO.fromList(self.readValue() as! [Any?])
     case 173:
-      return InstantPaymentConfigurationDTO.fromList(self.readValue() as! [Any?])
+      return CardComponentConfigurationDTO.fromList(self.readValue() as! [Any?])
     case 174:
-      return InstantPaymentSetupResultDTO.fromList(self.readValue() as! [Any?])
+      return InstantPaymentConfigurationDTO.fromList(self.readValue() as! [Any?])
     case 175:
-      return UnencryptedCardDTO.fromList(self.readValue() as! [Any?])
+      return InstantPaymentSetupResultDTO.fromList(self.readValue() as! [Any?])
     case 176:
-      return EncryptedCardDTO.fromList(self.readValue() as! [Any?])
+      return UnencryptedCardDTO.fromList(self.readValue() as! [Any?])
     case 177:
-      return ActionComponentConfigurationDTO.fromList(self.readValue() as! [Any?])
+      return EncryptedCardDTO.fromList(self.readValue() as! [Any?])
     case 178:
-      return OrderCancelResultDTO.fromList(self.readValue() as! [Any?])
+      return ActionComponentConfigurationDTO.fromList(self.readValue() as! [Any?])
     case 179:
+      return OrderCancelResultDTO.fromList(self.readValue() as! [Any?])
+    case 180:
       return BinLookupDataDTO.fromList(self.readValue() as! [Any?])
     default:
       return super.readValue(ofType: type)
@@ -1870,104 +1901,107 @@ private class PlatformApiPigeonCodecWriter: FlutterStandardWriter {
     } else if let value = value as? CardSecurityCodeValidationResultDTO {
       super.writeByte(146)
       super.writeValue(value.rawValue)
-    } else if let value = value as? SessionDTO {
+    } else if let value = value as? SessionResponseDTO {
       super.writeByte(147)
       super.writeValue(value.toList())
-    } else if let value = value as? AmountDTO {
+    } else if let value = value as? SessionDTO {
       super.writeByte(148)
       super.writeValue(value.toList())
-    } else if let value = value as? AnalyticsOptionsDTO {
+    } else if let value = value as? AmountDTO {
       super.writeByte(149)
       super.writeValue(value.toList())
-    } else if let value = value as? ThreeDS2ConfigurationDTO {
+    } else if let value = value as? AnalyticsOptionsDTO {
       super.writeByte(150)
       super.writeValue(value.toList())
-    } else if let value = value as? CheckoutConfigurationDTO {
+    } else if let value = value as? ThreeDS2ConfigurationDTO {
       super.writeByte(151)
       super.writeValue(value.toList())
-    } else if let value = value as? DropInConfigurationDTO {
+    } else if let value = value as? CheckoutConfigurationDTO {
       super.writeByte(152)
       super.writeValue(value.toList())
-    } else if let value = value as? CardConfigurationDTO {
+    } else if let value = value as? DropInConfigurationDTO {
       super.writeByte(153)
       super.writeValue(value.toList())
-    } else if let value = value as? ApplePayConfigurationDTO {
+    } else if let value = value as? CardConfigurationDTO {
       super.writeByte(154)
       super.writeValue(value.toList())
-    } else if let value = value as? ApplePayContactDTO {
+    } else if let value = value as? ApplePayConfigurationDTO {
       super.writeByte(155)
       super.writeValue(value.toList())
-    } else if let value = value as? ApplePayShippingMethodDTO {
+    } else if let value = value as? ApplePayContactDTO {
       super.writeByte(156)
       super.writeValue(value.toList())
-    } else if let value = value as? ApplePaySummaryItemDTO {
+    } else if let value = value as? ApplePayShippingMethodDTO {
       super.writeByte(157)
       super.writeValue(value.toList())
-    } else if let value = value as? GooglePayConfigurationDTO {
+    } else if let value = value as? ApplePaySummaryItemDTO {
       super.writeByte(158)
       super.writeValue(value.toList())
-    } else if let value = value as? MerchantInfoDTO {
+    } else if let value = value as? GooglePayConfigurationDTO {
       super.writeByte(159)
       super.writeValue(value.toList())
-    } else if let value = value as? ShippingAddressParametersDTO {
+    } else if let value = value as? MerchantInfoDTO {
       super.writeByte(160)
       super.writeValue(value.toList())
-    } else if let value = value as? BillingAddressParametersDTO {
+    } else if let value = value as? ShippingAddressParametersDTO {
       super.writeByte(161)
       super.writeValue(value.toList())
-    } else if let value = value as? CashAppPayConfigurationDTO {
+    } else if let value = value as? BillingAddressParametersDTO {
       super.writeByte(162)
       super.writeValue(value.toList())
-    } else if let value = value as? TwintConfigurationDTO {
+    } else if let value = value as? CashAppPayConfigurationDTO {
       super.writeByte(163)
       super.writeValue(value.toList())
-    } else if let value = value as? PaymentResultDTO {
+    } else if let value = value as? TwintConfigurationDTO {
       super.writeByte(164)
       super.writeValue(value.toList())
-    } else if let value = value as? PaymentResultModelDTO {
+    } else if let value = value as? PaymentResultDTO {
       super.writeByte(165)
       super.writeValue(value.toList())
-    } else if let value = value as? OrderResponseDTO {
+    } else if let value = value as? PaymentResultModelDTO {
       super.writeByte(166)
       super.writeValue(value.toList())
-    } else if let value = value as? CheckoutEvent {
+    } else if let value = value as? OrderResponseDTO {
       super.writeByte(167)
       super.writeValue(value.toList())
-    } else if let value = value as? ComponentCommunicationModel {
+    } else if let value = value as? CheckoutEvent {
       super.writeByte(168)
       super.writeValue(value.toList())
-    } else if let value = value as? PaymentEventDTO {
+    } else if let value = value as? ComponentCommunicationModel {
       super.writeByte(169)
       super.writeValue(value.toList())
-    } else if let value = value as? ErrorDTO {
+    } else if let value = value as? PaymentEventDTO {
       super.writeByte(170)
       super.writeValue(value.toList())
-    } else if let value = value as? DeletedStoredPaymentMethodResultDTO {
+    } else if let value = value as? ErrorDTO {
       super.writeByte(171)
       super.writeValue(value.toList())
-    } else if let value = value as? CardComponentConfigurationDTO {
+    } else if let value = value as? DeletedStoredPaymentMethodResultDTO {
       super.writeByte(172)
       super.writeValue(value.toList())
-    } else if let value = value as? InstantPaymentConfigurationDTO {
+    } else if let value = value as? CardComponentConfigurationDTO {
       super.writeByte(173)
       super.writeValue(value.toList())
-    } else if let value = value as? InstantPaymentSetupResultDTO {
+    } else if let value = value as? InstantPaymentConfigurationDTO {
       super.writeByte(174)
       super.writeValue(value.toList())
-    } else if let value = value as? UnencryptedCardDTO {
+    } else if let value = value as? InstantPaymentSetupResultDTO {
       super.writeByte(175)
       super.writeValue(value.toList())
-    } else if let value = value as? EncryptedCardDTO {
+    } else if let value = value as? UnencryptedCardDTO {
       super.writeByte(176)
       super.writeValue(value.toList())
-    } else if let value = value as? ActionComponentConfigurationDTO {
+    } else if let value = value as? EncryptedCardDTO {
       super.writeByte(177)
       super.writeValue(value.toList())
-    } else if let value = value as? OrderCancelResultDTO {
+    } else if let value = value as? ActionComponentConfigurationDTO {
       super.writeByte(178)
       super.writeValue(value.toList())
-    } else if let value = value as? BinLookupDataDTO {
+    } else if let value = value as? OrderCancelResultDTO {
       super.writeByte(179)
+      super.writeValue(value.toList())
+    } else if let value = value as? BinLookupDataDTO {
+      super.writeByte(180)
       super.writeValue(value.toList())
     } else {
       super.writeValue(value)
@@ -1993,6 +2027,7 @@ class PlatformApiPigeonCodec: FlutterStandardMessageCodec, @unchecked Sendable {
 /// Generated protocol from Pigeon that represents a handler of messages from Flutter.
 protocol CheckoutPlatformInterface {
   func getReturnUrl(completion: @escaping (Result<String, Error>) -> Void)
+  func setup(sessionResponseDTO: SessionResponseDTO, checkoutConfigurationDTO: CheckoutConfigurationDTO, completion: @escaping (Result<SessionDTO, Error>) -> Void)
   func createSession(sessionId: String, sessionData: String, configuration: Any?, completion: @escaping (Result<SessionDTO, Error>) -> Void)
   func clearSession() throws
   func encryptCard(unencryptedCardDTO: UnencryptedCardDTO, publicKey: String, completion: @escaping (Result<EncryptedCardDTO, Error>) -> Void)
@@ -2024,6 +2059,24 @@ class CheckoutPlatformInterfaceSetup {
       }
     } else {
       getReturnUrlChannel.setMessageHandler(nil)
+    }
+    let setupChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.setup\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      setupChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let sessionResponseDTOArg = args[0] as! SessionResponseDTO
+        let checkoutConfigurationDTOArg = args[1] as! CheckoutConfigurationDTO
+        api.setup(sessionResponseDTO: sessionResponseDTOArg, checkoutConfigurationDTO: checkoutConfigurationDTOArg) { result in
+          switch result {
+          case .success(let res):
+            reply(wrapResult(res))
+          case .failure(let error):
+            reply(wrapError(error))
+          }
+        }
+      }
+    } else {
+      setupChannel.setMessageHandler(nil)
     }
     let createSessionChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.createSession\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {

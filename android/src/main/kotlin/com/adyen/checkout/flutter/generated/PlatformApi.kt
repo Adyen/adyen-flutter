@@ -312,6 +312,37 @@ enum class CardSecurityCodeValidationResultDTO(val raw: Int) {
 }
 
 /** Generated class from Pigeon that represents data sent in messages. */
+data class SessionResponseDTO (
+  val id: String,
+  val sessionData: String
+)
+ {
+  companion object {
+    fun fromList(pigeonVar_list: List<Any?>): SessionResponseDTO {
+      val id = pigeonVar_list[0] as String
+      val sessionData = pigeonVar_list[1] as String
+      return SessionResponseDTO(id, sessionData)
+    }
+  }
+  fun toList(): List<Any?> {
+    return listOf(
+      id,
+      sessionData,
+    )
+  }
+  override fun equals(other: Any?): Boolean {
+    if (other !is SessionResponseDTO) {
+      return false
+    }
+    if (this === other) {
+      return true
+    }
+    return PlatformApiPigeonUtils.deepEquals(toList(), other.toList())  }
+
+  override fun hashCode(): Int = toList().hashCode()
+}
+
+/** Generated class from Pigeon that represents data sent in messages. */
 data class SessionDTO (
   val id: String,
   val paymentMethodsJson: String
@@ -406,12 +437,12 @@ data class AnalyticsOptionsDTO (
 
 /** Generated class from Pigeon that represents data sent in messages. */
 data class ThreeDS2ConfigurationDTO (
-  val requestorAppURL: String
+  val requestorAppURL: String? = null
 )
  {
   companion object {
     fun fromList(pigeonVar_list: List<Any?>): ThreeDS2ConfigurationDTO {
-      val requestorAppURL = pigeonVar_list[0] as String
+      val requestorAppURL = pigeonVar_list[0] as String?
       return ThreeDS2ConfigurationDTO(requestorAppURL)
     }
   }
@@ -436,7 +467,7 @@ data class ThreeDS2ConfigurationDTO (
 data class CheckoutConfigurationDTO (
   val environment: Environment,
   val clientKey: String,
-  val countryCode: String,
+  val countryCode: String? = null,
   val amount: AmountDTO? = null,
   val shopperLocale: String? = null,
   val analyticsOptionsDTO: AnalyticsOptionsDTO,
@@ -453,7 +484,7 @@ data class CheckoutConfigurationDTO (
     fun fromList(pigeonVar_list: List<Any?>): CheckoutConfigurationDTO {
       val environment = pigeonVar_list[0] as Environment
       val clientKey = pigeonVar_list[1] as String
-      val countryCode = pigeonVar_list[2] as String
+      val countryCode = pigeonVar_list[2] as String?
       val amount = pigeonVar_list[3] as AmountDTO?
       val shopperLocale = pigeonVar_list[4] as String?
       val analyticsOptionsDTO = pigeonVar_list[5] as AnalyticsOptionsDTO
@@ -1743,165 +1774,170 @@ private open class PlatformApiPigeonCodec : StandardMessageCodec() {
       }
       147.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          SessionDTO.fromList(it)
+          SessionResponseDTO.fromList(it)
         }
       }
       148.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          AmountDTO.fromList(it)
+          SessionDTO.fromList(it)
         }
       }
       149.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          AnalyticsOptionsDTO.fromList(it)
+          AmountDTO.fromList(it)
         }
       }
       150.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          ThreeDS2ConfigurationDTO.fromList(it)
+          AnalyticsOptionsDTO.fromList(it)
         }
       }
       151.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          CheckoutConfigurationDTO.fromList(it)
+          ThreeDS2ConfigurationDTO.fromList(it)
         }
       }
       152.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          DropInConfigurationDTO.fromList(it)
+          CheckoutConfigurationDTO.fromList(it)
         }
       }
       153.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          CardConfigurationDTO.fromList(it)
+          DropInConfigurationDTO.fromList(it)
         }
       }
       154.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          ApplePayConfigurationDTO.fromList(it)
+          CardConfigurationDTO.fromList(it)
         }
       }
       155.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          ApplePayContactDTO.fromList(it)
+          ApplePayConfigurationDTO.fromList(it)
         }
       }
       156.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          ApplePayShippingMethodDTO.fromList(it)
+          ApplePayContactDTO.fromList(it)
         }
       }
       157.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          ApplePaySummaryItemDTO.fromList(it)
+          ApplePayShippingMethodDTO.fromList(it)
         }
       }
       158.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          GooglePayConfigurationDTO.fromList(it)
+          ApplePaySummaryItemDTO.fromList(it)
         }
       }
       159.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          MerchantInfoDTO.fromList(it)
+          GooglePayConfigurationDTO.fromList(it)
         }
       }
       160.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          ShippingAddressParametersDTO.fromList(it)
+          MerchantInfoDTO.fromList(it)
         }
       }
       161.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          BillingAddressParametersDTO.fromList(it)
+          ShippingAddressParametersDTO.fromList(it)
         }
       }
       162.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          CashAppPayConfigurationDTO.fromList(it)
+          BillingAddressParametersDTO.fromList(it)
         }
       }
       163.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          TwintConfigurationDTO.fromList(it)
+          CashAppPayConfigurationDTO.fromList(it)
         }
       }
       164.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          PaymentResultDTO.fromList(it)
+          TwintConfigurationDTO.fromList(it)
         }
       }
       165.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          PaymentResultModelDTO.fromList(it)
+          PaymentResultDTO.fromList(it)
         }
       }
       166.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          OrderResponseDTO.fromList(it)
+          PaymentResultModelDTO.fromList(it)
         }
       }
       167.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          CheckoutEvent.fromList(it)
+          OrderResponseDTO.fromList(it)
         }
       }
       168.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          ComponentCommunicationModel.fromList(it)
+          CheckoutEvent.fromList(it)
         }
       }
       169.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          PaymentEventDTO.fromList(it)
+          ComponentCommunicationModel.fromList(it)
         }
       }
       170.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          ErrorDTO.fromList(it)
+          PaymentEventDTO.fromList(it)
         }
       }
       171.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          DeletedStoredPaymentMethodResultDTO.fromList(it)
+          ErrorDTO.fromList(it)
         }
       }
       172.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          CardComponentConfigurationDTO.fromList(it)
+          DeletedStoredPaymentMethodResultDTO.fromList(it)
         }
       }
       173.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          InstantPaymentConfigurationDTO.fromList(it)
+          CardComponentConfigurationDTO.fromList(it)
         }
       }
       174.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          InstantPaymentSetupResultDTO.fromList(it)
+          InstantPaymentConfigurationDTO.fromList(it)
         }
       }
       175.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          UnencryptedCardDTO.fromList(it)
+          InstantPaymentSetupResultDTO.fromList(it)
         }
       }
       176.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          EncryptedCardDTO.fromList(it)
+          UnencryptedCardDTO.fromList(it)
         }
       }
       177.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          ActionComponentConfigurationDTO.fromList(it)
+          EncryptedCardDTO.fromList(it)
         }
       }
       178.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          OrderCancelResultDTO.fromList(it)
+          ActionComponentConfigurationDTO.fromList(it)
         }
       }
       179.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          OrderCancelResultDTO.fromList(it)
+        }
+      }
+      180.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
           BinLookupDataDTO.fromList(it)
         }
@@ -1983,136 +2019,140 @@ private open class PlatformApiPigeonCodec : StandardMessageCodec() {
         stream.write(146)
         writeValue(stream, value.raw)
       }
-      is SessionDTO -> {
+      is SessionResponseDTO -> {
         stream.write(147)
         writeValue(stream, value.toList())
       }
-      is AmountDTO -> {
+      is SessionDTO -> {
         stream.write(148)
         writeValue(stream, value.toList())
       }
-      is AnalyticsOptionsDTO -> {
+      is AmountDTO -> {
         stream.write(149)
         writeValue(stream, value.toList())
       }
-      is ThreeDS2ConfigurationDTO -> {
+      is AnalyticsOptionsDTO -> {
         stream.write(150)
         writeValue(stream, value.toList())
       }
-      is CheckoutConfigurationDTO -> {
+      is ThreeDS2ConfigurationDTO -> {
         stream.write(151)
         writeValue(stream, value.toList())
       }
-      is DropInConfigurationDTO -> {
+      is CheckoutConfigurationDTO -> {
         stream.write(152)
         writeValue(stream, value.toList())
       }
-      is CardConfigurationDTO -> {
+      is DropInConfigurationDTO -> {
         stream.write(153)
         writeValue(stream, value.toList())
       }
-      is ApplePayConfigurationDTO -> {
+      is CardConfigurationDTO -> {
         stream.write(154)
         writeValue(stream, value.toList())
       }
-      is ApplePayContactDTO -> {
+      is ApplePayConfigurationDTO -> {
         stream.write(155)
         writeValue(stream, value.toList())
       }
-      is ApplePayShippingMethodDTO -> {
+      is ApplePayContactDTO -> {
         stream.write(156)
         writeValue(stream, value.toList())
       }
-      is ApplePaySummaryItemDTO -> {
+      is ApplePayShippingMethodDTO -> {
         stream.write(157)
         writeValue(stream, value.toList())
       }
-      is GooglePayConfigurationDTO -> {
+      is ApplePaySummaryItemDTO -> {
         stream.write(158)
         writeValue(stream, value.toList())
       }
-      is MerchantInfoDTO -> {
+      is GooglePayConfigurationDTO -> {
         stream.write(159)
         writeValue(stream, value.toList())
       }
-      is ShippingAddressParametersDTO -> {
+      is MerchantInfoDTO -> {
         stream.write(160)
         writeValue(stream, value.toList())
       }
-      is BillingAddressParametersDTO -> {
+      is ShippingAddressParametersDTO -> {
         stream.write(161)
         writeValue(stream, value.toList())
       }
-      is CashAppPayConfigurationDTO -> {
+      is BillingAddressParametersDTO -> {
         stream.write(162)
         writeValue(stream, value.toList())
       }
-      is TwintConfigurationDTO -> {
+      is CashAppPayConfigurationDTO -> {
         stream.write(163)
         writeValue(stream, value.toList())
       }
-      is PaymentResultDTO -> {
+      is TwintConfigurationDTO -> {
         stream.write(164)
         writeValue(stream, value.toList())
       }
-      is PaymentResultModelDTO -> {
+      is PaymentResultDTO -> {
         stream.write(165)
         writeValue(stream, value.toList())
       }
-      is OrderResponseDTO -> {
+      is PaymentResultModelDTO -> {
         stream.write(166)
         writeValue(stream, value.toList())
       }
-      is CheckoutEvent -> {
+      is OrderResponseDTO -> {
         stream.write(167)
         writeValue(stream, value.toList())
       }
-      is ComponentCommunicationModel -> {
+      is CheckoutEvent -> {
         stream.write(168)
         writeValue(stream, value.toList())
       }
-      is PaymentEventDTO -> {
+      is ComponentCommunicationModel -> {
         stream.write(169)
         writeValue(stream, value.toList())
       }
-      is ErrorDTO -> {
+      is PaymentEventDTO -> {
         stream.write(170)
         writeValue(stream, value.toList())
       }
-      is DeletedStoredPaymentMethodResultDTO -> {
+      is ErrorDTO -> {
         stream.write(171)
         writeValue(stream, value.toList())
       }
-      is CardComponentConfigurationDTO -> {
+      is DeletedStoredPaymentMethodResultDTO -> {
         stream.write(172)
         writeValue(stream, value.toList())
       }
-      is InstantPaymentConfigurationDTO -> {
+      is CardComponentConfigurationDTO -> {
         stream.write(173)
         writeValue(stream, value.toList())
       }
-      is InstantPaymentSetupResultDTO -> {
+      is InstantPaymentConfigurationDTO -> {
         stream.write(174)
         writeValue(stream, value.toList())
       }
-      is UnencryptedCardDTO -> {
+      is InstantPaymentSetupResultDTO -> {
         stream.write(175)
         writeValue(stream, value.toList())
       }
-      is EncryptedCardDTO -> {
+      is UnencryptedCardDTO -> {
         stream.write(176)
         writeValue(stream, value.toList())
       }
-      is ActionComponentConfigurationDTO -> {
+      is EncryptedCardDTO -> {
         stream.write(177)
         writeValue(stream, value.toList())
       }
-      is OrderCancelResultDTO -> {
+      is ActionComponentConfigurationDTO -> {
         stream.write(178)
         writeValue(stream, value.toList())
       }
-      is BinLookupDataDTO -> {
+      is OrderCancelResultDTO -> {
         stream.write(179)
+        writeValue(stream, value.toList())
+      }
+      is BinLookupDataDTO -> {
+        stream.write(180)
         writeValue(stream, value.toList())
       }
       else -> super.writeValue(stream, value)
@@ -2124,6 +2164,7 @@ private open class PlatformApiPigeonCodec : StandardMessageCodec() {
 /** Generated interface from Pigeon that represents a handler of messages from Flutter. */
 interface CheckoutPlatformInterface {
   fun getReturnUrl(callback: (Result<String>) -> Unit)
+  fun setup(sessionResponseDTO: SessionResponseDTO, checkoutConfigurationDTO: CheckoutConfigurationDTO, callback: (Result<SessionDTO>) -> Unit)
   fun createSession(sessionId: String, sessionData: String, configuration: Any?, callback: (Result<SessionDTO>) -> Unit)
   fun clearSession()
   fun encryptCard(unencryptedCardDTO: UnencryptedCardDTO, publicKey: String, callback: (Result<EncryptedCardDTO>) -> Unit)
@@ -2148,6 +2189,27 @@ interface CheckoutPlatformInterface {
         if (api != null) {
           channel.setMessageHandler { _, reply ->
             api.getReturnUrl{ result: Result<String> ->
+              val error = result.exceptionOrNull()
+              if (error != null) {
+                reply.reply(PlatformApiPigeonUtils.wrapError(error))
+              } else {
+                val data = result.getOrNull()
+                reply.reply(PlatformApiPigeonUtils.wrapResult(data))
+              }
+            }
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.setup$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { message, reply ->
+            val args = message as List<Any?>
+            val sessionResponseDTOArg = args[0] as SessionResponseDTO
+            val checkoutConfigurationDTOArg = args[1] as CheckoutConfigurationDTO
+            api.setup(sessionResponseDTOArg, checkoutConfigurationDTOArg) { result: Result<SessionDTO> ->
               val error = result.exceptionOrNull()
               if (error != null) {
                 reply.reply(PlatformApiPigeonUtils.wrapError(error))

@@ -27,6 +27,7 @@ import 'package:adyen_checkout_example/screens/component/multi_component/multi_c
 import 'package:adyen_checkout_example/screens/component/multi_component/multi_component_navigation_screen.dart';
 import 'package:adyen_checkout_example/screens/component/multi_component/multi_component_session_screen.dart';
 import 'package:adyen_checkout_example/screens/drop_in/drop_in_screen.dart';
+import 'package:adyen_checkout_example/screens/v2/v2_screen.dart';
 import 'package:adyen_checkout_example/utils/provider.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -34,6 +35,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 
 void main() {
   final service = Service();
+  final adyenDropInRepository = AdyenDropInRepository(service: service);
   final adyenGooglePayComponentRepository =
       AdyenGooglePayComponentRepository(service: service);
   final adyenApplePayComponentRepository =
@@ -69,7 +71,7 @@ void main() {
     routes: {
       '/': (context) => const MyApp(),
       '/dropInScreen': (context) => DropInScreen(
-            repository: AdyenDropInRepository(service: service),
+            repository: adyenDropInRepository,
           ),
       '/cardComponentScreen': (context) => const CardNavigationScreen(),
       '/cardSessionComponentScreen': (context) => CardSessionComponentScreen(
@@ -121,6 +123,7 @@ void main() {
             notifier: CardStateNotifier(adyenCseRepository),
             child: const CustomCardScreen(),
           ),
+      '/v2Screen': (context) => V2Screen(repository: adyenDropInRepository),
     },
     initialRoute: "/",
   ));
@@ -160,6 +163,9 @@ class MyApp extends StatelessWidget {
             TextButton(
                 onPressed: () => Navigator.pushNamed(context, "/customCard"),
                 child: const Text("Custom card (CSE)")),
+            TextButton(
+                onPressed: () => Navigator.pushNamed(context, "/v2Screen"),
+                child: const Text("V2 example (v6 integration)")),
           ],
         ),
       ),

@@ -20,6 +20,23 @@ class AdyenCheckoutSession {
     this.dropIn,
   );
 
+  Future<SessionCheckout> setup({
+    required SessionResponse sessionResponse,
+    required CheckoutConfiguration checkoutConfiguration,
+  }) async {
+    final sdkVersionNumber =
+        await _sdkVersionNumberProvider.getSdkVersionNumber();
+
+    final sessionDTO = await adyenCheckoutApi.setup(
+      sessionResponse.toDTO(),
+      checkoutConfiguration.toDTO(sdkVersionNumber),
+    );
+    return SessionCheckout(
+      id: sessionDTO.id,
+      paymentMethods: jsonDecode(sessionDTO.paymentMethodsJson),
+    );
+  }
+
   Future<PaymentResult> startDropIn({
     required DropInConfiguration dropInConfiguration,
     required SessionCheckout checkout,

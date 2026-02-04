@@ -134,6 +134,16 @@ enum CardExpiryDateValidationResultDTO {
 
 enum CardSecurityCodeValidationResultDTO { valid, invalid }
 
+class SessionResponseDTO {
+  final String id;
+  final String sessionData;
+
+  SessionResponseDTO(
+    this.id,
+    this.sessionData,
+  );
+}
+
 class SessionDTO {
   final String id;
   final String paymentMethodsJson;
@@ -175,7 +185,7 @@ class ThreeDS2ConfigurationDTO {
 class CheckoutConfigurationDTO {
   final Environment environment;
   final String clientKey;
-  final String countryCode;
+  final String? countryCode;
   final AmountDTO? amount;
   final String? shopperLocale;
   final AnalyticsOptionsDTO analyticsOptionsDTO;
@@ -676,6 +686,12 @@ class BinLookupDataDTO {
 abstract class CheckoutPlatformInterface {
   @async
   String getReturnUrl();
+
+  @async
+  SessionDTO setup(
+    SessionResponseDTO sessionResponseDTO,
+    CheckoutConfigurationDTO checkoutConfigurationDTO,
+  );
 
   @async
   SessionDTO createSession(

@@ -55,8 +55,10 @@ class DropInPlatformApi implements DropInPlatformInterface {
       _dropInPlatformInterface.onOrderCancelResult(orderCancelResponse);
 
   @override
+  // ignore: non_constant_identifier_names
   BinaryMessenger? get pigeonVar_binaryMessenger => null;
 
   @override
+  // ignore: non_constant_identifier_names
   String get pigeonVar_messageChannelSuffix => "adyen_checkout";
 }

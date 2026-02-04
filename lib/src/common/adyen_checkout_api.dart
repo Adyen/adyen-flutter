@@ -65,8 +65,15 @@ class AdyenCheckoutApi implements CheckoutPlatformInterface {
   Future<String> getThreeDS2SdkVersion() => checkoutApi.getThreeDS2SdkVersion();
 
   @override
+  // ignore: non_constant_identifier_names
   BinaryMessenger? get pigeonVar_binaryMessenger => null;
 
   @override
+  // ignore: non_constant_identifier_names
   String get pigeonVar_messageChannelSuffix => "adyen_checkout";
+
+  @override
+  Future<SessionDTO> setup(SessionResponseDTO sessionResponseDTO,
+          CheckoutConfigurationDTO checkoutConfigurationDTO) =>
+      checkoutApi.setup(sessionResponseDTO, checkoutConfigurationDTO);
 }

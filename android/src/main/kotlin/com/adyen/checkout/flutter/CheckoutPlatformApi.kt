@@ -3,30 +3,40 @@ package com.adyen.checkout.flutter
 import android.annotation.SuppressLint
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.lifecycleScope
+import com.adyen.checkout.components.core.internal.Configuration
 import com.adyen.checkout.core.common.CheckoutContext
 import com.adyen.checkout.core.components.Checkout
 import com.adyen.checkout.core.components.CheckoutConfiguration
 import com.adyen.checkout.core.components.data.model.PaymentMethodsApiResponse
 import com.adyen.checkout.core.old.AdyenLogLevel
 import com.adyen.checkout.core.old.AdyenLogger
-import com.adyen.checkout.core.sessions.SessionResponse
 import com.adyen.checkout.flutter.apiOnly.AdyenCSE
 import com.adyen.checkout.flutter.apiOnly.CardValidation
 import com.adyen.checkout.flutter.generated.CardComponentConfigurationDTO
 import com.adyen.checkout.flutter.generated.CardExpiryDateValidationResultDTO
 import com.adyen.checkout.flutter.generated.CardNumberValidationResultDTO
 import com.adyen.checkout.flutter.generated.CardSecurityCodeValidationResultDTO
+import com.adyen.checkout.flutter.generated.CheckoutConfigurationDTO
 import com.adyen.checkout.flutter.generated.CheckoutPlatformInterface
 import com.adyen.checkout.flutter.generated.DropInConfigurationDTO
 import com.adyen.checkout.flutter.generated.EncryptedCardDTO
 import com.adyen.checkout.flutter.generated.InstantPaymentConfigurationDTO
 import com.adyen.checkout.flutter.generated.InstantPaymentType
 import com.adyen.checkout.flutter.generated.SessionDTO
+import com.adyen.checkout.flutter.generated.SessionResponseDTO
 import com.adyen.checkout.flutter.generated.UnencryptedCardDTO
 import com.adyen.checkout.flutter.session.SessionHolder
+import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToAmount
+import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToAnalyticsConfiguration
+import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToEnvironment
+import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToSessionResponse
 import com.adyen.checkout.flutter.utils.ConfigurationMapper.toCheckoutConfiguration
 import com.adyen.checkout.flutter.utils.PlatformException
 import com.adyen.checkout.redirect.old.RedirectComponent
+import com.adyen.checkout.sessions.core.CheckoutSessionProvider
+import com.adyen.checkout.sessions.core.CheckoutSessionResult
+import com.adyen.checkout.sessions.core.SessionModel
+import com.adyen.checkout.sessions.core.SessionSetupResponse
 import com.adyen.threeds2.ThreeDS2Service
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -39,28 +49,27 @@ class CheckoutPlatformApi(
         callback(Result.success(RedirectComponent.getReturnUrl(activity.applicationContext)))
     }
 
-    override fun createSession(
-        sessionId: String,
-        sessionData: String,
-        configuration: Any?,
-        callback: (Result<SessionDTO>) -> Unit,
+    override fun setup(
+        sessionResponseDTO: SessionResponseDTO,
+        checkoutConfigurationDTO: CheckoutConfigurationDTO,
+        callback: (Result<SessionDTO>) -> Unit
     ) {
-        //v2 TODO: Create SessionResponse DTO class with id and sessionData parameters
         activity.lifecycleScope.launch(Dispatchers.IO) {
             try {
-                val sessionConfiguration = determineSessionConfiguration(configuration)
+                val sessionResponse = sessionResponseDTO.mapToSessionResponse()
+                val checkoutConfiguration = createConfiguration(checkoutConfigurationDTO)
                 val checkoutResult = Checkout.setup(
-                    SessionResponse(sessionId, sessionData),
-                    sessionConfiguration
+                    sessionResponse,
+                    checkoutConfiguration
                 )
 
                 when (checkoutResult) {
-                    is Checkout.Result.Error -> onSessionCreationError(
+                    is Checkout.Result.Error -> onSetupError(
                         error = checkoutResult.errorReason,
                         callback = callback
                     )
 
-                    is Checkout.Result.Success -> onSessionCreationSuccess(
+                    is Checkout.Result.Success -> onSetupSuccess(
                         checkoutSession = checkoutResult.checkoutContext,
                         callback = callback
                     )
@@ -69,10 +78,32 @@ class CheckoutPlatformApi(
             } catch (exception: Exception) {
                 //Exception will contain the checkout error
                 // TODO: Add error handling
-                onSessionCreationError(exception.message ?: "Checkout setup failed.", callback)
+                onSetupError(exception.message ?: "Checkout setup failed.", callback)
                 return@launch
             }
         }
+    }
+
+    override fun createSession(
+        sessionId: String,
+        sessionData: String,
+        configuration: Any?,
+        callback: (Result<SessionDTO>) -> Unit,
+    ) {
+//        activity.lifecycleScope.launch(Dispatchers.IO) {
+//            val sessionModel = SessionModel(sessionId, sessionData)
+//            determineSessionConfiguration(configuration)?.let { sessionConfiguration ->
+//                when (val sessionResult = CheckoutSessionProvider.createSession(sessionModel=sessionModel, sessionConfiguration= sessionConfiguration)) {
+//                    is CheckoutSessionResult.Error -> callback(Result.failure(sessionResult.exception))
+//                    is CheckoutSessionResult.Success ->
+//                        onSessionSuccessfullyCreated(
+//                            sessionResult,
+//                            sessionModel,
+//                            callback
+//                        )
+//                }
+//            }
+//        }
     }
 
     override fun clearSession() {
@@ -123,25 +154,30 @@ class CheckoutPlatformApi(
 
     override fun getThreeDS2SdkVersion(): String = ThreeDS2Service.INSTANCE.sdkVersion
 
-    private fun determineSessionConfiguration(configuration: Any?): CheckoutConfiguration {
-        when (configuration) {
-            is DropInConfigurationDTO -> return configuration.toCheckoutConfiguration()
-            is CardComponentConfigurationDTO -> return configuration.toCheckoutConfiguration()
-            is InstantPaymentConfigurationDTO -> {
-                return when (configuration.instantPaymentType) {
-                    InstantPaymentType.APPLE_PAY -> throw IllegalStateException(
-                        "Apple Pay is not supported on Android."
-                    )
-
-                    else -> configuration.toCheckoutConfiguration()
+    private fun onSessionSuccessfullyCreated(
+        sessionResult: CheckoutSessionResult.Success,
+        sessionModel: SessionModel,
+        callback: (Result<SessionDTO>) -> Unit,
+    ) {
+        with(sessionResult.checkoutSession) {
+            val sessionResponse = SessionSetupResponse.SERIALIZER.serialize(sessionSetupResponse)
+            val paymentMethodsJsonObject =
+                sessionSetupResponse.paymentMethodsApiResponse?.let {
+                    com.adyen.checkout.components.core.PaymentMethodsApiResponse.SERIALIZER.serialize(it)
                 }
-            }
+            sessionHolder.sessionSetupResponse = sessionResponse
+            callback(
+                Result.success(
+                    SessionDTO(
+                        id = sessionModel.id,
+                        paymentMethodsJson = paymentMethodsJsonObject?.toString() ?: "",
+                    )
+                )
+            )
         }
-
-        throw IllegalArgumentException("Invalid configuration provided")
     }
 
-    private fun onSessionCreationSuccess(
+    private fun onSetupSuccess(
         checkoutSession: CheckoutContext.Sessions,
         callback: (Result<SessionDTO>) -> Unit,
     ) {
@@ -160,10 +196,13 @@ class CheckoutPlatformApi(
         )
     }
 
-    private fun onSessionCreationError(
+    private fun onSetupError(
         error: String,
         callback: (Result<SessionDTO>) -> Unit,
     ) {
         callback(Result.failure(PlatformException(error)))
     }
+
+    private fun createConfiguration(configurationDTO: CheckoutConfigurationDTO): CheckoutConfiguration =
+        configurationDTO.toCheckoutConfiguration()
 }
