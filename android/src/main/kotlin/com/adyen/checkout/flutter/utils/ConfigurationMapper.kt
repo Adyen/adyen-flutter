@@ -46,14 +46,13 @@ import com.adyen.checkout.flutter.generated.ThreeDS2ConfigurationDTO
 import com.adyen.checkout.flutter.generated.TotalPriceStatus
 import com.adyen.checkout.flutter.generated.TwintConfigurationDTO
 import com.adyen.checkout.flutter.generated.UnencryptedCardDTO
-import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToCardBasedInstallmentOptions
+import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToCheckoutConfiguration
 import com.adyen.checkout.googlepay.BillingAddressParameters
 import com.adyen.checkout.googlepay.GooglePayConfiguration
 import com.adyen.checkout.googlepay.MerchantInfo
 import com.adyen.checkout.googlepay.ShippingAddressParameters
 import com.adyen.checkout.googlepay.googlePay
 import com.adyen.checkout.twint.TwintConfiguration
-import com.adyen.checkout.twint.twint
 import com.google.android.gms.wallet.WalletConstants
 import java.util.Locale
 import com.adyen.checkout.cashapppay.CashAppPayEnvironment as SDKCashAppPayEnvironment
@@ -488,14 +487,14 @@ object ConfigurationMapper {
     private fun DefaultInstallmentOptionsDTO.mapToDefaultInstallmentOptions():
         InstallmentOptions.DefaultInstallmentOptions =
         InstallmentOptions.DefaultInstallmentOptions(
-            values = (values as List<*>).mapNotNull { it as? Int },
+            values = (values as List<Number?>).mapNotNull { it?.toInt() },
             includeRevolving = includesRevolving
         )
 
     private fun CardBasedInstallmentOptionsDTO.mapToCardBasedInstallmentOptions():
         InstallmentOptions.CardBasedInstallmentOptions =
         InstallmentOptions.CardBasedInstallmentOptions(
-            values = (values as List<*>).mapNotNull { it as? Int },
+            values = (values as List<Number?>).mapNotNull { it?.toInt() },
             includeRevolving = includesRevolving,
             cardBrand = CardBrand(txVariant = cardBrand)
         )
