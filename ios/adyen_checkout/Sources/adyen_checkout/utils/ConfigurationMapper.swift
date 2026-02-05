@@ -356,7 +356,7 @@ extension InstallmentConfigurationDTO {
         let defaultOptions = defaultOptions.map { buildDefaultInstallmentOptions(from: $0) }
         
         switch (defaultOptions, cardBasedOptions) {
-        case (let defaultOptions?, let cardBasedOptions?):
+        case let (defaultOptions?, cardBasedOptions?):
             return InstallmentConfiguration(
                 cardBasedOptions: cardBasedOptions,
                 defaultOptions: defaultOptions,
