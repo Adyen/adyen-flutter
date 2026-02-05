@@ -46,7 +46,6 @@ import com.adyen.checkout.flutter.generated.ThreeDS2ConfigurationDTO
 import com.adyen.checkout.flutter.generated.TotalPriceStatus
 import com.adyen.checkout.flutter.generated.TwintConfigurationDTO
 import com.adyen.checkout.flutter.generated.UnencryptedCardDTO
-import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToCheckoutConfiguration
 import com.adyen.checkout.googlepay.BillingAddressParameters
 import com.adyen.checkout.googlepay.GooglePayConfiguration
 import com.adyen.checkout.googlepay.MerchantInfo

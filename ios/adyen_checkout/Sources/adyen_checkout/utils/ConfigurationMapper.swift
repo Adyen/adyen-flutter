@@ -403,7 +403,7 @@ extension InstallmentConfigurationDTO {
     
     private func createInstallmentOptions(values: [Int64?], includesRevolving: Bool) -> InstallmentOptions {
         InstallmentOptions(
-            monthValues: values.compactMap { UInt($0 ?? 0) },
+            monthValues: values.compactMap { $0 }.map { UInt($0) },
             includesRevolving: includesRevolving
         )
     }
