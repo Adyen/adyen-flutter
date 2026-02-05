@@ -63,12 +63,12 @@ class _V2ScreenState extends State<V2Screen> {
     );
 
     final checkoutConfiguration = _createCheckoutConfiguration();
-    await AdyenCheckout.session.setup(
+    final checkout = await AdyenCheckout.session.setup(
       sessionResponse: sessionResponse,
       checkoutConfiguration: checkoutConfiguration,
     );
 
-    return sessionResponse.id;
+    return checkout.id;
   }
 
   CheckoutConfiguration _createCheckoutConfiguration() {
