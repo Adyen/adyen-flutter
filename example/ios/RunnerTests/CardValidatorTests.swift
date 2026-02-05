@@ -1,9 +1,8 @@
+@testable import adyen_checkout
 import XCTest
 
-@testable import adyen_checkout
-
 class CardValidatorTestss: XCTestCase {
-    // Card number validation
+    /// Card number validation
     func test_given_correctCardNumber_when_validate_then_resultShouldBeValid() {
         let cardNumber = "4111111111111111"
 
