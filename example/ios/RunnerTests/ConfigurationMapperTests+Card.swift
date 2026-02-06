@@ -28,22 +28,6 @@ extension ConfigurationMapperTests {
         XCTAssertEqual(result.expiryYear, "2030")
         XCTAssertEqual(result.securityCode, "737")
     }
-    
-    func test_mapToUnencryptedCard_withNilCvc_shouldMapWithNilSecurityCode() {
-        let sut = UnencryptedCardDTO(
-            cardNumber: "5500000000000004",
-            expiryMonth: "12",
-            expiryYear: "2025",
-            cvc: nil
-        )
-        
-        let result = sut.mapToUnencryptedCard()
-        
-        XCTAssertEqual(result.number, "5500000000000004")
-        XCTAssertEqual(result.expiryMonth, "12")
-        XCTAssertEqual(result.expiryYear, "2025")
-        XCTAssertNil(result.securityCode)
-    }
 
     // MARK: - CardConfigurationDTO Mapping Tests
     
@@ -221,43 +205,29 @@ extension ConfigurationMapperTests {
     // MARK: - UnencryptedCard Null Handling Tests
     
     func test_mapToUnencryptedCard_withNilCardNumber_shouldMapWithNilNumber() {
-        let sut = UnencryptedCardDTO(
-            cardNumber: nil,
-            expiryMonth: "03",
-            expiryYear: "2030",
-            cvc: "737"
-        )
+        let sut = makeUnencryptedCardSut(cardNumber: nil)
+
         
         let result = sut.mapToUnencryptedCard()
         
         XCTAssertNil(result.number)
         XCTAssertEqual(result.expiryMonth, "03")
-        XCTAssertEqual(result.expiryYear, "2030")
+        XCTAssertEqual(result.expiryYear, "2025")
         XCTAssertEqual(result.securityCode, "737")
     }
     
     func test_mapToUnencryptedCard_withNilExpiryMonth_shouldMapWithNilExpiryMonth() {
-        let sut = UnencryptedCardDTO(
-            cardNumber: "4111111111111111",
-            expiryMonth: nil,
-            expiryYear: "2030",
-            cvc: "737"
-        )
+        let sut = makeUnencryptedCardSut(expiryMonth: nil)
         
         let result = sut.mapToUnencryptedCard()
         
         XCTAssertEqual(result.number, "4111111111111111")
         XCTAssertNil(result.expiryMonth)
-        XCTAssertEqual(result.expiryYear, "2030")
+        XCTAssertEqual(result.expiryYear, "2025")
     }
     
     func test_mapToUnencryptedCard_withNilExpiryYear_shouldMapWithNilExpiryYear() {
-        let sut = UnencryptedCardDTO(
-            cardNumber: "4111111111111111",
-            expiryMonth: "03",
-            expiryYear: nil,
-            cvc: "737"
-        )
+        let sut = makeUnencryptedCardSut(expiryYear: nil)
         
         let result = sut.mapToUnencryptedCard()
         
@@ -266,13 +236,19 @@ extension ConfigurationMapperTests {
         XCTAssertNil(result.expiryYear)
     }
     
+    func test_mapToUnencryptedCard_withNilCvc_shouldMapWithNilSecurityCode() {
+        let sut = makeUnencryptedCardSut(cvc: nil)
+        
+        let result = sut.mapToUnencryptedCard()
+        
+        XCTAssertEqual(result.number, "4111111111111111")
+        XCTAssertEqual(result.expiryMonth, "03")
+        XCTAssertEqual(result.expiryYear, "2025")
+        XCTAssertNil(result.securityCode)
+    }
+    
     func test_mapToUnencryptedCard_withAllNilFields_shouldMapToEmptyCard() {
-        let sut = UnencryptedCardDTO(
-            cardNumber: nil,
-            expiryMonth: nil,
-            expiryYear: nil,
-            cvc: nil
-        )
+        let sut = makeUnencryptedCardSut(cardNumber: nil, expiryMonth: nil,expiryYear: nil, cvc: nil)
         
         let result = sut.mapToUnencryptedCard()
         
@@ -280,5 +256,19 @@ extension ConfigurationMapperTests {
         XCTAssertNil(result.expiryMonth)
         XCTAssertNil(result.expiryYear)
         XCTAssertNil(result.securityCode)
+    }
+    
+    private func makeUnencryptedCardSut(
+        cardNumber: String? = "4111111111111111",
+        expiryMonth: String? = "03",
+        expiryYear: String? = "2025",
+        cvc: String? = "737"
+    ) -> UnencryptedCardDTO {
+        return UnencryptedCardDTO(
+            cardNumber: cardNumber,
+            expiryMonth: expiryMonth,
+            expiryYear: expiryYear,
+            cvc: cvc
+        )
     }
 }
