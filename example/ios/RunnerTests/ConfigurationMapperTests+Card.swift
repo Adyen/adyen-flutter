@@ -1,4 +1,5 @@
 @_spi(AdyenInternal) import Adyen
+@_spi(AdyenInternal) import AdyenEncryption
 @testable import adyen_checkout
 import XCTest
 
