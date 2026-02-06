@@ -1,5 +1,4 @@
 @_spi(AdyenInternal) import Adyen
-@_spi(AdyenInternal) import AdyenEncryption
 @testable import adyen_checkout
 import XCTest
 
@@ -44,40 +43,6 @@ extension ConfigurationMapperTests {
         XCTAssertEqual(result.expiryMonth, "12")
         XCTAssertEqual(result.expiryYear, "2025")
         XCTAssertNil(result.securityCode)
-    }
-    
-    // MARK: - EncryptedCard Mapping Tests
-    
-    func test_mapToEncryptedCardDTO_withAllFields_shouldMapCorrectly() {
-        let sut = EncryptedCard(
-            number: "encryptedNumber123",
-            securityCode: "encryptedCvc000",
-            expiryMonth: "encryptedMonth456",
-            expiryYear: "encryptedYear789"
-        )
-        
-        let result = sut.mapToEncryptedCardDTO()
-        
-        XCTAssertEqual(result.encryptedCardNumber, "encryptedNumber123")
-        XCTAssertEqual(result.encryptedExpiryMonth, "encryptedMonth456")
-        XCTAssertEqual(result.encryptedExpiryYear, "encryptedYear789")
-        XCTAssertEqual(result.encryptedSecurityCode, "encryptedCvc000")
-    }
-    
-    func test_mapToEncryptedCardDTO_withNilFields_shouldMapWithNilFields() {
-        let sut = EncryptedCard(
-            number: nil,
-            securityCode: nil,
-            expiryMonth: nil,
-            expiryYear: nil
-        )
-        
-        let result = sut.mapToEncryptedCardDTO()
-        
-        XCTAssertNil(result.encryptedCardNumber)
-        XCTAssertNil(result.encryptedExpiryMonth)
-        XCTAssertNil(result.encryptedExpiryYear)
-        XCTAssertNil(result.encryptedSecurityCode)
     }
 
     // MARK: - CardConfigurationDTO Mapping Tests

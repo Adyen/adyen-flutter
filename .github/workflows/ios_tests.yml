@@ -54,4 +54,5 @@ jobs:
         env:
           DESTINATION: "platform=iOS Simulator,name=iPhone 17,OS=26.1"
         run: |
+            set -o pipefail
             xcodebuild test -workspace Runner.xcworkspace -scheme Runner -destination "$DESTINATION" -enableCodeCoverage YES | xcpretty --utf --color
