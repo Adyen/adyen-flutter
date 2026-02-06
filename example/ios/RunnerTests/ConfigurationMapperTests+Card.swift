@@ -6,17 +6,8 @@ import XCTest
     import AdyenCard
 #endif
 #if canImport(AdyenEncryption)
-    import AdyenEncryption
+    @testable import AdyenEncryption
 #endif
-#if canImport(AdyenActions)
-    import AdyenActions
-#endif
-#if canImport(Adyen3DS2)
-    import Adyen3DS2
-#endif
-
-@testable import AdyenEncryption
-
 
 extension ConfigurationMapperTests {
 

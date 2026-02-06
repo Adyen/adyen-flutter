@@ -1,20 +1,6 @@
 @_spi(AdyenInternal) import Adyen
-@_spi(AdyenInternal) import AdyenNetworking
 @testable import adyen_checkout
 import XCTest
-
-#if canImport(AdyenCard)
-    import AdyenCard
-#endif
-#if canImport(AdyenEncryption)
-    import AdyenEncryption
-#endif
-#if canImport(AdyenActions)
-    import AdyenActions
-#endif
-#if canImport(Adyen3DS2)
-    import Adyen3DS2
-#endif
 
 extension ConfigurationMapperTests {
 

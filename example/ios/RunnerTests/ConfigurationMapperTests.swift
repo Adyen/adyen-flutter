@@ -5,12 +5,6 @@ import XCTest
 #if canImport(AdyenCard)
     import AdyenCard
 #endif
-#if canImport(AdyenEncryption)
-    import AdyenEncryption
-#endif
-#if canImport(AdyenActions)
-    import AdyenActions
-#endif
 #if canImport(Adyen3DS2)
     import Adyen3DS2
 #endif
