@@ -49,10 +49,10 @@ jobs:
           path: ios/
           key: ios-reports
 
-      - name: Running iOS unit tests
-        working-directory: example/ios
-        env:
-          DESTINATION: "platform=iOS Simulator,name=iPhone 17,OS=26.1"
+      - name: Run ios unit tests
         run: |
-            set -o pipefail
-            xcodebuild test -workspace Runner.xcworkspace -scheme Runner -destination "$DESTINATION" -enableCodeCoverage YES | xcpretty --utf --color
+          xcodebuild test \
+          -workspace Runner.xcworkspace \
+          -scheme Runner \
+          -destination "platform=iOS Simulator,name=iPhone 17,OS=26.1" \
+          -enableCodeCoverage YES | xcpretty --utf --color && exit ${PIPESTATUS[0]}
