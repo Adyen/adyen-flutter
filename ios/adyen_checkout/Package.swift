@@ -25,11 +25,6 @@ let package = Package(
                 .product(name: "AdyenActions", package: "adyen-ios")
             ],
             resources: []
-        ),
-        .testTarget(
-            name: "adyen_checkoutTests",
-            dependencies: ["adyen_checkout"],
-            path: "Tests/adyen_checkoutTests"
         )
     ]
 )
