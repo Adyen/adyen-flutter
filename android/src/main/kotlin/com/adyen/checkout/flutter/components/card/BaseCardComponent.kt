@@ -10,10 +10,7 @@ import com.adyen.checkout.flutter.generated.CardComponentConfigurationDTO
 import com.adyen.checkout.flutter.generated.ComponentCommunicationModel
 import com.adyen.checkout.flutter.generated.ComponentCommunicationType
 import com.adyen.checkout.flutter.generated.ComponentFlutterInterface
-import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToAmount
-import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToAnalyticsConfiguration
-import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToCardConfiguration
-import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToEnvironment
+import com.adyen.checkout.flutter.utils.ConfigurationMapper.toCheckoutConfiguration
 import io.flutter.plugin.platform.PlatformView
 
 abstract class BaseCardComponent(
@@ -32,16 +29,7 @@ abstract class BaseCardComponent(
     internal val componentId = creationParams[COMPONENT_ID_KEY] as String? ?: ""
     internal val isStoredPaymentMethod = creationParams[IS_STORED_PAYMENT_METHOD_KEY] as Boolean? ?: false
     private val dynamicComponentView = DynamicComponentView(activity, componentFlutterApi, componentId)
-    internal val cardConfiguration =
-        configuration.cardConfiguration.mapToCardConfiguration(
-            context,
-            configuration.shopperLocale,
-            configuration.environment.mapToEnvironment(),
-            configuration.clientKey,
-            configuration.analyticsOptionsDTO.mapToAnalyticsConfiguration(),
-            configuration.amount?.mapToAmount(),
-            configuration.threeDS2ConfigurationDTO,
-        )
+    internal val checkoutConfiguration = configuration.toCheckoutConfiguration()
     internal var cardComponent: CardComponent? = null
 
     override fun getView(): View = dynamicComponentView
