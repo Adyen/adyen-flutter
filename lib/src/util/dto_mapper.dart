@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:ui';
 
 import 'package:adyen_checkout/adyen_checkout.dart';
 import 'package:adyen_checkout/src/generated/platform_api.g.dart';
@@ -164,7 +165,83 @@ extension TwintConfigurationMapper on TwintConfiguration {
 extension ThreeDS2ConfigurationMapper on ThreeDS2Configuration {
   ThreeDS2ConfigurationDTO toDTO() => ThreeDS2ConfigurationDTO(
         requestorAppURL: requestorAppURL,
+        uiCustomization:
+            theme?.toUICustomizationDTO(toolbarTitle: toolbarTitle) ??
+                (toolbarTitle == null
+                    ? null
+                    : ThreeDS2UICustomizationDTO(
+                        toolbarCustomization: ThreeDS2ToolbarCustomizationDTO(
+                          backgroundColor: null,
+                          headerText: toolbarTitle,
+                          buttonText: null,
+                          textColor: null,
+                          textFontName: null,
+                          textFontSize: null,
+                        ),
+                      )),
       );
+}
+
+extension Adyen3DSThemeMapper on Adyen3DSTheme {
+  ThreeDS2UICustomizationDTO toUICustomizationDTO({String? toolbarTitle}) {
+    String? sanitizedFontFamily(String? value) {
+      if (value == null || value.trim().isEmpty) {
+        return null;
+      }
+      return value;
+    }
+
+    ThreeDS2ButtonCustomizationDTO buttonDTOFromTheme(
+        Adyen3DSButtonTheme? override) {
+      return ThreeDS2ButtonCustomizationDTO(
+        backgroundColor:
+            (override?.backgroundColor ?? primaryColor)?.toHexString(),
+        textColor: (override?.textColor ?? onPrimaryColor)?.toHexString(),
+        cornerRadius: (override?.cornerRadius ?? buttonCornerRadius)?.round(),
+        textFontSize: (override?.fontSize ?? buttonFontSize)?.round(),
+      );
+    }
+
+    final fontFamily = sanitizedFontFamily(this.fontFamily);
+
+    return ThreeDS2UICustomizationDTO(
+      labelCustomization: ThreeDS2LabelCustomizationDTO(
+        textFontName: fontFamily,
+        textColor: textColor?.toHexString(),
+        textFontSize: labelFontSize?.round(),
+        headingTextColor: headingTextColor?.toHexString(),
+        headingTextFontSize: headingFontSize?.round(),
+        headingTextFontName: fontFamily,
+      ),
+      submitButtonCustomization: buttonDTOFromTheme(submitButtonTheme),
+      continueButtonCustomization: buttonDTOFromTheme(continueButtonTheme),
+      nextButtonCustomization: buttonDTOFromTheme(nextButtonTheme),
+      cancelButtonCustomization: buttonDTOFromTheme(cancelButtonTheme),
+      resendButtonCustomization: buttonDTOFromTheme(resendButtonTheme),
+      textBoxCustomization: ThreeDS2TextBoxCustomizationDTO(
+        borderColor: inputBorderColor?.toHexString(),
+        borderWidth: inputBorderWidth?.round(),
+        cornerRadius: inputCornerRadius?.round(),
+        textColor: inputTextColor?.toHexString(),
+        textFontName: fontFamily,
+        textFontSize: labelFontSize?.round(),
+      ),
+      toolbarCustomization: ThreeDS2ToolbarCustomizationDTO(
+        backgroundColor: headerBackgroundColor?.toHexString(),
+        headerText: toolbarTitle,
+        buttonText: null,
+        textColor: textColor?.toHexString(),
+        textFontName: fontFamily,
+        textFontSize: headingFontSize?.round(),
+      ),
+    );
+  }
+}
+
+extension ColorToHex on Color {
+  String toHexString() {
+    return '#${toARGB32().toRadixString(16).padLeft(8, '0').toUpperCase()}';
+  }
 }
 
 extension SessionMapper on SessionCheckout {

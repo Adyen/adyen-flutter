@@ -266,21 +266,225 @@ struct AnalyticsOptionsDTO {
 }
 
 /// Generated class from Pigeon that represents data sent in messages.
-struct ThreeDS2ConfigurationDTO {
-    var requestorAppURL: String?
+struct ThreeDS2UICustomizationDTO {
+    var labelCustomization: ThreeDS2LabelCustomizationDTO?
+    var submitButtonCustomization: ThreeDS2ButtonCustomizationDTO?
+    var continueButtonCustomization: ThreeDS2ButtonCustomizationDTO?
+    var nextButtonCustomization: ThreeDS2ButtonCustomizationDTO?
+    var cancelButtonCustomization: ThreeDS2ButtonCustomizationDTO?
+    var resendButtonCustomization: ThreeDS2ButtonCustomizationDTO?
+    var textBoxCustomization: ThreeDS2TextBoxCustomizationDTO?
+    var toolbarCustomization: ThreeDS2ToolbarCustomizationDTO?
 
     // swift-format-ignore: AlwaysUseLowerCamelCase
-    static func fromList(_ __pigeon_list: [Any?]) -> ThreeDS2ConfigurationDTO? {
-        let requestorAppURL: String? = nilOrValue(__pigeon_list[0])
+    static func fromList(_ __pigeon_list: [Any?]) -> ThreeDS2UICustomizationDTO? {
+        let labelCustomization: ThreeDS2LabelCustomizationDTO? = nilOrValue(__pigeon_list[0])
+        let submitButtonCustomization: ThreeDS2ButtonCustomizationDTO? = nilOrValue(__pigeon_list[1])
+        let continueButtonCustomization: ThreeDS2ButtonCustomizationDTO? = nilOrValue(__pigeon_list[2])
+        let nextButtonCustomization: ThreeDS2ButtonCustomizationDTO? = nilOrValue(__pigeon_list[3])
+        let cancelButtonCustomization: ThreeDS2ButtonCustomizationDTO? = nilOrValue(__pigeon_list[4])
+        let resendButtonCustomization: ThreeDS2ButtonCustomizationDTO? = nilOrValue(__pigeon_list[5])
+        let textBoxCustomization: ThreeDS2TextBoxCustomizationDTO? = nilOrValue(__pigeon_list[6])
+        let toolbarCustomization: ThreeDS2ToolbarCustomizationDTO? = nilOrValue(__pigeon_list[7])
 
-        return ThreeDS2ConfigurationDTO(
-            requestorAppURL: requestorAppURL
+        return ThreeDS2UICustomizationDTO(
+            labelCustomization: labelCustomization,
+            submitButtonCustomization: submitButtonCustomization,
+            continueButtonCustomization: continueButtonCustomization,
+            nextButtonCustomization: nextButtonCustomization,
+            cancelButtonCustomization: cancelButtonCustomization,
+            resendButtonCustomization: resendButtonCustomization,
+            textBoxCustomization: textBoxCustomization,
+            toolbarCustomization: toolbarCustomization
         )
     }
 
     func toList() -> [Any?] {
         [
-            requestorAppURL
+            labelCustomization,
+            submitButtonCustomization,
+            continueButtonCustomization,
+            nextButtonCustomization,
+            cancelButtonCustomization,
+            resendButtonCustomization,
+            textBoxCustomization,
+            toolbarCustomization
+        ]
+    }
+}
+
+/// Generated class from Pigeon that represents data sent in messages.
+struct ThreeDS2LabelCustomizationDTO {
+    var textFontName: String?
+    var textColor: String?
+    var textFontSize: Int64?
+    var headingTextColor: String?
+    var headingTextFontSize: Int64?
+    var headingTextFontName: String?
+
+    // swift-format-ignore: AlwaysUseLowerCamelCase
+    static func fromList(_ __pigeon_list: [Any?]) -> ThreeDS2LabelCustomizationDTO? {
+        let textFontName: String? = nilOrValue(__pigeon_list[0])
+        let textColor: String? = nilOrValue(__pigeon_list[1])
+        let textFontSize: Int64? = isNullish(__pigeon_list[2]) ? nil : (__pigeon_list[2] is Int64? ? __pigeon_list[2] as! Int64? : Int64(__pigeon_list[2] as! Int32))
+        let headingTextColor: String? = nilOrValue(__pigeon_list[3])
+        let headingTextFontSize: Int64? = isNullish(__pigeon_list[4]) ? nil : (__pigeon_list[4] is Int64? ? __pigeon_list[4] as! Int64? : Int64(__pigeon_list[4] as! Int32))
+        let headingTextFontName: String? = nilOrValue(__pigeon_list[5])
+
+        return ThreeDS2LabelCustomizationDTO(
+            textFontName: textFontName,
+            textColor: textColor,
+            textFontSize: textFontSize,
+            headingTextColor: headingTextColor,
+            headingTextFontSize: headingTextFontSize,
+            headingTextFontName: headingTextFontName
+        )
+    }
+
+    func toList() -> [Any?] {
+        [
+            textFontName,
+            textColor,
+            textFontSize,
+            headingTextColor,
+            headingTextFontSize,
+            headingTextFontName
+        ]
+    }
+}
+
+/// Generated class from Pigeon that represents data sent in messages.
+struct ThreeDS2ButtonCustomizationDTO {
+    var backgroundColor: String?
+    var textColor: String?
+    var cornerRadius: Int64?
+    var textFontSize: Int64?
+
+    // swift-format-ignore: AlwaysUseLowerCamelCase
+    static func fromList(_ __pigeon_list: [Any?]) -> ThreeDS2ButtonCustomizationDTO? {
+        let backgroundColor: String? = nilOrValue(__pigeon_list[0])
+        let textColor: String? = nilOrValue(__pigeon_list[1])
+        let cornerRadius: Int64? = isNullish(__pigeon_list[2]) ? nil : (__pigeon_list[2] is Int64? ? __pigeon_list[2] as! Int64? : Int64(__pigeon_list[2] as! Int32))
+        let textFontSize: Int64? = isNullish(__pigeon_list[3]) ? nil : (__pigeon_list[3] is Int64? ? __pigeon_list[3] as! Int64? : Int64(__pigeon_list[3] as! Int32))
+
+        return ThreeDS2ButtonCustomizationDTO(
+            backgroundColor: backgroundColor,
+            textColor: textColor,
+            cornerRadius: cornerRadius,
+            textFontSize: textFontSize
+        )
+    }
+
+    func toList() -> [Any?] {
+        [
+            backgroundColor,
+            textColor,
+            cornerRadius,
+            textFontSize
+        ]
+    }
+}
+
+/// Generated class from Pigeon that represents data sent in messages.
+struct ThreeDS2TextBoxCustomizationDTO {
+    var borderColor: String?
+    var borderWidth: Int64?
+    var cornerRadius: Int64?
+    var textColor: String?
+    var textFontName: String?
+    var textFontSize: Int64?
+
+    // swift-format-ignore: AlwaysUseLowerCamelCase
+    static func fromList(_ __pigeon_list: [Any?]) -> ThreeDS2TextBoxCustomizationDTO? {
+        let borderColor: String? = nilOrValue(__pigeon_list[0])
+        let borderWidth: Int64? = isNullish(__pigeon_list[1]) ? nil : (__pigeon_list[1] is Int64? ? __pigeon_list[1] as! Int64? : Int64(__pigeon_list[1] as! Int32))
+        let cornerRadius: Int64? = isNullish(__pigeon_list[2]) ? nil : (__pigeon_list[2] is Int64? ? __pigeon_list[2] as! Int64? : Int64(__pigeon_list[2] as! Int32))
+        let textColor: String? = nilOrValue(__pigeon_list[3])
+        let textFontName: String? = nilOrValue(__pigeon_list[4])
+        let textFontSize: Int64? = isNullish(__pigeon_list[5]) ? nil : (__pigeon_list[5] is Int64? ? __pigeon_list[5] as! Int64? : Int64(__pigeon_list[5] as! Int32))
+
+        return ThreeDS2TextBoxCustomizationDTO(
+            borderColor: borderColor,
+            borderWidth: borderWidth,
+            cornerRadius: cornerRadius,
+            textColor: textColor,
+            textFontName: textFontName,
+            textFontSize: textFontSize
+        )
+    }
+
+    func toList() -> [Any?] {
+        [
+            borderColor,
+            borderWidth,
+            cornerRadius,
+            textColor,
+            textFontName,
+            textFontSize
+        ]
+    }
+}
+
+/// Generated class from Pigeon that represents data sent in messages.
+struct ThreeDS2ToolbarCustomizationDTO {
+    var backgroundColor: String?
+    var headerText: String?
+    var buttonText: String?
+    var textColor: String?
+    var textFontName: String?
+    var textFontSize: Int64?
+
+    // swift-format-ignore: AlwaysUseLowerCamelCase
+    static func fromList(_ __pigeon_list: [Any?]) -> ThreeDS2ToolbarCustomizationDTO? {
+        let backgroundColor: String? = nilOrValue(__pigeon_list[0])
+        let headerText: String? = nilOrValue(__pigeon_list[1])
+        let buttonText: String? = nilOrValue(__pigeon_list[2])
+        let textColor: String? = nilOrValue(__pigeon_list[3])
+        let textFontName: String? = nilOrValue(__pigeon_list[4])
+        let textFontSize: Int64? = isNullish(__pigeon_list[5]) ? nil : (__pigeon_list[5] is Int64? ? __pigeon_list[5] as! Int64? : Int64(__pigeon_list[5] as! Int32))
+
+        return ThreeDS2ToolbarCustomizationDTO(
+            backgroundColor: backgroundColor,
+            headerText: headerText,
+            buttonText: buttonText,
+            textColor: textColor,
+            textFontName: textFontName,
+            textFontSize: textFontSize
+        )
+    }
+
+    func toList() -> [Any?] {
+        [
+            backgroundColor,
+            headerText,
+            buttonText,
+            textColor,
+            textFontName,
+            textFontSize
+        ]
+    }
+}
+
+/// Generated class from Pigeon that represents data sent in messages.
+struct ThreeDS2ConfigurationDTO {
+    var requestorAppURL: String?
+    var uiCustomization: ThreeDS2UICustomizationDTO?
+
+    // swift-format-ignore: AlwaysUseLowerCamelCase
+    static func fromList(_ __pigeon_list: [Any?]) -> ThreeDS2ConfigurationDTO? {
+        let requestorAppURL: String? = nilOrValue(__pigeon_list[0])
+        let uiCustomization: ThreeDS2UICustomizationDTO? = nilOrValue(__pigeon_list[1])
+
+        return ThreeDS2ConfigurationDTO(
+            requestorAppURL: requestorAppURL,
+            uiCustomization: uiCustomization
+        )
+    }
+
+    func toList() -> [Any?] {
+        [
+            requestorAppURL,
+            uiCustomization
         ]
     }
 }
@@ -1347,183 +1551,193 @@ private class PlatformApiPigeonCodecReader: FlutterStandardReader {
         case 131:
             return AnalyticsOptionsDTO.fromList(self.readValue() as! [Any?])
         case 132:
-            return ThreeDS2ConfigurationDTO.fromList(self.readValue() as! [Any?])
+            return ThreeDS2UICustomizationDTO.fromList(self.readValue() as! [Any?])
         case 133:
-            return DropInConfigurationDTO.fromList(self.readValue() as! [Any?])
+            return ThreeDS2LabelCustomizationDTO.fromList(self.readValue() as! [Any?])
         case 134:
-            return CardConfigurationDTO.fromList(self.readValue() as! [Any?])
+            return ThreeDS2ButtonCustomizationDTO.fromList(self.readValue() as! [Any?])
         case 135:
-            return ApplePayConfigurationDTO.fromList(self.readValue() as! [Any?])
+            return ThreeDS2TextBoxCustomizationDTO.fromList(self.readValue() as! [Any?])
         case 136:
-            return ApplePayContactDTO.fromList(self.readValue() as! [Any?])
+            return ThreeDS2ToolbarCustomizationDTO.fromList(self.readValue() as! [Any?])
         case 137:
-            return ApplePayShippingMethodDTO.fromList(self.readValue() as! [Any?])
+            return ThreeDS2ConfigurationDTO.fromList(self.readValue() as! [Any?])
         case 138:
-            return ApplePaySummaryItemDTO.fromList(self.readValue() as! [Any?])
+            return DropInConfigurationDTO.fromList(self.readValue() as! [Any?])
         case 139:
-            return GooglePayConfigurationDTO.fromList(self.readValue() as! [Any?])
+            return CardConfigurationDTO.fromList(self.readValue() as! [Any?])
         case 140:
-            return MerchantInfoDTO.fromList(self.readValue() as! [Any?])
+            return ApplePayConfigurationDTO.fromList(self.readValue() as! [Any?])
         case 141:
-            return ShippingAddressParametersDTO.fromList(self.readValue() as! [Any?])
+            return ApplePayContactDTO.fromList(self.readValue() as! [Any?])
         case 142:
-            return BillingAddressParametersDTO.fromList(self.readValue() as! [Any?])
+            return ApplePayShippingMethodDTO.fromList(self.readValue() as! [Any?])
         case 143:
-            return CashAppPayConfigurationDTO.fromList(self.readValue() as! [Any?])
+            return ApplePaySummaryItemDTO.fromList(self.readValue() as! [Any?])
         case 144:
-            return TwintConfigurationDTO.fromList(self.readValue() as! [Any?])
+            return GooglePayConfigurationDTO.fromList(self.readValue() as! [Any?])
         case 145:
-            return PaymentResultDTO.fromList(self.readValue() as! [Any?])
+            return MerchantInfoDTO.fromList(self.readValue() as! [Any?])
         case 146:
-            return PaymentResultModelDTO.fromList(self.readValue() as! [Any?])
+            return ShippingAddressParametersDTO.fromList(self.readValue() as! [Any?])
         case 147:
-            return OrderResponseDTO.fromList(self.readValue() as! [Any?])
+            return BillingAddressParametersDTO.fromList(self.readValue() as! [Any?])
         case 148:
-            return CheckoutEvent.fromList(self.readValue() as! [Any?])
+            return CashAppPayConfigurationDTO.fromList(self.readValue() as! [Any?])
         case 149:
-            return ComponentCommunicationModel.fromList(self.readValue() as! [Any?])
+            return TwintConfigurationDTO.fromList(self.readValue() as! [Any?])
         case 150:
-            return PaymentEventDTO.fromList(self.readValue() as! [Any?])
+            return PaymentResultDTO.fromList(self.readValue() as! [Any?])
         case 151:
-            return ErrorDTO.fromList(self.readValue() as! [Any?])
+            return PaymentResultModelDTO.fromList(self.readValue() as! [Any?])
         case 152:
-            return DeletedStoredPaymentMethodResultDTO.fromList(self.readValue() as! [Any?])
+            return OrderResponseDTO.fromList(self.readValue() as! [Any?])
         case 153:
-            return CardComponentConfigurationDTO.fromList(self.readValue() as! [Any?])
+            return CheckoutEvent.fromList(self.readValue() as! [Any?])
         case 154:
-            return InstantPaymentConfigurationDTO.fromList(self.readValue() as! [Any?])
+            return ComponentCommunicationModel.fromList(self.readValue() as! [Any?])
         case 155:
-            return InstantPaymentSetupResultDTO.fromList(self.readValue() as! [Any?])
+            return PaymentEventDTO.fromList(self.readValue() as! [Any?])
         case 156:
-            return UnencryptedCardDTO.fromList(self.readValue() as! [Any?])
+            return ErrorDTO.fromList(self.readValue() as! [Any?])
         case 157:
-            return EncryptedCardDTO.fromList(self.readValue() as! [Any?])
+            return DeletedStoredPaymentMethodResultDTO.fromList(self.readValue() as! [Any?])
         case 158:
-            return ActionComponentConfigurationDTO.fromList(self.readValue() as! [Any?])
+            return CardComponentConfigurationDTO.fromList(self.readValue() as! [Any?])
         case 159:
-            return OrderCancelResultDTO.fromList(self.readValue() as! [Any?])
+            return InstantPaymentConfigurationDTO.fromList(self.readValue() as! [Any?])
         case 160:
-            return BinLookupDataDTO.fromList(self.readValue() as! [Any?])
+            return InstantPaymentSetupResultDTO.fromList(self.readValue() as! [Any?])
         case 161:
+            return UnencryptedCardDTO.fromList(self.readValue() as! [Any?])
+        case 162:
+            return EncryptedCardDTO.fromList(self.readValue() as! [Any?])
+        case 163:
+            return ActionComponentConfigurationDTO.fromList(self.readValue() as! [Any?])
+        case 164:
+            return OrderCancelResultDTO.fromList(self.readValue() as! [Any?])
+        case 165:
+            return BinLookupDataDTO.fromList(self.readValue() as! [Any?])
+        case 166:
             var enumResult: Environment? = nil
             let enumResultAsInt: Int? = nilOrValue(self.readValue() as? Int)
             if let enumResultAsInt {
                 enumResult = Environment(rawValue: enumResultAsInt)
             }
             return enumResult
-        case 162:
+        case 167:
             var enumResult: AddressMode? = nil
             let enumResultAsInt: Int? = nilOrValue(self.readValue() as? Int)
             if let enumResultAsInt {
                 enumResult = AddressMode(rawValue: enumResultAsInt)
             }
             return enumResult
-        case 163:
+        case 168:
             var enumResult: CardAuthMethod? = nil
             let enumResultAsInt: Int? = nilOrValue(self.readValue() as? Int)
             if let enumResultAsInt {
                 enumResult = CardAuthMethod(rawValue: enumResultAsInt)
             }
             return enumResult
-        case 164:
+        case 169:
             var enumResult: TotalPriceStatus? = nil
             let enumResultAsInt: Int? = nilOrValue(self.readValue() as? Int)
             if let enumResultAsInt {
                 enumResult = TotalPriceStatus(rawValue: enumResultAsInt)
             }
             return enumResult
-        case 165:
+        case 170:
             var enumResult: GooglePayEnvironment? = nil
             let enumResultAsInt: Int? = nilOrValue(self.readValue() as? Int)
             if let enumResultAsInt {
                 enumResult = GooglePayEnvironment(rawValue: enumResultAsInt)
             }
             return enumResult
-        case 166:
+        case 171:
             var enumResult: CashAppPayEnvironment? = nil
             let enumResultAsInt: Int? = nilOrValue(self.readValue() as? Int)
             if let enumResultAsInt {
                 enumResult = CashAppPayEnvironment(rawValue: enumResultAsInt)
             }
             return enumResult
-        case 167:
+        case 172:
             var enumResult: PaymentResultEnum? = nil
             let enumResultAsInt: Int? = nilOrValue(self.readValue() as? Int)
             if let enumResultAsInt {
                 enumResult = PaymentResultEnum(rawValue: enumResultAsInt)
             }
             return enumResult
-        case 168:
+        case 173:
             var enumResult: CheckoutEventType? = nil
             let enumResultAsInt: Int? = nilOrValue(self.readValue() as? Int)
             if let enumResultAsInt {
                 enumResult = CheckoutEventType(rawValue: enumResultAsInt)
             }
             return enumResult
-        case 169:
+        case 174:
             var enumResult: ComponentCommunicationType? = nil
             let enumResultAsInt: Int? = nilOrValue(self.readValue() as? Int)
             if let enumResultAsInt {
                 enumResult = ComponentCommunicationType(rawValue: enumResultAsInt)
             }
             return enumResult
-        case 170:
+        case 175:
             var enumResult: PaymentEventType? = nil
             let enumResultAsInt: Int? = nilOrValue(self.readValue() as? Int)
             if let enumResultAsInt {
                 enumResult = PaymentEventType(rawValue: enumResultAsInt)
             }
             return enumResult
-        case 171:
+        case 176:
             var enumResult: FieldVisibility? = nil
             let enumResultAsInt: Int? = nilOrValue(self.readValue() as? Int)
             if let enumResultAsInt {
                 enumResult = FieldVisibility(rawValue: enumResultAsInt)
             }
             return enumResult
-        case 172:
+        case 177:
             var enumResult: InstantPaymentType? = nil
             let enumResultAsInt: Int? = nilOrValue(self.readValue() as? Int)
             if let enumResultAsInt {
                 enumResult = InstantPaymentType(rawValue: enumResultAsInt)
             }
             return enumResult
-        case 173:
+        case 178:
             var enumResult: ApplePayShippingType? = nil
             let enumResultAsInt: Int? = nilOrValue(self.readValue() as? Int)
             if let enumResultAsInt {
                 enumResult = ApplePayShippingType(rawValue: enumResultAsInt)
             }
             return enumResult
-        case 174:
+        case 179:
             var enumResult: ApplePayMerchantCapability? = nil
             let enumResultAsInt: Int? = nilOrValue(self.readValue() as? Int)
             if let enumResultAsInt {
                 enumResult = ApplePayMerchantCapability(rawValue: enumResultAsInt)
             }
             return enumResult
-        case 175:
+        case 180:
             var enumResult: ApplePaySummaryItemType? = nil
             let enumResultAsInt: Int? = nilOrValue(self.readValue() as? Int)
             if let enumResultAsInt {
                 enumResult = ApplePaySummaryItemType(rawValue: enumResultAsInt)
             }
             return enumResult
-        case 176:
+        case 181:
             var enumResult: CardNumberValidationResultDTO? = nil
             let enumResultAsInt: Int? = nilOrValue(self.readValue() as? Int)
             if let enumResultAsInt {
                 enumResult = CardNumberValidationResultDTO(rawValue: enumResultAsInt)
             }
             return enumResult
-        case 177:
+        case 182:
             var enumResult: CardExpiryDateValidationResultDTO? = nil
             let enumResultAsInt: Int? = nilOrValue(self.readValue() as? Int)
             if let enumResultAsInt {
                 enumResult = CardExpiryDateValidationResultDTO(rawValue: enumResultAsInt)
             }
             return enumResult
-        case 178:
+        case 183:
             var enumResult: CardSecurityCodeValidationResultDTO? = nil
             let enumResultAsInt: Int? = nilOrValue(self.readValue() as? Int)
             if let enumResultAsInt {
@@ -1547,146 +1761,161 @@ private class PlatformApiPigeonCodecWriter: FlutterStandardWriter {
         } else if let value = value as? AnalyticsOptionsDTO {
             super.writeByte(131)
             super.writeValue(value.toList())
-        } else if let value = value as? ThreeDS2ConfigurationDTO {
+        } else if let value = value as? ThreeDS2UICustomizationDTO {
             super.writeByte(132)
             super.writeValue(value.toList())
-        } else if let value = value as? DropInConfigurationDTO {
+        } else if let value = value as? ThreeDS2LabelCustomizationDTO {
             super.writeByte(133)
             super.writeValue(value.toList())
-        } else if let value = value as? CardConfigurationDTO {
+        } else if let value = value as? ThreeDS2ButtonCustomizationDTO {
             super.writeByte(134)
             super.writeValue(value.toList())
-        } else if let value = value as? ApplePayConfigurationDTO {
+        } else if let value = value as? ThreeDS2TextBoxCustomizationDTO {
             super.writeByte(135)
             super.writeValue(value.toList())
-        } else if let value = value as? ApplePayContactDTO {
+        } else if let value = value as? ThreeDS2ToolbarCustomizationDTO {
             super.writeByte(136)
             super.writeValue(value.toList())
-        } else if let value = value as? ApplePayShippingMethodDTO {
+        } else if let value = value as? ThreeDS2ConfigurationDTO {
             super.writeByte(137)
             super.writeValue(value.toList())
-        } else if let value = value as? ApplePaySummaryItemDTO {
+        } else if let value = value as? DropInConfigurationDTO {
             super.writeByte(138)
             super.writeValue(value.toList())
-        } else if let value = value as? GooglePayConfigurationDTO {
+        } else if let value = value as? CardConfigurationDTO {
             super.writeByte(139)
             super.writeValue(value.toList())
-        } else if let value = value as? MerchantInfoDTO {
+        } else if let value = value as? ApplePayConfigurationDTO {
             super.writeByte(140)
             super.writeValue(value.toList())
-        } else if let value = value as? ShippingAddressParametersDTO {
+        } else if let value = value as? ApplePayContactDTO {
             super.writeByte(141)
             super.writeValue(value.toList())
-        } else if let value = value as? BillingAddressParametersDTO {
+        } else if let value = value as? ApplePayShippingMethodDTO {
             super.writeByte(142)
             super.writeValue(value.toList())
-        } else if let value = value as? CashAppPayConfigurationDTO {
+        } else if let value = value as? ApplePaySummaryItemDTO {
             super.writeByte(143)
             super.writeValue(value.toList())
-        } else if let value = value as? TwintConfigurationDTO {
+        } else if let value = value as? GooglePayConfigurationDTO {
             super.writeByte(144)
             super.writeValue(value.toList())
-        } else if let value = value as? PaymentResultDTO {
+        } else if let value = value as? MerchantInfoDTO {
             super.writeByte(145)
             super.writeValue(value.toList())
-        } else if let value = value as? PaymentResultModelDTO {
+        } else if let value = value as? ShippingAddressParametersDTO {
             super.writeByte(146)
             super.writeValue(value.toList())
-        } else if let value = value as? OrderResponseDTO {
+        } else if let value = value as? BillingAddressParametersDTO {
             super.writeByte(147)
             super.writeValue(value.toList())
-        } else if let value = value as? CheckoutEvent {
+        } else if let value = value as? CashAppPayConfigurationDTO {
             super.writeByte(148)
             super.writeValue(value.toList())
-        } else if let value = value as? ComponentCommunicationModel {
+        } else if let value = value as? TwintConfigurationDTO {
             super.writeByte(149)
             super.writeValue(value.toList())
-        } else if let value = value as? PaymentEventDTO {
+        } else if let value = value as? PaymentResultDTO {
             super.writeByte(150)
             super.writeValue(value.toList())
-        } else if let value = value as? ErrorDTO {
+        } else if let value = value as? PaymentResultModelDTO {
             super.writeByte(151)
             super.writeValue(value.toList())
-        } else if let value = value as? DeletedStoredPaymentMethodResultDTO {
+        } else if let value = value as? OrderResponseDTO {
             super.writeByte(152)
             super.writeValue(value.toList())
-        } else if let value = value as? CardComponentConfigurationDTO {
+        } else if let value = value as? CheckoutEvent {
             super.writeByte(153)
             super.writeValue(value.toList())
-        } else if let value = value as? InstantPaymentConfigurationDTO {
+        } else if let value = value as? ComponentCommunicationModel {
             super.writeByte(154)
             super.writeValue(value.toList())
-        } else if let value = value as? InstantPaymentSetupResultDTO {
+        } else if let value = value as? PaymentEventDTO {
             super.writeByte(155)
             super.writeValue(value.toList())
-        } else if let value = value as? UnencryptedCardDTO {
+        } else if let value = value as? ErrorDTO {
             super.writeByte(156)
             super.writeValue(value.toList())
-        } else if let value = value as? EncryptedCardDTO {
+        } else if let value = value as? DeletedStoredPaymentMethodResultDTO {
             super.writeByte(157)
             super.writeValue(value.toList())
-        } else if let value = value as? ActionComponentConfigurationDTO {
+        } else if let value = value as? CardComponentConfigurationDTO {
             super.writeByte(158)
             super.writeValue(value.toList())
-        } else if let value = value as? OrderCancelResultDTO {
+        } else if let value = value as? InstantPaymentConfigurationDTO {
             super.writeByte(159)
             super.writeValue(value.toList())
-        } else if let value = value as? BinLookupDataDTO {
+        } else if let value = value as? InstantPaymentSetupResultDTO {
             super.writeByte(160)
             super.writeValue(value.toList())
-        } else if let value = value as? Environment {
+        } else if let value = value as? UnencryptedCardDTO {
             super.writeByte(161)
-            super.writeValue(value.rawValue)
-        } else if let value = value as? AddressMode {
+            super.writeValue(value.toList())
+        } else if let value = value as? EncryptedCardDTO {
             super.writeByte(162)
-            super.writeValue(value.rawValue)
-        } else if let value = value as? CardAuthMethod {
+            super.writeValue(value.toList())
+        } else if let value = value as? ActionComponentConfigurationDTO {
             super.writeByte(163)
-            super.writeValue(value.rawValue)
-        } else if let value = value as? TotalPriceStatus {
+            super.writeValue(value.toList())
+        } else if let value = value as? OrderCancelResultDTO {
             super.writeByte(164)
-            super.writeValue(value.rawValue)
-        } else if let value = value as? GooglePayEnvironment {
+            super.writeValue(value.toList())
+        } else if let value = value as? BinLookupDataDTO {
             super.writeByte(165)
-            super.writeValue(value.rawValue)
-        } else if let value = value as? CashAppPayEnvironment {
+            super.writeValue(value.toList())
+        } else if let value = value as? Environment {
             super.writeByte(166)
             super.writeValue(value.rawValue)
-        } else if let value = value as? PaymentResultEnum {
+        } else if let value = value as? AddressMode {
             super.writeByte(167)
             super.writeValue(value.rawValue)
-        } else if let value = value as? CheckoutEventType {
+        } else if let value = value as? CardAuthMethod {
             super.writeByte(168)
             super.writeValue(value.rawValue)
-        } else if let value = value as? ComponentCommunicationType {
+        } else if let value = value as? TotalPriceStatus {
             super.writeByte(169)
             super.writeValue(value.rawValue)
-        } else if let value = value as? PaymentEventType {
+        } else if let value = value as? GooglePayEnvironment {
             super.writeByte(170)
             super.writeValue(value.rawValue)
-        } else if let value = value as? FieldVisibility {
+        } else if let value = value as? CashAppPayEnvironment {
             super.writeByte(171)
             super.writeValue(value.rawValue)
-        } else if let value = value as? InstantPaymentType {
+        } else if let value = value as? PaymentResultEnum {
             super.writeByte(172)
             super.writeValue(value.rawValue)
-        } else if let value = value as? ApplePayShippingType {
+        } else if let value = value as? CheckoutEventType {
             super.writeByte(173)
             super.writeValue(value.rawValue)
-        } else if let value = value as? ApplePayMerchantCapability {
+        } else if let value = value as? ComponentCommunicationType {
             super.writeByte(174)
             super.writeValue(value.rawValue)
-        } else if let value = value as? ApplePaySummaryItemType {
+        } else if let value = value as? PaymentEventType {
             super.writeByte(175)
             super.writeValue(value.rawValue)
-        } else if let value = value as? CardNumberValidationResultDTO {
+        } else if let value = value as? FieldVisibility {
             super.writeByte(176)
             super.writeValue(value.rawValue)
-        } else if let value = value as? CardExpiryDateValidationResultDTO {
+        } else if let value = value as? InstantPaymentType {
             super.writeByte(177)
             super.writeValue(value.rawValue)
-        } else if let value = value as? CardSecurityCodeValidationResultDTO {
+        } else if let value = value as? ApplePayShippingType {
             super.writeByte(178)
+            super.writeValue(value.rawValue)
+        } else if let value = value as? ApplePayMerchantCapability {
+            super.writeByte(179)
+            super.writeValue(value.rawValue)
+        } else if let value = value as? ApplePaySummaryItemType {
+            super.writeByte(180)
+            super.writeValue(value.rawValue)
+        } else if let value = value as? CardNumberValidationResultDTO {
+            super.writeByte(181)
+            super.writeValue(value.rawValue)
+        } else if let value = value as? CardExpiryDateValidationResultDTO {
+            super.writeByte(182)
+            super.writeValue(value.rawValue)
+        } else if let value = value as? CardSecurityCodeValidationResultDTO {
+            super.writeByte(183)
             super.writeValue(value.rawValue)
         } else {
             super.writeValue(value)

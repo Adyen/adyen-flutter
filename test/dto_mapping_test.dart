@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:adyen_checkout/adyen_checkout.dart';
 import 'package:adyen_checkout/src/generated/platform_api.g.dart';
 import 'package:adyen_checkout/src/util/dto_mapper.dart';
@@ -250,5 +252,60 @@ void main() {
     expect(cashAppPayConfigurationDTO.cashAppPayEnvironment,
         CashAppPayEnvironment.production);
     expect(cashAppPayConfigurationDTO.returnUrl, "RETURN_URL");
+  });
+
+  test('when using 3DS theme, then should map to ui customization DTO', () {
+    const theme = Adyen3DSTheme(
+      primaryColor: Color(0xFF112233),
+      onPrimaryColor: Color(0xFFFFFFFF),
+      textColor: Color(0xFF010203),
+      headingTextColor: Color(0xFF040506),
+      inputBorderColor: Color(0xFF0A0B0C),
+      inputTextColor: Color(0xFF0D0E0F),
+      buttonCornerRadius: 6,
+      inputCornerRadius: 4,
+      inputBorderWidth: 2,
+      fontFamily: 'Roboto',
+      labelFontSize: 14,
+      headingFontSize: 16,
+      buttonFontSize: 15,
+    );
+
+    final configuration = ThreeDS2Configuration(theme: theme);
+    final dto = configuration.toDTO();
+
+    final uiCustomization = dto.uiCustomization;
+    expect(uiCustomization, isNotNull);
+    expect(uiCustomization?.labelCustomization?.textColor, '#FF010203');
+    expect(uiCustomization?.labelCustomization?.headingTextColor, '#FF040506');
+    expect(uiCustomization?.labelCustomization?.textFontName, 'Roboto');
+    expect(uiCustomization?.labelCustomization?.textFontSize, 14);
+    expect(uiCustomization?.labelCustomization?.headingTextFontSize, 16);
+    expect(uiCustomization?.submitButtonCustomization?.backgroundColor,
+        '#FF112233');
+    expect(uiCustomization?.submitButtonCustomization?.textColor, '#FFFFFFFF');
+    expect(uiCustomization?.submitButtonCustomization?.textFontSize, 15);
+    expect(uiCustomization?.submitButtonCustomization?.cornerRadius, 6);
+    expect(uiCustomization?.textBoxCustomization?.borderColor, '#FF0A0B0C');
+    expect(uiCustomization?.textBoxCustomization?.borderWidth, 2);
+    expect(uiCustomization?.textBoxCustomization?.cornerRadius, 4);
+    expect(uiCustomization?.textBoxCustomization?.textColor, '#FF0D0E0F');
+  });
+
+  test('when toolbar title is set, then should map to toolbar header text', () {
+    final configuration = ThreeDS2Configuration(
+      toolbarTitle: 'Challenge',
+    );
+
+    final dto = configuration.toDTO();
+
+    expect(dto.uiCustomization, isNotNull);
+    expect(dto.uiCustomization?.toolbarCustomization, isNotNull);
+    expect(dto.uiCustomization?.toolbarCustomization?.headerText, 'Challenge');
+  });
+
+  test('color to hex should include alpha channel', () {
+    const color = Color(0x80112233);
+    expect(color.toHexString(), '#80112233');
   });
 }
