@@ -4,2525 +4,2457 @@
 import Foundation
 
 #if os(iOS)
-    import Flutter
+  import Flutter
 #elseif os(macOS)
-    import FlutterMacOS
+  import FlutterMacOS
 #else
-    #error("Unsupported platform.")
+  #error("Unsupported platform.")
 #endif
 
 /// Error class for passing custom error details to Dart side.
 final class AdyenPigeonError: Error {
-    let code: String
-    let message: String?
-    let details: Any?
+  let code: String
+  let message: String?
+  let details: Any?
 
-    init(code: String, message: String?, details: Any?) {
-        self.code = code
-        self.message = message
-        self.details = details
-    }
+  init(code: String, message: String?, details: Any?) {
+    self.code = code
+    self.message = message
+    self.details = details
+  }
 
-    var localizedDescription: String {
-        "AdyenPigeonError(code: \(code), message: \(message ?? "<nil>"), details: \(details ?? "<nil>")"
-    }
+  var localizedDescription: String {
+    return
+      "AdyenPigeonError(code: \(code), message: \(message ?? "<nil>"), details: \(details ?? "<nil>")"
+      }
 }
 
 private func wrapResult(_ result: Any?) -> [Any?] {
-    [result]
+  return [result]
 }
 
 private func wrapError(_ error: Any) -> [Any?] {
-    if let pigeonError = error as? AdyenPigeonError {
-        return [
-            pigeonError.code,
-            pigeonError.message,
-            pigeonError.details
-        ]
-    }
-    if let flutterError = error as? FlutterError {
-        return [
-            flutterError.code,
-            flutterError.message,
-            flutterError.details
-        ]
-    }
+  if let pigeonError = error as? AdyenPigeonError {
     return [
-        "\(error)",
-        "\(type(of: error))",
-        "Stacktrace: \(Thread.callStackSymbols)"
+      pigeonError.code,
+      pigeonError.message,
+      pigeonError.details,
     ]
+  }
+  if let flutterError = error as? FlutterError {
+    return [
+      flutterError.code,
+      flutterError.message,
+      flutterError.details,
+    ]
+  }
+  return [
+    "\(error)",
+    "\(type(of: error))",
+    "Stacktrace: \(Thread.callStackSymbols)",
+  ]
 }
 
 private func createConnectionError(withChannelName channelName: String) -> AdyenPigeonError {
-    AdyenPigeonError(code: "channel-error", message: "Unable to establish connection on channel: '\(channelName)'.", details: "")
+  return AdyenPigeonError(code: "channel-error", message: "Unable to establish connection on channel: '\(channelName)'.", details: "")
 }
 
 private func isNullish(_ value: Any?) -> Bool {
-    value is NSNull || value == nil
+  return value is NSNull || value == nil
 }
 
 private func nilOrValue<T>(_ value: Any?) -> T? {
-    if value is NSNull { return nil }
-    return value as! T?
+  if value is NSNull { return nil }
+  return value as! T?
 }
 
 enum Environment: Int {
-    case test = 0
-    case europe = 1
-    case unitedStates = 2
-    case australia = 3
-    case india = 4
-    case apse = 5
+  case test = 0
+  case europe = 1
+  case unitedStates = 2
+  case australia = 3
+  case india = 4
+  case apse = 5
 }
 
 enum AddressMode: Int {
-    case full = 0
-    case postalCode = 1
-    case none = 2
+  case full = 0
+  case postalCode = 1
+  case none = 2
 }
 
 enum CardAuthMethod: Int {
-    case panOnly = 0
-    case cryptogram3DS = 1
+  case panOnly = 0
+  case cryptogram3DS = 1
 }
 
 enum TotalPriceStatus: Int {
-    case notCurrentlyKnown = 0
-    case estimated = 1
-    case finalPrice = 2
+  case notCurrentlyKnown = 0
+  case estimated = 1
+  case finalPrice = 2
 }
 
 enum GooglePayEnvironment: Int {
-    case test = 0
-    case production = 1
+  case test = 0
+  case production = 1
 }
 
 enum CashAppPayEnvironment: Int {
-    case sandbox = 0
-    case production = 1
+  case sandbox = 0
+  case production = 1
 }
 
 enum PaymentResultEnum: Int {
-    case cancelledByUser = 0
-    case error = 1
-    case finished = 2
+  case cancelledByUser = 0
+  case error = 1
+  case finished = 2
 }
 
 enum CheckoutEventType: Int {
-    case submit = 0
-    case additionalDetails = 1
-    case result = 2
-    case deleteStoredPaymentMethod = 3
-    case balanceCheck = 4
-    case requestOrder = 5
-    case cancelOrder = 6
-    case binLookup = 7
-    case binValue = 8
+  case submit = 0
+  case additionalDetails = 1
+  case result = 2
+  case deleteStoredPaymentMethod = 3
+  case balanceCheck = 4
+  case requestOrder = 5
+  case cancelOrder = 6
+  case binLookup = 7
+  case binValue = 8
 }
 
 enum ComponentCommunicationType: Int {
-    case onSubmit = 0
-    case additionalDetails = 1
-    case loading = 2
-    case result = 3
-    case resize = 4
-    case binLookup = 5
-    case binValue = 6
-    case availability = 7
+  case onSubmit = 0
+  case additionalDetails = 1
+  case loading = 2
+  case result = 3
+  case resize = 4
+  case binLookup = 5
+  case binValue = 6
+  case availability = 7
 }
 
 enum PaymentEventType: Int {
-    case finished = 0
-    case action = 1
-    case error = 2
-    case update = 3
+  case finished = 0
+  case action = 1
+  case error = 2
+  case update = 3
 }
 
 enum FieldVisibility: Int {
-    case show = 0
-    case hide = 1
+  case show = 0
+  case hide = 1
 }
 
 enum InstantPaymentType: Int {
-    case googlePay = 0
-    case applePay = 1
-    case instant = 2
+  case googlePay = 0
+  case applePay = 1
+  case instant = 2
 }
 
 enum ApplePayShippingType: Int {
-    case shipping = 0
-    case delivery = 1
-    case storePickup = 2
-    case servicePickup = 3
+  case shipping = 0
+  case delivery = 1
+  case storePickup = 2
+  case servicePickup = 3
 }
 
 enum ApplePayMerchantCapability: Int {
-    case debit = 0
-    case credit = 1
+  case debit = 0
+  case credit = 1
 }
 
 enum ApplePaySummaryItemType: Int {
-    case pending = 0
-    case definite = 1
+  case pending = 0
+  case definite = 1
 }
 
 enum CardNumberValidationResultDTO: Int {
-    case valid = 0
-    case invalidIllegalCharacters = 1
-    case invalidLuhnCheck = 2
-    case invalidTooShort = 3
-    case invalidTooLong = 4
-    case invalidOtherReason = 5
+  case valid = 0
+  case invalidIllegalCharacters = 1
+  case invalidLuhnCheck = 2
+  case invalidTooShort = 3
+  case invalidTooLong = 4
+  case invalidOtherReason = 5
 }
 
 enum CardExpiryDateValidationResultDTO: Int {
-    case valid = 0
-    case invalidTooFarInTheFuture = 1
-    case invalidTooOld = 2
-    case nonParseableDate = 3
-    case invalidOtherReason = 4
+  case valid = 0
+  case invalidTooFarInTheFuture = 1
+  case invalidTooOld = 2
+  case nonParseableDate = 3
+  case invalidOtherReason = 4
 }
 
 enum CardSecurityCodeValidationResultDTO: Int {
-    case valid = 0
-    case invalid = 1
+  case valid = 0
+  case invalid = 1
 }
 
 /// Generated class from Pigeon that represents data sent in messages.
 struct SessionDTO {
-    var id: String
-    var sessionData: String
-    var paymentMethodsJson: String
+  var id: String
+  var sessionData: String
+  var paymentMethodsJson: String
 
-    // swift-format-ignore: AlwaysUseLowerCamelCase
-    static func fromList(_ __pigeon_list: [Any?]) -> SessionDTO? {
-        let id = __pigeon_list[0] as! String
-        let sessionData = __pigeon_list[1] as! String
-        let paymentMethodsJson = __pigeon_list[2] as! String
+  // swift-format-ignore: AlwaysUseLowerCamelCase
+  static func fromList(_ __pigeon_list: [Any?]) -> SessionDTO? {
+    let id = __pigeon_list[0] as! String
+    let sessionData = __pigeon_list[1] as! String
+    let paymentMethodsJson = __pigeon_list[2] as! String
 
-        return SessionDTO(
-            id: id,
-            sessionData: sessionData,
-            paymentMethodsJson: paymentMethodsJson
-        )
-    }
-
-    func toList() -> [Any?] {
-        [
-            id,
-            sessionData,
-            paymentMethodsJson
-        ]
-    }
+    return SessionDTO(
+      id: id,
+      sessionData: sessionData,
+      paymentMethodsJson: paymentMethodsJson
+    )
+  }
+  func toList() -> [Any?] {
+    return [
+      id,
+      sessionData,
+      paymentMethodsJson,
+    ]
+  }
 }
 
 /// Generated class from Pigeon that represents data sent in messages.
 struct AmountDTO {
-    var currency: String
-    var value: Int64
+  var currency: String
+  var value: Int64
 
-    // swift-format-ignore: AlwaysUseLowerCamelCase
-    static func fromList(_ __pigeon_list: [Any?]) -> AmountDTO? {
-        let currency = __pigeon_list[0] as! String
-        let value = __pigeon_list[1] is Int64 ? __pigeon_list[1] as! Int64 : Int64(__pigeon_list[1] as! Int32)
+  // swift-format-ignore: AlwaysUseLowerCamelCase
+  static func fromList(_ __pigeon_list: [Any?]) -> AmountDTO? {
+    let currency = __pigeon_list[0] as! String
+    let value = __pigeon_list[1] is Int64 ? __pigeon_list[1] as! Int64 : Int64(__pigeon_list[1] as! Int32)
 
-        return AmountDTO(
-            currency: currency,
-            value: value
-        )
-    }
-
-    func toList() -> [Any?] {
-        [
-            currency,
-            value
-        ]
-    }
+    return AmountDTO(
+      currency: currency,
+      value: value
+    )
+  }
+  func toList() -> [Any?] {
+    return [
+      currency,
+      value,
+    ]
+  }
 }
 
 /// Generated class from Pigeon that represents data sent in messages.
 struct AnalyticsOptionsDTO {
-    var enabled: Bool
-    var version: String
+  var enabled: Bool
+  var version: String
 
-    // swift-format-ignore: AlwaysUseLowerCamelCase
-    static func fromList(_ __pigeon_list: [Any?]) -> AnalyticsOptionsDTO? {
-        let enabled = __pigeon_list[0] as! Bool
-        let version = __pigeon_list[1] as! String
+  // swift-format-ignore: AlwaysUseLowerCamelCase
+  static func fromList(_ __pigeon_list: [Any?]) -> AnalyticsOptionsDTO? {
+    let enabled = __pigeon_list[0] as! Bool
+    let version = __pigeon_list[1] as! String
 
-        return AnalyticsOptionsDTO(
-            enabled: enabled,
-            version: version
-        )
-    }
-
-    func toList() -> [Any?] {
-        [
-            enabled,
-            version
-        ]
-    }
+    return AnalyticsOptionsDTO(
+      enabled: enabled,
+      version: version
+    )
+  }
+  func toList() -> [Any?] {
+    return [
+      enabled,
+      version,
+    ]
+  }
 }
 
 /// Generated class from Pigeon that represents data sent in messages.
 struct ThreeDS2UICustomizationDTO {
-    var labelCustomization: ThreeDS2LabelCustomizationDTO?
-    var submitButtonCustomization: ThreeDS2ButtonCustomizationDTO?
-    var continueButtonCustomization: ThreeDS2ButtonCustomizationDTO?
-    var nextButtonCustomization: ThreeDS2ButtonCustomizationDTO?
-    var cancelButtonCustomization: ThreeDS2ButtonCustomizationDTO?
-    var resendButtonCustomization: ThreeDS2ButtonCustomizationDTO?
-    var textBoxCustomization: ThreeDS2TextBoxCustomizationDTO?
-    var toolbarCustomization: ThreeDS2ToolbarCustomizationDTO?
+  var headingCustomization: ThreeDS2ToolbarCustomizationDTO? = nil
+  var labelCustomization: ThreeDS2LabelCustomizationDTO? = nil
+  var textBoxCustomization: ThreeDS2TextBoxCustomizationDTO? = nil
+  var submitButtonCustomization: ThreeDS2ButtonCustomizationDTO? = nil
+  var continueButtonCustomization: ThreeDS2ButtonCustomizationDTO? = nil
+  var nextButtonCustomization: ThreeDS2ButtonCustomizationDTO? = nil
+  var cancelButtonCustomization: ThreeDS2ButtonCustomizationDTO? = nil
+  var resendButtonCustomization: ThreeDS2ButtonCustomizationDTO? = nil
 
-    // swift-format-ignore: AlwaysUseLowerCamelCase
-    static func fromList(_ __pigeon_list: [Any?]) -> ThreeDS2UICustomizationDTO? {
-        let labelCustomization: ThreeDS2LabelCustomizationDTO? = nilOrValue(__pigeon_list[0])
-        let submitButtonCustomization: ThreeDS2ButtonCustomizationDTO? = nilOrValue(__pigeon_list[1])
-        let continueButtonCustomization: ThreeDS2ButtonCustomizationDTO? = nilOrValue(__pigeon_list[2])
-        let nextButtonCustomization: ThreeDS2ButtonCustomizationDTO? = nilOrValue(__pigeon_list[3])
-        let cancelButtonCustomization: ThreeDS2ButtonCustomizationDTO? = nilOrValue(__pigeon_list[4])
-        let resendButtonCustomization: ThreeDS2ButtonCustomizationDTO? = nilOrValue(__pigeon_list[5])
-        let textBoxCustomization: ThreeDS2TextBoxCustomizationDTO? = nilOrValue(__pigeon_list[6])
-        let toolbarCustomization: ThreeDS2ToolbarCustomizationDTO? = nilOrValue(__pigeon_list[7])
+  // swift-format-ignore: AlwaysUseLowerCamelCase
+  static func fromList(_ __pigeon_list: [Any?]) -> ThreeDS2UICustomizationDTO? {
+    let headingCustomization: ThreeDS2ToolbarCustomizationDTO? = nilOrValue(__pigeon_list[0])
+    let labelCustomization: ThreeDS2LabelCustomizationDTO? = nilOrValue(__pigeon_list[1])
+    let textBoxCustomization: ThreeDS2TextBoxCustomizationDTO? = nilOrValue(__pigeon_list[2])
+    let submitButtonCustomization: ThreeDS2ButtonCustomizationDTO? = nilOrValue(__pigeon_list[3])
+    let continueButtonCustomization: ThreeDS2ButtonCustomizationDTO? = nilOrValue(__pigeon_list[4])
+    let nextButtonCustomization: ThreeDS2ButtonCustomizationDTO? = nilOrValue(__pigeon_list[5])
+    let cancelButtonCustomization: ThreeDS2ButtonCustomizationDTO? = nilOrValue(__pigeon_list[6])
+    let resendButtonCustomization: ThreeDS2ButtonCustomizationDTO? = nilOrValue(__pigeon_list[7])
 
-        return ThreeDS2UICustomizationDTO(
-            labelCustomization: labelCustomization,
-            submitButtonCustomization: submitButtonCustomization,
-            continueButtonCustomization: continueButtonCustomization,
-            nextButtonCustomization: nextButtonCustomization,
-            cancelButtonCustomization: cancelButtonCustomization,
-            resendButtonCustomization: resendButtonCustomization,
-            textBoxCustomization: textBoxCustomization,
-            toolbarCustomization: toolbarCustomization
-        )
-    }
-
-    func toList() -> [Any?] {
-        [
-            labelCustomization,
-            submitButtonCustomization,
-            continueButtonCustomization,
-            nextButtonCustomization,
-            cancelButtonCustomization,
-            resendButtonCustomization,
-            textBoxCustomization,
-            toolbarCustomization
-        ]
-    }
+    return ThreeDS2UICustomizationDTO(
+      headingCustomization: headingCustomization,
+      labelCustomization: labelCustomization,
+      textBoxCustomization: textBoxCustomization,
+      submitButtonCustomization: submitButtonCustomization,
+      continueButtonCustomization: continueButtonCustomization,
+      nextButtonCustomization: nextButtonCustomization,
+      cancelButtonCustomization: cancelButtonCustomization,
+      resendButtonCustomization: resendButtonCustomization
+    )
+  }
+  func toList() -> [Any?] {
+    return [
+      headingCustomization,
+      labelCustomization,
+      textBoxCustomization,
+      submitButtonCustomization,
+      continueButtonCustomization,
+      nextButtonCustomization,
+      cancelButtonCustomization,
+      resendButtonCustomization,
+    ]
+  }
 }
 
 /// Generated class from Pigeon that represents data sent in messages.
 struct ThreeDS2LabelCustomizationDTO {
-    var textFontName: String?
-    var textColor: String?
-    var textFontSize: Int64?
-    var headingTextColor: String?
-    var headingTextFontSize: Int64?
-    var headingTextFontName: String?
+  var textFontName: String? = nil
+  var textColor: String? = nil
+  var textFontSize: Int64? = nil
 
-    // swift-format-ignore: AlwaysUseLowerCamelCase
-    static func fromList(_ __pigeon_list: [Any?]) -> ThreeDS2LabelCustomizationDTO? {
-        let textFontName: String? = nilOrValue(__pigeon_list[0])
-        let textColor: String? = nilOrValue(__pigeon_list[1])
-        let textFontSize: Int64? = isNullish(__pigeon_list[2]) ? nil : (__pigeon_list[2] is Int64? ? __pigeon_list[2] as! Int64? : Int64(__pigeon_list[2] as! Int32))
-        let headingTextColor: String? = nilOrValue(__pigeon_list[3])
-        let headingTextFontSize: Int64? = isNullish(__pigeon_list[4]) ? nil : (__pigeon_list[4] is Int64? ? __pigeon_list[4] as! Int64? : Int64(__pigeon_list[4] as! Int32))
-        let headingTextFontName: String? = nilOrValue(__pigeon_list[5])
+  // swift-format-ignore: AlwaysUseLowerCamelCase
+  static func fromList(_ __pigeon_list: [Any?]) -> ThreeDS2LabelCustomizationDTO? {
+    let textFontName: String? = nilOrValue(__pigeon_list[0])
+    let textColor: String? = nilOrValue(__pigeon_list[1])
+    let textFontSize: Int64? = isNullish(__pigeon_list[2]) ? nil : (__pigeon_list[2] is Int64? ? __pigeon_list[2] as! Int64? : Int64(__pigeon_list[2] as! Int32))
 
-        return ThreeDS2LabelCustomizationDTO(
-            textFontName: textFontName,
-            textColor: textColor,
-            textFontSize: textFontSize,
-            headingTextColor: headingTextColor,
-            headingTextFontSize: headingTextFontSize,
-            headingTextFontName: headingTextFontName
-        )
-    }
-
-    func toList() -> [Any?] {
-        [
-            textFontName,
-            textColor,
-            textFontSize,
-            headingTextColor,
-            headingTextFontSize,
-            headingTextFontName
-        ]
-    }
+    return ThreeDS2LabelCustomizationDTO(
+      textFontName: textFontName,
+      textColor: textColor,
+      textFontSize: textFontSize
+    )
+  }
+  func toList() -> [Any?] {
+    return [
+      textFontName,
+      textColor,
+      textFontSize,
+    ]
+  }
 }
 
 /// Generated class from Pigeon that represents data sent in messages.
 struct ThreeDS2ButtonCustomizationDTO {
-    var backgroundColor: String?
-    var textColor: String?
-    var cornerRadius: Int64?
-    var textFontSize: Int64?
+  var backgroundColor: String? = nil
+  var textColor: String? = nil
+  var cornerRadius: Int64? = nil
+  var textFontSize: Int64? = nil
 
-    // swift-format-ignore: AlwaysUseLowerCamelCase
-    static func fromList(_ __pigeon_list: [Any?]) -> ThreeDS2ButtonCustomizationDTO? {
-        let backgroundColor: String? = nilOrValue(__pigeon_list[0])
-        let textColor: String? = nilOrValue(__pigeon_list[1])
-        let cornerRadius: Int64? = isNullish(__pigeon_list[2]) ? nil : (__pigeon_list[2] is Int64? ? __pigeon_list[2] as! Int64? : Int64(__pigeon_list[2] as! Int32))
-        let textFontSize: Int64? = isNullish(__pigeon_list[3]) ? nil : (__pigeon_list[3] is Int64? ? __pigeon_list[3] as! Int64? : Int64(__pigeon_list[3] as! Int32))
+  // swift-format-ignore: AlwaysUseLowerCamelCase
+  static func fromList(_ __pigeon_list: [Any?]) -> ThreeDS2ButtonCustomizationDTO? {
+    let backgroundColor: String? = nilOrValue(__pigeon_list[0])
+    let textColor: String? = nilOrValue(__pigeon_list[1])
+    let cornerRadius: Int64? = isNullish(__pigeon_list[2]) ? nil : (__pigeon_list[2] is Int64? ? __pigeon_list[2] as! Int64? : Int64(__pigeon_list[2] as! Int32))
+    let textFontSize: Int64? = isNullish(__pigeon_list[3]) ? nil : (__pigeon_list[3] is Int64? ? __pigeon_list[3] as! Int64? : Int64(__pigeon_list[3] as! Int32))
 
-        return ThreeDS2ButtonCustomizationDTO(
-            backgroundColor: backgroundColor,
-            textColor: textColor,
-            cornerRadius: cornerRadius,
-            textFontSize: textFontSize
-        )
-    }
-
-    func toList() -> [Any?] {
-        [
-            backgroundColor,
-            textColor,
-            cornerRadius,
-            textFontSize
-        ]
-    }
+    return ThreeDS2ButtonCustomizationDTO(
+      backgroundColor: backgroundColor,
+      textColor: textColor,
+      cornerRadius: cornerRadius,
+      textFontSize: textFontSize
+    )
+  }
+  func toList() -> [Any?] {
+    return [
+      backgroundColor,
+      textColor,
+      cornerRadius,
+      textFontSize,
+    ]
+  }
 }
 
 /// Generated class from Pigeon that represents data sent in messages.
 struct ThreeDS2TextBoxCustomizationDTO {
-    var borderColor: String?
-    var borderWidth: Int64?
-    var cornerRadius: Int64?
-    var textColor: String?
-    var textFontName: String?
-    var textFontSize: Int64?
+  var borderColor: String? = nil
+  var borderWidth: Int64? = nil
+  var cornerRadius: Int64? = nil
+  var textColor: String? = nil
+  var textFontName: String? = nil
+  var textFontSize: Int64? = nil
 
-    // swift-format-ignore: AlwaysUseLowerCamelCase
-    static func fromList(_ __pigeon_list: [Any?]) -> ThreeDS2TextBoxCustomizationDTO? {
-        let borderColor: String? = nilOrValue(__pigeon_list[0])
-        let borderWidth: Int64? = isNullish(__pigeon_list[1]) ? nil : (__pigeon_list[1] is Int64? ? __pigeon_list[1] as! Int64? : Int64(__pigeon_list[1] as! Int32))
-        let cornerRadius: Int64? = isNullish(__pigeon_list[2]) ? nil : (__pigeon_list[2] is Int64? ? __pigeon_list[2] as! Int64? : Int64(__pigeon_list[2] as! Int32))
-        let textColor: String? = nilOrValue(__pigeon_list[3])
-        let textFontName: String? = nilOrValue(__pigeon_list[4])
-        let textFontSize: Int64? = isNullish(__pigeon_list[5]) ? nil : (__pigeon_list[5] is Int64? ? __pigeon_list[5] as! Int64? : Int64(__pigeon_list[5] as! Int32))
+  // swift-format-ignore: AlwaysUseLowerCamelCase
+  static func fromList(_ __pigeon_list: [Any?]) -> ThreeDS2TextBoxCustomizationDTO? {
+    let borderColor: String? = nilOrValue(__pigeon_list[0])
+    let borderWidth: Int64? = isNullish(__pigeon_list[1]) ? nil : (__pigeon_list[1] is Int64? ? __pigeon_list[1] as! Int64? : Int64(__pigeon_list[1] as! Int32))
+    let cornerRadius: Int64? = isNullish(__pigeon_list[2]) ? nil : (__pigeon_list[2] is Int64? ? __pigeon_list[2] as! Int64? : Int64(__pigeon_list[2] as! Int32))
+    let textColor: String? = nilOrValue(__pigeon_list[3])
+    let textFontName: String? = nilOrValue(__pigeon_list[4])
+    let textFontSize: Int64? = isNullish(__pigeon_list[5]) ? nil : (__pigeon_list[5] is Int64? ? __pigeon_list[5] as! Int64? : Int64(__pigeon_list[5] as! Int32))
 
-        return ThreeDS2TextBoxCustomizationDTO(
-            borderColor: borderColor,
-            borderWidth: borderWidth,
-            cornerRadius: cornerRadius,
-            textColor: textColor,
-            textFontName: textFontName,
-            textFontSize: textFontSize
-        )
-    }
-
-    func toList() -> [Any?] {
-        [
-            borderColor,
-            borderWidth,
-            cornerRadius,
-            textColor,
-            textFontName,
-            textFontSize
-        ]
-    }
+    return ThreeDS2TextBoxCustomizationDTO(
+      borderColor: borderColor,
+      borderWidth: borderWidth,
+      cornerRadius: cornerRadius,
+      textColor: textColor,
+      textFontName: textFontName,
+      textFontSize: textFontSize
+    )
+  }
+  func toList() -> [Any?] {
+    return [
+      borderColor,
+      borderWidth,
+      cornerRadius,
+      textColor,
+      textFontName,
+      textFontSize,
+    ]
+  }
 }
 
 /// Generated class from Pigeon that represents data sent in messages.
 struct ThreeDS2ToolbarCustomizationDTO {
-    var backgroundColor: String?
-    var headerText: String?
-    var buttonText: String?
-    var textColor: String?
-    var textFontName: String?
-    var textFontSize: Int64?
+  var backgroundColor: String? = nil
+  var headerText: String? = nil
+  var buttonText: String? = nil
+  var textColor: String? = nil
+  var textFontName: String? = nil
+  var textFontSize: Int64? = nil
 
-    // swift-format-ignore: AlwaysUseLowerCamelCase
-    static func fromList(_ __pigeon_list: [Any?]) -> ThreeDS2ToolbarCustomizationDTO? {
-        let backgroundColor: String? = nilOrValue(__pigeon_list[0])
-        let headerText: String? = nilOrValue(__pigeon_list[1])
-        let buttonText: String? = nilOrValue(__pigeon_list[2])
-        let textColor: String? = nilOrValue(__pigeon_list[3])
-        let textFontName: String? = nilOrValue(__pigeon_list[4])
-        let textFontSize: Int64? = isNullish(__pigeon_list[5]) ? nil : (__pigeon_list[5] is Int64? ? __pigeon_list[5] as! Int64? : Int64(__pigeon_list[5] as! Int32))
+  // swift-format-ignore: AlwaysUseLowerCamelCase
+  static func fromList(_ __pigeon_list: [Any?]) -> ThreeDS2ToolbarCustomizationDTO? {
+    let backgroundColor: String? = nilOrValue(__pigeon_list[0])
+    let headerText: String? = nilOrValue(__pigeon_list[1])
+    let buttonText: String? = nilOrValue(__pigeon_list[2])
+    let textColor: String? = nilOrValue(__pigeon_list[3])
+    let textFontName: String? = nilOrValue(__pigeon_list[4])
+    let textFontSize: Int64? = isNullish(__pigeon_list[5]) ? nil : (__pigeon_list[5] is Int64? ? __pigeon_list[5] as! Int64? : Int64(__pigeon_list[5] as! Int32))
 
-        return ThreeDS2ToolbarCustomizationDTO(
-            backgroundColor: backgroundColor,
-            headerText: headerText,
-            buttonText: buttonText,
-            textColor: textColor,
-            textFontName: textFontName,
-            textFontSize: textFontSize
-        )
-    }
-
-    func toList() -> [Any?] {
-        [
-            backgroundColor,
-            headerText,
-            buttonText,
-            textColor,
-            textFontName,
-            textFontSize
-        ]
-    }
+    return ThreeDS2ToolbarCustomizationDTO(
+      backgroundColor: backgroundColor,
+      headerText: headerText,
+      buttonText: buttonText,
+      textColor: textColor,
+      textFontName: textFontName,
+      textFontSize: textFontSize
+    )
+  }
+  func toList() -> [Any?] {
+    return [
+      backgroundColor,
+      headerText,
+      buttonText,
+      textColor,
+      textFontName,
+      textFontSize,
+    ]
+  }
 }
 
 /// Generated class from Pigeon that represents data sent in messages.
 struct ThreeDS2ConfigurationDTO {
-    var requestorAppURL: String?
-    var uiCustomization: ThreeDS2UICustomizationDTO?
+  var requestorAppURL: String? = nil
+  var uiCustomization: ThreeDS2UICustomizationDTO? = nil
 
-    // swift-format-ignore: AlwaysUseLowerCamelCase
-    static func fromList(_ __pigeon_list: [Any?]) -> ThreeDS2ConfigurationDTO? {
-        let requestorAppURL: String? = nilOrValue(__pigeon_list[0])
-        let uiCustomization: ThreeDS2UICustomizationDTO? = nilOrValue(__pigeon_list[1])
+  // swift-format-ignore: AlwaysUseLowerCamelCase
+  static func fromList(_ __pigeon_list: [Any?]) -> ThreeDS2ConfigurationDTO? {
+    let requestorAppURL: String? = nilOrValue(__pigeon_list[0])
+    let uiCustomization: ThreeDS2UICustomizationDTO? = nilOrValue(__pigeon_list[1])
 
-        return ThreeDS2ConfigurationDTO(
-            requestorAppURL: requestorAppURL,
-            uiCustomization: uiCustomization
-        )
-    }
-
-    func toList() -> [Any?] {
-        [
-            requestorAppURL,
-            uiCustomization
-        ]
-    }
+    return ThreeDS2ConfigurationDTO(
+      requestorAppURL: requestorAppURL,
+      uiCustomization: uiCustomization
+    )
+  }
+  func toList() -> [Any?] {
+    return [
+      requestorAppURL,
+      uiCustomization,
+    ]
+  }
 }
 
 /// Generated class from Pigeon that represents data sent in messages.
 struct DropInConfigurationDTO {
-    var environment: Environment
-    var clientKey: String
-    var countryCode: String
-    var amount: AmountDTO?
-    var shopperLocale: String?
-    var cardConfigurationDTO: CardConfigurationDTO?
-    var applePayConfigurationDTO: ApplePayConfigurationDTO?
-    var googlePayConfigurationDTO: GooglePayConfigurationDTO?
-    var cashAppPayConfigurationDTO: CashAppPayConfigurationDTO?
-    var twintConfigurationDTO: TwintConfigurationDTO?
-    var threeDS2ConfigurationDTO: ThreeDS2ConfigurationDTO?
-    var analyticsOptionsDTO: AnalyticsOptionsDTO
-    var showPreselectedStoredPaymentMethod: Bool
-    var skipListWhenSinglePaymentMethod: Bool
-    var isRemoveStoredPaymentMethodEnabled: Bool
-    var preselectedPaymentMethodTitle: String?
-    var paymentMethodNames: [String?: String?]?
-    var isPartialPaymentSupported: Bool
+  var environment: Environment
+  var clientKey: String
+  var countryCode: String
+  var amount: AmountDTO? = nil
+  var shopperLocale: String? = nil
+  var cardConfigurationDTO: CardConfigurationDTO? = nil
+  var applePayConfigurationDTO: ApplePayConfigurationDTO? = nil
+  var googlePayConfigurationDTO: GooglePayConfigurationDTO? = nil
+  var cashAppPayConfigurationDTO: CashAppPayConfigurationDTO? = nil
+  var twintConfigurationDTO: TwintConfigurationDTO? = nil
+  var threeDS2ConfigurationDTO: ThreeDS2ConfigurationDTO? = nil
+  var analyticsOptionsDTO: AnalyticsOptionsDTO
+  var showPreselectedStoredPaymentMethod: Bool
+  var skipListWhenSinglePaymentMethod: Bool
+  var isRemoveStoredPaymentMethodEnabled: Bool
+  var preselectedPaymentMethodTitle: String? = nil
+  var paymentMethodNames: [String?: String?]? = nil
+  var isPartialPaymentSupported: Bool
 
-    // swift-format-ignore: AlwaysUseLowerCamelCase
-    static func fromList(_ __pigeon_list: [Any?]) -> DropInConfigurationDTO? {
-        let environment = __pigeon_list[0] as! Environment
-        let clientKey = __pigeon_list[1] as! String
-        let countryCode = __pigeon_list[2] as! String
-        let amount: AmountDTO? = nilOrValue(__pigeon_list[3])
-        let shopperLocale: String? = nilOrValue(__pigeon_list[4])
-        let cardConfigurationDTO: CardConfigurationDTO? = nilOrValue(__pigeon_list[5])
-        let applePayConfigurationDTO: ApplePayConfigurationDTO? = nilOrValue(__pigeon_list[6])
-        let googlePayConfigurationDTO: GooglePayConfigurationDTO? = nilOrValue(__pigeon_list[7])
-        let cashAppPayConfigurationDTO: CashAppPayConfigurationDTO? = nilOrValue(__pigeon_list[8])
-        let twintConfigurationDTO: TwintConfigurationDTO? = nilOrValue(__pigeon_list[9])
-        let threeDS2ConfigurationDTO: ThreeDS2ConfigurationDTO? = nilOrValue(__pigeon_list[10])
-        let analyticsOptionsDTO = __pigeon_list[11] as! AnalyticsOptionsDTO
-        let showPreselectedStoredPaymentMethod = __pigeon_list[12] as! Bool
-        let skipListWhenSinglePaymentMethod = __pigeon_list[13] as! Bool
-        let isRemoveStoredPaymentMethodEnabled = __pigeon_list[14] as! Bool
-        let preselectedPaymentMethodTitle: String? = nilOrValue(__pigeon_list[15])
-        let paymentMethodNames: [String?: String?]? = nilOrValue(__pigeon_list[16])
-        let isPartialPaymentSupported = __pigeon_list[17] as! Bool
+  // swift-format-ignore: AlwaysUseLowerCamelCase
+  static func fromList(_ __pigeon_list: [Any?]) -> DropInConfigurationDTO? {
+    let environment = __pigeon_list[0] as! Environment
+    let clientKey = __pigeon_list[1] as! String
+    let countryCode = __pigeon_list[2] as! String
+    let amount: AmountDTO? = nilOrValue(__pigeon_list[3])
+    let shopperLocale: String? = nilOrValue(__pigeon_list[4])
+    let cardConfigurationDTO: CardConfigurationDTO? = nilOrValue(__pigeon_list[5])
+    let applePayConfigurationDTO: ApplePayConfigurationDTO? = nilOrValue(__pigeon_list[6])
+    let googlePayConfigurationDTO: GooglePayConfigurationDTO? = nilOrValue(__pigeon_list[7])
+    let cashAppPayConfigurationDTO: CashAppPayConfigurationDTO? = nilOrValue(__pigeon_list[8])
+    let twintConfigurationDTO: TwintConfigurationDTO? = nilOrValue(__pigeon_list[9])
+    let threeDS2ConfigurationDTO: ThreeDS2ConfigurationDTO? = nilOrValue(__pigeon_list[10])
+    let analyticsOptionsDTO = __pigeon_list[11] as! AnalyticsOptionsDTO
+    let showPreselectedStoredPaymentMethod = __pigeon_list[12] as! Bool
+    let skipListWhenSinglePaymentMethod = __pigeon_list[13] as! Bool
+    let isRemoveStoredPaymentMethodEnabled = __pigeon_list[14] as! Bool
+    let preselectedPaymentMethodTitle: String? = nilOrValue(__pigeon_list[15])
+    let paymentMethodNames: [String?: String?]? = nilOrValue(__pigeon_list[16])
+    let isPartialPaymentSupported = __pigeon_list[17] as! Bool
 
-        return DropInConfigurationDTO(
-            environment: environment,
-            clientKey: clientKey,
-            countryCode: countryCode,
-            amount: amount,
-            shopperLocale: shopperLocale,
-            cardConfigurationDTO: cardConfigurationDTO,
-            applePayConfigurationDTO: applePayConfigurationDTO,
-            googlePayConfigurationDTO: googlePayConfigurationDTO,
-            cashAppPayConfigurationDTO: cashAppPayConfigurationDTO,
-            twintConfigurationDTO: twintConfigurationDTO,
-            threeDS2ConfigurationDTO: threeDS2ConfigurationDTO,
-            analyticsOptionsDTO: analyticsOptionsDTO,
-            showPreselectedStoredPaymentMethod: showPreselectedStoredPaymentMethod,
-            skipListWhenSinglePaymentMethod: skipListWhenSinglePaymentMethod,
-            isRemoveStoredPaymentMethodEnabled: isRemoveStoredPaymentMethodEnabled,
-            preselectedPaymentMethodTitle: preselectedPaymentMethodTitle,
-            paymentMethodNames: paymentMethodNames,
-            isPartialPaymentSupported: isPartialPaymentSupported
-        )
-    }
-
-    func toList() -> [Any?] {
-        [
-            environment,
-            clientKey,
-            countryCode,
-            amount,
-            shopperLocale,
-            cardConfigurationDTO,
-            applePayConfigurationDTO,
-            googlePayConfigurationDTO,
-            cashAppPayConfigurationDTO,
-            twintConfigurationDTO,
-            threeDS2ConfigurationDTO,
-            analyticsOptionsDTO,
-            showPreselectedStoredPaymentMethod,
-            skipListWhenSinglePaymentMethod,
-            isRemoveStoredPaymentMethodEnabled,
-            preselectedPaymentMethodTitle,
-            paymentMethodNames,
-            isPartialPaymentSupported
-        ]
-    }
+    return DropInConfigurationDTO(
+      environment: environment,
+      clientKey: clientKey,
+      countryCode: countryCode,
+      amount: amount,
+      shopperLocale: shopperLocale,
+      cardConfigurationDTO: cardConfigurationDTO,
+      applePayConfigurationDTO: applePayConfigurationDTO,
+      googlePayConfigurationDTO: googlePayConfigurationDTO,
+      cashAppPayConfigurationDTO: cashAppPayConfigurationDTO,
+      twintConfigurationDTO: twintConfigurationDTO,
+      threeDS2ConfigurationDTO: threeDS2ConfigurationDTO,
+      analyticsOptionsDTO: analyticsOptionsDTO,
+      showPreselectedStoredPaymentMethod: showPreselectedStoredPaymentMethod,
+      skipListWhenSinglePaymentMethod: skipListWhenSinglePaymentMethod,
+      isRemoveStoredPaymentMethodEnabled: isRemoveStoredPaymentMethodEnabled,
+      preselectedPaymentMethodTitle: preselectedPaymentMethodTitle,
+      paymentMethodNames: paymentMethodNames,
+      isPartialPaymentSupported: isPartialPaymentSupported
+    )
+  }
+  func toList() -> [Any?] {
+    return [
+      environment,
+      clientKey,
+      countryCode,
+      amount,
+      shopperLocale,
+      cardConfigurationDTO,
+      applePayConfigurationDTO,
+      googlePayConfigurationDTO,
+      cashAppPayConfigurationDTO,
+      twintConfigurationDTO,
+      threeDS2ConfigurationDTO,
+      analyticsOptionsDTO,
+      showPreselectedStoredPaymentMethod,
+      skipListWhenSinglePaymentMethod,
+      isRemoveStoredPaymentMethodEnabled,
+      preselectedPaymentMethodTitle,
+      paymentMethodNames,
+      isPartialPaymentSupported,
+    ]
+  }
 }
 
 /// Generated class from Pigeon that represents data sent in messages.
 struct CardConfigurationDTO {
-    var holderNameRequired: Bool
-    var addressMode: AddressMode
-    var showStorePaymentField: Bool
-    var showCvcForStoredCard: Bool
-    var showCvc: Bool
-    var kcpFieldVisibility: FieldVisibility
-    var socialSecurityNumberFieldVisibility: FieldVisibility
-    var supportedCardTypes: [String?]
+  var holderNameRequired: Bool
+  var addressMode: AddressMode
+  var showStorePaymentField: Bool
+  var showCvcForStoredCard: Bool
+  var showCvc: Bool
+  var kcpFieldVisibility: FieldVisibility
+  var socialSecurityNumberFieldVisibility: FieldVisibility
+  var supportedCardTypes: [String?]
 
-    // swift-format-ignore: AlwaysUseLowerCamelCase
-    static func fromList(_ __pigeon_list: [Any?]) -> CardConfigurationDTO? {
-        let holderNameRequired = __pigeon_list[0] as! Bool
-        let addressMode = __pigeon_list[1] as! AddressMode
-        let showStorePaymentField = __pigeon_list[2] as! Bool
-        let showCvcForStoredCard = __pigeon_list[3] as! Bool
-        let showCvc = __pigeon_list[4] as! Bool
-        let kcpFieldVisibility = __pigeon_list[5] as! FieldVisibility
-        let socialSecurityNumberFieldVisibility = __pigeon_list[6] as! FieldVisibility
-        let supportedCardTypes = __pigeon_list[7] as! [String?]
+  // swift-format-ignore: AlwaysUseLowerCamelCase
+  static func fromList(_ __pigeon_list: [Any?]) -> CardConfigurationDTO? {
+    let holderNameRequired = __pigeon_list[0] as! Bool
+    let addressMode = __pigeon_list[1] as! AddressMode
+    let showStorePaymentField = __pigeon_list[2] as! Bool
+    let showCvcForStoredCard = __pigeon_list[3] as! Bool
+    let showCvc = __pigeon_list[4] as! Bool
+    let kcpFieldVisibility = __pigeon_list[5] as! FieldVisibility
+    let socialSecurityNumberFieldVisibility = __pigeon_list[6] as! FieldVisibility
+    let supportedCardTypes = __pigeon_list[7] as! [String?]
 
-        return CardConfigurationDTO(
-            holderNameRequired: holderNameRequired,
-            addressMode: addressMode,
-            showStorePaymentField: showStorePaymentField,
-            showCvcForStoredCard: showCvcForStoredCard,
-            showCvc: showCvc,
-            kcpFieldVisibility: kcpFieldVisibility,
-            socialSecurityNumberFieldVisibility: socialSecurityNumberFieldVisibility,
-            supportedCardTypes: supportedCardTypes
-        )
-    }
-
-    func toList() -> [Any?] {
-        [
-            holderNameRequired,
-            addressMode,
-            showStorePaymentField,
-            showCvcForStoredCard,
-            showCvc,
-            kcpFieldVisibility,
-            socialSecurityNumberFieldVisibility,
-            supportedCardTypes
-        ]
-    }
+    return CardConfigurationDTO(
+      holderNameRequired: holderNameRequired,
+      addressMode: addressMode,
+      showStorePaymentField: showStorePaymentField,
+      showCvcForStoredCard: showCvcForStoredCard,
+      showCvc: showCvc,
+      kcpFieldVisibility: kcpFieldVisibility,
+      socialSecurityNumberFieldVisibility: socialSecurityNumberFieldVisibility,
+      supportedCardTypes: supportedCardTypes
+    )
+  }
+  func toList() -> [Any?] {
+    return [
+      holderNameRequired,
+      addressMode,
+      showStorePaymentField,
+      showCvcForStoredCard,
+      showCvc,
+      kcpFieldVisibility,
+      socialSecurityNumberFieldVisibility,
+      supportedCardTypes,
+    ]
+  }
 }
 
 /// Generated class from Pigeon that represents data sent in messages.
 struct ApplePayConfigurationDTO {
-    var merchantId: String
-    var merchantName: String
-    var allowOnboarding: Bool?
-    var summaryItems: [ApplePaySummaryItemDTO?]?
-    var requiredBillingContactFields: [String?]?
-    var billingContact: ApplePayContactDTO?
-    var requiredShippingContactFields: [String?]?
-    var shippingContact: ApplePayContactDTO?
-    var applePayShippingType: ApplePayShippingType?
-    var allowShippingContactEditing: Bool?
-    var shippingMethods: [ApplePayShippingMethodDTO?]?
-    var applicationData: String?
-    var supportedCountries: [String?]?
-    var merchantCapability: ApplePayMerchantCapability?
+  var merchantId: String
+  var merchantName: String
+  var allowOnboarding: Bool? = nil
+  var summaryItems: [ApplePaySummaryItemDTO?]? = nil
+  var requiredBillingContactFields: [String?]? = nil
+  var billingContact: ApplePayContactDTO? = nil
+  var requiredShippingContactFields: [String?]? = nil
+  var shippingContact: ApplePayContactDTO? = nil
+  var applePayShippingType: ApplePayShippingType? = nil
+  var allowShippingContactEditing: Bool? = nil
+  var shippingMethods: [ApplePayShippingMethodDTO?]? = nil
+  var applicationData: String? = nil
+  var supportedCountries: [String?]? = nil
+  var merchantCapability: ApplePayMerchantCapability? = nil
 
-    // swift-format-ignore: AlwaysUseLowerCamelCase
-    static func fromList(_ __pigeon_list: [Any?]) -> ApplePayConfigurationDTO? {
-        let merchantId = __pigeon_list[0] as! String
-        let merchantName = __pigeon_list[1] as! String
-        let allowOnboarding: Bool? = nilOrValue(__pigeon_list[2])
-        let summaryItems: [ApplePaySummaryItemDTO?]? = nilOrValue(__pigeon_list[3])
-        let requiredBillingContactFields: [String?]? = nilOrValue(__pigeon_list[4])
-        let billingContact: ApplePayContactDTO? = nilOrValue(__pigeon_list[5])
-        let requiredShippingContactFields: [String?]? = nilOrValue(__pigeon_list[6])
-        let shippingContact: ApplePayContactDTO? = nilOrValue(__pigeon_list[7])
-        let applePayShippingType: ApplePayShippingType? = nilOrValue(__pigeon_list[8])
-        let allowShippingContactEditing: Bool? = nilOrValue(__pigeon_list[9])
-        let shippingMethods: [ApplePayShippingMethodDTO?]? = nilOrValue(__pigeon_list[10])
-        let applicationData: String? = nilOrValue(__pigeon_list[11])
-        let supportedCountries: [String?]? = nilOrValue(__pigeon_list[12])
-        let merchantCapability: ApplePayMerchantCapability? = nilOrValue(__pigeon_list[13])
+  // swift-format-ignore: AlwaysUseLowerCamelCase
+  static func fromList(_ __pigeon_list: [Any?]) -> ApplePayConfigurationDTO? {
+    let merchantId = __pigeon_list[0] as! String
+    let merchantName = __pigeon_list[1] as! String
+    let allowOnboarding: Bool? = nilOrValue(__pigeon_list[2])
+    let summaryItems: [ApplePaySummaryItemDTO?]? = nilOrValue(__pigeon_list[3])
+    let requiredBillingContactFields: [String?]? = nilOrValue(__pigeon_list[4])
+    let billingContact: ApplePayContactDTO? = nilOrValue(__pigeon_list[5])
+    let requiredShippingContactFields: [String?]? = nilOrValue(__pigeon_list[6])
+    let shippingContact: ApplePayContactDTO? = nilOrValue(__pigeon_list[7])
+    let applePayShippingType: ApplePayShippingType? = nilOrValue(__pigeon_list[8])
+    let allowShippingContactEditing: Bool? = nilOrValue(__pigeon_list[9])
+    let shippingMethods: [ApplePayShippingMethodDTO?]? = nilOrValue(__pigeon_list[10])
+    let applicationData: String? = nilOrValue(__pigeon_list[11])
+    let supportedCountries: [String?]? = nilOrValue(__pigeon_list[12])
+    let merchantCapability: ApplePayMerchantCapability? = nilOrValue(__pigeon_list[13])
 
-        return ApplePayConfigurationDTO(
-            merchantId: merchantId,
-            merchantName: merchantName,
-            allowOnboarding: allowOnboarding,
-            summaryItems: summaryItems,
-            requiredBillingContactFields: requiredBillingContactFields,
-            billingContact: billingContact,
-            requiredShippingContactFields: requiredShippingContactFields,
-            shippingContact: shippingContact,
-            applePayShippingType: applePayShippingType,
-            allowShippingContactEditing: allowShippingContactEditing,
-            shippingMethods: shippingMethods,
-            applicationData: applicationData,
-            supportedCountries: supportedCountries,
-            merchantCapability: merchantCapability
-        )
-    }
-
-    func toList() -> [Any?] {
-        [
-            merchantId,
-            merchantName,
-            allowOnboarding,
-            summaryItems,
-            requiredBillingContactFields,
-            billingContact,
-            requiredShippingContactFields,
-            shippingContact,
-            applePayShippingType,
-            allowShippingContactEditing,
-            shippingMethods,
-            applicationData,
-            supportedCountries,
-            merchantCapability
-        ]
-    }
+    return ApplePayConfigurationDTO(
+      merchantId: merchantId,
+      merchantName: merchantName,
+      allowOnboarding: allowOnboarding,
+      summaryItems: summaryItems,
+      requiredBillingContactFields: requiredBillingContactFields,
+      billingContact: billingContact,
+      requiredShippingContactFields: requiredShippingContactFields,
+      shippingContact: shippingContact,
+      applePayShippingType: applePayShippingType,
+      allowShippingContactEditing: allowShippingContactEditing,
+      shippingMethods: shippingMethods,
+      applicationData: applicationData,
+      supportedCountries: supportedCountries,
+      merchantCapability: merchantCapability
+    )
+  }
+  func toList() -> [Any?] {
+    return [
+      merchantId,
+      merchantName,
+      allowOnboarding,
+      summaryItems,
+      requiredBillingContactFields,
+      billingContact,
+      requiredShippingContactFields,
+      shippingContact,
+      applePayShippingType,
+      allowShippingContactEditing,
+      shippingMethods,
+      applicationData,
+      supportedCountries,
+      merchantCapability,
+    ]
+  }
 }
 
 /// Generated class from Pigeon that represents data sent in messages.
 struct ApplePayContactDTO {
-    var phoneNumber: String?
-    var emailAddress: String?
-    var givenName: String?
-    var familyName: String?
-    var phoneticGivenName: String?
-    var phoneticFamilyName: String?
-    var addressLines: [String?]?
-    var subLocality: String?
-    var city: String?
-    var postalCode: String?
-    var subAdministrativeArea: String?
-    var administrativeArea: String?
-    var country: String?
-    var countryCode: String?
+  var phoneNumber: String? = nil
+  var emailAddress: String? = nil
+  var givenName: String? = nil
+  var familyName: String? = nil
+  var phoneticGivenName: String? = nil
+  var phoneticFamilyName: String? = nil
+  var addressLines: [String?]? = nil
+  var subLocality: String? = nil
+  var city: String? = nil
+  var postalCode: String? = nil
+  var subAdministrativeArea: String? = nil
+  var administrativeArea: String? = nil
+  var country: String? = nil
+  var countryCode: String? = nil
 
-    // swift-format-ignore: AlwaysUseLowerCamelCase
-    static func fromList(_ __pigeon_list: [Any?]) -> ApplePayContactDTO? {
-        let phoneNumber: String? = nilOrValue(__pigeon_list[0])
-        let emailAddress: String? = nilOrValue(__pigeon_list[1])
-        let givenName: String? = nilOrValue(__pigeon_list[2])
-        let familyName: String? = nilOrValue(__pigeon_list[3])
-        let phoneticGivenName: String? = nilOrValue(__pigeon_list[4])
-        let phoneticFamilyName: String? = nilOrValue(__pigeon_list[5])
-        let addressLines: [String?]? = nilOrValue(__pigeon_list[6])
-        let subLocality: String? = nilOrValue(__pigeon_list[7])
-        let city: String? = nilOrValue(__pigeon_list[8])
-        let postalCode: String? = nilOrValue(__pigeon_list[9])
-        let subAdministrativeArea: String? = nilOrValue(__pigeon_list[10])
-        let administrativeArea: String? = nilOrValue(__pigeon_list[11])
-        let country: String? = nilOrValue(__pigeon_list[12])
-        let countryCode: String? = nilOrValue(__pigeon_list[13])
+  // swift-format-ignore: AlwaysUseLowerCamelCase
+  static func fromList(_ __pigeon_list: [Any?]) -> ApplePayContactDTO? {
+    let phoneNumber: String? = nilOrValue(__pigeon_list[0])
+    let emailAddress: String? = nilOrValue(__pigeon_list[1])
+    let givenName: String? = nilOrValue(__pigeon_list[2])
+    let familyName: String? = nilOrValue(__pigeon_list[3])
+    let phoneticGivenName: String? = nilOrValue(__pigeon_list[4])
+    let phoneticFamilyName: String? = nilOrValue(__pigeon_list[5])
+    let addressLines: [String?]? = nilOrValue(__pigeon_list[6])
+    let subLocality: String? = nilOrValue(__pigeon_list[7])
+    let city: String? = nilOrValue(__pigeon_list[8])
+    let postalCode: String? = nilOrValue(__pigeon_list[9])
+    let subAdministrativeArea: String? = nilOrValue(__pigeon_list[10])
+    let administrativeArea: String? = nilOrValue(__pigeon_list[11])
+    let country: String? = nilOrValue(__pigeon_list[12])
+    let countryCode: String? = nilOrValue(__pigeon_list[13])
 
-        return ApplePayContactDTO(
-            phoneNumber: phoneNumber,
-            emailAddress: emailAddress,
-            givenName: givenName,
-            familyName: familyName,
-            phoneticGivenName: phoneticGivenName,
-            phoneticFamilyName: phoneticFamilyName,
-            addressLines: addressLines,
-            subLocality: subLocality,
-            city: city,
-            postalCode: postalCode,
-            subAdministrativeArea: subAdministrativeArea,
-            administrativeArea: administrativeArea,
-            country: country,
-            countryCode: countryCode
-        )
-    }
-
-    func toList() -> [Any?] {
-        [
-            phoneNumber,
-            emailAddress,
-            givenName,
-            familyName,
-            phoneticGivenName,
-            phoneticFamilyName,
-            addressLines,
-            subLocality,
-            city,
-            postalCode,
-            subAdministrativeArea,
-            administrativeArea,
-            country,
-            countryCode
-        ]
-    }
+    return ApplePayContactDTO(
+      phoneNumber: phoneNumber,
+      emailAddress: emailAddress,
+      givenName: givenName,
+      familyName: familyName,
+      phoneticGivenName: phoneticGivenName,
+      phoneticFamilyName: phoneticFamilyName,
+      addressLines: addressLines,
+      subLocality: subLocality,
+      city: city,
+      postalCode: postalCode,
+      subAdministrativeArea: subAdministrativeArea,
+      administrativeArea: administrativeArea,
+      country: country,
+      countryCode: countryCode
+    )
+  }
+  func toList() -> [Any?] {
+    return [
+      phoneNumber,
+      emailAddress,
+      givenName,
+      familyName,
+      phoneticGivenName,
+      phoneticFamilyName,
+      addressLines,
+      subLocality,
+      city,
+      postalCode,
+      subAdministrativeArea,
+      administrativeArea,
+      country,
+      countryCode,
+    ]
+  }
 }
 
 /// Generated class from Pigeon that represents data sent in messages.
 struct ApplePayShippingMethodDTO {
-    var label: String
-    var detail: String
-    var amount: AmountDTO
-    var identifier: String
-    var startDate: String?
-    var endDate: String?
+  var label: String
+  var detail: String
+  var amount: AmountDTO
+  var identifier: String
+  var startDate: String? = nil
+  var endDate: String? = nil
 
-    // swift-format-ignore: AlwaysUseLowerCamelCase
-    static func fromList(_ __pigeon_list: [Any?]) -> ApplePayShippingMethodDTO? {
-        let label = __pigeon_list[0] as! String
-        let detail = __pigeon_list[1] as! String
-        let amount = __pigeon_list[2] as! AmountDTO
-        let identifier = __pigeon_list[3] as! String
-        let startDate: String? = nilOrValue(__pigeon_list[4])
-        let endDate: String? = nilOrValue(__pigeon_list[5])
+  // swift-format-ignore: AlwaysUseLowerCamelCase
+  static func fromList(_ __pigeon_list: [Any?]) -> ApplePayShippingMethodDTO? {
+    let label = __pigeon_list[0] as! String
+    let detail = __pigeon_list[1] as! String
+    let amount = __pigeon_list[2] as! AmountDTO
+    let identifier = __pigeon_list[3] as! String
+    let startDate: String? = nilOrValue(__pigeon_list[4])
+    let endDate: String? = nilOrValue(__pigeon_list[5])
 
-        return ApplePayShippingMethodDTO(
-            label: label,
-            detail: detail,
-            amount: amount,
-            identifier: identifier,
-            startDate: startDate,
-            endDate: endDate
-        )
-    }
-
-    func toList() -> [Any?] {
-        [
-            label,
-            detail,
-            amount,
-            identifier,
-            startDate,
-            endDate
-        ]
-    }
+    return ApplePayShippingMethodDTO(
+      label: label,
+      detail: detail,
+      amount: amount,
+      identifier: identifier,
+      startDate: startDate,
+      endDate: endDate
+    )
+  }
+  func toList() -> [Any?] {
+    return [
+      label,
+      detail,
+      amount,
+      identifier,
+      startDate,
+      endDate,
+    ]
+  }
 }
 
 /// Generated class from Pigeon that represents data sent in messages.
 struct ApplePaySummaryItemDTO {
-    var label: String
-    var amount: AmountDTO
-    var type: ApplePaySummaryItemType
+  var label: String
+  var amount: AmountDTO
+  var type: ApplePaySummaryItemType
 
-    // swift-format-ignore: AlwaysUseLowerCamelCase
-    static func fromList(_ __pigeon_list: [Any?]) -> ApplePaySummaryItemDTO? {
-        let label = __pigeon_list[0] as! String
-        let amount = __pigeon_list[1] as! AmountDTO
-        let type = __pigeon_list[2] as! ApplePaySummaryItemType
+  // swift-format-ignore: AlwaysUseLowerCamelCase
+  static func fromList(_ __pigeon_list: [Any?]) -> ApplePaySummaryItemDTO? {
+    let label = __pigeon_list[0] as! String
+    let amount = __pigeon_list[1] as! AmountDTO
+    let type = __pigeon_list[2] as! ApplePaySummaryItemType
 
-        return ApplePaySummaryItemDTO(
-            label: label,
-            amount: amount,
-            type: type
-        )
-    }
-
-    func toList() -> [Any?] {
-        [
-            label,
-            amount,
-            type
-        ]
-    }
+    return ApplePaySummaryItemDTO(
+      label: label,
+      amount: amount,
+      type: type
+    )
+  }
+  func toList() -> [Any?] {
+    return [
+      label,
+      amount,
+      type,
+    ]
+  }
 }
 
 /// Generated class from Pigeon that represents data sent in messages.
 struct GooglePayConfigurationDTO {
-    var googlePayEnvironment: GooglePayEnvironment
-    var merchantAccount: String?
-    var merchantInfoDTO: MerchantInfoDTO?
-    var totalPriceStatus: TotalPriceStatus?
-    var allowedCardNetworks: [String?]?
-    var allowedAuthMethods: [String?]?
-    var allowPrepaidCards: Bool?
-    var allowCreditCards: Bool?
-    var assuranceDetailsRequired: Bool?
-    var emailRequired: Bool?
-    var existingPaymentMethodRequired: Bool?
-    var shippingAddressRequired: Bool?
-    var shippingAddressParametersDTO: ShippingAddressParametersDTO?
-    var billingAddressRequired: Bool?
-    var billingAddressParametersDTO: BillingAddressParametersDTO?
+  var googlePayEnvironment: GooglePayEnvironment
+  var merchantAccount: String? = nil
+  var merchantInfoDTO: MerchantInfoDTO? = nil
+  var totalPriceStatus: TotalPriceStatus? = nil
+  var allowedCardNetworks: [String?]? = nil
+  var allowedAuthMethods: [String?]? = nil
+  var allowPrepaidCards: Bool? = nil
+  var allowCreditCards: Bool? = nil
+  var assuranceDetailsRequired: Bool? = nil
+  var emailRequired: Bool? = nil
+  var existingPaymentMethodRequired: Bool? = nil
+  var shippingAddressRequired: Bool? = nil
+  var shippingAddressParametersDTO: ShippingAddressParametersDTO? = nil
+  var billingAddressRequired: Bool? = nil
+  var billingAddressParametersDTO: BillingAddressParametersDTO? = nil
 
-    // swift-format-ignore: AlwaysUseLowerCamelCase
-    static func fromList(_ __pigeon_list: [Any?]) -> GooglePayConfigurationDTO? {
-        let googlePayEnvironment = __pigeon_list[0] as! GooglePayEnvironment
-        let merchantAccount: String? = nilOrValue(__pigeon_list[1])
-        let merchantInfoDTO: MerchantInfoDTO? = nilOrValue(__pigeon_list[2])
-        let totalPriceStatus: TotalPriceStatus? = nilOrValue(__pigeon_list[3])
-        let allowedCardNetworks: [String?]? = nilOrValue(__pigeon_list[4])
-        let allowedAuthMethods: [String?]? = nilOrValue(__pigeon_list[5])
-        let allowPrepaidCards: Bool? = nilOrValue(__pigeon_list[6])
-        let allowCreditCards: Bool? = nilOrValue(__pigeon_list[7])
-        let assuranceDetailsRequired: Bool? = nilOrValue(__pigeon_list[8])
-        let emailRequired: Bool? = nilOrValue(__pigeon_list[9])
-        let existingPaymentMethodRequired: Bool? = nilOrValue(__pigeon_list[10])
-        let shippingAddressRequired: Bool? = nilOrValue(__pigeon_list[11])
-        let shippingAddressParametersDTO: ShippingAddressParametersDTO? = nilOrValue(__pigeon_list[12])
-        let billingAddressRequired: Bool? = nilOrValue(__pigeon_list[13])
-        let billingAddressParametersDTO: BillingAddressParametersDTO? = nilOrValue(__pigeon_list[14])
+  // swift-format-ignore: AlwaysUseLowerCamelCase
+  static func fromList(_ __pigeon_list: [Any?]) -> GooglePayConfigurationDTO? {
+    let googlePayEnvironment = __pigeon_list[0] as! GooglePayEnvironment
+    let merchantAccount: String? = nilOrValue(__pigeon_list[1])
+    let merchantInfoDTO: MerchantInfoDTO? = nilOrValue(__pigeon_list[2])
+    let totalPriceStatus: TotalPriceStatus? = nilOrValue(__pigeon_list[3])
+    let allowedCardNetworks: [String?]? = nilOrValue(__pigeon_list[4])
+    let allowedAuthMethods: [String?]? = nilOrValue(__pigeon_list[5])
+    let allowPrepaidCards: Bool? = nilOrValue(__pigeon_list[6])
+    let allowCreditCards: Bool? = nilOrValue(__pigeon_list[7])
+    let assuranceDetailsRequired: Bool? = nilOrValue(__pigeon_list[8])
+    let emailRequired: Bool? = nilOrValue(__pigeon_list[9])
+    let existingPaymentMethodRequired: Bool? = nilOrValue(__pigeon_list[10])
+    let shippingAddressRequired: Bool? = nilOrValue(__pigeon_list[11])
+    let shippingAddressParametersDTO: ShippingAddressParametersDTO? = nilOrValue(__pigeon_list[12])
+    let billingAddressRequired: Bool? = nilOrValue(__pigeon_list[13])
+    let billingAddressParametersDTO: BillingAddressParametersDTO? = nilOrValue(__pigeon_list[14])
 
-        return GooglePayConfigurationDTO(
-            googlePayEnvironment: googlePayEnvironment,
-            merchantAccount: merchantAccount,
-            merchantInfoDTO: merchantInfoDTO,
-            totalPriceStatus: totalPriceStatus,
-            allowedCardNetworks: allowedCardNetworks,
-            allowedAuthMethods: allowedAuthMethods,
-            allowPrepaidCards: allowPrepaidCards,
-            allowCreditCards: allowCreditCards,
-            assuranceDetailsRequired: assuranceDetailsRequired,
-            emailRequired: emailRequired,
-            existingPaymentMethodRequired: existingPaymentMethodRequired,
-            shippingAddressRequired: shippingAddressRequired,
-            shippingAddressParametersDTO: shippingAddressParametersDTO,
-            billingAddressRequired: billingAddressRequired,
-            billingAddressParametersDTO: billingAddressParametersDTO
-        )
-    }
-
-    func toList() -> [Any?] {
-        [
-            googlePayEnvironment,
-            merchantAccount,
-            merchantInfoDTO,
-            totalPriceStatus,
-            allowedCardNetworks,
-            allowedAuthMethods,
-            allowPrepaidCards,
-            allowCreditCards,
-            assuranceDetailsRequired,
-            emailRequired,
-            existingPaymentMethodRequired,
-            shippingAddressRequired,
-            shippingAddressParametersDTO,
-            billingAddressRequired,
-            billingAddressParametersDTO
-        ]
-    }
+    return GooglePayConfigurationDTO(
+      googlePayEnvironment: googlePayEnvironment,
+      merchantAccount: merchantAccount,
+      merchantInfoDTO: merchantInfoDTO,
+      totalPriceStatus: totalPriceStatus,
+      allowedCardNetworks: allowedCardNetworks,
+      allowedAuthMethods: allowedAuthMethods,
+      allowPrepaidCards: allowPrepaidCards,
+      allowCreditCards: allowCreditCards,
+      assuranceDetailsRequired: assuranceDetailsRequired,
+      emailRequired: emailRequired,
+      existingPaymentMethodRequired: existingPaymentMethodRequired,
+      shippingAddressRequired: shippingAddressRequired,
+      shippingAddressParametersDTO: shippingAddressParametersDTO,
+      billingAddressRequired: billingAddressRequired,
+      billingAddressParametersDTO: billingAddressParametersDTO
+    )
+  }
+  func toList() -> [Any?] {
+    return [
+      googlePayEnvironment,
+      merchantAccount,
+      merchantInfoDTO,
+      totalPriceStatus,
+      allowedCardNetworks,
+      allowedAuthMethods,
+      allowPrepaidCards,
+      allowCreditCards,
+      assuranceDetailsRequired,
+      emailRequired,
+      existingPaymentMethodRequired,
+      shippingAddressRequired,
+      shippingAddressParametersDTO,
+      billingAddressRequired,
+      billingAddressParametersDTO,
+    ]
+  }
 }
 
 /// Generated class from Pigeon that represents data sent in messages.
 struct MerchantInfoDTO {
-    var merchantName: String?
-    var merchantId: String?
+  var merchantName: String? = nil
+  var merchantId: String? = nil
 
-    // swift-format-ignore: AlwaysUseLowerCamelCase
-    static func fromList(_ __pigeon_list: [Any?]) -> MerchantInfoDTO? {
-        let merchantName: String? = nilOrValue(__pigeon_list[0])
-        let merchantId: String? = nilOrValue(__pigeon_list[1])
+  // swift-format-ignore: AlwaysUseLowerCamelCase
+  static func fromList(_ __pigeon_list: [Any?]) -> MerchantInfoDTO? {
+    let merchantName: String? = nilOrValue(__pigeon_list[0])
+    let merchantId: String? = nilOrValue(__pigeon_list[1])
 
-        return MerchantInfoDTO(
-            merchantName: merchantName,
-            merchantId: merchantId
-        )
-    }
-
-    func toList() -> [Any?] {
-        [
-            merchantName,
-            merchantId
-        ]
-    }
+    return MerchantInfoDTO(
+      merchantName: merchantName,
+      merchantId: merchantId
+    )
+  }
+  func toList() -> [Any?] {
+    return [
+      merchantName,
+      merchantId,
+    ]
+  }
 }
 
 /// Generated class from Pigeon that represents data sent in messages.
 struct ShippingAddressParametersDTO {
-    var allowedCountryCodes: [String?]?
-    var isPhoneNumberRequired: Bool?
+  var allowedCountryCodes: [String?]? = nil
+  var isPhoneNumberRequired: Bool? = nil
 
-    // swift-format-ignore: AlwaysUseLowerCamelCase
-    static func fromList(_ __pigeon_list: [Any?]) -> ShippingAddressParametersDTO? {
-        let allowedCountryCodes: [String?]? = nilOrValue(__pigeon_list[0])
-        let isPhoneNumberRequired: Bool? = nilOrValue(__pigeon_list[1])
+  // swift-format-ignore: AlwaysUseLowerCamelCase
+  static func fromList(_ __pigeon_list: [Any?]) -> ShippingAddressParametersDTO? {
+    let allowedCountryCodes: [String?]? = nilOrValue(__pigeon_list[0])
+    let isPhoneNumberRequired: Bool? = nilOrValue(__pigeon_list[1])
 
-        return ShippingAddressParametersDTO(
-            allowedCountryCodes: allowedCountryCodes,
-            isPhoneNumberRequired: isPhoneNumberRequired
-        )
-    }
-
-    func toList() -> [Any?] {
-        [
-            allowedCountryCodes,
-            isPhoneNumberRequired
-        ]
-    }
+    return ShippingAddressParametersDTO(
+      allowedCountryCodes: allowedCountryCodes,
+      isPhoneNumberRequired: isPhoneNumberRequired
+    )
+  }
+  func toList() -> [Any?] {
+    return [
+      allowedCountryCodes,
+      isPhoneNumberRequired,
+    ]
+  }
 }
 
 /// Generated class from Pigeon that represents data sent in messages.
 struct BillingAddressParametersDTO {
-    var format: String?
-    var isPhoneNumberRequired: Bool?
+  var format: String? = nil
+  var isPhoneNumberRequired: Bool? = nil
 
-    // swift-format-ignore: AlwaysUseLowerCamelCase
-    static func fromList(_ __pigeon_list: [Any?]) -> BillingAddressParametersDTO? {
-        let format: String? = nilOrValue(__pigeon_list[0])
-        let isPhoneNumberRequired: Bool? = nilOrValue(__pigeon_list[1])
+  // swift-format-ignore: AlwaysUseLowerCamelCase
+  static func fromList(_ __pigeon_list: [Any?]) -> BillingAddressParametersDTO? {
+    let format: String? = nilOrValue(__pigeon_list[0])
+    let isPhoneNumberRequired: Bool? = nilOrValue(__pigeon_list[1])
 
-        return BillingAddressParametersDTO(
-            format: format,
-            isPhoneNumberRequired: isPhoneNumberRequired
-        )
-    }
-
-    func toList() -> [Any?] {
-        [
-            format,
-            isPhoneNumberRequired
-        ]
-    }
+    return BillingAddressParametersDTO(
+      format: format,
+      isPhoneNumberRequired: isPhoneNumberRequired
+    )
+  }
+  func toList() -> [Any?] {
+    return [
+      format,
+      isPhoneNumberRequired,
+    ]
+  }
 }
 
 /// Generated class from Pigeon that represents data sent in messages.
 struct CashAppPayConfigurationDTO {
-    var cashAppPayEnvironment: CashAppPayEnvironment
-    var returnUrl: String
+  var cashAppPayEnvironment: CashAppPayEnvironment
+  var returnUrl: String
 
-    // swift-format-ignore: AlwaysUseLowerCamelCase
-    static func fromList(_ __pigeon_list: [Any?]) -> CashAppPayConfigurationDTO? {
-        let cashAppPayEnvironment = __pigeon_list[0] as! CashAppPayEnvironment
-        let returnUrl = __pigeon_list[1] as! String
+  // swift-format-ignore: AlwaysUseLowerCamelCase
+  static func fromList(_ __pigeon_list: [Any?]) -> CashAppPayConfigurationDTO? {
+    let cashAppPayEnvironment = __pigeon_list[0] as! CashAppPayEnvironment
+    let returnUrl = __pigeon_list[1] as! String
 
-        return CashAppPayConfigurationDTO(
-            cashAppPayEnvironment: cashAppPayEnvironment,
-            returnUrl: returnUrl
-        )
-    }
-
-    func toList() -> [Any?] {
-        [
-            cashAppPayEnvironment,
-            returnUrl
-        ]
-    }
+    return CashAppPayConfigurationDTO(
+      cashAppPayEnvironment: cashAppPayEnvironment,
+      returnUrl: returnUrl
+    )
+  }
+  func toList() -> [Any?] {
+    return [
+      cashAppPayEnvironment,
+      returnUrl,
+    ]
+  }
 }
 
 /// Generated class from Pigeon that represents data sent in messages.
 struct TwintConfigurationDTO {
-    var iosCallbackAppScheme: String
-    var showStorePaymentField: Bool
+  var iosCallbackAppScheme: String
+  var showStorePaymentField: Bool
 
-    // swift-format-ignore: AlwaysUseLowerCamelCase
-    static func fromList(_ __pigeon_list: [Any?]) -> TwintConfigurationDTO? {
-        let iosCallbackAppScheme = __pigeon_list[0] as! String
-        let showStorePaymentField = __pigeon_list[1] as! Bool
+  // swift-format-ignore: AlwaysUseLowerCamelCase
+  static func fromList(_ __pigeon_list: [Any?]) -> TwintConfigurationDTO? {
+    let iosCallbackAppScheme = __pigeon_list[0] as! String
+    let showStorePaymentField = __pigeon_list[1] as! Bool
 
-        return TwintConfigurationDTO(
-            iosCallbackAppScheme: iosCallbackAppScheme,
-            showStorePaymentField: showStorePaymentField
-        )
-    }
-
-    func toList() -> [Any?] {
-        [
-            iosCallbackAppScheme,
-            showStorePaymentField
-        ]
-    }
+    return TwintConfigurationDTO(
+      iosCallbackAppScheme: iosCallbackAppScheme,
+      showStorePaymentField: showStorePaymentField
+    )
+  }
+  func toList() -> [Any?] {
+    return [
+      iosCallbackAppScheme,
+      showStorePaymentField,
+    ]
+  }
 }
 
 /// Generated class from Pigeon that represents data sent in messages.
 struct PaymentResultDTO {
-    var type: PaymentResultEnum
-    var reason: String?
-    var result: PaymentResultModelDTO?
+  var type: PaymentResultEnum
+  var reason: String? = nil
+  var result: PaymentResultModelDTO? = nil
 
-    // swift-format-ignore: AlwaysUseLowerCamelCase
-    static func fromList(_ __pigeon_list: [Any?]) -> PaymentResultDTO? {
-        let type = __pigeon_list[0] as! PaymentResultEnum
-        let reason: String? = nilOrValue(__pigeon_list[1])
-        let result: PaymentResultModelDTO? = nilOrValue(__pigeon_list[2])
+  // swift-format-ignore: AlwaysUseLowerCamelCase
+  static func fromList(_ __pigeon_list: [Any?]) -> PaymentResultDTO? {
+    let type = __pigeon_list[0] as! PaymentResultEnum
+    let reason: String? = nilOrValue(__pigeon_list[1])
+    let result: PaymentResultModelDTO? = nilOrValue(__pigeon_list[2])
 
-        return PaymentResultDTO(
-            type: type,
-            reason: reason,
-            result: result
-        )
-    }
-
-    func toList() -> [Any?] {
-        [
-            type,
-            reason,
-            result
-        ]
-    }
+    return PaymentResultDTO(
+      type: type,
+      reason: reason,
+      result: result
+    )
+  }
+  func toList() -> [Any?] {
+    return [
+      type,
+      reason,
+      result,
+    ]
+  }
 }
 
 /// Generated class from Pigeon that represents data sent in messages.
 struct PaymentResultModelDTO {
-    var sessionId: String?
-    var sessionData: String?
-    var sessionResult: String?
-    var resultCode: String?
-    var order: OrderResponseDTO?
+  var sessionId: String? = nil
+  var sessionData: String? = nil
+  var sessionResult: String? = nil
+  var resultCode: String? = nil
+  var order: OrderResponseDTO? = nil
 
-    // swift-format-ignore: AlwaysUseLowerCamelCase
-    static func fromList(_ __pigeon_list: [Any?]) -> PaymentResultModelDTO? {
-        let sessionId: String? = nilOrValue(__pigeon_list[0])
-        let sessionData: String? = nilOrValue(__pigeon_list[1])
-        let sessionResult: String? = nilOrValue(__pigeon_list[2])
-        let resultCode: String? = nilOrValue(__pigeon_list[3])
-        let order: OrderResponseDTO? = nilOrValue(__pigeon_list[4])
+  // swift-format-ignore: AlwaysUseLowerCamelCase
+  static func fromList(_ __pigeon_list: [Any?]) -> PaymentResultModelDTO? {
+    let sessionId: String? = nilOrValue(__pigeon_list[0])
+    let sessionData: String? = nilOrValue(__pigeon_list[1])
+    let sessionResult: String? = nilOrValue(__pigeon_list[2])
+    let resultCode: String? = nilOrValue(__pigeon_list[3])
+    let order: OrderResponseDTO? = nilOrValue(__pigeon_list[4])
 
-        return PaymentResultModelDTO(
-            sessionId: sessionId,
-            sessionData: sessionData,
-            sessionResult: sessionResult,
-            resultCode: resultCode,
-            order: order
-        )
-    }
-
-    func toList() -> [Any?] {
-        [
-            sessionId,
-            sessionData,
-            sessionResult,
-            resultCode,
-            order
-        ]
-    }
+    return PaymentResultModelDTO(
+      sessionId: sessionId,
+      sessionData: sessionData,
+      sessionResult: sessionResult,
+      resultCode: resultCode,
+      order: order
+    )
+  }
+  func toList() -> [Any?] {
+    return [
+      sessionId,
+      sessionData,
+      sessionResult,
+      resultCode,
+      order,
+    ]
+  }
 }
 
 /// Generated class from Pigeon that represents data sent in messages.
 struct OrderResponseDTO {
-    var pspReference: String
-    var orderData: String
-    var amount: AmountDTO?
-    var remainingAmount: AmountDTO?
+  var pspReference: String
+  var orderData: String
+  var amount: AmountDTO? = nil
+  var remainingAmount: AmountDTO? = nil
 
-    // swift-format-ignore: AlwaysUseLowerCamelCase
-    static func fromList(_ __pigeon_list: [Any?]) -> OrderResponseDTO? {
-        let pspReference = __pigeon_list[0] as! String
-        let orderData = __pigeon_list[1] as! String
-        let amount: AmountDTO? = nilOrValue(__pigeon_list[2])
-        let remainingAmount: AmountDTO? = nilOrValue(__pigeon_list[3])
+  // swift-format-ignore: AlwaysUseLowerCamelCase
+  static func fromList(_ __pigeon_list: [Any?]) -> OrderResponseDTO? {
+    let pspReference = __pigeon_list[0] as! String
+    let orderData = __pigeon_list[1] as! String
+    let amount: AmountDTO? = nilOrValue(__pigeon_list[2])
+    let remainingAmount: AmountDTO? = nilOrValue(__pigeon_list[3])
 
-        return OrderResponseDTO(
-            pspReference: pspReference,
-            orderData: orderData,
-            amount: amount,
-            remainingAmount: remainingAmount
-        )
-    }
-
-    func toList() -> [Any?] {
-        [
-            pspReference,
-            orderData,
-            amount,
-            remainingAmount
-        ]
-    }
+    return OrderResponseDTO(
+      pspReference: pspReference,
+      orderData: orderData,
+      amount: amount,
+      remainingAmount: remainingAmount
+    )
+  }
+  func toList() -> [Any?] {
+    return [
+      pspReference,
+      orderData,
+      amount,
+      remainingAmount,
+    ]
+  }
 }
 
 /// Generated class from Pigeon that represents data sent in messages.
 struct CheckoutEvent {
-    var type: CheckoutEventType
-    var data: Any?
+  var type: CheckoutEventType
+  var data: Any? = nil
 
-    // swift-format-ignore: AlwaysUseLowerCamelCase
-    static func fromList(_ __pigeon_list: [Any?]) -> CheckoutEvent? {
-        let type = __pigeon_list[0] as! CheckoutEventType
-        let data: Any? = __pigeon_list[1]
+  // swift-format-ignore: AlwaysUseLowerCamelCase
+  static func fromList(_ __pigeon_list: [Any?]) -> CheckoutEvent? {
+    let type = __pigeon_list[0] as! CheckoutEventType
+    let data: Any? = __pigeon_list[1]
 
-        return CheckoutEvent(
-            type: type,
-            data: data
-        )
-    }
-
-    func toList() -> [Any?] {
-        [
-            type,
-            data
-        ]
-    }
+    return CheckoutEvent(
+      type: type,
+      data: data
+    )
+  }
+  func toList() -> [Any?] {
+    return [
+      type,
+      data,
+    ]
+  }
 }
 
 /// Generated class from Pigeon that represents data sent in messages.
 struct ComponentCommunicationModel {
-    var type: ComponentCommunicationType
-    var componentId: String
-    var data: Any?
-    var paymentResult: PaymentResultDTO?
+  var type: ComponentCommunicationType
+  var componentId: String
+  var data: Any? = nil
+  var paymentResult: PaymentResultDTO? = nil
 
-    // swift-format-ignore: AlwaysUseLowerCamelCase
-    static func fromList(_ __pigeon_list: [Any?]) -> ComponentCommunicationModel? {
-        let type = __pigeon_list[0] as! ComponentCommunicationType
-        let componentId = __pigeon_list[1] as! String
-        let data: Any? = __pigeon_list[2]
-        let paymentResult: PaymentResultDTO? = nilOrValue(__pigeon_list[3])
+  // swift-format-ignore: AlwaysUseLowerCamelCase
+  static func fromList(_ __pigeon_list: [Any?]) -> ComponentCommunicationModel? {
+    let type = __pigeon_list[0] as! ComponentCommunicationType
+    let componentId = __pigeon_list[1] as! String
+    let data: Any? = __pigeon_list[2]
+    let paymentResult: PaymentResultDTO? = nilOrValue(__pigeon_list[3])
 
-        return ComponentCommunicationModel(
-            type: type,
-            componentId: componentId,
-            data: data,
-            paymentResult: paymentResult
-        )
-    }
-
-    func toList() -> [Any?] {
-        [
-            type,
-            componentId,
-            data,
-            paymentResult
-        ]
-    }
+    return ComponentCommunicationModel(
+      type: type,
+      componentId: componentId,
+      data: data,
+      paymentResult: paymentResult
+    )
+  }
+  func toList() -> [Any?] {
+    return [
+      type,
+      componentId,
+      data,
+      paymentResult,
+    ]
+  }
 }
 
 /// Generated class from Pigeon that represents data sent in messages.
 struct PaymentEventDTO {
-    var paymentEventType: PaymentEventType
-    var result: String?
-    var data: [String?: Any?]?
-    var error: ErrorDTO?
+  var paymentEventType: PaymentEventType
+  var result: String? = nil
+  var data: [String?: Any?]? = nil
+  var error: ErrorDTO? = nil
 
-    // swift-format-ignore: AlwaysUseLowerCamelCase
-    static func fromList(_ __pigeon_list: [Any?]) -> PaymentEventDTO? {
-        let paymentEventType = __pigeon_list[0] as! PaymentEventType
-        let result: String? = nilOrValue(__pigeon_list[1])
-        let data: [String?: Any?]? = nilOrValue(__pigeon_list[2])
-        let error: ErrorDTO? = nilOrValue(__pigeon_list[3])
+  // swift-format-ignore: AlwaysUseLowerCamelCase
+  static func fromList(_ __pigeon_list: [Any?]) -> PaymentEventDTO? {
+    let paymentEventType = __pigeon_list[0] as! PaymentEventType
+    let result: String? = nilOrValue(__pigeon_list[1])
+    let data: [String?: Any?]? = nilOrValue(__pigeon_list[2])
+    let error: ErrorDTO? = nilOrValue(__pigeon_list[3])
 
-        return PaymentEventDTO(
-            paymentEventType: paymentEventType,
-            result: result,
-            data: data,
-            error: error
-        )
-    }
-
-    func toList() -> [Any?] {
-        [
-            paymentEventType,
-            result,
-            data,
-            error
-        ]
-    }
+    return PaymentEventDTO(
+      paymentEventType: paymentEventType,
+      result: result,
+      data: data,
+      error: error
+    )
+  }
+  func toList() -> [Any?] {
+    return [
+      paymentEventType,
+      result,
+      data,
+      error,
+    ]
+  }
 }
 
 /// Generated class from Pigeon that represents data sent in messages.
 struct ErrorDTO {
-    var errorMessage: String?
-    var reason: String?
-    var dismissDropIn: Bool?
+  var errorMessage: String? = nil
+  var reason: String? = nil
+  var dismissDropIn: Bool? = nil
 
-    // swift-format-ignore: AlwaysUseLowerCamelCase
-    static func fromList(_ __pigeon_list: [Any?]) -> ErrorDTO? {
-        let errorMessage: String? = nilOrValue(__pigeon_list[0])
-        let reason: String? = nilOrValue(__pigeon_list[1])
-        let dismissDropIn: Bool? = nilOrValue(__pigeon_list[2])
+  // swift-format-ignore: AlwaysUseLowerCamelCase
+  static func fromList(_ __pigeon_list: [Any?]) -> ErrorDTO? {
+    let errorMessage: String? = nilOrValue(__pigeon_list[0])
+    let reason: String? = nilOrValue(__pigeon_list[1])
+    let dismissDropIn: Bool? = nilOrValue(__pigeon_list[2])
 
-        return ErrorDTO(
-            errorMessage: errorMessage,
-            reason: reason,
-            dismissDropIn: dismissDropIn
-        )
-    }
-
-    func toList() -> [Any?] {
-        [
-            errorMessage,
-            reason,
-            dismissDropIn
-        ]
-    }
+    return ErrorDTO(
+      errorMessage: errorMessage,
+      reason: reason,
+      dismissDropIn: dismissDropIn
+    )
+  }
+  func toList() -> [Any?] {
+    return [
+      errorMessage,
+      reason,
+      dismissDropIn,
+    ]
+  }
 }
 
 /// Generated class from Pigeon that represents data sent in messages.
 struct DeletedStoredPaymentMethodResultDTO {
-    var storedPaymentMethodId: String
-    var isSuccessfullyRemoved: Bool
+  var storedPaymentMethodId: String
+  var isSuccessfullyRemoved: Bool
 
-    // swift-format-ignore: AlwaysUseLowerCamelCase
-    static func fromList(_ __pigeon_list: [Any?]) -> DeletedStoredPaymentMethodResultDTO? {
-        let storedPaymentMethodId = __pigeon_list[0] as! String
-        let isSuccessfullyRemoved = __pigeon_list[1] as! Bool
+  // swift-format-ignore: AlwaysUseLowerCamelCase
+  static func fromList(_ __pigeon_list: [Any?]) -> DeletedStoredPaymentMethodResultDTO? {
+    let storedPaymentMethodId = __pigeon_list[0] as! String
+    let isSuccessfullyRemoved = __pigeon_list[1] as! Bool
 
-        return DeletedStoredPaymentMethodResultDTO(
-            storedPaymentMethodId: storedPaymentMethodId,
-            isSuccessfullyRemoved: isSuccessfullyRemoved
-        )
-    }
-
-    func toList() -> [Any?] {
-        [
-            storedPaymentMethodId,
-            isSuccessfullyRemoved
-        ]
-    }
+    return DeletedStoredPaymentMethodResultDTO(
+      storedPaymentMethodId: storedPaymentMethodId,
+      isSuccessfullyRemoved: isSuccessfullyRemoved
+    )
+  }
+  func toList() -> [Any?] {
+    return [
+      storedPaymentMethodId,
+      isSuccessfullyRemoved,
+    ]
+  }
 }
 
 /// Generated class from Pigeon that represents data sent in messages.
 struct CardComponentConfigurationDTO {
-    var environment: Environment
-    var clientKey: String
-    var countryCode: String
-    var amount: AmountDTO?
-    var shopperLocale: String?
-    var cardConfiguration: CardConfigurationDTO
-    var threeDS2ConfigurationDTO: ThreeDS2ConfigurationDTO?
-    var analyticsOptionsDTO: AnalyticsOptionsDTO
+  var environment: Environment
+  var clientKey: String
+  var countryCode: String
+  var amount: AmountDTO? = nil
+  var shopperLocale: String? = nil
+  var cardConfiguration: CardConfigurationDTO
+  var threeDS2ConfigurationDTO: ThreeDS2ConfigurationDTO? = nil
+  var analyticsOptionsDTO: AnalyticsOptionsDTO
 
-    // swift-format-ignore: AlwaysUseLowerCamelCase
-    static func fromList(_ __pigeon_list: [Any?]) -> CardComponentConfigurationDTO? {
-        let environment = __pigeon_list[0] as! Environment
-        let clientKey = __pigeon_list[1] as! String
-        let countryCode = __pigeon_list[2] as! String
-        let amount: AmountDTO? = nilOrValue(__pigeon_list[3])
-        let shopperLocale: String? = nilOrValue(__pigeon_list[4])
-        let cardConfiguration = __pigeon_list[5] as! CardConfigurationDTO
-        let threeDS2ConfigurationDTO: ThreeDS2ConfigurationDTO? = nilOrValue(__pigeon_list[6])
-        let analyticsOptionsDTO = __pigeon_list[7] as! AnalyticsOptionsDTO
+  // swift-format-ignore: AlwaysUseLowerCamelCase
+  static func fromList(_ __pigeon_list: [Any?]) -> CardComponentConfigurationDTO? {
+    let environment = __pigeon_list[0] as! Environment
+    let clientKey = __pigeon_list[1] as! String
+    let countryCode = __pigeon_list[2] as! String
+    let amount: AmountDTO? = nilOrValue(__pigeon_list[3])
+    let shopperLocale: String? = nilOrValue(__pigeon_list[4])
+    let cardConfiguration = __pigeon_list[5] as! CardConfigurationDTO
+    let threeDS2ConfigurationDTO: ThreeDS2ConfigurationDTO? = nilOrValue(__pigeon_list[6])
+    let analyticsOptionsDTO = __pigeon_list[7] as! AnalyticsOptionsDTO
 
-        return CardComponentConfigurationDTO(
-            environment: environment,
-            clientKey: clientKey,
-            countryCode: countryCode,
-            amount: amount,
-            shopperLocale: shopperLocale,
-            cardConfiguration: cardConfiguration,
-            threeDS2ConfigurationDTO: threeDS2ConfigurationDTO,
-            analyticsOptionsDTO: analyticsOptionsDTO
-        )
-    }
-
-    func toList() -> [Any?] {
-        [
-            environment,
-            clientKey,
-            countryCode,
-            amount,
-            shopperLocale,
-            cardConfiguration,
-            threeDS2ConfigurationDTO,
-            analyticsOptionsDTO
-        ]
-    }
+    return CardComponentConfigurationDTO(
+      environment: environment,
+      clientKey: clientKey,
+      countryCode: countryCode,
+      amount: amount,
+      shopperLocale: shopperLocale,
+      cardConfiguration: cardConfiguration,
+      threeDS2ConfigurationDTO: threeDS2ConfigurationDTO,
+      analyticsOptionsDTO: analyticsOptionsDTO
+    )
+  }
+  func toList() -> [Any?] {
+    return [
+      environment,
+      clientKey,
+      countryCode,
+      amount,
+      shopperLocale,
+      cardConfiguration,
+      threeDS2ConfigurationDTO,
+      analyticsOptionsDTO,
+    ]
+  }
 }
 
 /// Generated class from Pigeon that represents data sent in messages.
 struct InstantPaymentConfigurationDTO {
-    var instantPaymentType: InstantPaymentType
-    var environment: Environment
-    var clientKey: String
-    var countryCode: String
-    var amount: AmountDTO?
-    var shopperLocale: String?
-    var analyticsOptionsDTO: AnalyticsOptionsDTO
-    var googlePayConfigurationDTO: GooglePayConfigurationDTO?
-    var applePayConfigurationDTO: ApplePayConfigurationDTO?
+  var instantPaymentType: InstantPaymentType
+  var environment: Environment
+  var clientKey: String
+  var countryCode: String
+  var amount: AmountDTO? = nil
+  var shopperLocale: String? = nil
+  var analyticsOptionsDTO: AnalyticsOptionsDTO
+  var googlePayConfigurationDTO: GooglePayConfigurationDTO? = nil
+  var applePayConfigurationDTO: ApplePayConfigurationDTO? = nil
 
-    // swift-format-ignore: AlwaysUseLowerCamelCase
-    static func fromList(_ __pigeon_list: [Any?]) -> InstantPaymentConfigurationDTO? {
-        let instantPaymentType = __pigeon_list[0] as! InstantPaymentType
-        let environment = __pigeon_list[1] as! Environment
-        let clientKey = __pigeon_list[2] as! String
-        let countryCode = __pigeon_list[3] as! String
-        let amount: AmountDTO? = nilOrValue(__pigeon_list[4])
-        let shopperLocale: String? = nilOrValue(__pigeon_list[5])
-        let analyticsOptionsDTO = __pigeon_list[6] as! AnalyticsOptionsDTO
-        let googlePayConfigurationDTO: GooglePayConfigurationDTO? = nilOrValue(__pigeon_list[7])
-        let applePayConfigurationDTO: ApplePayConfigurationDTO? = nilOrValue(__pigeon_list[8])
+  // swift-format-ignore: AlwaysUseLowerCamelCase
+  static func fromList(_ __pigeon_list: [Any?]) -> InstantPaymentConfigurationDTO? {
+    let instantPaymentType = __pigeon_list[0] as! InstantPaymentType
+    let environment = __pigeon_list[1] as! Environment
+    let clientKey = __pigeon_list[2] as! String
+    let countryCode = __pigeon_list[3] as! String
+    let amount: AmountDTO? = nilOrValue(__pigeon_list[4])
+    let shopperLocale: String? = nilOrValue(__pigeon_list[5])
+    let analyticsOptionsDTO = __pigeon_list[6] as! AnalyticsOptionsDTO
+    let googlePayConfigurationDTO: GooglePayConfigurationDTO? = nilOrValue(__pigeon_list[7])
+    let applePayConfigurationDTO: ApplePayConfigurationDTO? = nilOrValue(__pigeon_list[8])
 
-        return InstantPaymentConfigurationDTO(
-            instantPaymentType: instantPaymentType,
-            environment: environment,
-            clientKey: clientKey,
-            countryCode: countryCode,
-            amount: amount,
-            shopperLocale: shopperLocale,
-            analyticsOptionsDTO: analyticsOptionsDTO,
-            googlePayConfigurationDTO: googlePayConfigurationDTO,
-            applePayConfigurationDTO: applePayConfigurationDTO
-        )
-    }
-
-    func toList() -> [Any?] {
-        [
-            instantPaymentType,
-            environment,
-            clientKey,
-            countryCode,
-            amount,
-            shopperLocale,
-            analyticsOptionsDTO,
-            googlePayConfigurationDTO,
-            applePayConfigurationDTO
-        ]
-    }
+    return InstantPaymentConfigurationDTO(
+      instantPaymentType: instantPaymentType,
+      environment: environment,
+      clientKey: clientKey,
+      countryCode: countryCode,
+      amount: amount,
+      shopperLocale: shopperLocale,
+      analyticsOptionsDTO: analyticsOptionsDTO,
+      googlePayConfigurationDTO: googlePayConfigurationDTO,
+      applePayConfigurationDTO: applePayConfigurationDTO
+    )
+  }
+  func toList() -> [Any?] {
+    return [
+      instantPaymentType,
+      environment,
+      clientKey,
+      countryCode,
+      amount,
+      shopperLocale,
+      analyticsOptionsDTO,
+      googlePayConfigurationDTO,
+      applePayConfigurationDTO,
+    ]
+  }
 }
 
 /// Generated class from Pigeon that represents data sent in messages.
 struct InstantPaymentSetupResultDTO {
-    var instantPaymentType: InstantPaymentType
-    var isSupported: Bool
-    var resultData: Any?
+  var instantPaymentType: InstantPaymentType
+  var isSupported: Bool
+  var resultData: Any? = nil
 
-    // swift-format-ignore: AlwaysUseLowerCamelCase
-    static func fromList(_ __pigeon_list: [Any?]) -> InstantPaymentSetupResultDTO? {
-        let instantPaymentType = __pigeon_list[0] as! InstantPaymentType
-        let isSupported = __pigeon_list[1] as! Bool
-        let resultData: Any? = __pigeon_list[2]
+  // swift-format-ignore: AlwaysUseLowerCamelCase
+  static func fromList(_ __pigeon_list: [Any?]) -> InstantPaymentSetupResultDTO? {
+    let instantPaymentType = __pigeon_list[0] as! InstantPaymentType
+    let isSupported = __pigeon_list[1] as! Bool
+    let resultData: Any? = __pigeon_list[2]
 
-        return InstantPaymentSetupResultDTO(
-            instantPaymentType: instantPaymentType,
-            isSupported: isSupported,
-            resultData: resultData
-        )
-    }
-
-    func toList() -> [Any?] {
-        [
-            instantPaymentType,
-            isSupported,
-            resultData
-        ]
-    }
+    return InstantPaymentSetupResultDTO(
+      instantPaymentType: instantPaymentType,
+      isSupported: isSupported,
+      resultData: resultData
+    )
+  }
+  func toList() -> [Any?] {
+    return [
+      instantPaymentType,
+      isSupported,
+      resultData,
+    ]
+  }
 }
 
 /// Generated class from Pigeon that represents data sent in messages.
 struct UnencryptedCardDTO {
-    var cardNumber: String?
-    var expiryMonth: String?
-    var expiryYear: String?
-    var cvc: String?
+  var cardNumber: String? = nil
+  var expiryMonth: String? = nil
+  var expiryYear: String? = nil
+  var cvc: String? = nil
 
-    // swift-format-ignore: AlwaysUseLowerCamelCase
-    static func fromList(_ __pigeon_list: [Any?]) -> UnencryptedCardDTO? {
-        let cardNumber: String? = nilOrValue(__pigeon_list[0])
-        let expiryMonth: String? = nilOrValue(__pigeon_list[1])
-        let expiryYear: String? = nilOrValue(__pigeon_list[2])
-        let cvc: String? = nilOrValue(__pigeon_list[3])
+  // swift-format-ignore: AlwaysUseLowerCamelCase
+  static func fromList(_ __pigeon_list: [Any?]) -> UnencryptedCardDTO? {
+    let cardNumber: String? = nilOrValue(__pigeon_list[0])
+    let expiryMonth: String? = nilOrValue(__pigeon_list[1])
+    let expiryYear: String? = nilOrValue(__pigeon_list[2])
+    let cvc: String? = nilOrValue(__pigeon_list[3])
 
-        return UnencryptedCardDTO(
-            cardNumber: cardNumber,
-            expiryMonth: expiryMonth,
-            expiryYear: expiryYear,
-            cvc: cvc
-        )
-    }
-
-    func toList() -> [Any?] {
-        [
-            cardNumber,
-            expiryMonth,
-            expiryYear,
-            cvc
-        ]
-    }
+    return UnencryptedCardDTO(
+      cardNumber: cardNumber,
+      expiryMonth: expiryMonth,
+      expiryYear: expiryYear,
+      cvc: cvc
+    )
+  }
+  func toList() -> [Any?] {
+    return [
+      cardNumber,
+      expiryMonth,
+      expiryYear,
+      cvc,
+    ]
+  }
 }
 
 /// Generated class from Pigeon that represents data sent in messages.
 struct EncryptedCardDTO {
-    var encryptedCardNumber: String?
-    var encryptedExpiryMonth: String?
-    var encryptedExpiryYear: String?
-    var encryptedSecurityCode: String?
+  var encryptedCardNumber: String? = nil
+  var encryptedExpiryMonth: String? = nil
+  var encryptedExpiryYear: String? = nil
+  var encryptedSecurityCode: String? = nil
 
-    // swift-format-ignore: AlwaysUseLowerCamelCase
-    static func fromList(_ __pigeon_list: [Any?]) -> EncryptedCardDTO? {
-        let encryptedCardNumber: String? = nilOrValue(__pigeon_list[0])
-        let encryptedExpiryMonth: String? = nilOrValue(__pigeon_list[1])
-        let encryptedExpiryYear: String? = nilOrValue(__pigeon_list[2])
-        let encryptedSecurityCode: String? = nilOrValue(__pigeon_list[3])
+  // swift-format-ignore: AlwaysUseLowerCamelCase
+  static func fromList(_ __pigeon_list: [Any?]) -> EncryptedCardDTO? {
+    let encryptedCardNumber: String? = nilOrValue(__pigeon_list[0])
+    let encryptedExpiryMonth: String? = nilOrValue(__pigeon_list[1])
+    let encryptedExpiryYear: String? = nilOrValue(__pigeon_list[2])
+    let encryptedSecurityCode: String? = nilOrValue(__pigeon_list[3])
 
-        return EncryptedCardDTO(
-            encryptedCardNumber: encryptedCardNumber,
-            encryptedExpiryMonth: encryptedExpiryMonth,
-            encryptedExpiryYear: encryptedExpiryYear,
-            encryptedSecurityCode: encryptedSecurityCode
-        )
-    }
-
-    func toList() -> [Any?] {
-        [
-            encryptedCardNumber,
-            encryptedExpiryMonth,
-            encryptedExpiryYear,
-            encryptedSecurityCode
-        ]
-    }
+    return EncryptedCardDTO(
+      encryptedCardNumber: encryptedCardNumber,
+      encryptedExpiryMonth: encryptedExpiryMonth,
+      encryptedExpiryYear: encryptedExpiryYear,
+      encryptedSecurityCode: encryptedSecurityCode
+    )
+  }
+  func toList() -> [Any?] {
+    return [
+      encryptedCardNumber,
+      encryptedExpiryMonth,
+      encryptedExpiryYear,
+      encryptedSecurityCode,
+    ]
+  }
 }
 
 /// Generated class from Pigeon that represents data sent in messages.
 struct ActionComponentConfigurationDTO {
-    var environment: Environment
-    var clientKey: String
-    var shopperLocale: String?
-    var amount: AmountDTO?
-    var analyticsOptionsDTO: AnalyticsOptionsDTO
+  var environment: Environment
+  var clientKey: String
+  var shopperLocale: String? = nil
+  var amount: AmountDTO? = nil
+  var analyticsOptionsDTO: AnalyticsOptionsDTO
 
-    // swift-format-ignore: AlwaysUseLowerCamelCase
-    static func fromList(_ __pigeon_list: [Any?]) -> ActionComponentConfigurationDTO? {
-        let environment = __pigeon_list[0] as! Environment
-        let clientKey = __pigeon_list[1] as! String
-        let shopperLocale: String? = nilOrValue(__pigeon_list[2])
-        let amount: AmountDTO? = nilOrValue(__pigeon_list[3])
-        let analyticsOptionsDTO = __pigeon_list[4] as! AnalyticsOptionsDTO
+  // swift-format-ignore: AlwaysUseLowerCamelCase
+  static func fromList(_ __pigeon_list: [Any?]) -> ActionComponentConfigurationDTO? {
+    let environment = __pigeon_list[0] as! Environment
+    let clientKey = __pigeon_list[1] as! String
+    let shopperLocale: String? = nilOrValue(__pigeon_list[2])
+    let amount: AmountDTO? = nilOrValue(__pigeon_list[3])
+    let analyticsOptionsDTO = __pigeon_list[4] as! AnalyticsOptionsDTO
 
-        return ActionComponentConfigurationDTO(
-            environment: environment,
-            clientKey: clientKey,
-            shopperLocale: shopperLocale,
-            amount: amount,
-            analyticsOptionsDTO: analyticsOptionsDTO
-        )
-    }
-
-    func toList() -> [Any?] {
-        [
-            environment,
-            clientKey,
-            shopperLocale,
-            amount,
-            analyticsOptionsDTO
-        ]
-    }
+    return ActionComponentConfigurationDTO(
+      environment: environment,
+      clientKey: clientKey,
+      shopperLocale: shopperLocale,
+      amount: amount,
+      analyticsOptionsDTO: analyticsOptionsDTO
+    )
+  }
+  func toList() -> [Any?] {
+    return [
+      environment,
+      clientKey,
+      shopperLocale,
+      amount,
+      analyticsOptionsDTO,
+    ]
+  }
 }
 
 /// Generated class from Pigeon that represents data sent in messages.
 struct OrderCancelResultDTO {
-    var orderCancelResponseBody: [String?: Any?]
-    var updatedPaymentMethodsResponseBody: [String?: Any?]?
+  var orderCancelResponseBody: [String?: Any?]
+  var updatedPaymentMethodsResponseBody: [String?: Any?]? = nil
 
-    // swift-format-ignore: AlwaysUseLowerCamelCase
-    static func fromList(_ __pigeon_list: [Any?]) -> OrderCancelResultDTO? {
-        let orderCancelResponseBody = __pigeon_list[0] as! [String?: Any?]
-        let updatedPaymentMethodsResponseBody: [String?: Any?]? = nilOrValue(__pigeon_list[1])
+  // swift-format-ignore: AlwaysUseLowerCamelCase
+  static func fromList(_ __pigeon_list: [Any?]) -> OrderCancelResultDTO? {
+    let orderCancelResponseBody = __pigeon_list[0] as! [String?: Any?]
+    let updatedPaymentMethodsResponseBody: [String?: Any?]? = nilOrValue(__pigeon_list[1])
 
-        return OrderCancelResultDTO(
-            orderCancelResponseBody: orderCancelResponseBody,
-            updatedPaymentMethodsResponseBody: updatedPaymentMethodsResponseBody
-        )
-    }
-
-    func toList() -> [Any?] {
-        [
-            orderCancelResponseBody,
-            updatedPaymentMethodsResponseBody
-        ]
-    }
+    return OrderCancelResultDTO(
+      orderCancelResponseBody: orderCancelResponseBody,
+      updatedPaymentMethodsResponseBody: updatedPaymentMethodsResponseBody
+    )
+  }
+  func toList() -> [Any?] {
+    return [
+      orderCancelResponseBody,
+      updatedPaymentMethodsResponseBody,
+    ]
+  }
 }
 
 /// Generated class from Pigeon that represents data sent in messages.
 struct BinLookupDataDTO {
-    var brand: String
+  var brand: String
 
-    // swift-format-ignore: AlwaysUseLowerCamelCase
-    static func fromList(_ __pigeon_list: [Any?]) -> BinLookupDataDTO? {
-        let brand = __pigeon_list[0] as! String
+  // swift-format-ignore: AlwaysUseLowerCamelCase
+  static func fromList(_ __pigeon_list: [Any?]) -> BinLookupDataDTO? {
+    let brand = __pigeon_list[0] as! String
 
-        return BinLookupDataDTO(
-            brand: brand
-        )
-    }
-
-    func toList() -> [Any?] {
-        [
-            brand
-        ]
-    }
+    return BinLookupDataDTO(
+      brand: brand
+    )
+  }
+  func toList() -> [Any?] {
+    return [
+      brand
+    ]
+  }
 }
-
 private class PlatformApiPigeonCodecReader: FlutterStandardReader {
-    override func readValue(ofType type: UInt8) -> Any? {
-        switch type {
-        case 129:
-            return SessionDTO.fromList(self.readValue() as! [Any?])
-        case 130:
-            return AmountDTO.fromList(self.readValue() as! [Any?])
-        case 131:
-            return AnalyticsOptionsDTO.fromList(self.readValue() as! [Any?])
-        case 132:
-            return ThreeDS2UICustomizationDTO.fromList(self.readValue() as! [Any?])
-        case 133:
-            return ThreeDS2LabelCustomizationDTO.fromList(self.readValue() as! [Any?])
-        case 134:
-            return ThreeDS2ButtonCustomizationDTO.fromList(self.readValue() as! [Any?])
-        case 135:
-            return ThreeDS2TextBoxCustomizationDTO.fromList(self.readValue() as! [Any?])
-        case 136:
-            return ThreeDS2ToolbarCustomizationDTO.fromList(self.readValue() as! [Any?])
-        case 137:
-            return ThreeDS2ConfigurationDTO.fromList(self.readValue() as! [Any?])
-        case 138:
-            return DropInConfigurationDTO.fromList(self.readValue() as! [Any?])
-        case 139:
-            return CardConfigurationDTO.fromList(self.readValue() as! [Any?])
-        case 140:
-            return ApplePayConfigurationDTO.fromList(self.readValue() as! [Any?])
-        case 141:
-            return ApplePayContactDTO.fromList(self.readValue() as! [Any?])
-        case 142:
-            return ApplePayShippingMethodDTO.fromList(self.readValue() as! [Any?])
-        case 143:
-            return ApplePaySummaryItemDTO.fromList(self.readValue() as! [Any?])
-        case 144:
-            return GooglePayConfigurationDTO.fromList(self.readValue() as! [Any?])
-        case 145:
-            return MerchantInfoDTO.fromList(self.readValue() as! [Any?])
-        case 146:
-            return ShippingAddressParametersDTO.fromList(self.readValue() as! [Any?])
-        case 147:
-            return BillingAddressParametersDTO.fromList(self.readValue() as! [Any?])
-        case 148:
-            return CashAppPayConfigurationDTO.fromList(self.readValue() as! [Any?])
-        case 149:
-            return TwintConfigurationDTO.fromList(self.readValue() as! [Any?])
-        case 150:
-            return PaymentResultDTO.fromList(self.readValue() as! [Any?])
-        case 151:
-            return PaymentResultModelDTO.fromList(self.readValue() as! [Any?])
-        case 152:
-            return OrderResponseDTO.fromList(self.readValue() as! [Any?])
-        case 153:
-            return CheckoutEvent.fromList(self.readValue() as! [Any?])
-        case 154:
-            return ComponentCommunicationModel.fromList(self.readValue() as! [Any?])
-        case 155:
-            return PaymentEventDTO.fromList(self.readValue() as! [Any?])
-        case 156:
-            return ErrorDTO.fromList(self.readValue() as! [Any?])
-        case 157:
-            return DeletedStoredPaymentMethodResultDTO.fromList(self.readValue() as! [Any?])
-        case 158:
-            return CardComponentConfigurationDTO.fromList(self.readValue() as! [Any?])
-        case 159:
-            return InstantPaymentConfigurationDTO.fromList(self.readValue() as! [Any?])
-        case 160:
-            return InstantPaymentSetupResultDTO.fromList(self.readValue() as! [Any?])
-        case 161:
-            return UnencryptedCardDTO.fromList(self.readValue() as! [Any?])
-        case 162:
-            return EncryptedCardDTO.fromList(self.readValue() as! [Any?])
-        case 163:
-            return ActionComponentConfigurationDTO.fromList(self.readValue() as! [Any?])
-        case 164:
-            return OrderCancelResultDTO.fromList(self.readValue() as! [Any?])
-        case 165:
-            return BinLookupDataDTO.fromList(self.readValue() as! [Any?])
-        case 166:
-            var enumResult: Environment? = nil
-            let enumResultAsInt: Int? = nilOrValue(self.readValue() as? Int)
-            if let enumResultAsInt {
-                enumResult = Environment(rawValue: enumResultAsInt)
-            }
-            return enumResult
-        case 167:
-            var enumResult: AddressMode? = nil
-            let enumResultAsInt: Int? = nilOrValue(self.readValue() as? Int)
-            if let enumResultAsInt {
-                enumResult = AddressMode(rawValue: enumResultAsInt)
-            }
-            return enumResult
-        case 168:
-            var enumResult: CardAuthMethod? = nil
-            let enumResultAsInt: Int? = nilOrValue(self.readValue() as? Int)
-            if let enumResultAsInt {
-                enumResult = CardAuthMethod(rawValue: enumResultAsInt)
-            }
-            return enumResult
-        case 169:
-            var enumResult: TotalPriceStatus? = nil
-            let enumResultAsInt: Int? = nilOrValue(self.readValue() as? Int)
-            if let enumResultAsInt {
-                enumResult = TotalPriceStatus(rawValue: enumResultAsInt)
-            }
-            return enumResult
-        case 170:
-            var enumResult: GooglePayEnvironment? = nil
-            let enumResultAsInt: Int? = nilOrValue(self.readValue() as? Int)
-            if let enumResultAsInt {
-                enumResult = GooglePayEnvironment(rawValue: enumResultAsInt)
-            }
-            return enumResult
-        case 171:
-            var enumResult: CashAppPayEnvironment? = nil
-            let enumResultAsInt: Int? = nilOrValue(self.readValue() as? Int)
-            if let enumResultAsInt {
-                enumResult = CashAppPayEnvironment(rawValue: enumResultAsInt)
-            }
-            return enumResult
-        case 172:
-            var enumResult: PaymentResultEnum? = nil
-            let enumResultAsInt: Int? = nilOrValue(self.readValue() as? Int)
-            if let enumResultAsInt {
-                enumResult = PaymentResultEnum(rawValue: enumResultAsInt)
-            }
-            return enumResult
-        case 173:
-            var enumResult: CheckoutEventType? = nil
-            let enumResultAsInt: Int? = nilOrValue(self.readValue() as? Int)
-            if let enumResultAsInt {
-                enumResult = CheckoutEventType(rawValue: enumResultAsInt)
-            }
-            return enumResult
-        case 174:
-            var enumResult: ComponentCommunicationType? = nil
-            let enumResultAsInt: Int? = nilOrValue(self.readValue() as? Int)
-            if let enumResultAsInt {
-                enumResult = ComponentCommunicationType(rawValue: enumResultAsInt)
-            }
-            return enumResult
-        case 175:
-            var enumResult: PaymentEventType? = nil
-            let enumResultAsInt: Int? = nilOrValue(self.readValue() as? Int)
-            if let enumResultAsInt {
-                enumResult = PaymentEventType(rawValue: enumResultAsInt)
-            }
-            return enumResult
-        case 176:
-            var enumResult: FieldVisibility? = nil
-            let enumResultAsInt: Int? = nilOrValue(self.readValue() as? Int)
-            if let enumResultAsInt {
-                enumResult = FieldVisibility(rawValue: enumResultAsInt)
-            }
-            return enumResult
-        case 177:
-            var enumResult: InstantPaymentType? = nil
-            let enumResultAsInt: Int? = nilOrValue(self.readValue() as? Int)
-            if let enumResultAsInt {
-                enumResult = InstantPaymentType(rawValue: enumResultAsInt)
-            }
-            return enumResult
-        case 178:
-            var enumResult: ApplePayShippingType? = nil
-            let enumResultAsInt: Int? = nilOrValue(self.readValue() as? Int)
-            if let enumResultAsInt {
-                enumResult = ApplePayShippingType(rawValue: enumResultAsInt)
-            }
-            return enumResult
-        case 179:
-            var enumResult: ApplePayMerchantCapability? = nil
-            let enumResultAsInt: Int? = nilOrValue(self.readValue() as? Int)
-            if let enumResultAsInt {
-                enumResult = ApplePayMerchantCapability(rawValue: enumResultAsInt)
-            }
-            return enumResult
-        case 180:
-            var enumResult: ApplePaySummaryItemType? = nil
-            let enumResultAsInt: Int? = nilOrValue(self.readValue() as? Int)
-            if let enumResultAsInt {
-                enumResult = ApplePaySummaryItemType(rawValue: enumResultAsInt)
-            }
-            return enumResult
-        case 181:
-            var enumResult: CardNumberValidationResultDTO? = nil
-            let enumResultAsInt: Int? = nilOrValue(self.readValue() as? Int)
-            if let enumResultAsInt {
-                enumResult = CardNumberValidationResultDTO(rawValue: enumResultAsInt)
-            }
-            return enumResult
-        case 182:
-            var enumResult: CardExpiryDateValidationResultDTO? = nil
-            let enumResultAsInt: Int? = nilOrValue(self.readValue() as? Int)
-            if let enumResultAsInt {
-                enumResult = CardExpiryDateValidationResultDTO(rawValue: enumResultAsInt)
-            }
-            return enumResult
-        case 183:
-            var enumResult: CardSecurityCodeValidationResultDTO? = nil
-            let enumResultAsInt: Int? = nilOrValue(self.readValue() as? Int)
-            if let enumResultAsInt {
-                enumResult = CardSecurityCodeValidationResultDTO(rawValue: enumResultAsInt)
-            }
-            return enumResult
-        default:
-            return super.readValue(ofType: type)
-        }
+  override func readValue(ofType type: UInt8) -> Any? {
+    switch type {
+    case 129:
+      return SessionDTO.fromList(self.readValue() as! [Any?])
+    case 130:
+      return AmountDTO.fromList(self.readValue() as! [Any?])
+    case 131:
+      return AnalyticsOptionsDTO.fromList(self.readValue() as! [Any?])
+    case 132:
+      return ThreeDS2UICustomizationDTO.fromList(self.readValue() as! [Any?])
+    case 133:
+      return ThreeDS2LabelCustomizationDTO.fromList(self.readValue() as! [Any?])
+    case 134:
+      return ThreeDS2ButtonCustomizationDTO.fromList(self.readValue() as! [Any?])
+    case 135:
+      return ThreeDS2TextBoxCustomizationDTO.fromList(self.readValue() as! [Any?])
+    case 136:
+      return ThreeDS2ToolbarCustomizationDTO.fromList(self.readValue() as! [Any?])
+    case 137:
+      return ThreeDS2ConfigurationDTO.fromList(self.readValue() as! [Any?])
+    case 138:
+      return DropInConfigurationDTO.fromList(self.readValue() as! [Any?])
+    case 139:
+      return CardConfigurationDTO.fromList(self.readValue() as! [Any?])
+    case 140:
+      return ApplePayConfigurationDTO.fromList(self.readValue() as! [Any?])
+    case 141:
+      return ApplePayContactDTO.fromList(self.readValue() as! [Any?])
+    case 142:
+      return ApplePayShippingMethodDTO.fromList(self.readValue() as! [Any?])
+    case 143:
+      return ApplePaySummaryItemDTO.fromList(self.readValue() as! [Any?])
+    case 144:
+      return GooglePayConfigurationDTO.fromList(self.readValue() as! [Any?])
+    case 145:
+      return MerchantInfoDTO.fromList(self.readValue() as! [Any?])
+    case 146:
+      return ShippingAddressParametersDTO.fromList(self.readValue() as! [Any?])
+    case 147:
+      return BillingAddressParametersDTO.fromList(self.readValue() as! [Any?])
+    case 148:
+      return CashAppPayConfigurationDTO.fromList(self.readValue() as! [Any?])
+    case 149:
+      return TwintConfigurationDTO.fromList(self.readValue() as! [Any?])
+    case 150:
+      return PaymentResultDTO.fromList(self.readValue() as! [Any?])
+    case 151:
+      return PaymentResultModelDTO.fromList(self.readValue() as! [Any?])
+    case 152:
+      return OrderResponseDTO.fromList(self.readValue() as! [Any?])
+    case 153:
+      return CheckoutEvent.fromList(self.readValue() as! [Any?])
+    case 154:
+      return ComponentCommunicationModel.fromList(self.readValue() as! [Any?])
+    case 155:
+      return PaymentEventDTO.fromList(self.readValue() as! [Any?])
+    case 156:
+      return ErrorDTO.fromList(self.readValue() as! [Any?])
+    case 157:
+      return DeletedStoredPaymentMethodResultDTO.fromList(self.readValue() as! [Any?])
+    case 158:
+      return CardComponentConfigurationDTO.fromList(self.readValue() as! [Any?])
+    case 159:
+      return InstantPaymentConfigurationDTO.fromList(self.readValue() as! [Any?])
+    case 160:
+      return InstantPaymentSetupResultDTO.fromList(self.readValue() as! [Any?])
+    case 161:
+      return UnencryptedCardDTO.fromList(self.readValue() as! [Any?])
+    case 162:
+      return EncryptedCardDTO.fromList(self.readValue() as! [Any?])
+    case 163:
+      return ActionComponentConfigurationDTO.fromList(self.readValue() as! [Any?])
+    case 164:
+      return OrderCancelResultDTO.fromList(self.readValue() as! [Any?])
+    case 165:
+      return BinLookupDataDTO.fromList(self.readValue() as! [Any?])
+    case 166:
+      var enumResult: Environment? = nil
+      let enumResultAsInt: Int? = nilOrValue(self.readValue() as? Int)
+      if let enumResultAsInt = enumResultAsInt {
+        enumResult = Environment(rawValue: enumResultAsInt)
+      }
+      return enumResult
+    case 167:
+      var enumResult: AddressMode? = nil
+      let enumResultAsInt: Int? = nilOrValue(self.readValue() as? Int)
+      if let enumResultAsInt = enumResultAsInt {
+        enumResult = AddressMode(rawValue: enumResultAsInt)
+      }
+      return enumResult
+    case 168:
+      var enumResult: CardAuthMethod? = nil
+      let enumResultAsInt: Int? = nilOrValue(self.readValue() as? Int)
+      if let enumResultAsInt = enumResultAsInt {
+        enumResult = CardAuthMethod(rawValue: enumResultAsInt)
+      }
+      return enumResult
+    case 169:
+      var enumResult: TotalPriceStatus? = nil
+      let enumResultAsInt: Int? = nilOrValue(self.readValue() as? Int)
+      if let enumResultAsInt = enumResultAsInt {
+        enumResult = TotalPriceStatus(rawValue: enumResultAsInt)
+      }
+      return enumResult
+    case 170:
+      var enumResult: GooglePayEnvironment? = nil
+      let enumResultAsInt: Int? = nilOrValue(self.readValue() as? Int)
+      if let enumResultAsInt = enumResultAsInt {
+        enumResult = GooglePayEnvironment(rawValue: enumResultAsInt)
+      }
+      return enumResult
+    case 171:
+      var enumResult: CashAppPayEnvironment? = nil
+      let enumResultAsInt: Int? = nilOrValue(self.readValue() as? Int)
+      if let enumResultAsInt = enumResultAsInt {
+        enumResult = CashAppPayEnvironment(rawValue: enumResultAsInt)
+      }
+      return enumResult
+    case 172:
+      var enumResult: PaymentResultEnum? = nil
+      let enumResultAsInt: Int? = nilOrValue(self.readValue() as? Int)
+      if let enumResultAsInt = enumResultAsInt {
+        enumResult = PaymentResultEnum(rawValue: enumResultAsInt)
+      }
+      return enumResult
+    case 173:
+      var enumResult: CheckoutEventType? = nil
+      let enumResultAsInt: Int? = nilOrValue(self.readValue() as? Int)
+      if let enumResultAsInt = enumResultAsInt {
+        enumResult = CheckoutEventType(rawValue: enumResultAsInt)
+      }
+      return enumResult
+    case 174:
+      var enumResult: ComponentCommunicationType? = nil
+      let enumResultAsInt: Int? = nilOrValue(self.readValue() as? Int)
+      if let enumResultAsInt = enumResultAsInt {
+        enumResult = ComponentCommunicationType(rawValue: enumResultAsInt)
+      }
+      return enumResult
+    case 175:
+      var enumResult: PaymentEventType? = nil
+      let enumResultAsInt: Int? = nilOrValue(self.readValue() as? Int)
+      if let enumResultAsInt = enumResultAsInt {
+        enumResult = PaymentEventType(rawValue: enumResultAsInt)
+      }
+      return enumResult
+    case 176:
+      var enumResult: FieldVisibility? = nil
+      let enumResultAsInt: Int? = nilOrValue(self.readValue() as? Int)
+      if let enumResultAsInt = enumResultAsInt {
+        enumResult = FieldVisibility(rawValue: enumResultAsInt)
+      }
+      return enumResult
+    case 177:
+      var enumResult: InstantPaymentType? = nil
+      let enumResultAsInt: Int? = nilOrValue(self.readValue() as? Int)
+      if let enumResultAsInt = enumResultAsInt {
+        enumResult = InstantPaymentType(rawValue: enumResultAsInt)
+      }
+      return enumResult
+    case 178:
+      var enumResult: ApplePayShippingType? = nil
+      let enumResultAsInt: Int? = nilOrValue(self.readValue() as? Int)
+      if let enumResultAsInt = enumResultAsInt {
+        enumResult = ApplePayShippingType(rawValue: enumResultAsInt)
+      }
+      return enumResult
+    case 179:
+      var enumResult: ApplePayMerchantCapability? = nil
+      let enumResultAsInt: Int? = nilOrValue(self.readValue() as? Int)
+      if let enumResultAsInt = enumResultAsInt {
+        enumResult = ApplePayMerchantCapability(rawValue: enumResultAsInt)
+      }
+      return enumResult
+    case 180:
+      var enumResult: ApplePaySummaryItemType? = nil
+      let enumResultAsInt: Int? = nilOrValue(self.readValue() as? Int)
+      if let enumResultAsInt = enumResultAsInt {
+        enumResult = ApplePaySummaryItemType(rawValue: enumResultAsInt)
+      }
+      return enumResult
+    case 181:
+      var enumResult: CardNumberValidationResultDTO? = nil
+      let enumResultAsInt: Int? = nilOrValue(self.readValue() as? Int)
+      if let enumResultAsInt = enumResultAsInt {
+        enumResult = CardNumberValidationResultDTO(rawValue: enumResultAsInt)
+      }
+      return enumResult
+    case 182:
+      var enumResult: CardExpiryDateValidationResultDTO? = nil
+      let enumResultAsInt: Int? = nilOrValue(self.readValue() as? Int)
+      if let enumResultAsInt = enumResultAsInt {
+        enumResult = CardExpiryDateValidationResultDTO(rawValue: enumResultAsInt)
+      }
+      return enumResult
+    case 183:
+      var enumResult: CardSecurityCodeValidationResultDTO? = nil
+      let enumResultAsInt: Int? = nilOrValue(self.readValue() as? Int)
+      if let enumResultAsInt = enumResultAsInt {
+        enumResult = CardSecurityCodeValidationResultDTO(rawValue: enumResultAsInt)
+      }
+      return enumResult
+    default:
+      return super.readValue(ofType: type)
     }
+  }
 }
 
 private class PlatformApiPigeonCodecWriter: FlutterStandardWriter {
-    override func writeValue(_ value: Any) {
-        if let value = value as? SessionDTO {
-            super.writeByte(129)
-            super.writeValue(value.toList())
-        } else if let value = value as? AmountDTO {
-            super.writeByte(130)
-            super.writeValue(value.toList())
-        } else if let value = value as? AnalyticsOptionsDTO {
-            super.writeByte(131)
-            super.writeValue(value.toList())
-        } else if let value = value as? ThreeDS2UICustomizationDTO {
-            super.writeByte(132)
-            super.writeValue(value.toList())
-        } else if let value = value as? ThreeDS2LabelCustomizationDTO {
-            super.writeByte(133)
-            super.writeValue(value.toList())
-        } else if let value = value as? ThreeDS2ButtonCustomizationDTO {
-            super.writeByte(134)
-            super.writeValue(value.toList())
-        } else if let value = value as? ThreeDS2TextBoxCustomizationDTO {
-            super.writeByte(135)
-            super.writeValue(value.toList())
-        } else if let value = value as? ThreeDS2ToolbarCustomizationDTO {
-            super.writeByte(136)
-            super.writeValue(value.toList())
-        } else if let value = value as? ThreeDS2ConfigurationDTO {
-            super.writeByte(137)
-            super.writeValue(value.toList())
-        } else if let value = value as? DropInConfigurationDTO {
-            super.writeByte(138)
-            super.writeValue(value.toList())
-        } else if let value = value as? CardConfigurationDTO {
-            super.writeByte(139)
-            super.writeValue(value.toList())
-        } else if let value = value as? ApplePayConfigurationDTO {
-            super.writeByte(140)
-            super.writeValue(value.toList())
-        } else if let value = value as? ApplePayContactDTO {
-            super.writeByte(141)
-            super.writeValue(value.toList())
-        } else if let value = value as? ApplePayShippingMethodDTO {
-            super.writeByte(142)
-            super.writeValue(value.toList())
-        } else if let value = value as? ApplePaySummaryItemDTO {
-            super.writeByte(143)
-            super.writeValue(value.toList())
-        } else if let value = value as? GooglePayConfigurationDTO {
-            super.writeByte(144)
-            super.writeValue(value.toList())
-        } else if let value = value as? MerchantInfoDTO {
-            super.writeByte(145)
-            super.writeValue(value.toList())
-        } else if let value = value as? ShippingAddressParametersDTO {
-            super.writeByte(146)
-            super.writeValue(value.toList())
-        } else if let value = value as? BillingAddressParametersDTO {
-            super.writeByte(147)
-            super.writeValue(value.toList())
-        } else if let value = value as? CashAppPayConfigurationDTO {
-            super.writeByte(148)
-            super.writeValue(value.toList())
-        } else if let value = value as? TwintConfigurationDTO {
-            super.writeByte(149)
-            super.writeValue(value.toList())
-        } else if let value = value as? PaymentResultDTO {
-            super.writeByte(150)
-            super.writeValue(value.toList())
-        } else if let value = value as? PaymentResultModelDTO {
-            super.writeByte(151)
-            super.writeValue(value.toList())
-        } else if let value = value as? OrderResponseDTO {
-            super.writeByte(152)
-            super.writeValue(value.toList())
-        } else if let value = value as? CheckoutEvent {
-            super.writeByte(153)
-            super.writeValue(value.toList())
-        } else if let value = value as? ComponentCommunicationModel {
-            super.writeByte(154)
-            super.writeValue(value.toList())
-        } else if let value = value as? PaymentEventDTO {
-            super.writeByte(155)
-            super.writeValue(value.toList())
-        } else if let value = value as? ErrorDTO {
-            super.writeByte(156)
-            super.writeValue(value.toList())
-        } else if let value = value as? DeletedStoredPaymentMethodResultDTO {
-            super.writeByte(157)
-            super.writeValue(value.toList())
-        } else if let value = value as? CardComponentConfigurationDTO {
-            super.writeByte(158)
-            super.writeValue(value.toList())
-        } else if let value = value as? InstantPaymentConfigurationDTO {
-            super.writeByte(159)
-            super.writeValue(value.toList())
-        } else if let value = value as? InstantPaymentSetupResultDTO {
-            super.writeByte(160)
-            super.writeValue(value.toList())
-        } else if let value = value as? UnencryptedCardDTO {
-            super.writeByte(161)
-            super.writeValue(value.toList())
-        } else if let value = value as? EncryptedCardDTO {
-            super.writeByte(162)
-            super.writeValue(value.toList())
-        } else if let value = value as? ActionComponentConfigurationDTO {
-            super.writeByte(163)
-            super.writeValue(value.toList())
-        } else if let value = value as? OrderCancelResultDTO {
-            super.writeByte(164)
-            super.writeValue(value.toList())
-        } else if let value = value as? BinLookupDataDTO {
-            super.writeByte(165)
-            super.writeValue(value.toList())
-        } else if let value = value as? Environment {
-            super.writeByte(166)
-            super.writeValue(value.rawValue)
-        } else if let value = value as? AddressMode {
-            super.writeByte(167)
-            super.writeValue(value.rawValue)
-        } else if let value = value as? CardAuthMethod {
-            super.writeByte(168)
-            super.writeValue(value.rawValue)
-        } else if let value = value as? TotalPriceStatus {
-            super.writeByte(169)
-            super.writeValue(value.rawValue)
-        } else if let value = value as? GooglePayEnvironment {
-            super.writeByte(170)
-            super.writeValue(value.rawValue)
-        } else if let value = value as? CashAppPayEnvironment {
-            super.writeByte(171)
-            super.writeValue(value.rawValue)
-        } else if let value = value as? PaymentResultEnum {
-            super.writeByte(172)
-            super.writeValue(value.rawValue)
-        } else if let value = value as? CheckoutEventType {
-            super.writeByte(173)
-            super.writeValue(value.rawValue)
-        } else if let value = value as? ComponentCommunicationType {
-            super.writeByte(174)
-            super.writeValue(value.rawValue)
-        } else if let value = value as? PaymentEventType {
-            super.writeByte(175)
-            super.writeValue(value.rawValue)
-        } else if let value = value as? FieldVisibility {
-            super.writeByte(176)
-            super.writeValue(value.rawValue)
-        } else if let value = value as? InstantPaymentType {
-            super.writeByte(177)
-            super.writeValue(value.rawValue)
-        } else if let value = value as? ApplePayShippingType {
-            super.writeByte(178)
-            super.writeValue(value.rawValue)
-        } else if let value = value as? ApplePayMerchantCapability {
-            super.writeByte(179)
-            super.writeValue(value.rawValue)
-        } else if let value = value as? ApplePaySummaryItemType {
-            super.writeByte(180)
-            super.writeValue(value.rawValue)
-        } else if let value = value as? CardNumberValidationResultDTO {
-            super.writeByte(181)
-            super.writeValue(value.rawValue)
-        } else if let value = value as? CardExpiryDateValidationResultDTO {
-            super.writeByte(182)
-            super.writeValue(value.rawValue)
-        } else if let value = value as? CardSecurityCodeValidationResultDTO {
-            super.writeByte(183)
-            super.writeValue(value.rawValue)
-        } else {
-            super.writeValue(value)
-        }
+  override func writeValue(_ value: Any) {
+    if let value = value as? SessionDTO {
+      super.writeByte(129)
+      super.writeValue(value.toList())
+    } else if let value = value as? AmountDTO {
+      super.writeByte(130)
+      super.writeValue(value.toList())
+    } else if let value = value as? AnalyticsOptionsDTO {
+      super.writeByte(131)
+      super.writeValue(value.toList())
+    } else if let value = value as? ThreeDS2UICustomizationDTO {
+      super.writeByte(132)
+      super.writeValue(value.toList())
+    } else if let value = value as? ThreeDS2LabelCustomizationDTO {
+      super.writeByte(133)
+      super.writeValue(value.toList())
+    } else if let value = value as? ThreeDS2ButtonCustomizationDTO {
+      super.writeByte(134)
+      super.writeValue(value.toList())
+    } else if let value = value as? ThreeDS2TextBoxCustomizationDTO {
+      super.writeByte(135)
+      super.writeValue(value.toList())
+    } else if let value = value as? ThreeDS2ToolbarCustomizationDTO {
+      super.writeByte(136)
+      super.writeValue(value.toList())
+    } else if let value = value as? ThreeDS2ConfigurationDTO {
+      super.writeByte(137)
+      super.writeValue(value.toList())
+    } else if let value = value as? DropInConfigurationDTO {
+      super.writeByte(138)
+      super.writeValue(value.toList())
+    } else if let value = value as? CardConfigurationDTO {
+      super.writeByte(139)
+      super.writeValue(value.toList())
+    } else if let value = value as? ApplePayConfigurationDTO {
+      super.writeByte(140)
+      super.writeValue(value.toList())
+    } else if let value = value as? ApplePayContactDTO {
+      super.writeByte(141)
+      super.writeValue(value.toList())
+    } else if let value = value as? ApplePayShippingMethodDTO {
+      super.writeByte(142)
+      super.writeValue(value.toList())
+    } else if let value = value as? ApplePaySummaryItemDTO {
+      super.writeByte(143)
+      super.writeValue(value.toList())
+    } else if let value = value as? GooglePayConfigurationDTO {
+      super.writeByte(144)
+      super.writeValue(value.toList())
+    } else if let value = value as? MerchantInfoDTO {
+      super.writeByte(145)
+      super.writeValue(value.toList())
+    } else if let value = value as? ShippingAddressParametersDTO {
+      super.writeByte(146)
+      super.writeValue(value.toList())
+    } else if let value = value as? BillingAddressParametersDTO {
+      super.writeByte(147)
+      super.writeValue(value.toList())
+    } else if let value = value as? CashAppPayConfigurationDTO {
+      super.writeByte(148)
+      super.writeValue(value.toList())
+    } else if let value = value as? TwintConfigurationDTO {
+      super.writeByte(149)
+      super.writeValue(value.toList())
+    } else if let value = value as? PaymentResultDTO {
+      super.writeByte(150)
+      super.writeValue(value.toList())
+    } else if let value = value as? PaymentResultModelDTO {
+      super.writeByte(151)
+      super.writeValue(value.toList())
+    } else if let value = value as? OrderResponseDTO {
+      super.writeByte(152)
+      super.writeValue(value.toList())
+    } else if let value = value as? CheckoutEvent {
+      super.writeByte(153)
+      super.writeValue(value.toList())
+    } else if let value = value as? ComponentCommunicationModel {
+      super.writeByte(154)
+      super.writeValue(value.toList())
+    } else if let value = value as? PaymentEventDTO {
+      super.writeByte(155)
+      super.writeValue(value.toList())
+    } else if let value = value as? ErrorDTO {
+      super.writeByte(156)
+      super.writeValue(value.toList())
+    } else if let value = value as? DeletedStoredPaymentMethodResultDTO {
+      super.writeByte(157)
+      super.writeValue(value.toList())
+    } else if let value = value as? CardComponentConfigurationDTO {
+      super.writeByte(158)
+      super.writeValue(value.toList())
+    } else if let value = value as? InstantPaymentConfigurationDTO {
+      super.writeByte(159)
+      super.writeValue(value.toList())
+    } else if let value = value as? InstantPaymentSetupResultDTO {
+      super.writeByte(160)
+      super.writeValue(value.toList())
+    } else if let value = value as? UnencryptedCardDTO {
+      super.writeByte(161)
+      super.writeValue(value.toList())
+    } else if let value = value as? EncryptedCardDTO {
+      super.writeByte(162)
+      super.writeValue(value.toList())
+    } else if let value = value as? ActionComponentConfigurationDTO {
+      super.writeByte(163)
+      super.writeValue(value.toList())
+    } else if let value = value as? OrderCancelResultDTO {
+      super.writeByte(164)
+      super.writeValue(value.toList())
+    } else if let value = value as? BinLookupDataDTO {
+      super.writeByte(165)
+      super.writeValue(value.toList())
+    } else if let value = value as? Environment {
+      super.writeByte(166)
+      super.writeValue(value.rawValue)
+    } else if let value = value as? AddressMode {
+      super.writeByte(167)
+      super.writeValue(value.rawValue)
+    } else if let value = value as? CardAuthMethod {
+      super.writeByte(168)
+      super.writeValue(value.rawValue)
+    } else if let value = value as? TotalPriceStatus {
+      super.writeByte(169)
+      super.writeValue(value.rawValue)
+    } else if let value = value as? GooglePayEnvironment {
+      super.writeByte(170)
+      super.writeValue(value.rawValue)
+    } else if let value = value as? CashAppPayEnvironment {
+      super.writeByte(171)
+      super.writeValue(value.rawValue)
+    } else if let value = value as? PaymentResultEnum {
+      super.writeByte(172)
+      super.writeValue(value.rawValue)
+    } else if let value = value as? CheckoutEventType {
+      super.writeByte(173)
+      super.writeValue(value.rawValue)
+    } else if let value = value as? ComponentCommunicationType {
+      super.writeByte(174)
+      super.writeValue(value.rawValue)
+    } else if let value = value as? PaymentEventType {
+      super.writeByte(175)
+      super.writeValue(value.rawValue)
+    } else if let value = value as? FieldVisibility {
+      super.writeByte(176)
+      super.writeValue(value.rawValue)
+    } else if let value = value as? InstantPaymentType {
+      super.writeByte(177)
+      super.writeValue(value.rawValue)
+    } else if let value = value as? ApplePayShippingType {
+      super.writeByte(178)
+      super.writeValue(value.rawValue)
+    } else if let value = value as? ApplePayMerchantCapability {
+      super.writeByte(179)
+      super.writeValue(value.rawValue)
+    } else if let value = value as? ApplePaySummaryItemType {
+      super.writeByte(180)
+      super.writeValue(value.rawValue)
+    } else if let value = value as? CardNumberValidationResultDTO {
+      super.writeByte(181)
+      super.writeValue(value.rawValue)
+    } else if let value = value as? CardExpiryDateValidationResultDTO {
+      super.writeByte(182)
+      super.writeValue(value.rawValue)
+    } else if let value = value as? CardSecurityCodeValidationResultDTO {
+      super.writeByte(183)
+      super.writeValue(value.rawValue)
+    } else {
+      super.writeValue(value)
     }
+  }
 }
 
 private class PlatformApiPigeonCodecReaderWriter: FlutterStandardReaderWriter {
-    override func reader(with data: Data) -> FlutterStandardReader {
-        PlatformApiPigeonCodecReader(data: data)
-    }
+  override func reader(with data: Data) -> FlutterStandardReader {
+    return PlatformApiPigeonCodecReader(data: data)
+  }
 
-    override func writer(with data: NSMutableData) -> FlutterStandardWriter {
-        PlatformApiPigeonCodecWriter(data: data)
-    }
+  override func writer(with data: NSMutableData) -> FlutterStandardWriter {
+    return PlatformApiPigeonCodecWriter(data: data)
+  }
 }
 
 class PlatformApiPigeonCodec: FlutterStandardMessageCodec, @unchecked Sendable {
-    static let shared = PlatformApiPigeonCodec(readerWriter: PlatformApiPigeonCodecReaderWriter())
+  static let shared = PlatformApiPigeonCodec(readerWriter: PlatformApiPigeonCodecReaderWriter())
 }
+
 
 /// Generated protocol from Pigeon that represents a handler of messages from Flutter.
 protocol CheckoutPlatformInterface {
-    func getReturnUrl(completion: @escaping (Result<String, Error>) -> Void)
-    func createSession(sessionId: String, sessionData: String, configuration: Any?, completion: @escaping (Result<SessionDTO, Error>) -> Void)
-    func clearSession() throws
-    func encryptCard(unencryptedCardDTO: UnencryptedCardDTO, publicKey: String, completion: @escaping (Result<EncryptedCardDTO, Error>) -> Void)
-    func encryptBin(bin: String, publicKey: String, completion: @escaping (Result<String, Error>) -> Void)
-    func validateCardNumber(cardNumber: String, enableLuhnCheck: Bool) throws -> CardNumberValidationResultDTO
-    func validateCardExpiryDate(expiryMonth: String, expiryYear: String) throws -> CardExpiryDateValidationResultDTO
-    func validateCardSecurityCode(securityCode: String, cardBrand: String?) throws -> CardSecurityCodeValidationResultDTO
-    func enableConsoleLogging(loggingEnabled: Bool) throws
-    func getThreeDS2SdkVersion() throws -> String
+  func getReturnUrl(completion: @escaping (Result<String, Error>) -> Void)
+  func createSession(sessionId: String, sessionData: String, configuration: Any?, completion: @escaping (Result<SessionDTO, Error>) -> Void)
+  func clearSession() throws
+  func encryptCard(unencryptedCardDTO: UnencryptedCardDTO, publicKey: String, completion: @escaping (Result<EncryptedCardDTO, Error>) -> Void)
+  func encryptBin(bin: String, publicKey: String, completion: @escaping (Result<String, Error>) -> Void)
+  func validateCardNumber(cardNumber: String, enableLuhnCheck: Bool) throws -> CardNumberValidationResultDTO
+  func validateCardExpiryDate(expiryMonth: String, expiryYear: String) throws -> CardExpiryDateValidationResultDTO
+  func validateCardSecurityCode(securityCode: String, cardBrand: String?) throws -> CardSecurityCodeValidationResultDTO
+  func enableConsoleLogging(loggingEnabled: Bool) throws
+  func getThreeDS2SdkVersion() throws -> String
 }
 
 /// Generated setup class from Pigeon to handle messages through the `binaryMessenger`.
 class CheckoutPlatformInterfaceSetup {
-    static var codec: FlutterStandardMessageCodec {
-        PlatformApiPigeonCodec.shared
+  static var codec: FlutterStandardMessageCodec { PlatformApiPigeonCodec.shared }
+  /// Sets up an instance of `CheckoutPlatformInterface` to handle messages through the `binaryMessenger`.
+  static func setUp(binaryMessenger: FlutterBinaryMessenger, api: CheckoutPlatformInterface?, messageChannelSuffix: String = "") {
+    let channelSuffix = messageChannelSuffix.count > 0 ? ".\(messageChannelSuffix)" : ""
+    let getReturnUrlChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.getReturnUrl\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      getReturnUrlChannel.setMessageHandler { _, reply in
+        api.getReturnUrl { result in
+          switch result {
+          case .success(let res):
+            reply(wrapResult(res))
+          case .failure(let error):
+            reply(wrapError(error))
+          }
+        }
+      }
+    } else {
+      getReturnUrlChannel.setMessageHandler(nil)
     }
-
-    /// Sets up an instance of `CheckoutPlatformInterface` to handle messages through the `binaryMessenger`.
-    static func setUp(binaryMessenger: FlutterBinaryMessenger, api: CheckoutPlatformInterface?, messageChannelSuffix: String = "") {
-        let channelSuffix = messageChannelSuffix.count > 0 ? ".\(messageChannelSuffix)" : ""
-        let getReturnUrlChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.getReturnUrl\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
-        if let api {
-            getReturnUrlChannel.setMessageHandler { _, reply in
-                api.getReturnUrl { result in
-                    switch result {
-                    case let .success(res):
-                        reply(wrapResult(res))
-                    case let .failure(error):
-                        reply(wrapError(error))
-                    }
-                }
-            }
-        } else {
-            getReturnUrlChannel.setMessageHandler(nil)
+    let createSessionChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.createSession\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      createSessionChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let sessionIdArg = args[0] as! String
+        let sessionDataArg = args[1] as! String
+        let configurationArg: Any? = args[2]
+        api.createSession(sessionId: sessionIdArg, sessionData: sessionDataArg, configuration: configurationArg) { result in
+          switch result {
+          case .success(let res):
+            reply(wrapResult(res))
+          case .failure(let error):
+            reply(wrapError(error))
+          }
         }
-        let createSessionChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.createSession\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
-        if let api {
-            createSessionChannel.setMessageHandler { message, reply in
-                let args = message as! [Any?]
-                let sessionIdArg = args[0] as! String
-                let sessionDataArg = args[1] as! String
-                let configurationArg: Any? = args[2]
-                api.createSession(sessionId: sessionIdArg, sessionData: sessionDataArg, configuration: configurationArg) { result in
-                    switch result {
-                    case let .success(res):
-                        reply(wrapResult(res))
-                    case let .failure(error):
-                        reply(wrapError(error))
-                    }
-                }
-            }
-        } else {
-            createSessionChannel.setMessageHandler(nil)
-        }
-        let clearSessionChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.clearSession\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
-        if let api {
-            clearSessionChannel.setMessageHandler { _, reply in
-                do {
-                    try api.clearSession()
-                    reply(wrapResult(nil))
-                } catch {
-                    reply(wrapError(error))
-                }
-            }
-        } else {
-            clearSessionChannel.setMessageHandler(nil)
-        }
-        let encryptCardChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.encryptCard\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
-        if let api {
-            encryptCardChannel.setMessageHandler { message, reply in
-                let args = message as! [Any?]
-                let unencryptedCardDTOArg = args[0] as! UnencryptedCardDTO
-                let publicKeyArg = args[1] as! String
-                api.encryptCard(unencryptedCardDTO: unencryptedCardDTOArg, publicKey: publicKeyArg) { result in
-                    switch result {
-                    case let .success(res):
-                        reply(wrapResult(res))
-                    case let .failure(error):
-                        reply(wrapError(error))
-                    }
-                }
-            }
-        } else {
-            encryptCardChannel.setMessageHandler(nil)
-        }
-        let encryptBinChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.encryptBin\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
-        if let api {
-            encryptBinChannel.setMessageHandler { message, reply in
-                let args = message as! [Any?]
-                let binArg = args[0] as! String
-                let publicKeyArg = args[1] as! String
-                api.encryptBin(bin: binArg, publicKey: publicKeyArg) { result in
-                    switch result {
-                    case let .success(res):
-                        reply(wrapResult(res))
-                    case let .failure(error):
-                        reply(wrapError(error))
-                    }
-                }
-            }
-        } else {
-            encryptBinChannel.setMessageHandler(nil)
-        }
-        let validateCardNumberChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.validateCardNumber\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
-        if let api {
-            validateCardNumberChannel.setMessageHandler { message, reply in
-                let args = message as! [Any?]
-                let cardNumberArg = args[0] as! String
-                let enableLuhnCheckArg = args[1] as! Bool
-                do {
-                    let result = try api.validateCardNumber(cardNumber: cardNumberArg, enableLuhnCheck: enableLuhnCheckArg)
-                    reply(wrapResult(result))
-                } catch {
-                    reply(wrapError(error))
-                }
-            }
-        } else {
-            validateCardNumberChannel.setMessageHandler(nil)
-        }
-        let validateCardExpiryDateChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.validateCardExpiryDate\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
-        if let api {
-            validateCardExpiryDateChannel.setMessageHandler { message, reply in
-                let args = message as! [Any?]
-                let expiryMonthArg = args[0] as! String
-                let expiryYearArg = args[1] as! String
-                do {
-                    let result = try api.validateCardExpiryDate(expiryMonth: expiryMonthArg, expiryYear: expiryYearArg)
-                    reply(wrapResult(result))
-                } catch {
-                    reply(wrapError(error))
-                }
-            }
-        } else {
-            validateCardExpiryDateChannel.setMessageHandler(nil)
-        }
-        let validateCardSecurityCodeChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.validateCardSecurityCode\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
-        if let api {
-            validateCardSecurityCodeChannel.setMessageHandler { message, reply in
-                let args = message as! [Any?]
-                let securityCodeArg = args[0] as! String
-                let cardBrandArg: String? = nilOrValue(args[1])
-                do {
-                    let result = try api.validateCardSecurityCode(securityCode: securityCodeArg, cardBrand: cardBrandArg)
-                    reply(wrapResult(result))
-                } catch {
-                    reply(wrapError(error))
-                }
-            }
-        } else {
-            validateCardSecurityCodeChannel.setMessageHandler(nil)
-        }
-        let enableConsoleLoggingChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.enableConsoleLogging\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
-        if let api {
-            enableConsoleLoggingChannel.setMessageHandler { message, reply in
-                let args = message as! [Any?]
-                let loggingEnabledArg = args[0] as! Bool
-                do {
-                    try api.enableConsoleLogging(loggingEnabled: loggingEnabledArg)
-                    reply(wrapResult(nil))
-                } catch {
-                    reply(wrapError(error))
-                }
-            }
-        } else {
-            enableConsoleLoggingChannel.setMessageHandler(nil)
-        }
-        let getThreeDS2SdkVersionChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.getThreeDS2SdkVersion\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
-        if let api {
-            getThreeDS2SdkVersionChannel.setMessageHandler { _, reply in
-                do {
-                    let result = try api.getThreeDS2SdkVersion()
-                    reply(wrapResult(result))
-                } catch {
-                    reply(wrapError(error))
-                }
-            }
-        } else {
-            getThreeDS2SdkVersionChannel.setMessageHandler(nil)
-        }
+      }
+    } else {
+      createSessionChannel.setMessageHandler(nil)
     }
+    let clearSessionChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.clearSession\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      clearSessionChannel.setMessageHandler { _, reply in
+        do {
+          try api.clearSession()
+          reply(wrapResult(nil))
+        } catch {
+          reply(wrapError(error))
+        }
+      }
+    } else {
+      clearSessionChannel.setMessageHandler(nil)
+    }
+    let encryptCardChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.encryptCard\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      encryptCardChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let unencryptedCardDTOArg = args[0] as! UnencryptedCardDTO
+        let publicKeyArg = args[1] as! String
+        api.encryptCard(unencryptedCardDTO: unencryptedCardDTOArg, publicKey: publicKeyArg) { result in
+          switch result {
+          case .success(let res):
+            reply(wrapResult(res))
+          case .failure(let error):
+            reply(wrapError(error))
+          }
+        }
+      }
+    } else {
+      encryptCardChannel.setMessageHandler(nil)
+    }
+    let encryptBinChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.encryptBin\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      encryptBinChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let binArg = args[0] as! String
+        let publicKeyArg = args[1] as! String
+        api.encryptBin(bin: binArg, publicKey: publicKeyArg) { result in
+          switch result {
+          case .success(let res):
+            reply(wrapResult(res))
+          case .failure(let error):
+            reply(wrapError(error))
+          }
+        }
+      }
+    } else {
+      encryptBinChannel.setMessageHandler(nil)
+    }
+    let validateCardNumberChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.validateCardNumber\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      validateCardNumberChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let cardNumberArg = args[0] as! String
+        let enableLuhnCheckArg = args[1] as! Bool
+        do {
+          let result = try api.validateCardNumber(cardNumber: cardNumberArg, enableLuhnCheck: enableLuhnCheckArg)
+          reply(wrapResult(result))
+        } catch {
+          reply(wrapError(error))
+        }
+      }
+    } else {
+      validateCardNumberChannel.setMessageHandler(nil)
+    }
+    let validateCardExpiryDateChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.validateCardExpiryDate\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      validateCardExpiryDateChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let expiryMonthArg = args[0] as! String
+        let expiryYearArg = args[1] as! String
+        do {
+          let result = try api.validateCardExpiryDate(expiryMonth: expiryMonthArg, expiryYear: expiryYearArg)
+          reply(wrapResult(result))
+        } catch {
+          reply(wrapError(error))
+        }
+      }
+    } else {
+      validateCardExpiryDateChannel.setMessageHandler(nil)
+    }
+    let validateCardSecurityCodeChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.validateCardSecurityCode\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      validateCardSecurityCodeChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let securityCodeArg = args[0] as! String
+        let cardBrandArg: String? = nilOrValue(args[1])
+        do {
+          let result = try api.validateCardSecurityCode(securityCode: securityCodeArg, cardBrand: cardBrandArg)
+          reply(wrapResult(result))
+        } catch {
+          reply(wrapError(error))
+        }
+      }
+    } else {
+      validateCardSecurityCodeChannel.setMessageHandler(nil)
+    }
+    let enableConsoleLoggingChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.enableConsoleLogging\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      enableConsoleLoggingChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let loggingEnabledArg = args[0] as! Bool
+        do {
+          try api.enableConsoleLogging(loggingEnabled: loggingEnabledArg)
+          reply(wrapResult(nil))
+        } catch {
+          reply(wrapError(error))
+        }
+      }
+    } else {
+      enableConsoleLoggingChannel.setMessageHandler(nil)
+    }
+    let getThreeDS2SdkVersionChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.getThreeDS2SdkVersion\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      getThreeDS2SdkVersionChannel.setMessageHandler { _, reply in
+        do {
+          let result = try api.getThreeDS2SdkVersion()
+          reply(wrapResult(result))
+        } catch {
+          reply(wrapError(error))
+        }
+      }
+    } else {
+      getThreeDS2SdkVersionChannel.setMessageHandler(nil)
+    }
+  }
 }
-
 /// Generated protocol from Pigeon that represents a handler of messages from Flutter.
 protocol DropInPlatformInterface {
-    func showDropInSession(dropInConfigurationDTO: DropInConfigurationDTO) throws
-    func showDropInAdvanced(dropInConfigurationDTO: DropInConfigurationDTO, paymentMethodsResponse: String) throws
-    func stopDropIn() throws
-    func onPaymentsResult(paymentsResult: PaymentEventDTO) throws
-    func onPaymentsDetailsResult(paymentsDetailsResult: PaymentEventDTO) throws
-    func onDeleteStoredPaymentMethodResult(deleteStoredPaymentMethodResultDTO: DeletedStoredPaymentMethodResultDTO) throws
-    func onBalanceCheckResult(balanceCheckResponse: String) throws
-    func onOrderRequestResult(orderRequestResponse: String) throws
-    func onOrderCancelResult(orderCancelResult: OrderCancelResultDTO) throws
-    func cleanUpDropIn() throws
+  func showDropInSession(dropInConfigurationDTO: DropInConfigurationDTO) throws
+  func showDropInAdvanced(dropInConfigurationDTO: DropInConfigurationDTO, paymentMethodsResponse: String) throws
+  func stopDropIn() throws
+  func onPaymentsResult(paymentsResult: PaymentEventDTO) throws
+  func onPaymentsDetailsResult(paymentsDetailsResult: PaymentEventDTO) throws
+  func onDeleteStoredPaymentMethodResult(deleteStoredPaymentMethodResultDTO: DeletedStoredPaymentMethodResultDTO) throws
+  func onBalanceCheckResult(balanceCheckResponse: String) throws
+  func onOrderRequestResult(orderRequestResponse: String) throws
+  func onOrderCancelResult(orderCancelResult: OrderCancelResultDTO) throws
+  func cleanUpDropIn() throws
 }
 
 /// Generated setup class from Pigeon to handle messages through the `binaryMessenger`.
 class DropInPlatformInterfaceSetup {
-    static var codec: FlutterStandardMessageCodec {
-        PlatformApiPigeonCodec.shared
+  static var codec: FlutterStandardMessageCodec { PlatformApiPigeonCodec.shared }
+  /// Sets up an instance of `DropInPlatformInterface` to handle messages through the `binaryMessenger`.
+  static func setUp(binaryMessenger: FlutterBinaryMessenger, api: DropInPlatformInterface?, messageChannelSuffix: String = "") {
+    let channelSuffix = messageChannelSuffix.count > 0 ? ".\(messageChannelSuffix)" : ""
+    let showDropInSessionChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.DropInPlatformInterface.showDropInSession\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      showDropInSessionChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let dropInConfigurationDTOArg = args[0] as! DropInConfigurationDTO
+        do {
+          try api.showDropInSession(dropInConfigurationDTO: dropInConfigurationDTOArg)
+          reply(wrapResult(nil))
+        } catch {
+          reply(wrapError(error))
+        }
+      }
+    } else {
+      showDropInSessionChannel.setMessageHandler(nil)
     }
-
-    /// Sets up an instance of `DropInPlatformInterface` to handle messages through the `binaryMessenger`.
-    static func setUp(binaryMessenger: FlutterBinaryMessenger, api: DropInPlatformInterface?, messageChannelSuffix: String = "") {
-        let channelSuffix = messageChannelSuffix.count > 0 ? ".\(messageChannelSuffix)" : ""
-        let showDropInSessionChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.DropInPlatformInterface.showDropInSession\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
-        if let api {
-            showDropInSessionChannel.setMessageHandler { message, reply in
-                let args = message as! [Any?]
-                let dropInConfigurationDTOArg = args[0] as! DropInConfigurationDTO
-                do {
-                    try api.showDropInSession(dropInConfigurationDTO: dropInConfigurationDTOArg)
-                    reply(wrapResult(nil))
-                } catch {
-                    reply(wrapError(error))
-                }
-            }
-        } else {
-            showDropInSessionChannel.setMessageHandler(nil)
+    let showDropInAdvancedChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.DropInPlatformInterface.showDropInAdvanced\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      showDropInAdvancedChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let dropInConfigurationDTOArg = args[0] as! DropInConfigurationDTO
+        let paymentMethodsResponseArg = args[1] as! String
+        do {
+          try api.showDropInAdvanced(dropInConfigurationDTO: dropInConfigurationDTOArg, paymentMethodsResponse: paymentMethodsResponseArg)
+          reply(wrapResult(nil))
+        } catch {
+          reply(wrapError(error))
         }
-        let showDropInAdvancedChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.DropInPlatformInterface.showDropInAdvanced\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
-        if let api {
-            showDropInAdvancedChannel.setMessageHandler { message, reply in
-                let args = message as! [Any?]
-                let dropInConfigurationDTOArg = args[0] as! DropInConfigurationDTO
-                let paymentMethodsResponseArg = args[1] as! String
-                do {
-                    try api.showDropInAdvanced(dropInConfigurationDTO: dropInConfigurationDTOArg, paymentMethodsResponse: paymentMethodsResponseArg)
-                    reply(wrapResult(nil))
-                } catch {
-                    reply(wrapError(error))
-                }
-            }
-        } else {
-            showDropInAdvancedChannel.setMessageHandler(nil)
-        }
-        let stopDropInChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.DropInPlatformInterface.stopDropIn\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
-        if let api {
-            stopDropInChannel.setMessageHandler { _, reply in
-                do {
-                    try api.stopDropIn()
-                    reply(wrapResult(nil))
-                } catch {
-                    reply(wrapError(error))
-                }
-            }
-        } else {
-            stopDropInChannel.setMessageHandler(nil)
-        }
-        let onPaymentsResultChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.DropInPlatformInterface.onPaymentsResult\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
-        if let api {
-            onPaymentsResultChannel.setMessageHandler { message, reply in
-                let args = message as! [Any?]
-                let paymentsResultArg = args[0] as! PaymentEventDTO
-                do {
-                    try api.onPaymentsResult(paymentsResult: paymentsResultArg)
-                    reply(wrapResult(nil))
-                } catch {
-                    reply(wrapError(error))
-                }
-            }
-        } else {
-            onPaymentsResultChannel.setMessageHandler(nil)
-        }
-        let onPaymentsDetailsResultChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.DropInPlatformInterface.onPaymentsDetailsResult\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
-        if let api {
-            onPaymentsDetailsResultChannel.setMessageHandler { message, reply in
-                let args = message as! [Any?]
-                let paymentsDetailsResultArg = args[0] as! PaymentEventDTO
-                do {
-                    try api.onPaymentsDetailsResult(paymentsDetailsResult: paymentsDetailsResultArg)
-                    reply(wrapResult(nil))
-                } catch {
-                    reply(wrapError(error))
-                }
-            }
-        } else {
-            onPaymentsDetailsResultChannel.setMessageHandler(nil)
-        }
-        let onDeleteStoredPaymentMethodResultChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.DropInPlatformInterface.onDeleteStoredPaymentMethodResult\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
-        if let api {
-            onDeleteStoredPaymentMethodResultChannel.setMessageHandler { message, reply in
-                let args = message as! [Any?]
-                let deleteStoredPaymentMethodResultDTOArg = args[0] as! DeletedStoredPaymentMethodResultDTO
-                do {
-                    try api.onDeleteStoredPaymentMethodResult(deleteStoredPaymentMethodResultDTO: deleteStoredPaymentMethodResultDTOArg)
-                    reply(wrapResult(nil))
-                } catch {
-                    reply(wrapError(error))
-                }
-            }
-        } else {
-            onDeleteStoredPaymentMethodResultChannel.setMessageHandler(nil)
-        }
-        let onBalanceCheckResultChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.DropInPlatformInterface.onBalanceCheckResult\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
-        if let api {
-            onBalanceCheckResultChannel.setMessageHandler { message, reply in
-                let args = message as! [Any?]
-                let balanceCheckResponseArg = args[0] as! String
-                do {
-                    try api.onBalanceCheckResult(balanceCheckResponse: balanceCheckResponseArg)
-                    reply(wrapResult(nil))
-                } catch {
-                    reply(wrapError(error))
-                }
-            }
-        } else {
-            onBalanceCheckResultChannel.setMessageHandler(nil)
-        }
-        let onOrderRequestResultChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.DropInPlatformInterface.onOrderRequestResult\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
-        if let api {
-            onOrderRequestResultChannel.setMessageHandler { message, reply in
-                let args = message as! [Any?]
-                let orderRequestResponseArg = args[0] as! String
-                do {
-                    try api.onOrderRequestResult(orderRequestResponse: orderRequestResponseArg)
-                    reply(wrapResult(nil))
-                } catch {
-                    reply(wrapError(error))
-                }
-            }
-        } else {
-            onOrderRequestResultChannel.setMessageHandler(nil)
-        }
-        let onOrderCancelResultChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.DropInPlatformInterface.onOrderCancelResult\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
-        if let api {
-            onOrderCancelResultChannel.setMessageHandler { message, reply in
-                let args = message as! [Any?]
-                let orderCancelResultArg = args[0] as! OrderCancelResultDTO
-                do {
-                    try api.onOrderCancelResult(orderCancelResult: orderCancelResultArg)
-                    reply(wrapResult(nil))
-                } catch {
-                    reply(wrapError(error))
-                }
-            }
-        } else {
-            onOrderCancelResultChannel.setMessageHandler(nil)
-        }
-        let cleanUpDropInChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.DropInPlatformInterface.cleanUpDropIn\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
-        if let api {
-            cleanUpDropInChannel.setMessageHandler { _, reply in
-                do {
-                    try api.cleanUpDropIn()
-                    reply(wrapResult(nil))
-                } catch {
-                    reply(wrapError(error))
-                }
-            }
-        } else {
-            cleanUpDropInChannel.setMessageHandler(nil)
-        }
+      }
+    } else {
+      showDropInAdvancedChannel.setMessageHandler(nil)
     }
+    let stopDropInChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.DropInPlatformInterface.stopDropIn\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      stopDropInChannel.setMessageHandler { _, reply in
+        do {
+          try api.stopDropIn()
+          reply(wrapResult(nil))
+        } catch {
+          reply(wrapError(error))
+        }
+      }
+    } else {
+      stopDropInChannel.setMessageHandler(nil)
+    }
+    let onPaymentsResultChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.DropInPlatformInterface.onPaymentsResult\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      onPaymentsResultChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let paymentsResultArg = args[0] as! PaymentEventDTO
+        do {
+          try api.onPaymentsResult(paymentsResult: paymentsResultArg)
+          reply(wrapResult(nil))
+        } catch {
+          reply(wrapError(error))
+        }
+      }
+    } else {
+      onPaymentsResultChannel.setMessageHandler(nil)
+    }
+    let onPaymentsDetailsResultChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.DropInPlatformInterface.onPaymentsDetailsResult\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      onPaymentsDetailsResultChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let paymentsDetailsResultArg = args[0] as! PaymentEventDTO
+        do {
+          try api.onPaymentsDetailsResult(paymentsDetailsResult: paymentsDetailsResultArg)
+          reply(wrapResult(nil))
+        } catch {
+          reply(wrapError(error))
+        }
+      }
+    } else {
+      onPaymentsDetailsResultChannel.setMessageHandler(nil)
+    }
+    let onDeleteStoredPaymentMethodResultChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.DropInPlatformInterface.onDeleteStoredPaymentMethodResult\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      onDeleteStoredPaymentMethodResultChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let deleteStoredPaymentMethodResultDTOArg = args[0] as! DeletedStoredPaymentMethodResultDTO
+        do {
+          try api.onDeleteStoredPaymentMethodResult(deleteStoredPaymentMethodResultDTO: deleteStoredPaymentMethodResultDTOArg)
+          reply(wrapResult(nil))
+        } catch {
+          reply(wrapError(error))
+        }
+      }
+    } else {
+      onDeleteStoredPaymentMethodResultChannel.setMessageHandler(nil)
+    }
+    let onBalanceCheckResultChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.DropInPlatformInterface.onBalanceCheckResult\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      onBalanceCheckResultChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let balanceCheckResponseArg = args[0] as! String
+        do {
+          try api.onBalanceCheckResult(balanceCheckResponse: balanceCheckResponseArg)
+          reply(wrapResult(nil))
+        } catch {
+          reply(wrapError(error))
+        }
+      }
+    } else {
+      onBalanceCheckResultChannel.setMessageHandler(nil)
+    }
+    let onOrderRequestResultChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.DropInPlatformInterface.onOrderRequestResult\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      onOrderRequestResultChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let orderRequestResponseArg = args[0] as! String
+        do {
+          try api.onOrderRequestResult(orderRequestResponse: orderRequestResponseArg)
+          reply(wrapResult(nil))
+        } catch {
+          reply(wrapError(error))
+        }
+      }
+    } else {
+      onOrderRequestResultChannel.setMessageHandler(nil)
+    }
+    let onOrderCancelResultChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.DropInPlatformInterface.onOrderCancelResult\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      onOrderCancelResultChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let orderCancelResultArg = args[0] as! OrderCancelResultDTO
+        do {
+          try api.onOrderCancelResult(orderCancelResult: orderCancelResultArg)
+          reply(wrapResult(nil))
+        } catch {
+          reply(wrapError(error))
+        }
+      }
+    } else {
+      onOrderCancelResultChannel.setMessageHandler(nil)
+    }
+    let cleanUpDropInChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.DropInPlatformInterface.cleanUpDropIn\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      cleanUpDropInChannel.setMessageHandler { _, reply in
+        do {
+          try api.cleanUpDropIn()
+          reply(wrapResult(nil))
+        } catch {
+          reply(wrapError(error))
+        }
+      }
+    } else {
+      cleanUpDropInChannel.setMessageHandler(nil)
+    }
+  }
 }
-
 /// Generated protocol from Pigeon that represents Flutter messages that can be called from Swift.
 protocol CheckoutFlutterInterfaceProtocol {
-    func send(event eventArg: CheckoutEvent, completion: @escaping (Result<Void, AdyenPigeonError>) -> Void)
+  func send(event eventArg: CheckoutEvent, completion: @escaping (Result<Void, AdyenPigeonError>) -> Void)
 }
-
 class CheckoutFlutterInterface: CheckoutFlutterInterfaceProtocol {
-    private let binaryMessenger: FlutterBinaryMessenger
-    private let messageChannelSuffix: String
-    init(binaryMessenger: FlutterBinaryMessenger, messageChannelSuffix: String = "") {
-        self.binaryMessenger = binaryMessenger
-        self.messageChannelSuffix = messageChannelSuffix.count > 0 ? ".\(messageChannelSuffix)" : ""
+  private let binaryMessenger: FlutterBinaryMessenger
+  private let messageChannelSuffix: String
+  init(binaryMessenger: FlutterBinaryMessenger, messageChannelSuffix: String = "") {
+    self.binaryMessenger = binaryMessenger
+    self.messageChannelSuffix = messageChannelSuffix.count > 0 ? ".\(messageChannelSuffix)" : ""
+  }
+  var codec: PlatformApiPigeonCodec {
+    return PlatformApiPigeonCodec.shared
+  }
+  func send(event eventArg: CheckoutEvent, completion: @escaping (Result<Void, AdyenPigeonError>) -> Void) {
+    let channelName: String = "dev.flutter.pigeon.adyen_checkout.CheckoutFlutterInterface.send\(messageChannelSuffix)"
+    let channel = FlutterBasicMessageChannel(name: channelName, binaryMessenger: binaryMessenger, codec: codec)
+    channel.sendMessage([eventArg] as [Any?]) { response in
+      guard let listResponse = response as? [Any?] else {
+        completion(.failure(createConnectionError(withChannelName: channelName)))
+        return
+      }
+      if listResponse.count > 1 {
+        let code: String = listResponse[0] as! String
+        let message: String? = nilOrValue(listResponse[1])
+        let details: String? = nilOrValue(listResponse[2])
+        completion(.failure(AdyenPigeonError(code: code, message: message, details: details)))
+      } else {
+        completion(.success(Void()))
+      }
     }
-
-    var codec: PlatformApiPigeonCodec {
-        PlatformApiPigeonCodec.shared
-    }
-
-    func send(event eventArg: CheckoutEvent, completion: @escaping (Result<Void, AdyenPigeonError>) -> Void) {
-        let channelName = "dev.flutter.pigeon.adyen_checkout.CheckoutFlutterInterface.send\(messageChannelSuffix)"
-        let channel = FlutterBasicMessageChannel(name: channelName, binaryMessenger: binaryMessenger, codec: codec)
-        channel.sendMessage([eventArg] as [Any?]) { response in
-            guard let listResponse = response as? [Any?] else {
-                completion(.failure(createConnectionError(withChannelName: channelName)))
-                return
-            }
-            if listResponse.count > 1 {
-                let code: String = listResponse[0] as! String
-                let message: String? = nilOrValue(listResponse[1])
-                let details: String? = nilOrValue(listResponse[2])
-                completion(.failure(AdyenPigeonError(code: code, message: message, details: details)))
-            } else {
-                completion(.success(()))
-            }
-        }
-    }
+  }
 }
-
 /// Generated protocol from Pigeon that represents a handler of messages from Flutter.
 protocol ComponentPlatformInterface {
-    func updateViewHeight(viewId: Int64) throws
-    func onPaymentsResult(componentId: String, paymentsResult: PaymentEventDTO) throws
-    func onPaymentsDetailsResult(componentId: String, paymentsDetailsResult: PaymentEventDTO) throws
-    func isInstantPaymentSupportedByPlatform(instantPaymentConfigurationDTO: InstantPaymentConfigurationDTO, paymentMethodResponse: String, componentId: String, completion: @escaping (Result<InstantPaymentSetupResultDTO, Error>) -> Void)
-    func onInstantPaymentPressed(instantPaymentConfigurationDTO: InstantPaymentConfigurationDTO, encodedPaymentMethod: String, componentId: String) throws
-    func handleAction(actionComponentConfiguration: ActionComponentConfigurationDTO, componentId: String, actionResponse: [String?: Any?]?) throws
-    func onDispose(componentId: String) throws
+  func updateViewHeight(viewId: Int64) throws
+  func onPaymentsResult(componentId: String, paymentsResult: PaymentEventDTO) throws
+  func onPaymentsDetailsResult(componentId: String, paymentsDetailsResult: PaymentEventDTO) throws
+  func isInstantPaymentSupportedByPlatform(instantPaymentConfigurationDTO: InstantPaymentConfigurationDTO, paymentMethodResponse: String, componentId: String, completion: @escaping (Result<InstantPaymentSetupResultDTO, Error>) -> Void)
+  func onInstantPaymentPressed(instantPaymentConfigurationDTO: InstantPaymentConfigurationDTO, encodedPaymentMethod: String, componentId: String) throws
+  func handleAction(actionComponentConfiguration: ActionComponentConfigurationDTO, componentId: String, actionResponse: [String?: Any?]?) throws
+  func onDispose(componentId: String) throws
 }
 
 /// Generated setup class from Pigeon to handle messages through the `binaryMessenger`.
 class ComponentPlatformInterfaceSetup {
-    static var codec: FlutterStandardMessageCodec {
-        PlatformApiPigeonCodec.shared
+  static var codec: FlutterStandardMessageCodec { PlatformApiPigeonCodec.shared }
+  /// Sets up an instance of `ComponentPlatformInterface` to handle messages through the `binaryMessenger`.
+  static func setUp(binaryMessenger: FlutterBinaryMessenger, api: ComponentPlatformInterface?, messageChannelSuffix: String = "") {
+    let channelSuffix = messageChannelSuffix.count > 0 ? ".\(messageChannelSuffix)" : ""
+    let updateViewHeightChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.ComponentPlatformInterface.updateViewHeight\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      updateViewHeightChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let viewIdArg = args[0] is Int64 ? args[0] as! Int64 : Int64(args[0] as! Int32)
+        do {
+          try api.updateViewHeight(viewId: viewIdArg)
+          reply(wrapResult(nil))
+        } catch {
+          reply(wrapError(error))
+        }
+      }
+    } else {
+      updateViewHeightChannel.setMessageHandler(nil)
     }
-
-    /// Sets up an instance of `ComponentPlatformInterface` to handle messages through the `binaryMessenger`.
-    static func setUp(binaryMessenger: FlutterBinaryMessenger, api: ComponentPlatformInterface?, messageChannelSuffix: String = "") {
-        let channelSuffix = messageChannelSuffix.count > 0 ? ".\(messageChannelSuffix)" : ""
-        let updateViewHeightChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.ComponentPlatformInterface.updateViewHeight\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
-        if let api {
-            updateViewHeightChannel.setMessageHandler { message, reply in
-                let args = message as! [Any?]
-                let viewIdArg = args[0] is Int64 ? args[0] as! Int64 : Int64(args[0] as! Int32)
-                do {
-                    try api.updateViewHeight(viewId: viewIdArg)
-                    reply(wrapResult(nil))
-                } catch {
-                    reply(wrapError(error))
-                }
-            }
-        } else {
-            updateViewHeightChannel.setMessageHandler(nil)
+    let onPaymentsResultChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.ComponentPlatformInterface.onPaymentsResult\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      onPaymentsResultChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let componentIdArg = args[0] as! String
+        let paymentsResultArg = args[1] as! PaymentEventDTO
+        do {
+          try api.onPaymentsResult(componentId: componentIdArg, paymentsResult: paymentsResultArg)
+          reply(wrapResult(nil))
+        } catch {
+          reply(wrapError(error))
         }
-        let onPaymentsResultChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.ComponentPlatformInterface.onPaymentsResult\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
-        if let api {
-            onPaymentsResultChannel.setMessageHandler { message, reply in
-                let args = message as! [Any?]
-                let componentIdArg = args[0] as! String
-                let paymentsResultArg = args[1] as! PaymentEventDTO
-                do {
-                    try api.onPaymentsResult(componentId: componentIdArg, paymentsResult: paymentsResultArg)
-                    reply(wrapResult(nil))
-                } catch {
-                    reply(wrapError(error))
-                }
-            }
-        } else {
-            onPaymentsResultChannel.setMessageHandler(nil)
-        }
-        let onPaymentsDetailsResultChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.ComponentPlatformInterface.onPaymentsDetailsResult\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
-        if let api {
-            onPaymentsDetailsResultChannel.setMessageHandler { message, reply in
-                let args = message as! [Any?]
-                let componentIdArg = args[0] as! String
-                let paymentsDetailsResultArg = args[1] as! PaymentEventDTO
-                do {
-                    try api.onPaymentsDetailsResult(componentId: componentIdArg, paymentsDetailsResult: paymentsDetailsResultArg)
-                    reply(wrapResult(nil))
-                } catch {
-                    reply(wrapError(error))
-                }
-            }
-        } else {
-            onPaymentsDetailsResultChannel.setMessageHandler(nil)
-        }
-        let isInstantPaymentSupportedByPlatformChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.ComponentPlatformInterface.isInstantPaymentSupportedByPlatform\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
-        if let api {
-            isInstantPaymentSupportedByPlatformChannel.setMessageHandler { message, reply in
-                let args = message as! [Any?]
-                let instantPaymentConfigurationDTOArg = args[0] as! InstantPaymentConfigurationDTO
-                let paymentMethodResponseArg = args[1] as! String
-                let componentIdArg = args[2] as! String
-                api.isInstantPaymentSupportedByPlatform(instantPaymentConfigurationDTO: instantPaymentConfigurationDTOArg, paymentMethodResponse: paymentMethodResponseArg, componentId: componentIdArg) { result in
-                    switch result {
-                    case let .success(res):
-                        reply(wrapResult(res))
-                    case let .failure(error):
-                        reply(wrapError(error))
-                    }
-                }
-            }
-        } else {
-            isInstantPaymentSupportedByPlatformChannel.setMessageHandler(nil)
-        }
-        let onInstantPaymentPressedChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.ComponentPlatformInterface.onInstantPaymentPressed\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
-        if let api {
-            onInstantPaymentPressedChannel.setMessageHandler { message, reply in
-                let args = message as! [Any?]
-                let instantPaymentConfigurationDTOArg = args[0] as! InstantPaymentConfigurationDTO
-                let encodedPaymentMethodArg = args[1] as! String
-                let componentIdArg = args[2] as! String
-                do {
-                    try api.onInstantPaymentPressed(instantPaymentConfigurationDTO: instantPaymentConfigurationDTOArg, encodedPaymentMethod: encodedPaymentMethodArg, componentId: componentIdArg)
-                    reply(wrapResult(nil))
-                } catch {
-                    reply(wrapError(error))
-                }
-            }
-        } else {
-            onInstantPaymentPressedChannel.setMessageHandler(nil)
-        }
-        let handleActionChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.ComponentPlatformInterface.handleAction\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
-        if let api {
-            handleActionChannel.setMessageHandler { message, reply in
-                let args = message as! [Any?]
-                let actionComponentConfigurationArg = args[0] as! ActionComponentConfigurationDTO
-                let componentIdArg = args[1] as! String
-                let actionResponseArg: [String?: Any?]? = nilOrValue(args[2])
-                do {
-                    try api.handleAction(actionComponentConfiguration: actionComponentConfigurationArg, componentId: componentIdArg, actionResponse: actionResponseArg)
-                    reply(wrapResult(nil))
-                } catch {
-                    reply(wrapError(error))
-                }
-            }
-        } else {
-            handleActionChannel.setMessageHandler(nil)
-        }
-        let onDisposeChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.ComponentPlatformInterface.onDispose\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
-        if let api {
-            onDisposeChannel.setMessageHandler { message, reply in
-                let args = message as! [Any?]
-                let componentIdArg = args[0] as! String
-                do {
-                    try api.onDispose(componentId: componentIdArg)
-                    reply(wrapResult(nil))
-                } catch {
-                    reply(wrapError(error))
-                }
-            }
-        } else {
-            onDisposeChannel.setMessageHandler(nil)
-        }
+      }
+    } else {
+      onPaymentsResultChannel.setMessageHandler(nil)
     }
+    let onPaymentsDetailsResultChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.ComponentPlatformInterface.onPaymentsDetailsResult\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      onPaymentsDetailsResultChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let componentIdArg = args[0] as! String
+        let paymentsDetailsResultArg = args[1] as! PaymentEventDTO
+        do {
+          try api.onPaymentsDetailsResult(componentId: componentIdArg, paymentsDetailsResult: paymentsDetailsResultArg)
+          reply(wrapResult(nil))
+        } catch {
+          reply(wrapError(error))
+        }
+      }
+    } else {
+      onPaymentsDetailsResultChannel.setMessageHandler(nil)
+    }
+    let isInstantPaymentSupportedByPlatformChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.ComponentPlatformInterface.isInstantPaymentSupportedByPlatform\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      isInstantPaymentSupportedByPlatformChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let instantPaymentConfigurationDTOArg = args[0] as! InstantPaymentConfigurationDTO
+        let paymentMethodResponseArg = args[1] as! String
+        let componentIdArg = args[2] as! String
+        api.isInstantPaymentSupportedByPlatform(instantPaymentConfigurationDTO: instantPaymentConfigurationDTOArg, paymentMethodResponse: paymentMethodResponseArg, componentId: componentIdArg) { result in
+          switch result {
+          case .success(let res):
+            reply(wrapResult(res))
+          case .failure(let error):
+            reply(wrapError(error))
+          }
+        }
+      }
+    } else {
+      isInstantPaymentSupportedByPlatformChannel.setMessageHandler(nil)
+    }
+    let onInstantPaymentPressedChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.ComponentPlatformInterface.onInstantPaymentPressed\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      onInstantPaymentPressedChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let instantPaymentConfigurationDTOArg = args[0] as! InstantPaymentConfigurationDTO
+        let encodedPaymentMethodArg = args[1] as! String
+        let componentIdArg = args[2] as! String
+        do {
+          try api.onInstantPaymentPressed(instantPaymentConfigurationDTO: instantPaymentConfigurationDTOArg, encodedPaymentMethod: encodedPaymentMethodArg, componentId: componentIdArg)
+          reply(wrapResult(nil))
+        } catch {
+          reply(wrapError(error))
+        }
+      }
+    } else {
+      onInstantPaymentPressedChannel.setMessageHandler(nil)
+    }
+    let handleActionChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.ComponentPlatformInterface.handleAction\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      handleActionChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let actionComponentConfigurationArg = args[0] as! ActionComponentConfigurationDTO
+        let componentIdArg = args[1] as! String
+        let actionResponseArg: [String?: Any?]? = nilOrValue(args[2])
+        do {
+          try api.handleAction(actionComponentConfiguration: actionComponentConfigurationArg, componentId: componentIdArg, actionResponse: actionResponseArg)
+          reply(wrapResult(nil))
+        } catch {
+          reply(wrapError(error))
+        }
+      }
+    } else {
+      handleActionChannel.setMessageHandler(nil)
+    }
+    let onDisposeChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.ComponentPlatformInterface.onDispose\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      onDisposeChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let componentIdArg = args[0] as! String
+        do {
+          try api.onDispose(componentId: componentIdArg)
+          reply(wrapResult(nil))
+        } catch {
+          reply(wrapError(error))
+        }
+      }
+    } else {
+      onDisposeChannel.setMessageHandler(nil)
+    }
+  }
 }
-
 /// Generated protocol from Pigeon that represents Flutter messages that can be called from Swift.
 protocol ComponentFlutterInterfaceProtocol {
-    func _generateCodecForDTOs(cardComponentConfigurationDTO cardComponentConfigurationDTOArg: CardComponentConfigurationDTO, sessionDTO sessionDTOArg: SessionDTO, binLookupDataDTO binLookupDataDTOArg: BinLookupDataDTO, completion: @escaping (Result<Void, AdyenPigeonError>) -> Void)
-    func onComponentCommunication(componentCommunicationModel componentCommunicationModelArg: ComponentCommunicationModel, completion: @escaping (Result<Void, AdyenPigeonError>) -> Void)
+  func _generateCodecForDTOs(cardComponentConfigurationDTO cardComponentConfigurationDTOArg: CardComponentConfigurationDTO, sessionDTO sessionDTOArg: SessionDTO, binLookupDataDTO binLookupDataDTOArg: BinLookupDataDTO, completion: @escaping (Result<Void, AdyenPigeonError>) -> Void)
+  func onComponentCommunication(componentCommunicationModel componentCommunicationModelArg: ComponentCommunicationModel, completion: @escaping (Result<Void, AdyenPigeonError>) -> Void)
 }
-
 class ComponentFlutterInterface: ComponentFlutterInterfaceProtocol {
-    private let binaryMessenger: FlutterBinaryMessenger
-    private let messageChannelSuffix: String
-    init(binaryMessenger: FlutterBinaryMessenger, messageChannelSuffix: String = "") {
-        self.binaryMessenger = binaryMessenger
-        self.messageChannelSuffix = messageChannelSuffix.count > 0 ? ".\(messageChannelSuffix)" : ""
+  private let binaryMessenger: FlutterBinaryMessenger
+  private let messageChannelSuffix: String
+  init(binaryMessenger: FlutterBinaryMessenger, messageChannelSuffix: String = "") {
+    self.binaryMessenger = binaryMessenger
+    self.messageChannelSuffix = messageChannelSuffix.count > 0 ? ".\(messageChannelSuffix)" : ""
+  }
+  var codec: PlatformApiPigeonCodec {
+    return PlatformApiPigeonCodec.shared
+  }
+  func _generateCodecForDTOs(cardComponentConfigurationDTO cardComponentConfigurationDTOArg: CardComponentConfigurationDTO, sessionDTO sessionDTOArg: SessionDTO, binLookupDataDTO binLookupDataDTOArg: BinLookupDataDTO, completion: @escaping (Result<Void, AdyenPigeonError>) -> Void) {
+    let channelName: String = "dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface._generateCodecForDTOs\(messageChannelSuffix)"
+    let channel = FlutterBasicMessageChannel(name: channelName, binaryMessenger: binaryMessenger, codec: codec)
+    channel.sendMessage([cardComponentConfigurationDTOArg, sessionDTOArg, binLookupDataDTOArg] as [Any?]) { response in
+      guard let listResponse = response as? [Any?] else {
+        completion(.failure(createConnectionError(withChannelName: channelName)))
+        return
+      }
+      if listResponse.count > 1 {
+        let code: String = listResponse[0] as! String
+        let message: String? = nilOrValue(listResponse[1])
+        let details: String? = nilOrValue(listResponse[2])
+        completion(.failure(AdyenPigeonError(code: code, message: message, details: details)))
+      } else {
+        completion(.success(Void()))
+      }
     }
-
-    var codec: PlatformApiPigeonCodec {
-        PlatformApiPigeonCodec.shared
+  }
+  func onComponentCommunication(componentCommunicationModel componentCommunicationModelArg: ComponentCommunicationModel, completion: @escaping (Result<Void, AdyenPigeonError>) -> Void) {
+    let channelName: String = "dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface.onComponentCommunication\(messageChannelSuffix)"
+    let channel = FlutterBasicMessageChannel(name: channelName, binaryMessenger: binaryMessenger, codec: codec)
+    channel.sendMessage([componentCommunicationModelArg] as [Any?]) { response in
+      guard let listResponse = response as? [Any?] else {
+        completion(.failure(createConnectionError(withChannelName: channelName)))
+        return
+      }
+      if listResponse.count > 1 {
+        let code: String = listResponse[0] as! String
+        let message: String? = nilOrValue(listResponse[1])
+        let details: String? = nilOrValue(listResponse[2])
+        completion(.failure(AdyenPigeonError(code: code, message: message, details: details)))
+      } else {
+        completion(.success(Void()))
+      }
     }
-
-    func _generateCodecForDTOs(cardComponentConfigurationDTO cardComponentConfigurationDTOArg: CardComponentConfigurationDTO, sessionDTO sessionDTOArg: SessionDTO, binLookupDataDTO binLookupDataDTOArg: BinLookupDataDTO, completion: @escaping (Result<Void, AdyenPigeonError>) -> Void) {
-        let channelName = "dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface._generateCodecForDTOs\(messageChannelSuffix)"
-        let channel = FlutterBasicMessageChannel(name: channelName, binaryMessenger: binaryMessenger, codec: codec)
-        channel.sendMessage([cardComponentConfigurationDTOArg, sessionDTOArg, binLookupDataDTOArg] as [Any?]) { response in
-            guard let listResponse = response as? [Any?] else {
-                completion(.failure(createConnectionError(withChannelName: channelName)))
-                return
-            }
-            if listResponse.count > 1 {
-                let code: String = listResponse[0] as! String
-                let message: String? = nilOrValue(listResponse[1])
-                let details: String? = nilOrValue(listResponse[2])
-                completion(.failure(AdyenPigeonError(code: code, message: message, details: details)))
-            } else {
-                completion(.success(()))
-            }
-        }
-    }
-
-    func onComponentCommunication(componentCommunicationModel componentCommunicationModelArg: ComponentCommunicationModel, completion: @escaping (Result<Void, AdyenPigeonError>) -> Void) {
-        let channelName = "dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface.onComponentCommunication\(messageChannelSuffix)"
-        let channel = FlutterBasicMessageChannel(name: channelName, binaryMessenger: binaryMessenger, codec: codec)
-        channel.sendMessage([componentCommunicationModelArg] as [Any?]) { response in
-            guard let listResponse = response as? [Any?] else {
-                completion(.failure(createConnectionError(withChannelName: channelName)))
-                return
-            }
-            if listResponse.count > 1 {
-                let code: String = listResponse[0] as! String
-                let message: String? = nilOrValue(listResponse[1])
-                let details: String? = nilOrValue(listResponse[2])
-                completion(.failure(AdyenPigeonError(code: code, message: message, details: details)))
-            } else {
-                completion(.success(()))
-            }
-        }
-    }
+  }
 }

@@ -2,17 +2,17 @@ import 'package:adyen_checkout/src/common/model/payment_method_configurations/th
 
 final class ThreeDS2Configuration {
   final String? requestorAppURL;
+  final String? headingTitle;
   final Adyen3DSTheme? theme;
-  final String? toolbarTitle;
 
   ThreeDS2Configuration({
     this.requestorAppURL,
+    this.headingTitle,
     this.theme,
-    this.toolbarTitle,
   });
 
   @override
   String toString() {
-    return 'ThreeDS2Configuration(requestorAppURL: $requestorAppURL, theme: $theme, toolbarTitle: $toolbarTitle)';
+    return 'ThreeDS2Configuration(requestorAppURL: $requestorAppURL, headingTitle: $headingTitle, theme: $theme,)';
   }
 }

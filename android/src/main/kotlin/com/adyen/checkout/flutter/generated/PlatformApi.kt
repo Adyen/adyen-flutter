@@ -348,40 +348,40 @@ data class AnalyticsOptionsDTO (
 
 /** Generated class from Pigeon that represents data sent in messages. */
 data class ThreeDS2UICustomizationDTO (
+  val headingCustomization: ThreeDS2ToolbarCustomizationDTO? = null,
   val labelCustomization: ThreeDS2LabelCustomizationDTO? = null,
+  val textBoxCustomization: ThreeDS2TextBoxCustomizationDTO? = null,
   val submitButtonCustomization: ThreeDS2ButtonCustomizationDTO? = null,
   val continueButtonCustomization: ThreeDS2ButtonCustomizationDTO? = null,
   val nextButtonCustomization: ThreeDS2ButtonCustomizationDTO? = null,
   val cancelButtonCustomization: ThreeDS2ButtonCustomizationDTO? = null,
-  val resendButtonCustomization: ThreeDS2ButtonCustomizationDTO? = null,
-  val textBoxCustomization: ThreeDS2TextBoxCustomizationDTO? = null,
-  val toolbarCustomization: ThreeDS2ToolbarCustomizationDTO? = null
+  val resendButtonCustomization: ThreeDS2ButtonCustomizationDTO? = null
 
 ) {
   companion object {
     @Suppress("LocalVariableName")
     fun fromList(__pigeon_list: List<Any?>): ThreeDS2UICustomizationDTO {
-      val labelCustomization = __pigeon_list[0] as ThreeDS2LabelCustomizationDTO?
-      val submitButtonCustomization = __pigeon_list[1] as ThreeDS2ButtonCustomizationDTO?
-      val continueButtonCustomization = __pigeon_list[2] as ThreeDS2ButtonCustomizationDTO?
-      val nextButtonCustomization = __pigeon_list[3] as ThreeDS2ButtonCustomizationDTO?
-      val cancelButtonCustomization = __pigeon_list[4] as ThreeDS2ButtonCustomizationDTO?
-      val resendButtonCustomization = __pigeon_list[5] as ThreeDS2ButtonCustomizationDTO?
-      val textBoxCustomization = __pigeon_list[6] as ThreeDS2TextBoxCustomizationDTO?
-      val toolbarCustomization = __pigeon_list[7] as ThreeDS2ToolbarCustomizationDTO?
-      return ThreeDS2UICustomizationDTO(labelCustomization, submitButtonCustomization, continueButtonCustomization, nextButtonCustomization, cancelButtonCustomization, resendButtonCustomization, textBoxCustomization, toolbarCustomization)
+      val headingCustomization = __pigeon_list[0] as ThreeDS2ToolbarCustomizationDTO?
+      val labelCustomization = __pigeon_list[1] as ThreeDS2LabelCustomizationDTO?
+      val textBoxCustomization = __pigeon_list[2] as ThreeDS2TextBoxCustomizationDTO?
+      val submitButtonCustomization = __pigeon_list[3] as ThreeDS2ButtonCustomizationDTO?
+      val continueButtonCustomization = __pigeon_list[4] as ThreeDS2ButtonCustomizationDTO?
+      val nextButtonCustomization = __pigeon_list[5] as ThreeDS2ButtonCustomizationDTO?
+      val cancelButtonCustomization = __pigeon_list[6] as ThreeDS2ButtonCustomizationDTO?
+      val resendButtonCustomization = __pigeon_list[7] as ThreeDS2ButtonCustomizationDTO?
+      return ThreeDS2UICustomizationDTO(headingCustomization, labelCustomization, textBoxCustomization, submitButtonCustomization, continueButtonCustomization, nextButtonCustomization, cancelButtonCustomization, resendButtonCustomization)
     }
   }
   fun toList(): List<Any?> {
     return listOf(
+      headingCustomization,
       labelCustomization,
+      textBoxCustomization,
       submitButtonCustomization,
       continueButtonCustomization,
       nextButtonCustomization,
       cancelButtonCustomization,
       resendButtonCustomization,
-      textBoxCustomization,
-      toolbarCustomization,
     )
   }
 }
@@ -390,10 +390,7 @@ data class ThreeDS2UICustomizationDTO (
 data class ThreeDS2LabelCustomizationDTO (
   val textFontName: String? = null,
   val textColor: String? = null,
-  val textFontSize: Long? = null,
-  val headingTextColor: String? = null,
-  val headingTextFontSize: Long? = null,
-  val headingTextFontName: String? = null
+  val textFontSize: Long? = null
 
 ) {
   companion object {
@@ -402,10 +399,7 @@ data class ThreeDS2LabelCustomizationDTO (
       val textFontName = __pigeon_list[0] as String?
       val textColor = __pigeon_list[1] as String?
       val textFontSize = __pigeon_list[2].let { num -> if (num is Int) num.toLong() else num as Long? }
-      val headingTextColor = __pigeon_list[3] as String?
-      val headingTextFontSize = __pigeon_list[4].let { num -> if (num is Int) num.toLong() else num as Long? }
-      val headingTextFontName = __pigeon_list[5] as String?
-      return ThreeDS2LabelCustomizationDTO(textFontName, textColor, textFontSize, headingTextColor, headingTextFontSize, headingTextFontName)
+      return ThreeDS2LabelCustomizationDTO(textFontName, textColor, textFontSize)
     }
   }
   fun toList(): List<Any?> {
@@ -413,9 +407,6 @@ data class ThreeDS2LabelCustomizationDTO (
       textFontName,
       textColor,
       textFontSize,
-      headingTextColor,
-      headingTextFontSize,
-      headingTextFontName,
     )
   }
 }

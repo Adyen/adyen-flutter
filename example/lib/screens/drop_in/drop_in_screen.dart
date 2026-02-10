@@ -136,24 +136,29 @@ class DropInScreen extends StatelessWidget {
     );
 
     final ThreeDS2Configuration threeDS2Configuration = ThreeDS2Configuration(
-      toolbarTitle: "Test title",
+      headingTitle: "Test 3DS2 title",
       theme: const Adyen3DSTheme(
         primaryColor: Colors.amber,
         onPrimaryColor: Colors.tealAccent,
-        headerBackgroundColor: Colors.lightGreen,
         inputTextColor: Colors.deepOrangeAccent,
-        inputBorderColor: Colors.cyanAccent,
+        inputBorderColor: Colors.blueAccent,
         inputBorderWidth: 10,
         inputCornerRadius: 80,
+        headerTheme: Adyen3DSHeaderTheme(
+          backgroundColor: Colors.red,
+          textColor: Colors.white,
+          cancelButtonText: 'Close',
+        ),
         resendButtonTheme: Adyen3DSButtonTheme(
           backgroundColor: Colors.red,
           cornerRadius: 80,
           fontSize: 16,
         ),
         submitButtonTheme: Adyen3DSButtonTheme(backgroundColor: Colors.blue),
-        continueButtonTheme: Adyen3DSButtonTheme(),
+        continueButtonTheme: Adyen3DSButtonTheme(backgroundColor: Colors.black),
         nextButtonTheme: Adyen3DSButtonTheme(backgroundColor: Colors.purple),
-        cancelButtonTheme: Adyen3DSButtonTheme(backgroundColor: Colors.orange),
+        cancelButtonTheme: Adyen3DSButtonTheme(
+            backgroundColor: Colors.orange, textColor: Colors.lightGreen),
       ),
     );
 

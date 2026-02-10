@@ -259,7 +259,6 @@ void main() {
       primaryColor: Color(0xFF112233),
       onPrimaryColor: Color(0xFFFFFFFF),
       textColor: Color(0xFF010203),
-      headingTextColor: Color(0xFF040506),
       inputBorderColor: Color(0xFF0A0B0C),
       inputTextColor: Color(0xFF0D0E0F),
       buttonCornerRadius: 6,
@@ -267,7 +266,6 @@ void main() {
       inputBorderWidth: 2,
       fontFamily: 'Roboto',
       labelFontSize: 14,
-      headingFontSize: 16,
       buttonFontSize: 15,
     );
 
@@ -277,10 +275,8 @@ void main() {
     final uiCustomization = dto.uiCustomization;
     expect(uiCustomization, isNotNull);
     expect(uiCustomization?.labelCustomization?.textColor, '#FF010203');
-    expect(uiCustomization?.labelCustomization?.headingTextColor, '#FF040506');
     expect(uiCustomization?.labelCustomization?.textFontName, 'Roboto');
     expect(uiCustomization?.labelCustomization?.textFontSize, 14);
-    expect(uiCustomization?.labelCustomization?.headingTextFontSize, 16);
     expect(uiCustomization?.submitButtonCustomization?.backgroundColor,
         '#FF112233');
     expect(uiCustomization?.submitButtonCustomization?.textColor, '#FFFFFFFF');
@@ -294,14 +290,14 @@ void main() {
 
   test('when toolbar title is set, then should map to toolbar header text', () {
     final configuration = ThreeDS2Configuration(
-      toolbarTitle: 'Challenge',
+      headingTitle: 'Challenge',
     );
 
     final dto = configuration.toDTO();
 
     expect(dto.uiCustomization, isNotNull);
-    expect(dto.uiCustomization?.toolbarCustomization, isNotNull);
-    expect(dto.uiCustomization?.toolbarCustomization?.headerText, 'Challenge');
+    expect(dto.uiCustomization?.headingCustomization, isNotNull);
+    expect(dto.uiCustomization?.headingCustomization?.headerText, 'Challenge');
   });
 
   test('color to hex should include alpha channel', () {

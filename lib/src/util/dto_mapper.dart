@@ -166,13 +166,13 @@ extension ThreeDS2ConfigurationMapper on ThreeDS2Configuration {
   ThreeDS2ConfigurationDTO toDTO() => ThreeDS2ConfigurationDTO(
         requestorAppURL: requestorAppURL,
         uiCustomization:
-            theme?.toUICustomizationDTO(toolbarTitle: toolbarTitle) ??
-                (toolbarTitle == null
+            theme?.toUICustomizationDTO(toolbarTitle: headingTitle) ??
+                (headingTitle == null
                     ? null
                     : ThreeDS2UICustomizationDTO(
-                        toolbarCustomization: ThreeDS2ToolbarCustomizationDTO(
+                        headingCustomization: ThreeDS2ToolbarCustomizationDTO(
                           backgroundColor: null,
-                          headerText: toolbarTitle,
+                          headerText: headingTitle,
                           buttonText: null,
                           textColor: null,
                           textFontName: null,
@@ -203,15 +203,13 @@ extension Adyen3DSThemeMapper on Adyen3DSTheme {
     }
 
     final fontFamily = sanitizedFontFamily(this.fontFamily);
+    final headerFontFamily = sanitizedFontFamily(headerTheme?.fontFamily);
 
     return ThreeDS2UICustomizationDTO(
       labelCustomization: ThreeDS2LabelCustomizationDTO(
         textFontName: fontFamily,
         textColor: textColor?.toHexString(),
         textFontSize: labelFontSize?.round(),
-        headingTextColor: headingTextColor?.toHexString(),
-        headingTextFontSize: headingFontSize?.round(),
-        headingTextFontName: fontFamily,
       ),
       submitButtonCustomization: buttonDTOFromTheme(submitButtonTheme),
       continueButtonCustomization: buttonDTOFromTheme(continueButtonTheme),
@@ -226,13 +224,13 @@ extension Adyen3DSThemeMapper on Adyen3DSTheme {
         textFontName: fontFamily,
         textFontSize: labelFontSize?.round(),
       ),
-      toolbarCustomization: ThreeDS2ToolbarCustomizationDTO(
-        backgroundColor: headerBackgroundColor?.toHexString(),
+      headingCustomization: ThreeDS2ToolbarCustomizationDTO(
+        backgroundColor: headerTheme?.backgroundColor?.toHexString(),
         headerText: toolbarTitle,
-        buttonText: null,
-        textColor: textColor?.toHexString(),
-        textFontName: fontFamily,
-        textFontSize: headingFontSize?.round(),
+        buttonText: headerTheme?.cancelButtonText,
+        textColor: headerTheme?.textColor?.toHexString(),
+        textFontName: headerFontFamily ?? fontFamily,
+        textFontSize: headerTheme?.fontSize?.round(),
       ),
     );
   }

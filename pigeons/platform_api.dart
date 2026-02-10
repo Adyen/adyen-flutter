@@ -167,24 +167,24 @@ class AnalyticsOptionsDTO {
 }
 
 class ThreeDS2UICustomizationDTO {
+  final ThreeDS2ToolbarCustomizationDTO? headingCustomization;
   final ThreeDS2LabelCustomizationDTO? labelCustomization;
+  final ThreeDS2TextBoxCustomizationDTO? textBoxCustomization;
   final ThreeDS2ButtonCustomizationDTO? submitButtonCustomization;
   final ThreeDS2ButtonCustomizationDTO? continueButtonCustomization;
   final ThreeDS2ButtonCustomizationDTO? nextButtonCustomization;
   final ThreeDS2ButtonCustomizationDTO? cancelButtonCustomization;
   final ThreeDS2ButtonCustomizationDTO? resendButtonCustomization;
-  final ThreeDS2TextBoxCustomizationDTO? textBoxCustomization;
-  final ThreeDS2ToolbarCustomizationDTO? toolbarCustomization;
 
   ThreeDS2UICustomizationDTO(
+    this.headingCustomization,
     this.labelCustomization,
+    this.textBoxCustomization,
     this.submitButtonCustomization,
     this.continueButtonCustomization,
     this.nextButtonCustomization,
     this.cancelButtonCustomization,
     this.resendButtonCustomization,
-    this.textBoxCustomization,
-    this.toolbarCustomization,
   );
 }
 
@@ -192,17 +192,11 @@ class ThreeDS2LabelCustomizationDTO {
   final String? textFontName;
   final String? textColor;
   final int? textFontSize;
-  final String? headingTextColor;
-  final int? headingTextFontSize;
-  final String? headingTextFontName;
 
   ThreeDS2LabelCustomizationDTO(
     this.textFontName,
     this.textColor,
     this.textFontSize,
-    this.headingTextColor,
-    this.headingTextFontSize,
-    this.headingTextFontName,
   );
 }
 

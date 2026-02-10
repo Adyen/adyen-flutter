@@ -24,12 +24,10 @@ final theme = Adyen3DSTheme(
   onPrimaryColor: Colors.white,
   backgroundColor: Colors.white,
   textColor: Colors.black87,
-  headingTextColor: Colors.black,
   inputBorderColor: Colors.grey,
   buttonCornerRadius: 8,
   inputCornerRadius: 4,
   labelFontSize: 14,
-  headingFontSize: 16,
   buttonFontSize: 15,
   submitButtonTheme: Adyen3DSButtonTheme(
     backgroundColor: Colors.green,

@@ -8,15 +8,14 @@ final class Adyen3DSTheme {
   // Primary colors
   final Color? primaryColor; // Submit/action button background
   final Color? onPrimaryColor; // Text on primary buttons
-
-  // Background colors
   final Color? backgroundColor; // Screen background
-  final Color? headerBackgroundColor; // Toolbar/header background
+
+  // Header
+  final Adyen3DSHeaderTheme? headerTheme;
 
   // Text colors
   final Color? textColor; // Primary text (labels)
   final Color? secondaryTextColor; // Secondary text, hints
-  final Color? headingTextColor; // Heading text
   final Color? errorColor; // Error messages
 
   // Input styling
@@ -27,7 +26,6 @@ final class Adyen3DSTheme {
   // Typography
   final String? fontFamily; // Font for all text
   final double? labelFontSize;
-  final double? headingFontSize;
   final double? buttonFontSize;
 
   // Shape
@@ -45,17 +43,15 @@ final class Adyen3DSTheme {
     this.primaryColor,
     this.onPrimaryColor,
     this.backgroundColor,
-    this.headerBackgroundColor,
+    this.headerTheme,
     this.textColor,
     this.secondaryTextColor,
-    this.headingTextColor,
     this.errorColor,
     this.inputBorderColor,
     this.inputTextColor,
     this.inputBorderWidth,
     this.fontFamily,
     this.labelFontSize,
-    this.headingFontSize,
     this.buttonFontSize,
     this.buttonCornerRadius,
     this.inputCornerRadius,
@@ -86,19 +82,38 @@ final class Adyen3DSTheme {
       primaryColor: colorScheme.primary,
       onPrimaryColor: colorScheme.onPrimary,
       backgroundColor: colorScheme.surface,
-      headerBackgroundColor: colorScheme.surface,
+      headerTheme: Adyen3DSHeaderTheme(
+        backgroundColor: colorScheme.surface,
+        textColor: colorScheme.onSurface,
+        fontFamily: fontFamily,
+        fontSize: headingStyle?.fontSize,
+      ),
       textColor: colorScheme.onSurface,
       secondaryTextColor: colorScheme.onSurfaceVariant,
-      headingTextColor: colorScheme.onSurface,
       errorColor: colorScheme.error,
       inputBorderColor: colorScheme.outline,
       inputTextColor: colorScheme.onSurface,
       fontFamily: fontFamily,
       labelFontSize: labelStyle?.fontSize,
-      headingFontSize: headingStyle?.fontSize,
       buttonFontSize: buttonStyle?.fontSize,
     );
   }
+}
+
+final class Adyen3DSHeaderTheme {
+  final Color? backgroundColor;
+  final Color? textColor;
+  final String? fontFamily;
+  final double? fontSize;
+  final String? cancelButtonText;
+
+  const Adyen3DSHeaderTheme({
+    this.backgroundColor, // This has no effect on iOS
+    this.textColor,
+    this.fontFamily,
+    this.fontSize,
+    this.cancelButtonText,
+  });
 }
 
 /// Optional per-button overrides.
