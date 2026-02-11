@@ -351,6 +351,10 @@ extension ThreeDS2ConfigurationDTO {
 extension ThreeDS2UICustomizationDTO {
     func toAppearanceConfiguration() -> ADYAppearanceConfiguration {
         let configuration = ADYAppearanceConfiguration()
+
+        if let screenCustomization {
+            screenCustomization.apply(to: configuration)
+        }
         
         if let headingCustomization {
             headingCustomization.apply(to: configuration)
@@ -360,12 +364,10 @@ extension ThreeDS2UICustomizationDTO {
             labelCustomization.apply(to: configuration)
         }
 
-        if let textBoxCustomization {
-            textBoxCustomization.apply(to: configuration)
+        if let inputCustomization {
+            inputCustomization.apply(to: configuration)
         }
 
-       
-        
         submitButtonCustomization?.apply(to: configuration, buttonType: .submit)
         continueButtonCustomization?.apply(to: configuration, buttonType: .continue)
         nextButtonCustomization?.apply(to: configuration, buttonType: .next)
@@ -373,6 +375,12 @@ extension ThreeDS2UICustomizationDTO {
         resendButtonCustomization?.apply(to: configuration, buttonType: .resend)
 
         return configuration
+    }
+}
+
+extension ThreeDS2ScreenCustomizationDTO {
+    func apply(to configuration: ADYAppearanceConfiguration) {
+        _ = configuration
     }
 }
 
@@ -407,7 +415,7 @@ extension ThreeDS2ButtonCustomizationDTO {
     }
 }
 
-extension ThreeDS2TextBoxCustomizationDTO {
+extension ThreeDS2InputCustomizationDTO {
     func apply(to configuration: ADYAppearanceConfiguration) {
         if let borderColor, let textUIColor = UIColor(hex: borderColor) {
             configuration.textFieldAppearance.borderColor = textUIColor

@@ -259,11 +259,13 @@ void main() {
       primaryColor: Color(0xFF112233),
       onPrimaryColor: Color(0xFFFFFFFF),
       textColor: Color(0xFF010203),
-      inputBorderColor: Color(0xFF0A0B0C),
-      inputTextColor: Color(0xFF0D0E0F),
+      inputDecorationTheme: Adyen3DSInputDecorationTheme(
+        borderColor: Color(0xFF0A0B0C),
+        textColor: Color(0xFF0D0E0F),
+        borderWidth: 2,
+        cornerRadius: 4,
+      ),
       buttonCornerRadius: 6,
-      inputCornerRadius: 4,
-      inputBorderWidth: 2,
       fontFamily: 'Roboto',
       labelFontSize: 14,
       buttonFontSize: 15,
@@ -282,10 +284,10 @@ void main() {
     expect(uiCustomization?.submitButtonCustomization?.textColor, '#FFFFFFFF');
     expect(uiCustomization?.submitButtonCustomization?.textFontSize, 15);
     expect(uiCustomization?.submitButtonCustomization?.cornerRadius, 6);
-    expect(uiCustomization?.textBoxCustomization?.borderColor, '#FF0A0B0C');
-    expect(uiCustomization?.textBoxCustomization?.borderWidth, 2);
-    expect(uiCustomization?.textBoxCustomization?.cornerRadius, 4);
-    expect(uiCustomization?.textBoxCustomization?.textColor, '#FF0D0E0F');
+    expect(uiCustomization?.inputCustomization?.borderColor, '#FF0A0B0C');
+    expect(uiCustomization?.inputCustomization?.borderWidth, 2);
+    expect(uiCustomization?.inputCustomization?.cornerRadius, 4);
+    expect(uiCustomization?.inputCustomization?.textColor, '#FF0D0E0F');
   });
 
   test('when toolbar title is set, then should map to toolbar header text', () {

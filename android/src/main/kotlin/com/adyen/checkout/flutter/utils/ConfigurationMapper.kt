@@ -39,7 +39,7 @@ import com.adyen.checkout.flutter.generated.ShippingAddressParametersDTO
 import com.adyen.checkout.flutter.generated.ThreeDS2ButtonCustomizationDTO
 import com.adyen.checkout.flutter.generated.ThreeDS2ConfigurationDTO
 import com.adyen.checkout.flutter.generated.ThreeDS2LabelCustomizationDTO
-import com.adyen.checkout.flutter.generated.ThreeDS2TextBoxCustomizationDTO
+import com.adyen.checkout.flutter.generated.ThreeDS2InputCustomizationDTO
 import com.adyen.checkout.flutter.generated.ThreeDS2ToolbarCustomizationDTO
 import com.adyen.checkout.flutter.generated.ThreeDS2UICustomizationDTO
 import com.adyen.checkout.flutter.generated.TotalPriceStatus
@@ -318,15 +318,19 @@ object ConfigurationMapper {
                 dto?.let { setButtonCustomization(it.toButtonCustomization(), type) }
             }
 
+            this@toUiCustomization.screenCustomization?.backgroundColor?.let {
+                runCatching { setScreenBackgroundColor(it) }
+            }
+
             this@toUiCustomization.labelCustomization?.let { dto ->
                 labelCustomization = dto.toLabelCustomization()
             }
 
-            this@toUiCustomization.textBoxCustomization?.let { dto ->
+            this@toUiCustomization.inputCustomization?.let { dto ->
                 textBoxCustomization = dto.toTextBoxCustomization()
             }
 
-            this@toUiCustomization.toolbarCustomization?.let { dto ->
+            this@toUiCustomization.headingCustomization?.let { dto ->
                 toolbarCustomization = dto.toToolbarCustomization()
             }
 
@@ -343,9 +347,6 @@ object ConfigurationMapper {
             this@toLabelCustomization.textColor?.let { inputLabelTextColor = it }
             this@toLabelCustomization.textFontName?.let { inputLabelTextFontName = it }
             this@toLabelCustomization.textFontSize?.let { inputLabelTextFontSize = it.toInt() } // HERE CHECK
-            this@toLabelCustomization.headingTextColor?.let { headingTextColor = it }
-            this@toLabelCustomization.headingTextFontName?.let { headingTextFontName = it }
-            this@toLabelCustomization.headingTextFontSize?.let { headingTextFontSize = it.toInt() } // HERE CHECK
         }
 
     private fun ThreeDS2ButtonCustomizationDTO.toButtonCustomization(): ButtonCustomization =
@@ -356,7 +357,7 @@ object ConfigurationMapper {
             this@toButtonCustomization.textFontSize?.let { textFontSize = it.toInt() }
         }
 
-    private fun ThreeDS2TextBoxCustomizationDTO.toTextBoxCustomization(): TextBoxCustomization =
+    private fun ThreeDS2InputCustomizationDTO.toTextBoxCustomization(): TextBoxCustomization =
         TextBoxCustomization().apply {
             this@toTextBoxCustomization.borderColor?.let { borderColor = it }
             this@toTextBoxCustomization.borderWidth?.let { borderWidth = it.toInt() }

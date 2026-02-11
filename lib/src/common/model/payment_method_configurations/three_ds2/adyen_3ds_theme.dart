@@ -8,20 +8,20 @@ final class Adyen3DSTheme {
   // Primary colors
   final Color? primaryColor; // Submit/action button background
   final Color? onPrimaryColor; // Text on primary buttons
-  final Color? backgroundColor; // Screen background
+
+  // Screen
+  final Color? backgroundColor;
 
   // Header
   final Adyen3DSHeaderTheme? headerTheme;
+
+  // Inputs
+  final Adyen3DSInputDecorationTheme? inputDecorationTheme;
 
   // Text colors
   final Color? textColor; // Primary text (labels)
   final Color? secondaryTextColor; // Secondary text, hints
   final Color? errorColor; // Error messages
-
-  // Input styling
-  final Color? inputBorderColor; // TextBox border
-  final Color? inputTextColor; // TextBox text
-  final double? inputBorderWidth;
 
   // Typography
   final String? fontFamily; // Font for all text
@@ -30,7 +30,6 @@ final class Adyen3DSTheme {
 
   // Shape
   final double? buttonCornerRadius;
-  final double? inputCornerRadius;
 
   // Optional per-button overrides (falls back to primary/onPrimary defaults)
   final Adyen3DSButtonTheme? submitButtonTheme;
@@ -39,30 +38,27 @@ final class Adyen3DSTheme {
   final Adyen3DSButtonTheme? cancelButtonTheme;
   final Adyen3DSButtonTheme? resendButtonTheme;
 
+  /// Creates an Adyen3DSTheme from a Flutter ThemeData.
+
   const Adyen3DSTheme({
     this.primaryColor,
     this.onPrimaryColor,
     this.backgroundColor,
     this.headerTheme,
+    this.inputDecorationTheme,
     this.textColor,
     this.secondaryTextColor,
     this.errorColor,
-    this.inputBorderColor,
-    this.inputTextColor,
-    this.inputBorderWidth,
     this.fontFamily,
-    this.labelFontSize,
     this.buttonFontSize,
     this.buttonCornerRadius,
-    this.inputCornerRadius,
+    this.labelFontSize,
     this.submitButtonTheme,
     this.continueButtonTheme,
     this.nextButtonTheme,
     this.cancelButtonTheme,
     this.resendButtonTheme,
   });
-
-  /// Creates an Adyen3DSTheme from a Flutter ThemeData.
   ///
   /// Automatically maps Flutter theme values to 3DS customization,
   /// providing consistent branding with minimal configuration.
@@ -88,16 +84,32 @@ final class Adyen3DSTheme {
         fontFamily: fontFamily,
         fontSize: headingStyle?.fontSize,
       ),
+      inputDecorationTheme: Adyen3DSInputDecorationTheme(
+        borderColor: colorScheme.outline,
+        textColor: colorScheme.onSurface,
+      ),
       textColor: colorScheme.onSurface,
       secondaryTextColor: colorScheme.onSurfaceVariant,
       errorColor: colorScheme.error,
-      inputBorderColor: colorScheme.outline,
-      inputTextColor: colorScheme.onSurface,
       fontFamily: fontFamily,
       labelFontSize: labelStyle?.fontSize,
       buttonFontSize: buttonStyle?.fontSize,
     );
   }
+}
+
+final class Adyen3DSInputDecorationTheme {
+  final Color? borderColor;
+  final Color? textColor;
+  final double? borderWidth;
+  final double? cornerRadius;
+
+  const Adyen3DSInputDecorationTheme({
+    this.borderColor,
+    this.textColor,
+    this.borderWidth,
+    this.cornerRadius,
+  });
 }
 
 final class Adyen3DSHeaderTheme {

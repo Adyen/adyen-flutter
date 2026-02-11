@@ -205,7 +205,17 @@ extension Adyen3DSThemeMapper on Adyen3DSTheme {
     final fontFamily = sanitizedFontFamily(this.fontFamily);
     final headerFontFamily = sanitizedFontFamily(headerTheme?.fontFamily);
 
+    final inputBorderColor = inputDecorationTheme?.borderColor;
+    final inputTextColor = inputDecorationTheme?.textColor;
+    final inputBorderWidth = inputDecorationTheme?.borderWidth;
+    final inputCornerRadius = inputDecorationTheme?.cornerRadius;
+
     return ThreeDS2UICustomizationDTO(
+      screenCustomization: backgroundColor == null
+          ? null
+          : ThreeDS2ScreenCustomizationDTO(
+              backgroundColor: backgroundColor?.toHexString(),
+            ),
       labelCustomization: ThreeDS2LabelCustomizationDTO(
         textFontName: fontFamily,
         textColor: textColor?.toHexString(),
@@ -216,14 +226,16 @@ extension Adyen3DSThemeMapper on Adyen3DSTheme {
       nextButtonCustomization: buttonDTOFromTheme(nextButtonTheme),
       cancelButtonCustomization: buttonDTOFromTheme(cancelButtonTheme),
       resendButtonCustomization: buttonDTOFromTheme(resendButtonTheme),
-      textBoxCustomization: ThreeDS2TextBoxCustomizationDTO(
-        borderColor: inputBorderColor?.toHexString(),
-        borderWidth: inputBorderWidth?.round(),
-        cornerRadius: inputCornerRadius?.round(),
-        textColor: inputTextColor?.toHexString(),
-        textFontName: fontFamily,
-        textFontSize: labelFontSize?.round(),
-      ),
+      inputCustomization: inputDecorationTheme == null
+          ? null
+          : ThreeDS2InputCustomizationDTO(
+              borderColor: inputBorderColor?.toHexString(),
+              borderWidth: inputBorderWidth?.round(),
+              cornerRadius: inputCornerRadius?.round(),
+              textColor: inputTextColor?.toHexString(),
+              textFontName: fontFamily,
+              textFontSize: labelFontSize?.round(),
+            ),
       headingCustomization: ThreeDS2ToolbarCustomizationDTO(
         backgroundColor: headerTheme?.backgroundColor?.toHexString(),
         headerText: toolbarTitle,

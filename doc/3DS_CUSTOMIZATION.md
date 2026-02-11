@@ -22,11 +22,13 @@ final dropInConfiguration = DropInConfiguration(
 final theme = Adyen3DSTheme(
   primaryColor: Colors.green,
   onPrimaryColor: Colors.white,
-  backgroundColor: Colors.white,
+  screenBackgroundColor: Colors.white,
   textColor: Colors.black87,
-  inputBorderColor: Colors.grey,
+  inputDecorationTheme: Adyen3DSInputDecorationTheme(
+    borderColor: Colors.grey,
+    cornerRadius: 4,
+  ),
   buttonCornerRadius: 8,
-  inputCornerRadius: 4,
   labelFontSize: 14,
   buttonFontSize: 15,
   submitButtonTheme: Adyen3DSButtonTheme(
