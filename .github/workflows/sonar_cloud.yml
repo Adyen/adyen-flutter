@@ -2,12 +2,6 @@ name: Sonar cloud check
 
 on:
   workflow_call:
-    inputs:
-      flutter-version:
-        description: 'Flutter version'
-        required: true
-        default: '3.29.0'
-        type: string
 
 permissions:
   contents: read
