@@ -7,7 +7,7 @@ on:
     branches: [ "main" ]
 
 env:
-  FLUTTER_VERSION: '3.32.x'
+  FLUTTER_VERSION: '3.41.x'
 
 permissions:
   contents: read
@@ -46,6 +46,4 @@ jobs:
     name: Sonar cloud
     needs: [ test_android, test_ios ]
     uses: ./.github/workflows/sonar_cloud.yml
-    with:
-      flutter-version: ${{ needs.preparation.outputs.FLUTTER_VERSION }}
     secrets: inherit
