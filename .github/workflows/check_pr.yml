@@ -6,9 +6,6 @@ on:
   pull_request:
     branches: [ "main" ]
 
-env:
-  FLUTTER_VERSION: '3.41.x'
-
 permissions:
   contents: read
 
@@ -18,18 +15,15 @@ jobs:
     permissions:
       pull-requests: write
     uses: ./.github/workflows/flutter_tests.yml
-    with:
-      flutter-version: ${{ env.FLUTTER_VERSION }}
+
   test_android:
     name: Android tests
     uses: ./.github/workflows/android_tests.yml
-    with:
-      flutter-version: ${{ env.FLUTTER_VERSION }}
+
   test_ios:
     name: iOS tests
     uses: ./.github/workflows/ios_tests.yml
-    with:
-      flutter-version: ${{ env.FLUTTER_VERSION }}
+
   sonar_cloud:
     name: Sonar cloud
     needs: [ test_android, test_ios ]
