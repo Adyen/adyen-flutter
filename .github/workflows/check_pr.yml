@@ -13,35 +13,23 @@ permissions:
   contents: read
 
 jobs:
-  #  The preparation job is required to populate the FLUTTER_VERSION value as output for the tests jobs.
-  preparation:
-    name: Prepare environment vars
-    runs-on: ubuntu-24.04
-    outputs:
-      FLUTTER_VERSION: ${{ env.FLUTTER_VERSION }}
-    steps:
-      - run: echo ""
-
   test_flutter:
     name: Flutter tests
-    needs: [ preparation ]
     permissions:
       pull-requests: write
     uses: ./.github/workflows/flutter_tests.yml
     with:
-      flutter-version: ${{ needs.preparation.outputs.FLUTTER_VERSION }}
+      flutter-version: ${{ env.FLUTTER_VERSION }}
   test_android:
     name: Android tests
-    needs: [ preparation ]
     uses: ./.github/workflows/android_tests.yml
     with:
-      flutter-version: ${{ needs.preparation.outputs.FLUTTER_VERSION }}
+      flutter-version: ${{ env.FLUTTER_VERSION }}
   test_ios:
     name: iOS tests
-    needs: [ preparation ]
     uses: ./.github/workflows/ios_tests.yml
     with:
-      flutter-version: ${{ needs.preparation.outputs.FLUTTER_VERSION }}
+      flutter-version: ${{ env.FLUTTER_VERSION }}
   sonar_cloud:
     name: Sonar cloud
     needs: [ test_android, test_ios ]
