@@ -5,8 +5,8 @@ on:
     inputs:
       flutter-version:
         description: 'Flutter version'
-        required: true
-        default: '3.29.x'
+        required: false
+        default: '3.41.x'
         type: string
 
 jobs:
