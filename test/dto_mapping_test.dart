@@ -257,18 +257,13 @@ void main() {
   test('when using 3DS theme, then should map to ui customization DTO', () {
     const theme = Adyen3DSTheme(
       primaryColor: Color(0xFF112233),
-      onPrimaryColor: Color(0xFFFFFFFF),
-      textColor: Color(0xFF010203),
+      textColor: Color(0xFFFFFFFF),
       inputDecorationTheme: Adyen3DSInputDecorationTheme(
         borderColor: Color(0xFF0A0B0C),
         textColor: Color(0xFF0D0E0F),
         borderWidth: 2,
         cornerRadius: 4,
       ),
-      buttonCornerRadius: 6,
-      fontFamily: 'Roboto',
-      labelFontSize: 14,
-      buttonFontSize: 15,
     );
 
     final configuration = ThreeDS2Configuration(theme: theme);
@@ -276,14 +271,11 @@ void main() {
 
     final uiCustomization = dto.uiCustomization;
     expect(uiCustomization, isNotNull);
-    expect(uiCustomization?.labelCustomization?.textColor, '#FF010203');
-    expect(uiCustomization?.labelCustomization?.textFontName, 'Roboto');
-    expect(uiCustomization?.labelCustomization?.textFontSize, 14);
     expect(uiCustomization?.submitButtonCustomization?.backgroundColor,
         '#FF112233');
     expect(uiCustomization?.submitButtonCustomization?.textColor, '#FFFFFFFF');
-    expect(uiCustomization?.submitButtonCustomization?.textFontSize, 15);
-    expect(uiCustomization?.submitButtonCustomization?.cornerRadius, 6);
+    expect(uiCustomization?.submitButtonCustomization?.textFontSize, null);
+    expect(uiCustomization?.submitButtonCustomization?.cornerRadius, null);
     expect(uiCustomization?.inputCustomization?.borderColor, '#FF0A0B0C');
     expect(uiCustomization?.inputCustomization?.borderWidth, 2);
     expect(uiCustomization?.inputCustomization?.cornerRadius, 4);

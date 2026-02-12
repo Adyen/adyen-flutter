@@ -164,86 +164,74 @@ extension TwintConfigurationMapper on TwintConfiguration {
 
 extension ThreeDS2ConfigurationMapper on ThreeDS2Configuration {
   ThreeDS2ConfigurationDTO toDTO() => ThreeDS2ConfigurationDTO(
-        requestorAppURL: requestorAppURL,
-        uiCustomization:
-            theme?.toUICustomizationDTO(toolbarTitle: headingTitle) ??
-                (headingTitle == null
-                    ? null
-                    : ThreeDS2UICustomizationDTO(
-                        headingCustomization: ThreeDS2ToolbarCustomizationDTO(
-                          backgroundColor: null,
-                          headerText: headingTitle,
-                          buttonText: null,
-                          textColor: null,
-                          textFontName: null,
-                          textFontSize: null,
-                        ),
-                      )),
-      );
+      requestorAppURL: requestorAppURL,
+      uiCustomization: theme?.toUICustomizationDTO(headingTitle: headingTitle));
 }
 
 extension Adyen3DSThemeMapper on Adyen3DSTheme {
-  ThreeDS2UICustomizationDTO toUICustomizationDTO({String? toolbarTitle}) {
-    String? sanitizedFontFamily(String? value) {
-      if (value == null || value.trim().isEmpty) {
-        return null;
-      }
-      return value;
-    }
-
+  ThreeDS2UICustomizationDTO toUICustomizationDTO({String? headingTitle}) {
     ThreeDS2ButtonCustomizationDTO buttonDTOFromTheme(
-        Adyen3DSButtonTheme? override) {
+        Adyen3DSButtonTheme? buttonCustomization) {
       return ThreeDS2ButtonCustomizationDTO(
-        backgroundColor:
-            (override?.backgroundColor ?? primaryColor)?.toHexString(),
-        textColor: (override?.textColor ?? onPrimaryColor)?.toHexString(),
-        cornerRadius: (override?.cornerRadius ?? buttonCornerRadius)?.round(),
-        textFontSize: (override?.fontSize ?? buttonFontSize)?.round(),
+        backgroundColor: buttonCustomization?.backgroundColor?.toHexString(),
+        textColor: (buttonCustomization?.textColor ?? textColor)?.toHexString(),
+        cornerRadius: buttonCustomization?.cornerRadius?.round(),
+        textFontSize: buttonCustomization?.fontSize?.round(),
       );
     }
 
-    final fontFamily = sanitizedFontFamily(this.fontFamily);
-    final headerFontFamily = sanitizedFontFamily(headerTheme?.fontFamily);
+    ThreeDS2InputCustomizationDTO? inputDTOFromTheme() {
+    if (inputDecorationTheme == null) {
+      // Only create DTO if we have root values to apply as fallbacks
+      return textColor == null ? null : ThreeDS2InputCustomizationDTO(
+        borderColor: null,
+        borderWidth: null,
+        cornerRadius: null,
+        textColor: textColor?.toHexString(),
+      );
+    }
+    
+    return ThreeDS2InputCustomizationDTO(
+      borderColor: inputDecorationTheme?.borderColor?.toHexString(),
+      borderWidth: inputDecorationTheme?.borderWidth?.round(),
+      cornerRadius: inputDecorationTheme?.cornerRadius?.round(),
+      textColor: (inputDecorationTheme?.textColor ?? textColor)?.toHexString(),
+    );
+  }
 
-    final inputBorderColor = inputDecorationTheme?.borderColor;
-    final inputTextColor = inputDecorationTheme?.textColor;
-    final inputBorderWidth = inputDecorationTheme?.borderWidth;
-    final inputCornerRadius = inputDecorationTheme?.cornerRadius;
+    ThreeDS2ToolbarCustomizationDTO? createThreeDS2ToolbarCustomizationDTO() {
+    if (headerTheme == null) {
+      // Only create DTO if we have root values to apply as fallbacks
+      return (textColor == null && headingTitle == null) ? null : ThreeDS2ToolbarCustomizationDTO(
+        backgroundColor: null,
+        headerText: headingTitle,
+        buttonText: null,
+        textColor: textColor?.toHexString(),
+        textFontSize: null,
+      );
+    }
+    
+    return ThreeDS2ToolbarCustomizationDTO(
+      backgroundColor: headerTheme?.backgroundColor?.toHexString(),
+      headerText: headingTitle,
+      buttonText: headerTheme?.cancelButtonText,
+      textColor: (headerTheme?.textColor ?? textColor)?.toHexString(),
+      textFontSize: headerTheme?.fontSize?.round(),
+    );
+  }
 
     return ThreeDS2UICustomizationDTO(
-      screenCustomization: backgroundColor == null
-          ? null
-          : ThreeDS2ScreenCustomizationDTO(
-              backgroundColor: backgroundColor?.toHexString(),
-            ),
-      labelCustomization: ThreeDS2LabelCustomizationDTO(
-        textFontName: fontFamily,
+      screenCustomization: ThreeDS2ScreenCustomizationDTO(
+        backgroundColor: backgroundColor?.toHexString(),
         textColor: textColor?.toHexString(),
-        textFontSize: labelFontSize?.round(),
       ),
-      submitButtonCustomization: buttonDTOFromTheme(submitButtonTheme),
-      continueButtonCustomization: buttonDTOFromTheme(continueButtonTheme),
-      nextButtonCustomization: buttonDTOFromTheme(nextButtonTheme),
-      cancelButtonCustomization: buttonDTOFromTheme(cancelButtonTheme),
-      resendButtonCustomization: buttonDTOFromTheme(resendButtonTheme),
-      inputCustomization: inputDecorationTheme == null
-          ? null
-          : ThreeDS2InputCustomizationDTO(
-              borderColor: inputBorderColor?.toHexString(),
-              borderWidth: inputBorderWidth?.round(),
-              cornerRadius: inputCornerRadius?.round(),
-              textColor: inputTextColor?.toHexString(),
-              textFontName: fontFamily,
-              textFontSize: labelFontSize?.round(),
-            ),
-      headingCustomization: ThreeDS2ToolbarCustomizationDTO(
-        backgroundColor: headerTheme?.backgroundColor?.toHexString(),
-        headerText: toolbarTitle,
-        buttonText: headerTheme?.cancelButtonText,
-        textColor: headerTheme?.textColor?.toHexString(),
-        textFontName: headerFontFamily ?? fontFamily,
-        textFontSize: headerTheme?.fontSize?.round(),
-      ),
+      headingCustomization: createThreeDS2ToolbarCustomizationDTO(),
+      inputCustomization: inputDTOFromTheme(),
+      submitButtonCustomization: submitButtonTheme == null ? null : buttonDTOFromTheme(submitButtonTheme),
+      continueButtonCustomization: continueButtonTheme == null ? null : buttonDTOFromTheme(continueButtonTheme),
+      nextButtonCustomization: nextButtonTheme == null ? null : buttonDTOFromTheme(nextButtonTheme),
+      cancelButtonCustomization: cancelButtonTheme == null ? null : buttonDTOFromTheme(cancelButtonTheme),
+      resendButtonCustomization: resendButtonTheme == null ? null : buttonDTOFromTheme(resendButtonTheme),
     );
   }
 }

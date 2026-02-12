@@ -169,7 +169,6 @@ class AnalyticsOptionsDTO {
 class ThreeDS2UICustomizationDTO {
   final ThreeDS2ScreenCustomizationDTO? screenCustomization;
   final ThreeDS2ToolbarCustomizationDTO? headingCustomization;
-  final ThreeDS2LabelCustomizationDTO? labelCustomization;
   final ThreeDS2InputCustomizationDTO? inputCustomization;
   final ThreeDS2ButtonCustomizationDTO? submitButtonCustomization;
   final ThreeDS2ButtonCustomizationDTO? continueButtonCustomization;
@@ -180,7 +179,6 @@ class ThreeDS2UICustomizationDTO {
   ThreeDS2UICustomizationDTO(
     this.screenCustomization,
     this.headingCustomization,
-    this.labelCustomization,
     this.inputCustomization,
     this.submitButtonCustomization,
     this.continueButtonCustomization,
@@ -192,21 +190,11 @@ class ThreeDS2UICustomizationDTO {
 
 class ThreeDS2ScreenCustomizationDTO {
   final String? backgroundColor;
+  final String? textColor;
 
   ThreeDS2ScreenCustomizationDTO(
     this.backgroundColor,
-  );
-}
-
-class ThreeDS2LabelCustomizationDTO {
-  final String? textFontName;
-  final String? textColor;
-  final int? textFontSize;
-
-  ThreeDS2LabelCustomizationDTO(
-    this.textFontName,
     this.textColor,
-    this.textFontSize,
   );
 }
 
@@ -229,16 +217,12 @@ class ThreeDS2InputCustomizationDTO {
   final int? borderWidth;
   final int? cornerRadius;
   final String? textColor;
-  final String? textFontName;
-  final int? textFontSize;
 
   ThreeDS2InputCustomizationDTO(
     this.borderColor,
     this.borderWidth,
     this.cornerRadius,
     this.textColor,
-    this.textFontName,
-    this.textFontSize,
   );
 }
 
@@ -247,7 +231,6 @@ class ThreeDS2ToolbarCustomizationDTO {
   final String? headerText;
   final String? buttonText;
   final String? textColor;
-  final String? textFontName;
   final int? textFontSize;
 
   ThreeDS2ToolbarCustomizationDTO(
@@ -255,7 +238,6 @@ class ThreeDS2ToolbarCustomizationDTO {
     this.headerText,
     this.buttonText,
     this.textColor,
-    this.textFontName,
     this.textFontSize,
   );
 }

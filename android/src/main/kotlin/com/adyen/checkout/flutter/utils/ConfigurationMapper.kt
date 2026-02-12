@@ -1,5 +1,6 @@
 package com.adyen.checkout.flutter.utils
 
+import atd.bb.setBackgroundColor
 import com.adyen.checkout.adyen3ds2.adyen3DS2
 import com.adyen.checkout.card.AddressConfiguration
 import com.adyen.checkout.card.CardBrand
@@ -38,14 +39,13 @@ import com.adyen.checkout.flutter.generated.OrderResponseDTO
 import com.adyen.checkout.flutter.generated.ShippingAddressParametersDTO
 import com.adyen.checkout.flutter.generated.ThreeDS2ButtonCustomizationDTO
 import com.adyen.checkout.flutter.generated.ThreeDS2ConfigurationDTO
-import com.adyen.checkout.flutter.generated.ThreeDS2LabelCustomizationDTO
 import com.adyen.checkout.flutter.generated.ThreeDS2InputCustomizationDTO
+import com.adyen.checkout.flutter.generated.ThreeDS2ScreenCustomizationDTO
 import com.adyen.checkout.flutter.generated.ThreeDS2ToolbarCustomizationDTO
 import com.adyen.checkout.flutter.generated.ThreeDS2UICustomizationDTO
 import com.adyen.checkout.flutter.generated.TotalPriceStatus
 import com.adyen.checkout.flutter.generated.TwintConfigurationDTO
 import com.adyen.checkout.flutter.generated.UnencryptedCardDTO
-import com.adyen.checkout.flutter.utils.ConfigurationMapper.toLabelCustomization
 import com.adyen.checkout.googlepay.BillingAddressParameters
 import com.adyen.checkout.googlepay.MerchantInfo
 import com.adyen.checkout.googlepay.ShippingAddressParameters
@@ -54,6 +54,8 @@ import com.adyen.checkout.twint.twint
 import com.google.android.gms.wallet.WalletConstants
 import com.adyen.threeds2.customization.ButtonCustomization
 import com.adyen.threeds2.customization.LabelCustomization
+import com.adyen.threeds2.customization.ScreenCustomization
+import com.adyen.threeds2.customization.SelectionItemCustomization
 import com.adyen.threeds2.customization.TextBoxCustomization
 import com.adyen.threeds2.customization.ToolbarCustomization
 import com.adyen.threeds2.customization.UiCustomization
@@ -318,20 +320,21 @@ object ConfigurationMapper {
                 dto?.let { setButtonCustomization(it.toButtonCustomization(), type) }
             }
 
-            this@toUiCustomization.screenCustomization?.backgroundColor?.let {
-                runCatching { setScreenBackgroundColor(it) }
-            }
-
-            this@toUiCustomization.labelCustomization?.let { dto ->
-                labelCustomization = dto.toLabelCustomization()
-            }
-
-            this@toUiCustomization.inputCustomization?.let { dto ->
-                textBoxCustomization = dto.toTextBoxCustomization()
+            this@toUiCustomization.screenCustomization?.let { dto ->
+                dto.backgroundColor?.let { setScreenBackgroundColor(it) }
+                dto.textColor?.let {
+                    setTextColor(it)
+                    setTintColor(it)
+                    setHighlightedBackgroundColor(it)
+                }
             }
 
             this@toUiCustomization.headingCustomization?.let { dto ->
                 toolbarCustomization = dto.toToolbarCustomization()
+            }
+
+            this@toUiCustomization.inputCustomization?.let { dto ->
+                textBoxCustomization = dto.toTextBoxCustomization()
             }
 
             setButtonCustomizationIfPresent(submitButtonCustomization, UiCustomization.ButtonType.VERIFY)
@@ -341,12 +344,13 @@ object ConfigurationMapper {
             setButtonCustomizationIfPresent(resendButtonCustomization, UiCustomization.ButtonType.RESEND)
         }
 
-    private fun ThreeDS2LabelCustomizationDTO.toLabelCustomization(): LabelCustomization =
-        LabelCustomization().apply {
-            // INPUT instead of TEXT
-            this@toLabelCustomization.textColor?.let { inputLabelTextColor = it }
-            this@toLabelCustomization.textFontName?.let { inputLabelTextFontName = it }
-            this@toLabelCustomization.textFontSize?.let { inputLabelTextFontSize = it.toInt() } // HERE CHECK
+    private fun ThreeDS2ToolbarCustomizationDTO.toToolbarCustomization(): ToolbarCustomization =
+        ToolbarCustomization().apply {
+            this@toToolbarCustomization.backgroundColor?.let { backgroundColor = it }
+            this@toToolbarCustomization.headerText?.let { headerText = it }
+            this@toToolbarCustomization.buttonText?.let { buttonText = it }
+            this@toToolbarCustomization.textColor?.let { textColor = it }
+            this@toToolbarCustomization.textFontSize?.let { textFontSize = it.toInt() }
         }
 
     private fun ThreeDS2ButtonCustomizationDTO.toButtonCustomization(): ButtonCustomization =
@@ -363,17 +367,5 @@ object ConfigurationMapper {
             this@toTextBoxCustomization.borderWidth?.let { borderWidth = it.toInt() }
             this@toTextBoxCustomization.cornerRadius?.let { cornerRadius = it.toInt() }
             this@toTextBoxCustomization.textColor?.let { textColor = it }
-            this@toTextBoxCustomization.textFontName?.let { textFontName = it }
-            this@toTextBoxCustomization.textFontSize?.let { textFontSize = it.toInt() }
-        }
-
-    private fun ThreeDS2ToolbarCustomizationDTO.toToolbarCustomization(): ToolbarCustomization =
-        ToolbarCustomization().apply {
-            this@toToolbarCustomization.backgroundColor?.let { backgroundColor = it }
-            this@toToolbarCustomization.headerText?.let { headerText = it }
-            this@toToolbarCustomization.buttonText?.let { buttonText = it }
-            this@toToolbarCustomization.textColor?.let { textColor = it }
-            this@toToolbarCustomization.textFontName?.let { textFontName = it }
-            this@toToolbarCustomization.textFontSize?.let { textFontSize = it.toInt() }
         }
 }

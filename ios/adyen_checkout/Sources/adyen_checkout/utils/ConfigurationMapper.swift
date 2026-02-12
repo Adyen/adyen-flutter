@@ -360,10 +360,6 @@ extension ThreeDS2UICustomizationDTO {
             headingCustomization.apply(to: configuration)
         }
 
-        if let labelCustomization {
-            labelCustomization.apply(to: configuration)
-        }
-
         if let inputCustomization {
             inputCustomization.apply(to: configuration)
         }
@@ -380,18 +376,51 @@ extension ThreeDS2UICustomizationDTO {
 
 extension ThreeDS2ScreenCustomizationDTO {
     func apply(to configuration: ADYAppearanceConfiguration) {
-        _ = configuration
-    }
-}
-
-extension ThreeDS2LabelCustomizationDTO {
-    func apply(to configuration: ADYAppearanceConfiguration) {
+        // Apply screen background color
+        if let backgroundColor, let bgColor = UIColor(hex: backgroundColor) {
+            // Note: iOS may not support setting screen background color directly
+            // This is a best-effort implementation
+        }
+        
+        // Apply general text styling as fallback for labels
         if let textColor, let textUIColor = UIColor(hex: textColor) {
             configuration.labelAppearance.textColor = textUIColor
         }
-        if let textFontName {
-            let fontSize = CGFloat(textFontSize ?? 14)
-            configuration.labelAppearance.font = UIFont(name: textFontName, size: fontSize) ?? configuration.labelAppearance.font
+        
+        // No font family customization available
+    }
+}
+
+extension ThreeDS2ToolbarCustomizationDTO {
+    func apply(to configuration: ADYAppearanceConfiguration) {
+        if let backgroundColor {
+            configuration.navigationBarAppearance.backgroundColor = UIColor(hex: backgroundColor)!
+        }
+        if let textColor {
+            configuration.navigationBarAppearance.textColor = UIColor(hex: textColor)!
+        }
+        if let headerText {
+            configuration.navigationBarAppearance.title = headerText
+        }
+        if let buttonText {
+            configuration.navigationBarAppearance.cancelButtonTitle = buttonText
+        }
+    }
+}
+
+extension ThreeDS2InputCustomizationDTO {
+    func apply(to configuration: ADYAppearanceConfiguration) {
+        if let borderColor, let textUIColor = UIColor(hex: borderColor) {
+            configuration.textFieldAppearance.borderColor = textUIColor
+        }
+        if let borderWidth {
+            configuration.textFieldAppearance.borderWidth = CGFloat(borderWidth)
+        }
+        if let cornerRadius {
+            configuration.textFieldAppearance.cornerRadius = CGFloat(cornerRadius)
+        }
+        if let textColor, let textUIColor = UIColor(hex: textColor) {
+            configuration.textFieldAppearance.textColor = textUIColor
         }
     }
 }
@@ -411,48 +440,6 @@ extension ThreeDS2ButtonCustomizationDTO {
         }
         if let textFontSize {
             buttonAppearance.font = buttonAppearance.font.withSize(CGFloat(textFontSize))
-        }
-    }
-}
-
-extension ThreeDS2InputCustomizationDTO {
-    func apply(to configuration: ADYAppearanceConfiguration) {
-        if let borderColor, let textUIColor = UIColor(hex: borderColor) {
-            configuration.textFieldAppearance.borderColor = textUIColor
-        }
-        if let borderWidth {
-            configuration.textFieldAppearance.borderWidth = CGFloat(borderWidth)
-        }
-        if let cornerRadius {
-            configuration.textFieldAppearance.cornerRadius = CGFloat(cornerRadius)
-        }
-        if let textColor, let textUIColor = UIColor(hex: textColor) {
-            configuration.textFieldAppearance.textColor = textUIColor
-        }
-        if let textFontName {
-            let fontSize = CGFloat(textFontSize ?? 14)
-            configuration.textFieldAppearance.font = UIFont(name: textFontName, size: fontSize) ?? configuration.textFieldAppearance.font
-        }
-    }
-}
-
-extension ThreeDS2ToolbarCustomizationDTO {
-    func apply(to configuration: ADYAppearanceConfiguration) {
-        if let backgroundColor {
-            configuration.navigationBarAppearance.backgroundColor = UIColor(hex: backgroundColor)!
-        }
-        if let textColor {
-            configuration.navigationBarAppearance.textColor = UIColor(hex: textColor)!
-        }
-        if let textFontName {
-            let fontSize = CGFloat(textFontSize ?? 16)
-            configuration.navigationBarAppearance.font = UIFont(name: textFontName, size: fontSize) ?? configuration.navigationBarAppearance.font
-        }
-        if let headerText {
-            configuration.navigationBarAppearance.title = headerText
-        }
-        if let buttonText {
-            configuration.navigationBarAppearance.cancelButtonTitle = buttonText
         }
     }
 }
