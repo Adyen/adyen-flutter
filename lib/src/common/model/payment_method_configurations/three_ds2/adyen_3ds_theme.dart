@@ -5,12 +5,14 @@ import 'package:flutter/material.dart';
 /// Provides a Flutter-idiomatic API that internally maps to
 /// platform-specific native SDK customization options.
 final class Adyen3DSTheme {
-  final Color? primaryColor; // Submit/action button background
   final Color? textColor; // Primary text (labels)
   final Color? backgroundColor; // Screen background (only on Android)
 
   // Header
   final Adyen3DSHeaderTheme? headerTheme;
+
+  // Description / body labels
+  final Adyen3DSDescriptionTheme? descriptionTheme;
 
   // Inputs
   final Adyen3DSInputDecorationTheme? inputDecorationTheme;
@@ -18,17 +20,17 @@ final class Adyen3DSTheme {
   // Grouped button themes
   // Primary applies to submit/continue/next (and OOB if available)
   final Adyen3DSButtonTheme? primaryButtonTheme;
+
   // Secondary applies to cancel/resend
   final Adyen3DSButtonTheme? secondaryButtonTheme;
 
   /// Creates an Adyen3DSTheme from a Flutter ThemeData.
 
   const Adyen3DSTheme({
-    this.primaryColor,
     this.backgroundColor,
     this.textColor,
-
     this.headerTheme,
+    this.descriptionTheme,
     this.inputDecorationTheme,
     this.primaryButtonTheme,
     this.secondaryButtonTheme,
@@ -44,7 +46,6 @@ final class Adyen3DSTheme {
     final headingStyle = textTheme.titleMedium ?? textTheme.titleLarge;
 
     return Adyen3DSTheme(
-      primaryColor: colorScheme.primary,
       backgroundColor: colorScheme.surface,
       textColor: colorScheme.onPrimary,
       headerTheme: Adyen3DSHeaderTheme(
@@ -52,12 +53,36 @@ final class Adyen3DSTheme {
         textColor: colorScheme.onSurface,
         fontSize: headingStyle?.fontSize,
       ),
+      descriptionTheme: Adyen3DSDescriptionTheme(
+        textColor: textTheme.bodyMedium?.color ?? colorScheme.onSurface,
+        titleTextColor: textTheme.titleSmall?.color ?? colorScheme.onSurface,
+        textFontSize: textTheme.bodyMedium?.fontSize,
+        titleFontSize: textTheme.titleSmall?.fontSize,
+      ),
       inputDecorationTheme: Adyen3DSInputDecorationTheme(
         borderColor: colorScheme.outline,
         textColor: colorScheme.onSurface,
       ),
     );
   }
+}
+
+final class Adyen3DSDescriptionTheme {
+  final Color? titleTextColor;
+  final double? titleFontSize;
+  final Color? textColor;
+  final double? textFontSize;
+  final Color? inputLabelTextColor;
+  final double? inputLabelFontSize;
+
+  const Adyen3DSDescriptionTheme({
+    this.titleTextColor,
+    this.titleFontSize,
+    this.textColor,
+    this.textFontSize,
+    this.inputLabelTextColor,
+    this.inputLabelFontSize,
+  });
 }
 
 final class Adyen3DSInputDecorationTheme {

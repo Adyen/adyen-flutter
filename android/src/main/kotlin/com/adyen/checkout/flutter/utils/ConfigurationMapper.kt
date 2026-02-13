@@ -40,6 +40,7 @@ import com.adyen.checkout.flutter.generated.ShippingAddressParametersDTO
 import com.adyen.checkout.flutter.generated.ThreeDS2ButtonCustomizationDTO
 import com.adyen.checkout.flutter.generated.ThreeDS2ConfigurationDTO
 import com.adyen.checkout.flutter.generated.ThreeDS2InputCustomizationDTO
+import com.adyen.checkout.flutter.generated.ThreeDS2LabelCustomizationDTO
 import com.adyen.checkout.flutter.generated.ThreeDS2ScreenCustomizationDTO
 import com.adyen.checkout.flutter.generated.ThreeDS2ToolbarCustomizationDTO
 import com.adyen.checkout.flutter.generated.ThreeDS2UICustomizationDTO
@@ -322,15 +323,15 @@ object ConfigurationMapper {
 
             this@toUiCustomization.screenCustomization?.let { dto ->
                 dto.backgroundColor?.let { setScreenBackgroundColor(it) }
-                dto.textColor?.let {
-                    setTextColor(it)
-                    setTintColor(it)
-                    setHighlightedBackgroundColor(it)
-                }
+                dto.textColor?.let { setTextColor(it) }
             }
 
             this@toUiCustomization.headingCustomization?.let { dto ->
                 toolbarCustomization = dto.toToolbarCustomization()
+            }
+
+            this@toUiCustomization.labelCustomization?.let { dto ->
+                labelCustomization = dto.toLabelCustomization()
             }
 
             this@toUiCustomization.inputCustomization?.let { dto ->
@@ -355,6 +356,16 @@ object ConfigurationMapper {
             this@toToolbarCustomization.buttonText?.let { buttonText = it }
             this@toToolbarCustomization.textColor?.let { textColor = it }
             this@toToolbarCustomization.textFontSize?.let { textFontSize = it.toInt() }
+        }
+
+    private fun ThreeDS2LabelCustomizationDTO.toLabelCustomization(): LabelCustomization =
+        LabelCustomization().apply {
+            this@toLabelCustomization.headingTextColor?.let { headingTextColor = it }
+            this@toLabelCustomization.headingTextFontSize?.let { headingTextFontSize = it.toInt() }
+            this@toLabelCustomization.textColor?.let { textColor = it }
+            this@toLabelCustomization.textFontSize?.let { textFontSize = it.toInt() }
+            this@toLabelCustomization.inputLabelTextColor?.let { inputLabelTextColor = it }
+            this@toLabelCustomization.inputLabelFontSize?.let { inputLabelTextFontSize = it.toInt() }
         }
 
     private fun ThreeDS2ButtonCustomizationDTO.toButtonCustomization(): ButtonCustomization =

@@ -11,6 +11,7 @@ import com.adyen.checkout.flutter.generated.FieldVisibility
 import com.adyen.checkout.flutter.generated.ThreeDS2ButtonCustomizationDTO
 import com.adyen.checkout.flutter.generated.ThreeDS2ConfigurationDTO
 import com.adyen.checkout.flutter.generated.ThreeDS2InputCustomizationDTO
+import com.adyen.checkout.flutter.generated.ThreeDS2LabelCustomizationDTO
 import com.adyen.checkout.flutter.generated.ThreeDS2ScreenCustomizationDTO
 import com.adyen.checkout.flutter.generated.ThreeDS2ToolbarCustomizationDTO
 import com.adyen.checkout.flutter.generated.ThreeDS2UICustomizationDTO
@@ -29,6 +30,12 @@ class ThreeDS2CustomizationMapperTest {
                 headerText = "Heading",
                 buttonText = "Cancel",
                 textFontSize = 18,
+            ),
+            labelCustomization = ThreeDS2LabelCustomizationDTO(
+                textColor = "#111111",
+                textFontSize = 12,
+                headingTextColor = "#222222",
+                headingTextFontSize = 14,
             ),
         )
 
@@ -62,5 +69,11 @@ class ThreeDS2CustomizationMapperTest {
         assertEquals("Heading", toolbar?.headerText)
         assertEquals("Cancel", toolbar?.buttonText)
         assertEquals(18, toolbar?.textFontSize)
+
+        val label = uiCustomization?.labelCustomization
+        assertEquals("#111111", label?.textColor)
+        assertEquals(12, label?.textFontSize)
+        assertEquals("#222222", label?.headingTextColor)
+        assertEquals(14, label?.headingTextFontSize)
     }
 }

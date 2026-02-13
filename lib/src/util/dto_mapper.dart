@@ -190,6 +190,7 @@ extension Adyen3DSThemeMapper on Adyen3DSTheme {
       ),
       headingCustomization:
           createHeadingCustomization(headingTitle: headingTitle),
+      labelCustomization: descriptionTheme?.toDTO(),
       inputCustomization: inputDecorationTheme?.toDTO(),
       primaryButtonCustomization: primaryButtonTheme?.toDTO(),
       secondaryButtonCustomization: secondaryButtonTheme?.toDTO(),
@@ -216,6 +217,19 @@ extension Adyen3DSButtonThemeMapper on Adyen3DSButtonTheme {
       textColor: textColor?.toHexString(),
       cornerRadius: cornerRadius?.round(),
       textFontSize: fontSize?.round(),
+    );
+  }
+}
+
+extension Adyen3DSDescriptionThemeMapper on Adyen3DSDescriptionTheme {
+  ThreeDS2LabelCustomizationDTO toDTO() {
+    return ThreeDS2LabelCustomizationDTO(
+      headingTextColor: titleTextColor?.toHexString(),
+      headingTextFontSize: titleFontSize?.round(),
+      inputLabelTextColor: inputLabelTextColor?.toHexString(),
+      inputLabelFontSize: inputLabelFontSize?.round(),
+      textColor: textColor?.toHexString(),
+      textFontSize: textFontSize?.round(),
     );
   }
 }

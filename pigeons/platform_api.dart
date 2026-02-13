@@ -169,6 +169,7 @@ class AnalyticsOptionsDTO {
 class ThreeDS2UICustomizationDTO {
   final ThreeDS2ScreenCustomizationDTO? screenCustomization;
   final ThreeDS2ToolbarCustomizationDTO? headingCustomization;
+  final ThreeDS2LabelCustomizationDTO? labelCustomization;
   final ThreeDS2InputCustomizationDTO? inputCustomization;
   final ThreeDS2ButtonCustomizationDTO? primaryButtonCustomization;
   final ThreeDS2ButtonCustomizationDTO? secondaryButtonCustomization;
@@ -176,6 +177,7 @@ class ThreeDS2UICustomizationDTO {
   ThreeDS2UICustomizationDTO(
     this.screenCustomization,
     this.headingCustomization,
+    this.labelCustomization,
     this.inputCustomization,
     this.primaryButtonCustomization,
     this.secondaryButtonCustomization,
@@ -202,6 +204,24 @@ class ThreeDS2ButtonCustomizationDTO {
     this.backgroundColor,
     this.textColor,
     this.cornerRadius,
+    this.textFontSize,
+  );
+}
+
+class ThreeDS2LabelCustomizationDTO {
+  final String? headingTextColor;
+  final int? headingTextFontSize;
+  final String? inputLabelTextColor;
+  final int? inputLabelFontSize;
+  final String? textColor;
+  final int? textFontSize;
+
+  ThreeDS2LabelCustomizationDTO(
+    this.headingTextColor,
+    this.headingTextFontSize,
+    this.inputLabelTextColor,
+    this.inputLabelFontSize,
+    this.textColor,
     this.textFontSize,
   );
 }

@@ -360,6 +360,10 @@ extension ThreeDS2UICustomizationDTO {
             headingCustomization.apply(to: configuration)
         }
 
+        if let labelCustomization {
+            labelCustomization.apply(to: configuration)
+        }
+
         if let inputCustomization {
             inputCustomization.apply(to: configuration)
         }
@@ -400,11 +404,11 @@ extension ThreeDS2ScreenCustomizationDTO {
 
 extension ThreeDS2ToolbarCustomizationDTO {
     func apply(to configuration: ADYAppearanceConfiguration) {
-        if let backgroundColor {
-            configuration.navigationBarAppearance.backgroundColor = UIColor(hex: backgroundColor)!
+        if let backgroundColor, let backgroundColor = UIColor(hex: backgroundColor) {
+            configuration.navigationBarAppearance.backgroundColor = backgroundColor
         }
-        if let textColor {
-            configuration.navigationBarAppearance.textColor = UIColor(hex: textColor)!
+        if let textColor, let textUIColor = UIColor(hex: textColor) {
+            configuration.navigationBarAppearance.textColor = textUIColor
         }
         if let headerText {
             configuration.navigationBarAppearance.title = headerText
@@ -415,10 +419,33 @@ extension ThreeDS2ToolbarCustomizationDTO {
     }
 }
 
+extension ThreeDS2LabelCustomizationDTO {
+    func apply(to configuration: ADYAppearanceConfiguration) {
+        if let headingTextColor, let headingColor = UIColor(hex: headingTextColor) {
+            configuration.labelAppearance.headingTextColor = headingColor
+        }
+        if let headingTextFontSize {
+            configuration.labelAppearance.headingFont = configuration.labelAppearance.headingFont.withSize(CGFloat(headingTextFontSize))
+        }
+        if let textColor, let textUIColor = UIColor(hex: textColor) {
+            configuration.labelAppearance.textColor = textUIColor
+        }
+        if let textFontSize {
+            configuration.labelAppearance.font = configuration.labelAppearance.font.withSize(CGFloat(textFontSize))
+        }
+        if let inputLabelTextColor, let inputLabelColor = UIColor(hex: inputLabelTextColor) {
+            configuration.labelAppearance.subheadingTextColor = inputLabelColor
+        }
+        if let inputLabelFontSize {
+            configuration.labelAppearance.subheadingFont = configuration.labelAppearance.subheadingFont.withSize(CGFloat(inputLabelFontSize))
+        }
+    }
+}
+
 extension ThreeDS2InputCustomizationDTO {
     func apply(to configuration: ADYAppearanceConfiguration) {
-        if let borderColor, let textUIColor = UIColor(hex: borderColor) {
-            configuration.textFieldAppearance.borderColor = textUIColor
+        if let borderColor, let boarderUIColor = UIColor(hex: borderColor) {
+            configuration.textFieldAppearance.borderColor = boarderUIColor
         }
         if let borderWidth {
             configuration.textFieldAppearance.borderWidth = CGFloat(borderWidth)
