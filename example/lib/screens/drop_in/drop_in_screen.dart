@@ -40,10 +40,11 @@ class DropInScreen extends StatelessWidget {
 
   Future<void> startDropInSessions(BuildContext context) async {
     try {
+      final theme = Theme.of(context);
       final Map<String, dynamic> sessionResponse =
           await repository.fetchSession();
       final DropInConfiguration dropInConfiguration =
-          await _createDropInConfiguration();
+          await _createDropInConfiguration(theme);
 
       final SessionCheckout sessionCheckout =
           await AdyenCheckout.session.create(
@@ -68,8 +69,9 @@ class DropInScreen extends StatelessWidget {
 
   Future<void> startDropInAdvancedFlow(BuildContext context) async {
     try {
+      final theme = Theme.of(context);
       final paymentMethodsResponse = await repository.fetchPaymentMethods();
-      final dropInConfiguration = await _createDropInConfiguration();
+      final dropInConfiguration = await _createDropInConfiguration(theme);
       final advancedCheckout = AdvancedCheckout(
         onSubmit: repository.onSubmit,
         onAdditionalDetails: repository.onAdditionalDetails,
@@ -94,7 +96,8 @@ class DropInScreen extends StatelessWidget {
     }
   }
 
-  Future<DropInConfiguration> _createDropInConfiguration() async {
+  Future<DropInConfiguration> _createDropInConfiguration(
+      ThemeData theme) async {
     CardConfiguration cardsConfiguration = CardConfiguration(
       onBinLookup: _onBinLookup,
       onBinValue: _onBinValue,
@@ -132,6 +135,47 @@ class DropInScreen extends StatelessWidget {
       deleteStoredPaymentMethodCallback: repository.deleteStoredPaymentMethod,
     );
 
+    final ThreeDS2Configuration threeDS2Configuration = ThreeDS2Configuration(
+      headingTitle: "Test 3DS2 title",
+      theme: const Adyen3DSTheme(
+        textColor: Colors.green,
+        // backgroundColor: Colors.yellow, //ASK Why it is not supported on iOS
+        headerTheme: Adyen3DSHeaderTheme(
+          backgroundColor: Colors.green,
+          textColor: Colors.white,
+          cancelButtonText: 'STOP!',
+        ),
+
+        descriptionTheme: Adyen3DSDescriptionTheme(
+          titleTextColor: Colors.tealAccent,
+          titleFontSize: 16,
+          textColor: Colors.teal,
+          textFontSize: 14,
+          inputLabelTextColor: Colors.yellow,
+          inputLabelFontSize: 8,
+        ),
+
+        inputDecorationTheme: Adyen3DSInputDecorationTheme(
+          textColor: Colors.deepOrangeAccent,
+          borderColor: Colors.purpleAccent,
+          borderWidth: 10,
+          cornerRadius: 80,
+        ),
+
+        primaryButtonTheme: Adyen3DSButtonTheme(
+          backgroundColor: Colors.blue,
+          textColor: Colors.white,
+          cornerRadius: 12,
+        ),
+
+        // secondaryButtonTheme: Adyen3DSButtonTheme(
+        //   backgroundColor: Colors.orange,
+        //   textColor: Colors.lightGreen,
+        //   cornerRadius: 8,
+        // ),
+      ),
+    );
+
     final DropInConfiguration dropInConfiguration = DropInConfiguration(
       environment: Config.environment,
       clientKey: Config.clientKey,
@@ -143,6 +187,7 @@ class DropInScreen extends StatelessWidget {
       googlePayConfiguration: googlePayConfiguration,
       cashAppPayConfiguration: cashAppPayConfiguration,
       twintConfiguration: twintConfiguration,
+      threeDS2Configuration: threeDS2Configuration,
       storedPaymentMethodConfiguration: storedPaymentMethodConfiguration,
       paymentMethodNames: {
         "scheme": "Credit card",

@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:ui';
 
 import 'package:adyen_checkout/adyen_checkout.dart';
 import 'package:adyen_checkout/src/generated/platform_api.g.dart';
@@ -162,9 +163,104 @@ extension TwintConfigurationMapper on TwintConfiguration {
 }
 
 extension ThreeDS2ConfigurationMapper on ThreeDS2Configuration {
-  ThreeDS2ConfigurationDTO toDTO() => ThreeDS2ConfigurationDTO(
+  ThreeDS2ConfigurationDTO toDTO() {
+    if (theme == null && headingTitle != null) {
+      final headingCustomization =
+          ThreeDS2ToolbarCustomizationDTO(headerText: headingTitle);
+      return ThreeDS2ConfigurationDTO(
         requestorAppURL: requestorAppURL,
+        uiCustomization: ThreeDS2UICustomizationDTO(
+            headingCustomization: headingCustomization),
       );
+    }
+
+    return ThreeDS2ConfigurationDTO(
+      requestorAppURL: requestorAppURL,
+      uiCustomization: theme?.toUICustomizationDTO(headingTitle: headingTitle),
+    );
+  }
+}
+
+extension Adyen3DSThemeMapper on Adyen3DSTheme {
+  ThreeDS2UICustomizationDTO toUICustomizationDTO({String? headingTitle}) {
+    return ThreeDS2UICustomizationDTO(
+      screenCustomization: ThreeDS2ScreenCustomizationDTO(
+        backgroundColor: backgroundColor?.toHexString(),
+        textColor: textColor?.toHexString(),
+      ),
+      headingCustomization:
+          createHeadingCustomization(headingTitle: headingTitle),
+      labelCustomization: descriptionTheme?.toDTO(),
+      inputCustomization: inputDecorationTheme?.toDTO(),
+      primaryButtonCustomization: primaryButtonTheme?.toDTO(),
+      secondaryButtonCustomization: secondaryButtonTheme?.toDTO(),
+    );
+  }
+
+  ThreeDS2ToolbarCustomizationDTO? createHeadingCustomization(
+      {String? headingTitle}) {
+    final headerTheme = this.headerTheme;
+    if (headingTitle != null && headerTheme == null) {
+      return ThreeDS2ToolbarCustomizationDTO(headerText: headingTitle);
+    }
+    if (headerTheme != null) {
+      return headerTheme.toDTO(headingTitle: headingTitle);
+    }
+    return null;
+  }
+}
+
+extension Adyen3DSButtonThemeMapper on Adyen3DSButtonTheme {
+  ThreeDS2ButtonCustomizationDTO toDTO() {
+    return ThreeDS2ButtonCustomizationDTO(
+      backgroundColor: backgroundColor?.toHexString(),
+      textColor: textColor?.toHexString(),
+      cornerRadius: cornerRadius?.round(),
+      textFontSize: fontSize?.round(),
+    );
+  }
+}
+
+extension Adyen3DSDescriptionThemeMapper on Adyen3DSDescriptionTheme {
+  ThreeDS2LabelCustomizationDTO toDTO() {
+    return ThreeDS2LabelCustomizationDTO(
+      headingTextColor: titleTextColor?.toHexString(),
+      headingTextFontSize: titleFontSize?.round(),
+      inputLabelTextColor: inputLabelTextColor?.toHexString(),
+      inputLabelFontSize: inputLabelFontSize?.round(),
+      textColor: textColor?.toHexString(),
+      textFontSize: textFontSize?.round(),
+    );
+  }
+}
+
+extension Adyen3DSInputDecorationThemeMapper on Adyen3DSInputDecorationTheme {
+  ThreeDS2InputCustomizationDTO toDTO() {
+    return ThreeDS2InputCustomizationDTO(
+      borderColor: borderColor?.toHexString(),
+      borderWidth: borderWidth?.round(),
+      cornerRadius: cornerRadius?.round(),
+      textColor: textColor?.toHexString(),
+    );
+  }
+}
+
+extension Adyen3DSHeaderThemeMapper on Adyen3DSHeaderTheme {
+  ThreeDS2ToolbarCustomizationDTO toDTO({String? headingTitle}) {
+    return ThreeDS2ToolbarCustomizationDTO(
+      backgroundColor: backgroundColor?.toHexString(),
+      headerText: headingTitle,
+      buttonText: cancelButtonText,
+      textColor: textColor?.toHexString(),
+      textFontSize: fontSize?.round(),
+    );
+  }
+}
+
+extension ColorToHex on Color {
+  String toHexString() {
+    return '#${toARGB32().toRadixString(16).padLeft(8, '0').toUpperCase()}';
+  }
 }
 
 extension SessionMapper on SessionCheckout {

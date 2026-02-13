@@ -107,6 +107,7 @@ You can customize the styling of the user interface and change the wording if re
 guides for each platform:
 
 * [UI customization](/doc/CUSTOMIZATION.md)
+* [3DS2 UI customization](/doc/3DS_CUSTOMIZATION.md)
 * [Localization](/doc/LOCALIZATION.md)
 
 ## Support

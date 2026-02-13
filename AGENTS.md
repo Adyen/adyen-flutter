@@ -38,6 +38,44 @@ adyen-flutter/
 └── example/                          # Example Flutter app
 ```
 
+## Planning Flutter Features
+
+- **[Write the plan in Obsidian]** Store implementation plans in the appropriate plan folder.
+- **[Problem statement + non-goals]** Start the plan with a short problem statement and explicit
+  non-goals/out-of-scope.
+- **[Public API sketch first]** Define the intended Dart-facing API early (types + a short usage
+  snippet). Keep it Flutter-idiomatic and minimal.
+- **[Ownership + data flow]** Decide and document what happens in Flutter vs native.
+- **[Acceptance criteria]** Add a small checklist of observable behaviors, including
+  backwards-compat expectations ("when omitted, existing behavior is unchanged").
+- **[Phase-based delivery]** Break work into phases that can be completed and validated
+  independently. A good default for cross-platform features is:
+    - **[Flutter models]** Public Dart API models.
+    - **[Pigeon DTOs + codegen]** Define DTOs in `pigeons/platform_api.dart`, then generate.
+    - **[Dart DTO mapping]** Map public models to DTOs in `lib/src/util/dto_mapper.dart`.
+    - **[Android mapping]** Map DTOs to Android SDK types.
+    - **[iOS mapping]** Map DTOs to iOS SDK types.
+    - **[Finalization]** Exports, tests, example usage, docs, changelog.
+- **[Keep the public API clean]** Prefer a Flutter-idiomatic abstraction (simple Dart models) and do
+  the complex mapping internally. Avoid exposing native SDK configuration graphs directly.
+- **[Backwards compatibility]** New fields should be optional and default to current behavior when
+  omitted.
+- **[DTO structure]** When adding platform configuration, design DTOs to match the native SDK
+  structure the platform code needs, minimizing transformation on native.
+- **[Named parameters for DTOs]** Prefer named parameters when constructing DTOs (especially
+  Pigeon-generated DTOs) and any constructors with many fields. This improves readability and avoids
+  breakage when constructor signatures change.
+- **[Value/format decisions]** Decide early where conversions happen (e.g., `Color` to hex string,
+  `double` to `int` rounding) and keep that logic in one place.
+- **[Validation strategy]** Validate obvious invalid values on the Flutter side where feasible (for
+  clearer errors), while keeping defaults/omitted values delegated to the native SDK.
+- **[Testing + manual verification]** Plan both unit tests (Flutter mapping) and manual verification
+  steps (Android + iOS), especially for UI changes.
+- **[Risks + mitigations]** List the top risks (platform differences, invalid values, SDK
+  limitations) and how you’ll validate/mitigate.
+- **[Done definition]** End the plan with “done when” items (codegen committed, tests passing,
+  example updated, docs/changelog updated).
+
 ## Idiomatic Flutter Practices
 
 ### General
@@ -114,10 +152,8 @@ class ExampleConfigurationDTO {
   final String requiredField;
   final String? optionalField;
 
-  ExampleConfigurationDTO(
-    this.requiredField,
-    this.optionalField,
-  );
+  ExampleConfigurationDTO(this.requiredField,
+      this.optionalField,);
 }
 ```
 
@@ -258,12 +294,13 @@ Flutter Widget (Dart)
 
 ## Testing
 
-- When creating or updating iOS tests, always follow the Adyen iOS SDK testing guide: https://github.com/Adyen/adyen-ios/blob/develop/TESTING.md
+- When creating or updating iOS tests, always follow the Adyen iOS SDK testing
+  guide: https://github.com/Adyen/adyen-ios/blob/develop/TESTING.md
 - Run with `flutter test`
 - Test both model classes and DTO mappings
 
-| Platform | Where to put tests | Notes |
-|---|---|---|
-| Flutter (Dart) | `test/` | Dart unit tests |
-| Android | `android/src/test/kotlin/...` | JVM unit tests. If you need instrumentation tests, use `android/src/androidTest/kotlin/...`. |
-| iOS | `example/ios/RunnerTests/` | Xcode/Swift tests for the iOS example app target. |
+| Platform       | Where to put tests            | Notes                                                                                        |
+|----------------|-------------------------------|----------------------------------------------------------------------------------------------|
+| Flutter (Dart) | `test/`                       | Dart unit tests                                                                              |
+| Android        | `android/src/test/kotlin/...` | JVM unit tests. If you need instrumentation tests, use `android/src/androidTest/kotlin/...`. |
+| iOS            | `example/ios/RunnerTests/`    | Xcode/Swift tests for the iOS example app target.                                            |

@@ -1,5 +1,8 @@
 ## UI Customization
 
+### 3DS2 challenge screens
+
+See [3DS2 UI customization](./3DS_CUSTOMIZATION.md).
 
 ### Android
 

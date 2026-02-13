@@ -15,6 +15,7 @@
 		75072B952F3508AB00DB2A56 /* ConfigurationMapperTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75072B8F2F3508AB00DB2A56 /* ConfigurationMapperTests.swift */; };
 		75072B962F3508AB00DB2A56 /* TestUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75072B922F3508AB00DB2A56 /* TestUtils.swift */; };
 		75072B972F3508AB00DB2A56 /* ConfigurationMapperTests+Card.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75072B902F3508AB00DB2A56 /* ConfigurationMapperTests+Card.swift */; };
+		7525B4FC2F3F77B600095BAD /* ThreeDS2CustomizationMapperTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7525B4FB2F3F77B600095BAD /* ThreeDS2CustomizationMapperTests.swift */; };
 		75609D702D3159AB0057CFC3 /* CardValidatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75609D6F2D3159AB0057CFC3 /* CardValidatorTests.swift */; };
 		7567D9652DB7D0B900868648 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 7567D9642DB7D0B900868648 /* Localizable.xcstrings */; };
 		78A318202AECB46A00862997 /* FlutterGeneratedPluginSwiftPackage in Frameworks */ = {isa = PBXBuildFile; productRef = 78A3181F2AECB46A00862997 /* FlutterGeneratedPluginSwiftPackage */; };
@@ -64,6 +65,7 @@
 		75072B902F3508AB00DB2A56 /* ConfigurationMapperTests+Card.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ConfigurationMapperTests+Card.swift"; sourceTree = "<group>"; };
 		75072B912F3508AB00DB2A56 /* ConfigurationMapperTests+DropIn.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ConfigurationMapperTests+DropIn.swift"; sourceTree = "<group>"; };
 		75072B922F3508AB00DB2A56 /* TestUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestUtils.swift; sourceTree = "<group>"; };
+		7525B4FB2F3F77B600095BAD /* ThreeDS2CustomizationMapperTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThreeDS2CustomizationMapperTests.swift; sourceTree = "<group>"; };
 		75609D6F2D3159AB0057CFC3 /* CardValidatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardValidatorTests.swift; sourceTree = "<group>"; };
 		7567D95D2DB7C7BB00868648 /* en-US */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "en-US"; path = "en-US.lproj/Main.strings"; sourceTree = "<group>"; };
 		7567D95E2DB7C7BB00868648 /* en-US */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "en-US"; path = "en-US.lproj/LaunchScreen.strings"; sourceTree = "<group>"; };
@@ -116,6 +118,7 @@
 				75072B902F3508AB00DB2A56 /* ConfigurationMapperTests+Card.swift */,
 				75072B912F3508AB00DB2A56 /* ConfigurationMapperTests+DropIn.swift */,
 				75072B922F3508AB00DB2A56 /* TestUtils.swift */,
+				7525B4FB2F3F77B600095BAD /* ThreeDS2CustomizationMapperTests.swift */,
 			);
 			path = RunnerTests;
 			sourceTree = "<group>";
@@ -404,6 +407,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7525B4FC2F3F77B600095BAD /* ThreeDS2CustomizationMapperTests.swift in Sources */,
 				75609D702D3159AB0057CFC3 /* CardValidatorTests.swift in Sources */,
 				75072B942F3508AB00DB2A56 /* ConfigurationMapperTests+DropIn.swift in Sources */,
 				75072B952F3508AB00DB2A56 /* ConfigurationMapperTests.swift in Sources */,
