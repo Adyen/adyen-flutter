@@ -271,15 +271,104 @@ void main() {
 
     final uiCustomization = dto.uiCustomization;
     expect(uiCustomization, isNotNull);
-    expect(uiCustomization?.submitButtonCustomization?.backgroundColor,
-        '#FF112233');
-    expect(uiCustomization?.submitButtonCustomization?.textColor, '#FFFFFFFF');
-    expect(uiCustomization?.submitButtonCustomization?.textFontSize, null);
-    expect(uiCustomization?.submitButtonCustomization?.cornerRadius, null);
+    expect(uiCustomization?.primaryButtonCustomization, isNull);
+    expect(uiCustomization?.secondaryButtonCustomization, isNull);
     expect(uiCustomization?.inputCustomization?.borderColor, '#FF0A0B0C');
     expect(uiCustomization?.inputCustomization?.borderWidth, 2);
     expect(uiCustomization?.inputCustomization?.cornerRadius, 4);
     expect(uiCustomization?.inputCustomization?.textColor, '#FF0D0E0F');
+  });
+
+  test('when requestorAppURL set, then should pass through', () {
+    final configuration = ThreeDS2Configuration(requestorAppURL: 'app://cb');
+
+    final dto = configuration.toDTO();
+
+    expect(dto.requestorAppURL, 'app://cb');
+  });
+
+  test('when theme has screen colors, then should map to screenCustomization', () {
+    const theme = Adyen3DSTheme(
+      backgroundColor: Color(0xFF111213),
+      textColor: Color(0xFF141516),
+    );
+
+    final dto = ThreeDS2Configuration(theme: theme).toDTO();
+
+    expect(dto.uiCustomization?.screenCustomization?.backgroundColor, '#FF111213');
+    expect(dto.uiCustomization?.screenCustomization?.textColor, '#FF141516');
+  });
+
+  test('when header theme set, then should map all header fields', () {
+    const headerTheme = Adyen3DSHeaderTheme(
+      backgroundColor: Color(0xFF010203),
+      textColor: Color(0xFF040506),
+      fontSize: 18,
+      cancelButtonText: 'Cancel',
+    );
+    const theme = Adyen3DSTheme(headerTheme: headerTheme);
+
+    final dto = ThreeDS2Configuration(theme: theme, headingTitle: 'Heading').toDTO();
+
+    final heading = dto.uiCustomization?.headingCustomization;
+    expect(heading?.backgroundColor, '#FF010203');
+    expect(heading?.textColor, '#FF040506');
+    expect(heading?.textFontSize, 18);
+    expect(heading?.buttonText, 'Cancel');
+    expect(heading?.headerText, 'Heading');
+  });
+
+  test('when button themes set, then should map primary and secondary', () {
+    const theme = Adyen3DSTheme(
+      primaryButtonTheme: Adyen3DSButtonTheme(
+        backgroundColor: Color(0xFF0A0B0C),
+        textColor: Color(0xFF0D0E0F),
+        cornerRadius: 6,
+        fontSize: 15,
+      ),
+      secondaryButtonTheme: Adyen3DSButtonTheme(
+        backgroundColor: Color(0xFF101112),
+        textColor: Color(0xFF131415),
+        cornerRadius: 8,
+        fontSize: 13,
+      ),
+    );
+
+    final dto = ThreeDS2Configuration(theme: theme).toDTO();
+
+    final primary = dto.uiCustomization?.primaryButtonCustomization;
+    final secondary = dto.uiCustomization?.secondaryButtonCustomization;
+    expect(primary?.backgroundColor, '#FF0A0B0C');
+    expect(primary?.textColor, '#FF0D0E0F');
+    expect(primary?.cornerRadius, 6);
+    expect(primary?.textFontSize, 15);
+    expect(secondary?.backgroundColor, '#FF101112');
+    expect(secondary?.textColor, '#FF131415');
+    expect(secondary?.cornerRadius, 8);
+    expect(secondary?.textFontSize, 13);
+  });
+
+  test('when both headingTitle and headerTheme provided, headerTheme should win for style', () {
+    const theme = Adyen3DSTheme(
+      headerTheme: Adyen3DSHeaderTheme(
+        backgroundColor: Color(0xFF212223),
+        textColor: Color(0xFF242526),
+        fontSize: 20,
+        cancelButtonText: 'Close',
+      ),
+    );
+
+    final dto = ThreeDS2Configuration(
+      headingTitle: 'Preferred heading',
+      theme: theme,
+    ).toDTO();
+
+    final heading = dto.uiCustomization?.headingCustomization;
+    expect(heading?.headerText, 'Preferred heading');
+    expect(heading?.backgroundColor, '#FF212223');
+    expect(heading?.textColor, '#FF242526');
+    expect(heading?.textFontSize, 20);
+    expect(heading?.buttonText, 'Close');
   });
 
   test('when toolbar title is set, then should map to toolbar header text', () {

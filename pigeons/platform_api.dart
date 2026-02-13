@@ -170,21 +170,15 @@ class ThreeDS2UICustomizationDTO {
   final ThreeDS2ScreenCustomizationDTO? screenCustomization;
   final ThreeDS2ToolbarCustomizationDTO? headingCustomization;
   final ThreeDS2InputCustomizationDTO? inputCustomization;
-  final ThreeDS2ButtonCustomizationDTO? submitButtonCustomization;
-  final ThreeDS2ButtonCustomizationDTO? continueButtonCustomization;
-  final ThreeDS2ButtonCustomizationDTO? nextButtonCustomization;
-  final ThreeDS2ButtonCustomizationDTO? cancelButtonCustomization;
-  final ThreeDS2ButtonCustomizationDTO? resendButtonCustomization;
+  final ThreeDS2ButtonCustomizationDTO? primaryButtonCustomization;
+  final ThreeDS2ButtonCustomizationDTO? secondaryButtonCustomization;
 
   ThreeDS2UICustomizationDTO(
     this.screenCustomization,
     this.headingCustomization,
     this.inputCustomization,
-    this.submitButtonCustomization,
-    this.continueButtonCustomization,
-    this.nextButtonCustomization,
-    this.cancelButtonCustomization,
-    this.resendButtonCustomization,
+    this.primaryButtonCustomization,
+    this.secondaryButtonCustomization,
   );
 }
 

@@ -163,75 +163,82 @@ extension TwintConfigurationMapper on TwintConfiguration {
 }
 
 extension ThreeDS2ConfigurationMapper on ThreeDS2Configuration {
-  ThreeDS2ConfigurationDTO toDTO() => ThreeDS2ConfigurationDTO(
+  ThreeDS2ConfigurationDTO toDTO() {
+    if (theme == null && headingTitle != null) {
+      final headingCustomization =
+          ThreeDS2ToolbarCustomizationDTO(headerText: headingTitle);
+      return ThreeDS2ConfigurationDTO(
+        requestorAppURL: requestorAppURL,
+        uiCustomization: ThreeDS2UICustomizationDTO(
+            headingCustomization: headingCustomization),
+      );
+    }
+
+    return ThreeDS2ConfigurationDTO(
       requestorAppURL: requestorAppURL,
-      uiCustomization: theme?.toUICustomizationDTO(headingTitle: headingTitle));
+      uiCustomization: theme?.toUICustomizationDTO(headingTitle: headingTitle),
+    );
+  }
 }
 
 extension Adyen3DSThemeMapper on Adyen3DSTheme {
   ThreeDS2UICustomizationDTO toUICustomizationDTO({String? headingTitle}) {
-    ThreeDS2ButtonCustomizationDTO buttonDTOFromTheme(
-        Adyen3DSButtonTheme? buttonCustomization) {
-      return ThreeDS2ButtonCustomizationDTO(
-        backgroundColor: buttonCustomization?.backgroundColor?.toHexString(),
-        textColor: (buttonCustomization?.textColor ?? textColor)?.toHexString(),
-        cornerRadius: buttonCustomization?.cornerRadius?.round(),
-        textFontSize: buttonCustomization?.fontSize?.round(),
-      );
-    }
-
-    ThreeDS2InputCustomizationDTO? inputDTOFromTheme() {
-    if (inputDecorationTheme == null) {
-      // Only create DTO if we have root values to apply as fallbacks
-      return textColor == null ? null : ThreeDS2InputCustomizationDTO(
-        borderColor: null,
-        borderWidth: null,
-        cornerRadius: null,
-        textColor: textColor?.toHexString(),
-      );
-    }
-    
-    return ThreeDS2InputCustomizationDTO(
-      borderColor: inputDecorationTheme?.borderColor?.toHexString(),
-      borderWidth: inputDecorationTheme?.borderWidth?.round(),
-      cornerRadius: inputDecorationTheme?.cornerRadius?.round(),
-      textColor: (inputDecorationTheme?.textColor ?? textColor)?.toHexString(),
-    );
-  }
-
-    ThreeDS2ToolbarCustomizationDTO? createThreeDS2ToolbarCustomizationDTO() {
-    if (headerTheme == null) {
-      // Only create DTO if we have root values to apply as fallbacks
-      return (textColor == null && headingTitle == null) ? null : ThreeDS2ToolbarCustomizationDTO(
-        backgroundColor: null,
-        headerText: headingTitle,
-        buttonText: null,
-        textColor: textColor?.toHexString(),
-        textFontSize: null,
-      );
-    }
-    
-    return ThreeDS2ToolbarCustomizationDTO(
-      backgroundColor: headerTheme?.backgroundColor?.toHexString(),
-      headerText: headingTitle,
-      buttonText: headerTheme?.cancelButtonText,
-      textColor: (headerTheme?.textColor ?? textColor)?.toHexString(),
-      textFontSize: headerTheme?.fontSize?.round(),
-    );
-  }
-
     return ThreeDS2UICustomizationDTO(
       screenCustomization: ThreeDS2ScreenCustomizationDTO(
         backgroundColor: backgroundColor?.toHexString(),
         textColor: textColor?.toHexString(),
       ),
-      headingCustomization: createThreeDS2ToolbarCustomizationDTO(),
-      inputCustomization: inputDTOFromTheme(),
-      submitButtonCustomization: submitButtonTheme == null ? null : buttonDTOFromTheme(submitButtonTheme),
-      continueButtonCustomization: continueButtonTheme == null ? null : buttonDTOFromTheme(continueButtonTheme),
-      nextButtonCustomization: nextButtonTheme == null ? null : buttonDTOFromTheme(nextButtonTheme),
-      cancelButtonCustomization: cancelButtonTheme == null ? null : buttonDTOFromTheme(cancelButtonTheme),
-      resendButtonCustomization: resendButtonTheme == null ? null : buttonDTOFromTheme(resendButtonTheme),
+      headingCustomization:
+          createHeadingCustomization(headingTitle: headingTitle),
+      inputCustomization: inputDecorationTheme?.toDTO(),
+      primaryButtonCustomization: primaryButtonTheme?.toDTO(),
+      secondaryButtonCustomization: secondaryButtonTheme?.toDTO(),
+    );
+  }
+
+  ThreeDS2ToolbarCustomizationDTO? createHeadingCustomization(
+      {String? headingTitle}) {
+    final headerTheme = this.headerTheme;
+    if (headingTitle != null && headerTheme == null) {
+      return ThreeDS2ToolbarCustomizationDTO(headerText: headingTitle);
+    }
+    if (headerTheme != null) {
+      return headerTheme.toDTO(headingTitle: headingTitle);
+    }
+    return null;
+  }
+}
+
+extension Adyen3DSButtonThemeMapper on Adyen3DSButtonTheme {
+  ThreeDS2ButtonCustomizationDTO toDTO() {
+    return ThreeDS2ButtonCustomizationDTO(
+      backgroundColor: backgroundColor?.toHexString(),
+      textColor: textColor?.toHexString(),
+      cornerRadius: cornerRadius?.round(),
+      textFontSize: fontSize?.round(),
+    );
+  }
+}
+
+extension Adyen3DSInputDecorationThemeMapper on Adyen3DSInputDecorationTheme {
+  ThreeDS2InputCustomizationDTO toDTO() {
+    return ThreeDS2InputCustomizationDTO(
+      borderColor: borderColor?.toHexString(),
+      borderWidth: borderWidth?.round(),
+      cornerRadius: cornerRadius?.round(),
+      textColor: textColor?.toHexString(),
+    );
+  }
+}
+
+extension Adyen3DSHeaderThemeMapper on Adyen3DSHeaderTheme {
+  ThreeDS2ToolbarCustomizationDTO toDTO({String? headingTitle}) {
+    return ThreeDS2ToolbarCustomizationDTO(
+      backgroundColor: backgroundColor?.toHexString(),
+      headerText: headingTitle,
+      buttonText: cancelButtonText,
+      textColor: textColor?.toHexString(),
+      textFontSize: fontSize?.round(),
     );
   }
 }

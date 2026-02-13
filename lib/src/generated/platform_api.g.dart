@@ -235,11 +235,8 @@ class ThreeDS2UICustomizationDTO {
     this.screenCustomization,
     this.headingCustomization,
     this.inputCustomization,
-    this.submitButtonCustomization,
-    this.continueButtonCustomization,
-    this.nextButtonCustomization,
-    this.cancelButtonCustomization,
-    this.resendButtonCustomization,
+    this.primaryButtonCustomization,
+    this.secondaryButtonCustomization,
   });
 
   ThreeDS2ScreenCustomizationDTO? screenCustomization;
@@ -248,26 +245,17 @@ class ThreeDS2UICustomizationDTO {
 
   ThreeDS2InputCustomizationDTO? inputCustomization;
 
-  ThreeDS2ButtonCustomizationDTO? submitButtonCustomization;
+  ThreeDS2ButtonCustomizationDTO? primaryButtonCustomization;
 
-  ThreeDS2ButtonCustomizationDTO? continueButtonCustomization;
-
-  ThreeDS2ButtonCustomizationDTO? nextButtonCustomization;
-
-  ThreeDS2ButtonCustomizationDTO? cancelButtonCustomization;
-
-  ThreeDS2ButtonCustomizationDTO? resendButtonCustomization;
+  ThreeDS2ButtonCustomizationDTO? secondaryButtonCustomization;
 
   Object encode() {
     return <Object?>[
       screenCustomization,
       headingCustomization,
       inputCustomization,
-      submitButtonCustomization,
-      continueButtonCustomization,
-      nextButtonCustomization,
-      cancelButtonCustomization,
-      resendButtonCustomization,
+      primaryButtonCustomization,
+      secondaryButtonCustomization,
     ];
   }
 
@@ -277,11 +265,8 @@ class ThreeDS2UICustomizationDTO {
       screenCustomization: result[0] as ThreeDS2ScreenCustomizationDTO?,
       headingCustomization: result[1] as ThreeDS2ToolbarCustomizationDTO?,
       inputCustomization: result[2] as ThreeDS2InputCustomizationDTO?,
-      submitButtonCustomization: result[3] as ThreeDS2ButtonCustomizationDTO?,
-      continueButtonCustomization: result[4] as ThreeDS2ButtonCustomizationDTO?,
-      nextButtonCustomization: result[5] as ThreeDS2ButtonCustomizationDTO?,
-      cancelButtonCustomization: result[6] as ThreeDS2ButtonCustomizationDTO?,
-      resendButtonCustomization: result[7] as ThreeDS2ButtonCustomizationDTO?,
+      primaryButtonCustomization: result[3] as ThreeDS2ButtonCustomizationDTO?,
+      secondaryButtonCustomization: result[4] as ThreeDS2ButtonCustomizationDTO?,
     );
   }
 }

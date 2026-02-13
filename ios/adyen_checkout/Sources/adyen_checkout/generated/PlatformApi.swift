@@ -268,32 +268,23 @@ struct ThreeDS2UICustomizationDTO {
   var screenCustomization: ThreeDS2ScreenCustomizationDTO? = nil
   var headingCustomization: ThreeDS2ToolbarCustomizationDTO? = nil
   var inputCustomization: ThreeDS2InputCustomizationDTO? = nil
-  var submitButtonCustomization: ThreeDS2ButtonCustomizationDTO? = nil
-  var continueButtonCustomization: ThreeDS2ButtonCustomizationDTO? = nil
-  var nextButtonCustomization: ThreeDS2ButtonCustomizationDTO? = nil
-  var cancelButtonCustomization: ThreeDS2ButtonCustomizationDTO? = nil
-  var resendButtonCustomization: ThreeDS2ButtonCustomizationDTO? = nil
+  var primaryButtonCustomization: ThreeDS2ButtonCustomizationDTO? = nil
+  var secondaryButtonCustomization: ThreeDS2ButtonCustomizationDTO? = nil
 
   // swift-format-ignore: AlwaysUseLowerCamelCase
   static func fromList(_ __pigeon_list: [Any?]) -> ThreeDS2UICustomizationDTO? {
     let screenCustomization: ThreeDS2ScreenCustomizationDTO? = nilOrValue(__pigeon_list[0])
     let headingCustomization: ThreeDS2ToolbarCustomizationDTO? = nilOrValue(__pigeon_list[1])
     let inputCustomization: ThreeDS2InputCustomizationDTO? = nilOrValue(__pigeon_list[2])
-    let submitButtonCustomization: ThreeDS2ButtonCustomizationDTO? = nilOrValue(__pigeon_list[3])
-    let continueButtonCustomization: ThreeDS2ButtonCustomizationDTO? = nilOrValue(__pigeon_list[4])
-    let nextButtonCustomization: ThreeDS2ButtonCustomizationDTO? = nilOrValue(__pigeon_list[5])
-    let cancelButtonCustomization: ThreeDS2ButtonCustomizationDTO? = nilOrValue(__pigeon_list[6])
-    let resendButtonCustomization: ThreeDS2ButtonCustomizationDTO? = nilOrValue(__pigeon_list[7])
+    let primaryButtonCustomization: ThreeDS2ButtonCustomizationDTO? = nilOrValue(__pigeon_list[3])
+    let secondaryButtonCustomization: ThreeDS2ButtonCustomizationDTO? = nilOrValue(__pigeon_list[4])
 
     return ThreeDS2UICustomizationDTO(
       screenCustomization: screenCustomization,
       headingCustomization: headingCustomization,
       inputCustomization: inputCustomization,
-      submitButtonCustomization: submitButtonCustomization,
-      continueButtonCustomization: continueButtonCustomization,
-      nextButtonCustomization: nextButtonCustomization,
-      cancelButtonCustomization: cancelButtonCustomization,
-      resendButtonCustomization: resendButtonCustomization
+      primaryButtonCustomization: primaryButtonCustomization,
+      secondaryButtonCustomization: secondaryButtonCustomization
     )
   }
   func toList() -> [Any?] {
@@ -301,11 +292,8 @@ struct ThreeDS2UICustomizationDTO {
       screenCustomization,
       headingCustomization,
       inputCustomization,
-      submitButtonCustomization,
-      continueButtonCustomization,
-      nextButtonCustomization,
-      cancelButtonCustomization,
-      resendButtonCustomization,
+      primaryButtonCustomization,
+      secondaryButtonCustomization,
     ]
   }
 }

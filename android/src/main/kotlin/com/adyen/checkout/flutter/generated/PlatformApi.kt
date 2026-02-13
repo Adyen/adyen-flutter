@@ -351,11 +351,8 @@ data class ThreeDS2UICustomizationDTO (
   val screenCustomization: ThreeDS2ScreenCustomizationDTO? = null,
   val headingCustomization: ThreeDS2ToolbarCustomizationDTO? = null,
   val inputCustomization: ThreeDS2InputCustomizationDTO? = null,
-  val submitButtonCustomization: ThreeDS2ButtonCustomizationDTO? = null,
-  val continueButtonCustomization: ThreeDS2ButtonCustomizationDTO? = null,
-  val nextButtonCustomization: ThreeDS2ButtonCustomizationDTO? = null,
-  val cancelButtonCustomization: ThreeDS2ButtonCustomizationDTO? = null,
-  val resendButtonCustomization: ThreeDS2ButtonCustomizationDTO? = null
+  val primaryButtonCustomization: ThreeDS2ButtonCustomizationDTO? = null,
+  val secondaryButtonCustomization: ThreeDS2ButtonCustomizationDTO? = null
 
 ) {
   companion object {
@@ -364,12 +361,9 @@ data class ThreeDS2UICustomizationDTO (
       val screenCustomization = __pigeon_list[0] as ThreeDS2ScreenCustomizationDTO?
       val headingCustomization = __pigeon_list[1] as ThreeDS2ToolbarCustomizationDTO?
       val inputCustomization = __pigeon_list[2] as ThreeDS2InputCustomizationDTO?
-      val submitButtonCustomization = __pigeon_list[3] as ThreeDS2ButtonCustomizationDTO?
-      val continueButtonCustomization = __pigeon_list[4] as ThreeDS2ButtonCustomizationDTO?
-      val nextButtonCustomization = __pigeon_list[5] as ThreeDS2ButtonCustomizationDTO?
-      val cancelButtonCustomization = __pigeon_list[6] as ThreeDS2ButtonCustomizationDTO?
-      val resendButtonCustomization = __pigeon_list[7] as ThreeDS2ButtonCustomizationDTO?
-      return ThreeDS2UICustomizationDTO(screenCustomization, headingCustomization, inputCustomization, submitButtonCustomization, continueButtonCustomization, nextButtonCustomization, cancelButtonCustomization, resendButtonCustomization)
+      val primaryButtonCustomization = __pigeon_list[3] as ThreeDS2ButtonCustomizationDTO?
+      val secondaryButtonCustomization = __pigeon_list[4] as ThreeDS2ButtonCustomizationDTO?
+      return ThreeDS2UICustomizationDTO(screenCustomization, headingCustomization, inputCustomization, primaryButtonCustomization, secondaryButtonCustomization)
     }
   }
   fun toList(): List<Any?> {
@@ -377,11 +371,8 @@ data class ThreeDS2UICustomizationDTO (
       screenCustomization,
       headingCustomization,
       inputCustomization,
-      submitButtonCustomization,
-      continueButtonCustomization,
-      nextButtonCustomization,
-      cancelButtonCustomization,
-      resendButtonCustomization,
+      primaryButtonCustomization,
+      secondaryButtonCustomization,
     )
   }
 }

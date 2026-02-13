@@ -15,12 +15,11 @@ final class Adyen3DSTheme {
   // Inputs
   final Adyen3DSInputDecorationTheme? inputDecorationTheme;
 
-  // Optional per-button overrides (falls back to primary/onPrimary defaults)
-  final Adyen3DSButtonTheme? submitButtonTheme;
-  final Adyen3DSButtonTheme? continueButtonTheme;
-  final Adyen3DSButtonTheme? nextButtonTheme;
-  final Adyen3DSButtonTheme? cancelButtonTheme;
-  final Adyen3DSButtonTheme? resendButtonTheme;
+  // Grouped button themes
+  // Primary applies to submit/continue/next (and OOB if available)
+  final Adyen3DSButtonTheme? primaryButtonTheme;
+  // Secondary applies to cancel/resend
+  final Adyen3DSButtonTheme? secondaryButtonTheme;
 
   /// Creates an Adyen3DSTheme from a Flutter ThemeData.
 
@@ -31,11 +30,8 @@ final class Adyen3DSTheme {
 
     this.headerTheme,
     this.inputDecorationTheme,
-    this.submitButtonTheme,
-    this.continueButtonTheme,
-    this.nextButtonTheme,
-    this.cancelButtonTheme,
-    this.resendButtonTheme,
+    this.primaryButtonTheme,
+    this.secondaryButtonTheme,
   });
 
   ///

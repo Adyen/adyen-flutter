@@ -149,21 +149,22 @@ class DropInScreen extends StatelessWidget {
 
         inputDecorationTheme: Adyen3DSInputDecorationTheme(
           textColor: Colors.deepOrangeAccent,
-          borderColor: Colors.blueAccent,
+          borderColor: Colors.purpleAccent,
           borderWidth: 10,
           cornerRadius: 80,
         ),
-        resendButtonTheme: Adyen3DSButtonTheme(
-          backgroundColor: Colors.red,
-          cornerRadius: 80,
-          fontSize: 16,
+
+
+        primaryButtonTheme: Adyen3DSButtonTheme(
+          backgroundColor: Colors.blue,
+          textColor: Colors.white,
+          cornerRadius: 12,
         ),
-        submitButtonTheme: Adyen3DSButtonTheme(backgroundColor: Colors.blue),
-        continueButtonTheme: Adyen3DSButtonTheme(backgroundColor: Colors.black),
-        nextButtonTheme: Adyen3DSButtonTheme(backgroundColor: Colors.purple),
-        cancelButtonTheme: Adyen3DSButtonTheme(
+
+        secondaryButtonTheme: Adyen3DSButtonTheme(
           backgroundColor: Colors.orange,
           textColor: Colors.lightGreen,
+          cornerRadius: 8,
         ),
       ),
     );

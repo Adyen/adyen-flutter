@@ -337,11 +337,15 @@ object ConfigurationMapper {
                 textBoxCustomization = dto.toTextBoxCustomization()
             }
 
-            setButtonCustomizationIfPresent(submitButtonCustomization, UiCustomization.ButtonType.VERIFY)
-            setButtonCustomizationIfPresent(continueButtonCustomization, UiCustomization.ButtonType.CONTINUE)
-            setButtonCustomizationIfPresent(nextButtonCustomization, UiCustomization.ButtonType.NEXT)
-            setButtonCustomizationIfPresent(cancelButtonCustomization, UiCustomization.ButtonType.CANCEL)
-            setButtonCustomizationIfPresent(resendButtonCustomization, UiCustomization.ButtonType.RESEND)
+            // Primary group: submit/continue/next/OOB
+            setButtonCustomizationIfPresent(primaryButtonCustomization, UiCustomization.ButtonType.VERIFY)
+            setButtonCustomizationIfPresent(primaryButtonCustomization, UiCustomization.ButtonType.CONTINUE)
+            setButtonCustomizationIfPresent(primaryButtonCustomization, UiCustomization.ButtonType.NEXT)
+            setButtonCustomizationIfPresent(primaryButtonCustomization, UiCustomization.ButtonType.OPEN_OOB_APP)
+
+            // Secondary group: cancel/resend
+            setButtonCustomizationIfPresent(secondaryButtonCustomization, UiCustomization.ButtonType.CANCEL)
+            setButtonCustomizationIfPresent(secondaryButtonCustomization, UiCustomization.ButtonType.RESEND)
         }
 
     private fun ThreeDS2ToolbarCustomizationDTO.toToolbarCustomization(): ToolbarCustomization =

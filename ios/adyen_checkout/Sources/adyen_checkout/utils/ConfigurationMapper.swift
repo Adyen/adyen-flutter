@@ -364,11 +364,15 @@ extension ThreeDS2UICustomizationDTO {
             inputCustomization.apply(to: configuration)
         }
 
-        submitButtonCustomization?.apply(to: configuration, buttonType: .submit)
-        continueButtonCustomization?.apply(to: configuration, buttonType: .continue)
-        nextButtonCustomization?.apply(to: configuration, buttonType: .next)
-        cancelButtonCustomization?.apply(to: configuration, buttonType: .cancel)
-        resendButtonCustomization?.apply(to: configuration, buttonType: .resend)
+        // Primary group: submit / continue / next / OOB
+        primaryButtonCustomization?.apply(to: configuration, buttonType: .submit)
+        primaryButtonCustomization?.apply(to: configuration, buttonType: .continue)
+        primaryButtonCustomization?.apply(to: configuration, buttonType: .next)
+        primaryButtonCustomization?.apply(to: configuration, buttonType: .OOB)
+
+        // Secondary group: cancel / resend
+        secondaryButtonCustomization?.apply(to: configuration, buttonType: .cancel)
+        secondaryButtonCustomization?.apply(to: configuration, buttonType: .resend)
 
         return configuration
     }
@@ -380,14 +384,17 @@ extension ThreeDS2ScreenCustomizationDTO {
         if let backgroundColor, let bgColor = UIColor(hex: backgroundColor) {
             // Note: iOS may not support setting screen background color directly
             // This is a best-effort implementation
+            configuration.backgroundColor = bgColor
         }
         
         // Apply general text styling as fallback for labels
         if let textColor, let textUIColor = UIColor(hex: textColor) {
-            configuration.labelAppearance.textColor = textUIColor
+            configuration.textColor = textUIColor
+            configuration.tintColor = textUIColor
+            configuration.infoAppearance.headingTextColor = textUIColor
+            configuration.infoAppearance.textColor = textUIColor
         }
         
-        // No font family customization available
     }
 }
 
