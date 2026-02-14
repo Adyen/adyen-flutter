@@ -36,7 +36,7 @@ jobs:
           lcov --remove coverage/lcov.info 'lib/**/*.g.dart' -o ./coverage/coverage_with_exclusion.info 
 
       - name: Report code coverage
-        uses: zgosalvez/github-actions-report-lcov@4eb99c09644c30cceb609413620bd9e1bf80ee79 # v6.0.1
+        uses: zgosalvez/github-actions-report-lcov@e39334be3189ac6539d0bace59ab3c065449a776 # v6.0.2
         with:
           coverage-files: coverage/coverage_with_exclusion.info
           artifact-name: flutter-coverage-report
