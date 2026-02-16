@@ -71,7 +71,6 @@ class ThreeDS2CustomizationMapperTest {
             headingCustomization = ThreeDS2ToolbarCustomizationDTO(
                 headerText = "Heading",
                 buttonText = "Cancel",
-                textFontSize = 18,
             ),
             labelCustomization = ThreeDS2LabelCustomizationDTO(
                 textColor = textColor,
@@ -95,7 +94,6 @@ class ThreeDS2CustomizationMapperTest {
         val toolbar = uiCustomization?.toolbarCustomization
         assertEquals("Heading", toolbar?.headerText)
         assertEquals("Cancel", toolbar?.buttonText)
-        assertEquals(18, toolbar?.textFontSize)
 
         val label = uiCustomization?.labelCustomization
         assertEquals(textColor, label?.textColor)

@@ -241,18 +241,16 @@ class ThreeDS2InputCustomizationDTO {
 }
 
 class ThreeDS2ToolbarCustomizationDTO {
-  final String? backgroundColor;
   final String? headerText;
-  final String? buttonText;
   final String? textColor;
-  final int? textFontSize;
+  final String? backgroundColor;
+  final String? buttonText;
 
   ThreeDS2ToolbarCustomizationDTO(
-    this.backgroundColor,
     this.headerText,
-    this.buttonText,
     this.textColor,
-    this.textFontSize,
+    this.backgroundColor,
+    this.buttonText,
   );
 }
 

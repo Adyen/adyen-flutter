@@ -331,7 +331,6 @@ void main() {
     const headerTheme = Adyen3DSHeaderTheme(
       backgroundColor: Color(0xFF010203),
       textColor: Color(0xFF040506),
-      fontSize: 18,
       cancelButtonText: 'Cancel',
     );
     const theme = Adyen3DSTheme(headerTheme: headerTheme);
@@ -342,7 +341,6 @@ void main() {
     final heading = dto.uiCustomization?.headingCustomization;
     expect(heading?.backgroundColor, '#FF010203');
     expect(heading?.textColor, '#FF040506');
-    expect(heading?.textFontSize, 18);
     expect(heading?.buttonText, 'Cancel');
     expect(heading?.headerText, 'Heading');
   });
@@ -384,7 +382,6 @@ void main() {
       headerTheme: Adyen3DSHeaderTheme(
         backgroundColor: Color(0xFF212223),
         textColor: Color(0xFF242526),
-        fontSize: 20,
         cancelButtonText: 'Close',
       ),
     );
@@ -398,7 +395,6 @@ void main() {
     expect(heading?.headerText, 'Preferred heading');
     expect(heading?.backgroundColor, '#FF212223');
     expect(heading?.textColor, '#FF242526');
-    expect(heading?.textFontSize, 20);
     expect(heading?.buttonText, 'Close');
   });
 
@@ -431,9 +427,7 @@ void main() {
         onSurface: Color(0xFF444444),
         outline: Color(0xFF555555),
       ),
-      textTheme: const TextTheme(
-        titleMedium: TextStyle(fontSize: 17),
-      ),
+      textTheme: const TextTheme(),
     );
 
     final theme = Adyen3DSTheme.fromThemeData(themeData);
@@ -444,7 +438,6 @@ void main() {
     expect(ui?.screenCustomization?.backgroundColor, '#FF222222');
     expect(ui?.screenCustomization?.textColor, '#FF444444');
     expect(ui?.headingCustomization?.textColor, '#FF444444');
-    expect(ui?.headingCustomization?.textFontSize, 17);
     expect(ui?.headingCustomization?.headerText, 'Heading');
     expect(ui?.inputCustomization?.borderColor, '#FF555555');
   });
@@ -547,7 +540,6 @@ void main() {
     expect(heading?.buttonText, 'Back');
     expect(heading?.backgroundColor, isNull);
     expect(heading?.textColor, isNull);
-    expect(heading?.textFontSize, isNull);
     expect(heading?.headerText, 'Heading');
   });
 

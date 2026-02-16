@@ -251,7 +251,6 @@ extension Adyen3DSHeaderThemeMapper on Adyen3DSHeaderTheme {
       headerText: headingTitle,
       buttonText: cancelButtonText,
       textColor: textColor?.toHexString(),
-      textFontSize: fontSize?.round(),
     );
   }
 }

@@ -497,8 +497,7 @@ data class ThreeDS2ToolbarCustomizationDTO (
   val backgroundColor: String? = null,
   val headerText: String? = null,
   val buttonText: String? = null,
-  val textColor: String? = null,
-  val textFontSize: Long? = null
+  val textColor: String? = null
 
 ) {
   companion object {
@@ -508,8 +507,7 @@ data class ThreeDS2ToolbarCustomizationDTO (
       val headerText = __pigeon_list[1] as String?
       val buttonText = __pigeon_list[2] as String?
       val textColor = __pigeon_list[3] as String?
-      val textFontSize = __pigeon_list[4].let { num -> if (num is Int) num.toLong() else num as Long? }
-      return ThreeDS2ToolbarCustomizationDTO(backgroundColor, headerText, buttonText, textColor, textFontSize)
+      return ThreeDS2ToolbarCustomizationDTO(backgroundColor, headerText, buttonText, textColor)
     }
   }
   fun toList(): List<Any?> {
@@ -518,7 +516,6 @@ data class ThreeDS2ToolbarCustomizationDTO (
       headerText,
       buttonText,
       textColor,
-      textFontSize,
     )
   }
 }

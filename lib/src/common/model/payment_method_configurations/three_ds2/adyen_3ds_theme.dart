@@ -43,15 +43,12 @@ final class Adyen3DSTheme {
     final colorScheme = theme.colorScheme;
     final textTheme = theme.textTheme;
 
-    final headingStyle = textTheme.titleMedium ?? textTheme.titleLarge;
-
     return Adyen3DSTheme(
       backgroundColor: colorScheme.surface,
       textColor: colorScheme.onSurface,
       headerTheme: Adyen3DSHeaderTheme(
         backgroundColor: colorScheme.surface,
         textColor: colorScheme.onSurface,
-        fontSize: headingStyle?.fontSize,
       ),
       descriptionTheme: Adyen3DSDescriptionTheme(
         textColor: textTheme.bodyMedium?.color ?? colorScheme.onSurface,
@@ -102,13 +99,11 @@ final class Adyen3DSInputDecorationTheme {
 final class Adyen3DSHeaderTheme {
   final Color? backgroundColor;
   final Color? textColor;
-  final double? fontSize;
   final String? cancelButtonText;
 
   const Adyen3DSHeaderTheme({
     this.backgroundColor, // This has no effect on iOS
     this.textColor,
-    this.fontSize,
     this.cancelButtonText,
   });
 }

@@ -351,7 +351,6 @@ object ConfigurationMapper {
             this@toToolbarCustomization.headerText?.let { headerText = it }
             this@toToolbarCustomization.buttonText?.let { buttonText = it }
             this@toToolbarCustomization.textColor?.let { textColor = it }
-            this@toToolbarCustomization.textFontSize?.let { textFontSize = it.toInt() }
         }
 
     private fun ThreeDS2LabelCustomizationDTO.toLabelCustomization(): LabelCustomization =

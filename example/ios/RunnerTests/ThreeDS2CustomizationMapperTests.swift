@@ -219,8 +219,7 @@ final class ThreeDS2CustomizationMapperTests: XCTestCase {
                     backgroundColor: "#222222",
                     headerText: "Heading",
                     buttonText: "Cancel",
-                    textColor: "#111111",
-                    textFontSize: 18
+                    textColor: "#111111"
                 ),
                 labelCustomization: ThreeDS2LabelCustomizationDTO(
                     headingTextColor: "#202020",
