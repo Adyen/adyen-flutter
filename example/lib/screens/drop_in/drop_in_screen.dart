@@ -168,11 +168,11 @@ class DropInScreen extends StatelessWidget {
           cornerRadius: 12,
         ),
 
-        // secondaryButtonTheme: Adyen3DSButtonTheme(
-        //   backgroundColor: Colors.orange,
-        //   textColor: Colors.lightGreen,
-        //   cornerRadius: 8,
-        // ),
+        secondaryButtonTheme: Adyen3DSButtonTheme(
+          backgroundColor: Colors.orange,
+          textColor: Colors.lightGreen,
+          cornerRadius: 8,
+        ),
       ),
     );
 

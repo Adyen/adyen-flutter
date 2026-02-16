@@ -260,10 +260,7 @@ class ThreeDS2CustomizationMapperTest {
     @Test
     fun `when UI customization provided without requestorAppURL, then map UI only`() {
         val uiCustomizationDTO = ThreeDS2UICustomizationDTO(
-            headingCustomization = ThreeDS2ToolbarCustomizationDTO(
-                headerText = "Heading only",
-                textFontSize = 20,
-            ),
+            headingCustomization = ThreeDS2ToolbarCustomizationDTO(headerText = "Heading only"),
         )
 
         val configuration = createBaseCardComponentConfiguration(
@@ -280,7 +277,6 @@ class ThreeDS2CustomizationMapperTest {
         val toolbar = (adyen3DS2Configuration?.uiCustomization as UiCustomization?)?.toolbarCustomization
         assertEquals(null, adyen3DS2Configuration?.threeDSRequestorAppURL)
         assertEquals("Heading only", toolbar?.headerText)
-        assertEquals(20, toolbar?.textFontSize)
     }
 
     @Test
@@ -300,7 +296,6 @@ class ThreeDS2CustomizationMapperTest {
             headingCustomization = ThreeDS2ToolbarCustomizationDTO(
                 headerText = "Heading",
                 buttonText = "Cancel",
-                textFontSize = 18,
                 textColor = headingColor,
             ),
             labelCustomization = ThreeDS2LabelCustomizationDTO(
@@ -347,7 +342,6 @@ class ThreeDS2CustomizationMapperTest {
         val toolbar = uiCustomization?.toolbarCustomization
         assertEquals("Heading", toolbar?.headerText)
         assertEquals("Cancel", toolbar?.buttonText)
-        assertEquals(18, toolbar?.textFontSize)
         assertEquals(headingColor, toolbar?.textColor)
 
         val label = uiCustomization?.labelCustomization
