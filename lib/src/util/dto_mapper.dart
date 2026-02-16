@@ -200,13 +200,12 @@ extension Adyen3DSThemeMapper on Adyen3DSTheme {
   ThreeDS2ToolbarCustomizationDTO? createHeadingCustomization(
       {String? headingTitle}) {
     final headerTheme = this.headerTheme;
-    if (headingTitle != null && headerTheme == null) {
-      return ThreeDS2ToolbarCustomizationDTO(headerText: headingTitle);
+    if (headerTheme == null && headingTitle == null) {
+      return null;
     }
-    if (headerTheme != null) {
-      return headerTheme.toDTO(headingTitle: headingTitle);
-    }
-    return null;
+
+    return headerTheme?.toDTO(headingTitle: headingTitle) ??
+        ThreeDS2ToolbarCustomizationDTO(headerText: headingTitle);
   }
 }
 

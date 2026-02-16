@@ -47,7 +47,7 @@ final class Adyen3DSTheme {
 
     return Adyen3DSTheme(
       backgroundColor: colorScheme.surface,
-      textColor: colorScheme.onPrimary,
+      textColor: colorScheme.onSurface,
       headerTheme: Adyen3DSHeaderTheme(
         backgroundColor: colorScheme.surface,
         textColor: colorScheme.onSurface,

@@ -1,6 +1,5 @@
 package com.adyen.checkout.flutter.utils
 
-import atd.bb.setBackgroundColor
 import com.adyen.checkout.adyen3ds2.adyen3DS2
 import com.adyen.checkout.card.AddressConfiguration
 import com.adyen.checkout.card.CardBrand
@@ -41,7 +40,6 @@ import com.adyen.checkout.flutter.generated.ThreeDS2ButtonCustomizationDTO
 import com.adyen.checkout.flutter.generated.ThreeDS2ConfigurationDTO
 import com.adyen.checkout.flutter.generated.ThreeDS2InputCustomizationDTO
 import com.adyen.checkout.flutter.generated.ThreeDS2LabelCustomizationDTO
-import com.adyen.checkout.flutter.generated.ThreeDS2ScreenCustomizationDTO
 import com.adyen.checkout.flutter.generated.ThreeDS2ToolbarCustomizationDTO
 import com.adyen.checkout.flutter.generated.ThreeDS2UICustomizationDTO
 import com.adyen.checkout.flutter.generated.TotalPriceStatus
@@ -55,8 +53,6 @@ import com.adyen.checkout.twint.twint
 import com.google.android.gms.wallet.WalletConstants
 import com.adyen.threeds2.customization.ButtonCustomization
 import com.adyen.threeds2.customization.LabelCustomization
-import com.adyen.threeds2.customization.ScreenCustomization
-import com.adyen.threeds2.customization.SelectionItemCustomization
 import com.adyen.threeds2.customization.TextBoxCustomization
 import com.adyen.threeds2.customization.ToolbarCustomization
 import com.adyen.threeds2.customization.UiCustomization

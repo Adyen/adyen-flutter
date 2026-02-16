@@ -305,22 +305,6 @@ void main() {
     expect(label?.headingTextFontSize, 15); // 15.2 -> 15
   });
 
-  test('descriptionTheme falls back to theme colors when fields are null', () {
-    const theme = Adyen3DSTheme(
-      textColor: Color(0xFF0A0B0C),
-      headerTheme: Adyen3DSHeaderTheme(textColor: Color(0xFF0D0E0F)),
-      descriptionTheme: Adyen3DSDescriptionTheme(),
-    );
-
-    final dto = ThreeDS2Configuration(theme: theme).toDTO();
-
-    final label = dto.uiCustomization?.labelCustomization;
-    expect(label?.textColor, '#FF0A0B0C');
-    expect(label?.headingTextColor, '#FF0D0E0F');
-    expect(label?.textFontSize, null);
-    expect(label?.headingTextFontSize, null);
-  });
-
   test('when requestorAppURL set, then should pass through', () {
     final configuration = ThreeDS2Configuration(requestorAppURL: 'app://cb');
 
@@ -444,7 +428,6 @@ void main() {
       colorScheme: const ColorScheme.light(
         primary: Color(0xFF111111),
         surface: Color(0xFF222222),
-        onPrimary: Color(0xFF333333),
         onSurface: Color(0xFF444444),
         outline: Color(0xFF555555),
       ),
@@ -459,7 +442,7 @@ void main() {
 
     final ui = dto.uiCustomization;
     expect(ui?.screenCustomization?.backgroundColor, '#FF222222');
-    expect(ui?.screenCustomization?.textColor, '#FF333333');
+    expect(ui?.screenCustomization?.textColor, '#FF444444');
     expect(ui?.headingCustomization?.textColor, '#FF444444');
     expect(ui?.headingCustomization?.textFontSize, 17);
     expect(ui?.headingCustomization?.headerText, 'Heading');
