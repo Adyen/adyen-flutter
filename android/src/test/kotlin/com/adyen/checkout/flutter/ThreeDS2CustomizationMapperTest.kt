@@ -13,6 +13,7 @@ import com.adyen.checkout.flutter.generated.ThreeDS2ButtonCustomizationDTO
 import com.adyen.checkout.flutter.generated.ThreeDS2ConfigurationDTO
 import com.adyen.checkout.flutter.generated.ThreeDS2InputCustomizationDTO
 import com.adyen.checkout.flutter.generated.ThreeDS2LabelCustomizationDTO
+import com.adyen.checkout.flutter.generated.ThreeDS2SelectionItemCustomizationDTO
 import com.adyen.checkout.flutter.generated.ThreeDS2ScreenCustomizationDTO
 import com.adyen.checkout.flutter.generated.ThreeDS2ToolbarCustomizationDTO
 import com.adyen.checkout.flutter.generated.ThreeDS2UICustomizationDTO
@@ -20,6 +21,7 @@ import com.adyen.checkout.flutter.utils.ConfigurationMapper.toCheckoutConfigurat
 import com.adyen.threeds2.customization.ButtonCustomization
 import com.adyen.threeds2.customization.ScreenCustomization
 import com.adyen.threeds2.customization.TextBoxCustomization
+import com.adyen.threeds2.customization.SelectionItemCustomization
 import com.adyen.threeds2.customization.UiCustomization
 import io.mockk.every
 import io.mockk.mockkStatic
@@ -210,6 +212,38 @@ class ThreeDS2CustomizationMapperTest {
             assertEquals("#000000", button?.textColor)
             assertEquals(14, button?.textFontSize)
         }
+    }
+
+    @Test
+    fun `when selection item customization provided, then map to selection customization`() {
+        val tint = "#FF0000"
+        val highlighted = "#00FF00"
+        val textColor = "#111111"
+        mockkStatic(Color::class)
+        every { Color.parseColor(any()) } returns -1
+
+        val uiCustomizationDTO = ThreeDS2UICustomizationDTO(
+            selectionItemCustomization = ThreeDS2SelectionItemCustomizationDTO(
+                selectionIndicatorTintColor = tint,
+                highlightedBackgroundColor = highlighted,
+                textColor = textColor,
+            ),
+        )
+
+        val selectionCustomization = createBaseCardComponentConfiguration(
+            ThreeDS2ConfigurationDTO(
+                requestorAppURL = "https://adyen.com/3ds2",
+                uiCustomization = uiCustomizationDTO,
+            )
+        ).toCheckoutConfiguration()
+            .getActionConfiguration(Adyen3DS2Configuration::class.java)
+            ?.uiCustomization as UiCustomization?
+
+        val selectionItemCustomization: SelectionItemCustomization? = selectionCustomization?.selectionItemCustomization
+
+        assertEquals(tint, selectionItemCustomization?.selectionIndicatorTintColor)
+        assertEquals(highlighted, selectionItemCustomization?.highlightedBackgroundColor)
+        assertEquals(textColor, selectionItemCustomization?.textColor)
     }
 
     @Test

@@ -40,6 +40,7 @@ import com.adyen.checkout.flutter.generated.ThreeDS2ButtonCustomizationDTO
 import com.adyen.checkout.flutter.generated.ThreeDS2ConfigurationDTO
 import com.adyen.checkout.flutter.generated.ThreeDS2InputCustomizationDTO
 import com.adyen.checkout.flutter.generated.ThreeDS2LabelCustomizationDTO
+import com.adyen.checkout.flutter.generated.ThreeDS2SelectionItemCustomizationDTO
 import com.adyen.checkout.flutter.generated.ThreeDS2ToolbarCustomizationDTO
 import com.adyen.checkout.flutter.generated.ThreeDS2UICustomizationDTO
 import com.adyen.checkout.flutter.generated.TotalPriceStatus
@@ -54,6 +55,7 @@ import com.google.android.gms.wallet.WalletConstants
 import com.adyen.threeds2.customization.ButtonCustomization
 import com.adyen.threeds2.customization.LabelCustomization
 import com.adyen.threeds2.customization.TextBoxCustomization
+import com.adyen.threeds2.customization.SelectionItemCustomization
 import com.adyen.threeds2.customization.ToolbarCustomization
 import com.adyen.threeds2.customization.UiCustomization
 import java.util.Locale
@@ -310,16 +312,18 @@ object ConfigurationMapper {
 
     private fun ThreeDS2UICustomizationDTO.toUiCustomization(): UiCustomization =
         UiCustomization().apply {
-            fun setButtonCustomizationIfPresent(
-                dto: ThreeDS2ButtonCustomizationDTO?,
-                type: UiCustomization.ButtonType,
-            ) {
-                dto?.let { setButtonCustomization(it.toButtonCustomization(), type) }
-            }
-
             this@toUiCustomization.screenCustomization?.let { dto ->
                 dto.backgroundColor?.let { setScreenBackgroundColor(it) }
-                dto.textColor?.let { setTextColor(it) }
+                dto.textColor?.let {
+                    setTextColor(it)
+                    // TODO: remove when 3DS SDK maps screen textColor to selection text automatically
+                    // Why is it not applied?
+                    selectionItemCustomization =
+                        SelectionItemCustomization().apply {
+                            textColor = it
+                            selectionIndicatorTintColor = it
+                        }
+                }
             }
 
             this@toUiCustomization.headingCustomization?.let { dto ->
@@ -334,15 +338,23 @@ object ConfigurationMapper {
                 textBoxCustomization = dto.toTextBoxCustomization()
             }
 
-            // Primary group: submit/continue/next/OOB
-            setButtonCustomizationIfPresent(primaryButtonCustomization, UiCustomization.ButtonType.VERIFY)
-            setButtonCustomizationIfPresent(primaryButtonCustomization, UiCustomization.ButtonType.CONTINUE)
-            setButtonCustomizationIfPresent(primaryButtonCustomization, UiCustomization.ButtonType.NEXT)
-            setButtonCustomizationIfPresent(primaryButtonCustomization, UiCustomization.ButtonType.OPEN_OOB_APP)
+            this@toUiCustomization.selectionItemCustomization?.let { dto ->
+                selectionItemCustomization = dto.toSelectionItemCustomization()
+            }
 
-            // Secondary group: cancel/resend
-            setButtonCustomizationIfPresent(secondaryButtonCustomization, UiCustomization.ButtonType.CANCEL)
-            setButtonCustomizationIfPresent(secondaryButtonCustomization, UiCustomization.ButtonType.RESEND)
+            this@toUiCustomization.primaryButtonCustomization?.let { dto ->
+                val buttonCustomization = dto.toButtonCustomization()
+                setButtonCustomization(buttonCustomization, UiCustomization.ButtonType.VERIFY)
+                setButtonCustomization(buttonCustomization, UiCustomization.ButtonType.CONTINUE)
+                setButtonCustomization(buttonCustomization, UiCustomization.ButtonType.NEXT)
+                setButtonCustomization(buttonCustomization, UiCustomization.ButtonType.OPEN_OOB_APP)
+            }
+
+            this@toUiCustomization.secondaryButtonCustomization?.let { dto ->
+                val buttonCustomization = dto.toButtonCustomization()
+                setButtonCustomization(buttonCustomization, UiCustomization.ButtonType.CANCEL)
+                setButtonCustomization(buttonCustomization, UiCustomization.ButtonType.RESEND)
+            }
         }
 
     private fun ThreeDS2ToolbarCustomizationDTO.toToolbarCustomization(): ToolbarCustomization =
@@ -363,19 +375,26 @@ object ConfigurationMapper {
             this@toLabelCustomization.inputLabelFontSize?.let { inputLabelTextFontSize = it.toInt() }
         }
 
-    private fun ThreeDS2ButtonCustomizationDTO.toButtonCustomization(): ButtonCustomization =
-        ButtonCustomization().apply {
-            this@toButtonCustomization.backgroundColor?.let { backgroundColor = it }
-            this@toButtonCustomization.cornerRadius?.let { cornerRadius = it.toInt() }
-            this@toButtonCustomization.textColor?.let { textColor = it }
-            this@toButtonCustomization.textFontSize?.let { textFontSize = it.toInt() }
-        }
-
     private fun ThreeDS2InputCustomizationDTO.toTextBoxCustomization(): TextBoxCustomization =
         TextBoxCustomization().apply {
             this@toTextBoxCustomization.borderColor?.let { borderColor = it }
             this@toTextBoxCustomization.borderWidth?.let { borderWidth = it.toInt() }
             this@toTextBoxCustomization.cornerRadius?.let { cornerRadius = it.toInt() }
             this@toTextBoxCustomization.textColor?.let { textColor = it }
+        }
+
+    private fun ThreeDS2SelectionItemCustomizationDTO.toSelectionItemCustomization(): SelectionItemCustomization =
+        SelectionItemCustomization().apply {
+            this@toSelectionItemCustomization.selectionIndicatorTintColor?.let { selectionIndicatorTintColor = it }
+            this@toSelectionItemCustomization.highlightedBackgroundColor?.let { highlightedBackgroundColor = it }
+            this@toSelectionItemCustomization.textColor?.let { textColor = it }
+        }
+
+    private fun ThreeDS2ButtonCustomizationDTO.toButtonCustomization(): ButtonCustomization =
+        ButtonCustomization().apply {
+            this@toButtonCustomization.backgroundColor?.let { backgroundColor = it }
+            this@toButtonCustomization.cornerRadius?.let { cornerRadius = it.toInt() }
+            this@toButtonCustomization.textColor?.let { textColor = it }
+            this@toButtonCustomization.textFontSize?.let { textFontSize = it.toInt() }
         }
 }

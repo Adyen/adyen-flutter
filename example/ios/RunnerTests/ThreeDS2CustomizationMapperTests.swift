@@ -18,10 +18,10 @@ final class ThreeDS2CustomizationMapperTests: XCTestCase {
                 textColor: "#222222"
             ),
             headingCustomization: ThreeDS2ToolbarCustomizationDTO(
-                backgroundColor: "#333333",
                 headerText: "Heading",
-                buttonText: "Cancel",
-                textColor: "#444444"
+                textColor: "#444444",
+                backgroundColor: "#333333",
+                buttonText: "Cancel"
             ),
             inputCustomization: ThreeDS2InputCustomizationDTO(
                 borderColor: "#555555",
@@ -207,6 +207,25 @@ final class ThreeDS2CustomizationMapperTests: XCTestCase {
         XCTAssertEqual(primary.font.pointSize, 14)
     }
 
+    func test_selectionItemCustomization_setsSwitchTint() {
+        let uiCustomization = ThreeDS2UICustomizationDTO(
+            selectionItemCustomization: ThreeDS2SelectionItemCustomizationDTO(
+                selectionIndicatorTintColor: "#FF1122",
+                highlightedBackgroundColor: nil,
+                textColor: nil
+            )
+        )
+
+        let dto = ThreeDS2ConfigurationDTO(
+            requestorAppURL: "https://adyen.com/3ds2",
+            uiCustomization: uiCustomization
+        )
+
+        let appearance = dto.mapToThreeDS2Configuration().appearanceConfiguration
+
+        assertColor(appearance.switchAppearance.switchTintColor, equalsHex: "#FF1122")
+    }
+
     func test_allUICustomizations_mapTogether() {
         let dto = ThreeDS2ConfigurationDTO(
             requestorAppURL: "https://adyen.com/3ds2",
@@ -216,10 +235,10 @@ final class ThreeDS2CustomizationMapperTests: XCTestCase {
                     textColor: "#123456"
                 ),
                 headingCustomization: ThreeDS2ToolbarCustomizationDTO(
-                    backgroundColor: "#222222",
                     headerText: "Heading",
-                    buttonText: "Cancel",
-                    textColor: "#111111"
+                    textColor: "#111111",
+                    backgroundColor: "#222222",
+                    buttonText: "Cancel"
                 ),
                 labelCustomization: ThreeDS2LabelCustomizationDTO(
                     headingTextColor: "#202020",

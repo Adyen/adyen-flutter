@@ -120,6 +120,15 @@ extension FieldVisibility {
     }
 }
 
+extension ThreeDS2SelectionItemCustomizationDTO {
+    func apply(to configuration: ADYAppearanceConfiguration) {
+        if let selectionIndicatorTintColor,
+           let tintColor = UIColor(hex: selectionIndicatorTintColor) {
+            configuration.switchAppearance.switchTintColor = tintColor
+        }
+    }
+}
+
 extension DropInConfigurationDTO {
     func createAdyenContext(payment: Payment? = nil) throws -> AdyenContext {
         try buildAdyenContext(
@@ -366,6 +375,10 @@ extension ThreeDS2UICustomizationDTO {
 
         if let inputCustomization {
             inputCustomization.apply(to: configuration)
+        }
+
+        if let selectionItemCustomization {
+            selectionItemCustomization.apply(to: configuration)
         }
 
         // Primary group: submit / continue / next / OOB

@@ -162,6 +162,11 @@ class DropInScreen extends StatelessWidget {
           cornerRadius: 80,
         ),
 
+        selectionItemTheme: Adyen3DSSelectionItemTheme(
+          textColor: Colors.red,
+          selectionIndicatorTintColor: Colors.yellow,
+        ),
+
         primaryButtonTheme: Adyen3DSButtonTheme(
           backgroundColor: Colors.blue,
           textColor: Colors.white,

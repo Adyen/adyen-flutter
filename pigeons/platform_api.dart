@@ -171,6 +171,7 @@ class ThreeDS2UICustomizationDTO {
   final ThreeDS2ToolbarCustomizationDTO? headingCustomization;
   final ThreeDS2LabelCustomizationDTO? labelCustomization;
   final ThreeDS2InputCustomizationDTO? inputCustomization;
+  final ThreeDS2SelectionItemCustomizationDTO? selectionItemCustomization;
   final ThreeDS2ButtonCustomizationDTO? primaryButtonCustomization;
   final ThreeDS2ButtonCustomizationDTO? secondaryButtonCustomization;
 
@@ -179,6 +180,7 @@ class ThreeDS2UICustomizationDTO {
     this.headingCustomization,
     this.labelCustomization,
     this.inputCustomization,
+    this.selectionItemCustomization,
     this.primaryButtonCustomization,
     this.secondaryButtonCustomization,
   );
@@ -205,6 +207,18 @@ class ThreeDS2ButtonCustomizationDTO {
     this.textColor,
     this.cornerRadius,
     this.textFontSize,
+  );
+}
+
+class ThreeDS2SelectionItemCustomizationDTO {
+  final String? selectionIndicatorTintColor;
+  final String? highlightedBackgroundColor;
+  final String? textColor;
+
+  ThreeDS2SelectionItemCustomizationDTO(
+    this.selectionIndicatorTintColor,
+    this.highlightedBackgroundColor,
+    this.textColor,
   );
 }
 

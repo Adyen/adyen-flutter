@@ -24,6 +24,9 @@ final class Adyen3DSTheme {
   // Secondary applies to cancel/resend
   final Adyen3DSButtonTheme? secondaryButtonTheme;
 
+  // Selection items (e.g., switches / radio rows)
+  final Adyen3DSSelectionItemTheme? selectionItemTheme;
+
   /// Creates an Adyen3DSTheme from a Flutter ThemeData.
 
   const Adyen3DSTheme({
@@ -34,6 +37,7 @@ final class Adyen3DSTheme {
     this.inputDecorationTheme,
     this.primaryButtonTheme,
     this.secondaryButtonTheme,
+    this.selectionItemTheme,
   });
 
   ///
@@ -58,6 +62,11 @@ final class Adyen3DSTheme {
       ),
       inputDecorationTheme: Adyen3DSInputDecorationTheme(
         borderColor: colorScheme.outline,
+        textColor: colorScheme.onSurface,
+      ),
+      selectionItemTheme: Adyen3DSSelectionItemTheme(
+        selectionIndicatorTintColor: colorScheme.primary,
+        highlightedBackgroundColor: colorScheme.surfaceVariant,
         textColor: colorScheme.onSurface,
       ),
     );
@@ -120,5 +129,17 @@ final class Adyen3DSButtonTheme {
     this.textColor,
     this.cornerRadius,
     this.fontSize,
+  });
+}
+
+final class Adyen3DSSelectionItemTheme {
+  final Color? selectionIndicatorTintColor;
+  final Color? highlightedBackgroundColor;
+  final Color? textColor;
+
+  const Adyen3DSSelectionItemTheme({
+    this.selectionIndicatorTintColor,
+    this.highlightedBackgroundColor,
+    this.textColor,
   });
 }
