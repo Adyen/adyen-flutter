@@ -46,13 +46,17 @@ final class Adyen3DSTheme {
   factory Adyen3DSTheme.fromThemeData(ThemeData theme) {
     final colorScheme = theme.colorScheme;
     final textTheme = theme.textTheme;
+    final inputTheme = theme.inputDecorationTheme;
+    final appBarTheme = theme.appBarTheme;
 
     return Adyen3DSTheme(
-      backgroundColor: colorScheme.surface,
-      textColor: colorScheme.onSurface,
+      backgroundColor: theme.scaffoldBackgroundColor,
+      textColor: textTheme.bodyMedium?.color ?? colorScheme.onSurface,
       headerTheme: Adyen3DSHeaderTheme(
-        backgroundColor: colorScheme.surface,
-        textColor: colorScheme.onSurface,
+        backgroundColor: appBarTheme.backgroundColor,
+        textColor: appBarTheme.foregroundColor ??
+            appBarTheme.titleTextStyle?.color ??
+            colorScheme.onPrimary,
       ),
       descriptionTheme: Adyen3DSDescriptionTheme(
         textColor: textTheme.bodyMedium?.color ?? colorScheme.onSurface,
@@ -61,12 +65,23 @@ final class Adyen3DSTheme {
         titleFontSize: textTheme.titleSmall?.fontSize,
       ),
       inputDecorationTheme: Adyen3DSInputDecorationTheme(
-        borderColor: colorScheme.outline,
+        borderColor:
+            inputTheme.enabledBorder?.borderSide.color ?? colorScheme.outline,
+        textColor: inputTheme.labelStyle?.color ?? colorScheme.onSurface,
+      ),
+      primaryButtonTheme: Adyen3DSButtonTheme(
+        backgroundColor: colorScheme.primary,
+        textColor: colorScheme.onPrimary,
+        fontSize: textTheme.labelLarge?.fontSize,
+      ),
+      secondaryButtonTheme: Adyen3DSButtonTheme(
+        backgroundColor: colorScheme.surface,
         textColor: colorScheme.onSurface,
+        fontSize: textTheme.labelLarge?.fontSize,
       ),
       selectionItemTheme: Adyen3DSSelectionItemTheme(
         selectionIndicatorTintColor: colorScheme.primary,
-        highlightedBackgroundColor: colorScheme.surfaceVariant,
+        highlightedBackgroundColor: colorScheme.onSurface,
         textColor: colorScheme.onSurface,
       ),
     );
