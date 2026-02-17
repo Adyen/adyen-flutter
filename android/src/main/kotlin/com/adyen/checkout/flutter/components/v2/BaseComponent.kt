@@ -1,4 +1,4 @@
-package com.adyen.checkout.flutter.components.card
+package com.adyen.checkout.flutter.components.v2
 
 import android.content.Context
 import android.view.View
@@ -10,23 +10,24 @@ import com.adyen.checkout.core.components.data.model.PaymentMethod
 import com.adyen.checkout.flutter.components.view.DynamicComponentView
 import com.adyen.checkout.flutter.generated.BinLookupDataDTO
 import com.adyen.checkout.flutter.generated.CardComponentConfigurationDTO
+import com.adyen.checkout.flutter.generated.CheckoutConfigurationDTO
 import com.adyen.checkout.flutter.generated.ComponentCommunicationModel
 import com.adyen.checkout.flutter.generated.ComponentCommunicationType
 import com.adyen.checkout.flutter.generated.ComponentFlutterInterface
 import com.adyen.checkout.flutter.utils.ConfigurationMapper.toCheckoutConfiguration
 import io.flutter.plugin.platform.PlatformView
 
-abstract class BaseCardComponent(
+abstract class BaseComponent(
     private val context: Context,
     private val id: Int,
     private val creationParams: Map<*, *>,
     private val activity: ComponentActivity,
     private val componentFlutterApi: ComponentFlutterInterface,
     private val onDispose: (String) -> Unit,
-    private val setCurrentCardComponent: (BaseCardComponent) -> Unit,
+    private val setComponent: (BaseComponent) -> Unit,
 ) : PlatformView {
     val configuration =
-        creationParams[CARD_COMPONENT_CONFIGURATION_KEY] as CardComponentConfigurationDTO?
+        creationParams[CARD_COMPONENT_CONFIGURATION_KEY] as CheckoutConfigurationDTO?
             ?: throw Exception("Card configuration not found")
     internal val paymentMethodString = creationParams[PAYMENT_METHOD_KEY] as String? ?: ""
     internal val componentId = creationParams[COMPONENT_ID_KEY] as String? ?: ""
@@ -43,21 +44,15 @@ abstract class BaseCardComponent(
         onDispose(componentId)
     }
 
-    fun addComponent(cardComponent: CardComponent) {
-        setOnBinLookupListener(cardComponent)
-        setOnBinValueListener(cardComponent)
-        dynamicComponentView.addComponent(cardComponent, activity)
+    fun addV6Component(
+        paymentMethod: PaymentMethod,
+        checkoutContext: CheckoutContext,
+        callbacks: CheckoutCallbacks
+    ) {
+        dynamicComponentView.addV6Component(paymentMethod, checkoutContext, callbacks)
     }
 
-//    fun addV6Component(
-//        paymentMethod: PaymentMethod,
-//        checkoutContext: CheckoutContext,
-//        checkoutCallbacks: CheckoutCallbacks
-//    ) {
-//        dynamicComponentView.addV6Component(paymentMethod, checkoutContext, checkoutCallbacks)
-//    }
-
-    fun setCurrentCardComponent() = setCurrentCardComponent(this)
+    fun setCurrentCardComponent() = setComponent(this)
 
     private fun setOnBinLookupListener(cardComponent: CardComponent) {
         cardComponent.setOnBinLookupListener { binLookupData ->
@@ -85,7 +80,7 @@ abstract class BaseCardComponent(
     }
 
     companion object {
-        const val CARD_COMPONENT_CONFIGURATION_KEY = "cardComponentConfiguration"
+        const val CARD_COMPONENT_CONFIGURATION_KEY = "checkoutConfigurationKey"
         const val PAYMENT_METHOD_KEY = "paymentMethod"
         const val IS_STORED_PAYMENT_METHOD_KEY = "isStoredPaymentMethod"
         const val CARD_PAYMENT_METHOD_KEY = "scheme"

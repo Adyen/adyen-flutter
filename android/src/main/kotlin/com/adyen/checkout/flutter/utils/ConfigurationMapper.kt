@@ -39,9 +39,9 @@ import com.adyen.checkout.flutter.generated.ThreeDS2ConfigurationDTO
 import com.adyen.checkout.flutter.generated.TotalPriceStatus
 import com.adyen.checkout.flutter.generated.TwintConfigurationDTO
 import com.adyen.checkout.flutter.generated.UnencryptedCardDTO
-import com.adyen.checkout.googlepay.BillingAddressParameters
-import com.adyen.checkout.googlepay.MerchantInfo
-import com.adyen.checkout.googlepay.ShippingAddressParameters
+import com.adyen.checkout.googlepay.old.BillingAddressParameters
+import com.adyen.checkout.googlepay.old.MerchantInfo
+import com.adyen.checkout.googlepay.old.ShippingAddressParameters
 import com.google.android.gms.wallet.WalletConstants
 import java.util.Locale
 import com.adyen.checkout.cashapppay.CashAppPayEnvironment as SDKCashAppPayEnvironment

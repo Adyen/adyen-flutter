@@ -59,3 +59,5 @@ export 'src/generated/platform_api.g.dart'
         ApplePayShippingType,
         ApplePayMerchantCapability,
         ApplePaySummaryItemType;
+export 'src/v2/adyen_component.dart';
+

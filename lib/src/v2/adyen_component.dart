@@ -1,194 +1,160 @@
-import 'dart:async';
 
-import 'package:adyen_checkout/src/common/model/card_callbacks/bin_lookup_data.dart';
-import 'package:adyen_checkout/src/common/model/payment_result.dart';
-import 'package:adyen_checkout/src/components/card/card_component_container.dart';
-import 'package:adyen_checkout/src/components/component_flutter_api.dart';
-import 'package:adyen_checkout/src/components/component_platform_api.dart';
-import 'package:adyen_checkout/src/components/platform/android_platform_view.dart';
-import 'package:adyen_checkout/src/components/platform/ios_platform_view.dart';
-import 'package:adyen_checkout/src/generated/platform_api.g.dart';
-import 'package:adyen_checkout/src/logging/adyen_logger.dart';
+import 'dart:convert';
+
+import 'package:adyen_checkout/adyen_checkout.dart';
+import 'package:adyen_checkout/src/util/constants.dart';
 import 'package:adyen_checkout/src/util/dto_mapper.dart';
+import 'package:adyen_checkout/src/v2/adyen_session_component.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
 
-abstract class BaseCardComponent extends StatefulWidget {
-  final CardComponentConfigurationDTO cardComponentConfiguration;
-  final String paymentMethod;
+class AdyenComponent extends StatelessWidget {
+  final CheckoutConfiguration configuration;
+  final Checkout checkout;
+  final Map<String, dynamic> paymentMethod;
   final Future<void> Function(PaymentResult) onPaymentResult;
-  final double initialViewHeight;
-  final bool isStoredPaymentMethod;
   final Set<Factory<OneSequenceGestureRecognizer>>? gestureRecognizers;
-  final AdyenLogger adyenLogger;
-  final void Function(List<BinLookupData>)? onBinLookup;
-  final void Function(String)? onBinValue;
-  abstract final String componentId;
-  abstract final Map<String, dynamic> creationParams;
-  abstract final String viewType;
+  final _isStoredPaymentMethodIndicator =
+      Constants.isStoredPaymentMethodIndicator;
 
-  BaseCardComponent({
+  const AdyenComponent({
     super.key,
-    required this.cardComponentConfiguration,
+    required this.configuration,
+    required this.checkout,
     required this.paymentMethod,
     required this.onPaymentResult,
-    required this.initialViewHeight,
-    required this.isStoredPaymentMethod,
     this.gestureRecognizers,
-    this.onBinLookup,
-    this.onBinValue,
-    AdyenLogger? adyenLogger,
-  }) : adyenLogger = adyenLogger ?? AdyenLogger.instance;
-
-  void handleComponentCommunication(ComponentCommunicationModel event);
-
-  void onFinished(PaymentResultDTO? paymentResultDTO);
-
-  void onResult(ComponentCommunicationModel event) {
-    final paymentResult = event.paymentResult;
-    if (paymentResult == null) {
-      throw Exception("Payment result handling failed");
-    }
-
-    switch (paymentResult.type) {
-      case PaymentResultEnum.finished:
-        onFinished(event.paymentResult);
-      case PaymentResultEnum.error:
-        _onError(event.paymentResult);
-      case PaymentResultEnum.cancelledByUser:
-        _onCancelledByUser();
-    }
-  }
-
-  void _onError(PaymentResultDTO? paymentResultDTO) =>
-      onPaymentResult(PaymentError(reason: paymentResultDTO?.reason));
-
-  void _onCancelledByUser() => onPaymentResult(PaymentCancelledByUser());
-
-  @override
-  State<BaseCardComponent> createState() => _BaseCardComponentState();
-}
-
-class _BaseCardComponentState extends State<BaseCardComponent> {
-  final MessageCodec<Object?> _codec =
-      ComponentFlutterInterface.pigeonChannelCodec;
-  final ComponentPlatformApi _componentPlatformApi =
-      ComponentPlatformApi.instance;
-  final GlobalKey _cardWidgetKey = GlobalKey();
-  late Widget _cardWidget;
-  final ComponentFlutterApi _componentFlutterApi = ComponentFlutterApi.instance;
-  late StreamSubscription<ComponentCommunicationModel>
-  _componentCommunicationStream;
-  int? previousViewportHeight;
-  int? viewportHeight;
-
-  @override
-  void initState() {
-    _cardWidget = _buildCardWidget();
-    _componentCommunicationStream = _componentFlutterApi
-        .componentCommunicationStream.stream
-        .where((communicationModel) =>
-    communicationModel.componentId == widget.componentId)
-        .listen(_onComponentCommunication);
-
-    super.initState();
-  }
+  });
 
   @override
   Widget build(BuildContext context) {
-    return CardComponentContainer(
-      cardWidgetKey: _cardWidgetKey,
-      initialViewPortHeight: widget.initialViewHeight,
-      viewportHeight: viewportHeight,
-      cardWidget: _cardWidget,
+    return switch (checkout) {
+      SessionCheckout() => _buildCardSessionFlowWidget("2.0.0"),
+      AdvancedCheckout it => _buildCardAdvancedFlowWidget("2.0.0", it),
+    };
+  }
+
+  Widget _buildCardSessionFlowWidget(String sdkVersionNumber) {
+    final SessionCheckout sessionCheckout = checkout as SessionCheckout;
+    final String encodedPaymentMethod = json.encode(paymentMethod);
+    final double initialHeight =
+        _determineInitialHeight(configuration.cardConfiguration);
+    // final bool isStoredPaymentMethod =
+    //     paymentMethod.containsKey(_isStoredPaymentMethodIndicator);
+
+    return AdyenSessionComponent(
+      checkoutConfiguration: configuration.toDTO(sdkVersionNumber),
+      paymentMethod: encodedPaymentMethod,
+      session: sessionCheckout.toDTO(),
+      onPaymentResult: onPaymentResult,
+      initialViewHeight: initialHeight,
+      isStoredPaymentMethod: false,
+      onBinLookup: configuration.cardConfiguration?.onBinLookup,
+      onBinValue: configuration.cardConfiguration?.onBinValue,
     );
   }
 
-  @override
-  void dispose() {
-    _componentCommunicationStream.cancel();
-    _componentFlutterApi.dispose();
-    super.dispose();
+  Widget _buildCardAdvancedFlowWidget(
+    String sdkVersionNumber,
+    Checkout advancedCheckout,
+  ) {
+    // final initialHeight =
+    //     _determineInitialHeight(configuration.cardConfiguration);
+    // final String encodedPaymentMethod = json.encode(paymentMethod);
+    // final bool isStoredPaymentMethod =
+    //     paymentMethod.containsKey(_isStoredPaymentMethodIndicator);
+
+    return const Text("ADVANCED ADYEN COMPONENT");
+
+    // return CardAdvancedComponent(
+    //   cardComponentConfiguration: configuration.toDTO(sdkVersionNumber),
+    //   paymentMethod: encodedPaymentMethod,
+    //   advancedCheckout: advancedCheckout,
+    //   onPaymentResult: onPaymentResult,
+    //   initialViewHeight: initialHeight,
+    //   isStoredPaymentMethod: isStoredPaymentMethod,
+    //   gestureRecognizers: gestureRecognizers,
+    //   onBinLookup: configuration.cardConfiguration.onBinLookup,
+    //   onBinValue: configuration.cardConfiguration.onBinValue,
+    // );
   }
 
-  Widget _buildCardWidget() {
+  double _determineInitialHeight(CardConfiguration? cardConfiguration) {
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
-        return AndroidPlatformView(
-          key: UniqueKey(),
-          viewType: widget.viewType,
-          codec: _codec,
-          creationParams: widget.creationParams,
-          gestureRecognizers: widget.gestureRecognizers,
-          onPlatformViewCreated: _componentPlatformApi.updateViewHeight,
-        );
+        return _determineInitialAndroidViewHeight(cardConfiguration);
       case TargetPlatform.iOS:
-        return IosPlatformView(
-          key: UniqueKey(),
-          viewType: widget.viewType,
-          codec: _codec,
-          creationParams: widget.creationParams,
-          gestureRecognizers: widget.gestureRecognizers,
-          onPlatformViewCreated: _componentPlatformApi.updateViewHeight,
-          cardWidgetKey: _cardWidgetKey,
-        );
+        return _determineInitialIosViewHeight(cardConfiguration);
       default:
-        throw UnsupportedError('Unsupported platform');
+        throw UnsupportedError('Unsupported platform view');
     }
   }
 
-  void _onComponentCommunication(ComponentCommunicationModel event) {
-    if (event.type case ComponentCommunicationType.resize) {
-      _resizeViewport(event);
-    } else if (event.type case ComponentCommunicationType.result) {
-      widget.onResult(event);
-    } else if (event.type case ComponentCommunicationType.binLookup) {
-      _handleOnBinLookup(event, widget.onBinLookup);
-    } else if (event.type case ComponentCommunicationType.binValue) {
-      _handleOnBinValue(event, widget.onBinValue);
-    } else {
-      widget.handleComponentCommunication(event);
+  double _determineInitialAndroidViewHeight(
+      CardConfiguration? cardConfiguration) {
+    double androidViewHeight = 294;
+
+    if (cardConfiguration == null) {
+      return androidViewHeight;
     }
+
+    if (cardConfiguration.holderNameRequired) {
+      androidViewHeight += 61;
+    }
+
+    if (cardConfiguration.showStorePaymentField) {
+      androidViewHeight += 84;
+    }
+
+    if (cardConfiguration.addressMode == AddressMode.full) {
+      androidViewHeight += 650;
+    }
+
+    if (cardConfiguration.addressMode == AddressMode.postalCode) {
+      androidViewHeight += 61;
+    }
+
+    if (cardConfiguration.socialSecurityNumberFieldVisibility ==
+        FieldVisibility.show) {
+      androidViewHeight += 61;
+    }
+
+    if (cardConfiguration.kcpFieldVisibility == FieldVisibility.show) {
+      androidViewHeight += 164;
+    }
+
+    return androidViewHeight;
   }
 
-  void _resizeViewport(ComponentCommunicationModel event) {
-    final int? newViewportHeight = event.data is int ? event.data as int : null;
-    if (newViewportHeight != previousViewportHeight &&
-        newViewportHeight != null) {
-      setState(() {
-        previousViewportHeight = viewportHeight;
-        viewportHeight = newViewportHeight;
-      });
-    }
-  }
+  double _determineInitialIosViewHeight(CardConfiguration? cardConfiguration) {
+    double iosViewHeight = 272;
 
-  void _handleOnBinLookup(
-      ComponentCommunicationModel event,
-      void Function(List<BinLookupData>)? onBinLookup,
-      ) {
-    if (onBinLookup == null) {
-      return;
+    if (cardConfiguration == null) {
+      return iosViewHeight;
     }
 
-    if (event.data case List<Object?> binLookupDataDTOList) {
-      onBinLookup(binLookupDataDTOList
-          .whereType<BinLookupDataDTO>()
-          .toBinLookupDataList());
-    }
-  }
-
-  void _handleOnBinValue(
-      ComponentCommunicationModel event,
-      void Function(String)? onBinValue,
-      ) {
-    if (onBinValue == null) {
-      return;
+    if (cardConfiguration.holderNameRequired) {
+      iosViewHeight += 63;
     }
 
-    if (event.data case String binValue) {
-      onBinValue(binValue);
+    if (cardConfiguration.showStorePaymentField) {
+      iosViewHeight += 55;
     }
+
+    if (cardConfiguration.addressMode != AddressMode.none) {
+      iosViewHeight += 63;
+    }
+
+    if (cardConfiguration.socialSecurityNumberFieldVisibility ==
+        FieldVisibility.show) {
+      iosViewHeight += 63;
+    }
+
+    if (cardConfiguration.kcpFieldVisibility == FieldVisibility.show) {
+      iosViewHeight += 63;
+    }
+
+    return iosViewHeight;
   }
 }

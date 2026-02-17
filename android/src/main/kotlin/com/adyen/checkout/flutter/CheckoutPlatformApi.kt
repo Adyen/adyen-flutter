@@ -65,7 +65,7 @@ class CheckoutPlatformApi(
 
                 when (checkoutResult) {
                     is Checkout.Result.Error -> onSetupError(
-                        error = checkoutResult.errorReason,
+                        error = checkoutResult.error.message ?: "Checkout setup failed.",
                         callback = callback
                     )
 

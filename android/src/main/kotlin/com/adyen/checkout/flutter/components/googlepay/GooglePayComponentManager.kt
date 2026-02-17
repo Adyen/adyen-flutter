@@ -20,7 +20,7 @@ import com.adyen.checkout.flutter.generated.InstantPaymentType
 import com.adyen.checkout.flutter.session.SessionHolder
 import com.adyen.checkout.flutter.utils.ConfigurationMapper.toCheckoutConfiguration
 import com.adyen.checkout.flutter.utils.Constants
-import com.adyen.checkout.googlepay.GooglePayComponent
+import com.adyen.checkout.googlepay.old.GooglePayComponent
 import com.adyen.checkout.sessions.core.CheckoutSession
 import com.adyen.checkout.sessions.core.SessionSetupResponse
 import com.adyen.checkout.ui.core.old.AdyenComponentView

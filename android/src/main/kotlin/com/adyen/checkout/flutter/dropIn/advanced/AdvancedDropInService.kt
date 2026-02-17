@@ -36,7 +36,7 @@ import com.adyen.checkout.flutter.generated.PaymentEventDTO
 import com.adyen.checkout.flutter.generated.PaymentEventType
 import com.adyen.checkout.flutter.utils.Constants
 import com.adyen.checkout.flutter.utils.Constants.Companion.RESULT_CODE_CANCELLED
-import com.adyen.checkout.googlepay.GooglePayComponentState
+import com.adyen.checkout.googlepay.old.GooglePayComponentState
 import kotlinx.coroutines.launch
 import org.json.JSONObject
 

@@ -42,11 +42,11 @@ internal class CardSessionComponent(
             }
         )
 
-        addV6Component(
-            paymentMethod = paymentMethod,
-            checkoutContext = sessionCheckout,
-            checkoutCallbacks = checkoutCallbacks
-        )
+//        addV6Component(
+//            paymentMethod = paymentMethod,
+//            checkoutContext = sessionCheckout,
+//            checkoutCallbacks = checkoutCallbacks
+//        )
     }
 
     private fun createCardComponent(checkoutSession: CheckoutSession): CardComponent {

@@ -1,0 +1,66 @@
+package com.adyen.checkout.flutter.components.v2
+
+import android.content.Context
+import androidx.fragment.app.FragmentActivity
+import com.adyen.checkout.card.old.CardComponent
+import com.adyen.checkout.components.core.PaymentMethod
+import com.adyen.checkout.components.core.PaymentMethodTypes
+import com.adyen.checkout.components.core.StoredPaymentMethod
+import com.adyen.checkout.flutter.components.card.advanced.CardAdvancedCallback
+import com.adyen.checkout.flutter.generated.ComponentFlutterInterface
+import org.json.JSONObject
+import java.util.UUID
+
+internal class AdyenAdvancedComponent(
+    private val context: Context,
+    private val id: Int,
+    private val creationParams: Map<*, *>,
+    private val activity: FragmentActivity,
+    private val componentFlutterApi: ComponentFlutterInterface,
+    private val onDispose: (String) -> Unit,
+    private val setCurrentComponent: (BaseComponent) -> Unit
+) : BaseComponent(context, id, creationParams, activity, componentFlutterApi, onDispose, setCurrentComponent) {
+    init {
+//        cardComponent =
+//            createCardComponent().apply {
+//                addComponent(this)
+//            }
+    }
+
+    private fun createCardComponent(): CardComponent {
+        val paymentMethodJson = JSONObject(paymentMethodString)
+        when (isStoredPaymentMethod) {
+            true -> {
+                val storedPaymentMethod = StoredPaymentMethod.SERIALIZER.deserialize(paymentMethodJson)
+                return CardComponent.PROVIDER.get(
+                    activity = activity,
+                    storedPaymentMethod = storedPaymentMethod,
+                    configuration = checkoutConfiguration.getConfiguration(PaymentMethodTypes.SCHEME)!!,
+                    callback =
+                        CardAdvancedCallback(
+                            componentFlutterApi,
+                            componentId,
+                            ::setCurrentCardComponent,
+                        ),
+                    key = UUID.randomUUID().toString()
+                )
+            }
+
+            false -> {
+                val paymentMethod = PaymentMethod.SERIALIZER.deserialize(paymentMethodJson)
+                return CardComponent.PROVIDER.get(
+                    activity = activity,
+                    paymentMethod = paymentMethod,
+                    configuration = checkoutConfiguration.getConfiguration(PaymentMethodTypes.SCHEME)!!,
+                    callback =
+                        CardAdvancedCallback(
+                            componentFlutterApi,
+                            componentId,
+                            ::setCurrentCardComponent,
+                        ),
+                    key = UUID.randomUUID().toString()
+                )
+            }
+        }
+    }
+}

@@ -7,7 +7,7 @@ import com.adyen.checkout.flutter.generated.ComponentCommunicationModel
 import com.adyen.checkout.flutter.generated.ComponentCommunicationType
 import com.adyen.checkout.flutter.generated.ComponentFlutterInterface
 import com.adyen.checkout.flutter.utils.Constants
-import com.adyen.checkout.googlepay.GooglePayComponentState
+import com.adyen.checkout.googlepay.old.GooglePayComponentState
 import org.json.JSONObject
 
 class GooglePayAdvancedCallback(

@@ -18,4 +18,8 @@ class Constants {
   static const String updatedPaymentMethodsKey = "updatedPaymentMethods";
   static const String shouldUpdatePaymentMethodsKey =
       "shouldUpdatePaymentMethods";
+  //v2
+  static const String adyenSessionComponentKey = "AdyenSessionComponent";
+  static const String checkoutConfigurationKey =
+      "checkoutConfigurationKey";
 }
