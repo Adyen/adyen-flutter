@@ -72,7 +72,6 @@ class ThreeDS2CustomizationMapperTest {
         val uiCustomizationDTO = ThreeDS2UICustomizationDTO(
             headingCustomization = ThreeDS2ToolbarCustomizationDTO(
                 headerText = "Heading",
-                buttonText = "Cancel",
             ),
             labelCustomization = ThreeDS2LabelCustomizationDTO(
                 textColor = textColor,
@@ -95,7 +94,6 @@ class ThreeDS2CustomizationMapperTest {
 
         val toolbar = uiCustomization?.toolbarCustomization
         assertEquals("Heading", toolbar?.headerText)
-        assertEquals("Cancel", toolbar?.buttonText)
 
         val label = uiCustomization?.labelCustomization
         assertEquals(textColor, label?.textColor)
@@ -329,7 +327,6 @@ class ThreeDS2CustomizationMapperTest {
         val uiCustomizationDTO = ThreeDS2UICustomizationDTO(
             headingCustomization = ThreeDS2ToolbarCustomizationDTO(
                 headerText = "Heading",
-                buttonText = "Cancel",
                 textColor = headingColor,
             ),
             labelCustomization = ThreeDS2LabelCustomizationDTO(
@@ -375,7 +372,6 @@ class ThreeDS2CustomizationMapperTest {
 
         val toolbar = uiCustomization?.toolbarCustomization
         assertEquals("Heading", toolbar?.headerText)
-        assertEquals("Cancel", toolbar?.buttonText)
         assertEquals(headingColor, toolbar?.textColor)
 
         val label = uiCustomization?.labelCustomization

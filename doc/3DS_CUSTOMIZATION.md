@@ -33,7 +33,6 @@ final theme = Adyen3DSTheme(
   headerTheme: const Adyen3DSHeaderTheme(
     backgroundColor: Colors.green,
     textColor: Colors.white,
-    cancelButtonText: 'Close',
   ),
   inputDecorationTheme: Adyen3DSInputDecorationTheme(
     borderColor: Colors.grey,

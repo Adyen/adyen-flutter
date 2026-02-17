@@ -347,22 +347,22 @@ object ConfigurationMapper {
                 setButtonCustomization(buttonCustomization, UiCustomization.ButtonType.VERIFY)
                 setButtonCustomization(buttonCustomization, UiCustomization.ButtonType.CONTINUE)
                 setButtonCustomization(buttonCustomization, UiCustomization.ButtonType.NEXT)
-                setButtonCustomization(buttonCustomization, UiCustomization.ButtonType.OPEN_OOB_APP)
             }
 
+            //Prevent background color
             this@toUiCustomization.secondaryButtonCustomization?.let { dto ->
                 val buttonCustomization = dto.toButtonCustomization()
                 setButtonCustomization(buttonCustomization, UiCustomization.ButtonType.CANCEL)
                 setButtonCustomization(buttonCustomization, UiCustomization.ButtonType.RESEND)
+                setButtonCustomization(buttonCustomization, UiCustomization.ButtonType.OPEN_OOB_APP)
             }
         }
 
     private fun ThreeDS2ToolbarCustomizationDTO.toToolbarCustomization(): ToolbarCustomization =
         ToolbarCustomization().apply {
+            this@toToolbarCustomization.textColor?.let { textColor = it }
             this@toToolbarCustomization.backgroundColor?.let { backgroundColor = it }
             this@toToolbarCustomization.headerText?.let { headerText = it }
-            this@toToolbarCustomization.buttonText?.let { buttonText = it }
-            this@toToolbarCustomization.textColor?.let { textColor = it }
         }
 
     private fun ThreeDS2LabelCustomizationDTO.toLabelCustomization(): LabelCustomization =

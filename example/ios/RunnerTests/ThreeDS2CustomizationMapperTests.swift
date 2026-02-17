@@ -20,8 +20,7 @@ final class ThreeDS2CustomizationMapperTests: XCTestCase {
             headingCustomization: ThreeDS2ToolbarCustomizationDTO(
                 headerText: "Heading",
                 textColor: "#444444",
-                backgroundColor: "#333333",
-                buttonText: "Cancel"
+                backgroundColor: "#333333"
             ),
             inputCustomization: ThreeDS2InputCustomizationDTO(
                 borderColor: "#555555",
@@ -237,8 +236,7 @@ final class ThreeDS2CustomizationMapperTests: XCTestCase {
                 headingCustomization: ThreeDS2ToolbarCustomizationDTO(
                     headerText: "Heading",
                     textColor: "#111111",
-                    backgroundColor: "#222222",
-                    buttonText: "Cancel"
+                    backgroundColor: "#222222"
                 ),
                 labelCustomization: ThreeDS2LabelCustomizationDTO(
                     headingTextColor: "#202020",

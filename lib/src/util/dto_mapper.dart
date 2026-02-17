@@ -260,7 +260,6 @@ extension Adyen3DSHeaderThemeMapper on Adyen3DSHeaderTheme {
     return ThreeDS2ToolbarCustomizationDTO(
       backgroundColor: backgroundColor?.toHexString(),
       headerText: headingTitle,
-      buttonText: cancelButtonText,
       textColor: textColor?.toHexString(),
     );
   }

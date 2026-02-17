@@ -327,11 +327,10 @@ void main() {
     expect(dto.uiCustomization?.screenCustomization?.textColor, '#FF141516');
   });
 
-  test('when header theme set, then should map all header fields', () {
+  test('when header theme set, then should map header fields', () {
     const headerTheme = Adyen3DSHeaderTheme(
       backgroundColor: Color(0xFF010203),
       textColor: Color(0xFF040506),
-      cancelButtonText: 'Cancel',
     );
     const theme = Adyen3DSTheme(headerTheme: headerTheme);
 
@@ -341,7 +340,6 @@ void main() {
     final heading = dto.uiCustomization?.headingCustomization;
     expect(heading?.backgroundColor, '#FF010203');
     expect(heading?.textColor, '#FF040506');
-    expect(heading?.buttonText, 'Cancel');
     expect(heading?.headerText, 'Heading');
   });
 
@@ -382,7 +380,6 @@ void main() {
       headerTheme: Adyen3DSHeaderTheme(
         backgroundColor: Color(0xFF212223),
         textColor: Color(0xFF242526),
-        cancelButtonText: 'Close',
       ),
     );
 
@@ -395,7 +392,6 @@ void main() {
     expect(heading?.headerText, 'Preferred heading');
     expect(heading?.backgroundColor, '#FF212223');
     expect(heading?.textColor, '#FF242526');
-    expect(heading?.buttonText, 'Close');
   });
 
   test('when no heading or theme, uiCustomization should be null', () {
@@ -537,25 +533,6 @@ void main() {
     expect(dto.uiCustomization?.secondaryButtonCustomization?.backgroundColor,
         '#FF020202');
     expect(dto.uiCustomization?.primaryButtonCustomization, isNull);
-  });
-
-  test(
-      'headerTheme with only cancel text should map buttonText and leave others null',
-      () {
-    const theme = Adyen3DSTheme(
-      headerTheme: Adyen3DSHeaderTheme(
-        cancelButtonText: 'Back',
-      ),
-    );
-
-    final dto =
-        ThreeDS2Configuration(theme: theme, headingTitle: 'Heading').toDTO();
-
-    final heading = dto.uiCustomization?.headingCustomization;
-    expect(heading?.buttonText, 'Back');
-    expect(heading?.backgroundColor, isNull);
-    expect(heading?.textColor, isNull);
-    expect(heading?.headerText, 'Heading');
   });
 
   test(

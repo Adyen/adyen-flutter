@@ -126,12 +126,10 @@ final class Adyen3DSInputDecorationTheme {
 final class Adyen3DSHeaderTheme {
   final Color? backgroundColor;
   final Color? textColor;
-  final String? cancelButtonText;
 
   const Adyen3DSHeaderTheme({
     this.backgroundColor,
     this.textColor,
-    this.cancelButtonText,
   });
 }
 

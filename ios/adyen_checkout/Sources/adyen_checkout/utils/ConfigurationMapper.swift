@@ -124,6 +124,7 @@ extension ThreeDS2SelectionItemCustomizationDTO {
     func apply(to configuration: ADYAppearanceConfiguration) {
         if let selectionIndicatorTintColor,
            let tintColor = UIColor(hex: selectionIndicatorTintColor) {
+            //THis is wrong, map it to selectAppearance
             configuration.switchAppearance.switchTintColor = tintColor
         }
     }
@@ -399,8 +400,6 @@ extension ThreeDS2ScreenCustomizationDTO {
     func apply(to configuration: ADYAppearanceConfiguration) {
         // Apply screen background color
         if let backgroundColor, let bgColor = UIColor(hex: backgroundColor) {
-            // Note: iOS may not support setting screen background color directly
-            // This is a best-effort implementation
             configuration.backgroundColor = bgColor
         }
         
@@ -425,9 +424,6 @@ extension ThreeDS2ToolbarCustomizationDTO {
         }
         if let headerText {
             configuration.navigationBarAppearance.title = headerText
-        }
-        if let buttonText {
-            configuration.navigationBarAppearance.cancelButtonTitle = buttonText
         }
     }
 }
