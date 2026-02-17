@@ -426,8 +426,23 @@ void main() {
         surface: Color(0xFF222222),
         onSurface: Color(0xFF444444),
         outline: Color(0xFF555555),
+        onPrimary: Color(0xFFEEEEEE),
       ),
-      textTheme: const TextTheme(),
+      scaffoldBackgroundColor: const Color(0xFF222222),
+      appBarTheme: const AppBarTheme(
+        backgroundColor: Color(0xFF111111),
+        foregroundColor: Color(0xFFEEEEEE),
+      ),
+      textTheme: const TextTheme(
+        bodyMedium: TextStyle(color: Color(0xFF444444)),
+        titleSmall: TextStyle(color: Color(0xFF666666)),
+      ),
+      inputDecorationTheme: const InputDecorationTheme(
+        enabledBorder: OutlineInputBorder(
+          borderSide: BorderSide(color: Color(0xFF555555)),
+        ),
+        labelStyle: TextStyle(color: Color(0xFF444444)),
+      ),
     );
 
     final theme = Adyen3DSTheme.fromThemeData(themeData);
@@ -437,7 +452,7 @@ void main() {
     final ui = dto.uiCustomization;
     expect(ui?.screenCustomization?.backgroundColor, '#FF222222');
     expect(ui?.screenCustomization?.textColor, '#FF444444');
-    expect(ui?.headingCustomization?.textColor, '#FF444444');
+    expect(ui?.headingCustomization?.textColor, '#FFEEEEEE');
     expect(ui?.headingCustomization?.headerText, 'Heading');
     expect(ui?.inputCustomization?.borderColor, '#FF555555');
   });
