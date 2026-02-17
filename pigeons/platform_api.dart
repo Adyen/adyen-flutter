@@ -258,11 +258,13 @@ class ThreeDS2ToolbarCustomizationDTO {
   final String? headerText;
   final String? textColor;
   final String? backgroundColor;
+  final String? cancelButtonColor;
 
   ThreeDS2ToolbarCustomizationDTO(
     this.headerText,
     this.textColor,
     this.backgroundColor,
+    this.cancelButtonColor,
   );
 }
 

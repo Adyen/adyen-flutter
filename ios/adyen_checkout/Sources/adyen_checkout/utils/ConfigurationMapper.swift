@@ -120,16 +120,6 @@ extension FieldVisibility {
     }
 }
 
-extension ThreeDS2SelectionItemCustomizationDTO {
-    func apply(to configuration: ADYAppearanceConfiguration) {
-        if let selectionIndicatorTintColor,
-           let tintColor = UIColor(hex: selectionIndicatorTintColor) {
-            //THis is wrong, map it to selectAppearance
-            configuration.switchAppearance.switchTintColor = tintColor
-        }
-    }
-}
-
 extension DropInConfigurationDTO {
     func createAdyenContext(payment: Payment? = nil) throws -> AdyenContext {
         try buildAdyenContext(
@@ -425,6 +415,9 @@ extension ThreeDS2ToolbarCustomizationDTO {
         if let headerText {
             configuration.navigationBarAppearance.title = headerText
         }
+        if let cancelButtonColor, let cancelTextColor = UIColor(hex: cancelButtonColor) {
+            configuration.buttonAppearance(for: .cancel).textColor = cancelTextColor
+        }
     }
 }
 
@@ -464,6 +457,21 @@ extension ThreeDS2InputCustomizationDTO {
         }
         if let textColor, let textUIColor = UIColor(hex: textColor) {
             configuration.textFieldAppearance.textColor = textUIColor
+        }
+    }
+}
+
+extension ThreeDS2SelectionItemCustomizationDTO {
+    func apply(to configuration: ADYAppearanceConfiguration) {
+        if let selectionIndicatorTintColor,
+           let tintColor = UIColor(hex: selectionIndicatorTintColor) {
+            configuration.selectAppearance.selectionIndicatorTintColor = tintColor
+        }
+        if let highlightedBackgroundColor, let backgroundColor = UIColor(hex: highlightedBackgroundColor) {
+            configuration.selectAppearance.highlightedBackgroundColor = backgroundColor
+        }
+        if let textColor, let textUIColor = UIColor(hex: textColor) {
+            configuration.selectAppearance.textColor = textUIColor
         }
     }
 }

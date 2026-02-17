@@ -120,16 +120,18 @@ final class Adyen3DSInputDecorationTheme {
   });
 }
 
-/// The background color of the header.
+/// Theme for the 3DS2 challenge header.
 ///
-/// This property has no effect on iOS.
+/// The [cancelButtonColor] is only applicable to iOS.
 final class Adyen3DSHeaderTheme {
   final Color? backgroundColor;
   final Color? textColor;
+  final Color? cancelButtonColor; // iOS only
 
   const Adyen3DSHeaderTheme({
     this.backgroundColor,
     this.textColor,
+    this.cancelButtonColor,
   });
 }
 

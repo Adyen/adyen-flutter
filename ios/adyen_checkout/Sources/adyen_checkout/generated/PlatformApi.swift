@@ -462,17 +462,20 @@ struct ThreeDS2ToolbarCustomizationDTO {
   var headerText: String? = nil
   var textColor: String? = nil
   var backgroundColor: String? = nil
+  var cancelButtonColor: String? = nil
 
   // swift-format-ignore: AlwaysUseLowerCamelCase
   static func fromList(_ __pigeon_list: [Any?]) -> ThreeDS2ToolbarCustomizationDTO? {
     let headerText: String? = nilOrValue(__pigeon_list[0])
     let textColor: String? = nilOrValue(__pigeon_list[1])
     let backgroundColor: String? = nilOrValue(__pigeon_list[2])
+    let cancelButtonColor: String? = nilOrValue(__pigeon_list[3])
 
     return ThreeDS2ToolbarCustomizationDTO(
       headerText: headerText,
       textColor: textColor,
-      backgroundColor: backgroundColor
+      backgroundColor: backgroundColor,
+      cancelButtonColor: cancelButtonColor
     )
   }
   func toList() -> [Any?] {
@@ -480,6 +483,7 @@ struct ThreeDS2ToolbarCustomizationDTO {
       headerText,
       textColor,
       backgroundColor,
+      cancelButtonColor,
     ]
   }
 }

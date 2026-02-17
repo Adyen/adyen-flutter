@@ -331,6 +331,7 @@ void main() {
     const headerTheme = Adyen3DSHeaderTheme(
       backgroundColor: Color(0xFF010203),
       textColor: Color(0xFF040506),
+      cancelButtonColor: Color(0xFF070809),
     );
     const theme = Adyen3DSTheme(headerTheme: headerTheme);
 
@@ -340,6 +341,7 @@ void main() {
     final heading = dto.uiCustomization?.headingCustomization;
     expect(heading?.backgroundColor, '#FF010203');
     expect(heading?.textColor, '#FF040506');
+    expect(heading?.cancelButtonColor, '#FF070809');
     expect(heading?.headerText, 'Heading');
   });
 
@@ -380,6 +382,7 @@ void main() {
       headerTheme: Adyen3DSHeaderTheme(
         backgroundColor: Color(0xFF212223),
         textColor: Color(0xFF242526),
+        cancelButtonColor: Color(0xFF272829),
       ),
     );
 
@@ -392,6 +395,7 @@ void main() {
     expect(heading?.headerText, 'Preferred heading');
     expect(heading?.backgroundColor, '#FF212223');
     expect(heading?.textColor, '#FF242526');
+    expect(heading?.cancelButtonColor, '#FF272829');
   });
 
   test('when no heading or theme, uiCustomization should be null', () {

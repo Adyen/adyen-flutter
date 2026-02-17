@@ -1,5 +1,6 @@
 package com.adyen.checkout.flutter.utils
 
+import atd.bb.setCancelButtonTextColor
 import com.adyen.checkout.adyen3ds2.adyen3DS2
 import com.adyen.checkout.card.AddressConfiguration
 import com.adyen.checkout.card.CardBrand
@@ -314,16 +315,7 @@ object ConfigurationMapper {
         UiCustomization().apply {
             this@toUiCustomization.screenCustomization?.let { dto ->
                 dto.backgroundColor?.let { setScreenBackgroundColor(it) }
-                dto.textColor?.let {
-                    setTextColor(it)
-                    // TODO: remove when 3DS SDK maps screen textColor to selection text automatically
-                    // Why is it not applied?
-                    selectionItemCustomization =
-                        SelectionItemCustomization().apply {
-                            textColor = it
-                            selectionIndicatorTintColor = it
-                        }
-                }
+                dto.textColor?.let { setTextColor(it) }
             }
 
             this@toUiCustomization.headingCustomization?.let { dto ->
@@ -349,7 +341,6 @@ object ConfigurationMapper {
                 setButtonCustomization(buttonCustomization, UiCustomization.ButtonType.NEXT)
             }
 
-            //Prevent background color
             this@toUiCustomization.secondaryButtonCustomization?.let { dto ->
                 val buttonCustomization = dto.toButtonCustomization()
                 setButtonCustomization(buttonCustomization, UiCustomization.ButtonType.CANCEL)

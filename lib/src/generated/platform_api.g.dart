@@ -461,6 +461,7 @@ class ThreeDS2ToolbarCustomizationDTO {
     this.headerText,
     this.textColor,
     this.backgroundColor,
+    this.cancelButtonColor,
   });
 
   String? headerText;
@@ -469,11 +470,14 @@ class ThreeDS2ToolbarCustomizationDTO {
 
   String? backgroundColor;
 
+  String? cancelButtonColor;
+
   Object encode() {
     return <Object?>[
       headerText,
       textColor,
       backgroundColor,
+      cancelButtonColor,
     ];
   }
 
@@ -483,6 +487,7 @@ class ThreeDS2ToolbarCustomizationDTO {
       headerText: result[0] as String?,
       textColor: result[1] as String?,
       backgroundColor: result[2] as String?,
+      cancelButtonColor: result[3] as String?,
     );
   }
 }

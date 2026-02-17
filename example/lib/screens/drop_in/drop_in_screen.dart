@@ -139,11 +139,11 @@ class DropInScreen extends StatelessWidget {
       headingTitle: "Test 3DS2 title",
       theme: const Adyen3DSTheme(
         textColor: Colors.green,
-        // backgroundColor: Colors.yellow, //ASK Why it is not supported on iOS
+        backgroundColor: Colors.yellow,
         headerTheme: Adyen3DSHeaderTheme(
           backgroundColor: Colors.green,
-          textColor: Colors.white,
-          cancelButtonText: 'STOP!',
+          textColor: Colors.purpleAccent,
+          cancelButtonColor: Colors.red,
         ),
 
         descriptionTheme: Adyen3DSDescriptionTheme(
@@ -151,7 +151,7 @@ class DropInScreen extends StatelessWidget {
           titleFontSize: 16,
           textColor: Colors.teal,
           textFontSize: 14,
-          inputLabelTextColor: Colors.yellow,
+          inputLabelTextColor: Colors.brown,
           inputLabelFontSize: 8,
         ),
 
@@ -162,21 +162,10 @@ class DropInScreen extends StatelessWidget {
           cornerRadius: 80,
         ),
 
-        selectionItemTheme: Adyen3DSSelectionItemTheme(
-          textColor: Colors.red,
-          selectionIndicatorTintColor: Colors.yellow,
-        ),
-
         primaryButtonTheme: Adyen3DSButtonTheme(
           backgroundColor: Colors.blue,
           textColor: Colors.white,
           cornerRadius: 12,
-        ),
-
-        secondaryButtonTheme: Adyen3DSButtonTheme(
-          backgroundColor: Colors.orange,
-          textColor: Colors.lightGreen,
-          cornerRadius: 8,
         ),
       ),
     );
