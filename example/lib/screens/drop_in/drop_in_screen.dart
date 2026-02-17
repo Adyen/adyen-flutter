@@ -135,41 +135,6 @@ class DropInScreen extends StatelessWidget {
       deleteStoredPaymentMethodCallback: repository.deleteStoredPaymentMethod,
     );
 
-    final ThreeDS2Configuration threeDS2Configuration = ThreeDS2Configuration(
-      headingTitle: "Test 3DS2 title",
-      theme: const Adyen3DSTheme(
-        textColor: Colors.green,
-        backgroundColor: Colors.yellow,
-        headerTheme: Adyen3DSHeaderTheme(
-          backgroundColor: Colors.green,
-          textColor: Colors.purpleAccent,
-          cancelButtonColor: Colors.red,
-        ),
-
-        descriptionTheme: Adyen3DSDescriptionTheme(
-          titleTextColor: Colors.tealAccent,
-          titleFontSize: 16,
-          textColor: Colors.teal,
-          textFontSize: 14,
-          inputLabelTextColor: Colors.brown,
-          inputLabelFontSize: 8,
-        ),
-
-        inputDecorationTheme: Adyen3DSInputDecorationTheme(
-          textColor: Colors.deepOrangeAccent,
-          borderColor: Colors.purpleAccent,
-          borderWidth: 10,
-          cornerRadius: 80,
-        ),
-
-        primaryButtonTheme: Adyen3DSButtonTheme(
-          backgroundColor: Colors.blue,
-          textColor: Colors.white,
-          cornerRadius: 12,
-        ),
-      ),
-    );
-
     final DropInConfiguration dropInConfiguration = DropInConfiguration(
       environment: Config.environment,
       clientKey: Config.clientKey,
@@ -181,7 +146,6 @@ class DropInScreen extends StatelessWidget {
       googlePayConfiguration: googlePayConfiguration,
       cashAppPayConfiguration: cashAppPayConfiguration,
       twintConfiguration: twintConfiguration,
-      threeDS2Configuration: threeDS2Configuration,
       storedPaymentMethodConfiguration: storedPaymentMethodConfiguration,
       paymentMethodNames: {
         "scheme": "Credit card",

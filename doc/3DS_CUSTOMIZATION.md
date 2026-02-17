@@ -11,6 +11,8 @@ final dropInConfiguration = DropInConfiguration(
   clientKey: clientKey,
   countryCode: 'NL',
   threeDS2Configuration: ThreeDS2Configuration(
+    headingTitle: 'Custom 3DS2 Title', // Optional custom title
+    requestorAppURL: 'myapp://adyen-redirect', // Optional deep link
     theme: Adyen3DSTheme.fromThemeData(Theme.of(context)),
   ),
 );
@@ -33,6 +35,7 @@ final theme = Adyen3DSTheme(
   headerTheme: const Adyen3DSHeaderTheme(
     backgroundColor: Colors.green,
     textColor: Colors.white,
+    cancelButtonColor: Colors.blue, // iOS only
   ),
   inputDecorationTheme: Adyen3DSInputDecorationTheme(
     borderColor: Colors.grey,
@@ -67,7 +70,8 @@ final configuration = DropInConfiguration(
   clientKey: clientKey,
   countryCode: 'NL',
   threeDS2Configuration: ThreeDS2Configuration(
-    requestorAppURL: 'myapp://adyen-redirect',
+    headingTitle: 'Custom 3DS2 Title', // Optional custom heading
+    requestorAppURL: 'myapp://adyen-redirect', // Optional deep link
     theme: theme,
   ),
 );
@@ -79,3 +83,36 @@ final configuration = DropInConfiguration(
 - Sizes are `double` in Flutter and are rounded when mapped to native SDKs.
 - Colors are converted to `#AARRGGBB` hex strings to preserve alpha.
 - `backgroundColor` affects Android; iOS uses native defaults for the screen.
+- `headingTitle` allows customization of the 3DS2 challenge screen heading.
+- `requestorAppURL` enables deep linking back to your app after 3DS2 completion.
+- `cancelButtonColor` in `Adyen3DSHeaderTheme` is iOS-only.
+
+## Configuration Options
+
+### ThreeDS2Configuration
+
+- `headingTitle`: Custom title for the 3DS2 challenge screen header
+- `requestorAppURL`: Deep link URL for returning to your app after 3DS2
+- `theme`: `Adyen3DSTheme` instance for visual customization
+
+### Adyen3DSTheme
+
+- `backgroundColor`: Screen background color (Android only)
+- `textColor`: Primary text color for labels and content
+- `headerTheme`: Customization for the challenge screen header
+- `descriptionTheme`: Styling for description text and titles
+- `inputDecorationTheme`: Text input field styling
+- `primaryButtonTheme`: Submit/continue button styling
+- `secondaryButtonTheme`: Cancel/resend button styling
+- `selectionItemTheme`: Radio/selection item styling
+
+### Platform-Specific Notes
+
+**Android:**
+- `backgroundColor` is applied to the challenge screen background
+- All theme properties are supported
+
+**iOS:**
+- Uses native system background color (ignores `backgroundColor`)
+- `cancelButtonColor` in header theme is iOS-specific
+- All other theme properties are supported
