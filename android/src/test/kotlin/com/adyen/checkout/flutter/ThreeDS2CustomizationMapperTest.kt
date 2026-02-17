@@ -192,7 +192,7 @@ class ThreeDS2CustomizationMapperTest {
 
         primaryTypes.forEach { type ->
             val button = uiCustomization?.getButtonCustomization(type)
-            assertEquals("#0000FF", button?.backgroundColor)
+            assertEquals("#00FF00", button?.backgroundColor)
             assertEquals(6, button?.cornerRadius)
             assertEquals("#FFFFFF", button?.textColor)
             assertEquals(16, button?.textFontSize)

@@ -1,6 +1,5 @@
 package com.adyen.checkout.flutter.utils
 
-import atd.bb.setCancelButtonTextColor
 import com.adyen.checkout.adyen3ds2.adyen3DS2
 import com.adyen.checkout.card.AddressConfiguration
 import com.adyen.checkout.card.CardBrand

@@ -1,17 +1,16 @@
 ## UI Customization
 
-### 3DS2 challenge screens
-
-See [3DS2 UI customization](./3DS_CUSTOMIZATION.md).
-
 ### Android
 
-Follow the Android SDK [customization docs](https://github.com/Adyen/adyen-android/blob/main/docs/UI_CUSTOMIZATION.md).
+Follow the Android
+SDK [customization docs](https://github.com/Adyen/adyen-android/blob/main/docs/UI_CUSTOMIZATION.md).
 
 ### iOS
 
-On your iOS layer e.g. in the AppDelegate, set the `dropInStyle` or the `cardComponentStyle` of AdyenAppearance depending on your integration.
-The SDK will use your provided style and apply it automatically. Feel free to check out the example app [implementation](https://github.com/Adyen/adyen-flutter/blob/main/example/ios/Runner/AppDelegate.swift#L23).
+On your iOS layer e.g. in the AppDelegate, set the `dropInStyle` or the `cardComponentStyle` of
+AdyenAppearance depending on your integration.
+The SDK will use your provided style and apply it automatically. Feel free to check out the example
+app [implementation](https://github.com/Adyen/adyen-flutter/blob/main/example/ios/Runner/AppDelegate.swift#L23).
 
 Drop-in:
 
@@ -43,3 +42,7 @@ cardComponentStyle.mainButtonItem.button.backgroundColor = .black
 cardComponentStyle.mainButtonItem.button.title.color = .white
 AdyenAppearance.cardComponentStyle = cardComponentStyle
 ```
+
+### 3DS2 challenge screens
+
+See [3DS2 UI customization](./3DS_CUSTOMIZATION.md).
