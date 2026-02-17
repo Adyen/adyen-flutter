@@ -120,13 +120,16 @@ final class Adyen3DSInputDecorationTheme {
   });
 }
 
+/// The background color of the header.
+///
+/// This property has no effect on iOS.
 final class Adyen3DSHeaderTheme {
   final Color? backgroundColor;
   final Color? textColor;
   final String? cancelButtonText;
 
   const Adyen3DSHeaderTheme({
-    this.backgroundColor, // This has no effect on iOS
+    this.backgroundColor,
     this.textColor,
     this.cancelButtonText,
   });
