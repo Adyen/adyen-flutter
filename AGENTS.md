@@ -152,8 +152,10 @@ class ExampleConfigurationDTO {
   final String requiredField;
   final String? optionalField;
 
-  ExampleConfigurationDTO(this.requiredField,
-      this.optionalField,);
+  ExampleConfigurationDTO(
+    this.requiredField,
+    this.optionalField,
+  );
 }
 ```
 
