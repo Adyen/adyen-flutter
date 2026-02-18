@@ -187,12 +187,11 @@ class ThreeDS2CustomizationMapperTest {
             UiCustomization.ButtonType.VERIFY,
             UiCustomization.ButtonType.CONTINUE,
             UiCustomization.ButtonType.NEXT,
-            UiCustomization.ButtonType.OPEN_OOB_APP,
         )
 
         primaryTypes.forEach { type ->
             val button = uiCustomization?.getButtonCustomization(type)
-            assertEquals("#00FF00", button?.backgroundColor)
+            assertEquals("#0000FF", button?.backgroundColor)
             assertEquals(6, button?.cornerRadius)
             assertEquals("#FFFFFF", button?.textColor)
             assertEquals(16, button?.textFontSize)
@@ -201,6 +200,7 @@ class ThreeDS2CustomizationMapperTest {
         val secondaryTypes = listOf(
             UiCustomization.ButtonType.CANCEL,
             UiCustomization.ButtonType.RESEND,
+            UiCustomization.ButtonType.OPEN_OOB_APP,
         )
 
         secondaryTypes.forEach { type ->

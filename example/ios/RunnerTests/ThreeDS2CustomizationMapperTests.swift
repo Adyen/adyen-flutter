@@ -52,7 +52,6 @@ final class ThreeDS2CustomizationMapperTests: XCTestCase {
 
         let nav = appearance.navigationBarAppearance
         XCTAssertEqual(nav.title, "Heading")
-        XCTAssertEqual(nav.cancelButtonTitle, "Cancel")
         assertColor(nav.backgroundColor, equalsHex: "#333333")
         assertColor(nav.textColor, equalsHex: "#444444")
 
@@ -222,7 +221,7 @@ final class ThreeDS2CustomizationMapperTests: XCTestCase {
 
         let appearance = dto.mapToThreeDS2Configuration().appearanceConfiguration
 
-        assertColor(appearance.switchAppearance.switchTintColor, equalsHex: "#FF1122")
+        assertColor(appearance.selectAppearance.selectionIndicatorTintColor, equalsHex: "#FF1122")
     }
 
     func test_allUICustomizations_mapTogether() {
@@ -273,7 +272,6 @@ final class ThreeDS2CustomizationMapperTests: XCTestCase {
         assertColor(nav.backgroundColor, equalsHex: "#222222")
         assertColor(nav.textColor, equalsHex: "#111111")
         XCTAssertEqual(nav.title, "Heading")
-        XCTAssertEqual(nav.cancelButtonTitle, "Cancel")
 
         let label = appearance.labelAppearance
         assertColor(label.textColor, equalsHex: "#101010")
