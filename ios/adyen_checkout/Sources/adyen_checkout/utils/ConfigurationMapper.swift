@@ -372,15 +372,15 @@ extension ThreeDS2UICustomizationDTO {
             selectionItemCustomization.apply(to: configuration)
         }
 
-        // Primary group: submit / continue / next / OOB
+        // Primary group: submit / continue / next
         primaryButtonCustomization?.apply(to: configuration, buttonType: .submit)
         primaryButtonCustomization?.apply(to: configuration, buttonType: .continue)
         primaryButtonCustomization?.apply(to: configuration, buttonType: .next)
 
-        // Secondary group: cancel / resend
+        // Secondary group: cancel / resend / OOB
         secondaryButtonCustomization?.apply(to: configuration, buttonType: .cancel)
         secondaryButtonCustomization?.apply(to: configuration, buttonType: .resend)
-        primaryButtonCustomization?.apply(to: configuration, buttonType: .OOB)
+        secondaryButtonCustomization?.apply(to: configuration, buttonType: .OOB)
 
         return configuration
     }
