@@ -33,6 +33,8 @@ import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToSessionResponse
 import com.adyen.checkout.flutter.utils.ConfigurationMapper.toCheckoutConfiguration
 import com.adyen.checkout.flutter.utils.PlatformException
 import com.adyen.checkout.redirect.old.RedirectComponent
+import com.adyen.checkout.flutter.utils.ConfigurationMapper.toCheckoutConfiguration
+import com.adyen.checkout.redirect.RedirectComponent
 import com.adyen.checkout.sessions.core.CheckoutSessionProvider
 import com.adyen.checkout.sessions.core.CheckoutSessionResult
 import com.adyen.checkout.sessions.core.SessionModel
@@ -90,20 +92,20 @@ class CheckoutPlatformApi(
         configuration: Any?,
         callback: (Result<SessionDTO>) -> Unit,
     ) {
-//        activity.lifecycleScope.launch(Dispatchers.IO) {
-//            val sessionModel = SessionModel(sessionId, sessionData)
-//            determineSessionConfiguration(configuration)?.let { sessionConfiguration ->
-//                when (val sessionResult = CheckoutSessionProvider.createSession(sessionModel=sessionModel, sessionConfiguration= sessionConfiguration)) {
-//                    is CheckoutSessionResult.Error -> callback(Result.failure(sessionResult.exception))
-//                    is CheckoutSessionResult.Success ->
-//                        onSessionSuccessfullyCreated(
-//                            sessionResult,
-//                            sessionModel,
-//                            callback
-//                        )
-//                }
-//            }
-//        }
+        activity.lifecycleScope.launch(Dispatchers.IO) {
+            val sessionModel = SessionModel(sessionId, sessionData)
+            determineSessionConfiguration(configuration)?.let { sessionConfiguration ->
+                when (val sessionResult = CheckoutSessionProvider.createSession(sessionModel, sessionConfiguration)) {
+                    is CheckoutSessionResult.Error -> callback(Result.failure(sessionResult.exception))
+                    is CheckoutSessionResult.Success ->
+                        onSessionSuccessfullyCreated(
+                            sessionResult,
+                            sessionModel,
+                            callback
+                        )
+                }
+            }
+        }
     }
 
     override fun clearSession() {
@@ -143,16 +145,23 @@ class CheckoutPlatformApi(
         cardBrand: String?
     ): CardSecurityCodeValidationResultDTO = CardValidation.validateCardSecurityCode(securityCode, cardBrand)
 
-    @SuppressLint("RestrictedApi")
-    override fun enableConsoleLogging(loggingEnabled: Boolean) {
-        if (loggingEnabled) {
-            AdyenLogger.setLogLevel(AdyenLogLevel.VERBOSE)
-        } else {
-            AdyenLogger.setLogLevel(AdyenLogLevel.NONE)
-        }
-    }
+    private fun determineSessionConfiguration(configuration: Any?): Configuration? {
+        when (configuration) {
+            is DropInConfigurationDTO -> return configuration.toCheckoutConfiguration()
+            is CardComponentConfigurationDTO -> return configuration.toCheckoutConfiguration()
+            is InstantPaymentConfigurationDTO -> {
+                return when (configuration.instantPaymentType) {
+                    InstantPaymentType.APPLE_PAY -> throw IllegalStateException(
+                        "Apple Pay is not supported on Android."
+                    )
 
-    override fun getThreeDS2SdkVersion(): String = ThreeDS2Service.INSTANCE.sdkVersion
+                    else -> configuration.toCheckoutConfiguration()
+                }
+            }
+        }
+
+        return null
+    }
 
     private fun onSessionSuccessfullyCreated(
         sessionResult: CheckoutSessionResult.Success,
@@ -161,6 +170,7 @@ class CheckoutPlatformApi(
     ) {
         with(sessionResult.checkoutSession) {
             val sessionResponse = SessionSetupResponse.SERIALIZER.serialize(sessionSetupResponse)
+            val orderResponse = order?.let { OrderRequest.SERIALIZER.serialize(it) }
             val paymentMethodsJsonObject =
                 sessionSetupResponse.paymentMethodsApiResponse?.let {
                     com.adyen.checkout.components.core.PaymentMethodsApiResponse.SERIALIZER.serialize(it)
@@ -176,6 +186,17 @@ class CheckoutPlatformApi(
             )
         }
     }
+
+    @SuppressLint("RestrictedApi")
+    override fun enableConsoleLogging(loggingEnabled: Boolean) {
+        if (loggingEnabled) {
+            AdyenLogger.setLogLevel(Log.VERBOSE)
+        } else {
+            AdyenLogger.setLogLevel(NONE)
+        }
+    }
+
+    override fun getThreeDS2SdkVersion(): String = ThreeDS2Service.INSTANCE.sdkVersion
 
     private fun onSetupSuccess(
         checkoutSession: CheckoutContext.Sessions,

@@ -29,24 +29,19 @@ internal class CardSessionComponent(
     private val sessionHolder: SessionHolder
 ) : BaseCardComponent(context, id, creationParams, activity, componentFlutterApi, onDispose, setCurrentCardComponent) {
     init {
-        val sessionCheckout = sessionHolder.sessionCheckout ?: throw PlatformException("Session not initialized")
-        val paymentMethod = com.adyen.checkout.core.components.data.model.PaymentMethod.SERIALIZER.deserialize(
-            JSONObject(paymentMethodString)
-        )
-        val checkoutCallbacks = CheckoutCallbacks(
-            onError = {
-                println("ON ERROR INVOKED")
-            },
-            onFinished = { it: PaymentResult ->
-                println("ON FINISHED INVOKED: ${it.sessionResult}")
+        val sessionSetupResponse = SessionSetupResponse.SERIALIZER.deserialize(sessionHolder.sessionSetupResponse)
+        val order = sessionHolder.orderResponse?.let { Order.SERIALIZER.deserialize(it) }
+        val checkoutSession =
+            CheckoutSession(
+                sessionSetupResponse = sessionSetupResponse,
+                order = order,
+                environment = checkoutConfiguration.environment,
+                clientKey = checkoutConfiguration.clientKey
+            )
+        cardComponent =
+            createCardComponent(checkoutSession).apply {
+                addComponent(this)
             }
-        )
-
-//        addV6Component(
-//            paymentMethod = paymentMethod,
-//            checkoutContext = sessionCheckout,
-//            checkoutCallbacks = checkoutCallbacks
-//        )
     }
 
     private fun createCardComponent(checkoutSession: CheckoutSession): CardComponent {
@@ -58,13 +53,14 @@ internal class CardSessionComponent(
                     activity = activity,
                     checkoutSession = checkoutSession,
                     storedPaymentMethod = storedPaymentMethod,
-                    configuration = checkoutConfiguration.getConfiguration(PaymentMethodTypes.SCHEME)!!,
-                    componentCallback = CardSessionCallback(
-                        componentFlutterApi,
-                        componentId,
-                        ::onAction,
-                        ::setCurrentCardComponent,
-                    ),
+                    checkoutConfiguration = checkoutConfiguration,
+                    componentCallback =
+                        CardSessionCallback(
+                            componentFlutterApi,
+                            componentId,
+                            ::onAction,
+                            ::setCurrentCardComponent,
+                        ),
                     key = UUID.randomUUID().toString()
                 )
             }
@@ -75,13 +71,14 @@ internal class CardSessionComponent(
                     activity = activity,
                     checkoutSession = checkoutSession,
                     paymentMethod = paymentMethod,
-                    configuration = checkoutConfiguration.getConfiguration(PaymentMethodTypes.SCHEME)!!,
-                    componentCallback = CardSessionCallback(
-                        componentFlutterApi,
-                        componentId,
-                        ::onAction,
-                        ::setCurrentCardComponent,
-                    ),
+                    checkoutConfiguration = checkoutConfiguration,
+                    componentCallback =
+                        CardSessionCallback(
+                            componentFlutterApi,
+                            componentId,
+                            ::onAction,
+                            ::setCurrentCardComponent,
+                        ),
                     key = UUID.randomUUID().toString()
                 )
             }

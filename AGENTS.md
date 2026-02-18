@@ -258,6 +258,12 @@ Flutter Widget (Dart)
 
 ## Testing
 
-- Unit tests in `test/`
+- When creating or updating iOS tests, always follow the Adyen iOS SDK testing guide: https://github.com/Adyen/adyen-ios/blob/develop/TESTING.md
 - Run with `flutter test`
 - Test both model classes and DTO mappings
+
+| Platform | Where to put tests | Notes |
+|---|---|---|
+| Flutter (Dart) | `test/` | Dart unit tests |
+| Android | `android/src/test/kotlin/...` | JVM unit tests. If you need instrumentation tests, use `android/src/androidTest/kotlin/...`. |
+| iOS | `example/ios/RunnerTests/` | Xcode/Swift tests for the iOS example app target. |

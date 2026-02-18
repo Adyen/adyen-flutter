@@ -14,7 +14,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        flutter-version: [ 3.32.x, 3.35.x, 3.38.x ]
+        flutter-version: [ 3.32.x, 3.35.x, 3.38.x, 3.41.x ]
     env:
       IPHONE_MODEL: "iPhone 17"
 
