@@ -83,7 +83,7 @@ class MockAdyenCheckoutPlatform implements CheckoutPlatformInterface {
   String get pigeonVar_messageChannelSuffix => throw UnimplementedError();
 
   @override
-  Future<SessionDTO> setup(
+  Future<SessionDTO> setupSession(
     SessionResponseDTO sessionResponseDTO,
     CheckoutConfigurationDTO checkoutConfigurationDTO,
   ) async {
@@ -91,6 +91,12 @@ class MockAdyenCheckoutPlatform implements CheckoutPlatformInterface {
       id: "id",
       paymentMethodsJson: "",
     );
+  }
+
+  @override
+  Future<void> setupAdvanced(String paymentMethodsResponse,
+      CheckoutConfigurationDTO checkoutConfigurationDTO) {
+    return Future.value();
   }
 }
 

@@ -73,7 +73,18 @@ class AdyenCheckoutApi implements CheckoutPlatformInterface {
   String get pigeonVar_messageChannelSuffix => "adyen_checkout";
 
   @override
-  Future<SessionDTO> setup(SessionResponseDTO sessionResponseDTO,
+  Future<SessionDTO> setupSession(SessionResponseDTO sessionResponseDTO,
           CheckoutConfigurationDTO checkoutConfigurationDTO) =>
-      checkoutApi.setup(sessionResponseDTO, checkoutConfigurationDTO);
+      checkoutApi.setupSession(sessionResponseDTO, checkoutConfigurationDTO);
+
+  @override
+  Future<void> setupAdvanced(
+    String paymentMethodsResponse,
+    CheckoutConfigurationDTO checkoutConfigurationDTO,
+  ) {
+    return checkoutApi.setupAdvanced(
+      paymentMethodsResponse,
+      checkoutConfigurationDTO,
+    );
+  }
 }

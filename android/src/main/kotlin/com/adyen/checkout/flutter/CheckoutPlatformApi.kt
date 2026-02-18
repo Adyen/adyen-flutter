@@ -3,7 +3,6 @@ package com.adyen.checkout.flutter
 import android.annotation.SuppressLint
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.lifecycleScope
-import com.adyen.checkout.components.core.internal.Configuration
 import com.adyen.checkout.core.common.CheckoutContext
 import com.adyen.checkout.core.components.Checkout
 import com.adyen.checkout.core.components.CheckoutConfiguration
@@ -26,15 +25,11 @@ import com.adyen.checkout.flutter.generated.SessionDTO
 import com.adyen.checkout.flutter.generated.SessionResponseDTO
 import com.adyen.checkout.flutter.generated.UnencryptedCardDTO
 import com.adyen.checkout.flutter.session.SessionHolder
-import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToAmount
-import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToAnalyticsConfiguration
-import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToEnvironment
 import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToSessionResponse
 import com.adyen.checkout.flutter.utils.ConfigurationMapper.toCheckoutConfiguration
 import com.adyen.checkout.flutter.utils.PlatformException
 import com.adyen.checkout.redirect.old.RedirectComponent
 import com.adyen.checkout.flutter.utils.ConfigurationMapper.toCheckoutConfiguration
-import com.adyen.checkout.redirect.RedirectComponent
 import com.adyen.checkout.sessions.core.CheckoutSessionProvider
 import com.adyen.checkout.sessions.core.CheckoutSessionResult
 import com.adyen.checkout.sessions.core.SessionModel
@@ -51,7 +46,7 @@ class CheckoutPlatformApi(
         callback(Result.success(RedirectComponent.getReturnUrl(activity.applicationContext)))
     }
 
-    override fun setup(
+    override fun setupSession(
         sessionResponseDTO: SessionResponseDTO,
         checkoutConfigurationDTO: CheckoutConfigurationDTO,
         callback: (Result<SessionDTO>) -> Unit
@@ -86,6 +81,14 @@ class CheckoutPlatformApi(
         }
     }
 
+    override fun setupAdvanced(
+        paymentMethodsResponse: String,
+        checkoutConfigurationDTO: CheckoutConfigurationDTO,
+        callback: (Result<Unit>) -> Unit
+    ) {
+        TODO("Not yet implemented")
+    }
+
     override fun createSession(
         sessionId: String,
         sessionData: String,
@@ -95,15 +98,15 @@ class CheckoutPlatformApi(
         activity.lifecycleScope.launch(Dispatchers.IO) {
             val sessionModel = SessionModel(sessionId, sessionData)
             determineSessionConfiguration(configuration)?.let { sessionConfiguration ->
-                when (val sessionResult = CheckoutSessionProvider.createSession(sessionModel, sessionConfiguration)) {
-                    is CheckoutSessionResult.Error -> callback(Result.failure(sessionResult.exception))
-                    is CheckoutSessionResult.Success ->
-                        onSessionSuccessfullyCreated(
-                            sessionResult,
-                            sessionModel,
-                            callback
-                        )
-                }
+//                when (val sessionResult = CheckoutSessionProvider.createSession(sessionModel, sessionConfiguration)) {
+//                    is CheckoutSessionResult.Error -> callback(Result.failure(sessionResult.exception))
+//                    is CheckoutSessionResult.Success ->
+//                        onSessionSuccessfullyCreated(
+//                            sessionResult,
+//                            sessionModel,
+//                            callback
+//                        )
+//                }
             }
         }
     }
@@ -145,7 +148,7 @@ class CheckoutPlatformApi(
         cardBrand: String?
     ): CardSecurityCodeValidationResultDTO = CardValidation.validateCardSecurityCode(securityCode, cardBrand)
 
-    private fun determineSessionConfiguration(configuration: Any?): Configuration? {
+    private fun determineSessionConfiguration(configuration: Any?): CheckoutConfiguration? {
         when (configuration) {
             is DropInConfigurationDTO -> return configuration.toCheckoutConfiguration()
             is CardComponentConfigurationDTO -> return configuration.toCheckoutConfiguration()
@@ -170,7 +173,6 @@ class CheckoutPlatformApi(
     ) {
         with(sessionResult.checkoutSession) {
             val sessionResponse = SessionSetupResponse.SERIALIZER.serialize(sessionSetupResponse)
-            val orderResponse = order?.let { OrderRequest.SERIALIZER.serialize(it) }
             val paymentMethodsJsonObject =
                 sessionSetupResponse.paymentMethodsApiResponse?.let {
                     com.adyen.checkout.components.core.PaymentMethodsApiResponse.SERIALIZER.serialize(it)
@@ -190,9 +192,9 @@ class CheckoutPlatformApi(
     @SuppressLint("RestrictedApi")
     override fun enableConsoleLogging(loggingEnabled: Boolean) {
         if (loggingEnabled) {
-            AdyenLogger.setLogLevel(Log.VERBOSE)
+            AdyenLogger.setLogLevel(AdyenLogLevel.VERBOSE)
         } else {
-            AdyenLogger.setLogLevel(NONE)
+            AdyenLogger.setLogLevel(AdyenLogLevel.NONE)
         }
     }
 

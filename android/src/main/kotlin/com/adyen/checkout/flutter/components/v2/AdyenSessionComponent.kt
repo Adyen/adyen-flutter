@@ -46,7 +46,7 @@ internal class AdyenSessionComponent(
             }
         )
 
-        addV6Component(
+        dynamicComponentView.addV6Component(
             paymentMethod = paymentMethod,
             checkoutContext = sessionCheckout,
             callbacks = checkoutCallbacks

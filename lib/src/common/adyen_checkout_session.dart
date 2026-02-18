@@ -27,7 +27,7 @@ class AdyenCheckoutSession {
     final sdkVersionNumber =
         await _sdkVersionNumberProvider.getSdkVersionNumber();
 
-    final sessionDTO = await adyenCheckoutApi.setup(
+    final sessionDTO = await adyenCheckoutApi.setupSession(
       sessionResponse.toDTO(),
       checkoutConfiguration.toDTO(sdkVersionNumber),
     );

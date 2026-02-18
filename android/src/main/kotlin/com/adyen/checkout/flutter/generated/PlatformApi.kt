@@ -2164,7 +2164,8 @@ private open class PlatformApiPigeonCodec : StandardMessageCodec() {
 /** Generated interface from Pigeon that represents a handler of messages from Flutter. */
 interface CheckoutPlatformInterface {
   fun getReturnUrl(callback: (Result<String>) -> Unit)
-  fun setup(sessionResponseDTO: SessionResponseDTO, checkoutConfigurationDTO: CheckoutConfigurationDTO, callback: (Result<SessionDTO>) -> Unit)
+  fun setupSession(sessionResponseDTO: SessionResponseDTO, checkoutConfigurationDTO: CheckoutConfigurationDTO, callback: (Result<SessionDTO>) -> Unit)
+  fun setupAdvanced(paymentMethodsResponse: String, checkoutConfigurationDTO: CheckoutConfigurationDTO, callback: (Result<Unit>) -> Unit)
   fun createSession(sessionId: String, sessionData: String, configuration: Any?, callback: (Result<SessionDTO>) -> Unit)
   fun clearSession()
   fun encryptCard(unencryptedCardDTO: UnencryptedCardDTO, publicKey: String, callback: (Result<EncryptedCardDTO>) -> Unit)
@@ -2203,19 +2204,39 @@ interface CheckoutPlatformInterface {
         }
       }
       run {
-        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.setup$separatedMessageChannelSuffix", codec)
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.setupSession$separatedMessageChannelSuffix", codec)
         if (api != null) {
           channel.setMessageHandler { message, reply ->
             val args = message as List<Any?>
             val sessionResponseDTOArg = args[0] as SessionResponseDTO
             val checkoutConfigurationDTOArg = args[1] as CheckoutConfigurationDTO
-            api.setup(sessionResponseDTOArg, checkoutConfigurationDTOArg) { result: Result<SessionDTO> ->
+            api.setupSession(sessionResponseDTOArg, checkoutConfigurationDTOArg) { result: Result<SessionDTO> ->
               val error = result.exceptionOrNull()
               if (error != null) {
                 reply.reply(PlatformApiPigeonUtils.wrapError(error))
               } else {
                 val data = result.getOrNull()
                 reply.reply(PlatformApiPigeonUtils.wrapResult(data))
+              }
+            }
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.setupAdvanced$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { message, reply ->
+            val args = message as List<Any?>
+            val paymentMethodsResponseArg = args[0] as String
+            val checkoutConfigurationDTOArg = args[1] as CheckoutConfigurationDTO
+            api.setupAdvanced(paymentMethodsResponseArg, checkoutConfigurationDTOArg) { result: Result<Unit> ->
+              val error = result.exceptionOrNull()
+              if (error != null) {
+                reply.reply(PlatformApiPigeonUtils.wrapError(error))
+              } else {
+                reply.reply(PlatformApiPigeonUtils.wrapResult(null))
               }
             }
           }

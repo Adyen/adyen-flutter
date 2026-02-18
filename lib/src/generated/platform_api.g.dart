@@ -2591,8 +2591,8 @@ class CheckoutPlatformInterface {
     }
   }
 
-  Future<SessionDTO> setup(SessionResponseDTO sessionResponseDTO, CheckoutConfigurationDTO checkoutConfigurationDTO) async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.setup$pigeonVar_messageChannelSuffix';
+  Future<SessionDTO> setupSession(SessionResponseDTO sessionResponseDTO, CheckoutConfigurationDTO checkoutConfigurationDTO) async {
+    final String pigeonVar_channelName = 'dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.setupSession$pigeonVar_messageChannelSuffix';
     final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
@@ -2616,6 +2616,29 @@ class CheckoutPlatformInterface {
       );
     } else {
       return (pigeonVar_replyList[0] as SessionDTO?)!;
+    }
+  }
+
+  Future<void> setupAdvanced(String paymentMethodsResponse, CheckoutConfigurationDTO checkoutConfigurationDTO) async {
+    final String pigeonVar_channelName = 'dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.setupAdvanced$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[paymentMethodsResponse, checkoutConfigurationDTO]);
+    final List<Object?>? pigeonVar_replyList =
+        await pigeonVar_sendFuture as List<Object?>?;
+    if (pigeonVar_replyList == null) {
+      throw _createConnectionError(pigeonVar_channelName);
+    } else if (pigeonVar_replyList.length > 1) {
+      throw PlatformException(
+        code: pigeonVar_replyList[0]! as String,
+        message: pigeonVar_replyList[1] as String?,
+        details: pigeonVar_replyList[2],
+      );
+    } else {
+      return;
     }
   }
 

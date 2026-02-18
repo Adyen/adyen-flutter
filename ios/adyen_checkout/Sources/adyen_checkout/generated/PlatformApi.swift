@@ -2027,7 +2027,8 @@ class PlatformApiPigeonCodec: FlutterStandardMessageCodec, @unchecked Sendable {
 /// Generated protocol from Pigeon that represents a handler of messages from Flutter.
 protocol CheckoutPlatformInterface {
   func getReturnUrl(completion: @escaping (Result<String, Error>) -> Void)
-  func setup(sessionResponseDTO: SessionResponseDTO, checkoutConfigurationDTO: CheckoutConfigurationDTO, completion: @escaping (Result<SessionDTO, Error>) -> Void)
+  func setupSession(sessionResponseDTO: SessionResponseDTO, checkoutConfigurationDTO: CheckoutConfigurationDTO, completion: @escaping (Result<SessionDTO, Error>) -> Void)
+  func setupAdvanced(paymentMethodsResponse: String, checkoutConfigurationDTO: CheckoutConfigurationDTO, completion: @escaping (Result<Void, Error>) -> Void)
   func createSession(sessionId: String, sessionData: String, configuration: Any?, completion: @escaping (Result<SessionDTO, Error>) -> Void)
   func clearSession() throws
   func encryptCard(unencryptedCardDTO: UnencryptedCardDTO, publicKey: String, completion: @escaping (Result<EncryptedCardDTO, Error>) -> Void)
@@ -2060,13 +2061,13 @@ class CheckoutPlatformInterfaceSetup {
     } else {
       getReturnUrlChannel.setMessageHandler(nil)
     }
-    let setupChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.setup\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    let setupSessionChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.setupSession\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {
-      setupChannel.setMessageHandler { message, reply in
+      setupSessionChannel.setMessageHandler { message, reply in
         let args = message as! [Any?]
         let sessionResponseDTOArg = args[0] as! SessionResponseDTO
         let checkoutConfigurationDTOArg = args[1] as! CheckoutConfigurationDTO
-        api.setup(sessionResponseDTO: sessionResponseDTOArg, checkoutConfigurationDTO: checkoutConfigurationDTOArg) { result in
+        api.setupSession(sessionResponseDTO: sessionResponseDTOArg, checkoutConfigurationDTO: checkoutConfigurationDTOArg) { result in
           switch result {
           case .success(let res):
             reply(wrapResult(res))
@@ -2076,7 +2077,25 @@ class CheckoutPlatformInterfaceSetup {
         }
       }
     } else {
-      setupChannel.setMessageHandler(nil)
+      setupSessionChannel.setMessageHandler(nil)
+    }
+    let setupAdvancedChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.setupAdvanced\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      setupAdvancedChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let paymentMethodsResponseArg = args[0] as! String
+        let checkoutConfigurationDTOArg = args[1] as! CheckoutConfigurationDTO
+        api.setupAdvanced(paymentMethodsResponse: paymentMethodsResponseArg, checkoutConfigurationDTO: checkoutConfigurationDTOArg) { result in
+          switch result {
+          case .success:
+            reply(wrapResult(nil))
+          case .failure(let error):
+            reply(wrapError(error))
+          }
+        }
+      }
+    } else {
+      setupAdvancedChannel.setMessageHandler(nil)
     }
     let createSessionChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.createSession\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {

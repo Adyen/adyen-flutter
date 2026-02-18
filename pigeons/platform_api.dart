@@ -688,8 +688,14 @@ abstract class CheckoutPlatformInterface {
   String getReturnUrl();
 
   @async
-  SessionDTO setup(
+  SessionDTO setupSession(
     SessionResponseDTO sessionResponseDTO,
+    CheckoutConfigurationDTO checkoutConfigurationDTO,
+  );
+
+  @async
+  void setupAdvanced(
+    String paymentMethodsResponse,
     CheckoutConfigurationDTO checkoutConfigurationDTO,
   );
 

@@ -32,7 +32,7 @@ abstract class BaseComponent(
     internal val paymentMethodString = creationParams[PAYMENT_METHOD_KEY] as String? ?: ""
     internal val componentId = creationParams[COMPONENT_ID_KEY] as String? ?: ""
     internal val isStoredPaymentMethod = creationParams[IS_STORED_PAYMENT_METHOD_KEY] as Boolean? ?: false
-    private val dynamicComponentView = DynamicComponentView(activity, componentFlutterApi, componentId)
+    internal val dynamicComponentView = DynamicComponentView(activity, componentFlutterApi, componentId)
     internal val checkoutConfiguration = configuration.toCheckoutConfiguration()
     internal var cardComponent: CardComponent? = null
 
@@ -42,14 +42,6 @@ abstract class BaseComponent(
         dynamicComponentView.onDispose()
         cardComponent = null
         onDispose(componentId)
-    }
-
-    fun addV6Component(
-        paymentMethod: PaymentMethod,
-        checkoutContext: CheckoutContext,
-        callbacks: CheckoutCallbacks
-    ) {
-        dynamicComponentView.addV6Component(paymentMethod, checkoutContext, callbacks)
     }
 
     fun setCurrentCardComponent() = setComponent(this)
