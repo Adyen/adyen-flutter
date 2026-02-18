@@ -40,7 +40,7 @@ adyen-flutter/
 
 ## Planning Flutter Features
 
-- **[Write the plan in Obsidian]** Store implementation plans in the appropriate plan folder.
+- **[Write the plan]** Store implementation plans in the appropriate plan folder.
 - **[Problem statement + non-goals]** Start the plan with a short problem statement and explicit
   non-goals/out-of-scope.
 - **[Public API sketch first]** Define the intended Dart-facing API early (types + a short usage
@@ -48,6 +48,7 @@ adyen-flutter/
 - **[Ownership + data flow]** Decide and document what happens in Flutter vs native.
 - **[Acceptance criteria]** Add a small checklist of observable behaviors, including
   backwards-compat expectations ("when omitted, existing behavior is unchanged").
+- **[Clarify unknowns]** Ask questions when requirements are unclear instead of making assumptions.
 - **[Phase-based delivery]** Break work into phases that can be completed and validated
   independently. A good default for cross-platform features is:
     - **[Flutter models]** Public Dart API models.
