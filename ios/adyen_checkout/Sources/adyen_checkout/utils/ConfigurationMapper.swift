@@ -351,48 +351,36 @@ extension ThreeDS2ConfigurationDTO {
 extension ThreeDS2UICustomizationDTO {
     func toAppearanceConfiguration() -> ADYAppearanceConfiguration {
         let configuration = ADYAppearanceConfiguration()
-
         if let screenCustomization {
             screenCustomization.apply(to: configuration)
         }
-        
         if let headingCustomization {
             headingCustomization.apply(to: configuration)
         }
-
         if let labelCustomization {
             labelCustomization.apply(to: configuration)
         }
-
         if let inputCustomization {
             inputCustomization.apply(to: configuration)
         }
-
         if let selectionItemCustomization {
             selectionItemCustomization.apply(to: configuration)
         }
-
-        // Primary group: submit / continue / next
         primaryButtonCustomization?.apply(to: configuration, buttonType: .submit)
         primaryButtonCustomization?.apply(to: configuration, buttonType: .continue)
         primaryButtonCustomization?.apply(to: configuration, buttonType: .next)
-
-        // Secondary group: cancel / resend / OOB
         secondaryButtonCustomization?.apply(to: configuration, buttonType: .cancel)
         secondaryButtonCustomization?.apply(to: configuration, buttonType: .resend)
         secondaryButtonCustomization?.apply(to: configuration, buttonType: .OOB)
-
         return configuration
     }
 }
 
 extension ThreeDS2ScreenCustomizationDTO {
     func apply(to configuration: ADYAppearanceConfiguration) {
-        // Apply screen background color
         if let backgroundColor, let bgColor = UIColor(hex: backgroundColor) {
             configuration.backgroundColor = bgColor
         }
-        
         // Apply general text styling as fallback for labels
         if let textColor, let textUIColor = UIColor(hex: textColor) {
             configuration.textColor = textUIColor
@@ -400,7 +388,6 @@ extension ThreeDS2ScreenCustomizationDTO {
             configuration.infoAppearance.headingTextColor = textUIColor
             configuration.infoAppearance.textColor = textUIColor
         }
-        
     }
 }
 
