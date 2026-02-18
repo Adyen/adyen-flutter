@@ -40,11 +40,10 @@ class DropInScreen extends StatelessWidget {
 
   Future<void> startDropInSessions(BuildContext context) async {
     try {
-      final theme = Theme.of(context);
       final Map<String, dynamic> sessionResponse =
           await repository.fetchSession();
       final DropInConfiguration dropInConfiguration =
-          await _createDropInConfiguration(theme);
+          await _createDropInConfiguration();
 
       final SessionCheckout sessionCheckout =
           await AdyenCheckout.session.create(
@@ -69,9 +68,8 @@ class DropInScreen extends StatelessWidget {
 
   Future<void> startDropInAdvancedFlow(BuildContext context) async {
     try {
-      final theme = Theme.of(context);
       final paymentMethodsResponse = await repository.fetchPaymentMethods();
-      final dropInConfiguration = await _createDropInConfiguration(theme);
+      final dropInConfiguration = await _createDropInConfiguration();
       final advancedCheckout = AdvancedCheckout(
         onSubmit: repository.onSubmit,
         onAdditionalDetails: repository.onAdditionalDetails,
@@ -96,8 +94,7 @@ class DropInScreen extends StatelessWidget {
     }
   }
 
-  Future<DropInConfiguration> _createDropInConfiguration(
-      ThemeData theme) async {
+  Future<DropInConfiguration> _createDropInConfiguration() async {
     CardConfiguration cardsConfiguration = CardConfiguration(
       onBinLookup: _onBinLookup,
       onBinValue: _onBinValue,

@@ -82,7 +82,7 @@ final configuration = DropInConfiguration(
 - All properties are optional. Null values fall back to the native SDK defaults.
 - Sizes are `double` in Flutter and are rounded when mapped to native SDKs.
 - Colors are converted to `#AARRGGBB` hex strings to preserve alpha.
-- `backgroundColor` affects Android; iOS uses native defaults for the screen.
+- `backgroundColor` affects both Android and iOS challenge screens.
 - `headingTitle` allows customization of the 3DS2 challenge screen heading.
 - `requestorAppURL` enables deep linking back to your app after 3DS2 completion.
 - `cancelButtonColor` in `Adyen3DSHeaderTheme` is iOS-only.
@@ -102,17 +102,11 @@ final configuration = DropInConfiguration(
 - `headerTheme`: Customization for the challenge screen header
 - `descriptionTheme`: Styling for description text and titles
 - `inputDecorationTheme`: Text input field styling
-- `primaryButtonTheme`: Submit/continue button styling
-- `secondaryButtonTheme`: Cancel/resend button styling
+- `primaryButtonTheme`: Submit/continue/next button styling
+- `secondaryButtonTheme`: Cancel/resend/out-of-band button styling
 - `selectionItemTheme`: Radio/selection item styling
 
 ### Platform-Specific Notes
 
-**Android:**
-- `backgroundColor` is applied to the challenge screen background
-- All theme properties are supported
-
 **iOS:**
-- Uses native system background color (ignores `backgroundColor`)
 - `cancelButtonColor` in header theme is iOS-specific
-- All other theme properties are supported

@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 /// platform-specific native SDK customization options.
 final class Adyen3DSTheme {
   final Color? textColor; // Primary text (labels)
-  final Color? backgroundColor; // Screen background (only on Android)
+  final Color? backgroundColor; // Screen background
 
   // Header
   final Adyen3DSHeaderTheme? headerTheme;
@@ -17,11 +17,10 @@ final class Adyen3DSTheme {
   // Inputs
   final Adyen3DSInputDecorationTheme? inputDecorationTheme;
 
-  // Grouped button themes
-  // Primary applies to submit/continue/next (and OOB if available)
+  // Primary applies to submit/continue/next
   final Adyen3DSButtonTheme? primaryButtonTheme;
 
-  // Secondary applies to cancel/resend
+  // Secondary applies to cancel/resend/oob
   final Adyen3DSButtonTheme? secondaryButtonTheme;
 
   // Selection items (e.g., switches / radio rows)
@@ -135,7 +134,6 @@ final class Adyen3DSHeaderTheme {
   });
 }
 
-/// Optional per-button overrides.
 final class Adyen3DSButtonTheme {
   final Color? backgroundColor;
   final Color? textColor;
