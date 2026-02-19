@@ -1,6 +1,5 @@
 package com.adyen.checkout.flutter.components.view
 
-import android.content.ComponentCallbacks
 import android.content.Context
 import android.util.AttributeSet
 import android.view.ViewGroup
@@ -8,7 +7,6 @@ import android.view.ViewTreeObserver
 import android.widget.FrameLayout
 import androidx.activity.ComponentActivity
 import androidx.appcompat.widget.SwitchCompat
-import androidx.compose.material3.Text
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.core.content.ContextCompat
@@ -36,18 +34,16 @@ class DynamicComponentView
         defStyle: Int = 0,
     ) : FrameLayout(context) {
         private val screenDensity = resources.displayMetrics.density
-        private var activity: ComponentActivity? = null
         private var componentFlutterApi: ComponentFlutterInterface? = null
         private var componentId: String = ""
         private var ignoreLayoutChanges = false
         private var interactionBlocked = false
 
         constructor(
-            componentActivity: ComponentActivity,
+            context: Context,
             componentFlutterApi: ComponentFlutterInterface,
             componentId: String
-        ) : this(componentActivity) {
-            this.activity = componentActivity
+        ) : this(context) {
             this.componentFlutterApi = componentFlutterApi
             this.componentId = componentId
         }
@@ -110,7 +106,7 @@ class DynamicComponentView
         }
 
         fun onDispose() {
-            activity = null
+//            activity = null
             componentFlutterApi = null
             ignoreLayoutChanges = false
             interactionBlocked = false

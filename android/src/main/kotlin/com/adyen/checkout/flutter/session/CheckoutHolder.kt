@@ -3,9 +3,9 @@ package com.adyen.checkout.flutter.session
 import com.adyen.checkout.core.common.CheckoutContext
 import org.json.JSONObject
 
-class SessionHolder(
+class CheckoutHolder(
     var sessionSetupResponse: JSONObject = JSONObject(),
-    var sessionCheckout: CheckoutContext.Sessions? = null
+    var checkoutContext: CheckoutContext? = null
 ) {
     fun reset() {
         sessionSetupResponse = JSONObject()

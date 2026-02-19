@@ -7,12 +7,13 @@ import androidx.lifecycle.LifecycleEventObserver
 import com.adyen.checkout.dropin.old.DropIn
 import com.adyen.checkout.flutter.components.ComponentPlatformApi
 import com.adyen.checkout.flutter.dropIn.DropInPlatformApi
+import com.adyen.checkout.flutter.generated.AdyenFlutterInterface
 import com.adyen.checkout.flutter.generated.CheckoutFlutterInterface
 import com.adyen.checkout.flutter.generated.CheckoutPlatformInterface
 import com.adyen.checkout.flutter.generated.ComponentFlutterInterface
 import com.adyen.checkout.flutter.generated.ComponentPlatformInterface
 import com.adyen.checkout.flutter.generated.DropInPlatformInterface
-import com.adyen.checkout.flutter.session.SessionHolder
+import com.adyen.checkout.flutter.session.CheckoutHolder
 import com.adyen.checkout.flutter.utils.Constants.Companion.WRONG_FLUTTER_ACTIVITY_USAGE_ERROR_MESSAGE
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.embedding.engine.plugins.FlutterPlugin.FlutterPluginBinding
@@ -32,9 +33,11 @@ class AdyenCheckoutPlugin :
     private var checkoutFlutter: CheckoutFlutterInterface? = null
     private var dropInPlatformApi: DropInPlatformApi? = null
     private var componentFlutterApi: ComponentFlutterInterface? = null
+
+    private var adyenFlutterInterface: AdyenFlutterInterface? = null
     private var componentPlatformApi: ComponentPlatformApi? = null
     private var lifecycleObserver: LifecycleEventObserver? = null
-    private var sessionHolder: SessionHolder = SessionHolder()
+    private var checkoutHolder: CheckoutHolder = CheckoutHolder()
 
     override fun onAttachedToEngine(flutterPluginBinding: FlutterPluginBinding) {
         this.flutterPluginBinding = flutterPluginBinding
@@ -74,7 +77,7 @@ class AdyenCheckoutPlugin :
         fragmentActivity: FragmentActivity,
         binaryMessenger: BinaryMessenger,
     ) {
-        checkoutPlatformApi = CheckoutPlatformApi(fragmentActivity, sessionHolder)
+        checkoutPlatformApi = CheckoutPlatformApi(fragmentActivity, checkoutHolder)
         CheckoutPlatformInterface.setUp(binaryMessenger, checkoutPlatformApi)
     }
 
@@ -84,7 +87,7 @@ class AdyenCheckoutPlugin :
     ) {
         checkoutFlutter =
             CheckoutFlutterInterface(binaryMessenger).apply {
-                dropInPlatformApi = DropInPlatformApi(this, fragmentActivity, sessionHolder)
+                dropInPlatformApi = DropInPlatformApi(this, fragmentActivity, checkoutHolder)
                 DropInPlatformInterface.setUp(binaryMessenger, dropInPlatformApi)
             }
 
@@ -98,11 +101,16 @@ class AdyenCheckoutPlugin :
         fragmentActivity: FragmentActivity,
         binaryMessenger: BinaryMessenger
     ) {
-        componentFlutterApi =
-            ComponentFlutterInterface(binaryMessenger).apply {
-                componentPlatformApi = ComponentPlatformApi(fragmentActivity, sessionHolder, this, flutterPluginBinding)
-                ComponentPlatformInterface.setUp(binaryMessenger, componentPlatformApi)
-            }
+        componentFlutterApi = ComponentFlutterInterface(binaryMessenger)
+        adyenFlutterInterface = AdyenFlutterInterface(binaryMessenger)
+        componentPlatformApi = ComponentPlatformApi(
+            fragmentActivity,
+            checkoutHolder,
+            componentFlutterApi!!,
+            adyenFlutterInterface!!,
+            flutterPluginBinding
+        )
+        ComponentPlatformInterface.setUp(binaryMessenger, componentPlatformApi)
     }
 
     private fun createLifecycleEventObserver(fragmentActivity: FragmentActivity): LifecycleEventObserver =

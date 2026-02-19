@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:adyen_checkout/src/common/model/payment_event.dart';
 import 'package:adyen_checkout/src/generated/platform_api.g.dart';
 import 'package:adyen_checkout/src/util/constants.dart';
@@ -28,6 +30,15 @@ class PaymentEventHandler {
             Constants.orderKey: paymentEvent.orderJson,
           },
         ),
+    };
+  }
+
+  CheckoutResultDTO mapToCheckoutResultDTO(PaymentEvent paymentEvent) {
+    return switch (paymentEvent) {
+      Finished() => FinishedResultDTO(resultCode: paymentEvent.resultCode),
+      Action() => ActionResultDTO(actionResponse: jsonEncode(paymentEvent.actionResponse)),
+      Error() => ErrorResultDTO(errorMessage: paymentEvent.errorMessage ?? ''), //TODO add error fallback
+      Update() => throw UnsupportedError('Update cannot be mapped to CheckoutResultDTO'),
     };
   }
 }

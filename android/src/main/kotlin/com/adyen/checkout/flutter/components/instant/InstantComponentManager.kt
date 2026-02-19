@@ -4,7 +4,6 @@ import androidx.fragment.app.FragmentActivity
 import com.adyen.checkout.action.core.internal.ActionHandlingComponent
 import com.adyen.checkout.components.core.ActionHandlingMethod
 import com.adyen.checkout.components.core.CheckoutConfiguration
-import com.adyen.checkout.components.core.Order
 import com.adyen.checkout.components.core.PaymentComponentState
 import com.adyen.checkout.components.core.PaymentMethod
 import com.adyen.checkout.components.core.PaymentMethodTypes
@@ -17,8 +16,7 @@ import com.adyen.checkout.flutter.generated.ComponentFlutterInterface
 import com.adyen.checkout.flutter.generated.InstantPaymentConfigurationDTO
 import com.adyen.checkout.flutter.generated.PaymentResultDTO
 import com.adyen.checkout.flutter.generated.PaymentResultEnum
-import com.adyen.checkout.flutter.generated.TwintConfigurationDTO
-import com.adyen.checkout.flutter.session.SessionHolder
+import com.adyen.checkout.flutter.session.CheckoutHolder
 import com.adyen.checkout.flutter.utils.ConfigurationMapper.toCheckoutConfiguration
 import com.adyen.checkout.flutter.utils.Constants
 import com.adyen.checkout.flutter.utils.Constants.Companion.UNKNOWN_PAYMENT_METHOD_TYPE_ERROR_MESSAGE
@@ -34,7 +32,7 @@ import java.util.UUID
 
 class InstantComponentManager(
     private val activity: FragmentActivity,
-    private val sessionHolder: SessionHolder,
+    private val checkoutHolder: CheckoutHolder,
     private val componentFlutterInterface: ComponentFlutterInterface,
     private val assignCurrentComponent: (ActionHandlingComponent?) -> Unit,
     private val onAction: (Action) -> Unit,
@@ -225,7 +223,7 @@ class InstantComponentManager(
     }
 
     private fun createCheckoutSession(configuration: CheckoutConfiguration): CheckoutSession {
-        val sessionSetupResponse = SessionSetupResponse.SERIALIZER.deserialize(sessionHolder.sessionSetupResponse)
+        val sessionSetupResponse = SessionSetupResponse.SERIALIZER.deserialize(checkoutHolder.sessionSetupResponse)
 //        val order = sessionHolder.orderResponse?.let { Order.SERIALIZER.deserialize(it) }
         return CheckoutSession(
             sessionSetupResponse = sessionSetupResponse,

@@ -1202,6 +1202,95 @@ data class OrderResponseDTO (
   override fun hashCode(): Int = toList().hashCode()
 }
 
+/**
+ * Generated class from Pigeon that represents data sent in messages.
+ * This class should not be extended by any user class outside of the generated file.
+ */
+sealed class CheckoutResultDTO 
+/** Generated class from Pigeon that represents data sent in messages. */
+data class FinishedResultDTO (
+  val resultCode: String
+) : CheckoutResultDTO()
+ {
+  companion object {
+    fun fromList(pigeonVar_list: List<Any?>): FinishedResultDTO {
+      val resultCode = pigeonVar_list[0] as String
+      return FinishedResultDTO(resultCode)
+    }
+  }
+  fun toList(): List<Any?> {
+    return listOf(
+      resultCode,
+    )
+  }
+  override fun equals(other: Any?): Boolean {
+    if (other !is FinishedResultDTO) {
+      return false
+    }
+    if (this === other) {
+      return true
+    }
+    return PlatformApiPigeonUtils.deepEquals(toList(), other.toList())  }
+
+  override fun hashCode(): Int = toList().hashCode()
+}
+
+/** Generated class from Pigeon that represents data sent in messages. */
+data class ActionResultDTO (
+  val actionResponse: String
+) : CheckoutResultDTO()
+ {
+  companion object {
+    fun fromList(pigeonVar_list: List<Any?>): ActionResultDTO {
+      val actionResponse = pigeonVar_list[0] as String
+      return ActionResultDTO(actionResponse)
+    }
+  }
+  fun toList(): List<Any?> {
+    return listOf(
+      actionResponse,
+    )
+  }
+  override fun equals(other: Any?): Boolean {
+    if (other !is ActionResultDTO) {
+      return false
+    }
+    if (this === other) {
+      return true
+    }
+    return PlatformApiPigeonUtils.deepEquals(toList(), other.toList())  }
+
+  override fun hashCode(): Int = toList().hashCode()
+}
+
+/** Generated class from Pigeon that represents data sent in messages. */
+data class ErrorResultDTO (
+  val errorMessage: String
+) : CheckoutResultDTO()
+ {
+  companion object {
+    fun fromList(pigeonVar_list: List<Any?>): ErrorResultDTO {
+      val errorMessage = pigeonVar_list[0] as String
+      return ErrorResultDTO(errorMessage)
+    }
+  }
+  fun toList(): List<Any?> {
+    return listOf(
+      errorMessage,
+    )
+  }
+  override fun equals(other: Any?): Boolean {
+    if (other !is ErrorResultDTO) {
+      return false
+    }
+    if (this === other) {
+      return true
+    }
+    return PlatformApiPigeonUtils.deepEquals(toList(), other.toList())  }
+
+  override fun hashCode(): Int = toList().hashCode()
+}
+
 /** Generated class from Pigeon that represents data sent in messages. */
 data class CheckoutEvent (
   val type: CheckoutEventType,
@@ -1260,6 +1349,40 @@ data class ComponentCommunicationModel (
   }
   override fun equals(other: Any?): Boolean {
     if (other !is ComponentCommunicationModel) {
+      return false
+    }
+    if (this === other) {
+      return true
+    }
+    return PlatformApiPigeonUtils.deepEquals(toList(), other.toList())  }
+
+  override fun hashCode(): Int = toList().hashCode()
+}
+
+/** Generated class from Pigeon that represents data sent in messages. */
+data class PlatformCommunicationDTO (
+  val type: ComponentCommunicationType,
+  val componentId: String,
+  val dataJson: String? = null
+)
+ {
+  companion object {
+    fun fromList(pigeonVar_list: List<Any?>): PlatformCommunicationDTO {
+      val type = pigeonVar_list[0] as ComponentCommunicationType
+      val componentId = pigeonVar_list[1] as String
+      val dataJson = pigeonVar_list[2] as String?
+      return PlatformCommunicationDTO(type, componentId, dataJson)
+    }
+  }
+  fun toList(): List<Any?> {
+    return listOf(
+      type,
+      componentId,
+      dataJson,
+    )
+  }
+  override fun equals(other: Any?): Boolean {
+    if (other !is PlatformCommunicationDTO) {
       return false
     }
     if (this === other) {
@@ -1879,65 +2002,85 @@ private open class PlatformApiPigeonCodec : StandardMessageCodec() {
       }
       168.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          CheckoutEvent.fromList(it)
+          FinishedResultDTO.fromList(it)
         }
       }
       169.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          ComponentCommunicationModel.fromList(it)
+          ActionResultDTO.fromList(it)
         }
       }
       170.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          PaymentEventDTO.fromList(it)
+          ErrorResultDTO.fromList(it)
         }
       }
       171.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          ErrorDTO.fromList(it)
+          CheckoutEvent.fromList(it)
         }
       }
       172.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          DeletedStoredPaymentMethodResultDTO.fromList(it)
+          ComponentCommunicationModel.fromList(it)
         }
       }
       173.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          CardComponentConfigurationDTO.fromList(it)
+          PlatformCommunicationDTO.fromList(it)
         }
       }
       174.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          InstantPaymentConfigurationDTO.fromList(it)
+          PaymentEventDTO.fromList(it)
         }
       }
       175.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          InstantPaymentSetupResultDTO.fromList(it)
+          ErrorDTO.fromList(it)
         }
       }
       176.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          UnencryptedCardDTO.fromList(it)
+          DeletedStoredPaymentMethodResultDTO.fromList(it)
         }
       }
       177.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          EncryptedCardDTO.fromList(it)
+          CardComponentConfigurationDTO.fromList(it)
         }
       }
       178.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          ActionComponentConfigurationDTO.fromList(it)
+          InstantPaymentConfigurationDTO.fromList(it)
         }
       }
       179.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          OrderCancelResultDTO.fromList(it)
+          InstantPaymentSetupResultDTO.fromList(it)
         }
       }
       180.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          UnencryptedCardDTO.fromList(it)
+        }
+      }
+      181.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          EncryptedCardDTO.fromList(it)
+        }
+      }
+      182.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          ActionComponentConfigurationDTO.fromList(it)
+        }
+      }
+      183.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          OrderCancelResultDTO.fromList(it)
+        }
+      }
+      184.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
           BinLookupDataDTO.fromList(it)
         }
@@ -2103,56 +2246,72 @@ private open class PlatformApiPigeonCodec : StandardMessageCodec() {
         stream.write(167)
         writeValue(stream, value.toList())
       }
-      is CheckoutEvent -> {
+      is FinishedResultDTO -> {
         stream.write(168)
         writeValue(stream, value.toList())
       }
-      is ComponentCommunicationModel -> {
+      is ActionResultDTO -> {
         stream.write(169)
         writeValue(stream, value.toList())
       }
-      is PaymentEventDTO -> {
+      is ErrorResultDTO -> {
         stream.write(170)
         writeValue(stream, value.toList())
       }
-      is ErrorDTO -> {
+      is CheckoutEvent -> {
         stream.write(171)
         writeValue(stream, value.toList())
       }
-      is DeletedStoredPaymentMethodResultDTO -> {
+      is ComponentCommunicationModel -> {
         stream.write(172)
         writeValue(stream, value.toList())
       }
-      is CardComponentConfigurationDTO -> {
+      is PlatformCommunicationDTO -> {
         stream.write(173)
         writeValue(stream, value.toList())
       }
-      is InstantPaymentConfigurationDTO -> {
+      is PaymentEventDTO -> {
         stream.write(174)
         writeValue(stream, value.toList())
       }
-      is InstantPaymentSetupResultDTO -> {
+      is ErrorDTO -> {
         stream.write(175)
         writeValue(stream, value.toList())
       }
-      is UnencryptedCardDTO -> {
+      is DeletedStoredPaymentMethodResultDTO -> {
         stream.write(176)
         writeValue(stream, value.toList())
       }
-      is EncryptedCardDTO -> {
+      is CardComponentConfigurationDTO -> {
         stream.write(177)
         writeValue(stream, value.toList())
       }
-      is ActionComponentConfigurationDTO -> {
+      is InstantPaymentConfigurationDTO -> {
         stream.write(178)
         writeValue(stream, value.toList())
       }
-      is OrderCancelResultDTO -> {
+      is InstantPaymentSetupResultDTO -> {
         stream.write(179)
         writeValue(stream, value.toList())
       }
-      is BinLookupDataDTO -> {
+      is UnencryptedCardDTO -> {
         stream.write(180)
+        writeValue(stream, value.toList())
+      }
+      is EncryptedCardDTO -> {
+        stream.write(181)
+        writeValue(stream, value.toList())
+      }
+      is ActionComponentConfigurationDTO -> {
+        stream.write(182)
+        writeValue(stream, value.toList())
+      }
+      is OrderCancelResultDTO -> {
+        stream.write(183)
+        writeValue(stream, value.toList())
+      }
+      is BinLookupDataDTO -> {
+        stream.write(184)
         writeValue(stream, value.toList())
       }
       else -> super.writeValue(stream, value)
@@ -2836,6 +2995,55 @@ class ComponentFlutterInterface(private val binaryMessenger: BinaryMessenger, pr
           callback(Result.failure(AdyenPigeonError(it[0] as String, it[1] as String, it[2] as String?)))
         } else {
           callback(Result.success(Unit))
+        }
+      } else {
+        callback(Result.failure(PlatformApiPigeonUtils.createConnectionError(channelName)))
+      } 
+    }
+  }
+}
+/** Generated class from Pigeon that represents Flutter messages that can be called from Kotlin. */
+class AdyenFlutterInterface(private val binaryMessenger: BinaryMessenger, private val messageChannelSuffix: String = "") {
+  companion object {
+    /** The codec used by AdyenFlutterInterface. */
+    val codec: MessageCodec<Any?> by lazy {
+      PlatformApiPigeonCodec()
+    }
+  }
+  fun onSubmit(paymentCommunicationModelArg: PlatformCommunicationDTO, callback: (Result<CheckoutResultDTO>) -> Unit)
+{
+    val separatedMessageChannelSuffix = if (messageChannelSuffix.isNotEmpty()) ".$messageChannelSuffix" else ""
+    val channelName = "dev.flutter.pigeon.adyen_checkout.AdyenFlutterInterface.onSubmit$separatedMessageChannelSuffix"
+    val channel = BasicMessageChannel<Any?>(binaryMessenger, channelName, codec)
+    channel.send(listOf(paymentCommunicationModelArg)) {
+      if (it is List<*>) {
+        if (it.size > 1) {
+          callback(Result.failure(AdyenPigeonError(it[0] as String, it[1] as String, it[2] as String?)))
+        } else if (it[0] == null) {
+          callback(Result.failure(AdyenPigeonError("null-error", "Flutter api returned null value for non-null return value.", "")))
+        } else {
+          val output = it[0] as CheckoutResultDTO
+          callback(Result.success(output))
+        }
+      } else {
+        callback(Result.failure(PlatformApiPigeonUtils.createConnectionError(channelName)))
+      } 
+    }
+  }
+  fun onAdditionalDetails(paymentCommunicationModelArg: PlatformCommunicationDTO, callback: (Result<CheckoutResultDTO>) -> Unit)
+{
+    val separatedMessageChannelSuffix = if (messageChannelSuffix.isNotEmpty()) ".$messageChannelSuffix" else ""
+    val channelName = "dev.flutter.pigeon.adyen_checkout.AdyenFlutterInterface.onAdditionalDetails$separatedMessageChannelSuffix"
+    val channel = BasicMessageChannel<Any?>(binaryMessenger, channelName, codec)
+    channel.send(listOf(paymentCommunicationModelArg)) {
+      if (it is List<*>) {
+        if (it.size > 1) {
+          callback(Result.failure(AdyenPigeonError(it[0] as String, it[1] as String, it[2] as String?)))
+        } else if (it[0] == null) {
+          callback(Result.failure(AdyenPigeonError("null-error", "Flutter api returned null value for non-null return value.", "")))
+        } else {
+          val output = it[0] as CheckoutResultDTO
+          callback(Result.success(output))
         }
       } else {
         callback(Result.failure(PlatformApiPigeonUtils.createConnectionError(channelName)))

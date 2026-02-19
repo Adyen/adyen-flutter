@@ -24,13 +24,11 @@ import com.adyen.checkout.flutter.generated.InstantPaymentType
 import com.adyen.checkout.flutter.generated.SessionDTO
 import com.adyen.checkout.flutter.generated.SessionResponseDTO
 import com.adyen.checkout.flutter.generated.UnencryptedCardDTO
-import com.adyen.checkout.flutter.session.SessionHolder
+import com.adyen.checkout.flutter.session.CheckoutHolder
 import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToSessionResponse
 import com.adyen.checkout.flutter.utils.ConfigurationMapper.toCheckoutConfiguration
 import com.adyen.checkout.flutter.utils.PlatformException
 import com.adyen.checkout.redirect.old.RedirectComponent
-import com.adyen.checkout.flutter.utils.ConfigurationMapper.toCheckoutConfiguration
-import com.adyen.checkout.sessions.core.CheckoutSessionProvider
 import com.adyen.checkout.sessions.core.CheckoutSessionResult
 import com.adyen.checkout.sessions.core.SessionModel
 import com.adyen.checkout.sessions.core.SessionSetupResponse
@@ -40,7 +38,7 @@ import kotlinx.coroutines.launch
 
 class CheckoutPlatformApi(
     private val activity: FragmentActivity,
-    private val sessionHolder: SessionHolder,
+    private val checkoutHolder: CheckoutHolder,
 ) : CheckoutPlatformInterface {
     override fun getReturnUrl(callback: (Result<String>) -> Unit) {
         callback(Result.success(RedirectComponent.getReturnUrl(activity.applicationContext)))
@@ -86,7 +84,31 @@ class CheckoutPlatformApi(
         checkoutConfigurationDTO: CheckoutConfigurationDTO,
         callback: (Result<Unit>) -> Unit
     ) {
-        TODO("Not yet implemented")
+        activity.lifecycleScope.launch(Dispatchers.IO) {
+            try {
+                val paymentMethods = PaymentMethodsApiResponse.SERIALIZER.deserialize(
+                    org.json.JSONObject(paymentMethodsResponse)
+                )
+                val checkoutConfiguration = checkoutConfigurationDTO.toCheckoutConfiguration()
+                val checkoutResult = Checkout.setup(
+                    paymentMethodsApiResponse = paymentMethods,
+                    configuration = checkoutConfiguration
+                )
+
+                when (checkoutResult) {
+                    is Checkout.Result.Error -> callback(
+                        Result.failure(PlatformException(checkoutResult.error.message ?: "Checkout setup failed."))
+                    )
+
+                    is Checkout.Result.Success -> {
+                        checkoutHolder.checkoutContext = checkoutResult.checkoutContext
+                        callback(Result.success(Unit))
+                    }
+                }
+            } catch (exception: Exception) {
+                callback(Result.failure(PlatformException(exception.message ?: "Checkout setup failed.")))
+            }
+        }
     }
 
     override fun createSession(
@@ -112,7 +134,7 @@ class CheckoutPlatformApi(
     }
 
     override fun clearSession() {
-        sessionHolder.reset()
+        checkoutHolder.reset()
     }
 
     override fun encryptCard(
@@ -177,7 +199,7 @@ class CheckoutPlatformApi(
                 sessionSetupResponse.paymentMethodsApiResponse?.let {
                     com.adyen.checkout.components.core.PaymentMethodsApiResponse.SERIALIZER.serialize(it)
                 }
-            sessionHolder.sessionSetupResponse = sessionResponse
+            checkoutHolder.sessionSetupResponse = sessionResponse
             callback(
                 Result.success(
                     SessionDTO(
@@ -204,7 +226,7 @@ class CheckoutPlatformApi(
         checkoutSession: CheckoutContext.Sessions,
         callback: (Result<SessionDTO>) -> Unit,
     ) {
-        sessionHolder.sessionCheckout = checkoutSession
+        checkoutHolder.checkoutContext = checkoutSession
         val paymentMethodsJsonObject =
             checkoutSession.checkoutSession.sessionSetupResponse.paymentMethodsApiResponse?.let {
                 PaymentMethodsApiResponse.SERIALIZER.serialize(it)

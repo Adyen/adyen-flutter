@@ -504,6 +504,32 @@ class OrderResponseDTO {
   });
 }
 
+sealed class CheckoutResultDTO {}
+
+class FinishedResultDTO extends CheckoutResultDTO {
+  final String resultCode;
+
+  FinishedResultDTO({
+    required this.resultCode,
+  });
+}
+
+class ActionResultDTO extends CheckoutResultDTO {
+  final String actionResponse;
+
+  ActionResultDTO({
+    required this.actionResponse,
+  });
+}
+
+class ErrorResultDTO extends CheckoutResultDTO {
+  final String errorMessage;
+
+  ErrorResultDTO({
+    required this.errorMessage,
+  });
+}
+
 class CheckoutEvent {
   final CheckoutEventType type;
   final Object? data;
@@ -525,6 +551,18 @@ class ComponentCommunicationModel {
     required this.componentId,
     this.data,
     this.paymentResult,
+  });
+}
+
+class PlatformCommunicationDTO {
+  final ComponentCommunicationType type;
+  final String componentId;
+  final String? dataJson;
+
+  PlatformCommunicationDTO({
+    required this.type,
+    required this.componentId,
+    this.dataJson,
   });
 }
 
@@ -819,4 +857,13 @@ abstract class ComponentFlutterInterface {
 
   void onComponentCommunication(
       ComponentCommunicationModel componentCommunicationModel);
+}
+
+@FlutterApi()
+abstract class AdyenFlutterInterface {
+  @async
+  CheckoutResultDTO onSubmit(PlatformCommunicationDTO paymentCommunicationModel);
+
+  @async
+  CheckoutResultDTO onAdditionalDetails(PlatformCommunicationDTO paymentCommunicationModel);
 }

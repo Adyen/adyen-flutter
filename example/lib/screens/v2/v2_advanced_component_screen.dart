@@ -28,7 +28,7 @@ class V2AdvancedComponentScreen extends StatelessWidget {
       appBar: AppBar(title: const Text('V2 Advanced Component')),
       body: SafeArea(
         child: FutureBuilder<Map<String, dynamic>>(
-          future: repository.fetchPaymentMethods(),
+          future: _fetchPaymentMethodsAndSetupIas(checkoutConfiguration),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const Center(child: CircularProgressIndicator());
@@ -86,5 +86,17 @@ class V2AdvancedComponentScreen extends StatelessWidget {
   void _endPayment(BuildContext context, PaymentResult paymentResult) {
     Navigator.pop(context);
     DialogBuilder.showPaymentResultDialog(paymentResult, context);
+  }
+
+  Future<Map<String, dynamic>> _fetchPaymentMethodsAndSetupIas(
+    CheckoutConfiguration checkoutConfiguration,
+  ) async {
+    final paymentMethods = await repository.fetchPaymentMethods();
+    await AdyenCheckout.advanced.setup(
+      paymentMethods: paymentMethods,
+      checkoutConfiguration: checkoutConfiguration,
+    );
+
+    return paymentMethods;
   }
 }

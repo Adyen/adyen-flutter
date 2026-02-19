@@ -4,7 +4,6 @@ import android.content.Intent
 import androidx.fragment.app.FragmentActivity
 import com.adyen.checkout.action.core.internal.ActionHandlingComponent
 import com.adyen.checkout.components.core.ComponentAvailableCallback
-import com.adyen.checkout.components.core.Order
 import com.adyen.checkout.components.core.PaymentMethod
 import com.adyen.checkout.components.core.PaymentMethodTypes
 import com.adyen.checkout.components.core.action.Action
@@ -13,11 +12,10 @@ import com.adyen.checkout.flutter.components.view.ComponentLoadingBottomSheet
 import com.adyen.checkout.flutter.generated.ComponentCommunicationModel
 import com.adyen.checkout.flutter.generated.ComponentCommunicationType
 import com.adyen.checkout.flutter.generated.ComponentFlutterInterface
-import com.adyen.checkout.flutter.generated.Environment
 import com.adyen.checkout.flutter.generated.InstantPaymentConfigurationDTO
 import com.adyen.checkout.flutter.generated.InstantPaymentSetupResultDTO
 import com.adyen.checkout.flutter.generated.InstantPaymentType
-import com.adyen.checkout.flutter.session.SessionHolder
+import com.adyen.checkout.flutter.session.CheckoutHolder
 import com.adyen.checkout.flutter.utils.ConfigurationMapper.toCheckoutConfiguration
 import com.adyen.checkout.flutter.utils.Constants
 import com.adyen.checkout.googlepay.old.GooglePayComponent
@@ -28,7 +26,7 @@ import java.util.UUID
 
 class GooglePayComponentManager(
     private val activity: FragmentActivity,
-    private val sessionHolder: SessionHolder,
+    private val checkoutHolder: CheckoutHolder,
     private val componentFlutterInterface: ComponentFlutterInterface,
     private val assignCurrentComponent: (ActionHandlingComponent?) -> Unit,
 ) : ComponentAvailableCallback {
@@ -133,7 +131,7 @@ class GooglePayComponentManager(
         componentId: String,
         paymentMethod: PaymentMethod,
     ): GooglePayComponent {
-        val sessionSetupResponse = SessionSetupResponse.SERIALIZER.deserialize(sessionHolder.sessionSetupResponse)
+        val sessionSetupResponse = SessionSetupResponse.SERIALIZER.deserialize(checkoutHolder.sessionSetupResponse)
 //        val order = sessionHolder.orderResponse?.let { Order.SERIALIZER.deserialize(it) }
         val checkoutSession =
             CheckoutSession(

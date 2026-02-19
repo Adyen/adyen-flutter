@@ -4,7 +4,6 @@ import android.content.Context
 import androidx.fragment.app.FragmentActivity
 import com.adyen.checkout.card.old.CardComponent
 import com.adyen.checkout.components.core.PaymentMethod
-import com.adyen.checkout.components.core.PaymentMethodTypes
 import com.adyen.checkout.components.core.StoredPaymentMethod
 import com.adyen.checkout.flutter.components.card.BaseCardComponent
 import com.adyen.checkout.flutter.generated.ComponentFlutterInterface

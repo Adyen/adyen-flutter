@@ -4,15 +4,11 @@ import android.content.Context
 import androidx.fragment.app.FragmentActivity
 import com.adyen.checkout.card.old.CardComponent
 import com.adyen.checkout.components.core.PaymentMethod
-import com.adyen.checkout.components.core.PaymentMethodTypes
 import com.adyen.checkout.components.core.StoredPaymentMethod
 import com.adyen.checkout.components.core.action.Action
-import com.adyen.checkout.core.common.PaymentResult
-import com.adyen.checkout.core.components.CheckoutCallbacks
 import com.adyen.checkout.flutter.components.card.BaseCardComponent
 import com.adyen.checkout.flutter.generated.ComponentFlutterInterface
-import com.adyen.checkout.flutter.session.SessionHolder
-import com.adyen.checkout.flutter.utils.PlatformException
+import com.adyen.checkout.flutter.session.CheckoutHolder
 import com.adyen.checkout.sessions.core.CheckoutSession
 import com.adyen.checkout.sessions.core.SessionSetupResponse
 import org.json.JSONObject
@@ -26,15 +22,14 @@ internal class CardSessionComponent(
     private val componentFlutterApi: ComponentFlutterInterface,
     private val onDispose: (String) -> Unit,
     private val setCurrentCardComponent: (BaseCardComponent) -> Unit,
-    private val sessionHolder: SessionHolder
+    private val checkoutHolder: CheckoutHolder
 ) : BaseCardComponent(context, id, creationParams, activity, componentFlutterApi, onDispose, setCurrentCardComponent) {
     init {
-        val sessionSetupResponse = SessionSetupResponse.SERIALIZER.deserialize(sessionHolder.sessionSetupResponse)
-        val order = sessionHolder.orderResponse?.let { Order.SERIALIZER.deserialize(it) }
+        val sessionSetupResponse = SessionSetupResponse.SERIALIZER.deserialize(checkoutHolder.sessionSetupResponse)
         val checkoutSession =
             CheckoutSession(
                 sessionSetupResponse = sessionSetupResponse,
-                order = order,
+                order = null,
                 environment = checkoutConfiguration.environment,
                 clientKey = checkoutConfiguration.clientKey
             )
@@ -91,7 +86,7 @@ internal class CardSessionComponent(
         if (paymentMethodJson.length() > 0) {
             PaymentMethod.SERIALIZER.deserialize(paymentMethodJson)
         } else {
-            val sessionResponse = SessionSetupResponse.SERIALIZER.deserialize(sessionHolder.sessionSetupResponse)
+            val sessionResponse = SessionSetupResponse.SERIALIZER.deserialize(checkoutHolder.sessionSetupResponse)
             sessionResponse.paymentMethodsApiResponse?.paymentMethods?.first { it.type == CARD_PAYMENT_METHOD_KEY }
                 ?: throw Exception("Cannot find card payment method")
         }

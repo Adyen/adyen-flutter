@@ -1184,6 +1184,87 @@ struct OrderResponseDTO: Hashable {
 }
 
 /// Generated class from Pigeon that represents data sent in messages.
+/// This protocol should not be extended by any user class outside of the generated file.
+protocol CheckoutResultDTO {
+
+}
+
+/// Generated class from Pigeon that represents data sent in messages.
+struct FinishedResultDTO: CheckoutResultDTO {
+  var resultCode: String
+
+
+  // swift-format-ignore: AlwaysUseLowerCamelCase
+  static func fromList(_ pigeonVar_list: [Any?]) -> FinishedResultDTO? {
+    let resultCode = pigeonVar_list[0] as! String
+
+    return FinishedResultDTO(
+      resultCode: resultCode
+    )
+  }
+  func toList() -> [Any?] {
+    return [
+      resultCode
+    ]
+  }
+  static func == (lhs: FinishedResultDTO, rhs: FinishedResultDTO) -> Bool {
+    return deepEqualsPlatformApi(lhs.toList(), rhs.toList())  }
+  func hash(into hasher: inout Hasher) {
+    deepHashPlatformApi(value: toList(), hasher: &hasher)
+  }
+}
+
+/// Generated class from Pigeon that represents data sent in messages.
+struct ActionResultDTO: CheckoutResultDTO {
+  var actionResponse: String
+
+
+  // swift-format-ignore: AlwaysUseLowerCamelCase
+  static func fromList(_ pigeonVar_list: [Any?]) -> ActionResultDTO? {
+    let actionResponse = pigeonVar_list[0] as! String
+
+    return ActionResultDTO(
+      actionResponse: actionResponse
+    )
+  }
+  func toList() -> [Any?] {
+    return [
+      actionResponse
+    ]
+  }
+  static func == (lhs: ActionResultDTO, rhs: ActionResultDTO) -> Bool {
+    return deepEqualsPlatformApi(lhs.toList(), rhs.toList())  }
+  func hash(into hasher: inout Hasher) {
+    deepHashPlatformApi(value: toList(), hasher: &hasher)
+  }
+}
+
+/// Generated class from Pigeon that represents data sent in messages.
+struct ErrorResultDTO: CheckoutResultDTO {
+  var errorMessage: String
+
+
+  // swift-format-ignore: AlwaysUseLowerCamelCase
+  static func fromList(_ pigeonVar_list: [Any?]) -> ErrorResultDTO? {
+    let errorMessage = pigeonVar_list[0] as! String
+
+    return ErrorResultDTO(
+      errorMessage: errorMessage
+    )
+  }
+  func toList() -> [Any?] {
+    return [
+      errorMessage
+    ]
+  }
+  static func == (lhs: ErrorResultDTO, rhs: ErrorResultDTO) -> Bool {
+    return deepEqualsPlatformApi(lhs.toList(), rhs.toList())  }
+  func hash(into hasher: inout Hasher) {
+    deepHashPlatformApi(value: toList(), hasher: &hasher)
+  }
+}
+
+/// Generated class from Pigeon that represents data sent in messages.
 struct CheckoutEvent: Hashable {
   var type: CheckoutEventType
   var data: Any? = nil
@@ -1243,6 +1324,39 @@ struct ComponentCommunicationModel: Hashable {
     ]
   }
   static func == (lhs: ComponentCommunicationModel, rhs: ComponentCommunicationModel) -> Bool {
+    return deepEqualsPlatformApi(lhs.toList(), rhs.toList())  }
+  func hash(into hasher: inout Hasher) {
+    deepHashPlatformApi(value: toList(), hasher: &hasher)
+  }
+}
+
+/// Generated class from Pigeon that represents data sent in messages.
+struct PlatformCommunicationDTO: Hashable {
+  var type: ComponentCommunicationType
+  var componentId: String
+  var dataJson: String? = nil
+
+
+  // swift-format-ignore: AlwaysUseLowerCamelCase
+  static func fromList(_ pigeonVar_list: [Any?]) -> PlatformCommunicationDTO? {
+    let type = pigeonVar_list[0] as! ComponentCommunicationType
+    let componentId = pigeonVar_list[1] as! String
+    let dataJson: String? = nilOrValue(pigeonVar_list[2])
+
+    return PlatformCommunicationDTO(
+      type: type,
+      componentId: componentId,
+      dataJson: dataJson
+    )
+  }
+  func toList() -> [Any?] {
+    return [
+      type,
+      componentId,
+      dataJson,
+    ]
+  }
+  static func == (lhs: PlatformCommunicationDTO, rhs: PlatformCommunicationDTO) -> Bool {
     return deepEqualsPlatformApi(lhs.toList(), rhs.toList())  }
   func hash(into hasher: inout Hasher) {
     deepHashPlatformApi(value: toList(), hasher: &hasher)
@@ -1814,30 +1928,38 @@ private class PlatformApiPigeonCodecReader: FlutterStandardReader {
     case 167:
       return OrderResponseDTO.fromList(self.readValue() as! [Any?])
     case 168:
-      return CheckoutEvent.fromList(self.readValue() as! [Any?])
+      return FinishedResultDTO.fromList(self.readValue() as! [Any?])
     case 169:
-      return ComponentCommunicationModel.fromList(self.readValue() as! [Any?])
+      return ActionResultDTO.fromList(self.readValue() as! [Any?])
     case 170:
-      return PaymentEventDTO.fromList(self.readValue() as! [Any?])
+      return ErrorResultDTO.fromList(self.readValue() as! [Any?])
     case 171:
-      return ErrorDTO.fromList(self.readValue() as! [Any?])
+      return CheckoutEvent.fromList(self.readValue() as! [Any?])
     case 172:
-      return DeletedStoredPaymentMethodResultDTO.fromList(self.readValue() as! [Any?])
+      return ComponentCommunicationModel.fromList(self.readValue() as! [Any?])
     case 173:
-      return CardComponentConfigurationDTO.fromList(self.readValue() as! [Any?])
+      return PlatformCommunicationDTO.fromList(self.readValue() as! [Any?])
     case 174:
-      return InstantPaymentConfigurationDTO.fromList(self.readValue() as! [Any?])
+      return PaymentEventDTO.fromList(self.readValue() as! [Any?])
     case 175:
-      return InstantPaymentSetupResultDTO.fromList(self.readValue() as! [Any?])
+      return ErrorDTO.fromList(self.readValue() as! [Any?])
     case 176:
-      return UnencryptedCardDTO.fromList(self.readValue() as! [Any?])
+      return DeletedStoredPaymentMethodResultDTO.fromList(self.readValue() as! [Any?])
     case 177:
-      return EncryptedCardDTO.fromList(self.readValue() as! [Any?])
+      return CardComponentConfigurationDTO.fromList(self.readValue() as! [Any?])
     case 178:
-      return ActionComponentConfigurationDTO.fromList(self.readValue() as! [Any?])
+      return InstantPaymentConfigurationDTO.fromList(self.readValue() as! [Any?])
     case 179:
-      return OrderCancelResultDTO.fromList(self.readValue() as! [Any?])
+      return InstantPaymentSetupResultDTO.fromList(self.readValue() as! [Any?])
     case 180:
+      return UnencryptedCardDTO.fromList(self.readValue() as! [Any?])
+    case 181:
+      return EncryptedCardDTO.fromList(self.readValue() as! [Any?])
+    case 182:
+      return ActionComponentConfigurationDTO.fromList(self.readValue() as! [Any?])
+    case 183:
+      return OrderCancelResultDTO.fromList(self.readValue() as! [Any?])
+    case 184:
       return BinLookupDataDTO.fromList(self.readValue() as! [Any?])
     default:
       return super.readValue(ofType: type)
@@ -1964,44 +2086,56 @@ private class PlatformApiPigeonCodecWriter: FlutterStandardWriter {
     } else if let value = value as? OrderResponseDTO {
       super.writeByte(167)
       super.writeValue(value.toList())
-    } else if let value = value as? CheckoutEvent {
+    } else if let value = value as? FinishedResultDTO {
       super.writeByte(168)
       super.writeValue(value.toList())
-    } else if let value = value as? ComponentCommunicationModel {
+    } else if let value = value as? ActionResultDTO {
       super.writeByte(169)
       super.writeValue(value.toList())
-    } else if let value = value as? PaymentEventDTO {
+    } else if let value = value as? ErrorResultDTO {
       super.writeByte(170)
       super.writeValue(value.toList())
-    } else if let value = value as? ErrorDTO {
+    } else if let value = value as? CheckoutEvent {
       super.writeByte(171)
       super.writeValue(value.toList())
-    } else if let value = value as? DeletedStoredPaymentMethodResultDTO {
+    } else if let value = value as? ComponentCommunicationModel {
       super.writeByte(172)
       super.writeValue(value.toList())
-    } else if let value = value as? CardComponentConfigurationDTO {
+    } else if let value = value as? PlatformCommunicationDTO {
       super.writeByte(173)
       super.writeValue(value.toList())
-    } else if let value = value as? InstantPaymentConfigurationDTO {
+    } else if let value = value as? PaymentEventDTO {
       super.writeByte(174)
       super.writeValue(value.toList())
-    } else if let value = value as? InstantPaymentSetupResultDTO {
+    } else if let value = value as? ErrorDTO {
       super.writeByte(175)
       super.writeValue(value.toList())
-    } else if let value = value as? UnencryptedCardDTO {
+    } else if let value = value as? DeletedStoredPaymentMethodResultDTO {
       super.writeByte(176)
       super.writeValue(value.toList())
-    } else if let value = value as? EncryptedCardDTO {
+    } else if let value = value as? CardComponentConfigurationDTO {
       super.writeByte(177)
       super.writeValue(value.toList())
-    } else if let value = value as? ActionComponentConfigurationDTO {
+    } else if let value = value as? InstantPaymentConfigurationDTO {
       super.writeByte(178)
       super.writeValue(value.toList())
-    } else if let value = value as? OrderCancelResultDTO {
+    } else if let value = value as? InstantPaymentSetupResultDTO {
       super.writeByte(179)
       super.writeValue(value.toList())
-    } else if let value = value as? BinLookupDataDTO {
+    } else if let value = value as? UnencryptedCardDTO {
       super.writeByte(180)
+      super.writeValue(value.toList())
+    } else if let value = value as? EncryptedCardDTO {
+      super.writeByte(181)
+      super.writeValue(value.toList())
+    } else if let value = value as? ActionComponentConfigurationDTO {
+      super.writeByte(182)
+      super.writeValue(value.toList())
+    } else if let value = value as? OrderCancelResultDTO {
+      super.writeByte(183)
+      super.writeValue(value.toList())
+    } else if let value = value as? BinLookupDataDTO {
+      super.writeByte(184)
       super.writeValue(value.toList())
     } else {
       super.writeValue(value)
@@ -2627,6 +2761,64 @@ class ComponentFlutterInterface: ComponentFlutterInterfaceProtocol {
         completion(.failure(AdyenPigeonError(code: code, message: message, details: details)))
       } else {
         completion(.success(()))
+      }
+    }
+  }
+}
+/// Generated protocol from Pigeon that represents Flutter messages that can be called from Swift.
+protocol AdyenFlutterInterfaceProtocol {
+  func onSubmit(paymentCommunicationModel paymentCommunicationModelArg: PlatformCommunicationDTO, completion: @escaping (Result<CheckoutResultDTO, AdyenPigeonError>) -> Void)
+  func onAdditionalDetails(paymentCommunicationModel paymentCommunicationModelArg: PlatformCommunicationDTO, completion: @escaping (Result<CheckoutResultDTO, AdyenPigeonError>) -> Void)
+}
+class AdyenFlutterInterface: AdyenFlutterInterfaceProtocol {
+  private let binaryMessenger: FlutterBinaryMessenger
+  private let messageChannelSuffix: String
+  init(binaryMessenger: FlutterBinaryMessenger, messageChannelSuffix: String = "") {
+    self.binaryMessenger = binaryMessenger
+    self.messageChannelSuffix = messageChannelSuffix.count > 0 ? ".\(messageChannelSuffix)" : ""
+  }
+  var codec: PlatformApiPigeonCodec {
+    return PlatformApiPigeonCodec.shared
+  }
+  func onSubmit(paymentCommunicationModel paymentCommunicationModelArg: PlatformCommunicationDTO, completion: @escaping (Result<CheckoutResultDTO, AdyenPigeonError>) -> Void) {
+    let channelName: String = "dev.flutter.pigeon.adyen_checkout.AdyenFlutterInterface.onSubmit\(messageChannelSuffix)"
+    let channel = FlutterBasicMessageChannel(name: channelName, binaryMessenger: binaryMessenger, codec: codec)
+    channel.sendMessage([paymentCommunicationModelArg] as [Any?]) { response in
+      guard let listResponse = response as? [Any?] else {
+        completion(.failure(createConnectionError(withChannelName: channelName)))
+        return
+      }
+      if listResponse.count > 1 {
+        let code: String = listResponse[0] as! String
+        let message: String? = nilOrValue(listResponse[1])
+        let details: String? = nilOrValue(listResponse[2])
+        completion(.failure(AdyenPigeonError(code: code, message: message, details: details)))
+      } else if listResponse[0] == nil {
+        completion(.failure(AdyenPigeonError(code: "null-error", message: "Flutter api returned null value for non-null return value.", details: "")))
+      } else {
+        let result = listResponse[0] as! CheckoutResultDTO
+        completion(.success(result))
+      }
+    }
+  }
+  func onAdditionalDetails(paymentCommunicationModel paymentCommunicationModelArg: PlatformCommunicationDTO, completion: @escaping (Result<CheckoutResultDTO, AdyenPigeonError>) -> Void) {
+    let channelName: String = "dev.flutter.pigeon.adyen_checkout.AdyenFlutterInterface.onAdditionalDetails\(messageChannelSuffix)"
+    let channel = FlutterBasicMessageChannel(name: channelName, binaryMessenger: binaryMessenger, codec: codec)
+    channel.sendMessage([paymentCommunicationModelArg] as [Any?]) { response in
+      guard let listResponse = response as? [Any?] else {
+        completion(.failure(createConnectionError(withChannelName: channelName)))
+        return
+      }
+      if listResponse.count > 1 {
+        let code: String = listResponse[0] as! String
+        let message: String? = nilOrValue(listResponse[1])
+        let details: String? = nilOrValue(listResponse[2])
+        completion(.failure(AdyenPigeonError(code: code, message: message, details: details)))
+      } else if listResponse[0] == nil {
+        completion(.failure(AdyenPigeonError(code: "null-error", message: "Flutter api returned null value for non-null return value.", details: "")))
+      } else {
+        let result = listResponse[0] as! CheckoutResultDTO
+        completion(.success(result))
       }
     }
   }

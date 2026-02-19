@@ -1,28 +1,18 @@
 package com.adyen.checkout.flutter.utils
 
-import com.adyen.checkout.adyen3ds2.adyen3DS2
-import com.adyen.checkout.card.AddressConfiguration
-import com.adyen.checkout.card.CardBrand
-import com.adyen.checkout.card.KCPAuthVisibility
-import com.adyen.checkout.card.SocialSecurityNumberVisibility
+import com.adyen.checkout.card.FieldMode
 import com.adyen.checkout.card.card
-import com.adyen.checkout.cashapppay.cashAppPay
-import com.adyen.checkout.components.core.Amount
-import com.adyen.checkout.components.core.AnalyticsConfiguration
-import com.adyen.checkout.components.core.AnalyticsLevel
-import com.adyen.checkout.components.core.CheckoutConfiguration
+import com.adyen.checkout.card.old.AddressConfiguration
 import com.adyen.checkout.components.core.OrderResponse
 import com.adyen.checkout.core.common.CardBrand
 import com.adyen.checkout.core.common.internal.helper.CheckoutPlatform
 import com.adyen.checkout.core.common.internal.helper.CheckoutPlatformParams
 import com.adyen.checkout.core.components.AnalyticsConfiguration
 import com.adyen.checkout.core.components.AnalyticsLevel
-import com.adyen.checkout.core.components.CheckoutConfiguration
 import com.adyen.checkout.core.components.data.model.Amount
 import com.adyen.checkout.core.sessions.SessionResponse
 import com.adyen.checkout.cse.EncryptedCard
 import com.adyen.checkout.cse.UnencryptedCard
-import com.adyen.checkout.dropin.dropIn
 import com.adyen.checkout.flutter.generated.ActionComponentConfigurationDTO
 import com.adyen.checkout.flutter.generated.AddressMode
 import com.adyen.checkout.flutter.generated.AmountDTO
@@ -48,11 +38,6 @@ import com.adyen.checkout.flutter.generated.ThreeDS2ConfigurationDTO
 import com.adyen.checkout.flutter.generated.TotalPriceStatus
 import com.adyen.checkout.flutter.generated.TwintConfigurationDTO
 import com.adyen.checkout.flutter.generated.UnencryptedCardDTO
-import com.adyen.checkout.googlepay.BillingAddressParameters
-import com.adyen.checkout.googlepay.MerchantInfo
-import com.adyen.checkout.googlepay.ShippingAddressParameters
-import com.adyen.checkout.googlepay.googlePay
-import com.adyen.checkout.twint.twint
 import com.adyen.checkout.googlepay.old.BillingAddressParameters
 import com.adyen.checkout.googlepay.old.MerchantInfo
 import com.adyen.checkout.googlepay.old.ShippingAddressParameters
@@ -60,6 +45,7 @@ import com.google.android.gms.wallet.WalletConstants
 import java.util.Locale
 import com.adyen.checkout.cashapppay.CashAppPayEnvironment as SDKCashAppPayEnvironment
 import com.adyen.checkout.core.common.Environment as SDKEnvironment
+import com.adyen.checkout.core.components.CheckoutConfiguration
 
 object ConfigurationMapper {
     fun CheckoutConfigurationDTO.toCheckoutConfiguration(): CheckoutConfiguration =
@@ -99,16 +85,16 @@ object ConfigurationMapper {
             twintConfigurationDTO = twintConfigurationDTO,
             threeDS2ConfigurationDTO = threeDS2ConfigurationDTO,
         ).apply {
-            dropIn {
-                isRemovingStoredPaymentMethodsEnabled = this@toCheckoutConfiguration.isRemoveStoredPaymentMethodEnabled
-                showPreselectedStoredPaymentMethod = this@toCheckoutConfiguration.showPreselectedStoredPaymentMethod
-                skipListWhenSinglePaymentMethod = this@toCheckoutConfiguration.skipListWhenSinglePaymentMethod
-                paymentMethodNames?.forEach { (paymentMethodType, paymentMethodName) ->
-                    if (paymentMethodType != null && paymentMethodName != null) {
-                        overridePaymentMethodName(paymentMethodType, paymentMethodName)
-                    }
-                }
-            }
+//            dropIn {
+//                isRemovingStoredPaymentMethodsEnabled = this@toCheckoutConfiguration.isRemoveStoredPaymentMethodEnabled
+//                showPreselectedStoredPaymentMethod = this@toCheckoutConfiguration.showPreselectedStoredPaymentMethod
+//                skipListWhenSinglePaymentMethod = this@toCheckoutConfiguration.skipListWhenSinglePaymentMethod
+//                paymentMethodNames?.forEach { (paymentMethodType, paymentMethodName) ->
+//                    if (paymentMethodType != null && paymentMethodName != null) {
+//                        overridePaymentMethodName(paymentMethodType, paymentMethodName)
+//                    }
+//                }
+//            }
         }
 
     fun CardComponentConfigurationDTO.toCheckoutConfiguration(): CheckoutConfiguration =
@@ -169,58 +155,58 @@ object ConfigurationMapper {
         ).apply {
             cardConfigurationDTO?.let { configurationDTO ->
                 card {
-                    addressConfiguration = configurationDTO.addressMode.mapToAddressConfiguration()
-                    isStorePaymentFieldVisible = configurationDTO.showStorePaymentField
-                    isHideCvcStoredCard = !configurationDTO.showCvcForStoredCard
-                    isHideCvc = !configurationDTO.showCvc
-                    kcpAuthVisibility = determineKcpAuthVisibility(configurationDTO.kcpFieldVisibility)
-                    socialSecurityNumberVisibility =
-                        determineSocialSecurityNumberVisibility(configurationDTO.socialSecurityNumberFieldVisibility)
                     supportedCardBrands = mapToSupportedCardBrands(configurationDTO.supportedCardTypes)
-                    isHolderNameRequired = configurationDTO.holderNameRequired
+                    showHolderName = configurationDTO.holderNameRequired
+                    showStorePayment = configurationDTO.showStorePaymentField
+                    hideSecurityCode = !configurationDTO.showCvc
+                    hideStoredSecurityCode = !configurationDTO.showCvcForStoredCard
+                    koreanAuthenticationMode = determineFieldVisibility(configurationDTO.kcpFieldVisibility)
+                    socialSecurityNumberMode =
+                        determineFieldVisibility(configurationDTO.socialSecurityNumberFieldVisibility)
+//                    addressConfiguration = configurationDTO.addressMode.mapToAddressConfiguration()
                 }
             }
 
             threeDS2ConfigurationDTO?.let { configurationDTO ->
-                adyen3DS2 {
-                    threeDSRequestorAppURL = configurationDTO.requestorAppURL
-                }
+//                adyen3DS2 {
+//                    threeDSRequestorAppURL = configurationDTO.requestorAppURL
+//                }
             }
 
             googlePayConfigurationDTO?.let { configurationDTO ->
-                googlePay {
-                    googlePayEnvironment = configurationDTO.googlePayEnvironment.mapToWalletConstants()
-                    this.countryCode = countryCode
-                    merchantAccount = configurationDTO.merchantAccount
-                    merchantInfo = configurationDTO.merchantInfoDTO?.mapToMerchantInfo()
-                    totalPriceStatus = configurationDTO.totalPriceStatus?.mapToTotalPriceStatus()
-                    configurationDTO.allowedCardNetworks?.let { allowedCardNetworks = it.filterNotNull() }
-                    configurationDTO.allowedAuthMethods?.let { allowedAuthMethods = it.filterNotNull() }
-                    configurationDTO.allowPrepaidCards?.let { isAllowPrepaidCards = it }
-                    configurationDTO.allowCreditCards?.let { isAllowCreditCards = it }
-                    configurationDTO.assuranceDetailsRequired?.let { isAssuranceDetailsRequired = it }
-                    configurationDTO.emailRequired?.let { isEmailRequired = it }
-                    configurationDTO.existingPaymentMethodRequired?.let { isExistingPaymentMethodRequired = it }
-                    configurationDTO.shippingAddressRequired?.let { isShippingAddressRequired = it }
-                    shippingAddressParameters =
-                        configurationDTO.shippingAddressParametersDTO?.mapToShippingAddressParameters()
-                    configurationDTO.billingAddressRequired?.let { isBillingAddressRequired = it }
-                    billingAddressParameters =
-                        configurationDTO.billingAddressParametersDTO?.mapToBillingAddressParameters()
-                }
+//                googlePay {
+//                    googlePayEnvironment = configurationDTO.googlePayEnvironment.mapToWalletConstants()
+//                    this.countryCode = countryCode
+//                    merchantAccount = configurationDTO.merchantAccount
+//                    merchantInfo = configurationDTO.merchantInfoDTO?.mapToMerchantInfo()
+//                    totalPriceStatus = configurationDTO.totalPriceStatus?.mapToTotalPriceStatus()
+//                    configurationDTO.allowedCardNetworks?.let { allowedCardNetworks = it.filterNotNull() }
+//                    configurationDTO.allowedAuthMethods?.let { allowedAuthMethods = it.filterNotNull() }
+//                    configurationDTO.allowPrepaidCards?.let { isAllowPrepaidCards = it }
+//                    configurationDTO.allowCreditCards?.let { isAllowCreditCards = it }
+//                    configurationDTO.assuranceDetailsRequired?.let { isAssuranceDetailsRequired = it }
+//                    configurationDTO.emailRequired?.let { isEmailRequired = it }
+//                    configurationDTO.existingPaymentMethodRequired?.let { isExistingPaymentMethodRequired = it }
+//                    configurationDTO.shippingAddressRequired?.let { isShippingAddressRequired = it }
+//                    shippingAddressParameters =
+//                        configurationDTO.shippingAddressParametersDTO?.mapToShippingAddressParameters()
+//                    configurationDTO.billingAddressRequired?.let { isBillingAddressRequired = it }
+//                    billingAddressParameters =
+//                        configurationDTO.billingAddressParametersDTO?.mapToBillingAddressParameters()
+//                }
             }
 
             cashAppPayConfigurationDTO?.let { configurationDTO ->
-                cashAppPay {
-                    cashAppPayEnvironment = configurationDTO.cashAppPayEnvironment.mapToCashAppPayEnvironment()
-                    returnUrl = configurationDTO.returnUrl
-                }
+//                cashAppPay {
+//                    cashAppPayEnvironment = configurationDTO.cashAppPayEnvironment.mapToCashAppPayEnvironment()
+//                    returnUrl = configurationDTO.returnUrl
+//                }
             }
 
             twintConfigurationDTO?.let { configurationDTO ->
-                twint {
-                    showStorePaymentField = configurationDTO.showStorePaymentField
-                }
+//                twint {
+//                    showStorePaymentField = configurationDTO.showStorePaymentField
+//                }
             }
         }
     }
@@ -276,6 +262,9 @@ object ConfigurationMapper {
 
     fun AmountDTO.mapToAmount(): Amount = Amount(this.currency, this.value)
 
+    fun SessionResponseDTO.mapToSessionResponse(): SessionResponse =
+        SessionResponse(id, sessionData)
+
     private fun com.adyen.checkout.components.core.Amount.mapToDTOAmount(): AmountDTO =
         AmountDTO(
             this.currency ?: throw IllegalStateException("Currency must not be null"),
@@ -295,7 +284,8 @@ object ConfigurationMapper {
             TotalPriceStatus.FINAL_PRICE -> "FINAL"
         }
 
-    private fun MerchantInfoDTO.mapToMerchantInfo(): MerchantInfo = MerchantInfo(merchantName, merchantId)
+    private fun MerchantInfoDTO.mapToMerchantInfo(): MerchantInfo =
+        MerchantInfo(merchantName, merchantId)
 
     private fun ShippingAddressParametersDTO.mapToShippingAddressParameters(): ShippingAddressParameters =
         when {

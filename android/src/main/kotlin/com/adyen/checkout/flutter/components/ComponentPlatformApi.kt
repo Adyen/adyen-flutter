@@ -10,8 +10,10 @@ import com.adyen.checkout.flutter.components.action.ActionComponentManager
 import com.adyen.checkout.flutter.components.card.CardComponentManager
 import com.adyen.checkout.flutter.components.googlepay.GooglePayComponentManager
 import com.adyen.checkout.flutter.components.instant.InstantComponentManager
+import com.adyen.checkout.flutter.components.v2.AdyenComponentFactory
 import com.adyen.checkout.flutter.components.view.ComponentLoadingBottomSheet
 import com.adyen.checkout.flutter.generated.ActionComponentConfigurationDTO
+import com.adyen.checkout.flutter.generated.AdyenFlutterInterface
 import com.adyen.checkout.flutter.generated.ComponentCommunicationModel
 import com.adyen.checkout.flutter.generated.ComponentCommunicationType
 import com.adyen.checkout.flutter.generated.ComponentFlutterInterface
@@ -25,7 +27,7 @@ import com.adyen.checkout.flutter.generated.PaymentEventType
 import com.adyen.checkout.flutter.generated.PaymentResultDTO
 import com.adyen.checkout.flutter.generated.PaymentResultEnum
 import com.adyen.checkout.flutter.generated.PaymentResultModelDTO
-import com.adyen.checkout.flutter.session.SessionHolder
+import com.adyen.checkout.flutter.session.CheckoutHolder
 import com.adyen.checkout.flutter.utils.Constants
 import com.adyen.checkout.googlepay.old.GooglePayComponent
 import com.adyen.checkout.redirect.old.RedirectComponent
@@ -34,8 +36,9 @@ import org.json.JSONObject
 
 class ComponentPlatformApi(
     private val activity: FragmentActivity,
-    private val sessionHolder: SessionHolder,
+    private val checkoutHolder: CheckoutHolder,
     private val componentFlutterInterface: ComponentFlutterInterface,
+    private val adyenFlutterInterface: AdyenFlutterInterface,
     private val flutterPluginBinding: FlutterPlugin.FlutterPluginBinding?,
 ) : ComponentPlatformInterface {
     private val cardComponentManager: CardComponentManager =
@@ -43,16 +46,16 @@ class ComponentPlatformApi(
             activity,
             componentFlutterInterface,
             flutterPluginBinding,
-            sessionHolder,
+            checkoutHolder,
             ::onDispose,
             ::assignCurrentComponent
         )
     private val googlePayComponentManager: GooglePayComponentManager =
-        GooglePayComponentManager(activity, sessionHolder, componentFlutterInterface, ::assignCurrentComponent)
+        GooglePayComponentManager(activity, checkoutHolder, componentFlutterInterface, ::assignCurrentComponent)
     private val instantComponentManager: InstantComponentManager =
         InstantComponentManager(
             activity,
-            sessionHolder,
+            checkoutHolder,
             componentFlutterInterface,
             ::assignCurrentComponent,
             ::handleComponentAction
@@ -64,6 +67,27 @@ class ComponentPlatformApi(
 
     init {
         cardComponentManager.registerComponentViewFactories()
+        flutterPluginBinding?.platformViewRegistry?.registerViewFactory(
+            AdyenComponentFactory.ADYEN_COMPONENT_SESSION,
+            AdyenComponentFactory(
+                componentFlutterApi = componentFlutterInterface,
+                adyenFlutterInterface = adyenFlutterInterface,
+                viewTypeId = AdyenComponentFactory.ADYEN_COMPONENT_SESSION,
+                onDispose = ::onDispose,
+                checkoutHolder = checkoutHolder,
+            )
+        )
+
+        flutterPluginBinding?.platformViewRegistry?.registerViewFactory(
+            AdyenComponentFactory.ADYEN_COMPONENT_ADVANCED,
+            AdyenComponentFactory(
+                componentFlutterApi = componentFlutterInterface,
+                adyenFlutterInterface = adyenFlutterInterface,
+                viewTypeId = AdyenComponentFactory.ADYEN_COMPONENT_ADVANCED,
+                onDispose = ::onDispose,
+                checkoutHolder = checkoutHolder,
+            )
+        )
     }
 
     // Update view height from Flutter when required.

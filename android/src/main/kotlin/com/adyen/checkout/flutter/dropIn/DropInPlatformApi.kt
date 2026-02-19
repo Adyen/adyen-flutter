@@ -3,18 +3,15 @@ package com.adyen.checkout.flutter.dropIn
 import androidx.activity.result.ActivityResultLauncher
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.lifecycleScope
-import com.adyen.checkout.components.core.Order
 import com.adyen.checkout.components.core.PaymentMethodsApiResponse
 import com.adyen.checkout.core.old.Environment
 import com.adyen.checkout.core.old.Environment.Companion.TEST
-import com.adyen.checkout.dropin.old.DropIn
 import com.adyen.checkout.dropin.old.DropInCallback
 import com.adyen.checkout.dropin.old.DropInResult
 import com.adyen.checkout.dropin.old.SessionDropInCallback
 import com.adyen.checkout.dropin.old.SessionDropInResult
 import com.adyen.checkout.dropin.old.internal.ui.model.DropInResultContractParams
 import com.adyen.checkout.dropin.old.internal.ui.model.SessionDropInResultContractParams
-import com.adyen.checkout.flutter.dropIn.advanced.AdvancedDropInService
 import com.adyen.checkout.flutter.dropIn.advanced.DropInAdditionalDetailsPlatformMessenger
 import com.adyen.checkout.flutter.dropIn.advanced.DropInAdditionalDetailsResultMessenger
 import com.adyen.checkout.flutter.dropIn.advanced.DropInBalanceCheckResultMessenger
@@ -25,7 +22,6 @@ import com.adyen.checkout.flutter.dropIn.advanced.DropInPaymentMethodDeletionRes
 import com.adyen.checkout.flutter.dropIn.advanced.DropInPaymentResultMessenger
 import com.adyen.checkout.flutter.dropIn.advanced.DropInServiceResultMessenger
 import com.adyen.checkout.flutter.dropIn.model.DropInServiceEvent
-import com.adyen.checkout.flutter.dropIn.session.SessionDropInService
 import com.adyen.checkout.flutter.generated.CheckoutEvent
 import com.adyen.checkout.flutter.generated.CheckoutEventType
 import com.adyen.checkout.flutter.generated.CheckoutFlutterInterface
@@ -38,9 +34,8 @@ import com.adyen.checkout.flutter.generated.PaymentEventType
 import com.adyen.checkout.flutter.generated.PaymentResultDTO
 import com.adyen.checkout.flutter.generated.PaymentResultEnum
 import com.adyen.checkout.flutter.generated.PaymentResultModelDTO
-import com.adyen.checkout.flutter.session.SessionHolder
+import com.adyen.checkout.flutter.session.CheckoutHolder
 import com.adyen.checkout.flutter.utils.ConfigurationMapper.toCheckoutConfiguration
-import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToEnvironment
 import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToOrderResponseModel
 import com.adyen.checkout.sessions.core.CheckoutSession
 import com.adyen.checkout.sessions.core.SessionSetupResponse
@@ -54,7 +49,7 @@ import org.json.JSONObject
 internal class DropInPlatformApi(
     private val checkoutFlutter: CheckoutFlutterInterface,
     private val activity: FragmentActivity,
-    private val sessionHolder: SessionHolder,
+    private val checkoutHolder: CheckoutHolder,
 ) : DropInPlatformInterface {
     lateinit var dropInSessionLauncher: ActivityResultLauncher<SessionDropInResultContractParams>
     lateinit var dropInAdvancedFlowLauncher: ActivityResultLauncher<DropInResultContractParams>
@@ -70,7 +65,7 @@ internal class DropInPlatformApi(
         val dropInConfiguration = dropInConfigurationDTO.toCheckoutConfiguration()
         val checkoutSession =
             createCheckoutSession(
-                sessionHolder,
+                checkoutHolder,
                 TEST, //TODO Change back to generic
                 dropInConfigurationDTO.clientKey
             )
@@ -221,11 +216,11 @@ internal class DropInPlatformApi(
     }
 
     private fun createCheckoutSession(
-        sessionHolder: SessionHolder,
+        checkoutHolder: CheckoutHolder,
         environment: Environment,
         clientKey: String,
     ): CheckoutSession {
-        val sessionSetupResponse = SessionSetupResponse.SERIALIZER.deserialize(sessionHolder.sessionSetupResponse)
+        val sessionSetupResponse = SessionSetupResponse.SERIALIZER.deserialize(checkoutHolder.sessionSetupResponse)
 //        val order = sessionHolder.orderResponse?.let { Order.SERIALIZER.deserialize(it) }
         return CheckoutSession(
             sessionSetupResponse = sessionSetupResponse,

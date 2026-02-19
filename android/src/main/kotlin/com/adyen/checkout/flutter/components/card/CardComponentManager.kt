@@ -2,17 +2,16 @@ package com.adyen.checkout.flutter.components.card
 
 import androidx.fragment.app.FragmentActivity
 import com.adyen.checkout.action.core.internal.ActionHandlingComponent
-import com.adyen.checkout.flutter.components.v2.AdyenComponentFactory
 import com.adyen.checkout.flutter.components.v2.BaseComponent
 import com.adyen.checkout.flutter.generated.ComponentFlutterInterface
-import com.adyen.checkout.flutter.session.SessionHolder
+import com.adyen.checkout.flutter.session.CheckoutHolder
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 
 internal class CardComponentManager(
     private val activity: FragmentActivity,
     private val componentFlutterInterface: ComponentFlutterInterface,
     private val flutterPluginBinding: FlutterPlugin.FlutterPluginBinding?,
-    private val sessionHolder: SessionHolder?,
+    private val checkoutHolder: CheckoutHolder,
     private val onDispose: (String) -> Unit,
     private val assignCurrentComponent: (ActionHandlingComponent?) -> Unit,
 ) {
@@ -39,22 +38,9 @@ internal class CardComponentManager(
                 CardComponentFactory.CARD_COMPONENT_SESSION,
                 onDispose,
                 ::setCurrentCardComponent,
-                sessionHolder,
+                checkoutHolder,
             )
         )
-
-        flutterPluginBinding?.platformViewRegistry?.registerViewFactory(
-            AdyenComponentFactory.ADYEN_COMPONENT_SESSION,
-            AdyenComponentFactory(
-                activity,
-                componentFlutterInterface,
-                AdyenComponentFactory.ADYEN_COMPONENT_SESSION,
-                onDispose,
-                ::setCurrentAdyenComponent,
-                sessionHolder,
-            )
-        )
-
 
     }
 

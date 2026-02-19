@@ -4,16 +4,14 @@ import android.content.Context
 import android.view.View
 import androidx.activity.ComponentActivity
 import com.adyen.checkout.card.old.CardComponent
-import com.adyen.checkout.core.common.CheckoutContext
-import com.adyen.checkout.core.components.CheckoutCallbacks
-import com.adyen.checkout.core.components.data.model.PaymentMethod
+import com.adyen.checkout.components.core.CheckoutConfiguration
+import com.adyen.checkout.core.old.Environment
 import com.adyen.checkout.flutter.components.view.DynamicComponentView
 import com.adyen.checkout.flutter.generated.BinLookupDataDTO
 import com.adyen.checkout.flutter.generated.CardComponentConfigurationDTO
 import com.adyen.checkout.flutter.generated.ComponentCommunicationModel
 import com.adyen.checkout.flutter.generated.ComponentCommunicationType
 import com.adyen.checkout.flutter.generated.ComponentFlutterInterface
-import com.adyen.checkout.flutter.utils.ConfigurationMapper.toCheckoutConfiguration
 import io.flutter.plugin.platform.PlatformView
 
 abstract class BaseCardComponent(
@@ -31,14 +29,17 @@ abstract class BaseCardComponent(
     internal val paymentMethodString = creationParams[PAYMENT_METHOD_KEY] as String? ?: ""
     internal val componentId = creationParams[COMPONENT_ID_KEY] as String? ?: ""
     internal val isStoredPaymentMethod = creationParams[IS_STORED_PAYMENT_METHOD_KEY] as Boolean? ?: false
-    private val dynamicComponentView = DynamicComponentView(activity, componentFlutterApi, componentId)
-    internal val checkoutConfiguration = configuration.toCheckoutConfiguration()
+//    private val dynamicComponentView = DynamicComponentView(activity, componentFlutterApi, componentId)
+    internal val checkoutConfiguration: CheckoutConfiguration = CheckoutConfiguration(
+        environment = Environment.TEST,
+        clientKey = configuration.clientKey
+    )
     internal var cardComponent: CardComponent? = null
 
-    override fun getView(): View = dynamicComponentView
+    override fun getView(): View = View(context)
 
     override fun dispose() {
-        dynamicComponentView.onDispose()
+//        dynamicComponentView.onDispose()
         cardComponent = null
         onDispose(componentId)
     }
@@ -46,16 +47,8 @@ abstract class BaseCardComponent(
     fun addComponent(cardComponent: CardComponent) {
         setOnBinLookupListener(cardComponent)
         setOnBinValueListener(cardComponent)
-        dynamicComponentView.addComponent(cardComponent, activity)
+//        dynamicComponentView.addComponent(cardComponent, activity)
     }
-
-//    fun addV6Component(
-//        paymentMethod: PaymentMethod,
-//        checkoutContext: CheckoutContext,
-//        checkoutCallbacks: CheckoutCallbacks
-//    ) {
-//        dynamicComponentView.addV6Component(paymentMethod, checkoutContext, checkoutCallbacks)
-//    }
 
     fun setCurrentCardComponent() = setCurrentCardComponent(this)
 

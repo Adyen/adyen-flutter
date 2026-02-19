@@ -91,7 +91,7 @@ class _AdyenBaseComponentState extends State<AdyenBaseComponent> {
         .componentCommunicationStream.stream
         .where((communicationModel) =>
     communicationModel.componentId == widget.componentId)
-        .listen(_onComponentCommunication);
+        .listen(onComponentCommunication);
 
     super.initState();
   }
@@ -139,7 +139,7 @@ class _AdyenBaseComponentState extends State<AdyenBaseComponent> {
     }
   }
 
-  void _onComponentCommunication(ComponentCommunicationModel event) {
+  void onComponentCommunication(ComponentCommunicationModel event) {
     if (event.type case ComponentCommunicationType.resize) {
       _resizeViewport(event);
     } else if (event.type case ComponentCommunicationType.result) {
