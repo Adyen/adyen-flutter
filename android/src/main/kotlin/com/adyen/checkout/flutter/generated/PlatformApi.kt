@@ -1128,7 +1128,6 @@ data class PaymentResultDTO (
 /** Generated class from Pigeon that represents data sent in messages. */
 data class PaymentResultModelDTO (
   val sessionId: String? = null,
-  val sessionData: String? = null,
   val sessionResult: String? = null,
   val resultCode: String? = null,
   val order: OrderResponseDTO? = null
@@ -1137,17 +1136,15 @@ data class PaymentResultModelDTO (
   companion object {
     fun fromList(pigeonVar_list: List<Any?>): PaymentResultModelDTO {
       val sessionId = pigeonVar_list[0] as String?
-      val sessionData = pigeonVar_list[1] as String?
-      val sessionResult = pigeonVar_list[2] as String?
-      val resultCode = pigeonVar_list[3] as String?
-      val order = pigeonVar_list[4] as OrderResponseDTO?
-      return PaymentResultModelDTO(sessionId, sessionData, sessionResult, resultCode, order)
+      val sessionResult = pigeonVar_list[1] as String?
+      val resultCode = pigeonVar_list[2] as String?
+      val order = pigeonVar_list[3] as OrderResponseDTO?
+      return PaymentResultModelDTO(sessionId, sessionResult, resultCode, order)
     }
   }
   fun toList(): List<Any?> {
     return listOf(
       sessionId,
-      sessionData,
       sessionResult,
       resultCode,
       order,
@@ -2319,6 +2316,8 @@ private open class PlatformApiPigeonCodec : StandardMessageCodec() {
   }
 }
 
+val PlatformApiPigeonMethodCodec = StandardMethodCodec(PlatformApiPigeonCodec())
+
 
 /** Generated interface from Pigeon that represents a handler of messages from Flutter. */
 interface CheckoutPlatformInterface {
@@ -3010,12 +3009,12 @@ class AdyenFlutterInterface(private val binaryMessenger: BinaryMessenger, privat
       PlatformApiPigeonCodec()
     }
   }
-  fun onSubmit(paymentCommunicationModelArg: PlatformCommunicationDTO, callback: (Result<CheckoutResultDTO>) -> Unit)
+  fun onSubmit(paymentCommunicationDTOArg: PlatformCommunicationDTO, callback: (Result<CheckoutResultDTO>) -> Unit)
 {
     val separatedMessageChannelSuffix = if (messageChannelSuffix.isNotEmpty()) ".$messageChannelSuffix" else ""
     val channelName = "dev.flutter.pigeon.adyen_checkout.AdyenFlutterInterface.onSubmit$separatedMessageChannelSuffix"
     val channel = BasicMessageChannel<Any?>(binaryMessenger, channelName, codec)
-    channel.send(listOf(paymentCommunicationModelArg)) {
+    channel.send(listOf(paymentCommunicationDTOArg)) {
       if (it is List<*>) {
         if (it.size > 1) {
           callback(Result.failure(AdyenPigeonError(it[0] as String, it[1] as String, it[2] as String?)))
@@ -3030,12 +3029,12 @@ class AdyenFlutterInterface(private val binaryMessenger: BinaryMessenger, privat
       } 
     }
   }
-  fun onAdditionalDetails(paymentCommunicationModelArg: PlatformCommunicationDTO, callback: (Result<CheckoutResultDTO>) -> Unit)
+  fun onAdditionalDetails(paymentCommunicationDTOArg: PlatformCommunicationDTO, callback: (Result<CheckoutResultDTO>) -> Unit)
 {
     val separatedMessageChannelSuffix = if (messageChannelSuffix.isNotEmpty()) ".$messageChannelSuffix" else ""
     val channelName = "dev.flutter.pigeon.adyen_checkout.AdyenFlutterInterface.onAdditionalDetails$separatedMessageChannelSuffix"
     val channel = BasicMessageChannel<Any?>(binaryMessenger, channelName, codec)
-    channel.send(listOf(paymentCommunicationModelArg)) {
+    channel.send(listOf(paymentCommunicationDTOArg)) {
       if (it is List<*>) {
         if (it.size > 1) {
           callback(Result.failure(AdyenPigeonError(it[0] as String, it[1] as String, it[2] as String?)))
@@ -3044,6 +3043,40 @@ class AdyenFlutterInterface(private val binaryMessenger: BinaryMessenger, privat
         } else {
           val output = it[0] as CheckoutResultDTO
           callback(Result.success(output))
+        }
+      } else {
+        callback(Result.failure(PlatformApiPigeonUtils.createConnectionError(channelName)))
+      } 
+    }
+  }
+  fun onFinished(paymentResultDTOArg: PaymentResultDTO, callback: (Result<Unit>) -> Unit)
+{
+    val separatedMessageChannelSuffix = if (messageChannelSuffix.isNotEmpty()) ".$messageChannelSuffix" else ""
+    val channelName = "dev.flutter.pigeon.adyen_checkout.AdyenFlutterInterface.onFinished$separatedMessageChannelSuffix"
+    val channel = BasicMessageChannel<Any?>(binaryMessenger, channelName, codec)
+    channel.send(listOf(paymentResultDTOArg)) {
+      if (it is List<*>) {
+        if (it.size > 1) {
+          callback(Result.failure(AdyenPigeonError(it[0] as String, it[1] as String, it[2] as String?)))
+        } else {
+          callback(Result.success(Unit))
+        }
+      } else {
+        callback(Result.failure(PlatformApiPigeonUtils.createConnectionError(channelName)))
+      } 
+    }
+  }
+  fun onError(errorDTOArg: ErrorDTO, callback: (Result<Unit>) -> Unit)
+{
+    val separatedMessageChannelSuffix = if (messageChannelSuffix.isNotEmpty()) ".$messageChannelSuffix" else ""
+    val channelName = "dev.flutter.pigeon.adyen_checkout.AdyenFlutterInterface.onError$separatedMessageChannelSuffix"
+    val channel = BasicMessageChannel<Any?>(binaryMessenger, channelName, codec)
+    channel.send(listOf(errorDTOArg)) {
+      if (it is List<*>) {
+        if (it.size > 1) {
+          callback(Result.failure(AdyenPigeonError(it[0] as String, it[1] as String, it[2] as String?)))
+        } else {
+          callback(Result.success(Unit))
         }
       } else {
         callback(Result.failure(PlatformApiPigeonUtils.createConnectionError(channelName)))
@@ -3051,3 +3084,53 @@ class AdyenFlutterInterface(private val binaryMessenger: BinaryMessenger, privat
     }
   }
 }
+
+private class PlatformApiPigeonStreamHandler<T>(
+    val wrapper: PlatformApiPigeonEventChannelWrapper<T>
+) : EventChannel.StreamHandler {
+  var pigeonSink: PigeonEventSink<T>? = null
+
+  override fun onListen(p0: Any?, sink: EventChannel.EventSink) {
+    pigeonSink = PigeonEventSink<T>(sink)
+    wrapper.onListen(p0, pigeonSink!!)
+  }
+
+  override fun onCancel(p0: Any?) {
+    pigeonSink = null
+    wrapper.onCancel(p0)
+  }
+}
+
+interface PlatformApiPigeonEventChannelWrapper<T> {
+  open fun onListen(p0: Any?, sink: PigeonEventSink<T>) {}
+
+  open fun onCancel(p0: Any?) {}
+}
+
+class PigeonEventSink<T>(private val sink: EventChannel.EventSink) {
+  fun success(value: T) {
+    sink.success(value)
+  }
+
+  fun error(errorCode: String, errorMessage: String?, errorDetails: Any?) {
+    sink.error(errorCode, errorMessage, errorDetails)
+  }
+
+  fun endOfStream() {
+    sink.endOfStream()
+  }
+}
+      
+abstract class OnPlatformEventStreamHandler : PlatformApiPigeonEventChannelWrapper<ComponentCommunicationModel> {
+  companion object {
+    fun register(messenger: BinaryMessenger, streamHandler: OnPlatformEventStreamHandler, instanceName: String = "") {
+      var channelName: String = "dev.flutter.pigeon.adyen_checkout.PlatformEvents.onPlatformEvent"
+      if (instanceName.isNotEmpty()) {
+        channelName += ".$instanceName"
+      }
+      val internalStreamHandler = PlatformApiPigeonStreamHandler<ComponentCommunicationModel>(streamHandler)
+      EventChannel(messenger, channelName, PlatformApiPigeonMethodCodec).setStreamHandler(internalStreamHandler)
+    }
+  }
+}
+      

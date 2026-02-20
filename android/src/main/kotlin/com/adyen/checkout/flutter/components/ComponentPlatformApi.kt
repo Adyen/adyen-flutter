@@ -22,6 +22,7 @@ import com.adyen.checkout.flutter.generated.ErrorDTO
 import com.adyen.checkout.flutter.generated.InstantPaymentConfigurationDTO
 import com.adyen.checkout.flutter.generated.InstantPaymentSetupResultDTO
 import com.adyen.checkout.flutter.generated.InstantPaymentType
+import com.adyen.checkout.flutter.generated.OnPlatformEventStreamHandler
 import com.adyen.checkout.flutter.generated.PaymentEventDTO
 import com.adyen.checkout.flutter.generated.PaymentEventType
 import com.adyen.checkout.flutter.generated.PaymentResultDTO
@@ -64,30 +65,35 @@ class ComponentPlatformApi(
         ActionComponentManager(activity, componentFlutterInterface, ::assignCurrentComponent)
     private val intentListener = Consumer<Intent> { handleIntent(it) }
     private var currentComponent: ActionHandlingComponent? = null
+    private var platformEventHandler: ComponentPlatformEventHandler = ComponentPlatformEventHandler()
 
     init {
         cardComponentManager.registerComponentViewFactories()
-        flutterPluginBinding?.platformViewRegistry?.registerViewFactory(
-            AdyenComponentFactory.ADYEN_COMPONENT_SESSION,
-            AdyenComponentFactory(
-                componentFlutterApi = componentFlutterInterface,
-                adyenFlutterInterface = adyenFlutterInterface,
-                viewTypeId = AdyenComponentFactory.ADYEN_COMPONENT_SESSION,
-                onDispose = ::onDispose,
-                checkoutHolder = checkoutHolder,
+        flutterPluginBinding?.let { binding ->
+            OnPlatformEventStreamHandler.register(binding.binaryMessenger, platformEventHandler)
+            binding.platformViewRegistry.registerViewFactory(
+                AdyenComponentFactory.ADYEN_COMPONENT_SESSION,
+                AdyenComponentFactory(
+                    adyenFlutterInterface = adyenFlutterInterface,
+                    activity = activity,
+                    viewTypeId = AdyenComponentFactory.ADYEN_COMPONENT_SESSION,
+                    onDispose = ::onDispose,
+                    checkoutHolder = checkoutHolder,
+                    platformEventHandler = platformEventHandler,
+                )
             )
-        )
-
-        flutterPluginBinding?.platformViewRegistry?.registerViewFactory(
-            AdyenComponentFactory.ADYEN_COMPONENT_ADVANCED,
-            AdyenComponentFactory(
-                componentFlutterApi = componentFlutterInterface,
-                adyenFlutterInterface = adyenFlutterInterface,
-                viewTypeId = AdyenComponentFactory.ADYEN_COMPONENT_ADVANCED,
-                onDispose = ::onDispose,
-                checkoutHolder = checkoutHolder,
+            binding.platformViewRegistry.registerViewFactory(
+                AdyenComponentFactory.ADYEN_COMPONENT_ADVANCED,
+                AdyenComponentFactory(
+                    adyenFlutterInterface = adyenFlutterInterface,
+                    platformEventHandler = platformEventHandler,
+                    activity = activity,
+                    viewTypeId = AdyenComponentFactory.ADYEN_COMPONENT_ADVANCED,
+                    onDispose = ::onDispose,
+                    checkoutHolder = checkoutHolder,
+                )
             )
-        )
+        }
     }
 
     // Update view height from Flutter when required.

@@ -42,10 +42,6 @@ abstract class AdyenBaseComponent extends StatefulWidget {
     AdyenLogger? adyenLogger,
   }) : adyenLogger = adyenLogger ?? AdyenLogger.instance;
 
-  void handleComponentCommunication(ComponentCommunicationModel event);
-
-  void onFinished(PaymentResultDTO? paymentResultDTO);
-
   void onResult(ComponentCommunicationModel event) {
     final paymentResult = event.paymentResult;
     if (paymentResult == null) {
@@ -53,17 +49,16 @@ abstract class AdyenBaseComponent extends StatefulWidget {
     }
 
     switch (paymentResult.type) {
-      case PaymentResultEnum.finished:
-        onFinished(event.paymentResult);
-      case PaymentResultEnum.error:
-        _onError(event.paymentResult);
       case PaymentResultEnum.cancelledByUser:
         _onCancelledByUser();
+      case PaymentResultEnum.finished:
+        // TODO: Handle this case.
+        throw UnimplementedError();
+      case PaymentResultEnum.error:
+        // TODO: Handle this case.
+        throw UnimplementedError();
     }
   }
-
-  void _onError(PaymentResultDTO? paymentResultDTO) =>
-      onPaymentResult(PaymentError(reason: paymentResultDTO?.reason));
 
   void _onCancelledByUser() => onPaymentResult(PaymentCancelledByUser());
 
@@ -79,18 +74,15 @@ class _AdyenBaseComponentState extends State<AdyenBaseComponent> {
   final GlobalKey _cardWidgetKey = GlobalKey();
   late Widget _cardWidget;
   final ComponentFlutterApi _componentFlutterApi = ComponentFlutterApi.instance;
-  late StreamSubscription<ComponentCommunicationModel>
-  _componentCommunicationStream;
+
   int? previousViewportHeight;
   int? viewportHeight;
 
   @override
   void initState() {
     _cardWidget = _buildCardWidget();
-    _componentCommunicationStream = _componentFlutterApi
-        .componentCommunicationStream.stream
-        .where((communicationModel) =>
-    communicationModel.componentId == widget.componentId)
+    onPlatformEvent()
+        .where((event) => event.componentId == widget.componentId)
         .listen(onComponentCommunication);
 
     super.initState();
@@ -108,7 +100,6 @@ class _AdyenBaseComponentState extends State<AdyenBaseComponent> {
 
   @override
   void dispose() {
-    _componentCommunicationStream.cancel();
     _componentFlutterApi.dispose();
     super.dispose();
   }
@@ -148,8 +139,6 @@ class _AdyenBaseComponentState extends State<AdyenBaseComponent> {
       _handleOnBinLookup(event, widget.onBinLookup);
     } else if (event.type case ComponentCommunicationType.binValue) {
       _handleOnBinValue(event, widget.onBinValue);
-    } else {
-      widget.handleComponentCommunication(event);
     }
   }
 
@@ -165,9 +154,9 @@ class _AdyenBaseComponentState extends State<AdyenBaseComponent> {
   }
 
   void _handleOnBinLookup(
-      ComponentCommunicationModel event,
-      void Function(List<BinLookupData>)? onBinLookup,
-      ) {
+    ComponentCommunicationModel event,
+    void Function(List<BinLookupData>)? onBinLookup,
+  ) {
     if (onBinLookup == null) {
       return;
     }
@@ -180,9 +169,9 @@ class _AdyenBaseComponentState extends State<AdyenBaseComponent> {
   }
 
   void _handleOnBinValue(
-      ComponentCommunicationModel event,
-      void Function(String)? onBinValue,
-      ) {
+    ComponentCommunicationModel event,
+    void Function(String)? onBinValue,
+  ) {
     if (onBinValue == null) {
       return;
     }

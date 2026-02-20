@@ -80,7 +80,6 @@ class DropIn {
           PaymentError(reason: paymentResultDTO.reason),
         PaymentResultEnum.finished => PaymentSessionFinished(
             sessionId: paymentResultDTO.result?.sessionId ?? "",
-            sessionData: paymentResultDTO.result?.sessionData ?? "",
             sessionResult: paymentResultDTO.result?.sessionResult ?? "",
             resultCode:
                 paymentResultDTO.result?.toResultCode() ?? ResultCode.unknown,

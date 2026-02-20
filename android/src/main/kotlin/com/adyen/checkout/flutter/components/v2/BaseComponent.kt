@@ -2,7 +2,9 @@ package com.adyen.checkout.flutter.components.v2
 
 import android.content.Context
 import android.view.View
+import androidx.activity.ComponentActivity
 import com.adyen.checkout.card.old.CardComponent
+import com.adyen.checkout.flutter.components.ComponentPlatformEventHandler
 import com.adyen.checkout.flutter.components.view.DynamicComponentView
 import com.adyen.checkout.flutter.generated.AdyenFlutterInterface
 import com.adyen.checkout.flutter.generated.BinLookupDataDTO
@@ -15,21 +17,15 @@ import com.adyen.checkout.flutter.utils.ConfigurationMapper.toCheckoutConfigurat
 import io.flutter.plugin.platform.PlatformView
 
 abstract class BaseComponent(
-    protected val checkoutHolder: CheckoutHolder,
-    private val context: Context,
+    private val activity: ComponentActivity,
     private val creationParams: Map<*, *>,
-    private val componentFlutterApi: ComponentFlutterInterface,
-    private val adyenFlutterInterface: AdyenFlutterInterface,
     private val onDispose: (String) -> Unit,
+    private val platformEventHandler: ComponentPlatformEventHandler
 ) : PlatformView {
-    val configuration =
-        creationParams[CARD_COMPONENT_CONFIGURATION_KEY] as CheckoutConfigurationDTO?
-            ?: throw Exception("Card configuration not found")
-    internal val paymentMethodString = creationParams[PAYMENT_METHOD_KEY] as String? ?: ""
     internal val componentId = creationParams[COMPONENT_ID_KEY] as String? ?: ""
     internal val isStoredPaymentMethod = creationParams[IS_STORED_PAYMENT_METHOD_KEY] as Boolean? ?: false
-    internal val dynamicComponentView = DynamicComponentView(context, componentFlutterApi, componentId)
-    internal val checkoutConfiguration = configuration.toCheckoutConfiguration()
+    internal val dynamicComponentView =
+        DynamicComponentView(activity, componentId, platformEventHandler)
     internal var cardComponent: CardComponent? = null
 
     override fun getView(): View = dynamicComponentView
@@ -49,7 +45,7 @@ abstract class BaseComponent(
                     componentId,
                     binLookupDataDtoList
                 )
-            componentFlutterApi.onComponentCommunication(componentCommunicationModel) {}
+            platformEventHandler.eventSink?.success(componentCommunicationModel)
         }
     }
 
@@ -61,12 +57,11 @@ abstract class BaseComponent(
                     componentId,
                     binValue
                 )
-            componentFlutterApi.onComponentCommunication(componentCommunicationModel) {}
+            platformEventHandler.eventSink?.success(componentCommunicationModel)
         }
     }
 
     companion object {
-        const val CARD_COMPONENT_CONFIGURATION_KEY = "checkoutConfigurationKey"
         const val PAYMENT_METHOD_KEY = "paymentMethod"
         const val IS_STORED_PAYMENT_METHOD_KEY = "isStoredPaymentMethod"
         const val COMPONENT_ID_KEY = "componentId"

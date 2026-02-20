@@ -476,14 +476,12 @@ class PaymentResultDTO {
 
 class PaymentResultModelDTO {
   final String? sessionId;
-  final String? sessionData;
   final String? sessionResult;
   final String? resultCode;
   final OrderResponseDTO? order;
 
   PaymentResultModelDTO(
     this.sessionId,
-    this.sessionData,
     this.sessionResult,
     this.resultCode,
     this.order,
@@ -859,11 +857,22 @@ abstract class ComponentFlutterInterface {
       ComponentCommunicationModel componentCommunicationModel);
 }
 
+//V2
 @FlutterApi()
 abstract class AdyenFlutterInterface {
   @async
-  CheckoutResultDTO onSubmit(PlatformCommunicationDTO paymentCommunicationModel);
+  CheckoutResultDTO onSubmit(PlatformCommunicationDTO paymentCommunicationDTO);
 
   @async
-  CheckoutResultDTO onAdditionalDetails(PlatformCommunicationDTO paymentCommunicationModel);
+  CheckoutResultDTO onAdditionalDetails(
+      PlatformCommunicationDTO paymentCommunicationDTO);
+
+  void onFinished(PaymentResultDTO paymentResultDTO);
+
+  void onError(ErrorDTO errorDTO);
+}
+
+@EventChannelApi()
+abstract class PlatformEvents {
+  ComponentCommunicationModel onPlatformEvent();
 }

@@ -1108,7 +1108,6 @@ struct PaymentResultDTO: Hashable {
 /// Generated class from Pigeon that represents data sent in messages.
 struct PaymentResultModelDTO: Hashable {
   var sessionId: String? = nil
-  var sessionData: String? = nil
   var sessionResult: String? = nil
   var resultCode: String? = nil
   var order: OrderResponseDTO? = nil
@@ -1117,14 +1116,12 @@ struct PaymentResultModelDTO: Hashable {
   // swift-format-ignore: AlwaysUseLowerCamelCase
   static func fromList(_ pigeonVar_list: [Any?]) -> PaymentResultModelDTO? {
     let sessionId: String? = nilOrValue(pigeonVar_list[0])
-    let sessionData: String? = nilOrValue(pigeonVar_list[1])
-    let sessionResult: String? = nilOrValue(pigeonVar_list[2])
-    let resultCode: String? = nilOrValue(pigeonVar_list[3])
-    let order: OrderResponseDTO? = nilOrValue(pigeonVar_list[4])
+    let sessionResult: String? = nilOrValue(pigeonVar_list[1])
+    let resultCode: String? = nilOrValue(pigeonVar_list[2])
+    let order: OrderResponseDTO? = nilOrValue(pigeonVar_list[3])
 
     return PaymentResultModelDTO(
       sessionId: sessionId,
-      sessionData: sessionData,
       sessionResult: sessionResult,
       resultCode: resultCode,
       order: order
@@ -1133,7 +1130,6 @@ struct PaymentResultModelDTO: Hashable {
   func toList() -> [Any?] {
     return [
       sessionId,
-      sessionData,
       sessionResult,
       resultCode,
       order,
@@ -2157,6 +2153,8 @@ class PlatformApiPigeonCodec: FlutterStandardMessageCodec, @unchecked Sendable {
   static let shared = PlatformApiPigeonCodec(readerWriter: PlatformApiPigeonCodecReaderWriter())
 }
 
+var platformApiPigeonMethodCodec = FlutterStandardMethodCodec(readerWriter: PlatformApiPigeonCodecReaderWriter());
+
 
 /// Generated protocol from Pigeon that represents a handler of messages from Flutter.
 protocol CheckoutPlatformInterface {
@@ -2767,8 +2765,10 @@ class ComponentFlutterInterface: ComponentFlutterInterfaceProtocol {
 }
 /// Generated protocol from Pigeon that represents Flutter messages that can be called from Swift.
 protocol AdyenFlutterInterfaceProtocol {
-  func onSubmit(paymentCommunicationModel paymentCommunicationModelArg: PlatformCommunicationDTO, completion: @escaping (Result<CheckoutResultDTO, AdyenPigeonError>) -> Void)
-  func onAdditionalDetails(paymentCommunicationModel paymentCommunicationModelArg: PlatformCommunicationDTO, completion: @escaping (Result<CheckoutResultDTO, AdyenPigeonError>) -> Void)
+  func onSubmit(paymentCommunicationDTO paymentCommunicationDTOArg: PlatformCommunicationDTO, completion: @escaping (Result<CheckoutResultDTO, AdyenPigeonError>) -> Void)
+  func onAdditionalDetails(paymentCommunicationDTO paymentCommunicationDTOArg: PlatformCommunicationDTO, completion: @escaping (Result<CheckoutResultDTO, AdyenPigeonError>) -> Void)
+  func onFinished(paymentResultDTO paymentResultDTOArg: PaymentResultDTO, completion: @escaping (Result<Void, AdyenPigeonError>) -> Void)
+  func onError(errorDTO errorDTOArg: ErrorDTO, completion: @escaping (Result<Void, AdyenPigeonError>) -> Void)
 }
 class AdyenFlutterInterface: AdyenFlutterInterfaceProtocol {
   private let binaryMessenger: FlutterBinaryMessenger
@@ -2780,10 +2780,10 @@ class AdyenFlutterInterface: AdyenFlutterInterfaceProtocol {
   var codec: PlatformApiPigeonCodec {
     return PlatformApiPigeonCodec.shared
   }
-  func onSubmit(paymentCommunicationModel paymentCommunicationModelArg: PlatformCommunicationDTO, completion: @escaping (Result<CheckoutResultDTO, AdyenPigeonError>) -> Void) {
+  func onSubmit(paymentCommunicationDTO paymentCommunicationDTOArg: PlatformCommunicationDTO, completion: @escaping (Result<CheckoutResultDTO, AdyenPigeonError>) -> Void) {
     let channelName: String = "dev.flutter.pigeon.adyen_checkout.AdyenFlutterInterface.onSubmit\(messageChannelSuffix)"
     let channel = FlutterBasicMessageChannel(name: channelName, binaryMessenger: binaryMessenger, codec: codec)
-    channel.sendMessage([paymentCommunicationModelArg] as [Any?]) { response in
+    channel.sendMessage([paymentCommunicationDTOArg] as [Any?]) { response in
       guard let listResponse = response as? [Any?] else {
         completion(.failure(createConnectionError(withChannelName: channelName)))
         return
@@ -2801,10 +2801,10 @@ class AdyenFlutterInterface: AdyenFlutterInterfaceProtocol {
       }
     }
   }
-  func onAdditionalDetails(paymentCommunicationModel paymentCommunicationModelArg: PlatformCommunicationDTO, completion: @escaping (Result<CheckoutResultDTO, AdyenPigeonError>) -> Void) {
+  func onAdditionalDetails(paymentCommunicationDTO paymentCommunicationDTOArg: PlatformCommunicationDTO, completion: @escaping (Result<CheckoutResultDTO, AdyenPigeonError>) -> Void) {
     let channelName: String = "dev.flutter.pigeon.adyen_checkout.AdyenFlutterInterface.onAdditionalDetails\(messageChannelSuffix)"
     let channel = FlutterBasicMessageChannel(name: channelName, binaryMessenger: binaryMessenger, codec: codec)
-    channel.sendMessage([paymentCommunicationModelArg] as [Any?]) { response in
+    channel.sendMessage([paymentCommunicationDTOArg] as [Any?]) { response in
       guard let listResponse = response as? [Any?] else {
         completion(.failure(createConnectionError(withChannelName: channelName)))
         return
@@ -2819,7 +2819,107 @@ class AdyenFlutterInterface: AdyenFlutterInterfaceProtocol {
       } else {
         let result = listResponse[0] as! CheckoutResultDTO
         completion(.success(result))
+      }
+    }
+  }
+  func onFinished(paymentResultDTO paymentResultDTOArg: PaymentResultDTO, completion: @escaping (Result<Void, AdyenPigeonError>) -> Void) {
+    let channelName: String = "dev.flutter.pigeon.adyen_checkout.AdyenFlutterInterface.onFinished\(messageChannelSuffix)"
+    let channel = FlutterBasicMessageChannel(name: channelName, binaryMessenger: binaryMessenger, codec: codec)
+    channel.sendMessage([paymentResultDTOArg] as [Any?]) { response in
+      guard let listResponse = response as? [Any?] else {
+        completion(.failure(createConnectionError(withChannelName: channelName)))
+        return
+      }
+      if listResponse.count > 1 {
+        let code: String = listResponse[0] as! String
+        let message: String? = nilOrValue(listResponse[1])
+        let details: String? = nilOrValue(listResponse[2])
+        completion(.failure(AdyenPigeonError(code: code, message: message, details: details)))
+      } else {
+        completion(.success(()))
+      }
+    }
+  }
+  func onError(errorDTO errorDTOArg: ErrorDTO, completion: @escaping (Result<Void, AdyenPigeonError>) -> Void) {
+    let channelName: String = "dev.flutter.pigeon.adyen_checkout.AdyenFlutterInterface.onError\(messageChannelSuffix)"
+    let channel = FlutterBasicMessageChannel(name: channelName, binaryMessenger: binaryMessenger, codec: codec)
+    channel.sendMessage([errorDTOArg] as [Any?]) { response in
+      guard let listResponse = response as? [Any?] else {
+        completion(.failure(createConnectionError(withChannelName: channelName)))
+        return
+      }
+      if listResponse.count > 1 {
+        let code: String = listResponse[0] as! String
+        let message: String? = nilOrValue(listResponse[1])
+        let details: String? = nilOrValue(listResponse[2])
+        completion(.failure(AdyenPigeonError(code: code, message: message, details: details)))
+      } else {
+        completion(.success(()))
       }
     }
   }
 }
+
+private class PigeonStreamHandler<ReturnType>: NSObject, FlutterStreamHandler {
+  private let wrapper: PigeonEventChannelWrapper<ReturnType>
+  private var pigeonSink: PigeonEventSink<ReturnType>? = nil
+
+  init(wrapper: PigeonEventChannelWrapper<ReturnType>) {
+    self.wrapper = wrapper
+  }
+
+  func onListen(withArguments arguments: Any?, eventSink events: @escaping FlutterEventSink)
+    -> FlutterError?
+  {
+    pigeonSink = PigeonEventSink<ReturnType>(events)
+    wrapper.onListen(withArguments: arguments, sink: pigeonSink!)
+    return nil
+  }
+
+  func onCancel(withArguments arguments: Any?) -> FlutterError? {
+    pigeonSink = nil
+    wrapper.onCancel(withArguments: arguments)
+    return nil
+  }
+}
+
+class PigeonEventChannelWrapper<ReturnType> {
+  func onListen(withArguments arguments: Any?, sink: PigeonEventSink<ReturnType>) {}
+  func onCancel(withArguments arguments: Any?) {}
+}
+
+class PigeonEventSink<ReturnType> {
+  private let sink: FlutterEventSink
+
+  init(_ sink: @escaping FlutterEventSink) {
+    self.sink = sink
+  }
+
+  func success(_ value: ReturnType) {
+    sink(value)
+  }
+
+  func error(code: String, message: String?, details: Any?) {
+    sink(FlutterError(code: code, message: message, details: details))
+  }
+
+  func endOfStream() {
+    sink(FlutterEndOfEventStream)
+  }
+
+}
+
+class OnPlatformEventStreamHandler: PigeonEventChannelWrapper<ComponentCommunicationModel> {
+  static func register(with messenger: FlutterBinaryMessenger,
+                      instanceName: String = "",
+                      streamHandler: OnPlatformEventStreamHandler) {
+    var channelName = "dev.flutter.pigeon.adyen_checkout.PlatformEvents.onPlatformEvent"
+    if !instanceName.isEmpty {
+      channelName += ".\(instanceName)"
+    }
+    let internalStreamHandler = PigeonStreamHandler<ComponentCommunicationModel>(wrapper: streamHandler)
+    let channel = FlutterEventChannel(name: channelName, binaryMessenger: messenger, codec: platformApiPigeonMethodCodec)
+    channel.setStreamHandler(internalStreamHandler)
+  }
+}
+      

@@ -275,7 +275,6 @@ internal class DropInPlatformApi(
                                 with(sessionDropInResult.result) {
                                     PaymentResultModelDTO(
                                         sessionId,
-                                        sessionData,
                                         sessionResult,
                                         resultCode,
                                         order?.mapToOrderResponseModel()

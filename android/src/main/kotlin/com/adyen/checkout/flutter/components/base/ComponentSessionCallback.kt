@@ -25,7 +25,6 @@ abstract class ComponentSessionCallback<T : PaymentComponentState<*>>(
         val paymentResult =
             PaymentResultModelDTO(
                 result.sessionId,
-                result.sessionData,
                 result.sessionResult,
                 result.resultCode,
                 result.order?.mapToOrderResponseModel()

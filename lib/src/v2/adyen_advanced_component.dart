@@ -45,23 +45,8 @@ class AdyenAdvancedComponent extends AdyenBaseComponent
       };
 
   @override
-  void handleComponentCommunication(ComponentCommunicationModel event) {
-
-  }
-
-  @override
-  void onFinished(PaymentResultDTO? paymentResultDTO) {
-    final ResultCode resultCode =
-        paymentResultDTO?.result?.toResultCode() ?? ResultCode.unknown;
-    adyenLogger.print("Card advanced flow result code: $resultCode");
-    onPaymentResult(PaymentAdvancedFinished(resultCode: resultCode));
-  }
-
-  @override
   Future<CheckoutResultDTO> onSubmit(
       PlatformCommunicationDTO paymentCommunicationModel) async {
-    print("ON SUBMIT on Flutter");
-
     final Map<String, dynamic> data =
         jsonDecode(paymentCommunicationModel.dataJson!);
     final PaymentEvent onSubmitResult = await advancedCheckout.onSubmit(data);
@@ -73,8 +58,6 @@ class AdyenAdvancedComponent extends AdyenBaseComponent
   @override
   Future<CheckoutResultDTO> onAdditionalDetails(
       PlatformCommunicationDTO paymentCommunicationModel) async {
-    print("ON ADDITIONAL DETAILS on Flutter");
-
     final Map<String, dynamic> data =
         jsonDecode(paymentCommunicationModel.dataJson!);
     final PaymentEvent onSubmitResult =
@@ -82,5 +65,18 @@ class AdyenAdvancedComponent extends AdyenBaseComponent
     final CheckoutResultDTO checkoutResultDTO =
         paymentEventHandler.mapToCheckoutResultDTO(onSubmitResult);
     return checkoutResultDTO;
+  }
+
+  @override
+  void onFinished(PaymentResultDTO paymentResultDTO) {
+    final ResultCode resultCode =
+        paymentResultDTO.result?.toResultCode() ?? ResultCode.unknown;
+    adyenLogger.print("Component advanced flow result code: $resultCode");
+    onPaymentResult(PaymentAdvancedFinished(resultCode: resultCode));
+  }
+
+  @override
+  void onError(ErrorDTO errorDTO) {
+    onPaymentResult(PaymentError(reason: errorDTO.reason));
   }
 }

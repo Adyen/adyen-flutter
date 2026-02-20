@@ -26,7 +26,6 @@ class InstantSessionComponent extends BaseInstantComponent {
     _resetSession();
     onPaymentResult(PaymentSessionFinished(
       sessionId: paymentResultDTO.result?.sessionId ?? "",
-      sessionData: paymentResultDTO.result?.sessionData ?? "",
       sessionResult: paymentResultDTO.result?.sessionResult ?? "",
       resultCode: resultCode,
     ));

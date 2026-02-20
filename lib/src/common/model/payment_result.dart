@@ -16,14 +16,12 @@ class PaymentAdvancedFinished extends PaymentResult {
 
 class PaymentSessionFinished extends PaymentResult {
   final String sessionId;
-  final String sessionData;
   final String sessionResult;
   final ResultCode resultCode;
   final OrderResponse? order;
 
   PaymentSessionFinished({
     required this.sessionId,
-    required this.sessionData,
     required this.sessionResult,
     required this.resultCode,
     this.order,
@@ -33,7 +31,6 @@ class PaymentSessionFinished extends PaymentResult {
   String toString() {
     return 'PaymentSessionFinished('
         'sessionId: $sessionId, '
-        'sessionData: $sessionData, '
         'sessionResult: $sessionResult, '
         'resultCode: $resultCode, '
         'order: $order)';
