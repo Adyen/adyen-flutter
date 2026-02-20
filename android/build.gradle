@@ -54,17 +54,19 @@ android {
         implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
         testImplementation 'org.jetbrains.kotlin:kotlin-test'
         testImplementation 'org.mockito:mockito-core:5.21.0'
-        testImplementation 'io.mockk:mockk:1.14.9'
     }
 
     testOptions {
-        unitTests.all {
-            useJUnitPlatform()
+        unitTests {
+            returnDefaultValues = true
+            all {
+                useJUnitPlatform()
 
-            testLogging {
-                events "passed", "skipped", "failed", "standardOut", "standardError"
-                outputs.upToDateWhen { false }
-                showStandardStreams = true
+                testLogging {
+                    events "passed", "skipped", "failed", "standardOut", "standardError"
+                    outputs.upToDateWhen { false }
+                    showStandardStreams = true
+                }
             }
         }
     }

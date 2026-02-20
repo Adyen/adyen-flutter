@@ -1,6 +1,5 @@
 package com.adyen.checkout.flutter
 
-import android.graphics.Color
 import com.adyen.checkout.adyen3ds2.Adyen3DS2Configuration
 import com.adyen.checkout.flutter.generated.AddressMode
 import com.adyen.checkout.flutter.generated.AmountDTO
@@ -20,23 +19,14 @@ import com.adyen.checkout.flutter.generated.ThreeDS2UICustomizationDTO
 import com.adyen.checkout.flutter.utils.ConfigurationMapper.toCheckoutConfiguration
 import com.adyen.threeds2.customization.ButtonCustomization
 import com.adyen.threeds2.customization.ScreenCustomization
-import com.adyen.threeds2.customization.TextBoxCustomization
 import com.adyen.threeds2.customization.SelectionItemCustomization
+import com.adyen.threeds2.customization.TextBoxCustomization
 import com.adyen.threeds2.customization.UiCustomization
-import io.mockk.every
-import io.mockk.mockkStatic
-import io.mockk.unmockkAll
-import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 
 class ThreeDS2CustomizationMapperTest {
     private val testClientKey = "test_qwertyuiopasdfghjklzxcvbnmqwerty"
-
-    @AfterEach
-    fun tearDown() {
-        unmockkAll()
-    }
 
     private fun createBaseCardComponentConfiguration(
         threeDS2ConfigurationDTO: ThreeDS2ConfigurationDTO
@@ -65,9 +55,7 @@ class ThreeDS2CustomizationMapperTest {
     fun `when 3DS2 UI customization provided, then map to UiCustomization`() {
         val headingColor = "#222222"
         val textColor = "#111111"
-        mockkStatic(Color::class)
-        every { Color.parseColor(headingColor) } returns -1
-        every { Color.parseColor(textColor) } returns -1
+       
 
         val uiCustomizationDTO = ThreeDS2UICustomizationDTO(
             headingCustomization = ThreeDS2ToolbarCustomizationDTO(
@@ -108,11 +96,6 @@ class ThreeDS2CustomizationMapperTest {
         val screenTextColor = "#123456"
         val borderColor = "#654321"
         val inputTextColor = "#0F0F0F"
-        mockkStatic(Color::class)
-        every { Color.parseColor(screenBackgroundColor) } returns -1
-        every { Color.parseColor(screenTextColor) } returns -1
-        every { Color.parseColor(borderColor) } returns -1
-        every { Color.parseColor(inputTextColor) } returns -1
 
         val uiCustomizationDTO = ThreeDS2UICustomizationDTO(
             screenCustomization = ThreeDS2ScreenCustomizationDTO(
@@ -163,8 +146,6 @@ class ThreeDS2CustomizationMapperTest {
             textColor = "#000000",
             textFontSize = 14,
         )
-        mockkStatic(Color::class)
-        every { Color.parseColor(any()) } returns -1
 
         val uiCustomizationDTO = ThreeDS2UICustomizationDTO(
             primaryButtonCustomization = primary,
@@ -217,8 +198,6 @@ class ThreeDS2CustomizationMapperTest {
         val tint = "#FF0000"
         val highlighted = "#00FF00"
         val textColor = "#111111"
-        mockkStatic(Color::class)
-        every { Color.parseColor(any()) } returns -1
 
         val uiCustomizationDTO = ThreeDS2UICustomizationDTO(
             selectionItemCustomization = ThreeDS2SelectionItemCustomizationDTO(
@@ -248,8 +227,6 @@ class ThreeDS2CustomizationMapperTest {
     fun `when input label customization provided, then map input label fields`() {
         val inputLabelColor = "#101010"
         val inputLabelFontSize = 11L
-        mockkStatic(Color::class)
-        every { Color.parseColor(any()) } returns -1
 
         val uiCustomizationDTO = ThreeDS2UICustomizationDTO(
             labelCustomization = ThreeDS2LabelCustomizationDTO(
@@ -321,8 +298,6 @@ class ThreeDS2CustomizationMapperTest {
         val inputTextColor = "#0F0F0F"
         val primaryColor = "#0000FF"
         val secondaryColor = "#00FF00"
-        mockkStatic(Color::class)
-        every { Color.parseColor(any()) } returns -1
 
         val uiCustomizationDTO = ThreeDS2UICustomizationDTO(
             headingCustomization = ThreeDS2ToolbarCustomizationDTO(
@@ -454,9 +429,6 @@ class ThreeDS2CustomizationMapperTest {
 
     @Test
     fun `when screen customization has only background color, then text color remains default`() {
-        mockkStatic(Color::class)
-        every { Color.parseColor("#F0F0F0") } returns -1
-
         val uiCustomizationDTO = ThreeDS2UICustomizationDTO(
             screenCustomization = ThreeDS2ScreenCustomizationDTO(
                 backgroundColor = "#F0F0F0",
@@ -480,9 +452,6 @@ class ThreeDS2CustomizationMapperTest {
 
     @Test
     fun `when secondary buttons are not provided, then button customization remains default`() {
-        mockkStatic(Color::class)
-        every { Color.parseColor("#123123") } returns -1
-
         val uiCustomizationDTO = ThreeDS2UICustomizationDTO(
             primaryButtonCustomization = ThreeDS2ButtonCustomizationDTO(
                 backgroundColor = "#123123",
