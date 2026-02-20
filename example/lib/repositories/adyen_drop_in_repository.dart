@@ -57,7 +57,7 @@ class AdyenDropInRepository extends AdyenBaseRepository {
       ],
       "installmentOptions": {
         "card": {
-          "values": [1, 2, 3, 6],
+          "values": [2, 3, 6],
           "plans": ["with_interest"]
         },
         "visa": {
