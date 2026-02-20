@@ -277,17 +277,6 @@ enum class CardSecurityCodeValidationResultDTO(val raw: Int) {
   }
 }
 
-enum class InstallmentPlan(val raw: Int) {
-  REGULAR(0),
-  REVOLVING(1);
-
-  companion object {
-    fun ofRaw(raw: Int): InstallmentPlan? {
-      return values().firstOrNull { it.raw == raw }
-    }
-  }
-}
-
 /** Generated class from Pigeon that represents data sent in messages. */
 data class SessionDTO (
   val id: String,
@@ -1619,11 +1608,6 @@ private object PlatformApiPigeonCodec : StandardMessageCodec() {
           CardSecurityCodeValidationResultDTO.ofRaw(it)
         }
       }
-      182.toByte() -> {
-        return (readValue(buffer) as Int?)?.let {
-          InstallmentPlan.ofRaw(it)
-        }
-      }
       else -> super.readValueOfType(type, buffer)
     }
   }
@@ -1839,10 +1823,6 @@ private object PlatformApiPigeonCodec : StandardMessageCodec() {
       }
       is CardSecurityCodeValidationResultDTO -> {
         stream.write(181)
-        writeValue(stream, value.raw)
-      }
-      is InstallmentPlan -> {
-        stream.write(182)
         writeValue(stream, value.raw)
       }
       else -> super.writeValue(stream, value)

@@ -134,11 +134,6 @@ enum CardExpiryDateValidationResultDTO {
 
 enum CardSecurityCodeValidationResultDTO { valid, invalid }
 
-enum InstallmentPlan {
-  regular,
-  revolving,
-}
-
 class SessionDTO {
   final String id;
   final String sessionData;

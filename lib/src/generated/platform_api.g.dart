@@ -148,11 +148,6 @@ enum CardSecurityCodeValidationResultDTO {
   invalid,
 }
 
-enum InstallmentPlan {
-  regular,
-  revolving,
-}
-
 class SessionDTO {
   SessionDTO({
     required this.id,
@@ -1724,9 +1719,6 @@ class _PigeonCodec extends StandardMessageCodec {
     } else if (value is CardSecurityCodeValidationResultDTO) {
       buffer.putUint8(181);
       writeValue(buffer, value.index);
-    } else if (value is InstallmentPlan) {
-      buffer.putUint8(182);
-      writeValue(buffer, value.index);
     } else {
       super.writeValue(buffer, value);
     }
@@ -1865,9 +1857,6 @@ class _PigeonCodec extends StandardMessageCodec {
         return value == null
             ? null
             : CardSecurityCodeValidationResultDTO.values[value];
-      case 182:
-        final int? value = readValue(buffer) as int?;
-        return value == null ? null : InstallmentPlan.values[value];
       default:
         return super.readValueOfType(type, buffer);
     }

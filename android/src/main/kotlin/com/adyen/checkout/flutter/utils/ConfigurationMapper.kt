@@ -157,7 +157,8 @@ object ConfigurationMapper {
                         determineSocialSecurityNumberVisibility(configurationDTO.socialSecurityNumberFieldVisibility)
                     supportedCardBrands = mapToSupportedCardBrands(configurationDTO.supportedCardTypes)
                     isHolderNameRequired = configurationDTO.holderNameRequired
-                    installmentConfiguration = configurationDTO.installmentConfiguration?.mapToInstallmentConfiguration()
+                    installmentConfiguration =
+                        configurationDTO.installmentConfiguration?.mapToInstallmentConfiguration()
                 }
             }
 

@@ -1,6 +1,6 @@
 @_spi(AdyenInternal) import Adyen
-@_spi(AdyenInternal) import AdyenNetworking
 @testable import adyen_checkout
+@_spi(AdyenInternal) import AdyenNetworking
 
 #if canImport(AdyenCard)
     import AdyenCard
@@ -16,7 +16,6 @@
 #endif
 
 extension CardComponent.AddressFormType: Equatable {
-
     public static func == (lhs: Self, rhs: Self) -> Bool {
         switch (lhs, rhs) {
         case (.full, .full):
@@ -70,7 +69,6 @@ func createDropInConfigurationDTO(
         isPartialPaymentSupported: false
     )
 }
-
 
 func createCardConfigurationDTO(
     holderNameRequired: Bool = false,

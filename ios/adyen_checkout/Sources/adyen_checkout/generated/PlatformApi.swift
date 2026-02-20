@@ -189,11 +189,6 @@ enum CardSecurityCodeValidationResultDTO: Int {
     case invalid = 1
 }
 
-enum InstallmentPlan: Int {
-    case regular = 0
-    case revolving = 1
-}
-
 /// Generated class from Pigeon that represents data sent in messages.
 struct SessionDTO {
     var id: String
@@ -1625,13 +1620,6 @@ private class PlatformApiPigeonCodecReader: FlutterStandardReader {
                 enumResult = CardSecurityCodeValidationResultDTO(rawValue: enumResultAsInt)
             }
             return enumResult
-        case 182:
-            var enumResult: InstallmentPlan? = nil
-            let enumResultAsInt: Int? = nilOrValue(self.readValue() as? Int)
-            if let enumResultAsInt {
-                enumResult = InstallmentPlan(rawValue: enumResultAsInt)
-            }
-            return enumResult
         default:
             return super.readValue(ofType: type)
         }
@@ -1798,9 +1786,6 @@ private class PlatformApiPigeonCodecWriter: FlutterStandardWriter {
             super.writeValue(value.rawValue)
         } else if let value = value as? CardSecurityCodeValidationResultDTO {
             super.writeByte(181)
-            super.writeValue(value.rawValue)
-        } else if let value = value as? InstallmentPlan {
-            super.writeByte(182)
             super.writeValue(value.rawValue)
         } else {
             super.writeValue(value)
