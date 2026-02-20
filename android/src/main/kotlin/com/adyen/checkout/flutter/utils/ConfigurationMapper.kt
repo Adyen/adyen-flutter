@@ -3,8 +3,6 @@ package com.adyen.checkout.flutter.utils
 import com.adyen.checkout.adyen3ds2.adyen3DS2
 import com.adyen.checkout.card.AddressConfiguration
 import com.adyen.checkout.card.CardBrand
-import com.adyen.checkout.card.CardConfiguration
-import com.adyen.checkout.card.CardType
 import com.adyen.checkout.card.InstallmentConfiguration
 import com.adyen.checkout.card.InstallmentOptions
 import com.adyen.checkout.card.KCPAuthVisibility
@@ -52,7 +50,6 @@ import com.adyen.checkout.googlepay.MerchantInfo
 import com.adyen.checkout.googlepay.ShippingAddressParameters
 import com.adyen.checkout.googlepay.googlePay
 import com.adyen.checkout.twint.twint
-import com.adyen.checkout.twint.TwintConfiguration
 import com.google.android.gms.wallet.WalletConstants
 import java.util.Locale
 import com.adyen.checkout.cashapppay.CashAppPayEnvironment as SDKCashAppPayEnvironment
@@ -160,6 +157,7 @@ object ConfigurationMapper {
                         determineSocialSecurityNumberVisibility(configurationDTO.socialSecurityNumberFieldVisibility)
                     supportedCardBrands = mapToSupportedCardBrands(configurationDTO.supportedCardTypes)
                     isHolderNameRequired = configurationDTO.holderNameRequired
+                    installmentConfiguration = configurationDTO.installmentConfiguration?.mapToInstallmentConfiguration()
                 }
             }
 

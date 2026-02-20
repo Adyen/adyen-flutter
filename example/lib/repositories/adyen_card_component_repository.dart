@@ -36,6 +36,20 @@ class AdyenCardComponentRepository extends AdyenBaseRepository {
       "storePaymentMethodMode": "disabled", //enabled, disabled, askForConsent
       "recurringProcessingModel": "CardOnFile", // Subscription
       "shopperInteraction": "Ecommerce",
+      "installmentOptions": {
+        "card": {
+          "values": [1, 2, 3, 6],
+          "plans": ["with_interest"]
+        },
+        "visa": {
+          "values": [1, 2, 3, 4, 5, 12],
+          "plans": ["regular", "revolving"]
+        },
+        "mc": {
+          "values": [1, 2, 3, 4, 5, 12],
+          "plans": ["regular", "revolving"]
+        }
+      },
     };
 
     return await service.createSession(sessionRequestBody);
