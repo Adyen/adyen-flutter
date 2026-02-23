@@ -1,3 +1,21 @@
+## 1.8.1
+
+### Fixed
+
+- **HUF Currency Formatting:** Fixed an issue where Hungarian Forint (HUF) amounts were incorrectly
+  formatted on iOS 26.4 Beta. The iOS beta changed the minor digits for HUF from 2 to 0 in this
+  beta, which conflicted with the Adyen backend expectation of 2 decimal places. The SDK now
+  explicitly overrides HUF to use 2 minor units, ensuring consistent amount formatting across all
+  iOS versions.
+
+### Changed
+
+- Dependency versions:
+  | Name | Version |
+  |---------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------|
+  | [iOS Drop-in/Components](https://docs.adyen.com/online-payments/release-notes/?title%5B0%5D=iOS+Components%2FDrop-in#releaseNote=2026-02-23-ios-componentsdrop-in-5.22.2) |  5.22.2 |
+
+
 ## 1.8.0
 
 ### New
