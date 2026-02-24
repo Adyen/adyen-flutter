@@ -278,6 +278,40 @@ class ThreeDS2ConfigurationDTO {
   );
 }
 
+class DefaultInstallmentOptionsDTO {
+  final List<int?> values;
+  final bool includesRevolving;
+
+  DefaultInstallmentOptionsDTO(
+    this.values,
+    this.includesRevolving,
+  );
+}
+
+class CardBasedInstallmentOptionsDTO {
+  final List<int?> values;
+  final bool includesRevolving;
+  final String cardBrand;
+
+  CardBasedInstallmentOptionsDTO(
+    this.values,
+    this.includesRevolving,
+    this.cardBrand,
+  );
+}
+
+class InstallmentConfigurationDTO {
+  final DefaultInstallmentOptionsDTO? defaultOptions;
+  final List<CardBasedInstallmentOptionsDTO?>? cardBasedOptions;
+  final bool showInstallmentAmount;
+
+  InstallmentConfigurationDTO(
+    this.defaultOptions,
+    this.cardBasedOptions,
+    this.showInstallmentAmount,
+  );
+}
+
 class DropInConfigurationDTO {
   final Environment environment;
   final String clientKey;
@@ -329,6 +363,7 @@ class CardConfigurationDTO {
   final FieldVisibility kcpFieldVisibility;
   final FieldVisibility socialSecurityNumberFieldVisibility;
   final List<String?> supportedCardTypes;
+  final InstallmentConfigurationDTO? installmentConfiguration;
 
   CardConfigurationDTO(
     this.holderNameRequired,
@@ -339,6 +374,7 @@ class CardConfigurationDTO {
     this.kcpFieldVisibility,
     this.socialSecurityNumberFieldVisibility,
     this.supportedCardTypes,
+    this.installmentConfiguration,
   );
 }
 

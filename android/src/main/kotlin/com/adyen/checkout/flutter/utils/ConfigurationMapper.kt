@@ -3,6 +3,8 @@ package com.adyen.checkout.flutter.utils
 import com.adyen.checkout.adyen3ds2.adyen3DS2
 import com.adyen.checkout.card.AddressConfiguration
 import com.adyen.checkout.card.CardBrand
+import com.adyen.checkout.card.InstallmentConfiguration
+import com.adyen.checkout.card.InstallmentOptions
 import com.adyen.checkout.card.KCPAuthVisibility
 import com.adyen.checkout.card.SocialSecurityNumberVisibility
 import com.adyen.checkout.card.card
@@ -23,15 +25,18 @@ import com.adyen.checkout.flutter.generated.AmountDTO
 import com.adyen.checkout.flutter.generated.AnalyticsOptionsDTO
 import com.adyen.checkout.flutter.generated.BillingAddressParametersDTO
 import com.adyen.checkout.flutter.generated.CardComponentConfigurationDTO
+import com.adyen.checkout.flutter.generated.CardBasedInstallmentOptionsDTO
 import com.adyen.checkout.flutter.generated.CardConfigurationDTO
 import com.adyen.checkout.flutter.generated.CashAppPayConfigurationDTO
 import com.adyen.checkout.flutter.generated.CashAppPayEnvironment
+import com.adyen.checkout.flutter.generated.DefaultInstallmentOptionsDTO
 import com.adyen.checkout.flutter.generated.DropInConfigurationDTO
 import com.adyen.checkout.flutter.generated.EncryptedCardDTO
 import com.adyen.checkout.flutter.generated.Environment
 import com.adyen.checkout.flutter.generated.FieldVisibility
 import com.adyen.checkout.flutter.generated.GooglePayConfigurationDTO
 import com.adyen.checkout.flutter.generated.GooglePayEnvironment
+import com.adyen.checkout.flutter.generated.InstallmentConfigurationDTO
 import com.adyen.checkout.flutter.generated.InstantPaymentConfigurationDTO
 import com.adyen.checkout.flutter.generated.MerchantInfoDTO
 import com.adyen.checkout.flutter.generated.OrderResponseDTO
@@ -164,6 +169,8 @@ object ConfigurationMapper {
                         determineSocialSecurityNumberVisibility(configurationDTO.socialSecurityNumberFieldVisibility)
                     supportedCardBrands = mapToSupportedCardBrands(configurationDTO.supportedCardTypes)
                     isHolderNameRequired = configurationDTO.holderNameRequired
+                    installmentConfiguration =
+                        configurationDTO.installmentConfiguration?.mapToInstallmentConfiguration()
                 }
             }
 
@@ -387,4 +394,30 @@ object ConfigurationMapper {
             this@toButtonCustomization.textColor?.let { textColor = it }
             this@toButtonCustomization.textFontSize?.let { textFontSize = it.toInt() }
         }
+
+    private fun InstallmentConfigurationDTO.mapToInstallmentConfiguration(): InstallmentConfiguration {
+        val defaultOptions = defaultOptions?.mapToDefaultInstallmentOptions()
+        val cardBasedOptions = cardBasedOptions?.mapNotNull { it?.mapToCardBasedInstallmentOptions() } ?: emptyList()
+
+        return InstallmentConfiguration(
+            defaultOptions = defaultOptions,
+            cardBasedOptions = cardBasedOptions,
+            showInstallmentAmount = showInstallmentAmount
+        )
+    }
+
+    private fun DefaultInstallmentOptionsDTO.mapToDefaultInstallmentOptions():
+        InstallmentOptions.DefaultInstallmentOptions =
+        InstallmentOptions.DefaultInstallmentOptions(
+            values = (values as List<Number?>).mapNotNull { it?.toInt() },
+            includeRevolving = includesRevolving
+        )
+
+    private fun CardBasedInstallmentOptionsDTO.mapToCardBasedInstallmentOptions():
+        InstallmentOptions.CardBasedInstallmentOptions =
+        InstallmentOptions.CardBasedInstallmentOptions(
+            values = (values as List<Number?>).mapNotNull { it?.toInt() },
+            includeRevolving = includesRevolving,
+            cardBrand = CardBrand(txVariant = cardBrand)
+        )
 }

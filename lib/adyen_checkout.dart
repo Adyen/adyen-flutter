@@ -17,6 +17,8 @@ export 'src/common/model/payment_method_configurations/apple_pay/apple_pay_conta
 export 'src/common/model/payment_method_configurations/apple_pay/apple_pay_contact_field.dart';
 export 'src/common/model/payment_method_configurations/apple_pay/apple_pay_shipping_method.dart';
 export 'src/common/model/payment_method_configurations/apple_pay/apple_pay_summary_item.dart';
+export 'src/common/model/payment_method_configurations/card/installment_configuration.dart';
+export 'src/common/model/payment_method_configurations/card/installment_options.dart';
 export 'src/common/model/payment_method_configurations/card_configuration.dart';
 export 'src/common/model/payment_method_configurations/cash_app_pay_configuration.dart';
 export 'src/common/model/payment_method_configurations/google_pay/billing_address_parameters.dart';
