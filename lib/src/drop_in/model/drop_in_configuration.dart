@@ -5,8 +5,8 @@ import 'package:adyen_checkout/src/common/model/payment_method_configurations/ca
 import 'package:adyen_checkout/src/common/model/payment_method_configurations/cash_app_pay_configuration.dart';
 import 'package:adyen_checkout/src/common/model/payment_method_configurations/google_pay/google_pay_configuration.dart';
 import 'package:adyen_checkout/src/common/model/payment_method_configurations/stored_payment_method_configuration.dart';
+import 'package:adyen_checkout/src/common/model/payment_method_configurations/three_ds2/three_ds2_configuration.dart';
 import 'package:adyen_checkout/src/common/model/payment_method_configurations/twint_configuration.dart';
-import 'package:adyen_checkout/src/common/model/payment_method_configurations/three_ds2_configuration.dart';
 
 final class DropInConfiguration extends BaseConfiguration {
   final CardConfiguration? cardConfiguration;

@@ -340,7 +340,171 @@ extension ActionComponentConfigurationDTO {
 
 extension ThreeDS2ConfigurationDTO {
     func mapToThreeDS2Configuration() -> AdyenActionComponent.Configuration.ThreeDS {
-        guard let requestorAppURL, let url = URL(string: requestorAppURL) else { return .init() }
-        return .init(requestorAppURL: url)
+        let appearanceConfiguration = uiCustomization?.toAppearanceConfiguration() ?? ADYAppearanceConfiguration()
+        guard let requestorAppURL, let url = URL(string: requestorAppURL) else {
+            return .init(appearanceConfiguration: appearanceConfiguration)
+        }
+        return .init(requestorAppURL: url, appearanceConfiguration: appearanceConfiguration)
+    }
+}
+
+extension ThreeDS2UICustomizationDTO {
+    func toAppearanceConfiguration() -> ADYAppearanceConfiguration {
+        let configuration = ADYAppearanceConfiguration()
+        if let screenCustomization {
+            screenCustomization.apply(to: configuration)
+        }
+        if let headingCustomization {
+            headingCustomization.apply(to: configuration)
+        }
+        if let labelCustomization {
+            labelCustomization.apply(to: configuration)
+        }
+        if let inputCustomization {
+            inputCustomization.apply(to: configuration)
+        }
+        if let selectionItemCustomization {
+            selectionItemCustomization.apply(to: configuration)
+        }
+        primaryButtonCustomization?.apply(to: configuration, buttonType: .submit)
+        primaryButtonCustomization?.apply(to: configuration, buttonType: .continue)
+        primaryButtonCustomization?.apply(to: configuration, buttonType: .next)
+        secondaryButtonCustomization?.apply(to: configuration, buttonType: .cancel)
+        secondaryButtonCustomization?.apply(to: configuration, buttonType: .resend)
+        secondaryButtonCustomization?.apply(to: configuration, buttonType: .OOB)
+        return configuration
+    }
+}
+
+extension ThreeDS2ScreenCustomizationDTO {
+    func apply(to configuration: ADYAppearanceConfiguration) {
+        if let backgroundColor, let bgColor = UIColor(hex: backgroundColor) {
+            configuration.backgroundColor = bgColor
+        }
+        // Apply general text styling as fallback for labels
+        if let textColor, let textUIColor = UIColor(hex: textColor) {
+            configuration.textColor = textUIColor
+            configuration.tintColor = textUIColor
+            configuration.infoAppearance.headingTextColor = textUIColor
+            configuration.infoAppearance.textColor = textUIColor
+        }
+    }
+}
+
+extension ThreeDS2ToolbarCustomizationDTO {
+    func apply(to configuration: ADYAppearanceConfiguration) {
+        if let backgroundColor, let backgroundColor = UIColor(hex: backgroundColor) {
+            configuration.navigationBarAppearance.backgroundColor = backgroundColor
+        }
+        if let textColor, let textUIColor = UIColor(hex: textColor) {
+            configuration.navigationBarAppearance.textColor = textUIColor
+        }
+        if let headerText {
+            configuration.navigationBarAppearance.title = headerText
+        }
+        if let cancelButtonColor, let cancelTextColor = UIColor(hex: cancelButtonColor) {
+            configuration.buttonAppearance(for: .cancel).textColor = cancelTextColor
+        }
+    }
+}
+
+extension ThreeDS2LabelCustomizationDTO {
+    func apply(to configuration: ADYAppearanceConfiguration) {
+        if let headingTextColor, let headingColor = UIColor(hex: headingTextColor) {
+            configuration.labelAppearance.headingTextColor = headingColor
+        }
+        if let headingTextFontSize {
+            configuration.labelAppearance.headingFont = configuration.labelAppearance.headingFont.withSize(CGFloat(headingTextFontSize))
+        }
+        if let textColor, let textUIColor = UIColor(hex: textColor) {
+            configuration.labelAppearance.textColor = textUIColor
+        }
+        if let textFontSize {
+            configuration.labelAppearance.font = configuration.labelAppearance.font.withSize(CGFloat(textFontSize))
+        }
+        if let inputLabelTextColor, let inputLabelColor = UIColor(hex: inputLabelTextColor) {
+            configuration.labelAppearance.subheadingTextColor = inputLabelColor
+        }
+        if let inputLabelFontSize {
+            configuration.labelAppearance.subheadingFont = configuration.labelAppearance.subheadingFont.withSize(CGFloat(inputLabelFontSize))
+        }
+    }
+}
+
+extension ThreeDS2InputCustomizationDTO {
+    func apply(to configuration: ADYAppearanceConfiguration) {
+        if let borderColor, let boarderUIColor = UIColor(hex: borderColor) {
+            configuration.textFieldAppearance.borderColor = boarderUIColor
+        }
+        if let borderWidth {
+            configuration.textFieldAppearance.borderWidth = CGFloat(borderWidth)
+        }
+        if let cornerRadius {
+            configuration.textFieldAppearance.cornerRadius = CGFloat(cornerRadius)
+        }
+        if let textColor, let textUIColor = UIColor(hex: textColor) {
+            configuration.textFieldAppearance.textColor = textUIColor
+        }
+    }
+}
+
+extension ThreeDS2SelectionItemCustomizationDTO {
+    func apply(to configuration: ADYAppearanceConfiguration) {
+        if let selectionIndicatorTintColor,
+           let tintColor = UIColor(hex: selectionIndicatorTintColor) {
+            configuration.selectAppearance.selectionIndicatorTintColor = tintColor
+        }
+        if let highlightedBackgroundColor, let backgroundColor = UIColor(hex: highlightedBackgroundColor) {
+            configuration.selectAppearance.highlightedBackgroundColor = backgroundColor
+        }
+        if let textColor, let textUIColor = UIColor(hex: textColor) {
+            configuration.selectAppearance.textColor = textUIColor
+        }
+    }
+}
+
+extension ThreeDS2ButtonCustomizationDTO {
+    func apply(to configuration: ADYAppearanceConfiguration, buttonType: ADYAppearanceButtonType) {
+        let buttonAppearance = configuration.buttonAppearance(for: buttonType)
+
+        if let backgroundColor, let buttonColor = UIColor(hex: backgroundColor) {
+            buttonAppearance.backgroundColor = buttonColor
+        }
+        if let textColor, let textUIColor = UIColor(hex: textColor) {
+            buttonAppearance.textColor = textUIColor
+        }
+        if let cornerRadius {
+            buttonAppearance.cornerRadius = CGFloat(cornerRadius)
+        }
+        if let textFontSize {
+            buttonAppearance.font = buttonAppearance.font.withSize(CGFloat(textFontSize))
+        }
+    }
+}
+
+extension UIColor {
+    convenience init?(hex: String) {
+        var hexSanitized = hex.trimmingCharacters(in: .whitespacesAndNewlines)
+        hexSanitized = hexSanitized.replacingOccurrences(of: "#", with: "")
+
+        var rgb: UInt64 = 0
+        Scanner(string: hexSanitized).scanHexInt64(&rgb)
+
+        let red, green, blue, alpha: CGFloat
+        if hexSanitized.count == 8 {
+            alpha = CGFloat((rgb & 0xFF00_0000) >> 24) / 255.0
+            red = CGFloat((rgb & 0x00FF_0000) >> 16) / 255.0
+            green = CGFloat((rgb & 0x0000_FF00) >> 8) / 255.0
+            blue = CGFloat(rgb & 0x0000_00FF) / 255.0
+        } else if hexSanitized.count == 6 {
+            red = CGFloat((rgb & 0xFF0000) >> 16) / 255.0
+            green = CGFloat((rgb & 0x00FF00) >> 8) / 255.0
+            blue = CGFloat(rgb & 0x0000FF) / 255.0
+            alpha = 1.0
+        } else {
+            return nil
+        }
+
+        self.init(red: red, green: green, blue: blue, alpha: alpha)
     }
 }
