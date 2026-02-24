@@ -1,3 +1,16 @@
+## 1.9.0 (in development)
+
+### New
+
+- 
+
+### Changed
+
+- Dependency versions:
+  | Name | Version |
+  |---------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------|
+  | [Android Drop-in/Components](https://docs.adyen.com/online-payments/release-notes/?title%5B0%5D=Android+Components%2FDrop-in&version%5B0%5D=5.16.1)                       |  5.16.1 |
+
 ## 1.8.1
 
 ### Fixed
@@ -15,22 +28,21 @@
   |---------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------|
   | [iOS Drop-in/Components](https://docs.adyen.com/online-payments/release-notes/?title%5B0%5D=iOS+Components%2FDrop-in#releaseNote=2026-02-23-ios-componentsdrop-in-5.22.2) |  5.22.2 |
 
-
 ## 1.8.0
 
 ### New
 
-- TWINT is now supported fully in Drop-in and as an redirect Instant Component. Payment
+- TWINT is now supported in Drop-in and as a redirect instant component. Payment
   method [type](https://docs.adyen.com/payment-methods/payment-method-types): **twint**.
-- Added support for the ThreeDS2Configuration with `requestorAppURL` parameter for Drop-in and Card
-  Component.
-- The paymentMethod object now includes `sdkData`. For Advanced flow, we recommend that you include
-  this parameter in your /payments request.
+- For card payments with Drop-in and Component, you can now configure a `requestorAppURL` in your
+  `ThreeDS2Configuration`.
+- The `data` object in the onSubmit callback now includes an `sdkData` parameter. For Advanced flow,
+  we recommend that you include this parameter in your /payments request.`
 
 ## Improved
 
-- For Drop-in on iOS: Payment amount requested via /sessions endpoint is now used as the primary
-  source for the UI.
+- For Drop-in on iOS, the payment amount you specified in your `/sessions` request is used to show
+  the amount at checkout.
 - Updated Gradle and AGP to v8.13.
 
 ### Changed
@@ -41,7 +53,6 @@
   | [iOS Drop-in/Components](https://docs.adyen.com/online-payments/release-notes/?title%5B0%5D=iOS+Components%2FDrop-in#releaseNote=2025-12-18-ios-componentsdrop-in-5.22.1) |  5.22.1 |
   | [Android Drop-in/Components](https://docs.adyen.com/online-payments/release-notes/#releaseNote=2025-12-19-android-componentsdrop-in-5.16.0)                               |  5.16.0 |
   | [Android Gradle Plugin](https://developer.android.com/build/releases/gradle-plugin)                                                                                       |  8.13.2 |
-
 
 ## 1.7.0
 
