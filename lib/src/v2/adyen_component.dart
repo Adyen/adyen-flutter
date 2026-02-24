@@ -1,4 +1,3 @@
-
 import 'dart:convert';
 
 import 'package:adyen_checkout/adyen_checkout.dart';
@@ -27,52 +26,35 @@ class AdyenComponent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final String encodedPaymentMethod = json.encode(paymentMethod);
+    final double initialHeight = _calculateInitialHeight(configuration.cardConfiguration);
     return switch (checkout) {
-      SessionCheckout() => _buildCardSessionFlowWidget("2.0.0"),
-      AdvancedCheckout it => _buildCardAdvancedFlowWidget("2.0.0", it),
+      SessionCheckout it => AdyenSessionComponent(
+          checkoutConfiguration: configuration.toDTO(),
+          paymentMethod: encodedPaymentMethod,
+          session: it.toDTO(),
+          onPaymentResult: onPaymentResult,
+          initialViewHeight: initialHeight,
+          isStoredPaymentMethod: false,
+          gestureRecognizers: gestureRecognizers,
+          onBinLookup: configuration.cardConfiguration?.onBinLookup,
+          onBinValue: configuration.cardConfiguration?.onBinValue,
+        ),
+      AdvancedCheckout it => AdyenAdvancedComponent(
+          checkoutConfiguration: configuration.toDTO(),
+          paymentMethod: encodedPaymentMethod,
+          advancedCheckout: it,
+          onPaymentResult: onPaymentResult,
+          initialViewHeight: initialHeight,
+          isStoredPaymentMethod: false,
+          gestureRecognizers: gestureRecognizers,
+          onBinLookup: configuration.cardConfiguration?.onBinLookup,
+          onBinValue: configuration.cardConfiguration?.onBinValue,
+        )
     };
   }
 
-  Widget _buildCardSessionFlowWidget(String sdkVersionNumber) {
-    final SessionCheckout sessionCheckout = checkout as SessionCheckout;
-    final String encodedPaymentMethod = json.encode(paymentMethod);
-    final double initialHeight =
-        _determineInitialHeight(configuration.cardConfiguration);
-
-    return AdyenSessionComponent(
-      checkoutConfiguration: configuration.toDTO(sdkVersionNumber),
-      paymentMethod: encodedPaymentMethod,
-      session: sessionCheckout.toDTO(),
-      onPaymentResult: onPaymentResult,
-      initialViewHeight: initialHeight,
-      isStoredPaymentMethod: false,
-      onBinLookup: configuration.cardConfiguration?.onBinLookup,
-      onBinValue: configuration.cardConfiguration?.onBinValue,
-    );
-  }
-
-  Widget _buildCardAdvancedFlowWidget(
-    String sdkVersionNumber,
-    AdvancedCheckout advancedCheckout,
-  ) {
-    final initialHeight =
-        _determineInitialHeight(configuration.cardConfiguration);
-    final String encodedPaymentMethod = json.encode(paymentMethod);
-
-    return AdyenAdvancedComponent(
-      checkoutConfiguration: configuration.toDTO(sdkVersionNumber),
-      paymentMethod: encodedPaymentMethod,
-      advancedCheckout: advancedCheckout,
-      onPaymentResult: onPaymentResult,
-      initialViewHeight: initialHeight,
-      isStoredPaymentMethod: false,
-      gestureRecognizers: gestureRecognizers,
-      onBinLookup: configuration.cardConfiguration?.onBinLookup,
-      onBinValue: configuration.cardConfiguration?.onBinValue,
-    );
-  }
-
-  double _determineInitialHeight(CardConfiguration? cardConfiguration) {
+  double _calculateInitialHeight(CardConfiguration? cardConfiguration) {
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
         return _determineInitialAndroidViewHeight(cardConfiguration);

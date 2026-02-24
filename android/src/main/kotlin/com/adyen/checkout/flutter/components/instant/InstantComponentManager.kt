@@ -153,7 +153,7 @@ class InstantComponentManager(
         // We use the web redirect for now and prevent storing the payment method to align with iOS
         configuration.twint {
             setShowStorePaymentField(false)
-            setActionHandlingMethod( ActionHandlingMethod.PREFER_WEB)
+            setActionHandlingMethod(ActionHandlingMethod.PREFER_WEB)
         }
         val twintComponent =
             when (componentId) {

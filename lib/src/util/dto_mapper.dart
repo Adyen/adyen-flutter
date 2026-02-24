@@ -335,7 +335,8 @@ extension BinLookupDataMapper on Iterable<BinLookupDataDTO> {
 }
 
 extension CheckoutConfigurationMapper on CheckoutConfiguration {
-  CheckoutConfigurationDTO toDTO(String sdkVersionNumber) {
+  CheckoutConfigurationDTO toDTO() {
+    const sdkVersionNumber = "2.0.0";
     return CheckoutConfigurationDTO(
       environment: environment,
       clientKey: clientKey,

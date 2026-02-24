@@ -103,13 +103,14 @@ class AdyenCheckoutPlugin :
     ) {
         componentFlutterApi = ComponentFlutterInterface(binaryMessenger)
         adyenFlutterInterface = AdyenFlutterInterface(binaryMessenger)
-        componentPlatformApi = ComponentPlatformApi(
-            fragmentActivity,
-            checkoutHolder,
-            componentFlutterApi!!,
-            adyenFlutterInterface!!,
-            flutterPluginBinding
-        )
+        componentPlatformApi =
+            ComponentPlatformApi(
+                fragmentActivity,
+                checkoutHolder,
+                componentFlutterApi!!,
+                adyenFlutterInterface!!,
+                flutterPluginBinding
+            )
         ComponentPlatformInterface.setUp(binaryMessenger, componentPlatformApi)
     }
 

@@ -2,7 +2,6 @@ package com.adyen.checkout.flutter.components.card
 
 import androidx.fragment.app.FragmentActivity
 import com.adyen.checkout.action.core.internal.ActionHandlingComponent
-import com.adyen.checkout.flutter.components.v2.BaseComponent
 import com.adyen.checkout.flutter.generated.ComponentFlutterInterface
 import com.adyen.checkout.flutter.session.CheckoutHolder
 import io.flutter.embedding.engine.plugins.FlutterPlugin
@@ -41,11 +40,6 @@ internal class CardComponentManager(
                 checkoutHolder,
             )
         )
-
-    }
-
-    private fun setCurrentAdyenComponent(currentComponent: BaseComponent) {
-
     }
 
     private fun setCurrentCardComponent(currentCardComponent: BaseCardComponent) {

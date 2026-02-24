@@ -74,9 +74,4 @@ class AdyenAdvancedComponent extends AdyenBaseComponent
     adyenLogger.print("Component advanced flow result code: $resultCode");
     onPaymentResult(PaymentAdvancedFinished(resultCode: resultCode));
   }
-
-  @override
-  void onError(ErrorDTO errorDTO) {
-    onPaymentResult(PaymentError(reason: errorDTO.reason));
-  }
 }

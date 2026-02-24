@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:adyen_checkout/src/common/model/card_callbacks/bin_lookup_data.dart';
 import 'package:adyen_checkout/src/common/model/payment_result.dart';
-import 'package:adyen_checkout/src/components/card/card_component_container.dart';
+import 'package:adyen_checkout/src/components/card/adyen_component_container.dart';
 import 'package:adyen_checkout/src/components/component_flutter_api.dart';
 import 'package:adyen_checkout/src/components/component_platform_api.dart';
 import 'package:adyen_checkout/src/components/platform/android_platform_view.dart';
@@ -98,11 +98,11 @@ class _BaseCardComponentState extends State<BaseCardComponent> {
 
   @override
   Widget build(BuildContext context) {
-    return CardComponentContainer(
-      cardWidgetKey: _cardWidgetKey,
+    return AdyenComponentContainer(
+      widgetKey: _cardWidgetKey,
       initialViewPortHeight: widget.initialViewHeight,
       viewportHeight: viewportHeight,
-      cardWidget: _cardWidget,
+      componentWidget: _cardWidget,
     );
   }
 
@@ -132,7 +132,7 @@ class _BaseCardComponentState extends State<BaseCardComponent> {
           creationParams: widget.creationParams,
           gestureRecognizers: widget.gestureRecognizers,
           onPlatformViewCreated: _componentPlatformApi.updateViewHeight,
-          cardWidgetKey: _cardWidgetKey,
+          widgetKey: _cardWidgetKey,
         );
       default:
         throw UnsupportedError('Unsupported platform');

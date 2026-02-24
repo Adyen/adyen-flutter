@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:adyen_checkout/src/common/model/card_callbacks/bin_lookup_data.dart';
 import 'package:adyen_checkout/src/common/model/payment_result.dart';
-import 'package:adyen_checkout/src/components/card/card_component_container.dart';
+import 'package:adyen_checkout/src/components/card/adyen_component_container.dart';
 import 'package:adyen_checkout/src/components/component_flutter_api.dart';
 import 'package:adyen_checkout/src/components/component_platform_api.dart';
 import 'package:adyen_checkout/src/components/platform/android_platform_view.dart';
@@ -52,13 +52,16 @@ abstract class AdyenBaseComponent extends StatefulWidget {
       case PaymentResultEnum.cancelledByUser:
         _onCancelledByUser();
       case PaymentResultEnum.finished:
-        // TODO: Handle this case.
-        throw UnimplementedError();
+        onFinished(paymentResult);
       case PaymentResultEnum.error:
-        // TODO: Handle this case.
-        throw UnimplementedError();
+        _onError(paymentResult);
     }
   }
+
+  void onFinished(PaymentResultDTO paymentResultDTO);
+
+  void _onError(PaymentResultDTO paymentResultDTO) =>
+      onPaymentResult(PaymentError(reason: paymentResultDTO.reason));
 
   void _onCancelledByUser() => onPaymentResult(PaymentCancelledByUser());
 
@@ -71,8 +74,8 @@ class _AdyenBaseComponentState extends State<AdyenBaseComponent> {
       ComponentFlutterInterface.pigeonChannelCodec;
   final ComponentPlatformApi _componentPlatformApi =
       ComponentPlatformApi.instance;
-  final GlobalKey _cardWidgetKey = GlobalKey();
-  late Widget _cardWidget;
+  final GlobalKey _widgetKey = GlobalKey();
+  late Widget _componentWidget;
   final ComponentFlutterApi _componentFlutterApi = ComponentFlutterApi.instance;
 
   int? previousViewportHeight;
@@ -80,7 +83,7 @@ class _AdyenBaseComponentState extends State<AdyenBaseComponent> {
 
   @override
   void initState() {
-    _cardWidget = _buildCardWidget();
+    _componentWidget = _buildComponentWidget();
     onPlatformEvent()
         .where((event) => event.componentId == widget.componentId)
         .listen(onComponentCommunication);
@@ -90,11 +93,11 @@ class _AdyenBaseComponentState extends State<AdyenBaseComponent> {
 
   @override
   Widget build(BuildContext context) {
-    return CardComponentContainer(
-      cardWidgetKey: _cardWidgetKey,
+    return AdyenComponentContainer(
+      widgetKey: _widgetKey,
       initialViewPortHeight: widget.initialViewHeight,
       viewportHeight: viewportHeight,
-      cardWidget: _cardWidget,
+      componentWidget: _componentWidget,
     );
   }
 
@@ -104,7 +107,7 @@ class _AdyenBaseComponentState extends State<AdyenBaseComponent> {
     super.dispose();
   }
 
-  Widget _buildCardWidget() {
+  Widget _buildComponentWidget() {
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
         return AndroidPlatformView(
@@ -123,7 +126,7 @@ class _AdyenBaseComponentState extends State<AdyenBaseComponent> {
           creationParams: widget.creationParams,
           gestureRecognizers: widget.gestureRecognizers,
           onPlatformViewCreated: _componentPlatformApi.updateViewHeight,
-          cardWidgetKey: _cardWidgetKey,
+          widgetKey: _widgetKey,
         );
       default:
         throw UnsupportedError('Unsupported platform');

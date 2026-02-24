@@ -24,12 +24,9 @@ class AdyenCheckoutSession {
     required SessionResponse sessionResponse,
     required CheckoutConfiguration checkoutConfiguration,
   }) async {
-    final sdkVersionNumber =
-        await _sdkVersionNumberProvider.getSdkVersionNumber();
-
     final sessionDTO = await adyenCheckoutApi.setupSession(
       sessionResponse.toDTO(),
-      checkoutConfiguration.toDTO(sdkVersionNumber),
+      checkoutConfiguration.toDTO(),
     );
     return SessionCheckout(
       id: sessionDTO.id,

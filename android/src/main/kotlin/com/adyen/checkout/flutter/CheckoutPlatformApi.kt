@@ -53,25 +53,27 @@ class CheckoutPlatformApi(
             try {
                 val sessionResponse = sessionResponseDTO.mapToSessionResponse()
                 val checkoutConfiguration = createConfiguration(checkoutConfigurationDTO)
-                val checkoutResult = Checkout.setup(
-                    sessionResponse,
-                    checkoutConfiguration
-                )
+                val checkoutResult =
+                    Checkout.setup(
+                        sessionResponse,
+                        checkoutConfiguration
+                    )
 
                 when (checkoutResult) {
-                    is Checkout.Result.Error -> onSetupError(
-                        error = checkoutResult.error.message ?: "Checkout setup failed.",
-                        callback = callback
-                    )
+                    is Checkout.Result.Error ->
+                        onSetupError(
+                            error = checkoutResult.error.message ?: "Checkout setup failed.",
+                            callback = callback
+                        )
 
-                    is Checkout.Result.Success -> onSetupSuccess(
-                        checkoutSession = checkoutResult.checkoutContext,
-                        callback = callback
-                    )
+                    is Checkout.Result.Success ->
+                        onSetupSuccess(
+                            checkoutSession = checkoutResult.checkoutContext,
+                            callback = callback
+                        )
                 }
-
             } catch (exception: Exception) {
-                //Exception will contain the checkout error
+                // Exception will contain the checkout error
                 // TODO: Add error handling
                 onSetupError(exception.message ?: "Checkout setup failed.", callback)
                 return@launch
@@ -86,20 +88,20 @@ class CheckoutPlatformApi(
     ) {
         activity.lifecycleScope.launch(Dispatchers.IO) {
             try {
-                val paymentMethods = PaymentMethodsApiResponse.SERIALIZER.deserialize(
-                    org.json.JSONObject(paymentMethodsResponse)
-                )
+                val paymentMethods =
+                    PaymentMethodsApiResponse.SERIALIZER.deserialize(
+                        org.json.JSONObject(paymentMethodsResponse)
+                    )
                 val checkoutConfiguration = checkoutConfigurationDTO.toCheckoutConfiguration()
-                val checkoutResult = Checkout.setup(
-                    paymentMethodsApiResponse = paymentMethods,
-                    configuration = checkoutConfiguration
-                )
-
-                when (checkoutResult) {
-                    is Checkout.Result.Error -> callback(
-                        Result.failure(PlatformException(checkoutResult.error.message ?: "Checkout setup failed."))
+                val checkoutResult =
+                    Checkout.setup(
+                        paymentMethodsApiResponse = paymentMethods,
+                        configuration = checkoutConfiguration
                     )
 
+                when (checkoutResult) {
+                    is Checkout.Result.Error ->
+                        callback(Result.failure(PlatformException(checkoutResult.error.message ?: "Checkout setup failed.")))
                     is Checkout.Result.Success -> {
                         checkoutHolder.checkoutContext = checkoutResult.checkoutContext
                         callback(Result.success(Unit))
@@ -197,7 +199,8 @@ class CheckoutPlatformApi(
             val sessionResponse = SessionSetupResponse.SERIALIZER.serialize(sessionSetupResponse)
             val paymentMethodsJsonObject =
                 sessionSetupResponse.paymentMethodsApiResponse?.let {
-                    com.adyen.checkout.components.core.PaymentMethodsApiResponse.SERIALIZER.serialize(it)
+                    com.adyen.checkout.components.core.PaymentMethodsApiResponse.SERIALIZER
+                        .serialize(it)
                 }
             checkoutHolder.sessionSetupResponse = sessionResponse
             callback(

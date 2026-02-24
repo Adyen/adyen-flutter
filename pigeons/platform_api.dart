@@ -866,10 +866,6 @@ abstract class AdyenFlutterInterface {
   @async
   CheckoutResultDTO onAdditionalDetails(
       PlatformCommunicationDTO paymentCommunicationDTO);
-
-  void onFinished(PaymentResultDTO paymentResultDTO);
-
-  void onError(ErrorDTO errorDTO);
 }
 
 @EventChannelApi()

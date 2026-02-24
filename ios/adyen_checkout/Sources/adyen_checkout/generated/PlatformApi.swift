@@ -2767,8 +2767,6 @@ class ComponentFlutterInterface: ComponentFlutterInterfaceProtocol {
 protocol AdyenFlutterInterfaceProtocol {
   func onSubmit(paymentCommunicationDTO paymentCommunicationDTOArg: PlatformCommunicationDTO, completion: @escaping (Result<CheckoutResultDTO, AdyenPigeonError>) -> Void)
   func onAdditionalDetails(paymentCommunicationDTO paymentCommunicationDTOArg: PlatformCommunicationDTO, completion: @escaping (Result<CheckoutResultDTO, AdyenPigeonError>) -> Void)
-  func onFinished(paymentResultDTO paymentResultDTOArg: PaymentResultDTO, completion: @escaping (Result<Void, AdyenPigeonError>) -> Void)
-  func onError(errorDTO errorDTOArg: ErrorDTO, completion: @escaping (Result<Void, AdyenPigeonError>) -> Void)
 }
 class AdyenFlutterInterface: AdyenFlutterInterfaceProtocol {
   private let binaryMessenger: FlutterBinaryMessenger
@@ -2819,42 +2817,6 @@ class AdyenFlutterInterface: AdyenFlutterInterfaceProtocol {
       } else {
         let result = listResponse[0] as! CheckoutResultDTO
         completion(.success(result))
-      }
-    }
-  }
-  func onFinished(paymentResultDTO paymentResultDTOArg: PaymentResultDTO, completion: @escaping (Result<Void, AdyenPigeonError>) -> Void) {
-    let channelName: String = "dev.flutter.pigeon.adyen_checkout.AdyenFlutterInterface.onFinished\(messageChannelSuffix)"
-    let channel = FlutterBasicMessageChannel(name: channelName, binaryMessenger: binaryMessenger, codec: codec)
-    channel.sendMessage([paymentResultDTOArg] as [Any?]) { response in
-      guard let listResponse = response as? [Any?] else {
-        completion(.failure(createConnectionError(withChannelName: channelName)))
-        return
-      }
-      if listResponse.count > 1 {
-        let code: String = listResponse[0] as! String
-        let message: String? = nilOrValue(listResponse[1])
-        let details: String? = nilOrValue(listResponse[2])
-        completion(.failure(AdyenPigeonError(code: code, message: message, details: details)))
-      } else {
-        completion(.success(()))
-      }
-    }
-  }
-  func onError(errorDTO errorDTOArg: ErrorDTO, completion: @escaping (Result<Void, AdyenPigeonError>) -> Void) {
-    let channelName: String = "dev.flutter.pigeon.adyen_checkout.AdyenFlutterInterface.onError\(messageChannelSuffix)"
-    let channel = FlutterBasicMessageChannel(name: channelName, binaryMessenger: binaryMessenger, codec: codec)
-    channel.sendMessage([errorDTOArg] as [Any?]) { response in
-      guard let listResponse = response as? [Any?] else {
-        completion(.failure(createConnectionError(withChannelName: channelName)))
-        return
-      }
-      if listResponse.count > 1 {
-        let code: String = listResponse[0] as! String
-        let message: String? = nilOrValue(listResponse[1])
-        let details: String? = nilOrValue(listResponse[2])
-        completion(.failure(AdyenPigeonError(code: code, message: message, details: details)))
-      } else {
-        completion(.success(()))
       }
     }
   }

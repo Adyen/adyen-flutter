@@ -13,7 +13,7 @@ class IosPlatformView extends StatelessWidget {
   final MessageCodec codec;
   final Set<Factory<OneSequenceGestureRecognizer>>? gestureRecognizers;
   final Function(int) onPlatformViewCreated;
-  final GlobalKey cardWidgetKey;
+  final GlobalKey widgetKey;
 
   const IosPlatformView({
     super.key,
@@ -21,7 +21,7 @@ class IosPlatformView extends StatelessWidget {
     required this.creationParams,
     required this.codec,
     required this.onPlatformViewCreated,
-    required this.cardWidgetKey,
+    required this.widgetKey,
     this.gestureRecognizers,
   });
 
@@ -63,7 +63,7 @@ class IosPlatformView extends StatelessWidget {
         Factory<HorizontalDragGestureRecognizer>(
             () => HorizontalDragGestureRecognizer()),
         Factory<ToggleAreaGestureRecognizer>(() => ToggleAreaGestureRecognizer(
-            cardWidgetKey: cardWidgetKey,
+            cardWidgetKey: widgetKey,
             textDirection: Directionality.of(context))),
       });
     }

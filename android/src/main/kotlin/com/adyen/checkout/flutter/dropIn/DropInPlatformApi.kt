@@ -66,7 +66,7 @@ internal class DropInPlatformApi(
         val checkoutSession =
             createCheckoutSession(
                 checkoutHolder,
-                TEST, //TODO Change back to generic
+                TEST, // TODO Change back to generic
                 dropInConfigurationDTO.clientKey
             )
 

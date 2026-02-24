@@ -25,7 +25,7 @@ class AdyenCheckoutAdvanced {
     );
     await adyenCheckoutApi.setupAdvanced(
       encodedPaymentMethodsResponse,
-      checkoutConfiguration.toDTO("2.0"),
+      checkoutConfiguration.toDTO(),
     );
   }
 

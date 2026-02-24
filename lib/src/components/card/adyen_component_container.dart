@@ -1,20 +1,20 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-class CardComponentContainer extends StatelessWidget {
-  const CardComponentContainer({
+class AdyenComponentContainer extends StatelessWidget {
+  const AdyenComponentContainer({
     super.key,
     required this.viewportHeight,
-    required this.cardWidgetKey,
+    required this.widgetKey,
     required this.initialViewPortHeight,
-    required this.cardWidget,
+    required this.componentWidget,
   });
 
   final double bottomSpacing = 8;
   final double initialViewPortHeight;
   final int? viewportHeight;
-  final Key cardWidgetKey;
-  final Widget cardWidget;
+  final Key widgetKey;
+  final Widget componentWidget;
 
   @override
   Widget build(BuildContext context) {
@@ -25,9 +25,9 @@ class CardComponentContainer extends StatelessWidget {
           curve: Curves.fastOutSlowIn,
           opacity: viewportHeight != null ? 1 : 0,
           child: SizedBox(
-            key: cardWidgetKey,
+            key: widgetKey,
             height: _determineHeight(viewportHeight),
-            child: cardWidget,
+            child: componentWidget,
           ),
         ),
         if (viewportHeight == null)

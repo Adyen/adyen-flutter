@@ -29,11 +29,13 @@ abstract class BaseCardComponent(
     internal val paymentMethodString = creationParams[PAYMENT_METHOD_KEY] as String? ?: ""
     internal val componentId = creationParams[COMPONENT_ID_KEY] as String? ?: ""
     internal val isStoredPaymentMethod = creationParams[IS_STORED_PAYMENT_METHOD_KEY] as Boolean? ?: false
+
 //    private val dynamicComponentView = DynamicComponentView(activity, componentFlutterApi, componentId)
-    internal val checkoutConfiguration: CheckoutConfiguration = CheckoutConfiguration(
-        environment = Environment.TEST,
-        clientKey = configuration.clientKey
-    )
+    internal val checkoutConfiguration: CheckoutConfiguration =
+        CheckoutConfiguration(
+            environment = Environment.TEST,
+            clientKey = configuration.clientKey
+        )
     internal var cardComponent: CardComponent? = null
 
     override fun getView(): View = View(context)

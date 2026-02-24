@@ -3049,40 +3049,6 @@ class AdyenFlutterInterface(private val binaryMessenger: BinaryMessenger, privat
       } 
     }
   }
-  fun onFinished(paymentResultDTOArg: PaymentResultDTO, callback: (Result<Unit>) -> Unit)
-{
-    val separatedMessageChannelSuffix = if (messageChannelSuffix.isNotEmpty()) ".$messageChannelSuffix" else ""
-    val channelName = "dev.flutter.pigeon.adyen_checkout.AdyenFlutterInterface.onFinished$separatedMessageChannelSuffix"
-    val channel = BasicMessageChannel<Any?>(binaryMessenger, channelName, codec)
-    channel.send(listOf(paymentResultDTOArg)) {
-      if (it is List<*>) {
-        if (it.size > 1) {
-          callback(Result.failure(AdyenPigeonError(it[0] as String, it[1] as String, it[2] as String?)))
-        } else {
-          callback(Result.success(Unit))
-        }
-      } else {
-        callback(Result.failure(PlatformApiPigeonUtils.createConnectionError(channelName)))
-      } 
-    }
-  }
-  fun onError(errorDTOArg: ErrorDTO, callback: (Result<Unit>) -> Unit)
-{
-    val separatedMessageChannelSuffix = if (messageChannelSuffix.isNotEmpty()) ".$messageChannelSuffix" else ""
-    val channelName = "dev.flutter.pigeon.adyen_checkout.AdyenFlutterInterface.onError$separatedMessageChannelSuffix"
-    val channel = BasicMessageChannel<Any?>(binaryMessenger, channelName, codec)
-    channel.send(listOf(errorDTOArg)) {
-      if (it is List<*>) {
-        if (it.size > 1) {
-          callback(Result.failure(AdyenPigeonError(it[0] as String, it[1] as String, it[2] as String?)))
-        } else {
-          callback(Result.success(Unit))
-        }
-      } else {
-        callback(Result.failure(PlatformApiPigeonUtils.createConnectionError(channelName)))
-      } 
-    }
-  }
 }
 
 private class PlatformApiPigeonStreamHandler<T>(

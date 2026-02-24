@@ -262,8 +262,7 @@ object ConfigurationMapper {
 
     fun AmountDTO.mapToAmount(): Amount = Amount(this.currency, this.value)
 
-    fun SessionResponseDTO.mapToSessionResponse(): SessionResponse =
-        SessionResponse(id, sessionData)
+    fun SessionResponseDTO.mapToSessionResponse(): SessionResponse = SessionResponse(id, sessionData)
 
     private fun com.adyen.checkout.components.core.Amount.mapToDTOAmount(): AmountDTO =
         AmountDTO(
@@ -284,8 +283,7 @@ object ConfigurationMapper {
             TotalPriceStatus.FINAL_PRICE -> "FINAL"
         }
 
-    private fun MerchantInfoDTO.mapToMerchantInfo(): MerchantInfo =
-        MerchantInfo(merchantName, merchantId)
+    private fun MerchantInfoDTO.mapToMerchantInfo(): MerchantInfo = MerchantInfo(merchantName, merchantId)
 
     private fun ShippingAddressParametersDTO.mapToShippingAddressParameters(): ShippingAddressParameters =
         when {

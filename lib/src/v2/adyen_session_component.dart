@@ -39,9 +39,6 @@ class AdyenSessionComponent extends AdyenBaseComponent {
       };
 
   @override
-  void handleComponentCommunication(ComponentCommunicationModel event) {}
-
-  @override
   void onFinished(PaymentResultDTO? paymentResultDTO) {
     final ResultCode resultCode =
         paymentResultDTO?.result?.toResultCode() ?? ResultCode.unknown;

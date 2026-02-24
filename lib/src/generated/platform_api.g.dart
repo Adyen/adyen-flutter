@@ -3613,10 +3613,6 @@ abstract class AdyenFlutterInterface {
 
   Future<CheckoutResultDTO> onAdditionalDetails(PlatformCommunicationDTO paymentCommunicationDTO);
 
-  void onFinished(PaymentResultDTO paymentResultDTO);
-
-  void onError(ErrorDTO errorDTO);
-
   static void setUp(AdyenFlutterInterface? api, {BinaryMessenger? binaryMessenger, String messageChannelSuffix = '',}) {
     messageChannelSuffix = messageChannelSuffix.isNotEmpty ? '.$messageChannelSuffix' : '';
     {
@@ -3661,56 +3657,6 @@ abstract class AdyenFlutterInterface {
           try {
             final CheckoutResultDTO output = await api.onAdditionalDetails(arg_paymentCommunicationDTO!);
             return wrapResponse(result: output);
-          } on PlatformException catch (e) {
-            return wrapResponse(error: e);
-          }          catch (e) {
-            return wrapResponse(error: PlatformException(code: 'error', message: e.toString()));
-          }
-        });
-      }
-    }
-    {
-      final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-          'dev.flutter.pigeon.adyen_checkout.AdyenFlutterInterface.onFinished$messageChannelSuffix', pigeonChannelCodec,
-          binaryMessenger: binaryMessenger);
-      if (api == null) {
-        pigeonVar_channel.setMessageHandler(null);
-      } else {
-        pigeonVar_channel.setMessageHandler((Object? message) async {
-          assert(message != null,
-          'Argument for dev.flutter.pigeon.adyen_checkout.AdyenFlutterInterface.onFinished was null.');
-          final List<Object?> args = (message as List<Object?>?)!;
-          final PaymentResultDTO? arg_paymentResultDTO = (args[0] as PaymentResultDTO?);
-          assert(arg_paymentResultDTO != null,
-              'Argument for dev.flutter.pigeon.adyen_checkout.AdyenFlutterInterface.onFinished was null, expected non-null PaymentResultDTO.');
-          try {
-            api.onFinished(arg_paymentResultDTO!);
-            return wrapResponse(empty: true);
-          } on PlatformException catch (e) {
-            return wrapResponse(error: e);
-          }          catch (e) {
-            return wrapResponse(error: PlatformException(code: 'error', message: e.toString()));
-          }
-        });
-      }
-    }
-    {
-      final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-          'dev.flutter.pigeon.adyen_checkout.AdyenFlutterInterface.onError$messageChannelSuffix', pigeonChannelCodec,
-          binaryMessenger: binaryMessenger);
-      if (api == null) {
-        pigeonVar_channel.setMessageHandler(null);
-      } else {
-        pigeonVar_channel.setMessageHandler((Object? message) async {
-          assert(message != null,
-          'Argument for dev.flutter.pigeon.adyen_checkout.AdyenFlutterInterface.onError was null.');
-          final List<Object?> args = (message as List<Object?>?)!;
-          final ErrorDTO? arg_errorDTO = (args[0] as ErrorDTO?);
-          assert(arg_errorDTO != null,
-              'Argument for dev.flutter.pigeon.adyen_checkout.AdyenFlutterInterface.onError was null, expected non-null ErrorDTO.');
-          try {
-            api.onError(arg_errorDTO!);
-            return wrapResponse(empty: true);
           } on PlatformException catch (e) {
             return wrapResponse(error: e);
           }          catch (e) {
