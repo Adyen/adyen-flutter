@@ -26,7 +26,8 @@ export 'src/common/model/payment_method_configurations/google_pay/google_pay_con
 export 'src/common/model/payment_method_configurations/google_pay/merchant_info.dart';
 export 'src/common/model/payment_method_configurations/google_pay/shipping_address_parameters.dart';
 export 'src/common/model/payment_method_configurations/stored_payment_method_configuration.dart';
-export 'src/common/model/payment_method_configurations/three_ds2_configuration.dart';
+export 'src/common/model/payment_method_configurations/three_ds2/adyen_3ds_theme.dart';
+export 'src/common/model/payment_method_configurations/three_ds2/three_ds2_configuration.dart';
 export 'src/common/model/payment_method_configurations/twint_configuration.dart';
 export 'src/common/model/payment_result.dart';
 export 'src/common/model/result_code.dart';

@@ -2,7 +2,7 @@
 
 ### New
 
-- 
+- Added 3DS2 UI customization via `Adyen3DSTheme`, including `fromThemeData()` support.
 
 ### Changed
 

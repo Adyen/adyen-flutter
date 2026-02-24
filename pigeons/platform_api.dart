@@ -166,11 +166,115 @@ class AnalyticsOptionsDTO {
   );
 }
 
+class ThreeDS2UICustomizationDTO {
+  final ThreeDS2ScreenCustomizationDTO? screenCustomization;
+  final ThreeDS2ToolbarCustomizationDTO? headingCustomization;
+  final ThreeDS2LabelCustomizationDTO? labelCustomization;
+  final ThreeDS2InputCustomizationDTO? inputCustomization;
+  final ThreeDS2SelectionItemCustomizationDTO? selectionItemCustomization;
+  final ThreeDS2ButtonCustomizationDTO? primaryButtonCustomization;
+  final ThreeDS2ButtonCustomizationDTO? secondaryButtonCustomization;
+
+  ThreeDS2UICustomizationDTO(
+    this.screenCustomization,
+    this.headingCustomization,
+    this.labelCustomization,
+    this.inputCustomization,
+    this.selectionItemCustomization,
+    this.primaryButtonCustomization,
+    this.secondaryButtonCustomization,
+  );
+}
+
+class ThreeDS2ScreenCustomizationDTO {
+  final String? backgroundColor;
+  final String? textColor;
+
+  ThreeDS2ScreenCustomizationDTO(
+    this.backgroundColor,
+    this.textColor,
+  );
+}
+
+class ThreeDS2ButtonCustomizationDTO {
+  final String? backgroundColor;
+  final String? textColor;
+  final int? cornerRadius;
+  final int? textFontSize;
+
+  ThreeDS2ButtonCustomizationDTO(
+    this.backgroundColor,
+    this.textColor,
+    this.cornerRadius,
+    this.textFontSize,
+  );
+}
+
+class ThreeDS2SelectionItemCustomizationDTO {
+  final String? selectionIndicatorTintColor;
+  final String? highlightedBackgroundColor;
+  final String? textColor;
+
+  ThreeDS2SelectionItemCustomizationDTO(
+    this.selectionIndicatorTintColor,
+    this.highlightedBackgroundColor,
+    this.textColor,
+  );
+}
+
+class ThreeDS2LabelCustomizationDTO {
+  final String? headingTextColor;
+  final int? headingTextFontSize;
+  final String? inputLabelTextColor;
+  final int? inputLabelFontSize;
+  final String? textColor;
+  final int? textFontSize;
+
+  ThreeDS2LabelCustomizationDTO(
+    this.headingTextColor,
+    this.headingTextFontSize,
+    this.inputLabelTextColor,
+    this.inputLabelFontSize,
+    this.textColor,
+    this.textFontSize,
+  );
+}
+
+class ThreeDS2InputCustomizationDTO {
+  final String? borderColor;
+  final int? borderWidth;
+  final int? cornerRadius;
+  final String? textColor;
+
+  ThreeDS2InputCustomizationDTO(
+    this.borderColor,
+    this.borderWidth,
+    this.cornerRadius,
+    this.textColor,
+  );
+}
+
+class ThreeDS2ToolbarCustomizationDTO {
+  final String? headerText;
+  final String? textColor;
+  final String? backgroundColor;
+  final String? cancelButtonColor;
+
+  ThreeDS2ToolbarCustomizationDTO(
+    this.headerText,
+    this.textColor,
+    this.backgroundColor,
+    this.cancelButtonColor,
+  );
+}
+
 class ThreeDS2ConfigurationDTO {
   final String? requestorAppURL;
+  final ThreeDS2UICustomizationDTO? uiCustomization;
 
   ThreeDS2ConfigurationDTO(
     this.requestorAppURL,
+    this.uiCustomization,
   );
 }
 
