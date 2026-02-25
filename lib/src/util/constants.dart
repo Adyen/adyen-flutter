@@ -22,5 +22,7 @@ class Constants {
   static const String adyenSessionComponentKey = "AdyenSessionComponent";
   static const String adyenAdvancedComponentKey = "AdyenAdvancedComponent";
   static const String checkoutConfigurationKey =
-      "checkoutConfigurationKey";
+      "checkoutConfiguration";
+  static const String paymentMethodTxVariantKey =
+      "paymentMethodTxVariant";
 }

@@ -21,16 +21,24 @@ import UIKit
 class CheckoutPlatformApi: CheckoutPlatformInterface {
     private let checkoutFlutter: CheckoutFlutterInterface
     private let componentFlutterApi: ComponentFlutterInterface
+    private let adyenFlutterInterface: AdyenFlutterInterface
+    private let componentPlatformEventHandler: ComponentPlatformEventHandler
     private let sessionHolder: SessionHolder
     private let adyenCse: AdyenCSE = .init()
+    
+    private var checkoutConfig : CheckoutConfiguration? = nil
 
     init(
         checkoutFlutter: CheckoutFlutterInterface,
         componentFlutterApi: ComponentFlutterInterface,
+        adyenFlutterInterface: AdyenFlutterInterface,
+        componentPlatformEventHandler: ComponentPlatformEventHandler,
         sessionHolder: SessionHolder
     ) {
         self.checkoutFlutter = checkoutFlutter
         self.componentFlutterApi = componentFlutterApi
+        self.adyenFlutterInterface = adyenFlutterInterface
+        self.componentPlatformEventHandler = componentPlatformEventHandler
         self.sessionHolder = sessionHolder
     }
     
@@ -42,7 +50,7 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
                 do {
                     //TODO: Config needs to be just session relevant, component specific one needs to be bound when creating component?
                     let sessionResponse = sessionResponseDTO.mapToSessionResponse()
-                    let checkoutConfiguration = try await createConfiguration(configurationDTO: checkoutConfigurationDTO)
+                    let checkoutConfiguration = try await createSessionCheckoutConfiguration(configurationDTO: checkoutConfigurationDTO)
                     let checkoutSession = try await Checkout.setup(
                         with: sessionResponse,
                         configuration: checkoutConfiguration
@@ -57,6 +65,48 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
                     completion(Result.failure(error))
                 }
             }
+    }
+    
+    func setupSession(sessionResponseDTO: SessionResponseDTO, checkoutConfigurationDTO: CheckoutConfigurationDTO, completion: @escaping (Result<SessionDTO, any Error>) -> Void) {
+        Task {
+            do {
+                let sessionResponse = sessionResponseDTO.mapToSessionResponse()
+                let checkoutConfiguration = try await createSessionCheckoutConfiguration(configurationDTO: checkoutConfigurationDTO)
+                self.checkoutConfig = checkoutConfiguration
+                let checkoutSession = try await Checkout.setup(
+                    with: sessionResponse,
+                    configuration: checkoutConfiguration
+                )
+
+                try onSetupSuccess(
+                    id: sessionResponseDTO.id,
+                    checkoutSession: checkoutSession,
+                    completion: completion
+                )
+            } catch {
+                completion(Result.failure(error))
+            }
+        }
+    }
+    
+    func setupAdvanced(paymentMethodsResponse: String, checkoutConfigurationDTO: CheckoutConfigurationDTO, completion: @escaping (Result<Void, any Error>) -> Void) {
+        Task {
+            do {
+                let paymentMethodsData = Data(paymentMethodsResponse.utf8)
+                let paymentMethods = try JSONDecoder().decode(PaymentMethods.self, from: paymentMethodsData)
+                let checkoutConfiguration = try await createAdvancedCheckoutConfiguration(configurationDTO: checkoutConfigurationDTO)
+                self.checkoutConfig = checkoutConfiguration
+                let adyenCheckout = try await Checkout.setup(
+                    with: paymentMethods,
+                    configuration: checkoutConfiguration
+                )
+
+                sessionHolder.adyenCheckout = adyenCheckout
+                completion(Result.success(()))
+            } catch {
+                completion(Result.failure(error))
+            }
+        }
     }
 
     func createSession(
@@ -149,7 +199,7 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
         return nil
     }
 
-    private func createConfiguration(
+    private func createSessionCheckoutConfiguration(
         configurationDTO: CheckoutConfigurationDTO,
     ) async throws -> CheckoutConfiguration {
         let checkoutConfig = try CheckoutConfiguration(
@@ -160,39 +210,82 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
         ) {
             configurationDTO.cardConfigurationDTO!.mapToCardComponentConfiguration(shopperLocale: configurationDTO.shopperLocale)            
         }.onComplete { [weak self] result in
+            print("ON COMPLETE SWIFT INVOKED")
             let paymentResult = PaymentResultModelDTO(
                 sessionId: "", // REMOVE FROM DTO
-                sessionData: "", // REMOVE FROM DTO
                 sessionResult: result.sessionResult,
                 resultCode: result.resultCode.rawValue
             )
             let componentCommunicationModel = ComponentCommunicationModel(
                 type: ComponentCommunicationType.result,
-                componentId: "CARD_SESSION_COMPONENT",
+                componentId: "SESSION_ADYEN_COMPONENT",
                 paymentResult: PaymentResultDTO(
                     type: PaymentResultEnum.finished,
                     result: paymentResult
                 )
             )
-            self?.componentFlutterApi.onComponentCommunication(
-                componentCommunicationModel: componentCommunicationModel,
-                completion: { _ in }
-            )
+            self?.componentPlatformEventHandler.send(event: componentCommunicationModel)
+            
         }.onError { [weak self] error in
+            print("ON ERROR SWIFT INVOKED")
             let componentCommunicationModel = ComponentCommunicationModel(
                 type: ComponentCommunicationType.result,
-                componentId: "CARD_SESSION_COMPONENT",
+                componentId: "SESSION_ADYEN_COMPONENT",
                 paymentResult: PaymentResultDTO(
                     type: .from(error: error),
                     reason: error.localizedDescription
                 )
             )
-            self?.componentFlutterApi.onComponentCommunication(
-                componentCommunicationModel: componentCommunicationModel,
-                completion: { _ in }
-            )
+            self?.componentPlatformEventHandler.send(event: componentCommunicationModel)
         }
         
+        return checkoutConfig
+    }
+
+    private func createAdvancedCheckoutConfiguration(
+        configurationDTO: CheckoutConfigurationDTO,
+    ) async throws -> CheckoutConfiguration {
+        let checkoutConfig = try await createSessionCheckoutConfiguration(configurationDTO: configurationDTO)
+        checkoutConfig.onSubmit { [weak self] paymentData, handler in
+            print("ON SUBMIT SWIFT INVOKED")
+            guard let self else { return }
+            do {
+                let dataJson = try paymentData.toPlatformSubmitDataJson()
+                sendSubmitToFlutter(dataJson: dataJson) { [weak self] result in
+                    guard let self else { return }
+                    switch result {
+                    case let .success(checkoutResult):
+                        self.handleCheckoutResult(checkoutResult, handler: handler)
+                    case let .failure(error):
+                        self.sendErrorResultToFlutter(componentId: "ADVANCED_ADYEN_COMPONENT", reason: error.localizedDescription)
+                        handler?(CheckoutPaymentsResponse(resultCode: .error))
+                    }
+                }
+            } catch {
+                sendErrorResultToFlutter(componentId: "ADVANCED_ADYEN_COMPONENT", reason: error.localizedDescription)
+                handler?(CheckoutPaymentsResponse(resultCode: .error))
+            }
+        }.onAdditionalDetails { [weak self] additionalDetailsData, handler in
+            print("ON ADDITIONAL DETAILS SWIFT INVOKED")
+            guard let self else { return }
+            do {
+                let dataJson = try additionalDetailsData.toPlatformAdditionalDetailsJson()
+                sendAdditionalDetailsToFlutter(dataJson: dataJson) { [weak self] result in
+                    guard let self else { return }
+                    switch result {
+                    case let .success(checkoutResult):
+                        self.handleCheckoutResult(checkoutResult, handler: handler)
+                    case let .failure(error):
+                        self.sendErrorResultToFlutter(componentId: "ADVANCED_ADYEN_COMPONENT", reason: error.localizedDescription)
+                        handler?(CheckoutPaymentsResponse(resultCode: .error))
+                    }
+                }
+            } catch {
+                sendErrorResultToFlutter(componentId: "ADVANCED_ADYEN_COMPONENT", reason: error.localizedDescription)
+                handler?(CheckoutPaymentsResponse(resultCode: .error))
+            }
+        }
+
         return checkoutConfig
     }
     
@@ -222,6 +315,68 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
             }
         }
 
+    private func handleCheckoutResult(
+        _ checkoutResult: CheckoutResultDTO,
+        handler: PaymentsResponseHandler?
+    ) {
+        guard let handler else { return }
+        switch checkoutResult {
+        case let result as FinishedResultDTO:
+            handler(CheckoutPaymentsResponse(resultCode: .init(rawValue: result.resultCode)))
+        case let result as ErrorResultDTO:
+            sendErrorResultToFlutter(componentId: "ADVANCED_ADYEN_COMPONENT", reason: result.errorMessage)
+            handler(CheckoutPaymentsResponse(resultCode: .error))
+        case let result as ActionResultDTO:
+            do {
+                let action = try JSONDecoder().decode(Action.self, from: Data(result.actionResponse.utf8))
+                handler(CheckoutPaymentsResponse(resultCode: .redirectShopper, action: action))
+            } catch {
+                sendErrorResultToFlutter(componentId: "ADVANCED_ADYEN_COMPONENT", reason: error.localizedDescription)
+                handler(CheckoutPaymentsResponse(resultCode: .error))
+            }
+        default:
+            sendErrorResultToFlutter(componentId: "ADVANCED_ADYEN_COMPONENT", reason: "Unsupported checkout result.")
+            handler(CheckoutPaymentsResponse(resultCode: .error))
+        }
+    }
+
+    private func sendErrorResultToFlutter(componentId: String, reason: String) {
+        componentPlatformEventHandler.send(
+            event: ComponentCommunicationModel(
+                type: ComponentCommunicationType.result,
+                componentId: componentId,
+                paymentResult: PaymentResultDTO(
+                    type: PaymentResultEnum.error,
+                    reason: reason
+                )
+            )
+        )
+    }
+
+    private func sendSubmitToFlutter(
+        dataJson: String,
+        completion: @escaping (Result<CheckoutResultDTO, AdyenPigeonError>) -> Void
+    ) {
+        let platformCommunication = PlatformCommunicationDTO(
+            type: ComponentCommunicationType.onSubmit,
+            componentId: "ADVANCED_ADYEN_COMPONENT",
+            dataJson: dataJson
+        )
+        adyenFlutterInterface.onSubmit(platformCommunicationDTO: platformCommunication, completion: completion)
+    }
+
+    private func sendAdditionalDetailsToFlutter(
+        dataJson: String,
+        completion: @escaping (Result<CheckoutResultDTO, AdyenPigeonError>) -> Void
+    ) {
+        let platformCommunication = PlatformCommunicationDTO(
+            type: ComponentCommunicationType.additionalDetails,
+            componentId: "ADVANCED_ADYEN_COMPONENT",
+            dataJson: dataJson
+        )
+        adyenFlutterInterface.onAdditionalDetails(platformCommunicationDTO: platformCommunication, completion: completion)
+    }
+
     private func getViewController() -> UIViewController? {
         var rootViewController = UIApplication.shared.adyen.mainKeyWindow?.rootViewController
         while let presentedViewController = rootViewController?.presentedViewController {
@@ -241,3 +396,41 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
         return try configuration.createCheckoutConfiguration()
     }
 }
+
+private extension PaymentComponentData {
+    func toPlatformSubmitDataJson() throws -> String {
+        let paymentComponentData = PaymentComponentDataResponse(
+            amount: amount,
+            paymentMethod: paymentMethod.encodable,
+            storePaymentMethod: storePaymentMethod,
+            order: order,
+            amountToPay: order?.remainingAmount,
+            installments: installments,
+            shopperName: shopperName,
+            emailAddress: emailAddress,
+            telephoneNumber: telephoneNumber,
+            browserInfo: browserInfo,
+            billingAddress: billingAddress,
+            deliveryAddress: deliveryAddress,
+            socialSecurityNumber: socialSecurityNumber,
+            delegatedAuthenticationData: delegatedAuthenticationData
+        )
+        let json = try JSONEncoder().encode(paymentComponentData)
+        guard let jsonString = String(data: json, encoding: .utf8) else {
+            throw PlatformError(errorDescription: "Unable to encode submit data")
+        }
+        return jsonString
+    }
+}
+
+private extension ActionComponentData {
+    func toPlatformAdditionalDetailsJson() throws -> String {
+        let actionComponentData = ActionComponentDataModel(details: details.encodable, paymentData: paymentData)
+        let json = try JSONEncoder().encode(actionComponentData)
+        guard let jsonString = String(data: json, encoding: .utf8) else {
+            throw PlatformError(errorDescription: "Unable to encode additional details")
+        }
+        return jsonString
+    }
+}
+

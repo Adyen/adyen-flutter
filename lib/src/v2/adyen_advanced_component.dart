@@ -23,6 +23,7 @@ class AdyenAdvancedComponent extends AdyenBaseComponent
     super.key,
     required super.checkoutConfiguration,
     required super.paymentMethod,
+    required super.paymentMethodTxVariant,
     required super.onPaymentResult,
     required this.advancedCheckout,
     required super.initialViewHeight,
@@ -39,6 +40,7 @@ class AdyenAdvancedComponent extends AdyenBaseComponent
   @override
   Map<String, dynamic> get creationParams => <String, dynamic>{
         Constants.paymentMethodKey: paymentMethod,
+        Constants.paymentMethodTxVariantKey: paymentMethodTxVariant,
         Constants.checkoutConfigurationKey: checkoutConfiguration,
         Constants.isStoredPaymentMethodKey: isStoredPaymentMethod,
         Constants.componentIdKey: componentId,

@@ -18,6 +18,7 @@ import 'package:flutter/services.dart';
 abstract class AdyenBaseComponent extends StatefulWidget {
   final CheckoutConfigurationDTO checkoutConfiguration;
   final String paymentMethod;
+  final String paymentMethodTxVariant;
   final Future<void> Function(PaymentResult) onPaymentResult;
   final double initialViewHeight;
   final bool isStoredPaymentMethod;
@@ -33,6 +34,7 @@ abstract class AdyenBaseComponent extends StatefulWidget {
     super.key,
     required this.checkoutConfiguration,
     required this.paymentMethod,
+    required this.paymentMethodTxVariant,
     required this.onPaymentResult,
     required this.initialViewHeight,
     required this.isStoredPaymentMethod,

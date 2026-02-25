@@ -7,9 +7,14 @@ public class AdyenCheckoutPlugin: NSObject, FlutterPlugin {
         let messenger: FlutterBinaryMessenger = registrar.messenger()
         let checkoutFlutter = CheckoutFlutterInterface(binaryMessenger: messenger)
         let componentFlutterApi = ComponentFlutterInterface(binaryMessenger: messenger)
+        //V2
+        let adyenFlutterInterface = AdyenFlutterInterface(binaryMessenger: messenger)
+        let componentPlatformEventHandler = ComponentPlatformEventHandler()
         let checkoutPlatformApi = CheckoutPlatformApi(
             checkoutFlutter: checkoutFlutter,
             componentFlutterApi: componentFlutterApi,
+            adyenFlutterInterface: adyenFlutterInterface,
+            componentPlatformEventHandler: componentPlatformEventHandler,
             sessionHolder: sessionHolder
         )
         
@@ -35,5 +40,30 @@ public class AdyenCheckoutPlugin: NSObject, FlutterPlugin {
             sessionHolder: sessionHolder
         )
         registrar.register(cardComponentSessionFactory, withId: CardComponentFactory.cardComponentSessionId)
+
+        
+        //V2
+        OnPlatformEventStreamHandler.register(with: messenger, streamHandler: componentPlatformEventHandler)
+        let adyenComponentSessionFactory = AdyenComponentFactory(
+            adyenFlutterInterface: adyenFlutterInterface,
+            componentPlatformEventHandler: componentPlatformEventHandler,
+            sessionHolder: sessionHolder,
+            viewTypeId: AdyenComponentFactory.adyenSessionComponentId
+        )
+        registrar.register(
+            adyenComponentSessionFactory,
+            withId: AdyenComponentFactory.adyenSessionComponentId
+        )
+        
+        let adyenComponentAdvancedFactory = AdyenComponentFactory(
+            adyenFlutterInterface: adyenFlutterInterface,
+            componentPlatformEventHandler: componentPlatformEventHandler,
+            sessionHolder: sessionHolder,
+            viewTypeId: AdyenComponentFactory.adyenAdvancedComponentId
+        )
+        registrar.register(
+            adyenComponentAdvancedFactory,
+            withId: AdyenComponentFactory.adyenAdvancedComponentId
+        )
     }
 }

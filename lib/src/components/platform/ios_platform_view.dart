@@ -55,10 +55,10 @@ class IosPlatformView extends StatelessWidget {
     Set<Factory<OneSequenceGestureRecognizer>> groupedGestureRecognizers,
     BuildContext context,
   ) {
-    final cardConfiguration =
-        creationParams[Constants.cardComponentConfigurationKey]
-            as CardComponentConfigurationDTO;
-    if (cardConfiguration.cardConfiguration.showStorePaymentField) {
+    final checkoutConfiguration =
+        creationParams[Constants.checkoutConfigurationKey]
+            as CheckoutConfigurationDTO?;
+    if (checkoutConfiguration?.cardConfigurationDTO?.showStorePaymentField == true) {
       groupedGestureRecognizers.addAll({
         Factory<HorizontalDragGestureRecognizer>(
             () => HorizontalDragGestureRecognizer()),

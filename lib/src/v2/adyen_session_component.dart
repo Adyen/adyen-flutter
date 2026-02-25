@@ -20,6 +20,7 @@ class AdyenSessionComponent extends AdyenBaseComponent {
     required super.checkoutConfiguration,
     required this.session,
     required super.paymentMethod,
+    required super.paymentMethodTxVariant,
     required super.onPaymentResult,
     required super.initialViewHeight,
     required super.isStoredPaymentMethod,
@@ -34,6 +35,7 @@ class AdyenSessionComponent extends AdyenBaseComponent {
         Constants.sessionKey: session,
         Constants.checkoutConfigurationKey: checkoutConfiguration,
         Constants.paymentMethodKey: paymentMethod,
+        Constants.paymentMethodTxVariantKey: paymentMethodTxVariant,
         Constants.isStoredPaymentMethodKey: isStoredPaymentMethod,
         Constants.componentIdKey: componentId,
       };

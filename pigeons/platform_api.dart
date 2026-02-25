@@ -861,11 +861,11 @@ abstract class ComponentFlutterInterface {
 @FlutterApi()
 abstract class AdyenFlutterInterface {
   @async
-  CheckoutResultDTO onSubmit(PlatformCommunicationDTO paymentCommunicationDTO);
+  CheckoutResultDTO onSubmit(PlatformCommunicationDTO platformCommunicationDTO);
 
   @async
   CheckoutResultDTO onAdditionalDetails(
-      PlatformCommunicationDTO paymentCommunicationDTO);
+      PlatformCommunicationDTO platformCommunicationDTO);
 }
 
 @EventChannelApi()

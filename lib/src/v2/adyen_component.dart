@@ -27,11 +27,14 @@ class AdyenComponent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final String encodedPaymentMethod = json.encode(paymentMethod);
-    final double initialHeight = _calculateInitialHeight(configuration.cardConfiguration);
+    final String paymentMethodTxVariant = paymentMethod["type"];
+    final double initialHeight =
+        _calculateInitialHeight(configuration.cardConfiguration);
     return switch (checkout) {
       SessionCheckout it => AdyenSessionComponent(
           checkoutConfiguration: configuration.toDTO(),
           paymentMethod: encodedPaymentMethod,
+          paymentMethodTxVariant: paymentMethodTxVariant,
           session: it.toDTO(),
           onPaymentResult: onPaymentResult,
           initialViewHeight: initialHeight,
@@ -43,6 +46,7 @@ class AdyenComponent extends StatelessWidget {
       AdvancedCheckout it => AdyenAdvancedComponent(
           checkoutConfiguration: configuration.toDTO(),
           paymentMethod: encodedPaymentMethod,
+          paymentMethodTxVariant: paymentMethodTxVariant,
           advancedCheckout: it,
           onPaymentResult: onPaymentResult,
           initialViewHeight: initialHeight,

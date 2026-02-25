@@ -20,7 +20,6 @@ class ComponentSessionFlowHandler: SessionDelegate {
         finalizeCallback?(success) { [weak self] in
             let paymentResult = PaymentResultModelDTO(
                 sessionId: session.state.identifier,
-                sessionData: session.state.data,
                 sessionResult: result.sessionResult,
                 resultCode: result.resultCode.rawValue
             )

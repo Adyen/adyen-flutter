@@ -20,7 +20,6 @@ class DropInSessionsDelegate: SessionDelegate {
         viewController?.dismiss(animated: true, completion: { [weak self] in
             let paymentResult = PaymentResultModelDTO(
                 sessionId: session.state.identifier,
-                sessionData: session.state.data,
                 sessionResult: result.sessionResult,
                 resultCode: result.resultCode.rawValue
             )

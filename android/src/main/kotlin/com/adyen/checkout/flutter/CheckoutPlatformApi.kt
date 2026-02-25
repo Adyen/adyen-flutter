@@ -217,8 +217,10 @@ class CheckoutPlatformApi(
     @SuppressLint("RestrictedApi")
     override fun enableConsoleLogging(loggingEnabled: Boolean) {
         if (loggingEnabled) {
+            com.adyen.checkout.core.common.AdyenLogger.setLogLevel(com.adyen.checkout.core.common.AdyenLogLevel.VERBOSE)
             AdyenLogger.setLogLevel(AdyenLogLevel.VERBOSE)
         } else {
+            com.adyen.checkout.core.common.AdyenLogger.setLogLevel(com.adyen.checkout.core.common.AdyenLogLevel.NONE)
             AdyenLogger.setLogLevel(AdyenLogLevel.NONE)
         }
     }

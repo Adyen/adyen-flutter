@@ -2765,8 +2765,8 @@ class ComponentFlutterInterface: ComponentFlutterInterfaceProtocol {
 }
 /// Generated protocol from Pigeon that represents Flutter messages that can be called from Swift.
 protocol AdyenFlutterInterfaceProtocol {
-  func onSubmit(paymentCommunicationDTO paymentCommunicationDTOArg: PlatformCommunicationDTO, completion: @escaping (Result<CheckoutResultDTO, AdyenPigeonError>) -> Void)
-  func onAdditionalDetails(paymentCommunicationDTO paymentCommunicationDTOArg: PlatformCommunicationDTO, completion: @escaping (Result<CheckoutResultDTO, AdyenPigeonError>) -> Void)
+  func onSubmit(platformCommunicationDTO platformCommunicationDTOArg: PlatformCommunicationDTO, completion: @escaping (Result<CheckoutResultDTO, AdyenPigeonError>) -> Void)
+  func onAdditionalDetails(platformCommunicationDTO platformCommunicationDTOArg: PlatformCommunicationDTO, completion: @escaping (Result<CheckoutResultDTO, AdyenPigeonError>) -> Void)
 }
 class AdyenFlutterInterface: AdyenFlutterInterfaceProtocol {
   private let binaryMessenger: FlutterBinaryMessenger
@@ -2778,10 +2778,10 @@ class AdyenFlutterInterface: AdyenFlutterInterfaceProtocol {
   var codec: PlatformApiPigeonCodec {
     return PlatformApiPigeonCodec.shared
   }
-  func onSubmit(paymentCommunicationDTO paymentCommunicationDTOArg: PlatformCommunicationDTO, completion: @escaping (Result<CheckoutResultDTO, AdyenPigeonError>) -> Void) {
+  func onSubmit(platformCommunicationDTO platformCommunicationDTOArg: PlatformCommunicationDTO, completion: @escaping (Result<CheckoutResultDTO, AdyenPigeonError>) -> Void) {
     let channelName: String = "dev.flutter.pigeon.adyen_checkout.AdyenFlutterInterface.onSubmit\(messageChannelSuffix)"
     let channel = FlutterBasicMessageChannel(name: channelName, binaryMessenger: binaryMessenger, codec: codec)
-    channel.sendMessage([paymentCommunicationDTOArg] as [Any?]) { response in
+    channel.sendMessage([platformCommunicationDTOArg] as [Any?]) { response in
       guard let listResponse = response as? [Any?] else {
         completion(.failure(createConnectionError(withChannelName: channelName)))
         return
@@ -2799,10 +2799,10 @@ class AdyenFlutterInterface: AdyenFlutterInterfaceProtocol {
       }
     }
   }
-  func onAdditionalDetails(paymentCommunicationDTO paymentCommunicationDTOArg: PlatformCommunicationDTO, completion: @escaping (Result<CheckoutResultDTO, AdyenPigeonError>) -> Void) {
+  func onAdditionalDetails(platformCommunicationDTO platformCommunicationDTOArg: PlatformCommunicationDTO, completion: @escaping (Result<CheckoutResultDTO, AdyenPigeonError>) -> Void) {
     let channelName: String = "dev.flutter.pigeon.adyen_checkout.AdyenFlutterInterface.onAdditionalDetails\(messageChannelSuffix)"
     let channel = FlutterBasicMessageChannel(name: channelName, binaryMessenger: binaryMessenger, codec: codec)
-    channel.sendMessage([paymentCommunicationDTOArg] as [Any?]) { response in
+    channel.sendMessage([platformCommunicationDTOArg] as [Any?]) { response in
       guard let listResponse = response as? [Any?] else {
         completion(.failure(createConnectionError(withChannelName: channelName)))
         return

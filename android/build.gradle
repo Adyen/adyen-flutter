@@ -64,12 +64,12 @@ android {
     }
 
     defaultConfig {
-        minSdkVersion 21
+        minSdkVersion 23
         consumerProguardFiles 'proguard-rules.pro'
     }
 
     dependencies {
-        implementation "com.adyen.checkout:drop-in:2026.02.08-SNAPSHOT"
+        implementation "com.adyen.checkout:drop-in:2026.02.25-SNAPSHOT"
         implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
 
         // Compose Dependencies

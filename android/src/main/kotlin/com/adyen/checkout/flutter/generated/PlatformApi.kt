@@ -3009,12 +3009,12 @@ class AdyenFlutterInterface(private val binaryMessenger: BinaryMessenger, privat
       PlatformApiPigeonCodec()
     }
   }
-  fun onSubmit(paymentCommunicationDTOArg: PlatformCommunicationDTO, callback: (Result<CheckoutResultDTO>) -> Unit)
+  fun onSubmit(platformCommunicationDTOArg: PlatformCommunicationDTO, callback: (Result<CheckoutResultDTO>) -> Unit)
 {
     val separatedMessageChannelSuffix = if (messageChannelSuffix.isNotEmpty()) ".$messageChannelSuffix" else ""
     val channelName = "dev.flutter.pigeon.adyen_checkout.AdyenFlutterInterface.onSubmit$separatedMessageChannelSuffix"
     val channel = BasicMessageChannel<Any?>(binaryMessenger, channelName, codec)
-    channel.send(listOf(paymentCommunicationDTOArg)) {
+    channel.send(listOf(platformCommunicationDTOArg)) {
       if (it is List<*>) {
         if (it.size > 1) {
           callback(Result.failure(AdyenPigeonError(it[0] as String, it[1] as String, it[2] as String?)))
@@ -3029,12 +3029,12 @@ class AdyenFlutterInterface(private val binaryMessenger: BinaryMessenger, privat
       } 
     }
   }
-  fun onAdditionalDetails(paymentCommunicationDTOArg: PlatformCommunicationDTO, callback: (Result<CheckoutResultDTO>) -> Unit)
+  fun onAdditionalDetails(platformCommunicationDTOArg: PlatformCommunicationDTO, callback: (Result<CheckoutResultDTO>) -> Unit)
 {
     val separatedMessageChannelSuffix = if (messageChannelSuffix.isNotEmpty()) ".$messageChannelSuffix" else ""
     val channelName = "dev.flutter.pigeon.adyen_checkout.AdyenFlutterInterface.onAdditionalDetails$separatedMessageChannelSuffix"
     val channel = BasicMessageChannel<Any?>(binaryMessenger, channelName, codec)
-    channel.send(listOf(paymentCommunicationDTOArg)) {
+    channel.send(listOf(platformCommunicationDTOArg)) {
       if (it is List<*>) {
         if (it.size > 1) {
           callback(Result.failure(AdyenPigeonError(it[0] as String, it[1] as String, it[2] as String?)))
