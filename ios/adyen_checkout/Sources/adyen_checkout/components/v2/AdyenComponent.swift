@@ -68,6 +68,7 @@ class AdyenComponent: NSObject, FlutterPlatformView {
             sendErrorToFlutterLayer(errorMessage: "Component view not available.")
             return
         }
+        componentWrapperView.resizeViewportCallback = sendHeightUpdate
         componentWrapperView.addArrangedSubview(componentView)
         sendHeightUpdate()
     }

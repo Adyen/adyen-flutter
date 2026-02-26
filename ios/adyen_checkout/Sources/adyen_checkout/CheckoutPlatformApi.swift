@@ -245,8 +245,42 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
     private func createAdvancedCheckoutConfiguration(
         configurationDTO: CheckoutConfigurationDTO,
     ) async throws -> CheckoutConfiguration {
-        let checkoutConfig = try await createSessionCheckoutConfiguration(configurationDTO: configurationDTO)
-        checkoutConfig.onSubmit { [weak self] paymentData, handler in
+        let checkoutConfig = try CheckoutConfiguration(
+            environment: configurationDTO.environment.mapToEnvironment(),
+            amount: configurationDTO.amount!.mapToAmount(),
+            clientKey: configurationDTO.clientKey,
+            analyticsConfiguration: .init()
+        ) {
+            configurationDTO.cardConfigurationDTO!.mapToCardComponentConfiguration(shopperLocale: configurationDTO.shopperLocale)
+        }.onComplete { [weak self] result in
+            print("ON COMPLETE SWIFT INVOKED")
+            let paymentResult = PaymentResultModelDTO(
+                sessionId: "", // REMOVE FROM DTO
+                sessionResult: result.sessionResult,
+                resultCode: result.resultCode.rawValue
+            )
+            let componentCommunicationModel = ComponentCommunicationModel(
+                type: ComponentCommunicationType.result,
+                componentId: "ADVANCED_ADYEN_COMPONENT",
+                paymentResult: PaymentResultDTO(
+                    type: PaymentResultEnum.finished,
+                    result: paymentResult
+                )
+            )
+            self?.componentPlatformEventHandler.send(event: componentCommunicationModel)
+            
+        }.onError { [weak self] error in
+            print("ON ERROR SWIFT INVOKED")
+            let componentCommunicationModel = ComponentCommunicationModel(
+                type: ComponentCommunicationType.result,
+                componentId: "ADVANCED_ADYEN_COMPONENT",
+                paymentResult: PaymentResultDTO(
+                    type: .from(error: error),
+                    reason: error.localizedDescription
+                )
+            )
+            self?.componentPlatformEventHandler.send(event: componentCommunicationModel)
+        }.onSubmit { [weak self] paymentData, handler in
             print("ON SUBMIT SWIFT INVOKED")
             guard let self else { return }
             do {
