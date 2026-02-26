@@ -113,28 +113,6 @@ class CheckoutPlatformApi(
         }
     }
 
-    override fun createSession(
-        sessionId: String,
-        sessionData: String,
-        configuration: Any?,
-        callback: (Result<SessionDTO>) -> Unit,
-    ) {
-        activity.lifecycleScope.launch(Dispatchers.IO) {
-            val sessionModel = SessionModel(sessionId, sessionData)
-            determineSessionConfiguration(configuration)?.let { sessionConfiguration ->
-//                when (val sessionResult = CheckoutSessionProvider.createSession(sessionModel, sessionConfiguration)) {
-//                    is CheckoutSessionResult.Error -> callback(Result.failure(sessionResult.exception))
-//                    is CheckoutSessionResult.Success ->
-//                        onSessionSuccessfullyCreated(
-//                            sessionResult,
-//                            sessionModel,
-//                            callback
-//                        )
-//                }
-            }
-        }
-    }
-
     override fun clearSession() {
         checkoutHolder.reset()
     }

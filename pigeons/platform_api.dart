@@ -735,13 +735,6 @@ abstract class CheckoutPlatformInterface {
     CheckoutConfigurationDTO checkoutConfigurationDTO,
   );
 
-  @async
-  SessionDTO createSession(
-    String sessionId,
-    String sessionData,
-    Object? configuration,
-  );
-
   void clearSession();
 
   @async

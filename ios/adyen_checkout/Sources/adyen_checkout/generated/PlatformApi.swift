@@ -2161,7 +2161,6 @@ protocol CheckoutPlatformInterface {
   func getReturnUrl(completion: @escaping (Result<String, Error>) -> Void)
   func setupSession(sessionResponseDTO: SessionResponseDTO, checkoutConfigurationDTO: CheckoutConfigurationDTO, completion: @escaping (Result<SessionDTO, Error>) -> Void)
   func setupAdvanced(paymentMethodsResponse: String, checkoutConfigurationDTO: CheckoutConfigurationDTO, completion: @escaping (Result<Void, Error>) -> Void)
-  func createSession(sessionId: String, sessionData: String, configuration: Any?, completion: @escaping (Result<SessionDTO, Error>) -> Void)
   func clearSession() throws
   func encryptCard(unencryptedCardDTO: UnencryptedCardDTO, publicKey: String, completion: @escaping (Result<EncryptedCardDTO, Error>) -> Void)
   func encryptBin(bin: String, publicKey: String, completion: @escaping (Result<String, Error>) -> Void)
@@ -2228,25 +2227,6 @@ class CheckoutPlatformInterfaceSetup {
       }
     } else {
       setupAdvancedChannel.setMessageHandler(nil)
-    }
-    let createSessionChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.createSession\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
-    if let api = api {
-      createSessionChannel.setMessageHandler { message, reply in
-        let args = message as! [Any?]
-        let sessionIdArg = args[0] as! String
-        let sessionDataArg = args[1] as! String
-        let configurationArg: Any? = args[2]
-        api.createSession(sessionId: sessionIdArg, sessionData: sessionDataArg, configuration: configurationArg) { result in
-          switch result {
-          case .success(let res):
-            reply(wrapResult(res))
-          case .failure(let error):
-            reply(wrapError(error))
-          }
-        }
-      }
-    } else {
-      createSessionChannel.setMessageHandler(nil)
     }
     let clearSessionChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.clearSession\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {

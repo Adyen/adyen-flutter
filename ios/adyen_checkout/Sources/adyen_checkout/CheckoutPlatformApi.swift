@@ -25,8 +25,6 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
     private let componentPlatformEventHandler: ComponentPlatformEventHandler
     private let sessionHolder: SessionHolder
     private let adyenCse: AdyenCSE = .init()
-    
-    private var checkoutConfig : CheckoutConfiguration? = nil
 
     init(
         checkoutFlutter: CheckoutFlutterInterface,
@@ -42,47 +40,30 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
         self.sessionHolder = sessionHolder
     }
     
-    func setup(
-        sessionResponseDTO: SessionResponseDTO,
-        checkoutConfigurationDTO: CheckoutConfigurationDTO,
-        completion: @escaping (Result<SessionDTO, any Error>) -> Void) {
-            Task {
-                do {
-                    //TODO: Config needs to be just session relevant, component specific one needs to be bound when creating component?
-                    let sessionResponse = sessionResponseDTO.mapToSessionResponse()
-                    let checkoutConfiguration = try await createSessionCheckoutConfiguration(configurationDTO: checkoutConfigurationDTO)
-                    let checkoutSession = try await Checkout.setup(
-                        with: sessionResponse,
-                        configuration: checkoutConfiguration
-                    )
-                    
-                    try onSetupSuccess(
-                        id: sessionResponseDTO.id, //Flutter specific, maybe we can use id from the checkout session like on Android
-                        checkoutSession: checkoutSession,
-                        completion: completion
-                    )
-                } catch {
-                    completion(Result.failure(error))
-                }
-            }
-    }
-    
     func setupSession(sessionResponseDTO: SessionResponseDTO, checkoutConfigurationDTO: CheckoutConfigurationDTO, completion: @escaping (Result<SessionDTO, any Error>) -> Void) {
         Task {
             do {
                 let sessionResponse = sessionResponseDTO.mapToSessionResponse()
-                let checkoutConfiguration = try await createSessionCheckoutConfiguration(configurationDTO: checkoutConfigurationDTO)
-                self.checkoutConfig = checkoutConfiguration
+                let checkoutConfiguration = try await createSessionCheckoutConfiguration(
+                    sessionId: sessionResponseDTO.id,
+                    configurationDTO: checkoutConfigurationDTO
+                )
                 let checkoutSession = try await Checkout.setup(
                     with: sessionResponse,
                     configuration: checkoutConfiguration
                 )
 
-                try onSetupSuccess(
+                sessionHolder.adyenCheckout = checkoutSession
+                let encodedPaymentMethods = try JSONEncoder().encode(checkoutSession.paymentMethods)
+                guard let encodedPaymentMethodsString = String(data: encodedPaymentMethods, encoding: .utf8) else {
+                    completion(Result.failure(PlatformError(errorDescription: "Encoding payment methods failed")))
+                    return
+                }
+
+                completion(Result.success(SessionDTO(
                     id: sessionResponseDTO.id,
-                    checkoutSession: checkoutSession,
-                    completion: completion
-                )
+                    paymentMethodsJson: encodedPaymentMethodsString
+                )))
             } catch {
                 completion(Result.failure(error))
             }
@@ -95,7 +76,6 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
                 let paymentMethodsData = Data(paymentMethodsResponse.utf8)
                 let paymentMethods = try JSONDecoder().decode(PaymentMethods.self, from: paymentMethodsData)
                 let checkoutConfiguration = try await createAdvancedCheckoutConfiguration(configurationDTO: checkoutConfigurationDTO)
-                self.checkoutConfig = checkoutConfiguration
                 let adyenCheckout = try await Checkout.setup(
                     with: paymentMethods,
                     configuration: checkoutConfiguration
@@ -103,41 +83,6 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
 
                 sessionHolder.adyenCheckout = adyenCheckout
                 completion(Result.success(()))
-            } catch {
-                completion(Result.failure(error))
-            }
-        }
-    }
-
-    func createSession(
-        sessionId: String,
-        sessionData: String,
-        configuration: Any?,
-        completion: @escaping (Result<SessionDTO, Error>) -> Void
-    ) {
-        Task {
-            do {
-                switch configuration {
-                case let checkoutConfiguration as CardComponentConfigurationDTO:
-                    do {
-//                        let sessionConfiguration = try await createConfiguration(configuration: checkoutConfiguration)
-//                        let checkoutSession = try await Checkout.setup(
-//                            with: SessionResponse(id: sessionId, sessionData: sessionData),
-//                            configuration: sessionConfiguration
-//                        )
-//                        
-//                        try onSessionCreationSuccess(
-//                            id: sessionId, //Flutter specific, maybe we can use id from the checkout session like on Android
-//                            checkoutSession: checkoutSession,
-//                            completion: completion
-//                        )
-                    } catch {
-                        // TODO: Add error handling
-                        completion(Result.failure(error))
-                    }
-                case .none, .some:
-                    completion(Result.failure(PlatformError(errorDescription: "Configuration is not valid")))
-                }
             } catch {
                 completion(Result.failure(error))
             }
@@ -200,6 +145,7 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
     }
 
     private func createSessionCheckoutConfiguration(
+        sessionId: String,
         configurationDTO: CheckoutConfigurationDTO,
     ) async throws -> CheckoutConfiguration {
         let checkoutConfig = try CheckoutConfiguration(
@@ -212,7 +158,7 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
         }.onComplete { [weak self] result in
             print("ON COMPLETE SWIFT INVOKED")
             let paymentResult = PaymentResultModelDTO(
-                sessionId: "", // REMOVE FROM DTO
+                sessionId: sessionId,
                 sessionResult: result.sessionResult,
                 resultCode: result.resultCode.rawValue
             )

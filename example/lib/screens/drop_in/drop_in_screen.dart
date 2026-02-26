@@ -45,11 +45,20 @@ class DropInScreen extends StatelessWidget {
       final DropInConfiguration dropInConfiguration =
           await _createDropInConfiguration();
 
-      final SessionCheckout sessionCheckout =
-          await AdyenCheckout.session.create(
-        sessionId: sessionResponse["id"],
-        sessionData: sessionResponse["sessionData"],
-        configuration: dropInConfiguration,
+      final SessionCheckout sessionCheckout = await AdyenCheckout.session.setup(
+        sessionResponse: SessionResponse(
+          sessionResponse["id"],
+          sessionResponse["sessionData"],
+        ),
+        checkoutConfiguration: CheckoutConfiguration(
+          environment: dropInConfiguration.environment,
+          clientKey: dropInConfiguration.clientKey,
+          countryCode: dropInConfiguration.countryCode,
+          amount: dropInConfiguration.amount,
+          shopperLocale: dropInConfiguration.shopperLocale,
+          analyticsOptions: dropInConfiguration.analyticsOptions,
+          dropInConfiguration: dropInConfiguration,
+        ),
       );
 
       final PaymentResult paymentResult =

@@ -2324,7 +2324,6 @@ interface CheckoutPlatformInterface {
   fun getReturnUrl(callback: (Result<String>) -> Unit)
   fun setupSession(sessionResponseDTO: SessionResponseDTO, checkoutConfigurationDTO: CheckoutConfigurationDTO, callback: (Result<SessionDTO>) -> Unit)
   fun setupAdvanced(paymentMethodsResponse: String, checkoutConfigurationDTO: CheckoutConfigurationDTO, callback: (Result<Unit>) -> Unit)
-  fun createSession(sessionId: String, sessionData: String, configuration: Any?, callback: (Result<SessionDTO>) -> Unit)
   fun clearSession()
   fun encryptCard(unencryptedCardDTO: UnencryptedCardDTO, publicKey: String, callback: (Result<EncryptedCardDTO>) -> Unit)
   fun encryptBin(bin: String, publicKey: String, callback: (Result<String>) -> Unit)
@@ -2395,28 +2394,6 @@ interface CheckoutPlatformInterface {
                 reply.reply(PlatformApiPigeonUtils.wrapError(error))
               } else {
                 reply.reply(PlatformApiPigeonUtils.wrapResult(null))
-              }
-            }
-          }
-        } else {
-          channel.setMessageHandler(null)
-        }
-      }
-      run {
-        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.createSession$separatedMessageChannelSuffix", codec)
-        if (api != null) {
-          channel.setMessageHandler { message, reply ->
-            val args = message as List<Any?>
-            val sessionIdArg = args[0] as String
-            val sessionDataArg = args[1] as String
-            val configurationArg = args[2]
-            api.createSession(sessionIdArg, sessionDataArg, configurationArg) { result: Result<SessionDTO> ->
-              val error = result.exceptionOrNull()
-              if (error != null) {
-                reply.reply(PlatformApiPigeonUtils.wrapError(error))
-              } else {
-                val data = result.getOrNull()
-                reply.reply(PlatformApiPigeonUtils.wrapResult(data))
               }
             }
           }

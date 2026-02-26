@@ -10,10 +10,20 @@ class AdyenInstantComponentRepository extends AdyenBaseRepository {
   Future<SessionCheckout> createSessionCheckout(
       InstantComponentConfiguration instantComponentConfiguration) async {
     final sessionResponse = await _fetchSession();
-    return await AdyenCheckout.session.create(
-      sessionId: sessionResponse["id"],
-      sessionData: sessionResponse["sessionData"],
-      configuration: instantComponentConfiguration,
+
+    return AdyenCheckout.session.setup(
+      sessionResponse: SessionResponse(
+        sessionResponse["id"],
+        sessionResponse["sessionData"],
+      ),
+      checkoutConfiguration: CheckoutConfiguration(
+        environment: instantComponentConfiguration.environment,
+        clientKey: instantComponentConfiguration.clientKey,
+        countryCode: instantComponentConfiguration.countryCode,
+        amount: instantComponentConfiguration.amount,
+        shopperLocale: instantComponentConfiguration.shopperLocale,
+        analyticsOptions: instantComponentConfiguration.analyticsOptions,
+      ),
     );
   }
 

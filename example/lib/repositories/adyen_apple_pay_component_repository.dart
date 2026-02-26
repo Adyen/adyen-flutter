@@ -10,10 +10,21 @@ class AdyenApplePayComponentRepository extends AdyenBaseRepository {
   Future<SessionCheckout> createSessionCheckout(
       ApplePayComponentConfiguration applePayComponentConfiguration) async {
     final sessionResponse = await _fetchSession();
-    return await AdyenCheckout.session.create(
-      sessionId: sessionResponse["id"],
-      sessionData: sessionResponse["sessionData"],
-      configuration: applePayComponentConfiguration,
+
+    return AdyenCheckout.session.setup(
+      sessionResponse: SessionResponse(
+        sessionResponse["id"],
+        sessionResponse["sessionData"],
+      ),
+      checkoutConfiguration: CheckoutConfiguration(
+        environment: applePayComponentConfiguration.environment,
+        clientKey: applePayComponentConfiguration.clientKey,
+        countryCode: applePayComponentConfiguration.countryCode,
+        amount: applePayComponentConfiguration.amount,
+        shopperLocale: applePayComponentConfiguration.shopperLocale,
+        analyticsOptions: applePayComponentConfiguration.analyticsOptions,
+        applePayConfiguration: applePayComponentConfiguration.applePayConfiguration,
+      ),
     );
   }
 

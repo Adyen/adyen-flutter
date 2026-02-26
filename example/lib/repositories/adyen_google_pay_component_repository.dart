@@ -10,10 +10,21 @@ class AdyenGooglePayComponentRepository extends AdyenBaseRepository {
   Future<SessionCheckout> createSessionCheckout(
       GooglePayComponentConfiguration googlePayComponentConfiguration) async {
     final sessionResponse = await _fetchSession();
-    return await AdyenCheckout.session.create(
-      sessionId: sessionResponse["id"],
-      sessionData: sessionResponse["sessionData"],
-      configuration: googlePayComponentConfiguration,
+
+    return AdyenCheckout.session.setup(
+      sessionResponse: SessionResponse(
+        sessionResponse["id"],
+        sessionResponse["sessionData"],
+      ),
+      checkoutConfiguration: CheckoutConfiguration(
+        environment: googlePayComponentConfiguration.environment,
+        clientKey: googlePayComponentConfiguration.clientKey,
+        countryCode: googlePayComponentConfiguration.countryCode,
+        amount: googlePayComponentConfiguration.amount,
+        shopperLocale: googlePayComponentConfiguration.shopperLocale,
+        analyticsOptions: googlePayComponentConfiguration.analyticsOptions,
+        googlePayConfiguration: googlePayComponentConfiguration.googlePayConfiguration,
+      ),
     );
   }
 

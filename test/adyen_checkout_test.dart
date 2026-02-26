@@ -13,18 +13,6 @@ class MockAdyenCheckoutPlatform implements CheckoutPlatformInterface {
   Future<void> enableConsoleLogging(bool loggingEnabled) async {}
 
   @override
-  Future<SessionDTO> createSession(
-    String sessionId,
-    String sessionData,
-    dynamic configuration,
-  ) async {
-    return SessionDTO(
-      id: "id",
-      paymentMethodsJson: "",
-    );
-  }
-
-  @override
   Future<EncryptedCardDTO> encryptCard(
       UnencryptedCardDTO unencryptedCardDTO, String publicKey) async {
     return EncryptedCardDTO(

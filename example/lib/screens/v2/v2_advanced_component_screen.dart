@@ -21,14 +21,16 @@ class V2AdvancedComponentScreen extends StatelessWidget {
       countryCode: Config.countryCode,
       shopperLocale: Config.shopperLocale,
       amount: Config.amount,
-      cardConfiguration: const CardConfiguration(),
+      cardConfiguration: const CardConfiguration(
+        holderNameRequired: true,
+      ),
     );
 
     return Scaffold(
       appBar: AppBar(title: const Text('V2 Advanced Component')),
       body: SafeArea(
         child: FutureBuilder<Map<String, dynamic>>(
-          future: _fetchPaymentMethodsAndSetupIas(checkoutConfiguration),
+          future: _fetchPaymentMethodsAndSetup(checkoutConfiguration),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const Center(child: CircularProgressIndicator());
@@ -88,7 +90,7 @@ class V2AdvancedComponentScreen extends StatelessWidget {
     DialogBuilder.showPaymentResultDialog(paymentResult, context);
   }
 
-  Future<Map<String, dynamic>> _fetchPaymentMethodsAndSetupIas(
+  Future<Map<String, dynamic>> _fetchPaymentMethodsAndSetup(
     CheckoutConfiguration checkoutConfiguration,
   ) async {
     final paymentMethods = await repository.fetchPaymentMethods();

@@ -10,10 +10,22 @@ class AdyenCardComponentRepository extends AdyenBaseRepository {
   Future<SessionCheckout> createSessionCheckout(
       CardComponentConfiguration cardComponentConfiguration) async {
     final sessionResponse = await _fetchSession();
-    return await AdyenCheckout.session.create(
-      sessionId: sessionResponse["id"],
-      sessionData: sessionResponse["sessionData"],
-      configuration: cardComponentConfiguration,
+
+    return AdyenCheckout.session.setup(
+      sessionResponse: SessionResponse(
+        sessionResponse["id"],
+        sessionResponse["sessionData"],
+      ),
+      checkoutConfiguration: CheckoutConfiguration(
+        environment: cardComponentConfiguration.environment,
+        clientKey: cardComponentConfiguration.clientKey,
+        countryCode: cardComponentConfiguration.countryCode,
+        amount: cardComponentConfiguration.amount,
+        shopperLocale: cardComponentConfiguration.shopperLocale,
+        analyticsOptions: cardComponentConfiguration.analyticsOptions,
+        cardConfiguration: cardComponentConfiguration.cardConfiguration,
+        threeDS2Configuration: cardComponentConfiguration.threeDS2Configuration,
+      ),
     );
   }
 
