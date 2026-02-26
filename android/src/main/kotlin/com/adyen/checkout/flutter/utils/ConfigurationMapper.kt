@@ -5,6 +5,7 @@ import com.adyen.checkout.card.card
 import com.adyen.checkout.card.old.AddressConfiguration
 import com.adyen.checkout.components.core.OrderResponse
 import com.adyen.checkout.core.common.CardBrand
+import com.adyen.checkout.core.common.PaymentResult
 import com.adyen.checkout.core.common.internal.helper.CheckoutPlatform
 import com.adyen.checkout.core.common.internal.helper.CheckoutPlatformParams
 import com.adyen.checkout.core.components.AnalyticsConfiguration
@@ -46,6 +47,7 @@ import java.util.Locale
 import com.adyen.checkout.cashapppay.CashAppPayEnvironment as SDKCashAppPayEnvironment
 import com.adyen.checkout.core.common.Environment as SDKEnvironment
 import com.adyen.checkout.core.components.CheckoutConfiguration
+import com.adyen.checkout.flutter.generated.PaymentResultModelDTO
 
 object ConfigurationMapper {
     fun CheckoutConfigurationDTO.toCheckoutConfiguration(): CheckoutConfiguration =
@@ -263,6 +265,9 @@ object ConfigurationMapper {
     fun AmountDTO.mapToAmount(): Amount = Amount(this.currency, this.value)
 
     fun SessionResponseDTO.mapToSessionResponse(): SessionResponse = SessionResponse(id, sessionData)
+
+    fun PaymentResult.mapToPaymentResultModelDTO(): PaymentResultModelDTO =
+        PaymentResultModelDTO(sessionId, sessionResult, resultCode)
 
     private fun com.adyen.checkout.components.core.Amount.mapToDTOAmount(): AmountDTO =
         AmountDTO(

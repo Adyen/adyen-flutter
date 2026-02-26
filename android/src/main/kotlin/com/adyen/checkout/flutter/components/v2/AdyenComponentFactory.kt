@@ -20,9 +20,9 @@ import com.adyen.checkout.flutter.generated.ErrorResultDTO
 import com.adyen.checkout.flutter.generated.FinishedResultDTO
 import com.adyen.checkout.flutter.generated.PaymentResultDTO
 import com.adyen.checkout.flutter.generated.PaymentResultEnum
-import com.adyen.checkout.flutter.generated.PaymentResultModelDTO
 import com.adyen.checkout.flutter.generated.PlatformCommunicationDTO
 import com.adyen.checkout.flutter.session.CheckoutHolder
+import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToPaymentResultModelDTO
 import io.flutter.plugin.platform.PlatformView
 import io.flutter.plugin.platform.PlatformViewFactory
 import kotlinx.coroutines.suspendCancellableCoroutine
@@ -74,7 +74,7 @@ internal class AdyenComponentFactory(
     fun createSessionCheckoutCallbacks(componentId: String): CheckoutCallbacks =
         CheckoutCallbacks(
             onError = { checkoutError -> sendError(componentId, checkoutError.message) },
-            onFinished = { paymentResult -> sendFinished(componentId, paymentResult.resultCode) }
+            onFinished = { paymentResult -> sendFinished(componentId, paymentResult) }
         )
 
     fun createAdvancedCheckoutCallbacks(componentId: String): CheckoutCallbacks =
@@ -130,7 +130,7 @@ internal class AdyenComponentFactory(
                 }
             },
             onError = { error -> sendError(componentId, error.message) },
-            onFinished = { it: PaymentResult -> sendFinished(componentId, it.resultCode) }
+            onFinished = { paymentResult -> sendFinished(componentId, paymentResult) }
         )
 
     fun createPaymentMethod(creationParams: Map<*, *>): PaymentMethod {
@@ -162,15 +162,15 @@ internal class AdyenComponentFactory(
         )
     }
 
-    private fun sendFinished(componentId: String, resultCode: String) {
-        println("ON FINISHED INVOKED: $resultCode")
+    private fun sendFinished(componentId: String, paymentResult: PaymentResult) {
+        println("ON FINISHED INVOKED: ${paymentResult.resultCode}")
         platformEventHandler.eventSink?.success(
             ComponentCommunicationModel(
                 type = ComponentCommunicationType.RESULT,
                 componentId = componentId,
                 paymentResult = PaymentResultDTO(
                     type = PaymentResultEnum.FINISHED,
-                    result = PaymentResultModelDTO(resultCode = resultCode)
+                    result = paymentResult.mapToPaymentResultModelDTO()
                 ),
             )
         )
