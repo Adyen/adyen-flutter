@@ -23,7 +23,7 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
     private let componentFlutterApi: ComponentFlutterInterface
     private let adyenFlutterInterface: AdyenFlutterInterface
     private let componentPlatformEventHandler: ComponentPlatformEventHandler
-    private let sessionHolder: SessionHolder
+    private let checkoutHolder: CheckoutHolder
     private let adyenCse: AdyenCSE = .init()
 
     init(
@@ -31,13 +31,13 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
         componentFlutterApi: ComponentFlutterInterface,
         adyenFlutterInterface: AdyenFlutterInterface,
         componentPlatformEventHandler: ComponentPlatformEventHandler,
-        sessionHolder: SessionHolder
+        checkoutHolder: CheckoutHolder
     ) {
         self.checkoutFlutter = checkoutFlutter
         self.componentFlutterApi = componentFlutterApi
         self.adyenFlutterInterface = adyenFlutterInterface
         self.componentPlatformEventHandler = componentPlatformEventHandler
-        self.sessionHolder = sessionHolder
+        self.checkoutHolder = checkoutHolder
     }
     
     func setupSession(sessionResponseDTO: SessionResponseDTO, checkoutConfigurationDTO: CheckoutConfigurationDTO, completion: @escaping (Result<SessionDTO, any Error>) -> Void) {
@@ -53,7 +53,7 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
                     configuration: checkoutConfiguration
                 )
 
-                sessionHolder.adyenCheckout = checkoutSession
+                checkoutHolder.adyenCheckout = checkoutSession
                 let encodedPaymentMethods = try JSONEncoder().encode(checkoutSession.paymentMethods)
                 guard let encodedPaymentMethodsString = String(data: encodedPaymentMethods, encoding: .utf8) else {
                     completion(Result.failure(PlatformError(errorDescription: "Encoding payment methods failed")))
@@ -81,7 +81,7 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
                     configuration: checkoutConfiguration
                 )
 
-                sessionHolder.adyenCheckout = adyenCheckout
+                checkoutHolder.adyenCheckout = adyenCheckout
                 completion(Result.success(()))
             } catch {
                 completion(Result.failure(error))
@@ -90,7 +90,7 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
     }
     
     func clearSession() {
-        sessionHolder.reset()
+        checkoutHolder.reset()
     }
 
     func getReturnUrl(completion: @escaping (Result<String, Error>) -> Void) {
@@ -274,7 +274,7 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
         checkoutSession: Checkout,
         completion: @escaping (Result<SessionDTO, Error>) -> Void
     ) throws {
-        sessionHolder.adyenCheckout = checkoutSession
+        checkoutHolder.adyenCheckout = checkoutSession
         let encodedPaymentMethods = try JSONEncoder().encode(checkoutSession.paymentMethods)
         guard let encodedPaymentMethodsString = String(data: encodedPaymentMethods, encoding: .utf8) else {
             completion(Result.failure(PlatformError(errorDescription: "Encoding payment methods failed")))

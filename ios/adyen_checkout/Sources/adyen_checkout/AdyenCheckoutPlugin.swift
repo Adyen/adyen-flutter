@@ -3,7 +3,7 @@ import UIKit
 
 public class AdyenCheckoutPlugin: NSObject, FlutterPlugin {
     public static func register(with registrar: FlutterPluginRegistrar) {
-        let sessionHolder = SessionHolder()
+        let checkoutHolder = CheckoutHolder()
         let messenger: FlutterBinaryMessenger = registrar.messenger()
         let checkoutFlutter = CheckoutFlutterInterface(binaryMessenger: messenger)
         let componentFlutterApi = ComponentFlutterInterface(binaryMessenger: messenger)
@@ -15,14 +15,14 @@ public class AdyenCheckoutPlugin: NSObject, FlutterPlugin {
             componentFlutterApi: componentFlutterApi,
             adyenFlutterInterface: adyenFlutterInterface,
             componentPlatformEventHandler: componentPlatformEventHandler,
-            sessionHolder: sessionHolder
+            checkoutHolder: checkoutHolder
         )
         
-        let componentPlatformApi = ComponentPlatformApi(componentFlutterApi: componentFlutterApi, sessionHolder: sessionHolder)
+        let componentPlatformApi = ComponentPlatformApi(componentFlutterApi: componentFlutterApi, checkoutHolder: checkoutHolder)
         ComponentPlatformInterfaceSetup.setUp(binaryMessenger: messenger, api: componentPlatformApi)
         CheckoutPlatformInterfaceSetup.setUp(binaryMessenger: messenger, api: checkoutPlatformApi)
 
-        let dropInPlatformApi = DropInPlatformApi(checkoutFlutter: checkoutFlutter, sessionHolder: sessionHolder)
+        let dropInPlatformApi = DropInPlatformApi(checkoutFlutter: checkoutFlutter, checkoutHolder: checkoutHolder)
         DropInPlatformInterfaceSetup.setUp(binaryMessenger: messenger, api: dropInPlatformApi)
 
         let cardComponentAdvancedFactory = CardComponentFactory(
@@ -37,7 +37,7 @@ public class AdyenCheckoutPlugin: NSObject, FlutterPlugin {
             componentFlutterApi: componentFlutterApi,
             componentPlatformApi: componentPlatformApi,
             viewTypeId: CardComponentFactory.cardComponentSessionId,
-            sessionHolder: sessionHolder
+            checkoutHolder: checkoutHolder
         )
         registrar.register(cardComponentSessionFactory, withId: CardComponentFactory.cardComponentSessionId)
 
@@ -47,7 +47,7 @@ public class AdyenCheckoutPlugin: NSObject, FlutterPlugin {
         let adyenComponentSessionFactory = AdyenComponentFactory(
             adyenFlutterInterface: adyenFlutterInterface,
             componentPlatformEventHandler: componentPlatformEventHandler,
-            sessionHolder: sessionHolder,
+            checkoutHolder: checkoutHolder,
             viewTypeId: AdyenComponentFactory.adyenSessionComponentId
         )
         registrar.register(
@@ -58,7 +58,7 @@ public class AdyenCheckoutPlugin: NSObject, FlutterPlugin {
         let adyenComponentAdvancedFactory = AdyenComponentFactory(
             adyenFlutterInterface: adyenFlutterInterface,
             componentPlatformEventHandler: componentPlatformEventHandler,
-            sessionHolder: sessionHolder,
+            checkoutHolder: checkoutHolder,
             viewTypeId: AdyenComponentFactory.adyenAdvancedComponentId
         )
         registrar.register(

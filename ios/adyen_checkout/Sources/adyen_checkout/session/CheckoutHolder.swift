@@ -4,7 +4,7 @@
     import AdyenSession
 #endif
 
-class SessionHolder {
+class CheckoutHolder {
     var session: Session?
     var sessionDelegate: SessionDelegate?
     var adyenCheckout : Checkout?

@@ -8,7 +8,7 @@
 import Flutter
 
 class CardSessionComponent: BaseCardComponent {
-    private let sessionHolder: SessionHolder
+    private let checkoutHolder: CheckoutHolder
 
     init(
         frame: CGRect,
@@ -17,9 +17,9 @@ class CardSessionComponent: BaseCardComponent {
         binaryMessenger: FlutterBinaryMessenger,
         componentFlutterApi: ComponentFlutterInterface,
         componentPlatformApi: ComponentPlatformApi,
-        sessionHolder: SessionHolder
+        checkoutHolder: CheckoutHolder
     ) {
-        self.sessionHolder = sessionHolder
+        self.checkoutHolder = checkoutHolder
         super.init(
             frame: frame,
             viewIdentifier: viewIdentifier,
@@ -38,9 +38,9 @@ class CardSessionComponent: BaseCardComponent {
 
     private func setupCardComponentView() async {
         do {
-            guard let cardPaymentMethod = sessionHolder.adyenCheckout?.paymentMethods?.paymentMethod(ofType: CardPaymentMethod.self) else {throw PlatformError(errorDescription: "Card payment method not found") }
+            guard let cardPaymentMethod = checkoutHolder.adyenCheckout?.paymentMethods?.paymentMethod(ofType: CardPaymentMethod.self) else {throw PlatformError(errorDescription: "Card payment method not found") }
             let cardComponent = try buildCardComponent(
-                adyenCheckout: sessionHolder.adyenCheckout!,
+                adyenCheckout: checkoutHolder.adyenCheckout!,
                 cardPaymentMethod: cardPaymentMethod
             )
             showCardComponent(cardComponent: cardComponent)

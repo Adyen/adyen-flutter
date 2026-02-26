@@ -16,7 +16,7 @@ import Foundation
 class AdyenComponent: NSObject, FlutterPlatformView {
     private let adyenFlutterInterface: AdyenFlutterInterface
     private let componentPlatformEventHandler: ComponentPlatformEventHandler
-    private let sessionHolder: SessionHolder
+    private let checkoutHolder: CheckoutHolder
     private let componentWrapperView: ComponentWrapperView
     private let paymentMethodTxVariant: String
     private let componentId: String
@@ -29,12 +29,12 @@ class AdyenComponent: NSObject, FlutterPlatformView {
         arguments: NSDictionary,
         adyenFlutterInterface: AdyenFlutterInterface,
         componentPlatformEventHandler: ComponentPlatformEventHandler,
-        sessionHolder: SessionHolder,
+        checkoutHolder: CheckoutHolder,
         viewTypeId: String
     ) {
         self.adyenFlutterInterface = adyenFlutterInterface
         self.componentPlatformEventHandler = componentPlatformEventHandler
-        self.sessionHolder = sessionHolder
+        self.checkoutHolder = checkoutHolder
         componentWrapperView = .init()
         paymentMethodTxVariant = arguments.value(forKey: "paymentMethodTxVariant") as? String ?? ""
         componentId = arguments.value(forKey: "componentId") as? String ?? ""
@@ -48,11 +48,11 @@ class AdyenComponent: NSObject, FlutterPlatformView {
 
     private func setupComponentView() {
         do {
-            guard let checkout = sessionHolder.adyenCheckout, let paymentMethodType: PaymentMethodType = PaymentMethodType(rawValue: paymentMethodTxVariant) else {
+            guard let checkout = checkoutHolder.adyenCheckout, let paymentMethodType: PaymentMethodType = PaymentMethodType(rawValue: paymentMethodTxVariant) else {
                 throw PlatformError(errorDescription: "Checkout is not available.")
             }
             
-            guard let paymentComponent = sessionHolder.adyenCheckout?.createPaymentComponent(for: paymentMethodType) else {
+            guard let paymentComponent = checkoutHolder.adyenCheckout?.createPaymentComponent(for: paymentMethodType) else {
                 throw PlatformError(errorDescription: "Payment component not available.")
             }
             

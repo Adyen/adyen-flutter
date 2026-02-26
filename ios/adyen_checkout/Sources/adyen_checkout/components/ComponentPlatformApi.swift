@@ -7,9 +7,9 @@ class ComponentPlatformApi: ComponentPlatformInterface {
     private let instantComponentManager: InstantComponentManager
     private let actionComponentManager: ActionComponentManager
 
-    init(componentFlutterApi: ComponentFlutterInterface, sessionHolder: SessionHolder) {
-        self.applePayComponentManager = ApplePayComponentManager(componentFlutterApi: componentFlutterApi, sessionHolder: sessionHolder)
-        self.instantComponentManager = InstantComponentManager(componentFlutterApi: componentFlutterApi, sessionHolder: sessionHolder)
+    init(componentFlutterApi: ComponentFlutterInterface, checkoutHolder: CheckoutHolder) {
+        self.applePayComponentManager = ApplePayComponentManager(componentFlutterApi: componentFlutterApi, checkoutHolder: checkoutHolder)
+        self.instantComponentManager = InstantComponentManager(componentFlutterApi: componentFlutterApi, checkoutHolder: checkoutHolder)
         self.actionComponentManager = ActionComponentManager(componentFlutterApi: componentFlutterApi)
     }
 

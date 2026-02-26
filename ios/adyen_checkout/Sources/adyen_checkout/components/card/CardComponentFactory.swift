@@ -4,17 +4,17 @@ class CardComponentFactory: ComponentFactory {
     static let cardComponentAdvancedId = "cardComponentAdvanced"
     static let cardComponentSessionId = "cardComponentSession"
     let viewTypeId: String
-    let sessionHolder: SessionHolder?
+    let checkoutHolder: CheckoutHolder?
 
     init(
         messenger: FlutterBinaryMessenger,
         componentFlutterApi: ComponentFlutterInterface,
         componentPlatformApi: ComponentPlatformApi,
         viewTypeId: String,
-        sessionHolder: SessionHolder? = nil
+        checkoutHolder: CheckoutHolder? = nil
     ) {
         self.viewTypeId = viewTypeId
-        self.sessionHolder = sessionHolder
+        self.checkoutHolder = checkoutHolder
         super.init(
             messenger: messenger,
             componentFlutterApi: componentFlutterApi,
@@ -27,7 +27,7 @@ class CardComponentFactory: ComponentFactory {
         viewIdentifier viewId: Int64,
         arguments args: Any?
     ) -> FlutterPlatformView {
-        if viewTypeId == CardComponentFactory.cardComponentSessionId, sessionHolder != nil {
+        if viewTypeId == CardComponentFactory.cardComponentSessionId, checkoutHolder != nil {
             return CardSessionComponent(
                 frame: frame,
                 viewIdentifier: viewId,
@@ -35,7 +35,7 @@ class CardComponentFactory: ComponentFactory {
                 binaryMessenger: messenger,
                 componentFlutterApi: componentFlutterApi,
                 componentPlatformApi: componentPlatformApi,
-                sessionHolder: sessionHolder!
+                checkoutHolder: checkoutHolder!
             )
         } else {
             return CardAdvancedComponent(

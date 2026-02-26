@@ -3,16 +3,16 @@ import Foundation
 
 class InstantComponentManager {
     private let componentFlutterApi: ComponentFlutterInterface
-    private let sessionHolder: SessionHolder
+    private let checkoutHolder: CheckoutHolder
     private var instantComponent: InstantComponentProtocol?
     enum Constants {
         static let instantSessionComponentId = "INSTANT_SESSION_COMPONENT"
         static let instantAdvancedComponentId = "INSTANT_ADVANCED_COMPONENT"
     }
     
-    init(componentFlutterApi: ComponentFlutterInterface, sessionHolder: SessionHolder) {
+    init(componentFlutterApi: ComponentFlutterInterface, checkoutHolder: CheckoutHolder) {
         self.componentFlutterApi = componentFlutterApi
-        self.sessionHolder = sessionHolder
+        self.checkoutHolder = checkoutHolder
     }
     
     func startInstantComponent(
@@ -35,7 +35,7 @@ class InstantComponentManager {
                     componentFlutterApi: componentFlutterApi,
                     paymentMethod: paymentMethod,
                     adyenContext: adyenContext,
-                    sessionHolder: sessionHolder,
+                    checkoutHolder: checkoutHolder,
                     componentId: componentId
                 )
             } else {

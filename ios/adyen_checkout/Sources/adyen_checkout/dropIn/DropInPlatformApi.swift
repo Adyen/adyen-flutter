@@ -20,7 +20,7 @@ import UIKit
 class DropInPlatformApi: DropInPlatformInterface {
     private let jsonDecoder = JSONDecoder()
     private let checkoutFlutter: CheckoutFlutterInterface
-    private let sessionHolder: SessionHolder
+    private let checkoutHolder: CheckoutHolder
     private var dropInComponent: DropInComponent?
     private var dropInViewController: DropInViewController?
     private var dropInSessionStoredPaymentMethodsDelegate: DropInSessionsStoredPaymentMethodsDelegate?
@@ -32,10 +32,10 @@ class DropInPlatformApi: DropInPlatformInterface {
 
     init(
         checkoutFlutter: CheckoutFlutterInterface,
-        sessionHolder: SessionHolder
+        checkoutHolder: CheckoutHolder
     ) {
         self.checkoutFlutter = checkoutFlutter
-        self.sessionHolder = sessionHolder
+        self.checkoutHolder = checkoutHolder
     }
 
     func showDropInSession(dropInConfigurationDTO: DropInConfigurationDTO) {
@@ -43,12 +43,12 @@ class DropInPlatformApi: DropInPlatformInterface {
             guard let viewController = getViewController() else {
                 return
             }
-            guard var paymentMethods = sessionHolder.adyenCheckout?.paymentMethods else {
+            guard var paymentMethods = checkoutHolder.adyenCheckout?.paymentMethods else {
                 sendSessionError(error: PlatformError(errorDescription: "Session is not available."))
                 return
             }
 
-            guard let session = sessionHolder.session else {
+            guard let session = checkoutHolder.session else {
                 sendSessionError(error: PlatformError(errorDescription: "Session is not available."))
                 return
             }
@@ -71,8 +71,8 @@ class DropInPlatformApi: DropInPlatformInterface {
                 configuration: dropInConfiguration,
                 title: dropInConfigurationDTO.preselectedPaymentMethodTitle
             )
-            dropInComponent.delegate = sessionHolder.session
-            dropInComponent.partialPaymentDelegate = sessionHolder.session
+            dropInComponent.delegate = checkoutHolder.session
+            dropInComponent.partialPaymentDelegate = checkoutHolder.session
 //            dropInComponent.cardComponentDelegate = self
             if dropInConfigurationDTO.isRemoveStoredPaymentMethodEnabled {
                 dropInComponent.storedPaymentMethodsDelegate = dropInSessionStoredPaymentMethodsDelegate
@@ -197,7 +197,7 @@ class DropInPlatformApi: DropInPlatformInterface {
     func onOrderCancelResult(orderCancelResult: OrderCancelResultDTO) throws {}
 
     func cleanUpDropIn() {
-        sessionHolder.reset()
+        checkoutHolder.reset()
         dropInSessionStoredPaymentMethodsDelegate = nil
         dropInAdvancedFlowDelegate?.dropInInteractorDelegate = nil
         dropInAdvancedFlowDelegate = nil

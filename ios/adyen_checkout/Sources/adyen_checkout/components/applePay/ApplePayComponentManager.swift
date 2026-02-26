@@ -6,7 +6,7 @@ import PassKit
 
 class ApplePayComponentManager {
     private let componentFlutterApi: ComponentFlutterInterface
-    private let sessionHolder: SessionHolder
+    private let checkoutHolder: CheckoutHolder
     private var applePayComponent: BaseApplePayComponent?
     enum Constants {
         static let applePaySessionComponentId = "APPLE_PAY_SESSION_COMPONENT"
@@ -15,10 +15,10 @@ class ApplePayComponentManager {
 
     init(
         componentFlutterApi: ComponentFlutterInterface,
-        sessionHolder: SessionHolder
+        checkoutHolder: CheckoutHolder
     ) {
         self.componentFlutterApi = componentFlutterApi
-        self.sessionHolder = sessionHolder
+        self.checkoutHolder = checkoutHolder
     }
  
     func isApplePayAvailable(
@@ -97,7 +97,7 @@ class ApplePayComponentManager {
     ) throws -> BaseApplePayComponent {
         if componentId == Constants.applePaySessionComponentId {
             return try ApplePaySessionComponent(
-                sessionHolder: sessionHolder,
+                checkoutHolder: checkoutHolder,
                 configuration: instantPaymentComponentConfigurationDTO,
                 componentId: componentId
             )
@@ -116,7 +116,7 @@ class ApplePayComponentManager {
         componentId: String
     ) throws -> ApplePayPaymentMethod {
         if componentId == Constants.applePaySessionComponentId {
-            guard let paymentMethod = sessionHolder.session?.state.paymentMethods.paymentMethod(ofType: ApplePayPaymentMethod.self) else {
+            guard let paymentMethod = checkoutHolder.session?.state.paymentMethods.paymentMethod(ofType: ApplePayPaymentMethod.self) else {
                 throw PlatformError(errorDescription: "Apple Pay payment method not valid.")
             }
             return paymentMethod
