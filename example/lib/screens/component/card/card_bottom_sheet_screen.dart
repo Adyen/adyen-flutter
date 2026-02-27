@@ -60,6 +60,7 @@ class CardBottomSheetScreen extends StatelessWidget {
           if (snapshot.hasData) {
             final paymentMethod = _extractPaymentMethod(snapshot.data!);
             final advancedCheckout = AdvancedCheckout(
+              paymentMethods: snapshot.data!,
               onSubmit: repository.onSubmit,
               onAdditionalDetails: repository.onAdditionalDetails,
             );

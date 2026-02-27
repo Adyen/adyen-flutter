@@ -1,15 +1,18 @@
 import 'package:adyen_checkout/src/common/model/partial_payment/partial_payment.dart';
 import 'package:adyen_checkout/src/common/model/payment_event.dart';
 
-sealed class Checkout {}
+sealed class Checkout {
+  final Map<String, dynamic> paymentMethods;
+
+  Checkout({required this.paymentMethods});
+}
 
 class SessionCheckout extends Checkout {
   final String id;
-  final Map<String, dynamic> paymentMethods;
 
   SessionCheckout({
     required this.id,
-    required this.paymentMethods,
+    required super.paymentMethods,
   });
 }
 
@@ -25,6 +28,7 @@ class AdvancedCheckout extends Checkout {
   PartialPayment? partialPayment;
 
   AdvancedCheckout({
+    required super.paymentMethods,
     required this.onSubmit,
     required this.onAdditionalDetails,
     this.partialPayment,

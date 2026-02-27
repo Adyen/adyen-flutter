@@ -22,15 +22,15 @@ class V2AdvancedComponentScreen extends StatelessWidget {
       shopperLocale: Config.shopperLocale,
       amount: Config.amount,
       cardConfiguration: const CardConfiguration(
-        holderNameRequired: true,
+        // holderNameRequired: true,
       ),
     );
 
     return Scaffold(
       appBar: AppBar(title: const Text('V2 Advanced Component')),
       body: SafeArea(
-        child: FutureBuilder<Map<String, dynamic>>(
-          future: _fetchPaymentMethodsAndSetup(checkoutConfiguration),
+        child: FutureBuilder<AdvancedCheckout>(
+          future: _setupAdvancedCheckout(checkoutConfiguration),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const Center(child: CircularProgressIndicator());
@@ -43,7 +43,7 @@ class V2AdvancedComponentScreen extends StatelessWidget {
               );
             }
 
-            final paymentMethods = snapshot.data;
+            final paymentMethods = snapshot.data?.paymentMethods;
             if (paymentMethods == null || paymentMethods.isEmpty) {
               return const Center(child: Text('No payment methods available'));
             }
@@ -53,17 +53,12 @@ class V2AdvancedComponentScreen extends StatelessWidget {
               return const Center(child: Text('Card payment method not found'));
             }
 
-            final advancedCheckout = AdvancedCheckout(
-              onSubmit: repository.onSubmit,
-              onAdditionalDetails: repository.onAdditionalDetails,
-            );
-
             return SingleChildScrollView(
               padding: const EdgeInsets.all(16),
               child: AdyenComponent(
                 configuration: checkoutConfiguration,
                 paymentMethod: paymentMethod,
-                checkout: advancedCheckout,
+                checkout: snapshot.data!,
                 onPaymentResult: (paymentResult) async =>
                     _endPayment(context, paymentResult),
               ),
@@ -90,15 +85,19 @@ class V2AdvancedComponentScreen extends StatelessWidget {
     DialogBuilder.showPaymentResultDialog(paymentResult, context);
   }
 
-  Future<Map<String, dynamic>> _fetchPaymentMethodsAndSetup(
+  Future<AdvancedCheckout> _setupAdvancedCheckout(
     CheckoutConfiguration checkoutConfiguration,
   ) async {
     final paymentMethods = await repository.fetchPaymentMethods();
-    await AdyenCheckout.advanced.setup(
+    final advancedCheckout = await AdyenCheckout.advanced.setup(
       paymentMethods: paymentMethods,
       checkoutConfiguration: checkoutConfiguration,
+      callbacks: AdyenCheckoutCallbacks(
+        onSubmit: repository.onSubmit,
+        onAdditionalDetails: repository.onAdditionalDetails,
+      ),
     );
 
-    return paymentMethods;
+    return advancedCheckout;
   }
 }

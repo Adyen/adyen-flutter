@@ -67,6 +67,7 @@ class CardAdvancedComponentScreen extends StatelessWidget {
   ) {
     final paymentMethod = extractPaymentMethod(paymentMethods);
     final advancedCheckout = AdvancedCheckout(
+      paymentMethods: paymentMethods,
       onSubmit: repository.onSubmit,
       onAdditionalDetails: repository.onAdditionalDetails,
     );

@@ -1,4 +1,5 @@
 export 'src/adyen_checkout.dart';
+export 'src/common/adyen_checkout_advanced.dart';
 export 'src/common/model/amount.dart';
 export 'src/common/model/analytics_options.dart';
 export 'src/common/model/api_only/card_expiry_date_validation_result.dart';

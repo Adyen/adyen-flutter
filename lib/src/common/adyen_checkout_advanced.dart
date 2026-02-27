@@ -15,9 +15,10 @@ class AdyenCheckoutAdvanced {
     this.dropIn,
   );
 
-  Future<void> setup({
+  Future<AdvancedCheckout> setup({
     required Map<String, dynamic> paymentMethods,
     required CheckoutConfiguration checkoutConfiguration,
+    required AdyenCheckoutCallbacks callbacks,
   }) async {
     final encodedPaymentMethodsResponse = jsonEncode(
       paymentMethods,
@@ -26,6 +27,12 @@ class AdyenCheckoutAdvanced {
     await adyenCheckoutApi.setupAdvanced(
       encodedPaymentMethodsResponse,
       checkoutConfiguration.toDTO(),
+    );
+    return AdvancedCheckout(
+      paymentMethods: paymentMethods,
+      onSubmit: callbacks.onSubmit,
+      onAdditionalDetails: callbacks.onAdditionalDetails,
+      partialPayment: callbacks.partialPayment,
     );
   }
 
@@ -51,4 +58,22 @@ class AdyenCheckoutAdvanced {
       );
 
   Future<void> stopDropIn() async => await dropIn.stopDropIn();
+}
+
+class AdyenCheckoutCallbacks {
+  Future<PaymentEvent> Function(
+    Map<String, dynamic> data, [
+    Map<String, dynamic>? extra,
+  ]) onSubmit;
+
+  Future<PaymentEvent> Function(Map<String, dynamic> additionalDetails)
+      onAdditionalDetails;
+
+  PartialPayment? partialPayment;
+
+  AdyenCheckoutCallbacks({
+    required this.onSubmit,
+    required this.onAdditionalDetails,
+    this.partialPayment,
+  });
 }

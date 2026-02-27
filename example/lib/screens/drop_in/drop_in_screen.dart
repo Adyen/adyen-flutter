@@ -80,6 +80,7 @@ class DropInScreen extends StatelessWidget {
       final paymentMethodsResponse = await repository.fetchPaymentMethods();
       final dropInConfiguration = await _createDropInConfiguration();
       final advancedCheckout = AdvancedCheckout(
+        paymentMethods: paymentMethodsResponse,
         onSubmit: repository.onSubmit,
         onAdditionalDetails: repository.onAdditionalDetails,
         partialPayment: PartialPayment(
