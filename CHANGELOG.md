@@ -3,6 +3,7 @@
 ### New
 
 - Added 3DS2 UI customization via `Adyen3DSTheme`, including `fromThemeData()` support.
+- Added BLIK component support for both Sessions and Advanced flows.
 
 ### Changed
 

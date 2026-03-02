@@ -36,6 +36,8 @@ export 'src/components/apple_pay/model/apple_pay_button_style.dart';
 export 'src/components/apple_pay/model/apple_pay_button_theme.dart';
 export 'src/components/apple_pay/model/apple_pay_button_type.dart';
 export 'src/components/apple_pay/model/apple_pay_component_configuration.dart';
+export 'src/components/blik/adyen_blik_component.dart';
+export 'src/components/blik/model/blik_component_configuration.dart';
 export 'src/components/card/adyen_card_component.dart';
 export 'src/components/card/model/card_component_configuration.dart';
 export 'src/components/google_pay/adyen_google_pay_component.dart';

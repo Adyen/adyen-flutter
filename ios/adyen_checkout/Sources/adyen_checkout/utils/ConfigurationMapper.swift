@@ -199,6 +199,18 @@ extension CardComponentConfigurationDTO {
     }
 }
 
+extension BlikComponentConfigurationDTO {
+    func createAdyenContext() throws -> AdyenContext {
+        try buildAdyenContext(
+            environment: environment,
+            clientKey: clientKey,
+            amount: amount,
+            analyticsOptionsDTO: analyticsOptionsDTO,
+            countryCode: countryCode
+        )
+    }
+}
+
 extension Environment {
     func mapToEnvironment() -> Adyen.Environment {
         switch self {

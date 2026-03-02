@@ -35,5 +35,22 @@ public class AdyenCheckoutPlugin: NSObject, FlutterPlugin {
             sessionHolder: sessionHolder
         )
         registrar.register(cardComponentSessionFactory, withId: CardComponentFactory.cardComponentSessionId)
+
+        let blikComponentAdvancedFactory = BlikComponentFactory(
+            messenger: messenger,
+            componentFlutterApi: componentFlutterApi,
+            componentPlatformApi: componentPlatformApi,
+            viewTypeId: BlikComponentFactory.blikComponentAdvancedId
+        )
+        registrar.register(blikComponentAdvancedFactory, withId: BlikComponentFactory.blikComponentAdvancedId)
+
+        let blikComponentSessionFactory = BlikComponentFactory(
+            messenger: messenger,
+            componentFlutterApi: componentFlutterApi,
+            componentPlatformApi: componentPlatformApi,
+            viewTypeId: BlikComponentFactory.blikComponentSessionId,
+            sessionHolder: sessionHolder
+        )
+        registrar.register(blikComponentSessionFactory, withId: BlikComponentFactory.blikComponentSessionId)
     }
 }

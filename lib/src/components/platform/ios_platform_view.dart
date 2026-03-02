@@ -57,8 +57,8 @@ class IosPlatformView extends StatelessWidget {
   ) {
     final cardConfiguration =
         creationParams[Constants.cardComponentConfigurationKey]
-            as CardComponentConfigurationDTO;
-    if (cardConfiguration.cardConfiguration.showStorePaymentField) {
+            as CardComponentConfigurationDTO?;
+    if (cardConfiguration?.cardConfiguration.showStorePaymentField == true) {
       groupedGestureRecognizers.addAll({
         Factory<HorizontalDragGestureRecognizer>(
             () => HorizontalDragGestureRecognizer()),
