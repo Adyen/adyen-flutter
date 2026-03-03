@@ -97,7 +97,7 @@ class BlikAdvancedComponent extends BaseBlikComponent {
         final data = jsonDecode(event.data as String);
         return await it.onSubmit(data);
       case SessionCheckout():
-        throw Exception('Please use the session blik component.');
+        throw UnsupportedError('Please use the session blik component.');
     }
   }
 
@@ -108,7 +108,7 @@ class BlikAdvancedComponent extends BaseBlikComponent {
         final additionalDetails = jsonDecode(event.data as String);
         return await it.onAdditionalDetails(additionalDetails);
       case SessionCheckout():
-        throw Exception('Please use the session blik component.');
+        throw UnsupportedError('Please use the session blik component.');
     }
   }
 }

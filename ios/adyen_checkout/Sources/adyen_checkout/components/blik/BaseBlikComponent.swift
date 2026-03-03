@@ -130,11 +130,25 @@ class BaseBlikComponent: NSObject, FlutterPlatformView, UIScrollViewDelegate {
     }
     
     private func disableNativeScrollingAndBouncing(componentView: UIView) {
-        let formView = componentView.subviews[0].subviews[0] as? UIScrollView
+        let formView = findSubview(in: componentView, ofType: UIScrollView.self)
         formView?.delegate = self
         formView?.bounces = false
         formView?.isScrollEnabled = false
         formView?.alwaysBounceVertical = false
         formView?.contentInsetAdjustmentBehavior = .never
+    }
+
+    private func findSubview<T: UIView>(in view: UIView, ofType type: T.Type) -> T? {
+        if let matchingView = view as? T {
+            return matchingView
+        }
+
+        for subview in view.subviews {
+            if let matchingView = findSubview(in: subview, ofType: type) {
+                return matchingView
+            }
+        }
+
+        return nil
     }
 }
