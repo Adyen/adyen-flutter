@@ -28,7 +28,11 @@ internal class CardSessionComponent(
     private val sessionHolder: SessionHolder
 ) : BaseCardComponent(context, id, creationParams, activity, componentFlutterApi, onDispose, setCurrentCardComponent) {
     init {
-        val checkoutSession = sessionHolder.toCheckoutSession(checkoutConfiguration.environment, checkoutConfiguration.clientKey)
+        val checkoutSession =
+            sessionHolder.toCheckoutSession(
+                checkoutConfiguration.environment,
+                checkoutConfiguration.clientKey
+            )
         cardComponent =
             createCardComponent(checkoutSession).apply {
                 addComponent(this)

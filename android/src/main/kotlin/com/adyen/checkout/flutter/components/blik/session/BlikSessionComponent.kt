@@ -29,7 +29,11 @@ internal class BlikSessionComponent(
         setCurrentBlikComponent,
     ) {
     init {
-        val checkoutSession = sessionHolder.toCheckoutSession(checkoutConfiguration.environment, checkoutConfiguration.clientKey)
+        val checkoutSession =
+            sessionHolder.toCheckoutSession(
+                checkoutConfiguration.environment,
+                checkoutConfiguration.clientKey
+            )
 
         blikComponent =
             createBlikComponent(checkoutSession).apply {

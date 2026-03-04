@@ -36,7 +36,12 @@ internal class BlikAdvancedComponent(
             activity = activity,
             paymentMethod = paymentMethod,
             checkoutConfiguration = checkoutConfiguration,
-            callback = ComponentAdvancedCallback<BlikComponentState>(componentFlutterApi, componentId, ::setCurrentBlikComponent),
+            callback =
+                ComponentAdvancedCallback<BlikComponentState>(
+                    componentFlutterApi,
+                    componentId,
+                    ::setCurrentBlikComponent
+                ),
             key = UUID.randomUUID().toString(),
         )
     }
