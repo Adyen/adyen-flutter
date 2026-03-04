@@ -58,7 +58,7 @@ class AdyenBlikComponent extends StatelessWidget {
 
   BlikAdvancedComponent _buildBlikAdvancedFlowWidget(
     String sdkVersionNumber,
-    Checkout advancedCheckout,
+    AdvancedCheckout advancedCheckout,
   ) {
     final String encodedPaymentMethod = json.encode(paymentMethod);
 
@@ -74,9 +74,9 @@ class AdyenBlikComponent extends StatelessWidget {
   double _determineInitialHeight() {
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
-        return 180;
+        return 219;
       case TargetPlatform.iOS:
-        return 160;
+        return 213;
       default:
         throw UnsupportedError('Unsupported platform view');
     }

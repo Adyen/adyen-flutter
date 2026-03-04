@@ -2,7 +2,9 @@ package com.adyen.checkout.flutter.components.blik.advanced
 
 import androidx.fragment.app.FragmentActivity
 import com.adyen.checkout.blik.BlikComponent
+import com.adyen.checkout.blik.BlikComponentState
 import com.adyen.checkout.components.core.PaymentMethod
+import com.adyen.checkout.flutter.components.base.ComponentAdvancedCallback
 import com.adyen.checkout.flutter.components.blik.BaseBlikComponent
 import com.adyen.checkout.flutter.generated.ComponentFlutterInterface
 import org.json.JSONObject
@@ -34,7 +36,7 @@ internal class BlikAdvancedComponent(
             activity = activity,
             paymentMethod = paymentMethod,
             checkoutConfiguration = checkoutConfiguration,
-            callback = BlikAdvancedCallback(componentFlutterApi, componentId, ::setCurrentBlikComponent),
+            callback = ComponentAdvancedCallback<BlikComponentState>(componentFlutterApi, componentId, ::setCurrentBlikComponent),
             key = UUID.randomUUID().toString(),
         )
     }

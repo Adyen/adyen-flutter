@@ -1,16 +1,13 @@
-import 'package:adyen_checkout/src/adyen_checkout.dart';
-import 'package:adyen_checkout/src/common/model/payment_result.dart';
-import 'package:adyen_checkout/src/common/model/result_code.dart';
 import 'package:adyen_checkout/src/components/card/base_card_component.dart';
+import 'package:adyen_checkout/src/components/session_component_mixin.dart';
 import 'package:adyen_checkout/src/generated/platform_api.g.dart';
 import 'package:adyen_checkout/src/util/constants.dart';
-import 'package:adyen_checkout/src/util/dto_mapper.dart';
 
-class CardSessionComponent extends BaseCardComponent {
+class CardSessionComponent extends BaseCardComponent with SessionComponentMixin {
   final SessionDTO session;
 
   @override
-  final String componentId = "CARD_SESSION_COMPONENT";
+  final String componentId = 'CARD_SESSION_COMPONENT';
 
   @override
   String get viewType => Constants.cardComponentSessionKey;
@@ -37,23 +34,4 @@ class CardSessionComponent extends BaseCardComponent {
         Constants.isStoredPaymentMethodKey: isStoredPaymentMethod,
         Constants.componentIdKey: componentId,
       };
-
-  @override
-  void handleComponentCommunication(ComponentCommunicationModel event) {}
-
-  @override
-  void onFinished(PaymentResultDTO? paymentResultDTO) {
-    final ResultCode resultCode =
-        paymentResultDTO?.result?.toResultCode() ?? ResultCode.unknown;
-    adyenLogger.print("Card component session flow result code: $resultCode");
-    _resetSession();
-    onPaymentResult(PaymentSessionFinished(
-      sessionId: paymentResultDTO?.result?.sessionId ?? "",
-      sessionData: paymentResultDTO?.result?.sessionData ?? "",
-      sessionResult: paymentResultDTO?.result?.sessionResult ?? "",
-      resultCode: resultCode,
-    ));
-  }
-
-  void _resetSession() => AdyenCheckout.session.clear();
 }

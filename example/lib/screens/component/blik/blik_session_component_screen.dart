@@ -51,6 +51,7 @@ class BlikSessionComponentScreen extends StatelessWidget {
                             paymentResult, context);
                       },
                     ),
+                    Container(height: 200, color: Colors.yellow)
                   ],
                 ),
               );

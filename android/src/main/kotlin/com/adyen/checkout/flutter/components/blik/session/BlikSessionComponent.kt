@@ -2,14 +2,15 @@ package com.adyen.checkout.flutter.components.blik.session
 
 import androidx.fragment.app.FragmentActivity
 import com.adyen.checkout.blik.BlikComponent
-import com.adyen.checkout.components.core.Order
+import com.adyen.checkout.blik.BlikComponentState
 import com.adyen.checkout.components.core.PaymentMethod
 import com.adyen.checkout.components.core.action.Action
+import com.adyen.checkout.flutter.components.base.ComponentSessionCallback
 import com.adyen.checkout.flutter.components.blik.BaseBlikComponent
 import com.adyen.checkout.flutter.generated.ComponentFlutterInterface
 import com.adyen.checkout.flutter.session.SessionHolder
+import com.adyen.checkout.flutter.session.toCheckoutSession
 import com.adyen.checkout.sessions.core.CheckoutSession
-import com.adyen.checkout.sessions.core.SessionSetupResponse
 import org.json.JSONObject
 import java.util.UUID
 
@@ -28,15 +29,7 @@ internal class BlikSessionComponent(
         setCurrentBlikComponent,
     ) {
     init {
-        val sessionSetupResponse = SessionSetupResponse.SERIALIZER.deserialize(sessionHolder.sessionSetupResponse)
-        val order = sessionHolder.orderResponse?.let { Order.SERIALIZER.deserialize(it) }
-        val checkoutSession =
-            CheckoutSession(
-                sessionSetupResponse = sessionSetupResponse,
-                order = order,
-                environment = checkoutConfiguration.environment,
-                clientKey = checkoutConfiguration.clientKey,
-            )
+        val checkoutSession = sessionHolder.toCheckoutSession(checkoutConfiguration.environment, checkoutConfiguration.clientKey)
 
         blikComponent =
             createBlikComponent(checkoutSession).apply {
@@ -52,7 +45,7 @@ internal class BlikSessionComponent(
             paymentMethod = paymentMethod,
             checkoutConfiguration = checkoutConfiguration,
             componentCallback =
-                BlikSessionCallback(
+                ComponentSessionCallback<BlikComponentState>(
                     componentFlutterApi,
                     componentId,
                     ::onAction,

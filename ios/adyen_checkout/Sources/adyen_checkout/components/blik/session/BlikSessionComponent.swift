@@ -7,8 +7,8 @@
 #endif
 import Flutter
 
-class BlikSessionComponent: BaseBlikComponent {
-    private let sessionHolder: SessionHolder
+class BlikSessionComponent: BaseBlikComponent, SessionComponentProtocol {
+    let sessionHolder: SessionHolder
 
     init(
         frame: CGRect,
@@ -56,15 +56,6 @@ class BlikSessionComponent: BaseBlikComponent {
         )
         blikComponent.delegate = session
         return blikComponent
-    }
-
-    private func setupSessionFlowDelegate() {
-        if let componentSessionFlowDelegate = (sessionHolder.sessionDelegate as? ComponentSessionFlowHandler) {
-            componentSessionFlowDelegate.finalizeCallback = finalizeAndDismissSessionComponent
-            componentSessionFlowDelegate.componentId = componentId
-        } else {
-            AdyenAssertion.assertionFailure(message: "Wrong session flow delegate usage")
-        }
     }
 
     func finalizeAndDismissSessionComponent(success: Bool, completion: @escaping (() -> Void)) {

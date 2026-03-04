@@ -1,12 +1,10 @@
-import 'package:adyen_checkout/src/adyen_checkout.dart';
-import 'package:adyen_checkout/src/common/model/payment_result.dart';
-import 'package:adyen_checkout/src/common/model/result_code.dart';
 import 'package:adyen_checkout/src/components/blik/base_blik_component.dart';
+import 'package:adyen_checkout/src/components/session_component_mixin.dart';
 import 'package:adyen_checkout/src/generated/platform_api.g.dart';
 import 'package:adyen_checkout/src/util/constants.dart';
-import 'package:adyen_checkout/src/util/dto_mapper.dart';
 
-class BlikSessionComponent extends BaseBlikComponent {
+class BlikSessionComponent extends BaseBlikComponent
+    with SessionComponentMixin {
   final SessionDTO session;
 
   @override
@@ -32,23 +30,4 @@ class BlikSessionComponent extends BaseBlikComponent {
         Constants.paymentMethodKey: paymentMethod,
         Constants.componentIdKey: componentId,
       };
-
-  @override
-  void handleComponentCommunication(ComponentCommunicationModel event) {}
-
-  @override
-  void onFinished(PaymentResultDTO? paymentResultDTO) {
-    final ResultCode resultCode =
-        paymentResultDTO?.result?.toResultCode() ?? ResultCode.unknown;
-    adyenLogger.print('Blik component session flow result code: $resultCode');
-    _resetSession();
-    onPaymentResult(PaymentSessionFinished(
-      sessionId: paymentResultDTO?.result?.sessionId ?? '',
-      sessionData: paymentResultDTO?.result?.sessionData ?? '',
-      sessionResult: paymentResultDTO?.result?.sessionResult ?? '',
-      resultCode: resultCode,
-    ));
-  }
-
-  void _resetSession() => AdyenCheckout.session.clear();
 }

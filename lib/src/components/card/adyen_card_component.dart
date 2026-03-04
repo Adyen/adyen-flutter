@@ -73,7 +73,7 @@ class AdyenCardComponent extends StatelessWidget {
 
   CardAdvancedComponent _buildCardAdvancedFlowWidget(
     String sdkVersionNumber,
-    Checkout advancedCheckout,
+    AdvancedCheckout advancedCheckout,
   ) {
     final initialHeight =
         _determineInitialHeight(configuration.cardConfiguration);

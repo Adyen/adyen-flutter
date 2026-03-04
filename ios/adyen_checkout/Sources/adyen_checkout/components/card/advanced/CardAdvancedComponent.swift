@@ -7,11 +7,11 @@
 #endif
 import Flutter
 
-class CardAdvancedComponent: BaseCardComponent {
+class CardAdvancedComponent: BaseCardComponent, AdvancedComponentProtocol {
     private var actionComponentDelegate: ActionComponentDelegate?
-    private var actionComponent: AdyenActionComponent?
     private var presentationDelegate: PresentationDelegate?
     private var componentDelegate: PaymentComponentDelegate?
+    var actionComponent: AdyenActionComponent?
 
     override init(
         frame: CGRect,
@@ -57,7 +57,7 @@ class CardAdvancedComponent: BaseCardComponent {
     }
 
     private func setupCardComponent() throws -> CardComponent {
-        componentDelegate = CardAdvancedFlowDelegate(
+        componentDelegate = AdvancedFlowDelegate(
             componentFlutterApi: componentFlutterApi,
             componentId: componentId
         )
@@ -81,34 +81,4 @@ class CardAdvancedComponent: BaseCardComponent {
         return actionComponent
     }
 
-    private func onAction(actionResponse: [String?: Any?]) {
-        do {
-            let jsonData = try JSONSerialization.data(withJSONObject: actionResponse, options: [])
-            let action = try JSONDecoder().decode(Action.self, from: jsonData)
-            actionComponent?.handle(action)
-        } catch {
-            sendErrorToFlutterLayer(errorMessage: error.localizedDescription)
-        }
-    }
-
-    private func setupFinalizeComponentCallback() {
-        componentPlatformApi.onFinishCallback = { [weak self] paymentEvent in
-            let resultCode = ResultCode(rawValue: paymentEvent.result ?? "")
-            let isAccepted = resultCode?.isAccepted ?? false
-            self?.finalizeAndDismiss(success: isAccepted, completion: { [weak self] in
-                let componentCommunicationModel = ComponentCommunicationModel(
-                    type: ComponentCommunicationType.result,
-                    componentId: self?.componentId ?? "",
-                    paymentResult: PaymentResultDTO(
-                        type: PaymentResultEnum.finished,
-                        result: PaymentResultModelDTO(resultCode: resultCode?.rawValue)
-                    )
-                )
-                self?.componentFlutterApi.onComponentCommunication(
-                    componentCommunicationModel: componentCommunicationModel,
-                    completion: { _ in }
-                )
-            })
-        }
-    }
 }

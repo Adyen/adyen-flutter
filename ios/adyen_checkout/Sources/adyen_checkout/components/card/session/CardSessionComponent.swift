@@ -7,8 +7,8 @@
 #endif
 import Flutter
 
-class CardSessionComponent: BaseCardComponent {
-    private let sessionHolder: SessionHolder
+class CardSessionComponent: BaseCardComponent, SessionComponentProtocol {
+    let sessionHolder: SessionHolder
 
     init(
         frame: CGRect,
@@ -51,15 +51,6 @@ class CardSessionComponent: BaseCardComponent {
             componentDelegate: session,
             cardDelegate: self
         )
-    }
-
-    private func setupSessionFlowDelegate() {
-        if let componentSessionFlowDelegate = (sessionHolder.sessionDelegate as? ComponentSessionFlowHandler) {
-            componentSessionFlowDelegate.finalizeCallback = finalizeAndDismissSessionComponent
-            componentSessionFlowDelegate.componentId = componentId
-        } else {
-            AdyenAssertion.assertionFailure(message: "Wrong session flow delegate usage")
-        }
     }
 
     func finalizeAndDismissSessionComponent(success: Bool, completion: @escaping (() -> Void)) {
