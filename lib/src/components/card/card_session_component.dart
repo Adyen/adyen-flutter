@@ -3,7 +3,8 @@ import 'package:adyen_checkout/src/components/session_component_mixin.dart';
 import 'package:adyen_checkout/src/generated/platform_api.g.dart';
 import 'package:adyen_checkout/src/util/constants.dart';
 
-class CardSessionComponent extends BaseCardComponent with SessionComponentMixin {
+class CardSessionComponent extends BaseCardComponent
+    with SessionComponentMixin {
   final SessionDTO session;
 
   @override

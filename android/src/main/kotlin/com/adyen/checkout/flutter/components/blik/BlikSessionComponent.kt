@@ -1,4 +1,4 @@
-package com.adyen.checkout.flutter.components.blik.session
+package com.adyen.checkout.flutter.components.blik
 
 import androidx.fragment.app.FragmentActivity
 import com.adyen.checkout.blik.BlikComponent
@@ -6,7 +6,6 @@ import com.adyen.checkout.blik.BlikComponentState
 import com.adyen.checkout.components.core.PaymentMethod
 import com.adyen.checkout.components.core.action.Action
 import com.adyen.checkout.flutter.components.base.ComponentSessionCallback
-import com.adyen.checkout.flutter.components.blik.BaseBlikComponent
 import com.adyen.checkout.flutter.generated.ComponentFlutterInterface
 import com.adyen.checkout.flutter.session.SessionHolder
 import com.adyen.checkout.flutter.session.toCheckoutSession
@@ -42,8 +41,8 @@ internal class BlikSessionComponent(
     }
 
     private fun createBlikComponent(checkoutSession: CheckoutSession): BlikComponent {
-        val paymentMethod = PaymentMethod.SERIALIZER.deserialize(JSONObject(paymentMethodString))
-        return BlikComponent.PROVIDER.get(
+        val paymentMethod = PaymentMethod.Companion.SERIALIZER.deserialize(JSONObject(paymentMethodString))
+        return BlikComponent.Companion.PROVIDER.get(
             activity = activity,
             checkoutSession = checkoutSession,
             paymentMethod = paymentMethod,

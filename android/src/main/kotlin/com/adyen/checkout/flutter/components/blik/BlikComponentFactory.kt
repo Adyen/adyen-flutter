@@ -2,8 +2,6 @@ package com.adyen.checkout.flutter.components.blik
 
 import android.content.Context
 import androidx.fragment.app.FragmentActivity
-import com.adyen.checkout.flutter.components.blik.advanced.BlikAdvancedComponent
-import com.adyen.checkout.flutter.components.blik.session.BlikSessionComponent
 import com.adyen.checkout.flutter.generated.ComponentFlutterInterface
 import com.adyen.checkout.flutter.session.SessionHolder
 import io.flutter.plugin.platform.PlatformView

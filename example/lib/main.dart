@@ -121,12 +121,14 @@ void main() {
           const MultiComponentNavigationScreen(),
       '/multiComponentSessionScreen': (context) => MultiComponentSessionScreen(
             cardRepository: adyenCardComponentRepository,
+            blikRepository: adyenBlikComponentRepository,
             googlePayRepository: adyenGooglePayComponentRepository,
             applePayRepository: adyenApplePayComponentRepository,
           ),
       '/multiComponentAdvancedScreen': (context) =>
           MultiComponentAdvancedScreen(
             cardRepository: adyenCardComponentRepository,
+            blikRepository: adyenBlikComponentRepository,
             googlePayRepository: adyenGooglePayComponentRepository,
             applePayRepository: adyenApplePayComponentRepository,
           ),

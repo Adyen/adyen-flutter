@@ -1,4 +1,4 @@
-package com.adyen.checkout.flutter.components.card.session
+package com.adyen.checkout.flutter.components.card
 
 import android.content.Context
 import androidx.fragment.app.FragmentActivity
@@ -8,7 +8,6 @@ import com.adyen.checkout.components.core.PaymentMethod
 import com.adyen.checkout.components.core.StoredPaymentMethod
 import com.adyen.checkout.components.core.action.Action
 import com.adyen.checkout.flutter.components.base.ComponentSessionCallback
-import com.adyen.checkout.flutter.components.card.BaseCardComponent
 import com.adyen.checkout.flutter.generated.ComponentFlutterInterface
 import com.adyen.checkout.flutter.session.SessionHolder
 import com.adyen.checkout.flutter.session.toCheckoutSession
@@ -43,8 +42,8 @@ internal class CardSessionComponent(
         val paymentMethodJson = JSONObject(paymentMethodString)
         when (isStoredPaymentMethod) {
             true -> {
-                val storedPaymentMethod = StoredPaymentMethod.SERIALIZER.deserialize(paymentMethodJson)
-                return CardComponent.PROVIDER.get(
+                val storedPaymentMethod = StoredPaymentMethod.Companion.SERIALIZER.deserialize(paymentMethodJson)
+                return CardComponent.Companion.PROVIDER.get(
                     activity = activity,
                     checkoutSession = checkoutSession,
                     storedPaymentMethod = storedPaymentMethod,
@@ -62,7 +61,7 @@ internal class CardSessionComponent(
 
             false -> {
                 val paymentMethod = determineCardPaymentMethod(paymentMethodJson)
-                return CardComponent.PROVIDER.get(
+                return CardComponent.Companion.PROVIDER.get(
                     activity = activity,
                     checkoutSession = checkoutSession,
                     paymentMethod = paymentMethod,
@@ -84,9 +83,12 @@ internal class CardSessionComponent(
 
     private fun determineCardPaymentMethod(paymentMethodJson: JSONObject): PaymentMethod =
         if (paymentMethodJson.length() > 0) {
-            PaymentMethod.SERIALIZER.deserialize(paymentMethodJson)
+            PaymentMethod.Companion.SERIALIZER.deserialize(paymentMethodJson)
         } else {
-            val sessionResponse = SessionSetupResponse.SERIALIZER.deserialize(sessionHolder.sessionSetupResponse)
+            val sessionResponse =
+                SessionSetupResponse.Companion.SERIALIZER.deserialize(
+                    sessionHolder.sessionSetupResponse
+                )
             sessionResponse.paymentMethodsApiResponse?.paymentMethods?.first { it.type == CARD_PAYMENT_METHOD_KEY }
                 ?: throw Exception("Cannot find card payment method")
         }

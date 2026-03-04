@@ -1,6 +1,5 @@
 package com.adyen.checkout.flutter.components.blik
 
-import android.content.Context
 import android.view.View
 import androidx.activity.ComponentActivity
 import com.adyen.checkout.blik.BlikComponent
@@ -8,6 +7,7 @@ import com.adyen.checkout.flutter.components.view.DynamicComponentView
 import com.adyen.checkout.flutter.generated.BlikComponentConfigurationDTO
 import com.adyen.checkout.flutter.generated.ComponentFlutterInterface
 import com.adyen.checkout.flutter.utils.ConfigurationMapper.toCheckoutConfiguration
+import com.adyen.checkout.flutter.utils.Constants
 import io.flutter.plugin.platform.PlatformView
 
 abstract class BaseBlikComponent(
@@ -17,14 +17,14 @@ abstract class BaseBlikComponent(
     private val onDispose: (String) -> Unit,
     private val setCurrentBlikComponent: (BaseBlikComponent) -> Unit,
 ) : PlatformView {
-    private val configuration =
-        creationParams[BLIK_COMPONENT_CONFIGURATION_KEY] as BlikComponentConfigurationDTO?
-            ?: throw IllegalArgumentException("Blik configuration not found")
-    internal val paymentMethodString = creationParams[PAYMENT_METHOD_KEY] as String? ?: ""
-    internal val componentId = creationParams[COMPONENT_ID_KEY] as String? ?: ""
-    private val dynamicComponentView = DynamicComponentView(activity, componentFlutterApi, componentId)
-    internal val checkoutConfiguration = configuration.toCheckoutConfiguration()
     internal var blikComponent: BlikComponent? = null
+    internal val checkoutConfiguration =
+        (creationParams[Constants.BLIK_COMPONENT_CONFIGURATION_KEY] as BlikComponentConfigurationDTO?)
+            ?.toCheckoutConfiguration()
+            ?: throw IllegalArgumentException("Blik configuration not found")
+    internal val paymentMethodString = creationParams[Constants.PAYMENT_METHOD_KEY] as String? ?: ""
+    internal val componentId = creationParams[Constants.COMPONENT_ID_KEY] as String? ?: ""
+    private val dynamicComponentView = DynamicComponentView(activity, componentFlutterApi, componentId)
 
     override fun getView(): View = dynamicComponentView
 
@@ -39,10 +39,4 @@ abstract class BaseBlikComponent(
     }
 
     fun setCurrentBlikComponent() = setCurrentBlikComponent(this)
-
-    companion object {
-        const val BLIK_COMPONENT_CONFIGURATION_KEY = "blikComponentConfiguration"
-        const val PAYMENT_METHOD_KEY = "paymentMethod"
-        const val COMPONENT_ID_KEY = "componentId"
-    }
 }

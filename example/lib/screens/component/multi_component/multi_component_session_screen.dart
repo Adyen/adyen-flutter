@@ -3,6 +3,7 @@
 import 'package:adyen_checkout/adyen_checkout.dart';
 import 'package:adyen_checkout_example/config.dart';
 import 'package:adyen_checkout_example/repositories/adyen_apple_pay_component_repository.dart';
+import 'package:adyen_checkout_example/repositories/adyen_blik_component_repository.dart';
 import 'package:adyen_checkout_example/repositories/adyen_card_component_repository.dart';
 import 'package:adyen_checkout_example/repositories/adyen_google_pay_component_repository.dart';
 import 'package:adyen_checkout_example/utils/dialog_builder.dart';
@@ -13,12 +14,14 @@ import 'package:flutter/material.dart';
 class MultiComponentSessionScreen extends StatelessWidget {
   MultiComponentSessionScreen({
     required this.cardRepository,
+    required this.blikRepository,
     required this.applePayRepository,
     required this.googlePayRepository,
     super.key,
   });
 
   final AdyenCardComponentRepository cardRepository;
+  final AdyenBlikComponentRepository blikRepository;
   final AdyenApplePayComponentRepository applePayRepository;
   final AdyenGooglePayComponentRepository googlePayRepository;
   final cardComponentConfiguration = CardComponentConfiguration(
@@ -35,31 +38,68 @@ class MultiComponentSessionScreen extends StatelessWidget {
       appBar: AppBar(title: const Text('Multi component session')),
       body: SafeArea(
         child: FutureBuilder<SessionCheckout>(
-            future: _getSessionCheckout(),
-            builder: (
-              BuildContext context,
-              AsyncSnapshot<SessionCheckout> snapshot,
-            ) {
-              if (snapshot.data != null) {
-                SessionCheckout sessionCheckout = snapshot.data!;
+          future: _getSessionCheckout(),
+          builder: (
+            BuildContext context,
+            AsyncSnapshot<SessionCheckout> snapshot,
+          ) {
+            if (snapshot.data != null) {
+              SessionCheckout sessionCheckout = snapshot.data!;
 
-                return SingleChildScrollView(
-                  physics: const ClampingScrollPhysics(),
-                  child: Column(
-                    children: [
-                      _buildCardWidget(
-                        context,
-                        sessionCheckout,
-                      ),
-                      _buildAppleOrGooglePayWidget(context, sessionCheckout),
-                    ],
-                  ),
-                );
-              } else {
-                return const Center(child: CircularProgressIndicator());
-              }
-            }),
+              return SingleChildScrollView(
+                physics: const ClampingScrollPhysics(),
+                child: Column(
+                  children: [
+                    _buildCardWidget(
+                      context,
+                      sessionCheckout,
+                    ),
+                    _buildAppleOrGooglePayWidget(
+                      context,
+                      sessionCheckout,
+                    ),
+                    _buildBlikWidget(
+                      context,
+                      sessionCheckout,
+                    ),
+                  ],
+                ),
+              );
+            } else {
+              return const Center(child: CircularProgressIndicator());
+            }
+          },
+        ),
       ),
+    );
+  }
+
+  Widget _buildBlikWidget(
+    BuildContext context,
+    SessionCheckout sessionCheckout,
+  ) {
+    final Map<String, dynamic> blikPaymentMethod =
+        _extractBlikPaymentMethod(sessionCheckout.paymentMethods);
+    if (blikPaymentMethod.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    final blikConfiguration = BlikComponentConfiguration(
+      environment: Config.environment,
+      clientKey: Config.clientKey,
+      countryCode: Config.countryCode,
+      amount: Config.amount,
+      shopperLocale: Config.shopperLocale,
+    );
+
+    return AdyenBlikComponent(
+      configuration: blikConfiguration,
+      paymentMethod: blikPaymentMethod,
+      checkout: sessionCheckout,
+      onPaymentResult: (paymentResult) async {
+        Navigator.pop(context);
+        DialogBuilder.showPaymentResultDialog(paymentResult, context);
+      },
     );
   }
 
@@ -223,5 +263,17 @@ class MultiComponentSessionScreen extends StatelessWidget {
         storedPaymentMethodList.firstOrNull;
 
     return paymentMethod ?? <String, String>{};
+  }
+
+  Map<String, dynamic> _extractBlikPaymentMethod(
+      Map<String, dynamic> paymentMethods) {
+    if (paymentMethods.isEmpty) {
+      return <String, String>{};
+    }
+
+    return paymentMethods['paymentMethods'].firstWhere(
+      (paymentMethod) => paymentMethod['type'] == 'blik',
+      orElse: () => <String, dynamic>{},
+    );
   }
 }

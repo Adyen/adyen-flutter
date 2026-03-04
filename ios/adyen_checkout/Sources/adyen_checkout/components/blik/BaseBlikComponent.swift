@@ -4,16 +4,12 @@
 #endif
 import Flutter
 
-class BaseBlikComponent: NSObject, FlutterPlatformView, UIScrollViewDelegate {
+class BaseBlikComponent: BasePlatformViewComponent {
     let blikComponentConfigurationKey = "blikComponentConfiguration"
     let paymentMethodKey = "paymentMethod"
     let componentIdKey = "componentId"
     let blikComponentConfiguration: BlikComponentConfigurationDTO?
     let paymentMethod: String?
-    let componentId: String
-    let componentFlutterApi: ComponentFlutterInterface
-    let componentPlatformApi: ComponentPlatformApi
-    let componentWrapperView: ComponentWrapperView
     var blikComponent: BLIKComponent?
     
     init(
@@ -24,32 +20,14 @@ class BaseBlikComponent: NSObject, FlutterPlatformView, UIScrollViewDelegate {
         componentFlutterApi: ComponentFlutterInterface,
         componentPlatformApi: ComponentPlatformApi
     ) {
-        self.componentFlutterApi = componentFlutterApi
-        self.componentPlatformApi = componentPlatformApi
         blikComponentConfiguration = arguments.value(forKey: blikComponentConfigurationKey) as? BlikComponentConfigurationDTO
         paymentMethod = arguments.value(forKey: paymentMethodKey) as? String
-        componentId = arguments.value(forKey: componentIdKey) as? String ?? ""
-        componentWrapperView = .init()
-        super.init()
-
-        setupResizeViewportCallback()
-    }
-
-    func view() -> UIView {
-        componentWrapperView
-    }
-    
-    func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        scrollView.contentOffset = .zero
-    }
-
-    func getViewController() -> UIViewController? {
-        var rootViewController = UIApplication.shared.adyen.mainKeyWindow?.rootViewController
-        while let presentedViewController = rootViewController?.presentedViewController {
-            rootViewController = presentedViewController
-        }
-
-        return rootViewController
+        let componentId = arguments.value(forKey: componentIdKey) as? String ?? ""
+        super.init(
+            componentId: componentId,
+            componentFlutterApi: componentFlutterApi,
+            componentPlatformApi: componentPlatformApi
+        )
     }
 
     func buildBlikComponent(
@@ -76,22 +54,7 @@ class BaseBlikComponent: NSObject, FlutterPlatformView, UIScrollViewDelegate {
         guard let blikView = blikComponent.viewController.view else { return }
         componentWrapperView.addArrangedSubview(blikView)
         disableNativeScrollingAndBouncing(componentView: blikView)
-        sendHeightUpdate()
-    }
-
-    func sendErrorToFlutterLayer(errorMessage: String) {
-        let componentCommunicationModel = ComponentCommunicationModel(
-            type: ComponentCommunicationType.result,
-            componentId: componentId,
-            paymentResult: PaymentResultDTO(
-                type: PaymentResultEnum.error,
-                reason: errorMessage
-            )
-        )
-        componentFlutterApi.onComponentCommunication(
-            componentCommunicationModel: componentCommunicationModel,
-            completion: { _ in }
-        )
+        notifyHeightChanged()
     }
 
     func finalizeAndDismiss(
@@ -105,50 +68,7 @@ class BaseBlikComponent: NSObject, FlutterPlatformView, UIScrollViewDelegate {
         }
     }
 
-    private func setupResizeViewportCallback() {
-        componentWrapperView.resizeViewportCallback = { [weak self] in
-            self?.sendHeightUpdate()
-        }
-
-        componentPlatformApi.onUpdateViewHeightCallback = { [weak self] in
-            self?.sendHeightUpdate()
-        }
-    }
-
-    private func sendHeightUpdate() {
-        guard let viewHeight = blikComponent?.viewController.preferredContentSize.height else { return }
-        let roundedViewHeight = Int(viewHeight)
-        let componentCommunicationModel = ComponentCommunicationModel(
-            type: ComponentCommunicationType.resize,
-            componentId: componentId,
-            data: roundedViewHeight
-        )
-        componentFlutterApi.onComponentCommunication(
-            componentCommunicationModel: componentCommunicationModel,
-            completion: { _ in }
-        )
-    }
-    
-    private func disableNativeScrollingAndBouncing(componentView: UIView) {
-        let formView = findSubview(in: componentView, ofType: UIScrollView.self)
-        formView?.delegate = self
-        formView?.bounces = false
-        formView?.isScrollEnabled = false
-        formView?.alwaysBounceVertical = false
-        formView?.contentInsetAdjustmentBehavior = .never
-    }
-
-    private func findSubview<T: UIView>(in view: UIView, ofType type: T.Type) -> T? {
-        if let matchingView = view as? T {
-            return matchingView
-        }
-
-        for subview in view.subviews {
-            if let matchingView = findSubview(in: subview, ofType: type) {
-                return matchingView
-            }
-        }
-
-        return nil
+    override func componentViewPreferredContentHeight() -> CGFloat? {
+        blikComponent?.viewController.preferredContentSize.height
     }
 }

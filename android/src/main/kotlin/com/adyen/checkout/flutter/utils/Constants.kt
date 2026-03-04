@@ -10,16 +10,18 @@ class Constants {
         const val GOOGLE_PAY_ADVANCED_COMPONENT_KEY = "GOOGLE_PAY_ADVANCED_COMPONENT"
         const val INSTANT_SESSION_COMPONENT_KEY = "INSTANT_SESSION_COMPONENT"
         const val INSTANT_ADVANCED_COMPONENT_KEY = "INSTANT_ADVANCED_COMPONENT"
-        const val CARD_SESSION_COMPONENT_KEY = "CARD_SESSION_COMPONENT"
-        const val CARD_ADVANCED_COMPONENT_KEY = "CARD_ADVANCED_COMPONENT"
         const val GOOGLE_PAY_COMPONENT_REQUEST_CODE = 486351
         const val SDK_PAYMENT_CANCELED_IDENTIFIER = "Payment canceled"
         const val ADVANCED_PAYMENT_DATA_KEY = "data"
         const val ADVANCED_EXTRA_DATA_KEY = "extra"
+        const val PAYMENT_METHOD_KEY = "paymentMethod"
+        const val COMPONENT_ID_KEY = "componentId"
         const val ORDER_KEY = "order"
         const val SHOULD_UPDATE_PAYMENT_METHODS_KEY = "shouldUpdatePaymentMethods"
         const val UPDATED_PAYMENT_METHODS_KEY = "updatedPaymentMethods"
         const val RESULT_CODE_KEY = "resultCode"
         const val RESULT_CODE_CANCELLED = "cancelled"
+        const val CARD_COMPONENT_CONFIGURATION_KEY = "cardComponentConfiguration"
+        const val BLIK_COMPONENT_CONFIGURATION_KEY = "blikComponentConfiguration"
     }
 }

@@ -70,8 +70,7 @@ abstract class BasePlatformViewComponent extends StatefulWidget {
       _BasePlatformViewComponentState();
 }
 
-class _BasePlatformViewComponentState
-    extends State<BasePlatformViewComponent> {
+class _BasePlatformViewComponentState extends State<BasePlatformViewComponent> {
   final MessageCodec<Object?> _codec =
       ComponentFlutterInterface.pigeonChannelCodec;
   final ComponentPlatformApi _componentPlatformApi =

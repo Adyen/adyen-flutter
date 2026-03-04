@@ -1,4 +1,4 @@
-package com.adyen.checkout.flutter.components.card.advanced
+package com.adyen.checkout.flutter.components.card
 
 import android.content.Context
 import androidx.fragment.app.FragmentActivity
@@ -7,7 +7,6 @@ import com.adyen.checkout.card.CardComponentState
 import com.adyen.checkout.components.core.PaymentMethod
 import com.adyen.checkout.components.core.StoredPaymentMethod
 import com.adyen.checkout.flutter.components.base.ComponentAdvancedCallback
-import com.adyen.checkout.flutter.components.card.BaseCardComponent
 import com.adyen.checkout.flutter.generated.ComponentFlutterInterface
 import org.json.JSONObject
 import java.util.UUID
@@ -32,8 +31,8 @@ internal class CardAdvancedComponent(
         val paymentMethodJson = JSONObject(paymentMethodString)
         when (isStoredPaymentMethod) {
             true -> {
-                val storedPaymentMethod = StoredPaymentMethod.SERIALIZER.deserialize(paymentMethodJson)
-                return CardComponent.PROVIDER.get(
+                val storedPaymentMethod = StoredPaymentMethod.Companion.SERIALIZER.deserialize(paymentMethodJson)
+                return CardComponent.Companion.PROVIDER.get(
                     activity = activity,
                     storedPaymentMethod = storedPaymentMethod,
                     checkoutConfiguration = checkoutConfiguration,
@@ -48,8 +47,8 @@ internal class CardAdvancedComponent(
             }
 
             false -> {
-                val paymentMethod = PaymentMethod.SERIALIZER.deserialize(paymentMethodJson)
-                return CardComponent.PROVIDER.get(
+                val paymentMethod = PaymentMethod.Companion.SERIALIZER.deserialize(paymentMethodJson)
+                return CardComponent.Companion.PROVIDER.get(
                     activity = activity,
                     paymentMethod = paymentMethod,
                     checkoutConfiguration = checkoutConfiguration,
