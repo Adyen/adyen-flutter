@@ -10,12 +10,12 @@ class AdyenBlikComponentRepository extends AdyenBaseRepository {
   Future<SessionCheckout> createSessionCheckout(
       BlikComponentConfiguration blikComponentConfiguration) async {
     final sessionResponse = await _fetchSession();
-    final test = await AdyenCheckout.session.create(
+    final sessionCheckout = await AdyenCheckout.session.create(
       sessionId: sessionResponse['id'],
       sessionData: sessionResponse['sessionData'],
       configuration: blikComponentConfiguration,
     );
-    return test;
+    return sessionCheckout;
   }
 
   Future<Map<String, dynamic>> _fetchSession() async {
