@@ -16,6 +16,7 @@ import com.adyen.checkout.flutter.generated.AddressMode
 import com.adyen.checkout.flutter.generated.AmountDTO
 import com.adyen.checkout.flutter.generated.AnalyticsOptionsDTO
 import com.adyen.checkout.flutter.generated.BillingAddressParametersDTO
+import com.adyen.checkout.flutter.generated.BlikComponentConfigurationDTO
 import com.adyen.checkout.flutter.generated.CardComponentConfigurationDTO
 import com.adyen.checkout.flutter.generated.CardConfigurationDTO
 import com.adyen.checkout.flutter.generated.CashAppPayConfigurationDTO
@@ -936,6 +937,88 @@ class ConfigurationMapperTest {
             assertNull(unencryptedCard.expiryMonth)
             assertNull(unencryptedCard.expiryYear)
             assertNull(unencryptedCard.cvc)
+        }
+    }
+
+    @Nested
+    inner class BlikConfigurationTests {
+        @Test
+        fun `when blik configuration is provided, then map environment and clientKey correctly`() {
+            val blikConfigurationDTO = BlikComponentConfigurationDTO(
+                environment = Environment.TEST,
+                clientKey = TEST_CLIENT_KEY,
+                countryCode = "PL",
+                amount = AmountDTO("PLN", 1000),
+                shopperLocale = "pl-PL",
+                analyticsOptionsDTO = AnalyticsOptionsDTO(true, "1.0.0"),
+            )
+
+            val checkoutConfiguration = blikConfigurationDTO.toCheckoutConfiguration()
+
+            assertEquals(SDKEnvironment.TEST, checkoutConfiguration.environment)
+            assertEquals(TEST_CLIENT_KEY, checkoutConfiguration.clientKey)
+        }
+
+        @Test
+        fun `when blik configuration has shopperLocale, then map correctly`() {
+            val blikConfigurationDTO = BlikComponentConfigurationDTO(
+                environment = Environment.TEST,
+                clientKey = TEST_CLIENT_KEY,
+                countryCode = "PL",
+                amount = AmountDTO("PLN", 1000),
+                shopperLocale = "pl-PL",
+                analyticsOptionsDTO = AnalyticsOptionsDTO(true, "1.0.0"),
+            )
+
+            val checkoutConfiguration = blikConfigurationDTO.toCheckoutConfiguration()
+
+            assertEquals("pl-PL", checkoutConfiguration.shopperLocale?.toLanguageTag())
+        }
+
+        @Test
+        fun `when blik configuration has amount, then map currency and value correctly`() {
+            val blikConfigurationDTO = BlikComponentConfigurationDTO(
+                environment = Environment.TEST,
+                clientKey = TEST_CLIENT_KEY,
+                countryCode = "PL",
+                amount = AmountDTO("PLN", 2500),
+                analyticsOptionsDTO = AnalyticsOptionsDTO(true, "1.0.0"),
+            )
+
+            val checkoutConfiguration = blikConfigurationDTO.toCheckoutConfiguration()
+
+            assertEquals("PLN", checkoutConfiguration.amount?.currency)
+            assertEquals(2500, checkoutConfiguration.amount?.value)
+        }
+
+        @Test
+        fun `when blik configuration has null shopperLocale, then shopperLocale is null`() {
+            val blikConfigurationDTO = BlikComponentConfigurationDTO(
+                environment = Environment.TEST,
+                clientKey = TEST_CLIENT_KEY,
+                countryCode = "PL",
+                shopperLocale = null,
+                analyticsOptionsDTO = AnalyticsOptionsDTO(true, "1.0.0"),
+            )
+
+            val checkoutConfiguration = blikConfigurationDTO.toCheckoutConfiguration()
+
+            assertNull(checkoutConfiguration.shopperLocale)
+        }
+
+        @Test
+        fun `when blik configuration has null amount, then amount is null`() {
+            val blikConfigurationDTO = BlikComponentConfigurationDTO(
+                environment = Environment.TEST,
+                clientKey = TEST_CLIENT_KEY,
+                countryCode = "PL",
+                amount = null,
+                analyticsOptionsDTO = AnalyticsOptionsDTO(true, "1.0.0"),
+            )
+
+            val checkoutConfiguration = blikConfigurationDTO.toCheckoutConfiguration()
+
+            assertNull(checkoutConfiguration.amount)
         }
     }
 

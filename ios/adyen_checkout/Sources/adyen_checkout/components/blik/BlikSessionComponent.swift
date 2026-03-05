@@ -44,15 +44,10 @@ class BlikSessionComponent: BaseBlikComponent, SessionComponentProtocol {
 
     private func setupBlikComponent() throws -> BLIKComponent {
         guard let session = sessionHolder.session else { throw PlatformError(errorDescription: "Session not found") }
-        guard let paymentMethodString = paymentMethod else { throw PlatformError(errorDescription: "Payment method not found") }
-        guard let blikComponentConfiguration else { throw PlatformError(errorDescription: "Blik configuration not found") }
-        let adyenContext = try blikComponentConfiguration.createAdyenContext()
-        let paymentMethod = try JSONDecoder().decode(BLIKPaymentMethod.self, from: Data(paymentMethodString.utf8))
-        let blikComponentStyle = AdyenAppearance.blikComponentStyle
-        let blikComponent = BLIKComponent(
-            paymentMethod: paymentMethod,
-            context: adyenContext,
-            configuration: .init(style: blikComponentStyle)
+        let blikComponent = try buildBlikComponent(
+            paymentMethodString: paymentMethod,
+            blikComponentConfiguration: blikComponentConfiguration,
+            componentDelegate: nil
         )
         blikComponent.delegate = session
         return blikComponent

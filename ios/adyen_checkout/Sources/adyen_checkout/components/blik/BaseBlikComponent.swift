@@ -39,11 +39,10 @@ class BaseBlikComponent: BasePlatformViewComponent {
         guard let blikComponentConfiguration else { throw PlatformError(errorDescription: "Blik configuration not found") }
         let adyenContext = try blikComponentConfiguration.createAdyenContext()
         let paymentMethod = try JSONDecoder().decode(BLIKPaymentMethod.self, from: Data(paymentMethodString.utf8))
-        let blikComponentStyle = AdyenAppearance.blikComponentStyle
         let blikComponent = BLIKComponent(
             paymentMethod: paymentMethod,
             context: adyenContext,
-            configuration: .init(style: blikComponentStyle)
+            configuration: blikComponentConfiguration.mapToBlikComponentConfiguration()
         )
         blikComponent.delegate = componentDelegate
         return blikComponent

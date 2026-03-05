@@ -209,6 +209,14 @@ extension BlikComponentConfigurationDTO {
             countryCode: countryCode
         )
     }
+
+    func mapToBlikComponentConfiguration() -> BLIKComponent.Configuration {
+        let localizationParameters = shopperLocale.map { LocalizationParameters(enforcedLocale: $0) }
+        return BLIKComponent.Configuration(
+            style: AdyenAppearance.blikComponentStyle,
+            localizationParameters: localizationParameters
+        )
+    }
 }
 
 extension Environment {

@@ -92,6 +92,24 @@ func createCardConfigurationDTO(
     )
 }
 
+func createBlikComponentConfigurationDTO(
+    environment: adyen_checkout.Environment = adyen_checkout.Environment.test,
+    clientKey: String = testClientKey,
+    countryCode: String = "PL",
+    amount: AmountDTO? = AmountDTO(currency: "PLN", value: 1000),
+    shopperLocale: String? = nil,
+    analyticsOptionsDTO: AnalyticsOptionsDTO = AnalyticsOptionsDTO(enabled: true, version: "1.0.0")
+) -> BlikComponentConfigurationDTO {
+    BlikComponentConfigurationDTO(
+        environment: environment,
+        clientKey: clientKey,
+        countryCode: countryCode,
+        amount: amount,
+        shopperLocale: shopperLocale,
+        analyticsOptionsDTO: analyticsOptionsDTO
+    )
+}
+
 func createActionComponentConfigurationDTO(
     environment: adyen_checkout.Environment = adyen_checkout.Environment.test,
     clientKey: String = testClientKey,
