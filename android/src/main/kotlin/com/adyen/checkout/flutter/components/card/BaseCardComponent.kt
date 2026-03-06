@@ -27,7 +27,7 @@ abstract class BaseCardComponent(
     internal val checkoutConfiguration =
         (creationParams[Constants.CARD_COMPONENT_CONFIGURATION_KEY] as CardComponentConfigurationDTO?)
             ?.toCheckoutConfiguration()
-            ?: throw Exception("Card configuration not found")
+            ?: throw IllegalStateException("Card configuration not found")
     internal val paymentMethodString = creationParams[Constants.PAYMENT_METHOD_KEY] as String? ?: ""
     internal val componentId = creationParams[Constants.COMPONENT_ID_KEY] as String? ?: ""
     internal val isStoredPaymentMethod = creationParams[IS_STORED_PAYMENT_METHOD_KEY] as Boolean? ?: false

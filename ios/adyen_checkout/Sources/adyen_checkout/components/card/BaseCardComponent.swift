@@ -14,6 +14,7 @@ class BaseCardComponent: BasePlatformViewComponent {
     let componentIdKey = "componentId"
     let cardComponentConfiguration: CardComponentConfigurationDTO?
     let isStoredPaymentMethod: Bool
+    let storedCardComponentAdditionalHeight = 256.0
     let paymentMethod: String?
     var cardComponent: CardComponent?
     var contentOffset: CGPoint?
@@ -104,7 +105,7 @@ class BaseCardComponent: BasePlatformViewComponent {
     }
 
     override func additionalViewportSpace() -> CGFloat {
-        isStoredPaymentMethod ? 256.0 : 0
+        isStoredPaymentMethod ? storedCardComponentAdditionalHeight : 0
     }
 }
 
