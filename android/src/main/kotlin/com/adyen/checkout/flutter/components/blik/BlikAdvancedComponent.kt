@@ -30,13 +30,8 @@ internal class BlikAdvancedComponent(
     }
 
     private fun createBlikComponent(): BlikComponent {
-        val paymentMethod =
-            PaymentMethod.Companion.SERIALIZER.deserialize(
-                JSONObject(
-                    paymentMethodString
-                )
-            )
-        return BlikComponent.Companion.PROVIDER.get(
+        val paymentMethod = PaymentMethod.SERIALIZER.deserialize(JSONObject(paymentMethodString))
+        return BlikComponent.PROVIDER.get(
             activity = activity,
             paymentMethod = paymentMethod,
             checkoutConfiguration = checkoutConfiguration,

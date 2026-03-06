@@ -42,8 +42,8 @@ internal class CardSessionComponent(
         val paymentMethodJson = JSONObject(paymentMethodString)
         when (isStoredPaymentMethod) {
             true -> {
-                val storedPaymentMethod = StoredPaymentMethod.Companion.SERIALIZER.deserialize(paymentMethodJson)
-                return CardComponent.Companion.PROVIDER.get(
+                val storedPaymentMethod = StoredPaymentMethod.SERIALIZER.deserialize(paymentMethodJson)
+                return CardComponent.PROVIDER.get(
                     activity = activity,
                     checkoutSession = checkoutSession,
                     storedPaymentMethod = storedPaymentMethod,
@@ -61,7 +61,7 @@ internal class CardSessionComponent(
 
             false -> {
                 val paymentMethod = determineCardPaymentMethod(paymentMethodJson)
-                return CardComponent.Companion.PROVIDER.get(
+                return CardComponent.PROVIDER.get(
                     activity = activity,
                     checkoutSession = checkoutSession,
                     paymentMethod = paymentMethod,
@@ -83,13 +83,10 @@ internal class CardSessionComponent(
 
     private fun determineCardPaymentMethod(paymentMethodJson: JSONObject): PaymentMethod =
         if (paymentMethodJson.length() > 0) {
-            PaymentMethod.Companion.SERIALIZER.deserialize(paymentMethodJson)
+            PaymentMethod.SERIALIZER.deserialize(paymentMethodJson)
         } else {
-            val sessionResponse =
-                SessionSetupResponse.Companion.SERIALIZER.deserialize(
-                    sessionHolder.sessionSetupResponse
-                )
+            val sessionResponse = SessionSetupResponse.SERIALIZER.deserialize(sessionHolder.sessionSetupResponse)
             sessionResponse.paymentMethodsApiResponse?.paymentMethods?.first { it.type == CARD_PAYMENT_METHOD_KEY }
-                ?: throw Exception("Cannot find card payment method")
+                ?: throw IllegalStateException("Cannot find card payment method")
         }
 }

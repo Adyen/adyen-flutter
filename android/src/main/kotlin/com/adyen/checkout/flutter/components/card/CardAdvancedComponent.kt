@@ -31,8 +31,8 @@ internal class CardAdvancedComponent(
         val paymentMethodJson = JSONObject(paymentMethodString)
         when (isStoredPaymentMethod) {
             true -> {
-                val storedPaymentMethod = StoredPaymentMethod.Companion.SERIALIZER.deserialize(paymentMethodJson)
-                return CardComponent.Companion.PROVIDER.get(
+                val storedPaymentMethod = StoredPaymentMethod.SERIALIZER.deserialize(paymentMethodJson)
+                return CardComponent.PROVIDER.get(
                     activity = activity,
                     storedPaymentMethod = storedPaymentMethod,
                     checkoutConfiguration = checkoutConfiguration,
@@ -47,8 +47,8 @@ internal class CardAdvancedComponent(
             }
 
             false -> {
-                val paymentMethod = PaymentMethod.Companion.SERIALIZER.deserialize(paymentMethodJson)
-                return CardComponent.Companion.PROVIDER.get(
+                val paymentMethod = PaymentMethod.SERIALIZER.deserialize(paymentMethodJson)
+                return CardComponent.PROVIDER.get(
                     activity = activity,
                     paymentMethod = paymentMethod,
                     checkoutConfiguration = checkoutConfiguration,
