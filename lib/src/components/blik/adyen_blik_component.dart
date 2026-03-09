@@ -72,11 +72,13 @@ class AdyenBlikComponent extends StatelessWidget {
   }
 
   double _determineInitialHeight() {
+    const double initialAndroidViewHeight = 219;
+    const double initialIosViewHeight = 213;
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
-        return 219;
+        return initialAndroidViewHeight;
       case TargetPlatform.iOS:
-        return 213;
+        return initialIosViewHeight;
       default:
         throw UnsupportedError('Unsupported platform view');
     }
