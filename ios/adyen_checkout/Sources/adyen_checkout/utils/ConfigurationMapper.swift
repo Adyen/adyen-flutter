@@ -66,6 +66,7 @@ extension DropInConfigurationDTO {
         let storedCardConfiguration = createStoredCardConfiguration(showCvcForStoredCard: cardConfigurationDTO.showCvcForStoredCard)
         let allowedCardTypes = determineAllowedCardTypes(cardTypes: cardConfigurationDTO.supportedCardTypes)
         let billingAddressConfiguration = determineBillingAddressConfiguration(addressMode: cardConfigurationDTO.addressMode)
+        let installmentConfiguration = cardConfigurationDTO.installmentConfiguration?.mapToInstallmentConfiguration()
         return DropInComponent.Card(
             showsHolderNameField: cardConfigurationDTO.holderNameRequired,
             showsStorePaymentMethodField: cardConfigurationDTO.showStorePaymentField,
@@ -74,6 +75,7 @@ extension DropInConfigurationDTO {
             socialSecurityNumberMode: socialSecurityNumberMode,
             storedCardConfiguration: storedCardConfiguration,
             allowedCardTypes: allowedCardTypes,
+            installmentConfiguration: installmentConfiguration,
             billingAddress: billingAddressConfiguration
         )
     }
@@ -142,6 +144,7 @@ extension CardConfigurationDTO {
         let storedCardConfiguration = createStoredCardConfiguration(showCvcForStoredCard: showCvcForStoredCard)
         let allowedCardTypes = determineAllowedCardTypes(cardTypes: supportedCardTypes)
         let billingAddressConfiguration = determineBillingAddressConfiguration(addressMode: addressMode)
+        let installmentConfiguration = installmentConfiguration?.mapToInstallmentConfiguration()
         return CardComponent.Configuration(
             style: cardComponentStyle,
             localizationParameters: localizationParameters,
@@ -152,6 +155,7 @@ extension CardConfigurationDTO {
             socialSecurityNumberMode: socialSecurityNumberMode,
             storedCardConfiguration: storedCardConfiguration,
             allowedCardTypes: allowedCardTypes,
+            installmentConfiguration: installmentConfiguration,
             billingAddress: billingAddressConfiguration
         )
     }
@@ -506,5 +510,65 @@ extension UIColor {
         }
 
         self.init(red: red, green: green, blue: blue, alpha: alpha)
+    }
+}
+
+extension InstallmentConfigurationDTO {
+    func mapToInstallmentConfiguration() -> InstallmentConfiguration? {
+        guard defaultOptions != nil || cardBasedOptions != nil else { return nil }
+        let cardBasedOptions = cardBasedOptions.flatMap { buildCardBasedInstallmentOptions(from: $0) }
+        let defaultOptions = defaultOptions.map { buildDefaultInstallmentOptions(from: $0) }
+        
+        switch (defaultOptions, cardBasedOptions) {
+        case let (defaultOptions?, cardBasedOptions?):
+            return InstallmentConfiguration(
+                cardBasedOptions: cardBasedOptions,
+                defaultOptions: defaultOptions,
+                showInstallmentAmount: showInstallmentAmount
+            )
+            
+        case (nil, let cardBasedOptions?):
+            return InstallmentConfiguration(
+                cardBasedOptions: cardBasedOptions,
+                showInstallmentAmount: showInstallmentAmount
+            )
+            
+        case (let defaultOptions?, nil):
+            return InstallmentConfiguration(
+                defaultOptions: defaultOptions,
+                showInstallmentAmount: showInstallmentAmount
+            )
+            
+        default:
+            return nil
+        }
+    }
+    
+    private func buildCardBasedInstallmentOptions(from cardBasedOptions: [CardBasedInstallmentOptionsDTO?]) -> [CardType: InstallmentOptions]? {
+        var options: [CardType: InstallmentOptions] = [:]
+        for cardBasedOption in cardBasedOptions {
+            guard let cardBasedOption else { continue }
+            let cardBrandRaw = cardBasedOption.cardBrand
+            let cardType = CardType(rawValue: cardBrandRaw)
+            options[cardType] = createInstallmentOptions(
+                values: cardBasedOption.values,
+                includesRevolving: cardBasedOption.includesRevolving
+            )
+        }
+        return options.isEmpty ? nil : options
+    }
+    
+    private func buildDefaultInstallmentOptions(from defaultOptions: DefaultInstallmentOptionsDTO) -> InstallmentOptions {
+        createInstallmentOptions(
+            values: defaultOptions.values,
+            includesRevolving: defaultOptions.includesRevolving
+        )
+    }
+    
+    private func createInstallmentOptions(values: [Int64?], includesRevolving: Bool) -> InstallmentOptions {
+        InstallmentOptions(
+            monthValues: values.compactMap { $0 }.map { UInt($0) },
+            includesRevolving: includesRevolving
+        )
     }
 }

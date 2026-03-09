@@ -134,6 +134,89 @@ extension ConfigurationMapperTests {
         XCTAssertFalse(result.stored.showsSecurityCodeField)
     }
 
+    // MARK: - InstallmentConfigurationDTO Mapping Tests
+
+    func test_mapToInstallmentConfiguration_withDefaultAndCardBasedOptions_shouldMapCorrectly() {
+        let sut = InstallmentConfigurationDTO(
+            defaultOptions: DefaultInstallmentOptionsDTO(
+                values: [3, 6, nil],
+                includesRevolving: true
+            ),
+            cardBasedOptions: [
+                CardBasedInstallmentOptionsDTO(
+                    values: [9, 12, nil],
+                    includesRevolving: false,
+                    cardBrand: "visa"
+                ),
+                nil,
+            ],
+            showInstallmentAmount: true
+        )
+
+        let result = sut.mapToInstallmentConfiguration()
+
+        XCTAssertNotNil(result)
+        XCTAssertEqual(result?.showInstallmentAmount, true)
+        XCTAssertEqual(result?.defaultOptions?.regularInstallmentMonths, [3, 6])
+        XCTAssertEqual(result?.defaultOptions?.includesRevolving, true)
+        XCTAssertEqual(result?.cardBasedOptions?.count, 1)
+        XCTAssertEqual(result?.cardBasedOptions?[CardType(rawValue: "visa")]?.regularInstallmentMonths, [9, 12])
+        XCTAssertEqual(result?.cardBasedOptions?[CardType(rawValue: "visa")]?.includesRevolving, false)
+    }
+
+    func test_mapToInstallmentConfiguration_withCardBasedOptionsOnly_shouldMapCorrectly() {
+        let sut = InstallmentConfigurationDTO(
+            defaultOptions: nil,
+            cardBasedOptions: [
+                CardBasedInstallmentOptionsDTO(
+                    values: [3, 6],
+                    includesRevolving: true,
+                    cardBrand: "mc"
+                ),
+            ],
+            showInstallmentAmount: false
+        )
+
+        let result = sut.mapToInstallmentConfiguration()
+
+        XCTAssertNotNil(result)
+        XCTAssertNil(result?.defaultOptions)
+        XCTAssertEqual(result?.showInstallmentAmount, false)
+        XCTAssertEqual(result?.cardBasedOptions?.count, 1)
+        XCTAssertEqual(result?.cardBasedOptions?[CardType(rawValue: "mc")]?.regularInstallmentMonths, [3, 6])
+        XCTAssertEqual(result?.cardBasedOptions?[CardType(rawValue: "mc")]?.includesRevolving, true)
+    }
+
+    func test_mapToInstallmentConfiguration_withNoOptions_shouldReturnNil() {
+        let sut = InstallmentConfigurationDTO(
+            defaultOptions: nil,
+            cardBasedOptions: nil,
+            showInstallmentAmount: true
+        )
+
+        let result = sut.mapToInstallmentConfiguration()
+
+        XCTAssertNil(result)
+    }
+
+    func test_mapToCardComponentConfiguration_withInstallmentConfiguration_shouldMapInstallments() {
+        let installmentConfiguration = InstallmentConfigurationDTO(
+            defaultOptions: DefaultInstallmentOptionsDTO(
+                values: [3, 6],
+                includesRevolving: false
+            ),
+            cardBasedOptions: nil,
+            showInstallmentAmount: false
+        )
+        let sut = createCardConfigurationDTO(installmentConfiguration: installmentConfiguration)
+
+        let result = sut.mapToCardComponentConfiguration(shopperLocale: nil)
+
+        XCTAssertNotNil(result.installmentConfiguration)
+        XCTAssertEqual(result.installmentConfiguration?.defaultOptions?.regularInstallmentMonths, [3, 6])
+        XCTAssertEqual(result.installmentConfiguration?.showInstallmentAmount, false)
+    }
+
     // MARK: - AddressMode Mapping Tests
 
     func test_billingAddressMode_withFull_shouldBeFull() {

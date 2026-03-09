@@ -11,6 +11,7 @@ class CardConfiguration {
   final List<String?> supportedCardTypes;
   final void Function(List<BinLookupData>)? onBinLookup;
   final void Function(String)? onBinValue;
+  final InstallmentConfiguration? installmentConfiguration;
 
   const CardConfiguration({
     this.holderNameRequired = false,
@@ -23,6 +24,7 @@ class CardConfiguration {
     this.supportedCardTypes = const [],
     this.onBinLookup,
     this.onBinValue,
+    this.installmentConfiguration,
   });
 
   @override
@@ -35,6 +37,7 @@ class CardConfiguration {
         'showCvc: $showCvc, '
         'kcpFieldVisibility: $kcpFieldVisibility, '
         'socialSecurityNumberFieldVisibility: $socialSecurityNumberFieldVisibility, '
-        'supportedCardTypes: $supportedCardTypes)';
+        'supportedCardTypes: $supportedCardTypes, '
+        'installmentConfiguration: $installmentConfiguration)';
   }
 }
