@@ -1,7 +1,7 @@
 package com.adyen.checkout.flutter.components.blik
 
 import android.view.View
-import androidx.activity.ComponentActivity
+import androidx.fragment.app.FragmentActivity
 import com.adyen.checkout.blik.BlikComponent
 import com.adyen.checkout.flutter.components.view.DynamicComponentView
 import com.adyen.checkout.flutter.generated.BlikComponentConfigurationDTO
@@ -12,7 +12,7 @@ import io.flutter.plugin.platform.PlatformView
 
 abstract class BaseBlikComponent(
     private val creationParams: Map<*, *>,
-    private val activity: ComponentActivity,
+    private val activity: FragmentActivity,
     private val componentFlutterApi: ComponentFlutterInterface,
     private val onDispose: (String) -> Unit,
     private val setCurrentBlikComponent: (BaseBlikComponent) -> Unit,

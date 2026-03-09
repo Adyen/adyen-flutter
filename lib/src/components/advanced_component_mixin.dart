@@ -24,7 +24,7 @@ mixin AdvancedComponentMixin on BasePlatformViewComponent {
   void onFinished(PaymentResultDTO? paymentResultDTO) {
     final ResultCode resultCode =
         paymentResultDTO?.result?.toResultCode() ?? ResultCode.unknown;
-    adyenLogger.print('$componentId result code: $resultCode');
+    adyenLogger.print('Card advanced flow result code: $resultCode');
     onPaymentResult(PaymentAdvancedFinished(resultCode: resultCode));
   }
 

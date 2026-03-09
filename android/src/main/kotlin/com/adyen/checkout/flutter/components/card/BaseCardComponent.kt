@@ -1,6 +1,5 @@
 package com.adyen.checkout.flutter.components.card
 
-import android.content.Context
 import android.view.View
 import androidx.activity.ComponentActivity
 import com.adyen.checkout.card.CardComponent
@@ -15,8 +14,6 @@ import com.adyen.checkout.flutter.utils.Constants
 import io.flutter.plugin.platform.PlatformView
 
 abstract class BaseCardComponent(
-    private val context: Context,
-    private val id: Int,
     private val creationParams: Map<*, *>,
     private val activity: ComponentActivity,
     private val componentFlutterApi: ComponentFlutterInterface,

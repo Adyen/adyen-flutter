@@ -131,7 +131,7 @@ class _BasePlatformViewComponentState extends State<BasePlatformViewComponent> {
           creationParams: widget.creationParams,
           gestureRecognizers: widget.gestureRecognizers,
           onPlatformViewCreated: _componentPlatformApi.updateViewHeight,
-          cardWidgetKey: _widgetKey,
+          componentWidgetKey: _widgetKey,
         );
       default:
         throw UnsupportedError('Unsupported platform');

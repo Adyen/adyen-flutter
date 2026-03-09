@@ -1,6 +1,5 @@
 package com.adyen.checkout.flutter.components.card
 
-import android.content.Context
 import androidx.fragment.app.FragmentActivity
 import com.adyen.checkout.card.CardComponent
 import com.adyen.checkout.card.CardComponentState
@@ -17,15 +16,13 @@ import org.json.JSONObject
 import java.util.UUID
 
 internal class CardSessionComponent(
-    private val context: Context,
-    private val id: Int,
     private val creationParams: Map<*, *>,
     private val activity: FragmentActivity,
     private val componentFlutterApi: ComponentFlutterInterface,
     private val onDispose: (String) -> Unit,
     private val setCurrentCardComponent: (BaseCardComponent) -> Unit,
     private val sessionHolder: SessionHolder
-) : BaseCardComponent(context, id, creationParams, activity, componentFlutterApi, onDispose, setCurrentCardComponent) {
+) : BaseCardComponent(creationParams, activity, componentFlutterApi, onDispose, setCurrentCardComponent) {
     init {
         val checkoutSession =
             sessionHolder.toCheckoutSession(

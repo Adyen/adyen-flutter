@@ -27,7 +27,7 @@ class BlikComponentFactory: ComponentFactory {
         viewIdentifier viewId: Int64,
         arguments args: Any?
     ) -> FlutterPlatformView {
-        if viewTypeId == BlikComponentFactory.blikComponentSessionId, sessionHolder != nil {
+        if viewTypeId == BlikComponentFactory.blikComponentSessionId, let sessionHolder {
             return BlikSessionComponent(
                 frame: frame,
                 viewIdentifier: viewId,
@@ -35,7 +35,7 @@ class BlikComponentFactory: ComponentFactory {
                 binaryMessenger: messenger,
                 componentFlutterApi: componentFlutterApi,
                 componentPlatformApi: componentPlatformApi,
-                sessionHolder: sessionHolder!
+                sessionHolder: sessionHolder
             )
         } else {
             return BlikAdvancedComponent(

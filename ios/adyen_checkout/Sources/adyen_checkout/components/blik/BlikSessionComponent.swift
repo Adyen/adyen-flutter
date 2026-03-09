@@ -44,13 +44,11 @@ class BlikSessionComponent: BaseBlikComponent, SessionComponentProtocol {
 
     private func setupBlikComponent() throws -> BLIKComponent {
         guard let session = sessionHolder.session else { throw PlatformError(errorDescription: "Session not found") }
-        let blikComponent = try buildBlikComponent(
+        return try buildBlikComponent(
             paymentMethodString: paymentMethod,
             blikComponentConfiguration: blikComponentConfiguration,
-            componentDelegate: nil
+            componentDelegate: session
         )
-        blikComponent.delegate = session
-        return blikComponent
     }
 
     func finalizeAndDismissSessionComponent(success: Bool, completion: @escaping (() -> Void)) {

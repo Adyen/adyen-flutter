@@ -32,7 +32,8 @@ class AdyenBlikComponent extends StatelessWidget {
         if (snapshot.data != null) {
           final sdkVersionNumber = snapshot.data ?? "";
           return switch (checkout) {
-            SessionCheckout() => _buildBlikSessionFlowWidget(sdkVersionNumber),
+            SessionCheckout it =>
+              _buildBlikSessionFlowWidget(sdkVersionNumber, it),
             AdvancedCheckout it =>
               _buildBlikAdvancedFlowWidget(sdkVersionNumber, it),
           };
@@ -43,10 +44,11 @@ class AdyenBlikComponent extends StatelessWidget {
     );
   }
 
-  BlikSessionComponent _buildBlikSessionFlowWidget(String sdkVersionNumber) {
-    final SessionCheckout sessionCheckout = checkout as SessionCheckout;
+  BlikSessionComponent _buildBlikSessionFlowWidget(
+    String sdkVersionNumber,
+    SessionCheckout sessionCheckout,
+  ) {
     final String encodedPaymentMethod = json.encode(paymentMethod);
-
     return BlikSessionComponent(
       blikComponentConfiguration: configuration.toDTO(sdkVersionNumber),
       paymentMethod: encodedPaymentMethod,

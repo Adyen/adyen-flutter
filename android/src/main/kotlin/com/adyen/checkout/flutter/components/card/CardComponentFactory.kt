@@ -29,8 +29,6 @@ internal class CardComponentFactory(
         val cardComponent =
             if (viewTypeId == CARD_COMPONENT_SESSION && sessionHolder != null) {
                 CardSessionComponent(
-                    context,
-                    viewId,
                     creationParams,
                     activity,
                     componentFlutterApi,
@@ -40,8 +38,6 @@ internal class CardComponentFactory(
                 )
             } else {
                 CardAdvancedComponent(
-                    context,
-                    viewId,
                     creationParams,
                     activity,
                     componentFlutterApi,
