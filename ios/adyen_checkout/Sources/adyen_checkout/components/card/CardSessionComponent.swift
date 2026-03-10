@@ -7,7 +7,7 @@
 #endif
 import Flutter
 
-class CardSessionComponent: BaseCardComponent, SessionComponentProtocol {
+class CardSessionComponent: BaseCardComponent {
     let sessionHolder: SessionHolder
 
     init(
@@ -30,13 +30,14 @@ class CardSessionComponent: BaseCardComponent, SessionComponentProtocol {
         )
 
         setupCardComponentView()
-        setupSessionFlowDelegate()
     }
 
     private func setupCardComponentView() {
         do {
             let cardComponent = try setupCardComponent()
             showCardComponent(cardComponent: cardComponent)
+            componentPlatformApi.register(cardBaseComponent: self)
+            setupSessionFlowDelegate()
         } catch {
             sendErrorToFlutterLayer(errorMessage: error.localizedDescription)
         }
@@ -51,6 +52,17 @@ class CardSessionComponent: BaseCardComponent, SessionComponentProtocol {
             componentDelegate: session,
             cardDelegate: self
         )
+    }
+
+    private func setupSessionFlowDelegate() {
+        if let componentSessionFlowDelegate = (sessionHolder.sessionDelegate as? ComponentSessionFlowHandler) {
+            componentSessionFlowDelegate.componentId = componentId
+            componentSessionFlowDelegate.finalizeCallback = { [weak self] success, completion in
+                self?.finalizeAndDismissSessionComponent(success: success, completion: completion)
+            }
+        } else {
+            AdyenAssertion.assertionFailure(message: "Wrong session flow delegate usage")
+        }
     }
 
     func finalizeAndDismissSessionComponent(success: Bool, completion: @escaping (() -> Void)) {

@@ -14,7 +14,7 @@ class BaseBlikComponent: BasePlatformViewComponent {
     
     init(
         frame _: CGRect,
-        viewIdentifier _: Int64,
+        viewIdentifier: Int64,
         arguments: NSDictionary,
         binaryMessenger _: FlutterBinaryMessenger,
         componentFlutterApi: ComponentFlutterInterface,
@@ -24,6 +24,7 @@ class BaseBlikComponent: BasePlatformViewComponent {
         paymentMethod = arguments.value(forKey: paymentMethodKey) as? String
         let componentId = arguments.value(forKey: componentIdKey) as? String ?? ""
         super.init(
+            viewId: viewIdentifier,
             componentId: componentId,
             componentFlutterApi: componentFlutterApi,
             componentPlatformApi: componentPlatformApi
@@ -65,6 +66,11 @@ class BaseBlikComponent: BasePlatformViewComponent {
                 completion()
             })
         }
+    }
+
+    override func onDispose() {
+        blikComponent?.cancelIfNeeded()
+        blikComponent = nil
     }
 
     override func componentViewPreferredContentHeight() -> CGFloat? {

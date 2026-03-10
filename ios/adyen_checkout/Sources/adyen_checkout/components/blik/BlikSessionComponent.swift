@@ -7,7 +7,7 @@
 #endif
 import Flutter
 
-class BlikSessionComponent: BaseBlikComponent, SessionComponentProtocol {
+class BlikSessionComponent: BaseBlikComponent {
     let sessionHolder: SessionHolder
 
     init(
@@ -30,13 +30,14 @@ class BlikSessionComponent: BaseBlikComponent, SessionComponentProtocol {
         )
 
         setupBlikComponentView()
-        setupSessionFlowDelegate()
     }
 
     private func setupBlikComponentView() {
         do {
             let blikComponent = try setupBlikComponent()
             showBlikComponent(blikComponent: blikComponent)
+            componentPlatformApi.register(blikBaseComponent: self)
+            setupSessionFlowDelegate()
         } catch {
             sendErrorToFlutterLayer(errorMessage: error.localizedDescription)
         }
@@ -49,6 +50,17 @@ class BlikSessionComponent: BaseBlikComponent, SessionComponentProtocol {
             blikComponentConfiguration: blikComponentConfiguration,
             componentDelegate: session
         )
+    }
+
+    private func setupSessionFlowDelegate() {
+        if let componentSessionFlowDelegate = (sessionHolder.sessionDelegate as? ComponentSessionFlowHandler) {
+            componentSessionFlowDelegate.componentId = componentId
+            componentSessionFlowDelegate.finalizeCallback = { [weak self] success, completion in
+                self?.finalizeAndDismissSessionComponent(success: success, completion: completion)
+            }
+        } else {
+            AdyenAssertion.assertionFailure(message: "Wrong session flow delegate usage")
+        }
     }
 
     func finalizeAndDismissSessionComponent(success: Bool, completion: @escaping (() -> Void)) {

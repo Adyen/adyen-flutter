@@ -6,12 +6,13 @@
     import AdyenCard
 #endif
 import Flutter
+import Foundation
 
-class CardAdvancedComponent: BaseCardComponent, AdvancedComponentProtocol {
+class CardAdvancedComponent: BaseCardComponent {
     private var actionComponentDelegate: ActionComponentDelegate?
     private var presentationDelegate: PresentationDelegate?
     private var componentDelegate: PaymentComponentDelegate?
-    var actionComponent: AdyenActionComponent?
+    private var actionComponent: AdyenActionComponent?
 
     override init(
         frame: CGRect,
@@ -36,7 +37,6 @@ class CardAdvancedComponent: BaseCardComponent, AdvancedComponentProtocol {
             finalizeCallback: finalizeAndDismiss(success:completion:)
         )
         setupCardComponentView()
-        setupFinalizeComponentCallback()
     }
 
     private func setupCardComponentView() {
@@ -44,13 +44,7 @@ class CardAdvancedComponent: BaseCardComponent, AdvancedComponentProtocol {
             let cardComponent = try setupCardComponent()
             actionComponent = buildActionComponent(adyenContext: cardComponent.context)
             showCardComponent(cardComponent: cardComponent)
-            componentPlatformApi.onActionCallback = { [weak self] jsonActionResponse in
-                self?.onAction(actionResponse: jsonActionResponse)
-            }
-            componentPlatformApi.onErrorCallback = { [weak self] error in
-                self?.cardComponent?.stopLoadingIfNeeded()
-                self?.sendErrorToFlutterLayer(errorMessage: error?.errorMessage ?? "")
-            }
+            componentPlatformApi.register(cardBaseComponent: self)
         } catch {
             sendErrorToFlutterLayer(errorMessage: error.localizedDescription)
         }
@@ -79,6 +73,63 @@ class CardAdvancedComponent: BaseCardComponent, AdvancedComponentProtocol {
         actionComponent.delegate = actionComponentDelegate
         actionComponent.presentationDelegate = getViewController()
         return actionComponent
+    }
+
+    private func onAction(actionResponse: [String?: Any?]) {
+        do {
+            let jsonData = try JSONSerialization.data(withJSONObject: actionResponse, options: [])
+            let action = try JSONDecoder().decode(Action.self, from: jsonData)
+            actionComponent?.handle(action)
+        } catch {
+            sendErrorToFlutterLayer(errorMessage: error.localizedDescription)
+        }
+    }
+
+    private func onFinish(paymentEventDTO: PaymentEventDTO) {
+        let resultCode = ResultCode(rawValue: paymentEventDTO.result ?? "")
+        let isAccepted = resultCode?.isAccepted ?? false
+        finalizeAndDismiss(success: isAccepted, completion: { [weak self] in
+            let componentCommunicationModel = ComponentCommunicationModel(
+                type: ComponentCommunicationType.result,
+                componentId: self?.componentId ?? "",
+                paymentResult: PaymentResultDTO(
+                    type: PaymentResultEnum.finished,
+                    result: PaymentResultModelDTO(resultCode: resultCode?.rawValue)
+                )
+            )
+            self?.componentFlutterApi.onComponentCommunication(
+                componentCommunicationModel: componentCommunicationModel,
+                completion: { _ in }
+            )
+        })
+    }
+
+    private func onError(errorDTO: ErrorDTO?) {
+        cardComponent?.stopLoadingIfNeeded()
+        sendErrorToFlutterLayer(errorMessage: errorDTO?.errorMessage ?? "")
+    }
+
+    override func onDispose() {
+        actionComponentDelegate = nil
+        presentationDelegate = nil
+        componentDelegate = nil
+        actionComponent = nil
+        super.onDispose()
+    }
+
+    func handlePaymentEvent(paymentEventDTO: PaymentEventDTO) {
+        switch paymentEventDTO.paymentEventType {
+        case .finished:
+            onFinish(paymentEventDTO: paymentEventDTO)
+        case .action:
+            guard let actionResponse = paymentEventDTO.data else { return }
+            onAction(actionResponse: actionResponse)
+        case .error:
+            onError(errorDTO: paymentEventDTO.error)
+        case .update:
+            // Card does not support updates
+            return
+        }
     }
 
 }

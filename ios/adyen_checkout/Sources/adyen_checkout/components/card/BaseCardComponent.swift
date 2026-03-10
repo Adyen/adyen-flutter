@@ -21,7 +21,7 @@ class BaseCardComponent: BasePlatformViewComponent {
 
     init(
         frame _: CGRect,
-        viewIdentifier _: Int64,
+        viewIdentifier: Int64,
         arguments: NSDictionary,
         binaryMessenger: FlutterBinaryMessenger,
         componentFlutterApi: ComponentFlutterInterface,
@@ -32,6 +32,7 @@ class BaseCardComponent: BasePlatformViewComponent {
         isStoredPaymentMethod = arguments.value(forKey: isStoredPaymentMethodKey) as? Bool ?? false
         let componentId = arguments.value(forKey: componentIdKey) as? String ?? ""
         super.init(
+            viewId: viewIdentifier,
             componentId: componentId,
             componentFlutterApi: componentFlutterApi,
             componentPlatformApi: componentPlatformApi
@@ -98,6 +99,11 @@ class BaseCardComponent: BasePlatformViewComponent {
                 completion()
             })
         }
+    }
+
+    override func onDispose() {
+        cardComponent?.cancelIfNeeded()
+        cardComponent = nil
     }
 
     override func componentViewPreferredContentHeight() -> CGFloat? {

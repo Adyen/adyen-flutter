@@ -107,6 +107,7 @@ class _BasePlatformViewComponentState extends State<BasePlatformViewComponent> {
 
   @override
   void dispose() {
+    _componentPlatformApi.onDispose(widget.componentId);
     _componentCommunicationStream.cancel();
     _componentFlutterApi.dispose();
     super.dispose();

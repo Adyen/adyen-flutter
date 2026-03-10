@@ -6,11 +6,12 @@
     import AdyenComponents
 #endif
 import Flutter
+import Foundation
 
-class BlikAdvancedComponent: BaseBlikComponent, AdvancedComponentProtocol {
+class BlikAdvancedComponent: BaseBlikComponent {
     private var actionComponentDelegate: ActionComponentDelegate?
     private var componentDelegate: PaymentComponentDelegate?
-    var actionComponent: AdyenActionComponent?
+    private var actionComponent: AdyenActionComponent?
 
     override init(
         frame: CGRect,
@@ -35,7 +36,6 @@ class BlikAdvancedComponent: BaseBlikComponent, AdvancedComponentProtocol {
             finalizeCallback: finalizeAndDismiss(success:completion:)
         )
         setupBlikComponentView()
-        setupFinalizeComponentCallback()
     }
 
     private func setupBlikComponentView() {
@@ -45,13 +45,7 @@ class BlikAdvancedComponent: BaseBlikComponent, AdvancedComponentProtocol {
             actionComponent?.delegate = actionComponentDelegate
             actionComponent?.presentationDelegate = getViewController()
             showBlikComponent(blikComponent: blikComponent)
-            componentPlatformApi.onActionCallback = { [weak self] jsonActionResponse in
-                self?.onAction(actionResponse: jsonActionResponse)
-            }
-            componentPlatformApi.onErrorCallback = { [weak self] error in
-                self?.blikComponent?.stopLoadingIfNeeded()
-                self?.sendErrorToFlutterLayer(errorMessage: error?.errorMessage ?? "")
-            }
+            componentPlatformApi.register(blikBaseComponent: self)
         } catch {
             sendErrorToFlutterLayer(errorMessage: error.localizedDescription)
         }
@@ -67,6 +61,62 @@ class BlikAdvancedComponent: BaseBlikComponent, AdvancedComponentProtocol {
             blikComponentConfiguration: blikComponentConfiguration,
             componentDelegate: componentDelegate
         )
+    }
+
+    private func onAction(actionResponse: [String?: Any?]) {
+        do {
+            let jsonData = try JSONSerialization.data(withJSONObject: actionResponse, options: [])
+            let action = try JSONDecoder().decode(Action.self, from: jsonData)
+            actionComponent?.handle(action)
+        } catch {
+            sendErrorToFlutterLayer(errorMessage: error.localizedDescription)
+        }
+    }
+
+    private func onFinish(paymentEventDTO: PaymentEventDTO) {
+        let resultCode = ResultCode(rawValue: paymentEventDTO.result ?? "")
+        let isAccepted = resultCode?.isAccepted ?? false
+        finalizeAndDismiss(success: isAccepted, completion: { [weak self] in
+            let componentCommunicationModel = ComponentCommunicationModel(
+                type: ComponentCommunicationType.result,
+                componentId: self?.componentId ?? "",
+                paymentResult: PaymentResultDTO(
+                    type: PaymentResultEnum.finished,
+                    result: PaymentResultModelDTO(resultCode: resultCode?.rawValue)
+                )
+            )
+            self?.componentFlutterApi.onComponentCommunication(
+                componentCommunicationModel: componentCommunicationModel,
+                completion: { _ in }
+            )
+        })
+    }
+
+    private func onError(errorDTO: ErrorDTO?) {
+        blikComponent?.stopLoadingIfNeeded()
+        sendErrorToFlutterLayer(errorMessage: errorDTO?.errorMessage ?? "")
+    }
+
+    override func onDispose() {
+        actionComponentDelegate = nil
+        componentDelegate = nil
+        actionComponent = nil
+        super.onDispose()
+    }
+
+    func handlePaymentEvent(paymentEventDTO: PaymentEventDTO) {
+        switch paymentEventDTO.paymentEventType {
+        case .finished:
+            onFinish(paymentEventDTO: paymentEventDTO)
+        case .action:
+            guard let actionResponse = paymentEventDTO.data else { return }
+            onAction(actionResponse: actionResponse)
+        case .error:
+            onError(errorDTO: paymentEventDTO.error)
+        case .update:
+            // Blik does not support updates
+            return
+        }
     }
 
 }

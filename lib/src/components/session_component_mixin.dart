@@ -10,7 +10,7 @@ mixin SessionComponentMixin on BasePlatformViewComponent {
   void onFinished(PaymentResultDTO? paymentResultDTO) {
     final ResultCode resultCode =
         paymentResultDTO?.result?.toResultCode() ?? ResultCode.unknown;
-    adyenLogger.print('Card component session flow result code: $resultCode');
+    adyenLogger.print('Session flow result code: $resultCode');
     _resetSession();
     onPaymentResult(PaymentSessionFinished(
       sessionId: paymentResultDTO?.result?.sessionId ?? '',

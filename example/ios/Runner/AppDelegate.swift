@@ -48,7 +48,7 @@ import UIKit
         cardComponentStyle.backgroundColor = UIColor(named: "AppBackground") ?? .white
         AdyenAppearance.cardComponentStyle = cardComponentStyle
     }
-    
+
     private func setBlikComponentStyle() {
         var blikComponentStyle = Adyen.FormComponentStyle()
         blikComponentStyle.mainButtonItem.button.backgroundColor = UIColor(named: "PrimaryBackground") ?? .black

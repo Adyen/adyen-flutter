@@ -3,16 +3,19 @@ import Flutter
 import UIKit
 
 class BasePlatformViewComponent: NSObject, FlutterPlatformView, UIScrollViewDelegate {
+    let viewId: Int64
     let componentId: String
     let componentFlutterApi: ComponentFlutterInterface
     let componentPlatformApi: ComponentPlatformApi
     let componentWrapperView: ComponentWrapperView
 
     init(
+        viewId: Int64,
         componentId: String,
         componentFlutterApi: ComponentFlutterInterface,
         componentPlatformApi: ComponentPlatformApi
     ) {
+        self.viewId = viewId
         self.componentId = componentId
         self.componentFlutterApi = componentFlutterApi
         self.componentPlatformApi = componentPlatformApi
@@ -89,12 +92,10 @@ class BasePlatformViewComponent: NSObject, FlutterPlatformView, UIScrollViewDele
         return nil
     }
 
+    func onDispose() {}
+
     private func setupResizeViewportCallback() {
         componentWrapperView.resizeViewportCallback = { [weak self] in
-            self?.sendHeightUpdate()
-        }
-
-        componentPlatformApi.onUpdateViewHeightCallback = { [weak self] in
             self?.sendHeightUpdate()
         }
     }
