@@ -8,10 +8,10 @@
 import Flutter
 import Foundation
 
-class BlikAdvancedComponent: BaseBlikComponent {
+class BlikAdvancedComponent: BaseBlikComponent, AdvancedComponentProtocol {
     private var actionComponentDelegate: ActionComponentDelegate?
     private var componentDelegate: PaymentComponentDelegate?
-    private var actionComponent: AdyenActionComponent?
+    private(set) var actionComponent: AdyenActionComponent?
 
     override init(
         frame: CGRect,
@@ -63,38 +63,8 @@ class BlikAdvancedComponent: BaseBlikComponent {
         )
     }
 
-    private func onAction(actionResponse: [String?: Any?]) {
-        do {
-            let jsonData = try JSONSerialization.data(withJSONObject: actionResponse, options: [])
-            let action = try JSONDecoder().decode(Action.self, from: jsonData)
-            actionComponent?.handle(action)
-        } catch {
-            sendErrorToFlutterLayer(errorMessage: error.localizedDescription)
-        }
-    }
-
-    private func onFinish(paymentEventDTO: PaymentEventDTO) {
-        let resultCode = ResultCode(rawValue: paymentEventDTO.result ?? "")
-        let isAccepted = resultCode?.isAccepted ?? false
-        finalizeAndDismiss(success: isAccepted, completion: { [weak self] in
-            let componentCommunicationModel = ComponentCommunicationModel(
-                type: ComponentCommunicationType.result,
-                componentId: self?.componentId ?? "",
-                paymentResult: PaymentResultDTO(
-                    type: PaymentResultEnum.finished,
-                    result: PaymentResultModelDTO(resultCode: resultCode?.rawValue)
-                )
-            )
-            self?.componentFlutterApi.onComponentCommunication(
-                componentCommunicationModel: componentCommunicationModel,
-                completion: { _ in }
-            )
-        })
-    }
-
-    private func onError(errorDTO: ErrorDTO?) {
+    func stopLoadingOnError() {
         blikComponent?.stopLoadingIfNeeded()
-        sendErrorToFlutterLayer(errorMessage: errorDTO?.errorMessage ?? "")
     }
 
     override func onDispose() {
@@ -103,20 +73,4 @@ class BlikAdvancedComponent: BaseBlikComponent {
         actionComponent = nil
         super.onDispose()
     }
-
-    func handlePaymentEvent(paymentEventDTO: PaymentEventDTO) {
-        switch paymentEventDTO.paymentEventType {
-        case .finished:
-            onFinish(paymentEventDTO: paymentEventDTO)
-        case .action:
-            guard let actionResponse = paymentEventDTO.data else { return }
-            onAction(actionResponse: actionResponse)
-        case .error:
-            onError(errorDTO: paymentEventDTO.error)
-        case .update:
-            // Blik does not support updates
-            return
-        }
-    }
-
 }

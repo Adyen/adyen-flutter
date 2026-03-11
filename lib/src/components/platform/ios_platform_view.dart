@@ -63,7 +63,7 @@ class IosPlatformView extends StatelessWidget {
         Factory<HorizontalDragGestureRecognizer>(
             () => HorizontalDragGestureRecognizer()),
         Factory<ToggleAreaGestureRecognizer>(() => ToggleAreaGestureRecognizer(
-            cardWidgetKey: componentWidgetKey,
+            componentWidgetKey: componentWidgetKey,
             textDirection: Directionality.of(context))),
       });
     }

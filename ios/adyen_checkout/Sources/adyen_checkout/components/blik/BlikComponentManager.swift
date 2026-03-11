@@ -7,7 +7,7 @@ class BlikComponentManager: BasePlatformViewManager<BaseBlikComponent> {
     }
 
     func handlePaymentEvent(paymentEventDTO: PaymentEventDTO) {
-        if let currentComponent = currentBaseComponent as? BlikAdvancedComponent {
+        if let currentComponent = currentBaseComponent as? AdvancedComponentProtocol {
             currentComponent.handlePaymentEvent(paymentEventDTO: paymentEventDTO)
         }
     }

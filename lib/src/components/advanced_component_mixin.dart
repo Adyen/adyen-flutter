@@ -37,13 +37,7 @@ mixin AdvancedComponentMixin on BasePlatformViewComponent {
       ComponentPlatformApi.instance
           .onPaymentsResult(componentId, paymentEventDTO);
     } catch (exception) {
-      ComponentPlatformApi.instance.onPaymentsResult(
-        componentId,
-        PaymentEventDTO(
-          paymentEventType: PaymentEventType.error,
-          error: ErrorDTO(errorMessage: exception.toString()),
-        ),
-      );
+      _sendErrorToNative(exception.toString());
     }
   }
 
@@ -57,13 +51,17 @@ mixin AdvancedComponentMixin on BasePlatformViewComponent {
       ComponentPlatformApi.instance
           .onPaymentsDetailsResult(componentId, paymentEventDTO);
     } catch (exception) {
-      ComponentPlatformApi.instance.onPaymentsResult(
-        componentId,
-        PaymentEventDTO(
-          paymentEventType: PaymentEventType.error,
-          error: ErrorDTO(errorMessage: exception.toString()),
-        ),
-      );
+      _sendErrorToNative(exception.toString());
     }
+  }
+
+  void _sendErrorToNative(String errorMessage) {
+    ComponentPlatformApi.instance.onPaymentsResult(
+      componentId,
+      PaymentEventDTO(
+        paymentEventType: PaymentEventType.error,
+        error: ErrorDTO(errorMessage: errorMessage),
+      ),
+    );
   }
 }
