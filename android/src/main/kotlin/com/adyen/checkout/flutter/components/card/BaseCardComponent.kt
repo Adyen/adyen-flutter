@@ -22,11 +22,11 @@ abstract class BaseCardComponent(
 ) : PlatformView {
     internal var cardComponent: CardComponent? = null
     internal val checkoutConfiguration =
-        (creationParams[Constants.CARD_COMPONENT_CONFIGURATION_KEY] as CardComponentConfigurationDTO?)
-            ?.toCheckoutConfiguration()
-            ?: throw IllegalStateException("Card configuration not found")
-    internal val paymentMethodString = creationParams[Constants.PAYMENT_METHOD_KEY] as String? ?: ""
-    internal val componentId = creationParams[Constants.COMPONENT_ID_KEY] as String? ?: ""
+        (creationParams[Constants.CARD_COMPONENT_CONFIGURATION_KEY] as CardComponentConfigurationDTO).toCheckoutConfiguration()
+    internal val paymentMethodString =
+        creationParams[Constants.PAYMENT_METHOD_KEY] as String
+    internal val componentId =
+        creationParams[Constants.COMPONENT_ID_KEY] as String
     internal val isStoredPaymentMethod = creationParams[IS_STORED_PAYMENT_METHOD_KEY] as Boolean? ?: false
     private val dynamicComponentView = DynamicComponentView(activity, componentFlutterApi, componentId)
 

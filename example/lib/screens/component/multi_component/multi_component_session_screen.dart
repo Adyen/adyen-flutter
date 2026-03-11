@@ -79,7 +79,7 @@ class MultiComponentSessionScreen extends StatelessWidget {
     SessionCheckout sessionCheckout,
   ) {
     final Map<String, dynamic> blikPaymentMethod =
-        _extractBlikPaymentMethod(sessionCheckout.paymentMethods);
+        _extractPaymentMethodByType(sessionCheckout.paymentMethods, 'blik');
     if (blikPaymentMethod.isEmpty) {
       return const SizedBox.shrink();
     }
@@ -156,7 +156,10 @@ class MultiComponentSessionScreen extends StatelessWidget {
     );
 
     final Map<String, dynamic> paymentMethod =
-        _extractGooglePayPaymentMethod(sessionCheckout.paymentMethods);
+        _extractPaymentMethodByType(
+          sessionCheckout.paymentMethods,
+          'googlepay',
+        );
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
       child: AdyenGooglePayComponent(
@@ -187,7 +190,10 @@ class MultiComponentSessionScreen extends StatelessWidget {
     );
 
     final Map<String, dynamic> applePayPaymentMethod =
-        _extractApplePayPaymentMethod(sessionCheckout.paymentMethods);
+        _extractPaymentMethodByType(
+          sessionCheckout.paymentMethods,
+          'applepay',
+        );
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
       child: AdyenApplePayComponent(
@@ -225,27 +231,17 @@ class MultiComponentSessionScreen extends StatelessWidget {
   Future<SessionCheckout> _getSessionCheckout() async =>
       await cardRepository.createSessionCheckout(cardComponentConfiguration);
 
-  Map<String, dynamic> _extractApplePayPaymentMethod(
-      Map<String, dynamic> paymentMethods) {
+  Map<String, dynamic> _extractPaymentMethodByType(
+    Map<String, dynamic> paymentMethods,
+    String type,
+  ) {
     if (paymentMethods.isEmpty) {
       return <String, String>{};
     }
 
     return paymentMethods["paymentMethods"].firstWhere(
-      (paymentMethod) => paymentMethod["type"] == "applepay",
-      orElse: () => throw Exception("Apple pay payment method not provided"),
-    );
-  }
-
-  Map<String, dynamic> _extractGooglePayPaymentMethod(
-      Map<String, dynamic> paymentMethods) {
-    if (paymentMethods.isEmpty) {
-      return <String, String>{};
-    }
-
-    return paymentMethods["paymentMethods"].firstWhere(
-      (paymentMethod) => paymentMethod["type"] == "googlepay",
-      orElse: () => throw Exception("Google pay payment method not provided"),
+      (paymentMethod) => paymentMethod["type"] == type,
+      orElse: () => <String, dynamic>{},
     );
   }
 
@@ -263,17 +259,5 @@ class MultiComponentSessionScreen extends StatelessWidget {
         storedPaymentMethodList.firstOrNull;
 
     return paymentMethod ?? <String, String>{};
-  }
-
-  Map<String, dynamic> _extractBlikPaymentMethod(
-      Map<String, dynamic> paymentMethods) {
-    if (paymentMethods.isEmpty) {
-      return <String, String>{};
-    }
-
-    return paymentMethods['paymentMethods'].firstWhere(
-      (paymentMethod) => paymentMethod['type'] == 'blik',
-      orElse: () => <String, dynamic>{},
-    );
   }
 }

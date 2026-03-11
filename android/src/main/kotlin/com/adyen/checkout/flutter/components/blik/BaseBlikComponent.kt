@@ -19,11 +19,13 @@ abstract class BaseBlikComponent(
 ) : PlatformView {
     internal var blikComponent: BlikComponent? = null
     internal val checkoutConfiguration =
-        (creationParams[Constants.BLIK_COMPONENT_CONFIGURATION_KEY] as BlikComponentConfigurationDTO?)
-            ?.toCheckoutConfiguration()
-            ?: throw IllegalArgumentException("Blik configuration not found")
-    internal val paymentMethodString = creationParams[Constants.PAYMENT_METHOD_KEY] as String? ?: ""
-    internal val componentId = creationParams[Constants.COMPONENT_ID_KEY] as String? ?: ""
+        (creationParams[Constants.BLIK_COMPONENT_CONFIGURATION_KEY] as BlikComponentConfigurationDTO)
+            .toCheckoutConfiguration()
+
+    internal val paymentMethodString =
+        creationParams[Constants.PAYMENT_METHOD_KEY] as String
+    internal val componentId =
+        creationParams[Constants.COMPONENT_ID_KEY] as String
     private val dynamicComponentView = DynamicComponentView(activity, componentFlutterApi, componentId)
 
     override fun getView(): View = dynamicComponentView
