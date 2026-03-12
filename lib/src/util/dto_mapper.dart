@@ -339,6 +339,18 @@ extension CardComponentConfigurationMapper on CardComponentConfiguration {
       );
 }
 
+extension BlikComponentConfigurationMapper on BlikComponentConfiguration {
+  BlikComponentConfigurationDTO toDTO(String sdkVersionNumber) =>
+      BlikComponentConfigurationDTO(
+        environment: environment,
+        clientKey: clientKey,
+        countryCode: countryCode,
+        amount: amount?.toDTO(),
+        shopperLocale: shopperLocale,
+        analyticsOptionsDTO: analyticsOptions.toDTO(sdkVersionNumber),
+      );
+}
+
 extension GooglePayComponentConfigurationMapper
     on GooglePayComponentConfiguration {
   InstantPaymentConfigurationDTO toDTO(

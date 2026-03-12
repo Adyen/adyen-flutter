@@ -203,6 +203,26 @@ extension CardComponentConfigurationDTO {
     }
 }
 
+extension BlikComponentConfigurationDTO {
+    func createAdyenContext() throws -> AdyenContext {
+        try buildAdyenContext(
+            environment: environment,
+            clientKey: clientKey,
+            amount: amount,
+            analyticsOptionsDTO: analyticsOptionsDTO,
+            countryCode: countryCode
+        )
+    }
+
+    func mapToBlikComponentConfiguration() -> BLIKComponent.Configuration {
+        let localizationParameters = shopperLocale.map { LocalizationParameters(enforcedLocale: $0) }
+        return BLIKComponent.Configuration(
+            style: AdyenAppearance.blikComponentStyle,
+            localizationParameters: localizationParameters
+        )
+    }
+}
+
 extension Environment {
     func mapToEnvironment() -> Adyen.Environment {
         switch self {

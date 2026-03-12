@@ -57,6 +57,13 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
                     sessionData: sessionData,
                     completion: completion
                 )
+            case let blikComponentConfigurationDTO as BlikComponentConfigurationDTO:
+                try createSessionForComponent(
+                    adyenContext: blikComponentConfigurationDTO.createAdyenContext(),
+                    sessionId: sessionId,
+                    sessionData: sessionData,
+                    completion: completion
+                )
             case let instantComponentConfigurationDTO as InstantPaymentConfigurationDTO:
                 try createSessionForComponent(
                     adyenContext: instantComponentConfigurationDTO.createAdyenContext(),

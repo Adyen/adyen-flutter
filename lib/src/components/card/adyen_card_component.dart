@@ -38,7 +38,8 @@ class AdyenCardComponent extends StatelessWidget {
         if (snapshot.data != null) {
           final sdkVersionNumber = snapshot.data ?? "";
           return switch (checkout) {
-            SessionCheckout() => _buildCardSessionFlowWidget(sdkVersionNumber),
+            SessionCheckout it =>
+              _buildCardSessionFlowWidget(sdkVersionNumber, it),
             AdvancedCheckout it =>
               _buildCardAdvancedFlowWidget(sdkVersionNumber, it),
           };
@@ -51,8 +52,10 @@ class AdyenCardComponent extends StatelessWidget {
     );
   }
 
-  CardSessionComponent _buildCardSessionFlowWidget(String sdkVersionNumber) {
-    final SessionCheckout sessionCheckout = checkout as SessionCheckout;
+  CardSessionComponent _buildCardSessionFlowWidget(
+    String sdkVersionNumber,
+    SessionCheckout sessionCheckout,
+  ) {
     final String encodedPaymentMethod = json.encode(paymentMethod);
     final double initialHeight =
         _determineInitialHeight(configuration.cardConfiguration);
@@ -73,7 +76,7 @@ class AdyenCardComponent extends StatelessWidget {
 
   CardAdvancedComponent _buildCardAdvancedFlowWidget(
     String sdkVersionNumber,
-    Checkout advancedCheckout,
+    AdvancedCheckout advancedCheckout,
   ) {
     final initialHeight =
         _determineInitialHeight(configuration.cardConfiguration);

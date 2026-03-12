@@ -1,14 +1,14 @@
 @_spi(AdyenInternal) import Adyen
-#if canImport(AdyenCard)
-    import AdyenCard
+#if canImport(AdyenComponents)
+    import AdyenComponents
 #endif
-#if canImport(AdyenNetworking)
-    import AdyenNetworking
+#if canImport(AdyenSession)
+    import AdyenSession
 #endif
 import Flutter
 
-class CardSessionComponent: BaseCardComponent {
-    private let sessionHolder: SessionHolder
+class BlikSessionComponent: BaseBlikComponent {
+    let sessionHolder: SessionHolder
 
     init(
         frame: CGRect,
@@ -29,34 +29,35 @@ class CardSessionComponent: BaseCardComponent {
             componentPlatformApi: componentPlatformApi
         )
 
-        setupCardComponentView()
-        setupSessionFlowDelegate()
+        setupBlikComponentView()
     }
 
-    private func setupCardComponentView() {
+    private func setupBlikComponentView() {
         do {
-            let cardComponent = try setupCardComponent()
-            showCardComponent(cardComponent: cardComponent)
+            let blikComponent = try setupBlikComponent()
+            showBlikComponent(blikComponent: blikComponent)
+            componentPlatformApi.register(blikBaseComponent: self)
+            setupSessionFlowDelegate()
         } catch {
             sendErrorToFlutterLayer(errorMessage: error.localizedDescription)
         }
     }
 
-    private func setupCardComponent() throws -> CardComponent {
+    private func setupBlikComponent() throws -> BLIKComponent {
         guard let session = sessionHolder.session else { throw PlatformError(errorDescription: "Session not found") }
-        return try buildCardComponent(
+        return try buildBlikComponent(
             paymentMethodString: paymentMethod,
-            isStoredPaymentMethod: isStoredPaymentMethod,
-            cardComponentConfiguration: cardComponentConfiguration,
-            componentDelegate: session,
-            cardDelegate: self
+            blikComponentConfiguration: blikComponentConfiguration,
+            componentDelegate: session
         )
     }
 
     private func setupSessionFlowDelegate() {
         if let componentSessionFlowDelegate = (sessionHolder.sessionDelegate as? ComponentSessionFlowHandler) {
-            componentSessionFlowDelegate.finalizeCallback = finalizeAndDismissSessionComponent
             componentSessionFlowDelegate.componentId = componentId
+            componentSessionFlowDelegate.finalizeCallback = { [weak self] success, completion in
+                self?.finalizeAndDismissSessionComponent(success: success, completion: completion)
+            }
         } else {
             AdyenAssertion.assertionFailure(message: "Wrong session flow delegate usage")
         }
@@ -66,7 +67,7 @@ class CardSessionComponent: BaseCardComponent {
         finalizeAndDismiss(success: success, completion: { [weak self] in
             guard let self else { return }
             completion()
-            self.cardComponent = nil
+            self.blikComponent = nil
         })
     }
 }

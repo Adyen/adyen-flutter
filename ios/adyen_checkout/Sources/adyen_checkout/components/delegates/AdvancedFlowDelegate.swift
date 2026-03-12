@@ -1,7 +1,7 @@
 import Adyen
 import Foundation
 
-class CardAdvancedFlowDelegate: PaymentComponentDelegate {
+class AdvancedFlowDelegate: PaymentComponentDelegate {
     private let componentFlutterApi: ComponentFlutterInterface
     private let componentId: String
 
