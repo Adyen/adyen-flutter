@@ -155,11 +155,10 @@ class MultiComponentSessionScreen extends StatelessWidget {
       ),
     );
 
-    final Map<String, dynamic> paymentMethod =
-        _extractPaymentMethodByType(
-          sessionCheckout.paymentMethods,
-          'googlepay',
-        );
+    final Map<String, dynamic> paymentMethod = _extractPaymentMethodByType(
+      sessionCheckout.paymentMethods,
+      'googlepay',
+    );
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
       child: AdyenGooglePayComponent(
@@ -191,9 +190,9 @@ class MultiComponentSessionScreen extends StatelessWidget {
 
     final Map<String, dynamic> applePayPaymentMethod =
         _extractPaymentMethodByType(
-          sessionCheckout.paymentMethods,
-          'applepay',
-        );
+      sessionCheckout.paymentMethods,
+      'applepay',
+    );
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
       child: AdyenApplePayComponent(

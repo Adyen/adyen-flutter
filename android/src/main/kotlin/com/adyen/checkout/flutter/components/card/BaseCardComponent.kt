@@ -22,7 +22,8 @@ abstract class BaseCardComponent(
 ) : PlatformView {
     internal var cardComponent: CardComponent? = null
     internal val checkoutConfiguration =
-        (creationParams[Constants.CARD_COMPONENT_CONFIGURATION_KEY] as CardComponentConfigurationDTO).toCheckoutConfiguration()
+        (creationParams[Constants.CARD_COMPONENT_CONFIGURATION_KEY] as CardComponentConfigurationDTO)
+            .toCheckoutConfiguration()
     internal val paymentMethodString =
         creationParams[Constants.PAYMENT_METHOD_KEY] as String
     internal val componentId =
