@@ -23,7 +23,6 @@ class ComponentPlatformApi: ComponentPlatformInterface {
     }
 
     func updateViewHeight(viewId: Int64) {
-        print("updateViewHeight: \(viewId)")
         cardComponentManager.updateViewHeight(viewId: viewId)
         blikComponentManager.updateViewHeight(viewId: viewId)
     }
@@ -88,7 +87,6 @@ class ComponentPlatformApi: ComponentPlatformInterface {
     }
 
     func onDispose(componentId: String) {
-        print("onDispose: \(componentId)")
         if isApplePayComponent(componentId: componentId) {
             applePayComponentManager.onDispose()
         } else if isInstantPaymentComponent(componentId: componentId) {
