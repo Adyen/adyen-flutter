@@ -78,7 +78,8 @@ func createCardConfigurationDTO(
     showCvc: Bool = true,
     kcpFieldVisibility: FieldVisibility = .hide,
     socialSecurityNumberFieldVisibility: FieldVisibility = .hide,
-    supportedCardTypes: [String?] = []
+    supportedCardTypes: [String?] = [],
+    installmentConfiguration: InstallmentConfigurationDTO? = nil
 ) -> CardConfigurationDTO {
     CardConfigurationDTO(
         holderNameRequired: holderNameRequired,
@@ -88,7 +89,8 @@ func createCardConfigurationDTO(
         showCvc: showCvc,
         kcpFieldVisibility: kcpFieldVisibility,
         socialSecurityNumberFieldVisibility: socialSecurityNumberFieldVisibility,
-        supportedCardTypes: supportedCardTypes
+        supportedCardTypes: supportedCardTypes,
+        installmentConfiguration: installmentConfiguration
     )
 }
 
