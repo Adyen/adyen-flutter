@@ -34,11 +34,20 @@ final class DropInConfiguration extends BaseConfiguration {
     this.twintConfiguration,
     this.threeDS2Configuration,
     this.preselectedPaymentMethodTitle,
-    bool? skipListWhenSinglePaymentMethod,
+    this.skipListWhenSinglePaymentMethod = false,
     AnalyticsOptions? analyticsOptions,
     this.paymentMethodNames,
-  }) : skipListWhenSinglePaymentMethod =
-            skipListWhenSinglePaymentMethod ?? false;
+  });
+
+  final CardConfiguration? cardConfiguration;
+  final ApplePayConfiguration? applePayConfiguration;
+  final GooglePayConfiguration? googlePayConfiguration;
+  final CashAppPayConfiguration? cashAppPayConfiguration;
+  final StoredPaymentMethodConfiguration? storedPaymentMethodConfiguration;
+  final bool skipListWhenSinglePaymentMethod;
+  final String? preselectedPaymentMethodTitle;
+  final Map<String, String>? paymentMethodNames;
+
 
   @override
   String toString() {
