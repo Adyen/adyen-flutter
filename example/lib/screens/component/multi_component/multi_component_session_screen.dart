@@ -108,7 +108,10 @@ class MultiComponentSessionScreen extends StatelessWidget {
     SessionCheckout sessionCheckout,
   ) {
     final Map<String, dynamic> schemePaymentMethod =
-        _extractSchemePaymentMethod(sessionCheckout.paymentMethods);
+        _extractPaymentMethodByType(
+      sessionCheckout.paymentMethods,
+      'scheme',
+    );
 
     return AdyenCardComponent(
       configuration: cardComponentConfiguration,
@@ -238,25 +241,9 @@ class MultiComponentSessionScreen extends StatelessWidget {
       return <String, String>{};
     }
 
-    return paymentMethods["paymentMethods"].firstWhere(
-      (paymentMethod) => paymentMethod["type"] == type,
-      orElse: () => <String, dynamic>{},
-    );
-  }
-
-  Map<String, dynamic> _extractSchemePaymentMethod(
-      Map<String, dynamic> paymentMethods) {
     List paymentMethodList = paymentMethods["paymentMethods"] as List;
-    Map<String, dynamic>? paymentMethod = paymentMethodList
-        .firstWhereOrNull((paymentMethod) => paymentMethod["type"] == "scheme");
-
-    List storedPaymentMethodList =
-        paymentMethods.containsKey("storedPaymentMethods")
-            ? paymentMethods["storedPaymentMethods"] as List
-            : [];
-    Map<String, dynamic>? storedPaymentMethod =
-        storedPaymentMethodList.firstOrNull;
-
-    return paymentMethod ?? <String, String>{};
+    return paymentMethodList.firstWhereOrNull(
+            (paymentMethod) => paymentMethod["type"] == type) ??
+        <String, String>{};
   }
 }

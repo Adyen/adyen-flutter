@@ -101,7 +101,10 @@ class MultiComponentAdvancedScreen extends StatelessWidget {
     Map<String, dynamic> paymentMethods,
     BuildContext context,
   ) {
-    final paymentMethod = extractSchemePaymentMethod(paymentMethods);
+    final paymentMethod = _extractPaymentMethodByType(
+      paymentMethods,
+      'scheme',
+    );
     final cardComponentConfiguration = CardComponentConfiguration(
       environment: Config.environment,
       clientKey: Config.clientKey,
@@ -267,10 +270,11 @@ class MultiComponentAdvancedScreen extends StatelessWidget {
       return <String, String>{};
     }
 
-    return paymentMethods["paymentMethods"].firstWhere(
-      (paymentMethod) => paymentMethod["type"] == type,
-      orElse: () => <String, dynamic>{},
-    );
+    List paymentMethodList = paymentMethods["paymentMethods"] as List;
+    return paymentMethodList.firstWhereOrNull(
+          (paymentMethod) => paymentMethod["type"] == type,
+        ) ??
+        <String, dynamic>{};
   }
 
   Map<String, dynamic> extractSchemePaymentMethod(

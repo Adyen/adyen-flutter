@@ -14,8 +14,6 @@ internal class BlikComponentManager(
     private val onDispose: (String) -> Unit,
     private val assignCurrentComponent: (ActionHandlingComponent?) -> Unit,
 ) {
-    private var currentBlikComponent: BaseBlikComponent? = null
-
     fun registerComponentViewFactories() {
         flutterPluginBinding?.platformViewRegistry?.registerViewFactory(
             BlikComponentFactory.BLIK_COMPONENT_ADVANCED,
@@ -43,7 +41,6 @@ internal class BlikComponentManager(
     }
 
     private fun setCurrentBlikComponent(currentBlikComponent: BaseBlikComponent) {
-        this.currentBlikComponent = currentBlikComponent
         assignCurrentComponent(currentBlikComponent.blikComponent)
     }
 }
