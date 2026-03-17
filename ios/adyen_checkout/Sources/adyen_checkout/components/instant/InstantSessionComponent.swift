@@ -21,10 +21,12 @@ class InstantSessionComponent: BaseInstantComponent, InstantComponentProtocol {
                 throw PlatformError(errorDescription: "The provided session identifier or data is invalid.")
             }
             
-            let componentSessionFlowHandler = sessionHolder.sessionDelegate as? ComponentSessionFlowHandler
-            componentSessionFlowHandler?.componentId = componentId
-            componentSessionFlowHandler?.finalizeCallback = finalizeCallback
             let component = InstantPaymentComponent(paymentMethod: paymentMethod, context: adyenContext, order: nil)
+            let componentSessionFlowHandler = sessionHolder.sessionDelegate as? ComponentSessionFlowHandler
+            componentSessionFlowHandler?.register(
+                componentId: componentId,
+                finalizeCallback: finalizeCallback
+            )
             component.delegate = session
             return component
         } catch {

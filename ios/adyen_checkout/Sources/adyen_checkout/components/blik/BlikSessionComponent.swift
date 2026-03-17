@@ -54,10 +54,12 @@ class BlikSessionComponent: BaseBlikComponent {
 
     private func setupSessionFlowDelegate() {
         if let componentSessionFlowDelegate = (sessionHolder.sessionDelegate as? ComponentSessionFlowHandler) {
-            componentSessionFlowDelegate.componentId = componentId
-            componentSessionFlowDelegate.finalizeCallback = { [weak self] success, completion in
-                self?.finalizeAndDismissSessionComponent(success: success, completion: completion)
-            }
+            componentSessionFlowDelegate.register(
+                componentId: componentId,
+                finalizeCallback: { [weak self] success, completion in
+                    self?.finalizeAndDismissSessionComponent(success: success, completion: completion)
+                }
+            )
         } else {
             AdyenAssertion.assertionFailure(message: "Wrong session flow delegate usage")
         }
@@ -70,4 +72,5 @@ class BlikSessionComponent: BaseBlikComponent {
             self.blikComponent = nil
         })
     }
+
 }
