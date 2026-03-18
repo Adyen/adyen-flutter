@@ -160,9 +160,11 @@ class DropInPlatformApi: DropInPlatformInterface {
 
     func onDeleteStoredPaymentMethodResult(deleteStoredPaymentMethodResultDTO: DeletedStoredPaymentMethodResultDTO) {
         dropInSessionStoredPaymentMethodsDelegate?.handleDisableResult(
-            isSuccessfullyRemoved: deleteStoredPaymentMethodResultDTO.isSuccessfullyRemoved)
+            isSuccessfullyRemoved: deleteStoredPaymentMethodResultDTO.isSuccessfullyRemoved
+        )
         dropInAdvancedFlowStoredPaymentMethodsDelegate?.handleDisableResult(
-            isSuccessfullyRemoved: deleteStoredPaymentMethodResultDTO.isSuccessfullyRemoved)
+            isSuccessfullyRemoved: deleteStoredPaymentMethodResultDTO.isSuccessfullyRemoved
+        )
     }
     
     func onBalanceCheckResult(balanceCheckResponse: String) throws {
@@ -223,7 +225,8 @@ class DropInPlatformApi: DropInPlatformInterface {
             let paymentResult = PaymentResultDTO(
                 type: PaymentResultEnum.finished,
                 result: PaymentResultModelDTO(
-                    resultCode: resultCode?.rawValue)
+                    resultCode: resultCode?.rawValue
+                )
             )
             let checkoutEvent = CheckoutEvent(type: CheckoutEventType.result, data: paymentResult)
             self?.checkoutFlutter.send(

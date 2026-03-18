@@ -1,16 +1,49 @@
-## 1.8.0 (in development)
+## 1.9.0 (in development)
 
 ### New
 
-- TWINT is now supported fully in Drop-in and as an redirect Instant Component. Payment
+- Added 3DS2 UI customization via `Adyen3DSTheme`, including `fromThemeData()` support.
+
+### Changed
+
+- Dependency versions:
+  | Name | Version |
+  |---------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------|
+  | [Android Drop-in/Components](https://docs.adyen.com/online-payments/release-notes/?title%5B0%5D=Android+Components%2FDrop-in&version%5B0%5D=5.16.1)                       |  5.16.1 |
+
+## 1.8.1
+
+### Fixed
+
+- **HUF Currency Formatting:** Fixed an issue where Hungarian Forint (HUF) amounts were incorrectly
+  formatted on iOS 26.4 Beta. The iOS beta changed the minor digits for HUF from 2 to 0 in this
+  beta, which conflicted with the Adyen backend expectation of 2 decimal places. The SDK now
+  explicitly overrides HUF to use 2 minor units, ensuring consistent amount formatting across all
+  iOS versions.
+
+### Changed
+
+- Dependency versions:
+  | Name | Version |
+  |---------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------|
+  | [iOS Drop-in/Components](https://docs.adyen.com/online-payments/release-notes/?title%5B0%5D=iOS+Components%2FDrop-in#releaseNote=2026-02-23-ios-componentsdrop-in-5.22.2) |  5.22.2 |
+
+## 1.8.0
+
+### New
+
+- TWINT is now supported in Drop-in and as a redirect instant component. Payment
   method [type](https://docs.adyen.com/payment-methods/payment-method-types): **twint**.
-- Added support for the ThreeDS2Configuration with `requestorAppURL` parameter for Drop-in and Card
-  Component.
+- For card payments with Drop-in and Component, you can now configure a `requestorAppURL` in your
+  `ThreeDS2Configuration`.
+- The `data` object in the onSubmit callback now includes an `sdkData` parameter. For Advanced flow,
+  we recommend that you include this parameter in your /payments request.`
 
 ## Improved
 
-- For Drop-in on iOS: Added payment to create adyenContext to prioritize the session amount in the
-  UI.
+- For Drop-in on iOS, the payment amount you specified in your `/sessions` request is used to show
+  the amount at checkout.
+- Updated Gradle and AGP to v8.13.
 
 ### Changed
 
@@ -20,7 +53,6 @@
   | [iOS Drop-in/Components](https://docs.adyen.com/online-payments/release-notes/?title%5B0%5D=iOS+Components%2FDrop-in#releaseNote=2026-03-18-ios-componentsdrop-in-5.23.0) |  5.23.0 |
   | [Android Drop-in/Components](https://docs.adyen.com/online-payments/release-notes/#releaseNote=2025-12-19-android-componentsdrop-in-5.16.0)                               |  5.16.0 |
   | [Android Gradle Plugin](https://developer.android.com/build/releases/gradle-plugin)                                                                                       |  8.13.2 |
-
 
 ## 1.7.0
 

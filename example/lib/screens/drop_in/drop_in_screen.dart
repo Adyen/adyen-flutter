@@ -98,6 +98,27 @@ class DropInScreen extends StatelessWidget {
     CardConfiguration cardsConfiguration = CardConfiguration(
       onBinLookup: _onBinLookup,
       onBinValue: _onBinValue,
+      // Note: installmentConfiguration is only used for Advanced flow.
+      // For Sessions flow, installments are automatically configured from the backend /sessions response.
+      installmentConfiguration: InstallmentConfiguration(
+        defaultOptions: DefaultInstallmentOptions(
+          values: [6, 12],
+          includesRevolving: true,
+        ),
+        cardBasedOptions: [
+          CardBasedInstallmentOptions(
+            cardBrand: 'visa',
+            values: [9, 12],
+            includesRevolving: true,
+          ),
+          CardBasedInstallmentOptions(
+            cardBrand: 'mc',
+            values: [2, 3, 6],
+            includesRevolving: false,
+          ),
+        ],
+        showInstallmentAmount: true,
+      ),
     );
 
     ApplePayConfiguration applePayConfiguration = ApplePayConfiguration(

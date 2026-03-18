@@ -4,7 +4,7 @@
 #endif
 import UIKit
 
-// View controller is required to prevent propagating the tap event to the FlutterViewController - https://github.com/flutter/flutter/issues/35784#issuecomment-516243057
+/// View controller is required to prevent propagating the tap event to the FlutterViewController - https://github.com/flutter/flutter/issues/35784#issuecomment-516243057
 class DropInViewController: UIViewController {
     let dropInComponent: DropInComponent
     
