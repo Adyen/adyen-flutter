@@ -53,7 +53,8 @@ enum class Environment(val raw: Int) {
   UNITED_STATES(2),
   AUSTRALIA(3),
   INDIA(4),
-  APSE(5);
+  APSE(5),
+  NEA(6);
 
   companion object {
     fun ofRaw(raw: Int): Environment? {

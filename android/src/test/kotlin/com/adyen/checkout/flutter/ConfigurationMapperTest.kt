@@ -88,6 +88,11 @@ class ConfigurationMapperTest {
         fun `when environment is APSE, then map to SDK APSE environment`() {
             assertEquals(SDKEnvironment.APSE, Environment.APSE.mapToEnvironment())
         }
+
+        @Test
+        fun `when environment is NEA, then map to SDK NEA environment`() {
+            assertEquals(SDKEnvironment.NEA, Environment.NEA.mapToEnvironment())
+        }
     }
 
     @Nested
