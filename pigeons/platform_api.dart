@@ -21,7 +21,8 @@ enum Environment {
   unitedStates,
   australia,
   india,
-  apse;
+  apse,
+  nea;
 }
 
 enum AddressMode {

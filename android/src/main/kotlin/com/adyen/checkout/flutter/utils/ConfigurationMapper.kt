@@ -242,6 +242,7 @@ object ConfigurationMapper {
             Environment.AUSTRALIA -> SDKEnvironment.AUSTRALIA
             Environment.INDIA -> SDKEnvironment.INDIA
             Environment.APSE -> SDKEnvironment.APSE
+            Environment.NEA -> SDKEnvironment.NEA
         }
 
     private fun AnalyticsOptionsDTO.mapToAnalyticsConfiguration(): AnalyticsConfiguration {
