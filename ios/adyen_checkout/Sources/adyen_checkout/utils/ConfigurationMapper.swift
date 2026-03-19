@@ -238,6 +238,8 @@ extension Environment {
             return .liveIndia
         case .apse:
             return .liveApse
+        case .nea:
+            return .liveNea
         }
     }
 }

@@ -20,6 +20,7 @@ final class ConfigurationMapperTests: XCTestCase {
             (.australia, .liveAustralia),
             (.india, .liveIndia),
             (.apse, .liveApse),
+            (.nea, .liveNea),
         ]
 
         for testCase in testCases {

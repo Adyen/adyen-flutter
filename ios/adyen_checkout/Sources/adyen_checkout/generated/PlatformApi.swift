@@ -74,6 +74,7 @@ enum Environment: Int {
     case australia = 3
     case india = 4
     case apse = 5
+    case nea = 6
 }
 
 enum AddressMode: Int {

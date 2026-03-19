@@ -33,6 +33,7 @@ enum Environment {
   australia,
   india,
   apse,
+  nea,
 }
 
 enum AddressMode {
