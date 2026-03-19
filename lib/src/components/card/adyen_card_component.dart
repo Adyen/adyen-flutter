@@ -98,14 +98,12 @@ class AdyenCardComponent extends StatelessWidget {
   }
 
   double _determineInitialHeight(CardConfiguration cardConfiguration) {
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.android:
-        return _determineInitialAndroidViewHeight(cardConfiguration);
-      case TargetPlatform.iOS:
-        return _determineInitialIosViewHeight(cardConfiguration);
-      default:
-        throw UnsupportedError('Unsupported platform view');
-    }
+    return switch (defaultTargetPlatform) {
+      TargetPlatform.android =>
+        _determineInitialAndroidViewHeight(cardConfiguration),
+      TargetPlatform.iOS => _determineInitialIosViewHeight(cardConfiguration),
+      _ => throw UnsupportedError('Unsupported platform view')
+    };
   }
 
   double _determineInitialAndroidViewHeight(
