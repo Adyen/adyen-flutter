@@ -7,7 +7,10 @@
 
 ## Improved
 
-- Refactored the component architecture and added a shared layer for card and BLIK components.
+- Refactored the component architecture by introducing a shared layer to improve maintainability and
+  extensibility of platform view based components.
+- Migrated the card component to comply with the new component architecture and simplified its
+  implementation.
 
 ### Changed
 
