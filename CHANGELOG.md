@@ -10,6 +10,7 @@
   | Name | Version |
   |---------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------|
   | [Android Drop-in/Components](https://docs.adyen.com/online-payments/release-notes/?title%5B0%5D=Android+Components%2FDrop-in&version%5B0%5D=5.17.0)                       |  5.17.0 |
+  | [iOS Drop-in/Components](https://docs.adyen.com/online-payments/release-notes/?title%5B0%5D=iOS+Components%2FDrop-in#releaseNote=2026-03-18-ios-componentsdrop-in-5.23.0) |  5.23.0 |
 
 ## 1.8.1
 
@@ -50,7 +51,7 @@
 - Dependency versions:
   | Name | Version |
   |---------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------|
-  | [iOS Drop-in/Components](https://docs.adyen.com/online-payments/release-notes/?title%5B0%5D=iOS+Components%2FDrop-in#releaseNote=2026-03-18-ios-componentsdrop-in-5.23.0) |  5.23.0 |
+  | [iOS Drop-in/Components](https://docs.adyen.com/online-payments/release-notes/?title%5B0%5D=iOS+Components%2FDrop-in#releaseNote=2025-12-18-ios-componentsdrop-in-5.22.1) |  5.22.1 |
   | [Android Drop-in/Components](https://docs.adyen.com/online-payments/release-notes/#releaseNote=2025-12-19-android-componentsdrop-in-5.16.0)                               |  5.16.0 |
   | [Android Gradle Plugin](https://developer.android.com/build/releases/gradle-plugin)                                                                                       |  8.13.2 |
 
