@@ -139,6 +139,7 @@ enum Environment: Int {
   case australia = 3
   case india = 4
   case apse = 5
+  case nea = 6
 }
 
 enum AddressMode: Int {
@@ -371,24 +372,390 @@ struct AnalyticsOptionsDTO: Hashable {
 }
 
 /// Generated class from Pigeon that represents data sent in messages.
+struct ThreeDS2UICustomizationDTO: Hashable {
+  var screenCustomization: ThreeDS2ScreenCustomizationDTO? = nil
+  var headingCustomization: ThreeDS2ToolbarCustomizationDTO? = nil
+  var labelCustomization: ThreeDS2LabelCustomizationDTO? = nil
+  var inputCustomization: ThreeDS2InputCustomizationDTO? = nil
+  var selectionItemCustomization: ThreeDS2SelectionItemCustomizationDTO? = nil
+  var primaryButtonCustomization: ThreeDS2ButtonCustomizationDTO? = nil
+  var secondaryButtonCustomization: ThreeDS2ButtonCustomizationDTO? = nil
+
+
+  // swift-format-ignore: AlwaysUseLowerCamelCase
+  static func fromList(_ pigeonVar_list: [Any?]) -> ThreeDS2UICustomizationDTO? {
+    let screenCustomization: ThreeDS2ScreenCustomizationDTO? = nilOrValue(pigeonVar_list[0])
+    let headingCustomization: ThreeDS2ToolbarCustomizationDTO? = nilOrValue(pigeonVar_list[1])
+    let labelCustomization: ThreeDS2LabelCustomizationDTO? = nilOrValue(pigeonVar_list[2])
+    let inputCustomization: ThreeDS2InputCustomizationDTO? = nilOrValue(pigeonVar_list[3])
+    let selectionItemCustomization: ThreeDS2SelectionItemCustomizationDTO? = nilOrValue(pigeonVar_list[4])
+    let primaryButtonCustomization: ThreeDS2ButtonCustomizationDTO? = nilOrValue(pigeonVar_list[5])
+    let secondaryButtonCustomization: ThreeDS2ButtonCustomizationDTO? = nilOrValue(pigeonVar_list[6])
+
+    return ThreeDS2UICustomizationDTO(
+      screenCustomization: screenCustomization,
+      headingCustomization: headingCustomization,
+      labelCustomization: labelCustomization,
+      inputCustomization: inputCustomization,
+      selectionItemCustomization: selectionItemCustomization,
+      primaryButtonCustomization: primaryButtonCustomization,
+      secondaryButtonCustomization: secondaryButtonCustomization
+    )
+  }
+  func toList() -> [Any?] {
+    return [
+      screenCustomization,
+      headingCustomization,
+      labelCustomization,
+      inputCustomization,
+      selectionItemCustomization,
+      primaryButtonCustomization,
+      secondaryButtonCustomization,
+    ]
+  }
+  static func == (lhs: ThreeDS2UICustomizationDTO, rhs: ThreeDS2UICustomizationDTO) -> Bool {
+    return deepEqualsPlatformApi(lhs.toList(), rhs.toList())  }
+  func hash(into hasher: inout Hasher) {
+    deepHashPlatformApi(value: toList(), hasher: &hasher)
+  }
+}
+
+/// Generated class from Pigeon that represents data sent in messages.
+struct ThreeDS2ScreenCustomizationDTO: Hashable {
+  var backgroundColor: String? = nil
+  var textColor: String? = nil
+
+
+  // swift-format-ignore: AlwaysUseLowerCamelCase
+  static func fromList(_ pigeonVar_list: [Any?]) -> ThreeDS2ScreenCustomizationDTO? {
+    let backgroundColor: String? = nilOrValue(pigeonVar_list[0])
+    let textColor: String? = nilOrValue(pigeonVar_list[1])
+
+    return ThreeDS2ScreenCustomizationDTO(
+      backgroundColor: backgroundColor,
+      textColor: textColor
+    )
+  }
+  func toList() -> [Any?] {
+    return [
+      backgroundColor,
+      textColor,
+    ]
+  }
+  static func == (lhs: ThreeDS2ScreenCustomizationDTO, rhs: ThreeDS2ScreenCustomizationDTO) -> Bool {
+    return deepEqualsPlatformApi(lhs.toList(), rhs.toList())  }
+  func hash(into hasher: inout Hasher) {
+    deepHashPlatformApi(value: toList(), hasher: &hasher)
+  }
+}
+
+/// Generated class from Pigeon that represents data sent in messages.
+struct ThreeDS2ButtonCustomizationDTO: Hashable {
+  var backgroundColor: String? = nil
+  var textColor: String? = nil
+  var cornerRadius: Int64? = nil
+  var textFontSize: Int64? = nil
+
+
+  // swift-format-ignore: AlwaysUseLowerCamelCase
+  static func fromList(_ pigeonVar_list: [Any?]) -> ThreeDS2ButtonCustomizationDTO? {
+    let backgroundColor: String? = nilOrValue(pigeonVar_list[0])
+    let textColor: String? = nilOrValue(pigeonVar_list[1])
+    let cornerRadius: Int64? = nilOrValue(pigeonVar_list[2])
+    let textFontSize: Int64? = nilOrValue(pigeonVar_list[3])
+
+    return ThreeDS2ButtonCustomizationDTO(
+      backgroundColor: backgroundColor,
+      textColor: textColor,
+      cornerRadius: cornerRadius,
+      textFontSize: textFontSize
+    )
+  }
+  func toList() -> [Any?] {
+    return [
+      backgroundColor,
+      textColor,
+      cornerRadius,
+      textFontSize,
+    ]
+  }
+  static func == (lhs: ThreeDS2ButtonCustomizationDTO, rhs: ThreeDS2ButtonCustomizationDTO) -> Bool {
+    return deepEqualsPlatformApi(lhs.toList(), rhs.toList())  }
+  func hash(into hasher: inout Hasher) {
+    deepHashPlatformApi(value: toList(), hasher: &hasher)
+  }
+}
+
+/// Generated class from Pigeon that represents data sent in messages.
+struct ThreeDS2SelectionItemCustomizationDTO: Hashable {
+  var selectionIndicatorTintColor: String? = nil
+  var highlightedBackgroundColor: String? = nil
+  var textColor: String? = nil
+
+
+  // swift-format-ignore: AlwaysUseLowerCamelCase
+  static func fromList(_ pigeonVar_list: [Any?]) -> ThreeDS2SelectionItemCustomizationDTO? {
+    let selectionIndicatorTintColor: String? = nilOrValue(pigeonVar_list[0])
+    let highlightedBackgroundColor: String? = nilOrValue(pigeonVar_list[1])
+    let textColor: String? = nilOrValue(pigeonVar_list[2])
+
+    return ThreeDS2SelectionItemCustomizationDTO(
+      selectionIndicatorTintColor: selectionIndicatorTintColor,
+      highlightedBackgroundColor: highlightedBackgroundColor,
+      textColor: textColor
+    )
+  }
+  func toList() -> [Any?] {
+    return [
+      selectionIndicatorTintColor,
+      highlightedBackgroundColor,
+      textColor,
+    ]
+  }
+  static func == (lhs: ThreeDS2SelectionItemCustomizationDTO, rhs: ThreeDS2SelectionItemCustomizationDTO) -> Bool {
+    return deepEqualsPlatformApi(lhs.toList(), rhs.toList())  }
+  func hash(into hasher: inout Hasher) {
+    deepHashPlatformApi(value: toList(), hasher: &hasher)
+  }
+}
+
+/// Generated class from Pigeon that represents data sent in messages.
+struct ThreeDS2LabelCustomizationDTO: Hashable {
+  var headingTextColor: String? = nil
+  var headingTextFontSize: Int64? = nil
+  var inputLabelTextColor: String? = nil
+  var inputLabelFontSize: Int64? = nil
+  var textColor: String? = nil
+  var textFontSize: Int64? = nil
+
+
+  // swift-format-ignore: AlwaysUseLowerCamelCase
+  static func fromList(_ pigeonVar_list: [Any?]) -> ThreeDS2LabelCustomizationDTO? {
+    let headingTextColor: String? = nilOrValue(pigeonVar_list[0])
+    let headingTextFontSize: Int64? = nilOrValue(pigeonVar_list[1])
+    let inputLabelTextColor: String? = nilOrValue(pigeonVar_list[2])
+    let inputLabelFontSize: Int64? = nilOrValue(pigeonVar_list[3])
+    let textColor: String? = nilOrValue(pigeonVar_list[4])
+    let textFontSize: Int64? = nilOrValue(pigeonVar_list[5])
+
+    return ThreeDS2LabelCustomizationDTO(
+      headingTextColor: headingTextColor,
+      headingTextFontSize: headingTextFontSize,
+      inputLabelTextColor: inputLabelTextColor,
+      inputLabelFontSize: inputLabelFontSize,
+      textColor: textColor,
+      textFontSize: textFontSize
+    )
+  }
+  func toList() -> [Any?] {
+    return [
+      headingTextColor,
+      headingTextFontSize,
+      inputLabelTextColor,
+      inputLabelFontSize,
+      textColor,
+      textFontSize,
+    ]
+  }
+  static func == (lhs: ThreeDS2LabelCustomizationDTO, rhs: ThreeDS2LabelCustomizationDTO) -> Bool {
+    return deepEqualsPlatformApi(lhs.toList(), rhs.toList())  }
+  func hash(into hasher: inout Hasher) {
+    deepHashPlatformApi(value: toList(), hasher: &hasher)
+  }
+}
+
+/// Generated class from Pigeon that represents data sent in messages.
+struct ThreeDS2InputCustomizationDTO: Hashable {
+  var borderColor: String? = nil
+  var borderWidth: Int64? = nil
+  var cornerRadius: Int64? = nil
+  var textColor: String? = nil
+
+
+  // swift-format-ignore: AlwaysUseLowerCamelCase
+  static func fromList(_ pigeonVar_list: [Any?]) -> ThreeDS2InputCustomizationDTO? {
+    let borderColor: String? = nilOrValue(pigeonVar_list[0])
+    let borderWidth: Int64? = nilOrValue(pigeonVar_list[1])
+    let cornerRadius: Int64? = nilOrValue(pigeonVar_list[2])
+    let textColor: String? = nilOrValue(pigeonVar_list[3])
+
+    return ThreeDS2InputCustomizationDTO(
+      borderColor: borderColor,
+      borderWidth: borderWidth,
+      cornerRadius: cornerRadius,
+      textColor: textColor
+    )
+  }
+  func toList() -> [Any?] {
+    return [
+      borderColor,
+      borderWidth,
+      cornerRadius,
+      textColor,
+    ]
+  }
+  static func == (lhs: ThreeDS2InputCustomizationDTO, rhs: ThreeDS2InputCustomizationDTO) -> Bool {
+    return deepEqualsPlatformApi(lhs.toList(), rhs.toList())  }
+  func hash(into hasher: inout Hasher) {
+    deepHashPlatformApi(value: toList(), hasher: &hasher)
+  }
+}
+
+/// Generated class from Pigeon that represents data sent in messages.
+struct ThreeDS2ToolbarCustomizationDTO: Hashable {
+  var headerText: String? = nil
+  var textColor: String? = nil
+  var backgroundColor: String? = nil
+  var cancelButtonColor: String? = nil
+
+
+  // swift-format-ignore: AlwaysUseLowerCamelCase
+  static func fromList(_ pigeonVar_list: [Any?]) -> ThreeDS2ToolbarCustomizationDTO? {
+    let headerText: String? = nilOrValue(pigeonVar_list[0])
+    let textColor: String? = nilOrValue(pigeonVar_list[1])
+    let backgroundColor: String? = nilOrValue(pigeonVar_list[2])
+    let cancelButtonColor: String? = nilOrValue(pigeonVar_list[3])
+
+    return ThreeDS2ToolbarCustomizationDTO(
+      headerText: headerText,
+      textColor: textColor,
+      backgroundColor: backgroundColor,
+      cancelButtonColor: cancelButtonColor
+    )
+  }
+  func toList() -> [Any?] {
+    return [
+      headerText,
+      textColor,
+      backgroundColor,
+      cancelButtonColor,
+    ]
+  }
+  static func == (lhs: ThreeDS2ToolbarCustomizationDTO, rhs: ThreeDS2ToolbarCustomizationDTO) -> Bool {
+    return deepEqualsPlatformApi(lhs.toList(), rhs.toList())  }
+  func hash(into hasher: inout Hasher) {
+    deepHashPlatformApi(value: toList(), hasher: &hasher)
+  }
+}
+
+/// Generated class from Pigeon that represents data sent in messages.
 struct ThreeDS2ConfigurationDTO: Hashable {
   var requestorAppURL: String? = nil
+  var uiCustomization: ThreeDS2UICustomizationDTO? = nil
 
 
   // swift-format-ignore: AlwaysUseLowerCamelCase
   static func fromList(_ pigeonVar_list: [Any?]) -> ThreeDS2ConfigurationDTO? {
     let requestorAppURL: String? = nilOrValue(pigeonVar_list[0])
+    let uiCustomization: ThreeDS2UICustomizationDTO? = nilOrValue(pigeonVar_list[1])
 
     return ThreeDS2ConfigurationDTO(
-      requestorAppURL: requestorAppURL
+      requestorAppURL: requestorAppURL,
+      uiCustomization: uiCustomization
     )
   }
   func toList() -> [Any?] {
     return [
-      requestorAppURL
+      requestorAppURL,
+      uiCustomization,
     ]
   }
   static func == (lhs: ThreeDS2ConfigurationDTO, rhs: ThreeDS2ConfigurationDTO) -> Bool {
+    return deepEqualsPlatformApi(lhs.toList(), rhs.toList())  }
+  func hash(into hasher: inout Hasher) {
+    deepHashPlatformApi(value: toList(), hasher: &hasher)
+  }
+}
+
+/// Generated class from Pigeon that represents data sent in messages.
+struct DefaultInstallmentOptionsDTO: Hashable {
+  var values: [Int64?]
+  var includesRevolving: Bool
+
+
+  // swift-format-ignore: AlwaysUseLowerCamelCase
+  static func fromList(_ pigeonVar_list: [Any?]) -> DefaultInstallmentOptionsDTO? {
+    let values = pigeonVar_list[0] as! [Int64?]
+    let includesRevolving = pigeonVar_list[1] as! Bool
+
+    return DefaultInstallmentOptionsDTO(
+      values: values,
+      includesRevolving: includesRevolving
+    )
+  }
+  func toList() -> [Any?] {
+    return [
+      values,
+      includesRevolving,
+    ]
+  }
+  static func == (lhs: DefaultInstallmentOptionsDTO, rhs: DefaultInstallmentOptionsDTO) -> Bool {
+    return deepEqualsPlatformApi(lhs.toList(), rhs.toList())  }
+  func hash(into hasher: inout Hasher) {
+    deepHashPlatformApi(value: toList(), hasher: &hasher)
+  }
+}
+
+/// Generated class from Pigeon that represents data sent in messages.
+struct CardBasedInstallmentOptionsDTO: Hashable {
+  var values: [Int64?]
+  var includesRevolving: Bool
+  var cardBrand: String
+
+
+  // swift-format-ignore: AlwaysUseLowerCamelCase
+  static func fromList(_ pigeonVar_list: [Any?]) -> CardBasedInstallmentOptionsDTO? {
+    let values = pigeonVar_list[0] as! [Int64?]
+    let includesRevolving = pigeonVar_list[1] as! Bool
+    let cardBrand = pigeonVar_list[2] as! String
+
+    return CardBasedInstallmentOptionsDTO(
+      values: values,
+      includesRevolving: includesRevolving,
+      cardBrand: cardBrand
+    )
+  }
+  func toList() -> [Any?] {
+    return [
+      values,
+      includesRevolving,
+      cardBrand,
+    ]
+  }
+  static func == (lhs: CardBasedInstallmentOptionsDTO, rhs: CardBasedInstallmentOptionsDTO) -> Bool {
+    return deepEqualsPlatformApi(lhs.toList(), rhs.toList())  }
+  func hash(into hasher: inout Hasher) {
+    deepHashPlatformApi(value: toList(), hasher: &hasher)
+  }
+}
+
+/// Generated class from Pigeon that represents data sent in messages.
+struct InstallmentConfigurationDTO: Hashable {
+  var defaultOptions: DefaultInstallmentOptionsDTO? = nil
+  var cardBasedOptions: [CardBasedInstallmentOptionsDTO?]? = nil
+  var showInstallmentAmount: Bool
+
+
+  // swift-format-ignore: AlwaysUseLowerCamelCase
+  static func fromList(_ pigeonVar_list: [Any?]) -> InstallmentConfigurationDTO? {
+    let defaultOptions: DefaultInstallmentOptionsDTO? = nilOrValue(pigeonVar_list[0])
+    let cardBasedOptions: [CardBasedInstallmentOptionsDTO?]? = nilOrValue(pigeonVar_list[1])
+    let showInstallmentAmount = pigeonVar_list[2] as! Bool
+
+    return InstallmentConfigurationDTO(
+      defaultOptions: defaultOptions,
+      cardBasedOptions: cardBasedOptions,
+      showInstallmentAmount: showInstallmentAmount
+    )
+  }
+  func toList() -> [Any?] {
+    return [
+      defaultOptions,
+      cardBasedOptions,
+      showInstallmentAmount,
+    ]
+  }
+  static func == (lhs: InstallmentConfigurationDTO, rhs: InstallmentConfigurationDTO) -> Bool {
     return deepEqualsPlatformApi(lhs.toList(), rhs.toList())  }
   func hash(into hasher: inout Hasher) {
     deepHashPlatformApi(value: toList(), hasher: &hasher)
@@ -571,6 +938,7 @@ struct CardConfigurationDTO: Hashable {
   var kcpFieldVisibility: FieldVisibility
   var socialSecurityNumberFieldVisibility: FieldVisibility
   var supportedCardTypes: [String?]
+  var installmentConfiguration: InstallmentConfigurationDTO? = nil
 
 
   // swift-format-ignore: AlwaysUseLowerCamelCase
@@ -583,6 +951,7 @@ struct CardConfigurationDTO: Hashable {
     let kcpFieldVisibility = pigeonVar_list[5] as! FieldVisibility
     let socialSecurityNumberFieldVisibility = pigeonVar_list[6] as! FieldVisibility
     let supportedCardTypes = pigeonVar_list[7] as! [String?]
+    let installmentConfiguration: InstallmentConfigurationDTO? = nilOrValue(pigeonVar_list[8])
 
     return CardConfigurationDTO(
       holderNameRequired: holderNameRequired,
@@ -592,7 +961,8 @@ struct CardConfigurationDTO: Hashable {
       showCvc: showCvc,
       kcpFieldVisibility: kcpFieldVisibility,
       socialSecurityNumberFieldVisibility: socialSecurityNumberFieldVisibility,
-      supportedCardTypes: supportedCardTypes
+      supportedCardTypes: supportedCardTypes,
+      installmentConfiguration: installmentConfiguration
     )
   }
   func toList() -> [Any?] {
@@ -605,6 +975,7 @@ struct CardConfigurationDTO: Hashable {
       kcpFieldVisibility,
       socialSecurityNumberFieldVisibility,
       supportedCardTypes,
+      installmentConfiguration,
     ]
   }
   static func == (lhs: CardConfigurationDTO, rhs: CardConfigurationDTO) -> Bool {
@@ -1890,72 +2261,92 @@ private class PlatformApiPigeonCodecReader: FlutterStandardReader {
     case 150:
       return AnalyticsOptionsDTO.fromList(self.readValue() as! [Any?])
     case 151:
-      return ThreeDS2ConfigurationDTO.fromList(self.readValue() as! [Any?])
+      return ThreeDS2UICustomizationDTO.fromList(self.readValue() as! [Any?])
     case 152:
-      return CheckoutConfigurationDTO.fromList(self.readValue() as! [Any?])
+      return ThreeDS2ScreenCustomizationDTO.fromList(self.readValue() as! [Any?])
     case 153:
-      return DropInConfigurationDTO.fromList(self.readValue() as! [Any?])
+      return ThreeDS2ButtonCustomizationDTO.fromList(self.readValue() as! [Any?])
     case 154:
-      return CardConfigurationDTO.fromList(self.readValue() as! [Any?])
+      return ThreeDS2SelectionItemCustomizationDTO.fromList(self.readValue() as! [Any?])
     case 155:
-      return ApplePayConfigurationDTO.fromList(self.readValue() as! [Any?])
+      return ThreeDS2LabelCustomizationDTO.fromList(self.readValue() as! [Any?])
     case 156:
-      return ApplePayContactDTO.fromList(self.readValue() as! [Any?])
+      return ThreeDS2InputCustomizationDTO.fromList(self.readValue() as! [Any?])
     case 157:
-      return ApplePayShippingMethodDTO.fromList(self.readValue() as! [Any?])
+      return ThreeDS2ToolbarCustomizationDTO.fromList(self.readValue() as! [Any?])
     case 158:
-      return ApplePaySummaryItemDTO.fromList(self.readValue() as! [Any?])
+      return ThreeDS2ConfigurationDTO.fromList(self.readValue() as! [Any?])
     case 159:
-      return GooglePayConfigurationDTO.fromList(self.readValue() as! [Any?])
+      return DefaultInstallmentOptionsDTO.fromList(self.readValue() as! [Any?])
     case 160:
-      return MerchantInfoDTO.fromList(self.readValue() as! [Any?])
+      return CardBasedInstallmentOptionsDTO.fromList(self.readValue() as! [Any?])
     case 161:
-      return ShippingAddressParametersDTO.fromList(self.readValue() as! [Any?])
+      return InstallmentConfigurationDTO.fromList(self.readValue() as! [Any?])
     case 162:
-      return BillingAddressParametersDTO.fromList(self.readValue() as! [Any?])
+      return CheckoutConfigurationDTO.fromList(self.readValue() as! [Any?])
     case 163:
-      return CashAppPayConfigurationDTO.fromList(self.readValue() as! [Any?])
+      return DropInConfigurationDTO.fromList(self.readValue() as! [Any?])
     case 164:
-      return TwintConfigurationDTO.fromList(self.readValue() as! [Any?])
+      return CardConfigurationDTO.fromList(self.readValue() as! [Any?])
     case 165:
-      return PaymentResultDTO.fromList(self.readValue() as! [Any?])
+      return ApplePayConfigurationDTO.fromList(self.readValue() as! [Any?])
     case 166:
-      return PaymentResultModelDTO.fromList(self.readValue() as! [Any?])
+      return ApplePayContactDTO.fromList(self.readValue() as! [Any?])
     case 167:
-      return OrderResponseDTO.fromList(self.readValue() as! [Any?])
+      return ApplePayShippingMethodDTO.fromList(self.readValue() as! [Any?])
     case 168:
-      return FinishedResultDTO.fromList(self.readValue() as! [Any?])
+      return ApplePaySummaryItemDTO.fromList(self.readValue() as! [Any?])
     case 169:
-      return ActionResultDTO.fromList(self.readValue() as! [Any?])
+      return GooglePayConfigurationDTO.fromList(self.readValue() as! [Any?])
     case 170:
-      return ErrorResultDTO.fromList(self.readValue() as! [Any?])
+      return MerchantInfoDTO.fromList(self.readValue() as! [Any?])
     case 171:
-      return CheckoutEvent.fromList(self.readValue() as! [Any?])
+      return ShippingAddressParametersDTO.fromList(self.readValue() as! [Any?])
     case 172:
-      return ComponentCommunicationModel.fromList(self.readValue() as! [Any?])
+      return BillingAddressParametersDTO.fromList(self.readValue() as! [Any?])
     case 173:
-      return PlatformCommunicationDTO.fromList(self.readValue() as! [Any?])
+      return CashAppPayConfigurationDTO.fromList(self.readValue() as! [Any?])
     case 174:
-      return PaymentEventDTO.fromList(self.readValue() as! [Any?])
+      return TwintConfigurationDTO.fromList(self.readValue() as! [Any?])
     case 175:
-      return ErrorDTO.fromList(self.readValue() as! [Any?])
+      return PaymentResultDTO.fromList(self.readValue() as! [Any?])
     case 176:
-      return DeletedStoredPaymentMethodResultDTO.fromList(self.readValue() as! [Any?])
+      return PaymentResultModelDTO.fromList(self.readValue() as! [Any?])
     case 177:
-      return CardComponentConfigurationDTO.fromList(self.readValue() as! [Any?])
+      return OrderResponseDTO.fromList(self.readValue() as! [Any?])
     case 178:
-      return InstantPaymentConfigurationDTO.fromList(self.readValue() as! [Any?])
+      return FinishedResultDTO.fromList(self.readValue() as! [Any?])
     case 179:
-      return InstantPaymentSetupResultDTO.fromList(self.readValue() as! [Any?])
+      return ActionResultDTO.fromList(self.readValue() as! [Any?])
     case 180:
-      return UnencryptedCardDTO.fromList(self.readValue() as! [Any?])
+      return ErrorResultDTO.fromList(self.readValue() as! [Any?])
     case 181:
-      return EncryptedCardDTO.fromList(self.readValue() as! [Any?])
+      return CheckoutEvent.fromList(self.readValue() as! [Any?])
     case 182:
-      return ActionComponentConfigurationDTO.fromList(self.readValue() as! [Any?])
+      return ComponentCommunicationModel.fromList(self.readValue() as! [Any?])
     case 183:
-      return OrderCancelResultDTO.fromList(self.readValue() as! [Any?])
+      return PlatformCommunicationDTO.fromList(self.readValue() as! [Any?])
     case 184:
+      return PaymentEventDTO.fromList(self.readValue() as! [Any?])
+    case 185:
+      return ErrorDTO.fromList(self.readValue() as! [Any?])
+    case 186:
+      return DeletedStoredPaymentMethodResultDTO.fromList(self.readValue() as! [Any?])
+    case 187:
+      return CardComponentConfigurationDTO.fromList(self.readValue() as! [Any?])
+    case 188:
+      return InstantPaymentConfigurationDTO.fromList(self.readValue() as! [Any?])
+    case 189:
+      return InstantPaymentSetupResultDTO.fromList(self.readValue() as! [Any?])
+    case 190:
+      return UnencryptedCardDTO.fromList(self.readValue() as! [Any?])
+    case 191:
+      return EncryptedCardDTO.fromList(self.readValue() as! [Any?])
+    case 192:
+      return ActionComponentConfigurationDTO.fromList(self.readValue() as! [Any?])
+    case 193:
+      return OrderCancelResultDTO.fromList(self.readValue() as! [Any?])
+    case 194:
       return BinLookupDataDTO.fromList(self.readValue() as! [Any?])
     default:
       return super.readValue(ofType: type)
@@ -2031,107 +2422,137 @@ private class PlatformApiPigeonCodecWriter: FlutterStandardWriter {
     } else if let value = value as? AnalyticsOptionsDTO {
       super.writeByte(150)
       super.writeValue(value.toList())
-    } else if let value = value as? ThreeDS2ConfigurationDTO {
+    } else if let value = value as? ThreeDS2UICustomizationDTO {
       super.writeByte(151)
       super.writeValue(value.toList())
-    } else if let value = value as? CheckoutConfigurationDTO {
+    } else if let value = value as? ThreeDS2ScreenCustomizationDTO {
       super.writeByte(152)
       super.writeValue(value.toList())
-    } else if let value = value as? DropInConfigurationDTO {
+    } else if let value = value as? ThreeDS2ButtonCustomizationDTO {
       super.writeByte(153)
       super.writeValue(value.toList())
-    } else if let value = value as? CardConfigurationDTO {
+    } else if let value = value as? ThreeDS2SelectionItemCustomizationDTO {
       super.writeByte(154)
       super.writeValue(value.toList())
-    } else if let value = value as? ApplePayConfigurationDTO {
+    } else if let value = value as? ThreeDS2LabelCustomizationDTO {
       super.writeByte(155)
       super.writeValue(value.toList())
-    } else if let value = value as? ApplePayContactDTO {
+    } else if let value = value as? ThreeDS2InputCustomizationDTO {
       super.writeByte(156)
       super.writeValue(value.toList())
-    } else if let value = value as? ApplePayShippingMethodDTO {
+    } else if let value = value as? ThreeDS2ToolbarCustomizationDTO {
       super.writeByte(157)
       super.writeValue(value.toList())
-    } else if let value = value as? ApplePaySummaryItemDTO {
+    } else if let value = value as? ThreeDS2ConfigurationDTO {
       super.writeByte(158)
       super.writeValue(value.toList())
-    } else if let value = value as? GooglePayConfigurationDTO {
+    } else if let value = value as? DefaultInstallmentOptionsDTO {
       super.writeByte(159)
       super.writeValue(value.toList())
-    } else if let value = value as? MerchantInfoDTO {
+    } else if let value = value as? CardBasedInstallmentOptionsDTO {
       super.writeByte(160)
       super.writeValue(value.toList())
-    } else if let value = value as? ShippingAddressParametersDTO {
+    } else if let value = value as? InstallmentConfigurationDTO {
       super.writeByte(161)
       super.writeValue(value.toList())
-    } else if let value = value as? BillingAddressParametersDTO {
+    } else if let value = value as? CheckoutConfigurationDTO {
       super.writeByte(162)
       super.writeValue(value.toList())
-    } else if let value = value as? CashAppPayConfigurationDTO {
+    } else if let value = value as? DropInConfigurationDTO {
       super.writeByte(163)
       super.writeValue(value.toList())
-    } else if let value = value as? TwintConfigurationDTO {
+    } else if let value = value as? CardConfigurationDTO {
       super.writeByte(164)
       super.writeValue(value.toList())
-    } else if let value = value as? PaymentResultDTO {
+    } else if let value = value as? ApplePayConfigurationDTO {
       super.writeByte(165)
       super.writeValue(value.toList())
-    } else if let value = value as? PaymentResultModelDTO {
+    } else if let value = value as? ApplePayContactDTO {
       super.writeByte(166)
       super.writeValue(value.toList())
-    } else if let value = value as? OrderResponseDTO {
+    } else if let value = value as? ApplePayShippingMethodDTO {
       super.writeByte(167)
       super.writeValue(value.toList())
-    } else if let value = value as? FinishedResultDTO {
+    } else if let value = value as? ApplePaySummaryItemDTO {
       super.writeByte(168)
       super.writeValue(value.toList())
-    } else if let value = value as? ActionResultDTO {
+    } else if let value = value as? GooglePayConfigurationDTO {
       super.writeByte(169)
       super.writeValue(value.toList())
-    } else if let value = value as? ErrorResultDTO {
+    } else if let value = value as? MerchantInfoDTO {
       super.writeByte(170)
       super.writeValue(value.toList())
-    } else if let value = value as? CheckoutEvent {
+    } else if let value = value as? ShippingAddressParametersDTO {
       super.writeByte(171)
       super.writeValue(value.toList())
-    } else if let value = value as? ComponentCommunicationModel {
+    } else if let value = value as? BillingAddressParametersDTO {
       super.writeByte(172)
       super.writeValue(value.toList())
-    } else if let value = value as? PlatformCommunicationDTO {
+    } else if let value = value as? CashAppPayConfigurationDTO {
       super.writeByte(173)
       super.writeValue(value.toList())
-    } else if let value = value as? PaymentEventDTO {
+    } else if let value = value as? TwintConfigurationDTO {
       super.writeByte(174)
       super.writeValue(value.toList())
-    } else if let value = value as? ErrorDTO {
+    } else if let value = value as? PaymentResultDTO {
       super.writeByte(175)
       super.writeValue(value.toList())
-    } else if let value = value as? DeletedStoredPaymentMethodResultDTO {
+    } else if let value = value as? PaymentResultModelDTO {
       super.writeByte(176)
       super.writeValue(value.toList())
-    } else if let value = value as? CardComponentConfigurationDTO {
+    } else if let value = value as? OrderResponseDTO {
       super.writeByte(177)
       super.writeValue(value.toList())
-    } else if let value = value as? InstantPaymentConfigurationDTO {
+    } else if let value = value as? FinishedResultDTO {
       super.writeByte(178)
       super.writeValue(value.toList())
-    } else if let value = value as? InstantPaymentSetupResultDTO {
+    } else if let value = value as? ActionResultDTO {
       super.writeByte(179)
       super.writeValue(value.toList())
-    } else if let value = value as? UnencryptedCardDTO {
+    } else if let value = value as? ErrorResultDTO {
       super.writeByte(180)
       super.writeValue(value.toList())
-    } else if let value = value as? EncryptedCardDTO {
+    } else if let value = value as? CheckoutEvent {
       super.writeByte(181)
       super.writeValue(value.toList())
-    } else if let value = value as? ActionComponentConfigurationDTO {
+    } else if let value = value as? ComponentCommunicationModel {
       super.writeByte(182)
       super.writeValue(value.toList())
-    } else if let value = value as? OrderCancelResultDTO {
+    } else if let value = value as? PlatformCommunicationDTO {
       super.writeByte(183)
       super.writeValue(value.toList())
-    } else if let value = value as? BinLookupDataDTO {
+    } else if let value = value as? PaymentEventDTO {
       super.writeByte(184)
+      super.writeValue(value.toList())
+    } else if let value = value as? ErrorDTO {
+      super.writeByte(185)
+      super.writeValue(value.toList())
+    } else if let value = value as? DeletedStoredPaymentMethodResultDTO {
+      super.writeByte(186)
+      super.writeValue(value.toList())
+    } else if let value = value as? CardComponentConfigurationDTO {
+      super.writeByte(187)
+      super.writeValue(value.toList())
+    } else if let value = value as? InstantPaymentConfigurationDTO {
+      super.writeByte(188)
+      super.writeValue(value.toList())
+    } else if let value = value as? InstantPaymentSetupResultDTO {
+      super.writeByte(189)
+      super.writeValue(value.toList())
+    } else if let value = value as? UnencryptedCardDTO {
+      super.writeByte(190)
+      super.writeValue(value.toList())
+    } else if let value = value as? EncryptedCardDTO {
+      super.writeByte(191)
+      super.writeValue(value.toList())
+    } else if let value = value as? ActionComponentConfigurationDTO {
+      super.writeByte(192)
+      super.writeValue(value.toList())
+    } else if let value = value as? OrderCancelResultDTO {
+      super.writeByte(193)
+      super.writeValue(value.toList())
+    } else if let value = value as? BinLookupDataDTO {
+      super.writeByte(194)
       super.writeValue(value.toList())
     } else {
       super.writeValue(value)

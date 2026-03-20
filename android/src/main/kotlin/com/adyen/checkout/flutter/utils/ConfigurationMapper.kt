@@ -3,6 +3,8 @@ package com.adyen.checkout.flutter.utils
 import com.adyen.checkout.card.FieldMode
 import com.adyen.checkout.card.card
 import com.adyen.checkout.card.old.AddressConfiguration
+import com.adyen.checkout.card.old.InstallmentConfiguration
+import com.adyen.checkout.card.old.InstallmentOptions
 import com.adyen.checkout.components.core.OrderResponse
 import com.adyen.checkout.core.common.CardBrand
 import com.adyen.checkout.core.common.PaymentResult
@@ -249,6 +251,7 @@ object ConfigurationMapper {
             Environment.AUSTRALIA -> SDKEnvironment.LIVE_AUSTRALIA
             Environment.INDIA -> SDKEnvironment.LIVE_INDIA
             Environment.APSE -> SDKEnvironment.LIVE_APSE
+            Environment.NEA -> SDKEnvironment.LIVE_NEA
         }
 
     private fun AnalyticsOptionsDTO.mapToAnalyticsConfiguration(): AnalyticsConfiguration {
@@ -424,6 +427,6 @@ object ConfigurationMapper {
         InstallmentOptions.CardBasedInstallmentOptions(
             values = (values as List<Number?>).mapNotNull { it?.toInt() },
             includeRevolving = includesRevolving,
-            cardBrand = CardBrand(txVariant = cardBrand)
+            cardBrand = com.adyen.checkout.core.old.CardBrand(txVariant = cardBrand)
         )
 }

@@ -46,6 +46,7 @@ enum Environment {
   australia,
   india,
   apse,
+  nea,
 }
 
 enum AddressMode {
@@ -345,16 +346,422 @@ class AnalyticsOptionsDTO {
 ;
 }
 
+class ThreeDS2UICustomizationDTO {
+  ThreeDS2UICustomizationDTO({
+    this.screenCustomization,
+    this.headingCustomization,
+    this.labelCustomization,
+    this.inputCustomization,
+    this.selectionItemCustomization,
+    this.primaryButtonCustomization,
+    this.secondaryButtonCustomization,
+  });
+
+  ThreeDS2ScreenCustomizationDTO? screenCustomization;
+
+  ThreeDS2ToolbarCustomizationDTO? headingCustomization;
+
+  ThreeDS2LabelCustomizationDTO? labelCustomization;
+
+  ThreeDS2InputCustomizationDTO? inputCustomization;
+
+  ThreeDS2SelectionItemCustomizationDTO? selectionItemCustomization;
+
+  ThreeDS2ButtonCustomizationDTO? primaryButtonCustomization;
+
+  ThreeDS2ButtonCustomizationDTO? secondaryButtonCustomization;
+
+  List<Object?> _toList() {
+    return <Object?>[
+      screenCustomization,
+      headingCustomization,
+      labelCustomization,
+      inputCustomization,
+      selectionItemCustomization,
+      primaryButtonCustomization,
+      secondaryButtonCustomization,
+    ];
+  }
+
+  Object encode() {
+    return _toList();  }
+
+  static ThreeDS2UICustomizationDTO decode(Object result) {
+    result as List<Object?>;
+    return ThreeDS2UICustomizationDTO(
+      screenCustomization: result[0] as ThreeDS2ScreenCustomizationDTO?,
+      headingCustomization: result[1] as ThreeDS2ToolbarCustomizationDTO?,
+      labelCustomization: result[2] as ThreeDS2LabelCustomizationDTO?,
+      inputCustomization: result[3] as ThreeDS2InputCustomizationDTO?,
+      selectionItemCustomization: result[4] as ThreeDS2SelectionItemCustomizationDTO?,
+      primaryButtonCustomization: result[5] as ThreeDS2ButtonCustomizationDTO?,
+      secondaryButtonCustomization: result[6] as ThreeDS2ButtonCustomizationDTO?,
+    );
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  bool operator ==(Object other) {
+    if (other is! ThreeDS2UICustomizationDTO || other.runtimeType != runtimeType) {
+      return false;
+    }
+    if (identical(this, other)) {
+      return true;
+    }
+    return _deepEquals(encode(), other.encode());
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  int get hashCode => Object.hashAll(_toList())
+;
+}
+
+class ThreeDS2ScreenCustomizationDTO {
+  ThreeDS2ScreenCustomizationDTO({
+    this.backgroundColor,
+    this.textColor,
+  });
+
+  String? backgroundColor;
+
+  String? textColor;
+
+  List<Object?> _toList() {
+    return <Object?>[
+      backgroundColor,
+      textColor,
+    ];
+  }
+
+  Object encode() {
+    return _toList();  }
+
+  static ThreeDS2ScreenCustomizationDTO decode(Object result) {
+    result as List<Object?>;
+    return ThreeDS2ScreenCustomizationDTO(
+      backgroundColor: result[0] as String?,
+      textColor: result[1] as String?,
+    );
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  bool operator ==(Object other) {
+    if (other is! ThreeDS2ScreenCustomizationDTO || other.runtimeType != runtimeType) {
+      return false;
+    }
+    if (identical(this, other)) {
+      return true;
+    }
+    return _deepEquals(encode(), other.encode());
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  int get hashCode => Object.hashAll(_toList())
+;
+}
+
+class ThreeDS2ButtonCustomizationDTO {
+  ThreeDS2ButtonCustomizationDTO({
+    this.backgroundColor,
+    this.textColor,
+    this.cornerRadius,
+    this.textFontSize,
+  });
+
+  String? backgroundColor;
+
+  String? textColor;
+
+  int? cornerRadius;
+
+  int? textFontSize;
+
+  List<Object?> _toList() {
+    return <Object?>[
+      backgroundColor,
+      textColor,
+      cornerRadius,
+      textFontSize,
+    ];
+  }
+
+  Object encode() {
+    return _toList();  }
+
+  static ThreeDS2ButtonCustomizationDTO decode(Object result) {
+    result as List<Object?>;
+    return ThreeDS2ButtonCustomizationDTO(
+      backgroundColor: result[0] as String?,
+      textColor: result[1] as String?,
+      cornerRadius: result[2] as int?,
+      textFontSize: result[3] as int?,
+    );
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  bool operator ==(Object other) {
+    if (other is! ThreeDS2ButtonCustomizationDTO || other.runtimeType != runtimeType) {
+      return false;
+    }
+    if (identical(this, other)) {
+      return true;
+    }
+    return _deepEquals(encode(), other.encode());
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  int get hashCode => Object.hashAll(_toList())
+;
+}
+
+class ThreeDS2SelectionItemCustomizationDTO {
+  ThreeDS2SelectionItemCustomizationDTO({
+    this.selectionIndicatorTintColor,
+    this.highlightedBackgroundColor,
+    this.textColor,
+  });
+
+  String? selectionIndicatorTintColor;
+
+  String? highlightedBackgroundColor;
+
+  String? textColor;
+
+  List<Object?> _toList() {
+    return <Object?>[
+      selectionIndicatorTintColor,
+      highlightedBackgroundColor,
+      textColor,
+    ];
+  }
+
+  Object encode() {
+    return _toList();  }
+
+  static ThreeDS2SelectionItemCustomizationDTO decode(Object result) {
+    result as List<Object?>;
+    return ThreeDS2SelectionItemCustomizationDTO(
+      selectionIndicatorTintColor: result[0] as String?,
+      highlightedBackgroundColor: result[1] as String?,
+      textColor: result[2] as String?,
+    );
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  bool operator ==(Object other) {
+    if (other is! ThreeDS2SelectionItemCustomizationDTO || other.runtimeType != runtimeType) {
+      return false;
+    }
+    if (identical(this, other)) {
+      return true;
+    }
+    return _deepEquals(encode(), other.encode());
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  int get hashCode => Object.hashAll(_toList())
+;
+}
+
+class ThreeDS2LabelCustomizationDTO {
+  ThreeDS2LabelCustomizationDTO({
+    this.headingTextColor,
+    this.headingTextFontSize,
+    this.inputLabelTextColor,
+    this.inputLabelFontSize,
+    this.textColor,
+    this.textFontSize,
+  });
+
+  String? headingTextColor;
+
+  int? headingTextFontSize;
+
+  String? inputLabelTextColor;
+
+  int? inputLabelFontSize;
+
+  String? textColor;
+
+  int? textFontSize;
+
+  List<Object?> _toList() {
+    return <Object?>[
+      headingTextColor,
+      headingTextFontSize,
+      inputLabelTextColor,
+      inputLabelFontSize,
+      textColor,
+      textFontSize,
+    ];
+  }
+
+  Object encode() {
+    return _toList();  }
+
+  static ThreeDS2LabelCustomizationDTO decode(Object result) {
+    result as List<Object?>;
+    return ThreeDS2LabelCustomizationDTO(
+      headingTextColor: result[0] as String?,
+      headingTextFontSize: result[1] as int?,
+      inputLabelTextColor: result[2] as String?,
+      inputLabelFontSize: result[3] as int?,
+      textColor: result[4] as String?,
+      textFontSize: result[5] as int?,
+    );
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  bool operator ==(Object other) {
+    if (other is! ThreeDS2LabelCustomizationDTO || other.runtimeType != runtimeType) {
+      return false;
+    }
+    if (identical(this, other)) {
+      return true;
+    }
+    return _deepEquals(encode(), other.encode());
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  int get hashCode => Object.hashAll(_toList())
+;
+}
+
+class ThreeDS2InputCustomizationDTO {
+  ThreeDS2InputCustomizationDTO({
+    this.borderColor,
+    this.borderWidth,
+    this.cornerRadius,
+    this.textColor,
+  });
+
+  String? borderColor;
+
+  int? borderWidth;
+
+  int? cornerRadius;
+
+  String? textColor;
+
+  List<Object?> _toList() {
+    return <Object?>[
+      borderColor,
+      borderWidth,
+      cornerRadius,
+      textColor,
+    ];
+  }
+
+  Object encode() {
+    return _toList();  }
+
+  static ThreeDS2InputCustomizationDTO decode(Object result) {
+    result as List<Object?>;
+    return ThreeDS2InputCustomizationDTO(
+      borderColor: result[0] as String?,
+      borderWidth: result[1] as int?,
+      cornerRadius: result[2] as int?,
+      textColor: result[3] as String?,
+    );
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  bool operator ==(Object other) {
+    if (other is! ThreeDS2InputCustomizationDTO || other.runtimeType != runtimeType) {
+      return false;
+    }
+    if (identical(this, other)) {
+      return true;
+    }
+    return _deepEquals(encode(), other.encode());
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  int get hashCode => Object.hashAll(_toList())
+;
+}
+
+class ThreeDS2ToolbarCustomizationDTO {
+  ThreeDS2ToolbarCustomizationDTO({
+    this.headerText,
+    this.textColor,
+    this.backgroundColor,
+    this.cancelButtonColor,
+  });
+
+  String? headerText;
+
+  String? textColor;
+
+  String? backgroundColor;
+
+  String? cancelButtonColor;
+
+  List<Object?> _toList() {
+    return <Object?>[
+      headerText,
+      textColor,
+      backgroundColor,
+      cancelButtonColor,
+    ];
+  }
+
+  Object encode() {
+    return _toList();  }
+
+  static ThreeDS2ToolbarCustomizationDTO decode(Object result) {
+    result as List<Object?>;
+    return ThreeDS2ToolbarCustomizationDTO(
+      headerText: result[0] as String?,
+      textColor: result[1] as String?,
+      backgroundColor: result[2] as String?,
+      cancelButtonColor: result[3] as String?,
+    );
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  bool operator ==(Object other) {
+    if (other is! ThreeDS2ToolbarCustomizationDTO || other.runtimeType != runtimeType) {
+      return false;
+    }
+    if (identical(this, other)) {
+      return true;
+    }
+    return _deepEquals(encode(), other.encode());
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  int get hashCode => Object.hashAll(_toList())
+;
+}
+
 class ThreeDS2ConfigurationDTO {
   ThreeDS2ConfigurationDTO({
     this.requestorAppURL,
+    this.uiCustomization,
   });
 
   String? requestorAppURL;
 
+  ThreeDS2UICustomizationDTO? uiCustomization;
+
   List<Object?> _toList() {
     return <Object?>[
       requestorAppURL,
+      uiCustomization,
     ];
   }
 
@@ -365,6 +772,7 @@ class ThreeDS2ConfigurationDTO {
     result as List<Object?>;
     return ThreeDS2ConfigurationDTO(
       requestorAppURL: result[0] as String?,
+      uiCustomization: result[1] as ThreeDS2UICustomizationDTO?,
     );
   }
 
@@ -372,6 +780,154 @@ class ThreeDS2ConfigurationDTO {
   // ignore: avoid_equals_and_hash_code_on_mutable_classes
   bool operator ==(Object other) {
     if (other is! ThreeDS2ConfigurationDTO || other.runtimeType != runtimeType) {
+      return false;
+    }
+    if (identical(this, other)) {
+      return true;
+    }
+    return _deepEquals(encode(), other.encode());
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  int get hashCode => Object.hashAll(_toList())
+;
+}
+
+class DefaultInstallmentOptionsDTO {
+  DefaultInstallmentOptionsDTO({
+    required this.values,
+    required this.includesRevolving,
+  });
+
+  List<int?> values;
+
+  bool includesRevolving;
+
+  List<Object?> _toList() {
+    return <Object?>[
+      values,
+      includesRevolving,
+    ];
+  }
+
+  Object encode() {
+    return _toList();  }
+
+  static DefaultInstallmentOptionsDTO decode(Object result) {
+    result as List<Object?>;
+    return DefaultInstallmentOptionsDTO(
+      values: (result[0] as List<Object?>?)!.cast<int?>(),
+      includesRevolving: result[1]! as bool,
+    );
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  bool operator ==(Object other) {
+    if (other is! DefaultInstallmentOptionsDTO || other.runtimeType != runtimeType) {
+      return false;
+    }
+    if (identical(this, other)) {
+      return true;
+    }
+    return _deepEquals(encode(), other.encode());
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  int get hashCode => Object.hashAll(_toList())
+;
+}
+
+class CardBasedInstallmentOptionsDTO {
+  CardBasedInstallmentOptionsDTO({
+    required this.values,
+    required this.includesRevolving,
+    required this.cardBrand,
+  });
+
+  List<int?> values;
+
+  bool includesRevolving;
+
+  String cardBrand;
+
+  List<Object?> _toList() {
+    return <Object?>[
+      values,
+      includesRevolving,
+      cardBrand,
+    ];
+  }
+
+  Object encode() {
+    return _toList();  }
+
+  static CardBasedInstallmentOptionsDTO decode(Object result) {
+    result as List<Object?>;
+    return CardBasedInstallmentOptionsDTO(
+      values: (result[0] as List<Object?>?)!.cast<int?>(),
+      includesRevolving: result[1]! as bool,
+      cardBrand: result[2]! as String,
+    );
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  bool operator ==(Object other) {
+    if (other is! CardBasedInstallmentOptionsDTO || other.runtimeType != runtimeType) {
+      return false;
+    }
+    if (identical(this, other)) {
+      return true;
+    }
+    return _deepEquals(encode(), other.encode());
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  int get hashCode => Object.hashAll(_toList())
+;
+}
+
+class InstallmentConfigurationDTO {
+  InstallmentConfigurationDTO({
+    this.defaultOptions,
+    this.cardBasedOptions,
+    required this.showInstallmentAmount,
+  });
+
+  DefaultInstallmentOptionsDTO? defaultOptions;
+
+  List<CardBasedInstallmentOptionsDTO?>? cardBasedOptions;
+
+  bool showInstallmentAmount;
+
+  List<Object?> _toList() {
+    return <Object?>[
+      defaultOptions,
+      cardBasedOptions,
+      showInstallmentAmount,
+    ];
+  }
+
+  Object encode() {
+    return _toList();  }
+
+  static InstallmentConfigurationDTO decode(Object result) {
+    result as List<Object?>;
+    return InstallmentConfigurationDTO(
+      defaultOptions: result[0] as DefaultInstallmentOptionsDTO?,
+      cardBasedOptions: (result[1] as List<Object?>?)?.cast<CardBasedInstallmentOptionsDTO?>(),
+      showInstallmentAmount: result[2]! as bool,
+    );
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  bool operator ==(Object other) {
+    if (other is! InstallmentConfigurationDTO || other.runtimeType != runtimeType) {
       return false;
     }
     if (identical(this, other)) {
@@ -623,6 +1179,7 @@ class CardConfigurationDTO {
     required this.kcpFieldVisibility,
     required this.socialSecurityNumberFieldVisibility,
     required this.supportedCardTypes,
+    this.installmentConfiguration,
   });
 
   bool holderNameRequired;
@@ -641,6 +1198,8 @@ class CardConfigurationDTO {
 
   List<String?> supportedCardTypes;
 
+  InstallmentConfigurationDTO? installmentConfiguration;
+
   List<Object?> _toList() {
     return <Object?>[
       holderNameRequired,
@@ -651,6 +1210,7 @@ class CardConfigurationDTO {
       kcpFieldVisibility,
       socialSecurityNumberFieldVisibility,
       supportedCardTypes,
+      installmentConfiguration,
     ];
   }
 
@@ -668,6 +1228,7 @@ class CardConfigurationDTO {
       kcpFieldVisibility: result[5]! as FieldVisibility,
       socialSecurityNumberFieldVisibility: result[6]! as FieldVisibility,
       supportedCardTypes: (result[7] as List<Object?>?)!.cast<String?>(),
+      installmentConfiguration: result[8] as InstallmentConfigurationDTO?,
     );
   }
 
@@ -2496,107 +3057,137 @@ class _PigeonCodec extends StandardMessageCodec {
     }    else if (value is AnalyticsOptionsDTO) {
       buffer.putUint8(150);
       writeValue(buffer, value.encode());
-    }    else if (value is ThreeDS2ConfigurationDTO) {
+    }    else if (value is ThreeDS2UICustomizationDTO) {
       buffer.putUint8(151);
       writeValue(buffer, value.encode());
-    }    else if (value is CheckoutConfigurationDTO) {
+    }    else if (value is ThreeDS2ScreenCustomizationDTO) {
       buffer.putUint8(152);
       writeValue(buffer, value.encode());
-    }    else if (value is DropInConfigurationDTO) {
+    }    else if (value is ThreeDS2ButtonCustomizationDTO) {
       buffer.putUint8(153);
       writeValue(buffer, value.encode());
-    }    else if (value is CardConfigurationDTO) {
+    }    else if (value is ThreeDS2SelectionItemCustomizationDTO) {
       buffer.putUint8(154);
       writeValue(buffer, value.encode());
-    }    else if (value is ApplePayConfigurationDTO) {
+    }    else if (value is ThreeDS2LabelCustomizationDTO) {
       buffer.putUint8(155);
       writeValue(buffer, value.encode());
-    }    else if (value is ApplePayContactDTO) {
+    }    else if (value is ThreeDS2InputCustomizationDTO) {
       buffer.putUint8(156);
       writeValue(buffer, value.encode());
-    }    else if (value is ApplePayShippingMethodDTO) {
+    }    else if (value is ThreeDS2ToolbarCustomizationDTO) {
       buffer.putUint8(157);
       writeValue(buffer, value.encode());
-    }    else if (value is ApplePaySummaryItemDTO) {
+    }    else if (value is ThreeDS2ConfigurationDTO) {
       buffer.putUint8(158);
       writeValue(buffer, value.encode());
-    }    else if (value is GooglePayConfigurationDTO) {
+    }    else if (value is DefaultInstallmentOptionsDTO) {
       buffer.putUint8(159);
       writeValue(buffer, value.encode());
-    }    else if (value is MerchantInfoDTO) {
+    }    else if (value is CardBasedInstallmentOptionsDTO) {
       buffer.putUint8(160);
       writeValue(buffer, value.encode());
-    }    else if (value is ShippingAddressParametersDTO) {
+    }    else if (value is InstallmentConfigurationDTO) {
       buffer.putUint8(161);
       writeValue(buffer, value.encode());
-    }    else if (value is BillingAddressParametersDTO) {
+    }    else if (value is CheckoutConfigurationDTO) {
       buffer.putUint8(162);
       writeValue(buffer, value.encode());
-    }    else if (value is CashAppPayConfigurationDTO) {
+    }    else if (value is DropInConfigurationDTO) {
       buffer.putUint8(163);
       writeValue(buffer, value.encode());
-    }    else if (value is TwintConfigurationDTO) {
+    }    else if (value is CardConfigurationDTO) {
       buffer.putUint8(164);
       writeValue(buffer, value.encode());
-    }    else if (value is PaymentResultDTO) {
+    }    else if (value is ApplePayConfigurationDTO) {
       buffer.putUint8(165);
       writeValue(buffer, value.encode());
-    }    else if (value is PaymentResultModelDTO) {
+    }    else if (value is ApplePayContactDTO) {
       buffer.putUint8(166);
       writeValue(buffer, value.encode());
-    }    else if (value is OrderResponseDTO) {
+    }    else if (value is ApplePayShippingMethodDTO) {
       buffer.putUint8(167);
       writeValue(buffer, value.encode());
-    }    else if (value is FinishedResultDTO) {
+    }    else if (value is ApplePaySummaryItemDTO) {
       buffer.putUint8(168);
       writeValue(buffer, value.encode());
-    }    else if (value is ActionResultDTO) {
+    }    else if (value is GooglePayConfigurationDTO) {
       buffer.putUint8(169);
       writeValue(buffer, value.encode());
-    }    else if (value is ErrorResultDTO) {
+    }    else if (value is MerchantInfoDTO) {
       buffer.putUint8(170);
       writeValue(buffer, value.encode());
-    }    else if (value is CheckoutEvent) {
+    }    else if (value is ShippingAddressParametersDTO) {
       buffer.putUint8(171);
       writeValue(buffer, value.encode());
-    }    else if (value is ComponentCommunicationModel) {
+    }    else if (value is BillingAddressParametersDTO) {
       buffer.putUint8(172);
       writeValue(buffer, value.encode());
-    }    else if (value is PlatformCommunicationDTO) {
+    }    else if (value is CashAppPayConfigurationDTO) {
       buffer.putUint8(173);
       writeValue(buffer, value.encode());
-    }    else if (value is PaymentEventDTO) {
+    }    else if (value is TwintConfigurationDTO) {
       buffer.putUint8(174);
       writeValue(buffer, value.encode());
-    }    else if (value is ErrorDTO) {
+    }    else if (value is PaymentResultDTO) {
       buffer.putUint8(175);
       writeValue(buffer, value.encode());
-    }    else if (value is DeletedStoredPaymentMethodResultDTO) {
+    }    else if (value is PaymentResultModelDTO) {
       buffer.putUint8(176);
       writeValue(buffer, value.encode());
-    }    else if (value is CardComponentConfigurationDTO) {
+    }    else if (value is OrderResponseDTO) {
       buffer.putUint8(177);
       writeValue(buffer, value.encode());
-    }    else if (value is InstantPaymentConfigurationDTO) {
+    }    else if (value is FinishedResultDTO) {
       buffer.putUint8(178);
       writeValue(buffer, value.encode());
-    }    else if (value is InstantPaymentSetupResultDTO) {
+    }    else if (value is ActionResultDTO) {
       buffer.putUint8(179);
       writeValue(buffer, value.encode());
-    }    else if (value is UnencryptedCardDTO) {
+    }    else if (value is ErrorResultDTO) {
       buffer.putUint8(180);
       writeValue(buffer, value.encode());
-    }    else if (value is EncryptedCardDTO) {
+    }    else if (value is CheckoutEvent) {
       buffer.putUint8(181);
       writeValue(buffer, value.encode());
-    }    else if (value is ActionComponentConfigurationDTO) {
+    }    else if (value is ComponentCommunicationModel) {
       buffer.putUint8(182);
       writeValue(buffer, value.encode());
-    }    else if (value is OrderCancelResultDTO) {
+    }    else if (value is PlatformCommunicationDTO) {
       buffer.putUint8(183);
       writeValue(buffer, value.encode());
-    }    else if (value is BinLookupDataDTO) {
+    }    else if (value is PaymentEventDTO) {
       buffer.putUint8(184);
+      writeValue(buffer, value.encode());
+    }    else if (value is ErrorDTO) {
+      buffer.putUint8(185);
+      writeValue(buffer, value.encode());
+    }    else if (value is DeletedStoredPaymentMethodResultDTO) {
+      buffer.putUint8(186);
+      writeValue(buffer, value.encode());
+    }    else if (value is CardComponentConfigurationDTO) {
+      buffer.putUint8(187);
+      writeValue(buffer, value.encode());
+    }    else if (value is InstantPaymentConfigurationDTO) {
+      buffer.putUint8(188);
+      writeValue(buffer, value.encode());
+    }    else if (value is InstantPaymentSetupResultDTO) {
+      buffer.putUint8(189);
+      writeValue(buffer, value.encode());
+    }    else if (value is UnencryptedCardDTO) {
+      buffer.putUint8(190);
+      writeValue(buffer, value.encode());
+    }    else if (value is EncryptedCardDTO) {
+      buffer.putUint8(191);
+      writeValue(buffer, value.encode());
+    }    else if (value is ActionComponentConfigurationDTO) {
+      buffer.putUint8(192);
+      writeValue(buffer, value.encode());
+    }    else if (value is OrderCancelResultDTO) {
+      buffer.putUint8(193);
+      writeValue(buffer, value.encode());
+    }    else if (value is BinLookupDataDTO) {
+      buffer.putUint8(194);
       writeValue(buffer, value.encode());
     } else {
       super.writeValue(buffer, value);
@@ -2669,72 +3260,92 @@ class _PigeonCodec extends StandardMessageCodec {
       case 150: 
         return AnalyticsOptionsDTO.decode(readValue(buffer)!);
       case 151: 
-        return ThreeDS2ConfigurationDTO.decode(readValue(buffer)!);
+        return ThreeDS2UICustomizationDTO.decode(readValue(buffer)!);
       case 152: 
-        return CheckoutConfigurationDTO.decode(readValue(buffer)!);
+        return ThreeDS2ScreenCustomizationDTO.decode(readValue(buffer)!);
       case 153: 
-        return DropInConfigurationDTO.decode(readValue(buffer)!);
+        return ThreeDS2ButtonCustomizationDTO.decode(readValue(buffer)!);
       case 154: 
-        return CardConfigurationDTO.decode(readValue(buffer)!);
+        return ThreeDS2SelectionItemCustomizationDTO.decode(readValue(buffer)!);
       case 155: 
-        return ApplePayConfigurationDTO.decode(readValue(buffer)!);
+        return ThreeDS2LabelCustomizationDTO.decode(readValue(buffer)!);
       case 156: 
-        return ApplePayContactDTO.decode(readValue(buffer)!);
+        return ThreeDS2InputCustomizationDTO.decode(readValue(buffer)!);
       case 157: 
-        return ApplePayShippingMethodDTO.decode(readValue(buffer)!);
+        return ThreeDS2ToolbarCustomizationDTO.decode(readValue(buffer)!);
       case 158: 
-        return ApplePaySummaryItemDTO.decode(readValue(buffer)!);
+        return ThreeDS2ConfigurationDTO.decode(readValue(buffer)!);
       case 159: 
-        return GooglePayConfigurationDTO.decode(readValue(buffer)!);
+        return DefaultInstallmentOptionsDTO.decode(readValue(buffer)!);
       case 160: 
-        return MerchantInfoDTO.decode(readValue(buffer)!);
+        return CardBasedInstallmentOptionsDTO.decode(readValue(buffer)!);
       case 161: 
-        return ShippingAddressParametersDTO.decode(readValue(buffer)!);
+        return InstallmentConfigurationDTO.decode(readValue(buffer)!);
       case 162: 
-        return BillingAddressParametersDTO.decode(readValue(buffer)!);
+        return CheckoutConfigurationDTO.decode(readValue(buffer)!);
       case 163: 
-        return CashAppPayConfigurationDTO.decode(readValue(buffer)!);
+        return DropInConfigurationDTO.decode(readValue(buffer)!);
       case 164: 
-        return TwintConfigurationDTO.decode(readValue(buffer)!);
+        return CardConfigurationDTO.decode(readValue(buffer)!);
       case 165: 
-        return PaymentResultDTO.decode(readValue(buffer)!);
+        return ApplePayConfigurationDTO.decode(readValue(buffer)!);
       case 166: 
-        return PaymentResultModelDTO.decode(readValue(buffer)!);
+        return ApplePayContactDTO.decode(readValue(buffer)!);
       case 167: 
-        return OrderResponseDTO.decode(readValue(buffer)!);
+        return ApplePayShippingMethodDTO.decode(readValue(buffer)!);
       case 168: 
-        return FinishedResultDTO.decode(readValue(buffer)!);
+        return ApplePaySummaryItemDTO.decode(readValue(buffer)!);
       case 169: 
-        return ActionResultDTO.decode(readValue(buffer)!);
+        return GooglePayConfigurationDTO.decode(readValue(buffer)!);
       case 170: 
-        return ErrorResultDTO.decode(readValue(buffer)!);
+        return MerchantInfoDTO.decode(readValue(buffer)!);
       case 171: 
-        return CheckoutEvent.decode(readValue(buffer)!);
+        return ShippingAddressParametersDTO.decode(readValue(buffer)!);
       case 172: 
-        return ComponentCommunicationModel.decode(readValue(buffer)!);
+        return BillingAddressParametersDTO.decode(readValue(buffer)!);
       case 173: 
-        return PlatformCommunicationDTO.decode(readValue(buffer)!);
+        return CashAppPayConfigurationDTO.decode(readValue(buffer)!);
       case 174: 
-        return PaymentEventDTO.decode(readValue(buffer)!);
+        return TwintConfigurationDTO.decode(readValue(buffer)!);
       case 175: 
-        return ErrorDTO.decode(readValue(buffer)!);
+        return PaymentResultDTO.decode(readValue(buffer)!);
       case 176: 
-        return DeletedStoredPaymentMethodResultDTO.decode(readValue(buffer)!);
+        return PaymentResultModelDTO.decode(readValue(buffer)!);
       case 177: 
-        return CardComponentConfigurationDTO.decode(readValue(buffer)!);
+        return OrderResponseDTO.decode(readValue(buffer)!);
       case 178: 
-        return InstantPaymentConfigurationDTO.decode(readValue(buffer)!);
+        return FinishedResultDTO.decode(readValue(buffer)!);
       case 179: 
-        return InstantPaymentSetupResultDTO.decode(readValue(buffer)!);
+        return ActionResultDTO.decode(readValue(buffer)!);
       case 180: 
-        return UnencryptedCardDTO.decode(readValue(buffer)!);
+        return ErrorResultDTO.decode(readValue(buffer)!);
       case 181: 
-        return EncryptedCardDTO.decode(readValue(buffer)!);
+        return CheckoutEvent.decode(readValue(buffer)!);
       case 182: 
-        return ActionComponentConfigurationDTO.decode(readValue(buffer)!);
+        return ComponentCommunicationModel.decode(readValue(buffer)!);
       case 183: 
-        return OrderCancelResultDTO.decode(readValue(buffer)!);
+        return PlatformCommunicationDTO.decode(readValue(buffer)!);
       case 184: 
+        return PaymentEventDTO.decode(readValue(buffer)!);
+      case 185: 
+        return ErrorDTO.decode(readValue(buffer)!);
+      case 186: 
+        return DeletedStoredPaymentMethodResultDTO.decode(readValue(buffer)!);
+      case 187: 
+        return CardComponentConfigurationDTO.decode(readValue(buffer)!);
+      case 188: 
+        return InstantPaymentConfigurationDTO.decode(readValue(buffer)!);
+      case 189: 
+        return InstantPaymentSetupResultDTO.decode(readValue(buffer)!);
+      case 190: 
+        return UnencryptedCardDTO.decode(readValue(buffer)!);
+      case 191: 
+        return EncryptedCardDTO.decode(readValue(buffer)!);
+      case 192: 
+        return ActionComponentConfigurationDTO.decode(readValue(buffer)!);
+      case 193: 
+        return OrderCancelResultDTO.decode(readValue(buffer)!);
+      case 194: 
         return BinLookupDataDTO.decode(readValue(buffer)!);
       default:
         return super.readValueOfType(type, buffer);
