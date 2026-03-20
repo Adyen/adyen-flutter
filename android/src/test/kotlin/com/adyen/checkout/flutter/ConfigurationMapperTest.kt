@@ -17,14 +17,17 @@ import com.adyen.checkout.flutter.generated.AmountDTO
 import com.adyen.checkout.flutter.generated.AnalyticsOptionsDTO
 import com.adyen.checkout.flutter.generated.BillingAddressParametersDTO
 import com.adyen.checkout.flutter.generated.CardComponentConfigurationDTO
+import com.adyen.checkout.flutter.generated.CardBasedInstallmentOptionsDTO
 import com.adyen.checkout.flutter.generated.CardConfigurationDTO
 import com.adyen.checkout.flutter.generated.CashAppPayConfigurationDTO
 import com.adyen.checkout.flutter.generated.CashAppPayEnvironment
+import com.adyen.checkout.flutter.generated.DefaultInstallmentOptionsDTO
 import com.adyen.checkout.flutter.generated.DropInConfigurationDTO
 import com.adyen.checkout.flutter.generated.Environment
 import com.adyen.checkout.flutter.generated.FieldVisibility
 import com.adyen.checkout.flutter.generated.GooglePayConfigurationDTO
 import com.adyen.checkout.flutter.generated.GooglePayEnvironment
+import com.adyen.checkout.flutter.generated.InstallmentConfigurationDTO
 import com.adyen.checkout.flutter.generated.InstantPaymentConfigurationDTO
 import com.adyen.checkout.flutter.generated.MerchantInfoDTO
 import com.adyen.checkout.flutter.generated.ShippingAddressParametersDTO
@@ -84,6 +87,11 @@ class ConfigurationMapperTest {
         @Test
         fun `when environment is APSE, then map to SDK APSE environment`() {
             assertEquals(SDKEnvironment.APSE, Environment.APSE.mapToEnvironment())
+        }
+
+        @Test
+        fun `when environment is NEA, then map to SDK NEA environment`() {
+            assertEquals(SDKEnvironment.NEA, Environment.NEA.mapToEnvironment())
         }
     }
 
@@ -222,6 +230,131 @@ class ConfigurationMapperTest {
 
     @Nested
     inner class CardConfigurationTests {
+        @Test
+        fun `when installment configuration is provided, then map to native installment configuration`() {
+            val installmentConfigurationDTO = InstallmentConfigurationDTO(
+                defaultOptions = DefaultInstallmentOptionsDTO(
+                    values = listOf(3, 6, null),
+                    includesRevolving = true,
+                ),
+                cardBasedOptions = listOf(
+                    CardBasedInstallmentOptionsDTO(
+                        values = listOf(9, 12, null),
+                        includesRevolving = false,
+                        cardBrand = "visa",
+                    ),
+                    null,
+                ),
+                showInstallmentAmount = true,
+            )
+
+            val cardConfigurationDTO = CardConfigurationDTO(
+                holderNameRequired = false,
+                addressMode = AddressMode.NONE,
+                showStorePaymentField = true,
+                showCvcForStoredCard = true,
+                showCvc = true,
+                kcpFieldVisibility = FieldVisibility.HIDE,
+                socialSecurityNumberFieldVisibility = FieldVisibility.HIDE,
+                supportedCardTypes = emptyList(),
+                installmentConfiguration = installmentConfigurationDTO,
+            )
+            val cardComponentConfigurationDTO = CardComponentConfigurationDTO(
+                environment = Environment.TEST,
+                clientKey = TEST_CLIENT_KEY,
+                countryCode = "US",
+                amount = AmountDTO("USD", 1824),
+                analyticsOptionsDTO = AnalyticsOptionsDTO(false, "0.0.1"),
+                cardConfiguration = cardConfigurationDTO,
+            )
+
+            val checkoutConfiguration = cardComponentConfigurationDTO.toCheckoutConfiguration()
+            val cardConfiguration = checkoutConfiguration.getConfiguration<CardConfiguration>(PaymentMethodTypes.SCHEME)
+            val installmentConfiguration = cardConfiguration?.installmentConfiguration
+
+            assertEquals(true, installmentConfiguration?.showInstallmentAmount)
+            assertEquals(listOf(3, 6), installmentConfiguration?.defaultOptions?.values)
+            assertEquals(true, installmentConfiguration?.defaultOptions?.includeRevolving)
+            assertEquals(1, installmentConfiguration?.cardBasedOptions?.size)
+            assertEquals(listOf(9, 12), installmentConfiguration?.cardBasedOptions?.first()?.values)
+            assertEquals(false, installmentConfiguration?.cardBasedOptions?.first()?.includeRevolving)
+            assertEquals("visa", installmentConfiguration?.cardBasedOptions?.first()?.cardBrand?.txVariant)
+        }
+
+        @Test
+        fun `when installment configuration has card based options only, then map to native installment configuration without default options`() {
+            val installmentConfigurationDTO = InstallmentConfigurationDTO(
+                defaultOptions = null,
+                cardBasedOptions = listOf(
+                    CardBasedInstallmentOptionsDTO(
+                        values = listOf(3, 6),
+                        includesRevolving = true,
+                        cardBrand = "mc",
+                    ),
+                ),
+                showInstallmentAmount = false,
+            )
+
+            val cardConfigurationDTO = CardConfigurationDTO(
+                holderNameRequired = false,
+                addressMode = AddressMode.NONE,
+                showStorePaymentField = true,
+                showCvcForStoredCard = true,
+                showCvc = true,
+                kcpFieldVisibility = FieldVisibility.HIDE,
+                socialSecurityNumberFieldVisibility = FieldVisibility.HIDE,
+                supportedCardTypes = emptyList(),
+                installmentConfiguration = installmentConfigurationDTO,
+            )
+            val cardComponentConfigurationDTO = CardComponentConfigurationDTO(
+                environment = Environment.TEST,
+                clientKey = TEST_CLIENT_KEY,
+                countryCode = "US",
+                amount = AmountDTO("USD", 1824),
+                analyticsOptionsDTO = AnalyticsOptionsDTO(false, "0.0.1"),
+                cardConfiguration = cardConfigurationDTO,
+            )
+
+            val checkoutConfiguration = cardComponentConfigurationDTO.toCheckoutConfiguration()
+            val cardConfiguration = checkoutConfiguration.getConfiguration<CardConfiguration>(PaymentMethodTypes.SCHEME)
+            val installmentConfiguration = cardConfiguration?.installmentConfiguration
+
+            assertNull(installmentConfiguration?.defaultOptions)
+            assertEquals(false, installmentConfiguration?.showInstallmentAmount)
+            assertEquals(1, installmentConfiguration?.cardBasedOptions?.size)
+            assertEquals(listOf(3, 6), installmentConfiguration?.cardBasedOptions?.first()?.values)
+            assertEquals(true, installmentConfiguration?.cardBasedOptions?.first()?.includeRevolving)
+            assertEquals("mc", installmentConfiguration?.cardBasedOptions?.first()?.cardBrand?.txVariant)
+        }
+
+        @Test
+        fun `when installment configuration is null, then native card installment configuration is null`() {
+            val cardConfigurationDTO = CardConfigurationDTO(
+                holderNameRequired = false,
+                addressMode = AddressMode.NONE,
+                showStorePaymentField = true,
+                showCvcForStoredCard = true,
+                showCvc = true,
+                kcpFieldVisibility = FieldVisibility.HIDE,
+                socialSecurityNumberFieldVisibility = FieldVisibility.HIDE,
+                supportedCardTypes = emptyList(),
+                installmentConfiguration = null,
+            )
+            val cardComponentConfigurationDTO = CardComponentConfigurationDTO(
+                environment = Environment.TEST,
+                clientKey = TEST_CLIENT_KEY,
+                countryCode = "US",
+                amount = AmountDTO("USD", 1824),
+                analyticsOptionsDTO = AnalyticsOptionsDTO(false, "0.0.1"),
+                cardConfiguration = cardConfigurationDTO,
+            )
+
+            val checkoutConfiguration = cardComponentConfigurationDTO.toCheckoutConfiguration()
+            val cardConfiguration = checkoutConfiguration.getConfiguration<CardConfiguration>(PaymentMethodTypes.SCHEME)
+
+            assertNull(cardConfiguration?.installmentConfiguration)
+        }
+
         @Test
         fun `when card configuration has address mode FULL, then map to FullAddress`() {
             val cardConfigurationDTO = CardConfigurationDTO(
