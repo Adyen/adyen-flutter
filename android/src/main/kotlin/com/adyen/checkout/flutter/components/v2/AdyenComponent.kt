@@ -4,7 +4,7 @@ import android.view.View
 import androidx.activity.ComponentActivity
 import com.adyen.checkout.core.common.CheckoutContext
 import com.adyen.checkout.core.components.CheckoutCallbacks
-import com.adyen.checkout.core.components.data.model.PaymentMethod
+import com.adyen.checkout.core.components.data.model.paymentmethod.PaymentMethod
 import com.adyen.checkout.flutter.components.ComponentPlatformEventHandler
 import com.adyen.checkout.flutter.components.view.DynamicComponentView
 import io.flutter.plugin.platform.PlatformView

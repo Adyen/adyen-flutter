@@ -17,7 +17,7 @@ import com.adyen.checkout.components.core.internal.Component
 import com.adyen.checkout.core.common.CheckoutContext
 import com.adyen.checkout.core.components.AdyenPaymentFlow
 import com.adyen.checkout.core.components.CheckoutCallbacks
-import com.adyen.checkout.core.components.data.model.PaymentMethod
+import com.adyen.checkout.core.components.data.model.paymentmethod.PaymentMethod
 import com.adyen.checkout.flutter.components.ComponentPlatformEventHandler
 import com.adyen.checkout.flutter.generated.ComponentCommunicationModel
 import com.adyen.checkout.flutter.generated.ComponentCommunicationType

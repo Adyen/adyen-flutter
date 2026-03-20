@@ -6,7 +6,7 @@ import androidx.lifecycle.lifecycleScope
 import com.adyen.checkout.core.common.CheckoutContext
 import com.adyen.checkout.core.components.Checkout
 import com.adyen.checkout.core.components.CheckoutConfiguration
-import com.adyen.checkout.core.components.data.model.PaymentMethodsApiResponse
+import com.adyen.checkout.core.components.data.model.paymentmethod.PaymentMethodsApiResponse
 import com.adyen.checkout.core.old.AdyenLogLevel
 import com.adyen.checkout.core.old.AdyenLogger
 import com.adyen.checkout.flutter.apiOnly.AdyenCSE

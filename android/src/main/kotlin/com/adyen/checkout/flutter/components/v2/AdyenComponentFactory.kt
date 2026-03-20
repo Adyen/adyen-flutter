@@ -8,7 +8,7 @@ import com.adyen.checkout.core.common.PaymentResult
 import com.adyen.checkout.core.components.CheckoutCallbacks
 import com.adyen.checkout.core.components.CheckoutResult
 import com.adyen.checkout.core.components.data.PaymentComponentData
-import com.adyen.checkout.core.components.data.model.PaymentMethod
+import com.adyen.checkout.core.components.data.model.paymentmethod.PaymentMethod
 import com.adyen.checkout.flutter.components.ComponentPlatformEventHandler
 import com.adyen.checkout.flutter.generated.ActionResultDTO
 import com.adyen.checkout.flutter.generated.AdyenFlutterInterface

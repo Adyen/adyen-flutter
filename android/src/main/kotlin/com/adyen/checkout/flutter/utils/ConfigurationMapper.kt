@@ -229,11 +229,11 @@ object ConfigurationMapper {
     fun Environment.mapToEnvironment(): SDKEnvironment =
         when (this) {
             Environment.TEST -> SDKEnvironment.TEST
-            Environment.EUROPE -> SDKEnvironment.EUROPE
-            Environment.UNITED_STATES -> SDKEnvironment.UNITED_STATES
-            Environment.AUSTRALIA -> SDKEnvironment.AUSTRALIA
-            Environment.INDIA -> SDKEnvironment.INDIA
-            Environment.APSE -> SDKEnvironment.APSE
+            Environment.EUROPE -> SDKEnvironment.LIVE_EUROPE
+            Environment.UNITED_STATES -> SDKEnvironment.LIVE_UNITED_STATES
+            Environment.AUSTRALIA -> SDKEnvironment.LIVE_AUSTRALIA
+            Environment.INDIA -> SDKEnvironment.LIVE_INDIA
+            Environment.APSE -> SDKEnvironment.LIVE_APSE
         }
 
     private fun AnalyticsOptionsDTO.mapToAnalyticsConfiguration(): AnalyticsConfiguration {
