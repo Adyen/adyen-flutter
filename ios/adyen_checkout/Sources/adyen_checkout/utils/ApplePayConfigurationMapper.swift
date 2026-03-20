@@ -5,19 +5,20 @@ import Adyen
 import PassKit
 
 extension ApplePayConfigurationDTO {
-    func toApplePayConfiguration(payment: Payment?) throws -> ApplePayComponent.Configuration {
-        guard let payment else { throw PlatformError(errorDescription: "Amount for Apple Pay not provided.") }
-        let summaryItems = try mapToPaymentSummaryItems(summaryItems: summaryItems, payment: payment)
-        let paymentRequest = try buildPaymentRequest(payment: payment, summaryItems: summaryItems)
+    // TODO: - Payment type removed in v6 SDK. Replaced with direct amount/countryCode parameters.
+    func toApplePayConfiguration(amount: Adyen.Amount? = nil, countryCode: String? = nil) throws -> ApplePayComponent.Configuration {
+        guard let amount, let countryCode else { throw PlatformError(errorDescription: "Amount and countryCode for Apple Pay not provided.") }
+        let summaryItems = try mapToPaymentSummaryItems(summaryItems: summaryItems, amount: amount)
+        let paymentRequest = try buildPaymentRequest(amount: amount, countryCode: countryCode, summaryItems: summaryItems)
         return try ApplePayComponent.Configuration(paymentRequest: paymentRequest, allowOnboarding: allowOnboarding ?? false)
     }
     
-    private func buildPaymentRequest(payment: Payment, summaryItems: [PKPaymentSummaryItem]) throws -> PKPaymentRequest {
+    private func buildPaymentRequest(amount: Adyen.Amount, countryCode: String, summaryItems: [PKPaymentSummaryItem]) throws -> PKPaymentRequest {
         let paymentRequest = PKPaymentRequest()
         paymentRequest.merchantIdentifier = merchantId
         paymentRequest.paymentSummaryItems = summaryItems
-        paymentRequest.countryCode = payment.countryCode
-        paymentRequest.currencyCode = payment.amount.currencyCode
+        paymentRequest.countryCode = countryCode
+        paymentRequest.currencyCode = amount.currencyCode
         paymentRequest.billingContact = billingContact?.toApplePayContact()
         paymentRequest.shippingContact = shippingContact?.toApplePayContact()
         paymentRequest.merchantCapabilities = merchantCapability.toMerchantCapability()
@@ -77,11 +78,11 @@ extension ApplePayConfigurationDTO {
         return Set<PKContactField>(contactFieldsNonNil.compactMap { PKContactField.fromString($0) })
     }
     
-    private func mapToPaymentSummaryItems(summaryItems: [ApplePaySummaryItemDTO?]?, payment: Payment) throws -> [PKPaymentSummaryItem] {
+    private func mapToPaymentSummaryItems(summaryItems: [ApplePaySummaryItemDTO?]?, amount: Adyen.Amount) throws -> [PKPaymentSummaryItem] {
         guard let summaryItems else {
-            let formattedAmount = AmountFormatter.decimalAmount(payment.amount.value,
-                                                                currencyCode: payment.amount.currencyCode,
-                                                                localeIdentifier: payment.amount.localeIdentifier)
+            let formattedAmount = AmountFormatter.decimalAmount(amount.value,
+                                                                currencyCode: amount.currencyCode,
+                                                                localeIdentifier: amount.localeIdentifier)
             return [PKPaymentSummaryItem(label: merchantName, amount: formattedAmount)]
         }
         

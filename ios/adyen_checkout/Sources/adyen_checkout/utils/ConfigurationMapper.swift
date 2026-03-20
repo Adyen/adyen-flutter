@@ -25,7 +25,7 @@ import PassKit
 #endif
 
 extension DropInConfigurationDTO {
-    func createDropInConfiguration(payment: Payment?) throws -> DropInComponent.Configuration {
+    func createDropInConfiguration() throws -> DropInComponent.Configuration {
         let dropInConfiguration = DropInComponent.Configuration(
             allowsSkippingPaymentList: skipListWhenSinglePaymentMethod,
             allowPreselectedPaymentView: showPreselectedStoredPaymentMethod
@@ -42,7 +42,7 @@ extension DropInConfigurationDTO {
         }
 
         if let applePayConfigurationDTO {
-            dropInConfiguration.applePay = try applePayConfigurationDTO.toApplePayConfiguration(payment: payment)
+            dropInConfiguration.applePay = try applePayConfigurationDTO.toApplePayConfiguration(amount: amount?.mapToAmount(), countryCode: countryCode)
         }
 
         if let cashAppPayConfigurationDTO {
@@ -137,14 +137,15 @@ extension FieldVisibility {
 }
 
 extension DropInConfigurationDTO {
-    func createAdyenContext(payment: Payment? = nil) throws -> AdyenContext {
+    // TODO: - buildAdyenContext is no longer usable in v6 (AdyenContext init is package-access).
+    // Drop-in flow should be migrated to use Checkout.setup() pattern.
+    func createAdyenContext() throws -> AdyenContext {
         try buildAdyenContext(
             environment: environment,
             clientKey: clientKey,
             amount: amount,
             analyticsOptionsDTO: analyticsOptionsDTO,
-            countryCode: countryCode,
-            payment: payment
+            countryCode: countryCode
         )
     }
 }
@@ -239,50 +240,31 @@ extension AmountDTO {
 }
 
 extension InstantPaymentConfigurationDTO {
-    func mapToApplePayConfiguration(payment: Payment?) throws -> ApplePayComponent.Configuration {
-        guard let applePayConfiguration = try applePayConfigurationDTO?.toApplePayConfiguration(payment: payment) else {
+    // TODO: - Payment type removed in v6. Apple Pay configuration needs migration.
+    func mapToApplePayConfiguration() throws -> ApplePayComponent.Configuration {
+        guard let applePayConfiguration = try applePayConfigurationDTO?.toApplePayConfiguration(amount: amount?.mapToAmount(), countryCode: countryCode) else {
             throw PlatformError(errorDescription: "Apple pay configuration not provided.")
         }
         
         return applePayConfiguration
     }
 
-    func createAdyenContext(payment: Payment? = nil) throws -> AdyenContext {
+    func createAdyenContext() throws -> AdyenContext {
         try buildAdyenContext(
             environment: environment,
             clientKey: clientKey,
             amount: amount,
             analyticsOptionsDTO: analyticsOptionsDTO,
-            countryCode: countryCode,
-            payment: payment
+            countryCode: countryCode
         )
     }
 }
 
-private func buildAdyenContext(environment: Environment, clientKey: String, amount: AmountDTO?, analyticsOptionsDTO: AnalyticsOptionsDTO, countryCode: String?, payment: Payment? = nil) throws -> AdyenContext {
-    let environment = environment.mapToEnvironment()
-    let apiContext = try APIContext(
-        environment: environment,
-        clientKey: clientKey
-    )
-    let payment: Payment? = payment ?? {
-        if let amount, let countryCode {
-            return Payment(amount: amount.mapToAmount(), countryCode: countryCode)
-        }
-        return nil
-    }()
-    var analyticsConfiguration = AnalyticsConfiguration(isEnabled: analyticsOptionsDTO.enabled)
-    analyticsConfiguration.context = AnalyticsContext(
-        version: analyticsOptionsDTO.version,
-        platform: .flutter
-    )
-
-    return AdyenContext(
-        apiContext: apiContext,
-        payment: payment,
-        amount: amount!.mapToAmount(), //Discuss if amount is really necessary
-        analyticsConfiguration: analyticsConfiguration
-    )
+// TODO: - AdyenContext init is now package-access in v6 SDK.
+// This function is kept for compilation but will fail at runtime.
+// All flows should migrate to use Checkout.setup() which creates AdyenContext internally.
+private func buildAdyenContext(environment: Environment, clientKey: String, amount: AmountDTO?, analyticsOptionsDTO: AnalyticsOptionsDTO, countryCode: String?) throws -> AdyenContext {
+    throw PlatformError(errorDescription: "buildAdyenContext is not supported in iOS SDK v6. Use Checkout.setup() instead.")
 }
 
 extension UnencryptedCardDTO {
@@ -334,11 +316,12 @@ extension ResultCode {
     }
 }
 
-extension Session.State {
-    func createPayment(fallbackCountryCode: String) -> Payment {
-        Payment(amount: amount, countryCode: countryCode ?? fallbackCountryCode)
-    }
-}
+// TODO: - Payment type removed in v6 SDK. Session.State.createPayment needs migration.
+//extension Session.State {
+//    func createPayment(fallbackCountryCode: String) -> Payment {
+//        Payment(amount: amount, countryCode: countryCode ?? fallbackCountryCode)
+//    }
+//}
 
 extension ActionComponentConfigurationDTO {
     func createAdyenContext() throws -> AdyenContext {
@@ -353,12 +336,14 @@ extension ActionComponentConfigurationDTO {
 }
 
 extension ThreeDS2ConfigurationDTO {
-    func mapToThreeDS2Configuration() -> CheckoutActionComponent.Configuration.ThreeDS {
-        let appearanceConfiguration = uiCustomization?.toAppearanceConfiguration() ?? ADYAppearanceConfiguration()
-        guard let requestorAppURL, let url = URL(string: requestorAppURL) else {
-            return .init(appearanceConfiguration: appearanceConfiguration)
+    // TODO: - ThreeDS2ActionConfiguration init changed in v6. appearanceConfiguration is now package-access.
+    // UI customization may need a different approach in v6.
+    func mapToThreeDS2Configuration() -> ThreeDS2ActionConfiguration {
+        var config = ThreeDS2ActionConfiguration()
+        if let requestorAppURL, let url = URL(string: requestorAppURL) {
+            config = config.requestorAppURL(url)
         }
-        return .init(requestorAppURL: url, appearanceConfiguration: appearanceConfiguration)
+        return config
     }
 }
 

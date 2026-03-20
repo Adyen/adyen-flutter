@@ -13,6 +13,7 @@ import Foundation
     import AdyenSession
 #endif
 
+@MainActor
 class AdyenComponent: NSObject, FlutterPlatformView {
     private let adyenFlutterInterface: AdyenFlutterInterface
     private let componentPlatformEventHandler: ComponentPlatformEventHandler

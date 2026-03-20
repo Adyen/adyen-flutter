@@ -1,6 +1,7 @@
 @_spi(AdyenInternal) import Adyen
 import UIKit
 
+@MainActor
 class BaseInstantComponent {
     let componentFlutterApi: ComponentFlutterInterface
     let componentId: String
@@ -12,12 +13,12 @@ class BaseInstantComponent {
         self.componentId = componentId
     }
     
-    func initiatePayment() {
+    func initiatePayment(delegate: PaymentComponentDelegate) {
         guard let instantPaymentComponent else {
             return
         }
         
-        instantPaymentComponent.initiatePayment()
+        instantPaymentComponent.initiatePayment(delegate: delegate)
         showActivityIndicator()
     }
     

@@ -4,6 +4,7 @@
 #endif
 import Foundation
 
+@MainActor
 class ApplePayAdvancedComponent: BaseApplePayComponent {
     private let componentFlutterApi: ComponentFlutterInterface
     private let configuration: InstantPaymentConfigurationDTO
@@ -55,7 +56,7 @@ class ApplePayAdvancedComponent: BaseApplePayComponent {
     private func buildApplePayAdvancedComponent() throws -> ApplePayComponent? {
         let paymentMethod = try JSONDecoder().decode(ApplePayPaymentMethod.self, from: Data(paymentMethodResponse.utf8))
         let context = try configuration.createAdyenContext()
-        let configuration = try configuration.mapToApplePayConfiguration(payment: context.payment)
+        let configuration = try configuration.mapToApplePayConfiguration()
         let applePayComponent = try ApplePayComponent(paymentMethod: paymentMethod, context: context, configuration: configuration)
         applePayComponent.delegate = self
         // applePayComponent?.applePayDelegate - Dynamic pricing will be added in the next version.

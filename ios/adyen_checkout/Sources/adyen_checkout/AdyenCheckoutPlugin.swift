@@ -1,6 +1,7 @@
 import Flutter
 import UIKit
 
+@MainActor
 public class AdyenCheckoutPlugin: NSObject, FlutterPlugin {
     public static func register(with registrar: FlutterPluginRegistrar) {
         let checkoutHolder = CheckoutHolder()

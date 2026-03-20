@@ -3,6 +3,7 @@
     import AdyenComponents
 #endif
 
+@MainActor
 class ApplePaySessionComponent: BaseApplePayComponent {
     private let checkoutHolder: CheckoutHolder
     private let configuration: InstantPaymentConfigurationDTO
@@ -34,8 +35,7 @@ class ApplePaySessionComponent: BaseApplePayComponent {
         guard let session = checkoutHolder.session else { throw PlatformError(errorDescription: "Session is not available.") }
         guard let paymentMethod = session.state.paymentMethods.paymentMethod(ofType: ApplePayPaymentMethod.self) else { throw PlatformError(errorDescription: "Apple Pay payment method not valid.") }
         let context = try configuration.createAdyenContext()
-        let payment = session.state.createPayment(fallbackCountryCode: configuration.countryCode)
-        let configuration = try configuration.mapToApplePayConfiguration(payment: payment)
+        let configuration = try configuration.mapToApplePayConfiguration()
         let applePayComponent = try ApplePayComponent(paymentMethod: paymentMethod, context: context, configuration: configuration)
         applePayComponent.delegate = checkoutHolder.session
         setupSessionFlowDelegate()
@@ -47,7 +47,7 @@ class ApplePaySessionComponent: BaseApplePayComponent {
             componentSessionFlowDelegate.componentId = componentId
             componentSessionFlowDelegate.finalizeCallback = finalizeAndDismissComponent
         } else {
-            AdyenAssertion.assertionFailure(message: "Wrong session flow delegate usage")
+            assertionFailure("Wrong session flow delegate usage")
         }
     }
         

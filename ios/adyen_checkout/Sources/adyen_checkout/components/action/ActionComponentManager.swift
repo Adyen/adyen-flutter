@@ -5,6 +5,7 @@
 import Foundation
 import UIKit
 
+@MainActor
 class ActionComponentManager {
     private let componentFlutterApi: ComponentFlutterInterface
     private var actionComponent: CheckoutActionComponent?

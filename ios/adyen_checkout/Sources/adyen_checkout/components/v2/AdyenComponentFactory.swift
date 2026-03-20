@@ -1,5 +1,6 @@
 import Flutter
 
+@MainActor
 final class AdyenComponentFactory: NSObject, FlutterPlatformViewFactory {
     static let adyenAdvancedComponentId = "AdyenAdvancedComponent"
     static let adyenSessionComponentId = "AdyenSessionComponent"

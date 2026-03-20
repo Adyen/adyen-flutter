@@ -1,5 +1,6 @@
 import Adyen
 
+@MainActor
 class InstantSessionComponent: BaseInstantComponent, InstantComponentProtocol {
     private let checkoutHolder: CheckoutHolder
     
@@ -15,6 +16,11 @@ class InstantSessionComponent: BaseInstantComponent, InstantComponentProtocol {
         instantPaymentComponent = buildInstantSessionComponent(paymentMethod: paymentMethod, adyenContext: adyenContext)
     }
     
+    func initiatePayment() {
+        guard let session = checkoutHolder.session else { return }
+        initiatePayment(delegate: session)
+    }
+    
     func buildInstantSessionComponent(paymentMethod: PaymentMethod, adyenContext: AdyenContext) -> InstantPaymentComponent? {
         do {
             guard let session = checkoutHolder.session else {
@@ -25,7 +31,6 @@ class InstantSessionComponent: BaseInstantComponent, InstantComponentProtocol {
             componentSessionFlowHandler?.componentId = componentId
             componentSessionFlowHandler?.finalizeCallback = finalizeCallback
             let component = InstantPaymentComponent(paymentMethod: paymentMethod, context: adyenContext, order: nil)
-            component.delegate = session
             return component
         } catch {
             sendErrorToFlutterLayer(error: error)

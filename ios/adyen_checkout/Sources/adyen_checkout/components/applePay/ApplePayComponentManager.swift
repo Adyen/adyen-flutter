@@ -4,6 +4,7 @@
 #endif
 import PassKit
 
+@MainActor
 class ApplePayComponentManager {
     private let componentFlutterApi: ComponentFlutterInterface
     private let checkoutHolder: CheckoutHolder

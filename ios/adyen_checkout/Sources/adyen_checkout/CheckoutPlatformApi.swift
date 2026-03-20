@@ -18,6 +18,7 @@ import UIKit
 // 2) Add url scheme
 // 3) Add AppDelegate redirect
 
+@MainActor
 class CheckoutPlatformApi: CheckoutPlatformInterface {
     private let checkoutFlutter: CheckoutFlutterInterface
     private let componentFlutterApi: ComponentFlutterInterface

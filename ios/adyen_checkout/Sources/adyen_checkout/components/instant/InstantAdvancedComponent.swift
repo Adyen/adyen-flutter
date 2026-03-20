@@ -4,6 +4,7 @@
 #endif
 import Foundation
 
+@MainActor
 class InstantAdvancedComponent: BaseInstantComponent, InstantComponentProtocol {
     private var actionComponent: CheckoutActionComponent?
     private var actionComponentHandler: ComponentActionHandler?
@@ -18,9 +19,12 @@ class InstantAdvancedComponent: BaseInstantComponent, InstantComponentProtocol {
         instantPaymentComponent = buildInstantComponent(paymentMethod: paymentMethod, adyenContext: adyenContext)
     }
     
+    func initiatePayment() {
+        initiatePayment(delegate: self)
+    }
+    
     func buildInstantComponent(paymentMethod: PaymentMethod, adyenContext: AdyenContext) -> InstantPaymentComponent {
         let component = InstantPaymentComponent(paymentMethod: paymentMethod, context: adyenContext, order: nil)
-        component.delegate = self
         actionComponent = CheckoutActionComponent(context: adyenContext)
         actionComponentHandler = ComponentActionHandler(
             componentFlutterApi: componentFlutterApi,

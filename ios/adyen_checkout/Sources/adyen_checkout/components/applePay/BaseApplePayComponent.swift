@@ -4,6 +4,7 @@ import UIKit
     import AdyenComponents
 #endif
 
+@MainActor
 class BaseApplePayComponent {
     var applePayComponent: ApplePayComponent?
 

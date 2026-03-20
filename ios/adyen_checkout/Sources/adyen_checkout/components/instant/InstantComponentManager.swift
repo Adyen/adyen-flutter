@@ -1,6 +1,7 @@
 import Adyen
 import Foundation
 
+@MainActor
 class InstantComponentManager {
     private let componentFlutterApi: ComponentFlutterInterface
     private let checkoutHolder: CheckoutHolder

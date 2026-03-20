@@ -1,3 +1,4 @@
+@MainActor
 class ComponentPlatformApi: ComponentPlatformInterface {
     var onUpdateViewHeightCallback: () -> Void = {}
     var onActionCallback: ([String?: Any?]) -> Void = { _ in }

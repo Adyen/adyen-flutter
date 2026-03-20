@@ -17,6 +17,7 @@ import UIKit
     import AdyenNetworking
 #endif
 
+@MainActor
 class DropInPlatformApi: DropInPlatformInterface {
     private let jsonDecoder = JSONDecoder()
     private let checkoutFlutter: CheckoutFlutterInterface
@@ -57,7 +58,7 @@ class DropInPlatformApi: DropInPlatformInterface {
                 viewController: viewController,
                 checkoutFlutter: checkoutFlutter
             )
-            let dropInConfiguration = try dropInConfigurationDTO.createDropInConfiguration(payment: adyenContext.payment)
+            let dropInConfiguration = try dropInConfigurationDTO.createDropInConfiguration()
             if let paymentMethodNames = dropInConfigurationDTO.paymentMethodNames {
                 paymentMethods = overridePaymentMethodNames(
                     paymentMethods: paymentMethods,
@@ -103,7 +104,7 @@ class DropInPlatformApi: DropInPlatformInterface {
             }
             
             let paymentMethodsWithoutGiftCards = removeGiftCardPaymentMethods(paymentMethods: paymentMethods, isPartialPaymentSupported: dropInConfigurationDTO.isPartialPaymentSupported)
-            let configuration = try dropInConfigurationDTO.createDropInConfiguration(payment: adyenContext.payment)
+            let configuration = try dropInConfigurationDTO.createDropInConfiguration()
             let dropInComponent = DropInComponent(
                 paymentMethods: paymentMethodsWithoutGiftCards,
                 context: adyenContext,
