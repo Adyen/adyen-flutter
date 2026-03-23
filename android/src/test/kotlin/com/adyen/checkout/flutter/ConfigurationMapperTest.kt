@@ -65,33 +65,33 @@ class ConfigurationMapperTest {
         }
 
         @Test
-        fun `when environment is EUROPE, then map to SDK EUROPE environment`() {
-            assertEquals(SDKEnvironment.EUROPE, Environment.EUROPE.mapToEnvironment())
+        fun `when environment is LIVE_EUROPE, then map to SDK LIVE_EUROPE environment`() {
+            assertEquals(SDKEnvironment.LIVE_EUROPE, Environment.LIVE_EUROPE.mapToEnvironment())
         }
 
         @Test
-        fun `when environment is UNITED_STATES, then map to SDK UNITED_STATES environment`() {
-            assertEquals(SDKEnvironment.UNITED_STATES, Environment.UNITED_STATES.mapToEnvironment())
+        fun `when environment is LIVE_UNITED_STATES, then map to SDK LIVE_UNITED_STATES environment`() {
+            assertEquals(SDKEnvironment.LIVE_UNITED_STATES, Environment.LIVE_UNITED_STATES.mapToEnvironment())
         }
 
         @Test
-        fun `when environment is AUSTRALIA, then map to SDK AUSTRALIA environment`() {
-            assertEquals(SDKEnvironment.AUSTRALIA, Environment.AUSTRALIA.mapToEnvironment())
+        fun `when environment is LIVE_AUSTRALIA, then map to SDK LIVE_AUSTRALIA environment`() {
+            assertEquals(SDKEnvironment.LIVE_AUSTRALIA, Environment.LIVE_AUSTRALIA.mapToEnvironment())
         }
 
         @Test
-        fun `when environment is INDIA, then map to SDK INDIA environment`() {
-            assertEquals(SDKEnvironment.INDIA, Environment.INDIA.mapToEnvironment())
+        fun `when environment is LIVE_APSE, then map to SDK LIVE_APSE environment`() {
+            assertEquals(SDKEnvironment.LIVE_APSE, Environment.LIVE_APSE.mapToEnvironment())
         }
 
         @Test
-        fun `when environment is APSE, then map to SDK APSE environment`() {
-            assertEquals(SDKEnvironment.APSE, Environment.APSE.mapToEnvironment())
+        fun `when environment is LIVE_INDIA, then map to SDK LIVE_INDIA environment`() {
+            assertEquals(SDKEnvironment.LIVE_INDIA, Environment.LIVE_INDIA.mapToEnvironment())
         }
 
         @Test
-        fun `when environment is NEA, then map to SDK NEA environment`() {
-            assertEquals(SDKEnvironment.NEA, Environment.NEA.mapToEnvironment())
+        fun `when environment is LIVE_NEA, then map to SDK LIVE_NEA environment`() {
+            assertEquals(SDKEnvironment.LIVE_NEA, Environment.LIVE_NEA.mapToEnvironment())
         }
     }
 
@@ -574,7 +574,7 @@ class ConfigurationMapperTest {
         @Test
         fun `when action component configuration has null optional fields, then map correctly`() {
             val actionConfigurationDTO = ActionComponentConfigurationDTO(
-                environment = Environment.UNITED_STATES,
+                environment = Environment.LIVE_UNITED_STATES,
                 clientKey = TEST_CLIENT_KEY,
                 shopperLocale = null,
                 amount = null,
@@ -583,7 +583,7 @@ class ConfigurationMapperTest {
 
             val checkoutConfiguration = actionConfigurationDTO.toCheckoutConfiguration()
 
-            assertEquals(SDKEnvironment.UNITED_STATES, checkoutConfiguration.environment)
+            assertEquals(SDKEnvironment.LIVE_UNITED_STATES, checkoutConfiguration.environment)
             assertNull(checkoutConfiguration.shopperLocale)
             assertNull(checkoutConfiguration.amount)
         }

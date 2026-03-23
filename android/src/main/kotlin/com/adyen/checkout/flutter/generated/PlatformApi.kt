@@ -83,12 +83,12 @@ class AdyenPigeonError (
 
 enum class Environment(val raw: Int) {
   TEST(0),
-  EUROPE(1),
-  UNITED_STATES(2),
-  AUSTRALIA(3),
-  INDIA(4),
-  APSE(5),
-  NEA(6);
+  LIVE_EUROPE(1),
+  LIVE_UNITED_STATES(2),
+  LIVE_AUSTRALIA(3),
+  LIVE_APSE(4),
+  LIVE_INDIA(5),
+  LIVE_NEA(6);
 
   companion object {
     fun ofRaw(raw: Int): Environment? {

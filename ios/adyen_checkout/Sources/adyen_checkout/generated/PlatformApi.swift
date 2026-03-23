@@ -4,3285 +4,3449 @@
 import Foundation
 
 #if os(iOS)
-  import Flutter
+    import Flutter
 #elseif os(macOS)
-  import FlutterMacOS
+    import FlutterMacOS
 #else
-  #error("Unsupported platform.")
+    #error("Unsupported platform.")
 #endif
 
 /// Error class for passing custom error details to Dart side.
 final class AdyenPigeonError: Error {
-  let code: String
-  let message: String?
-  let details: Sendable?
+    let code: String
+    let message: String?
+    let details: Sendable?
 
-  init(code: String, message: String?, details: Sendable?) {
-    self.code = code
-    self.message = message
-    self.details = details
-  }
+    init(code: String, message: String?, details: Sendable?) {
+        self.code = code
+        self.message = message
+        self.details = details
+    }
 
-  var localizedDescription: String {
-    return
-      "AdyenPigeonError(code: \(code), message: \(message ?? "<nil>"), details: \(details ?? "<nil>")"
-  }
+    var localizedDescription: String {
+        "AdyenPigeonError(code: \(code), message: \(message ?? "<nil>"), details: \(details ?? "<nil>")"
+    }
 }
 
 private func wrapResult(_ result: Any?) -> [Any?] {
-  return [result]
+    [result]
 }
 
 private func wrapError(_ error: Any) -> [Any?] {
-  if let pigeonError = error as? AdyenPigeonError {
+    if let pigeonError = error as? AdyenPigeonError {
+        return [
+            pigeonError.code,
+            pigeonError.message,
+            pigeonError.details
+        ]
+    }
+    if let flutterError = error as? FlutterError {
+        return [
+            flutterError.code,
+            flutterError.message,
+            flutterError.details
+        ]
+    }
     return [
-      pigeonError.code,
-      pigeonError.message,
-      pigeonError.details,
+        "\(error)",
+        "\(type(of: error))",
+        "Stacktrace: \(Thread.callStackSymbols)"
     ]
-  }
-  if let flutterError = error as? FlutterError {
-    return [
-      flutterError.code,
-      flutterError.message,
-      flutterError.details,
-    ]
-  }
-  return [
-    "\(error)",
-    "\(type(of: error))",
-    "Stacktrace: \(Thread.callStackSymbols)",
-  ]
 }
 
 private func createConnectionError(withChannelName channelName: String) -> AdyenPigeonError {
-  return AdyenPigeonError(code: "channel-error", message: "Unable to establish connection on channel: '\(channelName)'.", details: "")
+    AdyenPigeonError(code: "channel-error", message: "Unable to establish connection on channel: '\(channelName)'.", details: "")
 }
 
 private func isNullish(_ value: Any?) -> Bool {
-  return value is NSNull || value == nil
+    value is NSNull || value == nil
 }
 
 private func nilOrValue<T>(_ value: Any?) -> T? {
-  if value is NSNull { return nil }
-  return value as! T?
+    if value is NSNull { return nil }
+    return value as! T?
 }
 
 func deepEqualsPlatformApi(_ lhs: Any?, _ rhs: Any?) -> Bool {
-  let cleanLhs = nilOrValue(lhs) as Any?
-  let cleanRhs = nilOrValue(rhs) as Any?
-  switch (cleanLhs, cleanRhs) {
-  case (nil, nil):
-    return true
+    let cleanLhs = nilOrValue(lhs) as Any?
+    let cleanRhs = nilOrValue(rhs) as Any?
+    switch (cleanLhs, cleanRhs) {
+    case (nil, nil):
+        return true
 
-  case (nil, _), (_, nil):
-    return false
-
-  case is (Void, Void):
-    return true
-
-  case let (cleanLhsHashable, cleanRhsHashable) as (AnyHashable, AnyHashable):
-    return cleanLhsHashable == cleanRhsHashable
-
-  case let (cleanLhsArray, cleanRhsArray) as ([Any?], [Any?]):
-    guard cleanLhsArray.count == cleanRhsArray.count else { return false }
-    for (index, element) in cleanLhsArray.enumerated() {
-      if !deepEqualsPlatformApi(element, cleanRhsArray[index]) {
+    case (nil, _), (_, nil):
         return false
-      }
-    }
-    return true
 
-  case let (cleanLhsDictionary, cleanRhsDictionary) as ([AnyHashable: Any?], [AnyHashable: Any?]):
-    guard cleanLhsDictionary.count == cleanRhsDictionary.count else { return false }
-    for (key, cleanLhsValue) in cleanLhsDictionary {
-      guard cleanRhsDictionary.index(forKey: key) != nil else { return false }
-      if !deepEqualsPlatformApi(cleanLhsValue, cleanRhsDictionary[key]!) {
+    case is (Void, Void):
+        return true
+
+    case let (cleanLhsHashable, cleanRhsHashable) as (AnyHashable, AnyHashable):
+        return cleanLhsHashable == cleanRhsHashable
+
+    case let (cleanLhsArray, cleanRhsArray) as ([Any?], [Any?]):
+        guard cleanLhsArray.count == cleanRhsArray.count else { return false }
+        for (index, element) in cleanLhsArray.enumerated() {
+            if !deepEqualsPlatformApi(element, cleanRhsArray[index]) {
+                return false
+            }
+        }
+        return true
+
+    case let (cleanLhsDictionary, cleanRhsDictionary) as ([AnyHashable: Any?], [AnyHashable: Any?]):
+        guard cleanLhsDictionary.count == cleanRhsDictionary.count else { return false }
+        for (key, cleanLhsValue) in cleanLhsDictionary {
+            guard cleanRhsDictionary.index(forKey: key) != nil else { return false }
+            if !deepEqualsPlatformApi(cleanLhsValue, cleanRhsDictionary[key]!) {
+                return false
+            }
+        }
+        return true
+
+    default:
+        // Any other type shouldn't be able to be used with pigeon. File an issue if you find this to be untrue.
         return false
-      }
     }
-    return true
-
-  default:
-    // Any other type shouldn't be able to be used with pigeon. File an issue if you find this to be untrue.
-    return false
-  }
 }
 
 func deepHashPlatformApi(value: Any?, hasher: inout Hasher) {
-  if let valueList = value as? [AnyHashable] {
-     for item in valueList { deepHashPlatformApi(value: item, hasher: &hasher) }
-     return
-  }
-
-  if let valueDict = value as? [AnyHashable: AnyHashable] {
-    for key in valueDict.keys { 
-      hasher.combine(key)
-      deepHashPlatformApi(value: valueDict[key]!, hasher: &hasher)
+    if let valueList = value as? [AnyHashable] {
+        for item in valueList {
+            deepHashPlatformApi(value: item, hasher: &hasher)
+        }
+        return
     }
-    return
-  }
 
-  if let hashableValue = value as? AnyHashable {
-    hasher.combine(hashableValue.hashValue)
-  }
+    if let valueDict = value as? [AnyHashable: AnyHashable] {
+        for key in valueDict.keys {
+            hasher.combine(key)
+            deepHashPlatformApi(value: valueDict[key]!, hasher: &hasher)
+        }
+        return
+    }
 
-  return hasher.combine(String(describing: value))
+    if let hashableValue = value as? AnyHashable {
+        hasher.combine(hashableValue.hashValue)
+    }
+
+    return hasher.combine(String(describing: value))
 }
 
-    
-
 enum Environment: Int {
-  case test = 0
-  case europe = 1
-  case unitedStates = 2
-  case australia = 3
-  case india = 4
-  case apse = 5
-  case nea = 6
+    case test = 0
+    case liveEurope = 1
+    case liveUnitedStates = 2
+    case liveAustralia = 3
+    case liveApse = 4
+    case liveIndia = 5
+    case liveNea = 6
 }
 
 enum AddressMode: Int {
-  case full = 0
-  case postalCode = 1
-  case none = 2
+    case full = 0
+    case postalCode = 1
+    case none = 2
 }
 
 enum CardAuthMethod: Int {
-  case panOnly = 0
-  case cryptogram3DS = 1
+    case panOnly = 0
+    case cryptogram3DS = 1
 }
 
 enum TotalPriceStatus: Int {
-  case notCurrentlyKnown = 0
-  case estimated = 1
-  case finalPrice = 2
+    case notCurrentlyKnown = 0
+    case estimated = 1
+    case finalPrice = 2
 }
 
 enum GooglePayEnvironment: Int {
-  case test = 0
-  case production = 1
+    case test = 0
+    case production = 1
 }
 
 enum CashAppPayEnvironment: Int {
-  case sandbox = 0
-  case production = 1
+    case sandbox = 0
+    case production = 1
 }
 
 enum PaymentResultEnum: Int {
-  case cancelledByUser = 0
-  case error = 1
-  case finished = 2
+    case cancelledByUser = 0
+    case error = 1
+    case finished = 2
 }
 
 enum CheckoutEventType: Int {
-  case submit = 0
-  case additionalDetails = 1
-  case result = 2
-  case deleteStoredPaymentMethod = 3
-  case balanceCheck = 4
-  case requestOrder = 5
-  case cancelOrder = 6
-  case binLookup = 7
-  case binValue = 8
+    case submit = 0
+    case additionalDetails = 1
+    case result = 2
+    case deleteStoredPaymentMethod = 3
+    case balanceCheck = 4
+    case requestOrder = 5
+    case cancelOrder = 6
+    case binLookup = 7
+    case binValue = 8
 }
 
 enum ComponentCommunicationType: Int {
-  case onSubmit = 0
-  case additionalDetails = 1
-  case loading = 2
-  case result = 3
-  case resize = 4
-  case binLookup = 5
-  case binValue = 6
-  case availability = 7
+    case onSubmit = 0
+    case additionalDetails = 1
+    case loading = 2
+    case result = 3
+    case resize = 4
+    case binLookup = 5
+    case binValue = 6
+    case availability = 7
 }
 
 enum PaymentEventType: Int {
-  case finished = 0
-  case action = 1
-  case error = 2
-  case update = 3
+    case finished = 0
+    case action = 1
+    case error = 2
+    case update = 3
 }
 
 enum FieldVisibility: Int {
-  case show = 0
-  case hide = 1
+    case show = 0
+    case hide = 1
 }
 
 enum InstantPaymentType: Int {
-  case googlePay = 0
-  case applePay = 1
-  case instant = 2
+    case googlePay = 0
+    case applePay = 1
+    case instant = 2
 }
 
 enum ApplePayShippingType: Int {
-  case shipping = 0
-  case delivery = 1
-  case storePickup = 2
-  case servicePickup = 3
+    case shipping = 0
+    case delivery = 1
+    case storePickup = 2
+    case servicePickup = 3
 }
 
 enum ApplePayMerchantCapability: Int {
-  case debit = 0
-  case credit = 1
+    case debit = 0
+    case credit = 1
 }
 
 enum ApplePaySummaryItemType: Int {
-  case pending = 0
-  case definite = 1
+    case pending = 0
+    case definite = 1
 }
 
 enum CardNumberValidationResultDTO: Int {
-  case valid = 0
-  case invalidIllegalCharacters = 1
-  case invalidLuhnCheck = 2
-  case invalidTooShort = 3
-  case invalidTooLong = 4
-  case invalidOtherReason = 5
+    case valid = 0
+    case invalidIllegalCharacters = 1
+    case invalidLuhnCheck = 2
+    case invalidTooShort = 3
+    case invalidTooLong = 4
+    case invalidOtherReason = 5
 }
 
 enum CardExpiryDateValidationResultDTO: Int {
-  case valid = 0
-  case invalidTooFarInTheFuture = 1
-  case invalidTooOld = 2
-  case nonParseableDate = 3
-  case invalidOtherReason = 4
+    case valid = 0
+    case invalidTooFarInTheFuture = 1
+    case invalidTooOld = 2
+    case nonParseableDate = 3
+    case invalidOtherReason = 4
 }
 
 enum CardSecurityCodeValidationResultDTO: Int {
-  case valid = 0
-  case invalid = 1
+    case valid = 0
+    case invalid = 1
 }
 
 /// Generated class from Pigeon that represents data sent in messages.
 struct SessionResponseDTO: Hashable {
-  var id: String
-  var sessionData: String
+    var id: String
+    var sessionData: String
 
+    // swift-format-ignore: AlwaysUseLowerCamelCase
+    static func fromList(_ pigeonVar_list: [Any?]) -> SessionResponseDTO? {
+        let id = pigeonVar_list[0] as! String
+        let sessionData = pigeonVar_list[1] as! String
 
-  // swift-format-ignore: AlwaysUseLowerCamelCase
-  static func fromList(_ pigeonVar_list: [Any?]) -> SessionResponseDTO? {
-    let id = pigeonVar_list[0] as! String
-    let sessionData = pigeonVar_list[1] as! String
+        return SessionResponseDTO(
+            id: id,
+            sessionData: sessionData
+        )
+    }
 
-    return SessionResponseDTO(
-      id: id,
-      sessionData: sessionData
-    )
-  }
-  func toList() -> [Any?] {
-    return [
-      id,
-      sessionData,
-    ]
-  }
-  static func == (lhs: SessionResponseDTO, rhs: SessionResponseDTO) -> Bool {
-    return deepEqualsPlatformApi(lhs.toList(), rhs.toList())  }
-  func hash(into hasher: inout Hasher) {
-    deepHashPlatformApi(value: toList(), hasher: &hasher)
-  }
+    func toList() -> [Any?] {
+        [
+            id,
+            sessionData
+        ]
+    }
+
+    static func == (lhs: SessionResponseDTO, rhs: SessionResponseDTO) -> Bool {
+        deepEqualsPlatformApi(lhs.toList(), rhs.toList())
+    }
+
+    func hash(into hasher: inout Hasher) {
+        deepHashPlatformApi(value: toList(), hasher: &hasher)
+    }
 }
 
 /// Generated class from Pigeon that represents data sent in messages.
 struct SessionDTO: Hashable {
-  var id: String
-  var paymentMethodsJson: String
+    var id: String
+    var paymentMethodsJson: String
 
+    // swift-format-ignore: AlwaysUseLowerCamelCase
+    static func fromList(_ pigeonVar_list: [Any?]) -> SessionDTO? {
+        let id = pigeonVar_list[0] as! String
+        let paymentMethodsJson = pigeonVar_list[1] as! String
 
-  // swift-format-ignore: AlwaysUseLowerCamelCase
-  static func fromList(_ pigeonVar_list: [Any?]) -> SessionDTO? {
-    let id = pigeonVar_list[0] as! String
-    let paymentMethodsJson = pigeonVar_list[1] as! String
+        return SessionDTO(
+            id: id,
+            paymentMethodsJson: paymentMethodsJson
+        )
+    }
 
-    return SessionDTO(
-      id: id,
-      paymentMethodsJson: paymentMethodsJson
-    )
-  }
-  func toList() -> [Any?] {
-    return [
-      id,
-      paymentMethodsJson,
-    ]
-  }
-  static func == (lhs: SessionDTO, rhs: SessionDTO) -> Bool {
-    return deepEqualsPlatformApi(lhs.toList(), rhs.toList())  }
-  func hash(into hasher: inout Hasher) {
-    deepHashPlatformApi(value: toList(), hasher: &hasher)
-  }
+    func toList() -> [Any?] {
+        [
+            id,
+            paymentMethodsJson
+        ]
+    }
+
+    static func == (lhs: SessionDTO, rhs: SessionDTO) -> Bool {
+        deepEqualsPlatformApi(lhs.toList(), rhs.toList())
+    }
+
+    func hash(into hasher: inout Hasher) {
+        deepHashPlatformApi(value: toList(), hasher: &hasher)
+    }
 }
 
 /// Generated class from Pigeon that represents data sent in messages.
 struct AmountDTO: Hashable {
-  var currency: String
-  var value: Int64
+    var currency: String
+    var value: Int64
 
+    // swift-format-ignore: AlwaysUseLowerCamelCase
+    static func fromList(_ pigeonVar_list: [Any?]) -> AmountDTO? {
+        let currency = pigeonVar_list[0] as! String
+        let value = pigeonVar_list[1] as! Int64
 
-  // swift-format-ignore: AlwaysUseLowerCamelCase
-  static func fromList(_ pigeonVar_list: [Any?]) -> AmountDTO? {
-    let currency = pigeonVar_list[0] as! String
-    let value = pigeonVar_list[1] as! Int64
+        return AmountDTO(
+            currency: currency,
+            value: value
+        )
+    }
 
-    return AmountDTO(
-      currency: currency,
-      value: value
-    )
-  }
-  func toList() -> [Any?] {
-    return [
-      currency,
-      value,
-    ]
-  }
-  static func == (lhs: AmountDTO, rhs: AmountDTO) -> Bool {
-    return deepEqualsPlatformApi(lhs.toList(), rhs.toList())  }
-  func hash(into hasher: inout Hasher) {
-    deepHashPlatformApi(value: toList(), hasher: &hasher)
-  }
+    func toList() -> [Any?] {
+        [
+            currency,
+            value
+        ]
+    }
+
+    static func == (lhs: AmountDTO, rhs: AmountDTO) -> Bool {
+        deepEqualsPlatformApi(lhs.toList(), rhs.toList())
+    }
+
+    func hash(into hasher: inout Hasher) {
+        deepHashPlatformApi(value: toList(), hasher: &hasher)
+    }
 }
 
 /// Generated class from Pigeon that represents data sent in messages.
 struct AnalyticsOptionsDTO: Hashable {
-  var enabled: Bool
-  var version: String
+    var enabled: Bool
+    var version: String
 
+    // swift-format-ignore: AlwaysUseLowerCamelCase
+    static func fromList(_ pigeonVar_list: [Any?]) -> AnalyticsOptionsDTO? {
+        let enabled = pigeonVar_list[0] as! Bool
+        let version = pigeonVar_list[1] as! String
 
-  // swift-format-ignore: AlwaysUseLowerCamelCase
-  static func fromList(_ pigeonVar_list: [Any?]) -> AnalyticsOptionsDTO? {
-    let enabled = pigeonVar_list[0] as! Bool
-    let version = pigeonVar_list[1] as! String
+        return AnalyticsOptionsDTO(
+            enabled: enabled,
+            version: version
+        )
+    }
 
-    return AnalyticsOptionsDTO(
-      enabled: enabled,
-      version: version
-    )
-  }
-  func toList() -> [Any?] {
-    return [
-      enabled,
-      version,
-    ]
-  }
-  static func == (lhs: AnalyticsOptionsDTO, rhs: AnalyticsOptionsDTO) -> Bool {
-    return deepEqualsPlatformApi(lhs.toList(), rhs.toList())  }
-  func hash(into hasher: inout Hasher) {
-    deepHashPlatformApi(value: toList(), hasher: &hasher)
-  }
+    func toList() -> [Any?] {
+        [
+            enabled,
+            version
+        ]
+    }
+
+    static func == (lhs: AnalyticsOptionsDTO, rhs: AnalyticsOptionsDTO) -> Bool {
+        deepEqualsPlatformApi(lhs.toList(), rhs.toList())
+    }
+
+    func hash(into hasher: inout Hasher) {
+        deepHashPlatformApi(value: toList(), hasher: &hasher)
+    }
 }
 
 /// Generated class from Pigeon that represents data sent in messages.
 struct ThreeDS2UICustomizationDTO: Hashable {
-  var screenCustomization: ThreeDS2ScreenCustomizationDTO? = nil
-  var headingCustomization: ThreeDS2ToolbarCustomizationDTO? = nil
-  var labelCustomization: ThreeDS2LabelCustomizationDTO? = nil
-  var inputCustomization: ThreeDS2InputCustomizationDTO? = nil
-  var selectionItemCustomization: ThreeDS2SelectionItemCustomizationDTO? = nil
-  var primaryButtonCustomization: ThreeDS2ButtonCustomizationDTO? = nil
-  var secondaryButtonCustomization: ThreeDS2ButtonCustomizationDTO? = nil
+    var screenCustomization: ThreeDS2ScreenCustomizationDTO?
+    var headingCustomization: ThreeDS2ToolbarCustomizationDTO?
+    var labelCustomization: ThreeDS2LabelCustomizationDTO?
+    var inputCustomization: ThreeDS2InputCustomizationDTO?
+    var selectionItemCustomization: ThreeDS2SelectionItemCustomizationDTO?
+    var primaryButtonCustomization: ThreeDS2ButtonCustomizationDTO?
+    var secondaryButtonCustomization: ThreeDS2ButtonCustomizationDTO?
 
+    // swift-format-ignore: AlwaysUseLowerCamelCase
+    static func fromList(_ pigeonVar_list: [Any?]) -> ThreeDS2UICustomizationDTO? {
+        let screenCustomization: ThreeDS2ScreenCustomizationDTO? = nilOrValue(pigeonVar_list[0])
+        let headingCustomization: ThreeDS2ToolbarCustomizationDTO? = nilOrValue(pigeonVar_list[1])
+        let labelCustomization: ThreeDS2LabelCustomizationDTO? = nilOrValue(pigeonVar_list[2])
+        let inputCustomization: ThreeDS2InputCustomizationDTO? = nilOrValue(pigeonVar_list[3])
+        let selectionItemCustomization: ThreeDS2SelectionItemCustomizationDTO? = nilOrValue(pigeonVar_list[4])
+        let primaryButtonCustomization: ThreeDS2ButtonCustomizationDTO? = nilOrValue(pigeonVar_list[5])
+        let secondaryButtonCustomization: ThreeDS2ButtonCustomizationDTO? = nilOrValue(pigeonVar_list[6])
 
-  // swift-format-ignore: AlwaysUseLowerCamelCase
-  static func fromList(_ pigeonVar_list: [Any?]) -> ThreeDS2UICustomizationDTO? {
-    let screenCustomization: ThreeDS2ScreenCustomizationDTO? = nilOrValue(pigeonVar_list[0])
-    let headingCustomization: ThreeDS2ToolbarCustomizationDTO? = nilOrValue(pigeonVar_list[1])
-    let labelCustomization: ThreeDS2LabelCustomizationDTO? = nilOrValue(pigeonVar_list[2])
-    let inputCustomization: ThreeDS2InputCustomizationDTO? = nilOrValue(pigeonVar_list[3])
-    let selectionItemCustomization: ThreeDS2SelectionItemCustomizationDTO? = nilOrValue(pigeonVar_list[4])
-    let primaryButtonCustomization: ThreeDS2ButtonCustomizationDTO? = nilOrValue(pigeonVar_list[5])
-    let secondaryButtonCustomization: ThreeDS2ButtonCustomizationDTO? = nilOrValue(pigeonVar_list[6])
+        return ThreeDS2UICustomizationDTO(
+            screenCustomization: screenCustomization,
+            headingCustomization: headingCustomization,
+            labelCustomization: labelCustomization,
+            inputCustomization: inputCustomization,
+            selectionItemCustomization: selectionItemCustomization,
+            primaryButtonCustomization: primaryButtonCustomization,
+            secondaryButtonCustomization: secondaryButtonCustomization
+        )
+    }
 
-    return ThreeDS2UICustomizationDTO(
-      screenCustomization: screenCustomization,
-      headingCustomization: headingCustomization,
-      labelCustomization: labelCustomization,
-      inputCustomization: inputCustomization,
-      selectionItemCustomization: selectionItemCustomization,
-      primaryButtonCustomization: primaryButtonCustomization,
-      secondaryButtonCustomization: secondaryButtonCustomization
-    )
-  }
-  func toList() -> [Any?] {
-    return [
-      screenCustomization,
-      headingCustomization,
-      labelCustomization,
-      inputCustomization,
-      selectionItemCustomization,
-      primaryButtonCustomization,
-      secondaryButtonCustomization,
-    ]
-  }
-  static func == (lhs: ThreeDS2UICustomizationDTO, rhs: ThreeDS2UICustomizationDTO) -> Bool {
-    return deepEqualsPlatformApi(lhs.toList(), rhs.toList())  }
-  func hash(into hasher: inout Hasher) {
-    deepHashPlatformApi(value: toList(), hasher: &hasher)
-  }
+    func toList() -> [Any?] {
+        [
+            screenCustomization,
+            headingCustomization,
+            labelCustomization,
+            inputCustomization,
+            selectionItemCustomization,
+            primaryButtonCustomization,
+            secondaryButtonCustomization
+        ]
+    }
+
+    static func == (lhs: ThreeDS2UICustomizationDTO, rhs: ThreeDS2UICustomizationDTO) -> Bool {
+        deepEqualsPlatformApi(lhs.toList(), rhs.toList())
+    }
+
+    func hash(into hasher: inout Hasher) {
+        deepHashPlatformApi(value: toList(), hasher: &hasher)
+    }
 }
 
 /// Generated class from Pigeon that represents data sent in messages.
 struct ThreeDS2ScreenCustomizationDTO: Hashable {
-  var backgroundColor: String? = nil
-  var textColor: String? = nil
+    var backgroundColor: String?
+    var textColor: String?
 
+    // swift-format-ignore: AlwaysUseLowerCamelCase
+    static func fromList(_ pigeonVar_list: [Any?]) -> ThreeDS2ScreenCustomizationDTO? {
+        let backgroundColor: String? = nilOrValue(pigeonVar_list[0])
+        let textColor: String? = nilOrValue(pigeonVar_list[1])
 
-  // swift-format-ignore: AlwaysUseLowerCamelCase
-  static func fromList(_ pigeonVar_list: [Any?]) -> ThreeDS2ScreenCustomizationDTO? {
-    let backgroundColor: String? = nilOrValue(pigeonVar_list[0])
-    let textColor: String? = nilOrValue(pigeonVar_list[1])
+        return ThreeDS2ScreenCustomizationDTO(
+            backgroundColor: backgroundColor,
+            textColor: textColor
+        )
+    }
 
-    return ThreeDS2ScreenCustomizationDTO(
-      backgroundColor: backgroundColor,
-      textColor: textColor
-    )
-  }
-  func toList() -> [Any?] {
-    return [
-      backgroundColor,
-      textColor,
-    ]
-  }
-  static func == (lhs: ThreeDS2ScreenCustomizationDTO, rhs: ThreeDS2ScreenCustomizationDTO) -> Bool {
-    return deepEqualsPlatformApi(lhs.toList(), rhs.toList())  }
-  func hash(into hasher: inout Hasher) {
-    deepHashPlatformApi(value: toList(), hasher: &hasher)
-  }
+    func toList() -> [Any?] {
+        [
+            backgroundColor,
+            textColor
+        ]
+    }
+
+    static func == (lhs: ThreeDS2ScreenCustomizationDTO, rhs: ThreeDS2ScreenCustomizationDTO) -> Bool {
+        deepEqualsPlatformApi(lhs.toList(), rhs.toList())
+    }
+
+    func hash(into hasher: inout Hasher) {
+        deepHashPlatformApi(value: toList(), hasher: &hasher)
+    }
 }
 
 /// Generated class from Pigeon that represents data sent in messages.
 struct ThreeDS2ButtonCustomizationDTO: Hashable {
-  var backgroundColor: String? = nil
-  var textColor: String? = nil
-  var cornerRadius: Int64? = nil
-  var textFontSize: Int64? = nil
+    var backgroundColor: String?
+    var textColor: String?
+    var cornerRadius: Int64?
+    var textFontSize: Int64?
 
+    // swift-format-ignore: AlwaysUseLowerCamelCase
+    static func fromList(_ pigeonVar_list: [Any?]) -> ThreeDS2ButtonCustomizationDTO? {
+        let backgroundColor: String? = nilOrValue(pigeonVar_list[0])
+        let textColor: String? = nilOrValue(pigeonVar_list[1])
+        let cornerRadius: Int64? = nilOrValue(pigeonVar_list[2])
+        let textFontSize: Int64? = nilOrValue(pigeonVar_list[3])
 
-  // swift-format-ignore: AlwaysUseLowerCamelCase
-  static func fromList(_ pigeonVar_list: [Any?]) -> ThreeDS2ButtonCustomizationDTO? {
-    let backgroundColor: String? = nilOrValue(pigeonVar_list[0])
-    let textColor: String? = nilOrValue(pigeonVar_list[1])
-    let cornerRadius: Int64? = nilOrValue(pigeonVar_list[2])
-    let textFontSize: Int64? = nilOrValue(pigeonVar_list[3])
+        return ThreeDS2ButtonCustomizationDTO(
+            backgroundColor: backgroundColor,
+            textColor: textColor,
+            cornerRadius: cornerRadius,
+            textFontSize: textFontSize
+        )
+    }
 
-    return ThreeDS2ButtonCustomizationDTO(
-      backgroundColor: backgroundColor,
-      textColor: textColor,
-      cornerRadius: cornerRadius,
-      textFontSize: textFontSize
-    )
-  }
-  func toList() -> [Any?] {
-    return [
-      backgroundColor,
-      textColor,
-      cornerRadius,
-      textFontSize,
-    ]
-  }
-  static func == (lhs: ThreeDS2ButtonCustomizationDTO, rhs: ThreeDS2ButtonCustomizationDTO) -> Bool {
-    return deepEqualsPlatformApi(lhs.toList(), rhs.toList())  }
-  func hash(into hasher: inout Hasher) {
-    deepHashPlatformApi(value: toList(), hasher: &hasher)
-  }
+    func toList() -> [Any?] {
+        [
+            backgroundColor,
+            textColor,
+            cornerRadius,
+            textFontSize
+        ]
+    }
+
+    static func == (lhs: ThreeDS2ButtonCustomizationDTO, rhs: ThreeDS2ButtonCustomizationDTO) -> Bool {
+        deepEqualsPlatformApi(lhs.toList(), rhs.toList())
+    }
+
+    func hash(into hasher: inout Hasher) {
+        deepHashPlatformApi(value: toList(), hasher: &hasher)
+    }
 }
 
 /// Generated class from Pigeon that represents data sent in messages.
 struct ThreeDS2SelectionItemCustomizationDTO: Hashable {
-  var selectionIndicatorTintColor: String? = nil
-  var highlightedBackgroundColor: String? = nil
-  var textColor: String? = nil
+    var selectionIndicatorTintColor: String?
+    var highlightedBackgroundColor: String?
+    var textColor: String?
 
+    // swift-format-ignore: AlwaysUseLowerCamelCase
+    static func fromList(_ pigeonVar_list: [Any?]) -> ThreeDS2SelectionItemCustomizationDTO? {
+        let selectionIndicatorTintColor: String? = nilOrValue(pigeonVar_list[0])
+        let highlightedBackgroundColor: String? = nilOrValue(pigeonVar_list[1])
+        let textColor: String? = nilOrValue(pigeonVar_list[2])
 
-  // swift-format-ignore: AlwaysUseLowerCamelCase
-  static func fromList(_ pigeonVar_list: [Any?]) -> ThreeDS2SelectionItemCustomizationDTO? {
-    let selectionIndicatorTintColor: String? = nilOrValue(pigeonVar_list[0])
-    let highlightedBackgroundColor: String? = nilOrValue(pigeonVar_list[1])
-    let textColor: String? = nilOrValue(pigeonVar_list[2])
+        return ThreeDS2SelectionItemCustomizationDTO(
+            selectionIndicatorTintColor: selectionIndicatorTintColor,
+            highlightedBackgroundColor: highlightedBackgroundColor,
+            textColor: textColor
+        )
+    }
 
-    return ThreeDS2SelectionItemCustomizationDTO(
-      selectionIndicatorTintColor: selectionIndicatorTintColor,
-      highlightedBackgroundColor: highlightedBackgroundColor,
-      textColor: textColor
-    )
-  }
-  func toList() -> [Any?] {
-    return [
-      selectionIndicatorTintColor,
-      highlightedBackgroundColor,
-      textColor,
-    ]
-  }
-  static func == (lhs: ThreeDS2SelectionItemCustomizationDTO, rhs: ThreeDS2SelectionItemCustomizationDTO) -> Bool {
-    return deepEqualsPlatformApi(lhs.toList(), rhs.toList())  }
-  func hash(into hasher: inout Hasher) {
-    deepHashPlatformApi(value: toList(), hasher: &hasher)
-  }
+    func toList() -> [Any?] {
+        [
+            selectionIndicatorTintColor,
+            highlightedBackgroundColor,
+            textColor
+        ]
+    }
+
+    static func == (lhs: ThreeDS2SelectionItemCustomizationDTO, rhs: ThreeDS2SelectionItemCustomizationDTO) -> Bool {
+        deepEqualsPlatformApi(lhs.toList(), rhs.toList())
+    }
+
+    func hash(into hasher: inout Hasher) {
+        deepHashPlatformApi(value: toList(), hasher: &hasher)
+    }
 }
 
 /// Generated class from Pigeon that represents data sent in messages.
 struct ThreeDS2LabelCustomizationDTO: Hashable {
-  var headingTextColor: String? = nil
-  var headingTextFontSize: Int64? = nil
-  var inputLabelTextColor: String? = nil
-  var inputLabelFontSize: Int64? = nil
-  var textColor: String? = nil
-  var textFontSize: Int64? = nil
+    var headingTextColor: String?
+    var headingTextFontSize: Int64?
+    var inputLabelTextColor: String?
+    var inputLabelFontSize: Int64?
+    var textColor: String?
+    var textFontSize: Int64?
 
+    // swift-format-ignore: AlwaysUseLowerCamelCase
+    static func fromList(_ pigeonVar_list: [Any?]) -> ThreeDS2LabelCustomizationDTO? {
+        let headingTextColor: String? = nilOrValue(pigeonVar_list[0])
+        let headingTextFontSize: Int64? = nilOrValue(pigeonVar_list[1])
+        let inputLabelTextColor: String? = nilOrValue(pigeonVar_list[2])
+        let inputLabelFontSize: Int64? = nilOrValue(pigeonVar_list[3])
+        let textColor: String? = nilOrValue(pigeonVar_list[4])
+        let textFontSize: Int64? = nilOrValue(pigeonVar_list[5])
 
-  // swift-format-ignore: AlwaysUseLowerCamelCase
-  static func fromList(_ pigeonVar_list: [Any?]) -> ThreeDS2LabelCustomizationDTO? {
-    let headingTextColor: String? = nilOrValue(pigeonVar_list[0])
-    let headingTextFontSize: Int64? = nilOrValue(pigeonVar_list[1])
-    let inputLabelTextColor: String? = nilOrValue(pigeonVar_list[2])
-    let inputLabelFontSize: Int64? = nilOrValue(pigeonVar_list[3])
-    let textColor: String? = nilOrValue(pigeonVar_list[4])
-    let textFontSize: Int64? = nilOrValue(pigeonVar_list[5])
+        return ThreeDS2LabelCustomizationDTO(
+            headingTextColor: headingTextColor,
+            headingTextFontSize: headingTextFontSize,
+            inputLabelTextColor: inputLabelTextColor,
+            inputLabelFontSize: inputLabelFontSize,
+            textColor: textColor,
+            textFontSize: textFontSize
+        )
+    }
 
-    return ThreeDS2LabelCustomizationDTO(
-      headingTextColor: headingTextColor,
-      headingTextFontSize: headingTextFontSize,
-      inputLabelTextColor: inputLabelTextColor,
-      inputLabelFontSize: inputLabelFontSize,
-      textColor: textColor,
-      textFontSize: textFontSize
-    )
-  }
-  func toList() -> [Any?] {
-    return [
-      headingTextColor,
-      headingTextFontSize,
-      inputLabelTextColor,
-      inputLabelFontSize,
-      textColor,
-      textFontSize,
-    ]
-  }
-  static func == (lhs: ThreeDS2LabelCustomizationDTO, rhs: ThreeDS2LabelCustomizationDTO) -> Bool {
-    return deepEqualsPlatformApi(lhs.toList(), rhs.toList())  }
-  func hash(into hasher: inout Hasher) {
-    deepHashPlatformApi(value: toList(), hasher: &hasher)
-  }
+    func toList() -> [Any?] {
+        [
+            headingTextColor,
+            headingTextFontSize,
+            inputLabelTextColor,
+            inputLabelFontSize,
+            textColor,
+            textFontSize
+        ]
+    }
+
+    static func == (lhs: ThreeDS2LabelCustomizationDTO, rhs: ThreeDS2LabelCustomizationDTO) -> Bool {
+        deepEqualsPlatformApi(lhs.toList(), rhs.toList())
+    }
+
+    func hash(into hasher: inout Hasher) {
+        deepHashPlatformApi(value: toList(), hasher: &hasher)
+    }
 }
 
 /// Generated class from Pigeon that represents data sent in messages.
 struct ThreeDS2InputCustomizationDTO: Hashable {
-  var borderColor: String? = nil
-  var borderWidth: Int64? = nil
-  var cornerRadius: Int64? = nil
-  var textColor: String? = nil
+    var borderColor: String?
+    var borderWidth: Int64?
+    var cornerRadius: Int64?
+    var textColor: String?
 
+    // swift-format-ignore: AlwaysUseLowerCamelCase
+    static func fromList(_ pigeonVar_list: [Any?]) -> ThreeDS2InputCustomizationDTO? {
+        let borderColor: String? = nilOrValue(pigeonVar_list[0])
+        let borderWidth: Int64? = nilOrValue(pigeonVar_list[1])
+        let cornerRadius: Int64? = nilOrValue(pigeonVar_list[2])
+        let textColor: String? = nilOrValue(pigeonVar_list[3])
 
-  // swift-format-ignore: AlwaysUseLowerCamelCase
-  static func fromList(_ pigeonVar_list: [Any?]) -> ThreeDS2InputCustomizationDTO? {
-    let borderColor: String? = nilOrValue(pigeonVar_list[0])
-    let borderWidth: Int64? = nilOrValue(pigeonVar_list[1])
-    let cornerRadius: Int64? = nilOrValue(pigeonVar_list[2])
-    let textColor: String? = nilOrValue(pigeonVar_list[3])
+        return ThreeDS2InputCustomizationDTO(
+            borderColor: borderColor,
+            borderWidth: borderWidth,
+            cornerRadius: cornerRadius,
+            textColor: textColor
+        )
+    }
 
-    return ThreeDS2InputCustomizationDTO(
-      borderColor: borderColor,
-      borderWidth: borderWidth,
-      cornerRadius: cornerRadius,
-      textColor: textColor
-    )
-  }
-  func toList() -> [Any?] {
-    return [
-      borderColor,
-      borderWidth,
-      cornerRadius,
-      textColor,
-    ]
-  }
-  static func == (lhs: ThreeDS2InputCustomizationDTO, rhs: ThreeDS2InputCustomizationDTO) -> Bool {
-    return deepEqualsPlatformApi(lhs.toList(), rhs.toList())  }
-  func hash(into hasher: inout Hasher) {
-    deepHashPlatformApi(value: toList(), hasher: &hasher)
-  }
+    func toList() -> [Any?] {
+        [
+            borderColor,
+            borderWidth,
+            cornerRadius,
+            textColor
+        ]
+    }
+
+    static func == (lhs: ThreeDS2InputCustomizationDTO, rhs: ThreeDS2InputCustomizationDTO) -> Bool {
+        deepEqualsPlatformApi(lhs.toList(), rhs.toList())
+    }
+
+    func hash(into hasher: inout Hasher) {
+        deepHashPlatformApi(value: toList(), hasher: &hasher)
+    }
 }
 
 /// Generated class from Pigeon that represents data sent in messages.
 struct ThreeDS2ToolbarCustomizationDTO: Hashable {
-  var headerText: String? = nil
-  var textColor: String? = nil
-  var backgroundColor: String? = nil
-  var cancelButtonColor: String? = nil
+    var headerText: String?
+    var textColor: String?
+    var backgroundColor: String?
+    var cancelButtonColor: String?
 
+    // swift-format-ignore: AlwaysUseLowerCamelCase
+    static func fromList(_ pigeonVar_list: [Any?]) -> ThreeDS2ToolbarCustomizationDTO? {
+        let headerText: String? = nilOrValue(pigeonVar_list[0])
+        let textColor: String? = nilOrValue(pigeonVar_list[1])
+        let backgroundColor: String? = nilOrValue(pigeonVar_list[2])
+        let cancelButtonColor: String? = nilOrValue(pigeonVar_list[3])
 
-  // swift-format-ignore: AlwaysUseLowerCamelCase
-  static func fromList(_ pigeonVar_list: [Any?]) -> ThreeDS2ToolbarCustomizationDTO? {
-    let headerText: String? = nilOrValue(pigeonVar_list[0])
-    let textColor: String? = nilOrValue(pigeonVar_list[1])
-    let backgroundColor: String? = nilOrValue(pigeonVar_list[2])
-    let cancelButtonColor: String? = nilOrValue(pigeonVar_list[3])
+        return ThreeDS2ToolbarCustomizationDTO(
+            headerText: headerText,
+            textColor: textColor,
+            backgroundColor: backgroundColor,
+            cancelButtonColor: cancelButtonColor
+        )
+    }
 
-    return ThreeDS2ToolbarCustomizationDTO(
-      headerText: headerText,
-      textColor: textColor,
-      backgroundColor: backgroundColor,
-      cancelButtonColor: cancelButtonColor
-    )
-  }
-  func toList() -> [Any?] {
-    return [
-      headerText,
-      textColor,
-      backgroundColor,
-      cancelButtonColor,
-    ]
-  }
-  static func == (lhs: ThreeDS2ToolbarCustomizationDTO, rhs: ThreeDS2ToolbarCustomizationDTO) -> Bool {
-    return deepEqualsPlatformApi(lhs.toList(), rhs.toList())  }
-  func hash(into hasher: inout Hasher) {
-    deepHashPlatformApi(value: toList(), hasher: &hasher)
-  }
+    func toList() -> [Any?] {
+        [
+            headerText,
+            textColor,
+            backgroundColor,
+            cancelButtonColor
+        ]
+    }
+
+    static func == (lhs: ThreeDS2ToolbarCustomizationDTO, rhs: ThreeDS2ToolbarCustomizationDTO) -> Bool {
+        deepEqualsPlatformApi(lhs.toList(), rhs.toList())
+    }
+
+    func hash(into hasher: inout Hasher) {
+        deepHashPlatformApi(value: toList(), hasher: &hasher)
+    }
 }
 
 /// Generated class from Pigeon that represents data sent in messages.
 struct ThreeDS2ConfigurationDTO: Hashable {
-  var requestorAppURL: String? = nil
-  var uiCustomization: ThreeDS2UICustomizationDTO? = nil
+    var requestorAppURL: String?
+    var uiCustomization: ThreeDS2UICustomizationDTO?
 
+    // swift-format-ignore: AlwaysUseLowerCamelCase
+    static func fromList(_ pigeonVar_list: [Any?]) -> ThreeDS2ConfigurationDTO? {
+        let requestorAppURL: String? = nilOrValue(pigeonVar_list[0])
+        let uiCustomization: ThreeDS2UICustomizationDTO? = nilOrValue(pigeonVar_list[1])
 
-  // swift-format-ignore: AlwaysUseLowerCamelCase
-  static func fromList(_ pigeonVar_list: [Any?]) -> ThreeDS2ConfigurationDTO? {
-    let requestorAppURL: String? = nilOrValue(pigeonVar_list[0])
-    let uiCustomization: ThreeDS2UICustomizationDTO? = nilOrValue(pigeonVar_list[1])
+        return ThreeDS2ConfigurationDTO(
+            requestorAppURL: requestorAppURL,
+            uiCustomization: uiCustomization
+        )
+    }
 
-    return ThreeDS2ConfigurationDTO(
-      requestorAppURL: requestorAppURL,
-      uiCustomization: uiCustomization
-    )
-  }
-  func toList() -> [Any?] {
-    return [
-      requestorAppURL,
-      uiCustomization,
-    ]
-  }
-  static func == (lhs: ThreeDS2ConfigurationDTO, rhs: ThreeDS2ConfigurationDTO) -> Bool {
-    return deepEqualsPlatformApi(lhs.toList(), rhs.toList())  }
-  func hash(into hasher: inout Hasher) {
-    deepHashPlatformApi(value: toList(), hasher: &hasher)
-  }
+    func toList() -> [Any?] {
+        [
+            requestorAppURL,
+            uiCustomization
+        ]
+    }
+
+    static func == (lhs: ThreeDS2ConfigurationDTO, rhs: ThreeDS2ConfigurationDTO) -> Bool {
+        deepEqualsPlatformApi(lhs.toList(), rhs.toList())
+    }
+
+    func hash(into hasher: inout Hasher) {
+        deepHashPlatformApi(value: toList(), hasher: &hasher)
+    }
 }
 
 /// Generated class from Pigeon that represents data sent in messages.
 struct DefaultInstallmentOptionsDTO: Hashable {
-  var values: [Int64?]
-  var includesRevolving: Bool
+    var values: [Int64?]
+    var includesRevolving: Bool
 
+    // swift-format-ignore: AlwaysUseLowerCamelCase
+    static func fromList(_ pigeonVar_list: [Any?]) -> DefaultInstallmentOptionsDTO? {
+        let values = pigeonVar_list[0] as! [Int64?]
+        let includesRevolving = pigeonVar_list[1] as! Bool
 
-  // swift-format-ignore: AlwaysUseLowerCamelCase
-  static func fromList(_ pigeonVar_list: [Any?]) -> DefaultInstallmentOptionsDTO? {
-    let values = pigeonVar_list[0] as! [Int64?]
-    let includesRevolving = pigeonVar_list[1] as! Bool
+        return DefaultInstallmentOptionsDTO(
+            values: values,
+            includesRevolving: includesRevolving
+        )
+    }
 
-    return DefaultInstallmentOptionsDTO(
-      values: values,
-      includesRevolving: includesRevolving
-    )
-  }
-  func toList() -> [Any?] {
-    return [
-      values,
-      includesRevolving,
-    ]
-  }
-  static func == (lhs: DefaultInstallmentOptionsDTO, rhs: DefaultInstallmentOptionsDTO) -> Bool {
-    return deepEqualsPlatformApi(lhs.toList(), rhs.toList())  }
-  func hash(into hasher: inout Hasher) {
-    deepHashPlatformApi(value: toList(), hasher: &hasher)
-  }
+    func toList() -> [Any?] {
+        [
+            values,
+            includesRevolving
+        ]
+    }
+
+    static func == (lhs: DefaultInstallmentOptionsDTO, rhs: DefaultInstallmentOptionsDTO) -> Bool {
+        deepEqualsPlatformApi(lhs.toList(), rhs.toList())
+    }
+
+    func hash(into hasher: inout Hasher) {
+        deepHashPlatformApi(value: toList(), hasher: &hasher)
+    }
 }
 
 /// Generated class from Pigeon that represents data sent in messages.
 struct CardBasedInstallmentOptionsDTO: Hashable {
-  var values: [Int64?]
-  var includesRevolving: Bool
-  var cardBrand: String
+    var values: [Int64?]
+    var includesRevolving: Bool
+    var cardBrand: String
 
+    // swift-format-ignore: AlwaysUseLowerCamelCase
+    static func fromList(_ pigeonVar_list: [Any?]) -> CardBasedInstallmentOptionsDTO? {
+        let values = pigeonVar_list[0] as! [Int64?]
+        let includesRevolving = pigeonVar_list[1] as! Bool
+        let cardBrand = pigeonVar_list[2] as! String
 
-  // swift-format-ignore: AlwaysUseLowerCamelCase
-  static func fromList(_ pigeonVar_list: [Any?]) -> CardBasedInstallmentOptionsDTO? {
-    let values = pigeonVar_list[0] as! [Int64?]
-    let includesRevolving = pigeonVar_list[1] as! Bool
-    let cardBrand = pigeonVar_list[2] as! String
+        return CardBasedInstallmentOptionsDTO(
+            values: values,
+            includesRevolving: includesRevolving,
+            cardBrand: cardBrand
+        )
+    }
 
-    return CardBasedInstallmentOptionsDTO(
-      values: values,
-      includesRevolving: includesRevolving,
-      cardBrand: cardBrand
-    )
-  }
-  func toList() -> [Any?] {
-    return [
-      values,
-      includesRevolving,
-      cardBrand,
-    ]
-  }
-  static func == (lhs: CardBasedInstallmentOptionsDTO, rhs: CardBasedInstallmentOptionsDTO) -> Bool {
-    return deepEqualsPlatformApi(lhs.toList(), rhs.toList())  }
-  func hash(into hasher: inout Hasher) {
-    deepHashPlatformApi(value: toList(), hasher: &hasher)
-  }
+    func toList() -> [Any?] {
+        [
+            values,
+            includesRevolving,
+            cardBrand
+        ]
+    }
+
+    static func == (lhs: CardBasedInstallmentOptionsDTO, rhs: CardBasedInstallmentOptionsDTO) -> Bool {
+        deepEqualsPlatformApi(lhs.toList(), rhs.toList())
+    }
+
+    func hash(into hasher: inout Hasher) {
+        deepHashPlatformApi(value: toList(), hasher: &hasher)
+    }
 }
 
 /// Generated class from Pigeon that represents data sent in messages.
 struct InstallmentConfigurationDTO: Hashable {
-  var defaultOptions: DefaultInstallmentOptionsDTO? = nil
-  var cardBasedOptions: [CardBasedInstallmentOptionsDTO?]? = nil
-  var showInstallmentAmount: Bool
+    var defaultOptions: DefaultInstallmentOptionsDTO?
+    var cardBasedOptions: [CardBasedInstallmentOptionsDTO?]?
+    var showInstallmentAmount: Bool
 
+    // swift-format-ignore: AlwaysUseLowerCamelCase
+    static func fromList(_ pigeonVar_list: [Any?]) -> InstallmentConfigurationDTO? {
+        let defaultOptions: DefaultInstallmentOptionsDTO? = nilOrValue(pigeonVar_list[0])
+        let cardBasedOptions: [CardBasedInstallmentOptionsDTO?]? = nilOrValue(pigeonVar_list[1])
+        let showInstallmentAmount = pigeonVar_list[2] as! Bool
 
-  // swift-format-ignore: AlwaysUseLowerCamelCase
-  static func fromList(_ pigeonVar_list: [Any?]) -> InstallmentConfigurationDTO? {
-    let defaultOptions: DefaultInstallmentOptionsDTO? = nilOrValue(pigeonVar_list[0])
-    let cardBasedOptions: [CardBasedInstallmentOptionsDTO?]? = nilOrValue(pigeonVar_list[1])
-    let showInstallmentAmount = pigeonVar_list[2] as! Bool
+        return InstallmentConfigurationDTO(
+            defaultOptions: defaultOptions,
+            cardBasedOptions: cardBasedOptions,
+            showInstallmentAmount: showInstallmentAmount
+        )
+    }
 
-    return InstallmentConfigurationDTO(
-      defaultOptions: defaultOptions,
-      cardBasedOptions: cardBasedOptions,
-      showInstallmentAmount: showInstallmentAmount
-    )
-  }
-  func toList() -> [Any?] {
-    return [
-      defaultOptions,
-      cardBasedOptions,
-      showInstallmentAmount,
-    ]
-  }
-  static func == (lhs: InstallmentConfigurationDTO, rhs: InstallmentConfigurationDTO) -> Bool {
-    return deepEqualsPlatformApi(lhs.toList(), rhs.toList())  }
-  func hash(into hasher: inout Hasher) {
-    deepHashPlatformApi(value: toList(), hasher: &hasher)
-  }
+    func toList() -> [Any?] {
+        [
+            defaultOptions,
+            cardBasedOptions,
+            showInstallmentAmount
+        ]
+    }
+
+    static func == (lhs: InstallmentConfigurationDTO, rhs: InstallmentConfigurationDTO) -> Bool {
+        deepEqualsPlatformApi(lhs.toList(), rhs.toList())
+    }
+
+    func hash(into hasher: inout Hasher) {
+        deepHashPlatformApi(value: toList(), hasher: &hasher)
+    }
 }
 
 /// Generated class from Pigeon that represents data sent in messages.
 struct CheckoutConfigurationDTO: Hashable {
-  var environment: Environment
-  var clientKey: String
-  var countryCode: String? = nil
-  var amount: AmountDTO? = nil
-  var shopperLocale: String? = nil
-  var analyticsOptionsDTO: AnalyticsOptionsDTO
-  var cardConfigurationDTO: CardConfigurationDTO? = nil
-  var applePayConfigurationDTO: ApplePayConfigurationDTO? = nil
-  var googlePayConfigurationDTO: GooglePayConfigurationDTO? = nil
-  var cashAppPayConfigurationDTO: CashAppPayConfigurationDTO? = nil
-  var twintConfigurationDTO: TwintConfigurationDTO? = nil
-  var threeDS2ConfigurationDTO: ThreeDS2ConfigurationDTO? = nil
-  var dropInConfigurationDTO: DropInConfigurationDTO? = nil
+    var environment: Environment
+    var clientKey: String
+    var countryCode: String?
+    var amount: AmountDTO?
+    var shopperLocale: String?
+    var analyticsOptionsDTO: AnalyticsOptionsDTO
+    var cardConfigurationDTO: CardConfigurationDTO?
+    var applePayConfigurationDTO: ApplePayConfigurationDTO?
+    var googlePayConfigurationDTO: GooglePayConfigurationDTO?
+    var cashAppPayConfigurationDTO: CashAppPayConfigurationDTO?
+    var twintConfigurationDTO: TwintConfigurationDTO?
+    var threeDS2ConfigurationDTO: ThreeDS2ConfigurationDTO?
+    var dropInConfigurationDTO: DropInConfigurationDTO?
 
+    // swift-format-ignore: AlwaysUseLowerCamelCase
+    static func fromList(_ pigeonVar_list: [Any?]) -> CheckoutConfigurationDTO? {
+        let environment = pigeonVar_list[0] as! Environment
+        let clientKey = pigeonVar_list[1] as! String
+        let countryCode: String? = nilOrValue(pigeonVar_list[2])
+        let amount: AmountDTO? = nilOrValue(pigeonVar_list[3])
+        let shopperLocale: String? = nilOrValue(pigeonVar_list[4])
+        let analyticsOptionsDTO = pigeonVar_list[5] as! AnalyticsOptionsDTO
+        let cardConfigurationDTO: CardConfigurationDTO? = nilOrValue(pigeonVar_list[6])
+        let applePayConfigurationDTO: ApplePayConfigurationDTO? = nilOrValue(pigeonVar_list[7])
+        let googlePayConfigurationDTO: GooglePayConfigurationDTO? = nilOrValue(pigeonVar_list[8])
+        let cashAppPayConfigurationDTO: CashAppPayConfigurationDTO? = nilOrValue(pigeonVar_list[9])
+        let twintConfigurationDTO: TwintConfigurationDTO? = nilOrValue(pigeonVar_list[10])
+        let threeDS2ConfigurationDTO: ThreeDS2ConfigurationDTO? = nilOrValue(pigeonVar_list[11])
+        let dropInConfigurationDTO: DropInConfigurationDTO? = nilOrValue(pigeonVar_list[12])
 
-  // swift-format-ignore: AlwaysUseLowerCamelCase
-  static func fromList(_ pigeonVar_list: [Any?]) -> CheckoutConfigurationDTO? {
-    let environment = pigeonVar_list[0] as! Environment
-    let clientKey = pigeonVar_list[1] as! String
-    let countryCode: String? = nilOrValue(pigeonVar_list[2])
-    let amount: AmountDTO? = nilOrValue(pigeonVar_list[3])
-    let shopperLocale: String? = nilOrValue(pigeonVar_list[4])
-    let analyticsOptionsDTO = pigeonVar_list[5] as! AnalyticsOptionsDTO
-    let cardConfigurationDTO: CardConfigurationDTO? = nilOrValue(pigeonVar_list[6])
-    let applePayConfigurationDTO: ApplePayConfigurationDTO? = nilOrValue(pigeonVar_list[7])
-    let googlePayConfigurationDTO: GooglePayConfigurationDTO? = nilOrValue(pigeonVar_list[8])
-    let cashAppPayConfigurationDTO: CashAppPayConfigurationDTO? = nilOrValue(pigeonVar_list[9])
-    let twintConfigurationDTO: TwintConfigurationDTO? = nilOrValue(pigeonVar_list[10])
-    let threeDS2ConfigurationDTO: ThreeDS2ConfigurationDTO? = nilOrValue(pigeonVar_list[11])
-    let dropInConfigurationDTO: DropInConfigurationDTO? = nilOrValue(pigeonVar_list[12])
+        return CheckoutConfigurationDTO(
+            environment: environment,
+            clientKey: clientKey,
+            countryCode: countryCode,
+            amount: amount,
+            shopperLocale: shopperLocale,
+            analyticsOptionsDTO: analyticsOptionsDTO,
+            cardConfigurationDTO: cardConfigurationDTO,
+            applePayConfigurationDTO: applePayConfigurationDTO,
+            googlePayConfigurationDTO: googlePayConfigurationDTO,
+            cashAppPayConfigurationDTO: cashAppPayConfigurationDTO,
+            twintConfigurationDTO: twintConfigurationDTO,
+            threeDS2ConfigurationDTO: threeDS2ConfigurationDTO,
+            dropInConfigurationDTO: dropInConfigurationDTO
+        )
+    }
 
-    return CheckoutConfigurationDTO(
-      environment: environment,
-      clientKey: clientKey,
-      countryCode: countryCode,
-      amount: amount,
-      shopperLocale: shopperLocale,
-      analyticsOptionsDTO: analyticsOptionsDTO,
-      cardConfigurationDTO: cardConfigurationDTO,
-      applePayConfigurationDTO: applePayConfigurationDTO,
-      googlePayConfigurationDTO: googlePayConfigurationDTO,
-      cashAppPayConfigurationDTO: cashAppPayConfigurationDTO,
-      twintConfigurationDTO: twintConfigurationDTO,
-      threeDS2ConfigurationDTO: threeDS2ConfigurationDTO,
-      dropInConfigurationDTO: dropInConfigurationDTO
-    )
-  }
-  func toList() -> [Any?] {
-    return [
-      environment,
-      clientKey,
-      countryCode,
-      amount,
-      shopperLocale,
-      analyticsOptionsDTO,
-      cardConfigurationDTO,
-      applePayConfigurationDTO,
-      googlePayConfigurationDTO,
-      cashAppPayConfigurationDTO,
-      twintConfigurationDTO,
-      threeDS2ConfigurationDTO,
-      dropInConfigurationDTO,
-    ]
-  }
-  static func == (lhs: CheckoutConfigurationDTO, rhs: CheckoutConfigurationDTO) -> Bool {
-    return deepEqualsPlatformApi(lhs.toList(), rhs.toList())  }
-  func hash(into hasher: inout Hasher) {
-    deepHashPlatformApi(value: toList(), hasher: &hasher)
-  }
+    func toList() -> [Any?] {
+        [
+            environment,
+            clientKey,
+            countryCode,
+            amount,
+            shopperLocale,
+            analyticsOptionsDTO,
+            cardConfigurationDTO,
+            applePayConfigurationDTO,
+            googlePayConfigurationDTO,
+            cashAppPayConfigurationDTO,
+            twintConfigurationDTO,
+            threeDS2ConfigurationDTO,
+            dropInConfigurationDTO
+        ]
+    }
+
+    static func == (lhs: CheckoutConfigurationDTO, rhs: CheckoutConfigurationDTO) -> Bool {
+        deepEqualsPlatformApi(lhs.toList(), rhs.toList())
+    }
+
+    func hash(into hasher: inout Hasher) {
+        deepHashPlatformApi(value: toList(), hasher: &hasher)
+    }
 }
 
 /// Generated class from Pigeon that represents data sent in messages.
 struct DropInConfigurationDTO: Hashable {
-  var environment: Environment
-  var clientKey: String
-  var countryCode: String
-  var amount: AmountDTO? = nil
-  var shopperLocale: String? = nil
-  var analyticsOptionsDTO: AnalyticsOptionsDTO
-  var cardConfigurationDTO: CardConfigurationDTO? = nil
-  var applePayConfigurationDTO: ApplePayConfigurationDTO? = nil
-  var googlePayConfigurationDTO: GooglePayConfigurationDTO? = nil
-  var cashAppPayConfigurationDTO: CashAppPayConfigurationDTO? = nil
-  var twintConfigurationDTO: TwintConfigurationDTO? = nil
-  var threeDS2ConfigurationDTO: ThreeDS2ConfigurationDTO? = nil
-  var showPreselectedStoredPaymentMethod: Bool
-  var skipListWhenSinglePaymentMethod: Bool
-  var isRemoveStoredPaymentMethodEnabled: Bool
-  var preselectedPaymentMethodTitle: String? = nil
-  var paymentMethodNames: [String?: String?]? = nil
-  var isPartialPaymentSupported: Bool
+    var environment: Environment
+    var clientKey: String
+    var countryCode: String
+    var amount: AmountDTO?
+    var shopperLocale: String?
+    var analyticsOptionsDTO: AnalyticsOptionsDTO
+    var cardConfigurationDTO: CardConfigurationDTO?
+    var applePayConfigurationDTO: ApplePayConfigurationDTO?
+    var googlePayConfigurationDTO: GooglePayConfigurationDTO?
+    var cashAppPayConfigurationDTO: CashAppPayConfigurationDTO?
+    var twintConfigurationDTO: TwintConfigurationDTO?
+    var threeDS2ConfigurationDTO: ThreeDS2ConfigurationDTO?
+    var showPreselectedStoredPaymentMethod: Bool
+    var skipListWhenSinglePaymentMethod: Bool
+    var isRemoveStoredPaymentMethodEnabled: Bool
+    var preselectedPaymentMethodTitle: String?
+    var paymentMethodNames: [String?: String?]?
+    var isPartialPaymentSupported: Bool
 
+    // swift-format-ignore: AlwaysUseLowerCamelCase
+    static func fromList(_ pigeonVar_list: [Any?]) -> DropInConfigurationDTO? {
+        let environment = pigeonVar_list[0] as! Environment
+        let clientKey = pigeonVar_list[1] as! String
+        let countryCode = pigeonVar_list[2] as! String
+        let amount: AmountDTO? = nilOrValue(pigeonVar_list[3])
+        let shopperLocale: String? = nilOrValue(pigeonVar_list[4])
+        let analyticsOptionsDTO = pigeonVar_list[5] as! AnalyticsOptionsDTO
+        let cardConfigurationDTO: CardConfigurationDTO? = nilOrValue(pigeonVar_list[6])
+        let applePayConfigurationDTO: ApplePayConfigurationDTO? = nilOrValue(pigeonVar_list[7])
+        let googlePayConfigurationDTO: GooglePayConfigurationDTO? = nilOrValue(pigeonVar_list[8])
+        let cashAppPayConfigurationDTO: CashAppPayConfigurationDTO? = nilOrValue(pigeonVar_list[9])
+        let twintConfigurationDTO: TwintConfigurationDTO? = nilOrValue(pigeonVar_list[10])
+        let threeDS2ConfigurationDTO: ThreeDS2ConfigurationDTO? = nilOrValue(pigeonVar_list[11])
+        let showPreselectedStoredPaymentMethod = pigeonVar_list[12] as! Bool
+        let skipListWhenSinglePaymentMethod = pigeonVar_list[13] as! Bool
+        let isRemoveStoredPaymentMethodEnabled = pigeonVar_list[14] as! Bool
+        let preselectedPaymentMethodTitle: String? = nilOrValue(pigeonVar_list[15])
+        let paymentMethodNames: [String?: String?]? = nilOrValue(pigeonVar_list[16])
+        let isPartialPaymentSupported = pigeonVar_list[17] as! Bool
 
-  // swift-format-ignore: AlwaysUseLowerCamelCase
-  static func fromList(_ pigeonVar_list: [Any?]) -> DropInConfigurationDTO? {
-    let environment = pigeonVar_list[0] as! Environment
-    let clientKey = pigeonVar_list[1] as! String
-    let countryCode = pigeonVar_list[2] as! String
-    let amount: AmountDTO? = nilOrValue(pigeonVar_list[3])
-    let shopperLocale: String? = nilOrValue(pigeonVar_list[4])
-    let analyticsOptionsDTO = pigeonVar_list[5] as! AnalyticsOptionsDTO
-    let cardConfigurationDTO: CardConfigurationDTO? = nilOrValue(pigeonVar_list[6])
-    let applePayConfigurationDTO: ApplePayConfigurationDTO? = nilOrValue(pigeonVar_list[7])
-    let googlePayConfigurationDTO: GooglePayConfigurationDTO? = nilOrValue(pigeonVar_list[8])
-    let cashAppPayConfigurationDTO: CashAppPayConfigurationDTO? = nilOrValue(pigeonVar_list[9])
-    let twintConfigurationDTO: TwintConfigurationDTO? = nilOrValue(pigeonVar_list[10])
-    let threeDS2ConfigurationDTO: ThreeDS2ConfigurationDTO? = nilOrValue(pigeonVar_list[11])
-    let showPreselectedStoredPaymentMethod = pigeonVar_list[12] as! Bool
-    let skipListWhenSinglePaymentMethod = pigeonVar_list[13] as! Bool
-    let isRemoveStoredPaymentMethodEnabled = pigeonVar_list[14] as! Bool
-    let preselectedPaymentMethodTitle: String? = nilOrValue(pigeonVar_list[15])
-    let paymentMethodNames: [String?: String?]? = nilOrValue(pigeonVar_list[16])
-    let isPartialPaymentSupported = pigeonVar_list[17] as! Bool
+        return DropInConfigurationDTO(
+            environment: environment,
+            clientKey: clientKey,
+            countryCode: countryCode,
+            amount: amount,
+            shopperLocale: shopperLocale,
+            analyticsOptionsDTO: analyticsOptionsDTO,
+            cardConfigurationDTO: cardConfigurationDTO,
+            applePayConfigurationDTO: applePayConfigurationDTO,
+            googlePayConfigurationDTO: googlePayConfigurationDTO,
+            cashAppPayConfigurationDTO: cashAppPayConfigurationDTO,
+            twintConfigurationDTO: twintConfigurationDTO,
+            threeDS2ConfigurationDTO: threeDS2ConfigurationDTO,
+            showPreselectedStoredPaymentMethod: showPreselectedStoredPaymentMethod,
+            skipListWhenSinglePaymentMethod: skipListWhenSinglePaymentMethod,
+            isRemoveStoredPaymentMethodEnabled: isRemoveStoredPaymentMethodEnabled,
+            preselectedPaymentMethodTitle: preselectedPaymentMethodTitle,
+            paymentMethodNames: paymentMethodNames,
+            isPartialPaymentSupported: isPartialPaymentSupported
+        )
+    }
 
-    return DropInConfigurationDTO(
-      environment: environment,
-      clientKey: clientKey,
-      countryCode: countryCode,
-      amount: amount,
-      shopperLocale: shopperLocale,
-      analyticsOptionsDTO: analyticsOptionsDTO,
-      cardConfigurationDTO: cardConfigurationDTO,
-      applePayConfigurationDTO: applePayConfigurationDTO,
-      googlePayConfigurationDTO: googlePayConfigurationDTO,
-      cashAppPayConfigurationDTO: cashAppPayConfigurationDTO,
-      twintConfigurationDTO: twintConfigurationDTO,
-      threeDS2ConfigurationDTO: threeDS2ConfigurationDTO,
-      showPreselectedStoredPaymentMethod: showPreselectedStoredPaymentMethod,
-      skipListWhenSinglePaymentMethod: skipListWhenSinglePaymentMethod,
-      isRemoveStoredPaymentMethodEnabled: isRemoveStoredPaymentMethodEnabled,
-      preselectedPaymentMethodTitle: preselectedPaymentMethodTitle,
-      paymentMethodNames: paymentMethodNames,
-      isPartialPaymentSupported: isPartialPaymentSupported
-    )
-  }
-  func toList() -> [Any?] {
-    return [
-      environment,
-      clientKey,
-      countryCode,
-      amount,
-      shopperLocale,
-      analyticsOptionsDTO,
-      cardConfigurationDTO,
-      applePayConfigurationDTO,
-      googlePayConfigurationDTO,
-      cashAppPayConfigurationDTO,
-      twintConfigurationDTO,
-      threeDS2ConfigurationDTO,
-      showPreselectedStoredPaymentMethod,
-      skipListWhenSinglePaymentMethod,
-      isRemoveStoredPaymentMethodEnabled,
-      preselectedPaymentMethodTitle,
-      paymentMethodNames,
-      isPartialPaymentSupported,
-    ]
-  }
-  static func == (lhs: DropInConfigurationDTO, rhs: DropInConfigurationDTO) -> Bool {
-    return deepEqualsPlatformApi(lhs.toList(), rhs.toList())  }
-  func hash(into hasher: inout Hasher) {
-    deepHashPlatformApi(value: toList(), hasher: &hasher)
-  }
+    func toList() -> [Any?] {
+        [
+            environment,
+            clientKey,
+            countryCode,
+            amount,
+            shopperLocale,
+            analyticsOptionsDTO,
+            cardConfigurationDTO,
+            applePayConfigurationDTO,
+            googlePayConfigurationDTO,
+            cashAppPayConfigurationDTO,
+            twintConfigurationDTO,
+            threeDS2ConfigurationDTO,
+            showPreselectedStoredPaymentMethod,
+            skipListWhenSinglePaymentMethod,
+            isRemoveStoredPaymentMethodEnabled,
+            preselectedPaymentMethodTitle,
+            paymentMethodNames,
+            isPartialPaymentSupported
+        ]
+    }
+
+    static func == (lhs: DropInConfigurationDTO, rhs: DropInConfigurationDTO) -> Bool {
+        deepEqualsPlatformApi(lhs.toList(), rhs.toList())
+    }
+
+    func hash(into hasher: inout Hasher) {
+        deepHashPlatformApi(value: toList(), hasher: &hasher)
+    }
 }
 
 /// Generated class from Pigeon that represents data sent in messages.
 struct CardConfigurationDTO: Hashable {
-  var holderNameRequired: Bool
-  var addressMode: AddressMode
-  var showStorePaymentField: Bool
-  var showCvcForStoredCard: Bool
-  var showCvc: Bool
-  var kcpFieldVisibility: FieldVisibility
-  var socialSecurityNumberFieldVisibility: FieldVisibility
-  var supportedCardTypes: [String?]
-  var installmentConfiguration: InstallmentConfigurationDTO? = nil
+    var holderNameRequired: Bool
+    var addressMode: AddressMode
+    var showStorePaymentField: Bool
+    var showCvcForStoredCard: Bool
+    var showCvc: Bool
+    var kcpFieldVisibility: FieldVisibility
+    var socialSecurityNumberFieldVisibility: FieldVisibility
+    var supportedCardTypes: [String?]
+    var installmentConfiguration: InstallmentConfigurationDTO?
 
+    // swift-format-ignore: AlwaysUseLowerCamelCase
+    static func fromList(_ pigeonVar_list: [Any?]) -> CardConfigurationDTO? {
+        let holderNameRequired = pigeonVar_list[0] as! Bool
+        let addressMode = pigeonVar_list[1] as! AddressMode
+        let showStorePaymentField = pigeonVar_list[2] as! Bool
+        let showCvcForStoredCard = pigeonVar_list[3] as! Bool
+        let showCvc = pigeonVar_list[4] as! Bool
+        let kcpFieldVisibility = pigeonVar_list[5] as! FieldVisibility
+        let socialSecurityNumberFieldVisibility = pigeonVar_list[6] as! FieldVisibility
+        let supportedCardTypes = pigeonVar_list[7] as! [String?]
+        let installmentConfiguration: InstallmentConfigurationDTO? = nilOrValue(pigeonVar_list[8])
 
-  // swift-format-ignore: AlwaysUseLowerCamelCase
-  static func fromList(_ pigeonVar_list: [Any?]) -> CardConfigurationDTO? {
-    let holderNameRequired = pigeonVar_list[0] as! Bool
-    let addressMode = pigeonVar_list[1] as! AddressMode
-    let showStorePaymentField = pigeonVar_list[2] as! Bool
-    let showCvcForStoredCard = pigeonVar_list[3] as! Bool
-    let showCvc = pigeonVar_list[4] as! Bool
-    let kcpFieldVisibility = pigeonVar_list[5] as! FieldVisibility
-    let socialSecurityNumberFieldVisibility = pigeonVar_list[6] as! FieldVisibility
-    let supportedCardTypes = pigeonVar_list[7] as! [String?]
-    let installmentConfiguration: InstallmentConfigurationDTO? = nilOrValue(pigeonVar_list[8])
+        return CardConfigurationDTO(
+            holderNameRequired: holderNameRequired,
+            addressMode: addressMode,
+            showStorePaymentField: showStorePaymentField,
+            showCvcForStoredCard: showCvcForStoredCard,
+            showCvc: showCvc,
+            kcpFieldVisibility: kcpFieldVisibility,
+            socialSecurityNumberFieldVisibility: socialSecurityNumberFieldVisibility,
+            supportedCardTypes: supportedCardTypes,
+            installmentConfiguration: installmentConfiguration
+        )
+    }
 
-    return CardConfigurationDTO(
-      holderNameRequired: holderNameRequired,
-      addressMode: addressMode,
-      showStorePaymentField: showStorePaymentField,
-      showCvcForStoredCard: showCvcForStoredCard,
-      showCvc: showCvc,
-      kcpFieldVisibility: kcpFieldVisibility,
-      socialSecurityNumberFieldVisibility: socialSecurityNumberFieldVisibility,
-      supportedCardTypes: supportedCardTypes,
-      installmentConfiguration: installmentConfiguration
-    )
-  }
-  func toList() -> [Any?] {
-    return [
-      holderNameRequired,
-      addressMode,
-      showStorePaymentField,
-      showCvcForStoredCard,
-      showCvc,
-      kcpFieldVisibility,
-      socialSecurityNumberFieldVisibility,
-      supportedCardTypes,
-      installmentConfiguration,
-    ]
-  }
-  static func == (lhs: CardConfigurationDTO, rhs: CardConfigurationDTO) -> Bool {
-    return deepEqualsPlatformApi(lhs.toList(), rhs.toList())  }
-  func hash(into hasher: inout Hasher) {
-    deepHashPlatformApi(value: toList(), hasher: &hasher)
-  }
+    func toList() -> [Any?] {
+        [
+            holderNameRequired,
+            addressMode,
+            showStorePaymentField,
+            showCvcForStoredCard,
+            showCvc,
+            kcpFieldVisibility,
+            socialSecurityNumberFieldVisibility,
+            supportedCardTypes,
+            installmentConfiguration
+        ]
+    }
+
+    static func == (lhs: CardConfigurationDTO, rhs: CardConfigurationDTO) -> Bool {
+        deepEqualsPlatformApi(lhs.toList(), rhs.toList())
+    }
+
+    func hash(into hasher: inout Hasher) {
+        deepHashPlatformApi(value: toList(), hasher: &hasher)
+    }
 }
 
 /// Generated class from Pigeon that represents data sent in messages.
 struct ApplePayConfigurationDTO: Hashable {
-  var merchantId: String
-  var merchantName: String
-  var allowOnboarding: Bool? = nil
-  var summaryItems: [ApplePaySummaryItemDTO?]? = nil
-  var requiredBillingContactFields: [String?]? = nil
-  var billingContact: ApplePayContactDTO? = nil
-  var requiredShippingContactFields: [String?]? = nil
-  var shippingContact: ApplePayContactDTO? = nil
-  var applePayShippingType: ApplePayShippingType? = nil
-  var allowShippingContactEditing: Bool? = nil
-  var shippingMethods: [ApplePayShippingMethodDTO?]? = nil
-  var applicationData: String? = nil
-  var supportedCountries: [String?]? = nil
-  var merchantCapability: ApplePayMerchantCapability? = nil
+    var merchantId: String
+    var merchantName: String
+    var allowOnboarding: Bool?
+    var summaryItems: [ApplePaySummaryItemDTO?]?
+    var requiredBillingContactFields: [String?]?
+    var billingContact: ApplePayContactDTO?
+    var requiredShippingContactFields: [String?]?
+    var shippingContact: ApplePayContactDTO?
+    var applePayShippingType: ApplePayShippingType?
+    var allowShippingContactEditing: Bool?
+    var shippingMethods: [ApplePayShippingMethodDTO?]?
+    var applicationData: String?
+    var supportedCountries: [String?]?
+    var merchantCapability: ApplePayMerchantCapability?
 
+    // swift-format-ignore: AlwaysUseLowerCamelCase
+    static func fromList(_ pigeonVar_list: [Any?]) -> ApplePayConfigurationDTO? {
+        let merchantId = pigeonVar_list[0] as! String
+        let merchantName = pigeonVar_list[1] as! String
+        let allowOnboarding: Bool? = nilOrValue(pigeonVar_list[2])
+        let summaryItems: [ApplePaySummaryItemDTO?]? = nilOrValue(pigeonVar_list[3])
+        let requiredBillingContactFields: [String?]? = nilOrValue(pigeonVar_list[4])
+        let billingContact: ApplePayContactDTO? = nilOrValue(pigeonVar_list[5])
+        let requiredShippingContactFields: [String?]? = nilOrValue(pigeonVar_list[6])
+        let shippingContact: ApplePayContactDTO? = nilOrValue(pigeonVar_list[7])
+        let applePayShippingType: ApplePayShippingType? = nilOrValue(pigeonVar_list[8])
+        let allowShippingContactEditing: Bool? = nilOrValue(pigeonVar_list[9])
+        let shippingMethods: [ApplePayShippingMethodDTO?]? = nilOrValue(pigeonVar_list[10])
+        let applicationData: String? = nilOrValue(pigeonVar_list[11])
+        let supportedCountries: [String?]? = nilOrValue(pigeonVar_list[12])
+        let merchantCapability: ApplePayMerchantCapability? = nilOrValue(pigeonVar_list[13])
 
-  // swift-format-ignore: AlwaysUseLowerCamelCase
-  static func fromList(_ pigeonVar_list: [Any?]) -> ApplePayConfigurationDTO? {
-    let merchantId = pigeonVar_list[0] as! String
-    let merchantName = pigeonVar_list[1] as! String
-    let allowOnboarding: Bool? = nilOrValue(pigeonVar_list[2])
-    let summaryItems: [ApplePaySummaryItemDTO?]? = nilOrValue(pigeonVar_list[3])
-    let requiredBillingContactFields: [String?]? = nilOrValue(pigeonVar_list[4])
-    let billingContact: ApplePayContactDTO? = nilOrValue(pigeonVar_list[5])
-    let requiredShippingContactFields: [String?]? = nilOrValue(pigeonVar_list[6])
-    let shippingContact: ApplePayContactDTO? = nilOrValue(pigeonVar_list[7])
-    let applePayShippingType: ApplePayShippingType? = nilOrValue(pigeonVar_list[8])
-    let allowShippingContactEditing: Bool? = nilOrValue(pigeonVar_list[9])
-    let shippingMethods: [ApplePayShippingMethodDTO?]? = nilOrValue(pigeonVar_list[10])
-    let applicationData: String? = nilOrValue(pigeonVar_list[11])
-    let supportedCountries: [String?]? = nilOrValue(pigeonVar_list[12])
-    let merchantCapability: ApplePayMerchantCapability? = nilOrValue(pigeonVar_list[13])
+        return ApplePayConfigurationDTO(
+            merchantId: merchantId,
+            merchantName: merchantName,
+            allowOnboarding: allowOnboarding,
+            summaryItems: summaryItems,
+            requiredBillingContactFields: requiredBillingContactFields,
+            billingContact: billingContact,
+            requiredShippingContactFields: requiredShippingContactFields,
+            shippingContact: shippingContact,
+            applePayShippingType: applePayShippingType,
+            allowShippingContactEditing: allowShippingContactEditing,
+            shippingMethods: shippingMethods,
+            applicationData: applicationData,
+            supportedCountries: supportedCountries,
+            merchantCapability: merchantCapability
+        )
+    }
 
-    return ApplePayConfigurationDTO(
-      merchantId: merchantId,
-      merchantName: merchantName,
-      allowOnboarding: allowOnboarding,
-      summaryItems: summaryItems,
-      requiredBillingContactFields: requiredBillingContactFields,
-      billingContact: billingContact,
-      requiredShippingContactFields: requiredShippingContactFields,
-      shippingContact: shippingContact,
-      applePayShippingType: applePayShippingType,
-      allowShippingContactEditing: allowShippingContactEditing,
-      shippingMethods: shippingMethods,
-      applicationData: applicationData,
-      supportedCountries: supportedCountries,
-      merchantCapability: merchantCapability
-    )
-  }
-  func toList() -> [Any?] {
-    return [
-      merchantId,
-      merchantName,
-      allowOnboarding,
-      summaryItems,
-      requiredBillingContactFields,
-      billingContact,
-      requiredShippingContactFields,
-      shippingContact,
-      applePayShippingType,
-      allowShippingContactEditing,
-      shippingMethods,
-      applicationData,
-      supportedCountries,
-      merchantCapability,
-    ]
-  }
-  static func == (lhs: ApplePayConfigurationDTO, rhs: ApplePayConfigurationDTO) -> Bool {
-    return deepEqualsPlatformApi(lhs.toList(), rhs.toList())  }
-  func hash(into hasher: inout Hasher) {
-    deepHashPlatformApi(value: toList(), hasher: &hasher)
-  }
+    func toList() -> [Any?] {
+        [
+            merchantId,
+            merchantName,
+            allowOnboarding,
+            summaryItems,
+            requiredBillingContactFields,
+            billingContact,
+            requiredShippingContactFields,
+            shippingContact,
+            applePayShippingType,
+            allowShippingContactEditing,
+            shippingMethods,
+            applicationData,
+            supportedCountries,
+            merchantCapability
+        ]
+    }
+
+    static func == (lhs: ApplePayConfigurationDTO, rhs: ApplePayConfigurationDTO) -> Bool {
+        deepEqualsPlatformApi(lhs.toList(), rhs.toList())
+    }
+
+    func hash(into hasher: inout Hasher) {
+        deepHashPlatformApi(value: toList(), hasher: &hasher)
+    }
 }
 
 /// Generated class from Pigeon that represents data sent in messages.
 struct ApplePayContactDTO: Hashable {
-  var phoneNumber: String? = nil
-  var emailAddress: String? = nil
-  var givenName: String? = nil
-  var familyName: String? = nil
-  var phoneticGivenName: String? = nil
-  var phoneticFamilyName: String? = nil
-  var addressLines: [String?]? = nil
-  var subLocality: String? = nil
-  var city: String? = nil
-  var postalCode: String? = nil
-  var subAdministrativeArea: String? = nil
-  var administrativeArea: String? = nil
-  var country: String? = nil
-  var countryCode: String? = nil
+    var phoneNumber: String?
+    var emailAddress: String?
+    var givenName: String?
+    var familyName: String?
+    var phoneticGivenName: String?
+    var phoneticFamilyName: String?
+    var addressLines: [String?]?
+    var subLocality: String?
+    var city: String?
+    var postalCode: String?
+    var subAdministrativeArea: String?
+    var administrativeArea: String?
+    var country: String?
+    var countryCode: String?
 
+    // swift-format-ignore: AlwaysUseLowerCamelCase
+    static func fromList(_ pigeonVar_list: [Any?]) -> ApplePayContactDTO? {
+        let phoneNumber: String? = nilOrValue(pigeonVar_list[0])
+        let emailAddress: String? = nilOrValue(pigeonVar_list[1])
+        let givenName: String? = nilOrValue(pigeonVar_list[2])
+        let familyName: String? = nilOrValue(pigeonVar_list[3])
+        let phoneticGivenName: String? = nilOrValue(pigeonVar_list[4])
+        let phoneticFamilyName: String? = nilOrValue(pigeonVar_list[5])
+        let addressLines: [String?]? = nilOrValue(pigeonVar_list[6])
+        let subLocality: String? = nilOrValue(pigeonVar_list[7])
+        let city: String? = nilOrValue(pigeonVar_list[8])
+        let postalCode: String? = nilOrValue(pigeonVar_list[9])
+        let subAdministrativeArea: String? = nilOrValue(pigeonVar_list[10])
+        let administrativeArea: String? = nilOrValue(pigeonVar_list[11])
+        let country: String? = nilOrValue(pigeonVar_list[12])
+        let countryCode: String? = nilOrValue(pigeonVar_list[13])
 
-  // swift-format-ignore: AlwaysUseLowerCamelCase
-  static func fromList(_ pigeonVar_list: [Any?]) -> ApplePayContactDTO? {
-    let phoneNumber: String? = nilOrValue(pigeonVar_list[0])
-    let emailAddress: String? = nilOrValue(pigeonVar_list[1])
-    let givenName: String? = nilOrValue(pigeonVar_list[2])
-    let familyName: String? = nilOrValue(pigeonVar_list[3])
-    let phoneticGivenName: String? = nilOrValue(pigeonVar_list[4])
-    let phoneticFamilyName: String? = nilOrValue(pigeonVar_list[5])
-    let addressLines: [String?]? = nilOrValue(pigeonVar_list[6])
-    let subLocality: String? = nilOrValue(pigeonVar_list[7])
-    let city: String? = nilOrValue(pigeonVar_list[8])
-    let postalCode: String? = nilOrValue(pigeonVar_list[9])
-    let subAdministrativeArea: String? = nilOrValue(pigeonVar_list[10])
-    let administrativeArea: String? = nilOrValue(pigeonVar_list[11])
-    let country: String? = nilOrValue(pigeonVar_list[12])
-    let countryCode: String? = nilOrValue(pigeonVar_list[13])
+        return ApplePayContactDTO(
+            phoneNumber: phoneNumber,
+            emailAddress: emailAddress,
+            givenName: givenName,
+            familyName: familyName,
+            phoneticGivenName: phoneticGivenName,
+            phoneticFamilyName: phoneticFamilyName,
+            addressLines: addressLines,
+            subLocality: subLocality,
+            city: city,
+            postalCode: postalCode,
+            subAdministrativeArea: subAdministrativeArea,
+            administrativeArea: administrativeArea,
+            country: country,
+            countryCode: countryCode
+        )
+    }
 
-    return ApplePayContactDTO(
-      phoneNumber: phoneNumber,
-      emailAddress: emailAddress,
-      givenName: givenName,
-      familyName: familyName,
-      phoneticGivenName: phoneticGivenName,
-      phoneticFamilyName: phoneticFamilyName,
-      addressLines: addressLines,
-      subLocality: subLocality,
-      city: city,
-      postalCode: postalCode,
-      subAdministrativeArea: subAdministrativeArea,
-      administrativeArea: administrativeArea,
-      country: country,
-      countryCode: countryCode
-    )
-  }
-  func toList() -> [Any?] {
-    return [
-      phoneNumber,
-      emailAddress,
-      givenName,
-      familyName,
-      phoneticGivenName,
-      phoneticFamilyName,
-      addressLines,
-      subLocality,
-      city,
-      postalCode,
-      subAdministrativeArea,
-      administrativeArea,
-      country,
-      countryCode,
-    ]
-  }
-  static func == (lhs: ApplePayContactDTO, rhs: ApplePayContactDTO) -> Bool {
-    return deepEqualsPlatformApi(lhs.toList(), rhs.toList())  }
-  func hash(into hasher: inout Hasher) {
-    deepHashPlatformApi(value: toList(), hasher: &hasher)
-  }
+    func toList() -> [Any?] {
+        [
+            phoneNumber,
+            emailAddress,
+            givenName,
+            familyName,
+            phoneticGivenName,
+            phoneticFamilyName,
+            addressLines,
+            subLocality,
+            city,
+            postalCode,
+            subAdministrativeArea,
+            administrativeArea,
+            country,
+            countryCode
+        ]
+    }
+
+    static func == (lhs: ApplePayContactDTO, rhs: ApplePayContactDTO) -> Bool {
+        deepEqualsPlatformApi(lhs.toList(), rhs.toList())
+    }
+
+    func hash(into hasher: inout Hasher) {
+        deepHashPlatformApi(value: toList(), hasher: &hasher)
+    }
 }
 
 /// Generated class from Pigeon that represents data sent in messages.
 struct ApplePayShippingMethodDTO: Hashable {
-  var label: String
-  var detail: String
-  var amount: AmountDTO
-  var identifier: String
-  var startDate: String? = nil
-  var endDate: String? = nil
+    var label: String
+    var detail: String
+    var amount: AmountDTO
+    var identifier: String
+    var startDate: String?
+    var endDate: String?
 
+    // swift-format-ignore: AlwaysUseLowerCamelCase
+    static func fromList(_ pigeonVar_list: [Any?]) -> ApplePayShippingMethodDTO? {
+        let label = pigeonVar_list[0] as! String
+        let detail = pigeonVar_list[1] as! String
+        let amount = pigeonVar_list[2] as! AmountDTO
+        let identifier = pigeonVar_list[3] as! String
+        let startDate: String? = nilOrValue(pigeonVar_list[4])
+        let endDate: String? = nilOrValue(pigeonVar_list[5])
 
-  // swift-format-ignore: AlwaysUseLowerCamelCase
-  static func fromList(_ pigeonVar_list: [Any?]) -> ApplePayShippingMethodDTO? {
-    let label = pigeonVar_list[0] as! String
-    let detail = pigeonVar_list[1] as! String
-    let amount = pigeonVar_list[2] as! AmountDTO
-    let identifier = pigeonVar_list[3] as! String
-    let startDate: String? = nilOrValue(pigeonVar_list[4])
-    let endDate: String? = nilOrValue(pigeonVar_list[5])
+        return ApplePayShippingMethodDTO(
+            label: label,
+            detail: detail,
+            amount: amount,
+            identifier: identifier,
+            startDate: startDate,
+            endDate: endDate
+        )
+    }
 
-    return ApplePayShippingMethodDTO(
-      label: label,
-      detail: detail,
-      amount: amount,
-      identifier: identifier,
-      startDate: startDate,
-      endDate: endDate
-    )
-  }
-  func toList() -> [Any?] {
-    return [
-      label,
-      detail,
-      amount,
-      identifier,
-      startDate,
-      endDate,
-    ]
-  }
-  static func == (lhs: ApplePayShippingMethodDTO, rhs: ApplePayShippingMethodDTO) -> Bool {
-    return deepEqualsPlatformApi(lhs.toList(), rhs.toList())  }
-  func hash(into hasher: inout Hasher) {
-    deepHashPlatformApi(value: toList(), hasher: &hasher)
-  }
+    func toList() -> [Any?] {
+        [
+            label,
+            detail,
+            amount,
+            identifier,
+            startDate,
+            endDate
+        ]
+    }
+
+    static func == (lhs: ApplePayShippingMethodDTO, rhs: ApplePayShippingMethodDTO) -> Bool {
+        deepEqualsPlatformApi(lhs.toList(), rhs.toList())
+    }
+
+    func hash(into hasher: inout Hasher) {
+        deepHashPlatformApi(value: toList(), hasher: &hasher)
+    }
 }
 
 /// Generated class from Pigeon that represents data sent in messages.
 struct ApplePaySummaryItemDTO: Hashable {
-  var label: String
-  var amount: AmountDTO
-  var type: ApplePaySummaryItemType
+    var label: String
+    var amount: AmountDTO
+    var type: ApplePaySummaryItemType
 
+    // swift-format-ignore: AlwaysUseLowerCamelCase
+    static func fromList(_ pigeonVar_list: [Any?]) -> ApplePaySummaryItemDTO? {
+        let label = pigeonVar_list[0] as! String
+        let amount = pigeonVar_list[1] as! AmountDTO
+        let type = pigeonVar_list[2] as! ApplePaySummaryItemType
 
-  // swift-format-ignore: AlwaysUseLowerCamelCase
-  static func fromList(_ pigeonVar_list: [Any?]) -> ApplePaySummaryItemDTO? {
-    let label = pigeonVar_list[0] as! String
-    let amount = pigeonVar_list[1] as! AmountDTO
-    let type = pigeonVar_list[2] as! ApplePaySummaryItemType
+        return ApplePaySummaryItemDTO(
+            label: label,
+            amount: amount,
+            type: type
+        )
+    }
 
-    return ApplePaySummaryItemDTO(
-      label: label,
-      amount: amount,
-      type: type
-    )
-  }
-  func toList() -> [Any?] {
-    return [
-      label,
-      amount,
-      type,
-    ]
-  }
-  static func == (lhs: ApplePaySummaryItemDTO, rhs: ApplePaySummaryItemDTO) -> Bool {
-    return deepEqualsPlatformApi(lhs.toList(), rhs.toList())  }
-  func hash(into hasher: inout Hasher) {
-    deepHashPlatformApi(value: toList(), hasher: &hasher)
-  }
+    func toList() -> [Any?] {
+        [
+            label,
+            amount,
+            type
+        ]
+    }
+
+    static func == (lhs: ApplePaySummaryItemDTO, rhs: ApplePaySummaryItemDTO) -> Bool {
+        deepEqualsPlatformApi(lhs.toList(), rhs.toList())
+    }
+
+    func hash(into hasher: inout Hasher) {
+        deepHashPlatformApi(value: toList(), hasher: &hasher)
+    }
 }
 
 /// Generated class from Pigeon that represents data sent in messages.
 struct GooglePayConfigurationDTO: Hashable {
-  var googlePayEnvironment: GooglePayEnvironment
-  var merchantAccount: String? = nil
-  var merchantInfoDTO: MerchantInfoDTO? = nil
-  var totalPriceStatus: TotalPriceStatus? = nil
-  var allowedCardNetworks: [String?]? = nil
-  var allowedAuthMethods: [String?]? = nil
-  var allowPrepaidCards: Bool? = nil
-  var allowCreditCards: Bool? = nil
-  var assuranceDetailsRequired: Bool? = nil
-  var emailRequired: Bool? = nil
-  var existingPaymentMethodRequired: Bool? = nil
-  var shippingAddressRequired: Bool? = nil
-  var shippingAddressParametersDTO: ShippingAddressParametersDTO? = nil
-  var billingAddressRequired: Bool? = nil
-  var billingAddressParametersDTO: BillingAddressParametersDTO? = nil
+    var googlePayEnvironment: GooglePayEnvironment
+    var merchantAccount: String?
+    var merchantInfoDTO: MerchantInfoDTO?
+    var totalPriceStatus: TotalPriceStatus?
+    var allowedCardNetworks: [String?]?
+    var allowedAuthMethods: [String?]?
+    var allowPrepaidCards: Bool?
+    var allowCreditCards: Bool?
+    var assuranceDetailsRequired: Bool?
+    var emailRequired: Bool?
+    var existingPaymentMethodRequired: Bool?
+    var shippingAddressRequired: Bool?
+    var shippingAddressParametersDTO: ShippingAddressParametersDTO?
+    var billingAddressRequired: Bool?
+    var billingAddressParametersDTO: BillingAddressParametersDTO?
 
+    // swift-format-ignore: AlwaysUseLowerCamelCase
+    static func fromList(_ pigeonVar_list: [Any?]) -> GooglePayConfigurationDTO? {
+        let googlePayEnvironment = pigeonVar_list[0] as! GooglePayEnvironment
+        let merchantAccount: String? = nilOrValue(pigeonVar_list[1])
+        let merchantInfoDTO: MerchantInfoDTO? = nilOrValue(pigeonVar_list[2])
+        let totalPriceStatus: TotalPriceStatus? = nilOrValue(pigeonVar_list[3])
+        let allowedCardNetworks: [String?]? = nilOrValue(pigeonVar_list[4])
+        let allowedAuthMethods: [String?]? = nilOrValue(pigeonVar_list[5])
+        let allowPrepaidCards: Bool? = nilOrValue(pigeonVar_list[6])
+        let allowCreditCards: Bool? = nilOrValue(pigeonVar_list[7])
+        let assuranceDetailsRequired: Bool? = nilOrValue(pigeonVar_list[8])
+        let emailRequired: Bool? = nilOrValue(pigeonVar_list[9])
+        let existingPaymentMethodRequired: Bool? = nilOrValue(pigeonVar_list[10])
+        let shippingAddressRequired: Bool? = nilOrValue(pigeonVar_list[11])
+        let shippingAddressParametersDTO: ShippingAddressParametersDTO? = nilOrValue(pigeonVar_list[12])
+        let billingAddressRequired: Bool? = nilOrValue(pigeonVar_list[13])
+        let billingAddressParametersDTO: BillingAddressParametersDTO? = nilOrValue(pigeonVar_list[14])
 
-  // swift-format-ignore: AlwaysUseLowerCamelCase
-  static func fromList(_ pigeonVar_list: [Any?]) -> GooglePayConfigurationDTO? {
-    let googlePayEnvironment = pigeonVar_list[0] as! GooglePayEnvironment
-    let merchantAccount: String? = nilOrValue(pigeonVar_list[1])
-    let merchantInfoDTO: MerchantInfoDTO? = nilOrValue(pigeonVar_list[2])
-    let totalPriceStatus: TotalPriceStatus? = nilOrValue(pigeonVar_list[3])
-    let allowedCardNetworks: [String?]? = nilOrValue(pigeonVar_list[4])
-    let allowedAuthMethods: [String?]? = nilOrValue(pigeonVar_list[5])
-    let allowPrepaidCards: Bool? = nilOrValue(pigeonVar_list[6])
-    let allowCreditCards: Bool? = nilOrValue(pigeonVar_list[7])
-    let assuranceDetailsRequired: Bool? = nilOrValue(pigeonVar_list[8])
-    let emailRequired: Bool? = nilOrValue(pigeonVar_list[9])
-    let existingPaymentMethodRequired: Bool? = nilOrValue(pigeonVar_list[10])
-    let shippingAddressRequired: Bool? = nilOrValue(pigeonVar_list[11])
-    let shippingAddressParametersDTO: ShippingAddressParametersDTO? = nilOrValue(pigeonVar_list[12])
-    let billingAddressRequired: Bool? = nilOrValue(pigeonVar_list[13])
-    let billingAddressParametersDTO: BillingAddressParametersDTO? = nilOrValue(pigeonVar_list[14])
+        return GooglePayConfigurationDTO(
+            googlePayEnvironment: googlePayEnvironment,
+            merchantAccount: merchantAccount,
+            merchantInfoDTO: merchantInfoDTO,
+            totalPriceStatus: totalPriceStatus,
+            allowedCardNetworks: allowedCardNetworks,
+            allowedAuthMethods: allowedAuthMethods,
+            allowPrepaidCards: allowPrepaidCards,
+            allowCreditCards: allowCreditCards,
+            assuranceDetailsRequired: assuranceDetailsRequired,
+            emailRequired: emailRequired,
+            existingPaymentMethodRequired: existingPaymentMethodRequired,
+            shippingAddressRequired: shippingAddressRequired,
+            shippingAddressParametersDTO: shippingAddressParametersDTO,
+            billingAddressRequired: billingAddressRequired,
+            billingAddressParametersDTO: billingAddressParametersDTO
+        )
+    }
 
-    return GooglePayConfigurationDTO(
-      googlePayEnvironment: googlePayEnvironment,
-      merchantAccount: merchantAccount,
-      merchantInfoDTO: merchantInfoDTO,
-      totalPriceStatus: totalPriceStatus,
-      allowedCardNetworks: allowedCardNetworks,
-      allowedAuthMethods: allowedAuthMethods,
-      allowPrepaidCards: allowPrepaidCards,
-      allowCreditCards: allowCreditCards,
-      assuranceDetailsRequired: assuranceDetailsRequired,
-      emailRequired: emailRequired,
-      existingPaymentMethodRequired: existingPaymentMethodRequired,
-      shippingAddressRequired: shippingAddressRequired,
-      shippingAddressParametersDTO: shippingAddressParametersDTO,
-      billingAddressRequired: billingAddressRequired,
-      billingAddressParametersDTO: billingAddressParametersDTO
-    )
-  }
-  func toList() -> [Any?] {
-    return [
-      googlePayEnvironment,
-      merchantAccount,
-      merchantInfoDTO,
-      totalPriceStatus,
-      allowedCardNetworks,
-      allowedAuthMethods,
-      allowPrepaidCards,
-      allowCreditCards,
-      assuranceDetailsRequired,
-      emailRequired,
-      existingPaymentMethodRequired,
-      shippingAddressRequired,
-      shippingAddressParametersDTO,
-      billingAddressRequired,
-      billingAddressParametersDTO,
-    ]
-  }
-  static func == (lhs: GooglePayConfigurationDTO, rhs: GooglePayConfigurationDTO) -> Bool {
-    return deepEqualsPlatformApi(lhs.toList(), rhs.toList())  }
-  func hash(into hasher: inout Hasher) {
-    deepHashPlatformApi(value: toList(), hasher: &hasher)
-  }
+    func toList() -> [Any?] {
+        [
+            googlePayEnvironment,
+            merchantAccount,
+            merchantInfoDTO,
+            totalPriceStatus,
+            allowedCardNetworks,
+            allowedAuthMethods,
+            allowPrepaidCards,
+            allowCreditCards,
+            assuranceDetailsRequired,
+            emailRequired,
+            existingPaymentMethodRequired,
+            shippingAddressRequired,
+            shippingAddressParametersDTO,
+            billingAddressRequired,
+            billingAddressParametersDTO
+        ]
+    }
+
+    static func == (lhs: GooglePayConfigurationDTO, rhs: GooglePayConfigurationDTO) -> Bool {
+        deepEqualsPlatformApi(lhs.toList(), rhs.toList())
+    }
+
+    func hash(into hasher: inout Hasher) {
+        deepHashPlatformApi(value: toList(), hasher: &hasher)
+    }
 }
 
 /// Generated class from Pigeon that represents data sent in messages.
 struct MerchantInfoDTO: Hashable {
-  var merchantName: String? = nil
-  var merchantId: String? = nil
+    var merchantName: String?
+    var merchantId: String?
 
+    // swift-format-ignore: AlwaysUseLowerCamelCase
+    static func fromList(_ pigeonVar_list: [Any?]) -> MerchantInfoDTO? {
+        let merchantName: String? = nilOrValue(pigeonVar_list[0])
+        let merchantId: String? = nilOrValue(pigeonVar_list[1])
 
-  // swift-format-ignore: AlwaysUseLowerCamelCase
-  static func fromList(_ pigeonVar_list: [Any?]) -> MerchantInfoDTO? {
-    let merchantName: String? = nilOrValue(pigeonVar_list[0])
-    let merchantId: String? = nilOrValue(pigeonVar_list[1])
+        return MerchantInfoDTO(
+            merchantName: merchantName,
+            merchantId: merchantId
+        )
+    }
 
-    return MerchantInfoDTO(
-      merchantName: merchantName,
-      merchantId: merchantId
-    )
-  }
-  func toList() -> [Any?] {
-    return [
-      merchantName,
-      merchantId,
-    ]
-  }
-  static func == (lhs: MerchantInfoDTO, rhs: MerchantInfoDTO) -> Bool {
-    return deepEqualsPlatformApi(lhs.toList(), rhs.toList())  }
-  func hash(into hasher: inout Hasher) {
-    deepHashPlatformApi(value: toList(), hasher: &hasher)
-  }
+    func toList() -> [Any?] {
+        [
+            merchantName,
+            merchantId
+        ]
+    }
+
+    static func == (lhs: MerchantInfoDTO, rhs: MerchantInfoDTO) -> Bool {
+        deepEqualsPlatformApi(lhs.toList(), rhs.toList())
+    }
+
+    func hash(into hasher: inout Hasher) {
+        deepHashPlatformApi(value: toList(), hasher: &hasher)
+    }
 }
 
 /// Generated class from Pigeon that represents data sent in messages.
 struct ShippingAddressParametersDTO: Hashable {
-  var allowedCountryCodes: [String?]? = nil
-  var isPhoneNumberRequired: Bool? = nil
+    var allowedCountryCodes: [String?]?
+    var isPhoneNumberRequired: Bool?
 
+    // swift-format-ignore: AlwaysUseLowerCamelCase
+    static func fromList(_ pigeonVar_list: [Any?]) -> ShippingAddressParametersDTO? {
+        let allowedCountryCodes: [String?]? = nilOrValue(pigeonVar_list[0])
+        let isPhoneNumberRequired: Bool? = nilOrValue(pigeonVar_list[1])
 
-  // swift-format-ignore: AlwaysUseLowerCamelCase
-  static func fromList(_ pigeonVar_list: [Any?]) -> ShippingAddressParametersDTO? {
-    let allowedCountryCodes: [String?]? = nilOrValue(pigeonVar_list[0])
-    let isPhoneNumberRequired: Bool? = nilOrValue(pigeonVar_list[1])
+        return ShippingAddressParametersDTO(
+            allowedCountryCodes: allowedCountryCodes,
+            isPhoneNumberRequired: isPhoneNumberRequired
+        )
+    }
 
-    return ShippingAddressParametersDTO(
-      allowedCountryCodes: allowedCountryCodes,
-      isPhoneNumberRequired: isPhoneNumberRequired
-    )
-  }
-  func toList() -> [Any?] {
-    return [
-      allowedCountryCodes,
-      isPhoneNumberRequired,
-    ]
-  }
-  static func == (lhs: ShippingAddressParametersDTO, rhs: ShippingAddressParametersDTO) -> Bool {
-    return deepEqualsPlatformApi(lhs.toList(), rhs.toList())  }
-  func hash(into hasher: inout Hasher) {
-    deepHashPlatformApi(value: toList(), hasher: &hasher)
-  }
+    func toList() -> [Any?] {
+        [
+            allowedCountryCodes,
+            isPhoneNumberRequired
+        ]
+    }
+
+    static func == (lhs: ShippingAddressParametersDTO, rhs: ShippingAddressParametersDTO) -> Bool {
+        deepEqualsPlatformApi(lhs.toList(), rhs.toList())
+    }
+
+    func hash(into hasher: inout Hasher) {
+        deepHashPlatformApi(value: toList(), hasher: &hasher)
+    }
 }
 
 /// Generated class from Pigeon that represents data sent in messages.
 struct BillingAddressParametersDTO: Hashable {
-  var format: String? = nil
-  var isPhoneNumberRequired: Bool? = nil
+    var format: String?
+    var isPhoneNumberRequired: Bool?
 
+    // swift-format-ignore: AlwaysUseLowerCamelCase
+    static func fromList(_ pigeonVar_list: [Any?]) -> BillingAddressParametersDTO? {
+        let format: String? = nilOrValue(pigeonVar_list[0])
+        let isPhoneNumberRequired: Bool? = nilOrValue(pigeonVar_list[1])
 
-  // swift-format-ignore: AlwaysUseLowerCamelCase
-  static func fromList(_ pigeonVar_list: [Any?]) -> BillingAddressParametersDTO? {
-    let format: String? = nilOrValue(pigeonVar_list[0])
-    let isPhoneNumberRequired: Bool? = nilOrValue(pigeonVar_list[1])
+        return BillingAddressParametersDTO(
+            format: format,
+            isPhoneNumberRequired: isPhoneNumberRequired
+        )
+    }
 
-    return BillingAddressParametersDTO(
-      format: format,
-      isPhoneNumberRequired: isPhoneNumberRequired
-    )
-  }
-  func toList() -> [Any?] {
-    return [
-      format,
-      isPhoneNumberRequired,
-    ]
-  }
-  static func == (lhs: BillingAddressParametersDTO, rhs: BillingAddressParametersDTO) -> Bool {
-    return deepEqualsPlatformApi(lhs.toList(), rhs.toList())  }
-  func hash(into hasher: inout Hasher) {
-    deepHashPlatformApi(value: toList(), hasher: &hasher)
-  }
+    func toList() -> [Any?] {
+        [
+            format,
+            isPhoneNumberRequired
+        ]
+    }
+
+    static func == (lhs: BillingAddressParametersDTO, rhs: BillingAddressParametersDTO) -> Bool {
+        deepEqualsPlatformApi(lhs.toList(), rhs.toList())
+    }
+
+    func hash(into hasher: inout Hasher) {
+        deepHashPlatformApi(value: toList(), hasher: &hasher)
+    }
 }
 
 /// Generated class from Pigeon that represents data sent in messages.
 struct CashAppPayConfigurationDTO: Hashable {
-  var cashAppPayEnvironment: CashAppPayEnvironment
-  var returnUrl: String
+    var cashAppPayEnvironment: CashAppPayEnvironment
+    var returnUrl: String
 
+    // swift-format-ignore: AlwaysUseLowerCamelCase
+    static func fromList(_ pigeonVar_list: [Any?]) -> CashAppPayConfigurationDTO? {
+        let cashAppPayEnvironment = pigeonVar_list[0] as! CashAppPayEnvironment
+        let returnUrl = pigeonVar_list[1] as! String
 
-  // swift-format-ignore: AlwaysUseLowerCamelCase
-  static func fromList(_ pigeonVar_list: [Any?]) -> CashAppPayConfigurationDTO? {
-    let cashAppPayEnvironment = pigeonVar_list[0] as! CashAppPayEnvironment
-    let returnUrl = pigeonVar_list[1] as! String
+        return CashAppPayConfigurationDTO(
+            cashAppPayEnvironment: cashAppPayEnvironment,
+            returnUrl: returnUrl
+        )
+    }
 
-    return CashAppPayConfigurationDTO(
-      cashAppPayEnvironment: cashAppPayEnvironment,
-      returnUrl: returnUrl
-    )
-  }
-  func toList() -> [Any?] {
-    return [
-      cashAppPayEnvironment,
-      returnUrl,
-    ]
-  }
-  static func == (lhs: CashAppPayConfigurationDTO, rhs: CashAppPayConfigurationDTO) -> Bool {
-    return deepEqualsPlatformApi(lhs.toList(), rhs.toList())  }
-  func hash(into hasher: inout Hasher) {
-    deepHashPlatformApi(value: toList(), hasher: &hasher)
-  }
+    func toList() -> [Any?] {
+        [
+            cashAppPayEnvironment,
+            returnUrl
+        ]
+    }
+
+    static func == (lhs: CashAppPayConfigurationDTO, rhs: CashAppPayConfigurationDTO) -> Bool {
+        deepEqualsPlatformApi(lhs.toList(), rhs.toList())
+    }
+
+    func hash(into hasher: inout Hasher) {
+        deepHashPlatformApi(value: toList(), hasher: &hasher)
+    }
 }
 
 /// Generated class from Pigeon that represents data sent in messages.
 struct TwintConfigurationDTO: Hashable {
-  var iosCallbackAppScheme: String
-  var showStorePaymentField: Bool
+    var iosCallbackAppScheme: String
+    var showStorePaymentField: Bool
 
+    // swift-format-ignore: AlwaysUseLowerCamelCase
+    static func fromList(_ pigeonVar_list: [Any?]) -> TwintConfigurationDTO? {
+        let iosCallbackAppScheme = pigeonVar_list[0] as! String
+        let showStorePaymentField = pigeonVar_list[1] as! Bool
 
-  // swift-format-ignore: AlwaysUseLowerCamelCase
-  static func fromList(_ pigeonVar_list: [Any?]) -> TwintConfigurationDTO? {
-    let iosCallbackAppScheme = pigeonVar_list[0] as! String
-    let showStorePaymentField = pigeonVar_list[1] as! Bool
+        return TwintConfigurationDTO(
+            iosCallbackAppScheme: iosCallbackAppScheme,
+            showStorePaymentField: showStorePaymentField
+        )
+    }
 
-    return TwintConfigurationDTO(
-      iosCallbackAppScheme: iosCallbackAppScheme,
-      showStorePaymentField: showStorePaymentField
-    )
-  }
-  func toList() -> [Any?] {
-    return [
-      iosCallbackAppScheme,
-      showStorePaymentField,
-    ]
-  }
-  static func == (lhs: TwintConfigurationDTO, rhs: TwintConfigurationDTO) -> Bool {
-    return deepEqualsPlatformApi(lhs.toList(), rhs.toList())  }
-  func hash(into hasher: inout Hasher) {
-    deepHashPlatformApi(value: toList(), hasher: &hasher)
-  }
+    func toList() -> [Any?] {
+        [
+            iosCallbackAppScheme,
+            showStorePaymentField
+        ]
+    }
+
+    static func == (lhs: TwintConfigurationDTO, rhs: TwintConfigurationDTO) -> Bool {
+        deepEqualsPlatformApi(lhs.toList(), rhs.toList())
+    }
+
+    func hash(into hasher: inout Hasher) {
+        deepHashPlatformApi(value: toList(), hasher: &hasher)
+    }
 }
 
 /// Generated class from Pigeon that represents data sent in messages.
 struct PaymentResultDTO: Hashable {
-  var type: PaymentResultEnum
-  var reason: String? = nil
-  var result: PaymentResultModelDTO? = nil
+    var type: PaymentResultEnum
+    var reason: String?
+    var result: PaymentResultModelDTO?
 
+    // swift-format-ignore: AlwaysUseLowerCamelCase
+    static func fromList(_ pigeonVar_list: [Any?]) -> PaymentResultDTO? {
+        let type = pigeonVar_list[0] as! PaymentResultEnum
+        let reason: String? = nilOrValue(pigeonVar_list[1])
+        let result: PaymentResultModelDTO? = nilOrValue(pigeonVar_list[2])
 
-  // swift-format-ignore: AlwaysUseLowerCamelCase
-  static func fromList(_ pigeonVar_list: [Any?]) -> PaymentResultDTO? {
-    let type = pigeonVar_list[0] as! PaymentResultEnum
-    let reason: String? = nilOrValue(pigeonVar_list[1])
-    let result: PaymentResultModelDTO? = nilOrValue(pigeonVar_list[2])
+        return PaymentResultDTO(
+            type: type,
+            reason: reason,
+            result: result
+        )
+    }
 
-    return PaymentResultDTO(
-      type: type,
-      reason: reason,
-      result: result
-    )
-  }
-  func toList() -> [Any?] {
-    return [
-      type,
-      reason,
-      result,
-    ]
-  }
-  static func == (lhs: PaymentResultDTO, rhs: PaymentResultDTO) -> Bool {
-    return deepEqualsPlatformApi(lhs.toList(), rhs.toList())  }
-  func hash(into hasher: inout Hasher) {
-    deepHashPlatformApi(value: toList(), hasher: &hasher)
-  }
+    func toList() -> [Any?] {
+        [
+            type,
+            reason,
+            result
+        ]
+    }
+
+    static func == (lhs: PaymentResultDTO, rhs: PaymentResultDTO) -> Bool {
+        deepEqualsPlatformApi(lhs.toList(), rhs.toList())
+    }
+
+    func hash(into hasher: inout Hasher) {
+        deepHashPlatformApi(value: toList(), hasher: &hasher)
+    }
 }
 
 /// Generated class from Pigeon that represents data sent in messages.
 struct PaymentResultModelDTO: Hashable {
-  var sessionId: String? = nil
-  var sessionResult: String? = nil
-  var resultCode: String? = nil
-  var order: OrderResponseDTO? = nil
+    var sessionId: String?
+    var sessionResult: String?
+    var resultCode: String?
+    var order: OrderResponseDTO?
 
+    // swift-format-ignore: AlwaysUseLowerCamelCase
+    static func fromList(_ pigeonVar_list: [Any?]) -> PaymentResultModelDTO? {
+        let sessionId: String? = nilOrValue(pigeonVar_list[0])
+        let sessionResult: String? = nilOrValue(pigeonVar_list[1])
+        let resultCode: String? = nilOrValue(pigeonVar_list[2])
+        let order: OrderResponseDTO? = nilOrValue(pigeonVar_list[3])
 
-  // swift-format-ignore: AlwaysUseLowerCamelCase
-  static func fromList(_ pigeonVar_list: [Any?]) -> PaymentResultModelDTO? {
-    let sessionId: String? = nilOrValue(pigeonVar_list[0])
-    let sessionResult: String? = nilOrValue(pigeonVar_list[1])
-    let resultCode: String? = nilOrValue(pigeonVar_list[2])
-    let order: OrderResponseDTO? = nilOrValue(pigeonVar_list[3])
+        return PaymentResultModelDTO(
+            sessionId: sessionId,
+            sessionResult: sessionResult,
+            resultCode: resultCode,
+            order: order
+        )
+    }
 
-    return PaymentResultModelDTO(
-      sessionId: sessionId,
-      sessionResult: sessionResult,
-      resultCode: resultCode,
-      order: order
-    )
-  }
-  func toList() -> [Any?] {
-    return [
-      sessionId,
-      sessionResult,
-      resultCode,
-      order,
-    ]
-  }
-  static func == (lhs: PaymentResultModelDTO, rhs: PaymentResultModelDTO) -> Bool {
-    return deepEqualsPlatformApi(lhs.toList(), rhs.toList())  }
-  func hash(into hasher: inout Hasher) {
-    deepHashPlatformApi(value: toList(), hasher: &hasher)
-  }
+    func toList() -> [Any?] {
+        [
+            sessionId,
+            sessionResult,
+            resultCode,
+            order
+        ]
+    }
+
+    static func == (lhs: PaymentResultModelDTO, rhs: PaymentResultModelDTO) -> Bool {
+        deepEqualsPlatformApi(lhs.toList(), rhs.toList())
+    }
+
+    func hash(into hasher: inout Hasher) {
+        deepHashPlatformApi(value: toList(), hasher: &hasher)
+    }
 }
 
 /// Generated class from Pigeon that represents data sent in messages.
 struct OrderResponseDTO: Hashable {
-  var pspReference: String
-  var orderData: String
-  var amount: AmountDTO? = nil
-  var remainingAmount: AmountDTO? = nil
+    var pspReference: String
+    var orderData: String
+    var amount: AmountDTO?
+    var remainingAmount: AmountDTO?
 
+    // swift-format-ignore: AlwaysUseLowerCamelCase
+    static func fromList(_ pigeonVar_list: [Any?]) -> OrderResponseDTO? {
+        let pspReference = pigeonVar_list[0] as! String
+        let orderData = pigeonVar_list[1] as! String
+        let amount: AmountDTO? = nilOrValue(pigeonVar_list[2])
+        let remainingAmount: AmountDTO? = nilOrValue(pigeonVar_list[3])
 
-  // swift-format-ignore: AlwaysUseLowerCamelCase
-  static func fromList(_ pigeonVar_list: [Any?]) -> OrderResponseDTO? {
-    let pspReference = pigeonVar_list[0] as! String
-    let orderData = pigeonVar_list[1] as! String
-    let amount: AmountDTO? = nilOrValue(pigeonVar_list[2])
-    let remainingAmount: AmountDTO? = nilOrValue(pigeonVar_list[3])
+        return OrderResponseDTO(
+            pspReference: pspReference,
+            orderData: orderData,
+            amount: amount,
+            remainingAmount: remainingAmount
+        )
+    }
 
-    return OrderResponseDTO(
-      pspReference: pspReference,
-      orderData: orderData,
-      amount: amount,
-      remainingAmount: remainingAmount
-    )
-  }
-  func toList() -> [Any?] {
-    return [
-      pspReference,
-      orderData,
-      amount,
-      remainingAmount,
-    ]
-  }
-  static func == (lhs: OrderResponseDTO, rhs: OrderResponseDTO) -> Bool {
-    return deepEqualsPlatformApi(lhs.toList(), rhs.toList())  }
-  func hash(into hasher: inout Hasher) {
-    deepHashPlatformApi(value: toList(), hasher: &hasher)
-  }
+    func toList() -> [Any?] {
+        [
+            pspReference,
+            orderData,
+            amount,
+            remainingAmount
+        ]
+    }
+
+    static func == (lhs: OrderResponseDTO, rhs: OrderResponseDTO) -> Bool {
+        deepEqualsPlatformApi(lhs.toList(), rhs.toList())
+    }
+
+    func hash(into hasher: inout Hasher) {
+        deepHashPlatformApi(value: toList(), hasher: &hasher)
+    }
 }
 
 /// Generated class from Pigeon that represents data sent in messages.
 /// This protocol should not be extended by any user class outside of the generated file.
-protocol CheckoutResultDTO {
-
-}
+protocol CheckoutResultDTO {}
 
 /// Generated class from Pigeon that represents data sent in messages.
 struct FinishedResultDTO: CheckoutResultDTO {
-  var resultCode: String
+    var resultCode: String
 
+    // swift-format-ignore: AlwaysUseLowerCamelCase
+    static func fromList(_ pigeonVar_list: [Any?]) -> FinishedResultDTO? {
+        let resultCode = pigeonVar_list[0] as! String
 
-  // swift-format-ignore: AlwaysUseLowerCamelCase
-  static func fromList(_ pigeonVar_list: [Any?]) -> FinishedResultDTO? {
-    let resultCode = pigeonVar_list[0] as! String
+        return FinishedResultDTO(
+            resultCode: resultCode
+        )
+    }
 
-    return FinishedResultDTO(
-      resultCode: resultCode
-    )
-  }
-  func toList() -> [Any?] {
-    return [
-      resultCode
-    ]
-  }
-  static func == (lhs: FinishedResultDTO, rhs: FinishedResultDTO) -> Bool {
-    return deepEqualsPlatformApi(lhs.toList(), rhs.toList())  }
-  func hash(into hasher: inout Hasher) {
-    deepHashPlatformApi(value: toList(), hasher: &hasher)
-  }
+    func toList() -> [Any?] {
+        [
+            resultCode
+        ]
+    }
+
+    static func == (lhs: FinishedResultDTO, rhs: FinishedResultDTO) -> Bool {
+        deepEqualsPlatformApi(lhs.toList(), rhs.toList())
+    }
+
+    func hash(into hasher: inout Hasher) {
+        deepHashPlatformApi(value: toList(), hasher: &hasher)
+    }
 }
 
 /// Generated class from Pigeon that represents data sent in messages.
 struct ActionResultDTO: CheckoutResultDTO {
-  var actionResponse: String
+    var actionResponse: String
 
+    // swift-format-ignore: AlwaysUseLowerCamelCase
+    static func fromList(_ pigeonVar_list: [Any?]) -> ActionResultDTO? {
+        let actionResponse = pigeonVar_list[0] as! String
 
-  // swift-format-ignore: AlwaysUseLowerCamelCase
-  static func fromList(_ pigeonVar_list: [Any?]) -> ActionResultDTO? {
-    let actionResponse = pigeonVar_list[0] as! String
+        return ActionResultDTO(
+            actionResponse: actionResponse
+        )
+    }
 
-    return ActionResultDTO(
-      actionResponse: actionResponse
-    )
-  }
-  func toList() -> [Any?] {
-    return [
-      actionResponse
-    ]
-  }
-  static func == (lhs: ActionResultDTO, rhs: ActionResultDTO) -> Bool {
-    return deepEqualsPlatformApi(lhs.toList(), rhs.toList())  }
-  func hash(into hasher: inout Hasher) {
-    deepHashPlatformApi(value: toList(), hasher: &hasher)
-  }
+    func toList() -> [Any?] {
+        [
+            actionResponse
+        ]
+    }
+
+    static func == (lhs: ActionResultDTO, rhs: ActionResultDTO) -> Bool {
+        deepEqualsPlatformApi(lhs.toList(), rhs.toList())
+    }
+
+    func hash(into hasher: inout Hasher) {
+        deepHashPlatformApi(value: toList(), hasher: &hasher)
+    }
 }
 
 /// Generated class from Pigeon that represents data sent in messages.
 struct ErrorResultDTO: CheckoutResultDTO {
-  var errorMessage: String
+    var errorMessage: String
 
+    // swift-format-ignore: AlwaysUseLowerCamelCase
+    static func fromList(_ pigeonVar_list: [Any?]) -> ErrorResultDTO? {
+        let errorMessage = pigeonVar_list[0] as! String
 
-  // swift-format-ignore: AlwaysUseLowerCamelCase
-  static func fromList(_ pigeonVar_list: [Any?]) -> ErrorResultDTO? {
-    let errorMessage = pigeonVar_list[0] as! String
+        return ErrorResultDTO(
+            errorMessage: errorMessage
+        )
+    }
 
-    return ErrorResultDTO(
-      errorMessage: errorMessage
-    )
-  }
-  func toList() -> [Any?] {
-    return [
-      errorMessage
-    ]
-  }
-  static func == (lhs: ErrorResultDTO, rhs: ErrorResultDTO) -> Bool {
-    return deepEqualsPlatformApi(lhs.toList(), rhs.toList())  }
-  func hash(into hasher: inout Hasher) {
-    deepHashPlatformApi(value: toList(), hasher: &hasher)
-  }
+    func toList() -> [Any?] {
+        [
+            errorMessage
+        ]
+    }
+
+    static func == (lhs: ErrorResultDTO, rhs: ErrorResultDTO) -> Bool {
+        deepEqualsPlatformApi(lhs.toList(), rhs.toList())
+    }
+
+    func hash(into hasher: inout Hasher) {
+        deepHashPlatformApi(value: toList(), hasher: &hasher)
+    }
 }
 
 /// Generated class from Pigeon that represents data sent in messages.
 struct CheckoutEvent: Hashable {
-  var type: CheckoutEventType
-  var data: Any? = nil
+    var type: CheckoutEventType
+    var data: Any?
 
+    // swift-format-ignore: AlwaysUseLowerCamelCase
+    static func fromList(_ pigeonVar_list: [Any?]) -> CheckoutEvent? {
+        let type = pigeonVar_list[0] as! CheckoutEventType
+        let data: Any? = pigeonVar_list[1]
 
-  // swift-format-ignore: AlwaysUseLowerCamelCase
-  static func fromList(_ pigeonVar_list: [Any?]) -> CheckoutEvent? {
-    let type = pigeonVar_list[0] as! CheckoutEventType
-    let data: Any? = pigeonVar_list[1]
+        return CheckoutEvent(
+            type: type,
+            data: data
+        )
+    }
 
-    return CheckoutEvent(
-      type: type,
-      data: data
-    )
-  }
-  func toList() -> [Any?] {
-    return [
-      type,
-      data,
-    ]
-  }
-  static func == (lhs: CheckoutEvent, rhs: CheckoutEvent) -> Bool {
-    return deepEqualsPlatformApi(lhs.toList(), rhs.toList())  }
-  func hash(into hasher: inout Hasher) {
-    deepHashPlatformApi(value: toList(), hasher: &hasher)
-  }
+    func toList() -> [Any?] {
+        [
+            type,
+            data
+        ]
+    }
+
+    static func == (lhs: CheckoutEvent, rhs: CheckoutEvent) -> Bool {
+        deepEqualsPlatformApi(lhs.toList(), rhs.toList())
+    }
+
+    func hash(into hasher: inout Hasher) {
+        deepHashPlatformApi(value: toList(), hasher: &hasher)
+    }
 }
 
 /// Generated class from Pigeon that represents data sent in messages.
 struct ComponentCommunicationModel: Hashable {
-  var type: ComponentCommunicationType
-  var componentId: String
-  var data: Any? = nil
-  var paymentResult: PaymentResultDTO? = nil
+    var type: ComponentCommunicationType
+    var componentId: String
+    var data: Any?
+    var paymentResult: PaymentResultDTO?
 
+    // swift-format-ignore: AlwaysUseLowerCamelCase
+    static func fromList(_ pigeonVar_list: [Any?]) -> ComponentCommunicationModel? {
+        let type = pigeonVar_list[0] as! ComponentCommunicationType
+        let componentId = pigeonVar_list[1] as! String
+        let data: Any? = pigeonVar_list[2]
+        let paymentResult: PaymentResultDTO? = nilOrValue(pigeonVar_list[3])
 
-  // swift-format-ignore: AlwaysUseLowerCamelCase
-  static func fromList(_ pigeonVar_list: [Any?]) -> ComponentCommunicationModel? {
-    let type = pigeonVar_list[0] as! ComponentCommunicationType
-    let componentId = pigeonVar_list[1] as! String
-    let data: Any? = pigeonVar_list[2]
-    let paymentResult: PaymentResultDTO? = nilOrValue(pigeonVar_list[3])
+        return ComponentCommunicationModel(
+            type: type,
+            componentId: componentId,
+            data: data,
+            paymentResult: paymentResult
+        )
+    }
 
-    return ComponentCommunicationModel(
-      type: type,
-      componentId: componentId,
-      data: data,
-      paymentResult: paymentResult
-    )
-  }
-  func toList() -> [Any?] {
-    return [
-      type,
-      componentId,
-      data,
-      paymentResult,
-    ]
-  }
-  static func == (lhs: ComponentCommunicationModel, rhs: ComponentCommunicationModel) -> Bool {
-    return deepEqualsPlatformApi(lhs.toList(), rhs.toList())  }
-  func hash(into hasher: inout Hasher) {
-    deepHashPlatformApi(value: toList(), hasher: &hasher)
-  }
+    func toList() -> [Any?] {
+        [
+            type,
+            componentId,
+            data,
+            paymentResult
+        ]
+    }
+
+    static func == (lhs: ComponentCommunicationModel, rhs: ComponentCommunicationModel) -> Bool {
+        deepEqualsPlatformApi(lhs.toList(), rhs.toList())
+    }
+
+    func hash(into hasher: inout Hasher) {
+        deepHashPlatformApi(value: toList(), hasher: &hasher)
+    }
 }
 
 /// Generated class from Pigeon that represents data sent in messages.
 struct PlatformCommunicationDTO: Hashable {
-  var type: ComponentCommunicationType
-  var componentId: String
-  var dataJson: String? = nil
+    var type: ComponentCommunicationType
+    var componentId: String
+    var dataJson: String?
 
+    // swift-format-ignore: AlwaysUseLowerCamelCase
+    static func fromList(_ pigeonVar_list: [Any?]) -> PlatformCommunicationDTO? {
+        let type = pigeonVar_list[0] as! ComponentCommunicationType
+        let componentId = pigeonVar_list[1] as! String
+        let dataJson: String? = nilOrValue(pigeonVar_list[2])
 
-  // swift-format-ignore: AlwaysUseLowerCamelCase
-  static func fromList(_ pigeonVar_list: [Any?]) -> PlatformCommunicationDTO? {
-    let type = pigeonVar_list[0] as! ComponentCommunicationType
-    let componentId = pigeonVar_list[1] as! String
-    let dataJson: String? = nilOrValue(pigeonVar_list[2])
+        return PlatformCommunicationDTO(
+            type: type,
+            componentId: componentId,
+            dataJson: dataJson
+        )
+    }
 
-    return PlatformCommunicationDTO(
-      type: type,
-      componentId: componentId,
-      dataJson: dataJson
-    )
-  }
-  func toList() -> [Any?] {
-    return [
-      type,
-      componentId,
-      dataJson,
-    ]
-  }
-  static func == (lhs: PlatformCommunicationDTO, rhs: PlatformCommunicationDTO) -> Bool {
-    return deepEqualsPlatformApi(lhs.toList(), rhs.toList())  }
-  func hash(into hasher: inout Hasher) {
-    deepHashPlatformApi(value: toList(), hasher: &hasher)
-  }
+    func toList() -> [Any?] {
+        [
+            type,
+            componentId,
+            dataJson
+        ]
+    }
+
+    static func == (lhs: PlatformCommunicationDTO, rhs: PlatformCommunicationDTO) -> Bool {
+        deepEqualsPlatformApi(lhs.toList(), rhs.toList())
+    }
+
+    func hash(into hasher: inout Hasher) {
+        deepHashPlatformApi(value: toList(), hasher: &hasher)
+    }
 }
 
 /// Generated class from Pigeon that represents data sent in messages.
 struct PaymentEventDTO: Hashable {
-  var paymentEventType: PaymentEventType
-  var result: String? = nil
-  var data: [String?: Any?]? = nil
-  var error: ErrorDTO? = nil
+    var paymentEventType: PaymentEventType
+    var result: String?
+    var data: [String?: Any?]?
+    var error: ErrorDTO?
 
+    // swift-format-ignore: AlwaysUseLowerCamelCase
+    static func fromList(_ pigeonVar_list: [Any?]) -> PaymentEventDTO? {
+        let paymentEventType = pigeonVar_list[0] as! PaymentEventType
+        let result: String? = nilOrValue(pigeonVar_list[1])
+        let data: [String?: Any?]? = nilOrValue(pigeonVar_list[2])
+        let error: ErrorDTO? = nilOrValue(pigeonVar_list[3])
 
-  // swift-format-ignore: AlwaysUseLowerCamelCase
-  static func fromList(_ pigeonVar_list: [Any?]) -> PaymentEventDTO? {
-    let paymentEventType = pigeonVar_list[0] as! PaymentEventType
-    let result: String? = nilOrValue(pigeonVar_list[1])
-    let data: [String?: Any?]? = nilOrValue(pigeonVar_list[2])
-    let error: ErrorDTO? = nilOrValue(pigeonVar_list[3])
+        return PaymentEventDTO(
+            paymentEventType: paymentEventType,
+            result: result,
+            data: data,
+            error: error
+        )
+    }
 
-    return PaymentEventDTO(
-      paymentEventType: paymentEventType,
-      result: result,
-      data: data,
-      error: error
-    )
-  }
-  func toList() -> [Any?] {
-    return [
-      paymentEventType,
-      result,
-      data,
-      error,
-    ]
-  }
-  static func == (lhs: PaymentEventDTO, rhs: PaymentEventDTO) -> Bool {
-    return deepEqualsPlatformApi(lhs.toList(), rhs.toList())  }
-  func hash(into hasher: inout Hasher) {
-    deepHashPlatformApi(value: toList(), hasher: &hasher)
-  }
+    func toList() -> [Any?] {
+        [
+            paymentEventType,
+            result,
+            data,
+            error
+        ]
+    }
+
+    static func == (lhs: PaymentEventDTO, rhs: PaymentEventDTO) -> Bool {
+        deepEqualsPlatformApi(lhs.toList(), rhs.toList())
+    }
+
+    func hash(into hasher: inout Hasher) {
+        deepHashPlatformApi(value: toList(), hasher: &hasher)
+    }
 }
 
 /// Generated class from Pigeon that represents data sent in messages.
 struct ErrorDTO: Hashable {
-  var errorMessage: String? = nil
-  var reason: String? = nil
-  var dismissDropIn: Bool? = nil
+    var errorMessage: String?
+    var reason: String?
+    var dismissDropIn: Bool?
 
+    // swift-format-ignore: AlwaysUseLowerCamelCase
+    static func fromList(_ pigeonVar_list: [Any?]) -> ErrorDTO? {
+        let errorMessage: String? = nilOrValue(pigeonVar_list[0])
+        let reason: String? = nilOrValue(pigeonVar_list[1])
+        let dismissDropIn: Bool? = nilOrValue(pigeonVar_list[2])
 
-  // swift-format-ignore: AlwaysUseLowerCamelCase
-  static func fromList(_ pigeonVar_list: [Any?]) -> ErrorDTO? {
-    let errorMessage: String? = nilOrValue(pigeonVar_list[0])
-    let reason: String? = nilOrValue(pigeonVar_list[1])
-    let dismissDropIn: Bool? = nilOrValue(pigeonVar_list[2])
+        return ErrorDTO(
+            errorMessage: errorMessage,
+            reason: reason,
+            dismissDropIn: dismissDropIn
+        )
+    }
 
-    return ErrorDTO(
-      errorMessage: errorMessage,
-      reason: reason,
-      dismissDropIn: dismissDropIn
-    )
-  }
-  func toList() -> [Any?] {
-    return [
-      errorMessage,
-      reason,
-      dismissDropIn,
-    ]
-  }
-  static func == (lhs: ErrorDTO, rhs: ErrorDTO) -> Bool {
-    return deepEqualsPlatformApi(lhs.toList(), rhs.toList())  }
-  func hash(into hasher: inout Hasher) {
-    deepHashPlatformApi(value: toList(), hasher: &hasher)
-  }
+    func toList() -> [Any?] {
+        [
+            errorMessage,
+            reason,
+            dismissDropIn
+        ]
+    }
+
+    static func == (lhs: ErrorDTO, rhs: ErrorDTO) -> Bool {
+        deepEqualsPlatformApi(lhs.toList(), rhs.toList())
+    }
+
+    func hash(into hasher: inout Hasher) {
+        deepHashPlatformApi(value: toList(), hasher: &hasher)
+    }
 }
 
 /// Generated class from Pigeon that represents data sent in messages.
 struct DeletedStoredPaymentMethodResultDTO: Hashable {
-  var storedPaymentMethodId: String
-  var isSuccessfullyRemoved: Bool
+    var storedPaymentMethodId: String
+    var isSuccessfullyRemoved: Bool
 
+    // swift-format-ignore: AlwaysUseLowerCamelCase
+    static func fromList(_ pigeonVar_list: [Any?]) -> DeletedStoredPaymentMethodResultDTO? {
+        let storedPaymentMethodId = pigeonVar_list[0] as! String
+        let isSuccessfullyRemoved = pigeonVar_list[1] as! Bool
 
-  // swift-format-ignore: AlwaysUseLowerCamelCase
-  static func fromList(_ pigeonVar_list: [Any?]) -> DeletedStoredPaymentMethodResultDTO? {
-    let storedPaymentMethodId = pigeonVar_list[0] as! String
-    let isSuccessfullyRemoved = pigeonVar_list[1] as! Bool
+        return DeletedStoredPaymentMethodResultDTO(
+            storedPaymentMethodId: storedPaymentMethodId,
+            isSuccessfullyRemoved: isSuccessfullyRemoved
+        )
+    }
 
-    return DeletedStoredPaymentMethodResultDTO(
-      storedPaymentMethodId: storedPaymentMethodId,
-      isSuccessfullyRemoved: isSuccessfullyRemoved
-    )
-  }
-  func toList() -> [Any?] {
-    return [
-      storedPaymentMethodId,
-      isSuccessfullyRemoved,
-    ]
-  }
-  static func == (lhs: DeletedStoredPaymentMethodResultDTO, rhs: DeletedStoredPaymentMethodResultDTO) -> Bool {
-    return deepEqualsPlatformApi(lhs.toList(), rhs.toList())  }
-  func hash(into hasher: inout Hasher) {
-    deepHashPlatformApi(value: toList(), hasher: &hasher)
-  }
+    func toList() -> [Any?] {
+        [
+            storedPaymentMethodId,
+            isSuccessfullyRemoved
+        ]
+    }
+
+    static func == (lhs: DeletedStoredPaymentMethodResultDTO, rhs: DeletedStoredPaymentMethodResultDTO) -> Bool {
+        deepEqualsPlatformApi(lhs.toList(), rhs.toList())
+    }
+
+    func hash(into hasher: inout Hasher) {
+        deepHashPlatformApi(value: toList(), hasher: &hasher)
+    }
 }
 
 /// Generated class from Pigeon that represents data sent in messages.
 struct CardComponentConfigurationDTO: Hashable {
-  var environment: Environment
-  var clientKey: String
-  var countryCode: String
-  var amount: AmountDTO? = nil
-  var shopperLocale: String? = nil
-  var analyticsOptionsDTO: AnalyticsOptionsDTO
-  var cardConfiguration: CardConfigurationDTO
-  var threeDS2ConfigurationDTO: ThreeDS2ConfigurationDTO? = nil
+    var environment: Environment
+    var clientKey: String
+    var countryCode: String
+    var amount: AmountDTO?
+    var shopperLocale: String?
+    var analyticsOptionsDTO: AnalyticsOptionsDTO
+    var cardConfiguration: CardConfigurationDTO
+    var threeDS2ConfigurationDTO: ThreeDS2ConfigurationDTO?
 
+    // swift-format-ignore: AlwaysUseLowerCamelCase
+    static func fromList(_ pigeonVar_list: [Any?]) -> CardComponentConfigurationDTO? {
+        let environment = pigeonVar_list[0] as! Environment
+        let clientKey = pigeonVar_list[1] as! String
+        let countryCode = pigeonVar_list[2] as! String
+        let amount: AmountDTO? = nilOrValue(pigeonVar_list[3])
+        let shopperLocale: String? = nilOrValue(pigeonVar_list[4])
+        let analyticsOptionsDTO = pigeonVar_list[5] as! AnalyticsOptionsDTO
+        let cardConfiguration = pigeonVar_list[6] as! CardConfigurationDTO
+        let threeDS2ConfigurationDTO: ThreeDS2ConfigurationDTO? = nilOrValue(pigeonVar_list[7])
 
-  // swift-format-ignore: AlwaysUseLowerCamelCase
-  static func fromList(_ pigeonVar_list: [Any?]) -> CardComponentConfigurationDTO? {
-    let environment = pigeonVar_list[0] as! Environment
-    let clientKey = pigeonVar_list[1] as! String
-    let countryCode = pigeonVar_list[2] as! String
-    let amount: AmountDTO? = nilOrValue(pigeonVar_list[3])
-    let shopperLocale: String? = nilOrValue(pigeonVar_list[4])
-    let analyticsOptionsDTO = pigeonVar_list[5] as! AnalyticsOptionsDTO
-    let cardConfiguration = pigeonVar_list[6] as! CardConfigurationDTO
-    let threeDS2ConfigurationDTO: ThreeDS2ConfigurationDTO? = nilOrValue(pigeonVar_list[7])
+        return CardComponentConfigurationDTO(
+            environment: environment,
+            clientKey: clientKey,
+            countryCode: countryCode,
+            amount: amount,
+            shopperLocale: shopperLocale,
+            analyticsOptionsDTO: analyticsOptionsDTO,
+            cardConfiguration: cardConfiguration,
+            threeDS2ConfigurationDTO: threeDS2ConfigurationDTO
+        )
+    }
 
-    return CardComponentConfigurationDTO(
-      environment: environment,
-      clientKey: clientKey,
-      countryCode: countryCode,
-      amount: amount,
-      shopperLocale: shopperLocale,
-      analyticsOptionsDTO: analyticsOptionsDTO,
-      cardConfiguration: cardConfiguration,
-      threeDS2ConfigurationDTO: threeDS2ConfigurationDTO
-    )
-  }
-  func toList() -> [Any?] {
-    return [
-      environment,
-      clientKey,
-      countryCode,
-      amount,
-      shopperLocale,
-      analyticsOptionsDTO,
-      cardConfiguration,
-      threeDS2ConfigurationDTO,
-    ]
-  }
-  static func == (lhs: CardComponentConfigurationDTO, rhs: CardComponentConfigurationDTO) -> Bool {
-    return deepEqualsPlatformApi(lhs.toList(), rhs.toList())  }
-  func hash(into hasher: inout Hasher) {
-    deepHashPlatformApi(value: toList(), hasher: &hasher)
-  }
+    func toList() -> [Any?] {
+        [
+            environment,
+            clientKey,
+            countryCode,
+            amount,
+            shopperLocale,
+            analyticsOptionsDTO,
+            cardConfiguration,
+            threeDS2ConfigurationDTO
+        ]
+    }
+
+    static func == (lhs: CardComponentConfigurationDTO, rhs: CardComponentConfigurationDTO) -> Bool {
+        deepEqualsPlatformApi(lhs.toList(), rhs.toList())
+    }
+
+    func hash(into hasher: inout Hasher) {
+        deepHashPlatformApi(value: toList(), hasher: &hasher)
+    }
 }
 
 /// Generated class from Pigeon that represents data sent in messages.
 struct InstantPaymentConfigurationDTO: Hashable {
-  var environment: Environment
-  var clientKey: String
-  var countryCode: String
-  var amount: AmountDTO? = nil
-  var shopperLocale: String? = nil
-  var analyticsOptionsDTO: AnalyticsOptionsDTO
-  var instantPaymentType: InstantPaymentType
-  var googlePayConfigurationDTO: GooglePayConfigurationDTO? = nil
-  var applePayConfigurationDTO: ApplePayConfigurationDTO? = nil
+    var environment: Environment
+    var clientKey: String
+    var countryCode: String
+    var amount: AmountDTO?
+    var shopperLocale: String?
+    var analyticsOptionsDTO: AnalyticsOptionsDTO
+    var instantPaymentType: InstantPaymentType
+    var googlePayConfigurationDTO: GooglePayConfigurationDTO?
+    var applePayConfigurationDTO: ApplePayConfigurationDTO?
 
+    // swift-format-ignore: AlwaysUseLowerCamelCase
+    static func fromList(_ pigeonVar_list: [Any?]) -> InstantPaymentConfigurationDTO? {
+        let environment = pigeonVar_list[0] as! Environment
+        let clientKey = pigeonVar_list[1] as! String
+        let countryCode = pigeonVar_list[2] as! String
+        let amount: AmountDTO? = nilOrValue(pigeonVar_list[3])
+        let shopperLocale: String? = nilOrValue(pigeonVar_list[4])
+        let analyticsOptionsDTO = pigeonVar_list[5] as! AnalyticsOptionsDTO
+        let instantPaymentType = pigeonVar_list[6] as! InstantPaymentType
+        let googlePayConfigurationDTO: GooglePayConfigurationDTO? = nilOrValue(pigeonVar_list[7])
+        let applePayConfigurationDTO: ApplePayConfigurationDTO? = nilOrValue(pigeonVar_list[8])
 
-  // swift-format-ignore: AlwaysUseLowerCamelCase
-  static func fromList(_ pigeonVar_list: [Any?]) -> InstantPaymentConfigurationDTO? {
-    let environment = pigeonVar_list[0] as! Environment
-    let clientKey = pigeonVar_list[1] as! String
-    let countryCode = pigeonVar_list[2] as! String
-    let amount: AmountDTO? = nilOrValue(pigeonVar_list[3])
-    let shopperLocale: String? = nilOrValue(pigeonVar_list[4])
-    let analyticsOptionsDTO = pigeonVar_list[5] as! AnalyticsOptionsDTO
-    let instantPaymentType = pigeonVar_list[6] as! InstantPaymentType
-    let googlePayConfigurationDTO: GooglePayConfigurationDTO? = nilOrValue(pigeonVar_list[7])
-    let applePayConfigurationDTO: ApplePayConfigurationDTO? = nilOrValue(pigeonVar_list[8])
+        return InstantPaymentConfigurationDTO(
+            environment: environment,
+            clientKey: clientKey,
+            countryCode: countryCode,
+            amount: amount,
+            shopperLocale: shopperLocale,
+            analyticsOptionsDTO: analyticsOptionsDTO,
+            instantPaymentType: instantPaymentType,
+            googlePayConfigurationDTO: googlePayConfigurationDTO,
+            applePayConfigurationDTO: applePayConfigurationDTO
+        )
+    }
 
-    return InstantPaymentConfigurationDTO(
-      environment: environment,
-      clientKey: clientKey,
-      countryCode: countryCode,
-      amount: amount,
-      shopperLocale: shopperLocale,
-      analyticsOptionsDTO: analyticsOptionsDTO,
-      instantPaymentType: instantPaymentType,
-      googlePayConfigurationDTO: googlePayConfigurationDTO,
-      applePayConfigurationDTO: applePayConfigurationDTO
-    )
-  }
-  func toList() -> [Any?] {
-    return [
-      environment,
-      clientKey,
-      countryCode,
-      amount,
-      shopperLocale,
-      analyticsOptionsDTO,
-      instantPaymentType,
-      googlePayConfigurationDTO,
-      applePayConfigurationDTO,
-    ]
-  }
-  static func == (lhs: InstantPaymentConfigurationDTO, rhs: InstantPaymentConfigurationDTO) -> Bool {
-    return deepEqualsPlatformApi(lhs.toList(), rhs.toList())  }
-  func hash(into hasher: inout Hasher) {
-    deepHashPlatformApi(value: toList(), hasher: &hasher)
-  }
+    func toList() -> [Any?] {
+        [
+            environment,
+            clientKey,
+            countryCode,
+            amount,
+            shopperLocale,
+            analyticsOptionsDTO,
+            instantPaymentType,
+            googlePayConfigurationDTO,
+            applePayConfigurationDTO
+        ]
+    }
+
+    static func == (lhs: InstantPaymentConfigurationDTO, rhs: InstantPaymentConfigurationDTO) -> Bool {
+        deepEqualsPlatformApi(lhs.toList(), rhs.toList())
+    }
+
+    func hash(into hasher: inout Hasher) {
+        deepHashPlatformApi(value: toList(), hasher: &hasher)
+    }
 }
 
 /// Generated class from Pigeon that represents data sent in messages.
 struct InstantPaymentSetupResultDTO: Hashable {
-  var instantPaymentType: InstantPaymentType
-  var isSupported: Bool
-  var resultData: Any? = nil
+    var instantPaymentType: InstantPaymentType
+    var isSupported: Bool
+    var resultData: Any?
 
+    // swift-format-ignore: AlwaysUseLowerCamelCase
+    static func fromList(_ pigeonVar_list: [Any?]) -> InstantPaymentSetupResultDTO? {
+        let instantPaymentType = pigeonVar_list[0] as! InstantPaymentType
+        let isSupported = pigeonVar_list[1] as! Bool
+        let resultData: Any? = pigeonVar_list[2]
 
-  // swift-format-ignore: AlwaysUseLowerCamelCase
-  static func fromList(_ pigeonVar_list: [Any?]) -> InstantPaymentSetupResultDTO? {
-    let instantPaymentType = pigeonVar_list[0] as! InstantPaymentType
-    let isSupported = pigeonVar_list[1] as! Bool
-    let resultData: Any? = pigeonVar_list[2]
+        return InstantPaymentSetupResultDTO(
+            instantPaymentType: instantPaymentType,
+            isSupported: isSupported,
+            resultData: resultData
+        )
+    }
 
-    return InstantPaymentSetupResultDTO(
-      instantPaymentType: instantPaymentType,
-      isSupported: isSupported,
-      resultData: resultData
-    )
-  }
-  func toList() -> [Any?] {
-    return [
-      instantPaymentType,
-      isSupported,
-      resultData,
-    ]
-  }
-  static func == (lhs: InstantPaymentSetupResultDTO, rhs: InstantPaymentSetupResultDTO) -> Bool {
-    return deepEqualsPlatformApi(lhs.toList(), rhs.toList())  }
-  func hash(into hasher: inout Hasher) {
-    deepHashPlatformApi(value: toList(), hasher: &hasher)
-  }
+    func toList() -> [Any?] {
+        [
+            instantPaymentType,
+            isSupported,
+            resultData
+        ]
+    }
+
+    static func == (lhs: InstantPaymentSetupResultDTO, rhs: InstantPaymentSetupResultDTO) -> Bool {
+        deepEqualsPlatformApi(lhs.toList(), rhs.toList())
+    }
+
+    func hash(into hasher: inout Hasher) {
+        deepHashPlatformApi(value: toList(), hasher: &hasher)
+    }
 }
 
 /// Generated class from Pigeon that represents data sent in messages.
 struct UnencryptedCardDTO: Hashable {
-  var cardNumber: String? = nil
-  var expiryMonth: String? = nil
-  var expiryYear: String? = nil
-  var cvc: String? = nil
+    var cardNumber: String?
+    var expiryMonth: String?
+    var expiryYear: String?
+    var cvc: String?
 
+    // swift-format-ignore: AlwaysUseLowerCamelCase
+    static func fromList(_ pigeonVar_list: [Any?]) -> UnencryptedCardDTO? {
+        let cardNumber: String? = nilOrValue(pigeonVar_list[0])
+        let expiryMonth: String? = nilOrValue(pigeonVar_list[1])
+        let expiryYear: String? = nilOrValue(pigeonVar_list[2])
+        let cvc: String? = nilOrValue(pigeonVar_list[3])
 
-  // swift-format-ignore: AlwaysUseLowerCamelCase
-  static func fromList(_ pigeonVar_list: [Any?]) -> UnencryptedCardDTO? {
-    let cardNumber: String? = nilOrValue(pigeonVar_list[0])
-    let expiryMonth: String? = nilOrValue(pigeonVar_list[1])
-    let expiryYear: String? = nilOrValue(pigeonVar_list[2])
-    let cvc: String? = nilOrValue(pigeonVar_list[3])
+        return UnencryptedCardDTO(
+            cardNumber: cardNumber,
+            expiryMonth: expiryMonth,
+            expiryYear: expiryYear,
+            cvc: cvc
+        )
+    }
 
-    return UnencryptedCardDTO(
-      cardNumber: cardNumber,
-      expiryMonth: expiryMonth,
-      expiryYear: expiryYear,
-      cvc: cvc
-    )
-  }
-  func toList() -> [Any?] {
-    return [
-      cardNumber,
-      expiryMonth,
-      expiryYear,
-      cvc,
-    ]
-  }
-  static func == (lhs: UnencryptedCardDTO, rhs: UnencryptedCardDTO) -> Bool {
-    return deepEqualsPlatformApi(lhs.toList(), rhs.toList())  }
-  func hash(into hasher: inout Hasher) {
-    deepHashPlatformApi(value: toList(), hasher: &hasher)
-  }
+    func toList() -> [Any?] {
+        [
+            cardNumber,
+            expiryMonth,
+            expiryYear,
+            cvc
+        ]
+    }
+
+    static func == (lhs: UnencryptedCardDTO, rhs: UnencryptedCardDTO) -> Bool {
+        deepEqualsPlatformApi(lhs.toList(), rhs.toList())
+    }
+
+    func hash(into hasher: inout Hasher) {
+        deepHashPlatformApi(value: toList(), hasher: &hasher)
+    }
 }
 
 /// Generated class from Pigeon that represents data sent in messages.
 struct EncryptedCardDTO: Hashable {
-  var encryptedCardNumber: String? = nil
-  var encryptedExpiryMonth: String? = nil
-  var encryptedExpiryYear: String? = nil
-  var encryptedSecurityCode: String? = nil
+    var encryptedCardNumber: String?
+    var encryptedExpiryMonth: String?
+    var encryptedExpiryYear: String?
+    var encryptedSecurityCode: String?
 
+    // swift-format-ignore: AlwaysUseLowerCamelCase
+    static func fromList(_ pigeonVar_list: [Any?]) -> EncryptedCardDTO? {
+        let encryptedCardNumber: String? = nilOrValue(pigeonVar_list[0])
+        let encryptedExpiryMonth: String? = nilOrValue(pigeonVar_list[1])
+        let encryptedExpiryYear: String? = nilOrValue(pigeonVar_list[2])
+        let encryptedSecurityCode: String? = nilOrValue(pigeonVar_list[3])
 
-  // swift-format-ignore: AlwaysUseLowerCamelCase
-  static func fromList(_ pigeonVar_list: [Any?]) -> EncryptedCardDTO? {
-    let encryptedCardNumber: String? = nilOrValue(pigeonVar_list[0])
-    let encryptedExpiryMonth: String? = nilOrValue(pigeonVar_list[1])
-    let encryptedExpiryYear: String? = nilOrValue(pigeonVar_list[2])
-    let encryptedSecurityCode: String? = nilOrValue(pigeonVar_list[3])
+        return EncryptedCardDTO(
+            encryptedCardNumber: encryptedCardNumber,
+            encryptedExpiryMonth: encryptedExpiryMonth,
+            encryptedExpiryYear: encryptedExpiryYear,
+            encryptedSecurityCode: encryptedSecurityCode
+        )
+    }
 
-    return EncryptedCardDTO(
-      encryptedCardNumber: encryptedCardNumber,
-      encryptedExpiryMonth: encryptedExpiryMonth,
-      encryptedExpiryYear: encryptedExpiryYear,
-      encryptedSecurityCode: encryptedSecurityCode
-    )
-  }
-  func toList() -> [Any?] {
-    return [
-      encryptedCardNumber,
-      encryptedExpiryMonth,
-      encryptedExpiryYear,
-      encryptedSecurityCode,
-    ]
-  }
-  static func == (lhs: EncryptedCardDTO, rhs: EncryptedCardDTO) -> Bool {
-    return deepEqualsPlatformApi(lhs.toList(), rhs.toList())  }
-  func hash(into hasher: inout Hasher) {
-    deepHashPlatformApi(value: toList(), hasher: &hasher)
-  }
+    func toList() -> [Any?] {
+        [
+            encryptedCardNumber,
+            encryptedExpiryMonth,
+            encryptedExpiryYear,
+            encryptedSecurityCode
+        ]
+    }
+
+    static func == (lhs: EncryptedCardDTO, rhs: EncryptedCardDTO) -> Bool {
+        deepEqualsPlatformApi(lhs.toList(), rhs.toList())
+    }
+
+    func hash(into hasher: inout Hasher) {
+        deepHashPlatformApi(value: toList(), hasher: &hasher)
+    }
 }
 
 /// Generated class from Pigeon that represents data sent in messages.
 struct ActionComponentConfigurationDTO: Hashable {
-  var environment: Environment
-  var clientKey: String
-  var amount: AmountDTO? = nil
-  var shopperLocale: String? = nil
-  var analyticsOptionsDTO: AnalyticsOptionsDTO
+    var environment: Environment
+    var clientKey: String
+    var amount: AmountDTO?
+    var shopperLocale: String?
+    var analyticsOptionsDTO: AnalyticsOptionsDTO
 
+    // swift-format-ignore: AlwaysUseLowerCamelCase
+    static func fromList(_ pigeonVar_list: [Any?]) -> ActionComponentConfigurationDTO? {
+        let environment = pigeonVar_list[0] as! Environment
+        let clientKey = pigeonVar_list[1] as! String
+        let amount: AmountDTO? = nilOrValue(pigeonVar_list[2])
+        let shopperLocale: String? = nilOrValue(pigeonVar_list[3])
+        let analyticsOptionsDTO = pigeonVar_list[4] as! AnalyticsOptionsDTO
 
-  // swift-format-ignore: AlwaysUseLowerCamelCase
-  static func fromList(_ pigeonVar_list: [Any?]) -> ActionComponentConfigurationDTO? {
-    let environment = pigeonVar_list[0] as! Environment
-    let clientKey = pigeonVar_list[1] as! String
-    let amount: AmountDTO? = nilOrValue(pigeonVar_list[2])
-    let shopperLocale: String? = nilOrValue(pigeonVar_list[3])
-    let analyticsOptionsDTO = pigeonVar_list[4] as! AnalyticsOptionsDTO
+        return ActionComponentConfigurationDTO(
+            environment: environment,
+            clientKey: clientKey,
+            amount: amount,
+            shopperLocale: shopperLocale,
+            analyticsOptionsDTO: analyticsOptionsDTO
+        )
+    }
 
-    return ActionComponentConfigurationDTO(
-      environment: environment,
-      clientKey: clientKey,
-      amount: amount,
-      shopperLocale: shopperLocale,
-      analyticsOptionsDTO: analyticsOptionsDTO
-    )
-  }
-  func toList() -> [Any?] {
-    return [
-      environment,
-      clientKey,
-      amount,
-      shopperLocale,
-      analyticsOptionsDTO,
-    ]
-  }
-  static func == (lhs: ActionComponentConfigurationDTO, rhs: ActionComponentConfigurationDTO) -> Bool {
-    return deepEqualsPlatformApi(lhs.toList(), rhs.toList())  }
-  func hash(into hasher: inout Hasher) {
-    deepHashPlatformApi(value: toList(), hasher: &hasher)
-  }
+    func toList() -> [Any?] {
+        [
+            environment,
+            clientKey,
+            amount,
+            shopperLocale,
+            analyticsOptionsDTO
+        ]
+    }
+
+    static func == (lhs: ActionComponentConfigurationDTO, rhs: ActionComponentConfigurationDTO) -> Bool {
+        deepEqualsPlatformApi(lhs.toList(), rhs.toList())
+    }
+
+    func hash(into hasher: inout Hasher) {
+        deepHashPlatformApi(value: toList(), hasher: &hasher)
+    }
 }
 
 /// Generated class from Pigeon that represents data sent in messages.
 struct OrderCancelResultDTO: Hashable {
-  var orderCancelResponseBody: [String?: Any?]
-  var updatedPaymentMethodsResponseBody: [String?: Any?]? = nil
+    var orderCancelResponseBody: [String?: Any?]
+    var updatedPaymentMethodsResponseBody: [String?: Any?]?
 
+    // swift-format-ignore: AlwaysUseLowerCamelCase
+    static func fromList(_ pigeonVar_list: [Any?]) -> OrderCancelResultDTO? {
+        let orderCancelResponseBody = pigeonVar_list[0] as! [String?: Any?]
+        let updatedPaymentMethodsResponseBody: [String?: Any?]? = nilOrValue(pigeonVar_list[1])
 
-  // swift-format-ignore: AlwaysUseLowerCamelCase
-  static func fromList(_ pigeonVar_list: [Any?]) -> OrderCancelResultDTO? {
-    let orderCancelResponseBody = pigeonVar_list[0] as! [String?: Any?]
-    let updatedPaymentMethodsResponseBody: [String?: Any?]? = nilOrValue(pigeonVar_list[1])
+        return OrderCancelResultDTO(
+            orderCancelResponseBody: orderCancelResponseBody,
+            updatedPaymentMethodsResponseBody: updatedPaymentMethodsResponseBody
+        )
+    }
 
-    return OrderCancelResultDTO(
-      orderCancelResponseBody: orderCancelResponseBody,
-      updatedPaymentMethodsResponseBody: updatedPaymentMethodsResponseBody
-    )
-  }
-  func toList() -> [Any?] {
-    return [
-      orderCancelResponseBody,
-      updatedPaymentMethodsResponseBody,
-    ]
-  }
-  static func == (lhs: OrderCancelResultDTO, rhs: OrderCancelResultDTO) -> Bool {
-    return deepEqualsPlatformApi(lhs.toList(), rhs.toList())  }
-  func hash(into hasher: inout Hasher) {
-    deepHashPlatformApi(value: toList(), hasher: &hasher)
-  }
+    func toList() -> [Any?] {
+        [
+            orderCancelResponseBody,
+            updatedPaymentMethodsResponseBody
+        ]
+    }
+
+    static func == (lhs: OrderCancelResultDTO, rhs: OrderCancelResultDTO) -> Bool {
+        deepEqualsPlatformApi(lhs.toList(), rhs.toList())
+    }
+
+    func hash(into hasher: inout Hasher) {
+        deepHashPlatformApi(value: toList(), hasher: &hasher)
+    }
 }
 
 /// Generated class from Pigeon that represents data sent in messages.
 struct BinLookupDataDTO: Hashable {
-  var brand: String
+    var brand: String
 
+    // swift-format-ignore: AlwaysUseLowerCamelCase
+    static func fromList(_ pigeonVar_list: [Any?]) -> BinLookupDataDTO? {
+        let brand = pigeonVar_list[0] as! String
 
-  // swift-format-ignore: AlwaysUseLowerCamelCase
-  static func fromList(_ pigeonVar_list: [Any?]) -> BinLookupDataDTO? {
-    let brand = pigeonVar_list[0] as! String
+        return BinLookupDataDTO(
+            brand: brand
+        )
+    }
 
-    return BinLookupDataDTO(
-      brand: brand
-    )
-  }
-  func toList() -> [Any?] {
-    return [
-      brand
-    ]
-  }
-  static func == (lhs: BinLookupDataDTO, rhs: BinLookupDataDTO) -> Bool {
-    return deepEqualsPlatformApi(lhs.toList(), rhs.toList())  }
-  func hash(into hasher: inout Hasher) {
-    deepHashPlatformApi(value: toList(), hasher: &hasher)
-  }
+    func toList() -> [Any?] {
+        [
+            brand
+        ]
+    }
+
+    static func == (lhs: BinLookupDataDTO, rhs: BinLookupDataDTO) -> Bool {
+        deepEqualsPlatformApi(lhs.toList(), rhs.toList())
+    }
+
+    func hash(into hasher: inout Hasher) {
+        deepHashPlatformApi(value: toList(), hasher: &hasher)
+    }
 }
 
 private class PlatformApiPigeonCodecReader: FlutterStandardReader {
-  override func readValue(ofType type: UInt8) -> Any? {
-    switch type {
-    case 129:
-      let enumResultAsInt: Int? = nilOrValue(self.readValue() as! Int?)
-      if let enumResultAsInt = enumResultAsInt {
-        return Environment(rawValue: enumResultAsInt)
-      }
-      return nil
-    case 130:
-      let enumResultAsInt: Int? = nilOrValue(self.readValue() as! Int?)
-      if let enumResultAsInt = enumResultAsInt {
-        return AddressMode(rawValue: enumResultAsInt)
-      }
-      return nil
-    case 131:
-      let enumResultAsInt: Int? = nilOrValue(self.readValue() as! Int?)
-      if let enumResultAsInt = enumResultAsInt {
-        return CardAuthMethod(rawValue: enumResultAsInt)
-      }
-      return nil
-    case 132:
-      let enumResultAsInt: Int? = nilOrValue(self.readValue() as! Int?)
-      if let enumResultAsInt = enumResultAsInt {
-        return TotalPriceStatus(rawValue: enumResultAsInt)
-      }
-      return nil
-    case 133:
-      let enumResultAsInt: Int? = nilOrValue(self.readValue() as! Int?)
-      if let enumResultAsInt = enumResultAsInt {
-        return GooglePayEnvironment(rawValue: enumResultAsInt)
-      }
-      return nil
-    case 134:
-      let enumResultAsInt: Int? = nilOrValue(self.readValue() as! Int?)
-      if let enumResultAsInt = enumResultAsInt {
-        return CashAppPayEnvironment(rawValue: enumResultAsInt)
-      }
-      return nil
-    case 135:
-      let enumResultAsInt: Int? = nilOrValue(self.readValue() as! Int?)
-      if let enumResultAsInt = enumResultAsInt {
-        return PaymentResultEnum(rawValue: enumResultAsInt)
-      }
-      return nil
-    case 136:
-      let enumResultAsInt: Int? = nilOrValue(self.readValue() as! Int?)
-      if let enumResultAsInt = enumResultAsInt {
-        return CheckoutEventType(rawValue: enumResultAsInt)
-      }
-      return nil
-    case 137:
-      let enumResultAsInt: Int? = nilOrValue(self.readValue() as! Int?)
-      if let enumResultAsInt = enumResultAsInt {
-        return ComponentCommunicationType(rawValue: enumResultAsInt)
-      }
-      return nil
-    case 138:
-      let enumResultAsInt: Int? = nilOrValue(self.readValue() as! Int?)
-      if let enumResultAsInt = enumResultAsInt {
-        return PaymentEventType(rawValue: enumResultAsInt)
-      }
-      return nil
-    case 139:
-      let enumResultAsInt: Int? = nilOrValue(self.readValue() as! Int?)
-      if let enumResultAsInt = enumResultAsInt {
-        return FieldVisibility(rawValue: enumResultAsInt)
-      }
-      return nil
-    case 140:
-      let enumResultAsInt: Int? = nilOrValue(self.readValue() as! Int?)
-      if let enumResultAsInt = enumResultAsInt {
-        return InstantPaymentType(rawValue: enumResultAsInt)
-      }
-      return nil
-    case 141:
-      let enumResultAsInt: Int? = nilOrValue(self.readValue() as! Int?)
-      if let enumResultAsInt = enumResultAsInt {
-        return ApplePayShippingType(rawValue: enumResultAsInt)
-      }
-      return nil
-    case 142:
-      let enumResultAsInt: Int? = nilOrValue(self.readValue() as! Int?)
-      if let enumResultAsInt = enumResultAsInt {
-        return ApplePayMerchantCapability(rawValue: enumResultAsInt)
-      }
-      return nil
-    case 143:
-      let enumResultAsInt: Int? = nilOrValue(self.readValue() as! Int?)
-      if let enumResultAsInt = enumResultAsInt {
-        return ApplePaySummaryItemType(rawValue: enumResultAsInt)
-      }
-      return nil
-    case 144:
-      let enumResultAsInt: Int? = nilOrValue(self.readValue() as! Int?)
-      if let enumResultAsInt = enumResultAsInt {
-        return CardNumberValidationResultDTO(rawValue: enumResultAsInt)
-      }
-      return nil
-    case 145:
-      let enumResultAsInt: Int? = nilOrValue(self.readValue() as! Int?)
-      if let enumResultAsInt = enumResultAsInt {
-        return CardExpiryDateValidationResultDTO(rawValue: enumResultAsInt)
-      }
-      return nil
-    case 146:
-      let enumResultAsInt: Int? = nilOrValue(self.readValue() as! Int?)
-      if let enumResultAsInt = enumResultAsInt {
-        return CardSecurityCodeValidationResultDTO(rawValue: enumResultAsInt)
-      }
-      return nil
-    case 147:
-      return SessionResponseDTO.fromList(self.readValue() as! [Any?])
-    case 148:
-      return SessionDTO.fromList(self.readValue() as! [Any?])
-    case 149:
-      return AmountDTO.fromList(self.readValue() as! [Any?])
-    case 150:
-      return AnalyticsOptionsDTO.fromList(self.readValue() as! [Any?])
-    case 151:
-      return ThreeDS2UICustomizationDTO.fromList(self.readValue() as! [Any?])
-    case 152:
-      return ThreeDS2ScreenCustomizationDTO.fromList(self.readValue() as! [Any?])
-    case 153:
-      return ThreeDS2ButtonCustomizationDTO.fromList(self.readValue() as! [Any?])
-    case 154:
-      return ThreeDS2SelectionItemCustomizationDTO.fromList(self.readValue() as! [Any?])
-    case 155:
-      return ThreeDS2LabelCustomizationDTO.fromList(self.readValue() as! [Any?])
-    case 156:
-      return ThreeDS2InputCustomizationDTO.fromList(self.readValue() as! [Any?])
-    case 157:
-      return ThreeDS2ToolbarCustomizationDTO.fromList(self.readValue() as! [Any?])
-    case 158:
-      return ThreeDS2ConfigurationDTO.fromList(self.readValue() as! [Any?])
-    case 159:
-      return DefaultInstallmentOptionsDTO.fromList(self.readValue() as! [Any?])
-    case 160:
-      return CardBasedInstallmentOptionsDTO.fromList(self.readValue() as! [Any?])
-    case 161:
-      return InstallmentConfigurationDTO.fromList(self.readValue() as! [Any?])
-    case 162:
-      return CheckoutConfigurationDTO.fromList(self.readValue() as! [Any?])
-    case 163:
-      return DropInConfigurationDTO.fromList(self.readValue() as! [Any?])
-    case 164:
-      return CardConfigurationDTO.fromList(self.readValue() as! [Any?])
-    case 165:
-      return ApplePayConfigurationDTO.fromList(self.readValue() as! [Any?])
-    case 166:
-      return ApplePayContactDTO.fromList(self.readValue() as! [Any?])
-    case 167:
-      return ApplePayShippingMethodDTO.fromList(self.readValue() as! [Any?])
-    case 168:
-      return ApplePaySummaryItemDTO.fromList(self.readValue() as! [Any?])
-    case 169:
-      return GooglePayConfigurationDTO.fromList(self.readValue() as! [Any?])
-    case 170:
-      return MerchantInfoDTO.fromList(self.readValue() as! [Any?])
-    case 171:
-      return ShippingAddressParametersDTO.fromList(self.readValue() as! [Any?])
-    case 172:
-      return BillingAddressParametersDTO.fromList(self.readValue() as! [Any?])
-    case 173:
-      return CashAppPayConfigurationDTO.fromList(self.readValue() as! [Any?])
-    case 174:
-      return TwintConfigurationDTO.fromList(self.readValue() as! [Any?])
-    case 175:
-      return PaymentResultDTO.fromList(self.readValue() as! [Any?])
-    case 176:
-      return PaymentResultModelDTO.fromList(self.readValue() as! [Any?])
-    case 177:
-      return OrderResponseDTO.fromList(self.readValue() as! [Any?])
-    case 178:
-      return FinishedResultDTO.fromList(self.readValue() as! [Any?])
-    case 179:
-      return ActionResultDTO.fromList(self.readValue() as! [Any?])
-    case 180:
-      return ErrorResultDTO.fromList(self.readValue() as! [Any?])
-    case 181:
-      return CheckoutEvent.fromList(self.readValue() as! [Any?])
-    case 182:
-      return ComponentCommunicationModel.fromList(self.readValue() as! [Any?])
-    case 183:
-      return PlatformCommunicationDTO.fromList(self.readValue() as! [Any?])
-    case 184:
-      return PaymentEventDTO.fromList(self.readValue() as! [Any?])
-    case 185:
-      return ErrorDTO.fromList(self.readValue() as! [Any?])
-    case 186:
-      return DeletedStoredPaymentMethodResultDTO.fromList(self.readValue() as! [Any?])
-    case 187:
-      return CardComponentConfigurationDTO.fromList(self.readValue() as! [Any?])
-    case 188:
-      return InstantPaymentConfigurationDTO.fromList(self.readValue() as! [Any?])
-    case 189:
-      return InstantPaymentSetupResultDTO.fromList(self.readValue() as! [Any?])
-    case 190:
-      return UnencryptedCardDTO.fromList(self.readValue() as! [Any?])
-    case 191:
-      return EncryptedCardDTO.fromList(self.readValue() as! [Any?])
-    case 192:
-      return ActionComponentConfigurationDTO.fromList(self.readValue() as! [Any?])
-    case 193:
-      return OrderCancelResultDTO.fromList(self.readValue() as! [Any?])
-    case 194:
-      return BinLookupDataDTO.fromList(self.readValue() as! [Any?])
-    default:
-      return super.readValue(ofType: type)
+    override func readValue(ofType type: UInt8) -> Any? {
+        switch type {
+        case 129:
+            let enumResultAsInt: Int? = nilOrValue(self.readValue() as! Int?)
+            if let enumResultAsInt {
+                return Environment(rawValue: enumResultAsInt)
+            }
+            return nil
+        case 130:
+            let enumResultAsInt: Int? = nilOrValue(self.readValue() as! Int?)
+            if let enumResultAsInt {
+                return AddressMode(rawValue: enumResultAsInt)
+            }
+            return nil
+        case 131:
+            let enumResultAsInt: Int? = nilOrValue(self.readValue() as! Int?)
+            if let enumResultAsInt {
+                return CardAuthMethod(rawValue: enumResultAsInt)
+            }
+            return nil
+        case 132:
+            let enumResultAsInt: Int? = nilOrValue(self.readValue() as! Int?)
+            if let enumResultAsInt {
+                return TotalPriceStatus(rawValue: enumResultAsInt)
+            }
+            return nil
+        case 133:
+            let enumResultAsInt: Int? = nilOrValue(self.readValue() as! Int?)
+            if let enumResultAsInt {
+                return GooglePayEnvironment(rawValue: enumResultAsInt)
+            }
+            return nil
+        case 134:
+            let enumResultAsInt: Int? = nilOrValue(self.readValue() as! Int?)
+            if let enumResultAsInt {
+                return CashAppPayEnvironment(rawValue: enumResultAsInt)
+            }
+            return nil
+        case 135:
+            let enumResultAsInt: Int? = nilOrValue(self.readValue() as! Int?)
+            if let enumResultAsInt {
+                return PaymentResultEnum(rawValue: enumResultAsInt)
+            }
+            return nil
+        case 136:
+            let enumResultAsInt: Int? = nilOrValue(self.readValue() as! Int?)
+            if let enumResultAsInt {
+                return CheckoutEventType(rawValue: enumResultAsInt)
+            }
+            return nil
+        case 137:
+            let enumResultAsInt: Int? = nilOrValue(self.readValue() as! Int?)
+            if let enumResultAsInt {
+                return ComponentCommunicationType(rawValue: enumResultAsInt)
+            }
+            return nil
+        case 138:
+            let enumResultAsInt: Int? = nilOrValue(self.readValue() as! Int?)
+            if let enumResultAsInt {
+                return PaymentEventType(rawValue: enumResultAsInt)
+            }
+            return nil
+        case 139:
+            let enumResultAsInt: Int? = nilOrValue(self.readValue() as! Int?)
+            if let enumResultAsInt {
+                return FieldVisibility(rawValue: enumResultAsInt)
+            }
+            return nil
+        case 140:
+            let enumResultAsInt: Int? = nilOrValue(self.readValue() as! Int?)
+            if let enumResultAsInt {
+                return InstantPaymentType(rawValue: enumResultAsInt)
+            }
+            return nil
+        case 141:
+            let enumResultAsInt: Int? = nilOrValue(self.readValue() as! Int?)
+            if let enumResultAsInt {
+                return ApplePayShippingType(rawValue: enumResultAsInt)
+            }
+            return nil
+        case 142:
+            let enumResultAsInt: Int? = nilOrValue(self.readValue() as! Int?)
+            if let enumResultAsInt {
+                return ApplePayMerchantCapability(rawValue: enumResultAsInt)
+            }
+            return nil
+        case 143:
+            let enumResultAsInt: Int? = nilOrValue(self.readValue() as! Int?)
+            if let enumResultAsInt {
+                return ApplePaySummaryItemType(rawValue: enumResultAsInt)
+            }
+            return nil
+        case 144:
+            let enumResultAsInt: Int? = nilOrValue(self.readValue() as! Int?)
+            if let enumResultAsInt {
+                return CardNumberValidationResultDTO(rawValue: enumResultAsInt)
+            }
+            return nil
+        case 145:
+            let enumResultAsInt: Int? = nilOrValue(self.readValue() as! Int?)
+            if let enumResultAsInt {
+                return CardExpiryDateValidationResultDTO(rawValue: enumResultAsInt)
+            }
+            return nil
+        case 146:
+            let enumResultAsInt: Int? = nilOrValue(self.readValue() as! Int?)
+            if let enumResultAsInt {
+                return CardSecurityCodeValidationResultDTO(rawValue: enumResultAsInt)
+            }
+            return nil
+        case 147:
+            return SessionResponseDTO.fromList(self.readValue() as! [Any?])
+        case 148:
+            return SessionDTO.fromList(self.readValue() as! [Any?])
+        case 149:
+            return AmountDTO.fromList(self.readValue() as! [Any?])
+        case 150:
+            return AnalyticsOptionsDTO.fromList(self.readValue() as! [Any?])
+        case 151:
+            return ThreeDS2UICustomizationDTO.fromList(self.readValue() as! [Any?])
+        case 152:
+            return ThreeDS2ScreenCustomizationDTO.fromList(self.readValue() as! [Any?])
+        case 153:
+            return ThreeDS2ButtonCustomizationDTO.fromList(self.readValue() as! [Any?])
+        case 154:
+            return ThreeDS2SelectionItemCustomizationDTO.fromList(self.readValue() as! [Any?])
+        case 155:
+            return ThreeDS2LabelCustomizationDTO.fromList(self.readValue() as! [Any?])
+        case 156:
+            return ThreeDS2InputCustomizationDTO.fromList(self.readValue() as! [Any?])
+        case 157:
+            return ThreeDS2ToolbarCustomizationDTO.fromList(self.readValue() as! [Any?])
+        case 158:
+            return ThreeDS2ConfigurationDTO.fromList(self.readValue() as! [Any?])
+        case 159:
+            return DefaultInstallmentOptionsDTO.fromList(self.readValue() as! [Any?])
+        case 160:
+            return CardBasedInstallmentOptionsDTO.fromList(self.readValue() as! [Any?])
+        case 161:
+            return InstallmentConfigurationDTO.fromList(self.readValue() as! [Any?])
+        case 162:
+            return CheckoutConfigurationDTO.fromList(self.readValue() as! [Any?])
+        case 163:
+            return DropInConfigurationDTO.fromList(self.readValue() as! [Any?])
+        case 164:
+            return CardConfigurationDTO.fromList(self.readValue() as! [Any?])
+        case 165:
+            return ApplePayConfigurationDTO.fromList(self.readValue() as! [Any?])
+        case 166:
+            return ApplePayContactDTO.fromList(self.readValue() as! [Any?])
+        case 167:
+            return ApplePayShippingMethodDTO.fromList(self.readValue() as! [Any?])
+        case 168:
+            return ApplePaySummaryItemDTO.fromList(self.readValue() as! [Any?])
+        case 169:
+            return GooglePayConfigurationDTO.fromList(self.readValue() as! [Any?])
+        case 170:
+            return MerchantInfoDTO.fromList(self.readValue() as! [Any?])
+        case 171:
+            return ShippingAddressParametersDTO.fromList(self.readValue() as! [Any?])
+        case 172:
+            return BillingAddressParametersDTO.fromList(self.readValue() as! [Any?])
+        case 173:
+            return CashAppPayConfigurationDTO.fromList(self.readValue() as! [Any?])
+        case 174:
+            return TwintConfigurationDTO.fromList(self.readValue() as! [Any?])
+        case 175:
+            return PaymentResultDTO.fromList(self.readValue() as! [Any?])
+        case 176:
+            return PaymentResultModelDTO.fromList(self.readValue() as! [Any?])
+        case 177:
+            return OrderResponseDTO.fromList(self.readValue() as! [Any?])
+        case 178:
+            return FinishedResultDTO.fromList(self.readValue() as! [Any?])
+        case 179:
+            return ActionResultDTO.fromList(self.readValue() as! [Any?])
+        case 180:
+            return ErrorResultDTO.fromList(self.readValue() as! [Any?])
+        case 181:
+            return CheckoutEvent.fromList(self.readValue() as! [Any?])
+        case 182:
+            return ComponentCommunicationModel.fromList(self.readValue() as! [Any?])
+        case 183:
+            return PlatformCommunicationDTO.fromList(self.readValue() as! [Any?])
+        case 184:
+            return PaymentEventDTO.fromList(self.readValue() as! [Any?])
+        case 185:
+            return ErrorDTO.fromList(self.readValue() as! [Any?])
+        case 186:
+            return DeletedStoredPaymentMethodResultDTO.fromList(self.readValue() as! [Any?])
+        case 187:
+            return CardComponentConfigurationDTO.fromList(self.readValue() as! [Any?])
+        case 188:
+            return InstantPaymentConfigurationDTO.fromList(self.readValue() as! [Any?])
+        case 189:
+            return InstantPaymentSetupResultDTO.fromList(self.readValue() as! [Any?])
+        case 190:
+            return UnencryptedCardDTO.fromList(self.readValue() as! [Any?])
+        case 191:
+            return EncryptedCardDTO.fromList(self.readValue() as! [Any?])
+        case 192:
+            return ActionComponentConfigurationDTO.fromList(self.readValue() as! [Any?])
+        case 193:
+            return OrderCancelResultDTO.fromList(self.readValue() as! [Any?])
+        case 194:
+            return BinLookupDataDTO.fromList(self.readValue() as! [Any?])
+        default:
+            return super.readValue(ofType: type)
+        }
     }
-  }
 }
 
 private class PlatformApiPigeonCodecWriter: FlutterStandardWriter {
-  override func writeValue(_ value: Any) {
-    if let value = value as? Environment {
-      super.writeByte(129)
-      super.writeValue(value.rawValue)
-    } else if let value = value as? AddressMode {
-      super.writeByte(130)
-      super.writeValue(value.rawValue)
-    } else if let value = value as? CardAuthMethod {
-      super.writeByte(131)
-      super.writeValue(value.rawValue)
-    } else if let value = value as? TotalPriceStatus {
-      super.writeByte(132)
-      super.writeValue(value.rawValue)
-    } else if let value = value as? GooglePayEnvironment {
-      super.writeByte(133)
-      super.writeValue(value.rawValue)
-    } else if let value = value as? CashAppPayEnvironment {
-      super.writeByte(134)
-      super.writeValue(value.rawValue)
-    } else if let value = value as? PaymentResultEnum {
-      super.writeByte(135)
-      super.writeValue(value.rawValue)
-    } else if let value = value as? CheckoutEventType {
-      super.writeByte(136)
-      super.writeValue(value.rawValue)
-    } else if let value = value as? ComponentCommunicationType {
-      super.writeByte(137)
-      super.writeValue(value.rawValue)
-    } else if let value = value as? PaymentEventType {
-      super.writeByte(138)
-      super.writeValue(value.rawValue)
-    } else if let value = value as? FieldVisibility {
-      super.writeByte(139)
-      super.writeValue(value.rawValue)
-    } else if let value = value as? InstantPaymentType {
-      super.writeByte(140)
-      super.writeValue(value.rawValue)
-    } else if let value = value as? ApplePayShippingType {
-      super.writeByte(141)
-      super.writeValue(value.rawValue)
-    } else if let value = value as? ApplePayMerchantCapability {
-      super.writeByte(142)
-      super.writeValue(value.rawValue)
-    } else if let value = value as? ApplePaySummaryItemType {
-      super.writeByte(143)
-      super.writeValue(value.rawValue)
-    } else if let value = value as? CardNumberValidationResultDTO {
-      super.writeByte(144)
-      super.writeValue(value.rawValue)
-    } else if let value = value as? CardExpiryDateValidationResultDTO {
-      super.writeByte(145)
-      super.writeValue(value.rawValue)
-    } else if let value = value as? CardSecurityCodeValidationResultDTO {
-      super.writeByte(146)
-      super.writeValue(value.rawValue)
-    } else if let value = value as? SessionResponseDTO {
-      super.writeByte(147)
-      super.writeValue(value.toList())
-    } else if let value = value as? SessionDTO {
-      super.writeByte(148)
-      super.writeValue(value.toList())
-    } else if let value = value as? AmountDTO {
-      super.writeByte(149)
-      super.writeValue(value.toList())
-    } else if let value = value as? AnalyticsOptionsDTO {
-      super.writeByte(150)
-      super.writeValue(value.toList())
-    } else if let value = value as? ThreeDS2UICustomizationDTO {
-      super.writeByte(151)
-      super.writeValue(value.toList())
-    } else if let value = value as? ThreeDS2ScreenCustomizationDTO {
-      super.writeByte(152)
-      super.writeValue(value.toList())
-    } else if let value = value as? ThreeDS2ButtonCustomizationDTO {
-      super.writeByte(153)
-      super.writeValue(value.toList())
-    } else if let value = value as? ThreeDS2SelectionItemCustomizationDTO {
-      super.writeByte(154)
-      super.writeValue(value.toList())
-    } else if let value = value as? ThreeDS2LabelCustomizationDTO {
-      super.writeByte(155)
-      super.writeValue(value.toList())
-    } else if let value = value as? ThreeDS2InputCustomizationDTO {
-      super.writeByte(156)
-      super.writeValue(value.toList())
-    } else if let value = value as? ThreeDS2ToolbarCustomizationDTO {
-      super.writeByte(157)
-      super.writeValue(value.toList())
-    } else if let value = value as? ThreeDS2ConfigurationDTO {
-      super.writeByte(158)
-      super.writeValue(value.toList())
-    } else if let value = value as? DefaultInstallmentOptionsDTO {
-      super.writeByte(159)
-      super.writeValue(value.toList())
-    } else if let value = value as? CardBasedInstallmentOptionsDTO {
-      super.writeByte(160)
-      super.writeValue(value.toList())
-    } else if let value = value as? InstallmentConfigurationDTO {
-      super.writeByte(161)
-      super.writeValue(value.toList())
-    } else if let value = value as? CheckoutConfigurationDTO {
-      super.writeByte(162)
-      super.writeValue(value.toList())
-    } else if let value = value as? DropInConfigurationDTO {
-      super.writeByte(163)
-      super.writeValue(value.toList())
-    } else if let value = value as? CardConfigurationDTO {
-      super.writeByte(164)
-      super.writeValue(value.toList())
-    } else if let value = value as? ApplePayConfigurationDTO {
-      super.writeByte(165)
-      super.writeValue(value.toList())
-    } else if let value = value as? ApplePayContactDTO {
-      super.writeByte(166)
-      super.writeValue(value.toList())
-    } else if let value = value as? ApplePayShippingMethodDTO {
-      super.writeByte(167)
-      super.writeValue(value.toList())
-    } else if let value = value as? ApplePaySummaryItemDTO {
-      super.writeByte(168)
-      super.writeValue(value.toList())
-    } else if let value = value as? GooglePayConfigurationDTO {
-      super.writeByte(169)
-      super.writeValue(value.toList())
-    } else if let value = value as? MerchantInfoDTO {
-      super.writeByte(170)
-      super.writeValue(value.toList())
-    } else if let value = value as? ShippingAddressParametersDTO {
-      super.writeByte(171)
-      super.writeValue(value.toList())
-    } else if let value = value as? BillingAddressParametersDTO {
-      super.writeByte(172)
-      super.writeValue(value.toList())
-    } else if let value = value as? CashAppPayConfigurationDTO {
-      super.writeByte(173)
-      super.writeValue(value.toList())
-    } else if let value = value as? TwintConfigurationDTO {
-      super.writeByte(174)
-      super.writeValue(value.toList())
-    } else if let value = value as? PaymentResultDTO {
-      super.writeByte(175)
-      super.writeValue(value.toList())
-    } else if let value = value as? PaymentResultModelDTO {
-      super.writeByte(176)
-      super.writeValue(value.toList())
-    } else if let value = value as? OrderResponseDTO {
-      super.writeByte(177)
-      super.writeValue(value.toList())
-    } else if let value = value as? FinishedResultDTO {
-      super.writeByte(178)
-      super.writeValue(value.toList())
-    } else if let value = value as? ActionResultDTO {
-      super.writeByte(179)
-      super.writeValue(value.toList())
-    } else if let value = value as? ErrorResultDTO {
-      super.writeByte(180)
-      super.writeValue(value.toList())
-    } else if let value = value as? CheckoutEvent {
-      super.writeByte(181)
-      super.writeValue(value.toList())
-    } else if let value = value as? ComponentCommunicationModel {
-      super.writeByte(182)
-      super.writeValue(value.toList())
-    } else if let value = value as? PlatformCommunicationDTO {
-      super.writeByte(183)
-      super.writeValue(value.toList())
-    } else if let value = value as? PaymentEventDTO {
-      super.writeByte(184)
-      super.writeValue(value.toList())
-    } else if let value = value as? ErrorDTO {
-      super.writeByte(185)
-      super.writeValue(value.toList())
-    } else if let value = value as? DeletedStoredPaymentMethodResultDTO {
-      super.writeByte(186)
-      super.writeValue(value.toList())
-    } else if let value = value as? CardComponentConfigurationDTO {
-      super.writeByte(187)
-      super.writeValue(value.toList())
-    } else if let value = value as? InstantPaymentConfigurationDTO {
-      super.writeByte(188)
-      super.writeValue(value.toList())
-    } else if let value = value as? InstantPaymentSetupResultDTO {
-      super.writeByte(189)
-      super.writeValue(value.toList())
-    } else if let value = value as? UnencryptedCardDTO {
-      super.writeByte(190)
-      super.writeValue(value.toList())
-    } else if let value = value as? EncryptedCardDTO {
-      super.writeByte(191)
-      super.writeValue(value.toList())
-    } else if let value = value as? ActionComponentConfigurationDTO {
-      super.writeByte(192)
-      super.writeValue(value.toList())
-    } else if let value = value as? OrderCancelResultDTO {
-      super.writeByte(193)
-      super.writeValue(value.toList())
-    } else if let value = value as? BinLookupDataDTO {
-      super.writeByte(194)
-      super.writeValue(value.toList())
-    } else {
-      super.writeValue(value)
+    override func writeValue(_ value: Any) {
+        if let value = value as? Environment {
+            super.writeByte(129)
+            super.writeValue(value.rawValue)
+        } else if let value = value as? AddressMode {
+            super.writeByte(130)
+            super.writeValue(value.rawValue)
+        } else if let value = value as? CardAuthMethod {
+            super.writeByte(131)
+            super.writeValue(value.rawValue)
+        } else if let value = value as? TotalPriceStatus {
+            super.writeByte(132)
+            super.writeValue(value.rawValue)
+        } else if let value = value as? GooglePayEnvironment {
+            super.writeByte(133)
+            super.writeValue(value.rawValue)
+        } else if let value = value as? CashAppPayEnvironment {
+            super.writeByte(134)
+            super.writeValue(value.rawValue)
+        } else if let value = value as? PaymentResultEnum {
+            super.writeByte(135)
+            super.writeValue(value.rawValue)
+        } else if let value = value as? CheckoutEventType {
+            super.writeByte(136)
+            super.writeValue(value.rawValue)
+        } else if let value = value as? ComponentCommunicationType {
+            super.writeByte(137)
+            super.writeValue(value.rawValue)
+        } else if let value = value as? PaymentEventType {
+            super.writeByte(138)
+            super.writeValue(value.rawValue)
+        } else if let value = value as? FieldVisibility {
+            super.writeByte(139)
+            super.writeValue(value.rawValue)
+        } else if let value = value as? InstantPaymentType {
+            super.writeByte(140)
+            super.writeValue(value.rawValue)
+        } else if let value = value as? ApplePayShippingType {
+            super.writeByte(141)
+            super.writeValue(value.rawValue)
+        } else if let value = value as? ApplePayMerchantCapability {
+            super.writeByte(142)
+            super.writeValue(value.rawValue)
+        } else if let value = value as? ApplePaySummaryItemType {
+            super.writeByte(143)
+            super.writeValue(value.rawValue)
+        } else if let value = value as? CardNumberValidationResultDTO {
+            super.writeByte(144)
+            super.writeValue(value.rawValue)
+        } else if let value = value as? CardExpiryDateValidationResultDTO {
+            super.writeByte(145)
+            super.writeValue(value.rawValue)
+        } else if let value = value as? CardSecurityCodeValidationResultDTO {
+            super.writeByte(146)
+            super.writeValue(value.rawValue)
+        } else if let value = value as? SessionResponseDTO {
+            super.writeByte(147)
+            super.writeValue(value.toList())
+        } else if let value = value as? SessionDTO {
+            super.writeByte(148)
+            super.writeValue(value.toList())
+        } else if let value = value as? AmountDTO {
+            super.writeByte(149)
+            super.writeValue(value.toList())
+        } else if let value = value as? AnalyticsOptionsDTO {
+            super.writeByte(150)
+            super.writeValue(value.toList())
+        } else if let value = value as? ThreeDS2UICustomizationDTO {
+            super.writeByte(151)
+            super.writeValue(value.toList())
+        } else if let value = value as? ThreeDS2ScreenCustomizationDTO {
+            super.writeByte(152)
+            super.writeValue(value.toList())
+        } else if let value = value as? ThreeDS2ButtonCustomizationDTO {
+            super.writeByte(153)
+            super.writeValue(value.toList())
+        } else if let value = value as? ThreeDS2SelectionItemCustomizationDTO {
+            super.writeByte(154)
+            super.writeValue(value.toList())
+        } else if let value = value as? ThreeDS2LabelCustomizationDTO {
+            super.writeByte(155)
+            super.writeValue(value.toList())
+        } else if let value = value as? ThreeDS2InputCustomizationDTO {
+            super.writeByte(156)
+            super.writeValue(value.toList())
+        } else if let value = value as? ThreeDS2ToolbarCustomizationDTO {
+            super.writeByte(157)
+            super.writeValue(value.toList())
+        } else if let value = value as? ThreeDS2ConfigurationDTO {
+            super.writeByte(158)
+            super.writeValue(value.toList())
+        } else if let value = value as? DefaultInstallmentOptionsDTO {
+            super.writeByte(159)
+            super.writeValue(value.toList())
+        } else if let value = value as? CardBasedInstallmentOptionsDTO {
+            super.writeByte(160)
+            super.writeValue(value.toList())
+        } else if let value = value as? InstallmentConfigurationDTO {
+            super.writeByte(161)
+            super.writeValue(value.toList())
+        } else if let value = value as? CheckoutConfigurationDTO {
+            super.writeByte(162)
+            super.writeValue(value.toList())
+        } else if let value = value as? DropInConfigurationDTO {
+            super.writeByte(163)
+            super.writeValue(value.toList())
+        } else if let value = value as? CardConfigurationDTO {
+            super.writeByte(164)
+            super.writeValue(value.toList())
+        } else if let value = value as? ApplePayConfigurationDTO {
+            super.writeByte(165)
+            super.writeValue(value.toList())
+        } else if let value = value as? ApplePayContactDTO {
+            super.writeByte(166)
+            super.writeValue(value.toList())
+        } else if let value = value as? ApplePayShippingMethodDTO {
+            super.writeByte(167)
+            super.writeValue(value.toList())
+        } else if let value = value as? ApplePaySummaryItemDTO {
+            super.writeByte(168)
+            super.writeValue(value.toList())
+        } else if let value = value as? GooglePayConfigurationDTO {
+            super.writeByte(169)
+            super.writeValue(value.toList())
+        } else if let value = value as? MerchantInfoDTO {
+            super.writeByte(170)
+            super.writeValue(value.toList())
+        } else if let value = value as? ShippingAddressParametersDTO {
+            super.writeByte(171)
+            super.writeValue(value.toList())
+        } else if let value = value as? BillingAddressParametersDTO {
+            super.writeByte(172)
+            super.writeValue(value.toList())
+        } else if let value = value as? CashAppPayConfigurationDTO {
+            super.writeByte(173)
+            super.writeValue(value.toList())
+        } else if let value = value as? TwintConfigurationDTO {
+            super.writeByte(174)
+            super.writeValue(value.toList())
+        } else if let value = value as? PaymentResultDTO {
+            super.writeByte(175)
+            super.writeValue(value.toList())
+        } else if let value = value as? PaymentResultModelDTO {
+            super.writeByte(176)
+            super.writeValue(value.toList())
+        } else if let value = value as? OrderResponseDTO {
+            super.writeByte(177)
+            super.writeValue(value.toList())
+        } else if let value = value as? FinishedResultDTO {
+            super.writeByte(178)
+            super.writeValue(value.toList())
+        } else if let value = value as? ActionResultDTO {
+            super.writeByte(179)
+            super.writeValue(value.toList())
+        } else if let value = value as? ErrorResultDTO {
+            super.writeByte(180)
+            super.writeValue(value.toList())
+        } else if let value = value as? CheckoutEvent {
+            super.writeByte(181)
+            super.writeValue(value.toList())
+        } else if let value = value as? ComponentCommunicationModel {
+            super.writeByte(182)
+            super.writeValue(value.toList())
+        } else if let value = value as? PlatformCommunicationDTO {
+            super.writeByte(183)
+            super.writeValue(value.toList())
+        } else if let value = value as? PaymentEventDTO {
+            super.writeByte(184)
+            super.writeValue(value.toList())
+        } else if let value = value as? ErrorDTO {
+            super.writeByte(185)
+            super.writeValue(value.toList())
+        } else if let value = value as? DeletedStoredPaymentMethodResultDTO {
+            super.writeByte(186)
+            super.writeValue(value.toList())
+        } else if let value = value as? CardComponentConfigurationDTO {
+            super.writeByte(187)
+            super.writeValue(value.toList())
+        } else if let value = value as? InstantPaymentConfigurationDTO {
+            super.writeByte(188)
+            super.writeValue(value.toList())
+        } else if let value = value as? InstantPaymentSetupResultDTO {
+            super.writeByte(189)
+            super.writeValue(value.toList())
+        } else if let value = value as? UnencryptedCardDTO {
+            super.writeByte(190)
+            super.writeValue(value.toList())
+        } else if let value = value as? EncryptedCardDTO {
+            super.writeByte(191)
+            super.writeValue(value.toList())
+        } else if let value = value as? ActionComponentConfigurationDTO {
+            super.writeByte(192)
+            super.writeValue(value.toList())
+        } else if let value = value as? OrderCancelResultDTO {
+            super.writeByte(193)
+            super.writeValue(value.toList())
+        } else if let value = value as? BinLookupDataDTO {
+            super.writeByte(194)
+            super.writeValue(value.toList())
+        } else {
+            super.writeValue(value)
+        }
     }
-  }
 }
 
 private class PlatformApiPigeonCodecReaderWriter: FlutterStandardReaderWriter {
-  override func reader(with data: Data) -> FlutterStandardReader {
-    return PlatformApiPigeonCodecReader(data: data)
-  }
+    override func reader(with data: Data) -> FlutterStandardReader {
+        PlatformApiPigeonCodecReader(data: data)
+    }
 
-  override func writer(with data: NSMutableData) -> FlutterStandardWriter {
-    return PlatformApiPigeonCodecWriter(data: data)
-  }
+    override func writer(with data: NSMutableData) -> FlutterStandardWriter {
+        PlatformApiPigeonCodecWriter(data: data)
+    }
 }
 
 class PlatformApiPigeonCodec: FlutterStandardMessageCodec, @unchecked Sendable {
-  static let shared = PlatformApiPigeonCodec(readerWriter: PlatformApiPigeonCodecReaderWriter())
+    static let shared = PlatformApiPigeonCodec(readerWriter: PlatformApiPigeonCodecReaderWriter())
 }
 
-var platformApiPigeonMethodCodec = FlutterStandardMethodCodec(readerWriter: PlatformApiPigeonCodecReaderWriter());
-
+var platformApiPigeonMethodCodec = FlutterStandardMethodCodec(readerWriter: PlatformApiPigeonCodecReaderWriter())
 
 /// Generated protocol from Pigeon that represents a handler of messages from Flutter.
 protocol CheckoutPlatformInterface {
-  func getReturnUrl(completion: @escaping (Result<String, Error>) -> Void)
-  func setupSession(sessionResponseDTO: SessionResponseDTO, checkoutConfigurationDTO: CheckoutConfigurationDTO, completion: @escaping (Result<SessionDTO, Error>) -> Void)
-  func setupAdvanced(paymentMethodsResponse: String, checkoutConfigurationDTO: CheckoutConfigurationDTO, completion: @escaping (Result<Void, Error>) -> Void)
-  func clearSession() throws
-  func encryptCard(unencryptedCardDTO: UnencryptedCardDTO, publicKey: String, completion: @escaping (Result<EncryptedCardDTO, Error>) -> Void)
-  func encryptBin(bin: String, publicKey: String, completion: @escaping (Result<String, Error>) -> Void)
-  func validateCardNumber(cardNumber: String, enableLuhnCheck: Bool) throws -> CardNumberValidationResultDTO
-  func validateCardExpiryDate(expiryMonth: String, expiryYear: String) throws -> CardExpiryDateValidationResultDTO
-  func validateCardSecurityCode(securityCode: String, cardBrand: String?) throws -> CardSecurityCodeValidationResultDTO
-  func enableConsoleLogging(loggingEnabled: Bool) throws
-  func getThreeDS2SdkVersion() throws -> String
+    func getReturnUrl(completion: @escaping (Result<String, Error>) -> Void)
+    func setupSession(sessionResponseDTO: SessionResponseDTO, checkoutConfigurationDTO: CheckoutConfigurationDTO, completion: @escaping (Result<SessionDTO, Error>) -> Void)
+    func setupAdvanced(paymentMethodsResponse: String, checkoutConfigurationDTO: CheckoutConfigurationDTO, completion: @escaping (Result<Void, Error>) -> Void)
+    func clearSession() throws
+    func encryptCard(unencryptedCardDTO: UnencryptedCardDTO, publicKey: String, completion: @escaping (Result<EncryptedCardDTO, Error>) -> Void)
+    func encryptBin(bin: String, publicKey: String, completion: @escaping (Result<String, Error>) -> Void)
+    func validateCardNumber(cardNumber: String, enableLuhnCheck: Bool) throws -> CardNumberValidationResultDTO
+    func validateCardExpiryDate(expiryMonth: String, expiryYear: String) throws -> CardExpiryDateValidationResultDTO
+    func validateCardSecurityCode(securityCode: String, cardBrand: String?) throws -> CardSecurityCodeValidationResultDTO
+    func enableConsoleLogging(loggingEnabled: Bool) throws
+    func getThreeDS2SdkVersion() throws -> String
 }
 
 /// Generated setup class from Pigeon to handle messages through the `binaryMessenger`.
 class CheckoutPlatformInterfaceSetup {
-  static var codec: FlutterStandardMessageCodec { PlatformApiPigeonCodec.shared }
-  /// Sets up an instance of `CheckoutPlatformInterface` to handle messages through the `binaryMessenger`.
-  static func setUp(binaryMessenger: FlutterBinaryMessenger, api: CheckoutPlatformInterface?, messageChannelSuffix: String = "") {
-    let channelSuffix = messageChannelSuffix.count > 0 ? ".\(messageChannelSuffix)" : ""
-    let getReturnUrlChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.getReturnUrl\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
-    if let api = api {
-      getReturnUrlChannel.setMessageHandler { _, reply in
-        api.getReturnUrl { result in
-          switch result {
-          case .success(let res):
-            reply(wrapResult(res))
-          case .failure(let error):
-            reply(wrapError(error))
-          }
-        }
-      }
-    } else {
-      getReturnUrlChannel.setMessageHandler(nil)
+    static var codec: FlutterStandardMessageCodec {
+        PlatformApiPigeonCodec.shared
     }
-    let setupSessionChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.setupSession\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
-    if let api = api {
-      setupSessionChannel.setMessageHandler { message, reply in
-        let args = message as! [Any?]
-        let sessionResponseDTOArg = args[0] as! SessionResponseDTO
-        let checkoutConfigurationDTOArg = args[1] as! CheckoutConfigurationDTO
-        api.setupSession(sessionResponseDTO: sessionResponseDTOArg, checkoutConfigurationDTO: checkoutConfigurationDTOArg) { result in
-          switch result {
-          case .success(let res):
-            reply(wrapResult(res))
-          case .failure(let error):
-            reply(wrapError(error))
-          }
+
+    /// Sets up an instance of `CheckoutPlatformInterface` to handle messages through the `binaryMessenger`.
+    static func setUp(binaryMessenger: FlutterBinaryMessenger, api: CheckoutPlatformInterface?, messageChannelSuffix: String = "") {
+        let channelSuffix = messageChannelSuffix.count > 0 ? ".\(messageChannelSuffix)" : ""
+        let getReturnUrlChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.getReturnUrl\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+        if let api {
+            getReturnUrlChannel.setMessageHandler { _, reply in
+                api.getReturnUrl { result in
+                    switch result {
+                    case let .success(res):
+                        reply(wrapResult(res))
+                    case let .failure(error):
+                        reply(wrapError(error))
+                    }
+                }
+            }
+        } else {
+            getReturnUrlChannel.setMessageHandler(nil)
         }
-      }
-    } else {
-      setupSessionChannel.setMessageHandler(nil)
-    }
-    let setupAdvancedChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.setupAdvanced\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
-    if let api = api {
-      setupAdvancedChannel.setMessageHandler { message, reply in
-        let args = message as! [Any?]
-        let paymentMethodsResponseArg = args[0] as! String
-        let checkoutConfigurationDTOArg = args[1] as! CheckoutConfigurationDTO
-        api.setupAdvanced(paymentMethodsResponse: paymentMethodsResponseArg, checkoutConfigurationDTO: checkoutConfigurationDTOArg) { result in
-          switch result {
-          case .success:
-            reply(wrapResult(nil))
-          case .failure(let error):
-            reply(wrapError(error))
-          }
+        let setupSessionChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.setupSession\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+        if let api {
+            setupSessionChannel.setMessageHandler { message, reply in
+                let args = message as! [Any?]
+                let sessionResponseDTOArg = args[0] as! SessionResponseDTO
+                let checkoutConfigurationDTOArg = args[1] as! CheckoutConfigurationDTO
+                api.setupSession(sessionResponseDTO: sessionResponseDTOArg, checkoutConfigurationDTO: checkoutConfigurationDTOArg) { result in
+                    switch result {
+                    case let .success(res):
+                        reply(wrapResult(res))
+                    case let .failure(error):
+                        reply(wrapError(error))
+                    }
+                }
+            }
+        } else {
+            setupSessionChannel.setMessageHandler(nil)
         }
-      }
-    } else {
-      setupAdvancedChannel.setMessageHandler(nil)
-    }
-    let clearSessionChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.clearSession\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
-    if let api = api {
-      clearSessionChannel.setMessageHandler { _, reply in
-        do {
-          try api.clearSession()
-          reply(wrapResult(nil))
-        } catch {
-          reply(wrapError(error))
+        let setupAdvancedChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.setupAdvanced\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+        if let api {
+            setupAdvancedChannel.setMessageHandler { message, reply in
+                let args = message as! [Any?]
+                let paymentMethodsResponseArg = args[0] as! String
+                let checkoutConfigurationDTOArg = args[1] as! CheckoutConfigurationDTO
+                api.setupAdvanced(paymentMethodsResponse: paymentMethodsResponseArg, checkoutConfigurationDTO: checkoutConfigurationDTOArg) { result in
+                    switch result {
+                    case .success:
+                        reply(wrapResult(nil))
+                    case let .failure(error):
+                        reply(wrapError(error))
+                    }
+                }
+            }
+        } else {
+            setupAdvancedChannel.setMessageHandler(nil)
         }
-      }
-    } else {
-      clearSessionChannel.setMessageHandler(nil)
-    }
-    let encryptCardChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.encryptCard\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
-    if let api = api {
-      encryptCardChannel.setMessageHandler { message, reply in
-        let args = message as! [Any?]
-        let unencryptedCardDTOArg = args[0] as! UnencryptedCardDTO
-        let publicKeyArg = args[1] as! String
-        api.encryptCard(unencryptedCardDTO: unencryptedCardDTOArg, publicKey: publicKeyArg) { result in
-          switch result {
-          case .success(let res):
-            reply(wrapResult(res))
-          case .failure(let error):
-            reply(wrapError(error))
-          }
+        let clearSessionChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.clearSession\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+        if let api {
+            clearSessionChannel.setMessageHandler { _, reply in
+                do {
+                    try api.clearSession()
+                    reply(wrapResult(nil))
+                } catch {
+                    reply(wrapError(error))
+                }
+            }
+        } else {
+            clearSessionChannel.setMessageHandler(nil)
         }
-      }
-    } else {
-      encryptCardChannel.setMessageHandler(nil)
-    }
-    let encryptBinChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.encryptBin\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
-    if let api = api {
-      encryptBinChannel.setMessageHandler { message, reply in
-        let args = message as! [Any?]
-        let binArg = args[0] as! String
-        let publicKeyArg = args[1] as! String
-        api.encryptBin(bin: binArg, publicKey: publicKeyArg) { result in
-          switch result {
-          case .success(let res):
-            reply(wrapResult(res))
-          case .failure(let error):
-            reply(wrapError(error))
-          }
+        let encryptCardChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.encryptCard\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+        if let api {
+            encryptCardChannel.setMessageHandler { message, reply in
+                let args = message as! [Any?]
+                let unencryptedCardDTOArg = args[0] as! UnencryptedCardDTO
+                let publicKeyArg = args[1] as! String
+                api.encryptCard(unencryptedCardDTO: unencryptedCardDTOArg, publicKey: publicKeyArg) { result in
+                    switch result {
+                    case let .success(res):
+                        reply(wrapResult(res))
+                    case let .failure(error):
+                        reply(wrapError(error))
+                    }
+                }
+            }
+        } else {
+            encryptCardChannel.setMessageHandler(nil)
         }
-      }
-    } else {
-      encryptBinChannel.setMessageHandler(nil)
-    }
-    let validateCardNumberChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.validateCardNumber\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
-    if let api = api {
-      validateCardNumberChannel.setMessageHandler { message, reply in
-        let args = message as! [Any?]
-        let cardNumberArg = args[0] as! String
-        let enableLuhnCheckArg = args[1] as! Bool
-        do {
-          let result = try api.validateCardNumber(cardNumber: cardNumberArg, enableLuhnCheck: enableLuhnCheckArg)
-          reply(wrapResult(result))
-        } catch {
-          reply(wrapError(error))
+        let encryptBinChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.encryptBin\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+        if let api {
+            encryptBinChannel.setMessageHandler { message, reply in
+                let args = message as! [Any?]
+                let binArg = args[0] as! String
+                let publicKeyArg = args[1] as! String
+                api.encryptBin(bin: binArg, publicKey: publicKeyArg) { result in
+                    switch result {
+                    case let .success(res):
+                        reply(wrapResult(res))
+                    case let .failure(error):
+                        reply(wrapError(error))
+                    }
+                }
+            }
+        } else {
+            encryptBinChannel.setMessageHandler(nil)
         }
-      }
-    } else {
-      validateCardNumberChannel.setMessageHandler(nil)
-    }
-    let validateCardExpiryDateChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.validateCardExpiryDate\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
-    if let api = api {
-      validateCardExpiryDateChannel.setMessageHandler { message, reply in
-        let args = message as! [Any?]
-        let expiryMonthArg = args[0] as! String
-        let expiryYearArg = args[1] as! String
-        do {
-          let result = try api.validateCardExpiryDate(expiryMonth: expiryMonthArg, expiryYear: expiryYearArg)
-          reply(wrapResult(result))
-        } catch {
-          reply(wrapError(error))
+        let validateCardNumberChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.validateCardNumber\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+        if let api {
+            validateCardNumberChannel.setMessageHandler { message, reply in
+                let args = message as! [Any?]
+                let cardNumberArg = args[0] as! String
+                let enableLuhnCheckArg = args[1] as! Bool
+                do {
+                    let result = try api.validateCardNumber(cardNumber: cardNumberArg, enableLuhnCheck: enableLuhnCheckArg)
+                    reply(wrapResult(result))
+                } catch {
+                    reply(wrapError(error))
+                }
+            }
+        } else {
+            validateCardNumberChannel.setMessageHandler(nil)
         }
-      }
-    } else {
-      validateCardExpiryDateChannel.setMessageHandler(nil)
-    }
-    let validateCardSecurityCodeChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.validateCardSecurityCode\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
-    if let api = api {
-      validateCardSecurityCodeChannel.setMessageHandler { message, reply in
-        let args = message as! [Any?]
-        let securityCodeArg = args[0] as! String
-        let cardBrandArg: String? = nilOrValue(args[1])
-        do {
-          let result = try api.validateCardSecurityCode(securityCode: securityCodeArg, cardBrand: cardBrandArg)
-          reply(wrapResult(result))
-        } catch {
-          reply(wrapError(error))
+        let validateCardExpiryDateChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.validateCardExpiryDate\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+        if let api {
+            validateCardExpiryDateChannel.setMessageHandler { message, reply in
+                let args = message as! [Any?]
+                let expiryMonthArg = args[0] as! String
+                let expiryYearArg = args[1] as! String
+                do {
+                    let result = try api.validateCardExpiryDate(expiryMonth: expiryMonthArg, expiryYear: expiryYearArg)
+                    reply(wrapResult(result))
+                } catch {
+                    reply(wrapError(error))
+                }
+            }
+        } else {
+            validateCardExpiryDateChannel.setMessageHandler(nil)
         }
-      }
-    } else {
-      validateCardSecurityCodeChannel.setMessageHandler(nil)
-    }
-    let enableConsoleLoggingChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.enableConsoleLogging\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
-    if let api = api {
-      enableConsoleLoggingChannel.setMessageHandler { message, reply in
-        let args = message as! [Any?]
-        let loggingEnabledArg = args[0] as! Bool
-        do {
-          try api.enableConsoleLogging(loggingEnabled: loggingEnabledArg)
-          reply(wrapResult(nil))
-        } catch {
-          reply(wrapError(error))
+        let validateCardSecurityCodeChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.validateCardSecurityCode\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+        if let api {
+            validateCardSecurityCodeChannel.setMessageHandler { message, reply in
+                let args = message as! [Any?]
+                let securityCodeArg = args[0] as! String
+                let cardBrandArg: String? = nilOrValue(args[1])
+                do {
+                    let result = try api.validateCardSecurityCode(securityCode: securityCodeArg, cardBrand: cardBrandArg)
+                    reply(wrapResult(result))
+                } catch {
+                    reply(wrapError(error))
+                }
+            }
+        } else {
+            validateCardSecurityCodeChannel.setMessageHandler(nil)
         }
-      }
-    } else {
-      enableConsoleLoggingChannel.setMessageHandler(nil)
-    }
-    let getThreeDS2SdkVersionChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.getThreeDS2SdkVersion\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
-    if let api = api {
-      getThreeDS2SdkVersionChannel.setMessageHandler { _, reply in
-        do {
-          let result = try api.getThreeDS2SdkVersion()
-          reply(wrapResult(result))
-        } catch {
-          reply(wrapError(error))
+        let enableConsoleLoggingChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.enableConsoleLogging\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+        if let api {
+            enableConsoleLoggingChannel.setMessageHandler { message, reply in
+                let args = message as! [Any?]
+                let loggingEnabledArg = args[0] as! Bool
+                do {
+                    try api.enableConsoleLogging(loggingEnabled: loggingEnabledArg)
+                    reply(wrapResult(nil))
+                } catch {
+                    reply(wrapError(error))
+                }
+            }
+        } else {
+            enableConsoleLoggingChannel.setMessageHandler(nil)
         }
-      }
-    } else {
-      getThreeDS2SdkVersionChannel.setMessageHandler(nil)
+        let getThreeDS2SdkVersionChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.getThreeDS2SdkVersion\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+        if let api {
+            getThreeDS2SdkVersionChannel.setMessageHandler { _, reply in
+                do {
+                    let result = try api.getThreeDS2SdkVersion()
+                    reply(wrapResult(result))
+                } catch {
+                    reply(wrapError(error))
+                }
+            }
+        } else {
+            getThreeDS2SdkVersionChannel.setMessageHandler(nil)
+        }
     }
-  }
 }
+
 /// Generated protocol from Pigeon that represents a handler of messages from Flutter.
 protocol DropInPlatformInterface {
-  func showDropInSession(dropInConfigurationDTO: DropInConfigurationDTO) throws
-  func showDropInAdvanced(dropInConfigurationDTO: DropInConfigurationDTO, paymentMethodsResponse: String) throws
-  func stopDropIn() throws
-  func onPaymentsResult(paymentsResult: PaymentEventDTO) throws
-  func onPaymentsDetailsResult(paymentsDetailsResult: PaymentEventDTO) throws
-  func onDeleteStoredPaymentMethodResult(deleteStoredPaymentMethodResultDTO: DeletedStoredPaymentMethodResultDTO) throws
-  func onBalanceCheckResult(balanceCheckResponse: String) throws
-  func onOrderRequestResult(orderRequestResponse: String) throws
-  func onOrderCancelResult(orderCancelResult: OrderCancelResultDTO) throws
-  func cleanUpDropIn() throws
+    func showDropInSession(dropInConfigurationDTO: DropInConfigurationDTO) throws
+    func showDropInAdvanced(dropInConfigurationDTO: DropInConfigurationDTO, paymentMethodsResponse: String) throws
+    func stopDropIn() throws
+    func onPaymentsResult(paymentsResult: PaymentEventDTO) throws
+    func onPaymentsDetailsResult(paymentsDetailsResult: PaymentEventDTO) throws
+    func onDeleteStoredPaymentMethodResult(deleteStoredPaymentMethodResultDTO: DeletedStoredPaymentMethodResultDTO) throws
+    func onBalanceCheckResult(balanceCheckResponse: String) throws
+    func onOrderRequestResult(orderRequestResponse: String) throws
+    func onOrderCancelResult(orderCancelResult: OrderCancelResultDTO) throws
+    func cleanUpDropIn() throws
 }
 
 /// Generated setup class from Pigeon to handle messages through the `binaryMessenger`.
 class DropInPlatformInterfaceSetup {
-  static var codec: FlutterStandardMessageCodec { PlatformApiPigeonCodec.shared }
-  /// Sets up an instance of `DropInPlatformInterface` to handle messages through the `binaryMessenger`.
-  static func setUp(binaryMessenger: FlutterBinaryMessenger, api: DropInPlatformInterface?, messageChannelSuffix: String = "") {
-    let channelSuffix = messageChannelSuffix.count > 0 ? ".\(messageChannelSuffix)" : ""
-    let showDropInSessionChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.DropInPlatformInterface.showDropInSession\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
-    if let api = api {
-      showDropInSessionChannel.setMessageHandler { message, reply in
-        let args = message as! [Any?]
-        let dropInConfigurationDTOArg = args[0] as! DropInConfigurationDTO
-        do {
-          try api.showDropInSession(dropInConfigurationDTO: dropInConfigurationDTOArg)
-          reply(wrapResult(nil))
-        } catch {
-          reply(wrapError(error))
-        }
-      }
-    } else {
-      showDropInSessionChannel.setMessageHandler(nil)
+    static var codec: FlutterStandardMessageCodec {
+        PlatformApiPigeonCodec.shared
     }
-    let showDropInAdvancedChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.DropInPlatformInterface.showDropInAdvanced\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
-    if let api = api {
-      showDropInAdvancedChannel.setMessageHandler { message, reply in
-        let args = message as! [Any?]
-        let dropInConfigurationDTOArg = args[0] as! DropInConfigurationDTO
-        let paymentMethodsResponseArg = args[1] as! String
-        do {
-          try api.showDropInAdvanced(dropInConfigurationDTO: dropInConfigurationDTOArg, paymentMethodsResponse: paymentMethodsResponseArg)
-          reply(wrapResult(nil))
-        } catch {
-          reply(wrapError(error))
+
+    /// Sets up an instance of `DropInPlatformInterface` to handle messages through the `binaryMessenger`.
+    static func setUp(binaryMessenger: FlutterBinaryMessenger, api: DropInPlatformInterface?, messageChannelSuffix: String = "") {
+        let channelSuffix = messageChannelSuffix.count > 0 ? ".\(messageChannelSuffix)" : ""
+        let showDropInSessionChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.DropInPlatformInterface.showDropInSession\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+        if let api {
+            showDropInSessionChannel.setMessageHandler { message, reply in
+                let args = message as! [Any?]
+                let dropInConfigurationDTOArg = args[0] as! DropInConfigurationDTO
+                do {
+                    try api.showDropInSession(dropInConfigurationDTO: dropInConfigurationDTOArg)
+                    reply(wrapResult(nil))
+                } catch {
+                    reply(wrapError(error))
+                }
+            }
+        } else {
+            showDropInSessionChannel.setMessageHandler(nil)
         }
-      }
-    } else {
-      showDropInAdvancedChannel.setMessageHandler(nil)
-    }
-    let stopDropInChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.DropInPlatformInterface.stopDropIn\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
-    if let api = api {
-      stopDropInChannel.setMessageHandler { _, reply in
-        do {
-          try api.stopDropIn()
-          reply(wrapResult(nil))
-        } catch {
-          reply(wrapError(error))
+        let showDropInAdvancedChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.DropInPlatformInterface.showDropInAdvanced\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+        if let api {
+            showDropInAdvancedChannel.setMessageHandler { message, reply in
+                let args = message as! [Any?]
+                let dropInConfigurationDTOArg = args[0] as! DropInConfigurationDTO
+                let paymentMethodsResponseArg = args[1] as! String
+                do {
+                    try api.showDropInAdvanced(dropInConfigurationDTO: dropInConfigurationDTOArg, paymentMethodsResponse: paymentMethodsResponseArg)
+                    reply(wrapResult(nil))
+                } catch {
+                    reply(wrapError(error))
+                }
+            }
+        } else {
+            showDropInAdvancedChannel.setMessageHandler(nil)
         }
-      }
-    } else {
-      stopDropInChannel.setMessageHandler(nil)
-    }
-    let onPaymentsResultChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.DropInPlatformInterface.onPaymentsResult\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
-    if let api = api {
-      onPaymentsResultChannel.setMessageHandler { message, reply in
-        let args = message as! [Any?]
-        let paymentsResultArg = args[0] as! PaymentEventDTO
-        do {
-          try api.onPaymentsResult(paymentsResult: paymentsResultArg)
-          reply(wrapResult(nil))
-        } catch {
-          reply(wrapError(error))
+        let stopDropInChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.DropInPlatformInterface.stopDropIn\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+        if let api {
+            stopDropInChannel.setMessageHandler { _, reply in
+                do {
+                    try api.stopDropIn()
+                    reply(wrapResult(nil))
+                } catch {
+                    reply(wrapError(error))
+                }
+            }
+        } else {
+            stopDropInChannel.setMessageHandler(nil)
         }
-      }
-    } else {
-      onPaymentsResultChannel.setMessageHandler(nil)
-    }
-    let onPaymentsDetailsResultChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.DropInPlatformInterface.onPaymentsDetailsResult\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
-    if let api = api {
-      onPaymentsDetailsResultChannel.setMessageHandler { message, reply in
-        let args = message as! [Any?]
-        let paymentsDetailsResultArg = args[0] as! PaymentEventDTO
-        do {
-          try api.onPaymentsDetailsResult(paymentsDetailsResult: paymentsDetailsResultArg)
-          reply(wrapResult(nil))
-        } catch {
-          reply(wrapError(error))
+        let onPaymentsResultChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.DropInPlatformInterface.onPaymentsResult\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+        if let api {
+            onPaymentsResultChannel.setMessageHandler { message, reply in
+                let args = message as! [Any?]
+                let paymentsResultArg = args[0] as! PaymentEventDTO
+                do {
+                    try api.onPaymentsResult(paymentsResult: paymentsResultArg)
+                    reply(wrapResult(nil))
+                } catch {
+                    reply(wrapError(error))
+                }
+            }
+        } else {
+            onPaymentsResultChannel.setMessageHandler(nil)
         }
-      }
-    } else {
-      onPaymentsDetailsResultChannel.setMessageHandler(nil)
-    }
-    let onDeleteStoredPaymentMethodResultChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.DropInPlatformInterface.onDeleteStoredPaymentMethodResult\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
-    if let api = api {
-      onDeleteStoredPaymentMethodResultChannel.setMessageHandler { message, reply in
-        let args = message as! [Any?]
-        let deleteStoredPaymentMethodResultDTOArg = args[0] as! DeletedStoredPaymentMethodResultDTO
-        do {
-          try api.onDeleteStoredPaymentMethodResult(deleteStoredPaymentMethodResultDTO: deleteStoredPaymentMethodResultDTOArg)
-          reply(wrapResult(nil))
-        } catch {
-          reply(wrapError(error))
+        let onPaymentsDetailsResultChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.DropInPlatformInterface.onPaymentsDetailsResult\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+        if let api {
+            onPaymentsDetailsResultChannel.setMessageHandler { message, reply in
+                let args = message as! [Any?]
+                let paymentsDetailsResultArg = args[0] as! PaymentEventDTO
+                do {
+                    try api.onPaymentsDetailsResult(paymentsDetailsResult: paymentsDetailsResultArg)
+                    reply(wrapResult(nil))
+                } catch {
+                    reply(wrapError(error))
+                }
+            }
+        } else {
+            onPaymentsDetailsResultChannel.setMessageHandler(nil)
         }
-      }
-    } else {
-      onDeleteStoredPaymentMethodResultChannel.setMessageHandler(nil)
-    }
-    let onBalanceCheckResultChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.DropInPlatformInterface.onBalanceCheckResult\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
-    if let api = api {
-      onBalanceCheckResultChannel.setMessageHandler { message, reply in
-        let args = message as! [Any?]
-        let balanceCheckResponseArg = args[0] as! String
-        do {
-          try api.onBalanceCheckResult(balanceCheckResponse: balanceCheckResponseArg)
-          reply(wrapResult(nil))
-        } catch {
-          reply(wrapError(error))
+        let onDeleteStoredPaymentMethodResultChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.DropInPlatformInterface.onDeleteStoredPaymentMethodResult\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+        if let api {
+            onDeleteStoredPaymentMethodResultChannel.setMessageHandler { message, reply in
+                let args = message as! [Any?]
+                let deleteStoredPaymentMethodResultDTOArg = args[0] as! DeletedStoredPaymentMethodResultDTO
+                do {
+                    try api.onDeleteStoredPaymentMethodResult(deleteStoredPaymentMethodResultDTO: deleteStoredPaymentMethodResultDTOArg)
+                    reply(wrapResult(nil))
+                } catch {
+                    reply(wrapError(error))
+                }
+            }
+        } else {
+            onDeleteStoredPaymentMethodResultChannel.setMessageHandler(nil)
         }
-      }
-    } else {
-      onBalanceCheckResultChannel.setMessageHandler(nil)
-    }
-    let onOrderRequestResultChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.DropInPlatformInterface.onOrderRequestResult\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
-    if let api = api {
-      onOrderRequestResultChannel.setMessageHandler { message, reply in
-        let args = message as! [Any?]
-        let orderRequestResponseArg = args[0] as! String
-        do {
-          try api.onOrderRequestResult(orderRequestResponse: orderRequestResponseArg)
-          reply(wrapResult(nil))
-        } catch {
-          reply(wrapError(error))
+        let onBalanceCheckResultChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.DropInPlatformInterface.onBalanceCheckResult\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+        if let api {
+            onBalanceCheckResultChannel.setMessageHandler { message, reply in
+                let args = message as! [Any?]
+                let balanceCheckResponseArg = args[0] as! String
+                do {
+                    try api.onBalanceCheckResult(balanceCheckResponse: balanceCheckResponseArg)
+                    reply(wrapResult(nil))
+                } catch {
+                    reply(wrapError(error))
+                }
+            }
+        } else {
+            onBalanceCheckResultChannel.setMessageHandler(nil)
         }
-      }
-    } else {
-      onOrderRequestResultChannel.setMessageHandler(nil)
-    }
-    let onOrderCancelResultChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.DropInPlatformInterface.onOrderCancelResult\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
-    if let api = api {
-      onOrderCancelResultChannel.setMessageHandler { message, reply in
-        let args = message as! [Any?]
-        let orderCancelResultArg = args[0] as! OrderCancelResultDTO
-        do {
-          try api.onOrderCancelResult(orderCancelResult: orderCancelResultArg)
-          reply(wrapResult(nil))
-        } catch {
-          reply(wrapError(error))
+        let onOrderRequestResultChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.DropInPlatformInterface.onOrderRequestResult\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+        if let api {
+            onOrderRequestResultChannel.setMessageHandler { message, reply in
+                let args = message as! [Any?]
+                let orderRequestResponseArg = args[0] as! String
+                do {
+                    try api.onOrderRequestResult(orderRequestResponse: orderRequestResponseArg)
+                    reply(wrapResult(nil))
+                } catch {
+                    reply(wrapError(error))
+                }
+            }
+        } else {
+            onOrderRequestResultChannel.setMessageHandler(nil)
         }
-      }
-    } else {
-      onOrderCancelResultChannel.setMessageHandler(nil)
-    }
-    let cleanUpDropInChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.DropInPlatformInterface.cleanUpDropIn\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
-    if let api = api {
-      cleanUpDropInChannel.setMessageHandler { _, reply in
-        do {
-          try api.cleanUpDropIn()
-          reply(wrapResult(nil))
-        } catch {
-          reply(wrapError(error))
+        let onOrderCancelResultChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.DropInPlatformInterface.onOrderCancelResult\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+        if let api {
+            onOrderCancelResultChannel.setMessageHandler { message, reply in
+                let args = message as! [Any?]
+                let orderCancelResultArg = args[0] as! OrderCancelResultDTO
+                do {
+                    try api.onOrderCancelResult(orderCancelResult: orderCancelResultArg)
+                    reply(wrapResult(nil))
+                } catch {
+                    reply(wrapError(error))
+                }
+            }
+        } else {
+            onOrderCancelResultChannel.setMessageHandler(nil)
         }
-      }
-    } else {
-      cleanUpDropInChannel.setMessageHandler(nil)
+        let cleanUpDropInChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.DropInPlatformInterface.cleanUpDropIn\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+        if let api {
+            cleanUpDropInChannel.setMessageHandler { _, reply in
+                do {
+                    try api.cleanUpDropIn()
+                    reply(wrapResult(nil))
+                } catch {
+                    reply(wrapError(error))
+                }
+            }
+        } else {
+            cleanUpDropInChannel.setMessageHandler(nil)
+        }
     }
-  }
 }
+
 /// Generated protocol from Pigeon that represents Flutter messages that can be called from Swift.
 protocol CheckoutFlutterInterfaceProtocol {
-  func send(event eventArg: CheckoutEvent, completion: @escaping (Result<Void, AdyenPigeonError>) -> Void)
+    func send(event eventArg: CheckoutEvent, completion: @escaping (Result<Void, AdyenPigeonError>) -> Void)
 }
+
 class CheckoutFlutterInterface: CheckoutFlutterInterfaceProtocol {
-  private let binaryMessenger: FlutterBinaryMessenger
-  private let messageChannelSuffix: String
-  init(binaryMessenger: FlutterBinaryMessenger, messageChannelSuffix: String = "") {
-    self.binaryMessenger = binaryMessenger
-    self.messageChannelSuffix = messageChannelSuffix.count > 0 ? ".\(messageChannelSuffix)" : ""
-  }
-  var codec: PlatformApiPigeonCodec {
-    return PlatformApiPigeonCodec.shared
-  }
-  func send(event eventArg: CheckoutEvent, completion: @escaping (Result<Void, AdyenPigeonError>) -> Void) {
-    let channelName: String = "dev.flutter.pigeon.adyen_checkout.CheckoutFlutterInterface.send\(messageChannelSuffix)"
-    let channel = FlutterBasicMessageChannel(name: channelName, binaryMessenger: binaryMessenger, codec: codec)
-    channel.sendMessage([eventArg] as [Any?]) { response in
-      guard let listResponse = response as? [Any?] else {
-        completion(.failure(createConnectionError(withChannelName: channelName)))
-        return
-      }
-      if listResponse.count > 1 {
-        let code: String = listResponse[0] as! String
-        let message: String? = nilOrValue(listResponse[1])
-        let details: String? = nilOrValue(listResponse[2])
-        completion(.failure(AdyenPigeonError(code: code, message: message, details: details)))
-      } else {
-        completion(.success(()))
-      }
+    private let binaryMessenger: FlutterBinaryMessenger
+    private let messageChannelSuffix: String
+    init(binaryMessenger: FlutterBinaryMessenger, messageChannelSuffix: String = "") {
+        self.binaryMessenger = binaryMessenger
+        self.messageChannelSuffix = messageChannelSuffix.count > 0 ? ".\(messageChannelSuffix)" : ""
     }
-  }
+
+    var codec: PlatformApiPigeonCodec {
+        PlatformApiPigeonCodec.shared
+    }
+
+    func send(event eventArg: CheckoutEvent, completion: @escaping (Result<Void, AdyenPigeonError>) -> Void) {
+        let channelName = "dev.flutter.pigeon.adyen_checkout.CheckoutFlutterInterface.send\(messageChannelSuffix)"
+        let channel = FlutterBasicMessageChannel(name: channelName, binaryMessenger: binaryMessenger, codec: codec)
+        channel.sendMessage([eventArg] as [Any?]) { response in
+            guard let listResponse = response as? [Any?] else {
+                completion(.failure(createConnectionError(withChannelName: channelName)))
+                return
+            }
+            if listResponse.count > 1 {
+                let code: String = listResponse[0] as! String
+                let message: String? = nilOrValue(listResponse[1])
+                let details: String? = nilOrValue(listResponse[2])
+                completion(.failure(AdyenPigeonError(code: code, message: message, details: details)))
+            } else {
+                completion(.success(()))
+            }
+        }
+    }
 }
+
 /// Generated protocol from Pigeon that represents a handler of messages from Flutter.
 protocol ComponentPlatformInterface {
-  func updateViewHeight(viewId: Int64) throws
-  func onPaymentsResult(componentId: String, paymentsResult: PaymentEventDTO) throws
-  func onPaymentsDetailsResult(componentId: String, paymentsDetailsResult: PaymentEventDTO) throws
-  func isInstantPaymentSupportedByPlatform(instantPaymentConfigurationDTO: InstantPaymentConfigurationDTO, paymentMethodResponse: String, componentId: String, completion: @escaping (Result<InstantPaymentSetupResultDTO, Error>) -> Void)
-  func onInstantPaymentPressed(instantPaymentConfigurationDTO: InstantPaymentConfigurationDTO, encodedPaymentMethod: String, componentId: String) throws
-  func handleAction(actionComponentConfiguration: ActionComponentConfigurationDTO, componentId: String, actionResponse: [String?: Any?]?) throws
-  func onDispose(componentId: String) throws
+    func updateViewHeight(viewId: Int64) throws
+    func onPaymentsResult(componentId: String, paymentsResult: PaymentEventDTO) throws
+    func onPaymentsDetailsResult(componentId: String, paymentsDetailsResult: PaymentEventDTO) throws
+    func isInstantPaymentSupportedByPlatform(instantPaymentConfigurationDTO: InstantPaymentConfigurationDTO, paymentMethodResponse: String, componentId: String, completion: @escaping (Result<InstantPaymentSetupResultDTO, Error>) -> Void)
+    func onInstantPaymentPressed(instantPaymentConfigurationDTO: InstantPaymentConfigurationDTO, encodedPaymentMethod: String, componentId: String) throws
+    func handleAction(actionComponentConfiguration: ActionComponentConfigurationDTO, componentId: String, actionResponse: [String?: Any?]?) throws
+    func onDispose(componentId: String) throws
 }
 
 /// Generated setup class from Pigeon to handle messages through the `binaryMessenger`.
 class ComponentPlatformInterfaceSetup {
-  static var codec: FlutterStandardMessageCodec { PlatformApiPigeonCodec.shared }
-  /// Sets up an instance of `ComponentPlatformInterface` to handle messages through the `binaryMessenger`.
-  static func setUp(binaryMessenger: FlutterBinaryMessenger, api: ComponentPlatformInterface?, messageChannelSuffix: String = "") {
-    let channelSuffix = messageChannelSuffix.count > 0 ? ".\(messageChannelSuffix)" : ""
-    let updateViewHeightChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.ComponentPlatformInterface.updateViewHeight\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
-    if let api = api {
-      updateViewHeightChannel.setMessageHandler { message, reply in
-        let args = message as! [Any?]
-        let viewIdArg = args[0] as! Int64
-        do {
-          try api.updateViewHeight(viewId: viewIdArg)
-          reply(wrapResult(nil))
-        } catch {
-          reply(wrapError(error))
-        }
-      }
-    } else {
-      updateViewHeightChannel.setMessageHandler(nil)
+    static var codec: FlutterStandardMessageCodec {
+        PlatformApiPigeonCodec.shared
     }
-    let onPaymentsResultChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.ComponentPlatformInterface.onPaymentsResult\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
-    if let api = api {
-      onPaymentsResultChannel.setMessageHandler { message, reply in
-        let args = message as! [Any?]
-        let componentIdArg = args[0] as! String
-        let paymentsResultArg = args[1] as! PaymentEventDTO
-        do {
-          try api.onPaymentsResult(componentId: componentIdArg, paymentsResult: paymentsResultArg)
-          reply(wrapResult(nil))
-        } catch {
-          reply(wrapError(error))
+
+    /// Sets up an instance of `ComponentPlatformInterface` to handle messages through the `binaryMessenger`.
+    static func setUp(binaryMessenger: FlutterBinaryMessenger, api: ComponentPlatformInterface?, messageChannelSuffix: String = "") {
+        let channelSuffix = messageChannelSuffix.count > 0 ? ".\(messageChannelSuffix)" : ""
+        let updateViewHeightChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.ComponentPlatformInterface.updateViewHeight\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+        if let api {
+            updateViewHeightChannel.setMessageHandler { message, reply in
+                let args = message as! [Any?]
+                let viewIdArg = args[0] as! Int64
+                do {
+                    try api.updateViewHeight(viewId: viewIdArg)
+                    reply(wrapResult(nil))
+                } catch {
+                    reply(wrapError(error))
+                }
+            }
+        } else {
+            updateViewHeightChannel.setMessageHandler(nil)
         }
-      }
-    } else {
-      onPaymentsResultChannel.setMessageHandler(nil)
-    }
-    let onPaymentsDetailsResultChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.ComponentPlatformInterface.onPaymentsDetailsResult\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
-    if let api = api {
-      onPaymentsDetailsResultChannel.setMessageHandler { message, reply in
-        let args = message as! [Any?]
-        let componentIdArg = args[0] as! String
-        let paymentsDetailsResultArg = args[1] as! PaymentEventDTO
-        do {
-          try api.onPaymentsDetailsResult(componentId: componentIdArg, paymentsDetailsResult: paymentsDetailsResultArg)
-          reply(wrapResult(nil))
-        } catch {
-          reply(wrapError(error))
+        let onPaymentsResultChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.ComponentPlatformInterface.onPaymentsResult\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+        if let api {
+            onPaymentsResultChannel.setMessageHandler { message, reply in
+                let args = message as! [Any?]
+                let componentIdArg = args[0] as! String
+                let paymentsResultArg = args[1] as! PaymentEventDTO
+                do {
+                    try api.onPaymentsResult(componentId: componentIdArg, paymentsResult: paymentsResultArg)
+                    reply(wrapResult(nil))
+                } catch {
+                    reply(wrapError(error))
+                }
+            }
+        } else {
+            onPaymentsResultChannel.setMessageHandler(nil)
         }
-      }
-    } else {
-      onPaymentsDetailsResultChannel.setMessageHandler(nil)
-    }
-    let isInstantPaymentSupportedByPlatformChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.ComponentPlatformInterface.isInstantPaymentSupportedByPlatform\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
-    if let api = api {
-      isInstantPaymentSupportedByPlatformChannel.setMessageHandler { message, reply in
-        let args = message as! [Any?]
-        let instantPaymentConfigurationDTOArg = args[0] as! InstantPaymentConfigurationDTO
-        let paymentMethodResponseArg = args[1] as! String
-        let componentIdArg = args[2] as! String
-        api.isInstantPaymentSupportedByPlatform(instantPaymentConfigurationDTO: instantPaymentConfigurationDTOArg, paymentMethodResponse: paymentMethodResponseArg, componentId: componentIdArg) { result in
-          switch result {
-          case .success(let res):
-            reply(wrapResult(res))
-          case .failure(let error):
-            reply(wrapError(error))
-          }
+        let onPaymentsDetailsResultChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.ComponentPlatformInterface.onPaymentsDetailsResult\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+        if let api {
+            onPaymentsDetailsResultChannel.setMessageHandler { message, reply in
+                let args = message as! [Any?]
+                let componentIdArg = args[0] as! String
+                let paymentsDetailsResultArg = args[1] as! PaymentEventDTO
+                do {
+                    try api.onPaymentsDetailsResult(componentId: componentIdArg, paymentsDetailsResult: paymentsDetailsResultArg)
+                    reply(wrapResult(nil))
+                } catch {
+                    reply(wrapError(error))
+                }
+            }
+        } else {
+            onPaymentsDetailsResultChannel.setMessageHandler(nil)
         }
-      }
-    } else {
-      isInstantPaymentSupportedByPlatformChannel.setMessageHandler(nil)
-    }
-    let onInstantPaymentPressedChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.ComponentPlatformInterface.onInstantPaymentPressed\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
-    if let api = api {
-      onInstantPaymentPressedChannel.setMessageHandler { message, reply in
-        let args = message as! [Any?]
-        let instantPaymentConfigurationDTOArg = args[0] as! InstantPaymentConfigurationDTO
-        let encodedPaymentMethodArg = args[1] as! String
-        let componentIdArg = args[2] as! String
-        do {
-          try api.onInstantPaymentPressed(instantPaymentConfigurationDTO: instantPaymentConfigurationDTOArg, encodedPaymentMethod: encodedPaymentMethodArg, componentId: componentIdArg)
-          reply(wrapResult(nil))
-        } catch {
-          reply(wrapError(error))
+        let isInstantPaymentSupportedByPlatformChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.ComponentPlatformInterface.isInstantPaymentSupportedByPlatform\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+        if let api {
+            isInstantPaymentSupportedByPlatformChannel.setMessageHandler { message, reply in
+                let args = message as! [Any?]
+                let instantPaymentConfigurationDTOArg = args[0] as! InstantPaymentConfigurationDTO
+                let paymentMethodResponseArg = args[1] as! String
+                let componentIdArg = args[2] as! String
+                api.isInstantPaymentSupportedByPlatform(instantPaymentConfigurationDTO: instantPaymentConfigurationDTOArg, paymentMethodResponse: paymentMethodResponseArg, componentId: componentIdArg) { result in
+                    switch result {
+                    case let .success(res):
+                        reply(wrapResult(res))
+                    case let .failure(error):
+                        reply(wrapError(error))
+                    }
+                }
+            }
+        } else {
+            isInstantPaymentSupportedByPlatformChannel.setMessageHandler(nil)
         }
-      }
-    } else {
-      onInstantPaymentPressedChannel.setMessageHandler(nil)
-    }
-    let handleActionChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.ComponentPlatformInterface.handleAction\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
-    if let api = api {
-      handleActionChannel.setMessageHandler { message, reply in
-        let args = message as! [Any?]
-        let actionComponentConfigurationArg = args[0] as! ActionComponentConfigurationDTO
-        let componentIdArg = args[1] as! String
-        let actionResponseArg: [String?: Any?]? = nilOrValue(args[2])
-        do {
-          try api.handleAction(actionComponentConfiguration: actionComponentConfigurationArg, componentId: componentIdArg, actionResponse: actionResponseArg)
-          reply(wrapResult(nil))
-        } catch {
-          reply(wrapError(error))
+        let onInstantPaymentPressedChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.ComponentPlatformInterface.onInstantPaymentPressed\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+        if let api {
+            onInstantPaymentPressedChannel.setMessageHandler { message, reply in
+                let args = message as! [Any?]
+                let instantPaymentConfigurationDTOArg = args[0] as! InstantPaymentConfigurationDTO
+                let encodedPaymentMethodArg = args[1] as! String
+                let componentIdArg = args[2] as! String
+                do {
+                    try api.onInstantPaymentPressed(instantPaymentConfigurationDTO: instantPaymentConfigurationDTOArg, encodedPaymentMethod: encodedPaymentMethodArg, componentId: componentIdArg)
+                    reply(wrapResult(nil))
+                } catch {
+                    reply(wrapError(error))
+                }
+            }
+        } else {
+            onInstantPaymentPressedChannel.setMessageHandler(nil)
         }
-      }
-    } else {
-      handleActionChannel.setMessageHandler(nil)
-    }
-    let onDisposeChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.ComponentPlatformInterface.onDispose\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
-    if let api = api {
-      onDisposeChannel.setMessageHandler { message, reply in
-        let args = message as! [Any?]
-        let componentIdArg = args[0] as! String
-        do {
-          try api.onDispose(componentId: componentIdArg)
-          reply(wrapResult(nil))
-        } catch {
-          reply(wrapError(error))
+        let handleActionChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.ComponentPlatformInterface.handleAction\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+        if let api {
+            handleActionChannel.setMessageHandler { message, reply in
+                let args = message as! [Any?]
+                let actionComponentConfigurationArg = args[0] as! ActionComponentConfigurationDTO
+                let componentIdArg = args[1] as! String
+                let actionResponseArg: [String?: Any?]? = nilOrValue(args[2])
+                do {
+                    try api.handleAction(actionComponentConfiguration: actionComponentConfigurationArg, componentId: componentIdArg, actionResponse: actionResponseArg)
+                    reply(wrapResult(nil))
+                } catch {
+                    reply(wrapError(error))
+                }
+            }
+        } else {
+            handleActionChannel.setMessageHandler(nil)
         }
-      }
-    } else {
-      onDisposeChannel.setMessageHandler(nil)
+        let onDisposeChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.ComponentPlatformInterface.onDispose\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+        if let api {
+            onDisposeChannel.setMessageHandler { message, reply in
+                let args = message as! [Any?]
+                let componentIdArg = args[0] as! String
+                do {
+                    try api.onDispose(componentId: componentIdArg)
+                    reply(wrapResult(nil))
+                } catch {
+                    reply(wrapError(error))
+                }
+            }
+        } else {
+            onDisposeChannel.setMessageHandler(nil)
+        }
     }
-  }
 }
+
 /// Generated protocol from Pigeon that represents Flutter messages that can be called from Swift.
 protocol ComponentFlutterInterfaceProtocol {
-  func _generateCodecForDTOs(cardComponentConfigurationDTO cardComponentConfigurationDTOArg: CardComponentConfigurationDTO, sessionDTO sessionDTOArg: SessionDTO, binLookupDataDTO binLookupDataDTOArg: BinLookupDataDTO, completion: @escaping (Result<Void, AdyenPigeonError>) -> Void)
-  func onComponentCommunication(componentCommunicationModel componentCommunicationModelArg: ComponentCommunicationModel, completion: @escaping (Result<Void, AdyenPigeonError>) -> Void)
+    func _generateCodecForDTOs(cardComponentConfigurationDTO cardComponentConfigurationDTOArg: CardComponentConfigurationDTO, sessionDTO sessionDTOArg: SessionDTO, binLookupDataDTO binLookupDataDTOArg: BinLookupDataDTO, completion: @escaping (Result<Void, AdyenPigeonError>) -> Void)
+    func onComponentCommunication(componentCommunicationModel componentCommunicationModelArg: ComponentCommunicationModel, completion: @escaping (Result<Void, AdyenPigeonError>) -> Void)
 }
+
 class ComponentFlutterInterface: ComponentFlutterInterfaceProtocol {
-  private let binaryMessenger: FlutterBinaryMessenger
-  private let messageChannelSuffix: String
-  init(binaryMessenger: FlutterBinaryMessenger, messageChannelSuffix: String = "") {
-    self.binaryMessenger = binaryMessenger
-    self.messageChannelSuffix = messageChannelSuffix.count > 0 ? ".\(messageChannelSuffix)" : ""
-  }
-  var codec: PlatformApiPigeonCodec {
-    return PlatformApiPigeonCodec.shared
-  }
-  func _generateCodecForDTOs(cardComponentConfigurationDTO cardComponentConfigurationDTOArg: CardComponentConfigurationDTO, sessionDTO sessionDTOArg: SessionDTO, binLookupDataDTO binLookupDataDTOArg: BinLookupDataDTO, completion: @escaping (Result<Void, AdyenPigeonError>) -> Void) {
-    let channelName: String = "dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface._generateCodecForDTOs\(messageChannelSuffix)"
-    let channel = FlutterBasicMessageChannel(name: channelName, binaryMessenger: binaryMessenger, codec: codec)
-    channel.sendMessage([cardComponentConfigurationDTOArg, sessionDTOArg, binLookupDataDTOArg] as [Any?]) { response in
-      guard let listResponse = response as? [Any?] else {
-        completion(.failure(createConnectionError(withChannelName: channelName)))
-        return
-      }
-      if listResponse.count > 1 {
-        let code: String = listResponse[0] as! String
-        let message: String? = nilOrValue(listResponse[1])
-        let details: String? = nilOrValue(listResponse[2])
-        completion(.failure(AdyenPigeonError(code: code, message: message, details: details)))
-      } else {
-        completion(.success(()))
-      }
+    private let binaryMessenger: FlutterBinaryMessenger
+    private let messageChannelSuffix: String
+    init(binaryMessenger: FlutterBinaryMessenger, messageChannelSuffix: String = "") {
+        self.binaryMessenger = binaryMessenger
+        self.messageChannelSuffix = messageChannelSuffix.count > 0 ? ".\(messageChannelSuffix)" : ""
     }
-  }
-  func onComponentCommunication(componentCommunicationModel componentCommunicationModelArg: ComponentCommunicationModel, completion: @escaping (Result<Void, AdyenPigeonError>) -> Void) {
-    let channelName: String = "dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface.onComponentCommunication\(messageChannelSuffix)"
-    let channel = FlutterBasicMessageChannel(name: channelName, binaryMessenger: binaryMessenger, codec: codec)
-    channel.sendMessage([componentCommunicationModelArg] as [Any?]) { response in
-      guard let listResponse = response as? [Any?] else {
-        completion(.failure(createConnectionError(withChannelName: channelName)))
-        return
-      }
-      if listResponse.count > 1 {
-        let code: String = listResponse[0] as! String
-        let message: String? = nilOrValue(listResponse[1])
-        let details: String? = nilOrValue(listResponse[2])
-        completion(.failure(AdyenPigeonError(code: code, message: message, details: details)))
-      } else {
-        completion(.success(()))
-      }
+
+    var codec: PlatformApiPigeonCodec {
+        PlatformApiPigeonCodec.shared
     }
-  }
+
+    func _generateCodecForDTOs(cardComponentConfigurationDTO cardComponentConfigurationDTOArg: CardComponentConfigurationDTO, sessionDTO sessionDTOArg: SessionDTO, binLookupDataDTO binLookupDataDTOArg: BinLookupDataDTO, completion: @escaping (Result<Void, AdyenPigeonError>) -> Void) {
+        let channelName = "dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface._generateCodecForDTOs\(messageChannelSuffix)"
+        let channel = FlutterBasicMessageChannel(name: channelName, binaryMessenger: binaryMessenger, codec: codec)
+        channel.sendMessage([cardComponentConfigurationDTOArg, sessionDTOArg, binLookupDataDTOArg] as [Any?]) { response in
+            guard let listResponse = response as? [Any?] else {
+                completion(.failure(createConnectionError(withChannelName: channelName)))
+                return
+            }
+            if listResponse.count > 1 {
+                let code: String = listResponse[0] as! String
+                let message: String? = nilOrValue(listResponse[1])
+                let details: String? = nilOrValue(listResponse[2])
+                completion(.failure(AdyenPigeonError(code: code, message: message, details: details)))
+            } else {
+                completion(.success(()))
+            }
+        }
+    }
+
+    func onComponentCommunication(componentCommunicationModel componentCommunicationModelArg: ComponentCommunicationModel, completion: @escaping (Result<Void, AdyenPigeonError>) -> Void) {
+        let channelName = "dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface.onComponentCommunication\(messageChannelSuffix)"
+        let channel = FlutterBasicMessageChannel(name: channelName, binaryMessenger: binaryMessenger, codec: codec)
+        channel.sendMessage([componentCommunicationModelArg] as [Any?]) { response in
+            guard let listResponse = response as? [Any?] else {
+                completion(.failure(createConnectionError(withChannelName: channelName)))
+                return
+            }
+            if listResponse.count > 1 {
+                let code: String = listResponse[0] as! String
+                let message: String? = nilOrValue(listResponse[1])
+                let details: String? = nilOrValue(listResponse[2])
+                completion(.failure(AdyenPigeonError(code: code, message: message, details: details)))
+            } else {
+                completion(.success(()))
+            }
+        }
+    }
 }
+
 /// Generated protocol from Pigeon that represents Flutter messages that can be called from Swift.
 protocol AdyenFlutterInterfaceProtocol {
-  func onSubmit(platformCommunicationDTO platformCommunicationDTOArg: PlatformCommunicationDTO, completion: @escaping (Result<CheckoutResultDTO, AdyenPigeonError>) -> Void)
-  func onAdditionalDetails(platformCommunicationDTO platformCommunicationDTOArg: PlatformCommunicationDTO, completion: @escaping (Result<CheckoutResultDTO, AdyenPigeonError>) -> Void)
+    func onSubmit(platformCommunicationDTO platformCommunicationDTOArg: PlatformCommunicationDTO, completion: @escaping (Result<CheckoutResultDTO, AdyenPigeonError>) -> Void)
+    func onAdditionalDetails(platformCommunicationDTO platformCommunicationDTOArg: PlatformCommunicationDTO, completion: @escaping (Result<CheckoutResultDTO, AdyenPigeonError>) -> Void)
 }
+
 class AdyenFlutterInterface: AdyenFlutterInterfaceProtocol {
-  private let binaryMessenger: FlutterBinaryMessenger
-  private let messageChannelSuffix: String
-  init(binaryMessenger: FlutterBinaryMessenger, messageChannelSuffix: String = "") {
-    self.binaryMessenger = binaryMessenger
-    self.messageChannelSuffix = messageChannelSuffix.count > 0 ? ".\(messageChannelSuffix)" : ""
-  }
-  var codec: PlatformApiPigeonCodec {
-    return PlatformApiPigeonCodec.shared
-  }
-  func onSubmit(platformCommunicationDTO platformCommunicationDTOArg: PlatformCommunicationDTO, completion: @escaping (Result<CheckoutResultDTO, AdyenPigeonError>) -> Void) {
-    let channelName: String = "dev.flutter.pigeon.adyen_checkout.AdyenFlutterInterface.onSubmit\(messageChannelSuffix)"
-    let channel = FlutterBasicMessageChannel(name: channelName, binaryMessenger: binaryMessenger, codec: codec)
-    channel.sendMessage([platformCommunicationDTOArg] as [Any?]) { response in
-      guard let listResponse = response as? [Any?] else {
-        completion(.failure(createConnectionError(withChannelName: channelName)))
-        return
-      }
-      if listResponse.count > 1 {
-        let code: String = listResponse[0] as! String
-        let message: String? = nilOrValue(listResponse[1])
-        let details: String? = nilOrValue(listResponse[2])
-        completion(.failure(AdyenPigeonError(code: code, message: message, details: details)))
-      } else if listResponse[0] == nil {
-        completion(.failure(AdyenPigeonError(code: "null-error", message: "Flutter api returned null value for non-null return value.", details: "")))
-      } else {
-        let result = listResponse[0] as! CheckoutResultDTO
-        completion(.success(result))
-      }
+    private let binaryMessenger: FlutterBinaryMessenger
+    private let messageChannelSuffix: String
+    init(binaryMessenger: FlutterBinaryMessenger, messageChannelSuffix: String = "") {
+        self.binaryMessenger = binaryMessenger
+        self.messageChannelSuffix = messageChannelSuffix.count > 0 ? ".\(messageChannelSuffix)" : ""
     }
-  }
-  func onAdditionalDetails(platformCommunicationDTO platformCommunicationDTOArg: PlatformCommunicationDTO, completion: @escaping (Result<CheckoutResultDTO, AdyenPigeonError>) -> Void) {
-    let channelName: String = "dev.flutter.pigeon.adyen_checkout.AdyenFlutterInterface.onAdditionalDetails\(messageChannelSuffix)"
-    let channel = FlutterBasicMessageChannel(name: channelName, binaryMessenger: binaryMessenger, codec: codec)
-    channel.sendMessage([platformCommunicationDTOArg] as [Any?]) { response in
-      guard let listResponse = response as? [Any?] else {
-        completion(.failure(createConnectionError(withChannelName: channelName)))
-        return
-      }
-      if listResponse.count > 1 {
-        let code: String = listResponse[0] as! String
-        let message: String? = nilOrValue(listResponse[1])
-        let details: String? = nilOrValue(listResponse[2])
-        completion(.failure(AdyenPigeonError(code: code, message: message, details: details)))
-      } else if listResponse[0] == nil {
-        completion(.failure(AdyenPigeonError(code: "null-error", message: "Flutter api returned null value for non-null return value.", details: "")))
-      } else {
-        let result = listResponse[0] as! CheckoutResultDTO
-        completion(.success(result))
-      }
+
+    var codec: PlatformApiPigeonCodec {
+        PlatformApiPigeonCodec.shared
     }
-  }
+
+    func onSubmit(platformCommunicationDTO platformCommunicationDTOArg: PlatformCommunicationDTO, completion: @escaping (Result<CheckoutResultDTO, AdyenPigeonError>) -> Void) {
+        let channelName = "dev.flutter.pigeon.adyen_checkout.AdyenFlutterInterface.onSubmit\(messageChannelSuffix)"
+        let channel = FlutterBasicMessageChannel(name: channelName, binaryMessenger: binaryMessenger, codec: codec)
+        channel.sendMessage([platformCommunicationDTOArg] as [Any?]) { response in
+            guard let listResponse = response as? [Any?] else {
+                completion(.failure(createConnectionError(withChannelName: channelName)))
+                return
+            }
+            if listResponse.count > 1 {
+                let code: String = listResponse[0] as! String
+                let message: String? = nilOrValue(listResponse[1])
+                let details: String? = nilOrValue(listResponse[2])
+                completion(.failure(AdyenPigeonError(code: code, message: message, details: details)))
+            } else if listResponse[0] == nil {
+                completion(.failure(AdyenPigeonError(code: "null-error", message: "Flutter api returned null value for non-null return value.", details: "")))
+            } else {
+                let result = listResponse[0] as! CheckoutResultDTO
+                completion(.success(result))
+            }
+        }
+    }
+
+    func onAdditionalDetails(platformCommunicationDTO platformCommunicationDTOArg: PlatformCommunicationDTO, completion: @escaping (Result<CheckoutResultDTO, AdyenPigeonError>) -> Void) {
+        let channelName = "dev.flutter.pigeon.adyen_checkout.AdyenFlutterInterface.onAdditionalDetails\(messageChannelSuffix)"
+        let channel = FlutterBasicMessageChannel(name: channelName, binaryMessenger: binaryMessenger, codec: codec)
+        channel.sendMessage([platformCommunicationDTOArg] as [Any?]) { response in
+            guard let listResponse = response as? [Any?] else {
+                completion(.failure(createConnectionError(withChannelName: channelName)))
+                return
+            }
+            if listResponse.count > 1 {
+                let code: String = listResponse[0] as! String
+                let message: String? = nilOrValue(listResponse[1])
+                let details: String? = nilOrValue(listResponse[2])
+                completion(.failure(AdyenPigeonError(code: code, message: message, details: details)))
+            } else if listResponse[0] == nil {
+                completion(.failure(AdyenPigeonError(code: "null-error", message: "Flutter api returned null value for non-null return value.", details: "")))
+            } else {
+                let result = listResponse[0] as! CheckoutResultDTO
+                completion(.success(result))
+            }
+        }
+    }
 }
 
 private class PigeonStreamHandler<ReturnType>: NSObject, FlutterStreamHandler {
-  private let wrapper: PigeonEventChannelWrapper<ReturnType>
-  private var pigeonSink: PigeonEventSink<ReturnType>? = nil
+    private let wrapper: PigeonEventChannelWrapper<ReturnType>
+    private var pigeonSink: PigeonEventSink<ReturnType>?
 
-  init(wrapper: PigeonEventChannelWrapper<ReturnType>) {
-    self.wrapper = wrapper
-  }
+    init(wrapper: PigeonEventChannelWrapper<ReturnType>) {
+        self.wrapper = wrapper
+    }
 
-  func onListen(withArguments arguments: Any?, eventSink events: @escaping FlutterEventSink)
-    -> FlutterError?
-  {
-    pigeonSink = PigeonEventSink<ReturnType>(events)
-    wrapper.onListen(withArguments: arguments, sink: pigeonSink!)
-    return nil
-  }
+    func onListen(withArguments arguments: Any?, eventSink events: @escaping FlutterEventSink)
+        -> FlutterError? {
+        pigeonSink = PigeonEventSink<ReturnType>(events)
+        wrapper.onListen(withArguments: arguments, sink: pigeonSink!)
+        return nil
+    }
 
-  func onCancel(withArguments arguments: Any?) -> FlutterError? {
-    pigeonSink = nil
-    wrapper.onCancel(withArguments: arguments)
-    return nil
-  }
+    func onCancel(withArguments arguments: Any?) -> FlutterError? {
+        pigeonSink = nil
+        wrapper.onCancel(withArguments: arguments)
+        return nil
+    }
 }
 
 class PigeonEventChannelWrapper<ReturnType> {
-  func onListen(withArguments arguments: Any?, sink: PigeonEventSink<ReturnType>) {}
-  func onCancel(withArguments arguments: Any?) {}
+    func onListen(withArguments arguments: Any?, sink: PigeonEventSink<ReturnType>) {}
+    func onCancel(withArguments arguments: Any?) {}
 }
 
 class PigeonEventSink<ReturnType> {
-  private let sink: FlutterEventSink
+    private let sink: FlutterEventSink
 
-  init(_ sink: @escaping FlutterEventSink) {
-    self.sink = sink
-  }
+    init(_ sink: @escaping FlutterEventSink) {
+        self.sink = sink
+    }
 
-  func success(_ value: ReturnType) {
-    sink(value)
-  }
+    func success(_ value: ReturnType) {
+        sink(value)
+    }
 
-  func error(code: String, message: String?, details: Any?) {
-    sink(FlutterError(code: code, message: message, details: details))
-  }
+    func error(code: String, message: String?, details: Any?) {
+        sink(FlutterError(code: code, message: message, details: details))
+    }
 
-  func endOfStream() {
-    sink(FlutterEndOfEventStream)
-  }
+    func endOfStream() {
+        sink(FlutterEndOfEventStream)
+    }
 
 }
 
 class OnPlatformEventStreamHandler: PigeonEventChannelWrapper<ComponentCommunicationModel> {
-  static func register(with messenger: FlutterBinaryMessenger,
-                      instanceName: String = "",
-                      streamHandler: OnPlatformEventStreamHandler) {
-    var channelName = "dev.flutter.pigeon.adyen_checkout.PlatformEvents.onPlatformEvent"
-    if !instanceName.isEmpty {
-      channelName += ".\(instanceName)"
+    static func register(with messenger: FlutterBinaryMessenger,
+                         instanceName: String = "",
+                         streamHandler: OnPlatformEventStreamHandler) {
+        var channelName = "dev.flutter.pigeon.adyen_checkout.PlatformEvents.onPlatformEvent"
+        if !instanceName.isEmpty {
+            channelName += ".\(instanceName)"
+        }
+        let internalStreamHandler = PigeonStreamHandler<ComponentCommunicationModel>(wrapper: streamHandler)
+        let channel = FlutterEventChannel(name: channelName, binaryMessenger: messenger, codec: platformApiPigeonMethodCodec)
+        channel.setStreamHandler(internalStreamHandler)
     }
-    let internalStreamHandler = PigeonStreamHandler<ComponentCommunicationModel>(wrapper: streamHandler)
-    let channel = FlutterEventChannel(name: channelName, binaryMessenger: messenger, codec: platformApiPigeonMethodCodec)
-    channel.setStreamHandler(internalStreamHandler)
-  }
 }
       

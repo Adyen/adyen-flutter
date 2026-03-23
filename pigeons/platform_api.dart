@@ -17,12 +17,12 @@ import 'package:pigeon/pigeon.dart';
 ))
 enum Environment {
   test,
-  europe,
-  unitedStates,
-  australia,
-  india,
-  apse,
-  nea;
+  liveEurope,
+  liveUnitedStates,
+  liveAustralia,
+  liveApse,
+  liveIndia,
+  liveNea;
 }
 
 enum AddressMode {

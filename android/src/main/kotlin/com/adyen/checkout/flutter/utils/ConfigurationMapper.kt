@@ -246,12 +246,12 @@ object ConfigurationMapper {
     fun Environment.mapToEnvironment(): SDKEnvironment =
         when (this) {
             Environment.TEST -> SDKEnvironment.TEST
-            Environment.EUROPE -> SDKEnvironment.LIVE_EUROPE
-            Environment.UNITED_STATES -> SDKEnvironment.LIVE_UNITED_STATES
-            Environment.AUSTRALIA -> SDKEnvironment.LIVE_AUSTRALIA
-            Environment.INDIA -> SDKEnvironment.LIVE_INDIA
-            Environment.APSE -> SDKEnvironment.LIVE_APSE
-            Environment.NEA -> SDKEnvironment.LIVE_NEA
+            Environment.LIVE_EUROPE -> SDKEnvironment.LIVE_EUROPE
+            Environment.LIVE_UNITED_STATES -> SDKEnvironment.LIVE_UNITED_STATES
+            Environment.LIVE_AUSTRALIA -> SDKEnvironment.LIVE_AUSTRALIA
+            Environment.LIVE_APSE -> SDKEnvironment.LIVE_APSE
+            Environment.LIVE_INDIA -> SDKEnvironment.LIVE_INDIA
+            Environment.LIVE_NEA -> SDKEnvironment.LIVE_NEA
         }
 
     private fun AnalyticsOptionsDTO.mapToAnalyticsConfiguration(): AnalyticsConfiguration {
@@ -427,6 +427,8 @@ object ConfigurationMapper {
         InstallmentOptions.CardBasedInstallmentOptions(
             values = (values as List<Number?>).mapNotNull { it?.toInt() },
             includeRevolving = includesRevolving,
-            cardBrand = com.adyen.checkout.core.old.CardBrand(txVariant = cardBrand)
+            cardBrand =
+                com.adyen.checkout.core.old
+                    .CardBrand(txVariant = cardBrand)
         )
 }
