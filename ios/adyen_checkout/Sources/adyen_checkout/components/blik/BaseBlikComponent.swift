@@ -6,8 +6,6 @@ import Flutter
 
 class BaseBlikComponent: BasePlatformViewComponent {
     let blikComponentConfigurationKey = "blikComponentConfiguration"
-    let paymentMethodKey = "paymentMethod"
-    let componentIdKey = "componentId"
     let blikComponentConfiguration: BlikComponentConfigurationDTO?
     let paymentMethod: String?
     var blikComponent: BLIKComponent?
@@ -21,8 +19,8 @@ class BaseBlikComponent: BasePlatformViewComponent {
         componentPlatformApi: ComponentPlatformApi
     ) {
         blikComponentConfiguration = arguments.value(forKey: blikComponentConfigurationKey) as? BlikComponentConfigurationDTO
-        paymentMethod = arguments.value(forKey: paymentMethodKey) as? String
-        let componentId = arguments.value(forKey: componentIdKey) as? String ?? ""
+        paymentMethod = arguments.value(forKey: Constants.paymentMethodKey) as? String
+        let componentId = arguments.value(forKey: Constants.componentIdKey) as? String ?? ""
         super.init(
             viewId: viewIdentifier,
             componentId: componentId,

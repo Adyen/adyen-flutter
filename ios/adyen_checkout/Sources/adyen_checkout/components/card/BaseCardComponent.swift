@@ -10,8 +10,6 @@ import Flutter
 class BaseCardComponent: BasePlatformViewComponent {
     let cardComponentConfigurationKey = "cardComponentConfiguration"
     let isStoredPaymentMethodKey = "isStoredPaymentMethod"
-    let paymentMethodKey = "paymentMethod"
-    let componentIdKey = "componentId"
     let cardComponentConfiguration: CardComponentConfigurationDTO?
     let isStoredPaymentMethod: Bool
     let storedCardComponentAdditionalHeight = 256.0
@@ -28,9 +26,9 @@ class BaseCardComponent: BasePlatformViewComponent {
         componentPlatformApi: ComponentPlatformApi
     ) {
         cardComponentConfiguration = arguments.value(forKey: cardComponentConfigurationKey) as? CardComponentConfigurationDTO
-        paymentMethod = arguments.value(forKey: paymentMethodKey) as? String
+        paymentMethod = arguments.value(forKey: Constants.paymentMethodKey) as? String
         isStoredPaymentMethod = arguments.value(forKey: isStoredPaymentMethodKey) as? Bool ?? false
-        let componentId = arguments.value(forKey: componentIdKey) as? String ?? ""
+        let componentId = arguments.value(forKey: Constants.componentIdKey) as? String ?? ""
         super.init(
             viewId: viewIdentifier,
             componentId: componentId,
