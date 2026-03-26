@@ -56,7 +56,7 @@ class BlikAdvancedComponentScreen extends StatelessWidget {
                 ),
               );
             }
-            return const SizedBox.shrink();
+            return const Center(child: CircularProgressIndicator());
           },
         ),
       ),
