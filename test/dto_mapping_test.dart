@@ -253,6 +253,30 @@ void main() {
     expect(cashAppPayConfigurationDTO.returnUrl, "RETURN_URL");
   });
 
+  test(
+      'when using blik component configuration, then should map to BlikComponentConfigurationDTO',
+      () {
+    final blikComponentConfiguration = BlikComponentConfiguration(
+      environment: Environment.test,
+      clientKey: 'test-client-key',
+      countryCode: 'PL',
+      amount: Amount(value: 1000, currency: 'PLN'),
+      shopperLocale: 'pl-PL',
+      analyticsOptions: AnalyticsOptions(enabled: false),
+    );
+
+    final dto = blikComponentConfiguration.toDTO('0.0.1');
+
+    expect(dto.environment, Environment.test);
+    expect(dto.clientKey, 'test-client-key');
+    expect(dto.countryCode, 'PL');
+    expect(dto.amount?.value, 1000);
+    expect(dto.amount?.currency, 'PLN');
+    expect(dto.shopperLocale, 'pl-PL');
+    expect(dto.analyticsOptionsDTO.enabled, false);
+    expect(dto.analyticsOptionsDTO.version, '0.0.1');
+  });
+
   test('when using 3DS theme, then should map to ui customization DTO', () {
     const theme = Adyen3DSTheme(
       textColor: Color(0xFFFFFFFF),

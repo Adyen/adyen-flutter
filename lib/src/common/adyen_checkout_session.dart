@@ -77,6 +77,8 @@ class AdyenCheckoutSession {
         sdkVersionNumber,
         InstantPaymentType.instant,
       );
+    } else if (configuration is BlikComponentConfiguration) {
+      return configuration.toDTO(sdkVersionNumber);
     }
   }
 

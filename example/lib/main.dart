@@ -1,8 +1,9 @@
 // ignore_for_file: unused_local_variable
 
-import 'package:adyen_checkout/adyen_checkout.dart';
+import 'package:adyen_checkout_example/config.dart';
 import 'package:adyen_checkout_example/network/service.dart';
 import 'package:adyen_checkout_example/repositories/adyen_apple_pay_component_repository.dart';
+import 'package:adyen_checkout_example/repositories/adyen_blik_component_repository.dart';
 import 'package:adyen_checkout_example/repositories/adyen_card_component_repository.dart';
 import 'package:adyen_checkout_example/repositories/adyen_cse_repository.dart';
 import 'package:adyen_checkout_example/repositories/adyen_drop_in_repository.dart';
@@ -13,6 +14,9 @@ import 'package:adyen_checkout_example/screens/api_only/custom_card_screen.dart'
 import 'package:adyen_checkout_example/screens/component/apple_pay/apple_pay_advanced_component_screen.dart';
 import 'package:adyen_checkout_example/screens/component/apple_pay/apple_pay_navigation_screen.dart';
 import 'package:adyen_checkout_example/screens/component/apple_pay/apple_pay_session_component_screen.dart';
+import 'package:adyen_checkout_example/screens/component/blik/blik_advanced_component_screen.dart';
+import 'package:adyen_checkout_example/screens/component/blik/blik_navigation_screen.dart';
+import 'package:adyen_checkout_example/screens/component/blik/blik_session_component_screen.dart';
 import 'package:adyen_checkout_example/screens/component/card/card_advanced_component_screen.dart';
 import 'package:adyen_checkout_example/screens/component/card/card_bottom_sheet_screen.dart';
 import 'package:adyen_checkout_example/screens/component/card/card_navigation_screen.dart';
@@ -40,6 +44,8 @@ void main() {
       AdyenApplePayComponentRepository(service: service);
   final adyenCardComponentRepository =
       AdyenCardComponentRepository(service: service);
+  final adyenBlikComponentRepository =
+      AdyenBlikComponentRepository(service: service);
   final adyenInstantComponentRepository =
       AdyenInstantComponentRepository(service: service);
   final adyenCseRepository = AdyenCseRepository(service: service);
@@ -81,6 +87,13 @@ void main() {
       '/cardBottomSheetScreen': (context) => CardBottomSheetScreen(
             repository: adyenCardComponentRepository,
           ),
+      '/blikComponentNavigation': (context) => const BlikNavigationScreen(),
+      '/blikSessionComponentScreen': (context) => BlikSessionComponentScreen(
+            repository: adyenBlikComponentRepository,
+          ),
+      '/blikAdvancedComponentScreen': (context) => BlikAdvancedComponentScreen(
+            repository: adyenBlikComponentRepository,
+          ),
       '/googlePayNavigation': (context) => const GooglePayNavigationScreen(),
       '/googlePaySessionComponent': (context) =>
           GooglePaySessionsComponentScreen(
@@ -108,12 +121,14 @@ void main() {
           const MultiComponentNavigationScreen(),
       '/multiComponentSessionScreen': (context) => MultiComponentSessionScreen(
             cardRepository: adyenCardComponentRepository,
+            blikRepository: adyenBlikComponentRepository,
             googlePayRepository: adyenGooglePayComponentRepository,
             applePayRepository: adyenApplePayComponentRepository,
           ),
       '/multiComponentAdvancedScreen': (context) =>
           MultiComponentAdvancedScreen(
             cardRepository: adyenCardComponentRepository,
+            blikRepository: adyenBlikComponentRepository,
             googlePayRepository: adyenGooglePayComponentRepository,
             applePayRepository: adyenApplePayComponentRepository,
           ),
@@ -131,7 +146,8 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    AdyenCheckout.instance.enableConsoleLogging(enabled: false);
+    final isBlikSupported =
+        Config.countryCode == 'PL' && Config.amount.currency == 'PLN';
 
     return Scaffold(
       appBar: AppBar(
@@ -148,6 +164,11 @@ class MyApp extends StatelessWidget {
                 onPressed: () =>
                     Navigator.pushNamed(context, "/cardComponentScreen"),
                 child: const Text("Card component")),
+            if (isBlikSupported)
+              TextButton(
+                  onPressed: () =>
+                      Navigator.pushNamed(context, "/blikComponentNavigation"),
+                  child: const Text("BLIK component")),
             _buildGoogleOrApplePayComponent(context),
             TextButton(
                 onPressed: () =>
