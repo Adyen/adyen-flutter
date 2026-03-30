@@ -39,16 +39,17 @@ extension AdvancedComponentProtocol {
     private func onFinish(paymentEventDTO: PaymentEventDTO) {
         let resultCode = ResultCode(rawValue: paymentEventDTO.result ?? "")
         let isAccepted = resultCode?.isAccepted ?? false
-        finalizeAndDismiss(success: isAccepted, completion: { [self] in
+        finalizeAndDismiss(success: isAccepted, completion: { [weak self] in
+            guard let self else { return }
             let componentCommunicationModel = ComponentCommunicationModel(
                 type: ComponentCommunicationType.result,
-                componentId: componentId,
+                componentId: self.componentId,
                 paymentResult: PaymentResultDTO(
                     type: PaymentResultEnum.finished,
                     result: PaymentResultModelDTO(resultCode: resultCode?.rawValue)
                 )
             )
-            componentFlutterApi.onComponentCommunication(
+            self.componentFlutterApi.onComponentCommunication(
                 componentCommunicationModel: componentCommunicationModel,
                 completion: { _ in }
             )
