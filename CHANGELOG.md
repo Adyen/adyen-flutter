@@ -1,4 +1,4 @@
-## 1.9.0 (in development)
+## 1.9.0
 
 ### New
 
