@@ -23,6 +23,7 @@ import UIKit
         GeneratedPluginRegistrant.register(with: self)
         setDropInStyle()
         setCardComponentStyle()
+        setBlikComponentStyle()
         return super.application(application, didFinishLaunchingWithOptions: launchOptions)
     }
 
@@ -46,5 +47,14 @@ import UIKit
         cardComponentStyle.textField.tintColor = UIColor(named: "PrimaryBackground") ?? .black
         cardComponentStyle.backgroundColor = UIColor(named: "AppBackground") ?? .white
         AdyenAppearance.cardComponentStyle = cardComponentStyle
+    }
+
+    private func setBlikComponentStyle() {
+        var blikComponentStyle = Adyen.FormComponentStyle()
+        blikComponentStyle.mainButtonItem.button.backgroundColor = UIColor(named: "PrimaryBackground") ?? .black
+        blikComponentStyle.mainButtonItem.button.title.color = UIColor(named: "PrimaryTitle") ?? .white
+        blikComponentStyle.textField.tintColor = UIColor(named: "PrimaryBackground") ?? .black
+        blikComponentStyle.backgroundColor = UIColor(named: "AppBackground") ?? .white
+        AdyenAppearance.blikComponentStyle = blikComponentStyle
     }
 }
