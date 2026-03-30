@@ -9,14 +9,18 @@ import 'package:adyen_checkout/src/util/payment_event_handler.dart';
 
 mixin AdvancedComponentMixin on BasePlatformViewComponent {
   AdvancedCheckout get advancedCheckout;
+
   PaymentEventHandler get paymentEventHandler;
 
   @override
   void handleComponentCommunication(ComponentCommunicationModel event) {
-    if (event.type case ComponentCommunicationType.onSubmit) {
-      _onSubmit(event);
-    } else if (event.type case ComponentCommunicationType.additionalDetails) {
-      _onAdditionalDetails(event);
+    switch (event.type) {
+      case ComponentCommunicationType.onSubmit:
+        _onSubmit(event);
+      case ComponentCommunicationType.additionalDetails:
+        _onAdditionalDetails(event);
+      default:
+        return;
     }
   }
 
