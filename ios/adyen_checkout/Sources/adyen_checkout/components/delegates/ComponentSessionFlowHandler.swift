@@ -94,14 +94,15 @@ class ComponentSessionFlowHandler: AdyenSessionDelegate {
     }
 
     private func sessionComponentId(for component: PaymentComponent) -> String? {
-        switch component {
-        case is CardComponent:
+        let paymentMethod = component.paymentMethod
+        switch paymentMethod {
+        case is AnyCardPaymentMethod:
             return CardComponentManager.Constants.cardSessionComponentId
-        case is BLIKComponent:
+        case is BLIKPaymentMethod, is StoredBLIKPaymentMethod:
             return BlikComponentManager.Constants.blikSessionComponentId
-        case is ApplePayComponent:
+        case is ApplePayPaymentMethod:
             return ApplePayComponentManager.Constants.applePaySessionComponentId
-        case is InstantPaymentComponent:
+        case is InstantPaymentMethod, is StoredInstantPaymentMethod:
             return InstantComponentManager.Constants.instantSessionComponentId
         default:
             return nil
