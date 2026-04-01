@@ -62,6 +62,9 @@ class CardSessionComponent: BaseCardComponent {
                     self?.finalizeAndDismissSessionComponent(success: success, completion: completion)
                 }
             )
+            if isStoredPaymentMethod {
+                componentSessionFlowDelegate.setCurrentFlow(componentId: componentId)
+            }
         } else {
             AdyenAssertion.assertionFailure(message: "Wrong session flow delegate usage")
         }
