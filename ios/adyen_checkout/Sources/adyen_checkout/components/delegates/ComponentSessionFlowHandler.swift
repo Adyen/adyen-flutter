@@ -49,9 +49,7 @@ class ComponentSessionFlowHandler: AdyenSessionDelegate {
     }
     
     func didComplete(with result: AdyenSessionResult, component: Component, session: AdyenSession) {
-        guard let registration = currentFlowRegistration else {
-            return
-        }
+        guard let registration = currentFlowRegistration else { return }
         let resultCode = result.resultCode
         let success = resultCode == .authorised || resultCode == .received || resultCode == .pending
         registration.finalizeCallback(success) { [weak self] in
