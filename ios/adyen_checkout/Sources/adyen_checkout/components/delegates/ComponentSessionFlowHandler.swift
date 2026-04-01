@@ -49,7 +49,9 @@ class ComponentSessionFlowHandler: AdyenSessionDelegate {
     }
     
     func didComplete(with result: AdyenSessionResult, component: Component, session: AdyenSession) {
-        guard let registration = currentFlowRegistration else { return }
+        guard let registration = currentFlowRegistration else {
+            return
+        }
         let resultCode = result.resultCode
         let success = resultCode == .authorised || resultCode == .received || resultCode == .pending
         registration.finalizeCallback(success) { [weak self] in
@@ -94,14 +96,15 @@ class ComponentSessionFlowHandler: AdyenSessionDelegate {
     }
 
     private func sessionComponentId(for component: PaymentComponent) -> String? {
-        switch component {
-        case is CardComponent:
+        let paymentMethod = component.paymentMethod
+        switch paymentMethod {
+        case is AnyCardPaymentMethod:
             return CardComponentManager.Constants.cardSessionComponentId
-        case is BLIKComponent:
+        case is BLIKPaymentMethod, is StoredBLIKPaymentMethod:
             return BlikComponentManager.Constants.blikSessionComponentId
-        case is ApplePayComponent:
+        case is ApplePayPaymentMethod:
             return ApplePayComponentManager.Constants.applePaySessionComponentId
-        case is InstantPaymentComponent:
+        case is InstantPaymentMethod, is StoredInstantPaymentMethod:
             return InstantComponentManager.Constants.instantSessionComponentId
         default:
             return nil
