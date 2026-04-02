@@ -1,24 +1,36 @@
-## 1.9.0 (in development)
+## 1.9.0
 
 ### New
 
-- Added 3DS2 UI customization via `Adyen3DSTheme`, including `fromThemeData()` support.
-- Added BLIK component support for both Sessions and Advanced flows.
+- For the 3D Secure 2: you can now customize the user interface using `Adyen3DSTheme`. This includes
+  support for `fromThemeData()`, which enables you use the styling from your application's existing
+  theme.
+- Supported payment method: BLIK. Payment
+  method [type](https://docs.adyen.com/payment-methods/payment-method-types): **blik**. The shopper
+  pays using a 6-digit code generated in their banking app.
+- For card payments: you can now offer shoppers the option to pay in installments.
+  - Sessions flow: use the [
+    `installmentOptions`](https://docs.adyen.com/api-explorer/Checkout/latest/post/sessions#request-installmentOptions)
+    parameter.
+  - Advanced flow: use the new [
+    `installmentConfiguration`](https://github.com/Adyen/adyen-flutter/blob/c49cf217c3270ff56d034dc16970a25e6993c098/example/lib/repositories/adyen_card_component_repository.dart#L39)
+    property.
 
-## Improved
+### Improved
 
-- Refactored the component architecture by introducing a shared layer to improve maintainability and
-  extensibility of platform view based components.
-- Migrated the card component to comply with the new component architecture and simplified its
-  implementation.
+- The internal component architecture now uses a shared layer. This improves maintainability and
+  makes it easier to extend components that are based
+  on [platform views](https://github.com/flutter/flutter/tree/master/examples/platform_view).
+- For the Card Component: the implementation is now simplified and complies with the updated
+  component architecture.
 
 ### Changed
 
 - Dependency versions:
   | Name | Version |
   |---------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------|
-  | [Android Drop-in/Components](https://docs.adyen.com/online-payments/release-notes/?title%5B0%5D=Android+Components%2FDrop-in&version%5B0%5D=5.17.0)                       |  5.17.0 |
-  | [iOS Drop-in/Components](https://docs.adyen.com/online-payments/release-notes/?title%5B0%5D=iOS+Components%2FDrop-in&version%5B0%5D=5.23.1)                               |  5.23.1 |
+  | [Android Drop-in/Components](https://docs.adyen.com/online-payments/release-notes/?title%5B0%5D=Android+Components%2FDrop-in&version%5B0%5D=5.17.0) | 5.16.0 -> **5.17.0** |
+  | [iOS Drop-in/Components](https://docs.adyen.com/online-payments/release-notes/?title%5B0%5D=iOS+Components%2FDrop-in&version%5B0%5D=5.23.1) | 5.22.2 -> **5.23.1** |
 
 ## 1.8.1
 
