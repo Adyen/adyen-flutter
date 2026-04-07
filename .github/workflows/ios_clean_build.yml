@@ -48,12 +48,13 @@ jobs:
       - name: Install app on simulator
         working-directory: demo_project
         run: |
-          DEVICE_ID=$(xcrun simctl list devices | awk -v model="$IPHONE_MODEL" '$0 ~ model && $0 ~ /\(Booted\)/ { if (match($0, /\(([0-9A-Fa-f-]+)\)/)) { print substr($0, RSTART + 1, RLENGTH - 2); exit } }')
+          xcrun simctl list devices
+          DEVICE_ID=$(xcrun simctl list devices | awk '/\(Booted\)/ { if (match($0, /\(([0-9A-Fa-f-]+)\)/)) { print substr($0, RSTART + 1, RLENGTH - 2); exit } }')
           if [ -z "$DEVICE_ID" ]; then
             open -a Simulator
             xcrun simctl boot "$IPHONE_MODEL"
             xcrun simctl bootstatus "$IPHONE_MODEL" -b
-            DEVICE_ID="$IPHONE_MODEL"
+            DEVICE_ID=$(xcrun simctl list devices | awk -v model="$IPHONE_MODEL" '$0 ~ model && $0 ~ /\(Booted\)/ { if (match($0, /\(([0-9A-Fa-f-]+)\)/)) { print substr($0, RSTART + 1, RLENGTH - 2); exit } }')
           fi
           xcrun simctl install "$DEVICE_ID" build/ios/iphonesimulator/Runner.app
           xcrun simctl launch "$DEVICE_ID" com.example.demoProject
