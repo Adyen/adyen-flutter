@@ -48,6 +48,12 @@ jobs:
       - name: Install app on simulator
         working-directory: demo_project
         run: |
-          open -a Simulator && xcrun simctl boot "$IPHONE_MODEL"
-          xcrun simctl install "$IPHONE_MODEL" build/ios/iphonesimulator/Runner.app
-          xcrun simctl launch "$IPHONE_MODEL" com.example.demoProject
+          DEVICE_ID=$(xcrun simctl list devices available | grep -F "$IPHONE_MODEL (" | grep "(Booted)" | sed -E 's/.*\(([A-F0-9-]+)\) \(Booted\).*/\1/' | head -n 1)
+          if [ -z "$DEVICE_ID" ]; then
+            open -a Simulator
+            xcrun simctl boot "$IPHONE_MODEL"
+            xcrun simctl bootstatus "$IPHONE_MODEL" -b
+            DEVICE_ID="$IPHONE_MODEL"
+          fi
+          xcrun simctl install "$DEVICE_ID" build/ios/iphonesimulator/Runner.app
+          xcrun simctl launch "$DEVICE_ID" com.example.demoProject
