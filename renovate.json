@@ -11,11 +11,15 @@
       "minimumReleaseAge": "14 days"
     },
     {
-      "matchVulnerabilityAlerts": true,
       "matchUpdateTypes": [
+        "vulnerability",
         "security"
       ],
       "minimumReleaseAge": null
     }
-  ]
+  ],
+  "osvVulnerabilityAlerts": true,
+  "vulnerabilityAlerts": {
+    "enabled": true
+  }
 }
