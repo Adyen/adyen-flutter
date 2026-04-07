@@ -5,9 +5,15 @@
   ],
   "packageRules": [
     {
+      "matchUpdateTypes": [
+        "vulnerability"
+      ],
+      "minimumReleaseAge": null
+    },
+    {
       "minimumReleaseAge": "14 days",
       "matchPackagePatterns": [
-        "*"
+        ".*"
       ]
     }
   ]
