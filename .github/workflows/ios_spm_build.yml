@@ -56,12 +56,7 @@ jobs:
         working-directory: demo_project
         run: |
           xcrun simctl list devices
-          TARGET_DEVICE_ID=$(xcrun simctl list devices available | awk -v model="$IPHONE_MODEL" 'index($0, "    " model " (") == 1 { if (match($0, /\(([0-9A-Fa-f-]+)\)/)) { device_id = substr($0, RSTART + 1, RLENGTH - 2) } } END { print device_id }')
-          DEVICE_ID=$(xcrun simctl list devices | awk '/\(Booted\)/ { if (match($0, /\(([0-9A-Fa-f-]+)\)/)) { print substr($0, RSTART + 1, RLENGTH - 2); exit } }')
-          if [ -z "$DEVICE_ID" ]; then
-            xcrun simctl boot "$TARGET_DEVICE_ID"
-            xcrun simctl bootstatus "$TARGET_DEVICE_ID" -b
-            DEVICE_ID="$TARGET_DEVICE_ID"
-          fi
-          xcrun simctl install "$DEVICE_ID" build/ios/iphonesimulator/Runner.app
-          xcrun simctl launch "$DEVICE_ID" com.example.demoProject
+          xcrun simctl boot "$IPHONE_MODEL"
+          xcrun simctl bootstatus "$IPHONE_MODEL" -b
+          xcrun simctl install "$IPHONE_MODEL" build/ios/iphonesimulator/Runner.app
+          xcrun simctl launch "$IPHONE_MODEL" com.example.demoProject
