@@ -48,7 +48,7 @@ jobs:
       - name: Install app on simulator
         working-directory: demo_project
         run: |
-          DEVICE_ID=$(xcrun simctl list devices available | grep -F "$IPHONE_MODEL (" | grep "(Booted)" | sed -E 's/.*\(([A-F0-9-]+)\) \(Booted\).*/\1/' | head -n 1)
+          DEVICE_ID=$(xcrun simctl list devices | awk -v model="$IPHONE_MODEL" '$0 ~ model && $0 ~ /\(Booted\)/ { if (match($0, /\(([0-9A-Fa-f-]+)\)/)) { print substr($0, RSTART + 1, RLENGTH - 2); exit } }')
           if [ -z "$DEVICE_ID" ]; then
             open -a Simulator
             xcrun simctl boot "$IPHONE_MODEL"
