@@ -12,6 +12,9 @@
     },
     {
       "matchVulnerabilityAlerts": true,
+      "matchUpdateTypes": [
+        "security"
+      ],
       "minimumReleaseAge": null
     }
   ]
