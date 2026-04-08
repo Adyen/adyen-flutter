@@ -21,6 +21,7 @@ import com.adyen.checkout.flutter.generated.AddressMode
 import com.adyen.checkout.flutter.generated.AmountDTO
 import com.adyen.checkout.flutter.generated.AnalyticsOptionsDTO
 import com.adyen.checkout.flutter.generated.BillingAddressParametersDTO
+import com.adyen.checkout.flutter.generated.BlikComponentConfigurationDTO
 import com.adyen.checkout.flutter.generated.CardComponentConfigurationDTO
 import com.adyen.checkout.flutter.generated.CardBasedInstallmentOptionsDTO
 import com.adyen.checkout.flutter.generated.CardConfigurationDTO
@@ -126,6 +127,16 @@ object ConfigurationMapper {
             countryCode = countryCode,
             cardConfigurationDTO = cardConfiguration,
             threeDS2ConfigurationDTO = threeDS2ConfigurationDTO,
+        )
+
+    fun BlikComponentConfigurationDTO.toCheckoutConfiguration(): CheckoutConfiguration =
+        toCheckoutConfiguration(
+            environment = environment,
+            clientKey = clientKey,
+            analyticsOptionsDTO = analyticsOptionsDTO,
+            shopperLocale = shopperLocale,
+            amount = amount,
+            countryCode = countryCode,
         )
 
     fun ActionComponentConfigurationDTO.toCheckoutConfiguration(): CheckoutConfiguration =

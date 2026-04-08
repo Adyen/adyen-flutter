@@ -11,6 +11,7 @@ import com.adyen.checkout.core.old.AdyenLogLevel
 import com.adyen.checkout.core.old.AdyenLogger
 import com.adyen.checkout.flutter.apiOnly.AdyenCSE
 import com.adyen.checkout.flutter.apiOnly.CardValidation
+import com.adyen.checkout.flutter.generated.BlikComponentConfigurationDTO
 import com.adyen.checkout.flutter.generated.CardComponentConfigurationDTO
 import com.adyen.checkout.flutter.generated.CardExpiryDateValidationResultDTO
 import com.adyen.checkout.flutter.generated.CardNumberValidationResultDTO
@@ -154,6 +155,7 @@ class CheckoutPlatformApi(
         when (configuration) {
             is DropInConfigurationDTO -> return configuration.toCheckoutConfiguration()
             is CardComponentConfigurationDTO -> return configuration.toCheckoutConfiguration()
+            is BlikComponentConfigurationDTO -> return configuration.toCheckoutConfiguration()
             is InstantPaymentConfigurationDTO -> {
                 return when (configuration.instantPaymentType) {
                     InstantPaymentType.APPLE_PAY -> throw IllegalStateException(

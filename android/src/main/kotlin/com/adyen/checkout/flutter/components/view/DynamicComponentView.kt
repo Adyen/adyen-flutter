@@ -13,6 +13,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.children
 import androidx.core.view.postDelayed
 import com.adyen.checkout.card.old.CardComponent
+import com.adyen.checkout.components.core.internal.ButtonComponent
 import com.adyen.checkout.components.core.internal.Component
 import com.adyen.checkout.core.common.CheckoutContext
 import com.adyen.checkout.core.components.AdyenPaymentFlow
@@ -103,7 +104,7 @@ class DynamicComponentView
             adyenComponentView.getViewTreeObserver()?.addOnGlobalLayoutListener(
                 object : ViewTreeObserver.OnGlobalLayoutListener {
                     override fun onGlobalLayout() {
-                        if (component is CardComponent) {
+                        if (component is ButtonComponent) {
                             overrideSubmit(component)
                         }
 
@@ -113,7 +114,7 @@ class DynamicComponentView
             )
         }
 
-        private fun overrideSubmit(component: CardComponent) {
+        private fun overrideSubmit(component: ButtonComponent) {
             val payButton = findViewById<MaterialButton>(com.adyen.checkout.ui.core.R.id.payButton)
             if (android.os.Build.VERSION.SDK_INT <= android.os.Build.VERSION_CODES.O) {
                 disableRippleAnimationOnPayButton()

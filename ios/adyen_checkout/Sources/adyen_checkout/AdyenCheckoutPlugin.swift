@@ -19,7 +19,10 @@ public class AdyenCheckoutPlugin: NSObject, FlutterPlugin {
             checkoutHolder: checkoutHolder
         )
         
-        let componentPlatformApi = ComponentPlatformApi(componentFlutterApi: componentFlutterApi, checkoutHolder: checkoutHolder)
+        let componentPlatformApi = ComponentPlatformApi(
+            componentFlutterApi: componentFlutterApi,
+            checkoutHolder: checkoutHolder
+        )
         ComponentPlatformInterfaceSetup.setUp(binaryMessenger: messenger, api: componentPlatformApi)
         CheckoutPlatformInterfaceSetup.setUp(binaryMessenger: messenger, api: checkoutPlatformApi)
 
@@ -42,7 +45,23 @@ public class AdyenCheckoutPlugin: NSObject, FlutterPlugin {
         )
         registrar.register(cardComponentSessionFactory, withId: CardComponentFactory.cardComponentSessionId)
 
-        
+        let blikComponentAdvancedFactory = BlikComponentFactory(
+            messenger: messenger,
+            componentFlutterApi: componentFlutterApi,
+            componentPlatformApi: componentPlatformApi,
+            viewTypeId: BlikComponentFactory.blikComponentAdvancedId
+        )
+        registrar.register(blikComponentAdvancedFactory, withId: BlikComponentFactory.blikComponentAdvancedId)
+
+        let blikComponentSessionFactory = BlikComponentFactory(
+            messenger: messenger,
+            componentFlutterApi: componentFlutterApi,
+            componentPlatformApi: componentPlatformApi,
+            viewTypeId: BlikComponentFactory.blikComponentSessionId,
+            sessionHolder: sessionHolder
+        )
+        registrar.register(blikComponentSessionFactory, withId: BlikComponentFactory.blikComponentSessionId)
+
         //V2
         OnPlatformEventStreamHandler.register(with: messenger, streamHandler: componentPlatformEventHandler)
         let adyenComponentSessionFactory = AdyenComponentFactory(
@@ -55,7 +74,7 @@ public class AdyenCheckoutPlugin: NSObject, FlutterPlugin {
             adyenComponentSessionFactory,
             withId: AdyenComponentFactory.adyenSessionComponentId
         )
-        
+
         let adyenComponentAdvancedFactory = AdyenComponentFactory(
             adyenFlutterInterface: adyenFlutterInterface,
             componentPlatformEventHandler: componentPlatformEventHandler,

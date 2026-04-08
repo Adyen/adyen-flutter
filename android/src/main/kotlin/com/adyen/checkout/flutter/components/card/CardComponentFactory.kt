@@ -2,8 +2,6 @@ package com.adyen.checkout.flutter.components.card
 
 import android.content.Context
 import androidx.fragment.app.FragmentActivity
-import com.adyen.checkout.flutter.components.card.advanced.CardAdvancedComponent
-import com.adyen.checkout.flutter.components.card.session.CardSessionComponent
 import com.adyen.checkout.flutter.generated.ComponentFlutterInterface
 import com.adyen.checkout.flutter.session.CheckoutHolder
 import io.flutter.plugin.platform.PlatformView
@@ -31,8 +29,6 @@ internal class CardComponentFactory(
         val cardComponent =
             if (viewTypeId == CARD_COMPONENT_SESSION && checkoutHolder != null) {
                 CardSessionComponent(
-                    context,
-                    viewId,
                     creationParams,
                     activity,
                     componentFlutterApi,
@@ -42,8 +38,6 @@ internal class CardComponentFactory(
                 )
             } else {
                 CardAdvancedComponent(
-                    context,
-                    viewId,
                     creationParams,
                     activity,
                     componentFlutterApi,

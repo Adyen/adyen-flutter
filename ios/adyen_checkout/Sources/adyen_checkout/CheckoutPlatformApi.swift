@@ -40,7 +40,7 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
         self.componentPlatformEventHandler = componentPlatformEventHandler
         self.checkoutHolder = checkoutHolder
     }
-    
+
     func setupSession(sessionResponseDTO: SessionResponseDTO, checkoutConfigurationDTO: CheckoutConfigurationDTO, completion: @escaping (Result<SessionDTO, any Error>) -> Void) {
         Task {
             do {
@@ -70,7 +70,7 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
             }
         }
     }
-    
+
     func setupAdvanced(paymentMethodsResponse: String, checkoutConfigurationDTO: CheckoutConfigurationDTO, completion: @escaping (Result<Void, any Error>) -> Void) {
         Task {
             do {
@@ -89,7 +89,7 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
             }
         }
     }
-    
+
     func clearSession() {
         checkoutHolder.reset()
     }
@@ -140,7 +140,7 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
     ) async throws {
         let sessionDelegate = DropInSessionsDelegate(viewController: getViewController(), checkoutFlutter: checkoutFlutter)
     }
-    
+
     private func test() -> CardComponentConfiguration? {
         return nil
     }
@@ -155,7 +155,7 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
             clientKey: configurationDTO.clientKey,
             analyticsConfiguration: .init()
         ) {
-            configurationDTO.cardConfigurationDTO!.mapToCardComponentConfiguration(shopperLocale: configurationDTO.shopperLocale)            
+            configurationDTO.cardConfigurationDTO!.mapToCardComponentConfiguration(shopperLocale: configurationDTO.shopperLocale)
         }.onComplete { [weak self] result in
             print("ON COMPLETE SWIFT INVOKED")
             let paymentResult = PaymentResultModelDTO(
@@ -172,7 +172,7 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
                 )
             )
             self?.componentPlatformEventHandler.send(event: componentCommunicationModel)
-            
+
         }.onError { [weak self] error in
             print("ON ERROR SWIFT INVOKED")
             let componentCommunicationModel = ComponentCommunicationModel(
@@ -185,7 +185,7 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
             )
             self?.componentPlatformEventHandler.send(event: componentCommunicationModel)
         }
-        
+
         return checkoutConfig
     }
 
@@ -215,7 +215,7 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
                 )
             )
             self?.componentPlatformEventHandler.send(event: componentCommunicationModel)
-            
+
         }.onError { [weak self] error in
             print("ON ERROR SWIFT INVOKED")
             let componentCommunicationModel = ComponentCommunicationModel(
@@ -269,7 +269,7 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
 
         return checkoutConfig
     }
-    
+
     private func onSetupSuccess(
         id: String,
         checkoutSession: Checkout,
@@ -372,7 +372,7 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
 
         return rootViewController
     }
-    
+
     private func determineSessionConfiguration(configuration: DropInConfigurationDTO) throws -> CheckoutConfiguration {
         return try configuration.createCheckoutConfiguration()
     }

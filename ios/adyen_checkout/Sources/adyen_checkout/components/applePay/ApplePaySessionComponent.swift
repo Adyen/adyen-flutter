@@ -23,6 +23,7 @@ class ApplePaySessionComponent: BaseApplePayComponent {
     
     override func present() {
         if let applePayComponent {
+            (sessionHolder.sessionDelegate as? ComponentSessionFlowHandler)?.setCurrentFlow(componentId: componentId)
             getViewController()?.present(component: applePayComponent)
         }
     }
@@ -44,8 +45,10 @@ class ApplePaySessionComponent: BaseApplePayComponent {
     
     private func setupSessionFlowDelegate() {
         if let componentSessionFlowDelegate = (checkoutHolder.sessionDelegate as? ComponentSessionFlowHandler) {
-            componentSessionFlowDelegate.componentId = componentId
-            componentSessionFlowDelegate.finalizeCallback = finalizeAndDismissComponent
+            componentSessionFlowDelegate.register(
+                componentId: componentId,
+                finalizeCallback: finalizeAndDismissComponent
+            )
         } else {
             assertionFailure("Wrong session flow delegate usage")
         }

@@ -8,7 +8,7 @@
 import Flutter
 
 class CardSessionComponent: BaseCardComponent {
-    private let checkoutHolder: CheckoutHolder
+    let checkoutHolder: CheckoutHolder
 
     init(
         frame: CGRect,
@@ -28,7 +28,7 @@ class CardSessionComponent: BaseCardComponent {
             componentFlutterApi: componentFlutterApi,
             componentPlatformApi: componentPlatformApi
         )
-        
+
         Task {
             do {
                 await setupCardComponentView()
@@ -44,10 +44,28 @@ class CardSessionComponent: BaseCardComponent {
                 cardPaymentMethod: cardPaymentMethod
             )
             showCardComponent(cardComponent: cardComponent)
+            componentPlatformApi.register(cardBaseComponent: self)
+            setupSessionFlowDelegate()
         } catch {
             sendErrorToFlutterLayer(errorMessage: error.localizedDescription)
         }
     }
+
+//      private func setupSessionFlowDelegate() {
+//             if let componentSessionFlowDelegate = (sessionHolder.sessionDelegate as? ComponentSessionFlowHandler) {
+//                 componentSessionFlowDelegate.register(
+//                     componentId: componentId,
+//                     finalizeCallback: { [weak self] success, completion in
+//                         self?.finalizeAndDismissSessionComponent(success: success, completion: completion)
+//                     }
+//                 )
+//                 if isStoredPaymentMethod {
+//                     componentSessionFlowDelegate.setCurrentFlow(componentId: componentId)
+//                 }
+//             } else {
+//                 AdyenAssertion.assertionFailure(message: "Wrong session flow delegate usage")
+//             }
+//         }
 
     func finalizeAndDismissSessionComponent(success: Bool, completion: @escaping (() -> Void)) {
         finalizeAndDismiss(success: success, completion: { [weak self] in

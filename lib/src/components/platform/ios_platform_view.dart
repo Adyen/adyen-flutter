@@ -13,7 +13,7 @@ class IosPlatformView extends StatelessWidget {
   final MessageCodec codec;
   final Set<Factory<OneSequenceGestureRecognizer>>? gestureRecognizers;
   final Function(int) onPlatformViewCreated;
-  final GlobalKey widgetKey;
+  final GlobalKey componentWidgetKey;
 
   const IosPlatformView({
     super.key,
@@ -21,7 +21,7 @@ class IosPlatformView extends StatelessWidget {
     required this.creationParams,
     required this.codec,
     required this.onPlatformViewCreated,
-    required this.widgetKey,
+    required this.componentWidgetKey,
     this.gestureRecognizers,
   });
 
@@ -55,15 +55,15 @@ class IosPlatformView extends StatelessWidget {
     Set<Factory<OneSequenceGestureRecognizer>> groupedGestureRecognizers,
     BuildContext context,
   ) {
-    final checkoutConfiguration =
-        creationParams[Constants.checkoutConfigurationKey]
-            as CheckoutConfigurationDTO?;
-    if (checkoutConfiguration?.cardConfigurationDTO?.showStorePaymentField == true) {
+    final cardConfiguration =
+        creationParams[Constants.cardComponentConfigurationKey]
+            as CardComponentConfigurationDTO?;
+    if (cardConfiguration?.cardConfiguration.showStorePaymentField == true) {
       groupedGestureRecognizers.addAll({
         Factory<HorizontalDragGestureRecognizer>(
             () => HorizontalDragGestureRecognizer()),
         Factory<ToggleAreaGestureRecognizer>(() => ToggleAreaGestureRecognizer(
-            cardWidgetKey: widgetKey,
+            componentWidgetKey: componentWidgetKey,
             textDirection: Directionality.of(context))),
       });
     }

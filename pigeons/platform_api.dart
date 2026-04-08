@@ -763,6 +763,24 @@ class CardComponentConfigurationDTO {
   );
 }
 
+class BlikComponentConfigurationDTO {
+  final Environment environment;
+  final String clientKey;
+  final String countryCode;
+  final AmountDTO? amount;
+  final String? shopperLocale;
+  final AnalyticsOptionsDTO analyticsOptionsDTO;
+
+  BlikComponentConfigurationDTO(
+    this.environment,
+    this.clientKey,
+    this.countryCode,
+    this.amount,
+    this.shopperLocale,
+    this.analyticsOptionsDTO,
+  );
+}
+
 class InstantPaymentConfigurationDTO {
   final Environment environment;
   final String clientKey;
@@ -983,6 +1001,7 @@ abstract class ComponentFlutterInterface {
   // ignore: unused_element
   void _generateCodecForDTOs(
     CardComponentConfigurationDTO cardComponentConfigurationDTO,
+    BlikComponentConfigurationDTO blikComponentConfigurationDTO,
     SessionDTO sessionDTO,
     BinLookupDataDTO binLookupDataDTO,
   );

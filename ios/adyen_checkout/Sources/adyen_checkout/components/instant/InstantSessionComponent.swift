@@ -20,17 +20,20 @@ class InstantSessionComponent: BaseInstantComponent, InstantComponentProtocol {
         guard let session = checkoutHolder.session else { return }
         initiatePayment(delegate: session)
     }
-    
+
     func buildInstantSessionComponent(paymentMethod: PaymentMethod, adyenContext: AdyenContext) -> InstantPaymentComponent? {
         do {
             guard let session = checkoutHolder.session else {
                 throw PlatformError(errorDescription: "The provided session identifier or data is invalid.")
             }
-            
-            let componentSessionFlowHandler = checkoutHolder.sessionDelegate as? ComponentSessionFlowHandler
-            componentSessionFlowHandler?.componentId = componentId
-            componentSessionFlowHandler?.finalizeCallback = finalizeCallback
+
             let component = InstantPaymentComponent(paymentMethod: paymentMethod, context: adyenContext, order: nil)
+            let componentSessionFlowHandler = checkoutHolder.sessionDelegate as? ComponentSessionFlowHandler
+            componentSessionFlowHandler?.register(
+                            componentId: componentId,
+                            finalizeCallback: finalizeCallback
+                        )
+            component.delegate = session
             return component
         } catch {
             sendErrorToFlutterLayer(error: error)

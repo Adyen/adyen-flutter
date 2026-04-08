@@ -18,6 +18,7 @@ class CheckoutHolder {
     }
 
     func reset() {
+        (sessionDelegate as? ComponentSessionFlowHandler)?.reset()
         session = nil
         sessionDelegate = nil
         adyenCheckout = nil
