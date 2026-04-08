@@ -2,10 +2,10 @@ import 'dart:async';
 
 import 'package:adyen_checkout/src/common/model/card_callbacks/bin_lookup_data.dart';
 import 'package:adyen_checkout/src/common/model/payment_result.dart';
-import 'package:adyen_checkout/src/components/card/adyen_component_container.dart';
 import 'package:adyen_checkout/src/components/component_flutter_api.dart';
 import 'package:adyen_checkout/src/components/component_platform_api.dart';
 import 'package:adyen_checkout/src/components/platform/android_platform_view.dart';
+import 'package:adyen_checkout/src/components/platform/component_container.dart';
 import 'package:adyen_checkout/src/components/platform/ios_platform_view.dart';
 import 'package:adyen_checkout/src/generated/platform_api.g.dart';
 import 'package:adyen_checkout/src/logging/adyen_logger.dart';
@@ -76,7 +76,7 @@ class _AdyenBaseComponentState extends State<AdyenBaseComponent> {
       ComponentFlutterInterface.pigeonChannelCodec;
   final ComponentPlatformApi _componentPlatformApi =
       ComponentPlatformApi.instance;
-  final GlobalKey _widgetKey = GlobalKey();
+  final GlobalKey _componentWidgetKey = GlobalKey();
   late Widget _componentWidget;
   final ComponentFlutterApi _componentFlutterApi = ComponentFlutterApi.instance;
 
@@ -95,8 +95,8 @@ class _AdyenBaseComponentState extends State<AdyenBaseComponent> {
 
   @override
   Widget build(BuildContext context) {
-    return AdyenComponentContainer(
-      widgetKey: _widgetKey,
+    return ComponentContainer(
+      componentWidgetKey: _componentWidgetKey,
       initialViewPortHeight: widget.initialViewHeight,
       viewportHeight: viewportHeight,
       componentWidget: _componentWidget,
@@ -128,7 +128,7 @@ class _AdyenBaseComponentState extends State<AdyenBaseComponent> {
           creationParams: widget.creationParams,
           gestureRecognizers: widget.gestureRecognizers,
           onPlatformViewCreated: _componentPlatformApi.updateViewHeight,
-          widgetKey: _widgetKey,
+          componentWidgetKey: _componentWidgetKey,
         );
       default:
         throw UnsupportedError('Unsupported platform');

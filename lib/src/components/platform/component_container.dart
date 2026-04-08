@@ -1,19 +1,11 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-<<<<<<<< HEAD:lib/src/components/card/adyen_component_container.dart
-class AdyenComponentContainer extends StatelessWidget {
-  const AdyenComponentContainer({
-    super.key,
-    required this.viewportHeight,
-    required this.widgetKey,
-========
 class ComponentContainer extends StatelessWidget {
   const ComponentContainer({
     super.key,
     required this.viewportHeight,
     required this.componentWidgetKey,
->>>>>>>> main:lib/src/components/platform/component_container.dart
     required this.initialViewPortHeight,
     required this.componentWidget,
   });
@@ -21,11 +13,7 @@ class ComponentContainer extends StatelessWidget {
   final double bottomSpacing = 8;
   final double initialViewPortHeight;
   final int? viewportHeight;
-<<<<<<<< HEAD:lib/src/components/card/adyen_component_container.dart
-  final Key widgetKey;
-========
   final Key componentWidgetKey;
->>>>>>>> main:lib/src/components/platform/component_container.dart
   final Widget componentWidget;
 
   @override
@@ -37,11 +25,7 @@ class ComponentContainer extends StatelessWidget {
           curve: Curves.fastOutSlowIn,
           opacity: viewportHeight != null ? 1 : 0,
           child: SizedBox(
-<<<<<<<< HEAD:lib/src/components/card/adyen_component_container.dart
-            key: widgetKey,
-========
             key: componentWidgetKey,
->>>>>>>> main:lib/src/components/platform/component_container.dart
             height: _determineHeight(viewportHeight),
             child: componentWidget,
           ),

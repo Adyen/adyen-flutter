@@ -3,10 +3,11 @@ package com.adyen.checkout.flutter
 import android.annotation.SuppressLint
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.lifecycleScope
+import com.adyen.checkout.components.core.PaymentMethodsApiResponse
 import com.adyen.checkout.core.common.CheckoutContext
 import com.adyen.checkout.core.components.Checkout
 import com.adyen.checkout.core.components.CheckoutConfiguration
-import com.adyen.checkout.core.components.data.model.paymentmethod.PaymentMethodsApiResponse
+import com.adyen.checkout.core.components.data.model.paymentmethod.PaymentMethods
 import com.adyen.checkout.core.old.AdyenLogLevel
 import com.adyen.checkout.core.old.AdyenLogger
 import com.adyen.checkout.flutter.apiOnly.AdyenCSE
@@ -89,14 +90,13 @@ class CheckoutPlatformApi(
     ) {
         activity.lifecycleScope.launch(Dispatchers.IO) {
             try {
-                val paymentMethods =
-                    PaymentMethodsApiResponse.SERIALIZER.deserialize(
+                val paymentMethods = PaymentMethods.SERIALIZER.deserialize(
                         org.json.JSONObject(paymentMethodsResponse)
                     )
                 val checkoutConfiguration = checkoutConfigurationDTO.toCheckoutConfiguration()
                 val checkoutResult =
                     Checkout.setup(
-                        paymentMethodsApiResponse = paymentMethods,
+                        paymentMethods = paymentMethods,
                         configuration = checkoutConfiguration
                     )
 
@@ -213,8 +213,8 @@ class CheckoutPlatformApi(
     ) {
         checkoutHolder.checkoutContext = checkoutSession
         val paymentMethodsJsonObject =
-            checkoutSession.checkoutSession.sessionSetupResponse.paymentMethodsApiResponse?.let {
-                PaymentMethodsApiResponse.SERIALIZER.serialize(it)
+            checkoutSession.checkoutSession.sessionSetupResponse.paymentMethods?.let {
+                PaymentMethods.SERIALIZER.serialize(it)
             }
         callback(
             Result.success(

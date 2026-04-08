@@ -2,6 +2,7 @@ package com.adyen.checkout.flutter.components.card
 
 import android.content.Context
 import androidx.fragment.app.FragmentActivity
+import com.adyen.checkout.flutter.components.ComponentPlatformEventHandler
 import com.adyen.checkout.flutter.generated.ComponentFlutterInterface
 import com.adyen.checkout.flutter.session.CheckoutHolder
 import io.flutter.plugin.platform.PlatformView
@@ -10,6 +11,7 @@ import io.flutter.plugin.platform.PlatformViewFactory
 internal class CardComponentFactory(
     private val activity: FragmentActivity,
     private val componentFlutterApi: ComponentFlutterInterface,
+    private val componentEventHandler: ComponentPlatformEventHandler,
     private val viewTypeId: String,
     private val onDispose: (String) -> Unit,
     private val setCurrentCardComponent: (BaseCardComponent) -> Unit,
@@ -32,6 +34,7 @@ internal class CardComponentFactory(
                     creationParams,
                     activity,
                     componentFlutterApi,
+                    componentEventHandler,
                     onDispose,
                     setCurrentCardComponent,
                     checkoutHolder
@@ -41,6 +44,7 @@ internal class CardComponentFactory(
                     creationParams,
                     activity,
                     componentFlutterApi,
+                    componentEventHandler,
                     onDispose,
                     setCurrentCardComponent
                 )

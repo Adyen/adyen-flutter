@@ -85,7 +85,7 @@ internal class AdyenComponentFactory(
                     PlatformCommunicationDTO(
                         type = ComponentCommunicationType.ON_SUBMIT,
                         componentId = componentId,
-                        dataJson = PaymentComponentData.SERIALIZER.serialize(state.data).toString()
+                        dataJson = PaymentComponentData.SERIALIZER.serialize(state).toString()
                     )
 
                 suspendCancellableCoroutine<CheckoutResult> { continuation ->

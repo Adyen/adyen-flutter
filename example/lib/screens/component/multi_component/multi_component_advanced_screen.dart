@@ -87,6 +87,7 @@ class MultiComponentAdvancedScreen extends StatelessWidget {
       configuration: blikConfiguration,
       paymentMethod: paymentMethod,
       checkout: AdvancedCheckout(
+        paymentMethods: paymentMethods,
         onSubmit: blikRepository.onSubmit,
         onAdditionalDetails: blikRepository.onAdditionalDetails,
       ),

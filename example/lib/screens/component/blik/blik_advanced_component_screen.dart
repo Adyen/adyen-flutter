@@ -43,6 +43,7 @@ class BlikAdvancedComponentScreen extends StatelessWidget {
                       configuration: blikConfiguration,
                       paymentMethod: paymentMethod,
                       checkout: AdvancedCheckout(
+                        paymentMethods: snapshot.data!,
                         onSubmit: repository.onSubmit,
                         onAdditionalDetails: repository.onAdditionalDetails,
                       ),

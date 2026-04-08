@@ -2,7 +2,8 @@ package com.adyen.checkout.flutter.components.blik
 
 import android.view.View
 import androidx.fragment.app.FragmentActivity
-import com.adyen.checkout.blik.BlikComponent
+import com.adyen.checkout.blik.old.BlikComponent
+import com.adyen.checkout.flutter.components.ComponentPlatformEventHandler
 import com.adyen.checkout.flutter.components.view.DynamicComponentView
 import com.adyen.checkout.flutter.generated.BlikComponentConfigurationDTO
 import com.adyen.checkout.flutter.generated.ComponentFlutterInterface
@@ -14,6 +15,7 @@ abstract class BaseBlikComponent(
     private val creationParams: Map<*, *>,
     private val activity: FragmentActivity,
     private val componentFlutterApi: ComponentFlutterInterface,
+    private val componentEventHandler: ComponentPlatformEventHandler,
     private val onDispose: (String) -> Unit,
     private val setCurrentBlikComponent: (BaseBlikComponent) -> Unit,
 ) : PlatformView {
@@ -26,7 +28,7 @@ abstract class BaseBlikComponent(
         creationParams[Constants.PAYMENT_METHOD_KEY] as String
     internal val componentId =
         creationParams[Constants.COMPONENT_ID_KEY] as String
-    private val dynamicComponentView = DynamicComponentView(activity, componentFlutterApi, componentId)
+    private val dynamicComponentView = DynamicComponentView(activity, componentId, componentEventHandler)
 
     override fun getView(): View = dynamicComponentView
 
@@ -37,7 +39,7 @@ abstract class BaseBlikComponent(
     }
 
     fun addComponent(blikComponent: BlikComponent) {
-        dynamicComponentView.addComponent(blikComponent, activity)
+//        dynamicComponentView.addComponent(blikComponent, activity)
     }
 
     fun setCurrentBlikComponent() = setCurrentBlikComponent(this)

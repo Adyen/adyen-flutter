@@ -43,10 +43,13 @@ class ComponentPlatformApi(
     private val adyenFlutterInterface: AdyenFlutterInterface,
     private val flutterPluginBinding: FlutterPlugin.FlutterPluginBinding?,
 ) : ComponentPlatformInterface {
+    private var platformEventHandler: ComponentPlatformEventHandler = ComponentPlatformEventHandler()
+
     private val cardComponentManager: CardComponentManager =
         CardComponentManager(
             activity,
             componentFlutterInterface,
+            platformEventHandler,
             flutterPluginBinding,
             checkoutHolder,
             ::onDispose,
@@ -56,8 +59,9 @@ class ComponentPlatformApi(
         BlikComponentManager(
             activity,
             componentFlutterInterface,
+            platformEventHandler,
             flutterPluginBinding,
-            sessionHolder,
+            checkoutHolder,
             ::onDispose,
             ::assignCurrentComponent
         )
@@ -75,7 +79,6 @@ class ComponentPlatformApi(
         ActionComponentManager(activity, componentFlutterInterface, ::assignCurrentComponent)
     private val intentListener = Consumer<Intent> { handleIntent(it) }
     private var currentComponent: ActionHandlingComponent? = null
-    private var platformEventHandler: ComponentPlatformEventHandler = ComponentPlatformEventHandler()
 
     init {
         cardComponentManager.registerComponentViewFactories()

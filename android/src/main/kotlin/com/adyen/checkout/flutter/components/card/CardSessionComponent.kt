@@ -1,14 +1,15 @@
 package com.adyen.checkout.flutter.components.card
 
 import androidx.fragment.app.FragmentActivity
-import com.adyen.checkout.card.CardComponentState
 import com.adyen.checkout.card.old.CardComponent
+import com.adyen.checkout.card.old.CardComponentState
 import com.adyen.checkout.components.core.PaymentMethod
 import com.adyen.checkout.components.core.StoredPaymentMethod
 import com.adyen.checkout.components.core.action.Action
+import com.adyen.checkout.core.old.Environment
+import com.adyen.checkout.flutter.components.ComponentPlatformEventHandler
 import com.adyen.checkout.flutter.components.base.ComponentSessionCallback
 import com.adyen.checkout.flutter.generated.ComponentFlutterInterface
-import com.adyen.checkout.flutter.session.toCheckoutSession
 import com.adyen.checkout.flutter.session.CheckoutHolder
 import com.adyen.checkout.sessions.core.CheckoutSession
 import com.adyen.checkout.sessions.core.SessionSetupResponse
@@ -19,65 +20,73 @@ internal class CardSessionComponent(
     private val creationParams: Map<*, *>,
     private val activity: FragmentActivity,
     private val componentFlutterApi: ComponentFlutterInterface,
+    private val componentEventHandler: ComponentPlatformEventHandler,
     private val onDispose: (String) -> Unit,
     private val setCurrentCardComponent: (BaseCardComponent) -> Unit,
     private val checkoutHolder: CheckoutHolder
-) : BaseCardComponent(creationParams, activity, componentFlutterApi, onDispose, setCurrentCardComponent) {
+) : BaseCardComponent(
+    creationParams,
+    activity,
+    componentFlutterApi,
+    componentEventHandler,
+    onDispose,
+    setCurrentCardComponent
+) {
     init {
         val sessionSetupResponse = SessionSetupResponse.SERIALIZER.deserialize(checkoutHolder.sessionSetupResponse)
         val checkoutSession =
             CheckoutSession(
                 sessionSetupResponse = sessionSetupResponse,
                 order = null,
-                environment = checkoutConfiguration.environment,
+                environment = Environment.TEST,
                 clientKey = checkoutConfiguration.clientKey
             )
-        cardComponent =
-            createCardComponent(checkoutSession).apply {
-                addComponent(this)
-            }
+//        cardComponent =
+//            createCardComponent(checkoutSession).apply {
+//                addComponent(this)
+//            }
     }
 
-    private fun createCardComponent(checkoutSession: CheckoutSession): CardComponent {
-        val paymentMethodJson = JSONObject(paymentMethodString)
-        when (isStoredPaymentMethod) {
-            true -> {
-                val storedPaymentMethod = StoredPaymentMethod.SERIALIZER.deserialize(paymentMethodJson)
-                return CardComponent.PROVIDER.get(
-                    activity = activity,
-                    checkoutSession = checkoutSession,
-                    storedPaymentMethod = storedPaymentMethod,
-                    checkoutConfiguration = checkoutConfiguration,
-                    componentCallback =
-                        ComponentSessionCallback<CardComponentState>(
-                            componentFlutterApi,
-                            componentId,
-                            ::onAction,
-                            ::setCurrentCardComponent,
-                        ),
-                    key = UUID.randomUUID().toString()
-                )
-            }
-
-            false -> {
-                val paymentMethod = determineCardPaymentMethod(paymentMethodJson)
-                return CardComponent.PROVIDER.get(
-                    activity = activity,
-                    checkoutSession = checkoutSession,
-                    paymentMethod = paymentMethod,
-                    checkoutConfiguration = checkoutConfiguration,
-                    componentCallback =
-                        ComponentSessionCallback<CardComponentState>(
-                            componentFlutterApi,
-                            componentId,
-                            ::onAction,
-                            ::setCurrentCardComponent,
-                        ),
-                    key = UUID.randomUUID().toString()
-                )
-            }
-        }
-    }
+//    private fun createCardComponent(checkoutSession: CheckoutSession): CardComponent {
+//        val paymentMethodJson = JSONObject(paymentMethodString)
+//        when (isStoredPaymentMethod) {
+//            true -> {
+//                val storedPaymentMethod = StoredPaymentMethod.SERIALIZER.deserialize(paymentMethodJson)
+//                return CardComponent.PROVIDER.get(
+//                    activity = activity,
+//                    checkoutSession = checkoutSession,
+//                    storedPaymentMethod = storedPaymentMethod,
+//                    checkoutConfiguration = checkoutConfiguration,
+//                    componentCallback =
+//                        ComponentSessionCallback<CardComponentState>(
+//                            componentFlutterApi,
+//                            componentId,
+//                            ::onAction,
+//                            ::setCurrentCardComponent,
+//                        ),
+//                    key = UUID.randomUUID().toString()
+//                )
+//            }
+//
+//            false -> {
+//                val paymentMethod = determineCardPaymentMethod(paymentMethodJson)
+//                return CardComponent.PROVIDER.get(
+//                    activity = activity,
+//                    checkoutSession = checkoutSession,
+//                    paymentMethod = paymentMethod,
+//                    checkoutConfiguration = checkoutConfiguration,
+//                    componentCallback =
+//                        ComponentSessionCallback<CardComponentState>(
+//                            componentFlutterApi,
+//                            componentId,
+//                            ::onAction,
+//                            ::setCurrentCardComponent,
+//                        ),
+//                    key = UUID.randomUUID().toString()
+//                )
+//            }
+//        }
+//    }
 
     private fun onAction(action: Action) = cardComponent?.handleAction(action, activity)
 

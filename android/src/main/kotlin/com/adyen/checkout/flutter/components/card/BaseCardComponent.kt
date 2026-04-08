@@ -2,7 +2,8 @@ package com.adyen.checkout.flutter.components.card
 
 import android.view.View
 import androidx.activity.ComponentActivity
-import com.adyen.checkout.card.CardComponent
+import com.adyen.checkout.card.old.CardComponent
+import com.adyen.checkout.flutter.components.ComponentPlatformEventHandler
 import com.adyen.checkout.flutter.components.view.DynamicComponentView
 import com.adyen.checkout.flutter.generated.BinLookupDataDTO
 import com.adyen.checkout.flutter.generated.CardComponentConfigurationDTO
@@ -17,6 +18,7 @@ abstract class BaseCardComponent(
     private val creationParams: Map<*, *>,
     private val activity: ComponentActivity,
     private val componentFlutterApi: ComponentFlutterInterface,
+    private val componentEventHandler: ComponentPlatformEventHandler,
     private val onDispose: (String) -> Unit,
     private val setCurrentCardComponent: (BaseCardComponent) -> Unit,
 ) : PlatformView {
@@ -29,7 +31,7 @@ abstract class BaseCardComponent(
     internal val componentId =
         creationParams[Constants.COMPONENT_ID_KEY] as String
     internal val isStoredPaymentMethod = creationParams[IS_STORED_PAYMENT_METHOD_KEY] as Boolean? ?: false
-    private val dynamicComponentView = DynamicComponentView(activity, componentFlutterApi, componentId)
+    private val dynamicComponentView = DynamicComponentView(activity, componentId, componentEventHandler)
 
     override fun getView(): View = dynamicComponentView
 
@@ -42,7 +44,7 @@ abstract class BaseCardComponent(
     fun addComponent(cardComponent: CardComponent) {
         setOnBinLookupListener(cardComponent)
         setOnBinValueListener(cardComponent)
-        dynamicComponentView.addComponent(cardComponent, activity)
+//        dynamicComponentView.addComponent(cardComponent, activity)
     }
 
     fun setCurrentCardComponent() = setCurrentCardComponent(this)

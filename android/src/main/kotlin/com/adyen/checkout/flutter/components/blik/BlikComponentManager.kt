@@ -2,15 +2,17 @@ package com.adyen.checkout.flutter.components.blik
 
 import androidx.fragment.app.FragmentActivity
 import com.adyen.checkout.action.core.internal.ActionHandlingComponent
+import com.adyen.checkout.flutter.components.ComponentPlatformEventHandler
 import com.adyen.checkout.flutter.generated.ComponentFlutterInterface
-import com.adyen.checkout.flutter.session.SessionHolder
+import com.adyen.checkout.flutter.session.CheckoutHolder
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 
 internal class BlikComponentManager(
     private val activity: FragmentActivity,
     private val componentFlutterInterface: ComponentFlutterInterface,
+    private val componentEventHandler: ComponentPlatformEventHandler,
     private val flutterPluginBinding: FlutterPlugin.FlutterPluginBinding?,
-    private val sessionHolder: SessionHolder?,
+    private val checkoutHolder: CheckoutHolder?,
     private val onDispose: (String) -> Unit,
     private val assignCurrentComponent: (ActionHandlingComponent?) -> Unit,
 ) {
@@ -20,6 +22,7 @@ internal class BlikComponentManager(
             BlikComponentFactory(
                 activity,
                 componentFlutterInterface,
+                componentEventHandler,
                 BlikComponentFactory.BLIK_COMPONENT_ADVANCED,
                 onDispose,
                 ::setCurrentBlikComponent,
@@ -32,10 +35,11 @@ internal class BlikComponentManager(
             BlikComponentFactory(
                 activity,
                 componentFlutterInterface,
+                componentEventHandler,
                 BlikComponentFactory.BLIK_COMPONENT_SESSION,
                 onDispose,
                 ::setCurrentBlikComponent,
-                sessionHolder,
+                checkoutHolder,
             ),
         )
     }
