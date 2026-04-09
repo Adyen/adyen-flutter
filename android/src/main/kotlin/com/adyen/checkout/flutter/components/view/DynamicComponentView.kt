@@ -6,13 +6,17 @@ import android.view.ViewGroup
 import android.view.ViewTreeObserver
 import android.widget.FrameLayout
 import androidx.activity.ComponentActivity
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.appcompat.widget.SwitchCompat
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.core.content.ContextCompat
 import androidx.core.view.children
 import androidx.core.view.postDelayed
-import com.adyen.checkout.card.old.CardComponent
+import androidx.navigationevent.NavigationEventDispatcherOwner
+import androidx.navigationevent.compose.LocalNavigationEventDispatcherOwner
+import androidx.navigationevent.compose.rememberNavigationEventDispatcherOwner
+import androidx.navigationevent.findViewTreeNavigationEventDispatcherOwner
 import com.adyen.checkout.components.core.internal.ButtonComponent
 import com.adyen.checkout.components.core.internal.Component
 import com.adyen.checkout.core.common.CheckoutContext
@@ -22,7 +26,6 @@ import com.adyen.checkout.core.components.data.model.paymentmethod.PaymentMethod
 import com.adyen.checkout.flutter.components.ComponentPlatformEventHandler
 import com.adyen.checkout.flutter.generated.ComponentCommunicationModel
 import com.adyen.checkout.flutter.generated.ComponentCommunicationType
-import com.adyen.checkout.flutter.generated.ComponentFlutterInterface
 import com.adyen.checkout.ui.core.old.AdyenComponentView
 import com.adyen.checkout.ui.core.old.internal.ui.ViewableComponent
 import com.google.android.material.button.MaterialButton
@@ -78,17 +81,38 @@ class DynamicComponentView
             checkoutContext: CheckoutContext,
             callbacks: CheckoutCallbacks
         ) {
+            val navigationEventDispatcherOwner =
+                (context as? ComponentActivity)
+                    ?.window
+                    ?.decorView
+                    ?.findViewTreeNavigationEventDispatcherOwner()
+
             addView(
                 ComposeView(context).apply {
                     setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
                     setContent {
-                        AdyenPaymentFlow(
-                            paymentMethod = paymentMethod,
-                            checkoutContext = checkoutContext,
-                            checkoutCallbacks = callbacks
-                        )
+                        ProvideNavigationEventDispatcherOwner(navigationEventDispatcherOwner) {
+                            AdyenPaymentFlow(
+                                paymentMethod = paymentMethod,
+                                checkoutContext = checkoutContext,
+                                checkoutCallbacks = callbacks
+                            )
+                        }
                     }
                 }
+            )
+        }
+
+        @androidx.compose.runtime.Composable
+        private fun ProvideNavigationEventDispatcherOwner(
+            parentOwner: NavigationEventDispatcherOwner?,
+            content: @androidx.compose.runtime.Composable () -> Unit
+        ) {
+            val navigationEventDispatcherOwner =
+                rememberNavigationEventDispatcherOwner(parent = parentOwner)
+            CompositionLocalProvider(
+                LocalNavigationEventDispatcherOwner provides navigationEventDispatcherOwner,
+                content = content
             )
         }
 
