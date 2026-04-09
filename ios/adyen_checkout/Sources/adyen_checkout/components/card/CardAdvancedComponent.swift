@@ -13,10 +13,9 @@ import Foundation
 
 class CardAdvancedComponent: BaseCardComponent, AdvancedComponentProtocol {
     private var actionComponentDelegate: ActionComponentDelegate?
-    private var actionComponent: CheckoutActionComponent?
     private var presentationDelegate: PresentationDelegate?
     private var componentDelegate: PaymentComponentDelegate?
-    private(set) var actionComponent: AdyenActionComponent?
+    private(set) var actionComponent: CheckoutActionComponent?
 
     override init(
         frame: CGRect,
@@ -119,7 +118,7 @@ class CardAdvancedComponent: BaseCardComponent, AdvancedComponentProtocol {
     }
 
     func stopLoadingOnError() {
-        cardComponent?.stopLoadingIfNeeded()
+        return
     }
 
     override func onDispose() {

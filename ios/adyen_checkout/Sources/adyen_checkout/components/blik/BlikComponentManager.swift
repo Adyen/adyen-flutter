@@ -6,6 +6,7 @@ class BlikComponentManager: BasePlatformViewManager<BaseBlikComponent> {
         static let blikSessionComponentId = "BLIK_SESSION_COMPONENT"
     }
 
+    @MainActor
     func handlePaymentEvent(paymentEventDTO: PaymentEventDTO) {
         if let currentComponent = currentBaseComponent as? AdvancedComponentProtocol {
             currentComponent.handlePaymentEvent(paymentEventDTO: paymentEventDTO)

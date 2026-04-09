@@ -23,7 +23,7 @@ class ApplePaySessionComponent: BaseApplePayComponent {
     
     override func present() {
         if let applePayComponent {
-            (sessionHolder.sessionDelegate as? ComponentSessionFlowHandler)?.setCurrentFlow(componentId: componentId)
+            (checkoutHolder.sessionDelegate as? ComponentSessionFlowHandler)?.setCurrentFlow(componentId: componentId)
             getViewController()?.present(component: applePayComponent)
         }
     }

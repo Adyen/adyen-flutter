@@ -4,17 +4,17 @@ class BlikComponentFactory: ComponentFactory {
     static let blikComponentAdvancedId = "blikComponentAdvanced"
     static let blikComponentSessionId = "blikComponentSession"
     let viewTypeId: String
-    let sessionHolder: SessionHolder?
+    let checkoutHolder: CheckoutHolder?
 
     init(
         messenger: FlutterBinaryMessenger,
         componentFlutterApi: ComponentFlutterInterface,
         componentPlatformApi: ComponentPlatformApi,
         viewTypeId: String,
-        sessionHolder: SessionHolder? = nil
+        checkoutHolder: CheckoutHolder? = nil
     ) {
         self.viewTypeId = viewTypeId
-        self.sessionHolder = sessionHolder
+        self.checkoutHolder = checkoutHolder
         super.init(
             messenger: messenger,
             componentFlutterApi: componentFlutterApi,
@@ -27,7 +27,7 @@ class BlikComponentFactory: ComponentFactory {
         viewIdentifier viewId: Int64,
         arguments args: Any?
     ) -> FlutterPlatformView {
-        if viewTypeId == BlikComponentFactory.blikComponentSessionId, let sessionHolder {
+        if viewTypeId == BlikComponentFactory.blikComponentSessionId, let checkoutHolder {
             return BlikSessionComponent(
                 frame: frame,
                 viewIdentifier: viewId,
@@ -35,7 +35,7 @@ class BlikComponentFactory: ComponentFactory {
                 binaryMessenger: messenger,
                 componentFlutterApi: componentFlutterApi,
                 componentPlatformApi: componentPlatformApi,
-                sessionHolder: sessionHolder
+                checkoutHolder: checkoutHolder
             )
         } else {
             return BlikAdvancedComponent(

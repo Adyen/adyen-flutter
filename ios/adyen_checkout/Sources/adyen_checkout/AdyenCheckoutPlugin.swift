@@ -58,7 +58,7 @@ public class AdyenCheckoutPlugin: NSObject, FlutterPlugin {
             componentFlutterApi: componentFlutterApi,
             componentPlatformApi: componentPlatformApi,
             viewTypeId: BlikComponentFactory.blikComponentSessionId,
-            sessionHolder: sessionHolder
+            checkoutHolder: checkoutHolder
         )
         registrar.register(blikComponentSessionFactory, withId: BlikComponentFactory.blikComponentSessionId)
 

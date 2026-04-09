@@ -6,6 +6,7 @@ class CardComponentManager: BasePlatformViewManager<BaseCardComponent> {
         static let cardSessionComponentId = "CARD_SESSION_COMPONENT"
     }
 
+    @MainActor
     func handlePaymentEvent(paymentEventDTO: PaymentEventDTO) {
         if let currentComponent = currentBaseComponent as? AdvancedComponentProtocol {
             currentComponent.handlePaymentEvent(paymentEventDTO: paymentEventDTO)

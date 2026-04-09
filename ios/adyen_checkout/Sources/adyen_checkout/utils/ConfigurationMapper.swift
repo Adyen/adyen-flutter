@@ -223,9 +223,9 @@ extension BlikComponentConfigurationDTO {
         )
     }
 
-    func mapToBlikComponentConfiguration() -> BLIKComponent.Configuration {
+    func mapToBlikComponentConfiguration() -> BLIKComponentConfiguration {
         let localizationParameters = shopperLocale.map { LocalizationParameters(enforcedLocale: $0) }
-        return BLIKComponent.Configuration(
+        return BLIKComponentConfiguration(
             style: AdyenAppearance.blikComponentStyle,
             localizationParameters: localizationParameters
         )
@@ -237,17 +237,17 @@ extension Environment {
         switch self {
         case .test:
             return Adyen.Environment.test
-        case .europe:
+        case .liveEurope:
             return .liveEurope
-        case .unitedStates:
+        case .liveUnitedStates:
             return .liveUnitedStates
-        case .australia:
+        case .liveAustralia:
             return .liveAustralia
-        case .india:
+        case .liveIndia:
             return .liveIndia
-        case .apse:
+        case .liveApse:
             return .liveApse
-        case .nea:
+        case .liveNea:
             return .liveNea
         }
     }

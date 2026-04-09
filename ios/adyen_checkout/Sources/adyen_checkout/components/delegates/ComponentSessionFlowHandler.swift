@@ -10,7 +10,7 @@ import Adyen
     import AdyenSession
 #endif
 
-class ComponentSessionFlowHandler: AdyenSessionDelegate {
+class ComponentSessionFlowHandler: SessionDelegate {
     private let componentFlutterApi: ComponentFlutterInterface
     private var componentRegistrations: [String: ComponentRegistration] = [:]
     private var currentFlowRegistration: ComponentRegistration?
@@ -40,17 +40,8 @@ class ComponentSessionFlowHandler: AdyenSessionDelegate {
         currentFlowRegistration = nil
     }
 
-    func handlerForPayments(in component: PaymentComponent, session: AdyenSession) -> AdyenSessionPaymentsHandler? {
-        guard let componentId = sessionComponentId(for: component) else {
-            currentFlowRegistration = nil
-            return nil
-        }
-        setCurrentFlow(componentId: componentId)
-        return nil
-    }
-
-    func didComplete(with result: CheckoutResult, component _: Component, session: Session) {
-        guard let registration = currentFlowRegistration else { return }
+    func didComplete(with result: CheckoutResult, component: Component, session: Session) {
+        guard let registration = registration(for: component) else { return }
         let resultCode = result.resultCode
         let success = resultCode == .authorised || resultCode == .received || resultCode == .pending
         registration.finalizeCallback(success) { [weak self] in
@@ -75,7 +66,7 @@ class ComponentSessionFlowHandler: AdyenSessionDelegate {
     }
     
     func didFail(with error: Error, from component: Component, session: Session) {
-        guard let registration = currentFlowRegistration else { return }
+        guard let registration = registration(for: component) else { return }
         registration.finalizeCallback(false) { [weak self] in
             guard let self else { return }
             let componentCommunicationModel = ComponentCommunicationModel(
@@ -91,6 +82,17 @@ class ComponentSessionFlowHandler: AdyenSessionDelegate {
                 completion: { _ in }
             )
         }
+    }
+
+    private func registration(for component: Component) -> ComponentRegistration? {
+        if let paymentComponent = component as? PaymentComponent,
+           let componentId = sessionComponentId(for: paymentComponent),
+           let registration = componentRegistrations[componentId] {
+            currentFlowRegistration = registration
+            return registration
+        }
+
+        return currentFlowRegistration
     }
 
     private func sessionComponentId(for component: PaymentComponent) -> String? {

@@ -67,7 +67,6 @@ class BaseBlikComponent: BasePlatformViewComponent {
     }
 
     override func onDispose() {
-        blikComponent?.cancelIfNeeded()
         blikComponent = nil
     }
 

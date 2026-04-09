@@ -16,7 +16,7 @@ class BaseCardComponent: BasePlatformViewComponent {
     let isStoredPaymentMethod: Bool
     let storedCardComponentAdditionalHeight = 256.0
     let paymentMethod: String?
-    var cardComponent: CardComponent?
+    var cardComponent: CheckoutPaymentComponent?
     var contentOffset: CGPoint?
 
     init(
@@ -106,12 +106,11 @@ class BaseCardComponent: BasePlatformViewComponent {
     }
 
     override func onDispose() {
-        cardComponent?.cancelIfNeeded()
         cardComponent = nil
     }
 
     override func componentViewPreferredContentHeight() -> CGFloat? {
-        cardComponent?.viewController.preferredContentSize.height
+        cardComponent?.viewController?.preferredContentSize.height
     }
 
     override func additionalViewportSpace() -> CGFloat {

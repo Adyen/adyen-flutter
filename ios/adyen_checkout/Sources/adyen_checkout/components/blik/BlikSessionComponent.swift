@@ -8,7 +8,7 @@
 import Flutter
 
 class BlikSessionComponent: BaseBlikComponent {
-    let sessionHolder: SessionHolder
+    let checkoutHolder: CheckoutHolder
 
     init(
         frame: CGRect,
@@ -17,9 +17,9 @@ class BlikSessionComponent: BaseBlikComponent {
         binaryMessenger: FlutterBinaryMessenger,
         componentFlutterApi: ComponentFlutterInterface,
         componentPlatformApi: ComponentPlatformApi,
-        sessionHolder: SessionHolder
+        checkoutHolder: CheckoutHolder
     ) {
-        self.sessionHolder = sessionHolder
+        self.checkoutHolder = checkoutHolder
         super.init(
             frame: frame,
             viewIdentifier: viewIdentifier,
@@ -44,7 +44,7 @@ class BlikSessionComponent: BaseBlikComponent {
     }
 
     private func setupBlikComponent() throws -> BLIKComponent {
-        guard let session = sessionHolder.session else { throw PlatformError(errorDescription: "Session not found") }
+        guard let session = checkoutHolder.session else { throw PlatformError(errorDescription: "Session not found") }
         return try buildBlikComponent(
             paymentMethodString: paymentMethod,
             blikComponentConfiguration: blikComponentConfiguration,
@@ -53,7 +53,7 @@ class BlikSessionComponent: BaseBlikComponent {
     }
 
     private func setupSessionFlowDelegate() {
-        if let componentSessionFlowDelegate = (sessionHolder.sessionDelegate as? ComponentSessionFlowHandler) {
+        if let componentSessionFlowDelegate = (checkoutHolder.sessionDelegate as? ComponentSessionFlowHandler) {
             componentSessionFlowDelegate.register(
                 componentId: componentId,
                 finalizeCallback: { [weak self] success, completion in
@@ -61,7 +61,7 @@ class BlikSessionComponent: BaseBlikComponent {
                 }
             )
         } else {
-            AdyenAssertion.assertionFailure(message: "Wrong session flow delegate usage")
+            assertionFailure("Wrong session flow delegate usage")
         }
     }
 

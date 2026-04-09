@@ -54,7 +54,7 @@ import UIKit
     }
 
     private func setBlikComponentStyle() {
-        var blikComponentStyle = Adyen.FormComponentStyle()
+        var blikComponentStyle = AdyenUI.FormComponentStyle()
         blikComponentStyle.mainButtonItem.button.backgroundColor = UIColor(named: "PrimaryBackground") ?? .black
         blikComponentStyle.mainButtonItem.button.title.color = UIColor(named: "PrimaryTitle") ?? .white
         blikComponentStyle.textField.tintColor = UIColor(named: "PrimaryBackground") ?? .black

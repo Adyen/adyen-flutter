@@ -51,21 +51,21 @@ class CardSessionComponent: BaseCardComponent {
         }
     }
 
-//      private func setupSessionFlowDelegate() {
-//             if let componentSessionFlowDelegate = (sessionHolder.sessionDelegate as? ComponentSessionFlowHandler) {
-//                 componentSessionFlowDelegate.register(
-//                     componentId: componentId,
-//                     finalizeCallback: { [weak self] success, completion in
-//                         self?.finalizeAndDismissSessionComponent(success: success, completion: completion)
-//                     }
-//                 )
-//                 if isStoredPaymentMethod {
-//                     componentSessionFlowDelegate.setCurrentFlow(componentId: componentId)
-//                 }
-//             } else {
-//                 AdyenAssertion.assertionFailure(message: "Wrong session flow delegate usage")
-//             }
-//         }
+    private func setupSessionFlowDelegate() {
+        if let componentSessionFlowDelegate = (checkoutHolder.sessionDelegate as? ComponentSessionFlowHandler) {
+            componentSessionFlowDelegate.register(
+                componentId: componentId,
+                finalizeCallback: { [weak self] success, completion in
+                    self?.finalizeAndDismissSessionComponent(success: success, completion: completion)
+                }
+            )
+            if isStoredPaymentMethod {
+                componentSessionFlowDelegate.setCurrentFlow(componentId: componentId)
+            }
+        } else {
+            assertionFailure("Wrong session flow delegate usage")
+        }
+    }
 
     func finalizeAndDismissSessionComponent(success: Bool, completion: @escaping (() -> Void)) {
         finalizeAndDismiss(success: success, completion: { [weak self] in

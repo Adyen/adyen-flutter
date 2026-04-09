@@ -4,13 +4,15 @@ import Foundation
     import AdyenActions
 #endif
 
+@MainActor
 protocol AdvancedComponentProtocol: BasePlatformViewComponent {
-    var actionComponent: AdyenActionComponent? { get }
+    var actionComponent: CheckoutActionComponent? { get }
 
     func finalizeAndDismiss(success: Bool, completion: @escaping (() -> Void))
     func stopLoadingOnError()
 }
 
+@MainActor
 extension AdvancedComponentProtocol {
     func handlePaymentEvent(paymentEventDTO: PaymentEventDTO) {
         switch paymentEventDTO.paymentEventType {

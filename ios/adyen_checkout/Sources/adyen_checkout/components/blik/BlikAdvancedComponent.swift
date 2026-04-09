@@ -11,7 +11,7 @@ import Foundation
 class BlikAdvancedComponent: BaseBlikComponent, AdvancedComponentProtocol {
     private var actionComponentDelegate: ActionComponentDelegate?
     private var componentDelegate: PaymentComponentDelegate?
-    private(set) var actionComponent: AdyenActionComponent?
+    private(set) var actionComponent: CheckoutActionComponent?
 
     override init(
         frame: CGRect,
@@ -41,7 +41,7 @@ class BlikAdvancedComponent: BaseBlikComponent, AdvancedComponentProtocol {
     private func setupBlikComponentView() {
         do {
             let blikComponent = try setupBlikComponent()
-            actionComponent = AdyenActionComponent(context: blikComponent.context)
+            actionComponent = CheckoutActionComponent(context: blikComponent.context)
             actionComponent?.delegate = actionComponentDelegate
             actionComponent?.presentationDelegate = getViewController()
             showBlikComponent(blikComponent: blikComponent)
@@ -64,7 +64,7 @@ class BlikAdvancedComponent: BaseBlikComponent, AdvancedComponentProtocol {
     }
 
     func stopLoadingOnError() {
-        blikComponent?.stopLoadingIfNeeded()
+        blikComponent?.stopLoading()
     }
 
     override func onDispose() {
