@@ -1,4 +1,3 @@
-@_spi(AdyenInternal) import Adyen
 import Foundation
 import UIKit
 
@@ -11,6 +10,7 @@ import UIKit
 #if canImport(AdyenActions)
     import AdyenActions
 #endif
+@_spi(AdyenInternal) import Adyen
 
 // TODO: Add config:
 // 1) Add Info.plist for adding photo library usage description
@@ -44,8 +44,7 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
             case let dropInConfigurationDTO as DropInConfigurationDTO:
                 try createSessionForDropIn(
                     adyenContext: dropInConfigurationDTO.createAdyenContext(),
-                    actionComponentConfiguration: dropInConfigurationDTO.threeDS2ConfigurationDTO?
-                        .buildActionComponentConfiguration(),
+                    actionComponentConfiguration: dropInConfigurationDTO.threeDS2ConfigurationDTO?.buildActionComponentConfiguration(),
                     sessionId: sessionId,
                     sessionData: sessionData,
                     completion: completion
@@ -53,8 +52,7 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
             case let cardComponentConfigurationDTO as CardComponentConfigurationDTO:
                 try createSessionForComponent(
                     adyenContext: cardComponentConfigurationDTO.createAdyenContext(),
-                    actionComponentConfiguration: cardComponentConfigurationDTO.threeDS2ConfigurationDTO?
-                        .buildActionComponentConfiguration(),
+                    actionComponentConfiguration: cardComponentConfigurationDTO.threeDS2ConfigurationDTO?.buildActionComponentConfiguration(),
                     sessionId: sessionId,
                     sessionData: sessionData,
                     completion: completion
@@ -80,64 +78,44 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
             completion(Result.failure(error))
         }
     }
-
+    
     func clearSession() {
         sessionHolder.reset()
     }
 
     func getReturnUrl(completion: @escaping (Result<String, Error>) -> Void) {
-        completion(
-            Result.failure(
-                PlatformError(errorDescription: "Please use your app url type instead of this method.")
-            )
-        )
+        completion(Result.failure(PlatformError(errorDescription: "Please use your app url type instead of this method.")))
     }
 
     func enableConsoleLogging(loggingEnabled: Bool) {
         AdyenLogging.isEnabled = loggingEnabled
     }
-
-    func encryptCard(
-        unencryptedCardDTO: UnencryptedCardDTO, publicKey: String,
-        completion: @escaping (Result<EncryptedCardDTO, any Error>) -> Void
-    ) {
-        let encryptedCardResult = adyenCse.encryptCard(
-            unencryptedCardDTO: unencryptedCardDTO, publicKey: publicKey
-        )
+    
+    func encryptCard(unencryptedCardDTO: UnencryptedCardDTO, publicKey: String, completion: @escaping (Result<EncryptedCardDTO, any Error>) -> Void) {
+        let encryptedCardResult = adyenCse.encryptCard(unencryptedCardDTO: unencryptedCardDTO, publicKey: publicKey)
         completion(encryptedCardResult)
     }
-
-    func encryptBin(
-        bin: String, publicKey: String, completion: @escaping (Result<String, any Error>) -> Void
-    ) {
+    
+    func encryptBin(bin: String, publicKey: String, completion: @escaping (Result<String, any Error>) -> Void) {
         let encryptedBinResult = adyenCse.encryptBin(bin: bin, publicKey: publicKey)
         completion(encryptedBinResult)
     }
-
-    func validateCardNumber(cardNumber: String, enableLuhnCheck: Bool) throws
-        -> CardNumberValidationResultDTO {
-        let validationResult = CardValidation().validateCardNumber(
-            cardNumber: cardNumber, enableLuhnCheck: enableLuhnCheck
-        )
+    
+    func validateCardNumber(cardNumber: String, enableLuhnCheck: Bool) throws -> CardNumberValidationResultDTO {
+        let validationResult = CardValidation().validateCardNumber(cardNumber: cardNumber, enableLuhnCheck: enableLuhnCheck)
         return validationResult ? .valid : .invalidOtherReason
     }
-
-    func validateCardExpiryDate(expiryMonth: String, expiryYear: String) throws
-        -> CardExpiryDateValidationResultDTO {
-        let validationResult = CardValidation().validateCardExpiryDate(
-            expiryMonth: expiryMonth, expiryYear: expiryYear
-        )
+    
+    func validateCardExpiryDate(expiryMonth: String, expiryYear: String) throws -> CardExpiryDateValidationResultDTO {
+        let validationResult = CardValidation().validateCardExpiryDate(expiryMonth: expiryMonth, expiryYear: expiryYear)
         return validationResult ? .valid : .invalidOtherReason
     }
-
-    func validateCardSecurityCode(securityCode: String, cardBrand: String?) throws
-        -> CardSecurityCodeValidationResultDTO {
-        let validationResult = CardValidation().validateCardSecurityCode(
-            securityCode: securityCode, cardBrand: cardBrand
-        )
+    
+    func validateCardSecurityCode(securityCode: String, cardBrand: String?) throws -> CardSecurityCodeValidationResultDTO {
+        let validationResult = CardValidation().validateCardSecurityCode(securityCode: securityCode, cardBrand: cardBrand)
         return validationResult ? .valid : .invalid
     }
-
+    
     func getThreeDS2SdkVersion() throws -> String {
         threeDS2SdkVersion
     }
@@ -149,9 +127,7 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
         sessionData: String,
         completion: @escaping (Result<SessionDTO, Error>) -> Void
     ) throws {
-        let sessionDelegate = DropInSessionsDelegate(
-            viewController: getViewController(), checkoutFlutter: checkoutFlutter
-        )
+        let sessionDelegate = DropInSessionsDelegate(viewController: getViewController(), checkoutFlutter: checkoutFlutter)
         try requestAndSetSession(
             adyenContext: adyenContext,
             sessionId: sessionId,
@@ -191,7 +167,7 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
         guard let presentationDelegate = getViewController() else {
             throw PlatformError(errorDescription: "Host view controller not available.")
         }
-
+        
         let sessionConfiguration = AdyenSession.Configuration(
             sessionIdentifier: sessionId,
             initialSessionData: sessionData,
@@ -210,26 +186,16 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
                         session: session,
                         sessionDelegate: sessionDelegate
                     )
-                    let encodedPaymentMethods = try JSONEncoder().encode(
-                        session.sessionContext.paymentMethods
-                    )
-                    guard
-                        let encodedPaymentMethodsString = String(data: encodedPaymentMethods, encoding: .utf8)
-                    else {
-                        completion(
-                            Result.failure(PlatformError(errorDescription: "Encoding payment methods failed"))
-                        )
+                    let encodedPaymentMethods = try JSONEncoder().encode(session.sessionContext.paymentMethods)
+                    guard let encodedPaymentMethodsString = String(data: encodedPaymentMethods, encoding: .utf8) else {
+                        completion(Result.failure(PlatformError(errorDescription: "Encoding payment methods failed")))
                         return
                     }
-                    completion(
-                        Result.success(
-                            SessionDTO(
-                                id: sessionId,
-                                sessionData: sessionData,
-                                paymentMethodsJson: encodedPaymentMethodsString
-                            )
-                        )
-                    )
+                    completion(Result.success(SessionDTO(
+                        id: sessionId,
+                        sessionData: sessionData,
+                        paymentMethodsJson: encodedPaymentMethodsString
+                    )))
                 case let .failure(error):
                     completion(Result.failure(error))
                 }

@@ -1,6 +1,5 @@
 @_spi(AdyenInternal) import Adyen
 import PassKit
-
 #if canImport(AdyenComponents)
     import AdyenComponents
 #endif
@@ -30,13 +29,10 @@ extension DropInConfigurationDTO {
             allowPreselectedPaymentView: showPreselectedStoredPaymentMethod
         )
 
-        dropInConfiguration.paymentMethodsList.allowDisablingStoredPaymentMethods =
-            isRemoveStoredPaymentMethodEnabled
+        dropInConfiguration.paymentMethodsList.allowDisablingStoredPaymentMethods = isRemoveStoredPaymentMethodEnabled
 
         if let shopperLocal = shopperLocale {
-            dropInConfiguration.localizationParameters = LocalizationParameters(
-                enforcedLocale: shopperLocal
-            )
+            dropInConfiguration.localizationParameters = LocalizationParameters(enforcedLocale: shopperLocal)
         }
 
         if let cardConfigurationDTO {
@@ -44,26 +40,19 @@ extension DropInConfigurationDTO {
         }
 
         if let applePayConfigurationDTO {
-            dropInConfiguration.applePay = try applePayConfigurationDTO.toApplePayConfiguration(
-                payment: payment
-            )
+            dropInConfiguration.applePay = try applePayConfigurationDTO.toApplePayConfiguration(payment: payment)
         }
 
         if let cashAppPayConfigurationDTO {
-            dropInConfiguration.cashAppPay = DropInComponent.CashAppPay(
-                redirectURL: URL(string: cashAppPayConfigurationDTO.returnUrl)!
-            )
+            dropInConfiguration.cashAppPay = DropInComponent.CashAppPay(redirectURL: URL(string: cashAppPayConfigurationDTO.returnUrl)!)
         }
 
         if let twintConfigurationDTO {
-            dropInConfiguration.actionComponent.twint = .init(
-                callbackAppScheme: twintConfigurationDTO.iosCallbackAppScheme
-            )
+            dropInConfiguration.actionComponent.twint = .init(callbackAppScheme: twintConfigurationDTO.iosCallbackAppScheme)
         }
 
         if let threeDS2ConfigurationDTO {
-            dropInConfiguration.actionComponent.threeDS =
-                threeDS2ConfigurationDTO.mapToThreeDS2Configuration()
+            dropInConfiguration.actionComponent.threeDS = threeDS2ConfigurationDTO.mapToThreeDS2Configuration()
         }
 
         dropInConfiguration.style = AdyenAppearance.dropInStyle
@@ -73,19 +62,11 @@ extension DropInConfigurationDTO {
 
     private func buildCard(from cardConfigurationDTO: CardConfigurationDTO) -> DropInComponent.Card {
         let koreanAuthenticationMode = cardConfigurationDTO.kcpFieldVisibility.toCardFieldVisibility()
-        let socialSecurityNumberMode = cardConfigurationDTO.socialSecurityNumberFieldVisibility
-            .toCardFieldVisibility()
-        let storedCardConfiguration = createStoredCardConfiguration(
-            showCvcForStoredCard: cardConfigurationDTO.showCvcForStoredCard
-        )
-        let allowedCardTypes = determineAllowedCardTypes(
-            cardTypes: cardConfigurationDTO.supportedCardTypes
-        )
-        let billingAddressConfiguration = determineBillingAddressConfiguration(
-            addressMode: cardConfigurationDTO.addressMode
-        )
-        let installmentConfiguration = cardConfigurationDTO.installmentConfiguration?
-            .mapToInstallmentConfiguration()
+        let socialSecurityNumberMode = cardConfigurationDTO.socialSecurityNumberFieldVisibility.toCardFieldVisibility()
+        let storedCardConfiguration = createStoredCardConfiguration(showCvcForStoredCard: cardConfigurationDTO.showCvcForStoredCard)
+        let allowedCardTypes = determineAllowedCardTypes(cardTypes: cardConfigurationDTO.supportedCardTypes)
+        let billingAddressConfiguration = determineBillingAddressConfiguration(addressMode: cardConfigurationDTO.addressMode)
+        let installmentConfiguration = cardConfigurationDTO.installmentConfiguration?.mapToInstallmentConfiguration()
         return DropInComponent.Card(
             showsHolderNameField: cardConfigurationDTO.holderNameRequired,
             showsStorePaymentMethodField: cardConfigurationDTO.showStorePaymentField,
@@ -113,8 +94,7 @@ extension DropInConfigurationDTO {
         return mappedCardTypes.compactMap { $0 }.map { CardType(rawValue: $0.lowercased()) }
     }
 
-    private func determineBillingAddressConfiguration(addressMode: AddressMode?)
-        -> BillingAddressConfiguration {
+    private func determineBillingAddressConfiguration(addressMode: AddressMode?) -> BillingAddressConfiguration {
         var billingAddressConfiguration = BillingAddressConfiguration()
         switch addressMode {
         case .full:
@@ -158,13 +138,10 @@ extension DropInConfigurationDTO {
 extension CardConfigurationDTO {
     func mapToCardComponentConfiguration(shopperLocale: String?) -> CardComponent.Configuration {
         let cardComponentStyle = AdyenAppearance.cardComponentStyle
-        let localizationParameters =
-            shopperLocale != nil ? LocalizationParameters(enforcedLocale: shopperLocale!) : nil
+        let localizationParameters = shopperLocale != nil ? LocalizationParameters(enforcedLocale: shopperLocale!) : nil
         let koreanAuthenticationMode = kcpFieldVisibility.toCardFieldVisibility()
         let socialSecurityNumberMode = socialSecurityNumberFieldVisibility.toCardFieldVisibility()
-        let storedCardConfiguration = createStoredCardConfiguration(
-            showCvcForStoredCard: showCvcForStoredCard
-        )
+        let storedCardConfiguration = createStoredCardConfiguration(showCvcForStoredCard: showCvcForStoredCard)
         let allowedCardTypes = determineAllowedCardTypes(cardTypes: supportedCardTypes)
         let billingAddressConfiguration = determineBillingAddressConfiguration(addressMode: addressMode)
         let installmentConfiguration = installmentConfiguration?.mapToInstallmentConfiguration()
@@ -197,8 +174,7 @@ extension CardConfigurationDTO {
         return mappedCardTypes.compactMap { $0 }.map { CardType(rawValue: $0.lowercased()) }
     }
 
-    private func determineBillingAddressConfiguration(addressMode: AddressMode?)
-        -> BillingAddressConfiguration {
+    private func determineBillingAddressConfiguration(addressMode: AddressMode?) -> BillingAddressConfiguration {
         var billingAddressConfiguration = BillingAddressConfiguration()
         switch addressMode {
         case .full:
@@ -276,14 +252,10 @@ extension AmountDTO {
 
 extension InstantPaymentConfigurationDTO {
     func mapToApplePayConfiguration(payment: Payment?) throws -> ApplePayComponent.Configuration {
-        guard
-            let applePayConfiguration = try applePayConfigurationDTO?.toApplePayConfiguration(
-                payment: payment
-            )
-        else {
+        guard let applePayConfiguration = try applePayConfigurationDTO?.toApplePayConfiguration(payment: payment) else {
             throw PlatformError(errorDescription: "Apple pay configuration not provided.")
         }
-
+        
         return applePayConfiguration
     }
 
@@ -299,23 +271,18 @@ extension InstantPaymentConfigurationDTO {
     }
 }
 
-private func buildAdyenContext(
-    environment: Environment, clientKey: String, amount: AmountDTO?,
-    analyticsOptionsDTO: AnalyticsOptionsDTO, countryCode: String?, payment: Payment? = nil
-) throws -> AdyenContext {
+private func buildAdyenContext(environment: Environment, clientKey: String, amount: AmountDTO?, analyticsOptionsDTO: AnalyticsOptionsDTO, countryCode: String?, payment: Payment? = nil) throws -> AdyenContext {
     let environment = environment.mapToEnvironment()
     let apiContext = try APIContext(
         environment: environment,
         clientKey: clientKey
     )
-    let payment: Payment? =
-        payment
-            ?? {
-                if let amount, let countryCode {
-                    return Payment(amount: amount.mapToAmount(), countryCode: countryCode)
-                }
-                return nil
-            }()
+    let payment: Payment? = payment ?? {
+        if let amount, let countryCode {
+            return Payment(amount: amount.mapToAmount(), countryCode: countryCode)
+        }
+        return nil
+    }()
     var analyticsConfiguration = AnalyticsConfiguration()
     analyticsConfiguration.isEnabled = analyticsOptionsDTO.enabled
     analyticsConfiguration.context = AnalyticsContext(
@@ -362,10 +329,9 @@ extension PaymentResultEnum {
             .error
         }
     }
-
+    
     private static func isThree3ds2Cancellation(error: NSError) -> Bool {
-        error.domain == ADYRuntimeErrorDomain
-            && error.code == ADYRuntimeErrorCode.challengeCancelled.rawValue
+        error.domain == ADYRuntimeErrorDomain && error.code == ADYRuntimeErrorCode.challengeCancelled.rawValue
     }
 }
 
@@ -374,8 +340,7 @@ extension ResultCode {
         switch self {
         case .authorised, .received, .pending:
             return true
-        case .refused, .cancelled, .error, .redirectShopper, .identifyShopper, .challengeShopper,
-             .presentToShopper:
+        case .refused, .cancelled, .error, .redirectShopper, .identifyShopper, .challengeShopper, .presentToShopper:
             return false
         }
     }
@@ -407,8 +372,7 @@ extension ThreeDS2ConfigurationDTO {
     }
 
     func mapToThreeDS2Configuration() -> AdyenActionComponent.Configuration.ThreeDS {
-        let appearanceConfiguration =
-            uiCustomization?.toAppearanceConfiguration() ?? ADYAppearanceConfiguration()
+        let appearanceConfiguration = uiCustomization?.toAppearanceConfiguration() ?? ADYAppearanceConfiguration()
         guard let requestorAppURL, let url = URL(string: requestorAppURL) else {
             return .init(appearanceConfiguration: appearanceConfiguration)
         }
@@ -482,23 +446,19 @@ extension ThreeDS2LabelCustomizationDTO {
             configuration.labelAppearance.headingTextColor = headingColor
         }
         if let headingTextFontSize {
-            configuration.labelAppearance.headingFont = configuration.labelAppearance.headingFont
-                .withSize(CGFloat(headingTextFontSize))
+            configuration.labelAppearance.headingFont = configuration.labelAppearance.headingFont.withSize(CGFloat(headingTextFontSize))
         }
         if let textColor, let textUIColor = UIColor(hex: textColor) {
             configuration.labelAppearance.textColor = textUIColor
         }
         if let textFontSize {
-            configuration.labelAppearance.font = configuration.labelAppearance.font.withSize(
-                CGFloat(textFontSize)
-            )
+            configuration.labelAppearance.font = configuration.labelAppearance.font.withSize(CGFloat(textFontSize))
         }
         if let inputLabelTextColor, let inputLabelColor = UIColor(hex: inputLabelTextColor) {
             configuration.labelAppearance.subheadingTextColor = inputLabelColor
         }
         if let inputLabelFontSize {
-            configuration.labelAppearance.subheadingFont = configuration.labelAppearance.subheadingFont
-                .withSize(CGFloat(inputLabelFontSize))
+            configuration.labelAppearance.subheadingFont = configuration.labelAppearance.subheadingFont.withSize(CGFloat(inputLabelFontSize))
         }
     }
 }
@@ -526,8 +486,7 @@ extension ThreeDS2SelectionItemCustomizationDTO {
            let tintColor = UIColor(hex: selectionIndicatorTintColor) {
             configuration.selectAppearance.selectionIndicatorTintColor = tintColor
         }
-        if let highlightedBackgroundColor,
-           let backgroundColor = UIColor(hex: highlightedBackgroundColor) {
+        if let highlightedBackgroundColor, let backgroundColor = UIColor(hex: highlightedBackgroundColor) {
             configuration.selectAppearance.highlightedBackgroundColor = backgroundColor
         }
         if let textColor, let textUIColor = UIColor(hex: textColor) {
@@ -563,10 +522,7 @@ extension UIColor {
         var rgb: UInt64 = 0
         Scanner(string: hexSanitized).scanHexInt64(&rgb)
 
-        let red: CGFloat
-        let green: CGFloat
-        let blue: CGFloat
-        let alpha: CGFloat
+        let red, green, blue, alpha: CGFloat
         if hexSanitized.count == 8 {
             alpha = CGFloat((rgb & 0xFF00_0000) >> 24) / 255.0
             red = CGFloat((rgb & 0x00FF_0000) >> 16) / 255.0
@@ -590,7 +546,7 @@ extension InstallmentConfigurationDTO {
         guard defaultOptions != nil || cardBasedOptions != nil else { return nil }
         let cardBasedOptions = cardBasedOptions.flatMap { buildCardBasedInstallmentOptions(from: $0) }
         let defaultOptions = defaultOptions.map { buildDefaultInstallmentOptions(from: $0) }
-
+        
         switch (defaultOptions, cardBasedOptions) {
         case let (defaultOptions?, cardBasedOptions?):
             return InstallmentConfiguration(
@@ -598,27 +554,25 @@ extension InstallmentConfigurationDTO {
                 defaultOptions: defaultOptions,
                 showInstallmentAmount: showInstallmentAmount
             )
-
+            
         case (nil, let cardBasedOptions?):
             return InstallmentConfiguration(
                 cardBasedOptions: cardBasedOptions,
                 showInstallmentAmount: showInstallmentAmount
             )
-
+            
         case (let defaultOptions?, nil):
             return InstallmentConfiguration(
                 defaultOptions: defaultOptions,
                 showInstallmentAmount: showInstallmentAmount
             )
-
+            
         default:
             return nil
         }
     }
-
-    private func buildCardBasedInstallmentOptions(
-        from cardBasedOptions: [CardBasedInstallmentOptionsDTO?]
-    ) -> [CardType: InstallmentOptions]? {
+    
+    private func buildCardBasedInstallmentOptions(from cardBasedOptions: [CardBasedInstallmentOptionsDTO?]) -> [CardType: InstallmentOptions]? {
         var options: [CardType: InstallmentOptions] = [:]
         for cardBasedOption in cardBasedOptions {
             guard let cardBasedOption else { continue }
@@ -631,17 +585,15 @@ extension InstallmentConfigurationDTO {
         }
         return options.isEmpty ? nil : options
     }
-
-    private func buildDefaultInstallmentOptions(from defaultOptions: DefaultInstallmentOptionsDTO)
-        -> InstallmentOptions {
+    
+    private func buildDefaultInstallmentOptions(from defaultOptions: DefaultInstallmentOptionsDTO) -> InstallmentOptions {
         createInstallmentOptions(
             values: defaultOptions.values,
             includesRevolving: defaultOptions.includesRevolving
         )
     }
-
-    private func createInstallmentOptions(values: [Int64?], includesRevolving: Bool)
-        -> InstallmentOptions {
+    
+    private func createInstallmentOptions(values: [Int64?], includesRevolving: Bool) -> InstallmentOptions {
         InstallmentOptions(
             monthValues: values.compactMap { $0 }.map { UInt($0) },
             includesRevolving: includesRevolving

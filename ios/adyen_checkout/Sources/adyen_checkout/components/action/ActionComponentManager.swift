@@ -1,10 +1,9 @@
 @_spi(AdyenInternal) import Adyen
-import Foundation
-import UIKit
-
 #if canImport(AdyenActions)
     import AdyenActions
 #endif
+import Foundation
+import UIKit
 
 class ActionComponentManager {
     private let componentFlutterApi: ComponentFlutterInterface
@@ -12,23 +11,18 @@ class ActionComponentManager {
     enum Constants {
         static let actionComponentId: String = "ACTION_COMPONENT"
     }
-
+    
     init(componentFlutterApi: ComponentFlutterInterface) {
         self.componentFlutterApi = componentFlutterApi
     }
-
-    func handleAction(
-        actionComponentConfiguration: ActionComponentConfigurationDTO, componentId: String,
-        actionResponse: [String?: Any?]
-    ) {
+    
+    func handleAction(actionComponentConfiguration: ActionComponentConfigurationDTO, componentId: String, actionResponse: [String?: Any?]) {
         do {
             let adyenContext = try actionComponentConfiguration.createAdyenContext()
-            let configuration = actionComponentConfiguration.threeDS2ConfigurationDTO?
-                .buildActionComponentConfiguration()
-            actionComponent =
-                configuration.map {
-                    AdyenActionComponent(context: adyenContext, configuration: $0)
-                } ?? AdyenActionComponent(context: adyenContext)
+            let configuration = actionComponentConfiguration.threeDS2ConfigurationDTO?.buildActionComponentConfiguration()
+            actionComponent = configuration.map {
+                AdyenActionComponent(context: adyenContext, configuration: $0)
+            } ?? AdyenActionComponent(context: adyenContext)
             actionComponent?.delegate = self
             actionComponent?.presentationDelegate = getViewController()
             let jsonData = try JSONSerialization.data(withJSONObject: actionResponse, options: [])
@@ -38,12 +32,12 @@ class ActionComponentManager {
             sendErrorToFlutterLayer(error: error)
         }
     }
-
+    
     func getViewController() -> UIViewController? {
         let rootViewController = UIApplication.shared.adyen.mainKeyWindow?.rootViewController
         return rootViewController?.adyen.topPresenter
     }
-
+    
     func finalizeCallback(success: Bool, completion: @escaping (() -> Void)) {
         actionComponent?.finalizeIfNeeded(with: success) { [weak self] in
             self?.getViewController()?.dismiss(animated: true) {
@@ -51,7 +45,7 @@ class ActionComponentManager {
             }
         }
     }
-
+    
     func onDispose() {
         actionComponent = nil
     }
@@ -75,9 +69,7 @@ class ActionComponentManager {
 extension ActionComponentManager: ActionComponentDelegate {
     func didProvide(_ data: Adyen.ActionComponentData, from component: any Adyen.ActionComponent) {
         do {
-            let actionComponentData = ActionComponentDataModel(
-                details: data.details.encodable, paymentData: data.paymentData
-            )
+            let actionComponentData = ActionComponentDataModel(details: data.details.encodable, paymentData: data.paymentData)
             let actionComponentDataJson = try JSONEncoder().encode(actionComponentData)
             let actionComponentDataString = String(data: actionComponentDataJson, encoding: .utf8)
             let componentCommunicationModel = ComponentCommunicationModel(
@@ -96,15 +88,15 @@ extension ActionComponentManager: ActionComponentDelegate {
             }
         }
     }
-
+    
     func didComplete(from component: any Adyen.ActionComponent) {
         // Only for voucher payment method - currently not supported.
     }
-
+    
     func didFail(with error: any Error, from component: any Adyen.ActionComponent) {
         finalizeCallback(success: false) { [weak self] in
             self?.sendErrorToFlutterLayer(error: error)
         }
     }
-
+    
 }
