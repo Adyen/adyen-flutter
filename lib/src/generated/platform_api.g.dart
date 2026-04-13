@@ -1789,6 +1789,7 @@ class ActionComponentConfigurationDTO {
     this.shopperLocale,
     this.amount,
     required this.analyticsOptionsDTO,
+    this.threeDS2ConfigurationDTO,
   });
 
   Environment environment;
@@ -1801,6 +1802,8 @@ class ActionComponentConfigurationDTO {
 
   AnalyticsOptionsDTO analyticsOptionsDTO;
 
+  ThreeDS2ConfigurationDTO? threeDS2ConfigurationDTO;
+
   Object encode() {
     return <Object?>[
       environment,
@@ -1808,6 +1811,7 @@ class ActionComponentConfigurationDTO {
       shopperLocale,
       amount,
       analyticsOptionsDTO,
+      threeDS2ConfigurationDTO,
     ];
   }
 
@@ -1819,6 +1823,7 @@ class ActionComponentConfigurationDTO {
       shopperLocale: result[2] as String?,
       amount: result[3] as AmountDTO?,
       analyticsOptionsDTO: result[4]! as AnalyticsOptionsDTO,
+      threeDS2ConfigurationDTO: result[5] as ThreeDS2ConfigurationDTO?,
     );
   }
 }

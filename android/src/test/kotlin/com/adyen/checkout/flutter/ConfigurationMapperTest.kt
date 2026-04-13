@@ -561,6 +561,7 @@ class ConfigurationMapperTest {
                 shopperLocale = "nl-NL",
                 amount = AmountDTO("EUR", 5000),
                 analyticsOptionsDTO = AnalyticsOptionsDTO(true, "1.0.0"),
+                threeDS2ConfigurationDTO = null,
             )
 
             val checkoutConfiguration = actionConfigurationDTO.toCheckoutConfiguration()
@@ -580,6 +581,7 @@ class ConfigurationMapperTest {
                 shopperLocale = null,
                 amount = null,
                 analyticsOptionsDTO = AnalyticsOptionsDTO(false, "1.0.0"),
+                threeDS2ConfigurationDTO = null,
             )
 
             val checkoutConfiguration = actionConfigurationDTO.toCheckoutConfiguration()
@@ -587,6 +589,25 @@ class ConfigurationMapperTest {
             assertEquals(SDKEnvironment.UNITED_STATES, checkoutConfiguration.environment)
             assertNull(checkoutConfiguration.shopperLocale)
             assertNull(checkoutConfiguration.amount)
+        }
+
+        @Test
+        fun `when action component configuration has 3DS2 configuration, then map correctly`() {
+            val actionConfigurationDTO = ActionComponentConfigurationDTO(
+                environment = Environment.TEST,
+                clientKey = TEST_CLIENT_KEY,
+                shopperLocale = null,
+                amount = null,
+                analyticsOptionsDTO = AnalyticsOptionsDTO(true, "1.0.0"),
+                threeDS2ConfigurationDTO = ThreeDS2ConfigurationDTO(
+                    requestorAppURL = "https://example.com/action-3ds2"
+                ),
+            )
+
+            val checkoutConfiguration = actionConfigurationDTO.toCheckoutConfiguration()
+            val threeDS2Configuration = checkoutConfiguration.getActionConfiguration(Adyen3DS2Configuration::class.java)
+
+            assertEquals("https://example.com/action-3ds2", threeDS2Configuration?.threeDSRequestorAppURL)
         }
     }
 
