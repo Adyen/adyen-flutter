@@ -198,11 +198,11 @@ class CardStateNotifier extends ValueNotifier<CardState> {
           headerTheme: Adyen3DSHeaderTheme(
             backgroundColor: Colors.green,
             textColor: Colors.black,
-            cancelButtonColor: Colors.blue,
+            cancelButtonColor: Colors.black,
           ),
           primaryButtonTheme: Adyen3DSButtonTheme(
-            backgroundColor: Colors.blue,
-            textColor: Colors.white,
+            backgroundColor: Colors.yellow,
+            textColor: Colors.black,
             cornerRadius: 24,
           ),
         ),
