@@ -79,9 +79,11 @@ extension ApplePayConfigurationDTO {
     
     private func mapToPaymentSummaryItems(summaryItems: [ApplePaySummaryItemDTO?]?, payment: Payment) throws -> [PKPaymentSummaryItem] {
         guard let summaryItems else {
-            let formattedAmount = AmountFormatter.decimalAmount(payment.amount.value,
-                                                                currencyCode: payment.amount.currencyCode,
-                                                                localeIdentifier: payment.amount.localeIdentifier)
+            let formattedAmount = AmountFormatter.decimalAmount(
+                payment.amount.value,
+                currencyCode: payment.amount.currencyCode,
+                localeIdentifier: payment.amount.localeIdentifier
+            )
             return [PKPaymentSummaryItem(label: merchantName, amount: formattedAmount)]
         }
         
