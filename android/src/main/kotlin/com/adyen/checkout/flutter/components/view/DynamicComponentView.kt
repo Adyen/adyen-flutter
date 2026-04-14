@@ -7,6 +7,8 @@ import android.view.ViewTreeObserver
 import android.widget.FrameLayout
 import androidx.activity.ComponentActivity
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.appcompat.widget.SwitchCompat
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
@@ -20,8 +22,10 @@ import androidx.navigationevent.findViewTreeNavigationEventDispatcherOwner
 import com.adyen.checkout.components.core.internal.ButtonComponent
 import com.adyen.checkout.components.core.internal.Component
 import com.adyen.checkout.core.common.CheckoutContext
-import com.adyen.checkout.core.components.AdyenPaymentFlow
 import com.adyen.checkout.core.components.CheckoutCallbacks
+import com.adyen.checkout.core.components.CheckoutPaymentMethod
+import com.adyen.checkout.core.components.CheckoutTarget
+import com.adyen.checkout.core.components.NewCheckoutController
 import com.adyen.checkout.core.components.data.model.paymentmethod.PaymentMethod
 import com.adyen.checkout.flutter.components.ComponentPlatformEventHandler
 import com.adyen.checkout.flutter.generated.ComponentCommunicationModel
@@ -92,11 +96,18 @@ class DynamicComponentView
                     setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
                     setContent {
                         ProvideNavigationEventDispatcherOwner(navigationEventDispatcherOwner) {
-                            AdyenPaymentFlow(
-                                paymentMethod = paymentMethod,
-                                checkoutContext = checkoutContext,
-                                checkoutCallbacks = callbacks
-                            )
+                            val coroutineScope = rememberCoroutineScope()
+                            val controller =
+                                remember(paymentMethod, checkoutContext, callbacks) {
+                                    NewCheckoutController(
+                                        target = CheckoutTarget.PaymentMethod(paymentMethod.type),
+                                        context = checkoutContext,
+                                        callbacks = callbacks,
+                                        applicationContext = context.applicationContext,
+                                        coroutineScope = coroutineScope,
+                                    )
+                                }
+                            CheckoutPaymentMethod(controller = controller)
                         }
                     }
                 }
