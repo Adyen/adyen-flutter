@@ -150,7 +150,7 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    AdyenCheckout.instance.enableConsoleLogging(enabled: true);
+    AdyenCheckout.instance.enableConsoleLogging(enabled: false);
     final isBlikSupported =
         Config.countryCode == 'PL' && Config.amount.currency == 'PLN';
 

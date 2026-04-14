@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:adyen_checkout/adyen_checkout.dart';
 import 'package:adyen_checkout/src/adyen_checkout_interface.dart';
-import 'package:adyen_checkout/src/common/adyen_checkout_advanced.dart';
 import 'package:adyen_checkout/src/common/adyen_checkout_api.dart';
 import 'package:adyen_checkout/src/common/adyen_checkout_session.dart';
 import 'package:adyen_checkout/src/components/action_handling/action_component.dart';

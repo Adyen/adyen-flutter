@@ -5,11 +5,8 @@ import 'package:adyen_checkout/src/common/adyen_checkout_api.dart';
 import 'package:adyen_checkout/src/components/instant/instant_session_component.dart';
 import 'package:adyen_checkout/src/drop_in/drop_in.dart';
 import 'package:adyen_checkout/src/util/dto_mapper.dart';
-import 'package:adyen_checkout/src/util/sdk_version_number_provider.dart';
 
 class AdyenCheckoutSession {
-  final SdkVersionNumberProvider _sdkVersionNumberProvider =
-      SdkVersionNumberProvider.instance;
   final AdyenCheckoutApi adyenCheckoutApi;
   final DropIn dropIn;
 

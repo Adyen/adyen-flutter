@@ -1,5 +1,6 @@
 package com.adyen.checkout.flutter.components.v2
 
+import android.content.Context
 import android.view.View
 import androidx.activity.ComponentActivity
 import com.adyen.checkout.core.common.CheckoutContext
@@ -13,13 +14,12 @@ internal class AdyenComponent(
     checkoutContext: CheckoutContext,
     checkoutCallbacks: CheckoutCallbacks,
     paymentMethod: PaymentMethod,
-    activity: ComponentActivity,
+    context: Context,
     private val componentId: String,
     private val onDispose: (String) -> Unit,
     platformEventHandler: ComponentPlatformEventHandler,
 ) : PlatformView {
-    internal val dynamicComponentView =
-        DynamicComponentView(activity, componentId, platformEventHandler)
+    internal val dynamicComponentView = DynamicComponentView(context, componentId, platformEventHandler)
 
     init {
         dynamicComponentView.addV6Component(

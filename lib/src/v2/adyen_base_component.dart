@@ -151,6 +151,7 @@ class _AdyenBaseComponentState extends State<AdyenBaseComponent> {
     final int? newViewportHeight = event.data is int ? event.data as int : null;
     if (newViewportHeight != previousViewportHeight &&
         newViewportHeight != null) {
+      print("New viewport height: $newViewportHeight");
       setState(() {
         previousViewportHeight = viewportHeight;
         viewportHeight = newViewportHeight;

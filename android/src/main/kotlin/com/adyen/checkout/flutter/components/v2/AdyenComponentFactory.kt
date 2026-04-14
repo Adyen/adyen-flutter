@@ -34,7 +34,6 @@ import kotlin.coroutines.resumeWithException
 internal class AdyenComponentFactory(
     private val adyenFlutterInterface: AdyenFlutterInterface,
     private val platformEventHandler: ComponentPlatformEventHandler,
-    private val activity: ComponentActivity,
     private val viewTypeId: String,
     private val onDispose: (String) -> Unit,
     private val checkoutHolder: CheckoutHolder,
@@ -57,7 +56,7 @@ internal class AdyenComponentFactory(
             checkoutContext = checkoutHolder.checkoutContext!!,
             checkoutCallbacks = createCheckoutCallbacks(componentId),
             paymentMethod = createPaymentMethod(creationParams),
-            activity = activity,
+            context = context,
             componentId = componentId,
             onDispose = onDispose,
             platformEventHandler = platformEventHandler,

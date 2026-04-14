@@ -89,7 +89,6 @@ class ComponentPlatformApi(
                 AdyenComponentFactory.ADYEN_COMPONENT_SESSION,
                 AdyenComponentFactory(
                     adyenFlutterInterface = adyenFlutterInterface,
-                    activity = activity,
                     viewTypeId = AdyenComponentFactory.ADYEN_COMPONENT_SESSION,
                     onDispose = ::onDispose,
                     checkoutHolder = checkoutHolder,
@@ -101,7 +100,6 @@ class ComponentPlatformApi(
                 AdyenComponentFactory(
                     adyenFlutterInterface = adyenFlutterInterface,
                     platformEventHandler = platformEventHandler,
-                    activity = activity,
                     viewTypeId = AdyenComponentFactory.ADYEN_COMPONENT_ADVANCED,
                     onDispose = ::onDispose,
                     checkoutHolder = checkoutHolder,
