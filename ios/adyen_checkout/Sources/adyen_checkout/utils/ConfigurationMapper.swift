@@ -365,6 +365,12 @@ extension ActionComponentConfigurationDTO {
 }
 
 extension ThreeDS2ConfigurationDTO {
+    func buildActionComponentConfiguration() -> AdyenActionComponent.Configuration {
+        var actionComponentConfiguration = AdyenActionComponent.Configuration()
+        actionComponentConfiguration.threeDS = mapToThreeDS2Configuration()
+        return actionComponentConfiguration
+    }
+
     func mapToThreeDS2Configuration() -> AdyenActionComponent.Configuration.ThreeDS {
         let appearanceConfiguration = uiCustomization?.toAppearanceConfiguration() ?? ADYAppearanceConfiguration()
         guard let requestorAppURL, let url = URL(string: requestorAppURL) else {

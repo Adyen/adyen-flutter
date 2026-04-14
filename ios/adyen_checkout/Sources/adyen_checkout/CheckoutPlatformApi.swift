@@ -44,7 +44,7 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
             case let dropInConfigurationDTO as DropInConfigurationDTO:
                 try createSessionForDropIn(
                     adyenContext: dropInConfigurationDTO.createAdyenContext(),
-                    actionComponentConfiguration: buildActionComponentConfiguration(from: dropInConfigurationDTO.threeDS2ConfigurationDTO),
+                    actionComponentConfiguration: dropInConfigurationDTO.threeDS2ConfigurationDTO?.buildActionComponentConfiguration(),
                     sessionId: sessionId,
                     sessionData: sessionData,
                     completion: completion
@@ -52,7 +52,7 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
             case let cardComponentConfigurationDTO as CardComponentConfigurationDTO:
                 try createSessionForComponent(
                     adyenContext: cardComponentConfigurationDTO.createAdyenContext(),
-                    actionComponentConfiguration: buildActionComponentConfiguration(from: cardComponentConfigurationDTO.threeDS2ConfigurationDTO),
+                    actionComponentConfiguration: cardComponentConfigurationDTO.threeDS2ConfigurationDTO?.buildActionComponentConfiguration(),
                     sessionId: sessionId,
                     sessionData: sessionData,
                     completion: completion
@@ -202,14 +202,6 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
             } catch {
                 completion(Result.failure(error))
             }
-        }
-    }
-
-    private func buildActionComponentConfiguration(from threeDS2ConfigurationDTO: ThreeDS2ConfigurationDTO?) -> AdyenActionComponent.Configuration? {
-        threeDS2ConfigurationDTO.map {
-            var actionComponentConfiguration = AdyenActionComponent.Configuration()
-            actionComponentConfiguration.threeDS = $0.mapToThreeDS2Configuration()
-            return actionComponentConfiguration
         }
     }
 

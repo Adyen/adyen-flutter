@@ -1625,6 +1625,7 @@ struct ActionComponentConfigurationDTO {
     var shopperLocale: String?
     var amount: AmountDTO?
     var analyticsOptionsDTO: AnalyticsOptionsDTO
+    var threeDS2ConfigurationDTO: ThreeDS2ConfigurationDTO?
 
     // swift-format-ignore: AlwaysUseLowerCamelCase
     static func fromList(_ __pigeon_list: [Any?]) -> ActionComponentConfigurationDTO? {
@@ -1633,13 +1634,15 @@ struct ActionComponentConfigurationDTO {
         let shopperLocale: String? = nilOrValue(__pigeon_list[2])
         let amount: AmountDTO? = nilOrValue(__pigeon_list[3])
         let analyticsOptionsDTO = __pigeon_list[4] as! AnalyticsOptionsDTO
+        let threeDS2ConfigurationDTO: ThreeDS2ConfigurationDTO? = nilOrValue(__pigeon_list[5])
 
         return ActionComponentConfigurationDTO(
             environment: environment,
             clientKey: clientKey,
             shopperLocale: shopperLocale,
             amount: amount,
-            analyticsOptionsDTO: analyticsOptionsDTO
+            analyticsOptionsDTO: analyticsOptionsDTO,
+            threeDS2ConfigurationDTO: threeDS2ConfigurationDTO
         )
     }
 
@@ -1649,7 +1652,8 @@ struct ActionComponentConfigurationDTO {
             clientKey,
             shopperLocale,
             amount,
-            analyticsOptionsDTO
+            analyticsOptionsDTO,
+            threeDS2ConfigurationDTO
         ]
     }
 }

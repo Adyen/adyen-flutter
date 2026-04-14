@@ -1,5 +1,9 @@
 ## 1.10.0 (in development)
 
+### New
+
+- `ActionComponentConfiguration` now supports `ThreeDS2Configuration`, including `requestorAppURL` and 3DS2 UI customization for standalone action handling.
+
 ## 1.9.0
 
 ### New

@@ -117,13 +117,15 @@ func createActionComponentConfigurationDTO(
     clientKey: String = testClientKey,
     shopperLocale: String? = nil,
     amount: AmountDTO? = nil,
-    analyticsOptionsDTO: AnalyticsOptionsDTO = AnalyticsOptionsDTO(enabled: true, version: "1.0.0")
+    analyticsOptionsDTO: AnalyticsOptionsDTO = AnalyticsOptionsDTO(enabled: true, version: "1.0.0"),
+    threeDS2ConfigurationDTO: ThreeDS2ConfigurationDTO? = nil
 ) -> ActionComponentConfigurationDTO {
     ActionComponentConfigurationDTO(
         environment: environment,
         clientKey: clientKey,
         shopperLocale: shopperLocale,
         amount: amount,
-        analyticsOptionsDTO: analyticsOptionsDTO
+        analyticsOptionsDTO: analyticsOptionsDTO,
+        threeDS2ConfigurationDTO: threeDS2ConfigurationDTO
     )
 }

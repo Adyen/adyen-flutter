@@ -775,6 +775,7 @@ class ActionComponentConfigurationDTO {
   final String? shopperLocale;
   final AmountDTO? amount;
   final AnalyticsOptionsDTO analyticsOptionsDTO;
+  final ThreeDS2ConfigurationDTO? threeDS2ConfigurationDTO;
 
   ActionComponentConfigurationDTO(
     this.environment,
@@ -782,6 +783,7 @@ class ActionComponentConfigurationDTO {
     this.shopperLocale,
     this.amount,
     this.analyticsOptionsDTO,
+    this.threeDS2ConfigurationDTO,
   );
 }
 

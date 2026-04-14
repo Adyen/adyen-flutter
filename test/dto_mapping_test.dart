@@ -620,6 +620,42 @@ void main() {
     expect(dto.uiCustomization?.headingCustomization?.headerText, 'Challenge');
   });
 
+  test(
+      'when action component configuration has 3DS2 configuration, then should map to ActionComponentConfigurationDTO',
+      () {
+    final configuration = ActionComponentConfiguration(
+      environment: Environment.test,
+      clientKey: 'test_client_key',
+      shopperLocale: 'en-US',
+      amount: Amount(value: 1500, currency: 'EUR'),
+      threeDS2Configuration: ThreeDS2Configuration(
+        requestorAppURL: 'myapp://adyen3ds2',
+      ),
+    );
+
+    final dto = configuration.toDTO('1.0.0');
+
+    expect(dto.environment, Environment.test);
+    expect(dto.clientKey, 'test_client_key');
+    expect(dto.shopperLocale, 'en-US');
+    expect(dto.amount?.value, 1500);
+    expect(dto.amount?.currency, 'EUR');
+    expect(dto.threeDS2ConfigurationDTO?.requestorAppURL, 'myapp://adyen3ds2');
+  });
+
+  test(
+      'when action component configuration omits 3DS2 configuration, then ActionComponentConfigurationDTO should contain null 3DS2 configuration',
+      () {
+    final configuration = ActionComponentConfiguration(
+      environment: Environment.test,
+      clientKey: 'test_client_key',
+    );
+
+    final dto = configuration.toDTO('1.0.0');
+
+    expect(dto.threeDS2ConfigurationDTO, isNull);
+  });
+
   test('color to hex should include alpha channel', () {
     const color = Color(0x80112233);
     expect(color.toHexString(), '#80112233');

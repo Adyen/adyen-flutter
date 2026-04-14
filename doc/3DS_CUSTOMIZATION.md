@@ -18,6 +18,20 @@ final dropInConfiguration = DropInConfiguration(
 );
 ```
 
+You can apply the same `ThreeDS2Configuration` to standalone action handling:
+
+```dart
+final actionComponentConfiguration = ActionComponentConfiguration(
+  environment: Environment.test,
+  clientKey: clientKey,
+  threeDS2Configuration: ThreeDS2Configuration(
+    headingTitle: 'Custom 3DS2 Title',
+    requestorAppURL: 'myapp://adyen-redirect',
+    theme: Adyen3DSTheme.fromThemeData(Theme.of(context)),
+  ),
+);
+```
+
 `fromThemeData` uses Flutter defaults to keep UI consistent with your app:
 
 - `scaffoldBackgroundColor` for screen background
@@ -80,6 +94,7 @@ final configuration = DropInConfiguration(
 ## Notes
 
 - All properties are optional. Null values fall back to the native SDK defaults.
+- `ThreeDS2Configuration` is supported by `DropInConfiguration`, `CardComponentConfiguration`, and `ActionComponentConfiguration`.
 - Sizes are `double` in Flutter and are rounded when mapped to native SDKs.
 - Colors are converted to `#AARRGGBB` hex strings to preserve alpha.
 - `backgroundColor` affects both Android and iOS challenge screens.

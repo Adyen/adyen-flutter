@@ -141,4 +141,29 @@ final class ConfigurationMapperTests: XCTestCase {
 
         XCTAssertNotNil(result)
     }
+
+    func
+        test_createActionComponentConfiguration_withThreeDS2RequestorAppURL_shouldCreateConfiguration()
+    {
+        let sut = createActionComponentConfigurationDTO(
+            threeDS2ConfigurationDTO: ThreeDS2ConfigurationDTO(
+                requestorAppURL: "https://example.com/action-3ds2"
+            )
+        )
+
+        let result = sut.threeDS2ConfigurationDTO?.buildActionComponentConfiguration()
+
+        XCTAssertNotNil(result)
+        XCTAssertEqual(
+            result?.threeDS.requestorAppURL?.absoluteString, "https://example.com/action-3ds2"
+        )
+    }
+
+    func test_createActionComponentConfiguration_withoutThreeDS2_shouldReturnNil() {
+        let sut = createActionComponentConfigurationDTO(threeDS2ConfigurationDTO: nil)
+
+        let result = sut.threeDS2ConfigurationDTO?.buildActionComponentConfiguration()
+
+        XCTAssertNil(result)
+    }
 }
