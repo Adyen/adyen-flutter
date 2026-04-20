@@ -28,6 +28,13 @@ class DropInScreen extends StatelessWidget {
                 child: const Text("Drop-in sessions"),
               ),
               TextButton(
+                onPressed: () => startDropInSessions(
+                  context,
+                  hideStoredPaymentMethods: true,
+                ),
+                child: const Text("Drop-in sessions (hide stored)"),
+              ),
+              TextButton(
                 onPressed: () => startDropInAdvancedFlow(context),
                 child: const Text("Drop-in advanced flow"),
               ),
@@ -38,12 +45,17 @@ class DropInScreen extends StatelessWidget {
     );
   }
 
-  Future<void> startDropInSessions(BuildContext context) async {
+  Future<void> startDropInSessions(
+    BuildContext context, {
+    bool hideStoredPaymentMethods = false,
+  }) async {
     try {
       final Map<String, dynamic> sessionResponse =
           await repository.fetchSession();
       final DropInConfiguration dropInConfiguration =
-          await _createDropInConfiguration();
+          await _createDropInConfiguration(
+        hideStoredPaymentMethods: hideStoredPaymentMethods,
+      );
 
       final SessionCheckout sessionCheckout =
           await AdyenCheckout.session.create(
@@ -94,7 +106,9 @@ class DropInScreen extends StatelessWidget {
     }
   }
 
-  Future<DropInConfiguration> _createDropInConfiguration() async {
+  Future<DropInConfiguration> _createDropInConfiguration({
+    bool hideStoredPaymentMethods = false,
+  }) async {
     CardConfiguration cardsConfiguration = CardConfiguration(
       onBinLookup: _onBinLookup,
       onBinValue: _onBinValue,
@@ -151,6 +165,7 @@ class DropInScreen extends StatelessWidget {
       showPreselectedStoredPaymentMethod: false,
       isRemoveStoredPaymentMethodEnabled: true,
       deleteStoredPaymentMethodCallback: repository.deleteStoredPaymentMethod,
+      showStoredPaymentMethods: !hideStoredPaymentMethods,
     );
 
     final DropInConfiguration dropInConfiguration = DropInConfiguration(
