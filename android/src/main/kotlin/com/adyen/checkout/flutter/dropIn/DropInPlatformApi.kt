@@ -231,6 +231,10 @@ internal class DropInPlatformApi(
         showStoredPaymentMethods: Boolean,
     ): CheckoutSession {
         val sessionSetupResponse = SessionSetupResponse.SERIALIZER.deserialize(sessionHolder.sessionSetupResponse)
+        // Relies on SessionSetupResponse and PaymentMethodsApiResponse being
+        // Kotlin data classes in sessions-core and components-core. If Adyen
+        // ever switches them to regular classes, the copy() calls below must
+        // be replaced with a serializer round-trip (JSON -> filter -> deserialize).
         val adjustedSessionSetupResponse =
             if (showStoredPaymentMethods) {
                 sessionSetupResponse
