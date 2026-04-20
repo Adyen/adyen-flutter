@@ -46,6 +46,7 @@ import com.adyen.checkout.googlepay.GooglePayConfiguration
 import com.adyen.checkout.twint.TwintConfiguration
 import com.google.android.gms.wallet.WalletConstants
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -571,6 +572,7 @@ class ConfigurationMapperTest {
             assertEquals("nl-NL", checkoutConfiguration.shopperLocale?.toLanguageTag())
             assertEquals("EUR", checkoutConfiguration.amount?.currency)
             assertEquals(5000, checkoutConfiguration.amount?.value)
+            assertNull(checkoutConfiguration.getActionConfiguration(Adyen3DS2Configuration::class.java))
         }
 
         @Test
@@ -589,6 +591,7 @@ class ConfigurationMapperTest {
             assertEquals(SDKEnvironment.UNITED_STATES, checkoutConfiguration.environment)
             assertNull(checkoutConfiguration.shopperLocale)
             assertNull(checkoutConfiguration.amount)
+            assertNull(checkoutConfiguration.getActionConfiguration(Adyen3DS2Configuration::class.java))
         }
 
         @Test
@@ -607,6 +610,7 @@ class ConfigurationMapperTest {
             val checkoutConfiguration = actionConfigurationDTO.toCheckoutConfiguration()
             val threeDS2Configuration = checkoutConfiguration.getActionConfiguration(Adyen3DS2Configuration::class.java)
 
+            assertNotNull(threeDS2Configuration)
             assertEquals("https://example.com/action-3ds2", threeDS2Configuration?.threeDSRequestorAppURL)
         }
     }

@@ -623,6 +623,11 @@ void main() {
   test(
       'when action component configuration has 3DS2 configuration, then should map to ActionComponentConfigurationDTO',
       () {
+    const theme = Adyen3DSTheme(
+      headerTheme: Adyen3DSHeaderTheme(
+        textColor: Color(0xFFAABBCC),
+      ),
+    );
     final configuration = ActionComponentConfiguration(
       environment: Environment.test,
       clientKey: 'test_client_key',
@@ -630,6 +635,8 @@ void main() {
       amount: Amount(value: 1500, currency: 'EUR'),
       threeDS2Configuration: ThreeDS2Configuration(
         requestorAppURL: 'myapp://adyen3ds2',
+        headingTitle: 'Action heading',
+        theme: theme,
       ),
     );
 
@@ -641,6 +648,16 @@ void main() {
     expect(dto.amount?.value, 1500);
     expect(dto.amount?.currency, 'EUR');
     expect(dto.threeDS2ConfigurationDTO?.requestorAppURL, 'myapp://adyen3ds2');
+    expect(
+      dto.threeDS2ConfigurationDTO?.uiCustomization?.headingCustomization
+          ?.headerText,
+      'Action heading',
+    );
+    expect(
+      dto.threeDS2ConfigurationDTO?.uiCustomization?.headingCustomization
+          ?.textColor,
+      '#FFAABBCC',
+    );
   });
 
   test(
