@@ -5,7 +5,7 @@
 - Drop-in: `StoredPaymentMethodConfiguration.showStoredPaymentMethods` — hide
   previously stored payment methods from the Drop-in payment list without
   changing the `shopperReference`. Defaults to `true` (existing behavior).
-  Mirrors the Web Drop-in `cardConfiguration.showStoredPaymentMethods` option.
+  Mirrors the Web Drop-in `DropinConfiguration.showStoredPaymentMethods` option.
 
 ## 1.9.0
 
