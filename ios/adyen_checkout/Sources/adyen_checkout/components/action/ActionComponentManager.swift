@@ -19,7 +19,10 @@ class ActionComponentManager {
     func handleAction(actionComponentConfiguration: ActionComponentConfigurationDTO, componentId: String, actionResponse: [String?: Any?]) {
         do {
             let adyenContext = try actionComponentConfiguration.createAdyenContext()
-            actionComponent = AdyenActionComponent(context: adyenContext)
+            let configuration = actionComponentConfiguration.threeDS2ConfigurationDTO?.buildActionComponentConfiguration()
+            actionComponent = configuration.map {
+                AdyenActionComponent(context: adyenContext, configuration: $0)
+            } ?? AdyenActionComponent(context: adyenContext)
             actionComponent?.delegate = self
             actionComponent?.presentationDelegate = getViewController()
             let jsonData = try JSONSerialization.data(withJSONObject: actionResponse, options: [])

@@ -1518,7 +1518,8 @@ data class ActionComponentConfigurationDTO (
   val clientKey: String,
   val shopperLocale: String? = null,
   val amount: AmountDTO? = null,
-  val analyticsOptionsDTO: AnalyticsOptionsDTO
+  val analyticsOptionsDTO: AnalyticsOptionsDTO,
+  val threeDS2ConfigurationDTO: ThreeDS2ConfigurationDTO? = null
 
 ) {
   companion object {
@@ -1529,7 +1530,8 @@ data class ActionComponentConfigurationDTO (
       val shopperLocale = __pigeon_list[2] as String?
       val amount = __pigeon_list[3] as AmountDTO?
       val analyticsOptionsDTO = __pigeon_list[4] as AnalyticsOptionsDTO
-      return ActionComponentConfigurationDTO(environment, clientKey, shopperLocale, amount, analyticsOptionsDTO)
+      val threeDS2ConfigurationDTO = __pigeon_list[5] as ThreeDS2ConfigurationDTO?
+      return ActionComponentConfigurationDTO(environment, clientKey, shopperLocale, amount, analyticsOptionsDTO, threeDS2ConfigurationDTO)
     }
   }
   fun toList(): List<Any?> {
@@ -1539,6 +1541,7 @@ data class ActionComponentConfigurationDTO (
       shopperLocale,
       amount,
       analyticsOptionsDTO,
+      threeDS2ConfigurationDTO,
     )
   }
 }

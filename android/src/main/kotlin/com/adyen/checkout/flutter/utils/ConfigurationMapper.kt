@@ -132,6 +132,7 @@ object ConfigurationMapper {
             analyticsOptionsDTO = analyticsOptionsDTO,
             shopperLocale = shopperLocale,
             amount = amount,
+            threeDS2ConfigurationDTO = threeDS2ConfigurationDTO,
         )
 
     fun InstantPaymentConfigurationDTO.toCheckoutConfiguration(): CheckoutConfiguration =

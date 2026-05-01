@@ -464,6 +464,7 @@ extension ActionComponentConfigurationMapper on ActionComponentConfiguration {
         shopperLocale: shopperLocale,
         amount: amount?.toDTO(),
         analyticsOptionsDTO: analyticsOptions.toDTO(sdkVersionNumber),
+        threeDS2ConfigurationDTO: threeDS2Configuration?.toDTO(),
       );
 }
 
