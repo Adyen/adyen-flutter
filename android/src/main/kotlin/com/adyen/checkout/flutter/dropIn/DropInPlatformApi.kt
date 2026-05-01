@@ -109,7 +109,7 @@ internal class DropInPlatformApi(
                     dropInConfigurationDTO.isPartialPaymentSupported
                 )
             val filteredPaymentMethods =
-                hideStoredPaymentMethodsIfNeeded(
+                applyStoredPaymentMethodsVisibility(
                     paymentMethodsWithoutGiftCards,
                     dropInConfigurationDTO.showStoredPaymentMethods
                 )
