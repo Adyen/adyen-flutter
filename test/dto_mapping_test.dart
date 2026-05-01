@@ -238,7 +238,11 @@ void main() {
         supportedCountries: ["NL"],
         merchantCapability: ApplePayMerchantCapability.debit,
         supportsCouponCode: true,
-        couponCode: "SUMMER10");
+        couponCode: "SUMMER10",
+        onShippingMethodChange: (method, currentSummaryItems) async =>
+            ApplePayShippingMethodUpdate(
+              summaryItems: currentSummaryItems,
+            ));
 
     final applePayConfigurationDTO = applePayConfiguration.toDTO();
 
@@ -291,6 +295,49 @@ void main() {
         ApplePayMerchantCapability.debit);
     expect(applePayConfigurationDTO.supportsCouponCode, true);
     expect(applePayConfigurationDTO.couponCode, "SUMMER10");
+    expect(applePayConfigurationDTO.hasOnShippingMethodChange, true);
+  });
+
+  test(
+      "when using apple pay configuration without shipping method callback, then should map callback flag to false",
+      () {
+    final applePayConfiguration = ApplePayConfiguration(
+      merchantId: "APPLE_PAY_MERCHANT_ID",
+      merchantName: "APPLE_PAY_MERCHANT_NAME",
+    );
+
+    final applePayConfigurationDTO = applePayConfiguration.toDTO();
+
+    expect(applePayConfigurationDTO.hasOnShippingMethodChange, false);
+  });
+
+  test(
+      "when using apple pay shipping method update, then should parse to ApplePayShippingMethodUpdateDTO",
+      () {
+    final applePayShippingMethodUpdate = ApplePayShippingMethodUpdate(
+      summaryItems: [
+        ApplePaySummaryItem(
+          label: "Total",
+          amount: Amount(value: 3098, currency: "EUR"),
+          type: ApplePaySummaryItemType.definite,
+        )
+      ],
+    );
+
+    final applePayShippingMethodUpdateDTO =
+        applePayShippingMethodUpdate.toDTO();
+
+    expect(applePayShippingMethodUpdateDTO.summaryItems.firstOrNull?.label,
+        "Total");
+    expect(
+        applePayShippingMethodUpdateDTO.summaryItems.firstOrNull?.amount.value,
+        3098);
+    expect(
+        applePayShippingMethodUpdateDTO
+            .summaryItems.firstOrNull?.amount.currency,
+        "EUR");
+    expect(applePayShippingMethodUpdateDTO.summaryItems.firstOrNull?.type,
+        ApplePaySummaryItemType.definite);
   });
 
   test(

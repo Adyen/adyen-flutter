@@ -136,6 +136,7 @@ extension ApplePayConfigurationMapper on ApplePayConfiguration {
         merchantCapability: merchantCapability,
         supportsCouponCode: supportsCouponCode,
         couponCode: couponCode,
+        hasOnShippingMethodChange: onShippingMethodChange != null,
       );
 }
 
@@ -172,6 +173,32 @@ extension ApplePaySummaryItemsMapper on ApplePaySummaryItem {
   ApplePaySummaryItemDTO toDTO() => ApplePaySummaryItemDTO(
         label: label,
         amount: amount.toDTO(),
+        type: type,
+      );
+}
+
+extension ApplePayShippingMethodUpdateMapper on ApplePayShippingMethodUpdate {
+  ApplePayShippingMethodUpdateDTO toDTO() => ApplePayShippingMethodUpdateDTO(
+        summaryItems:
+            summaryItems.map((summaryItem) => summaryItem.toDTO()).toList(),
+      );
+}
+
+extension ApplePayShippingMethodDTOMapper on ApplePayShippingMethodDTO {
+  ApplePayShippingMethod fromDTO() => ApplePayShippingMethod(
+        label: label,
+        detail: detail,
+        amount: amount.fromDTO(),
+        identifier: identifier,
+        startDate: startDate == null ? null : DateTime.tryParse(startDate!),
+        endDate: endDate == null ? null : DateTime.tryParse(endDate!),
+      );
+}
+
+extension ApplePaySummaryItemDTOMapper on ApplePaySummaryItemDTO {
+  ApplePaySummaryItem fromDTO() => ApplePaySummaryItem(
+        label: label,
+        amount: amount.fromDTO(),
         type: type,
       );
 }
@@ -320,6 +347,10 @@ extension AmountMapper on Amount {
         value: value,
         currency: currency,
       );
+}
+
+extension AmountDTOMapper on AmountDTO {
+  Amount fromDTO() => Amount(value: value, currency: currency);
 }
 
 extension OrderResponseMapper on OrderResponseDTO {

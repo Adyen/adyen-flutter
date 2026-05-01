@@ -5,7 +5,11 @@ import Adyen
 import PassKit
 
 extension ApplePayConfigurationDTO {
-    func toApplePayConfiguration(payment: Payment?) throws -> ApplePayComponent.Configuration {
+    func toApplePayConfiguration(
+        payment: Payment?,
+        componentFlutterApi: ComponentFlutterInterface? = nil,
+        componentId: String? = nil
+    ) throws -> ApplePayComponent.Configuration {
         guard let payment else {
             throw AdyenPigeonError(
                 code: ApplePayConfigurationErrorCode.missingAmount,
@@ -264,6 +268,59 @@ extension AmountDTO {
             )
         }
         return AmountFormatter.decimalAmount(value, currencyCode: currency)
+    }
+}
+
+extension ApplePayShippingMethodUpdateDTO {
+    func toPKPaymentRequestShippingMethodUpdate() -> PKPaymentRequestShippingMethodUpdate {
+        PKPaymentRequestShippingMethodUpdate(
+            paymentSummaryItems: summaryItems.compactMap { try? $0?.toApplePaySummeryItem() }
+        )
+    }
+}
+
+extension PKPaymentSummaryItem {
+    func toDTO(currencyCode: String) -> ApplePaySummaryItemDTO {
+        ApplePaySummaryItemDTO(
+            label: label,
+            amount: amount.toDTO(currencyCode: currencyCode),
+            type: type.toDTO()
+        )
+    }
+}
+
+extension PKPaymentSummaryItemType {
+    func toDTO() -> ApplePaySummaryItemType {
+        switch self {
+        case .pending:
+            return .pending
+        case .final:
+            return .definite
+        @unknown default:
+            return .definite
+        }
+    }
+}
+
+extension PKShippingMethod {
+    func toDTO(currencyCode: String) -> ApplePayShippingMethodDTO {
+        ApplePayShippingMethodDTO(
+            label: label,
+            detail: detail ?? "",
+            amount: amount.toDTO(currencyCode: currencyCode),
+            identifier: identifier ?? "",
+            startDate: nil,
+            endDate: nil
+        )
+    }
+}
+
+extension NSDecimalNumber {
+    func toDTO(currencyCode: String) -> AmountDTO {
+        AmountDTO(
+            currency: currencyCode,
+            value: Int64(AmountFormatter.minorUnitAmount(from: decimalValue, currencyCode: currencyCode))
+        )
     }
 }
 

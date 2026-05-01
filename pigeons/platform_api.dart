@@ -398,6 +398,7 @@ class ApplePayConfigurationDTO {
   final ApplePayMerchantCapability? merchantCapability;
   final bool? supportsCouponCode;
   final String? couponCode;
+  final bool hasOnShippingMethodChange;
 
   ApplePayConfigurationDTO(
     this.merchantId,
@@ -416,7 +417,14 @@ class ApplePayConfigurationDTO {
     this.merchantCapability,
     this.supportsCouponCode,
     this.couponCode,
+    this.hasOnShippingMethodChange,
   );
+}
+
+class ApplePayShippingMethodUpdateDTO {
+  final List<ApplePaySummaryItemDTO?> summaryItems;
+
+  ApplePayShippingMethodUpdateDTO(this.summaryItems);
 }
 
 class ApplePayContactDTO {
@@ -935,4 +943,11 @@ abstract class ComponentFlutterInterface {
 
   void onComponentCommunication(
       ComponentCommunicationModel componentCommunicationModel);
+
+  @async
+  ApplePayShippingMethodUpdateDTO onApplePayShippingMethodChange(
+    String componentId,
+    ApplePayShippingMethodDTO shippingMethod,
+    List<ApplePaySummaryItemDTO?> currentSummaryItems,
+  );
 }

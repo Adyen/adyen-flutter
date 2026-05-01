@@ -1,6 +1,7 @@
 import 'package:adyen_checkout/src/common/model/payment_method_configurations/apple_pay/apple_pay_contact.dart';
 import 'package:adyen_checkout/src/common/model/payment_method_configurations/apple_pay/apple_pay_contact_field.dart';
 import 'package:adyen_checkout/src/common/model/payment_method_configurations/apple_pay/apple_pay_shipping_method.dart';
+import 'package:adyen_checkout/src/common/model/payment_method_configurations/apple_pay/apple_pay_shipping_method_update.dart';
 import 'package:adyen_checkout/src/common/model/payment_method_configurations/apple_pay/apple_pay_summary_item.dart';
 import 'package:adyen_checkout/src/generated/platform_api.g.dart';
 
@@ -21,6 +22,10 @@ class ApplePayConfiguration {
   final ApplePayMerchantCapability? merchantCapability;
   final bool? supportsCouponCode;
   final String? couponCode;
+  final Future<ApplePayShippingMethodUpdate> Function(
+    ApplePayShippingMethod method,
+    List<ApplePaySummaryItem> currentSummaryItems,
+  )? onShippingMethodChange;
 
   ApplePayConfiguration({
     required this.merchantId,
@@ -39,6 +44,7 @@ class ApplePayConfiguration {
     this.merchantCapability,
     this.supportsCouponCode,
     this.couponCode,
+    this.onShippingMethodChange,
   });
 
   @override
@@ -59,6 +65,7 @@ class ApplePayConfiguration {
         'supportedCountries: $supportedCountries, '
         'merchantCapability: $merchantCapability, '
         'supportsCouponCode: $supportsCouponCode, '
-        'couponCode: $couponCode)';
+        'couponCode: $couponCode, '
+        'onShippingMethodChange: $onShippingMethodChange)';
   }
 }
