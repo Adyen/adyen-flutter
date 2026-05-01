@@ -269,7 +269,7 @@ internal class DropInPlatformApi(
         )
     }
 
-    private fun hideStoredPaymentMethodsIfNeeded(
+    private fun applyStoredPaymentMethodsVisibility(
         paymentMethodsApiResponse: PaymentMethodsApiResponse,
         showStoredPaymentMethods: Boolean,
     ): PaymentMethodsApiResponse {
