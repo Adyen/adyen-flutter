@@ -235,7 +235,7 @@ internal class DropInPlatformApi(
             sessionSetupResponse.paymentMethodsApiResponse?.let { paymentMethodsApiResponse ->
                 sessionSetupResponse.copy(
                     paymentMethodsApiResponse =
-                        hideStoredPaymentMethodsIfNeeded(
+                        applyStoredPaymentMethodsVisibility(
                             paymentMethodsApiResponse = paymentMethodsApiResponse,
                             showStoredPaymentMethods = showStoredPaymentMethods,
                         )
