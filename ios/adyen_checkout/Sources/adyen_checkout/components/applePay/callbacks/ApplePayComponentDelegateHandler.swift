@@ -5,14 +5,14 @@
 import PassKit
 
 final class ApplePayComponentDelegateHandler: ApplePayComponentDelegate {
-    private let componentFlutterApi: ComponentFlutterInterface
+    private let applePayCallbackBridge: ApplePayCallbackBridge
     private let componentId: String
 
     init(
-        componentFlutterApi: ComponentFlutterInterface,
+        applePayCallbackBridge: ApplePayCallbackBridge,
         componentId: String
     ) {
-        self.componentFlutterApi = componentFlutterApi
+        self.applePayCallbackBridge = applePayCallbackBridge
         self.componentId = componentId
     }
 
@@ -29,18 +29,11 @@ final class ApplePayComponentDelegateHandler: ApplePayComponentDelegate {
         for payment: ApplePayPayment,
         completion: @escaping (PKPaymentRequestShippingMethodUpdate) -> Void
     ) {
-        componentFlutterApi.onApplePayShippingMethodChange(
+        applePayCallbackBridge.onShippingMethodChange(
             componentId: componentId,
-            shippingMethod: shippingMethod.toDTO(currencyCode: payment.currencyCode),
-            currentSummaryItems: payment.summaryItems.map { $0.toDTO(currencyCode: payment.currencyCode) },
-            completion: { result in
-                switch result {
-                case let .success(update):
-                    completion(update.toPKPaymentRequestShippingMethodUpdate())
-                case .failure:
-                    completion(PKPaymentRequestShippingMethodUpdate(paymentSummaryItems: payment.summaryItems))
-                }
-            }
+            shippingMethod: shippingMethod,
+            payment: payment,
+            completion: completion
         )
     }
 

@@ -45,7 +45,9 @@ class ApplePaySessionComponent: BaseApplePayComponent {
         applePayComponent.delegate = sessionHolder.session
         if self.configuration.applePayConfigurationDTO?.hasOnShippingMethodChange == true {
             let applePayComponentDelegateHandler = ApplePayComponentDelegateHandler(
-                componentFlutterApi: componentFlutterApi,
+                applePayCallbackBridge: PigeonApplePayCallbackBridge(
+                    componentFlutterApi: componentFlutterApi
+                ),
                 componentId: componentId
             )
             self.applePayComponentDelegateHandler = applePayComponentDelegateHandler
