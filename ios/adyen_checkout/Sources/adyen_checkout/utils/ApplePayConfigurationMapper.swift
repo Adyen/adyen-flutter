@@ -199,6 +199,27 @@ extension ApplePayContactDTO {
     }
 }
 
+extension PKContact {
+    func toDTO() -> ApplePayContactDTO {
+        ApplePayContactDTO(
+            phoneNumber: phoneNumber?.stringValue,
+            emailAddress: emailAddress as String?,
+            givenName: name?.givenName,
+            familyName: name?.familyName,
+            phoneticGivenName: name?.phoneticRepresentation?.givenName,
+            phoneticFamilyName: name?.phoneticRepresentation?.familyName,
+            addressLines: postalAddress?.street.components(separatedBy: "\n"),
+            subLocality: postalAddress?.subLocality,
+            city: postalAddress?.city,
+            postalCode: postalAddress?.postalCode,
+            subAdministrativeArea: postalAddress?.subAdministrativeArea,
+            administrativeArea: postalAddress?.state,
+            country: postalAddress?.country,
+            countryCode: postalAddress?.isoCountryCode
+        )
+    }
+}
+
 extension PKContactField {
     static func fromString(_ rawValue: String) -> PKContactField {
         switch rawValue {
@@ -275,6 +296,16 @@ extension ApplePayShippingMethodUpdateDTO {
     func toPKPaymentRequestShippingMethodUpdate() -> PKPaymentRequestShippingMethodUpdate {
         PKPaymentRequestShippingMethodUpdate(
             paymentSummaryItems: summaryItems.compactMap { try? $0?.toApplePaySummeryItem() }
+        )
+    }
+}
+
+extension ApplePayShippingContactUpdateDTO {
+    func toPKPaymentRequestShippingContactUpdate() -> PKPaymentRequestShippingContactUpdate {
+        PKPaymentRequestShippingContactUpdate(
+            errors: nil,
+            paymentSummaryItems: summaryItems.compactMap { try? $0?.toApplePaySummeryItem() },
+            shippingMethods: shippingMethods?.compactMap { try? $0?.toPKShippingMethod() } ?? []
         )
     }
 }

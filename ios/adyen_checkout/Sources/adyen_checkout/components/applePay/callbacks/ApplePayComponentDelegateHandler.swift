@@ -21,7 +21,12 @@ final class ApplePayComponentDelegateHandler: ApplePayComponentDelegate {
         for payment: ApplePayPayment,
         completion: @escaping (PKPaymentRequestShippingContactUpdate) -> Void
     ) {
-        completion(PKPaymentRequestShippingContactUpdate(paymentSummaryItems: payment.summaryItems))
+        applePayCallbackBridge.onShippingContactChange(
+            componentId: componentId,
+            contact: contact,
+            payment: payment,
+            completion: completion
+        )
     }
 
     func didUpdate(

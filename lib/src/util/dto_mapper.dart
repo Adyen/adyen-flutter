@@ -137,6 +137,7 @@ extension ApplePayConfigurationMapper on ApplePayConfiguration {
         supportsCouponCode: supportsCouponCode,
         couponCode: couponCode,
         hasOnShippingMethodChange: onShippingMethodChange != null,
+        hasOnShippingContactChange: onShippingContactChange != null,
       );
 }
 
@@ -149,6 +150,25 @@ extension ApplePayContactMapper on ApplePayContact {
         phoneticGivenName: phoneticGivenName,
         phoneticFamilyName: phoneticFamilyName,
         addressLines: addressLines,
+        subLocality: subLocality,
+        city: city,
+        postalCode: postalCode,
+        subAdministrativeArea: subAdministrativeArea,
+        administrativeArea: administrativeArea,
+        country: country,
+        countryCode: countryCode,
+      );
+}
+
+extension ApplePayContactDTOMapper on ApplePayContactDTO {
+  ApplePayContact fromDTO() => ApplePayContact(
+        phoneNumber: phoneNumber,
+        emailAddress: emailAddress,
+        givenName: givenName,
+        familyName: familyName,
+        phoneticGivenName: phoneticGivenName,
+        phoneticFamilyName: phoneticFamilyName,
+        addressLines: addressLines?.whereType<String>().toList(),
         subLocality: subLocality,
         city: city,
         postalCode: postalCode,
@@ -181,6 +201,16 @@ extension ApplePayShippingMethodUpdateMapper on ApplePayShippingMethodUpdate {
   ApplePayShippingMethodUpdateDTO toDTO() => ApplePayShippingMethodUpdateDTO(
         summaryItems:
             summaryItems.map((summaryItem) => summaryItem.toDTO()).toList(),
+      );
+}
+
+extension ApplePayShippingContactUpdateMapper on ApplePayShippingContactUpdate {
+  ApplePayShippingContactUpdateDTO toDTO() => ApplePayShippingContactUpdateDTO(
+        summaryItems:
+            summaryItems.map((summaryItem) => summaryItem.toDTO()).toList(),
+        shippingMethods: shippingMethods
+            ?.map((shippingMethod) => shippingMethod.toDTO())
+            .toList(),
       );
 }
 
