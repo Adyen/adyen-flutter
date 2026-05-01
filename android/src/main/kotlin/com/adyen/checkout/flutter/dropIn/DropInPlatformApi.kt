@@ -109,7 +109,7 @@ internal class DropInPlatformApi(
                     dropInConfigurationDTO.isPartialPaymentSupported
                 )
             val filteredPaymentMethods =
-                applyStoredPaymentMethodsVisibility(
+                hideStoredPaymentMethodsIfNeeded(
                     paymentMethodsWithoutGiftCards,
                     dropInConfigurationDTO.showStoredPaymentMethods
                 )
@@ -232,14 +232,15 @@ internal class DropInPlatformApi(
     ): CheckoutSession {
         val sessionSetupResponse = SessionSetupResponse.SERIALIZER.deserialize(sessionHolder.sessionSetupResponse)
         val adjustedSessionSetupResponse =
-            if (showStoredPaymentMethods) {
-                sessionSetupResponse
-            } else {
+            sessionSetupResponse.paymentMethodsApiResponse?.let { paymentMethodsApiResponse ->
                 sessionSetupResponse.copy(
                     paymentMethodsApiResponse =
-                        sessionSetupResponse.paymentMethodsApiResponse?.copy(storedPaymentMethods = emptyList())
+                        hideStoredPaymentMethodsIfNeeded(
+                            paymentMethodsApiResponse = paymentMethodsApiResponse,
+                            showStoredPaymentMethods = showStoredPaymentMethods,
+                        )
                 )
-            }
+            } ?: sessionSetupResponse
         val order = sessionHolder.orderResponse?.let { Order.SERIALIZER.deserialize(it) }
         return CheckoutSession(
             sessionSetupResponse = adjustedSessionSetupResponse,
@@ -268,16 +269,15 @@ internal class DropInPlatformApi(
         )
     }
 
-    private fun applyStoredPaymentMethodsVisibility(
-        paymentMethodsResponse: PaymentMethodsApiResponse,
+    private fun hideStoredPaymentMethodsIfNeeded(
+        paymentMethodsApiResponse: PaymentMethodsApiResponse,
         showStoredPaymentMethods: Boolean,
     ): PaymentMethodsApiResponse {
         if (showStoredPaymentMethods) {
-            return paymentMethodsResponse
+            return paymentMethodsApiResponse
         }
-        return PaymentMethodsApiResponse(
+        return paymentMethodsApiResponse.copy(
             storedPaymentMethods = emptyList(),
-            paymentMethods = paymentMethodsResponse.paymentMethods
         )
     }
 
