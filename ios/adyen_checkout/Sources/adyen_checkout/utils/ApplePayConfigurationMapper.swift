@@ -300,6 +300,17 @@ extension ApplePayShippingMethodUpdateDTO {
     }
 }
 
+@available(iOS 15.0, *)
+extension ApplePayCouponCodeUpdateDTO {
+    func toPKPaymentRequestCouponCodeUpdate() -> PKPaymentRequestCouponCodeUpdate {
+        PKPaymentRequestCouponCodeUpdate(
+            errors: nil,
+            paymentSummaryItems: summaryItems.compactMap { try? $0?.toApplePaySummeryItem() },
+            shippingMethods: []
+        )
+    }
+}
+
 extension ApplePayShippingContactUpdateDTO {
     func toPKPaymentRequestShippingContactUpdate() -> PKPaymentRequestShippingContactUpdate {
         PKPaymentRequestShippingContactUpdate(

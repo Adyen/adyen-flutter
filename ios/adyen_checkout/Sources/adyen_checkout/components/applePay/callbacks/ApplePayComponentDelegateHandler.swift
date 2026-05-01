@@ -48,6 +48,11 @@ final class ApplePayComponentDelegateHandler: ApplePayComponentDelegate {
         for payment: ApplePayPayment,
         completion: @escaping (PKPaymentRequestCouponCodeUpdate) -> Void
     ) {
-        completion(PKPaymentRequestCouponCodeUpdate(paymentSummaryItems: payment.summaryItems))
+        applePayCallbackBridge.onCouponCodeChange(
+            componentId: componentId,
+            couponCode: couponCode,
+            payment: payment,
+            completion: completion
+        )
     }
 }

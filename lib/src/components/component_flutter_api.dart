@@ -93,6 +93,36 @@ class ComponentFlutterApi implements ComponentFlutterInterface {
     }
   }
 
+  @override
+  Future<ApplePayCouponCodeUpdateDTO> onApplePayCouponCodeChange(
+    String componentId,
+    String couponCode,
+    List<ApplePaySummaryItemDTO?> currentSummaryItems,
+  ) async {
+    final fallbackSummaryItems = currentSummaryItems
+        .whereType<ApplePaySummaryItemDTO>()
+        .map((summaryItem) => summaryItem.fromDTO())
+        .toList();
+    final callback = _applePayConfiguration?.onCouponCodeChange;
+    if (callback == null) {
+      return ApplePayCouponCodeUpdateDTO(
+        summaryItems: currentSummaryItems,
+      );
+    }
+
+    try {
+      return (await callback(
+        couponCode,
+        fallbackSummaryItems,
+      ))
+          .toDTO();
+    } catch (_) {
+      return ApplePayCouponCodeUpdateDTO(
+        summaryItems: currentSummaryItems,
+      );
+    }
+  }
+
   void registerApplePayConfiguration(
       ApplePayConfiguration applePayConfiguration) {
     _applePayConfiguration = applePayConfiguration;

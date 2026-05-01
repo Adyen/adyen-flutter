@@ -138,6 +138,7 @@ extension ApplePayConfigurationMapper on ApplePayConfiguration {
         couponCode: couponCode,
         hasOnShippingMethodChange: onShippingMethodChange != null,
         hasOnShippingContactChange: onShippingContactChange != null,
+        hasOnCouponCodeChange: onCouponCodeChange != null,
       );
 }
 
@@ -199,6 +200,13 @@ extension ApplePaySummaryItemsMapper on ApplePaySummaryItem {
 
 extension ApplePayShippingMethodUpdateMapper on ApplePayShippingMethodUpdate {
   ApplePayShippingMethodUpdateDTO toDTO() => ApplePayShippingMethodUpdateDTO(
+        summaryItems:
+            summaryItems.map((summaryItem) => summaryItem.toDTO()).toList(),
+      );
+}
+
+extension ApplePayCouponCodeUpdateMapper on ApplePayCouponCodeUpdate {
+  ApplePayCouponCodeUpdateDTO toDTO() => ApplePayCouponCodeUpdateDTO(
         summaryItems:
             summaryItems.map((summaryItem) => summaryItem.toDTO()).toList(),
       );

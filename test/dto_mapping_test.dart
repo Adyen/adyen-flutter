@@ -246,6 +246,10 @@ void main() {
         onShippingContactChange: (contact, currentSummaryItems) async =>
             ApplePayShippingContactUpdate(
               summaryItems: currentSummaryItems,
+            ),
+        onCouponCodeChange: (couponCode, currentSummaryItems) async =>
+            ApplePayCouponCodeUpdate(
+              summaryItems: currentSummaryItems,
             ));
 
     final applePayConfigurationDTO = applePayConfiguration.toDTO();
@@ -301,6 +305,7 @@ void main() {
     expect(applePayConfigurationDTO.couponCode, "SUMMER10");
     expect(applePayConfigurationDTO.hasOnShippingMethodChange, true);
     expect(applePayConfigurationDTO.hasOnShippingContactChange, true);
+    expect(applePayConfigurationDTO.hasOnCouponCodeChange, true);
   });
 
   test(
@@ -315,6 +320,7 @@ void main() {
 
     expect(applePayConfigurationDTO.hasOnShippingMethodChange, false);
     expect(applePayConfigurationDTO.hasOnShippingContactChange, false);
+    expect(applePayConfigurationDTO.hasOnCouponCodeChange, false);
   });
 
   test(
@@ -381,6 +387,29 @@ void main() {
         applePayShippingContactUpdateDTO
             .shippingMethods?.firstOrNull?.identifier,
         "express");
+  });
+
+  test(
+      "when using apple pay coupon code update, then should parse to ApplePayCouponCodeUpdateDTO",
+      () {
+    final applePayCouponCodeUpdate = ApplePayCouponCodeUpdate(
+      summaryItems: [
+        ApplePaySummaryItem(
+          label: "Discounted total",
+          amount: Amount(value: 2099, currency: "EUR"),
+          type: ApplePaySummaryItemType.definite,
+        )
+      ],
+    );
+
+    final applePayCouponCodeUpdateDTO = applePayCouponCodeUpdate.toDTO();
+
+    expect(applePayCouponCodeUpdateDTO.summaryItems.firstOrNull?.label,
+        "Discounted total");
+    expect(applePayCouponCodeUpdateDTO.summaryItems.firstOrNull?.amount.value,
+        2099);
+    expect(applePayCouponCodeUpdateDTO.summaryItems.firstOrNull?.type,
+        ApplePaySummaryItemType.definite);
   });
 
   test(
