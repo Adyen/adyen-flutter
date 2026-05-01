@@ -236,7 +236,21 @@ void main() {
         ],
         applicationData: null,
         supportedCountries: ["NL"],
-        merchantCapability: ApplePayMerchantCapability.debit);
+        merchantCapability: ApplePayMerchantCapability.debit,
+        supportsCouponCode: true,
+        couponCode: "SUMMER10",
+        onShippingMethodChange: (method, currentSummaryItems) async =>
+            ApplePayShippingMethodUpdate(
+              summaryItems: currentSummaryItems,
+            ),
+        onShippingContactChange: (contact, currentSummaryItems) async =>
+            ApplePayShippingContactUpdate(
+              summaryItems: currentSummaryItems,
+            ),
+        onCouponCodeChange: (couponCode, currentSummaryItems) async =>
+            ApplePayCouponCodeUpdate(
+              summaryItems: currentSummaryItems,
+            ));
 
     final applePayConfigurationDTO = applePayConfiguration.toDTO();
 
@@ -287,6 +301,115 @@ void main() {
     expect(applePayConfigurationDTO.supportedCountries, ["NL"]);
     expect(applePayConfigurationDTO.merchantCapability,
         ApplePayMerchantCapability.debit);
+    expect(applePayConfigurationDTO.supportsCouponCode, true);
+    expect(applePayConfigurationDTO.couponCode, "SUMMER10");
+    expect(applePayConfigurationDTO.hasOnShippingMethodChange, true);
+    expect(applePayConfigurationDTO.hasOnShippingContactChange, true);
+    expect(applePayConfigurationDTO.hasOnCouponCodeChange, true);
+  });
+
+  test(
+      "when using apple pay configuration without shipping callbacks, then should map callback flags to false",
+      () {
+    final applePayConfiguration = ApplePayConfiguration(
+      merchantId: "APPLE_PAY_MERCHANT_ID",
+      merchantName: "APPLE_PAY_MERCHANT_NAME",
+    );
+
+    final applePayConfigurationDTO = applePayConfiguration.toDTO();
+
+    expect(applePayConfigurationDTO.hasOnShippingMethodChange, false);
+    expect(applePayConfigurationDTO.hasOnShippingContactChange, false);
+    expect(applePayConfigurationDTO.hasOnCouponCodeChange, false);
+  });
+
+  test(
+      "when using apple pay shipping method update, then should parse to ApplePayShippingMethodUpdateDTO",
+      () {
+    final applePayShippingMethodUpdate = ApplePayShippingMethodUpdate(
+      summaryItems: [
+        ApplePaySummaryItem(
+          label: "Total",
+          amount: Amount(value: 3098, currency: "EUR"),
+          type: ApplePaySummaryItemType.definite,
+        )
+      ],
+    );
+
+    final applePayShippingMethodUpdateDTO =
+        applePayShippingMethodUpdate.toDTO();
+
+    expect(applePayShippingMethodUpdateDTO.summaryItems.firstOrNull?.label,
+        "Total");
+    expect(
+        applePayShippingMethodUpdateDTO.summaryItems.firstOrNull?.amount.value,
+        3098);
+    expect(
+        applePayShippingMethodUpdateDTO
+            .summaryItems.firstOrNull?.amount.currency,
+        "EUR");
+    expect(applePayShippingMethodUpdateDTO.summaryItems.firstOrNull?.type,
+        ApplePaySummaryItemType.definite);
+  });
+
+  test(
+      "when using apple pay shipping contact update, then should parse to ApplePayShippingContactUpdateDTO",
+      () {
+    final applePayShippingContactUpdate = ApplePayShippingContactUpdate(
+      summaryItems: [
+        ApplePaySummaryItem(
+          label: "Total",
+          amount: Amount(value: 3597, currency: "EUR"),
+          type: ApplePaySummaryItemType.definite,
+        )
+      ],
+      shippingMethods: [
+        ApplePayShippingMethod(
+          label: "Express shipping",
+          detail: "DHL Express",
+          amount: Amount(value: 999, currency: "EUR"),
+          identifier: "express",
+        )
+      ],
+    );
+
+    final applePayShippingContactUpdateDTO =
+        applePayShippingContactUpdate.toDTO();
+
+    expect(applePayShippingContactUpdateDTO.summaryItems.firstOrNull?.label,
+        "Total");
+    expect(
+        applePayShippingContactUpdateDTO.summaryItems.firstOrNull?.amount.value,
+        3597);
+    expect(applePayShippingContactUpdateDTO.shippingMethods?.firstOrNull?.label,
+        "Express shipping");
+    expect(
+        applePayShippingContactUpdateDTO
+            .shippingMethods?.firstOrNull?.identifier,
+        "express");
+  });
+
+  test(
+      "when using apple pay coupon code update, then should parse to ApplePayCouponCodeUpdateDTO",
+      () {
+    final applePayCouponCodeUpdate = ApplePayCouponCodeUpdate(
+      summaryItems: [
+        ApplePaySummaryItem(
+          label: "Discounted total",
+          amount: Amount(value: 2099, currency: "EUR"),
+          type: ApplePaySummaryItemType.definite,
+        )
+      ],
+    );
+
+    final applePayCouponCodeUpdateDTO = applePayCouponCodeUpdate.toDTO();
+
+    expect(applePayCouponCodeUpdateDTO.summaryItems.firstOrNull?.label,
+        "Discounted total");
+    expect(applePayCouponCodeUpdateDTO.summaryItems.firstOrNull?.amount.value,
+        2099);
+    expect(applePayCouponCodeUpdateDTO.summaryItems.firstOrNull?.type,
+        ApplePaySummaryItemType.definite);
   });
 
   test(

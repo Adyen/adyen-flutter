@@ -6,15 +6,19 @@
 class ApplePaySessionComponent: BaseApplePayComponent {
     private let sessionHolder: SessionHolder
     private let configuration: InstantPaymentConfigurationDTO
+    private let componentFlutterApi: ComponentFlutterInterface
     private let componentId: String
+    private var applePayComponentDelegateHandler: ApplePayComponentDelegateHandler?
     
     init(
         sessionHolder: SessionHolder,
         configuration: InstantPaymentConfigurationDTO,
+        componentFlutterApi: ComponentFlutterInterface,
         componentId: String
     ) throws {
         self.sessionHolder = sessionHolder
         self.configuration = configuration
+        self.componentFlutterApi = componentFlutterApi
         self.componentId = componentId
         super.init()
         applePayComponent = try buildApplePaySessionComponent()
@@ -39,6 +43,21 @@ class ApplePaySessionComponent: BaseApplePayComponent {
         let configuration = try configuration.mapToApplePayConfiguration(payment: payment)
         let applePayComponent = try ApplePayComponent(paymentMethod: paymentMethod, context: context, configuration: configuration)
         applePayComponent.delegate = sessionHolder.session
+        if self.configuration.applePayConfigurationDTO?.hasAnyApplePayCallback == true {
+            let applePayComponentDelegateHandler = ApplePayComponentDelegateHandler(
+                applePayCallbackBridge: PigeonApplePayCallbackBridge(
+                    componentFlutterApi: componentFlutterApi
+                ),
+                componentId: componentId
+            )
+            self.applePayComponentDelegateHandler = applePayComponentDelegateHandler
+            if self.configuration.applePayConfigurationDTO?.hasAnyApplePayUpdateCallback == true {
+                applePayComponent.applePayDelegate = applePayComponentDelegateHandler
+            }
+            if self.configuration.applePayConfigurationDTO?.hasOnAuthorize == true {
+                applePayComponent.authorizationDelegate = applePayComponentDelegateHandler
+            }
+        }
         setupSessionFlowDelegate()
         return applePayComponent
     }

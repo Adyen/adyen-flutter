@@ -38,9 +38,8 @@ extension DropInConfigurationMapper on DropInConfiguration {
         preselectedPaymentMethodTitle: preselectedPaymentMethodTitle,
         paymentMethodNames: paymentMethodNames,
         isPartialPaymentSupported: isPartialPaymentSupported,
-        showStoredPaymentMethods: storedPaymentMethodConfiguration
-                ?.showStoredPaymentMethods ??
-            true,
+        showStoredPaymentMethods:
+            storedPaymentMethodConfiguration?.showStoredPaymentMethods ?? true,
       );
 
   bool _isRemoveStoredPaymentMethodEnabled(
@@ -135,6 +134,46 @@ extension ApplePayConfigurationMapper on ApplePayConfiguration {
         applicationData: applicationData,
         supportedCountries: supportedCountries,
         merchantCapability: merchantCapability,
+        supportsCouponCode: supportsCouponCode,
+        couponCode: couponCode,
+        hasOnShippingMethodChange: onShippingMethodChange != null,
+        hasOnShippingContactChange: onShippingContactChange != null,
+        hasOnCouponCodeChange: onCouponCodeChange != null,
+        hasOnAuthorize: onAuthorize != null,
+      );
+}
+
+extension ApplePayAuthorizedPaymentDTOMapper on ApplePayAuthorizedPaymentDTO {
+  ApplePayAuthorizedPayment fromDTO() => ApplePayAuthorizedPayment(
+        token: token,
+        network: network,
+        billingContact: billingContact?.fromDTO(),
+        shippingContact: shippingContact?.fromDTO(),
+        shippingMethod: shippingMethod?.fromDTO(),
+      );
+}
+
+extension ApplePayAuthorizationResultMapper on ApplePayAuthorizationResult {
+  ApplePayAuthorizationResultDTO toDTO() {
+    switch (this) {
+      case ApplePayAuthorizationSuccess():
+        return ApplePayAuthorizationResultDTO(
+          isSuccess: true,
+        );
+      case ApplePayAuthorizationFailure(errors: final errors):
+        return ApplePayAuthorizationResultDTO(
+          isSuccess: false,
+          errors: errors.map((error) => error.toDTO()).toList(),
+        );
+    }
+  }
+}
+
+extension ApplePayPaymentErrorMapper on ApplePayPaymentError {
+  ApplePayPaymentErrorDTO toDTO() => ApplePayPaymentErrorDTO(
+        type: type,
+        field: field?.name,
+        localizedDescription: localizedDescription,
       );
 }
 
@@ -147,6 +186,25 @@ extension ApplePayContactMapper on ApplePayContact {
         phoneticGivenName: phoneticGivenName,
         phoneticFamilyName: phoneticFamilyName,
         addressLines: addressLines,
+        subLocality: subLocality,
+        city: city,
+        postalCode: postalCode,
+        subAdministrativeArea: subAdministrativeArea,
+        administrativeArea: administrativeArea,
+        country: country,
+        countryCode: countryCode,
+      );
+}
+
+extension ApplePayContactDTOMapper on ApplePayContactDTO {
+  ApplePayContact fromDTO() => ApplePayContact(
+        phoneNumber: phoneNumber,
+        emailAddress: emailAddress,
+        givenName: givenName,
+        familyName: familyName,
+        phoneticGivenName: phoneticGivenName,
+        phoneticFamilyName: phoneticFamilyName,
+        addressLines: addressLines?.whereType<String>().toList(),
         subLocality: subLocality,
         city: city,
         postalCode: postalCode,
@@ -171,6 +229,49 @@ extension ApplePaySummaryItemsMapper on ApplePaySummaryItem {
   ApplePaySummaryItemDTO toDTO() => ApplePaySummaryItemDTO(
         label: label,
         amount: amount.toDTO(),
+        type: type,
+      );
+}
+
+extension ApplePayShippingMethodUpdateMapper on ApplePayShippingMethodUpdate {
+  ApplePayShippingMethodUpdateDTO toDTO() => ApplePayShippingMethodUpdateDTO(
+        summaryItems:
+            summaryItems.map((summaryItem) => summaryItem.toDTO()).toList(),
+      );
+}
+
+extension ApplePayCouponCodeUpdateMapper on ApplePayCouponCodeUpdate {
+  ApplePayCouponCodeUpdateDTO toDTO() => ApplePayCouponCodeUpdateDTO(
+        summaryItems:
+            summaryItems.map((summaryItem) => summaryItem.toDTO()).toList(),
+      );
+}
+
+extension ApplePayShippingContactUpdateMapper on ApplePayShippingContactUpdate {
+  ApplePayShippingContactUpdateDTO toDTO() => ApplePayShippingContactUpdateDTO(
+        summaryItems:
+            summaryItems.map((summaryItem) => summaryItem.toDTO()).toList(),
+        shippingMethods: shippingMethods
+            ?.map((shippingMethod) => shippingMethod.toDTO())
+            .toList(),
+      );
+}
+
+extension ApplePayShippingMethodDTOMapper on ApplePayShippingMethodDTO {
+  ApplePayShippingMethod fromDTO() => ApplePayShippingMethod(
+        label: label,
+        detail: detail,
+        amount: amount.fromDTO(),
+        identifier: identifier,
+        startDate: startDate == null ? null : DateTime.tryParse(startDate!),
+        endDate: endDate == null ? null : DateTime.tryParse(endDate!),
+      );
+}
+
+extension ApplePaySummaryItemDTOMapper on ApplePaySummaryItemDTO {
+  ApplePaySummaryItem fromDTO() => ApplePaySummaryItem(
+        label: label,
+        amount: amount.fromDTO(),
         type: type,
       );
 }
@@ -319,6 +420,10 @@ extension AmountMapper on Amount {
         value: value,
         currency: currency,
       );
+}
+
+extension AmountDTOMapper on AmountDTO {
+  Amount fromDTO() => Amount(value: value, currency: currency);
 }
 
 extension OrderResponseMapper on OrderResponseDTO {

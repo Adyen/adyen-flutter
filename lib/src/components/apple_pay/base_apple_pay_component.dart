@@ -208,6 +208,9 @@ class _BaseApplePayComponentState extends State<BaseApplePayComponent> {
       createInstantPaymentConfigurationDTO() async {
     final String versionNumber =
         await widget._sdkVersionNumberProvider.getSdkVersionNumber();
+    _componentFlutterApi.registerApplePayConfiguration(
+      widget.applePayComponentConfiguration.applePayConfiguration,
+    );
     final InstantPaymentConfigurationDTO
         instantPaymentComponentConfigurationDTO =
         widget.applePayComponentConfiguration.toDTO(

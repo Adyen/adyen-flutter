@@ -9,6 +9,7 @@ class ApplePayAdvancedComponent: BaseApplePayComponent {
     private let configuration: InstantPaymentConfigurationDTO
     private let paymentMethodResponse: String
     private let componentId: String
+    private var applePayComponentDelegateHandler: ApplePayComponentDelegateHandler?
 
     init(
         componentFlutterApi: ComponentFlutterInterface,
@@ -58,7 +59,21 @@ class ApplePayAdvancedComponent: BaseApplePayComponent {
         let configuration = try configuration.mapToApplePayConfiguration(payment: context.payment)
         let applePayComponent = try ApplePayComponent(paymentMethod: paymentMethod, context: context, configuration: configuration)
         applePayComponent.delegate = self
-        // applePayComponent?.applePayDelegate - Dynamic pricing will be added in the next version.
+        if self.configuration.applePayConfigurationDTO?.hasAnyApplePayCallback == true {
+            let applePayComponentDelegateHandler = ApplePayComponentDelegateHandler(
+                applePayCallbackBridge: PigeonApplePayCallbackBridge(
+                    componentFlutterApi: componentFlutterApi
+                ),
+                componentId: componentId
+            )
+            self.applePayComponentDelegateHandler = applePayComponentDelegateHandler
+            if self.configuration.applePayConfigurationDTO?.hasAnyApplePayUpdateCallback == true {
+                applePayComponent.applePayDelegate = applePayComponentDelegateHandler
+            }
+            if self.configuration.applePayConfigurationDTO?.hasOnAuthorize == true {
+                applePayComponent.authorizationDelegate = applePayComponentDelegateHandler
+            }
+        }
         return applePayComponent
     }
     
