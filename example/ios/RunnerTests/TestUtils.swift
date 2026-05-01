@@ -46,7 +46,8 @@ func createDropInConfigurationDTO(
     analyticsOptionsDTO: AnalyticsOptionsDTO = AnalyticsOptionsDTO(enabled: true, version: "1.0.0"),
     showPreselectedStoredPaymentMethod: Bool = true,
     skipListWhenSinglePaymentMethod: Bool = false,
-    isRemoveStoredPaymentMethodEnabled: Bool = false
+    isRemoveStoredPaymentMethodEnabled: Bool = false,
+    showStoredPaymentMethods: Bool = true
 ) -> DropInConfigurationDTO {
     DropInConfigurationDTO(
         environment: environment,
@@ -66,7 +67,8 @@ func createDropInConfigurationDTO(
         isRemoveStoredPaymentMethodEnabled: isRemoveStoredPaymentMethodEnabled,
         preselectedPaymentMethodTitle: nil,
         paymentMethodNames: nil,
-        isPartialPaymentSupported: false
+        isPartialPaymentSupported: false,
+        showStoredPaymentMethods: showStoredPaymentMethods
     )
 }
 

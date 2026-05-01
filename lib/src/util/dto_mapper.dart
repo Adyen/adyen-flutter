@@ -38,6 +38,9 @@ extension DropInConfigurationMapper on DropInConfiguration {
         preselectedPaymentMethodTitle: preselectedPaymentMethodTitle,
         paymentMethodNames: paymentMethodNames,
         isPartialPaymentSupported: isPartialPaymentSupported,
+        showStoredPaymentMethods: storedPaymentMethodConfiguration
+                ?.showStoredPaymentMethods ??
+            true,
       );
 
   bool _isRemoveStoredPaymentMethodEnabled(

@@ -622,6 +622,7 @@ struct DropInConfigurationDTO {
     var preselectedPaymentMethodTitle: String?
     var paymentMethodNames: [String?: String?]?
     var isPartialPaymentSupported: Bool
+    var showStoredPaymentMethods: Bool
 
     // swift-format-ignore: AlwaysUseLowerCamelCase
     static func fromList(_ __pigeon_list: [Any?]) -> DropInConfigurationDTO? {
@@ -643,6 +644,7 @@ struct DropInConfigurationDTO {
         let preselectedPaymentMethodTitle: String? = nilOrValue(__pigeon_list[15])
         let paymentMethodNames: [String?: String?]? = nilOrValue(__pigeon_list[16])
         let isPartialPaymentSupported = __pigeon_list[17] as! Bool
+        let showStoredPaymentMethods = __pigeon_list[18] as! Bool
 
         return DropInConfigurationDTO(
             environment: environment,
@@ -662,7 +664,8 @@ struct DropInConfigurationDTO {
             isRemoveStoredPaymentMethodEnabled: isRemoveStoredPaymentMethodEnabled,
             preselectedPaymentMethodTitle: preselectedPaymentMethodTitle,
             paymentMethodNames: paymentMethodNames,
-            isPartialPaymentSupported: isPartialPaymentSupported
+            isPartialPaymentSupported: isPartialPaymentSupported,
+            showStoredPaymentMethods: showStoredPaymentMethods
         )
     }
 
@@ -685,7 +688,8 @@ struct DropInConfigurationDTO {
             isRemoveStoredPaymentMethodEnabled,
             preselectedPaymentMethodTitle,
             paymentMethodNames,
-            isPartialPaymentSupported
+            isPartialPaymentSupported,
+            showStoredPaymentMethods
         ]
     }
 }

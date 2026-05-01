@@ -149,6 +149,7 @@ class ConfigurationMapperTest {
                 skipListWhenSinglePaymentMethod = false,
                 isRemoveStoredPaymentMethodEnabled = false,
                 isPartialPaymentSupported = false,
+                showStoredPaymentMethods = true,
             )
 
             val checkoutConfiguration = dropInConfigurationDTO.toCheckoutConfiguration()
@@ -170,6 +171,7 @@ class ConfigurationMapperTest {
                 skipListWhenSinglePaymentMethod = false,
                 isRemoveStoredPaymentMethodEnabled = false,
                 isPartialPaymentSupported = true,
+                showStoredPaymentMethods = true,
             )
 
             val checkoutConfiguration = dropInConfigurationDTO.toCheckoutConfiguration()
@@ -196,6 +198,7 @@ class ConfigurationMapperTest {
                 skipListWhenSinglePaymentMethod = true,
                 isRemoveStoredPaymentMethodEnabled = true,
                 isPartialPaymentSupported = false,
+                showStoredPaymentMethods = true,
                 paymentMethodNames = mapOf("scheme" to "Credit Card", "ideal" to "iDEAL Payment"),
             )
 
@@ -220,6 +223,7 @@ class ConfigurationMapperTest {
                 skipListWhenSinglePaymentMethod = false,
                 isRemoveStoredPaymentMethodEnabled = false,
                 isPartialPaymentSupported = false,
+                showStoredPaymentMethods = true,
             )
 
             val checkoutConfiguration = dropInConfigurationDTO.toCheckoutConfiguration()
@@ -227,6 +231,23 @@ class ConfigurationMapperTest {
             assertEquals(SDKEnvironment.TEST, checkoutConfiguration.environment)
             assertNull(checkoutConfiguration.shopperLocale)
             assertNull(checkoutConfiguration.amount)
+        }
+
+        @Test
+        fun `when showStoredPaymentMethods is false, then DTO carries the value`() {
+            val dropInConfigurationDTO = DropInConfigurationDTO(
+                environment = Environment.TEST,
+                clientKey = TEST_CLIENT_KEY,
+                countryCode = "NL",
+                analyticsOptionsDTO = AnalyticsOptionsDTO(true, "0.0.1"),
+                showPreselectedStoredPaymentMethod = true,
+                skipListWhenSinglePaymentMethod = false,
+                isRemoveStoredPaymentMethodEnabled = false,
+                isPartialPaymentSupported = false,
+                showStoredPaymentMethods = false,
+            )
+
+            assertEquals(false, dropInConfigurationDTO.showStoredPaymentMethods)
         }
     }
 
@@ -913,6 +934,7 @@ class ConfigurationMapperTest {
                 skipListWhenSinglePaymentMethod = false,
                 isRemoveStoredPaymentMethodEnabled = false,
                 isPartialPaymentSupported = false,
+                showStoredPaymentMethods = true,
                 cashAppPayConfigurationDTO = CashAppPayConfigurationDTO(
                     cashAppPayEnvironment = CashAppPayEnvironment.SANDBOX,
                     returnUrl = "myapp://cashapp/callback"
@@ -941,6 +963,7 @@ class ConfigurationMapperTest {
                 skipListWhenSinglePaymentMethod = false,
                 isRemoveStoredPaymentMethodEnabled = false,
                 isPartialPaymentSupported = false,
+                showStoredPaymentMethods = true,
                 twintConfigurationDTO = TwintConfigurationDTO(
                     iosCallbackAppScheme = "myapp",
                     showStorePaymentField = true
@@ -965,6 +988,7 @@ class ConfigurationMapperTest {
                 skipListWhenSinglePaymentMethod = false,
                 isRemoveStoredPaymentMethodEnabled = false,
                 isPartialPaymentSupported = false,
+                showStoredPaymentMethods = true,
                 twintConfigurationDTO = TwintConfigurationDTO(
                     iosCallbackAppScheme = "myapp",
                     showStorePaymentField = false
@@ -1193,6 +1217,7 @@ class ConfigurationMapperTest {
                 skipListWhenSinglePaymentMethod = false,
                 isRemoveStoredPaymentMethodEnabled = false,
                 isPartialPaymentSupported = false,
+                showStoredPaymentMethods = true,
             )
 
             val checkoutConfiguration = dropInConfigurationDTO.toCheckoutConfiguration()
@@ -1214,6 +1239,7 @@ class ConfigurationMapperTest {
                 skipListWhenSinglePaymentMethod = false,
                 isRemoveStoredPaymentMethodEnabled = false,
                 isPartialPaymentSupported = false,
+                showStoredPaymentMethods = true,
             )
 
             val checkoutConfiguration = dropInConfigurationDTO.toCheckoutConfiguration()

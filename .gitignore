@@ -114,6 +114,7 @@ unlinked_spec.ds
 **/ios/Runner/GeneratedPluginRegistrant.*
 **/ios/**/*.swiftpm
 **/ios/**/Package.resolved
+**/ios/**/.build
 
 # Coverage
 coverage/

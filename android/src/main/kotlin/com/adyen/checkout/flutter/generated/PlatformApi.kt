@@ -662,7 +662,8 @@ data class DropInConfigurationDTO (
   val isRemoveStoredPaymentMethodEnabled: Boolean,
   val preselectedPaymentMethodTitle: String? = null,
   val paymentMethodNames: Map<String?, String?>? = null,
-  val isPartialPaymentSupported: Boolean
+  val isPartialPaymentSupported: Boolean,
+  val showStoredPaymentMethods: Boolean
 
 ) {
   companion object {
@@ -686,7 +687,8 @@ data class DropInConfigurationDTO (
       val preselectedPaymentMethodTitle = __pigeon_list[15] as String?
       val paymentMethodNames = __pigeon_list[16] as Map<String?, String?>?
       val isPartialPaymentSupported = __pigeon_list[17] as Boolean
-      return DropInConfigurationDTO(environment, clientKey, countryCode, amount, shopperLocale, cardConfigurationDTO, applePayConfigurationDTO, googlePayConfigurationDTO, cashAppPayConfigurationDTO, twintConfigurationDTO, threeDS2ConfigurationDTO, analyticsOptionsDTO, showPreselectedStoredPaymentMethod, skipListWhenSinglePaymentMethod, isRemoveStoredPaymentMethodEnabled, preselectedPaymentMethodTitle, paymentMethodNames, isPartialPaymentSupported)
+      val showStoredPaymentMethods = __pigeon_list[18] as Boolean
+      return DropInConfigurationDTO(environment, clientKey, countryCode, amount, shopperLocale, cardConfigurationDTO, applePayConfigurationDTO, googlePayConfigurationDTO, cashAppPayConfigurationDTO, twintConfigurationDTO, threeDS2ConfigurationDTO, analyticsOptionsDTO, showPreselectedStoredPaymentMethod, skipListWhenSinglePaymentMethod, isRemoveStoredPaymentMethodEnabled, preselectedPaymentMethodTitle, paymentMethodNames, isPartialPaymentSupported, showStoredPaymentMethods)
     }
   }
   fun toList(): List<Any?> {
@@ -709,6 +711,7 @@ data class DropInConfigurationDTO (
       preselectedPaymentMethodTitle,
       paymentMethodNames,
       isPartialPaymentSupported,
+      showStoredPaymentMethods,
     )
   }
 }

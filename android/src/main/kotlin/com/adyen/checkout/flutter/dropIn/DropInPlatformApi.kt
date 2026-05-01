@@ -70,7 +70,8 @@ internal class DropInPlatformApi(
             createCheckoutSession(
                 sessionHolder,
                 dropInConfigurationDTO.environment.mapToEnvironment(),
-                dropInConfigurationDTO.clientKey
+                dropInConfigurationDTO.clientKey,
+                dropInConfigurationDTO.showStoredPaymentMethods
             )
 
         dropInPlatformMessengerJob?.cancel()
@@ -107,12 +108,17 @@ internal class DropInPlatformApi(
                     paymentMethodsApiResponse,
                     dropInConfigurationDTO.isPartialPaymentSupported
                 )
+            val filteredPaymentMethods =
+                applyStoredPaymentMethodsVisibility(
+                    paymentMethodsWithoutGiftCards,
+                    dropInConfigurationDTO.showStoredPaymentMethods
+                )
             val dropInConfiguration = dropInConfigurationDTO.toCheckoutConfiguration()
             withContext(Dispatchers.Main) {
                 DropIn.startPayment(
                     activity.applicationContext,
                     dropInAdvancedFlowLauncher,
-                    paymentMethodsWithoutGiftCards,
+                    filteredPaymentMethods,
                     dropInConfiguration,
                     AdvancedDropInService::class.java,
                 )
@@ -222,11 +228,22 @@ internal class DropInPlatformApi(
         sessionHolder: SessionHolder,
         environment: com.adyen.checkout.core.Environment,
         clientKey: String,
+        showStoredPaymentMethods: Boolean,
     ): CheckoutSession {
         val sessionSetupResponse = SessionSetupResponse.SERIALIZER.deserialize(sessionHolder.sessionSetupResponse)
+        val adjustedSessionSetupResponse =
+            sessionSetupResponse.paymentMethodsApiResponse?.let { paymentMethodsApiResponse ->
+                sessionSetupResponse.copy(
+                    paymentMethodsApiResponse =
+                        applyStoredPaymentMethodsVisibility(
+                            paymentMethodsApiResponse = paymentMethodsApiResponse,
+                            showStoredPaymentMethods = showStoredPaymentMethods,
+                        )
+                )
+            } ?: sessionSetupResponse
         val order = sessionHolder.orderResponse?.let { Order.SERIALIZER.deserialize(it) }
         return CheckoutSession(
-            sessionSetupResponse = sessionSetupResponse,
+            sessionSetupResponse = adjustedSessionSetupResponse,
             order = order,
             environment = environment,
             clientKey = clientKey
@@ -249,6 +266,18 @@ internal class DropInPlatformApi(
         return PaymentMethodsApiResponse(
             storedPaymentMethods = storedPaymentMethods,
             paymentMethods = paymentMethods
+        )
+    }
+
+    private fun applyStoredPaymentMethodsVisibility(
+        paymentMethodsApiResponse: PaymentMethodsApiResponse,
+        showStoredPaymentMethods: Boolean,
+    ): PaymentMethodsApiResponse {
+        if (showStoredPaymentMethods) {
+            return paymentMethodsApiResponse
+        }
+        return paymentMethodsApiResponse.copy(
+            storedPaymentMethods = emptyList(),
         )
     }
 

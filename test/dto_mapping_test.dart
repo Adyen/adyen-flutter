@@ -44,6 +44,57 @@ void main() {
     expect(dropInConfigurationDto.showPreselectedStoredPaymentMethod, true);
     expect(dropInConfigurationDto.isRemoveStoredPaymentMethodEnabled, true);
     expect(dropInConfigurationDto.isPartialPaymentSupported, true);
+    expect(dropInConfigurationDto.showStoredPaymentMethods, true);
+  });
+
+  test(
+      'when showStoredPaymentMethods is not provided, then DTO defaults to true',
+      () {
+    final dropInConfiguration = DropInConfiguration(
+      environment: Environment.test,
+      clientKey: "test-key",
+      countryCode: "US",
+    );
+
+    final dto = dropInConfiguration.toDTO("0.0.1", false);
+
+    expect(dto.showStoredPaymentMethods, true);
+  });
+
+  test(
+      'when showStoredPaymentMethods is set to false, then DTO mirrors the value',
+      () {
+    final storedPaymentMethodConfiguration = StoredPaymentMethodConfiguration(
+      showStoredPaymentMethods: false,
+    );
+    final dropInConfiguration = DropInConfiguration(
+      environment: Environment.test,
+      clientKey: "test-key",
+      countryCode: "US",
+      storedPaymentMethodConfiguration: storedPaymentMethodConfiguration,
+    );
+
+    final dto = dropInConfiguration.toDTO("0.0.1", false);
+
+    expect(dto.showStoredPaymentMethods, false);
+  });
+
+  test(
+      'when showStoredPaymentMethods is set to true, then DTO mirrors the value',
+      () {
+    final storedPaymentMethodConfiguration = StoredPaymentMethodConfiguration(
+      showStoredPaymentMethods: true,
+    );
+    final dropInConfiguration = DropInConfiguration(
+      environment: Environment.test,
+      clientKey: "test-key",
+      countryCode: "US",
+      storedPaymentMethodConfiguration: storedPaymentMethodConfiguration,
+    );
+
+    final dto = dropInConfiguration.toDTO("0.0.1", false);
+
+    expect(dto.showStoredPaymentMethods, true);
   });
 
   test(

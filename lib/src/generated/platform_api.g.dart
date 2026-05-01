@@ -631,6 +631,7 @@ class DropInConfigurationDTO {
     this.preselectedPaymentMethodTitle,
     this.paymentMethodNames,
     required this.isPartialPaymentSupported,
+    required this.showStoredPaymentMethods,
   });
 
   Environment environment;
@@ -669,6 +670,8 @@ class DropInConfigurationDTO {
 
   bool isPartialPaymentSupported;
 
+  bool showStoredPaymentMethods;
+
   Object encode() {
     return <Object?>[
       environment,
@@ -689,6 +692,7 @@ class DropInConfigurationDTO {
       preselectedPaymentMethodTitle,
       paymentMethodNames,
       isPartialPaymentSupported,
+      showStoredPaymentMethods,
     ];
   }
 
@@ -714,6 +718,7 @@ class DropInConfigurationDTO {
       paymentMethodNames:
           (result[16] as Map<Object?, Object?>?)?.cast<String?, String?>(),
       isPartialPaymentSupported: result[17]! as bool,
+      showStoredPaymentMethods: result[18]! as bool,
     );
   }
 }
