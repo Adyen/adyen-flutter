@@ -800,6 +800,8 @@ class ApplePayConfigurationDTO {
     this.applicationData,
     this.supportedCountries,
     this.merchantCapability,
+    this.supportsCouponCode,
+    this.couponCode,
   });
 
   String merchantId;
@@ -830,6 +832,10 @@ class ApplePayConfigurationDTO {
 
   ApplePayMerchantCapability? merchantCapability;
 
+  bool? supportsCouponCode;
+
+  String? couponCode;
+
   Object encode() {
     return <Object?>[
       merchantId,
@@ -846,6 +852,8 @@ class ApplePayConfigurationDTO {
       applicationData,
       supportedCountries,
       merchantCapability,
+      supportsCouponCode,
+      couponCode,
     ];
   }
 
@@ -870,6 +878,8 @@ class ApplePayConfigurationDTO {
       applicationData: result[11] as String?,
       supportedCountries: (result[12] as List<Object?>?)?.cast<String?>(),
       merchantCapability: result[13] as ApplePayMerchantCapability?,
+      supportsCouponCode: result[14] as bool?,
+      couponCode: result[15] as String?,
     );
   }
 }

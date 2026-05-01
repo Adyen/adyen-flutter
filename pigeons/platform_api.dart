@@ -396,6 +396,8 @@ class ApplePayConfigurationDTO {
   final String? applicationData;
   final List<String?>? supportedCountries;
   final ApplePayMerchantCapability? merchantCapability;
+  final bool? supportsCouponCode;
+  final String? couponCode;
 
   ApplePayConfigurationDTO(
     this.merchantId,
@@ -412,6 +414,8 @@ class ApplePayConfigurationDTO {
     this.applicationData,
     this.supportedCountries,
     this.merchantCapability,
+    this.supportsCouponCode,
+    this.couponCode,
   );
 }
 

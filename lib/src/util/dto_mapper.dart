@@ -38,9 +38,8 @@ extension DropInConfigurationMapper on DropInConfiguration {
         preselectedPaymentMethodTitle: preselectedPaymentMethodTitle,
         paymentMethodNames: paymentMethodNames,
         isPartialPaymentSupported: isPartialPaymentSupported,
-        showStoredPaymentMethods: storedPaymentMethodConfiguration
-                ?.showStoredPaymentMethods ??
-            true,
+        showStoredPaymentMethods:
+            storedPaymentMethodConfiguration?.showStoredPaymentMethods ?? true,
       );
 
   bool _isRemoveStoredPaymentMethodEnabled(
@@ -135,6 +134,8 @@ extension ApplePayConfigurationMapper on ApplePayConfiguration {
         applicationData: applicationData,
         supportedCountries: supportedCountries,
         merchantCapability: merchantCapability,
+        supportsCouponCode: supportsCouponCode,
+        couponCode: couponCode,
       );
 }
 

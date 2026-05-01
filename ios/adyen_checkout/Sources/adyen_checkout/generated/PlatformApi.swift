@@ -762,6 +762,8 @@ struct ApplePayConfigurationDTO {
     var applicationData: String?
     var supportedCountries: [String?]?
     var merchantCapability: ApplePayMerchantCapability?
+    var supportsCouponCode: Bool?
+    var couponCode: String?
 
     // swift-format-ignore: AlwaysUseLowerCamelCase
     static func fromList(_ __pigeon_list: [Any?]) -> ApplePayConfigurationDTO? {
@@ -779,6 +781,8 @@ struct ApplePayConfigurationDTO {
         let applicationData: String? = nilOrValue(__pigeon_list[11])
         let supportedCountries: [String?]? = nilOrValue(__pigeon_list[12])
         let merchantCapability: ApplePayMerchantCapability? = nilOrValue(__pigeon_list[13])
+        let supportsCouponCode: Bool? = nilOrValue(__pigeon_list[14])
+        let couponCode: String? = nilOrValue(__pigeon_list[15])
 
         return ApplePayConfigurationDTO(
             merchantId: merchantId,
@@ -794,7 +798,9 @@ struct ApplePayConfigurationDTO {
             shippingMethods: shippingMethods,
             applicationData: applicationData,
             supportedCountries: supportedCountries,
-            merchantCapability: merchantCapability
+            merchantCapability: merchantCapability,
+            supportsCouponCode: supportsCouponCode,
+            couponCode: couponCode
         )
     }
 
@@ -813,7 +819,9 @@ struct ApplePayConfigurationDTO {
             shippingMethods,
             applicationData,
             supportedCountries,
-            merchantCapability
+            merchantCapability,
+            supportsCouponCode,
+            couponCode
         ]
     }
 }

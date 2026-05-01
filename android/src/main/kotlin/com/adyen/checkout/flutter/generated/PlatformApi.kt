@@ -774,7 +774,9 @@ data class ApplePayConfigurationDTO (
   val shippingMethods: List<ApplePayShippingMethodDTO?>? = null,
   val applicationData: String? = null,
   val supportedCountries: List<String?>? = null,
-  val merchantCapability: ApplePayMerchantCapability? = null
+  val merchantCapability: ApplePayMerchantCapability? = null,
+  val supportsCouponCode: Boolean? = null,
+  val couponCode: String? = null
 
 ) {
   companion object {
@@ -794,7 +796,9 @@ data class ApplePayConfigurationDTO (
       val applicationData = __pigeon_list[11] as String?
       val supportedCountries = __pigeon_list[12] as List<String?>?
       val merchantCapability = __pigeon_list[13] as ApplePayMerchantCapability?
-      return ApplePayConfigurationDTO(merchantId, merchantName, allowOnboarding, summaryItems, requiredBillingContactFields, billingContact, requiredShippingContactFields, shippingContact, applePayShippingType, allowShippingContactEditing, shippingMethods, applicationData, supportedCountries, merchantCapability)
+      val supportsCouponCode = __pigeon_list[14] as Boolean?
+      val couponCode = __pigeon_list[15] as String?
+      return ApplePayConfigurationDTO(merchantId, merchantName, allowOnboarding, summaryItems, requiredBillingContactFields, billingContact, requiredShippingContactFields, shippingContact, applePayShippingType, allowShippingContactEditing, shippingMethods, applicationData, supportedCountries, merchantCapability, supportsCouponCode, couponCode)
     }
   }
   fun toList(): List<Any?> {
@@ -813,6 +817,8 @@ data class ApplePayConfigurationDTO (
       applicationData,
       supportedCountries,
       merchantCapability,
+      supportsCouponCode,
+      couponCode,
     )
   }
 }

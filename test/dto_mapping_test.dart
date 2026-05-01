@@ -236,7 +236,9 @@ void main() {
         ],
         applicationData: null,
         supportedCountries: ["NL"],
-        merchantCapability: ApplePayMerchantCapability.debit);
+        merchantCapability: ApplePayMerchantCapability.debit,
+        supportsCouponCode: true,
+        couponCode: "SUMMER10");
 
     final applePayConfigurationDTO = applePayConfiguration.toDTO();
 
@@ -287,6 +289,8 @@ void main() {
     expect(applePayConfigurationDTO.supportedCountries, ["NL"]);
     expect(applePayConfigurationDTO.merchantCapability,
         ApplePayMerchantCapability.debit);
+    expect(applePayConfigurationDTO.supportsCouponCode, true);
+    expect(applePayConfigurationDTO.couponCode, "SUMMER10");
   });
 
   test(

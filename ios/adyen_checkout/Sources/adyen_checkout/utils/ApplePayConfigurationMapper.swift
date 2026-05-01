@@ -46,6 +46,8 @@ extension ApplePayConfigurationDTO {
                 // We have to use enabled until we forcing the newest Xcode version. Otherwise the build fails.
                 paymentRequest.shippingContactEditingMode = $0 ? PKShippingContactEditingMode.enabled : PKShippingContactEditingMode.storePickup
             }
+            supportsCouponCode.map { paymentRequest.supportsCouponCode = $0 }
+            couponCode.map { paymentRequest.couponCode = $0 }
         }
         
         applicationData.map { paymentRequest.applicationData = Data($0.utf8) }
