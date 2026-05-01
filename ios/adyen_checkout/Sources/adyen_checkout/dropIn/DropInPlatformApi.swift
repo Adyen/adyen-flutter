@@ -60,7 +60,11 @@ class DropInPlatformApi: DropInPlatformInterface {
                     paymentMethodNames: paymentMethodNames
                 )
             }
-            
+            paymentMethods = applyStoredPaymentMethodsVisibility(
+                paymentMethods: paymentMethods,
+                showStoredPaymentMethods: dropInConfigurationDTO.showStoredPaymentMethods
+            )
+
             let dropInComponent = DropInComponent(
                 paymentMethods: paymentMethods,
                 context: adyenContext,
@@ -100,9 +104,13 @@ class DropInPlatformApi: DropInPlatformInterface {
             }
             
             let paymentMethodsWithoutGiftCards = removeGiftCardPaymentMethods(paymentMethods: paymentMethods, isPartialPaymentSupported: dropInConfigurationDTO.isPartialPaymentSupported)
+            let filteredPaymentMethods = applyStoredPaymentMethodsVisibility(
+                paymentMethods: paymentMethodsWithoutGiftCards,
+                showStoredPaymentMethods: dropInConfigurationDTO.showStoredPaymentMethods
+            )
             let configuration = try dropInConfigurationDTO.createDropInConfiguration(payment: adyenContext.payment)
             let dropInComponent = DropInComponent(
-                paymentMethods: paymentMethodsWithoutGiftCards,
+                paymentMethods: filteredPaymentMethods,
                 context: adyenContext,
                 configuration: configuration,
                 title: dropInConfigurationDTO.preselectedPaymentMethodTitle
@@ -305,10 +313,17 @@ class DropInPlatformApi: DropInPlatformInterface {
         if isPartialPaymentSupported {
             return paymentMethods
         }
-        
+
         let storedPaymentMethods = paymentMethods.stored.filter { !($0.type == PaymentMethodType.giftcard) }
         let paymentMethods = paymentMethods.regular.filter { !($0.type == PaymentMethodType.giftcard) }
         return PaymentMethods(regular: paymentMethods, stored: storedPaymentMethods)
+    }
+
+    private func applyStoredPaymentMethodsVisibility(paymentMethods: PaymentMethods, showStoredPaymentMethods: Bool) -> PaymentMethods {
+        if showStoredPaymentMethods {
+            return paymentMethods
+        }
+        return PaymentMethods(regular: paymentMethods.regular, stored: [])
     }
 
     private func sendSessionError(error: Error) {

@@ -3,10 +3,13 @@ class StoredPaymentMethodConfiguration {
   final bool? isRemoveStoredPaymentMethodEnabled;
   final Future<bool> Function(String)? deleteStoredPaymentMethodCallback;
 
+  final bool? showStoredPaymentMethods;
+
   StoredPaymentMethodConfiguration({
     this.showPreselectedStoredPaymentMethod,
     this.isRemoveStoredPaymentMethodEnabled,
     this.deleteStoredPaymentMethodCallback,
+    this.showStoredPaymentMethods,
   });
 
   @override
@@ -14,6 +17,7 @@ class StoredPaymentMethodConfiguration {
     return 'StoredPaymentMethodConfiguration('
         'showPreselectedStoredPaymentMethod: $showPreselectedStoredPaymentMethod, '
         'isRemoveStoredPaymentMethodEnabled: $isRemoveStoredPaymentMethodEnabled, '
-        'deleteStoredPaymentMethodCallback: $deleteStoredPaymentMethodCallback)';
+        'deleteStoredPaymentMethodCallback: $deleteStoredPaymentMethodCallback, '
+        'showStoredPaymentMethods: $showStoredPaymentMethods)';
   }
 }
