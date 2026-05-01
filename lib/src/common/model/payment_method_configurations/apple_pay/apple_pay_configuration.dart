@@ -1,3 +1,5 @@
+import 'package:adyen_checkout/src/common/model/payment_method_configurations/apple_pay/apple_pay_authorization_result.dart';
+import 'package:adyen_checkout/src/common/model/payment_method_configurations/apple_pay/apple_pay_authorized_payment.dart';
 import 'package:adyen_checkout/src/common/model/payment_method_configurations/apple_pay/apple_pay_contact.dart';
 import 'package:adyen_checkout/src/common/model/payment_method_configurations/apple_pay/apple_pay_contact_field.dart';
 import 'package:adyen_checkout/src/common/model/payment_method_configurations/apple_pay/apple_pay_coupon_code_update.dart';
@@ -36,6 +38,9 @@ class ApplePayConfiguration {
     String couponCode,
     List<ApplePaySummaryItem> currentSummaryItems,
   )? onCouponCodeChange;
+  final Future<ApplePayAuthorizationResult> Function(
+    ApplePayAuthorizedPayment payment,
+  )? onAuthorize;
 
   ApplePayConfiguration({
     required this.merchantId,
@@ -57,6 +62,7 @@ class ApplePayConfiguration {
     this.onShippingMethodChange,
     this.onShippingContactChange,
     this.onCouponCodeChange,
+    this.onAuthorize,
   });
 
   @override
@@ -80,6 +86,7 @@ class ApplePayConfiguration {
         'couponCode: $couponCode, '
         'onShippingMethodChange: $onShippingMethodChange, '
         'onShippingContactChange: $onShippingContactChange, '
-        'onCouponCodeChange: $onCouponCodeChange)';
+        'onCouponCodeChange: $onCouponCodeChange, '
+        'onAuthorize: $onAuthorize)';
   }
 }

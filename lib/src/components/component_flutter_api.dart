@@ -123,6 +123,27 @@ class ComponentFlutterApi implements ComponentFlutterInterface {
     }
   }
 
+  @override
+  Future<ApplePayAuthorizationResultDTO> onApplePayAuthorize(
+    String componentId,
+    ApplePayAuthorizedPaymentDTO payment,
+  ) async {
+    final callback = _applePayConfiguration?.onAuthorize;
+    if (callback == null) {
+      return ApplePayAuthorizationResultDTO(
+        isSuccess: true,
+      );
+    }
+
+    try {
+      return (await callback(payment.fromDTO())).toDTO();
+    } catch (_) {
+      return ApplePayAuthorizationResultDTO(
+        isSuccess: false,
+      );
+    }
+  }
+
   void registerApplePayConfiguration(
       ApplePayConfiguration applePayConfiguration) {
     _applePayConfiguration = applePayConfiguration;

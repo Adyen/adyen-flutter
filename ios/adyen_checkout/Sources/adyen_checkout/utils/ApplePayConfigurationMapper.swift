@@ -5,6 +5,16 @@ import Adyen
 import PassKit
 
 extension ApplePayConfigurationDTO {
+    var hasAnyApplePayUpdateCallback: Bool {
+        hasOnShippingMethodChange || hasOnShippingContactChange || hasOnCouponCodeChange
+    }
+
+    var hasAnyApplePayCallback: Bool {
+        hasAnyApplePayUpdateCallback || hasOnAuthorize
+    }
+}
+
+extension ApplePayConfigurationDTO {
     func toApplePayConfiguration(
         payment: Payment?,
         componentFlutterApi: ComponentFlutterInterface? = nil,
@@ -363,6 +373,63 @@ extension NSDecimalNumber {
             currency: currencyCode,
             value: Int64(AmountFormatter.minorUnitAmount(from: decimalValue, currencyCode: currencyCode))
         )
+    }
+}
+
+extension PKPayment {
+    func toAuthorizedPaymentDTO() -> ApplePayAuthorizedPaymentDTO {
+        ApplePayAuthorizedPaymentDTO(
+            token: token.paymentData.base64EncodedString(),
+            network: token.paymentMethod.network?.rawValue ?? "",
+            billingContact: billingContact?.toDTO(),
+            shippingContact: shippingContact?.toDTO(),
+            shippingMethod: nil
+        )
+    }
+}
+
+extension ApplePayAuthorizationResultDTO {
+    func toPKPaymentAuthorizationResult() -> PKPaymentAuthorizationResult {
+        PKPaymentAuthorizationResult(
+            status: isSuccess ? .success : .failure,
+            errors: errors?.compactMap { $0?.toNSError() }
+        )
+    }
+}
+
+extension ApplePayPaymentErrorDTO {
+    func toNSError() -> Error {
+        switch type {
+        case .billingAddress:
+            return PKPaymentRequest.paymentBillingAddressInvalidError(
+                withKey: field ?? "",
+                localizedDescription: localizedDescription
+            )
+        case .shippingAddress:
+            return PKPaymentRequest.paymentShippingAddressInvalidError(
+                withKey: field ?? "",
+                localizedDescription: localizedDescription
+            )
+        case .contact:
+            return PKPaymentRequest.paymentContactInvalidError(
+                withContactField: field.map { PKContactField.fromString($0) } ?? .name,
+                localizedDescription: localizedDescription
+            )
+        case .couponCode:
+            if #available(iOS 15.0, *) {
+                return PKPaymentRequest.paymentCouponCodeInvalidError(localizedDescription: localizedDescription)
+            }
+            return NSError(domain: "ApplePayPaymentError", code: 0, userInfo: [NSLocalizedDescriptionKey: localizedDescription])
+        case .shippingAddressUnserviceable:
+            return PKPaymentRequest.paymentShippingAddressUnserviceableError(withLocalizedDescription: localizedDescription)
+        case .couponCodeExpired:
+            if #available(iOS 15.0, *) {
+                return PKPaymentRequest.paymentCouponCodeExpiredError(localizedDescription: localizedDescription)
+            }
+            return NSError(domain: "ApplePayPaymentError", code: 0, userInfo: [NSLocalizedDescriptionKey: localizedDescription])
+        case .unknown:
+            return NSError(domain: "ApplePayPaymentError", code: 0, userInfo: [NSLocalizedDescriptionKey: localizedDescription])
+        }
     }
 }
 

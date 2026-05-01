@@ -5,6 +5,12 @@
 import PassKit
 
 protocol ApplePayCallbackBridge {
+    func onAuthorize(
+        componentId: String,
+        payment: PKPayment,
+        completion: @escaping (PKPaymentAuthorizationResult) -> Void
+    )
+
     @available(iOS 15.0, *)
     func onCouponCodeChange(
         componentId: String,
@@ -33,6 +39,25 @@ final class PigeonApplePayCallbackBridge: ApplePayCallbackBridge {
 
     init(componentFlutterApi: ComponentFlutterInterface) {
         self.componentFlutterApi = componentFlutterApi
+    }
+
+    func onAuthorize(
+        componentId: String,
+        payment: PKPayment,
+        completion: @escaping (PKPaymentAuthorizationResult) -> Void
+    ) {
+        componentFlutterApi.onApplePayAuthorize(
+            componentId: componentId,
+            payment: payment.toAuthorizedPaymentDTO(),
+            completion: { result in
+                switch result {
+                case let .success(update):
+                    completion(update.toPKPaymentAuthorizationResult())
+                case .failure:
+                    completion(PKPaymentAuthorizationResult(status: .failure, errors: nil))
+                }
+            }
+        )
     }
 
     @available(iOS 15.0, *)

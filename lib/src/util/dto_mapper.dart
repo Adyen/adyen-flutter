@@ -139,6 +139,41 @@ extension ApplePayConfigurationMapper on ApplePayConfiguration {
         hasOnShippingMethodChange: onShippingMethodChange != null,
         hasOnShippingContactChange: onShippingContactChange != null,
         hasOnCouponCodeChange: onCouponCodeChange != null,
+        hasOnAuthorize: onAuthorize != null,
+      );
+}
+
+extension ApplePayAuthorizedPaymentDTOMapper on ApplePayAuthorizedPaymentDTO {
+  ApplePayAuthorizedPayment fromDTO() => ApplePayAuthorizedPayment(
+        token: token,
+        network: network,
+        billingContact: billingContact?.fromDTO(),
+        shippingContact: shippingContact?.fromDTO(),
+        shippingMethod: shippingMethod?.fromDTO(),
+      );
+}
+
+extension ApplePayAuthorizationResultMapper on ApplePayAuthorizationResult {
+  ApplePayAuthorizationResultDTO toDTO() {
+    switch (this) {
+      case ApplePayAuthorizationSuccess():
+        return ApplePayAuthorizationResultDTO(
+          isSuccess: true,
+        );
+      case ApplePayAuthorizationFailure(errors: final errors):
+        return ApplePayAuthorizationResultDTO(
+          isSuccess: false,
+          errors: errors.map((error) => error.toDTO()).toList(),
+        );
+    }
+  }
+}
+
+extension ApplePayPaymentErrorMapper on ApplePayPaymentError {
+  ApplePayPaymentErrorDTO toDTO() => ApplePayPaymentErrorDTO(
+        type: type,
+        field: field?.name,
+        localizedDescription: localizedDescription,
       );
 }
 

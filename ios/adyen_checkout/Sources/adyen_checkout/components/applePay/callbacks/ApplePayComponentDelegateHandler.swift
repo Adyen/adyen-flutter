@@ -4,7 +4,7 @@
 #endif
 import PassKit
 
-final class ApplePayComponentDelegateHandler: ApplePayComponentDelegate {
+final class ApplePayComponentDelegateHandler: ApplePayComponentDelegate, ApplePayAuthorizationDelegate {
     private let applePayCallbackBridge: ApplePayCallbackBridge
     private let componentId: String
 
@@ -14,6 +14,17 @@ final class ApplePayComponentDelegateHandler: ApplePayComponentDelegate {
     ) {
         self.applePayCallbackBridge = applePayCallbackBridge
         self.componentId = componentId
+    }
+
+    func didAuthorize(
+        payment: PKPayment,
+        completion: @escaping (PKPaymentAuthorizationResult) -> Void
+    ) {
+        applePayCallbackBridge.onAuthorize(
+            componentId: componentId,
+            payment: payment,
+            completion: completion
+        )
     }
 
     func didUpdate(

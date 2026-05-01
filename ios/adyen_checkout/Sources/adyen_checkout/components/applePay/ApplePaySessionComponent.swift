@@ -43,7 +43,7 @@ class ApplePaySessionComponent: BaseApplePayComponent {
         let configuration = try configuration.mapToApplePayConfiguration(payment: payment)
         let applePayComponent = try ApplePayComponent(paymentMethod: paymentMethod, context: context, configuration: configuration)
         applePayComponent.delegate = sessionHolder.session
-        if self.configuration.applePayConfigurationDTO?.hasOnShippingMethodChange == true {
+        if self.configuration.applePayConfigurationDTO?.hasAnyApplePayCallback == true {
             let applePayComponentDelegateHandler = ApplePayComponentDelegateHandler(
                 applePayCallbackBridge: PigeonApplePayCallbackBridge(
                     componentFlutterApi: componentFlutterApi
@@ -51,7 +51,12 @@ class ApplePaySessionComponent: BaseApplePayComponent {
                 componentId: componentId
             )
             self.applePayComponentDelegateHandler = applePayComponentDelegateHandler
-            applePayComponent.applePayDelegate = applePayComponentDelegateHandler
+            if self.configuration.applePayConfigurationDTO?.hasAnyApplePayUpdateCallback == true {
+                applePayComponent.applePayDelegate = applePayComponentDelegateHandler
+            }
+            if self.configuration.applePayConfigurationDTO?.hasOnAuthorize == true {
+                applePayComponent.authorizationDelegate = applePayComponentDelegateHandler
+            }
         }
         setupSessionFlowDelegate()
         return applePayComponent
