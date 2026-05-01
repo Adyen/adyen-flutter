@@ -2,7 +2,6 @@ import 'package:adyen_checkout/adyen_checkout.dart';
 import 'package:adyen_checkout/src/generated/platform_api.g.dart';
 import 'package:adyen_checkout/src/util/dto_mapper.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
@@ -292,39 +291,6 @@ void main() {
         ApplePayMerchantCapability.debit);
     expect(applePayConfigurationDTO.supportsCouponCode, true);
     expect(applePayConfigurationDTO.couponCode, "SUMMER10");
-  });
-
-  test(
-      "when apple pay configuration platform exception has known code, then should map to typed exception",
-      () {
-    final exception = ApplePayConfigurationException.fromPlatformException(
-      PlatformException(
-        code: ApplePayConfigurationExceptionCodes.missingAmount,
-        message: "Amount for Apple Pay not provided.",
-      ),
-    );
-
-    expect(exception, isA<ApplePayMissingAmountException>());
-    expect(exception.code, ApplePayConfigurationExceptionCodes.missingAmount);
-    expect(exception.message, "Amount for Apple Pay not provided.");
-  });
-
-  test(
-      "when apple pay configuration platform exception has unknown code, then should preserve code",
-      () {
-    final exception = ApplePayConfigurationException.fromPlatformException(
-      PlatformException(
-        code: "unknown-code",
-        message: "Unknown message",
-        details: "Unknown details",
-      ),
-    );
-
-    expect(exception, isA<ApplePayConfigurationException>());
-    expect(exception, isNot(isA<ApplePayMissingAmountException>()));
-    expect(exception.code, "unknown-code");
-    expect(exception.message, "Unknown message");
-    expect(exception.details, "Unknown details");
   });
 
   test(

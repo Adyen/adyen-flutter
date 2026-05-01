@@ -13,7 +13,6 @@ export 'src/common/model/partial_payment/order_cancel_result.dart';
 export 'src/common/model/partial_payment/partial_payment.dart';
 export 'src/common/model/payment_event.dart';
 export 'src/common/model/payment_method_configurations/apple_pay/apple_pay_configuration.dart';
-export 'src/common/model/payment_method_configurations/apple_pay/apple_pay_configuration_exception.dart';
 export 'src/common/model/payment_method_configurations/apple_pay/apple_pay_contact.dart';
 export 'src/common/model/payment_method_configurations/apple_pay/apple_pay_contact_field.dart';
 export 'src/common/model/payment_method_configurations/apple_pay/apple_pay_shipping_method.dart';
