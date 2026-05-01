@@ -6,10 +6,24 @@ import PassKit
 
 extension ApplePayConfigurationDTO {
     func toApplePayConfiguration(payment: Payment?) throws -> ApplePayComponent.Configuration {
-        guard let payment else { throw PlatformError(errorDescription: "Amount for Apple Pay not provided.") }
+        guard let payment else {
+            throw AdyenPigeonError(
+                code: ApplePayConfigurationErrorCode.missingAmount,
+                message: "Amount for Apple Pay not provided.",
+                details: nil
+            )
+        }
         let summaryItems = try mapToPaymentSummaryItems(summaryItems: summaryItems, payment: payment)
         let paymentRequest = try buildPaymentRequest(payment: payment, summaryItems: summaryItems)
-        return try ApplePayComponent.Configuration(paymentRequest: paymentRequest, allowOnboarding: allowOnboarding ?? false)
+        do {
+            return try ApplePayComponent.Configuration(paymentRequest: paymentRequest, allowOnboarding: allowOnboarding ?? false)
+        } catch {
+            throw AdyenPigeonError(
+                code: ApplePayConfigurationErrorCode.invalidConfiguration,
+                message: error.localizedDescription,
+                details: String(describing: error)
+            )
+        }
     }
     
     private func buildPaymentRequest(payment: Payment, summaryItems: [PKPaymentSummaryItem]) throws -> PKPaymentRequest {
@@ -243,10 +257,20 @@ extension ApplePayShippingMethodDTO {
 extension AmountDTO {
     func toFormattedAmount() throws -> NSDecimalNumber {
         guard let value = Int(exactly: value) else {
-            throw PlatformError(errorDescription: "Cannot map Int64 to Int.")
+            throw AdyenPigeonError(
+                code: ApplePayConfigurationErrorCode.invalidAmount,
+                message: "Cannot map Int64 to Int.",
+                details: nil
+            )
         }
         return AmountFormatter.decimalAmount(value, currencyCode: currency)
     }
+}
+
+private enum ApplePayConfigurationErrorCode {
+    static let missingAmount = "apple-pay-missing-amount"
+    static let invalidConfiguration = "apple-pay-invalid-configuration"
+    static let invalidAmount = "apple-pay-invalid-amount"
 }
 
 extension Date {
