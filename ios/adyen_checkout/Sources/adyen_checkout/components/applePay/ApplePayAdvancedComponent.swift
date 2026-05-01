@@ -3,6 +3,7 @@
     import AdyenComponents
 #endif
 import Foundation
+import PassKit
 
 class ApplePayAdvancedComponent: BaseApplePayComponent {
     private let componentFlutterApi: ComponentFlutterInterface
@@ -58,7 +59,9 @@ class ApplePayAdvancedComponent: BaseApplePayComponent {
         let configuration = try configuration.mapToApplePayConfiguration(payment: context.payment)
         let applePayComponent = try ApplePayComponent(paymentMethod: paymentMethod, context: context, configuration: configuration)
         applePayComponent.delegate = self
-        // applePayComponent?.applePayDelegate - Dynamic pricing will be added in the next version.
+        if self.configuration.applePayConfigurationDTO?.hasOnShippingMethodChange == true {
+            applePayComponent.applePayDelegate = self
+        }
         return applePayComponent
     }
     
@@ -146,5 +149,44 @@ extension ApplePayAdvancedComponent: PaymentComponentDelegate {
             componentCommunicationModel: componentCommunicationModel,
             completion: { _ in }
         )
+    }
+}
+
+extension ApplePayAdvancedComponent: ApplePayComponentDelegate {
+    func didUpdate(
+        contact: PKContact,
+        for payment: ApplePayPayment,
+        completion: @escaping (PKPaymentRequestShippingContactUpdate) -> Void
+    ) {
+        completion(PKPaymentRequestShippingContactUpdate(paymentSummaryItems: payment.summaryItems))
+    }
+
+    func didUpdate(
+        shippingMethod: PKShippingMethod,
+        for payment: ApplePayPayment,
+        completion: @escaping (PKPaymentRequestShippingMethodUpdate) -> Void
+    ) {
+        componentFlutterApi.onApplePayShippingMethodChange(
+            componentId: componentId,
+            shippingMethod: shippingMethod.toDTO(currencyCode: payment.currencyCode),
+            currentSummaryItems: payment.summaryItems.map { $0.toDTO(currencyCode: payment.currencyCode) },
+            completion: { result in
+                switch result {
+                case let .success(update):
+                    completion(update.toPKPaymentRequestShippingMethodUpdate())
+                case .failure:
+                    completion(PKPaymentRequestShippingMethodUpdate(paymentSummaryItems: payment.summaryItems))
+                }
+            }
+        )
+    }
+
+    @available(iOS 15.0, *)
+    func didUpdate(
+        couponCode: String,
+        for payment: ApplePayPayment,
+        completion: @escaping (PKPaymentRequestCouponCodeUpdate) -> Void
+    ) {
+        completion(PKPaymentRequestCouponCodeUpdate(paymentSummaryItems: payment.summaryItems))
     }
 }
