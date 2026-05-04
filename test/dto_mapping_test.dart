@@ -309,6 +309,167 @@ void main() {
   });
 
   test(
+      "when using apple pay recurring payment request, then should parse to ApplePayConfigurationDTO",
+      () {
+    final startDate = DateTime.utc(2026);
+    final endDate = DateTime.utc(2027);
+    final applePayConfiguration = ApplePayConfiguration(
+      merchantId: "APPLE_PAY_MERCHANT_ID",
+      merchantName: "APPLE_PAY_MERCHANT_NAME",
+      recurringPaymentRequest: ApplePayRecurringPaymentRequest(
+        paymentDescription: "Subscription",
+        regularBilling: ApplePayRecurringPaymentSummaryItem(
+          label: "Monthly subscription",
+          amount: Amount(value: 999, currency: "EUR"),
+          type: ApplePaySummaryItemType.definite,
+          startDate: startDate,
+          intervalUnit: ApplePayRecurringPaymentIntervalUnit.month,
+          intervalCount: 1,
+          endDate: endDate,
+        ),
+        managementUrl: "https://example.com/manage",
+        billingAgreement: "Billing agreement",
+        tokenNotificationUrl: "https://example.com/token",
+      ),
+      multiTokenContexts: [
+        ApplePayMultiTokenContext(
+          merchantId: "merchant.com.adyen",
+          externalId: "external-id",
+          merchantName: "Merchant",
+          merchantDomain: "adyen.com",
+          amount: Amount(value: 999, currency: "EUR"),
+        ),
+      ],
+    );
+
+    final applePayConfigurationDTO = applePayConfiguration.toDTO();
+
+    expect(applePayConfigurationDTO.recurringPaymentRequest?.paymentDescription,
+        "Subscription");
+    expect(
+        applePayConfigurationDTO.recurringPaymentRequest?.regularBilling.label,
+        "Monthly subscription");
+    expect(
+        applePayConfigurationDTO
+            .recurringPaymentRequest?.regularBilling.amount.value,
+        999);
+    expect(
+        applePayConfigurationDTO
+            .recurringPaymentRequest?.regularBilling.startDate,
+        startDate.toIso8601String());
+    expect(
+        applePayConfigurationDTO
+            .recurringPaymentRequest?.regularBilling.intervalUnit,
+        ApplePayRecurringPaymentIntervalUnit.month);
+    expect(
+        applePayConfigurationDTO
+            .recurringPaymentRequest?.regularBilling.intervalCount,
+        1);
+    expect(
+        applePayConfigurationDTO
+            .recurringPaymentRequest?.regularBilling.endDate,
+        endDate.toIso8601String());
+    expect(applePayConfigurationDTO.recurringPaymentRequest?.managementUrl,
+        "https://example.com/manage");
+    expect(applePayConfigurationDTO.recurringPaymentRequest?.billingAgreement,
+        "Billing agreement");
+    expect(
+        applePayConfigurationDTO.recurringPaymentRequest?.tokenNotificationUrl,
+        "https://example.com/token");
+    expect(applePayConfigurationDTO.multiTokenContexts?.firstOrNull?.merchantId,
+        "merchant.com.adyen");
+    expect(applePayConfigurationDTO.multiTokenContexts?.firstOrNull?.externalId,
+        "external-id");
+    expect(
+        applePayConfigurationDTO.multiTokenContexts?.firstOrNull?.amount.value,
+        999);
+  });
+
+  test(
+      "when using apple pay deferred payment request, then should parse to ApplePayConfigurationDTO",
+      () {
+    final deferredDate = DateTime.utc(2026, 2);
+    final freeCancellationDate = DateTime.utc(2026, 1);
+    final applePayConfiguration = ApplePayConfiguration(
+      merchantId: "APPLE_PAY_MERCHANT_ID",
+      merchantName: "APPLE_PAY_MERCHANT_NAME",
+      deferredPaymentRequest: ApplePayDeferredPaymentRequest(
+        paymentDescription: "Hotel booking",
+        deferredBilling: ApplePayDeferredPaymentSummaryItem(
+          label: "Hotel stay",
+          amount: Amount(value: 10999, currency: "EUR"),
+          type: ApplePaySummaryItemType.definite,
+          deferredDate: deferredDate,
+        ),
+        managementUrl: "https://example.com/manage",
+        billingAgreement: "Deferred billing agreement",
+        tokenNotificationUrl: "https://example.com/token",
+        freeCancellationDate: freeCancellationDate,
+        freeCancellationTimeZone: "Europe/Amsterdam",
+      ),
+    );
+
+    final applePayConfigurationDTO = applePayConfiguration.toDTO();
+
+    expect(applePayConfigurationDTO.deferredPaymentRequest?.paymentDescription,
+        "Hotel booking");
+    expect(
+        applePayConfigurationDTO.deferredPaymentRequest?.deferredBilling.label,
+        "Hotel stay");
+    expect(
+        applePayConfigurationDTO
+            .deferredPaymentRequest?.deferredBilling.deferredDate,
+        deferredDate.toIso8601String());
+    expect(
+        applePayConfigurationDTO.deferredPaymentRequest?.freeCancellationDate,
+        freeCancellationDate.toIso8601String());
+    expect(
+        applePayConfigurationDTO
+            .deferredPaymentRequest?.freeCancellationTimeZone,
+        "Europe/Amsterdam");
+  });
+
+  test(
+      "when using apple pay automatic reload payment request, then should parse to ApplePayConfigurationDTO",
+      () {
+    final applePayConfiguration = ApplePayConfiguration(
+      merchantId: "APPLE_PAY_MERCHANT_ID",
+      merchantName: "APPLE_PAY_MERCHANT_NAME",
+      automaticReloadPaymentRequest: ApplePayReloadPaymentRequest(
+        paymentDescription: "Card top-up",
+        automaticReloadBilling: ApplePayReloadPaymentSummaryItem(
+          label: "Top-up",
+          amount: Amount(value: 2000, currency: "EUR"),
+          type: ApplePaySummaryItemType.definite,
+          thresholdAmount: Amount(value: 500, currency: "EUR"),
+        ),
+        managementUrl: "https://example.com/manage",
+        billingAgreement: "Reload billing agreement",
+        tokenNotificationUrl: "https://example.com/token",
+      ),
+    );
+
+    final applePayConfigurationDTO = applePayConfiguration.toDTO();
+
+    expect(
+        applePayConfigurationDTO
+            .automaticReloadPaymentRequest?.paymentDescription,
+        "Card top-up");
+    expect(
+        applePayConfigurationDTO
+            .automaticReloadPaymentRequest?.automaticReloadBilling.label,
+        "Top-up");
+    expect(
+        applePayConfigurationDTO
+            .automaticReloadPaymentRequest?.automaticReloadBilling.amount.value,
+        2000);
+    expect(
+        applePayConfigurationDTO.automaticReloadPaymentRequest
+            ?.automaticReloadBilling.thresholdAmount.value,
+        500);
+  });
+
+  test(
       "when using apple pay configuration without shipping callbacks, then should map callback flags to false",
       () {
     final applePayConfiguration = ApplePayConfiguration(

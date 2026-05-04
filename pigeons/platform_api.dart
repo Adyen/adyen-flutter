@@ -116,6 +116,12 @@ enum ApplePaySummaryItemType {
   definite,
 }
 
+enum ApplePayRecurringPaymentIntervalUnit {
+  day,
+  month,
+  year,
+}
+
 enum ApplePayPaymentErrorType {
   billingAddress,
   shippingAddress,
@@ -408,6 +414,10 @@ class ApplePayConfigurationDTO {
   final ApplePayMerchantCapability? merchantCapability;
   final bool? supportsCouponCode;
   final String? couponCode;
+  final ApplePayRecurringPaymentRequestDTO? recurringPaymentRequest;
+  final ApplePayDeferredPaymentRequestDTO? deferredPaymentRequest;
+  final ApplePayReloadPaymentRequestDTO? automaticReloadPaymentRequest;
+  final List<ApplePayMultiTokenContextDTO?>? multiTokenContexts;
   final bool hasOnShippingMethodChange;
   final bool hasOnShippingContactChange;
   final bool hasOnCouponCodeChange;
@@ -430,10 +440,132 @@ class ApplePayConfigurationDTO {
     this.merchantCapability,
     this.supportsCouponCode,
     this.couponCode,
+    this.recurringPaymentRequest,
+    this.deferredPaymentRequest,
+    this.automaticReloadPaymentRequest,
+    this.multiTokenContexts,
     this.hasOnShippingMethodChange,
     this.hasOnShippingContactChange,
     this.hasOnCouponCodeChange,
     this.hasOnAuthorize,
+  );
+}
+
+class ApplePayRecurringPaymentRequestDTO {
+  final String paymentDescription;
+  final ApplePayRecurringPaymentSummaryItemDTO regularBilling;
+  final String managementUrl;
+  final ApplePayRecurringPaymentSummaryItemDTO? trialBilling;
+  final String? billingAgreement;
+  final String? tokenNotificationUrl;
+
+  ApplePayRecurringPaymentRequestDTO(
+    this.paymentDescription,
+    this.regularBilling,
+    this.managementUrl,
+    this.trialBilling,
+    this.billingAgreement,
+    this.tokenNotificationUrl,
+  );
+}
+
+class ApplePayRecurringPaymentSummaryItemDTO {
+  final String label;
+  final AmountDTO amount;
+  final ApplePaySummaryItemType type;
+  final String? startDate;
+  final ApplePayRecurringPaymentIntervalUnit? intervalUnit;
+  final int? intervalCount;
+  final String? endDate;
+
+  ApplePayRecurringPaymentSummaryItemDTO(
+    this.label,
+    this.amount,
+    this.type,
+    this.startDate,
+    this.intervalUnit,
+    this.intervalCount,
+    this.endDate,
+  );
+}
+
+class ApplePayDeferredPaymentRequestDTO {
+  final String paymentDescription;
+  final ApplePayDeferredPaymentSummaryItemDTO deferredBilling;
+  final String managementUrl;
+  final String? billingAgreement;
+  final String? tokenNotificationUrl;
+  final String? freeCancellationDate;
+  final String? freeCancellationTimeZone;
+
+  ApplePayDeferredPaymentRequestDTO(
+    this.paymentDescription,
+    this.deferredBilling,
+    this.managementUrl,
+    this.billingAgreement,
+    this.tokenNotificationUrl,
+    this.freeCancellationDate,
+    this.freeCancellationTimeZone,
+  );
+}
+
+class ApplePayDeferredPaymentSummaryItemDTO {
+  final String label;
+  final AmountDTO amount;
+  final ApplePaySummaryItemType type;
+  final String deferredDate;
+
+  ApplePayDeferredPaymentSummaryItemDTO(
+    this.label,
+    this.amount,
+    this.type,
+    this.deferredDate,
+  );
+}
+
+class ApplePayReloadPaymentRequestDTO {
+  final String paymentDescription;
+  final ApplePayReloadPaymentSummaryItemDTO automaticReloadBilling;
+  final String managementUrl;
+  final String? billingAgreement;
+  final String? tokenNotificationUrl;
+
+  ApplePayReloadPaymentRequestDTO(
+    this.paymentDescription,
+    this.automaticReloadBilling,
+    this.managementUrl,
+    this.billingAgreement,
+    this.tokenNotificationUrl,
+  );
+}
+
+class ApplePayReloadPaymentSummaryItemDTO {
+  final String label;
+  final AmountDTO amount;
+  final ApplePaySummaryItemType type;
+  final AmountDTO thresholdAmount;
+
+  ApplePayReloadPaymentSummaryItemDTO(
+    this.label,
+    this.amount,
+    this.type,
+    this.thresholdAmount,
+  );
+}
+
+class ApplePayMultiTokenContextDTO {
+  final String merchantId;
+  final String externalId;
+  final String merchantName;
+  final String? merchantDomain;
+  final AmountDTO amount;
+
+  ApplePayMultiTokenContextDTO(
+    this.merchantId,
+    this.externalId,
+    this.merchantName,
+    this.merchantDomain,
+    this.amount,
   );
 }
 

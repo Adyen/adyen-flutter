@@ -77,6 +77,18 @@ extension ApplePayConfigurationDTO {
             supportsCouponCode.map { paymentRequest.supportsCouponCode = $0 }
             couponCode.map { paymentRequest.couponCode = $0 }
         }
+
+        if #available(iOS 16.0, *) {
+            paymentRequest.recurringPaymentRequest = try recurringPaymentRequest?.toPKRecurringPaymentRequest()
+            paymentRequest.automaticReloadPaymentRequest = try automaticReloadPaymentRequest?.toPKAutomaticReloadPaymentRequest()
+            if let multiTokenContexts {
+                paymentRequest.multiTokenContexts = try multiTokenContexts.compactMap { try $0?.toPKPaymentTokenContext() }
+            }
+        }
+
+        if #available(iOS 16.4, *) {
+            paymentRequest.deferredPaymentRequest = try deferredPaymentRequest?.toPKDeferredPaymentRequest()
+        }
         
         applicationData.map { paymentRequest.applicationData = Data($0.utf8) }
         return paymentRequest
@@ -433,10 +445,154 @@ extension ApplePayPaymentErrorDTO {
     }
 }
 
+@available(iOS 16.0, *)
+extension ApplePayRecurringPaymentRequestDTO {
+    func toPKRecurringPaymentRequest() throws -> PKRecurringPaymentRequest {
+        let recurringPaymentRequest = try PKRecurringPaymentRequest(
+            paymentDescription: paymentDescription,
+            regularBilling: regularBilling.toPKRecurringPaymentSummaryItem(),
+            managementURL: managementUrl.toURL()
+        )
+        recurringPaymentRequest.trialBilling = try trialBilling?.toPKRecurringPaymentSummaryItem()
+        recurringPaymentRequest.billingAgreement = billingAgreement
+        recurringPaymentRequest.tokenNotificationURL = try tokenNotificationUrl?.toURL()
+        return recurringPaymentRequest
+    }
+}
+
+@available(iOS 16.0, *)
+extension ApplePayRecurringPaymentSummaryItemDTO {
+    func toPKRecurringPaymentSummaryItem() throws -> PKRecurringPaymentSummaryItem {
+        let summaryItem = try PKRecurringPaymentSummaryItem(
+            label: label,
+            amount: amount.toFormattedAmount(),
+            type: type.toPKPaymentSummaryItemType()
+        )
+        summaryItem.startDate = try startDate?.toDate()
+        summaryItem.intervalUnit = intervalUnit.toCalendarUnit()
+        intervalCount.map { summaryItem.intervalCount = Int($0) }
+        summaryItem.endDate = try endDate?.toDate()
+        return summaryItem
+    }
+}
+
+extension ApplePayRecurringPaymentIntervalUnit? {
+    func toCalendarUnit() -> NSCalendar.Unit {
+        switch self {
+        case .day:
+            return .day
+        case .year:
+            return .year
+        case .month, nil:
+            return .month
+        }
+    }
+}
+
+@available(iOS 16.4, *)
+extension ApplePayDeferredPaymentRequestDTO {
+    func toPKDeferredPaymentRequest() throws -> PKDeferredPaymentRequest {
+        let deferredPaymentRequest = try PKDeferredPaymentRequest(
+            paymentDescription: paymentDescription,
+            deferredBilling: deferredBilling.toPKDeferredPaymentSummaryItem(),
+            managementURL: managementUrl.toURL()
+        )
+        deferredPaymentRequest.billingAgreement = billingAgreement
+        deferredPaymentRequest.tokenNotificationURL = try tokenNotificationUrl?.toURL()
+        deferredPaymentRequest.freeCancellationDate = try freeCancellationDate?.toDate()
+        deferredPaymentRequest.freeCancellationDateTimeZone = freeCancellationTimeZone.map { TimeZone(identifier: $0) } ?? nil
+        return deferredPaymentRequest
+    }
+}
+
+@available(iOS 16.4, *)
+extension ApplePayDeferredPaymentSummaryItemDTO {
+    func toPKDeferredPaymentSummaryItem() throws -> PKDeferredPaymentSummaryItem {
+        let summaryItem = try PKDeferredPaymentSummaryItem(
+            label: label,
+            amount: amount.toFormattedAmount(),
+            type: type.toPKPaymentSummaryItemType()
+        )
+        summaryItem.deferredDate = try deferredDate.toDate()
+        return summaryItem
+    }
+}
+
+@available(iOS 16.0, *)
+extension ApplePayReloadPaymentRequestDTO {
+    func toPKAutomaticReloadPaymentRequest() throws -> PKAutomaticReloadPaymentRequest {
+        let automaticReloadPaymentRequest = try PKAutomaticReloadPaymentRequest(
+            paymentDescription: paymentDescription,
+            automaticReloadBilling: automaticReloadBilling.toPKAutomaticReloadPaymentSummaryItem(),
+            managementURL: managementUrl.toURL()
+        )
+        automaticReloadPaymentRequest.billingAgreement = billingAgreement
+        automaticReloadPaymentRequest.tokenNotificationURL = try tokenNotificationUrl?.toURL()
+        return automaticReloadPaymentRequest
+    }
+}
+
+@available(iOS 16.0, *)
+extension ApplePayReloadPaymentSummaryItemDTO {
+    func toPKAutomaticReloadPaymentSummaryItem() throws -> PKAutomaticReloadPaymentSummaryItem {
+        let summaryItem = try PKAutomaticReloadPaymentSummaryItem(
+            label: label,
+            amount: amount.toFormattedAmount(),
+            type: type.toPKPaymentSummaryItemType()
+        )
+        summaryItem.thresholdAmount = try thresholdAmount.toFormattedAmount()
+        return summaryItem
+    }
+}
+
+@available(iOS 16.0, *)
+extension ApplePayMultiTokenContextDTO {
+    func toPKPaymentTokenContext() throws -> PKPaymentTokenContext {
+        try PKPaymentTokenContext(
+            merchantIdentifier: merchantId,
+            externalIdentifier: externalId,
+            merchantName: merchantName,
+            merchantDomain: merchantDomain,
+            amount: amount.toFormattedAmount()
+        )
+    }
+}
+
+extension String {
+    func toDate() throws -> Date {
+        let formatter = ISO8601DateFormatter()
+        if let date = formatter.date(from: self) {
+            return date
+        }
+        formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        if let date = formatter.date(from: self) {
+            return date
+        }
+        throw AdyenPigeonError(
+            code: ApplePayConfigurationErrorCode.invalidDate,
+            message: "Cannot map String to Date.",
+            details: self
+        )
+    }
+
+    func toURL() throws -> URL {
+        guard let url = URL(string: self) else {
+            throw AdyenPigeonError(
+                code: ApplePayConfigurationErrorCode.invalidUrl,
+                message: "Cannot map String to URL.",
+                details: self
+            )
+        }
+        return url
+    }
+}
+
 private enum ApplePayConfigurationErrorCode {
     static let missingAmount = "apple-pay-missing-amount"
     static let invalidConfiguration = "apple-pay-invalid-configuration"
     static let invalidAmount = "apple-pay-invalid-amount"
+    static let invalidUrl = "apple-pay-invalid-url"
+    static let invalidDate = "apple-pay-invalid-date"
 }
 
 extension Date {

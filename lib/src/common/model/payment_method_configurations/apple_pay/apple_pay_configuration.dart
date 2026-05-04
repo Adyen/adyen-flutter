@@ -3,6 +3,10 @@ import 'package:adyen_checkout/src/common/model/payment_method_configurations/ap
 import 'package:adyen_checkout/src/common/model/payment_method_configurations/apple_pay/apple_pay_contact.dart';
 import 'package:adyen_checkout/src/common/model/payment_method_configurations/apple_pay/apple_pay_contact_field.dart';
 import 'package:adyen_checkout/src/common/model/payment_method_configurations/apple_pay/apple_pay_coupon_code_update.dart';
+import 'package:adyen_checkout/src/common/model/payment_method_configurations/apple_pay/apple_pay_deferred_payment_request.dart';
+import 'package:adyen_checkout/src/common/model/payment_method_configurations/apple_pay/apple_pay_multi_token_context.dart';
+import 'package:adyen_checkout/src/common/model/payment_method_configurations/apple_pay/apple_pay_recurring_payment_request.dart';
+import 'package:adyen_checkout/src/common/model/payment_method_configurations/apple_pay/apple_pay_reload_payment_request.dart';
 import 'package:adyen_checkout/src/common/model/payment_method_configurations/apple_pay/apple_pay_shipping_contact_update.dart';
 import 'package:adyen_checkout/src/common/model/payment_method_configurations/apple_pay/apple_pay_shipping_method.dart';
 import 'package:adyen_checkout/src/common/model/payment_method_configurations/apple_pay/apple_pay_shipping_method_update.dart';
@@ -26,6 +30,10 @@ class ApplePayConfiguration {
   final ApplePayMerchantCapability? merchantCapability;
   final bool? supportsCouponCode;
   final String? couponCode;
+  final ApplePayRecurringPaymentRequest? recurringPaymentRequest;
+  final ApplePayDeferredPaymentRequest? deferredPaymentRequest;
+  final ApplePayReloadPaymentRequest? automaticReloadPaymentRequest;
+  final List<ApplePayMultiTokenContext>? multiTokenContexts;
   final Future<ApplePayShippingMethodUpdate> Function(
     ApplePayShippingMethod method,
     List<ApplePaySummaryItem> currentSummaryItems,
@@ -59,6 +67,10 @@ class ApplePayConfiguration {
     this.merchantCapability,
     this.supportsCouponCode,
     this.couponCode,
+    this.recurringPaymentRequest,
+    this.deferredPaymentRequest,
+    this.automaticReloadPaymentRequest,
+    this.multiTokenContexts,
     this.onShippingMethodChange,
     this.onShippingContactChange,
     this.onCouponCodeChange,
@@ -84,6 +96,10 @@ class ApplePayConfiguration {
         'merchantCapability: $merchantCapability, '
         'supportsCouponCode: $supportsCouponCode, '
         'couponCode: $couponCode, '
+        'recurringPaymentRequest: $recurringPaymentRequest, '
+        'deferredPaymentRequest: $deferredPaymentRequest, '
+        'automaticReloadPaymentRequest: $automaticReloadPaymentRequest, '
+        'multiTokenContexts: $multiTokenContexts, '
         'onShippingMethodChange: $onShippingMethodChange, '
         'onShippingContactChange: $onShippingContactChange, '
         'onCouponCodeChange: $onCouponCodeChange, '
