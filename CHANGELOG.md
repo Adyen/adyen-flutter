@@ -7,6 +7,10 @@
   changing the `shopperReference`. Defaults to `true` (existing behavior).
   Mirrors the Web Drop-in `DropinConfiguration.showStoredPaymentMethods` option.
 - `ActionComponentConfiguration` now supports `ThreeDS2Configuration`, including `requestorAppURL` and 3DS2 UI customization for standalone action handling.
+- Apple Pay Component on iOS now supports coupon code configuration, dynamic
+  sheet updates for shipping contact, shipping method and coupon code changes,
+  authorization validation, and recurring/deferred/reload payment request
+  configuration.
 
 ## 1.9.0
 

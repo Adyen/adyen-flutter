@@ -2,10 +2,6 @@ import 'dart:convert';
 import 'dart:ui';
 
 import 'package:adyen_checkout/adyen_checkout.dart';
-import 'package:adyen_checkout/src/common/model/payment_method_configurations/apple_pay/apple_pay_deferred_payment_request.dart';
-import 'package:adyen_checkout/src/common/model/payment_method_configurations/apple_pay/apple_pay_multi_token_context.dart';
-import 'package:adyen_checkout/src/common/model/payment_method_configurations/apple_pay/apple_pay_recurring_payment_request.dart';
-import 'package:adyen_checkout/src/common/model/payment_method_configurations/apple_pay/apple_pay_reload_payment_request.dart';
 import 'package:adyen_checkout/src/generated/platform_api.g.dart';
 
 extension AnalyticsOptionsMapper on AnalyticsOptions {

@@ -72,4 +72,5 @@ export 'src/generated/platform_api.g.dart'
         ApplePayShippingType,
         ApplePayMerchantCapability,
         ApplePaySummaryItemType,
-        ApplePayRecurringPaymentIntervalUnit;
+        ApplePayRecurringPaymentIntervalUnit,
+        ApplePayPaymentErrorType;
