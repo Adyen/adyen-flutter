@@ -622,9 +622,8 @@ class ApplePayShippingContactUpdateDTO {
 
 class ApplePayShippingMethodUpdateDTO {
   final List<ApplePaySummaryItemDTO?> summaryItems;
-  final List<ApplePayPaymentErrorDTO?>? errors;
 
-  ApplePayShippingMethodUpdateDTO(this.summaryItems, this.errors);
+  ApplePayShippingMethodUpdateDTO(this.summaryItems);
 }
 
 class ApplePayContactDTO {

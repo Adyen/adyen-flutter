@@ -5,11 +5,8 @@
 import Foundation
 
 class ApplePayAdvancedComponent: BaseApplePayComponent {
-    private let componentFlutterApi: ComponentFlutterInterface
     private let configuration: InstantPaymentConfigurationDTO
     private let paymentMethodResponse: String
-    private let componentId: String
-    private var applePayComponentDelegateHandler: ApplePayComponentDelegateHandler?
 
     init(
         componentFlutterApi: ComponentFlutterInterface,
@@ -17,12 +14,13 @@ class ApplePayAdvancedComponent: BaseApplePayComponent {
         paymentMethodResponse: String,
         componentId: String
     ) throws {
-        self.componentFlutterApi = componentFlutterApi
         self.configuration = configuration
         self.paymentMethodResponse = paymentMethodResponse
-        self.componentId = componentId
-        super.init()
-        applePayComponent = try buildApplePayAdvancedComponent()
+        super.init(
+            componentFlutterApi: componentFlutterApi,
+            componentId: componentId
+        )
+        try buildApplePayAdvancedComponent()
     }
     
     override func present() {
@@ -53,28 +51,19 @@ class ApplePayAdvancedComponent: BaseApplePayComponent {
         }
     }
     
-    private func buildApplePayAdvancedComponent() throws -> ApplePayComponent? {
+    private func buildApplePayAdvancedComponent() throws {
         let paymentMethod = try JSONDecoder().decode(ApplePayPaymentMethod.self, from: Data(paymentMethodResponse.utf8))
         let context = try configuration.createAdyenContext()
         let configuration = try configuration.mapToApplePayConfiguration(payment: context.payment)
         let applePayComponent = try ApplePayComponent(paymentMethod: paymentMethod, context: context, configuration: configuration)
         applePayComponent.delegate = self
-        if self.configuration.applePayConfigurationDTO?.hasAnyApplePayCallback == true {
-            let applePayComponentDelegateHandler = ApplePayComponentDelegateHandler(
-                applePayCallbackBridge: PigeonApplePayCallbackBridge(
-                    componentFlutterApi: componentFlutterApi
-                ),
-                componentId: componentId
-            )
-            self.applePayComponentDelegateHandler = applePayComponentDelegateHandler
-            if self.configuration.applePayConfigurationDTO?.hasAnyApplePayUpdateCallback == true {
-                applePayComponent.applePayDelegate = applePayComponentDelegateHandler
-            }
-            if self.configuration.applePayConfigurationDTO?.hasOnAuthorize == true {
-                applePayComponent.authorizationDelegate = applePayComponentDelegateHandler
-            }
+        if self.configuration.applePayConfigurationDTO?.hasAnyApplePayUpdateCallback == true {
+            applePayComponent.applePayDelegate = self
         }
-        return applePayComponent
+        if self.configuration.applePayConfigurationDTO?.hasOnAuthorize == true {
+            applePayComponent.authorizationDelegate = self
+        }
+        self.applePayComponent = applePayComponent
     }
     
     private func onFinished(paymentEventDTO: PaymentEventDTO) {

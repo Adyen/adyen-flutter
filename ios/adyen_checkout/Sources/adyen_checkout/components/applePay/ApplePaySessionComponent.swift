@@ -6,9 +6,6 @@
 class ApplePaySessionComponent: BaseApplePayComponent {
     private let sessionHolder: SessionHolder
     private let configuration: InstantPaymentConfigurationDTO
-    private let componentFlutterApi: ComponentFlutterInterface
-    private let componentId: String
-    private var applePayComponentDelegateHandler: ApplePayComponentDelegateHandler?
     
     init(
         sessionHolder: SessionHolder,
@@ -18,10 +15,11 @@ class ApplePaySessionComponent: BaseApplePayComponent {
     ) throws {
         self.sessionHolder = sessionHolder
         self.configuration = configuration
-        self.componentFlutterApi = componentFlutterApi
-        self.componentId = componentId
-        super.init()
-        applePayComponent = try buildApplePaySessionComponent()
+        super.init(
+            componentFlutterApi: componentFlutterApi,
+            componentId: componentId
+        )
+        try buildApplePaySessionComponent()
     }
     
     override func present() {
@@ -35,7 +33,7 @@ class ApplePaySessionComponent: BaseApplePayComponent {
         applePayComponent = nil
     }
     
-    private func buildApplePaySessionComponent() throws -> ApplePayComponent? {
+    private func buildApplePaySessionComponent() throws {
         guard let session = sessionHolder.session else { throw PlatformError(errorDescription: "Session is not available.") }
         guard let paymentMethod = session.sessionContext.paymentMethods.paymentMethod(ofType: ApplePayPaymentMethod.self) else { throw PlatformError(errorDescription: "Apple Pay payment method not valid.") }
         let context = try configuration.createAdyenContext()
@@ -43,23 +41,14 @@ class ApplePaySessionComponent: BaseApplePayComponent {
         let configuration = try configuration.mapToApplePayConfiguration(payment: payment)
         let applePayComponent = try ApplePayComponent(paymentMethod: paymentMethod, context: context, configuration: configuration)
         applePayComponent.delegate = sessionHolder.session
-        if self.configuration.applePayConfigurationDTO?.hasAnyApplePayCallback == true {
-            let applePayComponentDelegateHandler = ApplePayComponentDelegateHandler(
-                applePayCallbackBridge: PigeonApplePayCallbackBridge(
-                    componentFlutterApi: componentFlutterApi
-                ),
-                componentId: componentId
-            )
-            self.applePayComponentDelegateHandler = applePayComponentDelegateHandler
-            if self.configuration.applePayConfigurationDTO?.hasAnyApplePayUpdateCallback == true {
-                applePayComponent.applePayDelegate = applePayComponentDelegateHandler
-            }
-            if self.configuration.applePayConfigurationDTO?.hasOnAuthorize == true {
-                applePayComponent.authorizationDelegate = applePayComponentDelegateHandler
-            }
+        if self.configuration.applePayConfigurationDTO?.hasAnyApplePayUpdateCallback == true {
+            applePayComponent.applePayDelegate = self
         }
+        if self.configuration.applePayConfigurationDTO?.hasOnAuthorize == true {
+            applePayComponent.authorizationDelegate = self
+        }
+        self.applePayComponent = applePayComponent
         setupSessionFlowDelegate()
-        return applePayComponent
     }
     
     private func setupSessionFlowDelegate() {

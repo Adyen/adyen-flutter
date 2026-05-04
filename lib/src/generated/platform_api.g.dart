@@ -1406,17 +1406,13 @@ class ApplePayShippingContactUpdateDTO {
 class ApplePayShippingMethodUpdateDTO {
   ApplePayShippingMethodUpdateDTO({
     required this.summaryItems,
-    this.errors,
   });
 
   List<ApplePaySummaryItemDTO?> summaryItems;
 
-  List<ApplePayPaymentErrorDTO?>? errors;
-
   Object encode() {
     return <Object?>[
       summaryItems,
-      errors,
     ];
   }
 
@@ -1425,7 +1421,6 @@ class ApplePayShippingMethodUpdateDTO {
     return ApplePayShippingMethodUpdateDTO(
       summaryItems:
           (result[0] as List<Object?>?)!.cast<ApplePaySummaryItemDTO?>(),
-      errors: (result[1] as List<Object?>?)?.cast<ApplePayPaymentErrorDTO?>(),
     );
   }
 }

@@ -1281,23 +1281,19 @@ struct ApplePayShippingContactUpdateDTO {
 /// Generated class from Pigeon that represents data sent in messages.
 struct ApplePayShippingMethodUpdateDTO {
     var summaryItems: [ApplePaySummaryItemDTO?]
-    var errors: [ApplePayPaymentErrorDTO?]?
 
     // swift-format-ignore: AlwaysUseLowerCamelCase
     static func fromList(_ __pigeon_list: [Any?]) -> ApplePayShippingMethodUpdateDTO? {
         let summaryItems = __pigeon_list[0] as! [ApplePaySummaryItemDTO?]
-        let errors: [ApplePayPaymentErrorDTO?]? = nilOrValue(__pigeon_list[1])
 
         return ApplePayShippingMethodUpdateDTO(
-            summaryItems: summaryItems,
-            errors: errors
+            summaryItems: summaryItems
         )
     }
 
     func toList() -> [Any?] {
         [
-            summaryItems,
-            errors
+            summaryItems
         ]
     }
 }
