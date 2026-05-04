@@ -60,7 +60,7 @@ class ApplePayAdvancedComponent: BaseApplePayComponent {
         if self.configuration.applePayConfigurationDTO?.hasAnyApplePayUpdateCallback == true {
             applePayComponent.applePayDelegate = self
         }
-        if self.configuration.applePayConfigurationDTO?.hasOnAuthorize == true {
+        if self.configuration.applePayConfigurationDTO?.hasOnAuthorized == true {
             applePayComponent.authorizationDelegate = self
         }
         self.applePayComponent = applePayComponent

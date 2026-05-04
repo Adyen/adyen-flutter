@@ -34,7 +34,7 @@ class ComponentFlutterApi implements ComponentFlutterInterface {
   }
 
   @override
-  Future<ApplePayShippingMethodUpdateDTO> onApplePayShippingMethodChange(
+  Future<ApplePayShippingMethodUpdateDTO> onApplePayShippingMethodSelected(
     String componentId,
     ApplePayShippingMethodDTO shippingMethod,
     List<ApplePaySummaryItemDTO?> currentSummaryItems,
@@ -43,7 +43,7 @@ class ComponentFlutterApi implements ComponentFlutterInterface {
         .whereType<ApplePaySummaryItemDTO>()
         .map((summaryItem) => summaryItem.fromDTO())
         .toList();
-    final callback = _applePayConfiguration?.onShippingMethodChange;
+    final callback = _applePayConfiguration?.onShippingMethodSelected;
     if (callback == null) {
       return ApplePayShippingMethodUpdateDTO(
         summaryItems: currentSummaryItems,
@@ -64,7 +64,7 @@ class ComponentFlutterApi implements ComponentFlutterInterface {
   }
 
   @override
-  Future<ApplePayShippingContactUpdateDTO> onApplePayShippingContactChange(
+  Future<ApplePayShippingContactUpdateDTO> onApplePayShippingContactSelected(
     String componentId,
     ApplePayContactDTO contact,
     List<ApplePaySummaryItemDTO?> currentSummaryItems,
@@ -73,7 +73,7 @@ class ComponentFlutterApi implements ComponentFlutterInterface {
         .whereType<ApplePaySummaryItemDTO>()
         .map((summaryItem) => summaryItem.fromDTO())
         .toList();
-    final callback = _applePayConfiguration?.onShippingContactChange;
+    final callback = _applePayConfiguration?.onShippingContactSelected;
     if (callback == null) {
       return ApplePayShippingContactUpdateDTO(
         summaryItems: currentSummaryItems,
@@ -94,7 +94,7 @@ class ComponentFlutterApi implements ComponentFlutterInterface {
   }
 
   @override
-  Future<ApplePayCouponCodeUpdateDTO> onApplePayCouponCodeChange(
+  Future<ApplePayCouponCodeUpdateDTO> onApplePayCouponCodeChanged(
     String componentId,
     String couponCode,
     List<ApplePaySummaryItemDTO?> currentSummaryItems,
@@ -103,7 +103,7 @@ class ComponentFlutterApi implements ComponentFlutterInterface {
         .whereType<ApplePaySummaryItemDTO>()
         .map((summaryItem) => summaryItem.fromDTO())
         .toList();
-    final callback = _applePayConfiguration?.onCouponCodeChange;
+    final callback = _applePayConfiguration?.onCouponCodeChanged;
     if (callback == null) {
       return ApplePayCouponCodeUpdateDTO(
         summaryItems: currentSummaryItems,
@@ -124,11 +124,11 @@ class ComponentFlutterApi implements ComponentFlutterInterface {
   }
 
   @override
-  Future<ApplePayAuthorizationResultDTO> onApplePayAuthorize(
+  Future<ApplePayAuthorizationResultDTO> onApplePayAuthorized(
     String componentId,
     ApplePayAuthorizedPaymentDTO payment,
   ) async {
-    final callback = _applePayConfiguration?.onAuthorize;
+    final callback = _applePayConfiguration?.onAuthorized;
     if (callback == null) {
       return ApplePayAuthorizationResultDTO(
         isSuccess: true,

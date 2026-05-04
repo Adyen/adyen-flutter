@@ -146,10 +146,10 @@ extension ApplePayConfigurationMapper on ApplePayConfiguration {
         multiTokenContexts: multiTokenContexts
             ?.map((multiTokenContext) => multiTokenContext.toDTO())
             .toList(),
-        hasOnShippingMethodChange: onShippingMethodChange != null,
-        hasOnShippingContactChange: onShippingContactChange != null,
-        hasOnCouponCodeChange: onCouponCodeChange != null,
-        hasOnAuthorize: onAuthorize != null,
+        hasOnShippingMethodSelected: onShippingMethodSelected != null,
+        hasOnShippingContactSelected: onShippingContactSelected != null,
+        hasOnCouponCodeChanged: onCouponCodeChanged != null,
+        hasOnAuthorized: onAuthorized != null,
       );
 }
 

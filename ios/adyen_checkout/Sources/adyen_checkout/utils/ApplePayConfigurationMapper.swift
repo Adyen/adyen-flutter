@@ -6,11 +6,11 @@ import PassKit
 
 extension ApplePayConfigurationDTO {
     var hasAnyApplePayUpdateCallback: Bool {
-        hasOnShippingMethodChange || hasOnShippingContactChange || hasOnCouponCodeChange
+        hasOnShippingMethodSelected || hasOnShippingContactSelected || hasOnCouponCodeChanged
     }
 
     var hasAnyApplePayCallback: Bool {
-        hasAnyApplePayUpdateCallback || hasOnAuthorize
+        hasAnyApplePayUpdateCallback || hasOnAuthorized
     }
 }
 

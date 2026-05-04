@@ -784,10 +784,10 @@ struct ApplePayConfigurationDTO {
     var deferredPaymentRequest: ApplePayDeferredPaymentRequestDTO?
     var automaticReloadPaymentRequest: ApplePayReloadPaymentRequestDTO?
     var multiTokenContexts: [ApplePayMultiTokenContextDTO?]?
-    var hasOnShippingMethodChange: Bool
-    var hasOnShippingContactChange: Bool
-    var hasOnCouponCodeChange: Bool
-    var hasOnAuthorize: Bool
+    var hasOnShippingMethodSelected: Bool
+    var hasOnShippingContactSelected: Bool
+    var hasOnCouponCodeChanged: Bool
+    var hasOnAuthorized: Bool
 
     // swift-format-ignore: AlwaysUseLowerCamelCase
     static func fromList(_ __pigeon_list: [Any?]) -> ApplePayConfigurationDTO? {
@@ -811,10 +811,10 @@ struct ApplePayConfigurationDTO {
         let deferredPaymentRequest: ApplePayDeferredPaymentRequestDTO? = nilOrValue(__pigeon_list[17])
         let automaticReloadPaymentRequest: ApplePayReloadPaymentRequestDTO? = nilOrValue(__pigeon_list[18])
         let multiTokenContexts: [ApplePayMultiTokenContextDTO?]? = nilOrValue(__pigeon_list[19])
-        let hasOnShippingMethodChange = __pigeon_list[20] as! Bool
-        let hasOnShippingContactChange = __pigeon_list[21] as! Bool
-        let hasOnCouponCodeChange = __pigeon_list[22] as! Bool
-        let hasOnAuthorize = __pigeon_list[23] as! Bool
+        let hasOnShippingMethodSelected = __pigeon_list[20] as! Bool
+        let hasOnShippingContactSelected = __pigeon_list[21] as! Bool
+        let hasOnCouponCodeChanged = __pigeon_list[22] as! Bool
+        let hasOnAuthorized = __pigeon_list[23] as! Bool
 
         return ApplePayConfigurationDTO(
             merchantId: merchantId,
@@ -837,10 +837,10 @@ struct ApplePayConfigurationDTO {
             deferredPaymentRequest: deferredPaymentRequest,
             automaticReloadPaymentRequest: automaticReloadPaymentRequest,
             multiTokenContexts: multiTokenContexts,
-            hasOnShippingMethodChange: hasOnShippingMethodChange,
-            hasOnShippingContactChange: hasOnShippingContactChange,
-            hasOnCouponCodeChange: hasOnCouponCodeChange,
-            hasOnAuthorize: hasOnAuthorize
+            hasOnShippingMethodSelected: hasOnShippingMethodSelected,
+            hasOnShippingContactSelected: hasOnShippingContactSelected,
+            hasOnCouponCodeChanged: hasOnCouponCodeChanged,
+            hasOnAuthorized: hasOnAuthorized
         )
     }
 
@@ -866,10 +866,10 @@ struct ApplePayConfigurationDTO {
             deferredPaymentRequest,
             automaticReloadPaymentRequest,
             multiTokenContexts,
-            hasOnShippingMethodChange,
-            hasOnShippingContactChange,
-            hasOnCouponCodeChange,
-            hasOnAuthorize
+            hasOnShippingMethodSelected,
+            hasOnShippingContactSelected,
+            hasOnCouponCodeChanged,
+            hasOnAuthorized
         ]
     }
 }
@@ -3234,10 +3234,10 @@ class ComponentPlatformInterfaceSetup {
 protocol ComponentFlutterInterfaceProtocol {
     func _generateCodecForDTOs(cardComponentConfigurationDTO cardComponentConfigurationDTOArg: CardComponentConfigurationDTO, blikComponentConfigurationDTO blikComponentConfigurationDTOArg: BlikComponentConfigurationDTO, sessionDTO sessionDTOArg: SessionDTO, binLookupDataDTO binLookupDataDTOArg: BinLookupDataDTO, completion: @escaping (Result<Void, AdyenPigeonError>) -> Void)
     func onComponentCommunication(componentCommunicationModel componentCommunicationModelArg: ComponentCommunicationModel, completion: @escaping (Result<Void, AdyenPigeonError>) -> Void)
-    func onApplePayShippingMethodChange(componentId componentIdArg: String, shippingMethod shippingMethodArg: ApplePayShippingMethodDTO, currentSummaryItems currentSummaryItemsArg: [ApplePaySummaryItemDTO?], completion: @escaping (Result<ApplePayShippingMethodUpdateDTO, AdyenPigeonError>) -> Void)
-    func onApplePayShippingContactChange(componentId componentIdArg: String, contact contactArg: ApplePayContactDTO, currentSummaryItems currentSummaryItemsArg: [ApplePaySummaryItemDTO?], completion: @escaping (Result<ApplePayShippingContactUpdateDTO, AdyenPigeonError>) -> Void)
-    func onApplePayCouponCodeChange(componentId componentIdArg: String, couponCode couponCodeArg: String, currentSummaryItems currentSummaryItemsArg: [ApplePaySummaryItemDTO?], completion: @escaping (Result<ApplePayCouponCodeUpdateDTO, AdyenPigeonError>) -> Void)
-    func onApplePayAuthorize(componentId componentIdArg: String, payment paymentArg: ApplePayAuthorizedPaymentDTO, completion: @escaping (Result<ApplePayAuthorizationResultDTO, AdyenPigeonError>) -> Void)
+    func onApplePayShippingMethodSelected(componentId componentIdArg: String, shippingMethod shippingMethodArg: ApplePayShippingMethodDTO, currentSummaryItems currentSummaryItemsArg: [ApplePaySummaryItemDTO?], completion: @escaping (Result<ApplePayShippingMethodUpdateDTO, AdyenPigeonError>) -> Void)
+    func onApplePayShippingContactSelected(componentId componentIdArg: String, contact contactArg: ApplePayContactDTO, currentSummaryItems currentSummaryItemsArg: [ApplePaySummaryItemDTO?], completion: @escaping (Result<ApplePayShippingContactUpdateDTO, AdyenPigeonError>) -> Void)
+    func onApplePayCouponCodeChanged(componentId componentIdArg: String, couponCode couponCodeArg: String, currentSummaryItems currentSummaryItemsArg: [ApplePaySummaryItemDTO?], completion: @escaping (Result<ApplePayCouponCodeUpdateDTO, AdyenPigeonError>) -> Void)
+    func onApplePayAuthorized(componentId componentIdArg: String, payment paymentArg: ApplePayAuthorizedPaymentDTO, completion: @escaping (Result<ApplePayAuthorizationResultDTO, AdyenPigeonError>) -> Void)
 }
 
 class ComponentFlutterInterface: ComponentFlutterInterfaceProtocol {
@@ -3290,8 +3290,8 @@ class ComponentFlutterInterface: ComponentFlutterInterfaceProtocol {
         }
     }
 
-    func onApplePayShippingMethodChange(componentId componentIdArg: String, shippingMethod shippingMethodArg: ApplePayShippingMethodDTO, currentSummaryItems currentSummaryItemsArg: [ApplePaySummaryItemDTO?], completion: @escaping (Result<ApplePayShippingMethodUpdateDTO, AdyenPigeonError>) -> Void) {
-        let channelName = "dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface.onApplePayShippingMethodChange\(messageChannelSuffix)"
+    func onApplePayShippingMethodSelected(componentId componentIdArg: String, shippingMethod shippingMethodArg: ApplePayShippingMethodDTO, currentSummaryItems currentSummaryItemsArg: [ApplePaySummaryItemDTO?], completion: @escaping (Result<ApplePayShippingMethodUpdateDTO, AdyenPigeonError>) -> Void) {
+        let channelName = "dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface.onApplePayShippingMethodSelected\(messageChannelSuffix)"
         let channel = FlutterBasicMessageChannel(name: channelName, binaryMessenger: binaryMessenger, codec: codec)
         channel.sendMessage([componentIdArg, shippingMethodArg, currentSummaryItemsArg] as [Any?]) { response in
             guard let listResponse = response as? [Any?] else {
@@ -3312,8 +3312,8 @@ class ComponentFlutterInterface: ComponentFlutterInterfaceProtocol {
         }
     }
 
-    func onApplePayShippingContactChange(componentId componentIdArg: String, contact contactArg: ApplePayContactDTO, currentSummaryItems currentSummaryItemsArg: [ApplePaySummaryItemDTO?], completion: @escaping (Result<ApplePayShippingContactUpdateDTO, AdyenPigeonError>) -> Void) {
-        let channelName = "dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface.onApplePayShippingContactChange\(messageChannelSuffix)"
+    func onApplePayShippingContactSelected(componentId componentIdArg: String, contact contactArg: ApplePayContactDTO, currentSummaryItems currentSummaryItemsArg: [ApplePaySummaryItemDTO?], completion: @escaping (Result<ApplePayShippingContactUpdateDTO, AdyenPigeonError>) -> Void) {
+        let channelName = "dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface.onApplePayShippingContactSelected\(messageChannelSuffix)"
         let channel = FlutterBasicMessageChannel(name: channelName, binaryMessenger: binaryMessenger, codec: codec)
         channel.sendMessage([componentIdArg, contactArg, currentSummaryItemsArg] as [Any?]) { response in
             guard let listResponse = response as? [Any?] else {
@@ -3334,8 +3334,8 @@ class ComponentFlutterInterface: ComponentFlutterInterfaceProtocol {
         }
     }
 
-    func onApplePayCouponCodeChange(componentId componentIdArg: String, couponCode couponCodeArg: String, currentSummaryItems currentSummaryItemsArg: [ApplePaySummaryItemDTO?], completion: @escaping (Result<ApplePayCouponCodeUpdateDTO, AdyenPigeonError>) -> Void) {
-        let channelName = "dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface.onApplePayCouponCodeChange\(messageChannelSuffix)"
+    func onApplePayCouponCodeChanged(componentId componentIdArg: String, couponCode couponCodeArg: String, currentSummaryItems currentSummaryItemsArg: [ApplePaySummaryItemDTO?], completion: @escaping (Result<ApplePayCouponCodeUpdateDTO, AdyenPigeonError>) -> Void) {
+        let channelName = "dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface.onApplePayCouponCodeChanged\(messageChannelSuffix)"
         let channel = FlutterBasicMessageChannel(name: channelName, binaryMessenger: binaryMessenger, codec: codec)
         channel.sendMessage([componentIdArg, couponCodeArg, currentSummaryItemsArg] as [Any?]) { response in
             guard let listResponse = response as? [Any?] else {
@@ -3356,8 +3356,8 @@ class ComponentFlutterInterface: ComponentFlutterInterfaceProtocol {
         }
     }
 
-    func onApplePayAuthorize(componentId componentIdArg: String, payment paymentArg: ApplePayAuthorizedPaymentDTO, completion: @escaping (Result<ApplePayAuthorizationResultDTO, AdyenPigeonError>) -> Void) {
-        let channelName = "dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface.onApplePayAuthorize\(messageChannelSuffix)"
+    func onApplePayAuthorized(componentId componentIdArg: String, payment paymentArg: ApplePayAuthorizedPaymentDTO, completion: @escaping (Result<ApplePayAuthorizationResultDTO, AdyenPigeonError>) -> Void) {
+        let channelName = "dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface.onApplePayAuthorized\(messageChannelSuffix)"
         let channel = FlutterBasicMessageChannel(name: channelName, binaryMessenger: binaryMessenger, codec: codec)
         channel.sendMessage([componentIdArg, paymentArg] as [Any?]) { response in
             guard let listResponse = response as? [Any?] else {

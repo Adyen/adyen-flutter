@@ -822,10 +822,10 @@ class ApplePayConfigurationDTO {
     this.deferredPaymentRequest,
     this.automaticReloadPaymentRequest,
     this.multiTokenContexts,
-    required this.hasOnShippingMethodChange,
-    required this.hasOnShippingContactChange,
-    required this.hasOnCouponCodeChange,
-    required this.hasOnAuthorize,
+    required this.hasOnShippingMethodSelected,
+    required this.hasOnShippingContactSelected,
+    required this.hasOnCouponCodeChanged,
+    required this.hasOnAuthorized,
   });
 
   String merchantId;
@@ -868,13 +868,13 @@ class ApplePayConfigurationDTO {
 
   List<ApplePayMultiTokenContextDTO?>? multiTokenContexts;
 
-  bool hasOnShippingMethodChange;
+  bool hasOnShippingMethodSelected;
 
-  bool hasOnShippingContactChange;
+  bool hasOnShippingContactSelected;
 
-  bool hasOnCouponCodeChange;
+  bool hasOnCouponCodeChanged;
 
-  bool hasOnAuthorize;
+  bool hasOnAuthorized;
 
   Object encode() {
     return <Object?>[
@@ -898,10 +898,10 @@ class ApplePayConfigurationDTO {
       deferredPaymentRequest,
       automaticReloadPaymentRequest,
       multiTokenContexts,
-      hasOnShippingMethodChange,
-      hasOnShippingContactChange,
-      hasOnCouponCodeChange,
-      hasOnAuthorize,
+      hasOnShippingMethodSelected,
+      hasOnShippingContactSelected,
+      hasOnCouponCodeChanged,
+      hasOnAuthorized,
     ];
   }
 
@@ -935,10 +935,10 @@ class ApplePayConfigurationDTO {
           result[18] as ApplePayReloadPaymentRequestDTO?,
       multiTokenContexts:
           (result[19] as List<Object?>?)?.cast<ApplePayMultiTokenContextDTO?>(),
-      hasOnShippingMethodChange: result[20]! as bool,
-      hasOnShippingContactChange: result[21]! as bool,
-      hasOnCouponCodeChange: result[22]! as bool,
-      hasOnAuthorize: result[23]! as bool,
+      hasOnShippingMethodSelected: result[20]! as bool,
+      hasOnShippingContactSelected: result[21]! as bool,
+      hasOnCouponCodeChanged: result[22]! as bool,
+      hasOnAuthorized: result[23]! as bool,
     );
   }
 }
@@ -3692,22 +3692,22 @@ abstract class ComponentFlutterInterface {
   void onComponentCommunication(
       ComponentCommunicationModel componentCommunicationModel);
 
-  Future<ApplePayShippingMethodUpdateDTO> onApplePayShippingMethodChange(
+  Future<ApplePayShippingMethodUpdateDTO> onApplePayShippingMethodSelected(
       String componentId,
       ApplePayShippingMethodDTO shippingMethod,
       List<ApplePaySummaryItemDTO?> currentSummaryItems);
 
-  Future<ApplePayShippingContactUpdateDTO> onApplePayShippingContactChange(
+  Future<ApplePayShippingContactUpdateDTO> onApplePayShippingContactSelected(
       String componentId,
       ApplePayContactDTO contact,
       List<ApplePaySummaryItemDTO?> currentSummaryItems);
 
-  Future<ApplePayCouponCodeUpdateDTO> onApplePayCouponCodeChange(
+  Future<ApplePayCouponCodeUpdateDTO> onApplePayCouponCodeChanged(
       String componentId,
       String couponCode,
       List<ApplePaySummaryItemDTO?> currentSummaryItems);
 
-  Future<ApplePayAuthorizationResultDTO> onApplePayAuthorize(
+  Future<ApplePayAuthorizationResultDTO> onApplePayAuthorized(
       String componentId, ApplePayAuthorizedPaymentDTO payment);
 
   static void setUp(
@@ -3795,7 +3795,7 @@ abstract class ComponentFlutterInterface {
     {
       final BasicMessageChannel<Object?> __pigeon_channel = BasicMessageChannel<
               Object?>(
-          'dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface.onApplePayShippingMethodChange$messageChannelSuffix',
+          'dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface.onApplePayShippingMethodSelected$messageChannelSuffix',
           pigeonChannelCodec,
           binaryMessenger: binaryMessenger);
       if (api == null) {
@@ -3803,22 +3803,22 @@ abstract class ComponentFlutterInterface {
       } else {
         __pigeon_channel.setMessageHandler((Object? message) async {
           assert(message != null,
-              'Argument for dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface.onApplePayShippingMethodChange was null.');
+              'Argument for dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface.onApplePayShippingMethodSelected was null.');
           final List<Object?> args = (message as List<Object?>?)!;
           final String? arg_componentId = (args[0] as String?);
           assert(arg_componentId != null,
-              'Argument for dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface.onApplePayShippingMethodChange was null, expected non-null String.');
+              'Argument for dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface.onApplePayShippingMethodSelected was null, expected non-null String.');
           final ApplePayShippingMethodDTO? arg_shippingMethod =
               (args[1] as ApplePayShippingMethodDTO?);
           assert(arg_shippingMethod != null,
-              'Argument for dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface.onApplePayShippingMethodChange was null, expected non-null ApplePayShippingMethodDTO.');
+              'Argument for dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface.onApplePayShippingMethodSelected was null, expected non-null ApplePayShippingMethodDTO.');
           final List<ApplePaySummaryItemDTO?>? arg_currentSummaryItems =
               (args[2] as List<Object?>?)?.cast<ApplePaySummaryItemDTO?>();
           assert(arg_currentSummaryItems != null,
-              'Argument for dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface.onApplePayShippingMethodChange was null, expected non-null List<ApplePaySummaryItemDTO?>.');
+              'Argument for dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface.onApplePayShippingMethodSelected was null, expected non-null List<ApplePaySummaryItemDTO?>.');
           try {
             final ApplePayShippingMethodUpdateDTO output =
-                await api.onApplePayShippingMethodChange(arg_componentId!,
+                await api.onApplePayShippingMethodSelected(arg_componentId!,
                     arg_shippingMethod!, arg_currentSummaryItems!);
             return wrapResponse(result: output);
           } on PlatformException catch (e) {
@@ -3833,7 +3833,7 @@ abstract class ComponentFlutterInterface {
     {
       final BasicMessageChannel<Object?> __pigeon_channel = BasicMessageChannel<
               Object?>(
-          'dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface.onApplePayShippingContactChange$messageChannelSuffix',
+          'dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface.onApplePayShippingContactSelected$messageChannelSuffix',
           pigeonChannelCodec,
           binaryMessenger: binaryMessenger);
       if (api == null) {
@@ -3841,22 +3841,22 @@ abstract class ComponentFlutterInterface {
       } else {
         __pigeon_channel.setMessageHandler((Object? message) async {
           assert(message != null,
-              'Argument for dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface.onApplePayShippingContactChange was null.');
+              'Argument for dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface.onApplePayShippingContactSelected was null.');
           final List<Object?> args = (message as List<Object?>?)!;
           final String? arg_componentId = (args[0] as String?);
           assert(arg_componentId != null,
-              'Argument for dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface.onApplePayShippingContactChange was null, expected non-null String.');
+              'Argument for dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface.onApplePayShippingContactSelected was null, expected non-null String.');
           final ApplePayContactDTO? arg_contact =
               (args[1] as ApplePayContactDTO?);
           assert(arg_contact != null,
-              'Argument for dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface.onApplePayShippingContactChange was null, expected non-null ApplePayContactDTO.');
+              'Argument for dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface.onApplePayShippingContactSelected was null, expected non-null ApplePayContactDTO.');
           final List<ApplePaySummaryItemDTO?>? arg_currentSummaryItems =
               (args[2] as List<Object?>?)?.cast<ApplePaySummaryItemDTO?>();
           assert(arg_currentSummaryItems != null,
-              'Argument for dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface.onApplePayShippingContactChange was null, expected non-null List<ApplePaySummaryItemDTO?>.');
+              'Argument for dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface.onApplePayShippingContactSelected was null, expected non-null List<ApplePaySummaryItemDTO?>.');
           try {
             final ApplePayShippingContactUpdateDTO output =
-                await api.onApplePayShippingContactChange(
+                await api.onApplePayShippingContactSelected(
                     arg_componentId!, arg_contact!, arg_currentSummaryItems!);
             return wrapResponse(result: output);
           } on PlatformException catch (e) {
@@ -3871,7 +3871,7 @@ abstract class ComponentFlutterInterface {
     {
       final BasicMessageChannel<Object?> __pigeon_channel = BasicMessageChannel<
               Object?>(
-          'dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface.onApplePayCouponCodeChange$messageChannelSuffix',
+          'dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface.onApplePayCouponCodeChanged$messageChannelSuffix',
           pigeonChannelCodec,
           binaryMessenger: binaryMessenger);
       if (api == null) {
@@ -3879,21 +3879,21 @@ abstract class ComponentFlutterInterface {
       } else {
         __pigeon_channel.setMessageHandler((Object? message) async {
           assert(message != null,
-              'Argument for dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface.onApplePayCouponCodeChange was null.');
+              'Argument for dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface.onApplePayCouponCodeChanged was null.');
           final List<Object?> args = (message as List<Object?>?)!;
           final String? arg_componentId = (args[0] as String?);
           assert(arg_componentId != null,
-              'Argument for dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface.onApplePayCouponCodeChange was null, expected non-null String.');
+              'Argument for dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface.onApplePayCouponCodeChanged was null, expected non-null String.');
           final String? arg_couponCode = (args[1] as String?);
           assert(arg_couponCode != null,
-              'Argument for dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface.onApplePayCouponCodeChange was null, expected non-null String.');
+              'Argument for dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface.onApplePayCouponCodeChanged was null, expected non-null String.');
           final List<ApplePaySummaryItemDTO?>? arg_currentSummaryItems =
               (args[2] as List<Object?>?)?.cast<ApplePaySummaryItemDTO?>();
           assert(arg_currentSummaryItems != null,
-              'Argument for dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface.onApplePayCouponCodeChange was null, expected non-null List<ApplePaySummaryItemDTO?>.');
+              'Argument for dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface.onApplePayCouponCodeChanged was null, expected non-null List<ApplePaySummaryItemDTO?>.');
           try {
             final ApplePayCouponCodeUpdateDTO output =
-                await api.onApplePayCouponCodeChange(arg_componentId!,
+                await api.onApplePayCouponCodeChanged(arg_componentId!,
                     arg_couponCode!, arg_currentSummaryItems!);
             return wrapResponse(result: output);
           } on PlatformException catch (e) {
@@ -3908,7 +3908,7 @@ abstract class ComponentFlutterInterface {
     {
       final BasicMessageChannel<Object?> __pigeon_channel = BasicMessageChannel<
               Object?>(
-          'dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface.onApplePayAuthorize$messageChannelSuffix',
+          'dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface.onApplePayAuthorized$messageChannelSuffix',
           pigeonChannelCodec,
           binaryMessenger: binaryMessenger);
       if (api == null) {
@@ -3916,18 +3916,18 @@ abstract class ComponentFlutterInterface {
       } else {
         __pigeon_channel.setMessageHandler((Object? message) async {
           assert(message != null,
-              'Argument for dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface.onApplePayAuthorize was null.');
+              'Argument for dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface.onApplePayAuthorized was null.');
           final List<Object?> args = (message as List<Object?>?)!;
           final String? arg_componentId = (args[0] as String?);
           assert(arg_componentId != null,
-              'Argument for dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface.onApplePayAuthorize was null, expected non-null String.');
+              'Argument for dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface.onApplePayAuthorized was null, expected non-null String.');
           final ApplePayAuthorizedPaymentDTO? arg_payment =
               (args[1] as ApplePayAuthorizedPaymentDTO?);
           assert(arg_payment != null,
-              'Argument for dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface.onApplePayAuthorize was null, expected non-null ApplePayAuthorizedPaymentDTO.');
+              'Argument for dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface.onApplePayAuthorized was null, expected non-null ApplePayAuthorizedPaymentDTO.');
           try {
             final ApplePayAuthorizationResultDTO output =
-                await api.onApplePayAuthorize(arg_componentId!, arg_payment!);
+                await api.onApplePayAuthorized(arg_componentId!, arg_payment!);
             return wrapResponse(result: output);
           } on PlatformException catch (e) {
             return wrapResponse(error: e);

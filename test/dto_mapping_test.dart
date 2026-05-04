@@ -239,15 +239,15 @@ void main() {
         merchantCapability: ApplePayMerchantCapability.debit,
         supportsCouponCode: true,
         couponCode: "SUMMER10",
-        onShippingMethodChange: (method, currentSummaryItems) async =>
+        onShippingMethodSelected: (method, currentSummaryItems) async =>
             ApplePayShippingMethodUpdate(
               summaryItems: currentSummaryItems,
             ),
-        onShippingContactChange: (contact, currentSummaryItems) async =>
+        onShippingContactSelected: (contact, currentSummaryItems) async =>
             ApplePayShippingContactUpdate(
               summaryItems: currentSummaryItems,
             ),
-        onCouponCodeChange: (couponCode, currentSummaryItems) async =>
+        onCouponCodeChanged: (couponCode, currentSummaryItems) async =>
             ApplePayCouponCodeUpdate(
               summaryItems: currentSummaryItems,
             ));
@@ -303,9 +303,9 @@ void main() {
         ApplePayMerchantCapability.debit);
     expect(applePayConfigurationDTO.supportsCouponCode, true);
     expect(applePayConfigurationDTO.couponCode, "SUMMER10");
-    expect(applePayConfigurationDTO.hasOnShippingMethodChange, true);
-    expect(applePayConfigurationDTO.hasOnShippingContactChange, true);
-    expect(applePayConfigurationDTO.hasOnCouponCodeChange, true);
+    expect(applePayConfigurationDTO.hasOnShippingMethodSelected, true);
+    expect(applePayConfigurationDTO.hasOnShippingContactSelected, true);
+    expect(applePayConfigurationDTO.hasOnCouponCodeChanged, true);
   });
 
   test(
@@ -479,9 +479,9 @@ void main() {
 
     final applePayConfigurationDTO = applePayConfiguration.toDTO();
 
-    expect(applePayConfigurationDTO.hasOnShippingMethodChange, false);
-    expect(applePayConfigurationDTO.hasOnShippingContactChange, false);
-    expect(applePayConfigurationDTO.hasOnCouponCodeChange, false);
+    expect(applePayConfigurationDTO.hasOnShippingMethodSelected, false);
+    expect(applePayConfigurationDTO.hasOnShippingContactSelected, false);
+    expect(applePayConfigurationDTO.hasOnCouponCodeChanged, false);
   });
 
   test(
