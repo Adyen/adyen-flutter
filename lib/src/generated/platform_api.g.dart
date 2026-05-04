@@ -1346,13 +1346,17 @@ class ApplePayAuthorizationResultDTO {
 class ApplePayCouponCodeUpdateDTO {
   ApplePayCouponCodeUpdateDTO({
     required this.summaryItems,
+    this.errors,
   });
 
   List<ApplePaySummaryItemDTO?> summaryItems;
 
+  List<ApplePayPaymentErrorDTO?>? errors;
+
   Object encode() {
     return <Object?>[
       summaryItems,
+      errors,
     ];
   }
 
@@ -1361,6 +1365,7 @@ class ApplePayCouponCodeUpdateDTO {
     return ApplePayCouponCodeUpdateDTO(
       summaryItems:
           (result[0] as List<Object?>?)!.cast<ApplePaySummaryItemDTO?>(),
+      errors: (result[1] as List<Object?>?)?.cast<ApplePayPaymentErrorDTO?>(),
     );
   }
 }
@@ -1369,16 +1374,20 @@ class ApplePayShippingContactUpdateDTO {
   ApplePayShippingContactUpdateDTO({
     required this.summaryItems,
     this.shippingMethods,
+    this.errors,
   });
 
   List<ApplePaySummaryItemDTO?> summaryItems;
 
   List<ApplePayShippingMethodDTO?>? shippingMethods;
 
+  List<ApplePayPaymentErrorDTO?>? errors;
+
   Object encode() {
     return <Object?>[
       summaryItems,
       shippingMethods,
+      errors,
     ];
   }
 
@@ -1389,6 +1398,7 @@ class ApplePayShippingContactUpdateDTO {
           (result[0] as List<Object?>?)!.cast<ApplePaySummaryItemDTO?>(),
       shippingMethods:
           (result[1] as List<Object?>?)?.cast<ApplePayShippingMethodDTO?>(),
+      errors: (result[2] as List<Object?>?)?.cast<ApplePayPaymentErrorDTO?>(),
     );
   }
 }
@@ -1396,13 +1406,17 @@ class ApplePayShippingContactUpdateDTO {
 class ApplePayShippingMethodUpdateDTO {
   ApplePayShippingMethodUpdateDTO({
     required this.summaryItems,
+    this.errors,
   });
 
   List<ApplePaySummaryItemDTO?> summaryItems;
 
+  List<ApplePayPaymentErrorDTO?>? errors;
+
   Object encode() {
     return <Object?>[
       summaryItems,
+      errors,
     ];
   }
 
@@ -1411,6 +1425,7 @@ class ApplePayShippingMethodUpdateDTO {
     return ApplePayShippingMethodUpdateDTO(
       summaryItems:
           (result[0] as List<Object?>?)!.cast<ApplePaySummaryItemDTO?>(),
+      errors: (result[1] as List<Object?>?)?.cast<ApplePayPaymentErrorDTO?>(),
     );
   }
 }

@@ -1229,19 +1229,23 @@ struct ApplePayAuthorizationResultDTO {
 /// Generated class from Pigeon that represents data sent in messages.
 struct ApplePayCouponCodeUpdateDTO {
     var summaryItems: [ApplePaySummaryItemDTO?]
+    var errors: [ApplePayPaymentErrorDTO?]?
 
     // swift-format-ignore: AlwaysUseLowerCamelCase
     static func fromList(_ __pigeon_list: [Any?]) -> ApplePayCouponCodeUpdateDTO? {
         let summaryItems = __pigeon_list[0] as! [ApplePaySummaryItemDTO?]
+        let errors: [ApplePayPaymentErrorDTO?]? = nilOrValue(__pigeon_list[1])
 
         return ApplePayCouponCodeUpdateDTO(
-            summaryItems: summaryItems
+            summaryItems: summaryItems,
+            errors: errors
         )
     }
 
     func toList() -> [Any?] {
         [
-            summaryItems
+            summaryItems,
+            errors
         ]
     }
 }
@@ -1250,22 +1254,26 @@ struct ApplePayCouponCodeUpdateDTO {
 struct ApplePayShippingContactUpdateDTO {
     var summaryItems: [ApplePaySummaryItemDTO?]
     var shippingMethods: [ApplePayShippingMethodDTO?]?
+    var errors: [ApplePayPaymentErrorDTO?]?
 
     // swift-format-ignore: AlwaysUseLowerCamelCase
     static func fromList(_ __pigeon_list: [Any?]) -> ApplePayShippingContactUpdateDTO? {
         let summaryItems = __pigeon_list[0] as! [ApplePaySummaryItemDTO?]
         let shippingMethods: [ApplePayShippingMethodDTO?]? = nilOrValue(__pigeon_list[1])
+        let errors: [ApplePayPaymentErrorDTO?]? = nilOrValue(__pigeon_list[2])
 
         return ApplePayShippingContactUpdateDTO(
             summaryItems: summaryItems,
-            shippingMethods: shippingMethods
+            shippingMethods: shippingMethods,
+            errors: errors
         )
     }
 
     func toList() -> [Any?] {
         [
             summaryItems,
-            shippingMethods
+            shippingMethods,
+            errors
         ]
     }
 }
@@ -1273,19 +1281,23 @@ struct ApplePayShippingContactUpdateDTO {
 /// Generated class from Pigeon that represents data sent in messages.
 struct ApplePayShippingMethodUpdateDTO {
     var summaryItems: [ApplePaySummaryItemDTO?]
+    var errors: [ApplePayPaymentErrorDTO?]?
 
     // swift-format-ignore: AlwaysUseLowerCamelCase
     static func fromList(_ __pigeon_list: [Any?]) -> ApplePayShippingMethodUpdateDTO? {
         let summaryItems = __pigeon_list[0] as! [ApplePaySummaryItemDTO?]
+        let errors: [ApplePayPaymentErrorDTO?]? = nilOrValue(__pigeon_list[1])
 
         return ApplePayShippingMethodUpdateDTO(
-            summaryItems: summaryItems
+            summaryItems: summaryItems,
+            errors: errors
         )
     }
 
     func toList() -> [Any?] {
         [
-            summaryItems
+            summaryItems,
+            errors
         ]
     }
 }

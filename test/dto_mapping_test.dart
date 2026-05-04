@@ -551,6 +551,39 @@ void main() {
   });
 
   test(
+      "when using apple pay shipping contact update with errors, then should parse to ApplePayShippingContactUpdateDTO",
+      () {
+    final applePayShippingContactUpdate = ApplePayShippingContactUpdate(
+      summaryItems: [
+        ApplePaySummaryItem(
+          label: "Total",
+          amount: Amount(value: 3597, currency: "EUR"),
+          type: ApplePaySummaryItemType.definite,
+        )
+      ],
+      errors: [
+        ApplePayPaymentError(
+          type: ApplePayPaymentErrorType.shippingAddress,
+          field: ApplePayContactField.postalAddress,
+          localizedDescription: "We do not ship to this postal code.",
+        )
+      ],
+    );
+
+    final applePayShippingContactUpdateDTO =
+        applePayShippingContactUpdate.toDTO();
+
+    expect(applePayShippingContactUpdateDTO.errors?.firstOrNull?.type,
+        ApplePayPaymentErrorType.shippingAddress);
+    expect(applePayShippingContactUpdateDTO.errors?.firstOrNull?.field,
+        "postalAddress");
+    expect(
+        applePayShippingContactUpdateDTO
+            .errors?.firstOrNull?.localizedDescription,
+        "We do not ship to this postal code.");
+  });
+
+  test(
       "when using apple pay coupon code update, then should parse to ApplePayCouponCodeUpdateDTO",
       () {
     final applePayCouponCodeUpdate = ApplePayCouponCodeUpdate(
@@ -571,6 +604,34 @@ void main() {
         2099);
     expect(applePayCouponCodeUpdateDTO.summaryItems.firstOrNull?.type,
         ApplePaySummaryItemType.definite);
+  });
+
+  test(
+      "when using apple pay coupon code update with errors, then should parse to ApplePayCouponCodeUpdateDTO",
+      () {
+    final applePayCouponCodeUpdate = ApplePayCouponCodeUpdate(
+      summaryItems: [
+        ApplePaySummaryItem(
+          label: "Discounted total",
+          amount: Amount(value: 2099, currency: "EUR"),
+          type: ApplePaySummaryItemType.definite,
+        )
+      ],
+      errors: [
+        ApplePayPaymentError(
+          type: ApplePayPaymentErrorType.couponCodeExpired,
+          localizedDescription: "Coupon code has expired.",
+        )
+      ],
+    );
+
+    final applePayCouponCodeUpdateDTO = applePayCouponCodeUpdate.toDTO();
+
+    expect(applePayCouponCodeUpdateDTO.errors?.firstOrNull?.type,
+        ApplePayPaymentErrorType.couponCodeExpired);
+    expect(
+        applePayCouponCodeUpdateDTO.errors?.firstOrNull?.localizedDescription,
+        "Coupon code has expired.");
   });
 
   test(

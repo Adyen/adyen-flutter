@@ -606,21 +606,25 @@ class ApplePayAuthorizationResultDTO {
 
 class ApplePayCouponCodeUpdateDTO {
   final List<ApplePaySummaryItemDTO?> summaryItems;
+  final List<ApplePayPaymentErrorDTO?>? errors;
 
-  ApplePayCouponCodeUpdateDTO(this.summaryItems);
+  ApplePayCouponCodeUpdateDTO(this.summaryItems, this.errors);
 }
 
 class ApplePayShippingContactUpdateDTO {
   final List<ApplePaySummaryItemDTO?> summaryItems;
   final List<ApplePayShippingMethodDTO?>? shippingMethods;
+  final List<ApplePayPaymentErrorDTO?>? errors;
 
-  ApplePayShippingContactUpdateDTO(this.summaryItems, this.shippingMethods);
+  ApplePayShippingContactUpdateDTO(
+      this.summaryItems, this.shippingMethods, this.errors);
 }
 
 class ApplePayShippingMethodUpdateDTO {
   final List<ApplePaySummaryItemDTO?> summaryItems;
+  final List<ApplePayPaymentErrorDTO?>? errors;
 
-  ApplePayShippingMethodUpdateDTO(this.summaryItems);
+  ApplePayShippingMethodUpdateDTO(this.summaryItems, this.errors);
 }
 
 class ApplePayContactDTO {

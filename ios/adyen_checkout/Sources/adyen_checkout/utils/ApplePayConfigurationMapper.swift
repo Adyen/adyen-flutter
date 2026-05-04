@@ -326,7 +326,7 @@ extension ApplePayShippingMethodUpdateDTO {
 extension ApplePayCouponCodeUpdateDTO {
     func toPKPaymentRequestCouponCodeUpdate() -> PKPaymentRequestCouponCodeUpdate {
         PKPaymentRequestCouponCodeUpdate(
-            errors: nil,
+            errors: errors?.compactMap { $0?.toNSError() },
             paymentSummaryItems: summaryItems.compactMap { try? $0?.toApplePaySummeryItem() },
             shippingMethods: []
         )
@@ -336,7 +336,7 @@ extension ApplePayCouponCodeUpdateDTO {
 extension ApplePayShippingContactUpdateDTO {
     func toPKPaymentRequestShippingContactUpdate() -> PKPaymentRequestShippingContactUpdate {
         PKPaymentRequestShippingContactUpdate(
-            errors: nil,
+            errors: errors?.compactMap { $0?.toNSError() },
             paymentSummaryItems: summaryItems.compactMap { try? $0?.toApplePaySummeryItem() },
             shippingMethods: shippingMethods?.compactMap { try? $0?.toPKShippingMethod() } ?? []
         )
