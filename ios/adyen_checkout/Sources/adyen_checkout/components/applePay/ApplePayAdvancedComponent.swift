@@ -57,10 +57,10 @@ class ApplePayAdvancedComponent: BaseApplePayComponent {
         let configuration = try configuration.mapToApplePayConfiguration(payment: context.payment)
         let applePayComponent = try ApplePayComponent(paymentMethod: paymentMethod, context: context, configuration: configuration)
         applePayComponent.delegate = self
-        if self.configuration.applePayConfigurationDTO?.hasAnyApplePayUpdateCallback == true {
+        if self.configuration.applePayConfigurationDTO?.requiresApplePayUpdateDelegate == true {
             applePayComponent.applePayDelegate = self
         }
-        if self.configuration.applePayConfigurationDTO?.hasOnAuthorized == true {
+        if self.configuration.applePayConfigurationDTO?.requiresAuthorizationDelegate == true {
             applePayComponent.authorizationDelegate = self
         }
         self.applePayComponent = applePayComponent

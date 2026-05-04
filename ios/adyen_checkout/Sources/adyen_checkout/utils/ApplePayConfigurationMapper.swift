@@ -5,12 +5,12 @@ import Adyen
 import PassKit
 
 extension ApplePayConfigurationDTO {
-    var hasAnyApplePayUpdateCallback: Bool {
+    var requiresApplePayUpdateDelegate: Bool {
         hasOnShippingMethodSelected || hasOnShippingContactSelected || hasOnCouponCodeChanged
     }
 
-    var hasAnyApplePayCallback: Bool {
-        hasAnyApplePayUpdateCallback || hasOnAuthorized
+    var requiresAuthorizationDelegate: Bool {
+        hasOnAuthorized
     }
 }
 
