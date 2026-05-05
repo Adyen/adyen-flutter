@@ -418,10 +418,10 @@ class ApplePayConfigurationDTO {
   final ApplePayDeferredPaymentRequestDTO? deferredPaymentRequest;
   final ApplePayReloadPaymentRequestDTO? automaticReloadPaymentRequest;
   final List<ApplePayMultiTokenContextDTO?>? multiTokenContexts;
-  final bool hasOnShippingMethodSelected;
-  final bool hasOnShippingContactSelected;
-  final bool hasOnCouponCodeChanged;
-  final bool hasOnAuthorized;
+  final bool hasOnShippingMethodChange;
+  final bool hasOnShippingContactChange;
+  final bool hasOnCouponCodeChange;
+  final bool hasOnAuthorize;
 
   ApplePayConfigurationDTO(
     this.merchantId,
@@ -444,10 +444,10 @@ class ApplePayConfigurationDTO {
     this.deferredPaymentRequest,
     this.automaticReloadPaymentRequest,
     this.multiTokenContexts,
-    this.hasOnShippingMethodSelected,
-    this.hasOnShippingContactSelected,
-    this.hasOnCouponCodeChanged,
-    this.hasOnAuthorized,
+    this.hasOnShippingMethodChange,
+    this.hasOnShippingContactChange,
+    this.hasOnCouponCodeChange,
+    this.hasOnAuthorize,
   );
 }
 
@@ -1144,28 +1144,28 @@ abstract class ComponentFlutterInterface {
       ComponentCommunicationModel componentCommunicationModel);
 
   @async
-  ApplePayShippingMethodUpdateDTO onApplePayShippingMethodSelected(
+  ApplePayShippingMethodUpdateDTO onApplePayShippingMethodChange(
     String componentId,
     ApplePayShippingMethodDTO shippingMethod,
     List<ApplePaySummaryItemDTO?> currentSummaryItems,
   );
 
   @async
-  ApplePayShippingContactUpdateDTO onApplePayShippingContactSelected(
+  ApplePayShippingContactUpdateDTO onApplePayShippingContactChange(
     String componentId,
     ApplePayContactDTO contact,
     List<ApplePaySummaryItemDTO?> currentSummaryItems,
   );
 
   @async
-  ApplePayCouponCodeUpdateDTO onApplePayCouponCodeChanged(
+  ApplePayCouponCodeUpdateDTO onApplePayCouponCodeChange(
     String componentId,
     String couponCode,
     List<ApplePaySummaryItemDTO?> currentSummaryItems,
   );
 
   @async
-  ApplePayAuthorizationResultDTO onApplePayAuthorized(
+  ApplePayAuthorizationResultDTO onApplePayAuthorize(
     String componentId,
     ApplePayAuthorizedPaymentDTO payment,
   );

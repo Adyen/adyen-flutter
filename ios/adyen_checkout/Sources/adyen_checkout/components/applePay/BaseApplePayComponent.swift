@@ -60,7 +60,7 @@ extension BaseApplePayComponent: ApplePayComponentDelegate {
         for payment: ApplePayPayment,
         completion: @escaping (PKPaymentRequestShippingContactUpdate) -> Void
     ) {
-        componentFlutterApi.onApplePayShippingContactSelected(
+        componentFlutterApi.onApplePayShippingContactChange(
             componentId: componentId,
             contact: contact.toDTO(),
             currentSummaryItems: payment.summaryItems.map { $0.toDTO(currencyCode: payment.currencyCode) },
@@ -80,7 +80,7 @@ extension BaseApplePayComponent: ApplePayComponentDelegate {
         for payment: ApplePayPayment,
         completion: @escaping (PKPaymentRequestShippingMethodUpdate) -> Void
     ) {
-        componentFlutterApi.onApplePayShippingMethodSelected(
+        componentFlutterApi.onApplePayShippingMethodChange(
             componentId: componentId,
             shippingMethod: shippingMethod.toDTO(currencyCode: payment.currencyCode),
             currentSummaryItems: payment.summaryItems.map { $0.toDTO(currencyCode: payment.currencyCode) },
@@ -101,7 +101,7 @@ extension BaseApplePayComponent: ApplePayComponentDelegate {
         for payment: ApplePayPayment,
         completion: @escaping (PKPaymentRequestCouponCodeUpdate) -> Void
     ) {
-        componentFlutterApi.onApplePayCouponCodeChanged(
+        componentFlutterApi.onApplePayCouponCodeChange(
             componentId: componentId,
             couponCode: couponCode,
             currentSummaryItems: payment.summaryItems.map { $0.toDTO(currencyCode: payment.currencyCode) },
@@ -122,7 +122,7 @@ extension BaseApplePayComponent: ApplePayAuthorizationDelegate {
         payment: PKPayment,
         completion: @escaping (PKPaymentAuthorizationResult) -> Void
     ) {
-        componentFlutterApi.onApplePayAuthorized(
+        componentFlutterApi.onApplePayAuthorize(
             componentId: componentId,
             payment: payment.toAuthorizedPaymentDTO(currencyCode: currencyCode ?? ""),
             completion: { result in

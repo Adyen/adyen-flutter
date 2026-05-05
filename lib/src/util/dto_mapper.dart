@@ -142,10 +142,10 @@ extension ApplePayConfigurationMapper on ApplePayConfiguration {
         multiTokenContexts: multiTokenContexts
             ?.map((multiTokenContext) => multiTokenContext.toDTO())
             .toList(),
-        hasOnShippingMethodSelected: onShippingMethodSelected != null,
-        hasOnShippingContactSelected: onShippingContactSelected != null,
-        hasOnCouponCodeChanged: onCouponCodeChanged != null,
-        hasOnAuthorized: onAuthorized != null,
+        hasOnShippingMethodChange: onShippingMethodChange != null,
+        hasOnShippingContactChange: onShippingContactChange != null,
+        hasOnCouponCodeChange: onCouponCodeChange != null,
+        hasOnAuthorize: onAuthorize != null,
       );
 }
 
@@ -169,10 +169,10 @@ extension ApplePayRecurringPaymentSummaryItemMapper
         label: label,
         amount: amount.toDTO(),
         type: type,
-        startDate: startDate?.toIso8601String(),
+        startDate: startDate?.toUtc().toIso8601String(),
         intervalUnit: intervalUnit,
         intervalCount: intervalCount,
-        endDate: endDate?.toIso8601String(),
+        endDate: endDate?.toUtc().toIso8601String(),
       );
 }
 
@@ -185,7 +185,7 @@ extension ApplePayDeferredPaymentRequestMapper
         managementUrl: managementUrl,
         billingAgreement: billingAgreement,
         tokenNotificationUrl: tokenNotificationUrl,
-        freeCancellationDate: freeCancellationDate?.toIso8601String(),
+        freeCancellationDate: freeCancellationDate?.toUtc().toIso8601String(),
         freeCancellationTimeZone: freeCancellationTimeZone,
       );
 }
@@ -197,7 +197,7 @@ extension ApplePayDeferredPaymentSummaryItemMapper
         label: label,
         amount: amount.toDTO(),
         type: type,
-        deferredDate: deferredDate.toIso8601String(),
+        deferredDate: deferredDate.toUtc().toIso8601String(),
       );
 }
 
@@ -310,8 +310,8 @@ extension ApplePayShippingMethodMapper on ApplePayShippingMethod {
       detail: detail,
       amount: amount.toDTO(),
       identifier: identifier,
-      startDate: startDate?.toIso8601String(),
-      endDate: endDate?.toIso8601String());
+      startDate: startDate?.toUtc().toIso8601String(),
+      endDate: endDate?.toUtc().toIso8601String());
 }
 
 extension ApplePaySummaryItemsMapper on ApplePaySummaryItem {

@@ -37,18 +37,18 @@ class ApplePayConfiguration {
   final Future<ApplePayShippingMethodUpdate> Function(
     ApplePayShippingMethod method,
     List<ApplePaySummaryItem> currentSummaryItems,
-  )? onShippingMethodSelected;
+  )? onShippingMethodChange;
   final Future<ApplePayShippingContactUpdate> Function(
     ApplePayContact contact,
     List<ApplePaySummaryItem> currentSummaryItems,
-  )? onShippingContactSelected;
+  )? onShippingContactChange;
   final Future<ApplePayCouponCodeUpdate> Function(
     String couponCode,
     List<ApplePaySummaryItem> currentSummaryItems,
-  )? onCouponCodeChanged;
+  )? onCouponCodeChange;
   final Future<ApplePayAuthorizationResult> Function(
     ApplePayAuthorizedPayment payment,
-  )? onAuthorized;
+  )? onAuthorize;
 
   ApplePayConfiguration({
     required this.merchantId,
@@ -71,10 +71,10 @@ class ApplePayConfiguration {
     this.deferredPaymentRequest,
     this.automaticReloadPaymentRequest,
     this.multiTokenContexts,
-    this.onShippingMethodSelected,
-    this.onShippingContactSelected,
-    this.onCouponCodeChanged,
-    this.onAuthorized,
+    this.onShippingMethodChange,
+    this.onShippingContactChange,
+    this.onCouponCodeChange,
+    this.onAuthorize,
   });
 
   @override
@@ -100,9 +100,9 @@ class ApplePayConfiguration {
         'deferredPaymentRequest: $deferredPaymentRequest, '
         'automaticReloadPaymentRequest: $automaticReloadPaymentRequest, '
         'multiTokenContexts: $multiTokenContexts, '
-        'onShippingMethodSelected: $onShippingMethodSelected, '
-        'onShippingContactSelected: $onShippingContactSelected, '
-        'onCouponCodeChanged: $onCouponCodeChanged, '
-        'onAuthorized: $onAuthorized)';
+        'onShippingMethodChange: $onShippingMethodChange, '
+        'onShippingContactChange: $onShippingContactChange, '
+        'onCouponCodeChange: $onCouponCodeChange, '
+        'onAuthorize: $onAuthorize)';
   }
 }

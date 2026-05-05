@@ -239,15 +239,15 @@ void main() {
         merchantCapability: ApplePayMerchantCapability.debit,
         supportsCouponCode: true,
         couponCode: "SUMMER10",
-        onShippingMethodSelected: (method, currentSummaryItems) async =>
+        onShippingMethodChange: (method, currentSummaryItems) async =>
             ApplePayShippingMethodUpdate(
               summaryItems: currentSummaryItems,
             ),
-        onShippingContactSelected: (contact, currentSummaryItems) async =>
+        onShippingContactChange: (contact, currentSummaryItems) async =>
             ApplePayShippingContactUpdate(
               summaryItems: currentSummaryItems,
             ),
-        onCouponCodeChanged: (couponCode, currentSummaryItems) async =>
+        onCouponCodeChange: (couponCode, currentSummaryItems) async =>
             ApplePayCouponCodeUpdate(
               summaryItems: currentSummaryItems,
             ));
@@ -294,18 +294,18 @@ void main() {
     expect(applePayConfigurationDTO.shippingMethods?.firstOrNull?.identifier,
         "Identifier 1");
     expect(applePayConfigurationDTO.shippingMethods?.firstOrNull?.startDate,
-        shippingStartDate.toIso8601String());
+        shippingStartDate.toUtc().toIso8601String());
     expect(applePayConfigurationDTO.shippingMethods?.firstOrNull?.endDate,
-        shippingEndDate.toIso8601String());
+        shippingEndDate.toUtc().toIso8601String());
     expect(applePayConfigurationDTO.applicationData, null);
     expect(applePayConfigurationDTO.supportedCountries, ["NL"]);
     expect(applePayConfigurationDTO.merchantCapability,
         ApplePayMerchantCapability.debit);
     expect(applePayConfigurationDTO.supportsCouponCode, true);
     expect(applePayConfigurationDTO.couponCode, "SUMMER10");
-    expect(applePayConfigurationDTO.hasOnShippingMethodSelected, true);
-    expect(applePayConfigurationDTO.hasOnShippingContactSelected, true);
-    expect(applePayConfigurationDTO.hasOnCouponCodeChanged, true);
+    expect(applePayConfigurationDTO.hasOnShippingMethodChange, true);
+    expect(applePayConfigurationDTO.hasOnShippingContactChange, true);
+    expect(applePayConfigurationDTO.hasOnCouponCodeChange, true);
   });
 
   test(
@@ -479,9 +479,9 @@ void main() {
 
     final applePayConfigurationDTO = applePayConfiguration.toDTO();
 
-    expect(applePayConfigurationDTO.hasOnShippingMethodSelected, false);
-    expect(applePayConfigurationDTO.hasOnShippingContactSelected, false);
-    expect(applePayConfigurationDTO.hasOnCouponCodeChanged, false);
+    expect(applePayConfigurationDTO.hasOnShippingMethodChange, false);
+    expect(applePayConfigurationDTO.hasOnShippingContactChange, false);
+    expect(applePayConfigurationDTO.hasOnCouponCodeChange, false);
   });
 
   test(
