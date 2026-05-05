@@ -98,15 +98,6 @@ class ApplePayAdvancedComponentScreen extends StatelessWidget {
         ApplePayContactField.name,
         ApplePayContactField.postalAddress,
       ],
-      shippingContact: ApplePayContact(
-        givenName: "John",
-        familyName: "Doe",
-        addressLines: ["Simon Carmiggeltstraat 6"],
-        postalCode: "1011 DJ",
-        city: "Amsterdam",
-        country: "Netherlands",
-        countryCode: "NL",
-      ),
       applePayShippingType: ApplePayShippingType.shipping,
       allowShippingContactEditing: true,
       supportsCouponCode: true,
@@ -137,60 +128,35 @@ class ApplePayAdvancedComponentScreen extends StatelessWidget {
     List<ApplePaySummaryItem> currentSummaryItems,
     DateTime today,
   ) async {
-    debugPrint(
-      'onShippingContactChange <- contact=$contact, '
-      'currentSummaryItems=$currentSummaryItems',
+    debugPrint('onShippingContactChange: $contact');
+    final shippingContactUpdate = ApplePayShippingContactUpdate(
+      summaryItems: _buildApplePaySummaryItems(),
+      shippingMethods: _buildShippingMethods(today),
     );
-    final ApplePayShippingContactUpdate update;
-    if (contact.postalCode == "") {
-      update = ApplePayShippingContactUpdate(
-        summaryItems: currentSummaryItems,
-        errors: [
-          ApplePayPaymentError(
-            type: ApplePayPaymentErrorType.shippingAddress,
-            field: ApplePayContactField.postalAddress,
-            localizedDescription: "Postal code is required.",
-          ),
-        ],
-      );
-    } else {
-      update = ApplePayShippingContactUpdate(
-        summaryItems: _buildApplePaySummaryItems(),
-        shippingMethods: _buildShippingMethods(today),
-      );
-    }
-    debugPrint('onShippingContactChange -> $update');
-    return update;
+    return shippingContactUpdate;
   }
 
   Future<ApplePayShippingMethodUpdate> _onShippingMethodChange(
     ApplePayShippingMethod method,
     List<ApplePaySummaryItem> currentSummaryItems,
   ) async {
-    debugPrint(
-      'onShippingMethodChange <- method=$method, '
-      'currentSummaryItems=$currentSummaryItems',
-    );
-    final update = ApplePayShippingMethodUpdate(
+    debugPrint('onShippingMethodChange: $method');
+    final shippingMethodUpdate = ApplePayShippingMethodUpdate(
       summaryItems: _buildApplePaySummaryItems(
         shippingAmount: method.amount.value,
       ),
     );
-    debugPrint('onShippingMethodChange -> $update');
-    return update;
+    return shippingMethodUpdate;
   }
 
   Future<ApplePayCouponCodeUpdate> _onCouponCodeChange(
     String couponCode,
     List<ApplePaySummaryItem> currentSummaryItems,
   ) async {
-    debugPrint(
-      'onCouponCodeChange <- couponCode=$couponCode, '
-      'currentSummaryItems=$currentSummaryItems',
-    );
-    final ApplePayCouponCodeUpdate update;
+    debugPrint('onCouponCodeChange: $couponCode');
+    final ApplePayCouponCodeUpdate couponCodeUpdate;
     if (couponCode.toUpperCase() != "SUMMER10") {
-      update = ApplePayCouponCodeUpdate(
+      couponCodeUpdate = ApplePayCouponCodeUpdate(
         summaryItems: currentSummaryItems,
         errors: [
           ApplePayPaymentError(
@@ -200,21 +166,20 @@ class ApplePayAdvancedComponentScreen extends StatelessWidget {
         ],
       );
     } else {
-      update = ApplePayCouponCodeUpdate(
+      couponCodeUpdate = ApplePayCouponCodeUpdate(
         summaryItems: _buildApplePaySummaryItems(discountAmount: 1000),
       );
     }
-    debugPrint('onCouponCodeChange -> $update');
-    return update;
+    return couponCodeUpdate;
   }
 
   Future<ApplePayAuthorizationResult> _onAuthorize(
     ApplePayAuthorizedPayment payment,
   ) async {
-    debugPrint('onAuthorize <- payment=$payment');
-    final ApplePayAuthorizationResult result;
+    debugPrint('onAuthorize: $payment');
+    final ApplePayAuthorizationResult authorizationResult;
     if (payment.shippingContact?.postalCode == "") {
-      result = ApplePayAuthorizationResult.failure(
+      authorizationResult = ApplePayAuthorizationResult.failure(
         errors: [
           ApplePayPaymentError(
             type: ApplePayPaymentErrorType.shippingAddress,
@@ -224,10 +189,9 @@ class ApplePayAdvancedComponentScreen extends StatelessWidget {
         ],
       );
     } else {
-      result = const ApplePayAuthorizationResult.success();
+      authorizationResult = const ApplePayAuthorizationResult.success();
     }
-    debugPrint('onAuthorize -> $result');
-    return result;
+    return authorizationResult;
   }
 
   List<ApplePaySummaryItem> _buildApplePaySummaryItems({
