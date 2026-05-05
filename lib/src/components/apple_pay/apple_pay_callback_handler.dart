@@ -6,9 +6,11 @@ import 'package:adyen_checkout/src/util/dto_mapper.dart';
 /// Encapsulates the merchant-provided Apple Pay callbacks for a single
 /// component instance and translates between DTOs and public models.
 class ApplePayCallbackHandler {
-  ApplePayCallbackHandler(this._configuration);
+  ApplePayCallbackHandler(this._configurationProvider);
 
-  final ApplePayConfiguration _configuration;
+  final ApplePayConfiguration Function() _configurationProvider;
+
+  ApplePayConfiguration get _configuration => _configurationProvider();
 
   Future<ApplePayShippingMethodUpdateDTO> onShippingMethodChange(
     ApplePayShippingMethodDTO shippingMethod,

@@ -91,7 +91,7 @@ class _BaseApplePayComponentState extends State<BaseApplePayComponent> {
     ApplePayCallbackRegistry.instance.register(
       widget.componentId,
       ApplePayCallbackHandler(
-          widget.applePayComponentConfiguration.applePayConfiguration),
+          () => widget.applePayComponentConfiguration.applePayConfiguration),
     );
     _componentCommunicationStream = _componentFlutterApi
         .componentCommunicationStream.stream
