@@ -367,6 +367,12 @@ extension ApplePaySummaryItemDTOMapper on ApplePaySummaryItemDTO {
       );
 }
 
+extension ApplePaySummaryItemDTOListMapper on List<ApplePaySummaryItemDTO?> {
+  List<ApplePaySummaryItem> fromDTOs() => whereType<ApplePaySummaryItemDTO>()
+      .map((summaryItem) => summaryItem.fromDTO())
+      .toList();
+}
+
 extension CashAppPayConfigurationMapper on CashAppPayConfiguration {
   CashAppPayConfigurationDTO toDTO() => CashAppPayConfigurationDTO(
         cashAppPayEnvironment: cashAppPayEnvironment,

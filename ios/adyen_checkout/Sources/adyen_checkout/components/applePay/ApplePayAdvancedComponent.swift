@@ -55,14 +55,10 @@ class ApplePayAdvancedComponent: BaseApplePayComponent {
         let paymentMethod = try JSONDecoder().decode(ApplePayPaymentMethod.self, from: Data(paymentMethodResponse.utf8))
         let context = try configuration.createAdyenContext()
         let configuration = try configuration.mapToApplePayConfiguration(payment: context.payment)
+        self.currencyCode = context.payment?.amount.currencyCode
         let applePayComponent = try ApplePayComponent(paymentMethod: paymentMethod, context: context, configuration: configuration)
         applePayComponent.delegate = self
-        if self.configuration.applePayConfigurationDTO?.requiresApplePayUpdateDelegate == true {
-            applePayComponent.applePayDelegate = self
-        }
-        if self.configuration.applePayConfigurationDTO?.requiresAuthorizationDelegate == true {
-            applePayComponent.authorizationDelegate = self
-        }
+        assignDelegates(to: applePayComponent, configuration: self.configuration.applePayConfigurationDTO)
         self.applePayComponent = applePayComponent
     }
     

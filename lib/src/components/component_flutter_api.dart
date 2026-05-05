@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:adyen_checkout/src/common/model/payment_method_configurations/apple_pay/apple_pay_configuration.dart';
 import 'package:adyen_checkout/src/generated/platform_api.g.dart';
+import 'package:adyen_checkout/src/logging/adyen_logger.dart';
 import 'package:adyen_checkout/src/util/dto_mapper.dart';
 
 class ComponentFlutterApi implements ComponentFlutterInterface {
@@ -37,29 +38,20 @@ class ComponentFlutterApi implements ComponentFlutterInterface {
   Future<ApplePayShippingMethodUpdateDTO> onApplePayShippingMethodSelected(
     String componentId,
     ApplePayShippingMethodDTO shippingMethod,
-    List<ApplePaySummaryItemDTO?> currentSummaryItems,
+    List<ApplePaySummaryItemDTO?> summaryItems,
   ) async {
-    final fallbackSummaryItems = currentSummaryItems
-        .whereType<ApplePaySummaryItemDTO>()
-        .map((summaryItem) => summaryItem.fromDTO())
-        .toList();
-    final callback = _applePayConfiguration?.onShippingMethodSelected;
-    if (callback == null) {
-      return ApplePayShippingMethodUpdateDTO(
-        summaryItems: currentSummaryItems,
-      );
-    }
-
     try {
-      return (await callback(
+      final shippingMethodUpdate =
+          await _applePayConfiguration?.onShippingMethodSelected?.call(
         shippingMethod.fromDTO(),
-        fallbackSummaryItems,
-      ))
-          .toDTO();
-    } catch (_) {
-      return ApplePayShippingMethodUpdateDTO(
-        summaryItems: currentSummaryItems,
+        summaryItems.fromDTOs(),
       );
+      return shippingMethodUpdate?.toDTO() ??
+          ApplePayShippingMethodUpdateDTO(summaryItems: summaryItems);
+    } catch (exception) {
+      AdyenLogger.instance
+          .print('onApplePayShippingMethodSelected failed: $exception');
+      return ApplePayShippingMethodUpdateDTO(summaryItems: summaryItems);
     }
   }
 
@@ -67,29 +59,20 @@ class ComponentFlutterApi implements ComponentFlutterInterface {
   Future<ApplePayShippingContactUpdateDTO> onApplePayShippingContactSelected(
     String componentId,
     ApplePayContactDTO contact,
-    List<ApplePaySummaryItemDTO?> currentSummaryItems,
+    List<ApplePaySummaryItemDTO?> summaryItems,
   ) async {
-    final fallbackSummaryItems = currentSummaryItems
-        .whereType<ApplePaySummaryItemDTO>()
-        .map((summaryItem) => summaryItem.fromDTO())
-        .toList();
-    final callback = _applePayConfiguration?.onShippingContactSelected;
-    if (callback == null) {
-      return ApplePayShippingContactUpdateDTO(
-        summaryItems: currentSummaryItems,
-      );
-    }
-
     try {
-      return (await callback(
+      final shippingContactUpdate =
+          await _applePayConfiguration?.onShippingContactSelected?.call(
         contact.fromDTO(),
-        fallbackSummaryItems,
-      ))
-          .toDTO();
-    } catch (_) {
-      return ApplePayShippingContactUpdateDTO(
-        summaryItems: currentSummaryItems,
+        summaryItems.fromDTOs(),
       );
+      return shippingContactUpdate?.toDTO() ??
+          ApplePayShippingContactUpdateDTO(summaryItems: summaryItems);
+    } catch (exception) {
+      AdyenLogger.instance
+          .print('onApplePayShippingContactSelected failed: $exception');
+      return ApplePayShippingContactUpdateDTO(summaryItems: summaryItems);
     }
   }
 
@@ -97,29 +80,20 @@ class ComponentFlutterApi implements ComponentFlutterInterface {
   Future<ApplePayCouponCodeUpdateDTO> onApplePayCouponCodeChanged(
     String componentId,
     String couponCode,
-    List<ApplePaySummaryItemDTO?> currentSummaryItems,
+    List<ApplePaySummaryItemDTO?> summaryItems,
   ) async {
-    final fallbackSummaryItems = currentSummaryItems
-        .whereType<ApplePaySummaryItemDTO>()
-        .map((summaryItem) => summaryItem.fromDTO())
-        .toList();
-    final callback = _applePayConfiguration?.onCouponCodeChanged;
-    if (callback == null) {
-      return ApplePayCouponCodeUpdateDTO(
-        summaryItems: currentSummaryItems,
-      );
-    }
-
     try {
-      return (await callback(
+      final couponCodeUpdate =
+          await _applePayConfiguration?.onCouponCodeChanged?.call(
         couponCode,
-        fallbackSummaryItems,
-      ))
-          .toDTO();
-    } catch (_) {
-      return ApplePayCouponCodeUpdateDTO(
-        summaryItems: currentSummaryItems,
+        summaryItems.fromDTOs(),
       );
+      return couponCodeUpdate?.toDTO() ??
+          ApplePayCouponCodeUpdateDTO(summaryItems: summaryItems);
+    } catch (exception) {
+      AdyenLogger.instance
+          .print('onApplePayCouponCodeChanged failed: $exception');
+      return ApplePayCouponCodeUpdateDTO(summaryItems: summaryItems);
     }
   }
 
@@ -128,19 +102,14 @@ class ComponentFlutterApi implements ComponentFlutterInterface {
     String componentId,
     ApplePayAuthorizedPaymentDTO payment,
   ) async {
-    final callback = _applePayConfiguration?.onAuthorized;
-    if (callback == null) {
-      return ApplePayAuthorizationResultDTO(
-        isSuccess: true,
-      );
-    }
-
     try {
-      return (await callback(payment.fromDTO())).toDTO();
-    } catch (_) {
-      return ApplePayAuthorizationResultDTO(
-        isSuccess: false,
-      );
+      final authorizationResult =
+          await _applePayConfiguration?.onAuthorized?.call(payment.fromDTO());
+      return authorizationResult?.toDTO() ??
+          ApplePayAuthorizationResultDTO(isSuccess: true);
+    } catch (exception) {
+      AdyenLogger.instance.print('onApplePayAuthorized failed: $exception');
+      return ApplePayAuthorizationResultDTO(isSuccess: false);
     }
   }
 

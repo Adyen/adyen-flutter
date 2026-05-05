@@ -39,14 +39,10 @@ class ApplePaySessionComponent: BaseApplePayComponent {
         let context = try configuration.createAdyenContext()
         let payment = session.sessionContext.createPayment(fallbackCountryCode: configuration.countryCode)
         let configuration = try configuration.mapToApplePayConfiguration(payment: payment)
+        self.currencyCode = payment.amount.currencyCode
         let applePayComponent = try ApplePayComponent(paymentMethod: paymentMethod, context: context, configuration: configuration)
         applePayComponent.delegate = sessionHolder.session
-        if self.configuration.applePayConfigurationDTO?.requiresApplePayUpdateDelegate == true {
-            applePayComponent.applePayDelegate = self
-        }
-        if self.configuration.applePayConfigurationDTO?.requiresAuthorizationDelegate == true {
-            applePayComponent.authorizationDelegate = self
-        }
+        assignDelegates(to: applePayComponent, configuration: self.configuration.applePayConfigurationDTO)
         self.applePayComponent = applePayComponent
         setupSessionFlowDelegate()
     }

@@ -16,9 +16,7 @@ extension ApplePayConfigurationDTO {
 
 extension ApplePayConfigurationDTO {
     func toApplePayConfiguration(
-        payment: Payment?,
-        componentFlutterApi: ComponentFlutterInterface? = nil,
-        componentId: String? = nil
+        payment: Payment?
     ) throws -> ApplePayComponent.Configuration {
         guard let payment else {
             throw AdyenPigeonError(
@@ -389,13 +387,13 @@ extension NSDecimalNumber {
 }
 
 extension PKPayment {
-    func toAuthorizedPaymentDTO() -> ApplePayAuthorizedPaymentDTO {
+    func toAuthorizedPaymentDTO(currencyCode: String) -> ApplePayAuthorizedPaymentDTO {
         ApplePayAuthorizedPaymentDTO(
             token: token.paymentData.base64EncodedString(),
             network: token.paymentMethod.network?.rawValue ?? "",
             billingContact: billingContact?.toDTO(),
             shippingContact: shippingContact?.toDTO(),
-            shippingMethod: nil
+            shippingMethod: shippingMethod?.toDTO(currencyCode: currencyCode)
         )
     }
 }

@@ -9,6 +9,7 @@ class BaseApplePayComponent {
     let componentFlutterApi: ComponentFlutterInterface
     let componentId: String
     var applePayComponent: ApplePayComponent?
+    var currencyCode: String?
 
     init(
         componentFlutterApi: ComponentFlutterInterface,
@@ -41,6 +42,15 @@ class BaseApplePayComponent {
     func getViewController() -> UIViewController? {
         let rootViewController = UIApplication.shared.adyen.mainKeyWindow?.rootViewController
         return rootViewController?.adyen.topPresenter
+    }
+
+    func assignDelegates(to component: ApplePayComponent, configuration: ApplePayConfigurationDTO?) {
+        if configuration?.requiresApplePayUpdateDelegate == true {
+            component.applePayDelegate = self
+        }
+        if configuration?.requiresAuthorizationDelegate == true {
+            component.authorizationDelegate = self
+        }
     }
 }
 
@@ -114,7 +124,7 @@ extension BaseApplePayComponent: ApplePayAuthorizationDelegate {
     ) {
         componentFlutterApi.onApplePayAuthorized(
             componentId: componentId,
-            payment: payment.toAuthorizedPaymentDTO(),
+            payment: payment.toAuthorizedPaymentDTO(currencyCode: currencyCode ?? ""),
             completion: { result in
                 switch result {
                 case let .success(update):

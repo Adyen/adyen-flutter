@@ -251,20 +251,11 @@ extension AmountDTO {
 }
 
 extension InstantPaymentConfigurationDTO {
-    func mapToApplePayConfiguration(
-        payment: Payment?,
-        componentFlutterApi: ComponentFlutterInterface? = nil,
-        componentId: String? = nil
-    ) throws -> ApplePayComponent.Configuration {
-        guard let applePayConfiguration = try applePayConfigurationDTO?.toApplePayConfiguration(
-            payment: payment,
-            componentFlutterApi: componentFlutterApi,
-            componentId: componentId
-        ) else {
+    func mapToApplePayConfiguration(payment: Payment?) throws -> ApplePayComponent.Configuration {
+        guard let applePayConfigurationDTO else {
             throw PlatformError(errorDescription: "Apple pay configuration not provided.")
         }
-        
-        return applePayConfiguration
+        return try applePayConfigurationDTO.toApplePayConfiguration(payment: payment)
     }
 
     func createAdyenContext(payment: Payment? = nil) throws -> AdyenContext {
