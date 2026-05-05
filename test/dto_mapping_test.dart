@@ -250,7 +250,9 @@ void main() {
         onCouponCodeChange: (couponCode, currentSummaryItems) async =>
             ApplePayCouponCodeUpdate(
               summaryItems: currentSummaryItems,
-            ));
+            ),
+        onAuthorize: (payment) async =>
+            const ApplePayAuthorizationResult.success());
 
     final applePayConfigurationDTO = applePayConfiguration.toDTO();
 
@@ -306,6 +308,7 @@ void main() {
     expect(applePayConfigurationDTO.hasOnShippingMethodChange, true);
     expect(applePayConfigurationDTO.hasOnShippingContactChange, true);
     expect(applePayConfigurationDTO.hasOnCouponCodeChange, true);
+    expect(applePayConfigurationDTO.hasOnAuthorize, true);
   });
 
   test(
@@ -482,6 +485,7 @@ void main() {
     expect(applePayConfigurationDTO.hasOnShippingMethodChange, false);
     expect(applePayConfigurationDTO.hasOnShippingContactChange, false);
     expect(applePayConfigurationDTO.hasOnCouponCodeChange, false);
+    expect(applePayConfigurationDTO.hasOnAuthorize, false);
   });
 
   test(
@@ -632,6 +636,78 @@ void main() {
     expect(
         applePayCouponCodeUpdateDTO.errors?.firstOrNull?.localizedDescription,
         "Coupon code has expired.");
+  });
+
+  test(
+      "when using apple pay authorization success, then should parse to ApplePayAuthorizationResultDTO",
+      () {
+    const applePayAuthorizationResult = ApplePayAuthorizationResult.success();
+
+    final applePayAuthorizationResultDTO = applePayAuthorizationResult.toDTO();
+
+    expect(applePayAuthorizationResultDTO.isSuccess, true);
+    expect(applePayAuthorizationResultDTO.errors, null);
+  });
+
+  test(
+      "when using apple pay authorization failure, then should parse to ApplePayAuthorizationResultDTO",
+      () {
+    final applePayAuthorizationResult = ApplePayAuthorizationResult.failure(
+      errors: [
+        ApplePayPaymentError(
+          type: ApplePayPaymentErrorType.shippingAddress,
+          field: ApplePayContactField.postalAddress,
+          localizedDescription: "Postal code is required.",
+        )
+      ],
+    );
+
+    final applePayAuthorizationResultDTO = applePayAuthorizationResult.toDTO();
+
+    expect(applePayAuthorizationResultDTO.isSuccess, false);
+    expect(applePayAuthorizationResultDTO.errors?.firstOrNull?.type,
+        ApplePayPaymentErrorType.shippingAddress);
+    expect(applePayAuthorizationResultDTO.errors?.firstOrNull?.field,
+        "postalAddress");
+    expect(
+        applePayAuthorizationResultDTO
+            .errors?.firstOrNull?.localizedDescription,
+        "Postal code is required.");
+  });
+
+  test(
+      "when using apple pay authorized payment DTO, then should parse to ApplePayAuthorizedPayment",
+      () {
+    final applePayAuthorizedPaymentDTO = ApplePayAuthorizedPaymentDTO(
+      token: "APPLE_PAY_TOKEN",
+      network: "visa",
+      billingContact: ApplePayContactDTO(
+        emailAddress: "billing@example.com",
+        postalCode: "1011 DJ",
+      ),
+      shippingContact: ApplePayContactDTO(
+        emailAddress: "shipping@example.com",
+        postalCode: "1011 DJ",
+      ),
+      shippingMethod: ApplePayShippingMethodDTO(
+        label: "Express shipping",
+        detail: "DHL Express",
+        amount: AmountDTO(value: 999, currency: "EUR"),
+        identifier: "express",
+      ),
+    );
+
+    final applePayAuthorizedPayment = applePayAuthorizedPaymentDTO.fromDTO();
+
+    expect(applePayAuthorizedPayment.token, "APPLE_PAY_TOKEN");
+    expect(applePayAuthorizedPayment.network, "visa");
+    expect(applePayAuthorizedPayment.billingContact?.emailAddress,
+        "billing@example.com");
+    expect(applePayAuthorizedPayment.shippingContact?.emailAddress,
+        "shipping@example.com");
+    expect(applePayAuthorizedPayment.shippingMethod?.label, "Express shipping");
+    expect(applePayAuthorizedPayment.shippingMethod?.amount.value, 999);
+    expect(applePayAuthorizedPayment.shippingMethod?.amount.currency, "EUR");
   });
 
   test(
