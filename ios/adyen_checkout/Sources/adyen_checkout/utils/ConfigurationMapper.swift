@@ -285,9 +285,9 @@ private func buildAdyenContext(environment: Environment, clientKey: String, amou
     }()
     var analyticsConfiguration = AnalyticsConfiguration()
     analyticsConfiguration.isEnabled = analyticsOptionsDTO.enabled
-    analyticsConfiguration.context = AnalyticsContext(
-        version: analyticsOptionsDTO.version,
-        platform: .flutter
+    CheckoutPlatformParams.shared.overrideForCrossPlatform(
+        platform: .flutter,
+        version: analyticsOptionsDTO.version
     )
 
     return AdyenContext(
