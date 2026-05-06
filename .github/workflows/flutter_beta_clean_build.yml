@@ -1,0 +1,120 @@
+name: Flutter beta clean build
+
+on:
+  workflow_call:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  android_beta_clean_build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    env:
+      ANDROID_API_LEVEL: 36
+
+    steps:
+      - name: Provide more disk space
+        run: |
+          sudo rm -rf /opt/hostedtoolcache
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf /opt/ghc /opt/cabal /opt/stack
+          sudo rm -rf /usr/local/.ghcup
+          sudo rm -rf "/usr/local/share/boost"
+          sudo apt-get remove -y 'php.*'
+          sudo docker image prune --all --force
+
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      - name: Set up JDK
+        uses: actions/setup-java@be666c2fcd27ec809703dec50e508c2fdc7f6654
+        with:
+          distribution: 'zulu'
+          java-version: 17
+
+      - uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2
+        with:
+          channel: 'beta'
+          cache: true
+          cache-key: beta-android
+
+      - run: flutter pub get
+
+      - name: Create default project and add Adyen checkout plugin package
+        run: |
+          flutter create --template=app --platforms=android,ios demo_project
+          cd demo_project
+          dart pub add 'adyen_checkout:{"path":"../"}'
+
+      - name: Build Android app
+        working-directory: demo_project
+        run: flutter build apk --debug
+
+      - name: Gradle cache
+        uses: gradle/actions/setup-gradle@50e97c2cd7a37755bbfafc9c5b7cafaece252f6e
+        with:
+          cache-read-only: false
+
+      - name: Run Android connected installation test
+        uses: reactivecircus/android-emulator-runner@e89f39f1abbbd05b1113a29cf4db69e7540cae5a
+        with:
+          api-level: ${{ env.ANDROID_API_LEVEL }}
+          target: google_apis
+          arch: x86_64
+          force-avd-creation: false
+          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          disable-animations: false
+          working-directory: ./demo_project
+          script: |
+            echo "Emulator launched"
+            adb install build/app/outputs/flutter-apk/app-debug.apk
+            adb shell monkey -p com.example.demo_project -c android.intent.category.LAUNCHER 1
+
+  ios_beta_clean_build:
+    runs-on: macos-26
+    timeout-minutes: 45
+    env:
+      IPHONE_MODEL: "iPhone 17"
+
+    steps:
+      - name: Provide more disk space
+        run: |
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf /opt/ghc
+          sudo rm -rf "/usr/local/share/boost"
+
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+
+      - uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2
+        with:
+          channel: 'beta'
+          cache: true
+          cache-key: beta-ios
+
+      - run: flutter pub get
+
+      - name: Create default project and add Adyen checkout plugin package
+        run: |
+          flutter create --template=app --platforms=android,ios demo_project
+          cd demo_project
+          dart pub add 'adyen_checkout:{"path":"../"}'
+
+      - name: Build iOS app for simulator
+        working-directory: demo_project
+        run: flutter build ios --debug --simulator
+
+      - name: Install iOS app on simulator
+        working-directory: demo_project
+        run: |
+          xcrun simctl list devices
+          xcrun simctl boot "$IPHONE_MODEL"
+          xcrun simctl bootstatus "$IPHONE_MODEL" -b
+          xcrun simctl install "$IPHONE_MODEL" build/ios/iphonesimulator/Runner.app
+          xcrun simctl launch "$IPHONE_MODEL" com.example.demoProject
