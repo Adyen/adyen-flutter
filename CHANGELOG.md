@@ -1,4 +1,4 @@
-## 1.10.0 (in development)
+## 1.10.0
 
 ### New
 
@@ -6,7 +6,8 @@
   previously stored payment methods from the Drop-in payment list without
   changing the `shopperReference`. Defaults to `true` (existing behavior).
   Mirrors the Web Drop-in `DropinConfiguration.showStoredPaymentMethods` option.
-- `ActionComponentConfiguration` now supports `ThreeDS2Configuration`, including `requestorAppURL` and 3DS2 UI customization for standalone action handling.
+- `ActionComponentConfiguration` now supports `ThreeDS2Configuration`, including `requestorAppURL`
+  and 3DS2 UI customization for standalone action handling.
 
 ### Changed
 
