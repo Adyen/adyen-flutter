@@ -8,6 +8,13 @@
   Mirrors the Web Drop-in `DropinConfiguration.showStoredPaymentMethods` option.
 - `ActionComponentConfiguration` now supports `ThreeDS2Configuration`, including `requestorAppURL` and 3DS2 UI customization for standalone action handling.
 
+### Changed
+
+- Dependency versions:
+  | Name | Version |
+  |---------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------|
+  | [Android Drop-in/Components](https://docs.adyen.com/online-payments/release-notes/?title%5B0%5D=Android+Components%2FDrop-in&version%5B0%5D=5.18.0) | 5.17.0 -> **5.18.0** |
+
 ## 1.9.0
 
 ### New
