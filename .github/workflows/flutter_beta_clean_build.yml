@@ -76,8 +76,7 @@ jobs:
           working-directory: ./demo_project
           script: |
             echo "Emulator launched"
-            adb install build/app/outputs/flutter-apk/app-debug.apk
-            adb shell monkey -p com.example.demo_project -c android.intent.category.LAUNCHER 1
+            flutter run --debug --no-resident --use-application-binary=build/app/outputs/flutter-apk/app-debug.apk
 
   ios_beta_clean_build:
     name: iOS beta clean build
