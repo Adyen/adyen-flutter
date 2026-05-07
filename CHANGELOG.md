@@ -3,8 +3,8 @@
 ### New
 
 - For Drop-in: you can now hide previously stored payment methods from the payment method list. Set
-  `showStoredPaymentMethods` to **false** in `StoredPaymentMethodConfiguration`. The default is *
-  *true**.
+  `showStoredPaymentMethods` to **false** in `StoredPaymentMethodConfiguration`. The default is 
+  **true**.
 - For standalone action handling: `ActionComponentConfiguration` now supports
   `ThreeDS2Configuration`, so you can set the `requestorAppURL` and customize the 3D Secure 2 UI.
 
