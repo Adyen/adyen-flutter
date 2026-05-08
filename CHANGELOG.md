@@ -1,16 +1,30 @@
-## 1.10.0 (in development)
+## 1.11.0 (in development)
 
 ### New
 
-- Drop-in: `StoredPaymentMethodConfiguration.showStoredPaymentMethods` — hide
-  previously stored payment methods from the Drop-in payment list without
-  changing the `shopperReference`. Defaults to `true` (existing behavior).
-  Mirrors the Web Drop-in `DropinConfiguration.showStoredPaymentMethods` option.
-- `ActionComponentConfiguration` now supports `ThreeDS2Configuration`, including `requestorAppURL` and 3DS2 UI customization for standalone action handling.
 - Apple Pay Component on iOS now supports coupon code configuration, dynamic
   sheet updates for shipping contact, shipping method and coupon code changes,
   authorization validation, and recurring/deferred/reload payment request
   configuration.
+
+
+## 1.10.0
+
+### New
+
+- For Drop-in: you can now hide previously stored payment methods from the payment method list. Set
+  `showStoredPaymentMethods` to **false** in `StoredPaymentMethodConfiguration`. The default is 
+  **true**.
+- For standalone action handling: `ActionComponentConfiguration` now supports
+  `ThreeDS2Configuration`, so you can set the `requestorAppURL` and customize the 3D Secure 2 UI.
+
+### Changed
+
+- Dependency versions:
+  | Name | Version |
+  |---------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------|
+  | [Android Drop-in/Components](https://docs.adyen.com/online-payments/release-notes/?title%5B0%5D=Android+Components%2FDrop-in&version%5B0%5D=5.18.0) | 5.17.0 -> **5.18.0** |
+  | [iOS Drop-in/Components](https://docs.adyen.com/online-payments/release-notes/?title%5B0%5D=iOS+Components%2FDrop-in&version%5B0%5D=5.24.0) | 5.23.1 -> **5.24.0** |
 
 ## 1.9.0
 
