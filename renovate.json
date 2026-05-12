@@ -8,7 +8,7 @@
       "matchPackagePatterns": [
         ".*"
       ],
-      "minimumReleaseAge": "14 days"
+      "minimumReleaseAge": "21 days"
     }
   ],
   "osvVulnerabilityAlerts": true,
