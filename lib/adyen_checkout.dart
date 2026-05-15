@@ -13,9 +13,19 @@ export 'src/common/model/partial_payment/order_cancel_result.dart';
 export 'src/common/model/partial_payment/partial_payment.dart';
 export 'src/common/model/payment_event.dart';
 export 'src/common/model/payment_method_configurations/apple_pay/apple_pay_configuration.dart';
+export 'src/common/model/payment_method_configurations/apple_pay/apple_pay_authorization_result.dart';
+export 'src/common/model/payment_method_configurations/apple_pay/apple_pay_authorized_payment.dart';
 export 'src/common/model/payment_method_configurations/apple_pay/apple_pay_contact.dart';
 export 'src/common/model/payment_method_configurations/apple_pay/apple_pay_contact_field.dart';
+export 'src/common/model/payment_method_configurations/apple_pay/apple_pay_coupon_code_update.dart';
+export 'src/common/model/payment_method_configurations/apple_pay/apple_pay_deferred_payment_request.dart';
+export 'src/common/model/payment_method_configurations/apple_pay/apple_pay_multi_token_context.dart';
+export 'src/common/model/payment_method_configurations/apple_pay/apple_pay_payment_error.dart';
+export 'src/common/model/payment_method_configurations/apple_pay/apple_pay_recurring_payment_request.dart';
+export 'src/common/model/payment_method_configurations/apple_pay/apple_pay_reload_payment_request.dart';
+export 'src/common/model/payment_method_configurations/apple_pay/apple_pay_shipping_contact_update.dart';
 export 'src/common/model/payment_method_configurations/apple_pay/apple_pay_shipping_method.dart';
+export 'src/common/model/payment_method_configurations/apple_pay/apple_pay_shipping_method_update.dart';
 export 'src/common/model/payment_method_configurations/apple_pay/apple_pay_summary_item.dart';
 export 'src/common/model/payment_method_configurations/card/installment_configuration.dart';
 export 'src/common/model/payment_method_configurations/card/installment_options.dart';
@@ -61,4 +71,6 @@ export 'src/generated/platform_api.g.dart'
         CashAppPayEnvironment,
         ApplePayShippingType,
         ApplePayMerchantCapability,
-        ApplePaySummaryItemType;
+        ApplePaySummaryItemType,
+        ApplePayRecurringPaymentIntervalUnit,
+        ApplePayPaymentErrorType;

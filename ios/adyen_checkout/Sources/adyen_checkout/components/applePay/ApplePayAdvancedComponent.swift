@@ -5,10 +5,8 @@
 import Foundation
 
 class ApplePayAdvancedComponent: BaseApplePayComponent {
-    private let componentFlutterApi: ComponentFlutterInterface
     private let configuration: InstantPaymentConfigurationDTO
     private let paymentMethodResponse: String
-    private let componentId: String
 
     init(
         componentFlutterApi: ComponentFlutterInterface,
@@ -16,12 +14,13 @@ class ApplePayAdvancedComponent: BaseApplePayComponent {
         paymentMethodResponse: String,
         componentId: String
     ) throws {
-        self.componentFlutterApi = componentFlutterApi
         self.configuration = configuration
         self.paymentMethodResponse = paymentMethodResponse
-        self.componentId = componentId
-        super.init()
-        applePayComponent = try buildApplePayAdvancedComponent()
+        super.init(
+            componentFlutterApi: componentFlutterApi,
+            componentId: componentId
+        )
+        try buildApplePayAdvancedComponent()
     }
     
     override func present() {
@@ -52,14 +51,15 @@ class ApplePayAdvancedComponent: BaseApplePayComponent {
         }
     }
     
-    private func buildApplePayAdvancedComponent() throws -> ApplePayComponent? {
+    private func buildApplePayAdvancedComponent() throws {
         let paymentMethod = try JSONDecoder().decode(ApplePayPaymentMethod.self, from: Data(paymentMethodResponse.utf8))
         let context = try configuration.createAdyenContext()
         let configuration = try configuration.mapToApplePayConfiguration(payment: context.payment)
+        self.currencyCode = context.payment?.amount.currencyCode
         let applePayComponent = try ApplePayComponent(paymentMethod: paymentMethod, context: context, configuration: configuration)
         applePayComponent.delegate = self
-        // applePayComponent?.applePayDelegate - Dynamic pricing will be added in the next version.
-        return applePayComponent
+        assignDelegates(to: applePayComponent, configuration: self.configuration.applePayConfigurationDTO)
+        self.applePayComponent = applePayComponent
     }
     
     private func onFinished(paymentEventDTO: PaymentEventDTO) {
