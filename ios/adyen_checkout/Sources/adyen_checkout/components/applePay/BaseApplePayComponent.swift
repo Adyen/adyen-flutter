@@ -122,9 +122,14 @@ extension BaseApplePayComponent: ApplePayAuthorizationDelegate {
         payment: PKPayment,
         completion: @escaping (PKPaymentAuthorizationResult) -> Void
     ) {
+        guard let currencyCode, currencyCode.isEmpty == false else {
+            completion(PKPaymentAuthorizationResult(status: .failure, errors: [ApplePayComponent.Error.invalidCurrencyCode]))
+            return
+        }
+
         componentFlutterApi.onApplePayAuthorize(
             componentId: componentId,
-            payment: payment.toAuthorizedPaymentDTO(currencyCode: currencyCode ?? ""),
+            payment: payment.toAuthorizedPaymentDTO(currencyCode: currencyCode),
             completion: { result in
                 switch result {
                 case let .success(update):
