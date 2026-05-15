@@ -559,10 +559,11 @@ extension ApplePayMultiTokenContextDTO {
 extension String {
     func toDate() throws -> Date {
         let formatter = ISO8601DateFormatter()
+        formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
         if let date = formatter.date(from: self) {
             return date
         }
-        formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        formatter.formatOptions = .withInternetDateTime
         if let date = formatter.date(from: self) {
             return date
         }

@@ -198,17 +198,20 @@ class ApplePayAdvancedComponentScreen extends StatelessWidget {
     int shippingAmount = 1000,
     int discountAmount = 500,
   }) {
-    final totalAmount = 8000 + 2295 + shippingAmount - discountAmount;
+    const productAAmount = 8000;
+    const productBAmount = 2295;
+    final totalAmount =
+        productAAmount + productBAmount + shippingAmount - discountAmount;
 
     return [
       ApplePaySummaryItem(
         label: "Product A",
-        amount: Amount(value: 8000, currency: Config.amount.currency),
+        amount: Amount(value: productAAmount, currency: Config.amount.currency),
         type: ApplePaySummaryItemType.definite,
       ),
       ApplePaySummaryItem(
         label: "Product B",
-        amount: Amount(value: 2295, currency: Config.amount.currency),
+        amount: Amount(value: productBAmount, currency: Config.amount.currency),
         type: ApplePaySummaryItemType.definite,
       ),
       ApplePaySummaryItem(

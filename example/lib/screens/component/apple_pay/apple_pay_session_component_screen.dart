@@ -110,20 +110,24 @@ class ApplePaySessionComponentScreen extends StatelessWidget {
   }
 
   List<ApplePaySummaryItem> _buildApplePaySummaryItems() {
+    const productAAmount = 8000;
+    const productBAmount = 2295;
+    const shippingAmount = 1000;
+
     return [
       ApplePaySummaryItem(
         label: "Product A",
-        amount: Amount(value: 8000, currency: Config.amount.currency),
+        amount: Amount(value: productAAmount, currency: Config.amount.currency),
         type: ApplePaySummaryItemType.definite,
       ),
       ApplePaySummaryItem(
         label: "Product B",
-        amount: Amount(value: 2295, currency: Config.amount.currency),
+        amount: Amount(value: productBAmount, currency: Config.amount.currency),
         type: ApplePaySummaryItemType.definite,
       ),
       ApplePaySummaryItem(
         label: "Shipping",
-        amount: Amount(value: 1000, currency: Config.amount.currency),
+        amount: Amount(value: shippingAmount, currency: Config.amount.currency),
         type: ApplePaySummaryItemType.definite,
       ),
       ApplePaySummaryItem(
