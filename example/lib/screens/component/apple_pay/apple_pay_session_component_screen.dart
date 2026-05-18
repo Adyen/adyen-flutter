@@ -93,7 +93,7 @@ class ApplePaySessionComponentScreen extends StatelessWidget {
   ) async {
     debugPrint('onAuthorize: $payment');
     final ApplePayAuthorizationResult authorizationResult;
-    if (payment.shippingContact?.postalCode == "") {
+    if (payment.shippingContact?.postalCode?.isEmpty ?? true) {
       authorizationResult = ApplePayAuthorizationResult.failure(
         errors: [
           ApplePayPaymentError(
