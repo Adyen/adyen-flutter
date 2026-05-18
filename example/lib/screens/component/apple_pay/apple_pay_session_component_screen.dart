@@ -84,7 +84,24 @@ class ApplePaySessionComponentScreen extends StatelessWidget {
       merchantName: Config.merchantName,
       allowOnboarding: true,
       applePaySummaryItems: _buildApplePaySummaryItems(),
+      applePayShippingType: ApplePayShippingType.shipping,
+      supportsCouponCode: false, //The amount cannot be changed in a session flow.
+      shippingMethods: _buildShippingMethods(),
+      onShippingMethodChange: _onShippingMethodChange,
       onAuthorize: _onAuthorize,
+    );
+  }
+
+  Future<ApplePayShippingMethodUpdate> _onShippingMethodChange(
+    ApplePayShippingMethod method,
+    List<ApplePaySummaryItem> currentSummaryItems,
+  ) async {
+    debugPrint('onShippingMethodChange: $method');
+    debugPrint(
+      'Session flow uses a fixed amount. Use advanced flow for paid shipping methods.',
+    );
+    return ApplePayShippingMethodUpdate(
+      summaryItems: currentSummaryItems,
     );
   }
 
@@ -92,21 +109,7 @@ class ApplePaySessionComponentScreen extends StatelessWidget {
     ApplePayAuthorizedPayment payment,
   ) async {
     debugPrint('onAuthorize: $payment');
-    final ApplePayAuthorizationResult authorizationResult;
-    if (payment.shippingContact?.postalCode?.isEmpty ?? true) {
-      authorizationResult = ApplePayAuthorizationResult.failure(
-        errors: [
-          ApplePayPaymentError(
-            type: ApplePayPaymentErrorType.shippingAddress,
-            field: ApplePayContactField.postalAddress,
-            localizedDescription: "Postal code is required.",
-          ),
-        ],
-      );
-    } else {
-      authorizationResult = const ApplePayAuthorizationResult.success();
-    }
-    return authorizationResult;
+    return const ApplePayAuthorizationResult.success();
   }
 
   List<ApplePaySummaryItem> _buildApplePaySummaryItems() {
@@ -134,6 +137,29 @@ class ApplePaySessionComponentScreen extends StatelessWidget {
         label: "Total",
         amount: Config.amount, //In sessions, the amount cannot be changed
         type: ApplePaySummaryItemType.definite,
+      ),
+    ];
+  }
+
+  // Session flow uses a fixed amount, so shipping methods must not change the total amount.
+  List<ApplePayShippingMethod> _buildShippingMethods() {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+
+    return [
+      ApplePayShippingMethod(
+        label: "Standard shipping",
+        detail: "DHL",
+        amount: Amount(value: 0, currency: Config.amount.currency),
+        identifier: "identifier 1",
+        startDate: today.add(const Duration(days: 2)),
+        endDate: today.add(const Duration(days: 5)),
+      ),
+      ApplePayShippingMethod(
+        label: "Store pick up",
+        detail: "Weekdays, from 9:00 am to 6:00 pm",
+        amount: Amount(value: 0, currency: Config.amount.currency),
+        identifier: "identifier 2",
       ),
     ];
   }
