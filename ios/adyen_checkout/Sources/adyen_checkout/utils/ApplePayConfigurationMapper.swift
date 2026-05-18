@@ -283,12 +283,10 @@ extension ApplePayShippingMethodDTO {
         pkShippingMethod.amount = try amount.toFormattedAmount()
         
         if #available(iOS 15.0, *) {
-            let iso8601Formatter = ISO8601DateFormatter()
-            iso8601Formatter.formatOptions = [.withFullDate]
             if let startRaw = startDate,
-               let endRaw = endDate,
-               let startDate = iso8601Formatter.date(from: startRaw),
-               let endDate = iso8601Formatter.date(from: endRaw) {
+               let endRaw = endDate {
+                let startDate = try startRaw.toDate()
+                let endDate = try endRaw.toDate()
                 pkShippingMethod.dateComponentsRange = .init(
                     start: startDate.toComponents(),
                     end: endDate.toComponents()
@@ -366,13 +364,21 @@ extension PKPaymentSummaryItemType {
 
 extension PKShippingMethod {
     func toDTO(currencyCode: String) -> ApplePayShippingMethodDTO {
-        ApplePayShippingMethodDTO(
+        var startDate: String?
+        var endDate: String?
+
+        if #available(iOS 15.0, *) {
+            startDate = dateComponentsRange?.startDateComponents.date?.ISO8601Format()
+            endDate = dateComponentsRange?.endDateComponents.date?.ISO8601Format()
+        }
+
+        return ApplePayShippingMethodDTO(
             label: label,
             detail: detail ?? "",
             amount: amount.toDTO(currencyCode: currencyCode),
             identifier: identifier ?? "",
-            startDate: nil,
-            endDate: nil
+            startDate: startDate,
+            endDate: endDate
         )
     }
 }
