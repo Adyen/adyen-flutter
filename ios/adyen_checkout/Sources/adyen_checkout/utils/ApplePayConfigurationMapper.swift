@@ -128,7 +128,7 @@ extension ApplePayConfigurationDTO {
         }
         
         let summaryItemsNonNil: [ApplePaySummaryItemDTO] = summaryItems.compactMap { $0 }
-        return try summaryItemsNonNil.compactMap { try $0.toApplePaySummeryItem() }
+        return try summaryItemsNonNil.compactMap { try $0.toApplePaySummaryItem() }
     }
 }
 
@@ -141,7 +141,7 @@ extension PKPaymentNetwork {
 }
 
 extension ApplePaySummaryItemDTO {
-    func toApplePaySummeryItem() throws -> PKPaymentSummaryItem {
+    func toApplePaySummaryItem() throws -> PKPaymentSummaryItem {
         let formattedAmount = try amount.toFormattedAmount()
         return PKPaymentSummaryItem(
             label: label,
@@ -311,30 +311,30 @@ extension AmountDTO {
 }
 
 extension ApplePayShippingMethodUpdateDTO {
-    func toPKPaymentRequestShippingMethodUpdate() -> PKPaymentRequestShippingMethodUpdate {
-        PKPaymentRequestShippingMethodUpdate(
-            paymentSummaryItems: summaryItems.compactMap { try? $0?.toApplePaySummeryItem() }
+    func toPKPaymentRequestShippingMethodUpdate() throws -> PKPaymentRequestShippingMethodUpdate {
+        try PKPaymentRequestShippingMethodUpdate(
+            paymentSummaryItems: summaryItems.compactMap { try $0?.toApplePaySummaryItem() }
         )
     }
 }
 
 @available(iOS 15.0, *)
 extension ApplePayCouponCodeUpdateDTO {
-    func toPKPaymentRequestCouponCodeUpdate() -> PKPaymentRequestCouponCodeUpdate {
-        PKPaymentRequestCouponCodeUpdate(
+    func toPKPaymentRequestCouponCodeUpdate() throws -> PKPaymentRequestCouponCodeUpdate {
+        try PKPaymentRequestCouponCodeUpdate(
             errors: errors?.compactMap { $0?.toNSError() },
-            paymentSummaryItems: summaryItems.compactMap { try? $0?.toApplePaySummeryItem() },
-            shippingMethods: []
+            paymentSummaryItems: summaryItems.compactMap { try $0?.toApplePaySummaryItem() },
+            shippingMethods: shippingMethods?.compactMap { try $0?.toPKShippingMethod() } ?? []
         )
     }
 }
 
 extension ApplePayShippingContactUpdateDTO {
-    func toPKPaymentRequestShippingContactUpdate() -> PKPaymentRequestShippingContactUpdate {
-        PKPaymentRequestShippingContactUpdate(
+    func toPKPaymentRequestShippingContactUpdate() throws -> PKPaymentRequestShippingContactUpdate {
+        try PKPaymentRequestShippingContactUpdate(
             errors: errors?.compactMap { $0?.toNSError() },
-            paymentSummaryItems: summaryItems.compactMap { try? $0?.toApplePaySummeryItem() },
-            shippingMethods: shippingMethods?.compactMap { try? $0?.toPKShippingMethod() } ?? []
+            paymentSummaryItems: summaryItems.compactMap { try $0?.toApplePaySummaryItem() },
+            shippingMethods: shippingMethods?.compactMap { try $0?.toPKShippingMethod() } ?? []
         )
     }
 }
@@ -504,7 +504,7 @@ extension ApplePayDeferredPaymentRequestDTO {
         deferredPaymentRequest.billingAgreement = billingAgreement
         deferredPaymentRequest.tokenNotificationURL = try tokenNotificationUrl?.toURL()
         deferredPaymentRequest.freeCancellationDate = try freeCancellationDate?.toDate()
-        deferredPaymentRequest.freeCancellationDateTimeZone = freeCancellationTimeZone.map { TimeZone(identifier: $0) } ?? nil
+        deferredPaymentRequest.freeCancellationDateTimeZone = freeCancellationTimeZone.flatMap { TimeZone(identifier: $0) }
         return deferredPaymentRequest
     }
 }

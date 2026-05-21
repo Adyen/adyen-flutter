@@ -67,7 +67,11 @@ extension BaseApplePayComponent: ApplePayComponentDelegate {
             completion: { result in
                 switch result {
                 case let .success(update):
-                    completion(update.toPKPaymentRequestShippingContactUpdate())
+                    do {
+                        try completion(update.toPKPaymentRequestShippingContactUpdate())
+                    } catch {
+                        completion(PKPaymentRequestShippingContactUpdate(paymentSummaryItems: payment.summaryItems))
+                    }
                 case .failure:
                     completion(PKPaymentRequestShippingContactUpdate(paymentSummaryItems: payment.summaryItems))
                 }
@@ -87,7 +91,11 @@ extension BaseApplePayComponent: ApplePayComponentDelegate {
             completion: { result in
                 switch result {
                 case let .success(update):
-                    completion(update.toPKPaymentRequestShippingMethodUpdate())
+                    do {
+                        try completion(update.toPKPaymentRequestShippingMethodUpdate())
+                    } catch {
+                        completion(PKPaymentRequestShippingMethodUpdate(paymentSummaryItems: payment.summaryItems))
+                    }
                 case .failure:
                     completion(PKPaymentRequestShippingMethodUpdate(paymentSummaryItems: payment.summaryItems))
                 }
@@ -108,7 +116,11 @@ extension BaseApplePayComponent: ApplePayComponentDelegate {
             completion: { result in
                 switch result {
                 case let .success(update):
-                    completion(update.toPKPaymentRequestCouponCodeUpdate())
+                    do {
+                        try completion(update.toPKPaymentRequestCouponCodeUpdate())
+                    } catch {
+                        completion(PKPaymentRequestCouponCodeUpdate(paymentSummaryItems: payment.summaryItems))
+                    }
                 case .failure:
                     completion(PKPaymentRequestCouponCodeUpdate(paymentSummaryItems: payment.summaryItems))
                 }

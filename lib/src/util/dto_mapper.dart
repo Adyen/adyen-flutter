@@ -333,6 +333,9 @@ extension ApplePayCouponCodeUpdateMapper on ApplePayCouponCodeUpdate {
   ApplePayCouponCodeUpdateDTO toDTO() => ApplePayCouponCodeUpdateDTO(
         summaryItems:
             summaryItems.map((summaryItem) => summaryItem.toDTO()).toList(),
+        shippingMethods: shippingMethods
+            ?.map((shippingMethod) => shippingMethod.toDTO())
+            .toList(),
         errors: errors?.map((error) => error.toDTO()).toList(),
       );
 }

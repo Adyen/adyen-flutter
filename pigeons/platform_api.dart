@@ -601,14 +601,22 @@ class ApplePayAuthorizationResultDTO {
   final bool isSuccess;
   final List<ApplePayPaymentErrorDTO?>? errors;
 
-  ApplePayAuthorizationResultDTO(this.isSuccess, this.errors);
+  ApplePayAuthorizationResultDTO(
+    this.isSuccess,
+    this.errors,
+  );
 }
 
 class ApplePayCouponCodeUpdateDTO {
   final List<ApplePaySummaryItemDTO?> summaryItems;
+  final List<ApplePayShippingMethodDTO?>? shippingMethods;
   final List<ApplePayPaymentErrorDTO?>? errors;
 
-  ApplePayCouponCodeUpdateDTO(this.summaryItems, this.errors);
+  ApplePayCouponCodeUpdateDTO(
+    this.summaryItems,
+    this.shippingMethods,
+    this.errors,
+  );
 }
 
 class ApplePayShippingContactUpdateDTO {
@@ -617,13 +625,18 @@ class ApplePayShippingContactUpdateDTO {
   final List<ApplePayPaymentErrorDTO?>? errors;
 
   ApplePayShippingContactUpdateDTO(
-      this.summaryItems, this.shippingMethods, this.errors);
+    this.summaryItems,
+    this.shippingMethods,
+    this.errors,
+  );
 }
 
 class ApplePayShippingMethodUpdateDTO {
   final List<ApplePaySummaryItemDTO?> summaryItems;
 
-  ApplePayShippingMethodUpdateDTO(this.summaryItems);
+  ApplePayShippingMethodUpdateDTO(
+    this.summaryItems,
+  );
 }
 
 class ApplePayContactDTO {

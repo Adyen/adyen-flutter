@@ -1203,21 +1203,25 @@ struct ApplePayAuthorizationResultDTO {
 /// Generated class from Pigeon that represents data sent in messages.
 struct ApplePayCouponCodeUpdateDTO {
   var summaryItems: [ApplePaySummaryItemDTO?]
+  var shippingMethods: [ApplePayShippingMethodDTO?]? = nil
   var errors: [ApplePayPaymentErrorDTO?]? = nil
 
   // swift-format-ignore: AlwaysUseLowerCamelCase
   static func fromList(_ __pigeon_list: [Any?]) -> ApplePayCouponCodeUpdateDTO? {
     let summaryItems = __pigeon_list[0] as! [ApplePaySummaryItemDTO?]
-    let errors: [ApplePayPaymentErrorDTO?]? = nilOrValue(__pigeon_list[1])
+    let shippingMethods: [ApplePayShippingMethodDTO?]? = nilOrValue(__pigeon_list[1])
+    let errors: [ApplePayPaymentErrorDTO?]? = nilOrValue(__pigeon_list[2])
 
     return ApplePayCouponCodeUpdateDTO(
       summaryItems: summaryItems,
+      shippingMethods: shippingMethods,
       errors: errors
     )
   }
   func toList() -> [Any?] {
     return [
       summaryItems,
+      shippingMethods,
       errors,
     ]
   }

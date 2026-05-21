@@ -1182,6 +1182,7 @@ data class ApplePayAuthorizationResultDTO (
 /** Generated class from Pigeon that represents data sent in messages. */
 data class ApplePayCouponCodeUpdateDTO (
   val summaryItems: List<ApplePaySummaryItemDTO?>,
+  val shippingMethods: List<ApplePayShippingMethodDTO?>? = null,
   val errors: List<ApplePayPaymentErrorDTO?>? = null
 
 ) {
@@ -1189,13 +1190,15 @@ data class ApplePayCouponCodeUpdateDTO (
     @Suppress("LocalVariableName")
     fun fromList(__pigeon_list: List<Any?>): ApplePayCouponCodeUpdateDTO {
       val summaryItems = __pigeon_list[0] as List<ApplePaySummaryItemDTO?>
-      val errors = __pigeon_list[1] as List<ApplePayPaymentErrorDTO?>?
-      return ApplePayCouponCodeUpdateDTO(summaryItems, errors)
+      val shippingMethods = __pigeon_list[1] as List<ApplePayShippingMethodDTO?>?
+      val errors = __pigeon_list[2] as List<ApplePayPaymentErrorDTO?>?
+      return ApplePayCouponCodeUpdateDTO(summaryItems, shippingMethods, errors)
     }
   }
   fun toList(): List<Any?> {
     return listOf(
       summaryItems,
+      shippingMethods,
       errors,
     )
   }
