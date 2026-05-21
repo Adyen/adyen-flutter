@@ -53,6 +53,21 @@ jobs:
         run: |
           flutter create --template=app --platforms=android,ios demo_project
           cd demo_project
+          cat >> android/build.gradle << 'EOF'
+          subprojects {
+              plugins.withId("com.android.library") {
+                  android {
+                      compileOptions {
+                          sourceCompatibility = JavaVersion.VERSION_11
+                          targetCompatibility = JavaVersion.VERSION_11
+                      }
+                  }
+                  tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
+                      kotlinOptions.jvmTarget = '11'
+                  }
+              }
+          }
+          EOF
           dart pub add 'adyen_checkout:{"path":"../"}'
 
       - name: Build Android app
