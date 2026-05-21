@@ -1,5 +1,3 @@
-import com.android.build.gradle.internal.plugins.VersionKt
-
 buildscript {
     ext.kotlin_version = '2.0.20'
     repositories {
@@ -24,15 +22,7 @@ allprojects {
 }
 
 apply plugin: 'com.android.library'
-
-// Built-in Kotlin migration: only apply Kotlin plugin for AGP < 9
-// See: https://docs.flutter.dev/release/breaking-changes/migrate-to-built-in-kotlin/for-plugin-authors
-def agpVersion = VersionKt.ANDROID_GRADLE_PLUGIN_VERSION
-def agpMajor = agpVersion.split("\\.")[0].toInteger()
-if (agpMajor < 9) {
-    apply plugin: 'kotlin-android'
-}
-
+apply plugin: 'kotlin-android'
 apply from: 'ktlint.gradle'
 apply from: 'jacoco.gradle'
 
@@ -41,8 +31,12 @@ android {
     compileSdk 35
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_17
-        targetCompatibility JavaVersion.VERSION_17
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    kotlinOptions {
+        jvmTarget = '1.8'
     }
 
     sourceSets {
@@ -79,12 +73,5 @@ android {
 
     lintOptions {
         disable 'RestrictedApi'
-    }
-}
-
-// Configure Kotlin compiler options using project extension (works with or without Kotlin plugin)
-project.extensions.configure(org.jetbrains.kotlin.gradle.dsl.KotlinAndroidProjectExtension.class) {
-    compilerOptions {
-        jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17
     }
 }
