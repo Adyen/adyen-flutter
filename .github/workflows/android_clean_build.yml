@@ -97,8 +97,9 @@ jobs:
           # Align JVM target for all library subprojects to prevent
           # Kotlin 2.2.x strict JVM target consistency errors in dependencies (Flutter 3.44.x+)
           if [[ "$FLUTTER_VERSION" == "3.44.x" ]]; then
-            cat >> android/build.gradle << 'EOF'
-          subprojects {
+            mkdir -p ~/.gradle
+            cat >> ~/.gradle/init.gradle << 'INITEOF'
+          allprojects {
               plugins.withId("com.android.library") {
                   android {
                       compileOptions {
@@ -111,7 +112,7 @@ jobs:
                   }
               }
           }
-          EOF
+          INITEOF
           fi
           
           dart pub add 'adyen_checkout:{"path":"../"}'
