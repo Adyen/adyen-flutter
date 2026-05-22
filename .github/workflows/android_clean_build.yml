@@ -94,6 +94,24 @@ jobs:
             ' android/app/build.gradle
           fi
                     
+          # Align JVM target for all library subprojects to prevent
+          # Kotlin 2.2.x strict JVM target consistency errors in dependencies
+          cat >> android/build.gradle << 'EOF'
+          subprojects {
+              plugins.withId("com.android.library") {
+                  android {
+                      compileOptions {
+                          sourceCompatibility = JavaVersion.VERSION_11
+                          targetCompatibility = JavaVersion.VERSION_11
+                      }
+                  }
+                  tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
+                      kotlinOptions.jvmTarget = '11'
+                  }
+              }
+          }
+          EOF
+          
           dart pub add 'adyen_checkout:{"path":"../"}'
           flutter build apk --debug  
 
