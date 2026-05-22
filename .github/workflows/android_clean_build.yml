@@ -107,7 +107,10 @@ jobs:
                           targetCompatibility = JavaVersion.VERSION_11
                       }
                   }
-                  tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
+              }
+              pluginManager.withPlugin("kotlin-android") {
+                  def ktCompile = Class.forName("org.jetbrains.kotlin.gradle.tasks.KotlinCompile")
+                  tasks.withType(ktCompile).configureEach {
                       kotlinOptions.jvmTarget = '11'
                   }
               }
