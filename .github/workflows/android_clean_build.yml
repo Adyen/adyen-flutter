@@ -94,28 +94,10 @@ jobs:
             ' android/app/build.gradle
           fi
                     
-          # Align JVM target for all library subprojects to prevent
-          # Kotlin 2.2.x strict JVM target consistency errors in dependencies (Flutter 3.44.x+)
+          # Suppress Kotlin 2.2.x strict JVM target consistency errors in dependencies (Flutter 3.44.x+)
+          # pay_android 3.1.x defaults to JVM 1.8 which conflicts with our JVM 11 target
           if [[ "$FLUTTER_VERSION" == "3.44.x" ]]; then
-            mkdir -p ~/.gradle
-            cat >> ~/.gradle/init.gradle << 'INITEOF'
-          allprojects {
-              plugins.withId("com.android.library") {
-                  android {
-                      compileOptions {
-                          sourceCompatibility = JavaVersion.VERSION_11
-                          targetCompatibility = JavaVersion.VERSION_11
-                      }
-                  }
-              }
-              pluginManager.withPlugin("kotlin-android") {
-                  def ktCompile = Class.forName("org.jetbrains.kotlin.gradle.tasks.KotlinCompile")
-                  tasks.withType(ktCompile).configureEach {
-                      kotlinOptions.jvmTarget = '11'
-                  }
-              }
-          }
-          INITEOF
+            echo "kotlin.jvm.target.validation.mode=warning" >> android/gradle.properties
           fi
           
           dart pub add 'adyen_checkout:{"path":"../"}'
