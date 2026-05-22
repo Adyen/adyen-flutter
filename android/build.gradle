@@ -71,7 +71,8 @@ android {
         }
     }
 
-    lintOptions {
+    lint {
         disable 'RestrictedApi'
+        checkDependencies false
     }
 }
