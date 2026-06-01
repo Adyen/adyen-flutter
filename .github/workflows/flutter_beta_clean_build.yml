@@ -53,12 +53,6 @@ jobs:
         run: |
           flutter create --template=app --platforms=android,ios demo_project
           cd demo_project
-
-#           Pin AGP 8 and compatible Gradle wrapper (handle both Groovy and Kotlin DSL templates)
-#          SETTINGS_FILE=$(ls android/settings.gradle.kts android/settings.gradle 2>/dev/null | head -1)
-#          sed -i 's/id.*"com.android.application".* version "[^"]*"/id("com.android.application") version "8.13.2"/' "$SETTINGS_FILE"
-#          sed -i 's|gradle-[0-9.]*-all|gradle-8.14.4-all|' android/gradle/wrapper/gradle-wrapper.properties
-
           # Suppress Kotlin JVM target consistency errors in dependencies
           echo "kotlin.jvm.target.validation.mode=warning" >> android/gradle.properties
 
