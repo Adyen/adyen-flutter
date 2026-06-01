@@ -6,7 +6,7 @@ on:
       flutter-version:
         description: 'Flutter version'
         required: false
-        default: '3.44.x'
+        default: '3.41.x'
         type: string
 
 permissions:
