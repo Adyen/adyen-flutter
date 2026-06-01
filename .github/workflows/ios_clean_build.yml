@@ -36,7 +36,7 @@ jobs:
       - run: flutter pub get
 
       - name: Clean SwiftPM Artifacts Cache
-        run: rm -rf ~/Library/Caches/org.swift.swiftpm/artifacts
+        run: rm -rf /Users/runner/Library/Caches/org.swift.swiftpm/artifacts
 
       - name: Create default project and add Adyen checkout plugin package
         run: |
