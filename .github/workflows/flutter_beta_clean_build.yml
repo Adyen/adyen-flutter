@@ -53,6 +53,9 @@ jobs:
         run: |
           flutter create --template=app --platforms=android,ios demo_project
           cd demo_project
+          # Suppress Kotlin JVM target consistency errors in dependencies
+          echo "kotlin.jvm.target.validation.mode=warning" >> android/gradle.properties
+
           dart pub add 'adyen_checkout:{"path":"../"}'
 
       - name: Build Android app

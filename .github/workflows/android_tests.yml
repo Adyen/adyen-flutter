@@ -6,7 +6,7 @@ on:
       flutter-version:
         description: 'Flutter version'
         required: false
-        default: '3.41.x'
+        default: '3.44.x'
         type: string
 
 permissions:
@@ -26,7 +26,7 @@ jobs:
       - uses: actions/setup-java@be666c2fcd27ec809703dec50e508c2fdc7f6654 # v5.2.0
         with:
           distribution: 'zulu'
-          java-version: 18
+          java-version: 17
 
       - uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2.23.0
         with:
@@ -47,10 +47,10 @@ jobs:
         run: gradle wrapper
 
       - name: Lint check
-        run: ./gradlew ktlintCheck lintReportDebug
+        run: ./gradlew :adyen_checkout:ktlintCheck :adyen_checkout:lintReportDebug
 
       - name: Unit tests with code coverage reporting
-        run: ./gradlew jacocoTestReport
+        run: ./gradlew :adyen_checkout:jacocoTestReport
 
       - name: Cache android reports
         uses: actions/cache/save@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
