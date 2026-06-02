@@ -183,7 +183,7 @@ class ApplePayAdvancedComponentScreen extends StatelessWidget {
         errors: [
           ApplePayPaymentError(
             type: ApplePayPaymentErrorType.shippingAddress,
-            field: ApplePayContactField.postalAddress,
+            field: ApplePayErrorField.postalCode,
             localizedDescription: "Postal code is required.",
           ),
         ],

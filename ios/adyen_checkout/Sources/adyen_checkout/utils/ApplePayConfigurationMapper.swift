@@ -2,6 +2,7 @@ import Adyen
 #if canImport(AdyenComponents)
     import AdyenComponents
 #endif
+import Contacts
 import PassKit
 
 extension ApplePayConfigurationDTO {
@@ -90,26 +91,6 @@ extension ApplePayConfigurationDTO {
         
         applicationData.map { paymentRequest.applicationData = Data($0.utf8) }
         return paymentRequest
-    }
-    
-    // TODO: could be deleted when implementing advanced flow
-    private func addShippingMethodToSummaryItems(paymentRequest: PKPaymentRequest) {
-        guard let shippingMethod = paymentRequest.shippingMethods?.first else {
-            return
-        }
-        
-        if let last = paymentRequest.paymentSummaryItems.last {
-            paymentRequest.paymentSummaryItems = paymentRequest.paymentSummaryItems.dropLast()
-            paymentRequest.paymentSummaryItems.append(shippingMethod)
-            paymentRequest.paymentSummaryItems.append(
-                .init(
-                    label: last.label,
-                    amount: NSDecimalNumber(
-                        value: last.amount.floatValue + shippingMethod.amount.floatValue
-                    )
-                )
-            )
-        }
     }
     
     private func mapToContactFields(contactFields: [String?]) -> Set<PKContactField> {
@@ -418,12 +399,12 @@ extension ApplePayPaymentErrorDTO {
         switch type {
         case .billingAddress:
             return PKPaymentRequest.paymentBillingAddressInvalidError(
-                withKey: field ?? "",
+                withKey: postalAddressKey(for: field),
                 localizedDescription: localizedDescription
             )
         case .shippingAddress:
             return PKPaymentRequest.paymentShippingAddressInvalidError(
-                withKey: field ?? "",
+                withKey: postalAddressKey(for: field),
                 localizedDescription: localizedDescription
             )
         case .contact:
@@ -446,6 +427,20 @@ extension ApplePayPaymentErrorDTO {
         case .unknown:
             return NSError(domain: "ApplePayPaymentError", code: 0, userInfo: [NSLocalizedDescriptionKey: localizedDescription])
         }
+    }
+}
+
+private func postalAddressKey(for field: String?) -> String {
+    switch field {
+    case "street": return CNPostalAddressStreetKey
+    case "city": return CNPostalAddressCityKey
+    case "postalCode": return CNPostalAddressPostalCodeKey
+    case "administrativeArea": return CNPostalAddressStateKey
+    case "country": return CNPostalAddressCountryKey
+    case "countryCode": return CNPostalAddressISOCountryCodeKey
+    case "subLocality": return CNPostalAddressSubLocalityKey
+    case "subAdministrativeArea": return CNPostalAddressSubAdministrativeAreaKey
+    default: return field ?? CNPostalAddressStreetKey
     }
 }
 

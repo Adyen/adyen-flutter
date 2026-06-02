@@ -568,7 +568,7 @@ void main() {
       errors: [
         ApplePayPaymentError(
           type: ApplePayPaymentErrorType.shippingAddress,
-          field: ApplePayContactField.postalAddress,
+          field: ApplePayErrorField.postalCode,
           localizedDescription: "We do not ship to this postal code.",
         )
       ],
@@ -580,7 +580,7 @@ void main() {
     expect(applePayShippingContactUpdateDTO.errors?.firstOrNull?.type,
         ApplePayPaymentErrorType.shippingAddress);
     expect(applePayShippingContactUpdateDTO.errors?.firstOrNull?.field,
-        "postalAddress");
+        "postalCode");
     expect(
         applePayShippingContactUpdateDTO
             .errors?.firstOrNull?.localizedDescription,
@@ -656,7 +656,7 @@ void main() {
       errors: [
         ApplePayPaymentError(
           type: ApplePayPaymentErrorType.shippingAddress,
-          field: ApplePayContactField.postalAddress,
+          field: ApplePayErrorField.postalCode,
           localizedDescription: "Postal code is required.",
         )
       ],
@@ -668,7 +668,7 @@ void main() {
     expect(applePayAuthorizationResultDTO.errors?.firstOrNull?.type,
         ApplePayPaymentErrorType.shippingAddress);
     expect(applePayAuthorizationResultDTO.errors?.firstOrNull?.field,
-        "postalAddress");
+        "postalCode");
     expect(
         applePayAuthorizationResultDTO
             .errors?.firstOrNull?.localizedDescription,
