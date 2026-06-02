@@ -102,7 +102,7 @@ class ApplePayAdvancedComponentScreen extends StatelessWidget {
       allowShippingContactEditing: true,
       supportsCouponCode: true,
       couponCode: "SUMMER10",
-      shippingMethods: _buildShippingMethods(today),
+      shippingMethods: _buildShippingMethods(),
       recurringPaymentRequest: ApplePayRecurringPaymentRequest(
         paymentDescription: "Monthly subscription",
         regularBilling: ApplePayRecurringPaymentSummaryItem(
@@ -115,8 +115,7 @@ class ApplePayAdvancedComponentScreen extends StatelessWidget {
         ),
         managementUrl: "https://www.example.com/account",
       ),
-      onShippingContactChange: (contact, currentSummaryItems) =>
-          _onShippingContactChange(contact, currentSummaryItems, today),
+      onShippingContactChange: _onShippingContactChange,
       onShippingMethodChange: _onShippingMethodChange,
       onCouponCodeChange: _onCouponCodeChange,
       onAuthorize: _onAuthorize,
@@ -126,12 +125,11 @@ class ApplePayAdvancedComponentScreen extends StatelessWidget {
   Future<ApplePayShippingContactUpdate> _onShippingContactChange(
     ApplePayContact contact,
     List<ApplePaySummaryItem> currentSummaryItems,
-    DateTime today,
   ) async {
     debugPrint('onShippingContactChange: $contact');
     final shippingContactUpdate = ApplePayShippingContactUpdate(
       summaryItems: _buildApplePaySummaryItems(),
-      shippingMethods: _buildShippingMethods(today),
+      shippingMethods: _buildShippingMethods(),
     );
     return shippingContactUpdate;
   }
@@ -233,7 +231,9 @@ class ApplePayAdvancedComponentScreen extends StatelessWidget {
     ];
   }
 
-  List<ApplePayShippingMethod> _buildShippingMethods(DateTime today) {
+  List<ApplePayShippingMethod> _buildShippingMethods() {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
     return [
       ApplePayShippingMethod(
         label: "Standard shipping",

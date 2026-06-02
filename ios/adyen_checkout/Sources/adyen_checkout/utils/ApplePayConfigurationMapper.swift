@@ -557,15 +557,24 @@ extension ApplePayMultiTokenContextDTO {
     }
 }
 
+private let iso8601FormatterWithFractionalSeconds: ISO8601DateFormatter = {
+    let formatter = ISO8601DateFormatter()
+    formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+    return formatter
+}()
+
+private let iso8601Formatter: ISO8601DateFormatter = {
+    let formatter = ISO8601DateFormatter()
+    formatter.formatOptions = .withInternetDateTime
+    return formatter
+}()
+
 extension String {
     func toDate() throws -> Date {
-        let formatter = ISO8601DateFormatter()
-        formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
-        if let date = formatter.date(from: self) {
+        if let date = iso8601FormatterWithFractionalSeconds.date(from: self) {
             return date
         }
-        formatter.formatOptions = .withInternetDateTime
-        if let date = formatter.date(from: self) {
+        if let date = iso8601Formatter.date(from: self) {
             return date
         }
         throw AdyenPigeonError(
