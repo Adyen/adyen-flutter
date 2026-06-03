@@ -136,99 +136,10 @@ extension ApplePayConfigurationMapper on ApplePayConfiguration {
         merchantCapability: merchantCapability,
         supportsCouponCode: supportsCouponCode,
         couponCode: couponCode,
-        recurringPaymentRequest: recurringPaymentRequest?.toDTO(),
-        deferredPaymentRequest: deferredPaymentRequest?.toDTO(),
-        automaticReloadPaymentRequest: automaticReloadPaymentRequest?.toDTO(),
-        multiTokenContexts: multiTokenContexts
-            ?.map((multiTokenContext) => multiTokenContext.toDTO())
-            .toList(),
         hasOnShippingMethodChange: onShippingMethodChange != null,
         hasOnShippingContactChange: onShippingContactChange != null,
         hasOnCouponCodeChange: onCouponCodeChange != null,
         hasOnAuthorize: onAuthorize != null,
-      );
-}
-
-extension ApplePayRecurringPaymentRequestMapper
-    on ApplePayRecurringPaymentRequest {
-  ApplePayRecurringPaymentRequestDTO toDTO() =>
-      ApplePayRecurringPaymentRequestDTO(
-        paymentDescription: paymentDescription,
-        regularBilling: regularBilling.toDTO(),
-        managementUrl: managementUrl,
-        trialBilling: trialBilling?.toDTO(),
-        billingAgreement: billingAgreement,
-        tokenNotificationUrl: tokenNotificationUrl,
-      );
-}
-
-extension ApplePayRecurringPaymentSummaryItemMapper
-    on ApplePayRecurringPaymentSummaryItem {
-  ApplePayRecurringPaymentSummaryItemDTO toDTO() =>
-      ApplePayRecurringPaymentSummaryItemDTO(
-        label: label,
-        amount: amount.toDTO(),
-        type: type,
-        startDate: startDate?.toUtc().toIso8601String(),
-        intervalUnit: intervalUnit,
-        intervalCount: intervalCount,
-        endDate: endDate?.toUtc().toIso8601String(),
-      );
-}
-
-extension ApplePayDeferredPaymentRequestMapper
-    on ApplePayDeferredPaymentRequest {
-  ApplePayDeferredPaymentRequestDTO toDTO() =>
-      ApplePayDeferredPaymentRequestDTO(
-        paymentDescription: paymentDescription,
-        deferredBilling: deferredBilling.toDTO(),
-        managementUrl: managementUrl,
-        billingAgreement: billingAgreement,
-        tokenNotificationUrl: tokenNotificationUrl,
-        freeCancellationDate: freeCancellationDate?.toUtc().toIso8601String(),
-        freeCancellationTimeZone: freeCancellationTimeZone,
-      );
-}
-
-extension ApplePayDeferredPaymentSummaryItemMapper
-    on ApplePayDeferredPaymentSummaryItem {
-  ApplePayDeferredPaymentSummaryItemDTO toDTO() =>
-      ApplePayDeferredPaymentSummaryItemDTO(
-        label: label,
-        amount: amount.toDTO(),
-        type: type,
-        deferredDate: deferredDate.toUtc().toIso8601String(),
-      );
-}
-
-extension ApplePayReloadPaymentRequestMapper on ApplePayReloadPaymentRequest {
-  ApplePayReloadPaymentRequestDTO toDTO() => ApplePayReloadPaymentRequestDTO(
-        paymentDescription: paymentDescription,
-        automaticReloadBilling: automaticReloadBilling.toDTO(),
-        managementUrl: managementUrl,
-        billingAgreement: billingAgreement,
-        tokenNotificationUrl: tokenNotificationUrl,
-      );
-}
-
-extension ApplePayReloadPaymentSummaryItemMapper
-    on ApplePayReloadPaymentSummaryItem {
-  ApplePayReloadPaymentSummaryItemDTO toDTO() =>
-      ApplePayReloadPaymentSummaryItemDTO(
-        label: label,
-        amount: amount.toDTO(),
-        type: type,
-        thresholdAmount: thresholdAmount.toDTO(),
-      );
-}
-
-extension ApplePayMultiTokenContextMapper on ApplePayMultiTokenContext {
-  ApplePayMultiTokenContextDTO toDTO() => ApplePayMultiTokenContextDTO(
-        merchantId: merchantId,
-        externalId: externalId,
-        merchantName: merchantName,
-        merchantDomain: merchantDomain,
-        amount: amount.toDTO(),
       );
 }
 

@@ -86,9 +86,6 @@ class ApplePayAdvancedComponentScreen extends StatelessWidget {
   }
 
   ApplePayConfiguration _createApplePayConfiguration() {
-    final now = DateTime.now();
-    final today = DateTime(now.year, now.month, now.day);
-
     return ApplePayConfiguration(
       merchantId: Config.merchantId,
       merchantName: Config.merchantName,
@@ -103,18 +100,6 @@ class ApplePayAdvancedComponentScreen extends StatelessWidget {
       supportsCouponCode: true,
       couponCode: "SUMMER10",
       shippingMethods: _buildShippingMethods(),
-      recurringPaymentRequest: ApplePayRecurringPaymentRequest(
-        paymentDescription: "Monthly subscription",
-        regularBilling: ApplePayRecurringPaymentSummaryItem(
-          label: "Monthly billing",
-          amount: Config.amount,
-          type: ApplePaySummaryItemType.definite,
-          startDate: today.add(const Duration(days: 30)),
-          intervalUnit: ApplePayRecurringPaymentIntervalUnit.month,
-          intervalCount: 1,
-        ),
-        managementUrl: "https://www.example.com/account",
-      ),
       onShippingContactChange: _onShippingContactChange,
       onShippingMethodChange: _onShippingMethodChange,
       onCouponCodeChange: _onCouponCodeChange,

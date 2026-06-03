@@ -18,12 +18,8 @@ export 'src/common/model/payment_method_configurations/apple_pay/apple_pay_confi
 export 'src/common/model/payment_method_configurations/apple_pay/apple_pay_contact.dart';
 export 'src/common/model/payment_method_configurations/apple_pay/apple_pay_contact_field.dart';
 export 'src/common/model/payment_method_configurations/apple_pay/apple_pay_coupon_code_update.dart';
-export 'src/common/model/payment_method_configurations/apple_pay/apple_pay_deferred_payment_request.dart';
 export 'src/common/model/payment_method_configurations/apple_pay/apple_pay_error_field.dart';
-export 'src/common/model/payment_method_configurations/apple_pay/apple_pay_multi_token_context.dart';
 export 'src/common/model/payment_method_configurations/apple_pay/apple_pay_payment_error.dart';
-export 'src/common/model/payment_method_configurations/apple_pay/apple_pay_recurring_payment_request.dart';
-export 'src/common/model/payment_method_configurations/apple_pay/apple_pay_reload_payment_request.dart';
 export 'src/common/model/payment_method_configurations/apple_pay/apple_pay_shipping_contact_update.dart';
 export 'src/common/model/payment_method_configurations/apple_pay/apple_pay_shipping_method.dart';
 export 'src/common/model/payment_method_configurations/apple_pay/apple_pay_shipping_method_update.dart';
@@ -73,5 +69,4 @@ export 'src/generated/platform_api.g.dart'
         ApplePayShippingType,
         ApplePayMerchantCapability,
         ApplePaySummaryItemType,
-        ApplePayRecurringPaymentIntervalUnit,
         ApplePayPaymentErrorType;

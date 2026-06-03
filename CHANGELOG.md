@@ -4,8 +4,7 @@
 
 - Apple Pay Component on iOS now supports coupon code configuration, dynamic
   sheet updates for shipping contact, shipping method and coupon code changes,
-  authorization validation, and recurring/deferred/reload payment request
-  configuration.
+  and authorization validation.
 
 ### Changed
 
