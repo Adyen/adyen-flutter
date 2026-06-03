@@ -356,6 +356,12 @@ extension ActionComponentConfigurationDTO {
 }
 
 extension ThreeDS2ConfigurationDTO {
+    func buildActionComponentConfiguration() -> AdyenActionComponent.Configuration {
+            var actionComponentConfiguration = AdyenActionComponent.Configuration()
+            actionComponentConfiguration.threeDS = mapToThreeDS2Configuration()
+            return actionComponentConfiguration
+        }
+
     // TODO: - ThreeDS2ActionConfiguration init changed in v6. appearanceConfiguration is now package-access.
     // UI customization may need a different approach in v6.
     func mapToThreeDS2Configuration() -> ThreeDS2ActionConfiguration {

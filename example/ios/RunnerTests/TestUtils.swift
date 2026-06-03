@@ -46,7 +46,8 @@ func createDropInConfigurationDTO(
     analyticsOptionsDTO: AnalyticsOptionsDTO = AnalyticsOptionsDTO(enabled: true, version: "1.0.0"),
     showPreselectedStoredPaymentMethod: Bool = true,
     skipListWhenSinglePaymentMethod: Bool = false,
-    isRemoveStoredPaymentMethodEnabled: Bool = false
+    isRemoveStoredPaymentMethodEnabled: Bool = false,
+    showStoredPaymentMethods: Bool = true
 ) -> DropInConfigurationDTO {
     DropInConfigurationDTO(
         environment: environment,
@@ -66,7 +67,8 @@ func createDropInConfigurationDTO(
         isRemoveStoredPaymentMethodEnabled: isRemoveStoredPaymentMethodEnabled,
         preselectedPaymentMethodTitle: nil,
         paymentMethodNames: nil,
-        isPartialPaymentSupported: false
+        isPartialPaymentSupported: false,
+        showStoredPaymentMethods: showStoredPaymentMethods
     )
 }
 
@@ -117,13 +119,15 @@ func createActionComponentConfigurationDTO(
     clientKey: String = testClientKey,
     shopperLocale: String? = nil,
     amount: AmountDTO? = nil,
-    analyticsOptionsDTO: AnalyticsOptionsDTO = AnalyticsOptionsDTO(enabled: true, version: "1.0.0")
+    analyticsOptionsDTO: AnalyticsOptionsDTO = AnalyticsOptionsDTO(enabled: true, version: "1.0.0"),
+    threeDS2ConfigurationDTO: ThreeDS2ConfigurationDTO? = nil
 ) -> ActionComponentConfigurationDTO {
     ActionComponentConfigurationDTO(
         environment: environment,
         clientKey: clientKey,
         shopperLocale: shopperLocale,
         amount: amount,
-        analyticsOptionsDTO: analyticsOptionsDTO
+        analyticsOptionsDTO: analyticsOptionsDTO,
+        threeDS2ConfigurationDTO: threeDS2ConfigurationDTO
     )
 }

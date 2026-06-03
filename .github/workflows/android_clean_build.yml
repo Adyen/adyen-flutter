@@ -14,9 +14,9 @@ jobs:
       fail-fast: false
       matrix:
         api-level: [ 36 ]
-        flutter-version: [ 3.16.x, 3.19.x, 3.22.x, 3.24.x, 3.27.x, 3.29.x, 3.32.x, 3.35.x, 3.38.x, 3.41.x ]
+        flutter-version: [ 3.16.x, 3.19.x, 3.22.x, 3.24.x, 3.27.x, 3.29.x, 3.32.x, 3.35.x, 3.38.x, 3.41.x, 3.44.x ]
         agp_version: [ 8.13.2 ]
-        gradle_version: [ 8.13 ]
+        gradle_version: [ 8.14.5 ]
     env:
       FLUTTER_VERSION: ${{ matrix.flutter-version }}
       COMPILE_SDK_VERSION: ${{ matrix.api-level }}
@@ -93,6 +93,12 @@ jobs:
               }\
             ' android/app/build.gradle
           fi
+                    
+          # Suppress Kotlin 2.2.x strict JVM target consistency errors in dependencies (Flutter 3.44.x+)
+          # pay_android 3.1.x defaults to JVM 1.8 which conflicts with our JVM 11 target
+          if [[ "$FLUTTER_VERSION" == "3.44.x" ]]; then
+            echo "kotlin.jvm.target.validation.mode=warning" >> android/gradle.properties
+          fi
           
           dart pub add 'adyen_checkout:{"path":"../"}'
           flutter build apk --debug  
@@ -103,7 +109,7 @@ jobs:
           cache-read-only: false
 
       - name: AVD cache
-        uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.4
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
         id: avd-cache
         with:
           path: |

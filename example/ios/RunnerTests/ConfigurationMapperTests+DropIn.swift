@@ -77,6 +77,18 @@ extension ConfigurationMapperTests {
         XCTAssertFalse(result.paymentMethodsList.allowDisablingStoredPaymentMethods)
     }
 
+    func test_showStoredPaymentMethods_defaultsToTrue() {
+        let sut = createDropInConfigurationDTO()
+
+        XCTAssertTrue(sut.showStoredPaymentMethods)
+    }
+
+    func test_showStoredPaymentMethods_whenSetToFalse_shouldBeFalse() {
+        let sut = createDropInConfigurationDTO(showStoredPaymentMethods: false)
+
+        XCTAssertFalse(sut.showStoredPaymentMethods)
+    }
+
     func test_cardConfiguration_withHolderNameRequired_shouldBeSet() throws {
         let cardConfig = createCardConfigurationDTO(holderNameRequired: true)
         let sut = createDropInConfigurationDTO(cardConfigurationDTO: cardConfig)

@@ -67,7 +67,8 @@ internal class DropInPlatformApi(
             createCheckoutSession(
                 checkoutHolder,
                 TEST, // TODO Change back to generic
-                dropInConfigurationDTO.clientKey
+                dropInConfigurationDTO.clientKey,
+                dropInConfigurationDTO.showStoredPaymentMethods
             )
 
         dropInPlatformMessengerJob?.cancel()
@@ -103,6 +104,11 @@ internal class DropInPlatformApi(
                 removeGiftCardPaymentMethods(
                     paymentMethodsApiResponse,
                     dropInConfigurationDTO.isPartialPaymentSupported
+                )
+            val filteredPaymentMethods =
+                applyStoredPaymentMethodsVisibility(
+                    paymentMethodsWithoutGiftCards,
+                    dropInConfigurationDTO.showStoredPaymentMethods
                 )
             val dropInConfiguration = dropInConfigurationDTO.toCheckoutConfiguration()
             withContext(Dispatchers.Main) {
@@ -219,11 +225,22 @@ internal class DropInPlatformApi(
         checkoutHolder: CheckoutHolder,
         environment: Environment,
         clientKey: String,
+        showStoredPaymentMethods: Boolean,
     ): CheckoutSession {
         val sessionSetupResponse = SessionSetupResponse.SERIALIZER.deserialize(checkoutHolder.sessionSetupResponse)
 //        val order = sessionHolder.orderResponse?.let { Order.SERIALIZER.deserialize(it) }
+        val adjustedSessionSetupResponse =
+            sessionSetupResponse.paymentMethodsApiResponse?.let { paymentMethodsApiResponse ->
+                sessionSetupResponse.copy(
+                    paymentMethodsApiResponse =
+                        applyStoredPaymentMethodsVisibility(
+                            paymentMethodsApiResponse = paymentMethodsApiResponse,
+                            showStoredPaymentMethods = showStoredPaymentMethods,
+                        )
+                )
+            } ?: sessionSetupResponse
         return CheckoutSession(
-            sessionSetupResponse = sessionSetupResponse,
+            sessionSetupResponse = adjustedSessionSetupResponse,
             order = null,
             environment = environment,
             clientKey = clientKey
@@ -246,6 +263,18 @@ internal class DropInPlatformApi(
         return PaymentMethodsApiResponse(
             storedPaymentMethods = storedPaymentMethods,
             paymentMethods = paymentMethods
+        )
+    }
+
+    private fun applyStoredPaymentMethodsVisibility(
+        paymentMethodsApiResponse: PaymentMethodsApiResponse,
+        showStoredPaymentMethods: Boolean,
+    ): PaymentMethodsApiResponse {
+        if (showStoredPaymentMethods) {
+            return paymentMethodsApiResponse
+        }
+        return paymentMethodsApiResponse.copy(
+            storedPaymentMethods = emptyList(),
         )
     }
 

@@ -372,6 +372,7 @@ class DropInConfigurationDTO {
   final String? preselectedPaymentMethodTitle;
   final Map<String?, String?>? paymentMethodNames;
   final bool isPartialPaymentSupported;
+  final bool showStoredPaymentMethods;
 
   DropInConfigurationDTO(
     this.environment,
@@ -392,6 +393,7 @@ class DropInConfigurationDTO {
     this.preselectedPaymentMethodTitle,
     this.paymentMethodNames,
     this.isPartialPaymentSupported,
+    this.showStoredPaymentMethods,
   );
 }
 
@@ -851,6 +853,7 @@ class ActionComponentConfigurationDTO {
   final AmountDTO? amount;
   final String? shopperLocale;
   final AnalyticsOptionsDTO analyticsOptionsDTO;
+  final ThreeDS2ConfigurationDTO? threeDS2ConfigurationDTO;
 
   ActionComponentConfigurationDTO(
     this.environment,
@@ -858,6 +861,7 @@ class ActionComponentConfigurationDTO {
     this.amount,
     this.shopperLocale,
     this.analyticsOptionsDTO,
+    this.threeDS2ConfigurationDTO,
   );
 }
 

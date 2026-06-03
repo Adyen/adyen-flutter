@@ -38,6 +38,8 @@ extension DropInConfigurationMapper on DropInConfiguration {
         preselectedPaymentMethodTitle: preselectedPaymentMethodTitle,
         paymentMethodNames: paymentMethodNames,
         isPartialPaymentSupported: isPartialPaymentSupported,
+        showStoredPaymentMethods:
+            storedPaymentMethodConfiguration?.showStoredPaymentMethods ?? true,
       );
 
   bool _isRemoveStoredPaymentMethodEnabled(
@@ -460,6 +462,7 @@ extension ActionComponentConfigurationMapper on ActionComponentConfiguration {
         shopperLocale: shopperLocale,
         amount: amount?.toDTO(),
         analyticsOptionsDTO: analyticsOptions.toDTO(sdkVersionNumber),
+        threeDS2ConfigurationDTO: threeDS2Configuration?.toDTO(),
       );
 }
 

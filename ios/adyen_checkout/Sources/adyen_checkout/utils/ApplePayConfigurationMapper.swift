@@ -80,9 +80,11 @@ extension ApplePayConfigurationDTO {
     
     private func mapToPaymentSummaryItems(summaryItems: [ApplePaySummaryItemDTO?]?, amount: Adyen.Amount) throws -> [PKPaymentSummaryItem] {
         guard let summaryItems else {
-            let formattedAmount = AmountFormatter.decimalAmount(amount.value,
-                                                                currencyCode: amount.currencyCode,
-                                                                localeIdentifier: amount.localeIdentifier)
+            let formattedAmount = AmountFormatter.decimalAmount(
+                amount.value,
+                currencyCode: amount.currencyCode,
+                localeIdentifier: amount.localeIdentifier
+            )
             return [PKPaymentSummaryItem(label: merchantName, amount: formattedAmount)]
         }
         

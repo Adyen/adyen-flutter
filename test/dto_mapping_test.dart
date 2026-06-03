@@ -44,6 +44,57 @@ void main() {
     expect(dropInConfigurationDto.showPreselectedStoredPaymentMethod, true);
     expect(dropInConfigurationDto.isRemoveStoredPaymentMethodEnabled, true);
     expect(dropInConfigurationDto.isPartialPaymentSupported, true);
+    expect(dropInConfigurationDto.showStoredPaymentMethods, true);
+  });
+
+  test(
+      'when showStoredPaymentMethods is not provided, then DTO defaults to true',
+      () {
+    final dropInConfiguration = DropInConfiguration(
+      environment: Environment.test,
+      clientKey: "test-key",
+      countryCode: "US",
+    );
+
+    final dto = dropInConfiguration.toDTO("0.0.1", false);
+
+    expect(dto.showStoredPaymentMethods, true);
+  });
+
+  test(
+      'when showStoredPaymentMethods is set to false, then DTO mirrors the value',
+      () {
+    final storedPaymentMethodConfiguration = StoredPaymentMethodConfiguration(
+      showStoredPaymentMethods: false,
+    );
+    final dropInConfiguration = DropInConfiguration(
+      environment: Environment.test,
+      clientKey: "test-key",
+      countryCode: "US",
+      storedPaymentMethodConfiguration: storedPaymentMethodConfiguration,
+    );
+
+    final dto = dropInConfiguration.toDTO("0.0.1", false);
+
+    expect(dto.showStoredPaymentMethods, false);
+  });
+
+  test(
+      'when showStoredPaymentMethods is set to true, then DTO mirrors the value',
+      () {
+    final storedPaymentMethodConfiguration = StoredPaymentMethodConfiguration(
+      showStoredPaymentMethods: true,
+    );
+    final dropInConfiguration = DropInConfiguration(
+      environment: Environment.test,
+      clientKey: "test-key",
+      countryCode: "US",
+      storedPaymentMethodConfiguration: storedPaymentMethodConfiguration,
+    );
+
+    final dto = dropInConfiguration.toDTO("0.0.1", false);
+
+    expect(dto.showStoredPaymentMethods, true);
   });
 
   test(
@@ -618,6 +669,59 @@ void main() {
     expect(dto.uiCustomization, isNotNull);
     expect(dto.uiCustomization?.headingCustomization, isNotNull);
     expect(dto.uiCustomization?.headingCustomization?.headerText, 'Challenge');
+  });
+
+  test(
+      'when action component configuration has 3DS2 configuration, then should map to ActionComponentConfigurationDTO',
+      () {
+    const theme = Adyen3DSTheme(
+      headerTheme: Adyen3DSHeaderTheme(
+        textColor: Color(0xFFAABBCC),
+      ),
+    );
+    final configuration = ActionComponentConfiguration(
+      environment: Environment.test,
+      clientKey: 'test_client_key',
+      shopperLocale: 'en-US',
+      amount: Amount(value: 1500, currency: 'EUR'),
+      threeDS2Configuration: ThreeDS2Configuration(
+        requestorAppURL: 'myapp://adyen3ds2',
+        headingTitle: 'Action heading',
+        theme: theme,
+      ),
+    );
+
+    final dto = configuration.toDTO('1.0.0');
+
+    expect(dto.environment, Environment.test);
+    expect(dto.clientKey, 'test_client_key');
+    expect(dto.shopperLocale, 'en-US');
+    expect(dto.amount?.value, 1500);
+    expect(dto.amount?.currency, 'EUR');
+    expect(dto.threeDS2ConfigurationDTO?.requestorAppURL, 'myapp://adyen3ds2');
+    expect(
+      dto.threeDS2ConfigurationDTO?.uiCustomization?.headingCustomization
+          ?.headerText,
+      'Action heading',
+    );
+    expect(
+      dto.threeDS2ConfigurationDTO?.uiCustomization?.headingCustomization
+          ?.textColor,
+      '#FFAABBCC',
+    );
+  });
+
+  test(
+      'when action component configuration omits 3DS2 configuration, then ActionComponentConfigurationDTO should contain null 3DS2 configuration',
+      () {
+    final configuration = ActionComponentConfiguration(
+      environment: Environment.test,
+      clientKey: 'test_client_key',
+    );
+
+    final dto = configuration.toDTO('1.0.0');
+
+    expect(dto.threeDS2ConfigurationDTO, isNull);
   });
 
   test('color to hex should include alpha channel', () {

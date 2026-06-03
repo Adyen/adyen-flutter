@@ -3,8 +3,8 @@
 # Adyen Flutter
 
 [![Pub Package](https://img.shields.io/pub/v/adyen_checkout.svg)](https://pub.dev/packages/adyen_checkout)
-[![Adyen iOS](https://img.shields.io/badge/ios-v5.23.1-brightgreen.svg)](https://github.com/Adyen/adyen-ios/releases/tag/5.23.1)
-[![Adyen Android](https://img.shields.io/badge/android-v5.17.0-brightgreen.svg)](https://github.com/Adyen/adyen-android/releases/tag/5.17.0)
+[![Adyen iOS](https://img.shields.io/badge/ios-v5.25.0-brightgreen.svg)](https://github.com/Adyen/adyen-ios/releases/tag/5.25.0)
+[![Adyen Android](https://img.shields.io/badge/android-v5.19.0-brightgreen.svg)](https://github.com/Adyen/adyen-android/releases/tag/5.19.0)
 
 The Adyen Flutter package provides you with the building blocks to create a checkout experience for
 your shoppers, allowing them to pay using the payment method of their choice. This is
@@ -60,7 +60,7 @@ release a new version when we need to.
 #### Android
 
 * [Android 5.0](https://www.android.com/versions/lollipop-5-0/) (API 21) or later.
-* [Kotlin 1.8.22](https://kotlinlang.org/docs/releases.html) or later.
+* [Kotlin 2.0.20](https://kotlinlang.org/docs/releases.html) or later.
 * [AGP 8.1](https://developer.android.com/build/releases/gradle-plugin) or later with Gradle 8.
 * Requires the usage of a `FlutterFragmentActivity` instead of the default `FlutterActivity` in the
   MainActivity of
