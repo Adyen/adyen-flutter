@@ -914,7 +914,8 @@ data class DropInConfigurationDTO (
   val isRemoveStoredPaymentMethodEnabled: Boolean,
   val preselectedPaymentMethodTitle: String? = null,
   val paymentMethodNames: Map<String?, String?>? = null,
-  val isPartialPaymentSupported: Boolean
+  val isPartialPaymentSupported: Boolean,
+  val showStoredPaymentMethods: Boolean
 )
  {
   companion object {
@@ -937,7 +938,8 @@ data class DropInConfigurationDTO (
       val preselectedPaymentMethodTitle = pigeonVar_list[15] as String?
       val paymentMethodNames = pigeonVar_list[16] as Map<String?, String?>?
       val isPartialPaymentSupported = pigeonVar_list[17] as Boolean
-      return DropInConfigurationDTO(environment, clientKey, countryCode, amount, shopperLocale, analyticsOptionsDTO, cardConfigurationDTO, applePayConfigurationDTO, googlePayConfigurationDTO, cashAppPayConfigurationDTO, twintConfigurationDTO, threeDS2ConfigurationDTO, showPreselectedStoredPaymentMethod, skipListWhenSinglePaymentMethod, isRemoveStoredPaymentMethodEnabled, preselectedPaymentMethodTitle, paymentMethodNames, isPartialPaymentSupported)
+      val showStoredPaymentMethods = pigeonVar_list[18] as Boolean
+      return DropInConfigurationDTO(environment, clientKey, countryCode, amount, shopperLocale, analyticsOptionsDTO, cardConfigurationDTO, applePayConfigurationDTO, googlePayConfigurationDTO, cashAppPayConfigurationDTO, twintConfigurationDTO, threeDS2ConfigurationDTO, showPreselectedStoredPaymentMethod, skipListWhenSinglePaymentMethod, isRemoveStoredPaymentMethodEnabled, preselectedPaymentMethodTitle, paymentMethodNames, isPartialPaymentSupported, showStoredPaymentMethods)
     }
   }
   fun toList(): List<Any?> {
@@ -960,6 +962,7 @@ data class DropInConfigurationDTO (
       preselectedPaymentMethodTitle,
       paymentMethodNames,
       isPartialPaymentSupported,
+      showStoredPaymentMethods,
     )
   }
   override fun equals(other: Any?): Boolean {
@@ -2121,7 +2124,8 @@ data class ActionComponentConfigurationDTO (
   val clientKey: String,
   val amount: AmountDTO? = null,
   val shopperLocale: String? = null,
-  val analyticsOptionsDTO: AnalyticsOptionsDTO
+  val analyticsOptionsDTO: AnalyticsOptionsDTO,
+  val threeDS2ConfigurationDTO: ThreeDS2ConfigurationDTO? = null
 )
  {
   companion object {
@@ -2131,7 +2135,8 @@ data class ActionComponentConfigurationDTO (
       val amount = pigeonVar_list[2] as AmountDTO?
       val shopperLocale = pigeonVar_list[3] as String?
       val analyticsOptionsDTO = pigeonVar_list[4] as AnalyticsOptionsDTO
-      return ActionComponentConfigurationDTO(environment, clientKey, amount, shopperLocale, analyticsOptionsDTO)
+      val threeDS2ConfigurationDTO = pigeonVar_list[5] as ThreeDS2ConfigurationDTO?
+      return ActionComponentConfigurationDTO(environment, clientKey, amount, shopperLocale, analyticsOptionsDTO, threeDS2ConfigurationDTO)
     }
   }
   fun toList(): List<Any?> {
@@ -2141,6 +2146,7 @@ data class ActionComponentConfigurationDTO (
       amount,
       shopperLocale,
       analyticsOptionsDTO,
+      threeDS2ConfigurationDTO,
     )
   }
   override fun equals(other: Any?): Boolean {

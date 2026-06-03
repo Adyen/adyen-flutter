@@ -356,8 +356,8 @@ extension ActionComponentConfigurationDTO {
 }
 
 extension ThreeDS2ConfigurationDTO {
-    func buildActionComponentConfiguration() -> AdyenActionComponent.Configuration {
-            var actionComponentConfiguration = AdyenActionComponent.Configuration()
+    func buildActionComponentConfiguration() -> CheckoutActionComponent.Configuration {
+            var actionComponentConfiguration = CheckoutActionComponent.Configuration()
             actionComponentConfiguration.threeDS = mapToThreeDS2Configuration()
             return actionComponentConfiguration
         }

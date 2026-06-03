@@ -855,6 +855,7 @@ struct DropInConfigurationDTO: Hashable {
   var preselectedPaymentMethodTitle: String? = nil
   var paymentMethodNames: [String?: String?]? = nil
   var isPartialPaymentSupported: Bool
+  var showStoredPaymentMethods: Bool
 
 
   // swift-format-ignore: AlwaysUseLowerCamelCase
@@ -877,6 +878,7 @@ struct DropInConfigurationDTO: Hashable {
     let preselectedPaymentMethodTitle: String? = nilOrValue(pigeonVar_list[15])
     let paymentMethodNames: [String?: String?]? = nilOrValue(pigeonVar_list[16])
     let isPartialPaymentSupported = pigeonVar_list[17] as! Bool
+    let showStoredPaymentMethods = pigeonVar_list[18] as! Bool
 
     return DropInConfigurationDTO(
       environment: environment,
@@ -896,7 +898,8 @@ struct DropInConfigurationDTO: Hashable {
       isRemoveStoredPaymentMethodEnabled: isRemoveStoredPaymentMethodEnabled,
       preselectedPaymentMethodTitle: preselectedPaymentMethodTitle,
       paymentMethodNames: paymentMethodNames,
-      isPartialPaymentSupported: isPartialPaymentSupported
+      isPartialPaymentSupported: isPartialPaymentSupported,
+      showStoredPaymentMethods: showStoredPaymentMethods
     )
   }
   func toList() -> [Any?] {
@@ -919,6 +922,7 @@ struct DropInConfigurationDTO: Hashable {
       preselectedPaymentMethodTitle,
       paymentMethodNames,
       isPartialPaymentSupported,
+      showStoredPaymentMethods,
     ]
   }
   static func == (lhs: DropInConfigurationDTO, rhs: DropInConfigurationDTO) -> Bool {
@@ -2098,6 +2102,7 @@ struct ActionComponentConfigurationDTO: Hashable {
   var amount: AmountDTO? = nil
   var shopperLocale: String? = nil
   var analyticsOptionsDTO: AnalyticsOptionsDTO
+  var threeDS2ConfigurationDTO: ThreeDS2ConfigurationDTO? = nil
 
 
   // swift-format-ignore: AlwaysUseLowerCamelCase
@@ -2107,13 +2112,15 @@ struct ActionComponentConfigurationDTO: Hashable {
     let amount: AmountDTO? = nilOrValue(pigeonVar_list[2])
     let shopperLocale: String? = nilOrValue(pigeonVar_list[3])
     let analyticsOptionsDTO = pigeonVar_list[4] as! AnalyticsOptionsDTO
+    let threeDS2ConfigurationDTO: ThreeDS2ConfigurationDTO? = nilOrValue(pigeonVar_list[5])
 
     return ActionComponentConfigurationDTO(
       environment: environment,
       clientKey: clientKey,
       amount: amount,
       shopperLocale: shopperLocale,
-      analyticsOptionsDTO: analyticsOptionsDTO
+      analyticsOptionsDTO: analyticsOptionsDTO,
+      threeDS2ConfigurationDTO: threeDS2ConfigurationDTO
     )
   }
   func toList() -> [Any?] {
@@ -2123,6 +2130,7 @@ struct ActionComponentConfigurationDTO: Hashable {
       amount,
       shopperLocale,
       analyticsOptionsDTO,
+      threeDS2ConfigurationDTO,
     ]
   }
   static func == (lhs: ActionComponentConfigurationDTO, rhs: ActionComponentConfigurationDTO) -> Bool {

@@ -1063,6 +1063,7 @@ class DropInConfigurationDTO {
     this.preselectedPaymentMethodTitle,
     this.paymentMethodNames,
     required this.isPartialPaymentSupported,
+    required this.showStoredPaymentMethods,
   });
 
   Environment environment;
@@ -1101,6 +1102,8 @@ class DropInConfigurationDTO {
 
   bool isPartialPaymentSupported;
 
+  bool showStoredPaymentMethods;
+
   List<Object?> _toList() {
     return <Object?>[
       environment,
@@ -1121,6 +1124,7 @@ class DropInConfigurationDTO {
       preselectedPaymentMethodTitle,
       paymentMethodNames,
       isPartialPaymentSupported,
+      showStoredPaymentMethods,
     ];
   }
 
@@ -1148,6 +1152,7 @@ class DropInConfigurationDTO {
       preselectedPaymentMethodTitle: result[15] as String?,
       paymentMethodNames: (result[16] as Map<Object?, Object?>?)?.cast<String?, String?>(),
       isPartialPaymentSupported: result[17]! as bool,
+      showStoredPaymentMethods: result[18]! as bool,
     );
   }
 
@@ -2908,6 +2913,7 @@ class ActionComponentConfigurationDTO {
     this.amount,
     this.shopperLocale,
     required this.analyticsOptionsDTO,
+    this.threeDS2ConfigurationDTO,
   });
 
   Environment environment;
@@ -2920,6 +2926,8 @@ class ActionComponentConfigurationDTO {
 
   AnalyticsOptionsDTO analyticsOptionsDTO;
 
+  ThreeDS2ConfigurationDTO? threeDS2ConfigurationDTO;
+
   List<Object?> _toList() {
     return <Object?>[
       environment,
@@ -2927,6 +2935,7 @@ class ActionComponentConfigurationDTO {
       amount,
       shopperLocale,
       analyticsOptionsDTO,
+      threeDS2ConfigurationDTO,
     ];
   }
 
@@ -2941,6 +2950,7 @@ class ActionComponentConfigurationDTO {
       amount: result[2] as AmountDTO?,
       shopperLocale: result[3] as String?,
       analyticsOptionsDTO: result[4]! as AnalyticsOptionsDTO,
+      threeDS2ConfigurationDTO: result[5] as ThreeDS2ConfigurationDTO?,
     );
   }
 
