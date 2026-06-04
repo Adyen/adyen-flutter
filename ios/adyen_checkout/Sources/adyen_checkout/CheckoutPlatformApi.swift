@@ -45,15 +45,13 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
         Task {
             do {
                 let sessionResponse = sessionResponseDTO.mapToSessionResponse()
-                let checkoutConfiguration = try createSessionCheckoutConfiguration(
-                    configurationDTO: checkoutConfigurationDTO
-                )
+                let checkoutConfiguration = try createSessionCheckoutConfiguration(configurationDTO: checkoutConfigurationDTO)
                 let checkoutSession = try await Checkout.setup(
                     with: sessionResponse,
                     configuration: checkoutConfiguration
                 )
 
-                setupSessionCallbacks(checkoutSession, sessionId: sessionResponseDTO.id)
+                setupSessionCallbacks(checkoutSession)
                 checkoutHolder.adyenCheckout = checkoutSession
                 let encodedPaymentMethods = try JSONEncoder().encode(checkoutSession.paymentMethods)
                 guard let encodedPaymentMethodsString = String(data: encodedPaymentMethods, encoding: .utf8) else {
@@ -141,11 +139,10 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
     }
 
     private func setupSessionCallbacks(
-        _ checkout: SessionCheckout,
-        sessionId: String
+        _ checkout: SessionCheckout
     ) {
         checkout.onComplete { [weak self] result in
-            self?.sendCompleteResult(componentId: "SESSION_ADYEN_COMPONENT", sessionId: sessionId, result: result)
+            self?.sendCompleteResult(componentId: "SESSION_ADYEN_COMPONENT", result: result)
         }.onError { [weak self] error in
             self?.sendErrorResult(componentId: "SESSION_ADYEN_COMPONENT", error: error)
         }
@@ -167,7 +164,7 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
             guard let self else { return .completion(resultCode: "Error") }
             return await self.handleAdditionalDetails(additionalDetailsData: additionalDetailsData)
         }.onComplete { [weak self] result in
-            self?.sendCompleteResult(componentId: "ADVANCED_ADYEN_COMPONENT", sessionId: "", result: result)
+            self?.sendCompleteResult(componentId: "ADVANCED_ADYEN_COMPONENT", result: result)
         }.onError { [weak self] error in
             self?.sendErrorResult(componentId: "ADVANCED_ADYEN_COMPONENT", error: error)
         }
@@ -265,9 +262,8 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
 
     // MARK: - Result helpers
 
-    private func sendCompleteResult(componentId: String, sessionId: String, result: CheckoutResult) {
+    private func sendCompleteResult(componentId: String, result: CheckoutResult) {
         let paymentResult = PaymentResultModelDTO(
-            sessionId: sessionId,
             sessionResult: result.sessionResult,
             resultCode: result.resultCode.rawValue
         )

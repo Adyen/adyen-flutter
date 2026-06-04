@@ -197,7 +197,7 @@ internal class AdyenComponentFactory(
                 componentId = componentId,
                 paymentResult = PaymentResultDTO(
                     type = PaymentResultEnum.FINISHED,
-                    result = Unit //TODO this needs to be exposed on Android SDK
+                    result = null //TODO this needs to be exposed on Android SDK
                 ),
             )
         )
