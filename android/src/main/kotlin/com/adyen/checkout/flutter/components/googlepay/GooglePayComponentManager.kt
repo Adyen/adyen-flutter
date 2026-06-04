@@ -1,6 +1,5 @@
 package com.adyen.checkout.flutter.components.googlepay
 
-import android.content.Intent
 import androidx.fragment.app.FragmentActivity
 import com.adyen.checkout.action.core.internal.ActionHandlingComponent
 import com.adyen.checkout.components.core.CheckoutConfiguration
@@ -84,14 +83,13 @@ class GooglePayComponentManager(
     fun start() {
         googlePayComponent?.let {
             assignCurrentComponent(it)
-            googlePayComponent?.startGooglePayScreen(activity, Constants.GOOGLE_PAY_COMPONENT_REQUEST_CODE)
+            // Adyen 5.9+ replacement for the deprecated startGooglePayScreen(activity, requestCode).
+            // submit() does not need an Activity result callback — the Adyen component pushes
+            // results through GooglePayCallback (advanced) or the session callback (session).
+            // See https://docs.adyen.com/payment-methods/google-pay/android-component/migrate
+            googlePayComponent?.submit()
         }
     }
-
-    fun handleGooglePayActivityResult(
-        resultCode: Int,
-        data: Intent?
-    ) = googlePayComponent?.handleActivityResult(resultCode, data)
 
     fun onDispose(componentId: String) {
         if (componentId == Constants.GOOGLE_PAY_ADVANCED_COMPONENT_KEY ||

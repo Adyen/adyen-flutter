@@ -495,6 +495,11 @@ class GooglePayConfigurationDTO {
   final ShippingAddressParametersDTO? shippingAddressParametersDTO;
   final bool? billingAddressRequired;
   final BillingAddressParametersDTO? billingAddressParametersDTO;
+  // Adyen 5.9+ optional fields. Both default to "off" so existing consumers
+  // (which render their own RawGooglePayButton and call submit() on click) keep
+  // working unchanged.
+  final bool? googlePaySubmitButtonVisible;
+  final GooglePayButtonStylingDTO? googlePayButtonStyling;
 
   GooglePayConfigurationDTO(
     this.googlePayEnvironment,
@@ -512,7 +517,38 @@ class GooglePayConfigurationDTO {
     this.shippingAddressParametersDTO,
     this.billingAddressRequired,
     this.billingAddressParametersDTO,
+    this.googlePaySubmitButtonVisible,
+    this.googlePayButtonStyling,
   );
+}
+
+class GooglePayButtonStylingDTO {
+  // Mirrors the Adyen Android `GooglePayButtonStyling` data class
+  // (com.adyen.checkout.googlepay.GooglePayButtonStyling, Adyen 5.9+).
+  // All fields are optional; nulls are forwarded to the native builder
+  // and the Adyen defaults are used.
+  final int? cornerRadius;
+  final GooglePayStylingButtonTheme? buttonTheme;
+  final GooglePayStylingButtonType? buttonType;
+
+  GooglePayButtonStylingDTO(
+    this.cornerRadius,
+    this.buttonTheme,
+    this.buttonType,
+  );
+}
+
+enum GooglePayStylingButtonTheme { light, dark }
+
+enum GooglePayStylingButtonType {
+  book,
+  buy,
+  checkout,
+  donate,
+  order,
+  pay,
+  plain,
+  subscribe,
 }
 
 class MerchantInfoDTO {
@@ -918,6 +954,11 @@ abstract class ComponentPlatformInterface {
 
   void onDispose(String componentId);
 }
+// `handleActivityResult` was removed in this version: the deprecated Android
+// `GooglePayComponent.startGooglePayScreen(activity, requestCode)` flow
+// (Adyen Android <5.9) is gone, replaced by `submit()`, which does not need
+// an Activity result callback. See Adyen Android 5.9.0 migration guide:
+// https://docs.adyen.com/payment-methods/google-pay/android-component/migrate
 
 @FlutterApi()
 abstract class ComponentFlutterInterface {

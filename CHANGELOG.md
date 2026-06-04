@@ -8,6 +8,14 @@
   | [Android Drop-in/Components](https://docs.adyen.com/online-payments/release-notes/?title%5B0%5D=Android+Components%2FDrop-in&version%5B0%5D=5.19.0) | 5.18.0 -> **5.19.0** |
   | [iOS Drop-in/Components](https://docs.adyen.com/online-payments/release-notes/?title%5B0%5D=iOS+Components%2FDrop-in&version%5B0%5D=5.25.0) | 5.24.0 -> **5.25.0** |
 
+### Removed
+
+- **Android Google Pay:** removed the deprecated `GooglePayComponent.startGooglePayScreen(activity, requestCode)` flow and its `handleActivityResult(...)` callback plumbing (Adyen Android 5.9.0+). `GooglePayComponentManager` now calls `submit()` directly. The Flutter plugin no longer needs the `onActivityResult` listener on the host activity. See the [Adyen 5.9.0 migration guide](https://docs.adyen.com/payment-methods/google-pay/android-component/migrate).
+
+### Added
+
+- **Android Google Pay:** added optional configuration knobs `googlePaySubmitButtonVisible` and `googlePayButtonStyling` (with `cornerRadius`, `buttonTheme`, `buttonType`) to `GooglePayConfigurationDTO`. Both default to "off" so existing consumers see no behaviour change; they forward to `setSubmitButtonVisible` and `setGooglePayButtonStyling` on the Adyen 5.9+ builder when set.
+
 ## 1.10.0
 
 ### New

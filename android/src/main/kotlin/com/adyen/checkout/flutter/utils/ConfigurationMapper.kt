@@ -36,6 +36,9 @@ import com.adyen.checkout.flutter.generated.EncryptedCardDTO
 import com.adyen.checkout.flutter.generated.Environment
 import com.adyen.checkout.flutter.generated.FieldVisibility
 import com.adyen.checkout.flutter.generated.GooglePayConfigurationDTO
+import com.adyen.checkout.flutter.generated.GooglePayButtonStylingDTO
+import com.adyen.checkout.flutter.generated.GooglePayStylingButtonTheme
+import com.adyen.checkout.flutter.generated.GooglePayStylingButtonType
 import com.adyen.checkout.flutter.generated.GooglePayEnvironment
 import com.adyen.checkout.flutter.generated.InstallmentConfigurationDTO
 import com.adyen.checkout.flutter.generated.InstantPaymentConfigurationDTO
@@ -53,6 +56,7 @@ import com.adyen.checkout.flutter.generated.TotalPriceStatus
 import com.adyen.checkout.flutter.generated.TwintConfigurationDTO
 import com.adyen.checkout.flutter.generated.UnencryptedCardDTO
 import com.adyen.checkout.googlepay.BillingAddressParameters
+import com.adyen.checkout.googlepay.GooglePayButtonStyling
 import com.adyen.checkout.googlepay.MerchantInfo
 import com.adyen.checkout.googlepay.ShippingAddressParameters
 import com.adyen.checkout.googlepay.googlePay
@@ -215,6 +219,11 @@ object ConfigurationMapper {
                     configurationDTO.billingAddressRequired?.let { isBillingAddressRequired = it }
                     billingAddressParameters =
                         configurationDTO.billingAddressParametersDTO?.mapToBillingAddressParameters()
+                    // Adyen 5.9+ button rendering. Both default to "off" so existing
+                    // consumers (who render their own RawGooglePayButton via the pay
+                    // package and call submit() on click) keep working unchanged.
+                    configurationDTO.googlePaySubmitButtonVisible?.let { isSubmitButtonVisible = it }
+                    configurationDTO.googlePayButtonStyling?.let { googlePayButtonStyling = it.mapToButtonStyling() }
                 }
             }
 
@@ -311,6 +320,33 @@ object ConfigurationMapper {
         }
 
     private fun MerchantInfoDTO.mapToMerchantInfo(): MerchantInfo = MerchantInfo(merchantName, merchantId)
+
+    private fun GooglePayButtonStylingDTO.mapToButtonStyling(): GooglePayButtonStyling =
+        GooglePayButtonStyling(
+            buttonTheme = buttonTheme?.mapToAdyenButtonTheme(),
+            buttonType = buttonType?.mapToAdyenButtonType(),
+            // Pigeon maps Dart's int? to Kotlin's Long? on the wire; Adyen's
+            // GooglePayButtonStyling.cornerRadius is Int? (DP), so we narrow.
+            cornerRadius = cornerRadius?.toInt(),
+        )
+
+    private fun GooglePayStylingButtonTheme.mapToAdyenButtonTheme(): com.adyen.checkout.googlepay.GooglePayButtonTheme =
+        when (this) {
+            GooglePayStylingButtonTheme.LIGHT -> com.adyen.checkout.googlepay.GooglePayButtonTheme.LIGHT
+            GooglePayStylingButtonTheme.DARK -> com.adyen.checkout.googlepay.GooglePayButtonTheme.DARK
+        }
+
+    private fun GooglePayStylingButtonType.mapToAdyenButtonType(): com.adyen.checkout.googlepay.GooglePayButtonType =
+        when (this) {
+            GooglePayStylingButtonType.BOOK -> com.adyen.checkout.googlepay.GooglePayButtonType.BOOK
+            GooglePayStylingButtonType.BUY -> com.adyen.checkout.googlepay.GooglePayButtonType.BUY
+            GooglePayStylingButtonType.CHECKOUT -> com.adyen.checkout.googlepay.GooglePayButtonType.CHECKOUT
+            GooglePayStylingButtonType.DONATE -> com.adyen.checkout.googlepay.GooglePayButtonType.DONATE
+            GooglePayStylingButtonType.ORDER -> com.adyen.checkout.googlepay.GooglePayButtonType.ORDER
+            GooglePayStylingButtonType.PAY -> com.adyen.checkout.googlepay.GooglePayButtonType.PAY
+            GooglePayStylingButtonType.PLAIN -> com.adyen.checkout.googlepay.GooglePayButtonType.PLAIN
+            GooglePayStylingButtonType.SUBSCRIBE -> com.adyen.checkout.googlepay.GooglePayButtonType.SUBSCRIBE
+        }
 
     private fun ShippingAddressParametersDTO.mapToShippingAddressParameters(): ShippingAddressParameters =
         when {
