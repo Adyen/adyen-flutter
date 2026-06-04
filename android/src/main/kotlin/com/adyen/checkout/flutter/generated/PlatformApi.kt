@@ -278,34 +278,6 @@ enum class CardSecurityCodeValidationResultDTO(val raw: Int) {
   }
 }
 
-enum class GooglePayStylingButtonTheme(val raw: Int) {
-  LIGHT(0),
-  DARK(1);
-
-  companion object {
-    fun ofRaw(raw: Int): GooglePayStylingButtonTheme? {
-      return values().firstOrNull { it.raw == raw }
-    }
-  }
-}
-
-enum class GooglePayStylingButtonType(val raw: Int) {
-  BOOK(0),
-  BUY(1),
-  CHECKOUT(2),
-  DONATE(3),
-  ORDER(4),
-  PAY(5),
-  PLAIN(6),
-  SUBSCRIBE(7);
-
-  companion object {
-    fun ofRaw(raw: Int): GooglePayStylingButtonType? {
-      return values().firstOrNull { it.raw == raw }
-    }
-  }
-}
-
 /** Generated class from Pigeon that represents data sent in messages. */
 data class SessionDTO (
   val id: String,
@@ -978,9 +950,7 @@ data class GooglePayConfigurationDTO (
   val shippingAddressRequired: Boolean? = null,
   val shippingAddressParametersDTO: ShippingAddressParametersDTO? = null,
   val billingAddressRequired: Boolean? = null,
-  val billingAddressParametersDTO: BillingAddressParametersDTO? = null,
-  val googlePaySubmitButtonVisible: Boolean? = null,
-  val googlePayButtonStyling: GooglePayButtonStylingDTO? = null
+  val billingAddressParametersDTO: BillingAddressParametersDTO? = null
 
 ) {
   companion object {
@@ -1001,9 +971,7 @@ data class GooglePayConfigurationDTO (
       val shippingAddressParametersDTO = __pigeon_list[12] as ShippingAddressParametersDTO?
       val billingAddressRequired = __pigeon_list[13] as Boolean?
       val billingAddressParametersDTO = __pigeon_list[14] as BillingAddressParametersDTO?
-      val googlePaySubmitButtonVisible = __pigeon_list[15] as Boolean?
-      val googlePayButtonStyling = __pigeon_list[16] as GooglePayButtonStylingDTO?
-      return GooglePayConfigurationDTO(googlePayEnvironment, merchantAccount, merchantInfoDTO, totalPriceStatus, allowedCardNetworks, allowedAuthMethods, allowPrepaidCards, allowCreditCards, assuranceDetailsRequired, emailRequired, existingPaymentMethodRequired, shippingAddressRequired, shippingAddressParametersDTO, billingAddressRequired, billingAddressParametersDTO, googlePaySubmitButtonVisible, googlePayButtonStyling)
+      return GooglePayConfigurationDTO(googlePayEnvironment, merchantAccount, merchantInfoDTO, totalPriceStatus, allowedCardNetworks, allowedAuthMethods, allowPrepaidCards, allowCreditCards, assuranceDetailsRequired, emailRequired, existingPaymentMethodRequired, shippingAddressRequired, shippingAddressParametersDTO, billingAddressRequired, billingAddressParametersDTO)
     }
   }
   fun toList(): List<Any?> {
@@ -1023,33 +991,6 @@ data class GooglePayConfigurationDTO (
       shippingAddressParametersDTO,
       billingAddressRequired,
       billingAddressParametersDTO,
-      googlePaySubmitButtonVisible,
-      googlePayButtonStyling,
-    )
-  }
-}
-
-/** Generated class from Pigeon that represents data sent in messages. */
-data class GooglePayButtonStylingDTO (
-  val cornerRadius: Long? = null,
-  val buttonTheme: GooglePayStylingButtonTheme? = null,
-  val buttonType: GooglePayStylingButtonType? = null
-
-) {
-  companion object {
-    @Suppress("LocalVariableName")
-    fun fromList(__pigeon_list: List<Any?>): GooglePayButtonStylingDTO {
-      val cornerRadius = __pigeon_list[0].let { num -> if (num is Int) num.toLong() else num as Long? }
-      val buttonTheme = __pigeon_list[1] as GooglePayStylingButtonTheme?
-      val buttonType = __pigeon_list[2] as GooglePayStylingButtonType?
-      return GooglePayButtonStylingDTO(cornerRadius, buttonTheme, buttonType)
-    }
-  }
-  fun toList(): List<Any?> {
-    return listOf(
-      cornerRadius,
-      buttonTheme,
-      buttonType,
     )
   }
 }
@@ -1755,217 +1696,202 @@ private object PlatformApiPigeonCodec : StandardMessageCodec() {
       }
       150.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          GooglePayButtonStylingDTO.fromList(it)
+          MerchantInfoDTO.fromList(it)
         }
       }
       151.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          MerchantInfoDTO.fromList(it)
+          ShippingAddressParametersDTO.fromList(it)
         }
       }
       152.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          ShippingAddressParametersDTO.fromList(it)
+          BillingAddressParametersDTO.fromList(it)
         }
       }
       153.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          BillingAddressParametersDTO.fromList(it)
+          CashAppPayConfigurationDTO.fromList(it)
         }
       }
       154.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          CashAppPayConfigurationDTO.fromList(it)
+          TwintConfigurationDTO.fromList(it)
         }
       }
       155.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          TwintConfigurationDTO.fromList(it)
+          PaymentResultDTO.fromList(it)
         }
       }
       156.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          PaymentResultDTO.fromList(it)
+          PaymentResultModelDTO.fromList(it)
         }
       }
       157.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          PaymentResultModelDTO.fromList(it)
+          OrderResponseDTO.fromList(it)
         }
       }
       158.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          OrderResponseDTO.fromList(it)
+          CheckoutEvent.fromList(it)
         }
       }
       159.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          CheckoutEvent.fromList(it)
+          ComponentCommunicationModel.fromList(it)
         }
       }
       160.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          ComponentCommunicationModel.fromList(it)
+          PaymentEventDTO.fromList(it)
         }
       }
       161.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          PaymentEventDTO.fromList(it)
+          ErrorDTO.fromList(it)
         }
       }
       162.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          ErrorDTO.fromList(it)
+          DeletedStoredPaymentMethodResultDTO.fromList(it)
         }
       }
       163.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          DeletedStoredPaymentMethodResultDTO.fromList(it)
+          CardComponentConfigurationDTO.fromList(it)
         }
       }
       164.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          CardComponentConfigurationDTO.fromList(it)
+          BlikComponentConfigurationDTO.fromList(it)
         }
       }
       165.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          BlikComponentConfigurationDTO.fromList(it)
+          InstantPaymentConfigurationDTO.fromList(it)
         }
       }
       166.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          InstantPaymentConfigurationDTO.fromList(it)
+          InstantPaymentSetupResultDTO.fromList(it)
         }
       }
       167.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          InstantPaymentSetupResultDTO.fromList(it)
+          UnencryptedCardDTO.fromList(it)
         }
       }
       168.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          UnencryptedCardDTO.fromList(it)
+          EncryptedCardDTO.fromList(it)
         }
       }
       169.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          EncryptedCardDTO.fromList(it)
+          ActionComponentConfigurationDTO.fromList(it)
         }
       }
       170.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          ActionComponentConfigurationDTO.fromList(it)
+          OrderCancelResultDTO.fromList(it)
         }
       }
       171.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          OrderCancelResultDTO.fromList(it)
-        }
-      }
-      172.toByte() -> {
-        return (readValue(buffer) as? List<Any?>)?.let {
           BinLookupDataDTO.fromList(it)
         }
       }
-      173.toByte() -> {
+      172.toByte() -> {
         return (readValue(buffer) as Int?)?.let {
           Environment.ofRaw(it)
         }
       }
-      174.toByte() -> {
+      173.toByte() -> {
         return (readValue(buffer) as Int?)?.let {
           AddressMode.ofRaw(it)
         }
       }
-      175.toByte() -> {
+      174.toByte() -> {
         return (readValue(buffer) as Int?)?.let {
           CardAuthMethod.ofRaw(it)
         }
       }
-      176.toByte() -> {
+      175.toByte() -> {
         return (readValue(buffer) as Int?)?.let {
           TotalPriceStatus.ofRaw(it)
         }
       }
-      177.toByte() -> {
+      176.toByte() -> {
         return (readValue(buffer) as Int?)?.let {
           GooglePayEnvironment.ofRaw(it)
         }
       }
-      178.toByte() -> {
+      177.toByte() -> {
         return (readValue(buffer) as Int?)?.let {
           CashAppPayEnvironment.ofRaw(it)
         }
       }
-      179.toByte() -> {
+      178.toByte() -> {
         return (readValue(buffer) as Int?)?.let {
           PaymentResultEnum.ofRaw(it)
         }
       }
-      180.toByte() -> {
+      179.toByte() -> {
         return (readValue(buffer) as Int?)?.let {
           CheckoutEventType.ofRaw(it)
         }
       }
-      181.toByte() -> {
+      180.toByte() -> {
         return (readValue(buffer) as Int?)?.let {
           ComponentCommunicationType.ofRaw(it)
         }
       }
-      182.toByte() -> {
+      181.toByte() -> {
         return (readValue(buffer) as Int?)?.let {
           PaymentEventType.ofRaw(it)
         }
       }
-      183.toByte() -> {
+      182.toByte() -> {
         return (readValue(buffer) as Int?)?.let {
           FieldVisibility.ofRaw(it)
         }
       }
-      184.toByte() -> {
+      183.toByte() -> {
         return (readValue(buffer) as Int?)?.let {
           InstantPaymentType.ofRaw(it)
         }
       }
-      185.toByte() -> {
+      184.toByte() -> {
         return (readValue(buffer) as Int?)?.let {
           ApplePayShippingType.ofRaw(it)
         }
       }
-      186.toByte() -> {
+      185.toByte() -> {
         return (readValue(buffer) as Int?)?.let {
           ApplePayMerchantCapability.ofRaw(it)
         }
       }
-      187.toByte() -> {
+      186.toByte() -> {
         return (readValue(buffer) as Int?)?.let {
           ApplePaySummaryItemType.ofRaw(it)
         }
       }
-      188.toByte() -> {
+      187.toByte() -> {
         return (readValue(buffer) as Int?)?.let {
           CardNumberValidationResultDTO.ofRaw(it)
         }
       }
-      189.toByte() -> {
+      188.toByte() -> {
         return (readValue(buffer) as Int?)?.let {
           CardExpiryDateValidationResultDTO.ofRaw(it)
         }
       }
-      190.toByte() -> {
+      189.toByte() -> {
         return (readValue(buffer) as Int?)?.let {
           CardSecurityCodeValidationResultDTO.ofRaw(it)
-        }
-      }
-      191.toByte() -> {
-        return (readValue(buffer) as Int?)?.let {
-          GooglePayStylingButtonTheme.ofRaw(it)
-        }
-      }
-      192.toByte() -> {
-        return (readValue(buffer) as Int?)?.let {
-          GooglePayStylingButtonType.ofRaw(it)
         }
       }
       else -> super.readValueOfType(type, buffer)
@@ -2057,176 +1983,164 @@ private object PlatformApiPigeonCodec : StandardMessageCodec() {
         stream.write(149)
         writeValue(stream, value.toList())
       }
-      is GooglePayButtonStylingDTO -> {
+      is MerchantInfoDTO -> {
         stream.write(150)
         writeValue(stream, value.toList())
       }
-      is MerchantInfoDTO -> {
+      is ShippingAddressParametersDTO -> {
         stream.write(151)
         writeValue(stream, value.toList())
       }
-      is ShippingAddressParametersDTO -> {
+      is BillingAddressParametersDTO -> {
         stream.write(152)
         writeValue(stream, value.toList())
       }
-      is BillingAddressParametersDTO -> {
+      is CashAppPayConfigurationDTO -> {
         stream.write(153)
         writeValue(stream, value.toList())
       }
-      is CashAppPayConfigurationDTO -> {
+      is TwintConfigurationDTO -> {
         stream.write(154)
         writeValue(stream, value.toList())
       }
-      is TwintConfigurationDTO -> {
+      is PaymentResultDTO -> {
         stream.write(155)
         writeValue(stream, value.toList())
       }
-      is PaymentResultDTO -> {
+      is PaymentResultModelDTO -> {
         stream.write(156)
         writeValue(stream, value.toList())
       }
-      is PaymentResultModelDTO -> {
+      is OrderResponseDTO -> {
         stream.write(157)
         writeValue(stream, value.toList())
       }
-      is OrderResponseDTO -> {
+      is CheckoutEvent -> {
         stream.write(158)
         writeValue(stream, value.toList())
       }
-      is CheckoutEvent -> {
+      is ComponentCommunicationModel -> {
         stream.write(159)
         writeValue(stream, value.toList())
       }
-      is ComponentCommunicationModel -> {
+      is PaymentEventDTO -> {
         stream.write(160)
         writeValue(stream, value.toList())
       }
-      is PaymentEventDTO -> {
+      is ErrorDTO -> {
         stream.write(161)
         writeValue(stream, value.toList())
       }
-      is ErrorDTO -> {
+      is DeletedStoredPaymentMethodResultDTO -> {
         stream.write(162)
         writeValue(stream, value.toList())
       }
-      is DeletedStoredPaymentMethodResultDTO -> {
+      is CardComponentConfigurationDTO -> {
         stream.write(163)
         writeValue(stream, value.toList())
       }
-      is CardComponentConfigurationDTO -> {
+      is BlikComponentConfigurationDTO -> {
         stream.write(164)
         writeValue(stream, value.toList())
       }
-      is BlikComponentConfigurationDTO -> {
+      is InstantPaymentConfigurationDTO -> {
         stream.write(165)
         writeValue(stream, value.toList())
       }
-      is InstantPaymentConfigurationDTO -> {
+      is InstantPaymentSetupResultDTO -> {
         stream.write(166)
         writeValue(stream, value.toList())
       }
-      is InstantPaymentSetupResultDTO -> {
+      is UnencryptedCardDTO -> {
         stream.write(167)
         writeValue(stream, value.toList())
       }
-      is UnencryptedCardDTO -> {
+      is EncryptedCardDTO -> {
         stream.write(168)
         writeValue(stream, value.toList())
       }
-      is EncryptedCardDTO -> {
+      is ActionComponentConfigurationDTO -> {
         stream.write(169)
         writeValue(stream, value.toList())
       }
-      is ActionComponentConfigurationDTO -> {
+      is OrderCancelResultDTO -> {
         stream.write(170)
         writeValue(stream, value.toList())
       }
-      is OrderCancelResultDTO -> {
+      is BinLookupDataDTO -> {
         stream.write(171)
         writeValue(stream, value.toList())
       }
-      is BinLookupDataDTO -> {
-        stream.write(172)
-        writeValue(stream, value.toList())
-      }
       is Environment -> {
-        stream.write(173)
+        stream.write(172)
         writeValue(stream, value.raw)
       }
       is AddressMode -> {
-        stream.write(174)
+        stream.write(173)
         writeValue(stream, value.raw)
       }
       is CardAuthMethod -> {
-        stream.write(175)
+        stream.write(174)
         writeValue(stream, value.raw)
       }
       is TotalPriceStatus -> {
-        stream.write(176)
+        stream.write(175)
         writeValue(stream, value.raw)
       }
       is GooglePayEnvironment -> {
-        stream.write(177)
+        stream.write(176)
         writeValue(stream, value.raw)
       }
       is CashAppPayEnvironment -> {
-        stream.write(178)
+        stream.write(177)
         writeValue(stream, value.raw)
       }
       is PaymentResultEnum -> {
-        stream.write(179)
+        stream.write(178)
         writeValue(stream, value.raw)
       }
       is CheckoutEventType -> {
-        stream.write(180)
+        stream.write(179)
         writeValue(stream, value.raw)
       }
       is ComponentCommunicationType -> {
-        stream.write(181)
+        stream.write(180)
         writeValue(stream, value.raw)
       }
       is PaymentEventType -> {
-        stream.write(182)
+        stream.write(181)
         writeValue(stream, value.raw)
       }
       is FieldVisibility -> {
-        stream.write(183)
+        stream.write(182)
         writeValue(stream, value.raw)
       }
       is InstantPaymentType -> {
-        stream.write(184)
+        stream.write(183)
         writeValue(stream, value.raw)
       }
       is ApplePayShippingType -> {
-        stream.write(185)
+        stream.write(184)
         writeValue(stream, value.raw)
       }
       is ApplePayMerchantCapability -> {
-        stream.write(186)
+        stream.write(185)
         writeValue(stream, value.raw)
       }
       is ApplePaySummaryItemType -> {
-        stream.write(187)
+        stream.write(186)
         writeValue(stream, value.raw)
       }
       is CardNumberValidationResultDTO -> {
-        stream.write(188)
+        stream.write(187)
         writeValue(stream, value.raw)
       }
       is CardExpiryDateValidationResultDTO -> {
-        stream.write(189)
+        stream.write(188)
         writeValue(stream, value.raw)
       }
       is CardSecurityCodeValidationResultDTO -> {
-        stream.write(190)
-        writeValue(stream, value.raw)
-      }
-      is GooglePayStylingButtonTheme -> {
-        stream.write(191)
-        writeValue(stream, value.raw)
-      }
-      is GooglePayStylingButtonType -> {
-        stream.write(192)
+        stream.write(189)
         writeValue(stream, value.raw)
       }
       else -> super.writeValue(stream, value)

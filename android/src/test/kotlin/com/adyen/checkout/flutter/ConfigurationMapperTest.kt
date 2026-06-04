@@ -27,7 +27,6 @@ import com.adyen.checkout.flutter.generated.DropInConfigurationDTO
 import com.adyen.checkout.flutter.generated.Environment
 import com.adyen.checkout.flutter.generated.FieldVisibility
 import com.adyen.checkout.flutter.generated.GooglePayConfigurationDTO
-import com.adyen.checkout.flutter.generated.GooglePayButtonStylingDTO
 import com.adyen.checkout.flutter.generated.GooglePayEnvironment
 import com.adyen.checkout.flutter.generated.InstallmentConfigurationDTO
 import com.adyen.checkout.flutter.generated.InstantPaymentConfigurationDTO
@@ -919,68 +918,6 @@ class ConfigurationMapperTest {
             assertEquals(null, googlePayConfiguration?.isExistingPaymentMethodRequired)
             assertEquals(null, googlePayConfiguration?.isShippingAddressRequired)
             assertEquals(null, googlePayConfiguration?.isBillingAddressRequired)
-        }
-
-        @Test
-        fun `when Google Pay 5_9 button styling is provided, then map to native configuration`() {
-            val googlePayConfigurationDTO = GooglePayConfigurationDTO(
-                googlePayEnvironment = GooglePayEnvironment.TEST,
-                merchantAccount = "TestMerchant",
-                googlePaySubmitButtonVisible = true,
-                googlePayButtonStyling = GooglePayButtonStylingDTO(
-                    cornerRadius = 16L,
-                    buttonTheme = com.adyen.checkout.flutter.generated.GooglePayStylingButtonTheme.DARK,
-                    buttonType = com.adyen.checkout.flutter.generated.GooglePayStylingButtonType.BUY,
-                ),
-            )
-            val instantPaymentConfigurationDTO = InstantPaymentConfigurationDTO(
-                instantPaymentType = InstantPaymentType.GOOGLE_PAY,
-                environment = Environment.TEST,
-                clientKey = TEST_CLIENT_KEY,
-                countryCode = "US",
-                amount = AmountDTO("USD", 1000),
-                analyticsOptionsDTO = AnalyticsOptionsDTO(true, "1.0.0"),
-                googlePayConfigurationDTO = googlePayConfigurationDTO,
-            )
-
-            val checkoutConfiguration = instantPaymentConfigurationDTO.toCheckoutConfiguration()
-            val googlePayConfiguration =
-                checkoutConfiguration.getConfiguration<GooglePayConfiguration>(PaymentMethodTypes.GOOGLE_PAY)
-
-            assertEquals(true, googlePayConfiguration?.isSubmitButtonVisible)
-            assertEquals(16, googlePayConfiguration?.googlePayButtonStyling?.cornerRadius)
-            assertEquals(
-                com.adyen.checkout.googlepay.GooglePayButtonTheme.DARK,
-                googlePayConfiguration?.googlePayButtonStyling?.buttonTheme
-            )
-            assertEquals(
-                com.adyen.checkout.googlepay.GooglePayButtonType.BUY,
-                googlePayConfiguration?.googlePayButtonStyling?.buttonType
-            )
-        }
-
-        @Test
-        fun `when Google Pay 5_9 button styling is not provided, then native configuration fields are null`() {
-            val googlePayConfigurationDTO = GooglePayConfigurationDTO(
-                googlePayEnvironment = GooglePayEnvironment.TEST,
-                merchantAccount = "TestMerchant",
-            )
-            val instantPaymentConfigurationDTO = InstantPaymentConfigurationDTO(
-                instantPaymentType = InstantPaymentType.GOOGLE_PAY,
-                environment = Environment.TEST,
-                clientKey = TEST_CLIENT_KEY,
-                countryCode = "US",
-                amount = AmountDTO("USD", 1000),
-                analyticsOptionsDTO = AnalyticsOptionsDTO(true, "1.0.0"),
-                googlePayConfigurationDTO = googlePayConfigurationDTO,
-            )
-
-            val checkoutConfiguration = instantPaymentConfigurationDTO.toCheckoutConfiguration()
-            val googlePayConfiguration =
-                checkoutConfiguration.getConfiguration<GooglePayConfiguration>(PaymentMethodTypes.GOOGLE_PAY)
-
-            assertNull(googlePayConfiguration?.isSubmitButtonVisible)
-            assertNull(googlePayConfiguration?.googlePayButtonStyling)
         }
     }
 

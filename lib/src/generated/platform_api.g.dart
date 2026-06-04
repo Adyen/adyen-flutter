@@ -149,22 +149,6 @@ enum CardSecurityCodeValidationResultDTO {
   invalid,
 }
 
-enum GooglePayStylingButtonTheme {
-  light,
-  dark,
-}
-
-enum GooglePayStylingButtonType {
-  book,
-  buy,
-  checkout,
-  donate,
-  order,
-  pay,
-  plain,
-  subscribe,
-}
-
 class SessionDTO {
   SessionDTO({
     required this.id,
@@ -1070,8 +1054,6 @@ class GooglePayConfigurationDTO {
     this.shippingAddressParametersDTO,
     this.billingAddressRequired,
     this.billingAddressParametersDTO,
-    this.googlePaySubmitButtonVisible,
-    this.googlePayButtonStyling,
   });
 
   GooglePayEnvironment googlePayEnvironment;
@@ -1104,10 +1086,6 @@ class GooglePayConfigurationDTO {
 
   BillingAddressParametersDTO? billingAddressParametersDTO;
 
-  bool? googlePaySubmitButtonVisible;
-
-  GooglePayButtonStylingDTO? googlePayButtonStyling;
-
   Object encode() {
     return <Object?>[
       googlePayEnvironment,
@@ -1125,8 +1103,6 @@ class GooglePayConfigurationDTO {
       shippingAddressParametersDTO,
       billingAddressRequired,
       billingAddressParametersDTO,
-      googlePaySubmitButtonVisible,
-      googlePayButtonStyling,
     ];
   }
 
@@ -1148,39 +1124,6 @@ class GooglePayConfigurationDTO {
       shippingAddressParametersDTO: result[12] as ShippingAddressParametersDTO?,
       billingAddressRequired: result[13] as bool?,
       billingAddressParametersDTO: result[14] as BillingAddressParametersDTO?,
-      googlePaySubmitButtonVisible: result[15] as bool?,
-      googlePayButtonStyling: result[16] as GooglePayButtonStylingDTO?,
-    );
-  }
-}
-
-class GooglePayButtonStylingDTO {
-  GooglePayButtonStylingDTO({
-    this.cornerRadius,
-    this.buttonTheme,
-    this.buttonType,
-  });
-
-  int? cornerRadius;
-
-  GooglePayStylingButtonTheme? buttonTheme;
-
-  GooglePayStylingButtonType? buttonType;
-
-  Object encode() {
-    return <Object?>[
-      cornerRadius,
-      buttonTheme,
-      buttonType,
-    ];
-  }
-
-  static GooglePayButtonStylingDTO decode(Object result) {
-    result as List<Object?>;
-    return GooglePayButtonStylingDTO(
-      cornerRadius: result[0] as int?,
-      buttonTheme: result[1] as GooglePayStylingButtonTheme?,
-      buttonType: result[2] as GooglePayStylingButtonType?,
     );
   }
 }
@@ -2006,134 +1949,125 @@ class _PigeonCodec extends StandardMessageCodec {
     } else if (value is GooglePayConfigurationDTO) {
       buffer.putUint8(149);
       writeValue(buffer, value.encode());
-    } else if (value is GooglePayButtonStylingDTO) {
+    } else if (value is MerchantInfoDTO) {
       buffer.putUint8(150);
       writeValue(buffer, value.encode());
-    } else if (value is MerchantInfoDTO) {
+    } else if (value is ShippingAddressParametersDTO) {
       buffer.putUint8(151);
       writeValue(buffer, value.encode());
-    } else if (value is ShippingAddressParametersDTO) {
+    } else if (value is BillingAddressParametersDTO) {
       buffer.putUint8(152);
       writeValue(buffer, value.encode());
-    } else if (value is BillingAddressParametersDTO) {
+    } else if (value is CashAppPayConfigurationDTO) {
       buffer.putUint8(153);
       writeValue(buffer, value.encode());
-    } else if (value is CashAppPayConfigurationDTO) {
+    } else if (value is TwintConfigurationDTO) {
       buffer.putUint8(154);
       writeValue(buffer, value.encode());
-    } else if (value is TwintConfigurationDTO) {
+    } else if (value is PaymentResultDTO) {
       buffer.putUint8(155);
       writeValue(buffer, value.encode());
-    } else if (value is PaymentResultDTO) {
+    } else if (value is PaymentResultModelDTO) {
       buffer.putUint8(156);
       writeValue(buffer, value.encode());
-    } else if (value is PaymentResultModelDTO) {
+    } else if (value is OrderResponseDTO) {
       buffer.putUint8(157);
       writeValue(buffer, value.encode());
-    } else if (value is OrderResponseDTO) {
+    } else if (value is CheckoutEvent) {
       buffer.putUint8(158);
       writeValue(buffer, value.encode());
-    } else if (value is CheckoutEvent) {
+    } else if (value is ComponentCommunicationModel) {
       buffer.putUint8(159);
       writeValue(buffer, value.encode());
-    } else if (value is ComponentCommunicationModel) {
+    } else if (value is PaymentEventDTO) {
       buffer.putUint8(160);
       writeValue(buffer, value.encode());
-    } else if (value is PaymentEventDTO) {
+    } else if (value is ErrorDTO) {
       buffer.putUint8(161);
       writeValue(buffer, value.encode());
-    } else if (value is ErrorDTO) {
+    } else if (value is DeletedStoredPaymentMethodResultDTO) {
       buffer.putUint8(162);
       writeValue(buffer, value.encode());
-    } else if (value is DeletedStoredPaymentMethodResultDTO) {
+    } else if (value is CardComponentConfigurationDTO) {
       buffer.putUint8(163);
       writeValue(buffer, value.encode());
-    } else if (value is CardComponentConfigurationDTO) {
+    } else if (value is BlikComponentConfigurationDTO) {
       buffer.putUint8(164);
       writeValue(buffer, value.encode());
-    } else if (value is BlikComponentConfigurationDTO) {
+    } else if (value is InstantPaymentConfigurationDTO) {
       buffer.putUint8(165);
       writeValue(buffer, value.encode());
-    } else if (value is InstantPaymentConfigurationDTO) {
+    } else if (value is InstantPaymentSetupResultDTO) {
       buffer.putUint8(166);
       writeValue(buffer, value.encode());
-    } else if (value is InstantPaymentSetupResultDTO) {
+    } else if (value is UnencryptedCardDTO) {
       buffer.putUint8(167);
       writeValue(buffer, value.encode());
-    } else if (value is UnencryptedCardDTO) {
+    } else if (value is EncryptedCardDTO) {
       buffer.putUint8(168);
       writeValue(buffer, value.encode());
-    } else if (value is EncryptedCardDTO) {
+    } else if (value is ActionComponentConfigurationDTO) {
       buffer.putUint8(169);
       writeValue(buffer, value.encode());
-    } else if (value is ActionComponentConfigurationDTO) {
+    } else if (value is OrderCancelResultDTO) {
       buffer.putUint8(170);
       writeValue(buffer, value.encode());
-    } else if (value is OrderCancelResultDTO) {
+    } else if (value is BinLookupDataDTO) {
       buffer.putUint8(171);
       writeValue(buffer, value.encode());
-    } else if (value is BinLookupDataDTO) {
-      buffer.putUint8(172);
-      writeValue(buffer, value.encode());
     } else if (value is Environment) {
-      buffer.putUint8(173);
+      buffer.putUint8(172);
       writeValue(buffer, value.index);
     } else if (value is AddressMode) {
-      buffer.putUint8(174);
+      buffer.putUint8(173);
       writeValue(buffer, value.index);
     } else if (value is CardAuthMethod) {
-      buffer.putUint8(175);
+      buffer.putUint8(174);
       writeValue(buffer, value.index);
     } else if (value is TotalPriceStatus) {
-      buffer.putUint8(176);
+      buffer.putUint8(175);
       writeValue(buffer, value.index);
     } else if (value is GooglePayEnvironment) {
-      buffer.putUint8(177);
+      buffer.putUint8(176);
       writeValue(buffer, value.index);
     } else if (value is CashAppPayEnvironment) {
-      buffer.putUint8(178);
+      buffer.putUint8(177);
       writeValue(buffer, value.index);
     } else if (value is PaymentResultEnum) {
-      buffer.putUint8(179);
+      buffer.putUint8(178);
       writeValue(buffer, value.index);
     } else if (value is CheckoutEventType) {
-      buffer.putUint8(180);
+      buffer.putUint8(179);
       writeValue(buffer, value.index);
     } else if (value is ComponentCommunicationType) {
-      buffer.putUint8(181);
+      buffer.putUint8(180);
       writeValue(buffer, value.index);
     } else if (value is PaymentEventType) {
-      buffer.putUint8(182);
+      buffer.putUint8(181);
       writeValue(buffer, value.index);
     } else if (value is FieldVisibility) {
-      buffer.putUint8(183);
+      buffer.putUint8(182);
       writeValue(buffer, value.index);
     } else if (value is InstantPaymentType) {
-      buffer.putUint8(184);
+      buffer.putUint8(183);
       writeValue(buffer, value.index);
     } else if (value is ApplePayShippingType) {
-      buffer.putUint8(185);
+      buffer.putUint8(184);
       writeValue(buffer, value.index);
     } else if (value is ApplePayMerchantCapability) {
-      buffer.putUint8(186);
+      buffer.putUint8(185);
       writeValue(buffer, value.index);
     } else if (value is ApplePaySummaryItemType) {
-      buffer.putUint8(187);
+      buffer.putUint8(186);
       writeValue(buffer, value.index);
     } else if (value is CardNumberValidationResultDTO) {
-      buffer.putUint8(188);
+      buffer.putUint8(187);
       writeValue(buffer, value.index);
     } else if (value is CardExpiryDateValidationResultDTO) {
-      buffer.putUint8(189);
+      buffer.putUint8(188);
       writeValue(buffer, value.index);
     } else if (value is CardSecurityCodeValidationResultDTO) {
-      buffer.putUint8(190);
-      writeValue(buffer, value.index);
-    } else if (value is GooglePayStylingButtonTheme) {
-      buffer.putUint8(191);
-      writeValue(buffer, value.index);
-    } else if (value is GooglePayStylingButtonType) {
-      buffer.putUint8(192);
+      buffer.putUint8(189);
       writeValue(buffer, value.index);
     } else {
       super.writeValue(buffer, value);
@@ -2186,117 +2120,109 @@ class _PigeonCodec extends StandardMessageCodec {
       case 149:
         return GooglePayConfigurationDTO.decode(readValue(buffer)!);
       case 150:
-        return GooglePayButtonStylingDTO.decode(readValue(buffer)!);
-      case 151:
         return MerchantInfoDTO.decode(readValue(buffer)!);
-      case 152:
+      case 151:
         return ShippingAddressParametersDTO.decode(readValue(buffer)!);
-      case 153:
+      case 152:
         return BillingAddressParametersDTO.decode(readValue(buffer)!);
-      case 154:
+      case 153:
         return CashAppPayConfigurationDTO.decode(readValue(buffer)!);
-      case 155:
+      case 154:
         return TwintConfigurationDTO.decode(readValue(buffer)!);
-      case 156:
+      case 155:
         return PaymentResultDTO.decode(readValue(buffer)!);
-      case 157:
+      case 156:
         return PaymentResultModelDTO.decode(readValue(buffer)!);
-      case 158:
+      case 157:
         return OrderResponseDTO.decode(readValue(buffer)!);
-      case 159:
+      case 158:
         return CheckoutEvent.decode(readValue(buffer)!);
-      case 160:
+      case 159:
         return ComponentCommunicationModel.decode(readValue(buffer)!);
-      case 161:
+      case 160:
         return PaymentEventDTO.decode(readValue(buffer)!);
-      case 162:
+      case 161:
         return ErrorDTO.decode(readValue(buffer)!);
-      case 163:
+      case 162:
         return DeletedStoredPaymentMethodResultDTO.decode(readValue(buffer)!);
-      case 164:
+      case 163:
         return CardComponentConfigurationDTO.decode(readValue(buffer)!);
-      case 165:
+      case 164:
         return BlikComponentConfigurationDTO.decode(readValue(buffer)!);
-      case 166:
+      case 165:
         return InstantPaymentConfigurationDTO.decode(readValue(buffer)!);
-      case 167:
+      case 166:
         return InstantPaymentSetupResultDTO.decode(readValue(buffer)!);
-      case 168:
+      case 167:
         return UnencryptedCardDTO.decode(readValue(buffer)!);
-      case 169:
+      case 168:
         return EncryptedCardDTO.decode(readValue(buffer)!);
-      case 170:
+      case 169:
         return ActionComponentConfigurationDTO.decode(readValue(buffer)!);
-      case 171:
+      case 170:
         return OrderCancelResultDTO.decode(readValue(buffer)!);
-      case 172:
+      case 171:
         return BinLookupDataDTO.decode(readValue(buffer)!);
-      case 173:
+      case 172:
         final int? value = readValue(buffer) as int?;
         return value == null ? null : Environment.values[value];
-      case 174:
+      case 173:
         final int? value = readValue(buffer) as int?;
         return value == null ? null : AddressMode.values[value];
-      case 175:
+      case 174:
         final int? value = readValue(buffer) as int?;
         return value == null ? null : CardAuthMethod.values[value];
-      case 176:
+      case 175:
         final int? value = readValue(buffer) as int?;
         return value == null ? null : TotalPriceStatus.values[value];
-      case 177:
+      case 176:
         final int? value = readValue(buffer) as int?;
         return value == null ? null : GooglePayEnvironment.values[value];
-      case 178:
+      case 177:
         final int? value = readValue(buffer) as int?;
         return value == null ? null : CashAppPayEnvironment.values[value];
-      case 179:
+      case 178:
         final int? value = readValue(buffer) as int?;
         return value == null ? null : PaymentResultEnum.values[value];
-      case 180:
+      case 179:
         final int? value = readValue(buffer) as int?;
         return value == null ? null : CheckoutEventType.values[value];
-      case 181:
+      case 180:
         final int? value = readValue(buffer) as int?;
         return value == null ? null : ComponentCommunicationType.values[value];
-      case 182:
+      case 181:
         final int? value = readValue(buffer) as int?;
         return value == null ? null : PaymentEventType.values[value];
-      case 183:
+      case 182:
         final int? value = readValue(buffer) as int?;
         return value == null ? null : FieldVisibility.values[value];
-      case 184:
+      case 183:
         final int? value = readValue(buffer) as int?;
         return value == null ? null : InstantPaymentType.values[value];
-      case 185:
+      case 184:
         final int? value = readValue(buffer) as int?;
         return value == null ? null : ApplePayShippingType.values[value];
-      case 186:
+      case 185:
         final int? value = readValue(buffer) as int?;
         return value == null ? null : ApplePayMerchantCapability.values[value];
-      case 187:
+      case 186:
         final int? value = readValue(buffer) as int?;
         return value == null ? null : ApplePaySummaryItemType.values[value];
-      case 188:
+      case 187:
         final int? value = readValue(buffer) as int?;
         return value == null
             ? null
             : CardNumberValidationResultDTO.values[value];
-      case 189:
+      case 188:
         final int? value = readValue(buffer) as int?;
         return value == null
             ? null
             : CardExpiryDateValidationResultDTO.values[value];
-      case 190:
+      case 189:
         final int? value = readValue(buffer) as int?;
         return value == null
             ? null
             : CardSecurityCodeValidationResultDTO.values[value];
-      case 191:
-        final int? value = readValue(buffer) as int?;
-        return value == null ? null : GooglePayStylingButtonTheme.values[value];
-      case 192:
-        final int? value = readValue(buffer) as int?;
-        return value == null ? null : GooglePayStylingButtonType.values[value];
       default:
         return super.readValueOfType(type, buffer);
     }
