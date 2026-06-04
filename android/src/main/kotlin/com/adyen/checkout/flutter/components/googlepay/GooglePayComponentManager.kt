@@ -1,5 +1,6 @@
 package com.adyen.checkout.flutter.components.googlepay
 
+import android.util.Log
 import androidx.fragment.app.FragmentActivity
 import com.adyen.checkout.action.core.internal.ActionHandlingComponent
 import com.adyen.checkout.components.core.CheckoutConfiguration
@@ -81,9 +82,12 @@ class GooglePayComponentManager(
     }
 
     fun start() {
-        googlePayComponent?.let {
-            assignCurrentComponent(it)
-            it.submit()
+        val component = googlePayComponent
+        if (component != null) {
+            assignCurrentComponent(component)
+            component.submit()
+        } else {
+            Log.e(Constants.ADYEN_LOG_TAG, "Google Pay component is not initialized or available.")
         }
     }
 
