@@ -45,13 +45,16 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
         Task {
             do {
                 let sessionResponse = sessionResponseDTO.mapToSessionResponse()
-                let checkoutConfiguration = try createSessionCheckoutConfiguration(configurationDTO: checkoutConfigurationDTO)
+                let configuration = try checkoutConfigurationDTO.createCheckoutConfiguration()
                 let checkoutSession = try await Checkout.setup(
                     with: sessionResponse,
-                    configuration: checkoutConfiguration
-                )
+                    configuration: configuration
+                ).onComplete { [weak self] result in
+                    self?.sendCompleteResult(componentId: "SESSION_ADYEN_COMPONENT", result: result)
+                }.onError { [weak self] error in
+                    self?.sendErrorResult(componentId: "SESSION_ADYEN_COMPONENT", error: error)
+                }
 
-                setupSessionCallbacks(checkoutSession)
                 checkoutHolder.adyenCheckout = checkoutSession
                 let encodedPaymentMethods = try JSONEncoder().encode(checkoutSession.paymentMethods)
                 guard let encodedPaymentMethodsString = String(data: encodedPaymentMethods, encoding: .utf8) else {
@@ -74,13 +77,22 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
             do {
                 let paymentMethodsData = Data(paymentMethodsResponse.utf8)
                 let paymentMethods = try JSONDecoder().decode(PaymentMethods.self, from: paymentMethodsData)
-                let checkoutConfiguration = try createAdvancedCheckoutConfiguration(configurationDTO: checkoutConfigurationDTO)
+                let configuration = try checkoutConfigurationDTO.createCheckoutConfiguration()
                 let adyenCheckout = try await Checkout.setup(
                     with: paymentMethods,
-                    configuration: checkoutConfiguration
-                )
-
-                setupAdvancedCallbacks(adyenCheckout)
+                    configuration: configuration
+                ).onSubmit { [weak self] paymentData -> SubmitResult in
+                    guard let self else { return .completion(resultCode: "Error") }
+                    return await self.handleSubmit(paymentData: paymentData)
+                }.onAdditionalDetails { [weak self] additionalDetailsData -> AdditionalDetailsResult in
+                    guard let self else { return .completion(resultCode: "Error") }
+                    return await self.handleAdditionalDetails(additionalDetailsData: additionalDetailsData)
+                }.onComplete { [weak self] result in
+                    self?.sendCompleteResult(componentId: "ADVANCED_ADYEN_COMPONENT", result: result)
+                }.onError { [weak self] error in
+                    self?.sendErrorResult(componentId: "ADVANCED_ADYEN_COMPONENT", error: error)
+                }
+                
                 checkoutHolder.adyenCheckout = adyenCheckout
                 completion(Result.success(()))
             } catch {
@@ -130,60 +142,8 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
         return threeDS2SdkVersion
     }
 
-    // MARK: - Session checkout configuration
-
-    private func createSessionCheckoutConfiguration(
-        configurationDTO: CheckoutConfigurationDTO
-    ) throws -> CheckoutConfiguration {
-        try createCheckoutConfiguration(configurationDTO: configurationDTO)
-    }
-
-    private func setupSessionCallbacks(
-        _ checkout: SessionCheckout
-    ) {
-        checkout.onComplete { [weak self] result in
-            self?.sendCompleteResult(componentId: "SESSION_ADYEN_COMPONENT", result: result)
-        }.onError { [weak self] error in
-            self?.sendErrorResult(componentId: "SESSION_ADYEN_COMPONENT", error: error)
-        }
-    }
-
-    // MARK: - Advanced checkout configuration
-
-    private func createAdvancedCheckoutConfiguration(
-        configurationDTO: CheckoutConfigurationDTO
-    ) throws -> CheckoutConfiguration {
-        try createCheckoutConfiguration(configurationDTO: configurationDTO)
-    }
-
     private func setupAdvancedCallbacks(_ checkout: AdvancedCheckout) {
-        checkout.onSubmit { [weak self] paymentData -> SubmitResult in
-            guard let self else { return .completion(resultCode: "Error") }
-            return await self.handleSubmit(paymentData: paymentData)
-        }.onAdditionalDetails { [weak self] additionalDetailsData -> AdditionalDetailsResult in
-            guard let self else { return .completion(resultCode: "Error") }
-            return await self.handleAdditionalDetails(additionalDetailsData: additionalDetailsData)
-        }.onComplete { [weak self] result in
-            self?.sendCompleteResult(componentId: "ADVANCED_ADYEN_COMPONENT", result: result)
-        }.onError { [weak self] error in
-            self?.sendErrorResult(componentId: "ADVANCED_ADYEN_COMPONENT", error: error)
-        }
-    }
-
-    // MARK: - Shared configuration builder
-
-    private func createCheckoutConfiguration(
-        configurationDTO: CheckoutConfigurationDTO
-    ) throws -> CheckoutConfiguration {
-        let cardConfig = configurationDTO.cardConfigurationDTO?.mapToCardConfiguration(shopperLocale: configurationDTO.shopperLocale) ?? CardConfiguration()
-        return try CheckoutConfiguration(
-            environment: configurationDTO.environment.mapToEnvironment(),
-            amount: configurationDTO.amount!.mapToAmount(),
-            clientKey: configurationDTO.clientKey,
-            analyticsConfiguration: .init()
-        ) {
-            cardConfig
-        }
+        
     }
 
     // MARK: - Advanced flow handlers

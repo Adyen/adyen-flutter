@@ -42,6 +42,20 @@ extension DropInConfigurationDTO {
     }
 }
 
+extension CheckoutConfigurationDTO {
+    func createCheckoutConfiguration() throws -> CheckoutConfiguration {
+        let cardConfig = cardConfigurationDTO?.mapToCardConfiguration(shopperLocale: shopperLocale) ?? CardConfiguration()
+        return try CheckoutConfiguration(
+            environment: environment.mapToEnvironment(),
+            amount: amount!.mapToAmount(),
+            clientKey: clientKey,
+            analyticsConfiguration: AnalyticsConfiguration(isEnabled: analyticsOptionsDTO.enabled)
+        ) {
+            cardConfig
+        }
+    }
+}
+
 extension FieldVisibility {
     func toCardFieldVisibility() -> CardConfiguration.FieldVisibility {
         switch self {

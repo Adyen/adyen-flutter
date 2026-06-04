@@ -3,7 +3,6 @@ package com.adyen.checkout.flutter
 import android.annotation.SuppressLint
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.lifecycleScope
-import com.adyen.checkout.components.core.PaymentMethodsApiResponse
 import com.adyen.checkout.core.common.CheckoutContext
 import com.adyen.checkout.core.components.Checkout
 import com.adyen.checkout.core.components.CheckoutConfiguration
@@ -54,11 +53,11 @@ class CheckoutPlatformApi(
         activity.lifecycleScope.launch(Dispatchers.IO) {
             try {
                 val sessionResponse = sessionResponseDTO.mapToSessionResponse()
-                val checkoutConfiguration = createConfiguration(checkoutConfigurationDTO)
+                val configuration = createConfiguration(checkoutConfigurationDTO)
                 val checkoutResult =
                     Checkout.setup(
                         sessionResponse,
-                        checkoutConfiguration
+                        configuration
                     )
 
                 when (checkoutResult) {
@@ -93,11 +92,11 @@ class CheckoutPlatformApi(
                 val paymentMethods = PaymentMethods.SERIALIZER.deserialize(
                         org.json.JSONObject(paymentMethodsResponse)
                     )
-                val checkoutConfiguration = checkoutConfigurationDTO.toCheckoutConfiguration()
+                val configuration = checkoutConfigurationDTO.toCheckoutConfiguration()
                 val checkoutResult =
                     Checkout.setup(
                         paymentMethods = paymentMethods,
-                        configuration = checkoutConfiguration
+                        configuration = configuration
                     )
 
                 when (checkoutResult) {
