@@ -954,11 +954,6 @@ abstract class ComponentPlatformInterface {
 
   void onDispose(String componentId);
 }
-// `handleActivityResult` was removed in this version: the deprecated Android
-// `GooglePayComponent.startGooglePayScreen(activity, requestCode)` flow
-// (Adyen Android <5.9) is gone, replaced by `submit()`, which does not need
-// an Activity result callback. See Adyen Android 5.9.0 migration guide:
-// https://docs.adyen.com/payment-methods/google-pay/android-component/migrate
 
 @FlutterApi()
 abstract class ComponentFlutterInterface {

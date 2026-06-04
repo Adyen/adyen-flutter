@@ -928,7 +928,7 @@ class ConfigurationMapperTest {
                 merchantAccount = "TestMerchant",
                 googlePaySubmitButtonVisible = true,
                 googlePayButtonStyling = GooglePayButtonStylingDTO(
-                    cornerRadius = 16,
+                    cornerRadius = 16L,
                     buttonTheme = com.adyen.checkout.flutter.generated.GooglePayStylingButtonTheme.DARK,
                     buttonType = com.adyen.checkout.flutter.generated.GooglePayStylingButtonType.BUY,
                 ),

@@ -83,11 +83,7 @@ class GooglePayComponentManager(
     fun start() {
         googlePayComponent?.let {
             assignCurrentComponent(it)
-            // Adyen 5.9+ replacement for the deprecated startGooglePayScreen(activity, requestCode).
-            // submit() does not need an Activity result callback — the Adyen component pushes
-            // results through GooglePayCallback (advanced) or the session callback (session).
-            // See https://docs.adyen.com/payment-methods/google-pay/android-component/migrate
-            googlePayComponent?.submit()
+            it.submit()
         }
     }
 

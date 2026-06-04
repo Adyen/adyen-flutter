@@ -219,9 +219,6 @@ object ConfigurationMapper {
                     configurationDTO.billingAddressRequired?.let { isBillingAddressRequired = it }
                     billingAddressParameters =
                         configurationDTO.billingAddressParametersDTO?.mapToBillingAddressParameters()
-                    // Adyen 5.9+ button rendering. Both default to "off" so existing
-                    // consumers (who render their own RawGooglePayButton via the pay
-                    // package and call submit() on click) keep working unchanged.
                     configurationDTO.googlePaySubmitButtonVisible?.let { isSubmitButtonVisible = it }
                     configurationDTO.googlePayButtonStyling?.let { googlePayButtonStyling = it.mapToButtonStyling() }
                 }
@@ -325,8 +322,6 @@ object ConfigurationMapper {
         GooglePayButtonStyling(
             buttonTheme = buttonTheme?.mapToAdyenButtonTheme(),
             buttonType = buttonType?.mapToAdyenButtonType(),
-            // Pigeon maps Dart's int? to Kotlin's Long? on the wire; Adyen's
-            // GooglePayButtonStyling.cornerRadius is Int? (DP), so we narrow.
             cornerRadius = cornerRadius?.toInt(),
         )
 
