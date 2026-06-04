@@ -1,27 +1,18 @@
-@_spi(AdyenInternal) import Adyen
+import Adyen
 import UIKit
 
+// TODO: v6 migration - InstantPaymentComponent, PaymentComponentDelegate are now package-access.
 @MainActor
 class BaseInstantComponent {
     let componentFlutterApi: ComponentFlutterInterface
     let componentId: String
-    var instantPaymentComponent: InstantPaymentComponent?
     var activityIndicatorView: UIActivityIndicatorView?
 
     init(componentFlutterApi: ComponentFlutterInterface, componentId: String) {
         self.componentFlutterApi = componentFlutterApi
         self.componentId = componentId
     }
-    
-    func initiatePayment(delegate: PaymentComponentDelegate) {
-        guard let instantPaymentComponent else {
-            return
-        }
-        
-        instantPaymentComponent.initiatePayment(delegate: delegate)
-        showActivityIndicator()
-    }
-    
+
     func sendErrorToFlutterLayer(error: Error) {
         let componentCommunicationModel = ComponentCommunicationModel(
             type: ComponentCommunicationType.result,
@@ -36,17 +27,28 @@ class BaseInstantComponent {
             completion: { _ in }
         )
     }
-    
+
     func getViewController() -> UIViewController? {
-        let rootViewController = UIApplication.shared.adyen.mainKeyWindow?.rootViewController
-        return rootViewController?.adyen.topPresenter
+        var rootViewController = UIApplication.shared.connectedScenes
+            .compactMap { $0 as? UIWindowScene }
+            .flatMap(\.windows)
+            .first { $0.isKeyWindow }?
+            .rootViewController
+        while let presentedViewController = rootViewController?.presentedViewController {
+            rootViewController = presentedViewController
+        }
+        return rootViewController
     }
-    
+
     func showActivityIndicator() {
-        guard let view = UIApplication.shared.adyen.mainKeyWindow else {
+        guard let view = UIApplication.shared.connectedScenes
+            .compactMap({ $0 as? UIWindowScene })
+            .flatMap(\.windows)
+            .first(where: { $0.isKeyWindow })
+        else {
             return
         }
-        let activityIndicatorView = UIActivityIndicatorView(style: .whiteLarge)
+        let activityIndicatorView = UIActivityIndicatorView(style: .large)
         activityIndicatorView.color = .gray
         activityIndicatorView.startAnimating()
         view.addSubview(activityIndicatorView)
@@ -58,7 +60,7 @@ class BaseInstantComponent {
         let bottomConstraint = activityIndicatorView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
         NSLayoutConstraint.activate([leadingConstraint, trailingConstraint, topConstraint, bottomConstraint])
     }
-    
+
     func hideActivityIndicator() {
         activityIndicatorView?.removeFromSuperview()
     }

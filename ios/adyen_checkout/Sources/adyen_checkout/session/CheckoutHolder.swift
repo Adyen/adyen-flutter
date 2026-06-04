@@ -1,26 +1,10 @@
 @_spi(AdyenInternal) import AdyenCheckout
 @_spi(AdyenInternal) import Adyen
-#if canImport(AdyenSession)
-    import AdyenSession
-#endif
 
 class CheckoutHolder {
-    var session: Session?
-    var sessionDelegate: SessionDelegate?
-    var adyenCheckout : Checkout?
-
-    func setup(
-        session: Session,
-        sessionDelegate: SessionDelegate
-    ) {
-        self.session = session
-        self.sessionDelegate = sessionDelegate
-    }
+    var adyenCheckout: PaymentCheckout?
 
     func reset() {
-        (sessionDelegate as? ComponentSessionFlowHandler)?.reset()
-        session = nil
-        sessionDelegate = nil
         adyenCheckout = nil
     }
 }

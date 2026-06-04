@@ -6,13 +6,13 @@ import PackageDescription
 let package = Package(
     name: "adyen_checkout",
     platforms: [
-        .iOS("15.0")
+        .iOS("16.0")
     ],
     products: [
         .library(name: "adyen-checkout", targets: ["adyen_checkout"])
     ],
     dependencies: [
-        .package(url: "https://github.com/Adyen/adyen-ios", revision: "ad6daf6655f2ed5155f81e8b99b07e4bd6ffd4bd")
+        .package(url: "https://github.com/Adyen/adyen-ios", branch: "develop")
     ],
     targets: [
         .target(

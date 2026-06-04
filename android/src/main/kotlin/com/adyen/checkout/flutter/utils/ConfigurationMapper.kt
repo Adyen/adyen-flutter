@@ -1,7 +1,8 @@
 package com.adyen.checkout.flutter.utils
 
-import com.adyen.checkout.card.FieldMode
+import com.adyen.checkout.card.FieldVisibility as SdkFieldVisibility
 import com.adyen.checkout.card.card
+import com.adyen.checkout.threeds2.threeDS2
 import com.adyen.checkout.card.old.AddressConfiguration
 import com.adyen.checkout.card.old.InstallmentConfiguration
 import com.adyen.checkout.card.old.InstallmentOptions
@@ -185,23 +186,22 @@ object ConfigurationMapper {
             analyticsConfiguration = analyticsConfiguration,
         ).apply {
             cardConfigurationDTO?.let { configurationDTO ->
-                card {
-                    supportedCardBrands = mapToSupportedCardBrands(configurationDTO.supportedCardTypes)
-                    showHolderName = configurationDTO.holderNameRequired
-                    showStorePayment = configurationDTO.showStorePaymentField
-                    hideSecurityCode = !configurationDTO.showCvc
-                    hideStoredSecurityCode = !configurationDTO.showCvcForStoredCard
-                    koreanAuthenticationMode = determineFieldVisibility(configurationDTO.kcpFieldVisibility)
-                    socialSecurityNumberMode =
-                        determineFieldVisibility(configurationDTO.socialSecurityNumberFieldVisibility)
-//                    addressConfiguration = configurationDTO.addressMode.mapToAddressConfiguration()
-                }
+                card(
+                    supportedCardBrands = mapToSupportedCardBrands(configurationDTO.supportedCardTypes),
+                    showCardholderName = configurationDTO.holderNameRequired,
+                    showStorePaymentMethod = configurationDTO.showStorePaymentField,
+                    showSecurityCode = configurationDTO.showCvc,
+                    showSecurityCodeForStoredCard = configurationDTO.showCvcForStoredCard,
+                    koreanAuthenticationVisibility = determineFieldVisibility(configurationDTO.kcpFieldVisibility),
+                    socialSecurityNumberVisibility = determineFieldVisibility(configurationDTO.socialSecurityNumberFieldVisibility)
+                )
             }
 
             threeDS2ConfigurationDTO?.let { configurationDTO ->
-//                adyen3DS2 {
-//                    threeDSRequestorAppURL = configurationDTO.requestorAppURL
-//                }
+                threeDS2(
+                    threeDSRequestorAppURL = configurationDTO.requestorAppURL,
+                    uiCustomization = configurationDTO.uiCustomization?.toUiCustomization()
+                )
             }
 
             googlePayConfigurationDTO?.let { configurationDTO ->
@@ -283,10 +283,10 @@ object ConfigurationMapper {
             AddressMode.NONE -> AddressConfiguration.None
         }
 
-    fun determineFieldVisibility(fieldVisibility: FieldVisibility): FieldMode =
+    fun determineFieldVisibility(fieldVisibility: FieldVisibility): SdkFieldVisibility =
         when (fieldVisibility) {
-            FieldVisibility.SHOW -> FieldMode.SHOW
-            FieldVisibility.HIDE -> FieldMode.HIDE
+            FieldVisibility.SHOW -> SdkFieldVisibility.SHOW
+            FieldVisibility.HIDE -> SdkFieldVisibility.HIDE
         }
 
     private fun mapToSupportedCardBrands(cardTypes: List<String?>?): List<CardBrand> =

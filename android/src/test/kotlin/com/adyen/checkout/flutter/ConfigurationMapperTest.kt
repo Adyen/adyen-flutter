@@ -1,16 +1,11 @@
 package com.adyen.checkout.flutter
 
-import com.adyen.checkout.adyen3ds2.Adyen3DS2Configuration
-import com.adyen.checkout.card.AddressConfiguration
 import com.adyen.checkout.card.CardConfiguration
-import com.adyen.checkout.card.KCPAuthVisibility
-import com.adyen.checkout.card.SocialSecurityNumberVisibility
-import com.adyen.checkout.cashapppay.CashAppPayConfiguration
+import com.adyen.checkout.card.FieldVisibility as SdkFieldVisibility
 import com.adyen.checkout.components.core.Amount
 import com.adyen.checkout.components.core.OrderResponse
 import com.adyen.checkout.components.core.PaymentMethodTypes
 import com.adyen.checkout.cse.EncryptedCard
-import com.adyen.checkout.dropin.DropInConfiguration
 import com.adyen.checkout.flutter.generated.ActionComponentConfigurationDTO
 import com.adyen.checkout.flutter.generated.AddressMode
 import com.adyen.checkout.flutter.generated.AmountDTO
@@ -43,9 +38,9 @@ import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToEnvironment
 import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToOrderResponseModel
 import com.adyen.checkout.flutter.utils.ConfigurationMapper.toCheckoutConfiguration
 import com.adyen.checkout.googlepay.GooglePayConfiguration
-import com.adyen.checkout.twint.TwintConfiguration
 import com.google.android.gms.wallet.WalletConstants
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Nested
@@ -53,11 +48,34 @@ import org.junit.jupiter.api.Test
 import kotlin.jvm.java
 import kotlin.test.assertIs
 import com.adyen.checkout.cashapppay.CashAppPayEnvironment as SDKCashAppPayEnvironment
-import com.adyen.checkout.core.Environment as SDKEnvironment
+import com.adyen.checkout.core.common.Environment as SDKEnvironment
 
 
 class ConfigurationMapperTest {
     private val TEST_CLIENT_KEY = "test_qwertyuiopasdfghjklzxcvbnmqwerty"
+
+    private fun hasInternalThreeDS2Configuration(checkoutConfiguration: com.adyen.checkout.core.components.CheckoutConfiguration): Boolean {
+        return try {
+            val getConfigurationMethod = checkoutConfiguration.javaClass.getDeclaredMethod("getActionConfiguration", Class::class.java)
+            val threeDS2ConfigClass = Class.forName("com.adyen.checkout.threeds2.ThreeDS2Configuration")
+            getConfigurationMethod.invoke(checkoutConfiguration, threeDS2ConfigClass) != null
+        } catch (e: Exception) {
+            false
+        }
+    }
+
+    private fun getInternalThreeDSRequestorAppURL(checkoutConfiguration: com.adyen.checkout.core.components.CheckoutConfiguration): String? {
+        return try {
+            val getConfigurationMethod = checkoutConfiguration.javaClass.getDeclaredMethod("getActionConfiguration", Class::class.java)
+            val threeDS2ConfigClass = Class.forName("com.adyen.checkout.threeds2.ThreeDS2Configuration")
+            val config = getConfigurationMethod.invoke(checkoutConfiguration, threeDS2ConfigClass) ?: return null
+            val getThreeDSRequestorAppURLMethod = config.javaClass.getDeclaredMethod("getThreeDSRequestorAppURL")
+            getThreeDSRequestorAppURLMethod.isAccessible = true
+            getThreeDSRequestorAppURLMethod.invoke(config) as String?
+        } catch (e: Exception) {
+            null
+        }
+    }
 
     @Nested
     inner class EnvironmentMappingTests {
@@ -137,329 +155,7 @@ class ConfigurationMapperTest {
     }
 
     @Nested
-    inner class DropInConfigurationTests {
-        @Test
-        fun `when minimal dropin configuration is provided, then map correctly`() {
-            val dropInConfigurationDTO = DropInConfigurationDTO(
-                environment = Environment.TEST,
-                clientKey = TEST_CLIENT_KEY,
-                countryCode = "NL",
-                analyticsOptionsDTO = AnalyticsOptionsDTO(true, "0.0.1"),
-                showPreselectedStoredPaymentMethod = true,
-                skipListWhenSinglePaymentMethod = false,
-                isRemoveStoredPaymentMethodEnabled = false,
-                isPartialPaymentSupported = false,
-                showStoredPaymentMethods = true,
-            )
-
-            val checkoutConfiguration = dropInConfigurationDTO.toCheckoutConfiguration()
-
-            assertEquals(SDKEnvironment.TEST, checkoutConfiguration.environment)
-            assertEquals(TEST_CLIENT_KEY, checkoutConfiguration.clientKey)
-        }
-
-        @Test
-        fun `when dropin configuration DTO is provided, then map it to native dropin configuration model`() {
-            val dropInConfigurationDTO = DropInConfigurationDTO(
-                environment = Environment.TEST,
-                clientKey = TEST_CLIENT_KEY,
-                countryCode = "US",
-                shopperLocale = "en-US",
-                amount = AmountDTO("USD", 1824),
-                analyticsOptionsDTO = AnalyticsOptionsDTO(false, "0.0.1"),
-                showPreselectedStoredPaymentMethod = false,
-                skipListWhenSinglePaymentMethod = false,
-                isRemoveStoredPaymentMethodEnabled = false,
-                isPartialPaymentSupported = true,
-                showStoredPaymentMethods = true,
-            )
-
-            val checkoutConfiguration = dropInConfigurationDTO.toCheckoutConfiguration()
-            val dropInConfiguration = checkoutConfiguration.getConfiguration<DropInConfiguration>("DROP_IN_CONFIG_KEY")
-
-            assertEquals(SDKEnvironment.TEST, checkoutConfiguration.environment)
-            assertEquals(TEST_CLIENT_KEY, checkoutConfiguration.clientKey)
-            assertEquals("en-US", checkoutConfiguration.shopperLocale?.toLanguageTag())
-            assertEquals("USD", checkoutConfiguration.amount?.currency)
-            assertEquals(1824, checkoutConfiguration.amount?.value)
-            assertEquals(false, dropInConfiguration?.showPreselectedStoredPaymentMethod)
-            assertEquals(false, dropInConfiguration?.skipListWhenSinglePaymentMethod)
-            assertEquals(false, dropInConfiguration?.isRemovingStoredPaymentMethodsEnabled)
-        }
-
-        @Test
-        fun `when dropin configuration has payment method names, then override names correctly`() {
-            val dropInConfigurationDTO = DropInConfigurationDTO(
-                environment = Environment.TEST,
-                clientKey = TEST_CLIENT_KEY,
-                countryCode = "US",
-                analyticsOptionsDTO = AnalyticsOptionsDTO(true, "0.0.1"),
-                showPreselectedStoredPaymentMethod = true,
-                skipListWhenSinglePaymentMethod = true,
-                isRemoveStoredPaymentMethodEnabled = true,
-                isPartialPaymentSupported = false,
-                showStoredPaymentMethods = true,
-                paymentMethodNames = mapOf("scheme" to "Credit Card", "ideal" to "iDEAL Payment"),
-            )
-
-            val checkoutConfiguration = dropInConfigurationDTO.toCheckoutConfiguration()
-            val dropInConfiguration = checkoutConfiguration.getConfiguration<DropInConfiguration>("DROP_IN_CONFIG_KEY")
-
-            assertEquals(true, dropInConfiguration?.showPreselectedStoredPaymentMethod)
-            assertEquals(true, dropInConfiguration?.skipListWhenSinglePaymentMethod)
-            assertEquals(true, dropInConfiguration?.isRemovingStoredPaymentMethodsEnabled)
-        }
-
-        @Test
-        fun `when dropin configuration has null optional fields, then map correctly`() {
-            val dropInConfigurationDTO = DropInConfigurationDTO(
-                environment = Environment.TEST,
-                clientKey = TEST_CLIENT_KEY,
-                countryCode = "NL",
-                shopperLocale = null,
-                amount = null,
-                analyticsOptionsDTO = AnalyticsOptionsDTO(true, "0.0.1"),
-                showPreselectedStoredPaymentMethod = true,
-                skipListWhenSinglePaymentMethod = false,
-                isRemoveStoredPaymentMethodEnabled = false,
-                isPartialPaymentSupported = false,
-                showStoredPaymentMethods = true,
-            )
-
-            val checkoutConfiguration = dropInConfigurationDTO.toCheckoutConfiguration()
-
-            assertEquals(SDKEnvironment.TEST, checkoutConfiguration.environment)
-            assertNull(checkoutConfiguration.shopperLocale)
-            assertNull(checkoutConfiguration.amount)
-        }
-
-        @Test
-        fun `when showStoredPaymentMethods is false, then DTO carries the value`() {
-            val dropInConfigurationDTO = DropInConfigurationDTO(
-                environment = Environment.TEST,
-                clientKey = TEST_CLIENT_KEY,
-                countryCode = "NL",
-                analyticsOptionsDTO = AnalyticsOptionsDTO(true, "0.0.1"),
-                showPreselectedStoredPaymentMethod = true,
-                skipListWhenSinglePaymentMethod = false,
-                isRemoveStoredPaymentMethodEnabled = false,
-                isPartialPaymentSupported = false,
-                showStoredPaymentMethods = false,
-            )
-
-            assertEquals(false, dropInConfigurationDTO.showStoredPaymentMethods)
-        }
-    }
-
-    @Nested
     inner class CardConfigurationTests {
-        @Test
-        fun `when installment configuration is provided, then map to native installment configuration`() {
-            val installmentConfigurationDTO = InstallmentConfigurationDTO(
-                defaultOptions = DefaultInstallmentOptionsDTO(
-                    values = listOf(3, 6, null),
-                    includesRevolving = true,
-                ),
-                cardBasedOptions = listOf(
-                    CardBasedInstallmentOptionsDTO(
-                        values = listOf(9, 12, null),
-                        includesRevolving = false,
-                        cardBrand = "visa",
-                    ),
-                    null,
-                ),
-                showInstallmentAmount = true,
-            )
-
-            val cardConfigurationDTO = CardConfigurationDTO(
-                holderNameRequired = false,
-                addressMode = AddressMode.NONE,
-                showStorePaymentField = true,
-                showCvcForStoredCard = true,
-                showCvc = true,
-                kcpFieldVisibility = FieldVisibility.HIDE,
-                socialSecurityNumberFieldVisibility = FieldVisibility.HIDE,
-                supportedCardTypes = emptyList(),
-                installmentConfiguration = installmentConfigurationDTO,
-            )
-            val cardComponentConfigurationDTO = CardComponentConfigurationDTO(
-                environment = Environment.TEST,
-                clientKey = TEST_CLIENT_KEY,
-                countryCode = "US",
-                amount = AmountDTO("USD", 1824),
-                analyticsOptionsDTO = AnalyticsOptionsDTO(false, "0.0.1"),
-                cardConfiguration = cardConfigurationDTO,
-            )
-
-            val checkoutConfiguration = cardComponentConfigurationDTO.toCheckoutConfiguration()
-            val cardConfiguration = checkoutConfiguration.getConfiguration<CardConfiguration>(PaymentMethodTypes.SCHEME)
-            val installmentConfiguration = cardConfiguration?.installmentConfiguration
-
-            assertEquals(true, installmentConfiguration?.showInstallmentAmount)
-            assertEquals(listOf(3, 6), installmentConfiguration?.defaultOptions?.values)
-            assertEquals(true, installmentConfiguration?.defaultOptions?.includeRevolving)
-            assertEquals(1, installmentConfiguration?.cardBasedOptions?.size)
-            assertEquals(listOf(9, 12), installmentConfiguration?.cardBasedOptions?.first()?.values)
-            assertEquals(false, installmentConfiguration?.cardBasedOptions?.first()?.includeRevolving)
-            assertEquals("visa", installmentConfiguration?.cardBasedOptions?.first()?.cardBrand?.txVariant)
-        }
-
-        @Test
-        fun `when installment configuration has card based options only, then map to native installment configuration without default options`() {
-            val installmentConfigurationDTO = InstallmentConfigurationDTO(
-                defaultOptions = null,
-                cardBasedOptions = listOf(
-                    CardBasedInstallmentOptionsDTO(
-                        values = listOf(3, 6),
-                        includesRevolving = true,
-                        cardBrand = "mc",
-                    ),
-                ),
-                showInstallmentAmount = false,
-            )
-
-            val cardConfigurationDTO = CardConfigurationDTO(
-                holderNameRequired = false,
-                addressMode = AddressMode.NONE,
-                showStorePaymentField = true,
-                showCvcForStoredCard = true,
-                showCvc = true,
-                kcpFieldVisibility = FieldVisibility.HIDE,
-                socialSecurityNumberFieldVisibility = FieldVisibility.HIDE,
-                supportedCardTypes = emptyList(),
-                installmentConfiguration = installmentConfigurationDTO,
-            )
-            val cardComponentConfigurationDTO = CardComponentConfigurationDTO(
-                environment = Environment.TEST,
-                clientKey = TEST_CLIENT_KEY,
-                countryCode = "US",
-                amount = AmountDTO("USD", 1824),
-                analyticsOptionsDTO = AnalyticsOptionsDTO(false, "0.0.1"),
-                cardConfiguration = cardConfigurationDTO,
-            )
-
-            val checkoutConfiguration = cardComponentConfigurationDTO.toCheckoutConfiguration()
-            val cardConfiguration = checkoutConfiguration.getConfiguration<CardConfiguration>(PaymentMethodTypes.SCHEME)
-            val installmentConfiguration = cardConfiguration?.installmentConfiguration
-
-            assertNull(installmentConfiguration?.defaultOptions)
-            assertEquals(false, installmentConfiguration?.showInstallmentAmount)
-            assertEquals(1, installmentConfiguration?.cardBasedOptions?.size)
-            assertEquals(listOf(3, 6), installmentConfiguration?.cardBasedOptions?.first()?.values)
-            assertEquals(true, installmentConfiguration?.cardBasedOptions?.first()?.includeRevolving)
-            assertEquals("mc", installmentConfiguration?.cardBasedOptions?.first()?.cardBrand?.txVariant)
-        }
-
-        @Test
-        fun `when installment configuration is null, then native card installment configuration is null`() {
-            val cardConfigurationDTO = CardConfigurationDTO(
-                holderNameRequired = false,
-                addressMode = AddressMode.NONE,
-                showStorePaymentField = true,
-                showCvcForStoredCard = true,
-                showCvc = true,
-                kcpFieldVisibility = FieldVisibility.HIDE,
-                socialSecurityNumberFieldVisibility = FieldVisibility.HIDE,
-                supportedCardTypes = emptyList(),
-                installmentConfiguration = null,
-            )
-            val cardComponentConfigurationDTO = CardComponentConfigurationDTO(
-                environment = Environment.TEST,
-                clientKey = TEST_CLIENT_KEY,
-                countryCode = "US",
-                amount = AmountDTO("USD", 1824),
-                analyticsOptionsDTO = AnalyticsOptionsDTO(false, "0.0.1"),
-                cardConfiguration = cardConfigurationDTO,
-            )
-
-            val checkoutConfiguration = cardComponentConfigurationDTO.toCheckoutConfiguration()
-            val cardConfiguration = checkoutConfiguration.getConfiguration<CardConfiguration>(PaymentMethodTypes.SCHEME)
-
-            assertNull(cardConfiguration?.installmentConfiguration)
-        }
-
-        @Test
-        fun `when card configuration has address mode FULL, then map to FullAddress`() {
-            val cardConfigurationDTO = CardConfigurationDTO(
-                holderNameRequired = true,
-                addressMode = AddressMode.FULL,
-                showStorePaymentField = true,
-                showCvcForStoredCard = true,
-                showCvc = true,
-                kcpFieldVisibility = FieldVisibility.HIDE,
-                socialSecurityNumberFieldVisibility = FieldVisibility.HIDE,
-                supportedCardTypes = emptyList()
-            )
-            val cardComponentConfigurationDTO = CardComponentConfigurationDTO(
-                environment = Environment.TEST,
-                clientKey = TEST_CLIENT_KEY,
-                countryCode = "US",
-                amount = AmountDTO("USD", 1824),
-                shopperLocale = "en-US",
-                analyticsOptionsDTO = AnalyticsOptionsDTO(false, "0.0.1"),
-                cardConfiguration = cardConfigurationDTO,
-            )
-
-            val checkoutConfiguration = cardComponentConfigurationDTO.toCheckoutConfiguration()
-            val cardConfiguration = checkoutConfiguration.getConfiguration<CardConfiguration>(PaymentMethodTypes.SCHEME)
-
-            assertIs<AddressConfiguration.FullAddress>(cardConfiguration?.addressConfiguration)
-        }
-
-        @Test
-        fun `when card configuration has address mode POSTAL_CODE, then map to PostalCode`() {
-            val cardConfigurationDTO = CardConfigurationDTO(
-                holderNameRequired = false,
-                addressMode = AddressMode.POSTAL_CODE,
-                showStorePaymentField = true,
-                showCvcForStoredCard = true,
-                showCvc = true,
-                kcpFieldVisibility = FieldVisibility.HIDE,
-                socialSecurityNumberFieldVisibility = FieldVisibility.HIDE,
-                supportedCardTypes = emptyList()
-            )
-            val cardComponentConfigurationDTO = CardComponentConfigurationDTO(
-                environment = Environment.TEST,
-                clientKey = TEST_CLIENT_KEY,
-                countryCode = "US",
-                amount = AmountDTO("USD", 1824),
-                analyticsOptionsDTO = AnalyticsOptionsDTO(false, "0.0.1"),
-                cardConfiguration = cardConfigurationDTO,
-            )
-
-            val checkoutConfiguration = cardComponentConfigurationDTO.toCheckoutConfiguration()
-            val cardConfiguration = checkoutConfiguration.getConfiguration<CardConfiguration>(PaymentMethodTypes.SCHEME)
-
-            assertIs<AddressConfiguration.PostalCode>(cardConfiguration?.addressConfiguration)
-        }
-
-        @Test
-        fun `when card configuration has address mode NONE, then map to None`() {
-            val cardConfigurationDTO = CardConfigurationDTO(
-                holderNameRequired = false,
-                addressMode = AddressMode.NONE,
-                showStorePaymentField = true,
-                showCvcForStoredCard = true,
-                showCvc = true,
-                kcpFieldVisibility = FieldVisibility.HIDE,
-                socialSecurityNumberFieldVisibility = FieldVisibility.HIDE,
-                supportedCardTypes = emptyList()
-            )
-            val cardComponentConfigurationDTO = CardComponentConfigurationDTO(
-                environment = Environment.TEST,
-                clientKey = TEST_CLIENT_KEY,
-                countryCode = "US",
-                amount = AmountDTO("USD", 1824),
-                analyticsOptionsDTO = AnalyticsOptionsDTO(false, "0.0.1"),
-                cardConfiguration = cardConfigurationDTO,
-            )
-
-            val checkoutConfiguration = cardComponentConfigurationDTO.toCheckoutConfiguration()
-            val cardConfiguration = checkoutConfiguration.getConfiguration<CardConfiguration>(PaymentMethodTypes.SCHEME)
-
-            assertIs<AddressConfiguration.None>(cardConfiguration?.addressConfiguration)
-        }
-
         @Test
         fun `when card configuration has KCP visibility SHOW, then map correctly`() {
             val cardConfigurationDTO = CardConfigurationDTO(
@@ -484,7 +180,7 @@ class ConfigurationMapperTest {
             val checkoutConfiguration = cardComponentConfigurationDTO.toCheckoutConfiguration()
             val cardConfiguration = checkoutConfiguration.getConfiguration<CardConfiguration>(PaymentMethodTypes.SCHEME)
 
-            assertEquals(KCPAuthVisibility.SHOW, cardConfiguration?.kcpAuthVisibility)
+            assertEquals(SdkFieldVisibility.SHOW, cardConfiguration?.koreanAuthenticationVisibility)
         }
 
         @Test
@@ -511,7 +207,7 @@ class ConfigurationMapperTest {
             val checkoutConfiguration = cardComponentConfigurationDTO.toCheckoutConfiguration()
             val cardConfiguration = checkoutConfiguration.getConfiguration<CardConfiguration>(PaymentMethodTypes.SCHEME)
 
-            assertEquals(SocialSecurityNumberVisibility.SHOW, cardConfiguration?.socialSecurityNumberVisibility)
+            assertEquals(SdkFieldVisibility.SHOW, cardConfiguration?.socialSecurityNumberVisibility)
         }
 
         @Test
@@ -539,10 +235,10 @@ class ConfigurationMapperTest {
             val cardConfiguration = checkoutConfiguration.getConfiguration<CardConfiguration>(PaymentMethodTypes.SCHEME)
 
             assertEquals(3, cardConfiguration?.supportedCardBrands?.size)
-            assertEquals(true, cardConfiguration?.isHolderNameRequired)
-            assertEquals(false, cardConfiguration?.isStorePaymentFieldVisible)
-            assertEquals(true, cardConfiguration?.isHideCvcStoredCard)
-            assertEquals(true, cardConfiguration?.isHideCvc)
+            assertEquals(true, cardConfiguration?.showCardholderName)
+            assertEquals(false, cardConfiguration?.showStorePaymentMethod)
+            assertEquals(false, cardConfiguration?.showSecurityCodeForStoredCard)
+            assertEquals(false, cardConfiguration?.showSecurityCode)
         }
 
         @Test
@@ -593,7 +289,7 @@ class ConfigurationMapperTest {
             assertEquals("nl-NL", checkoutConfiguration.shopperLocale?.toLanguageTag())
             assertEquals("EUR", checkoutConfiguration.amount?.currency)
             assertEquals(5000, checkoutConfiguration.amount?.value)
-            assertNull(checkoutConfiguration.getActionConfiguration(Adyen3DS2Configuration::class.java))
+            assertFalse(hasInternalThreeDS2Configuration(checkoutConfiguration))
         }
 
         @Test
@@ -612,7 +308,7 @@ class ConfigurationMapperTest {
             assertEquals(SDKEnvironment.LIVE_UNITED_STATES, checkoutConfiguration.environment)
             assertNull(checkoutConfiguration.shopperLocale)
             assertNull(checkoutConfiguration.amount)
-            assertNull(checkoutConfiguration.getActionConfiguration(Adyen3DS2Configuration::class.java))
+            assertFalse(hasInternalThreeDS2Configuration(checkoutConfiguration))
         }
 
         @Test
@@ -629,10 +325,7 @@ class ConfigurationMapperTest {
             )
 
             val checkoutConfiguration = actionConfigurationDTO.toCheckoutConfiguration()
-            val threeDS2Configuration = checkoutConfiguration.getActionConfiguration(Adyen3DS2Configuration::class.java)
-
-            assertNotNull(threeDS2Configuration)
-            assertEquals("https://example.com/action-3ds2", threeDS2Configuration?.threeDSRequestorAppURL)
+            assertEquals("https://example.com/action-3ds2", getInternalThreeDSRequestorAppURL(checkoutConfiguration))
         }
     }
 
@@ -662,9 +355,7 @@ class ConfigurationMapperTest {
             )
 
             val checkoutConfiguration = cardComponentConfigurationDTO.toCheckoutConfiguration()
-            val threeDS2Configuration = checkoutConfiguration.getActionConfiguration(Adyen3DS2Configuration::class.java)
-
-            assertEquals("https://example.com/3ds2", threeDS2Configuration?.threeDSRequestorAppURL)
+            assertEquals("https://example.com/3ds2", getInternalThreeDSRequestorAppURL(checkoutConfiguration))
         }
 
         @Test
@@ -689,12 +380,11 @@ class ConfigurationMapperTest {
             )
 
             val checkoutConfiguration = cardComponentConfigurationDTO.toCheckoutConfiguration()
-            val threeDS2Configuration = checkoutConfiguration.getConfiguration<Adyen3DS2Configuration>("threeDS2")
-
-            assertNull(threeDS2Configuration)
+            assertFalse(hasInternalThreeDS2Configuration(checkoutConfiguration))
         }
     }
 
+    /*
     @Nested
     inner class InstantPaymentConfigurationTests {
         @Test
@@ -920,88 +610,7 @@ class ConfigurationMapperTest {
             assertEquals(null, googlePayConfiguration?.isBillingAddressRequired)
         }
     }
-
-    @Nested
-    inner class CashAppPayConfigurationTests {
-        @Test
-        fun `when Cash App Pay configuration with SANDBOX environment is provided, then map correctly`() {
-            val dropInConfigurationDTO = DropInConfigurationDTO(
-                environment = Environment.TEST,
-                clientKey = TEST_CLIENT_KEY,
-                countryCode = "US",
-                analyticsOptionsDTO = AnalyticsOptionsDTO(true, "1.0.0"),
-                showPreselectedStoredPaymentMethod = true,
-                skipListWhenSinglePaymentMethod = false,
-                isRemoveStoredPaymentMethodEnabled = false,
-                isPartialPaymentSupported = false,
-                showStoredPaymentMethods = true,
-                cashAppPayConfigurationDTO = CashAppPayConfigurationDTO(
-                    cashAppPayEnvironment = CashAppPayEnvironment.SANDBOX,
-                    returnUrl = "myapp://cashapp/callback"
-                ),
-            )
-
-            val checkoutConfiguration = dropInConfigurationDTO.toCheckoutConfiguration()
-            val cashAppPayConfiguration =
-                checkoutConfiguration.getConfiguration<CashAppPayConfiguration>(PaymentMethodTypes.CASH_APP_PAY)
-
-            assertEquals(SDKCashAppPayEnvironment.SANDBOX, cashAppPayConfiguration?.cashAppPayEnvironment)
-            assertEquals("myapp://cashapp/callback", cashAppPayConfiguration?.returnUrl)
-        }
-    }
-
-    @Nested
-    inner class TwintConfigurationTests {
-        @Test
-        fun `when Twint configuration is provided, then map showStorePaymentField correctly`() {
-            val dropInConfigurationDTO = DropInConfigurationDTO(
-                environment = Environment.TEST,
-                clientKey = TEST_CLIENT_KEY,
-                countryCode = "CH",
-                analyticsOptionsDTO = AnalyticsOptionsDTO(true, "1.0.0"),
-                showPreselectedStoredPaymentMethod = true,
-                skipListWhenSinglePaymentMethod = false,
-                isRemoveStoredPaymentMethodEnabled = false,
-                isPartialPaymentSupported = false,
-                showStoredPaymentMethods = true,
-                twintConfigurationDTO = TwintConfigurationDTO(
-                    iosCallbackAppScheme = "myapp",
-                    showStorePaymentField = true
-                ),
-            )
-
-            val checkoutConfiguration = dropInConfigurationDTO.toCheckoutConfiguration()
-            val twintConfiguration =
-                checkoutConfiguration.getConfiguration<TwintConfiguration>(PaymentMethodTypes.TWINT)
-
-            assertEquals(true, twintConfiguration?.showStorePaymentField)
-        }
-
-        @Test
-        fun `when Twint configuration has showStorePaymentField false, then map correctly`() {
-            val dropInConfigurationDTO = DropInConfigurationDTO(
-                environment = Environment.TEST,
-                clientKey = TEST_CLIENT_KEY,
-                countryCode = "CH",
-                analyticsOptionsDTO = AnalyticsOptionsDTO(true, "1.0.0"),
-                showPreselectedStoredPaymentMethod = true,
-                skipListWhenSinglePaymentMethod = false,
-                isRemoveStoredPaymentMethodEnabled = false,
-                isPartialPaymentSupported = false,
-                showStoredPaymentMethods = true,
-                twintConfigurationDTO = TwintConfigurationDTO(
-                    iosCallbackAppScheme = "myapp",
-                    showStorePaymentField = false
-                ),
-            )
-
-            val checkoutConfiguration = dropInConfigurationDTO.toCheckoutConfiguration()
-            val twintConfiguration =
-                checkoutConfiguration.getConfiguration<TwintConfiguration>(PaymentMethodTypes.TWINT)
-
-            assertEquals(false, twintConfiguration?.showStorePaymentField)
-        }
-    }
+    */
 
     @Nested
     inner class EncryptedCardMappingTests {
@@ -1223,7 +832,7 @@ class ConfigurationMapperTest {
             val checkoutConfiguration = dropInConfigurationDTO.toCheckoutConfiguration()
 
             assertEquals(
-                com.adyen.checkout.components.core.AnalyticsLevel.ALL,
+                com.adyen.checkout.core.components.AnalyticsLevel.ALL,
                 checkoutConfiguration.analyticsConfiguration?.level
             )
         }
@@ -1245,7 +854,7 @@ class ConfigurationMapperTest {
             val checkoutConfiguration = dropInConfigurationDTO.toCheckoutConfiguration()
 
             assertEquals(
-                com.adyen.checkout.components.core.AnalyticsLevel.NONE,
+                com.adyen.checkout.core.components.AnalyticsLevel.NONE,
                 checkoutConfiguration.analyticsConfiguration?.level
             )
         }

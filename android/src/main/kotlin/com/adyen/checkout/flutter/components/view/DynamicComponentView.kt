@@ -25,7 +25,10 @@ import com.adyen.checkout.core.common.CheckoutContext
 import com.adyen.checkout.core.components.CheckoutCallbacks
 import com.adyen.checkout.core.components.CheckoutPaymentMethod
 import com.adyen.checkout.core.components.CheckoutTarget
-import com.adyen.checkout.core.components.NewCheckoutController
+import com.adyen.checkout.core.components.CheckoutController
+import com.adyen.checkout.core.components.AdvancedCheckoutCallbacks
+import com.adyen.checkout.core.components.CheckoutPaymentFlow
+import com.adyen.checkout.core.components.SessionCheckoutCallbacks
 import com.adyen.checkout.core.components.data.model.paymentmethod.PaymentMethod
 import com.adyen.checkout.flutter.components.ComponentPlatformEventHandler
 import com.adyen.checkout.flutter.generated.ComponentCommunicationModel
@@ -81,33 +84,46 @@ class DynamicComponentView
         }
 
         fun addV6Component(
+            activity: ComponentActivity,
             paymentMethod: PaymentMethod,
             checkoutContext: CheckoutContext,
             callbacks: CheckoutCallbacks
         ) {
             val navigationEventDispatcherOwner =
-                (context as? ComponentActivity)
-                    ?.window
+                activity.window
                     ?.decorView
                     ?.findViewTreeNavigationEventDispatcherOwner()
 
             addView(
-                ComposeView(context).apply {
+                ComposeView(activity).apply {
                     setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
                     setContent {
                         ProvideNavigationEventDispatcherOwner(navigationEventDispatcherOwner) {
                             val coroutineScope = rememberCoroutineScope()
                             val controller =
                                 remember(paymentMethod, checkoutContext, callbacks) {
-                                    NewCheckoutController(
-                                        target = CheckoutTarget.PaymentMethod(paymentMethod.type),
-                                        context = checkoutContext,
-                                        callbacks = callbacks,
-                                        applicationContext = context.applicationContext,
-                                        coroutineScope = coroutineScope,
-                                    )
+                                    if (checkoutContext is CheckoutContext.Advanced && callbacks is AdvancedCheckoutCallbacks) {
+                                        CheckoutController(
+                                            target = CheckoutTarget.PaymentMethod(paymentMethod.type.orEmpty()),
+                                            context = checkoutContext,
+                                            callbacks = callbacks,
+                                            coroutineScope = coroutineScope,
+                                        )
+                                    } else if (checkoutContext is CheckoutContext.Sessions && callbacks is SessionCheckoutCallbacks) {
+                                        CheckoutController(
+                                            target = CheckoutTarget.PaymentMethod(paymentMethod.type.orEmpty()),
+                                            context = checkoutContext,
+                                            callbacks = callbacks,
+                                            coroutineScope = coroutineScope,
+                                        )
+                                    } else {
+                                        throw IllegalArgumentException("Invalid combination of CheckoutContext and CheckoutCallbacks")
+                                    }
                                 }
-                            CheckoutPaymentMethod(controller = controller)
+                            CheckoutPaymentFlow(controller)
+//                            CheckoutPaymentMethod(controller = controller, onNavigate = { route ->
+//                                println("route: $route")
+//                            })
                         }
                     }
                 }

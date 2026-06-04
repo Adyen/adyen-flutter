@@ -1,12 +1,8 @@
 @_spi(AdyenInternal) import Adyen
-#if canImport(AdyenComponents)
-    import AdyenComponents
-#endif
-#if canImport(AdyenSession)
-    import AdyenSession
-#endif
+@_spi(AdyenInternal) import AdyenCheckout
 import Flutter
 
+// TODO: v6 migration - Session, SessionDelegate are now package-access.
 class BlikSessionComponent: BaseBlikComponent {
     let checkoutHolder: CheckoutHolder
 
@@ -34,43 +30,18 @@ class BlikSessionComponent: BaseBlikComponent {
 
     private func setupBlikComponentView() {
         do {
-            let blikComponent = try setupBlikComponent()
+            guard let checkout = checkoutHolder.adyenCheckout else {
+                throw PlatformError(errorDescription: "Checkout not available")
+            }
+            guard let paymentMethodString = paymentMethod else {
+                throw PlatformError(errorDescription: "Payment method not found")
+            }
+            let blikPaymentMethod = try JSONDecoder().decode(BLIKPaymentMethod.self, from: Data(paymentMethodString.utf8))
+            let blikComponent = try buildBlikComponent(adyenCheckout: checkout, blikPaymentMethod: blikPaymentMethod)
             showBlikComponent(blikComponent: blikComponent)
             componentPlatformApi.register(blikBaseComponent: self)
-            setupSessionFlowDelegate()
         } catch {
             sendErrorToFlutterLayer(errorMessage: error.localizedDescription)
         }
     }
-
-    private func setupBlikComponent() throws -> BLIKComponent {
-        guard let session = checkoutHolder.session else { throw PlatformError(errorDescription: "Session not found") }
-        return try buildBlikComponent(
-            paymentMethodString: paymentMethod,
-            blikComponentConfiguration: blikComponentConfiguration,
-            componentDelegate: session
-        )
-    }
-
-    private func setupSessionFlowDelegate() {
-        if let componentSessionFlowDelegate = (checkoutHolder.sessionDelegate as? ComponentSessionFlowHandler) {
-            componentSessionFlowDelegate.register(
-                componentId: componentId,
-                finalizeCallback: { [weak self] success, completion in
-                    self?.finalizeAndDismissSessionComponent(success: success, completion: completion)
-                }
-            )
-        } else {
-            assertionFailure("Wrong session flow delegate usage")
-        }
-    }
-
-    func finalizeAndDismissSessionComponent(success: Bool, completion: @escaping (() -> Void)) {
-        finalizeAndDismiss(success: success, completion: { [weak self] in
-            guard let self else { return }
-            completion()
-            self.blikComponent = nil
-        })
-    }
-
 }

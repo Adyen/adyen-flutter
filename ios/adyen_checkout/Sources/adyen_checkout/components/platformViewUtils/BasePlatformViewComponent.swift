@@ -34,7 +34,11 @@ class BasePlatformViewComponent: NSObject, FlutterPlatformView, UIScrollViewDele
     }
 
     func getViewController() -> UIViewController? {
-        var rootViewController = UIApplication.shared.adyen.mainKeyWindow?.rootViewController
+        var rootViewController = UIApplication.shared.connectedScenes
+            .compactMap { $0 as? UIWindowScene }
+            .flatMap(\.windows)
+            .first { $0.isKeyWindow }?
+            .rootViewController
         while let presentedViewController = rootViewController?.presentedViewController {
             rootViewController = presentedViewController
         }

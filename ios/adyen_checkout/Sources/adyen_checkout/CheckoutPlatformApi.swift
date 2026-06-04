@@ -45,8 +45,7 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
         Task {
             do {
                 let sessionResponse = sessionResponseDTO.mapToSessionResponse()
-                let checkoutConfiguration = try await createSessionCheckoutConfiguration(
-                    sessionId: sessionResponseDTO.id,
+                let checkoutConfiguration = try createSessionCheckoutConfiguration(
                     configurationDTO: checkoutConfigurationDTO
                 )
                 let checkoutSession = try await Checkout.setup(
@@ -54,6 +53,7 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
                     configuration: checkoutConfiguration
                 )
 
+                setupSessionCallbacks(checkoutSession, sessionId: sessionResponseDTO.id)
                 checkoutHolder.adyenCheckout = checkoutSession
                 let encodedPaymentMethods = try JSONEncoder().encode(checkoutSession.paymentMethods)
                 guard let encodedPaymentMethodsString = String(data: encodedPaymentMethods, encoding: .utf8) else {
@@ -76,12 +76,13 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
             do {
                 let paymentMethodsData = Data(paymentMethodsResponse.utf8)
                 let paymentMethods = try JSONDecoder().decode(PaymentMethods.self, from: paymentMethodsData)
-                let checkoutConfiguration = try await createAdvancedCheckoutConfiguration(configurationDTO: checkoutConfigurationDTO)
+                let checkoutConfiguration = try createAdvancedCheckoutConfiguration(configurationDTO: checkoutConfigurationDTO)
                 let adyenCheckout = try await Checkout.setup(
                     with: paymentMethods,
                     configuration: checkoutConfiguration
                 )
 
+                setupAdvancedCallbacks(adyenCheckout)
                 checkoutHolder.adyenCheckout = adyenCheckout
                 completion(Result.success(()))
             } catch {
@@ -131,194 +132,166 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
         return threeDS2SdkVersion
     }
 
-    private func createSessionForDropIn(
-        configuration: CheckoutConfiguration,
-        adyenContext: AdyenContext,
-        sessionId: String,
-        sessionData: String,
-        completion: @escaping (Result<SessionDTO, Error>) -> Void
-    ) async throws {
-        let sessionDelegate = DropInSessionsDelegate(viewController: getViewController(), checkoutFlutter: checkoutFlutter)
-    }
-
-    private func test() -> CardComponentConfiguration? {
-        return nil
-    }
+    // MARK: - Session checkout configuration
 
     private func createSessionCheckoutConfiguration(
-        sessionId: String,
-        configurationDTO: CheckoutConfigurationDTO,
-    ) async throws -> CheckoutConfiguration {
-        let checkoutConfig = try CheckoutConfiguration(
-            environment: configurationDTO.environment.mapToEnvironment(),
-            amount: configurationDTO.amount!.mapToAmount(),
-            clientKey: configurationDTO.clientKey,
-            analyticsConfiguration: .init()
-        ) {
-            configurationDTO.cardConfigurationDTO!.mapToCardComponentConfiguration(shopperLocale: configurationDTO.shopperLocale)
-        }.onComplete { [weak self] result in
-            print("ON COMPLETE SWIFT INVOKED")
-            let paymentResult = PaymentResultModelDTO(
-                sessionId: sessionId,
-                sessionResult: result.sessionResult,
-                resultCode: result.resultCode.rawValue
-            )
-            let componentCommunicationModel = ComponentCommunicationModel(
-                type: ComponentCommunicationType.result,
-                componentId: "SESSION_ADYEN_COMPONENT",
-                paymentResult: PaymentResultDTO(
-                    type: PaymentResultEnum.finished,
-                    result: paymentResult
-                )
-            )
-            self?.componentPlatformEventHandler.send(event: componentCommunicationModel)
-
-        }.onError { [weak self] error in
-            print("ON ERROR SWIFT INVOKED")
-            let componentCommunicationModel = ComponentCommunicationModel(
-                type: ComponentCommunicationType.result,
-                componentId: "SESSION_ADYEN_COMPONENT",
-                paymentResult: PaymentResultDTO(
-                    type: .from(error: error),
-                    reason: error.localizedDescription
-                )
-            )
-            self?.componentPlatformEventHandler.send(event: componentCommunicationModel)
-        }
-
-        return checkoutConfig
+        configurationDTO: CheckoutConfigurationDTO
+    ) throws -> CheckoutConfiguration {
+        try createCheckoutConfiguration(configurationDTO: configurationDTO)
     }
+
+    private func setupSessionCallbacks(
+        _ checkout: SessionCheckout,
+        sessionId: String
+    ) {
+        checkout.onComplete { [weak self] result in
+            self?.sendCompleteResult(componentId: "SESSION_ADYEN_COMPONENT", sessionId: sessionId, result: result)
+        }.onError { [weak self] error in
+            self?.sendErrorResult(componentId: "SESSION_ADYEN_COMPONENT", error: error)
+        }
+    }
+
+    // MARK: - Advanced checkout configuration
 
     private func createAdvancedCheckoutConfiguration(
-        configurationDTO: CheckoutConfigurationDTO,
-    ) async throws -> CheckoutConfiguration {
-        let checkoutConfig = try CheckoutConfiguration(
+        configurationDTO: CheckoutConfigurationDTO
+    ) throws -> CheckoutConfiguration {
+        try createCheckoutConfiguration(configurationDTO: configurationDTO)
+    }
+
+    private func setupAdvancedCallbacks(_ checkout: AdvancedCheckout) {
+        checkout.onSubmit { [weak self] paymentData -> SubmitResult in
+            guard let self else { return .completion(resultCode: "Error") }
+            return await self.handleSubmit(paymentData: paymentData)
+        }.onAdditionalDetails { [weak self] additionalDetailsData -> AdditionalDetailsResult in
+            guard let self else { return .completion(resultCode: "Error") }
+            return await self.handleAdditionalDetails(additionalDetailsData: additionalDetailsData)
+        }.onComplete { [weak self] result in
+            self?.sendCompleteResult(componentId: "ADVANCED_ADYEN_COMPONENT", sessionId: "", result: result)
+        }.onError { [weak self] error in
+            self?.sendErrorResult(componentId: "ADVANCED_ADYEN_COMPONENT", error: error)
+        }
+    }
+
+    // MARK: - Shared configuration builder
+
+    private func createCheckoutConfiguration(
+        configurationDTO: CheckoutConfigurationDTO
+    ) throws -> CheckoutConfiguration {
+        let cardConfig = configurationDTO.cardConfigurationDTO?.mapToCardConfiguration(shopperLocale: configurationDTO.shopperLocale) ?? CardConfiguration()
+        return try CheckoutConfiguration(
             environment: configurationDTO.environment.mapToEnvironment(),
             amount: configurationDTO.amount!.mapToAmount(),
             clientKey: configurationDTO.clientKey,
             analyticsConfiguration: .init()
         ) {
-            configurationDTO.cardConfigurationDTO!.mapToCardComponentConfiguration(shopperLocale: configurationDTO.shopperLocale)
-        }.onComplete { [weak self] result in
-            print("ON COMPLETE SWIFT INVOKED")
-            let paymentResult = PaymentResultModelDTO(
-                sessionId: "", // REMOVE FROM DTO
-                sessionResult: result.sessionResult,
-                resultCode: result.resultCode.rawValue
-            )
-            let componentCommunicationModel = ComponentCommunicationModel(
-                type: ComponentCommunicationType.result,
-                componentId: "ADVANCED_ADYEN_COMPONENT",
-                paymentResult: PaymentResultDTO(
-                    type: PaymentResultEnum.finished,
-                    result: paymentResult
-                )
-            )
-            self?.componentPlatformEventHandler.send(event: componentCommunicationModel)
-
-        }.onError { [weak self] error in
-            print("ON ERROR SWIFT INVOKED")
-            let componentCommunicationModel = ComponentCommunicationModel(
-                type: ComponentCommunicationType.result,
-                componentId: "ADVANCED_ADYEN_COMPONENT",
-                paymentResult: PaymentResultDTO(
-                    type: .from(error: error),
-                    reason: error.localizedDescription
-                )
-            )
-            self?.componentPlatformEventHandler.send(event: componentCommunicationModel)
-        }.onSubmit { [weak self] paymentData, handler in
-            print("ON SUBMIT SWIFT INVOKED")
-            guard let self else { return }
-            do {
-                let dataJson = try paymentData.toPlatformSubmitDataJson()
-                sendSubmitToFlutter(dataJson: dataJson) { [weak self] result in
-                    guard let self else { return }
-                    switch result {
-                    case let .success(checkoutResult):
-                        self.handleCheckoutResult(checkoutResult, handler: handler)
-                    case let .failure(error):
-                        self.sendErrorResultToFlutter(componentId: "ADVANCED_ADYEN_COMPONENT", reason: error.localizedDescription)
-                        handler?(CheckoutPaymentsResponse(resultCode: .error))
-                    }
-                }
-            } catch {
-                sendErrorResultToFlutter(componentId: "ADVANCED_ADYEN_COMPONENT", reason: error.localizedDescription)
-                handler?(CheckoutPaymentsResponse(resultCode: .error))
-            }
-        }.onAdditionalDetails { [weak self] additionalDetailsData, handler in
-            print("ON ADDITIONAL DETAILS SWIFT INVOKED")
-            guard let self else { return }
-            do {
-                let dataJson = try additionalDetailsData.toPlatformAdditionalDetailsJson()
-                sendAdditionalDetailsToFlutter(dataJson: dataJson) { [weak self] result in
-                    guard let self else { return }
-                    switch result {
-                    case let .success(checkoutResult):
-                        self.handleCheckoutResult(checkoutResult, handler: handler)
-                    case let .failure(error):
-                        self.sendErrorResultToFlutter(componentId: "ADVANCED_ADYEN_COMPONENT", reason: error.localizedDescription)
-                        handler?(CheckoutPaymentsResponse(resultCode: .error))
-                    }
-                }
-            } catch {
-                sendErrorResultToFlutter(componentId: "ADVANCED_ADYEN_COMPONENT", reason: error.localizedDescription)
-                handler?(CheckoutPaymentsResponse(resultCode: .error))
-            }
+            cardConfig
         }
-
-        return checkoutConfig
     }
 
-    private func onSetupSuccess(
-        id: String,
-        checkoutSession: Checkout,
-        completion: @escaping (Result<SessionDTO, Error>) -> Void
-    ) throws {
-        checkoutHolder.adyenCheckout = checkoutSession
-        let encodedPaymentMethods = try JSONEncoder().encode(checkoutSession.paymentMethods)
-        guard let encodedPaymentMethodsString = String(data: encodedPaymentMethods, encoding: .utf8) else {
-            completion(Result.failure(PlatformError(errorDescription: "Encoding payment methods failed")))
-            return
-        }
+    // MARK: - Advanced flow handlers
 
-        completion(Result.success(SessionDTO(
-            id: id,
-            paymentMethodsJson: encodedPaymentMethodsString
-        )))
+    private func handleSubmit(paymentData: PaymentComponentData) async -> SubmitResult {
+        do {
+            let dataJson = try paymentData.toPlatformSubmitDataJson()
+            let checkoutResult = try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<CheckoutResultDTO, Error>) in
+                sendSubmitToFlutter(dataJson: dataJson) { result in
+                    switch result {
+                    case let .success(dto):
+                        continuation.resume(returning: dto)
+                    case let .failure(error):
+                        continuation.resume(throwing: error)
+                    }
+                }
+            }
+            return mapCheckoutResultToSubmitResult(checkoutResult)
+        } catch {
+            sendErrorResultToFlutter(componentId: "ADVANCED_ADYEN_COMPONENT", reason: error.localizedDescription)
+            return .completion(resultCode: "Error")
+        }
     }
 
-    private func buildActionComponentConfiguration(from threeDS2ConfigurationDTO: ThreeDS2ConfigurationDTO?) -> CheckoutActionComponent.Configuration? {
-            threeDS2ConfigurationDTO.map {
-                var actionComponentConfiguration = CheckoutActionComponent.Configuration()
-                actionComponentConfiguration.threeDS = $0.mapToThreeDS2Configuration()
-                return actionComponentConfiguration
+    private func handleAdditionalDetails(additionalDetailsData: ActionComponentData) async -> AdditionalDetailsResult {
+        do {
+            let dataJson = try additionalDetailsData.toPlatformAdditionalDetailsJson()
+            let checkoutResult = try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<CheckoutResultDTO, Error>) in
+                sendAdditionalDetailsToFlutter(dataJson: dataJson) { result in
+                    switch result {
+                    case let .success(dto):
+                        continuation.resume(returning: dto)
+                    case let .failure(error):
+                        continuation.resume(throwing: error)
+                    }
+                }
             }
+            return mapCheckoutResultToAdditionalDetailsResult(checkoutResult)
+        } catch {
+            sendErrorResultToFlutter(componentId: "ADVANCED_ADYEN_COMPONENT", reason: error.localizedDescription)
+            return .completion(resultCode: "Error")
         }
+    }
 
-    private func handleCheckoutResult(
-        _ checkoutResult: CheckoutResultDTO,
-        handler: PaymentsResponseHandler?
-    ) {
-        guard let handler else { return }
+    private func mapCheckoutResultToSubmitResult(_ checkoutResult: CheckoutResultDTO) -> SubmitResult {
         switch checkoutResult {
         case let result as FinishedResultDTO:
-            handler(CheckoutPaymentsResponse(resultCode: .init(rawValue: result.resultCode)))
+            return .completion(resultCode: result.resultCode)
+        case let result as ActionResultDTO:
+            if let action = try? JSONDecoder().decode(Action.self, from: Data(result.actionResponse.utf8)) {
+                return .action(action)
+            }
+            sendErrorResultToFlutter(componentId: "ADVANCED_ADYEN_COMPONENT", reason: "Failed to decode action.")
+            return .completion(resultCode: "Error")
         case let result as ErrorResultDTO:
             sendErrorResultToFlutter(componentId: "ADVANCED_ADYEN_COMPONENT", reason: result.errorMessage)
-            handler(CheckoutPaymentsResponse(resultCode: .error))
-        case let result as ActionResultDTO:
-            do {
-                let action = try JSONDecoder().decode(Action.self, from: Data(result.actionResponse.utf8))
-                handler(CheckoutPaymentsResponse(resultCode: .redirectShopper, action: action))
-            } catch {
-                sendErrorResultToFlutter(componentId: "ADVANCED_ADYEN_COMPONENT", reason: error.localizedDescription)
-                handler(CheckoutPaymentsResponse(resultCode: .error))
-            }
+            return .completion(resultCode: "Error")
         default:
             sendErrorResultToFlutter(componentId: "ADVANCED_ADYEN_COMPONENT", reason: "Unsupported checkout result.")
-            handler(CheckoutPaymentsResponse(resultCode: .error))
+            return .completion(resultCode: "Error")
         }
+    }
+
+    private func mapCheckoutResultToAdditionalDetailsResult(_ checkoutResult: CheckoutResultDTO) -> AdditionalDetailsResult {
+        switch checkoutResult {
+        case let result as FinishedResultDTO:
+            return .completion(resultCode: result.resultCode)
+        case let result as ErrorResultDTO:
+            sendErrorResultToFlutter(componentId: "ADVANCED_ADYEN_COMPONENT", reason: result.errorMessage)
+            return .completion(resultCode: "Error")
+        default:
+            sendErrorResultToFlutter(componentId: "ADVANCED_ADYEN_COMPONENT", reason: "Unsupported checkout result.")
+            return .completion(resultCode: "Error")
+        }
+    }
+
+    // MARK: - Result helpers
+
+    private func sendCompleteResult(componentId: String, sessionId: String, result: CheckoutResult) {
+        let paymentResult = PaymentResultModelDTO(
+            sessionId: sessionId,
+            sessionResult: result.sessionResult,
+            resultCode: result.resultCode.rawValue
+        )
+        let componentCommunicationModel = ComponentCommunicationModel(
+            type: ComponentCommunicationType.result,
+            componentId: componentId,
+            paymentResult: PaymentResultDTO(
+                type: PaymentResultEnum.finished,
+                result: paymentResult
+            )
+        )
+        componentPlatformEventHandler.send(event: componentCommunicationModel)
+    }
+
+    private func sendErrorResult(componentId: String, error: CheckoutError) {
+        let componentCommunicationModel = ComponentCommunicationModel(
+            type: ComponentCommunicationType.result,
+            componentId: componentId,
+            paymentResult: PaymentResultDTO(
+                type: .from(error: error),
+                reason: error.localizedDescription
+            )
+        )
+        componentPlatformEventHandler.send(event: componentCommunicationModel)
     }
 
     private func sendErrorResultToFlutter(componentId: String, reason: String) {
@@ -359,10 +332,13 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
     }
 
     private func getViewController() -> UIViewController? {
-        var rootViewController = UIApplication.shared.adyen.mainKeyWindow?.rootViewController
+        var rootViewController = UIApplication.shared.connectedScenes
+            .compactMap { $0 as? UIWindowScene }
+            .flatMap(\.windows)
+            .first { $0.isKeyWindow }?
+            .rootViewController
         while let presentedViewController = rootViewController?.presentedViewController {
             let type = String(describing: type(of: presentedViewController))
-            // TODO: - We need to discuss how the SDK should react if a DropInNavigationController is already displayed
             if type == "DropInNavigationController" {
                 return nil
             } else {

@@ -1,13 +1,10 @@
 import Foundation
-@_spi(AdyenInternal) import Adyen
-#if canImport(AdyenActions)
-    import AdyenActions
-#endif
+import Adyen
 
+// TODO: v6 migration - CheckoutActionComponent, ResultCode are now package-access.
+// Advanced component action handling in v6 is done through PaymentCheckout.handle(action:).
 @MainActor
 protocol AdvancedComponentProtocol: BasePlatformViewComponent {
-    var actionComponent: CheckoutActionComponent? { get }
-
     func finalizeAndDismiss(success: Bool, completion: @escaping (() -> Void))
     func stopLoadingOnError()
 }
@@ -19,8 +16,8 @@ extension AdvancedComponentProtocol {
         case .finished:
             onFinish(paymentEventDTO: paymentEventDTO)
         case .action:
-            guard let actionResponse = paymentEventDTO.data else { return }
-            onAction(actionResponse: actionResponse)
+            // TODO: v6 migration - action handling needs PaymentCheckout.handle(action:)
+            sendErrorToFlutterLayer(errorMessage: "Action handling not yet migrated to v6.")
         case .error:
             onError(errorDTO: paymentEventDTO.error)
         case .update:
@@ -28,19 +25,9 @@ extension AdvancedComponentProtocol {
         }
     }
 
-    private func onAction(actionResponse: [String?: Any?]) {
-        do {
-            let jsonData = try JSONSerialization.data(withJSONObject: actionResponse, options: [])
-            let action = try JSONDecoder().decode(Action.self, from: jsonData)
-            actionComponent?.handle(action)
-        } catch {
-            sendErrorToFlutterLayer(errorMessage: error.localizedDescription)
-        }
-    }
-
     private func onFinish(paymentEventDTO: PaymentEventDTO) {
-        let resultCode = ResultCode(rawValue: paymentEventDTO.result ?? "")
-        let isAccepted = resultCode?.isAccepted ?? false
+        let resultCode = paymentEventDTO.result ?? ""
+        let isAccepted = ["Authorised", "Received", "Pending"].contains(resultCode)
         finalizeAndDismiss(success: isAccepted, completion: { [weak self] in
             guard let self else { return }
             let componentCommunicationModel = ComponentCommunicationModel(
@@ -48,7 +35,7 @@ extension AdvancedComponentProtocol {
                 componentId: self.componentId,
                 paymentResult: PaymentResultDTO(
                     type: PaymentResultEnum.finished,
-                    result: PaymentResultModelDTO(resultCode: resultCode?.rawValue)
+                    result: PaymentResultModelDTO(resultCode: resultCode)
                 )
             )
             self.componentFlutterApi.onComponentCommunication(

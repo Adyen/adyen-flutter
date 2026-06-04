@@ -24,109 +24,26 @@ import PassKit
     import AdyenActions
 #endif
 
+// TODO: v6 migration - DropInComponent.Configuration and related types are now package-access.
+// Drop-in needs to be migrated to use Checkout.setup() pattern when Drop-in is exposed in v6 public API.
 extension DropInConfigurationDTO {
-    func createDropInConfiguration() throws -> DropInComponent.Configuration {
-        let dropInConfiguration = DropInComponent.Configuration(
-            allowsSkippingPaymentList: skipListWhenSinglePaymentMethod,
-            allowPreselectedPaymentView: showPreselectedStoredPaymentMethod
-        )
-
-        dropInConfiguration.paymentMethodsList.allowDisablingStoredPaymentMethods = isRemoveStoredPaymentMethodEnabled
-
-        if let shopperLocal = shopperLocale {
-            dropInConfiguration.localizationParameters = LocalizationParameters(enforcedLocale: shopperLocal)
-        }
-
-        if let cardConfigurationDTO {
-            dropInConfiguration.card = buildCard(from: cardConfigurationDTO)
-        }
-
-        if let applePayConfigurationDTO {
-            dropInConfiguration.applePay = try applePayConfigurationDTO.toApplePayConfiguration(amount: amount?.mapToAmount(), countryCode: countryCode)
-        }
-
-        if let cashAppPayConfigurationDTO {
-            dropInConfiguration.cashAppPay = DropInComponent.CashAppPay(redirectURL: URL(string: cashAppPayConfigurationDTO.returnUrl)!)
-        }
-
-        if let twintConfigurationDTO {
-            dropInConfiguration.actionComponent.twint = .init(callbackAppScheme: twintConfigurationDTO.iosCallbackAppScheme)
-        }
-
-        if let threeDS2ConfigurationDTO {
-            dropInConfiguration.actionComponent.threeDS = threeDS2ConfigurationDTO.mapToThreeDS2Configuration()
-        }
-
-        dropInConfiguration.style = AdyenAppearance.dropInStyle
-
-        return dropInConfiguration
-    }
-
     func createCheckoutConfiguration() throws -> CheckoutConfiguration {
+        let cardConfig = cardConfigurationDTO?.mapToCardConfiguration(shopperLocale: shopperLocale) ?? CardConfiguration()
+        let authConfig = threeDS2ConfigurationDTO?.mapToAuthenticationConfiguration() ?? AuthenticationConfiguration()
         return try CheckoutConfiguration(
             environment: environment.mapToEnvironment(),
             amount: amount!.mapToAmount(),
             clientKey: clientKey,
-            analyticsConfiguration: AnalyticsConfiguration(isEnabled: analyticsOptionsDTO.enabled),
-            content: {
-
-            }
-        )
-    }
-
-    private func buildCard(from cardConfigurationDTO: CardConfigurationDTO) -> DropInComponent.Card {
-        let koreanAuthenticationMode = cardConfigurationDTO.kcpFieldVisibility.toCardFieldVisibility()
-        let socialSecurityNumberMode = cardConfigurationDTO.socialSecurityNumberFieldVisibility.toCardFieldVisibility()
-        let storedCardConfiguration = createStoredCardConfiguration(showCvcForStoredCard: cardConfigurationDTO.showCvcForStoredCard)
-        let allowedCardTypes = determineAllowedCardTypes(cardTypes: cardConfigurationDTO.supportedCardTypes)
-//        let billingAddressConfiguration = determineBillingAddressConfiguration(addressMode: cardConfigurationDTO.addressMode)
-        let installmentConfiguration = cardConfigurationDTO.installmentConfiguration?.mapToInstallmentConfiguration()
-        return DropInComponent.Card(
-            showsHolderNameField: cardConfigurationDTO.holderNameRequired,
-            showsStorePaymentMethodField: cardConfigurationDTO.showStorePaymentField,
-            showsSecurityCodeField: cardConfigurationDTO.showCvc,
-            koreanAuthenticationMode: koreanAuthenticationMode,
-            socialSecurityNumberMode: socialSecurityNumberMode,
-            storedCardConfiguration: storedCardConfiguration,
-            allowedCardTypes: allowedCardTypes,
-            installmentConfiguration: installmentConfiguration,
-            //billingAddress: billingAddressConfiguration
-        )
-    }
-
-    private func createStoredCardConfiguration(showCvcForStoredCard: Bool) -> StoredCardConfiguration {
-        var storedCardConfiguration = StoredCardConfiguration()
-        storedCardConfiguration.showsSecurityCodeField = showCvcForStoredCard
-        return storedCardConfiguration
-    }
-
-    private func determineAllowedCardTypes(cardTypes: [String?]?) -> [CardType]? {
-        guard let mappedCardTypes = cardTypes, !mappedCardTypes.isEmpty else {
-            return nil
+            analyticsConfiguration: AnalyticsConfiguration(isEnabled: analyticsOptionsDTO.enabled)
+        ) {
+            cardConfig
+            authConfig
         }
-
-        return mappedCardTypes.compactMap { $0 }.map { CardType(rawValue: $0.lowercased()) }
     }
-
-//    private func determineBillingAddressConfiguration(addressMode: AddressMode?) -> BillingAddressConfiguration {
-//        var billingAddressConfiguration = BillingAddressConfiguration()
-//        switch addressMode {
-//        case .full:
-//            billingAddressConfiguration.mode = CardComponent.AddressFormType.full
-//        case .postalCode:
-//            billingAddressConfiguration.mode = CardComponent.AddressFormType.postalCode
-//        case .none:
-//            billingAddressConfiguration.mode = CardComponent.AddressFormType.none
-//        default:
-//            billingAddressConfiguration.mode = CardComponent.AddressFormType.none
-//        }
-//
-//        return billingAddressConfiguration
-//    }
 }
 
 extension FieldVisibility {
-    func toCardFieldVisibility() -> CardComponentConfiguration.FieldVisibility {
+    func toCardFieldVisibility() -> CardConfiguration.FieldVisibility {
         switch self {
         case .show:
             return .show
@@ -151,27 +68,22 @@ extension DropInConfigurationDTO {
 }
 
 extension CardConfigurationDTO {
-    func mapToCardComponentConfiguration(shopperLocale: String?) -> CardComponentConfiguration {
-        let localizationParameters = shopperLocale != nil ? LocalizationParameters(enforcedLocale: shopperLocale!) : nil
+    func mapToCardConfiguration(shopperLocale: String?) -> CardConfiguration {
         let koreanAuthenticationMode = kcpFieldVisibility.toCardFieldVisibility()
         let socialSecurityNumberMode = socialSecurityNumberFieldVisibility.toCardFieldVisibility()
-        let storedCardConfiguration = createStoredCardConfiguration(showCvcForStoredCard: showCvcForStoredCard)
         let allowedCardTypes = determineAllowedCardTypes(cardTypes: supportedCardTypes)
-        let billingAddressConfiguration = determineBillingAddressConfiguration(addressMode: addressMode)
-        let installmentConfiguration = installmentConfiguration?.mapToInstallmentConfiguration()
-        return CardComponentConfiguration()
-            .showsHolderNameField(holderNameRequired)
-            .showsStorePaymentMethodField(showStorePaymentField)
-            .showsSecurityCodeField(showCvc)
-            .koreanAuthenticationMode(koreanAuthenticationMode)
-            .socialSecurityNumberMode(socialSecurityNumberMode)
-            .allowedCardTypes(allowedCardTypes)
-    }
-
-    private func createStoredCardConfiguration(showCvcForStoredCard: Bool) -> StoredCardConfiguration {
-        var storedCardConfiguration = StoredCardConfiguration()
-        storedCardConfiguration.showsSecurityCodeField = showCvcForStoredCard
-        return storedCardConfiguration
+        let billingAddressMode = determineBillingAddressConfiguration(addressMode: addressMode)
+        let installmentConfig = installmentConfiguration?.mapToInstallmentConfiguration()
+        return CardConfiguration()
+            .showCardholderName(holderNameRequired)
+            .showStorePaymentMethod(showStorePaymentField)
+            .showSecurityCode(showCvc)
+            .showSecurityCodeForStoredCard(showCvcForStoredCard)
+            .koreanAuthenticationVisibility(koreanAuthenticationMode)
+            .socialSecurityNumberVisibility(socialSecurityNumberMode)
+            .supportedCardBrands(allowedCardTypes)
+            .installmentConfiguration(installmentConfig)
+            .billingAddressMode(billingAddressMode)
     }
 
     private func determineAllowedCardTypes(cardTypes: [String?]?) -> [CardType]? {
@@ -207,8 +119,8 @@ extension CardComponentConfigurationDTO {
         )
     }
 
-    func createCardComponentConfiguration() -> CardComponentConfiguration? {
-        cardConfiguration.mapToCardComponentConfiguration(shopperLocale: shopperLocale)
+    func createCardConfiguration() -> CardConfiguration {
+        cardConfiguration.mapToCardConfiguration(shopperLocale: shopperLocale)
     }
 }
 
@@ -223,13 +135,8 @@ extension BlikComponentConfigurationDTO {
         )
     }
 
-    func mapToBlikComponentConfiguration() -> BLIKComponentConfiguration {
-        let localizationParameters = shopperLocale.map { LocalizationParameters(enforcedLocale: $0) }
-        return BLIKComponentConfiguration(
-            style: AdyenAppearance.blikComponentStyle,
-            localizationParameters: localizationParameters
-        )
-    }
+    // TODO: v6 migration - BLIKComponentConfiguration is now package-access.
+    // BLIK component needs to be created via Checkout.setup() + createPaymentComponent(for: .blik).
 }
 
 extension Environment {
@@ -260,14 +167,8 @@ extension AmountDTO {
 }
 
 extension InstantPaymentConfigurationDTO {
-    // TODO: - Payment type removed in v6. Apple Pay configuration needs migration.
-    func mapToApplePayConfiguration() throws -> ApplePayComponent.Configuration {
-        guard let applePayConfiguration = try applePayConfigurationDTO?.toApplePayConfiguration(amount: amount?.mapToAmount(), countryCode: countryCode) else {
-            throw PlatformError(errorDescription: "Apple pay configuration not provided.")
-        }
-        
-        return applePayConfiguration
-    }
+    // TODO: v6 migration - ApplePayComponent.Configuration is now package-access.
+    // Apple Pay needs to be created via Checkout.setup() + createPaymentComponent(for: .applePay).
 
     func createAdyenContext() throws -> AdyenContext {
         try buildAdyenContext(
@@ -325,23 +226,8 @@ extension PaymentResultEnum {
     }
 }
 
-extension ResultCode {
-    var isAccepted: Bool {
-        switch self {
-        case .authorised, .received, .pending:
-            return true
-        case .refused, .cancelled, .error, .redirectShopper, .identifyShopper, .challengeShopper, .presentToShopper:
-            return false
-        }
-    }
-}
-
-// TODO: - Payment type removed in v6 SDK. Session.State.createPayment needs migration.
-//extension Session.State {
-//    func createPayment(fallbackCountryCode: String) -> Payment {
-//        Payment(amount: amount, countryCode: countryCode ?? fallbackCountryCode)
-//    }
-//}
+// TODO: v6 migration - ResultCode removed from SDK. Use CheckoutResultCode instead.
+// Session.State.createPayment also removed.
 
 extension ActionComponentConfigurationDTO {
     func createAdyenContext() throws -> AdyenContext {
@@ -356,16 +242,8 @@ extension ActionComponentConfigurationDTO {
 }
 
 extension ThreeDS2ConfigurationDTO {
-    func buildActionComponentConfiguration() -> CheckoutActionComponent.Configuration {
-            var actionComponentConfiguration = CheckoutActionComponent.Configuration()
-            actionComponentConfiguration.threeDS = mapToThreeDS2Configuration()
-            return actionComponentConfiguration
-        }
-
-    // TODO: - ThreeDS2ActionConfiguration init changed in v6. appearanceConfiguration is now package-access.
-    // UI customization may need a different approach in v6.
-    func mapToThreeDS2Configuration() -> ThreeDS2ActionConfiguration {
-        var config = ThreeDS2ActionConfiguration()
+    func mapToAuthenticationConfiguration() -> AuthenticationConfiguration {
+        var config = AuthenticationConfiguration()
         if let requestorAppURL, let url = URL(string: requestorAppURL) {
             config = config.requestorAppURL(url)
         }

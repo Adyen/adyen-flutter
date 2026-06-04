@@ -1,18 +1,10 @@
 @_spi(AdyenInternal) import Adyen
-#if canImport(AdyenActions)
-    import AdyenActions
-#endif
-#if canImport(AdyenComponents)
-    import AdyenComponents
-#endif
+@_spi(AdyenInternal) import AdyenCheckout
 import Flutter
 import Foundation
 
+// TODO: v6 migration - ActionComponentDelegate, PaymentComponentDelegate, CheckoutActionComponent are now package-access.
 class BlikAdvancedComponent: BaseBlikComponent, AdvancedComponentProtocol {
-    private var actionComponentDelegate: ActionComponentDelegate?
-    private var componentDelegate: PaymentComponentDelegate?
-    private(set) var actionComponent: CheckoutActionComponent?
-
     override init(
         frame: CGRect,
         viewIdentifier: Int64,
@@ -29,48 +21,13 @@ class BlikAdvancedComponent: BaseBlikComponent, AdvancedComponentProtocol {
             componentFlutterApi: componentFlutterApi,
             componentPlatformApi: componentPlatformApi
         )
-
-        actionComponentDelegate = ComponentActionHandler(
-            componentFlutterApi: componentFlutterApi,
-            componentId: componentId,
-            finalizeCallback: finalizeAndDismiss(success:completion:)
-        )
-        setupBlikComponentView()
+        // TODO: v6 migration - Set up BLIK component through Checkout.setup() like CardAdvancedComponent
+        sendErrorToFlutterLayer(errorMessage: "BLIK advanced component not yet migrated to v6.")
     }
 
-    private func setupBlikComponentView() {
-        do {
-            let blikComponent = try setupBlikComponent()
-            actionComponent = CheckoutActionComponent(context: blikComponent.context)
-            actionComponent?.delegate = actionComponentDelegate
-            actionComponent?.presentationDelegate = getViewController()
-            showBlikComponent(blikComponent: blikComponent)
-            componentPlatformApi.register(blikBaseComponent: self)
-        } catch {
-            sendErrorToFlutterLayer(errorMessage: error.localizedDescription)
-        }
-    }
-
-    private func setupBlikComponent() throws -> BLIKComponent {
-        componentDelegate = AdvancedFlowDelegate(
-            componentFlutterApi: componentFlutterApi,
-            componentId: componentId
-        )
-        return try buildBlikComponent(
-            paymentMethodString: paymentMethod,
-            blikComponentConfiguration: blikComponentConfiguration,
-            componentDelegate: componentDelegate
-        )
-    }
-
-    func stopLoadingOnError() {
-        blikComponent?.stopLoading()
-    }
+    func stopLoadingOnError() {}
 
     override func onDispose() {
-        actionComponentDelegate = nil
-        componentDelegate = nil
-        actionComponent = nil
         super.onDispose()
     }
 }

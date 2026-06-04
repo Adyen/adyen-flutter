@@ -1,9 +1,7 @@
 @_spi(AdyenInternal) import Adyen
+@_spi(AdyenInternal) import AdyenCheckout
 #if canImport(AdyenCard)
     import AdyenCard
-#endif
-#if canImport(AdyenNetworking)
-    import AdyenNetworking
 #endif
 import Flutter
 
@@ -30,48 +28,25 @@ class CardSessionComponent: BaseCardComponent {
         )
 
         Task {
-            do {
-                await setupCardComponentView()
-            }
+            await setupCardComponentView()
         }
     }
 
     private func setupCardComponentView() async {
         do {
-            guard let cardPaymentMethod = checkoutHolder.adyenCheckout?.paymentMethods?.paymentMethod(ofType: CardPaymentMethod.self) else {throw PlatformError(errorDescription: "Card payment method not found") }
+            guard let checkout = checkoutHolder.adyenCheckout,
+                  let cardPaymentMethod = checkout.paymentMethods?.paymentMethod(ofType: CardPaymentMethod.self)
+            else {
+                throw PlatformError(errorDescription: "Card payment method not found")
+            }
             let cardComponent = try buildCardComponent(
-                adyenCheckout: checkoutHolder.adyenCheckout!,
+                adyenCheckout: checkout,
                 cardPaymentMethod: cardPaymentMethod
             )
             showCardComponent(cardComponent: cardComponent)
             componentPlatformApi.register(cardBaseComponent: self)
-            setupSessionFlowDelegate()
         } catch {
             sendErrorToFlutterLayer(errorMessage: error.localizedDescription)
         }
-    }
-
-    private func setupSessionFlowDelegate() {
-        if let componentSessionFlowDelegate = (checkoutHolder.sessionDelegate as? ComponentSessionFlowHandler) {
-            componentSessionFlowDelegate.register(
-                componentId: componentId,
-                finalizeCallback: { [weak self] success, completion in
-                    self?.finalizeAndDismissSessionComponent(success: success, completion: completion)
-                }
-            )
-            if isStoredPaymentMethod {
-                componentSessionFlowDelegate.setCurrentFlow(componentId: componentId)
-            }
-        } else {
-            assertionFailure("Wrong session flow delegate usage")
-        }
-    }
-
-    func finalizeAndDismissSessionComponent(success: Bool, completion: @escaping (() -> Void)) {
-        finalizeAndDismiss(success: success, completion: { [weak self] in
-            guard let self else { return }
-            completion()
-            self.cardComponent = nil
-        })
     }
 }

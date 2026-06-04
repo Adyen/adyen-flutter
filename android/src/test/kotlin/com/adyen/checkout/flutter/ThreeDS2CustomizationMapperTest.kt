@@ -1,6 +1,6 @@
 package com.adyen.checkout.flutter
 
-import com.adyen.checkout.adyen3ds2.Adyen3DS2Configuration
+import com.adyen.checkout.core.components.CheckoutConfiguration
 import com.adyen.checkout.flutter.generated.AddressMode
 import com.adyen.checkout.flutter.generated.AmountDTO
 import com.adyen.checkout.flutter.generated.AnalyticsOptionsDTO
@@ -51,6 +51,24 @@ class ThreeDS2CustomizationMapperTest {
         )
     }
 
+    private fun getInternalUiCustomization(checkoutConfiguration: CheckoutConfiguration): UiCustomization? {
+        val getConfigurationMethod = checkoutConfiguration.javaClass.getDeclaredMethod("getActionConfiguration", Class::class.java)
+        val threeDS2ConfigClass = Class.forName("com.adyen.checkout.threeds2.ThreeDS2Configuration")
+        val config = getConfigurationMethod.invoke(checkoutConfiguration, threeDS2ConfigClass) ?: return null
+        val getUiCustomizationMethod = config.javaClass.getDeclaredMethod("getUiCustomization")
+        getUiCustomizationMethod.isAccessible = true
+        return getUiCustomizationMethod.invoke(config) as UiCustomization?
+    }
+
+    private fun getInternalThreeDSRequestorAppURL(checkoutConfiguration: CheckoutConfiguration): String? {
+        val getConfigurationMethod = checkoutConfiguration.javaClass.getDeclaredMethod("getActionConfiguration", Class::class.java)
+        val threeDS2ConfigClass = Class.forName("com.adyen.checkout.threeds2.ThreeDS2Configuration")
+        val config = getConfigurationMethod.invoke(checkoutConfiguration, threeDS2ConfigClass) ?: return null
+        val getThreeDSRequestorAppURLMethod = config.javaClass.getDeclaredMethod("getThreeDSRequestorAppURL")
+        getThreeDSRequestorAppURLMethod.isAccessible = true
+        return getThreeDSRequestorAppURLMethod.invoke(config) as String?
+    }
+
     @Test
     fun `when 3DS2 UI customization provided, then map to UiCustomization`() {
         val headingColor = "#222222"
@@ -77,8 +95,7 @@ class ThreeDS2CustomizationMapperTest {
         )
 
         val checkoutConfiguration = cardComponentConfigurationDTO.toCheckoutConfiguration()
-        val threeDS2Configuration = checkoutConfiguration.getActionConfiguration(Adyen3DS2Configuration::class.java)
-        val uiCustomization = threeDS2Configuration?.uiCustomization as UiCustomization?
+        val uiCustomization = getInternalUiCustomization(checkoutConfiguration)
 
         val toolbar = uiCustomization?.toolbarCustomization
         assertEquals("Heading", toolbar?.headerText)
@@ -117,10 +134,7 @@ class ThreeDS2CustomizationMapperTest {
             )
         )
 
-        val uiCustomization = cardComponentConfigurationDTO
-            .toCheckoutConfiguration()
-            .getActionConfiguration(Adyen3DS2Configuration::class.java)
-            ?.uiCustomization as UiCustomization?
+        val uiCustomization = getInternalUiCustomization(cardComponentConfigurationDTO.toCheckoutConfiguration())
 
         val textBoxCustomization = uiCustomization?.textBoxCustomization
         val screenCustomization = uiCustomization?.screenCustomization
@@ -159,10 +173,7 @@ class ThreeDS2CustomizationMapperTest {
             )
         )
 
-        val uiCustomization = cardComponentConfigurationDTO
-            .toCheckoutConfiguration()
-            .getActionConfiguration(Adyen3DS2Configuration::class.java)
-            ?.uiCustomization as UiCustomization?
+        val uiCustomization = getInternalUiCustomization(cardComponentConfigurationDTO.toCheckoutConfiguration())
 
         val primaryTypes = listOf(
             UiCustomization.ButtonType.VERIFY,
@@ -207,14 +218,12 @@ class ThreeDS2CustomizationMapperTest {
             ),
         )
 
-        val selectionCustomization = createBaseCardComponentConfiguration(
+        val selectionCustomization = getInternalUiCustomization(createBaseCardComponentConfiguration(
             ThreeDS2ConfigurationDTO(
                 requestorAppURL = "https://adyen.com/3ds2",
                 uiCustomization = uiCustomizationDTO,
             )
-        ).toCheckoutConfiguration()
-            .getActionConfiguration(Adyen3DS2Configuration::class.java)
-            ?.uiCustomization as UiCustomization?
+        ).toCheckoutConfiguration())
 
         val selectionItemCustomization: SelectionItemCustomization? = selectionCustomization?.selectionItemCustomization
 
@@ -235,14 +244,12 @@ class ThreeDS2CustomizationMapperTest {
             )
         )
 
-        val uiCustomization = createBaseCardComponentConfiguration(
+        val uiCustomization = getInternalUiCustomization(createBaseCardComponentConfiguration(
             ThreeDS2ConfigurationDTO(
                 requestorAppURL = "https://adyen.com/3ds2",
                 uiCustomization = uiCustomizationDTO,
             )
-        ).toCheckoutConfiguration()
-            .getActionConfiguration(Adyen3DS2Configuration::class.java)
-            ?.uiCustomization as UiCustomization?
+        ).toCheckoutConfiguration())
 
         val labelCustomization = uiCustomization?.labelCustomization
         assertEquals(inputLabelColor, labelCustomization?.inputLabelTextColor)
@@ -258,12 +265,9 @@ class ThreeDS2CustomizationMapperTest {
             )
         )
 
-        val adyen3DS2Configuration = configuration
-            .toCheckoutConfiguration()
-            .getActionConfiguration(Adyen3DS2Configuration::class.java)
-
-        assertEquals("https://adyen.com/3ds2", adyen3DS2Configuration?.threeDSRequestorAppURL)
-        assertEquals(null, adyen3DS2Configuration?.uiCustomization)
+        val checkoutConfiguration = configuration.toCheckoutConfiguration()
+        assertEquals("https://adyen.com/3ds2", getInternalThreeDSRequestorAppURL(checkoutConfiguration))
+        assertEquals(null, getInternalUiCustomization(checkoutConfiguration))
     }
 
     @Test
@@ -279,12 +283,9 @@ class ThreeDS2CustomizationMapperTest {
             )
         )
 
-        val adyen3DS2Configuration = configuration
-            .toCheckoutConfiguration()
-            .getActionConfiguration(Adyen3DS2Configuration::class.java)
-
-        val toolbar = (adyen3DS2Configuration?.uiCustomization as UiCustomization?)?.toolbarCustomization
-        assertEquals(null, adyen3DS2Configuration?.threeDSRequestorAppURL)
+        val checkoutConfiguration = configuration.toCheckoutConfiguration()
+        val toolbar = getInternalUiCustomization(checkoutConfiguration)?.toolbarCustomization
+        assertEquals(null, getInternalThreeDSRequestorAppURL(checkoutConfiguration))
         assertEquals("Heading only", toolbar?.headerText)
     }
 
@@ -336,14 +337,12 @@ class ThreeDS2CustomizationMapperTest {
             ),
         )
 
-        val uiCustomization = createBaseCardComponentConfiguration(
+        val uiCustomization = getInternalUiCustomization(createBaseCardComponentConfiguration(
             ThreeDS2ConfigurationDTO(
                 requestorAppURL = "https://adyen.com/3ds2",
                 uiCustomization = uiCustomizationDTO,
             )
-        ).toCheckoutConfiguration()
-            .getActionConfiguration(Adyen3DS2Configuration::class.java)
-            ?.uiCustomization as UiCustomization?
+        ).toCheckoutConfiguration())
 
         val toolbar = uiCustomization?.toolbarCustomization
         assertEquals("Heading", toolbar?.headerText)
@@ -410,14 +409,12 @@ class ThreeDS2CustomizationMapperTest {
             )
         )
 
-        val uiCustomization = createBaseCardComponentConfiguration(
+        val uiCustomization = getInternalUiCustomization(createBaseCardComponentConfiguration(
             ThreeDS2ConfigurationDTO(
                 requestorAppURL = "https://adyen.com/3ds2",
                 uiCustomization = uiCustomizationDTO,
             )
-        ).toCheckoutConfiguration()
-            .getActionConfiguration(Adyen3DS2Configuration::class.java)
-            ?.uiCustomization as UiCustomization?
+        ).toCheckoutConfiguration())
 
         val textBoxCustomization = uiCustomization?.textBoxCustomization
         val defaultTextBoxCustomization = TextBoxCustomization()
@@ -435,14 +432,12 @@ class ThreeDS2CustomizationMapperTest {
             )
         )
 
-        val uiCustomization = createBaseCardComponentConfiguration(
+        val uiCustomization = getInternalUiCustomization(createBaseCardComponentConfiguration(
             ThreeDS2ConfigurationDTO(
                 requestorAppURL = "https://adyen.com/3ds2",
                 uiCustomization = uiCustomizationDTO,
             )
-        ).toCheckoutConfiguration()
-            .getActionConfiguration(Adyen3DS2Configuration::class.java)
-            ?.uiCustomization as UiCustomization?
+        ).toCheckoutConfiguration())
 
         val screenCustomization = uiCustomization?.screenCustomization
         val defaultScreenCustomization = ScreenCustomization()
@@ -459,14 +454,12 @@ class ThreeDS2CustomizationMapperTest {
             )
         )
 
-        val uiCustomization = createBaseCardComponentConfiguration(
+        val uiCustomization = getInternalUiCustomization(createBaseCardComponentConfiguration(
             ThreeDS2ConfigurationDTO(
                 requestorAppURL = "https://adyen.com/3ds2",
                 uiCustomization = uiCustomizationDTO,
             )
-        ).toCheckoutConfiguration()
-            .getActionConfiguration(Adyen3DS2Configuration::class.java)
-            ?.uiCustomization as UiCustomization?
+        ).toCheckoutConfiguration())
 
         val defaultButtonCustomization = ButtonCustomization()
         assertEquals(

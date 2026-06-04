@@ -2,13 +2,6 @@
 @_spi(AdyenInternal) import AdyenCheckout
 import Flutter
 
-#if canImport(AdyenCard)
-    import AdyenCard
-#endif
-#if canImport(AdyenNetworking)
-    import AdyenNetworking
-#endif
-
 class BaseCardComponent: BasePlatformViewComponent {
     let cardComponentConfigurationKey = "cardComponentConfiguration"
     let isStoredPaymentMethodKey = "isStoredPaymentMethod"
@@ -39,9 +32,8 @@ class BaseCardComponent: BasePlatformViewComponent {
         )
     }
     
-    func buildCardComponent(adyenCheckout : Checkout, cardPaymentMethod: PaymentMethod) throws -> CheckoutPaymentComponent {
-        guard let component = adyenCheckout.createPaymentComponent(for: cardPaymentMethod.type) else {throw PlatformError() }
-        return component
+    func buildCardComponent(adyenCheckout: PaymentCheckout, cardPaymentMethod: PaymentMethod) throws -> CheckoutPaymentComponent {
+        try adyenCheckout.createPaymentComponent(for: cardPaymentMethod.type)
     }
 
 //    func buildCardComponent(
@@ -74,7 +66,7 @@ class BaseCardComponent: BasePlatformViewComponent {
         if isStoredPaymentMethod {
             let storedCardViewController = cardComponent.viewController
             attachActivityIndicator()
-            getViewController()?.presentViewController(storedCardViewController!, animated: true)
+            getViewController()?.present(storedCardViewController!, animated: true)
         } else {
             guard let cardView = cardComponent.viewController!.view else { return }
             attachCardView(cardView: cardView)
@@ -118,38 +110,5 @@ class BaseCardComponent: BasePlatformViewComponent {
     }
 }
 
-extension BaseCardComponent {
-    func didSubmit(lastFour: String, finalBIN: String, component: CardComponent) {}
-    
-    func didChangeBIN(_ value: String, component: CardComponent) {
-        let componentCommunicationModel = ComponentCommunicationModel(
-            type: ComponentCommunicationType.binValue,
-            componentId: componentId,
-            data: value
-        )
-        componentFlutterApi.onComponentCommunication(
-            componentCommunicationModel: componentCommunicationModel,
-            completion: { _ in }
-        )
-    }
-    
-    func didChangeCardBrand(_ value: [CardBrand]?, component: CardComponent) {
-        guard let binLookupData = value else {
-            return
-        }
-        
-        let binLookupDataDtoList: [BinLookupDataDTO] = binLookupData.map { cardBrand in
-            BinLookupDataDTO(brand: cardBrand.type.rawValue)
-        }
-        
-        let componentCommunicationModel = ComponentCommunicationModel(
-            type: ComponentCommunicationType.binLookup,
-            componentId: componentId,
-            data: binLookupDataDtoList
-        )
-        componentFlutterApi.onComponentCommunication(
-            componentCommunicationModel: componentCommunicationModel,
-            completion: { _ in }
-        )
-    }
-}
+// TODO: v6 migration - CardComponent and CardComponentDelegate are now package-access.
+// Bin lookup / bin value callbacks need to be wired through CheckoutPaymentComponent or CardConfiguration callbacks.

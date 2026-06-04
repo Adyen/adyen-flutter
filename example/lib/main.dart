@@ -162,30 +162,30 @@ class MyApp extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            TextButton(
-                onPressed: () => Navigator.pushNamed(context, "/dropInScreen"),
-                child: const Text("Drop-in")),
-            TextButton(
-                onPressed: () =>
-                    Navigator.pushNamed(context, "/cardComponentScreen"),
-                child: const Text("Card component")),
-            if (isBlikSupported)
-              TextButton(
-                  onPressed: () =>
-                      Navigator.pushNamed(context, "/blikComponentNavigation"),
-                  child: const Text("BLIK component")),
-            _buildGoogleOrApplePayComponent(context),
-            TextButton(
-                onPressed: () =>
-                    Navigator.pushNamed(context, "/instantComponentNavigation"),
-                child: const Text("Instant component")),
-            TextButton(
-                onPressed: () => Navigator.pushNamed(
-                    context, "/multiComponentNavigationScreen"),
-                child: const Text("Multi component")),
-            TextButton(
-                onPressed: () => Navigator.pushNamed(context, "/customCard"),
-                child: const Text("Custom card (CSE)")),
+            // TextButton(
+            //     onPressed: () => Navigator.pushNamed(context, "/dropInScreen"),
+            //     child: const Text("Drop-in")),
+            // TextButton(
+            //     onPressed: () =>
+            //         Navigator.pushNamed(context, "/cardComponentScreen"),
+            //     child: const Text("Card component")),
+            // if (isBlikSupported)
+            //   TextButton(
+            //       onPressed: () =>
+            //           Navigator.pushNamed(context, "/blikComponentNavigation"),
+            //       child: const Text("BLIK component")),
+            // _buildGoogleOrApplePayComponent(context),
+            // TextButton(
+            //     onPressed: () =>
+            //         Navigator.pushNamed(context, "/instantComponentNavigation"),
+            //     child: const Text("Instant component")),
+            // TextButton(
+            //     onPressed: () => Navigator.pushNamed(
+            //         context, "/multiComponentNavigationScreen"),
+            //     child: const Text("Multi component")),
+            // TextButton(
+            //     onPressed: () => Navigator.pushNamed(context, "/customCard"),
+            //     child: const Text("Custom card (CSE)")),
             TextButton(
                 onPressed: () => Navigator.pushNamed(context, "/v2Screen"),
                 child: const Text("V2 example (v6 integration)")),

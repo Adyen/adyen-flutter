@@ -1,15 +1,14 @@
 @_spi(AdyenInternal) import Adyen
-#if canImport(AdyenComponents)
-    import AdyenComponents
-#endif
+@_spi(AdyenInternal) import AdyenCheckout
 import Flutter
 
+// TODO: v6 migration - BLIKComponent, PaymentComponentDelegate are now package-access.
 class BaseBlikComponent: BasePlatformViewComponent {
     let blikComponentConfigurationKey = "blikComponentConfiguration"
     let blikComponentConfiguration: BlikComponentConfigurationDTO?
     let paymentMethod: String?
-    var blikComponent: BLIKComponent?
-    
+    var blikComponent: CheckoutPaymentComponent?
+
     init(
         frame _: CGRect,
         viewIdentifier: Int64,
@@ -29,27 +28,13 @@ class BaseBlikComponent: BasePlatformViewComponent {
         )
     }
 
-    func buildBlikComponent(
-        paymentMethodString: String?,
-        blikComponentConfiguration: BlikComponentConfigurationDTO?,
-        componentDelegate: PaymentComponentDelegate?
-    ) throws -> BLIKComponent {
-        guard let paymentMethodString else { throw PlatformError(errorDescription: "Payment method not found") }
-        guard let blikComponentConfiguration else { throw PlatformError(errorDescription: "Blik configuration not found") }
-        let adyenContext = try blikComponentConfiguration.createAdyenContext()
-        let paymentMethod = try JSONDecoder().decode(BLIKPaymentMethod.self, from: Data(paymentMethodString.utf8))
-        let blikComponent = BLIKComponent(
-            paymentMethod: paymentMethod,
-            context: adyenContext,
-            configuration: blikComponentConfiguration.mapToBlikComponentConfiguration()
-        )
-        blikComponent.delegate = componentDelegate
-        return blikComponent
+    func buildBlikComponent(adyenCheckout: PaymentCheckout, blikPaymentMethod: PaymentMethod) throws -> CheckoutPaymentComponent {
+        try adyenCheckout.createPaymentComponent(for: blikPaymentMethod.type)
     }
 
-    func showBlikComponent(blikComponent: BLIKComponent) {
+    func showBlikComponent(blikComponent: CheckoutPaymentComponent) {
         self.blikComponent = blikComponent
-        guard let blikView = blikComponent.viewController.view else { return }
+        guard let blikView = blikComponent.viewController?.view else { return }
         componentWrapperView.addArrangedSubview(blikView)
         disableNativeScrollingAndBouncing(componentView: blikView)
         notifyHeightChanged()
@@ -59,11 +44,8 @@ class BaseBlikComponent: BasePlatformViewComponent {
         success: Bool,
         completion: @escaping (() -> Void)
     ) {
-        blikComponent?.finalizeIfNeeded(with: success) { [weak self] in
-            self?.getViewController()?.dismiss(animated: true, completion: {
-                completion()
-            })
-        }
+        // TODO: v6 migration - finalize through checkout callbacks
+        completion()
     }
 
     override func onDispose() {
@@ -71,6 +53,6 @@ class BaseBlikComponent: BasePlatformViewComponent {
     }
 
     override func componentViewPreferredContentHeight() -> CGFloat? {
-        blikComponent?.viewController.preferredContentSize.height
+        blikComponent?.viewController?.preferredContentSize.height
     }
 }

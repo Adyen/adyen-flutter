@@ -1,9 +1,7 @@
 @_spi(AdyenInternal) import Adyen
-#if canImport(AdyenComponents)
-    import AdyenComponents
-#endif
 import PassKit
 
+// TODO: v6 migration - ApplePayComponent is now package-access.
 @MainActor
 class ApplePayComponentManager {
     private let componentFlutterApi: ComponentFlutterInterface
@@ -21,7 +19,7 @@ class ApplePayComponentManager {
         self.componentFlutterApi = componentFlutterApi
         self.checkoutHolder = checkoutHolder
     }
- 
+
     func isApplePayAvailable(
         instantPaymentComponentConfigurationDTO: InstantPaymentConfigurationDTO,
         paymentMethodResponse: String,
@@ -33,12 +31,12 @@ class ApplePayComponentManager {
                 paymentMethodResponse: paymentMethodResponse,
                 componentId: componentId
             )
-            
+
             try checkApplePayAvailability(
                 applePayConfiguration: instantPaymentComponentConfigurationDTO.applePayConfigurationDTO,
                 paymentMethod: applePayPaymentMethod
             )
-            
+
             callback(
                 Result.success(
                     InstantPaymentSetupResultDTO(
@@ -51,7 +49,7 @@ class ApplePayComponentManager {
             callback(Result.failure(error))
         }
     }
-    
+
     func startApplePayComponent(
         instantPaymentComponentConfigurationDTO: InstantPaymentConfigurationDTO,
         paymentMethodResponse: String,
@@ -79,18 +77,18 @@ class ApplePayComponentManager {
             )
         }
     }
-    
+
     func handlePaymentEvent(paymentEventDTO: PaymentEventDTO) {
         if let applePayComponentWrapper = applePayComponent as? ApplePayAdvancedComponent {
             applePayComponentWrapper.handlePaymentEvent(paymentEventDTO: paymentEventDTO)
         }
     }
-    
+
     func onDispose() {
         applePayComponent?.onDispose()
         applePayComponent = nil
     }
-    
+
     private func createApplePayComponent(
         instantPaymentComponentConfigurationDTO: InstantPaymentConfigurationDTO,
         paymentMethodResponse: String,
@@ -111,13 +109,13 @@ class ApplePayComponentManager {
             )
         }
     }
-    
+
     private func getApplePayPaymentMethod(
         paymentMethodResponse: String,
         componentId: String
     ) throws -> ApplePayPaymentMethod {
         if componentId == Constants.applePaySessionComponentId {
-            guard let paymentMethod = checkoutHolder.session?.state.paymentMethods.paymentMethod(ofType: ApplePayPaymentMethod.self) else {
+            guard let paymentMethod = checkoutHolder.adyenCheckout?.paymentMethods?.paymentMethod(ofType: ApplePayPaymentMethod.self) else {
                 throw PlatformError(errorDescription: "Apple Pay payment method not valid.")
             }
             return paymentMethod
@@ -125,18 +123,18 @@ class ApplePayComponentManager {
 
         return try JSONDecoder().decode(ApplePayPaymentMethod.self, from: Data(paymentMethodResponse.utf8))
     }
-    
+
     private func checkApplePayAvailability(
         applePayConfiguration: ApplePayConfigurationDTO?,
         paymentMethod: ApplePayPaymentMethod
     ) throws {
         guard PKPaymentAuthorizationViewController.canMakePayments() else {
-            throw ApplePayComponent.Error.deviceDoesNotSupportApplePay
+            throw PlatformError(errorDescription: "Device does not support Apple Pay.")
         }
-        
+
         let allowOnboarding = applePayConfiguration?.allowOnboarding ?? false
         guard allowOnboarding || PKPaymentAuthorizationViewController.canMakePayments(usingNetworks: paymentMethod.supportedNetworks) else {
-            throw ApplePayComponent.Error.userCannotMakePayment
+            throw PlatformError(errorDescription: "User cannot make Apple Pay payments.")
         }
     }
 }

@@ -1,12 +1,15 @@
 package com.adyen.checkout.flutter.components.v2
 
 import android.content.Context
-import androidx.activity.ComponentActivity
+import androidx.fragment.app.FragmentActivity
 import com.adyen.checkout.core.action.data.Action
 import com.adyen.checkout.core.action.data.ActionComponentData
 import com.adyen.checkout.core.common.PaymentResult
 import com.adyen.checkout.core.components.CheckoutCallbacks
-import com.adyen.checkout.core.components.CheckoutResult
+import com.adyen.checkout.core.components.SubmitResult
+import com.adyen.checkout.core.components.AdditionalDetailsResult
+import com.adyen.checkout.core.components.SessionCheckoutCallbacks
+import com.adyen.checkout.core.components.AdvancedCheckoutCallbacks
 import com.adyen.checkout.core.components.data.PaymentComponentData
 import com.adyen.checkout.core.components.data.model.paymentmethod.PaymentMethod
 import com.adyen.checkout.flutter.components.ComponentPlatformEventHandler
@@ -20,6 +23,7 @@ import com.adyen.checkout.flutter.generated.ErrorResultDTO
 import com.adyen.checkout.flutter.generated.FinishedResultDTO
 import com.adyen.checkout.flutter.generated.PaymentResultDTO
 import com.adyen.checkout.flutter.generated.PaymentResultEnum
+import com.adyen.checkout.flutter.generated.PaymentResultModelDTO
 import com.adyen.checkout.flutter.generated.PlatformCommunicationDTO
 import com.adyen.checkout.flutter.session.CheckoutHolder
 import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToPaymentResultModelDTO
@@ -30,8 +34,10 @@ import org.json.JSONObject
 import kotlin.collections.get
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
+import kotlin.onSuccess
 
 internal class AdyenComponentFactory(
+    private val activity: FragmentActivity,
     private val adyenFlutterInterface: AdyenFlutterInterface,
     private val platformEventHandler: ComponentPlatformEventHandler,
     private val viewTypeId: String,
@@ -53,6 +59,7 @@ internal class AdyenComponentFactory(
         val creationParams = args as Map<*, *>? ?: emptyMap<Any, Any>()
         val componentId = creationParams[COMPONENT_ID_KEY] as String? ?: ""
         return AdyenComponent(
+            activity = activity,
             checkoutContext = checkoutHolder.checkoutContext!!,
             checkoutCallbacks = createCheckoutCallbacks(componentId),
             paymentMethod = createPaymentMethod(creationParams),
@@ -70,14 +77,14 @@ internal class AdyenComponentFactory(
             createAdvancedCheckoutCallbacks(componentId)
         }
 
-    fun createSessionCheckoutCallbacks(componentId: String): CheckoutCallbacks =
-        CheckoutCallbacks(
+    fun createSessionCheckoutCallbacks(componentId: String): SessionCheckoutCallbacks =
+        SessionCheckoutCallbacks(
             onError = { checkoutError -> sendError(componentId, checkoutError.message) },
-            onFinished = { paymentResult -> sendFinished(componentId, paymentResult) }
+            onFinished = { sendSessionFinished(componentId) }
         )
 
-    fun createAdvancedCheckoutCallbacks(componentId: String): CheckoutCallbacks =
-        CheckoutCallbacks(
+    fun createAdvancedCheckoutCallbacks(componentId: String): AdvancedCheckoutCallbacks =
+        AdvancedCheckoutCallbacks(
             onSubmit = { state ->
                 println("ON SUBMIT ON ANDROID INVOKED")
                 val model =
@@ -87,12 +94,12 @@ internal class AdyenComponentFactory(
                         dataJson = PaymentComponentData.SERIALIZER.serialize(state).toString()
                     )
 
-                suspendCancellableCoroutine<CheckoutResult> { continuation ->
+                suspendCancellableCoroutine<SubmitResult> { continuation ->
                     adyenFlutterInterface.onSubmit(model) { result: Result<CheckoutResultDTO> ->
                         result
                             .onSuccess { response: CheckoutResultDTO ->
                                 println("ON SUBMIT RESPONSE FROM FLUTTER: $response")
-                                val onSubmitResult: CheckoutResult = mapPaymentResult(response)
+                                val onSubmitResult: SubmitResult = mapToSubmitResult(response)
                                 continuation.resume(onSubmitResult)
                             }.onFailure { error ->
                                 println("Flutter onSubmit error: $error")
@@ -111,12 +118,12 @@ internal class AdyenComponentFactory(
                         dataJson = ActionComponentData.SERIALIZER.serialize(state).toString()
                     )
 
-                suspendCancellableCoroutine<CheckoutResult> { continuation ->
+                suspendCancellableCoroutine<AdditionalDetailsResult> { continuation ->
                     adyenFlutterInterface.onAdditionalDetails(model) { result: Result<CheckoutResultDTO> ->
                         result
                             .onSuccess { response: CheckoutResultDTO ->
                                 println("Flutter onAdditionalDetails response: $response")
-                                val onAdditionalDetailsResult: CheckoutResult = mapPaymentResult(response)
+                                val onAdditionalDetailsResult: AdditionalDetailsResult = mapToAdditionalDetailsResult(response)
                                 continuation.resume(onAdditionalDetailsResult)
                             }.onFailure { error ->
                                 println("Flutter onAdditionalDetails error: $error")
@@ -128,8 +135,8 @@ internal class AdyenComponentFactory(
                     }
                 }
             },
-            onError = { error -> sendError(componentId, error.message) },
-            onFinished = { paymentResult -> sendFinished(componentId, paymentResult) }
+            onError = { error -> sendError(componentId, error.message) }
+            //TODO add onFinished()
         )
 
     fun createPaymentMethod(creationParams: Map<*, *>): PaymentMethod {
@@ -137,14 +144,21 @@ internal class AdyenComponentFactory(
         return PaymentMethod.SERIALIZER.deserialize(JSONObject(paymentMethodString))
     }
 
-    private fun mapPaymentResult(response: CheckoutResultDTO): CheckoutResult =
+    private fun mapToSubmitResult(response: CheckoutResultDTO): SubmitResult =
         when (response) {
-            is ErrorResultDTO -> CheckoutResult.Error(response.errorMessage)
-            is FinishedResultDTO -> CheckoutResult.Finished(response.resultCode)
+            is ErrorResultDTO -> SubmitResult.Completion("Error")
+            is FinishedResultDTO -> SubmitResult.Completion(response.resultCode)
             is ActionResultDTO ->
-                CheckoutResult.Action(
+                SubmitResult.Action(
                     Action.SERIALIZER.deserialize(JSONObject(response.actionResponse))
                 )
+        }
+
+    private fun mapToAdditionalDetailsResult(response: CheckoutResultDTO): AdditionalDetailsResult =
+        when (response) {
+            is ErrorResultDTO -> AdditionalDetailsResult.Completion("Error")
+            is FinishedResultDTO -> AdditionalDetailsResult.Completion(response.resultCode)
+            is ActionResultDTO -> AdditionalDetailsResult.Completion("Error")
         }
 
     private fun sendError(componentId: String, errorMessage: String?) {
@@ -170,6 +184,20 @@ internal class AdyenComponentFactory(
                 paymentResult = PaymentResultDTO(
                     type = PaymentResultEnum.FINISHED,
                     result = paymentResult.mapToPaymentResultModelDTO()
+                ),
+            )
+        )
+    }
+
+    private fun sendSessionFinished(componentId: String) {
+        println("ON SESSION FINISHED INVOKED")
+        platformEventHandler.eventSink?.success(
+            ComponentCommunicationModel(
+                type = ComponentCommunicationType.RESULT,
+                componentId = componentId,
+                paymentResult = PaymentResultDTO(
+                    type = PaymentResultEnum.FINISHED,
+                    result = Unit //TODO this needs to be exposed on Android SDK
                 ),
             )
         )

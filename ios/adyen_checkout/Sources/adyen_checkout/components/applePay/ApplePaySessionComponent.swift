@@ -1,14 +1,12 @@
-@_spi(AdyenInternal) import Adyen
-#if canImport(AdyenComponents)
-    import AdyenComponents
-#endif
+import Adyen
 
+// TODO: v6 migration - ApplePayComponent, Session, SessionDelegate are now package-access.
 @MainActor
 class ApplePaySessionComponent: BaseApplePayComponent {
     private let checkoutHolder: CheckoutHolder
     private let configuration: InstantPaymentConfigurationDTO
     private let componentId: String
-    
+
     init(
         checkoutHolder: CheckoutHolder,
         configuration: InstantPaymentConfigurationDTO,
@@ -18,45 +16,11 @@ class ApplePaySessionComponent: BaseApplePayComponent {
         self.configuration = configuration
         self.componentId = componentId
         super.init()
-        applePayComponent = try buildApplePaySessionComponent()
     }
-    
+
     override func present() {
-        if let applePayComponent {
-            (checkoutHolder.sessionDelegate as? ComponentSessionFlowHandler)?.setCurrentFlow(componentId: componentId)
-            getViewController()?.present(component: applePayComponent)
-        }
+        // TODO: v6 migration - present Apple Pay through checkout session
     }
-    
-    override func onDispose() {
-        applePayComponent = nil
-    }
-    
-    private func buildApplePaySessionComponent() throws -> ApplePayComponent? {
-        guard let session = checkoutHolder.session else { throw PlatformError(errorDescription: "Session is not available.") }
-        guard let paymentMethod = session.state.paymentMethods.paymentMethod(ofType: ApplePayPaymentMethod.self) else { throw PlatformError(errorDescription: "Apple Pay payment method not valid.") }
-        let context = try configuration.createAdyenContext()
-        let configuration = try configuration.mapToApplePayConfiguration()
-        let applePayComponent = try ApplePayComponent(paymentMethod: paymentMethod, context: context, configuration: configuration)
-        applePayComponent.delegate = checkoutHolder.session
-        setupSessionFlowDelegate()
-        return applePayComponent
-    }
-    
-    private func setupSessionFlowDelegate() {
-        if let componentSessionFlowDelegate = (checkoutHolder.sessionDelegate as? ComponentSessionFlowHandler) {
-            componentSessionFlowDelegate.register(
-                componentId: componentId,
-                finalizeCallback: finalizeAndDismissComponent
-            )
-        } else {
-            assertionFailure("Wrong session flow delegate usage")
-        }
-    }
-        
-    override func finalizeAndDismissComponent(success: Bool, completion: @escaping (() -> Void)) {
-        super.finalizeAndDismissComponent(success: success, completion: { [weak self] in
-            completion()
-        })
-    }
+
+    override func onDispose() {}
 }

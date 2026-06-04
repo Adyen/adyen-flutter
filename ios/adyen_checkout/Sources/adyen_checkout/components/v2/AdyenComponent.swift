@@ -53,9 +53,7 @@ class AdyenComponent: NSObject, FlutterPlatformView {
                 throw PlatformError(errorDescription: "Checkout is not available.")
             }
             
-            guard let paymentComponent = checkoutHolder.adyenCheckout?.createPaymentComponent(for: paymentMethodType) else {
-                throw PlatformError(errorDescription: "Payment component not available.")
-            }
+            let paymentComponent = try checkout.createPaymentComponent(for: paymentMethodType)
             
             self.paymentComponent = paymentComponent
             self.showComponent(paymentComponent: paymentComponent)

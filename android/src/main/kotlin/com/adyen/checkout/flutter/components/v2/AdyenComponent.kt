@@ -3,6 +3,7 @@ package com.adyen.checkout.flutter.components.v2
 import android.content.Context
 import android.view.View
 import androidx.activity.ComponentActivity
+import androidx.fragment.app.FragmentActivity
 import com.adyen.checkout.core.common.CheckoutContext
 import com.adyen.checkout.core.components.CheckoutCallbacks
 import com.adyen.checkout.core.components.data.model.paymentmethod.PaymentMethod
@@ -11,6 +12,7 @@ import com.adyen.checkout.flutter.components.view.DynamicComponentView
 import io.flutter.plugin.platform.PlatformView
 
 internal class AdyenComponent(
+    activity: FragmentActivity,
     checkoutContext: CheckoutContext,
     checkoutCallbacks: CheckoutCallbacks,
     paymentMethod: PaymentMethod,
@@ -23,6 +25,7 @@ internal class AdyenComponent(
 
     init {
         dynamicComponentView.addV6Component(
+            activity = activity,
             paymentMethod = paymentMethod,
             checkoutContext = checkoutContext,
             callbacks = checkoutCallbacks

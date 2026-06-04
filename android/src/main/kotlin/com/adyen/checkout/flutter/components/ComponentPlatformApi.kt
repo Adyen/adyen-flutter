@@ -88,6 +88,7 @@ class ComponentPlatformApi(
             binding.platformViewRegistry.registerViewFactory(
                 AdyenComponentFactory.ADYEN_COMPONENT_SESSION,
                 AdyenComponentFactory(
+                    activity = activity,
                     adyenFlutterInterface = adyenFlutterInterface,
                     viewTypeId = AdyenComponentFactory.ADYEN_COMPONENT_SESSION,
                     onDispose = ::onDispose,
@@ -98,6 +99,7 @@ class ComponentPlatformApi(
             binding.platformViewRegistry.registerViewFactory(
                 AdyenComponentFactory.ADYEN_COMPONENT_ADVANCED,
                 AdyenComponentFactory(
+                    activity = activity,
                     adyenFlutterInterface = adyenFlutterInterface,
                     platformEventHandler = platformEventHandler,
                     viewTypeId = AdyenComponentFactory.ADYEN_COMPONENT_ADVANCED,

@@ -5,12 +5,13 @@ import Adyen
 import PassKit
 
 extension ApplePayConfigurationDTO {
-    // TODO: - Payment type removed in v6 SDK. Replaced with direct amount/countryCode parameters.
-    func toApplePayConfiguration(amount: Adyen.Amount? = nil, countryCode: String? = nil) throws -> ApplePayComponent.Configuration {
+    // TODO: v6 migration - ApplePayComponent is now package-access. Use ApplePayConfiguration directly.
+    func toApplePayConfiguration(amount: Adyen.Amount? = nil, countryCode: String? = nil) throws -> ApplePayConfiguration {
         guard let amount, let countryCode else { throw PlatformError(errorDescription: "Amount and countryCode for Apple Pay not provided.") }
         let summaryItems = try mapToPaymentSummaryItems(summaryItems: summaryItems, amount: amount)
         let paymentRequest = try buildPaymentRequest(amount: amount, countryCode: countryCode, summaryItems: summaryItems)
-        return try ApplePayComponent.Configuration(paymentRequest: paymentRequest, allowOnboarding: allowOnboarding ?? false)
+        // NOTE: allowOnboarding is now internal on ApplePayConfiguration; it will need to be set via CheckoutConfiguration DSL.
+        return try ApplePayConfiguration(paymentRequest: paymentRequest)
     }
     
     private func buildPaymentRequest(amount: Adyen.Amount, countryCode: String, summaryItems: [PKPaymentSummaryItem]) throws -> PKPaymentRequest {

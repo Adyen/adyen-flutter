@@ -6,13 +6,15 @@ import UIKit
     import adyen_checkout
 #endif
 
-#if canImport(AdyenActions)
-    import AdyenActions
-#endif
+// TODO: v6 migration - AdyenActions (RedirectComponent) is now package-access.
+// #if canImport(AdyenActions)
+//     import AdyenActions
+// #endif
 
-#if canImport(AdyenDropIn)
-    import AdyenDropIn
-#endif
+// TODO: v6 migration - DropInComponent.Style is now package-access.
+// #if canImport(AdyenDropIn)
+//     import AdyenDropIn
+// #endif
 
 #if canImport(AdyenUI)
     import AdyenUI
@@ -25,24 +27,27 @@ import UIKit
         didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
     ) -> Bool {
         GeneratedPluginRegistrant.register(with: self)
-        setDropInStyle()
+        // TODO: v6 migration - Drop-in styling via DropInComponent.Style is no longer available.
+        // setDropInStyle()
         setCardComponentStyle()
         setBlikComponentStyle()
         return super.application(application, didFinishLaunchingWithOptions: launchOptions)
     }
 
-    override func application(_: UIApplication, open url: URL, options _: [UIApplication.OpenURLOptionsKey: Any] = [:]) -> Bool {
-        RedirectComponent.applicationDidOpen(from: url)
-        return true
-    }
+    // TODO: v6 migration - RedirectComponent.applicationDidOpen is now package-access.
+    // override func application(_: UIApplication, open url: URL, options _: [UIApplication.OpenURLOptionsKey: Any] = [:]) -> Bool {
+    //     RedirectComponent.applicationDidOpen(from: url)
+    //     return true
+    // }
 
-    private func setDropInStyle() {
-        var dropInStyle = DropInComponent.Style()
-        dropInStyle.formComponent.mainButtonItem.button.backgroundColor = UIColor(named: "PrimaryBackground") ?? .black
-        dropInStyle.formComponent.mainButtonItem.button.title.color = UIColor(named: "PrimaryTitle") ?? .white
-        dropInStyle.formComponent.textField.tintColor = UIColor(named: "PrimaryBackground") ?? .black
-        AdyenAppearance.dropInStyle = dropInStyle
-    }
+    // TODO: v6 migration - DropInComponent.Style is now package-access.
+    // private func setDropInStyle() {
+    //     var dropInStyle = DropInComponent.Style()
+    //     dropInStyle.formComponent.mainButtonItem.button.backgroundColor = UIColor(named: "PrimaryBackground") ?? .black
+    //     dropInStyle.formComponent.mainButtonItem.button.title.color = UIColor(named: "PrimaryTitle") ?? .white
+    //     dropInStyle.formComponent.textField.tintColor = UIColor(named: "PrimaryBackground") ?? .black
+    //     AdyenAppearance.dropInStyle = dropInStyle
+    // }
 
     private func setCardComponentStyle() {
         var cardComponentStyle = AdyenUI.FormComponentStyle()
