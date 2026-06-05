@@ -20,7 +20,6 @@ import UIKit
         _ application: UIApplication,
         didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
     ) -> Bool {
-        // Style setup is process-level, not UI-level — keep here.
         setDropInStyle()
         setCardComponentStyle()
         setBlikComponentStyle()
@@ -31,7 +30,6 @@ import UIKit
         GeneratedPluginRegistrant.register(with: engineBridge.pluginRegistry)
     }
 
-    // iOS 12 / non-scene fallback. Dead on iOS 13+ with a scene manifest; kept for compat.
     override func application(_: UIApplication, open url: URL, options _: [UIApplication.OpenURLOptionsKey: Any] = [:]) -> Bool {
         RedirectComponent.applicationDidOpen(from: url)
         return true

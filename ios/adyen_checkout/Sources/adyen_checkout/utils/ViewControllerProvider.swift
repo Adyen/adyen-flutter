@@ -1,11 +1,6 @@
 import UIKit
 
-/// UIScene-aware helpers for locating the active key window and top-most view controller.
 enum ViewControllerProvider {
-    /// Returns the key window of a foreground `UIWindowScene`, or the application's key
-    /// window on iOS 12. Accepts `.foregroundActive` and `.foregroundInactive` so the
-    /// plugin can still anchor modal presentation during Apple Pay / 3DS2 / biometric /
-    /// system-overlay transitions.
     static func keyWindow() -> UIWindow? {
         if #available(iOS 13.0, *) {
             return UIApplication.shared.connectedScenes
@@ -22,8 +17,6 @@ enum ViewControllerProvider {
         keyWindow()?.rootViewController
     }
 
-    /// Walks the presented-view-controller chain. Bails out (returns `nil`) on the first
-    /// match of `skipTypeName` to preserve the prior `DropInNavigationController` skip.
     static func topViewController(skipTypeName: String? = nil) -> UIViewController? {
         var top = rootViewController()
         while let presented = top?.presentedViewController {
