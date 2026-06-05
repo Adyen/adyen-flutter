@@ -6,16 +6,18 @@ import UIKit
 /// so the plugin does not depend on Adyen iOS SDK internals and behaves correctly under
 /// the `UIScene` lifecycle that Apple now requires for iOS 26+ SDK submissions.
 enum ViewControllerProvider {
-    /// Returns the key window of the foreground-active `UIWindowScene` on iOS 13+,
+    /// Returns the key window of a foreground `UIWindowScene` on iOS 13+,
     /// or the application's key window on iOS 12. Returns `nil` if no window is key.
-    /// On multi-scene devices (iPad multitasking, visionOS) the foreground-active scene
-    /// is the only one the user is interacting with, so it is the right place to anchor
-    /// modal presentation.
+    /// Accepts both `.foregroundActive` and `.foregroundInactive` — during
+    /// Apple Pay, 3DS2 / biometric, and system-overlay transitions the active
+    /// scene briefly becomes `.foregroundInactive`, and the plugin still needs
+    /// a window to anchor modal presentation (e.g. for a redirect-component
+    /// view controller). Background scenes are skipped.
     static func keyWindow() -> UIWindow? {
         if #available(iOS 13.0, *) {
             return UIApplication.shared.connectedScenes
                 .compactMap { $0 as? UIWindowScene }
-                .first(where: { $0.activationState == .foregroundActive })?
+                .first(where: { $0.activationState == .foregroundActive || $0.activationState == .foregroundInactive })?
                 .windows
                 .first(where: { $0.isKeyWindow })
         } else {

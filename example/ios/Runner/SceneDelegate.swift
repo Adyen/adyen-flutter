@@ -11,8 +11,13 @@ final class SceneDelegate: FlutterSceneDelegate {
         _ scene: UIScene,
         openURLContexts URLContexts: Set<UIOpenURLContext>
     ) {
-        if let url = URLContexts.first?.url {
-            RedirectComponent.applicationDidOpen(from: url)
+        // `URLContexts` is a `Set`, so `.first` is non-deterministic when multiple
+        // contexts are delivered. Iterate to find the first URL that the Adyen
+        // redirect component handles (it returns `true` on match).
+        for context in URLContexts {
+            if RedirectComponent.applicationDidOpen(from: context.url) {
+                break
+            }
         }
         super.scene(scene, openURLContexts: URLContexts)
     }
