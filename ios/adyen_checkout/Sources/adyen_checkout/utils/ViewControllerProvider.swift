@@ -1,18 +1,11 @@
 import UIKit
 
-/// Scene-aware helpers for locating the active key window and top-most view controller.
-///
-/// Centralises the previous scattered `UIApplication.shared.adyen.mainKeyWindow` lookups
-/// so the plugin does not depend on Adyen iOS SDK internals and behaves correctly under
-/// the `UIScene` lifecycle that Apple now requires for iOS 26+ SDK submissions.
+/// UIScene-aware helpers for locating the active key window and top-most view controller.
 enum ViewControllerProvider {
-    /// Returns the key window of a foreground `UIWindowScene` on iOS 13+,
-    /// or the application's key window on iOS 12. Returns `nil` if no window is key.
-    /// Accepts both `.foregroundActive` and `.foregroundInactive` — during
-    /// Apple Pay, 3DS2 / biometric, and system-overlay transitions the active
-    /// scene briefly becomes `.foregroundInactive`, and the plugin still needs
-    /// a window to anchor modal presentation (e.g. for a redirect-component
-    /// view controller). Background scenes are skipped.
+    /// Returns the key window of a foreground `UIWindowScene`, or the application's key
+    /// window on iOS 12. Accepts `.foregroundActive` and `.foregroundInactive` so the
+    /// plugin can still anchor modal presentation during Apple Pay / 3DS2 / biometric /
+    /// system-overlay transitions.
     static func keyWindow() -> UIWindow? {
         if #available(iOS 13.0, *) {
             return UIApplication.shared.connectedScenes
@@ -25,15 +18,12 @@ enum ViewControllerProvider {
         }
     }
 
-    /// Returns the root view controller of the key window, or `nil`.
     static func rootViewController() -> UIViewController? {
         keyWindow()?.rootViewController
     }
 
-    /// Walks up the presented-view-controller chain starting from the key window's root.
-    /// If `skipTypeName` is set, the walk bails out (returns `nil`) the first time it
-    /// encounters a presented view controller whose type name matches. This preserves
-    /// the previous `String(describing:) == "DropInNavigationController"` behaviour.
+    /// Walks the presented-view-controller chain. Bails out (returns `nil`) on the first
+    /// match of `skipTypeName` to preserve the prior `DropInNavigationController` skip.
     static func topViewController(skipTypeName: String? = nil) -> UIViewController? {
         var top = rootViewController()
         while let presented = top?.presentedViewController {

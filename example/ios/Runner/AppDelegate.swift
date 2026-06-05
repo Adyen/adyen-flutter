@@ -27,16 +27,11 @@ import UIKit
         return super.application(application, didFinishLaunchingWithOptions: launchOptions)
     }
 
-    /// Move plugin registration to the scene's implicit engine. This is the iOS 26+ /
-    /// UIScene-aware pattern: plugins are now registered against the Flutter engine
-    /// attached to the scene, not the app.
     func didInitializeImplicitFlutterEngine(_ engineBridge: FlutterImplicitEngineBridge) {
         GeneratedPluginRegistrant.register(with: engineBridge.pluginRegistry)
     }
 
-    /// Kept as an iOS 12 / non-scene fallback. On iOS 13+ with a scene manifest
-    /// installed, iOS routes URL opens to SceneDelegate.scene(_:openURLContexts:)
-    /// and this method is dead. Harmless to leave for backwards compat.
+    // iOS 12 / non-scene fallback. Dead on iOS 13+ with a scene manifest; kept for compat.
     override func application(_: UIApplication, open url: URL, options _: [UIApplication.OpenURLOptionsKey: Any] = [:]) -> Bool {
         RedirectComponent.applicationDidOpen(from: url)
         return true
