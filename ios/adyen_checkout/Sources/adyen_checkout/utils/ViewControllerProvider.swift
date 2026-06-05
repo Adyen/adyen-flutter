@@ -4,7 +4,7 @@ import UIKit
 ///
 /// Centralises the previous scattered `UIApplication.shared.adyen.mainKeyWindow` lookups
 /// so the plugin does not depend on Adyen iOS SDK internals and behaves correctly under
-/// the `UIScene` lifecycle (iOS 13+).
+/// the `UIScene` lifecycle that Apple now requires for iOS 26+ SDK submissions.
 enum ViewControllerProvider {
     /// Returns the key window of the foreground-active `UIWindowScene` on iOS 13+,
     /// or the application's key window on iOS 12. Returns `nil` if no window is key.

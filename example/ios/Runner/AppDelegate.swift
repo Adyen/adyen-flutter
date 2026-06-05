@@ -27,7 +27,7 @@ import UIKit
         return super.application(application, didFinishLaunchingWithOptions: launchOptions)
     }
 
-    /// Move plugin registration to the scene's implicit engine. This is the iOS 13+ /
+    /// Move plugin registration to the scene's implicit engine. This is the iOS 26+ /
     /// UIScene-aware pattern: plugins are now registered against the Flutter engine
     /// attached to the scene, not the app.
     func didInitializeImplicitFlutterEngine(_ engineBridge: FlutterImplicitEngineBridge) {
