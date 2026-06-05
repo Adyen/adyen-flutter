@@ -1,4 +1,4 @@
-@_spi(AdyenInternal) import Adyen
+import Adyen
 import UIKit
 
 class BaseInstantComponent {
@@ -37,12 +37,11 @@ class BaseInstantComponent {
     }
     
     func getViewController() -> UIViewController? {
-        let rootViewController = UIApplication.shared.adyen.mainKeyWindow?.rootViewController
-        return rootViewController?.adyen.topPresenter
+        ViewControllerProvider.topViewController()
     }
     
     func showActivityIndicator() {
-        guard let view = UIApplication.shared.adyen.mainKeyWindow else {
+        guard let view = ViewControllerProvider.keyWindow() else {
             return
         }
         let activityIndicatorView = UIActivityIndicatorView(style: .whiteLarge)

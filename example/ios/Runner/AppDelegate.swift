@@ -15,18 +15,28 @@ import UIKit
 #endif
 
 @main
-@objc class AppDelegate: FlutterAppDelegate {
+@objc class AppDelegate: FlutterAppDelegate, FlutterImplicitEngineDelegate {
     override func application(
         _ application: UIApplication,
         didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
     ) -> Bool {
-        GeneratedPluginRegistrant.register(with: self)
+        // Style setup is process-level, not UI-level — keep here.
         setDropInStyle()
         setCardComponentStyle()
         setBlikComponentStyle()
         return super.application(application, didFinishLaunchingWithOptions: launchOptions)
     }
 
+    /// Move plugin registration to the scene's implicit engine. This is the iOS 26+ /
+    /// UIScene-aware pattern: plugins are now registered against the Flutter engine
+    /// attached to the scene, not the app.
+    func didInitializeImplicitFlutterEngine(_ engineBridge: FlutterImplicitEngineBridge) {
+        GeneratedPluginRegistrant.register(with: engineBridge.pluginRegistry)
+    }
+
+    /// Kept as an iOS 12 / non-scene fallback. On iOS 13+ with a scene manifest
+    /// installed, iOS routes URL opens to SceneDelegate.scene(_:openURLContexts:)
+    /// and this method is dead. Harmless to leave for backwards compat.
     override func application(_: UIApplication, open url: URL, options _: [UIApplication.OpenURLOptionsKey: Any] = [:]) -> Bool {
         RedirectComponent.applicationDidOpen(from: url)
         return true

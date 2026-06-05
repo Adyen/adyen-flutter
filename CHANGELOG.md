@@ -2,6 +2,7 @@
 
 ### Changed
 
+- iOS: replaced direct `UIApplication.shared.adyen.mainKeyWindow` access with a centralised, scene-aware `ViewControllerProvider`; example app migrated to the `UISceneDelegate` lifecycle via `FlutterSceneDelegate`.
 - Dependency versions:
   | Name | Version |
   |---------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------|
