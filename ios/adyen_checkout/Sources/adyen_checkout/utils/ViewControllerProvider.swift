@@ -4,15 +4,19 @@ import UIKit
 ///
 /// Centralises the previous scattered `UIApplication.shared.adyen.mainKeyWindow` lookups
 /// so the plugin does not depend on Adyen iOS SDK internals and behaves correctly under
-/// the `UIScene` lifecycle that Apple now requires (iOS 26+).
+/// the `UIScene` lifecycle (iOS 13+).
 enum ViewControllerProvider {
-    /// Returns the key window of the first active `UIWindowScene` on iOS 13+,
+    /// Returns the key window of the foreground-active `UIWindowScene` on iOS 13+,
     /// or the application's key window on iOS 12. Returns `nil` if no window is key.
+    /// On multi-scene devices (iPad multitasking, visionOS) the foreground-active scene
+    /// is the only one the user is interacting with, so it is the right place to anchor
+    /// modal presentation.
     static func keyWindow() -> UIWindow? {
         if #available(iOS 13.0, *) {
             return UIApplication.shared.connectedScenes
                 .compactMap { $0 as? UIWindowScene }
-                .flatMap(\.windows)
+                .first(where: { $0.activationState == .foregroundActive })?
+                .windows
                 .first(where: { $0.isKeyWindow })
         } else {
             return UIApplication.shared.keyWindow
