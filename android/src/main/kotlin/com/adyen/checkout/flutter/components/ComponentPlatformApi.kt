@@ -27,7 +27,6 @@ import com.adyen.checkout.flutter.generated.PaymentResultDTO
 import com.adyen.checkout.flutter.generated.PaymentResultEnum
 import com.adyen.checkout.flutter.generated.PaymentResultModelDTO
 import com.adyen.checkout.flutter.session.SessionHolder
-import com.adyen.checkout.flutter.utils.Constants
 import com.adyen.checkout.googlepay.GooglePayComponent
 import com.adyen.checkout.redirect.RedirectComponent
 import io.flutter.embedding.engine.plugins.FlutterPlugin
@@ -141,20 +140,6 @@ class ComponentPlatformApi(
         currentComponent = null
         googlePayComponentManager.onDispose(componentId)
     }
-
-    fun handleActivityResult(
-        requestCode: Int,
-        resultCode: Int,
-        data: Intent?
-    ): Boolean =
-        when (requestCode) {
-            Constants.GOOGLE_PAY_COMPONENT_REQUEST_CODE -> {
-                googlePayComponentManager.handleGooglePayActivityResult(resultCode, data)
-                true
-            }
-
-            else -> false
-        }
 
     private fun handlePaymentEvent(
         componentId: String,

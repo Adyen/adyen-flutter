@@ -1,6 +1,5 @@
 package com.adyen.checkout.flutter
 
-import android.content.Intent
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
@@ -19,13 +18,11 @@ import io.flutter.embedding.engine.plugins.FlutterPlugin.FlutterPluginBinding
 import io.flutter.embedding.engine.plugins.activity.ActivityAware
 import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding
 import io.flutter.plugin.common.BinaryMessenger
-import io.flutter.plugin.common.PluginRegistry
 
 /** AdyenCheckoutPlugin */
 class AdyenCheckoutPlugin :
     FlutterPlugin,
-    ActivityAware,
-    PluginRegistry.ActivityResultListener {
+    ActivityAware {
     private var flutterPluginBinding: FlutterPluginBinding? = null
     private var activityPluginBinding: ActivityPluginBinding? = null
     private var checkoutPlatformApi: CheckoutPlatformApi? = null
@@ -57,10 +54,7 @@ class AdyenCheckoutPlugin :
             throw Exception(WRONG_FLUTTER_ACTIVITY_USAGE_ERROR_MESSAGE)
         }
 
-        activityPluginBinding =
-            binding.apply {
-                addActivityResultListener(this@AdyenCheckoutPlugin)
-            }
+        activityPluginBinding = binding
 
         flutterPluginBinding?.apply {
             val fragmentActivity = binding.activity as FragmentActivity
@@ -137,7 +131,6 @@ class AdyenCheckoutPlugin :
             teardownComponents(it.binaryMessenger)
         }
 
-        activityPluginBinding?.removeActivityResultListener(this)
         activityPluginBinding = null
     }
 
@@ -162,10 +155,4 @@ class AdyenCheckoutPlugin :
         checkoutPlatformApi = null
         CheckoutPlatformInterface.setUp(binaryMessenger, null)
     }
-
-    override fun onActivityResult(
-        requestCode: Int,
-        resultCode: Int,
-        data: Intent?
-    ): Boolean = componentPlatformApi?.handleActivityResult(requestCode, resultCode, data) ?: false
 }
