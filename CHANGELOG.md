@@ -6,7 +6,7 @@
   | Name | Version |
   |---------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------|
   | [Android Drop-in/Components](https://docs.adyen.com/online-payments/release-notes/?title%5B0%5D=Android+Components%2FDrop-in&version%5B0%5D=5.19.0) | 5.18.0 -> **5.19.0** |
-  | [iOS Drop-in/Components](https://docs.adyen.com/online-payments/release-notes/?title%5B0%5D=iOS+Components%2FDrop-in&version%5B0%5D=5.25.0) | 5.24.0 -> **5.25.0** |
+  | [iOS Drop-in/Components](https://docs.adyen.com/online-payments/release-notes/?title%5B0%5D=iOS+Components%2FDrop-in&version%5B0%5D=5.25.1) | 5.25.0 -> **5.25.1** |
 
 ### Removed
 
