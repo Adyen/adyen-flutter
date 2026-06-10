@@ -341,7 +341,18 @@ class DropInPlatformApi: DropInPlatformInterface {
     }
 
     private func getViewController() -> UIViewController? {
-        ViewControllerProvider.topViewController(skipTypeName: "DropInNavigationController")
+        var rootViewController = UIApplication.shared.adyen.mainKeyWindow?.rootViewController
+        while let presentedViewController = rootViewController?.presentedViewController {
+            let type = String(describing: type(of: presentedViewController))
+            // TODO: - We need to discuss how the SDK should react if a DropInNavigationController is already displayed
+            if type == "DropInNavigationController" {
+                return nil
+            } else {
+                rootViewController = presentedViewController
+            }
+        }
+
+        return rootViewController
     }
     
     private func overridePaymentMethodNames(paymentMethods: PaymentMethods, paymentMethodNames: [String?: String?]) -> PaymentMethods {

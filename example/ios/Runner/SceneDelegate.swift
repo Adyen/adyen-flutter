@@ -2,6 +2,10 @@ import Adyen
 import Flutter
 import UIKit
 
+#if canImport(AdyenActions)
+    import AdyenActions
+#endif
+
 final class SceneDelegate: FlutterSceneDelegate {
     override func scene(
         _ scene: UIScene,

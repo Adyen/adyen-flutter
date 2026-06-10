@@ -1,5 +1,5 @@
-import Adyen
 import UIKit
+@_spi(AdyenInternal) import Adyen
 #if canImport(AdyenComponents)
     import AdyenComponents
 #endif
@@ -28,6 +28,7 @@ class BaseApplePayComponent {
     }
     
     func getViewController() -> UIViewController? {
-        ViewControllerProvider.topViewController()
+        let rootViewController = UIApplication.shared.adyen.mainKeyWindow?.rootViewController
+        return rootViewController?.adyen.topPresenter
     }
 }

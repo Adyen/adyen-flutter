@@ -1,4 +1,4 @@
-import Adyen
+@_spi(AdyenInternal) import Adyen
 #if canImport(AdyenActions)
     import AdyenActions
 #endif
@@ -34,7 +34,8 @@ class ActionComponentManager {
     }
     
     func getViewController() -> UIViewController? {
-        ViewControllerProvider.topViewController()
+        let rootViewController = UIApplication.shared.adyen.mainKeyWindow?.rootViewController
+        return rootViewController?.adyen.topPresenter
     }
     
     func finalizeCallback(success: Bool, completion: @escaping (() -> Void)) {

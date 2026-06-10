@@ -34,7 +34,12 @@ class BasePlatformViewComponent: NSObject, FlutterPlatformView, UIScrollViewDele
     }
 
     func getViewController() -> UIViewController? {
-        ViewControllerProvider.topViewController()
+        var rootViewController = UIApplication.shared.adyen.mainKeyWindow?.rootViewController
+        while let presentedViewController = rootViewController?.presentedViewController {
+            rootViewController = presentedViewController
+        }
+
+        return rootViewController
     }
 
     func sendErrorToFlutterLayer(errorMessage: String) {
