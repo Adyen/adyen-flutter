@@ -11,11 +11,9 @@ final class SceneDelegate: FlutterSceneDelegate {
         _ scene: UIScene,
         openURLContexts URLContexts: Set<UIOpenURLContext>
     ) {
-        for context in URLContexts {
-            if RedirectComponent.applicationDidOpen(from: context.url) {
-                break
-            }
+        let unhandledContexts = URLContexts.filter { context in
+            !RedirectComponent.applicationDidOpen(from: context.url)
         }
-        super.scene(scene, openURLContexts: URLContexts)
+        super.scene(scene, openURLContexts: Set(unhandledContexts))
     }
 }
