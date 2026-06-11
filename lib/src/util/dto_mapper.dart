@@ -136,9 +136,9 @@ extension ApplePayConfigurationMapper on ApplePayConfiguration {
         merchantCapability: merchantCapability,
         supportsCouponCode: supportsCouponCode,
         couponCode: couponCode,
-        hasOnShippingMethodChange: onShippingMethodChange != null,
-        hasOnShippingContactChange: onShippingContactChange != null,
-        hasOnCouponCodeChange: onCouponCodeChange != null,
+        hasOnSelectShippingMethod: onSelectShippingMethod != null,
+        hasOnSelectShippingContact: onSelectShippingContact != null,
+        hasOnChangeCouponChode: onChangeCouponChode != null,
         hasOnAuthorize: onAuthorize != null,
       );
 }

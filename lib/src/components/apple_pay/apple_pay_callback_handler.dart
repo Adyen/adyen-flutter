@@ -12,13 +12,13 @@ class ApplePayCallbackHandler {
 
   ApplePayConfiguration get _configuration => _configurationProvider();
 
-  Future<ApplePayShippingMethodUpdateDTO> onShippingMethodChange(
+  Future<ApplePayShippingMethodUpdateDTO> onSelectShippingMethod(
     ApplePayShippingMethodDTO shippingMethod,
     List<ApplePaySummaryItemDTO?> summaryItems,
   ) async {
     try {
       final shippingMethodUpdate =
-          await _configuration.onShippingMethodChange?.call(
+          await _configuration.onSelectShippingMethod?.call(
         shippingMethod.fromDTO(),
         summaryItems.fromDTOs(),
       );
@@ -26,18 +26,18 @@ class ApplePayCallbackHandler {
           ApplePayShippingMethodUpdateDTO(summaryItems: summaryItems);
     } catch (exception) {
       AdyenLogger.instance
-          .print('onApplePayShippingMethodChange failed: $exception');
+          .print('onApplePaySelectShippingMethod failed: $exception');
       return ApplePayShippingMethodUpdateDTO(summaryItems: summaryItems);
     }
   }
 
-  Future<ApplePayShippingContactUpdateDTO> onShippingContactChange(
+  Future<ApplePayShippingContactUpdateDTO> onSelectShippingContact(
     ApplePayContactDTO contact,
     List<ApplePaySummaryItemDTO?> summaryItems,
   ) async {
     try {
       final shippingContactUpdate =
-          await _configuration.onShippingContactChange?.call(
+          await _configuration.onSelectShippingContact?.call(
         contact.fromDTO(),
         summaryItems.fromDTOs(),
       );
@@ -45,17 +45,17 @@ class ApplePayCallbackHandler {
           ApplePayShippingContactUpdateDTO(summaryItems: summaryItems);
     } catch (exception) {
       AdyenLogger.instance
-          .print('onApplePayShippingContactChange failed: $exception');
+          .print('onApplePaySelectShippingContact failed: $exception');
       return ApplePayShippingContactUpdateDTO(summaryItems: summaryItems);
     }
   }
 
-  Future<ApplePayCouponCodeUpdateDTO> onCouponCodeChange(
+  Future<ApplePayCouponCodeUpdateDTO> onChangeCouponChode(
     String couponCode,
     List<ApplePaySummaryItemDTO?> summaryItems,
   ) async {
     try {
-      final couponCodeUpdate = await _configuration.onCouponCodeChange?.call(
+      final couponCodeUpdate = await _configuration.onChangeCouponChode?.call(
         couponCode,
         summaryItems.fromDTOs(),
       );
@@ -63,7 +63,7 @@ class ApplePayCallbackHandler {
           ApplePayCouponCodeUpdateDTO(summaryItems: summaryItems);
     } catch (exception) {
       AdyenLogger.instance
-          .print('onApplePayCouponCodeChange failed: $exception');
+          .print('onApplePayChangeCouponChode failed: $exception');
       return ApplePayCouponCodeUpdateDTO(summaryItems: summaryItems);
     }
   }

@@ -100,18 +100,18 @@ class ApplePayAdvancedComponentScreen extends StatelessWidget {
       supportsCouponCode: true,
       couponCode: "SUMMER10",
       shippingMethods: _buildShippingMethods(),
-      onShippingContactChange: _onShippingContactChange,
-      onShippingMethodChange: _onShippingMethodChange,
-      onCouponCodeChange: _onCouponCodeChange,
+      onSelectShippingContact: _onSelectShippingContact,
+      onSelectShippingMethod: _onSelectShippingMethod,
+      onChangeCouponChode: _onChangeCouponChode,
       onAuthorize: _onAuthorize,
     );
   }
 
-  Future<ApplePayShippingContactUpdate> _onShippingContactChange(
+  Future<ApplePayShippingContactUpdate> _onSelectShippingContact(
     ApplePayContact contact,
     List<ApplePaySummaryItem> currentSummaryItems,
   ) async {
-    debugPrint('onShippingContactChange: $contact');
+    debugPrint('onSelectShippingContact: $contact');
     final shippingContactUpdate = ApplePayShippingContactUpdate(
       summaryItems: _buildApplePaySummaryItems(),
       shippingMethods: _buildShippingMethods(),
@@ -119,11 +119,11 @@ class ApplePayAdvancedComponentScreen extends StatelessWidget {
     return shippingContactUpdate;
   }
 
-  Future<ApplePayShippingMethodUpdate> _onShippingMethodChange(
+  Future<ApplePayShippingMethodUpdate> _onSelectShippingMethod(
     ApplePayShippingMethod method,
     List<ApplePaySummaryItem> currentSummaryItems,
   ) async {
-    debugPrint('onShippingMethodChange: $method');
+    debugPrint('onSelectShippingMethod: $method');
     final shippingMethodUpdate = ApplePayShippingMethodUpdate(
       summaryItems: _buildApplePaySummaryItems(
         shippingAmount: method.amount.value,
@@ -132,11 +132,11 @@ class ApplePayAdvancedComponentScreen extends StatelessWidget {
     return shippingMethodUpdate;
   }
 
-  Future<ApplePayCouponCodeUpdate> _onCouponCodeChange(
+  Future<ApplePayCouponCodeUpdate> _onChangeCouponChode(
     String couponCode,
     List<ApplePaySummaryItem> currentSummaryItems,
   ) async {
-    debugPrint('onCouponCodeChange: $couponCode');
+    debugPrint('onChangeCouponChode: $couponCode');
     final ApplePayCouponCodeUpdate couponCodeUpdate;
     if (couponCode.toUpperCase() != "SUMMER10") {
       couponCodeUpdate = ApplePayCouponCodeUpdate(

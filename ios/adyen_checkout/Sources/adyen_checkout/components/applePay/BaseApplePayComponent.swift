@@ -62,7 +62,7 @@ extension BaseApplePayComponent: ApplePayComponentDelegate {
         completion: @escaping (PKPaymentRequestShippingContactUpdate) -> Void
     ) {
         let fallback = PKPaymentRequestShippingContactUpdate(paymentSummaryItems: payment.summaryItems)
-        componentFlutterApi.onApplePayShippingContactChange(
+        componentFlutterApi.onApplePaySelectShippingContact(
             componentId: componentId,
             contact: contact.toDTO(),
             currentSummaryItems: payment.summaryItems.map { $0.toDTO(currencyCode: payment.currencyCode) },
@@ -87,7 +87,7 @@ extension BaseApplePayComponent: ApplePayComponentDelegate {
         completion: @escaping (PKPaymentRequestShippingMethodUpdate) -> Void
     ) {
         let fallback = PKPaymentRequestShippingMethodUpdate(paymentSummaryItems: payment.summaryItems)
-        componentFlutterApi.onApplePayShippingMethodChange(
+        componentFlutterApi.onApplePaySelectShippingMethod(
             componentId: componentId,
             shippingMethod: shippingMethod.toDTO(currencyCode: payment.currencyCode),
             currentSummaryItems: payment.summaryItems.map { $0.toDTO(currencyCode: payment.currencyCode) },
@@ -113,7 +113,7 @@ extension BaseApplePayComponent: ApplePayComponentDelegate {
         completion: @escaping (PKPaymentRequestCouponCodeUpdate) -> Void
     ) {
         let fallback = PKPaymentRequestCouponCodeUpdate(paymentSummaryItems: payment.summaryItems)
-        componentFlutterApi.onApplePayCouponCodeChange(
+        componentFlutterApi.onApplePayChangeCouponChode(
             componentId: componentId,
             couponCode: couponCode,
             currentSummaryItems: payment.summaryItems.map { $0.toDTO(currencyCode: payment.currencyCode) },
@@ -151,9 +151,11 @@ extension BaseApplePayComponent: ApplePayAuthorizationDelegate {
                 case let .success(update):
                     completion(update.toPKPaymentAuthorizationResult())
                 case let .failure(adyenPigeonError):
-                    completion(PKPaymentAuthorizationResult(
+                    completion(
+                        PKPaymentAuthorizationResult(
                             status: .failure,
-                            errors: [NSError(domain: "AdyenPigeonError", code: 0, userInfo: [NSLocalizedDescriptionKey: adyenPigeonError.message ?? adyenPigeonError.code])])
+                            errors: [NSError(domain: "AdyenPigeonError", code: 0, userInfo: [NSLocalizedDescriptionKey: adyenPigeonError.message ?? adyenPigeonError.code])]
+                        )
                     )
                 }
             }

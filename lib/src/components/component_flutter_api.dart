@@ -32,36 +32,36 @@ class ComponentFlutterApi implements ComponentFlutterInterface {
   }
 
   @override
-  Future<ApplePayShippingMethodUpdateDTO> onApplePayShippingMethodChange(
+  Future<ApplePayShippingMethodUpdateDTO> onApplePaySelectShippingMethod(
     String componentId,
     ApplePayShippingMethodDTO shippingMethod,
     List<ApplePaySummaryItemDTO?> summaryItems,
   ) async =>
       await ApplePayCallbackRegistry.instance
           .handlerFor(componentId)
-          ?.onShippingMethodChange(shippingMethod, summaryItems) ??
+          ?.onSelectShippingMethod(shippingMethod, summaryItems) ??
       ApplePayShippingMethodUpdateDTO(summaryItems: summaryItems);
 
   @override
-  Future<ApplePayShippingContactUpdateDTO> onApplePayShippingContactChange(
+  Future<ApplePayShippingContactUpdateDTO> onApplePaySelectShippingContact(
     String componentId,
     ApplePayContactDTO contact,
     List<ApplePaySummaryItemDTO?> summaryItems,
   ) async =>
       await ApplePayCallbackRegistry.instance
           .handlerFor(componentId)
-          ?.onShippingContactChange(contact, summaryItems) ??
+          ?.onSelectShippingContact(contact, summaryItems) ??
       ApplePayShippingContactUpdateDTO(summaryItems: summaryItems);
 
   @override
-  Future<ApplePayCouponCodeUpdateDTO> onApplePayCouponCodeChange(
+  Future<ApplePayCouponCodeUpdateDTO> onApplePayChangeCouponChode(
     String componentId,
     String couponCode,
     List<ApplePaySummaryItemDTO?> summaryItems,
   ) async =>
       await ApplePayCallbackRegistry.instance
           .handlerFor(componentId)
-          ?.onCouponCodeChange(couponCode, summaryItems) ??
+          ?.onChangeCouponChode(couponCode, summaryItems) ??
       ApplePayCouponCodeUpdateDTO(summaryItems: summaryItems);
 
   @override

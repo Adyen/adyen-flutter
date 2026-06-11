@@ -85,18 +85,19 @@ class ApplePaySessionComponentScreen extends StatelessWidget {
       allowOnboarding: true,
       applePaySummaryItems: _buildApplePaySummaryItems(),
       applePayShippingType: ApplePayShippingType.shipping,
-      supportsCouponCode: false, //The amount cannot be changed in a session flow.
+      supportsCouponCode:
+          false, //The amount cannot be changed in a session flow.
       shippingMethods: _buildShippingMethods(),
-      onShippingMethodChange: _onShippingMethodChange,
+      onSelectShippingMethod: _onSelectShippingMethod,
       onAuthorize: _onAuthorize,
     );
   }
 
-  Future<ApplePayShippingMethodUpdate> _onShippingMethodChange(
+  Future<ApplePayShippingMethodUpdate> _onSelectShippingMethod(
     ApplePayShippingMethod method,
     List<ApplePaySummaryItem> currentSummaryItems,
   ) async {
-    debugPrint('onShippingMethodChange: $method');
+    debugPrint('onSelectShippingMethod: $method');
     debugPrint(
       'Session flow uses a fixed amount. Use advanced flow for paid shipping methods.',
     );

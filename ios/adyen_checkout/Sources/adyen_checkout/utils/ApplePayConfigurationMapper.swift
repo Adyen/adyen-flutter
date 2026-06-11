@@ -7,7 +7,7 @@ import PassKit
 
 extension ApplePayConfigurationDTO {
     var requiresApplePayUpdateDelegate: Bool {
-        hasOnShippingMethodChange || hasOnShippingContactChange || hasOnCouponCodeChange
+        hasOnSelectShippingMethod || hasOnSelectShippingContact || hasOnChangeCouponChode
     }
 
     var requiresAuthorizationDelegate: Bool {

@@ -408,9 +408,9 @@ class ApplePayConfigurationDTO {
   final ApplePayMerchantCapability? merchantCapability;
   final bool? supportsCouponCode;
   final String? couponCode;
-  final bool hasOnShippingMethodChange;
-  final bool hasOnShippingContactChange;
-  final bool hasOnCouponCodeChange;
+  final bool hasOnSelectShippingMethod;
+  final bool hasOnSelectShippingContact;
+  final bool hasOnChangeCouponChode;
   final bool hasOnAuthorize;
 
   ApplePayConfigurationDTO(
@@ -430,9 +430,9 @@ class ApplePayConfigurationDTO {
     this.merchantCapability,
     this.supportsCouponCode,
     this.couponCode,
-    this.hasOnShippingMethodChange,
-    this.hasOnShippingContactChange,
-    this.hasOnCouponCodeChange,
+    this.hasOnSelectShippingMethod,
+    this.hasOnSelectShippingContact,
+    this.hasOnChangeCouponChode,
     this.hasOnAuthorize,
   );
 }
@@ -1025,21 +1025,21 @@ abstract class ComponentFlutterInterface {
       ComponentCommunicationModel componentCommunicationModel);
 
   @async
-  ApplePayShippingMethodUpdateDTO onApplePayShippingMethodChange(
+  ApplePayShippingMethodUpdateDTO onApplePaySelectShippingMethod(
     String componentId,
     ApplePayShippingMethodDTO shippingMethod,
     List<ApplePaySummaryItemDTO?> currentSummaryItems,
   );
 
   @async
-  ApplePayShippingContactUpdateDTO onApplePayShippingContactChange(
+  ApplePayShippingContactUpdateDTO onApplePaySelectShippingContact(
     String componentId,
     ApplePayContactDTO contact,
     List<ApplePaySummaryItemDTO?> currentSummaryItems,
   );
 
   @async
-  ApplePayCouponCodeUpdateDTO onApplePayCouponCodeChange(
+  ApplePayCouponCodeUpdateDTO onApplePayChangeCouponChode(
     String componentId,
     String couponCode,
     List<ApplePaySummaryItemDTO?> currentSummaryItems,

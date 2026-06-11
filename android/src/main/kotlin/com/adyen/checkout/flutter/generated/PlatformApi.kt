@@ -793,9 +793,9 @@ data class ApplePayConfigurationDTO (
   val merchantCapability: ApplePayMerchantCapability? = null,
   val supportsCouponCode: Boolean? = null,
   val couponCode: String? = null,
-  val hasOnShippingMethodChange: Boolean,
-  val hasOnShippingContactChange: Boolean,
-  val hasOnCouponCodeChange: Boolean,
+  val hasOnSelectShippingMethod: Boolean,
+  val hasOnSelectShippingContact: Boolean,
+  val hasOnChangeCouponChode: Boolean,
   val hasOnAuthorize: Boolean
 
 ) {
@@ -818,11 +818,11 @@ data class ApplePayConfigurationDTO (
       val merchantCapability = __pigeon_list[13] as ApplePayMerchantCapability?
       val supportsCouponCode = __pigeon_list[14] as Boolean?
       val couponCode = __pigeon_list[15] as String?
-      val hasOnShippingMethodChange = __pigeon_list[16] as Boolean
-      val hasOnShippingContactChange = __pigeon_list[17] as Boolean
-      val hasOnCouponCodeChange = __pigeon_list[18] as Boolean
+      val hasOnSelectShippingMethod = __pigeon_list[16] as Boolean
+      val hasOnSelectShippingContact = __pigeon_list[17] as Boolean
+      val hasOnChangeCouponChode = __pigeon_list[18] as Boolean
       val hasOnAuthorize = __pigeon_list[19] as Boolean
-      return ApplePayConfigurationDTO(merchantId, merchantName, allowOnboarding, summaryItems, requiredBillingContactFields, billingContact, requiredShippingContactFields, shippingContact, applePayShippingType, allowShippingContactEditing, shippingMethods, applicationData, supportedCountries, merchantCapability, supportsCouponCode, couponCode, hasOnShippingMethodChange, hasOnShippingContactChange, hasOnCouponCodeChange, hasOnAuthorize)
+      return ApplePayConfigurationDTO(merchantId, merchantName, allowOnboarding, summaryItems, requiredBillingContactFields, billingContact, requiredShippingContactFields, shippingContact, applePayShippingType, allowShippingContactEditing, shippingMethods, applicationData, supportedCountries, merchantCapability, supportsCouponCode, couponCode, hasOnSelectShippingMethod, hasOnSelectShippingContact, hasOnChangeCouponChode, hasOnAuthorize)
     }
   }
   fun toList(): List<Any?> {
@@ -843,9 +843,9 @@ data class ApplePayConfigurationDTO (
       merchantCapability,
       supportsCouponCode,
       couponCode,
-      hasOnShippingMethodChange,
-      hasOnShippingContactChange,
-      hasOnCouponCodeChange,
+      hasOnSelectShippingMethod,
+      hasOnSelectShippingContact,
+      hasOnChangeCouponChode,
       hasOnAuthorize,
     )
   }
@@ -3031,10 +3031,10 @@ class ComponentFlutterInterface(private val binaryMessenger: BinaryMessenger, pr
       } 
     }
   }
-  fun onApplePayShippingMethodChange(componentIdArg: String, shippingMethodArg: ApplePayShippingMethodDTO, currentSummaryItemsArg: List<ApplePaySummaryItemDTO?>, callback: (Result<ApplePayShippingMethodUpdateDTO>) -> Unit)
+  fun onApplePaySelectShippingMethod(componentIdArg: String, shippingMethodArg: ApplePayShippingMethodDTO, currentSummaryItemsArg: List<ApplePaySummaryItemDTO?>, callback: (Result<ApplePayShippingMethodUpdateDTO>) -> Unit)
 {
     val separatedMessageChannelSuffix = if (messageChannelSuffix.isNotEmpty()) ".$messageChannelSuffix" else ""
-    val channelName = "dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface.onApplePayShippingMethodChange$separatedMessageChannelSuffix"
+    val channelName = "dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface.onApplePaySelectShippingMethod$separatedMessageChannelSuffix"
     val channel = BasicMessageChannel<Any?>(binaryMessenger, channelName, codec)
     channel.send(listOf(componentIdArg, shippingMethodArg, currentSummaryItemsArg)) {
       if (it is List<*>) {
@@ -3051,10 +3051,10 @@ class ComponentFlutterInterface(private val binaryMessenger: BinaryMessenger, pr
       } 
     }
   }
-  fun onApplePayShippingContactChange(componentIdArg: String, contactArg: ApplePayContactDTO, currentSummaryItemsArg: List<ApplePaySummaryItemDTO?>, callback: (Result<ApplePayShippingContactUpdateDTO>) -> Unit)
+  fun onApplePaySelectShippingContact(componentIdArg: String, contactArg: ApplePayContactDTO, currentSummaryItemsArg: List<ApplePaySummaryItemDTO?>, callback: (Result<ApplePayShippingContactUpdateDTO>) -> Unit)
 {
     val separatedMessageChannelSuffix = if (messageChannelSuffix.isNotEmpty()) ".$messageChannelSuffix" else ""
-    val channelName = "dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface.onApplePayShippingContactChange$separatedMessageChannelSuffix"
+    val channelName = "dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface.onApplePaySelectShippingContact$separatedMessageChannelSuffix"
     val channel = BasicMessageChannel<Any?>(binaryMessenger, channelName, codec)
     channel.send(listOf(componentIdArg, contactArg, currentSummaryItemsArg)) {
       if (it is List<*>) {
@@ -3071,10 +3071,10 @@ class ComponentFlutterInterface(private val binaryMessenger: BinaryMessenger, pr
       } 
     }
   }
-  fun onApplePayCouponCodeChange(componentIdArg: String, couponCodeArg: String, currentSummaryItemsArg: List<ApplePaySummaryItemDTO?>, callback: (Result<ApplePayCouponCodeUpdateDTO>) -> Unit)
+  fun onApplePayChangeCouponChode(componentIdArg: String, couponCodeArg: String, currentSummaryItemsArg: List<ApplePaySummaryItemDTO?>, callback: (Result<ApplePayCouponCodeUpdateDTO>) -> Unit)
 {
     val separatedMessageChannelSuffix = if (messageChannelSuffix.isNotEmpty()) ".$messageChannelSuffix" else ""
-    val channelName = "dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface.onApplePayCouponCodeChange$separatedMessageChannelSuffix"
+    val channelName = "dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface.onApplePayChangeCouponChode$separatedMessageChannelSuffix"
     val channel = BasicMessageChannel<Any?>(binaryMessenger, channelName, codec)
     channel.send(listOf(componentIdArg, couponCodeArg, currentSummaryItemsArg)) {
       if (it is List<*>) {

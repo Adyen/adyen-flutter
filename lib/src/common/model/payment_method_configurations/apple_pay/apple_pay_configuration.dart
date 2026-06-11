@@ -29,15 +29,15 @@ class ApplePayConfiguration {
   final Future<ApplePayShippingMethodUpdate> Function(
     ApplePayShippingMethod method,
     List<ApplePaySummaryItem> currentSummaryItems,
-  )? onShippingMethodChange;
+  )? onSelectShippingMethod;
   final Future<ApplePayShippingContactUpdate> Function(
     ApplePayContact contact,
     List<ApplePaySummaryItem> currentSummaryItems,
-  )? onShippingContactChange;
+  )? onSelectShippingContact;
   final Future<ApplePayCouponCodeUpdate> Function(
     String couponCode,
     List<ApplePaySummaryItem> currentSummaryItems,
-  )? onCouponCodeChange;
+  )? onChangeCouponChode;
   final Future<ApplePayAuthorizationResult> Function(
     ApplePayAuthorizedPayment payment,
   )? onAuthorize;
@@ -59,9 +59,9 @@ class ApplePayConfiguration {
     this.merchantCapability,
     this.supportsCouponCode,
     this.couponCode,
-    this.onShippingMethodChange,
-    this.onShippingContactChange,
-    this.onCouponCodeChange,
+    this.onSelectShippingMethod,
+    this.onSelectShippingContact,
+    this.onChangeCouponChode,
     this.onAuthorize,
   });
 
@@ -84,9 +84,9 @@ class ApplePayConfiguration {
         'merchantCapability: $merchantCapability, '
         'supportsCouponCode: $supportsCouponCode, '
         'couponCode: $couponCode, '
-        'onShippingMethodChange: $onShippingMethodChange, '
-        'onShippingContactChange: $onShippingContactChange, '
-        'onCouponCodeChange: $onCouponCodeChange, '
+        'onSelectShippingMethod: $onSelectShippingMethod, '
+        'onSelectShippingContact: $onSelectShippingContact, '
+        'onChangeCouponChode: $onChangeCouponChode, '
         'onAuthorize: $onAuthorize)';
   }
 }
