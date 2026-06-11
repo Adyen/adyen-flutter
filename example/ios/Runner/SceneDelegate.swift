@@ -7,13 +7,10 @@ import UIKit
 #endif
 
 final class SceneDelegate: FlutterSceneDelegate {
-    override func scene(
-        _ scene: UIScene,
-        openURLContexts URLContexts: Set<UIOpenURLContext>
-    ) {
-        let unhandledContexts = URLContexts.filter { context in
-            !RedirectComponent.applicationDidOpen(from: context.url)
-        }
-        super.scene(scene, openURLContexts: Set(unhandledContexts))
+
+    override func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {
+        URLContexts.forEach { RedirectComponent.applicationDidOpen(from: $0.url) }
+        super.scene(scene, openURLContexts: URLContexts)
     }
+
 }
