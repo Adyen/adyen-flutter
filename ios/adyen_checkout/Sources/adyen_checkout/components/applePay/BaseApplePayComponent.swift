@@ -52,6 +52,7 @@ class BaseApplePayComponent {
             component.authorizationDelegate = self
         }
     }
+
 }
 
 extension BaseApplePayComponent: ApplePayComponentDelegate {
@@ -60,6 +61,7 @@ extension BaseApplePayComponent: ApplePayComponentDelegate {
         for payment: ApplePayPayment,
         completion: @escaping (PKPaymentRequestShippingContactUpdate) -> Void
     ) {
+        let fallback = PKPaymentRequestShippingContactUpdate(paymentSummaryItems: payment.summaryItems)
         componentFlutterApi.onApplePayShippingContactChange(
             componentId: componentId,
             contact: contact.toDTO(),
@@ -70,10 +72,10 @@ extension BaseApplePayComponent: ApplePayComponentDelegate {
                     do {
                         try completion(update.toPKPaymentRequestShippingContactUpdate())
                     } catch {
-                        completion(PKPaymentRequestShippingContactUpdate(paymentSummaryItems: payment.summaryItems))
+                        completion(fallback)
                     }
                 case .failure:
-                    completion(PKPaymentRequestShippingContactUpdate(paymentSummaryItems: payment.summaryItems))
+                    completion(fallback)
                 }
             }
         )
@@ -84,6 +86,7 @@ extension BaseApplePayComponent: ApplePayComponentDelegate {
         for payment: ApplePayPayment,
         completion: @escaping (PKPaymentRequestShippingMethodUpdate) -> Void
     ) {
+        let fallback = PKPaymentRequestShippingMethodUpdate(paymentSummaryItems: payment.summaryItems)
         componentFlutterApi.onApplePayShippingMethodChange(
             componentId: componentId,
             shippingMethod: shippingMethod.toDTO(currencyCode: payment.currencyCode),
@@ -94,10 +97,10 @@ extension BaseApplePayComponent: ApplePayComponentDelegate {
                     do {
                         try completion(update.toPKPaymentRequestShippingMethodUpdate())
                     } catch {
-                        completion(PKPaymentRequestShippingMethodUpdate(paymentSummaryItems: payment.summaryItems))
+                        completion(fallback)
                     }
                 case .failure:
-                    completion(PKPaymentRequestShippingMethodUpdate(paymentSummaryItems: payment.summaryItems))
+                    completion(fallback)
                 }
             }
         )
@@ -109,6 +112,7 @@ extension BaseApplePayComponent: ApplePayComponentDelegate {
         for payment: ApplePayPayment,
         completion: @escaping (PKPaymentRequestCouponCodeUpdate) -> Void
     ) {
+        let fallback = PKPaymentRequestCouponCodeUpdate(paymentSummaryItems: payment.summaryItems)
         componentFlutterApi.onApplePayCouponCodeChange(
             componentId: componentId,
             couponCode: couponCode,
@@ -119,10 +123,10 @@ extension BaseApplePayComponent: ApplePayComponentDelegate {
                     do {
                         try completion(update.toPKPaymentRequestCouponCodeUpdate())
                     } catch {
-                        completion(PKPaymentRequestCouponCodeUpdate(paymentSummaryItems: payment.summaryItems))
+                        completion(fallback)
                     }
                 case .failure:
-                    completion(PKPaymentRequestCouponCodeUpdate(paymentSummaryItems: payment.summaryItems))
+                    completion(fallback)
                 }
             }
         )
@@ -146,8 +150,11 @@ extension BaseApplePayComponent: ApplePayAuthorizationDelegate {
                 switch result {
                 case let .success(update):
                     completion(update.toPKPaymentAuthorizationResult())
-                case .failure:
-                    completion(PKPaymentAuthorizationResult(status: .failure, errors: nil))
+                case let .failure(adyenPigeonError):
+                    completion(PKPaymentAuthorizationResult(
+                            status: .failure,
+                            errors: [NSError(domain: "AdyenPigeonError", code: 0, userInfo: [NSLocalizedDescriptionKey: adyenPigeonError.message ?? adyenPigeonError.code])])
+                    )
                 }
             }
         )
