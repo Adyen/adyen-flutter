@@ -410,7 +410,7 @@ class ApplePayConfigurationDTO {
   final String? couponCode;
   final bool hasOnSelectShippingMethod;
   final bool hasOnSelectShippingContact;
-  final bool hasOnChangeCouponChode;
+  final bool hasOnChangeCouponCode;
   final bool hasOnAuthorize;
 
   ApplePayConfigurationDTO(
@@ -432,7 +432,7 @@ class ApplePayConfigurationDTO {
     this.couponCode,
     this.hasOnSelectShippingMethod,
     this.hasOnSelectShippingContact,
-    this.hasOnChangeCouponChode,
+    this.hasOnChangeCouponCode,
     this.hasOnAuthorize,
   );
 }
@@ -1039,7 +1039,7 @@ abstract class ComponentFlutterInterface {
   );
 
   @async
-  ApplePayCouponCodeUpdateDTO onApplePayChangeCouponChode(
+  ApplePayCouponCodeUpdateDTO onApplePayChangeCouponCode(
     String componentId,
     String couponCode,
     List<ApplePaySummaryItemDTO?> currentSummaryItems,

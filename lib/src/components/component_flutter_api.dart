@@ -54,14 +54,14 @@ class ComponentFlutterApi implements ComponentFlutterInterface {
       ApplePayShippingContactUpdateDTO(summaryItems: summaryItems);
 
   @override
-  Future<ApplePayCouponCodeUpdateDTO> onApplePayChangeCouponChode(
+  Future<ApplePayCouponCodeUpdateDTO> onApplePayChangeCouponCode(
     String componentId,
     String couponCode,
     List<ApplePaySummaryItemDTO?> summaryItems,
   ) async =>
       await ApplePayCallbackRegistry.instance
           .handlerFor(componentId)
-          ?.onChangeCouponChode(couponCode, summaryItems) ??
+          ?.onChangeCouponCode(couponCode, summaryItems) ??
       ApplePayCouponCodeUpdateDTO(summaryItems: summaryItems);
 
   @override

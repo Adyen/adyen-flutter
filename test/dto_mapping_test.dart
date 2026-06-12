@@ -247,7 +247,7 @@ void main() {
             ApplePayShippingContactUpdate(
               summaryItems: currentSummaryItems,
             ),
-        onChangeCouponChode: (couponCode, currentSummaryItems) async =>
+        onChangeCouponCode: (couponCode, currentSummaryItems) async =>
             ApplePayCouponCodeUpdate(
               summaryItems: currentSummaryItems,
             ),
@@ -307,7 +307,7 @@ void main() {
     expect(applePayConfigurationDTO.couponCode, "SUMMER10");
     expect(applePayConfigurationDTO.hasOnSelectShippingMethod, true);
     expect(applePayConfigurationDTO.hasOnSelectShippingContact, true);
-    expect(applePayConfigurationDTO.hasOnChangeCouponChode, true);
+    expect(applePayConfigurationDTO.hasOnChangeCouponCode, true);
     expect(applePayConfigurationDTO.hasOnAuthorize, true);
   });
 
@@ -323,7 +323,7 @@ void main() {
 
     expect(applePayConfigurationDTO.hasOnSelectShippingMethod, false);
     expect(applePayConfigurationDTO.hasOnSelectShippingContact, false);
-    expect(applePayConfigurationDTO.hasOnChangeCouponChode, false);
+    expect(applePayConfigurationDTO.hasOnChangeCouponCode, false);
     expect(applePayConfigurationDTO.hasOnAuthorize, false);
   });
 

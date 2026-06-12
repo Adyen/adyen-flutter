@@ -776,7 +776,7 @@ struct ApplePayConfigurationDTO {
     var couponCode: String?
     var hasOnSelectShippingMethod: Bool
     var hasOnSelectShippingContact: Bool
-    var hasOnChangeCouponChode: Bool
+    var hasOnChangeCouponCode: Bool
     var hasOnAuthorize: Bool
 
     // swift-format-ignore: AlwaysUseLowerCamelCase
@@ -799,7 +799,7 @@ struct ApplePayConfigurationDTO {
         let couponCode: String? = nilOrValue(__pigeon_list[15])
         let hasOnSelectShippingMethod = __pigeon_list[16] as! Bool
         let hasOnSelectShippingContact = __pigeon_list[17] as! Bool
-        let hasOnChangeCouponChode = __pigeon_list[18] as! Bool
+        let hasOnChangeCouponCode = __pigeon_list[18] as! Bool
         let hasOnAuthorize = __pigeon_list[19] as! Bool
 
         return ApplePayConfigurationDTO(
@@ -821,7 +821,7 @@ struct ApplePayConfigurationDTO {
             couponCode: couponCode,
             hasOnSelectShippingMethod: hasOnSelectShippingMethod,
             hasOnSelectShippingContact: hasOnSelectShippingContact,
-            hasOnChangeCouponChode: hasOnChangeCouponChode,
+            hasOnChangeCouponCode: hasOnChangeCouponCode,
             hasOnAuthorize: hasOnAuthorize
         )
     }
@@ -846,7 +846,7 @@ struct ApplePayConfigurationDTO {
             couponCode,
             hasOnSelectShippingMethod,
             hasOnSelectShippingContact,
-            hasOnChangeCouponChode,
+            hasOnChangeCouponCode,
             hasOnAuthorize
         ]
     }
@@ -2909,7 +2909,7 @@ protocol ComponentFlutterInterfaceProtocol {
     func onComponentCommunication(componentCommunicationModel componentCommunicationModelArg: ComponentCommunicationModel, completion: @escaping (Result<Void, AdyenPigeonError>) -> Void)
     func onApplePaySelectShippingMethod(componentId componentIdArg: String, shippingMethod shippingMethodArg: ApplePayShippingMethodDTO, currentSummaryItems currentSummaryItemsArg: [ApplePaySummaryItemDTO?], completion: @escaping (Result<ApplePayShippingMethodUpdateDTO, AdyenPigeonError>) -> Void)
     func onApplePaySelectShippingContact(componentId componentIdArg: String, contact contactArg: ApplePayContactDTO, currentSummaryItems currentSummaryItemsArg: [ApplePaySummaryItemDTO?], completion: @escaping (Result<ApplePayShippingContactUpdateDTO, AdyenPigeonError>) -> Void)
-    func onApplePayChangeCouponChode(componentId componentIdArg: String, couponCode couponCodeArg: String, currentSummaryItems currentSummaryItemsArg: [ApplePaySummaryItemDTO?], completion: @escaping (Result<ApplePayCouponCodeUpdateDTO, AdyenPigeonError>) -> Void)
+    func onApplePayChangeCouponCode(componentId componentIdArg: String, couponCode couponCodeArg: String, currentSummaryItems currentSummaryItemsArg: [ApplePaySummaryItemDTO?], completion: @escaping (Result<ApplePayCouponCodeUpdateDTO, AdyenPigeonError>) -> Void)
     func onApplePayAuthorize(componentId componentIdArg: String, payment paymentArg: ApplePayAuthorizedPaymentDTO, completion: @escaping (Result<ApplePayAuthorizationResultDTO, AdyenPigeonError>) -> Void)
 }
 
@@ -3007,8 +3007,8 @@ class ComponentFlutterInterface: ComponentFlutterInterfaceProtocol {
         }
     }
 
-    func onApplePayChangeCouponChode(componentId componentIdArg: String, couponCode couponCodeArg: String, currentSummaryItems currentSummaryItemsArg: [ApplePaySummaryItemDTO?], completion: @escaping (Result<ApplePayCouponCodeUpdateDTO, AdyenPigeonError>) -> Void) {
-        let channelName = "dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface.onApplePayChangeCouponChode\(messageChannelSuffix)"
+    func onApplePayChangeCouponCode(componentId componentIdArg: String, couponCode couponCodeArg: String, currentSummaryItems currentSummaryItemsArg: [ApplePaySummaryItemDTO?], completion: @escaping (Result<ApplePayCouponCodeUpdateDTO, AdyenPigeonError>) -> Void) {
+        let channelName = "dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface.onApplePayChangeCouponCode\(messageChannelSuffix)"
         let channel = FlutterBasicMessageChannel(name: channelName, binaryMessenger: binaryMessenger, codec: codec)
         channel.sendMessage([componentIdArg, couponCodeArg, currentSummaryItemsArg] as [Any?]) { response in
             guard let listResponse = response as? [Any?] else {

@@ -37,7 +37,7 @@ class ApplePayConfiguration {
   final Future<ApplePayCouponCodeUpdate> Function(
     String couponCode,
     List<ApplePaySummaryItem> currentSummaryItems,
-  )? onChangeCouponChode;
+  )? onChangeCouponCode;
   final Future<ApplePayAuthorizationResult> Function(
     ApplePayAuthorizedPayment payment,
   )? onAuthorize;
@@ -61,7 +61,7 @@ class ApplePayConfiguration {
     this.couponCode,
     this.onSelectShippingMethod,
     this.onSelectShippingContact,
-    this.onChangeCouponChode,
+    this.onChangeCouponCode,
     this.onAuthorize,
   });
 
@@ -86,7 +86,7 @@ class ApplePayConfiguration {
         'couponCode: $couponCode, '
         'onSelectShippingMethod: $onSelectShippingMethod, '
         'onSelectShippingContact: $onSelectShippingContact, '
-        'onChangeCouponChode: $onChangeCouponChode, '
+        'onChangeCouponCode: $onChangeCouponCode, '
         'onAuthorize: $onAuthorize)';
   }
 }

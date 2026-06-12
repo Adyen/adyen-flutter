@@ -102,7 +102,7 @@ class ApplePayAdvancedComponentScreen extends StatelessWidget {
       shippingMethods: _buildShippingMethods(),
       onSelectShippingContact: _onSelectShippingContact,
       onSelectShippingMethod: _onSelectShippingMethod,
-      onChangeCouponChode: _onChangeCouponChode,
+      onChangeCouponCode: _onChangeCouponCode,
       onAuthorize: _onAuthorize,
     );
   }
@@ -132,11 +132,11 @@ class ApplePayAdvancedComponentScreen extends StatelessWidget {
     return shippingMethodUpdate;
   }
 
-  Future<ApplePayCouponCodeUpdate> _onChangeCouponChode(
+  Future<ApplePayCouponCodeUpdate> _onChangeCouponCode(
     String couponCode,
     List<ApplePaySummaryItem> currentSummaryItems,
   ) async {
-    debugPrint('onChangeCouponChode: $couponCode');
+    debugPrint('onChangeCouponCode: $couponCode');
     final ApplePayCouponCodeUpdate couponCodeUpdate;
     if (couponCode.toUpperCase() != "SUMMER10") {
       couponCodeUpdate = ApplePayCouponCodeUpdate(

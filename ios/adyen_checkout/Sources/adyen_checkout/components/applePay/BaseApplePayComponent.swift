@@ -113,7 +113,7 @@ extension BaseApplePayComponent: ApplePayComponentDelegate {
         completion: @escaping (PKPaymentRequestCouponCodeUpdate) -> Void
     ) {
         let fallback = PKPaymentRequestCouponCodeUpdate(paymentSummaryItems: payment.summaryItems)
-        componentFlutterApi.onApplePayChangeCouponChode(
+        componentFlutterApi.onApplePayChangeCouponCode(
             componentId: componentId,
             couponCode: couponCode,
             currentSummaryItems: payment.summaryItems.map { $0.toDTO(currencyCode: payment.currencyCode) },

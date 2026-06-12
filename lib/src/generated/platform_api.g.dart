@@ -814,7 +814,7 @@ class ApplePayConfigurationDTO {
     this.couponCode,
     required this.hasOnSelectShippingMethod,
     required this.hasOnSelectShippingContact,
-    required this.hasOnChangeCouponChode,
+    required this.hasOnChangeCouponCode,
     required this.hasOnAuthorize,
   });
 
@@ -854,7 +854,7 @@ class ApplePayConfigurationDTO {
 
   bool hasOnSelectShippingContact;
 
-  bool hasOnChangeCouponChode;
+  bool hasOnChangeCouponCode;
 
   bool hasOnAuthorize;
 
@@ -878,7 +878,7 @@ class ApplePayConfigurationDTO {
       couponCode,
       hasOnSelectShippingMethod,
       hasOnSelectShippingContact,
-      hasOnChangeCouponChode,
+      hasOnChangeCouponCode,
       hasOnAuthorize,
     ];
   }
@@ -908,7 +908,7 @@ class ApplePayConfigurationDTO {
       couponCode: result[15] as String?,
       hasOnSelectShippingMethod: result[16]! as bool,
       hasOnSelectShippingContact: result[17]! as bool,
-      hasOnChangeCouponChode: result[18]! as bool,
+      hasOnChangeCouponCode: result[18]! as bool,
       hasOnAuthorize: result[19]! as bool,
     );
   }
@@ -3333,7 +3333,7 @@ abstract class ComponentFlutterInterface {
       ApplePayContactDTO contact,
       List<ApplePaySummaryItemDTO?> currentSummaryItems);
 
-  Future<ApplePayCouponCodeUpdateDTO> onApplePayChangeCouponChode(
+  Future<ApplePayCouponCodeUpdateDTO> onApplePayChangeCouponCode(
       String componentId,
       String couponCode,
       List<ApplePaySummaryItemDTO?> currentSummaryItems);
@@ -3502,7 +3502,7 @@ abstract class ComponentFlutterInterface {
     {
       final BasicMessageChannel<Object?> __pigeon_channel = BasicMessageChannel<
               Object?>(
-          'dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface.onApplePayChangeCouponChode$messageChannelSuffix',
+          'dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface.onApplePayChangeCouponCode$messageChannelSuffix',
           pigeonChannelCodec,
           binaryMessenger: binaryMessenger);
       if (api == null) {
@@ -3510,21 +3510,21 @@ abstract class ComponentFlutterInterface {
       } else {
         __pigeon_channel.setMessageHandler((Object? message) async {
           assert(message != null,
-              'Argument for dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface.onApplePayChangeCouponChode was null.');
+              'Argument for dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface.onApplePayChangeCouponCode was null.');
           final List<Object?> args = (message as List<Object?>?)!;
           final String? arg_componentId = (args[0] as String?);
           assert(arg_componentId != null,
-              'Argument for dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface.onApplePayChangeCouponChode was null, expected non-null String.');
+              'Argument for dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface.onApplePayChangeCouponCode was null, expected non-null String.');
           final String? arg_couponCode = (args[1] as String?);
           assert(arg_couponCode != null,
-              'Argument for dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface.onApplePayChangeCouponChode was null, expected non-null String.');
+              'Argument for dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface.onApplePayChangeCouponCode was null, expected non-null String.');
           final List<ApplePaySummaryItemDTO?>? arg_currentSummaryItems =
               (args[2] as List<Object?>?)?.cast<ApplePaySummaryItemDTO?>();
           assert(arg_currentSummaryItems != null,
-              'Argument for dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface.onApplePayChangeCouponChode was null, expected non-null List<ApplePaySummaryItemDTO?>.');
+              'Argument for dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface.onApplePayChangeCouponCode was null, expected non-null List<ApplePaySummaryItemDTO?>.');
           try {
             final ApplePayCouponCodeUpdateDTO output =
-                await api.onApplePayChangeCouponChode(arg_componentId!,
+                await api.onApplePayChangeCouponCode(arg_componentId!,
                     arg_couponCode!, arg_currentSummaryItems!);
             return wrapResponse(result: output);
           } on PlatformException catch (e) {
