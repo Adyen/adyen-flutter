@@ -20,11 +20,7 @@ extension ApplePayConfigurationDTO {
         payment: Payment?
     ) throws -> ApplePayComponent.Configuration {
         guard let payment else {
-            throw AdyenPigeonError(
-                code: ApplePayConfigurationErrorCode.missingAmount,
-                message: "Amount for Apple Pay not provided.",
-                details: nil
-            )
+            throw PlatformError(errorDescription: "Amount for Apple Pay not provided.")
         }
         let summaryItems = try mapToPaymentSummaryItems(summaryItems: summaryItems, payment: payment)
         let paymentRequest = try buildPaymentRequest(payment: payment, summaryItems: summaryItems)
@@ -269,11 +265,7 @@ extension ApplePayShippingMethodDTO {
 extension AmountDTO {
     func toFormattedAmount() throws -> NSDecimalNumber {
         guard let value = Int(exactly: value) else {
-            throw AdyenPigeonError(
-                code: ApplePayConfigurationErrorCode.invalidAmount,
-                message: "Cannot map Int64 to Int.",
-                details: nil
-            )
+            throw PlatformError(errorDescription: "Cannot map Int64 to Int.")
         }
         return AmountFormatter.decimalAmount(value, currencyCode: currency)
     }
@@ -461,7 +453,6 @@ extension String {
 }
 
 private enum ApplePayConfigurationErrorCode {
-    static let missingAmount = "apple-pay-missing-amount"
     static let invalidConfiguration = "apple-pay-invalid-configuration"
     static let invalidAmount = "apple-pay-invalid-amount"
     static let invalidDate = "apple-pay-invalid-date"
