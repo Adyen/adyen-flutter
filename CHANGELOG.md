@@ -8,6 +8,7 @@
 
 ### Changed
 
+- iOS example app: migrated to the `UISceneDelegate` lifecycle via `FlutterSceneDelegate` for proper URL handling on iOS 13+.
 - Dependency versions:
   | Name | Version |
   |---------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------|
