@@ -83,16 +83,86 @@ class ApplePaySessionComponentScreen extends StatelessWidget {
       merchantId: Config.merchantId,
       merchantName: Config.merchantName,
       allowOnboarding: true,
-      applePaySummaryItems: [
-        ApplePaySummaryItem(
-          label: "Total",
-          amount: Config.amount,
-          type: ApplePaySummaryItemType.definite,
-        ),
-      ],
+      applePaySummaryItems: _buildApplePaySummaryItems(),
       applePayShippingType: ApplePayShippingType.shipping,
-      allowShippingContactEditing: true,
+      supportsCouponCode:
+          false, //The amount cannot be changed in a session flow.
+      shippingMethods: _buildShippingMethods(),
+      onSelectShippingMethod: _onSelectShippingMethod,
+      onAuthorize: _onAuthorize,
     );
+  }
+
+  Future<ApplePayShippingMethodUpdate> _onSelectShippingMethod(
+    ApplePayShippingMethod method,
+    List<ApplePaySummaryItem> currentSummaryItems,
+  ) async {
+    debugPrint('onSelectShippingMethod: $method');
+    debugPrint(
+      'Session flow uses a fixed amount. Use advanced flow for paid shipping methods.',
+    );
+    return ApplePayShippingMethodUpdate(
+      summaryItems: currentSummaryItems,
+    );
+  }
+
+  Future<ApplePayAuthorizationResult> _onAuthorize(
+    ApplePayAuthorizedPayment payment,
+  ) async {
+    debugPrint('onAuthorize: $payment');
+    return const ApplePayAuthorizationResult.success();
+  }
+
+  List<ApplePaySummaryItem> _buildApplePaySummaryItems() {
+    const productAAmount = 8000;
+    const productBAmount = 2295;
+    const shippingAmount = 1000;
+
+    return [
+      ApplePaySummaryItem(
+        label: "Product A",
+        amount: Amount(value: productAAmount, currency: Config.amount.currency),
+        type: ApplePaySummaryItemType.definite,
+      ),
+      ApplePaySummaryItem(
+        label: "Product B",
+        amount: Amount(value: productBAmount, currency: Config.amount.currency),
+        type: ApplePaySummaryItemType.definite,
+      ),
+      ApplePaySummaryItem(
+        label: "Shipping",
+        amount: Amount(value: shippingAmount, currency: Config.amount.currency),
+        type: ApplePaySummaryItemType.definite,
+      ),
+      ApplePaySummaryItem(
+        label: "Total",
+        amount: Config.amount, //In sessions, the amount cannot be changed
+        type: ApplePaySummaryItemType.definite,
+      ),
+    ];
+  }
+
+  // Session flow uses a fixed amount, so shipping methods must not change the total amount.
+  List<ApplePayShippingMethod> _buildShippingMethods() {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+
+    return [
+      ApplePayShippingMethod(
+        label: "Standard shipping",
+        detail: "DHL",
+        amount: Amount(value: 0, currency: Config.amount.currency),
+        identifier: "identifier 1",
+        startDate: today.add(const Duration(days: 2)),
+        endDate: today.add(const Duration(days: 5)),
+      ),
+      ApplePayShippingMethod(
+        label: "Store pick up",
+        detail: "Weekdays, from 9:00 am to 6:00 pm",
+        amount: Amount(value: 0, currency: Config.amount.currency),
+        identifier: "identifier 2",
+      ),
+    ];
   }
 
   Map<String, dynamic> _extractPaymentMethod(

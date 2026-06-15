@@ -116,6 +116,16 @@ enum ApplePaySummaryItemType {
   definite,
 }
 
+enum ApplePayPaymentErrorType {
+  billingAddress,
+  shippingAddress,
+  contact,
+  couponCode,
+  shippingAddressUnserviceable,
+  couponCodeExpired,
+  unknown,
+}
+
 enum CardNumberValidationResultDTO {
   valid,
   invalidIllegalCharacters,
@@ -396,6 +406,12 @@ class ApplePayConfigurationDTO {
   final String? applicationData;
   final List<String?>? supportedCountries;
   final ApplePayMerchantCapability? merchantCapability;
+  final bool? supportsCouponCode;
+  final String? couponCode;
+  final bool hasOnSelectShippingMethod;
+  final bool hasOnSelectShippingContact;
+  final bool hasOnChangeCouponCode;
+  final bool hasOnAuthorize;
 
   ApplePayConfigurationDTO(
     this.merchantId,
@@ -412,6 +428,82 @@ class ApplePayConfigurationDTO {
     this.applicationData,
     this.supportedCountries,
     this.merchantCapability,
+    this.supportsCouponCode,
+    this.couponCode,
+    this.hasOnSelectShippingMethod,
+    this.hasOnSelectShippingContact,
+    this.hasOnChangeCouponCode,
+    this.hasOnAuthorize,
+  );
+}
+
+class ApplePayAuthorizedPaymentDTO {
+  final String token;
+  final String network;
+  final ApplePayContactDTO? billingContact;
+  final ApplePayContactDTO? shippingContact;
+  final ApplePayShippingMethodDTO? shippingMethod;
+
+  ApplePayAuthorizedPaymentDTO(
+    this.token,
+    this.network,
+    this.billingContact,
+    this.shippingContact,
+    this.shippingMethod,
+  );
+}
+
+class ApplePayPaymentErrorDTO {
+  final ApplePayPaymentErrorType type;
+  final String? field;
+  final String localizedDescription;
+
+  ApplePayPaymentErrorDTO(
+    this.type,
+    this.field,
+    this.localizedDescription,
+  );
+}
+
+class ApplePayAuthorizationResultDTO {
+  final bool isSuccess;
+  final List<ApplePayPaymentErrorDTO?>? errors;
+
+  ApplePayAuthorizationResultDTO(
+    this.isSuccess,
+    this.errors,
+  );
+}
+
+class ApplePayCouponCodeUpdateDTO {
+  final List<ApplePaySummaryItemDTO?> summaryItems;
+  final List<ApplePayShippingMethodDTO?>? shippingMethods;
+  final List<ApplePayPaymentErrorDTO?>? errors;
+
+  ApplePayCouponCodeUpdateDTO(
+    this.summaryItems,
+    this.shippingMethods,
+    this.errors,
+  );
+}
+
+class ApplePayShippingContactUpdateDTO {
+  final List<ApplePaySummaryItemDTO?> summaryItems;
+  final List<ApplePayShippingMethodDTO?>? shippingMethods;
+  final List<ApplePayPaymentErrorDTO?>? errors;
+
+  ApplePayShippingContactUpdateDTO(
+    this.summaryItems,
+    this.shippingMethods,
+    this.errors,
+  );
+}
+
+class ApplePayShippingMethodUpdateDTO {
+  final List<ApplePaySummaryItemDTO?> summaryItems;
+
+  ApplePayShippingMethodUpdateDTO(
+    this.summaryItems,
   );
 }
 
@@ -931,4 +1023,31 @@ abstract class ComponentFlutterInterface {
 
   void onComponentCommunication(
       ComponentCommunicationModel componentCommunicationModel);
+
+  @async
+  ApplePayShippingMethodUpdateDTO onApplePaySelectShippingMethod(
+    String componentId,
+    ApplePayShippingMethodDTO shippingMethod,
+    List<ApplePaySummaryItemDTO?> currentSummaryItems,
+  );
+
+  @async
+  ApplePayShippingContactUpdateDTO onApplePaySelectShippingContact(
+    String componentId,
+    ApplePayContactDTO contact,
+    List<ApplePaySummaryItemDTO?> currentSummaryItems,
+  );
+
+  @async
+  ApplePayCouponCodeUpdateDTO onApplePayChangeCouponCode(
+    String componentId,
+    String couponCode,
+    List<ApplePaySummaryItemDTO?> currentSummaryItems,
+  );
+
+  @async
+  ApplePayAuthorizationResultDTO onApplePayAuthorize(
+    String componentId,
+    ApplePayAuthorizedPaymentDTO payment,
+  );
 }

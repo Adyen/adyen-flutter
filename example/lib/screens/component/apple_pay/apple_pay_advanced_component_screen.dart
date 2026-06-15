@@ -13,6 +13,7 @@ class ApplePayAdvancedComponentScreen extends StatelessWidget {
   });
 
   final AdyenApplePayComponentRepository repository;
+  static const _applePayShippingValue = 500;
 
   @override
   Widget build(BuildContext context) {
@@ -86,66 +87,160 @@ class ApplePayAdvancedComponentScreen extends StatelessWidget {
   }
 
   ApplePayConfiguration _createApplePayConfiguration() {
-    final now = DateTime.now();
-    final today = DateTime(now.year, now.month, now.day);
-
     return ApplePayConfiguration(
       merchantId: Config.merchantId,
       merchantName: Config.merchantName,
       allowOnboarding: true,
-      applePaySummaryItems: [
-        ApplePaySummaryItem(
-          label: "Product A",
-          amount: Amount(value: 5000, currency: "EUR"),
-          type: ApplePaySummaryItemType.definite,
-        ),
-        ApplePaySummaryItem(
-          label: "Product B",
-          amount: Amount(value: 2500, currency: "EUR"),
-          type: ApplePaySummaryItemType.definite,
-        ),
-        ApplePaySummaryItem(
-          label: "Discount",
-          amount: Amount(value: -1000, currency: "EUR"),
-          type: ApplePaySummaryItemType.definite,
-        ),
-        ApplePaySummaryItem(
-          label: "Total",
-          amount: Config.amount,
-          type: ApplePaySummaryItemType.definite,
-        ),
-      ],
+      applePaySummaryItems:
+          _buildApplePaySummaryItems(shippingAmount: _applePayShippingValue),
       requiredShippingContactFields: [
         ApplePayContactField.name,
         ApplePayContactField.postalAddress,
       ],
-      shippingContact: ApplePayContact(
-        givenName: "John",
-        familyName: "Doe",
-        addressLines: ["Simon Carmiggeltstraat 6"],
-        postalCode: "1011 DJ",
-        city: "Amsterdam",
-        country: "Netherlands",
-      ),
       applePayShippingType: ApplePayShippingType.shipping,
       allowShippingContactEditing: true,
-      shippingMethods: [
-        ApplePayShippingMethod(
-          label: "Standard shipping",
-          detail: "DHL",
-          amount: Amount(value: 1000, currency: "EUR"),
-          identifier: "identifier 1",
-          startDate: today.add(const Duration(days: 2)),
-          endDate: today.add(const Duration(days: 5)),
-        ),
-        ApplePayShippingMethod(
-          label: "Store pick up",
-          detail: "Weekdays, from 9:00 am to 6:00 pm",
-          amount: Amount(value: 0, currency: "EUR"),
-          identifier: "identifier 2",
-        ),
-      ],
+      supportsCouponCode: true,
+      shippingMethods: _buildShippingMethods(),
+      onSelectShippingContact: _onSelectShippingContact,
+      onSelectShippingMethod: _onSelectShippingMethod,
+      onChangeCouponCode: _onChangeCouponCode,
+      onAuthorize: _onAuthorize,
     );
+  }
+
+  Future<ApplePayShippingContactUpdate> _onSelectShippingContact(
+    ApplePayContact contact,
+    List<ApplePaySummaryItem> currentSummaryItems,
+  ) async {
+    debugPrint('onSelectShippingContact: $contact');
+    final shippingContactUpdate = ApplePayShippingContactUpdate(
+      summaryItems: _buildApplePaySummaryItems(),
+      shippingMethods: _buildShippingMethods(),
+    );
+    return shippingContactUpdate;
+  }
+
+  Future<ApplePayShippingMethodUpdate> _onSelectShippingMethod(
+    ApplePayShippingMethod method,
+    List<ApplePaySummaryItem> currentSummaryItems,
+  ) async {
+    debugPrint('onSelectShippingMethod: $method');
+    final shippingMethodUpdate = ApplePayShippingMethodUpdate(
+      summaryItems: _buildApplePaySummaryItems(
+        shippingAmount: method.amount.value,
+      ),
+    );
+    return shippingMethodUpdate;
+  }
+
+  Future<ApplePayCouponCodeUpdate> _onChangeCouponCode(
+    String couponCode,
+    List<ApplePaySummaryItem> currentSummaryItems,
+  ) async {
+    debugPrint('onChangeCouponCode: $couponCode');
+    final ApplePayCouponCodeUpdate couponCodeUpdate;
+    if (couponCode.toUpperCase() == "SUMMER") {
+      couponCodeUpdate = ApplePayCouponCodeUpdate(
+        summaryItems: currentSummaryItems,
+        errors: [
+          ApplePayPaymentError(
+            type: ApplePayPaymentErrorType.couponCode,
+            localizedDescription: "Use SUMMER10 for the example discount.",
+          ),
+        ],
+      );
+    } else if (couponCode.toUpperCase() == "SUMMER10") {
+      couponCodeUpdate = ApplePayCouponCodeUpdate(
+        summaryItems: _buildApplePaySummaryItems(discountAmount: 1000),
+      );
+    } else {
+      couponCodeUpdate = ApplePayCouponCodeUpdate(
+        summaryItems: _buildApplePaySummaryItems(),
+      );
+    }
+    return couponCodeUpdate;
+  }
+
+  Future<ApplePayAuthorizationResult> _onAuthorize(
+    ApplePayAuthorizedPayment payment,
+  ) async {
+    debugPrint('onAuthorize: $payment');
+    final ApplePayAuthorizationResult authorizationResult;
+    if (payment.shippingContact?.postalCode?.isEmpty ?? true) {
+      authorizationResult = ApplePayAuthorizationResult.failure(
+        errors: [
+          ApplePayPaymentError(
+            type: ApplePayPaymentErrorType.shippingAddress,
+            field: ApplePayErrorField.postalCode,
+            localizedDescription: "Postal code is required.",
+          ),
+        ],
+      );
+    } else {
+      authorizationResult = const ApplePayAuthorizationResult.success();
+    }
+    return authorizationResult;
+  }
+
+  List<ApplePaySummaryItem> _buildApplePaySummaryItems({
+    int shippingAmount = _applePayShippingValue,
+    int discountAmount = 0,
+  }) {
+    const productAAmount = 1000;
+    const productBAmount = 2000;
+    final totalAmount =
+        productAAmount + productBAmount + shippingAmount - discountAmount;
+
+    return [
+      ApplePaySummaryItem(
+        label: "Product A",
+        amount: Amount(value: productAAmount, currency: Config.amount.currency),
+        type: ApplePaySummaryItemType.definite,
+      ),
+      ApplePaySummaryItem(
+        label: "Product B",
+        amount: Amount(value: productBAmount, currency: Config.amount.currency),
+        type: ApplePaySummaryItemType.definite,
+      ),
+      ApplePaySummaryItem(
+        label: "Shipping",
+        amount: Amount(value: shippingAmount, currency: Config.amount.currency),
+        type: ApplePaySummaryItemType.definite,
+      ),
+      ApplePaySummaryItem(
+        label: "Discount",
+        amount:
+            Amount(value: -discountAmount, currency: Config.amount.currency),
+        type: ApplePaySummaryItemType.definite,
+      ),
+      ApplePaySummaryItem(
+        label: "Total",
+        amount: Amount(value: totalAmount, currency: Config.amount.currency),
+        type: ApplePaySummaryItemType.definite,
+      ),
+    ];
+  }
+
+  List<ApplePayShippingMethod> _buildShippingMethods() {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    return [
+      ApplePayShippingMethod(
+        label: "Standard shipping",
+        detail: "DHL",
+        amount: Amount(
+            value: _applePayShippingValue, currency: Config.amount.currency),
+        identifier: "identifier 1",
+        startDate: today.add(const Duration(days: 2)),
+        endDate: today.add(const Duration(days: 5)),
+      ),
+      ApplePayShippingMethod(
+        label: "Store pick up",
+        detail: "Weekdays, from 9:00 am to 6:00 pm",
+        amount: Amount(value: 0, currency: Config.amount.currency),
+        identifier: "identifier 2",
+      ),
+    ];
   }
 
   Map<String, dynamic> _extractPaymentMethod(
