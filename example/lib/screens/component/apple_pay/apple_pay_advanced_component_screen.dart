@@ -13,6 +13,7 @@ class ApplePayAdvancedComponentScreen extends StatelessWidget {
   });
 
   final AdyenApplePayComponentRepository repository;
+  static const _applePayShippingValue = 500;
 
   @override
   Widget build(BuildContext context) {
@@ -90,7 +91,8 @@ class ApplePayAdvancedComponentScreen extends StatelessWidget {
       merchantId: Config.merchantId,
       merchantName: Config.merchantName,
       allowOnboarding: true,
-      applePaySummaryItems: _buildApplePaySummaryItems(),
+      applePaySummaryItems:
+          _buildApplePaySummaryItems(shippingAmount: _applePayShippingValue),
       requiredShippingContactFields: [
         ApplePayContactField.name,
         ApplePayContactField.postalAddress,
@@ -98,7 +100,6 @@ class ApplePayAdvancedComponentScreen extends StatelessWidget {
       applePayShippingType: ApplePayShippingType.shipping,
       allowShippingContactEditing: true,
       supportsCouponCode: true,
-      couponCode: "SUMMER10",
       shippingMethods: _buildShippingMethods(),
       onSelectShippingContact: _onSelectShippingContact,
       onSelectShippingMethod: _onSelectShippingMethod,
@@ -138,7 +139,7 @@ class ApplePayAdvancedComponentScreen extends StatelessWidget {
   ) async {
     debugPrint('onChangeCouponCode: $couponCode');
     final ApplePayCouponCodeUpdate couponCodeUpdate;
-    if (couponCode.toUpperCase() != "SUMMER10") {
+    if (couponCode.toUpperCase() == "SUMMER") {
       couponCodeUpdate = ApplePayCouponCodeUpdate(
         summaryItems: currentSummaryItems,
         errors: [
@@ -148,9 +149,13 @@ class ApplePayAdvancedComponentScreen extends StatelessWidget {
           ),
         ],
       );
-    } else {
+    } else if (couponCode.toUpperCase() == "SUMMER10") {
       couponCodeUpdate = ApplePayCouponCodeUpdate(
         summaryItems: _buildApplePaySummaryItems(discountAmount: 1000),
+      );
+    } else {
+      couponCodeUpdate = ApplePayCouponCodeUpdate(
+        summaryItems: _buildApplePaySummaryItems(),
       );
     }
     return couponCodeUpdate;
@@ -178,11 +183,11 @@ class ApplePayAdvancedComponentScreen extends StatelessWidget {
   }
 
   List<ApplePaySummaryItem> _buildApplePaySummaryItems({
-    int shippingAmount = 1000,
-    int discountAmount = 500,
+    int shippingAmount = _applePayShippingValue,
+    int discountAmount = 0,
   }) {
-    const productAAmount = 8000;
-    const productBAmount = 2295;
+    const productAAmount = 1000;
+    const productBAmount = 2000;
     final totalAmount =
         productAAmount + productBAmount + shippingAmount - discountAmount;
 
@@ -223,7 +228,8 @@ class ApplePayAdvancedComponentScreen extends StatelessWidget {
       ApplePayShippingMethod(
         label: "Standard shipping",
         detail: "DHL",
-        amount: Amount(value: 1000, currency: Config.amount.currency),
+        amount: Amount(
+            value: _applePayShippingValue, currency: Config.amount.currency),
         identifier: "identifier 1",
         startDate: today.add(const Duration(days: 2)),
         endDate: today.add(const Duration(days: 5)),
