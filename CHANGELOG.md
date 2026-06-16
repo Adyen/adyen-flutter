@@ -1,23 +1,21 @@
-## 1.11.0 (in development)
+## 1.11.0
 
 ### New
 
 - Apple Pay Component on iOS now supports coupon code configuration, dynamic
-  sheet updates for shipping contact, shipping method and coupon code changes,
-  and authorization validation.
+  sheet updates for shipping contact, shipping method and coupon code changes as well as
+  authorization validation.
 
 ### Changed
 
-- iOS example app: migrated to the `UISceneDelegate` lifecycle via `FlutterSceneDelegate` for proper URL handling on iOS 13+.
+- For Google Pay: moved from the deprecated `onActivityResult` flow to the internal flow, so the
+  plugin no longer needs the `onActivityResult` listener on the host activity.
+- iOS example app: Added support for the `UISceneDelegate` lifecycle with returnUrl handling.
 - Dependency versions:
   | Name | Version |
   |---------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------|
   | [Android Drop-in/Components](https://docs.adyen.com/online-payments/release-notes/?title%5B0%5D=Android+Components%2FDrop-in&version%5B0%5D=5.19.0) | 5.18.0 -> **5.19.0** |
   | [iOS Drop-in/Components](https://docs.adyen.com/online-payments/release-notes/?title%5B0%5D=iOS+Components%2FDrop-in&version%5B0%5D=5.25.1) | 5.25.0 -> **5.25.1** |
-
-### Removed
-
-- **Android Google Pay:** moved from the deprecated `startGooglePayScreen(activity, requestCode)` + `onActivityResult` flow to the internal Adyen 5.9+ `submit()` flow, so the plugin no longer needs the `onActivityResult` listener on the host activity. See the [Adyen 5.9.0 migration guide](https://docs.adyen.com/payment-methods/google-pay/android-component/migrate).
 
 ## 1.10.0
 
