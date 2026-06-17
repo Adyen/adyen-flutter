@@ -10,7 +10,7 @@
 
 - For Google Pay: moved from the deprecated `onActivityResult` flow to the internal flow, so the
   plugin no longer needs the `onActivityResult` listener on the host activity.
-- iOS example app: Added support for the `UISceneDelegate` lifecycle with returnUrl handling.
+- iOS example app: Now using a `UISceneDelegate` for returnUrl handling.
 - Dependency versions:
   | Name | Version |
   |---------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------|
