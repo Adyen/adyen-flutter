@@ -2,11 +2,11 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/widgets.dart';
 
 class ToggleAreaGestureRecognizer extends OneSequenceGestureRecognizer {
-  final GlobalKey cardWidgetKey;
+  final GlobalKey componentWidgetKey;
   final TextDirection textDirection;
 
   ToggleAreaGestureRecognizer({
-    required this.cardWidgetKey,
+    required this.componentWidgetKey,
     required this.textDirection,
   });
 
@@ -17,7 +17,7 @@ class ToggleAreaGestureRecognizer extends OneSequenceGestureRecognizer {
   @override
   void handleEvent(PointerEvent event) {
     final renderBox =
-        cardWidgetKey.currentContext?.findRenderObject() as RenderBox;
+        componentWidgetKey.currentContext?.findRenderObject() as RenderBox;
 
     switch (event) {
       case PointerDownEvent():

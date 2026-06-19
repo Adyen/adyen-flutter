@@ -14,8 +14,6 @@ internal class CardComponentManager(
     private val onDispose: (String) -> Unit,
     private val assignCurrentComponent: (ActionHandlingComponent?) -> Unit,
 ) {
-    private var currentCardComponent: BaseCardComponent? = null
-
     fun registerComponentViewFactories() {
         flutterPluginBinding?.platformViewRegistry?.registerViewFactory(
             CardComponentFactory.CARD_COMPONENT_ADVANCED,
@@ -43,7 +41,6 @@ internal class CardComponentManager(
     }
 
     private fun setCurrentCardComponent(currentCardComponent: BaseCardComponent) {
-        this.currentCardComponent = currentCardComponent
         assignCurrentComponent(currentCardComponent.cardComponent)
     }
 }

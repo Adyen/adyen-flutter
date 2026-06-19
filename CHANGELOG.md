@@ -1,16 +1,107 @@
-## 1.8.0 (in development)
+## 1.11.0
 
 ### New
 
-- TWINT is now supported fully in Drop-in and as an redirect Instant Component. Payment
+- Apple Pay Component on iOS now supports coupon code configuration, dynamic
+  sheet updates for shipping contact, shipping method and coupon code changes as well as
+  authorization validation.
+
+### Changed
+
+- For Google Pay: moved from the deprecated `onActivityResult` flow to the internal flow, so the
+  plugin no longer needs the `onActivityResult` listener on the host activity.
+- iOS example app: Now using a `UISceneDelegate` for returnUrl handling.
+- Dependency versions:
+  | Name | Version |
+  |---------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------|
+  | [Android Drop-in/Components](https://docs.adyen.com/online-payments/release-notes/?title%5B0%5D=Android+Components%2FDrop-in&version%5B0%5D=5.19.0) | 5.18.0 -> **5.19.0** |
+  | [iOS Drop-in/Components](https://docs.adyen.com/online-payments/release-notes/?title%5B0%5D=iOS+Components%2FDrop-in&version%5B0%5D=5.25.1) | 5.25.0 -> **5.25.1** |
+
+## 1.10.0
+
+### New
+
+- For Drop-in: you can now hide previously stored payment methods from the payment method list. Set
+  `showStoredPaymentMethods` to **false** in `StoredPaymentMethodConfiguration`. The default is 
+  **true**.
+- For standalone action handling: `ActionComponentConfiguration` now supports
+  `ThreeDS2Configuration`, so you can set the `requestorAppURL` and customize the 3D Secure 2 UI.
+
+### Changed
+
+- Dependency versions:
+  | Name | Version |
+  |---------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------|
+  | [Android Drop-in/Components](https://docs.adyen.com/online-payments/release-notes/?title%5B0%5D=Android+Components%2FDrop-in&version%5B0%5D=5.18.0) | 5.17.0 -> **5.18.0** |
+  | [iOS Drop-in/Components](https://docs.adyen.com/online-payments/release-notes/?title%5B0%5D=iOS+Components%2FDrop-in&version%5B0%5D=5.24.0) | 5.23.1 -> **5.24.0** |
+
+## 1.9.0
+
+### New
+
+- For the 3D Secure 2: you can now customize the user interface using `Adyen3DSTheme`. This includes
+  support for `fromThemeData()`, which enables you use the styling from your application's existing
+  theme.
+- Supported payment method: BLIK. Payment
+  method [type](https://docs.adyen.com/payment-methods/payment-method-types): **blik**. The shopper
+  pays using a 6-digit code generated in their banking app.
+- For card payments: you can now offer shoppers the option to pay in installments.
+  - Sessions flow: use the [
+    `installmentOptions`](https://docs.adyen.com/api-explorer/Checkout/latest/post/sessions#request-installmentOptions)
+    parameter.
+  - Advanced flow: use the new [
+    `installmentConfiguration`](https://github.com/Adyen/adyen-flutter/blob/c49cf217c3270ff56d034dc16970a25e6993c098/example/lib/repositories/adyen_card_component_repository.dart#L39)
+    property.
+
+### Improved
+
+- The internal component architecture now uses a shared layer. This improves maintainability and
+  makes it easier to extend components that are based
+  on [platform views](https://github.com/flutter/flutter/tree/master/examples/platform_view).
+- For the Card Component: the implementation is now simplified and complies with the updated
+  component architecture.
+
+### Changed
+
+- Dependency versions:
+  | Name | Version |
+  |---------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------|
+  | [Android Drop-in/Components](https://docs.adyen.com/online-payments/release-notes/?title%5B0%5D=Android+Components%2FDrop-in&version%5B0%5D=5.17.0) | 5.16.0 -> **5.17.0** |
+  | [iOS Drop-in/Components](https://docs.adyen.com/online-payments/release-notes/?title%5B0%5D=iOS+Components%2FDrop-in&version%5B0%5D=5.23.1) | 5.22.2 -> **5.23.1** |
+
+## 1.8.1
+
+### Fixed
+
+- **HUF Currency Formatting:** Fixed an issue where Hungarian Forint (HUF) amounts were incorrectly
+  formatted on iOS 26.4 Beta. The iOS beta changed the minor digits for HUF from 2 to 0 in this
+  beta, which conflicted with the Adyen backend expectation of 2 decimal places. The SDK now
+  explicitly overrides HUF to use 2 minor units, ensuring consistent amount formatting across all
+  iOS versions.
+
+### Changed
+
+- Dependency versions:
+  | Name | Version |
+  |---------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------|
+  | [iOS Drop-in/Components](https://docs.adyen.com/online-payments/release-notes/?title%5B0%5D=iOS+Components%2FDrop-in#releaseNote=2026-02-23-ios-componentsdrop-in-5.22.2) |  5.22.2 |
+
+## 1.8.0
+
+### New
+
+- TWINT is now supported in Drop-in and as a redirect instant component. Payment
   method [type](https://docs.adyen.com/payment-methods/payment-method-types): **twint**.
-- Added support for the ThreeDS2Configuration with `requestorAppURL` parameter for Drop-in and Card
-  Component.
+- For card payments with Drop-in and Component, you can now configure a `requestorAppURL` in your
+  `ThreeDS2Configuration`.
+- The `data` object in the onSubmit callback now includes an `sdkData` parameter. For Advanced flow,
+  we recommend that you include this parameter in your /payments request.`
 
 ## Improved
 
-- For Drop-in on iOS: Added payment to create adyenContext to prioritize the session amount in the
-  UI.
+- For Drop-in on iOS, the payment amount you specified in your `/sessions` request is used to show
+  the amount at checkout.
+- Updated Gradle and AGP to v8.13.
 
 ### Changed
 
@@ -20,7 +111,6 @@
   | [iOS Drop-in/Components](https://docs.adyen.com/online-payments/release-notes/?title%5B0%5D=iOS+Components%2FDrop-in#releaseNote=2025-12-18-ios-componentsdrop-in-5.22.1) |  5.22.1 |
   | [Android Drop-in/Components](https://docs.adyen.com/online-payments/release-notes/#releaseNote=2025-12-19-android-componentsdrop-in-5.16.0)                               |  5.16.0 |
   | [Android Gradle Plugin](https://developer.android.com/build/releases/gradle-plugin)                                                                                       |  8.13.2 |
-
 
 ## 1.7.0
 

@@ -23,6 +23,22 @@ class CardBottomSheetScreen extends StatelessWidget {
     cardConfiguration: const CardConfiguration(
       showStorePaymentField: true,
     ),
+    threeDS2Configuration: ThreeDS2Configuration(
+      headingTitle: "Test 3DS2 title",
+      theme: const Adyen3DSTheme(
+        textColor: Colors.green,
+        headerTheme: Adyen3DSHeaderTheme(
+          backgroundColor: Colors.green,
+          textColor: Colors.black,
+          cancelButtonColor: Colors.blue,
+        ),
+        primaryButtonTheme: Adyen3DSButtonTheme(
+          backgroundColor: Colors.blue,
+          textColor: Colors.white,
+          cornerRadius: 24,
+        ),
+      ),
+    ),
   );
 
   @override

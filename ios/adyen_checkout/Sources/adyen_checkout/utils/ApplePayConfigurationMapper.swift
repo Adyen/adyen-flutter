@@ -2,14 +2,37 @@ import Adyen
 #if canImport(AdyenComponents)
     import AdyenComponents
 #endif
+import Contacts
 import PassKit
 
 extension ApplePayConfigurationDTO {
-    func toApplePayConfiguration(payment: Payment?) throws -> ApplePayComponent.Configuration {
-        guard let payment else { throw PlatformError(errorDescription: "Amount for Apple Pay not provided.") }
+    var requiresApplePayUpdateDelegate: Bool {
+        hasOnSelectShippingMethod || hasOnSelectShippingContact || hasOnChangeCouponCode
+    }
+
+    var requiresAuthorizationDelegate: Bool {
+        hasOnAuthorize
+    }
+}
+
+extension ApplePayConfigurationDTO {
+    func toApplePayConfiguration(
+        payment: Payment?
+    ) throws -> ApplePayComponent.Configuration {
+        guard let payment else {
+            throw PlatformError(errorDescription: "Amount for Apple Pay not provided.")
+        }
         let summaryItems = try mapToPaymentSummaryItems(summaryItems: summaryItems, payment: payment)
         let paymentRequest = try buildPaymentRequest(payment: payment, summaryItems: summaryItems)
-        return try ApplePayComponent.Configuration(paymentRequest: paymentRequest, allowOnboarding: allowOnboarding ?? false)
+        do {
+            return try ApplePayComponent.Configuration(paymentRequest: paymentRequest, allowOnboarding: allowOnboarding ?? false)
+        } catch {
+            throw AdyenPigeonError(
+                code: ApplePayConfigurationErrorCode.invalidConfiguration,
+                message: error.localizedDescription,
+                details: String(describing: error)
+            )
+        }
     }
     
     private func buildPaymentRequest(payment: Payment, summaryItems: [PKPaymentSummaryItem]) throws -> PKPaymentRequest {
@@ -46,30 +69,12 @@ extension ApplePayConfigurationDTO {
                 // We have to use enabled until we forcing the newest Xcode version. Otherwise the build fails.
                 paymentRequest.shippingContactEditingMode = $0 ? PKShippingContactEditingMode.enabled : PKShippingContactEditingMode.storePickup
             }
+            supportsCouponCode.map { paymentRequest.supportsCouponCode = $0 }
+            couponCode.map { paymentRequest.couponCode = $0 }
         }
         
         applicationData.map { paymentRequest.applicationData = Data($0.utf8) }
         return paymentRequest
-    }
-    
-    // TODO: could be deleted when implementing advanced flow
-    private func addShippingMethodToSummaryItems(paymentRequest: PKPaymentRequest) {
-        guard let shippingMethod = paymentRequest.shippingMethods?.first else {
-            return
-        }
-        
-        if let last = paymentRequest.paymentSummaryItems.last {
-            paymentRequest.paymentSummaryItems = paymentRequest.paymentSummaryItems.dropLast()
-            paymentRequest.paymentSummaryItems.append(shippingMethod)
-            paymentRequest.paymentSummaryItems.append(
-                .init(
-                    label: last.label,
-                    amount: NSDecimalNumber(
-                        value: last.amount.floatValue + shippingMethod.amount.floatValue
-                    )
-                )
-            )
-        }
     }
     
     private func mapToContactFields(contactFields: [String?]) -> Set<PKContactField> {
@@ -79,14 +84,16 @@ extension ApplePayConfigurationDTO {
     
     private func mapToPaymentSummaryItems(summaryItems: [ApplePaySummaryItemDTO?]?, payment: Payment) throws -> [PKPaymentSummaryItem] {
         guard let summaryItems else {
-            let formattedAmount = AmountFormatter.decimalAmount(payment.amount.value,
-                                                                currencyCode: payment.amount.currencyCode,
-                                                                localeIdentifier: payment.amount.localeIdentifier)
+            let formattedAmount = AmountFormatter.decimalAmount(
+                payment.amount.value,
+                currencyCode: payment.amount.currencyCode,
+                localeIdentifier: payment.amount.localeIdentifier
+            )
             return [PKPaymentSummaryItem(label: merchantName, amount: formattedAmount)]
         }
         
         let summaryItemsNonNil: [ApplePaySummaryItemDTO] = summaryItems.compactMap { $0 }
-        return try summaryItemsNonNil.compactMap { try $0.toApplePaySummeryItem() }
+        return try summaryItemsNonNil.compactMap { try $0.toApplePaySummaryItem() }
     }
 }
 
@@ -99,7 +106,7 @@ extension PKPaymentNetwork {
 }
 
 extension ApplePaySummaryItemDTO {
-    func toApplePaySummeryItem() throws -> PKPaymentSummaryItem {
+    func toApplePaySummaryItem() throws -> PKPaymentSummaryItem {
         let formattedAmount = try amount.toFormattedAmount()
         return PKPaymentSummaryItem(
             label: label,
@@ -177,6 +184,27 @@ extension ApplePayContactDTO {
     }
 }
 
+extension PKContact {
+    func toDTO() -> ApplePayContactDTO {
+        ApplePayContactDTO(
+            phoneNumber: phoneNumber?.stringValue,
+            emailAddress: emailAddress as String?,
+            givenName: name?.givenName,
+            familyName: name?.familyName,
+            phoneticGivenName: name?.phoneticRepresentation?.givenName,
+            phoneticFamilyName: name?.phoneticRepresentation?.familyName,
+            addressLines: postalAddress?.street.components(separatedBy: "\n"),
+            subLocality: postalAddress?.subLocality,
+            city: postalAddress?.city,
+            postalCode: postalAddress?.postalCode,
+            subAdministrativeArea: postalAddress?.subAdministrativeArea,
+            administrativeArea: postalAddress?.state,
+            country: postalAddress?.country,
+            countryCode: postalAddress?.isoCountryCode
+        )
+    }
+}
+
 extension PKContactField {
     static func fromString(_ rawValue: String) -> PKContactField {
         switch rawValue {
@@ -220,12 +248,10 @@ extension ApplePayShippingMethodDTO {
         pkShippingMethod.amount = try amount.toFormattedAmount()
         
         if #available(iOS 15.0, *) {
-            let iso8601Formatter = ISO8601DateFormatter()
-            iso8601Formatter.formatOptions = [.withFullDate]
             if let startRaw = startDate,
-               let endRaw = endDate,
-               let startDate = iso8601Formatter.date(from: startRaw),
-               let endDate = iso8601Formatter.date(from: endRaw) {
+               let endRaw = endDate {
+                let startDate = try startRaw.toDate()
+                let endDate = try endRaw.toDate()
                 pkShippingMethod.dateComponentsRange = .init(
                     start: startDate.toComponents(),
                     end: endDate.toComponents()
@@ -243,6 +269,193 @@ extension AmountDTO {
         }
         return AmountFormatter.decimalAmount(value, currencyCode: currency)
     }
+}
+
+extension ApplePayShippingMethodUpdateDTO {
+    func toPKPaymentRequestShippingMethodUpdate() throws -> PKPaymentRequestShippingMethodUpdate {
+        try PKPaymentRequestShippingMethodUpdate(
+            paymentSummaryItems: summaryItems.compactMap { try $0?.toApplePaySummaryItem() }
+        )
+    }
+}
+
+@available(iOS 15.0, *)
+extension ApplePayCouponCodeUpdateDTO {
+    func toPKPaymentRequestCouponCodeUpdate() throws -> PKPaymentRequestCouponCodeUpdate {
+        try PKPaymentRequestCouponCodeUpdate(
+            errors: errors?.compactMap { $0?.toNSError() },
+            paymentSummaryItems: summaryItems.compactMap { try $0?.toApplePaySummaryItem() },
+            shippingMethods: shippingMethods?.compactMap { try $0?.toPKShippingMethod() } ?? []
+        )
+    }
+}
+
+extension ApplePayShippingContactUpdateDTO {
+    func toPKPaymentRequestShippingContactUpdate() throws -> PKPaymentRequestShippingContactUpdate {
+        try PKPaymentRequestShippingContactUpdate(
+            errors: errors?.compactMap { $0?.toNSError() },
+            paymentSummaryItems: summaryItems.compactMap { try $0?.toApplePaySummaryItem() },
+            shippingMethods: shippingMethods?.compactMap { try $0?.toPKShippingMethod() } ?? []
+        )
+    }
+}
+
+extension PKPaymentSummaryItem {
+    func toDTO(currencyCode: String) -> ApplePaySummaryItemDTO {
+        ApplePaySummaryItemDTO(
+            label: label,
+            amount: amount.toDTO(currencyCode: currencyCode),
+            type: type.toDTO()
+        )
+    }
+}
+
+extension PKPaymentSummaryItemType {
+    func toDTO() -> ApplePaySummaryItemType {
+        switch self {
+        case .pending:
+            return .pending
+        case .final:
+            return .definite
+        @unknown default:
+            return .definite
+        }
+    }
+}
+
+extension PKShippingMethod {
+    func toDTO(currencyCode: String) -> ApplePayShippingMethodDTO {
+        var startDate: String?
+        var endDate: String?
+
+        if #available(iOS 15.0, *) {
+            startDate = dateComponentsRange?.startDateComponents.date?.ISO8601Format()
+            endDate = dateComponentsRange?.endDateComponents.date?.ISO8601Format()
+        }
+
+        return ApplePayShippingMethodDTO(
+            label: label,
+            detail: detail ?? "",
+            amount: amount.toDTO(currencyCode: currencyCode),
+            identifier: identifier ?? "",
+            startDate: startDate,
+            endDate: endDate
+        )
+    }
+}
+
+extension NSDecimalNumber {
+    func toDTO(currencyCode: String) -> AmountDTO {
+        AmountDTO(
+            currency: currencyCode,
+            value: Int64(AmountFormatter.minorUnitAmount(from: decimalValue, currencyCode: currencyCode))
+        )
+    }
+}
+
+extension PKPayment {
+    func toAuthorizedPaymentDTO(currencyCode: String) -> ApplePayAuthorizedPaymentDTO {
+        ApplePayAuthorizedPaymentDTO(
+            token: token.paymentData.base64EncodedString(),
+            network: token.paymentMethod.network?.rawValue ?? "",
+            billingContact: billingContact?.toDTO(),
+            shippingContact: shippingContact?.toDTO(),
+            shippingMethod: shippingMethod?.toDTO(currencyCode: currencyCode)
+        )
+    }
+}
+
+extension ApplePayAuthorizationResultDTO {
+    func toPKPaymentAuthorizationResult() -> PKPaymentAuthorizationResult {
+        PKPaymentAuthorizationResult(
+            status: isSuccess ? .success : .failure,
+            errors: errors?.compactMap { $0?.toNSError() }
+        )
+    }
+}
+
+extension ApplePayPaymentErrorDTO {
+    func toNSError() -> Error {
+        switch type {
+        case .billingAddress:
+            return PKPaymentRequest.paymentBillingAddressInvalidError(
+                withKey: postalAddressKey(for: field),
+                localizedDescription: localizedDescription
+            )
+        case .shippingAddress:
+            return PKPaymentRequest.paymentShippingAddressInvalidError(
+                withKey: postalAddressKey(for: field),
+                localizedDescription: localizedDescription
+            )
+        case .contact:
+            return PKPaymentRequest.paymentContactInvalidError(
+                withContactField: field.map { PKContactField.fromString($0) } ?? .name,
+                localizedDescription: localizedDescription
+            )
+        case .couponCode:
+            if #available(iOS 15.0, *) {
+                return PKPaymentRequest.paymentCouponCodeInvalidError(localizedDescription: localizedDescription)
+            }
+            return NSError(domain: "ApplePayPaymentError", code: 0, userInfo: [NSLocalizedDescriptionKey: localizedDescription])
+        case .shippingAddressUnserviceable:
+            return PKPaymentRequest.paymentShippingAddressUnserviceableError(withLocalizedDescription: localizedDescription)
+        case .couponCodeExpired:
+            if #available(iOS 15.0, *) {
+                return PKPaymentRequest.paymentCouponCodeExpiredError(localizedDescription: localizedDescription)
+            }
+            return NSError(domain: "ApplePayPaymentError", code: 0, userInfo: [NSLocalizedDescriptionKey: localizedDescription])
+        case .unknown:
+            return NSError(domain: "ApplePayPaymentError", code: 0, userInfo: [NSLocalizedDescriptionKey: localizedDescription])
+        }
+    }
+}
+
+private func postalAddressKey(for field: String?) -> String {
+    switch field {
+    case "street": return CNPostalAddressStreetKey
+    case "city": return CNPostalAddressCityKey
+    case "postalCode": return CNPostalAddressPostalCodeKey
+    case "administrativeArea": return CNPostalAddressStateKey
+    case "country": return CNPostalAddressCountryKey
+    case "countryCode": return CNPostalAddressISOCountryCodeKey
+    case "subLocality": return CNPostalAddressSubLocalityKey
+    case "subAdministrativeArea": return CNPostalAddressSubAdministrativeAreaKey
+    default: return field ?? CNPostalAddressStreetKey
+    }
+}
+
+private let iso8601FormatterWithFractionalSeconds: ISO8601DateFormatter = {
+    let formatter = ISO8601DateFormatter()
+    formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+    return formatter
+}()
+
+private let iso8601Formatter: ISO8601DateFormatter = {
+    let formatter = ISO8601DateFormatter()
+    formatter.formatOptions = .withInternetDateTime
+    return formatter
+}()
+
+extension String {
+    func toDate() throws -> Date {
+        if let date = iso8601FormatterWithFractionalSeconds.date(from: self) {
+            return date
+        }
+        if let date = iso8601Formatter.date(from: self) {
+            return date
+        }
+        throw AdyenPigeonError(
+            code: ApplePayConfigurationErrorCode.invalidDate,
+            message: "Cannot map String to Date.",
+            details: self
+        )
+    }
+}
+
+private enum ApplePayConfigurationErrorCode {
+    static let invalidConfiguration = "apple-pay-invalid-configuration"
+    static let invalidAmount = "apple-pay-invalid-amount"
+    static let invalidDate = "apple-pay-invalid-date"
 }
 
 extension Date {

@@ -6,12 +6,13 @@
     import AdyenCard
 #endif
 import Flutter
+import Foundation
 
-class CardAdvancedComponent: BaseCardComponent {
+class CardAdvancedComponent: BaseCardComponent, AdvancedComponentProtocol {
     private var actionComponentDelegate: ActionComponentDelegate?
-    private var actionComponent: AdyenActionComponent?
     private var presentationDelegate: PresentationDelegate?
     private var componentDelegate: PaymentComponentDelegate?
+    private(set) var actionComponent: AdyenActionComponent?
 
     override init(
         frame: CGRect,
@@ -36,7 +37,6 @@ class CardAdvancedComponent: BaseCardComponent {
             finalizeCallback: finalizeAndDismiss(success:completion:)
         )
         setupCardComponentView()
-        setupFinalizeComponentCallback()
     }
 
     private func setupCardComponentView() {
@@ -44,20 +44,14 @@ class CardAdvancedComponent: BaseCardComponent {
             let cardComponent = try setupCardComponent()
             actionComponent = buildActionComponent(adyenContext: cardComponent.context)
             showCardComponent(cardComponent: cardComponent)
-            componentPlatformApi.onActionCallback = { [weak self] jsonActionResponse in
-                self?.onAction(actionResponse: jsonActionResponse)
-            }
-            componentPlatformApi.onErrorCallback = { [weak self] error in
-                self?.cardComponent?.stopLoadingIfNeeded()
-                self?.sendErrorToFlutterLayer(errorMessage: error?.errorMessage ?? "")
-            }
+            componentPlatformApi.register(cardBaseComponent: self)
         } catch {
             sendErrorToFlutterLayer(errorMessage: error.localizedDescription)
         }
     }
 
     private func setupCardComponent() throws -> CardComponent {
-        componentDelegate = CardAdvancedFlowDelegate(
+        componentDelegate = AdvancedFlowDelegate(
             componentFlutterApi: componentFlutterApi,
             componentId: componentId
         )
@@ -81,34 +75,15 @@ class CardAdvancedComponent: BaseCardComponent {
         return actionComponent
     }
 
-    private func onAction(actionResponse: [String?: Any?]) {
-        do {
-            let jsonData = try JSONSerialization.data(withJSONObject: actionResponse, options: [])
-            let action = try JSONDecoder().decode(Action.self, from: jsonData)
-            actionComponent?.handle(action)
-        } catch {
-            sendErrorToFlutterLayer(errorMessage: error.localizedDescription)
-        }
+    func stopLoadingOnError() {
+        cardComponent?.stopLoadingIfNeeded()
     }
 
-    private func setupFinalizeComponentCallback() {
-        componentPlatformApi.onFinishCallback = { [weak self] paymentEvent in
-            let resultCode = ResultCode(rawValue: paymentEvent.result ?? "")
-            let isAccepted = resultCode?.isAccepted ?? false
-            self?.finalizeAndDismiss(success: isAccepted, completion: { [weak self] in
-                let componentCommunicationModel = ComponentCommunicationModel(
-                    type: ComponentCommunicationType.result,
-                    componentId: self?.componentId ?? "",
-                    paymentResult: PaymentResultDTO(
-                        type: PaymentResultEnum.finished,
-                        result: PaymentResultModelDTO(resultCode: resultCode?.rawValue)
-                    )
-                )
-                self?.componentFlutterApi.onComponentCommunication(
-                    componentCommunicationModel: componentCommunicationModel,
-                    completion: { _ in }
-                )
-            })
-        }
+    override func onDispose() {
+        actionComponentDelegate = nil
+        presentationDelegate = nil
+        componentDelegate = nil
+        actionComponent = nil
+        super.onDispose()
     }
 }

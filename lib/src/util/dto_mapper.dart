@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:ui';
 
 import 'package:adyen_checkout/adyen_checkout.dart';
 import 'package:adyen_checkout/src/generated/platform_api.g.dart';
@@ -37,6 +38,8 @@ extension DropInConfigurationMapper on DropInConfiguration {
         preselectedPaymentMethodTitle: preselectedPaymentMethodTitle,
         paymentMethodNames: paymentMethodNames,
         isPartialPaymentSupported: isPartialPaymentSupported,
+        showStoredPaymentMethods:
+            storedPaymentMethodConfiguration?.showStoredPaymentMethods ?? true,
       );
 
   bool _isRemoveStoredPaymentMethodEnabled(
@@ -45,6 +48,29 @@ extension DropInConfigurationMapper on DropInConfiguration {
           null &&
       storedPaymentMethodConfiguration?.isRemoveStoredPaymentMethodEnabled ==
           true;
+}
+
+extension DefaultInstallmentOptionsMapper on DefaultInstallmentOptions {
+  DefaultInstallmentOptionsDTO toDTO() => DefaultInstallmentOptionsDTO(
+        values: values,
+        includesRevolving: includesRevolving,
+      );
+}
+
+extension CardBasedInstallmentOptionsMapper on CardBasedInstallmentOptions {
+  CardBasedInstallmentOptionsDTO toDTO() => CardBasedInstallmentOptionsDTO(
+        values: values,
+        includesRevolving: includesRevolving,
+        cardBrand: cardBrand,
+      );
+}
+
+extension InstallmentConfigurationMapper on InstallmentConfiguration {
+  InstallmentConfigurationDTO toDTO() => InstallmentConfigurationDTO(
+        defaultOptions: defaultOptions?.toDTO(),
+        cardBasedOptions: cardBasedOptions?.map((e) => e.toDTO()).toList(),
+        showInstallmentAmount: showInstallmentAmount,
+      );
 }
 
 extension CardConfigurationMapper on CardConfiguration {
@@ -58,6 +84,7 @@ extension CardConfigurationMapper on CardConfiguration {
         socialSecurityNumberFieldVisibility:
             socialSecurityNumberFieldVisibility,
         supportedCardTypes: supportedCardTypes,
+        installmentConfiguration: installmentConfiguration?.toDTO(),
       );
 }
 
@@ -107,6 +134,46 @@ extension ApplePayConfigurationMapper on ApplePayConfiguration {
         applicationData: applicationData,
         supportedCountries: supportedCountries,
         merchantCapability: merchantCapability,
+        supportsCouponCode: supportsCouponCode,
+        couponCode: couponCode,
+        hasOnSelectShippingMethod: onSelectShippingMethod != null,
+        hasOnSelectShippingContact: onSelectShippingContact != null,
+        hasOnChangeCouponCode: onChangeCouponCode != null,
+        hasOnAuthorize: onAuthorize != null,
+      );
+}
+
+extension ApplePayAuthorizedPaymentDTOMapper on ApplePayAuthorizedPaymentDTO {
+  ApplePayAuthorizedPayment fromDTO() => ApplePayAuthorizedPayment(
+        token: token,
+        network: network,
+        billingContact: billingContact?.fromDTO(),
+        shippingContact: shippingContact?.fromDTO(),
+        shippingMethod: shippingMethod?.fromDTO(),
+      );
+}
+
+extension ApplePayAuthorizationResultMapper on ApplePayAuthorizationResult {
+  ApplePayAuthorizationResultDTO toDTO() {
+    switch (this) {
+      case ApplePayAuthorizationSuccess():
+        return ApplePayAuthorizationResultDTO(
+          isSuccess: true,
+        );
+      case ApplePayAuthorizationFailure(errors: final errors):
+        return ApplePayAuthorizationResultDTO(
+          isSuccess: false,
+          errors: errors.map((error) => error.toDTO()).toList(),
+        );
+    }
+  }
+}
+
+extension ApplePayPaymentErrorMapper on ApplePayPaymentError {
+  ApplePayPaymentErrorDTO toDTO() => ApplePayPaymentErrorDTO(
+        type: type,
+        field: field?.name,
+        localizedDescription: localizedDescription,
       );
 }
 
@@ -129,14 +196,33 @@ extension ApplePayContactMapper on ApplePayContact {
       );
 }
 
+extension ApplePayContactDTOMapper on ApplePayContactDTO {
+  ApplePayContact fromDTO() => ApplePayContact(
+        phoneNumber: phoneNumber,
+        emailAddress: emailAddress,
+        givenName: givenName,
+        familyName: familyName,
+        phoneticGivenName: phoneticGivenName,
+        phoneticFamilyName: phoneticFamilyName,
+        addressLines: addressLines?.whereType<String>().toList(),
+        subLocality: subLocality,
+        city: city,
+        postalCode: postalCode,
+        subAdministrativeArea: subAdministrativeArea,
+        administrativeArea: administrativeArea,
+        country: country,
+        countryCode: countryCode,
+      );
+}
+
 extension ApplePayShippingMethodMapper on ApplePayShippingMethod {
   ApplePayShippingMethodDTO toDTO() => ApplePayShippingMethodDTO(
       label: label,
       detail: detail,
       amount: amount.toDTO(),
       identifier: identifier,
-      startDate: startDate?.toIso8601String(),
-      endDate: endDate?.toIso8601String());
+      startDate: startDate?.toUtc().toIso8601String(),
+      endDate: endDate?.toUtc().toIso8601String());
 }
 
 extension ApplePaySummaryItemsMapper on ApplePaySummaryItem {
@@ -145,6 +231,60 @@ extension ApplePaySummaryItemsMapper on ApplePaySummaryItem {
         amount: amount.toDTO(),
         type: type,
       );
+}
+
+extension ApplePayShippingMethodUpdateMapper on ApplePayShippingMethodUpdate {
+  ApplePayShippingMethodUpdateDTO toDTO() => ApplePayShippingMethodUpdateDTO(
+        summaryItems:
+            summaryItems.map((summaryItem) => summaryItem.toDTO()).toList(),
+      );
+}
+
+extension ApplePayCouponCodeUpdateMapper on ApplePayCouponCodeUpdate {
+  ApplePayCouponCodeUpdateDTO toDTO() => ApplePayCouponCodeUpdateDTO(
+        summaryItems:
+            summaryItems.map((summaryItem) => summaryItem.toDTO()).toList(),
+        shippingMethods: shippingMethods
+            ?.map((shippingMethod) => shippingMethod.toDTO())
+            .toList(),
+        errors: errors?.map((error) => error.toDTO()).toList(),
+      );
+}
+
+extension ApplePayShippingContactUpdateMapper on ApplePayShippingContactUpdate {
+  ApplePayShippingContactUpdateDTO toDTO() => ApplePayShippingContactUpdateDTO(
+        summaryItems:
+            summaryItems.map((summaryItem) => summaryItem.toDTO()).toList(),
+        shippingMethods: shippingMethods
+            ?.map((shippingMethod) => shippingMethod.toDTO())
+            .toList(),
+        errors: errors?.map((error) => error.toDTO()).toList(),
+      );
+}
+
+extension ApplePayShippingMethodDTOMapper on ApplePayShippingMethodDTO {
+  ApplePayShippingMethod fromDTO() => ApplePayShippingMethod(
+        label: label,
+        detail: detail,
+        amount: amount.fromDTO(),
+        identifier: identifier,
+        startDate: startDate == null ? null : DateTime.tryParse(startDate!),
+        endDate: endDate == null ? null : DateTime.tryParse(endDate!),
+      );
+}
+
+extension ApplePaySummaryItemDTOMapper on ApplePaySummaryItemDTO {
+  ApplePaySummaryItem fromDTO() => ApplePaySummaryItem(
+        label: label,
+        amount: amount.fromDTO(),
+        type: type,
+      );
+}
+
+extension ApplePaySummaryItemDTOListMapper on List<ApplePaySummaryItemDTO?> {
+  List<ApplePaySummaryItem> fromDTOs() => whereType<ApplePaySummaryItemDTO>()
+      .map((summaryItem) => summaryItem.fromDTO())
+      .toList();
 }
 
 extension CashAppPayConfigurationMapper on CashAppPayConfiguration {
@@ -162,9 +302,113 @@ extension TwintConfigurationMapper on TwintConfiguration {
 }
 
 extension ThreeDS2ConfigurationMapper on ThreeDS2Configuration {
-  ThreeDS2ConfigurationDTO toDTO() => ThreeDS2ConfigurationDTO(
+  ThreeDS2ConfigurationDTO toDTO() {
+    if (theme == null && headingTitle != null) {
+      final headingCustomization =
+          ThreeDS2ToolbarCustomizationDTO(headerText: headingTitle);
+      return ThreeDS2ConfigurationDTO(
         requestorAppURL: requestorAppURL,
+        uiCustomization: ThreeDS2UICustomizationDTO(
+            headingCustomization: headingCustomization),
       );
+    }
+
+    return ThreeDS2ConfigurationDTO(
+      requestorAppURL: requestorAppURL,
+      uiCustomization: theme?.toUICustomizationDTO(headingTitle: headingTitle),
+    );
+  }
+}
+
+extension Adyen3DSThemeMapper on Adyen3DSTheme {
+  ThreeDS2UICustomizationDTO toUICustomizationDTO({String? headingTitle}) {
+    return ThreeDS2UICustomizationDTO(
+      screenCustomization: ThreeDS2ScreenCustomizationDTO(
+        backgroundColor: backgroundColor?.toHexString(),
+        textColor: textColor?.toHexString(),
+      ),
+      headingCustomization:
+          createHeadingCustomization(headingTitle: headingTitle),
+      labelCustomization: descriptionTheme?.toDTO(),
+      inputCustomization: inputDecorationTheme?.toDTO(),
+      selectionItemCustomization: selectionItemTheme?.toDTO(),
+      primaryButtonCustomization: primaryButtonTheme?.toDTO(),
+      secondaryButtonCustomization: secondaryButtonTheme?.toDTO(),
+    );
+  }
+
+  ThreeDS2ToolbarCustomizationDTO? createHeadingCustomization(
+      {String? headingTitle}) {
+    final headerTheme = this.headerTheme;
+    if (headerTheme == null && headingTitle == null) {
+      return null;
+    }
+
+    return headerTheme?.toDTO(headingTitle: headingTitle) ??
+        ThreeDS2ToolbarCustomizationDTO(headerText: headingTitle);
+  }
+}
+
+extension Adyen3DSButtonThemeMapper on Adyen3DSButtonTheme {
+  ThreeDS2ButtonCustomizationDTO toDTO() {
+    return ThreeDS2ButtonCustomizationDTO(
+      backgroundColor: backgroundColor?.toHexString(),
+      textColor: textColor?.toHexString(),
+      cornerRadius: cornerRadius?.round(),
+      textFontSize: fontSize?.round(),
+    );
+  }
+}
+
+extension Adyen3DSDescriptionThemeMapper on Adyen3DSDescriptionTheme {
+  ThreeDS2LabelCustomizationDTO toDTO() {
+    return ThreeDS2LabelCustomizationDTO(
+      headingTextColor: titleTextColor?.toHexString(),
+      headingTextFontSize: titleFontSize?.round(),
+      inputLabelTextColor: inputLabelTextColor?.toHexString(),
+      inputLabelFontSize: inputLabelFontSize?.round(),
+      textColor: textColor?.toHexString(),
+      textFontSize: textFontSize?.round(),
+    );
+  }
+}
+
+extension Adyen3DSInputDecorationThemeMapper on Adyen3DSInputDecorationTheme {
+  ThreeDS2InputCustomizationDTO toDTO() {
+    return ThreeDS2InputCustomizationDTO(
+      borderColor: borderColor?.toHexString(),
+      borderWidth: borderWidth?.round(),
+      cornerRadius: cornerRadius?.round(),
+      textColor: textColor?.toHexString(),
+    );
+  }
+}
+
+extension Adyen3DSSelectionItemThemeMapper on Adyen3DSSelectionItemTheme {
+  ThreeDS2SelectionItemCustomizationDTO toDTO() {
+    return ThreeDS2SelectionItemCustomizationDTO(
+      selectionIndicatorTintColor: selectionIndicatorTintColor?.toHexString(),
+      highlightedBackgroundColor: highlightedBackgroundColor?.toHexString(),
+      textColor: textColor?.toHexString(),
+    );
+  }
+}
+
+extension Adyen3DSHeaderThemeMapper on Adyen3DSHeaderTheme {
+  ThreeDS2ToolbarCustomizationDTO toDTO({String? headingTitle}) {
+    return ThreeDS2ToolbarCustomizationDTO(
+      backgroundColor: backgroundColor?.toHexString(),
+      headerText: headingTitle,
+      textColor: textColor?.toHexString(),
+      cancelButtonColor: cancelButtonColor?.toHexString(),
+    );
+  }
+}
+
+extension ColorToHex on Color {
+  String toHexString() {
+    return '#${toARGB32().toRadixString(16).padLeft(8, '0').toUpperCase()}';
+  }
 }
 
 extension SessionMapper on SessionCheckout {
@@ -189,6 +433,10 @@ extension AmountMapper on Amount {
       );
 }
 
+extension AmountDTOMapper on AmountDTO {
+  Amount fromDTO() => Amount(value: value, currency: currency);
+}
+
 extension OrderResponseMapper on OrderResponseDTO {
   OrderResponse fromDTO() => OrderResponse(
         pspReference: pspReference,
@@ -206,6 +454,18 @@ extension CardComponentConfigurationMapper on CardComponentConfiguration {
         shopperLocale: shopperLocale,
         cardConfiguration: cardConfiguration.toDTO(),
         threeDS2ConfigurationDTO: threeDS2Configuration?.toDTO(),
+        analyticsOptionsDTO: analyticsOptions.toDTO(sdkVersionNumber),
+      );
+}
+
+extension BlikComponentConfigurationMapper on BlikComponentConfiguration {
+  BlikComponentConfigurationDTO toDTO(String sdkVersionNumber) =>
+      BlikComponentConfigurationDTO(
+        environment: environment,
+        clientKey: clientKey,
+        countryCode: countryCode,
+        amount: amount?.toDTO(),
+        shopperLocale: shopperLocale,
         analyticsOptionsDTO: analyticsOptions.toDTO(sdkVersionNumber),
       );
 }
@@ -320,6 +580,7 @@ extension ActionComponentConfigurationMapper on ActionComponentConfiguration {
         shopperLocale: shopperLocale,
         amount: amount?.toDTO(),
         analyticsOptionsDTO: analyticsOptions.toDTO(sdkVersionNumber),
+        threeDS2ConfigurationDTO: threeDS2Configuration?.toDTO(),
       );
 }
 

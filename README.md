@@ -3,8 +3,8 @@
 # Adyen Flutter
 
 [![Pub Package](https://img.shields.io/pub/v/adyen_checkout.svg)](https://pub.dev/packages/adyen_checkout)
-[![Adyen iOS](https://img.shields.io/badge/ios-v5.22.1-brightgreen.svg)](https://github.com/Adyen/adyen-ios/releases/tag/5.22.1)
-[![Adyen Android](https://img.shields.io/badge/android-v5.16.0-brightgreen.svg)](https://github.com/Adyen/adyen-android/releases/tag/5.16.0)
+[![Adyen iOS](https://img.shields.io/badge/ios-v5.25.1-brightgreen.svg)](https://github.com/Adyen/adyen-ios/releases/tag/5.25.1)
+[![Adyen Android](https://img.shields.io/badge/android-v5.19.0-brightgreen.svg)](https://github.com/Adyen/adyen-android/releases/tag/5.19.0)
 
 The Adyen Flutter package provides you with the building blocks to create a checkout experience for
 your shoppers, allowing them to pay using the payment method of their choice. This is
@@ -18,6 +18,7 @@ You can integrate with the following:
 * **Components**: Flutter widgets for native iOS and Android Adyen Components. You use one Component
   for each payment method. We currently offer the following Components:
     - Card Component: allows shoppers to pay with card. Stored cards are also supported.
+    - BLIK Component: renders native BLIK code input for shoppers in Poland.
     - Google Pay Component: renders a Google Pay button.
     - Apple Pay Component: renders an Apple Pay button.
     - Instant Component: supports payment methods that do not require additional input fields, like
@@ -59,7 +60,7 @@ release a new version when we need to.
 #### Android
 
 * [Android 5.0](https://www.android.com/versions/lollipop-5-0/) (API 21) or later.
-* [Kotlin 1.8.22](https://kotlinlang.org/docs/releases.html) or later.
+* [Kotlin 2.0.20](https://kotlinlang.org/docs/releases.html) or later.
 * [AGP 8.1](https://developer.android.com/build/releases/gradle-plugin) or later with Gradle 8.
 * Requires the usage of a `FlutterFragmentActivity` instead of the default `FlutterActivity` in the
   MainActivity of

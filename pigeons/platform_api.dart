@@ -21,7 +21,8 @@ enum Environment {
   unitedStates,
   australia,
   india,
-  apse;
+  apse,
+  nea;
 }
 
 enum AddressMode {
@@ -115,6 +116,16 @@ enum ApplePaySummaryItemType {
   definite,
 }
 
+enum ApplePayPaymentErrorType {
+  billingAddress,
+  shippingAddress,
+  contact,
+  couponCode,
+  shippingAddressUnserviceable,
+  couponCodeExpired,
+  unknown,
+}
+
 enum CardNumberValidationResultDTO {
   valid,
   invalidIllegalCharacters,
@@ -166,11 +177,149 @@ class AnalyticsOptionsDTO {
   );
 }
 
+class ThreeDS2UICustomizationDTO {
+  final ThreeDS2ScreenCustomizationDTO? screenCustomization;
+  final ThreeDS2ToolbarCustomizationDTO? headingCustomization;
+  final ThreeDS2LabelCustomizationDTO? labelCustomization;
+  final ThreeDS2InputCustomizationDTO? inputCustomization;
+  final ThreeDS2SelectionItemCustomizationDTO? selectionItemCustomization;
+  final ThreeDS2ButtonCustomizationDTO? primaryButtonCustomization;
+  final ThreeDS2ButtonCustomizationDTO? secondaryButtonCustomization;
+
+  ThreeDS2UICustomizationDTO(
+    this.screenCustomization,
+    this.headingCustomization,
+    this.labelCustomization,
+    this.inputCustomization,
+    this.selectionItemCustomization,
+    this.primaryButtonCustomization,
+    this.secondaryButtonCustomization,
+  );
+}
+
+class ThreeDS2ScreenCustomizationDTO {
+  final String? backgroundColor;
+  final String? textColor;
+
+  ThreeDS2ScreenCustomizationDTO(
+    this.backgroundColor,
+    this.textColor,
+  );
+}
+
+class ThreeDS2ButtonCustomizationDTO {
+  final String? backgroundColor;
+  final String? textColor;
+  final int? cornerRadius;
+  final int? textFontSize;
+
+  ThreeDS2ButtonCustomizationDTO(
+    this.backgroundColor,
+    this.textColor,
+    this.cornerRadius,
+    this.textFontSize,
+  );
+}
+
+class ThreeDS2SelectionItemCustomizationDTO {
+  final String? selectionIndicatorTintColor;
+  final String? highlightedBackgroundColor;
+  final String? textColor;
+
+  ThreeDS2SelectionItemCustomizationDTO(
+    this.selectionIndicatorTintColor,
+    this.highlightedBackgroundColor,
+    this.textColor,
+  );
+}
+
+class ThreeDS2LabelCustomizationDTO {
+  final String? headingTextColor;
+  final int? headingTextFontSize;
+  final String? inputLabelTextColor;
+  final int? inputLabelFontSize;
+  final String? textColor;
+  final int? textFontSize;
+
+  ThreeDS2LabelCustomizationDTO(
+    this.headingTextColor,
+    this.headingTextFontSize,
+    this.inputLabelTextColor,
+    this.inputLabelFontSize,
+    this.textColor,
+    this.textFontSize,
+  );
+}
+
+class ThreeDS2InputCustomizationDTO {
+  final String? borderColor;
+  final int? borderWidth;
+  final int? cornerRadius;
+  final String? textColor;
+
+  ThreeDS2InputCustomizationDTO(
+    this.borderColor,
+    this.borderWidth,
+    this.cornerRadius,
+    this.textColor,
+  );
+}
+
+class ThreeDS2ToolbarCustomizationDTO {
+  final String? headerText;
+  final String? textColor;
+  final String? backgroundColor;
+  final String? cancelButtonColor;
+
+  ThreeDS2ToolbarCustomizationDTO(
+    this.headerText,
+    this.textColor,
+    this.backgroundColor,
+    this.cancelButtonColor,
+  );
+}
+
 class ThreeDS2ConfigurationDTO {
   final String? requestorAppURL;
+  final ThreeDS2UICustomizationDTO? uiCustomization;
 
   ThreeDS2ConfigurationDTO(
     this.requestorAppURL,
+    this.uiCustomization,
+  );
+}
+
+class DefaultInstallmentOptionsDTO {
+  final List<int?> values;
+  final bool includesRevolving;
+
+  DefaultInstallmentOptionsDTO(
+    this.values,
+    this.includesRevolving,
+  );
+}
+
+class CardBasedInstallmentOptionsDTO {
+  final List<int?> values;
+  final bool includesRevolving;
+  final String cardBrand;
+
+  CardBasedInstallmentOptionsDTO(
+    this.values,
+    this.includesRevolving,
+    this.cardBrand,
+  );
+}
+
+class InstallmentConfigurationDTO {
+  final DefaultInstallmentOptionsDTO? defaultOptions;
+  final List<CardBasedInstallmentOptionsDTO?>? cardBasedOptions;
+  final bool showInstallmentAmount;
+
+  InstallmentConfigurationDTO(
+    this.defaultOptions,
+    this.cardBasedOptions,
+    this.showInstallmentAmount,
   );
 }
 
@@ -193,6 +342,7 @@ class DropInConfigurationDTO {
   final String? preselectedPaymentMethodTitle;
   final Map<String?, String?>? paymentMethodNames;
   final bool isPartialPaymentSupported;
+  final bool showStoredPaymentMethods;
 
   DropInConfigurationDTO(
     this.environment,
@@ -213,6 +363,7 @@ class DropInConfigurationDTO {
     this.preselectedPaymentMethodTitle,
     this.paymentMethodNames,
     this.isPartialPaymentSupported,
+    this.showStoredPaymentMethods,
   );
 }
 
@@ -225,6 +376,7 @@ class CardConfigurationDTO {
   final FieldVisibility kcpFieldVisibility;
   final FieldVisibility socialSecurityNumberFieldVisibility;
   final List<String?> supportedCardTypes;
+  final InstallmentConfigurationDTO? installmentConfiguration;
 
   CardConfigurationDTO(
     this.holderNameRequired,
@@ -235,6 +387,7 @@ class CardConfigurationDTO {
     this.kcpFieldVisibility,
     this.socialSecurityNumberFieldVisibility,
     this.supportedCardTypes,
+    this.installmentConfiguration,
   );
 }
 
@@ -253,6 +406,12 @@ class ApplePayConfigurationDTO {
   final String? applicationData;
   final List<String?>? supportedCountries;
   final ApplePayMerchantCapability? merchantCapability;
+  final bool? supportsCouponCode;
+  final String? couponCode;
+  final bool hasOnSelectShippingMethod;
+  final bool hasOnSelectShippingContact;
+  final bool hasOnChangeCouponCode;
+  final bool hasOnAuthorize;
 
   ApplePayConfigurationDTO(
     this.merchantId,
@@ -269,6 +428,82 @@ class ApplePayConfigurationDTO {
     this.applicationData,
     this.supportedCountries,
     this.merchantCapability,
+    this.supportsCouponCode,
+    this.couponCode,
+    this.hasOnSelectShippingMethod,
+    this.hasOnSelectShippingContact,
+    this.hasOnChangeCouponCode,
+    this.hasOnAuthorize,
+  );
+}
+
+class ApplePayAuthorizedPaymentDTO {
+  final String token;
+  final String network;
+  final ApplePayContactDTO? billingContact;
+  final ApplePayContactDTO? shippingContact;
+  final ApplePayShippingMethodDTO? shippingMethod;
+
+  ApplePayAuthorizedPaymentDTO(
+    this.token,
+    this.network,
+    this.billingContact,
+    this.shippingContact,
+    this.shippingMethod,
+  );
+}
+
+class ApplePayPaymentErrorDTO {
+  final ApplePayPaymentErrorType type;
+  final String? field;
+  final String localizedDescription;
+
+  ApplePayPaymentErrorDTO(
+    this.type,
+    this.field,
+    this.localizedDescription,
+  );
+}
+
+class ApplePayAuthorizationResultDTO {
+  final bool isSuccess;
+  final List<ApplePayPaymentErrorDTO?>? errors;
+
+  ApplePayAuthorizationResultDTO(
+    this.isSuccess,
+    this.errors,
+  );
+}
+
+class ApplePayCouponCodeUpdateDTO {
+  final List<ApplePaySummaryItemDTO?> summaryItems;
+  final List<ApplePayShippingMethodDTO?>? shippingMethods;
+  final List<ApplePayPaymentErrorDTO?>? errors;
+
+  ApplePayCouponCodeUpdateDTO(
+    this.summaryItems,
+    this.shippingMethods,
+    this.errors,
+  );
+}
+
+class ApplePayShippingContactUpdateDTO {
+  final List<ApplePaySummaryItemDTO?> summaryItems;
+  final List<ApplePayShippingMethodDTO?>? shippingMethods;
+  final List<ApplePayPaymentErrorDTO?>? errors;
+
+  ApplePayShippingContactUpdateDTO(
+    this.summaryItems,
+    this.shippingMethods,
+    this.errors,
+  );
+}
+
+class ApplePayShippingMethodUpdateDTO {
+  final List<ApplePaySummaryItemDTO?> summaryItems;
+
+  ApplePayShippingMethodUpdateDTO(
+    this.summaryItems,
   );
 }
 
@@ -546,6 +781,24 @@ class CardComponentConfigurationDTO {
   );
 }
 
+class BlikComponentConfigurationDTO {
+  final Environment environment;
+  final String clientKey;
+  final String countryCode;
+  final AmountDTO? amount;
+  final String? shopperLocale;
+  final AnalyticsOptionsDTO analyticsOptionsDTO;
+
+  BlikComponentConfigurationDTO(
+    this.environment,
+    this.clientKey,
+    this.countryCode,
+    this.amount,
+    this.shopperLocale,
+    this.analyticsOptionsDTO,
+  );
+}
+
 class InstantPaymentConfigurationDTO {
   final InstantPaymentType instantPaymentType;
   final Environment environment;
@@ -616,6 +869,7 @@ class ActionComponentConfigurationDTO {
   final String? shopperLocale;
   final AmountDTO? amount;
   final AnalyticsOptionsDTO analyticsOptionsDTO;
+  final ThreeDS2ConfigurationDTO? threeDS2ConfigurationDTO;
 
   ActionComponentConfigurationDTO(
     this.environment,
@@ -623,6 +877,7 @@ class ActionComponentConfigurationDTO {
     this.shopperLocale,
     this.amount,
     this.analyticsOptionsDTO,
+    this.threeDS2ConfigurationDTO,
   );
 }
 
@@ -761,10 +1016,38 @@ abstract class ComponentFlutterInterface {
   // ignore: unused_element
   void _generateCodecForDTOs(
     CardComponentConfigurationDTO cardComponentConfigurationDTO,
+    BlikComponentConfigurationDTO blikComponentConfigurationDTO,
     SessionDTO sessionDTO,
     BinLookupDataDTO binLookupDataDTO,
   );
 
   void onComponentCommunication(
       ComponentCommunicationModel componentCommunicationModel);
+
+  @async
+  ApplePayShippingMethodUpdateDTO onApplePaySelectShippingMethod(
+    String componentId,
+    ApplePayShippingMethodDTO shippingMethod,
+    List<ApplePaySummaryItemDTO?> currentSummaryItems,
+  );
+
+  @async
+  ApplePayShippingContactUpdateDTO onApplePaySelectShippingContact(
+    String componentId,
+    ApplePayContactDTO contact,
+    List<ApplePaySummaryItemDTO?> currentSummaryItems,
+  );
+
+  @async
+  ApplePayCouponCodeUpdateDTO onApplePayChangeCouponCode(
+    String componentId,
+    String couponCode,
+    List<ApplePaySummaryItemDTO?> currentSummaryItems,
+  );
+
+  @async
+  ApplePayAuthorizationResultDTO onApplePayAuthorize(
+    String componentId,
+    ApplePayAuthorizedPaymentDTO payment,
+  );
 }

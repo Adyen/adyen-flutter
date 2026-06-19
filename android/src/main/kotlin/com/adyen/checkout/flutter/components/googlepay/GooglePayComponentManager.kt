@@ -1,6 +1,6 @@
 package com.adyen.checkout.flutter.components.googlepay
 
-import android.content.Intent
+import android.util.Log
 import androidx.fragment.app.FragmentActivity
 import com.adyen.checkout.action.core.internal.ActionHandlingComponent
 import com.adyen.checkout.components.core.CheckoutConfiguration
@@ -16,7 +16,7 @@ import com.adyen.checkout.flutter.generated.InstantPaymentConfigurationDTO
 import com.adyen.checkout.flutter.generated.InstantPaymentSetupResultDTO
 import com.adyen.checkout.flutter.generated.InstantPaymentType
 import com.adyen.checkout.flutter.session.SessionHolder
-import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToGooglePayCheckoutConfiguration
+import com.adyen.checkout.flutter.utils.ConfigurationMapper.toCheckoutConfiguration
 import com.adyen.checkout.flutter.utils.Constants
 import com.adyen.checkout.googlepay.GooglePayComponent
 import com.adyen.checkout.sessions.core.CheckoutSession
@@ -70,7 +70,7 @@ class GooglePayComponentManager(
             return
         }
 
-        val checkoutConfiguration = instantPaymentComponentConfigurationDTO.mapToGooglePayCheckoutConfiguration()
+        val checkoutConfiguration = instantPaymentComponentConfigurationDTO.toCheckoutConfiguration()
         this.componentId = componentId
         this.checkoutConfiguration = checkoutConfiguration
         GooglePayComponent.PROVIDER.isAvailable(
@@ -82,16 +82,14 @@ class GooglePayComponentManager(
     }
 
     fun start() {
-        googlePayComponent?.let {
-            assignCurrentComponent(it)
-            googlePayComponent?.startGooglePayScreen(activity, Constants.GOOGLE_PAY_COMPONENT_REQUEST_CODE)
+        val component = googlePayComponent
+        if (component != null) {
+            assignCurrentComponent(component)
+            component.submit()
+        } else {
+            Log.e(Constants.ADYEN_LOG_TAG, "Google Pay component is not initialized or available.")
         }
     }
-
-    fun handleGooglePayActivityResult(
-        resultCode: Int,
-        data: Intent?
-    ) = googlePayComponent?.handleActivityResult(resultCode, data)
 
     fun onDispose(componentId: String) {
         if (componentId == Constants.GOOGLE_PAY_ADVANCED_COMPONENT_KEY ||

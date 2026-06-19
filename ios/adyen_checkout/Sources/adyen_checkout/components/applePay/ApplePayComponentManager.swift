@@ -99,6 +99,7 @@ class ApplePayComponentManager {
             return try ApplePaySessionComponent(
                 sessionHolder: sessionHolder,
                 configuration: instantPaymentComponentConfigurationDTO,
+                componentFlutterApi: componentFlutterApi,
                 componentId: componentId
             )
         } else {

@@ -1,6 +1,7 @@
 import 'package:adyen_checkout/adyen_checkout.dart';
 import 'package:adyen_checkout/src/generated/platform_api.g.dart';
 import 'package:adyen_checkout/src/util/dto_mapper.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
@@ -43,6 +44,57 @@ void main() {
     expect(dropInConfigurationDto.showPreselectedStoredPaymentMethod, true);
     expect(dropInConfigurationDto.isRemoveStoredPaymentMethodEnabled, true);
     expect(dropInConfigurationDto.isPartialPaymentSupported, true);
+    expect(dropInConfigurationDto.showStoredPaymentMethods, true);
+  });
+
+  test(
+      'when showStoredPaymentMethods is not provided, then DTO defaults to true',
+      () {
+    final dropInConfiguration = DropInConfiguration(
+      environment: Environment.test,
+      clientKey: "test-key",
+      countryCode: "US",
+    );
+
+    final dto = dropInConfiguration.toDTO("0.0.1", false);
+
+    expect(dto.showStoredPaymentMethods, true);
+  });
+
+  test(
+      'when showStoredPaymentMethods is set to false, then DTO mirrors the value',
+      () {
+    final storedPaymentMethodConfiguration = StoredPaymentMethodConfiguration(
+      showStoredPaymentMethods: false,
+    );
+    final dropInConfiguration = DropInConfiguration(
+      environment: Environment.test,
+      clientKey: "test-key",
+      countryCode: "US",
+      storedPaymentMethodConfiguration: storedPaymentMethodConfiguration,
+    );
+
+    final dto = dropInConfiguration.toDTO("0.0.1", false);
+
+    expect(dto.showStoredPaymentMethods, false);
+  });
+
+  test(
+      'when showStoredPaymentMethods is set to true, then DTO mirrors the value',
+      () {
+    final storedPaymentMethodConfiguration = StoredPaymentMethodConfiguration(
+      showStoredPaymentMethods: true,
+    );
+    final dropInConfiguration = DropInConfiguration(
+      environment: Environment.test,
+      clientKey: "test-key",
+      countryCode: "US",
+      storedPaymentMethodConfiguration: storedPaymentMethodConfiguration,
+    );
+
+    final dto = dropInConfiguration.toDTO("0.0.1", false);
+
+    expect(dto.showStoredPaymentMethods, true);
   });
 
   test(
@@ -184,7 +236,23 @@ void main() {
         ],
         applicationData: null,
         supportedCountries: ["NL"],
-        merchantCapability: ApplePayMerchantCapability.debit);
+        merchantCapability: ApplePayMerchantCapability.debit,
+        supportsCouponCode: true,
+        couponCode: "SUMMER10",
+        onSelectShippingMethod: (method, currentSummaryItems) async =>
+            ApplePayShippingMethodUpdate(
+              summaryItems: currentSummaryItems,
+            ),
+        onSelectShippingContact: (contact, currentSummaryItems) async =>
+            ApplePayShippingContactUpdate(
+              summaryItems: currentSummaryItems,
+            ),
+        onChangeCouponCode: (couponCode, currentSummaryItems) async =>
+            ApplePayCouponCodeUpdate(
+              summaryItems: currentSummaryItems,
+            ),
+        onAuthorize: (payment) async =>
+            const ApplePayAuthorizationResult.success());
 
     final applePayConfigurationDTO = applePayConfiguration.toDTO();
 
@@ -228,13 +296,257 @@ void main() {
     expect(applePayConfigurationDTO.shippingMethods?.firstOrNull?.identifier,
         "Identifier 1");
     expect(applePayConfigurationDTO.shippingMethods?.firstOrNull?.startDate,
-        shippingStartDate.toIso8601String());
+        shippingStartDate.toUtc().toIso8601String());
     expect(applePayConfigurationDTO.shippingMethods?.firstOrNull?.endDate,
-        shippingEndDate.toIso8601String());
+        shippingEndDate.toUtc().toIso8601String());
     expect(applePayConfigurationDTO.applicationData, null);
     expect(applePayConfigurationDTO.supportedCountries, ["NL"]);
     expect(applePayConfigurationDTO.merchantCapability,
         ApplePayMerchantCapability.debit);
+    expect(applePayConfigurationDTO.supportsCouponCode, true);
+    expect(applePayConfigurationDTO.couponCode, "SUMMER10");
+    expect(applePayConfigurationDTO.hasOnSelectShippingMethod, true);
+    expect(applePayConfigurationDTO.hasOnSelectShippingContact, true);
+    expect(applePayConfigurationDTO.hasOnChangeCouponCode, true);
+    expect(applePayConfigurationDTO.hasOnAuthorize, true);
+  });
+
+  test(
+      "when using apple pay configuration without shipping callbacks, then should map callback flags to false",
+      () {
+    final applePayConfiguration = ApplePayConfiguration(
+      merchantId: "APPLE_PAY_MERCHANT_ID",
+      merchantName: "APPLE_PAY_MERCHANT_NAME",
+    );
+
+    final applePayConfigurationDTO = applePayConfiguration.toDTO();
+
+    expect(applePayConfigurationDTO.hasOnSelectShippingMethod, false);
+    expect(applePayConfigurationDTO.hasOnSelectShippingContact, false);
+    expect(applePayConfigurationDTO.hasOnChangeCouponCode, false);
+    expect(applePayConfigurationDTO.hasOnAuthorize, false);
+  });
+
+  test(
+      "when using apple pay shipping method update, then should parse to ApplePayShippingMethodUpdateDTO",
+      () {
+    final applePayShippingMethodUpdate = ApplePayShippingMethodUpdate(
+      summaryItems: [
+        ApplePaySummaryItem(
+          label: "Total",
+          amount: Amount(value: 3098, currency: "EUR"),
+          type: ApplePaySummaryItemType.definite,
+        )
+      ],
+    );
+
+    final applePayShippingMethodUpdateDTO =
+        applePayShippingMethodUpdate.toDTO();
+
+    expect(applePayShippingMethodUpdateDTO.summaryItems.firstOrNull?.label,
+        "Total");
+    expect(
+        applePayShippingMethodUpdateDTO.summaryItems.firstOrNull?.amount.value,
+        3098);
+    expect(
+        applePayShippingMethodUpdateDTO
+            .summaryItems.firstOrNull?.amount.currency,
+        "EUR");
+    expect(applePayShippingMethodUpdateDTO.summaryItems.firstOrNull?.type,
+        ApplePaySummaryItemType.definite);
+  });
+
+  test(
+      "when using apple pay shipping contact update, then should parse to ApplePayShippingContactUpdateDTO",
+      () {
+    final applePayShippingContactUpdate = ApplePayShippingContactUpdate(
+      summaryItems: [
+        ApplePaySummaryItem(
+          label: "Total",
+          amount: Amount(value: 3597, currency: "EUR"),
+          type: ApplePaySummaryItemType.definite,
+        )
+      ],
+      shippingMethods: [
+        ApplePayShippingMethod(
+          label: "Express shipping",
+          detail: "DHL Express",
+          amount: Amount(value: 999, currency: "EUR"),
+          identifier: "express",
+        )
+      ],
+    );
+
+    final applePayShippingContactUpdateDTO =
+        applePayShippingContactUpdate.toDTO();
+
+    expect(applePayShippingContactUpdateDTO.summaryItems.firstOrNull?.label,
+        "Total");
+    expect(
+        applePayShippingContactUpdateDTO.summaryItems.firstOrNull?.amount.value,
+        3597);
+    expect(applePayShippingContactUpdateDTO.shippingMethods?.firstOrNull?.label,
+        "Express shipping");
+    expect(
+        applePayShippingContactUpdateDTO
+            .shippingMethods?.firstOrNull?.identifier,
+        "express");
+  });
+
+  test(
+      "when using apple pay shipping contact update with errors, then should parse to ApplePayShippingContactUpdateDTO",
+      () {
+    final applePayShippingContactUpdate = ApplePayShippingContactUpdate(
+      summaryItems: [
+        ApplePaySummaryItem(
+          label: "Total",
+          amount: Amount(value: 3597, currency: "EUR"),
+          type: ApplePaySummaryItemType.definite,
+        )
+      ],
+      errors: [
+        ApplePayPaymentError(
+          type: ApplePayPaymentErrorType.shippingAddress,
+          field: ApplePayErrorField.postalCode,
+          localizedDescription: "We do not ship to this postal code.",
+        )
+      ],
+    );
+
+    final applePayShippingContactUpdateDTO =
+        applePayShippingContactUpdate.toDTO();
+
+    expect(applePayShippingContactUpdateDTO.errors?.firstOrNull?.type,
+        ApplePayPaymentErrorType.shippingAddress);
+    expect(applePayShippingContactUpdateDTO.errors?.firstOrNull?.field,
+        "postalCode");
+    expect(
+        applePayShippingContactUpdateDTO
+            .errors?.firstOrNull?.localizedDescription,
+        "We do not ship to this postal code.");
+  });
+
+  test(
+      "when using apple pay coupon code update, then should parse to ApplePayCouponCodeUpdateDTO",
+      () {
+    final applePayCouponCodeUpdate = ApplePayCouponCodeUpdate(
+      summaryItems: [
+        ApplePaySummaryItem(
+          label: "Discounted total",
+          amount: Amount(value: 2099, currency: "EUR"),
+          type: ApplePaySummaryItemType.definite,
+        )
+      ],
+    );
+
+    final applePayCouponCodeUpdateDTO = applePayCouponCodeUpdate.toDTO();
+
+    expect(applePayCouponCodeUpdateDTO.summaryItems.firstOrNull?.label,
+        "Discounted total");
+    expect(applePayCouponCodeUpdateDTO.summaryItems.firstOrNull?.amount.value,
+        2099);
+    expect(applePayCouponCodeUpdateDTO.summaryItems.firstOrNull?.type,
+        ApplePaySummaryItemType.definite);
+  });
+
+  test(
+      "when using apple pay coupon code update with errors, then should parse to ApplePayCouponCodeUpdateDTO",
+      () {
+    final applePayCouponCodeUpdate = ApplePayCouponCodeUpdate(
+      summaryItems: [
+        ApplePaySummaryItem(
+          label: "Discounted total",
+          amount: Amount(value: 2099, currency: "EUR"),
+          type: ApplePaySummaryItemType.definite,
+        )
+      ],
+      errors: [
+        ApplePayPaymentError(
+          type: ApplePayPaymentErrorType.couponCodeExpired,
+          localizedDescription: "Coupon code has expired.",
+        )
+      ],
+    );
+
+    final applePayCouponCodeUpdateDTO = applePayCouponCodeUpdate.toDTO();
+
+    expect(applePayCouponCodeUpdateDTO.errors?.firstOrNull?.type,
+        ApplePayPaymentErrorType.couponCodeExpired);
+    expect(
+        applePayCouponCodeUpdateDTO.errors?.firstOrNull?.localizedDescription,
+        "Coupon code has expired.");
+  });
+
+  test(
+      "when using apple pay authorization success, then should parse to ApplePayAuthorizationResultDTO",
+      () {
+    const applePayAuthorizationResult = ApplePayAuthorizationResult.success();
+
+    final applePayAuthorizationResultDTO = applePayAuthorizationResult.toDTO();
+
+    expect(applePayAuthorizationResultDTO.isSuccess, true);
+    expect(applePayAuthorizationResultDTO.errors, null);
+  });
+
+  test(
+      "when using apple pay authorization failure, then should parse to ApplePayAuthorizationResultDTO",
+      () {
+    final applePayAuthorizationResult = ApplePayAuthorizationResult.failure(
+      errors: [
+        ApplePayPaymentError(
+          type: ApplePayPaymentErrorType.shippingAddress,
+          field: ApplePayErrorField.postalCode,
+          localizedDescription: "Postal code is required.",
+        )
+      ],
+    );
+
+    final applePayAuthorizationResultDTO = applePayAuthorizationResult.toDTO();
+
+    expect(applePayAuthorizationResultDTO.isSuccess, false);
+    expect(applePayAuthorizationResultDTO.errors?.firstOrNull?.type,
+        ApplePayPaymentErrorType.shippingAddress);
+    expect(applePayAuthorizationResultDTO.errors?.firstOrNull?.field,
+        "postalCode");
+    expect(
+        applePayAuthorizationResultDTO
+            .errors?.firstOrNull?.localizedDescription,
+        "Postal code is required.");
+  });
+
+  test(
+      "when using apple pay authorized payment DTO, then should parse to ApplePayAuthorizedPayment",
+      () {
+    final applePayAuthorizedPaymentDTO = ApplePayAuthorizedPaymentDTO(
+      token: "APPLE_PAY_TOKEN",
+      network: "visa",
+      billingContact: ApplePayContactDTO(
+        emailAddress: "billing@example.com",
+        postalCode: "1011 DJ",
+      ),
+      shippingContact: ApplePayContactDTO(
+        emailAddress: "shipping@example.com",
+        postalCode: "1011 DJ",
+      ),
+      shippingMethod: ApplePayShippingMethodDTO(
+        label: "Express shipping",
+        detail: "DHL Express",
+        amount: AmountDTO(value: 999, currency: "EUR"),
+        identifier: "express",
+      ),
+    );
+
+    final applePayAuthorizedPayment = applePayAuthorizedPaymentDTO.fromDTO();
+
+    expect(applePayAuthorizedPayment.token, "APPLE_PAY_TOKEN");
+    expect(applePayAuthorizedPayment.network, "visa");
+    expect(applePayAuthorizedPayment.billingContact?.emailAddress,
+        "billing@example.com");
+    expect(applePayAuthorizedPayment.shippingContact?.emailAddress,
+        "shipping@example.com");
+    expect(applePayAuthorizedPayment.shippingMethod?.label, "Express shipping");
+    expect(applePayAuthorizedPayment.shippingMethod?.amount.value, 999);
+    expect(applePayAuthorizedPayment.shippingMethod?.amount.currency, "EUR");
   });
 
   test(
@@ -250,5 +562,430 @@ void main() {
     expect(cashAppPayConfigurationDTO.cashAppPayEnvironment,
         CashAppPayEnvironment.production);
     expect(cashAppPayConfigurationDTO.returnUrl, "RETURN_URL");
+  });
+
+  test(
+      'when using blik component configuration, then should map to BlikComponentConfigurationDTO',
+      () {
+    final blikComponentConfiguration = BlikComponentConfiguration(
+      environment: Environment.test,
+      clientKey: 'test-client-key',
+      countryCode: 'PL',
+      amount: Amount(value: 1000, currency: 'PLN'),
+      shopperLocale: 'pl-PL',
+      analyticsOptions: AnalyticsOptions(enabled: false),
+    );
+
+    final dto = blikComponentConfiguration.toDTO('0.0.1');
+
+    expect(dto.environment, Environment.test);
+    expect(dto.clientKey, 'test-client-key');
+    expect(dto.countryCode, 'PL');
+    expect(dto.amount?.value, 1000);
+    expect(dto.amount?.currency, 'PLN');
+    expect(dto.shopperLocale, 'pl-PL');
+    expect(dto.analyticsOptionsDTO.enabled, false);
+    expect(dto.analyticsOptionsDTO.version, '0.0.1');
+  });
+
+  test('when using 3DS theme, then should map to ui customization DTO', () {
+    const theme = Adyen3DSTheme(
+      textColor: Color(0xFFFFFFFF),
+      inputDecorationTheme: Adyen3DSInputDecorationTheme(
+        borderColor: Color(0xFF0A0B0C),
+        textColor: Color(0xFF0D0E0F),
+        borderWidth: 2,
+        cornerRadius: 4,
+      ),
+    );
+
+    final configuration = ThreeDS2Configuration(theme: theme);
+    final dto = configuration.toDTO();
+
+    final uiCustomization = dto.uiCustomization;
+    expect(uiCustomization, isNotNull);
+    expect(uiCustomization?.primaryButtonCustomization, isNull);
+    expect(uiCustomization?.secondaryButtonCustomization, isNull);
+    expect(uiCustomization?.inputCustomization?.borderColor, '#FF0A0B0C');
+    expect(uiCustomization?.inputCustomization?.borderWidth, 2);
+    expect(uiCustomization?.inputCustomization?.cornerRadius, 4);
+    expect(uiCustomization?.inputCustomization?.textColor, '#FF0D0E0F');
+  });
+
+  test('descriptionTheme should map label colors and font sizes', () {
+    const descriptionTheme = Adyen3DSDescriptionTheme(
+      textColor: Color(0xFF111111),
+      textFontSize: 13.6,
+      titleTextColor: Color(0xFF222222),
+      titleFontSize: 15.2,
+      inputLabelTextColor: Color(0xFF333333),
+      inputLabelFontSize: 12.4,
+    );
+
+    const theme = Adyen3DSTheme(
+      textColor: Color(0xFFAAAAAA),
+      headerTheme: Adyen3DSHeaderTheme(textColor: Color(0xFFBBBBBB)),
+      descriptionTheme: descriptionTheme,
+    );
+
+    final dto =
+        ThreeDS2Configuration(theme: theme, headingTitle: 'Heading').toDTO();
+
+    final label = dto.uiCustomization?.labelCustomization;
+    expect(label?.textColor, '#FF111111');
+    expect(label?.textFontSize, 14); // 13.6 -> 14
+    expect(label?.inputLabelTextColor, '#FF333333');
+    expect(label?.inputLabelFontSize, 12); // 12.4 -> 12
+    expect(label?.headingTextColor, '#FF222222');
+    expect(label?.headingTextFontSize, 15); // 15.2 -> 15
+  });
+
+  test('when requestorAppURL set, then should pass through', () {
+    final configuration = ThreeDS2Configuration(requestorAppURL: 'app://cb');
+
+    final dto = configuration.toDTO();
+
+    expect(dto.requestorAppURL, 'app://cb');
+  });
+
+  test('when theme has screen colors, then should map to screenCustomization',
+      () {
+    const theme = Adyen3DSTheme(
+      backgroundColor: Color(0xFF111213),
+      textColor: Color(0xFF141516),
+    );
+
+    final dto = ThreeDS2Configuration(theme: theme).toDTO();
+
+    expect(
+        dto.uiCustomization?.screenCustomization?.backgroundColor, '#FF111213');
+    expect(dto.uiCustomization?.screenCustomization?.textColor, '#FF141516');
+  });
+
+  test('when header theme set, then should map header fields', () {
+    const headerTheme = Adyen3DSHeaderTheme(
+      backgroundColor: Color(0xFF010203),
+      textColor: Color(0xFF040506),
+      cancelButtonColor: Color(0xFF070809),
+    );
+    const theme = Adyen3DSTheme(headerTheme: headerTheme);
+
+    final dto =
+        ThreeDS2Configuration(theme: theme, headingTitle: 'Heading').toDTO();
+
+    final heading = dto.uiCustomization?.headingCustomization;
+    expect(heading?.backgroundColor, '#FF010203');
+    expect(heading?.textColor, '#FF040506');
+    expect(heading?.cancelButtonColor, '#FF070809');
+    expect(heading?.headerText, 'Heading');
+  });
+
+  test('when button themes set, then should map primary and secondary', () {
+    const theme = Adyen3DSTheme(
+      primaryButtonTheme: Adyen3DSButtonTheme(
+        backgroundColor: Color(0xFF0A0B0C),
+        textColor: Color(0xFF0D0E0F),
+        cornerRadius: 6,
+        fontSize: 15,
+      ),
+      secondaryButtonTheme: Adyen3DSButtonTheme(
+        backgroundColor: Color(0xFF101112),
+        textColor: Color(0xFF131415),
+        cornerRadius: 8,
+        fontSize: 13,
+      ),
+    );
+
+    final dto = ThreeDS2Configuration(theme: theme).toDTO();
+
+    final primary = dto.uiCustomization?.primaryButtonCustomization;
+    final secondary = dto.uiCustomization?.secondaryButtonCustomization;
+    expect(primary?.backgroundColor, '#FF0A0B0C');
+    expect(primary?.textColor, '#FF0D0E0F');
+    expect(primary?.cornerRadius, 6);
+    expect(primary?.textFontSize, 15);
+    expect(secondary?.backgroundColor, '#FF101112');
+    expect(secondary?.textColor, '#FF131415');
+    expect(secondary?.cornerRadius, 8);
+    expect(secondary?.textFontSize, 13);
+  });
+
+  test(
+      'when both headingTitle and headerTheme provided, headerTheme should win for style',
+      () {
+    const theme = Adyen3DSTheme(
+      headerTheme: Adyen3DSHeaderTheme(
+        backgroundColor: Color(0xFF212223),
+        textColor: Color(0xFF242526),
+        cancelButtonColor: Color(0xFF272829),
+      ),
+    );
+
+    final dto = ThreeDS2Configuration(
+      headingTitle: 'Preferred heading',
+      theme: theme,
+    ).toDTO();
+
+    final heading = dto.uiCustomization?.headingCustomization;
+    expect(heading?.headerText, 'Preferred heading');
+    expect(heading?.backgroundColor, '#FF212223');
+    expect(heading?.textColor, '#FF242526');
+    expect(heading?.cancelButtonColor, '#FF272829');
+  });
+
+  test('when no heading or theme, uiCustomization should be null', () {
+    final dto = ThreeDS2Configuration().toDTO();
+
+    expect(dto.uiCustomization, isNull);
+  });
+
+  test('input decoration values should round to ints', () {
+    const theme = Adyen3DSTheme(
+      inputDecorationTheme: Adyen3DSInputDecorationTheme(
+        borderWidth: 2.7,
+        cornerRadius: 3.1,
+      ),
+    );
+
+    final dto = ThreeDS2Configuration(theme: theme).toDTO();
+
+    final input = dto.uiCustomization?.inputCustomization;
+    expect(input?.borderWidth, 3);
+    expect(input?.cornerRadius, 3);
+  });
+
+  test('fromThemeData should map common fields into uiCustomization DTO', () {
+    final themeData = ThemeData(
+      colorScheme: const ColorScheme.light(
+        primary: Color(0xFF111111),
+        surface: Color(0xFF222222),
+        onSurface: Color(0xFF444444),
+        outline: Color(0xFF555555),
+        onPrimary: Color(0xFFEEEEEE),
+      ),
+      scaffoldBackgroundColor: const Color(0xFF222222),
+      appBarTheme: const AppBarTheme(
+        backgroundColor: Color(0xFF111111),
+        foregroundColor: Color(0xFFEEEEEE),
+      ),
+      textTheme: const TextTheme(
+        bodyMedium: TextStyle(color: Color(0xFF444444)),
+        titleSmall: TextStyle(color: Color(0xFF666666)),
+      ),
+      inputDecorationTheme: const InputDecorationTheme(
+        enabledBorder: OutlineInputBorder(
+          borderSide: BorderSide(color: Color(0xFF555555)),
+        ),
+        labelStyle: TextStyle(color: Color(0xFF444444)),
+      ),
+    );
+
+    final theme = Adyen3DSTheme.fromThemeData(themeData);
+    final dto =
+        ThreeDS2Configuration(theme: theme, headingTitle: 'Heading').toDTO();
+
+    final ui = dto.uiCustomization;
+    expect(ui?.screenCustomization?.backgroundColor, '#FF222222');
+    expect(ui?.screenCustomization?.textColor, '#FF444444');
+    expect(ui?.headingCustomization?.textColor, '#FFEEEEEE');
+    expect(ui?.headingCustomization?.headerText, 'Heading');
+    expect(ui?.inputCustomization?.borderColor, '#FF555555');
+  });
+
+  test('when only primary button theme set, secondary should stay null', () {
+    const theme = Adyen3DSTheme(
+      primaryButtonTheme: Adyen3DSButtonTheme(
+        backgroundColor: Color(0xFF010101),
+      ),
+    );
+
+    final dto = ThreeDS2Configuration(theme: theme).toDTO();
+
+    expect(dto.uiCustomization?.primaryButtonCustomization?.backgroundColor,
+        '#FF010101');
+    expect(dto.uiCustomization?.secondaryButtonCustomization, isNull);
+  });
+
+  test(
+      'headingTitle should populate headerText even if headerTheme headerText is null',
+      () {
+    const theme = Adyen3DSTheme(
+      headerTheme: Adyen3DSHeaderTheme(
+        textColor: Color(0xFF0A0A0A),
+      ),
+    );
+
+    final dto = ThreeDS2Configuration(
+      headingTitle: 'Use this heading',
+      theme: theme,
+    ).toDTO();
+
+    final heading = dto.uiCustomization?.headingCustomization;
+    expect(heading?.headerText, 'Use this heading');
+    expect(heading?.textColor, '#FF0A0A0A');
+  });
+
+  test(
+      'when only background color set, should map screenCustomization without buttons/inputs',
+      () {
+    const theme = Adyen3DSTheme(
+      backgroundColor: Color(0xFFABCDEF),
+    );
+
+    final dto = ThreeDS2Configuration(theme: theme).toDTO();
+
+    expect(
+        dto.uiCustomization?.screenCustomization?.backgroundColor, '#FFABCDEF');
+    expect(dto.uiCustomization?.primaryButtonCustomization, isNull);
+    expect(dto.uiCustomization?.secondaryButtonCustomization, isNull);
+    expect(dto.uiCustomization?.inputCustomization, isNull);
+  });
+
+  test('requestorAppURL should survive alongside headingTitle and theme', () {
+    const theme = Adyen3DSTheme(
+      headerTheme: Adyen3DSHeaderTheme(
+        textColor: Color(0xFFBBBBBB),
+      ),
+    );
+
+    final dto = ThreeDS2Configuration(
+      requestorAppURL: 'app://combined',
+      headingTitle: 'Combined heading',
+      theme: theme,
+    ).toDTO();
+
+    expect(dto.requestorAppURL, 'app://combined');
+    expect(dto.uiCustomization?.headingCustomization?.headerText,
+        'Combined heading');
+    expect(dto.uiCustomization?.headingCustomization?.textColor, '#FFBBBBBB');
+  });
+
+  test('when only secondary button theme set, primary should stay null', () {
+    const theme = Adyen3DSTheme(
+      secondaryButtonTheme: Adyen3DSButtonTheme(
+        backgroundColor: Color(0xFF020202),
+      ),
+    );
+
+    final dto = ThreeDS2Configuration(theme: theme).toDTO();
+
+    expect(dto.uiCustomization?.secondaryButtonCustomization?.backgroundColor,
+        '#FF020202');
+    expect(dto.uiCustomization?.primaryButtonCustomization, isNull);
+  });
+
+  test(
+      'screenCustomization should map textColor alone when backgroundColor is null',
+      () {
+    const theme = Adyen3DSTheme(
+      textColor: Color(0xFF0B0B0B),
+    );
+
+    final dto = ThreeDS2Configuration(theme: theme).toDTO();
+
+    expect(dto.uiCustomization?.screenCustomization?.textColor, '#FF0B0B0B');
+    expect(dto.uiCustomization?.screenCustomization?.backgroundColor, isNull);
+  });
+
+  test('rounding uses .round() semantics for .5 values', () {
+    const theme = Adyen3DSTheme(
+      inputDecorationTheme: Adyen3DSInputDecorationTheme(
+        borderWidth: 2.5,
+        cornerRadius: 3.5,
+      ),
+    );
+
+    final dto = ThreeDS2Configuration(theme: theme).toDTO();
+
+    final input = dto.uiCustomization?.inputCustomization;
+    expect(input?.borderWidth, 3);
+    expect(input?.cornerRadius, 4);
+  });
+
+  test(
+      'no headingTitle and headerTheme without headerText should still map styling',
+      () {
+    const theme = Adyen3DSTheme(
+      headerTheme: Adyen3DSHeaderTheme(
+        textColor: Color(0xFF0C0C0C),
+      ),
+    );
+
+    final dto = ThreeDS2Configuration(theme: theme).toDTO();
+
+    final heading = dto.uiCustomization?.headingCustomization;
+    expect(heading, isNotNull);
+    expect(heading?.headerText, isNull);
+    expect(heading?.textColor, '#FF0C0C0C');
+  });
+
+  test('when toolbar title is set, then should map to toolbar header text', () {
+    final configuration = ThreeDS2Configuration(
+      headingTitle: 'Challenge',
+    );
+
+    final dto = configuration.toDTO();
+
+    expect(dto.uiCustomization, isNotNull);
+    expect(dto.uiCustomization?.headingCustomization, isNotNull);
+    expect(dto.uiCustomization?.headingCustomization?.headerText, 'Challenge');
+  });
+
+  test(
+      'when action component configuration has 3DS2 configuration, then should map to ActionComponentConfigurationDTO',
+      () {
+    const theme = Adyen3DSTheme(
+      headerTheme: Adyen3DSHeaderTheme(
+        textColor: Color(0xFFAABBCC),
+      ),
+    );
+    final configuration = ActionComponentConfiguration(
+      environment: Environment.test,
+      clientKey: 'test_client_key',
+      shopperLocale: 'en-US',
+      amount: Amount(value: 1500, currency: 'EUR'),
+      threeDS2Configuration: ThreeDS2Configuration(
+        requestorAppURL: 'myapp://adyen3ds2',
+        headingTitle: 'Action heading',
+        theme: theme,
+      ),
+    );
+
+    final dto = configuration.toDTO('1.0.0');
+
+    expect(dto.environment, Environment.test);
+    expect(dto.clientKey, 'test_client_key');
+    expect(dto.shopperLocale, 'en-US');
+    expect(dto.amount?.value, 1500);
+    expect(dto.amount?.currency, 'EUR');
+    expect(dto.threeDS2ConfigurationDTO?.requestorAppURL, 'myapp://adyen3ds2');
+    expect(
+      dto.threeDS2ConfigurationDTO?.uiCustomization?.headingCustomization
+          ?.headerText,
+      'Action heading',
+    );
+    expect(
+      dto.threeDS2ConfigurationDTO?.uiCustomization?.headingCustomization
+          ?.textColor,
+      '#FFAABBCC',
+    );
+  });
+
+  test(
+      'when action component configuration omits 3DS2 configuration, then ActionComponentConfigurationDTO should contain null 3DS2 configuration',
+      () {
+    final configuration = ActionComponentConfiguration(
+      environment: Environment.test,
+      clientKey: 'test_client_key',
+    );
+
+    final dto = configuration.toDTO('1.0.0');
+
+    expect(dto.threeDS2ConfigurationDTO, isNull);
+  });
+
+  test('color to hex should include alpha channel', () {
+    const color = Color(0x80112233);
+    expect(color.toHexString(), '#80112233');
   });
 }

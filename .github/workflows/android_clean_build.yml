@@ -14,9 +14,9 @@ jobs:
       fail-fast: false
       matrix:
         api-level: [ 36 ]
-        flutter-version: [ 3.16.x, 3.19.x, 3.22.x, 3.24.x, 3.27.x, 3.29.x, 3.32.x, 3.35.x, 3.38.x ]
+        flutter-version: [ 3.16.x, 3.19.x, 3.22.x, 3.24.x, 3.27.x, 3.29.x, 3.32.x, 3.35.x, 3.38.x, 3.41.x, 3.44.x ]
         agp_version: [ 8.13.2 ]
-        gradle_version: [ 8.13 ]
+        gradle_version: [ 8.14.5 ]
     env:
       FLUTTER_VERSION: ${{ matrix.flutter-version }}
       COMPILE_SDK_VERSION: ${{ matrix.api-level }}
@@ -34,7 +34,7 @@ jobs:
           sudo apt-get remove -y 'php.*'
           sudo docker image prune --all --force
 
-      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
       - name: Enable KVM
         run: |
@@ -43,12 +43,12 @@ jobs:
           sudo udevadm trigger --name-match=kvm
 
       - name: Set up JDK
-        uses: actions/setup-java@f2beeb24e141e01a676f977032f5a29d81c9e27e # v5.1.0
+        uses: actions/setup-java@be666c2fcd27ec809703dec50e508c2fdc7f6654 # v5.2.0
         with:
           distribution: 'zulu'
           java-version: 17
 
-      - uses: subosito/flutter-action@fd55f4c5af5b953cc57a2be44cb082c8f6635e8e # v2.21.0
+      - uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2.23.0
         with:
           flutter-version: ${{ matrix.flutter-version }}
           channel: 'stable'
@@ -93,17 +93,23 @@ jobs:
               }\
             ' android/app/build.gradle
           fi
+                    
+          # Suppress Kotlin 2.2.x strict JVM target consistency errors in dependencies (Flutter 3.44.x+)
+          # pay_android 3.1.x defaults to JVM 1.8 which conflicts with our JVM 11 target
+          if [[ "$FLUTTER_VERSION" == "3.44.x" ]]; then
+            echo "kotlin.jvm.target.validation.mode=warning" >> android/gradle.properties
+          fi
           
           dart pub add 'adyen_checkout:{"path":"../"}'
           flutter build apk --debug  
 
       - name: Gradle cache
-        uses: gradle/actions/setup-gradle@4d9f0ba0025fe599b4ebab900eb7f3a1d93ef4c2 # v5.0.0
+        uses: gradle/actions/setup-gradle@50e97c2cd7a37755bbfafc9c5b7cafaece252f6e # v6.1.0
         with:
           cache-read-only: false
 
       - name: AVD cache
-        uses: actions/cache@9255dc7a253b0ccc959486e2bca901246202afeb # v5.0.1
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
         id: avd-cache
         with:
           path: |
@@ -113,7 +119,7 @@ jobs:
 
       - name: Create AVD and generate snapshot for caching
         if: steps.avd-cache.outputs.cache-hit != 'true'
-        uses: reactivecircus/android-emulator-runner@b530d96654c385303d652368551fb075bc2f0b6b # v2.35.0
+        uses: reactivecircus/android-emulator-runner@e89f39f1abbbd05b1113a29cf4db69e7540cae5a # v2.37.0
         with:
           api-level: ${{ matrix.api-level }}
           target: google_apis
@@ -125,7 +131,7 @@ jobs:
           script: echo "Generated AVD snapshot for caching."
 
       - name: Run connected installation test
-        uses: reactivecircus/android-emulator-runner@b530d96654c385303d652368551fb075bc2f0b6b # v2.35.0
+        uses: reactivecircus/android-emulator-runner@e89f39f1abbbd05b1113a29cf4db69e7540cae5a # v2.37.0
         with:
           api-level: ${{ matrix.api-level }}
           target: google_apis

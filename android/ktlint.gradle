@@ -11,7 +11,7 @@ tasks.register('ktlintCheck', JavaExec) {
     group = "verification"
 
     classpath = configurations.ktlint
-    main = "com.pinterest.ktlint.Main"
+    mainClass.set("com.pinterest.ktlint.Main")
     args "src/**/main/**/*.kt", "--reporter=plain", "--reporter=checkstyle,output=${project.buildDir}/reports/klint/klint-results.xml"
 }
 
@@ -22,7 +22,7 @@ tasks.register('ktlintFormat', JavaExec) {
     group = "formatting"
 
     classpath = configurations.ktlint
-    main = "com.pinterest.ktlint.Main"
+    mainClass.set("com.pinterest.ktlint.Main")
     args "-F", "src/main/**/*.kt"
     jvmArgs("--add-opens", "java.base/java.lang=ALL-UNNAMED")
 }

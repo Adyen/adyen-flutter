@@ -1,6 +1,11 @@
+import 'package:adyen_checkout/src/common/model/payment_method_configurations/apple_pay/apple_pay_authorization_result.dart';
+import 'package:adyen_checkout/src/common/model/payment_method_configurations/apple_pay/apple_pay_authorized_payment.dart';
 import 'package:adyen_checkout/src/common/model/payment_method_configurations/apple_pay/apple_pay_contact.dart';
 import 'package:adyen_checkout/src/common/model/payment_method_configurations/apple_pay/apple_pay_contact_field.dart';
+import 'package:adyen_checkout/src/common/model/payment_method_configurations/apple_pay/apple_pay_coupon_code_update.dart';
+import 'package:adyen_checkout/src/common/model/payment_method_configurations/apple_pay/apple_pay_shipping_contact_update.dart';
 import 'package:adyen_checkout/src/common/model/payment_method_configurations/apple_pay/apple_pay_shipping_method.dart';
+import 'package:adyen_checkout/src/common/model/payment_method_configurations/apple_pay/apple_pay_shipping_method_update.dart';
 import 'package:adyen_checkout/src/common/model/payment_method_configurations/apple_pay/apple_pay_summary_item.dart';
 import 'package:adyen_checkout/src/generated/platform_api.g.dart';
 
@@ -19,6 +24,23 @@ class ApplePayConfiguration {
   final String? applicationData;
   final List<String>? supportedCountries;
   final ApplePayMerchantCapability? merchantCapability;
+  final bool? supportsCouponCode;
+  final String? couponCode;
+  final Future<ApplePayShippingMethodUpdate> Function(
+    ApplePayShippingMethod method,
+    List<ApplePaySummaryItem> currentSummaryItems,
+  )? onSelectShippingMethod;
+  final Future<ApplePayShippingContactUpdate> Function(
+    ApplePayContact contact,
+    List<ApplePaySummaryItem> currentSummaryItems,
+  )? onSelectShippingContact;
+  final Future<ApplePayCouponCodeUpdate> Function(
+    String couponCode,
+    List<ApplePaySummaryItem> currentSummaryItems,
+  )? onChangeCouponCode;
+  final Future<ApplePayAuthorizationResult> Function(
+    ApplePayAuthorizedPayment payment,
+  )? onAuthorize;
 
   ApplePayConfiguration({
     required this.merchantId,
@@ -35,6 +57,12 @@ class ApplePayConfiguration {
     this.applicationData,
     this.supportedCountries,
     this.merchantCapability,
+    this.supportsCouponCode,
+    this.couponCode,
+    this.onSelectShippingMethod,
+    this.onSelectShippingContact,
+    this.onChangeCouponCode,
+    this.onAuthorize,
   });
 
   @override
@@ -53,6 +81,12 @@ class ApplePayConfiguration {
         'shippingMethods: $shippingMethods, '
         'applicationData: $applicationData, '
         'supportedCountries: $supportedCountries, '
-        'merchantCapability: $merchantCapability)';
+        'merchantCapability: $merchantCapability, '
+        'supportsCouponCode: $supportsCouponCode, '
+        'couponCode: $couponCode, '
+        'onSelectShippingMethod: $onSelectShippingMethod, '
+        'onSelectShippingContact: $onSelectShippingContact, '
+        'onChangeCouponCode: $onChangeCouponCode, '
+        'onAuthorize: $onAuthorize)';
   }
 }

@@ -14,12 +14,18 @@ import com.adyen.checkout.flutter.utils.Constants
 import com.adyen.checkout.sessions.core.SessionComponentCallback
 import com.adyen.checkout.sessions.core.SessionPaymentResult
 
-abstract class ComponentSessionCallback<T : PaymentComponentState<*>>(
+open class ComponentSessionCallback<T : PaymentComponentState<*>>(
     private val componentFlutterApi: ComponentFlutterInterface,
     private val componentId: String,
     private val onActionCallback: (Action) -> Unit,
+    private val assignCurrentComponent: () -> Unit = {},
 ) : SessionComponentCallback<T> {
     override fun onAction(action: Action) = onActionCallback(action)
+
+    override fun onSubmit(state: T): Boolean {
+        assignCurrentComponent.invoke()
+        return super.onSubmit(state)
+    }
 
     override fun onFinished(result: SessionPaymentResult) {
         val paymentResult =

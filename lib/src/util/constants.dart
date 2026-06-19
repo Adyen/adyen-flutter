@@ -7,6 +7,10 @@ class Constants {
   static const String sessionKey = "session";
   static const String cardComponentSessionKey = "cardComponentSession";
   static const String cardComponentAdvancedKey = "cardComponentAdvanced";
+  static const String blikComponentConfigurationKey =
+      "blikComponentConfiguration";
+  static const String blikComponentSessionKey = "blikComponentSession";
+  static const String blikComponentAdvancedKey = "blikComponentAdvanced";
   static const String isStoredPaymentMethodIndicator = "id";
   static const String componentIdKey = "componentId";
   static const String submitDataKey = "data";

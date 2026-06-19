@@ -53,7 +53,8 @@ enum class Environment(val raw: Int) {
   UNITED_STATES(2),
   AUSTRALIA(3),
   INDIA(4),
-  APSE(5);
+  APSE(5),
+  NEA(6);
 
   companion object {
     fun ofRaw(raw: Int): Environment? {
@@ -237,6 +238,22 @@ enum class ApplePaySummaryItemType(val raw: Int) {
   }
 }
 
+enum class ApplePayPaymentErrorType(val raw: Int) {
+  BILLING_ADDRESS(0),
+  SHIPPING_ADDRESS(1),
+  CONTACT(2),
+  COUPON_CODE(3),
+  SHIPPING_ADDRESS_UNSERVICEABLE(4),
+  COUPON_CODE_EXPIRED(5),
+  UNKNOWN(6);
+
+  companion object {
+    fun ofRaw(raw: Int): ApplePayPaymentErrorType? {
+      return values().firstOrNull { it.raw == raw }
+    }
+  }
+}
+
 enum class CardNumberValidationResultDTO(val raw: Int) {
   VALID(0),
   INVALID_ILLEGAL_CHARACTERS(1),
@@ -347,20 +364,297 @@ data class AnalyticsOptionsDTO (
 }
 
 /** Generated class from Pigeon that represents data sent in messages. */
+data class ThreeDS2UICustomizationDTO (
+  val screenCustomization: ThreeDS2ScreenCustomizationDTO? = null,
+  val headingCustomization: ThreeDS2ToolbarCustomizationDTO? = null,
+  val labelCustomization: ThreeDS2LabelCustomizationDTO? = null,
+  val inputCustomization: ThreeDS2InputCustomizationDTO? = null,
+  val selectionItemCustomization: ThreeDS2SelectionItemCustomizationDTO? = null,
+  val primaryButtonCustomization: ThreeDS2ButtonCustomizationDTO? = null,
+  val secondaryButtonCustomization: ThreeDS2ButtonCustomizationDTO? = null
+
+) {
+  companion object {
+    @Suppress("LocalVariableName")
+    fun fromList(__pigeon_list: List<Any?>): ThreeDS2UICustomizationDTO {
+      val screenCustomization = __pigeon_list[0] as ThreeDS2ScreenCustomizationDTO?
+      val headingCustomization = __pigeon_list[1] as ThreeDS2ToolbarCustomizationDTO?
+      val labelCustomization = __pigeon_list[2] as ThreeDS2LabelCustomizationDTO?
+      val inputCustomization = __pigeon_list[3] as ThreeDS2InputCustomizationDTO?
+      val selectionItemCustomization = __pigeon_list[4] as ThreeDS2SelectionItemCustomizationDTO?
+      val primaryButtonCustomization = __pigeon_list[5] as ThreeDS2ButtonCustomizationDTO?
+      val secondaryButtonCustomization = __pigeon_list[6] as ThreeDS2ButtonCustomizationDTO?
+      return ThreeDS2UICustomizationDTO(screenCustomization, headingCustomization, labelCustomization, inputCustomization, selectionItemCustomization, primaryButtonCustomization, secondaryButtonCustomization)
+    }
+  }
+  fun toList(): List<Any?> {
+    return listOf(
+      screenCustomization,
+      headingCustomization,
+      labelCustomization,
+      inputCustomization,
+      selectionItemCustomization,
+      primaryButtonCustomization,
+      secondaryButtonCustomization,
+    )
+  }
+}
+
+/** Generated class from Pigeon that represents data sent in messages. */
+data class ThreeDS2ScreenCustomizationDTO (
+  val backgroundColor: String? = null,
+  val textColor: String? = null
+
+) {
+  companion object {
+    @Suppress("LocalVariableName")
+    fun fromList(__pigeon_list: List<Any?>): ThreeDS2ScreenCustomizationDTO {
+      val backgroundColor = __pigeon_list[0] as String?
+      val textColor = __pigeon_list[1] as String?
+      return ThreeDS2ScreenCustomizationDTO(backgroundColor, textColor)
+    }
+  }
+  fun toList(): List<Any?> {
+    return listOf(
+      backgroundColor,
+      textColor,
+    )
+  }
+}
+
+/** Generated class from Pigeon that represents data sent in messages. */
+data class ThreeDS2ButtonCustomizationDTO (
+  val backgroundColor: String? = null,
+  val textColor: String? = null,
+  val cornerRadius: Long? = null,
+  val textFontSize: Long? = null
+
+) {
+  companion object {
+    @Suppress("LocalVariableName")
+    fun fromList(__pigeon_list: List<Any?>): ThreeDS2ButtonCustomizationDTO {
+      val backgroundColor = __pigeon_list[0] as String?
+      val textColor = __pigeon_list[1] as String?
+      val cornerRadius = __pigeon_list[2].let { num -> if (num is Int) num.toLong() else num as Long? }
+      val textFontSize = __pigeon_list[3].let { num -> if (num is Int) num.toLong() else num as Long? }
+      return ThreeDS2ButtonCustomizationDTO(backgroundColor, textColor, cornerRadius, textFontSize)
+    }
+  }
+  fun toList(): List<Any?> {
+    return listOf(
+      backgroundColor,
+      textColor,
+      cornerRadius,
+      textFontSize,
+    )
+  }
+}
+
+/** Generated class from Pigeon that represents data sent in messages. */
+data class ThreeDS2SelectionItemCustomizationDTO (
+  val selectionIndicatorTintColor: String? = null,
+  val highlightedBackgroundColor: String? = null,
+  val textColor: String? = null
+
+) {
+  companion object {
+    @Suppress("LocalVariableName")
+    fun fromList(__pigeon_list: List<Any?>): ThreeDS2SelectionItemCustomizationDTO {
+      val selectionIndicatorTintColor = __pigeon_list[0] as String?
+      val highlightedBackgroundColor = __pigeon_list[1] as String?
+      val textColor = __pigeon_list[2] as String?
+      return ThreeDS2SelectionItemCustomizationDTO(selectionIndicatorTintColor, highlightedBackgroundColor, textColor)
+    }
+  }
+  fun toList(): List<Any?> {
+    return listOf(
+      selectionIndicatorTintColor,
+      highlightedBackgroundColor,
+      textColor,
+    )
+  }
+}
+
+/** Generated class from Pigeon that represents data sent in messages. */
+data class ThreeDS2LabelCustomizationDTO (
+  val headingTextColor: String? = null,
+  val headingTextFontSize: Long? = null,
+  val inputLabelTextColor: String? = null,
+  val inputLabelFontSize: Long? = null,
+  val textColor: String? = null,
+  val textFontSize: Long? = null
+
+) {
+  companion object {
+    @Suppress("LocalVariableName")
+    fun fromList(__pigeon_list: List<Any?>): ThreeDS2LabelCustomizationDTO {
+      val headingTextColor = __pigeon_list[0] as String?
+      val headingTextFontSize = __pigeon_list[1].let { num -> if (num is Int) num.toLong() else num as Long? }
+      val inputLabelTextColor = __pigeon_list[2] as String?
+      val inputLabelFontSize = __pigeon_list[3].let { num -> if (num is Int) num.toLong() else num as Long? }
+      val textColor = __pigeon_list[4] as String?
+      val textFontSize = __pigeon_list[5].let { num -> if (num is Int) num.toLong() else num as Long? }
+      return ThreeDS2LabelCustomizationDTO(headingTextColor, headingTextFontSize, inputLabelTextColor, inputLabelFontSize, textColor, textFontSize)
+    }
+  }
+  fun toList(): List<Any?> {
+    return listOf(
+      headingTextColor,
+      headingTextFontSize,
+      inputLabelTextColor,
+      inputLabelFontSize,
+      textColor,
+      textFontSize,
+    )
+  }
+}
+
+/** Generated class from Pigeon that represents data sent in messages. */
+data class ThreeDS2InputCustomizationDTO (
+  val borderColor: String? = null,
+  val borderWidth: Long? = null,
+  val cornerRadius: Long? = null,
+  val textColor: String? = null
+
+) {
+  companion object {
+    @Suppress("LocalVariableName")
+    fun fromList(__pigeon_list: List<Any?>): ThreeDS2InputCustomizationDTO {
+      val borderColor = __pigeon_list[0] as String?
+      val borderWidth = __pigeon_list[1].let { num -> if (num is Int) num.toLong() else num as Long? }
+      val cornerRadius = __pigeon_list[2].let { num -> if (num is Int) num.toLong() else num as Long? }
+      val textColor = __pigeon_list[3] as String?
+      return ThreeDS2InputCustomizationDTO(borderColor, borderWidth, cornerRadius, textColor)
+    }
+  }
+  fun toList(): List<Any?> {
+    return listOf(
+      borderColor,
+      borderWidth,
+      cornerRadius,
+      textColor,
+    )
+  }
+}
+
+/** Generated class from Pigeon that represents data sent in messages. */
+data class ThreeDS2ToolbarCustomizationDTO (
+  val headerText: String? = null,
+  val textColor: String? = null,
+  val backgroundColor: String? = null,
+  val cancelButtonColor: String? = null
+
+) {
+  companion object {
+    @Suppress("LocalVariableName")
+    fun fromList(__pigeon_list: List<Any?>): ThreeDS2ToolbarCustomizationDTO {
+      val headerText = __pigeon_list[0] as String?
+      val textColor = __pigeon_list[1] as String?
+      val backgroundColor = __pigeon_list[2] as String?
+      val cancelButtonColor = __pigeon_list[3] as String?
+      return ThreeDS2ToolbarCustomizationDTO(headerText, textColor, backgroundColor, cancelButtonColor)
+    }
+  }
+  fun toList(): List<Any?> {
+    return listOf(
+      headerText,
+      textColor,
+      backgroundColor,
+      cancelButtonColor,
+    )
+  }
+}
+
+/** Generated class from Pigeon that represents data sent in messages. */
 data class ThreeDS2ConfigurationDTO (
-  val requestorAppURL: String? = null
+  val requestorAppURL: String? = null,
+  val uiCustomization: ThreeDS2UICustomizationDTO? = null
 
 ) {
   companion object {
     @Suppress("LocalVariableName")
     fun fromList(__pigeon_list: List<Any?>): ThreeDS2ConfigurationDTO {
       val requestorAppURL = __pigeon_list[0] as String?
-      return ThreeDS2ConfigurationDTO(requestorAppURL)
+      val uiCustomization = __pigeon_list[1] as ThreeDS2UICustomizationDTO?
+      return ThreeDS2ConfigurationDTO(requestorAppURL, uiCustomization)
     }
   }
   fun toList(): List<Any?> {
     return listOf(
       requestorAppURL,
+      uiCustomization,
+    )
+  }
+}
+
+/** Generated class from Pigeon that represents data sent in messages. */
+data class DefaultInstallmentOptionsDTO (
+  val values: List<Long?>,
+  val includesRevolving: Boolean
+
+) {
+  companion object {
+    @Suppress("LocalVariableName")
+    fun fromList(__pigeon_list: List<Any?>): DefaultInstallmentOptionsDTO {
+      val values = __pigeon_list[0] as List<Long?>
+      val includesRevolving = __pigeon_list[1] as Boolean
+      return DefaultInstallmentOptionsDTO(values, includesRevolving)
+    }
+  }
+  fun toList(): List<Any?> {
+    return listOf(
+      values,
+      includesRevolving,
+    )
+  }
+}
+
+/** Generated class from Pigeon that represents data sent in messages. */
+data class CardBasedInstallmentOptionsDTO (
+  val values: List<Long?>,
+  val includesRevolving: Boolean,
+  val cardBrand: String
+
+) {
+  companion object {
+    @Suppress("LocalVariableName")
+    fun fromList(__pigeon_list: List<Any?>): CardBasedInstallmentOptionsDTO {
+      val values = __pigeon_list[0] as List<Long?>
+      val includesRevolving = __pigeon_list[1] as Boolean
+      val cardBrand = __pigeon_list[2] as String
+      return CardBasedInstallmentOptionsDTO(values, includesRevolving, cardBrand)
+    }
+  }
+  fun toList(): List<Any?> {
+    return listOf(
+      values,
+      includesRevolving,
+      cardBrand,
+    )
+  }
+}
+
+/** Generated class from Pigeon that represents data sent in messages. */
+data class InstallmentConfigurationDTO (
+  val defaultOptions: DefaultInstallmentOptionsDTO? = null,
+  val cardBasedOptions: List<CardBasedInstallmentOptionsDTO?>? = null,
+  val showInstallmentAmount: Boolean
+
+) {
+  companion object {
+    @Suppress("LocalVariableName")
+    fun fromList(__pigeon_list: List<Any?>): InstallmentConfigurationDTO {
+      val defaultOptions = __pigeon_list[0] as DefaultInstallmentOptionsDTO?
+      val cardBasedOptions = __pigeon_list[1] as List<CardBasedInstallmentOptionsDTO?>?
+      val showInstallmentAmount = __pigeon_list[2] as Boolean
+      return InstallmentConfigurationDTO(defaultOptions, cardBasedOptions, showInstallmentAmount)
+    }
+  }
+  fun toList(): List<Any?> {
+    return listOf(
+      defaultOptions,
+      cardBasedOptions,
+      showInstallmentAmount,
     )
   }
 }
@@ -384,7 +678,8 @@ data class DropInConfigurationDTO (
   val isRemoveStoredPaymentMethodEnabled: Boolean,
   val preselectedPaymentMethodTitle: String? = null,
   val paymentMethodNames: Map<String?, String?>? = null,
-  val isPartialPaymentSupported: Boolean
+  val isPartialPaymentSupported: Boolean,
+  val showStoredPaymentMethods: Boolean
 
 ) {
   companion object {
@@ -408,7 +703,8 @@ data class DropInConfigurationDTO (
       val preselectedPaymentMethodTitle = __pigeon_list[15] as String?
       val paymentMethodNames = __pigeon_list[16] as Map<String?, String?>?
       val isPartialPaymentSupported = __pigeon_list[17] as Boolean
-      return DropInConfigurationDTO(environment, clientKey, countryCode, amount, shopperLocale, cardConfigurationDTO, applePayConfigurationDTO, googlePayConfigurationDTO, cashAppPayConfigurationDTO, twintConfigurationDTO, threeDS2ConfigurationDTO, analyticsOptionsDTO, showPreselectedStoredPaymentMethod, skipListWhenSinglePaymentMethod, isRemoveStoredPaymentMethodEnabled, preselectedPaymentMethodTitle, paymentMethodNames, isPartialPaymentSupported)
+      val showStoredPaymentMethods = __pigeon_list[18] as Boolean
+      return DropInConfigurationDTO(environment, clientKey, countryCode, amount, shopperLocale, cardConfigurationDTO, applePayConfigurationDTO, googlePayConfigurationDTO, cashAppPayConfigurationDTO, twintConfigurationDTO, threeDS2ConfigurationDTO, analyticsOptionsDTO, showPreselectedStoredPaymentMethod, skipListWhenSinglePaymentMethod, isRemoveStoredPaymentMethodEnabled, preselectedPaymentMethodTitle, paymentMethodNames, isPartialPaymentSupported, showStoredPaymentMethods)
     }
   }
   fun toList(): List<Any?> {
@@ -431,6 +727,7 @@ data class DropInConfigurationDTO (
       preselectedPaymentMethodTitle,
       paymentMethodNames,
       isPartialPaymentSupported,
+      showStoredPaymentMethods,
     )
   }
 }
@@ -444,7 +741,8 @@ data class CardConfigurationDTO (
   val showCvc: Boolean,
   val kcpFieldVisibility: FieldVisibility,
   val socialSecurityNumberFieldVisibility: FieldVisibility,
-  val supportedCardTypes: List<String?>
+  val supportedCardTypes: List<String?>,
+  val installmentConfiguration: InstallmentConfigurationDTO? = null
 
 ) {
   companion object {
@@ -458,7 +756,8 @@ data class CardConfigurationDTO (
       val kcpFieldVisibility = __pigeon_list[5] as FieldVisibility
       val socialSecurityNumberFieldVisibility = __pigeon_list[6] as FieldVisibility
       val supportedCardTypes = __pigeon_list[7] as List<String?>
-      return CardConfigurationDTO(holderNameRequired, addressMode, showStorePaymentField, showCvcForStoredCard, showCvc, kcpFieldVisibility, socialSecurityNumberFieldVisibility, supportedCardTypes)
+      val installmentConfiguration = __pigeon_list[8] as InstallmentConfigurationDTO?
+      return CardConfigurationDTO(holderNameRequired, addressMode, showStorePaymentField, showCvcForStoredCard, showCvc, kcpFieldVisibility, socialSecurityNumberFieldVisibility, supportedCardTypes, installmentConfiguration)
     }
   }
   fun toList(): List<Any?> {
@@ -471,6 +770,7 @@ data class CardConfigurationDTO (
       kcpFieldVisibility,
       socialSecurityNumberFieldVisibility,
       supportedCardTypes,
+      installmentConfiguration,
     )
   }
 }
@@ -490,7 +790,13 @@ data class ApplePayConfigurationDTO (
   val shippingMethods: List<ApplePayShippingMethodDTO?>? = null,
   val applicationData: String? = null,
   val supportedCountries: List<String?>? = null,
-  val merchantCapability: ApplePayMerchantCapability? = null
+  val merchantCapability: ApplePayMerchantCapability? = null,
+  val supportsCouponCode: Boolean? = null,
+  val couponCode: String? = null,
+  val hasOnSelectShippingMethod: Boolean,
+  val hasOnSelectShippingContact: Boolean,
+  val hasOnChangeCouponCode: Boolean,
+  val hasOnAuthorize: Boolean
 
 ) {
   companion object {
@@ -510,7 +816,13 @@ data class ApplePayConfigurationDTO (
       val applicationData = __pigeon_list[11] as String?
       val supportedCountries = __pigeon_list[12] as List<String?>?
       val merchantCapability = __pigeon_list[13] as ApplePayMerchantCapability?
-      return ApplePayConfigurationDTO(merchantId, merchantName, allowOnboarding, summaryItems, requiredBillingContactFields, billingContact, requiredShippingContactFields, shippingContact, applePayShippingType, allowShippingContactEditing, shippingMethods, applicationData, supportedCountries, merchantCapability)
+      val supportsCouponCode = __pigeon_list[14] as Boolean?
+      val couponCode = __pigeon_list[15] as String?
+      val hasOnSelectShippingMethod = __pigeon_list[16] as Boolean
+      val hasOnSelectShippingContact = __pigeon_list[17] as Boolean
+      val hasOnChangeCouponCode = __pigeon_list[18] as Boolean
+      val hasOnAuthorize = __pigeon_list[19] as Boolean
+      return ApplePayConfigurationDTO(merchantId, merchantName, allowOnboarding, summaryItems, requiredBillingContactFields, billingContact, requiredShippingContactFields, shippingContact, applePayShippingType, allowShippingContactEditing, shippingMethods, applicationData, supportedCountries, merchantCapability, supportsCouponCode, couponCode, hasOnSelectShippingMethod, hasOnSelectShippingContact, hasOnChangeCouponCode, hasOnAuthorize)
     }
   }
   fun toList(): List<Any?> {
@@ -529,6 +841,159 @@ data class ApplePayConfigurationDTO (
       applicationData,
       supportedCountries,
       merchantCapability,
+      supportsCouponCode,
+      couponCode,
+      hasOnSelectShippingMethod,
+      hasOnSelectShippingContact,
+      hasOnChangeCouponCode,
+      hasOnAuthorize,
+    )
+  }
+}
+
+/** Generated class from Pigeon that represents data sent in messages. */
+data class ApplePayAuthorizedPaymentDTO (
+  val token: String,
+  val network: String,
+  val billingContact: ApplePayContactDTO? = null,
+  val shippingContact: ApplePayContactDTO? = null,
+  val shippingMethod: ApplePayShippingMethodDTO? = null
+
+) {
+  companion object {
+    @Suppress("LocalVariableName")
+    fun fromList(__pigeon_list: List<Any?>): ApplePayAuthorizedPaymentDTO {
+      val token = __pigeon_list[0] as String
+      val network = __pigeon_list[1] as String
+      val billingContact = __pigeon_list[2] as ApplePayContactDTO?
+      val shippingContact = __pigeon_list[3] as ApplePayContactDTO?
+      val shippingMethod = __pigeon_list[4] as ApplePayShippingMethodDTO?
+      return ApplePayAuthorizedPaymentDTO(token, network, billingContact, shippingContact, shippingMethod)
+    }
+  }
+  fun toList(): List<Any?> {
+    return listOf(
+      token,
+      network,
+      billingContact,
+      shippingContact,
+      shippingMethod,
+    )
+  }
+}
+
+/** Generated class from Pigeon that represents data sent in messages. */
+data class ApplePayPaymentErrorDTO (
+  val type: ApplePayPaymentErrorType,
+  val field: String? = null,
+  val localizedDescription: String
+
+) {
+  companion object {
+    @Suppress("LocalVariableName")
+    fun fromList(__pigeon_list: List<Any?>): ApplePayPaymentErrorDTO {
+      val type = __pigeon_list[0] as ApplePayPaymentErrorType
+      val field = __pigeon_list[1] as String?
+      val localizedDescription = __pigeon_list[2] as String
+      return ApplePayPaymentErrorDTO(type, field, localizedDescription)
+    }
+  }
+  fun toList(): List<Any?> {
+    return listOf(
+      type,
+      field,
+      localizedDescription,
+    )
+  }
+}
+
+/** Generated class from Pigeon that represents data sent in messages. */
+data class ApplePayAuthorizationResultDTO (
+  val isSuccess: Boolean,
+  val errors: List<ApplePayPaymentErrorDTO?>? = null
+
+) {
+  companion object {
+    @Suppress("LocalVariableName")
+    fun fromList(__pigeon_list: List<Any?>): ApplePayAuthorizationResultDTO {
+      val isSuccess = __pigeon_list[0] as Boolean
+      val errors = __pigeon_list[1] as List<ApplePayPaymentErrorDTO?>?
+      return ApplePayAuthorizationResultDTO(isSuccess, errors)
+    }
+  }
+  fun toList(): List<Any?> {
+    return listOf(
+      isSuccess,
+      errors,
+    )
+  }
+}
+
+/** Generated class from Pigeon that represents data sent in messages. */
+data class ApplePayCouponCodeUpdateDTO (
+  val summaryItems: List<ApplePaySummaryItemDTO?>,
+  val shippingMethods: List<ApplePayShippingMethodDTO?>? = null,
+  val errors: List<ApplePayPaymentErrorDTO?>? = null
+
+) {
+  companion object {
+    @Suppress("LocalVariableName")
+    fun fromList(__pigeon_list: List<Any?>): ApplePayCouponCodeUpdateDTO {
+      val summaryItems = __pigeon_list[0] as List<ApplePaySummaryItemDTO?>
+      val shippingMethods = __pigeon_list[1] as List<ApplePayShippingMethodDTO?>?
+      val errors = __pigeon_list[2] as List<ApplePayPaymentErrorDTO?>?
+      return ApplePayCouponCodeUpdateDTO(summaryItems, shippingMethods, errors)
+    }
+  }
+  fun toList(): List<Any?> {
+    return listOf(
+      summaryItems,
+      shippingMethods,
+      errors,
+    )
+  }
+}
+
+/** Generated class from Pigeon that represents data sent in messages. */
+data class ApplePayShippingContactUpdateDTO (
+  val summaryItems: List<ApplePaySummaryItemDTO?>,
+  val shippingMethods: List<ApplePayShippingMethodDTO?>? = null,
+  val errors: List<ApplePayPaymentErrorDTO?>? = null
+
+) {
+  companion object {
+    @Suppress("LocalVariableName")
+    fun fromList(__pigeon_list: List<Any?>): ApplePayShippingContactUpdateDTO {
+      val summaryItems = __pigeon_list[0] as List<ApplePaySummaryItemDTO?>
+      val shippingMethods = __pigeon_list[1] as List<ApplePayShippingMethodDTO?>?
+      val errors = __pigeon_list[2] as List<ApplePayPaymentErrorDTO?>?
+      return ApplePayShippingContactUpdateDTO(summaryItems, shippingMethods, errors)
+    }
+  }
+  fun toList(): List<Any?> {
+    return listOf(
+      summaryItems,
+      shippingMethods,
+      errors,
+    )
+  }
+}
+
+/** Generated class from Pigeon that represents data sent in messages. */
+data class ApplePayShippingMethodUpdateDTO (
+  val summaryItems: List<ApplePaySummaryItemDTO?>
+
+) {
+  companion object {
+    @Suppress("LocalVariableName")
+    fun fromList(__pigeon_list: List<Any?>): ApplePayShippingMethodUpdateDTO {
+      val summaryItems = __pigeon_list[0] as List<ApplePaySummaryItemDTO?>
+      return ApplePayShippingMethodUpdateDTO(summaryItems)
+    }
+  }
+  fun toList(): List<Any?> {
+    return listOf(
+      summaryItems,
     )
   }
 }
@@ -1071,6 +1536,40 @@ data class CardComponentConfigurationDTO (
 }
 
 /** Generated class from Pigeon that represents data sent in messages. */
+data class BlikComponentConfigurationDTO (
+  val environment: Environment,
+  val clientKey: String,
+  val countryCode: String,
+  val amount: AmountDTO? = null,
+  val shopperLocale: String? = null,
+  val analyticsOptionsDTO: AnalyticsOptionsDTO
+
+) {
+  companion object {
+    @Suppress("LocalVariableName")
+    fun fromList(__pigeon_list: List<Any?>): BlikComponentConfigurationDTO {
+      val environment = __pigeon_list[0] as Environment
+      val clientKey = __pigeon_list[1] as String
+      val countryCode = __pigeon_list[2] as String
+      val amount = __pigeon_list[3] as AmountDTO?
+      val shopperLocale = __pigeon_list[4] as String?
+      val analyticsOptionsDTO = __pigeon_list[5] as AnalyticsOptionsDTO
+      return BlikComponentConfigurationDTO(environment, clientKey, countryCode, amount, shopperLocale, analyticsOptionsDTO)
+    }
+  }
+  fun toList(): List<Any?> {
+    return listOf(
+      environment,
+      clientKey,
+      countryCode,
+      amount,
+      shopperLocale,
+      analyticsOptionsDTO,
+    )
+  }
+}
+
+/** Generated class from Pigeon that represents data sent in messages. */
 data class InstantPaymentConfigurationDTO (
   val instantPaymentType: InstantPaymentType,
   val environment: Environment,
@@ -1200,7 +1699,8 @@ data class ActionComponentConfigurationDTO (
   val clientKey: String,
   val shopperLocale: String? = null,
   val amount: AmountDTO? = null,
-  val analyticsOptionsDTO: AnalyticsOptionsDTO
+  val analyticsOptionsDTO: AnalyticsOptionsDTO,
+  val threeDS2ConfigurationDTO: ThreeDS2ConfigurationDTO? = null
 
 ) {
   companion object {
@@ -1211,7 +1711,8 @@ data class ActionComponentConfigurationDTO (
       val shopperLocale = __pigeon_list[2] as String?
       val amount = __pigeon_list[3] as AmountDTO?
       val analyticsOptionsDTO = __pigeon_list[4] as AnalyticsOptionsDTO
-      return ActionComponentConfigurationDTO(environment, clientKey, shopperLocale, amount, analyticsOptionsDTO)
+      val threeDS2ConfigurationDTO = __pigeon_list[5] as ThreeDS2ConfigurationDTO?
+      return ActionComponentConfigurationDTO(environment, clientKey, shopperLocale, amount, analyticsOptionsDTO, threeDS2ConfigurationDTO)
     }
   }
   fun toList(): List<Any?> {
@@ -1221,6 +1722,7 @@ data class ActionComponentConfigurationDTO (
       shopperLocale,
       amount,
       analyticsOptionsDTO,
+      threeDS2ConfigurationDTO,
     )
   }
 }
@@ -1285,235 +1787,325 @@ private object PlatformApiPigeonCodec : StandardMessageCodec() {
       }
       132.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          ThreeDS2ConfigurationDTO.fromList(it)
+          ThreeDS2UICustomizationDTO.fromList(it)
         }
       }
       133.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          DropInConfigurationDTO.fromList(it)
+          ThreeDS2ScreenCustomizationDTO.fromList(it)
         }
       }
       134.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          CardConfigurationDTO.fromList(it)
+          ThreeDS2ButtonCustomizationDTO.fromList(it)
         }
       }
       135.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          ApplePayConfigurationDTO.fromList(it)
+          ThreeDS2SelectionItemCustomizationDTO.fromList(it)
         }
       }
       136.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          ApplePayContactDTO.fromList(it)
+          ThreeDS2LabelCustomizationDTO.fromList(it)
         }
       }
       137.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          ApplePayShippingMethodDTO.fromList(it)
+          ThreeDS2InputCustomizationDTO.fromList(it)
         }
       }
       138.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          ApplePaySummaryItemDTO.fromList(it)
+          ThreeDS2ToolbarCustomizationDTO.fromList(it)
         }
       }
       139.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          GooglePayConfigurationDTO.fromList(it)
+          ThreeDS2ConfigurationDTO.fromList(it)
         }
       }
       140.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          MerchantInfoDTO.fromList(it)
+          DefaultInstallmentOptionsDTO.fromList(it)
         }
       }
       141.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          ShippingAddressParametersDTO.fromList(it)
+          CardBasedInstallmentOptionsDTO.fromList(it)
         }
       }
       142.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          BillingAddressParametersDTO.fromList(it)
+          InstallmentConfigurationDTO.fromList(it)
         }
       }
       143.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          CashAppPayConfigurationDTO.fromList(it)
+          DropInConfigurationDTO.fromList(it)
         }
       }
       144.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          TwintConfigurationDTO.fromList(it)
+          CardConfigurationDTO.fromList(it)
         }
       }
       145.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          PaymentResultDTO.fromList(it)
+          ApplePayConfigurationDTO.fromList(it)
         }
       }
       146.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          PaymentResultModelDTO.fromList(it)
+          ApplePayAuthorizedPaymentDTO.fromList(it)
         }
       }
       147.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          OrderResponseDTO.fromList(it)
+          ApplePayPaymentErrorDTO.fromList(it)
         }
       }
       148.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          CheckoutEvent.fromList(it)
+          ApplePayAuthorizationResultDTO.fromList(it)
         }
       }
       149.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          ComponentCommunicationModel.fromList(it)
+          ApplePayCouponCodeUpdateDTO.fromList(it)
         }
       }
       150.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          PaymentEventDTO.fromList(it)
+          ApplePayShippingContactUpdateDTO.fromList(it)
         }
       }
       151.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          ErrorDTO.fromList(it)
+          ApplePayShippingMethodUpdateDTO.fromList(it)
         }
       }
       152.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          DeletedStoredPaymentMethodResultDTO.fromList(it)
+          ApplePayContactDTO.fromList(it)
         }
       }
       153.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          CardComponentConfigurationDTO.fromList(it)
+          ApplePayShippingMethodDTO.fromList(it)
         }
       }
       154.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          InstantPaymentConfigurationDTO.fromList(it)
+          ApplePaySummaryItemDTO.fromList(it)
         }
       }
       155.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          InstantPaymentSetupResultDTO.fromList(it)
+          GooglePayConfigurationDTO.fromList(it)
         }
       }
       156.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          UnencryptedCardDTO.fromList(it)
+          MerchantInfoDTO.fromList(it)
         }
       }
       157.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          EncryptedCardDTO.fromList(it)
+          ShippingAddressParametersDTO.fromList(it)
         }
       }
       158.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          ActionComponentConfigurationDTO.fromList(it)
+          BillingAddressParametersDTO.fromList(it)
         }
       }
       159.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          OrderCancelResultDTO.fromList(it)
+          CashAppPayConfigurationDTO.fromList(it)
         }
       }
       160.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          BinLookupDataDTO.fromList(it)
+          TwintConfigurationDTO.fromList(it)
         }
       }
       161.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          PaymentResultDTO.fromList(it)
+        }
+      }
+      162.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          PaymentResultModelDTO.fromList(it)
+        }
+      }
+      163.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          OrderResponseDTO.fromList(it)
+        }
+      }
+      164.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          CheckoutEvent.fromList(it)
+        }
+      }
+      165.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          ComponentCommunicationModel.fromList(it)
+        }
+      }
+      166.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          PaymentEventDTO.fromList(it)
+        }
+      }
+      167.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          ErrorDTO.fromList(it)
+        }
+      }
+      168.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          DeletedStoredPaymentMethodResultDTO.fromList(it)
+        }
+      }
+      169.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          CardComponentConfigurationDTO.fromList(it)
+        }
+      }
+      170.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          BlikComponentConfigurationDTO.fromList(it)
+        }
+      }
+      171.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          InstantPaymentConfigurationDTO.fromList(it)
+        }
+      }
+      172.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          InstantPaymentSetupResultDTO.fromList(it)
+        }
+      }
+      173.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          UnencryptedCardDTO.fromList(it)
+        }
+      }
+      174.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          EncryptedCardDTO.fromList(it)
+        }
+      }
+      175.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          ActionComponentConfigurationDTO.fromList(it)
+        }
+      }
+      176.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          OrderCancelResultDTO.fromList(it)
+        }
+      }
+      177.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          BinLookupDataDTO.fromList(it)
+        }
+      }
+      178.toByte() -> {
         return (readValue(buffer) as Int?)?.let {
           Environment.ofRaw(it)
         }
       }
-      162.toByte() -> {
+      179.toByte() -> {
         return (readValue(buffer) as Int?)?.let {
           AddressMode.ofRaw(it)
         }
       }
-      163.toByte() -> {
+      180.toByte() -> {
         return (readValue(buffer) as Int?)?.let {
           CardAuthMethod.ofRaw(it)
         }
       }
-      164.toByte() -> {
+      181.toByte() -> {
         return (readValue(buffer) as Int?)?.let {
           TotalPriceStatus.ofRaw(it)
         }
       }
-      165.toByte() -> {
+      182.toByte() -> {
         return (readValue(buffer) as Int?)?.let {
           GooglePayEnvironment.ofRaw(it)
         }
       }
-      166.toByte() -> {
+      183.toByte() -> {
         return (readValue(buffer) as Int?)?.let {
           CashAppPayEnvironment.ofRaw(it)
         }
       }
-      167.toByte() -> {
+      184.toByte() -> {
         return (readValue(buffer) as Int?)?.let {
           PaymentResultEnum.ofRaw(it)
         }
       }
-      168.toByte() -> {
+      185.toByte() -> {
         return (readValue(buffer) as Int?)?.let {
           CheckoutEventType.ofRaw(it)
         }
       }
-      169.toByte() -> {
+      186.toByte() -> {
         return (readValue(buffer) as Int?)?.let {
           ComponentCommunicationType.ofRaw(it)
         }
       }
-      170.toByte() -> {
+      187.toByte() -> {
         return (readValue(buffer) as Int?)?.let {
           PaymentEventType.ofRaw(it)
         }
       }
-      171.toByte() -> {
+      188.toByte() -> {
         return (readValue(buffer) as Int?)?.let {
           FieldVisibility.ofRaw(it)
         }
       }
-      172.toByte() -> {
+      189.toByte() -> {
         return (readValue(buffer) as Int?)?.let {
           InstantPaymentType.ofRaw(it)
         }
       }
-      173.toByte() -> {
+      190.toByte() -> {
         return (readValue(buffer) as Int?)?.let {
           ApplePayShippingType.ofRaw(it)
         }
       }
-      174.toByte() -> {
+      191.toByte() -> {
         return (readValue(buffer) as Int?)?.let {
           ApplePayMerchantCapability.ofRaw(it)
         }
       }
-      175.toByte() -> {
+      192.toByte() -> {
         return (readValue(buffer) as Int?)?.let {
           ApplePaySummaryItemType.ofRaw(it)
         }
       }
-      176.toByte() -> {
+      193.toByte() -> {
+        return (readValue(buffer) as Int?)?.let {
+          ApplePayPaymentErrorType.ofRaw(it)
+        }
+      }
+      194.toByte() -> {
         return (readValue(buffer) as Int?)?.let {
           CardNumberValidationResultDTO.ofRaw(it)
         }
       }
-      177.toByte() -> {
+      195.toByte() -> {
         return (readValue(buffer) as Int?)?.let {
           CardExpiryDateValidationResultDTO.ofRaw(it)
         }
       }
-      178.toByte() -> {
+      196.toByte() -> {
         return (readValue(buffer) as Int?)?.let {
           CardSecurityCodeValidationResultDTO.ofRaw(it)
         }
@@ -1535,192 +2127,264 @@ private object PlatformApiPigeonCodec : StandardMessageCodec() {
         stream.write(131)
         writeValue(stream, value.toList())
       }
-      is ThreeDS2ConfigurationDTO -> {
+      is ThreeDS2UICustomizationDTO -> {
         stream.write(132)
         writeValue(stream, value.toList())
       }
-      is DropInConfigurationDTO -> {
+      is ThreeDS2ScreenCustomizationDTO -> {
         stream.write(133)
         writeValue(stream, value.toList())
       }
-      is CardConfigurationDTO -> {
+      is ThreeDS2ButtonCustomizationDTO -> {
         stream.write(134)
         writeValue(stream, value.toList())
       }
-      is ApplePayConfigurationDTO -> {
+      is ThreeDS2SelectionItemCustomizationDTO -> {
         stream.write(135)
         writeValue(stream, value.toList())
       }
-      is ApplePayContactDTO -> {
+      is ThreeDS2LabelCustomizationDTO -> {
         stream.write(136)
         writeValue(stream, value.toList())
       }
-      is ApplePayShippingMethodDTO -> {
+      is ThreeDS2InputCustomizationDTO -> {
         stream.write(137)
         writeValue(stream, value.toList())
       }
-      is ApplePaySummaryItemDTO -> {
+      is ThreeDS2ToolbarCustomizationDTO -> {
         stream.write(138)
         writeValue(stream, value.toList())
       }
-      is GooglePayConfigurationDTO -> {
+      is ThreeDS2ConfigurationDTO -> {
         stream.write(139)
         writeValue(stream, value.toList())
       }
-      is MerchantInfoDTO -> {
+      is DefaultInstallmentOptionsDTO -> {
         stream.write(140)
         writeValue(stream, value.toList())
       }
-      is ShippingAddressParametersDTO -> {
+      is CardBasedInstallmentOptionsDTO -> {
         stream.write(141)
         writeValue(stream, value.toList())
       }
-      is BillingAddressParametersDTO -> {
+      is InstallmentConfigurationDTO -> {
         stream.write(142)
         writeValue(stream, value.toList())
       }
-      is CashAppPayConfigurationDTO -> {
+      is DropInConfigurationDTO -> {
         stream.write(143)
         writeValue(stream, value.toList())
       }
-      is TwintConfigurationDTO -> {
+      is CardConfigurationDTO -> {
         stream.write(144)
         writeValue(stream, value.toList())
       }
-      is PaymentResultDTO -> {
+      is ApplePayConfigurationDTO -> {
         stream.write(145)
         writeValue(stream, value.toList())
       }
-      is PaymentResultModelDTO -> {
+      is ApplePayAuthorizedPaymentDTO -> {
         stream.write(146)
         writeValue(stream, value.toList())
       }
-      is OrderResponseDTO -> {
+      is ApplePayPaymentErrorDTO -> {
         stream.write(147)
         writeValue(stream, value.toList())
       }
-      is CheckoutEvent -> {
+      is ApplePayAuthorizationResultDTO -> {
         stream.write(148)
         writeValue(stream, value.toList())
       }
-      is ComponentCommunicationModel -> {
+      is ApplePayCouponCodeUpdateDTO -> {
         stream.write(149)
         writeValue(stream, value.toList())
       }
-      is PaymentEventDTO -> {
+      is ApplePayShippingContactUpdateDTO -> {
         stream.write(150)
         writeValue(stream, value.toList())
       }
-      is ErrorDTO -> {
+      is ApplePayShippingMethodUpdateDTO -> {
         stream.write(151)
         writeValue(stream, value.toList())
       }
-      is DeletedStoredPaymentMethodResultDTO -> {
+      is ApplePayContactDTO -> {
         stream.write(152)
         writeValue(stream, value.toList())
       }
-      is CardComponentConfigurationDTO -> {
+      is ApplePayShippingMethodDTO -> {
         stream.write(153)
         writeValue(stream, value.toList())
       }
-      is InstantPaymentConfigurationDTO -> {
+      is ApplePaySummaryItemDTO -> {
         stream.write(154)
         writeValue(stream, value.toList())
       }
-      is InstantPaymentSetupResultDTO -> {
+      is GooglePayConfigurationDTO -> {
         stream.write(155)
         writeValue(stream, value.toList())
       }
-      is UnencryptedCardDTO -> {
+      is MerchantInfoDTO -> {
         stream.write(156)
         writeValue(stream, value.toList())
       }
-      is EncryptedCardDTO -> {
+      is ShippingAddressParametersDTO -> {
         stream.write(157)
         writeValue(stream, value.toList())
       }
-      is ActionComponentConfigurationDTO -> {
+      is BillingAddressParametersDTO -> {
         stream.write(158)
         writeValue(stream, value.toList())
       }
-      is OrderCancelResultDTO -> {
+      is CashAppPayConfigurationDTO -> {
         stream.write(159)
         writeValue(stream, value.toList())
       }
-      is BinLookupDataDTO -> {
+      is TwintConfigurationDTO -> {
         stream.write(160)
         writeValue(stream, value.toList())
       }
-      is Environment -> {
+      is PaymentResultDTO -> {
         stream.write(161)
+        writeValue(stream, value.toList())
+      }
+      is PaymentResultModelDTO -> {
+        stream.write(162)
+        writeValue(stream, value.toList())
+      }
+      is OrderResponseDTO -> {
+        stream.write(163)
+        writeValue(stream, value.toList())
+      }
+      is CheckoutEvent -> {
+        stream.write(164)
+        writeValue(stream, value.toList())
+      }
+      is ComponentCommunicationModel -> {
+        stream.write(165)
+        writeValue(stream, value.toList())
+      }
+      is PaymentEventDTO -> {
+        stream.write(166)
+        writeValue(stream, value.toList())
+      }
+      is ErrorDTO -> {
+        stream.write(167)
+        writeValue(stream, value.toList())
+      }
+      is DeletedStoredPaymentMethodResultDTO -> {
+        stream.write(168)
+        writeValue(stream, value.toList())
+      }
+      is CardComponentConfigurationDTO -> {
+        stream.write(169)
+        writeValue(stream, value.toList())
+      }
+      is BlikComponentConfigurationDTO -> {
+        stream.write(170)
+        writeValue(stream, value.toList())
+      }
+      is InstantPaymentConfigurationDTO -> {
+        stream.write(171)
+        writeValue(stream, value.toList())
+      }
+      is InstantPaymentSetupResultDTO -> {
+        stream.write(172)
+        writeValue(stream, value.toList())
+      }
+      is UnencryptedCardDTO -> {
+        stream.write(173)
+        writeValue(stream, value.toList())
+      }
+      is EncryptedCardDTO -> {
+        stream.write(174)
+        writeValue(stream, value.toList())
+      }
+      is ActionComponentConfigurationDTO -> {
+        stream.write(175)
+        writeValue(stream, value.toList())
+      }
+      is OrderCancelResultDTO -> {
+        stream.write(176)
+        writeValue(stream, value.toList())
+      }
+      is BinLookupDataDTO -> {
+        stream.write(177)
+        writeValue(stream, value.toList())
+      }
+      is Environment -> {
+        stream.write(178)
         writeValue(stream, value.raw)
       }
       is AddressMode -> {
-        stream.write(162)
+        stream.write(179)
         writeValue(stream, value.raw)
       }
       is CardAuthMethod -> {
-        stream.write(163)
+        stream.write(180)
         writeValue(stream, value.raw)
       }
       is TotalPriceStatus -> {
-        stream.write(164)
+        stream.write(181)
         writeValue(stream, value.raw)
       }
       is GooglePayEnvironment -> {
-        stream.write(165)
+        stream.write(182)
         writeValue(stream, value.raw)
       }
       is CashAppPayEnvironment -> {
-        stream.write(166)
+        stream.write(183)
         writeValue(stream, value.raw)
       }
       is PaymentResultEnum -> {
-        stream.write(167)
+        stream.write(184)
         writeValue(stream, value.raw)
       }
       is CheckoutEventType -> {
-        stream.write(168)
+        stream.write(185)
         writeValue(stream, value.raw)
       }
       is ComponentCommunicationType -> {
-        stream.write(169)
+        stream.write(186)
         writeValue(stream, value.raw)
       }
       is PaymentEventType -> {
-        stream.write(170)
+        stream.write(187)
         writeValue(stream, value.raw)
       }
       is FieldVisibility -> {
-        stream.write(171)
+        stream.write(188)
         writeValue(stream, value.raw)
       }
       is InstantPaymentType -> {
-        stream.write(172)
+        stream.write(189)
         writeValue(stream, value.raw)
       }
       is ApplePayShippingType -> {
-        stream.write(173)
+        stream.write(190)
         writeValue(stream, value.raw)
       }
       is ApplePayMerchantCapability -> {
-        stream.write(174)
+        stream.write(191)
         writeValue(stream, value.raw)
       }
       is ApplePaySummaryItemType -> {
-        stream.write(175)
+        stream.write(192)
+        writeValue(stream, value.raw)
+      }
+      is ApplePayPaymentErrorType -> {
+        stream.write(193)
         writeValue(stream, value.raw)
       }
       is CardNumberValidationResultDTO -> {
-        stream.write(176)
+        stream.write(194)
         writeValue(stream, value.raw)
       }
       is CardExpiryDateValidationResultDTO -> {
-        stream.write(177)
+        stream.write(195)
         writeValue(stream, value.raw)
       }
       is CardSecurityCodeValidationResultDTO -> {
-        stream.write(178)
+        stream.write(196)
         writeValue(stream, value.raw)
       }
       else -> super.writeValue(stream, value)
@@ -2333,12 +2997,12 @@ class ComponentFlutterInterface(private val binaryMessenger: BinaryMessenger, pr
       PlatformApiPigeonCodec
     }
   }
-  fun _generateCodecForDTOs(cardComponentConfigurationDTOArg: CardComponentConfigurationDTO, sessionDTOArg: SessionDTO, binLookupDataDTOArg: BinLookupDataDTO, callback: (Result<Unit>) -> Unit)
+  fun _generateCodecForDTOs(cardComponentConfigurationDTOArg: CardComponentConfigurationDTO, blikComponentConfigurationDTOArg: BlikComponentConfigurationDTO, sessionDTOArg: SessionDTO, binLookupDataDTOArg: BinLookupDataDTO, callback: (Result<Unit>) -> Unit)
 {
     val separatedMessageChannelSuffix = if (messageChannelSuffix.isNotEmpty()) ".$messageChannelSuffix" else ""
     val channelName = "dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface._generateCodecForDTOs$separatedMessageChannelSuffix"
     val channel = BasicMessageChannel<Any?>(binaryMessenger, channelName, codec)
-    channel.send(listOf(cardComponentConfigurationDTOArg, sessionDTOArg, binLookupDataDTOArg)) {
+    channel.send(listOf(cardComponentConfigurationDTOArg, blikComponentConfigurationDTOArg, sessionDTOArg, binLookupDataDTOArg)) {
       if (it is List<*>) {
         if (it.size > 1) {
           callback(Result.failure(AdyenPigeonError(it[0] as String, it[1] as String, it[2] as String?)))
@@ -2361,6 +3025,86 @@ class ComponentFlutterInterface(private val binaryMessenger: BinaryMessenger, pr
           callback(Result.failure(AdyenPigeonError(it[0] as String, it[1] as String, it[2] as String?)))
         } else {
           callback(Result.success(Unit))
+        }
+      } else {
+        callback(Result.failure(createConnectionError(channelName)))
+      } 
+    }
+  }
+  fun onApplePaySelectShippingMethod(componentIdArg: String, shippingMethodArg: ApplePayShippingMethodDTO, currentSummaryItemsArg: List<ApplePaySummaryItemDTO?>, callback: (Result<ApplePayShippingMethodUpdateDTO>) -> Unit)
+{
+    val separatedMessageChannelSuffix = if (messageChannelSuffix.isNotEmpty()) ".$messageChannelSuffix" else ""
+    val channelName = "dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface.onApplePaySelectShippingMethod$separatedMessageChannelSuffix"
+    val channel = BasicMessageChannel<Any?>(binaryMessenger, channelName, codec)
+    channel.send(listOf(componentIdArg, shippingMethodArg, currentSummaryItemsArg)) {
+      if (it is List<*>) {
+        if (it.size > 1) {
+          callback(Result.failure(AdyenPigeonError(it[0] as String, it[1] as String, it[2] as String?)))
+        } else if (it[0] == null) {
+          callback(Result.failure(AdyenPigeonError("null-error", "Flutter api returned null value for non-null return value.", "")))
+        } else {
+          val output = it[0] as ApplePayShippingMethodUpdateDTO
+          callback(Result.success(output))
+        }
+      } else {
+        callback(Result.failure(createConnectionError(channelName)))
+      } 
+    }
+  }
+  fun onApplePaySelectShippingContact(componentIdArg: String, contactArg: ApplePayContactDTO, currentSummaryItemsArg: List<ApplePaySummaryItemDTO?>, callback: (Result<ApplePayShippingContactUpdateDTO>) -> Unit)
+{
+    val separatedMessageChannelSuffix = if (messageChannelSuffix.isNotEmpty()) ".$messageChannelSuffix" else ""
+    val channelName = "dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface.onApplePaySelectShippingContact$separatedMessageChannelSuffix"
+    val channel = BasicMessageChannel<Any?>(binaryMessenger, channelName, codec)
+    channel.send(listOf(componentIdArg, contactArg, currentSummaryItemsArg)) {
+      if (it is List<*>) {
+        if (it.size > 1) {
+          callback(Result.failure(AdyenPigeonError(it[0] as String, it[1] as String, it[2] as String?)))
+        } else if (it[0] == null) {
+          callback(Result.failure(AdyenPigeonError("null-error", "Flutter api returned null value for non-null return value.", "")))
+        } else {
+          val output = it[0] as ApplePayShippingContactUpdateDTO
+          callback(Result.success(output))
+        }
+      } else {
+        callback(Result.failure(createConnectionError(channelName)))
+      } 
+    }
+  }
+  fun onApplePayChangeCouponCode(componentIdArg: String, couponCodeArg: String, currentSummaryItemsArg: List<ApplePaySummaryItemDTO?>, callback: (Result<ApplePayCouponCodeUpdateDTO>) -> Unit)
+{
+    val separatedMessageChannelSuffix = if (messageChannelSuffix.isNotEmpty()) ".$messageChannelSuffix" else ""
+    val channelName = "dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface.onApplePayChangeCouponCode$separatedMessageChannelSuffix"
+    val channel = BasicMessageChannel<Any?>(binaryMessenger, channelName, codec)
+    channel.send(listOf(componentIdArg, couponCodeArg, currentSummaryItemsArg)) {
+      if (it is List<*>) {
+        if (it.size > 1) {
+          callback(Result.failure(AdyenPigeonError(it[0] as String, it[1] as String, it[2] as String?)))
+        } else if (it[0] == null) {
+          callback(Result.failure(AdyenPigeonError("null-error", "Flutter api returned null value for non-null return value.", "")))
+        } else {
+          val output = it[0] as ApplePayCouponCodeUpdateDTO
+          callback(Result.success(output))
+        }
+      } else {
+        callback(Result.failure(createConnectionError(channelName)))
+      } 
+    }
+  }
+  fun onApplePayAuthorize(componentIdArg: String, paymentArg: ApplePayAuthorizedPaymentDTO, callback: (Result<ApplePayAuthorizationResultDTO>) -> Unit)
+{
+    val separatedMessageChannelSuffix = if (messageChannelSuffix.isNotEmpty()) ".$messageChannelSuffix" else ""
+    val channelName = "dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface.onApplePayAuthorize$separatedMessageChannelSuffix"
+    val channel = BasicMessageChannel<Any?>(binaryMessenger, channelName, codec)
+    channel.send(listOf(componentIdArg, paymentArg)) {
+      if (it is List<*>) {
+        if (it.size > 1) {
+          callback(Result.failure(AdyenPigeonError(it[0] as String, it[1] as String, it[2] as String?)))
+        } else if (it[0] == null) {
+          callback(Result.failure(AdyenPigeonError("null-error", "Flutter api returned null value for non-null return value.", "")))
+        } else {
+          val output = it[0] as ApplePayAuthorizationResultDTO
+          callback(Result.success(output))
         }
       } else {
         callback(Result.failure(createConnectionError(channelName)))

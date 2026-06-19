@@ -23,9 +23,11 @@ import UIKit
         GeneratedPluginRegistrant.register(with: self)
         setDropInStyle()
         setCardComponentStyle()
+        setBlikComponentStyle()
         return super.application(application, didFinishLaunchingWithOptions: launchOptions)
     }
 
+    // This method is not needed in case of using UISceneDelegate and handling the returnUrl there.
     override func application(_: UIApplication, open url: URL, options _: [UIApplication.OpenURLOptionsKey: Any] = [:]) -> Bool {
         RedirectComponent.applicationDidOpen(from: url)
         return true
@@ -46,5 +48,14 @@ import UIKit
         cardComponentStyle.textField.tintColor = UIColor(named: "PrimaryBackground") ?? .black
         cardComponentStyle.backgroundColor = UIColor(named: "AppBackground") ?? .white
         AdyenAppearance.cardComponentStyle = cardComponentStyle
+    }
+
+    private func setBlikComponentStyle() {
+        var blikComponentStyle = Adyen.FormComponentStyle()
+        blikComponentStyle.mainButtonItem.button.backgroundColor = UIColor(named: "PrimaryBackground") ?? .black
+        blikComponentStyle.mainButtonItem.button.title.color = UIColor(named: "PrimaryTitle") ?? .white
+        blikComponentStyle.textField.tintColor = UIColor(named: "PrimaryBackground") ?? .black
+        blikComponentStyle.backgroundColor = UIColor(named: "AppBackground") ?? .white
+        AdyenAppearance.blikComponentStyle = blikComponentStyle
     }
 }

@@ -13,7 +13,9 @@ class ComponentWrapperView: UIStackView {
         fatalError("init(coder:) has not been implemented")
     }
     
-    override var safeAreaInsets: UIEdgeInsets { .zero }
+    override var safeAreaInsets: UIEdgeInsets {
+        .zero
+    }
 
     override func layoutSubviews() {
         super.layoutSubviews()

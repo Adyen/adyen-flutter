@@ -7,6 +7,7 @@ import com.adyen.checkout.action.core.internal.ActionHandlingComponent
 import com.adyen.checkout.components.core.PaymentMethod
 import com.adyen.checkout.components.core.action.Action
 import com.adyen.checkout.flutter.components.action.ActionComponentManager
+import com.adyen.checkout.flutter.components.blik.BlikComponentManager
 import com.adyen.checkout.flutter.components.card.CardComponentManager
 import com.adyen.checkout.flutter.components.googlepay.GooglePayComponentManager
 import com.adyen.checkout.flutter.components.instant.InstantComponentManager
@@ -26,7 +27,6 @@ import com.adyen.checkout.flutter.generated.PaymentResultDTO
 import com.adyen.checkout.flutter.generated.PaymentResultEnum
 import com.adyen.checkout.flutter.generated.PaymentResultModelDTO
 import com.adyen.checkout.flutter.session.SessionHolder
-import com.adyen.checkout.flutter.utils.Constants
 import com.adyen.checkout.googlepay.GooglePayComponent
 import com.adyen.checkout.redirect.RedirectComponent
 import io.flutter.embedding.engine.plugins.FlutterPlugin
@@ -40,6 +40,15 @@ class ComponentPlatformApi(
 ) : ComponentPlatformInterface {
     private val cardComponentManager: CardComponentManager =
         CardComponentManager(
+            activity,
+            componentFlutterInterface,
+            flutterPluginBinding,
+            sessionHolder,
+            ::onDispose,
+            ::assignCurrentComponent
+        )
+    private val blikComponentManager: BlikComponentManager =
+        BlikComponentManager(
             activity,
             componentFlutterInterface,
             flutterPluginBinding,
@@ -64,6 +73,7 @@ class ComponentPlatformApi(
 
     init {
         cardComponentManager.registerComponentViewFactories()
+        blikComponentManager.registerComponentViewFactories()
     }
 
     // Update view height from Flutter when required.
@@ -130,20 +140,6 @@ class ComponentPlatformApi(
         currentComponent = null
         googlePayComponentManager.onDispose(componentId)
     }
-
-    fun handleActivityResult(
-        requestCode: Int,
-        resultCode: Int,
-        data: Intent?
-    ): Boolean =
-        when (requestCode) {
-            Constants.GOOGLE_PAY_COMPONENT_REQUEST_CODE -> {
-                googlePayComponentManager.handleGooglePayActivityResult(resultCode, data)
-                true
-            }
-
-            else -> false
-        }
 
     private fun handlePaymentEvent(
         componentId: String,

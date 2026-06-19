@@ -1,24 +1,22 @@
-package com.adyen.checkout.flutter.components.card.advanced
+package com.adyen.checkout.flutter.components.card
 
-import android.content.Context
 import androidx.fragment.app.FragmentActivity
 import com.adyen.checkout.card.CardComponent
+import com.adyen.checkout.card.CardComponentState
 import com.adyen.checkout.components.core.PaymentMethod
 import com.adyen.checkout.components.core.StoredPaymentMethod
-import com.adyen.checkout.flutter.components.card.BaseCardComponent
+import com.adyen.checkout.flutter.components.base.ComponentAdvancedCallback
 import com.adyen.checkout.flutter.generated.ComponentFlutterInterface
 import org.json.JSONObject
 import java.util.UUID
 
 internal class CardAdvancedComponent(
-    private val context: Context,
-    private val id: Int,
     private val creationParams: Map<*, *>,
     private val activity: FragmentActivity,
     private val componentFlutterApi: ComponentFlutterInterface,
     private val onDispose: (String) -> Unit,
     private val setCurrentCardComponent: (BaseCardComponent) -> Unit
-) : BaseCardComponent(context, id, creationParams, activity, componentFlutterApi, onDispose, setCurrentCardComponent) {
+) : BaseCardComponent(creationParams, activity, componentFlutterApi, onDispose, setCurrentCardComponent) {
     init {
         cardComponent =
             createCardComponent().apply {
@@ -34,9 +32,9 @@ internal class CardAdvancedComponent(
                 return CardComponent.PROVIDER.get(
                     activity = activity,
                     storedPaymentMethod = storedPaymentMethod,
-                    configuration = cardConfiguration,
+                    checkoutConfiguration = checkoutConfiguration,
                     callback =
-                        CardAdvancedCallback(
+                        ComponentAdvancedCallback<CardComponentState>(
                             componentFlutterApi,
                             componentId,
                             ::setCurrentCardComponent,
@@ -50,9 +48,9 @@ internal class CardAdvancedComponent(
                 return CardComponent.PROVIDER.get(
                     activity = activity,
                     paymentMethod = paymentMethod,
-                    configuration = cardConfiguration,
+                    checkoutConfiguration = checkoutConfiguration,
                     callback =
-                        CardAdvancedCallback(
+                        ComponentAdvancedCallback<CardComponentState>(
                             componentFlutterApi,
                             componentId,
                             ::setCurrentCardComponent,

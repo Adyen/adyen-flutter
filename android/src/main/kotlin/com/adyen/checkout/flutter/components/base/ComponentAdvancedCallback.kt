@@ -12,11 +12,13 @@ import com.adyen.checkout.flutter.generated.PaymentResultDTO
 import com.adyen.checkout.flutter.generated.PaymentResultEnum
 import com.adyen.checkout.flutter.utils.Constants
 
-abstract class ComponentAdvancedCallback<T : PaymentComponentState<*>>(
+open class ComponentAdvancedCallback<T : PaymentComponentState<*>>(
     private val componentFlutterApi: ComponentFlutterInterface,
     private val componentId: String,
+    private val assignCurrentComponent: () -> Unit = {},
 ) : ComponentCallback<T> {
     override fun onSubmit(state: T) {
+        assignCurrentComponent.invoke()
         val model =
             ComponentCommunicationModel(
                 ComponentCommunicationType.ON_SUBMIT,
