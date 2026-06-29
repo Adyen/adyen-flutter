@@ -6,7 +6,7 @@ import PackageDescription
 let package = Package(
     name: "adyen_checkout",
     platforms: [
-        .iOS("12.0")
+        .iOS("13.0")
     ],
     products: [
         .library(name: "adyen-checkout", targets: ["adyen_checkout"])

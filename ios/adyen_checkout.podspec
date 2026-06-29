@@ -16,7 +16,7 @@ Adyen checkout SDK for Flutter
   s.source_files = 'adyen_checkout/Sources/adyen_checkout/**/*.swift'
   s.dependency 'Flutter'
   s.dependency 'Adyen', '5.25.1'
-  s.platform = :ios, '12.0'
+  s.platform = :ios, '13.0'
 
   # Flutter.framework does not contain a i386 slice.
   s.pod_target_xcconfig = { 'DEFINES_MODULE' => 'YES', 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'i386' }
