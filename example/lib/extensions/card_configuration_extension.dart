@@ -3,7 +3,7 @@ import 'package:adyen_checkout/adyen_checkout.dart';
 extension CardConfigurationExtension on CardConfiguration {
   static CardConfiguration fromJson(Map<String, dynamic> json) {
     return CardConfiguration(
-      holderNameRequired: json['holderNameRequired'] ?? false,
+      holderNameRequired: json['showCardholderName'] ?? false,
       addressMode: _parseAddressMode(json['addressMode']),
       showStorePaymentField: json['showStorePaymentField'] ?? false,
       showCvcForStoredCard: json['showCvcForStoredCard'] ?? true,
