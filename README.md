@@ -69,7 +69,7 @@ release a new version when we need to.
 
 #### iOS
 
-* [iOS 12](https://support.apple.com/en-us/118387) or later.
+* [iOS 13](https://support.apple.com/en-us/118392) or later.
 * Add the return URL handler to your AppDelegate in
   your [native iOS](https://github.com/Adyen/adyen-flutter/blob/main/example/ios/Runner/AppDelegate.swift#L19)
   layer.

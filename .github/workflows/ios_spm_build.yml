@@ -46,6 +46,11 @@ jobs:
           cd demo_project
           dart pub add 'adyen_checkout:{"path":"../"}'
 
+      - name: Bump iOS deployment target to 13.0 for older Flutter versions
+        if: matrix.flutter-version == '3.32.x'
+        working-directory: demo_project
+        run: sed -i '' 's/IPHONEOS_DEPLOYMENT_TARGET = [0-9.]*/IPHONEOS_DEPLOYMENT_TARGET = 13.0/g' ios/Runner.xcodeproj/project.pbxproj
+
       - name: Build app for simulator
         working-directory: demo_project
         run: flutter build ios --debug --simulator

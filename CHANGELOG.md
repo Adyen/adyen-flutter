@@ -1,3 +1,10 @@
+## 1.12.0 (in development)
+
+### Changed
+
+- Minimum iOS version increased from 12.0 to 13.0. This aligns with Flutter's own minimum iOS
+  requirement.
+
 ## 1.11.0
 
 ### New
