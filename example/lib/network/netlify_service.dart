@@ -4,12 +4,14 @@ import 'package:adyen_checkout_example/network/service.dart';
 import 'package:http/http.dart' as http;
 
 class NetlifyService implements Service {
-  final _baseUrl = "https://www.mystoredemo.io/.netlify/functions";
+  static const _baseUrl = "https://www.mystoredemo.io/.netlify/functions";
+  static const _headers = {"content-type": "application/json"};
 
   @override
   Future<Map<String, dynamic>> createSession(Map<String, dynamic> body) async {
     final http.Response response = await http.post(
       Uri.parse('$_baseUrl/sessions'),
+      headers: _headers,
       body: jsonEncode(body),
     );
 
@@ -22,6 +24,7 @@ class NetlifyService implements Service {
       Map<String, dynamic> body) async {
     final http.Response response = await http.post(
       Uri.parse('$_baseUrl/paymentMethods'),
+      headers: _headers,
       body: jsonEncode(body),
     );
 
@@ -33,6 +36,7 @@ class NetlifyService implements Service {
   Future<Map<String, dynamic>> postPayments(Map<String, dynamic> body) async {
     final http.Response response = await http.post(
       Uri.parse('$_baseUrl/payments'),
+      headers: _headers,
       body: jsonEncode(body),
     );
 
@@ -45,6 +49,7 @@ class NetlifyService implements Service {
       Map<String, dynamic> body) async {
     final http.Response response = await http.post(
       Uri.parse('$_baseUrl/payments/details'),
+      headers: _headers,
       body: jsonEncode(body),
     );
 
