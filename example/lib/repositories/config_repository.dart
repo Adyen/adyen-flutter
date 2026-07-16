@@ -22,15 +22,12 @@ class ConfigRepository {
   Future<String?> _loadLaunchConfig() async {
     final configBase64 =
         await flutterLaunchArguments.getString(launchConfigKey);
-    print("Raw: $configBase64");
-
     if (configBase64 == null) {
       return null;
     }
 
     List<int> bytes = base64.decode(configBase64);
     String jsonString = utf8.decode(bytes);
-    print("Config JSON: $jsonString");
     return jsonString;
   }
 }
