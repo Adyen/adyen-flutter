@@ -11,10 +11,9 @@ extension CardConfigurationExtension on CardConfiguration {
       kcpFieldVisibility: _parseFieldVisibility(json['kcpFieldVisibility']),
       socialSecurityNumberFieldVisibility:
           _parseFieldVisibility(json['socialSecurityNumberFieldVisibility']),
-      supportedCardTypes: (json['supportedCardTypes'] as List<dynamic>?)
-              ?.map((element) => element as String)
-              .toList() ??
-          [],
+      supportedCardTypes: json['supportedCardTypes'] is List
+          ? (json['supportedCardTypes'] as List).whereType<String>().toList()
+          : [],
     );
   }
 

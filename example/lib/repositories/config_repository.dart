@@ -12,22 +12,36 @@ class ConfigRepository {
 
   Future<CardConfiguration> loadCardConfiguration() async {
     final String? launchConfigString = await _loadLaunchConfig();
-    final Map<String, dynamic>? launchConfigJson =
-        launchConfigString != null ? jsonDecode(launchConfigString) : null;
-    final Map<String, dynamic> cardConfigJson =
-        launchConfigJson?[cardConfigurationKey] ?? {};
-    return CardConfigurationExtension.fromJson(cardConfigJson);
+    if (launchConfigString == null) {
+      return const CardConfiguration();
+    }
+
+    try {
+      final launchConfigJson = jsonDecode(launchConfigString);
+      if (launchConfigJson is! Map<String, dynamic>) {
+        return const CardConfiguration();
+      }
+
+      final cardConfigJson = launchConfigJson[cardConfigurationKey];
+      return CardConfigurationExtension.fromJson(
+        cardConfigJson is Map<String, dynamic> ? cardConfigJson : {},
+      );
+    } on FormatException {
+      return const CardConfiguration();
+    }
   }
 
   Future<String?> _loadLaunchConfig() async {
-    final configBase64 =
-        await flutterLaunchArguments.getString(launchConfigKey);
-    if (configBase64 == null) {
+    try {
+      final configBase64 =
+          await flutterLaunchArguments.getString(launchConfigKey);
+      if (configBase64 == null) {
+        return null;
+      }
+
+      return utf8.decode(base64.decode(configBase64.trim()));
+    } on FormatException {
       return null;
     }
-
-    List<int> bytes = base64.decode(configBase64);
-    String jsonString = utf8.decode(bytes);
-    return jsonString;
   }
 }
