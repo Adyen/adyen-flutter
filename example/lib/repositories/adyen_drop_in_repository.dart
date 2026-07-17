@@ -21,7 +21,7 @@ class AdyenDropInRepository extends AdyenBaseRepository {
       "countryCode": Config.countryCode,
       "shopperLocale": Config.shopperLocale,
       "shopperReference": Config.shopperReference,
-      "storePaymentMethodMode": "disabled",
+      "storePaymentMethodMode": "askForConsent",
       "recurringProcessingModel": "CardOnFile",
       "shopperInteraction": "Ecommerce",
       "channel": determineChannel(),
@@ -55,20 +55,6 @@ class AdyenDropInRepository extends AdyenBaseRepository {
           "imageUrl": "URL_TO_PICTURE_OF_PURCHASED_ITEM",
         },
       ],
-      "installmentOptions": {
-        "card": {
-          "values": [2, 3, 6],
-          "plans": ["with_interest"]
-        },
-        "visa": {
-          "values": [1, 2, 3, 4, 5, 12],
-          "plans": ["regular", "revolving"]
-        },
-        "mc": {
-          "values": [1, 2, 3, 4, 5, 12],
-          "plans": ["regular", "revolving"]
-        }
-      },
     };
 
     return await service.createSession(sessionRequestBody);
