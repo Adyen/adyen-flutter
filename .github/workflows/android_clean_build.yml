@@ -62,7 +62,7 @@ jobs:
           
           change_sdk_versions() {
             sed -i "s/flutter.compileSdkVersion/$COMPILE_SDK_VERSION/g" android/app/build.gradle
-            sed -i "s/flutter.minSdkVersion/21/g" android/app/build.gradle
+            sed -i "s/flutter.minSdkVersion/23/g" android/app/build.gradle
           }
           
           change_agp_version() {
@@ -74,7 +74,6 @@ jobs:
             sed -i "s/ext.kotlin_version = '1.7.10'/ext.kotlin_version = '1.8.22'/g" android/build.gradle
             sed -i "s/gradle-7.5-all/gradle-$GRADLE_VERSION-all/g" android/gradle/wrapper/gradle-wrapper.properties
             change_agp_version
-            change_sdk_versions
           fi
           
           # Change Kotlin version and adjust Gradle for Flutter 3.19.x - 3.24.x versions
@@ -82,10 +81,9 @@ jobs:
             sed -i 's/"org.jetbrains.kotlin.android" version "1.7.10"/"org.jetbrains.kotlin.android" version "1.8.22"/g' android/settings.gradle
             sed -i "s/gradle-7.6.3-all/gradle-$GRADLE_VERSION-all/g" android/gradle/wrapper/gradle-wrapper.properties
             change_agp_version
-            change_sdk_versions
           fi  
 
-          #Add missing Kotlin options for Flutter 3.22.x
+          # Add missing Kotlin options for Flutter 3.22.x
           if [ $FLUTTER_VERSION == '3.22.x' ]; then
             sed -i '/defaultConfig {/i \
               kotlinOptions {\
@@ -95,10 +93,13 @@ jobs:
           fi
                     
           # Suppress Kotlin 2.2.x strict JVM target consistency errors in dependencies (Flutter 3.44.x+)
-          # pay_android 3.1.x defaults to JVM 1.8 which conflicts with our JVM 11 target
+          # pay_android 3.2.x defaults to JVM 1.8 which conflicts with our JVM 11 target
           if [[ "$FLUTTER_VERSION" == "3.44.x" ]]; then
             echo "kotlin.jvm.target.validation.mode=warning" >> android/gradle.properties
           fi
+
+          # Ensure the demo app meets the plugin's minimum Android SDK requirement
+          change_sdk_versions
           
           dart pub add 'adyen_checkout:{"path":"../"}'
           flutter build apk --debug  
