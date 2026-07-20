@@ -21,7 +21,7 @@ class AdyenDropInRepository extends AdyenBaseRepository {
       "countryCode": Config.countryCode,
       "shopperLocale": Config.shopperLocale,
       "shopperReference": Config.shopperReference,
-      "storePaymentMethodMode": "askForConsent",
+      "storePaymentMethodMode": "disabled",
       "recurringProcessingModel": "CardOnFile",
       "shopperInteraction": "Ecommerce",
       "channel": determineChannel(),
