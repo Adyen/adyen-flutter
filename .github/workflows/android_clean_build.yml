@@ -80,6 +80,7 @@ jobs:
             sed -i "s/ext.kotlin_version = '1.7.10'/ext.kotlin_version = '1.8.22'/g" android/build.gradle
             sed -i "s/gradle-7.5-all/gradle-$GRADLE_VERSION-all/g" android/gradle/wrapper/gradle-wrapper.properties
             change_agp_version
+            change_sdk_versions
           fi
           
           # Change Kotlin version and adjust Gradle for Flutter 3.19.x - 3.24.x versions
@@ -87,6 +88,12 @@ jobs:
             sed -i 's/"org.jetbrains.kotlin.android" version "1.7.10"/"org.jetbrains.kotlin.android" version "1.8.22"/g' android/settings.gradle
             sed -i "s/gradle-7.6.3-all/gradle-$GRADLE_VERSION-all/g" android/gradle/wrapper/gradle-wrapper.properties
             change_agp_version
+            change_sdk_versions
+          fi
+
+          # Ensure the demo app meets the plugin's minimum Android SDK requirement for Flutter 3.27.x - 3.32.x
+          if [[ "$FLUTTER_VERSION" == "3.27.x" || "$FLUTTER_VERSION" == "3.29.x" || "$FLUTTER_VERSION" == "3.32.x" ]]; then
+            change_sdk_versions
           fi  
 
           # Add missing Kotlin options for Flutter 3.22.x
@@ -104,9 +111,6 @@ jobs:
             echo "kotlin.jvm.target.validation.mode=warning" >> android/gradle.properties
           fi
 
-          # Ensure the demo app meets the plugin's minimum Android SDK requirement
-          change_sdk_versions
-          
           dart pub add 'adyen_checkout:{"path":"../"}'
           flutter build apk --debug  
 
