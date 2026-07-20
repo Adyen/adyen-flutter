@@ -4,6 +4,14 @@
 
 - Minimum iOS version increased from 12.0 to 13.0. This aligns with Flutter's own minimum iOS
   requirement.
+- Minimum Android version increased from API 21 to API 23. This aligns with the Adyen Android SDK
+  and the latest `pay` package requirements.
+- Dependency versions:
+  | Name | Version |
+  |---------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------|
+  | [pay](https://pub.dev/packages/pay) | 3.2.1 -> **3.3.0** |
+
+  `pay_android` is now pulled in transitively by `pay` (endorsed implementation).
 
 ## 1.11.0
 
