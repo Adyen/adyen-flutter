@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:adyen_checkout/adyen_checkout.dart';
+import 'package:adyen_checkout/src/drop_in/drop_in_activity.dart';
 import 'package:adyen_checkout/src/drop_in/drop_in_flutter.dart';
 import 'package:adyen_checkout/src/drop_in/drop_in_platform_api.dart';
 import 'package:adyen_checkout/src/generated/platform_api.g.dart';
@@ -10,6 +11,7 @@ import 'package:adyen_checkout/src/util/constants.dart';
 import 'package:adyen_checkout/src/util/dto_mapper.dart';
 import 'package:adyen_checkout/src/util/payment_event_handler.dart';
 import 'package:adyen_checkout/src/util/sdk_version_number_provider.dart';
+import 'package:flutter/widgets.dart';
 
 class DropIn {
   DropIn(
@@ -35,6 +37,7 @@ class DropIn {
     final sdkVersionNumber =
         await sdkVersionNumberProvider.getSdkVersionNumber();
 
+    await _activateFocusScope();
     dropInPlatformApi.showDropInSession(
       dropInConfiguration.toDTO(sdkVersionNumber, true),
     );
@@ -105,6 +108,7 @@ class DropIn {
     );
     final isPartialPaymentSupported = advancedCheckout.partialPayment != null;
 
+    await _activateFocusScope();
     dropInPlatformApi.showDropInAdvanced(
       dropInConfiguration.toDTO(
         sdkVersionNumber,
@@ -185,7 +189,13 @@ class DropIn {
 
   Future<void> stopDropIn() async => await dropInPlatformApi.stopDropIn();
 
+  Future<void> _activateFocusScope() async {
+    DropInActivity.active.value = true;
+    await WidgetsBinding.instance.endOfFrame;
+  }
+
   Future<void> _cleanUpDropIn() async {
+    DropInActivity.active.value = false;
     dropInPlatformApi.cleanUpDropIn();
     await dropInFlutter.platformEventStream?.close();
     dropInFlutter.platformEventStream = null;

@@ -1,5 +1,9 @@
 import 'package:adyen_checkout/src/adyen_checkout.dart';
+import 'package:adyen_checkout/src/drop_in/adyen_drop_in_focus_scope.dart';
+import 'package:adyen_checkout/src/drop_in/drop_in_activity.dart';
 import 'package:adyen_checkout/src/generated/platform_api.g.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 class MockAdyenCheckoutPlatform implements CheckoutPlatformInterface {
@@ -81,5 +85,43 @@ void main() {
 
   test('$AdyenCheckout is the default instance', () {
     expect(initialPlatform, isInstanceOf<AdyenCheckout>());
+  });
+
+  testWidgets('blocks Flutter focus while Drop-in is active on iOS',
+      (tester) async {
+    debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+    DropInActivity.active.value = true;
+    final focusNode = FocusNode();
+    addTearDown(() => DropInActivity.active.value = false);
+    addTearDown(focusNode.dispose);
+    await tester.pumpWidget(
+      AdyenDropInFocusScope(
+        child: Focus(focusNode: focusNode, child: const SizedBox()),
+      ),
+    );
+
+    focusNode.requestFocus();
+    await tester.pump();
+
+    expect(focusNode.hasFocus, isFalse);
+    debugDefaultTargetPlatformOverride = null;
+  });
+
+  testWidgets('keeps Flutter focus unchanged on Android', (tester) async {
+    debugDefaultTargetPlatformOverride = TargetPlatform.android;
+    DropInActivity.active.value = true;
+    final focusNode = FocusNode();
+    addTearDown(() => DropInActivity.active.value = false);
+    addTearDown(focusNode.dispose);
+    await tester.pumpWidget(
+      AdyenDropInFocusScope(
+        child: Focus(focusNode: focusNode, child: const SizedBox()),
+      ),
+    );
+    focusNode.requestFocus();
+    await tester.pump();
+
+    expect(focusNode.hasFocus, isTrue);
+    debugDefaultTargetPlatformOverride = null;
   });
 }

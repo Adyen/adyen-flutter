@@ -1,5 +1,6 @@
 // ignore_for_file: unused_local_variable
 
+import 'package:adyen_checkout/adyen_checkout.dart';
 import 'package:adyen_checkout_example/config.dart';
 import 'package:adyen_checkout_example/network/service.dart';
 import 'package:adyen_checkout_example/repositories/adyen_apple_pay_component_repository.dart';
@@ -52,6 +53,7 @@ void mainCommon(Service service) {
   final configRepository = ConfigRepository();
 
   runApp(MaterialApp(
+    builder: (context, child) => AdyenDropInFocusScope(child: child!),
     localizationsDelegates: const [
       GlobalMaterialLocalizations.delegate,
       GlobalWidgetsLocalizations.delegate,
