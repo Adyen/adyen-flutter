@@ -77,9 +77,6 @@ class DropInPlatformApi: DropInPlatformInterface {
             }
             if let sessionDelegate = sessionHolder.sessionDelegate as? DropInSessionsDelegate {
                 sessionDelegate.viewController = dropInViewController
-                sessionDelegate.dismissHandler = { [dropInWindowManager] completion in
-                    dropInWindowManager.dismiss(animated: true, completion: completion)
-                }
             }
 
             self.dropInViewController = dropInViewController
@@ -217,7 +214,6 @@ private extension DropInPlatformApi {
     func clearPresentationReferences() {
         if let sessionDelegate = sessionHolder.sessionDelegate as? DropInSessionsDelegate {
             sessionDelegate.viewController = nil
-            sessionDelegate.dismissHandler = nil
         }
         dropInSessionStoredPaymentMethodsDelegate = nil
         dropInAdvancedFlowDelegate?.dropInInteractorDelegate = nil
