@@ -25,7 +25,6 @@ class DropInPlatformApi: DropInPlatformInterface {
     private var dropInAdvancedFlowStoredPaymentMethodsDelegate: DropInAdvancedFlowStoredPaymentMethodsDelegate?
     private var checkBalanceHandler: ((Result<Balance, any Error>) -> Void)?
     private var requestOrderHandler: ((Result<PartialPaymentOrder, any Error>) -> Void)?
-    private var didSendTerminalResult = false
 
     init(
         checkoutFlutter: CheckoutFlutterInterface,
@@ -43,7 +42,6 @@ class DropInPlatformApi: DropInPlatformInterface {
     func showDropInSession(dropInConfigurationDTO: DropInConfigurationDTO) {
         do {
             try dropInWindowManager.ensureCanPresent()
-            didSendTerminalResult = false
             let dropInViewController = try createSessionDropInViewController(
                 dropInConfigurationDTO: dropInConfigurationDTO
             )
@@ -59,7 +57,6 @@ class DropInPlatformApi: DropInPlatformInterface {
     func showDropInAdvanced(dropInConfigurationDTO: DropInConfigurationDTO, paymentMethodsResponse: String) {
         do {
             try dropInWindowManager.ensureCanPresent()
-            didSendTerminalResult = false
             let dropInViewController = try createAdvancedDropInViewController(
                 dropInConfigurationDTO: dropInConfigurationDTO,
                 paymentMethodsResponse: paymentMethodsResponse
@@ -73,7 +70,7 @@ class DropInPlatformApi: DropInPlatformInterface {
                 type: CheckoutEventType.result,
                 data: PaymentResultDTO(type: PaymentResultEnum.error, reason: error.localizedDescription)
             )
-            sendTerminalEvent(checkoutEvent)
+            checkoutFlutter.send(event: checkoutEvent, completion: { _ in })
         }
     }
 
@@ -130,9 +127,6 @@ class DropInPlatformApi: DropInPlatformInterface {
             }
             dropInWindowManager.dismiss(animated: true, completion: completion)
         }
-        sessionDelegate.terminalEventHandler = { [weak self] event in
-            self?.sendTerminalEvent(event)
-        }
     }
 
     private func createAdvancedDropInViewController(
@@ -166,9 +160,6 @@ class DropInPlatformApi: DropInPlatformInterface {
         let dropInViewController = DropInViewController(dropInComponent: dropInComponent)
         dropInAdvancedFlowDelegate = DropInAdvancedFlowDelegate(checkoutFlutter: checkoutFlutter)
         dropInAdvancedFlowDelegate?.dropInInteractorDelegate = self
-        dropInAdvancedFlowDelegate?.terminalEventHandler = { [weak self] event in
-            self?.sendTerminalEvent(event)
-        }
         dropInComponent.delegate = dropInAdvancedFlowDelegate
         dropInComponent.cardComponentDelegate = self
         if dropInConfigurationDTO.isPartialPaymentSupported {
@@ -193,7 +184,7 @@ class DropInPlatformApi: DropInPlatformInterface {
             )
         )
         finalizeAndDismiss(success: false, completion: { [weak self] in
-            self?.sendTerminalEvent(checkoutEvent)
+            self?.checkoutFlutter.send(event: checkoutEvent, completion: { _ in })
         })
     }
 
@@ -258,21 +249,16 @@ private extension DropInPlatformApi {
             type: CheckoutEventType.result,
             data: PaymentResultDTO(type: PaymentResultEnum.error, reason: reason)
         )
-        sendTerminalEvent(checkoutEvent)
-    }
-
-    func sendTerminalEvent(_ checkoutEvent: CheckoutEvent) {
-        guard !didSendTerminalResult else { return }
-        didSendTerminalResult = true
         checkoutFlutter.send(event: checkoutEvent, completion: { _ in })
     }
 
     func clearPresentationReferences() {
         if let sessionDelegate = sessionHolder.sessionDelegate as? DropInSessionsDelegate {
-            sessionDelegate.invalidate()
+            sessionDelegate.viewController = nil
+            sessionDelegate.dismissHandler = nil
         }
         dropInSessionStoredPaymentMethodsDelegate = nil
-        dropInAdvancedFlowDelegate?.invalidate()
+        dropInAdvancedFlowDelegate?.dropInInteractorDelegate = nil
         dropInAdvancedFlowDelegate = nil
         dropInAdvancedFlowStoredPaymentMethodsDelegate = nil
         checkBalanceHandler = nil
@@ -304,7 +290,7 @@ private extension DropInPlatformApi {
                 )
             )
             let checkoutEvent = CheckoutEvent(type: CheckoutEventType.result, data: paymentResult)
-            self?.sendTerminalEvent(checkoutEvent)
+            self?.checkoutFlutter.send(event: checkoutEvent, completion: { _ in })
         })
     }
 
@@ -317,7 +303,7 @@ private extension DropInPlatformApi {
             let paymentResult = PaymentResultDTO(type: PaymentResultEnum.error, reason: error.localizedDescription)
             let checkoutEvent = CheckoutEvent(type: CheckoutEventType.result, data: paymentResult)
             finalizeAndDismiss(success: false) { [weak self] in
-                self?.sendTerminalEvent(checkoutEvent)
+                self?.checkoutFlutter.send(event: checkoutEvent, completion: { _ in })
             }
         }
     }
@@ -329,7 +315,7 @@ private extension DropInPlatformApi {
             finalizeAndDismiss(success: false) { [weak self] in
                 let paymentResult = PaymentResultDTO(type: PaymentResultEnum.error, reason: paymentEventDTO.error?.errorMessage)
                 let checkoutEvent = CheckoutEvent(type: CheckoutEventType.result, data: paymentResult)
-                self?.sendTerminalEvent(checkoutEvent)
+                self?.checkoutFlutter.send(event: checkoutEvent, completion: { _ in })
             }
         } else {
             dropInViewController?.dropInComponent.finalizeIfNeeded(with: false, completion: {})
@@ -393,7 +379,7 @@ private extension DropInPlatformApi {
                 reason: error.localizedDescription
             )
         )
-        sendTerminalEvent(checkoutEvent)
+        checkoutFlutter.send(event: checkoutEvent, completion: { _ in })
     }
 
     private func overridePaymentMethodNames(paymentMethods: PaymentMethods, paymentMethodNames: [String?: String?]) -> PaymentMethods {

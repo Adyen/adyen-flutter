@@ -10,10 +10,7 @@ import UIKit
 class DropInSessionsDelegate: AdyenSessionDelegate {
     weak var viewController: UIViewController?
     var dismissHandler: ((@escaping () -> Void) -> Void)?
-    var terminalEventHandler: ((CheckoutEvent) -> Void)?
     private let checkoutFlutter: CheckoutFlutterInterface
-    private var didSendTerminalResult = false
-    private var isActive = true
 
     init(viewController: UIViewController?, checkoutFlutter: CheckoutFlutterInterface) {
         self.viewController = viewController
@@ -21,8 +18,6 @@ class DropInSessionsDelegate: AdyenSessionDelegate {
     }
 
     func didComplete(with result: AdyenSessionResult, component _: Adyen.Component, session: AdyenSession) {
-        guard isActive, !didSendTerminalResult else { return }
-        didSendTerminalResult = true
         dismissDropIn { [weak self] in
             let paymentResult = PaymentResultModelDTO(
                 sessionId: session.sessionContext.identifier,
@@ -37,13 +32,14 @@ class DropInSessionsDelegate: AdyenSessionDelegate {
                     result: paymentResult
                 )
             )
-            self?.sendTerminalEvent(checkoutEvent)
+            self?.checkoutFlutter.send(
+                event: checkoutEvent,
+                completion: { _ in }
+            )
         }
     }
 
     func didFail(with error: Error, from _: Component, session _: AdyenSession) {
-        guard isActive, !didSendTerminalResult else { return }
-        didSendTerminalResult = true
         dismissDropIn { [weak self] in
             switch error {
             case ComponentError.cancelled:
@@ -54,7 +50,10 @@ class DropInSessionsDelegate: AdyenSessionDelegate {
                         reason: error.localizedDescription
                     )
                 )
-                self?.sendTerminalEvent(checkoutEvent)
+                self?.checkoutFlutter.send(
+                    event: checkoutEvent,
+                    completion: { _ in }
+                )
             default:
                 let checkoutEvent = CheckoutEvent(
                     type: CheckoutEventType.result,
@@ -63,29 +62,16 @@ class DropInSessionsDelegate: AdyenSessionDelegate {
                         reason: error.localizedDescription
                     )
                 )
-                self?.sendTerminalEvent(checkoutEvent)
+                self?.checkoutFlutter.send(
+                    event: checkoutEvent,
+                    completion: { _ in }
+                )
             }
         }
     }
 
     func didOpenExternalApplication(component _: ActionComponent, session _: AdyenSession) {
         print("external")
-    }
-
-    func invalidate() {
-        isActive = false
-        viewController = nil
-        dismissHandler = nil
-        terminalEventHandler = nil
-    }
-
-    private func sendTerminalEvent(_ checkoutEvent: CheckoutEvent) {
-        guard isActive else { return }
-        if let terminalEventHandler {
-            terminalEventHandler(checkoutEvent)
-        } else {
-            checkoutFlutter.send(event: checkoutEvent, completion: { _ in })
-        }
     }
 
     private func dismissDropIn(completion: @escaping () -> Void) {
