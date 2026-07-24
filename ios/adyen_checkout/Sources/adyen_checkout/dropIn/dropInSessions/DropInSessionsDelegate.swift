@@ -83,10 +83,6 @@ class DropInSessionsDelegate: AdyenSessionDelegate {
             completion()
             return
         }
-        if let dropInViewController = viewController as? DropInViewController {
-            dropInViewController.dismissDropIn(animated: true, completion: completion)
-        } else {
-            viewController.dismiss(animated: true, completion: completion)
-        }
+        viewController.dismiss(animated: true, completion: completion)
     }
 }

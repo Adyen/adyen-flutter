@@ -42,9 +42,49 @@ class DropInPlatformApi: DropInPlatformInterface {
     func showDropInSession(dropInConfigurationDTO: DropInConfigurationDTO) {
         do {
             try dropInWindowManager.ensureCanPresent()
-            let dropInViewController = try createSessionDropInViewController(
-                dropInConfigurationDTO: dropInConfigurationDTO
+            guard let session = sessionHolder.session else {
+                throw PlatformError(errorDescription: "Session is not available.")
+            }
+
+            let sessionPayment = session.sessionContext.createPayment(fallbackCountryCode: dropInConfigurationDTO.countryCode)
+            let adyenContext = try dropInConfigurationDTO.createAdyenContext(payment: sessionPayment)
+            let dropInConfiguration = try dropInConfigurationDTO.createDropInConfiguration(payment: sessionPayment)
+            var paymentMethods = session.sessionContext.paymentMethods
+            if let paymentMethodNames = dropInConfigurationDTO.paymentMethodNames {
+                paymentMethods = overridePaymentMethodNames(
+                    paymentMethods: paymentMethods,
+                    paymentMethodNames: paymentMethodNames
+                )
+            }
+            paymentMethods = applyStoredPaymentMethodsVisibility(
+                paymentMethods: paymentMethods,
+                showStoredPaymentMethods: dropInConfigurationDTO.showStoredPaymentMethods
             )
+
+            let dropInComponent = DropInComponent(
+                paymentMethods: paymentMethods,
+                context: adyenContext,
+                configuration: dropInConfiguration,
+                title: dropInConfigurationDTO.preselectedPaymentMethodTitle
+            )
+            let dropInViewController = DropInViewController(dropInComponent: dropInComponent)
+            dropInSessionStoredPaymentMethodsDelegate = DropInSessionsStoredPaymentMethodsDelegate(
+                viewController: dropInViewController,
+                checkoutFlutter: checkoutFlutter
+            )
+            dropInComponent.delegate = session
+            dropInComponent.partialPaymentDelegate = session
+            dropInComponent.cardComponentDelegate = self
+            if dropInConfigurationDTO.isRemoveStoredPaymentMethodEnabled {
+                dropInComponent.storedPaymentMethodsDelegate = dropInSessionStoredPaymentMethodsDelegate
+            }
+            if let sessionDelegate = sessionHolder.sessionDelegate as? DropInSessionsDelegate {
+                sessionDelegate.viewController = dropInViewController
+                sessionDelegate.dismissHandler = { [dropInWindowManager] completion in
+                    dropInWindowManager.dismiss(animated: true, completion: completion)
+                }
+            }
+
             self.dropInViewController = dropInViewController
             try dropInWindowManager.present(rootViewController: dropInViewController)
         } catch {
@@ -57,10 +97,44 @@ class DropInPlatformApi: DropInPlatformInterface {
     func showDropInAdvanced(dropInConfigurationDTO: DropInConfigurationDTO, paymentMethodsResponse: String) {
         do {
             try dropInWindowManager.ensureCanPresent()
-            let dropInViewController = try createAdvancedDropInViewController(
-                dropInConfigurationDTO: dropInConfigurationDTO,
-                paymentMethodsResponse: paymentMethodsResponse
+            let adyenContext = try dropInConfigurationDTO.createAdyenContext()
+            var paymentMethods = try jsonDecoder.decode(PaymentMethods.self, from: Data(paymentMethodsResponse.utf8))
+            if let paymentMethodNames = dropInConfigurationDTO.paymentMethodNames {
+                paymentMethods = overridePaymentMethodNames(
+                    paymentMethods: paymentMethods,
+                    paymentMethodNames: paymentMethodNames
+                )
+            }
+
+            let paymentMethodsWithoutGiftCards = removeGiftCardPaymentMethods(
+                paymentMethods: paymentMethods,
+                isPartialPaymentSupported: dropInConfigurationDTO.isPartialPaymentSupported
             )
+            let filteredPaymentMethods = applyStoredPaymentMethodsVisibility(
+                paymentMethods: paymentMethodsWithoutGiftCards,
+                showStoredPaymentMethods: dropInConfigurationDTO.showStoredPaymentMethods
+            )
+            let configuration = try dropInConfigurationDTO.createDropInConfiguration(payment: adyenContext.payment)
+            let dropInComponent = DropInComponent(
+                paymentMethods: filteredPaymentMethods,
+                context: adyenContext,
+                configuration: configuration,
+                title: dropInConfigurationDTO.preselectedPaymentMethodTitle
+            )
+            let dropInViewController = DropInViewController(dropInComponent: dropInComponent)
+            dropInAdvancedFlowDelegate = DropInAdvancedFlowDelegate(checkoutFlutter: checkoutFlutter)
+            dropInAdvancedFlowDelegate?.dropInInteractorDelegate = self
+            dropInComponent.delegate = dropInAdvancedFlowDelegate
+            dropInComponent.cardComponentDelegate = self
+            dropInComponent.partialPaymentDelegate = dropInConfigurationDTO.isPartialPaymentSupported ? self : nil
+            if dropInConfigurationDTO.isRemoveStoredPaymentMethodEnabled == true {
+                dropInAdvancedFlowStoredPaymentMethodsDelegate = DropInAdvancedFlowStoredPaymentMethodsDelegate(
+                    viewController: dropInViewController,
+                    checkoutFlutter: checkoutFlutter
+                )
+                dropInComponent.storedPaymentMethodsDelegate = dropInAdvancedFlowStoredPaymentMethodsDelegate
+            }
+
             self.dropInViewController = dropInViewController
             try dropInWindowManager.present(rootViewController: dropInViewController)
         } catch {
@@ -72,107 +146,6 @@ class DropInPlatformApi: DropInPlatformInterface {
             )
             checkoutFlutter.send(event: checkoutEvent, completion: { _ in })
         }
-    }
-
-    private func createSessionDropInViewController(
-        dropInConfigurationDTO: DropInConfigurationDTO
-    ) throws -> DropInViewController {
-        guard let session = sessionHolder.session else {
-            throw PlatformError(errorDescription: "Session is not available.")
-        }
-
-        let sessionPayment = session.sessionContext.createPayment(fallbackCountryCode: dropInConfigurationDTO.countryCode)
-        let adyenContext = try dropInConfigurationDTO.createAdyenContext(payment: sessionPayment)
-        let dropInConfiguration = try dropInConfigurationDTO.createDropInConfiguration(payment: sessionPayment)
-        var paymentMethods = session.sessionContext.paymentMethods
-        if let paymentMethodNames = dropInConfigurationDTO.paymentMethodNames {
-            paymentMethods = overridePaymentMethodNames(
-                paymentMethods: paymentMethods,
-                paymentMethodNames: paymentMethodNames
-            )
-        }
-        paymentMethods = applyStoredPaymentMethodsVisibility(
-            paymentMethods: paymentMethods,
-            showStoredPaymentMethods: dropInConfigurationDTO.showStoredPaymentMethods
-        )
-
-        let dropInComponent = DropInComponent(
-            paymentMethods: paymentMethods,
-            context: adyenContext,
-            configuration: dropInConfiguration,
-            title: dropInConfigurationDTO.preselectedPaymentMethodTitle
-        )
-        let dropInViewController = DropInViewController(dropInComponent: dropInComponent)
-        dropInSessionStoredPaymentMethodsDelegate = DropInSessionsStoredPaymentMethodsDelegate(
-            viewController: dropInViewController,
-            checkoutFlutter: checkoutFlutter
-        )
-        dropInComponent.delegate = session
-        dropInComponent.partialPaymentDelegate = session
-        dropInComponent.cardComponentDelegate = self
-        if dropInConfigurationDTO.isRemoveStoredPaymentMethodEnabled {
-            dropInComponent.storedPaymentMethodsDelegate = dropInSessionStoredPaymentMethodsDelegate
-        }
-        configureSessionDelegate(viewController: dropInViewController)
-        return dropInViewController
-    }
-
-    private func configureSessionDelegate(viewController: DropInViewController) {
-        guard let sessionDelegate = sessionHolder.sessionDelegate as? DropInSessionsDelegate else { return }
-        sessionDelegate.viewController = viewController
-        sessionDelegate.dismissHandler = { [weak dropInWindowManager = dropInWindowManager] completion in
-            guard let dropInWindowManager else {
-                completion()
-                return
-            }
-            dropInWindowManager.dismiss(animated: true, completion: completion)
-        }
-    }
-
-    private func createAdvancedDropInViewController(
-        dropInConfigurationDTO: DropInConfigurationDTO,
-        paymentMethodsResponse: String
-    ) throws -> DropInViewController {
-        let adyenContext = try dropInConfigurationDTO.createAdyenContext()
-        var paymentMethods = try jsonDecoder.decode(PaymentMethods.self, from: Data(paymentMethodsResponse.utf8))
-        if let paymentMethodNames = dropInConfigurationDTO.paymentMethodNames {
-            paymentMethods = overridePaymentMethodNames(
-                paymentMethods: paymentMethods,
-                paymentMethodNames: paymentMethodNames
-            )
-        }
-
-        let paymentMethodsWithoutGiftCards = removeGiftCardPaymentMethods(
-            paymentMethods: paymentMethods,
-            isPartialPaymentSupported: dropInConfigurationDTO.isPartialPaymentSupported
-        )
-        let filteredPaymentMethods = applyStoredPaymentMethodsVisibility(
-            paymentMethods: paymentMethodsWithoutGiftCards,
-            showStoredPaymentMethods: dropInConfigurationDTO.showStoredPaymentMethods
-        )
-        let configuration = try dropInConfigurationDTO.createDropInConfiguration(payment: adyenContext.payment)
-        let dropInComponent = DropInComponent(
-            paymentMethods: filteredPaymentMethods,
-            context: adyenContext,
-            configuration: configuration,
-            title: dropInConfigurationDTO.preselectedPaymentMethodTitle
-        )
-        let dropInViewController = DropInViewController(dropInComponent: dropInComponent)
-        dropInAdvancedFlowDelegate = DropInAdvancedFlowDelegate(checkoutFlutter: checkoutFlutter)
-        dropInAdvancedFlowDelegate?.dropInInteractorDelegate = self
-        dropInComponent.delegate = dropInAdvancedFlowDelegate
-        dropInComponent.cardComponentDelegate = self
-        if dropInConfigurationDTO.isPartialPaymentSupported {
-            dropInComponent.partialPaymentDelegate = self
-        }
-        if dropInConfigurationDTO.isRemoveStoredPaymentMethodEnabled == true {
-            dropInAdvancedFlowStoredPaymentMethodsDelegate = DropInAdvancedFlowStoredPaymentMethodsDelegate(
-                viewController: dropInViewController,
-                checkoutFlutter: checkoutFlutter
-            )
-            dropInComponent.storedPaymentMethodsDelegate = dropInAdvancedFlowStoredPaymentMethodsDelegate
-        }
-        return dropInViewController
     }
     
     func stopDropIn() throws {
