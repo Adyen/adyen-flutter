@@ -172,7 +172,7 @@ object ConfigurationMapper {
         ).apply {
             cardConfigurationDTO?.let { configurationDTO ->
                 card {
-                    addressConfiguration = configurationDTO.addressMode.mapToAddressConfiguration()
+                    addressConfiguration = configurationDTO.addressMode.mapToAddressConfiguration(countryCode)
                     isStorePaymentFieldVisible = configurationDTO.showStorePaymentField
                     isHideCvcStoredCard = !configurationDTO.showCvcForStoredCard
                     isHideCvc = !configurationDTO.showCvc
@@ -267,9 +267,12 @@ object ConfigurationMapper {
         return AnalyticsConfiguration(analyticsLevel)
     }
 
-    private fun AddressMode.mapToAddressConfiguration(): AddressConfiguration =
+    private fun AddressMode.mapToAddressConfiguration(countryCode: String?): AddressConfiguration =
         when (this) {
-            AddressMode.FULL -> AddressConfiguration.FullAddress()
+            AddressMode.FULL ->
+                AddressConfiguration.FullAddress(
+                    defaultCountryCode = countryCode?.takeIf { it.isNotBlank() },
+                )
             AddressMode.POSTAL_CODE -> AddressConfiguration.PostalCode()
             AddressMode.NONE -> AddressConfiguration.None
         }
