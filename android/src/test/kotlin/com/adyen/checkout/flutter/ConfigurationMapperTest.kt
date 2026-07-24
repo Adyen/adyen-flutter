@@ -403,7 +403,8 @@ class ConfigurationMapperTest {
             val checkoutConfiguration = cardComponentConfigurationDTO.toCheckoutConfiguration()
             val cardConfiguration = checkoutConfiguration.getConfiguration<CardConfiguration>(PaymentMethodTypes.SCHEME)
 
-            assertIs<AddressConfiguration.FullAddress>(cardConfiguration?.addressConfiguration)
+            val addressConfiguration = assertIs<AddressConfiguration.FullAddress>(cardConfiguration?.addressConfiguration)
+            assertEquals("US", addressConfiguration.defaultCountryCode)
         }
 
         @Test
