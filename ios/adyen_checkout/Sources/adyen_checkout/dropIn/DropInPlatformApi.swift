@@ -34,9 +34,6 @@ class DropInPlatformApi: DropInPlatformInterface {
         self.checkoutFlutter = checkoutFlutter
         self.sessionHolder = sessionHolder
         self.dropInWindowManager = dropInWindowManager ?? DropInWindowManager()
-        self.dropInWindowManager.onSceneDisconnect = { [weak self] in
-            self?.sendPresentationError(reason: "Drop-in window scene disconnected.")
-        }
     }
 
     func showDropInSession(dropInConfigurationDTO: DropInConfigurationDTO) {
@@ -217,14 +214,6 @@ class DropInPlatformApi: DropInPlatformInterface {
 }
 
 private extension DropInPlatformApi {
-    func sendPresentationError(reason: String) {
-        let checkoutEvent = CheckoutEvent(
-            type: CheckoutEventType.result,
-            data: PaymentResultDTO(type: PaymentResultEnum.error, reason: reason)
-        )
-        checkoutFlutter.send(event: checkoutEvent, completion: { _ in })
-    }
-
     func clearPresentationReferences() {
         if let sessionDelegate = sessionHolder.sessionDelegate as? DropInSessionsDelegate {
             sessionDelegate.viewController = nil

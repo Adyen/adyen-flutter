@@ -132,7 +132,7 @@ class RunnerTests: XCTestCase {
     }
 
     @MainActor
-    func testDropInWindowManagerCleansUpWhenSceneDisconnects() async throws {
+    func testDropInWindowManagerCleansUpWhenSceneDisconnects() throws {
         let hostWindow = try XCTUnwrap(activeWindow())
         let windowScene = try XCTUnwrap(hostWindow.windowScene)
         let notificationCenter = NotificationCenter()
@@ -140,12 +140,9 @@ class RunnerTests: XCTestCase {
             hostWindowProvider: { hostWindow },
             notificationCenter: notificationCenter
         )
-        let disconnected = expectation(description: "Scene disconnect handled")
-        manager.onSceneDisconnect = { disconnected.fulfill() }
         try manager.present(rootViewController: UIViewController())
 
         notificationCenter.post(name: UIScene.didDisconnectNotification, object: windowScene)
-        await fulfillment(of: [disconnected], timeout: 1)
 
         XCTAssertEqual(manager.state, .idle)
     }

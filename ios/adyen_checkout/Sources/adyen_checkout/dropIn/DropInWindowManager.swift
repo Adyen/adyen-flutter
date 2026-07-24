@@ -17,7 +17,6 @@ final class DropInWindowManager {
     private var dropInWindow: UIWindow?
     private var sceneDisconnectObserver: NSObjectProtocol?
     private var dismissalCompletions: [() -> Void] = []
-    var onSceneDisconnect: (() -> Void)?
     private(set) var state = State.idle
 
     init(
@@ -110,12 +109,7 @@ final class DropInWindowManager {
             object: windowScene,
             queue: .main
         ) { [weak self] _ in
-            guard let self else { return }
-            let shouldNotify = state == .presented
-            restorePreviousWindow(shouldMakeKey: false)
-            if shouldNotify {
-                onSceneDisconnect?()
-            }
+            self?.restorePreviousWindow(shouldMakeKey: false)
         }
     }
 
