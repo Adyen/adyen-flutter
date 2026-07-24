@@ -36,7 +36,7 @@ class DropInPlatformApi: DropInPlatformInterface {
 
     func showDropInSession(dropInConfigurationDTO: DropInConfigurationDTO) {
         do {
-            guard let viewController = getViewController() else {
+            guard let viewController = DropInWindowManager.shared.prepareWindow() else {
                 return
             }
             
@@ -46,6 +46,9 @@ class DropInPlatformApi: DropInPlatformInterface {
             }
 
             hostViewController = viewController
+            if let sessionDelegate = sessionHolder.sessionDelegate as? DropInSessionsDelegate {
+                sessionDelegate.viewController = viewController
+            }
             let sessionPayment = session.sessionContext.createPayment(fallbackCountryCode: dropInConfigurationDTO.countryCode)
             let adyenContext = try dropInConfigurationDTO.createAdyenContext(payment: sessionPayment)
             dropInSessionStoredPaymentMethodsDelegate = DropInSessionsStoredPaymentMethodsDelegate(
@@ -81,6 +84,7 @@ class DropInPlatformApi: DropInPlatformInterface {
             let dropInViewController = DropInViewController(dropInComponent: dropInComponent)
             dropInViewController.modalPresentationStyle = .overCurrentContext
             self.dropInViewController = dropInViewController
+            DropInWindowManager.shared.show()
             self.hostViewController?.present(dropInViewController, animated: false)
         } catch {
             sendSessionError(error: error)
@@ -89,7 +93,7 @@ class DropInPlatformApi: DropInPlatformInterface {
 
     func showDropInAdvanced(dropInConfigurationDTO: DropInConfigurationDTO, paymentMethodsResponse: String) {
         do {
-            guard let viewController = getViewController() else {
+            guard let viewController = DropInWindowManager.shared.prepareWindow() else {
                 return
             }
             
@@ -132,6 +136,7 @@ class DropInPlatformApi: DropInPlatformInterface {
             let dropInViewController = DropInViewController(dropInComponent: dropInComponent)
             dropInViewController.modalPresentationStyle = .overCurrentContext
             self.dropInViewController = dropInViewController
+            DropInWindowManager.shared.show()
             self.hostViewController?.present(dropInViewController, animated: false)
         } catch {
             let checkoutEvent = CheckoutEvent(
@@ -211,6 +216,7 @@ class DropInPlatformApi: DropInPlatformInterface {
         requestOrderHandler = nil
         dropInViewController = nil
         hostViewController = nil
+        DropInWindowManager.shared.hide()
     }
 
     private func handlePaymentEvent(paymentEventDTO: PaymentEventDTO) {
@@ -340,21 +346,6 @@ class DropInPlatformApi: DropInPlatformInterface {
         )
     }
 
-    private func getViewController() -> UIViewController? {
-        var rootViewController = UIApplication.shared.adyen.mainKeyWindow?.rootViewController
-        while let presentedViewController = rootViewController?.presentedViewController {
-            let type = String(describing: type(of: presentedViewController))
-            // TODO: - We need to discuss how the SDK should react if a DropInNavigationController is already displayed
-            if type == "DropInNavigationController" {
-                return nil
-            } else {
-                rootViewController = presentedViewController
-            }
-        }
-
-        return rootViewController
-    }
-    
     private func overridePaymentMethodNames(paymentMethods: PaymentMethods, paymentMethodNames: [String?: String?]) -> PaymentMethods {
         var paymentMethodsWithAdjustedNames = paymentMethods
         for paymentMethodNamePair in paymentMethodNames {
@@ -376,6 +367,7 @@ extension DropInPlatformApi: DropInInteractorDelegate {
     func finalizeAndDismiss(success: Bool, completion: @escaping (() -> Void)) {
         dropInViewController?.dropInComponent.finalizeIfNeeded(with: success) { [weak self] in
             self?.hostViewController?.dismiss(animated: true, completion: {
+                DropInWindowManager.shared.hide()
                 completion()
             })
         }

@@ -8,7 +8,7 @@
 import UIKit
 
 class DropInSessionsDelegate: AdyenSessionDelegate {
-    private let viewController: UIViewController?
+    var viewController: UIViewController?
     private let checkoutFlutter: CheckoutFlutterInterface
 
     init(viewController: UIViewController?, checkoutFlutter: CheckoutFlutterInterface) {
@@ -35,6 +35,7 @@ class DropInSessionsDelegate: AdyenSessionDelegate {
                 event: checkoutEvent,
                 completion: { _ in }
             )
+            DropInWindowManager.shared.hide()
         })
     }
 
@@ -66,6 +67,7 @@ class DropInSessionsDelegate: AdyenSessionDelegate {
                     completion: { _ in }
                 )
             }
+            DropInWindowManager.shared.hide()
         })
     }
 
