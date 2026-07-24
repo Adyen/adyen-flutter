@@ -269,9 +269,10 @@ object ConfigurationMapper {
 
     private fun AddressMode.mapToAddressConfiguration(countryCode: String?): AddressConfiguration =
         when (this) {
-            AddressMode.FULL -> AddressConfiguration.FullAddress(
-                defaultCountryCode = countryCode?.takeIf { it.isNotBlank() },
-            )
+            AddressMode.FULL ->
+                AddressConfiguration.FullAddress(
+                    defaultCountryCode = countryCode?.takeIf { it.isNotBlank() },
+                )
             AddressMode.POSTAL_CODE -> AddressConfiguration.PostalCode()
             AddressMode.NONE -> AddressConfiguration.None
         }
