@@ -18,136 +18,170 @@ class DropInPlatformApi: DropInPlatformInterface {
     private let jsonDecoder = JSONDecoder()
     private let checkoutFlutter: CheckoutFlutterInterface
     private let sessionHolder: SessionHolder
-    private var hostViewController: UIViewController?
+    private let dropInWindowManager: DropInWindowManager
     private var dropInViewController: DropInViewController?
     private var dropInSessionStoredPaymentMethodsDelegate: DropInSessionsStoredPaymentMethodsDelegate?
     private var dropInAdvancedFlowDelegate: DropInAdvancedFlowDelegate?
     private var dropInAdvancedFlowStoredPaymentMethodsDelegate: DropInAdvancedFlowStoredPaymentMethodsDelegate?
     private var checkBalanceHandler: ((Result<Balance, any Error>) -> Void)?
     private var requestOrderHandler: ((Result<PartialPaymentOrder, any Error>) -> Void)?
+    private var didSendTerminalResult = false
 
     init(
         checkoutFlutter: CheckoutFlutterInterface,
-        sessionHolder: SessionHolder
+        sessionHolder: SessionHolder,
+        dropInWindowManager: DropInWindowManager? = nil
     ) {
         self.checkoutFlutter = checkoutFlutter
         self.sessionHolder = sessionHolder
+        self.dropInWindowManager = dropInWindowManager ?? DropInWindowManager()
+        self.dropInWindowManager.onSceneDisconnect = { [weak self] in
+            self?.sendPresentationError(reason: "Drop-in window scene disconnected.")
+        }
     }
 
     func showDropInSession(dropInConfigurationDTO: DropInConfigurationDTO) {
         do {
-            guard let viewController = DropInWindowManager.shared.prepareWindow() else {
-                return
-            }
-            
-            guard let session = sessionHolder.session else {
-                sendSessionError(error: PlatformError(errorDescription: "Session is not available."))
-                return
-            }
-
-            hostViewController = viewController
-            if let sessionDelegate = sessionHolder.sessionDelegate as? DropInSessionsDelegate {
-                sessionDelegate.viewController = viewController
-            }
-            let sessionPayment = session.sessionContext.createPayment(fallbackCountryCode: dropInConfigurationDTO.countryCode)
-            let adyenContext = try dropInConfigurationDTO.createAdyenContext(payment: sessionPayment)
-            dropInSessionStoredPaymentMethodsDelegate = DropInSessionsStoredPaymentMethodsDelegate(
-                viewController: viewController,
-                checkoutFlutter: checkoutFlutter
+            try dropInWindowManager.ensureCanPresent()
+            didSendTerminalResult = false
+            let dropInViewController = try createSessionDropInViewController(
+                dropInConfigurationDTO: dropInConfigurationDTO
             )
-            let dropInConfiguration = try dropInConfigurationDTO.createDropInConfiguration(payment: sessionPayment)
-            var paymentMethods = session.sessionContext.paymentMethods
-            if let paymentMethodNames = dropInConfigurationDTO.paymentMethodNames {
-                paymentMethods = overridePaymentMethodNames(
-                    paymentMethods: paymentMethods,
-                    paymentMethodNames: paymentMethodNames
-                )
-            }
-            paymentMethods = applyStoredPaymentMethodsVisibility(
-                paymentMethods: paymentMethods,
-                showStoredPaymentMethods: dropInConfigurationDTO.showStoredPaymentMethods
-            )
-
-            let dropInComponent = DropInComponent(
-                paymentMethods: paymentMethods,
-                context: adyenContext,
-                configuration: dropInConfiguration,
-                title: dropInConfigurationDTO.preselectedPaymentMethodTitle
-            )
-            dropInComponent.delegate = sessionHolder.session
-            dropInComponent.partialPaymentDelegate = sessionHolder.session
-            dropInComponent.cardComponentDelegate = self
-            if dropInConfigurationDTO.isRemoveStoredPaymentMethodEnabled {
-                dropInComponent.storedPaymentMethodsDelegate = dropInSessionStoredPaymentMethodsDelegate
-            }
-            
-            let dropInViewController = DropInViewController(dropInComponent: dropInComponent)
-            dropInViewController.modalPresentationStyle = .overCurrentContext
             self.dropInViewController = dropInViewController
-            DropInWindowManager.shared.show()
-            self.hostViewController?.present(dropInViewController, animated: false)
+            try dropInWindowManager.present(rootViewController: dropInViewController)
         } catch {
+            guard dropInWindowManager.state == .idle else { return }
+            clearPresentationReferences()
             sendSessionError(error: error)
         }
     }
 
     func showDropInAdvanced(dropInConfigurationDTO: DropInConfigurationDTO, paymentMethodsResponse: String) {
         do {
-            guard let viewController = DropInWindowManager.shared.prepareWindow() else {
-                return
-            }
-            
-            hostViewController = viewController
-            let adyenContext = try dropInConfigurationDTO.createAdyenContext()
-            var paymentMethods = try jsonDecoder.decode(PaymentMethods.self, from: Data(paymentMethodsResponse.utf8))
-            if let paymentMethodNames = dropInConfigurationDTO.paymentMethodNames {
-                paymentMethods = overridePaymentMethodNames(
-                    paymentMethods: paymentMethods,
-                    paymentMethodNames: paymentMethodNames
-                )
-            }
-            
-            let paymentMethodsWithoutGiftCards = removeGiftCardPaymentMethods(paymentMethods: paymentMethods, isPartialPaymentSupported: dropInConfigurationDTO.isPartialPaymentSupported)
-            let filteredPaymentMethods = applyStoredPaymentMethodsVisibility(
-                paymentMethods: paymentMethodsWithoutGiftCards,
-                showStoredPaymentMethods: dropInConfigurationDTO.showStoredPaymentMethods
+            try dropInWindowManager.ensureCanPresent()
+            didSendTerminalResult = false
+            let dropInViewController = try createAdvancedDropInViewController(
+                dropInConfigurationDTO: dropInConfigurationDTO,
+                paymentMethodsResponse: paymentMethodsResponse
             )
-            let configuration = try dropInConfigurationDTO.createDropInConfiguration(payment: adyenContext.payment)
-            let dropInComponent = DropInComponent(
-                paymentMethods: filteredPaymentMethods,
-                context: adyenContext,
-                configuration: configuration,
-                title: dropInConfigurationDTO.preselectedPaymentMethodTitle
-            )
-            dropInAdvancedFlowDelegate = DropInAdvancedFlowDelegate(checkoutFlutter: checkoutFlutter)
-            dropInAdvancedFlowDelegate?.dropInInteractorDelegate = self
-            dropInComponent.delegate = dropInAdvancedFlowDelegate
-            dropInComponent.cardComponentDelegate = self
-            if dropInConfigurationDTO.isPartialPaymentSupported {
-                dropInComponent.partialPaymentDelegate = self
-            }
-            if dropInConfigurationDTO.isRemoveStoredPaymentMethodEnabled == true {
-                dropInAdvancedFlowStoredPaymentMethodsDelegate = DropInAdvancedFlowStoredPaymentMethodsDelegate(
-                    viewController: viewController,
-                    checkoutFlutter: checkoutFlutter
-                )
-                dropInComponent.storedPaymentMethodsDelegate = dropInAdvancedFlowStoredPaymentMethodsDelegate
-            }
-            let dropInViewController = DropInViewController(dropInComponent: dropInComponent)
-            dropInViewController.modalPresentationStyle = .overCurrentContext
             self.dropInViewController = dropInViewController
-            DropInWindowManager.shared.show()
-            self.hostViewController?.present(dropInViewController, animated: false)
+            try dropInWindowManager.present(rootViewController: dropInViewController)
         } catch {
+            guard dropInWindowManager.state == .idle else { return }
+            clearPresentationReferences()
             let checkoutEvent = CheckoutEvent(
                 type: CheckoutEventType.result,
                 data: PaymentResultDTO(type: PaymentResultEnum.error, reason: error.localizedDescription)
             )
-            checkoutFlutter.send(
-                event: checkoutEvent,
-                completion: { _ in }
+            sendTerminalEvent(checkoutEvent)
+        }
+    }
+
+    private func createSessionDropInViewController(
+        dropInConfigurationDTO: DropInConfigurationDTO
+    ) throws -> DropInViewController {
+        guard let session = sessionHolder.session else {
+            throw PlatformError(errorDescription: "Session is not available.")
+        }
+
+        let sessionPayment = session.sessionContext.createPayment(fallbackCountryCode: dropInConfigurationDTO.countryCode)
+        let adyenContext = try dropInConfigurationDTO.createAdyenContext(payment: sessionPayment)
+        let dropInConfiguration = try dropInConfigurationDTO.createDropInConfiguration(payment: sessionPayment)
+        var paymentMethods = session.sessionContext.paymentMethods
+        if let paymentMethodNames = dropInConfigurationDTO.paymentMethodNames {
+            paymentMethods = overridePaymentMethodNames(
+                paymentMethods: paymentMethods,
+                paymentMethodNames: paymentMethodNames
             )
         }
+        paymentMethods = applyStoredPaymentMethodsVisibility(
+            paymentMethods: paymentMethods,
+            showStoredPaymentMethods: dropInConfigurationDTO.showStoredPaymentMethods
+        )
+
+        let dropInComponent = DropInComponent(
+            paymentMethods: paymentMethods,
+            context: adyenContext,
+            configuration: dropInConfiguration,
+            title: dropInConfigurationDTO.preselectedPaymentMethodTitle
+        )
+        let dropInViewController = DropInViewController(dropInComponent: dropInComponent)
+        dropInSessionStoredPaymentMethodsDelegate = DropInSessionsStoredPaymentMethodsDelegate(
+            viewController: dropInViewController,
+            checkoutFlutter: checkoutFlutter
+        )
+        dropInComponent.delegate = session
+        dropInComponent.partialPaymentDelegate = session
+        dropInComponent.cardComponentDelegate = self
+        if dropInConfigurationDTO.isRemoveStoredPaymentMethodEnabled {
+            dropInComponent.storedPaymentMethodsDelegate = dropInSessionStoredPaymentMethodsDelegate
+        }
+        configureSessionDelegate(viewController: dropInViewController)
+        return dropInViewController
+    }
+
+    private func configureSessionDelegate(viewController: DropInViewController) {
+        guard let sessionDelegate = sessionHolder.sessionDelegate as? DropInSessionsDelegate else { return }
+        sessionDelegate.viewController = viewController
+        sessionDelegate.dismissHandler = { [weak dropInWindowManager = dropInWindowManager] completion in
+            guard let dropInWindowManager else {
+                completion()
+                return
+            }
+            dropInWindowManager.dismiss(animated: true, completion: completion)
+        }
+        sessionDelegate.terminalEventHandler = { [weak self] event in
+            self?.sendTerminalEvent(event)
+        }
+    }
+
+    private func createAdvancedDropInViewController(
+        dropInConfigurationDTO: DropInConfigurationDTO,
+        paymentMethodsResponse: String
+    ) throws -> DropInViewController {
+        let adyenContext = try dropInConfigurationDTO.createAdyenContext()
+        var paymentMethods = try jsonDecoder.decode(PaymentMethods.self, from: Data(paymentMethodsResponse.utf8))
+        if let paymentMethodNames = dropInConfigurationDTO.paymentMethodNames {
+            paymentMethods = overridePaymentMethodNames(
+                paymentMethods: paymentMethods,
+                paymentMethodNames: paymentMethodNames
+            )
+        }
+
+        let paymentMethodsWithoutGiftCards = removeGiftCardPaymentMethods(
+            paymentMethods: paymentMethods,
+            isPartialPaymentSupported: dropInConfigurationDTO.isPartialPaymentSupported
+        )
+        let filteredPaymentMethods = applyStoredPaymentMethodsVisibility(
+            paymentMethods: paymentMethodsWithoutGiftCards,
+            showStoredPaymentMethods: dropInConfigurationDTO.showStoredPaymentMethods
+        )
+        let configuration = try dropInConfigurationDTO.createDropInConfiguration(payment: adyenContext.payment)
+        let dropInComponent = DropInComponent(
+            paymentMethods: filteredPaymentMethods,
+            context: adyenContext,
+            configuration: configuration,
+            title: dropInConfigurationDTO.preselectedPaymentMethodTitle
+        )
+        let dropInViewController = DropInViewController(dropInComponent: dropInComponent)
+        dropInAdvancedFlowDelegate = DropInAdvancedFlowDelegate(checkoutFlutter: checkoutFlutter)
+        dropInAdvancedFlowDelegate?.dropInInteractorDelegate = self
+        dropInAdvancedFlowDelegate?.terminalEventHandler = { [weak self] event in
+            self?.sendTerminalEvent(event)
+        }
+        dropInComponent.delegate = dropInAdvancedFlowDelegate
+        dropInComponent.cardComponentDelegate = self
+        if dropInConfigurationDTO.isPartialPaymentSupported {
+            dropInComponent.partialPaymentDelegate = self
+        }
+        if dropInConfigurationDTO.isRemoveStoredPaymentMethodEnabled == true {
+            dropInAdvancedFlowStoredPaymentMethodsDelegate = DropInAdvancedFlowStoredPaymentMethodsDelegate(
+                viewController: dropInViewController,
+                checkoutFlutter: checkoutFlutter
+            )
+            dropInComponent.storedPaymentMethodsDelegate = dropInAdvancedFlowStoredPaymentMethodsDelegate
+        }
+        return dropInViewController
     }
     
     func stopDropIn() throws {
@@ -159,7 +193,7 @@ class DropInPlatformApi: DropInPlatformInterface {
             )
         )
         finalizeAndDismiss(success: false, completion: { [weak self] in
-            self?.checkoutFlutter.send(event: checkoutEvent, completion: { _ in })
+            self?.sendTerminalEvent(checkoutEvent)
         })
     }
 
@@ -184,7 +218,9 @@ class DropInPlatformApi: DropInPlatformInterface {
         guard let checkBalanceHandler else { return }
         
         do {
-            guard let balanceCheckData = balanceCheckResponse.data(using: .utf8) else { throw PlatformError(errorDescription: "Failure parsing balance check response.") }
+            guard let balanceCheckData = balanceCheckResponse.data(using: .utf8) else {
+                throw PlatformError(errorDescription: "Failure parsing balance check response.")
+            }
             let balance = try jsonDecoder.decode(Balance.self, from: balanceCheckData)
             checkBalanceHandler(.success(balance))
         } catch {
@@ -196,7 +232,9 @@ class DropInPlatformApi: DropInPlatformInterface {
         guard let requestOrderHandler else { return }
         
         do {
-            guard let orderRequestData = orderRequestResponse.data(using: .utf8) else { throw PlatformError(errorDescription: "Failure parsing order request response.") }
+            guard let orderRequestData = orderRequestResponse.data(using: .utf8) else {
+                throw PlatformError(errorDescription: "Failure parsing order request response.")
+            }
             let partialPaymentOrder = try jsonDecoder.decode(PartialPaymentOrder.self, from: orderRequestData)
             requestOrderHandler(.success(partialPaymentOrder))
         } catch {
@@ -207,16 +245,39 @@ class DropInPlatformApi: DropInPlatformInterface {
     func onOrderCancelResult(orderCancelResult: OrderCancelResultDTO) throws {}
 
     func cleanUpDropIn() {
+        dropInWindowManager.cleanUp()
+        clearPresentationReferences()
         sessionHolder.reset()
+    }
+
+}
+
+private extension DropInPlatformApi {
+    func sendPresentationError(reason: String) {
+        let checkoutEvent = CheckoutEvent(
+            type: CheckoutEventType.result,
+            data: PaymentResultDTO(type: PaymentResultEnum.error, reason: reason)
+        )
+        sendTerminalEvent(checkoutEvent)
+    }
+
+    func sendTerminalEvent(_ checkoutEvent: CheckoutEvent) {
+        guard !didSendTerminalResult else { return }
+        didSendTerminalResult = true
+        checkoutFlutter.send(event: checkoutEvent, completion: { _ in })
+    }
+
+    func clearPresentationReferences() {
+        if let sessionDelegate = sessionHolder.sessionDelegate as? DropInSessionsDelegate {
+            sessionDelegate.invalidate()
+        }
         dropInSessionStoredPaymentMethodsDelegate = nil
-        dropInAdvancedFlowDelegate?.dropInInteractorDelegate = nil
+        dropInAdvancedFlowDelegate?.invalidate()
         dropInAdvancedFlowDelegate = nil
         dropInAdvancedFlowStoredPaymentMethodsDelegate = nil
         checkBalanceHandler = nil
         requestOrderHandler = nil
         dropInViewController = nil
-        hostViewController = nil
-        DropInWindowManager.shared.hide()
     }
 
     private func handlePaymentEvent(paymentEventDTO: PaymentEventDTO) {
@@ -243,10 +304,7 @@ class DropInPlatformApi: DropInPlatformInterface {
                 )
             )
             let checkoutEvent = CheckoutEvent(type: CheckoutEventType.result, data: paymentResult)
-            self?.checkoutFlutter.send(
-                event: checkoutEvent,
-                completion: { _ in }
-            )
+            self?.sendTerminalEvent(checkoutEvent)
         })
     }
 
@@ -258,11 +316,9 @@ class DropInPlatformApi: DropInPlatformInterface {
         } catch {
             let paymentResult = PaymentResultDTO(type: PaymentResultEnum.error, reason: error.localizedDescription)
             let checkoutEvent = CheckoutEvent(type: CheckoutEventType.result, data: paymentResult)
-            checkoutFlutter.send(
-                event: checkoutEvent,
-                completion: { _ in }
-            )
-            finalizeAndDismiss(success: false) {}
+            finalizeAndDismiss(success: false) { [weak self] in
+                self?.sendTerminalEvent(checkoutEvent)
+            }
         }
     }
 
@@ -273,10 +329,7 @@ class DropInPlatformApi: DropInPlatformInterface {
             finalizeAndDismiss(success: false) { [weak self] in
                 let paymentResult = PaymentResultDTO(type: PaymentResultEnum.error, reason: paymentEventDTO.error?.errorMessage)
                 let checkoutEvent = CheckoutEvent(type: CheckoutEventType.result, data: paymentResult)
-                self?.checkoutFlutter.send(
-                    event: checkoutEvent,
-                    completion: { _ in }
-                )
+                self?.sendTerminalEvent(checkoutEvent)
             }
         } else {
             dropInViewController?.dropInComponent.finalizeIfNeeded(with: false, completion: {})
@@ -291,7 +344,7 @@ class DropInPlatformApi: DropInPlatformInterface {
                 title: localizedString(.dismissButton, localizationParameters),
                 style: .cancel
             ))
-            hostViewController?.adyen.topPresenter.present(alertController, animated: true)
+            dropInViewController?.adyen.topPresenter.present(alertController, animated: true)
         }
     }
     
@@ -340,10 +393,7 @@ class DropInPlatformApi: DropInPlatformInterface {
                 reason: error.localizedDescription
             )
         )
-        checkoutFlutter.send(
-            event: checkoutEvent,
-            completion: { _ in }
-        )
+        sendTerminalEvent(checkoutEvent)
     }
 
     private func overridePaymentMethodNames(paymentMethods: PaymentMethods, paymentMethodNames: [String?: String?]) -> PaymentMethods {
@@ -365,11 +415,17 @@ class DropInPlatformApi: DropInPlatformInterface {
 
 extension DropInPlatformApi: DropInInteractorDelegate {
     func finalizeAndDismiss(success: Bool, completion: @escaping (() -> Void)) {
-        dropInViewController?.dropInComponent.finalizeIfNeeded(with: success) { [weak self] in
-            self?.hostViewController?.dismiss(animated: true, completion: {
-                DropInWindowManager.shared.hide()
+        guard let dropInViewController else {
+            dropInWindowManager.dismiss(animated: true, completion: completion)
+            return
+        }
+
+        dropInViewController.dropInComponent.finalizeIfNeeded(with: success) { [weak self] in
+            guard let self else {
                 completion()
-            })
+                return
+            }
+            dropInWindowManager.dismiss(animated: true, completion: completion)
         }
     }
 }

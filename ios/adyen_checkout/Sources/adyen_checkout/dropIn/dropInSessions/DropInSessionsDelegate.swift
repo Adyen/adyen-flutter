@@ -8,8 +8,12 @@
 import UIKit
 
 class DropInSessionsDelegate: AdyenSessionDelegate {
-    var viewController: UIViewController?
+    weak var viewController: UIViewController?
+    var dismissHandler: ((@escaping () -> Void) -> Void)?
+    var terminalEventHandler: ((CheckoutEvent) -> Void)?
     private let checkoutFlutter: CheckoutFlutterInterface
+    private var didSendTerminalResult = false
+    private var isActive = true
 
     init(viewController: UIViewController?, checkoutFlutter: CheckoutFlutterInterface) {
         self.viewController = viewController
@@ -17,7 +21,9 @@ class DropInSessionsDelegate: AdyenSessionDelegate {
     }
 
     func didComplete(with result: AdyenSessionResult, component _: Adyen.Component, session: AdyenSession) {
-        viewController?.dismiss(animated: true, completion: { [weak self] in
+        guard isActive, !didSendTerminalResult else { return }
+        didSendTerminalResult = true
+        dismissDropIn { [weak self] in
             let paymentResult = PaymentResultModelDTO(
                 sessionId: session.sessionContext.identifier,
                 sessionData: session.sessionContext.data,
@@ -31,16 +37,14 @@ class DropInSessionsDelegate: AdyenSessionDelegate {
                     result: paymentResult
                 )
             )
-            self?.checkoutFlutter.send(
-                event: checkoutEvent,
-                completion: { _ in }
-            )
-            DropInWindowManager.shared.hide()
-        })
+            self?.sendTerminalEvent(checkoutEvent)
+        }
     }
 
     func didFail(with error: Error, from _: Component, session _: AdyenSession) {
-        viewController?.dismiss(animated: true, completion: { [weak self] in
+        guard isActive, !didSendTerminalResult else { return }
+        didSendTerminalResult = true
+        dismissDropIn { [weak self] in
             switch error {
             case ComponentError.cancelled:
                 let checkoutEvent = CheckoutEvent(
@@ -50,10 +54,7 @@ class DropInSessionsDelegate: AdyenSessionDelegate {
                         reason: error.localizedDescription
                     )
                 )
-                self?.checkoutFlutter.send(
-                    event: checkoutEvent,
-                    completion: { _ in }
-                )
+                self?.sendTerminalEvent(checkoutEvent)
             default:
                 let checkoutEvent = CheckoutEvent(
                     type: CheckoutEventType.result,
@@ -62,16 +63,44 @@ class DropInSessionsDelegate: AdyenSessionDelegate {
                         reason: error.localizedDescription
                     )
                 )
-                self?.checkoutFlutter.send(
-                    event: checkoutEvent,
-                    completion: { _ in }
-                )
+                self?.sendTerminalEvent(checkoutEvent)
             }
-            DropInWindowManager.shared.hide()
-        })
+        }
     }
 
     func didOpenExternalApplication(component _: ActionComponent, session _: AdyenSession) {
         print("external")
+    }
+
+    func invalidate() {
+        isActive = false
+        viewController = nil
+        dismissHandler = nil
+        terminalEventHandler = nil
+    }
+
+    private func sendTerminalEvent(_ checkoutEvent: CheckoutEvent) {
+        guard isActive else { return }
+        if let terminalEventHandler {
+            terminalEventHandler(checkoutEvent)
+        } else {
+            checkoutFlutter.send(event: checkoutEvent, completion: { _ in })
+        }
+    }
+
+    private func dismissDropIn(completion: @escaping () -> Void) {
+        if let dismissHandler {
+            dismissHandler(completion)
+            return
+        }
+        guard let viewController else {
+            completion()
+            return
+        }
+        if let dropInViewController = viewController as? DropInViewController {
+            dropInViewController.dismissDropIn(animated: true, completion: completion)
+        } else {
+            viewController.dismiss(animated: true, completion: completion)
+        }
     }
 }

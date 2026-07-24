@@ -25,8 +25,20 @@ class DropIn {
   final SdkVersionNumberProvider sdkVersionNumberProvider;
   final DropInFlutter dropInFlutter;
   final DropInPlatformApi dropInPlatformApi;
+  bool _isDropInActive = false;
 
   Future<PaymentResult> startDropInSessionsPayment(
+    DropInConfiguration dropInConfiguration,
+    SessionCheckout sessionCheckout,
+  ) =>
+      _runExclusive(
+        () => _startDropInSessionsPayment(
+          dropInConfiguration,
+          sessionCheckout,
+        ),
+      );
+
+  Future<PaymentResult> _startDropInSessionsPayment(
     DropInConfiguration dropInConfiguration,
     SessionCheckout sessionCheckout,
   ) async {
@@ -34,10 +46,6 @@ class DropIn {
     final dropInSessionCompleter = Completer<PaymentResultDTO>();
     final sdkVersionNumber =
         await sdkVersionNumberProvider.getSdkVersionNumber();
-
-    dropInPlatformApi.showDropInSession(
-      dropInConfiguration.toDTO(sdkVersionNumber, true),
-    );
 
     dropInFlutter.platformEventStream = StreamController<CheckoutEvent>();
     final platformEventSubscription =
@@ -67,6 +75,16 @@ class DropIn {
       }
     });
 
+    try {
+      await dropInPlatformApi.showDropInSession(
+        dropInConfiguration.toDTO(sdkVersionNumber, true),
+      );
+    } catch (_) {
+      await platformEventSubscription?.cancel();
+      await _cleanUpDropIn();
+      rethrow;
+    }
+
     return dropInSessionCompleter.future.then((paymentResultDTO) async {
       await platformEventSubscription?.cancel();
       await _cleanUpDropIn();
@@ -94,6 +112,19 @@ class DropIn {
     DropInConfiguration dropInConfiguration,
     Map<String, dynamic> paymentMethodsResponse,
     AdvancedCheckout advancedCheckout,
+  ) =>
+      _runExclusive(
+        () => _startDropInAdvancedFlowPayment(
+          dropInConfiguration,
+          paymentMethodsResponse,
+          advancedCheckout,
+        ),
+      );
+
+  Future<PaymentResult> _startDropInAdvancedFlowPayment(
+    DropInConfiguration dropInConfiguration,
+    Map<String, dynamic> paymentMethodsResponse,
+    AdvancedCheckout advancedCheckout,
   ) async {
     adyenLogger.print("Start Drop-in advanced flow");
     final dropInAdvancedFlowCompleter = Completer<PaymentResultDTO>();
@@ -104,14 +135,6 @@ class DropIn {
       toEncodable: (value) => throw Exception("Could not encode $value"),
     );
     final isPartialPaymentSupported = advancedCheckout.partialPayment != null;
-
-    dropInPlatformApi.showDropInAdvanced(
-      dropInConfiguration.toDTO(
-        sdkVersionNumber,
-        isPartialPaymentSupported,
-      ),
-      encodedPaymentMethodsResponse,
-    );
 
     dropInFlutter.platformEventStream = StreamController<CheckoutEvent>();
     final platformEventSubscription =
@@ -165,6 +188,20 @@ class DropIn {
       }
     });
 
+    try {
+      await dropInPlatformApi.showDropInAdvanced(
+        dropInConfiguration.toDTO(
+          sdkVersionNumber,
+          isPartialPaymentSupported,
+        ),
+        encodedPaymentMethodsResponse,
+      );
+    } catch (_) {
+      await platformEventSubscription?.cancel();
+      await _cleanUpDropIn();
+      rethrow;
+    }
+
     return dropInAdvancedFlowCompleter.future.then((paymentResultDTO) async {
       await platformEventSubscription?.cancel();
       await _cleanUpDropIn();
@@ -185,8 +222,23 @@ class DropIn {
 
   Future<void> stopDropIn() async => await dropInPlatformApi.stopDropIn();
 
+  Future<PaymentResult> _runExclusive(
+    Future<PaymentResult> Function() startPayment,
+  ) async {
+    if (_isDropInActive) {
+      return PaymentError(reason: "Drop-in is already active.");
+    }
+
+    _isDropInActive = true;
+    try {
+      return await startPayment();
+    } finally {
+      _isDropInActive = false;
+    }
+  }
+
   Future<void> _cleanUpDropIn() async {
-    dropInPlatformApi.cleanUpDropIn();
+    await dropInPlatformApi.cleanUpDropIn();
     await dropInFlutter.platformEventStream?.close();
     dropInFlutter.platformEventStream = null;
   }
@@ -195,6 +247,10 @@ class DropIn {
     CheckoutEvent event,
     Completer<PaymentResultDTO> completer,
   ) {
+    if (completer.isCompleted) {
+      return;
+    }
+
     switch (event.data) {
       case PaymentResultDTO paymentResultDTO:
         completer.complete(paymentResultDTO);

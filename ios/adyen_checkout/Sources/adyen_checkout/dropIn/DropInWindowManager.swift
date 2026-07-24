@@ -1,52 +1,155 @@
 @_spi(AdyenInternal) import Adyen
 import UIKit
 
-class DropInWindowManager {
-    static let shared = DropInWindowManager()
+final class DropInWindowManager {
+    enum State: Equatable {
+        case idle
+        case presented
+        case dismissing
+    }
 
+    private let hostWindowProvider: () -> UIWindow?
+    private let windowFactory: (UIWindowScene) -> UIWindow
+    private let notificationCenter: NotificationCenter
+    private weak var previousKeyWindow: UIWindow?
+    private weak var previousRootView: UIView?
+    private var previousAccessibilityElementsHidden = false
     private var dropInWindow: UIWindow?
-    private(set) var rootViewController: UIViewController?
+    private var sceneDisconnectObserver: NSObjectProtocol?
+    private var dismissalCompletions: [() -> Void] = []
+    var onSceneDisconnect: (() -> Void)?
+    private(set) var state = State.idle
 
-    private init() {}
+    init(
+        hostWindowProvider: @escaping () -> UIWindow? = { UIApplication.shared.adyen.mainKeyWindow },
+        windowFactory: @escaping (UIWindowScene) -> UIWindow = UIWindow.init(windowScene:),
+        notificationCenter: NotificationCenter = .default
+    ) {
+        self.hostWindowProvider = hostWindowProvider
+        self.windowFactory = windowFactory
+        self.notificationCenter = notificationCenter
+    }
 
-    func prepareWindow() -> UIViewController? {
-        guard dropInWindow == nil else {
-            return rootViewController
+    deinit {
+        if let sceneDisconnectObserver {
+            notificationCenter.removeObserver(sceneDisconnectObserver)
+        }
+    }
+
+    func ensureCanPresent() throws {
+        dispatchPrecondition(condition: .onQueue(.main))
+        guard state == .idle else {
+            throw PlatformError(errorDescription: "Drop-in is already presented.")
+        }
+    }
+
+    func present(rootViewController: UIViewController) throws {
+        dispatchPrecondition(condition: .onQueue(.main))
+        try ensureCanPresent()
+
+        guard let hostWindow = hostWindowProvider(), let windowScene = hostWindow.windowScene else {
+            throw PlatformError(errorDescription: "Host window scene is not available.")
         }
 
-        guard let windowScene = UIApplication.shared.adyen.mainKeyWindow?.windowScene else {
-            return nil
-        }
+        previousKeyWindow = hostWindow
+        previousRootView = hostWindow.rootViewController?.view
+        previousAccessibilityElementsHidden = previousRootView?.accessibilityElementsHidden ?? false
+        previousRootView?.accessibilityElementsHidden = true
 
-        let window = UIWindow(windowScene: windowScene)
-        window.windowLevel = .statusBar
-        let rootViewController = UIViewController()
+        let window = windowFactory(windowScene)
+        window.windowLevel = .normal
+        window.backgroundColor = .clear
+        window.isOpaque = false
         rootViewController.view.backgroundColor = .clear
         window.rootViewController = rootViewController
-        window.isHidden = true
+        window.accessibilityViewIsModal = true
+        rootViewController.view.accessibilityViewIsModal = true
+        dropInWindow = window
+        observeDisconnect(of: windowScene)
 
-        self.dropInWindow = window
-        self.rootViewController = rootViewController
-
-        return rootViewController
-    }
-
-    func show() {
-        guard let window = dropInWindow else { return }
-        window.isHidden = false
         window.makeKeyAndVisible()
+        state = .presented
     }
 
-    func hide(completion: (() -> Void)? = nil) {
-        guard let window = dropInWindow else {
-            completion?()
-            return
+    func dismiss(animated: Bool, completion: @escaping () -> Void = {}) {
+        dispatchPrecondition(condition: .onQueue(.main))
+        switch state {
+        case .idle:
+            completion()
+        case .dismissing:
+            dismissalCompletions.append(completion)
+        case .presented:
+            dismissalCompletions.append(completion)
+            guard let rootViewController = dropInWindow?.rootViewController else {
+                restorePreviousWindow()
+                return
+            }
+
+            state = .dismissing
+            if rootViewController.presentedViewController != nil {
+                let restore = { self.restorePreviousWindow() }
+                if let dropInViewController = rootViewController as? DropInViewController {
+                    dropInViewController.dismissDropIn(animated: animated, completion: restore)
+                } else {
+                    rootViewController.dismiss(animated: animated, completion: restore)
+                }
+            } else {
+                restorePreviousWindow()
+            }
+        }
+    }
+
+    func cleanUp() {
+        dispatchPrecondition(condition: .onQueue(.main))
+        dismiss(animated: false)
+    }
+
+    private func observeDisconnect(of windowScene: UIWindowScene) {
+        sceneDisconnectObserver = notificationCenter.addObserver(
+            forName: UIScene.didDisconnectNotification,
+            object: windowScene,
+            queue: .main
+        ) { [weak self] _ in
+            guard let self else { return }
+            let shouldNotify = state == .presented
+            restorePreviousWindow(shouldMakeKey: false)
+            if shouldNotify {
+                onSceneDisconnect?()
+            }
+        }
+    }
+
+    private func restorePreviousWindow(shouldMakeKey: Bool = true) {
+        dispatchPrecondition(condition: .onQueue(.main))
+        guard state != .idle else { return }
+        if let sceneDisconnectObserver {
+            notificationCenter.removeObserver(sceneDisconnectObserver)
+            self.sceneDisconnectObserver = nil
         }
 
-        window.isHidden = true
-        self.dropInWindow = nil
-        self.rootViewController = nil
-        UIApplication.shared.adyen.mainKeyWindow?.makeKeyAndVisible()
-        completion?()
+        let dismissedWindowScene = dropInWindow?.windowScene
+        dropInWindow?.isHidden = true
+        dropInWindow?.rootViewController = nil
+        dropInWindow = nil
+        previousRootView?.accessibilityElementsHidden = previousAccessibilityElementsHidden
+
+        if shouldMakeKey,
+           let previousKeyWindow,
+           previousKeyWindow.windowScene === dismissedWindowScene,
+           !previousKeyWindow.isHidden {
+            previousKeyWindow.makeKey()
+            UIAccessibility.post(
+                notification: .screenChanged,
+                argument: previousKeyWindow.rootViewController?.view
+            )
+        }
+
+        previousKeyWindow = nil
+        previousRootView = nil
+        previousAccessibilityElementsHidden = false
+        state = .idle
+        let completions = dismissalCompletions
+        dismissalCompletions.removeAll()
+        completions.forEach { $0() }
     }
 }

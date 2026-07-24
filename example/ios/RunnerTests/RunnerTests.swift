@@ -41,4 +41,120 @@ class RunnerTests: XCTestCase {
             XCTAssert(false, "Failed")
         }
     }
+
+    @MainActor
+    func testDropInWindowManagerRestoresHostWindowState() throws {
+        let hostWindow = try XCTUnwrap(activeWindow())
+        let hostView = try XCTUnwrap(hostWindow.rootViewController?.view)
+        let initialAccessibilityElementsHidden = hostView.accessibilityElementsHidden
+        var dropInWindow: UIWindow?
+        let manager = DropInWindowManager(
+            hostWindowProvider: { hostWindow },
+            windowFactory: {
+                let window = UIWindow(windowScene: $0)
+                dropInWindow = window
+                return window
+            }
+        )
+        let rootViewController = UIViewController()
+
+        try manager.present(rootViewController: rootViewController)
+
+        XCTAssertEqual(manager.state, .presented)
+        XCTAssertEqual(dropInWindow?.windowLevel, .normal)
+        XCTAssertTrue(dropInWindow?.isKeyWindow == true)
+        XCTAssertTrue(dropInWindow?.accessibilityViewIsModal == true)
+        XCTAssertTrue(rootViewController.view.accessibilityViewIsModal)
+        XCTAssertTrue(hostView.accessibilityElementsHidden)
+
+        manager.cleanUp()
+
+        XCTAssertEqual(manager.state, .idle)
+        XCTAssertEqual(hostView.accessibilityElementsHidden, initialAccessibilityElementsHidden)
+        XCTAssertTrue(hostWindow.isKeyWindow)
+        XCTAssertTrue(dropInWindow?.isHidden == true)
+    }
+
+    @MainActor
+    func testDropInWindowManagerRejectsOverlappingPresentations() throws {
+        let hostWindow = try XCTUnwrap(activeWindow())
+        let manager = DropInWindowManager(hostWindowProvider: { hostWindow })
+        try manager.present(rootViewController: UIViewController())
+        defer { manager.cleanUp() }
+
+        XCTAssertThrowsError(try manager.ensureCanPresent())
+        XCTAssertEqual(manager.state, .presented)
+    }
+
+    @MainActor
+    func testDropInWindowManagerPreservesHiddenAccessibilityState() throws {
+        let hostWindow = try XCTUnwrap(activeWindow())
+        let hostView = try XCTUnwrap(hostWindow.rootViewController?.view)
+        let initialAccessibilityElementsHidden = hostView.accessibilityElementsHidden
+        hostView.accessibilityElementsHidden = true
+        defer { hostView.accessibilityElementsHidden = initialAccessibilityElementsHidden }
+        let manager = DropInWindowManager(hostWindowProvider: { hostWindow })
+
+        try manager.present(rootViewController: UIViewController())
+        manager.cleanUp()
+
+        XCTAssertTrue(hostView.accessibilityElementsHidden)
+    }
+
+    @MainActor
+    func testDropInWindowManagerFailsWithoutWindowScene() {
+        let manager = DropInWindowManager(hostWindowProvider: { UIWindow(frame: .zero) })
+
+        XCTAssertThrowsError(try manager.present(rootViewController: UIViewController()))
+        XCTAssertEqual(manager.state, .idle)
+    }
+
+    @MainActor
+    func testDropInWindowManagerCoalescesDismissals() async throws {
+        let hostWindow = try XCTUnwrap(activeWindow())
+        let manager = DropInWindowManager(hostWindowProvider: { hostWindow })
+        let rootViewController = UIViewController()
+        try manager.present(rootViewController: rootViewController)
+        let presented = expectation(description: "Child presented")
+        rootViewController.present(UIViewController(), animated: false) {
+            presented.fulfill()
+        }
+        await fulfillment(of: [presented], timeout: 1)
+        let firstDismissal = expectation(description: "First dismissal completed")
+        let secondDismissal = expectation(description: "Second dismissal completed")
+
+        manager.dismiss(animated: true) { firstDismissal.fulfill() }
+        manager.dismiss(animated: true) { secondDismissal.fulfill() }
+        await fulfillment(of: [firstDismissal, secondDismissal], timeout: 1)
+
+        XCTAssertEqual(manager.state, .idle)
+        XCTAssertTrue(hostWindow.isKeyWindow)
+    }
+
+    @MainActor
+    func testDropInWindowManagerCleansUpWhenSceneDisconnects() async throws {
+        let hostWindow = try XCTUnwrap(activeWindow())
+        let windowScene = try XCTUnwrap(hostWindow.windowScene)
+        let notificationCenter = NotificationCenter()
+        let manager = DropInWindowManager(
+            hostWindowProvider: { hostWindow },
+            notificationCenter: notificationCenter
+        )
+        let disconnected = expectation(description: "Scene disconnect handled")
+        manager.onSceneDisconnect = { disconnected.fulfill() }
+        try manager.present(rootViewController: UIViewController())
+
+        notificationCenter.post(name: UIScene.didDisconnectNotification, object: windowScene)
+        await fulfillment(of: [disconnected], timeout: 1)
+
+        XCTAssertEqual(manager.state, .idle)
+    }
+
+    @MainActor
+    private func activeWindow() -> UIWindow? {
+        let windows = UIApplication.shared.connectedScenes
+            .compactMap { $0 as? UIWindowScene }
+            .flatMap(\.windows)
+        return windows.first(where: \.isKeyWindow) ?? windows.first { !$0.isHidden }
+    }
 }
