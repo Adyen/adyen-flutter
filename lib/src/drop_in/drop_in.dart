@@ -2,8 +2,8 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:adyen_checkout/adyen_checkout.dart';
-import 'package:adyen_checkout/src/drop_in/drop_in_activity.dart';
 import 'package:adyen_checkout/src/drop_in/drop_in_flutter.dart';
+import 'package:adyen_checkout/src/drop_in/accessibility/drop_in_focus_state.dart';
 import 'package:adyen_checkout/src/drop_in/drop_in_platform_api.dart';
 import 'package:adyen_checkout/src/generated/platform_api.g.dart';
 import 'package:adyen_checkout/src/logging/adyen_logger.dart';
@@ -190,12 +190,12 @@ class DropIn {
   Future<void> stopDropIn() async => await dropInPlatformApi.stopDropIn();
 
   Future<void> _activateFocusScope() async {
-    DropInActivity.active.value = true;
+    DropInFocusState.activate();
     await WidgetsBinding.instance.endOfFrame;
   }
 
   Future<void> _cleanUpDropIn() async {
-    DropInActivity.active.value = false;
+    DropInFocusState.deactivate();
     dropInPlatformApi.cleanUpDropIn();
     await dropInFlutter.platformEventStream?.close();
     dropInFlutter.platformEventStream = null;

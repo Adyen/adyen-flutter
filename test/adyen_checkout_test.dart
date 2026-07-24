@@ -1,6 +1,6 @@
 import 'package:adyen_checkout/src/adyen_checkout.dart';
-import 'package:adyen_checkout/src/drop_in/adyen_drop_in_focus_scope.dart';
-import 'package:adyen_checkout/src/drop_in/drop_in_activity.dart';
+import 'package:adyen_checkout/src/drop_in/accessibility/adyen_drop_in_focus_scope.dart';
+import 'package:adyen_checkout/src/drop_in/accessibility/drop_in_focus_state.dart';
 import 'package:adyen_checkout/src/generated/platform_api.g.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
@@ -90,9 +90,9 @@ void main() {
   testWidgets('blocks Flutter focus while Drop-in is active on iOS',
       (tester) async {
     debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
-    DropInActivity.active.value = true;
+    DropInFocusState.activate();
     final focusNode = FocusNode();
-    addTearDown(() => DropInActivity.active.value = false);
+    addTearDown(() => DropInFocusState.deactivate());
     addTearDown(focusNode.dispose);
     await tester.pumpWidget(
       AdyenDropInFocusScope(
@@ -109,9 +109,9 @@ void main() {
 
   testWidgets('keeps Flutter focus unchanged on Android', (tester) async {
     debugDefaultTargetPlatformOverride = TargetPlatform.android;
-    DropInActivity.active.value = true;
+    DropInFocusState.activate();
     final focusNode = FocusNode();
-    addTearDown(() => DropInActivity.active.value = false);
+    addTearDown(() => DropInFocusState.deactivate());
     addTearDown(focusNode.dispose);
     await tester.pumpWidget(
       AdyenDropInFocusScope(
