@@ -408,6 +408,34 @@ class ConfigurationMapperTest {
         }
 
         @Test
+        fun `when card configuration has blank country code, then map to null default country code`() {
+            val cardConfigurationDTO = CardConfigurationDTO(
+                holderNameRequired = true,
+                addressMode = AddressMode.FULL,
+                showStorePaymentField = true,
+                showCvcForStoredCard = true,
+                showCvc = true,
+                kcpFieldVisibility = FieldVisibility.HIDE,
+                socialSecurityNumberFieldVisibility = FieldVisibility.HIDE,
+                supportedCardTypes = emptyList()
+            )
+            val cardComponentConfigurationDTO = CardComponentConfigurationDTO(
+                environment = Environment.TEST,
+                clientKey = TEST_CLIENT_KEY,
+                countryCode = " ",
+                amount = AmountDTO("USD", 1824),
+                analyticsOptionsDTO = AnalyticsOptionsDTO(false, "0.0.1"),
+                cardConfiguration = cardConfigurationDTO,
+            )
+
+            val checkoutConfiguration = cardComponentConfigurationDTO.toCheckoutConfiguration()
+            val cardConfiguration = checkoutConfiguration.getConfiguration<CardConfiguration>(PaymentMethodTypes.SCHEME)
+            val addressConfiguration = assertIs<AddressConfiguration.FullAddress>(cardConfiguration?.addressConfiguration)
+
+            assertNull(addressConfiguration.defaultCountryCode)
+        }
+
+        @Test
         fun `when card configuration has address mode POSTAL_CODE, then map to PostalCode`() {
             val cardConfigurationDTO = CardConfigurationDTO(
                 holderNameRequired = false,
