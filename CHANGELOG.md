@@ -1,5 +1,10 @@
 ## 1.12.0 (in development)
 
+### Fixed
+
+- For Card Component on Android: the configured `countryCode` is now applied as the
+  default country for full-address forms.
+
 ### Changed
 
 - Minimum iOS version increased from 12.0 to 13.0. This aligns with Flutter's own minimum iOS
