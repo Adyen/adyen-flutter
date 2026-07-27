@@ -85,6 +85,7 @@ class _BaseGooglePayComponentState extends State<BaseGooglePayComponent> {
   late StreamSubscription<ComponentCommunicationModel>
       _componentCommunicationStream;
   late Completer<InstantPaymentSetupResultDTO> _availabilityCompleter;
+  late final Future<InstantPaymentSetupResultDTO> _googlePayAvailableFuture;
 
   @override
   void initState() {
@@ -101,12 +102,13 @@ class _BaseGooglePayComponentState extends State<BaseGooglePayComponent> {
         widget.handleComponentCommunication(communicationModel);
       }
     });
+    _googlePayAvailableFuture = _isGooglePayAvailable();
   }
 
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-      future: _isGooglePayAvailable(),
+      future: _googlePayAvailableFuture,
       builder: (
         BuildContext context,
         AsyncSnapshot<InstantPaymentSetupResultDTO> snapshot,
