@@ -21,16 +21,19 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
     private let checkoutFlutter: CheckoutFlutterInterface
     private let componentFlutterApi: ComponentFlutterInterface
     private let sessionHolder: SessionHolder
+    private let dropInWindowManager: DropInWindowManager
     private let adyenCse: AdyenCSE = .init()
 
     init(
         checkoutFlutter: CheckoutFlutterInterface,
         componentFlutterApi: ComponentFlutterInterface,
-        sessionHolder: SessionHolder
+        sessionHolder: SessionHolder,
+        dropInWindowManager: DropInWindowManager
     ) {
         self.checkoutFlutter = checkoutFlutter
         self.componentFlutterApi = componentFlutterApi
         self.sessionHolder = sessionHolder
+        self.dropInWindowManager = dropInWindowManager
     }
 
     func createSession(
@@ -127,7 +130,7 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
         sessionData: String,
         completion: @escaping (Result<SessionDTO, Error>) -> Void
     ) throws {
-        let sessionDelegate = DropInSessionsDelegate(viewController: getViewController(), checkoutFlutter: checkoutFlutter)
+        let sessionDelegate = DropInSessionsDelegate(dropInWindowManager: dropInWindowManager, checkoutFlutter: checkoutFlutter)
         try requestAndSetSession(
             adyenContext: adyenContext,
             sessionId: sessionId,

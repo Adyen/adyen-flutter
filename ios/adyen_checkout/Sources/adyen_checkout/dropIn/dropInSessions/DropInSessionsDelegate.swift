@@ -5,19 +5,18 @@
 #if canImport(AdyenNetworking)
     import AdyenNetworking
 #endif
-import UIKit
 
 class DropInSessionsDelegate: AdyenSessionDelegate {
-    weak var viewController: UIViewController?
+    private let dropInWindowManager: DropInWindowManager
     private let checkoutFlutter: CheckoutFlutterInterface
 
-    init(viewController: UIViewController?, checkoutFlutter: CheckoutFlutterInterface) {
-        self.viewController = viewController
+    init(dropInWindowManager: DropInWindowManager, checkoutFlutter: CheckoutFlutterInterface) {
+        self.dropInWindowManager = dropInWindowManager
         self.checkoutFlutter = checkoutFlutter
     }
 
     func didComplete(with result: AdyenSessionResult, component _: Adyen.Component, session: AdyenSession) {
-        viewController?.dismiss(animated: true, completion: { [weak self] in
+        dropInWindowManager.dismiss(animated: true, completion: { [weak self] in
             let paymentResult = PaymentResultModelDTO(
                 sessionId: session.sessionContext.identifier,
                 sessionData: session.sessionContext.data,
@@ -39,7 +38,7 @@ class DropInSessionsDelegate: AdyenSessionDelegate {
     }
 
     func didFail(with error: Error, from _: Component, session _: AdyenSession) {
-        viewController?.dismiss(animated: true, completion: { [weak self] in
+        dropInWindowManager.dismiss(animated: true, completion: { [weak self] in
             switch error {
             case ComponentError.cancelled:
                 let checkoutEvent = CheckoutEvent(

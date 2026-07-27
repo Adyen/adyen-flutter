@@ -75,9 +75,6 @@ class DropInPlatformApi: DropInPlatformInterface {
             if dropInConfigurationDTO.isRemoveStoredPaymentMethodEnabled {
                 dropInComponent.storedPaymentMethodsDelegate = dropInSessionStoredPaymentMethodsDelegate
             }
-            if let sessionDelegate = sessionHolder.sessionDelegate as? DropInSessionsDelegate {
-                sessionDelegate.viewController = dropInViewController
-            }
 
             self.dropInViewController = dropInViewController
             try dropInWindowManager.present(rootViewController: dropInViewController)
@@ -212,9 +209,6 @@ class DropInPlatformApi: DropInPlatformInterface {
 
 private extension DropInPlatformApi {
     func clearPresentationReferences() {
-        if let sessionDelegate = sessionHolder.sessionDelegate as? DropInSessionsDelegate {
-            sessionDelegate.viewController = nil
-        }
         dropInSessionStoredPaymentMethodsDelegate = nil
         dropInAdvancedFlowDelegate?.dropInInteractorDelegate = nil
         dropInAdvancedFlowDelegate = nil
