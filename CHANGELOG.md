@@ -1,5 +1,10 @@
 ## 1.12.0 (in development)
 
+### Improved
+
+- For Apple Pay and Google Pay Components: reduced unnecessary re-rendering on widget rebuilds by
+  caching the availability result.
+
 ### Changed
 
 - Minimum iOS version increased from 12.0 to 13.0. This aligns with Flutter's own minimum iOS
