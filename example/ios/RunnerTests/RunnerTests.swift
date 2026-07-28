@@ -28,7 +28,12 @@ class RunnerTests: XCTestCase {
             )
 
             let adyenContext = try dropInConfigurationDTO.createAdyenContext()
-            let dropInConfiguration = try dropInConfigurationDTO.createDropInConfiguration(payment: Payment(amount: Amount(value: 1600, currencyCode: "USD"), countryCode: "US"))
+            let dropInConfiguration = try dropInConfigurationDTO.createDropInConfiguration(
+                payment: Payment(
+                    amount: Amount(value: 1600, currencyCode: "USD"),
+                    countryCode: "US"
+                )
+            )
 
             XCTAssertEqual(adyenContext.apiContext.environment.baseURL, Adyen.Environment.test.baseURL)
             XCTAssertEqual(adyenContext.apiContext.clientKey, TEST_CLIENT_KEY)
@@ -56,7 +61,7 @@ class RunnerTests: XCTestCase {
                 return window
             }
         )
-        let rootViewController = UIViewController()
+        let rootViewController = MockDropInRootViewController()
 
         try manager.present(rootViewController: rootViewController)
 
@@ -79,7 +84,7 @@ class RunnerTests: XCTestCase {
     func testDropInWindowManagerRejectsOverlappingPresentations() throws {
         let hostWindow = try XCTUnwrap(activeWindow())
         let manager = DropInWindowManager(hostWindowProvider: { hostWindow })
-        try manager.present(rootViewController: UIViewController())
+        try manager.present(rootViewController: MockDropInRootViewController())
         defer { manager.cleanUp() }
 
         XCTAssertThrowsError(try manager.ensureCanPresent())
@@ -95,7 +100,7 @@ class RunnerTests: XCTestCase {
         defer { hostView.accessibilityElementsHidden = initialAccessibilityElementsHidden }
         let manager = DropInWindowManager(hostWindowProvider: { hostWindow })
 
-        try manager.present(rootViewController: UIViewController())
+        try manager.present(rootViewController: MockDropInRootViewController())
         manager.cleanUp()
 
         XCTAssertTrue(hostView.accessibilityElementsHidden)
@@ -105,7 +110,7 @@ class RunnerTests: XCTestCase {
     func testDropInWindowManagerFailsWithoutWindowScene() {
         let manager = DropInWindowManager(hostWindowProvider: { UIWindow(frame: .zero) })
 
-        XCTAssertThrowsError(try manager.present(rootViewController: UIViewController()))
+        XCTAssertThrowsError(try manager.present(rootViewController: MockDropInRootViewController()))
         XCTAssertEqual(manager.state, .idle)
     }
 
@@ -113,7 +118,7 @@ class RunnerTests: XCTestCase {
     func testDropInWindowManagerCoalescesDismissals() async throws {
         let hostWindow = try XCTUnwrap(activeWindow())
         let manager = DropInWindowManager(hostWindowProvider: { hostWindow })
-        let rootViewController = UIViewController()
+        let rootViewController = MockDropInRootViewController()
         try manager.present(rootViewController: rootViewController)
         let presented = expectation(description: "Child presented")
         rootViewController.present(UIViewController(), animated: false) {
@@ -140,7 +145,7 @@ class RunnerTests: XCTestCase {
             hostWindowProvider: { hostWindow },
             notificationCenter: notificationCenter
         )
-        try manager.present(rootViewController: UIViewController())
+        try manager.present(rootViewController: MockDropInRootViewController())
 
         notificationCenter.post(name: UIScene.didDisconnectNotification, object: windowScene)
 
@@ -153,5 +158,11 @@ class RunnerTests: XCTestCase {
             .compactMap { $0 as? UIWindowScene }
             .flatMap(\.windows)
         return windows.first(where: \.isKeyWindow) ?? windows.first { !$0.isHidden }
+    }
+}
+
+private class MockDropInRootViewController: UIViewController, DropInRootViewController {
+    func dismissDropIn(animated: Bool, completion: (() -> Void)?) {
+        dismiss(animated: animated, completion: completion)
     }
 }

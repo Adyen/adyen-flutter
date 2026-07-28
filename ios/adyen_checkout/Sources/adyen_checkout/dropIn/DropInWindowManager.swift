@@ -1,6 +1,10 @@
 @_spi(AdyenInternal) import Adyen
 import UIKit
 
+protocol DropInRootViewController: UIViewController {
+    func dismissDropIn(animated: Bool, completion: (() -> Void)?)
+}
+
 final class DropInWindowManager {
     enum State: Equatable {
         case idle
@@ -15,6 +19,7 @@ final class DropInWindowManager {
     private weak var previousRootView: UIView?
     private var previousAccessibilityElementsHidden = false
     private var dropInWindow: UIWindow?
+    private weak var dropInRootViewController: DropInRootViewController?
     private var sceneDisconnectObserver: NSObjectProtocol?
     private var dismissalCompletions: [() -> Void] = []
     private(set) var state = State.idle
@@ -30,6 +35,7 @@ final class DropInWindowManager {
     }
 
     deinit {
+        assert(state == .idle, "DropInWindowManager must be dismissed before deallocation.")
         if let sceneDisconnectObserver {
             notificationCenter.removeObserver(sceneDisconnectObserver)
         }
@@ -42,7 +48,7 @@ final class DropInWindowManager {
         }
     }
 
-    func present(rootViewController: UIViewController) throws {
+    func present(rootViewController: DropInRootViewController) throws {
         dispatchPrecondition(condition: .onQueue(.main))
         try ensureCanPresent()
 
@@ -53,48 +59,46 @@ final class DropInWindowManager {
         previousKeyWindow = hostWindow
         previousRootView = hostWindow.rootViewController?.view
         previousAccessibilityElementsHidden = previousRootView?.accessibilityElementsHidden ?? false
-        previousRootView?.accessibilityElementsHidden = true
 
         let window = windowFactory(windowScene)
         window.windowLevel = .normal
         window.backgroundColor = .clear
         window.isOpaque = false
         rootViewController.view.backgroundColor = .clear
+        dropInRootViewController = rootViewController
         window.rootViewController = rootViewController
         window.accessibilityViewIsModal = true
         rootViewController.view.accessibilityViewIsModal = true
         dropInWindow = window
         observeDisconnect(of: windowScene)
 
+        previousRootView?.accessibilityElementsHidden = true
         window.makeKeyAndVisible()
         state = .presented
     }
 
     func dismiss(animated: Bool, completion: @escaping () -> Void = {}) {
         dispatchPrecondition(condition: .onQueue(.main))
-        switch state {
-        case .idle:
-            completion()
-        case .dismissing:
-            dismissalCompletions.append(completion)
-        case .presented:
-            dismissalCompletions.append(completion)
-            guard let rootViewController = dropInWindow?.rootViewController else {
-                restorePreviousWindow()
-                return
-            }
 
-            state = .dismissing
-            if rootViewController.presentedViewController != nil {
-                let restore = { self.restorePreviousWindow() }
-                if let dropInViewController = rootViewController as? DropInViewController {
-                    dropInViewController.dismissDropIn(animated: animated, completion: restore)
-                } else {
-                    rootViewController.dismiss(animated: animated, completion: restore)
-                }
-            } else {
-                restorePreviousWindow()
-            }
+        guard state != .idle else {
+            completion()
+            return
+        }
+
+        dismissalCompletions.append(completion)
+
+        guard state == .presented else { return }
+        state = .dismissing
+
+        guard let rootViewController = dropInRootViewController ?? dropInWindow?.rootViewController as? DropInRootViewController else {
+            restorePreviousWindow()
+            return
+        }
+
+        if rootViewController.presentedViewController != nil {
+            rootViewController.dismissDropIn(animated: animated, completion: { self.restorePreviousWindow() })
+        } else {
+            restorePreviousWindow()
         }
     }
 
@@ -124,6 +128,7 @@ final class DropInWindowManager {
         let dismissedWindowScene = dropInWindow?.windowScene
         dropInWindow?.isHidden = true
         dropInWindow?.rootViewController = nil
+        dropInRootViewController = nil
         dropInWindow = nil
         previousRootView?.accessibilityElementsHidden = previousAccessibilityElementsHidden
 
