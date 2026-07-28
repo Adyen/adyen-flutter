@@ -2,6 +2,8 @@
 
 ### Improved
 
+- For Card Component on Android: the configured `countryCode` is now applied as the
+  default country for full-address forms.
 - For Apple Pay and Google Pay Components: reduced unnecessary re-rendering on widget rebuilds by
   caching the availability result.
 
