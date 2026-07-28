@@ -128,8 +128,8 @@ class RunnerTests: XCTestCase {
         let firstDismissal = expectation(description: "First dismissal completed")
         let secondDismissal = expectation(description: "Second dismissal completed")
 
-        manager.dismiss(animated: true) { firstDismissal.fulfill() }
-        manager.dismiss(animated: true) { secondDismissal.fulfill() }
+        manager.dismiss(animated: false) { firstDismissal.fulfill() }
+        manager.dismiss(animated: false) { secondDismissal.fulfill() }
         await fulfillment(of: [firstDismissal, secondDismissal], timeout: 1)
 
         XCTAssertEqual(manager.state, .idle)
