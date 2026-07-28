@@ -2,17 +2,21 @@ import 'dart:async';
 
 import 'package:adyen_checkout/adyen_checkout.dart';
 import 'package:adyen_checkout_example/config.dart';
+import 'package:adyen_checkout_example/extensions/card_configuration_extension.dart';
 import 'package:adyen_checkout_example/repositories/adyen_drop_in_repository.dart';
+import 'package:adyen_checkout_example/repositories/config_repository.dart';
 import 'package:adyen_checkout_example/utils/dialog_builder.dart';
 import 'package:flutter/material.dart';
 
 class DropInScreen extends StatelessWidget {
   const DropInScreen({
     required this.repository,
+    required this.configRepository,
     super.key,
   });
 
   final AdyenDropInRepository repository;
+  final ConfigRepository configRepository;
 
   @override
   Widget build(BuildContext context) {
@@ -25,10 +29,12 @@ class DropInScreen extends StatelessWidget {
             children: [
               TextButton(
                 onPressed: () => startDropInSessions(context),
-                child: const Text("Drop-in sessions"),
+                key: const Key('Drop-in sessions flow'),
+                child: const Text("Drop-in sessions flow"),
               ),
               TextButton(
                 onPressed: () => startDropInAdvancedFlow(context),
+                key: const Key('Drop-in advanced flow'),
                 child: const Text("Drop-in advanced flow"),
               ),
             ],
@@ -105,31 +111,7 @@ class DropInScreen extends StatelessWidget {
   }
 
   Future<DropInConfiguration> _createDropInConfiguration() async {
-    CardConfiguration cardsConfiguration = CardConfiguration(
-      onBinLookup: _onBinLookup,
-      onBinValue: _onBinValue,
-      // Note: installmentConfiguration is only used for Advanced flow.
-      // For Sessions flow, installments are automatically configured from the backend /sessions response.
-      installmentConfiguration: InstallmentConfiguration(
-        defaultOptions: DefaultInstallmentOptions(
-          values: [6, 12],
-          includesRevolving: true,
-        ),
-        cardBasedOptions: [
-          CardBasedInstallmentOptions(
-            cardBrand: 'visa',
-            values: [9, 12],
-            includesRevolving: true,
-          ),
-          CardBasedInstallmentOptions(
-            cardBrand: 'mc',
-            values: [2, 3, 6],
-            includesRevolving: false,
-          ),
-        ],
-        showInstallmentAmount: true,
-      ),
-    );
+    CardConfiguration cardsConfiguration = await _createCardConfiguration();
 
     ApplePayConfiguration applePayConfiguration = ApplePayConfiguration(
       merchantId: Config.merchantId,
@@ -143,17 +125,12 @@ class DropInScreen extends StatelessWidget {
       billingAddressRequired: true,
     );
 
-    //To support CashAppPay on iOS please add "pod 'Adyen/CashAppPay'" to your Podfile.
+    //To support CashAppPay please add "pod 'Adyen/CashAppPay'" to your Podfile.
     final String returnUrl = await repository.determineBaseReturnUrl();
     final CashAppPayConfiguration cashAppPayConfiguration =
         CashAppPayConfiguration(
       cashAppPayEnvironment: CashAppPayEnvironment.sandbox,
       returnUrl: returnUrl,
-    );
-
-    //To support TWINT on iOS please add "pod 'Adyen/AdyenTwint'" to your Podfile.
-    const TwintConfiguration twintConfiguration = TwintConfiguration(
-      iosCallbackAppScheme: "com.mydomain.adyencheckout",
     );
 
     final StoredPaymentMethodConfiguration storedPaymentMethodConfiguration =
@@ -173,14 +150,19 @@ class DropInScreen extends StatelessWidget {
       applePayConfiguration: applePayConfiguration,
       googlePayConfiguration: googlePayConfiguration,
       cashAppPayConfiguration: cashAppPayConfiguration,
-      twintConfiguration: twintConfiguration,
       storedPaymentMethodConfiguration: storedPaymentMethodConfiguration,
-      paymentMethodNames: {
-        "scheme": "Credit card",
-      },
     );
 
     return dropInConfiguration;
+  }
+
+  Future<CardConfiguration> _createCardConfiguration() async {
+    final CardConfiguration cardConfiguration =
+        await configRepository.loadCardConfiguration();
+    return cardConfiguration.copyWith(
+      onBinLookup: _onBinLookup,
+      onBinValue: _onBinValue,
+    );
   }
 
   void _onBinLookup(List<BinLookupData> binLookupDataList) {

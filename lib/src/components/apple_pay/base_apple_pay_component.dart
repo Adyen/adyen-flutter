@@ -1,6 +1,8 @@
 import 'dart:async';
 
 import 'package:adyen_checkout/src/common/model/payment_result.dart';
+import 'package:adyen_checkout/src/components/apple_pay/apple_pay_callback_handler.dart';
+import 'package:adyen_checkout/src/components/apple_pay/apple_pay_callback_registry.dart';
 import 'package:adyen_checkout/src/components/apple_pay/model/apple_pay_component_configuration.dart';
 import 'package:adyen_checkout/src/components/component_flutter_api.dart';
 import 'package:adyen_checkout/src/components/component_platform_api.dart';
@@ -82,21 +84,28 @@ class _BaseApplePayComponentState extends State<BaseApplePayComponent> {
   final ComponentFlutterApi _componentFlutterApi = ComponentFlutterApi.instance;
   late StreamSubscription<ComponentCommunicationModel>
       _componentCommunicationStream;
+  late final Future<InstantPaymentSetupResultDTO> _applePaySupportedFuture;
 
   @override
   void initState() {
     super.initState();
+    ApplePayCallbackRegistry.instance.register(
+      widget.componentId,
+      ApplePayCallbackHandler(
+          () => widget.applePayComponentConfiguration.applePayConfiguration),
+    );
     _componentCommunicationStream = _componentFlutterApi
         .componentCommunicationStream.stream
         .where((communicationModel) =>
             communicationModel.componentId == widget.componentId)
         .listen(widget.handleComponentCommunication);
+    _applePaySupportedFuture = _isApplePaySupported();
   }
 
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-      future: _isApplePaySupported(),
+      future: _applePaySupportedFuture,
       builder: (
         BuildContext context,
         AsyncSnapshot<InstantPaymentSetupResultDTO> snapshot,
@@ -119,6 +128,7 @@ class _BaseApplePayComponentState extends State<BaseApplePayComponent> {
 
   @override
   void dispose() {
+    ApplePayCallbackRegistry.instance.unregister(widget.componentId);
     widget.isButtonClickable.dispose();
     widget.isLoading.dispose();
     widget.componentPlatformApi.onDispose(widget.componentId);

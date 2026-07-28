@@ -183,6 +183,12 @@ extension AmountDTO {
 extension InstantPaymentConfigurationDTO {
     // TODO: v6 migration - ApplePayComponent.Configuration is now package-access.
     // Apple Pay needs to be created via Checkout.setup() + createPaymentComponent(for: .applePay).
+    func mapToApplePayConfiguration(payment: Payment?) throws -> ApplePayComponent.Configuration {
+        guard let applePayConfigurationDTO else {
+            throw PlatformError(errorDescription: "Apple pay configuration not provided.")
+        }
+        return try applePayConfigurationDTO.toApplePayConfiguration(payment: payment)
+    }
 
     func createAdyenContext() throws -> AdyenContext {
         try buildAdyenContext(

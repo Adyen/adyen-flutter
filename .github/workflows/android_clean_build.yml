@@ -34,7 +34,7 @@ jobs:
           sudo apt-get remove -y 'php.*'
           sudo docker image prune --all --force
 
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
 
       - name: Enable KVM
         run: |
@@ -43,7 +43,7 @@ jobs:
           sudo udevadm trigger --name-match=kvm
 
       - name: Set up JDK
-        uses: actions/setup-java@be666c2fcd27ec809703dec50e508c2fdc7f6654 # v5.2.0
+        uses: actions/setup-java@1bcf9fb12cf4aa7d266a90ae39939e61372fe520 # v5.4.0
         with:
           distribution: 'zulu'
           java-version: 17
@@ -61,8 +61,14 @@ jobs:
           cd demo_project
           
           change_sdk_versions() {
-            sed -i "s/flutter.compileSdkVersion/$COMPILE_SDK_VERSION/g" android/app/build.gradle
-            sed -i "s/flutter.minSdkVersion/21/g" android/app/build.gradle
+            if [ -f android/app/build.gradle ]; then
+              sed -i "s/flutter.compileSdkVersion/$COMPILE_SDK_VERSION/g" android/app/build.gradle
+              sed -i "s/flutter.minSdkVersion/23/g" android/app/build.gradle
+            fi
+            if [ -f android/app/build.gradle.kts ]; then
+              sed -i "s/flutter.compileSdkVersion/$COMPILE_SDK_VERSION/g" android/app/build.gradle.kts
+              sed -i "s/flutter.minSdkVersion/23/g" android/app/build.gradle.kts
+            fi
           }
           
           change_agp_version() {
@@ -83,9 +89,14 @@ jobs:
             sed -i "s/gradle-7.6.3-all/gradle-$GRADLE_VERSION-all/g" android/gradle/wrapper/gradle-wrapper.properties
             change_agp_version
             change_sdk_versions
+          fi
+
+          # Ensure the demo app meets the plugin's minimum Android SDK requirement for Flutter 3.27.x - 3.32.x
+          if [[ "$FLUTTER_VERSION" == "3.27.x" || "$FLUTTER_VERSION" == "3.29.x" || "$FLUTTER_VERSION" == "3.32.x" ]]; then
+            change_sdk_versions
           fi  
 
-          #Add missing Kotlin options for Flutter 3.22.x
+          # Add missing Kotlin options for Flutter 3.22.x
           if [ $FLUTTER_VERSION == '3.22.x' ]; then
             sed -i '/defaultConfig {/i \
               kotlinOptions {\
@@ -95,21 +106,21 @@ jobs:
           fi
                     
           # Suppress Kotlin 2.2.x strict JVM target consistency errors in dependencies (Flutter 3.44.x+)
-          # pay_android 3.1.x defaults to JVM 1.8 which conflicts with our JVM 11 target
+          # pay_android 3.2.x defaults to JVM 1.8 which conflicts with our JVM 11 target
           if [[ "$FLUTTER_VERSION" == "3.44.x" ]]; then
             echo "kotlin.jvm.target.validation.mode=warning" >> android/gradle.properties
           fi
-          
+
           dart pub add 'adyen_checkout:{"path":"../"}'
           flutter build apk --debug  
 
       - name: Gradle cache
-        uses: gradle/actions/setup-gradle@50e97c2cd7a37755bbfafc9c5b7cafaece252f6e # v6.1.0
+        uses: gradle/actions/setup-gradle@3f131e8634966bd73d06cc69884922b02e6faf92 # v6.2.0
         with:
           cache-read-only: false
 
       - name: AVD cache
-        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         id: avd-cache
         with:
           path: |
@@ -119,7 +130,7 @@ jobs:
 
       - name: Create AVD and generate snapshot for caching
         if: steps.avd-cache.outputs.cache-hit != 'true'
-        uses: reactivecircus/android-emulator-runner@e89f39f1abbbd05b1113a29cf4db69e7540cae5a # v2.37.0
+        uses: reactivecircus/android-emulator-runner@a421e43855164a8197daf9d8d40fe71c6996bb0d # v2.38.0
         with:
           api-level: ${{ matrix.api-level }}
           target: google_apis
@@ -131,7 +142,7 @@ jobs:
           script: echo "Generated AVD snapshot for caching."
 
       - name: Run connected installation test
-        uses: reactivecircus/android-emulator-runner@e89f39f1abbbd05b1113a29cf4db69e7540cae5a # v2.37.0
+        uses: reactivecircus/android-emulator-runner@a421e43855164a8197daf9d8d40fe71c6996bb0d # v2.38.0
         with:
           api-level: ${{ matrix.api-level }}
           target: google_apis

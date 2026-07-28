@@ -25,7 +25,7 @@ jobs:
           sudo rm -rf /opt/ghc
           sudo rm -rf "/usr/local/share/boost"
 
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
 
       - uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2.23.0
         with:
@@ -45,6 +45,11 @@ jobs:
           flutter create --template=app --platforms=android,ios demo_project
           cd demo_project
           dart pub add 'adyen_checkout:{"path":"../"}'
+
+      - name: Bump iOS deployment target to 13.0 for older Flutter versions
+        if: matrix.flutter-version == '3.32.x'
+        working-directory: demo_project
+        run: sed -i '' 's/IPHONEOS_DEPLOYMENT_TARGET = [0-9.]*/IPHONEOS_DEPLOYMENT_TARGET = 13.0/g' ios/Runner.xcodeproj/project.pbxproj
 
       - name: Build app for simulator
         working-directory: demo_project

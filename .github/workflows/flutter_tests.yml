@@ -17,7 +17,7 @@ jobs:
       pull-requests: write
 
     steps:
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
 
       - uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2.23.0
         with:
@@ -36,7 +36,7 @@ jobs:
           lcov --remove coverage/lcov.info 'lib/**/*.g.dart' -o ./coverage/coverage_with_exclusion.info 
 
       - name: Report code coverage
-        uses: zgosalvez/github-actions-report-lcov@7d72c57ce4bc101a4a0bf9d726b6c435abde8439 # v7.0.10
+        uses: zgosalvez/github-actions-report-lcov@0e97540271bfaece1ddff20e7fa8d9a6ab1abf67 # v7.1.0
         with:
           coverage-files: coverage/coverage_with_exclusion.info
           artifact-name: flutter-coverage-report

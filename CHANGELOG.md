@@ -1,12 +1,43 @@
-## Development
+## 1.12.0 (in development)
+
+### Improved
+
+- For Card Component on Android: the configured `countryCode` is now applied as the
+  default country for full-address forms.
+- For Apple Pay and Google Pay Components: reduced unnecessary re-rendering on widget rebuilds by
+  caching the availability result.
 
 ### Changed
 
+- Minimum iOS version increased from 12.0 to 13.0. This aligns with Flutter's own minimum iOS
+  requirement.
+- Minimum Android version increased from API 21 to API 23. This aligns with the Adyen Android SDK
+  and the latest `pay` package requirements.
+- Dependency versions:
+  | Name | Version |
+  |---------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------|
+  | [pay](https://pub.dev/packages/pay) | 3.2.1 -> **3.3.0** |
+
+  `pay_android` is now pulled in transitively by `pay` (endorsed implementation).
+
+## 1.11.0
+
+### New
+
+- Apple Pay Component on iOS now supports coupon code configuration, dynamic
+  sheet updates for shipping contact, shipping method and coupon code changes as well as
+  authorization validation.
+
+### Changed
+
+- For Google Pay: moved from the deprecated `onActivityResult` flow to the internal flow, so the
+  plugin no longer needs the `onActivityResult` listener on the host activity.
+- iOS example app: Now using a `UISceneDelegate` for returnUrl handling.
 - Dependency versions:
   | Name | Version |
   |---------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------|
   | [Android Drop-in/Components](https://docs.adyen.com/online-payments/release-notes/?title%5B0%5D=Android+Components%2FDrop-in&version%5B0%5D=5.19.0) | 5.18.0 -> **5.19.0** |
-  | [iOS Drop-in/Components](https://docs.adyen.com/online-payments/release-notes/?title%5B0%5D=iOS+Components%2FDrop-in&version%5B0%5D=5.25.0) | 5.24.0 -> **5.25.0** |
+  | [iOS Drop-in/Components](https://docs.adyen.com/online-payments/release-notes/?title%5B0%5D=iOS+Components%2FDrop-in&version%5B0%5D=5.25.1) | 5.25.0 -> **5.25.1** |
 
 ## 1.10.0
 

@@ -28,13 +28,6 @@ class CardAdvancedComponentScreen extends StatelessWidget {
         addressMode: AddressMode.full,
         onBinLookup: _onBinLookup,
         onBinValue: _onBinValue,
-        installmentConfiguration: InstallmentConfiguration(
-          defaultOptions: DefaultInstallmentOptions(
-            values: [2, 3, 6, 12],
-            includesRevolving: true,
-          ),
-          showInstallmentAmount: true,
-        ),
       ),
     );
 

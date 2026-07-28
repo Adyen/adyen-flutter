@@ -4,10 +4,8 @@ import Foundation
 // TODO: v6 migration - ApplePayComponent, PaymentComponentDelegate are now package-access.
 @MainActor
 class ApplePayAdvancedComponent: BaseApplePayComponent {
-    private let componentFlutterApi: ComponentFlutterInterface
     private let configuration: InstantPaymentConfigurationDTO
     private let paymentMethodResponse: String
-    private let componentId: String
 
     init(
         componentFlutterApi: ComponentFlutterInterface,
@@ -15,11 +13,13 @@ class ApplePayAdvancedComponent: BaseApplePayComponent {
         paymentMethodResponse: String,
         componentId: String
     ) throws {
-        self.componentFlutterApi = componentFlutterApi
         self.configuration = configuration
         self.paymentMethodResponse = paymentMethodResponse
-        self.componentId = componentId
-        super.init()
+        super.init(
+            componentFlutterApi: componentFlutterApi,
+            componentId: componentId
+        )
+        try buildApplePayAdvancedComponent()
     }
 
     override func present() {

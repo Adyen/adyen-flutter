@@ -1,0 +1,7 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="main_netlify.dart" type="FlutterRunConfigurationType" factoryName="Flutter" nameIsGenerated="true">
+    <option name="additionalArgs" value="--dart-define-from-file=example/secrets.json" />
+    <option name="filePath" value="$PROJECT_DIR$/example/lib/main_netlify.dart" />
+    <method v="2" />
+  </configuration>
+</component>

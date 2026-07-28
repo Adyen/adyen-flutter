@@ -157,6 +157,242 @@ class ConfigurationMapperTest {
     @Nested
     inner class CardConfigurationTests {
         @Test
+        fun `when installment configuration is provided, then map to native installment configuration`() {
+            val installmentConfigurationDTO = InstallmentConfigurationDTO(
+                defaultOptions = DefaultInstallmentOptionsDTO(
+                    values = listOf(3, 6, null),
+                    includesRevolving = true,
+                ),
+                cardBasedOptions = listOf(
+                    CardBasedInstallmentOptionsDTO(
+                        values = listOf(9, 12, null),
+                        includesRevolving = false,
+                        cardBrand = "visa",
+                    ),
+                    null,
+                ),
+                showInstallmentAmount = true,
+            )
+
+            val cardConfigurationDTO = CardConfigurationDTO(
+                holderNameRequired = false,
+                addressMode = AddressMode.NONE,
+                showStorePaymentField = true,
+                showCvcForStoredCard = true,
+                showCvc = true,
+                kcpFieldVisibility = FieldVisibility.HIDE,
+                socialSecurityNumberFieldVisibility = FieldVisibility.HIDE,
+                supportedCardTypes = emptyList(),
+                installmentConfiguration = installmentConfigurationDTO,
+            )
+            val cardComponentConfigurationDTO = CardComponentConfigurationDTO(
+                environment = Environment.TEST,
+                clientKey = TEST_CLIENT_KEY,
+                countryCode = "US",
+                amount = AmountDTO("USD", 1824),
+                analyticsOptionsDTO = AnalyticsOptionsDTO(false, "0.0.1"),
+                cardConfiguration = cardConfigurationDTO,
+            )
+
+            val checkoutConfiguration = cardComponentConfigurationDTO.toCheckoutConfiguration()
+            val cardConfiguration = checkoutConfiguration.getConfiguration<CardConfiguration>(PaymentMethodTypes.SCHEME)
+            val installmentConfiguration = cardConfiguration?.installmentConfiguration
+
+            assertEquals(true, installmentConfiguration?.showInstallmentAmount)
+            assertEquals(listOf(3, 6), installmentConfiguration?.defaultOptions?.values)
+            assertEquals(true, installmentConfiguration?.defaultOptions?.includeRevolving)
+            assertEquals(1, installmentConfiguration?.cardBasedOptions?.size)
+            assertEquals(listOf(9, 12), installmentConfiguration?.cardBasedOptions?.first()?.values)
+            assertEquals(false, installmentConfiguration?.cardBasedOptions?.first()?.includeRevolving)
+            assertEquals("visa", installmentConfiguration?.cardBasedOptions?.first()?.cardBrand?.txVariant)
+        }
+
+        @Test
+        fun `when installment configuration has card based options only, then map to native installment configuration without default options`() {
+            val installmentConfigurationDTO = InstallmentConfigurationDTO(
+                defaultOptions = null,
+                cardBasedOptions = listOf(
+                    CardBasedInstallmentOptionsDTO(
+                        values = listOf(3, 6),
+                        includesRevolving = true,
+                        cardBrand = "mc",
+                    ),
+                ),
+                showInstallmentAmount = false,
+            )
+
+            val cardConfigurationDTO = CardConfigurationDTO(
+                holderNameRequired = false,
+                addressMode = AddressMode.NONE,
+                showStorePaymentField = true,
+                showCvcForStoredCard = true,
+                showCvc = true,
+                kcpFieldVisibility = FieldVisibility.HIDE,
+                socialSecurityNumberFieldVisibility = FieldVisibility.HIDE,
+                supportedCardTypes = emptyList(),
+                installmentConfiguration = installmentConfigurationDTO,
+            )
+            val cardComponentConfigurationDTO = CardComponentConfigurationDTO(
+                environment = Environment.TEST,
+                clientKey = TEST_CLIENT_KEY,
+                countryCode = "US",
+                amount = AmountDTO("USD", 1824),
+                analyticsOptionsDTO = AnalyticsOptionsDTO(false, "0.0.1"),
+                cardConfiguration = cardConfigurationDTO,
+            )
+
+            val checkoutConfiguration = cardComponentConfigurationDTO.toCheckoutConfiguration()
+            val cardConfiguration = checkoutConfiguration.getConfiguration<CardConfiguration>(PaymentMethodTypes.SCHEME)
+            val installmentConfiguration = cardConfiguration?.installmentConfiguration
+
+            assertNull(installmentConfiguration?.defaultOptions)
+            assertEquals(false, installmentConfiguration?.showInstallmentAmount)
+            assertEquals(1, installmentConfiguration?.cardBasedOptions?.size)
+            assertEquals(listOf(3, 6), installmentConfiguration?.cardBasedOptions?.first()?.values)
+            assertEquals(true, installmentConfiguration?.cardBasedOptions?.first()?.includeRevolving)
+            assertEquals("mc", installmentConfiguration?.cardBasedOptions?.first()?.cardBrand?.txVariant)
+        }
+
+        @Test
+        fun `when installment configuration is null, then native card installment configuration is null`() {
+            val cardConfigurationDTO = CardConfigurationDTO(
+                holderNameRequired = false,
+                addressMode = AddressMode.NONE,
+                showStorePaymentField = true,
+                showCvcForStoredCard = true,
+                showCvc = true,
+                kcpFieldVisibility = FieldVisibility.HIDE,
+                socialSecurityNumberFieldVisibility = FieldVisibility.HIDE,
+                supportedCardTypes = emptyList(),
+                installmentConfiguration = null,
+            )
+            val cardComponentConfigurationDTO = CardComponentConfigurationDTO(
+                environment = Environment.TEST,
+                clientKey = TEST_CLIENT_KEY,
+                countryCode = "US",
+                amount = AmountDTO("USD", 1824),
+                analyticsOptionsDTO = AnalyticsOptionsDTO(false, "0.0.1"),
+                cardConfiguration = cardConfigurationDTO,
+            )
+
+            val checkoutConfiguration = cardComponentConfigurationDTO.toCheckoutConfiguration()
+            val cardConfiguration = checkoutConfiguration.getConfiguration<CardConfiguration>(PaymentMethodTypes.SCHEME)
+
+            assertNull(cardConfiguration?.installmentConfiguration)
+        }
+
+        @Test
+        fun `when card configuration has address mode FULL, then map to FullAddress`() {
+            val cardConfigurationDTO = CardConfigurationDTO(
+                holderNameRequired = true,
+                addressMode = AddressMode.FULL,
+                showStorePaymentField = true,
+                showCvcForStoredCard = true,
+                showCvc = true,
+                kcpFieldVisibility = FieldVisibility.HIDE,
+                socialSecurityNumberFieldVisibility = FieldVisibility.HIDE,
+                supportedCardTypes = emptyList()
+            )
+            val cardComponentConfigurationDTO = CardComponentConfigurationDTO(
+                environment = Environment.TEST,
+                clientKey = TEST_CLIENT_KEY,
+                countryCode = "US",
+                amount = AmountDTO("USD", 1824),
+                shopperLocale = "en-US",
+                analyticsOptionsDTO = AnalyticsOptionsDTO(false, "0.0.1"),
+                cardConfiguration = cardConfigurationDTO,
+            )
+
+            val checkoutConfiguration = cardComponentConfigurationDTO.toCheckoutConfiguration()
+            val cardConfiguration = checkoutConfiguration.getConfiguration<CardConfiguration>(PaymentMethodTypes.SCHEME)
+
+            val addressConfiguration = assertIs<AddressConfiguration.FullAddress>(cardConfiguration?.addressConfiguration)
+            assertEquals("US", addressConfiguration.defaultCountryCode)
+        }
+
+        @Test
+        fun `when card configuration has blank country code, then map to null default country code`() {
+            val cardConfigurationDTO = CardConfigurationDTO(
+                holderNameRequired = true,
+                addressMode = AddressMode.FULL,
+                showStorePaymentField = true,
+                showCvcForStoredCard = true,
+                showCvc = true,
+                kcpFieldVisibility = FieldVisibility.HIDE,
+                socialSecurityNumberFieldVisibility = FieldVisibility.HIDE,
+                supportedCardTypes = emptyList()
+            )
+            val cardComponentConfigurationDTO = CardComponentConfigurationDTO(
+                environment = Environment.TEST,
+                clientKey = TEST_CLIENT_KEY,
+                countryCode = " ",
+                amount = AmountDTO("USD", 1824),
+                analyticsOptionsDTO = AnalyticsOptionsDTO(false, "0.0.1"),
+                cardConfiguration = cardConfigurationDTO,
+            )
+
+            val checkoutConfiguration = cardComponentConfigurationDTO.toCheckoutConfiguration()
+            val cardConfiguration = checkoutConfiguration.getConfiguration<CardConfiguration>(PaymentMethodTypes.SCHEME)
+            val addressConfiguration = assertIs<AddressConfiguration.FullAddress>(cardConfiguration?.addressConfiguration)
+
+            assertNull(addressConfiguration.defaultCountryCode)
+        }
+
+        @Test
+        fun `when card configuration has address mode POSTAL_CODE, then map to PostalCode`() {
+            val cardConfigurationDTO = CardConfigurationDTO(
+                holderNameRequired = false,
+                addressMode = AddressMode.POSTAL_CODE,
+                showStorePaymentField = true,
+                showCvcForStoredCard = true,
+                showCvc = true,
+                kcpFieldVisibility = FieldVisibility.HIDE,
+                socialSecurityNumberFieldVisibility = FieldVisibility.HIDE,
+                supportedCardTypes = emptyList()
+            )
+            val cardComponentConfigurationDTO = CardComponentConfigurationDTO(
+                environment = Environment.TEST,
+                clientKey = TEST_CLIENT_KEY,
+                countryCode = "US",
+                amount = AmountDTO("USD", 1824),
+                analyticsOptionsDTO = AnalyticsOptionsDTO(false, "0.0.1"),
+                cardConfiguration = cardConfigurationDTO,
+            )
+
+            val checkoutConfiguration = cardComponentConfigurationDTO.toCheckoutConfiguration()
+            val cardConfiguration = checkoutConfiguration.getConfiguration<CardConfiguration>(PaymentMethodTypes.SCHEME)
+
+            assertIs<AddressConfiguration.PostalCode>(cardConfiguration?.addressConfiguration)
+        }
+
+        @Test
+        fun `when card configuration has address mode NONE, then map to None`() {
+            val cardConfigurationDTO = CardConfigurationDTO(
+                holderNameRequired = false,
+                addressMode = AddressMode.NONE,
+                showStorePaymentField = true,
+                showCvcForStoredCard = true,
+                showCvc = true,
+                kcpFieldVisibility = FieldVisibility.HIDE,
+                socialSecurityNumberFieldVisibility = FieldVisibility.HIDE,
+                supportedCardTypes = emptyList()
+            )
+            val cardComponentConfigurationDTO = CardComponentConfigurationDTO(
+                environment = Environment.TEST,
+                clientKey = TEST_CLIENT_KEY,
+                countryCode = "US",
+                amount = AmountDTO("USD", 1824),
+                analyticsOptionsDTO = AnalyticsOptionsDTO(false, "0.0.1"),
+                cardConfiguration = cardConfigurationDTO,
+            )
+
+            val checkoutConfiguration = cardComponentConfigurationDTO.toCheckoutConfiguration()
+            val cardConfiguration = checkoutConfiguration.getConfiguration<CardConfiguration>(PaymentMethodTypes.SCHEME)
+
+            assertIs<AddressConfiguration.None>(cardConfiguration?.addressConfiguration)
+        }
+
+        @Test
         fun `when card configuration has KCP visibility SHOW, then map correctly`() {
             val cardConfigurationDTO = CardConfigurationDTO(
                 holderNameRequired = false,
