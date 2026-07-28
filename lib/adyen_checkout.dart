@@ -1,10 +1,12 @@
 export 'src/adyen_checkout.dart';
 export 'src/common/adyen_checkout_advanced.dart';
+export 'src/common/model/address.dart';
 export 'src/common/model/amount.dart';
 export 'src/common/model/analytics_options.dart';
 export 'src/common/model/api_only/card_expiry_date_validation_result.dart';
 export 'src/common/model/api_only/card_number_validation_result.dart';
 export 'src/common/model/api_only/card_security_code_validation_result.dart';
+export 'src/common/model/before_submit.dart';
 export 'src/common/model/card_callbacks/bin_lookup_data.dart';
 export 'src/common/model/checkout.dart';
 export 'src/common/model/checkout_configuration.dart';
@@ -41,6 +43,7 @@ export 'src/common/model/payment_method_configurations/twint_configuration.dart'
 export 'src/common/model/payment_result.dart';
 export 'src/common/model/result_code.dart';
 export 'src/common/model/session_response.dart';
+export 'src/common/model/shopper_name.dart';
 export 'src/components/action_handling/model/action_component_configuration.dart';
 export 'src/components/action_handling/model/action_result.dart';
 export 'src/components/apple_pay/adyen_apple_pay_component.dart';
@@ -73,6 +76,4 @@ export 'src/generated/platform_api.g.dart'
         ApplePayMerchantCapability,
         ApplePaySummaryItemType,
         ApplePayPaymentErrorType;
-        ApplePaySummaryItemType;
 export 'src/v2/adyen_component.dart';
-

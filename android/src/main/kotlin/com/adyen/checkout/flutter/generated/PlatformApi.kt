@@ -1929,6 +1929,160 @@ data class CheckoutEvent (
 }
 
 /** Generated class from Pigeon that represents data sent in messages. */
+data class AddressDTO (
+  val city: String? = null,
+  val country: String? = null,
+  val houseNumberOrName: String? = null,
+  val postalCode: String? = null,
+  val stateOrProvince: String? = null,
+  val street: String? = null,
+  val apartment: String? = null
+)
+ {
+  companion object {
+    fun fromList(pigeonVar_list: List<Any?>): AddressDTO {
+      val city = pigeonVar_list[0] as String?
+      val country = pigeonVar_list[1] as String?
+      val houseNumberOrName = pigeonVar_list[2] as String?
+      val postalCode = pigeonVar_list[3] as String?
+      val stateOrProvince = pigeonVar_list[4] as String?
+      val street = pigeonVar_list[5] as String?
+      val apartment = pigeonVar_list[6] as String?
+      return AddressDTO(city, country, houseNumberOrName, postalCode, stateOrProvince, street, apartment)
+    }
+  }
+  fun toList(): List<Any?> {
+    return listOf(
+      city,
+      country,
+      houseNumberOrName,
+      postalCode,
+      stateOrProvince,
+      street,
+      apartment,
+    )
+  }
+  override fun equals(other: Any?): Boolean {
+    if (other !is AddressDTO) {
+      return false
+    }
+    if (this === other) {
+      return true
+    }
+    return PlatformApiPigeonUtils.deepEquals(toList(), other.toList())  }
+
+  override fun hashCode(): Int = toList().hashCode()
+}
+
+/** Generated class from Pigeon that represents data sent in messages. */
+data class ShopperNameDTO (
+  val firstName: String? = null,
+  val lastName: String? = null,
+  val infix: String? = null,
+  val gender: String? = null
+)
+ {
+  companion object {
+    fun fromList(pigeonVar_list: List<Any?>): ShopperNameDTO {
+      val firstName = pigeonVar_list[0] as String?
+      val lastName = pigeonVar_list[1] as String?
+      val infix = pigeonVar_list[2] as String?
+      val gender = pigeonVar_list[3] as String?
+      return ShopperNameDTO(firstName, lastName, infix, gender)
+    }
+  }
+  fun toList(): List<Any?> {
+    return listOf(
+      firstName,
+      lastName,
+      infix,
+      gender,
+    )
+  }
+  override fun equals(other: Any?): Boolean {
+    if (other !is ShopperNameDTO) {
+      return false
+    }
+    if (this === other) {
+      return true
+    }
+    return PlatformApiPigeonUtils.deepEquals(toList(), other.toList())  }
+
+  override fun hashCode(): Int = toList().hashCode()
+}
+
+/** Generated class from Pigeon that represents data sent in messages. */
+data class BeforeSubmitDataDTO (
+  val billingAddress: AddressDTO? = null,
+  val deliveryAddress: AddressDTO? = null,
+  val shopperName: ShopperNameDTO? = null,
+  val shopperEmail: String? = null
+)
+ {
+  companion object {
+    fun fromList(pigeonVar_list: List<Any?>): BeforeSubmitDataDTO {
+      val billingAddress = pigeonVar_list[0] as AddressDTO?
+      val deliveryAddress = pigeonVar_list[1] as AddressDTO?
+      val shopperName = pigeonVar_list[2] as ShopperNameDTO?
+      val shopperEmail = pigeonVar_list[3] as String?
+      return BeforeSubmitDataDTO(billingAddress, deliveryAddress, shopperName, shopperEmail)
+    }
+  }
+  fun toList(): List<Any?> {
+    return listOf(
+      billingAddress,
+      deliveryAddress,
+      shopperName,
+      shopperEmail,
+    )
+  }
+  override fun equals(other: Any?): Boolean {
+    if (other !is BeforeSubmitDataDTO) {
+      return false
+    }
+    if (this === other) {
+      return true
+    }
+    return PlatformApiPigeonUtils.deepEquals(toList(), other.toList())  }
+
+  override fun hashCode(): Int = toList().hashCode()
+}
+
+/** Generated class from Pigeon that represents data sent in messages. */
+data class BeforeSubmitResultDTO (
+  val isAborted: Boolean,
+  val data: BeforeSubmitDataDTO? = null,
+  val sessionData: String? = null
+)
+ {
+  companion object {
+    fun fromList(pigeonVar_list: List<Any?>): BeforeSubmitResultDTO {
+      val isAborted = pigeonVar_list[0] as Boolean
+      val data = pigeonVar_list[1] as BeforeSubmitDataDTO?
+      val sessionData = pigeonVar_list[2] as String?
+      return BeforeSubmitResultDTO(isAborted, data, sessionData)
+    }
+  }
+  fun toList(): List<Any?> {
+    return listOf(
+      isAborted,
+      data,
+      sessionData,
+    )
+  }
+  override fun equals(other: Any?): Boolean {
+    if (other !is BeforeSubmitResultDTO) {
+      return false
+    }
+    if (this === other) {
+      return true
+    }
+    return PlatformApiPigeonUtils.deepEquals(toList(), other.toList())  }
+
+  override fun hashCode(): Int = toList().hashCode()
+}
+
+/** Generated class from Pigeon that represents data sent in messages. */
 data class ComponentCommunicationModel (
   val type: ComponentCommunicationType,
   val componentId: String,
@@ -2759,70 +2913,90 @@ private open class PlatformApiPigeonCodec : StandardMessageCodec() {
       }
       189.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          ComponentCommunicationModel.fromList(it)
+          AddressDTO.fromList(it)
         }
       }
       190.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          PlatformCommunicationDTO.fromList(it)
+          ShopperNameDTO.fromList(it)
         }
       }
       191.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          PaymentEventDTO.fromList(it)
+          BeforeSubmitDataDTO.fromList(it)
         }
       }
       192.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          ErrorDTO.fromList(it)
+          BeforeSubmitResultDTO.fromList(it)
         }
       }
       193.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          DeletedStoredPaymentMethodResultDTO.fromList(it)
+          ComponentCommunicationModel.fromList(it)
         }
       }
       194.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          CardComponentConfigurationDTO.fromList(it)
+          PlatformCommunicationDTO.fromList(it)
         }
       }
       195.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          BlikComponentConfigurationDTO.fromList(it)
+          PaymentEventDTO.fromList(it)
         }
       }
       196.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          InstantPaymentConfigurationDTO.fromList(it)
+          ErrorDTO.fromList(it)
         }
       }
       197.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          InstantPaymentSetupResultDTO.fromList(it)
+          DeletedStoredPaymentMethodResultDTO.fromList(it)
         }
       }
       198.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          UnencryptedCardDTO.fromList(it)
+          CardComponentConfigurationDTO.fromList(it)
         }
       }
       199.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          EncryptedCardDTO.fromList(it)
+          BlikComponentConfigurationDTO.fromList(it)
         }
       }
       200.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          ActionComponentConfigurationDTO.fromList(it)
+          InstantPaymentConfigurationDTO.fromList(it)
         }
       }
       201.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          OrderCancelResultDTO.fromList(it)
+          InstantPaymentSetupResultDTO.fromList(it)
         }
       }
       202.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          UnencryptedCardDTO.fromList(it)
+        }
+      }
+      203.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          EncryptedCardDTO.fromList(it)
+        }
+      }
+      204.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          ActionComponentConfigurationDTO.fromList(it)
+        }
+      }
+      205.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          OrderCancelResultDTO.fromList(it)
+        }
+      }
+      206.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
           BinLookupDataDTO.fromList(it)
         }
@@ -3072,60 +3246,76 @@ private open class PlatformApiPigeonCodec : StandardMessageCodec() {
         stream.write(188)
         writeValue(stream, value.toList())
       }
-      is ComponentCommunicationModel -> {
+      is AddressDTO -> {
         stream.write(189)
         writeValue(stream, value.toList())
       }
-      is PlatformCommunicationDTO -> {
+      is ShopperNameDTO -> {
         stream.write(190)
         writeValue(stream, value.toList())
       }
-      is PaymentEventDTO -> {
+      is BeforeSubmitDataDTO -> {
         stream.write(191)
         writeValue(stream, value.toList())
       }
-      is ErrorDTO -> {
+      is BeforeSubmitResultDTO -> {
         stream.write(192)
         writeValue(stream, value.toList())
       }
-      is DeletedStoredPaymentMethodResultDTO -> {
+      is ComponentCommunicationModel -> {
         stream.write(193)
         writeValue(stream, value.toList())
       }
-      is CardComponentConfigurationDTO -> {
+      is PlatformCommunicationDTO -> {
         stream.write(194)
         writeValue(stream, value.toList())
       }
-      is BlikComponentConfigurationDTO -> {
+      is PaymentEventDTO -> {
         stream.write(195)
         writeValue(stream, value.toList())
       }
-      is InstantPaymentConfigurationDTO -> {
+      is ErrorDTO -> {
         stream.write(196)
         writeValue(stream, value.toList())
       }
-      is InstantPaymentSetupResultDTO -> {
+      is DeletedStoredPaymentMethodResultDTO -> {
         stream.write(197)
         writeValue(stream, value.toList())
       }
-      is UnencryptedCardDTO -> {
+      is CardComponentConfigurationDTO -> {
         stream.write(198)
         writeValue(stream, value.toList())
       }
-      is EncryptedCardDTO -> {
+      is BlikComponentConfigurationDTO -> {
         stream.write(199)
         writeValue(stream, value.toList())
       }
-      is ActionComponentConfigurationDTO -> {
+      is InstantPaymentConfigurationDTO -> {
         stream.write(200)
         writeValue(stream, value.toList())
       }
-      is OrderCancelResultDTO -> {
+      is InstantPaymentSetupResultDTO -> {
         stream.write(201)
         writeValue(stream, value.toList())
       }
-      is BinLookupDataDTO -> {
+      is UnencryptedCardDTO -> {
         stream.write(202)
+        writeValue(stream, value.toList())
+      }
+      is EncryptedCardDTO -> {
+        stream.write(203)
+        writeValue(stream, value.toList())
+      }
+      is ActionComponentConfigurationDTO -> {
+        stream.write(204)
+        writeValue(stream, value.toList())
+      }
+      is OrderCancelResultDTO -> {
+        stream.write(205)
+        writeValue(stream, value.toList())
+      }
+      is BinLookupDataDTO -> {
+        stream.write(206)
         writeValue(stream, value.toList())
       }
       else -> super.writeValue(stream, value)
@@ -3916,6 +4106,46 @@ class AdyenFlutterInterface(private val binaryMessenger: BinaryMessenger, privat
           callback(Result.failure(AdyenPigeonError("null-error", "Flutter api returned null value for non-null return value.", "")))
         } else {
           val output = it[0] as CheckoutResultDTO
+          callback(Result.success(output))
+        }
+      } else {
+        callback(Result.failure(PlatformApiPigeonUtils.createConnectionError(channelName)))
+      } 
+    }
+  }
+}
+/**
+ * Separate from [AdyenFlutterInterface] because that interface is only ever
+ * implemented/registered by the advanced-flow component, while
+ * `onBeforeSubmit` is a sessions-flow-only concept implemented by the
+ * session component.
+ *
+ * Generated class from Pigeon that represents Flutter messages that can be called from Kotlin.
+ */
+class SessionCheckoutFlutterInterface(private val binaryMessenger: BinaryMessenger, private val messageChannelSuffix: String = "") {
+  companion object {
+    /** The codec used by SessionCheckoutFlutterInterface. */
+    val codec: MessageCodec<Any?> by lazy {
+      PlatformApiPigeonCodec()
+    }
+  }
+  /**
+   * Called before the sessions flow submits payment data, when a merchant
+   * has registered [SessionCheckout.onBeforeSubmit].
+   */
+  fun onBeforeSubmit(dataArg: BeforeSubmitDataDTO, callback: (Result<BeforeSubmitResultDTO>) -> Unit)
+{
+    val separatedMessageChannelSuffix = if (messageChannelSuffix.isNotEmpty()) ".$messageChannelSuffix" else ""
+    val channelName = "dev.flutter.pigeon.adyen_checkout.SessionCheckoutFlutterInterface.onBeforeSubmit$separatedMessageChannelSuffix"
+    val channel = BasicMessageChannel<Any?>(binaryMessenger, channelName, codec)
+    channel.send(listOf(dataArg)) {
+      if (it is List<*>) {
+        if (it.size > 1) {
+          callback(Result.failure(AdyenPigeonError(it[0] as String, it[1] as String, it[2] as String?)))
+        } else if (it[0] == null) {
+          callback(Result.failure(AdyenPigeonError("null-error", "Flutter api returned null value for non-null return value.", "")))
+        } else {
+          val output = it[0] as BeforeSubmitResultDTO
           callback(Result.success(output))
         }
       } else {

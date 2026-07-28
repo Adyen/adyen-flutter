@@ -29,6 +29,7 @@ import com.adyen.checkout.flutter.generated.PaymentEventType
 import com.adyen.checkout.flutter.generated.PaymentResultDTO
 import com.adyen.checkout.flutter.generated.PaymentResultEnum
 import com.adyen.checkout.flutter.generated.PaymentResultModelDTO
+import com.adyen.checkout.flutter.generated.SessionCheckoutFlutterInterface
 import com.adyen.checkout.flutter.session.CheckoutHolder
 import com.adyen.checkout.googlepay.old.GooglePayComponent
 import com.adyen.checkout.redirect.old.RedirectComponent
@@ -40,6 +41,7 @@ class ComponentPlatformApi(
     private val checkoutHolder: CheckoutHolder,
     private val componentFlutterInterface: ComponentFlutterInterface,
     private val adyenFlutterInterface: AdyenFlutterInterface,
+    private val sessionCheckoutFlutterInterface: SessionCheckoutFlutterInterface,
     private val flutterPluginBinding: FlutterPlugin.FlutterPluginBinding?,
 ) : ComponentPlatformInterface {
     private var platformEventHandler: ComponentPlatformEventHandler = ComponentPlatformEventHandler()
@@ -89,6 +91,7 @@ class ComponentPlatformApi(
                 AdyenComponentFactory(
                     activity = activity,
                     adyenFlutterInterface = adyenFlutterInterface,
+                    sessionCheckoutFlutterInterface = sessionCheckoutFlutterInterface,
                     viewTypeId = AdyenComponentFactory.ADYEN_COMPONENT_SESSION,
                     onDispose = ::onDispose,
                     checkoutHolder = checkoutHolder,
@@ -100,6 +103,7 @@ class ComponentPlatformApi(
                 AdyenComponentFactory(
                     activity = activity,
                     adyenFlutterInterface = adyenFlutterInterface,
+                    sessionCheckoutFlutterInterface = sessionCheckoutFlutterInterface,
                     platformEventHandler = platformEventHandler,
                     viewTypeId = AdyenComponentFactory.ADYEN_COMPONENT_ADVANCED,
                     onDispose = ::onDispose,

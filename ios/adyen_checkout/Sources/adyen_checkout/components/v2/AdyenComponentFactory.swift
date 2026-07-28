@@ -6,17 +6,20 @@ final class AdyenComponentFactory: NSObject, FlutterPlatformViewFactory {
     static let adyenSessionComponentId = "AdyenSessionComponent"
 
     private let adyenFlutterInterface: AdyenFlutterInterface
+    private let sessionCheckoutFlutterInterface: SessionCheckoutFlutterInterface
     private let componentPlatformEventHandler: ComponentPlatformEventHandler
     private let checkoutHolder: CheckoutHolder
     private let viewTypeId: String
 
     init(
         adyenFlutterInterface: AdyenFlutterInterface,
+        sessionCheckoutFlutterInterface: SessionCheckoutFlutterInterface,
         componentPlatformEventHandler: ComponentPlatformEventHandler,
         checkoutHolder: CheckoutHolder,
         viewTypeId: String
     ) {
         self.adyenFlutterInterface = adyenFlutterInterface
+        self.sessionCheckoutFlutterInterface = sessionCheckoutFlutterInterface
         self.componentPlatformEventHandler = componentPlatformEventHandler
         self.checkoutHolder = checkoutHolder
         self.viewTypeId = viewTypeId
@@ -32,6 +35,7 @@ final class AdyenComponentFactory: NSObject, FlutterPlatformViewFactory {
             viewIdentifier: viewId,
             arguments: args as? NSDictionary ?? [:],
             adyenFlutterInterface: adyenFlutterInterface,
+            sessionCheckoutFlutterInterface: sessionCheckoutFlutterInterface,
             componentPlatformEventHandler: componentPlatformEventHandler,
             checkoutHolder: checkoutHolder,
             viewTypeId: viewTypeId

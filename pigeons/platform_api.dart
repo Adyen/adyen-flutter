@@ -773,6 +773,71 @@ class CheckoutEvent {
   });
 }
 
+class AddressDTO {
+  final String? city;
+  final String? country;
+  final String? houseNumberOrName;
+  final String? postalCode;
+  final String? stateOrProvince;
+  final String? street;
+  final String? apartment;
+
+  AddressDTO({
+    this.city,
+    this.country,
+    this.houseNumberOrName,
+    this.postalCode,
+    this.stateOrProvince,
+    this.street,
+    this.apartment,
+  });
+}
+
+class ShopperNameDTO {
+  final String? firstName;
+  final String? lastName;
+  final String? infix;
+  final String? gender;
+
+  ShopperNameDTO({
+    this.firstName,
+    this.lastName,
+    this.infix,
+    this.gender,
+  });
+}
+
+class BeforeSubmitDataDTO {
+  final AddressDTO? billingAddress;
+  final AddressDTO? deliveryAddress;
+  final ShopperNameDTO? shopperName;
+  final String? shopperEmail;
+
+  BeforeSubmitDataDTO({
+    this.billingAddress,
+    this.deliveryAddress,
+    this.shopperName,
+    this.shopperEmail,
+  });
+}
+
+// Not modeled as a sealed class: Pigeon does not generate codec methods for a
+// field-less sealed subclass (the "abort" case has no payload), so a flag is
+// used instead. The public Dart API still models this as a proper sealed
+// `BeforeSubmitResult` (`BeforeSubmitProceed`/`BeforeSubmitAbort`); this DTO
+// is purely an internal platform-channel detail.
+class BeforeSubmitResultDTO {
+  final bool isAborted;
+  final BeforeSubmitDataDTO? data;
+  final String? sessionData;
+
+  BeforeSubmitResultDTO({
+    required this.isAborted,
+    this.data,
+    this.sessionData,
+  });
+}
+
 class ComponentCommunicationModel {
   final ComponentCommunicationType type;
   final String componentId;
@@ -1142,6 +1207,18 @@ abstract class AdyenFlutterInterface {
   @async
   CheckoutResultDTO onAdditionalDetails(
       PlatformCommunicationDTO platformCommunicationDTO);
+}
+
+/// Separate from [AdyenFlutterInterface] because that interface is only ever
+/// implemented/registered by the advanced-flow component, while
+/// `onBeforeSubmit` is a sessions-flow-only concept implemented by the
+/// session component.
+@FlutterApi()
+abstract class SessionCheckoutFlutterInterface {
+  /// Called before the sessions flow submits payment data, when a merchant
+  /// has registered [SessionCheckout.onBeforeSubmit].
+  @async
+  BeforeSubmitResultDTO onBeforeSubmit(BeforeSubmitDataDTO data);
 }
 
 @EventChannelApi()

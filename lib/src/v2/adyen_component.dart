@@ -35,7 +35,7 @@ class AdyenComponent extends StatelessWidget {
           checkoutConfiguration: configuration.toDTO(),
           paymentMethod: encodedPaymentMethod,
           paymentMethodTxVariant: paymentMethodTxVariant,
-          session: it.toDTO(),
+          sessionCheckout: it,
           onPaymentResult: onPaymentResult,
           initialViewHeight: initialHeight,
           isStoredPaymentMethod: false,

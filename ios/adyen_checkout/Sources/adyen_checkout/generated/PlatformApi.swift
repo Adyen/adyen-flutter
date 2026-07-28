@@ -1893,6 +1893,162 @@ struct CheckoutEvent: Hashable {
 }
 
 /// Generated class from Pigeon that represents data sent in messages.
+struct AddressDTO: Hashable {
+  var city: String? = nil
+  var country: String? = nil
+  var houseNumberOrName: String? = nil
+  var postalCode: String? = nil
+  var stateOrProvince: String? = nil
+  var street: String? = nil
+  var apartment: String? = nil
+
+
+  // swift-format-ignore: AlwaysUseLowerCamelCase
+  static func fromList(_ pigeonVar_list: [Any?]) -> AddressDTO? {
+    let city: String? = nilOrValue(pigeonVar_list[0])
+    let country: String? = nilOrValue(pigeonVar_list[1])
+    let houseNumberOrName: String? = nilOrValue(pigeonVar_list[2])
+    let postalCode: String? = nilOrValue(pigeonVar_list[3])
+    let stateOrProvince: String? = nilOrValue(pigeonVar_list[4])
+    let street: String? = nilOrValue(pigeonVar_list[5])
+    let apartment: String? = nilOrValue(pigeonVar_list[6])
+
+    return AddressDTO(
+      city: city,
+      country: country,
+      houseNumberOrName: houseNumberOrName,
+      postalCode: postalCode,
+      stateOrProvince: stateOrProvince,
+      street: street,
+      apartment: apartment
+    )
+  }
+  func toList() -> [Any?] {
+    return [
+      city,
+      country,
+      houseNumberOrName,
+      postalCode,
+      stateOrProvince,
+      street,
+      apartment,
+    ]
+  }
+  static func == (lhs: AddressDTO, rhs: AddressDTO) -> Bool {
+    return deepEqualsPlatformApi(lhs.toList(), rhs.toList())  }
+  func hash(into hasher: inout Hasher) {
+    deepHashPlatformApi(value: toList(), hasher: &hasher)
+  }
+}
+
+/// Generated class from Pigeon that represents data sent in messages.
+struct ShopperNameDTO: Hashable {
+  var firstName: String? = nil
+  var lastName: String? = nil
+  var infix: String? = nil
+  var gender: String? = nil
+
+
+  // swift-format-ignore: AlwaysUseLowerCamelCase
+  static func fromList(_ pigeonVar_list: [Any?]) -> ShopperNameDTO? {
+    let firstName: String? = nilOrValue(pigeonVar_list[0])
+    let lastName: String? = nilOrValue(pigeonVar_list[1])
+    let infix: String? = nilOrValue(pigeonVar_list[2])
+    let gender: String? = nilOrValue(pigeonVar_list[3])
+
+    return ShopperNameDTO(
+      firstName: firstName,
+      lastName: lastName,
+      infix: infix,
+      gender: gender
+    )
+  }
+  func toList() -> [Any?] {
+    return [
+      firstName,
+      lastName,
+      infix,
+      gender,
+    ]
+  }
+  static func == (lhs: ShopperNameDTO, rhs: ShopperNameDTO) -> Bool {
+    return deepEqualsPlatformApi(lhs.toList(), rhs.toList())  }
+  func hash(into hasher: inout Hasher) {
+    deepHashPlatformApi(value: toList(), hasher: &hasher)
+  }
+}
+
+/// Generated class from Pigeon that represents data sent in messages.
+struct BeforeSubmitDataDTO: Hashable {
+  var billingAddress: AddressDTO? = nil
+  var deliveryAddress: AddressDTO? = nil
+  var shopperName: ShopperNameDTO? = nil
+  var shopperEmail: String? = nil
+
+
+  // swift-format-ignore: AlwaysUseLowerCamelCase
+  static func fromList(_ pigeonVar_list: [Any?]) -> BeforeSubmitDataDTO? {
+    let billingAddress: AddressDTO? = nilOrValue(pigeonVar_list[0])
+    let deliveryAddress: AddressDTO? = nilOrValue(pigeonVar_list[1])
+    let shopperName: ShopperNameDTO? = nilOrValue(pigeonVar_list[2])
+    let shopperEmail: String? = nilOrValue(pigeonVar_list[3])
+
+    return BeforeSubmitDataDTO(
+      billingAddress: billingAddress,
+      deliveryAddress: deliveryAddress,
+      shopperName: shopperName,
+      shopperEmail: shopperEmail
+    )
+  }
+  func toList() -> [Any?] {
+    return [
+      billingAddress,
+      deliveryAddress,
+      shopperName,
+      shopperEmail,
+    ]
+  }
+  static func == (lhs: BeforeSubmitDataDTO, rhs: BeforeSubmitDataDTO) -> Bool {
+    return deepEqualsPlatformApi(lhs.toList(), rhs.toList())  }
+  func hash(into hasher: inout Hasher) {
+    deepHashPlatformApi(value: toList(), hasher: &hasher)
+  }
+}
+
+/// Generated class from Pigeon that represents data sent in messages.
+struct BeforeSubmitResultDTO: Hashable {
+  var isAborted: Bool
+  var data: BeforeSubmitDataDTO? = nil
+  var sessionData: String? = nil
+
+
+  // swift-format-ignore: AlwaysUseLowerCamelCase
+  static func fromList(_ pigeonVar_list: [Any?]) -> BeforeSubmitResultDTO? {
+    let isAborted = pigeonVar_list[0] as! Bool
+    let data: BeforeSubmitDataDTO? = nilOrValue(pigeonVar_list[1])
+    let sessionData: String? = nilOrValue(pigeonVar_list[2])
+
+    return BeforeSubmitResultDTO(
+      isAborted: isAborted,
+      data: data,
+      sessionData: sessionData
+    )
+  }
+  func toList() -> [Any?] {
+    return [
+      isAborted,
+      data,
+      sessionData,
+    ]
+  }
+  static func == (lhs: BeforeSubmitResultDTO, rhs: BeforeSubmitResultDTO) -> Bool {
+    return deepEqualsPlatformApi(lhs.toList(), rhs.toList())  }
+  func hash(into hasher: inout Hasher) {
+    deepHashPlatformApi(value: toList(), hasher: &hasher)
+  }
+}
+
+/// Generated class from Pigeon that represents data sent in messages.
 struct ComponentCommunicationModel: Hashable {
   var type: ComponentCommunicationType
   var componentId: String
@@ -2622,32 +2778,40 @@ private class PlatformApiPigeonCodecReader: FlutterStandardReader {
     case 188:
       return CheckoutEvent.fromList(self.readValue() as! [Any?])
     case 189:
-      return ComponentCommunicationModel.fromList(self.readValue() as! [Any?])
+      return AddressDTO.fromList(self.readValue() as! [Any?])
     case 190:
-      return PlatformCommunicationDTO.fromList(self.readValue() as! [Any?])
+      return ShopperNameDTO.fromList(self.readValue() as! [Any?])
     case 191:
-      return PaymentEventDTO.fromList(self.readValue() as! [Any?])
+      return BeforeSubmitDataDTO.fromList(self.readValue() as! [Any?])
     case 192:
-      return ErrorDTO.fromList(self.readValue() as! [Any?])
+      return BeforeSubmitResultDTO.fromList(self.readValue() as! [Any?])
     case 193:
-      return DeletedStoredPaymentMethodResultDTO.fromList(self.readValue() as! [Any?])
+      return ComponentCommunicationModel.fromList(self.readValue() as! [Any?])
     case 194:
-      return CardComponentConfigurationDTO.fromList(self.readValue() as! [Any?])
+      return PlatformCommunicationDTO.fromList(self.readValue() as! [Any?])
     case 195:
-      return BlikComponentConfigurationDTO.fromList(self.readValue() as! [Any?])
+      return PaymentEventDTO.fromList(self.readValue() as! [Any?])
     case 196:
-      return InstantPaymentConfigurationDTO.fromList(self.readValue() as! [Any?])
+      return ErrorDTO.fromList(self.readValue() as! [Any?])
     case 197:
-      return InstantPaymentSetupResultDTO.fromList(self.readValue() as! [Any?])
+      return DeletedStoredPaymentMethodResultDTO.fromList(self.readValue() as! [Any?])
     case 198:
-      return UnencryptedCardDTO.fromList(self.readValue() as! [Any?])
+      return CardComponentConfigurationDTO.fromList(self.readValue() as! [Any?])
     case 199:
-      return EncryptedCardDTO.fromList(self.readValue() as! [Any?])
+      return BlikComponentConfigurationDTO.fromList(self.readValue() as! [Any?])
     case 200:
-      return ActionComponentConfigurationDTO.fromList(self.readValue() as! [Any?])
+      return InstantPaymentConfigurationDTO.fromList(self.readValue() as! [Any?])
     case 201:
-      return OrderCancelResultDTO.fromList(self.readValue() as! [Any?])
+      return InstantPaymentSetupResultDTO.fromList(self.readValue() as! [Any?])
     case 202:
+      return UnencryptedCardDTO.fromList(self.readValue() as! [Any?])
+    case 203:
+      return EncryptedCardDTO.fromList(self.readValue() as! [Any?])
+    case 204:
+      return ActionComponentConfigurationDTO.fromList(self.readValue() as! [Any?])
+    case 205:
+      return OrderCancelResultDTO.fromList(self.readValue() as! [Any?])
+    case 206:
       return BinLookupDataDTO.fromList(self.readValue() as! [Any?])
     default:
       return super.readValue(ofType: type)
@@ -2837,47 +3001,59 @@ private class PlatformApiPigeonCodecWriter: FlutterStandardWriter {
     } else if let value = value as? CheckoutEvent {
       super.writeByte(188)
       super.writeValue(value.toList())
-    } else if let value = value as? ComponentCommunicationModel {
+    } else if let value = value as? AddressDTO {
       super.writeByte(189)
       super.writeValue(value.toList())
-    } else if let value = value as? PlatformCommunicationDTO {
+    } else if let value = value as? ShopperNameDTO {
       super.writeByte(190)
       super.writeValue(value.toList())
-    } else if let value = value as? PaymentEventDTO {
+    } else if let value = value as? BeforeSubmitDataDTO {
       super.writeByte(191)
       super.writeValue(value.toList())
-    } else if let value = value as? ErrorDTO {
+    } else if let value = value as? BeforeSubmitResultDTO {
       super.writeByte(192)
       super.writeValue(value.toList())
-    } else if let value = value as? DeletedStoredPaymentMethodResultDTO {
+    } else if let value = value as? ComponentCommunicationModel {
       super.writeByte(193)
       super.writeValue(value.toList())
-    } else if let value = value as? CardComponentConfigurationDTO {
+    } else if let value = value as? PlatformCommunicationDTO {
       super.writeByte(194)
       super.writeValue(value.toList())
-    } else if let value = value as? BlikComponentConfigurationDTO {
+    } else if let value = value as? PaymentEventDTO {
       super.writeByte(195)
       super.writeValue(value.toList())
-    } else if let value = value as? InstantPaymentConfigurationDTO {
+    } else if let value = value as? ErrorDTO {
       super.writeByte(196)
       super.writeValue(value.toList())
-    } else if let value = value as? InstantPaymentSetupResultDTO {
+    } else if let value = value as? DeletedStoredPaymentMethodResultDTO {
       super.writeByte(197)
       super.writeValue(value.toList())
-    } else if let value = value as? UnencryptedCardDTO {
+    } else if let value = value as? CardComponentConfigurationDTO {
       super.writeByte(198)
       super.writeValue(value.toList())
-    } else if let value = value as? EncryptedCardDTO {
+    } else if let value = value as? BlikComponentConfigurationDTO {
       super.writeByte(199)
       super.writeValue(value.toList())
-    } else if let value = value as? ActionComponentConfigurationDTO {
+    } else if let value = value as? InstantPaymentConfigurationDTO {
       super.writeByte(200)
       super.writeValue(value.toList())
-    } else if let value = value as? OrderCancelResultDTO {
+    } else if let value = value as? InstantPaymentSetupResultDTO {
       super.writeByte(201)
       super.writeValue(value.toList())
-    } else if let value = value as? BinLookupDataDTO {
+    } else if let value = value as? UnencryptedCardDTO {
       super.writeByte(202)
+      super.writeValue(value.toList())
+    } else if let value = value as? EncryptedCardDTO {
+      super.writeByte(203)
+      super.writeValue(value.toList())
+    } else if let value = value as? ActionComponentConfigurationDTO {
+      super.writeByte(204)
+      super.writeValue(value.toList())
+    } else if let value = value as? OrderCancelResultDTO {
+      super.writeByte(205)
+      super.writeValue(value.toList())
+    } else if let value = value as? BinLookupDataDTO {
+      super.writeByte(206)
       super.writeValue(value.toList())
     } else {
       super.writeValue(value)
@@ -3630,6 +3806,51 @@ class AdyenFlutterInterface: AdyenFlutterInterfaceProtocol {
         completion(.failure(AdyenPigeonError(code: "null-error", message: "Flutter api returned null value for non-null return value.", details: "")))
       } else {
         let result = listResponse[0] as! CheckoutResultDTO
+        completion(.success(result))
+      }
+    }
+  }
+}
+/// Separate from [AdyenFlutterInterface] because that interface is only ever
+/// implemented/registered by the advanced-flow component, while
+/// `onBeforeSubmit` is a sessions-flow-only concept implemented by the
+/// session component.
+///
+/// Generated protocol from Pigeon that represents Flutter messages that can be called from Swift.
+protocol SessionCheckoutFlutterInterfaceProtocol {
+  /// Called before the sessions flow submits payment data, when a merchant
+  /// has registered [SessionCheckout.onBeforeSubmit].
+  func onBeforeSubmit(data dataArg: BeforeSubmitDataDTO, completion: @escaping (Result<BeforeSubmitResultDTO, AdyenPigeonError>) -> Void)
+}
+class SessionCheckoutFlutterInterface: SessionCheckoutFlutterInterfaceProtocol {
+  private let binaryMessenger: FlutterBinaryMessenger
+  private let messageChannelSuffix: String
+  init(binaryMessenger: FlutterBinaryMessenger, messageChannelSuffix: String = "") {
+    self.binaryMessenger = binaryMessenger
+    self.messageChannelSuffix = messageChannelSuffix.count > 0 ? ".\(messageChannelSuffix)" : ""
+  }
+  var codec: PlatformApiPigeonCodec {
+    return PlatformApiPigeonCodec.shared
+  }
+  /// Called before the sessions flow submits payment data, when a merchant
+  /// has registered [SessionCheckout.onBeforeSubmit].
+  func onBeforeSubmit(data dataArg: BeforeSubmitDataDTO, completion: @escaping (Result<BeforeSubmitResultDTO, AdyenPigeonError>) -> Void) {
+    let channelName: String = "dev.flutter.pigeon.adyen_checkout.SessionCheckoutFlutterInterface.onBeforeSubmit\(messageChannelSuffix)"
+    let channel = FlutterBasicMessageChannel(name: channelName, binaryMessenger: binaryMessenger, codec: codec)
+    channel.sendMessage([dataArg] as [Any?]) { response in
+      guard let listResponse = response as? [Any?] else {
+        completion(.failure(createConnectionError(withChannelName: channelName)))
+        return
+      }
+      if listResponse.count > 1 {
+        let code: String = listResponse[0] as! String
+        let message: String? = nilOrValue(listResponse[1])
+        let details: String? = nilOrValue(listResponse[2])
+        completion(.failure(AdyenPigeonError(code: code, message: message, details: details)))
+      } else if listResponse[0] == nil {
+        completion(.failure(AdyenPigeonError(code: "null-error", message: "Flutter api returned null value for non-null return value.", details: "")))
+      } else {
+        let result = listResponse[0] as! BeforeSubmitResultDTO
         completion(.success(result))
       }
     }

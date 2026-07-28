@@ -1,5 +1,15 @@
 ## 1.12.0 (in development)
 
+### New
+
+- Added `onBeforeSubmit` support for the sessions flow via `AdyenCheckoutSession.setup()`.
+  Lets you inspect or modify shopper data (billing/delivery address, shopper name, shopper
+  email), or abort the submission, right before the SDK submits the sessions `/payments`
+  request. Available for the generic session component integration
+  (`AdyenComponent`/`AdyenSessionComponent`); Drop-in and the dedicated Card/Blik session
+  components are not yet supported. On iOS, `ShopperName.infix`/`.gender` are not yet
+  populated pending a native SDK change.
+
 ### Improved
 
 - For Card Component on Android: the configured `countryCode` is now applied as the

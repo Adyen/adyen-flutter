@@ -1,3 +1,4 @@
+import 'package:adyen_checkout/src/common/model/before_submit.dart';
 import 'package:adyen_checkout/src/common/model/partial_payment/partial_payment.dart';
 import 'package:adyen_checkout/src/common/model/payment_event.dart';
 
@@ -10,9 +11,14 @@ sealed class Checkout {
 class SessionCheckout extends Checkout {
   final String id;
 
+  /// Called before the sessions flow submits payment data. See
+  /// [OnBeforeSubmitCallback].
+  final OnBeforeSubmitCallback? onBeforeSubmit;
+
   SessionCheckout({
     required this.id,
     required super.paymentMethods,
+    this.onBeforeSubmit,
   });
 }
 

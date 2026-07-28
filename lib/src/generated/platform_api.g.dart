@@ -2601,6 +2601,240 @@ class CheckoutEvent {
 ;
 }
 
+class AddressDTO {
+  AddressDTO({
+    this.city,
+    this.country,
+    this.houseNumberOrName,
+    this.postalCode,
+    this.stateOrProvince,
+    this.street,
+    this.apartment,
+  });
+
+  String? city;
+
+  String? country;
+
+  String? houseNumberOrName;
+
+  String? postalCode;
+
+  String? stateOrProvince;
+
+  String? street;
+
+  String? apartment;
+
+  List<Object?> _toList() {
+    return <Object?>[
+      city,
+      country,
+      houseNumberOrName,
+      postalCode,
+      stateOrProvince,
+      street,
+      apartment,
+    ];
+  }
+
+  Object encode() {
+    return _toList();  }
+
+  static AddressDTO decode(Object result) {
+    result as List<Object?>;
+    return AddressDTO(
+      city: result[0] as String?,
+      country: result[1] as String?,
+      houseNumberOrName: result[2] as String?,
+      postalCode: result[3] as String?,
+      stateOrProvince: result[4] as String?,
+      street: result[5] as String?,
+      apartment: result[6] as String?,
+    );
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  bool operator ==(Object other) {
+    if (other is! AddressDTO || other.runtimeType != runtimeType) {
+      return false;
+    }
+    if (identical(this, other)) {
+      return true;
+    }
+    return _deepEquals(encode(), other.encode());
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  int get hashCode => Object.hashAll(_toList())
+;
+}
+
+class ShopperNameDTO {
+  ShopperNameDTO({
+    this.firstName,
+    this.lastName,
+    this.infix,
+    this.gender,
+  });
+
+  String? firstName;
+
+  String? lastName;
+
+  String? infix;
+
+  String? gender;
+
+  List<Object?> _toList() {
+    return <Object?>[
+      firstName,
+      lastName,
+      infix,
+      gender,
+    ];
+  }
+
+  Object encode() {
+    return _toList();  }
+
+  static ShopperNameDTO decode(Object result) {
+    result as List<Object?>;
+    return ShopperNameDTO(
+      firstName: result[0] as String?,
+      lastName: result[1] as String?,
+      infix: result[2] as String?,
+      gender: result[3] as String?,
+    );
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  bool operator ==(Object other) {
+    if (other is! ShopperNameDTO || other.runtimeType != runtimeType) {
+      return false;
+    }
+    if (identical(this, other)) {
+      return true;
+    }
+    return _deepEquals(encode(), other.encode());
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  int get hashCode => Object.hashAll(_toList())
+;
+}
+
+class BeforeSubmitDataDTO {
+  BeforeSubmitDataDTO({
+    this.billingAddress,
+    this.deliveryAddress,
+    this.shopperName,
+    this.shopperEmail,
+  });
+
+  AddressDTO? billingAddress;
+
+  AddressDTO? deliveryAddress;
+
+  ShopperNameDTO? shopperName;
+
+  String? shopperEmail;
+
+  List<Object?> _toList() {
+    return <Object?>[
+      billingAddress,
+      deliveryAddress,
+      shopperName,
+      shopperEmail,
+    ];
+  }
+
+  Object encode() {
+    return _toList();  }
+
+  static BeforeSubmitDataDTO decode(Object result) {
+    result as List<Object?>;
+    return BeforeSubmitDataDTO(
+      billingAddress: result[0] as AddressDTO?,
+      deliveryAddress: result[1] as AddressDTO?,
+      shopperName: result[2] as ShopperNameDTO?,
+      shopperEmail: result[3] as String?,
+    );
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  bool operator ==(Object other) {
+    if (other is! BeforeSubmitDataDTO || other.runtimeType != runtimeType) {
+      return false;
+    }
+    if (identical(this, other)) {
+      return true;
+    }
+    return _deepEquals(encode(), other.encode());
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  int get hashCode => Object.hashAll(_toList())
+;
+}
+
+class BeforeSubmitResultDTO {
+  BeforeSubmitResultDTO({
+    required this.isAborted,
+    this.data,
+    this.sessionData,
+  });
+
+  bool isAborted;
+
+  BeforeSubmitDataDTO? data;
+
+  String? sessionData;
+
+  List<Object?> _toList() {
+    return <Object?>[
+      isAborted,
+      data,
+      sessionData,
+    ];
+  }
+
+  Object encode() {
+    return _toList();  }
+
+  static BeforeSubmitResultDTO decode(Object result) {
+    result as List<Object?>;
+    return BeforeSubmitResultDTO(
+      isAborted: result[0]! as bool,
+      data: result[1] as BeforeSubmitDataDTO?,
+      sessionData: result[2] as String?,
+    );
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  bool operator ==(Object other) {
+    if (other is! BeforeSubmitResultDTO || other.runtimeType != runtimeType) {
+      return false;
+    }
+    if (identical(this, other)) {
+      return true;
+    }
+    return _deepEquals(encode(), other.encode());
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  int get hashCode => Object.hashAll(_toList())
+;
+}
+
 class ComponentCommunicationModel {
   ComponentCommunicationModel({
     required this.type,
@@ -3588,47 +3822,59 @@ class _PigeonCodec extends StandardMessageCodec {
     }    else if (value is CheckoutEvent) {
       buffer.putUint8(188);
       writeValue(buffer, value.encode());
-    }    else if (value is ComponentCommunicationModel) {
+    }    else if (value is AddressDTO) {
       buffer.putUint8(189);
       writeValue(buffer, value.encode());
-    }    else if (value is PlatformCommunicationDTO) {
+    }    else if (value is ShopperNameDTO) {
       buffer.putUint8(190);
       writeValue(buffer, value.encode());
-    }    else if (value is PaymentEventDTO) {
+    }    else if (value is BeforeSubmitDataDTO) {
       buffer.putUint8(191);
       writeValue(buffer, value.encode());
-    }    else if (value is ErrorDTO) {
+    }    else if (value is BeforeSubmitResultDTO) {
       buffer.putUint8(192);
       writeValue(buffer, value.encode());
-    }    else if (value is DeletedStoredPaymentMethodResultDTO) {
+    }    else if (value is ComponentCommunicationModel) {
       buffer.putUint8(193);
       writeValue(buffer, value.encode());
-    }    else if (value is CardComponentConfigurationDTO) {
+    }    else if (value is PlatformCommunicationDTO) {
       buffer.putUint8(194);
       writeValue(buffer, value.encode());
-    }    else if (value is BlikComponentConfigurationDTO) {
+    }    else if (value is PaymentEventDTO) {
       buffer.putUint8(195);
       writeValue(buffer, value.encode());
-    }    else if (value is InstantPaymentConfigurationDTO) {
+    }    else if (value is ErrorDTO) {
       buffer.putUint8(196);
       writeValue(buffer, value.encode());
-    }    else if (value is InstantPaymentSetupResultDTO) {
+    }    else if (value is DeletedStoredPaymentMethodResultDTO) {
       buffer.putUint8(197);
       writeValue(buffer, value.encode());
-    }    else if (value is UnencryptedCardDTO) {
+    }    else if (value is CardComponentConfigurationDTO) {
       buffer.putUint8(198);
       writeValue(buffer, value.encode());
-    }    else if (value is EncryptedCardDTO) {
+    }    else if (value is BlikComponentConfigurationDTO) {
       buffer.putUint8(199);
       writeValue(buffer, value.encode());
-    }    else if (value is ActionComponentConfigurationDTO) {
+    }    else if (value is InstantPaymentConfigurationDTO) {
       buffer.putUint8(200);
       writeValue(buffer, value.encode());
-    }    else if (value is OrderCancelResultDTO) {
+    }    else if (value is InstantPaymentSetupResultDTO) {
       buffer.putUint8(201);
       writeValue(buffer, value.encode());
-    }    else if (value is BinLookupDataDTO) {
+    }    else if (value is UnencryptedCardDTO) {
       buffer.putUint8(202);
+      writeValue(buffer, value.encode());
+    }    else if (value is EncryptedCardDTO) {
+      buffer.putUint8(203);
+      writeValue(buffer, value.encode());
+    }    else if (value is ActionComponentConfigurationDTO) {
+      buffer.putUint8(204);
+      writeValue(buffer, value.encode());
+    }    else if (value is OrderCancelResultDTO) {
+      buffer.putUint8(205);
+      writeValue(buffer, value.encode());
+    }    else if (value is BinLookupDataDTO) {
+      buffer.putUint8(206);
       writeValue(buffer, value.encode());
     } else {
       super.writeValue(buffer, value);
@@ -3778,32 +4024,40 @@ class _PigeonCodec extends StandardMessageCodec {
       case 188: 
         return CheckoutEvent.decode(readValue(buffer)!);
       case 189: 
-        return ComponentCommunicationModel.decode(readValue(buffer)!);
+        return AddressDTO.decode(readValue(buffer)!);
       case 190: 
-        return PlatformCommunicationDTO.decode(readValue(buffer)!);
+        return ShopperNameDTO.decode(readValue(buffer)!);
       case 191: 
-        return PaymentEventDTO.decode(readValue(buffer)!);
+        return BeforeSubmitDataDTO.decode(readValue(buffer)!);
       case 192: 
-        return ErrorDTO.decode(readValue(buffer)!);
+        return BeforeSubmitResultDTO.decode(readValue(buffer)!);
       case 193: 
-        return DeletedStoredPaymentMethodResultDTO.decode(readValue(buffer)!);
+        return ComponentCommunicationModel.decode(readValue(buffer)!);
       case 194: 
-        return CardComponentConfigurationDTO.decode(readValue(buffer)!);
+        return PlatformCommunicationDTO.decode(readValue(buffer)!);
       case 195: 
-        return BlikComponentConfigurationDTO.decode(readValue(buffer)!);
+        return PaymentEventDTO.decode(readValue(buffer)!);
       case 196: 
-        return InstantPaymentConfigurationDTO.decode(readValue(buffer)!);
+        return ErrorDTO.decode(readValue(buffer)!);
       case 197: 
-        return InstantPaymentSetupResultDTO.decode(readValue(buffer)!);
+        return DeletedStoredPaymentMethodResultDTO.decode(readValue(buffer)!);
       case 198: 
-        return UnencryptedCardDTO.decode(readValue(buffer)!);
+        return CardComponentConfigurationDTO.decode(readValue(buffer)!);
       case 199: 
-        return EncryptedCardDTO.decode(readValue(buffer)!);
+        return BlikComponentConfigurationDTO.decode(readValue(buffer)!);
       case 200: 
-        return ActionComponentConfigurationDTO.decode(readValue(buffer)!);
+        return InstantPaymentConfigurationDTO.decode(readValue(buffer)!);
       case 201: 
-        return OrderCancelResultDTO.decode(readValue(buffer)!);
+        return InstantPaymentSetupResultDTO.decode(readValue(buffer)!);
       case 202: 
+        return UnencryptedCardDTO.decode(readValue(buffer)!);
+      case 203: 
+        return EncryptedCardDTO.decode(readValue(buffer)!);
+      case 204: 
+        return ActionComponentConfigurationDTO.decode(readValue(buffer)!);
+      case 205: 
+        return OrderCancelResultDTO.decode(readValue(buffer)!);
+      case 206: 
         return BinLookupDataDTO.decode(readValue(buffer)!);
       default:
         return super.readValueOfType(type, buffer);
@@ -4829,6 +5083,47 @@ abstract class AdyenFlutterInterface {
               'Argument for dev.flutter.pigeon.adyen_checkout.AdyenFlutterInterface.onAdditionalDetails was null, expected non-null PlatformCommunicationDTO.');
           try {
             final CheckoutResultDTO output = await api.onAdditionalDetails(arg_platformCommunicationDTO!);
+            return wrapResponse(result: output);
+          } on PlatformException catch (e) {
+            return wrapResponse(error: e);
+          }          catch (e) {
+            return wrapResponse(error: PlatformException(code: 'error', message: e.toString()));
+          }
+        });
+      }
+    }
+  }
+}
+
+/// Separate from [AdyenFlutterInterface] because that interface is only ever
+/// implemented/registered by the advanced-flow component, while
+/// `onBeforeSubmit` is a sessions-flow-only concept implemented by the
+/// session component.
+abstract class SessionCheckoutFlutterInterface {
+  static const MessageCodec<Object?> pigeonChannelCodec = _PigeonCodec();
+
+  /// Called before the sessions flow submits payment data, when a merchant
+  /// has registered [SessionCheckout.onBeforeSubmit].
+  Future<BeforeSubmitResultDTO> onBeforeSubmit(BeforeSubmitDataDTO data);
+
+  static void setUp(SessionCheckoutFlutterInterface? api, {BinaryMessenger? binaryMessenger, String messageChannelSuffix = '',}) {
+    messageChannelSuffix = messageChannelSuffix.isNotEmpty ? '.$messageChannelSuffix' : '';
+    {
+      final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
+          'dev.flutter.pigeon.adyen_checkout.SessionCheckoutFlutterInterface.onBeforeSubmit$messageChannelSuffix', pigeonChannelCodec,
+          binaryMessenger: binaryMessenger);
+      if (api == null) {
+        pigeonVar_channel.setMessageHandler(null);
+      } else {
+        pigeonVar_channel.setMessageHandler((Object? message) async {
+          assert(message != null,
+          'Argument for dev.flutter.pigeon.adyen_checkout.SessionCheckoutFlutterInterface.onBeforeSubmit was null.');
+          final List<Object?> args = (message as List<Object?>?)!;
+          final BeforeSubmitDataDTO? arg_data = (args[0] as BeforeSubmitDataDTO?);
+          assert(arg_data != null,
+              'Argument for dev.flutter.pigeon.adyen_checkout.SessionCheckoutFlutterInterface.onBeforeSubmit was null, expected non-null BeforeSubmitDataDTO.');
+          try {
+            final BeforeSubmitResultDTO output = await api.onBeforeSubmit(arg_data!);
             return wrapResponse(result: output);
           } on PlatformException catch (e) {
             return wrapResponse(error: e);

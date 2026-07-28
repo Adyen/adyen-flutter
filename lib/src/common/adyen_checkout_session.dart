@@ -18,6 +18,7 @@ class AdyenCheckoutSession {
   Future<SessionCheckout> setup({
     required SessionResponse sessionResponse,
     required CheckoutConfiguration checkoutConfiguration,
+    OnBeforeSubmitCallback? onBeforeSubmit,
   }) async {
     final sessionDTO = await adyenCheckoutApi.setupSession(
       sessionResponse.toDTO(),
@@ -26,6 +27,7 @@ class AdyenCheckoutSession {
     return SessionCheckout(
       id: sessionDTO.id,
       paymentMethods: jsonDecode(sessionDTO.paymentMethodsJson),
+      onBeforeSubmit: onBeforeSubmit,
     );
   }
 

@@ -988,4 +988,86 @@ void main() {
     const color = Color(0x80112233);
     expect(color.toHexString(), '#80112233');
   });
+
+  test('Address should map to/from AddressDTO preserving all fields', () {
+    const address = Address(
+      city: 'Amsterdam',
+      country: 'NL',
+      houseNumberOrName: '1',
+      postalCode: '1011AB',
+      stateOrProvince: 'NH',
+      street: 'Simon Carmiggeltstraat',
+      apartment: '2B',
+    );
+
+    final dto = address.toDTO();
+
+    expect(dto.city, address.city);
+    expect(dto.country, address.country);
+    expect(dto.houseNumberOrName, address.houseNumberOrName);
+    expect(dto.postalCode, address.postalCode);
+    expect(dto.stateOrProvince, address.stateOrProvince);
+    expect(dto.street, address.street);
+    expect(dto.apartment, address.apartment);
+
+    final roundTripped = dto.fromDTO();
+
+    expect(roundTripped.city, address.city);
+    expect(roundTripped.apartment, address.apartment);
+  });
+
+  test('ShopperName should map to/from ShopperNameDTO preserving all fields',
+      () {
+    const shopperName = ShopperName(
+      firstName: 'Checkout',
+      lastName: 'Shopper',
+      infix: 'van',
+      gender: 'UNKNOWN',
+    );
+
+    final dto = shopperName.toDTO();
+
+    expect(dto.firstName, shopperName.firstName);
+    expect(dto.lastName, shopperName.lastName);
+    expect(dto.infix, shopperName.infix);
+    expect(dto.gender, shopperName.gender);
+
+    final roundTripped = dto.fromDTO();
+
+    expect(roundTripped.infix, shopperName.infix);
+    expect(roundTripped.gender, shopperName.gender);
+  });
+
+  test(
+      'BeforeSubmitData with null fields should map to BeforeSubmitDataDTO with null fields',
+      () {
+    const data = BeforeSubmitData(shopperEmail: 'shopper@example.com');
+
+    final dto = data.toDTO();
+
+    expect(dto.billingAddress, isNull);
+    expect(dto.deliveryAddress, isNull);
+    expect(dto.shopperName, isNull);
+    expect(dto.shopperEmail, 'shopper@example.com');
+  });
+
+  test('BeforeSubmitProceed should map to a non-aborted BeforeSubmitResultDTO',
+      () {
+    const data = BeforeSubmitData(shopperEmail: 'shopper@example.com');
+    final result = BeforeSubmitProceed(data: data, sessionData: 'patched');
+
+    final BeforeSubmitResultDTO dto = result.toDTO();
+
+    expect(dto.isAborted, false);
+    expect(dto.data?.shopperEmail, 'shopper@example.com');
+    expect(dto.sessionData, 'patched');
+  });
+
+  test('BeforeSubmitAbort should map to an aborted BeforeSubmitResultDTO', () {
+    final BeforeSubmitResultDTO dto = BeforeSubmitAbort().toDTO();
+
+    expect(dto.isAborted, true);
+    expect(dto.data, isNull);
+    expect(dto.sessionData, isNull);
+  });
 }

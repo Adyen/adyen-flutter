@@ -12,6 +12,7 @@ import com.adyen.checkout.flutter.generated.CheckoutPlatformInterface
 import com.adyen.checkout.flutter.generated.ComponentFlutterInterface
 import com.adyen.checkout.flutter.generated.ComponentPlatformInterface
 import com.adyen.checkout.flutter.generated.DropInPlatformInterface
+import com.adyen.checkout.flutter.generated.SessionCheckoutFlutterInterface
 import com.adyen.checkout.flutter.session.CheckoutHolder
 import com.adyen.checkout.flutter.utils.Constants.Companion.WRONG_FLUTTER_ACTIVITY_USAGE_ERROR_MESSAGE
 import io.flutter.embedding.engine.plugins.FlutterPlugin
@@ -32,6 +33,7 @@ class AdyenCheckoutPlugin :
     private var componentFlutterApi: ComponentFlutterInterface? = null
 
     private var adyenFlutterInterface: AdyenFlutterInterface? = null
+    private var sessionCheckoutFlutterInterface: SessionCheckoutFlutterInterface? = null
     private var componentPlatformApi: ComponentPlatformApi? = null
     private var lifecycleObserver: LifecycleEventObserver? = null
     private var checkoutHolder: CheckoutHolder = CheckoutHolder()
@@ -97,12 +99,14 @@ class AdyenCheckoutPlugin :
     ) {
         componentFlutterApi = ComponentFlutterInterface(binaryMessenger)
         adyenFlutterInterface = AdyenFlutterInterface(binaryMessenger)
+        sessionCheckoutFlutterInterface = SessionCheckoutFlutterInterface(binaryMessenger)
         componentPlatformApi =
             ComponentPlatformApi(
                 fragmentActivity,
                 checkoutHolder,
                 componentFlutterApi!!,
                 adyenFlutterInterface!!,
+                sessionCheckoutFlutterInterface!!,
                 flutterPluginBinding
             )
         ComponentPlatformInterface.setUp(binaryMessenger, componentPlatformApi)

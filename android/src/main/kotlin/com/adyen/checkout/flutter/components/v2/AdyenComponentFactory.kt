@@ -4,17 +4,25 @@ import android.content.Context
 import androidx.fragment.app.FragmentActivity
 import com.adyen.checkout.core.action.data.Action
 import com.adyen.checkout.core.action.data.ActionComponentData
-import com.adyen.checkout.core.common.PaymentResult
+import com.adyen.checkout.core.components.AdvancedCheckoutResult
+import com.adyen.checkout.core.components.BeforeSubmitResult
 import com.adyen.checkout.core.components.CheckoutCallbacks
+import com.adyen.checkout.core.components.SessionCheckoutResult
 import com.adyen.checkout.core.components.SubmitResult
 import com.adyen.checkout.core.components.AdditionalDetailsResult
 import com.adyen.checkout.core.components.SessionCheckoutCallbacks
 import com.adyen.checkout.core.components.AdvancedCheckoutCallbacks
+import com.adyen.checkout.core.components.data.Address
+import com.adyen.checkout.core.components.data.BeforeSubmitData
 import com.adyen.checkout.core.components.data.PaymentComponentData
+import com.adyen.checkout.core.components.data.ShopperName
 import com.adyen.checkout.core.components.data.model.paymentmethod.PaymentMethod
 import com.adyen.checkout.flutter.components.ComponentPlatformEventHandler
 import com.adyen.checkout.flutter.generated.ActionResultDTO
+import com.adyen.checkout.flutter.generated.AddressDTO
 import com.adyen.checkout.flutter.generated.AdyenFlutterInterface
+import com.adyen.checkout.flutter.generated.BeforeSubmitDataDTO
+import com.adyen.checkout.flutter.generated.BeforeSubmitResultDTO
 import com.adyen.checkout.flutter.generated.CheckoutResultDTO
 import com.adyen.checkout.flutter.generated.ComponentCommunicationModel
 import com.adyen.checkout.flutter.generated.ComponentCommunicationType
@@ -25,6 +33,8 @@ import com.adyen.checkout.flutter.generated.PaymentResultDTO
 import com.adyen.checkout.flutter.generated.PaymentResultEnum
 import com.adyen.checkout.flutter.generated.PaymentResultModelDTO
 import com.adyen.checkout.flutter.generated.PlatformCommunicationDTO
+import com.adyen.checkout.flutter.generated.SessionCheckoutFlutterInterface
+import com.adyen.checkout.flutter.generated.ShopperNameDTO
 import com.adyen.checkout.flutter.session.CheckoutHolder
 import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToPaymentResultModelDTO
 import io.flutter.plugin.platform.PlatformView
@@ -39,6 +49,7 @@ import kotlin.onSuccess
 internal class AdyenComponentFactory(
     private val activity: FragmentActivity,
     private val adyenFlutterInterface: AdyenFlutterInterface,
+    private val sessionCheckoutFlutterInterface: SessionCheckoutFlutterInterface,
     private val platformEventHandler: ComponentPlatformEventHandler,
     private val viewTypeId: String,
     private val onDispose: (String) -> Unit,
@@ -79,8 +90,9 @@ internal class AdyenComponentFactory(
 
     fun createSessionCheckoutCallbacks(componentId: String): SessionCheckoutCallbacks =
         SessionCheckoutCallbacks(
-            onError = { checkoutError -> sendError(componentId, checkoutError.message) },
-            onFinished = { sendSessionFinished(componentId) }
+            onFailure = { checkoutError -> sendError(componentId, checkoutError.message) },
+            onComplete = { sessionCheckoutResult -> sendFinished(componentId, sessionCheckoutResult) },
+            onBeforeSubmit = { data -> onBeforeSubmit(data) },
         )
 
     fun createAdvancedCheckoutCallbacks(componentId: String): AdvancedCheckoutCallbacks =
@@ -135,8 +147,8 @@ internal class AdyenComponentFactory(
                     }
                 }
             },
-            onError = { error -> sendError(componentId, error.message) }
-            //TODO add onFinished()
+            onFailure = { error -> sendError(componentId, error.message) },
+            onComplete = { advancedCheckoutResult -> sendFinished(componentId, advancedCheckoutResult) }
         )
 
     fun createPaymentMethod(creationParams: Map<*, *>): PaymentMethod {
@@ -161,6 +173,77 @@ internal class AdyenComponentFactory(
             is ActionResultDTO -> AdditionalDetailsResult.Completion("Error")
         }
 
+    private suspend fun onBeforeSubmit(data: BeforeSubmitData): BeforeSubmitResult =
+        suspendCancellableCoroutine { continuation ->
+            sessionCheckoutFlutterInterface.onBeforeSubmit(data.toDTO()) { result: Result<BeforeSubmitResultDTO> ->
+                result
+                    .onSuccess { response: BeforeSubmitResultDTO -> continuation.resume(response.mapToBeforeSubmitResult()) }
+                    .onFailure { error -> continuation.resumeWithException(Exception("onBeforeSubmit failed: ${error.message}")) }
+            }
+        }
+
+    private fun BeforeSubmitData.toDTO(): BeforeSubmitDataDTO =
+        BeforeSubmitDataDTO(
+            billingAddress = billingAddress?.toDTO(),
+            deliveryAddress = deliveryAddress?.toDTO(),
+            shopperName = shopperName?.toDTO(),
+            shopperEmail = shopperEmail
+        )
+
+    private fun Address.toDTO(): AddressDTO =
+        AddressDTO(
+            city = city,
+            country = country,
+            houseNumberOrName = houseNumberOrName,
+            postalCode = postalCode,
+            stateOrProvince = stateOrProvince,
+            street = street
+        )
+
+    private fun ShopperName.toDTO(): ShopperNameDTO =
+        ShopperNameDTO(
+            firstName = firstName,
+            lastName = lastName,
+            infix = infix,
+            gender = gender
+        )
+
+    private fun BeforeSubmitResultDTO.mapToBeforeSubmitResult(): BeforeSubmitResult =
+        if (isAborted) {
+            BeforeSubmitResult.Abort()
+        } else {
+            BeforeSubmitResult.Proceed(
+                data = data?.fromDTO() ?: BeforeSubmitData(),
+                sessionData = sessionData
+            )
+        }
+
+    private fun BeforeSubmitDataDTO.fromDTO(): BeforeSubmitData =
+        BeforeSubmitData(
+            billingAddress = billingAddress?.fromDTO(),
+            deliveryAddress = deliveryAddress?.fromDTO(),
+            shopperName = shopperName?.fromDTO(),
+            shopperEmail = shopperEmail
+        )
+
+    private fun AddressDTO.fromDTO(): Address =
+        Address(
+            city = city,
+            country = country,
+            houseNumberOrName = houseNumberOrName,
+            postalCode = postalCode,
+            stateOrProvince = stateOrProvince,
+            street = street
+        )
+
+    private fun ShopperNameDTO.fromDTO(): ShopperName =
+        ShopperName(
+            firstName = firstName,
+            lastName = lastName,
+            infix = infix,
+            gender = gender
+        )
+
     private fun sendError(componentId: String, errorMessage: String?) {
         println("ON ERROR INVOKED: $errorMessage")
         platformEventHandler.eventSink?.success(
@@ -175,29 +258,29 @@ internal class AdyenComponentFactory(
         )
     }
 
-    private fun sendFinished(componentId: String, paymentResult: PaymentResult) {
-        println("ON FINISHED INVOKED: ${paymentResult.resultCode}")
+    private fun sendFinished(componentId: String, sessionCheckoutResult: SessionCheckoutResult) {
+        println("ON FINISHED INVOKED: ${sessionCheckoutResult.resultCode}")
         platformEventHandler.eventSink?.success(
             ComponentCommunicationModel(
                 type = ComponentCommunicationType.RESULT,
                 componentId = componentId,
                 paymentResult = PaymentResultDTO(
                     type = PaymentResultEnum.FINISHED,
-                    result = paymentResult.mapToPaymentResultModelDTO()
+                    result = sessionCheckoutResult.mapToPaymentResultModelDTO()
                 ),
             )
         )
     }
 
-    private fun sendSessionFinished(componentId: String) {
-        println("ON SESSION FINISHED INVOKED")
+    private fun sendFinished(componentId: String, advancedCheckoutResult: AdvancedCheckoutResult) {
+        println("ON FINISHED INVOKED: ${advancedCheckoutResult.resultCode}")
         platformEventHandler.eventSink?.success(
             ComponentCommunicationModel(
                 type = ComponentCommunicationType.RESULT,
                 componentId = componentId,
                 paymentResult = PaymentResultDTO(
                     type = PaymentResultEnum.FINISHED,
-                    result = null //TODO this needs to be exposed on Android SDK
+                    result = advancedCheckoutResult.mapToPaymentResultModelDTO()
                 ),
             )
         )

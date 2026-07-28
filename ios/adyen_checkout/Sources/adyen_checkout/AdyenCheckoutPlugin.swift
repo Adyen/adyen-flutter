@@ -10,6 +10,7 @@ public class AdyenCheckoutPlugin: NSObject, FlutterPlugin {
         let componentFlutterApi = ComponentFlutterInterface(binaryMessenger: messenger)
         //V2
         let adyenFlutterInterface = AdyenFlutterInterface(binaryMessenger: messenger)
+        let sessionCheckoutFlutterInterface = SessionCheckoutFlutterInterface(binaryMessenger: messenger)
         let componentPlatformEventHandler = ComponentPlatformEventHandler()
         let checkoutPlatformApi = CheckoutPlatformApi(
             checkoutFlutter: checkoutFlutter,
@@ -66,6 +67,7 @@ public class AdyenCheckoutPlugin: NSObject, FlutterPlugin {
         OnPlatformEventStreamHandler.register(with: messenger, streamHandler: componentPlatformEventHandler)
         let adyenComponentSessionFactory = AdyenComponentFactory(
             adyenFlutterInterface: adyenFlutterInterface,
+            sessionCheckoutFlutterInterface: sessionCheckoutFlutterInterface,
             componentPlatformEventHandler: componentPlatformEventHandler,
             checkoutHolder: checkoutHolder,
             viewTypeId: AdyenComponentFactory.adyenSessionComponentId
@@ -77,6 +79,7 @@ public class AdyenCheckoutPlugin: NSObject, FlutterPlugin {
 
         let adyenComponentAdvancedFactory = AdyenComponentFactory(
             adyenFlutterInterface: adyenFlutterInterface,
+            sessionCheckoutFlutterInterface: sessionCheckoutFlutterInterface,
             componentPlatformEventHandler: componentPlatformEventHandler,
             checkoutHolder: checkoutHolder,
             viewTypeId: AdyenComponentFactory.adyenAdvancedComponentId

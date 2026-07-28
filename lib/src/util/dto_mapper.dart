@@ -443,6 +443,78 @@ extension OrderResponseMapper on OrderResponseDTO {
       );
 }
 
+extension AddressMapper on Address {
+  AddressDTO toDTO() => AddressDTO(
+        city: city,
+        country: country,
+        houseNumberOrName: houseNumberOrName,
+        postalCode: postalCode,
+        stateOrProvince: stateOrProvince,
+        street: street,
+        apartment: apartment,
+      );
+}
+
+extension AddressDTOMapper on AddressDTO {
+  Address fromDTO() => Address(
+        city: city,
+        country: country,
+        houseNumberOrName: houseNumberOrName,
+        postalCode: postalCode,
+        stateOrProvince: stateOrProvince,
+        street: street,
+        apartment: apartment,
+      );
+}
+
+extension ShopperNameMapper on ShopperName {
+  ShopperNameDTO toDTO() => ShopperNameDTO(
+        firstName: firstName,
+        lastName: lastName,
+        infix: infix,
+        gender: gender,
+      );
+}
+
+extension ShopperNameDTOMapper on ShopperNameDTO {
+  ShopperName fromDTO() => ShopperName(
+        firstName: firstName,
+        lastName: lastName,
+        infix: infix,
+        gender: gender,
+      );
+}
+
+extension BeforeSubmitDataMapper on BeforeSubmitData {
+  BeforeSubmitDataDTO toDTO() => BeforeSubmitDataDTO(
+        billingAddress: billingAddress?.toDTO(),
+        deliveryAddress: deliveryAddress?.toDTO(),
+        shopperName: shopperName?.toDTO(),
+        shopperEmail: shopperEmail,
+      );
+}
+
+extension BeforeSubmitDataDTOMapper on BeforeSubmitDataDTO {
+  BeforeSubmitData fromDTO() => BeforeSubmitData(
+        billingAddress: billingAddress?.fromDTO(),
+        deliveryAddress: deliveryAddress?.fromDTO(),
+        shopperName: shopperName?.fromDTO(),
+        shopperEmail: shopperEmail,
+      );
+}
+
+extension BeforeSubmitResultMapper on BeforeSubmitResult {
+  BeforeSubmitResultDTO toDTO() => switch (this) {
+        BeforeSubmitProceed(data: final data, sessionData: final sessionData) =>
+          BeforeSubmitResultDTO(
+            isAborted: false,
+            data: data.toDTO(),
+            sessionData: sessionData,
+          ),
+        BeforeSubmitAbort() => BeforeSubmitResultDTO(isAborted: true),
+      };
+}
+
 extension CardComponentConfigurationMapper on CardComponentConfiguration {
   CardComponentConfigurationDTO toDTO(String sdkVersionNumber) =>
       CardComponentConfigurationDTO(
