@@ -84,6 +84,7 @@ class _BaseApplePayComponentState extends State<BaseApplePayComponent> {
   final ComponentFlutterApi _componentFlutterApi = ComponentFlutterApi.instance;
   late StreamSubscription<ComponentCommunicationModel>
       _componentCommunicationStream;
+  late final Future<InstantPaymentSetupResultDTO> _applePaySupportedFuture;
 
   @override
   void initState() {
@@ -98,12 +99,13 @@ class _BaseApplePayComponentState extends State<BaseApplePayComponent> {
         .where((communicationModel) =>
             communicationModel.componentId == widget.componentId)
         .listen(widget.handleComponentCommunication);
+    _applePaySupportedFuture = _isApplePaySupported();
   }
 
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-      future: _isApplePaySupported(),
+      future: _applePaySupportedFuture,
       builder: (
         BuildContext context,
         AsyncSnapshot<InstantPaymentSetupResultDTO> snapshot,

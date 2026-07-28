@@ -42,9 +42,10 @@ secrets.json
 .history
 .svn/
 
-#windsurf
+#Harnesses and LLMs
 .windsurf/
 .factory
+.devin/
 
 # IntelliJ related
 *.iml
