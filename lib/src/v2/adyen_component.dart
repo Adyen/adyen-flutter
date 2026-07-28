@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:adyen_checkout/adyen_checkout.dart';
+import 'package:adyen_checkout/src/util/constants.dart';
 import 'package:adyen_checkout/src/util/dto_mapper.dart';
 import 'package:adyen_checkout/src/v2/adyen_advanced_component.dart';
 import 'package:adyen_checkout/src/v2/adyen_session_component.dart';
@@ -24,12 +25,22 @@ class AdyenComponent extends StatelessWidget {
     this.gestureRecognizers,
   });
 
+  /// A payment method payload identifies a stored payment method by the
+  /// presence of an `id` field (the recurring detail reference), the same
+  /// way merchants distinguish stored vs. new payment methods when building
+  /// the payment methods list. There's no separate merchant-facing flag for
+  /// this: whether the flow is "stored" is entirely determined by which
+  /// payment method payload the merchant chose to render.
+  bool get _isStoredPaymentMethod =>
+      paymentMethod.containsKey(Constants.isStoredPaymentMethodIndicator);
+
   @override
   Widget build(BuildContext context) {
     final String encodedPaymentMethod = json.encode(paymentMethod);
     final String paymentMethodTxVariant = paymentMethod["type"];
     final double initialHeight =
         _calculateInitialHeight(configuration.cardConfiguration);
+    final bool isStoredPaymentMethod = _isStoredPaymentMethod;
     return switch (checkout) {
       SessionCheckout it => AdyenSessionComponent(
           checkoutConfiguration: configuration.toDTO(),
@@ -38,7 +49,7 @@ class AdyenComponent extends StatelessWidget {
           sessionCheckout: it,
           onPaymentResult: onPaymentResult,
           initialViewHeight: initialHeight,
-          isStoredPaymentMethod: false,
+          isStoredPaymentMethod: isStoredPaymentMethod,
           gestureRecognizers: gestureRecognizers,
           onBinLookup: configuration.cardConfiguration?.onBinLookup,
           onBinValue: configuration.cardConfiguration?.onBinValue,
@@ -50,7 +61,7 @@ class AdyenComponent extends StatelessWidget {
           advancedCheckout: it,
           onPaymentResult: onPaymentResult,
           initialViewHeight: initialHeight,
-          isStoredPaymentMethod: false,
+          isStoredPaymentMethod: isStoredPaymentMethod,
           gestureRecognizers: gestureRecognizers,
           onBinLookup: configuration.cardConfiguration?.onBinLookup,
           onBinValue: configuration.cardConfiguration?.onBinValue,
