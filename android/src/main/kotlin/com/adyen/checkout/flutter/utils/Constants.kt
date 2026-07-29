@@ -14,6 +14,7 @@ class Constants {
         const val ADVANCED_PAYMENT_DATA_KEY = "data"
         const val ADVANCED_EXTRA_DATA_KEY = "extra"
         const val PAYMENT_METHOD_KEY = "paymentMethod"
+        const val IS_STORED_PAYMENT_METHOD_KEY = "isStoredPaymentMethod"
         const val COMPONENT_ID_KEY = "componentId"
         const val ORDER_KEY = "order"
         const val SHOULD_UPDATE_PAYMENT_METHODS_KEY = "shouldUpdatePaymentMethods"

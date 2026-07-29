@@ -29,7 +29,8 @@ import com.adyen.checkout.core.components.CheckoutController
 import com.adyen.checkout.core.components.AdvancedCheckoutCallbacks
 import com.adyen.checkout.core.components.CheckoutPaymentFlow
 import com.adyen.checkout.core.components.SessionCheckoutCallbacks
-import com.adyen.checkout.core.components.data.model.paymentmethod.PaymentMethod
+import com.adyen.checkout.core.components.data.model.paymentmethod.PaymentMethodResponse
+import com.adyen.checkout.core.components.data.model.paymentmethod.StoredPaymentMethod
 import com.adyen.checkout.flutter.components.ComponentPlatformEventHandler
 import com.adyen.checkout.flutter.generated.ComponentCommunicationModel
 import com.adyen.checkout.flutter.generated.ComponentCommunicationType
@@ -85,7 +86,7 @@ class DynamicComponentView
 
         fun addV6Component(
             activity: ComponentActivity,
-            paymentMethod: PaymentMethod,
+            paymentMethod: PaymentMethodResponse,
             checkoutContext: CheckoutContext,
             callbacks: CheckoutCallbacks
         ) {
@@ -94,6 +95,15 @@ class DynamicComponentView
                     ?.decorView
                     ?.findViewTreeNavigationEventDispatcherOwner()
 
+            // A stored payment method is targeted by its id (it does not appear in the
+            // regular payment methods list), while a regular payment method is targeted by
+            // its type.
+            val target =
+                when (paymentMethod) {
+                    is StoredPaymentMethod -> CheckoutTarget.StoredPaymentMethod(paymentMethod.id)
+                    else -> CheckoutTarget.PaymentMethod(paymentMethod.type.orEmpty())
+                }
+
             addView(
                 ComposeView(activity).apply {
                     setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
@@ -101,17 +111,17 @@ class DynamicComponentView
                         ProvideNavigationEventDispatcherOwner(navigationEventDispatcherOwner) {
                             val coroutineScope = rememberCoroutineScope()
                             val controller =
-                                remember(paymentMethod, checkoutContext, callbacks) {
+                                remember(target, checkoutContext, callbacks) {
                                     if (checkoutContext is CheckoutContext.Advanced && callbacks is AdvancedCheckoutCallbacks) {
                                         CheckoutController(
-                                            target = CheckoutTarget.PaymentMethod(paymentMethod.type.orEmpty()),
+                                            target = target,
                                             context = checkoutContext,
                                             callbacks = callbacks,
                                             coroutineScope = coroutineScope,
                                         )
                                     } else if (checkoutContext is CheckoutContext.Sessions && callbacks is SessionCheckoutCallbacks) {
                                         CheckoutController(
-                                            target = CheckoutTarget.PaymentMethod(paymentMethod.type.orEmpty()),
+                                            target = target,
                                             context = checkoutContext,
                                             callbacks = callbacks,
                                             coroutineScope = coroutineScope,

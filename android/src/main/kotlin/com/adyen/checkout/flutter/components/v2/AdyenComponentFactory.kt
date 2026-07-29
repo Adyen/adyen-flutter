@@ -17,6 +17,8 @@ import com.adyen.checkout.core.components.data.BeforeSubmitData
 import com.adyen.checkout.core.components.data.PaymentComponentData
 import com.adyen.checkout.core.components.data.ShopperName
 import com.adyen.checkout.core.components.data.model.paymentmethod.PaymentMethod
+import com.adyen.checkout.core.components.data.model.paymentmethod.PaymentMethodResponse
+import com.adyen.checkout.core.components.data.model.paymentmethod.StoredPaymentMethod
 import com.adyen.checkout.flutter.components.ComponentPlatformEventHandler
 import com.adyen.checkout.flutter.generated.ActionResultDTO
 import com.adyen.checkout.flutter.generated.AddressDTO
@@ -59,6 +61,7 @@ internal class AdyenComponentFactory(
         const val ADYEN_COMPONENT_ADVANCED = "AdyenAdvancedComponent"
         const val ADYEN_COMPONENT_SESSION = "AdyenSessionComponent"
         const val PAYMENT_METHOD_KEY = "paymentMethod"
+        const val IS_STORED_PAYMENT_METHOD_KEY = "isStoredPaymentMethod"
         const val COMPONENT_ID_KEY = "componentId"
     }
 
@@ -151,9 +154,15 @@ internal class AdyenComponentFactory(
             onComplete = { advancedCheckoutResult -> sendFinished(componentId, advancedCheckoutResult) }
         )
 
-    fun createPaymentMethod(creationParams: Map<*, *>): PaymentMethod {
+    fun createPaymentMethod(creationParams: Map<*, *>): PaymentMethodResponse {
         val paymentMethodString = creationParams[PAYMENT_METHOD_KEY] as String? ?: ""
-        return PaymentMethod.SERIALIZER.deserialize(JSONObject(paymentMethodString))
+        val isStoredPaymentMethod = creationParams[IS_STORED_PAYMENT_METHOD_KEY] as Boolean? ?: false
+        val jsonObject = JSONObject(paymentMethodString)
+        return if (isStoredPaymentMethod) {
+            StoredPaymentMethod.SERIALIZER.deserialize(jsonObject)
+        } else {
+            PaymentMethod.SERIALIZER.deserialize(jsonObject)
+        }
     }
 
     private fun mapToSubmitResult(response: CheckoutResultDTO): SubmitResult =

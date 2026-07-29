@@ -21,6 +21,8 @@ class AdyenComponent: NSObject, FlutterPlatformView {
     private let checkoutHolder: CheckoutHolder
     private let componentWrapperView: ComponentWrapperView
     private let paymentMethodTxVariant: String
+    private let paymentMethodJson: String
+    private let isStoredPaymentMethod: Bool
     private let componentId: String
 
     private var paymentComponent: CheckoutPaymentComponent?
@@ -41,6 +43,8 @@ class AdyenComponent: NSObject, FlutterPlatformView {
         self.checkoutHolder = checkoutHolder
         componentWrapperView = .init()
         paymentMethodTxVariant = arguments.value(forKey: "paymentMethodTxVariant") as? String ?? ""
+        paymentMethodJson = arguments.value(forKey: "paymentMethod") as? String ?? ""
+        isStoredPaymentMethod = arguments.value(forKey: "isStoredPaymentMethod") as? Bool ?? false
         componentId = arguments.value(forKey: "componentId") as? String ?? ""
         super.init()
         setupComponentView()
@@ -52,7 +56,7 @@ class AdyenComponent: NSObject, FlutterPlatformView {
 
     private func setupComponentView() {
         do {
-            guard let checkout = checkoutHolder.adyenCheckout, let paymentMethodType: PaymentMethodType = PaymentMethodType(rawValue: paymentMethodTxVariant) else {
+            guard let checkout = checkoutHolder.adyenCheckout else {
                 throw PlatformError(errorDescription: "Checkout is not available.")
             }
 
@@ -63,13 +67,38 @@ class AdyenComponent: NSObject, FlutterPlatformView {
                 }
             }
 
-            let paymentComponent = try checkout.createPaymentComponent(for: paymentMethodType)
-            
+            let paymentComponent = try createPaymentComponent(checkout: checkout)
+
             self.paymentComponent = paymentComponent
             self.showComponent(paymentComponent: paymentComponent)
         } catch {
             sendErrorToFlutterLayer(errorMessage: error.localizedDescription)
         }
+    }
+
+    /// A stored payment method is targeted by its identifier (it does not appear in the
+    /// regular payment methods list), while a regular payment method is targeted by its type.
+    private func createPaymentComponent(checkout: PaymentCheckout) throws -> CheckoutPaymentComponent {
+        if isStoredPaymentMethod {
+            guard let identifier = storedPaymentMethodIdentifier else {
+                throw PlatformError(errorDescription: "Stored payment method identifier not found.")
+            }
+            return try checkout.createPaymentComponent(for: identifier)
+        }
+
+        guard let paymentMethodType = PaymentMethodType(rawValue: paymentMethodTxVariant) else {
+            throw PlatformError(errorDescription: "Unknown payment method type.")
+        }
+        return try checkout.createPaymentComponent(for: paymentMethodType)
+    }
+
+    /// The recurring detail reference (`id`) Adyen's `/paymentMethods` response uses to
+    /// identify a stored payment method.
+    private var storedPaymentMethodIdentifier: String? {
+        guard let data = paymentMethodJson.data(using: .utf8),
+              let jsonObject = try? JSONSerialization.jsonObject(with: data) as? [String: Any]
+        else { return nil }
+        return jsonObject["id"] as? String
     }
 
     private func handleBeforeSubmit(data: BeforeSubmitData) async -> BeforeSubmitResult {
