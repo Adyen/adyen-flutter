@@ -4,8 +4,8 @@ import com.adyen.checkout.core.components.CheckoutConfiguration
 import com.adyen.checkout.flutter.generated.AddressMode
 import com.adyen.checkout.flutter.generated.AmountDTO
 import com.adyen.checkout.flutter.generated.AnalyticsOptionsDTO
-import com.adyen.checkout.flutter.generated.CardComponentConfigurationDTO
 import com.adyen.checkout.flutter.generated.CardConfigurationDTO
+import com.adyen.checkout.flutter.generated.CheckoutConfigurationDTO
 import com.adyen.checkout.flutter.generated.Environment
 import com.adyen.checkout.flutter.generated.FieldVisibility
 import com.adyen.checkout.flutter.generated.ThreeDS2ButtonCustomizationDTO
@@ -30,14 +30,14 @@ class ThreeDS2CustomizationMapperTest {
 
     private fun createBaseCardComponentConfiguration(
         threeDS2ConfigurationDTO: ThreeDS2ConfigurationDTO
-    ): CardComponentConfigurationDTO {
-        return CardComponentConfigurationDTO(
+    ): CheckoutConfigurationDTO {
+        return CheckoutConfigurationDTO(
             environment = Environment.TEST,
             clientKey = testClientKey,
             countryCode = "US",
             amount = AmountDTO("USD", 1824),
             analyticsOptionsDTO = AnalyticsOptionsDTO(false, "0.0.1"),
-            cardConfiguration = CardConfigurationDTO(
+            cardConfigurationDTO = CardConfigurationDTO(
                 holderNameRequired = false,
                 addressMode = AddressMode.NONE,
                 showStorePaymentField = true,

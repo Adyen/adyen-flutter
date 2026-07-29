@@ -4,7 +4,7 @@ import 'package:adyen_checkout/adyen_checkout.dart';
 import 'package:adyen_checkout_example/config.dart';
 import 'package:adyen_checkout_example/repositories/adyen_apple_pay_component_repository.dart';
 import 'package:adyen_checkout_example/repositories/adyen_blik_component_repository.dart';
-import 'package:adyen_checkout_example/repositories/adyen_card_component_repository.dart';
+import 'package:adyen_checkout_example/repositories/adyen_drop_in_repository.dart';
 import 'package:adyen_checkout_example/repositories/adyen_google_pay_component_repository.dart';
 import 'package:adyen_checkout_example/utils/dialog_builder.dart';
 import 'package:collection/collection.dart';
@@ -13,23 +13,24 @@ import 'package:flutter/material.dart';
 
 class MultiComponentSessionScreen extends StatelessWidget {
   MultiComponentSessionScreen({
-    required this.cardRepository,
+    required this.dropInRepository,
     required this.blikRepository,
     required this.applePayRepository,
     required this.googlePayRepository,
     super.key,
   });
 
-  final AdyenCardComponentRepository cardRepository;
+  final AdyenDropInRepository dropInRepository;
   final AdyenBlikComponentRepository blikRepository;
   final AdyenApplePayComponentRepository applePayRepository;
   final AdyenGooglePayComponentRepository googlePayRepository;
-  final cardComponentConfiguration = CardComponentConfiguration(
+  final checkoutConfiguration = CheckoutConfiguration(
     environment: Config.environment,
     clientKey: Config.clientKey,
     countryCode: Config.countryCode,
     amount: Config.amount,
     shopperLocale: Config.shopperLocale,
+    cardConfiguration: const CardConfiguration(),
   );
 
   @override
@@ -112,9 +113,12 @@ class MultiComponentSessionScreen extends StatelessWidget {
       sessionCheckout.paymentMethods,
       'scheme',
     );
+    if (schemePaymentMethod.isEmpty) {
+      return const SizedBox.shrink();
+    }
 
-    return AdyenCardComponent(
-      configuration: cardComponentConfiguration,
+    return AdyenComponent(
+      configuration: checkoutConfiguration,
       paymentMethod: schemePaymentMethod,
       checkout: sessionCheckout,
       onPaymentResult: (paymentResult) async {
@@ -230,8 +234,18 @@ class MultiComponentSessionScreen extends StatelessWidget {
     );
   }
 
-  Future<SessionCheckout> _getSessionCheckout() async =>
-      await cardRepository.createSessionCheckout(cardComponentConfiguration);
+  Future<SessionCheckout> _getSessionCheckout() async {
+    final sessionResponseBody = await dropInRepository.fetchSession();
+    final sessionResponse = SessionResponse(
+      sessionResponseBody['id'],
+      sessionResponseBody['sessionData'],
+    );
+
+    return AdyenCheckout.session.setup(
+      sessionResponse: sessionResponse,
+      checkoutConfiguration: checkoutConfiguration,
+    );
+  }
 
   Map<String, dynamic> _extractPaymentMethodByType(
     Map<String, dynamic> paymentMethods,

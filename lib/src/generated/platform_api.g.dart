@@ -3095,82 +3095,6 @@ class DeletedStoredPaymentMethodResultDTO {
 ;
 }
 
-class CardComponentConfigurationDTO {
-  CardComponentConfigurationDTO({
-    required this.environment,
-    required this.clientKey,
-    required this.countryCode,
-    this.amount,
-    this.shopperLocale,
-    required this.analyticsOptionsDTO,
-    required this.cardConfiguration,
-    this.threeDS2ConfigurationDTO,
-  });
-
-  Environment environment;
-
-  String clientKey;
-
-  String countryCode;
-
-  AmountDTO? amount;
-
-  String? shopperLocale;
-
-  AnalyticsOptionsDTO analyticsOptionsDTO;
-
-  CardConfigurationDTO cardConfiguration;
-
-  ThreeDS2ConfigurationDTO? threeDS2ConfigurationDTO;
-
-  List<Object?> _toList() {
-    return <Object?>[
-      environment,
-      clientKey,
-      countryCode,
-      amount,
-      shopperLocale,
-      analyticsOptionsDTO,
-      cardConfiguration,
-      threeDS2ConfigurationDTO,
-    ];
-  }
-
-  Object encode() {
-    return _toList();  }
-
-  static CardComponentConfigurationDTO decode(Object result) {
-    result as List<Object?>;
-    return CardComponentConfigurationDTO(
-      environment: result[0]! as Environment,
-      clientKey: result[1]! as String,
-      countryCode: result[2]! as String,
-      amount: result[3] as AmountDTO?,
-      shopperLocale: result[4] as String?,
-      analyticsOptionsDTO: result[5]! as AnalyticsOptionsDTO,
-      cardConfiguration: result[6]! as CardConfigurationDTO,
-      threeDS2ConfigurationDTO: result[7] as ThreeDS2ConfigurationDTO?,
-    );
-  }
-
-  @override
-  // ignore: avoid_equals_and_hash_code_on_mutable_classes
-  bool operator ==(Object other) {
-    if (other is! CardComponentConfigurationDTO || other.runtimeType != runtimeType) {
-      return false;
-    }
-    if (identical(this, other)) {
-      return true;
-    }
-    return _deepEquals(encode(), other.encode());
-  }
-
-  @override
-  // ignore: avoid_equals_and_hash_code_on_mutable_classes
-  int get hashCode => Object.hashAll(_toList())
-;
-}
-
 class BlikComponentConfigurationDTO {
   BlikComponentConfigurationDTO({
     required this.environment,
@@ -3849,32 +3773,29 @@ class _PigeonCodec extends StandardMessageCodec {
     }    else if (value is DeletedStoredPaymentMethodResultDTO) {
       buffer.putUint8(197);
       writeValue(buffer, value.encode());
-    }    else if (value is CardComponentConfigurationDTO) {
+    }    else if (value is BlikComponentConfigurationDTO) {
       buffer.putUint8(198);
       writeValue(buffer, value.encode());
-    }    else if (value is BlikComponentConfigurationDTO) {
+    }    else if (value is InstantPaymentConfigurationDTO) {
       buffer.putUint8(199);
       writeValue(buffer, value.encode());
-    }    else if (value is InstantPaymentConfigurationDTO) {
+    }    else if (value is InstantPaymentSetupResultDTO) {
       buffer.putUint8(200);
       writeValue(buffer, value.encode());
-    }    else if (value is InstantPaymentSetupResultDTO) {
+    }    else if (value is UnencryptedCardDTO) {
       buffer.putUint8(201);
       writeValue(buffer, value.encode());
-    }    else if (value is UnencryptedCardDTO) {
+    }    else if (value is EncryptedCardDTO) {
       buffer.putUint8(202);
       writeValue(buffer, value.encode());
-    }    else if (value is EncryptedCardDTO) {
+    }    else if (value is ActionComponentConfigurationDTO) {
       buffer.putUint8(203);
       writeValue(buffer, value.encode());
-    }    else if (value is ActionComponentConfigurationDTO) {
+    }    else if (value is OrderCancelResultDTO) {
       buffer.putUint8(204);
       writeValue(buffer, value.encode());
-    }    else if (value is OrderCancelResultDTO) {
-      buffer.putUint8(205);
-      writeValue(buffer, value.encode());
     }    else if (value is BinLookupDataDTO) {
-      buffer.putUint8(206);
+      buffer.putUint8(205);
       writeValue(buffer, value.encode());
     } else {
       super.writeValue(buffer, value);
@@ -4042,22 +3963,20 @@ class _PigeonCodec extends StandardMessageCodec {
       case 197: 
         return DeletedStoredPaymentMethodResultDTO.decode(readValue(buffer)!);
       case 198: 
-        return CardComponentConfigurationDTO.decode(readValue(buffer)!);
-      case 199: 
         return BlikComponentConfigurationDTO.decode(readValue(buffer)!);
-      case 200: 
+      case 199: 
         return InstantPaymentConfigurationDTO.decode(readValue(buffer)!);
-      case 201: 
+      case 200: 
         return InstantPaymentSetupResultDTO.decode(readValue(buffer)!);
-      case 202: 
+      case 201: 
         return UnencryptedCardDTO.decode(readValue(buffer)!);
-      case 203: 
+      case 202: 
         return EncryptedCardDTO.decode(readValue(buffer)!);
-      case 204: 
+      case 203: 
         return ActionComponentConfigurationDTO.decode(readValue(buffer)!);
-      case 205: 
+      case 204: 
         return OrderCancelResultDTO.decode(readValue(buffer)!);
-      case 206: 
+      case 205: 
         return BinLookupDataDTO.decode(readValue(buffer)!);
       default:
         return super.readValueOfType(type, buffer);
@@ -4836,7 +4755,7 @@ class ComponentPlatformInterface {
 abstract class ComponentFlutterInterface {
   static const MessageCodec<Object?> pigeonChannelCodec = _PigeonCodec();
 
-  void _generateCodecForDTOs(CardComponentConfigurationDTO cardComponentConfigurationDTO, BlikComponentConfigurationDTO blikComponentConfigurationDTO, SessionDTO sessionDTO, BinLookupDataDTO binLookupDataDTO);
+  void _generateCodecForDTOs(BlikComponentConfigurationDTO blikComponentConfigurationDTO, SessionDTO sessionDTO, BinLookupDataDTO binLookupDataDTO);
 
   void onComponentCommunication(ComponentCommunicationModel componentCommunicationModel);
 
@@ -4861,20 +4780,17 @@ abstract class ComponentFlutterInterface {
           assert(message != null,
           'Argument for dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface._generateCodecForDTOs was null.');
           final List<Object?> args = (message as List<Object?>?)!;
-          final CardComponentConfigurationDTO? arg_cardComponentConfigurationDTO = (args[0] as CardComponentConfigurationDTO?);
-          assert(arg_cardComponentConfigurationDTO != null,
-              'Argument for dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface._generateCodecForDTOs was null, expected non-null CardComponentConfigurationDTO.');
-          final BlikComponentConfigurationDTO? arg_blikComponentConfigurationDTO = (args[1] as BlikComponentConfigurationDTO?);
+          final BlikComponentConfigurationDTO? arg_blikComponentConfigurationDTO = (args[0] as BlikComponentConfigurationDTO?);
           assert(arg_blikComponentConfigurationDTO != null,
               'Argument for dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface._generateCodecForDTOs was null, expected non-null BlikComponentConfigurationDTO.');
-          final SessionDTO? arg_sessionDTO = (args[2] as SessionDTO?);
+          final SessionDTO? arg_sessionDTO = (args[1] as SessionDTO?);
           assert(arg_sessionDTO != null,
               'Argument for dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface._generateCodecForDTOs was null, expected non-null SessionDTO.');
-          final BinLookupDataDTO? arg_binLookupDataDTO = (args[3] as BinLookupDataDTO?);
+          final BinLookupDataDTO? arg_binLookupDataDTO = (args[2] as BinLookupDataDTO?);
           assert(arg_binLookupDataDTO != null,
               'Argument for dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface._generateCodecForDTOs was null, expected non-null BinLookupDataDTO.');
           try {
-            api._generateCodecForDTOs(arg_cardComponentConfigurationDTO!, arg_blikComponentConfigurationDTO!, arg_sessionDTO!, arg_binLookupDataDTO!);
+            api._generateCodecForDTOs(arg_blikComponentConfigurationDTO!, arg_sessionDTO!, arg_binLookupDataDTO!);
             return wrapResponse(empty: true);
           } on PlatformException catch (e) {
             return wrapResponse(error: e);

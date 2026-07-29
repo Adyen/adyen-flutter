@@ -2,9 +2,10 @@ package com.adyen.checkout.flutter.utils
 
 import com.adyen.checkout.card.FieldVisibility as SdkFieldVisibility
 import com.adyen.checkout.card.card
+import com.adyen.checkout.card.BillingAddressMode
+import com.adyen.checkout.card.InstallmentConfiguration
+import com.adyen.checkout.card.InstallmentOptions
 import com.adyen.checkout.card.old.AddressConfiguration
-import com.adyen.checkout.card.old.InstallmentConfiguration
-import com.adyen.checkout.card.old.InstallmentOptions
 import com.adyen.checkout.components.core.OrderResponse
 import com.adyen.checkout.core.common.CardBrand
 import com.adyen.checkout.core.components.AdvancedCheckoutResult
@@ -23,7 +24,6 @@ import com.adyen.checkout.flutter.generated.AmountDTO
 import com.adyen.checkout.flutter.generated.AnalyticsOptionsDTO
 import com.adyen.checkout.flutter.generated.BillingAddressParametersDTO
 import com.adyen.checkout.flutter.generated.BlikComponentConfigurationDTO
-import com.adyen.checkout.flutter.generated.CardComponentConfigurationDTO
 import com.adyen.checkout.flutter.generated.CardBasedInstallmentOptionsDTO
 import com.adyen.checkout.flutter.generated.CardConfigurationDTO
 import com.adyen.checkout.flutter.generated.CashAppPayConfigurationDTO
@@ -122,18 +122,6 @@ object ConfigurationMapper {
 //            }
         }
 
-    fun CardComponentConfigurationDTO.toCheckoutConfiguration(): CheckoutConfiguration =
-        toCheckoutConfiguration(
-            environment = environment,
-            clientKey = clientKey,
-            analyticsOptionsDTO = analyticsOptionsDTO,
-            shopperLocale = shopperLocale,
-            amount = amount,
-            countryCode = countryCode,
-            cardConfigurationDTO = cardConfiguration,
-            threeDS2ConfigurationDTO = threeDS2ConfigurationDTO,
-        )
-
     fun BlikComponentConfigurationDTO.toCheckoutConfiguration(): CheckoutConfiguration =
         toCheckoutConfiguration(
             environment = environment,
@@ -197,7 +185,9 @@ object ConfigurationMapper {
                     showSecurityCode = configurationDTO.showCvc,
                     showSecurityCodeForStoredCard = configurationDTO.showCvcForStoredCard,
                     koreanAuthenticationVisibility = determineFieldVisibility(configurationDTO.kcpFieldVisibility),
-                    socialSecurityNumberVisibility = determineFieldVisibility(configurationDTO.socialSecurityNumberFieldVisibility)
+                    socialSecurityNumberVisibility = determineFieldVisibility(configurationDTO.socialSecurityNumberFieldVisibility),
+                    installmentConfiguration = configurationDTO.installmentConfiguration?.mapToInstallmentConfiguration(),
+                    billingAddressMode = configurationDTO.addressMode.mapToBillingAddressMode(),
                 )
             }
 
@@ -286,6 +276,14 @@ object ConfigurationMapper {
         CheckoutPlatformParams.overrideForCrossPlatform(CheckoutPlatform.FLUTTER, version)
         return AnalyticsConfiguration(analyticsLevel)
     }
+
+    private fun AddressMode.mapToBillingAddressMode(): BillingAddressMode? =
+        when (this) {
+            // TODO: BillingAddressMode.Full is not yet implemented by the 6.0.0-alpha.1 SDK.
+            AddressMode.FULL -> null
+            AddressMode.POSTAL_CODE -> BillingAddressMode.PostalCode()
+            AddressMode.NONE -> BillingAddressMode.None()
+        }
 
     private fun AddressMode.mapToAddressConfiguration(countryCode: String?): AddressConfiguration =
         when (this) {
@@ -475,8 +473,12 @@ object ConfigurationMapper {
         }
 
     private fun InstallmentConfigurationDTO.mapToInstallmentConfiguration(): InstallmentConfiguration {
-        val defaultOptions = defaultOptions?.mapToDefaultInstallmentOptions()
-        val cardBasedOptions = cardBasedOptions?.mapNotNull { it?.mapToCardBasedInstallmentOptions() } ?: emptyList()
+        val defaultOptions = defaultOptions?.mapToInstallmentOptions()
+        val cardBasedOptions =
+            cardBasedOptions
+                ?.filterNotNull()
+                ?.associate { CardBrand(txVariant = it.cardBrand) to it.mapToInstallmentOptions() }
+                ?: emptyMap()
 
         return InstallmentConfiguration(
             defaultOptions = defaultOptions,
@@ -485,20 +487,24 @@ object ConfigurationMapper {
         )
     }
 
-    private fun DefaultInstallmentOptionsDTO.mapToDefaultInstallmentOptions():
-        InstallmentOptions.DefaultInstallmentOptions =
-        InstallmentOptions.DefaultInstallmentOptions(
-            values = (values as List<Number?>).mapNotNull { it?.toInt() },
-            includeRevolving = includesRevolving
-        )
+    private fun DefaultInstallmentOptionsDTO.mapToInstallmentOptions(): InstallmentOptions =
+        installmentOptions(values, includesRevolving)
 
-    private fun CardBasedInstallmentOptionsDTO.mapToCardBasedInstallmentOptions():
-        InstallmentOptions.CardBasedInstallmentOptions =
-        InstallmentOptions.CardBasedInstallmentOptions(
-            values = (values as List<Number?>).mapNotNull { it?.toInt() },
-            includeRevolving = includesRevolving,
-            cardBrand =
-                com.adyen.checkout.core.old
-                    .CardBrand(txVariant = cardBrand)
+    private fun CardBasedInstallmentOptionsDTO.mapToInstallmentOptions(): InstallmentOptions =
+        installmentOptions(values, includesRevolving)
+
+    private fun installmentOptions(
+        values: List<Long?>?,
+        includesRevolving: Boolean
+    ): InstallmentOptions =
+        InstallmentOptions(
+            values = values.orEmpty().mapNotNull { it?.toInt() },
+            plans =
+                if (includesRevolving) {
+                    listOf(InstallmentOptions.Plan.REGULAR, InstallmentOptions.Plan.REVOLVING)
+                } else {
+                    listOf(InstallmentOptions.Plan.REGULAR)
+                },
+            preselectedValue = null,
         )
 }

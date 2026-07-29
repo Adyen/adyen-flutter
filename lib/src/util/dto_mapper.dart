@@ -515,20 +515,6 @@ extension BeforeSubmitResultMapper on BeforeSubmitResult {
       };
 }
 
-extension CardComponentConfigurationMapper on CardComponentConfiguration {
-  CardComponentConfigurationDTO toDTO(String sdkVersionNumber) =>
-      CardComponentConfigurationDTO(
-        environment: environment,
-        clientKey: clientKey,
-        countryCode: countryCode,
-        amount: amount?.toDTO(),
-        shopperLocale: shopperLocale,
-        cardConfiguration: cardConfiguration.toDTO(),
-        threeDS2ConfigurationDTO: threeDS2Configuration?.toDTO(),
-        analyticsOptionsDTO: analyticsOptions.toDTO(sdkVersionNumber),
-      );
-}
-
 extension BlikComponentConfigurationMapper on BlikComponentConfiguration {
   BlikComponentConfigurationDTO toDTO(String sdkVersionNumber) =>
       BlikComponentConfigurationDTO(

@@ -900,28 +900,6 @@ class DeletedStoredPaymentMethodResultDTO {
   );
 }
 
-class CardComponentConfigurationDTO {
-  final Environment environment;
-  final String clientKey;
-  final String countryCode;
-  final AmountDTO? amount;
-  final String? shopperLocale;
-  final AnalyticsOptionsDTO analyticsOptionsDTO;
-  final CardConfigurationDTO cardConfiguration;
-  final ThreeDS2ConfigurationDTO? threeDS2ConfigurationDTO;
-
-  CardComponentConfigurationDTO(
-    this.environment,
-    this.clientKey,
-    this.countryCode,
-    this.amount,
-    this.shopperLocale,
-    this.analyticsOptionsDTO,
-    this.cardConfiguration,
-    this.threeDS2ConfigurationDTO,
-  );
-}
-
 class BlikComponentConfigurationDTO {
   final Environment environment;
   final String clientKey;
@@ -1161,7 +1139,6 @@ abstract class ComponentPlatformInterface {
 abstract class ComponentFlutterInterface {
   // ignore: unused_element
   void _generateCodecForDTOs(
-    CardComponentConfigurationDTO cardComponentConfigurationDTO,
     BlikComponentConfigurationDTO blikComponentConfigurationDTO,
     SessionDTO sessionDTO,
     BinLookupDataDTO binLookupDataDTO,

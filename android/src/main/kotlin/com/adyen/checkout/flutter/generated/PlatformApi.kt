@@ -2256,55 +2256,6 @@ data class DeletedStoredPaymentMethodResultDTO (
 }
 
 /** Generated class from Pigeon that represents data sent in messages. */
-data class CardComponentConfigurationDTO (
-  val environment: Environment,
-  val clientKey: String,
-  val countryCode: String,
-  val amount: AmountDTO? = null,
-  val shopperLocale: String? = null,
-  val analyticsOptionsDTO: AnalyticsOptionsDTO,
-  val cardConfiguration: CardConfigurationDTO,
-  val threeDS2ConfigurationDTO: ThreeDS2ConfigurationDTO? = null
-)
- {
-  companion object {
-    fun fromList(pigeonVar_list: List<Any?>): CardComponentConfigurationDTO {
-      val environment = pigeonVar_list[0] as Environment
-      val clientKey = pigeonVar_list[1] as String
-      val countryCode = pigeonVar_list[2] as String
-      val amount = pigeonVar_list[3] as AmountDTO?
-      val shopperLocale = pigeonVar_list[4] as String?
-      val analyticsOptionsDTO = pigeonVar_list[5] as AnalyticsOptionsDTO
-      val cardConfiguration = pigeonVar_list[6] as CardConfigurationDTO
-      val threeDS2ConfigurationDTO = pigeonVar_list[7] as ThreeDS2ConfigurationDTO?
-      return CardComponentConfigurationDTO(environment, clientKey, countryCode, amount, shopperLocale, analyticsOptionsDTO, cardConfiguration, threeDS2ConfigurationDTO)
-    }
-  }
-  fun toList(): List<Any?> {
-    return listOf(
-      environment,
-      clientKey,
-      countryCode,
-      amount,
-      shopperLocale,
-      analyticsOptionsDTO,
-      cardConfiguration,
-      threeDS2ConfigurationDTO,
-    )
-  }
-  override fun equals(other: Any?): Boolean {
-    if (other !is CardComponentConfigurationDTO) {
-      return false
-    }
-    if (this === other) {
-      return true
-    }
-    return PlatformApiPigeonUtils.deepEquals(toList(), other.toList())  }
-
-  override fun hashCode(): Int = toList().hashCode()
-}
-
-/** Generated class from Pigeon that represents data sent in messages. */
 data class BlikComponentConfigurationDTO (
   val environment: Environment,
   val clientKey: String,
@@ -2958,45 +2909,40 @@ private open class PlatformApiPigeonCodec : StandardMessageCodec() {
       }
       198.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          CardComponentConfigurationDTO.fromList(it)
+          BlikComponentConfigurationDTO.fromList(it)
         }
       }
       199.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          BlikComponentConfigurationDTO.fromList(it)
+          InstantPaymentConfigurationDTO.fromList(it)
         }
       }
       200.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          InstantPaymentConfigurationDTO.fromList(it)
+          InstantPaymentSetupResultDTO.fromList(it)
         }
       }
       201.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          InstantPaymentSetupResultDTO.fromList(it)
+          UnencryptedCardDTO.fromList(it)
         }
       }
       202.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          UnencryptedCardDTO.fromList(it)
+          EncryptedCardDTO.fromList(it)
         }
       }
       203.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          EncryptedCardDTO.fromList(it)
+          ActionComponentConfigurationDTO.fromList(it)
         }
       }
       204.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          ActionComponentConfigurationDTO.fromList(it)
-        }
-      }
-      205.toByte() -> {
-        return (readValue(buffer) as? List<Any?>)?.let {
           OrderCancelResultDTO.fromList(it)
         }
       }
-      206.toByte() -> {
+      205.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
           BinLookupDataDTO.fromList(it)
         }
@@ -3282,40 +3228,36 @@ private open class PlatformApiPigeonCodec : StandardMessageCodec() {
         stream.write(197)
         writeValue(stream, value.toList())
       }
-      is CardComponentConfigurationDTO -> {
+      is BlikComponentConfigurationDTO -> {
         stream.write(198)
         writeValue(stream, value.toList())
       }
-      is BlikComponentConfigurationDTO -> {
+      is InstantPaymentConfigurationDTO -> {
         stream.write(199)
         writeValue(stream, value.toList())
       }
-      is InstantPaymentConfigurationDTO -> {
+      is InstantPaymentSetupResultDTO -> {
         stream.write(200)
         writeValue(stream, value.toList())
       }
-      is InstantPaymentSetupResultDTO -> {
+      is UnencryptedCardDTO -> {
         stream.write(201)
         writeValue(stream, value.toList())
       }
-      is UnencryptedCardDTO -> {
+      is EncryptedCardDTO -> {
         stream.write(202)
         writeValue(stream, value.toList())
       }
-      is EncryptedCardDTO -> {
+      is ActionComponentConfigurationDTO -> {
         stream.write(203)
         writeValue(stream, value.toList())
       }
-      is ActionComponentConfigurationDTO -> {
+      is OrderCancelResultDTO -> {
         stream.write(204)
         writeValue(stream, value.toList())
       }
-      is OrderCancelResultDTO -> {
-        stream.write(205)
-        writeValue(stream, value.toList())
-      }
       is BinLookupDataDTO -> {
-        stream.write(206)
+        stream.write(205)
         writeValue(stream, value.toList())
       }
       else -> super.writeValue(stream, value)
@@ -3950,12 +3892,12 @@ class ComponentFlutterInterface(private val binaryMessenger: BinaryMessenger, pr
       PlatformApiPigeonCodec()
     }
   }
-  fun _generateCodecForDTOs(cardComponentConfigurationDTOArg: CardComponentConfigurationDTO, blikComponentConfigurationDTOArg: BlikComponentConfigurationDTO, sessionDTOArg: SessionDTO, binLookupDataDTOArg: BinLookupDataDTO, callback: (Result<Unit>) -> Unit)
+  fun _generateCodecForDTOs(blikComponentConfigurationDTOArg: BlikComponentConfigurationDTO, sessionDTOArg: SessionDTO, binLookupDataDTOArg: BinLookupDataDTO, callback: (Result<Unit>) -> Unit)
 {
     val separatedMessageChannelSuffix = if (messageChannelSuffix.isNotEmpty()) ".$messageChannelSuffix" else ""
     val channelName = "dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface._generateCodecForDTOs$separatedMessageChannelSuffix"
     val channel = BasicMessageChannel<Any?>(binaryMessenger, channelName, codec)
-    channel.send(listOf(cardComponentConfigurationDTOArg, blikComponentConfigurationDTOArg, sessionDTOArg, binLookupDataDTOArg)) {
+    channel.send(listOf(blikComponentConfigurationDTOArg, sessionDTOArg, binLookupDataDTOArg)) {
       if (it is List<*>) {
         if (it.size > 1) {
           callback(Result.failure(AdyenPigeonError(it[0] as String, it[1] as String, it[2] as String?)))

@@ -1,6 +1,5 @@
 @MainActor
 class ComponentPlatformApi: ComponentPlatformInterface {
-    private let cardComponentManager: CardComponentManager
     private let blikComponentManager: BlikComponentManager
     private let instantComponentManager: InstantComponentManager
     private let actionComponentManager: ActionComponentManager
@@ -8,12 +7,10 @@ class ComponentPlatformApi: ComponentPlatformInterface {
     init(componentFlutterApi: ComponentFlutterInterface, checkoutHolder: CheckoutHolder) {
         self.instantComponentManager = InstantComponentManager(componentFlutterApi: componentFlutterApi, checkoutHolder: checkoutHolder)
         self.actionComponentManager = ActionComponentManager(componentFlutterApi: componentFlutterApi)
-        self.cardComponentManager = CardComponentManager()
         self.blikComponentManager = BlikComponentManager()
     }
 
     func updateViewHeight(viewId: Int64) {
-        cardComponentManager.updateViewHeight(viewId: viewId)
         blikComponentManager.updateViewHeight(viewId: viewId)
     }
 
@@ -76,8 +73,6 @@ class ComponentPlatformApi: ComponentPlatformInterface {
             instantComponentManager.onDispose()
         } else if isActionComponent(componentId: componentId) {
             actionComponentManager.onDispose()
-        } else if isCardComponent(componentId: componentId) {
-            cardComponentManager.onDispose()
         } else if isBlikComponent(componentId: componentId) {
             blikComponentManager.onDispose()
         }
@@ -86,24 +81,13 @@ class ComponentPlatformApi: ComponentPlatformInterface {
     private func handlePaymentEvent(componentId: String, paymentEventDTO: PaymentEventDTO) {
         if isInstantPaymentComponent(componentId: componentId) {
             instantComponentManager.handlePaymentEvent(paymentEventDTO: paymentEventDTO)
-        } else if isCardComponent(componentId: componentId) {
-            cardComponentManager.handlePaymentEvent(paymentEventDTO: paymentEventDTO)
         } else if isBlikComponent(componentId: componentId) {
             blikComponentManager.handlePaymentEvent(paymentEventDTO: paymentEventDTO)
         }
     }
 
-    func register(cardBaseComponent: BaseCardComponent) {
-        cardComponentManager.register(baseComponent: cardBaseComponent)
-    }
-
     func register(blikBaseComponent: BaseBlikComponent) {
         blikComponentManager.register(baseComponent: blikBaseComponent)
-    }
-
-    private func isCardComponent(componentId: String) -> Bool {
-        componentId == CardComponentManager.Constants.cardAdvancedComponentId ||
-            componentId == CardComponentManager.Constants.cardSessionComponentId
     }
 
     private func isBlikComponent(componentId: String) -> Bool {

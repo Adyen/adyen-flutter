@@ -4,7 +4,7 @@ import 'package:adyen_checkout/adyen_checkout.dart';
 import 'package:adyen_checkout_example/config.dart';
 import 'package:adyen_checkout_example/repositories/adyen_apple_pay_component_repository.dart';
 import 'package:adyen_checkout_example/repositories/adyen_blik_component_repository.dart';
-import 'package:adyen_checkout_example/repositories/adyen_card_component_repository.dart';
+import 'package:adyen_checkout_example/repositories/adyen_drop_in_repository.dart';
 import 'package:adyen_checkout_example/repositories/adyen_google_pay_component_repository.dart';
 import 'package:adyen_checkout_example/utils/dialog_builder.dart';
 import 'package:collection/collection.dart';
@@ -13,14 +13,14 @@ import 'package:flutter/material.dart';
 
 class MultiComponentAdvancedScreen extends StatelessWidget {
   const MultiComponentAdvancedScreen({
-    required this.cardRepository,
+    required this.dropInRepository,
     required this.blikRepository,
     required this.applePayRepository,
     required this.googlePayRepository,
     super.key,
   });
 
-  final AdyenCardComponentRepository cardRepository;
+  final AdyenDropInRepository dropInRepository;
   final AdyenBlikComponentRepository blikRepository;
   final AdyenApplePayComponentRepository applePayRepository;
   final AdyenGooglePayComponentRepository googlePayRepository;
@@ -31,7 +31,7 @@ class MultiComponentAdvancedScreen extends StatelessWidget {
       appBar: AppBar(title: const Text('Adyen multi component')),
       body: SafeArea(
         child: FutureBuilder<Map<String, dynamic>>(
-          future: cardRepository.fetchPaymentMethods(),
+          future: dropInRepository.fetchPaymentMethods(),
           builder: (BuildContext context,
               AsyncSnapshot<Map<String, dynamic>> snapshot) {
             if (snapshot.data == null) {
@@ -106,7 +106,11 @@ class MultiComponentAdvancedScreen extends StatelessWidget {
       paymentMethods,
       'scheme',
     );
-    final cardComponentConfiguration = CardComponentConfiguration(
+    if (paymentMethod.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    final checkoutConfiguration = CheckoutConfiguration(
       environment: Config.environment,
       clientKey: Config.clientKey,
       countryCode: Config.countryCode,
@@ -116,12 +120,12 @@ class MultiComponentAdvancedScreen extends StatelessWidget {
     );
     final advancedCheckout = AdvancedCheckout(
       paymentMethods: paymentMethods,
-      onSubmit: cardRepository.onSubmit,
-      onAdditionalDetails: cardRepository.onAdditionalDetails,
+      onSubmit: dropInRepository.onSubmit,
+      onAdditionalDetails: dropInRepository.onAdditionalDetails,
     );
 
-    return AdyenCardComponent(
-      configuration: cardComponentConfiguration,
+    return AdyenComponent(
+      configuration: checkoutConfiguration,
       paymentMethod: paymentMethod,
       checkout: advancedCheckout,
       onPaymentResult: (paymentResult) async {

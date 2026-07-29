@@ -8,7 +8,6 @@ import com.adyen.checkout.components.core.PaymentMethod
 import com.adyen.checkout.components.core.action.Action
 import com.adyen.checkout.flutter.components.action.ActionComponentManager
 import com.adyen.checkout.flutter.components.blik.BlikComponentManager
-import com.adyen.checkout.flutter.components.card.CardComponentManager
 import com.adyen.checkout.flutter.components.googlepay.GooglePayComponentManager
 import com.adyen.checkout.flutter.components.instant.InstantComponentManager
 import com.adyen.checkout.flutter.components.v2.AdyenComponentFactory
@@ -46,16 +45,6 @@ class ComponentPlatformApi(
 ) : ComponentPlatformInterface {
     private var platformEventHandler: ComponentPlatformEventHandler = ComponentPlatformEventHandler()
 
-    private val cardComponentManager: CardComponentManager =
-        CardComponentManager(
-            activity,
-            componentFlutterInterface,
-            platformEventHandler,
-            flutterPluginBinding,
-            checkoutHolder,
-            ::onDispose,
-            ::assignCurrentComponent
-        )
     private val blikComponentManager: BlikComponentManager =
         BlikComponentManager(
             activity,
@@ -82,7 +71,6 @@ class ComponentPlatformApi(
     private var currentComponent: ActionHandlingComponent? = null
 
     init {
-        cardComponentManager.registerComponentViewFactories()
         blikComponentManager.registerComponentViewFactories()
         flutterPluginBinding?.let { binding ->
             OnPlatformEventStreamHandler.register(binding.binaryMessenger, platformEventHandler)

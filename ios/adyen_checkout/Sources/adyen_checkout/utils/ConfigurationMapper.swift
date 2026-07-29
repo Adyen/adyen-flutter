@@ -186,22 +186,6 @@ extension CardConfigurationDTO {
     }
 }
 
-extension CardComponentConfigurationDTO {
-    func createAdyenContext() throws -> AdyenContext {
-        try buildAdyenContext(
-            environment: environment,
-            clientKey: clientKey,
-            amount: amount,
-            analyticsOptionsDTO: analyticsOptionsDTO,
-            countryCode: countryCode
-        )
-    }
-
-    func createCardConfiguration() -> CardConfiguration {
-        cardConfiguration.mapToCardConfiguration(shopperLocale: shopperLocale)
-    }
-}
-
 extension BlikComponentConfigurationDTO {
     func createAdyenContext() throws -> AdyenContext {
         try buildAdyenContext(
