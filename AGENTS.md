@@ -204,59 +204,48 @@ Flutter Widget (Dart)
 | Layer                    | Android                                   | iOS                                          | Dart                                                                               |
 |--------------------------|-------------------------------------------|----------------------------------------------|------------------------------------------------------------------------------------|
 | Platform View Wrapper    | -                                         | -                                            | `lib/src/components/platform/android_platform_view.dart`, `ios_platform_view.dart` |
-| View Factory             | `components/card/CardComponentFactory.kt` | `components/card/CardComponentFactory.swift` | -                                                                                  |
+| View Factory             | `components/v2/AdyenComponentFactory.kt`  | `components/v2/AdyenComponentFactory.swift`  | -                                                                                  |
 | Native View Wrapper      | `components/view/DynamicComponentView.kt` | `components/ComponentWrapperView.swift`      | -                                                                                  |
-| Component Implementation | `components/card/BaseCardComponent.kt`    | `components/card/BaseCardComponent.swift`    | `lib/src/components/card/base_card_component.dart`                                 |
+| Component Implementation | `components/v2/AdyenComponent.kt`         | `components/v2/AdyenComponent.swift`         | `lib/src/v2/adyen_component.dart`, `adyen_base_component.dart`                     |
+
+Note: all payment methods rendered as native platform views (Card, Blik, and any future
+method with the same shape) go through this **single generic** factory/component/wrapper —
+there is no longer a dedicated per-payment-method `CardComponentFactory`/`BlikComponentFactory`
+etc. `PlatformMethodResponse`/`paymentMethod.type` is passed straight through to the native
+v6 SDK, which resolves the concrete component internally (see
+`components/view/DynamicComponentView.kt`'s `addV6Component`). Apple Pay/Google Pay are a
+separate case (Dart-drawn buttons, not platform views) — see
+`lib/src/components/apple_pay/`, `lib/src/components/google_pay/`.
 
 ### Adding a New Payment Method with Native UI
 
-1. **Define a unique view type ID** (used to match Flutter widget with native factory):
-   ```kotlin
-   // Android
-   const val MY_COMPONENT_ID = "myComponentId"
-   ```
-   ```swift
-   // iOS
-   static let myComponentId = "myComponentId"
-   ```
+As of the v6 generic component consolidation (Card and Blik were the first to migrate),
+**do not create a new per-payment-method `PlatformViewFactory`/`FlutterPlatformViewFactory`.**
+The existing generic factory/component pair
+(`components/v2/AdyenComponentFactory.kt`+`AdyenComponent.kt` on Android,
+`components/v2/AdyenComponentFactory.swift`+`AdyenComponent.swift` on iOS) already renders
+*any* payment method type as a native platform view, by passing `paymentMethod.type`
+straight through to the native v6 SDK (`CheckoutTarget.PaymentMethod(...)` on Android,
+`checkout.createPaymentComponent(for:)` on iOS), which resolves the concrete component
+internally. This was confirmed empirically for Google Pay on Android without any plugin
+code changes (see `Plans/Unify Payment Method Components into AdyenComponent.md` in the
+Obsidian vault).
 
-2. **Create the Dart widget** in `lib/src/components/`:
-    - Create a new StatefulWidget that builds platform-specific views
-    - Use `AndroidPlatformView` / `IosPlatformView` based on `defaultTargetPlatform`
-    - Pass configuration via `creationParams` map (use DTOs and mappers from `dto_mapper.dart`)
-    - Use the same `viewType` string as the native factory ID
-    - Note: `BaseCardComponent` is specific to card components, not a general base class
+Before adding anything, check whether the native v6 SDK (adyen-android/adyen-ios) already
+registers a component for the new payment method's `txVariant` in its own generic component
+registry (Android: `PaymentMethodProvider`/`*Initializer.kt` per payment method module; iOS:
+`CheckoutComponentBuilder`/`PaymentMethodType`). If it does, the payment method should
+**already work** through `AdyenComponent`/`lib/src/v2/adyen_component.dart` with no plugin
+changes at all — just verify it manually (both flows, both platforms) rather than writing
+new factory code.
 
-3. **Create Android PlatformViewFactory** in `android/.../components/`:
-   ```kotlin
-   class MyComponentFactory(...) : PlatformViewFactory(ComponentFlutterInterface.pigeonChannelCodec) {
-       override fun create(context: Context, viewId: Int, args: Any?): PlatformView {
-           // Parse creationParams and return native view
-       }
-   }
-   ```
-
-4. **Register Android factory** in a manager class:
-   ```kotlin
-   flutterPluginBinding?.platformViewRegistry?.registerViewFactory(
-       MY_COMPONENT_ID,
-       MyComponentFactory(...)
-   )
-   ```
-
-5. **Create iOS FlutterPlatformViewFactory** in `ios/.../components/`:
-   ```swift
-   class MyComponentFactory: NSObject, FlutterPlatformViewFactory {
-       func create(withFrame frame: CGRect, viewIdentifier viewId: Int64, arguments args: Any?) -> FlutterPlatformView {
-           // Parse arguments and return native view
-       }
-   }
-   ```
-
-6. **Register iOS factory** in `AdyenCheckoutPlugin.swift`:
-   ```swift
-   registrar.register(myComponentFactory, withId: MyComponentFactory.myComponentId)
-   ```
+Only fall back to a dedicated per-payment-method implementation if the native v6 SDK does
+**not** yet support the method generically, or if it renders as something other than an
+embeddable platform view (e.g. Apple Pay/Google Pay render as Dart-drawn buttons via the
+`pay` package plus an availability/instant-payment channel, not a platform view — see
+`lib/src/components/apple_pay/`, `lib/src/components/google_pay/`,
+`android/.../components/googlepay/GooglePayComponentManager.kt`,
+`ios/.../components/instant/` for that different pattern).
 
 ### Communication Pattern
 
