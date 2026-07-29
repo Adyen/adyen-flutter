@@ -14,8 +14,11 @@
 
 - For Card Component on Android: the configured `countryCode` is now applied as the
   default country for full-address forms.
-- For Apple Pay and Google Pay Components: reduced unnecessary re-rendering on widget rebuilds by
+- For Apple Pay Component: reduced unnecessary re-rendering on widget rebuilds by
   caching the availability result.
+- `AdyenApplePayComponent`'s button is now rendered by a native `PKPaymentButton` (the same
+  system button Adyen's own Drop-in uses) instead of a Dart-drawn approximation, matching
+  Apple's Apple Pay button exactly.
 
 ### Removed
 
@@ -27,6 +30,8 @@
   now rendered and styled by the native SDK, and an unavailable Google Pay renders nothing
   and reports a `PaymentError` via `onPaymentResult` instead of the previous silent
   `onUnavailable` callback.
+- Removed the `pay` dependency entirely, now that both Apple Pay and Google Pay render their
+  buttons natively instead of via that package.
 
 ### Changed
 
@@ -39,13 +44,7 @@
 - Minimum iOS version increased from 12.0 to 13.0. This aligns with Flutter's own minimum iOS
   requirement.
 - Minimum Android version increased from API 21 to API 23. This aligns with the Adyen Android SDK
-  and the latest `pay` package requirements.
-- Dependency versions:
-  | Name | Version |
-  |---------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------|
-  | [pay](https://pub.dev/packages/pay) | 3.2.1 -> **3.3.0** |
-
-  `pay_android` is now pulled in transitively by `pay` (endorsed implementation).
+  requirements.
 
 ## 1.11.0
 
