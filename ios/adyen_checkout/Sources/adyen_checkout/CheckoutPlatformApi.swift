@@ -26,6 +26,7 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
     private let componentPlatformEventHandler: ComponentPlatformEventHandler
     private let checkoutHolder: CheckoutHolder
     private let adyenCse: AdyenCSE = .init()
+    private var componentPresentationDelegate: ComponentPresentationDelegate?
 
     init(
         checkoutFlutter: CheckoutFlutterInterface,
@@ -49,9 +50,12 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
                     componentPlatformEventHandler: componentPlatformEventHandler,
                     componentId: "SESSION_ADYEN_COMPONENT"
                 )
+                let presentationDelegate = ComponentPresentationDelegate(presentingViewController: getViewController())
+                componentPresentationDelegate = presentationDelegate
                 let checkoutSession = try await Checkout.setup(
                     with: sessionResponse,
-                    configuration: configuration
+                    configuration: configuration,
+                    presentationDelegate: presentationDelegate
                 ).onComplete { [weak self] result in
                     self?.sendCompleteResult(componentId: "SESSION_ADYEN_COMPONENT", result: result)
                 }.onFailure { [weak self] error in
@@ -86,9 +90,12 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
                     componentPlatformEventHandler: componentPlatformEventHandler,
                     componentId: "ADVANCED_ADYEN_COMPONENT"
                 )
+                let presentationDelegate = ComponentPresentationDelegate(presentingViewController: getViewController())
+                componentPresentationDelegate = presentationDelegate
                 let adyenCheckout = try await Checkout.setup(
                     with: paymentMethods,
-                    configuration: configuration
+                    configuration: configuration,
+                    presentationDelegate: presentationDelegate
                 ).onSubmit { [weak self] paymentData -> SubmitResult in
                     guard let self else { return .completion(resultCode: "Error") }
                     return await self.handleSubmit(paymentData: paymentData)
@@ -231,6 +238,7 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
     // MARK: - Result helpers
 
     private func sendCompleteResult(componentId: String, result: SessionCheckoutResult) {
+        componentPresentationDelegate?.dismiss()
         let paymentResult = PaymentResultModelDTO(
             sessionId: result.sessionId,
             sessionResult: result.sessionResult,
@@ -248,6 +256,7 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
     }
 
     private func sendCompleteResult(componentId: String, result: AdvancedCheckoutResult) {
+        componentPresentationDelegate?.dismiss()
         let paymentResult = PaymentResultModelDTO(
             resultCode: result.resultCode.rawValue
         )
@@ -263,6 +272,7 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
     }
 
     private func sendErrorResult(componentId: String, error: CheckoutError) {
+        componentPresentationDelegate?.dismiss()
         let componentCommunicationModel = ComponentCommunicationModel(
             type: ComponentCommunicationType.result,
             componentId: componentId,
@@ -275,6 +285,7 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
     }
 
     private func sendErrorResultToFlutter(componentId: String, reason: String) {
+        componentPresentationDelegate?.dismiss()
         componentPlatformEventHandler.send(
             event: ComponentCommunicationModel(
                 type: ComponentCommunicationType.result,
