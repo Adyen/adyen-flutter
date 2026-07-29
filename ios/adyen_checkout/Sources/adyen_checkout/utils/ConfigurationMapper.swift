@@ -186,21 +186,6 @@ extension CardConfigurationDTO {
     }
 }
 
-extension BlikComponentConfigurationDTO {
-    func createAdyenContext() throws -> AdyenContext {
-        try buildAdyenContext(
-            environment: environment,
-            clientKey: clientKey,
-            amount: amount,
-            analyticsOptionsDTO: analyticsOptionsDTO,
-            countryCode: countryCode
-        )
-    }
-
-    // TODO: v6 migration - BLIKComponentConfiguration is now package-access.
-    // BLIK component needs to be created via Checkout.setup() + createPaymentComponent(for: .blik).
-}
-
 extension Environment {
     func mapToEnvironment() -> Adyen.Environment {
         switch self {

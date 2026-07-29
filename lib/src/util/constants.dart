@@ -3,10 +3,6 @@ class Constants {
   static const String paymentMethodKey = "paymentMethod";
   static const String isStoredPaymentMethodKey = "isStoredPaymentMethod";
   static const String sessionKey = "session";
-  static const String blikComponentConfigurationKey =
-      "blikComponentConfiguration";
-  static const String blikComponentSessionKey = "blikComponentSession";
-  static const String blikComponentAdvancedKey = "blikComponentAdvanced";
   static const String isStoredPaymentMethodIndicator = "id";
   static const String componentIdKey = "componentId";
   static const String submitDataKey = "data";

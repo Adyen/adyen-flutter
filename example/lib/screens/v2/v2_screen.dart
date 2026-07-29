@@ -1,4 +1,6 @@
+import 'package:adyen_checkout_example/config.dart';
 import 'package:adyen_checkout_example/repositories/adyen_drop_in_repository.dart';
+import 'package:adyen_checkout_example/screens/v2/v2_blik_navigation_screen.dart';
 import 'package:adyen_checkout_example/screens/v2/v2_card_navigation_screen.dart';
 import 'package:adyen_checkout_example/screens/v2/v2_google_pay_navigation_screen.dart';
 import 'package:flutter/material.dart';
@@ -13,6 +15,9 @@ class V2Screen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isBlikSupported =
+        Config.countryCode == 'PL' && Config.amount.currency == 'PLN';
+
     return Scaffold(
       appBar: AppBar(title: const Text('V2 Example (v6 integration)')),
       body: SafeArea(
@@ -30,6 +35,17 @@ class V2Screen extends StatelessWidget {
                 ),
                 child: const Text('Card component'),
               ),
+              if (isBlikSupported)
+                TextButton(
+                  onPressed: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) =>
+                          V2BlikNavigationScreen(repository: repository),
+                    ),
+                  ),
+                  child: const Text('Blik component'),
+                ),
               TextButton(
                 onPressed: () => Navigator.push(
                   context,

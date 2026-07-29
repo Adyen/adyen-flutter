@@ -5,6 +5,7 @@ import 'package:collection/collection.dart';
 /// Payment method types demoed by the V2 (v6 generic component) screens.
 enum V2PaymentMethodType {
   card('scheme'),
+  blik('blik'),
   googlePay('googlepay');
 
   const V2PaymentMethodType(this.txVariant);

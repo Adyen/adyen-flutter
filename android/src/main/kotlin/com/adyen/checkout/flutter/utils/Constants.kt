@@ -21,7 +21,5 @@ class Constants {
         const val UPDATED_PAYMENT_METHODS_KEY = "updatedPaymentMethods"
         const val RESULT_CODE_KEY = "resultCode"
         const val RESULT_CODE_CANCELLED = "cancelled"
-        const val CARD_COMPONENT_CONFIGURATION_KEY = "cardComponentConfiguration"
-        const val BLIK_COMPONENT_CONFIGURATION_KEY = "blikComponentConfiguration"
     }
 }

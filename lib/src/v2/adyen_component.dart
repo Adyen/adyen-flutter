@@ -38,8 +38,10 @@ class AdyenComponent extends StatelessWidget {
   Widget build(BuildContext context) {
     final String encodedPaymentMethod = json.encode(paymentMethod);
     final String paymentMethodTxVariant = paymentMethod["type"];
-    final double initialHeight =
-        _calculateInitialHeight(configuration.cardConfiguration);
+    final double initialHeight = _calculateInitialHeight(
+      paymentMethodTxVariant,
+      configuration.cardConfiguration,
+    );
     final bool isStoredPaymentMethod = _isStoredPaymentMethod;
     return switch (checkout) {
       SessionCheckout it => AdyenSessionComponent(
@@ -69,7 +71,21 @@ class AdyenComponent extends StatelessWidget {
     };
   }
 
-  double _calculateInitialHeight(CardConfiguration? cardConfiguration) {
+  double _calculateInitialHeight(
+    String paymentMethodTxVariant,
+    CardConfiguration? cardConfiguration,
+  ) {
+    // Blik has no merchant-configurable options that affect its height, so a
+    // flat, per-platform default is used instead of the card-specific
+    // calculation below.
+    if (paymentMethodTxVariant == "blik") {
+      return switch (defaultTargetPlatform) {
+        TargetPlatform.android => 219,
+        TargetPlatform.iOS => 213,
+        _ => throw UnsupportedError('Unsupported platform view'),
+      };
+    }
+
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
         return _determineInitialAndroidViewHeight(cardConfiguration);

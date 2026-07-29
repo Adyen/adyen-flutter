@@ -2218,51 +2218,6 @@ struct DeletedStoredPaymentMethodResultDTO: Hashable {
 }
 
 /// Generated class from Pigeon that represents data sent in messages.
-struct BlikComponentConfigurationDTO: Hashable {
-  var environment: Environment
-  var clientKey: String
-  var countryCode: String
-  var amount: AmountDTO? = nil
-  var shopperLocale: String? = nil
-  var analyticsOptionsDTO: AnalyticsOptionsDTO
-
-
-  // swift-format-ignore: AlwaysUseLowerCamelCase
-  static func fromList(_ pigeonVar_list: [Any?]) -> BlikComponentConfigurationDTO? {
-    let environment = pigeonVar_list[0] as! Environment
-    let clientKey = pigeonVar_list[1] as! String
-    let countryCode = pigeonVar_list[2] as! String
-    let amount: AmountDTO? = nilOrValue(pigeonVar_list[3])
-    let shopperLocale: String? = nilOrValue(pigeonVar_list[4])
-    let analyticsOptionsDTO = pigeonVar_list[5] as! AnalyticsOptionsDTO
-
-    return BlikComponentConfigurationDTO(
-      environment: environment,
-      clientKey: clientKey,
-      countryCode: countryCode,
-      amount: amount,
-      shopperLocale: shopperLocale,
-      analyticsOptionsDTO: analyticsOptionsDTO
-    )
-  }
-  func toList() -> [Any?] {
-    return [
-      environment,
-      clientKey,
-      countryCode,
-      amount,
-      shopperLocale,
-      analyticsOptionsDTO,
-    ]
-  }
-  static func == (lhs: BlikComponentConfigurationDTO, rhs: BlikComponentConfigurationDTO) -> Bool {
-    return deepEqualsPlatformApi(lhs.toList(), rhs.toList())  }
-  func hash(into hasher: inout Hasher) {
-    deepHashPlatformApi(value: toList(), hasher: &hasher)
-  }
-}
-
-/// Generated class from Pigeon that represents data sent in messages.
 struct InstantPaymentConfigurationDTO: Hashable {
   var environment: Environment
   var clientKey: String
@@ -2743,20 +2698,18 @@ private class PlatformApiPigeonCodecReader: FlutterStandardReader {
     case 197:
       return DeletedStoredPaymentMethodResultDTO.fromList(self.readValue() as! [Any?])
     case 198:
-      return BlikComponentConfigurationDTO.fromList(self.readValue() as! [Any?])
-    case 199:
       return InstantPaymentConfigurationDTO.fromList(self.readValue() as! [Any?])
-    case 200:
+    case 199:
       return InstantPaymentSetupResultDTO.fromList(self.readValue() as! [Any?])
-    case 201:
+    case 200:
       return UnencryptedCardDTO.fromList(self.readValue() as! [Any?])
-    case 202:
+    case 201:
       return EncryptedCardDTO.fromList(self.readValue() as! [Any?])
-    case 203:
+    case 202:
       return ActionComponentConfigurationDTO.fromList(self.readValue() as! [Any?])
-    case 204:
+    case 203:
       return OrderCancelResultDTO.fromList(self.readValue() as! [Any?])
-    case 205:
+    case 204:
       return BinLookupDataDTO.fromList(self.readValue() as! [Any?])
     default:
       return super.readValue(ofType: type)
@@ -2973,29 +2926,26 @@ private class PlatformApiPigeonCodecWriter: FlutterStandardWriter {
     } else if let value = value as? DeletedStoredPaymentMethodResultDTO {
       super.writeByte(197)
       super.writeValue(value.toList())
-    } else if let value = value as? BlikComponentConfigurationDTO {
+    } else if let value = value as? InstantPaymentConfigurationDTO {
       super.writeByte(198)
       super.writeValue(value.toList())
-    } else if let value = value as? InstantPaymentConfigurationDTO {
+    } else if let value = value as? InstantPaymentSetupResultDTO {
       super.writeByte(199)
       super.writeValue(value.toList())
-    } else if let value = value as? InstantPaymentSetupResultDTO {
+    } else if let value = value as? UnencryptedCardDTO {
       super.writeByte(200)
       super.writeValue(value.toList())
-    } else if let value = value as? UnencryptedCardDTO {
+    } else if let value = value as? EncryptedCardDTO {
       super.writeByte(201)
       super.writeValue(value.toList())
-    } else if let value = value as? EncryptedCardDTO {
+    } else if let value = value as? ActionComponentConfigurationDTO {
       super.writeByte(202)
       super.writeValue(value.toList())
-    } else if let value = value as? ActionComponentConfigurationDTO {
+    } else if let value = value as? OrderCancelResultDTO {
       super.writeByte(203)
       super.writeValue(value.toList())
-    } else if let value = value as? OrderCancelResultDTO {
-      super.writeByte(204)
-      super.writeValue(value.toList())
     } else if let value = value as? BinLookupDataDTO {
-      super.writeByte(205)
+      super.writeByte(204)
       super.writeValue(value.toList())
     } else {
       super.writeValue(value)
@@ -3557,7 +3507,7 @@ class ComponentPlatformInterfaceSetup {
 }
 /// Generated protocol from Pigeon that represents Flutter messages that can be called from Swift.
 protocol ComponentFlutterInterfaceProtocol {
-  func _generateCodecForDTOs(blikComponentConfigurationDTO blikComponentConfigurationDTOArg: BlikComponentConfigurationDTO, sessionDTO sessionDTOArg: SessionDTO, binLookupDataDTO binLookupDataDTOArg: BinLookupDataDTO, completion: @escaping (Result<Void, AdyenPigeonError>) -> Void)
+  func _generateCodecForDTOs(sessionDTO sessionDTOArg: SessionDTO, binLookupDataDTO binLookupDataDTOArg: BinLookupDataDTO, completion: @escaping (Result<Void, AdyenPigeonError>) -> Void)
   func onComponentCommunication(componentCommunicationModel componentCommunicationModelArg: ComponentCommunicationModel, completion: @escaping (Result<Void, AdyenPigeonError>) -> Void)
   func onApplePaySelectShippingMethod(componentId componentIdArg: String, shippingMethod shippingMethodArg: ApplePayShippingMethodDTO, currentSummaryItems currentSummaryItemsArg: [ApplePaySummaryItemDTO?], completion: @escaping (Result<ApplePayShippingMethodUpdateDTO, AdyenPigeonError>) -> Void)
   func onApplePaySelectShippingContact(componentId componentIdArg: String, contact contactArg: ApplePayContactDTO, currentSummaryItems currentSummaryItemsArg: [ApplePaySummaryItemDTO?], completion: @escaping (Result<ApplePayShippingContactUpdateDTO, AdyenPigeonError>) -> Void)
@@ -3574,10 +3524,10 @@ class ComponentFlutterInterface: ComponentFlutterInterfaceProtocol {
   var codec: PlatformApiPigeonCodec {
     return PlatformApiPigeonCodec.shared
   }
-  func _generateCodecForDTOs(blikComponentConfigurationDTO blikComponentConfigurationDTOArg: BlikComponentConfigurationDTO, sessionDTO sessionDTOArg: SessionDTO, binLookupDataDTO binLookupDataDTOArg: BinLookupDataDTO, completion: @escaping (Result<Void, AdyenPigeonError>) -> Void) {
+  func _generateCodecForDTOs(sessionDTO sessionDTOArg: SessionDTO, binLookupDataDTO binLookupDataDTOArg: BinLookupDataDTO, completion: @escaping (Result<Void, AdyenPigeonError>) -> Void) {
     let channelName: String = "dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface._generateCodecForDTOs\(messageChannelSuffix)"
     let channel = FlutterBasicMessageChannel(name: channelName, binaryMessenger: binaryMessenger, codec: codec)
-    channel.sendMessage([blikComponentConfigurationDTOArg, sessionDTOArg, binLookupDataDTOArg] as [Any?]) { response in
+    channel.sendMessage([sessionDTOArg, binLookupDataDTOArg] as [Any?]) { response in
       guard let listResponse = response as? [Any?] else {
         completion(.failure(createConnectionError(withChannelName: channelName)))
         return

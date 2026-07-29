@@ -3,7 +3,6 @@
 import 'package:adyen_checkout/adyen_checkout.dart';
 import 'package:adyen_checkout_example/config.dart';
 import 'package:adyen_checkout_example/repositories/adyen_apple_pay_component_repository.dart';
-import 'package:adyen_checkout_example/repositories/adyen_blik_component_repository.dart';
 import 'package:adyen_checkout_example/repositories/adyen_drop_in_repository.dart';
 import 'package:adyen_checkout_example/repositories/adyen_google_pay_component_repository.dart';
 import 'package:adyen_checkout_example/utils/dialog_builder.dart';
@@ -14,14 +13,12 @@ import 'package:flutter/material.dart';
 class MultiComponentAdvancedScreen extends StatelessWidget {
   const MultiComponentAdvancedScreen({
     required this.dropInRepository,
-    required this.blikRepository,
     required this.applePayRepository,
     required this.googlePayRepository,
     super.key,
   });
 
   final AdyenDropInRepository dropInRepository;
-  final AdyenBlikComponentRepository blikRepository;
   final AdyenApplePayComponentRepository applePayRepository;
   final AdyenGooglePayComponentRepository googlePayRepository;
 
@@ -75,7 +72,7 @@ class MultiComponentAdvancedScreen extends StatelessWidget {
       return const SizedBox.shrink();
     }
 
-    final blikConfiguration = BlikComponentConfiguration(
+    final checkoutConfiguration = CheckoutConfiguration(
       environment: Config.environment,
       clientKey: Config.clientKey,
       countryCode: Config.countryCode,
@@ -83,13 +80,13 @@ class MultiComponentAdvancedScreen extends StatelessWidget {
       shopperLocale: Config.shopperLocale,
     );
 
-    return AdyenBlikComponent(
-      configuration: blikConfiguration,
+    return AdyenComponent(
+      configuration: checkoutConfiguration,
       paymentMethod: paymentMethod,
       checkout: AdvancedCheckout(
         paymentMethods: paymentMethods,
-        onSubmit: blikRepository.onSubmit,
-        onAdditionalDetails: blikRepository.onAdditionalDetails,
+        onSubmit: dropInRepository.onSubmit,
+        onAdditionalDetails: dropInRepository.onAdditionalDetails,
       ),
       onPaymentResult: (paymentResult) async {
         Navigator.pop(context);

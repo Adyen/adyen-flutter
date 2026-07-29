@@ -3095,72 +3095,6 @@ class DeletedStoredPaymentMethodResultDTO {
 ;
 }
 
-class BlikComponentConfigurationDTO {
-  BlikComponentConfigurationDTO({
-    required this.environment,
-    required this.clientKey,
-    required this.countryCode,
-    this.amount,
-    this.shopperLocale,
-    required this.analyticsOptionsDTO,
-  });
-
-  Environment environment;
-
-  String clientKey;
-
-  String countryCode;
-
-  AmountDTO? amount;
-
-  String? shopperLocale;
-
-  AnalyticsOptionsDTO analyticsOptionsDTO;
-
-  List<Object?> _toList() {
-    return <Object?>[
-      environment,
-      clientKey,
-      countryCode,
-      amount,
-      shopperLocale,
-      analyticsOptionsDTO,
-    ];
-  }
-
-  Object encode() {
-    return _toList();  }
-
-  static BlikComponentConfigurationDTO decode(Object result) {
-    result as List<Object?>;
-    return BlikComponentConfigurationDTO(
-      environment: result[0]! as Environment,
-      clientKey: result[1]! as String,
-      countryCode: result[2]! as String,
-      amount: result[3] as AmountDTO?,
-      shopperLocale: result[4] as String?,
-      analyticsOptionsDTO: result[5]! as AnalyticsOptionsDTO,
-    );
-  }
-
-  @override
-  // ignore: avoid_equals_and_hash_code_on_mutable_classes
-  bool operator ==(Object other) {
-    if (other is! BlikComponentConfigurationDTO || other.runtimeType != runtimeType) {
-      return false;
-    }
-    if (identical(this, other)) {
-      return true;
-    }
-    return _deepEquals(encode(), other.encode());
-  }
-
-  @override
-  // ignore: avoid_equals_and_hash_code_on_mutable_classes
-  int get hashCode => Object.hashAll(_toList())
-;
-}
-
 class InstantPaymentConfigurationDTO {
   InstantPaymentConfigurationDTO({
     required this.environment,
@@ -3773,29 +3707,26 @@ class _PigeonCodec extends StandardMessageCodec {
     }    else if (value is DeletedStoredPaymentMethodResultDTO) {
       buffer.putUint8(197);
       writeValue(buffer, value.encode());
-    }    else if (value is BlikComponentConfigurationDTO) {
+    }    else if (value is InstantPaymentConfigurationDTO) {
       buffer.putUint8(198);
       writeValue(buffer, value.encode());
-    }    else if (value is InstantPaymentConfigurationDTO) {
+    }    else if (value is InstantPaymentSetupResultDTO) {
       buffer.putUint8(199);
       writeValue(buffer, value.encode());
-    }    else if (value is InstantPaymentSetupResultDTO) {
+    }    else if (value is UnencryptedCardDTO) {
       buffer.putUint8(200);
       writeValue(buffer, value.encode());
-    }    else if (value is UnencryptedCardDTO) {
+    }    else if (value is EncryptedCardDTO) {
       buffer.putUint8(201);
       writeValue(buffer, value.encode());
-    }    else if (value is EncryptedCardDTO) {
+    }    else if (value is ActionComponentConfigurationDTO) {
       buffer.putUint8(202);
       writeValue(buffer, value.encode());
-    }    else if (value is ActionComponentConfigurationDTO) {
+    }    else if (value is OrderCancelResultDTO) {
       buffer.putUint8(203);
       writeValue(buffer, value.encode());
-    }    else if (value is OrderCancelResultDTO) {
-      buffer.putUint8(204);
-      writeValue(buffer, value.encode());
     }    else if (value is BinLookupDataDTO) {
-      buffer.putUint8(205);
+      buffer.putUint8(204);
       writeValue(buffer, value.encode());
     } else {
       super.writeValue(buffer, value);
@@ -3963,20 +3894,18 @@ class _PigeonCodec extends StandardMessageCodec {
       case 197: 
         return DeletedStoredPaymentMethodResultDTO.decode(readValue(buffer)!);
       case 198: 
-        return BlikComponentConfigurationDTO.decode(readValue(buffer)!);
-      case 199: 
         return InstantPaymentConfigurationDTO.decode(readValue(buffer)!);
-      case 200: 
+      case 199: 
         return InstantPaymentSetupResultDTO.decode(readValue(buffer)!);
-      case 201: 
+      case 200: 
         return UnencryptedCardDTO.decode(readValue(buffer)!);
-      case 202: 
+      case 201: 
         return EncryptedCardDTO.decode(readValue(buffer)!);
-      case 203: 
+      case 202: 
         return ActionComponentConfigurationDTO.decode(readValue(buffer)!);
-      case 204: 
+      case 203: 
         return OrderCancelResultDTO.decode(readValue(buffer)!);
-      case 205: 
+      case 204: 
         return BinLookupDataDTO.decode(readValue(buffer)!);
       default:
         return super.readValueOfType(type, buffer);
@@ -4755,7 +4684,7 @@ class ComponentPlatformInterface {
 abstract class ComponentFlutterInterface {
   static const MessageCodec<Object?> pigeonChannelCodec = _PigeonCodec();
 
-  void _generateCodecForDTOs(BlikComponentConfigurationDTO blikComponentConfigurationDTO, SessionDTO sessionDTO, BinLookupDataDTO binLookupDataDTO);
+  void _generateCodecForDTOs(SessionDTO sessionDTO, BinLookupDataDTO binLookupDataDTO);
 
   void onComponentCommunication(ComponentCommunicationModel componentCommunicationModel);
 
@@ -4780,17 +4709,14 @@ abstract class ComponentFlutterInterface {
           assert(message != null,
           'Argument for dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface._generateCodecForDTOs was null.');
           final List<Object?> args = (message as List<Object?>?)!;
-          final BlikComponentConfigurationDTO? arg_blikComponentConfigurationDTO = (args[0] as BlikComponentConfigurationDTO?);
-          assert(arg_blikComponentConfigurationDTO != null,
-              'Argument for dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface._generateCodecForDTOs was null, expected non-null BlikComponentConfigurationDTO.');
-          final SessionDTO? arg_sessionDTO = (args[1] as SessionDTO?);
+          final SessionDTO? arg_sessionDTO = (args[0] as SessionDTO?);
           assert(arg_sessionDTO != null,
               'Argument for dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface._generateCodecForDTOs was null, expected non-null SessionDTO.');
-          final BinLookupDataDTO? arg_binLookupDataDTO = (args[2] as BinLookupDataDTO?);
+          final BinLookupDataDTO? arg_binLookupDataDTO = (args[1] as BinLookupDataDTO?);
           assert(arg_binLookupDataDTO != null,
               'Argument for dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface._generateCodecForDTOs was null, expected non-null BinLookupDataDTO.');
           try {
-            api._generateCodecForDTOs(arg_blikComponentConfigurationDTO!, arg_sessionDTO!, arg_binLookupDataDTO!);
+            api._generateCodecForDTOs(arg_sessionDTO!, arg_binLookupDataDTO!);
             return wrapResponse(empty: true);
           } on PlatformException catch (e) {
             return wrapResponse(error: e);

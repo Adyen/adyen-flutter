@@ -3,7 +3,6 @@
 import 'package:adyen_checkout/adyen_checkout.dart';
 import 'package:adyen_checkout_example/config.dart';
 import 'package:adyen_checkout_example/repositories/adyen_apple_pay_component_repository.dart';
-import 'package:adyen_checkout_example/repositories/adyen_blik_component_repository.dart';
 import 'package:adyen_checkout_example/repositories/adyen_drop_in_repository.dart';
 import 'package:adyen_checkout_example/repositories/adyen_google_pay_component_repository.dart';
 import 'package:adyen_checkout_example/utils/dialog_builder.dart';
@@ -14,14 +13,12 @@ import 'package:flutter/material.dart';
 class MultiComponentSessionScreen extends StatelessWidget {
   MultiComponentSessionScreen({
     required this.dropInRepository,
-    required this.blikRepository,
     required this.applePayRepository,
     required this.googlePayRepository,
     super.key,
   });
 
   final AdyenDropInRepository dropInRepository;
-  final AdyenBlikComponentRepository blikRepository;
   final AdyenApplePayComponentRepository applePayRepository;
   final AdyenGooglePayComponentRepository googlePayRepository;
   final checkoutConfiguration = CheckoutConfiguration(
@@ -85,16 +82,8 @@ class MultiComponentSessionScreen extends StatelessWidget {
       return const SizedBox.shrink();
     }
 
-    final blikConfiguration = BlikComponentConfiguration(
-      environment: Config.environment,
-      clientKey: Config.clientKey,
-      countryCode: Config.countryCode,
-      amount: Config.amount,
-      shopperLocale: Config.shopperLocale,
-    );
-
-    return AdyenBlikComponent(
-      configuration: blikConfiguration,
+    return AdyenComponent(
+      configuration: checkoutConfiguration,
       paymentMethod: blikPaymentMethod,
       checkout: sessionCheckout,
       onPaymentResult: (paymentResult) async {

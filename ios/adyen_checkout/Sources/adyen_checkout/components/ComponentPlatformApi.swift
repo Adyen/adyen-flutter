@@ -1,18 +1,14 @@
 @MainActor
 class ComponentPlatformApi: ComponentPlatformInterface {
-    private let blikComponentManager: BlikComponentManager
     private let instantComponentManager: InstantComponentManager
     private let actionComponentManager: ActionComponentManager
 
     init(componentFlutterApi: ComponentFlutterInterface, checkoutHolder: CheckoutHolder) {
         self.instantComponentManager = InstantComponentManager(componentFlutterApi: componentFlutterApi, checkoutHolder: checkoutHolder)
         self.actionComponentManager = ActionComponentManager(componentFlutterApi: componentFlutterApi)
-        self.blikComponentManager = BlikComponentManager()
     }
 
-    func updateViewHeight(viewId: Int64) {
-        blikComponentManager.updateViewHeight(viewId: viewId)
-    }
+    func updateViewHeight(viewId: Int64) {}
 
     func onPaymentsResult(componentId: String, paymentsResult: PaymentEventDTO) {
         handlePaymentEvent(componentId: componentId, paymentEventDTO: paymentsResult)
@@ -73,26 +69,13 @@ class ComponentPlatformApi: ComponentPlatformInterface {
             instantComponentManager.onDispose()
         } else if isActionComponent(componentId: componentId) {
             actionComponentManager.onDispose()
-        } else if isBlikComponent(componentId: componentId) {
-            blikComponentManager.onDispose()
         }
     }
 
     private func handlePaymentEvent(componentId: String, paymentEventDTO: PaymentEventDTO) {
         if isInstantPaymentComponent(componentId: componentId) {
             instantComponentManager.handlePaymentEvent(paymentEventDTO: paymentEventDTO)
-        } else if isBlikComponent(componentId: componentId) {
-            blikComponentManager.handlePaymentEvent(paymentEventDTO: paymentEventDTO)
         }
-    }
-
-    func register(blikBaseComponent: BaseBlikComponent) {
-        blikComponentManager.register(baseComponent: blikBaseComponent)
-    }
-
-    private func isBlikComponent(componentId: String) -> Bool {
-        componentId == BlikComponentManager.Constants.blikAdvancedComponentId ||
-            componentId == BlikComponentManager.Constants.blikSessionComponentId
     }
 
     private func isInstantPaymentComponent(componentId: String) -> Bool {

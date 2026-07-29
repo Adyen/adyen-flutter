@@ -30,23 +30,6 @@ public class AdyenCheckoutPlugin: NSObject, FlutterPlugin {
         let dropInPlatformApi = DropInPlatformApi(checkoutFlutter: checkoutFlutter, checkoutHolder: checkoutHolder)
         DropInPlatformInterfaceSetup.setUp(binaryMessenger: messenger, api: dropInPlatformApi)
 
-        let blikComponentAdvancedFactory = BlikComponentFactory(
-            messenger: messenger,
-            componentFlutterApi: componentFlutterApi,
-            componentPlatformApi: componentPlatformApi,
-            viewTypeId: BlikComponentFactory.blikComponentAdvancedId
-        )
-        registrar.register(blikComponentAdvancedFactory, withId: BlikComponentFactory.blikComponentAdvancedId)
-
-        let blikComponentSessionFactory = BlikComponentFactory(
-            messenger: messenger,
-            componentFlutterApi: componentFlutterApi,
-            componentPlatformApi: componentPlatformApi,
-            viewTypeId: BlikComponentFactory.blikComponentSessionId,
-            checkoutHolder: checkoutHolder
-        )
-        registrar.register(blikComponentSessionFactory, withId: BlikComponentFactory.blikComponentSessionId)
-
         //V2
         OnPlatformEventStreamHandler.register(with: messenger, streamHandler: componentPlatformEventHandler)
         let adyenComponentSessionFactory = AdyenComponentFactory(

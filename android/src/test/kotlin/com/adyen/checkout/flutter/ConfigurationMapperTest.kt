@@ -14,7 +14,6 @@ import com.adyen.checkout.flutter.generated.AddressMode
 import com.adyen.checkout.flutter.generated.AmountDTO
 import com.adyen.checkout.flutter.generated.AnalyticsOptionsDTO
 import com.adyen.checkout.flutter.generated.BillingAddressParametersDTO
-import com.adyen.checkout.flutter.generated.BlikComponentConfigurationDTO
 import com.adyen.checkout.flutter.generated.CardBasedInstallmentOptionsDTO
 import com.adyen.checkout.flutter.generated.CardConfigurationDTO
 import com.adyen.checkout.flutter.generated.CashAppPayConfigurationDTO
@@ -944,7 +943,7 @@ class ConfigurationMapperTest {
     inner class BlikConfigurationTests {
         @Test
         fun `when blik configuration is provided, then map environment and clientKey correctly`() {
-            val blikConfigurationDTO = BlikComponentConfigurationDTO(
+            val blikConfigurationDTO = CheckoutConfigurationDTO(
                 environment = Environment.TEST,
                 clientKey = TEST_CLIENT_KEY,
                 countryCode = "PL",
@@ -961,7 +960,7 @@ class ConfigurationMapperTest {
 
         @Test
         fun `when blik configuration has shopperLocale, then map correctly`() {
-            val blikConfigurationDTO = BlikComponentConfigurationDTO(
+            val blikConfigurationDTO = CheckoutConfigurationDTO(
                 environment = Environment.TEST,
                 clientKey = TEST_CLIENT_KEY,
                 countryCode = "PL",
@@ -977,7 +976,7 @@ class ConfigurationMapperTest {
 
         @Test
         fun `when blik configuration has amount, then map currency and value correctly`() {
-            val blikConfigurationDTO = BlikComponentConfigurationDTO(
+            val blikConfigurationDTO = CheckoutConfigurationDTO(
                 environment = Environment.TEST,
                 clientKey = TEST_CLIENT_KEY,
                 countryCode = "PL",
@@ -993,7 +992,7 @@ class ConfigurationMapperTest {
 
         @Test
         fun `when blik configuration has null shopperLocale, then shopperLocale is null`() {
-            val blikConfigurationDTO = BlikComponentConfigurationDTO(
+            val blikConfigurationDTO = CheckoutConfigurationDTO(
                 environment = Environment.TEST,
                 clientKey = TEST_CLIENT_KEY,
                 countryCode = "PL",
@@ -1008,7 +1007,7 @@ class ConfigurationMapperTest {
 
         @Test
         fun `when blik configuration has null amount, then amount is null`() {
-            val blikConfigurationDTO = BlikComponentConfigurationDTO(
+            val blikConfigurationDTO = CheckoutConfigurationDTO(
                 environment = Environment.TEST,
                 clientKey = TEST_CLIENT_KEY,
                 countryCode = "PL",
