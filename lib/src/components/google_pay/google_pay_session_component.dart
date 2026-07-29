@@ -15,7 +15,7 @@ class GooglePaySessionComponent extends BaseGooglePayComponent {
     super.key,
     required this.session,
     required super.googlePayPaymentMethod,
-    required super.googlePayComponentConfiguration,
+    required super.configuration,
     required super.onPaymentResult,
     required super.theme,
     required super.type,

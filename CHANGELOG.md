@@ -19,6 +19,11 @@
 
 ### Changed
 
+- **Breaking**: `AdyenApplePayComponent`/`AdyenGooglePayComponent` now take a `CheckoutConfiguration`
+  instead of the removed `ApplePayComponentConfiguration`/`GooglePayComponentConfiguration`. These
+  wrapper classes carried nothing beyond what `CheckoutConfiguration` already exposes
+  (`applePayConfiguration`/`googlePayConfiguration`), so they were redundant API surface duplicating
+  the shared configuration model.
 - Minimum iOS version increased from 12.0 to 13.0. This aligns with Flutter's own minimum iOS
   requirement.
 - Minimum Android version increased from API 21 to API 23. This aligns with the Adyen Android SDK

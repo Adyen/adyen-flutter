@@ -10,7 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:pay/pay.dart' as pay_sdk;
 
 class AdyenApplePayComponent extends StatelessWidget {
-  final ApplePayComponentConfiguration configuration;
+  final CheckoutConfiguration configuration;
   final Map<String, dynamic> paymentMethod;
   final Checkout checkout;
   final Function(PaymentResult) onPaymentResult;
@@ -37,6 +37,13 @@ class AdyenApplePayComponent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (configuration.applePayConfiguration == null) {
+      throw ArgumentError(
+        'CheckoutConfiguration.applePayConfiguration must be set to use '
+        'AdyenApplePayComponent.',
+      );
+    }
+
     switch (defaultTargetPlatform) {
       case TargetPlatform.iOS:
         switch (checkout) {
@@ -45,7 +52,7 @@ class AdyenApplePayComponent extends StatelessWidget {
               key: key,
               session: it.toDTO(),
               applePayPaymentMethod: json.encode(paymentMethod),
-              applePayComponentConfiguration: configuration,
+              configuration: configuration,
               onPaymentResult: onPaymentResult,
               style: _mapToApplePayButtonStyle(),
               type: _mapToApplePayButtonType(),
@@ -66,7 +73,7 @@ class AdyenApplePayComponent extends StatelessWidget {
             return ApplePayAdvancedComponent(
               key: key,
               applePayPaymentMethod: json.encode(paymentMethod),
-              applePayComponentConfiguration: configuration,
+              configuration: configuration,
               onPaymentResult: onPaymentResult,
               advancedCheckout: it,
               style: _mapToApplePayButtonStyle(),

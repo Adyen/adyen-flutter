@@ -34,8 +34,7 @@ class ApplePayAdvancedComponentScreen extends StatelessWidget {
   }
 
   Widget _buildAdyenApplePayAdvancedComponent() {
-    final ApplePayComponentConfiguration applePayComponentConfiguration =
-        ApplePayComponentConfiguration(
+    final CheckoutConfiguration checkoutConfiguration = CheckoutConfiguration(
       environment: Config.environment,
       clientKey: Config.clientKey,
       countryCode: Config.countryCode,
@@ -63,7 +62,7 @@ class ApplePayAdvancedComponentScreen extends StatelessWidget {
               ),
               const SizedBox(height: 8),
               AdyenApplePayComponent(
-                configuration: applePayComponentConfiguration,
+                configuration: checkoutConfiguration,
                 paymentMethod: paymentMethod,
                 checkout: advancedCheckout,
                 loadingIndicator: const CircularProgressIndicator(),

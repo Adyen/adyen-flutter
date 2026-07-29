@@ -9,7 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:pay/pay.dart' as google_pay_sdk;
 
 class AdyenGooglePayComponent extends StatelessWidget {
-  final GooglePayComponentConfiguration configuration;
+  final CheckoutConfiguration configuration;
   final Map<String, dynamic> paymentMethod;
   final Checkout checkout;
   final Function(PaymentResult) onPaymentResult;
@@ -36,13 +36,20 @@ class AdyenGooglePayComponent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (configuration.googlePayConfiguration == null) {
+      throw ArgumentError(
+        'CheckoutConfiguration.googlePayConfiguration must be set to use '
+        'AdyenGooglePayComponent.',
+      );
+    }
+
     return switch (defaultTargetPlatform) {
       TargetPlatform.android => switch (checkout) {
           SessionCheckout it => GooglePaySessionComponent(
               key: key,
               session: it.toDTO(),
               googlePayPaymentMethod: json.encode(paymentMethod),
-              googlePayComponentConfiguration: configuration,
+              configuration: configuration,
               onPaymentResult: onPaymentResult,
               theme: _mapToGooglePayButtonTheme(),
               type: _mapToGooglePayButtonType(),
@@ -56,7 +63,7 @@ class AdyenGooglePayComponent extends StatelessWidget {
           AdvancedCheckout it => GooglePayAdvancedComponent(
               key: key,
               googlePayPaymentMethod: json.encode(paymentMethod),
-              googlePayComponentConfiguration: configuration,
+              configuration: configuration,
               onPaymentResult: onPaymentResult,
               advancedCheckout: it,
               theme: _mapToGooglePayButtonTheme(),

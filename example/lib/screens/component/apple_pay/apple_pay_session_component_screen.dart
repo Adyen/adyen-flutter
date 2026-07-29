@@ -33,8 +33,7 @@ class ApplePaySessionComponentScreen extends StatelessWidget {
   }
 
   Widget _buildAdyenApplePaySessionComponent() {
-    final ApplePayComponentConfiguration applePayComponentConfiguration =
-        ApplePayComponentConfiguration(
+    final CheckoutConfiguration checkoutConfiguration = CheckoutConfiguration(
       environment: Config.environment,
       clientKey: Config.clientKey,
       countryCode: Config.countryCode,
@@ -42,7 +41,7 @@ class ApplePaySessionComponentScreen extends StatelessWidget {
     );
 
     return FutureBuilder<SessionCheckout>(
-      future: repository.createSessionCheckout(applePayComponentConfiguration),
+      future: repository.createSessionCheckout(checkoutConfiguration),
       builder: (BuildContext context, AsyncSnapshot<SessionCheckout> snapshot) {
         if (snapshot.hasData) {
           final SessionCheckout sessionCheckout = snapshot.data!;
@@ -58,7 +57,7 @@ class ApplePaySessionComponentScreen extends StatelessWidget {
               ),
               const SizedBox(height: 8),
               AdyenApplePayComponent(
-                configuration: applePayComponentConfiguration,
+                configuration: checkoutConfiguration,
                 paymentMethod: paymentMethod,
                 checkout: sessionCheckout,
                 loadingIndicator: const CircularProgressIndicator(),

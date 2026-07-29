@@ -141,8 +141,8 @@ class MultiComponentSessionScreen extends StatelessWidget {
     BuildContext context,
     SessionCheckout sessionCheckout,
   ) {
-    final GooglePayComponentConfiguration googlePayComponentConfiguration =
-        GooglePayComponentConfiguration(
+    final CheckoutConfiguration googlePayCheckoutConfiguration =
+        CheckoutConfiguration(
       environment: Config.environment,
       clientKey: Config.clientKey,
       countryCode: Config.countryCode,
@@ -158,7 +158,7 @@ class MultiComponentSessionScreen extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
       child: AdyenGooglePayComponent(
-        configuration: googlePayComponentConfiguration,
+        configuration: googlePayCheckoutConfiguration,
         paymentMethod: paymentMethod,
         checkout: sessionCheckout,
         loadingIndicator: const CircularProgressIndicator(),
@@ -176,8 +176,8 @@ class MultiComponentSessionScreen extends StatelessWidget {
     BuildContext context,
     SessionCheckout sessionCheckout,
   ) {
-    final ApplePayComponentConfiguration applePayComponentConfiguration =
-        ApplePayComponentConfiguration(
+    final CheckoutConfiguration applePayCheckoutConfiguration =
+        CheckoutConfiguration(
       environment: Config.environment,
       clientKey: Config.clientKey,
       countryCode: Config.countryCode,
@@ -192,7 +192,7 @@ class MultiComponentSessionScreen extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
       child: AdyenApplePayComponent(
-        configuration: applePayComponentConfiguration,
+        configuration: applePayCheckoutConfiguration,
         paymentMethod: applePayPaymentMethod,
         checkout: sessionCheckout,
         loadingIndicator: const CircularProgressIndicator(),

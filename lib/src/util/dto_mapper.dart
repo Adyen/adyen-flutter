@@ -515,21 +515,38 @@ extension BeforeSubmitResultMapper on BeforeSubmitResult {
       };
 }
 
-extension GooglePayComponentConfigurationMapper
-    on GooglePayComponentConfiguration {
-  InstantPaymentConfigurationDTO toDTO(
+extension InstantPaymentConfigurationMapper on CheckoutConfiguration {
+  /// Maps to the DTO consumed by the Apple Pay/Google Pay button widgets.
+  ///
+  /// Throws an [ArgumentError] if the configuration matching
+  /// [instantPaymentType] (`applePayConfiguration`/`googlePayConfiguration`)
+  /// or [countryCode] hasn't been set, since both are required to show an
+  /// Apple Pay/Google Pay button.
+  InstantPaymentConfigurationDTO toInstantPaymentConfigurationDTO(
     String sdkVersionNumber,
     InstantPaymentType instantPaymentType,
-  ) =>
-      InstantPaymentConfigurationDTO(
-        instantPaymentType: instantPaymentType,
-        environment: environment,
-        clientKey: clientKey,
-        countryCode: countryCode,
-        amount: amount?.toDTO(),
-        analyticsOptionsDTO: analyticsOptions.toDTO(sdkVersionNumber),
-        googlePayConfigurationDTO: googlePayConfiguration.toDTO(),
+  ) {
+    final countryCode = this.countryCode;
+    if (countryCode == null) {
+      throw ArgumentError(
+        'CheckoutConfiguration.countryCode must be set to use '
+        'AdyenApplePayComponent/AdyenGooglePayComponent.',
       );
+    }
+
+    return InstantPaymentConfigurationDTO(
+      instantPaymentType: instantPaymentType,
+      environment: environment,
+      clientKey: clientKey,
+      countryCode: countryCode,
+      amount: amount?.toDTO(),
+      shopperLocale: shopperLocale,
+      analyticsOptionsDTO: analyticsOptions?.toDTO(sdkVersionNumber) ??
+          AnalyticsOptionsDTO(enabled: true, version: sdkVersionNumber),
+      googlePayConfigurationDTO: googlePayConfiguration?.toDTO(),
+      applePayConfigurationDTO: applePayConfiguration?.toDTO(),
+    );
+  }
 }
 
 extension MerchantInfoMapper on MerchantInfo {
@@ -557,23 +574,6 @@ extension ShippingAddressParametersMapper on ShippingAddressParameters {
       isPhoneNumberRequired: isPhoneNumberRequired,
     );
   }
-}
-
-extension ApplePayComponentConfigurationMapper
-    on ApplePayComponentConfiguration {
-  InstantPaymentConfigurationDTO toDTO(
-    String sdkVersionNumber,
-    InstantPaymentType instantPaymentType,
-  ) =>
-      InstantPaymentConfigurationDTO(
-        instantPaymentType: instantPaymentType,
-        environment: environment,
-        clientKey: clientKey,
-        countryCode: countryCode,
-        amount: amount?.toDTO(),
-        analyticsOptionsDTO: analyticsOptions.toDTO(sdkVersionNumber),
-        applePayConfigurationDTO: applePayConfiguration.toDTO(),
-      );
 }
 
 extension EncryptedCardMapper on EncryptedCardDTO {

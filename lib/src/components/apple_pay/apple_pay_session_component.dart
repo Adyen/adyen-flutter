@@ -14,7 +14,7 @@ class ApplePaySessionComponent extends BaseApplePayComponent {
     super.key,
     required this.session,
     required super.applePayPaymentMethod,
-    required super.applePayComponentConfiguration,
+    required super.configuration,
     required super.onPaymentResult,
     required super.style,
     required super.type,

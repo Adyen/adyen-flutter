@@ -1,9 +1,9 @@
 import 'dart:async';
 
+import 'package:adyen_checkout/src/common/model/checkout_configuration.dart';
 import 'package:adyen_checkout/src/common/model/payment_result.dart';
 import 'package:adyen_checkout/src/components/component_flutter_api.dart';
 import 'package:adyen_checkout/src/components/component_platform_api.dart';
-import 'package:adyen_checkout/src/components/google_pay/model/google_pay_component_configuration.dart';
 import 'package:adyen_checkout/src/generated/platform_api.g.dart';
 import 'package:adyen_checkout/src/logging/adyen_logger.dart';
 import 'package:adyen_checkout/src/util/dto_mapper.dart';
@@ -14,7 +14,7 @@ import 'package:pay/pay.dart';
 abstract class BaseGooglePayComponent extends StatefulWidget {
   abstract final String componentId;
   final String googlePayPaymentMethod;
-  final GooglePayComponentConfiguration googlePayComponentConfiguration;
+  final CheckoutConfiguration configuration;
   final Function(PaymentResult) onPaymentResult;
   final GooglePayButtonTheme theme;
   final GooglePayButtonType type;
@@ -35,7 +35,7 @@ abstract class BaseGooglePayComponent extends StatefulWidget {
   BaseGooglePayComponent({
     super.key,
     required this.googlePayPaymentMethod,
-    required this.googlePayComponentConfiguration,
+    required this.configuration,
     required this.onPaymentResult,
     required this.theme,
     required this.type,
@@ -247,7 +247,7 @@ class _BaseGooglePayComponentState extends State<BaseGooglePayComponent> {
         await widget._sdkVersionNumberProvider.getSdkVersionNumber();
     final InstantPaymentConfigurationDTO
         instantPaymentComponentConfigurationDTO =
-        widget.googlePayComponentConfiguration.toDTO(
+        widget.configuration.toInstantPaymentConfigurationDTO(
       versionNumber,
       InstantPaymentType.googlePay,
     );

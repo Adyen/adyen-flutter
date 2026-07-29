@@ -42,8 +42,8 @@ class GooglePayAdvancedComponentScreen extends StatelessWidget {
             onAdditionalDetails: repository.onAdditionalDetails,
           );
 
-          final GooglePayComponentConfiguration
-              googlePayComponentConfiguration = GooglePayComponentConfiguration(
+          final CheckoutConfiguration checkoutConfiguration =
+              CheckoutConfiguration(
             environment: Config.environment,
             clientKey: Config.clientKey,
             countryCode: Config.countryCode,
@@ -72,7 +72,7 @@ class GooglePayAdvancedComponentScreen extends StatelessWidget {
               ),
               const SizedBox(height: 8),
               AdyenGooglePayComponent(
-                configuration: googlePayComponentConfiguration,
+                configuration: checkoutConfiguration,
                 paymentMethod: paymentMethod,
                 checkout: advancedCheckout,
                 style: googlePayButtonStyle,

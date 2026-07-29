@@ -18,7 +18,7 @@ class GooglePayAdvancedComponent extends BaseGooglePayComponent {
   GooglePayAdvancedComponent({
     super.key,
     required super.googlePayPaymentMethod,
-    required super.googlePayComponentConfiguration,
+    required super.configuration,
     required super.onPaymentResult,
     required this.advancedCheckout,
     required super.theme,

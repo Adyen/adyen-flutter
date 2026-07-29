@@ -31,8 +31,7 @@ class GooglePaySessionsComponentScreen extends StatelessWidget {
   }
 
   Widget _buildAdyenGooglePaySessionComponent() {
-    final GooglePayComponentConfiguration googlePayComponentConfiguration =
-        GooglePayComponentConfiguration(
+    final CheckoutConfiguration checkoutConfiguration = CheckoutConfiguration(
       environment: Config.environment,
       clientKey: Config.clientKey,
       countryCode: Config.countryCode,
@@ -42,7 +41,7 @@ class GooglePaySessionsComponentScreen extends StatelessWidget {
     );
 
     return FutureBuilder<SessionCheckout>(
-      future: repository.createSessionCheckout(googlePayComponentConfiguration),
+      future: repository.createSessionCheckout(checkoutConfiguration),
       builder: (BuildContext context, AsyncSnapshot<SessionCheckout> snapshot) {
         if (snapshot.hasData) {
           final SessionCheckout sessionCheckout = snapshot.data!;
@@ -57,7 +56,7 @@ class GooglePaySessionsComponentScreen extends StatelessWidget {
               ),
               const SizedBox(height: 8),
               AdyenGooglePayComponent(
-                configuration: googlePayComponentConfiguration,
+                configuration: checkoutConfiguration,
                 paymentMethod: paymentMethod,
                 checkout: sessionCheckout,
                 loadingIndicator: const CircularProgressIndicator(),

@@ -8,7 +8,7 @@ class AdyenApplePayComponentRepository extends AdyenBaseRepository {
   });
 
   Future<SessionCheckout> createSessionCheckout(
-      ApplePayComponentConfiguration applePayComponentConfiguration) async {
+      CheckoutConfiguration checkoutConfiguration) async {
     final sessionResponse = await _fetchSession();
 
     return AdyenCheckout.session.setup(
@@ -16,15 +16,7 @@ class AdyenApplePayComponentRepository extends AdyenBaseRepository {
         sessionResponse["id"],
         sessionResponse["sessionData"],
       ),
-      checkoutConfiguration: CheckoutConfiguration(
-        environment: applePayComponentConfiguration.environment,
-        clientKey: applePayComponentConfiguration.clientKey,
-        countryCode: applePayComponentConfiguration.countryCode,
-        amount: applePayComponentConfiguration.amount,
-        shopperLocale: applePayComponentConfiguration.shopperLocale,
-        analyticsOptions: applePayComponentConfiguration.analyticsOptions,
-        applePayConfiguration: applePayComponentConfiguration.applePayConfiguration,
-      ),
+      checkoutConfiguration: checkoutConfiguration,
     );
   }
 

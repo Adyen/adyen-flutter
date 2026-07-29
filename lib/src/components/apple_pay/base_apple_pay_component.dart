@@ -1,9 +1,9 @@
 import 'dart:async';
 
+import 'package:adyen_checkout/src/common/model/checkout_configuration.dart';
 import 'package:adyen_checkout/src/common/model/payment_result.dart';
 import 'package:adyen_checkout/src/components/apple_pay/apple_pay_callback_handler.dart';
 import 'package:adyen_checkout/src/components/apple_pay/apple_pay_callback_registry.dart';
-import 'package:adyen_checkout/src/components/apple_pay/model/apple_pay_component_configuration.dart';
 import 'package:adyen_checkout/src/components/component_flutter_api.dart';
 import 'package:adyen_checkout/src/components/component_platform_api.dart';
 import 'package:adyen_checkout/src/generated/platform_api.g.dart';
@@ -15,7 +15,7 @@ import 'package:pay/pay.dart';
 
 abstract class BaseApplePayComponent extends StatefulWidget {
   final String applePayPaymentMethod;
-  final ApplePayComponentConfiguration applePayComponentConfiguration;
+  final CheckoutConfiguration configuration;
   final Function(PaymentResult) onPaymentResult;
   final ApplePayButtonStyle style;
   final ApplePayButtonType type;
@@ -37,7 +37,7 @@ abstract class BaseApplePayComponent extends StatefulWidget {
   BaseApplePayComponent({
     super.key,
     required this.applePayPaymentMethod,
-    required this.applePayComponentConfiguration,
+    required this.configuration,
     required this.onPaymentResult,
     required this.style,
     required this.type,
@@ -92,7 +92,7 @@ class _BaseApplePayComponentState extends State<BaseApplePayComponent> {
     ApplePayCallbackRegistry.instance.register(
       widget.componentId,
       ApplePayCallbackHandler(
-          () => widget.applePayComponentConfiguration.applePayConfiguration),
+          () => widget.configuration.applePayConfiguration!),
     );
     _componentCommunicationStream = _componentFlutterApi
         .componentCommunicationStream.stream
@@ -220,7 +220,7 @@ class _BaseApplePayComponentState extends State<BaseApplePayComponent> {
         await widget._sdkVersionNumberProvider.getSdkVersionNumber();
     final InstantPaymentConfigurationDTO
         instantPaymentComponentConfigurationDTO =
-        widget.applePayComponentConfiguration.toDTO(
+        widget.configuration.toInstantPaymentConfigurationDTO(
       versionNumber,
       InstantPaymentType.applePay,
     );
