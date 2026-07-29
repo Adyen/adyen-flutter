@@ -1,30 +1,23 @@
 import 'package:adyen_checkout/adyen_checkout.dart';
-import 'package:adyen_checkout_example/config.dart';
 import 'package:adyen_checkout_example/repositories/adyen_drop_in_repository.dart';
+import 'package:adyen_checkout_example/screens/v2/v2_payment_method.dart';
 import 'package:adyen_checkout_example/utils/dialog_builder.dart';
-import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 
 class V2AdvancedComponentScreen extends StatelessWidget {
   const V2AdvancedComponentScreen({
     required this.repository,
+    this.paymentMethodType = V2PaymentMethodType.card,
     super.key,
   });
 
   final AdyenDropInRepository repository;
+  final V2PaymentMethodType paymentMethodType;
 
   @override
   Widget build(BuildContext context) {
-    final checkoutConfiguration = CheckoutConfiguration(
-      environment: Config.environment,
-      clientKey: Config.clientKey,
-      countryCode: Config.countryCode,
-      shopperLocale: Config.shopperLocale,
-      amount: Config.amount,
-      cardConfiguration: const CardConfiguration(
-        // holderNameRequired: true,
-      ),
-    );
+    final checkoutConfiguration =
+        buildV2CheckoutConfiguration(paymentMethodType);
 
     return Scaffold(
       appBar: AppBar(title: const Text('V2 Advanced Component')),
@@ -48,9 +41,12 @@ class V2AdvancedComponentScreen extends StatelessWidget {
               return const Center(child: Text('No payment methods available'));
             }
 
-            final paymentMethod = _extractPaymentMethod(paymentMethods);
+            final paymentMethod =
+                extractV2PaymentMethod(paymentMethods, paymentMethodType);
             if (paymentMethod.isEmpty) {
-              return const Center(child: Text('Card payment method not found'));
+              return Center(
+                  child: Text(
+                      '${paymentMethodType.txVariant} payment method not found'));
             }
 
             return SingleChildScrollView(
@@ -67,17 +63,6 @@ class V2AdvancedComponentScreen extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  Map<String, dynamic> _extractPaymentMethod(
-      Map<String, dynamic> paymentMethods) {
-    final paymentMethodList = paymentMethods['paymentMethods'] as List? ?? [];
-    final paymentMethod = paymentMethodList.firstWhereOrNull(
-          (paymentMethod) => paymentMethod['type'] == 'scheme',
-        ) as Map<String, dynamic>? ??
-        <String, String>{};
-
-    return paymentMethod;
   }
 
   void _endPayment(BuildContext context, PaymentResult paymentResult) {

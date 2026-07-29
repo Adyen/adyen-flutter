@@ -18,7 +18,8 @@ internal struct EncodablePaymentComponentData: Encodable {
         try container.encodeIfPresent(data.socialSecurityNumber, forKey: .socialSecurityNumber)
         try container.encodeIfPresent(data.order, forKey: .order)
         try container.encodeIfPresent(data.installments, forKey: .installments)
-        try container.encodeIfPresent(data.amount, forKey: .amount)
+        // TODO: v6 migration - PaymentComponentData.amount no longer exists; amount is now
+        // provided via CheckoutConfiguration at Checkout.setup() time instead of per-submission.
     }
 
     private enum CodingKeys: String, CodingKey {

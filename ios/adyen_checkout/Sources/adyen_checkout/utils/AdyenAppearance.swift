@@ -1,19 +1,6 @@
-#if canImport(AdyenUI)
-    import AdyenUI
-#endif
-
-// TODO: v6 migration - DropInComponent.Style is now package-access. Drop-in styling needs v6 CheckoutTheme.
-public enum AdyenAppearance {
-    private static var _cardComponentStyle: AdyenUI.FormComponentStyle = .init()
-    private static var _blikComponentStyle: AdyenUI.FormComponentStyle = .init()
-
-    public static var cardComponentStyle: AdyenUI.FormComponentStyle {
-        get { _cardComponentStyle }
-        set { _cardComponentStyle = newValue }
-    }
-
-    public static var blikComponentStyle: AdyenUI.FormComponentStyle {
-        get { _blikComponentStyle }
-        set { _blikComponentStyle = newValue }
-    }
-}
+// TODO: v6 migration - FormComponentStyle (and DropInComponent.Style) are now package-access.
+// Per-component styling has moved to a checkout-wide CheckoutTheme (colors + corner radius only,
+// via CheckoutConfiguration.theme(_:)), which is not a drop-in replacement for the granular
+// per-field styling this type used to expose. Needs a real design follow-up once fine-grained
+// theming lands in the public v6 API on iOS.
+public enum AdyenAppearance {}

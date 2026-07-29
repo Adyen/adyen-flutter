@@ -32,6 +32,7 @@ import 'package:adyen_checkout_example/screens/component/multi_component/multi_c
 import 'package:adyen_checkout_example/screens/component/multi_component/multi_component_navigation_screen.dart';
 import 'package:adyen_checkout_example/screens/component/multi_component/multi_component_session_screen.dart';
 import 'package:adyen_checkout_example/screens/drop_in/drop_in_screen.dart';
+import 'package:adyen_checkout_example/screens/v2/v2_screen.dart';
 import 'package:adyen_checkout_example/utils/provider.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -139,6 +140,9 @@ void mainCommon(Service service) {
             notifier: CardStateNotifier(adyenCseRepository),
             child: const CustomCardScreen(),
           ),
+      '/v2Screen': (context) => V2Screen(
+            repository: AdyenDropInRepository(service: service),
+          ),
     },
     initialRoute: "/",
   ));
@@ -185,6 +189,9 @@ class MyApp extends StatelessWidget {
             TextButton(
                 onPressed: () => Navigator.pushNamed(context, "/customCard"),
                 child: const Text("Custom card (CSE)")),
+            TextButton(
+                onPressed: () => Navigator.pushNamed(context, "/v2Screen"),
+                child: const Text("V2 (v6 integration)")),
           ],
         ),
       ),

@@ -1,17 +1,18 @@
 import 'package:adyen_checkout/adyen_checkout.dart';
-import 'package:adyen_checkout_example/config.dart';
 import 'package:adyen_checkout_example/repositories/adyen_drop_in_repository.dart';
+import 'package:adyen_checkout_example/screens/v2/v2_payment_method.dart';
 import 'package:adyen_checkout_example/utils/dialog_builder.dart';
-import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 
 class V2SessionComponentScreen extends StatefulWidget {
   const V2SessionComponentScreen({
     required this.repository,
+    this.paymentMethodType = V2PaymentMethodType.card,
     super.key,
   });
 
   final AdyenDropInRepository repository;
+  final V2PaymentMethodType paymentMethodType;
 
   @override
   State<V2SessionComponentScreen> createState() =>
@@ -20,18 +21,13 @@ class V2SessionComponentScreen extends StatefulWidget {
 
 class _V2SessionComponentScreenState extends State<V2SessionComponentScreen> {
   late final Future<SessionCheckout> _sessionCheckoutFuture;
-  final CheckoutConfiguration _checkoutConfiguration = CheckoutConfiguration(
-    environment: Config.environment,
-    clientKey: Config.clientKey,
-    countryCode: Config.countryCode,
-    shopperLocale: Config.shopperLocale,
-    amount: Config.amount,
-    cardConfiguration: const CardConfiguration(),
-  );
+  late final CheckoutConfiguration _checkoutConfiguration;
 
   @override
   void initState() {
     super.initState();
+    _checkoutConfiguration =
+        buildV2CheckoutConfiguration(widget.paymentMethodType);
     _sessionCheckoutFuture = _setupSession();
   }
 
@@ -67,8 +63,10 @@ class _V2SessionComponentScreenState extends State<V2SessionComponentScreen> {
                   const SizedBox(height: 16),
                   AdyenComponent(
                     configuration: _checkoutConfiguration,
-                    paymentMethod:
-                        _extractPaymentMethod(sessionCheckout.paymentMethods),
+                    paymentMethod: extractV2PaymentMethod(
+                      sessionCheckout.paymentMethods,
+                      widget.paymentMethodType,
+                    ),
                     checkout: sessionCheckout,
                     onPaymentResult: (paymentResult) async =>
                         _endPayment(context, paymentResult),
@@ -93,21 +91,6 @@ class _V2SessionComponentScreenState extends State<V2SessionComponentScreen> {
       sessionResponse: sessionResponse,
       checkoutConfiguration: _checkoutConfiguration,
     );
-  }
-
-  Map<String, dynamic> _extractPaymentMethod(
-      Map<String, dynamic> paymentMethods) {
-    if (paymentMethods.isEmpty) {
-      return <String, String>{};
-    }
-
-    final paymentMethodList = paymentMethods['paymentMethods'] as List? ?? [];
-    final paymentMethod = paymentMethodList.firstWhereOrNull(
-          (paymentMethod) => paymentMethod['type'] == 'scheme',
-        ) as Map<String, dynamic>? ??
-        <String, String>{};
-
-    return paymentMethod;
   }
 
   void _endPayment(BuildContext context, PaymentResult paymentResult) {

@@ -5,18 +5,20 @@ import androidx.fragment.app.FragmentActivity
 import com.adyen.checkout.action.core.internal.ActionHandlingComponent
 import com.adyen.checkout.components.core.ComponentAvailableCallback
 import com.adyen.checkout.components.core.PaymentMethod
-import com.adyen.checkout.components.core.PaymentMethodTypes
 import com.adyen.checkout.components.core.action.Action
 import com.adyen.checkout.core.components.CheckoutConfiguration
 import com.adyen.checkout.flutter.components.view.ComponentLoadingBottomSheet
 import com.adyen.checkout.flutter.generated.ComponentCommunicationModel
 import com.adyen.checkout.flutter.generated.ComponentCommunicationType
 import com.adyen.checkout.flutter.generated.ComponentFlutterInterface
+import com.adyen.checkout.flutter.generated.Environment
+import com.adyen.checkout.flutter.generated.GooglePayConfigurationDTO
 import com.adyen.checkout.flutter.generated.InstantPaymentConfigurationDTO
 import com.adyen.checkout.flutter.generated.InstantPaymentSetupResultDTO
 import com.adyen.checkout.flutter.generated.InstantPaymentType
 import com.adyen.checkout.flutter.session.CheckoutHolder
 import com.adyen.checkout.flutter.utils.ConfigurationMapper.toCheckoutConfiguration
+import com.adyen.checkout.flutter.utils.ConfigurationMapper.toOldGooglePayConfiguration
 import com.adyen.checkout.flutter.utils.Constants
 import com.adyen.checkout.googlepay.old.GooglePayComponent
 import com.adyen.checkout.sessions.core.CheckoutSession
@@ -32,6 +34,9 @@ class GooglePayComponentManager(
 ) : ComponentAvailableCallback {
     private var componentId: String? = null
     private var checkoutConfiguration: CheckoutConfiguration? = null
+    private var googlePayConfigurationDTO: GooglePayConfigurationDTO? = null
+    private var environment: Environment? = null
+    private var countryCode: String? = null
     private var googlePayComponent: GooglePayComponent? = null
     private var adyenComponentView: AdyenComponentView? = null
 
@@ -73,6 +78,9 @@ class GooglePayComponentManager(
         val checkoutConfiguration = instantPaymentComponentConfigurationDTO.toCheckoutConfiguration()
         this.componentId = componentId
         this.checkoutConfiguration = checkoutConfiguration
+        this.googlePayConfigurationDTO = instantPaymentComponentConfigurationDTO.googlePayConfigurationDTO
+        this.environment = instantPaymentComponentConfigurationDTO.environment
+        this.countryCode = instantPaymentComponentConfigurationDTO.countryCode
 //        GooglePayComponent.PROVIDER.isAvailable(
 //            application = activity.application,
 //            paymentMethod = paymentMethod,
@@ -97,6 +105,9 @@ class GooglePayComponentManager(
         ) {
             this.componentId = null
             checkoutConfiguration = null
+            googlePayConfigurationDTO = null
+            environment = null
+            countryCode = null
             googlePayComponent = null
             adyenComponentView = null
         }
@@ -142,7 +153,7 @@ class GooglePayComponentManager(
             activity = activity,
             checkoutSession = checkoutSession,
             paymentMethod = paymentMethod,
-            configuration = checkoutConfiguration.getConfiguration(PaymentMethodTypes.GOOGLE_PAY)!!,
+            configuration = buildOldGooglePayConfiguration(checkoutConfiguration),
             componentCallback =
                 GooglePaySessionCallback(
                     componentFlutterInterface,
@@ -162,7 +173,7 @@ class GooglePayComponentManager(
         GooglePayComponent.PROVIDER.get(
             activity = activity,
             paymentMethod = paymentMethod,
-            configuration = checkoutConfiguration.getConfiguration(PaymentMethodTypes.GOOGLE_PAY)!!,
+            configuration = buildOldGooglePayConfiguration(checkoutConfiguration),
             callback =
                 GooglePayAdvancedCallback(
                     componentFlutterInterface,
@@ -171,6 +182,20 @@ class GooglePayComponentManager(
                 ),
             key = UUID.randomUUID().toString()
         )
+
+    private fun buildOldGooglePayConfiguration(
+        checkoutConfiguration: CheckoutConfiguration,
+    ): com.adyen.checkout.googlepay.old.GooglePayConfiguration {
+        val configurationDTO = googlePayConfigurationDTO
+            ?: throw IllegalStateException("Google Pay configuration is missing.")
+        val pigeonEnvironment = environment
+            ?: throw IllegalStateException("Google Pay environment is missing.")
+        return configurationDTO.toOldGooglePayConfiguration(
+            environment = pigeonEnvironment,
+            clientKey = checkoutConfiguration.clientKey,
+            countryCode = countryCode,
+        )
+    }
 
     fun handleAction(action: Action) {
         googlePayComponent?.let {

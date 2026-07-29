@@ -17,7 +17,7 @@ class CardValidation {
         guard let cardBrand else {
             return CardSecurityCodeValidator().isValid(securityCode)
         }
-        let cardType = CardType(rawValue: cardBrand)
-        return CardSecurityCodeValidator(cardType: cardType).isValid(securityCode)
+        let cardType = CardBrand(rawValue: cardBrand)
+        return CardSecurityCodeValidator(cardBrand: cardType).isValid(securityCode)
     }
 }

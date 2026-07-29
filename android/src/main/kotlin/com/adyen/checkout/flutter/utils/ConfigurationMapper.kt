@@ -2,13 +2,13 @@ package com.adyen.checkout.flutter.utils
 
 import com.adyen.checkout.card.FieldVisibility as SdkFieldVisibility
 import com.adyen.checkout.card.card
-import com.adyen.checkout.threeds2.threeDS2
 import com.adyen.checkout.card.old.AddressConfiguration
 import com.adyen.checkout.card.old.InstallmentConfiguration
 import com.adyen.checkout.card.old.InstallmentOptions
 import com.adyen.checkout.components.core.OrderResponse
 import com.adyen.checkout.core.common.CardBrand
-import com.adyen.checkout.core.common.PaymentResult
+import com.adyen.checkout.core.components.AdvancedCheckoutResult
+import com.adyen.checkout.core.components.SessionCheckoutResult
 import com.adyen.checkout.core.common.internal.helper.CheckoutPlatform
 import com.adyen.checkout.core.common.internal.helper.CheckoutPlatformParams
 import com.adyen.checkout.core.components.AnalyticsConfiguration
@@ -52,7 +52,11 @@ import com.adyen.checkout.flutter.generated.ThreeDS2UICustomizationDTO
 import com.adyen.checkout.flutter.generated.TotalPriceStatus
 import com.adyen.checkout.flutter.generated.TwintConfigurationDTO
 import com.adyen.checkout.flutter.generated.UnencryptedCardDTO
+import com.adyen.checkout.googlepay.MerchantInfo as NewMerchantInfo
+import com.adyen.checkout.googlepay.ShippingAddressParameters as NewShippingAddressParameters
+import com.adyen.checkout.googlepay.googlePay
 import com.adyen.checkout.googlepay.old.BillingAddressParameters
+import com.adyen.checkout.googlepay.old.GooglePayConfiguration as OldGooglePayConfiguration
 import com.adyen.checkout.googlepay.old.MerchantInfo
 import com.adyen.checkout.googlepay.old.ShippingAddressParameters
 import com.google.android.gms.wallet.WalletConstants
@@ -198,33 +202,40 @@ object ConfigurationMapper {
             }
 
             threeDS2ConfigurationDTO?.let { configurationDTO ->
-                threeDS2(
-                    threeDSRequestorAppURL = configurationDTO.requestorAppURL,
-                    uiCustomization = configurationDTO.uiCustomization?.toUiCustomization()
-                )
+//                threeDS2 {
+//                    threeDSRequestorAppURL = configurationDTO.requestorAppURL
+//                    uiCustomization = configurationDTO.uiCustomization?.toUiCustomization()
+//                }
+                // TODO: com.adyen.checkout.threeds2.threeDS2 is not yet available on 6.0.0-alpha.1
             }
 
+            // NOTE: billingAddress-related fields are not yet supported by the 6.0.0-alpha.1
+            // googlePay(...) builder (com.adyen.checkout.googlepay.googlePay), only by the old API.
             googlePayConfigurationDTO?.let { configurationDTO ->
-//                googlePay {
-//                    googlePayEnvironment = configurationDTO.googlePayEnvironment.mapToWalletConstants()
-//                    this.countryCode = countryCode
-//                    merchantAccount = configurationDTO.merchantAccount
-//                    merchantInfo = configurationDTO.merchantInfoDTO?.mapToMerchantInfo()
-//                    totalPriceStatus = configurationDTO.totalPriceStatus?.mapToTotalPriceStatus()
-//                    configurationDTO.allowedCardNetworks?.let { allowedCardNetworks = it.filterNotNull() }
-//                    configurationDTO.allowedAuthMethods?.let { allowedAuthMethods = it.filterNotNull() }
-//                    configurationDTO.allowPrepaidCards?.let { isAllowPrepaidCards = it }
-//                    configurationDTO.allowCreditCards?.let { isAllowCreditCards = it }
-//                    configurationDTO.assuranceDetailsRequired?.let { isAssuranceDetailsRequired = it }
-//                    configurationDTO.emailRequired?.let { isEmailRequired = it }
-//                    configurationDTO.existingPaymentMethodRequired?.let { isExistingPaymentMethodRequired = it }
-//                    configurationDTO.shippingAddressRequired?.let { isShippingAddressRequired = it }
-//                    shippingAddressParameters =
-//                        configurationDTO.shippingAddressParametersDTO?.mapToShippingAddressParameters()
-//                    configurationDTO.billingAddressRequired?.let { isBillingAddressRequired = it }
-//                    billingAddressParameters =
-//                        configurationDTO.billingAddressParametersDTO?.mapToBillingAddressParameters()
-//                }
+                googlePay(
+                    merchantAccount = configurationDTO.merchantAccount,
+                    googlePayEnvironment = configurationDTO.googlePayEnvironment.mapToWalletConstants(),
+                    countryCode = countryCode,
+                    merchantInfo =
+                        configurationDTO.merchantInfoDTO?.let {
+                            NewMerchantInfo(
+                                merchantName = it.merchantName,
+                                merchantId = it.merchantId,
+                                softwareInfo = null,
+                            )
+                        },
+                    isEmailRequired = configurationDTO.emailRequired,
+                    isExistingPaymentMethodRequired = configurationDTO.existingPaymentMethodRequired,
+                    isShippingAddressRequired = configurationDTO.shippingAddressRequired,
+                    shippingAddressParameters =
+                        configurationDTO.shippingAddressParametersDTO?.let {
+                            NewShippingAddressParameters(
+                                allowedCountryCodes = it.allowedCountryCodes?.filterNotNull().orEmpty(),
+                                isPhoneNumberRequired = it.isPhoneNumberRequired ?: false,
+                            )
+                        },
+                    totalPriceStatus = configurationDTO.totalPriceStatus?.mapToTotalPriceStatus(),
+                )
             }
 
             cashAppPayConfigurationDTO?.let { configurationDTO ->
@@ -299,14 +310,58 @@ object ConfigurationMapper {
 
     fun SessionResponseDTO.mapToSessionResponse(): SessionResponse = SessionResponse(id, sessionData)
 
-    fun PaymentResult.mapToPaymentResultModelDTO(): PaymentResultModelDTO =
-        PaymentResultModelDTO(sessionId, sessionResult, resultCode)
+    fun SessionCheckoutResult.mapToPaymentResultModelDTO(): PaymentResultModelDTO =
+        PaymentResultModelDTO(sessionId, sessionData, resultCode.value)
+
+    fun AdvancedCheckoutResult.mapToPaymentResultModelDTO(): PaymentResultModelDTO =
+        PaymentResultModelDTO(null, null, resultCode.value)
 
     private fun com.adyen.checkout.components.core.Amount.mapToDTOAmount(): AmountDTO =
         AmountDTO(
             this.currency ?: throw IllegalStateException("Currency must not be null"),
             this.value,
         )
+
+    private fun Environment.mapToOldEnvironment(): com.adyen.checkout.core.old.Environment =
+        when (this) {
+            Environment.TEST -> com.adyen.checkout.core.old.Environment.TEST
+            Environment.LIVE_EUROPE -> com.adyen.checkout.core.old.Environment.EUROPE
+            Environment.LIVE_UNITED_STATES -> com.adyen.checkout.core.old.Environment.UNITED_STATES
+            Environment.LIVE_AUSTRALIA -> com.adyen.checkout.core.old.Environment.AUSTRALIA
+            Environment.LIVE_APSE -> com.adyen.checkout.core.old.Environment.APSE
+            Environment.LIVE_INDIA -> com.adyen.checkout.core.old.Environment.INDIA
+            Environment.LIVE_NEA -> com.adyen.checkout.core.old.Environment.APSE
+        }
+
+    // TODO: CheckoutConfiguration.getConfiguration(...) bridging to old-style Configuration is not
+    // yet available on 6.0.0-alpha.1, so the old-style GooglePayConfiguration is built directly here.
+    fun GooglePayConfigurationDTO.toOldGooglePayConfiguration(
+        environment: Environment,
+        clientKey: String,
+        countryCode: String?,
+    ): OldGooglePayConfiguration {
+        val oldEnvironment = environment.mapToOldEnvironment()
+        return OldGooglePayConfiguration.Builder(oldEnvironment, clientKey)
+            .apply {
+                setGooglePayEnvironment(googlePayEnvironment.mapToWalletConstants())
+                countryCode?.let { setCountryCode(it) }
+                merchantAccount?.let { setMerchantAccount(it) }
+                merchantInfoDTO?.let { setMerchantInfo(it.mapToMerchantInfo()) }
+                totalPriceStatus?.let { setTotalPriceStatus(it.mapToTotalPriceStatus()) }
+                allowedCardNetworks?.filterNotNull()?.let { setAllowedCardNetworks(it) }
+                allowedAuthMethods?.filterNotNull()?.let { setAllowedAuthMethods(it) }
+                allowPrepaidCards?.let { setAllowPrepaidCards(it) }
+                allowCreditCards?.let { setAllowCreditCards(it) }
+                assuranceDetailsRequired?.let { setAssuranceDetailsRequired(it) }
+                emailRequired?.let { setEmailRequired(it) }
+                existingPaymentMethodRequired?.let { setExistingPaymentMethodRequired(it) }
+                shippingAddressRequired?.let { setShippingAddressRequired(it) }
+                shippingAddressParametersDTO?.let { setShippingAddressParameters(it.mapToShippingAddressParameters()) }
+                billingAddressRequired?.let { setBillingAddressRequired(it) }
+                billingAddressParametersDTO?.let { setBillingAddressParameters(it.mapToBillingAddressParameters()) }
+            }
+            .build()
+    }
 
     private fun GooglePayEnvironment.mapToWalletConstants(): Int =
         when (this) {

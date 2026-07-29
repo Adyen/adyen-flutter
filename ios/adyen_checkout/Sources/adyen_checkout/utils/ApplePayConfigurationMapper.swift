@@ -18,33 +18,97 @@ extension ApplePayConfigurationDTO {
 
 extension ApplePayConfigurationDTO {
     // TODO: v6 migration - ApplePayComponent is now package-access. Use ApplePayConfiguration directly.
-func toApplePayConfiguration(amount: Adyen.Amount? = nil, countryCode: String? = nil) throws -> ApplePayConfiguration {
-    guard let amount, let countryCode else { throw PlatformError(errorDescription: "Amount and countryCode for Apple Pay not provided.") }
-    let summaryItems = try mapToPaymentSummaryItems(summaryItems: summaryItems, amount: amount)
-    let paymentRequest = try buildPaymentRequest(amount: amount, countryCode: countryCode, summaryItems: summaryItems)
-    // NOTE: allowOnboarding is now internal on ApplePayConfiguration; it will need to be set via CheckoutConfiguration DSL.
-    return try ApplePayConfiguration(paymentRequest: paymentRequest)
-
-
     func toApplePayConfiguration(
-        payment: Payment?
-    ) throws -> ApplePayComponent.Configuration {
-        guard let payment else {
-            throw PlatformError(errorDescription: "Amount for Apple Pay not provided.")
-        }
-        let summaryItems = try mapToPaymentSummaryItems(summaryItems: summaryItems, payment: payment)
-        let paymentRequest = try buildPaymentRequest(payment: payment, summaryItems: summaryItems)
-        do {
-            return try ApplePayComponent.Configuration(paymentRequest: paymentRequest, allowOnboarding: allowOnboarding ?? false)
-        } catch {
-            throw AdyenPigeonError(
-                code: ApplePayConfigurationErrorCode.invalidConfiguration,
-                message: error.localizedDescription,
-                details: String(describing: error)
-            )
-        }
+        amount: Adyen.Amount? = nil,
+        countryCode: String? = nil,
+        componentFlutterApi: ComponentFlutterInterface? = nil,
+        componentId: (() -> String)? = nil
+    ) throws -> ApplePayConfiguration {
+        guard let amount, let countryCode else { throw PlatformError(errorDescription: "Amount and countryCode for Apple Pay not provided.") }
+        let summaryItems = try mapToPaymentSummaryItems(summaryItems: summaryItems, amount: amount)
+        let paymentRequest = try buildPaymentRequest(amount: amount, countryCode: countryCode, summaryItems: summaryItems)
+        // NOTE: allowOnboarding is now internal on ApplePayConfiguration; it will need to be set via CheckoutConfiguration DSL.
+        let configuration = try ApplePayConfiguration(paymentRequest: paymentRequest)
+        guard let componentFlutterApi, let componentId else { return configuration }
+        return attachDynamicCallbacks(
+            to: configuration,
+            amount: amount,
+            componentFlutterApi: componentFlutterApi,
+            componentId: componentId
+        )
     }
-    
+
+    private func attachDynamicCallbacks(
+        to configuration: ApplePayConfiguration,
+        amount: Adyen.Amount,
+        componentFlutterApi: ComponentFlutterInterface,
+        componentId: @escaping () -> String
+    ) -> ApplePayConfiguration {
+        var configuration = configuration
+        let currencyCode = amount.currencyCode
+
+        if hasOnSelectShippingMethod {
+            configuration = configuration.onSelectShippingMethod { shippingMethod, summaryItems in
+                await withCheckedContinuation { continuation in
+                    componentFlutterApi.onApplePaySelectShippingMethod(
+                        componentId: componentId(),
+                        shippingMethod: shippingMethod.toDTO(currencyCode: currencyCode),
+                        currentSummaryItems: summaryItems.map { $0.toDTO(currencyCode: currencyCode) }
+                    ) { result in
+                        let update = try? result.get().toPKPaymentRequestShippingMethodUpdate()
+                        continuation.resume(returning: update ?? PKPaymentRequestShippingMethodUpdate(paymentSummaryItems: summaryItems))
+                    }
+                }
+            }
+        }
+
+        if hasOnSelectShippingContact {
+            configuration = configuration.onSelectShippingContact { contact, summaryItems in
+                await withCheckedContinuation { continuation in
+                    componentFlutterApi.onApplePaySelectShippingContact(
+                        componentId: componentId(),
+                        contact: contact.toDTO(),
+                        currentSummaryItems: summaryItems.map { $0.toDTO(currencyCode: currencyCode) }
+                    ) { result in
+                        let update = try? result.get().toPKPaymentRequestShippingContactUpdate()
+                        continuation.resume(returning: update ?? PKPaymentRequestShippingContactUpdate(paymentSummaryItems: summaryItems))
+                    }
+                }
+            }
+        }
+
+        if hasOnChangeCouponCode {
+            configuration = configuration.onChangeCouponCode { couponCode, summaryItems in
+                await withCheckedContinuation { continuation in
+                    componentFlutterApi.onApplePayChangeCouponCode(
+                        componentId: componentId(),
+                        couponCode: couponCode,
+                        currentSummaryItems: summaryItems.map { $0.toDTO(currencyCode: currencyCode) }
+                    ) { result in
+                        let update = try? result.get().toPKPaymentRequestCouponCodeUpdate()
+                        continuation.resume(returning: update ?? PKPaymentRequestCouponCodeUpdate(paymentSummaryItems: summaryItems))
+                    }
+                }
+            }
+        }
+
+        if hasOnAuthorize {
+            configuration = configuration.onAuthorize { payment in
+                await withCheckedContinuation { continuation in
+                    componentFlutterApi.onApplePayAuthorize(
+                        componentId: componentId(),
+                        payment: payment.toAuthorizedPaymentDTO(currencyCode: currencyCode)
+                    ) { result in
+                        let authorizationResult = (try? result.get())?.toPKPaymentAuthorizationResult()
+                        continuation.resume(returning: authorizationResult ?? PKPaymentAuthorizationResult(status: .success, errors: nil))
+                    }
+                }
+            }
+        }
+
+        return configuration
+    }
+
     private func buildPaymentRequest(amount: Adyen.Amount, countryCode: String, summaryItems: [PKPaymentSummaryItem]) throws -> PKPaymentRequest {
         let paymentRequest = PKPaymentRequest()
         paymentRequest.merchantIdentifier = merchantId

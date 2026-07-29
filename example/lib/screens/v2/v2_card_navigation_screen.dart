@@ -1,10 +1,10 @@
 import 'package:adyen_checkout_example/repositories/adyen_drop_in_repository.dart';
-import 'package:adyen_checkout_example/screens/v2/v2_card_navigation_screen.dart';
-import 'package:adyen_checkout_example/screens/v2/v2_google_pay_navigation_screen.dart';
+import 'package:adyen_checkout_example/screens/v2/v2_advanced_component_screen.dart';
+import 'package:adyen_checkout_example/screens/v2/v2_session_component_screen.dart';
 import 'package:flutter/material.dart';
 
-class V2Screen extends StatelessWidget {
-  const V2Screen({
+class V2CardNavigationScreen extends StatelessWidget {
+  const V2CardNavigationScreen({
     required this.repository,
     super.key,
   });
@@ -14,7 +14,7 @@ class V2Screen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('V2 Example (v6 integration)')),
+      appBar: AppBar(title: const Text('V2 Card component')),
       body: SafeArea(
         child: Center(
           child: Column(
@@ -25,20 +25,20 @@ class V2Screen extends StatelessWidget {
                   context,
                   MaterialPageRoute(
                     builder: (_) =>
-                        V2CardNavigationScreen(repository: repository),
+                        V2SessionComponentScreen(repository: repository),
                   ),
                 ),
-                child: const Text('Card component'),
+                child: const Text('Card component session'),
               ),
               TextButton(
                 onPressed: () => Navigator.push(
                   context,
                   MaterialPageRoute(
                     builder: (_) =>
-                        V2GooglePayNavigationScreen(repository: repository),
+                        V2AdvancedComponentScreen(repository: repository),
                   ),
                 ),
-                child: const Text('Google Pay component'),
+                child: const Text('Card component advanced'),
               ),
             ],
           ),

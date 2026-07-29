@@ -1,24 +1,35 @@
-import Adyen
+@_spi(AdyenInternal) import Adyen
+@_spi(AdyenInternal) import AdyenCheckout
 
-// TODO: v6 migration - Session, InstantPaymentComponent, SessionDelegate are now package-access.
 @MainActor
 class InstantSessionComponent: BaseInstantComponent, InstantComponentProtocol {
     private let checkoutHolder: CheckoutHolder
+    private let paymentMethodType: PaymentMethodType
 
     init(
         componentFlutterApi: ComponentFlutterInterface,
-        paymentMethod: PaymentMethod,
-        adyenContext: AdyenContext,
+        paymentMethodType: PaymentMethodType,
         checkoutHolder: CheckoutHolder,
         componentId: String
     ) {
         self.checkoutHolder = checkoutHolder
+        self.paymentMethodType = paymentMethodType
         super.init(componentFlutterApi: componentFlutterApi, componentId: componentId)
     }
 
     func initiatePayment() {
-        sendErrorToFlutterLayer(error: PlatformError(errorDescription: "Instant session component not yet migrated to v6."))
+        do {
+            guard let checkout = checkoutHolder.adyenCheckout else {
+                throw PlatformError(errorDescription: "Session checkout is not set up.")
+            }
+            let component = try checkout.createPaymentComponent(for: paymentMethodType)
+            present(component: component)
+        } catch {
+            sendErrorToFlutterLayer(errorMessage: error.localizedDescription)
+        }
     }
 
-    func onDispose() {}
+    override func onDispose() {
+        super.onDispose()
+    }
 }

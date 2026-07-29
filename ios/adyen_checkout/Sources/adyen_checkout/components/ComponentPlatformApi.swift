@@ -2,12 +2,10 @@
 class ComponentPlatformApi: ComponentPlatformInterface {
     private let cardComponentManager: CardComponentManager
     private let blikComponentManager: BlikComponentManager
-    private let applePayComponentManager: ApplePayComponentManager
     private let instantComponentManager: InstantComponentManager
     private let actionComponentManager: ActionComponentManager
 
     init(componentFlutterApi: ComponentFlutterInterface, checkoutHolder: CheckoutHolder) {
-        self.applePayComponentManager = ApplePayComponentManager(componentFlutterApi: componentFlutterApi, checkoutHolder: checkoutHolder)
         self.instantComponentManager = InstantComponentManager(componentFlutterApi: componentFlutterApi, checkoutHolder: checkoutHolder)
         self.actionComponentManager = ActionComponentManager(componentFlutterApi: componentFlutterApi)
         self.cardComponentManager = CardComponentManager()
@@ -38,7 +36,7 @@ class ComponentPlatformApi: ComponentPlatformInterface {
              .instant:
             return
         case .applePay:
-            applePayComponentManager.isApplePayAvailable(
+            instantComponentManager.isApplePayAvailable(
                 instantPaymentComponentConfigurationDTO: instantPaymentConfigurationDTO,
                 paymentMethodResponse: paymentMethodResponse,
                 componentId: componentId,
@@ -55,13 +53,8 @@ class ComponentPlatformApi: ComponentPlatformInterface {
         switch instantPaymentConfigurationDTO.instantPaymentType {
         case .googlePay:
             return
-        case .applePay:
-            applePayComponentManager.startApplePayComponent(
-                instantPaymentComponentConfigurationDTO: instantPaymentConfigurationDTO,
-                paymentMethodResponse: encodedPaymentMethod,
-                componentId: componentId
-            )
-        case .instant:
+        case .applePay,
+             .instant:
             instantComponentManager.startInstantComponent(
                 instantPaymentConfigurationDTO: instantPaymentConfigurationDTO,
                 encodedPaymentMethod: encodedPaymentMethod,
@@ -79,9 +72,7 @@ class ComponentPlatformApi: ComponentPlatformInterface {
     }
 
     func onDispose(componentId: String) {
-        if isApplePayComponent(componentId: componentId) {
-            applePayComponentManager.onDispose()
-        } else if isInstantPaymentComponent(componentId: componentId) {
+        if isInstantPaymentComponent(componentId: componentId) {
             instantComponentManager.onDispose()
         } else if isActionComponent(componentId: componentId) {
             actionComponentManager.onDispose()
@@ -93,9 +84,7 @@ class ComponentPlatformApi: ComponentPlatformInterface {
     }
 
     private func handlePaymentEvent(componentId: String, paymentEventDTO: PaymentEventDTO) {
-        if isApplePayComponent(componentId: componentId) {
-            applePayComponentManager.handlePaymentEvent(paymentEventDTO: paymentEventDTO)
-        } else if isInstantPaymentComponent(componentId: componentId) {
+        if isInstantPaymentComponent(componentId: componentId) {
             instantComponentManager.handlePaymentEvent(paymentEventDTO: paymentEventDTO)
         } else if isCardComponent(componentId: componentId) {
             cardComponentManager.handlePaymentEvent(paymentEventDTO: paymentEventDTO)
@@ -122,14 +111,11 @@ class ComponentPlatformApi: ComponentPlatformInterface {
             componentId == BlikComponentManager.Constants.blikSessionComponentId
     }
 
-    private func isApplePayComponent(componentId: String) -> Bool {
-        componentId == ApplePayComponentManager.Constants.applePaySessionComponentId ||
-            componentId == ApplePayComponentManager.Constants.applePayAdvancedComponentId
-    }
-    
     private func isInstantPaymentComponent(componentId: String) -> Bool {
         componentId == InstantComponentManager.Constants.instantSessionComponentId ||
-            componentId == InstantComponentManager.Constants.instantAdvancedComponentId
+            componentId == InstantComponentManager.Constants.instantAdvancedComponentId ||
+            componentId == InstantComponentManager.Constants.applePaySessionComponentId ||
+            componentId == InstantComponentManager.Constants.applePayAdvancedComponentId
     }
 
     private func isActionComponent(componentId: String) -> Bool {

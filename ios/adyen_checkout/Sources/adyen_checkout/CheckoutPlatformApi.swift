@@ -45,13 +45,16 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
         Task {
             do {
                 let sessionResponse = sessionResponseDTO.mapToSessionResponse()
-                let configuration = try checkoutConfigurationDTO.createCheckoutConfiguration()
+                let configuration = try checkoutConfigurationDTO.createCheckoutConfiguration(
+                    componentPlatformEventHandler: componentPlatformEventHandler,
+                    componentId: "SESSION_ADYEN_COMPONENT"
+                )
                 let checkoutSession = try await Checkout.setup(
                     with: sessionResponse,
                     configuration: configuration
                 ).onComplete { [weak self] result in
                     self?.sendCompleteResult(componentId: "SESSION_ADYEN_COMPONENT", result: result)
-                }.onError { [weak self] error in
+                }.onFailure { [weak self] error in
                     self?.sendErrorResult(componentId: "SESSION_ADYEN_COMPONENT", error: error)
                 }
 
@@ -77,7 +80,12 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
             do {
                 let paymentMethodsData = Data(paymentMethodsResponse.utf8)
                 let paymentMethods = try JSONDecoder().decode(PaymentMethods.self, from: paymentMethodsData)
-                let configuration = try checkoutConfigurationDTO.createCheckoutConfiguration()
+                let configuration = try checkoutConfigurationDTO.createCheckoutConfiguration(
+                    componentFlutterApi: componentFlutterApi,
+                    checkoutHolder: checkoutHolder,
+                    componentPlatformEventHandler: componentPlatformEventHandler,
+                    componentId: "ADVANCED_ADYEN_COMPONENT"
+                )
                 let adyenCheckout = try await Checkout.setup(
                     with: paymentMethods,
                     configuration: configuration
@@ -89,7 +97,7 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
                     return await self.handleAdditionalDetails(additionalDetailsData: additionalDetailsData)
                 }.onComplete { [weak self] result in
                     self?.sendCompleteResult(componentId: "ADVANCED_ADYEN_COMPONENT", result: result)
-                }.onError { [weak self] error in
+                }.onFailure { [weak self] error in
                     self?.sendErrorResult(componentId: "ADVANCED_ADYEN_COMPONENT", error: error)
                 }
                 
@@ -222,9 +230,25 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
 
     // MARK: - Result helpers
 
-    private func sendCompleteResult(componentId: String, result: CheckoutResult) {
+    private func sendCompleteResult(componentId: String, result: SessionCheckoutResult) {
         let paymentResult = PaymentResultModelDTO(
+            sessionId: result.sessionId,
             sessionResult: result.sessionResult,
+            resultCode: result.resultCode.rawValue
+        )
+        let componentCommunicationModel = ComponentCommunicationModel(
+            type: ComponentCommunicationType.result,
+            componentId: componentId,
+            paymentResult: PaymentResultDTO(
+                type: PaymentResultEnum.finished,
+                result: paymentResult
+            )
+        )
+        componentPlatformEventHandler.send(event: componentCommunicationModel)
+    }
+
+    private func sendCompleteResult(componentId: String, result: AdvancedCheckoutResult) {
+        let paymentResult = PaymentResultModelDTO(
             resultCode: result.resultCode.rawValue
         )
         let componentCommunicationModel = ComponentCommunicationModel(
@@ -313,7 +337,9 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
 private extension PaymentComponentData {
     func toPlatformSubmitDataJson() throws -> String {
         let paymentComponentData = PaymentComponentDataResponse(
-            amount: amount,
+            // TODO: v6 migration - PaymentComponentData.amount no longer exists; amount is now
+            // provided via CheckoutConfiguration at Checkout.setup() time instead of per-submission.
+            amount: nil,
             paymentMethod: paymentMethod.encodable,
             storePaymentMethod: storePaymentMethod,
             order: order,
@@ -326,7 +352,8 @@ private extension PaymentComponentData {
             billingAddress: billingAddress,
             deliveryAddress: deliveryAddress,
             socialSecurityNumber: socialSecurityNumber,
-            delegatedAuthenticationData: delegatedAuthenticationData
+            // TODO: v6 migration - PaymentComponentData.delegatedAuthenticationData is now package-access.
+            delegatedAuthenticationData: nil
         )
         let json = try JSONEncoder().encode(paymentComponentData)
         guard let jsonString = String(data: json, encoding: .utf8) else {
