@@ -2,6 +2,10 @@ package com.adyen.checkout.flutter.components.v2
 
 import android.content.Context
 import androidx.fragment.app.FragmentActivity
+import com.adyen.checkout.card.BinLookupData
+import com.adyen.checkout.card.OnBinChangeCallback
+import com.adyen.checkout.card.OnBinLookupCallback
+import com.adyen.checkout.card.card
 import com.adyen.checkout.core.action.data.Action
 import com.adyen.checkout.core.action.data.ActionComponentData
 import com.adyen.checkout.core.components.AdvancedCheckoutResult
@@ -25,6 +29,7 @@ import com.adyen.checkout.flutter.generated.AddressDTO
 import com.adyen.checkout.flutter.generated.AdyenFlutterInterface
 import com.adyen.checkout.flutter.generated.BeforeSubmitDataDTO
 import com.adyen.checkout.flutter.generated.BeforeSubmitResultDTO
+import com.adyen.checkout.flutter.generated.BinLookupDataDTO
 import com.adyen.checkout.flutter.generated.CheckoutResultDTO
 import com.adyen.checkout.flutter.generated.ComponentCommunicationModel
 import com.adyen.checkout.flutter.generated.ComponentCommunicationType
@@ -96,6 +101,7 @@ internal class AdyenComponentFactory(
             onFailure = { checkoutError -> sendError(componentId, checkoutError.message) },
             onComplete = { sessionCheckoutResult -> sendFinished(componentId, sessionCheckoutResult) },
             onBeforeSubmit = { data -> onBeforeSubmit(data) },
+            additionalCallbacksBlock = { registerCardCallbacks(componentId) },
         )
 
     fun createAdvancedCheckoutCallbacks(componentId: String): AdvancedCheckoutCallbacks =
@@ -151,8 +157,34 @@ internal class AdyenComponentFactory(
                 }
             },
             onFailure = { error -> sendError(componentId, error.message) },
-            onComplete = { advancedCheckoutResult -> sendFinished(componentId, advancedCheckoutResult) }
+            onComplete = { advancedCheckoutResult -> sendFinished(componentId, advancedCheckoutResult) },
+            additionalCallbacksBlock = { registerCardCallbacks(componentId) },
         )
+
+    /**
+     * Registers Card-specific additional callbacks (bin lookup/change). Safe to register
+     * unconditionally for any payment method: these only ever fire while the active
+     * component is a card component.
+     */
+    private fun CheckoutCallbacks.registerCardCallbacks(componentId: String) {
+        card(
+            onBinLookup = OnBinLookupCallback { data -> sendBinLookup(componentId, data) },
+            onBinChange = OnBinChangeCallback { binValue -> sendBinValue(componentId, binValue) },
+        )
+    }
+
+    private fun sendBinLookup(componentId: String, data: BinLookupData) {
+        val binLookupDataDtoList = data.brands.map { BinLookupDataDTO(it.brand) }
+        platformEventHandler.eventSink?.success(
+            ComponentCommunicationModel(ComponentCommunicationType.BIN_LOOKUP, componentId, binLookupDataDtoList)
+        )
+    }
+
+    private fun sendBinValue(componentId: String, binValue: String) {
+        platformEventHandler.eventSink?.success(
+            ComponentCommunicationModel(ComponentCommunicationType.BIN_VALUE, componentId, binValue)
+        )
+    }
 
     fun createPaymentMethod(creationParams: Map<*, *>): PaymentMethodResponse {
         val paymentMethodString = creationParams[PAYMENT_METHOD_KEY] as String? ?: ""

@@ -43,8 +43,36 @@ extension DropInConfigurationDTO {
 }
 
 extension CheckoutConfigurationDTO {
-    func createCheckoutConfiguration() throws -> CheckoutConfiguration {
-        let cardConfig = cardConfigurationDTO?.mapToCardConfiguration(shopperLocale: shopperLocale) ?? CardConfiguration()
+    func createCheckoutConfiguration(
+        componentFlutterApi: ComponentFlutterInterface? = nil,
+        checkoutHolder: CheckoutHolder? = nil,
+        componentPlatformEventHandler: ComponentPlatformEventHandler? = nil,
+        componentId: String? = nil
+    ) throws -> CheckoutConfiguration {
+        let cardConfig = cardConfigurationDTO?.mapToCardConfiguration(
+            shopperLocale: shopperLocale,
+            componentPlatformEventHandler: componentPlatformEventHandler,
+            componentId: componentId
+        ) ?? CardConfiguration()
+        let mappedAmount = amount?.mapToAmount()
+        guard let applePayConfigurationDTO else {
+            return try CheckoutConfiguration(
+                environment: environment.mapToEnvironment(),
+                amount: amount!.mapToAmount(),
+                clientKey: clientKey,
+                analyticsConfiguration: AnalyticsConfiguration(isEnabled: analyticsOptionsDTO.enabled)
+            ) {
+                cardConfig
+            }
+        }
+        let applePayConfiguration = try applePayConfigurationDTO.toApplePayConfiguration(
+            amount: mappedAmount,
+            countryCode: countryCode,
+            componentFlutterApi: componentFlutterApi,
+            componentId: checkoutHolder.map { holder in
+                { [weak holder] in holder?.activeApplePayComponentId ?? InstantComponentManager.Constants.applePaySessionComponentId }
+            }
+        )
         return try CheckoutConfiguration(
             environment: environment.mapToEnvironment(),
             amount: amount!.mapToAmount(),
@@ -52,6 +80,7 @@ extension CheckoutConfigurationDTO {
             analyticsConfiguration: AnalyticsConfiguration(isEnabled: analyticsOptionsDTO.enabled)
         ) {
             cardConfig
+            applePayConfiguration
         }
     }
 }
@@ -82,13 +111,27 @@ extension DropInConfigurationDTO {
 }
 
 extension CardConfigurationDTO {
-    func mapToCardConfiguration(shopperLocale: String?) -> CardConfiguration {
+    /// - Parameters:
+    ///   - componentPlatformEventHandler: When provided (together with `componentId`), bin
+    ///     lookup/change events are forwarded to Flutter as `ComponentCommunicationModel`
+    ///     events, the same channel already used for resize/result events. These callbacks
+    ///     only ever fire while the active component is a card component, so it's safe to
+    ///     always register them regardless of which payment method is actually rendered.
+    ///   - componentId: The fixed componentId of the generic session/advanced component
+    ///     (`"SESSION_ADYEN_COMPONENT"`/`"ADVANCED_ADYEN_COMPONENT"`), since this
+    ///     configuration is attached once at `Checkout.setup()` time, before any specific
+    ///     component is created.
+    func mapToCardConfiguration(
+        shopperLocale: String?,
+        componentPlatformEventHandler: ComponentPlatformEventHandler? = nil,
+        componentId: String? = nil
+    ) -> CardConfiguration {
         let koreanAuthenticationMode = kcpFieldVisibility.toCardFieldVisibility()
         let socialSecurityNumberMode = socialSecurityNumberFieldVisibility.toCardFieldVisibility()
         let allowedCardTypes = determineAllowedCardTypes(cardTypes: supportedCardTypes)
         let billingAddressMode = determineBillingAddressConfiguration(addressMode: addressMode)
         let installmentConfig = installmentConfiguration?.mapToInstallmentConfiguration()
-        return CardConfiguration()
+        var cardConfiguration = CardConfiguration()
             .showCardholderName(holderNameRequired)
             .showStorePaymentMethod(showStorePaymentField)
             .showSecurityCode(showCvc)
@@ -98,22 +141,43 @@ extension CardConfigurationDTO {
             .supportedCardBrands(allowedCardTypes)
             .installmentConfiguration(installmentConfig)
             .billingAddressMode(billingAddressMode)
+
+        if let componentPlatformEventHandler, let componentId {
+            cardConfiguration = cardConfiguration
+                .onBinLookup { data in
+                    let binLookupDataDtoList = data.brands.map { BinLookupDataDTO(brand: $0.brand) }
+                    componentPlatformEventHandler.send(event: ComponentCommunicationModel(
+                        type: .binLookup,
+                        componentId: componentId,
+                        data: binLookupDataDtoList
+                    ))
+                }
+                .onBinChange { binValue in
+                    componentPlatformEventHandler.send(event: ComponentCommunicationModel(
+                        type: .binValue,
+                        componentId: componentId,
+                        data: binValue
+                    ))
+                }
+        }
+
+        return cardConfiguration
     }
 
-    private func determineAllowedCardTypes(cardTypes: [String?]?) -> [CardType]? {
+    private func determineAllowedCardTypes(cardTypes: [String?]?) -> [CardBrand]? {
         guard let mappedCardTypes = cardTypes, !mappedCardTypes.isEmpty else {
             return nil
         }
 
-        return mappedCardTypes.compactMap { $0 }.map { CardType(rawValue: $0.lowercased()) }
+        return mappedCardTypes.compactMap { $0 }.map { CardBrand(rawValue: $0.lowercased()) }
     }
 
     private func determineBillingAddressConfiguration(addressMode: AddressMode?) -> BillingAddressMode {
         switch addressMode {
         case .full:
-            return BillingAddressMode.full
+            return BillingAddressMode.full()
         case .postalCode:
-            return BillingAddressMode.postalCode
+            return BillingAddressMode.postalCode()
         case .none?:
             return BillingAddressMode.none
         default:
@@ -181,15 +245,6 @@ extension AmountDTO {
 }
 
 extension InstantPaymentConfigurationDTO {
-    // TODO: v6 migration - ApplePayComponent.Configuration is now package-access.
-    // Apple Pay needs to be created via Checkout.setup() + createPaymentComponent(for: .applePay).
-    func mapToApplePayConfiguration(payment: Payment?) throws -> ApplePayComponent.Configuration {
-        guard let applePayConfigurationDTO else {
-            throw PlatformError(errorDescription: "Apple pay configuration not provided.")
-        }
-        return try applePayConfigurationDTO.toApplePayConfiguration(payment: payment)
-    }
-
     func createAdyenContext() throws -> AdyenContext {
         try buildAdyenContext(
             environment: environment,
@@ -198,6 +253,38 @@ extension InstantPaymentConfigurationDTO {
             analyticsOptionsDTO: analyticsOptionsDTO,
             countryCode: countryCode
         )
+    }
+
+    func createCheckoutConfiguration(
+        componentFlutterApi: ComponentFlutterInterface? = nil,
+        componentId: (() -> String)? = nil
+    ) throws -> CheckoutConfiguration {
+        guard let amount else {
+            throw PlatformError(errorDescription: "Amount is required to set up Apple Pay.")
+        }
+        let mappedAmount = amount.mapToAmount()
+        guard let applePayConfigurationDTO else {
+            return try CheckoutConfiguration(
+                environment: environment.mapToEnvironment(),
+                amount: mappedAmount,
+                clientKey: clientKey,
+                analyticsConfiguration: AnalyticsConfiguration(isEnabled: analyticsOptionsDTO.enabled)
+            ) {}
+        }
+        let applePayConfiguration = try applePayConfigurationDTO.toApplePayConfiguration(
+            amount: mappedAmount,
+            countryCode: countryCode,
+            componentFlutterApi: componentFlutterApi,
+            componentId: componentId
+        )
+        return try CheckoutConfiguration(
+            environment: environment.mapToEnvironment(),
+            amount: mappedAmount,
+            clientKey: clientKey,
+            analyticsConfiguration: AnalyticsConfiguration(isEnabled: analyticsOptionsDTO.enabled)
+        ) {
+            applePayConfiguration
+        }
     }
 }
 
@@ -232,7 +319,7 @@ extension EncryptedCard {
 
 extension PaymentResultEnum {
     static func from(error: Error) -> Self {
-        if let componentError = (error as? ComponentError), componentError == ComponentError.cancelled {
+        if let checkoutError = (error as? CheckoutError), checkoutError.code == CheckoutError.Code.cancelled {
             .cancelledByUser
         } else if isThree3ds2Cancellation(error: error as NSError) {
             .cancelledByUser
@@ -463,12 +550,12 @@ extension InstallmentConfigurationDTO {
         }
     }
 
-    private func buildCardBasedInstallmentOptions(from cardBasedOptions: [CardBasedInstallmentOptionsDTO?]) -> [CardType: InstallmentOptions]? {
-        var options: [CardType: InstallmentOptions] = [:]
+    private func buildCardBasedInstallmentOptions(from cardBasedOptions: [CardBasedInstallmentOptionsDTO?]) -> [CardBrand: InstallmentOptions]? {
+        var options: [CardBrand: InstallmentOptions] = [:]
         for cardBasedOption in cardBasedOptions {
             guard let cardBasedOption else { continue }
             let cardBrandRaw = cardBasedOption.cardBrand
-            let cardType = CardType(rawValue: cardBrandRaw)
+            let cardType = CardBrand(rawValue: cardBrandRaw)
             options[cardType] = createInstallmentOptions(
                 values: cardBasedOption.values,
                 includesRevolving: cardBasedOption.includesRevolving
