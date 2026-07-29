@@ -78,7 +78,8 @@ enum ComponentCommunicationType {
   resize,
   binLookup,
   binValue,
-  availability
+  availability,
+  buttonPressed
 }
 
 enum PaymentEventType {

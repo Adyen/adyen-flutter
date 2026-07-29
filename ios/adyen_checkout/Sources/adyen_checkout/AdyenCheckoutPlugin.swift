@@ -32,6 +32,11 @@ public class AdyenCheckoutPlugin: NSObject, FlutterPlugin {
 
         //V2
         OnPlatformEventStreamHandler.register(with: messenger, streamHandler: componentPlatformEventHandler)
+        let applePayButtonViewFactory = ApplePayButtonViewFactory(
+            componentPlatformEventHandler: componentPlatformEventHandler
+        )
+        registrar.register(applePayButtonViewFactory, withId: ApplePayButtonViewFactory.viewTypeId)
+
         let adyenComponentSessionFactory = AdyenComponentFactory(
             adyenFlutterInterface: adyenFlutterInterface,
             sessionCheckoutFlutterInterface: sessionCheckoutFlutterInterface,

@@ -7,7 +7,11 @@ import 'package:adyen_checkout/src/logging/adyen_logger.dart';
 import 'package:adyen_checkout/src/util/dto_mapper.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:pay/pay.dart' as pay_sdk;
+
+/// The default width/height of a native `PKPaymentButton`, matching Apple's
+/// Human Interface Guidelines for the Apple Pay button.
+const double _minimumApplePayButtonWidth = 100;
+const double _minimumApplePayButtonHeight = 30;
 
 class AdyenApplePayComponent extends StatelessWidget {
   final CheckoutConfiguration configuration;
@@ -54,11 +58,9 @@ class AdyenApplePayComponent extends StatelessWidget {
               applePayPaymentMethod: json.encode(paymentMethod),
               configuration: configuration,
               onPaymentResult: onPaymentResult,
-              style: _mapToApplePayButtonStyle(),
-              type: _mapToApplePayButtonType(),
+              style: style,
               width: _determineWidth(),
               height: _determineHeight(),
-              cornerRadius: style?.cornerRadius,
               loadingIndicator: loadingIndicator,
               onUnavailable: onUnavailable,
               unavailableWidget: unavailableWidget,
@@ -76,11 +78,9 @@ class AdyenApplePayComponent extends StatelessWidget {
               configuration: configuration,
               onPaymentResult: onPaymentResult,
               advancedCheckout: it,
-              style: _mapToApplePayButtonStyle(),
-              type: _mapToApplePayButtonType(),
+              style: style,
               width: _determineWidth(),
               height: _determineHeight(),
-              cornerRadius: style?.cornerRadius,
               loadingIndicator: loadingIndicator,
               onUnavailable: onUnavailable,
               unavailableWidget: unavailableWidget,
@@ -93,51 +93,20 @@ class AdyenApplePayComponent extends StatelessWidget {
   }
 
   double _determineWidth() {
-    final width = this.width ?? pay_sdk.RawApplePayButton.minimumButtonWidth;
-    if (width > pay_sdk.RawApplePayButton.minimumButtonWidth) {
+    final width = this.width ?? _minimumApplePayButtonWidth;
+    if (width > _minimumApplePayButtonWidth) {
       return width;
     }
 
-    return pay_sdk.RawApplePayButton.minimumButtonWidth;
+    return _minimumApplePayButtonWidth;
   }
 
   double _determineHeight() {
-    final height = this.height ?? pay_sdk.RawApplePayButton.minimumButtonHeight;
-    if (height > pay_sdk.RawApplePayButton.minimumButtonHeight) {
+    final height = this.height ?? _minimumApplePayButtonHeight;
+    if (height > _minimumApplePayButtonHeight) {
       return height;
     }
 
-    return pay_sdk.RawApplePayButton.minimumButtonHeight;
-  }
-
-  pay_sdk.ApplePayButtonStyle _mapToApplePayButtonStyle() {
-    return switch (style?.theme) {
-      null || ApplePayButtonTheme.black => pay_sdk.ApplePayButtonStyle.black,
-      ApplePayButtonTheme.white => pay_sdk.ApplePayButtonStyle.white,
-      ApplePayButtonTheme.whiteOutline =>
-        pay_sdk.ApplePayButtonStyle.whiteOutline,
-      ApplePayButtonTheme.automatic => pay_sdk.ApplePayButtonStyle.automatic,
-    };
-  }
-
-  pay_sdk.ApplePayButtonType _mapToApplePayButtonType() {
-    return switch (style?.type) {
-      null || ApplePayButtonType.plain => pay_sdk.ApplePayButtonType.plain,
-      ApplePayButtonType.buy => pay_sdk.ApplePayButtonType.buy,
-      ApplePayButtonType.setUp => pay_sdk.ApplePayButtonType.setUp,
-      ApplePayButtonType.inStore => pay_sdk.ApplePayButtonType.inStore,
-      ApplePayButtonType.donate => pay_sdk.ApplePayButtonType.donate,
-      ApplePayButtonType.checkout => pay_sdk.ApplePayButtonType.checkout,
-      ApplePayButtonType.book => pay_sdk.ApplePayButtonType.book,
-      ApplePayButtonType.subscribe => pay_sdk.ApplePayButtonType.subscribe,
-      ApplePayButtonType.reload => pay_sdk.ApplePayButtonType.reload,
-      ApplePayButtonType.addMoney => pay_sdk.ApplePayButtonType.addMoney,
-      ApplePayButtonType.topUp => pay_sdk.ApplePayButtonType.topUp,
-      ApplePayButtonType.order => pay_sdk.ApplePayButtonType.order,
-      ApplePayButtonType.rent => pay_sdk.ApplePayButtonType.rent,
-      ApplePayButtonType.support => pay_sdk.ApplePayButtonType.support,
-      ApplePayButtonType.contribute => pay_sdk.ApplePayButtonType.contribute,
-      ApplePayButtonType.tip => pay_sdk.ApplePayButtonType.tip,
-    };
+    return _minimumApplePayButtonHeight;
   }
 }

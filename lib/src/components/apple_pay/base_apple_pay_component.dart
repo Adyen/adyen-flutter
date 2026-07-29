@@ -2,8 +2,10 @@ import 'dart:async';
 
 import 'package:adyen_checkout/src/common/model/checkout_configuration.dart';
 import 'package:adyen_checkout/src/common/model/payment_result.dart';
+import 'package:adyen_checkout/src/components/apple_pay/apple_pay_button_platform_view.dart';
 import 'package:adyen_checkout/src/components/apple_pay/apple_pay_callback_handler.dart';
 import 'package:adyen_checkout/src/components/apple_pay/apple_pay_callback_registry.dart';
+import 'package:adyen_checkout/src/components/apple_pay/model/apple_pay_button_style.dart';
 import 'package:adyen_checkout/src/components/component_flutter_api.dart';
 import 'package:adyen_checkout/src/components/component_platform_api.dart';
 import 'package:adyen_checkout/src/generated/platform_api.g.dart';
@@ -11,15 +13,12 @@ import 'package:adyen_checkout/src/logging/adyen_logger.dart';
 import 'package:adyen_checkout/src/util/dto_mapper.dart';
 import 'package:adyen_checkout/src/util/sdk_version_number_provider.dart';
 import 'package:flutter/material.dart';
-import 'package:pay/pay.dart';
 
 abstract class BaseApplePayComponent extends StatefulWidget {
   final String applePayPaymentMethod;
   final CheckoutConfiguration configuration;
   final Function(PaymentResult) onPaymentResult;
-  final ApplePayButtonStyle style;
-  final ApplePayButtonType type;
-  final double? cornerRadius;
+  final ApplePayButtonStyle? style;
   final double width;
   final double height;
   final Function()? onUnavailable;
@@ -39,9 +38,7 @@ abstract class BaseApplePayComponent extends StatefulWidget {
     required this.applePayPaymentMethod,
     required this.configuration,
     required this.onPaymentResult,
-    required this.style,
-    required this.type,
-    required this.cornerRadius,
+    this.style,
     required this.width,
     required this.height,
     this.onUnavailable,
@@ -98,7 +95,13 @@ class _BaseApplePayComponentState extends State<BaseApplePayComponent> {
         .componentCommunicationStream.stream
         .where((communicationModel) =>
             communicationModel.componentId == widget.componentId)
-        .listen(widget.handleComponentCommunication);
+        .listen((communicationModel) {
+      if (communicationModel.type == ComponentCommunicationType.buttonPressed) {
+        onPressed();
+      } else {
+        widget.handleComponentCommunication(communicationModel);
+      }
+    });
     _applePaySupportedFuture = _isApplePaySupported();
   }
 
@@ -159,7 +162,10 @@ class _BaseApplePayComponentState extends State<BaseApplePayComponent> {
 
   SizedBox _buildApplePayButton(
       AsyncSnapshot<InstantPaymentSetupResultDTO> snapshot) {
-    final Widget applePayButton = _buildRawApplePayButton();
+    final Widget applePayButton = ApplePayButtonPlatformView(
+      componentId: widget.componentId,
+      style: widget.style,
+    );
 
     return SizedBox(
       width: widget.width,
@@ -173,15 +179,6 @@ class _BaseApplePayComponentState extends State<BaseApplePayComponent> {
           );
         },
       ),
-    );
-  }
-
-  RawApplePayButton _buildRawApplePayButton() {
-    return RawApplePayButton(
-      onPressed: onPressed,
-      style: widget.style,
-      type: widget.type,
-      cornerRadius: widget.cornerRadius,
     );
   }
 
