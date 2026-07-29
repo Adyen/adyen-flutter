@@ -1,4 +1,0 @@
-enum GooglePayButtonTheme {
-  dark,
-  light,
-}

@@ -4,7 +4,6 @@ import 'package:adyen_checkout/adyen_checkout.dart';
 import 'package:adyen_checkout_example/config.dart';
 import 'package:adyen_checkout_example/repositories/adyen_apple_pay_component_repository.dart';
 import 'package:adyen_checkout_example/repositories/adyen_drop_in_repository.dart';
-import 'package:adyen_checkout_example/repositories/adyen_google_pay_component_repository.dart';
 import 'package:adyen_checkout_example/utils/dialog_builder.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
@@ -14,13 +13,11 @@ class MultiComponentAdvancedScreen extends StatelessWidget {
   const MultiComponentAdvancedScreen({
     required this.dropInRepository,
     required this.applePayRepository,
-    required this.googlePayRepository,
     super.key,
   });
 
   final AdyenDropInRepository dropInRepository;
   final AdyenApplePayComponentRepository applePayRepository;
-  final AdyenGooglePayComponentRepository googlePayRepository;
 
   @override
   Widget build(BuildContext context) {
@@ -148,11 +145,13 @@ class MultiComponentAdvancedScreen extends StatelessWidget {
     Map<String, dynamic> paymentMethods,
     BuildContext context,
   ) {
-    final AdvancedCheckout advancedCheckout = AdvancedCheckout(
-      paymentMethods: paymentMethods,
-      onSubmit: googlePayRepository.onSubmit,
-      onAdditionalDetails: googlePayRepository.onAdditionalDetails,
+    final paymentMethod = _extractPaymentMethodByType(
+      paymentMethods,
+      'googlepay',
     );
+    if (paymentMethod.isEmpty) {
+      return const SizedBox.shrink();
+    }
 
     final CheckoutConfiguration googlePayCheckoutConfiguration =
         CheckoutConfiguration(
@@ -164,28 +163,19 @@ class MultiComponentAdvancedScreen extends StatelessWidget {
         googlePayEnvironment: Config.googlePayEnvironment,
       ),
     );
-
-    final GooglePayButtonStyle googlePayButtonStyle = GooglePayButtonStyle(
-      theme: GooglePayButtonTheme.dark,
-      type: GooglePayButtonType.buy,
-      cornerRadius: 4,
-    );
-
-    final paymentMethod = _extractPaymentMethodByType(
-      paymentMethods,
-      'googlepay',
+    final AdvancedCheckout advancedCheckout = AdvancedCheckout(
+      paymentMethods: paymentMethods,
+      onSubmit: dropInRepository.onSubmit,
+      onAdditionalDetails: dropInRepository.onAdditionalDetails,
     );
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
-      child: AdyenGooglePayComponent(
+      child: AdyenComponent(
         configuration: googlePayCheckoutConfiguration,
         paymentMethod: paymentMethod,
         checkout: advancedCheckout,
-        style: googlePayButtonStyle,
-        loadingIndicator: const CircularProgressIndicator(),
-        width: double.infinity,
-        onPaymentResult: (paymentResult) {
+        onPaymentResult: (paymentResult) async {
           Navigator.pop(context);
           DialogBuilder.showPaymentResultDialog(paymentResult, context);
         },

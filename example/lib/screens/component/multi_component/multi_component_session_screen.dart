@@ -4,7 +4,6 @@ import 'package:adyen_checkout/adyen_checkout.dart';
 import 'package:adyen_checkout_example/config.dart';
 import 'package:adyen_checkout_example/repositories/adyen_apple_pay_component_repository.dart';
 import 'package:adyen_checkout_example/repositories/adyen_drop_in_repository.dart';
-import 'package:adyen_checkout_example/repositories/adyen_google_pay_component_repository.dart';
 import 'package:adyen_checkout_example/utils/dialog_builder.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
@@ -14,13 +13,11 @@ class MultiComponentSessionScreen extends StatelessWidget {
   MultiComponentSessionScreen({
     required this.dropInRepository,
     required this.applePayRepository,
-    required this.googlePayRepository,
     super.key,
   });
 
   final AdyenDropInRepository dropInRepository;
   final AdyenApplePayComponentRepository applePayRepository;
-  final AdyenGooglePayComponentRepository googlePayRepository;
   final checkoutConfiguration = CheckoutConfiguration(
     environment: Config.environment,
     clientKey: Config.clientKey,
@@ -28,6 +25,9 @@ class MultiComponentSessionScreen extends StatelessWidget {
     amount: Config.amount,
     shopperLocale: Config.shopperLocale,
     cardConfiguration: const CardConfiguration(),
+    googlePayConfiguration: const GooglePayConfiguration(
+      googlePayEnvironment: Config.googlePayEnvironment,
+    ),
   );
 
   @override
@@ -141,30 +141,21 @@ class MultiComponentSessionScreen extends StatelessWidget {
     BuildContext context,
     SessionCheckout sessionCheckout,
   ) {
-    final CheckoutConfiguration googlePayCheckoutConfiguration =
-        CheckoutConfiguration(
-      environment: Config.environment,
-      clientKey: Config.clientKey,
-      countryCode: Config.countryCode,
-      googlePayConfiguration: const GooglePayConfiguration(
-        googlePayEnvironment: Config.googlePayEnvironment,
-      ),
-    );
-
     final Map<String, dynamic> paymentMethod = _extractPaymentMethodByType(
       sessionCheckout.paymentMethods,
       'googlepay',
     );
+    if (paymentMethod.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
-      child: AdyenGooglePayComponent(
-        configuration: googlePayCheckoutConfiguration,
+      child: AdyenComponent(
+        configuration: checkoutConfiguration,
         paymentMethod: paymentMethod,
         checkout: sessionCheckout,
-        loadingIndicator: const CircularProgressIndicator(),
-        width: double.infinity,
-        style: GooglePayButtonStyle(cornerRadius: 4),
-        onPaymentResult: (paymentResult) {
+        onPaymentResult: (paymentResult) async {
           Navigator.pop(context);
           DialogBuilder.showPaymentResultDialog(paymentResult, context);
         },

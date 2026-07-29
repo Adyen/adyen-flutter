@@ -17,13 +17,25 @@
 - For Apple Pay and Google Pay Components: reduced unnecessary re-rendering on widget rebuilds by
   caching the availability result.
 
+### Removed
+
+- **Breaking**: removed `AdyenGooglePayComponent` (Android). Render Google Pay through the
+  generic `AdyenComponent` instead, the same way Card/Blik are rendered, by passing the
+  `googlepay` payment method from your `/paymentMethods` response and setting
+  `CheckoutConfiguration.googlePayConfiguration`. `GooglePayButtonStyle`/`onUnavailable`/
+  `unavailableWidget`/`loadingIndicator` have no equivalent on `AdyenComponent`: the button is
+  now rendered and styled by the native SDK, and an unavailable Google Pay renders nothing
+  and reports a `PaymentError` via `onPaymentResult` instead of the previous silent
+  `onUnavailable` callback.
+
 ### Changed
 
-- **Breaking**: `AdyenApplePayComponent`/`AdyenGooglePayComponent` now take a `CheckoutConfiguration`
-  instead of the removed `ApplePayComponentConfiguration`/`GooglePayComponentConfiguration`. These
-  wrapper classes carried nothing beyond what `CheckoutConfiguration` already exposes
-  (`applePayConfiguration`/`googlePayConfiguration`), so they were redundant API surface duplicating
-  the shared configuration model.
+- **Breaking**: `AdyenApplePayComponent` now takes a `CheckoutConfiguration` instead of the
+  removed `ApplePayComponentConfiguration`. This wrapper class carried nothing beyond what
+  `CheckoutConfiguration` already exposes (`applePayConfiguration`), so it was redundant API
+  surface duplicating the shared configuration model. (The equivalent
+  `GooglePayComponentConfiguration` change is moot: see "Removed" above, `AdyenGooglePayComponent`
+  itself was removed shortly after this change.)
 - Minimum iOS version increased from 12.0 to 13.0. This aligns with Flutter's own minimum iOS
   requirement.
 - Minimum Android version increased from API 21 to API 23. This aligns with the Adyen Android SDK

@@ -86,6 +86,17 @@ class AdyenComponent extends StatelessWidget {
       };
     }
 
+    // Google Pay renders a single button, not a form, so it uses a flat
+    // default matching the native button height instead of the
+    // card-specific calculation below.
+    if (paymentMethodTxVariant == "googlepay") {
+      return switch (defaultTargetPlatform) {
+        TargetPlatform.android => 48,
+        TargetPlatform.iOS => 48,
+        _ => throw UnsupportedError('Unsupported platform view'),
+      };
+    }
+
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
         return _determineInitialAndroidViewHeight(cardConfiguration);

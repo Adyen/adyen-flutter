@@ -54,10 +54,6 @@ import com.adyen.checkout.flutter.generated.UnencryptedCardDTO
 import com.adyen.checkout.googlepay.MerchantInfo as NewMerchantInfo
 import com.adyen.checkout.googlepay.ShippingAddressParameters as NewShippingAddressParameters
 import com.adyen.checkout.googlepay.googlePay
-import com.adyen.checkout.googlepay.old.BillingAddressParameters
-import com.adyen.checkout.googlepay.old.GooglePayConfiguration as OldGooglePayConfiguration
-import com.adyen.checkout.googlepay.old.MerchantInfo
-import com.adyen.checkout.googlepay.old.ShippingAddressParameters
 import com.google.android.gms.wallet.WalletConstants
 import com.adyen.threeds2.customization.ButtonCustomization
 import com.adyen.threeds2.customization.LabelCustomization
@@ -309,47 +305,6 @@ object ConfigurationMapper {
             this.value,
         )
 
-    private fun Environment.mapToOldEnvironment(): com.adyen.checkout.core.old.Environment =
-        when (this) {
-            Environment.TEST -> com.adyen.checkout.core.old.Environment.TEST
-            Environment.LIVE_EUROPE -> com.adyen.checkout.core.old.Environment.EUROPE
-            Environment.LIVE_UNITED_STATES -> com.adyen.checkout.core.old.Environment.UNITED_STATES
-            Environment.LIVE_AUSTRALIA -> com.adyen.checkout.core.old.Environment.AUSTRALIA
-            Environment.LIVE_APSE -> com.adyen.checkout.core.old.Environment.APSE
-            Environment.LIVE_INDIA -> com.adyen.checkout.core.old.Environment.INDIA
-            Environment.LIVE_NEA -> com.adyen.checkout.core.old.Environment.APSE
-        }
-
-    // TODO: CheckoutConfiguration.getConfiguration(...) bridging to old-style Configuration is not
-    // yet available on 6.0.0-alpha.1, so the old-style GooglePayConfiguration is built directly here.
-    fun GooglePayConfigurationDTO.toOldGooglePayConfiguration(
-        environment: Environment,
-        clientKey: String,
-        countryCode: String?,
-    ): OldGooglePayConfiguration {
-        val oldEnvironment = environment.mapToOldEnvironment()
-        return OldGooglePayConfiguration.Builder(oldEnvironment, clientKey)
-            .apply {
-                setGooglePayEnvironment(googlePayEnvironment.mapToWalletConstants())
-                countryCode?.let { setCountryCode(it) }
-                merchantAccount?.let { setMerchantAccount(it) }
-                merchantInfoDTO?.let { setMerchantInfo(it.mapToMerchantInfo()) }
-                totalPriceStatus?.let { setTotalPriceStatus(it.mapToTotalPriceStatus()) }
-                allowedCardNetworks?.filterNotNull()?.let { setAllowedCardNetworks(it) }
-                allowedAuthMethods?.filterNotNull()?.let { setAllowedAuthMethods(it) }
-                allowPrepaidCards?.let { setAllowPrepaidCards(it) }
-                allowCreditCards?.let { setAllowCreditCards(it) }
-                assuranceDetailsRequired?.let { setAssuranceDetailsRequired(it) }
-                emailRequired?.let { setEmailRequired(it) }
-                existingPaymentMethodRequired?.let { setExistingPaymentMethodRequired(it) }
-                shippingAddressRequired?.let { setShippingAddressRequired(it) }
-                shippingAddressParametersDTO?.let { setShippingAddressParameters(it.mapToShippingAddressParameters()) }
-                billingAddressRequired?.let { setBillingAddressRequired(it) }
-                billingAddressParametersDTO?.let { setBillingAddressParameters(it.mapToBillingAddressParameters()) }
-            }
-            .build()
-    }
-
     private fun GooglePayEnvironment.mapToWalletConstants(): Int =
         when (this) {
             GooglePayEnvironment.TEST -> WalletConstants.ENVIRONMENT_TEST
@@ -361,20 +316,6 @@ object ConfigurationMapper {
             TotalPriceStatus.NOT_CURRENTLY_KNOWN -> "NOT_CURRENTLY_KNOWN"
             TotalPriceStatus.ESTIMATED -> "ESTIMATED"
             TotalPriceStatus.FINAL_PRICE -> "FINAL"
-        }
-
-    private fun MerchantInfoDTO.mapToMerchantInfo(): MerchantInfo = MerchantInfo(merchantName, merchantId)
-
-    private fun ShippingAddressParametersDTO.mapToShippingAddressParameters(): ShippingAddressParameters =
-        when {
-            isPhoneNumberRequired != null -> ShippingAddressParameters(allowedCountryCodes, isPhoneNumberRequired)
-            else -> ShippingAddressParameters(allowedCountryCodes)
-        }
-
-    private fun BillingAddressParametersDTO.mapToBillingAddressParameters(): BillingAddressParameters =
-        when {
-            isPhoneNumberRequired != null -> BillingAddressParameters(format, isPhoneNumberRequired)
-            else -> BillingAddressParameters(format)
         }
 
     private fun CashAppPayEnvironment.mapToCashAppPayEnvironment(): SDKCashAppPayEnvironment =

@@ -4,10 +4,8 @@ import android.content.Intent
 import androidx.core.util.Consumer
 import androidx.fragment.app.FragmentActivity
 import com.adyen.checkout.action.core.internal.ActionHandlingComponent
-import com.adyen.checkout.components.core.PaymentMethod
 import com.adyen.checkout.components.core.action.Action
 import com.adyen.checkout.flutter.components.action.ActionComponentManager
-import com.adyen.checkout.flutter.components.googlepay.GooglePayComponentManager
 import com.adyen.checkout.flutter.components.instant.InstantComponentManager
 import com.adyen.checkout.flutter.components.v2.AdyenComponentFactory
 import com.adyen.checkout.flutter.components.view.ComponentLoadingBottomSheet
@@ -29,7 +27,6 @@ import com.adyen.checkout.flutter.generated.PaymentResultEnum
 import com.adyen.checkout.flutter.generated.PaymentResultModelDTO
 import com.adyen.checkout.flutter.generated.SessionCheckoutFlutterInterface
 import com.adyen.checkout.flutter.session.CheckoutHolder
-import com.adyen.checkout.googlepay.old.GooglePayComponent
 import com.adyen.checkout.redirect.old.RedirectComponent
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import org.json.JSONObject
@@ -44,8 +41,6 @@ class ComponentPlatformApi(
 ) : ComponentPlatformInterface {
     private var platformEventHandler: ComponentPlatformEventHandler = ComponentPlatformEventHandler()
 
-    private val googlePayComponentManager: GooglePayComponentManager =
-        GooglePayComponentManager(activity, checkoutHolder, componentFlutterInterface, ::assignCurrentComponent)
     private val instantComponentManager: InstantComponentManager =
         InstantComponentManager(
             activity,
@@ -109,19 +104,12 @@ class ComponentPlatformApi(
         componentId: String,
         callback: (Result<InstantPaymentSetupResultDTO>) -> Unit
     ) {
-        val paymentMethodJson = JSONObject(paymentMethodResponse)
-        val paymentMethod = PaymentMethod.SERIALIZER.deserialize(paymentMethodJson)
         when (instantPaymentConfigurationDTO.instantPaymentType) {
-            // The callback to propagate the result back to Flutter is not used because we want to support multiple initializations in parallel.
-            // The result is sent through the componentFlutterInterface.onComponentCommunication(...).
-            InstantPaymentType.GOOGLE_PAY ->
-                googlePayComponentManager.initialize(
-                    paymentMethod,
-                    componentId,
-                    instantPaymentConfigurationDTO,
-                )
-
-            InstantPaymentType.INSTANT, InstantPaymentType.APPLE_PAY -> return
+            // Google Pay now renders through the generic v6 platform-view path
+            // (AdyenComponentFactory), not through this instant-payment mechanism.
+            InstantPaymentType.GOOGLE_PAY,
+            InstantPaymentType.INSTANT,
+            InstantPaymentType.APPLE_PAY -> return
         }
     }
 
@@ -131,8 +119,9 @@ class ComponentPlatformApi(
         componentId: String,
     ) {
         when (instantPaymentConfigurationDTO.instantPaymentType) {
-            InstantPaymentType.GOOGLE_PAY -> googlePayComponentManager.start()
-            InstantPaymentType.APPLE_PAY -> return
+            // Google Pay now renders through the generic v6 platform-view path
+            // (AdyenComponentFactory), not through this instant-payment mechanism.
+            InstantPaymentType.GOOGLE_PAY, InstantPaymentType.APPLE_PAY -> return
             InstantPaymentType.INSTANT ->
                 instantComponentManager.start(
                     instantPaymentConfigurationDTO,
@@ -151,7 +140,6 @@ class ComponentPlatformApi(
     override fun onDispose(componentId: String) {
         activity.removeOnNewIntentListener(intentListener)
         currentComponent = null
-        googlePayComponentManager.onDispose(componentId)
     }
 
     private fun handlePaymentEvent(
@@ -187,10 +175,7 @@ class ComponentPlatformApi(
     private fun onAction(actionResponse: Map<String?, Any?>?) {
         actionResponse?.let {
             val action = Action.SERIALIZER.deserialize(JSONObject(it))
-            when (currentComponent) {
-                is GooglePayComponent -> googlePayComponentManager.handleAction(action)
-                else -> handleComponentAction(action)
-            }
+            handleComponentAction(action)
         }
     }
 
