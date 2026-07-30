@@ -1,5 +1,5 @@
 ---
-name: flutter-update-android-sdk
+name: update-android-sdk
 description: Bumps this Flutter plugin's underlying native Android dependency to its latest released version.
 user-invocable: true
 ---

@@ -1,5 +1,5 @@
 ---
-name: flutter-update-ios-sdk
+name: update-ios-sdk
 description: Bumps this Flutter plugin's underlying native iOS dependency to its latest released version.
 user-invocable: true
 ---
