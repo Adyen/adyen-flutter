@@ -37,6 +37,10 @@ class ApplePaySessionComponentScreen extends StatelessWidget {
       environment: Config.environment,
       clientKey: Config.clientKey,
       countryCode: Config.countryCode,
+      // The final payment amount is determined by the session and can't be
+      // changed here, but the native SDK still needs an amount upfront to
+      // build the Apple Pay summary items UI.
+      amount: Config.amount,
       applePayConfiguration: _createApplePayConfiguration(),
     );
 
