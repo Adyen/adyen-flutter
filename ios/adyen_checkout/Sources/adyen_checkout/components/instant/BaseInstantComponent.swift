@@ -45,6 +45,22 @@ class BaseInstantComponent {
         )
     }
 
+    func sendErrorToFlutterLayer(error: Error) {
+        let componentCommunicationModel = ComponentCommunicationModel(
+            type: ComponentCommunicationType.result,
+            componentId: componentId,
+            paymentResult: PaymentResultDTO(
+                type: PaymentResultEnum.from(error: error),
+                reason: error.localizedDescription,
+                errorCode: (error as? CheckoutError)?.code.rawValue
+            )
+        )
+        componentFlutterApi.onComponentCommunication(
+            componentCommunicationModel: componentCommunicationModel,
+            completion: { _ in }
+        )
+    }
+
     func sendFinishedResult(resultCode: String) {
         let componentCommunicationModel = ComponentCommunicationModel(
             type: ComponentCommunicationType.result,

@@ -57,9 +57,15 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
                     configuration: configuration,
                     presentationDelegate: presentationDelegate
                 ).onComplete { [weak self] result in
-                    self?.sendCompleteResult(componentId: "SESSION_ADYEN_COMPONENT", result: result)
+                    self?.sendCompleteResult(
+                        componentId: self?.checkoutHolder.activeApplePayComponentId ?? "SESSION_ADYEN_COMPONENT",
+                        result: result
+                    )
                 }.onFailure { [weak self] error in
-                    self?.sendErrorResult(componentId: "SESSION_ADYEN_COMPONENT", error: error)
+                    self?.sendErrorResult(
+                        componentId: self?.checkoutHolder.activeApplePayComponentId ?? "SESSION_ADYEN_COMPONENT",
+                        error: error
+                    )
                 }
 
                 checkoutHolder.adyenCheckout = checkoutSession
@@ -103,9 +109,15 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
                     guard let self else { return .completion(resultCode: "Error") }
                     return await self.handleAdditionalDetails(additionalDetailsData: additionalDetailsData)
                 }.onComplete { [weak self] result in
-                    self?.sendCompleteResult(componentId: "ADVANCED_ADYEN_COMPONENT", result: result)
+                    self?.sendCompleteResult(
+                        componentId: self?.checkoutHolder.activeApplePayComponentId ?? "ADVANCED_ADYEN_COMPONENT",
+                        result: result
+                    )
                 }.onFailure { [weak self] error in
-                    self?.sendErrorResult(componentId: "ADVANCED_ADYEN_COMPONENT", error: error)
+                    self?.sendErrorResult(
+                        componentId: self?.checkoutHolder.activeApplePayComponentId ?? "ADVANCED_ADYEN_COMPONENT",
+                        error: error
+                    )
                 }
                 
                 checkoutHolder.adyenCheckout = adyenCheckout
@@ -154,12 +166,10 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
     }
     
     func getThreeDS2SdkVersion() throws -> String {
-        return threeDS2SdkVersion
+        threeDS2SdkVersion
     }
 
-    private func setupAdvancedCallbacks(_ checkout: AdvancedCheckout) {
-        
-    }
+    private func setupAdvancedCallbacks(_ checkout: AdvancedCheckout) {}
 
     // MARK: - Advanced flow handlers
 
@@ -253,6 +263,7 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
             )
         )
         componentPlatformEventHandler.send(event: componentCommunicationModel)
+        checkoutHolder.activeApplePayComponentId = nil
     }
 
     private func sendCompleteResult(componentId: String, result: AdvancedCheckoutResult) {
@@ -269,6 +280,7 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
             )
         )
         componentPlatformEventHandler.send(event: componentCommunicationModel)
+        checkoutHolder.activeApplePayComponentId = nil
     }
 
     private func sendErrorResult(componentId: String, error: CheckoutError) {
@@ -283,6 +295,7 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
             )
         )
         componentPlatformEventHandler.send(event: componentCommunicationModel)
+        checkoutHolder.activeApplePayComponentId = nil
     }
 
     private func sendErrorResultToFlutter(componentId: String, reason: String) {
@@ -342,7 +355,7 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
     }
 
     private func determineSessionConfiguration(configuration: DropInConfigurationDTO) throws -> CheckoutConfiguration {
-        return try configuration.createCheckoutConfiguration()
+        try configuration.createCheckoutConfiguration()
     }
 }
 
@@ -385,4 +398,3 @@ private extension ActionComponentData {
         return jsonString
     }
 }
-

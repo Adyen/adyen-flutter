@@ -28,8 +28,4 @@ class InstantSessionComponent: BaseInstantComponent, InstantComponentProtocol {
             sendErrorToFlutterLayer(errorMessage: error.localizedDescription)
         }
     }
-
-    override func onDispose() {
-        super.onDispose()
-    }
 }

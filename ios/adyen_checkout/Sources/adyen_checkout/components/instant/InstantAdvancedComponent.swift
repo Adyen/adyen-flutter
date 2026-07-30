@@ -10,6 +10,7 @@ class InstantAdvancedComponent: BaseInstantComponent, InstantComponentProtocol {
     private let instantPaymentConfigurationDTO: InstantPaymentConfigurationDTO
     private let paymentMethodResponse: String
     private var submitContinuation: CheckedContinuation<PaymentEventDTO, Never>?
+    private var presentationDelegate: ComponentPresentationDelegate?
 
     init(
         componentFlutterApi: ComponentFlutterInterface,
@@ -35,6 +36,7 @@ class InstantAdvancedComponent: BaseInstantComponent, InstantComponentProtocol {
 
     override func onDispose() {
         submitContinuation = nil
+        presentationDelegate = nil
         super.onDispose()
     }
 
@@ -52,16 +54,18 @@ class InstantAdvancedComponent: BaseInstantComponent, InstantComponentProtocol {
         guard let paymentMethod = paymentMethods.regular.first else {
             throw PlatformError(errorDescription: "Payment method not found")
         }
+        presentationDelegate = ComponentPresentationDelegate(presentingViewController: getViewController())
         let checkout = try await Checkout.setup(
             with: paymentMethods,
-            configuration: checkoutConfiguration
+            configuration: checkoutConfiguration,
+            presentationDelegate: presentationDelegate
         ).onSubmit { [weak self] data in
             guard let self else { return .completion(resultCode: "Error") }
             return await self.handleSubmit(paymentData: data)
         }.onComplete { [weak self] result in
             self?.sendFinishedResult(resultCode: result.resultCode.rawValue)
         }.onFailure { [weak self] error in
-            self?.sendErrorToFlutterLayer(errorMessage: error.localizedDescription)
+            self?.sendErrorToFlutterLayer(error: error)
         }
 
         return try checkout.createPaymentComponent(for: paymentMethod.type)

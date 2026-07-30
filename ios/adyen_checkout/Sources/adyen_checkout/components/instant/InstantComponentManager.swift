@@ -105,6 +105,7 @@ class InstantComponentManager {
     func onDispose() {
         instantComponent?.onDispose()
         instantComponent = nil
+        checkoutHolder.activeApplePayComponentId = nil
     }
 
     private func isSessionComponent(componentId: String) -> Bool {
