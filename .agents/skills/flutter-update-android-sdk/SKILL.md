@@ -31,8 +31,9 @@ All paths below are relative to the repository root.
 
 6. Update `CHANGELOG.md`:
    - In the development section, update the dependency version in the dependency versions table.
+   - Follow the existing format: link to the release notes and show the version transition in bold.
    - Example row:
-     `| [Android Drop-in/Components](https://docs.adyen.com/online-payments/release-notes/#releaseNote=YYYY-MM-DD-android-componentsdrop-in-X.X.X) | X.X.X |`
+     `| [Android Drop-in/Components](https://docs.adyen.com/online-payments/release-notes/?title%5B0%5D=Android+Components%2FDrop-in&version%5B0%5D=X.X.X) | Y.Y.Y -> **X.X.X** |`
 
 7. Verify the bump builds:
    - Run `flutter pub get` at the repository root.
