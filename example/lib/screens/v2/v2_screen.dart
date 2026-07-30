@@ -3,6 +3,7 @@ import 'package:adyen_checkout_example/repositories/adyen_drop_in_repository.dar
 import 'package:adyen_checkout_example/screens/v2/v2_blik_navigation_screen.dart';
 import 'package:adyen_checkout_example/screens/v2/v2_card_navigation_screen.dart';
 import 'package:adyen_checkout_example/screens/v2/v2_google_pay_navigation_screen.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class V2Screen extends StatelessWidget {
@@ -17,6 +18,11 @@ class V2Screen extends StatelessWidget {
   Widget build(BuildContext context) {
     final isBlikSupported =
         Config.countryCode == 'PL' && Config.amount.currency == 'PLN';
+    // Google Pay only exists on Android; there is no generic v6 path for
+    // Apple Pay (see AdyenApplePayComponent instead - its native component
+    // has no embeddable inline view, so it can't render via AdyenComponent).
+    final isGooglePaySupported =
+        defaultTargetPlatform == TargetPlatform.android;
 
     return Scaffold(
       appBar: AppBar(title: const Text('V2 Example (v6 integration)')),
@@ -46,16 +52,17 @@ class V2Screen extends StatelessWidget {
                   ),
                   child: const Text('Blik component'),
                 ),
-              TextButton(
-                onPressed: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) =>
-                        V2GooglePayNavigationScreen(repository: repository),
+              if (isGooglePaySupported)
+                TextButton(
+                  onPressed: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) =>
+                          V2GooglePayNavigationScreen(repository: repository),
+                    ),
                   ),
+                  child: const Text('Google Pay component'),
                 ),
-                child: const Text('Google Pay component'),
-              ),
             ],
           ),
         ),
