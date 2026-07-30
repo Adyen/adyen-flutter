@@ -18,11 +18,6 @@ class V2Screen extends StatelessWidget {
   Widget build(BuildContext context) {
     final isBlikSupported =
         Config.countryCode == 'PL' && Config.amount.currency == 'PLN';
-    // Google Pay only exists on Android; there is no generic v6 path for
-    // Apple Pay (see AdyenApplePayComponent instead - its native component
-    // has no embeddable inline view, so it can't render via AdyenComponent).
-    final isGooglePaySupported =
-        defaultTargetPlatform == TargetPlatform.android;
 
     return Scaffold(
       appBar: AppBar(title: const Text('V2 Example (v6 integration)')),
@@ -52,21 +47,40 @@ class V2Screen extends StatelessWidget {
                   ),
                   child: const Text('Blik component'),
                 ),
-              if (isGooglePaySupported)
-                TextButton(
-                  onPressed: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) =>
-                          V2GooglePayNavigationScreen(repository: repository),
-                    ),
-                  ),
-                  child: const Text('Google Pay component'),
-                ),
+              _buildGoogleOrApplePayComponent(context),
             ],
           ),
         ),
       ),
     );
+  }
+
+  // Google Pay only exists on Android; there is no generic v6 path for
+  // Apple Pay (its native component has no embeddable inline view, only the
+  // full-screen payment sheet), so it's shown via the dedicated
+  // AdyenApplePayComponent screen instead - mirroring how the app's Home
+  // screen alternates between the two per platform.
+  Widget _buildGoogleOrApplePayComponent(BuildContext context) {
+    switch (defaultTargetPlatform) {
+      case TargetPlatform.android:
+        return TextButton(
+          onPressed: () => Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => V2GooglePayNavigationScreen(
+                repository: repository,
+              ),
+            ),
+          ),
+          child: const Text('Google Pay component'),
+        );
+      case TargetPlatform.iOS:
+        return TextButton(
+          onPressed: () => Navigator.pushNamed(context, "/applePayNavigation"),
+          child: const Text('Apple Pay component'),
+        );
+      default:
+        return const SizedBox.shrink();
+    }
   }
 }
