@@ -1,6 +1,9 @@
 import 'dart:convert';
 
 import 'package:adyen_checkout/adyen_checkout.dart';
+import 'package:adyen_checkout/src/components/apple_pay/apple_pay_advanced_component.dart';
+import 'package:adyen_checkout/src/components/apple_pay/apple_pay_session_component.dart';
+import 'package:adyen_checkout/src/logging/adyen_logger.dart';
 import 'package:adyen_checkout/src/util/constants.dart';
 import 'package:adyen_checkout/src/util/dto_mapper.dart';
 import 'package:adyen_checkout/src/v2/adyen_advanced_component.dart';
@@ -16,6 +19,11 @@ class AdyenComponent extends StatelessWidget {
   final Future<void> Function(PaymentResult) onPaymentResult;
   final Set<Factory<OneSequenceGestureRecognizer>>? gestureRecognizers;
 
+  /// Apple Pay-only, ignored for every other payment method.
+  final Function()? onUnavailable;
+  final Widget? unavailableWidget;
+  final Widget? loadingIndicator;
+
   const AdyenComponent({
     super.key,
     required this.configuration,
@@ -23,6 +31,9 @@ class AdyenComponent extends StatelessWidget {
     required this.paymentMethod,
     required this.onPaymentResult,
     this.gestureRecognizers,
+    this.onUnavailable,
+    this.unavailableWidget,
+    this.loadingIndicator,
   });
 
   /// A payment method payload identifies a stored payment method by the
@@ -38,6 +49,11 @@ class AdyenComponent extends StatelessWidget {
   Widget build(BuildContext context) {
     final String encodedPaymentMethod = json.encode(paymentMethod);
     final String paymentMethodTxVariant = paymentMethod["type"];
+
+    if (paymentMethodTxVariant == "applepay") {
+      return _buildApplePayComponent(encodedPaymentMethod);
+    }
+
     final double initialHeight = _calculateInitialHeight(
       paymentMethodTxVariant,
       configuration.cardConfiguration,
@@ -69,6 +85,58 @@ class AdyenComponent extends StatelessWidget {
           onBinValue: configuration.cardConfiguration?.onBinValue,
         )
     };
+  }
+
+  Widget _buildApplePayComponent(String encodedPaymentMethod) {
+    if (configuration.applePayConfiguration == null) {
+      throw ArgumentError(
+        'CheckoutConfiguration.applePayConfiguration must be set to use '
+        'AdyenComponent with an Apple Pay payment method.',
+      );
+    }
+
+    if (defaultTargetPlatform != TargetPlatform.iOS) {
+      throw Exception("Apple Pay is not supported on $defaultTargetPlatform");
+    }
+
+    return switch (checkout) {
+      SessionCheckout it => ApplePaySessionComponent(
+          key: key,
+          session: it.toDTO(),
+          applePayPaymentMethod: encodedPaymentMethod,
+          configuration: configuration,
+          onPaymentResult: onPaymentResult,
+          loadingIndicator: loadingIndicator,
+          onUnavailable: onUnavailable,
+          unavailableWidget: unavailableWidget,
+        ),
+      AdvancedCheckout it => _buildApplePayAdvancedComponent(
+          encodedPaymentMethod,
+          it,
+        ),
+    };
+  }
+
+  Widget _buildApplePayAdvancedComponent(
+    String encodedPaymentMethod,
+    AdvancedCheckout advancedCheckout,
+  ) {
+    if (configuration.amount == null) {
+      AdyenLogger.instance.print(
+          "Apple Pay requires to set an amount when using the advanced flow.");
+      onUnavailable?.call();
+      return unavailableWidget ?? const SizedBox.shrink();
+    }
+    return ApplePayAdvancedComponent(
+      key: key,
+      applePayPaymentMethod: encodedPaymentMethod,
+      configuration: configuration,
+      onPaymentResult: onPaymentResult,
+      advancedCheckout: advancedCheckout,
+      loadingIndicator: loadingIndicator,
+      onUnavailable: onUnavailable,
+      unavailableWidget: unavailableWidget,
+    );
   }
 
   double _calculateInitialHeight(

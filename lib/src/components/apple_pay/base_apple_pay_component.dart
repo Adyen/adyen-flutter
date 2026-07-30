@@ -5,7 +5,6 @@ import 'package:adyen_checkout/src/common/model/payment_result.dart';
 import 'package:adyen_checkout/src/components/apple_pay/apple_pay_button_platform_view.dart';
 import 'package:adyen_checkout/src/components/apple_pay/apple_pay_callback_handler.dart';
 import 'package:adyen_checkout/src/components/apple_pay/apple_pay_callback_registry.dart';
-import 'package:adyen_checkout/src/components/apple_pay/model/apple_pay_button_style.dart';
 import 'package:adyen_checkout/src/components/component_flutter_api.dart';
 import 'package:adyen_checkout/src/components/component_platform_api.dart';
 import 'package:adyen_checkout/src/generated/platform_api.g.dart';
@@ -14,13 +13,15 @@ import 'package:adyen_checkout/src/util/dto_mapper.dart';
 import 'package:adyen_checkout/src/util/sdk_version_number_provider.dart';
 import 'package:flutter/material.dart';
 
+/// The default width/height of a native `PKPaymentButton`, matching Apple's
+/// Human Interface Guidelines for the Apple Pay button.
+const double _minimumApplePayButtonWidth = 100;
+const double _minimumApplePayButtonHeight = 30;
+
 abstract class BaseApplePayComponent extends StatefulWidget {
   final String applePayPaymentMethod;
   final CheckoutConfiguration configuration;
   final Function(PaymentResult) onPaymentResult;
-  final ApplePayButtonStyle? style;
-  final double width;
-  final double height;
   final Function()? onUnavailable;
   final Widget? unavailableWidget;
   final Widget? loadingIndicator;
@@ -38,14 +39,27 @@ abstract class BaseApplePayComponent extends StatefulWidget {
     required this.applePayPaymentMethod,
     required this.configuration,
     required this.onPaymentResult,
-    this.style,
-    required this.width,
-    required this.height,
     this.onUnavailable,
     this.unavailableWidget,
     this.loadingIndicator,
     AdyenLogger? adyenLogger,
   }) : adyenLogger = adyenLogger ?? AdyenLogger.instance;
+
+  double get _buttonWidth {
+    final width = configuration.applePayConfiguration?.buttonWidth ??
+        _minimumApplePayButtonWidth;
+    return width > _minimumApplePayButtonWidth
+        ? width
+        : _minimumApplePayButtonWidth;
+  }
+
+  double get _buttonHeight {
+    final height = configuration.applePayConfiguration?.buttonHeight ??
+        _minimumApplePayButtonHeight;
+    return height > _minimumApplePayButtonHeight
+        ? height
+        : _minimumApplePayButtonHeight;
+  }
 
   void handleComponentCommunication(ComponentCommunicationModel event);
 
@@ -164,12 +178,12 @@ class _BaseApplePayComponentState extends State<BaseApplePayComponent> {
       AsyncSnapshot<InstantPaymentSetupResultDTO> snapshot) {
     final Widget applePayButton = ApplePayButtonPlatformView(
       componentId: widget.componentId,
-      style: widget.style,
+      style: widget.configuration.applePayConfiguration?.buttonStyle,
     );
 
     return SizedBox(
-      width: widget.width,
-      height: widget.height,
+      width: widget._buttonWidth,
+      height: widget._buttonHeight,
       child: ValueListenableBuilder(
         valueListenable: widget.isButtonClickable,
         builder: (BuildContext context, value, Widget? child) {

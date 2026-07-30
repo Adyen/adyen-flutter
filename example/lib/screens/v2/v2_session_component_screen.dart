@@ -22,6 +22,7 @@ class V2SessionComponentScreen extends StatefulWidget {
 class _V2SessionComponentScreenState extends State<V2SessionComponentScreen> {
   late final Future<SessionCheckout> _sessionCheckoutFuture;
   late final CheckoutConfiguration _checkoutConfiguration;
+  bool _isUnavailable = false;
 
   @override
   void initState() {
@@ -61,16 +62,20 @@ class _V2SessionComponentScreenState extends State<V2SessionComponentScreen> {
                 children: [
                   Text('Loaded session id: ${sessionCheckout.id}'),
                   const SizedBox(height: 16),
-                  AdyenComponent(
-                    configuration: _checkoutConfiguration,
-                    paymentMethod: extractV2PaymentMethod(
-                      sessionCheckout.paymentMethods,
-                      widget.paymentMethodType,
+                  if (_isUnavailable)
+                    Text(
+                        '${widget.paymentMethodType.txVariant} is not available')
+                  else
+                    AdyenComponent(
+                      configuration: _checkoutConfiguration,
+                      paymentMethod: extractV2PaymentMethod(
+                        sessionCheckout.paymentMethods,
+                        widget.paymentMethodType,
+                      ),
+                      checkout: sessionCheckout,
+                      onPaymentResult: (paymentResult) async =>
+                          _endPayment(context, paymentResult),
                     ),
-                    checkout: sessionCheckout,
-                    onPaymentResult: (paymentResult) async =>
-                        _endPayment(context, paymentResult),
-                  ),
                 ],
               ),
             );
@@ -94,6 +99,11 @@ class _V2SessionComponentScreenState extends State<V2SessionComponentScreen> {
   }
 
   void _endPayment(BuildContext context, PaymentResult paymentResult) {
+    if (paymentResult is PaymentError &&
+        paymentResult.code == PaymentErrorCode.paymentMethodFailure) {
+      setState(() => _isUnavailable = true);
+      return;
+    }
     Navigator.pop(context);
     DialogBuilder.showPaymentResultDialog(paymentResult, context);
   }

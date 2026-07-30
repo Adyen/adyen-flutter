@@ -2,6 +2,10 @@
 
 ### New
 
+- Added `PaymentError.code`, a stable string code (e.g. `PaymentErrorCode.paymentMethodFailure`)
+  mirroring the native SDKs' `CheckoutError.code`. Lets you distinguish error categories (e.g. a
+  payment method genuinely being unavailable) without matching on `PaymentError.reason`'s
+  human-readable text.
 - Added `onBeforeSubmit` support for the sessions flow via `AdyenCheckoutSession.setup()`.
   Lets you inspect or modify shopper data (billing/delivery address, shopper name, shopper
   email), or abort the submission, right before the SDK submits the sessions `/payments`
@@ -14,11 +18,11 @@
 
 - For Card Component on Android: the configured `countryCode` is now applied as the
   default country for full-address forms.
-- For Apple Pay Component: reduced unnecessary re-rendering on widget rebuilds by
-  caching the availability result.
-- `AdyenApplePayComponent`'s button is now rendered by a native `PKPaymentButton` (the same
-  system button Adyen's own Drop-in uses) instead of a Dart-drawn approximation, matching
-  Apple's Apple Pay button exactly.
+- For Apple Pay: reduced unnecessary re-rendering on widget rebuilds by caching the
+  availability result.
+- Apple Pay's button is now rendered by a native `PKPaymentButton` (the same system button
+  Adyen's own Drop-in uses) instead of a Dart-drawn approximation, matching Apple's Apple Pay
+  button exactly.
 
 ### Removed
 
@@ -27,20 +31,22 @@
   `googlepay` payment method from your `/paymentMethods` response and setting
   `CheckoutConfiguration.googlePayConfiguration`. `GooglePayButtonStyle`/`onUnavailable`/
   `unavailableWidget`/`loadingIndicator` have no equivalent on `AdyenComponent`: the button is
-  now rendered and styled by the native SDK, and an unavailable Google Pay renders nothing
-  and reports a `PaymentError` via `onPaymentResult` instead of the previous silent
-  `onUnavailable` callback.
+  now rendered and styled by the native SDK, and an unavailable Google Pay renders nothing and
+  reports a `PaymentError` (with `code == PaymentErrorCode.paymentMethodFailure`) via
+  `onPaymentResult` instead of the previous silent `onUnavailable` callback.
+- **Breaking**: removed `AdyenApplePayComponent`, `ApplePaySessionComponent`,
+  `ApplePayAdvancedComponent`. Render Apple Pay through the generic `AdyenComponent` instead, by
+  passing the `applepay` payment method from your `/paymentMethods` response and setting
+  `CheckoutConfiguration.applePayConfiguration`. `AdyenComponent` gained `onUnavailable`/
+  `unavailableWidget`/`loadingIndicator` parameters (used only for Apple Pay, ignored for every
+  other payment method) to replace the ones previously on `AdyenApplePayComponent`.
+- **Breaking**: removed the `style`/`width`/`height` parameters from the Apple Pay button widget.
+  Set `ApplePayConfiguration.buttonStyle`/`buttonWidth`/`buttonHeight` instead.
 - Removed the `pay` dependency entirely, now that both Apple Pay and Google Pay render their
   buttons natively instead of via that package.
 
 ### Changed
 
-- **Breaking**: `AdyenApplePayComponent` now takes a `CheckoutConfiguration` instead of the
-  removed `ApplePayComponentConfiguration`. This wrapper class carried nothing beyond what
-  `CheckoutConfiguration` already exposes (`applePayConfiguration`), so it was redundant API
-  surface duplicating the shared configuration model. (The equivalent
-  `GooglePayComponentConfiguration` change is moot: see "Removed" above, `AdyenGooglePayComponent`
-  itself was removed shortly after this change.)
 - Minimum iOS version increased from 12.0 to 13.0. This aligns with Flutter's own minimum iOS
   requirement.
 - Minimum Android version increased from API 21 to API 23. This aligns with the Adyen Android SDK

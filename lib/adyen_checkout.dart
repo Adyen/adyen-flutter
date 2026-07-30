@@ -46,7 +46,6 @@ export 'src/common/model/session_response.dart';
 export 'src/common/model/shopper_name.dart';
 export 'src/components/action_handling/model/action_component_configuration.dart';
 export 'src/components/action_handling/model/action_result.dart';
-export 'src/components/apple_pay/adyen_apple_pay_component.dart';
 export 'src/components/apple_pay/model/apple_pay_button_style.dart';
 export 'src/components/apple_pay/model/apple_pay_button_theme.dart';
 export 'src/components/apple_pay/model/apple_pay_button_type.dart';

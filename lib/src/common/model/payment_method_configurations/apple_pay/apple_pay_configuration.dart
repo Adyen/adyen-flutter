@@ -7,6 +7,7 @@ import 'package:adyen_checkout/src/common/model/payment_method_configurations/ap
 import 'package:adyen_checkout/src/common/model/payment_method_configurations/apple_pay/apple_pay_shipping_method.dart';
 import 'package:adyen_checkout/src/common/model/payment_method_configurations/apple_pay/apple_pay_shipping_method_update.dart';
 import 'package:adyen_checkout/src/common/model/payment_method_configurations/apple_pay/apple_pay_summary_item.dart';
+import 'package:adyen_checkout/src/components/apple_pay/model/apple_pay_button_style.dart';
 import 'package:adyen_checkout/src/generated/platform_api.g.dart';
 
 class ApplePayConfiguration {
@@ -26,6 +27,9 @@ class ApplePayConfiguration {
   final ApplePayMerchantCapability? merchantCapability;
   final bool? supportsCouponCode;
   final String? couponCode;
+  final ApplePayButtonStyle? buttonStyle;
+  final double? buttonWidth;
+  final double? buttonHeight;
   final Future<ApplePayShippingMethodUpdate> Function(
     ApplePayShippingMethod method,
     List<ApplePaySummaryItem> currentSummaryItems,
@@ -59,6 +63,9 @@ class ApplePayConfiguration {
     this.merchantCapability,
     this.supportsCouponCode,
     this.couponCode,
+    this.buttonStyle,
+    this.buttonWidth,
+    this.buttonHeight,
     this.onSelectShippingMethod,
     this.onSelectShippingContact,
     this.onChangeCouponCode,
@@ -84,6 +91,9 @@ class ApplePayConfiguration {
         'merchantCapability: $merchantCapability, '
         'supportsCouponCode: $supportsCouponCode, '
         'couponCode: $couponCode, '
+        'buttonStyle: $buttonStyle, '
+        'buttonWidth: $buttonWidth, '
+        'buttonHeight: $buttonHeight, '
         'onSelectShippingMethod: $onSelectShippingMethod, '
         'onSelectShippingContact: $onSelectShippingContact, '
         'onChangeCouponCode: $onChangeCouponCode, '

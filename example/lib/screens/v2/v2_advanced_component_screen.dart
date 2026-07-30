@@ -4,7 +4,7 @@ import 'package:adyen_checkout_example/screens/v2/v2_payment_method.dart';
 import 'package:adyen_checkout_example/utils/dialog_builder.dart';
 import 'package:flutter/material.dart';
 
-class V2AdvancedComponentScreen extends StatelessWidget {
+class V2AdvancedComponentScreen extends StatefulWidget {
   const V2AdvancedComponentScreen({
     required this.repository,
     this.paymentMethodType = V2PaymentMethodType.card,
@@ -15,9 +15,17 @@ class V2AdvancedComponentScreen extends StatelessWidget {
   final V2PaymentMethodType paymentMethodType;
 
   @override
+  State<V2AdvancedComponentScreen> createState() =>
+      _V2AdvancedComponentScreenState();
+}
+
+class _V2AdvancedComponentScreenState extends State<V2AdvancedComponentScreen> {
+  bool _isUnavailable = false;
+
+  @override
   Widget build(BuildContext context) {
     final checkoutConfiguration =
-        buildV2CheckoutConfiguration(paymentMethodType);
+        buildV2CheckoutConfiguration(widget.paymentMethodType);
 
     return Scaffold(
       appBar: AppBar(title: const Text('V2 Advanced Component')),
@@ -41,12 +49,18 @@ class V2AdvancedComponentScreen extends StatelessWidget {
               return const Center(child: Text('No payment methods available'));
             }
 
-            final paymentMethod =
-                extractV2PaymentMethod(paymentMethods, paymentMethodType);
+            final paymentMethod = extractV2PaymentMethod(
+                paymentMethods, widget.paymentMethodType);
             if (paymentMethod.isEmpty) {
               return Center(
                   child: Text(
-                      '${paymentMethodType.txVariant} payment method not found'));
+                      '${widget.paymentMethodType.txVariant} payment method not found'));
+            }
+
+            if (_isUnavailable) {
+              return Center(
+                  child: Text(
+                      '${widget.paymentMethodType.txVariant} is not available'));
             }
 
             return SingleChildScrollView(
@@ -66,6 +80,11 @@ class V2AdvancedComponentScreen extends StatelessWidget {
   }
 
   void _endPayment(BuildContext context, PaymentResult paymentResult) {
+    if (paymentResult is PaymentError &&
+        paymentResult.code == PaymentErrorCode.paymentMethodFailure) {
+      setState(() => _isUnavailable = true);
+      return;
+    }
     Navigator.pop(context);
     DialogBuilder.showPaymentResultDialog(paymentResult, context);
   }
@@ -73,13 +92,13 @@ class V2AdvancedComponentScreen extends StatelessWidget {
   Future<AdvancedCheckout> _setupAdvancedCheckout(
     CheckoutConfiguration checkoutConfiguration,
   ) async {
-    final paymentMethods = await repository.fetchPaymentMethods();
+    final paymentMethods = await widget.repository.fetchPaymentMethods();
     final advancedCheckout = await AdyenCheckout.advanced.setup(
       paymentMethods: paymentMethods,
       checkoutConfiguration: checkoutConfiguration,
       callbacks: AdyenCheckoutCallbacks(
-        onSubmit: repository.onSubmit,
-        onAdditionalDetails: repository.onAdditionalDetails,
+        onSubmit: widget.repository.onSubmit,
+        onAdditionalDetails: widget.repository.onAdditionalDetails,
       ),
     );
 

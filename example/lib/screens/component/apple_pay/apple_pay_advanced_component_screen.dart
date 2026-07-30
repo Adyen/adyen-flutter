@@ -61,18 +61,13 @@ class ApplePayAdvancedComponentScreen extends StatelessWidget {
                 "Advanced flow",
               ),
               const SizedBox(height: 8),
-              AdyenApplePayComponent(
+              AdyenComponent(
                 configuration: checkoutConfiguration,
                 paymentMethod: paymentMethod,
                 checkout: advancedCheckout,
                 loadingIndicator: const CircularProgressIndicator(),
-                style: const ApplePayButtonStyle(
-                  theme: ApplePayButtonTheme.whiteOutline,
-                  type: ApplePayButtonType.book,
-                ),
-                width: 300,
-                height: 56,
-                onPaymentResult: (paymentResult) {
+                unavailableWidget: const Text('Apple Pay is not available'),
+                onPaymentResult: (paymentResult) async {
                   Navigator.pop(context);
                   DialogBuilder.showPaymentResultDialog(paymentResult, context);
                 },
@@ -101,6 +96,12 @@ class ApplePayAdvancedComponentScreen extends StatelessWidget {
       allowShippingContactEditing: true,
       supportsCouponCode: true,
       shippingMethods: _buildShippingMethods(),
+      buttonStyle: const ApplePayButtonStyle(
+        theme: ApplePayButtonTheme.whiteOutline,
+        type: ApplePayButtonType.book,
+      ),
+      buttonWidth: 300,
+      buttonHeight: 56,
       onSelectShippingContact: _onSelectShippingContact,
       onSelectShippingMethod: _onSelectShippingMethod,
       onChangeCouponCode: _onChangeCouponCode,

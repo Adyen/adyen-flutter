@@ -182,14 +182,12 @@ class MultiComponentSessionScreen extends StatelessWidget {
     );
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
-      child: AdyenApplePayComponent(
+      child: AdyenComponent(
         configuration: applePayCheckoutConfiguration,
         paymentMethod: applePayPaymentMethod,
         checkout: sessionCheckout,
         loadingIndicator: const CircularProgressIndicator(),
-        width: double.infinity,
-        height: 48,
-        onPaymentResult: (paymentResult) {
+        onPaymentResult: (paymentResult) async {
           Navigator.pop(context);
           DialogBuilder.showPaymentResultDialog(paymentResult, context);
         },
@@ -211,6 +209,8 @@ class MultiComponentSessionScreen extends StatelessWidget {
       ],
       applePayShippingType: ApplePayShippingType.shipping,
       allowShippingContactEditing: true,
+      buttonWidth: double.infinity,
+      buttonHeight: 48,
     );
   }
 

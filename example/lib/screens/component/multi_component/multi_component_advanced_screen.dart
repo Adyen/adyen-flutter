@@ -208,18 +208,12 @@ class MultiComponentAdvancedScreen extends StatelessWidget {
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
-      child: AdyenApplePayComponent(
+      child: AdyenComponent(
         configuration: applePayCheckoutConfiguration,
         paymentMethod: paymentMethod,
         checkout: advancedCheckout,
         loadingIndicator: const CircularProgressIndicator(),
-        style: const ApplePayButtonStyle(
-          theme: ApplePayButtonTheme.black,
-          type: ApplePayButtonType.buy,
-        ),
-        width: double.infinity,
-        height: 48,
-        onPaymentResult: (paymentResult) {
+        onPaymentResult: (paymentResult) async {
           Navigator.pop(context);
           DialogBuilder.showPaymentResultDialog(paymentResult, context);
         },
@@ -254,6 +248,12 @@ class MultiComponentAdvancedScreen extends StatelessWidget {
           type: ApplePaySummaryItemType.definite,
         ),
       ],
+      buttonStyle: const ApplePayButtonStyle(
+        theme: ApplePayButtonTheme.black,
+        type: ApplePayButtonType.buy,
+      ),
+      buttonWidth: double.infinity,
+      buttonHeight: 48,
     );
   }
 

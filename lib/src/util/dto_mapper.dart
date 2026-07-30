@@ -530,7 +530,7 @@ extension InstantPaymentConfigurationMapper on CheckoutConfiguration {
     if (countryCode == null) {
       throw ArgumentError(
         'CheckoutConfiguration.countryCode must be set to use '
-        'AdyenApplePayComponent/AdyenGooglePayComponent.',
+        'AdyenComponent with an Apple Pay/Google Pay payment method.',
       );
     }
 

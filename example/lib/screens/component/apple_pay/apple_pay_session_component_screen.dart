@@ -56,14 +56,13 @@ class ApplePaySessionComponentScreen extends StatelessWidget {
                 "Session flow",
               ),
               const SizedBox(height: 8),
-              AdyenApplePayComponent(
+              AdyenComponent(
                 configuration: checkoutConfiguration,
                 paymentMethod: paymentMethod,
                 checkout: sessionCheckout,
                 loadingIndicator: const CircularProgressIndicator(),
-                width: 200,
-                height: 48,
-                onPaymentResult: (paymentResult) {
+                unavailableWidget: const Text('Apple Pay is not available'),
+                onPaymentResult: (paymentResult) async {
                   Navigator.pop(context);
                   DialogBuilder.showPaymentResultDialog(paymentResult, context);
                 },
@@ -87,6 +86,8 @@ class ApplePaySessionComponentScreen extends StatelessWidget {
       supportsCouponCode:
           false, //The amount cannot be changed in a session flow.
       shippingMethods: _buildShippingMethods(),
+      buttonWidth: 200,
+      buttonHeight: 48,
       onSelectShippingMethod: _onSelectShippingMethod,
       onAuthorize: _onAuthorize,
     );

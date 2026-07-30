@@ -55,11 +55,6 @@ class V2Screen extends StatelessWidget {
     );
   }
 
-  // Google Pay only exists on Android; there is no generic v6 path for
-  // Apple Pay (its native component has no embeddable inline view, only the
-  // full-screen payment sheet), so it's shown via the dedicated
-  // AdyenApplePayComponent screen instead - mirroring how the app's Home
-  // screen alternates between the two per platform.
   Widget _buildGoogleOrApplePayComponent(BuildContext context) {
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
