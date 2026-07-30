@@ -17,6 +17,7 @@
   | Name | Version |
   |---------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------|
   | [pay](https://pub.dev/packages/pay) | 3.2.1 -> **3.3.0** |
+  | [Android Drop-in/Components](https://docs.adyen.com/online-payments/release-notes/?title%5B0%5D=Android+Components%2FDrop-in&version%5B0%5D=5.20.0) | 5.19.0 -> **5.20.0** |
 
   `pay_android` is now pulled in transitively by `pay` (endorsed implementation).
 
