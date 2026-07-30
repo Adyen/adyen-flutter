@@ -2272,6 +2272,7 @@ class PaymentResultDTO {
     required this.type,
     this.reason,
     this.result,
+    this.errorCode,
   });
 
   PaymentResultEnum type;
@@ -2280,11 +2281,14 @@ class PaymentResultDTO {
 
   PaymentResultModelDTO? result;
 
+  String? errorCode;
+
   List<Object?> _toList() {
     return <Object?>[
       type,
       reason,
       result,
+      errorCode,
     ];
   }
 
@@ -2297,6 +2301,7 @@ class PaymentResultDTO {
       type: result[0]! as PaymentResultEnum,
       reason: result[1] as String?,
       result: result[2] as PaymentResultModelDTO?,
+      errorCode: result[3] as String?,
     );
   }
 

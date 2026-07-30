@@ -1705,7 +1705,8 @@ data class TwintConfigurationDTO (
 data class PaymentResultDTO (
   val type: PaymentResultEnum,
   val reason: String? = null,
-  val result: PaymentResultModelDTO? = null
+  val result: PaymentResultModelDTO? = null,
+  val errorCode: String? = null
 )
  {
   companion object {
@@ -1713,7 +1714,8 @@ data class PaymentResultDTO (
       val type = pigeonVar_list[0] as PaymentResultEnum
       val reason = pigeonVar_list[1] as String?
       val result = pigeonVar_list[2] as PaymentResultModelDTO?
-      return PaymentResultDTO(type, reason, result)
+      val errorCode = pigeonVar_list[3] as String?
+      return PaymentResultDTO(type, reason, result, errorCode)
     }
   }
   fun toList(): List<Any?> {
@@ -1721,6 +1723,7 @@ data class PaymentResultDTO (
       type,
       reason,
       result,
+      errorCode,
     )
   }
   override fun equals(other: Any?): Boolean {

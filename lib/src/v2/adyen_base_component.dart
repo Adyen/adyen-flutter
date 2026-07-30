@@ -62,8 +62,12 @@ abstract class AdyenBaseComponent extends StatefulWidget {
 
   void onFinished(PaymentResultDTO paymentResultDTO);
 
-  void _onError(PaymentResultDTO paymentResultDTO) =>
-      onPaymentResult(PaymentError(reason: paymentResultDTO.reason));
+  void _onError(PaymentResultDTO paymentResultDTO) => onPaymentResult(
+        PaymentError(
+          reason: paymentResultDTO.reason,
+          code: paymentResultDTO.errorCode,
+        ),
+      );
 
   void _onCancelledByUser() => onPaymentResult(PaymentCancelledByUser());
 

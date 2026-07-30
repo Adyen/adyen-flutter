@@ -278,7 +278,8 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
             componentId: componentId,
             paymentResult: PaymentResultDTO(
                 type: .from(error: error),
-                reason: error.localizedDescription
+                reason: error.localizedDescription,
+                errorCode: error.code.rawValue
             )
         )
         componentPlatformEventHandler.send(event: componentCommunicationModel)

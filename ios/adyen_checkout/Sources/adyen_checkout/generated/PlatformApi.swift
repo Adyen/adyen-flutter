@@ -1681,6 +1681,7 @@ struct PaymentResultDTO: Hashable {
   var type: PaymentResultEnum
   var reason: String? = nil
   var result: PaymentResultModelDTO? = nil
+  var errorCode: String? = nil
 
 
   // swift-format-ignore: AlwaysUseLowerCamelCase
@@ -1688,11 +1689,13 @@ struct PaymentResultDTO: Hashable {
     let type = pigeonVar_list[0] as! PaymentResultEnum
     let reason: String? = nilOrValue(pigeonVar_list[1])
     let result: PaymentResultModelDTO? = nilOrValue(pigeonVar_list[2])
+    let errorCode: String? = nilOrValue(pigeonVar_list[3])
 
     return PaymentResultDTO(
       type: type,
       reason: reason,
-      result: result
+      result: result,
+      errorCode: errorCode
     )
   }
   func toList() -> [Any?] {
@@ -1700,6 +1703,7 @@ struct PaymentResultDTO: Hashable {
       type,
       reason,
       result,
+      errorCode,
     ]
   }
   static func == (lhs: PaymentResultDTO, rhs: PaymentResultDTO) -> Bool {

@@ -41,11 +41,16 @@ class PaymentCancelledByUser extends PaymentResult {}
 
 class PaymentError extends PaymentResult {
   final String? reason;
+  final String? code;
 
-  PaymentError({required this.reason});
+  PaymentError({required this.reason, this.code});
 
   @override
   String toString() {
-    return 'PaymentError(reason: $reason)';
+    return 'PaymentError(reason: $reason, code: $code)';
   }
+}
+
+abstract final class PaymentErrorCode {
+  static const String paymentMethodFailure = 'PaymentMethodFailure';
 }

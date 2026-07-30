@@ -702,11 +702,13 @@ class PaymentResultDTO {
   final PaymentResultEnum type;
   final String? reason;
   final PaymentResultModelDTO? result;
+  final String? errorCode;
 
   PaymentResultDTO(
     this.type,
     this.reason,
     this.result,
+    this.errorCode,
   );
 }
 

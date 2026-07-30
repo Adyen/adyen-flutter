@@ -98,7 +98,7 @@ internal class AdyenComponentFactory(
 
     fun createSessionCheckoutCallbacks(componentId: String): SessionCheckoutCallbacks =
         SessionCheckoutCallbacks(
-            onFailure = { checkoutError -> sendError(componentId, checkoutError.message) },
+            onFailure = { checkoutError -> sendError(componentId, checkoutError.message, checkoutError.code) },
             onComplete = { sessionCheckoutResult -> sendFinished(componentId, sessionCheckoutResult) },
             onBeforeSubmit = { data -> onBeforeSubmit(data) },
             additionalCallbacksBlock = { registerCardCallbacks(componentId) },
@@ -156,7 +156,7 @@ internal class AdyenComponentFactory(
                     }
                 }
             },
-            onFailure = { error -> sendError(componentId, error.message) },
+            onFailure = { error -> sendError(componentId, error.message, error.code) },
             onComplete = { advancedCheckoutResult -> sendFinished(componentId, advancedCheckoutResult) },
             additionalCallbacksBlock = { registerCardCallbacks(componentId) },
         )
@@ -285,7 +285,7 @@ internal class AdyenComponentFactory(
             gender = gender
         )
 
-    private fun sendError(componentId: String, errorMessage: String?) {
+    private fun sendError(componentId: String, errorMessage: String?, errorCode: String? = null) {
         println("ON ERROR INVOKED: $errorMessage")
         platformEventHandler.eventSink?.success(
             ComponentCommunicationModel(
@@ -293,7 +293,8 @@ internal class AdyenComponentFactory(
                 componentId = componentId,
                 paymentResult = PaymentResultDTO(
                     type = PaymentResultEnum.ERROR,
-                    reason = errorMessage
+                    reason = errorMessage,
+                    errorCode = errorCode
                 ),
             )
         )
