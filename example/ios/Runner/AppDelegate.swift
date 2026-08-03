@@ -6,10 +6,9 @@ import UIKit
     import adyen_checkout
 #endif
 
-// TODO: v6 migration - AdyenActions (RedirectComponent) is now package-access.
-// #if canImport(AdyenActions)
-//     import AdyenActions
-// #endif
+#if canImport(AdyenCheckout)
+    import AdyenCheckout
+#endif
 
 // TODO: v6 migration - DropInComponent.Style is now package-access.
 // #if canImport(AdyenDropIn)
@@ -36,11 +35,13 @@ import UIKit
         return super.application(application, didFinishLaunchingWithOptions: launchOptions)
     }
 
-    // TODO: v6 migration - RedirectComponent.applicationDidOpen is now package-access.
-    // override func application(_: UIApplication, open url: URL, options _: [UIApplication.OpenURLOptionsKey: Any] = [:]) -> Bool {
-    //     RedirectComponent.applicationDidOpen(from: url)
-    //     return true
-    // }
+    override func application(
+        _ application: UIApplication,
+        open url: URL,
+        options: [UIApplication.OpenURLOptionsKey: Any] = [:]
+    ) -> Bool {
+        Checkout.handleReturn(url: url) || super.application(application, open: url, options: options)
+    }
 
     // TODO: v6 migration - DropInComponent.Style is now package-access.
     // private func setDropInStyle() {
