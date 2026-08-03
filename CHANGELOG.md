@@ -1,4 +1,4 @@
-## 1.12.0 (in development)
+## 1.12.0
 
 ### Improved
 
