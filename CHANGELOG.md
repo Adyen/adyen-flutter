@@ -9,10 +9,12 @@
 
 ### Changed
 
-- Minimum iOS version increased from 12.0 to 13.0. This aligns with Flutter's own minimum iOS
-  requirement.
-- Minimum Android version increased from API 21 to API 23. This aligns with the Adyen Android SDK
-  and the latest `pay` package requirements.
+- iOS: [The minimum version](https://docs.adyen.com/online-payments/upgrade-your-integration#ios)
+  has increased 12.0 to **13.0**. This aligns with Flutter's own minimum iOS requirement.
+- Android: [The minimum  API level (
+  `minSdkVersion`)](https://docs.adyen.com/online-payments/upgrade-your-integration#android) has
+  increased from 21 to **23**. This aligns with the latest [
+  `pay` package](https://pub.dev/packages/pay) requirements.
 - Dependency versions:
   | Name | Version |
   |---------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------|
