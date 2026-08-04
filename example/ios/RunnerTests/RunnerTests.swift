@@ -115,24 +115,26 @@ class RunnerTests: XCTestCase {
     }
 
     @MainActor
-    func testDropInWindowManagerCoalescesDismissals() async throws {
+    func testDropInWindowManagerCoalescesDismissals() throws {
         let hostWindow = try XCTUnwrap(activeWindow())
         let manager = DropInWindowManager(hostWindowProvider: { hostWindow })
         let rootViewController = MockDropInRootViewController()
+        rootViewController.stubbedPresentedViewController = UIViewController()
         try manager.present(rootViewController: rootViewController)
-        let presented = expectation(description: "Child presented")
-        rootViewController.present(UIViewController(), animated: false) {
-            presented.fulfill()
-        }
-        await fulfillment(of: [presented], timeout: 1)
-        let firstDismissal = expectation(description: "First dismissal completed")
-        let secondDismissal = expectation(description: "Second dismissal completed")
+        var completedDismissals = 0
 
-        manager.dismiss(animated: false) { firstDismissal.fulfill() }
-        manager.dismiss(animated: false) { secondDismissal.fulfill() }
-        await fulfillment(of: [firstDismissal, secondDismissal], timeout: 1)
+        manager.dismiss(animated: false) { completedDismissals += 1 }
+        manager.dismiss(animated: false) { completedDismissals += 1 }
+
+        // Both requests wait on the single underlying dismissal rather than starting a second one.
+        XCTAssertEqual(manager.state, .dismissing)
+        XCTAssertEqual(rootViewController.dismissDropInCallCount, 1)
+        XCTAssertEqual(completedDismissals, 0)
+
+        rootViewController.completePendingDismissal()
 
         XCTAssertEqual(manager.state, .idle)
+        XCTAssertEqual(completedDismissals, 2)
         XCTAssertTrue(hostWindow.isKeyWindow)
     }
 
@@ -162,7 +164,26 @@ class RunnerTests: XCTestCase {
 }
 
 private class MockDropInRootViewController: UIViewController, DropInRootViewController {
-    func dismissDropIn(animated: Bool, completion: (() -> Void)?) {
-        dismiss(animated: animated, completion: completion)
+    /// Stubbed so the manager's "is anything presented?" check does not rely on a real UIKit transition.
+    /// CI simulators do not reliably run presentation transitions to completion, which previously hung the tests.
+    var stubbedPresentedViewController: UIViewController?
+    private(set) var dismissDropInCallCount = 0
+    private var pendingDismissalCompletion: (() -> Void)?
+
+    override var presentedViewController: UIViewController? {
+        stubbedPresentedViewController
+    }
+
+    func dismissDropIn(animated _: Bool, completion: (() -> Void)?) {
+        dismissDropInCallCount += 1
+        pendingDismissalCompletion = completion
+    }
+
+    /// Invokes the dismissal completion UIKit would have delivered.
+    func completePendingDismissal() {
+        stubbedPresentedViewController = nil
+        let completion = pendingDismissalCompletion
+        pendingDismissalCompletion = nil
+        completion?()
     }
 }
