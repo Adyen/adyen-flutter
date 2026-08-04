@@ -1,3 +1,10 @@
+## 1.13.0 (in development)
+
+### Improved
+
+- Improved accessibility for Drop-in on iOS. Drop-in is now presented in a dedicated
+  window so assistive technologies can move focus to the payment interface automatically.
+
 ## 1.12.0
 
 ### Improved

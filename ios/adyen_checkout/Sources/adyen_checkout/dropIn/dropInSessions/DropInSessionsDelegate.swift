@@ -71,5 +71,4 @@ class DropInSessionsDelegate: AdyenSessionDelegate {
     func didOpenExternalApplication(component _: ActionComponent, session _: AdyenSession) {
         print("external")
     }
-
 }

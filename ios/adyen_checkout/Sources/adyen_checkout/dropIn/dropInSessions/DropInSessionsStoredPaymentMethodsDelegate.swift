@@ -1,15 +1,12 @@
 @_spi(AdyenInternal)
 import Adyen
-import UIKit
 
 class DropInSessionsStoredPaymentMethodsDelegate: StoredPaymentMethodsDelegate {
     private let checkoutFlutter: CheckoutFlutterInterface
-    private let viewController: UIViewController
     private var completionHandler: ((Bool) -> Void)?
 
-    init(viewController: UIViewController, checkoutFlutter: CheckoutFlutterInterface) {
+    init(checkoutFlutter: CheckoutFlutterInterface) {
         self.checkoutFlutter = checkoutFlutter
-        self.viewController = viewController
     }
 
     func disable(storedPaymentMethod: StoredPaymentMethod, completion: @escaping (Bool) -> Void) {

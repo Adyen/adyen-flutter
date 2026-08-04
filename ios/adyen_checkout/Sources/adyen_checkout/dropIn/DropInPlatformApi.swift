@@ -29,11 +29,14 @@ class DropInPlatformApi: DropInPlatformInterface {
     init(
         checkoutFlutter: CheckoutFlutterInterface,
         sessionHolder: SessionHolder,
-        dropInWindowManager: DropInWindowManager? = nil
+        dropInWindowManager: DropInWindowManager
     ) {
         self.checkoutFlutter = checkoutFlutter
         self.sessionHolder = sessionHolder
-        self.dropInWindowManager = dropInWindowManager ?? DropInWindowManager()
+        self.dropInWindowManager = dropInWindowManager
+        dropInWindowManager.onUnexpectedDismissal = { [weak self] in
+            self?.handleUnexpectedDismissal()
+        }
     }
 
     func showDropInSession(dropInConfigurationDTO: DropInConfigurationDTO) {
@@ -66,7 +69,6 @@ class DropInPlatformApi: DropInPlatformInterface {
             )
             let dropInViewController = DropInViewController(dropInComponent: dropInComponent)
             dropInSessionStoredPaymentMethodsDelegate = DropInSessionsStoredPaymentMethodsDelegate(
-                viewController: dropInViewController,
                 checkoutFlutter: checkoutFlutter
             )
             dropInComponent.delegate = session
@@ -79,8 +81,10 @@ class DropInPlatformApi: DropInPlatformInterface {
             self.dropInViewController = dropInViewController
             try dropInWindowManager.present(rootViewController: dropInViewController)
         } catch {
-            guard dropInWindowManager.state == .idle else { return }
-            clearPresentationReferences()
+            // Only reset when nothing is on screen, so a failed request cannot tear down a live Drop-in.
+            if dropInWindowManager.state == .idle {
+                clearPresentationReferences()
+            }
             sendSessionError(error: error)
         }
     }
@@ -120,7 +124,6 @@ class DropInPlatformApi: DropInPlatformInterface {
             dropInComponent.partialPaymentDelegate = dropInConfigurationDTO.isPartialPaymentSupported ? self : nil
             if dropInConfigurationDTO.isRemoveStoredPaymentMethodEnabled == true {
                 dropInAdvancedFlowStoredPaymentMethodsDelegate = DropInAdvancedFlowStoredPaymentMethodsDelegate(
-                    viewController: dropInViewController,
                     checkoutFlutter: checkoutFlutter
                 )
                 dropInComponent.storedPaymentMethodsDelegate = dropInAdvancedFlowStoredPaymentMethodsDelegate
@@ -129,8 +132,10 @@ class DropInPlatformApi: DropInPlatformInterface {
             self.dropInViewController = dropInViewController
             try dropInWindowManager.present(rootViewController: dropInViewController)
         } catch {
-            guard dropInWindowManager.state == .idle else { return }
-            clearPresentationReferences()
+            // Only reset when nothing is on screen, so a failed request cannot tear down a live Drop-in.
+            if dropInWindowManager.state == .idle {
+                clearPresentationReferences()
+            }
             let checkoutEvent = CheckoutEvent(
                 type: CheckoutEventType.result,
                 data: PaymentResultDTO(type: PaymentResultEnum.error, reason: error.localizedDescription)
@@ -204,10 +209,23 @@ class DropInPlatformApi: DropInPlatformInterface {
         clearPresentationReferences()
         sessionHolder.reset()
     }
-
 }
 
 private extension DropInPlatformApi {
+    /// The Drop-in window disappeared without a dismissal request, so Flutter still awaits a result.
+    func handleUnexpectedDismissal() {
+        guard dropInViewController != nil else { return }
+        clearPresentationReferences()
+        let checkoutEvent = CheckoutEvent(
+            type: CheckoutEventType.result,
+            data: PaymentResultDTO(
+                type: PaymentResultEnum.error,
+                reason: "Drop-in was dismissed unexpectedly."
+            )
+        )
+        checkoutFlutter.send(event: checkoutEvent, completion: { _ in })
+    }
+
     func clearPresentationReferences() {
         dropInSessionStoredPaymentMethodsDelegate = nil
         dropInAdvancedFlowDelegate?.dropInInteractorDelegate = nil
@@ -218,7 +236,7 @@ private extension DropInPlatformApi {
         dropInViewController = nil
     }
 
-    private func handlePaymentEvent(paymentEventDTO: PaymentEventDTO) {
+    func handlePaymentEvent(paymentEventDTO: PaymentEventDTO) {
         switch paymentEventDTO.paymentEventType {
         case .finished:
             onDropInResultFinished(paymentEventDTO: paymentEventDTO)
@@ -231,7 +249,7 @@ private extension DropInPlatformApi {
         }
     }
 
-    private func onDropInResultFinished(paymentEventDTO: PaymentEventDTO) {
+    func onDropInResultFinished(paymentEventDTO: PaymentEventDTO) {
         let resultCode = ResultCode(rawValue: paymentEventDTO.result ?? "")
         let isAccepted = resultCode?.isAccepted ?? false
         finalizeAndDismiss(success: isAccepted, completion: { [weak self] in
@@ -246,7 +264,7 @@ private extension DropInPlatformApi {
         })
     }
 
-    private func onDropInResultAction(paymentEventDTO: PaymentEventDTO) {
+    func onDropInResultAction(paymentEventDTO: PaymentEventDTO) {
         do {
             let jsonData = try JSONSerialization.data(withJSONObject: paymentEventDTO.data as Any, options: [])
             let result = try JSONDecoder().decode(Action.self, from: jsonData)
@@ -260,7 +278,7 @@ private extension DropInPlatformApi {
         }
     }
 
-    private func onDropInResultError(paymentEventDTO: PaymentEventDTO) {
+    func onDropInResultError(paymentEventDTO: PaymentEventDTO) {
         dropInViewController?.dropInComponent.stopLoading()
 
         if paymentEventDTO.error?.dismissDropIn == true || dropInAdvancedFlowDelegate?.isApplePay == true {
@@ -286,7 +304,7 @@ private extension DropInPlatformApi {
         }
     }
     
-    private func onDropInResultUpdate(paymentEventDTO: PaymentEventDTO) {
+    func onDropInResultUpdate(paymentEventDTO: PaymentEventDTO) {
         do {
             guard let updatedPaymentMethods = paymentEventDTO.data?[Constants.updatedPaymentMethodsKey] ?? "" else {
                 throw PlatformError(errorDescription: "Updated payment methods not provided.")
@@ -306,7 +324,7 @@ private extension DropInPlatformApi {
         }
     }
 
-    private func removeGiftCardPaymentMethods(paymentMethods: PaymentMethods, isPartialPaymentSupported: Bool) -> PaymentMethods {
+    func removeGiftCardPaymentMethods(paymentMethods: PaymentMethods, isPartialPaymentSupported: Bool) -> PaymentMethods {
         if isPartialPaymentSupported {
             return paymentMethods
         }
@@ -316,14 +334,14 @@ private extension DropInPlatformApi {
         return PaymentMethods(regular: paymentMethods, stored: storedPaymentMethods)
     }
 
-    private func applyStoredPaymentMethodsVisibility(paymentMethods: PaymentMethods, showStoredPaymentMethods: Bool) -> PaymentMethods {
+    func applyStoredPaymentMethodsVisibility(paymentMethods: PaymentMethods, showStoredPaymentMethods: Bool) -> PaymentMethods {
         if showStoredPaymentMethods {
             return paymentMethods
         }
         return PaymentMethods(regular: paymentMethods.regular, stored: [])
     }
 
-    private func sendSessionError(error: Error) {
+    func sendSessionError(error: Error) {
         let checkoutEvent = CheckoutEvent(
             type: CheckoutEventType.result,
             data: PaymentResultDTO(
@@ -334,7 +352,7 @@ private extension DropInPlatformApi {
         checkoutFlutter.send(event: checkoutEvent, completion: { _ in })
     }
 
-    private func overridePaymentMethodNames(paymentMethods: PaymentMethods, paymentMethodNames: [String?: String?]) -> PaymentMethods {
+    func overridePaymentMethodNames(paymentMethods: PaymentMethods, paymentMethodNames: [String?: String?]) -> PaymentMethods {
         var paymentMethodsWithAdjustedNames = paymentMethods
         for paymentMethodNamePair in paymentMethodNames {
             if let paymentMethodRawValue = paymentMethodNamePair.key,

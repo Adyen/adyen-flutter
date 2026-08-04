@@ -2,6 +2,9 @@
 import UIKit
 
 protocol DropInRootViewController: UIViewController {
+    /// The host view controller whose appearance traits should be mirrored while the Drop-in window is key.
+    var hostViewController: UIViewController? { get set }
+
     func dismissDropIn(animated: Bool, completion: (() -> Void)?)
 }
 
@@ -11,6 +14,13 @@ final class DropInWindowManager {
         case presented
         case dismissing
     }
+
+    /// Kept above the host window so the Drop-in stays in front of content the host application presents itself.
+    private static let dropInWindowLevel = UIWindow.Level(rawValue: UIWindow.Level.normal.rawValue + 1)
+
+    /// Invoked when the Drop-in window is torn down without a dismissal having been requested, for example when the
+    /// hosting scene disconnects. Gives the owner a chance to report a result, since Flutter awaits one indefinitely.
+    var onUnexpectedDismissal: (() -> Void)?
 
     private let hostWindowProvider: () -> UIWindow?
     private let windowFactory: (UIWindowScene) -> UIWindow
@@ -35,40 +45,46 @@ final class DropInWindowManager {
     }
 
     deinit {
-        assert(state == .idle, "DropInWindowManager must be dismissed before deallocation.")
         if let sceneDisconnectObserver {
             notificationCenter.removeObserver(sceneDisconnectObserver)
         }
     }
 
     func ensureCanPresent() throws {
-        dispatchPrecondition(condition: .onQueue(.main))
+        assertMainThread()
         guard state == .idle else {
             throw PlatformError(errorDescription: "Drop-in is already presented.")
         }
     }
 
     func present(rootViewController: DropInRootViewController) throws {
-        dispatchPrecondition(condition: .onQueue(.main))
+        assertMainThread()
         try ensureCanPresent()
 
         guard let hostWindow = hostWindowProvider(), let windowScene = hostWindow.windowScene else {
             throw PlatformError(errorDescription: "Host window scene is not available.")
         }
 
+        let hostRootViewController = hostWindow.rootViewController
         previousKeyWindow = hostWindow
-        previousRootView = hostWindow.rootViewController?.view
+        previousRootView = hostRootViewController?.view
         previousAccessibilityElementsHidden = previousRootView?.accessibilityElementsHidden ?? false
 
         let window = windowFactory(windowScene)
-        window.windowLevel = .normal
+        window.windowLevel = Self.dropInWindowLevel
         window.backgroundColor = .clear
         window.isOpaque = false
+        window.overrideUserInterfaceStyle = hostWindow.overrideUserInterfaceStyle
+        // The Drop-in window becomes key, so its root view controller drives orientation and status bar
+        // appearance. Mirroring the host keeps the preferences configured through Flutter applied.
+        rootViewController.hostViewController = hostRootViewController
         rootViewController.view.backgroundColor = .clear
-        dropInRootViewController = rootViewController
-        window.rootViewController = rootViewController
+        // `accessibilityViewIsModal` traps VoiceOver and Full Keyboard Access inside the Drop-in window, while
+        // hiding the host elements covers assistive technologies that walk the element tree across windows.
         window.accessibilityViewIsModal = true
         rootViewController.view.accessibilityViewIsModal = true
+        dropInRootViewController = rootViewController
+        window.rootViewController = rootViewController
         dropInWindow = window
         observeDisconnect(of: windowScene)
 
@@ -78,33 +94,37 @@ final class DropInWindowManager {
     }
 
     func dismiss(animated: Bool, completion: @escaping () -> Void = {}) {
-        dispatchPrecondition(condition: .onQueue(.main))
+        assertMainThread()
 
         guard state != .idle else {
             completion()
             return
         }
 
+        // Queued so overlapping dismissal requests are all answered exactly once. They are drained by
+        // `restorePreviousWindow`, which is reached either through the dismissal completion below or
+        // through the scene disconnect observer.
         dismissalCompletions.append(completion)
 
         guard state == .presented else { return }
         state = .dismissing
 
-        guard let rootViewController = dropInRootViewController ?? dropInWindow?.rootViewController as? DropInRootViewController else {
+        guard let dropInRootViewController, dropInRootViewController.presentedViewController != nil else {
             restorePreviousWindow()
             return
         }
 
-        if rootViewController.presentedViewController != nil {
-            rootViewController.dismissDropIn(animated: animated, completion: { self.restorePreviousWindow() })
-        } else {
-            restorePreviousWindow()
-        }
+        // `self` is captured strongly on purpose: the window must be restored even if the owner released us.
+        dropInRootViewController.dismissDropIn(animated: animated, completion: { self.restorePreviousWindow() })
     }
 
     func cleanUp() {
-        dispatchPrecondition(condition: .onQueue(.main))
+        assertMainThread()
         dismiss(animated: false)
+    }
+
+    private func assertMainThread() {
+        assert(Thread.isMainThread, "DropInWindowManager must be used on the main thread.")
     }
 
     private func observeDisconnect(of windowScene: UIWindowScene) {
@@ -113,12 +133,17 @@ final class DropInWindowManager {
             object: windowScene,
             queue: .main
         ) { [weak self] _ in
-            self?.restorePreviousWindow(shouldMakeKey: false)
+            guard let self else { return }
+            let wasDismissalRequested = !dismissalCompletions.isEmpty
+            restorePreviousWindow(shouldMakeKey: false)
+            if !wasDismissalRequested {
+                onUnexpectedDismissal?()
+            }
         }
     }
 
     private func restorePreviousWindow(shouldMakeKey: Bool = true) {
-        dispatchPrecondition(condition: .onQueue(.main))
+        assertMainThread()
         guard state != .idle else { return }
         if let sceneDisconnectObserver {
             notificationCenter.removeObserver(sceneDisconnectObserver)

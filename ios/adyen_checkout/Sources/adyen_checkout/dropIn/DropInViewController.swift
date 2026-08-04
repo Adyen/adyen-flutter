@@ -7,7 +7,24 @@ import UIKit
 /// View controller is required to prevent propagating the tap event to the FlutterViewController - https://github.com/flutter/flutter/issues/35784#issuecomment-516243057
 class DropInViewController: UIViewController, DropInRootViewController {
     let dropInComponent: DropInComponent
+    weak var hostViewController: UIViewController?
     private var shouldPresentDropIn = true
+
+    override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
+        hostViewController?.supportedInterfaceOrientations ?? super.supportedInterfaceOrientations
+    }
+
+    override var preferredStatusBarStyle: UIStatusBarStyle {
+        hostViewController?.preferredStatusBarStyle ?? super.preferredStatusBarStyle
+    }
+
+    override var prefersStatusBarHidden: Bool {
+        hostViewController?.prefersStatusBarHidden ?? super.prefersStatusBarHidden
+    }
+
+    override var prefersHomeIndicatorAutoHidden: Bool {
+        hostViewController?.prefersHomeIndicatorAutoHidden ?? super.prefersHomeIndicatorAutoHidden
+    }
     
     init(dropInComponent: DropInComponent) {
         self.dropInComponent = dropInComponent
@@ -29,7 +46,8 @@ class DropInViewController: UIViewController, DropInRootViewController {
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        guard shouldPresentDropIn, presentedViewController == nil else { return }
+        guard shouldPresentDropIn else { return }
+        shouldPresentDropIn = false
         let componentViewController = dropInComponent.viewController
         present(componentViewController, animated: true) {
             UIAccessibility.post(notification: .screenChanged, argument: componentViewController.view)
