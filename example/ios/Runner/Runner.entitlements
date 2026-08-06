@@ -3,5 +3,8 @@
 <plist version="1.0">
 <dict>
 	<key>com.apple.developer.in-app-payments</key>
+	<array>
+		<string>merchant.com.adyen.mystore.ios.test</string>
+	</array>
 </dict>
 </plist>

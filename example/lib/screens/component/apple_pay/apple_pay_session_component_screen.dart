@@ -57,17 +57,21 @@ class ApplePaySessionComponentScreen extends StatelessWidget {
                 "Session flow",
               ),
               const SizedBox(height: 8),
-              AdyenApplePayComponent(
-                configuration: applePayComponentConfiguration,
-                paymentMethod: paymentMethod,
-                checkout: sessionCheckout,
-                loadingIndicator: const CircularProgressIndicator(),
-                width: 200,
-                height: 48,
-                onPaymentResult: (paymentResult) {
-                  Navigator.pop(context);
-                  DialogBuilder.showPaymentResultDialog(paymentResult, context);
-                },
+              Semantics(
+                identifier: "e2e-apple-pay-button",
+                child: AdyenApplePayComponent(
+                  configuration: applePayComponentConfiguration,
+                  paymentMethod: paymentMethod,
+                  checkout: sessionCheckout,
+                  loadingIndicator: const CircularProgressIndicator(),
+                  width: 200,
+                  height: 48,
+                  onPaymentResult: (paymentResult) {
+                    Navigator.pop(context);
+                    DialogBuilder.showPaymentResultDialog(
+                        paymentResult, context);
+                  },
+                ),
               ),
             ],
           );
