@@ -12,11 +12,11 @@ import XCTest
 // See https://developer.apple.com/documentation/xctest for more information about using XCTest.
 
 class RunnerTests: XCTestCase {
-    private let TEST_CLIENT_KEY = "test_qwertyuiopasdfghjklzxcvbnmqwerty"
+    private let testClientKey = "test_qwertyuiopasdfghjklzxcvbnmqwerty"
 
-    func testWhenDropInConfigurationDtoIsProvidedThenMapItToNativeSdkModel() {
+    func test_givenDropInConfigurationDTO_whenMapping_thenCreatesNativeSDKModels() {
         do {
-            let dropInConfigurationDTO = makeDropInConfigurationDTO()
+            let dropInConfigurationDTO = createDropInConfigurationDTO()
 
             let adyenContext = try dropInConfigurationDTO.createAdyenContext()
             let dropInConfiguration = try dropInConfigurationDTO.createDropInConfiguration(
@@ -27,7 +27,7 @@ class RunnerTests: XCTestCase {
             )
 
             XCTAssertEqual(adyenContext.apiContext.environment.baseURL, Adyen.Environment.test.baseURL)
-            XCTAssertEqual(adyenContext.apiContext.clientKey, TEST_CLIENT_KEY)
+            XCTAssertEqual(adyenContext.apiContext.clientKey, testClientKey)
             XCTAssertEqual(adyenContext.payment?.countryCode, "US")
             XCTAssertEqual(adyenContext.payment?.amount.currencyCode, "USD")
             XCTAssertEqual(adyenContext.payment?.amount.value, 1600)
@@ -39,7 +39,7 @@ class RunnerTests: XCTestCase {
     }
 
     @MainActor
-    func testDropInWindowManagerRestoresHostWindowState() throws {
+    func test_givenDropInIsPresented_whenCleanedUp_thenRestoresHostWindowState() throws {
         let hostWindow = try XCTUnwrap(activeWindow())
         let hostView = try XCTUnwrap(hostWindow.rootViewController?.view)
         let initialAccessibilityElementsHidden = hostView.accessibilityElementsHidden
@@ -74,7 +74,7 @@ class RunnerTests: XCTestCase {
     }
 
     @MainActor
-    func testDropInWindowManagerRejectsOverlappingPresentations() throws {
+    func test_givenDropInIsPresented_whenPresentingAgain_thenRejectsPresentation() throws {
         let hostWindow = try XCTUnwrap(activeWindow())
         let manager = DropInWindowManager(hostWindowProvider: { hostWindow })
         try manager.present(rootViewController: MockDropInRootViewController())
@@ -86,7 +86,7 @@ class RunnerTests: XCTestCase {
     }
 
     @MainActor
-    func testDropInWindowManagerPreservesHiddenAccessibilityState() throws {
+    func test_givenHostAccessibilityIsHidden_whenDropInIsDismissed_thenPreservesHiddenState() throws {
         let hostWindow = try XCTUnwrap(activeWindow())
         let hostView = try XCTUnwrap(hostWindow.rootViewController?.view)
         let initialAccessibilityElementsHidden = hostView.accessibilityElementsHidden
@@ -101,7 +101,7 @@ class RunnerTests: XCTestCase {
     }
 
     @MainActor
-    func testDropInWindowManagerFailsWithoutWindowScene() {
+    func test_givenHostWindowHasNoScene_whenPresentingDropIn_thenFails() {
         let manager = DropInWindowManager(hostWindowProvider: { UIWindow(frame: .zero) })
 
         XCTAssertThrowsError(try manager.present(rootViewController: MockDropInRootViewController()))
@@ -109,7 +109,7 @@ class RunnerTests: XCTestCase {
     }
 
     @MainActor
-    func testDropInWindowManagerCoalescesDismissals() throws {
+    func test_givenDropInIsPresented_whenMultipleDismissalsAreRequested_thenCoalescesDismissals() throws {
         let hostWindow = try XCTUnwrap(activeWindow())
         let manager = DropInWindowManager(hostWindowProvider: { hostWindow })
         let rootViewController = MockDropInRootViewController()
@@ -133,7 +133,7 @@ class RunnerTests: XCTestCase {
     }
 
     @MainActor
-    func testDropInWindowManagerCleansUpWhenSceneDisconnects() throws {
+    func test_givenDropInIsPresented_whenSceneDisconnects_thenCleansUpAndReportsUnexpectedDismissal() throws {
         let hostWindow = try XCTUnwrap(activeWindow())
         // The scene disconnect path deliberately leaves the key window untouched, so restore it here to
         // keep the host application usable for the remaining tests.
@@ -155,7 +155,7 @@ class RunnerTests: XCTestCase {
     }
 
     @MainActor
-    func testDropInWindowManagerDoesNotReportUnexpectedDismissalWhenDismissalWasRequested() throws {
+    func test_givenDismissalIsRequested_whenSceneDisconnects_thenDoesNotReportUnexpectedDismissal() throws {
         let hostWindow = try XCTUnwrap(activeWindow())
         defer { hostWindow.makeKey() }
         let windowScene = try XCTUnwrap(hostWindow.windowScene)
@@ -179,7 +179,7 @@ class RunnerTests: XCTestCase {
     }
 
     @MainActor
-    func testDropInViewControllerMirrorsHostViewControllerTraits() throws {
+    func test_givenHostViewController_whenReadingDropInTraits_thenMirrorsHostTraits() throws {
         let sut = try DropInViewController(dropInComponent: makeDropInComponent())
         // Held strongly for the duration of the test, mirroring the host window retaining its root view controller.
         let hostViewController = MockHostViewController()
@@ -197,7 +197,7 @@ class RunnerTests: XCTestCase {
     }
 
     @MainActor
-    func testDropInViewControllerDoesNotPresentAfterDismissal() throws {
+    func test_givenDropInWasDismissed_whenViewAppears_thenDoesNotPresentDropIn() throws {
         let sut = try DropInViewController(dropInComponent: makeDropInComponent())
         sut.dismissDropIn(animated: false, completion: nil)
 
@@ -206,10 +206,10 @@ class RunnerTests: XCTestCase {
         XCTAssertNil(sut.presentedViewController)
     }
 
-    private func makeDropInConfigurationDTO() -> DropInConfigurationDTO {
+    private func createDropInConfigurationDTO() -> DropInConfigurationDTO {
         DropInConfigurationDTO(
             environment: Environment.test,
-            clientKey: TEST_CLIENT_KEY,
+            clientKey: testClientKey,
             countryCode: "US",
             amount: AmountDTO(currency: "USD", value: 1600),
             shopperLocale: "en-US",
@@ -224,7 +224,7 @@ class RunnerTests: XCTestCase {
 
     @MainActor
     private func makeDropInComponent() throws -> DropInComponent {
-        let dropInConfigurationDTO = makeDropInConfigurationDTO()
+        let dropInConfigurationDTO = createDropInConfigurationDTO()
         let payment = Payment(amount: Amount(value: 1600, currencyCode: "USD"), countryCode: "US")
         return try DropInComponent(
             paymentMethods: PaymentMethods(regular: [], stored: []),

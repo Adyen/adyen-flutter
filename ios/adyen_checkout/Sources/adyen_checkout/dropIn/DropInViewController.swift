@@ -8,7 +8,7 @@ import UIKit
 class DropInViewController: UIViewController, DropInRootViewController {
     let dropInComponent: DropInComponent
     weak var hostViewController: UIViewController?
-    private var shouldPresentDropIn = true
+    private var isDropInPresentationPending = true
 
     override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
         hostViewController?.supportedInterfaceOrientations ?? super.supportedInterfaceOrientations
@@ -46,8 +46,8 @@ class DropInViewController: UIViewController, DropInRootViewController {
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        guard shouldPresentDropIn else { return }
-        shouldPresentDropIn = false
+        guard isDropInPresentationPending else { return }
+        isDropInPresentationPending = false
         let componentViewController = dropInComponent.viewController
         present(componentViewController, animated: true) {
             UIAccessibility.post(notification: .screenChanged, argument: componentViewController.view)
@@ -55,7 +55,7 @@ class DropInViewController: UIViewController, DropInRootViewController {
     }
 
     func dismissDropIn(animated: Bool, completion: (() -> Void)? = nil) {
-        shouldPresentDropIn = false
+        isDropInPresentationPending = false
         dismiss(animated: animated, completion: completion)
     }
 }
