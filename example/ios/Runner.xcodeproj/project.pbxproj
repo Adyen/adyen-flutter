@@ -71,7 +71,7 @@
 		75072B932F3508AB00DB2A56 /* ConfigurationMapperTests+Blik.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ConfigurationMapperTests+Blik.swift"; sourceTree = "<group>"; };
 		7525B4FB2F3F77B600095BAD /* ThreeDS2CustomizationMapperTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThreeDS2CustomizationMapperTests.swift; sourceTree = "<group>"; };
 		75609D6F2D3159AB0057CFC3 /* CardValidatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardValidatorTests.swift; sourceTree = "<group>"; };
-		75645AF32FA8887C00637895 /* adyen_checkout */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = adyen_checkout; path = ../../ios/adyen_checkout; sourceTree = "<group>"; };
+		75645AF32FA8887C00637895 /* adyen_checkout */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = adyen_checkout; path = Flutter/ephemeral/Packages/.packages/adyen-flutter; sourceTree = "<group>"; };
 		7567D95D2DB7C7BB00868648 /* en-US */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "en-US"; path = "en-US.lproj/Main.strings"; sourceTree = "<group>"; };
 		7567D95E2DB7C7BB00868648 /* en-US */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "en-US"; path = "en-US.lproj/LaunchScreen.strings"; sourceTree = "<group>"; };
 		7567D9642DB7D0B900868648 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
