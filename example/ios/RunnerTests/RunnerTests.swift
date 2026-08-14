@@ -146,7 +146,7 @@ class RunnerTests: XCTestCase {
             notificationCenter: notificationCenter
         )
         var unexpectedDismissals = 0
-        manager.onUnexpectedDismissal = { unexpectedDismissals += 1 }
+        manager.onUnexpectedDismissal = { _ in unexpectedDismissals += 1 }
         try manager.present(rootViewController: MockDropInRootViewController())
 
         notificationCenter.post(name: UIScene.didDisconnectNotification, object: windowScene)
@@ -166,7 +166,7 @@ class RunnerTests: XCTestCase {
             notificationCenter: notificationCenter
         )
         var unexpectedDismissals = 0
-        manager.onUnexpectedDismissal = { unexpectedDismissals += 1 }
+        manager.onUnexpectedDismissal = { _ in unexpectedDismissals += 1 }
         let rootViewController = MockDropInRootViewController()
         rootViewController.stubbedPresentedViewController = UIViewController()
         try manager.present(rootViewController: rootViewController)
@@ -177,6 +177,77 @@ class RunnerTests: XCTestCase {
 
         XCTAssertEqual(manager.state, .idle)
         XCTAssertEqual(unexpectedDismissals, 0)
+    }
+
+    @MainActor
+    func test_givenSceneDisconnectDuringFinalization_whenFinalizationCompletes_thenAllowsOneTerminalResult() throws {
+        let hostWindow = try XCTUnwrap(activeWindow())
+        defer { hostWindow.makeKey() }
+        let windowScene = try XCTUnwrap(hostWindow.windowScene)
+        let notificationCenter = NotificationCenter()
+        let manager = DropInWindowManager(
+            hostWindowProvider: { hostWindow },
+            notificationCenter: notificationCenter
+        )
+        var terminalResults = 0
+        manager.onUnexpectedDismissal = { presentationID in
+            if manager.claimTerminalResult(for: presentationID) {
+                terminalResults += 1
+            }
+        }
+        try manager.present(rootViewController: MockDropInRootViewController())
+        let presentationID = try XCTUnwrap(manager.activePresentationID)
+
+        notificationCenter.post(name: UIScene.didDisconnectNotification, object: windowScene)
+        if manager.claimTerminalResult(for: presentationID) {
+            terminalResults += 1
+        }
+
+        XCTAssertEqual(terminalResults, 1)
+    }
+
+    @MainActor
+    func test_givenHostHasPresentedViewController_whenPresentingDropIn_thenUsesVisibleControllerForTraits() throws {
+        let originalWindow = try XCTUnwrap(activeWindow())
+        let windowScene = try XCTUnwrap(originalWindow.windowScene)
+        let hostRootViewController = MockDropInRootViewController()
+        let visibleViewController = MockHostViewController()
+        hostRootViewController.stubbedPresentedViewController = visibleViewController
+        let hostWindow = UIWindow(windowScene: windowScene)
+        hostWindow.rootViewController = hostRootViewController
+        hostWindow.makeKeyAndVisible()
+        let manager = DropInWindowManager(hostWindowProvider: { hostWindow })
+        let dropInRootViewController = MockDropInRootViewController()
+        defer {
+            manager.cleanUp()
+            hostWindow.isHidden = true
+            originalWindow.makeKey()
+        }
+
+        try manager.present(rootViewController: dropInRootViewController)
+
+        XCTAssertTrue(dropInRootViewController.hostViewController === visibleViewController)
+    }
+
+    @MainActor
+    func test_givenNewerWindowIsKey_whenDropInIsDismissed_thenPreservesNewerKeyWindow() throws {
+        let hostWindow = try XCTUnwrap(activeWindow())
+        let windowScene = try XCTUnwrap(hostWindow.windowScene)
+        let manager = DropInWindowManager(hostWindowProvider: { hostWindow })
+        let newerWindow = UIWindow(windowScene: windowScene)
+        newerWindow.rootViewController = UIViewController()
+        defer {
+            manager.cleanUp()
+            newerWindow.isHidden = true
+            hostWindow.makeKey()
+        }
+        try manager.present(rootViewController: MockDropInRootViewController())
+        newerWindow.makeKeyAndVisible()
+
+        manager.cleanUp()
+
+        XCTAssertTrue(newerWindow.isKeyWindow)
+        XCTAssertFalse(hostWindow.isKeyWindow)
     }
 
     @MainActor

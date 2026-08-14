@@ -22,6 +22,7 @@ class DropInPlatformApi: DropInPlatformInterface {
     private let checkoutFlutter: CheckoutFlutterInterface
     private let sessionHolder: SessionHolder
     private let dropInWindowManager: DropInWindowManager
+    private var presentationID: UUID?
     private var dropInViewController: DropInViewController?
     // `DropInComponent.delegate` and `AdyenSession.delegate` are weak, and the session holder is the only
     // other owner. Holding both for the lifetime of the presentation keeps the Drop-in able to report its
@@ -42,8 +43,8 @@ class DropInPlatformApi: DropInPlatformInterface {
         self.checkoutFlutter = checkoutFlutter
         self.sessionHolder = sessionHolder
         self.dropInWindowManager = dropInWindowManager
-        dropInWindowManager.onUnexpectedDismissal = { [weak self] in
-            self?.handleUnexpectedDismissal()
+        dropInWindowManager.onUnexpectedDismissal = { [weak self] presentationID in
+            self?.handleUnexpectedDismissal(presentationID: presentationID)
         }
     }
 
@@ -88,12 +89,14 @@ class DropInPlatformApi: DropInPlatformInterface {
             // Everything above is built into locals so a rejected presentation cannot replace the
             // references of a Drop-in that is already on screen. They are committed only once the
             // window manager accepted the presentation.
-            guard try dropInWindowManager.present(rootViewController: dropInViewController) else {
+            guard let presentationID = try presentDropIn(rootViewController: dropInViewController) else {
                 return
             }
+            self.presentationID = presentationID
             self.dropInViewController = dropInViewController
             presentedSession = session
             presentedSessionDelegate = sessionHolder.sessionDelegate
+            (presentedSessionDelegate as? DropInSessionsDelegate)?.presentationID = presentationID
             dropInSessionStoredPaymentMethodsDelegate = storedPaymentMethodsDelegate
         } catch {
             sendSessionError(error: error)
@@ -142,9 +145,10 @@ class DropInPlatformApi: DropInPlatformInterface {
             // Everything above is built into locals so a rejected presentation cannot replace the
             // references of a Drop-in that is already on screen. They are committed only once the
             // window manager accepted the presentation.
-            guard try dropInWindowManager.present(rootViewController: dropInViewController) else {
+            guard let presentationID = try presentDropIn(rootViewController: dropInViewController) else {
                 return
             }
+            self.presentationID = presentationID
             self.dropInViewController = dropInViewController
             dropInAdvancedFlowDelegate = advancedFlowDelegate
             dropInAdvancedFlowStoredPaymentMethodsDelegate = storedPaymentMethodsDelegate
@@ -225,9 +229,19 @@ class DropInPlatformApi: DropInPlatformInterface {
 }
 
 private extension DropInPlatformApi {
+    func presentDropIn(rootViewController: DropInRootViewController) throws -> UUID? {
+        guard try dropInWindowManager.present(rootViewController: rootViewController) else {
+            return nil
+        }
+        return dropInWindowManager.activePresentationID
+    }
+
     /// The Drop-in window disappeared without a dismissal request, so Flutter still awaits a result.
-    func handleUnexpectedDismissal() {
-        guard dropInViewController != nil else { return }
+    func handleUnexpectedDismissal(presentationID: UUID) {
+        guard dropInViewController != nil,
+              dropInWindowManager.claimTerminalResult(for: presentationID) else {
+            return
+        }
         clearPresentationReferences()
         let checkoutEvent = CheckoutEvent(
             type: CheckoutEventType.result,
@@ -240,6 +254,7 @@ private extension DropInPlatformApi {
     }
 
     func clearPresentationReferences() {
+        presentationID = nil
         presentedSession = nil
         presentedSessionDelegate = nil
         dropInSessionStoredPaymentMethodsDelegate = nil
@@ -386,17 +401,22 @@ private extension DropInPlatformApi {
 
 extension DropInPlatformApi: DropInInteractorDelegate {
     func finalizeAndDismiss(success: Bool, completion: @escaping (() -> Void)) {
+        guard let presentationID else { return }
+        let completeOnce = { [weak self] in
+            guard let self,
+                  self.dropInWindowManager.claimTerminalResult(for: presentationID) else {
+                return
+            }
+            self.presentationID = nil
+            completion()
+        }
         guard let dropInViewController else {
-            dropInWindowManager.dismiss(animated: true, completion: completion)
+            dropInWindowManager.dismiss(animated: true, completion: completeOnce)
             return
         }
 
         dropInViewController.dropInComponent.finalizeIfNeeded(with: success) { [weak self] in
-            guard let self else {
-                completion()
-                return
-            }
-            dropInWindowManager.dismiss(animated: true, completion: completion)
+            self?.dropInWindowManager.dismiss(animated: true, completion: completeOnce)
         }
     }
 }

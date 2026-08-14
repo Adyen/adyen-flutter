@@ -5,10 +5,14 @@
 #if canImport(AdyenNetworking)
     import AdyenNetworking
 #endif
+import Foundation
 
 class DropInSessionsDelegate: AdyenSessionDelegate {
     private let dropInWindowManager: DropInWindowManager
     private let checkoutFlutter: CheckoutFlutterInterface
+    /// Identifies this delegate's Drop-in presentation so an asynchronous session callback is ignored if another
+    /// terminal path, such as a scene disconnect, has already reported its result.
+    var presentationID: UUID?
 
     init(dropInWindowManager: DropInWindowManager, checkoutFlutter: CheckoutFlutterInterface) {
         self.dropInWindowManager = dropInWindowManager
@@ -17,6 +21,12 @@ class DropInSessionsDelegate: AdyenSessionDelegate {
 
     func didComplete(with result: AdyenSessionResult, component _: Adyen.Component, session: AdyenSession) {
         dropInWindowManager.dismiss(animated: true, completion: { [weak self] in
+            guard let self,
+                  let presentationID,
+                  dropInWindowManager.claimTerminalResult(for: presentationID) else {
+                return
+            }
+            self.presentationID = nil
             let paymentResult = PaymentResultModelDTO(
                 sessionId: session.sessionContext.identifier,
                 sessionData: session.sessionContext.data,
@@ -30,7 +40,7 @@ class DropInSessionsDelegate: AdyenSessionDelegate {
                     result: paymentResult
                 )
             )
-            self?.checkoutFlutter.send(
+            self.checkoutFlutter.send(
                 event: checkoutEvent,
                 completion: { _ in }
             )
@@ -39,6 +49,12 @@ class DropInSessionsDelegate: AdyenSessionDelegate {
 
     func didFail(with error: Error, from _: Component, session _: AdyenSession) {
         dropInWindowManager.dismiss(animated: true, completion: { [weak self] in
+            guard let self,
+                  let presentationID,
+                  dropInWindowManager.claimTerminalResult(for: presentationID) else {
+                return
+            }
+            self.presentationID = nil
             switch error {
             case ComponentError.cancelled:
                 let checkoutEvent = CheckoutEvent(
@@ -48,7 +64,7 @@ class DropInSessionsDelegate: AdyenSessionDelegate {
                         reason: error.localizedDescription
                     )
                 )
-                self?.checkoutFlutter.send(
+                self.checkoutFlutter.send(
                     event: checkoutEvent,
                     completion: { _ in }
                 )
@@ -60,7 +76,7 @@ class DropInSessionsDelegate: AdyenSessionDelegate {
                         reason: error.localizedDescription
                     )
                 )
-                self?.checkoutFlutter.send(
+                self.checkoutFlutter.send(
                     event: checkoutEvent,
                     completion: { _ in }
                 )

@@ -19,7 +19,7 @@ final class DropInWindowManager {
 
     /// Invoked when the Drop-in window is torn down without a dismissal having been requested, for example when the
     /// hosting scene disconnects.
-    var onUnexpectedDismissal: (() -> Void)?
+    var onUnexpectedDismissal: ((UUID) -> Void)?
 
     private let hostWindowProvider: () -> UIWindow?
     private let windowFactory: (UIWindowScene) -> UIWindow
@@ -31,6 +31,8 @@ final class DropInWindowManager {
     private weak var dropInRootViewController: DropInRootViewController?
     private var sceneDisconnectObserver: NSObjectProtocol?
     private var dismissalCompletions: [() -> Void] = []
+    /// Identifies the presentation whose terminal result is still pending, so an earlier Drop-in cannot complete a later one.
+    private(set) var activePresentationID: UUID?
     private(set) var state = State.idle
 
     init(
@@ -53,7 +55,7 @@ final class DropInWindowManager {
     func present(rootViewController: DropInRootViewController) throws -> Bool {
         assertMainThread()
 
-        guard state == .idle else {
+        guard state == .idle, activePresentationID == nil else {
             return false
         }
 
@@ -72,7 +74,7 @@ final class DropInWindowManager {
         window.isOpaque = false
         window.overrideUserInterfaceStyle = hostWindow.overrideUserInterfaceStyle
         // Mirroring the host keeps the preferences configured through Flutter applied.
-        rootViewController.hostViewController = hostRootViewController
+        rootViewController.hostViewController = hostRootViewController?.adyen.topPresenter
         rootViewController.view.backgroundColor = .clear
         window.accessibilityViewIsModal = true
         rootViewController.view.accessibilityViewIsModal = true
@@ -81,8 +83,9 @@ final class DropInWindowManager {
         dropInWindow = window
         observeDisconnect(of: windowScene)
         previousRootView?.accessibilityElementsHidden = true
-        window.makeKeyAndVisible()
+        activePresentationID = UUID()
         state = .presented
+        window.makeKeyAndVisible()
         return true
     }
 
@@ -108,9 +111,22 @@ final class DropInWindowManager {
         dropInRootViewController.dismissDropIn(animated: animated, completion: { self.restorePreviousWindow() })
     }
 
+    /// Claims the active presentation's terminal result so late callbacks cannot emit a duplicate.
+    @discardableResult
+    func claimTerminalResult(for presentationID: UUID) -> Bool {
+        assertMainThread()
+        guard activePresentationID == presentationID else { return false }
+        activePresentationID = nil
+        return true
+    }
+
     func cleanUp() {
         assertMainThread()
+        let presentationID = activePresentationID
         dismiss(animated: false)
+        if activePresentationID == presentationID {
+            activePresentationID = nil
+        }
     }
 
     private func assertMainThread() {
@@ -125,14 +141,21 @@ final class DropInWindowManager {
         ) { [weak self] _ in
             guard let self else { return }
             let wasDismissalRequested = !dismissalCompletions.isEmpty
-            restorePreviousWindow(shouldMakeKey: false)
-            if !wasDismissalRequested {
-                onUnexpectedDismissal?()
+            let presentationID = activePresentationID
+            restorePreviousWindow(shouldMakeKey: false, shouldClearPresentationID: false)
+            if !wasDismissalRequested, let presentationID {
+                onUnexpectedDismissal?(presentationID)
+            }
+            if activePresentationID == presentationID {
+                activePresentationID = nil
             }
         }
     }
 
-    private func restorePreviousWindow(shouldMakeKey: Bool = true) {
+    private func restorePreviousWindow(
+        shouldMakeKey: Bool = true,
+        shouldClearPresentationID: Bool = true
+    ) {
         assertMainThread()
         guard state != .idle else { return }
         if let sceneDisconnectObserver {
@@ -140,7 +163,10 @@ final class DropInWindowManager {
             self.sceneDisconnectObserver = nil
         }
 
+        let presentationID = activePresentationID
         let dismissedWindowScene = dropInWindow?.windowScene
+        let currentKeyWindow = dismissedWindowScene?.windows.first(where: \.isKeyWindow)
+        let shouldRestorePreviousKeyWindow = currentKeyWindow == nil || currentKeyWindow === dropInWindow
         dropInWindow?.isHidden = true
         dropInWindow?.rootViewController = nil
         dropInRootViewController = nil
@@ -148,6 +174,7 @@ final class DropInWindowManager {
         previousRootView?.accessibilityElementsHidden = previousAccessibilityElementsHidden
 
         if shouldMakeKey,
+           shouldRestorePreviousKeyWindow,
            let previousKeyWindow,
            previousKeyWindow.windowScene === dismissedWindowScene,
            !previousKeyWindow.isHidden {
@@ -165,5 +192,8 @@ final class DropInWindowManager {
         let completions = dismissalCompletions
         dismissalCompletions.removeAll()
         completions.forEach { $0() }
+        if shouldClearPresentationID, activePresentationID == presentationID {
+            activePresentationID = nil
+        }
     }
 }
