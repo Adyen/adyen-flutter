@@ -2,7 +2,6 @@
 import UIKit
 
 protocol DropInRootViewController: UIViewController {
-    /// The host view controller whose appearance traits should be mirrored while the Drop-in window is key.
     var hostViewController: UIViewController? { get set }
 
     func dismissDropIn(animated: Bool, completion: (() -> Void)?)
@@ -19,7 +18,7 @@ final class DropInWindowManager {
     private static let dropInWindowLevel = UIWindow.Level(rawValue: UIWindow.Level.normal.rawValue + 1)
 
     /// Invoked when the Drop-in window is torn down without a dismissal having been requested, for example when the
-    /// hosting scene disconnects. Gives the owner a chance to report a result, since Flutter awaits one indefinitely.
+    /// hosting scene disconnects.
     var onUnexpectedDismissal: (() -> Void)?
 
     private let hostWindowProvider: () -> UIWindow?
@@ -50,16 +49,13 @@ final class DropInWindowManager {
         }
     }
 
-    func ensureCanPresent() throws {
+    @discardableResult
+    func present(rootViewController: DropInRootViewController) throws -> Bool {
         assertMainThread()
-        guard state == .idle else {
-            throw PlatformError(errorDescription: "Drop-in is already presented.")
-        }
-    }
 
-    func present(rootViewController: DropInRootViewController) throws {
-        assertMainThread()
-        try ensureCanPresent()
+        guard state == .idle else {
+            return false
+        }
 
         guard let hostWindow = hostWindowProvider(), let windowScene = hostWindow.windowScene else {
             throw PlatformError(errorDescription: "Host window scene is not available.")
@@ -75,22 +71,19 @@ final class DropInWindowManager {
         window.backgroundColor = .clear
         window.isOpaque = false
         window.overrideUserInterfaceStyle = hostWindow.overrideUserInterfaceStyle
-        // The Drop-in window becomes key, so its root view controller drives orientation and status bar
-        // appearance. Mirroring the host keeps the preferences configured through Flutter applied.
+        // Mirroring the host keeps the preferences configured through Flutter applied.
         rootViewController.hostViewController = hostRootViewController
         rootViewController.view.backgroundColor = .clear
-        // `accessibilityViewIsModal` traps VoiceOver and Full Keyboard Access inside the Drop-in window, while
-        // hiding the host elements covers assistive technologies that walk the element tree across windows.
         window.accessibilityViewIsModal = true
         rootViewController.view.accessibilityViewIsModal = true
         dropInRootViewController = rootViewController
         window.rootViewController = rootViewController
         dropInWindow = window
         observeDisconnect(of: windowScene)
-
         previousRootView?.accessibilityElementsHidden = true
         window.makeKeyAndVisible()
         state = .presented
+        return true
     }
 
     func dismiss(animated: Bool, completion: @escaping () -> Void = {}) {
@@ -101,9 +94,6 @@ final class DropInWindowManager {
             return
         }
 
-        // Queued so overlapping dismissal requests are all answered exactly once. They are drained by
-        // `restorePreviousWindow`, which is reached either through the dismissal completion below or
-        // through the scene disconnect observer.
         dismissalCompletions.append(completion)
 
         guard state == .presented else { return }

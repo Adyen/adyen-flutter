@@ -8,6 +8,9 @@ import Foundation
 #if canImport(AdyenCard)
     import AdyenCard
 #endif
+#if canImport(AdyenSession)
+    import AdyenSession
+#endif
 import UIKit
 @_spi(AdyenInternal) import Adyen
 #if canImport(AdyenNetworking)
@@ -20,6 +23,11 @@ class DropInPlatformApi: DropInPlatformInterface {
     private let sessionHolder: SessionHolder
     private let dropInWindowManager: DropInWindowManager
     private var dropInViewController: DropInViewController?
+    // `DropInComponent.delegate` and `AdyenSession.delegate` are weak, and the session holder is the only
+    // other owner. Holding both for the lifetime of the presentation keeps the Drop-in able to report its
+    // result even when a new session is created while it is on screen.
+    private var presentedSession: AdyenSession?
+    private var presentedSessionDelegate: AdyenSessionDelegate?
     private var dropInSessionStoredPaymentMethodsDelegate: DropInSessionsStoredPaymentMethodsDelegate?
     private var dropInAdvancedFlowDelegate: DropInAdvancedFlowDelegate?
     private var dropInAdvancedFlowStoredPaymentMethodsDelegate: DropInAdvancedFlowStoredPaymentMethodsDelegate?
@@ -41,7 +49,6 @@ class DropInPlatformApi: DropInPlatformInterface {
 
     func showDropInSession(dropInConfigurationDTO: DropInConfigurationDTO) {
         do {
-            try dropInWindowManager.ensureCanPresent()
             guard let session = sessionHolder.session else {
                 throw PlatformError(errorDescription: "Session is not available.")
             }
@@ -68,30 +75,33 @@ class DropInPlatformApi: DropInPlatformInterface {
                 title: dropInConfigurationDTO.preselectedPaymentMethodTitle
             )
             let dropInViewController = DropInViewController(dropInComponent: dropInComponent)
-            dropInSessionStoredPaymentMethodsDelegate = DropInSessionsStoredPaymentMethodsDelegate(
+            let storedPaymentMethodsDelegate = DropInSessionsStoredPaymentMethodsDelegate(
                 checkoutFlutter: checkoutFlutter
             )
             dropInComponent.delegate = session
             dropInComponent.partialPaymentDelegate = session
             dropInComponent.cardComponentDelegate = self
             if dropInConfigurationDTO.isRemoveStoredPaymentMethodEnabled {
-                dropInComponent.storedPaymentMethodsDelegate = dropInSessionStoredPaymentMethodsDelegate
+                dropInComponent.storedPaymentMethodsDelegate = storedPaymentMethodsDelegate
             }
 
-            self.dropInViewController = dropInViewController
-            try dropInWindowManager.present(rootViewController: dropInViewController)
-        } catch {
-            // Only reset when nothing is on screen, so a failed request cannot tear down a live Drop-in.
-            if dropInWindowManager.state == .idle {
-                clearPresentationReferences()
+            // Everything above is built into locals so a rejected presentation cannot replace the
+            // references of a Drop-in that is already on screen. They are committed only once the
+            // window manager accepted the presentation.
+            guard try dropInWindowManager.present(rootViewController: dropInViewController) else {
+                return
             }
+            self.dropInViewController = dropInViewController
+            presentedSession = session
+            presentedSessionDelegate = sessionHolder.sessionDelegate
+            dropInSessionStoredPaymentMethodsDelegate = storedPaymentMethodsDelegate
+        } catch {
             sendSessionError(error: error)
         }
     }
 
     func showDropInAdvanced(dropInConfigurationDTO: DropInConfigurationDTO, paymentMethodsResponse: String) {
         do {
-            try dropInWindowManager.ensureCanPresent()
             let adyenContext = try dropInConfigurationDTO.createAdyenContext()
             var paymentMethods = try jsonDecoder.decode(PaymentMethods.self, from: Data(paymentMethodsResponse.utf8))
             if let paymentMethodNames = dropInConfigurationDTO.paymentMethodNames {
@@ -117,25 +127,28 @@ class DropInPlatformApi: DropInPlatformInterface {
                 title: dropInConfigurationDTO.preselectedPaymentMethodTitle
             )
             let dropInViewController = DropInViewController(dropInComponent: dropInComponent)
-            dropInAdvancedFlowDelegate = DropInAdvancedFlowDelegate(checkoutFlutter: checkoutFlutter)
-            dropInAdvancedFlowDelegate?.dropInInteractorDelegate = self
-            dropInComponent.delegate = dropInAdvancedFlowDelegate
+            let advancedFlowDelegate = DropInAdvancedFlowDelegate(checkoutFlutter: checkoutFlutter)
+            advancedFlowDelegate.dropInInteractorDelegate = self
+            dropInComponent.delegate = advancedFlowDelegate
             dropInComponent.cardComponentDelegate = self
             dropInComponent.partialPaymentDelegate = dropInConfigurationDTO.isPartialPaymentSupported ? self : nil
+            var storedPaymentMethodsDelegate: DropInAdvancedFlowStoredPaymentMethodsDelegate?
             if dropInConfigurationDTO.isRemoveStoredPaymentMethodEnabled == true {
-                dropInAdvancedFlowStoredPaymentMethodsDelegate = DropInAdvancedFlowStoredPaymentMethodsDelegate(
-                    checkoutFlutter: checkoutFlutter
-                )
-                dropInComponent.storedPaymentMethodsDelegate = dropInAdvancedFlowStoredPaymentMethodsDelegate
+                let delegate = DropInAdvancedFlowStoredPaymentMethodsDelegate(checkoutFlutter: checkoutFlutter)
+                dropInComponent.storedPaymentMethodsDelegate = delegate
+                storedPaymentMethodsDelegate = delegate
             }
 
-            self.dropInViewController = dropInViewController
-            try dropInWindowManager.present(rootViewController: dropInViewController)
-        } catch {
-            // Only reset when nothing is on screen, so a failed request cannot tear down a live Drop-in.
-            if dropInWindowManager.state == .idle {
-                clearPresentationReferences()
+            // Everything above is built into locals so a rejected presentation cannot replace the
+            // references of a Drop-in that is already on screen. They are committed only once the
+            // window manager accepted the presentation.
+            guard try dropInWindowManager.present(rootViewController: dropInViewController) else {
+                return
             }
+            self.dropInViewController = dropInViewController
+            dropInAdvancedFlowDelegate = advancedFlowDelegate
+            dropInAdvancedFlowStoredPaymentMethodsDelegate = storedPaymentMethodsDelegate
+        } catch {
             let checkoutEvent = CheckoutEvent(
                 type: CheckoutEventType.result,
                 data: PaymentResultDTO(type: PaymentResultEnum.error, reason: error.localizedDescription)
@@ -227,6 +240,8 @@ private extension DropInPlatformApi {
     }
 
     func clearPresentationReferences() {
+        presentedSession = nil
+        presentedSessionDelegate = nil
         dropInSessionStoredPaymentMethodsDelegate = nil
         dropInAdvancedFlowDelegate?.dropInInteractorDelegate = nil
         dropInAdvancedFlowDelegate = nil

@@ -74,14 +74,15 @@ class RunnerTests: XCTestCase {
     }
 
     @MainActor
-    func test_givenDropInIsPresented_whenPresentingAgain_thenRejectsPresentation() throws {
+    func test_givenDropInIsPresented_whenPresentingAgain_thenKeepsExistingPresentation() throws {
         let hostWindow = try XCTUnwrap(activeWindow())
         let manager = DropInWindowManager(hostWindowProvider: { hostWindow })
         try manager.present(rootViewController: MockDropInRootViewController())
         defer { manager.cleanUp() }
 
-        XCTAssertThrowsError(try manager.ensureCanPresent())
-        XCTAssertThrowsError(try manager.present(rootViewController: MockDropInRootViewController()))
+        let result = try manager.present(rootViewController: MockDropInRootViewController())
+
+        XCTAssertFalse(result)
         XCTAssertEqual(manager.state, .presented)
     }
 
