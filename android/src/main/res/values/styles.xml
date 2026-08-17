@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Base theme for components rendered inside a Flutter platform view. It links into the
+         Android SDK theme chain (AdyenCheckout -> AppTheme -> Adyen -> Theme.MaterialComponents),
+         so integrators can keep customizing components by overriding "AdyenCheckout" or
+         "AppTheme" in their own resources. -->
+    <style name="AdyenCheckout.Flutter" parent="@style/AdyenCheckout" />
+</resources>

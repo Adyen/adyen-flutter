@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.FragmentManager
 import com.adyen.checkout.components.core.internal.Component
 import com.adyen.checkout.flutter.R
+import com.adyen.checkout.flutter.utils.ThemeUtil
 import com.adyen.checkout.ui.core.AdyenComponentView
 import com.adyen.checkout.ui.core.internal.ui.ViewableComponent
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -16,7 +17,10 @@ internal class ComponentLoadingBottomSheet<T> : BottomSheetDialogFragment() wher
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? = inflater.inflate(R.layout.component_bottom_sheet_content, container, false)
+    ): View? =
+        inflater
+            .cloneInContext(ThemeUtil.applyAdyenTheme(inflater.context))
+            .inflate(R.layout.component_bottom_sheet_content, container, false)
 
     @Suppress("UNCHECKED_CAST")
     override fun onViewCreated(

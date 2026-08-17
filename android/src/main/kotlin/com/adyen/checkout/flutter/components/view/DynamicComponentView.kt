@@ -15,6 +15,7 @@ import com.adyen.checkout.components.core.internal.Component
 import com.adyen.checkout.flutter.generated.ComponentCommunicationModel
 import com.adyen.checkout.flutter.generated.ComponentCommunicationType
 import com.adyen.checkout.flutter.generated.ComponentFlutterInterface
+import com.adyen.checkout.flutter.utils.ThemeUtil
 import com.adyen.checkout.ui.core.AdyenComponentView
 import com.adyen.checkout.ui.core.internal.ui.ViewableComponent
 import com.google.android.material.button.MaterialButton
@@ -72,7 +73,7 @@ class DynamicComponentView
             activity: ComponentActivity,
         ) where T : Component, T : ViewableComponent {
             val adyenComponentView =
-                AdyenComponentView(context).apply {
+                AdyenComponentView(ThemeUtil.applyAdyenTheme(context)).apply {
                     onComponentViewGlobalLayout(this, component)
                     attach(component, activity)
                 }

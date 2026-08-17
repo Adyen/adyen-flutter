@@ -18,6 +18,7 @@ import com.adyen.checkout.flutter.generated.InstantPaymentType
 import com.adyen.checkout.flutter.session.SessionHolder
 import com.adyen.checkout.flutter.utils.ConfigurationMapper.toCheckoutConfiguration
 import com.adyen.checkout.flutter.utils.Constants
+import com.adyen.checkout.flutter.utils.ThemeUtil
 import com.adyen.checkout.googlepay.GooglePayComponent
 import com.adyen.checkout.sessions.core.CheckoutSession
 import com.adyen.checkout.sessions.core.SessionSetupResponse
@@ -52,7 +53,7 @@ class GooglePayComponentManager(
 
         this.googlePayComponent = googlePayComponent
         this.adyenComponentView =
-            AdyenComponentView(activity).apply {
+            AdyenComponentView(ThemeUtil.applyAdyenTheme(activity)).apply {
                 attach(googlePayComponent, activity)
             }
 
