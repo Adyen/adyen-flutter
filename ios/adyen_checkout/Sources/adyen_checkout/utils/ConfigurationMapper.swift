@@ -30,9 +30,10 @@ extension DropInConfigurationDTO {
     func createCheckoutConfiguration() throws -> CheckoutConfiguration {
         let cardConfig = cardConfigurationDTO?.mapToCardConfiguration(shopperLocale: shopperLocale) ?? CardConfiguration()
         let authConfig = threeDS2ConfigurationDTO?.mapToAuthenticationConfiguration() ?? AuthenticationConfiguration()
+        let mappedAmount = amount?.mapToAmount()
         return try CheckoutConfiguration(
             environment: environment.mapToEnvironment(),
-            amount: amount!.mapToAmount(),
+            amount: mappedAmount,
             clientKey: clientKey,
             analyticsConfiguration: AnalyticsConfiguration(isEnabled: analyticsOptionsDTO.enabled)
         ) {
@@ -58,7 +59,7 @@ extension CheckoutConfigurationDTO {
         guard let applePayConfigurationDTO else {
             return try CheckoutConfiguration(
                 environment: environment.mapToEnvironment(),
-                amount: amount!.mapToAmount(),
+                amount: mappedAmount,
                 clientKey: clientKey,
                 analyticsConfiguration: AnalyticsConfiguration(isEnabled: analyticsOptionsDTO.enabled)
             ) {
@@ -75,7 +76,7 @@ extension CheckoutConfigurationDTO {
         )
         return try CheckoutConfiguration(
             environment: environment.mapToEnvironment(),
-            amount: amount!.mapToAmount(),
+            amount: mappedAmount,
             clientKey: clientKey,
             analyticsConfiguration: AnalyticsConfiguration(isEnabled: analyticsOptionsDTO.enabled)
         ) {
@@ -550,6 +551,6 @@ extension InstallmentConfigurationDTO {
 
 extension SessionResponseDTO {
     func mapToSessionResponse() -> SessionResponse {
-        return SessionResponse(id: id, sessionData: sessionData)
+        SessionResponse(id: id, sessionData: sessionData)
     }
 }

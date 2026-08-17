@@ -159,6 +159,7 @@ class AdyenCheckoutPlugin :
     }
 
     private fun teardownComponents(binaryMessenger: BinaryMessenger) {
+        componentPlatformApi?.teardown()
         componentPlatformApi = null
         componentFlutterApi = null
         ComponentPlatformInterface.setUp(binaryMessenger, null)

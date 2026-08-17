@@ -19,6 +19,10 @@ class AdyenComponent extends StatelessWidget {
   final Future<void> Function(PaymentResult) onPaymentResult;
   final Set<Factory<OneSequenceGestureRecognizer>>? gestureRecognizers;
 
+  /// Optional controller for observing readiness and submitting direct
+  /// (no-input) payment methods such as iDEAL or PayPal.
+  final AdyenComponentController? controller;
+
   /// Apple Pay-only, ignored for every other payment method.
   final Function()? onUnavailable;
   final Widget? unavailableWidget;
@@ -26,6 +30,7 @@ class AdyenComponent extends StatelessWidget {
 
   const AdyenComponent({
     super.key,
+    this.controller,
     required this.configuration,
     required this.checkout,
     required this.paymentMethod,
@@ -61,6 +66,7 @@ class AdyenComponent extends StatelessWidget {
     final bool isStoredPaymentMethod = _isStoredPaymentMethod;
     return switch (checkout) {
       SessionCheckout it => AdyenSessionComponent(
+          controller: controller,
           checkoutConfiguration: configuration.toDTO(),
           paymentMethod: encodedPaymentMethod,
           paymentMethodTxVariant: paymentMethodTxVariant,
@@ -73,6 +79,7 @@ class AdyenComponent extends StatelessWidget {
           onBinValue: configuration.cardConfiguration?.onBinValue,
         ),
       AdvancedCheckout it => AdyenAdvancedComponent(
+          controller: controller,
           checkoutConfiguration: configuration.toDTO(),
           paymentMethod: encodedPaymentMethod,
           paymentMethodTxVariant: paymentMethodTxVariant,
@@ -102,6 +109,7 @@ class AdyenComponent extends StatelessWidget {
     return switch (checkout) {
       SessionCheckout it => ApplePaySessionComponent(
           key: key,
+          controller: controller,
           session: it.toDTO(),
           applePayPaymentMethod: encodedPaymentMethod,
           configuration: configuration,
@@ -129,6 +137,7 @@ class AdyenComponent extends StatelessWidget {
     }
     return ApplePayAdvancedComponent(
       key: key,
+      controller: controller,
       applePayPaymentMethod: encodedPaymentMethod,
       configuration: configuration,
       onPaymentResult: onPaymentResult,

@@ -22,6 +22,7 @@ class V2SessionComponentScreen extends StatefulWidget {
 class _V2SessionComponentScreenState extends State<V2SessionComponentScreen> {
   late final Future<SessionCheckout> _sessionCheckoutFuture;
   late final CheckoutConfiguration _checkoutConfiguration;
+  final AdyenComponentController _controller = AdyenComponentController();
   bool _isUnavailable = false;
 
   @override
@@ -30,6 +31,12 @@ class _V2SessionComponentScreenState extends State<V2SessionComponentScreen> {
     _checkoutConfiguration =
         buildV2CheckoutConfiguration(widget.paymentMethodType);
     _sessionCheckoutFuture = _setupSession();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
   }
 
   @override
@@ -55,6 +62,19 @@ class _V2SessionComponentScreenState extends State<V2SessionComponentScreen> {
                   child: Text('Failed to setup session: missing session id'));
             }
 
+            final paymentMethod = extractV2PaymentMethod(
+              sessionCheckout.paymentMethods,
+              widget.paymentMethodType,
+            );
+
+            if (paymentMethod.isEmpty) {
+              return Center(
+                child: Text(
+                  '${widget.paymentMethodType.txVariant} payment method not found',
+                ),
+              );
+            }
+
             return SingleChildScrollView(
               padding: const EdgeInsets.all(16),
               child: Column(
@@ -67,15 +87,28 @@ class _V2SessionComponentScreenState extends State<V2SessionComponentScreen> {
                         '${widget.paymentMethodType.txVariant} is not available')
                   else
                     AdyenComponent(
+                      controller: _controller,
                       configuration: _checkoutConfiguration,
-                      paymentMethod: extractV2PaymentMethod(
-                        sessionCheckout.paymentMethods,
-                        widget.paymentMethodType,
-                      ),
+                      paymentMethod: paymentMethod,
                       checkout: sessionCheckout,
                       onPaymentResult: (paymentResult) async =>
                           _endPayment(context, paymentResult),
                     ),
+                  ListenableBuilder(
+                    listenable: _controller,
+                    builder: (context, child) {
+                      if (_controller.isReady &&
+                          _controller.requiresUserInteraction == false) {
+                        return ElevatedButton(
+                          onPressed: _controller.submit,
+                          child: Text(
+                            'Pay with ${widget.paymentMethodType.txVariant}',
+                          ),
+                        );
+                      }
+                      return child ?? const SizedBox.shrink();
+                    },
+                  ),
                 ],
               ),
             );

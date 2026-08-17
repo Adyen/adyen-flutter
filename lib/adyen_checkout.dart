@@ -65,4 +65,5 @@ export 'src/generated/platform_api.g.dart'
         ApplePayMerchantCapability,
         ApplePaySummaryItemType,
         ApplePayPaymentErrorType;
+export 'src/v2/adyen_component_controller.dart' show AdyenComponentController;
 export 'src/v2/adyen_component.dart';

@@ -10,6 +10,14 @@ class ComponentPlatformApi: ComponentPlatformInterface {
 
     func updateViewHeight(viewId: Int64) {}
 
+    func submitComponent(componentId: String) throws {
+        V6ComponentControllerRegistry.shared.setActive(componentId: componentId)
+        guard let component = V6ComponentControllerRegistry.shared.component(for: componentId) else {
+            return
+        }
+        component.submit()
+    }
+
     func onPaymentsResult(componentId: String, paymentsResult: PaymentEventDTO) {
         handlePaymentEvent(componentId: componentId, paymentEventDTO: paymentsResult)
     }
@@ -65,6 +73,8 @@ class ComponentPlatformApi: ComponentPlatformInterface {
     }
 
     func onDispose(componentId: String) {
+        V6ComponentControllerRegistry.shared.unregister(componentId: componentId)
+
         if isInstantPaymentComponent(componentId: componentId) {
             instantComponentManager.onDispose()
         } else if isActionComponent(componentId: componentId) {

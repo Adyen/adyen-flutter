@@ -63,6 +63,10 @@ class ComponentPlatformApi implements ComponentPlatformInterface {
       _componentPlatformInterface.onDispose(componentId);
 
   @override
+  Future<void> submitComponent(String componentId) async =>
+      _componentPlatformInterface.submitComponent(componentId);
+
+  @override
   Future<void> handleAction(
     ActionComponentConfigurationDTO actionComponentConfiguration,
     String componentId,

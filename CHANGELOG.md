@@ -1,3 +1,21 @@
+## Unreleased
+
+### New
+
+- Added `AdyenComponentController` for the v6 generic `AdyenComponent`. Merchants can now provide an
+  optional controller to query native readiness (`isReady`, `requiresUserInteraction`) and trigger
+  `submit()` for payment methods that do not require user input (e.g. iDEAL, PayPal).
+- v6 `AdyenComponent` now emits `componentReady` from the native side, collapsing to zero height for
+  no-input payment methods while preserving existing behavior when no controller is supplied.
+- Added iDEAL and PayPal demos to the v2 example screens (both session and advanced flows).
+
+### Improved
+
+- Android: direct v6 payment components are submitted via a shared controller registry, and return
+  intents are routed to the active component without dispatching to legacy action handlers.
+- iOS: direct v6 payment components register their submit handler with `ComponentPlatformApi` and
+  report `requiresUserInteraction` to Dart.
+
 ## 1.12.0
 
 ### Improved

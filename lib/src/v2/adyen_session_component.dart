@@ -27,6 +27,7 @@ class AdyenSessionComponent extends AdyenBaseComponent
     required super.onPaymentResult,
     required super.initialViewHeight,
     required super.isStoredPaymentMethod,
+    super.controller,
     super.gestureRecognizers,
     super.adyenLogger,
     super.onBinLookup,

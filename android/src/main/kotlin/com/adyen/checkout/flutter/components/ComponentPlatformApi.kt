@@ -8,6 +8,7 @@ import com.adyen.checkout.components.core.action.Action
 import com.adyen.checkout.flutter.components.action.ActionComponentManager
 import com.adyen.checkout.flutter.components.instant.InstantComponentManager
 import com.adyen.checkout.flutter.components.v2.AdyenComponentFactory
+import com.adyen.checkout.flutter.components.v2.V6ComponentControllerRegistry
 import com.adyen.checkout.flutter.components.view.ComponentLoadingBottomSheet
 import com.adyen.checkout.flutter.generated.ActionComponentConfigurationDTO
 import com.adyen.checkout.flutter.generated.AdyenFlutterInterface
@@ -55,6 +56,7 @@ class ComponentPlatformApi(
     private var currentComponent: ActionHandlingComponent? = null
 
     init {
+        setupIntentListener()
         flutterPluginBinding?.let { binding ->
             OnPlatformEventStreamHandler.register(binding.binaryMessenger, platformEventHandler)
             binding.platformViewRegistry.registerViewFactory(
@@ -138,7 +140,17 @@ class ComponentPlatformApi(
     ) = actionComponentManager.handleAction(actionComponentConfiguration, componentId, actionResponse)
 
     override fun onDispose(componentId: String) {
+        V6ComponentControllerRegistry.unregister(componentId)
+    }
+
+    override fun submitComponent(componentId: String) {
+        V6ComponentControllerRegistry.setActive(componentId)
+        V6ComponentControllerRegistry.getHandle(componentId)?.submit()
+    }
+
+    fun teardown() {
         activity.removeOnNewIntentListener(intentListener)
+        V6ComponentControllerRegistry.clear()
         currentComponent = null
     }
 
@@ -212,14 +224,17 @@ class ComponentPlatformApi(
     }
 
     private fun handleIntent(intent: Intent) {
-        if (intent.data != null &&
-            intent.data
-                ?.toString()
-                .orEmpty()
-                .startsWith(RedirectComponent.REDIRECT_RESULT_SCHEME)
-        ) {
-            currentComponent?.handleIntent(intent)
+        val data = intent.data?.toString().orEmpty()
+        if (!data.startsWith(RedirectComponent.REDIRECT_RESULT_SCHEME)) {
+            return
         }
+
+        V6ComponentControllerRegistry.getActiveHandle()?.let {
+            it.handleReturn(intent)
+            return
+        }
+
+        currentComponent?.handleIntent(intent)
     }
 
     private fun onUpdate(

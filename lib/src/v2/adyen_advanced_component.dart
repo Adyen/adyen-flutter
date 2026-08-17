@@ -28,6 +28,7 @@ class AdyenAdvancedComponent extends AdyenBaseComponent
     required this.advancedCheckout,
     required super.initialViewHeight,
     required super.isStoredPaymentMethod,
+    super.controller,
     super.gestureRecognizers,
     super.adyenLogger,
     super.onBinLookup,

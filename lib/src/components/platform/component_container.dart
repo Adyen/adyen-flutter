@@ -49,6 +49,12 @@ class ComponentContainer extends StatelessWidget {
   }
 
   double _determineHeight(int? height) {
-    return height == null ? initialViewPortHeight : height + bottomSpacing;
+    if (height == null) {
+      return initialViewPortHeight;
+    }
+    if (height == 0) {
+      return 0;
+    }
+    return height + bottomSpacing;
   }
 }

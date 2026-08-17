@@ -79,7 +79,8 @@ enum ComponentCommunicationType {
   binLookup,
   binValue,
   availability,
-  buttonPressed
+  buttonPressed,
+  componentReady,
 }
 
 enum PaymentEventType {
@@ -1118,6 +1119,8 @@ abstract class ComponentPlatformInterface {
   );
 
   void onDispose(String componentId);
+
+  void submitComponent(String componentId);
 }
 
 @FlutterApi()

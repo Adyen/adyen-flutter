@@ -197,6 +197,7 @@ enum ComponentCommunicationType: Int {
   case binValue = 6
   case availability = 7
   case buttonPressed = 8
+  case componentReady = 9
 }
 
 enum PaymentEventType: Int {
@@ -3385,6 +3386,7 @@ protocol ComponentPlatformInterface {
   func onInstantPaymentPressed(instantPaymentConfigurationDTO: InstantPaymentConfigurationDTO, encodedPaymentMethod: String, componentId: String) throws
   func handleAction(actionComponentConfiguration: ActionComponentConfigurationDTO, componentId: String, actionResponse: [String?: Any?]?) throws
   func onDispose(componentId: String) throws
+  func submitComponent(componentId: String) throws
 }
 
 /// Generated setup class from Pigeon to handle messages through the `binaryMessenger`.
@@ -3507,6 +3509,21 @@ class ComponentPlatformInterfaceSetup {
       }
     } else {
       onDisposeChannel.setMessageHandler(nil)
+    }
+    let submitComponentChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.ComponentPlatformInterface.submitComponent\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      submitComponentChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let componentIdArg = args[0] as! String
+        do {
+          try api.submitComponent(componentId: componentIdArg)
+          reply(wrapResult(nil))
+        } catch {
+          reply(wrapError(error))
+        }
+      }
+    } else {
+      submitComponentChannel.setMessageHandler(nil)
     }
   }
 }

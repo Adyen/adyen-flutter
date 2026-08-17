@@ -3,6 +3,7 @@ import 'package:adyen_checkout_example/repositories/adyen_drop_in_repository.dar
 import 'package:adyen_checkout_example/screens/v2/v2_blik_navigation_screen.dart';
 import 'package:adyen_checkout_example/screens/v2/v2_card_navigation_screen.dart';
 import 'package:adyen_checkout_example/screens/v2/v2_google_pay_navigation_screen.dart';
+import 'package:adyen_checkout_example/screens/v2/v2_instant_navigation_screen.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -47,6 +48,16 @@ class V2Screen extends StatelessWidget {
                   ),
                   child: const Text('Blik component'),
                 ),
+              TextButton(
+                onPressed: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) =>
+                        V2InstantNavigationScreen(repository: repository),
+                  ),
+                ),
+                child: const Text('Instant components'),
+              ),
               _buildGoogleOrApplePayComponent(context),
             ],
           ),

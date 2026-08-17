@@ -6,7 +6,9 @@ import 'package:collection/collection.dart';
 enum V2PaymentMethodType {
   card('scheme'),
   blik('blik'),
-  googlePay('googlepay');
+  googlePay('googlepay'),
+  ideal('ideal'),
+  payPal('paypal');
 
   const V2PaymentMethodType(this.txVariant);
 

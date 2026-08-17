@@ -11,6 +11,7 @@ import 'package:adyen_checkout/src/generated/platform_api.g.dart';
 import 'package:adyen_checkout/src/logging/adyen_logger.dart';
 import 'package:adyen_checkout/src/util/dto_mapper.dart';
 import 'package:adyen_checkout/src/util/sdk_version_number_provider.dart';
+import 'package:adyen_checkout/src/v2/adyen_component_controller.dart';
 import 'package:flutter/material.dart';
 
 /// The default width/height of a native `PKPaymentButton`, matching Apple's
@@ -22,6 +23,7 @@ abstract class BaseApplePayComponent extends StatefulWidget {
   final String applePayPaymentMethod;
   final CheckoutConfiguration configuration;
   final Function(PaymentResult) onPaymentResult;
+  final AdyenComponentController? controller;
   final Function()? onUnavailable;
   final Widget? unavailableWidget;
   final Widget? loadingIndicator;
@@ -39,6 +41,7 @@ abstract class BaseApplePayComponent extends StatefulWidget {
     required this.applePayPaymentMethod,
     required this.configuration,
     required this.onPaymentResult,
+    this.controller,
     this.onUnavailable,
     this.unavailableWidget,
     this.loadingIndicator,
@@ -96,6 +99,7 @@ class _BaseApplePayComponentState extends State<BaseApplePayComponent> {
   late StreamSubscription<ComponentCommunicationModel>
       _componentCommunicationStream;
   late final Future<InstantPaymentSetupResultDTO> _applePaySupportedFuture;
+  bool _controllerAttached = false;
 
   @override
   void initState() {
@@ -129,6 +133,7 @@ class _BaseApplePayComponentState extends State<BaseApplePayComponent> {
       ) {
         if (snapshot.connectionState == ConnectionState.done) {
           if (_isApplePaySupportedOnDevice(snapshot)) {
+            _attachControllerIfNeeded();
             return _buildApplePayOrLoadingContainer(snapshot);
           } else {
             widget.adyenLogger
@@ -150,6 +155,10 @@ class _BaseApplePayComponentState extends State<BaseApplePayComponent> {
     widget.isLoading.dispose();
     widget.componentPlatformApi.onDispose(widget.componentId);
     _componentCommunicationStream.cancel();
+    if (widget.controller != null && _controllerAttached) {
+      detachAdyenComponentController(widget.controller!);
+      _controllerAttached = false;
+    }
     _componentFlutterApi.dispose();
     super.dispose();
   }
@@ -158,6 +167,15 @@ class _BaseApplePayComponentState extends State<BaseApplePayComponent> {
       AsyncSnapshot<InstantPaymentSetupResultDTO> snapshot) {
     return snapshot.data?.instantPaymentType == InstantPaymentType.applePay &&
         snapshot.data?.isSupported == true;
+  }
+
+  void _attachControllerIfNeeded() {
+    final controller = widget.controller;
+    if (controller != null && !_controllerAttached) {
+      _controllerAttached = true;
+      attachAdyenComponentController(controller, () async => onPressed());
+      markAdyenComponentControllerReady(controller, true);
+    }
   }
 
   Widget _buildApplePayOrLoadingContainer(

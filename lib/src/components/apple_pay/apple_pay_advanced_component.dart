@@ -17,6 +17,7 @@ class ApplePayAdvancedComponent extends BaseApplePayComponent {
 
   ApplePayAdvancedComponent({
     super.key,
+    super.controller,
     required super.applePayPaymentMethod,
     required super.configuration,
     required super.onPaymentResult,

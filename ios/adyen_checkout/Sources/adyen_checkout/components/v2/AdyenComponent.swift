@@ -54,6 +54,10 @@ class AdyenComponent: NSObject, FlutterPlatformView {
         componentWrapperView
     }
 
+    func dispose() {
+        V6ComponentControllerRegistry.shared.unregister(componentId: componentId)
+    }
+
     private func setupComponentView() {
         do {
             guard let checkout = checkoutHolder.adyenCheckout else {
@@ -70,7 +74,19 @@ class AdyenComponent: NSObject, FlutterPlatformView {
             let paymentComponent = try createPaymentComponent(checkout: checkout)
 
             self.paymentComponent = paymentComponent
-            self.showComponent(paymentComponent: paymentComponent)
+            V6ComponentControllerRegistry.shared.register(componentId: componentId) { [weak self] in
+                self?.paymentComponent
+            }
+
+            let requiresUserInteraction = paymentComponent.requiresUserInteraction
+            sendComponentReady(requiresUserInteraction: requiresUserInteraction)
+
+            if requiresUserInteraction {
+                showComponent(paymentComponent: paymentComponent)
+            } else {
+                componentWrapperView.resizeViewportCallback = sendHeightUpdate
+                sendHeightUpdate(viewHeight: 0)
+            }
         } catch {
             sendErrorToFlutterLayer(errorMessage: error.localizedDescription)
         }
@@ -124,13 +140,25 @@ class AdyenComponent: NSObject, FlutterPlatformView {
         sendHeightUpdate()
     }
 
+    private func sendComponentReady(requiresUserInteraction: Bool) {
+        let componentCommunicationModel = ComponentCommunicationModel(
+            type: ComponentCommunicationType.componentReady,
+            componentId: componentId,
+            data: requiresUserInteraction
+        )
+        componentPlatformEventHandler.send(event: componentCommunicationModel)
+    }
+
     private func sendHeightUpdate() {
         guard let viewHeight = paymentComponent?.viewController?.preferredContentSize.height else { return }
-        let roundedViewHeight = Int(viewHeight)
+        sendHeightUpdate(viewHeight: Int(viewHeight))
+    }
+
+    private func sendHeightUpdate(viewHeight: Int) {
         let componentCommunicationModel = ComponentCommunicationModel(
             type: ComponentCommunicationType.resize,
             componentId: componentId,
-            data: roundedViewHeight
+            data: viewHeight
         )
         componentPlatformEventHandler.send(event: componentCommunicationModel)
     }

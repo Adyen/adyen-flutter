@@ -20,7 +20,14 @@ class V2AdvancedComponentScreen extends StatefulWidget {
 }
 
 class _V2AdvancedComponentScreenState extends State<V2AdvancedComponentScreen> {
+  final AdyenComponentController _controller = AdyenComponentController();
   bool _isUnavailable = false;
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -65,12 +72,32 @@ class _V2AdvancedComponentScreenState extends State<V2AdvancedComponentScreen> {
 
             return SingleChildScrollView(
               padding: const EdgeInsets.all(16),
-              child: AdyenComponent(
-                configuration: checkoutConfiguration,
-                paymentMethod: paymentMethod,
-                checkout: snapshot.data!,
-                onPaymentResult: (paymentResult) async =>
-                    _endPayment(context, paymentResult),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  AdyenComponent(
+                    controller: _controller,
+                    configuration: checkoutConfiguration,
+                    paymentMethod: paymentMethod,
+                    checkout: snapshot.data!,
+                    onPaymentResult: (paymentResult) async =>
+                        _endPayment(context, paymentResult),
+                  ),
+                  ListenableBuilder(
+                    listenable: _controller,
+                    builder: (context, child) {
+                      if (_controller.isReady &&
+                          _controller.requiresUserInteraction == false) {
+                        return ElevatedButton(
+                          onPressed: _controller.submit,
+                          child: Text(
+                              'Pay with ${widget.paymentMethodType.txVariant}'),
+                        );
+                      }
+                      return child ?? const SizedBox.shrink();
+                    },
+                  ),
+                ],
               ),
             );
           },

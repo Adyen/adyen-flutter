@@ -15,7 +15,8 @@ PlatformException _createConnectionError(String channelName) {
   );
 }
 
-List<Object?> wrapResponse({Object? result, PlatformException? error, bool empty = false}) {
+List<Object?> wrapResponse(
+    {Object? result, PlatformException? error, bool empty = false}) {
   if (empty) {
     return <Object?>[];
   }
@@ -24,20 +25,21 @@ List<Object?> wrapResponse({Object? result, PlatformException? error, bool empty
   }
   return <Object?>[error.code, error.message, error.details];
 }
+
 bool _deepEquals(Object? a, Object? b) {
   if (a is List && b is List) {
     return a.length == b.length &&
         a.indexed
-        .every(((int, dynamic) item) => _deepEquals(item.$2, b[item.$1]));
+            .every(((int, dynamic) item) => _deepEquals(item.$2, b[item.$1]));
   }
   if (a is Map && b is Map) {
-    return a.length == b.length && a.entries.every((MapEntry<Object?, Object?> entry) =>
-        (b as Map<Object?, Object?>).containsKey(entry.key) &&
-        _deepEquals(entry.value, b[entry.key]));
+    return a.length == b.length &&
+        a.entries.every((MapEntry<Object?, Object?> entry) =>
+            (b as Map<Object?, Object?>).containsKey(entry.key) &&
+            _deepEquals(entry.value, b[entry.key]));
   }
   return a == b;
 }
-
 
 enum Environment {
   test,
@@ -104,6 +106,7 @@ enum ComponentCommunicationType {
   binValue,
   availability,
   buttonPressed,
+  componentReady,
 }
 
 enum PaymentEventType {
@@ -191,7 +194,8 @@ class SessionResponseDTO {
   }
 
   Object encode() {
-    return _toList();  }
+    return _toList();
+  }
 
   static SessionResponseDTO decode(Object result) {
     result as List<Object?>;
@@ -215,8 +219,7 @@ class SessionResponseDTO {
 
   @override
   // ignore: avoid_equals_and_hash_code_on_mutable_classes
-  int get hashCode => Object.hashAll(_toList())
-;
+  int get hashCode => Object.hashAll(_toList());
 }
 
 class SessionDTO {
@@ -237,7 +240,8 @@ class SessionDTO {
   }
 
   Object encode() {
-    return _toList();  }
+    return _toList();
+  }
 
   static SessionDTO decode(Object result) {
     result as List<Object?>;
@@ -261,8 +265,7 @@ class SessionDTO {
 
   @override
   // ignore: avoid_equals_and_hash_code_on_mutable_classes
-  int get hashCode => Object.hashAll(_toList())
-;
+  int get hashCode => Object.hashAll(_toList());
 }
 
 class AmountDTO {
@@ -283,7 +286,8 @@ class AmountDTO {
   }
 
   Object encode() {
-    return _toList();  }
+    return _toList();
+  }
 
   static AmountDTO decode(Object result) {
     result as List<Object?>;
@@ -307,8 +311,7 @@ class AmountDTO {
 
   @override
   // ignore: avoid_equals_and_hash_code_on_mutable_classes
-  int get hashCode => Object.hashAll(_toList())
-;
+  int get hashCode => Object.hashAll(_toList());
 }
 
 class AnalyticsOptionsDTO {
@@ -329,7 +332,8 @@ class AnalyticsOptionsDTO {
   }
 
   Object encode() {
-    return _toList();  }
+    return _toList();
+  }
 
   static AnalyticsOptionsDTO decode(Object result) {
     result as List<Object?>;
@@ -353,8 +357,7 @@ class AnalyticsOptionsDTO {
 
   @override
   // ignore: avoid_equals_and_hash_code_on_mutable_classes
-  int get hashCode => Object.hashAll(_toList())
-;
+  int get hashCode => Object.hashAll(_toList());
 }
 
 class ThreeDS2UICustomizationDTO {
@@ -395,7 +398,8 @@ class ThreeDS2UICustomizationDTO {
   }
 
   Object encode() {
-    return _toList();  }
+    return _toList();
+  }
 
   static ThreeDS2UICustomizationDTO decode(Object result) {
     result as List<Object?>;
@@ -404,16 +408,19 @@ class ThreeDS2UICustomizationDTO {
       headingCustomization: result[1] as ThreeDS2ToolbarCustomizationDTO?,
       labelCustomization: result[2] as ThreeDS2LabelCustomizationDTO?,
       inputCustomization: result[3] as ThreeDS2InputCustomizationDTO?,
-      selectionItemCustomization: result[4] as ThreeDS2SelectionItemCustomizationDTO?,
+      selectionItemCustomization:
+          result[4] as ThreeDS2SelectionItemCustomizationDTO?,
       primaryButtonCustomization: result[5] as ThreeDS2ButtonCustomizationDTO?,
-      secondaryButtonCustomization: result[6] as ThreeDS2ButtonCustomizationDTO?,
+      secondaryButtonCustomization:
+          result[6] as ThreeDS2ButtonCustomizationDTO?,
     );
   }
 
   @override
   // ignore: avoid_equals_and_hash_code_on_mutable_classes
   bool operator ==(Object other) {
-    if (other is! ThreeDS2UICustomizationDTO || other.runtimeType != runtimeType) {
+    if (other is! ThreeDS2UICustomizationDTO ||
+        other.runtimeType != runtimeType) {
       return false;
     }
     if (identical(this, other)) {
@@ -424,8 +431,7 @@ class ThreeDS2UICustomizationDTO {
 
   @override
   // ignore: avoid_equals_and_hash_code_on_mutable_classes
-  int get hashCode => Object.hashAll(_toList())
-;
+  int get hashCode => Object.hashAll(_toList());
 }
 
 class ThreeDS2ScreenCustomizationDTO {
@@ -446,7 +452,8 @@ class ThreeDS2ScreenCustomizationDTO {
   }
 
   Object encode() {
-    return _toList();  }
+    return _toList();
+  }
 
   static ThreeDS2ScreenCustomizationDTO decode(Object result) {
     result as List<Object?>;
@@ -459,7 +466,8 @@ class ThreeDS2ScreenCustomizationDTO {
   @override
   // ignore: avoid_equals_and_hash_code_on_mutable_classes
   bool operator ==(Object other) {
-    if (other is! ThreeDS2ScreenCustomizationDTO || other.runtimeType != runtimeType) {
+    if (other is! ThreeDS2ScreenCustomizationDTO ||
+        other.runtimeType != runtimeType) {
       return false;
     }
     if (identical(this, other)) {
@@ -470,8 +478,7 @@ class ThreeDS2ScreenCustomizationDTO {
 
   @override
   // ignore: avoid_equals_and_hash_code_on_mutable_classes
-  int get hashCode => Object.hashAll(_toList())
-;
+  int get hashCode => Object.hashAll(_toList());
 }
 
 class ThreeDS2ButtonCustomizationDTO {
@@ -500,7 +507,8 @@ class ThreeDS2ButtonCustomizationDTO {
   }
 
   Object encode() {
-    return _toList();  }
+    return _toList();
+  }
 
   static ThreeDS2ButtonCustomizationDTO decode(Object result) {
     result as List<Object?>;
@@ -515,7 +523,8 @@ class ThreeDS2ButtonCustomizationDTO {
   @override
   // ignore: avoid_equals_and_hash_code_on_mutable_classes
   bool operator ==(Object other) {
-    if (other is! ThreeDS2ButtonCustomizationDTO || other.runtimeType != runtimeType) {
+    if (other is! ThreeDS2ButtonCustomizationDTO ||
+        other.runtimeType != runtimeType) {
       return false;
     }
     if (identical(this, other)) {
@@ -526,8 +535,7 @@ class ThreeDS2ButtonCustomizationDTO {
 
   @override
   // ignore: avoid_equals_and_hash_code_on_mutable_classes
-  int get hashCode => Object.hashAll(_toList())
-;
+  int get hashCode => Object.hashAll(_toList());
 }
 
 class ThreeDS2SelectionItemCustomizationDTO {
@@ -552,7 +560,8 @@ class ThreeDS2SelectionItemCustomizationDTO {
   }
 
   Object encode() {
-    return _toList();  }
+    return _toList();
+  }
 
   static ThreeDS2SelectionItemCustomizationDTO decode(Object result) {
     result as List<Object?>;
@@ -566,7 +575,8 @@ class ThreeDS2SelectionItemCustomizationDTO {
   @override
   // ignore: avoid_equals_and_hash_code_on_mutable_classes
   bool operator ==(Object other) {
-    if (other is! ThreeDS2SelectionItemCustomizationDTO || other.runtimeType != runtimeType) {
+    if (other is! ThreeDS2SelectionItemCustomizationDTO ||
+        other.runtimeType != runtimeType) {
       return false;
     }
     if (identical(this, other)) {
@@ -577,8 +587,7 @@ class ThreeDS2SelectionItemCustomizationDTO {
 
   @override
   // ignore: avoid_equals_and_hash_code_on_mutable_classes
-  int get hashCode => Object.hashAll(_toList())
-;
+  int get hashCode => Object.hashAll(_toList());
 }
 
 class ThreeDS2LabelCustomizationDTO {
@@ -615,7 +624,8 @@ class ThreeDS2LabelCustomizationDTO {
   }
 
   Object encode() {
-    return _toList();  }
+    return _toList();
+  }
 
   static ThreeDS2LabelCustomizationDTO decode(Object result) {
     result as List<Object?>;
@@ -632,7 +642,8 @@ class ThreeDS2LabelCustomizationDTO {
   @override
   // ignore: avoid_equals_and_hash_code_on_mutable_classes
   bool operator ==(Object other) {
-    if (other is! ThreeDS2LabelCustomizationDTO || other.runtimeType != runtimeType) {
+    if (other is! ThreeDS2LabelCustomizationDTO ||
+        other.runtimeType != runtimeType) {
       return false;
     }
     if (identical(this, other)) {
@@ -643,8 +654,7 @@ class ThreeDS2LabelCustomizationDTO {
 
   @override
   // ignore: avoid_equals_and_hash_code_on_mutable_classes
-  int get hashCode => Object.hashAll(_toList())
-;
+  int get hashCode => Object.hashAll(_toList());
 }
 
 class ThreeDS2InputCustomizationDTO {
@@ -673,7 +683,8 @@ class ThreeDS2InputCustomizationDTO {
   }
 
   Object encode() {
-    return _toList();  }
+    return _toList();
+  }
 
   static ThreeDS2InputCustomizationDTO decode(Object result) {
     result as List<Object?>;
@@ -688,7 +699,8 @@ class ThreeDS2InputCustomizationDTO {
   @override
   // ignore: avoid_equals_and_hash_code_on_mutable_classes
   bool operator ==(Object other) {
-    if (other is! ThreeDS2InputCustomizationDTO || other.runtimeType != runtimeType) {
+    if (other is! ThreeDS2InputCustomizationDTO ||
+        other.runtimeType != runtimeType) {
       return false;
     }
     if (identical(this, other)) {
@@ -699,8 +711,7 @@ class ThreeDS2InputCustomizationDTO {
 
   @override
   // ignore: avoid_equals_and_hash_code_on_mutable_classes
-  int get hashCode => Object.hashAll(_toList())
-;
+  int get hashCode => Object.hashAll(_toList());
 }
 
 class ThreeDS2ToolbarCustomizationDTO {
@@ -729,7 +740,8 @@ class ThreeDS2ToolbarCustomizationDTO {
   }
 
   Object encode() {
-    return _toList();  }
+    return _toList();
+  }
 
   static ThreeDS2ToolbarCustomizationDTO decode(Object result) {
     result as List<Object?>;
@@ -744,7 +756,8 @@ class ThreeDS2ToolbarCustomizationDTO {
   @override
   // ignore: avoid_equals_and_hash_code_on_mutable_classes
   bool operator ==(Object other) {
-    if (other is! ThreeDS2ToolbarCustomizationDTO || other.runtimeType != runtimeType) {
+    if (other is! ThreeDS2ToolbarCustomizationDTO ||
+        other.runtimeType != runtimeType) {
       return false;
     }
     if (identical(this, other)) {
@@ -755,8 +768,7 @@ class ThreeDS2ToolbarCustomizationDTO {
 
   @override
   // ignore: avoid_equals_and_hash_code_on_mutable_classes
-  int get hashCode => Object.hashAll(_toList())
-;
+  int get hashCode => Object.hashAll(_toList());
 }
 
 class ThreeDS2ConfigurationDTO {
@@ -777,7 +789,8 @@ class ThreeDS2ConfigurationDTO {
   }
 
   Object encode() {
-    return _toList();  }
+    return _toList();
+  }
 
   static ThreeDS2ConfigurationDTO decode(Object result) {
     result as List<Object?>;
@@ -790,7 +803,8 @@ class ThreeDS2ConfigurationDTO {
   @override
   // ignore: avoid_equals_and_hash_code_on_mutable_classes
   bool operator ==(Object other) {
-    if (other is! ThreeDS2ConfigurationDTO || other.runtimeType != runtimeType) {
+    if (other is! ThreeDS2ConfigurationDTO ||
+        other.runtimeType != runtimeType) {
       return false;
     }
     if (identical(this, other)) {
@@ -801,8 +815,7 @@ class ThreeDS2ConfigurationDTO {
 
   @override
   // ignore: avoid_equals_and_hash_code_on_mutable_classes
-  int get hashCode => Object.hashAll(_toList())
-;
+  int get hashCode => Object.hashAll(_toList());
 }
 
 class DefaultInstallmentOptionsDTO {
@@ -823,7 +836,8 @@ class DefaultInstallmentOptionsDTO {
   }
 
   Object encode() {
-    return _toList();  }
+    return _toList();
+  }
 
   static DefaultInstallmentOptionsDTO decode(Object result) {
     result as List<Object?>;
@@ -836,7 +850,8 @@ class DefaultInstallmentOptionsDTO {
   @override
   // ignore: avoid_equals_and_hash_code_on_mutable_classes
   bool operator ==(Object other) {
-    if (other is! DefaultInstallmentOptionsDTO || other.runtimeType != runtimeType) {
+    if (other is! DefaultInstallmentOptionsDTO ||
+        other.runtimeType != runtimeType) {
       return false;
     }
     if (identical(this, other)) {
@@ -847,8 +862,7 @@ class DefaultInstallmentOptionsDTO {
 
   @override
   // ignore: avoid_equals_and_hash_code_on_mutable_classes
-  int get hashCode => Object.hashAll(_toList())
-;
+  int get hashCode => Object.hashAll(_toList());
 }
 
 class CardBasedInstallmentOptionsDTO {
@@ -873,7 +887,8 @@ class CardBasedInstallmentOptionsDTO {
   }
 
   Object encode() {
-    return _toList();  }
+    return _toList();
+  }
 
   static CardBasedInstallmentOptionsDTO decode(Object result) {
     result as List<Object?>;
@@ -887,7 +902,8 @@ class CardBasedInstallmentOptionsDTO {
   @override
   // ignore: avoid_equals_and_hash_code_on_mutable_classes
   bool operator ==(Object other) {
-    if (other is! CardBasedInstallmentOptionsDTO || other.runtimeType != runtimeType) {
+    if (other is! CardBasedInstallmentOptionsDTO ||
+        other.runtimeType != runtimeType) {
       return false;
     }
     if (identical(this, other)) {
@@ -898,8 +914,7 @@ class CardBasedInstallmentOptionsDTO {
 
   @override
   // ignore: avoid_equals_and_hash_code_on_mutable_classes
-  int get hashCode => Object.hashAll(_toList())
-;
+  int get hashCode => Object.hashAll(_toList());
 }
 
 class InstallmentConfigurationDTO {
@@ -924,13 +939,15 @@ class InstallmentConfigurationDTO {
   }
 
   Object encode() {
-    return _toList();  }
+    return _toList();
+  }
 
   static InstallmentConfigurationDTO decode(Object result) {
     result as List<Object?>;
     return InstallmentConfigurationDTO(
       defaultOptions: result[0] as DefaultInstallmentOptionsDTO?,
-      cardBasedOptions: (result[1] as List<Object?>?)?.cast<CardBasedInstallmentOptionsDTO?>(),
+      cardBasedOptions: (result[1] as List<Object?>?)
+          ?.cast<CardBasedInstallmentOptionsDTO?>(),
       showInstallmentAmount: result[2]! as bool,
     );
   }
@@ -938,7 +955,8 @@ class InstallmentConfigurationDTO {
   @override
   // ignore: avoid_equals_and_hash_code_on_mutable_classes
   bool operator ==(Object other) {
-    if (other is! InstallmentConfigurationDTO || other.runtimeType != runtimeType) {
+    if (other is! InstallmentConfigurationDTO ||
+        other.runtimeType != runtimeType) {
       return false;
     }
     if (identical(this, other)) {
@@ -949,8 +967,7 @@ class InstallmentConfigurationDTO {
 
   @override
   // ignore: avoid_equals_and_hash_code_on_mutable_classes
-  int get hashCode => Object.hashAll(_toList())
-;
+  int get hashCode => Object.hashAll(_toList());
 }
 
 class CheckoutConfigurationDTO {
@@ -1015,7 +1032,8 @@ class CheckoutConfigurationDTO {
   }
 
   Object encode() {
-    return _toList();  }
+    return _toList();
+  }
 
   static CheckoutConfigurationDTO decode(Object result) {
     result as List<Object?>;
@@ -1039,7 +1057,8 @@ class CheckoutConfigurationDTO {
   @override
   // ignore: avoid_equals_and_hash_code_on_mutable_classes
   bool operator ==(Object other) {
-    if (other is! CheckoutConfigurationDTO || other.runtimeType != runtimeType) {
+    if (other is! CheckoutConfigurationDTO ||
+        other.runtimeType != runtimeType) {
       return false;
     }
     if (identical(this, other)) {
@@ -1050,8 +1069,7 @@ class CheckoutConfigurationDTO {
 
   @override
   // ignore: avoid_equals_and_hash_code_on_mutable_classes
-  int get hashCode => Object.hashAll(_toList())
-;
+  int get hashCode => Object.hashAll(_toList());
 }
 
 class DropInConfigurationDTO {
@@ -1140,7 +1158,8 @@ class DropInConfigurationDTO {
   }
 
   Object encode() {
-    return _toList();  }
+    return _toList();
+  }
 
   static DropInConfigurationDTO decode(Object result) {
     result as List<Object?>;
@@ -1161,7 +1180,8 @@ class DropInConfigurationDTO {
       skipListWhenSinglePaymentMethod: result[13]! as bool,
       isRemoveStoredPaymentMethodEnabled: result[14]! as bool,
       preselectedPaymentMethodTitle: result[15] as String?,
-      paymentMethodNames: (result[16] as Map<Object?, Object?>?)?.cast<String?, String?>(),
+      paymentMethodNames:
+          (result[16] as Map<Object?, Object?>?)?.cast<String?, String?>(),
       isPartialPaymentSupported: result[17]! as bool,
       showStoredPaymentMethods: result[18]! as bool,
     );
@@ -1181,8 +1201,7 @@ class DropInConfigurationDTO {
 
   @override
   // ignore: avoid_equals_and_hash_code_on_mutable_classes
-  int get hashCode => Object.hashAll(_toList())
-;
+  int get hashCode => Object.hashAll(_toList());
 }
 
 class CardConfigurationDTO {
@@ -1231,7 +1250,8 @@ class CardConfigurationDTO {
   }
 
   Object encode() {
-    return _toList();  }
+    return _toList();
+  }
 
   static CardConfigurationDTO decode(Object result) {
     result as List<Object?>;
@@ -1262,8 +1282,7 @@ class CardConfigurationDTO {
 
   @override
   // ignore: avoid_equals_and_hash_code_on_mutable_classes
-  int get hashCode => Object.hashAll(_toList())
-;
+  int get hashCode => Object.hashAll(_toList());
 }
 
 class ApplePayConfigurationDTO {
@@ -1356,7 +1375,8 @@ class ApplePayConfigurationDTO {
   }
 
   Object encode() {
-    return _toList();  }
+    return _toList();
+  }
 
   static ApplePayConfigurationDTO decode(Object result) {
     result as List<Object?>;
@@ -1364,14 +1384,18 @@ class ApplePayConfigurationDTO {
       merchantId: result[0]! as String,
       merchantName: result[1]! as String,
       allowOnboarding: result[2] as bool?,
-      summaryItems: (result[3] as List<Object?>?)?.cast<ApplePaySummaryItemDTO?>(),
-      requiredBillingContactFields: (result[4] as List<Object?>?)?.cast<String?>(),
+      summaryItems:
+          (result[3] as List<Object?>?)?.cast<ApplePaySummaryItemDTO?>(),
+      requiredBillingContactFields:
+          (result[4] as List<Object?>?)?.cast<String?>(),
       billingContact: result[5] as ApplePayContactDTO?,
-      requiredShippingContactFields: (result[6] as List<Object?>?)?.cast<String?>(),
+      requiredShippingContactFields:
+          (result[6] as List<Object?>?)?.cast<String?>(),
       shippingContact: result[7] as ApplePayContactDTO?,
       applePayShippingType: result[8] as ApplePayShippingType?,
       allowShippingContactEditing: result[9] as bool?,
-      shippingMethods: (result[10] as List<Object?>?)?.cast<ApplePayShippingMethodDTO?>(),
+      shippingMethods:
+          (result[10] as List<Object?>?)?.cast<ApplePayShippingMethodDTO?>(),
       applicationData: result[11] as String?,
       supportedCountries: (result[12] as List<Object?>?)?.cast<String?>(),
       merchantCapability: result[13] as ApplePayMerchantCapability?,
@@ -1387,7 +1411,8 @@ class ApplePayConfigurationDTO {
   @override
   // ignore: avoid_equals_and_hash_code_on_mutable_classes
   bool operator ==(Object other) {
-    if (other is! ApplePayConfigurationDTO || other.runtimeType != runtimeType) {
+    if (other is! ApplePayConfigurationDTO ||
+        other.runtimeType != runtimeType) {
       return false;
     }
     if (identical(this, other)) {
@@ -1398,8 +1423,7 @@ class ApplePayConfigurationDTO {
 
   @override
   // ignore: avoid_equals_and_hash_code_on_mutable_classes
-  int get hashCode => Object.hashAll(_toList())
-;
+  int get hashCode => Object.hashAll(_toList());
 }
 
 class ApplePayAuthorizedPaymentDTO {
@@ -1432,7 +1456,8 @@ class ApplePayAuthorizedPaymentDTO {
   }
 
   Object encode() {
-    return _toList();  }
+    return _toList();
+  }
 
   static ApplePayAuthorizedPaymentDTO decode(Object result) {
     result as List<Object?>;
@@ -1448,7 +1473,8 @@ class ApplePayAuthorizedPaymentDTO {
   @override
   // ignore: avoid_equals_and_hash_code_on_mutable_classes
   bool operator ==(Object other) {
-    if (other is! ApplePayAuthorizedPaymentDTO || other.runtimeType != runtimeType) {
+    if (other is! ApplePayAuthorizedPaymentDTO ||
+        other.runtimeType != runtimeType) {
       return false;
     }
     if (identical(this, other)) {
@@ -1459,8 +1485,7 @@ class ApplePayAuthorizedPaymentDTO {
 
   @override
   // ignore: avoid_equals_and_hash_code_on_mutable_classes
-  int get hashCode => Object.hashAll(_toList())
-;
+  int get hashCode => Object.hashAll(_toList());
 }
 
 class ApplePayPaymentErrorDTO {
@@ -1485,7 +1510,8 @@ class ApplePayPaymentErrorDTO {
   }
 
   Object encode() {
-    return _toList();  }
+    return _toList();
+  }
 
   static ApplePayPaymentErrorDTO decode(Object result) {
     result as List<Object?>;
@@ -1510,8 +1536,7 @@ class ApplePayPaymentErrorDTO {
 
   @override
   // ignore: avoid_equals_and_hash_code_on_mutable_classes
-  int get hashCode => Object.hashAll(_toList())
-;
+  int get hashCode => Object.hashAll(_toList());
 }
 
 class ApplePayAuthorizationResultDTO {
@@ -1532,7 +1557,8 @@ class ApplePayAuthorizationResultDTO {
   }
 
   Object encode() {
-    return _toList();  }
+    return _toList();
+  }
 
   static ApplePayAuthorizationResultDTO decode(Object result) {
     result as List<Object?>;
@@ -1545,7 +1571,8 @@ class ApplePayAuthorizationResultDTO {
   @override
   // ignore: avoid_equals_and_hash_code_on_mutable_classes
   bool operator ==(Object other) {
-    if (other is! ApplePayAuthorizationResultDTO || other.runtimeType != runtimeType) {
+    if (other is! ApplePayAuthorizationResultDTO ||
+        other.runtimeType != runtimeType) {
       return false;
     }
     if (identical(this, other)) {
@@ -1556,8 +1583,7 @@ class ApplePayAuthorizationResultDTO {
 
   @override
   // ignore: avoid_equals_and_hash_code_on_mutable_classes
-  int get hashCode => Object.hashAll(_toList())
-;
+  int get hashCode => Object.hashAll(_toList());
 }
 
 class ApplePayCouponCodeUpdateDTO {
@@ -1582,13 +1608,16 @@ class ApplePayCouponCodeUpdateDTO {
   }
 
   Object encode() {
-    return _toList();  }
+    return _toList();
+  }
 
   static ApplePayCouponCodeUpdateDTO decode(Object result) {
     result as List<Object?>;
     return ApplePayCouponCodeUpdateDTO(
-      summaryItems: (result[0] as List<Object?>?)!.cast<ApplePaySummaryItemDTO?>(),
-      shippingMethods: (result[1] as List<Object?>?)?.cast<ApplePayShippingMethodDTO?>(),
+      summaryItems:
+          (result[0] as List<Object?>?)!.cast<ApplePaySummaryItemDTO?>(),
+      shippingMethods:
+          (result[1] as List<Object?>?)?.cast<ApplePayShippingMethodDTO?>(),
       errors: (result[2] as List<Object?>?)?.cast<ApplePayPaymentErrorDTO?>(),
     );
   }
@@ -1596,7 +1625,8 @@ class ApplePayCouponCodeUpdateDTO {
   @override
   // ignore: avoid_equals_and_hash_code_on_mutable_classes
   bool operator ==(Object other) {
-    if (other is! ApplePayCouponCodeUpdateDTO || other.runtimeType != runtimeType) {
+    if (other is! ApplePayCouponCodeUpdateDTO ||
+        other.runtimeType != runtimeType) {
       return false;
     }
     if (identical(this, other)) {
@@ -1607,8 +1637,7 @@ class ApplePayCouponCodeUpdateDTO {
 
   @override
   // ignore: avoid_equals_and_hash_code_on_mutable_classes
-  int get hashCode => Object.hashAll(_toList())
-;
+  int get hashCode => Object.hashAll(_toList());
 }
 
 class ApplePayShippingContactUpdateDTO {
@@ -1633,13 +1662,16 @@ class ApplePayShippingContactUpdateDTO {
   }
 
   Object encode() {
-    return _toList();  }
+    return _toList();
+  }
 
   static ApplePayShippingContactUpdateDTO decode(Object result) {
     result as List<Object?>;
     return ApplePayShippingContactUpdateDTO(
-      summaryItems: (result[0] as List<Object?>?)!.cast<ApplePaySummaryItemDTO?>(),
-      shippingMethods: (result[1] as List<Object?>?)?.cast<ApplePayShippingMethodDTO?>(),
+      summaryItems:
+          (result[0] as List<Object?>?)!.cast<ApplePaySummaryItemDTO?>(),
+      shippingMethods:
+          (result[1] as List<Object?>?)?.cast<ApplePayShippingMethodDTO?>(),
       errors: (result[2] as List<Object?>?)?.cast<ApplePayPaymentErrorDTO?>(),
     );
   }
@@ -1647,7 +1679,8 @@ class ApplePayShippingContactUpdateDTO {
   @override
   // ignore: avoid_equals_and_hash_code_on_mutable_classes
   bool operator ==(Object other) {
-    if (other is! ApplePayShippingContactUpdateDTO || other.runtimeType != runtimeType) {
+    if (other is! ApplePayShippingContactUpdateDTO ||
+        other.runtimeType != runtimeType) {
       return false;
     }
     if (identical(this, other)) {
@@ -1658,8 +1691,7 @@ class ApplePayShippingContactUpdateDTO {
 
   @override
   // ignore: avoid_equals_and_hash_code_on_mutable_classes
-  int get hashCode => Object.hashAll(_toList())
-;
+  int get hashCode => Object.hashAll(_toList());
 }
 
 class ApplePayShippingMethodUpdateDTO {
@@ -1676,19 +1708,22 @@ class ApplePayShippingMethodUpdateDTO {
   }
 
   Object encode() {
-    return _toList();  }
+    return _toList();
+  }
 
   static ApplePayShippingMethodUpdateDTO decode(Object result) {
     result as List<Object?>;
     return ApplePayShippingMethodUpdateDTO(
-      summaryItems: (result[0] as List<Object?>?)!.cast<ApplePaySummaryItemDTO?>(),
+      summaryItems:
+          (result[0] as List<Object?>?)!.cast<ApplePaySummaryItemDTO?>(),
     );
   }
 
   @override
   // ignore: avoid_equals_and_hash_code_on_mutable_classes
   bool operator ==(Object other) {
-    if (other is! ApplePayShippingMethodUpdateDTO || other.runtimeType != runtimeType) {
+    if (other is! ApplePayShippingMethodUpdateDTO ||
+        other.runtimeType != runtimeType) {
       return false;
     }
     if (identical(this, other)) {
@@ -1699,8 +1734,7 @@ class ApplePayShippingMethodUpdateDTO {
 
   @override
   // ignore: avoid_equals_and_hash_code_on_mutable_classes
-  int get hashCode => Object.hashAll(_toList())
-;
+  int get hashCode => Object.hashAll(_toList());
 }
 
 class ApplePayContactDTO {
@@ -1769,7 +1803,8 @@ class ApplePayContactDTO {
   }
 
   Object encode() {
-    return _toList();  }
+    return _toList();
+  }
 
   static ApplePayContactDTO decode(Object result) {
     result as List<Object?>;
@@ -1805,8 +1840,7 @@ class ApplePayContactDTO {
 
   @override
   // ignore: avoid_equals_and_hash_code_on_mutable_classes
-  int get hashCode => Object.hashAll(_toList())
-;
+  int get hashCode => Object.hashAll(_toList());
 }
 
 class ApplePayShippingMethodDTO {
@@ -1843,7 +1877,8 @@ class ApplePayShippingMethodDTO {
   }
 
   Object encode() {
-    return _toList();  }
+    return _toList();
+  }
 
   static ApplePayShippingMethodDTO decode(Object result) {
     result as List<Object?>;
@@ -1860,7 +1895,8 @@ class ApplePayShippingMethodDTO {
   @override
   // ignore: avoid_equals_and_hash_code_on_mutable_classes
   bool operator ==(Object other) {
-    if (other is! ApplePayShippingMethodDTO || other.runtimeType != runtimeType) {
+    if (other is! ApplePayShippingMethodDTO ||
+        other.runtimeType != runtimeType) {
       return false;
     }
     if (identical(this, other)) {
@@ -1871,8 +1907,7 @@ class ApplePayShippingMethodDTO {
 
   @override
   // ignore: avoid_equals_and_hash_code_on_mutable_classes
-  int get hashCode => Object.hashAll(_toList())
-;
+  int get hashCode => Object.hashAll(_toList());
 }
 
 class ApplePaySummaryItemDTO {
@@ -1897,7 +1932,8 @@ class ApplePaySummaryItemDTO {
   }
 
   Object encode() {
-    return _toList();  }
+    return _toList();
+  }
 
   static ApplePaySummaryItemDTO decode(Object result) {
     result as List<Object?>;
@@ -1922,8 +1958,7 @@ class ApplePaySummaryItemDTO {
 
   @override
   // ignore: avoid_equals_and_hash_code_on_mutable_classes
-  int get hashCode => Object.hashAll(_toList())
-;
+  int get hashCode => Object.hashAll(_toList());
 }
 
 class GooglePayConfigurationDTO {
@@ -1996,7 +2031,8 @@ class GooglePayConfigurationDTO {
   }
 
   Object encode() {
-    return _toList();  }
+    return _toList();
+  }
 
   static GooglePayConfigurationDTO decode(Object result) {
     result as List<Object?>;
@@ -2022,7 +2058,8 @@ class GooglePayConfigurationDTO {
   @override
   // ignore: avoid_equals_and_hash_code_on_mutable_classes
   bool operator ==(Object other) {
-    if (other is! GooglePayConfigurationDTO || other.runtimeType != runtimeType) {
+    if (other is! GooglePayConfigurationDTO ||
+        other.runtimeType != runtimeType) {
       return false;
     }
     if (identical(this, other)) {
@@ -2033,8 +2070,7 @@ class GooglePayConfigurationDTO {
 
   @override
   // ignore: avoid_equals_and_hash_code_on_mutable_classes
-  int get hashCode => Object.hashAll(_toList())
-;
+  int get hashCode => Object.hashAll(_toList());
 }
 
 class MerchantInfoDTO {
@@ -2055,7 +2091,8 @@ class MerchantInfoDTO {
   }
 
   Object encode() {
-    return _toList();  }
+    return _toList();
+  }
 
   static MerchantInfoDTO decode(Object result) {
     result as List<Object?>;
@@ -2079,8 +2116,7 @@ class MerchantInfoDTO {
 
   @override
   // ignore: avoid_equals_and_hash_code_on_mutable_classes
-  int get hashCode => Object.hashAll(_toList())
-;
+  int get hashCode => Object.hashAll(_toList());
 }
 
 class ShippingAddressParametersDTO {
@@ -2101,7 +2137,8 @@ class ShippingAddressParametersDTO {
   }
 
   Object encode() {
-    return _toList();  }
+    return _toList();
+  }
 
   static ShippingAddressParametersDTO decode(Object result) {
     result as List<Object?>;
@@ -2114,7 +2151,8 @@ class ShippingAddressParametersDTO {
   @override
   // ignore: avoid_equals_and_hash_code_on_mutable_classes
   bool operator ==(Object other) {
-    if (other is! ShippingAddressParametersDTO || other.runtimeType != runtimeType) {
+    if (other is! ShippingAddressParametersDTO ||
+        other.runtimeType != runtimeType) {
       return false;
     }
     if (identical(this, other)) {
@@ -2125,8 +2163,7 @@ class ShippingAddressParametersDTO {
 
   @override
   // ignore: avoid_equals_and_hash_code_on_mutable_classes
-  int get hashCode => Object.hashAll(_toList())
-;
+  int get hashCode => Object.hashAll(_toList());
 }
 
 class BillingAddressParametersDTO {
@@ -2147,7 +2184,8 @@ class BillingAddressParametersDTO {
   }
 
   Object encode() {
-    return _toList();  }
+    return _toList();
+  }
 
   static BillingAddressParametersDTO decode(Object result) {
     result as List<Object?>;
@@ -2160,7 +2198,8 @@ class BillingAddressParametersDTO {
   @override
   // ignore: avoid_equals_and_hash_code_on_mutable_classes
   bool operator ==(Object other) {
-    if (other is! BillingAddressParametersDTO || other.runtimeType != runtimeType) {
+    if (other is! BillingAddressParametersDTO ||
+        other.runtimeType != runtimeType) {
       return false;
     }
     if (identical(this, other)) {
@@ -2171,8 +2210,7 @@ class BillingAddressParametersDTO {
 
   @override
   // ignore: avoid_equals_and_hash_code_on_mutable_classes
-  int get hashCode => Object.hashAll(_toList())
-;
+  int get hashCode => Object.hashAll(_toList());
 }
 
 class CashAppPayConfigurationDTO {
@@ -2193,7 +2231,8 @@ class CashAppPayConfigurationDTO {
   }
 
   Object encode() {
-    return _toList();  }
+    return _toList();
+  }
 
   static CashAppPayConfigurationDTO decode(Object result) {
     result as List<Object?>;
@@ -2206,7 +2245,8 @@ class CashAppPayConfigurationDTO {
   @override
   // ignore: avoid_equals_and_hash_code_on_mutable_classes
   bool operator ==(Object other) {
-    if (other is! CashAppPayConfigurationDTO || other.runtimeType != runtimeType) {
+    if (other is! CashAppPayConfigurationDTO ||
+        other.runtimeType != runtimeType) {
       return false;
     }
     if (identical(this, other)) {
@@ -2217,8 +2257,7 @@ class CashAppPayConfigurationDTO {
 
   @override
   // ignore: avoid_equals_and_hash_code_on_mutable_classes
-  int get hashCode => Object.hashAll(_toList())
-;
+  int get hashCode => Object.hashAll(_toList());
 }
 
 class TwintConfigurationDTO {
@@ -2239,7 +2278,8 @@ class TwintConfigurationDTO {
   }
 
   Object encode() {
-    return _toList();  }
+    return _toList();
+  }
 
   static TwintConfigurationDTO decode(Object result) {
     result as List<Object?>;
@@ -2263,8 +2303,7 @@ class TwintConfigurationDTO {
 
   @override
   // ignore: avoid_equals_and_hash_code_on_mutable_classes
-  int get hashCode => Object.hashAll(_toList())
-;
+  int get hashCode => Object.hashAll(_toList());
 }
 
 class PaymentResultDTO {
@@ -2293,7 +2332,8 @@ class PaymentResultDTO {
   }
 
   Object encode() {
-    return _toList();  }
+    return _toList();
+  }
 
   static PaymentResultDTO decode(Object result) {
     result as List<Object?>;
@@ -2319,8 +2359,7 @@ class PaymentResultDTO {
 
   @override
   // ignore: avoid_equals_and_hash_code_on_mutable_classes
-  int get hashCode => Object.hashAll(_toList())
-;
+  int get hashCode => Object.hashAll(_toList());
 }
 
 class PaymentResultModelDTO {
@@ -2349,7 +2388,8 @@ class PaymentResultModelDTO {
   }
 
   Object encode() {
-    return _toList();  }
+    return _toList();
+  }
 
   static PaymentResultModelDTO decode(Object result) {
     result as List<Object?>;
@@ -2375,8 +2415,7 @@ class PaymentResultModelDTO {
 
   @override
   // ignore: avoid_equals_and_hash_code_on_mutable_classes
-  int get hashCode => Object.hashAll(_toList())
-;
+  int get hashCode => Object.hashAll(_toList());
 }
 
 class OrderResponseDTO {
@@ -2405,7 +2444,8 @@ class OrderResponseDTO {
   }
 
   Object encode() {
-    return _toList();  }
+    return _toList();
+  }
 
   static OrderResponseDTO decode(Object result) {
     result as List<Object?>;
@@ -2431,12 +2471,10 @@ class OrderResponseDTO {
 
   @override
   // ignore: avoid_equals_and_hash_code_on_mutable_classes
-  int get hashCode => Object.hashAll(_toList())
-;
+  int get hashCode => Object.hashAll(_toList());
 }
 
-sealed class CheckoutResultDTO {
-}
+sealed class CheckoutResultDTO {}
 
 class FinishedResultDTO extends CheckoutResultDTO {
   FinishedResultDTO({
@@ -2452,7 +2490,8 @@ class FinishedResultDTO extends CheckoutResultDTO {
   }
 
   Object encode() {
-    return _toList();  }
+    return _toList();
+  }
 
   static FinishedResultDTO decode(Object result) {
     result as List<Object?>;
@@ -2475,8 +2514,7 @@ class FinishedResultDTO extends CheckoutResultDTO {
 
   @override
   // ignore: avoid_equals_and_hash_code_on_mutable_classes
-  int get hashCode => Object.hashAll(_toList())
-;
+  int get hashCode => Object.hashAll(_toList());
 }
 
 class ActionResultDTO extends CheckoutResultDTO {
@@ -2493,7 +2531,8 @@ class ActionResultDTO extends CheckoutResultDTO {
   }
 
   Object encode() {
-    return _toList();  }
+    return _toList();
+  }
 
   static ActionResultDTO decode(Object result) {
     result as List<Object?>;
@@ -2516,8 +2555,7 @@ class ActionResultDTO extends CheckoutResultDTO {
 
   @override
   // ignore: avoid_equals_and_hash_code_on_mutable_classes
-  int get hashCode => Object.hashAll(_toList())
-;
+  int get hashCode => Object.hashAll(_toList());
 }
 
 class ErrorResultDTO extends CheckoutResultDTO {
@@ -2534,7 +2572,8 @@ class ErrorResultDTO extends CheckoutResultDTO {
   }
 
   Object encode() {
-    return _toList();  }
+    return _toList();
+  }
 
   static ErrorResultDTO decode(Object result) {
     result as List<Object?>;
@@ -2557,8 +2596,7 @@ class ErrorResultDTO extends CheckoutResultDTO {
 
   @override
   // ignore: avoid_equals_and_hash_code_on_mutable_classes
-  int get hashCode => Object.hashAll(_toList())
-;
+  int get hashCode => Object.hashAll(_toList());
 }
 
 class CheckoutEvent {
@@ -2579,7 +2617,8 @@ class CheckoutEvent {
   }
 
   Object encode() {
-    return _toList();  }
+    return _toList();
+  }
 
   static CheckoutEvent decode(Object result) {
     result as List<Object?>;
@@ -2603,8 +2642,7 @@ class CheckoutEvent {
 
   @override
   // ignore: avoid_equals_and_hash_code_on_mutable_classes
-  int get hashCode => Object.hashAll(_toList())
-;
+  int get hashCode => Object.hashAll(_toList());
 }
 
 class AddressDTO {
@@ -2645,7 +2683,8 @@ class AddressDTO {
   }
 
   Object encode() {
-    return _toList();  }
+    return _toList();
+  }
 
   static AddressDTO decode(Object result) {
     result as List<Object?>;
@@ -2674,8 +2713,7 @@ class AddressDTO {
 
   @override
   // ignore: avoid_equals_and_hash_code_on_mutable_classes
-  int get hashCode => Object.hashAll(_toList())
-;
+  int get hashCode => Object.hashAll(_toList());
 }
 
 class ShopperNameDTO {
@@ -2704,7 +2742,8 @@ class ShopperNameDTO {
   }
 
   Object encode() {
-    return _toList();  }
+    return _toList();
+  }
 
   static ShopperNameDTO decode(Object result) {
     result as List<Object?>;
@@ -2730,8 +2769,7 @@ class ShopperNameDTO {
 
   @override
   // ignore: avoid_equals_and_hash_code_on_mutable_classes
-  int get hashCode => Object.hashAll(_toList())
-;
+  int get hashCode => Object.hashAll(_toList());
 }
 
 class BeforeSubmitDataDTO {
@@ -2760,7 +2798,8 @@ class BeforeSubmitDataDTO {
   }
 
   Object encode() {
-    return _toList();  }
+    return _toList();
+  }
 
   static BeforeSubmitDataDTO decode(Object result) {
     result as List<Object?>;
@@ -2786,8 +2825,7 @@ class BeforeSubmitDataDTO {
 
   @override
   // ignore: avoid_equals_and_hash_code_on_mutable_classes
-  int get hashCode => Object.hashAll(_toList())
-;
+  int get hashCode => Object.hashAll(_toList());
 }
 
 class BeforeSubmitResultDTO {
@@ -2812,7 +2850,8 @@ class BeforeSubmitResultDTO {
   }
 
   Object encode() {
-    return _toList();  }
+    return _toList();
+  }
 
   static BeforeSubmitResultDTO decode(Object result) {
     result as List<Object?>;
@@ -2837,8 +2876,7 @@ class BeforeSubmitResultDTO {
 
   @override
   // ignore: avoid_equals_and_hash_code_on_mutable_classes
-  int get hashCode => Object.hashAll(_toList())
-;
+  int get hashCode => Object.hashAll(_toList());
 }
 
 class ComponentCommunicationModel {
@@ -2867,7 +2905,8 @@ class ComponentCommunicationModel {
   }
 
   Object encode() {
-    return _toList();  }
+    return _toList();
+  }
 
   static ComponentCommunicationModel decode(Object result) {
     result as List<Object?>;
@@ -2882,7 +2921,8 @@ class ComponentCommunicationModel {
   @override
   // ignore: avoid_equals_and_hash_code_on_mutable_classes
   bool operator ==(Object other) {
-    if (other is! ComponentCommunicationModel || other.runtimeType != runtimeType) {
+    if (other is! ComponentCommunicationModel ||
+        other.runtimeType != runtimeType) {
       return false;
     }
     if (identical(this, other)) {
@@ -2893,8 +2933,7 @@ class ComponentCommunicationModel {
 
   @override
   // ignore: avoid_equals_and_hash_code_on_mutable_classes
-  int get hashCode => Object.hashAll(_toList())
-;
+  int get hashCode => Object.hashAll(_toList());
 }
 
 class PlatformCommunicationDTO {
@@ -2919,7 +2958,8 @@ class PlatformCommunicationDTO {
   }
 
   Object encode() {
-    return _toList();  }
+    return _toList();
+  }
 
   static PlatformCommunicationDTO decode(Object result) {
     result as List<Object?>;
@@ -2933,7 +2973,8 @@ class PlatformCommunicationDTO {
   @override
   // ignore: avoid_equals_and_hash_code_on_mutable_classes
   bool operator ==(Object other) {
-    if (other is! PlatformCommunicationDTO || other.runtimeType != runtimeType) {
+    if (other is! PlatformCommunicationDTO ||
+        other.runtimeType != runtimeType) {
       return false;
     }
     if (identical(this, other)) {
@@ -2944,8 +2985,7 @@ class PlatformCommunicationDTO {
 
   @override
   // ignore: avoid_equals_and_hash_code_on_mutable_classes
-  int get hashCode => Object.hashAll(_toList())
-;
+  int get hashCode => Object.hashAll(_toList());
 }
 
 class PaymentEventDTO {
@@ -2974,7 +3014,8 @@ class PaymentEventDTO {
   }
 
   Object encode() {
-    return _toList();  }
+    return _toList();
+  }
 
   static PaymentEventDTO decode(Object result) {
     result as List<Object?>;
@@ -3000,8 +3041,7 @@ class PaymentEventDTO {
 
   @override
   // ignore: avoid_equals_and_hash_code_on_mutable_classes
-  int get hashCode => Object.hashAll(_toList())
-;
+  int get hashCode => Object.hashAll(_toList());
 }
 
 class ErrorDTO {
@@ -3026,7 +3066,8 @@ class ErrorDTO {
   }
 
   Object encode() {
-    return _toList();  }
+    return _toList();
+  }
 
   static ErrorDTO decode(Object result) {
     result as List<Object?>;
@@ -3051,8 +3092,7 @@ class ErrorDTO {
 
   @override
   // ignore: avoid_equals_and_hash_code_on_mutable_classes
-  int get hashCode => Object.hashAll(_toList())
-;
+  int get hashCode => Object.hashAll(_toList());
 }
 
 class DeletedStoredPaymentMethodResultDTO {
@@ -3073,7 +3113,8 @@ class DeletedStoredPaymentMethodResultDTO {
   }
 
   Object encode() {
-    return _toList();  }
+    return _toList();
+  }
 
   static DeletedStoredPaymentMethodResultDTO decode(Object result) {
     result as List<Object?>;
@@ -3086,7 +3127,8 @@ class DeletedStoredPaymentMethodResultDTO {
   @override
   // ignore: avoid_equals_and_hash_code_on_mutable_classes
   bool operator ==(Object other) {
-    if (other is! DeletedStoredPaymentMethodResultDTO || other.runtimeType != runtimeType) {
+    if (other is! DeletedStoredPaymentMethodResultDTO ||
+        other.runtimeType != runtimeType) {
       return false;
     }
     if (identical(this, other)) {
@@ -3097,8 +3139,7 @@ class DeletedStoredPaymentMethodResultDTO {
 
   @override
   // ignore: avoid_equals_and_hash_code_on_mutable_classes
-  int get hashCode => Object.hashAll(_toList())
-;
+  int get hashCode => Object.hashAll(_toList());
 }
 
 class InstantPaymentConfigurationDTO {
@@ -3147,7 +3188,8 @@ class InstantPaymentConfigurationDTO {
   }
 
   Object encode() {
-    return _toList();  }
+    return _toList();
+  }
 
   static InstantPaymentConfigurationDTO decode(Object result) {
     result as List<Object?>;
@@ -3167,7 +3209,8 @@ class InstantPaymentConfigurationDTO {
   @override
   // ignore: avoid_equals_and_hash_code_on_mutable_classes
   bool operator ==(Object other) {
-    if (other is! InstantPaymentConfigurationDTO || other.runtimeType != runtimeType) {
+    if (other is! InstantPaymentConfigurationDTO ||
+        other.runtimeType != runtimeType) {
       return false;
     }
     if (identical(this, other)) {
@@ -3178,8 +3221,7 @@ class InstantPaymentConfigurationDTO {
 
   @override
   // ignore: avoid_equals_and_hash_code_on_mutable_classes
-  int get hashCode => Object.hashAll(_toList())
-;
+  int get hashCode => Object.hashAll(_toList());
 }
 
 class InstantPaymentSetupResultDTO {
@@ -3204,7 +3246,8 @@ class InstantPaymentSetupResultDTO {
   }
 
   Object encode() {
-    return _toList();  }
+    return _toList();
+  }
 
   static InstantPaymentSetupResultDTO decode(Object result) {
     result as List<Object?>;
@@ -3218,7 +3261,8 @@ class InstantPaymentSetupResultDTO {
   @override
   // ignore: avoid_equals_and_hash_code_on_mutable_classes
   bool operator ==(Object other) {
-    if (other is! InstantPaymentSetupResultDTO || other.runtimeType != runtimeType) {
+    if (other is! InstantPaymentSetupResultDTO ||
+        other.runtimeType != runtimeType) {
       return false;
     }
     if (identical(this, other)) {
@@ -3229,8 +3273,7 @@ class InstantPaymentSetupResultDTO {
 
   @override
   // ignore: avoid_equals_and_hash_code_on_mutable_classes
-  int get hashCode => Object.hashAll(_toList())
-;
+  int get hashCode => Object.hashAll(_toList());
 }
 
 class UnencryptedCardDTO {
@@ -3259,7 +3302,8 @@ class UnencryptedCardDTO {
   }
 
   Object encode() {
-    return _toList();  }
+    return _toList();
+  }
 
   static UnencryptedCardDTO decode(Object result) {
     result as List<Object?>;
@@ -3285,8 +3329,7 @@ class UnencryptedCardDTO {
 
   @override
   // ignore: avoid_equals_and_hash_code_on_mutable_classes
-  int get hashCode => Object.hashAll(_toList())
-;
+  int get hashCode => Object.hashAll(_toList());
 }
 
 class EncryptedCardDTO {
@@ -3315,7 +3358,8 @@ class EncryptedCardDTO {
   }
 
   Object encode() {
-    return _toList();  }
+    return _toList();
+  }
 
   static EncryptedCardDTO decode(Object result) {
     result as List<Object?>;
@@ -3341,8 +3385,7 @@ class EncryptedCardDTO {
 
   @override
   // ignore: avoid_equals_and_hash_code_on_mutable_classes
-  int get hashCode => Object.hashAll(_toList())
-;
+  int get hashCode => Object.hashAll(_toList());
 }
 
 class ActionComponentConfigurationDTO {
@@ -3379,7 +3422,8 @@ class ActionComponentConfigurationDTO {
   }
 
   Object encode() {
-    return _toList();  }
+    return _toList();
+  }
 
   static ActionComponentConfigurationDTO decode(Object result) {
     result as List<Object?>;
@@ -3396,7 +3440,8 @@ class ActionComponentConfigurationDTO {
   @override
   // ignore: avoid_equals_and_hash_code_on_mutable_classes
   bool operator ==(Object other) {
-    if (other is! ActionComponentConfigurationDTO || other.runtimeType != runtimeType) {
+    if (other is! ActionComponentConfigurationDTO ||
+        other.runtimeType != runtimeType) {
       return false;
     }
     if (identical(this, other)) {
@@ -3407,8 +3452,7 @@ class ActionComponentConfigurationDTO {
 
   @override
   // ignore: avoid_equals_and_hash_code_on_mutable_classes
-  int get hashCode => Object.hashAll(_toList())
-;
+  int get hashCode => Object.hashAll(_toList());
 }
 
 class OrderCancelResultDTO {
@@ -3429,13 +3473,16 @@ class OrderCancelResultDTO {
   }
 
   Object encode() {
-    return _toList();  }
+    return _toList();
+  }
 
   static OrderCancelResultDTO decode(Object result) {
     result as List<Object?>;
     return OrderCancelResultDTO(
-      orderCancelResponseBody: (result[0] as Map<Object?, Object?>?)!.cast<String?, Object?>(),
-      updatedPaymentMethodsResponseBody: (result[1] as Map<Object?, Object?>?)?.cast<String?, Object?>(),
+      orderCancelResponseBody:
+          (result[0] as Map<Object?, Object?>?)!.cast<String?, Object?>(),
+      updatedPaymentMethodsResponseBody:
+          (result[1] as Map<Object?, Object?>?)?.cast<String?, Object?>(),
     );
   }
 
@@ -3453,8 +3500,7 @@ class OrderCancelResultDTO {
 
   @override
   // ignore: avoid_equals_and_hash_code_on_mutable_classes
-  int get hashCode => Object.hashAll(_toList())
-;
+  int get hashCode => Object.hashAll(_toList());
 }
 
 class BinLookupDataDTO {
@@ -3471,7 +3517,8 @@ class BinLookupDataDTO {
   }
 
   Object encode() {
-    return _toList();  }
+    return _toList();
+  }
 
   static BinLookupDataDTO decode(Object result) {
     result as List<Object?>;
@@ -3494,10 +3541,8 @@ class BinLookupDataDTO {
 
   @override
   // ignore: avoid_equals_and_hash_code_on_mutable_classes
-  int get hashCode => Object.hashAll(_toList())
-;
+  int get hashCode => Object.hashAll(_toList());
 }
-
 
 class _PigeonCodec extends StandardMessageCodec {
   const _PigeonCodec();
@@ -3506,232 +3551,232 @@ class _PigeonCodec extends StandardMessageCodec {
     if (value is int) {
       buffer.putUint8(4);
       buffer.putInt64(value);
-    }    else if (value is Environment) {
+    } else if (value is Environment) {
       buffer.putUint8(129);
       writeValue(buffer, value.index);
-    }    else if (value is AddressMode) {
+    } else if (value is AddressMode) {
       buffer.putUint8(130);
       writeValue(buffer, value.index);
-    }    else if (value is CardAuthMethod) {
+    } else if (value is CardAuthMethod) {
       buffer.putUint8(131);
       writeValue(buffer, value.index);
-    }    else if (value is TotalPriceStatus) {
+    } else if (value is TotalPriceStatus) {
       buffer.putUint8(132);
       writeValue(buffer, value.index);
-    }    else if (value is GooglePayEnvironment) {
+    } else if (value is GooglePayEnvironment) {
       buffer.putUint8(133);
       writeValue(buffer, value.index);
-    }    else if (value is CashAppPayEnvironment) {
+    } else if (value is CashAppPayEnvironment) {
       buffer.putUint8(134);
       writeValue(buffer, value.index);
-    }    else if (value is PaymentResultEnum) {
+    } else if (value is PaymentResultEnum) {
       buffer.putUint8(135);
       writeValue(buffer, value.index);
-    }    else if (value is CheckoutEventType) {
+    } else if (value is CheckoutEventType) {
       buffer.putUint8(136);
       writeValue(buffer, value.index);
-    }    else if (value is ComponentCommunicationType) {
+    } else if (value is ComponentCommunicationType) {
       buffer.putUint8(137);
       writeValue(buffer, value.index);
-    }    else if (value is PaymentEventType) {
+    } else if (value is PaymentEventType) {
       buffer.putUint8(138);
       writeValue(buffer, value.index);
-    }    else if (value is FieldVisibility) {
+    } else if (value is FieldVisibility) {
       buffer.putUint8(139);
       writeValue(buffer, value.index);
-    }    else if (value is InstantPaymentType) {
+    } else if (value is InstantPaymentType) {
       buffer.putUint8(140);
       writeValue(buffer, value.index);
-    }    else if (value is ApplePayShippingType) {
+    } else if (value is ApplePayShippingType) {
       buffer.putUint8(141);
       writeValue(buffer, value.index);
-    }    else if (value is ApplePayMerchantCapability) {
+    } else if (value is ApplePayMerchantCapability) {
       buffer.putUint8(142);
       writeValue(buffer, value.index);
-    }    else if (value is ApplePaySummaryItemType) {
+    } else if (value is ApplePaySummaryItemType) {
       buffer.putUint8(143);
       writeValue(buffer, value.index);
-    }    else if (value is ApplePayPaymentErrorType) {
+    } else if (value is ApplePayPaymentErrorType) {
       buffer.putUint8(144);
       writeValue(buffer, value.index);
-    }    else if (value is CardNumberValidationResultDTO) {
+    } else if (value is CardNumberValidationResultDTO) {
       buffer.putUint8(145);
       writeValue(buffer, value.index);
-    }    else if (value is CardExpiryDateValidationResultDTO) {
+    } else if (value is CardExpiryDateValidationResultDTO) {
       buffer.putUint8(146);
       writeValue(buffer, value.index);
-    }    else if (value is CardSecurityCodeValidationResultDTO) {
+    } else if (value is CardSecurityCodeValidationResultDTO) {
       buffer.putUint8(147);
       writeValue(buffer, value.index);
-    }    else if (value is SessionResponseDTO) {
+    } else if (value is SessionResponseDTO) {
       buffer.putUint8(148);
       writeValue(buffer, value.encode());
-    }    else if (value is SessionDTO) {
+    } else if (value is SessionDTO) {
       buffer.putUint8(149);
       writeValue(buffer, value.encode());
-    }    else if (value is AmountDTO) {
+    } else if (value is AmountDTO) {
       buffer.putUint8(150);
       writeValue(buffer, value.encode());
-    }    else if (value is AnalyticsOptionsDTO) {
+    } else if (value is AnalyticsOptionsDTO) {
       buffer.putUint8(151);
       writeValue(buffer, value.encode());
-    }    else if (value is ThreeDS2UICustomizationDTO) {
+    } else if (value is ThreeDS2UICustomizationDTO) {
       buffer.putUint8(152);
       writeValue(buffer, value.encode());
-    }    else if (value is ThreeDS2ScreenCustomizationDTO) {
+    } else if (value is ThreeDS2ScreenCustomizationDTO) {
       buffer.putUint8(153);
       writeValue(buffer, value.encode());
-    }    else if (value is ThreeDS2ButtonCustomizationDTO) {
+    } else if (value is ThreeDS2ButtonCustomizationDTO) {
       buffer.putUint8(154);
       writeValue(buffer, value.encode());
-    }    else if (value is ThreeDS2SelectionItemCustomizationDTO) {
+    } else if (value is ThreeDS2SelectionItemCustomizationDTO) {
       buffer.putUint8(155);
       writeValue(buffer, value.encode());
-    }    else if (value is ThreeDS2LabelCustomizationDTO) {
+    } else if (value is ThreeDS2LabelCustomizationDTO) {
       buffer.putUint8(156);
       writeValue(buffer, value.encode());
-    }    else if (value is ThreeDS2InputCustomizationDTO) {
+    } else if (value is ThreeDS2InputCustomizationDTO) {
       buffer.putUint8(157);
       writeValue(buffer, value.encode());
-    }    else if (value is ThreeDS2ToolbarCustomizationDTO) {
+    } else if (value is ThreeDS2ToolbarCustomizationDTO) {
       buffer.putUint8(158);
       writeValue(buffer, value.encode());
-    }    else if (value is ThreeDS2ConfigurationDTO) {
+    } else if (value is ThreeDS2ConfigurationDTO) {
       buffer.putUint8(159);
       writeValue(buffer, value.encode());
-    }    else if (value is DefaultInstallmentOptionsDTO) {
+    } else if (value is DefaultInstallmentOptionsDTO) {
       buffer.putUint8(160);
       writeValue(buffer, value.encode());
-    }    else if (value is CardBasedInstallmentOptionsDTO) {
+    } else if (value is CardBasedInstallmentOptionsDTO) {
       buffer.putUint8(161);
       writeValue(buffer, value.encode());
-    }    else if (value is InstallmentConfigurationDTO) {
+    } else if (value is InstallmentConfigurationDTO) {
       buffer.putUint8(162);
       writeValue(buffer, value.encode());
-    }    else if (value is CheckoutConfigurationDTO) {
+    } else if (value is CheckoutConfigurationDTO) {
       buffer.putUint8(163);
       writeValue(buffer, value.encode());
-    }    else if (value is DropInConfigurationDTO) {
+    } else if (value is DropInConfigurationDTO) {
       buffer.putUint8(164);
       writeValue(buffer, value.encode());
-    }    else if (value is CardConfigurationDTO) {
+    } else if (value is CardConfigurationDTO) {
       buffer.putUint8(165);
       writeValue(buffer, value.encode());
-    }    else if (value is ApplePayConfigurationDTO) {
+    } else if (value is ApplePayConfigurationDTO) {
       buffer.putUint8(166);
       writeValue(buffer, value.encode());
-    }    else if (value is ApplePayAuthorizedPaymentDTO) {
+    } else if (value is ApplePayAuthorizedPaymentDTO) {
       buffer.putUint8(167);
       writeValue(buffer, value.encode());
-    }    else if (value is ApplePayPaymentErrorDTO) {
+    } else if (value is ApplePayPaymentErrorDTO) {
       buffer.putUint8(168);
       writeValue(buffer, value.encode());
-    }    else if (value is ApplePayAuthorizationResultDTO) {
+    } else if (value is ApplePayAuthorizationResultDTO) {
       buffer.putUint8(169);
       writeValue(buffer, value.encode());
-    }    else if (value is ApplePayCouponCodeUpdateDTO) {
+    } else if (value is ApplePayCouponCodeUpdateDTO) {
       buffer.putUint8(170);
       writeValue(buffer, value.encode());
-    }    else if (value is ApplePayShippingContactUpdateDTO) {
+    } else if (value is ApplePayShippingContactUpdateDTO) {
       buffer.putUint8(171);
       writeValue(buffer, value.encode());
-    }    else if (value is ApplePayShippingMethodUpdateDTO) {
+    } else if (value is ApplePayShippingMethodUpdateDTO) {
       buffer.putUint8(172);
       writeValue(buffer, value.encode());
-    }    else if (value is ApplePayContactDTO) {
+    } else if (value is ApplePayContactDTO) {
       buffer.putUint8(173);
       writeValue(buffer, value.encode());
-    }    else if (value is ApplePayShippingMethodDTO) {
+    } else if (value is ApplePayShippingMethodDTO) {
       buffer.putUint8(174);
       writeValue(buffer, value.encode());
-    }    else if (value is ApplePaySummaryItemDTO) {
+    } else if (value is ApplePaySummaryItemDTO) {
       buffer.putUint8(175);
       writeValue(buffer, value.encode());
-    }    else if (value is GooglePayConfigurationDTO) {
+    } else if (value is GooglePayConfigurationDTO) {
       buffer.putUint8(176);
       writeValue(buffer, value.encode());
-    }    else if (value is MerchantInfoDTO) {
+    } else if (value is MerchantInfoDTO) {
       buffer.putUint8(177);
       writeValue(buffer, value.encode());
-    }    else if (value is ShippingAddressParametersDTO) {
+    } else if (value is ShippingAddressParametersDTO) {
       buffer.putUint8(178);
       writeValue(buffer, value.encode());
-    }    else if (value is BillingAddressParametersDTO) {
+    } else if (value is BillingAddressParametersDTO) {
       buffer.putUint8(179);
       writeValue(buffer, value.encode());
-    }    else if (value is CashAppPayConfigurationDTO) {
+    } else if (value is CashAppPayConfigurationDTO) {
       buffer.putUint8(180);
       writeValue(buffer, value.encode());
-    }    else if (value is TwintConfigurationDTO) {
+    } else if (value is TwintConfigurationDTO) {
       buffer.putUint8(181);
       writeValue(buffer, value.encode());
-    }    else if (value is PaymentResultDTO) {
+    } else if (value is PaymentResultDTO) {
       buffer.putUint8(182);
       writeValue(buffer, value.encode());
-    }    else if (value is PaymentResultModelDTO) {
+    } else if (value is PaymentResultModelDTO) {
       buffer.putUint8(183);
       writeValue(buffer, value.encode());
-    }    else if (value is OrderResponseDTO) {
+    } else if (value is OrderResponseDTO) {
       buffer.putUint8(184);
       writeValue(buffer, value.encode());
-    }    else if (value is FinishedResultDTO) {
+    } else if (value is FinishedResultDTO) {
       buffer.putUint8(185);
       writeValue(buffer, value.encode());
-    }    else if (value is ActionResultDTO) {
+    } else if (value is ActionResultDTO) {
       buffer.putUint8(186);
       writeValue(buffer, value.encode());
-    }    else if (value is ErrorResultDTO) {
+    } else if (value is ErrorResultDTO) {
       buffer.putUint8(187);
       writeValue(buffer, value.encode());
-    }    else if (value is CheckoutEvent) {
+    } else if (value is CheckoutEvent) {
       buffer.putUint8(188);
       writeValue(buffer, value.encode());
-    }    else if (value is AddressDTO) {
+    } else if (value is AddressDTO) {
       buffer.putUint8(189);
       writeValue(buffer, value.encode());
-    }    else if (value is ShopperNameDTO) {
+    } else if (value is ShopperNameDTO) {
       buffer.putUint8(190);
       writeValue(buffer, value.encode());
-    }    else if (value is BeforeSubmitDataDTO) {
+    } else if (value is BeforeSubmitDataDTO) {
       buffer.putUint8(191);
       writeValue(buffer, value.encode());
-    }    else if (value is BeforeSubmitResultDTO) {
+    } else if (value is BeforeSubmitResultDTO) {
       buffer.putUint8(192);
       writeValue(buffer, value.encode());
-    }    else if (value is ComponentCommunicationModel) {
+    } else if (value is ComponentCommunicationModel) {
       buffer.putUint8(193);
       writeValue(buffer, value.encode());
-    }    else if (value is PlatformCommunicationDTO) {
+    } else if (value is PlatformCommunicationDTO) {
       buffer.putUint8(194);
       writeValue(buffer, value.encode());
-    }    else if (value is PaymentEventDTO) {
+    } else if (value is PaymentEventDTO) {
       buffer.putUint8(195);
       writeValue(buffer, value.encode());
-    }    else if (value is ErrorDTO) {
+    } else if (value is ErrorDTO) {
       buffer.putUint8(196);
       writeValue(buffer, value.encode());
-    }    else if (value is DeletedStoredPaymentMethodResultDTO) {
+    } else if (value is DeletedStoredPaymentMethodResultDTO) {
       buffer.putUint8(197);
       writeValue(buffer, value.encode());
-    }    else if (value is InstantPaymentConfigurationDTO) {
+    } else if (value is InstantPaymentConfigurationDTO) {
       buffer.putUint8(198);
       writeValue(buffer, value.encode());
-    }    else if (value is InstantPaymentSetupResultDTO) {
+    } else if (value is InstantPaymentSetupResultDTO) {
       buffer.putUint8(199);
       writeValue(buffer, value.encode());
-    }    else if (value is UnencryptedCardDTO) {
+    } else if (value is UnencryptedCardDTO) {
       buffer.putUint8(200);
       writeValue(buffer, value.encode());
-    }    else if (value is EncryptedCardDTO) {
+    } else if (value is EncryptedCardDTO) {
       buffer.putUint8(201);
       writeValue(buffer, value.encode());
-    }    else if (value is ActionComponentConfigurationDTO) {
+    } else if (value is ActionComponentConfigurationDTO) {
       buffer.putUint8(202);
       writeValue(buffer, value.encode());
-    }    else if (value is OrderCancelResultDTO) {
+    } else if (value is OrderCancelResultDTO) {
       buffer.putUint8(203);
       writeValue(buffer, value.encode());
-    }    else if (value is BinLookupDataDTO) {
+    } else if (value is BinLookupDataDTO) {
       buffer.putUint8(204);
       writeValue(buffer, value.encode());
     } else {
@@ -3742,176 +3787,182 @@ class _PigeonCodec extends StandardMessageCodec {
   @override
   Object? readValueOfType(int type, ReadBuffer buffer) {
     switch (type) {
-      case 129: 
+      case 129:
         final int? value = readValue(buffer) as int?;
         return value == null ? null : Environment.values[value];
-      case 130: 
+      case 130:
         final int? value = readValue(buffer) as int?;
         return value == null ? null : AddressMode.values[value];
-      case 131: 
+      case 131:
         final int? value = readValue(buffer) as int?;
         return value == null ? null : CardAuthMethod.values[value];
-      case 132: 
+      case 132:
         final int? value = readValue(buffer) as int?;
         return value == null ? null : TotalPriceStatus.values[value];
-      case 133: 
+      case 133:
         final int? value = readValue(buffer) as int?;
         return value == null ? null : GooglePayEnvironment.values[value];
-      case 134: 
+      case 134:
         final int? value = readValue(buffer) as int?;
         return value == null ? null : CashAppPayEnvironment.values[value];
-      case 135: 
+      case 135:
         final int? value = readValue(buffer) as int?;
         return value == null ? null : PaymentResultEnum.values[value];
-      case 136: 
+      case 136:
         final int? value = readValue(buffer) as int?;
         return value == null ? null : CheckoutEventType.values[value];
-      case 137: 
+      case 137:
         final int? value = readValue(buffer) as int?;
         return value == null ? null : ComponentCommunicationType.values[value];
-      case 138: 
+      case 138:
         final int? value = readValue(buffer) as int?;
         return value == null ? null : PaymentEventType.values[value];
-      case 139: 
+      case 139:
         final int? value = readValue(buffer) as int?;
         return value == null ? null : FieldVisibility.values[value];
-      case 140: 
+      case 140:
         final int? value = readValue(buffer) as int?;
         return value == null ? null : InstantPaymentType.values[value];
-      case 141: 
+      case 141:
         final int? value = readValue(buffer) as int?;
         return value == null ? null : ApplePayShippingType.values[value];
-      case 142: 
+      case 142:
         final int? value = readValue(buffer) as int?;
         return value == null ? null : ApplePayMerchantCapability.values[value];
-      case 143: 
+      case 143:
         final int? value = readValue(buffer) as int?;
         return value == null ? null : ApplePaySummaryItemType.values[value];
-      case 144: 
+      case 144:
         final int? value = readValue(buffer) as int?;
         return value == null ? null : ApplePayPaymentErrorType.values[value];
-      case 145: 
+      case 145:
         final int? value = readValue(buffer) as int?;
-        return value == null ? null : CardNumberValidationResultDTO.values[value];
-      case 146: 
+        return value == null
+            ? null
+            : CardNumberValidationResultDTO.values[value];
+      case 146:
         final int? value = readValue(buffer) as int?;
-        return value == null ? null : CardExpiryDateValidationResultDTO.values[value];
-      case 147: 
+        return value == null
+            ? null
+            : CardExpiryDateValidationResultDTO.values[value];
+      case 147:
         final int? value = readValue(buffer) as int?;
-        return value == null ? null : CardSecurityCodeValidationResultDTO.values[value];
-      case 148: 
+        return value == null
+            ? null
+            : CardSecurityCodeValidationResultDTO.values[value];
+      case 148:
         return SessionResponseDTO.decode(readValue(buffer)!);
-      case 149: 
+      case 149:
         return SessionDTO.decode(readValue(buffer)!);
-      case 150: 
+      case 150:
         return AmountDTO.decode(readValue(buffer)!);
-      case 151: 
+      case 151:
         return AnalyticsOptionsDTO.decode(readValue(buffer)!);
-      case 152: 
+      case 152:
         return ThreeDS2UICustomizationDTO.decode(readValue(buffer)!);
-      case 153: 
+      case 153:
         return ThreeDS2ScreenCustomizationDTO.decode(readValue(buffer)!);
-      case 154: 
+      case 154:
         return ThreeDS2ButtonCustomizationDTO.decode(readValue(buffer)!);
-      case 155: 
+      case 155:
         return ThreeDS2SelectionItemCustomizationDTO.decode(readValue(buffer)!);
-      case 156: 
+      case 156:
         return ThreeDS2LabelCustomizationDTO.decode(readValue(buffer)!);
-      case 157: 
+      case 157:
         return ThreeDS2InputCustomizationDTO.decode(readValue(buffer)!);
-      case 158: 
+      case 158:
         return ThreeDS2ToolbarCustomizationDTO.decode(readValue(buffer)!);
-      case 159: 
+      case 159:
         return ThreeDS2ConfigurationDTO.decode(readValue(buffer)!);
-      case 160: 
+      case 160:
         return DefaultInstallmentOptionsDTO.decode(readValue(buffer)!);
-      case 161: 
+      case 161:
         return CardBasedInstallmentOptionsDTO.decode(readValue(buffer)!);
-      case 162: 
+      case 162:
         return InstallmentConfigurationDTO.decode(readValue(buffer)!);
-      case 163: 
+      case 163:
         return CheckoutConfigurationDTO.decode(readValue(buffer)!);
-      case 164: 
+      case 164:
         return DropInConfigurationDTO.decode(readValue(buffer)!);
-      case 165: 
+      case 165:
         return CardConfigurationDTO.decode(readValue(buffer)!);
-      case 166: 
+      case 166:
         return ApplePayConfigurationDTO.decode(readValue(buffer)!);
-      case 167: 
+      case 167:
         return ApplePayAuthorizedPaymentDTO.decode(readValue(buffer)!);
-      case 168: 
+      case 168:
         return ApplePayPaymentErrorDTO.decode(readValue(buffer)!);
-      case 169: 
+      case 169:
         return ApplePayAuthorizationResultDTO.decode(readValue(buffer)!);
-      case 170: 
+      case 170:
         return ApplePayCouponCodeUpdateDTO.decode(readValue(buffer)!);
-      case 171: 
+      case 171:
         return ApplePayShippingContactUpdateDTO.decode(readValue(buffer)!);
-      case 172: 
+      case 172:
         return ApplePayShippingMethodUpdateDTO.decode(readValue(buffer)!);
-      case 173: 
+      case 173:
         return ApplePayContactDTO.decode(readValue(buffer)!);
-      case 174: 
+      case 174:
         return ApplePayShippingMethodDTO.decode(readValue(buffer)!);
-      case 175: 
+      case 175:
         return ApplePaySummaryItemDTO.decode(readValue(buffer)!);
-      case 176: 
+      case 176:
         return GooglePayConfigurationDTO.decode(readValue(buffer)!);
-      case 177: 
+      case 177:
         return MerchantInfoDTO.decode(readValue(buffer)!);
-      case 178: 
+      case 178:
         return ShippingAddressParametersDTO.decode(readValue(buffer)!);
-      case 179: 
+      case 179:
         return BillingAddressParametersDTO.decode(readValue(buffer)!);
-      case 180: 
+      case 180:
         return CashAppPayConfigurationDTO.decode(readValue(buffer)!);
-      case 181: 
+      case 181:
         return TwintConfigurationDTO.decode(readValue(buffer)!);
-      case 182: 
+      case 182:
         return PaymentResultDTO.decode(readValue(buffer)!);
-      case 183: 
+      case 183:
         return PaymentResultModelDTO.decode(readValue(buffer)!);
-      case 184: 
+      case 184:
         return OrderResponseDTO.decode(readValue(buffer)!);
-      case 185: 
+      case 185:
         return FinishedResultDTO.decode(readValue(buffer)!);
-      case 186: 
+      case 186:
         return ActionResultDTO.decode(readValue(buffer)!);
-      case 187: 
+      case 187:
         return ErrorResultDTO.decode(readValue(buffer)!);
-      case 188: 
+      case 188:
         return CheckoutEvent.decode(readValue(buffer)!);
-      case 189: 
+      case 189:
         return AddressDTO.decode(readValue(buffer)!);
-      case 190: 
+      case 190:
         return ShopperNameDTO.decode(readValue(buffer)!);
-      case 191: 
+      case 191:
         return BeforeSubmitDataDTO.decode(readValue(buffer)!);
-      case 192: 
+      case 192:
         return BeforeSubmitResultDTO.decode(readValue(buffer)!);
-      case 193: 
+      case 193:
         return ComponentCommunicationModel.decode(readValue(buffer)!);
-      case 194: 
+      case 194:
         return PlatformCommunicationDTO.decode(readValue(buffer)!);
-      case 195: 
+      case 195:
         return PaymentEventDTO.decode(readValue(buffer)!);
-      case 196: 
+      case 196:
         return ErrorDTO.decode(readValue(buffer)!);
-      case 197: 
+      case 197:
         return DeletedStoredPaymentMethodResultDTO.decode(readValue(buffer)!);
-      case 198: 
+      case 198:
         return InstantPaymentConfigurationDTO.decode(readValue(buffer)!);
-      case 199: 
+      case 199:
         return InstantPaymentSetupResultDTO.decode(readValue(buffer)!);
-      case 200: 
+      case 200:
         return UnencryptedCardDTO.decode(readValue(buffer)!);
-      case 201: 
+      case 201:
         return EncryptedCardDTO.decode(readValue(buffer)!);
-      case 202: 
+      case 202:
         return ActionComponentConfigurationDTO.decode(readValue(buffer)!);
-      case 203: 
+      case 203:
         return OrderCancelResultDTO.decode(readValue(buffer)!);
-      case 204: 
+      case 204:
         return BinLookupDataDTO.decode(readValue(buffer)!);
       default:
         return super.readValueOfType(type, buffer);
@@ -3919,15 +3970,18 @@ class _PigeonCodec extends StandardMessageCodec {
   }
 }
 
-const StandardMethodCodec pigeonMethodCodec = StandardMethodCodec(_PigeonCodec());
+const StandardMethodCodec pigeonMethodCodec =
+    StandardMethodCodec(_PigeonCodec());
 
 class CheckoutPlatformInterface {
   /// Constructor for [CheckoutPlatformInterface].  The [binaryMessenger] named argument is
   /// available for dependency injection.  If it is left null, the default
   /// BinaryMessenger will be used which routes to the host platform.
-  CheckoutPlatformInterface({BinaryMessenger? binaryMessenger, String messageChannelSuffix = ''})
+  CheckoutPlatformInterface(
+      {BinaryMessenger? binaryMessenger, String messageChannelSuffix = ''})
       : pigeonVar_binaryMessenger = binaryMessenger,
-        pigeonVar_messageChannelSuffix = messageChannelSuffix.isNotEmpty ? '.$messageChannelSuffix' : '';
+        pigeonVar_messageChannelSuffix =
+            messageChannelSuffix.isNotEmpty ? '.$messageChannelSuffix' : '';
   final BinaryMessenger? pigeonVar_binaryMessenger;
 
   static const MessageCodec<Object?> pigeonChannelCodec = _PigeonCodec();
@@ -3935,8 +3989,10 @@ class CheckoutPlatformInterface {
   final String pigeonVar_messageChannelSuffix;
 
   Future<String> getReturnUrl() async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.getReturnUrl$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
+    final String pigeonVar_channelName =
+        'dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.getReturnUrl$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel =
+        BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
       binaryMessenger: pigeonVar_binaryMessenger,
@@ -3962,14 +4018,18 @@ class CheckoutPlatformInterface {
     }
   }
 
-  Future<SessionDTO> setupSession(SessionResponseDTO sessionResponseDTO, CheckoutConfigurationDTO checkoutConfigurationDTO) async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.setupSession$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
+  Future<SessionDTO> setupSession(SessionResponseDTO sessionResponseDTO,
+      CheckoutConfigurationDTO checkoutConfigurationDTO) async {
+    final String pigeonVar_channelName =
+        'dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.setupSession$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel =
+        BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
       binaryMessenger: pigeonVar_binaryMessenger,
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[sessionResponseDTO, checkoutConfigurationDTO]);
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel
+        .send(<Object?>[sessionResponseDTO, checkoutConfigurationDTO]);
     final List<Object?>? pigeonVar_replyList =
         await pigeonVar_sendFuture as List<Object?>?;
     if (pigeonVar_replyList == null) {
@@ -3990,14 +4050,18 @@ class CheckoutPlatformInterface {
     }
   }
 
-  Future<void> setupAdvanced(String paymentMethodsResponse, CheckoutConfigurationDTO checkoutConfigurationDTO) async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.setupAdvanced$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
+  Future<void> setupAdvanced(String paymentMethodsResponse,
+      CheckoutConfigurationDTO checkoutConfigurationDTO) async {
+    final String pigeonVar_channelName =
+        'dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.setupAdvanced$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel =
+        BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
       binaryMessenger: pigeonVar_binaryMessenger,
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[paymentMethodsResponse, checkoutConfigurationDTO]);
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel
+        .send(<Object?>[paymentMethodsResponse, checkoutConfigurationDTO]);
     final List<Object?>? pigeonVar_replyList =
         await pigeonVar_sendFuture as List<Object?>?;
     if (pigeonVar_replyList == null) {
@@ -4014,8 +4078,10 @@ class CheckoutPlatformInterface {
   }
 
   Future<void> clearSession() async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.clearSession$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
+    final String pigeonVar_channelName =
+        'dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.clearSession$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel =
+        BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
       binaryMessenger: pigeonVar_binaryMessenger,
@@ -4036,14 +4102,18 @@ class CheckoutPlatformInterface {
     }
   }
 
-  Future<EncryptedCardDTO> encryptCard(UnencryptedCardDTO unencryptedCardDTO, String publicKey) async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.encryptCard$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
+  Future<EncryptedCardDTO> encryptCard(
+      UnencryptedCardDTO unencryptedCardDTO, String publicKey) async {
+    final String pigeonVar_channelName =
+        'dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.encryptCard$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel =
+        BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
       binaryMessenger: pigeonVar_binaryMessenger,
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[unencryptedCardDTO, publicKey]);
+    final Future<Object?> pigeonVar_sendFuture =
+        pigeonVar_channel.send(<Object?>[unencryptedCardDTO, publicKey]);
     final List<Object?>? pigeonVar_replyList =
         await pigeonVar_sendFuture as List<Object?>?;
     if (pigeonVar_replyList == null) {
@@ -4065,13 +4135,16 @@ class CheckoutPlatformInterface {
   }
 
   Future<String> encryptBin(String bin, String publicKey) async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.encryptBin$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
+    final String pigeonVar_channelName =
+        'dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.encryptBin$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel =
+        BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
       binaryMessenger: pigeonVar_binaryMessenger,
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[bin, publicKey]);
+    final Future<Object?> pigeonVar_sendFuture =
+        pigeonVar_channel.send(<Object?>[bin, publicKey]);
     final List<Object?>? pigeonVar_replyList =
         await pigeonVar_sendFuture as List<Object?>?;
     if (pigeonVar_replyList == null) {
@@ -4092,14 +4165,18 @@ class CheckoutPlatformInterface {
     }
   }
 
-  Future<CardNumberValidationResultDTO> validateCardNumber(String cardNumber, bool enableLuhnCheck) async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.validateCardNumber$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
+  Future<CardNumberValidationResultDTO> validateCardNumber(
+      String cardNumber, bool enableLuhnCheck) async {
+    final String pigeonVar_channelName =
+        'dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.validateCardNumber$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel =
+        BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
       binaryMessenger: pigeonVar_binaryMessenger,
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[cardNumber, enableLuhnCheck]);
+    final Future<Object?> pigeonVar_sendFuture =
+        pigeonVar_channel.send(<Object?>[cardNumber, enableLuhnCheck]);
     final List<Object?>? pigeonVar_replyList =
         await pigeonVar_sendFuture as List<Object?>?;
     if (pigeonVar_replyList == null) {
@@ -4120,14 +4197,18 @@ class CheckoutPlatformInterface {
     }
   }
 
-  Future<CardExpiryDateValidationResultDTO> validateCardExpiryDate(String expiryMonth, String expiryYear) async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.validateCardExpiryDate$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
+  Future<CardExpiryDateValidationResultDTO> validateCardExpiryDate(
+      String expiryMonth, String expiryYear) async {
+    final String pigeonVar_channelName =
+        'dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.validateCardExpiryDate$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel =
+        BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
       binaryMessenger: pigeonVar_binaryMessenger,
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[expiryMonth, expiryYear]);
+    final Future<Object?> pigeonVar_sendFuture =
+        pigeonVar_channel.send(<Object?>[expiryMonth, expiryYear]);
     final List<Object?>? pigeonVar_replyList =
         await pigeonVar_sendFuture as List<Object?>?;
     if (pigeonVar_replyList == null) {
@@ -4148,14 +4229,18 @@ class CheckoutPlatformInterface {
     }
   }
 
-  Future<CardSecurityCodeValidationResultDTO> validateCardSecurityCode(String securityCode, String? cardBrand) async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.validateCardSecurityCode$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
+  Future<CardSecurityCodeValidationResultDTO> validateCardSecurityCode(
+      String securityCode, String? cardBrand) async {
+    final String pigeonVar_channelName =
+        'dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.validateCardSecurityCode$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel =
+        BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
       binaryMessenger: pigeonVar_binaryMessenger,
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[securityCode, cardBrand]);
+    final Future<Object?> pigeonVar_sendFuture =
+        pigeonVar_channel.send(<Object?>[securityCode, cardBrand]);
     final List<Object?>? pigeonVar_replyList =
         await pigeonVar_sendFuture as List<Object?>?;
     if (pigeonVar_replyList == null) {
@@ -4177,13 +4262,16 @@ class CheckoutPlatformInterface {
   }
 
   Future<void> enableConsoleLogging(bool loggingEnabled) async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.enableConsoleLogging$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
+    final String pigeonVar_channelName =
+        'dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.enableConsoleLogging$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel =
+        BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
       binaryMessenger: pigeonVar_binaryMessenger,
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[loggingEnabled]);
+    final Future<Object?> pigeonVar_sendFuture =
+        pigeonVar_channel.send(<Object?>[loggingEnabled]);
     final List<Object?>? pigeonVar_replyList =
         await pigeonVar_sendFuture as List<Object?>?;
     if (pigeonVar_replyList == null) {
@@ -4200,8 +4288,10 @@ class CheckoutPlatformInterface {
   }
 
   Future<String> getThreeDS2SdkVersion() async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.getThreeDS2SdkVersion$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
+    final String pigeonVar_channelName =
+        'dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.getThreeDS2SdkVersion$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel =
+        BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
       binaryMessenger: pigeonVar_binaryMessenger,
@@ -4232,23 +4322,29 @@ class DropInPlatformInterface {
   /// Constructor for [DropInPlatformInterface].  The [binaryMessenger] named argument is
   /// available for dependency injection.  If it is left null, the default
   /// BinaryMessenger will be used which routes to the host platform.
-  DropInPlatformInterface({BinaryMessenger? binaryMessenger, String messageChannelSuffix = ''})
+  DropInPlatformInterface(
+      {BinaryMessenger? binaryMessenger, String messageChannelSuffix = ''})
       : pigeonVar_binaryMessenger = binaryMessenger,
-        pigeonVar_messageChannelSuffix = messageChannelSuffix.isNotEmpty ? '.$messageChannelSuffix' : '';
+        pigeonVar_messageChannelSuffix =
+            messageChannelSuffix.isNotEmpty ? '.$messageChannelSuffix' : '';
   final BinaryMessenger? pigeonVar_binaryMessenger;
 
   static const MessageCodec<Object?> pigeonChannelCodec = _PigeonCodec();
 
   final String pigeonVar_messageChannelSuffix;
 
-  Future<void> showDropInSession(DropInConfigurationDTO dropInConfigurationDTO) async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.adyen_checkout.DropInPlatformInterface.showDropInSession$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
+  Future<void> showDropInSession(
+      DropInConfigurationDTO dropInConfigurationDTO) async {
+    final String pigeonVar_channelName =
+        'dev.flutter.pigeon.adyen_checkout.DropInPlatformInterface.showDropInSession$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel =
+        BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
       binaryMessenger: pigeonVar_binaryMessenger,
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[dropInConfigurationDTO]);
+    final Future<Object?> pigeonVar_sendFuture =
+        pigeonVar_channel.send(<Object?>[dropInConfigurationDTO]);
     final List<Object?>? pigeonVar_replyList =
         await pigeonVar_sendFuture as List<Object?>?;
     if (pigeonVar_replyList == null) {
@@ -4264,14 +4360,18 @@ class DropInPlatformInterface {
     }
   }
 
-  Future<void> showDropInAdvanced(DropInConfigurationDTO dropInConfigurationDTO, String paymentMethodsResponse) async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.adyen_checkout.DropInPlatformInterface.showDropInAdvanced$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
+  Future<void> showDropInAdvanced(DropInConfigurationDTO dropInConfigurationDTO,
+      String paymentMethodsResponse) async {
+    final String pigeonVar_channelName =
+        'dev.flutter.pigeon.adyen_checkout.DropInPlatformInterface.showDropInAdvanced$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel =
+        BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
       binaryMessenger: pigeonVar_binaryMessenger,
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[dropInConfigurationDTO, paymentMethodsResponse]);
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel
+        .send(<Object?>[dropInConfigurationDTO, paymentMethodsResponse]);
     final List<Object?>? pigeonVar_replyList =
         await pigeonVar_sendFuture as List<Object?>?;
     if (pigeonVar_replyList == null) {
@@ -4288,8 +4388,10 @@ class DropInPlatformInterface {
   }
 
   Future<void> stopDropIn() async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.adyen_checkout.DropInPlatformInterface.stopDropIn$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
+    final String pigeonVar_channelName =
+        'dev.flutter.pigeon.adyen_checkout.DropInPlatformInterface.stopDropIn$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel =
+        BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
       binaryMessenger: pigeonVar_binaryMessenger,
@@ -4311,13 +4413,16 @@ class DropInPlatformInterface {
   }
 
   Future<void> onPaymentsResult(PaymentEventDTO paymentsResult) async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.adyen_checkout.DropInPlatformInterface.onPaymentsResult$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
+    final String pigeonVar_channelName =
+        'dev.flutter.pigeon.adyen_checkout.DropInPlatformInterface.onPaymentsResult$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel =
+        BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
       binaryMessenger: pigeonVar_binaryMessenger,
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[paymentsResult]);
+    final Future<Object?> pigeonVar_sendFuture =
+        pigeonVar_channel.send(<Object?>[paymentsResult]);
     final List<Object?>? pigeonVar_replyList =
         await pigeonVar_sendFuture as List<Object?>?;
     if (pigeonVar_replyList == null) {
@@ -4333,14 +4438,18 @@ class DropInPlatformInterface {
     }
   }
 
-  Future<void> onPaymentsDetailsResult(PaymentEventDTO paymentsDetailsResult) async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.adyen_checkout.DropInPlatformInterface.onPaymentsDetailsResult$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
+  Future<void> onPaymentsDetailsResult(
+      PaymentEventDTO paymentsDetailsResult) async {
+    final String pigeonVar_channelName =
+        'dev.flutter.pigeon.adyen_checkout.DropInPlatformInterface.onPaymentsDetailsResult$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel =
+        BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
       binaryMessenger: pigeonVar_binaryMessenger,
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[paymentsDetailsResult]);
+    final Future<Object?> pigeonVar_sendFuture =
+        pigeonVar_channel.send(<Object?>[paymentsDetailsResult]);
     final List<Object?>? pigeonVar_replyList =
         await pigeonVar_sendFuture as List<Object?>?;
     if (pigeonVar_replyList == null) {
@@ -4356,14 +4465,19 @@ class DropInPlatformInterface {
     }
   }
 
-  Future<void> onDeleteStoredPaymentMethodResult(DeletedStoredPaymentMethodResultDTO deleteStoredPaymentMethodResultDTO) async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.adyen_checkout.DropInPlatformInterface.onDeleteStoredPaymentMethodResult$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
+  Future<void> onDeleteStoredPaymentMethodResult(
+      DeletedStoredPaymentMethodResultDTO
+          deleteStoredPaymentMethodResultDTO) async {
+    final String pigeonVar_channelName =
+        'dev.flutter.pigeon.adyen_checkout.DropInPlatformInterface.onDeleteStoredPaymentMethodResult$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel =
+        BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
       binaryMessenger: pigeonVar_binaryMessenger,
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[deleteStoredPaymentMethodResultDTO]);
+    final Future<Object?> pigeonVar_sendFuture =
+        pigeonVar_channel.send(<Object?>[deleteStoredPaymentMethodResultDTO]);
     final List<Object?>? pigeonVar_replyList =
         await pigeonVar_sendFuture as List<Object?>?;
     if (pigeonVar_replyList == null) {
@@ -4380,13 +4494,16 @@ class DropInPlatformInterface {
   }
 
   Future<void> onBalanceCheckResult(String balanceCheckResponse) async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.adyen_checkout.DropInPlatformInterface.onBalanceCheckResult$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
+    final String pigeonVar_channelName =
+        'dev.flutter.pigeon.adyen_checkout.DropInPlatformInterface.onBalanceCheckResult$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel =
+        BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
       binaryMessenger: pigeonVar_binaryMessenger,
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[balanceCheckResponse]);
+    final Future<Object?> pigeonVar_sendFuture =
+        pigeonVar_channel.send(<Object?>[balanceCheckResponse]);
     final List<Object?>? pigeonVar_replyList =
         await pigeonVar_sendFuture as List<Object?>?;
     if (pigeonVar_replyList == null) {
@@ -4403,13 +4520,16 @@ class DropInPlatformInterface {
   }
 
   Future<void> onOrderRequestResult(String orderRequestResponse) async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.adyen_checkout.DropInPlatformInterface.onOrderRequestResult$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
+    final String pigeonVar_channelName =
+        'dev.flutter.pigeon.adyen_checkout.DropInPlatformInterface.onOrderRequestResult$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel =
+        BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
       binaryMessenger: pigeonVar_binaryMessenger,
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[orderRequestResponse]);
+    final Future<Object?> pigeonVar_sendFuture =
+        pigeonVar_channel.send(<Object?>[orderRequestResponse]);
     final List<Object?>? pigeonVar_replyList =
         await pigeonVar_sendFuture as List<Object?>?;
     if (pigeonVar_replyList == null) {
@@ -4425,14 +4545,18 @@ class DropInPlatformInterface {
     }
   }
 
-  Future<void> onOrderCancelResult(OrderCancelResultDTO orderCancelResult) async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.adyen_checkout.DropInPlatformInterface.onOrderCancelResult$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
+  Future<void> onOrderCancelResult(
+      OrderCancelResultDTO orderCancelResult) async {
+    final String pigeonVar_channelName =
+        'dev.flutter.pigeon.adyen_checkout.DropInPlatformInterface.onOrderCancelResult$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel =
+        BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
       binaryMessenger: pigeonVar_binaryMessenger,
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[orderCancelResult]);
+    final Future<Object?> pigeonVar_sendFuture =
+        pigeonVar_channel.send(<Object?>[orderCancelResult]);
     final List<Object?>? pigeonVar_replyList =
         await pigeonVar_sendFuture as List<Object?>?;
     if (pigeonVar_replyList == null) {
@@ -4449,8 +4573,10 @@ class DropInPlatformInterface {
   }
 
   Future<void> cleanUpDropIn() async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.adyen_checkout.DropInPlatformInterface.cleanUpDropIn$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
+    final String pigeonVar_channelName =
+        'dev.flutter.pigeon.adyen_checkout.DropInPlatformInterface.cleanUpDropIn$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel =
+        BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
       binaryMessenger: pigeonVar_binaryMessenger,
@@ -4477,18 +4603,26 @@ abstract class CheckoutFlutterInterface {
 
   void send(CheckoutEvent event);
 
-  static void setUp(CheckoutFlutterInterface? api, {BinaryMessenger? binaryMessenger, String messageChannelSuffix = '',}) {
-    messageChannelSuffix = messageChannelSuffix.isNotEmpty ? '.$messageChannelSuffix' : '';
+  static void setUp(
+    CheckoutFlutterInterface? api, {
+    BinaryMessenger? binaryMessenger,
+    String messageChannelSuffix = '',
+  }) {
+    messageChannelSuffix =
+        messageChannelSuffix.isNotEmpty ? '.$messageChannelSuffix' : '';
     {
-      final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-          'dev.flutter.pigeon.adyen_checkout.CheckoutFlutterInterface.send$messageChannelSuffix', pigeonChannelCodec,
+      final BasicMessageChannel<
+          Object?> pigeonVar_channel = BasicMessageChannel<
+              Object?>(
+          'dev.flutter.pigeon.adyen_checkout.CheckoutFlutterInterface.send$messageChannelSuffix',
+          pigeonChannelCodec,
           binaryMessenger: binaryMessenger);
       if (api == null) {
         pigeonVar_channel.setMessageHandler(null);
       } else {
         pigeonVar_channel.setMessageHandler((Object? message) async {
           assert(message != null,
-          'Argument for dev.flutter.pigeon.adyen_checkout.CheckoutFlutterInterface.send was null.');
+              'Argument for dev.flutter.pigeon.adyen_checkout.CheckoutFlutterInterface.send was null.');
           final List<Object?> args = (message as List<Object?>?)!;
           final CheckoutEvent? arg_event = (args[0] as CheckoutEvent?);
           assert(arg_event != null,
@@ -4498,8 +4632,9 @@ abstract class CheckoutFlutterInterface {
             return wrapResponse(empty: true);
           } on PlatformException catch (e) {
             return wrapResponse(error: e);
-          }          catch (e) {
-            return wrapResponse(error: PlatformException(code: 'error', message: e.toString()));
+          } catch (e) {
+            return wrapResponse(
+                error: PlatformException(code: 'error', message: e.toString()));
           }
         });
       }
@@ -4511,9 +4646,11 @@ class ComponentPlatformInterface {
   /// Constructor for [ComponentPlatformInterface].  The [binaryMessenger] named argument is
   /// available for dependency injection.  If it is left null, the default
   /// BinaryMessenger will be used which routes to the host platform.
-  ComponentPlatformInterface({BinaryMessenger? binaryMessenger, String messageChannelSuffix = ''})
+  ComponentPlatformInterface(
+      {BinaryMessenger? binaryMessenger, String messageChannelSuffix = ''})
       : pigeonVar_binaryMessenger = binaryMessenger,
-        pigeonVar_messageChannelSuffix = messageChannelSuffix.isNotEmpty ? '.$messageChannelSuffix' : '';
+        pigeonVar_messageChannelSuffix =
+            messageChannelSuffix.isNotEmpty ? '.$messageChannelSuffix' : '';
   final BinaryMessenger? pigeonVar_binaryMessenger;
 
   static const MessageCodec<Object?> pigeonChannelCodec = _PigeonCodec();
@@ -4521,13 +4658,16 @@ class ComponentPlatformInterface {
   final String pigeonVar_messageChannelSuffix;
 
   Future<void> updateViewHeight(int viewId) async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.adyen_checkout.ComponentPlatformInterface.updateViewHeight$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
+    final String pigeonVar_channelName =
+        'dev.flutter.pigeon.adyen_checkout.ComponentPlatformInterface.updateViewHeight$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel =
+        BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
       binaryMessenger: pigeonVar_binaryMessenger,
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[viewId]);
+    final Future<Object?> pigeonVar_sendFuture =
+        pigeonVar_channel.send(<Object?>[viewId]);
     final List<Object?>? pigeonVar_replyList =
         await pigeonVar_sendFuture as List<Object?>?;
     if (pigeonVar_replyList == null) {
@@ -4543,14 +4683,18 @@ class ComponentPlatformInterface {
     }
   }
 
-  Future<void> onPaymentsResult(String componentId, PaymentEventDTO paymentsResult) async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.adyen_checkout.ComponentPlatformInterface.onPaymentsResult$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
+  Future<void> onPaymentsResult(
+      String componentId, PaymentEventDTO paymentsResult) async {
+    final String pigeonVar_channelName =
+        'dev.flutter.pigeon.adyen_checkout.ComponentPlatformInterface.onPaymentsResult$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel =
+        BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
       binaryMessenger: pigeonVar_binaryMessenger,
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[componentId, paymentsResult]);
+    final Future<Object?> pigeonVar_sendFuture =
+        pigeonVar_channel.send(<Object?>[componentId, paymentsResult]);
     final List<Object?>? pigeonVar_replyList =
         await pigeonVar_sendFuture as List<Object?>?;
     if (pigeonVar_replyList == null) {
@@ -4566,14 +4710,18 @@ class ComponentPlatformInterface {
     }
   }
 
-  Future<void> onPaymentsDetailsResult(String componentId, PaymentEventDTO paymentsDetailsResult) async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.adyen_checkout.ComponentPlatformInterface.onPaymentsDetailsResult$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
+  Future<void> onPaymentsDetailsResult(
+      String componentId, PaymentEventDTO paymentsDetailsResult) async {
+    final String pigeonVar_channelName =
+        'dev.flutter.pigeon.adyen_checkout.ComponentPlatformInterface.onPaymentsDetailsResult$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel =
+        BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
       binaryMessenger: pigeonVar_binaryMessenger,
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[componentId, paymentsDetailsResult]);
+    final Future<Object?> pigeonVar_sendFuture =
+        pigeonVar_channel.send(<Object?>[componentId, paymentsDetailsResult]);
     final List<Object?>? pigeonVar_replyList =
         await pigeonVar_sendFuture as List<Object?>?;
     if (pigeonVar_replyList == null) {
@@ -4589,14 +4737,24 @@ class ComponentPlatformInterface {
     }
   }
 
-  Future<InstantPaymentSetupResultDTO> isInstantPaymentSupportedByPlatform(InstantPaymentConfigurationDTO instantPaymentConfigurationDTO, String paymentMethodResponse, String componentId) async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.adyen_checkout.ComponentPlatformInterface.isInstantPaymentSupportedByPlatform$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
+  Future<InstantPaymentSetupResultDTO> isInstantPaymentSupportedByPlatform(
+      InstantPaymentConfigurationDTO instantPaymentConfigurationDTO,
+      String paymentMethodResponse,
+      String componentId) async {
+    final String pigeonVar_channelName =
+        'dev.flutter.pigeon.adyen_checkout.ComponentPlatformInterface.isInstantPaymentSupportedByPlatform$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel =
+        BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
       binaryMessenger: pigeonVar_binaryMessenger,
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[instantPaymentConfigurationDTO, paymentMethodResponse, componentId]);
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel
+        .send(<Object?>[
+      instantPaymentConfigurationDTO,
+      paymentMethodResponse,
+      componentId
+    ]);
     final List<Object?>? pigeonVar_replyList =
         await pigeonVar_sendFuture as List<Object?>?;
     if (pigeonVar_replyList == null) {
@@ -4617,14 +4775,24 @@ class ComponentPlatformInterface {
     }
   }
 
-  Future<void> onInstantPaymentPressed(InstantPaymentConfigurationDTO instantPaymentConfigurationDTO, String encodedPaymentMethod, String componentId) async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.adyen_checkout.ComponentPlatformInterface.onInstantPaymentPressed$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
+  Future<void> onInstantPaymentPressed(
+      InstantPaymentConfigurationDTO instantPaymentConfigurationDTO,
+      String encodedPaymentMethod,
+      String componentId) async {
+    final String pigeonVar_channelName =
+        'dev.flutter.pigeon.adyen_checkout.ComponentPlatformInterface.onInstantPaymentPressed$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel =
+        BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
       binaryMessenger: pigeonVar_binaryMessenger,
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[instantPaymentConfigurationDTO, encodedPaymentMethod, componentId]);
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel
+        .send(<Object?>[
+      instantPaymentConfigurationDTO,
+      encodedPaymentMethod,
+      componentId
+    ]);
     final List<Object?>? pigeonVar_replyList =
         await pigeonVar_sendFuture as List<Object?>?;
     if (pigeonVar_replyList == null) {
@@ -4640,14 +4808,20 @@ class ComponentPlatformInterface {
     }
   }
 
-  Future<void> handleAction(ActionComponentConfigurationDTO actionComponentConfiguration, String componentId, Map<String?, Object?>? actionResponse) async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.adyen_checkout.ComponentPlatformInterface.handleAction$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
+  Future<void> handleAction(
+      ActionComponentConfigurationDTO actionComponentConfiguration,
+      String componentId,
+      Map<String?, Object?>? actionResponse) async {
+    final String pigeonVar_channelName =
+        'dev.flutter.pigeon.adyen_checkout.ComponentPlatformInterface.handleAction$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel =
+        BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
       binaryMessenger: pigeonVar_binaryMessenger,
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[actionComponentConfiguration, componentId, actionResponse]);
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
+        <Object?>[actionComponentConfiguration, componentId, actionResponse]);
     final List<Object?>? pigeonVar_replyList =
         await pigeonVar_sendFuture as List<Object?>?;
     if (pigeonVar_replyList == null) {
@@ -4664,13 +4838,42 @@ class ComponentPlatformInterface {
   }
 
   Future<void> onDispose(String componentId) async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.adyen_checkout.ComponentPlatformInterface.onDispose$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
+    final String pigeonVar_channelName =
+        'dev.flutter.pigeon.adyen_checkout.ComponentPlatformInterface.onDispose$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel =
+        BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
       binaryMessenger: pigeonVar_binaryMessenger,
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[componentId]);
+    final Future<Object?> pigeonVar_sendFuture =
+        pigeonVar_channel.send(<Object?>[componentId]);
+    final List<Object?>? pigeonVar_replyList =
+        await pigeonVar_sendFuture as List<Object?>?;
+    if (pigeonVar_replyList == null) {
+      throw _createConnectionError(pigeonVar_channelName);
+    } else if (pigeonVar_replyList.length > 1) {
+      throw PlatformException(
+        code: pigeonVar_replyList[0]! as String,
+        message: pigeonVar_replyList[1] as String?,
+        details: pigeonVar_replyList[2],
+      );
+    } else {
+      return;
+    }
+  }
+
+  Future<void> submitComponent(String componentId) async {
+    final String pigeonVar_channelName =
+        'dev.flutter.pigeon.adyen_checkout.ComponentPlatformInterface.submitComponent$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel =
+        BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture =
+        pigeonVar_channel.send(<Object?>[componentId]);
     final List<Object?>? pigeonVar_replyList =
         await pigeonVar_sendFuture as List<Object?>?;
     if (pigeonVar_replyList == null) {
@@ -4690,35 +4893,56 @@ class ComponentPlatformInterface {
 abstract class ComponentFlutterInterface {
   static const MessageCodec<Object?> pigeonChannelCodec = _PigeonCodec();
 
-  void _generateCodecForDTOs(SessionDTO sessionDTO, BinLookupDataDTO binLookupDataDTO);
+  void _generateCodecForDTOs(
+      SessionDTO sessionDTO, BinLookupDataDTO binLookupDataDTO);
 
-  void onComponentCommunication(ComponentCommunicationModel componentCommunicationModel);
+  void onComponentCommunication(
+      ComponentCommunicationModel componentCommunicationModel);
 
-  Future<ApplePayShippingMethodUpdateDTO> onApplePaySelectShippingMethod(String componentId, ApplePayShippingMethodDTO shippingMethod, List<ApplePaySummaryItemDTO?> currentSummaryItems);
+  Future<ApplePayShippingMethodUpdateDTO> onApplePaySelectShippingMethod(
+      String componentId,
+      ApplePayShippingMethodDTO shippingMethod,
+      List<ApplePaySummaryItemDTO?> currentSummaryItems);
 
-  Future<ApplePayShippingContactUpdateDTO> onApplePaySelectShippingContact(String componentId, ApplePayContactDTO contact, List<ApplePaySummaryItemDTO?> currentSummaryItems);
+  Future<ApplePayShippingContactUpdateDTO> onApplePaySelectShippingContact(
+      String componentId,
+      ApplePayContactDTO contact,
+      List<ApplePaySummaryItemDTO?> currentSummaryItems);
 
-  Future<ApplePayCouponCodeUpdateDTO> onApplePayChangeCouponCode(String componentId, String couponCode, List<ApplePaySummaryItemDTO?> currentSummaryItems);
+  Future<ApplePayCouponCodeUpdateDTO> onApplePayChangeCouponCode(
+      String componentId,
+      String couponCode,
+      List<ApplePaySummaryItemDTO?> currentSummaryItems);
 
-  Future<ApplePayAuthorizationResultDTO> onApplePayAuthorize(String componentId, ApplePayAuthorizedPaymentDTO payment);
+  Future<ApplePayAuthorizationResultDTO> onApplePayAuthorize(
+      String componentId, ApplePayAuthorizedPaymentDTO payment);
 
-  static void setUp(ComponentFlutterInterface? api, {BinaryMessenger? binaryMessenger, String messageChannelSuffix = '',}) {
-    messageChannelSuffix = messageChannelSuffix.isNotEmpty ? '.$messageChannelSuffix' : '';
+  static void setUp(
+    ComponentFlutterInterface? api, {
+    BinaryMessenger? binaryMessenger,
+    String messageChannelSuffix = '',
+  }) {
+    messageChannelSuffix =
+        messageChannelSuffix.isNotEmpty ? '.$messageChannelSuffix' : '';
     {
-      final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-          'dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface._generateCodecForDTOs$messageChannelSuffix', pigeonChannelCodec,
+      final BasicMessageChannel<
+          Object?> pigeonVar_channel = BasicMessageChannel<
+              Object?>(
+          'dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface._generateCodecForDTOs$messageChannelSuffix',
+          pigeonChannelCodec,
           binaryMessenger: binaryMessenger);
       if (api == null) {
         pigeonVar_channel.setMessageHandler(null);
       } else {
         pigeonVar_channel.setMessageHandler((Object? message) async {
           assert(message != null,
-          'Argument for dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface._generateCodecForDTOs was null.');
+              'Argument for dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface._generateCodecForDTOs was null.');
           final List<Object?> args = (message as List<Object?>?)!;
           final SessionDTO? arg_sessionDTO = (args[0] as SessionDTO?);
           assert(arg_sessionDTO != null,
               'Argument for dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface._generateCodecForDTOs was null, expected non-null SessionDTO.');
-          final BinLookupDataDTO? arg_binLookupDataDTO = (args[1] as BinLookupDataDTO?);
+          final BinLookupDataDTO? arg_binLookupDataDTO =
+              (args[1] as BinLookupDataDTO?);
           assert(arg_binLookupDataDTO != null,
               'Argument for dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface._generateCodecForDTOs was null, expected non-null BinLookupDataDTO.');
           try {
@@ -4726,24 +4950,29 @@ abstract class ComponentFlutterInterface {
             return wrapResponse(empty: true);
           } on PlatformException catch (e) {
             return wrapResponse(error: e);
-          }          catch (e) {
-            return wrapResponse(error: PlatformException(code: 'error', message: e.toString()));
+          } catch (e) {
+            return wrapResponse(
+                error: PlatformException(code: 'error', message: e.toString()));
           }
         });
       }
     }
     {
-      final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-          'dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface.onComponentCommunication$messageChannelSuffix', pigeonChannelCodec,
+      final BasicMessageChannel<
+          Object?> pigeonVar_channel = BasicMessageChannel<
+              Object?>(
+          'dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface.onComponentCommunication$messageChannelSuffix',
+          pigeonChannelCodec,
           binaryMessenger: binaryMessenger);
       if (api == null) {
         pigeonVar_channel.setMessageHandler(null);
       } else {
         pigeonVar_channel.setMessageHandler((Object? message) async {
           assert(message != null,
-          'Argument for dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface.onComponentCommunication was null.');
+              'Argument for dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface.onComponentCommunication was null.');
           final List<Object?> args = (message as List<Object?>?)!;
-          final ComponentCommunicationModel? arg_componentCommunicationModel = (args[0] as ComponentCommunicationModel?);
+          final ComponentCommunicationModel? arg_componentCommunicationModel =
+              (args[0] as ComponentCommunicationModel?);
           assert(arg_componentCommunicationModel != null,
               'Argument for dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface.onComponentCommunication was null, expected non-null ComponentCommunicationModel.');
           try {
@@ -4751,84 +4980,104 @@ abstract class ComponentFlutterInterface {
             return wrapResponse(empty: true);
           } on PlatformException catch (e) {
             return wrapResponse(error: e);
-          }          catch (e) {
-            return wrapResponse(error: PlatformException(code: 'error', message: e.toString()));
+          } catch (e) {
+            return wrapResponse(
+                error: PlatformException(code: 'error', message: e.toString()));
           }
         });
       }
     }
     {
-      final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-          'dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface.onApplePaySelectShippingMethod$messageChannelSuffix', pigeonChannelCodec,
+      final BasicMessageChannel<
+          Object?> pigeonVar_channel = BasicMessageChannel<
+              Object?>(
+          'dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface.onApplePaySelectShippingMethod$messageChannelSuffix',
+          pigeonChannelCodec,
           binaryMessenger: binaryMessenger);
       if (api == null) {
         pigeonVar_channel.setMessageHandler(null);
       } else {
         pigeonVar_channel.setMessageHandler((Object? message) async {
           assert(message != null,
-          'Argument for dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface.onApplePaySelectShippingMethod was null.');
+              'Argument for dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface.onApplePaySelectShippingMethod was null.');
           final List<Object?> args = (message as List<Object?>?)!;
           final String? arg_componentId = (args[0] as String?);
           assert(arg_componentId != null,
               'Argument for dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface.onApplePaySelectShippingMethod was null, expected non-null String.');
-          final ApplePayShippingMethodDTO? arg_shippingMethod = (args[1] as ApplePayShippingMethodDTO?);
+          final ApplePayShippingMethodDTO? arg_shippingMethod =
+              (args[1] as ApplePayShippingMethodDTO?);
           assert(arg_shippingMethod != null,
               'Argument for dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface.onApplePaySelectShippingMethod was null, expected non-null ApplePayShippingMethodDTO.');
-          final List<ApplePaySummaryItemDTO?>? arg_currentSummaryItems = (args[2] as List<Object?>?)?.cast<ApplePaySummaryItemDTO?>();
+          final List<ApplePaySummaryItemDTO?>? arg_currentSummaryItems =
+              (args[2] as List<Object?>?)?.cast<ApplePaySummaryItemDTO?>();
           assert(arg_currentSummaryItems != null,
               'Argument for dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface.onApplePaySelectShippingMethod was null, expected non-null List<ApplePaySummaryItemDTO?>.');
           try {
-            final ApplePayShippingMethodUpdateDTO output = await api.onApplePaySelectShippingMethod(arg_componentId!, arg_shippingMethod!, arg_currentSummaryItems!);
+            final ApplePayShippingMethodUpdateDTO output =
+                await api.onApplePaySelectShippingMethod(arg_componentId!,
+                    arg_shippingMethod!, arg_currentSummaryItems!);
             return wrapResponse(result: output);
           } on PlatformException catch (e) {
             return wrapResponse(error: e);
-          }          catch (e) {
-            return wrapResponse(error: PlatformException(code: 'error', message: e.toString()));
+          } catch (e) {
+            return wrapResponse(
+                error: PlatformException(code: 'error', message: e.toString()));
           }
         });
       }
     }
     {
-      final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-          'dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface.onApplePaySelectShippingContact$messageChannelSuffix', pigeonChannelCodec,
+      final BasicMessageChannel<
+          Object?> pigeonVar_channel = BasicMessageChannel<
+              Object?>(
+          'dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface.onApplePaySelectShippingContact$messageChannelSuffix',
+          pigeonChannelCodec,
           binaryMessenger: binaryMessenger);
       if (api == null) {
         pigeonVar_channel.setMessageHandler(null);
       } else {
         pigeonVar_channel.setMessageHandler((Object? message) async {
           assert(message != null,
-          'Argument for dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface.onApplePaySelectShippingContact was null.');
+              'Argument for dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface.onApplePaySelectShippingContact was null.');
           final List<Object?> args = (message as List<Object?>?)!;
           final String? arg_componentId = (args[0] as String?);
           assert(arg_componentId != null,
               'Argument for dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface.onApplePaySelectShippingContact was null, expected non-null String.');
-          final ApplePayContactDTO? arg_contact = (args[1] as ApplePayContactDTO?);
+          final ApplePayContactDTO? arg_contact =
+              (args[1] as ApplePayContactDTO?);
           assert(arg_contact != null,
               'Argument for dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface.onApplePaySelectShippingContact was null, expected non-null ApplePayContactDTO.');
-          final List<ApplePaySummaryItemDTO?>? arg_currentSummaryItems = (args[2] as List<Object?>?)?.cast<ApplePaySummaryItemDTO?>();
+          final List<ApplePaySummaryItemDTO?>? arg_currentSummaryItems =
+              (args[2] as List<Object?>?)?.cast<ApplePaySummaryItemDTO?>();
           assert(arg_currentSummaryItems != null,
               'Argument for dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface.onApplePaySelectShippingContact was null, expected non-null List<ApplePaySummaryItemDTO?>.');
           try {
-            final ApplePayShippingContactUpdateDTO output = await api.onApplePaySelectShippingContact(arg_componentId!, arg_contact!, arg_currentSummaryItems!);
+            final ApplePayShippingContactUpdateDTO output =
+                await api.onApplePaySelectShippingContact(
+                    arg_componentId!, arg_contact!, arg_currentSummaryItems!);
             return wrapResponse(result: output);
           } on PlatformException catch (e) {
             return wrapResponse(error: e);
-          }          catch (e) {
-            return wrapResponse(error: PlatformException(code: 'error', message: e.toString()));
+          } catch (e) {
+            return wrapResponse(
+                error: PlatformException(code: 'error', message: e.toString()));
           }
         });
       }
     }
     {
-      final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-          'dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface.onApplePayChangeCouponCode$messageChannelSuffix', pigeonChannelCodec,
+      final BasicMessageChannel<
+          Object?> pigeonVar_channel = BasicMessageChannel<
+              Object?>(
+          'dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface.onApplePayChangeCouponCode$messageChannelSuffix',
+          pigeonChannelCodec,
           binaryMessenger: binaryMessenger);
       if (api == null) {
         pigeonVar_channel.setMessageHandler(null);
       } else {
         pigeonVar_channel.setMessageHandler((Object? message) async {
           assert(message != null,
-          'Argument for dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface.onApplePayChangeCouponCode was null.');
+              'Argument for dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface.onApplePayChangeCouponCode was null.');
           final List<Object?> args = (message as List<Object?>?)!;
           final String? arg_componentId = (args[0] as String?);
           assert(arg_componentId != null,
@@ -4836,44 +5085,54 @@ abstract class ComponentFlutterInterface {
           final String? arg_couponCode = (args[1] as String?);
           assert(arg_couponCode != null,
               'Argument for dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface.onApplePayChangeCouponCode was null, expected non-null String.');
-          final List<ApplePaySummaryItemDTO?>? arg_currentSummaryItems = (args[2] as List<Object?>?)?.cast<ApplePaySummaryItemDTO?>();
+          final List<ApplePaySummaryItemDTO?>? arg_currentSummaryItems =
+              (args[2] as List<Object?>?)?.cast<ApplePaySummaryItemDTO?>();
           assert(arg_currentSummaryItems != null,
               'Argument for dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface.onApplePayChangeCouponCode was null, expected non-null List<ApplePaySummaryItemDTO?>.');
           try {
-            final ApplePayCouponCodeUpdateDTO output = await api.onApplePayChangeCouponCode(arg_componentId!, arg_couponCode!, arg_currentSummaryItems!);
+            final ApplePayCouponCodeUpdateDTO output =
+                await api.onApplePayChangeCouponCode(arg_componentId!,
+                    arg_couponCode!, arg_currentSummaryItems!);
             return wrapResponse(result: output);
           } on PlatformException catch (e) {
             return wrapResponse(error: e);
-          }          catch (e) {
-            return wrapResponse(error: PlatformException(code: 'error', message: e.toString()));
+          } catch (e) {
+            return wrapResponse(
+                error: PlatformException(code: 'error', message: e.toString()));
           }
         });
       }
     }
     {
-      final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-          'dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface.onApplePayAuthorize$messageChannelSuffix', pigeonChannelCodec,
+      final BasicMessageChannel<
+          Object?> pigeonVar_channel = BasicMessageChannel<
+              Object?>(
+          'dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface.onApplePayAuthorize$messageChannelSuffix',
+          pigeonChannelCodec,
           binaryMessenger: binaryMessenger);
       if (api == null) {
         pigeonVar_channel.setMessageHandler(null);
       } else {
         pigeonVar_channel.setMessageHandler((Object? message) async {
           assert(message != null,
-          'Argument for dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface.onApplePayAuthorize was null.');
+              'Argument for dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface.onApplePayAuthorize was null.');
           final List<Object?> args = (message as List<Object?>?)!;
           final String? arg_componentId = (args[0] as String?);
           assert(arg_componentId != null,
               'Argument for dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface.onApplePayAuthorize was null, expected non-null String.');
-          final ApplePayAuthorizedPaymentDTO? arg_payment = (args[1] as ApplePayAuthorizedPaymentDTO?);
+          final ApplePayAuthorizedPaymentDTO? arg_payment =
+              (args[1] as ApplePayAuthorizedPaymentDTO?);
           assert(arg_payment != null,
               'Argument for dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface.onApplePayAuthorize was null, expected non-null ApplePayAuthorizedPaymentDTO.');
           try {
-            final ApplePayAuthorizationResultDTO output = await api.onApplePayAuthorize(arg_componentId!, arg_payment!);
+            final ApplePayAuthorizationResultDTO output =
+                await api.onApplePayAuthorize(arg_componentId!, arg_payment!);
             return wrapResponse(result: output);
           } on PlatformException catch (e) {
             return wrapResponse(error: e);
-          }          catch (e) {
-            return wrapResponse(error: PlatformException(code: 'error', message: e.toString()));
+          } catch (e) {
+            return wrapResponse(
+                error: PlatformException(code: 'error', message: e.toString()));
           }
         });
       }
@@ -4884,58 +5143,77 @@ abstract class ComponentFlutterInterface {
 abstract class AdyenFlutterInterface {
   static const MessageCodec<Object?> pigeonChannelCodec = _PigeonCodec();
 
-  Future<CheckoutResultDTO> onSubmit(PlatformCommunicationDTO platformCommunicationDTO);
+  Future<CheckoutResultDTO> onSubmit(
+      PlatformCommunicationDTO platformCommunicationDTO);
 
-  Future<CheckoutResultDTO> onAdditionalDetails(PlatformCommunicationDTO platformCommunicationDTO);
+  Future<CheckoutResultDTO> onAdditionalDetails(
+      PlatformCommunicationDTO platformCommunicationDTO);
 
-  static void setUp(AdyenFlutterInterface? api, {BinaryMessenger? binaryMessenger, String messageChannelSuffix = '',}) {
-    messageChannelSuffix = messageChannelSuffix.isNotEmpty ? '.$messageChannelSuffix' : '';
+  static void setUp(
+    AdyenFlutterInterface? api, {
+    BinaryMessenger? binaryMessenger,
+    String messageChannelSuffix = '',
+  }) {
+    messageChannelSuffix =
+        messageChannelSuffix.isNotEmpty ? '.$messageChannelSuffix' : '';
     {
-      final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-          'dev.flutter.pigeon.adyen_checkout.AdyenFlutterInterface.onSubmit$messageChannelSuffix', pigeonChannelCodec,
+      final BasicMessageChannel<
+          Object?> pigeonVar_channel = BasicMessageChannel<
+              Object?>(
+          'dev.flutter.pigeon.adyen_checkout.AdyenFlutterInterface.onSubmit$messageChannelSuffix',
+          pigeonChannelCodec,
           binaryMessenger: binaryMessenger);
       if (api == null) {
         pigeonVar_channel.setMessageHandler(null);
       } else {
         pigeonVar_channel.setMessageHandler((Object? message) async {
           assert(message != null,
-          'Argument for dev.flutter.pigeon.adyen_checkout.AdyenFlutterInterface.onSubmit was null.');
+              'Argument for dev.flutter.pigeon.adyen_checkout.AdyenFlutterInterface.onSubmit was null.');
           final List<Object?> args = (message as List<Object?>?)!;
-          final PlatformCommunicationDTO? arg_platformCommunicationDTO = (args[0] as PlatformCommunicationDTO?);
+          final PlatformCommunicationDTO? arg_platformCommunicationDTO =
+              (args[0] as PlatformCommunicationDTO?);
           assert(arg_platformCommunicationDTO != null,
               'Argument for dev.flutter.pigeon.adyen_checkout.AdyenFlutterInterface.onSubmit was null, expected non-null PlatformCommunicationDTO.');
           try {
-            final CheckoutResultDTO output = await api.onSubmit(arg_platformCommunicationDTO!);
+            final CheckoutResultDTO output =
+                await api.onSubmit(arg_platformCommunicationDTO!);
             return wrapResponse(result: output);
           } on PlatformException catch (e) {
             return wrapResponse(error: e);
-          }          catch (e) {
-            return wrapResponse(error: PlatformException(code: 'error', message: e.toString()));
+          } catch (e) {
+            return wrapResponse(
+                error: PlatformException(code: 'error', message: e.toString()));
           }
         });
       }
     }
     {
-      final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-          'dev.flutter.pigeon.adyen_checkout.AdyenFlutterInterface.onAdditionalDetails$messageChannelSuffix', pigeonChannelCodec,
+      final BasicMessageChannel<
+          Object?> pigeonVar_channel = BasicMessageChannel<
+              Object?>(
+          'dev.flutter.pigeon.adyen_checkout.AdyenFlutterInterface.onAdditionalDetails$messageChannelSuffix',
+          pigeonChannelCodec,
           binaryMessenger: binaryMessenger);
       if (api == null) {
         pigeonVar_channel.setMessageHandler(null);
       } else {
         pigeonVar_channel.setMessageHandler((Object? message) async {
           assert(message != null,
-          'Argument for dev.flutter.pigeon.adyen_checkout.AdyenFlutterInterface.onAdditionalDetails was null.');
+              'Argument for dev.flutter.pigeon.adyen_checkout.AdyenFlutterInterface.onAdditionalDetails was null.');
           final List<Object?> args = (message as List<Object?>?)!;
-          final PlatformCommunicationDTO? arg_platformCommunicationDTO = (args[0] as PlatformCommunicationDTO?);
+          final PlatformCommunicationDTO? arg_platformCommunicationDTO =
+              (args[0] as PlatformCommunicationDTO?);
           assert(arg_platformCommunicationDTO != null,
               'Argument for dev.flutter.pigeon.adyen_checkout.AdyenFlutterInterface.onAdditionalDetails was null, expected non-null PlatformCommunicationDTO.');
           try {
-            final CheckoutResultDTO output = await api.onAdditionalDetails(arg_platformCommunicationDTO!);
+            final CheckoutResultDTO output =
+                await api.onAdditionalDetails(arg_platformCommunicationDTO!);
             return wrapResponse(result: output);
           } on PlatformException catch (e) {
             return wrapResponse(error: e);
-          }          catch (e) {
-            return wrapResponse(error: PlatformException(code: 'error', message: e.toString()));
+          } catch (e) {
+            return wrapResponse(
+                error: PlatformException(code: 'error', message: e.toString()));
           }
         });
       }
@@ -4954,29 +5232,40 @@ abstract class SessionCheckoutFlutterInterface {
   /// has registered [SessionCheckout.onBeforeSubmit].
   Future<BeforeSubmitResultDTO> onBeforeSubmit(BeforeSubmitDataDTO data);
 
-  static void setUp(SessionCheckoutFlutterInterface? api, {BinaryMessenger? binaryMessenger, String messageChannelSuffix = '',}) {
-    messageChannelSuffix = messageChannelSuffix.isNotEmpty ? '.$messageChannelSuffix' : '';
+  static void setUp(
+    SessionCheckoutFlutterInterface? api, {
+    BinaryMessenger? binaryMessenger,
+    String messageChannelSuffix = '',
+  }) {
+    messageChannelSuffix =
+        messageChannelSuffix.isNotEmpty ? '.$messageChannelSuffix' : '';
     {
-      final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-          'dev.flutter.pigeon.adyen_checkout.SessionCheckoutFlutterInterface.onBeforeSubmit$messageChannelSuffix', pigeonChannelCodec,
+      final BasicMessageChannel<
+          Object?> pigeonVar_channel = BasicMessageChannel<
+              Object?>(
+          'dev.flutter.pigeon.adyen_checkout.SessionCheckoutFlutterInterface.onBeforeSubmit$messageChannelSuffix',
+          pigeonChannelCodec,
           binaryMessenger: binaryMessenger);
       if (api == null) {
         pigeonVar_channel.setMessageHandler(null);
       } else {
         pigeonVar_channel.setMessageHandler((Object? message) async {
           assert(message != null,
-          'Argument for dev.flutter.pigeon.adyen_checkout.SessionCheckoutFlutterInterface.onBeforeSubmit was null.');
+              'Argument for dev.flutter.pigeon.adyen_checkout.SessionCheckoutFlutterInterface.onBeforeSubmit was null.');
           final List<Object?> args = (message as List<Object?>?)!;
-          final BeforeSubmitDataDTO? arg_data = (args[0] as BeforeSubmitDataDTO?);
+          final BeforeSubmitDataDTO? arg_data =
+              (args[0] as BeforeSubmitDataDTO?);
           assert(arg_data != null,
               'Argument for dev.flutter.pigeon.adyen_checkout.SessionCheckoutFlutterInterface.onBeforeSubmit was null, expected non-null BeforeSubmitDataDTO.');
           try {
-            final BeforeSubmitResultDTO output = await api.onBeforeSubmit(arg_data!);
+            final BeforeSubmitResultDTO output =
+                await api.onBeforeSubmit(arg_data!);
             return wrapResponse(result: output);
           } on PlatformException catch (e) {
             return wrapResponse(error: e);
-          }          catch (e) {
-            return wrapResponse(error: PlatformException(code: 'error', message: e.toString()));
+          } catch (e) {
+            return wrapResponse(
+                error: PlatformException(code: 'error', message: e.toString()));
           }
         });
       }
@@ -4984,14 +5273,15 @@ abstract class SessionCheckoutFlutterInterface {
   }
 }
 
-Stream<ComponentCommunicationModel> onPlatformEvent( {String instanceName = ''}) {
+Stream<ComponentCommunicationModel> onPlatformEvent(
+    {String instanceName = ''}) {
   if (instanceName.isNotEmpty) {
     instanceName = '.$instanceName';
   }
-  final EventChannel onPlatformEventChannel =
-      EventChannel('dev.flutter.pigeon.adyen_checkout.PlatformEvents.onPlatformEvent$instanceName', pigeonMethodCodec);
+  final EventChannel onPlatformEventChannel = EventChannel(
+      'dev.flutter.pigeon.adyen_checkout.PlatformEvents.onPlatformEvent$instanceName',
+      pigeonMethodCodec);
   return onPlatformEventChannel.receiveBroadcastStream().map((dynamic event) {
     return event as ComponentCommunicationModel;
   });
 }
-    

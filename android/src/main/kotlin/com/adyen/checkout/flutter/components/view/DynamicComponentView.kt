@@ -7,6 +7,8 @@ import android.view.ViewTreeObserver
 import android.widget.FrameLayout
 import androidx.activity.ComponentActivity
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.appcompat.widget.SwitchCompat
@@ -28,7 +30,9 @@ import com.adyen.checkout.core.components.CheckoutTarget
 import com.adyen.checkout.core.components.CheckoutController
 import com.adyen.checkout.core.components.AdvancedCheckoutCallbacks
 import com.adyen.checkout.core.components.CheckoutPaymentFlow
+import com.adyen.checkout.core.components.CheckoutRoute
 import com.adyen.checkout.core.components.SessionCheckoutCallbacks
+import com.adyen.checkout.flutter.components.v2.V6ComponentControllerRegistry
 import com.adyen.checkout.core.components.data.model.paymentmethod.PaymentMethodResponse
 import com.adyen.checkout.core.components.data.model.paymentmethod.StoredPaymentMethod
 import com.adyen.checkout.flutter.components.ComponentPlatformEventHandler
@@ -130,10 +134,30 @@ class DynamicComponentView
                                         throw IllegalArgumentException("Invalid combination of CheckoutContext and CheckoutCallbacks")
                                     }
                                 }
+
+                            LaunchedEffect(controller) {
+                                val requiresUserInteraction = controller.requiresUserInteraction()
+                                sendComponentReady(requiresUserInteraction)
+
+                                if (!requiresUserInteraction) {
+                                    resizeFlutterViewport(0)
+                                }
+
+                                controller.navigation.collect { route ->
+                                    if (route is CheckoutRoute.Action) {
+                                        V6ComponentControllerRegistry.setActive(componentId)
+                                    }
+                                }
+                            }
+
+                            DisposableEffect(controller) {
+                                V6ComponentControllerRegistry.register(componentId, controller)
+                                onDispose {
+                                    V6ComponentControllerRegistry.unregister(componentId)
+                                }
+                            }
+
                             CheckoutPaymentFlow(controller)
-//                            CheckoutPaymentMethod(controller = controller, onNavigate = { route ->
-//                                println("route: $route")
-//                            })
                         }
                     }
                 }
@@ -156,6 +180,16 @@ class DynamicComponentView
         fun onDispose() {
             ignoreLayoutChanges = false
             interactionBlocked = false
+        }
+
+        private fun sendComponentReady(requiresUserInteraction: Boolean) {
+            platformEventHandler?.eventSink?.success(
+                ComponentCommunicationModel(
+                    type = ComponentCommunicationType.COMPONENT_READY,
+                    componentId = componentId,
+                    data = requiresUserInteraction,
+                ),
+            )
         }
 
         private fun <T> onComponentViewGlobalLayout(

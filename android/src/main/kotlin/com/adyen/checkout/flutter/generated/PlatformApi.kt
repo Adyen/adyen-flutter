@@ -193,7 +193,8 @@ enum class ComponentCommunicationType(val raw: Int) {
   BIN_LOOKUP(5),
   BIN_VALUE(6),
   AVAILABILITY(7),
-  BUTTON_PRESSED(8);
+  BUTTON_PRESSED(8),
+  COMPONENT_READY(9);
 
   companion object {
     fun ofRaw(raw: Int): ComponentCommunicationType? {
@@ -3687,6 +3688,7 @@ interface ComponentPlatformInterface {
   fun onInstantPaymentPressed(instantPaymentConfigurationDTO: InstantPaymentConfigurationDTO, encodedPaymentMethod: String, componentId: String)
   fun handleAction(actionComponentConfiguration: ActionComponentConfigurationDTO, componentId: String, actionResponse: Map<String?, Any?>?)
   fun onDispose(componentId: String)
+  fun submitComponent(componentId: String)
 
   companion object {
     /** The codec used by ComponentPlatformInterface. */
@@ -3823,6 +3825,24 @@ interface ComponentPlatformInterface {
             val componentIdArg = args[0] as String
             val wrapped: List<Any?> = try {
               api.onDispose(componentIdArg)
+              listOf(null)
+            } catch (exception: Throwable) {
+              PlatformApiPigeonUtils.wrapError(exception)
+            }
+            reply.reply(wrapped)
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.adyen_checkout.ComponentPlatformInterface.submitComponent$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { message, reply ->
+            val args = message as List<Any?>
+            val componentIdArg = args[0] as String
+            val wrapped: List<Any?> = try {
+              api.submitComponent(componentIdArg)
               listOf(null)
             } catch (exception: Throwable) {
               PlatformApiPigeonUtils.wrapError(exception)
