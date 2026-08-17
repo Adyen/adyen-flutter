@@ -9,7 +9,7 @@ import UIKit
 final class SceneDelegate: FlutterSceneDelegate {
     override func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {
         var unhandledURLContexts = Set<UIOpenURLContext>()
-        for context in URLContexts where !RedirectComponent.applicationDidOpen(from: context.url) {
+        for context in URLContexts where !Checkout.handleReturn(url: context.url) {
             unhandledURLContexts.insert(context)
         }
         guard !unhandledURLContexts.isEmpty else { return }
