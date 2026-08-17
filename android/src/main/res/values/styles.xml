@@ -1,8 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Base theme for components rendered inside a Flutter platform view. It links into the
-         Android SDK theme chain (AdyenCheckout -> AppTheme -> Adyen -> Theme.MaterialComponents),
-         so integrators can keep customizing components by overriding "AdyenCheckout" or
-         "AppTheme" in their own resources. -->
+    <!-- The Android SDK chains "AdyenCheckout" to a placeholder named "AppTheme", which is a name
+         generic enough that other libraries define it too. Such a library replaces the placeholder
+         during resource merging, which detaches the whole Adyen theme from Theme.MaterialComponents
+         and makes the components fail to inflate. Skipping the placeholder keeps the default Adyen
+         theme intact, as described by option 3 of the Android SDK UI customization guide.
+         Integrators can still override "AdyenCheckout" in their own resources. -->
+    <style name="AdyenCheckout" parent="@style/Adyen" />
+
+    <!-- Base theme for components rendered inside a Flutter platform view. -->
     <style name="AdyenCheckout.Flutter" parent="@style/AdyenCheckout" />
 </resources>
