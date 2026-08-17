@@ -1,56 +1,25 @@
-## 1.12.0 (in development)
-
-### New
-
-- Added `PaymentError.code`, a stable string code (e.g. `PaymentErrorCode.paymentMethodFailure`)
-  mirroring the native SDKs' `CheckoutError.code`. Lets you distinguish error categories (e.g. a
-  payment method genuinely being unavailable) without matching on `PaymentError.reason`'s
-  human-readable text.
-- Added `onBeforeSubmit` support for the sessions flow via `AdyenCheckoutSession.setup()`.
-  Lets you inspect or modify shopper data (billing/delivery address, shopper name, shopper
-  email), or abort the submission, right before the SDK submits the sessions `/payments`
-  request. Available for the generic session component integration
-  (`AdyenComponent`/`AdyenSessionComponent`); Drop-in and the dedicated Card/Blik session
-  components are not yet supported. On iOS, `ShopperName.infix`/`.gender` are not yet
-  populated pending a native SDK change.
+## 1.12.0
 
 ### Improved
 
 - For Card Component on Android: the configured `countryCode` is now applied as the
   default country for full-address forms.
-- For Apple Pay: reduced unnecessary re-rendering on widget rebuilds by caching the
-  availability result.
-- Apple Pay's button is now rendered by a native `PKPaymentButton` (the same system button
-  Adyen's own Drop-in uses) instead of a Dart-drawn approximation, matching Apple's Apple Pay
-  button exactly.
-
-### Removed
-
-- **Breaking**: removed `AdyenGooglePayComponent` (Android). Render Google Pay through the
-  generic `AdyenComponent` instead, the same way Card/Blik are rendered, by passing the
-  `googlepay` payment method from your `/paymentMethods` response and setting
-  `CheckoutConfiguration.googlePayConfiguration`. `GooglePayButtonStyle`/`onUnavailable`/
-  `unavailableWidget`/`loadingIndicator` have no equivalent on `AdyenComponent`: the button is
-  now rendered and styled by the native SDK, and an unavailable Google Pay renders nothing and
-  reports a `PaymentError` (with `code == PaymentErrorCode.paymentMethodFailure`) via
-  `onPaymentResult` instead of the previous silent `onUnavailable` callback.
-- **Breaking**: removed `AdyenApplePayComponent`, `ApplePaySessionComponent`,
-  `ApplePayAdvancedComponent`. Render Apple Pay through the generic `AdyenComponent` instead, by
-  passing the `applepay` payment method from your `/paymentMethods` response and setting
-  `CheckoutConfiguration.applePayConfiguration`. `AdyenComponent` gained `onUnavailable`/
-  `unavailableWidget`/`loadingIndicator` parameters (used only for Apple Pay, ignored for every
-  other payment method) to replace the ones previously on `AdyenApplePayComponent`.
-- **Breaking**: removed the `style`/`width`/`height` parameters from the Apple Pay button widget.
-  Set `ApplePayConfiguration.buttonStyle`/`buttonWidth`/`buttonHeight` instead.
-- Removed the `pay` dependency entirely, now that both Apple Pay and Google Pay render their
-  buttons natively instead of via that package.
+- For Apple Pay and Google Pay Components: reduced unnecessary re-rendering on widget rebuilds by
+  caching the availability result.
 
 ### Changed
 
-- Minimum iOS version increased from 12.0 to 13.0. This aligns with Flutter's own minimum iOS
-  requirement.
-- Minimum Android version increased from API 21 to API 23. This aligns with the Adyen Android SDK
-  requirements.
+- iOS: [The minimum version](https://docs.adyen.com/online-payments/upgrade-your-integration#ios)
+  has increased 12.0 to **13.0**. This aligns with Flutter's own minimum iOS requirement.
+- Android: [The minimum  API level (
+  `minSdkVersion`)](https://docs.adyen.com/online-payments/upgrade-your-integration#android) has
+  increased from 21 to **23**. This aligns with the latest [
+  `pay` package](https://pub.dev/packages/pay) requirements.
+- Dependency versions:
+  | Name | Version |
+  |---------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------|
+  | [pay](https://pub.dev/packages/pay) | 3.2.1 -> **3.3.0** |
+  | [Android Drop-in/Components](https://docs.adyen.com/online-payments/release-notes/?title%5B0%5D=Android+Components%2FDrop-in&version%5B0%5D=5.20.0) | 5.19.0 -> **5.20.0** |
 
 ## 1.11.0
 
