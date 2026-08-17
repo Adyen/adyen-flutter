@@ -20,9 +20,8 @@ class DropInPlatformApi: DropInPlatformInterface {
     private let sessionHolder: SessionHolder
     private var hostViewController: UIViewController?
     private var dropInViewController: DropInViewController?
-    private var dropInSessionStoredPaymentMethodsDelegate: DropInSessionsStoredPaymentMethodsDelegate?
+    private var dropInStoredPaymentMethodsDelegate: DropInStoredPaymentMethodsDelegate?
     private var dropInAdvancedFlowDelegate: DropInAdvancedFlowDelegate?
-    private var dropInAdvancedFlowStoredPaymentMethodsDelegate: DropInAdvancedFlowStoredPaymentMethodsDelegate?
     private var checkBalanceHandler: ((Result<Balance, any Error>) -> Void)?
     private var requestOrderHandler: ((Result<PartialPaymentOrder, any Error>) -> Void)?
 
@@ -48,7 +47,7 @@ class DropInPlatformApi: DropInPlatformInterface {
             hostViewController = viewController
             let sessionPayment = session.sessionContext.createPayment(fallbackCountryCode: dropInConfigurationDTO.countryCode)
             let adyenContext = try dropInConfigurationDTO.createAdyenContext(payment: sessionPayment)
-            dropInSessionStoredPaymentMethodsDelegate = DropInSessionsStoredPaymentMethodsDelegate(
+            dropInStoredPaymentMethodsDelegate = DropInStoredPaymentMethodsDelegate(
                 viewController: viewController,
                 checkoutFlutter: checkoutFlutter
             )
@@ -75,7 +74,7 @@ class DropInPlatformApi: DropInPlatformInterface {
             dropInComponent.partialPaymentDelegate = sessionHolder.session
             dropInComponent.cardComponentDelegate = self
             if dropInConfigurationDTO.isRemoveStoredPaymentMethodEnabled {
-                dropInComponent.storedPaymentMethodsDelegate = dropInSessionStoredPaymentMethodsDelegate
+                dropInComponent.storedPaymentMethodsDelegate = dropInStoredPaymentMethodsDelegate
             }
             
             let dropInViewController = DropInViewController(dropInComponent: dropInComponent)
@@ -123,11 +122,11 @@ class DropInPlatformApi: DropInPlatformInterface {
                 dropInComponent.partialPaymentDelegate = self
             }
             if dropInConfigurationDTO.isRemoveStoredPaymentMethodEnabled == true {
-                dropInAdvancedFlowStoredPaymentMethodsDelegate = DropInAdvancedFlowStoredPaymentMethodsDelegate(
+                dropInStoredPaymentMethodsDelegate = DropInStoredPaymentMethodsDelegate(
                     viewController: viewController,
                     checkoutFlutter: checkoutFlutter
                 )
-                dropInComponent.storedPaymentMethodsDelegate = dropInAdvancedFlowStoredPaymentMethodsDelegate
+                dropInComponent.storedPaymentMethodsDelegate = dropInStoredPaymentMethodsDelegate
             }
             let dropInViewController = DropInViewController(dropInComponent: dropInComponent)
             dropInViewController.modalPresentationStyle = .overCurrentContext
@@ -167,10 +166,7 @@ class DropInPlatformApi: DropInPlatformInterface {
     }
 
     func onDeleteStoredPaymentMethodResult(deleteStoredPaymentMethodResultDTO: DeletedStoredPaymentMethodResultDTO) {
-        dropInSessionStoredPaymentMethodsDelegate?.handleDisableResult(
-            isSuccessfullyRemoved: deleteStoredPaymentMethodResultDTO.isSuccessfullyRemoved
-        )
-        dropInAdvancedFlowStoredPaymentMethodsDelegate?.handleDisableResult(
+        dropInStoredPaymentMethodsDelegate?.handleDisableResult(
             isSuccessfullyRemoved: deleteStoredPaymentMethodResultDTO.isSuccessfullyRemoved
         )
     }
@@ -203,10 +199,9 @@ class DropInPlatformApi: DropInPlatformInterface {
 
     func cleanUpDropIn() {
         sessionHolder.reset()
-        dropInSessionStoredPaymentMethodsDelegate = nil
+        dropInStoredPaymentMethodsDelegate = nil
         dropInAdvancedFlowDelegate?.dropInInteractorDelegate = nil
         dropInAdvancedFlowDelegate = nil
-        dropInAdvancedFlowStoredPaymentMethodsDelegate = nil
         checkBalanceHandler = nil
         requestOrderHandler = nil
         dropInViewController = nil

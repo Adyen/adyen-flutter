@@ -2,7 +2,7 @@
 import Adyen
 import UIKit
 
-class DropInAdvancedFlowStoredPaymentMethodsDelegate: StoredPaymentMethodsDelegate {
+class DropInStoredPaymentMethodsDelegate: StoredPaymentMethodsDelegate {
     private let checkoutFlutter: CheckoutFlutterInterface
     private let viewController: UIViewController
     private var completionHandler: ((Bool) -> Void)?
