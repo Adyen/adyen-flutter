@@ -7,10 +7,12 @@ import com.adyen.checkout.flutter.R
 
 internal object ThemeUtil {
     /**
-     * Components rendered inside a Flutter platform view inherit the theme of the host activity.
-     * The Adyen views require a Theme.MaterialComponents descendant, which the host activity theme
-     * does not necessarily provide. When it does not, the context is wrapped in
-     * [R.style.AdyenCheckout_Flutter] so the components can still be inflated.
+     * Components rendered inside a Flutter platform view inherit the theme of the host activity,
+     * unlike Drop-in, which runs in an activity that the Android SDK themes itself. The Adyen views
+     * require a Theme.MaterialComponents descendant, which a host activity theme does not
+     * necessarily provide: the theme Flutter generates for a new project does not. When the host
+     * theme misses the material attributes, the context is wrapped in
+     * [R.style.AdyenCheckout_Flutter], which is a material theme by definition.
      */
     fun applyAdyenTheme(context: Context): Context {
         if (isMaterialTheme(context)) return context
