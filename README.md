@@ -68,7 +68,9 @@ release a new version when we need to.
   layer.
 * Standalone Components require the Android `NormalTheme` to inherit from a
   `Theme.MaterialComponents` theme. See [Android UI customization](doc/CUSTOMIZATION.md#android)
-  and the [example theme configuration](https://github.com/Adyen/adyen-flutter/blob/main/example/android/app/src/main/res/values/styles.xml#L15-L23).
+  and the example [day](https://github.com/Adyen/adyen-flutter/blob/main/example/android/app/src/main/res/values/styles.xml#L15-L23)
+  and [night](https://github.com/Adyen/adyen-flutter/blob/main/example/android/app/src/main/res/values-night/styles.xml#L15-L17)
+  theme configurations.
 
 #### iOS
 
