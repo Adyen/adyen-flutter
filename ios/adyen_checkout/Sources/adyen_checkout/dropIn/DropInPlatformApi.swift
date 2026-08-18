@@ -8,9 +8,6 @@ import Foundation
 #if canImport(AdyenCard)
     import AdyenCard
 #endif
-#if canImport(AdyenSession)
-    import AdyenSession
-#endif
 import UIKit
 @_spi(AdyenInternal) import Adyen
 #if canImport(AdyenNetworking)
@@ -24,11 +21,6 @@ class DropInPlatformApi: DropInPlatformInterface {
     private let dropInWindowManager: DropInWindowManager
     private var presentationID: UUID?
     private var dropInViewController: DropInViewController?
-    // `DropInComponent.delegate` and `AdyenSession.delegate` are weak, and the session holder is the only
-    // other owner. Holding both for the lifetime of the presentation keeps the Drop-in able to report its
-    // result even when a new session is created while it is on screen.
-    private var presentedSession: AdyenSession?
-    private var presentedSessionDelegate: AdyenSessionDelegate?
     private var dropInSessionStoredPaymentMethodsDelegate: DropInSessionsStoredPaymentMethodsDelegate?
     private var dropInAdvancedFlowDelegate: DropInAdvancedFlowDelegate?
     private var dropInAdvancedFlowStoredPaymentMethodsDelegate: DropInAdvancedFlowStoredPaymentMethodsDelegate?
@@ -94,9 +86,8 @@ class DropInPlatformApi: DropInPlatformInterface {
             }
             self.presentationID = presentationID
             self.dropInViewController = dropInViewController
-            presentedSession = session
-            presentedSessionDelegate = sessionHolder.sessionDelegate
-            (presentedSessionDelegate as? DropInSessionsDelegate)?.presentationID = presentationID
+            sessionHolder.markSessionAsInUse()
+            (sessionHolder.sessionDelegate as? DropInSessionsDelegate)?.presentationID = presentationID
             dropInSessionStoredPaymentMethodsDelegate = storedPaymentMethodsDelegate
         } catch {
             sendSessionError(error: error)
@@ -255,8 +246,7 @@ private extension DropInPlatformApi {
 
     func clearPresentationReferences() {
         presentationID = nil
-        presentedSession = nil
-        presentedSessionDelegate = nil
+        sessionHolder.releaseSession()
         dropInSessionStoredPaymentMethodsDelegate = nil
         dropInAdvancedFlowDelegate?.dropInInteractorDelegate = nil
         dropInAdvancedFlowDelegate = nil

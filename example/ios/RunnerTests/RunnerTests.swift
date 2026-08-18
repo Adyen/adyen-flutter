@@ -314,6 +314,27 @@ class RunnerTests: XCTestCase {
     }
 }
 
+extension RunnerTests {
+    func test_reset_whenSessionIsInUse_shouldDoNothing() {
+        let sessionHolder = SessionHolder()
+        sessionHolder.markSessionAsInUse()
+
+        sessionHolder.reset()
+
+        XCTAssertTrue(sessionHolder.isSessionInUse)
+    }
+
+    func test_reset_afterSessionIsReleased_shouldSucceed() {
+        let sessionHolder = SessionHolder()
+        sessionHolder.markSessionAsInUse()
+        sessionHolder.releaseSession()
+
+        sessionHolder.reset()
+
+        XCTAssertFalse(sessionHolder.isSessionInUse)
+    }
+}
+
 private class MockDropInRootViewController: UIViewController, DropInRootViewController {
     weak var hostViewController: UIViewController?
     /// Stubbed so the manager's "is anything presented?" check does not rely on a real UIKit transition.
