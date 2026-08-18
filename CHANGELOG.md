@@ -1,3 +1,11 @@
+## 1.13.0 (In development)
+
+### Improved
+
+- Android: Improved Checkout theme inheritance so unrelated `AppTheme` resources no longer cause
+  Material widget inflation failures, and documented the Material-compatible `NormalTheme`
+  requirement for standalone Components.
+
 ## 1.12.0
 
 ### Improved
