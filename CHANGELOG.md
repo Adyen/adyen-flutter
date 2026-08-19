@@ -1,3 +1,10 @@
+## 1.13.0 (in development)
+
+### Improved
+
+- For Drop-in on iOS: simplified stored payment method deletion handling by consolidating duplicated
+  internal delegates.
+
 ## 1.12.0
 
 ### Improved
