@@ -117,7 +117,7 @@ class DropInPlatformApi: DropInPlatformInterface {
             if dropInConfigurationDTO.isPartialPaymentSupported {
                 dropInComponent.partialPaymentDelegate = self
             }
-            if dropInConfigurationDTO.isRemoveStoredPaymentMethodEnabled == true {
+            if dropInConfigurationDTO.isRemoveStoredPaymentMethodEnabled {
                 dropInComponent.storedPaymentMethodsDelegate = self
             }
             let dropInViewController = DropInViewController(dropInComponent: dropInComponent)
