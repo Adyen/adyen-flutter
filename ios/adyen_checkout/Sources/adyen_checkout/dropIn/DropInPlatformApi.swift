@@ -20,7 +20,7 @@ class DropInPlatformApi: DropInPlatformInterface {
     private let sessionHolder: SessionHolder
     private var hostViewController: UIViewController?
     private var dropInViewController: DropInViewController?
-    private var dropInStoredPaymentMethodsDelegate: DropInStoredPaymentMethodsDelegate?
+    private var deleteStoredPaymentMethodCompletionHandler: ((Bool) -> Void)?
     private var dropInAdvancedFlowDelegate: DropInAdvancedFlowDelegate?
     private var checkBalanceHandler: ((Result<Balance, any Error>) -> Void)?
     private var requestOrderHandler: ((Result<PartialPaymentOrder, any Error>) -> Void)?
@@ -47,10 +47,6 @@ class DropInPlatformApi: DropInPlatformInterface {
             hostViewController = viewController
             let sessionPayment = session.sessionContext.createPayment(fallbackCountryCode: dropInConfigurationDTO.countryCode)
             let adyenContext = try dropInConfigurationDTO.createAdyenContext(payment: sessionPayment)
-            dropInStoredPaymentMethodsDelegate = DropInStoredPaymentMethodsDelegate(
-                viewController: viewController,
-                checkoutFlutter: checkoutFlutter
-            )
             let dropInConfiguration = try dropInConfigurationDTO.createDropInConfiguration(payment: sessionPayment)
             var paymentMethods = session.sessionContext.paymentMethods
             if let paymentMethodNames = dropInConfigurationDTO.paymentMethodNames {
@@ -74,7 +70,7 @@ class DropInPlatformApi: DropInPlatformInterface {
             dropInComponent.partialPaymentDelegate = sessionHolder.session
             dropInComponent.cardComponentDelegate = self
             if dropInConfigurationDTO.isRemoveStoredPaymentMethodEnabled {
-                dropInComponent.storedPaymentMethodsDelegate = dropInStoredPaymentMethodsDelegate
+                dropInComponent.storedPaymentMethodsDelegate = self
             }
             
             let dropInViewController = DropInViewController(dropInComponent: dropInComponent)
@@ -122,11 +118,7 @@ class DropInPlatformApi: DropInPlatformInterface {
                 dropInComponent.partialPaymentDelegate = self
             }
             if dropInConfigurationDTO.isRemoveStoredPaymentMethodEnabled == true {
-                dropInStoredPaymentMethodsDelegate = DropInStoredPaymentMethodsDelegate(
-                    viewController: viewController,
-                    checkoutFlutter: checkoutFlutter
-                )
-                dropInComponent.storedPaymentMethodsDelegate = dropInStoredPaymentMethodsDelegate
+                dropInComponent.storedPaymentMethodsDelegate = self
             }
             let dropInViewController = DropInViewController(dropInComponent: dropInComponent)
             dropInViewController.modalPresentationStyle = .overCurrentContext
@@ -166,9 +158,10 @@ class DropInPlatformApi: DropInPlatformInterface {
     }
 
     func onDeleteStoredPaymentMethodResult(deleteStoredPaymentMethodResultDTO: DeletedStoredPaymentMethodResultDTO) {
-        dropInStoredPaymentMethodsDelegate?.handleDisableResult(
-            isSuccessfullyRemoved: deleteStoredPaymentMethodResultDTO.isSuccessfullyRemoved
+        deleteStoredPaymentMethodCompletionHandler?(
+            deleteStoredPaymentMethodResultDTO.isSuccessfullyRemoved
         )
+        deleteStoredPaymentMethodCompletionHandler = nil
     }
     
     func onBalanceCheckResult(balanceCheckResponse: String) throws {
@@ -199,7 +192,7 @@ class DropInPlatformApi: DropInPlatformInterface {
 
     func cleanUpDropIn() {
         sessionHolder.reset()
-        dropInStoredPaymentMethodsDelegate = nil
+        deleteStoredPaymentMethodCompletionHandler = nil
         dropInAdvancedFlowDelegate?.dropInInteractorDelegate = nil
         dropInAdvancedFlowDelegate = nil
         checkBalanceHandler = nil
@@ -364,6 +357,20 @@ class DropInPlatformApi: DropInPlatformInterface {
         }
         
         return paymentMethodsWithAdjustedNames
+    }
+}
+
+extension DropInPlatformApi: StoredPaymentMethodsDelegate {
+    func disable(storedPaymentMethod: StoredPaymentMethod, completion: @escaping (Bool) -> Void) {
+        deleteStoredPaymentMethodCompletionHandler = completion
+        let checkoutEvent = CheckoutEvent(
+            type: CheckoutEventType.deleteStoredPaymentMethod,
+            data: storedPaymentMethod.identifier
+        )
+        checkoutFlutter.send(
+            event: checkoutEvent,
+            completion: { _ in }
+        )
     }
 }
 
