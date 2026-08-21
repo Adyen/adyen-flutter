@@ -4,9 +4,13 @@
 
 - For Drop-in on iOS: simplified stored payment method deletion handling by consolidating duplicated
   internal delegates.
-- Android: Improved Checkout theme inheritance so unrelated `AppTheme` resources no longer cause
-  Material widget inflation failures, and documented the Material-compatible `NormalTheme`
-  requirement for standalone Components.
+
+### Changed
+
+- Android: Changed the default `AdyenCheckout` theme to inherit directly from `Adyen`, preventing
+  unrelated dependencies that define `AppTheme` from causing Material widget inflation failures.
+  Apps that customize Drop-in through `AppTheme` must move those attributes to an app-level
+  `AdyenCheckout` style.
 
 ## 1.12.0
 
