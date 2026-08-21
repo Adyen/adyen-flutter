@@ -1,7 +1,9 @@
-## 1.13.0 (In development)
+## 1.13.0 (in development)
 
 ### Improved
 
+- For Drop-in on iOS: simplified stored payment method deletion handling by consolidating duplicated
+  internal delegates.
 - Android: Improved Checkout theme inheritance so unrelated `AppTheme` resources no longer cause
   Material widget inflation failures, and documented the Material-compatible `NormalTheme`
   requirement for standalone Components.
