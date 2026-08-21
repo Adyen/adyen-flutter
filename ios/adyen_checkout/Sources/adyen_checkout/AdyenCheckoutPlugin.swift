@@ -4,15 +4,13 @@ import UIKit
 public class AdyenCheckoutPlugin: NSObject, FlutterPlugin {
     public static func register(with registrar: FlutterPluginRegistrar) {
         let sessionHolder = SessionHolder()
-        let dropInWindowManager = DropInWindowManager()
         let messenger: FlutterBinaryMessenger = registrar.messenger()
         let checkoutFlutter = CheckoutFlutterInterface(binaryMessenger: messenger)
         let componentFlutterApi = ComponentFlutterInterface(binaryMessenger: messenger)
         let checkoutPlatformApi = CheckoutPlatformApi(
             checkoutFlutter: checkoutFlutter,
             componentFlutterApi: componentFlutterApi,
-            sessionHolder: sessionHolder,
-            dropInWindowManager: dropInWindowManager
+            sessionHolder: sessionHolder
         )
         
         let componentPlatformApi = ComponentPlatformApi(
@@ -24,8 +22,7 @@ public class AdyenCheckoutPlugin: NSObject, FlutterPlugin {
 
         let dropInPlatformApi = DropInPlatformApi(
             checkoutFlutter: checkoutFlutter,
-            sessionHolder: sessionHolder,
-            dropInWindowManager: dropInWindowManager
+            sessionHolder: sessionHolder
         )
         DropInPlatformInterfaceSetup.setUp(binaryMessenger: messenger, api: dropInPlatformApi)
 

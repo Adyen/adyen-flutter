@@ -39,97 +39,66 @@ class RunnerTests: XCTestCase {
     }
 
     @MainActor
-    func test_givenDropInIsPresented_whenCleanedUp_thenRestoresHostWindowState() throws {
+    func test_givenDropInIsPresented_whenCleanedUp_thenTearsDownDropInWindow() throws {
         let hostWindow = try XCTUnwrap(activeWindow())
-        let hostView = try XCTUnwrap(hostWindow.rootViewController?.view)
-        let initialAccessibilityElementsHidden = hostView.accessibilityElementsHidden
-        defer { hostView.accessibilityElementsHidden = initialAccessibilityElementsHidden }
         var dropInWindow: UIWindow?
         let manager = DropInWindowManager(
-            hostWindowProvider: { hostWindow },
             windowFactory: {
                 let window = UIWindow(windowScene: $0)
                 dropInWindow = window
                 return window
             }
         )
-        let rootViewController = MockDropInRootViewController()
+        let dropInComponent = try makeDropInComponent()
 
-        try manager.present(rootViewController: rootViewController)
+        try manager.present(viewController: dropInComponent.viewController)
 
-        XCTAssertEqual(manager.state, .presented)
         XCTAssertEqual(dropInWindow?.windowLevel.rawValue, UIWindow.Level.normal.rawValue + 1)
         XCTAssertTrue(dropInWindow?.isKeyWindow == true)
-        XCTAssertTrue(rootViewController.hostViewController === hostWindow.rootViewController)
-        XCTAssertTrue(dropInWindow?.accessibilityViewIsModal == true)
-        XCTAssertTrue(rootViewController.view.accessibilityViewIsModal)
-        XCTAssertTrue(hostView.accessibilityElementsHidden)
+        XCTAssertFalse(dropInWindow?.rootViewController === dropInComponent.viewController)
+        XCTAssertTrue(dropInWindow?.rootViewController?.presentedViewController === dropInComponent.viewController)
 
         manager.cleanUp()
 
-        XCTAssertEqual(manager.state, .idle)
-        XCTAssertEqual(hostView.accessibilityElementsHidden, initialAccessibilityElementsHidden)
         XCTAssertTrue(hostWindow.isKeyWindow)
         XCTAssertTrue(dropInWindow?.isHidden == true)
     }
 
     @MainActor
     func test_givenDropInIsPresented_whenPresentingAgain_thenKeepsExistingPresentation() throws {
-        let hostWindow = try XCTUnwrap(activeWindow())
-        let manager = DropInWindowManager(hostWindowProvider: { hostWindow })
-        try manager.present(rootViewController: MockDropInRootViewController())
+        let manager = DropInWindowManager()
+        try manager.present(viewController: UIViewController())
         defer { manager.cleanUp() }
 
-        let result = try manager.present(rootViewController: MockDropInRootViewController())
+        let result = try manager.present(viewController: UIViewController())
 
         XCTAssertFalse(result)
-        XCTAssertEqual(manager.state, .presented)
     }
 
     @MainActor
-    func test_givenHostAccessibilityIsHidden_whenDropInIsDismissed_thenPreservesHiddenState() throws {
+    func test_givenDropInIsPresented_whenMultipleDismissalsAreRequested_thenCompletesOnlyFirst() throws {
         let hostWindow = try XCTUnwrap(activeWindow())
-        let hostView = try XCTUnwrap(hostWindow.rootViewController?.view)
-        let initialAccessibilityElementsHidden = hostView.accessibilityElementsHidden
-        hostView.accessibilityElementsHidden = true
-        defer { hostView.accessibilityElementsHidden = initialAccessibilityElementsHidden }
-        let manager = DropInWindowManager(hostWindowProvider: { hostWindow })
-
-        try manager.present(rootViewController: MockDropInRootViewController())
-        manager.cleanUp()
-
-        XCTAssertTrue(hostView.accessibilityElementsHidden)
-    }
-
-    @MainActor
-    func test_givenHostWindowHasNoScene_whenPresentingDropIn_thenFails() {
-        let manager = DropInWindowManager(hostWindowProvider: { UIWindow(frame: .zero) })
-
-        XCTAssertThrowsError(try manager.present(rootViewController: MockDropInRootViewController()))
-        XCTAssertEqual(manager.state, .idle)
-    }
-
-    @MainActor
-    func test_givenDropInIsPresented_whenMultipleDismissalsAreRequested_thenCoalescesDismissals() throws {
-        let hostWindow = try XCTUnwrap(activeWindow())
-        let manager = DropInWindowManager(hostWindowProvider: { hostWindow })
-        let rootViewController = MockDropInRootViewController()
-        rootViewController.stubbedPresentedViewController = UIViewController()
-        try manager.present(rootViewController: rootViewController)
+        var dismissCallCount = 0
+        var pendingDismissalCompletion: (() -> Void)?
+        let manager = DropInWindowManager(
+            dismissViewController: { _, _, completion in
+                dismissCallCount += 1
+                pendingDismissalCompletion = completion
+            }
+        )
+        try manager.present(viewController: UIViewController())
         var completedDismissals = 0
 
         manager.dismiss(animated: false) { completedDismissals += 1 }
         manager.dismiss(animated: false) { completedDismissals += 1 }
 
-        // Both requests wait on the single underlying dismissal rather than starting a second one.
-        XCTAssertEqual(manager.state, .dismissing)
-        XCTAssertEqual(rootViewController.dismissDropInCallCount, 1)
+        // The later request cannot replace the terminal completion that already owns the dismissal.
+        XCTAssertEqual(dismissCallCount, 1)
         XCTAssertEqual(completedDismissals, 0)
 
-        rootViewController.completePendingDismissal()
+        pendingDismissalCompletion?()
 
-        XCTAssertEqual(manager.state, .idle)
-        XCTAssertEqual(completedDismissals, 2)
+        XCTAssertEqual(completedDismissals, 1)
         XCTAssertTrue(hostWindow.isKeyWindow)
     }
 
@@ -142,16 +111,14 @@ class RunnerTests: XCTestCase {
         let windowScene = try XCTUnwrap(hostWindow.windowScene)
         let notificationCenter = NotificationCenter()
         let manager = DropInWindowManager(
-            hostWindowProvider: { hostWindow },
             notificationCenter: notificationCenter
         )
         var unexpectedDismissals = 0
-        manager.onUnexpectedDismissal = { _ in unexpectedDismissals += 1 }
-        try manager.present(rootViewController: MockDropInRootViewController())
+        manager.onUnexpectedDismissal = { unexpectedDismissals += 1 }
+        try manager.present(viewController: UIViewController())
 
         notificationCenter.post(name: UIScene.didDisconnectNotification, object: windowScene)
 
-        XCTAssertEqual(manager.state, .idle)
         XCTAssertEqual(unexpectedDismissals, 1)
     }
 
@@ -162,78 +129,52 @@ class RunnerTests: XCTestCase {
         let windowScene = try XCTUnwrap(hostWindow.windowScene)
         let notificationCenter = NotificationCenter()
         let manager = DropInWindowManager(
-            hostWindowProvider: { hostWindow },
+            dismissViewController: { _, _, _ in },
             notificationCenter: notificationCenter
         )
         var unexpectedDismissals = 0
-        manager.onUnexpectedDismissal = { _ in unexpectedDismissals += 1 }
-        let rootViewController = MockDropInRootViewController()
-        rootViewController.stubbedPresentedViewController = UIViewController()
-        try manager.present(rootViewController: rootViewController)
+        manager.onUnexpectedDismissal = { unexpectedDismissals += 1 }
+        try manager.present(viewController: UIViewController())
         // Dismissal is requested but never completed by UIKit, leaving the manager mid-dismissal.
         manager.dismiss(animated: false)
 
         notificationCenter.post(name: UIScene.didDisconnectNotification, object: windowScene)
 
-        XCTAssertEqual(manager.state, .idle)
         XCTAssertEqual(unexpectedDismissals, 0)
     }
 
     @MainActor
-    func test_givenSceneDisconnectDuringFinalization_whenFinalizationCompletes_thenAllowsOneTerminalResult() throws {
+    func test_givenSceneDisconnectDuringFinalization_whenFinalizationCompletes_thenReportsOneTerminalResult() throws {
         let hostWindow = try XCTUnwrap(activeWindow())
         defer { hostWindow.makeKey() }
         let windowScene = try XCTUnwrap(hostWindow.windowScene)
         let notificationCenter = NotificationCenter()
         let manager = DropInWindowManager(
-            hostWindowProvider: { hostWindow },
             notificationCenter: notificationCenter
         )
+        let dropInViewController = UIViewController()
         var terminalResults = 0
-        manager.onUnexpectedDismissal = { presentationID in
-            if manager.claimTerminalResult(for: presentationID) {
-                terminalResults += 1
-            }
+        manager.onUnexpectedDismissal = { terminalResults += 1 }
+        try manager.present(viewController: dropInViewController)
+        let finishFinalization = {
+            manager.dismiss(
+                viewController: dropInViewController,
+                animated: false,
+                completion: { terminalResults += 1 }
+            )
         }
-        try manager.present(rootViewController: MockDropInRootViewController())
-        let presentationID = try XCTUnwrap(manager.activePresentationID)
 
         notificationCenter.post(name: UIScene.didDisconnectNotification, object: windowScene)
-        if manager.claimTerminalResult(for: presentationID) {
-            terminalResults += 1
-        }
+        finishFinalization()
 
         XCTAssertEqual(terminalResults, 1)
-    }
-
-    @MainActor
-    func test_givenHostHasPresentedViewController_whenPresentingDropIn_thenUsesVisibleControllerForTraits() throws {
-        let originalWindow = try XCTUnwrap(activeWindow())
-        let windowScene = try XCTUnwrap(originalWindow.windowScene)
-        let hostRootViewController = MockDropInRootViewController()
-        let visibleViewController = MockHostViewController()
-        hostRootViewController.stubbedPresentedViewController = visibleViewController
-        let hostWindow = UIWindow(windowScene: windowScene)
-        hostWindow.rootViewController = hostRootViewController
-        hostWindow.makeKeyAndVisible()
-        let manager = DropInWindowManager(hostWindowProvider: { hostWindow })
-        let dropInRootViewController = MockDropInRootViewController()
-        defer {
-            manager.cleanUp()
-            hostWindow.isHidden = true
-            originalWindow.makeKey()
-        }
-
-        try manager.present(rootViewController: dropInRootViewController)
-
-        XCTAssertTrue(dropInRootViewController.hostViewController === visibleViewController)
     }
 
     @MainActor
     func test_givenNewerWindowIsKey_whenDropInIsDismissed_thenPreservesNewerKeyWindow() throws {
         let hostWindow = try XCTUnwrap(activeWindow())
         let windowScene = try XCTUnwrap(hostWindow.windowScene)
-        let manager = DropInWindowManager(hostWindowProvider: { hostWindow })
+        let manager = DropInWindowManager()
         let newerWindow = UIWindow(windowScene: windowScene)
         newerWindow.rootViewController = UIViewController()
         defer {
@@ -241,41 +182,13 @@ class RunnerTests: XCTestCase {
             newerWindow.isHidden = true
             hostWindow.makeKey()
         }
-        try manager.present(rootViewController: MockDropInRootViewController())
+        try manager.present(viewController: UIViewController())
         newerWindow.makeKeyAndVisible()
 
         manager.cleanUp()
 
         XCTAssertTrue(newerWindow.isKeyWindow)
         XCTAssertFalse(hostWindow.isKeyWindow)
-    }
-
-    @MainActor
-    func test_givenHostViewController_whenReadingDropInTraits_thenMirrorsHostTraits() throws {
-        let sut = try DropInViewController(dropInComponent: makeDropInComponent())
-        // Held strongly for the duration of the test, mirroring the host window retaining its root view controller.
-        let hostViewController = MockHostViewController()
-
-        XCTAssertEqual(sut.supportedInterfaceOrientations, UIViewController().supportedInterfaceOrientations)
-
-        sut.hostViewController = hostViewController
-
-        withExtendedLifetime(hostViewController) {
-            XCTAssertEqual(sut.supportedInterfaceOrientations, .portrait)
-            XCTAssertEqual(sut.preferredStatusBarStyle, .lightContent)
-            XCTAssertTrue(sut.prefersStatusBarHidden)
-            XCTAssertTrue(sut.prefersHomeIndicatorAutoHidden)
-        }
-    }
-
-    @MainActor
-    func test_givenDropInWasDismissed_whenViewAppears_thenDoesNotPresentDropIn() throws {
-        let sut = try DropInViewController(dropInComponent: makeDropInComponent())
-        sut.dismissDropIn(animated: false, completion: nil)
-
-        sut.viewDidAppear(false)
-
-        XCTAssertNil(sut.presentedViewController)
     }
 
     private func createDropInConfigurationDTO() -> DropInConfigurationDTO {
@@ -332,49 +245,5 @@ extension RunnerTests {
         sessionHolder.reset()
 
         XCTAssertFalse(sessionHolder.isSessionInUse)
-    }
-}
-
-private class MockDropInRootViewController: UIViewController, DropInRootViewController {
-    weak var hostViewController: UIViewController?
-    /// Stubbed so the manager's "is anything presented?" check does not rely on a real UIKit transition.
-    /// CI simulators do not reliably run presentation transitions to completion, which previously hung the tests.
-    var stubbedPresentedViewController: UIViewController?
-    private(set) var dismissDropInCallCount = 0
-    private var pendingDismissalCompletion: (() -> Void)?
-
-    override var presentedViewController: UIViewController? {
-        stubbedPresentedViewController
-    }
-
-    func dismissDropIn(animated _: Bool, completion: (() -> Void)?) {
-        dismissDropInCallCount += 1
-        pendingDismissalCompletion = completion
-    }
-
-    /// Invokes the dismissal completion UIKit would have delivered.
-    func completePendingDismissal() {
-        stubbedPresentedViewController = nil
-        let completion = pendingDismissalCompletion
-        pendingDismissalCompletion = nil
-        completion?()
-    }
-}
-
-private class MockHostViewController: UIViewController {
-    override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
-        .portrait
-    }
-
-    override var preferredStatusBarStyle: UIStatusBarStyle {
-        .lightContent
-    }
-
-    override var prefersStatusBarHidden: Bool {
-        true
-    }
-
-    override var prefersHomeIndicatorAutoHidden: Bool {
-        true
     }
 }

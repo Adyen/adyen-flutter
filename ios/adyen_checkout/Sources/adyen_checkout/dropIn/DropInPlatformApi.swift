@@ -18,25 +18,22 @@ class DropInPlatformApi: DropInPlatformInterface {
     private let jsonDecoder = JSONDecoder()
     private let checkoutFlutter: CheckoutFlutterInterface
     private let sessionHolder: SessionHolder
-    private let dropInWindowManager: DropInWindowManager
-    private var presentationID: UUID?
-    private var dropInViewController: DropInViewController?
+    private var dropInComponent: DropInComponent?
     private var dropInSessionStoredPaymentMethodsDelegate: DropInSessionsStoredPaymentMethodsDelegate?
     private var dropInAdvancedFlowDelegate: DropInAdvancedFlowDelegate?
     private var dropInAdvancedFlowStoredPaymentMethodsDelegate: DropInAdvancedFlowStoredPaymentMethodsDelegate?
     private var checkBalanceHandler: ((Result<Balance, any Error>) -> Void)?
     private var requestOrderHandler: ((Result<PartialPaymentOrder, any Error>) -> Void)?
+    private let dropInWindowManager = DropInWindowManager()
 
     init(
         checkoutFlutter: CheckoutFlutterInterface,
-        sessionHolder: SessionHolder,
-        dropInWindowManager: DropInWindowManager
+        sessionHolder: SessionHolder
     ) {
         self.checkoutFlutter = checkoutFlutter
         self.sessionHolder = sessionHolder
-        self.dropInWindowManager = dropInWindowManager
-        dropInWindowManager.onUnexpectedDismissal = { [weak self] presentationID in
-            self?.handleUnexpectedDismissal(presentationID: presentationID)
+        dropInWindowManager.onUnexpectedDismissal = { [weak self] in
+            self?.handleUnexpectedDismissal()
         }
     }
 
@@ -67,10 +64,10 @@ class DropInPlatformApi: DropInPlatformInterface {
                 configuration: dropInConfiguration,
                 title: dropInConfigurationDTO.preselectedPaymentMethodTitle
             )
-            let dropInViewController = DropInViewController(dropInComponent: dropInComponent)
             let storedPaymentMethodsDelegate = DropInSessionsStoredPaymentMethodsDelegate(
                 checkoutFlutter: checkoutFlutter
             )
+
             dropInComponent.delegate = session
             dropInComponent.partialPaymentDelegate = session
             dropInComponent.cardComponentDelegate = self
@@ -81,13 +78,13 @@ class DropInPlatformApi: DropInPlatformInterface {
             // Everything above is built into locals so a rejected presentation cannot replace the
             // references of a Drop-in that is already on screen. They are committed only once the
             // window manager accepted the presentation.
-            guard let presentationID = try presentDropIn(rootViewController: dropInViewController) else {
+            guard try dropInWindowManager.present(dropInViewController: dropInComponent.viewController) else {
                 return
             }
-            self.presentationID = presentationID
-            self.dropInViewController = dropInViewController
+
+            self.dropInComponent = dropInComponent
             sessionHolder.markSessionAsInUse()
-            (sessionHolder.sessionDelegate as? DropInSessionsDelegate)?.presentationID = presentationID
+            (sessionHolder.sessionDelegate as? DropInSessionsDelegate)?.dropInInteractorDelegate = self
             dropInSessionStoredPaymentMethodsDelegate = storedPaymentMethodsDelegate
         } catch {
             sendSessionError(error: error)
@@ -120,7 +117,6 @@ class DropInPlatformApi: DropInPlatformInterface {
                 configuration: configuration,
                 title: dropInConfigurationDTO.preselectedPaymentMethodTitle
             )
-            let dropInViewController = DropInViewController(dropInComponent: dropInComponent)
             let advancedFlowDelegate = DropInAdvancedFlowDelegate(checkoutFlutter: checkoutFlutter)
             advancedFlowDelegate.dropInInteractorDelegate = self
             dropInComponent.delegate = advancedFlowDelegate
@@ -132,15 +128,11 @@ class DropInPlatformApi: DropInPlatformInterface {
                 dropInComponent.storedPaymentMethodsDelegate = delegate
                 storedPaymentMethodsDelegate = delegate
             }
-
-            // Everything above is built into locals so a rejected presentation cannot replace the
-            // references of a Drop-in that is already on screen. They are committed only once the
-            // window manager accepted the presentation.
-            guard let presentationID = try presentDropIn(rootViewController: dropInViewController) else {
+            guard try dropInWindowManager.present(dropInViewController: dropInComponent.viewController) else {
                 return
             }
-            self.presentationID = presentationID
-            self.dropInViewController = dropInViewController
+
+            self.dropInComponent = dropInComponent
             dropInAdvancedFlowDelegate = advancedFlowDelegate
             dropInAdvancedFlowStoredPaymentMethodsDelegate = storedPaymentMethodsDelegate
         } catch {
@@ -220,19 +212,8 @@ class DropInPlatformApi: DropInPlatformInterface {
 }
 
 private extension DropInPlatformApi {
-    func presentDropIn(rootViewController: DropInRootViewController) throws -> UUID? {
-        guard try dropInWindowManager.present(rootViewController: rootViewController) else {
-            return nil
-        }
-        return dropInWindowManager.activePresentationID
-    }
-
     /// The Drop-in window disappeared without a dismissal request, so Flutter still awaits a result.
-    func handleUnexpectedDismissal(presentationID: UUID) {
-        guard dropInViewController != nil,
-              dropInWindowManager.claimTerminalResult(for: presentationID) else {
-            return
-        }
+    func handleUnexpectedDismissal() {
         clearPresentationReferences()
         let checkoutEvent = CheckoutEvent(
             type: CheckoutEventType.result,
@@ -245,7 +226,7 @@ private extension DropInPlatformApi {
     }
 
     func clearPresentationReferences() {
-        presentationID = nil
+        dropInComponent = nil
         sessionHolder.releaseSession()
         dropInSessionStoredPaymentMethodsDelegate = nil
         dropInAdvancedFlowDelegate?.dropInInteractorDelegate = nil
@@ -253,7 +234,6 @@ private extension DropInPlatformApi {
         dropInAdvancedFlowStoredPaymentMethodsDelegate = nil
         checkBalanceHandler = nil
         requestOrderHandler = nil
-        dropInViewController = nil
     }
 
     func handlePaymentEvent(paymentEventDTO: PaymentEventDTO) {
@@ -288,7 +268,7 @@ private extension DropInPlatformApi {
         do {
             let jsonData = try JSONSerialization.data(withJSONObject: paymentEventDTO.data as Any, options: [])
             let result = try JSONDecoder().decode(Action.self, from: jsonData)
-            dropInViewController?.dropInComponent.handle(result)
+            dropInComponent?.handle(result)
         } catch {
             let paymentResult = PaymentResultDTO(type: PaymentResultEnum.error, reason: error.localizedDescription)
             let checkoutEvent = CheckoutEvent(type: CheckoutEventType.result, data: paymentResult)
@@ -299,7 +279,7 @@ private extension DropInPlatformApi {
     }
 
     func onDropInResultError(paymentEventDTO: PaymentEventDTO) {
-        dropInViewController?.dropInComponent.stopLoading()
+        dropInComponent?.stopLoading()
 
         if paymentEventDTO.error?.dismissDropIn == true || dropInAdvancedFlowDelegate?.isApplePay == true {
             finalizeAndDismiss(success: false) { [weak self] in
@@ -308,8 +288,8 @@ private extension DropInPlatformApi {
                 self?.checkoutFlutter.send(event: checkoutEvent, completion: { _ in })
             }
         } else {
-            dropInViewController?.dropInComponent.finalizeIfNeeded(with: false, completion: {})
-            let localizationParameters = (dropInViewController?.dropInComponent as? Localizable)?.localizationParameters
+            dropInComponent?.finalizeIfNeeded(with: false, completion: {})
+            let localizationParameters = (dropInComponent as? Localizable)?.localizationParameters
             let title = localizedString(.errorTitle, localizationParameters)
             let alertController = UIAlertController(
                 title: title,
@@ -320,7 +300,9 @@ private extension DropInPlatformApi {
                 title: localizedString(.dismissButton, localizationParameters),
                 style: .cancel
             ))
-            dropInViewController?.adyen.topPresenter.present(alertController, animated: true)
+
+            // Should be part of interactor
+            dropInComponent?.viewController.adyen.topPresenter.present(alertController, animated: true)
         }
     }
     
@@ -338,7 +320,7 @@ private extension DropInPlatformApi {
             let paymentMethods = try jsonDecoder.decode(PaymentMethods.self, from: updatedPaymentMethodsData)
             let orderData = try JSONSerialization.data(withJSONObject: orderResponse, options: [])
             let order = try jsonDecoder.decode(PartialPaymentOrder.self, from: orderData)
-            try dropInViewController?.dropInComponent.reload(with: order, paymentMethods)
+            try dropInComponent?.reload(with: order, paymentMethods)
         } catch {
             adyenPrint(error.localizedDescription)
         }
@@ -390,23 +372,23 @@ private extension DropInPlatformApi {
 }
 
 extension DropInPlatformApi: DropInInteractorDelegate {
+    func dismiss(completion: @escaping () -> Void) {
+        dropInWindowManager.dismiss(animated: true, completion: completion)
+    }
+
     func finalizeAndDismiss(success: Bool, completion: @escaping (() -> Void)) {
-        guard let presentationID else { return }
-        let completeOnce = { [weak self] in
-            guard let self,
-                  self.dropInWindowManager.claimTerminalResult(for: presentationID) else {
-                return
-            }
-            self.presentationID = nil
-            completion()
-        }
-        guard let dropInViewController else {
-            dropInWindowManager.dismiss(animated: true, completion: completeOnce)
+        guard let dropInComponent else {
+            dropInWindowManager.dismiss(animated: true, completion: completion)
             return
         }
 
-        dropInViewController.dropInComponent.finalizeIfNeeded(with: success) { [weak self] in
-            self?.dropInWindowManager.dismiss(animated: true, completion: completeOnce)
+        let viewController = dropInComponent.viewController
+        dropInComponent.finalizeIfNeeded(with: success) { [weak self] in
+            self?.dropInWindowManager.dismiss(
+                viewController: viewController,
+                animated: true,
+                completion: completion
+            )
         }
     }
 }
