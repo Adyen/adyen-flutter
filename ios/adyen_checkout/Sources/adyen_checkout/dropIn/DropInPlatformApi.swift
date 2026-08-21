@@ -81,7 +81,6 @@ class DropInPlatformApi: DropInPlatformInterface {
             self.dropInComponent = dropInComponent
             sessionHolder.markSessionAsInUse()
             (sessionHolder.sessionDelegate as? DropInSessionsDelegate)?.dropInInteractorDelegate = self
-            dropInSessionStoredPaymentMethodsDelegate = storedPaymentMethodsDelegate
         } catch {
             sendSessionError(error: error)
         }
@@ -129,7 +128,6 @@ class DropInPlatformApi: DropInPlatformInterface {
 
             self.dropInComponent = dropInComponent
             dropInAdvancedFlowDelegate = advancedFlowDelegate
-            dropInAdvancedFlowStoredPaymentMethodsDelegate = storedPaymentMethodsDelegate
         } catch {
             let checkoutEvent = CheckoutEvent(
                 type: CheckoutEventType.result,
@@ -201,7 +199,6 @@ class DropInPlatformApi: DropInPlatformInterface {
         dropInWindowManager.cleanUp()
         clearPresentationReferences()
         sessionHolder.reset()
-        deleteStoredPaymentMethodCompletionHandler = nil
     }
 }
 
@@ -221,8 +218,9 @@ private extension DropInPlatformApi {
 
     func clearPresentationReferences() {
         dropInComponent = nil
+        deleteStoredPaymentMethodCompletionHandler = nil
+        (sessionHolder.sessionDelegate as? DropInSessionsDelegate)?.dropInInteractorDelegate = nil
         sessionHolder.releaseSession()
-        dropInSessionStoredPaymentMethodsDelegate = nil
         dropInAdvancedFlowDelegate?.dropInInteractorDelegate = nil
         dropInAdvancedFlowDelegate = nil
         checkBalanceHandler = nil
@@ -293,8 +291,6 @@ private extension DropInPlatformApi {
                 title: localizedString(.dismissButton, localizationParameters),
                 style: .cancel
             ))
-
-            // Should be part of interactor
             dropInComponent?.viewController.adyen.topPresenter.present(alertController, animated: true)
         }
     }

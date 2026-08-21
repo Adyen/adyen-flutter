@@ -51,7 +51,7 @@ class RunnerTests: XCTestCase {
         )
         let dropInComponent = try makeDropInComponent()
 
-        try manager.present(viewController: dropInComponent.viewController)
+        try manager.present(dropInViewController: dropInComponent.viewController)
 
         XCTAssertEqual(dropInWindow?.windowLevel.rawValue, UIWindow.Level.normal.rawValue + 1)
         XCTAssertTrue(dropInWindow?.isKeyWindow == true)
@@ -67,10 +67,10 @@ class RunnerTests: XCTestCase {
     @MainActor
     func test_givenDropInIsPresented_whenPresentingAgain_thenKeepsExistingPresentation() throws {
         let manager = DropInWindowManager()
-        try manager.present(viewController: UIViewController())
+        try manager.present(dropInViewController: UIViewController())
         defer { manager.cleanUp() }
 
-        let result = try manager.present(viewController: UIViewController())
+        let result = try manager.present(dropInViewController: UIViewController())
 
         XCTAssertFalse(result)
     }
@@ -86,7 +86,7 @@ class RunnerTests: XCTestCase {
                 pendingDismissalCompletion = completion
             }
         )
-        try manager.present(viewController: UIViewController())
+        try manager.present(dropInViewController: UIViewController())
         var completedDismissals = 0
 
         manager.dismiss(animated: false) { completedDismissals += 1 }
@@ -115,7 +115,7 @@ class RunnerTests: XCTestCase {
         )
         var unexpectedDismissals = 0
         manager.onUnexpectedDismissal = { unexpectedDismissals += 1 }
-        try manager.present(viewController: UIViewController())
+        try manager.present(dropInViewController: UIViewController())
 
         notificationCenter.post(name: UIScene.didDisconnectNotification, object: windowScene)
 
@@ -134,7 +134,7 @@ class RunnerTests: XCTestCase {
         )
         var unexpectedDismissals = 0
         manager.onUnexpectedDismissal = { unexpectedDismissals += 1 }
-        try manager.present(viewController: UIViewController())
+        try manager.present(dropInViewController: UIViewController())
         // Dismissal is requested but never completed by UIKit, leaving the manager mid-dismissal.
         manager.dismiss(animated: false)
 
@@ -155,7 +155,7 @@ class RunnerTests: XCTestCase {
         let dropInViewController = UIViewController()
         var terminalResults = 0
         manager.onUnexpectedDismissal = { terminalResults += 1 }
-        try manager.present(viewController: dropInViewController)
+        try manager.present(dropInViewController: dropInViewController)
         let finishFinalization = {
             manager.dismiss(
                 viewController: dropInViewController,
@@ -182,7 +182,7 @@ class RunnerTests: XCTestCase {
             newerWindow.isHidden = true
             hostWindow.makeKey()
         }
-        try manager.present(viewController: UIViewController())
+        try manager.present(dropInViewController: UIViewController())
         newerWindow.makeKeyAndVisible()
 
         manager.cleanUp()
