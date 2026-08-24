@@ -38,7 +38,10 @@ class DropInPlatformApi: DropInPlatformInterface {
 
     func showDropInSession(dropInConfigurationDTO: DropInConfigurationDTO) {
         do {
-            guard let session = sessionHolder.session else {
+            // Drop-in relies on the delegate to dismiss itself once the session completes. Without it the
+            // Drop-in would stay on screen and Flutter would never receive a result, so fail fast instead.
+            guard let session = sessionHolder.session,
+                  let sessionsDelegate = sessionHolder.sessionDelegate as? DropInSessionsDelegate else {
                 throw PlatformError(errorDescription: "Session is not available.")
             }
 
@@ -80,7 +83,7 @@ class DropInPlatformApi: DropInPlatformInterface {
 
             self.dropInComponent = dropInComponent
             sessionHolder.markSessionAsInUse()
-            (sessionHolder.sessionDelegate as? DropInSessionsDelegate)?.dropInInteractorDelegate = self
+            sessionsDelegate.dropInInteractorDelegate = self
         } catch {
             sendSessionError(error: error)
         }
@@ -197,6 +200,7 @@ class DropInPlatformApi: DropInPlatformInterface {
 
     func cleanUpDropIn() {
         dropInWindowManager.cleanUp()
+        // Releases the session before resetting it, otherwise `SessionHolder` keeps the session alive.
         clearPresentationReferences()
         sessionHolder.reset()
     }
@@ -216,6 +220,7 @@ private extension DropInPlatformApi {
         checkoutFlutter.send(event: checkoutEvent, completion: { _ in })
     }
 
+    /// Drops everything tied to a single Drop-in presentation, including the session's in-use claim.
     func clearPresentationReferences() {
         dropInComponent = nil
         deleteStoredPaymentMethodCompletionHandler = nil

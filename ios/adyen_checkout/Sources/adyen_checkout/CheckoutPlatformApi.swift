@@ -183,7 +183,10 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
             do {
                 switch result {
                 case let .success(session):
-                    guard let self else { return }
+                    guard let self else {
+                        completion(Result.failure(PlatformError(errorDescription: "Checkout is no longer available.")))
+                        return
+                    }
                     try sessionHolder.setup(
                         session: session,
                         sessionDelegate: sessionDelegate

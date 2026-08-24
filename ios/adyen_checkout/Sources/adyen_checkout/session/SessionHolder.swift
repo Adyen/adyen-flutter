@@ -6,6 +6,9 @@
 class SessionHolder {
     var session: AdyenSession?
     var sessionDelegate: AdyenSessionDelegate?
+
+    /// Set while a presentation owns the session, so a stray `clearSession()` from the merchant cannot
+    /// tear down a session that is still driving an on-screen Drop-in.
     private(set) var isSessionInUse = false
 
     func setup(
@@ -17,8 +20,13 @@ class SessionHolder {
         self.sessionDelegate = sessionDelegate
     }
 
+    /// Discards the session, unless a presentation still holds it. Callers tearing down that presentation
+    /// must call `releaseSession()` first, otherwise the session is kept and the reset is ignored.
     func reset() {
-        guard !isSessionInUse else { return }
+        guard !isSessionInUse else {
+            adyenPrint("Session reset ignored because the session is still in use.")
+            return
+        }
         (sessionDelegate as? ComponentSessionFlowHandler)?.reset()
         session = nil
         sessionDelegate = nil
