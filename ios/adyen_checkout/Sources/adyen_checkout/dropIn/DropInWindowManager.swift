@@ -14,7 +14,7 @@ final class DropInWindowManager {
     private let notificationCenter: NotificationCenter
     private var dropInWindow: UIWindow?
     private var sceneDisconnectObserver: NSObjectProtocol?
-    private var dismissalCompletion: (() -> Void)?
+    private var pendingDismissalCompletion: (() -> Void)?
 
     init(
         windowFactory: @escaping (UIWindowScene) -> UIWindow = UIWindow.init(windowScene:),
@@ -63,55 +63,31 @@ final class DropInWindowManager {
         return true
     }
 
-    func dismiss(animated: Bool, completion: @escaping () -> Void = {}) {
-        assertMainThread()
-        guard let viewController = dropInWindow?.rootViewController?.presentedViewController else { return }
-        dismiss(
-            viewController: viewController,
-            animated: animated,
-            completion: completion
-        )
-    }
-
     func dismiss(
         viewController: UIViewController,
         animated: Bool,
         completion: @escaping () -> Void = {}
     ) {
         assertMainThread()
-        guard let window = dropInWindow,
-              window.rootViewController?.presentedViewController === viewController else {
+        guard pendingDismissalCompletion == nil,
+              let window = dropInWindow,
+              let rootViewController = window.rootViewController,
+              rootViewController.presentedViewController === viewController else {
             return
         }
-        performDismissal(
-            window: window,
-            animated: animated,
-            completion: completion
-        )
+        pendingDismissalCompletion = completion
+
+        // `self` is captured strongly on purpose: the window must be torn down even if the owner released us.
+        dismissViewController(rootViewController, animated) {
+            guard self.dropInWindow === window else { return }
+            self.tearDownWindow()
+        }
     }
 
     func cleanUp() {
-        dismissalCompletion = nil
-        tearDownWindow()
-    }
-
-    private func performDismissal(
-        window: UIWindow,
-        animated: Bool,
-        completion: @escaping () -> Void
-    ) {
         assertMainThread()
-        guard dismissalCompletion == nil, dropInWindow === window else { return }
-        dismissalCompletion = completion
-
-        guard let rootViewController = window.rootViewController,
-              rootViewController.presentedViewController != nil else {
-            tearDownWindow()
-            return
-        }
-
-        // `self` is captured strongly on purpose: the window must be torn down even if the owner released us.
-        dismissViewController(rootViewController, animated) { self.tearDownWindow() }
+        pendingDismissalCompletion = nil
+        tearDownWindow()
     }
 
     private func assertMainThread() {
@@ -125,7 +101,7 @@ final class DropInWindowManager {
             queue: .main
         ) { [weak self] _ in
             guard let self else { return }
-            let wasDismissalRequested = dismissalCompletion != nil
+            let wasDismissalRequested = pendingDismissalCompletion != nil
             tearDownWindow()
             if !wasDismissalRequested {
                 onUnexpectedDismissal?()
@@ -141,8 +117,8 @@ final class DropInWindowManager {
             self.sceneDisconnectObserver = nil
         }
 
-        let completion = dismissalCompletion
-        dismissalCompletion = nil
+        let completion = pendingDismissalCompletion
+        pendingDismissalCompletion = nil
         window.isHidden = true
         window.rootViewController = nil
         dropInWindow = nil

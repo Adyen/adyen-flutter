@@ -86,11 +86,12 @@ class RunnerTests: XCTestCase {
                 pendingDismissalCompletion = completion
             }
         )
-        try manager.present(dropInViewController: UIViewController())
+        let dropInViewController = UIViewController()
+        try manager.present(dropInViewController: dropInViewController)
         var completedDismissals = 0
 
-        manager.dismiss(animated: false) { completedDismissals += 1 }
-        manager.dismiss(animated: false) { completedDismissals += 1 }
+        manager.dismiss(viewController: dropInViewController, animated: false) { completedDismissals += 1 }
+        manager.dismiss(viewController: dropInViewController, animated: false) { completedDismissals += 1 }
 
         // The later request cannot replace the terminal completion that already owns the dismissal.
         XCTAssertEqual(dismissCallCount, 1)
@@ -138,9 +139,10 @@ class RunnerTests: XCTestCase {
         var completedDismissals = 0
         var unexpectedDismissals = 0
         manager.onUnexpectedDismissal = { unexpectedDismissals += 1 }
-        try manager.present(dropInViewController: UIViewController())
+        let dropInViewController = UIViewController()
+        try manager.present(dropInViewController: dropInViewController)
         // Dismissal is requested but never completed by UIKit, leaving the manager mid-dismissal.
-        manager.dismiss(animated: false) { completedDismissals += 1 }
+        manager.dismiss(viewController: dropInViewController, animated: false) { completedDismissals += 1 }
 
         notificationCenter.post(name: UIScene.didDisconnectNotification, object: windowScene)
 
@@ -150,6 +152,34 @@ class RunnerTests: XCTestCase {
         pendingDismissalCompletion?()
 
         XCTAssertEqual(completedDismissals, 1)
+    }
+
+    @MainActor
+    func test_givenNewPresentationAfterSceneDisconnect_whenOldDismissalCompletes_thenKeepsNewPresentation() throws {
+        let hostWindow = try XCTUnwrap(activeWindow())
+        defer { hostWindow.makeKey() }
+        let windowScene = try XCTUnwrap(hostWindow.windowScene)
+        let notificationCenter = NotificationCenter()
+        var pendingDismissalCompletion: (() -> Void)?
+        let manager = DropInWindowManager(
+            dismissViewController: { _, _, completion in
+                pendingDismissalCompletion = completion
+            },
+            notificationCenter: notificationCenter
+        )
+        let firstViewController = UIViewController()
+        try manager.present(dropInViewController: firstViewController)
+        manager.dismiss(viewController: firstViewController, animated: false)
+        notificationCenter.post(name: UIScene.didDisconnectNotification, object: windowScene)
+
+        hostWindow.makeKey()
+        let secondViewController = UIViewController()
+        XCTAssertTrue(try manager.present(dropInViewController: secondViewController))
+
+        pendingDismissalCompletion?()
+
+        XCTAssertFalse(try manager.present(dropInViewController: UIViewController()))
+        manager.cleanUp()
     }
 
     @MainActor
