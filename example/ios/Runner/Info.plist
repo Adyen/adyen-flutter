@@ -57,10 +57,10 @@
 				<dict>
 					<key>UISceneClassName</key>
 					<string>UIWindowScene</string>
-					<key>UISceneConfigurationName</key>
-					<string>flutter</string>
 					<key>UISceneDelegateClassName</key>
 					<string>$(PRODUCT_MODULE_NAME).SceneDelegate</string>
+					<key>UISceneConfigurationName</key>
+					<string>flutter</string>
 					<key>UISceneStoryboardFile</key>
 					<string>Main</string>
 				</dict>

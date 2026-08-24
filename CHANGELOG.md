@@ -4,8 +4,8 @@
 
 - For Drop-in on iOS: simplified stored payment method deletion handling by consolidating duplicated
   internal delegates.
-- Improved accessibility for Drop-in on iOS. Drop-in is now presented in a dedicated
-  window so assistive technologies can move focus to the payment interface automatically.
+- Improved accessibility for Drop-in on iOS by presenting it in a dedicated window, keeping
+  Full Keyboard Access focus within the native payment interface.
 
 ### Changed
 

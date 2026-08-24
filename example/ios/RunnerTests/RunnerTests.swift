@@ -123,24 +123,33 @@ class RunnerTests: XCTestCase {
     }
 
     @MainActor
-    func test_givenDismissalIsRequested_whenSceneDisconnects_thenDoesNotReportUnexpectedDismissal() throws {
+    func test_givenDismissalIsRequested_whenSceneDisconnects_thenCompletesDismissalOnce() throws {
         let hostWindow = try XCTUnwrap(activeWindow())
         defer { hostWindow.makeKey() }
         let windowScene = try XCTUnwrap(hostWindow.windowScene)
         let notificationCenter = NotificationCenter()
+        var pendingDismissalCompletion: (() -> Void)?
         let manager = DropInWindowManager(
-            dismissViewController: { _, _, _ in },
+            dismissViewController: { _, _, completion in
+                pendingDismissalCompletion = completion
+            },
             notificationCenter: notificationCenter
         )
+        var completedDismissals = 0
         var unexpectedDismissals = 0
         manager.onUnexpectedDismissal = { unexpectedDismissals += 1 }
         try manager.present(dropInViewController: UIViewController())
         // Dismissal is requested but never completed by UIKit, leaving the manager mid-dismissal.
-        manager.dismiss(animated: false)
+        manager.dismiss(animated: false) { completedDismissals += 1 }
 
         notificationCenter.post(name: UIScene.didDisconnectNotification, object: windowScene)
 
+        XCTAssertEqual(completedDismissals, 1)
         XCTAssertEqual(unexpectedDismissals, 0)
+
+        pendingDismissalCompletion?()
+
+        XCTAssertEqual(completedDismissals, 1)
     }
 
     @MainActor
