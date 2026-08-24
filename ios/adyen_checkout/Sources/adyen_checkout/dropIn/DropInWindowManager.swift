@@ -9,6 +9,10 @@ final class DropInWindowManager {
     /// hosting scene disconnects.
     var onUnexpectedDismissal: (() -> Void)?
 
+    /// Invoked whenever the Drop-in window is torn down, whichever path got us there, and before any pending
+    /// dismissal completion runs. Lets the owner drop state that is only valid while Drop-in is on screen.
+    var onWindowTornDown: (() -> Void)?
+
     private let windowFactory: (UIWindowScene) -> UIWindow
     private let dismissViewController: (UIViewController, Bool, @escaping () -> Void) -> Void
     private let notificationCenter: NotificationCenter
@@ -122,6 +126,7 @@ final class DropInWindowManager {
         window.isHidden = true
         window.rootViewController = nil
         dropInWindow = nil
+        onWindowTornDown?()
         completion?()
     }
 }
