@@ -34,8 +34,6 @@ class DropInPlatformApi: DropInPlatformInterface {
         dropInWindowManager.onUnexpectedDismissal = { [weak self] in
             self?.handleUnexpectedDismissal()
         }
-        // The claim only protects a Drop-in that is on screen, so it is dropped as soon as the window is gone.
-        // Waiting for the Dart cleanup round trip would keep the session locked whenever that never arrives.
         dropInWindowManager.onWindowTornDown = { [weak self] in
             self?.sessionHolder.releaseSession()
         }

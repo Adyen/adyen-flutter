@@ -15,13 +15,13 @@ class SessionHolder {
         session: AdyenSession,
         sessionDelegate: AdyenSessionDelegate
     ) throws {
-        try ensureSessionIsNotInUse()
+        guard !isSessionInUse else {
+            throw PlatformError(errorDescription: "Session is currently being used.")
+        }
         self.session = session
         self.sessionDelegate = sessionDelegate
     }
 
-    /// Discards the session, unless a presentation still holds it. Callers tearing down that presentation
-    /// must call `releaseSession()` first, otherwise the session is kept and the reset is ignored.
     func reset() {
         guard !isSessionInUse else {
             adyenPrint("Session reset ignored because the session is still in use.")
@@ -38,11 +38,5 @@ class SessionHolder {
 
     func releaseSession() {
         isSessionInUse = false
-    }
-
-    private func ensureSessionIsNotInUse() throws {
-        guard !isSessionInUse else {
-            throw PlatformError(errorDescription: "Session is currently being used.")
-        }
     }
 }
