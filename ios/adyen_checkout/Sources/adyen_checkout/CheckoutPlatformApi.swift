@@ -179,14 +179,10 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
             with: sessionConfiguration,
             delegate: sessionDelegate,
             presentationDelegate: presentationDelegate
-        ) { [weak self] result in
+        ) { [sessionHolder] result in
             do {
                 switch result {
                 case let .success(session):
-                    guard let self else {
-                        completion(Result.failure(PlatformError(errorDescription: "Checkout is no longer available.")))
-                        return
-                    }
                     try sessionHolder.setup(
                         session: session,
                         sessionDelegate: sessionDelegate
