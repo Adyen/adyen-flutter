@@ -6,9 +6,6 @@
 class SessionHolder {
     var session: AdyenSession?
     var sessionDelegate: AdyenSessionDelegate?
-
-    /// Set while a presentation owns the session, so a stray `clearSession()` from the merchant cannot
-    /// tear down a session that is still driving an on-screen Drop-in.
     private(set) var isSessionInUse = false
 
     func setup(
