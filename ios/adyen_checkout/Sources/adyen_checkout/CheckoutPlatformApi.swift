@@ -179,11 +179,11 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
             with: sessionConfiguration,
             delegate: sessionDelegate,
             presentationDelegate: presentationDelegate
-        ) { [sessionHolder] result in
+        ) { [weak self] result in
             do {
                 switch result {
                 case let .success(session):
-                    try sessionHolder.setup(
+                    self?.sessionHolder.setup(
                         session: session,
                         sessionDelegate: sessionDelegate
                     )

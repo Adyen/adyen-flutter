@@ -11,9 +11,10 @@ class SessionHolder {
     func setup(
         session: AdyenSession,
         sessionDelegate: AdyenSessionDelegate
-    ) throws {
+    ) {
         guard !isSessionInUse else {
-            throw PlatformError(errorDescription: "Session is currently being used.")
+            adyenPrint("Session is currently being used.")
+            return
         }
         self.session = session
         self.sessionDelegate = sessionDelegate
