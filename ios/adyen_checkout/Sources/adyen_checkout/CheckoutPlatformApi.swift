@@ -53,7 +53,7 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
                 try createSessionForComponent(
                     adyenContext: cardComponentConfigurationDTO.createAdyenContext(),
                     actionComponentConfiguration:
-                    cardComponentConfigurationDTO.threeDS2ConfigurationDTO?.buildActionComponentConfiguration(),
+                        cardComponentConfigurationDTO.threeDS2ConfigurationDTO?.buildActionComponentConfiguration(),
                     sessionId: sessionId,
                     sessionData: sessionData,
                     completion: completion

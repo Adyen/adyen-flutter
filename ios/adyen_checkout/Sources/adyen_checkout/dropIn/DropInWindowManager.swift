@@ -42,7 +42,10 @@ final class DropInWindowManager {
     func present(dropInViewController: UIViewController) throws -> Bool {
         assertMainThread()
 
-        guard dropInWindow == nil else { return false }
+        guard dropInWindow == nil else {
+            adyenPrint("Drop-in is already visible. Skipping presentation of a new Drop-in window.")
+            return false
+        }
 
         guard let hostWindow = UIApplication.shared.adyen.mainKeyWindow,
               let windowScene = hostWindow.windowScene else {
