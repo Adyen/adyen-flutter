@@ -16,7 +16,7 @@ class DropInSessionsDelegate: AdyenSessionDelegate {
     }
 
     func didComplete(with result: AdyenSessionResult, component _: Adyen.Component, session: AdyenSession) {
-        dropInInteractorDelegate?.dismiss(completion: { [weak self] in
+        dropInInteractorDelegate?.finalizeAndDismiss(success: true, completion: { [weak self] in
             let paymentResult = PaymentResultModelDTO(
                 sessionId: session.sessionContext.identifier,
                 sessionData: session.sessionContext.data,
@@ -38,7 +38,7 @@ class DropInSessionsDelegate: AdyenSessionDelegate {
     }
 
     func didFail(with error: Error, from _: Component, session _: AdyenSession) {
-        dropInInteractorDelegate?.dismiss(completion: { [weak self] in
+        dropInInteractorDelegate?.finalizeAndDismiss(success: false, completion: { [weak self] in
             switch error {
             case ComponentError.cancelled:
                 let checkoutEvent = CheckoutEvent(
