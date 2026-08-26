@@ -34,9 +34,6 @@ class DropInPlatformApi: DropInPlatformInterface {
         dropInWindowManager.onUnexpectedDismissal = { [weak self] in
             self?.handleUnexpectedDismissal()
         }
-        dropInWindowManager.onWindowTornDown = { [weak self] in
-            self?.sessionHolder.releaseSession()
-        }
     }
 
     func showDropInSession(dropInConfigurationDTO: DropInConfigurationDTO) {
@@ -85,7 +82,6 @@ class DropInPlatformApi: DropInPlatformInterface {
             }
 
             self.dropInComponent = dropInComponent
-            sessionHolder.markSessionAsInUse()
             sessionsDelegate.dropInInteractorDelegate = self
         } catch {
             sendSessionError(error: error)
@@ -203,7 +199,6 @@ class DropInPlatformApi: DropInPlatformInterface {
 
     func cleanUpDropIn() {
         dropInWindowManager.cleanUp()
-        // Covers the case where no window was ever presented, so the claim is released before `reset()` runs.
         clearPresentationReferences()
         sessionHolder.reset()
     }
@@ -223,12 +218,11 @@ private extension DropInPlatformApi {
         checkoutFlutter.send(event: checkoutEvent, completion: { _ in })
     }
 
-    /// Drops everything tied to a single Drop-in presentation, including the session's in-use claim.
+    /// Drops everything tied to a single Drop-in presentation.
     func clearPresentationReferences() {
         dropInComponent = nil
         deleteStoredPaymentMethodCompletionHandler = nil
         (sessionHolder.sessionDelegate as? DropInSessionsDelegate)?.dropInInteractorDelegate = nil
-        sessionHolder.releaseSession()
         dropInAdvancedFlowDelegate?.dropInInteractorDelegate = nil
         dropInAdvancedFlowDelegate = nil
         checkBalanceHandler = nil

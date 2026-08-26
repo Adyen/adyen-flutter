@@ -200,69 +200,6 @@ final class DropInWindowManagerTests: XCTestCase {
     }
 
     @MainActor
-    func test_givenDropInIsPresented_whenCleanedUp_thenReportsWindowTeardown() throws {
-        let hostWindow = try XCTUnwrap(activeWindow())
-        defer { hostWindow.makeKey() }
-        let manager = DropInWindowManager()
-        var teardowns = 0
-        manager.onWindowTornDown = { teardowns += 1 }
-        try manager.present(dropInViewController: UIViewController())
-
-        manager.cleanUp()
-
-        XCTAssertEqual(teardowns, 1)
-    }
-
-    @MainActor
-    func test_givenNoDropInIsPresented_whenCleanedUp_thenReportsNoWindowTeardown() {
-        let manager = DropInWindowManager()
-        var teardowns = 0
-        manager.onWindowTornDown = { teardowns += 1 }
-
-        manager.cleanUp()
-
-        XCTAssertEqual(teardowns, 0)
-    }
-
-    @MainActor
-    func test_givenDropInIsPresented_whenSceneDisconnects_thenReportsWindowTeardown() throws {
-        let hostWindow = try XCTUnwrap(activeWindow())
-        defer { hostWindow.makeKey() }
-        let windowScene = try XCTUnwrap(hostWindow.windowScene)
-        let notificationCenter = NotificationCenter()
-        let manager = DropInWindowManager(notificationCenter: notificationCenter)
-        var teardowns = 0
-        manager.onWindowTornDown = { teardowns += 1 }
-        try manager.present(dropInViewController: UIViewController())
-
-        notificationCenter.post(name: UIScene.didDisconnectNotification, object: windowScene)
-
-        XCTAssertEqual(teardowns, 1)
-    }
-
-    @MainActor
-    func test_givenDismissalIsRequested_whenItCompletes_thenReportsTeardownBeforeCompletion() throws {
-        let hostWindow = try XCTUnwrap(activeWindow())
-        defer { hostWindow.makeKey() }
-        var pendingDismissalCompletion: (() -> Void)?
-        let manager = DropInWindowManager(
-            dismissViewController: { _, _, completion in
-                pendingDismissalCompletion = completion
-            }
-        )
-        var events: [String] = []
-        manager.onWindowTornDown = { events.append("tornDown") }
-        let dropInViewController = UIViewController()
-        try manager.present(dropInViewController: dropInViewController)
-        manager.dismiss(viewController: dropInViewController, animated: false) { events.append("completion") }
-
-        pendingDismissalCompletion?()
-
-        // The owner must be able to drop presentation-scoped state before the result reaches Flutter.
-        XCTAssertEqual(events, ["tornDown", "completion"])
-    }
-
-    @MainActor
     private func makeDropInComponent() throws -> DropInComponent {
         let dropInConfigurationDTO = createDropInConfigurationDTO()
         let payment = Payment(amount: Amount(value: 1600, currencyCode: "USD"), countryCode: "US")
