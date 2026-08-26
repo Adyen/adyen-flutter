@@ -67,7 +67,7 @@ final class DropInWindowManager {
     }
 
     func dismiss(
-        viewController: UIViewController,
+        dropInViewController: UIViewController,
         animated: Bool,
         completion: @escaping () -> Void = {}
     ) {
@@ -75,7 +75,7 @@ final class DropInWindowManager {
         guard pendingDismissalCompletion == nil,
               let window = dropInWindow,
               let rootViewController = window.rootViewController,
-              rootViewController.presentedViewController === viewController else {
+              rootViewController.presentedViewController === dropInViewController else {
             return
         }
         pendingDismissalCompletion = completion

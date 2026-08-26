@@ -379,10 +379,10 @@ extension DropInPlatformApi: StoredPaymentMethodsDelegate {
 extension DropInPlatformApi: DropInInteractorDelegate {
     func finalizeAndDismiss(success: Bool, completion: @escaping (() -> Void)) {
         guard let dropInComponent else { return }
-        let viewController = dropInComponent.viewController
+        let dropInViewController = dropInComponent.viewController
         dropInComponent.finalizeIfNeeded(with: success) { [weak self] in
             self?.dropInWindowManager.dismiss(
-                viewController: viewController,
+                dropInViewController: dropInViewController,
                 animated: true,
                 completion: completion
             )

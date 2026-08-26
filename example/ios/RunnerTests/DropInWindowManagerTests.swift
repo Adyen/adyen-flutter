@@ -59,8 +59,8 @@ final class DropInWindowManagerTests: XCTestCase {
         try manager.present(dropInViewController: dropInViewController)
         var completedDismissals = 0
 
-        manager.dismiss(viewController: dropInViewController, animated: false) { completedDismissals += 1 }
-        manager.dismiss(viewController: dropInViewController, animated: false) { completedDismissals += 1 }
+        manager.dismiss(dropInViewController: dropInViewController, animated: false) { completedDismissals += 1 }
+        manager.dismiss(dropInViewController: dropInViewController, animated: false) { completedDismissals += 1 }
 
         // The later request cannot replace the terminal completion that already owns the dismissal.
         XCTAssertEqual(dismissCallCount, 1)
@@ -111,7 +111,7 @@ final class DropInWindowManagerTests: XCTestCase {
         let dropInViewController = UIViewController()
         try manager.present(dropInViewController: dropInViewController)
         // Dismissal is requested but never completed by UIKit, leaving the manager mid-dismissal.
-        manager.dismiss(viewController: dropInViewController, animated: false) { completedDismissals += 1 }
+        manager.dismiss(dropInViewController: dropInViewController, animated: false) { completedDismissals += 1 }
 
         notificationCenter.post(name: UIScene.didDisconnectNotification, object: windowScene)
 
@@ -138,7 +138,7 @@ final class DropInWindowManagerTests: XCTestCase {
         )
         let firstViewController = UIViewController()
         try manager.present(dropInViewController: firstViewController)
-        manager.dismiss(viewController: firstViewController, animated: false)
+        manager.dismiss(dropInViewController: firstViewController, animated: false)
         notificationCenter.post(name: UIScene.didDisconnectNotification, object: windowScene)
 
         hostWindow.makeKey()
@@ -166,7 +166,7 @@ final class DropInWindowManagerTests: XCTestCase {
         try manager.present(dropInViewController: dropInViewController)
         let finishFinalization = {
             manager.dismiss(
-                viewController: dropInViewController,
+                dropInViewController: dropInViewController,
                 animated: false,
                 completion: { terminalResults += 1 }
             )
