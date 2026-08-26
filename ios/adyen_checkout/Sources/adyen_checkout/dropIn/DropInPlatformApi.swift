@@ -221,7 +221,7 @@ extension DropInPlatformApi: DropInWindowManagerDelegate {
 
 private extension DropInPlatformApi {
     /// Drops everything tied to a single Drop-in presentation.
-    func clearPresentationReferences() {
+    private func clearPresentationReferences() {
         dropInComponent = nil
         deleteStoredPaymentMethodCompletionHandler = nil
         (sessionHolder.sessionDelegate as? DropInSessionsDelegate)?.dropInInteractorDelegate = nil
@@ -231,7 +231,7 @@ private extension DropInPlatformApi {
         requestOrderHandler = nil
     }
 
-    func handlePaymentEvent(paymentEventDTO: PaymentEventDTO) {
+    private func handlePaymentEvent(paymentEventDTO: PaymentEventDTO) {
         switch paymentEventDTO.paymentEventType {
         case .finished:
             onDropInResultFinished(paymentEventDTO: paymentEventDTO)
@@ -244,7 +244,7 @@ private extension DropInPlatformApi {
         }
     }
 
-    func onDropInResultFinished(paymentEventDTO: PaymentEventDTO) {
+    private func onDropInResultFinished(paymentEventDTO: PaymentEventDTO) {
         let resultCode = ResultCode(rawValue: paymentEventDTO.result ?? "")
         let isAccepted = resultCode?.isAccepted ?? false
         finalizeAndDismiss(success: isAccepted, completion: { [weak self] in
@@ -259,7 +259,7 @@ private extension DropInPlatformApi {
         })
     }
 
-    func onDropInResultAction(paymentEventDTO: PaymentEventDTO) {
+    private func onDropInResultAction(paymentEventDTO: PaymentEventDTO) {
         do {
             let jsonData = try JSONSerialization.data(withJSONObject: paymentEventDTO.data as Any, options: [])
             let result = try JSONDecoder().decode(Action.self, from: jsonData)
@@ -273,7 +273,7 @@ private extension DropInPlatformApi {
         }
     }
 
-    func onDropInResultError(paymentEventDTO: PaymentEventDTO) {
+    private func onDropInResultError(paymentEventDTO: PaymentEventDTO) {
         dropInComponent?.stopLoading()
 
         if paymentEventDTO.error?.dismissDropIn == true || dropInAdvancedFlowDelegate?.isApplePay == true {
@@ -299,7 +299,7 @@ private extension DropInPlatformApi {
         }
     }
     
-    func onDropInResultUpdate(paymentEventDTO: PaymentEventDTO) {
+    private func onDropInResultUpdate(paymentEventDTO: PaymentEventDTO) {
         do {
             guard let updatedPaymentMethods = paymentEventDTO.data?[Constants.updatedPaymentMethodsKey] ?? "" else {
                 throw PlatformError(errorDescription: "Updated payment methods not provided.")
@@ -319,7 +319,7 @@ private extension DropInPlatformApi {
         }
     }
 
-    func removeGiftCardPaymentMethods(paymentMethods: PaymentMethods, isPartialPaymentSupported: Bool) -> PaymentMethods {
+    private func removeGiftCardPaymentMethods(paymentMethods: PaymentMethods, isPartialPaymentSupported: Bool) -> PaymentMethods {
         if isPartialPaymentSupported {
             return paymentMethods
         }
@@ -329,14 +329,14 @@ private extension DropInPlatformApi {
         return PaymentMethods(regular: paymentMethods, stored: storedPaymentMethods)
     }
 
-    func applyStoredPaymentMethodsVisibility(paymentMethods: PaymentMethods, showStoredPaymentMethods: Bool) -> PaymentMethods {
+    private func applyStoredPaymentMethodsVisibility(paymentMethods: PaymentMethods, showStoredPaymentMethods: Bool) -> PaymentMethods {
         if showStoredPaymentMethods {
             return paymentMethods
         }
         return PaymentMethods(regular: paymentMethods.regular, stored: [])
     }
 
-    func sendSessionError(error: Error) {
+    private func sendSessionError(error: Error) {
         let checkoutEvent = CheckoutEvent(
             type: CheckoutEventType.result,
             data: PaymentResultDTO(
@@ -347,7 +347,7 @@ private extension DropInPlatformApi {
         checkoutFlutter.send(event: checkoutEvent, completion: { _ in })
     }
 
-    func overridePaymentMethodNames(paymentMethods: PaymentMethods, paymentMethodNames: [String?: String?]) -> PaymentMethods {
+    private func overridePaymentMethodNames(paymentMethods: PaymentMethods, paymentMethodNames: [String?: String?]) -> PaymentMethods {
         var paymentMethodsWithAdjustedNames = paymentMethods
         for paymentMethodNamePair in paymentMethodNames {
             if let paymentMethodRawValue = paymentMethodNamePair.key,
