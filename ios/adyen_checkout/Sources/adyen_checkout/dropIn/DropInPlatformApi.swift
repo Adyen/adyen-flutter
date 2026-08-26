@@ -23,15 +23,17 @@ class DropInPlatformApi: DropInPlatformInterface {
     private var dropInAdvancedFlowDelegate: DropInAdvancedFlowDelegate?
     private var checkBalanceHandler: ((Result<Balance, any Error>) -> Void)?
     private var requestOrderHandler: ((Result<PartialPaymentOrder, any Error>) -> Void)?
-    private let dropInWindowManager = DropInWindowManager()
+    private let dropInWindowManager: DropInWindowManager
 
     init(
         checkoutFlutter: CheckoutFlutterInterface,
-        sessionHolder: SessionHolder
+        sessionHolder: SessionHolder,
+        dropInWindowManager: DropInWindowManager = DropInWindowManager()
     ) {
         self.checkoutFlutter = checkoutFlutter
         self.sessionHolder = sessionHolder
-        dropInWindowManager.delegate = self
+        self.dropInWindowManager = dropInWindowManager
+        self.dropInWindowManager.delegate = self
     }
 
     func showDropInSession(dropInConfigurationDTO: DropInConfigurationDTO) {
