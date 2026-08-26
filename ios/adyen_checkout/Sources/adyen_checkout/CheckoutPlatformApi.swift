@@ -52,8 +52,8 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
             case let cardComponentConfigurationDTO as CardComponentConfigurationDTO:
                 try createSessionForComponent(
                     adyenContext: cardComponentConfigurationDTO.createAdyenContext(),
-                    actionComponentConfiguration:
-                        cardComponentConfigurationDTO.threeDS2ConfigurationDTO?.buildActionComponentConfiguration(),
+                    actionComponentConfiguration: cardComponentConfigurationDTO
+                        .threeDS2ConfigurationDTO?.buildActionComponentConfiguration(),
                     sessionId: sessionId,
                     sessionData: sessionData,
                     completion: completion
