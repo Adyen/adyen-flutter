@@ -5,33 +5,18 @@ final class DropInWindowManager {
     /// Kept above the host window so the Drop-in stays in front of content the host application presents itself.
     private static let dropInWindowLevel = UIWindow.Level(rawValue: UIWindow.Level.normal.rawValue + 1)
 
-    /// Invoked when the Drop-in window is torn down without a dismissal having been requested, for example when the
-    /// hosting scene disconnects.
-    var onUnexpectedDismissal: (() -> Void)?
+    weak var delegate: DropInWindowManagerDelegate?
 
-    private let windowFactory: (UIWindowScene) -> UIWindow
-    private let dismissViewController: (UIViewController, Bool, @escaping () -> Void) -> Void
-    private let notificationCenter: NotificationCenter
+    private let windowPresenter: DropInWindowPresenting
     private var dropInWindow: UIWindow?
-    private var sceneDisconnectObserver: NSObjectProtocol?
     private var pendingDismissalCompletion: (() -> Void)?
 
-    init(
-        windowFactory: @escaping (UIWindowScene) -> UIWindow = UIWindow.init(windowScene:),
-        dismissViewController: @escaping (UIViewController, Bool, @escaping () -> Void) -> Void = { viewController, animated, completion in
-            viewController.dismiss(animated: animated, completion: completion)
-        },
-        notificationCenter: NotificationCenter = .default
-    ) {
-        self.windowFactory = windowFactory
-        self.dismissViewController = dismissViewController
-        self.notificationCenter = notificationCenter
+    init(windowPresenter: DropInWindowPresenting = DropInWindowPresenter()) {
+        self.windowPresenter = windowPresenter
     }
 
     deinit {
-        if let sceneDisconnectObserver {
-            notificationCenter.removeObserver(sceneDisconnectObserver)
-        }
+        windowPresenter.stopObservingSceneDisconnect()
     }
 
     @discardableResult
@@ -51,7 +36,7 @@ final class DropInWindowManager {
         let rootViewController = UIViewController()
         rootViewController.view.backgroundColor = .clear
 
-        let window = windowFactory(windowScene)
+        let window = windowPresenter.makeWindow(for: windowScene)
         window.windowLevel = Self.dropInWindowLevel
         window.backgroundColor = .clear
         window.isOpaque = false
@@ -81,7 +66,7 @@ final class DropInWindowManager {
         pendingDismissalCompletion = completion
 
         // `self` is captured strongly on purpose: the window must be torn down even if the owner released us.
-        dismissViewController(rootViewController, animated) {
+        windowPresenter.dismiss(rootViewController, animated: animated) {
             guard self.dropInWindow === window else { return }
             self.tearDownWindow()
         }
@@ -98,16 +83,12 @@ final class DropInWindowManager {
     }
 
     private func observeDisconnect(of windowScene: UIWindowScene) {
-        sceneDisconnectObserver = notificationCenter.addObserver(
-            forName: UIScene.didDisconnectNotification,
-            object: windowScene,
-            queue: .main
-        ) { [weak self] _ in
+        windowPresenter.observeSceneDisconnect(of: windowScene) { [weak self] in
             guard let self else { return }
             let wasDismissalRequested = pendingDismissalCompletion != nil
             tearDownWindow()
             if !wasDismissalRequested {
-                onUnexpectedDismissal?()
+                delegate?.dropInWindowDidDismissUnexpectedly()
             }
         }
     }
@@ -115,10 +96,7 @@ final class DropInWindowManager {
     private func tearDownWindow() {
         assertMainThread()
         guard let window = dropInWindow else { return }
-        if let sceneDisconnectObserver {
-            notificationCenter.removeObserver(sceneDisconnectObserver)
-            self.sceneDisconnectObserver = nil
-        }
+        windowPresenter.stopObservingSceneDisconnect()
 
         let completion = pendingDismissalCompletion
         pendingDismissalCompletion = nil

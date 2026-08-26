@@ -31,9 +31,7 @@ class DropInPlatformApi: DropInPlatformInterface {
     ) {
         self.checkoutFlutter = checkoutFlutter
         self.sessionHolder = sessionHolder
-        dropInWindowManager.onUnexpectedDismissal = { [weak self] in
-            self?.handleUnexpectedDismissal()
-        }
+        dropInWindowManager.delegate = self
     }
 
     func showDropInSession(dropInConfigurationDTO: DropInConfigurationDTO) {
@@ -204,9 +202,9 @@ class DropInPlatformApi: DropInPlatformInterface {
     }
 }
 
-private extension DropInPlatformApi {
+extension DropInPlatformApi: DropInWindowManagerDelegate {
     /// The Drop-in window disappeared without a dismissal request, so Flutter still awaits a result.
-    func handleUnexpectedDismissal() {
+    func dropInWindowDidDismissUnexpectedly() {
         clearPresentationReferences()
         let checkoutEvent = CheckoutEvent(
             type: CheckoutEventType.result,
@@ -217,7 +215,9 @@ private extension DropInPlatformApi {
         )
         checkoutFlutter.send(event: checkoutEvent, completion: { _ in })
     }
+}
 
+private extension DropInPlatformApi {
     /// Drops everything tied to a single Drop-in presentation.
     func clearPresentationReferences() {
         dropInComponent = nil

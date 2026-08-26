@@ -10,18 +10,13 @@ final class DropInWindowManagerTests: XCTestCase {
     @MainActor
     func test_givenDropInIsPresented_whenCleanedUp_thenTearsDownDropInWindow() throws {
         let hostWindow = try XCTUnwrap(activeWindow())
-        var dropInWindow: UIWindow?
-        let manager = DropInWindowManager(
-            windowFactory: {
-                let window = UIWindow(windowScene: $0)
-                dropInWindow = window
-                return window
-            }
-        )
+        let windowPresenter = DropInWindowPresenterMock()
+        let manager = DropInWindowManager(windowPresenter: windowPresenter)
         let dropInComponent = try makeDropInComponent()
 
         try manager.present(dropInViewController: dropInComponent.viewController)
 
+        let dropInWindow = windowPresenter.window
         XCTAssertEqual(dropInWindow?.windowLevel.rawValue, UIWindow.Level.normal.rawValue + 1)
         XCTAssertTrue(dropInWindow?.isKeyWindow == true)
         XCTAssertFalse(dropInWindow?.rootViewController === dropInComponent.viewController)
@@ -47,14 +42,8 @@ final class DropInWindowManagerTests: XCTestCase {
     @MainActor
     func test_givenDropInIsPresented_whenMultipleDismissalsAreRequested_thenCompletesOnlyFirst() throws {
         let hostWindow = try XCTUnwrap(activeWindow())
-        var dismissCallCount = 0
-        var pendingDismissalCompletion: (() -> Void)?
-        let manager = DropInWindowManager(
-            dismissViewController: { _, _, completion in
-                dismissCallCount += 1
-                pendingDismissalCompletion = completion
-            }
-        )
+        let windowPresenter = DropInWindowPresenterMock()
+        let manager = DropInWindowManager(windowPresenter: windowPresenter)
         let dropInViewController = UIViewController()
         try manager.present(dropInViewController: dropInViewController)
         var completedDismissals = 0
@@ -63,10 +52,10 @@ final class DropInWindowManagerTests: XCTestCase {
         manager.dismiss(dropInViewController: dropInViewController, animated: false) { completedDismissals += 1 }
 
         // The later request cannot replace the terminal completion that already owns the dismissal.
-        XCTAssertEqual(dismissCallCount, 1)
+        XCTAssertEqual(windowPresenter.dismissCallCount, 1)
         XCTAssertEqual(completedDismissals, 0)
 
-        pendingDismissalCompletion?()
+        windowPresenter.completePendingDismissal()
 
         XCTAssertEqual(completedDismissals, 1)
         XCTAssertTrue(hostWindow.isKeyWindow)
@@ -78,47 +67,37 @@ final class DropInWindowManagerTests: XCTestCase {
         // The scene disconnect path deliberately leaves the key window untouched, so restore it here to
         // keep the host application usable for the remaining tests.
         defer { hostWindow.makeKey() }
-        let windowScene = try XCTUnwrap(hostWindow.windowScene)
-        let notificationCenter = NotificationCenter()
-        let manager = DropInWindowManager(
-            notificationCenter: notificationCenter
-        )
-        var unexpectedDismissals = 0
-        manager.onUnexpectedDismissal = { unexpectedDismissals += 1 }
+        let windowPresenter = DropInWindowPresenterMock()
+        let manager = DropInWindowManager(windowPresenter: windowPresenter)
+        let delegate = DropInWindowManagerDelegateMock()
+        manager.delegate = delegate
         try manager.present(dropInViewController: UIViewController())
 
-        notificationCenter.post(name: UIScene.didDisconnectNotification, object: windowScene)
+        windowPresenter.simulateSceneDisconnect()
 
-        XCTAssertEqual(unexpectedDismissals, 1)
+        XCTAssertEqual(delegate.unexpectedDismissals, 1)
     }
 
     @MainActor
     func test_givenDismissalIsRequested_whenSceneDisconnects_thenCompletesDismissalOnce() throws {
         let hostWindow = try XCTUnwrap(activeWindow())
         defer { hostWindow.makeKey() }
-        let windowScene = try XCTUnwrap(hostWindow.windowScene)
-        let notificationCenter = NotificationCenter()
-        var pendingDismissalCompletion: (() -> Void)?
-        let manager = DropInWindowManager(
-            dismissViewController: { _, _, completion in
-                pendingDismissalCompletion = completion
-            },
-            notificationCenter: notificationCenter
-        )
+        let windowPresenter = DropInWindowPresenterMock()
+        let manager = DropInWindowManager(windowPresenter: windowPresenter)
         var completedDismissals = 0
-        var unexpectedDismissals = 0
-        manager.onUnexpectedDismissal = { unexpectedDismissals += 1 }
+        let delegate = DropInWindowManagerDelegateMock()
+        manager.delegate = delegate
         let dropInViewController = UIViewController()
         try manager.present(dropInViewController: dropInViewController)
         // Dismissal is requested but never completed by UIKit, leaving the manager mid-dismissal.
         manager.dismiss(dropInViewController: dropInViewController, animated: false) { completedDismissals += 1 }
 
-        notificationCenter.post(name: UIScene.didDisconnectNotification, object: windowScene)
+        windowPresenter.simulateSceneDisconnect()
 
         XCTAssertEqual(completedDismissals, 1)
-        XCTAssertEqual(unexpectedDismissals, 0)
+        XCTAssertEqual(delegate.unexpectedDismissals, 0)
 
-        pendingDismissalCompletion?()
+        windowPresenter.completePendingDismissal()
 
         XCTAssertEqual(completedDismissals, 1)
     }
@@ -127,25 +106,18 @@ final class DropInWindowManagerTests: XCTestCase {
     func test_givenNewPresentationAfterSceneDisconnect_whenOldDismissalCompletes_thenKeepsNewPresentation() throws {
         let hostWindow = try XCTUnwrap(activeWindow())
         defer { hostWindow.makeKey() }
-        let windowScene = try XCTUnwrap(hostWindow.windowScene)
-        let notificationCenter = NotificationCenter()
-        var pendingDismissalCompletion: (() -> Void)?
-        let manager = DropInWindowManager(
-            dismissViewController: { _, _, completion in
-                pendingDismissalCompletion = completion
-            },
-            notificationCenter: notificationCenter
-        )
+        let windowPresenter = DropInWindowPresenterMock()
+        let manager = DropInWindowManager(windowPresenter: windowPresenter)
         let firstViewController = UIViewController()
         try manager.present(dropInViewController: firstViewController)
         manager.dismiss(dropInViewController: firstViewController, animated: false)
-        notificationCenter.post(name: UIScene.didDisconnectNotification, object: windowScene)
+        windowPresenter.simulateSceneDisconnect()
 
         hostWindow.makeKey()
         let secondViewController = UIViewController()
         XCTAssertTrue(try manager.present(dropInViewController: secondViewController))
 
-        pendingDismissalCompletion?()
+        windowPresenter.completePendingDismissal()
 
         XCTAssertFalse(try manager.present(dropInViewController: UIViewController()))
         manager.cleanUp()
@@ -155,27 +127,25 @@ final class DropInWindowManagerTests: XCTestCase {
     func test_givenSceneDisconnectDuringFinalization_whenFinalizationCompletes_thenReportsOneTerminalResult() throws {
         let hostWindow = try XCTUnwrap(activeWindow())
         defer { hostWindow.makeKey() }
-        let windowScene = try XCTUnwrap(hostWindow.windowScene)
-        let notificationCenter = NotificationCenter()
-        let manager = DropInWindowManager(
-            notificationCenter: notificationCenter
-        )
+        let windowPresenter = DropInWindowPresenterMock()
+        let manager = DropInWindowManager(windowPresenter: windowPresenter)
         let dropInViewController = UIViewController()
-        var terminalResults = 0
-        manager.onUnexpectedDismissal = { terminalResults += 1 }
+        var completedDismissals = 0
+        let delegate = DropInWindowManagerDelegateMock()
+        manager.delegate = delegate
         try manager.present(dropInViewController: dropInViewController)
         let finishFinalization = {
             manager.dismiss(
                 dropInViewController: dropInViewController,
                 animated: false,
-                completion: { terminalResults += 1 }
+                completion: { completedDismissals += 1 }
             )
         }
 
-        notificationCenter.post(name: UIScene.didDisconnectNotification, object: windowScene)
+        windowPresenter.simulateSceneDisconnect()
         finishFinalization()
 
-        XCTAssertEqual(terminalResults, 1)
+        XCTAssertEqual(delegate.unexpectedDismissals + completedDismissals, 1)
     }
 
     @MainActor
@@ -216,5 +186,50 @@ final class DropInWindowManagerTests: XCTestCase {
             .compactMap { $0 as? UIWindowScene }
             .flatMap(\.windows)
         return windows.first(where: \.isKeyWindow) ?? windows.first { !$0.isHidden }
+    }
+}
+
+private final class DropInWindowPresenterMock: DropInWindowPresenting {
+    private(set) var window: UIWindow?
+    private(set) var dismissCallCount = 0
+    private(set) var pendingDismissalCompletion: (() -> Void)?
+    private var sceneDisconnectHandler: (() -> Void)?
+
+    func makeWindow(for windowScene: UIWindowScene) -> UIWindow {
+        let window = UIWindow(windowScene: windowScene)
+        self.window = window
+        return window
+    }
+
+    /// Captures the dismissal instead of running the UIKit transition, so tests decide when it completes.
+    func dismiss(_: UIViewController, animated _: Bool, completion: @escaping () -> Void) {
+        dismissCallCount += 1
+        pendingDismissalCompletion = completion
+    }
+
+    func observeSceneDisconnect(of _: UIWindowScene, handler: @escaping () -> Void) {
+        sceneDisconnectHandler = handler
+    }
+
+    func stopObservingSceneDisconnect() {
+        sceneDisconnectHandler = nil
+    }
+
+    func completePendingDismissal() {
+        let completion = pendingDismissalCompletion
+        pendingDismissalCompletion = nil
+        completion?()
+    }
+
+    func simulateSceneDisconnect() {
+        sceneDisconnectHandler?()
+    }
+}
+
+private final class DropInWindowManagerDelegateMock: DropInWindowManagerDelegate {
+    private(set) var unexpectedDismissals = 0
+
+    func dropInWindowDidDismissUnexpectedly() {
+        unexpectedDismissals += 1
     }
 }
