@@ -52,7 +52,8 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
             case let cardComponentConfigurationDTO as CardComponentConfigurationDTO:
                 try createSessionForComponent(
                     adyenContext: cardComponentConfigurationDTO.createAdyenContext(),
-                    actionComponentConfiguration: cardComponentConfigurationDTO.threeDS2ConfigurationDTO?.buildActionComponentConfiguration(),
+                    actionComponentConfiguration: cardComponentConfigurationDTO
+                        .threeDS2ConfigurationDTO?.buildActionComponentConfiguration(),
                     sessionId: sessionId,
                     sessionData: sessionData,
                     completion: completion
@@ -127,7 +128,7 @@ class CheckoutPlatformApi: CheckoutPlatformInterface {
         sessionData: String,
         completion: @escaping (Result<SessionDTO, Error>) -> Void
     ) throws {
-        let sessionDelegate = DropInSessionsDelegate(viewController: getViewController(), checkoutFlutter: checkoutFlutter)
+        let sessionDelegate = DropInSessionsDelegate(checkoutFlutter: checkoutFlutter)
         try requestAndSetSession(
             adyenContext: adyenContext,
             sessionId: sessionId,
