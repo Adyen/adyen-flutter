@@ -4,8 +4,8 @@
 
 - For Drop-in on iOS: simplified stored payment method deletion handling by consolidating duplicated
   internal delegates.
-- For Drop-in on iOS: reorganized internal delegate implementations into focused files to improve
-  maintainability without changing behavior.
+- For Drop-in on iOS: internal delegate implementations are now organized into focused files, and
+  balance-check event serialization failures no longer retain the completion handler.
 - Improved accessibility for Drop-in on iOS by presenting it in a dedicated window, keeping
   Full Keyboard Access focus within the native payment interface.
 

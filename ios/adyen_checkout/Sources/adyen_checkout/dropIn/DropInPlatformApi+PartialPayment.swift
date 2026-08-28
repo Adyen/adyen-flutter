@@ -10,11 +10,11 @@ import Foundation
 extension DropInPlatformApi: PartialPaymentDelegate {
     func checkBalance(with data: Adyen.PaymentComponentData, component: any Adyen.Component, completion: @escaping (Result<Adyen.Balance, any Error>) -> Void) {
         do {
-            checkBalanceHandler = completion
             let checkoutEvent = try CheckoutEvent(
                 type: CheckoutEventType.balanceCheck,
                 data: data.jsonObject.toJsonStringRepresentation()
             )
+            checkBalanceHandler = completion
             checkoutFlutter.send(event: checkoutEvent, completion: { _ in })
         } catch {
             completion(.failure(error))
