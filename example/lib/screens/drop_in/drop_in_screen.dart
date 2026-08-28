@@ -37,18 +37,14 @@ class _DropInScreenState extends State<DropInScreen> {
               TextButton(
                 onPressed: _isStartingDropIn
                     ? null
-                    : () => _runDropIn(
-                          () => startDropInSessions(context),
-                        ),
+                    : () => _runDropIn(startDropInSessions),
                 key: const Key('Drop-in sessions flow'),
                 child: const Text("Drop-in sessions flow"),
               ),
               TextButton(
                 onPressed: _isStartingDropIn
                     ? null
-                    : () => _runDropIn(
-                          () => startDropInAdvancedFlow(context),
-                        ),
+                    : () => _runDropIn(startDropInAdvancedFlow),
                 key: const Key('Drop-in advanced flow'),
                 child: const Text("Drop-in advanced flow"),
               ),
@@ -74,7 +70,7 @@ class _DropInScreenState extends State<DropInScreen> {
     }
   }
 
-  Future<void> startDropInSessions(BuildContext context) async {
+  Future<void> startDropInSessions() async {
     try {
       final Map<String, dynamic> sessionResponse =
           await widget.repository.fetchSession();
@@ -94,7 +90,7 @@ class _DropInScreenState extends State<DropInScreen> {
         checkout: sessionCheckout,
       );
 
-      if (context.mounted) {
+      if (mounted) {
         DialogBuilder.showPaymentResultDialog(paymentResult, context);
       }
     } catch (error) {
@@ -102,7 +98,7 @@ class _DropInScreenState extends State<DropInScreen> {
     }
   }
 
-  Future<void> startDropInAdvancedFlow(BuildContext context) async {
+  Future<void> startDropInAdvancedFlow() async {
     try {
       final paymentMethodsResponse =
           await widget.repository.fetchPaymentMethods();
@@ -123,7 +119,7 @@ class _DropInScreenState extends State<DropInScreen> {
         checkout: advancedCheckout,
       );
 
-      if (context.mounted) {
+      if (mounted) {
         DialogBuilder.showPaymentResultDialog(paymentResult, context);
       }
     } catch (error) {
