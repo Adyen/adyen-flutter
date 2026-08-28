@@ -16,14 +16,14 @@ import UIKit
 
 class DropInPlatformApi: DropInPlatformInterface {
     private let jsonDecoder = JSONDecoder()
-    private let checkoutFlutter: CheckoutFlutterInterface
+    let checkoutFlutter: CheckoutFlutterInterface
     private let sessionHolder: SessionHolder
-    private var dropInComponent: DropInComponent?
-    private var deleteStoredPaymentMethodCompletionHandler: ((Bool) -> Void)?
+    var dropInComponent: DropInComponent?
+    var deleteStoredPaymentMethodCompletionHandler: ((Bool) -> Void)?
     private var dropInAdvancedFlowDelegate: DropInAdvancedFlowDelegate?
-    private var checkBalanceHandler: ((Result<Balance, any Error>) -> Void)?
-    private var requestOrderHandler: ((Result<PartialPaymentOrder, any Error>) -> Void)?
-    private let dropInWindowManager: DropInWindowManager
+    var checkBalanceHandler: ((Result<Balance, any Error>) -> Void)?
+    var requestOrderHandler: ((Result<PartialPaymentOrder, any Error>) -> Void)?
+    let dropInWindowManager: DropInWindowManager
 
     init(
         checkoutFlutter: CheckoutFlutterInterface,
@@ -204,24 +204,9 @@ class DropInPlatformApi: DropInPlatformInterface {
     }
 }
 
-extension DropInPlatformApi: DropInWindowManagerDelegate {
-    /// The Drop-in window disappeared without a dismissal request, so Flutter still awaits a result.
-    func dropInWindowDidDismissUnexpectedly() {
-        clearPresentationReferences()
-        let checkoutEvent = CheckoutEvent(
-            type: CheckoutEventType.result,
-            data: PaymentResultDTO(
-                type: PaymentResultEnum.error,
-                reason: "Drop-in was dismissed unexpectedly."
-            )
-        )
-        checkoutFlutter.send(event: checkoutEvent, completion: { _ in })
-    }
-}
-
-private extension DropInPlatformApi {
+extension DropInPlatformApi {
     /// Drops everything tied to a single Drop-in presentation.
-    private func clearPresentationReferences() {
+    func clearPresentationReferences() {
         dropInComponent = nil
         deleteStoredPaymentMethodCompletionHandler = nil
         (sessionHolder.sessionDelegate as? DropInSessionsDelegate)?.dropInInteractorDelegate = nil
@@ -361,92 +346,5 @@ private extension DropInPlatformApi {
         }
         
         return paymentMethodsWithAdjustedNames
-    }
-}
-
-extension DropInPlatformApi: StoredPaymentMethodsDelegate {
-    func disable(storedPaymentMethod: StoredPaymentMethod, completion: @escaping (Bool) -> Void) {
-        deleteStoredPaymentMethodCompletionHandler = completion
-        let checkoutEvent = CheckoutEvent(
-            type: CheckoutEventType.deleteStoredPaymentMethod,
-            data: storedPaymentMethod.identifier
-        )
-        checkoutFlutter.send(
-            event: checkoutEvent,
-            completion: { _ in }
-        )
-    }
-}
-
-extension DropInPlatformApi: DropInInteractorDelegate {
-    func finalizeAndDismiss(success: Bool, completion: @escaping (() -> Void)) {
-        guard let dropInComponent else { return }
-        let dropInViewController = dropInComponent.viewController
-        dropInComponent.finalizeIfNeeded(with: success) { [weak self] in
-            self?.dropInWindowManager.dismiss(
-                dropInViewController: dropInViewController,
-                animated: true,
-                completion: completion
-            )
-        }
-    }
-}
-
-extension DropInPlatformApi: PartialPaymentDelegate {
-    func checkBalance(with data: Adyen.PaymentComponentData, component: any Adyen.Component, completion: @escaping (Result<Adyen.Balance, any Error>) -> Void) {
-        do {
-            checkBalanceHandler = completion
-            let checkoutEvent = try CheckoutEvent(
-                type: CheckoutEventType.balanceCheck,
-                data: data.jsonObject.toJsonStringRepresentation()
-            )
-            checkoutFlutter.send(event: checkoutEvent, completion: { _ in })
-        } catch {
-            completion(.failure(error))
-        }
-    }
-    
-    func requestOrder(for component: any Adyen.Component, completion: @escaping (Result<Adyen.PartialPaymentOrder, any Error>) -> Void) {
-        requestOrderHandler = completion
-        let checkoutEvent = CheckoutEvent(type: CheckoutEventType.requestOrder)
-        checkoutFlutter.send(event: checkoutEvent, completion: { _ in })
-    }
-    
-    func cancelOrder(_ order: Adyen.PartialPaymentOrder, component: any Adyen.Component) {
-        do {
-            let cancelOrderData: [String: Any] = [
-                Constants.orderKey: order.jsonObject,
-                Constants.shouldUpdatePaymentMethodsKey: false
-            ]
-            let data = try JSONSerialization.data(withJSONObject: cancelOrderData, options: [])
-            let cancelOrderDataString = String(data: data, encoding: .utf8)
-            let checkoutEvent = CheckoutEvent(type: CheckoutEventType.cancelOrder, data: cancelOrderDataString)
-            checkoutFlutter.send(event: checkoutEvent, completion: { _ in })
-        } catch {
-            adyenPrint(error.localizedDescription)
-        }
-    }
-
-}
-
-extension DropInPlatformApi: CardComponentDelegate {
-    func didSubmit(lastFour: String, finalBIN: String, component: CardComponent) {}
-    
-    func didChangeBIN(_ value: String, component: CardComponent) {
-        let checkoutEvent = CheckoutEvent(type: CheckoutEventType.binValue, data: value)
-        checkoutFlutter.send(event: checkoutEvent, completion: { _ in })
-    }
-    
-    func didChangeCardBrand(_ value: [CardBrand]?, component: CardComponent) {
-        guard let binLookupData = value else {
-            return
-        }
-        
-        let binLookupDataDtoList: [BinLookupDataDTO] = binLookupData.map { cardBrand in
-            BinLookupDataDTO(brand: cardBrand.type.rawValue)
-        }
-        
-        let checkoutEvent = CheckoutEvent(type: CheckoutEventType.binLookup, data: binLookupDataDtoList)
-        checkoutFlutter.send(event: checkoutEvent, completion: { _ in })
     }
 }
