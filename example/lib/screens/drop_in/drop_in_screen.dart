@@ -8,7 +8,7 @@ import 'package:adyen_checkout_example/repositories/config_repository.dart';
 import 'package:adyen_checkout_example/utils/dialog_builder.dart';
 import 'package:flutter/material.dart';
 
-class DropInScreen extends StatelessWidget {
+class DropInScreen extends StatefulWidget {
   const DropInScreen({
     required this.repository,
     required this.configRepository,
@@ -17,6 +17,13 @@ class DropInScreen extends StatelessWidget {
 
   final AdyenDropInRepository repository;
   final ConfigRepository configRepository;
+
+  @override
+  State<DropInScreen> createState() => _DropInScreenState();
+}
+
+class _DropInScreenState extends State<DropInScreen> {
+  bool _isStartingDropIn = false;
 
   @override
   Widget build(BuildContext context) {
@@ -28,12 +35,20 @@ class DropInScreen extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               TextButton(
-                onPressed: () => startDropInSessions(context),
+                onPressed: _isStartingDropIn
+                    ? null
+                    : () => _runDropIn(
+                          () => startDropInSessions(context),
+                        ),
                 key: const Key('Drop-in sessions flow'),
                 child: const Text("Drop-in sessions flow"),
               ),
               TextButton(
-                onPressed: () => startDropInAdvancedFlow(context),
+                onPressed: _isStartingDropIn
+                    ? null
+                    : () => _runDropIn(
+                          () => startDropInAdvancedFlow(context),
+                        ),
                 key: const Key('Drop-in advanced flow'),
                 child: const Text("Drop-in advanced flow"),
               ),
@@ -44,10 +59,25 @@ class DropInScreen extends StatelessWidget {
     );
   }
 
+  Future<void> _runDropIn(Future<void> Function() flow) async {
+    if (_isStartingDropIn) {
+      return;
+    }
+
+    setState(() => _isStartingDropIn = true);
+    try {
+      await flow();
+    } finally {
+      if (mounted) {
+        setState(() => _isStartingDropIn = false);
+      }
+    }
+  }
+
   Future<void> startDropInSessions(BuildContext context) async {
     try {
       final Map<String, dynamic> sessionResponse =
-          await repository.fetchSession();
+          await widget.repository.fetchSession();
       final DropInConfiguration dropInConfiguration =
           await _createDropInConfiguration();
 
@@ -74,15 +104,16 @@ class DropInScreen extends StatelessWidget {
 
   Future<void> startDropInAdvancedFlow(BuildContext context) async {
     try {
-      final paymentMethodsResponse = await repository.fetchPaymentMethods();
+      final paymentMethodsResponse =
+          await widget.repository.fetchPaymentMethods();
       final dropInConfiguration = await _createDropInConfiguration();
       final advancedCheckout = AdvancedCheckout(
-        onSubmit: repository.onSubmit,
-        onAdditionalDetails: repository.onAdditionalDetails,
+        onSubmit: widget.repository.onSubmit,
+        onAdditionalDetails: widget.repository.onAdditionalDetails,
         partialPayment: PartialPayment(
-          onCheckBalance: repository.onCheckBalance,
-          onRequestOrder: repository.onRequestOrder,
-          onCancelOrder: repository.onCancelOrder,
+          onCheckBalance: widget.repository.onCheckBalance,
+          onRequestOrder: widget.repository.onRequestOrder,
+          onCancelOrder: widget.repository.onCancelOrder,
         ),
       );
 
@@ -116,7 +147,7 @@ class DropInScreen extends StatelessWidget {
     );
 
     //To support CashAppPay please add "pod 'Adyen/CashAppPay'" to your Podfile.
-    final String returnUrl = await repository.determineBaseReturnUrl();
+    final String returnUrl = await widget.repository.determineBaseReturnUrl();
     final CashAppPayConfiguration cashAppPayConfiguration =
         CashAppPayConfiguration(
       cashAppPayEnvironment: CashAppPayEnvironment.sandbox,
@@ -127,7 +158,8 @@ class DropInScreen extends StatelessWidget {
         StoredPaymentMethodConfiguration(
       showPreselectedStoredPaymentMethod: false,
       isRemoveStoredPaymentMethodEnabled: true,
-      deleteStoredPaymentMethodCallback: repository.deleteStoredPaymentMethod,
+      deleteStoredPaymentMethodCallback:
+          widget.repository.deleteStoredPaymentMethod,
     );
 
     final DropInConfiguration dropInConfiguration = DropInConfiguration(
@@ -148,7 +180,7 @@ class DropInScreen extends StatelessWidget {
 
   Future<CardConfiguration> _createCardConfiguration() async {
     final CardConfiguration cardConfiguration =
-        await configRepository.loadCardConfiguration();
+        await widget.configRepository.loadCardConfiguration();
     return cardConfiguration.copyWith(
       onBinLookup: _onBinLookup,
       onBinValue: _onBinValue,
