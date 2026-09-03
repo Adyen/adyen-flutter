@@ -1,4 +1,5 @@
 import Foundation
+
 // #if canImport(AdyenDropIn)
 //     import AdyenDropIn
 // #endif
@@ -14,6 +15,7 @@ import Foundation
 import UIKit
 @_spi(AdyenInternal) import Adyen
 @_spi(AdyenInternal) import AdyenCheckout
+
 // #if canImport(AdyenNetworking)
 //     import AdyenNetworking
 // #endif
@@ -23,8 +25,9 @@ import UIKit
 @MainActor
 class DropInPlatformApi: DropInPlatformInterface {
 //    private let jsonDecoder = JSONDecoder()
-    private let checkoutFlutter: CheckoutFlutterInterface
+    let checkoutFlutter: CheckoutFlutterInterface
     private let checkoutHolder: CheckoutHolder
+    private let dropInWindowManager: DropInWindowManager
 //    private var dropInComponent: DropInComponent?
 //    private var dropInViewController: DropInViewController?
 //    private var dropInSessionStoredPaymentMethodsDelegate: DropInSessionsStoredPaymentMethodsDelegate?
@@ -36,10 +39,13 @@ class DropInPlatformApi: DropInPlatformInterface {
 
     init(
         checkoutFlutter: CheckoutFlutterInterface,
-        checkoutHolder: CheckoutHolder
+        checkoutHolder: CheckoutHolder,
+        dropInWindowManager: DropInWindowManager = DropInWindowManager()
     ) {
         self.checkoutFlutter = checkoutFlutter
         self.checkoutHolder = checkoutHolder
+        self.dropInWindowManager = dropInWindowManager
+        self.dropInWindowManager.delegate = self
     }
 
     func showDropInSession(dropInConfigurationDTO: DropInConfigurationDTO) {
@@ -206,6 +212,7 @@ class DropInPlatformApi: DropInPlatformInterface {
     func onOrderCancelResult(orderCancelResult: OrderCancelResultDTO) throws {}
 
     func cleanUpDropIn() {
+        dropInWindowManager.cleanUp()
         checkoutHolder.reset()
 //        dropInSessionStoredPaymentMethodsDelegate = nil
 //        dropInAdvancedFlowDelegate?.dropInInteractorDelegate = nil

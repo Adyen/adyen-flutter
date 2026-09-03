@@ -1,3 +1,21 @@
+## 1.13.0 (in development)
+
+### Improved
+
+- For Drop-in on iOS: simplified stored payment method deletion handling by consolidating duplicated
+  internal delegates.
+- For Drop-in on iOS: reorganized internal delegate implementations into focused files to improve
+  maintainability.
+- Improved accessibility for Drop-in on iOS by presenting it in a dedicated window, keeping
+  Full Keyboard Access focus within the native payment interface.
+
+### Changed
+
+- Android: Changed the default `AdyenCheckout` theme to inherit directly from `Adyen`, preventing
+  unrelated dependencies that define `AppTheme` from causing Material widget inflation failures.
+  Apps that customize Drop-in through `AppTheme` must move those attributes to an app-level
+  `AdyenCheckout` style.
+
 ## 1.12.0
 
 ### Improved

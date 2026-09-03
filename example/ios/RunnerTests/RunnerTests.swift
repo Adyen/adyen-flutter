@@ -1,7 +1,5 @@
 import Adyen
 @testable import adyen_checkout
-import Flutter
-import UIKit
 import XCTest
 
 // This demonstrates a simple unit test of the Swift portion of this plugin's implementation.
@@ -9,29 +7,26 @@ import XCTest
 // See https://developer.apple.com/documentation/xctest for more information about using XCTest.
 
 class RunnerTests: XCTestCase {
-    private let TEST_CLIENT_KEY = "test_qwertyuiopasdfghjklzxcvbnmqwerty"
-
-    func testWhenDropInConfigurationDtoIsProvidedThenMapItToNativeSdkModel() {
+    func test_givenDropInConfigurationDTO_whenMapping_thenCreatesNativeSDKModels() {
         do {
-            let dropInConfigurationDTO = DropInConfigurationDTO(
-                environment: Environment.test,
-                clientKey: TEST_CLIENT_KEY,
+            let dropInConfigurationDTO = createDropInConfigurationDTO(
                 countryCode: "US",
                 amount: AmountDTO(currency: "USD", value: 1600),
                 shopperLocale: "en-US",
                 analyticsOptionsDTO: AnalyticsOptionsDTO(enabled: false, version: "0.0.1"),
-                showPreselectedStoredPaymentMethod: false,
-                skipListWhenSinglePaymentMethod: false,
-                isRemoveStoredPaymentMethodEnabled: false,
-                isPartialPaymentSupported: true,
-                showStoredPaymentMethods: true
+                showPreselectedStoredPaymentMethod: false
             )
 
             let adyenContext = try dropInConfigurationDTO.createAdyenContext()
-            let dropInConfiguration = try dropInConfigurationDTO.createDropInConfiguration(payment: Payment(amount: Amount(value: 1600, currencyCode: "USD"), countryCode: "US"))
+            let dropInConfiguration = try dropInConfigurationDTO.createDropInConfiguration(
+                payment: Payment(
+                    amount: Amount(value: 1600, currencyCode: "USD"),
+                    countryCode: "US"
+                )
+            )
 
             XCTAssertEqual(adyenContext.apiContext.environment.baseURL, Adyen.Environment.test.baseURL)
-            XCTAssertEqual(adyenContext.apiContext.clientKey, TEST_CLIENT_KEY)
+            XCTAssertEqual(adyenContext.apiContext.clientKey, testClientKey)
             XCTAssertEqual(adyenContext.payment?.countryCode, "US")
             XCTAssertEqual(adyenContext.payment?.amount.currencyCode, "USD")
             XCTAssertEqual(adyenContext.payment?.amount.value, 1600)
