@@ -35,16 +35,12 @@ class _DropInScreenState extends State<DropInScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               TextButton(
-                onPressed: _isStartingDropIn
-                    ? null
-                    : () => _runDropIn(startDropInSessions),
+                onPressed: () => _runDropIn(_startDropInSessions),
                 key: const Key('Drop-in sessions flow'),
                 child: const Text("Drop-in sessions flow"),
               ),
               TextButton(
-                onPressed: _isStartingDropIn
-                    ? null
-                    : () => _runDropIn(startDropInAdvancedFlow),
+                onPressed: () => _runDropIn(_startDropInAdvancedFlow),
                 key: const Key('Drop-in advanced flow'),
                 child: const Text("Drop-in advanced flow"),
               ),
@@ -55,28 +51,23 @@ class _DropInScreenState extends State<DropInScreen> {
     );
   }
 
-  Future<void> _runDropIn(Future<void> Function() flow) async {
+  Future<void> _runDropIn(Future<void> Function() paymentFlow) async {
+    // Prevent multiple Drop-in flows from starting at the same time.
     if (_isStartingDropIn) {
       return;
     }
 
     setState(() => _isStartingDropIn = true);
-    try {
-      await flow();
-    } finally {
-      if (mounted) {
-        setState(() => _isStartingDropIn = false);
-      }
-    }
+    await paymentFlow();
+    setState(() => _isStartingDropIn = false);
   }
 
-  Future<void> startDropInSessions() async {
+  Future<void> _startDropInSessions() async {
     try {
       final Map<String, dynamic> sessionResponse =
           await widget.repository.fetchSession();
       final DropInConfiguration dropInConfiguration =
           await _createDropInConfiguration();
-
       final SessionCheckout sessionCheckout =
           await AdyenCheckout.session.create(
         sessionId: sessionResponse["id"],
@@ -98,12 +89,13 @@ class _DropInScreenState extends State<DropInScreen> {
     }
   }
 
-  Future<void> startDropInAdvancedFlow() async {
+  Future<void> _startDropInAdvancedFlow() async {
     try {
-      final paymentMethodsResponse =
+      final Map<String, dynamic> paymentMethodsResponse =
           await widget.repository.fetchPaymentMethods();
-      final dropInConfiguration = await _createDropInConfiguration();
-      final advancedCheckout = AdvancedCheckout(
+      final DropInConfiguration dropInConfiguration =
+          await _createDropInConfiguration();
+      final AdvancedCheckout advancedCheckout = AdvancedCheckout(
         onSubmit: widget.repository.onSubmit,
         onAdditionalDetails: widget.repository.onAdditionalDetails,
         partialPayment: PartialPayment(
