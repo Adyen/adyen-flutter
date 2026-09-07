@@ -127,7 +127,7 @@ class _CheckoutExampleState extends State<CheckoutExample> {
         'reference': 'flutter-session-${DateTime.now().millisecondsSinceEpoch}',
         'channel': _channel,
       });
-      final checkout = await Checkout.setupSession(
+      final checkout = await Checkout.setup(
         sessionResponse: SessionResponse.fromJson(response),
         configuration: _configuration,
         callbacks: SessionCheckoutCallbacks(

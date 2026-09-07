@@ -52,7 +52,7 @@ backend and app URL scheme.
 ## Sessions
 
 ```dart
-final checkout = await Checkout.setupSession(
+final checkout = await Checkout.setup(
   sessionResponse: SessionResponse(
     id: sessionJson['id'] as String,
     sessionData: sessionJson['sessionData'] as String,

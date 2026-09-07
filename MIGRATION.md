@@ -16,7 +16,7 @@ AdyenCheckout.advanced.setup(...)
 with the static `Checkout` entry point:
 
 ```dart
-final sessionCheckout = await Checkout.setupSession(
+final sessionCheckout = await Checkout.setup(
   sessionResponse: sessionResponse,
   configuration: configuration,
   callbacks: SessionCheckoutCallbacks(

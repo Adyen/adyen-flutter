@@ -13,7 +13,7 @@ import 'common/model/session_response.dart';
 abstract final class Checkout {
   static CheckoutCoordinator get _coordinator => CheckoutCoordinator.shared;
 
-  static Future<SessionCheckout> setupSession({
+  static Future<SessionCheckout> setup({
     required SessionResponse sessionResponse,
     required CheckoutConfiguration configuration,
     required SessionCheckoutCallbacks callbacks,
