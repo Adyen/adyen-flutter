@@ -1,0 +1,4 @@
+enum GooglePayEnvironment {
+  test,
+  production,
+}

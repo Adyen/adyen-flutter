@@ -4,7 +4,7 @@ class UnencryptedCard {
   final String? expiryYear;
   final String? cvc;
 
-  UnencryptedCard({
+  const UnencryptedCard({
     this.cardNumber,
     this.expiryMonth,
     this.expiryYear,
@@ -12,11 +12,5 @@ class UnencryptedCard {
   });
 
   @override
-  String toString() {
-    return 'UnencryptedCard('
-        'cardNumber: **** **** **** ****, '
-        'expiryMonth: **, '
-        'expiryYear: ****, '
-        'cvc: ***)';
-  }
+  String toString() => 'UnencryptedCard(<redacted>)';
 }

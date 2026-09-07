@@ -1,20 +1,22 @@
-## 1.13.0 (in development)
+## 2.0.0-alpha.1
 
-### Improved
+### New
 
-- For Drop-in on iOS: simplified stored payment method deletion handling by consolidating duplicated
-  internal delegates.
-- For Drop-in on iOS: reorganized internal delegate implementations into focused files to improve
-  maintainability.
-- Improved accessibility for Drop-in on iOS by presenting it in a dedicated window, keeping
-  Full Keyboard Access focus within the native payment interface.
+- Added public v6-aligned Sessions, Advanced, and one-shot action Checkout APIs.
+- Added typed payment-method, action, callback payload, result, and error models.
+- Added the generic `CheckoutPaymentComponent` and optional `CheckoutController`.
+- Added public card, Google Pay, and Apple Pay configuration subsets supported by native alpha.1 APIs.
 
 ### Changed
 
-- Android: Changed the default `AdyenCheckout` theme to inherit directly from `Adyen`, preventing
-  unrelated dependencies that define `AppTheme` from causing Material widget inflation failures.
-  Apps that customize Drop-in through `AppTheme` must move those attributes to an app-level
-  `AdyenCheckout` style.
+- Migrated Android and iOS dependencies to `6.0.0-alpha.1` and Swift Package Manager on iOS.
+- Card validation now returns `bool`; expiry validation requires `MM` and `YY`.
+- Completion and failure callbacks are owned by the checkout flow, not individual components.
+
+### Removed
+
+- Drop-in, separate Instant, partial-payment/order, and legacy action-component APIs.
+- `Checkout.getReturnUrl()` and all generated Pigeon types from the public barrel.
 
 ## 1.12.0
 

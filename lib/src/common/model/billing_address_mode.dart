@@ -1,0 +1,4 @@
+enum BillingAddressMode {
+  none,
+  postalCode,
+}

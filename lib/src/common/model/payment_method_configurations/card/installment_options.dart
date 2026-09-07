@@ -1,21 +1,13 @@
-/// Base sealed class for installment options.
-///
-/// Use [DefaultInstallmentOptions] for options that apply to all card brands,
-/// or [CardBasedInstallmentOptions] for brand-specific options.
 sealed class InstallmentOptions {
-  /// Month values for installments. All values must be > 1.
   final List<int> values;
-
-  /// Whether revolving payment is included as an option.
   final bool includesRevolving;
 
   InstallmentOptions({
-    required this.values,
+    required List<int> values,
     this.includesRevolving = false,
-  });
+  }) : values = List<int>.unmodifiable(values);
 }
 
-/// Default installment options applied to all card brands.
 class DefaultInstallmentOptions extends InstallmentOptions {
   DefaultInstallmentOptions({
     required super.values,
@@ -23,19 +15,11 @@ class DefaultInstallmentOptions extends InstallmentOptions {
   });
 
   @override
-  String toString() {
-    return 'DefaultInstallmentOptions('
-        'values: $values, '
-        'includesRevolving: $includesRevolving)';
-  }
+  String toString() =>
+      'DefaultInstallmentOptions(values: $values, includesRevolving: $includesRevolving)';
 }
 
-/// Installment options for a specific card brand.
 class CardBasedInstallmentOptions extends InstallmentOptions {
-  /// Card brand identifier. Valid values:
-  /// - "visa", "mc" (Mastercard), "amex", "diners", "discover",
-  /// - "jcb", "maestro", "bcmc" (Bancontact), "cartebancaire"
-  /// See: https://docs.adyen.com/development-resources/paymentmethodvariant
   final String cardBrand;
 
   CardBasedInstallmentOptions({
@@ -45,10 +29,8 @@ class CardBasedInstallmentOptions extends InstallmentOptions {
   });
 
   @override
-  String toString() {
-    return 'CardBasedInstallmentOptions('
-        'cardBrand: $cardBrand, '
-        'values: $values, '
-        'includesRevolving: $includesRevolving)';
-  }
+  String toString() => 'CardBasedInstallmentOptions('
+      'cardBrand: $cardBrand, '
+      'values: $values, '
+      'includesRevolving: $includesRevolving)';
 }

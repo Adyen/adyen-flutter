@@ -1,18 +1,44 @@
-@_spi(AdyenInternal) import AdyenCheckout
-@_spi(AdyenInternal) import Adyen
+import AdyenCheckout
+import Foundation
 
-class CheckoutHolder {
-    var adyenCheckout: PaymentCheckout?
+@MainActor
+final class CheckoutHolder {
+    private var checkouts: [String: PaymentCheckout] = [:]
+    private var activeActionId: String?
+    var actionCheckout: ActionOnlyCheckout?
 
-    /// The componentId of the currently active Apple Pay component. Apple Pay's dynamic
-    /// callbacks (onAuthorize, onSelectShippingContact, onSelectShippingMethod, onChangeCouponCode)
-    /// are chained onto `ApplePayConfiguration` once, at `Checkout.setup()` time, before any
-    /// specific componentId is known. This property lets those closures resolve the componentId
-    /// lazily, when they actually fire during the Apple Pay sheet flow.
-    var activeApplePayComponentId: String?
+    var isActive: Bool {
+        !checkouts.isEmpty || activeActionId != nil
+    }
 
-    func reset() {
-        adyenCheckout = nil
-        activeApplePayComponentId = nil
+    func store(_ checkout: PaymentCheckout, id: String) {
+        checkouts[id] = checkout
+    }
+
+    func checkout(for id: String) -> PaymentCheckout? {
+        checkouts[id]
+    }
+
+    func removeCheckout(for id: String) {
+        checkouts.removeValue(forKey: id)
+    }
+
+    func beginAction(id: String) -> Bool {
+        guard !isActive else { return false }
+        activeActionId = id
+        return true
+    }
+
+    func endAction(id: String) {
+        if activeActionId == id {
+            activeActionId = nil
+        }
+        actionCheckout = nil
+    }
+
+    func clear() {
+        checkouts.removeAll()
+        activeActionId = nil
+        actionCheckout = nil
     }
 }

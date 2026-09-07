@@ -1,22 +1,8 @@
-import Adyen
 import Flutter
 import UIKit
 
-#if canImport(adyen_checkout)
-    import adyen_checkout
-#endif
-
 #if canImport(AdyenCheckout)
     import AdyenCheckout
-#endif
-
-// TODO: v6 migration - DropInComponent.Style is now package-access.
-// #if canImport(AdyenDropIn)
-//     import AdyenDropIn
-// #endif
-
-#if canImport(AdyenUI)
-    import AdyenUI
 #endif
 
 @main
@@ -26,12 +12,6 @@ import UIKit
         didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
     ) -> Bool {
         GeneratedPluginRegistrant.register(with: self)
-        // TODO: v6 migration - Drop-in styling via DropInComponent.Style is no longer available.
-        // setDropInStyle()
-        // TODO: v6 migration - AdyenAppearance.cardComponentStyle/blikComponentStyle relied on
-        // FormComponentStyle, now package-access. See AdyenAppearance.swift for details.
-        // setCardComponentStyle()
-        // setBlikComponentStyle()
         return super.application(application, didFinishLaunchingWithOptions: launchOptions)
     }
 
@@ -42,32 +22,4 @@ import UIKit
     ) -> Bool {
         Checkout.handleReturn(url: url) || super.application(application, open: url, options: options)
     }
-
-    // TODO: v6 migration - DropInComponent.Style is now package-access.
-    // private func setDropInStyle() {
-    //     var dropInStyle = DropInComponent.Style()
-    //     dropInStyle.formComponent.mainButtonItem.button.backgroundColor = UIColor(named: "PrimaryBackground") ?? .black
-    //     dropInStyle.formComponent.mainButtonItem.button.title.color = UIColor(named: "PrimaryTitle") ?? .white
-    //     dropInStyle.formComponent.textField.tintColor = UIColor(named: "PrimaryBackground") ?? .black
-    //     AdyenAppearance.dropInStyle = dropInStyle
-    // }
-
-    // TODO: v6 migration - FormComponentStyle is now package-access. See AdyenAppearance.swift.
-    // private func setCardComponentStyle() {
-    //     var cardComponentStyle = AdyenUI.FormComponentStyle()
-    //     cardComponentStyle.mainButtonItem.button.backgroundColor = UIColor(named: "PrimaryBackground") ?? .black
-    //     cardComponentStyle.mainButtonItem.button.title.color = UIColor(named: "PrimaryTitle") ?? .white
-    //     cardComponentStyle.textField.tintColor = UIColor(named: "PrimaryBackground") ?? .black
-    //     cardComponentStyle.backgroundColor = UIColor(named: "AppBackground") ?? .white
-    //     AdyenAppearance.cardComponentStyle = cardComponentStyle
-    // }
-    //
-    // private func setBlikComponentStyle() {
-    //     var blikComponentStyle = AdyenUI.FormComponentStyle()
-    //     blikComponentStyle.mainButtonItem.button.backgroundColor = UIColor(named: "PrimaryBackground") ?? .black
-    //     blikComponentStyle.mainButtonItem.button.title.color = UIColor(named: "PrimaryTitle") ?? .white
-    //     blikComponentStyle.textField.tintColor = UIColor(named: "PrimaryBackground") ?? .black
-    //     blikComponentStyle.backgroundColor = UIColor(named: "AppBackground") ?? .white
-    //     AdyenAppearance.blikComponentStyle = blikComponentStyle
-    // }
 }

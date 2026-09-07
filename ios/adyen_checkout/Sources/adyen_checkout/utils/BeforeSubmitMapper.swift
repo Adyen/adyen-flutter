@@ -1,5 +1,6 @@
-@_spi(AdyenInternal) import Adyen
-@_spi(AdyenInternal) import AdyenCheckout
+import Adyen
+import AdyenCheckout
+import Foundation
 
 extension BeforeSubmitData {
     func toDTO() -> BeforeSubmitDataDTO {
@@ -20,25 +21,19 @@ extension PostalAddress {
             houseNumberOrName: houseNumberOrName,
             postalCode: postalCode,
             stateOrProvince: stateOrProvince,
-            street: street,
-            apartment: apartment
+            street: street
         )
     }
 }
 
 extension ShopperName {
     func toDTO() -> ShopperNameDTO {
-        ShopperNameDTO(
-            firstName: firstName,
-            lastName: lastName,
-            infix: nil,
-            gender: nil
-        )
+        ShopperNameDTO(firstName: firstName, lastName: lastName, infix: nil, gender: nil)
     }
 }
 
 extension AddressDTO {
-    func fromDTO() -> PostalAddress {
+    func toPostalAddress() -> PostalAddress {
         PostalAddress(
             city: city,
             country: country,
@@ -46,38 +41,38 @@ extension AddressDTO {
             postalCode: postalCode,
             stateOrProvince: stateOrProvince,
             street: street,
-            apartment: apartment
+            apartment: nil
         )
     }
 }
 
-extension BeforeSubmitDataDTO {
-    /// `BeforeSubmitData` has no public initializer (only `public var` fields), so a `null`
-    /// field from Dart is applied by mutating `original` rather than constructing a new
-    /// instance. This also naturally matches the documented "null = keep original value"
-    /// semantics of the callback.
-    ///
-    /// - TODO: v6 migration - ShopperName.infix/gender are not exposed on iOS yet;
-    ///   BeforeSubmitDataDTO.shopperName.infix/gender are dropped here until the native SDK
-    ///   gap is closed (tracked via ADR).
-    func applied(to original: BeforeSubmitData) -> BeforeSubmitData {
-        var updated = original
-        if let billingAddress { updated.billingAddress = billingAddress.fromDTO() }
-        if let deliveryAddress { updated.deliveryAddress = deliveryAddress.fromDTO() }
-        if let shopperName, let firstName = shopperName.firstName, let lastName = shopperName.lastName {
-            updated.shopperName = ShopperName(firstName: firstName, lastName: lastName)
-        }
-        if let shopperEmail { updated.shopperEmail = shopperEmail }
-        return updated
+extension ShopperNameDTO {
+    func toShopperName() -> ShopperName? {
+        guard let firstName, let lastName else { return nil }
+        return ShopperName(firstName: firstName, lastName: lastName)
     }
 }
 
 extension BeforeSubmitResultDTO {
-    func mapToBeforeSubmitResult(original: BeforeSubmitData) -> BeforeSubmitResult {
+    func toNativeResult(original: BeforeSubmitData) -> BeforeSubmitResult {
         if isAborted {
             return .abort
         }
-        guard let data else { return .abort }
-        return .proceed(data: data.applied(to: original), sessionData: sessionData)
+        var updated = original
+        if let data {
+            if let billingAddress = data.billingAddress {
+                updated.billingAddress = billingAddress.toPostalAddress()
+            }
+            if let deliveryAddress = data.deliveryAddress {
+                updated.deliveryAddress = deliveryAddress.toPostalAddress()
+            }
+            if let shopperName = data.shopperName, let value = shopperName.toShopperName() {
+                updated.shopperName = value
+            }
+            if let shopperEmail = data.shopperEmail {
+                updated.shopperEmail = shopperEmail
+            }
+        }
+        return .proceed(data: updated, sessionData: sessionData)
     }
 }

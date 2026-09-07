@@ -1,4 +1,4 @@
-import 'package:adyen_checkout/src/common/model/payment_method_configurations/apple_pay/apple_pay_payment_error.dart';
+import 'apple_pay_payment_error.dart';
 
 sealed class ApplePayAuthorizationResult {
   const ApplePayAuthorizationResult();
@@ -18,7 +18,5 @@ class ApplePayAuthorizationSuccess extends ApplePayAuthorizationResult {
 class ApplePayAuthorizationFailure extends ApplePayAuthorizationResult {
   final List<ApplePayPaymentError> errors;
 
-  const ApplePayAuthorizationFailure({
-    required this.errors,
-  });
+  const ApplePayAuthorizationFailure({required this.errors}) : super();
 }

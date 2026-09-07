@@ -1,20 +1,22 @@
 package com.adyen.checkout.flutter.components
 
-import com.adyen.checkout.flutter.generated.ComponentCommunicationModel
-import com.adyen.checkout.flutter.generated.OnPlatformEventStreamHandler
+import com.adyen.checkout.flutter.generated.CheckoutEventDTO
+import com.adyen.checkout.flutter.generated.EventsStreamHandler
 import com.adyen.checkout.flutter.generated.PigeonEventSink
 
-class ComponentPlatformEventHandler : OnPlatformEventStreamHandler() {
-    var eventSink: PigeonEventSink<ComponentCommunicationModel>? = null
+internal class ComponentPlatformEventHandler : EventsStreamHandler() {
+    var eventSink: PigeonEventSink<CheckoutEventDTO>? = null
+        private set
 
-    override fun onListen(
-        p0: Any?,
-        sink: PigeonEventSink<ComponentCommunicationModel>
-    ) {
+    override fun onListen(arguments: Any?, sink: PigeonEventSink<CheckoutEventDTO>) {
         eventSink = sink
     }
 
-    override fun onCancel(args: Any?) {
+    override fun onCancel(arguments: Any?) {
         eventSink = null
+    }
+
+    fun send(event: CheckoutEventDTO) {
+        eventSink?.success(event)
     }
 }

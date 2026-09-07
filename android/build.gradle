@@ -71,8 +71,13 @@ android {
     }
 
     dependencies {
-        implementation "com.adyen.checkout:drop-in:6.0.0-alpha.1"
-        // implementation "com.adyen.checkout:drop-in:2026.05.31-SNAPSHOT"
+        implementation "com.adyen.checkout:core:6.0.0-alpha.1"
+        implementation "com.adyen.checkout:card:6.0.0-alpha.1"
+        implementation "com.adyen.checkout:blik:6.0.0-alpha.1"
+        implementation "com.adyen.checkout:googlepay:6.0.0-alpha.1"
+        implementation "com.adyen.checkout:3ds2:6.0.0-alpha.1"
+        implementation "com.adyen.checkout:cse:6.0.0-alpha.1"
+        // implementation "com.adyen.checkout:core:2026.05.31-SNAPSHOT"
         implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
 
         // Compose Dependencies

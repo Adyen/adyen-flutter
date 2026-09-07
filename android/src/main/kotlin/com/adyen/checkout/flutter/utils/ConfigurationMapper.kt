@@ -1,440 +1,169 @@
 package com.adyen.checkout.flutter.utils
 
-import com.adyen.checkout.card.FieldVisibility as SdkFieldVisibility
-import com.adyen.checkout.card.card
 import com.adyen.checkout.card.BillingAddressMode
+import com.adyen.checkout.card.FieldVisibility as SdkFieldVisibility
 import com.adyen.checkout.card.InstallmentConfiguration
 import com.adyen.checkout.card.InstallmentOptions
-import com.adyen.checkout.card.old.AddressConfiguration
-import com.adyen.checkout.components.core.OrderResponse
+import com.adyen.checkout.card.card
 import com.adyen.checkout.core.common.CardBrand
-import com.adyen.checkout.core.components.AdvancedCheckoutResult
-import com.adyen.checkout.core.components.SessionCheckoutResult
-import com.adyen.checkout.core.common.internal.helper.CheckoutPlatform
-import com.adyen.checkout.core.common.internal.helper.CheckoutPlatformParams
+import com.adyen.checkout.core.common.Environment as SdkEnvironment
 import com.adyen.checkout.core.components.AnalyticsConfiguration
 import com.adyen.checkout.core.components.AnalyticsLevel
+import com.adyen.checkout.core.components.CheckoutConfiguration
 import com.adyen.checkout.core.components.data.model.Amount
-import com.adyen.checkout.core.sessions.SessionResponse
-import com.adyen.checkout.cse.EncryptedCard
-import com.adyen.checkout.cse.UnencryptedCard
-import com.adyen.checkout.flutter.generated.ActionComponentConfigurationDTO
-import com.adyen.checkout.flutter.generated.AddressMode
 import com.adyen.checkout.flutter.generated.AmountDTO
-import com.adyen.checkout.flutter.generated.AnalyticsOptionsDTO
-import com.adyen.checkout.flutter.generated.BillingAddressParametersDTO
-import com.adyen.checkout.flutter.generated.CardBasedInstallmentOptionsDTO
+import com.adyen.checkout.flutter.generated.AnalyticsConfigurationDTO
+import com.adyen.checkout.flutter.generated.BillingAddressModeDTO
 import com.adyen.checkout.flutter.generated.CardConfigurationDTO
-import com.adyen.checkout.flutter.generated.CashAppPayConfigurationDTO
-import com.adyen.checkout.flutter.generated.CashAppPayEnvironment
 import com.adyen.checkout.flutter.generated.CheckoutConfigurationDTO
-import com.adyen.checkout.flutter.generated.DefaultInstallmentOptionsDTO
-import com.adyen.checkout.flutter.generated.DropInConfigurationDTO
-import com.adyen.checkout.flutter.generated.EncryptedCardDTO
-import com.adyen.checkout.flutter.generated.Environment
-import com.adyen.checkout.flutter.generated.FieldVisibility
+import com.adyen.checkout.flutter.generated.EnvironmentDTO
+import com.adyen.checkout.flutter.generated.FieldVisibilityDTO
 import com.adyen.checkout.flutter.generated.GooglePayConfigurationDTO
-import com.adyen.checkout.flutter.generated.GooglePayEnvironment
+import com.adyen.checkout.flutter.generated.GooglePayEnvironmentDTO
 import com.adyen.checkout.flutter.generated.InstallmentConfigurationDTO
-import com.adyen.checkout.flutter.generated.InstantPaymentConfigurationDTO
+import com.adyen.checkout.flutter.generated.InstallmentOptionsDTO
 import com.adyen.checkout.flutter.generated.MerchantInfoDTO
-import com.adyen.checkout.flutter.generated.OrderResponseDTO
-import com.adyen.checkout.flutter.generated.SessionResponseDTO
 import com.adyen.checkout.flutter.generated.ShippingAddressParametersDTO
-import com.adyen.checkout.flutter.generated.ThreeDS2ButtonCustomizationDTO
-import com.adyen.checkout.flutter.generated.ThreeDS2ConfigurationDTO
-import com.adyen.checkout.flutter.generated.ThreeDS2InputCustomizationDTO
-import com.adyen.checkout.flutter.generated.ThreeDS2LabelCustomizationDTO
-import com.adyen.checkout.flutter.generated.ThreeDS2SelectionItemCustomizationDTO
-import com.adyen.checkout.flutter.generated.ThreeDS2ToolbarCustomizationDTO
-import com.adyen.checkout.flutter.generated.ThreeDS2UICustomizationDTO
-import com.adyen.checkout.flutter.generated.TotalPriceStatus
-import com.adyen.checkout.flutter.generated.TwintConfigurationDTO
+import com.adyen.checkout.flutter.generated.TotalPriceStatusDTO
 import com.adyen.checkout.flutter.generated.UnencryptedCardDTO
-import com.adyen.checkout.googlepay.MerchantInfo as NewMerchantInfo
-import com.adyen.checkout.googlepay.ShippingAddressParameters as NewShippingAddressParameters
+import com.adyen.checkout.cse.UnencryptedCard
+import com.adyen.checkout.googlepay.MerchantInfo
+import com.adyen.checkout.googlepay.ShippingAddressParameters
 import com.adyen.checkout.googlepay.googlePay
 import com.google.android.gms.wallet.WalletConstants
-import com.adyen.threeds2.customization.ButtonCustomization
-import com.adyen.threeds2.customization.LabelCustomization
-import com.adyen.threeds2.customization.TextBoxCustomization
-import com.adyen.threeds2.customization.SelectionItemCustomization
-import com.adyen.threeds2.customization.ToolbarCustomization
-import com.adyen.threeds2.customization.UiCustomization
-import java.util.Locale
-import com.adyen.checkout.cashapppay.CashAppPayEnvironment as SDKCashAppPayEnvironment
-import com.adyen.checkout.core.common.Environment as SDKEnvironment
-import com.adyen.checkout.core.components.CheckoutConfiguration
-import com.adyen.checkout.flutter.generated.PaymentResultModelDTO
 
 object ConfigurationMapper {
-    fun CheckoutConfigurationDTO.toCheckoutConfiguration(): CheckoutConfiguration =
-        toCheckoutConfiguration(
-            environment = environment,
-            clientKey = clientKey,
-            analyticsOptionsDTO = analyticsOptionsDTO,
-            shopperLocale = shopperLocale,
-            amount = amount,
-            countryCode = countryCode,
-            cardConfigurationDTO = cardConfigurationDTO,
-            googlePayConfigurationDTO = googlePayConfigurationDTO,
-            cashAppPayConfigurationDTO = cashAppPayConfigurationDTO,
-            threeDS2ConfigurationDTO = threeDS2ConfigurationDTO,
-            twintConfigurationDTO = twintConfigurationDTO,
-        )
-
-    fun OrderResponse.mapToOrderResponseModel(): OrderResponseDTO =
-        OrderResponseDTO(
-            pspReference = pspReference,
-            orderData = orderData,
-            amount = amount?.mapToDTOAmount(),
-            remainingAmount = remainingAmount?.mapToDTOAmount(),
-        )
-
-    fun DropInConfigurationDTO.toCheckoutConfiguration(): CheckoutConfiguration =
-        toCheckoutConfiguration(
-            environment = environment,
-            clientKey = clientKey,
-            analyticsOptionsDTO = analyticsOptionsDTO,
-            shopperLocale = shopperLocale,
-            amount = amount,
-            countryCode = countryCode,
-            cardConfigurationDTO = cardConfigurationDTO,
-            googlePayConfigurationDTO = googlePayConfigurationDTO,
-            cashAppPayConfigurationDTO = cashAppPayConfigurationDTO,
-            twintConfigurationDTO = twintConfigurationDTO,
-            threeDS2ConfigurationDTO = threeDS2ConfigurationDTO,
-        ).apply {
-//            dropIn {
-//                isRemovingStoredPaymentMethodsEnabled = this@toCheckoutConfiguration.isRemoveStoredPaymentMethodEnabled
-//                showPreselectedStoredPaymentMethod = this@toCheckoutConfiguration.showPreselectedStoredPaymentMethod
-//                skipListWhenSinglePaymentMethod = this@toCheckoutConfiguration.skipListWhenSinglePaymentMethod
-//                paymentMethodNames?.forEach { (paymentMethodType, paymentMethodName) ->
-//                    if (paymentMethodType != null && paymentMethodName != null) {
-//                        overridePaymentMethodName(paymentMethodType, paymentMethodName)
-//                    }
-//                }
-//            }
+    fun CheckoutConfigurationDTO.toCheckoutConfiguration(): CheckoutConfiguration {
+        val countryCode = countryCode?.trim()?.uppercase()
+        if (googlePayConfiguration != null && countryCode.isNullOrEmpty()) {
+            throw IllegalArgumentException("countryCode is required when Google Pay is configured.")
         }
-
-    fun ActionComponentConfigurationDTO.toCheckoutConfiguration(): CheckoutConfiguration =
-        toCheckoutConfiguration(
-            environment = environment,
-            clientKey = clientKey,
-            analyticsOptionsDTO = analyticsOptionsDTO,
-            shopperLocale = shopperLocale,
-            amount = amount,
-            threeDS2ConfigurationDTO = threeDS2ConfigurationDTO,
-        )
-
-    fun InstantPaymentConfigurationDTO.toCheckoutConfiguration(): CheckoutConfiguration =
-        toCheckoutConfiguration(
-            environment = environment,
-            clientKey = clientKey,
-            analyticsOptionsDTO = analyticsOptionsDTO,
-            shopperLocale = shopperLocale,
-            amount = amount,
-            countryCode = countryCode,
-            googlePayConfigurationDTO = googlePayConfigurationDTO,
-        )
-
-    private fun toCheckoutConfiguration(
-        environment: Environment,
-        clientKey: String,
-        analyticsOptionsDTO: AnalyticsOptionsDTO,
-        shopperLocale: String? = null,
-        amount: AmountDTO? = null,
-        countryCode: String? = null,
-        cardConfigurationDTO: CardConfigurationDTO? = null,
-        googlePayConfigurationDTO: GooglePayConfigurationDTO? = null,
-        cashAppPayConfigurationDTO: CashAppPayConfigurationDTO? = null,
-        twintConfigurationDTO: TwintConfigurationDTO? = null,
-        threeDS2ConfigurationDTO: ThreeDS2ConfigurationDTO? = null,
-    ): CheckoutConfiguration {
-        val sdkEnvironment = environment.mapToEnvironment()
-        val sdkAmount = amount?.mapToAmount()
-        val analyticsConfiguration = analyticsOptionsDTO.mapToAnalyticsConfiguration()
 
         return CheckoutConfiguration(
-            environment = sdkEnvironment,
+            environment = environment.toNativeEnvironment(),
             clientKey = clientKey,
-            shopperLocale = shopperLocale?.let { Locale.forLanguageTag(it) },
-            amount = sdkAmount,
-            analyticsConfiguration = analyticsConfiguration,
+            amount = amount?.toNativeAmount(),
+            analyticsConfiguration = analyticsConfiguration.toNativeAnalyticsConfiguration(),
+            showSubmitButton = showSubmitButton,
         ).apply {
-            cardConfigurationDTO?.let { configurationDTO ->
+            cardConfiguration?.let { configuration ->
                 card(
-                    supportedCardBrands = mapToSupportedCardBrands(configurationDTO.supportedCardTypes),
-                    showCardholderName = configurationDTO.holderNameRequired,
-                    showStorePaymentMethod = configurationDTO.showStorePaymentField,
-                    showSecurityCode = configurationDTO.showCvc,
-                    showSecurityCodeForStoredCard = configurationDTO.showCvcForStoredCard,
-                    koreanAuthenticationVisibility = determineFieldVisibility(configurationDTO.kcpFieldVisibility),
-                    socialSecurityNumberVisibility = determineFieldVisibility(configurationDTO.socialSecurityNumberFieldVisibility),
-                    installmentConfiguration = configurationDTO.installmentConfiguration?.mapToInstallmentConfiguration(),
-                    billingAddressMode = configurationDTO.addressMode.mapToBillingAddressMode(),
+                    billingAddressMode = configuration.billingAddressMode.toNativeBillingAddressMode(),
+                    koreanAuthenticationVisibility = configuration.koreanAuthenticationVisibility.toNativeFieldVisibility(),
+                    showCardholderName = configuration.showCardholderName,
+                    showSecurityCode = configuration.showSecurityCode,
+                    showSecurityCodeForStoredCard = configuration.showSecurityCodeForStoredCard,
+                    showStorePaymentMethod = configuration.showStorePaymentMethod,
+                    showSupportedCardBrandLogos = configuration.showSupportedCardBrandLogos,
+                    socialSecurityNumberVisibility = configuration.socialSecurityNumberVisibility.toNativeFieldVisibility(),
+                    supportedCardBrands = configuration.supportedCardBrands
+                        ?.map(::CardBrand),
+                    installmentConfiguration = configuration.installmentConfiguration?.toNativeInstallmentConfiguration(),
                 )
             }
-
-            threeDS2ConfigurationDTO?.let { configurationDTO ->
-//                threeDS2 {
-//                    threeDSRequestorAppURL = configurationDTO.requestorAppURL
-//                    uiCustomization = configurationDTO.uiCustomization?.toUiCustomization()
-//                }
-                // TODO: com.adyen.checkout.threeds2.threeDS2 is not yet available on 6.0.0-alpha.1
-            }
-
-            // NOTE: billingAddress-related fields are not yet supported by the 6.0.0-alpha.1
-            // googlePay(...) builder (com.adyen.checkout.googlepay.googlePay), only by the old API.
-            googlePayConfigurationDTO?.let { configurationDTO ->
+            googlePayConfiguration?.let { configuration ->
                 googlePay(
-                    merchantAccount = configurationDTO.merchantAccount,
-                    googlePayEnvironment = configurationDTO.googlePayEnvironment.mapToWalletConstants(),
+                    merchantAccount = configuration.merchantAccount,
+                    googlePayEnvironment = configuration.googlePayEnvironment.toWalletEnvironment(),
+                    totalPriceStatus = configuration.totalPriceStatus?.toTotalPriceStatus(),
                     countryCode = countryCode,
-                    merchantInfo =
-                        configurationDTO.merchantInfoDTO?.let {
-                            NewMerchantInfo(
-                                merchantName = it.merchantName,
-                                merchantId = it.merchantId,
-                                softwareInfo = null,
-                            )
-                        },
-                    isEmailRequired = configurationDTO.emailRequired,
-                    isExistingPaymentMethodRequired = configurationDTO.existingPaymentMethodRequired,
-                    isShippingAddressRequired = configurationDTO.shippingAddressRequired,
-                    shippingAddressParameters =
-                        configurationDTO.shippingAddressParametersDTO?.let {
-                            NewShippingAddressParameters(
-                                allowedCountryCodes = it.allowedCountryCodes?.filterNotNull().orEmpty(),
-                                isPhoneNumberRequired = it.isPhoneNumberRequired ?: false,
-                            )
-                        },
-                    totalPriceStatus = configurationDTO.totalPriceStatus?.mapToTotalPriceStatus(),
+                    merchantInfo = configuration.merchantInfo?.toNativeMerchantInfo(),
+                    isEmailRequired = configuration.emailRequired,
+                    isExistingPaymentMethodRequired = configuration.existingPaymentMethodRequired,
+                    isShippingAddressRequired = configuration.shippingAddressRequired,
+                    shippingAddressParameters = configuration.shippingAddressParameters?.toNativeShippingAddressParameters(),
                 )
             }
-
-            cashAppPayConfigurationDTO?.let { configurationDTO ->
-//                cashAppPay {
-//                    cashAppPayEnvironment = configurationDTO.cashAppPayEnvironment.mapToCashAppPayEnvironment()
-//                    returnUrl = configurationDTO.returnUrl
-//                }
-            }
-
-            twintConfigurationDTO?.let { configurationDTO ->
-//                twint {
-//                    showStorePaymentField = configurationDTO.showStorePaymentField
-//                }
-            }
         }
     }
 
-    fun EncryptedCard.mapToEncryptedCardDTO(): EncryptedCardDTO =
-        EncryptedCardDTO(encryptedCardNumber, encryptedExpiryMonth, encryptedExpiryYear, encryptedSecurityCode)
-
-    fun UnencryptedCardDTO.fromDTO(): UnencryptedCard {
-        val unencryptedCardBuilder = UnencryptedCard.Builder()
-        cardNumber?.let { unencryptedCardBuilder.setNumber(it) }
-        if (expiryMonth != null && expiryYear != null) {
-            unencryptedCardBuilder.setExpiryDate(expiryMonth, expiryYear)
-        }
-        cvc?.let { unencryptedCardBuilder.setCvc(it) }
-        return unencryptedCardBuilder.build()
+    private fun EnvironmentDTO.toNativeEnvironment(): SdkEnvironment = when (this) {
+        EnvironmentDTO.TEST -> SdkEnvironment.TEST
+        EnvironmentDTO.LIVE_EUROPE -> SdkEnvironment.LIVE_EUROPE
+        EnvironmentDTO.LIVE_UNITED_STATES -> SdkEnvironment.LIVE_UNITED_STATES
+        EnvironmentDTO.LIVE_AUSTRALIA -> SdkEnvironment.LIVE_AUSTRALIA
+        EnvironmentDTO.LIVE_APSE -> SdkEnvironment.LIVE_APSE
+        EnvironmentDTO.LIVE_INDIA -> SdkEnvironment.LIVE_INDIA
+        EnvironmentDTO.LIVE_NEA -> SdkEnvironment.LIVE_NEA
     }
 
-    fun Environment.mapToEnvironment(): SDKEnvironment =
-        when (this) {
-            Environment.TEST -> SDKEnvironment.TEST
-            Environment.LIVE_EUROPE -> SDKEnvironment.LIVE_EUROPE
-            Environment.LIVE_UNITED_STATES -> SDKEnvironment.LIVE_UNITED_STATES
-            Environment.LIVE_AUSTRALIA -> SDKEnvironment.LIVE_AUSTRALIA
-            Environment.LIVE_APSE -> SDKEnvironment.LIVE_APSE
-            Environment.LIVE_INDIA -> SDKEnvironment.LIVE_INDIA
-            Environment.LIVE_NEA -> SDKEnvironment.LIVE_NEA
-        }
+    private fun AmountDTO.toNativeAmount(): Amount = Amount(
+        currency = currency,
+        value = value.toLong(),
+    )
 
-    private fun AnalyticsOptionsDTO.mapToAnalyticsConfiguration(): AnalyticsConfiguration {
-        val analyticsLevel =
-            when {
-                enabled -> AnalyticsLevel.ALL
-                else -> AnalyticsLevel.NONE
-            }
-        CheckoutPlatformParams.overrideForCrossPlatform(CheckoutPlatform.FLUTTER, version)
-        return AnalyticsConfiguration(analyticsLevel)
-    }
-
-    private fun AddressMode.mapToBillingAddressMode(): BillingAddressMode? =
-        when (this) {
-            // TODO: BillingAddressMode.Full is not yet implemented by the 6.0.0-alpha.1 SDK.
-            AddressMode.FULL -> null
-            AddressMode.POSTAL_CODE -> BillingAddressMode.PostalCode()
-            AddressMode.NONE -> BillingAddressMode.None()
-        }
-
-    private fun AddressMode.mapToAddressConfiguration(countryCode: String?): AddressConfiguration =
-        when (this) {
-            AddressMode.FULL ->
-                AddressConfiguration.FullAddress(
-                    defaultCountryCode = countryCode?.takeIf { it.isNotBlank() },
-                )
-            AddressMode.POSTAL_CODE -> AddressConfiguration.PostalCode()
-            AddressMode.NONE -> AddressConfiguration.None
-        }
-
-    fun determineFieldVisibility(fieldVisibility: FieldVisibility): SdkFieldVisibility =
-        when (fieldVisibility) {
-            FieldVisibility.SHOW -> SdkFieldVisibility.SHOW
-            FieldVisibility.HIDE -> SdkFieldVisibility.HIDE
-        }
-
-    private fun mapToSupportedCardBrands(cardTypes: List<String?>?): List<CardBrand> =
-        cardTypes.orEmpty().filterNotNull().map(::CardBrand)
-
-    fun AmountDTO.mapToAmount(): Amount = Amount(this.currency, this.value)
-
-    fun SessionResponseDTO.mapToSessionResponse(): SessionResponse = SessionResponse(id, sessionData)
-
-    fun SessionCheckoutResult.mapToPaymentResultModelDTO(): PaymentResultModelDTO =
-        PaymentResultModelDTO(sessionId, sessionData, resultCode.value)
-
-    fun AdvancedCheckoutResult.mapToPaymentResultModelDTO(): PaymentResultModelDTO =
-        PaymentResultModelDTO(null, null, resultCode.value)
-
-    private fun com.adyen.checkout.components.core.Amount.mapToDTOAmount(): AmountDTO =
-        AmountDTO(
-            this.currency ?: throw IllegalStateException("Currency must not be null"),
-            this.value,
+    private fun AnalyticsConfigurationDTO.toNativeAnalyticsConfiguration(): AnalyticsConfiguration =
+        AnalyticsConfiguration(
+            level = if (enabled) AnalyticsLevel.ALL else AnalyticsLevel.NONE,
         )
 
-    private fun GooglePayEnvironment.mapToWalletConstants(): Int =
-        when (this) {
-            GooglePayEnvironment.TEST -> WalletConstants.ENVIRONMENT_TEST
-            GooglePayEnvironment.PRODUCTION -> WalletConstants.ENVIRONMENT_PRODUCTION
-        }
+    private fun BillingAddressModeDTO.toNativeBillingAddressMode(): BillingAddressMode = when (this) {
+        BillingAddressModeDTO.NONE -> BillingAddressMode.None()
+        BillingAddressModeDTO.POSTAL_CODE -> BillingAddressMode.PostalCode()
+    }
 
-    private fun TotalPriceStatus.mapToTotalPriceStatus(): String =
-        when (this) {
-            TotalPriceStatus.NOT_CURRENTLY_KNOWN -> "NOT_CURRENTLY_KNOWN"
-            TotalPriceStatus.ESTIMATED -> "ESTIMATED"
-            TotalPriceStatus.FINAL_PRICE -> "FINAL"
-        }
+    private fun FieldVisibilityDTO.toNativeFieldVisibility(): SdkFieldVisibility? = when (this) {
+        FieldVisibilityDTO.SHOW -> SdkFieldVisibility.SHOW
+        FieldVisibilityDTO.HIDE -> SdkFieldVisibility.HIDE
+        FieldVisibilityDTO.AUTO -> null
+    }
 
-    private fun CashAppPayEnvironment.mapToCashAppPayEnvironment(): SDKCashAppPayEnvironment =
-        when (this) {
-            CashAppPayEnvironment.SANDBOX -> SDKCashAppPayEnvironment.SANDBOX
-            CashAppPayEnvironment.PRODUCTION -> SDKCashAppPayEnvironment.PRODUCTION
-        }
-
-    private fun ThreeDS2UICustomizationDTO.toUiCustomization(): UiCustomization =
-        UiCustomization().apply {
-            this@toUiCustomization.screenCustomization?.let { dto ->
-                dto.backgroundColor?.let { setScreenBackgroundColor(it) }
-                dto.textColor?.let { setTextColor(it) }
+    private fun InstallmentConfigurationDTO.toNativeInstallmentConfiguration(): InstallmentConfiguration? {
+        if (options.isEmpty()) return null
+        val defaultOptions = options.firstOrNull { it.cardBrand == null }?.toNativeInstallmentOptions()
+        val cardBasedOptions = options.mapNotNull { option ->
+            option.cardBrand?.let { brand ->
+                CardBrand(brand) to option.toNativeInstallmentOptions()
             }
-
-            this@toUiCustomization.headingCustomization?.let { dto ->
-                toolbarCustomization = dto.toToolbarCustomization()
-            }
-
-            this@toUiCustomization.labelCustomization?.let { dto ->
-                labelCustomization = dto.toLabelCustomization()
-            }
-
-            this@toUiCustomization.inputCustomization?.let { dto ->
-                textBoxCustomization = dto.toTextBoxCustomization()
-            }
-
-            this@toUiCustomization.selectionItemCustomization?.let { dto ->
-                selectionItemCustomization = dto.toSelectionItemCustomization()
-            }
-
-            this@toUiCustomization.primaryButtonCustomization?.let { dto ->
-                val buttonCustomization = dto.toButtonCustomization()
-                setButtonCustomization(buttonCustomization, UiCustomization.ButtonType.VERIFY)
-                setButtonCustomization(buttonCustomization, UiCustomization.ButtonType.CONTINUE)
-                setButtonCustomization(buttonCustomization, UiCustomization.ButtonType.NEXT)
-            }
-
-            this@toUiCustomization.secondaryButtonCustomization?.let { dto ->
-                val buttonCustomization = dto.toButtonCustomization()
-                setButtonCustomization(buttonCustomization, UiCustomization.ButtonType.CANCEL)
-                setButtonCustomization(buttonCustomization, UiCustomization.ButtonType.RESEND)
-                setButtonCustomization(buttonCustomization, UiCustomization.ButtonType.OPEN_OOB_APP)
-            }
-        }
-
-    private fun ThreeDS2ToolbarCustomizationDTO.toToolbarCustomization(): ToolbarCustomization =
-        ToolbarCustomization().apply {
-            this@toToolbarCustomization.textColor?.let { textColor = it }
-            this@toToolbarCustomization.backgroundColor?.let { backgroundColor = it }
-            this@toToolbarCustomization.headerText?.let { headerText = it }
-        }
-
-    private fun ThreeDS2LabelCustomizationDTO.toLabelCustomization(): LabelCustomization =
-        LabelCustomization().apply {
-            this@toLabelCustomization.headingTextColor?.let { headingTextColor = it }
-            this@toLabelCustomization.headingTextFontSize?.let { headingTextFontSize = it.toInt() }
-            this@toLabelCustomization.textColor?.let { textColor = it }
-            this@toLabelCustomization.textFontSize?.let { textFontSize = it.toInt() }
-            this@toLabelCustomization.inputLabelTextColor?.let { inputLabelTextColor = it }
-            this@toLabelCustomization.inputLabelFontSize?.let { inputLabelTextFontSize = it.toInt() }
-        }
-
-    private fun ThreeDS2InputCustomizationDTO.toTextBoxCustomization(): TextBoxCustomization =
-        TextBoxCustomization().apply {
-            this@toTextBoxCustomization.borderColor?.let { borderColor = it }
-            this@toTextBoxCustomization.borderWidth?.let { borderWidth = it.toInt() }
-            this@toTextBoxCustomization.cornerRadius?.let { cornerRadius = it.toInt() }
-            this@toTextBoxCustomization.textColor?.let { textColor = it }
-        }
-
-    private fun ThreeDS2SelectionItemCustomizationDTO.toSelectionItemCustomization(): SelectionItemCustomization =
-        SelectionItemCustomization().apply {
-            this@toSelectionItemCustomization.selectionIndicatorTintColor?.let { selectionIndicatorTintColor = it }
-            this@toSelectionItemCustomization.highlightedBackgroundColor?.let { highlightedBackgroundColor = it }
-            this@toSelectionItemCustomization.textColor?.let { textColor = it }
-        }
-
-    private fun ThreeDS2ButtonCustomizationDTO.toButtonCustomization(): ButtonCustomization =
-        ButtonCustomization().apply {
-            this@toButtonCustomization.backgroundColor?.let { backgroundColor = it }
-            this@toButtonCustomization.cornerRadius?.let { cornerRadius = it.toInt() }
-            this@toButtonCustomization.textColor?.let { textColor = it }
-            this@toButtonCustomization.textFontSize?.let { textFontSize = it.toInt() }
-        }
-
-    private fun InstallmentConfigurationDTO.mapToInstallmentConfiguration(): InstallmentConfiguration {
-        val defaultOptions = defaultOptions?.mapToInstallmentOptions()
-        val cardBasedOptions =
-            cardBasedOptions
-                ?.filterNotNull()
-                ?.associate { CardBrand(txVariant = it.cardBrand) to it.mapToInstallmentOptions() }
-                ?: emptyMap()
-
+        }.toMap()
         return InstallmentConfiguration(
             defaultOptions = defaultOptions,
             cardBasedOptions = cardBasedOptions,
-            showInstallmentAmount = showInstallmentAmount
+            showInstallmentAmount = showInstallmentAmount,
         )
     }
 
-    private fun DefaultInstallmentOptionsDTO.mapToInstallmentOptions(): InstallmentOptions =
-        installmentOptions(values, includesRevolving)
-
-    private fun CardBasedInstallmentOptionsDTO.mapToInstallmentOptions(): InstallmentOptions =
-        installmentOptions(values, includesRevolving)
-
-    private fun installmentOptions(
-        values: List<Long?>?,
-        includesRevolving: Boolean
-    ): InstallmentOptions =
+    private fun InstallmentOptionsDTO.toNativeInstallmentOptions(): InstallmentOptions =
         InstallmentOptions(
-            values = values.orEmpty().mapNotNull { it?.toInt() },
-            plans =
-                if (includesRevolving) {
-                    listOf(InstallmentOptions.Plan.REGULAR, InstallmentOptions.Plan.REVOLVING)
-                } else {
-                    listOf(InstallmentOptions.Plan.REGULAR)
-                },
+            values = values.map { it.toInt() },
+            plans = if (includesRevolving) {
+                listOf(InstallmentOptions.Plan.REGULAR, InstallmentOptions.Plan.REVOLVING)
+            } else {
+                listOf(InstallmentOptions.Plan.REGULAR)
+            },
             preselectedValue = null,
         )
+
+    private fun GooglePayEnvironmentDTO.toWalletEnvironment(): Int = when (this) {
+        GooglePayEnvironmentDTO.TEST -> WalletConstants.ENVIRONMENT_TEST
+        GooglePayEnvironmentDTO.PRODUCTION -> WalletConstants.ENVIRONMENT_PRODUCTION
+    }
+
+    private fun TotalPriceStatusDTO.toTotalPriceStatus(): String = when (this) {
+        TotalPriceStatusDTO.NOT_CURRENTLY_KNOWN -> "NOT_CURRENTLY_KNOWN"
+        TotalPriceStatusDTO.ESTIMATED -> "ESTIMATED"
+        TotalPriceStatusDTO.FINAL_PRICE -> "FINAL"
+    }
+
+    private fun MerchantInfoDTO.toNativeMerchantInfo(): MerchantInfo = MerchantInfo(
+        merchantName = merchantName,
+        merchantId = merchantId,
+        softwareInfo = null,
+    )
+
+    private fun ShippingAddressParametersDTO.toNativeShippingAddressParameters(): ShippingAddressParameters =
+        ShippingAddressParameters(
+            allowedCountryCodes = allowedCountryCodes,
+            isPhoneNumberRequired = isPhoneNumberRequired,
+        )
+
+    fun UnencryptedCardDTO.toNativeUnencryptedCard(): UnencryptedCard {
+        val builder = UnencryptedCard.Builder()
+        cardNumber?.let(builder::setNumber)
+        if (expiryMonth != null && expiryYear != null) {
+            builder.setExpiryDate(expiryMonth!!, expiryYear!!)
+        }
+        cvc?.let(builder::setCvc)
+        return builder.build()
+    }
 }

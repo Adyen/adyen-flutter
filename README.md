@@ -1,132 +1,112 @@
 ![Flutter](https://github.com/Adyen/adyen-flutter/assets/13377878/66a9fab8-dba0-426f-acd4-ab0bfd469d20)
 
-# Adyen Flutter
+# Adyen Flutter Checkout 2.0
 
 [![Pub Package](https://img.shields.io/pub/v/adyen_checkout.svg)](https://pub.dev/packages/adyen_checkout)
-[![Adyen iOS](https://img.shields.io/badge/ios-v5.25.1-brightgreen.svg)](https://github.com/Adyen/adyen-ios/releases/tag/5.25.1)
-[![Adyen Android](https://img.shields.io/badge/android-v5.20.0-brightgreen.svg)](https://github.com/Adyen/adyen-android/releases/tag/5.20.0)
+[![Adyen iOS](https://img.shields.io/badge/ios-v6.0.0--alpha.1-brightgreen.svg)](https://github.com/Adyen/adyen-ios/releases/tag/6.0.0-alpha.1)
+[![Adyen Android](https://img.shields.io/badge/android-v6.0.0--alpha.1-brightgreen.svg)](https://github.com/Adyen/adyen-android/releases/tag/6.0.0-alpha.1)
 
-The Adyen Flutter package provides you with the building blocks to create a checkout experience for
-your shoppers, allowing them to pay using the payment method of their choice. This is
-an [overview](https://docs.adyen.com/payment-methods/) of the payment methods that you can add to
-your online payments integration.
+This prerelease provides a Flutter wrapper around the public Adyen Checkout v6 APIs. It supports
+Sessions, Advanced integrations, generic native payment components, and one-shot action handling.
 
-You can integrate with the following:
+The first release is `2.0.0-alpha.1` because the native SDK dependencies are alpha releases.
 
-* **Drop-in**: an out-of-the-box Flutter wrapper for native iOS and Android Drop-in that includes
-  all available payment methods for your shoppers to choose.
-* **Components**: Flutter widgets for native iOS and Android Adyen Components. You use one Component
-  for each payment method. We currently offer the following Components:
-    - Card Component: allows shoppers to pay with card. Stored cards are also supported.
-    - BLIK Component: renders native BLIK code input for shoppers in Poland.
-    - Google Pay Component: renders a Google Pay button.
-    - Apple Pay Component: renders an Apple Pay button.
-    - Instant Component: supports payment methods that do not require additional input fields, like
-      PayPal, Klarna and many more.
-* **API only**: Build your own UI for the card payment form, collect the shopper's card details, and
-  then use the package to validate and encrypt the card data in your app.
+## Supported flows
 
-|                                                                iOS                                                                 |                                                              Android                                                               |
-|:----------------------------------------------------------------------------------------------------------------------------------:|:----------------------------------------------------------------------------------------------------------------------------------:|
-| <img align="top" src="https://github.com/Adyen/adyen-flutter/assets/13377878/4a1d623b-5f82-49f1-b18d-84a7b2c06d63" height="600" /> | <img align="top" src="https://github.com/Adyen/adyen-flutter/assets/13377878/0bce3d67-8d33-4ecc-a6e2-6e409d1ac876" height="600" /> |
+- **Sessions**: the native SDK handles the `/sessions` payment lifecycle.
+- **Advanced**: your callbacks handle `/payments` and `/payments/details`.
+- **Action-only**: `Checkout.handleAction` handles an action returned by your backend.
+- **Payment components**: `CheckoutPaymentComponent` renders the selected native payment method.
+  Card, stored cards, BLIK, Google Pay on Android, Apple Pay on iOS, and native direct methods use
+  the same generic component API.
+- **Card utilities**: client-side encryption and card validation remain on `Checkout`.
 
-## Contributing
+Drop-in, separate Instant APIs, partial payments, checkout theming, and web or desktop platforms are
+not part of this alpha.
 
-Follow our [guidelines](https://github.com/Adyen/.github/blob/main/CONTRIBUTING.md) to provide
-feedback and contribute the following to this repository:
+## Requirements
 
-* New features and functionality
-* Bug fixes and resolved issues
-* General improvements
+- Flutter `>=3.24.0` and Dart `>=3.5.0`.
+- Android API 23 or later and a `FlutterFragmentActivity` host.
+- iOS 16.0 or later.
+- iOS integration through Swift Package Manager. Flutter 3.24–3.43 projects must opt in to SwiftPM;
+  Flutter 3.44 and later enables it by default.
+- Checkout API v71 or later.
 
-We merge each pull request into the `main` branch. We aim to keep it in good shape so that we can
-release a new version when we need to.
+Configure your backend return URL and forward incoming native returns to the native Checkout API:
 
-## Before you begin
+```swift
+func application(
+    _ application: UIApplication,
+    open url: URL,
+    options: [UIApplication.OpenURLOptionsKey: Any] = [:]
+) -> Bool {
+    Checkout.handleReturn(url: url) || super.application(application, open: url, options: options)
+}
+```
 
-1. [Get an Adyen test account](https://www.adyen.com/signup).
-2. [Get your Client key](https://docs.adyen.com/development-resources/client-side-authentication#get-your-client-key).
-   Required for Drop-in/Components to communicate with the Adyen API.
-3. [Get your API key](https://docs.adyen.com/development-resources/how-to-get-the-api-key). Required
-   to make requests from your server to the Adyen API.
-4. [Set up your webhooks](https://docs.adyen.com/development-resources/webhooks/) to get the payment
-   outcome.
+Android hosts forward new intents to the active checkout controller through the plugin. The Flutter
+package intentionally does not provide a return-URL generator; merchants configure the URL with their
+backend and app URL scheme.
 
-## Requirements:
+## Sessions
 
-* [Checkout API v71](https://docs.adyen.com/api-explorer/Checkout/71/overview) or later.
-* Get familiar with defining the right [returnUrl](/doc/RETURN_URL.md).
+```dart
+final checkout = await Checkout.setupSession(
+  sessionResponse: SessionResponse(
+    id: sessionJson['id'] as String,
+    sessionData: sessionJson['sessionData'] as String,
+  ),
+  configuration: configuration,
+  callbacks: SessionCheckoutCallbacks(
+    onComplete: (result) => consumeSessionResult(result.sessionData),
+    onFailure: handleCheckoutError,
+  ),
+);
 
-#### Android
+CheckoutPaymentComponent(
+  checkout: checkout,
+  paymentMethod: checkout.paymentMethods.first,
+);
+```
 
-* [Android 6.0](https://www.android.com/versions/marshmallow-6-0/) (API 23) or later.
-* [Kotlin 2.0.20](https://kotlinlang.org/docs/releases.html) or later.
-* [AGP 8.1](https://developer.android.com/build/releases/gradle-plugin) or later with Gradle 8.
-* Requires the usage of a `FlutterFragmentActivity` instead of the default `FlutterActivity` in the
-  MainActivity of
-  your [native Android](https://github.com/Adyen/adyen-flutter/blob/main/example/android/app/src/main/kotlin/com/adyen/checkout/flutter/example/MainActivity.kt)
-  layer.
-* Standalone Components require the Android `NormalTheme` to inherit from a
-  `Theme.MaterialComponents` theme. See [Android UI customization](doc/CUSTOMIZATION.md#android)
-  and the example [day](https://github.com/Adyen/adyen-flutter/blob/main/example/android/app/src/main/res/values/styles.xml#L15-L23)
-  and [night](https://github.com/Adyen/adyen-flutter/blob/main/example/android/app/src/main/res/values-night/styles.xml#L15-L17)
-  theme configurations.
+## Advanced
 
-#### iOS
+```dart
+final checkout = await Checkout.setupAdvanced(
+  paymentMethods: PaymentMethods.fromJson(paymentMethodsJson),
+  configuration: configuration,
+  callbacks: AdvancedCheckoutCallbacks(
+    onSubmit: (data) async =>
+        SubmitResult.completion(resultCode: 'Authorised'),
+    onAdditionalDetails: (data) async =>
+        AdditionalDetailsResult.completion(resultCode: 'Authorised'),
+    onComplete: handleAdvancedResult,
+    onFailure: handleCheckoutError,
+  ),
+);
+```
 
-* [iOS 13](https://support.apple.com/en-us/118392) or later.
-* Add the return URL handler to your AppDelegate in
-  your [native iOS](https://github.com/Adyen/adyen-flutter/blob/main/example/ios/Runner/AppDelegate.swift#L19)
-  layer.
-* Add a
-  custom [URL scheme](https://developer.apple.com/documentation/xcode/defining-a-custom-url-scheme-for-your-app)
-  that matches the returnUrl you use.
+Use an optional `CheckoutController` for a custom submit button or direct/no-input payment methods.
+It exposes `isReady`, `requiresUserInteraction`, `submit()`, and lifecycle state. A controller is
+required when `showSubmitButton` is `false` or the selected native method does not require shopper
+input.
 
-> [!IMPORTANT]
-> For the standalone Component integration, we recommend using Flutter v3.29.2 or higher. Due
-> to [this](https://github.com/flutter/flutter/issues/160854)
-> Flutter issue, some Android 10 devices might experience a degraded performance when using a lower
-> Flutter version.
+## Configuration
 
-## Integration
+`CheckoutConfiguration` accepts the shared environment, client key, optional amount and country
+code, analytics configuration, submit-button visibility, and the applicable Card, Apple Pay, or
+Google Pay configuration. Unsupported native options are intentionally not exposed.
 
-Depending on the [server-side flow](https://docs.adyen.com/online-payments/build-your-integration/)
-you use, please follow the corresponding integration guide in our documentation.
+## Migration
 
-### Sessions flow
-
-* [Drop-in integration guide with Sessions flow](https://docs.adyen.com/online-payments/build-your-integration/sessions-flow/?platform=Flutter&integration=Drop-in)
-* [Components integration guide with Sessions flow](https://docs.adyen.com/online-payments/build-your-integration/sessions-flow/?platform=Flutter&integration=Components)
-
-### Advanced flow
-
-* [Drop-in integration guide with Advanced flow](https://docs.adyen.com/online-payments/build-your-integration/advanced-flow/?platform=Flutter&integration=Drop-in)
-* [Components integration guide with Advanced flow](https://docs.adyen.com/online-payments/build-your-integration/advanced-flow/?platform=Flutter&integration=Components)
-
-### API only
-
-* [API only integration guide](https://docs.adyen.com/payment-methods/cards/custom-card-integration/?tab=flutter_5)
-
-## Customization & Localization
-
-You can customize the styling of the user interface and change the wording if required. Follow the
-guides for each platform:
-
-* [UI customization](/doc/CUSTOMIZATION.md)
-* [Localization](/doc/LOCALIZATION.md)
+Flutter 2.0 is a breaking release and is not source-compatible with Flutter 1.x. See
+[`MIGRATION.md`](MIGRATION.md) for the API mapping and removed integrations.
 
 ## Support
 
-If you have a feature request, or spotted a bug or a technical problem, feel free to create a GitHub
-issue. For other questions, please contact our Support Team
-via [Customer Area](https://ca-live.adyen.com/ca/ca/contactUs/support.shtml) or via email:
-support@adyen.com
-
-## See also
-
-* [Adyen Checkout API](https://docs.adyen.com/api-explorer/Checkout/latest/overview)
-* [Adyen online payments documentation](https://docs.adyen.com/online-payments/)
+For issues, create a GitHub issue or contact Adyen Support through the Customer Area.
 
 ## License
 
-MIT license. For more information, see the LICENSE file.
+MIT license. See [LICENSE](LICENSE).

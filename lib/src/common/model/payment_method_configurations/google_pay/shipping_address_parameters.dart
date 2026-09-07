@@ -1,16 +1,14 @@
 class ShippingAddressParameters {
   final List<String>? allowedCountryCodes;
-  final bool? isPhoneNumberRequired;
+  final bool isPhoneNumberRequired;
 
-  ShippingAddressParameters({
+  const ShippingAddressParameters({
     this.allowedCountryCodes,
-    this.isPhoneNumberRequired,
+    this.isPhoneNumberRequired = false,
   });
 
   @override
-  String toString() {
-    return 'ShippingAddressParameters('
-        'allowedCountryCodes: $allowedCountryCodes, '
-        'isPhoneNumberRequired: $isPhoneNumberRequired)';
-  }
+  String toString() => 'ShippingAddressParameters('
+      'allowedCountryCodes: $allowedCountryCodes, '
+      'isPhoneNumberRequired: $isPhoneNumberRequired)';
 }

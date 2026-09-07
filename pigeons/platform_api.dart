@@ -1,123 +1,70 @@
 import 'package:pigeon/pigeon.dart';
 
-//dart run pigeon --input pigeons/platform_api.dart
+// dart run pigeon --input pigeons/platform_api.dart
 @ConfigurePigeon(PigeonOptions(
   dartOut: 'lib/src/generated/platform_api.g.dart',
   dartOptions: DartOptions(),
   kotlinOut:
       'android/src/main/kotlin/com/adyen/checkout/flutter/generated/PlatformApi.kt',
   kotlinOptions: KotlinOptions(
-    package: "com.adyen.checkout.flutter.generated",
-    errorClassName: "AdyenPigeonError",
+    package: 'com.adyen.checkout.flutter.generated',
+    errorClassName: 'AdyenPigeonError',
   ),
   swiftOut:
       'ios/adyen_checkout/Sources/adyen_checkout/generated/PlatformApi.swift',
-  swiftOptions: SwiftOptions(errorClassName: "AdyenPigeonError"),
+  swiftOptions: SwiftOptions(errorClassName: 'AdyenPigeonError'),
   dartPackageName: 'adyen_checkout',
 ))
-enum Environment {
+enum EnvironmentDTO {
   test,
   liveEurope,
   liveUnitedStates,
   liveAustralia,
   liveApse,
   liveIndia,
-  liveNea;
+  liveNea,
 }
 
-enum AddressMode {
-  full,
-  postalCode,
+enum BillingAddressModeDTO {
   none,
+  postalCode,
 }
 
-enum CardAuthMethod {
-  panOnly,
-  cryptogram3DS,
+enum FieldVisibilityDTO {
+  show,
+  hide,
+  auto,
 }
 
-enum TotalPriceStatus {
+enum GooglePayEnvironmentDTO {
+  test,
+  production,
+}
+
+enum TotalPriceStatusDTO {
   notCurrentlyKnown,
   estimated,
   finalPrice,
 }
 
-enum GooglePayEnvironment {
-  test,
-  production,
-}
-
-enum CashAppPayEnvironment {
-  sandbox,
-  production,
-}
-
-enum PaymentResultEnum {
-  cancelledByUser,
-  error,
-  finished,
-}
-
-enum CheckoutEventType {
-  submit,
-  additionalDetails,
-  result,
-  deleteStoredPaymentMethod,
-  balanceCheck,
-  requestOrder,
-  cancelOrder,
-  binLookup,
-  binValue
-}
-
-enum ComponentCommunicationType {
-  onSubmit,
-  additionalDetails,
-  loading,
-  result,
-  resize,
-  binLookup,
-  binValue,
-  availability,
-  buttonPressed
-}
-
-enum PaymentEventType {
-  finished,
-  action,
-  error,
-  update,
-}
-
-enum FieldVisibility {
-  show,
-  hide,
-}
-
-enum InstantPaymentType {
-  googlePay,
-  applePay,
-  instant,
-}
-
-enum ApplePayShippingType {
+enum ApplePayShippingTypeDTO {
   shipping,
   delivery,
   storePickup,
   servicePickup,
 }
 
-enum ApplePayMerchantCapability {
+enum ApplePayMerchantCapabilityDTO {
   debit,
   credit,
 }
 
-enum ApplePaySummaryItemType {
+enum ApplePaySummaryItemTypeDTO {
   pending,
   definite,
 }
 
-enum ApplePayPaymentErrorType {
+enum ApplePayPaymentErrorTypeDTO {
   billingAddress,
   shippingAddress,
   contact,
@@ -127,425 +74,166 @@ enum ApplePayPaymentErrorType {
   unknown,
 }
 
-enum CardNumberValidationResultDTO {
-  valid,
-  invalidIllegalCharacters,
-  invalidLuhnCheck,
-  invalidTooShort,
-  invalidTooLong,
-  invalidOtherReason
+enum ApplePayButtonThemeDTO {
+  black,
+  white,
+  whiteWithLine,
 }
 
-enum CardExpiryDateValidationResultDTO {
-  valid,
-  invalidTooFarInTheFuture,
-  invalidTooOld,
-  nonParseableDate,
-  invalidOtherReason,
+enum ApplePayButtonTypeDTO {
+  plain,
+  buy,
+  setUp,
+  inStore,
+  donate,
+  checkout,
+  book,
+  subscribe,
+  reload,
+  addMoney,
+  topUp,
+  order,
+  rent,
+  support,
+  contribute,
+  tip,
 }
 
-enum CardSecurityCodeValidationResultDTO { valid, invalid }
+enum CheckoutEventTypeDTO {
+  componentReady,
+  resize,
+  binLookup,
+  binValue,
+  complete,
+  failure,
+}
+
+enum SubmitResultTypeDTO {
+  completion,
+  action,
+  retry,
+}
 
 class SessionResponseDTO {
   final String id;
   final String sessionData;
 
-  SessionResponseDTO(
-    this.id,
-    this.sessionData,
-  );
-}
-
-class SessionDTO {
-  final String id;
-  final String paymentMethodsJson;
-
-  SessionDTO(
-    this.id,
-    this.paymentMethodsJson,
-  );
+  SessionResponseDTO({
+    required this.id,
+    required this.sessionData,
+  });
 }
 
 class AmountDTO {
   final String currency;
   final int value;
 
-  AmountDTO(
-    this.currency,
-    this.value,
-  );
+  AmountDTO({
+    required this.currency,
+    required this.value,
+  });
 }
 
-class AnalyticsOptionsDTO {
+class AnalyticsConfigurationDTO {
   final bool enabled;
-  final String version;
 
-  AnalyticsOptionsDTO(
-    this.enabled,
-    this.version,
-  );
+  AnalyticsConfigurationDTO({
+    required this.enabled,
+  });
 }
 
-class ThreeDS2UICustomizationDTO {
-  final ThreeDS2ScreenCustomizationDTO? screenCustomization;
-  final ThreeDS2ToolbarCustomizationDTO? headingCustomization;
-  final ThreeDS2LabelCustomizationDTO? labelCustomization;
-  final ThreeDS2InputCustomizationDTO? inputCustomization;
-  final ThreeDS2SelectionItemCustomizationDTO? selectionItemCustomization;
-  final ThreeDS2ButtonCustomizationDTO? primaryButtonCustomization;
-  final ThreeDS2ButtonCustomizationDTO? secondaryButtonCustomization;
-
-  ThreeDS2UICustomizationDTO(
-    this.screenCustomization,
-    this.headingCustomization,
-    this.labelCustomization,
-    this.inputCustomization,
-    this.selectionItemCustomization,
-    this.primaryButtonCustomization,
-    this.secondaryButtonCustomization,
-  );
-}
-
-class ThreeDS2ScreenCustomizationDTO {
-  final String? backgroundColor;
-  final String? textColor;
-
-  ThreeDS2ScreenCustomizationDTO(
-    this.backgroundColor,
-    this.textColor,
-  );
-}
-
-class ThreeDS2ButtonCustomizationDTO {
-  final String? backgroundColor;
-  final String? textColor;
-  final int? cornerRadius;
-  final int? textFontSize;
-
-  ThreeDS2ButtonCustomizationDTO(
-    this.backgroundColor,
-    this.textColor,
-    this.cornerRadius,
-    this.textFontSize,
-  );
-}
-
-class ThreeDS2SelectionItemCustomizationDTO {
-  final String? selectionIndicatorTintColor;
-  final String? highlightedBackgroundColor;
-  final String? textColor;
-
-  ThreeDS2SelectionItemCustomizationDTO(
-    this.selectionIndicatorTintColor,
-    this.highlightedBackgroundColor,
-    this.textColor,
-  );
-}
-
-class ThreeDS2LabelCustomizationDTO {
-  final String? headingTextColor;
-  final int? headingTextFontSize;
-  final String? inputLabelTextColor;
-  final int? inputLabelFontSize;
-  final String? textColor;
-  final int? textFontSize;
-
-  ThreeDS2LabelCustomizationDTO(
-    this.headingTextColor,
-    this.headingTextFontSize,
-    this.inputLabelTextColor,
-    this.inputLabelFontSize,
-    this.textColor,
-    this.textFontSize,
-  );
-}
-
-class ThreeDS2InputCustomizationDTO {
-  final String? borderColor;
-  final int? borderWidth;
-  final int? cornerRadius;
-  final String? textColor;
-
-  ThreeDS2InputCustomizationDTO(
-    this.borderColor,
-    this.borderWidth,
-    this.cornerRadius,
-    this.textColor,
-  );
-}
-
-class ThreeDS2ToolbarCustomizationDTO {
-  final String? headerText;
-  final String? textColor;
-  final String? backgroundColor;
-  final String? cancelButtonColor;
-
-  ThreeDS2ToolbarCustomizationDTO(
-    this.headerText,
-    this.textColor,
-    this.backgroundColor,
-    this.cancelButtonColor,
-  );
-}
-
-class ThreeDS2ConfigurationDTO {
-  final String? requestorAppURL;
-  final ThreeDS2UICustomizationDTO? uiCustomization;
-
-  ThreeDS2ConfigurationDTO(
-    this.requestorAppURL,
-    this.uiCustomization,
-  );
-}
-
-class DefaultInstallmentOptionsDTO {
-  final List<int?> values;
+class InstallmentOptionsDTO {
+  final List<int> values;
   final bool includesRevolving;
+  final String? cardBrand;
 
-  DefaultInstallmentOptionsDTO(
-    this.values,
-    this.includesRevolving,
-  );
-}
-
-class CardBasedInstallmentOptionsDTO {
-  final List<int?> values;
-  final bool includesRevolving;
-  final String cardBrand;
-
-  CardBasedInstallmentOptionsDTO(
-    this.values,
-    this.includesRevolving,
+  InstallmentOptionsDTO({
+    required this.values,
+    required this.includesRevolving,
     this.cardBrand,
-  );
+  });
 }
 
 class InstallmentConfigurationDTO {
-  final DefaultInstallmentOptionsDTO? defaultOptions;
-  final List<CardBasedInstallmentOptionsDTO?>? cardBasedOptions;
+  final List<InstallmentOptionsDTO> options;
   final bool showInstallmentAmount;
 
-  InstallmentConfigurationDTO(
-    this.defaultOptions,
-    this.cardBasedOptions,
-    this.showInstallmentAmount,
-  );
-}
-
-class CheckoutConfigurationDTO {
-  final Environment environment;
-  final String clientKey;
-  final String? countryCode;
-  final AmountDTO? amount;
-  final String? shopperLocale;
-  final AnalyticsOptionsDTO analyticsOptionsDTO;
-  final CardConfigurationDTO? cardConfigurationDTO;
-  final ApplePayConfigurationDTO? applePayConfigurationDTO;
-  final GooglePayConfigurationDTO? googlePayConfigurationDTO;
-  final CashAppPayConfigurationDTO? cashAppPayConfigurationDTO;
-  final TwintConfigurationDTO? twintConfigurationDTO;
-  final ThreeDS2ConfigurationDTO? threeDS2ConfigurationDTO;
-  final DropInConfigurationDTO? dropInConfigurationDTO;
-
-  CheckoutConfigurationDTO(
-    this.environment,
-    this.clientKey,
-    this.countryCode,
-    this.amount,
-    this.shopperLocale,
-    this.analyticsOptionsDTO,
-    this.cardConfigurationDTO,
-    this.applePayConfigurationDTO,
-    this.googlePayConfigurationDTO,
-    this.cashAppPayConfigurationDTO,
-    this.twintConfigurationDTO,
-    this.threeDS2ConfigurationDTO,
-    this.dropInConfigurationDTO,
-  );
-}
-
-class DropInConfigurationDTO {
-  final Environment environment;
-  final String clientKey;
-  final String countryCode;
-  final AmountDTO? amount;
-  final String? shopperLocale;
-  final AnalyticsOptionsDTO analyticsOptionsDTO;
-  final CardConfigurationDTO? cardConfigurationDTO;
-  final ApplePayConfigurationDTO? applePayConfigurationDTO;
-  final GooglePayConfigurationDTO? googlePayConfigurationDTO;
-  final CashAppPayConfigurationDTO? cashAppPayConfigurationDTO;
-  final TwintConfigurationDTO? twintConfigurationDTO;
-  final ThreeDS2ConfigurationDTO? threeDS2ConfigurationDTO;
-  final bool showPreselectedStoredPaymentMethod;
-  final bool skipListWhenSinglePaymentMethod;
-  final bool isRemoveStoredPaymentMethodEnabled;
-  final String? preselectedPaymentMethodTitle;
-  final Map<String?, String?>? paymentMethodNames;
-  final bool isPartialPaymentSupported;
-  final bool showStoredPaymentMethods;
-
-  DropInConfigurationDTO(
-    this.environment,
-    this.clientKey,
-    this.countryCode,
-    this.amount,
-    this.shopperLocale,
-    this.analyticsOptionsDTO,
-    this.cardConfigurationDTO,
-    this.applePayConfigurationDTO,
-    this.googlePayConfigurationDTO,
-    this.cashAppPayConfigurationDTO,
-    this.twintConfigurationDTO,
-    this.threeDS2ConfigurationDTO,
-    this.showPreselectedStoredPaymentMethod,
-    this.skipListWhenSinglePaymentMethod,
-    this.isRemoveStoredPaymentMethodEnabled,
-    this.preselectedPaymentMethodTitle,
-    this.paymentMethodNames,
-    this.isPartialPaymentSupported,
-    this.showStoredPaymentMethods,
-  );
+  InstallmentConfigurationDTO({
+    required this.options,
+    required this.showInstallmentAmount,
+  });
 }
 
 class CardConfigurationDTO {
-  final bool holderNameRequired;
-  final AddressMode addressMode;
-  final bool showStorePaymentField;
-  final bool showCvcForStoredCard;
-  final bool showCvc;
-  final FieldVisibility kcpFieldVisibility;
-  final FieldVisibility socialSecurityNumberFieldVisibility;
-  final List<String?> supportedCardTypes;
+  final BillingAddressModeDTO billingAddressMode;
+  final FieldVisibilityDTO koreanAuthenticationVisibility;
+  final bool showCardholderName;
+  final bool showSecurityCode;
+  final bool showSecurityCodeForStoredCard;
+  final bool showStorePaymentMethod;
+  final bool showSupportedCardBrandLogos;
+  final FieldVisibilityDTO socialSecurityNumberVisibility;
+  final List<String>? supportedCardBrands;
   final InstallmentConfigurationDTO? installmentConfiguration;
+  final bool hasOnBinChange;
+  final bool hasOnBinLookup;
 
-  CardConfigurationDTO(
-    this.holderNameRequired,
-    this.addressMode,
-    this.showStorePaymentField,
-    this.showCvcForStoredCard,
-    this.showCvc,
-    this.kcpFieldVisibility,
-    this.socialSecurityNumberFieldVisibility,
-    this.supportedCardTypes,
+  CardConfigurationDTO({
+    required this.billingAddressMode,
+    required this.koreanAuthenticationVisibility,
+    required this.showCardholderName,
+    required this.showSecurityCode,
+    required this.showSecurityCodeForStoredCard,
+    required this.showStorePaymentMethod,
+    required this.showSupportedCardBrandLogos,
+    required this.socialSecurityNumberVisibility,
+    this.supportedCardBrands,
     this.installmentConfiguration,
-  );
+    required this.hasOnBinChange,
+    required this.hasOnBinLookup,
+  });
 }
 
-class ApplePayConfigurationDTO {
-  final String merchantId;
-  final String merchantName;
-  final bool? allowOnboarding;
-  final List<ApplePaySummaryItemDTO?>? summaryItems;
-  final List<String?>? requiredBillingContactFields;
-  final ApplePayContactDTO? billingContact;
-  final List<String?>? requiredShippingContactFields;
-  final ApplePayContactDTO? shippingContact;
-  final ApplePayShippingType? applePayShippingType;
-  final bool? allowShippingContactEditing;
-  final List<ApplePayShippingMethodDTO?>? shippingMethods;
-  final String? applicationData;
-  final List<String?>? supportedCountries;
-  final ApplePayMerchantCapability? merchantCapability;
-  final bool? supportsCouponCode;
-  final String? couponCode;
-  final bool hasOnSelectShippingMethod;
-  final bool hasOnSelectShippingContact;
-  final bool hasOnChangeCouponCode;
-  final bool hasOnAuthorize;
+class MerchantInfoDTO {
+  final String? merchantName;
+  final String? merchantId;
 
-  ApplePayConfigurationDTO(
-    this.merchantId,
+  MerchantInfoDTO({
     this.merchantName,
-    this.allowOnboarding,
-    this.summaryItems,
-    this.requiredBillingContactFields,
-    this.billingContact,
-    this.requiredShippingContactFields,
-    this.shippingContact,
-    this.applePayShippingType,
-    this.allowShippingContactEditing,
-    this.shippingMethods,
-    this.applicationData,
-    this.supportedCountries,
-    this.merchantCapability,
-    this.supportsCouponCode,
-    this.couponCode,
-    this.hasOnSelectShippingMethod,
-    this.hasOnSelectShippingContact,
-    this.hasOnChangeCouponCode,
-    this.hasOnAuthorize,
-  );
+    this.merchantId,
+  });
 }
 
-class ApplePayAuthorizedPaymentDTO {
-  final String token;
-  final String network;
-  final ApplePayContactDTO? billingContact;
-  final ApplePayContactDTO? shippingContact;
-  final ApplePayShippingMethodDTO? shippingMethod;
+class ShippingAddressParametersDTO {
+  final List<String>? allowedCountryCodes;
+  final bool isPhoneNumberRequired;
 
-  ApplePayAuthorizedPaymentDTO(
-    this.token,
-    this.network,
-    this.billingContact,
-    this.shippingContact,
-    this.shippingMethod,
-  );
+  ShippingAddressParametersDTO({
+    this.allowedCountryCodes,
+    required this.isPhoneNumberRequired,
+  });
 }
 
-class ApplePayPaymentErrorDTO {
-  final ApplePayPaymentErrorType type;
-  final String? field;
-  final String localizedDescription;
+class GooglePayConfigurationDTO {
+  final GooglePayEnvironmentDTO googlePayEnvironment;
+  final String? merchantAccount;
+  final MerchantInfoDTO? merchantInfo;
+  final TotalPriceStatusDTO? totalPriceStatus;
+  final bool? emailRequired;
+  final bool? existingPaymentMethodRequired;
+  final bool? shippingAddressRequired;
+  final ShippingAddressParametersDTO? shippingAddressParameters;
 
-  ApplePayPaymentErrorDTO(
-    this.type,
-    this.field,
-    this.localizedDescription,
-  );
-}
-
-class ApplePayAuthorizationResultDTO {
-  final bool isSuccess;
-  final List<ApplePayPaymentErrorDTO?>? errors;
-
-  ApplePayAuthorizationResultDTO(
-    this.isSuccess,
-    this.errors,
-  );
-}
-
-class ApplePayCouponCodeUpdateDTO {
-  final List<ApplePaySummaryItemDTO?> summaryItems;
-  final List<ApplePayShippingMethodDTO?>? shippingMethods;
-  final List<ApplePayPaymentErrorDTO?>? errors;
-
-  ApplePayCouponCodeUpdateDTO(
-    this.summaryItems,
-    this.shippingMethods,
-    this.errors,
-  );
-}
-
-class ApplePayShippingContactUpdateDTO {
-  final List<ApplePaySummaryItemDTO?> summaryItems;
-  final List<ApplePayShippingMethodDTO?>? shippingMethods;
-  final List<ApplePayPaymentErrorDTO?>? errors;
-
-  ApplePayShippingContactUpdateDTO(
-    this.summaryItems,
-    this.shippingMethods,
-    this.errors,
-  );
-}
-
-class ApplePayShippingMethodUpdateDTO {
-  final List<ApplePaySummaryItemDTO?> summaryItems;
-
-  ApplePayShippingMethodUpdateDTO(
-    this.summaryItems,
-  );
+  GooglePayConfigurationDTO({
+    required this.googlePayEnvironment,
+    this.merchantAccount,
+    this.merchantInfo,
+    this.totalPriceStatus,
+    this.emailRequired,
+    this.existingPaymentMethodRequired,
+    this.shippingAddressRequired,
+    this.shippingAddressParameters,
+  });
 }
 
 class ApplePayContactDTO {
@@ -555,7 +243,7 @@ class ApplePayContactDTO {
   final String? familyName;
   final String? phoneticGivenName;
   final String? phoneticFamilyName;
-  final List<String?>? addressLines;
+  final List<String>? addressLines;
   final String? subLocality;
   final String? city;
   final String? postalCode;
@@ -564,7 +252,7 @@ class ApplePayContactDTO {
   final String? country;
   final String? countryCode;
 
-  ApplePayContactDTO(
+  ApplePayContactDTO({
     this.phoneNumber,
     this.emailAddress,
     this.givenName,
@@ -579,7 +267,19 @@ class ApplePayContactDTO {
     this.administrativeArea,
     this.country,
     this.countryCode,
-  );
+  });
+}
+
+class ApplePaySummaryItemDTO {
+  final String label;
+  final AmountDTO amount;
+  final ApplePaySummaryItemTypeDTO type;
+
+  ApplePaySummaryItemDTO({
+    required this.label,
+    required this.amount,
+    required this.type,
+  });
 }
 
 class ApplePayShippingMethodDTO {
@@ -590,223 +290,183 @@ class ApplePayShippingMethodDTO {
   final String? startDate;
   final String? endDate;
 
-  ApplePayShippingMethodDTO(
-    this.label,
-    this.detail,
-    this.amount,
-    this.identifier,
+  ApplePayShippingMethodDTO({
+    required this.label,
+    required this.detail,
+    required this.amount,
+    required this.identifier,
     this.startDate,
     this.endDate,
-  );
-}
-
-class ApplePaySummaryItemDTO {
-  final String label;
-  final AmountDTO amount;
-  final ApplePaySummaryItemType type;
-
-  ApplePaySummaryItemDTO(
-    this.label,
-    this.amount,
-    this.type,
-  );
-}
-
-class GooglePayConfigurationDTO {
-  final GooglePayEnvironment googlePayEnvironment;
-  final String? merchantAccount;
-  final MerchantInfoDTO? merchantInfoDTO;
-  final TotalPriceStatus? totalPriceStatus;
-  final List<String?>? allowedCardNetworks;
-  final List<String?>? allowedAuthMethods;
-  final bool? allowPrepaidCards;
-  final bool? allowCreditCards;
-  final bool? assuranceDetailsRequired;
-  final bool? emailRequired;
-  final bool? existingPaymentMethodRequired;
-  final bool? shippingAddressRequired;
-  final ShippingAddressParametersDTO? shippingAddressParametersDTO;
-  final bool? billingAddressRequired;
-  final BillingAddressParametersDTO? billingAddressParametersDTO;
-
-  GooglePayConfigurationDTO(
-    this.googlePayEnvironment,
-    this.merchantAccount,
-    this.merchantInfoDTO,
-    this.totalPriceStatus,
-    this.allowedCardNetworks,
-    this.allowedAuthMethods,
-    this.allowPrepaidCards,
-    this.allowCreditCards,
-    this.assuranceDetailsRequired,
-    this.emailRequired,
-    this.existingPaymentMethodRequired,
-    this.shippingAddressRequired,
-    this.shippingAddressParametersDTO,
-    this.billingAddressRequired,
-    this.billingAddressParametersDTO,
-  );
-}
-
-class MerchantInfoDTO {
-  final String? merchantName;
-  final String? merchantId;
-
-  MerchantInfoDTO(
-    this.merchantName,
-    this.merchantId,
-  );
-}
-
-class ShippingAddressParametersDTO {
-  final List<String?>? allowedCountryCodes;
-  final bool? isPhoneNumberRequired;
-
-  ShippingAddressParametersDTO(
-    this.allowedCountryCodes,
-    this.isPhoneNumberRequired,
-  );
-}
-
-class BillingAddressParametersDTO {
-  final String? format;
-  final bool? isPhoneNumberRequired;
-
-  BillingAddressParametersDTO(
-    this.format,
-    this.isPhoneNumberRequired,
-  );
-}
-
-class CashAppPayConfigurationDTO {
-  final CashAppPayEnvironment cashAppPayEnvironment;
-  final String returnUrl;
-
-  CashAppPayConfigurationDTO(
-    this.cashAppPayEnvironment,
-    this.returnUrl,
-  );
-}
-
-class TwintConfigurationDTO {
-  final String iosCallbackAppScheme;
-  final bool showStorePaymentField;
-
-  TwintConfigurationDTO(
-    this.iosCallbackAppScheme,
-    this.showStorePaymentField,
-  );
-}
-
-class PaymentResultDTO {
-  final PaymentResultEnum type;
-  final String? reason;
-  final PaymentResultModelDTO? result;
-  final String? errorCode;
-
-  PaymentResultDTO(
-    this.type,
-    this.reason,
-    this.result,
-    this.errorCode,
-  );
-}
-
-class PaymentResultModelDTO {
-  final String? sessionId;
-  final String? sessionResult;
-  final String? resultCode;
-  final OrderResponseDTO? order;
-
-  PaymentResultModelDTO(
-    this.sessionId,
-    this.sessionResult,
-    this.resultCode,
-    this.order,
-  );
-}
-
-class OrderResponseDTO {
-  final String pspReference;
-  final String orderData;
-  final AmountDTO? amount;
-  final AmountDTO? remainingAmount;
-
-  OrderResponseDTO({
-    required this.pspReference,
-    required this.orderData,
-    this.amount,
-    this.remainingAmount,
   });
 }
 
-sealed class CheckoutResultDTO {}
+class ApplePayPaymentErrorDTO {
+  final ApplePayPaymentErrorTypeDTO type;
+  final String? field;
+  final String localizedDescription;
 
-class FinishedResultDTO extends CheckoutResultDTO {
-  final String resultCode;
-
-  FinishedResultDTO({
-    required this.resultCode,
-  });
-}
-
-class ActionResultDTO extends CheckoutResultDTO {
-  final String actionResponse;
-
-  ActionResultDTO({
-    required this.actionResponse,
-  });
-}
-
-class ErrorResultDTO extends CheckoutResultDTO {
-  final String errorMessage;
-
-  ErrorResultDTO({
-    required this.errorMessage,
-  });
-}
-
-class CheckoutEvent {
-  final CheckoutEventType type;
-  final Object? data;
-
-  CheckoutEvent({
+  ApplePayPaymentErrorDTO({
     required this.type,
-    this.data,
+    this.field,
+    required this.localizedDescription,
   });
 }
 
-class AddressDTO {
-  final String? city;
-  final String? country;
-  final String? houseNumberOrName;
-  final String? postalCode;
-  final String? stateOrProvince;
-  final String? street;
-  final String? apartment;
+class ApplePayAuthorizedPaymentDTO {
+  final String token;
+  final String network;
+  final ApplePayContactDTO? billingContact;
+  final ApplePayContactDTO? shippingContact;
+  final ApplePayShippingMethodDTO? shippingMethod;
 
-  AddressDTO({
-    this.city,
-    this.country,
-    this.houseNumberOrName,
-    this.postalCode,
-    this.stateOrProvince,
-    this.street,
-    this.apartment,
+  ApplePayAuthorizedPaymentDTO({
+    required this.token,
+    required this.network,
+    this.billingContact,
+    this.shippingContact,
+    this.shippingMethod,
   });
 }
 
-class ShopperNameDTO {
-  final String? firstName;
-  final String? lastName;
-  final String? infix;
-  final String? gender;
+class ApplePayAuthorizationResultDTO {
+  final bool isSuccess;
+  final List<ApplePayPaymentErrorDTO>? errors;
 
-  ShopperNameDTO({
-    this.firstName,
-    this.lastName,
-    this.infix,
-    this.gender,
+  ApplePayAuthorizationResultDTO({
+    required this.isSuccess,
+    this.errors,
+  });
+}
+
+class ApplePayShippingMethodUpdateDTO {
+  final List<ApplePaySummaryItemDTO> summaryItems;
+
+  ApplePayShippingMethodUpdateDTO({
+    required this.summaryItems,
+  });
+}
+
+class ApplePayShippingContactUpdateDTO {
+  final List<ApplePaySummaryItemDTO> summaryItems;
+  final List<ApplePayShippingMethodDTO>? shippingMethods;
+  final List<ApplePayPaymentErrorDTO>? errors;
+
+  ApplePayShippingContactUpdateDTO({
+    required this.summaryItems,
+    this.shippingMethods,
+    this.errors,
+  });
+}
+
+class ApplePayCouponCodeUpdateDTO {
+  final List<ApplePaySummaryItemDTO> summaryItems;
+  final List<ApplePayShippingMethodDTO>? shippingMethods;
+  final List<ApplePayPaymentErrorDTO>? errors;
+
+  ApplePayCouponCodeUpdateDTO({
+    required this.summaryItems,
+    this.shippingMethods,
+    this.errors,
+  });
+}
+
+class ApplePayButtonStyleDTO {
+  final ApplePayButtonThemeDTO? theme;
+  final ApplePayButtonTypeDTO? type;
+  final double? cornerRadius;
+
+  ApplePayButtonStyleDTO({
+    this.theme,
+    this.type,
+    this.cornerRadius,
+  });
+}
+
+class ApplePayConfigurationDTO {
+  final String merchantId;
+  final String merchantName;
+  final bool? allowOnboarding;
+  final List<ApplePaySummaryItemDTO>? summaryItems;
+  final List<String>? requiredBillingContactFields;
+  final ApplePayContactDTO? billingContact;
+  final List<String>? requiredShippingContactFields;
+  final ApplePayContactDTO? shippingContact;
+  final ApplePayShippingTypeDTO? shippingType;
+  final bool? allowShippingContactEditing;
+  final List<ApplePayShippingMethodDTO>? shippingMethods;
+  final String? applicationData;
+  final List<String>? supportedCountries;
+  final ApplePayMerchantCapabilityDTO? merchantCapability;
+  final bool? supportsCouponCode;
+  final String? couponCode;
+  final ApplePayButtonStyleDTO? buttonStyle;
+  final double? buttonWidth;
+  final double? buttonHeight;
+  final bool hasOnSelectShippingMethod;
+  final bool hasOnSelectShippingContact;
+  final bool hasOnChangeCouponCode;
+  final bool hasOnAuthorize;
+
+  ApplePayConfigurationDTO({
+    required this.merchantId,
+    required this.merchantName,
+    this.allowOnboarding,
+    this.summaryItems,
+    this.requiredBillingContactFields,
+    this.billingContact,
+    this.requiredShippingContactFields,
+    this.shippingContact,
+    this.shippingType,
+    this.allowShippingContactEditing,
+    this.shippingMethods,
+    this.applicationData,
+    this.supportedCountries,
+    this.merchantCapability,
+    this.supportsCouponCode,
+    this.couponCode,
+    this.buttonStyle,
+    this.buttonWidth,
+    this.buttonHeight,
+    required this.hasOnSelectShippingMethod,
+    required this.hasOnSelectShippingContact,
+    required this.hasOnChangeCouponCode,
+    required this.hasOnAuthorize,
+  });
+}
+
+class CheckoutConfigurationDTO {
+  final EnvironmentDTO environment;
+  final String clientKey;
+  final String? countryCode;
+  final AmountDTO? amount;
+  final AnalyticsConfigurationDTO analyticsConfiguration;
+  final bool showSubmitButton;
+  final CardConfigurationDTO? cardConfiguration;
+  final ApplePayConfigurationDTO? applePayConfiguration;
+  final GooglePayConfigurationDTO? googlePayConfiguration;
+
+  CheckoutConfigurationDTO({
+    required this.environment,
+    required this.clientKey,
+    this.countryCode,
+    this.amount,
+    required this.analyticsConfiguration,
+    required this.showSubmitButton,
+    this.cardConfiguration,
+    this.applePayConfiguration,
+    this.googlePayConfiguration,
+  });
+}
+
+class CheckoutSetupResultDTO {
+  final String checkoutId;
+  final String regularPaymentMethodsJson;
+  final String storedPaymentMethodsJson;
+
+  CheckoutSetupResultDTO({
+    required this.checkoutId,
+    required this.regularPaymentMethodsJson,
+    required this.storedPaymentMethodsJson,
   });
 }
 
@@ -824,11 +484,6 @@ class BeforeSubmitDataDTO {
   });
 }
 
-// Not modeled as a sealed class: Pigeon does not generate codec methods for a
-// field-less sealed subclass (the "abort" case has no payload), so a flag is
-// used instead. The public Dart API still models this as a proper sealed
-// `BeforeSubmitResult` (`BeforeSubmitProceed`/`BeforeSubmitAbort`); this DTO
-// is purely an internal platform-channel detail.
 class BeforeSubmitResultDTO {
   final bool isAborted;
   final BeforeSubmitDataDTO? data;
@@ -841,102 +496,82 @@ class BeforeSubmitResultDTO {
   });
 }
 
-class ComponentCommunicationModel {
-  final ComponentCommunicationType type;
-  final String componentId;
-  final Object? data;
-  final PaymentResultDTO? paymentResult;
+class AddressDTO {
+  final String? city;
+  final String? country;
+  final String? houseNumberOrName;
+  final String? postalCode;
+  final String? stateOrProvince;
+  final String? street;
 
-  ComponentCommunicationModel({
-    required this.type,
-    required this.componentId,
-    this.data,
-    this.paymentResult,
+  AddressDTO({
+    this.city,
+    this.country,
+    this.houseNumberOrName,
+    this.postalCode,
+    this.stateOrProvince,
+    this.street,
   });
 }
 
-class PlatformCommunicationDTO {
-  final ComponentCommunicationType type;
-  final String componentId;
-  final String? dataJson;
+class ShopperNameDTO {
+  final String? firstName;
+  final String? lastName;
+  final String? infix;
+  final String? gender;
 
-  PlatformCommunicationDTO({
-    required this.type,
-    required this.componentId,
-    this.dataJson,
+  ShopperNameDTO({
+    this.firstName,
+    this.lastName,
+    this.infix,
+    this.gender,
   });
 }
 
-class PaymentEventDTO {
-  final PaymentEventType paymentEventType;
-  final String? result;
-  final Map<String?, Object?>? data;
-  final ErrorDTO? error;
+class PaymentComponentDataDTO {
+  final String dataJson;
 
-  PaymentEventDTO({
-    required this.paymentEventType,
-    this.result,
-    this.data,
-    this.error,
+  PaymentComponentDataDTO({
+    required this.dataJson,
   });
 }
 
-class ErrorDTO {
+class ActionComponentDataDTO {
+  final String dataJson;
+
+  ActionComponentDataDTO({
+    required this.dataJson,
+  });
+}
+
+class SubmitResultDTO {
+  final SubmitResultTypeDTO type;
+  final String? resultCode;
+  final String? actionJson;
   final String? errorMessage;
-  final String? reason;
-  final bool? dismissDropIn;
 
-  ErrorDTO({
+  SubmitResultDTO({
+    required this.type,
+    this.resultCode,
+    this.actionJson,
     this.errorMessage,
-    this.reason,
-    this.dismissDropIn = false,
   });
 }
 
-class DeletedStoredPaymentMethodResultDTO {
-  final String storedPaymentMethodId;
-  final bool isSuccessfullyRemoved;
+class AdditionalDetailsResultDTO {
+  final String resultCode;
 
-  DeletedStoredPaymentMethodResultDTO(
-    this.storedPaymentMethodId,
-    this.isSuccessfullyRemoved,
-  );
+  AdditionalDetailsResultDTO({
+    required this.resultCode,
+  });
 }
 
-class InstantPaymentConfigurationDTO {
-  final Environment environment;
-  final String clientKey;
-  final String countryCode;
-  final AmountDTO? amount;
-  final String? shopperLocale;
-  final AnalyticsOptionsDTO analyticsOptionsDTO;
-  final InstantPaymentType instantPaymentType;
-  final GooglePayConfigurationDTO? googlePayConfigurationDTO;
-  final ApplePayConfigurationDTO? applePayConfigurationDTO;
+class AdvancedCheckoutResultDTO {
+  final String resultCode;
 
-  InstantPaymentConfigurationDTO(
-    this.environment,
-    this.clientKey,
-    this.countryCode,
-    this.amount,
-    this.shopperLocale,
-    this.analyticsOptionsDTO,
-    this.instantPaymentType,
-    this.googlePayConfigurationDTO,
-    this.applePayConfigurationDTO,
-  );
-}
-
-class InstantPaymentSetupResultDTO {
-  final InstantPaymentType instantPaymentType;
-  final bool isSupported;
-  final Object? resultData;
-
-  InstantPaymentSetupResultDTO(
-    this.instantPaymentType,
-    this.isSupported,
-    this.resultData,
-  );
+  AdvancedCheckoutResultDTO({
+    required this.resultCode,
+  });
 }
 
 class UnencryptedCardDTO {
@@ -945,12 +580,12 @@ class UnencryptedCardDTO {
   final String? expiryYear;
   final String? cvc;
 
-  UnencryptedCardDTO(
+  UnencryptedCardDTO({
     this.cardNumber,
     this.expiryMonth,
     this.expiryYear,
     this.cvc,
-  );
+  });
 }
 
 class EncryptedCardDTO {
@@ -959,230 +594,175 @@ class EncryptedCardDTO {
   final String? encryptedExpiryYear;
   final String? encryptedSecurityCode;
 
-  EncryptedCardDTO(
+  EncryptedCardDTO({
     this.encryptedCardNumber,
     this.encryptedExpiryMonth,
     this.encryptedExpiryYear,
     this.encryptedSecurityCode,
-  );
+  });
 }
 
-class ActionComponentConfigurationDTO {
-  final Environment environment;
-  final String clientKey;
-  final AmountDTO? amount;
-  final String? shopperLocale;
-  final AnalyticsOptionsDTO analyticsOptionsDTO;
-  final ThreeDS2ConfigurationDTO? threeDS2ConfigurationDTO;
+class BinLookupBrandDTO {
+  final String brand;
+  final bool supported;
+  final String? paymentMethodVariant;
 
-  ActionComponentConfigurationDTO(
-    this.environment,
-    this.clientKey,
-    this.amount,
-    this.shopperLocale,
-    this.analyticsOptionsDTO,
-    this.threeDS2ConfigurationDTO,
-  );
-}
-
-class OrderCancelResultDTO {
-  final Map<String?, Object?> orderCancelResponseBody;
-  final Map<String?, Object?>? updatedPaymentMethodsResponseBody;
-
-  OrderCancelResultDTO(
-    this.orderCancelResponseBody,
-    this.updatedPaymentMethodsResponseBody,
-  );
+  BinLookupBrandDTO({
+    required this.brand,
+    required this.supported,
+    this.paymentMethodVariant,
+  });
 }
 
 class BinLookupDataDTO {
-  final String brand;
+  final String? issuingCountryCode;
+  final List<BinLookupBrandDTO> brands;
 
-  BinLookupDataDTO({required this.brand});
+  BinLookupDataDTO({
+    this.issuingCountryCode,
+    required this.brands,
+  });
+}
+
+class CheckoutEventDTO {
+  final CheckoutEventTypeDTO type;
+  final String checkoutId;
+  final String? componentId;
+  final bool? requiresUserInteraction;
+  final int? height;
+  final List<BinLookupDataDTO>? binLookupData;
+  final String? binValue;
+  final String? resultCode;
+  final String? sessionId;
+  final String? sessionData;
+  final String? errorCode;
+  final String? errorMessage;
+
+  CheckoutEventDTO({
+    required this.type,
+    required this.checkoutId,
+    this.componentId,
+    this.requiresUserInteraction,
+    this.height,
+    this.binLookupData,
+    this.binValue,
+    this.resultCode,
+    this.sessionId,
+    this.sessionData,
+    this.errorCode,
+    this.errorMessage,
+  });
 }
 
 @HostApi()
-abstract class CheckoutPlatformInterface {
+abstract class CheckoutHostApi {
   @async
-  String getReturnUrl();
-
-  @async
-  SessionDTO setupSession(
-    SessionResponseDTO sessionResponseDTO,
-    CheckoutConfigurationDTO checkoutConfigurationDTO,
+  CheckoutSetupResultDTO setupSession(
+    SessionResponseDTO sessionResponse,
+    CheckoutConfigurationDTO configuration,
   );
 
   @async
-  void setupAdvanced(
-    String paymentMethodsResponse,
-    CheckoutConfigurationDTO checkoutConfigurationDTO,
+  CheckoutSetupResultDTO setupAdvanced(
+    String paymentMethodsJson,
+    CheckoutConfigurationDTO configuration,
   );
 
-  void clearSession();
+  void disposeCheckout(String checkoutId);
+
+  @async
+  AdvancedCheckoutResultDTO handleAction(
+    String actionId,
+    String actionJson,
+    CheckoutConfigurationDTO configuration,
+  );
+
+  void enableConsoleLogging(bool enabled);
 
   @async
   EncryptedCardDTO encryptCard(
-    UnencryptedCardDTO unencryptedCardDTO,
+    UnencryptedCardDTO card,
     String publicKey,
   );
 
   @async
-  String encryptBin(
-    String bin,
-    String publicKey,
-  );
+  String encryptBin(String bin, String publicKey);
 
-  CardNumberValidationResultDTO validateCardNumber(
-    String cardNumber,
-    bool enableLuhnCheck,
-  );
+  bool validateCardNumber(String cardNumber, bool enableLuhnCheck);
 
-  CardExpiryDateValidationResultDTO validateCardExpiryDate(
-    String expiryMonth,
-    String expiryYear,
-  );
+  bool validateCardExpiryDate(String expiryMonth, String expiryYear);
 
-  CardSecurityCodeValidationResultDTO validateCardSecurityCode(
-    String securityCode,
-    String? cardBrand,
-  );
-
-  void enableConsoleLogging(bool loggingEnabled);
+  bool validateCardSecurityCode(String securityCode, String? cardBrand);
 
   String getThreeDS2SdkVersion();
 }
 
 @HostApi()
-abstract class DropInPlatformInterface {
-  void showDropInSession(DropInConfigurationDTO dropInConfigurationDTO);
+abstract class ComponentHostApi {
+  @async
+  void submit(String checkoutId, String componentId);
 
-  void showDropInAdvanced(
-    DropInConfigurationDTO dropInConfigurationDTO,
-    String paymentMethodsResponse,
-  );
-
-  void stopDropIn();
-
-  void onPaymentsResult(PaymentEventDTO paymentsResult);
-
-  void onPaymentsDetailsResult(PaymentEventDTO paymentsDetailsResult);
-
-  void onDeleteStoredPaymentMethodResult(
-      DeletedStoredPaymentMethodResultDTO deleteStoredPaymentMethodResultDTO);
-
-  void onBalanceCheckResult(String balanceCheckResponse);
-
-  void onOrderRequestResult(String orderRequestResponse);
-
-  void onOrderCancelResult(OrderCancelResultDTO orderCancelResult);
-
-  void cleanUpDropIn();
+  void dispose(String checkoutId, String componentId);
 }
 
 @FlutterApi()
-abstract class CheckoutFlutterInterface {
-  void send(CheckoutEvent event);
-}
-
-@HostApi()
-abstract class ComponentPlatformInterface {
-  void updateViewHeight(int viewId);
-
-  void onPaymentsResult(
-    String componentId,
-    PaymentEventDTO paymentsResult,
-  );
-
-  void onPaymentsDetailsResult(
-    String componentId,
-    PaymentEventDTO paymentsDetailsResult,
+abstract class CheckoutCallbacksFlutterApi {
+  @async
+  BeforeSubmitResultDTO onBeforeSubmit(
+    String checkoutId,
+    BeforeSubmitDataDTO data,
   );
 
   @async
-  InstantPaymentSetupResultDTO isInstantPaymentSupportedByPlatform(
-    InstantPaymentConfigurationDTO instantPaymentConfigurationDTO,
-    String paymentMethodResponse,
-    String componentId,
+  SubmitResultDTO onSubmit(
+    String checkoutId,
+    PaymentComponentDataDTO data,
   );
 
-  void onInstantPaymentPressed(
-    InstantPaymentConfigurationDTO instantPaymentConfigurationDTO,
-    String encodedPaymentMethod,
-    String componentId,
+  @async
+  AdditionalDetailsResultDTO onAdditionalDetails(
+    String checkoutId,
+    ActionComponentDataDTO data,
   );
-
-  void handleAction(
-    ActionComponentConfigurationDTO actionComponentConfiguration,
-    String componentId,
-    Map<String?, Object?>? actionResponse,
-  );
-
-  void onDispose(String componentId);
-}
-
-@FlutterApi()
-abstract class ComponentFlutterInterface {
-  // ignore: unused_element
-  void _generateCodecForDTOs(
-    SessionDTO sessionDTO,
-    BinLookupDataDTO binLookupDataDTO,
-  );
-
-  void onComponentCommunication(
-      ComponentCommunicationModel componentCommunicationModel);
 
   @async
   ApplePayShippingMethodUpdateDTO onApplePaySelectShippingMethod(
-    String componentId,
+    String checkoutId,
     ApplePayShippingMethodDTO shippingMethod,
-    List<ApplePaySummaryItemDTO?> currentSummaryItems,
+    List<ApplePaySummaryItemDTO> currentSummaryItems,
   );
 
   @async
   ApplePayShippingContactUpdateDTO onApplePaySelectShippingContact(
-    String componentId,
+    String checkoutId,
     ApplePayContactDTO contact,
-    List<ApplePaySummaryItemDTO?> currentSummaryItems,
+    List<ApplePaySummaryItemDTO> currentSummaryItems,
   );
 
   @async
   ApplePayCouponCodeUpdateDTO onApplePayChangeCouponCode(
-    String componentId,
+    String checkoutId,
     String couponCode,
-    List<ApplePaySummaryItemDTO?> currentSummaryItems,
+    List<ApplePaySummaryItemDTO> currentSummaryItems,
   );
 
   @async
   ApplePayAuthorizationResultDTO onApplePayAuthorize(
-    String componentId,
+    String checkoutId,
     ApplePayAuthorizedPaymentDTO payment,
   );
 }
 
-//V2
 @FlutterApi()
-abstract class AdyenFlutterInterface {
+abstract class ActionOnlyFlutterApi {
   @async
-  CheckoutResultDTO onSubmit(PlatformCommunicationDTO platformCommunicationDTO);
-
-  @async
-  CheckoutResultDTO onAdditionalDetails(
-      PlatformCommunicationDTO platformCommunicationDTO);
-}
-
-/// Separate from [AdyenFlutterInterface] because that interface is only ever
-/// implemented/registered by the advanced-flow component, while
-/// `onBeforeSubmit` is a sessions-flow-only concept implemented by the
-/// session component.
-@FlutterApi()
-abstract class SessionCheckoutFlutterInterface {
-  /// Called before the sessions flow submits payment data, when a merchant
-  /// has registered [SessionCheckout.onBeforeSubmit].
-  @async
-  BeforeSubmitResultDTO onBeforeSubmit(BeforeSubmitDataDTO data);
+  AdditionalDetailsResultDTO onAdditionalDetails(
+    String actionId,
+    ActionComponentDataDTO data,
+  );
 }
 
 @EventChannelApi()
-abstract class PlatformEvents {
-  ComponentCommunicationModel onPlatformEvent();
+abstract class CheckoutEvents {
+  CheckoutEventDTO events();
 }

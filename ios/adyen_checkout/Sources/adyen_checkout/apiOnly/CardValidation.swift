@@ -1,23 +1,26 @@
 import Adyen
-#if canImport(AdyenCard)
-    import AdyenCard
-#endif
+import AdyenCard
 
-class CardValidation {
+final class CardValidation {
     func validateCardNumber(cardNumber: String, enableLuhnCheck: Bool) -> Bool {
-        CardNumberValidator(isLuhnCheckEnabled: enableLuhnCheck, isEnteredBrandSupported: true).isValid(cardNumber)
+        CardNumberValidator(
+            isLuhnCheckEnabled: enableLuhnCheck,
+            isEnteredBrandSupported: true
+        ).isValid(cardNumber)
     }
-    
+
     func validateCardExpiryDate(expiryMonth: String, expiryYear: String) -> Bool {
-        let lastTwoYearChars = String(expiryYear.suffix(2))
-        return CardExpiryDateValidator().isValid("\(expiryMonth)\(lastTwoYearChars)")
+        guard expiryMonth.range(of: #"^\d{2}$"#, options: .regularExpression) != nil,
+              expiryYear.range(of: #"^\d{2}$"#, options: .regularExpression) != nil else {
+            return false
+        }
+        return CardExpiryDateValidator().isValid(expiryMonth + expiryYear)
     }
-    
+
     func validateCardSecurityCode(securityCode: String, cardBrand: String?) -> Bool {
         guard let cardBrand else {
             return CardSecurityCodeValidator().isValid(securityCode)
         }
-        let cardType = CardBrand(rawValue: cardBrand)
-        return CardSecurityCodeValidator(cardBrand: cardType).isValid(securityCode)
+        return CardSecurityCodeValidator(cardBrand: CardBrand(rawValue: cardBrand)).isValid(securityCode)
     }
 }

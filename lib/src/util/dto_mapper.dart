@@ -1,113 +1,186 @@
 import 'dart:convert';
-import 'dart:ui';
 
-import 'package:adyen_checkout/adyen_checkout.dart';
-import 'package:adyen_checkout/src/generated/platform_api.g.dart';
+import '../common/model/address.dart';
+import '../common/model/amount.dart';
+import '../common/model/billing_address_mode.dart';
+import '../common/model/card_callbacks/bin_lookup_data.dart';
+import '../common/model/action_component_data.dart';
+import '../common/model/analytics_configuration.dart';
+import '../common/model/before_submit.dart';
+import '../common/model/checkout_configuration.dart';
+import '../common/model/checkout_results.dart';
+import '../common/model/cse/encrypted_card.dart';
+import '../common/model/cse/unencrypted_card.dart';
+import '../common/model/environment.dart';
+import '../common/model/field_visibility.dart';
+import '../common/model/google_pay_environment.dart';
+import '../common/model/payment_component_data.dart';
+import '../common/model/payment_method.dart';
+import '../common/model/payment_method_configurations/card_configuration.dart';
+import '../common/model/payment_method_configurations/apple_pay/apple_pay_authorization_result.dart';
+import '../common/model/payment_method_configurations/apple_pay/apple_pay_authorized_payment.dart';
+import '../common/model/payment_method_configurations/apple_pay/apple_pay_configuration.dart';
+import '../common/model/payment_method_configurations/apple_pay/apple_pay_contact.dart';
+import '../common/model/payment_method_configurations/apple_pay/apple_pay_coupon_code_update.dart';
+import '../common/model/payment_method_configurations/apple_pay/apple_pay_merchant_capability.dart';
+import '../common/model/payment_method_configurations/apple_pay/apple_pay_payment_error.dart';
+import '../common/model/payment_method_configurations/apple_pay/apple_pay_payment_error_type.dart';
+import '../common/model/payment_method_configurations/apple_pay/apple_pay_shipping_contact_update.dart';
+import '../common/model/payment_method_configurations/apple_pay/apple_pay_shipping_method.dart';
+import '../common/model/payment_method_configurations/apple_pay/apple_pay_shipping_method_update.dart';
+import '../common/model/payment_method_configurations/apple_pay/apple_pay_shipping_type.dart';
+import '../common/model/payment_method_configurations/apple_pay/apple_pay_summary_item.dart';
+import '../common/model/payment_method_configurations/apple_pay/apple_pay_summary_item_type.dart';
+import '../common/model/payment_method_configurations/card/installment_configuration.dart';
+import '../common/model/payment_method_configurations/card/installment_options.dart';
+import '../common/model/payment_method_configurations/google_pay/google_pay_configuration.dart';
+import '../common/model/payment_method_configurations/google_pay/merchant_info.dart';
+import '../common/model/total_price_status.dart';
+import '../common/model/payment_method_configurations/google_pay/shipping_address_parameters.dart';
+import '../common/model/session_response.dart';
+import '../common/model/shopper_name.dart';
+import '../common/model/stored_payment_method.dart';
+import '../components/apple_pay/model/apple_pay_button_style.dart';
+import '../components/apple_pay/model/apple_pay_button_theme.dart';
+import '../components/apple_pay/model/apple_pay_button_type.dart';
+import '../generated/platform_api.g.dart';
 
-extension AnalyticsOptionsMapper on AnalyticsOptions {
-  AnalyticsOptionsDTO toDTO(String version) => AnalyticsOptionsDTO(
+extension SessionResponseMapper on SessionResponse {
+  SessionResponseDTO toDTO() => SessionResponseDTO(
+        id: id,
+        sessionData: sessionData,
+      );
+}
+
+extension AmountMapper on Amount {
+  AmountDTO toDTO() => AmountDTO(
+        currency: currency,
+        value: value,
+      );
+}
+
+extension AnalyticsConfigurationMapper on AnalyticsConfiguration {
+  AnalyticsConfigurationDTO toDTO() => AnalyticsConfigurationDTO(
         enabled: enabled,
-        version: version,
       );
 }
 
-extension DropInConfigurationMapper on DropInConfiguration {
-  DropInConfigurationDTO toDTO(
-    String sdkVersionNumber,
-    isPartialPaymentSupported,
-  ) =>
-      DropInConfigurationDTO(
-        environment: environment,
+extension CheckoutConfigurationMapper on CheckoutConfiguration {
+  CheckoutConfigurationDTO toDTO() => CheckoutConfigurationDTO(
+        environment: environment.toDTO(),
         clientKey: clientKey,
-        countryCode: countryCode.toUpperCase(),
+        countryCode: countryCode?.toUpperCase(),
         amount: amount?.toDTO(),
-        shopperLocale: shopperLocale,
-        cardConfigurationDTO: cardConfiguration?.toDTO(),
-        applePayConfigurationDTO: applePayConfiguration?.toDTO(),
-        googlePayConfigurationDTO: googlePayConfiguration?.toDTO(),
-        cashAppPayConfigurationDTO: cashAppPayConfiguration?.toDTO(),
-        twintConfigurationDTO: twintConfiguration?.toDTO(),
-        threeDS2ConfigurationDTO: threeDS2Configuration?.toDTO(),
-        analyticsOptionsDTO: analyticsOptions.toDTO(sdkVersionNumber),
-        isRemoveStoredPaymentMethodEnabled: _isRemoveStoredPaymentMethodEnabled(
-            storedPaymentMethodConfiguration),
-        showPreselectedStoredPaymentMethod: storedPaymentMethodConfiguration
-                ?.showPreselectedStoredPaymentMethod ??
-            true,
-        skipListWhenSinglePaymentMethod: skipListWhenSinglePaymentMethod,
-        preselectedPaymentMethodTitle: preselectedPaymentMethodTitle,
-        paymentMethodNames: paymentMethodNames,
-        isPartialPaymentSupported: isPartialPaymentSupported,
-        showStoredPaymentMethods:
-            storedPaymentMethodConfiguration?.showStoredPaymentMethods ?? true,
-      );
-
-  bool _isRemoveStoredPaymentMethodEnabled(
-          StoredPaymentMethodConfiguration? storedPaymentMethodConfiguration) =>
-      storedPaymentMethodConfiguration?.deleteStoredPaymentMethodCallback !=
-          null &&
-      storedPaymentMethodConfiguration?.isRemoveStoredPaymentMethodEnabled ==
-          true;
-}
-
-extension DefaultInstallmentOptionsMapper on DefaultInstallmentOptions {
-  DefaultInstallmentOptionsDTO toDTO() => DefaultInstallmentOptionsDTO(
-        values: values,
-        includesRevolving: includesRevolving,
+        analyticsConfiguration: analyticsConfiguration.toDTO(),
+        showSubmitButton: showSubmitButton,
+        cardConfiguration: cardConfiguration?.toDTO(),
+        applePayConfiguration: applePayConfiguration?.toDTO(),
+        googlePayConfiguration: googlePayConfiguration?.toDTO(),
       );
 }
 
-extension CardBasedInstallmentOptionsMapper on CardBasedInstallmentOptions {
-  CardBasedInstallmentOptionsDTO toDTO() => CardBasedInstallmentOptionsDTO(
-        values: values,
-        includesRevolving: includesRevolving,
-        cardBrand: cardBrand,
-      );
-}
-
-extension InstallmentConfigurationMapper on InstallmentConfiguration {
-  InstallmentConfigurationDTO toDTO() => InstallmentConfigurationDTO(
-        defaultOptions: defaultOptions?.toDTO(),
-        cardBasedOptions: cardBasedOptions?.map((e) => e.toDTO()).toList(),
-        showInstallmentAmount: showInstallmentAmount,
-      );
+extension EnvironmentMapper on Environment {
+  EnvironmentDTO toDTO() => switch (this) {
+        Environment.test => EnvironmentDTO.test,
+        Environment.liveEurope => EnvironmentDTO.liveEurope,
+        Environment.liveUnitedStates => EnvironmentDTO.liveUnitedStates,
+        Environment.liveAustralia => EnvironmentDTO.liveAustralia,
+        Environment.liveApse => EnvironmentDTO.liveApse,
+        Environment.liveIndia => EnvironmentDTO.liveIndia,
+        Environment.liveNea => EnvironmentDTO.liveNea,
+      };
 }
 
 extension CardConfigurationMapper on CardConfiguration {
   CardConfigurationDTO toDTO() => CardConfigurationDTO(
-        holderNameRequired: holderNameRequired,
-        addressMode: addressMode,
-        showStorePaymentField: showStorePaymentField,
-        showCvcForStoredCard: showCvcForStoredCard,
-        showCvc: showCvc,
-        kcpFieldVisibility: kcpFieldVisibility,
-        socialSecurityNumberFieldVisibility:
-            socialSecurityNumberFieldVisibility,
-        supportedCardTypes: supportedCardTypes,
+        billingAddressMode: billingAddressMode.toDTO(),
+        koreanAuthenticationVisibility: koreanAuthenticationVisibility.toDTO(),
+        showCardholderName: showCardholderName,
+        showSecurityCode: showSecurityCode,
+        showSecurityCodeForStoredCard: showSecurityCodeForStoredCard,
+        showStorePaymentMethod: showStorePaymentMethod,
+        showSupportedCardBrandLogos: showSupportedCardBrandLogos,
+        socialSecurityNumberVisibility: socialSecurityNumberVisibility.toDTO(),
+        supportedCardBrands: supportedCardBrands,
         installmentConfiguration: installmentConfiguration?.toDTO(),
+        hasOnBinChange: onBinChange != null,
+        hasOnBinLookup: onBinLookup != null,
+      );
+}
+
+extension BillingAddressModeMapper on BillingAddressMode {
+  BillingAddressModeDTO toDTO() => switch (this) {
+        BillingAddressMode.none => BillingAddressModeDTO.none,
+        BillingAddressMode.postalCode => BillingAddressModeDTO.postalCode,
+      };
+}
+
+extension FieldVisibilityMapper on FieldVisibility {
+  FieldVisibilityDTO toDTO() => switch (this) {
+        FieldVisibility.show => FieldVisibilityDTO.show,
+        FieldVisibility.hide => FieldVisibilityDTO.hide,
+        FieldVisibility.auto => FieldVisibilityDTO.auto,
+      };
+}
+
+extension InstallmentConfigurationMapper on InstallmentConfiguration {
+  InstallmentConfigurationDTO toDTO() => InstallmentConfigurationDTO(
+        options: <InstallmentOptionsDTO>[
+          if (defaultOptions case final options?) options.toDTO(),
+          ...?cardBasedOptions?.map((options) => options.toDTO()),
+        ],
+        showInstallmentAmount: showInstallmentAmount,
+      );
+}
+
+extension InstallmentOptionsMapper on InstallmentOptions {
+  InstallmentOptionsDTO toDTO() => InstallmentOptionsDTO(
+        values: values,
+        includesRevolving: includesRevolving,
+        cardBrand: switch (this) {
+          CardBasedInstallmentOptions options => options.cardBrand,
+          DefaultInstallmentOptions() => null,
+        },
       );
 }
 
 extension GooglePayConfigurationMapper on GooglePayConfiguration {
   GooglePayConfigurationDTO toDTO() => GooglePayConfigurationDTO(
-        googlePayEnvironment: googlePayEnvironment,
+        googlePayEnvironment: switch (googlePayEnvironment) {
+          GooglePayEnvironment.test => GooglePayEnvironmentDTO.test,
+          GooglePayEnvironment.production => GooglePayEnvironmentDTO.production,
+        },
         merchantAccount: merchantAccount,
-        merchantInfoDTO: merchantInfo?.toDTO(),
-        totalPriceStatus: totalPriceStatus,
-        allowedCardNetworks: allowedCardNetworks,
-        allowedAuthMethods: allowedAuthMethods
-            ?.map((allowedAuthMethod) => allowedAuthMethod.name)
-            .toList(),
-        allowPrepaidCards: allowPrepaidCards,
-        allowCreditCards: allowCreditCards,
-        billingAddressRequired: billingAddressRequired,
-        billingAddressParametersDTO: billingAddressParameters?.toDTO(),
-        assuranceDetailsRequired: assuranceDetailsRequired,
+        merchantInfo: merchantInfo?.toDTO(),
+        totalPriceStatus: totalPriceStatus?.toDTO(),
         emailRequired: emailRequired,
-        shippingAddressRequired: shippingAddressRequired,
-        shippingAddressParametersDTO: shippingAddressParameters?.toDTO(),
         existingPaymentMethodRequired: existingPaymentMethodRequired,
+        shippingAddressRequired: shippingAddressRequired,
+        shippingAddressParameters: shippingAddressParameters?.toDTO(),
       );
+}
+
+extension MerchantInfoMapper on MerchantInfo {
+  MerchantInfoDTO toDTO() => MerchantInfoDTO(
+        merchantName: merchantName,
+        merchantId: merchantId,
+      );
+}
+
+extension ShippingAddressParametersMapper on ShippingAddressParameters {
+  ShippingAddressParametersDTO toDTO() => ShippingAddressParametersDTO(
+        allowedCountryCodes: allowedCountryCodes,
+        isPhoneNumberRequired: isPhoneNumberRequired,
+      );
+}
+
+extension TotalPriceStatusMapper on TotalPriceStatus {
+  TotalPriceStatusDTO toDTO() => switch (this) {
+        TotalPriceStatus.notCurrentlyKnown =>
+          TotalPriceStatusDTO.notCurrentlyKnown,
+        TotalPriceStatus.estimated => TotalPriceStatusDTO.estimated,
+        TotalPriceStatus.finalPrice => TotalPriceStatusDTO.finalPrice,
+      };
 }
 
 extension ApplePayConfigurationMapper on ApplePayConfiguration {
@@ -116,26 +189,27 @@ extension ApplePayConfigurationMapper on ApplePayConfiguration {
         merchantName: merchantName,
         allowOnboarding: allowOnboarding,
         summaryItems: applePaySummaryItems
-            ?.map((applePaySummaryItem) => applePaySummaryItem.toDTO())
+            ?.map((summaryItem) => summaryItem.toDTO())
             .toList(),
-        requiredBillingContactFields: requiredBillingContactFields
-            ?.map((billingContactField) => billingContactField.name)
-            .toList(),
+        requiredBillingContactFields:
+            requiredBillingContactFields?.map((field) => field.name).toList(),
         billingContact: billingContact?.toDTO(),
-        requiredShippingContactFields: requiredShippingContactFields
-            ?.map((shippingContactField) => shippingContactField.name)
-            .toList(),
+        requiredShippingContactFields:
+            requiredShippingContactFields?.map((field) => field.name).toList(),
         shippingContact: shippingContact?.toDTO(),
-        applePayShippingType: applePayShippingType,
+        shippingType: applePayShippingType?.toDTO(),
         allowShippingContactEditing: allowShippingContactEditing,
         shippingMethods: shippingMethods
             ?.map((shippingMethod) => shippingMethod.toDTO())
             .toList(),
         applicationData: applicationData,
         supportedCountries: supportedCountries,
-        merchantCapability: merchantCapability,
+        merchantCapability: merchantCapability?.toDTO(),
         supportsCouponCode: supportsCouponCode,
         couponCode: couponCode,
+        buttonStyle: buttonStyle?.toDTO(),
+        buttonWidth: buttonWidth,
+        buttonHeight: buttonHeight,
         hasOnSelectShippingMethod: onSelectShippingMethod != null,
         hasOnSelectShippingContact: onSelectShippingContact != null,
         hasOnChangeCouponCode: onChangeCouponCode != null,
@@ -143,37 +217,15 @@ extension ApplePayConfigurationMapper on ApplePayConfiguration {
       );
 }
 
-extension ApplePayAuthorizedPaymentDTOMapper on ApplePayAuthorizedPaymentDTO {
-  ApplePayAuthorizedPayment fromDTO() => ApplePayAuthorizedPayment(
-        token: token,
-        network: network,
-        billingContact: billingContact?.fromDTO(),
-        shippingContact: shippingContact?.fromDTO(),
-        shippingMethod: shippingMethod?.fromDTO(),
-      );
-}
-
-extension ApplePayAuthorizationResultMapper on ApplePayAuthorizationResult {
-  ApplePayAuthorizationResultDTO toDTO() {
-    switch (this) {
-      case ApplePayAuthorizationSuccess():
-        return ApplePayAuthorizationResultDTO(
-          isSuccess: true,
-        );
-      case ApplePayAuthorizationFailure(errors: final errors):
-        return ApplePayAuthorizationResultDTO(
-          isSuccess: false,
-          errors: errors.map((error) => error.toDTO()).toList(),
-        );
-    }
-  }
-}
-
-extension ApplePayPaymentErrorMapper on ApplePayPaymentError {
-  ApplePayPaymentErrorDTO toDTO() => ApplePayPaymentErrorDTO(
-        type: type,
-        field: field?.name,
-        localizedDescription: localizedDescription,
+extension ApplePaySummaryItemMapper on ApplePaySummaryItem {
+  ApplePaySummaryItemDTO toDTO() => ApplePaySummaryItemDTO(
+        label: label,
+        amount: amount.toDTO(),
+        type: switch (type) {
+          ApplePaySummaryItemType.pending => ApplePaySummaryItemTypeDTO.pending,
+          ApplePaySummaryItemType.definite =>
+            ApplePaySummaryItemTypeDTO.definite,
+        },
       );
 }
 
@@ -196,293 +248,52 @@ extension ApplePayContactMapper on ApplePayContact {
       );
 }
 
-extension ApplePayContactDTOMapper on ApplePayContactDTO {
-  ApplePayContact fromDTO() => ApplePayContact(
-        phoneNumber: phoneNumber,
-        emailAddress: emailAddress,
-        givenName: givenName,
-        familyName: familyName,
-        phoneticGivenName: phoneticGivenName,
-        phoneticFamilyName: phoneticFamilyName,
-        addressLines: addressLines?.whereType<String>().toList(),
-        subLocality: subLocality,
-        city: city,
-        postalCode: postalCode,
-        subAdministrativeArea: subAdministrativeArea,
-        administrativeArea: administrativeArea,
-        country: country,
-        countryCode: countryCode,
-      );
-}
-
 extension ApplePayShippingMethodMapper on ApplePayShippingMethod {
   ApplePayShippingMethodDTO toDTO() => ApplePayShippingMethodDTO(
-      label: label,
-      detail: detail,
-      amount: amount.toDTO(),
-      identifier: identifier,
-      startDate: startDate?.toUtc().toIso8601String(),
-      endDate: endDate?.toUtc().toIso8601String());
-}
-
-extension ApplePaySummaryItemsMapper on ApplePaySummaryItem {
-  ApplePaySummaryItemDTO toDTO() => ApplePaySummaryItemDTO(
-        label: label,
-        amount: amount.toDTO(),
-        type: type,
-      );
-}
-
-extension ApplePayShippingMethodUpdateMapper on ApplePayShippingMethodUpdate {
-  ApplePayShippingMethodUpdateDTO toDTO() => ApplePayShippingMethodUpdateDTO(
-        summaryItems:
-            summaryItems.map((summaryItem) => summaryItem.toDTO()).toList(),
-      );
-}
-
-extension ApplePayCouponCodeUpdateMapper on ApplePayCouponCodeUpdate {
-  ApplePayCouponCodeUpdateDTO toDTO() => ApplePayCouponCodeUpdateDTO(
-        summaryItems:
-            summaryItems.map((summaryItem) => summaryItem.toDTO()).toList(),
-        shippingMethods: shippingMethods
-            ?.map((shippingMethod) => shippingMethod.toDTO())
-            .toList(),
-        errors: errors?.map((error) => error.toDTO()).toList(),
-      );
-}
-
-extension ApplePayShippingContactUpdateMapper on ApplePayShippingContactUpdate {
-  ApplePayShippingContactUpdateDTO toDTO() => ApplePayShippingContactUpdateDTO(
-        summaryItems:
-            summaryItems.map((summaryItem) => summaryItem.toDTO()).toList(),
-        shippingMethods: shippingMethods
-            ?.map((shippingMethod) => shippingMethod.toDTO())
-            .toList(),
-        errors: errors?.map((error) => error.toDTO()).toList(),
-      );
-}
-
-extension ApplePayShippingMethodDTOMapper on ApplePayShippingMethodDTO {
-  ApplePayShippingMethod fromDTO() => ApplePayShippingMethod(
         label: label,
         detail: detail,
-        amount: amount.fromDTO(),
+        amount: amount.toDTO(),
         identifier: identifier,
-        startDate: startDate == null ? null : DateTime.tryParse(startDate!),
-        endDate: endDate == null ? null : DateTime.tryParse(endDate!),
+        startDate: startDate?.toUtc().toIso8601String(),
+        endDate: endDate?.toUtc().toIso8601String(),
       );
 }
 
-extension ApplePaySummaryItemDTOMapper on ApplePaySummaryItemDTO {
-  ApplePaySummaryItem fromDTO() => ApplePaySummaryItem(
-        label: label,
-        amount: amount.fromDTO(),
-        type: type,
+extension ApplePayShippingTypeMapper on ApplePayShippingType {
+  ApplePayShippingTypeDTO toDTO() => switch (this) {
+        ApplePayShippingType.shipping => ApplePayShippingTypeDTO.shipping,
+        ApplePayShippingType.delivery => ApplePayShippingTypeDTO.delivery,
+        ApplePayShippingType.storePickup => ApplePayShippingTypeDTO.storePickup,
+        ApplePayShippingType.servicePickup =>
+          ApplePayShippingTypeDTO.servicePickup,
+      };
+}
+
+extension ApplePayMerchantCapabilityMapper on ApplePayMerchantCapability {
+  ApplePayMerchantCapabilityDTO toDTO() => switch (this) {
+        ApplePayMerchantCapability.debit => ApplePayMerchantCapabilityDTO.debit,
+        ApplePayMerchantCapability.credit =>
+          ApplePayMerchantCapabilityDTO.credit,
+      };
+}
+
+extension ApplePayButtonStyleMapper on ApplePayButtonStyle {
+  ApplePayButtonStyleDTO toDTO() => ApplePayButtonStyleDTO(
+        theme: switch (theme) {
+          ApplePayButtonTheme.white => ApplePayButtonThemeDTO.white,
+          ApplePayButtonTheme.whiteOutline =>
+            ApplePayButtonThemeDTO.whiteWithLine,
+          ApplePayButtonTheme.black => ApplePayButtonThemeDTO.black,
+          ApplePayButtonTheme.automatic => null,
+          null => null,
+        },
+        type: type?.toDTO(),
+        cornerRadius: cornerRadius,
       );
 }
 
-extension ApplePaySummaryItemDTOListMapper on List<ApplePaySummaryItemDTO?> {
-  List<ApplePaySummaryItem> fromDTOs() => whereType<ApplePaySummaryItemDTO>()
-      .map((summaryItem) => summaryItem.fromDTO())
-      .toList();
-}
-
-extension CashAppPayConfigurationMapper on CashAppPayConfiguration {
-  CashAppPayConfigurationDTO toDTO() => CashAppPayConfigurationDTO(
-        cashAppPayEnvironment: cashAppPayEnvironment,
-        returnUrl: returnUrl,
-      );
-}
-
-extension TwintConfigurationMapper on TwintConfiguration {
-  TwintConfigurationDTO toDTO() => TwintConfigurationDTO(
-        iosCallbackAppScheme: iosCallbackAppScheme,
-        showStorePaymentField: showStorePaymentField,
-      );
-}
-
-extension ThreeDS2ConfigurationMapper on ThreeDS2Configuration {
-  ThreeDS2ConfigurationDTO toDTO() {
-    if (theme == null && headingTitle != null) {
-      final headingCustomization =
-          ThreeDS2ToolbarCustomizationDTO(headerText: headingTitle);
-      return ThreeDS2ConfigurationDTO(
-        requestorAppURL: requestorAppURL,
-        uiCustomization: ThreeDS2UICustomizationDTO(
-            headingCustomization: headingCustomization),
-      );
-    }
-
-    return ThreeDS2ConfigurationDTO(
-      requestorAppURL: requestorAppURL,
-      uiCustomization: theme?.toUICustomizationDTO(headingTitle: headingTitle),
-    );
-  }
-}
-
-extension Adyen3DSThemeMapper on Adyen3DSTheme {
-  ThreeDS2UICustomizationDTO toUICustomizationDTO({String? headingTitle}) {
-    return ThreeDS2UICustomizationDTO(
-      screenCustomization: ThreeDS2ScreenCustomizationDTO(
-        backgroundColor: backgroundColor?.toHexString(),
-        textColor: textColor?.toHexString(),
-      ),
-      headingCustomization:
-          createHeadingCustomization(headingTitle: headingTitle),
-      labelCustomization: descriptionTheme?.toDTO(),
-      inputCustomization: inputDecorationTheme?.toDTO(),
-      selectionItemCustomization: selectionItemTheme?.toDTO(),
-      primaryButtonCustomization: primaryButtonTheme?.toDTO(),
-      secondaryButtonCustomization: secondaryButtonTheme?.toDTO(),
-    );
-  }
-
-  ThreeDS2ToolbarCustomizationDTO? createHeadingCustomization(
-      {String? headingTitle}) {
-    final headerTheme = this.headerTheme;
-    if (headerTheme == null && headingTitle == null) {
-      return null;
-    }
-
-    return headerTheme?.toDTO(headingTitle: headingTitle) ??
-        ThreeDS2ToolbarCustomizationDTO(headerText: headingTitle);
-  }
-}
-
-extension Adyen3DSButtonThemeMapper on Adyen3DSButtonTheme {
-  ThreeDS2ButtonCustomizationDTO toDTO() {
-    return ThreeDS2ButtonCustomizationDTO(
-      backgroundColor: backgroundColor?.toHexString(),
-      textColor: textColor?.toHexString(),
-      cornerRadius: cornerRadius?.round(),
-      textFontSize: fontSize?.round(),
-    );
-  }
-}
-
-extension Adyen3DSDescriptionThemeMapper on Adyen3DSDescriptionTheme {
-  ThreeDS2LabelCustomizationDTO toDTO() {
-    return ThreeDS2LabelCustomizationDTO(
-      headingTextColor: titleTextColor?.toHexString(),
-      headingTextFontSize: titleFontSize?.round(),
-      inputLabelTextColor: inputLabelTextColor?.toHexString(),
-      inputLabelFontSize: inputLabelFontSize?.round(),
-      textColor: textColor?.toHexString(),
-      textFontSize: textFontSize?.round(),
-    );
-  }
-}
-
-extension Adyen3DSInputDecorationThemeMapper on Adyen3DSInputDecorationTheme {
-  ThreeDS2InputCustomizationDTO toDTO() {
-    return ThreeDS2InputCustomizationDTO(
-      borderColor: borderColor?.toHexString(),
-      borderWidth: borderWidth?.round(),
-      cornerRadius: cornerRadius?.round(),
-      textColor: textColor?.toHexString(),
-    );
-  }
-}
-
-extension Adyen3DSSelectionItemThemeMapper on Adyen3DSSelectionItemTheme {
-  ThreeDS2SelectionItemCustomizationDTO toDTO() {
-    return ThreeDS2SelectionItemCustomizationDTO(
-      selectionIndicatorTintColor: selectionIndicatorTintColor?.toHexString(),
-      highlightedBackgroundColor: highlightedBackgroundColor?.toHexString(),
-      textColor: textColor?.toHexString(),
-    );
-  }
-}
-
-extension Adyen3DSHeaderThemeMapper on Adyen3DSHeaderTheme {
-  ThreeDS2ToolbarCustomizationDTO toDTO({String? headingTitle}) {
-    return ThreeDS2ToolbarCustomizationDTO(
-      backgroundColor: backgroundColor?.toHexString(),
-      headerText: headingTitle,
-      textColor: textColor?.toHexString(),
-      cancelButtonColor: cancelButtonColor?.toHexString(),
-    );
-  }
-}
-
-extension ColorToHex on Color {
-  String toHexString() {
-    return '#${toARGB32().toRadixString(16).padLeft(8, '0').toUpperCase()}';
-  }
-}
-
-extension SessionMapper on SessionCheckout {
-  SessionDTO toDTO() {
-    final encodedPaymentMethods = jsonEncode(
-      paymentMethods,
-      toEncodable: (value) => throw Exception("Could not encode $value"),
-    );
-
-    return SessionDTO(
-      id: id,
-      paymentMethodsJson: encodedPaymentMethods,
-    );
-  }
-}
-
-extension AmountMapper on Amount {
-  AmountDTO toDTO() => AmountDTO(
-        value: value,
-        currency: currency,
-      );
-}
-
-extension AmountDTOMapper on AmountDTO {
-  Amount fromDTO() => Amount(value: value, currency: currency);
-}
-
-extension OrderResponseMapper on OrderResponseDTO {
-  OrderResponse fromDTO() => OrderResponse(
-        pspReference: pspReference,
-        orderData: orderData,
-      );
-}
-
-extension AddressMapper on Address {
-  AddressDTO toDTO() => AddressDTO(
-        city: city,
-        country: country,
-        houseNumberOrName: houseNumberOrName,
-        postalCode: postalCode,
-        stateOrProvince: stateOrProvince,
-        street: street,
-        apartment: apartment,
-      );
-}
-
-extension AddressDTOMapper on AddressDTO {
-  Address fromDTO() => Address(
-        city: city,
-        country: country,
-        houseNumberOrName: houseNumberOrName,
-        postalCode: postalCode,
-        stateOrProvince: stateOrProvince,
-        street: street,
-        apartment: apartment,
-      );
-}
-
-extension ShopperNameMapper on ShopperName {
-  ShopperNameDTO toDTO() => ShopperNameDTO(
-        firstName: firstName,
-        lastName: lastName,
-        infix: infix,
-        gender: gender,
-      );
-}
-
-extension ShopperNameDTOMapper on ShopperNameDTO {
-  ShopperName fromDTO() => ShopperName(
-        firstName: firstName,
-        lastName: lastName,
-        infix: infix,
-        gender: gender,
-      );
+extension ApplePayButtonTypeMapper on ApplePayButtonType {
+  ApplePayButtonTypeDTO toDTO() => ApplePayButtonTypeDTO.values[index];
 }
 
 extension BeforeSubmitDataMapper on BeforeSubmitData {
@@ -490,15 +301,6 @@ extension BeforeSubmitDataMapper on BeforeSubmitData {
         billingAddress: billingAddress?.toDTO(),
         deliveryAddress: deliveryAddress?.toDTO(),
         shopperName: shopperName?.toDTO(),
-        shopperEmail: shopperEmail,
-      );
-}
-
-extension BeforeSubmitDataDTOMapper on BeforeSubmitDataDTO {
-  BeforeSubmitData fromDTO() => BeforeSubmitData(
-        billingAddress: billingAddress?.fromDTO(),
-        deliveryAddress: deliveryAddress?.fromDTO(),
-        shopperName: shopperName?.fromDTO(),
         shopperEmail: shopperEmail,
       );
 }
@@ -515,73 +317,195 @@ extension BeforeSubmitResultMapper on BeforeSubmitResult {
       };
 }
 
-extension InstantPaymentConfigurationMapper on CheckoutConfiguration {
-  /// Maps to the DTO consumed by the Apple Pay/Google Pay button widgets.
-  ///
-  /// Throws an [ArgumentError] if the configuration matching
-  /// [instantPaymentType] (`applePayConfiguration`/`googlePayConfiguration`)
-  /// or [countryCode] hasn't been set, since both are required to show an
-  /// Apple Pay/Google Pay button.
-  InstantPaymentConfigurationDTO toInstantPaymentConfigurationDTO(
-    String sdkVersionNumber,
-    InstantPaymentType instantPaymentType,
-  ) {
-    final countryCode = this.countryCode;
-    if (countryCode == null) {
-      throw ArgumentError(
-        'CheckoutConfiguration.countryCode must be set to use '
-        'AdyenComponent with an Apple Pay/Google Pay payment method.',
+extension BeforeSubmitDataDTOMapper on BeforeSubmitDataDTO {
+  BeforeSubmitData toModel() => BeforeSubmitData(
+        billingAddress: billingAddress?.toModel(),
+        deliveryAddress: deliveryAddress?.toModel(),
+        shopperName: shopperName?.toModel(),
+        shopperEmail: shopperEmail,
       );
-    }
-
-    return InstantPaymentConfigurationDTO(
-      instantPaymentType: instantPaymentType,
-      environment: environment,
-      clientKey: clientKey,
-      countryCode: countryCode,
-      amount: amount?.toDTO(),
-      shopperLocale: shopperLocale,
-      analyticsOptionsDTO: analyticsOptions?.toDTO(sdkVersionNumber) ??
-          AnalyticsOptionsDTO(enabled: true, version: sdkVersionNumber),
-      googlePayConfigurationDTO: googlePayConfiguration?.toDTO(),
-      applePayConfigurationDTO: applePayConfiguration?.toDTO(),
-    );
-  }
 }
 
-extension MerchantInfoMapper on MerchantInfo {
-  MerchantInfoDTO toDTO() {
-    return MerchantInfoDTO(
-      merchantName: merchantName,
-      merchantId: merchantId,
-    );
-  }
+extension AddressMapper on Address {
+  AddressDTO toDTO() => AddressDTO(
+        city: city,
+        country: country,
+        houseNumberOrName: _joinNonEmpty(houseNumberOrName, apartment),
+        postalCode: postalCode,
+        stateOrProvince: stateOrProvince,
+        street: street,
+      );
 }
 
-extension BillingAddressParametersMapper on BillingAddressParameters {
-  BillingAddressParametersDTO toDTO() {
-    return BillingAddressParametersDTO(
-      format: format,
-      isPhoneNumberRequired: isPhoneNumberRequired,
-    );
-  }
+extension AddressDTOMapper on AddressDTO {
+  Address toModel() => Address(
+        city: city,
+        country: country,
+        houseNumberOrName: houseNumberOrName,
+        postalCode: postalCode,
+        stateOrProvince: stateOrProvince,
+        street: street,
+      );
 }
 
-extension ShippingAddressParametersMapper on ShippingAddressParameters {
-  ShippingAddressParametersDTO toDTO() {
-    return ShippingAddressParametersDTO(
-      allowedCountryCodes: allowedCountryCodes,
-      isPhoneNumberRequired: isPhoneNumberRequired,
-    );
-  }
+extension ShopperNameMapper on ShopperName {
+  ShopperNameDTO toDTO() => ShopperNameDTO(
+        firstName: firstName,
+        lastName: lastName,
+        infix: infix,
+        gender: gender,
+      );
 }
 
-extension EncryptedCardMapper on EncryptedCardDTO {
-  EncryptedCard fromDTO() => EncryptedCard(
-        encryptedCardNumber: encryptedCardNumber,
-        encryptedExpiryMonth: encryptedExpiryMonth,
-        encryptedExpiryYear: encryptedExpiryYear,
-        encryptedSecurityCode: encryptedSecurityCode,
+extension ShopperNameDTOMapper on ShopperNameDTO {
+  ShopperName toModel() => ShopperName(
+        firstName: firstName,
+        lastName: lastName,
+        infix: infix,
+        gender: gender,
+      );
+}
+
+extension ApplePaySummaryItemDTOMapper on ApplePaySummaryItemDTO {
+  ApplePaySummaryItem toModel() => ApplePaySummaryItem(
+        label: label,
+        amount: Amount(value: amount.value, currency: amount.currency),
+        type: switch (type) {
+          ApplePaySummaryItemTypeDTO.pending => ApplePaySummaryItemType.pending,
+          ApplePaySummaryItemTypeDTO.definite =>
+            ApplePaySummaryItemType.definite,
+        },
+      );
+}
+
+extension ApplePayShippingMethodDTOMapper on ApplePayShippingMethodDTO {
+  ApplePayShippingMethod toModel() => ApplePayShippingMethod(
+        label: label,
+        detail: detail,
+        amount: Amount(value: amount.value, currency: amount.currency),
+        identifier: identifier,
+        startDate: startDate == null ? null : DateTime.tryParse(startDate!),
+        endDate: endDate == null ? null : DateTime.tryParse(endDate!),
+      );
+}
+
+extension ApplePayContactDTOMapper on ApplePayContactDTO {
+  ApplePayContact toModel() => ApplePayContact(
+        phoneNumber: phoneNumber,
+        emailAddress: emailAddress,
+        givenName: givenName,
+        familyName: familyName,
+        phoneticGivenName: phoneticGivenName,
+        phoneticFamilyName: phoneticFamilyName,
+        addressLines: addressLines,
+        subLocality: subLocality,
+        city: city,
+        postalCode: postalCode,
+        subAdministrativeArea: subAdministrativeArea,
+        administrativeArea: administrativeArea,
+        country: country,
+        countryCode: countryCode,
+      );
+}
+
+extension ApplePayAuthorizedPaymentDTOMapper on ApplePayAuthorizedPaymentDTO {
+  ApplePayAuthorizedPayment toModel() => ApplePayAuthorizedPayment(
+        token: token,
+        network: network,
+        billingContact: billingContact?.toModel(),
+        shippingContact: shippingContact?.toModel(),
+        shippingMethod: shippingMethod?.toModel(),
+      );
+}
+
+extension ApplePayShippingMethodUpdateMapper on ApplePayShippingMethodUpdate {
+  ApplePayShippingMethodUpdateDTO toDTO() => ApplePayShippingMethodUpdateDTO(
+        summaryItems: summaryItems.map((item) => item.toDTO()).toList(),
+      );
+}
+
+extension ApplePayShippingContactUpdateMapper on ApplePayShippingContactUpdate {
+  ApplePayShippingContactUpdateDTO toDTO() => ApplePayShippingContactUpdateDTO(
+        summaryItems: summaryItems.map((item) => item.toDTO()).toList(),
+        shippingMethods:
+            shippingMethods?.map((method) => method.toDTO()).toList(),
+        errors: errors?.map((error) => error.toDTO()).toList(),
+      );
+}
+
+extension ApplePayCouponCodeUpdateMapper on ApplePayCouponCodeUpdate {
+  ApplePayCouponCodeUpdateDTO toDTO() => ApplePayCouponCodeUpdateDTO(
+        summaryItems: summaryItems.map((item) => item.toDTO()).toList(),
+        shippingMethods:
+            shippingMethods?.map((method) => method.toDTO()).toList(),
+        errors: errors?.map((error) => error.toDTO()).toList(),
+      );
+}
+
+extension ApplePayAuthorizationResultMapper on ApplePayAuthorizationResult {
+  ApplePayAuthorizationResultDTO toDTO() => switch (this) {
+        ApplePayAuthorizationSuccess() =>
+          ApplePayAuthorizationResultDTO(isSuccess: true),
+        ApplePayAuthorizationFailure(errors: final errors) =>
+          ApplePayAuthorizationResultDTO(
+            isSuccess: false,
+            errors: errors.map((error) => error.toDTO()).toList(),
+          ),
+      };
+}
+
+extension ApplePayPaymentErrorMapper on ApplePayPaymentError {
+  ApplePayPaymentErrorDTO toDTO() => ApplePayPaymentErrorDTO(
+        type: switch (type) {
+          ApplePayPaymentErrorType.billingAddress =>
+            ApplePayPaymentErrorTypeDTO.billingAddress,
+          ApplePayPaymentErrorType.shippingAddress =>
+            ApplePayPaymentErrorTypeDTO.shippingAddress,
+          ApplePayPaymentErrorType.contact =>
+            ApplePayPaymentErrorTypeDTO.contact,
+          ApplePayPaymentErrorType.couponCode =>
+            ApplePayPaymentErrorTypeDTO.couponCode,
+          ApplePayPaymentErrorType.shippingAddressUnserviceable =>
+            ApplePayPaymentErrorTypeDTO.shippingAddressUnserviceable,
+          ApplePayPaymentErrorType.couponCodeExpired =>
+            ApplePayPaymentErrorTypeDTO.couponCodeExpired,
+          ApplePayPaymentErrorType.unknown =>
+            ApplePayPaymentErrorTypeDTO.unknown,
+        },
+        field: field?.name,
+        localizedDescription: localizedDescription,
+      );
+}
+
+extension PaymentComponentDataDTOMapper on PaymentComponentDataDTO {
+  PaymentComponentData fromDTO() => PaymentComponentData.fromJson(
+        _decodeObject(dataJson, 'PaymentComponentData'),
+      );
+}
+
+extension ActionComponentDataDTOMapper on ActionComponentDataDTO {
+  ActionComponentData fromDTO() => ActionComponentData.fromJson(
+        _decodeObject(dataJson, 'ActionComponentData'),
+      );
+}
+
+extension CheckoutEventMapper on CheckoutEventDTO {
+  BinLookupData? get mappedBinLookupData =>
+      binLookupData?.isEmpty == true ? null : binLookupData?.first.toModel();
+}
+
+extension BinLookupDataDTOMapper on BinLookupDataDTO {
+  BinLookupData toModel() => BinLookupData(
+        issuingCountryCode: issuingCountryCode,
+        brands: brands.map((brand) => brand.toModel()).toList(),
+      );
+}
+
+extension BinLookupBrandDTOMapper on BinLookupBrandDTO {
+  BinLookupBrand toModel() => BinLookupBrand(
+        brand: brand,
+        supported: supported,
+        paymentMethodVariant: paymentMethodVariant,
       );
 }
 
@@ -594,81 +518,93 @@ extension UnencryptedCardMapper on UnencryptedCard {
       );
 }
 
-extension InstantComponentConfigurationMapper on InstantComponentConfiguration {
-  InstantPaymentConfigurationDTO toDTO(
-    String sdkVersionNumber,
-    InstantPaymentType instantPaymentType,
-  ) =>
-      InstantPaymentConfigurationDTO(
-        instantPaymentType: instantPaymentType,
-        environment: environment,
-        clientKey: clientKey,
-        countryCode: countryCode,
-        amount: amount?.toDTO(),
-        analyticsOptionsDTO: analyticsOptions.toDTO(sdkVersionNumber),
+extension EncryptedCardDTOMapper on EncryptedCardDTO {
+  EncryptedCard toModel() => EncryptedCard(
+        encryptedCardNumber: encryptedCardNumber,
+        encryptedExpiryMonth: encryptedExpiryMonth,
+        encryptedExpiryYear: encryptedExpiryYear,
+        encryptedSecurityCode: encryptedSecurityCode,
       );
 }
 
-extension PaymentResultModelMapper on PaymentResultModelDTO {
-  ResultCode toResultCode() => ResultCode.values.firstWhere(
-        (resultCodeEnum) =>
-            resultCodeEnum.name.toUpperCase() == resultCode?.toUpperCase(),
-        orElse: () => ResultCode.unknown,
+extension SubmitResultMapper on SubmitResult {
+  SubmitResultDTO toDTO() => switch (this) {
+        SubmitCompletion(resultCode: final resultCode) => SubmitResultDTO(
+            type: SubmitResultTypeDTO.completion,
+            resultCode: resultCode,
+          ),
+        SubmitAction(action: final action) => SubmitResultDTO(
+            type: SubmitResultTypeDTO.action,
+            actionJson: jsonEncode(action.data),
+          ),
+        SubmitRetry(errorMessage: final errorMessage) => SubmitResultDTO(
+            type: SubmitResultTypeDTO.retry,
+            errorMessage: errorMessage,
+          ),
+      };
+}
+
+extension AdditionalDetailsResultMapper on AdditionalDetailsResult {
+  AdditionalDetailsResultDTO toDTO() => switch (this) {
+        AdditionalDetailsCompletion(resultCode: final resultCode) =>
+          AdditionalDetailsResultDTO(resultCode: resultCode),
+      };
+}
+
+extension CheckoutSetupResultMapper on CheckoutSetupResultDTO {
+  PaymentMethodsParts toPaymentMethods() => PaymentMethodsParts(
+        regular:
+            _decodeList(regularPaymentMethodsJson, 'regular payment methods'),
+        stored: _decodeStoredList(
+          storedPaymentMethodsJson,
+          'stored payment methods',
+        ),
       );
 }
 
-extension ActionComponentConfigurationMapper on ActionComponentConfiguration {
-  ActionComponentConfigurationDTO toDTO(String sdkVersionNumber) =>
-      ActionComponentConfigurationDTO(
-        environment: environment,
-        clientKey: clientKey,
-        shopperLocale: shopperLocale,
-        amount: amount?.toDTO(),
-        analyticsOptionsDTO: analyticsOptions.toDTO(sdkVersionNumber),
-        threeDS2ConfigurationDTO: threeDS2Configuration?.toDTO(),
-      );
+class PaymentMethodsParts {
+  final List<PaymentMethod> regular;
+  final List<StoredPaymentMethod> stored;
+
+  const PaymentMethodsParts({
+    required this.regular,
+    required this.stored,
+  });
 }
 
-extension OrderCancelResponseMapper on OrderCancelResult {
-  OrderCancelResultDTO toDTO() => OrderCancelResultDTO(
-        orderCancelResponseBody: orderCancelResponseBody,
-        updatedPaymentMethodsResponseBody: updatedPaymentMethodsResponseBody,
-      );
-}
-
-extension BinLookupDataMapper on Iterable<BinLookupDataDTO> {
-  List<BinLookupData> toBinLookupDataList() =>
-      map((entry) => BinLookupData(brand: entry.brand)).toList();
-}
-
-extension CheckoutConfigurationMapper on CheckoutConfiguration {
-  CheckoutConfigurationDTO toDTO() {
-    const sdkVersionNumber = "2.0.0";
-    return CheckoutConfigurationDTO(
-      environment: environment,
-      clientKey: clientKey,
-      countryCode: countryCode,
-      amount: amount?.toDTO(),
-      shopperLocale: shopperLocale,
-      analyticsOptionsDTO: analyticsOptions?.toDTO(sdkVersionNumber) ??
-          AnalyticsOptionsDTO(enabled: true, version: sdkVersionNumber),
-      cardConfigurationDTO: cardConfiguration?.toDTO(),
-      applePayConfigurationDTO: applePayConfiguration?.toDTO(),
-      googlePayConfigurationDTO: googlePayConfiguration?.toDTO(),
-      cashAppPayConfigurationDTO: cashAppPayConfiguration?.toDTO(),
-      twintConfigurationDTO: twintConfiguration?.toDTO(),
-      threeDS2ConfigurationDTO: threeDS2Configuration?.toDTO(),
-      dropInConfigurationDTO: dropInConfiguration?.toDTO(
-        sdkVersionNumber,
-        false,
-      ),
-    );
+Map<String, dynamic> _decodeObject(String json, String name) {
+  final decoded = jsonDecode(json);
+  if (decoded is! Map) {
+    throw FormatException('$name must be a JSON object.');
   }
+  return Map<String, dynamic>.from(decoded);
 }
 
-extension SessionResponseMapper on SessionResponse {
-  SessionResponseDTO toDTO() => SessionResponseDTO(
-        id: id,
-        sessionData: sessionData,
-      );
+List<PaymentMethod> _decodeList(String json, String name) {
+  final decoded = jsonDecode(json);
+  if (decoded is! List) {
+    throw FormatException('$name must be a JSON list.');
+  }
+  return decoded
+      .map((item) => PaymentMethod.fromJson(Map<String, dynamic>.from(item)))
+      .toList();
+}
+
+List<StoredPaymentMethod> _decodeStoredList(String json, String name) {
+  final decoded = jsonDecode(json);
+  if (decoded is! List) {
+    throw FormatException('$name must be a JSON list.');
+  }
+  return decoded
+      .map((item) =>
+          StoredPaymentMethod.fromJson(Map<String, dynamic>.from(item)))
+      .toList();
+}
+
+String? _joinNonEmpty(String? first, String? second) {
+  final values = [first, second]
+      .whereType<String>()
+      .where((value) => value.isNotEmpty)
+      .toList();
+  return values.isEmpty ? null : values.join(' ');
 }

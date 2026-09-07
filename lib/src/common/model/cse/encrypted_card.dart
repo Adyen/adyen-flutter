@@ -4,7 +4,7 @@ class EncryptedCard {
   final String? encryptedExpiryYear;
   final String? encryptedSecurityCode;
 
-  EncryptedCard({
+  const EncryptedCard({
     this.encryptedCardNumber,
     this.encryptedExpiryMonth,
     this.encryptedExpiryYear,
@@ -12,11 +12,5 @@ class EncryptedCard {
   });
 
   @override
-  String toString() {
-    return 'EncryptedCard('
-        'encryptedCardNumber: $encryptedCardNumber, '
-        'encryptedExpiryMonth: $encryptedExpiryMonth, '
-        'encryptedExpiryYear: $encryptedExpiryYear, '
-        'encryptedSecurityCode: $encryptedSecurityCode)';
-  }
+  String toString() => 'EncryptedCard(<redacted>)';
 }

@@ -12,10 +12,8 @@ class InstallmentConfiguration {
   });
 
   @override
-  String toString() {
-    return 'InstallmentConfiguration('
-        'defaultOptions: $defaultOptions, '
-        'cardBasedOptions: $cardBasedOptions, '
-        'showInstallmentAmount: $showInstallmentAmount)';
-  }
+  String toString() => 'InstallmentConfiguration('
+      'defaultOptions: $defaultOptions, '
+      'cardBasedOptions: $cardBasedOptions, '
+      'showInstallmentAmount: $showInstallmentAmount)';
 }

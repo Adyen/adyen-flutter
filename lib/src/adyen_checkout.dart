@@ -1,138 +1,95 @@
-import 'dart:async';
+import 'checkout_coordinator.dart';
+import 'common/model/action.dart';
+import 'common/model/action_component_data.dart';
+import 'common/model/checkout_callbacks.dart';
+import 'common/model/checkout_configuration.dart';
+import 'common/model/checkout.dart';
+import 'common/model/checkout_results.dart';
+import 'common/model/cse/encrypted_card.dart';
+import 'common/model/cse/unencrypted_card.dart';
+import 'common/model/payment_methods.dart';
+import 'common/model/session_response.dart';
 
-import 'package:adyen_checkout/adyen_checkout.dart';
-import 'package:adyen_checkout/src/adyen_checkout_interface.dart';
-import 'package:adyen_checkout/src/common/adyen_checkout_api.dart';
-import 'package:adyen_checkout/src/common/adyen_checkout_session.dart';
-import 'package:adyen_checkout/src/components/action_handling/action_component.dart';
-import 'package:adyen_checkout/src/drop_in/drop_in.dart';
-import 'package:adyen_checkout/src/drop_in/drop_in_flutter.dart';
-import 'package:adyen_checkout/src/drop_in/drop_in_platform_api.dart';
-import 'package:adyen_checkout/src/generated/platform_api.g.dart';
-import 'package:adyen_checkout/src/logging/adyen_logger.dart';
-import 'package:adyen_checkout/src/util/dto_mapper.dart';
-import 'package:adyen_checkout/src/util/sdk_version_number_provider.dart';
-import 'package:flutter/foundation.dart';
+abstract final class Checkout {
+  static CheckoutCoordinator get _coordinator => CheckoutCoordinator.shared;
 
-class AdyenCheckout implements AdyenCheckoutInterface {
-  static AdyenCheckout? _instance;
-  static AdyenCheckoutSession? _session;
-  static AdyenCheckoutAdvanced? _advanced;
-  static final AdyenCheckoutApi _adyenCheckoutApi = AdyenCheckoutApi();
-  static final DropIn _dropIn = DropIn(
-    SdkVersionNumberProvider.instance,
-    DropInFlutter(),
-    DropInPlatformApi(),
-  );
+  static Future<SessionCheckout> setupSession({
+    required SessionResponse sessionResponse,
+    required CheckoutConfiguration configuration,
+    required SessionCheckoutCallbacks callbacks,
+  }) =>
+      _coordinator.setupSession(
+        sessionResponse: sessionResponse,
+        configuration: configuration,
+        callbacks: callbacks,
+      );
 
-  static AdyenCheckout get instance => _instance ??= AdyenCheckout._init();
+  static Future<AdvancedCheckout> setupAdvanced({
+    required PaymentMethods paymentMethods,
+    required CheckoutConfiguration configuration,
+    required AdvancedCheckoutCallbacks callbacks,
+  }) =>
+      _coordinator.setupAdvanced(
+        paymentMethods: paymentMethods,
+        configuration: configuration,
+        callbacks: callbacks,
+      );
 
-  static AdyenCheckoutAdvanced get advanced =>
-      _advanced ??= AdyenCheckoutAdvanced(_adyenCheckoutApi, _dropIn);
+  static Future<AdvancedCheckoutResult> handleAction({
+    required Action action,
+    required CheckoutConfiguration configuration,
+    required Future<AdditionalDetailsResult> Function(
+      ActionComponentData data,
+    ) onAdditionalDetails,
+  }) =>
+      _coordinator.handleAction(
+        action: action,
+        configuration: configuration,
+        onAdditionalDetails: onAdditionalDetails,
+      );
 
-  static AdyenCheckoutSession get session =>
-      _session ??= AdyenCheckoutSession(_adyenCheckoutApi, _dropIn);
+  static Future<void> enableConsoleLogging({required bool enabled}) =>
+      _coordinator.enableConsoleLogging(enabled: enabled);
 
-  AdyenCheckout._init();
+  static Future<EncryptedCard> encryptCard({
+    required UnencryptedCard card,
+    required String publicKey,
+  }) =>
+      _coordinator.encryptCard(card: card, publicKey: publicKey);
 
-  @override
-  Future<String> getReturnUrl() async => _adyenCheckoutApi.getReturnUrl();
+  static Future<String> encryptBin({
+    required String bin,
+    required String publicKey,
+  }) =>
+      _coordinator.encryptBin(bin: bin, publicKey: publicKey);
 
-  @override
-  void enableConsoleLogging({required bool enabled}) {
-    if (kDebugMode) {
-      AdyenLogger.instance.enableConsoleLogging(loggingEnabled: enabled);
-      _adyenCheckoutApi.enableConsoleLogging(enabled);
-    }
-  }
-
-  @override
-  Future<EncryptedCard> encryptCard(
-    UnencryptedCard unencryptedCard,
-    String publicKey,
-  ) async {
-    final unencryptedCardDTO = unencryptedCard.toDTO();
-    final encryptedCardDTO =
-        await _adyenCheckoutApi.encryptCard(unencryptedCardDTO, publicKey);
-    return encryptedCardDTO.fromDTO();
-  }
-
-  @override
-  Future<String> encryptBin(
-    String bin,
-    String publicKey,
-  ) =>
-      _adyenCheckoutApi.encryptBin(bin, publicKey);
-
-  @override
-  Future<ActionResult> handleAction(
-    ActionComponentConfiguration actionComponentConfiguration,
-    Map<String, dynamic> action,
-  ) =>
-      ActionComponent().handleAction(actionComponentConfiguration, action);
-
-  @override
-  Future<CardNumberValidationResult> validateCardNumber({
+  static Future<bool> validateCardNumber({
     required String cardNumber,
     bool enableLuhnCheck = true,
-  }) async {
-    final CardNumberValidationResultDTO cardNumberValidation =
-        await _adyenCheckoutApi.validateCardNumber(
-      cardNumber,
-      enableLuhnCheck,
-    );
+  }) =>
+      _coordinator.validateCardNumber(
+        cardNumber: cardNumber,
+        enableLuhnCheck: enableLuhnCheck,
+      );
 
-    return switch (cardNumberValidation) {
-      CardNumberValidationResultDTO.valid => ValidCardNumber(),
-      CardNumberValidationResultDTO.invalidLuhnCheck ||
-      CardNumberValidationResultDTO.invalidIllegalCharacters ||
-      CardNumberValidationResultDTO.invalidTooShort ||
-      CardNumberValidationResultDTO.invalidTooLong ||
-      CardNumberValidationResultDTO.invalidOtherReason =>
-        InvalidCardNumberOtherReason()
-    };
-  }
-
-  @override
-  Future<CardExpiryDateValidationResult> validateCardExpiryDate({
+  static Future<bool> validateCardExpiryDate({
     required String expiryMonth,
     required String expiryYear,
-  }) async {
-    final CardExpiryDateValidationResultDTO cardExpiryDateValidationResultDTO =
-        await _adyenCheckoutApi.validateCardExpiryDate(
-      expiryMonth,
-      expiryYear,
-    );
+  }) =>
+      _coordinator.validateCardExpiryDate(
+        expiryMonth: expiryMonth,
+        expiryYear: expiryYear,
+      );
 
-    return switch (cardExpiryDateValidationResultDTO) {
-      CardExpiryDateValidationResultDTO.valid => ValidCardExpiryDate(),
-      CardExpiryDateValidationResultDTO.invalidTooFarInTheFuture ||
-      CardExpiryDateValidationResultDTO.invalidTooOld ||
-      CardExpiryDateValidationResultDTO.nonParseableDate ||
-      CardExpiryDateValidationResultDTO.invalidOtherReason =>
-        InvalidCardExpiryDateOtherReason()
-    };
-  }
-
-  @override
-  Future<CardSecurityCodeValidationResult> validateCardSecurityCode({
+  static Future<bool> validateCardSecurityCode({
     required String securityCode,
     String? cardBrand,
-  }) async {
-    final CardSecurityCodeValidationResultDTO
-        cardSecurityCodeValidationResultDTO =
-        await _adyenCheckoutApi.validateCardSecurityCode(
-      securityCode,
-      cardBrand,
-    );
+  }) =>
+      _coordinator.validateCardSecurityCode(
+        securityCode: securityCode,
+        cardBrand: cardBrand,
+      );
 
-    return switch (cardSecurityCodeValidationResultDTO) {
-      CardSecurityCodeValidationResultDTO.valid => ValidCardSecurityCode(),
-      CardSecurityCodeValidationResultDTO.invalid => InvalidCardSecurityCode()
-    };
-  }
-
-  @override
-  Future<String> getThreeDS2SdkVersion() async =>
-      _adyenCheckoutApi.getThreeDS2SdkVersion();
+  static Future<String> getThreeDS2SdkVersion() =>
+      _coordinator.getThreeDS2SdkVersion();
 }

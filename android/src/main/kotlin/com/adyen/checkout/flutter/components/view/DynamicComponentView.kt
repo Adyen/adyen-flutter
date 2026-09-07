@@ -2,268 +2,134 @@ package com.adyen.checkout.flutter.components.view
 
 import android.content.Context
 import android.util.AttributeSet
-import android.view.ViewGroup
-import android.view.ViewTreeObserver
 import android.widget.FrameLayout
 import androidx.activity.ComponentActivity
-import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.appcompat.widget.SwitchCompat
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
-import androidx.core.content.ContextCompat
-import androidx.core.view.children
-import androidx.core.view.postDelayed
-import androidx.navigationevent.NavigationEventDispatcherOwner
-import androidx.navigationevent.compose.LocalNavigationEventDispatcherOwner
-import androidx.navigationevent.compose.rememberNavigationEventDispatcherOwner
-import androidx.navigationevent.findViewTreeNavigationEventDispatcherOwner
-import com.adyen.checkout.components.core.internal.ButtonComponent
-import com.adyen.checkout.components.core.internal.Component
 import com.adyen.checkout.core.common.CheckoutContext
-import com.adyen.checkout.core.components.CheckoutCallbacks
-import com.adyen.checkout.core.components.CheckoutPaymentMethod
-import com.adyen.checkout.core.components.CheckoutTarget
-import com.adyen.checkout.core.components.CheckoutController
 import com.adyen.checkout.core.components.AdvancedCheckoutCallbacks
+import com.adyen.checkout.core.components.CheckoutCallbacks
+import com.adyen.checkout.core.components.CheckoutController
 import com.adyen.checkout.core.components.CheckoutPaymentFlow
+import com.adyen.checkout.core.components.CheckoutTarget
 import com.adyen.checkout.core.components.SessionCheckoutCallbacks
 import com.adyen.checkout.core.components.data.model.paymentmethod.PaymentMethodResponse
 import com.adyen.checkout.core.components.data.model.paymentmethod.StoredPaymentMethod
+import com.adyen.checkout.flutter.components.CheckoutComponentRegistry
 import com.adyen.checkout.flutter.components.ComponentPlatformEventHandler
-import com.adyen.checkout.flutter.generated.ComponentCommunicationModel
-import com.adyen.checkout.flutter.generated.ComponentCommunicationType
-import com.adyen.checkout.ui.core.old.AdyenComponentView
-import com.adyen.checkout.ui.core.old.internal.ui.ViewableComponent
-import com.google.android.material.button.MaterialButton
-import com.google.android.material.textfield.TextInputLayout
+import com.adyen.checkout.flutter.generated.CheckoutEventDTO
+import com.adyen.checkout.flutter.generated.CheckoutEventTypeDTO
 
-class DynamicComponentView
-    @JvmOverloads
+internal class DynamicComponentView @JvmOverloads constructor(
+    context: Context,
+    attrs: AttributeSet? = null,
+    defStyle: Int = 0,
+) : FrameLayout(context, attrs, defStyle) {
+    private val screenDensity = resources.displayMetrics.density
+    private var checkoutId = ""
+    private var componentId = ""
+    private var eventHandler: ComponentPlatformEventHandler? = null
+
     constructor(
         context: Context,
-        attrs: AttributeSet? = null,
-        defStyle: Int = 0,
-    ) : FrameLayout(context) {
-        private val screenDensity = resources.displayMetrics.density
-        private var componentId: String = ""
-        private var ignoreLayoutChanges = false
-        private var interactionBlocked = false
-        private var platformEventHandler: ComponentPlatformEventHandler? = null
+        checkoutId: String,
+        componentId: String,
+        eventHandler: ComponentPlatformEventHandler,
+    ) : this(context) {
+        this.checkoutId = checkoutId
+        this.componentId = componentId
+        this.eventHandler = eventHandler
+    }
 
-        constructor(
-            context: Context,
-            componentId: String,
-            platformEventHandler: ComponentPlatformEventHandler,
-        ) : this(context) {
-            this.componentId = componentId
-            this.platformEventHandler = platformEventHandler
-        }
+    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+        val heightSize = MeasureSpec.getSize(heightMeasureSpec)
+        super.onMeasure(widthMeasureSpec, heightSize)
+    }
 
-        // Usage of complete component height also when having error hints
-        override fun onMeasure(
-            widthMeasureSpec: Int,
-            heightMeasureSpec: Int
-        ) {
-            val heightSize = MeasureSpec.getSize(heightMeasureSpec)
-            super.onMeasure(widthMeasureSpec, heightSize)
-        }
-
-        override fun onLayout(
-            changed: Boolean,
-            l: Int,
-            t: Int,
-            r: Int,
-            b: Int
-        ) {
-            super.onLayout(changed, l, t, r, b)
-
-            if (changed && !ignoreLayoutChanges) {
-                resizeFlutterViewport(calculateFlutterViewportHeight())
-            }
-        }
-
-        fun addV6Component(
-            activity: ComponentActivity,
-            paymentMethod: PaymentMethodResponse,
-            checkoutContext: CheckoutContext,
-            callbacks: CheckoutCallbacks
-        ) {
-            val navigationEventDispatcherOwner =
-                activity.window
-                    ?.decorView
-                    ?.findViewTreeNavigationEventDispatcherOwner()
-
-            // A stored payment method is targeted by its id (it does not appear in the
-            // regular payment methods list), while a regular payment method is targeted by
-            // its type.
-            val target =
-                when (paymentMethod) {
-                    is StoredPaymentMethod -> CheckoutTarget.StoredPaymentMethod(paymentMethod.id)
-                    else -> CheckoutTarget.PaymentMethod(paymentMethod.type.orEmpty())
-                }
-
-            addView(
-                ComposeView(activity).apply {
-                    setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
-                    setContent {
-                        ProvideNavigationEventDispatcherOwner(navigationEventDispatcherOwner) {
-                            val coroutineScope = rememberCoroutineScope()
-                            val controller =
-                                remember(target, checkoutContext, callbacks) {
-                                    if (checkoutContext is CheckoutContext.Advanced && callbacks is AdvancedCheckoutCallbacks) {
-                                        CheckoutController(
-                                            target = target,
-                                            context = checkoutContext,
-                                            callbacks = callbacks,
-                                            coroutineScope = coroutineScope,
-                                        )
-                                    } else if (checkoutContext is CheckoutContext.Sessions && callbacks is SessionCheckoutCallbacks) {
-                                        CheckoutController(
-                                            target = target,
-                                            context = checkoutContext,
-                                            callbacks = callbacks,
-                                            coroutineScope = coroutineScope,
-                                        )
-                                    } else {
-                                        throw IllegalArgumentException("Invalid combination of CheckoutContext and CheckoutCallbacks")
-                                    }
-                                }
-                            CheckoutPaymentFlow(controller)
-//                            CheckoutPaymentMethod(controller = controller, onNavigate = { route ->
-//                                println("route: $route")
-//                            })
-                        }
-                    }
-                }
-            )
-        }
-
-        @androidx.compose.runtime.Composable
-        private fun ProvideNavigationEventDispatcherOwner(
-            parentOwner: NavigationEventDispatcherOwner?,
-            content: @androidx.compose.runtime.Composable () -> Unit
-        ) {
-            val navigationEventDispatcherOwner =
-                rememberNavigationEventDispatcherOwner(parent = parentOwner)
-            CompositionLocalProvider(
-                LocalNavigationEventDispatcherOwner provides navigationEventDispatcherOwner,
-                content = content
-            )
-        }
-
-        fun onDispose() {
-            ignoreLayoutChanges = false
-            interactionBlocked = false
-        }
-
-        private fun <T> onComponentViewGlobalLayout(
-            adyenComponentView: AdyenComponentView,
-            component: T
-        ) where T : Component, T : ViewableComponent {
-            adyenComponentView.getViewTreeObserver()?.addOnGlobalLayoutListener(
-                object : ViewTreeObserver.OnGlobalLayoutListener {
-                    override fun onGlobalLayout() {
-                        if (component is ButtonComponent) {
-                            overrideSubmit(component)
-                        }
-
-                        adyenComponentView.getViewTreeObserver()?.removeOnGlobalLayoutListener(this)
-                    }
-                }
-            )
-        }
-
-        private fun overrideSubmit(component: ButtonComponent) {
-            val payButton = findViewById<MaterialButton>(com.adyen.checkout.ui.core.R.id.payButton)
-            if (android.os.Build.VERSION.SDK_INT <= android.os.Build.VERSION_CODES.O) {
-                disableRippleAnimationOnPayButton()
-                disableRippleAnimationOnStorePaymentMethodSwitch()
-            }
-
-            payButton?.setOnClickListener {
-                isHintAnimationEnabledOnTextInputFields(this, false)
-                ignoreLayoutChanges = true
-                if (!interactionBlocked) {
-                    interactionBlocked = true
-                    component.submit()
-                }
-                resetInteractionBlocked()
-                postDelayed(100) {
-                    resizeFlutterViewport(calculateFlutterViewportHeight())
-                }
-                postDelayed(500) {
-                    ignoreLayoutChanges = false
-                    isHintAnimationEnabledOnTextInputFields(this, true)
-                }
-            }
-        }
-
-        // This is necessary because the RippleAnimation leads to an crash on older Android devices: https://github.com/Adyen/adyen-flutter/issues/335
-        private fun disableRippleAnimationOnPayButton() {
-            findViewById<MaterialButton>(com.adyen.checkout.ui.core.R.id.payButton)?.let { payButton ->
-                payButton.backgroundTintList = null
-                payButton.background =
-                    ContextCompat.getDrawable(
-                        context,
-                        com.adyen.checkout.flutter.R.drawable.adyen_legacy_pay_button_background
-                    )
-            }
-
-            findViewById<FrameLayout>(
-                com.adyen.checkout.ui.core.R.id.frameLayout_buttonContainer
-            )?.let { buttonContainer ->
-                val standardQuarterMargin =
-                    resources.getDimension(com.adyen.checkout.ui.core.R.dimen.standard_quarter_margin).toInt()
-                buttonContainer.setPadding(0, standardQuarterMargin, 0, standardQuarterMargin)
-            }
-        }
-
-        // This is necessary because the RippleAnimation leads to an crash on older Android devices: https://github.com/Adyen/adyen-flutter/issues/335
-        private fun disableRippleAnimationOnStorePaymentMethodSwitch() {
-            findViewById<SwitchCompat>(com.adyen.checkout.card.R.id.switch_storePaymentMethod)?.let { switch ->
-                switch.backgroundTintList = null
-                switch.background =
-                    ContextCompat.getDrawable(
-                        context,
-                        com.adyen.checkout.flutter.R.drawable.adyen_legacy_switch_background
-                    )
-            }
-        }
-
-        private fun calculateFlutterViewportHeight(): Int {
-            val componentViewHeightScreenDensity = measuredHeight / screenDensity
-            return componentViewHeightScreenDensity.toInt()
-        }
-
-        private fun resizeFlutterViewport(viewportHeight: Int) {
-            platformEventHandler?.eventSink?.success(
-                ComponentCommunicationModel(
-                    type = ComponentCommunicationType.RESIZE,
-                    componentId = componentId,
-                    data = viewportHeight
-                )
-            )
-        }
-
-        private fun isHintAnimationEnabledOnTextInputFields(
-            viewGroup: ViewGroup,
-            enabled: Boolean
-        ) {
-            viewGroup.children.forEach { child ->
-                when (child) {
-                    is TextInputLayout -> child.isHintAnimationEnabled = enabled
-                    !is ViewGroup -> Unit
-                    else -> isHintAnimationEnabledOnTextInputFields(child, enabled)
-                }
-            }
-        }
-
-        // TODO - We can use cardComponent.setInteractionBlocked() when the fix for releasing the blocked interaction is available in then native SDK
-        private fun resetInteractionBlocked() {
-            postDelayed(1000) {
-                interactionBlocked = false
-            }
+    override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
+        super.onLayout(changed, left, top, right, bottom)
+        if (changed) {
+            sendResize()
         }
     }
+
+    fun addV6Component(
+        activity: ComponentActivity,
+        paymentMethod: PaymentMethodResponse,
+        checkoutContext: CheckoutContext,
+        callbacks: CheckoutCallbacks,
+    ) {
+        val target = when (paymentMethod) {
+            is StoredPaymentMethod -> CheckoutTarget.StoredPaymentMethod(paymentMethod.id)
+            else -> CheckoutTarget.PaymentMethod(paymentMethod.type.orEmpty())
+        }
+
+        addView(
+            ComposeView(activity).apply {
+                setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+                setContent {
+                    val coroutineScope = rememberCoroutineScope()
+                    val controller = remember(target, checkoutContext, callbacks) {
+                        when {
+                            checkoutContext is CheckoutContext.Advanced && callbacks is AdvancedCheckoutCallbacks ->
+                                CheckoutController(
+                                    target = target,
+                                    context = checkoutContext,
+                                    callbacks = callbacks,
+                                    coroutineScope = coroutineScope,
+                                )
+
+                            checkoutContext is CheckoutContext.Sessions && callbacks is SessionCheckoutCallbacks ->
+                                CheckoutController(
+                                    target = target,
+                                    context = checkoutContext,
+                                    callbacks = callbacks,
+                                    coroutineScope = coroutineScope,
+                                )
+
+                            else -> throw IllegalArgumentException(
+                                "Invalid checkout context and callback combination.",
+                            )
+                        }
+                    }
+
+                    DisposableEffect(controller) {
+                        CheckoutComponentRegistry.register(checkoutId, componentId, controller)
+                        eventHandler?.send(
+                            CheckoutEventDTO(
+                                type = CheckoutEventTypeDTO.COMPONENT_READY,
+                                checkoutId = checkoutId,
+                                componentId = componentId,
+                                requiresUserInteraction = controller.requiresUserInteraction(),
+                            ),
+                        )
+                        onDispose {
+                            CheckoutComponentRegistry.unregister(checkoutId, componentId)
+                        }
+                    }
+
+                    CheckoutPaymentFlow(controller = controller)
+                }
+            },
+        )
+    }
+
+    fun onDispose() {
+        removeAllViews()
+        eventHandler = null
+    }
+
+    private fun sendResize() {
+        eventHandler?.send(
+            CheckoutEventDTO(
+                type = CheckoutEventTypeDTO.RESIZE,
+                checkoutId = checkoutId,
+                componentId = componentId,
+                height = (measuredHeight / screenDensity).toLong(),
+            ),
+        )
+    }
+}

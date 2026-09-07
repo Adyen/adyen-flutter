@@ -1,0 +1,4 @@
+enum ApplePaySummaryItemType {
+  pending,
+  definite,
+}

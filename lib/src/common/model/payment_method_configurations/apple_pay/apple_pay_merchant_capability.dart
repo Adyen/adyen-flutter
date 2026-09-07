@@ -1,0 +1,4 @@
+enum ApplePayMerchantCapability {
+  debit,
+  credit,
+}

@@ -33,5 +33,5 @@ class Config {
       GooglePayEnvironment.test;
 
   //Example data
-  static Amount amount = Amount(currency: "EUR", value: 11295);
+  static const Amount amount = Amount(currency: "EUR", value: 11295);
 }

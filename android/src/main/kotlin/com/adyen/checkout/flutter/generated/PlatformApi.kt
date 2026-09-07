@@ -81,7 +81,7 @@ class AdyenPigeonError (
   val details: Any? = null
 ) : Throwable()
 
-enum class Environment(val raw: Int) {
+enum class EnvironmentDTO(val raw: Int) {
   TEST(0),
   LIVE_EUROPE(1),
   LIVE_UNITED_STATES(2),
@@ -91,189 +91,94 @@ enum class Environment(val raw: Int) {
   LIVE_NEA(6);
 
   companion object {
-    fun ofRaw(raw: Int): Environment? {
+    fun ofRaw(raw: Int): EnvironmentDTO? {
       return values().firstOrNull { it.raw == raw }
     }
   }
 }
 
-enum class AddressMode(val raw: Int) {
-  FULL(0),
-  POSTAL_CODE(1),
-  NONE(2);
+enum class BillingAddressModeDTO(val raw: Int) {
+  NONE(0),
+  POSTAL_CODE(1);
 
   companion object {
-    fun ofRaw(raw: Int): AddressMode? {
+    fun ofRaw(raw: Int): BillingAddressModeDTO? {
       return values().firstOrNull { it.raw == raw }
     }
   }
 }
 
-enum class CardAuthMethod(val raw: Int) {
-  PAN_ONLY(0),
-  CRYPTOGRAM3DS(1);
+enum class FieldVisibilityDTO(val raw: Int) {
+  SHOW(0),
+  HIDE(1),
+  AUTO(2);
 
   companion object {
-    fun ofRaw(raw: Int): CardAuthMethod? {
+    fun ofRaw(raw: Int): FieldVisibilityDTO? {
       return values().firstOrNull { it.raw == raw }
     }
   }
 }
 
-enum class TotalPriceStatus(val raw: Int) {
+enum class GooglePayEnvironmentDTO(val raw: Int) {
+  TEST(0),
+  PRODUCTION(1);
+
+  companion object {
+    fun ofRaw(raw: Int): GooglePayEnvironmentDTO? {
+      return values().firstOrNull { it.raw == raw }
+    }
+  }
+}
+
+enum class TotalPriceStatusDTO(val raw: Int) {
   NOT_CURRENTLY_KNOWN(0),
   ESTIMATED(1),
   FINAL_PRICE(2);
 
   companion object {
-    fun ofRaw(raw: Int): TotalPriceStatus? {
+    fun ofRaw(raw: Int): TotalPriceStatusDTO? {
       return values().firstOrNull { it.raw == raw }
     }
   }
 }
 
-enum class GooglePayEnvironment(val raw: Int) {
-  TEST(0),
-  PRODUCTION(1);
-
-  companion object {
-    fun ofRaw(raw: Int): GooglePayEnvironment? {
-      return values().firstOrNull { it.raw == raw }
-    }
-  }
-}
-
-enum class CashAppPayEnvironment(val raw: Int) {
-  SANDBOX(0),
-  PRODUCTION(1);
-
-  companion object {
-    fun ofRaw(raw: Int): CashAppPayEnvironment? {
-      return values().firstOrNull { it.raw == raw }
-    }
-  }
-}
-
-enum class PaymentResultEnum(val raw: Int) {
-  CANCELLED_BY_USER(0),
-  ERROR(1),
-  FINISHED(2);
-
-  companion object {
-    fun ofRaw(raw: Int): PaymentResultEnum? {
-      return values().firstOrNull { it.raw == raw }
-    }
-  }
-}
-
-enum class CheckoutEventType(val raw: Int) {
-  SUBMIT(0),
-  ADDITIONAL_DETAILS(1),
-  RESULT(2),
-  DELETE_STORED_PAYMENT_METHOD(3),
-  BALANCE_CHECK(4),
-  REQUEST_ORDER(5),
-  CANCEL_ORDER(6),
-  BIN_LOOKUP(7),
-  BIN_VALUE(8);
-
-  companion object {
-    fun ofRaw(raw: Int): CheckoutEventType? {
-      return values().firstOrNull { it.raw == raw }
-    }
-  }
-}
-
-enum class ComponentCommunicationType(val raw: Int) {
-  ON_SUBMIT(0),
-  ADDITIONAL_DETAILS(1),
-  LOADING(2),
-  RESULT(3),
-  RESIZE(4),
-  BIN_LOOKUP(5),
-  BIN_VALUE(6),
-  AVAILABILITY(7),
-  BUTTON_PRESSED(8);
-
-  companion object {
-    fun ofRaw(raw: Int): ComponentCommunicationType? {
-      return values().firstOrNull { it.raw == raw }
-    }
-  }
-}
-
-enum class PaymentEventType(val raw: Int) {
-  FINISHED(0),
-  ACTION(1),
-  ERROR(2),
-  UPDATE(3);
-
-  companion object {
-    fun ofRaw(raw: Int): PaymentEventType? {
-      return values().firstOrNull { it.raw == raw }
-    }
-  }
-}
-
-enum class FieldVisibility(val raw: Int) {
-  SHOW(0),
-  HIDE(1);
-
-  companion object {
-    fun ofRaw(raw: Int): FieldVisibility? {
-      return values().firstOrNull { it.raw == raw }
-    }
-  }
-}
-
-enum class InstantPaymentType(val raw: Int) {
-  GOOGLE_PAY(0),
-  APPLE_PAY(1),
-  INSTANT(2);
-
-  companion object {
-    fun ofRaw(raw: Int): InstantPaymentType? {
-      return values().firstOrNull { it.raw == raw }
-    }
-  }
-}
-
-enum class ApplePayShippingType(val raw: Int) {
+enum class ApplePayShippingTypeDTO(val raw: Int) {
   SHIPPING(0),
   DELIVERY(1),
   STORE_PICKUP(2),
   SERVICE_PICKUP(3);
 
   companion object {
-    fun ofRaw(raw: Int): ApplePayShippingType? {
+    fun ofRaw(raw: Int): ApplePayShippingTypeDTO? {
       return values().firstOrNull { it.raw == raw }
     }
   }
 }
 
-enum class ApplePayMerchantCapability(val raw: Int) {
+enum class ApplePayMerchantCapabilityDTO(val raw: Int) {
   DEBIT(0),
   CREDIT(1);
 
   companion object {
-    fun ofRaw(raw: Int): ApplePayMerchantCapability? {
+    fun ofRaw(raw: Int): ApplePayMerchantCapabilityDTO? {
       return values().firstOrNull { it.raw == raw }
     }
   }
 }
 
-enum class ApplePaySummaryItemType(val raw: Int) {
+enum class ApplePaySummaryItemTypeDTO(val raw: Int) {
   PENDING(0),
   DEFINITE(1);
 
   companion object {
-    fun ofRaw(raw: Int): ApplePaySummaryItemType? {
+    fun ofRaw(raw: Int): ApplePaySummaryItemTypeDTO? {
       return values().firstOrNull { it.raw == raw }
     }
   }
 }
 
-enum class ApplePayPaymentErrorType(val raw: Int) {
+enum class ApplePayPaymentErrorTypeDTO(val raw: Int) {
   BILLING_ADDRESS(0),
   SHIPPING_ADDRESS(1),
   CONTACT(2),
@@ -283,47 +188,71 @@ enum class ApplePayPaymentErrorType(val raw: Int) {
   UNKNOWN(6);
 
   companion object {
-    fun ofRaw(raw: Int): ApplePayPaymentErrorType? {
+    fun ofRaw(raw: Int): ApplePayPaymentErrorTypeDTO? {
       return values().firstOrNull { it.raw == raw }
     }
   }
 }
 
-enum class CardNumberValidationResultDTO(val raw: Int) {
-  VALID(0),
-  INVALID_ILLEGAL_CHARACTERS(1),
-  INVALID_LUHN_CHECK(2),
-  INVALID_TOO_SHORT(3),
-  INVALID_TOO_LONG(4),
-  INVALID_OTHER_REASON(5);
+enum class ApplePayButtonThemeDTO(val raw: Int) {
+  BLACK(0),
+  WHITE(1),
+  WHITE_WITH_LINE(2);
 
   companion object {
-    fun ofRaw(raw: Int): CardNumberValidationResultDTO? {
+    fun ofRaw(raw: Int): ApplePayButtonThemeDTO? {
       return values().firstOrNull { it.raw == raw }
     }
   }
 }
 
-enum class CardExpiryDateValidationResultDTO(val raw: Int) {
-  VALID(0),
-  INVALID_TOO_FAR_IN_THE_FUTURE(1),
-  INVALID_TOO_OLD(2),
-  NON_PARSEABLE_DATE(3),
-  INVALID_OTHER_REASON(4);
+enum class ApplePayButtonTypeDTO(val raw: Int) {
+  PLAIN(0),
+  BUY(1),
+  SET_UP(2),
+  IN_STORE(3),
+  DONATE(4),
+  CHECKOUT(5),
+  BOOK(6),
+  SUBSCRIBE(7),
+  RELOAD(8),
+  ADD_MONEY(9),
+  TOP_UP(10),
+  ORDER(11),
+  RENT(12),
+  SUPPORT(13),
+  CONTRIBUTE(14),
+  TIP(15);
 
   companion object {
-    fun ofRaw(raw: Int): CardExpiryDateValidationResultDTO? {
+    fun ofRaw(raw: Int): ApplePayButtonTypeDTO? {
       return values().firstOrNull { it.raw == raw }
     }
   }
 }
 
-enum class CardSecurityCodeValidationResultDTO(val raw: Int) {
-  VALID(0),
-  INVALID(1);
+enum class CheckoutEventTypeDTO(val raw: Int) {
+  COMPONENT_READY(0),
+  RESIZE(1),
+  BIN_LOOKUP(2),
+  BIN_VALUE(3),
+  COMPLETE(4),
+  FAILURE(5);
 
   companion object {
-    fun ofRaw(raw: Int): CardSecurityCodeValidationResultDTO? {
+    fun ofRaw(raw: Int): CheckoutEventTypeDTO? {
+      return values().firstOrNull { it.raw == raw }
+    }
+  }
+}
+
+enum class SubmitResultTypeDTO(val raw: Int) {
+  COMPLETION(0),
+  ACTION(1),
+  RETRY(2);
+
+  companion object {
+    fun ofRaw(raw: Int): SubmitResultTypeDTO? {
       return values().firstOrNull { it.raw == raw }
     }
   }
@@ -350,37 +279,6 @@ data class SessionResponseDTO (
   }
   override fun equals(other: Any?): Boolean {
     if (other !is SessionResponseDTO) {
-      return false
-    }
-    if (this === other) {
-      return true
-    }
-    return PlatformApiPigeonUtils.deepEquals(toList(), other.toList())  }
-
-  override fun hashCode(): Int = toList().hashCode()
-}
-
-/** Generated class from Pigeon that represents data sent in messages. */
-data class SessionDTO (
-  val id: String,
-  val paymentMethodsJson: String
-)
- {
-  companion object {
-    fun fromList(pigeonVar_list: List<Any?>): SessionDTO {
-      val id = pigeonVar_list[0] as String
-      val paymentMethodsJson = pigeonVar_list[1] as String
-      return SessionDTO(id, paymentMethodsJson)
-    }
-  }
-  fun toList(): List<Any?> {
-    return listOf(
-      id,
-      paymentMethodsJson,
-    )
-  }
-  override fun equals(other: Any?): Boolean {
-    if (other !is SessionDTO) {
       return false
     }
     if (this === other) {
@@ -423,26 +321,23 @@ data class AmountDTO (
 }
 
 /** Generated class from Pigeon that represents data sent in messages. */
-data class AnalyticsOptionsDTO (
-  val enabled: Boolean,
-  val version: String
+data class AnalyticsConfigurationDTO (
+  val enabled: Boolean
 )
  {
   companion object {
-    fun fromList(pigeonVar_list: List<Any?>): AnalyticsOptionsDTO {
+    fun fromList(pigeonVar_list: List<Any?>): AnalyticsConfigurationDTO {
       val enabled = pigeonVar_list[0] as Boolean
-      val version = pigeonVar_list[1] as String
-      return AnalyticsOptionsDTO(enabled, version)
+      return AnalyticsConfigurationDTO(enabled)
     }
   }
   fun toList(): List<Any?> {
     return listOf(
       enabled,
-      version,
     )
   }
   override fun equals(other: Any?): Boolean {
-    if (other !is AnalyticsOptionsDTO) {
+    if (other !is AnalyticsConfigurationDTO) {
       return false
     }
     if (this === other) {
@@ -454,345 +349,18 @@ data class AnalyticsOptionsDTO (
 }
 
 /** Generated class from Pigeon that represents data sent in messages. */
-data class ThreeDS2UICustomizationDTO (
-  val screenCustomization: ThreeDS2ScreenCustomizationDTO? = null,
-  val headingCustomization: ThreeDS2ToolbarCustomizationDTO? = null,
-  val labelCustomization: ThreeDS2LabelCustomizationDTO? = null,
-  val inputCustomization: ThreeDS2InputCustomizationDTO? = null,
-  val selectionItemCustomization: ThreeDS2SelectionItemCustomizationDTO? = null,
-  val primaryButtonCustomization: ThreeDS2ButtonCustomizationDTO? = null,
-  val secondaryButtonCustomization: ThreeDS2ButtonCustomizationDTO? = null
-)
- {
-  companion object {
-    fun fromList(pigeonVar_list: List<Any?>): ThreeDS2UICustomizationDTO {
-      val screenCustomization = pigeonVar_list[0] as ThreeDS2ScreenCustomizationDTO?
-      val headingCustomization = pigeonVar_list[1] as ThreeDS2ToolbarCustomizationDTO?
-      val labelCustomization = pigeonVar_list[2] as ThreeDS2LabelCustomizationDTO?
-      val inputCustomization = pigeonVar_list[3] as ThreeDS2InputCustomizationDTO?
-      val selectionItemCustomization = pigeonVar_list[4] as ThreeDS2SelectionItemCustomizationDTO?
-      val primaryButtonCustomization = pigeonVar_list[5] as ThreeDS2ButtonCustomizationDTO?
-      val secondaryButtonCustomization = pigeonVar_list[6] as ThreeDS2ButtonCustomizationDTO?
-      return ThreeDS2UICustomizationDTO(screenCustomization, headingCustomization, labelCustomization, inputCustomization, selectionItemCustomization, primaryButtonCustomization, secondaryButtonCustomization)
-    }
-  }
-  fun toList(): List<Any?> {
-    return listOf(
-      screenCustomization,
-      headingCustomization,
-      labelCustomization,
-      inputCustomization,
-      selectionItemCustomization,
-      primaryButtonCustomization,
-      secondaryButtonCustomization,
-    )
-  }
-  override fun equals(other: Any?): Boolean {
-    if (other !is ThreeDS2UICustomizationDTO) {
-      return false
-    }
-    if (this === other) {
-      return true
-    }
-    return PlatformApiPigeonUtils.deepEquals(toList(), other.toList())  }
-
-  override fun hashCode(): Int = toList().hashCode()
-}
-
-/** Generated class from Pigeon that represents data sent in messages. */
-data class ThreeDS2ScreenCustomizationDTO (
-  val backgroundColor: String? = null,
-  val textColor: String? = null
-)
- {
-  companion object {
-    fun fromList(pigeonVar_list: List<Any?>): ThreeDS2ScreenCustomizationDTO {
-      val backgroundColor = pigeonVar_list[0] as String?
-      val textColor = pigeonVar_list[1] as String?
-      return ThreeDS2ScreenCustomizationDTO(backgroundColor, textColor)
-    }
-  }
-  fun toList(): List<Any?> {
-    return listOf(
-      backgroundColor,
-      textColor,
-    )
-  }
-  override fun equals(other: Any?): Boolean {
-    if (other !is ThreeDS2ScreenCustomizationDTO) {
-      return false
-    }
-    if (this === other) {
-      return true
-    }
-    return PlatformApiPigeonUtils.deepEquals(toList(), other.toList())  }
-
-  override fun hashCode(): Int = toList().hashCode()
-}
-
-/** Generated class from Pigeon that represents data sent in messages. */
-data class ThreeDS2ButtonCustomizationDTO (
-  val backgroundColor: String? = null,
-  val textColor: String? = null,
-  val cornerRadius: Long? = null,
-  val textFontSize: Long? = null
-)
- {
-  companion object {
-    fun fromList(pigeonVar_list: List<Any?>): ThreeDS2ButtonCustomizationDTO {
-      val backgroundColor = pigeonVar_list[0] as String?
-      val textColor = pigeonVar_list[1] as String?
-      val cornerRadius = pigeonVar_list[2] as Long?
-      val textFontSize = pigeonVar_list[3] as Long?
-      return ThreeDS2ButtonCustomizationDTO(backgroundColor, textColor, cornerRadius, textFontSize)
-    }
-  }
-  fun toList(): List<Any?> {
-    return listOf(
-      backgroundColor,
-      textColor,
-      cornerRadius,
-      textFontSize,
-    )
-  }
-  override fun equals(other: Any?): Boolean {
-    if (other !is ThreeDS2ButtonCustomizationDTO) {
-      return false
-    }
-    if (this === other) {
-      return true
-    }
-    return PlatformApiPigeonUtils.deepEquals(toList(), other.toList())  }
-
-  override fun hashCode(): Int = toList().hashCode()
-}
-
-/** Generated class from Pigeon that represents data sent in messages. */
-data class ThreeDS2SelectionItemCustomizationDTO (
-  val selectionIndicatorTintColor: String? = null,
-  val highlightedBackgroundColor: String? = null,
-  val textColor: String? = null
-)
- {
-  companion object {
-    fun fromList(pigeonVar_list: List<Any?>): ThreeDS2SelectionItemCustomizationDTO {
-      val selectionIndicatorTintColor = pigeonVar_list[0] as String?
-      val highlightedBackgroundColor = pigeonVar_list[1] as String?
-      val textColor = pigeonVar_list[2] as String?
-      return ThreeDS2SelectionItemCustomizationDTO(selectionIndicatorTintColor, highlightedBackgroundColor, textColor)
-    }
-  }
-  fun toList(): List<Any?> {
-    return listOf(
-      selectionIndicatorTintColor,
-      highlightedBackgroundColor,
-      textColor,
-    )
-  }
-  override fun equals(other: Any?): Boolean {
-    if (other !is ThreeDS2SelectionItemCustomizationDTO) {
-      return false
-    }
-    if (this === other) {
-      return true
-    }
-    return PlatformApiPigeonUtils.deepEquals(toList(), other.toList())  }
-
-  override fun hashCode(): Int = toList().hashCode()
-}
-
-/** Generated class from Pigeon that represents data sent in messages. */
-data class ThreeDS2LabelCustomizationDTO (
-  val headingTextColor: String? = null,
-  val headingTextFontSize: Long? = null,
-  val inputLabelTextColor: String? = null,
-  val inputLabelFontSize: Long? = null,
-  val textColor: String? = null,
-  val textFontSize: Long? = null
-)
- {
-  companion object {
-    fun fromList(pigeonVar_list: List<Any?>): ThreeDS2LabelCustomizationDTO {
-      val headingTextColor = pigeonVar_list[0] as String?
-      val headingTextFontSize = pigeonVar_list[1] as Long?
-      val inputLabelTextColor = pigeonVar_list[2] as String?
-      val inputLabelFontSize = pigeonVar_list[3] as Long?
-      val textColor = pigeonVar_list[4] as String?
-      val textFontSize = pigeonVar_list[5] as Long?
-      return ThreeDS2LabelCustomizationDTO(headingTextColor, headingTextFontSize, inputLabelTextColor, inputLabelFontSize, textColor, textFontSize)
-    }
-  }
-  fun toList(): List<Any?> {
-    return listOf(
-      headingTextColor,
-      headingTextFontSize,
-      inputLabelTextColor,
-      inputLabelFontSize,
-      textColor,
-      textFontSize,
-    )
-  }
-  override fun equals(other: Any?): Boolean {
-    if (other !is ThreeDS2LabelCustomizationDTO) {
-      return false
-    }
-    if (this === other) {
-      return true
-    }
-    return PlatformApiPigeonUtils.deepEquals(toList(), other.toList())  }
-
-  override fun hashCode(): Int = toList().hashCode()
-}
-
-/** Generated class from Pigeon that represents data sent in messages. */
-data class ThreeDS2InputCustomizationDTO (
-  val borderColor: String? = null,
-  val borderWidth: Long? = null,
-  val cornerRadius: Long? = null,
-  val textColor: String? = null
-)
- {
-  companion object {
-    fun fromList(pigeonVar_list: List<Any?>): ThreeDS2InputCustomizationDTO {
-      val borderColor = pigeonVar_list[0] as String?
-      val borderWidth = pigeonVar_list[1] as Long?
-      val cornerRadius = pigeonVar_list[2] as Long?
-      val textColor = pigeonVar_list[3] as String?
-      return ThreeDS2InputCustomizationDTO(borderColor, borderWidth, cornerRadius, textColor)
-    }
-  }
-  fun toList(): List<Any?> {
-    return listOf(
-      borderColor,
-      borderWidth,
-      cornerRadius,
-      textColor,
-    )
-  }
-  override fun equals(other: Any?): Boolean {
-    if (other !is ThreeDS2InputCustomizationDTO) {
-      return false
-    }
-    if (this === other) {
-      return true
-    }
-    return PlatformApiPigeonUtils.deepEquals(toList(), other.toList())  }
-
-  override fun hashCode(): Int = toList().hashCode()
-}
-
-/** Generated class from Pigeon that represents data sent in messages. */
-data class ThreeDS2ToolbarCustomizationDTO (
-  val headerText: String? = null,
-  val textColor: String? = null,
-  val backgroundColor: String? = null,
-  val cancelButtonColor: String? = null
-)
- {
-  companion object {
-    fun fromList(pigeonVar_list: List<Any?>): ThreeDS2ToolbarCustomizationDTO {
-      val headerText = pigeonVar_list[0] as String?
-      val textColor = pigeonVar_list[1] as String?
-      val backgroundColor = pigeonVar_list[2] as String?
-      val cancelButtonColor = pigeonVar_list[3] as String?
-      return ThreeDS2ToolbarCustomizationDTO(headerText, textColor, backgroundColor, cancelButtonColor)
-    }
-  }
-  fun toList(): List<Any?> {
-    return listOf(
-      headerText,
-      textColor,
-      backgroundColor,
-      cancelButtonColor,
-    )
-  }
-  override fun equals(other: Any?): Boolean {
-    if (other !is ThreeDS2ToolbarCustomizationDTO) {
-      return false
-    }
-    if (this === other) {
-      return true
-    }
-    return PlatformApiPigeonUtils.deepEquals(toList(), other.toList())  }
-
-  override fun hashCode(): Int = toList().hashCode()
-}
-
-/** Generated class from Pigeon that represents data sent in messages. */
-data class ThreeDS2ConfigurationDTO (
-  val requestorAppURL: String? = null,
-  val uiCustomization: ThreeDS2UICustomizationDTO? = null
-)
- {
-  companion object {
-    fun fromList(pigeonVar_list: List<Any?>): ThreeDS2ConfigurationDTO {
-      val requestorAppURL = pigeonVar_list[0] as String?
-      val uiCustomization = pigeonVar_list[1] as ThreeDS2UICustomizationDTO?
-      return ThreeDS2ConfigurationDTO(requestorAppURL, uiCustomization)
-    }
-  }
-  fun toList(): List<Any?> {
-    return listOf(
-      requestorAppURL,
-      uiCustomization,
-    )
-  }
-  override fun equals(other: Any?): Boolean {
-    if (other !is ThreeDS2ConfigurationDTO) {
-      return false
-    }
-    if (this === other) {
-      return true
-    }
-    return PlatformApiPigeonUtils.deepEquals(toList(), other.toList())  }
-
-  override fun hashCode(): Int = toList().hashCode()
-}
-
-/** Generated class from Pigeon that represents data sent in messages. */
-data class DefaultInstallmentOptionsDTO (
-  val values: List<Long?>,
-  val includesRevolving: Boolean
-)
- {
-  companion object {
-    fun fromList(pigeonVar_list: List<Any?>): DefaultInstallmentOptionsDTO {
-      val values = pigeonVar_list[0] as List<Long?>
-      val includesRevolving = pigeonVar_list[1] as Boolean
-      return DefaultInstallmentOptionsDTO(values, includesRevolving)
-    }
-  }
-  fun toList(): List<Any?> {
-    return listOf(
-      values,
-      includesRevolving,
-    )
-  }
-  override fun equals(other: Any?): Boolean {
-    if (other !is DefaultInstallmentOptionsDTO) {
-      return false
-    }
-    if (this === other) {
-      return true
-    }
-    return PlatformApiPigeonUtils.deepEquals(toList(), other.toList())  }
-
-  override fun hashCode(): Int = toList().hashCode()
-}
-
-/** Generated class from Pigeon that represents data sent in messages. */
-data class CardBasedInstallmentOptionsDTO (
-  val values: List<Long?>,
+data class InstallmentOptionsDTO (
+  val values: List<Long>,
   val includesRevolving: Boolean,
-  val cardBrand: String
+  val cardBrand: String? = null
 )
  {
   companion object {
-    fun fromList(pigeonVar_list: List<Any?>): CardBasedInstallmentOptionsDTO {
-      val values = pigeonVar_list[0] as List<Long?>
+    fun fromList(pigeonVar_list: List<Any?>): InstallmentOptionsDTO {
+      val values = pigeonVar_list[0] as List<Long>
       val includesRevolving = pigeonVar_list[1] as Boolean
-      val cardBrand = pigeonVar_list[2] as String
-      return CardBasedInstallmentOptionsDTO(values, includesRevolving, cardBrand)
+      val cardBrand = pigeonVar_list[2] as String?
+      return InstallmentOptionsDTO(values, includesRevolving, cardBrand)
     }
   }
   fun toList(): List<Any?> {
@@ -803,7 +371,7 @@ data class CardBasedInstallmentOptionsDTO (
     )
   }
   override fun equals(other: Any?): Boolean {
-    if (other !is CardBasedInstallmentOptionsDTO) {
+    if (other !is InstallmentOptionsDTO) {
       return false
     }
     if (this === other) {
@@ -816,23 +384,20 @@ data class CardBasedInstallmentOptionsDTO (
 
 /** Generated class from Pigeon that represents data sent in messages. */
 data class InstallmentConfigurationDTO (
-  val defaultOptions: DefaultInstallmentOptionsDTO? = null,
-  val cardBasedOptions: List<CardBasedInstallmentOptionsDTO?>? = null,
+  val options: List<InstallmentOptionsDTO>,
   val showInstallmentAmount: Boolean
 )
  {
   companion object {
     fun fromList(pigeonVar_list: List<Any?>): InstallmentConfigurationDTO {
-      val defaultOptions = pigeonVar_list[0] as DefaultInstallmentOptionsDTO?
-      val cardBasedOptions = pigeonVar_list[1] as List<CardBasedInstallmentOptionsDTO?>?
-      val showInstallmentAmount = pigeonVar_list[2] as Boolean
-      return InstallmentConfigurationDTO(defaultOptions, cardBasedOptions, showInstallmentAmount)
+      val options = pigeonVar_list[0] as List<InstallmentOptionsDTO>
+      val showInstallmentAmount = pigeonVar_list[1] as Boolean
+      return InstallmentConfigurationDTO(options, showInstallmentAmount)
     }
   }
   fun toList(): List<Any?> {
     return listOf(
-      defaultOptions,
-      cardBasedOptions,
+      options,
       showInstallmentAmount,
     )
   }
@@ -849,189 +414,52 @@ data class InstallmentConfigurationDTO (
 }
 
 /** Generated class from Pigeon that represents data sent in messages. */
-data class CheckoutConfigurationDTO (
-  val environment: Environment,
-  val clientKey: String,
-  val countryCode: String? = null,
-  val amount: AmountDTO? = null,
-  val shopperLocale: String? = null,
-  val analyticsOptionsDTO: AnalyticsOptionsDTO,
-  val cardConfigurationDTO: CardConfigurationDTO? = null,
-  val applePayConfigurationDTO: ApplePayConfigurationDTO? = null,
-  val googlePayConfigurationDTO: GooglePayConfigurationDTO? = null,
-  val cashAppPayConfigurationDTO: CashAppPayConfigurationDTO? = null,
-  val twintConfigurationDTO: TwintConfigurationDTO? = null,
-  val threeDS2ConfigurationDTO: ThreeDS2ConfigurationDTO? = null,
-  val dropInConfigurationDTO: DropInConfigurationDTO? = null
-)
- {
-  companion object {
-    fun fromList(pigeonVar_list: List<Any?>): CheckoutConfigurationDTO {
-      val environment = pigeonVar_list[0] as Environment
-      val clientKey = pigeonVar_list[1] as String
-      val countryCode = pigeonVar_list[2] as String?
-      val amount = pigeonVar_list[3] as AmountDTO?
-      val shopperLocale = pigeonVar_list[4] as String?
-      val analyticsOptionsDTO = pigeonVar_list[5] as AnalyticsOptionsDTO
-      val cardConfigurationDTO = pigeonVar_list[6] as CardConfigurationDTO?
-      val applePayConfigurationDTO = pigeonVar_list[7] as ApplePayConfigurationDTO?
-      val googlePayConfigurationDTO = pigeonVar_list[8] as GooglePayConfigurationDTO?
-      val cashAppPayConfigurationDTO = pigeonVar_list[9] as CashAppPayConfigurationDTO?
-      val twintConfigurationDTO = pigeonVar_list[10] as TwintConfigurationDTO?
-      val threeDS2ConfigurationDTO = pigeonVar_list[11] as ThreeDS2ConfigurationDTO?
-      val dropInConfigurationDTO = pigeonVar_list[12] as DropInConfigurationDTO?
-      return CheckoutConfigurationDTO(environment, clientKey, countryCode, amount, shopperLocale, analyticsOptionsDTO, cardConfigurationDTO, applePayConfigurationDTO, googlePayConfigurationDTO, cashAppPayConfigurationDTO, twintConfigurationDTO, threeDS2ConfigurationDTO, dropInConfigurationDTO)
-    }
-  }
-  fun toList(): List<Any?> {
-    return listOf(
-      environment,
-      clientKey,
-      countryCode,
-      amount,
-      shopperLocale,
-      analyticsOptionsDTO,
-      cardConfigurationDTO,
-      applePayConfigurationDTO,
-      googlePayConfigurationDTO,
-      cashAppPayConfigurationDTO,
-      twintConfigurationDTO,
-      threeDS2ConfigurationDTO,
-      dropInConfigurationDTO,
-    )
-  }
-  override fun equals(other: Any?): Boolean {
-    if (other !is CheckoutConfigurationDTO) {
-      return false
-    }
-    if (this === other) {
-      return true
-    }
-    return PlatformApiPigeonUtils.deepEquals(toList(), other.toList())  }
-
-  override fun hashCode(): Int = toList().hashCode()
-}
-
-/** Generated class from Pigeon that represents data sent in messages. */
-data class DropInConfigurationDTO (
-  val environment: Environment,
-  val clientKey: String,
-  val countryCode: String,
-  val amount: AmountDTO? = null,
-  val shopperLocale: String? = null,
-  val analyticsOptionsDTO: AnalyticsOptionsDTO,
-  val cardConfigurationDTO: CardConfigurationDTO? = null,
-  val applePayConfigurationDTO: ApplePayConfigurationDTO? = null,
-  val googlePayConfigurationDTO: GooglePayConfigurationDTO? = null,
-  val cashAppPayConfigurationDTO: CashAppPayConfigurationDTO? = null,
-  val twintConfigurationDTO: TwintConfigurationDTO? = null,
-  val threeDS2ConfigurationDTO: ThreeDS2ConfigurationDTO? = null,
-  val showPreselectedStoredPaymentMethod: Boolean,
-  val skipListWhenSinglePaymentMethod: Boolean,
-  val isRemoveStoredPaymentMethodEnabled: Boolean,
-  val preselectedPaymentMethodTitle: String? = null,
-  val paymentMethodNames: Map<String?, String?>? = null,
-  val isPartialPaymentSupported: Boolean,
-  val showStoredPaymentMethods: Boolean
-)
- {
-  companion object {
-    fun fromList(pigeonVar_list: List<Any?>): DropInConfigurationDTO {
-      val environment = pigeonVar_list[0] as Environment
-      val clientKey = pigeonVar_list[1] as String
-      val countryCode = pigeonVar_list[2] as String
-      val amount = pigeonVar_list[3] as AmountDTO?
-      val shopperLocale = pigeonVar_list[4] as String?
-      val analyticsOptionsDTO = pigeonVar_list[5] as AnalyticsOptionsDTO
-      val cardConfigurationDTO = pigeonVar_list[6] as CardConfigurationDTO?
-      val applePayConfigurationDTO = pigeonVar_list[7] as ApplePayConfigurationDTO?
-      val googlePayConfigurationDTO = pigeonVar_list[8] as GooglePayConfigurationDTO?
-      val cashAppPayConfigurationDTO = pigeonVar_list[9] as CashAppPayConfigurationDTO?
-      val twintConfigurationDTO = pigeonVar_list[10] as TwintConfigurationDTO?
-      val threeDS2ConfigurationDTO = pigeonVar_list[11] as ThreeDS2ConfigurationDTO?
-      val showPreselectedStoredPaymentMethod = pigeonVar_list[12] as Boolean
-      val skipListWhenSinglePaymentMethod = pigeonVar_list[13] as Boolean
-      val isRemoveStoredPaymentMethodEnabled = pigeonVar_list[14] as Boolean
-      val preselectedPaymentMethodTitle = pigeonVar_list[15] as String?
-      val paymentMethodNames = pigeonVar_list[16] as Map<String?, String?>?
-      val isPartialPaymentSupported = pigeonVar_list[17] as Boolean
-      val showStoredPaymentMethods = pigeonVar_list[18] as Boolean
-      return DropInConfigurationDTO(environment, clientKey, countryCode, amount, shopperLocale, analyticsOptionsDTO, cardConfigurationDTO, applePayConfigurationDTO, googlePayConfigurationDTO, cashAppPayConfigurationDTO, twintConfigurationDTO, threeDS2ConfigurationDTO, showPreselectedStoredPaymentMethod, skipListWhenSinglePaymentMethod, isRemoveStoredPaymentMethodEnabled, preselectedPaymentMethodTitle, paymentMethodNames, isPartialPaymentSupported, showStoredPaymentMethods)
-    }
-  }
-  fun toList(): List<Any?> {
-    return listOf(
-      environment,
-      clientKey,
-      countryCode,
-      amount,
-      shopperLocale,
-      analyticsOptionsDTO,
-      cardConfigurationDTO,
-      applePayConfigurationDTO,
-      googlePayConfigurationDTO,
-      cashAppPayConfigurationDTO,
-      twintConfigurationDTO,
-      threeDS2ConfigurationDTO,
-      showPreselectedStoredPaymentMethod,
-      skipListWhenSinglePaymentMethod,
-      isRemoveStoredPaymentMethodEnabled,
-      preselectedPaymentMethodTitle,
-      paymentMethodNames,
-      isPartialPaymentSupported,
-      showStoredPaymentMethods,
-    )
-  }
-  override fun equals(other: Any?): Boolean {
-    if (other !is DropInConfigurationDTO) {
-      return false
-    }
-    if (this === other) {
-      return true
-    }
-    return PlatformApiPigeonUtils.deepEquals(toList(), other.toList())  }
-
-  override fun hashCode(): Int = toList().hashCode()
-}
-
-/** Generated class from Pigeon that represents data sent in messages. */
 data class CardConfigurationDTO (
-  val holderNameRequired: Boolean,
-  val addressMode: AddressMode,
-  val showStorePaymentField: Boolean,
-  val showCvcForStoredCard: Boolean,
-  val showCvc: Boolean,
-  val kcpFieldVisibility: FieldVisibility,
-  val socialSecurityNumberFieldVisibility: FieldVisibility,
-  val supportedCardTypes: List<String?>,
-  val installmentConfiguration: InstallmentConfigurationDTO? = null
+  val billingAddressMode: BillingAddressModeDTO,
+  val koreanAuthenticationVisibility: FieldVisibilityDTO,
+  val showCardholderName: Boolean,
+  val showSecurityCode: Boolean,
+  val showSecurityCodeForStoredCard: Boolean,
+  val showStorePaymentMethod: Boolean,
+  val showSupportedCardBrandLogos: Boolean,
+  val socialSecurityNumberVisibility: FieldVisibilityDTO,
+  val supportedCardBrands: List<String>? = null,
+  val installmentConfiguration: InstallmentConfigurationDTO? = null,
+  val hasOnBinChange: Boolean,
+  val hasOnBinLookup: Boolean
 )
  {
   companion object {
     fun fromList(pigeonVar_list: List<Any?>): CardConfigurationDTO {
-      val holderNameRequired = pigeonVar_list[0] as Boolean
-      val addressMode = pigeonVar_list[1] as AddressMode
-      val showStorePaymentField = pigeonVar_list[2] as Boolean
-      val showCvcForStoredCard = pigeonVar_list[3] as Boolean
-      val showCvc = pigeonVar_list[4] as Boolean
-      val kcpFieldVisibility = pigeonVar_list[5] as FieldVisibility
-      val socialSecurityNumberFieldVisibility = pigeonVar_list[6] as FieldVisibility
-      val supportedCardTypes = pigeonVar_list[7] as List<String?>
-      val installmentConfiguration = pigeonVar_list[8] as InstallmentConfigurationDTO?
-      return CardConfigurationDTO(holderNameRequired, addressMode, showStorePaymentField, showCvcForStoredCard, showCvc, kcpFieldVisibility, socialSecurityNumberFieldVisibility, supportedCardTypes, installmentConfiguration)
+      val billingAddressMode = pigeonVar_list[0] as BillingAddressModeDTO
+      val koreanAuthenticationVisibility = pigeonVar_list[1] as FieldVisibilityDTO
+      val showCardholderName = pigeonVar_list[2] as Boolean
+      val showSecurityCode = pigeonVar_list[3] as Boolean
+      val showSecurityCodeForStoredCard = pigeonVar_list[4] as Boolean
+      val showStorePaymentMethod = pigeonVar_list[5] as Boolean
+      val showSupportedCardBrandLogos = pigeonVar_list[6] as Boolean
+      val socialSecurityNumberVisibility = pigeonVar_list[7] as FieldVisibilityDTO
+      val supportedCardBrands = pigeonVar_list[8] as List<String>?
+      val installmentConfiguration = pigeonVar_list[9] as InstallmentConfigurationDTO?
+      val hasOnBinChange = pigeonVar_list[10] as Boolean
+      val hasOnBinLookup = pigeonVar_list[11] as Boolean
+      return CardConfigurationDTO(billingAddressMode, koreanAuthenticationVisibility, showCardholderName, showSecurityCode, showSecurityCodeForStoredCard, showStorePaymentMethod, showSupportedCardBrandLogos, socialSecurityNumberVisibility, supportedCardBrands, installmentConfiguration, hasOnBinChange, hasOnBinLookup)
     }
   }
   fun toList(): List<Any?> {
     return listOf(
-      holderNameRequired,
-      addressMode,
-      showStorePaymentField,
-      showCvcForStoredCard,
-      showCvc,
-      kcpFieldVisibility,
-      socialSecurityNumberFieldVisibility,
-      supportedCardTypes,
+      billingAddressMode,
+      koreanAuthenticationVisibility,
+      showCardholderName,
+      showSecurityCode,
+      showSecurityCodeForStoredCard,
+      showStorePaymentMethod,
+      showSupportedCardBrandLogos,
+      socialSecurityNumberVisibility,
+      supportedCardBrands,
       installmentConfiguration,
+      hasOnBinChange,
+      hasOnBinLookup,
     )
   }
   override fun equals(other: Any?): Boolean {
@@ -1047,80 +475,26 @@ data class CardConfigurationDTO (
 }
 
 /** Generated class from Pigeon that represents data sent in messages. */
-data class ApplePayConfigurationDTO (
-  val merchantId: String,
-  val merchantName: String,
-  val allowOnboarding: Boolean? = null,
-  val summaryItems: List<ApplePaySummaryItemDTO?>? = null,
-  val requiredBillingContactFields: List<String?>? = null,
-  val billingContact: ApplePayContactDTO? = null,
-  val requiredShippingContactFields: List<String?>? = null,
-  val shippingContact: ApplePayContactDTO? = null,
-  val applePayShippingType: ApplePayShippingType? = null,
-  val allowShippingContactEditing: Boolean? = null,
-  val shippingMethods: List<ApplePayShippingMethodDTO?>? = null,
-  val applicationData: String? = null,
-  val supportedCountries: List<String?>? = null,
-  val merchantCapability: ApplePayMerchantCapability? = null,
-  val supportsCouponCode: Boolean? = null,
-  val couponCode: String? = null,
-  val hasOnSelectShippingMethod: Boolean,
-  val hasOnSelectShippingContact: Boolean,
-  val hasOnChangeCouponCode: Boolean,
-  val hasOnAuthorize: Boolean
+data class MerchantInfoDTO (
+  val merchantName: String? = null,
+  val merchantId: String? = null
 )
  {
   companion object {
-    fun fromList(pigeonVar_list: List<Any?>): ApplePayConfigurationDTO {
-      val merchantId = pigeonVar_list[0] as String
-      val merchantName = pigeonVar_list[1] as String
-      val allowOnboarding = pigeonVar_list[2] as Boolean?
-      val summaryItems = pigeonVar_list[3] as List<ApplePaySummaryItemDTO?>?
-      val requiredBillingContactFields = pigeonVar_list[4] as List<String?>?
-      val billingContact = pigeonVar_list[5] as ApplePayContactDTO?
-      val requiredShippingContactFields = pigeonVar_list[6] as List<String?>?
-      val shippingContact = pigeonVar_list[7] as ApplePayContactDTO?
-      val applePayShippingType = pigeonVar_list[8] as ApplePayShippingType?
-      val allowShippingContactEditing = pigeonVar_list[9] as Boolean?
-      val shippingMethods = pigeonVar_list[10] as List<ApplePayShippingMethodDTO?>?
-      val applicationData = pigeonVar_list[11] as String?
-      val supportedCountries = pigeonVar_list[12] as List<String?>?
-      val merchantCapability = pigeonVar_list[13] as ApplePayMerchantCapability?
-      val supportsCouponCode = pigeonVar_list[14] as Boolean?
-      val couponCode = pigeonVar_list[15] as String?
-      val hasOnSelectShippingMethod = pigeonVar_list[16] as Boolean
-      val hasOnSelectShippingContact = pigeonVar_list[17] as Boolean
-      val hasOnChangeCouponCode = pigeonVar_list[18] as Boolean
-      val hasOnAuthorize = pigeonVar_list[19] as Boolean
-      return ApplePayConfigurationDTO(merchantId, merchantName, allowOnboarding, summaryItems, requiredBillingContactFields, billingContact, requiredShippingContactFields, shippingContact, applePayShippingType, allowShippingContactEditing, shippingMethods, applicationData, supportedCountries, merchantCapability, supportsCouponCode, couponCode, hasOnSelectShippingMethod, hasOnSelectShippingContact, hasOnChangeCouponCode, hasOnAuthorize)
+    fun fromList(pigeonVar_list: List<Any?>): MerchantInfoDTO {
+      val merchantName = pigeonVar_list[0] as String?
+      val merchantId = pigeonVar_list[1] as String?
+      return MerchantInfoDTO(merchantName, merchantId)
     }
   }
   fun toList(): List<Any?> {
     return listOf(
-      merchantId,
       merchantName,
-      allowOnboarding,
-      summaryItems,
-      requiredBillingContactFields,
-      billingContact,
-      requiredShippingContactFields,
-      shippingContact,
-      applePayShippingType,
-      allowShippingContactEditing,
-      shippingMethods,
-      applicationData,
-      supportedCountries,
-      merchantCapability,
-      supportsCouponCode,
-      couponCode,
-      hasOnSelectShippingMethod,
-      hasOnSelectShippingContact,
-      hasOnChangeCouponCode,
-      hasOnAuthorize,
+      merchantId,
     )
   }
   override fun equals(other: Any?): Boolean {
-    if (other !is ApplePayConfigurationDTO) {
+    if (other !is MerchantInfoDTO) {
       return false
     }
     if (this === other) {
@@ -1132,35 +506,26 @@ data class ApplePayConfigurationDTO (
 }
 
 /** Generated class from Pigeon that represents data sent in messages. */
-data class ApplePayAuthorizedPaymentDTO (
-  val token: String,
-  val network: String,
-  val billingContact: ApplePayContactDTO? = null,
-  val shippingContact: ApplePayContactDTO? = null,
-  val shippingMethod: ApplePayShippingMethodDTO? = null
+data class ShippingAddressParametersDTO (
+  val allowedCountryCodes: List<String>? = null,
+  val isPhoneNumberRequired: Boolean
 )
  {
   companion object {
-    fun fromList(pigeonVar_list: List<Any?>): ApplePayAuthorizedPaymentDTO {
-      val token = pigeonVar_list[0] as String
-      val network = pigeonVar_list[1] as String
-      val billingContact = pigeonVar_list[2] as ApplePayContactDTO?
-      val shippingContact = pigeonVar_list[3] as ApplePayContactDTO?
-      val shippingMethod = pigeonVar_list[4] as ApplePayShippingMethodDTO?
-      return ApplePayAuthorizedPaymentDTO(token, network, billingContact, shippingContact, shippingMethod)
+    fun fromList(pigeonVar_list: List<Any?>): ShippingAddressParametersDTO {
+      val allowedCountryCodes = pigeonVar_list[0] as List<String>?
+      val isPhoneNumberRequired = pigeonVar_list[1] as Boolean
+      return ShippingAddressParametersDTO(allowedCountryCodes, isPhoneNumberRequired)
     }
   }
   fun toList(): List<Any?> {
     return listOf(
-      token,
-      network,
-      billingContact,
-      shippingContact,
-      shippingMethod,
+      allowedCountryCodes,
+      isPhoneNumberRequired,
     )
   }
   override fun equals(other: Any?): Boolean {
-    if (other !is ApplePayAuthorizedPaymentDTO) {
+    if (other !is ShippingAddressParametersDTO) {
       return false
     }
     if (this === other) {
@@ -1172,156 +537,44 @@ data class ApplePayAuthorizedPaymentDTO (
 }
 
 /** Generated class from Pigeon that represents data sent in messages. */
-data class ApplePayPaymentErrorDTO (
-  val type: ApplePayPaymentErrorType,
-  val field: String? = null,
-  val localizedDescription: String
+data class GooglePayConfigurationDTO (
+  val googlePayEnvironment: GooglePayEnvironmentDTO,
+  val merchantAccount: String? = null,
+  val merchantInfo: MerchantInfoDTO? = null,
+  val totalPriceStatus: TotalPriceStatusDTO? = null,
+  val emailRequired: Boolean? = null,
+  val existingPaymentMethodRequired: Boolean? = null,
+  val shippingAddressRequired: Boolean? = null,
+  val shippingAddressParameters: ShippingAddressParametersDTO? = null
 )
  {
   companion object {
-    fun fromList(pigeonVar_list: List<Any?>): ApplePayPaymentErrorDTO {
-      val type = pigeonVar_list[0] as ApplePayPaymentErrorType
-      val field = pigeonVar_list[1] as String?
-      val localizedDescription = pigeonVar_list[2] as String
-      return ApplePayPaymentErrorDTO(type, field, localizedDescription)
+    fun fromList(pigeonVar_list: List<Any?>): GooglePayConfigurationDTO {
+      val googlePayEnvironment = pigeonVar_list[0] as GooglePayEnvironmentDTO
+      val merchantAccount = pigeonVar_list[1] as String?
+      val merchantInfo = pigeonVar_list[2] as MerchantInfoDTO?
+      val totalPriceStatus = pigeonVar_list[3] as TotalPriceStatusDTO?
+      val emailRequired = pigeonVar_list[4] as Boolean?
+      val existingPaymentMethodRequired = pigeonVar_list[5] as Boolean?
+      val shippingAddressRequired = pigeonVar_list[6] as Boolean?
+      val shippingAddressParameters = pigeonVar_list[7] as ShippingAddressParametersDTO?
+      return GooglePayConfigurationDTO(googlePayEnvironment, merchantAccount, merchantInfo, totalPriceStatus, emailRequired, existingPaymentMethodRequired, shippingAddressRequired, shippingAddressParameters)
     }
   }
   fun toList(): List<Any?> {
     return listOf(
-      type,
-      field,
-      localizedDescription,
+      googlePayEnvironment,
+      merchantAccount,
+      merchantInfo,
+      totalPriceStatus,
+      emailRequired,
+      existingPaymentMethodRequired,
+      shippingAddressRequired,
+      shippingAddressParameters,
     )
   }
   override fun equals(other: Any?): Boolean {
-    if (other !is ApplePayPaymentErrorDTO) {
-      return false
-    }
-    if (this === other) {
-      return true
-    }
-    return PlatformApiPigeonUtils.deepEquals(toList(), other.toList())  }
-
-  override fun hashCode(): Int = toList().hashCode()
-}
-
-/** Generated class from Pigeon that represents data sent in messages. */
-data class ApplePayAuthorizationResultDTO (
-  val isSuccess: Boolean,
-  val errors: List<ApplePayPaymentErrorDTO?>? = null
-)
- {
-  companion object {
-    fun fromList(pigeonVar_list: List<Any?>): ApplePayAuthorizationResultDTO {
-      val isSuccess = pigeonVar_list[0] as Boolean
-      val errors = pigeonVar_list[1] as List<ApplePayPaymentErrorDTO?>?
-      return ApplePayAuthorizationResultDTO(isSuccess, errors)
-    }
-  }
-  fun toList(): List<Any?> {
-    return listOf(
-      isSuccess,
-      errors,
-    )
-  }
-  override fun equals(other: Any?): Boolean {
-    if (other !is ApplePayAuthorizationResultDTO) {
-      return false
-    }
-    if (this === other) {
-      return true
-    }
-    return PlatformApiPigeonUtils.deepEquals(toList(), other.toList())  }
-
-  override fun hashCode(): Int = toList().hashCode()
-}
-
-/** Generated class from Pigeon that represents data sent in messages. */
-data class ApplePayCouponCodeUpdateDTO (
-  val summaryItems: List<ApplePaySummaryItemDTO?>,
-  val shippingMethods: List<ApplePayShippingMethodDTO?>? = null,
-  val errors: List<ApplePayPaymentErrorDTO?>? = null
-)
- {
-  companion object {
-    fun fromList(pigeonVar_list: List<Any?>): ApplePayCouponCodeUpdateDTO {
-      val summaryItems = pigeonVar_list[0] as List<ApplePaySummaryItemDTO?>
-      val shippingMethods = pigeonVar_list[1] as List<ApplePayShippingMethodDTO?>?
-      val errors = pigeonVar_list[2] as List<ApplePayPaymentErrorDTO?>?
-      return ApplePayCouponCodeUpdateDTO(summaryItems, shippingMethods, errors)
-    }
-  }
-  fun toList(): List<Any?> {
-    return listOf(
-      summaryItems,
-      shippingMethods,
-      errors,
-    )
-  }
-  override fun equals(other: Any?): Boolean {
-    if (other !is ApplePayCouponCodeUpdateDTO) {
-      return false
-    }
-    if (this === other) {
-      return true
-    }
-    return PlatformApiPigeonUtils.deepEquals(toList(), other.toList())  }
-
-  override fun hashCode(): Int = toList().hashCode()
-}
-
-/** Generated class from Pigeon that represents data sent in messages. */
-data class ApplePayShippingContactUpdateDTO (
-  val summaryItems: List<ApplePaySummaryItemDTO?>,
-  val shippingMethods: List<ApplePayShippingMethodDTO?>? = null,
-  val errors: List<ApplePayPaymentErrorDTO?>? = null
-)
- {
-  companion object {
-    fun fromList(pigeonVar_list: List<Any?>): ApplePayShippingContactUpdateDTO {
-      val summaryItems = pigeonVar_list[0] as List<ApplePaySummaryItemDTO?>
-      val shippingMethods = pigeonVar_list[1] as List<ApplePayShippingMethodDTO?>?
-      val errors = pigeonVar_list[2] as List<ApplePayPaymentErrorDTO?>?
-      return ApplePayShippingContactUpdateDTO(summaryItems, shippingMethods, errors)
-    }
-  }
-  fun toList(): List<Any?> {
-    return listOf(
-      summaryItems,
-      shippingMethods,
-      errors,
-    )
-  }
-  override fun equals(other: Any?): Boolean {
-    if (other !is ApplePayShippingContactUpdateDTO) {
-      return false
-    }
-    if (this === other) {
-      return true
-    }
-    return PlatformApiPigeonUtils.deepEquals(toList(), other.toList())  }
-
-  override fun hashCode(): Int = toList().hashCode()
-}
-
-/** Generated class from Pigeon that represents data sent in messages. */
-data class ApplePayShippingMethodUpdateDTO (
-  val summaryItems: List<ApplePaySummaryItemDTO?>
-)
- {
-  companion object {
-    fun fromList(pigeonVar_list: List<Any?>): ApplePayShippingMethodUpdateDTO {
-      val summaryItems = pigeonVar_list[0] as List<ApplePaySummaryItemDTO?>
-      return ApplePayShippingMethodUpdateDTO(summaryItems)
-    }
-  }
-  fun toList(): List<Any?> {
-    return listOf(
-      summaryItems,
-    )
-  }
-  override fun equals(other: Any?): Boolean {
-    if (other !is ApplePayShippingMethodUpdateDTO) {
+    if (other !is GooglePayConfigurationDTO) {
       return false
     }
     if (this === other) {
@@ -1340,7 +593,7 @@ data class ApplePayContactDTO (
   val familyName: String? = null,
   val phoneticGivenName: String? = null,
   val phoneticFamilyName: String? = null,
-  val addressLines: List<String?>? = null,
+  val addressLines: List<String>? = null,
   val subLocality: String? = null,
   val city: String? = null,
   val postalCode: String? = null,
@@ -1358,7 +611,7 @@ data class ApplePayContactDTO (
       val familyName = pigeonVar_list[3] as String?
       val phoneticGivenName = pigeonVar_list[4] as String?
       val phoneticFamilyName = pigeonVar_list[5] as String?
-      val addressLines = pigeonVar_list[6] as List<String?>?
+      val addressLines = pigeonVar_list[6] as List<String>?
       val subLocality = pigeonVar_list[7] as String?
       val city = pigeonVar_list[8] as String?
       val postalCode = pigeonVar_list[9] as String?
@@ -1389,6 +642,40 @@ data class ApplePayContactDTO (
   }
   override fun equals(other: Any?): Boolean {
     if (other !is ApplePayContactDTO) {
+      return false
+    }
+    if (this === other) {
+      return true
+    }
+    return PlatformApiPigeonUtils.deepEquals(toList(), other.toList())  }
+
+  override fun hashCode(): Int = toList().hashCode()
+}
+
+/** Generated class from Pigeon that represents data sent in messages. */
+data class ApplePaySummaryItemDTO (
+  val label: String,
+  val amount: AmountDTO,
+  val type: ApplePaySummaryItemTypeDTO
+)
+ {
+  companion object {
+    fun fromList(pigeonVar_list: List<Any?>): ApplePaySummaryItemDTO {
+      val label = pigeonVar_list[0] as String
+      val amount = pigeonVar_list[1] as AmountDTO
+      val type = pigeonVar_list[2] as ApplePaySummaryItemTypeDTO
+      return ApplePaySummaryItemDTO(label, amount, type)
+    }
+  }
+  fun toList(): List<Any?> {
+    return listOf(
+      label,
+      amount,
+      type,
+    )
+  }
+  override fun equals(other: Any?): Boolean {
+    if (other !is ApplePaySummaryItemDTO) {
       return false
     }
     if (this === other) {
@@ -1443,29 +730,29 @@ data class ApplePayShippingMethodDTO (
 }
 
 /** Generated class from Pigeon that represents data sent in messages. */
-data class ApplePaySummaryItemDTO (
-  val label: String,
-  val amount: AmountDTO,
-  val type: ApplePaySummaryItemType
+data class ApplePayPaymentErrorDTO (
+  val type: ApplePayPaymentErrorTypeDTO,
+  val field: String? = null,
+  val localizedDescription: String
 )
  {
   companion object {
-    fun fromList(pigeonVar_list: List<Any?>): ApplePaySummaryItemDTO {
-      val label = pigeonVar_list[0] as String
-      val amount = pigeonVar_list[1] as AmountDTO
-      val type = pigeonVar_list[2] as ApplePaySummaryItemType
-      return ApplePaySummaryItemDTO(label, amount, type)
+    fun fromList(pigeonVar_list: List<Any?>): ApplePayPaymentErrorDTO {
+      val type = pigeonVar_list[0] as ApplePayPaymentErrorTypeDTO
+      val field = pigeonVar_list[1] as String?
+      val localizedDescription = pigeonVar_list[2] as String
+      return ApplePayPaymentErrorDTO(type, field, localizedDescription)
     }
   }
   fun toList(): List<Any?> {
     return listOf(
-      label,
-      amount,
       type,
+      field,
+      localizedDescription,
     )
   }
   override fun equals(other: Any?): Boolean {
-    if (other !is ApplePaySummaryItemDTO) {
+    if (other !is ApplePayPaymentErrorDTO) {
       return false
     }
     if (this === other) {
@@ -1477,65 +764,35 @@ data class ApplePaySummaryItemDTO (
 }
 
 /** Generated class from Pigeon that represents data sent in messages. */
-data class GooglePayConfigurationDTO (
-  val googlePayEnvironment: GooglePayEnvironment,
-  val merchantAccount: String? = null,
-  val merchantInfoDTO: MerchantInfoDTO? = null,
-  val totalPriceStatus: TotalPriceStatus? = null,
-  val allowedCardNetworks: List<String?>? = null,
-  val allowedAuthMethods: List<String?>? = null,
-  val allowPrepaidCards: Boolean? = null,
-  val allowCreditCards: Boolean? = null,
-  val assuranceDetailsRequired: Boolean? = null,
-  val emailRequired: Boolean? = null,
-  val existingPaymentMethodRequired: Boolean? = null,
-  val shippingAddressRequired: Boolean? = null,
-  val shippingAddressParametersDTO: ShippingAddressParametersDTO? = null,
-  val billingAddressRequired: Boolean? = null,
-  val billingAddressParametersDTO: BillingAddressParametersDTO? = null
+data class ApplePayAuthorizedPaymentDTO (
+  val token: String,
+  val network: String,
+  val billingContact: ApplePayContactDTO? = null,
+  val shippingContact: ApplePayContactDTO? = null,
+  val shippingMethod: ApplePayShippingMethodDTO? = null
 )
  {
   companion object {
-    fun fromList(pigeonVar_list: List<Any?>): GooglePayConfigurationDTO {
-      val googlePayEnvironment = pigeonVar_list[0] as GooglePayEnvironment
-      val merchantAccount = pigeonVar_list[1] as String?
-      val merchantInfoDTO = pigeonVar_list[2] as MerchantInfoDTO?
-      val totalPriceStatus = pigeonVar_list[3] as TotalPriceStatus?
-      val allowedCardNetworks = pigeonVar_list[4] as List<String?>?
-      val allowedAuthMethods = pigeonVar_list[5] as List<String?>?
-      val allowPrepaidCards = pigeonVar_list[6] as Boolean?
-      val allowCreditCards = pigeonVar_list[7] as Boolean?
-      val assuranceDetailsRequired = pigeonVar_list[8] as Boolean?
-      val emailRequired = pigeonVar_list[9] as Boolean?
-      val existingPaymentMethodRequired = pigeonVar_list[10] as Boolean?
-      val shippingAddressRequired = pigeonVar_list[11] as Boolean?
-      val shippingAddressParametersDTO = pigeonVar_list[12] as ShippingAddressParametersDTO?
-      val billingAddressRequired = pigeonVar_list[13] as Boolean?
-      val billingAddressParametersDTO = pigeonVar_list[14] as BillingAddressParametersDTO?
-      return GooglePayConfigurationDTO(googlePayEnvironment, merchantAccount, merchantInfoDTO, totalPriceStatus, allowedCardNetworks, allowedAuthMethods, allowPrepaidCards, allowCreditCards, assuranceDetailsRequired, emailRequired, existingPaymentMethodRequired, shippingAddressRequired, shippingAddressParametersDTO, billingAddressRequired, billingAddressParametersDTO)
+    fun fromList(pigeonVar_list: List<Any?>): ApplePayAuthorizedPaymentDTO {
+      val token = pigeonVar_list[0] as String
+      val network = pigeonVar_list[1] as String
+      val billingContact = pigeonVar_list[2] as ApplePayContactDTO?
+      val shippingContact = pigeonVar_list[3] as ApplePayContactDTO?
+      val shippingMethod = pigeonVar_list[4] as ApplePayShippingMethodDTO?
+      return ApplePayAuthorizedPaymentDTO(token, network, billingContact, shippingContact, shippingMethod)
     }
   }
   fun toList(): List<Any?> {
     return listOf(
-      googlePayEnvironment,
-      merchantAccount,
-      merchantInfoDTO,
-      totalPriceStatus,
-      allowedCardNetworks,
-      allowedAuthMethods,
-      allowPrepaidCards,
-      allowCreditCards,
-      assuranceDetailsRequired,
-      emailRequired,
-      existingPaymentMethodRequired,
-      shippingAddressRequired,
-      shippingAddressParametersDTO,
-      billingAddressRequired,
-      billingAddressParametersDTO,
+      token,
+      network,
+      billingContact,
+      shippingContact,
+      shippingMethod,
     )
   }
   override fun equals(other: Any?): Boolean {
-    if (other !is GooglePayConfigurationDTO) {
+    if (other !is ApplePayAuthorizedPaymentDTO) {
       return false
     }
     if (this === other) {
@@ -1547,26 +804,250 @@ data class GooglePayConfigurationDTO (
 }
 
 /** Generated class from Pigeon that represents data sent in messages. */
-data class MerchantInfoDTO (
-  val merchantName: String? = null,
-  val merchantId: String? = null
+data class ApplePayAuthorizationResultDTO (
+  val isSuccess: Boolean,
+  val errors: List<ApplePayPaymentErrorDTO>? = null
 )
  {
   companion object {
-    fun fromList(pigeonVar_list: List<Any?>): MerchantInfoDTO {
-      val merchantName = pigeonVar_list[0] as String?
-      val merchantId = pigeonVar_list[1] as String?
-      return MerchantInfoDTO(merchantName, merchantId)
+    fun fromList(pigeonVar_list: List<Any?>): ApplePayAuthorizationResultDTO {
+      val isSuccess = pigeonVar_list[0] as Boolean
+      val errors = pigeonVar_list[1] as List<ApplePayPaymentErrorDTO>?
+      return ApplePayAuthorizationResultDTO(isSuccess, errors)
     }
   }
   fun toList(): List<Any?> {
     return listOf(
-      merchantName,
+      isSuccess,
+      errors,
+    )
+  }
+  override fun equals(other: Any?): Boolean {
+    if (other !is ApplePayAuthorizationResultDTO) {
+      return false
+    }
+    if (this === other) {
+      return true
+    }
+    return PlatformApiPigeonUtils.deepEquals(toList(), other.toList())  }
+
+  override fun hashCode(): Int = toList().hashCode()
+}
+
+/** Generated class from Pigeon that represents data sent in messages. */
+data class ApplePayShippingMethodUpdateDTO (
+  val summaryItems: List<ApplePaySummaryItemDTO>
+)
+ {
+  companion object {
+    fun fromList(pigeonVar_list: List<Any?>): ApplePayShippingMethodUpdateDTO {
+      val summaryItems = pigeonVar_list[0] as List<ApplePaySummaryItemDTO>
+      return ApplePayShippingMethodUpdateDTO(summaryItems)
+    }
+  }
+  fun toList(): List<Any?> {
+    return listOf(
+      summaryItems,
+    )
+  }
+  override fun equals(other: Any?): Boolean {
+    if (other !is ApplePayShippingMethodUpdateDTO) {
+      return false
+    }
+    if (this === other) {
+      return true
+    }
+    return PlatformApiPigeonUtils.deepEquals(toList(), other.toList())  }
+
+  override fun hashCode(): Int = toList().hashCode()
+}
+
+/** Generated class from Pigeon that represents data sent in messages. */
+data class ApplePayShippingContactUpdateDTO (
+  val summaryItems: List<ApplePaySummaryItemDTO>,
+  val shippingMethods: List<ApplePayShippingMethodDTO>? = null,
+  val errors: List<ApplePayPaymentErrorDTO>? = null
+)
+ {
+  companion object {
+    fun fromList(pigeonVar_list: List<Any?>): ApplePayShippingContactUpdateDTO {
+      val summaryItems = pigeonVar_list[0] as List<ApplePaySummaryItemDTO>
+      val shippingMethods = pigeonVar_list[1] as List<ApplePayShippingMethodDTO>?
+      val errors = pigeonVar_list[2] as List<ApplePayPaymentErrorDTO>?
+      return ApplePayShippingContactUpdateDTO(summaryItems, shippingMethods, errors)
+    }
+  }
+  fun toList(): List<Any?> {
+    return listOf(
+      summaryItems,
+      shippingMethods,
+      errors,
+    )
+  }
+  override fun equals(other: Any?): Boolean {
+    if (other !is ApplePayShippingContactUpdateDTO) {
+      return false
+    }
+    if (this === other) {
+      return true
+    }
+    return PlatformApiPigeonUtils.deepEquals(toList(), other.toList())  }
+
+  override fun hashCode(): Int = toList().hashCode()
+}
+
+/** Generated class from Pigeon that represents data sent in messages. */
+data class ApplePayCouponCodeUpdateDTO (
+  val summaryItems: List<ApplePaySummaryItemDTO>,
+  val shippingMethods: List<ApplePayShippingMethodDTO>? = null,
+  val errors: List<ApplePayPaymentErrorDTO>? = null
+)
+ {
+  companion object {
+    fun fromList(pigeonVar_list: List<Any?>): ApplePayCouponCodeUpdateDTO {
+      val summaryItems = pigeonVar_list[0] as List<ApplePaySummaryItemDTO>
+      val shippingMethods = pigeonVar_list[1] as List<ApplePayShippingMethodDTO>?
+      val errors = pigeonVar_list[2] as List<ApplePayPaymentErrorDTO>?
+      return ApplePayCouponCodeUpdateDTO(summaryItems, shippingMethods, errors)
+    }
+  }
+  fun toList(): List<Any?> {
+    return listOf(
+      summaryItems,
+      shippingMethods,
+      errors,
+    )
+  }
+  override fun equals(other: Any?): Boolean {
+    if (other !is ApplePayCouponCodeUpdateDTO) {
+      return false
+    }
+    if (this === other) {
+      return true
+    }
+    return PlatformApiPigeonUtils.deepEquals(toList(), other.toList())  }
+
+  override fun hashCode(): Int = toList().hashCode()
+}
+
+/** Generated class from Pigeon that represents data sent in messages. */
+data class ApplePayButtonStyleDTO (
+  val theme: ApplePayButtonThemeDTO? = null,
+  val type: ApplePayButtonTypeDTO? = null,
+  val cornerRadius: Double? = null
+)
+ {
+  companion object {
+    fun fromList(pigeonVar_list: List<Any?>): ApplePayButtonStyleDTO {
+      val theme = pigeonVar_list[0] as ApplePayButtonThemeDTO?
+      val type = pigeonVar_list[1] as ApplePayButtonTypeDTO?
+      val cornerRadius = pigeonVar_list[2] as Double?
+      return ApplePayButtonStyleDTO(theme, type, cornerRadius)
+    }
+  }
+  fun toList(): List<Any?> {
+    return listOf(
+      theme,
+      type,
+      cornerRadius,
+    )
+  }
+  override fun equals(other: Any?): Boolean {
+    if (other !is ApplePayButtonStyleDTO) {
+      return false
+    }
+    if (this === other) {
+      return true
+    }
+    return PlatformApiPigeonUtils.deepEquals(toList(), other.toList())  }
+
+  override fun hashCode(): Int = toList().hashCode()
+}
+
+/** Generated class from Pigeon that represents data sent in messages. */
+data class ApplePayConfigurationDTO (
+  val merchantId: String,
+  val merchantName: String,
+  val allowOnboarding: Boolean? = null,
+  val summaryItems: List<ApplePaySummaryItemDTO>? = null,
+  val requiredBillingContactFields: List<String>? = null,
+  val billingContact: ApplePayContactDTO? = null,
+  val requiredShippingContactFields: List<String>? = null,
+  val shippingContact: ApplePayContactDTO? = null,
+  val shippingType: ApplePayShippingTypeDTO? = null,
+  val allowShippingContactEditing: Boolean? = null,
+  val shippingMethods: List<ApplePayShippingMethodDTO>? = null,
+  val applicationData: String? = null,
+  val supportedCountries: List<String>? = null,
+  val merchantCapability: ApplePayMerchantCapabilityDTO? = null,
+  val supportsCouponCode: Boolean? = null,
+  val couponCode: String? = null,
+  val buttonStyle: ApplePayButtonStyleDTO? = null,
+  val buttonWidth: Double? = null,
+  val buttonHeight: Double? = null,
+  val hasOnSelectShippingMethod: Boolean,
+  val hasOnSelectShippingContact: Boolean,
+  val hasOnChangeCouponCode: Boolean,
+  val hasOnAuthorize: Boolean
+)
+ {
+  companion object {
+    fun fromList(pigeonVar_list: List<Any?>): ApplePayConfigurationDTO {
+      val merchantId = pigeonVar_list[0] as String
+      val merchantName = pigeonVar_list[1] as String
+      val allowOnboarding = pigeonVar_list[2] as Boolean?
+      val summaryItems = pigeonVar_list[3] as List<ApplePaySummaryItemDTO>?
+      val requiredBillingContactFields = pigeonVar_list[4] as List<String>?
+      val billingContact = pigeonVar_list[5] as ApplePayContactDTO?
+      val requiredShippingContactFields = pigeonVar_list[6] as List<String>?
+      val shippingContact = pigeonVar_list[7] as ApplePayContactDTO?
+      val shippingType = pigeonVar_list[8] as ApplePayShippingTypeDTO?
+      val allowShippingContactEditing = pigeonVar_list[9] as Boolean?
+      val shippingMethods = pigeonVar_list[10] as List<ApplePayShippingMethodDTO>?
+      val applicationData = pigeonVar_list[11] as String?
+      val supportedCountries = pigeonVar_list[12] as List<String>?
+      val merchantCapability = pigeonVar_list[13] as ApplePayMerchantCapabilityDTO?
+      val supportsCouponCode = pigeonVar_list[14] as Boolean?
+      val couponCode = pigeonVar_list[15] as String?
+      val buttonStyle = pigeonVar_list[16] as ApplePayButtonStyleDTO?
+      val buttonWidth = pigeonVar_list[17] as Double?
+      val buttonHeight = pigeonVar_list[18] as Double?
+      val hasOnSelectShippingMethod = pigeonVar_list[19] as Boolean
+      val hasOnSelectShippingContact = pigeonVar_list[20] as Boolean
+      val hasOnChangeCouponCode = pigeonVar_list[21] as Boolean
+      val hasOnAuthorize = pigeonVar_list[22] as Boolean
+      return ApplePayConfigurationDTO(merchantId, merchantName, allowOnboarding, summaryItems, requiredBillingContactFields, billingContact, requiredShippingContactFields, shippingContact, shippingType, allowShippingContactEditing, shippingMethods, applicationData, supportedCountries, merchantCapability, supportsCouponCode, couponCode, buttonStyle, buttonWidth, buttonHeight, hasOnSelectShippingMethod, hasOnSelectShippingContact, hasOnChangeCouponCode, hasOnAuthorize)
+    }
+  }
+  fun toList(): List<Any?> {
+    return listOf(
       merchantId,
+      merchantName,
+      allowOnboarding,
+      summaryItems,
+      requiredBillingContactFields,
+      billingContact,
+      requiredShippingContactFields,
+      shippingContact,
+      shippingType,
+      allowShippingContactEditing,
+      shippingMethods,
+      applicationData,
+      supportedCountries,
+      merchantCapability,
+      supportsCouponCode,
+      couponCode,
+      buttonStyle,
+      buttonWidth,
+      buttonHeight,
+      hasOnSelectShippingMethod,
+      hasOnSelectShippingContact,
+      hasOnChangeCouponCode,
+      hasOnAuthorize,
     )
   }
   override fun equals(other: Any?): Boolean {
-    if (other !is MerchantInfoDTO) {
+    if (other !is ApplePayConfigurationDTO) {
       return false
     }
     if (this === other) {
@@ -1578,263 +1059,47 @@ data class MerchantInfoDTO (
 }
 
 /** Generated class from Pigeon that represents data sent in messages. */
-data class ShippingAddressParametersDTO (
-  val allowedCountryCodes: List<String?>? = null,
-  val isPhoneNumberRequired: Boolean? = null
-)
- {
-  companion object {
-    fun fromList(pigeonVar_list: List<Any?>): ShippingAddressParametersDTO {
-      val allowedCountryCodes = pigeonVar_list[0] as List<String?>?
-      val isPhoneNumberRequired = pigeonVar_list[1] as Boolean?
-      return ShippingAddressParametersDTO(allowedCountryCodes, isPhoneNumberRequired)
-    }
-  }
-  fun toList(): List<Any?> {
-    return listOf(
-      allowedCountryCodes,
-      isPhoneNumberRequired,
-    )
-  }
-  override fun equals(other: Any?): Boolean {
-    if (other !is ShippingAddressParametersDTO) {
-      return false
-    }
-    if (this === other) {
-      return true
-    }
-    return PlatformApiPigeonUtils.deepEquals(toList(), other.toList())  }
-
-  override fun hashCode(): Int = toList().hashCode()
-}
-
-/** Generated class from Pigeon that represents data sent in messages. */
-data class BillingAddressParametersDTO (
-  val format: String? = null,
-  val isPhoneNumberRequired: Boolean? = null
-)
- {
-  companion object {
-    fun fromList(pigeonVar_list: List<Any?>): BillingAddressParametersDTO {
-      val format = pigeonVar_list[0] as String?
-      val isPhoneNumberRequired = pigeonVar_list[1] as Boolean?
-      return BillingAddressParametersDTO(format, isPhoneNumberRequired)
-    }
-  }
-  fun toList(): List<Any?> {
-    return listOf(
-      format,
-      isPhoneNumberRequired,
-    )
-  }
-  override fun equals(other: Any?): Boolean {
-    if (other !is BillingAddressParametersDTO) {
-      return false
-    }
-    if (this === other) {
-      return true
-    }
-    return PlatformApiPigeonUtils.deepEquals(toList(), other.toList())  }
-
-  override fun hashCode(): Int = toList().hashCode()
-}
-
-/** Generated class from Pigeon that represents data sent in messages. */
-data class CashAppPayConfigurationDTO (
-  val cashAppPayEnvironment: CashAppPayEnvironment,
-  val returnUrl: String
-)
- {
-  companion object {
-    fun fromList(pigeonVar_list: List<Any?>): CashAppPayConfigurationDTO {
-      val cashAppPayEnvironment = pigeonVar_list[0] as CashAppPayEnvironment
-      val returnUrl = pigeonVar_list[1] as String
-      return CashAppPayConfigurationDTO(cashAppPayEnvironment, returnUrl)
-    }
-  }
-  fun toList(): List<Any?> {
-    return listOf(
-      cashAppPayEnvironment,
-      returnUrl,
-    )
-  }
-  override fun equals(other: Any?): Boolean {
-    if (other !is CashAppPayConfigurationDTO) {
-      return false
-    }
-    if (this === other) {
-      return true
-    }
-    return PlatformApiPigeonUtils.deepEquals(toList(), other.toList())  }
-
-  override fun hashCode(): Int = toList().hashCode()
-}
-
-/** Generated class from Pigeon that represents data sent in messages. */
-data class TwintConfigurationDTO (
-  val iosCallbackAppScheme: String,
-  val showStorePaymentField: Boolean
-)
- {
-  companion object {
-    fun fromList(pigeonVar_list: List<Any?>): TwintConfigurationDTO {
-      val iosCallbackAppScheme = pigeonVar_list[0] as String
-      val showStorePaymentField = pigeonVar_list[1] as Boolean
-      return TwintConfigurationDTO(iosCallbackAppScheme, showStorePaymentField)
-    }
-  }
-  fun toList(): List<Any?> {
-    return listOf(
-      iosCallbackAppScheme,
-      showStorePaymentField,
-    )
-  }
-  override fun equals(other: Any?): Boolean {
-    if (other !is TwintConfigurationDTO) {
-      return false
-    }
-    if (this === other) {
-      return true
-    }
-    return PlatformApiPigeonUtils.deepEquals(toList(), other.toList())  }
-
-  override fun hashCode(): Int = toList().hashCode()
-}
-
-/** Generated class from Pigeon that represents data sent in messages. */
-data class PaymentResultDTO (
-  val type: PaymentResultEnum,
-  val reason: String? = null,
-  val result: PaymentResultModelDTO? = null,
-  val errorCode: String? = null
-)
- {
-  companion object {
-    fun fromList(pigeonVar_list: List<Any?>): PaymentResultDTO {
-      val type = pigeonVar_list[0] as PaymentResultEnum
-      val reason = pigeonVar_list[1] as String?
-      val result = pigeonVar_list[2] as PaymentResultModelDTO?
-      val errorCode = pigeonVar_list[3] as String?
-      return PaymentResultDTO(type, reason, result, errorCode)
-    }
-  }
-  fun toList(): List<Any?> {
-    return listOf(
-      type,
-      reason,
-      result,
-      errorCode,
-    )
-  }
-  override fun equals(other: Any?): Boolean {
-    if (other !is PaymentResultDTO) {
-      return false
-    }
-    if (this === other) {
-      return true
-    }
-    return PlatformApiPigeonUtils.deepEquals(toList(), other.toList())  }
-
-  override fun hashCode(): Int = toList().hashCode()
-}
-
-/** Generated class from Pigeon that represents data sent in messages. */
-data class PaymentResultModelDTO (
-  val sessionId: String? = null,
-  val sessionResult: String? = null,
-  val resultCode: String? = null,
-  val order: OrderResponseDTO? = null
-)
- {
-  companion object {
-    fun fromList(pigeonVar_list: List<Any?>): PaymentResultModelDTO {
-      val sessionId = pigeonVar_list[0] as String?
-      val sessionResult = pigeonVar_list[1] as String?
-      val resultCode = pigeonVar_list[2] as String?
-      val order = pigeonVar_list[3] as OrderResponseDTO?
-      return PaymentResultModelDTO(sessionId, sessionResult, resultCode, order)
-    }
-  }
-  fun toList(): List<Any?> {
-    return listOf(
-      sessionId,
-      sessionResult,
-      resultCode,
-      order,
-    )
-  }
-  override fun equals(other: Any?): Boolean {
-    if (other !is PaymentResultModelDTO) {
-      return false
-    }
-    if (this === other) {
-      return true
-    }
-    return PlatformApiPigeonUtils.deepEquals(toList(), other.toList())  }
-
-  override fun hashCode(): Int = toList().hashCode()
-}
-
-/** Generated class from Pigeon that represents data sent in messages. */
-data class OrderResponseDTO (
-  val pspReference: String,
-  val orderData: String,
+data class CheckoutConfigurationDTO (
+  val environment: EnvironmentDTO,
+  val clientKey: String,
+  val countryCode: String? = null,
   val amount: AmountDTO? = null,
-  val remainingAmount: AmountDTO? = null
+  val analyticsConfiguration: AnalyticsConfigurationDTO,
+  val showSubmitButton: Boolean,
+  val cardConfiguration: CardConfigurationDTO? = null,
+  val applePayConfiguration: ApplePayConfigurationDTO? = null,
+  val googlePayConfiguration: GooglePayConfigurationDTO? = null
 )
  {
   companion object {
-    fun fromList(pigeonVar_list: List<Any?>): OrderResponseDTO {
-      val pspReference = pigeonVar_list[0] as String
-      val orderData = pigeonVar_list[1] as String
-      val amount = pigeonVar_list[2] as AmountDTO?
-      val remainingAmount = pigeonVar_list[3] as AmountDTO?
-      return OrderResponseDTO(pspReference, orderData, amount, remainingAmount)
+    fun fromList(pigeonVar_list: List<Any?>): CheckoutConfigurationDTO {
+      val environment = pigeonVar_list[0] as EnvironmentDTO
+      val clientKey = pigeonVar_list[1] as String
+      val countryCode = pigeonVar_list[2] as String?
+      val amount = pigeonVar_list[3] as AmountDTO?
+      val analyticsConfiguration = pigeonVar_list[4] as AnalyticsConfigurationDTO
+      val showSubmitButton = pigeonVar_list[5] as Boolean
+      val cardConfiguration = pigeonVar_list[6] as CardConfigurationDTO?
+      val applePayConfiguration = pigeonVar_list[7] as ApplePayConfigurationDTO?
+      val googlePayConfiguration = pigeonVar_list[8] as GooglePayConfigurationDTO?
+      return CheckoutConfigurationDTO(environment, clientKey, countryCode, amount, analyticsConfiguration, showSubmitButton, cardConfiguration, applePayConfiguration, googlePayConfiguration)
     }
   }
   fun toList(): List<Any?> {
     return listOf(
-      pspReference,
-      orderData,
+      environment,
+      clientKey,
+      countryCode,
       amount,
-      remainingAmount,
+      analyticsConfiguration,
+      showSubmitButton,
+      cardConfiguration,
+      applePayConfiguration,
+      googlePayConfiguration,
     )
   }
   override fun equals(other: Any?): Boolean {
-    if (other !is OrderResponseDTO) {
-      return false
-    }
-    if (this === other) {
-      return true
-    }
-    return PlatformApiPigeonUtils.deepEquals(toList(), other.toList())  }
-
-  override fun hashCode(): Int = toList().hashCode()
-}
-
-/**
- * Generated class from Pigeon that represents data sent in messages.
- * This class should not be extended by any user class outside of the generated file.
- */
-sealed class CheckoutResultDTO 
-/** Generated class from Pigeon that represents data sent in messages. */
-data class FinishedResultDTO (
-  val resultCode: String
-) : CheckoutResultDTO()
- {
-  companion object {
-    fun fromList(pigeonVar_list: List<Any?>): FinishedResultDTO {
-      val resultCode = pigeonVar_list[0] as String
-      return FinishedResultDTO(resultCode)
-    }
-  }
-  fun toList(): List<Any?> {
-    return listOf(
-      resultCode,
-    )
-  }
-  override fun equals(other: Any?): Boolean {
-    if (other !is FinishedResultDTO) {
+    if (other !is CheckoutConfigurationDTO) {
       return false
     }
     if (this === other) {
@@ -1846,165 +1111,29 @@ data class FinishedResultDTO (
 }
 
 /** Generated class from Pigeon that represents data sent in messages. */
-data class ActionResultDTO (
-  val actionResponse: String
-) : CheckoutResultDTO()
- {
-  companion object {
-    fun fromList(pigeonVar_list: List<Any?>): ActionResultDTO {
-      val actionResponse = pigeonVar_list[0] as String
-      return ActionResultDTO(actionResponse)
-    }
-  }
-  fun toList(): List<Any?> {
-    return listOf(
-      actionResponse,
-    )
-  }
-  override fun equals(other: Any?): Boolean {
-    if (other !is ActionResultDTO) {
-      return false
-    }
-    if (this === other) {
-      return true
-    }
-    return PlatformApiPigeonUtils.deepEquals(toList(), other.toList())  }
-
-  override fun hashCode(): Int = toList().hashCode()
-}
-
-/** Generated class from Pigeon that represents data sent in messages. */
-data class ErrorResultDTO (
-  val errorMessage: String
-) : CheckoutResultDTO()
- {
-  companion object {
-    fun fromList(pigeonVar_list: List<Any?>): ErrorResultDTO {
-      val errorMessage = pigeonVar_list[0] as String
-      return ErrorResultDTO(errorMessage)
-    }
-  }
-  fun toList(): List<Any?> {
-    return listOf(
-      errorMessage,
-    )
-  }
-  override fun equals(other: Any?): Boolean {
-    if (other !is ErrorResultDTO) {
-      return false
-    }
-    if (this === other) {
-      return true
-    }
-    return PlatformApiPigeonUtils.deepEquals(toList(), other.toList())  }
-
-  override fun hashCode(): Int = toList().hashCode()
-}
-
-/** Generated class from Pigeon that represents data sent in messages. */
-data class CheckoutEvent (
-  val type: CheckoutEventType,
-  val data: Any? = null
+data class CheckoutSetupResultDTO (
+  val checkoutId: String,
+  val regularPaymentMethodsJson: String,
+  val storedPaymentMethodsJson: String
 )
  {
   companion object {
-    fun fromList(pigeonVar_list: List<Any?>): CheckoutEvent {
-      val type = pigeonVar_list[0] as CheckoutEventType
-      val data = pigeonVar_list[1]
-      return CheckoutEvent(type, data)
+    fun fromList(pigeonVar_list: List<Any?>): CheckoutSetupResultDTO {
+      val checkoutId = pigeonVar_list[0] as String
+      val regularPaymentMethodsJson = pigeonVar_list[1] as String
+      val storedPaymentMethodsJson = pigeonVar_list[2] as String
+      return CheckoutSetupResultDTO(checkoutId, regularPaymentMethodsJson, storedPaymentMethodsJson)
     }
   }
   fun toList(): List<Any?> {
     return listOf(
-      type,
-      data,
+      checkoutId,
+      regularPaymentMethodsJson,
+      storedPaymentMethodsJson,
     )
   }
   override fun equals(other: Any?): Boolean {
-    if (other !is CheckoutEvent) {
-      return false
-    }
-    if (this === other) {
-      return true
-    }
-    return PlatformApiPigeonUtils.deepEquals(toList(), other.toList())  }
-
-  override fun hashCode(): Int = toList().hashCode()
-}
-
-/** Generated class from Pigeon that represents data sent in messages. */
-data class AddressDTO (
-  val city: String? = null,
-  val country: String? = null,
-  val houseNumberOrName: String? = null,
-  val postalCode: String? = null,
-  val stateOrProvince: String? = null,
-  val street: String? = null,
-  val apartment: String? = null
-)
- {
-  companion object {
-    fun fromList(pigeonVar_list: List<Any?>): AddressDTO {
-      val city = pigeonVar_list[0] as String?
-      val country = pigeonVar_list[1] as String?
-      val houseNumberOrName = pigeonVar_list[2] as String?
-      val postalCode = pigeonVar_list[3] as String?
-      val stateOrProvince = pigeonVar_list[4] as String?
-      val street = pigeonVar_list[5] as String?
-      val apartment = pigeonVar_list[6] as String?
-      return AddressDTO(city, country, houseNumberOrName, postalCode, stateOrProvince, street, apartment)
-    }
-  }
-  fun toList(): List<Any?> {
-    return listOf(
-      city,
-      country,
-      houseNumberOrName,
-      postalCode,
-      stateOrProvince,
-      street,
-      apartment,
-    )
-  }
-  override fun equals(other: Any?): Boolean {
-    if (other !is AddressDTO) {
-      return false
-    }
-    if (this === other) {
-      return true
-    }
-    return PlatformApiPigeonUtils.deepEquals(toList(), other.toList())  }
-
-  override fun hashCode(): Int = toList().hashCode()
-}
-
-/** Generated class from Pigeon that represents data sent in messages. */
-data class ShopperNameDTO (
-  val firstName: String? = null,
-  val lastName: String? = null,
-  val infix: String? = null,
-  val gender: String? = null
-)
- {
-  companion object {
-    fun fromList(pigeonVar_list: List<Any?>): ShopperNameDTO {
-      val firstName = pigeonVar_list[0] as String?
-      val lastName = pigeonVar_list[1] as String?
-      val infix = pigeonVar_list[2] as String?
-      val gender = pigeonVar_list[3] as String?
-      return ShopperNameDTO(firstName, lastName, infix, gender)
-    }
-  }
-  fun toList(): List<Any?> {
-    return listOf(
-      firstName,
-      lastName,
-      infix,
-      gender,
-    )
-  }
-  override fun equals(other: Any?): Boolean {
-    if (other !is ShopperNameDTO) {
+    if (other !is CheckoutSetupResultDTO) {
       return false
     }
     if (this === other) {
@@ -2087,32 +1216,38 @@ data class BeforeSubmitResultDTO (
 }
 
 /** Generated class from Pigeon that represents data sent in messages. */
-data class ComponentCommunicationModel (
-  val type: ComponentCommunicationType,
-  val componentId: String,
-  val data: Any? = null,
-  val paymentResult: PaymentResultDTO? = null
+data class AddressDTO (
+  val city: String? = null,
+  val country: String? = null,
+  val houseNumberOrName: String? = null,
+  val postalCode: String? = null,
+  val stateOrProvince: String? = null,
+  val street: String? = null
 )
  {
   companion object {
-    fun fromList(pigeonVar_list: List<Any?>): ComponentCommunicationModel {
-      val type = pigeonVar_list[0] as ComponentCommunicationType
-      val componentId = pigeonVar_list[1] as String
-      val data = pigeonVar_list[2]
-      val paymentResult = pigeonVar_list[3] as PaymentResultDTO?
-      return ComponentCommunicationModel(type, componentId, data, paymentResult)
+    fun fromList(pigeonVar_list: List<Any?>): AddressDTO {
+      val city = pigeonVar_list[0] as String?
+      val country = pigeonVar_list[1] as String?
+      val houseNumberOrName = pigeonVar_list[2] as String?
+      val postalCode = pigeonVar_list[3] as String?
+      val stateOrProvince = pigeonVar_list[4] as String?
+      val street = pigeonVar_list[5] as String?
+      return AddressDTO(city, country, houseNumberOrName, postalCode, stateOrProvince, street)
     }
   }
   fun toList(): List<Any?> {
     return listOf(
-      type,
-      componentId,
-      data,
-      paymentResult,
+      city,
+      country,
+      houseNumberOrName,
+      postalCode,
+      stateOrProvince,
+      street,
     )
   }
   override fun equals(other: Any?): Boolean {
-    if (other !is ComponentCommunicationModel) {
+    if (other !is AddressDTO) {
       return false
     }
     if (this === other) {
@@ -2124,29 +1259,60 @@ data class ComponentCommunicationModel (
 }
 
 /** Generated class from Pigeon that represents data sent in messages. */
-data class PlatformCommunicationDTO (
-  val type: ComponentCommunicationType,
-  val componentId: String,
-  val dataJson: String? = null
+data class ShopperNameDTO (
+  val firstName: String? = null,
+  val lastName: String? = null,
+  val infix: String? = null,
+  val gender: String? = null
 )
  {
   companion object {
-    fun fromList(pigeonVar_list: List<Any?>): PlatformCommunicationDTO {
-      val type = pigeonVar_list[0] as ComponentCommunicationType
-      val componentId = pigeonVar_list[1] as String
-      val dataJson = pigeonVar_list[2] as String?
-      return PlatformCommunicationDTO(type, componentId, dataJson)
+    fun fromList(pigeonVar_list: List<Any?>): ShopperNameDTO {
+      val firstName = pigeonVar_list[0] as String?
+      val lastName = pigeonVar_list[1] as String?
+      val infix = pigeonVar_list[2] as String?
+      val gender = pigeonVar_list[3] as String?
+      return ShopperNameDTO(firstName, lastName, infix, gender)
     }
   }
   fun toList(): List<Any?> {
     return listOf(
-      type,
-      componentId,
+      firstName,
+      lastName,
+      infix,
+      gender,
+    )
+  }
+  override fun equals(other: Any?): Boolean {
+    if (other !is ShopperNameDTO) {
+      return false
+    }
+    if (this === other) {
+      return true
+    }
+    return PlatformApiPigeonUtils.deepEquals(toList(), other.toList())  }
+
+  override fun hashCode(): Int = toList().hashCode()
+}
+
+/** Generated class from Pigeon that represents data sent in messages. */
+data class PaymentComponentDataDTO (
+  val dataJson: String
+)
+ {
+  companion object {
+    fun fromList(pigeonVar_list: List<Any?>): PaymentComponentDataDTO {
+      val dataJson = pigeonVar_list[0] as String
+      return PaymentComponentDataDTO(dataJson)
+    }
+  }
+  fun toList(): List<Any?> {
+    return listOf(
       dataJson,
     )
   }
   override fun equals(other: Any?): Boolean {
-    if (other !is PlatformCommunicationDTO) {
+    if (other !is PaymentComponentDataDTO) {
       return false
     }
     if (this === other) {
@@ -2158,32 +1324,23 @@ data class PlatformCommunicationDTO (
 }
 
 /** Generated class from Pigeon that represents data sent in messages. */
-data class PaymentEventDTO (
-  val paymentEventType: PaymentEventType,
-  val result: String? = null,
-  val data: Map<String?, Any?>? = null,
-  val error: ErrorDTO? = null
+data class ActionComponentDataDTO (
+  val dataJson: String
 )
  {
   companion object {
-    fun fromList(pigeonVar_list: List<Any?>): PaymentEventDTO {
-      val paymentEventType = pigeonVar_list[0] as PaymentEventType
-      val result = pigeonVar_list[1] as String?
-      val data = pigeonVar_list[2] as Map<String?, Any?>?
-      val error = pigeonVar_list[3] as ErrorDTO?
-      return PaymentEventDTO(paymentEventType, result, data, error)
+    fun fromList(pigeonVar_list: List<Any?>): ActionComponentDataDTO {
+      val dataJson = pigeonVar_list[0] as String
+      return ActionComponentDataDTO(dataJson)
     }
   }
   fun toList(): List<Any?> {
     return listOf(
-      paymentEventType,
-      result,
-      data,
-      error,
+      dataJson,
     )
   }
   override fun equals(other: Any?): Boolean {
-    if (other !is PaymentEventDTO) {
+    if (other !is ActionComponentDataDTO) {
       return false
     }
     if (this === other) {
@@ -2195,29 +1352,32 @@ data class PaymentEventDTO (
 }
 
 /** Generated class from Pigeon that represents data sent in messages. */
-data class ErrorDTO (
-  val errorMessage: String? = null,
-  val reason: String? = null,
-  val dismissDropIn: Boolean? = null
+data class SubmitResultDTO (
+  val type: SubmitResultTypeDTO,
+  val resultCode: String? = null,
+  val actionJson: String? = null,
+  val errorMessage: String? = null
 )
  {
   companion object {
-    fun fromList(pigeonVar_list: List<Any?>): ErrorDTO {
-      val errorMessage = pigeonVar_list[0] as String?
-      val reason = pigeonVar_list[1] as String?
-      val dismissDropIn = pigeonVar_list[2] as Boolean?
-      return ErrorDTO(errorMessage, reason, dismissDropIn)
+    fun fromList(pigeonVar_list: List<Any?>): SubmitResultDTO {
+      val type = pigeonVar_list[0] as SubmitResultTypeDTO
+      val resultCode = pigeonVar_list[1] as String?
+      val actionJson = pigeonVar_list[2] as String?
+      val errorMessage = pigeonVar_list[3] as String?
+      return SubmitResultDTO(type, resultCode, actionJson, errorMessage)
     }
   }
   fun toList(): List<Any?> {
     return listOf(
+      type,
+      resultCode,
+      actionJson,
       errorMessage,
-      reason,
-      dismissDropIn,
     )
   }
   override fun equals(other: Any?): Boolean {
-    if (other !is ErrorDTO) {
+    if (other !is SubmitResultDTO) {
       return false
     }
     if (this === other) {
@@ -2229,26 +1389,23 @@ data class ErrorDTO (
 }
 
 /** Generated class from Pigeon that represents data sent in messages. */
-data class DeletedStoredPaymentMethodResultDTO (
-  val storedPaymentMethodId: String,
-  val isSuccessfullyRemoved: Boolean
+data class AdditionalDetailsResultDTO (
+  val resultCode: String
 )
  {
   companion object {
-    fun fromList(pigeonVar_list: List<Any?>): DeletedStoredPaymentMethodResultDTO {
-      val storedPaymentMethodId = pigeonVar_list[0] as String
-      val isSuccessfullyRemoved = pigeonVar_list[1] as Boolean
-      return DeletedStoredPaymentMethodResultDTO(storedPaymentMethodId, isSuccessfullyRemoved)
+    fun fromList(pigeonVar_list: List<Any?>): AdditionalDetailsResultDTO {
+      val resultCode = pigeonVar_list[0] as String
+      return AdditionalDetailsResultDTO(resultCode)
     }
   }
   fun toList(): List<Any?> {
     return listOf(
-      storedPaymentMethodId,
-      isSuccessfullyRemoved,
+      resultCode,
     )
   }
   override fun equals(other: Any?): Boolean {
-    if (other !is DeletedStoredPaymentMethodResultDTO) {
+    if (other !is AdditionalDetailsResultDTO) {
       return false
     }
     if (this === other) {
@@ -2260,81 +1417,23 @@ data class DeletedStoredPaymentMethodResultDTO (
 }
 
 /** Generated class from Pigeon that represents data sent in messages. */
-data class InstantPaymentConfigurationDTO (
-  val environment: Environment,
-  val clientKey: String,
-  val countryCode: String,
-  val amount: AmountDTO? = null,
-  val shopperLocale: String? = null,
-  val analyticsOptionsDTO: AnalyticsOptionsDTO,
-  val instantPaymentType: InstantPaymentType,
-  val googlePayConfigurationDTO: GooglePayConfigurationDTO? = null,
-  val applePayConfigurationDTO: ApplePayConfigurationDTO? = null
+data class AdvancedCheckoutResultDTO (
+  val resultCode: String
 )
  {
   companion object {
-    fun fromList(pigeonVar_list: List<Any?>): InstantPaymentConfigurationDTO {
-      val environment = pigeonVar_list[0] as Environment
-      val clientKey = pigeonVar_list[1] as String
-      val countryCode = pigeonVar_list[2] as String
-      val amount = pigeonVar_list[3] as AmountDTO?
-      val shopperLocale = pigeonVar_list[4] as String?
-      val analyticsOptionsDTO = pigeonVar_list[5] as AnalyticsOptionsDTO
-      val instantPaymentType = pigeonVar_list[6] as InstantPaymentType
-      val googlePayConfigurationDTO = pigeonVar_list[7] as GooglePayConfigurationDTO?
-      val applePayConfigurationDTO = pigeonVar_list[8] as ApplePayConfigurationDTO?
-      return InstantPaymentConfigurationDTO(environment, clientKey, countryCode, amount, shopperLocale, analyticsOptionsDTO, instantPaymentType, googlePayConfigurationDTO, applePayConfigurationDTO)
+    fun fromList(pigeonVar_list: List<Any?>): AdvancedCheckoutResultDTO {
+      val resultCode = pigeonVar_list[0] as String
+      return AdvancedCheckoutResultDTO(resultCode)
     }
   }
   fun toList(): List<Any?> {
     return listOf(
-      environment,
-      clientKey,
-      countryCode,
-      amount,
-      shopperLocale,
-      analyticsOptionsDTO,
-      instantPaymentType,
-      googlePayConfigurationDTO,
-      applePayConfigurationDTO,
+      resultCode,
     )
   }
   override fun equals(other: Any?): Boolean {
-    if (other !is InstantPaymentConfigurationDTO) {
-      return false
-    }
-    if (this === other) {
-      return true
-    }
-    return PlatformApiPigeonUtils.deepEquals(toList(), other.toList())  }
-
-  override fun hashCode(): Int = toList().hashCode()
-}
-
-/** Generated class from Pigeon that represents data sent in messages. */
-data class InstantPaymentSetupResultDTO (
-  val instantPaymentType: InstantPaymentType,
-  val isSupported: Boolean,
-  val resultData: Any? = null
-)
- {
-  companion object {
-    fun fromList(pigeonVar_list: List<Any?>): InstantPaymentSetupResultDTO {
-      val instantPaymentType = pigeonVar_list[0] as InstantPaymentType
-      val isSupported = pigeonVar_list[1] as Boolean
-      val resultData = pigeonVar_list[2]
-      return InstantPaymentSetupResultDTO(instantPaymentType, isSupported, resultData)
-    }
-  }
-  fun toList(): List<Any?> {
-    return listOf(
-      instantPaymentType,
-      isSupported,
-      resultData,
-    )
-  }
-  override fun equals(other: Any?): Boolean {
-    if (other !is InstantPaymentSetupResultDTO) {
+    if (other !is AdvancedCheckoutResultDTO) {
       return false
     }
     if (this === other) {
@@ -2420,69 +1519,29 @@ data class EncryptedCardDTO (
 }
 
 /** Generated class from Pigeon that represents data sent in messages. */
-data class ActionComponentConfigurationDTO (
-  val environment: Environment,
-  val clientKey: String,
-  val amount: AmountDTO? = null,
-  val shopperLocale: String? = null,
-  val analyticsOptionsDTO: AnalyticsOptionsDTO,
-  val threeDS2ConfigurationDTO: ThreeDS2ConfigurationDTO? = null
+data class BinLookupBrandDTO (
+  val brand: String,
+  val supported: Boolean,
+  val paymentMethodVariant: String? = null
 )
  {
   companion object {
-    fun fromList(pigeonVar_list: List<Any?>): ActionComponentConfigurationDTO {
-      val environment = pigeonVar_list[0] as Environment
-      val clientKey = pigeonVar_list[1] as String
-      val amount = pigeonVar_list[2] as AmountDTO?
-      val shopperLocale = pigeonVar_list[3] as String?
-      val analyticsOptionsDTO = pigeonVar_list[4] as AnalyticsOptionsDTO
-      val threeDS2ConfigurationDTO = pigeonVar_list[5] as ThreeDS2ConfigurationDTO?
-      return ActionComponentConfigurationDTO(environment, clientKey, amount, shopperLocale, analyticsOptionsDTO, threeDS2ConfigurationDTO)
+    fun fromList(pigeonVar_list: List<Any?>): BinLookupBrandDTO {
+      val brand = pigeonVar_list[0] as String
+      val supported = pigeonVar_list[1] as Boolean
+      val paymentMethodVariant = pigeonVar_list[2] as String?
+      return BinLookupBrandDTO(brand, supported, paymentMethodVariant)
     }
   }
   fun toList(): List<Any?> {
     return listOf(
-      environment,
-      clientKey,
-      amount,
-      shopperLocale,
-      analyticsOptionsDTO,
-      threeDS2ConfigurationDTO,
+      brand,
+      supported,
+      paymentMethodVariant,
     )
   }
   override fun equals(other: Any?): Boolean {
-    if (other !is ActionComponentConfigurationDTO) {
-      return false
-    }
-    if (this === other) {
-      return true
-    }
-    return PlatformApiPigeonUtils.deepEquals(toList(), other.toList())  }
-
-  override fun hashCode(): Int = toList().hashCode()
-}
-
-/** Generated class from Pigeon that represents data sent in messages. */
-data class OrderCancelResultDTO (
-  val orderCancelResponseBody: Map<String?, Any?>,
-  val updatedPaymentMethodsResponseBody: Map<String?, Any?>? = null
-)
- {
-  companion object {
-    fun fromList(pigeonVar_list: List<Any?>): OrderCancelResultDTO {
-      val orderCancelResponseBody = pigeonVar_list[0] as Map<String?, Any?>
-      val updatedPaymentMethodsResponseBody = pigeonVar_list[1] as Map<String?, Any?>?
-      return OrderCancelResultDTO(orderCancelResponseBody, updatedPaymentMethodsResponseBody)
-    }
-  }
-  fun toList(): List<Any?> {
-    return listOf(
-      orderCancelResponseBody,
-      updatedPaymentMethodsResponseBody,
-    )
-  }
-  override fun equals(other: Any?): Boolean {
-    if (other !is OrderCancelResultDTO) {
+    if (other !is BinLookupBrandDTO) {
       return false
     }
     if (this === other) {
@@ -2495,22 +1554,86 @@ data class OrderCancelResultDTO (
 
 /** Generated class from Pigeon that represents data sent in messages. */
 data class BinLookupDataDTO (
-  val brand: String
+  val issuingCountryCode: String? = null,
+  val brands: List<BinLookupBrandDTO>
 )
  {
   companion object {
     fun fromList(pigeonVar_list: List<Any?>): BinLookupDataDTO {
-      val brand = pigeonVar_list[0] as String
-      return BinLookupDataDTO(brand)
+      val issuingCountryCode = pigeonVar_list[0] as String?
+      val brands = pigeonVar_list[1] as List<BinLookupBrandDTO>
+      return BinLookupDataDTO(issuingCountryCode, brands)
     }
   }
   fun toList(): List<Any?> {
     return listOf(
-      brand,
+      issuingCountryCode,
+      brands,
     )
   }
   override fun equals(other: Any?): Boolean {
     if (other !is BinLookupDataDTO) {
+      return false
+    }
+    if (this === other) {
+      return true
+    }
+    return PlatformApiPigeonUtils.deepEquals(toList(), other.toList())  }
+
+  override fun hashCode(): Int = toList().hashCode()
+}
+
+/** Generated class from Pigeon that represents data sent in messages. */
+data class CheckoutEventDTO (
+  val type: CheckoutEventTypeDTO,
+  val checkoutId: String,
+  val componentId: String? = null,
+  val requiresUserInteraction: Boolean? = null,
+  val height: Long? = null,
+  val binLookupData: List<BinLookupDataDTO>? = null,
+  val binValue: String? = null,
+  val resultCode: String? = null,
+  val sessionId: String? = null,
+  val sessionData: String? = null,
+  val errorCode: String? = null,
+  val errorMessage: String? = null
+)
+ {
+  companion object {
+    fun fromList(pigeonVar_list: List<Any?>): CheckoutEventDTO {
+      val type = pigeonVar_list[0] as CheckoutEventTypeDTO
+      val checkoutId = pigeonVar_list[1] as String
+      val componentId = pigeonVar_list[2] as String?
+      val requiresUserInteraction = pigeonVar_list[3] as Boolean?
+      val height = pigeonVar_list[4] as Long?
+      val binLookupData = pigeonVar_list[5] as List<BinLookupDataDTO>?
+      val binValue = pigeonVar_list[6] as String?
+      val resultCode = pigeonVar_list[7] as String?
+      val sessionId = pigeonVar_list[8] as String?
+      val sessionData = pigeonVar_list[9] as String?
+      val errorCode = pigeonVar_list[10] as String?
+      val errorMessage = pigeonVar_list[11] as String?
+      return CheckoutEventDTO(type, checkoutId, componentId, requiresUserInteraction, height, binLookupData, binValue, resultCode, sessionId, sessionData, errorCode, errorMessage)
+    }
+  }
+  fun toList(): List<Any?> {
+    return listOf(
+      type,
+      checkoutId,
+      componentId,
+      requiresUserInteraction,
+      height,
+      binLookupData,
+      binValue,
+      resultCode,
+      sessionId,
+      sessionData,
+      errorCode,
+      errorMessage,
+    )
+  }
+  override fun equals(other: Any?): Boolean {
+    if (other !is CheckoutEventDTO) {
       return false
     }
     if (this === other) {
@@ -2525,382 +1648,247 @@ private open class PlatformApiPigeonCodec : StandardMessageCodec() {
     return when (type) {
       129.toByte() -> {
         return (readValue(buffer) as Long?)?.let {
-          Environment.ofRaw(it.toInt())
+          EnvironmentDTO.ofRaw(it.toInt())
         }
       }
       130.toByte() -> {
         return (readValue(buffer) as Long?)?.let {
-          AddressMode.ofRaw(it.toInt())
+          BillingAddressModeDTO.ofRaw(it.toInt())
         }
       }
       131.toByte() -> {
         return (readValue(buffer) as Long?)?.let {
-          CardAuthMethod.ofRaw(it.toInt())
+          FieldVisibilityDTO.ofRaw(it.toInt())
         }
       }
       132.toByte() -> {
         return (readValue(buffer) as Long?)?.let {
-          TotalPriceStatus.ofRaw(it.toInt())
+          GooglePayEnvironmentDTO.ofRaw(it.toInt())
         }
       }
       133.toByte() -> {
         return (readValue(buffer) as Long?)?.let {
-          GooglePayEnvironment.ofRaw(it.toInt())
+          TotalPriceStatusDTO.ofRaw(it.toInt())
         }
       }
       134.toByte() -> {
         return (readValue(buffer) as Long?)?.let {
-          CashAppPayEnvironment.ofRaw(it.toInt())
+          ApplePayShippingTypeDTO.ofRaw(it.toInt())
         }
       }
       135.toByte() -> {
         return (readValue(buffer) as Long?)?.let {
-          PaymentResultEnum.ofRaw(it.toInt())
+          ApplePayMerchantCapabilityDTO.ofRaw(it.toInt())
         }
       }
       136.toByte() -> {
         return (readValue(buffer) as Long?)?.let {
-          CheckoutEventType.ofRaw(it.toInt())
+          ApplePaySummaryItemTypeDTO.ofRaw(it.toInt())
         }
       }
       137.toByte() -> {
         return (readValue(buffer) as Long?)?.let {
-          ComponentCommunicationType.ofRaw(it.toInt())
+          ApplePayPaymentErrorTypeDTO.ofRaw(it.toInt())
         }
       }
       138.toByte() -> {
         return (readValue(buffer) as Long?)?.let {
-          PaymentEventType.ofRaw(it.toInt())
+          ApplePayButtonThemeDTO.ofRaw(it.toInt())
         }
       }
       139.toByte() -> {
         return (readValue(buffer) as Long?)?.let {
-          FieldVisibility.ofRaw(it.toInt())
+          ApplePayButtonTypeDTO.ofRaw(it.toInt())
         }
       }
       140.toByte() -> {
         return (readValue(buffer) as Long?)?.let {
-          InstantPaymentType.ofRaw(it.toInt())
+          CheckoutEventTypeDTO.ofRaw(it.toInt())
         }
       }
       141.toByte() -> {
         return (readValue(buffer) as Long?)?.let {
-          ApplePayShippingType.ofRaw(it.toInt())
+          SubmitResultTypeDTO.ofRaw(it.toInt())
         }
       }
       142.toByte() -> {
-        return (readValue(buffer) as Long?)?.let {
-          ApplePayMerchantCapability.ofRaw(it.toInt())
-        }
-      }
-      143.toByte() -> {
-        return (readValue(buffer) as Long?)?.let {
-          ApplePaySummaryItemType.ofRaw(it.toInt())
-        }
-      }
-      144.toByte() -> {
-        return (readValue(buffer) as Long?)?.let {
-          ApplePayPaymentErrorType.ofRaw(it.toInt())
-        }
-      }
-      145.toByte() -> {
-        return (readValue(buffer) as Long?)?.let {
-          CardNumberValidationResultDTO.ofRaw(it.toInt())
-        }
-      }
-      146.toByte() -> {
-        return (readValue(buffer) as Long?)?.let {
-          CardExpiryDateValidationResultDTO.ofRaw(it.toInt())
-        }
-      }
-      147.toByte() -> {
-        return (readValue(buffer) as Long?)?.let {
-          CardSecurityCodeValidationResultDTO.ofRaw(it.toInt())
-        }
-      }
-      148.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
           SessionResponseDTO.fromList(it)
         }
       }
-      149.toByte() -> {
-        return (readValue(buffer) as? List<Any?>)?.let {
-          SessionDTO.fromList(it)
-        }
-      }
-      150.toByte() -> {
+      143.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
           AmountDTO.fromList(it)
         }
       }
-      151.toByte() -> {
+      144.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          AnalyticsOptionsDTO.fromList(it)
+          AnalyticsConfigurationDTO.fromList(it)
         }
       }
-      152.toByte() -> {
+      145.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          ThreeDS2UICustomizationDTO.fromList(it)
+          InstallmentOptionsDTO.fromList(it)
         }
       }
-      153.toByte() -> {
-        return (readValue(buffer) as? List<Any?>)?.let {
-          ThreeDS2ScreenCustomizationDTO.fromList(it)
-        }
-      }
-      154.toByte() -> {
-        return (readValue(buffer) as? List<Any?>)?.let {
-          ThreeDS2ButtonCustomizationDTO.fromList(it)
-        }
-      }
-      155.toByte() -> {
-        return (readValue(buffer) as? List<Any?>)?.let {
-          ThreeDS2SelectionItemCustomizationDTO.fromList(it)
-        }
-      }
-      156.toByte() -> {
-        return (readValue(buffer) as? List<Any?>)?.let {
-          ThreeDS2LabelCustomizationDTO.fromList(it)
-        }
-      }
-      157.toByte() -> {
-        return (readValue(buffer) as? List<Any?>)?.let {
-          ThreeDS2InputCustomizationDTO.fromList(it)
-        }
-      }
-      158.toByte() -> {
-        return (readValue(buffer) as? List<Any?>)?.let {
-          ThreeDS2ToolbarCustomizationDTO.fromList(it)
-        }
-      }
-      159.toByte() -> {
-        return (readValue(buffer) as? List<Any?>)?.let {
-          ThreeDS2ConfigurationDTO.fromList(it)
-        }
-      }
-      160.toByte() -> {
-        return (readValue(buffer) as? List<Any?>)?.let {
-          DefaultInstallmentOptionsDTO.fromList(it)
-        }
-      }
-      161.toByte() -> {
-        return (readValue(buffer) as? List<Any?>)?.let {
-          CardBasedInstallmentOptionsDTO.fromList(it)
-        }
-      }
-      162.toByte() -> {
+      146.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
           InstallmentConfigurationDTO.fromList(it)
         }
       }
-      163.toByte() -> {
-        return (readValue(buffer) as? List<Any?>)?.let {
-          CheckoutConfigurationDTO.fromList(it)
-        }
-      }
-      164.toByte() -> {
-        return (readValue(buffer) as? List<Any?>)?.let {
-          DropInConfigurationDTO.fromList(it)
-        }
-      }
-      165.toByte() -> {
+      147.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
           CardConfigurationDTO.fromList(it)
         }
       }
-      166.toByte() -> {
-        return (readValue(buffer) as? List<Any?>)?.let {
-          ApplePayConfigurationDTO.fromList(it)
-        }
-      }
-      167.toByte() -> {
-        return (readValue(buffer) as? List<Any?>)?.let {
-          ApplePayAuthorizedPaymentDTO.fromList(it)
-        }
-      }
-      168.toByte() -> {
-        return (readValue(buffer) as? List<Any?>)?.let {
-          ApplePayPaymentErrorDTO.fromList(it)
-        }
-      }
-      169.toByte() -> {
-        return (readValue(buffer) as? List<Any?>)?.let {
-          ApplePayAuthorizationResultDTO.fromList(it)
-        }
-      }
-      170.toByte() -> {
-        return (readValue(buffer) as? List<Any?>)?.let {
-          ApplePayCouponCodeUpdateDTO.fromList(it)
-        }
-      }
-      171.toByte() -> {
-        return (readValue(buffer) as? List<Any?>)?.let {
-          ApplePayShippingContactUpdateDTO.fromList(it)
-        }
-      }
-      172.toByte() -> {
-        return (readValue(buffer) as? List<Any?>)?.let {
-          ApplePayShippingMethodUpdateDTO.fromList(it)
-        }
-      }
-      173.toByte() -> {
-        return (readValue(buffer) as? List<Any?>)?.let {
-          ApplePayContactDTO.fromList(it)
-        }
-      }
-      174.toByte() -> {
-        return (readValue(buffer) as? List<Any?>)?.let {
-          ApplePayShippingMethodDTO.fromList(it)
-        }
-      }
-      175.toByte() -> {
-        return (readValue(buffer) as? List<Any?>)?.let {
-          ApplePaySummaryItemDTO.fromList(it)
-        }
-      }
-      176.toByte() -> {
-        return (readValue(buffer) as? List<Any?>)?.let {
-          GooglePayConfigurationDTO.fromList(it)
-        }
-      }
-      177.toByte() -> {
+      148.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
           MerchantInfoDTO.fromList(it)
         }
       }
-      178.toByte() -> {
+      149.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
           ShippingAddressParametersDTO.fromList(it)
         }
       }
-      179.toByte() -> {
+      150.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          BillingAddressParametersDTO.fromList(it)
+          GooglePayConfigurationDTO.fromList(it)
         }
       }
-      180.toByte() -> {
+      151.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          CashAppPayConfigurationDTO.fromList(it)
+          ApplePayContactDTO.fromList(it)
         }
       }
-      181.toByte() -> {
+      152.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          TwintConfigurationDTO.fromList(it)
+          ApplePaySummaryItemDTO.fromList(it)
         }
       }
-      182.toByte() -> {
+      153.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          PaymentResultDTO.fromList(it)
+          ApplePayShippingMethodDTO.fromList(it)
         }
       }
-      183.toByte() -> {
+      154.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          PaymentResultModelDTO.fromList(it)
+          ApplePayPaymentErrorDTO.fromList(it)
         }
       }
-      184.toByte() -> {
+      155.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          OrderResponseDTO.fromList(it)
+          ApplePayAuthorizedPaymentDTO.fromList(it)
         }
       }
-      185.toByte() -> {
+      156.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          FinishedResultDTO.fromList(it)
+          ApplePayAuthorizationResultDTO.fromList(it)
         }
       }
-      186.toByte() -> {
+      157.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          ActionResultDTO.fromList(it)
+          ApplePayShippingMethodUpdateDTO.fromList(it)
         }
       }
-      187.toByte() -> {
+      158.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          ErrorResultDTO.fromList(it)
+          ApplePayShippingContactUpdateDTO.fromList(it)
         }
       }
-      188.toByte() -> {
+      159.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          CheckoutEvent.fromList(it)
+          ApplePayCouponCodeUpdateDTO.fromList(it)
         }
       }
-      189.toByte() -> {
+      160.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          AddressDTO.fromList(it)
+          ApplePayButtonStyleDTO.fromList(it)
         }
       }
-      190.toByte() -> {
+      161.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          ShopperNameDTO.fromList(it)
+          ApplePayConfigurationDTO.fromList(it)
         }
       }
-      191.toByte() -> {
+      162.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          CheckoutConfigurationDTO.fromList(it)
+        }
+      }
+      163.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          CheckoutSetupResultDTO.fromList(it)
+        }
+      }
+      164.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
           BeforeSubmitDataDTO.fromList(it)
         }
       }
-      192.toByte() -> {
+      165.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
           BeforeSubmitResultDTO.fromList(it)
         }
       }
-      193.toByte() -> {
+      166.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          ComponentCommunicationModel.fromList(it)
+          AddressDTO.fromList(it)
         }
       }
-      194.toByte() -> {
+      167.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          PlatformCommunicationDTO.fromList(it)
+          ShopperNameDTO.fromList(it)
         }
       }
-      195.toByte() -> {
+      168.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          PaymentEventDTO.fromList(it)
+          PaymentComponentDataDTO.fromList(it)
         }
       }
-      196.toByte() -> {
+      169.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          ErrorDTO.fromList(it)
+          ActionComponentDataDTO.fromList(it)
         }
       }
-      197.toByte() -> {
+      170.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          DeletedStoredPaymentMethodResultDTO.fromList(it)
+          SubmitResultDTO.fromList(it)
         }
       }
-      198.toByte() -> {
+      171.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          InstantPaymentConfigurationDTO.fromList(it)
+          AdditionalDetailsResultDTO.fromList(it)
         }
       }
-      199.toByte() -> {
+      172.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          InstantPaymentSetupResultDTO.fromList(it)
+          AdvancedCheckoutResultDTO.fromList(it)
         }
       }
-      200.toByte() -> {
+      173.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
           UnencryptedCardDTO.fromList(it)
         }
       }
-      201.toByte() -> {
+      174.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
           EncryptedCardDTO.fromList(it)
         }
       }
-      202.toByte() -> {
+      175.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          ActionComponentConfigurationDTO.fromList(it)
+          BinLookupBrandDTO.fromList(it)
         }
       }
-      203.toByte() -> {
-        return (readValue(buffer) as? List<Any?>)?.let {
-          OrderCancelResultDTO.fromList(it)
-        }
-      }
-      204.toByte() -> {
+      176.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
           BinLookupDataDTO.fromList(it)
+        }
+      }
+      177.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          CheckoutEventDTO.fromList(it)
         }
       }
       else -> super.readValueOfType(type, buffer)
@@ -2908,308 +1896,200 @@ private open class PlatformApiPigeonCodec : StandardMessageCodec() {
   }
   override fun writeValue(stream: ByteArrayOutputStream, value: Any?)   {
     when (value) {
-      is Environment -> {
+      is EnvironmentDTO -> {
         stream.write(129)
         writeValue(stream, value.raw)
       }
-      is AddressMode -> {
+      is BillingAddressModeDTO -> {
         stream.write(130)
         writeValue(stream, value.raw)
       }
-      is CardAuthMethod -> {
+      is FieldVisibilityDTO -> {
         stream.write(131)
         writeValue(stream, value.raw)
       }
-      is TotalPriceStatus -> {
+      is GooglePayEnvironmentDTO -> {
         stream.write(132)
         writeValue(stream, value.raw)
       }
-      is GooglePayEnvironment -> {
+      is TotalPriceStatusDTO -> {
         stream.write(133)
         writeValue(stream, value.raw)
       }
-      is CashAppPayEnvironment -> {
+      is ApplePayShippingTypeDTO -> {
         stream.write(134)
         writeValue(stream, value.raw)
       }
-      is PaymentResultEnum -> {
+      is ApplePayMerchantCapabilityDTO -> {
         stream.write(135)
         writeValue(stream, value.raw)
       }
-      is CheckoutEventType -> {
+      is ApplePaySummaryItemTypeDTO -> {
         stream.write(136)
         writeValue(stream, value.raw)
       }
-      is ComponentCommunicationType -> {
+      is ApplePayPaymentErrorTypeDTO -> {
         stream.write(137)
         writeValue(stream, value.raw)
       }
-      is PaymentEventType -> {
+      is ApplePayButtonThemeDTO -> {
         stream.write(138)
         writeValue(stream, value.raw)
       }
-      is FieldVisibility -> {
+      is ApplePayButtonTypeDTO -> {
         stream.write(139)
         writeValue(stream, value.raw)
       }
-      is InstantPaymentType -> {
+      is CheckoutEventTypeDTO -> {
         stream.write(140)
         writeValue(stream, value.raw)
       }
-      is ApplePayShippingType -> {
+      is SubmitResultTypeDTO -> {
         stream.write(141)
         writeValue(stream, value.raw)
       }
-      is ApplePayMerchantCapability -> {
-        stream.write(142)
-        writeValue(stream, value.raw)
-      }
-      is ApplePaySummaryItemType -> {
-        stream.write(143)
-        writeValue(stream, value.raw)
-      }
-      is ApplePayPaymentErrorType -> {
-        stream.write(144)
-        writeValue(stream, value.raw)
-      }
-      is CardNumberValidationResultDTO -> {
-        stream.write(145)
-        writeValue(stream, value.raw)
-      }
-      is CardExpiryDateValidationResultDTO -> {
-        stream.write(146)
-        writeValue(stream, value.raw)
-      }
-      is CardSecurityCodeValidationResultDTO -> {
-        stream.write(147)
-        writeValue(stream, value.raw)
-      }
       is SessionResponseDTO -> {
-        stream.write(148)
-        writeValue(stream, value.toList())
-      }
-      is SessionDTO -> {
-        stream.write(149)
+        stream.write(142)
         writeValue(stream, value.toList())
       }
       is AmountDTO -> {
-        stream.write(150)
+        stream.write(143)
         writeValue(stream, value.toList())
       }
-      is AnalyticsOptionsDTO -> {
-        stream.write(151)
+      is AnalyticsConfigurationDTO -> {
+        stream.write(144)
         writeValue(stream, value.toList())
       }
-      is ThreeDS2UICustomizationDTO -> {
-        stream.write(152)
-        writeValue(stream, value.toList())
-      }
-      is ThreeDS2ScreenCustomizationDTO -> {
-        stream.write(153)
-        writeValue(stream, value.toList())
-      }
-      is ThreeDS2ButtonCustomizationDTO -> {
-        stream.write(154)
-        writeValue(stream, value.toList())
-      }
-      is ThreeDS2SelectionItemCustomizationDTO -> {
-        stream.write(155)
-        writeValue(stream, value.toList())
-      }
-      is ThreeDS2LabelCustomizationDTO -> {
-        stream.write(156)
-        writeValue(stream, value.toList())
-      }
-      is ThreeDS2InputCustomizationDTO -> {
-        stream.write(157)
-        writeValue(stream, value.toList())
-      }
-      is ThreeDS2ToolbarCustomizationDTO -> {
-        stream.write(158)
-        writeValue(stream, value.toList())
-      }
-      is ThreeDS2ConfigurationDTO -> {
-        stream.write(159)
-        writeValue(stream, value.toList())
-      }
-      is DefaultInstallmentOptionsDTO -> {
-        stream.write(160)
-        writeValue(stream, value.toList())
-      }
-      is CardBasedInstallmentOptionsDTO -> {
-        stream.write(161)
+      is InstallmentOptionsDTO -> {
+        stream.write(145)
         writeValue(stream, value.toList())
       }
       is InstallmentConfigurationDTO -> {
-        stream.write(162)
-        writeValue(stream, value.toList())
-      }
-      is CheckoutConfigurationDTO -> {
-        stream.write(163)
-        writeValue(stream, value.toList())
-      }
-      is DropInConfigurationDTO -> {
-        stream.write(164)
+        stream.write(146)
         writeValue(stream, value.toList())
       }
       is CardConfigurationDTO -> {
-        stream.write(165)
-        writeValue(stream, value.toList())
-      }
-      is ApplePayConfigurationDTO -> {
-        stream.write(166)
-        writeValue(stream, value.toList())
-      }
-      is ApplePayAuthorizedPaymentDTO -> {
-        stream.write(167)
-        writeValue(stream, value.toList())
-      }
-      is ApplePayPaymentErrorDTO -> {
-        stream.write(168)
-        writeValue(stream, value.toList())
-      }
-      is ApplePayAuthorizationResultDTO -> {
-        stream.write(169)
-        writeValue(stream, value.toList())
-      }
-      is ApplePayCouponCodeUpdateDTO -> {
-        stream.write(170)
-        writeValue(stream, value.toList())
-      }
-      is ApplePayShippingContactUpdateDTO -> {
-        stream.write(171)
-        writeValue(stream, value.toList())
-      }
-      is ApplePayShippingMethodUpdateDTO -> {
-        stream.write(172)
-        writeValue(stream, value.toList())
-      }
-      is ApplePayContactDTO -> {
-        stream.write(173)
-        writeValue(stream, value.toList())
-      }
-      is ApplePayShippingMethodDTO -> {
-        stream.write(174)
-        writeValue(stream, value.toList())
-      }
-      is ApplePaySummaryItemDTO -> {
-        stream.write(175)
-        writeValue(stream, value.toList())
-      }
-      is GooglePayConfigurationDTO -> {
-        stream.write(176)
+        stream.write(147)
         writeValue(stream, value.toList())
       }
       is MerchantInfoDTO -> {
-        stream.write(177)
+        stream.write(148)
         writeValue(stream, value.toList())
       }
       is ShippingAddressParametersDTO -> {
-        stream.write(178)
+        stream.write(149)
         writeValue(stream, value.toList())
       }
-      is BillingAddressParametersDTO -> {
-        stream.write(179)
+      is GooglePayConfigurationDTO -> {
+        stream.write(150)
         writeValue(stream, value.toList())
       }
-      is CashAppPayConfigurationDTO -> {
-        stream.write(180)
+      is ApplePayContactDTO -> {
+        stream.write(151)
         writeValue(stream, value.toList())
       }
-      is TwintConfigurationDTO -> {
-        stream.write(181)
+      is ApplePaySummaryItemDTO -> {
+        stream.write(152)
         writeValue(stream, value.toList())
       }
-      is PaymentResultDTO -> {
-        stream.write(182)
+      is ApplePayShippingMethodDTO -> {
+        stream.write(153)
         writeValue(stream, value.toList())
       }
-      is PaymentResultModelDTO -> {
-        stream.write(183)
+      is ApplePayPaymentErrorDTO -> {
+        stream.write(154)
         writeValue(stream, value.toList())
       }
-      is OrderResponseDTO -> {
-        stream.write(184)
+      is ApplePayAuthorizedPaymentDTO -> {
+        stream.write(155)
         writeValue(stream, value.toList())
       }
-      is FinishedResultDTO -> {
-        stream.write(185)
+      is ApplePayAuthorizationResultDTO -> {
+        stream.write(156)
         writeValue(stream, value.toList())
       }
-      is ActionResultDTO -> {
-        stream.write(186)
+      is ApplePayShippingMethodUpdateDTO -> {
+        stream.write(157)
         writeValue(stream, value.toList())
       }
-      is ErrorResultDTO -> {
-        stream.write(187)
+      is ApplePayShippingContactUpdateDTO -> {
+        stream.write(158)
         writeValue(stream, value.toList())
       }
-      is CheckoutEvent -> {
-        stream.write(188)
+      is ApplePayCouponCodeUpdateDTO -> {
+        stream.write(159)
         writeValue(stream, value.toList())
       }
-      is AddressDTO -> {
-        stream.write(189)
+      is ApplePayButtonStyleDTO -> {
+        stream.write(160)
         writeValue(stream, value.toList())
       }
-      is ShopperNameDTO -> {
-        stream.write(190)
+      is ApplePayConfigurationDTO -> {
+        stream.write(161)
+        writeValue(stream, value.toList())
+      }
+      is CheckoutConfigurationDTO -> {
+        stream.write(162)
+        writeValue(stream, value.toList())
+      }
+      is CheckoutSetupResultDTO -> {
+        stream.write(163)
         writeValue(stream, value.toList())
       }
       is BeforeSubmitDataDTO -> {
-        stream.write(191)
+        stream.write(164)
         writeValue(stream, value.toList())
       }
       is BeforeSubmitResultDTO -> {
-        stream.write(192)
+        stream.write(165)
         writeValue(stream, value.toList())
       }
-      is ComponentCommunicationModel -> {
-        stream.write(193)
+      is AddressDTO -> {
+        stream.write(166)
         writeValue(stream, value.toList())
       }
-      is PlatformCommunicationDTO -> {
-        stream.write(194)
+      is ShopperNameDTO -> {
+        stream.write(167)
         writeValue(stream, value.toList())
       }
-      is PaymentEventDTO -> {
-        stream.write(195)
+      is PaymentComponentDataDTO -> {
+        stream.write(168)
         writeValue(stream, value.toList())
       }
-      is ErrorDTO -> {
-        stream.write(196)
+      is ActionComponentDataDTO -> {
+        stream.write(169)
         writeValue(stream, value.toList())
       }
-      is DeletedStoredPaymentMethodResultDTO -> {
-        stream.write(197)
+      is SubmitResultDTO -> {
+        stream.write(170)
         writeValue(stream, value.toList())
       }
-      is InstantPaymentConfigurationDTO -> {
-        stream.write(198)
+      is AdditionalDetailsResultDTO -> {
+        stream.write(171)
         writeValue(stream, value.toList())
       }
-      is InstantPaymentSetupResultDTO -> {
-        stream.write(199)
+      is AdvancedCheckoutResultDTO -> {
+        stream.write(172)
         writeValue(stream, value.toList())
       }
       is UnencryptedCardDTO -> {
-        stream.write(200)
+        stream.write(173)
         writeValue(stream, value.toList())
       }
       is EncryptedCardDTO -> {
-        stream.write(201)
+        stream.write(174)
         writeValue(stream, value.toList())
       }
-      is ActionComponentConfigurationDTO -> {
-        stream.write(202)
-        writeValue(stream, value.toList())
-      }
-      is OrderCancelResultDTO -> {
-        stream.write(203)
+      is BinLookupBrandDTO -> {
+        stream.write(175)
         writeValue(stream, value.toList())
       }
       is BinLookupDataDTO -> {
-        stream.write(204)
+        stream.write(176)
+        writeValue(stream, value.toList())
+      }
+      is CheckoutEventDTO -> {
+        stream.write(177)
         writeValue(stream, value.toList())
       }
       else -> super.writeValue(stream, value)
@@ -3221,33 +2101,36 @@ val PlatformApiPigeonMethodCodec = StandardMethodCodec(PlatformApiPigeonCodec())
 
 
 /** Generated interface from Pigeon that represents a handler of messages from Flutter. */
-interface CheckoutPlatformInterface {
-  fun getReturnUrl(callback: (Result<String>) -> Unit)
-  fun setupSession(sessionResponseDTO: SessionResponseDTO, checkoutConfigurationDTO: CheckoutConfigurationDTO, callback: (Result<SessionDTO>) -> Unit)
-  fun setupAdvanced(paymentMethodsResponse: String, checkoutConfigurationDTO: CheckoutConfigurationDTO, callback: (Result<Unit>) -> Unit)
-  fun clearSession()
-  fun encryptCard(unencryptedCardDTO: UnencryptedCardDTO, publicKey: String, callback: (Result<EncryptedCardDTO>) -> Unit)
+interface CheckoutHostApi {
+  fun setupSession(sessionResponse: SessionResponseDTO, configuration: CheckoutConfigurationDTO, callback: (Result<CheckoutSetupResultDTO>) -> Unit)
+  fun setupAdvanced(paymentMethodsJson: String, configuration: CheckoutConfigurationDTO, callback: (Result<CheckoutSetupResultDTO>) -> Unit)
+  fun disposeCheckout(checkoutId: String)
+  fun handleAction(actionId: String, actionJson: String, configuration: CheckoutConfigurationDTO, callback: (Result<AdvancedCheckoutResultDTO>) -> Unit)
+  fun enableConsoleLogging(enabled: Boolean)
+  fun encryptCard(card: UnencryptedCardDTO, publicKey: String, callback: (Result<EncryptedCardDTO>) -> Unit)
   fun encryptBin(bin: String, publicKey: String, callback: (Result<String>) -> Unit)
-  fun validateCardNumber(cardNumber: String, enableLuhnCheck: Boolean): CardNumberValidationResultDTO
-  fun validateCardExpiryDate(expiryMonth: String, expiryYear: String): CardExpiryDateValidationResultDTO
-  fun validateCardSecurityCode(securityCode: String, cardBrand: String?): CardSecurityCodeValidationResultDTO
-  fun enableConsoleLogging(loggingEnabled: Boolean)
+  fun validateCardNumber(cardNumber: String, enableLuhnCheck: Boolean): Boolean
+  fun validateCardExpiryDate(expiryMonth: String, expiryYear: String): Boolean
+  fun validateCardSecurityCode(securityCode: String, cardBrand: String?): Boolean
   fun getThreeDS2SdkVersion(): String
 
   companion object {
-    /** The codec used by CheckoutPlatformInterface. */
+    /** The codec used by CheckoutHostApi. */
     val codec: MessageCodec<Any?> by lazy {
       PlatformApiPigeonCodec()
     }
-    /** Sets up an instance of `CheckoutPlatformInterface` to handle messages through the `binaryMessenger`. */
+    /** Sets up an instance of `CheckoutHostApi` to handle messages through the `binaryMessenger`. */
     @JvmOverloads
-    fun setUp(binaryMessenger: BinaryMessenger, api: CheckoutPlatformInterface?, messageChannelSuffix: String = "") {
+    fun setUp(binaryMessenger: BinaryMessenger, api: CheckoutHostApi?, messageChannelSuffix: String = "") {
       val separatedMessageChannelSuffix = if (messageChannelSuffix.isNotEmpty()) ".$messageChannelSuffix" else ""
       run {
-        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.getReturnUrl$separatedMessageChannelSuffix", codec)
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.adyen_checkout.CheckoutHostApi.setupSession$separatedMessageChannelSuffix", codec)
         if (api != null) {
-          channel.setMessageHandler { _, reply ->
-            api.getReturnUrl{ result: Result<String> ->
+          channel.setMessageHandler { message, reply ->
+            val args = message as List<Any?>
+            val sessionResponseArg = args[0] as SessionResponseDTO
+            val configurationArg = args[1] as CheckoutConfigurationDTO
+            api.setupSession(sessionResponseArg, configurationArg) { result: Result<CheckoutSetupResultDTO> ->
               val error = result.exceptionOrNull()
               if (error != null) {
                 reply.reply(PlatformApiPigeonUtils.wrapError(error))
@@ -3262,13 +2145,13 @@ interface CheckoutPlatformInterface {
         }
       }
       run {
-        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.setupSession$separatedMessageChannelSuffix", codec)
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.adyen_checkout.CheckoutHostApi.setupAdvanced$separatedMessageChannelSuffix", codec)
         if (api != null) {
           channel.setMessageHandler { message, reply ->
             val args = message as List<Any?>
-            val sessionResponseDTOArg = args[0] as SessionResponseDTO
-            val checkoutConfigurationDTOArg = args[1] as CheckoutConfigurationDTO
-            api.setupSession(sessionResponseDTOArg, checkoutConfigurationDTOArg) { result: Result<SessionDTO> ->
+            val paymentMethodsJsonArg = args[0] as String
+            val configurationArg = args[1] as CheckoutConfigurationDTO
+            api.setupAdvanced(paymentMethodsJsonArg, configurationArg) { result: Result<CheckoutSetupResultDTO> ->
               val error = result.exceptionOrNull()
               if (error != null) {
                 reply.reply(PlatformApiPigeonUtils.wrapError(error))
@@ -3283,31 +2166,13 @@ interface CheckoutPlatformInterface {
         }
       }
       run {
-        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.setupAdvanced$separatedMessageChannelSuffix", codec)
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.adyen_checkout.CheckoutHostApi.disposeCheckout$separatedMessageChannelSuffix", codec)
         if (api != null) {
           channel.setMessageHandler { message, reply ->
             val args = message as List<Any?>
-            val paymentMethodsResponseArg = args[0] as String
-            val checkoutConfigurationDTOArg = args[1] as CheckoutConfigurationDTO
-            api.setupAdvanced(paymentMethodsResponseArg, checkoutConfigurationDTOArg) { result: Result<Unit> ->
-              val error = result.exceptionOrNull()
-              if (error != null) {
-                reply.reply(PlatformApiPigeonUtils.wrapError(error))
-              } else {
-                reply.reply(PlatformApiPigeonUtils.wrapResult(null))
-              }
-            }
-          }
-        } else {
-          channel.setMessageHandler(null)
-        }
-      }
-      run {
-        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.clearSession$separatedMessageChannelSuffix", codec)
-        if (api != null) {
-          channel.setMessageHandler { _, reply ->
+            val checkoutIdArg = args[0] as String
             val wrapped: List<Any?> = try {
-              api.clearSession()
+              api.disposeCheckout(checkoutIdArg)
               listOf(null)
             } catch (exception: Throwable) {
               PlatformApiPigeonUtils.wrapError(exception)
@@ -3319,13 +2184,14 @@ interface CheckoutPlatformInterface {
         }
       }
       run {
-        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.encryptCard$separatedMessageChannelSuffix", codec)
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.adyen_checkout.CheckoutHostApi.handleAction$separatedMessageChannelSuffix", codec)
         if (api != null) {
           channel.setMessageHandler { message, reply ->
             val args = message as List<Any?>
-            val unencryptedCardDTOArg = args[0] as UnencryptedCardDTO
-            val publicKeyArg = args[1] as String
-            api.encryptCard(unencryptedCardDTOArg, publicKeyArg) { result: Result<EncryptedCardDTO> ->
+            val actionIdArg = args[0] as String
+            val actionJsonArg = args[1] as String
+            val configurationArg = args[2] as CheckoutConfigurationDTO
+            api.handleAction(actionIdArg, actionJsonArg, configurationArg) { result: Result<AdvancedCheckoutResultDTO> ->
               val error = result.exceptionOrNull()
               if (error != null) {
                 reply.reply(PlatformApiPigeonUtils.wrapError(error))
@@ -3340,7 +2206,46 @@ interface CheckoutPlatformInterface {
         }
       }
       run {
-        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.encryptBin$separatedMessageChannelSuffix", codec)
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.adyen_checkout.CheckoutHostApi.enableConsoleLogging$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { message, reply ->
+            val args = message as List<Any?>
+            val enabledArg = args[0] as Boolean
+            val wrapped: List<Any?> = try {
+              api.enableConsoleLogging(enabledArg)
+              listOf(null)
+            } catch (exception: Throwable) {
+              PlatformApiPigeonUtils.wrapError(exception)
+            }
+            reply.reply(wrapped)
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.adyen_checkout.CheckoutHostApi.encryptCard$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { message, reply ->
+            val args = message as List<Any?>
+            val cardArg = args[0] as UnencryptedCardDTO
+            val publicKeyArg = args[1] as String
+            api.encryptCard(cardArg, publicKeyArg) { result: Result<EncryptedCardDTO> ->
+              val error = result.exceptionOrNull()
+              if (error != null) {
+                reply.reply(PlatformApiPigeonUtils.wrapError(error))
+              } else {
+                val data = result.getOrNull()
+                reply.reply(PlatformApiPigeonUtils.wrapResult(data))
+              }
+            }
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.adyen_checkout.CheckoutHostApi.encryptBin$separatedMessageChannelSuffix", codec)
         if (api != null) {
           channel.setMessageHandler { message, reply ->
             val args = message as List<Any?>
@@ -3361,7 +2266,7 @@ interface CheckoutPlatformInterface {
         }
       }
       run {
-        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.validateCardNumber$separatedMessageChannelSuffix", codec)
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.adyen_checkout.CheckoutHostApi.validateCardNumber$separatedMessageChannelSuffix", codec)
         if (api != null) {
           channel.setMessageHandler { message, reply ->
             val args = message as List<Any?>
@@ -3379,7 +2284,7 @@ interface CheckoutPlatformInterface {
         }
       }
       run {
-        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.validateCardExpiryDate$separatedMessageChannelSuffix", codec)
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.adyen_checkout.CheckoutHostApi.validateCardExpiryDate$separatedMessageChannelSuffix", codec)
         if (api != null) {
           channel.setMessageHandler { message, reply ->
             val args = message as List<Any?>
@@ -3397,7 +2302,7 @@ interface CheckoutPlatformInterface {
         }
       }
       run {
-        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.validateCardSecurityCode$separatedMessageChannelSuffix", codec)
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.adyen_checkout.CheckoutHostApi.validateCardSecurityCode$separatedMessageChannelSuffix", codec)
         if (api != null) {
           channel.setMessageHandler { message, reply ->
             val args = message as List<Any?>
@@ -3415,25 +2320,7 @@ interface CheckoutPlatformInterface {
         }
       }
       run {
-        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.enableConsoleLogging$separatedMessageChannelSuffix", codec)
-        if (api != null) {
-          channel.setMessageHandler { message, reply ->
-            val args = message as List<Any?>
-            val loggingEnabledArg = args[0] as Boolean
-            val wrapped: List<Any?> = try {
-              api.enableConsoleLogging(loggingEnabledArg)
-              listOf(null)
-            } catch (exception: Throwable) {
-              PlatformApiPigeonUtils.wrapError(exception)
-            }
-            reply.reply(wrapped)
-          }
-        } else {
-          channel.setMessageHandler(null)
-        }
-      }
-      run {
-        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.adyen_checkout.CheckoutPlatformInterface.getThreeDS2SdkVersion$separatedMessageChannelSuffix", codec)
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.adyen_checkout.CheckoutHostApi.getThreeDS2SdkVersion$separatedMessageChannelSuffix", codec)
         if (api != null) {
           channel.setMessageHandler { _, reply ->
             val wrapped: List<Any?> = try {
@@ -3451,323 +2338,32 @@ interface CheckoutPlatformInterface {
   }
 }
 /** Generated interface from Pigeon that represents a handler of messages from Flutter. */
-interface DropInPlatformInterface {
-  fun showDropInSession(dropInConfigurationDTO: DropInConfigurationDTO)
-  fun showDropInAdvanced(dropInConfigurationDTO: DropInConfigurationDTO, paymentMethodsResponse: String)
-  fun stopDropIn()
-  fun onPaymentsResult(paymentsResult: PaymentEventDTO)
-  fun onPaymentsDetailsResult(paymentsDetailsResult: PaymentEventDTO)
-  fun onDeleteStoredPaymentMethodResult(deleteStoredPaymentMethodResultDTO: DeletedStoredPaymentMethodResultDTO)
-  fun onBalanceCheckResult(balanceCheckResponse: String)
-  fun onOrderRequestResult(orderRequestResponse: String)
-  fun onOrderCancelResult(orderCancelResult: OrderCancelResultDTO)
-  fun cleanUpDropIn()
+interface ComponentHostApi {
+  fun submit(checkoutId: String, componentId: String, callback: (Result<Unit>) -> Unit)
+  fun dispose(checkoutId: String, componentId: String)
 
   companion object {
-    /** The codec used by DropInPlatformInterface. */
+    /** The codec used by ComponentHostApi. */
     val codec: MessageCodec<Any?> by lazy {
       PlatformApiPigeonCodec()
     }
-    /** Sets up an instance of `DropInPlatformInterface` to handle messages through the `binaryMessenger`. */
+    /** Sets up an instance of `ComponentHostApi` to handle messages through the `binaryMessenger`. */
     @JvmOverloads
-    fun setUp(binaryMessenger: BinaryMessenger, api: DropInPlatformInterface?, messageChannelSuffix: String = "") {
+    fun setUp(binaryMessenger: BinaryMessenger, api: ComponentHostApi?, messageChannelSuffix: String = "") {
       val separatedMessageChannelSuffix = if (messageChannelSuffix.isNotEmpty()) ".$messageChannelSuffix" else ""
       run {
-        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.adyen_checkout.DropInPlatformInterface.showDropInSession$separatedMessageChannelSuffix", codec)
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.adyen_checkout.ComponentHostApi.submit$separatedMessageChannelSuffix", codec)
         if (api != null) {
           channel.setMessageHandler { message, reply ->
             val args = message as List<Any?>
-            val dropInConfigurationDTOArg = args[0] as DropInConfigurationDTO
-            val wrapped: List<Any?> = try {
-              api.showDropInSession(dropInConfigurationDTOArg)
-              listOf(null)
-            } catch (exception: Throwable) {
-              PlatformApiPigeonUtils.wrapError(exception)
-            }
-            reply.reply(wrapped)
-          }
-        } else {
-          channel.setMessageHandler(null)
-        }
-      }
-      run {
-        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.adyen_checkout.DropInPlatformInterface.showDropInAdvanced$separatedMessageChannelSuffix", codec)
-        if (api != null) {
-          channel.setMessageHandler { message, reply ->
-            val args = message as List<Any?>
-            val dropInConfigurationDTOArg = args[0] as DropInConfigurationDTO
-            val paymentMethodsResponseArg = args[1] as String
-            val wrapped: List<Any?> = try {
-              api.showDropInAdvanced(dropInConfigurationDTOArg, paymentMethodsResponseArg)
-              listOf(null)
-            } catch (exception: Throwable) {
-              PlatformApiPigeonUtils.wrapError(exception)
-            }
-            reply.reply(wrapped)
-          }
-        } else {
-          channel.setMessageHandler(null)
-        }
-      }
-      run {
-        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.adyen_checkout.DropInPlatformInterface.stopDropIn$separatedMessageChannelSuffix", codec)
-        if (api != null) {
-          channel.setMessageHandler { _, reply ->
-            val wrapped: List<Any?> = try {
-              api.stopDropIn()
-              listOf(null)
-            } catch (exception: Throwable) {
-              PlatformApiPigeonUtils.wrapError(exception)
-            }
-            reply.reply(wrapped)
-          }
-        } else {
-          channel.setMessageHandler(null)
-        }
-      }
-      run {
-        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.adyen_checkout.DropInPlatformInterface.onPaymentsResult$separatedMessageChannelSuffix", codec)
-        if (api != null) {
-          channel.setMessageHandler { message, reply ->
-            val args = message as List<Any?>
-            val paymentsResultArg = args[0] as PaymentEventDTO
-            val wrapped: List<Any?> = try {
-              api.onPaymentsResult(paymentsResultArg)
-              listOf(null)
-            } catch (exception: Throwable) {
-              PlatformApiPigeonUtils.wrapError(exception)
-            }
-            reply.reply(wrapped)
-          }
-        } else {
-          channel.setMessageHandler(null)
-        }
-      }
-      run {
-        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.adyen_checkout.DropInPlatformInterface.onPaymentsDetailsResult$separatedMessageChannelSuffix", codec)
-        if (api != null) {
-          channel.setMessageHandler { message, reply ->
-            val args = message as List<Any?>
-            val paymentsDetailsResultArg = args[0] as PaymentEventDTO
-            val wrapped: List<Any?> = try {
-              api.onPaymentsDetailsResult(paymentsDetailsResultArg)
-              listOf(null)
-            } catch (exception: Throwable) {
-              PlatformApiPigeonUtils.wrapError(exception)
-            }
-            reply.reply(wrapped)
-          }
-        } else {
-          channel.setMessageHandler(null)
-        }
-      }
-      run {
-        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.adyen_checkout.DropInPlatformInterface.onDeleteStoredPaymentMethodResult$separatedMessageChannelSuffix", codec)
-        if (api != null) {
-          channel.setMessageHandler { message, reply ->
-            val args = message as List<Any?>
-            val deleteStoredPaymentMethodResultDTOArg = args[0] as DeletedStoredPaymentMethodResultDTO
-            val wrapped: List<Any?> = try {
-              api.onDeleteStoredPaymentMethodResult(deleteStoredPaymentMethodResultDTOArg)
-              listOf(null)
-            } catch (exception: Throwable) {
-              PlatformApiPigeonUtils.wrapError(exception)
-            }
-            reply.reply(wrapped)
-          }
-        } else {
-          channel.setMessageHandler(null)
-        }
-      }
-      run {
-        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.adyen_checkout.DropInPlatformInterface.onBalanceCheckResult$separatedMessageChannelSuffix", codec)
-        if (api != null) {
-          channel.setMessageHandler { message, reply ->
-            val args = message as List<Any?>
-            val balanceCheckResponseArg = args[0] as String
-            val wrapped: List<Any?> = try {
-              api.onBalanceCheckResult(balanceCheckResponseArg)
-              listOf(null)
-            } catch (exception: Throwable) {
-              PlatformApiPigeonUtils.wrapError(exception)
-            }
-            reply.reply(wrapped)
-          }
-        } else {
-          channel.setMessageHandler(null)
-        }
-      }
-      run {
-        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.adyen_checkout.DropInPlatformInterface.onOrderRequestResult$separatedMessageChannelSuffix", codec)
-        if (api != null) {
-          channel.setMessageHandler { message, reply ->
-            val args = message as List<Any?>
-            val orderRequestResponseArg = args[0] as String
-            val wrapped: List<Any?> = try {
-              api.onOrderRequestResult(orderRequestResponseArg)
-              listOf(null)
-            } catch (exception: Throwable) {
-              PlatformApiPigeonUtils.wrapError(exception)
-            }
-            reply.reply(wrapped)
-          }
-        } else {
-          channel.setMessageHandler(null)
-        }
-      }
-      run {
-        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.adyen_checkout.DropInPlatformInterface.onOrderCancelResult$separatedMessageChannelSuffix", codec)
-        if (api != null) {
-          channel.setMessageHandler { message, reply ->
-            val args = message as List<Any?>
-            val orderCancelResultArg = args[0] as OrderCancelResultDTO
-            val wrapped: List<Any?> = try {
-              api.onOrderCancelResult(orderCancelResultArg)
-              listOf(null)
-            } catch (exception: Throwable) {
-              PlatformApiPigeonUtils.wrapError(exception)
-            }
-            reply.reply(wrapped)
-          }
-        } else {
-          channel.setMessageHandler(null)
-        }
-      }
-      run {
-        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.adyen_checkout.DropInPlatformInterface.cleanUpDropIn$separatedMessageChannelSuffix", codec)
-        if (api != null) {
-          channel.setMessageHandler { _, reply ->
-            val wrapped: List<Any?> = try {
-              api.cleanUpDropIn()
-              listOf(null)
-            } catch (exception: Throwable) {
-              PlatformApiPigeonUtils.wrapError(exception)
-            }
-            reply.reply(wrapped)
-          }
-        } else {
-          channel.setMessageHandler(null)
-        }
-      }
-    }
-  }
-}
-/** Generated class from Pigeon that represents Flutter messages that can be called from Kotlin. */
-class CheckoutFlutterInterface(private val binaryMessenger: BinaryMessenger, private val messageChannelSuffix: String = "") {
-  companion object {
-    /** The codec used by CheckoutFlutterInterface. */
-    val codec: MessageCodec<Any?> by lazy {
-      PlatformApiPigeonCodec()
-    }
-  }
-  fun send(eventArg: CheckoutEvent, callback: (Result<Unit>) -> Unit)
-{
-    val separatedMessageChannelSuffix = if (messageChannelSuffix.isNotEmpty()) ".$messageChannelSuffix" else ""
-    val channelName = "dev.flutter.pigeon.adyen_checkout.CheckoutFlutterInterface.send$separatedMessageChannelSuffix"
-    val channel = BasicMessageChannel<Any?>(binaryMessenger, channelName, codec)
-    channel.send(listOf(eventArg)) {
-      if (it is List<*>) {
-        if (it.size > 1) {
-          callback(Result.failure(AdyenPigeonError(it[0] as String, it[1] as String, it[2] as String?)))
-        } else {
-          callback(Result.success(Unit))
-        }
-      } else {
-        callback(Result.failure(PlatformApiPigeonUtils.createConnectionError(channelName)))
-      } 
-    }
-  }
-}
-/** Generated interface from Pigeon that represents a handler of messages from Flutter. */
-interface ComponentPlatformInterface {
-  fun updateViewHeight(viewId: Long)
-  fun onPaymentsResult(componentId: String, paymentsResult: PaymentEventDTO)
-  fun onPaymentsDetailsResult(componentId: String, paymentsDetailsResult: PaymentEventDTO)
-  fun isInstantPaymentSupportedByPlatform(instantPaymentConfigurationDTO: InstantPaymentConfigurationDTO, paymentMethodResponse: String, componentId: String, callback: (Result<InstantPaymentSetupResultDTO>) -> Unit)
-  fun onInstantPaymentPressed(instantPaymentConfigurationDTO: InstantPaymentConfigurationDTO, encodedPaymentMethod: String, componentId: String)
-  fun handleAction(actionComponentConfiguration: ActionComponentConfigurationDTO, componentId: String, actionResponse: Map<String?, Any?>?)
-  fun onDispose(componentId: String)
-
-  companion object {
-    /** The codec used by ComponentPlatformInterface. */
-    val codec: MessageCodec<Any?> by lazy {
-      PlatformApiPigeonCodec()
-    }
-    /** Sets up an instance of `ComponentPlatformInterface` to handle messages through the `binaryMessenger`. */
-    @JvmOverloads
-    fun setUp(binaryMessenger: BinaryMessenger, api: ComponentPlatformInterface?, messageChannelSuffix: String = "") {
-      val separatedMessageChannelSuffix = if (messageChannelSuffix.isNotEmpty()) ".$messageChannelSuffix" else ""
-      run {
-        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.adyen_checkout.ComponentPlatformInterface.updateViewHeight$separatedMessageChannelSuffix", codec)
-        if (api != null) {
-          channel.setMessageHandler { message, reply ->
-            val args = message as List<Any?>
-            val viewIdArg = args[0] as Long
-            val wrapped: List<Any?> = try {
-              api.updateViewHeight(viewIdArg)
-              listOf(null)
-            } catch (exception: Throwable) {
-              PlatformApiPigeonUtils.wrapError(exception)
-            }
-            reply.reply(wrapped)
-          }
-        } else {
-          channel.setMessageHandler(null)
-        }
-      }
-      run {
-        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.adyen_checkout.ComponentPlatformInterface.onPaymentsResult$separatedMessageChannelSuffix", codec)
-        if (api != null) {
-          channel.setMessageHandler { message, reply ->
-            val args = message as List<Any?>
-            val componentIdArg = args[0] as String
-            val paymentsResultArg = args[1] as PaymentEventDTO
-            val wrapped: List<Any?> = try {
-              api.onPaymentsResult(componentIdArg, paymentsResultArg)
-              listOf(null)
-            } catch (exception: Throwable) {
-              PlatformApiPigeonUtils.wrapError(exception)
-            }
-            reply.reply(wrapped)
-          }
-        } else {
-          channel.setMessageHandler(null)
-        }
-      }
-      run {
-        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.adyen_checkout.ComponentPlatformInterface.onPaymentsDetailsResult$separatedMessageChannelSuffix", codec)
-        if (api != null) {
-          channel.setMessageHandler { message, reply ->
-            val args = message as List<Any?>
-            val componentIdArg = args[0] as String
-            val paymentsDetailsResultArg = args[1] as PaymentEventDTO
-            val wrapped: List<Any?> = try {
-              api.onPaymentsDetailsResult(componentIdArg, paymentsDetailsResultArg)
-              listOf(null)
-            } catch (exception: Throwable) {
-              PlatformApiPigeonUtils.wrapError(exception)
-            }
-            reply.reply(wrapped)
-          }
-        } else {
-          channel.setMessageHandler(null)
-        }
-      }
-      run {
-        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.adyen_checkout.ComponentPlatformInterface.isInstantPaymentSupportedByPlatform$separatedMessageChannelSuffix", codec)
-        if (api != null) {
-          channel.setMessageHandler { message, reply ->
-            val args = message as List<Any?>
-            val instantPaymentConfigurationDTOArg = args[0] as InstantPaymentConfigurationDTO
-            val paymentMethodResponseArg = args[1] as String
-            val componentIdArg = args[2] as String
-            api.isInstantPaymentSupportedByPlatform(instantPaymentConfigurationDTOArg, paymentMethodResponseArg, componentIdArg) { result: Result<InstantPaymentSetupResultDTO> ->
+            val checkoutIdArg = args[0] as String
+            val componentIdArg = args[1] as String
+            api.submit(checkoutIdArg, componentIdArg) { result: Result<Unit> ->
               val error = result.exceptionOrNull()
               if (error != null) {
                 reply.reply(PlatformApiPigeonUtils.wrapError(error))
               } else {
-                val data = result.getOrNull()
-                reply.reply(PlatformApiPigeonUtils.wrapResult(data))
+                reply.reply(PlatformApiPigeonUtils.wrapResult(null))
               }
             }
           }
@@ -3776,53 +2372,14 @@ interface ComponentPlatformInterface {
         }
       }
       run {
-        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.adyen_checkout.ComponentPlatformInterface.onInstantPaymentPressed$separatedMessageChannelSuffix", codec)
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.adyen_checkout.ComponentHostApi.dispose$separatedMessageChannelSuffix", codec)
         if (api != null) {
           channel.setMessageHandler { message, reply ->
             val args = message as List<Any?>
-            val instantPaymentConfigurationDTOArg = args[0] as InstantPaymentConfigurationDTO
-            val encodedPaymentMethodArg = args[1] as String
-            val componentIdArg = args[2] as String
-            val wrapped: List<Any?> = try {
-              api.onInstantPaymentPressed(instantPaymentConfigurationDTOArg, encodedPaymentMethodArg, componentIdArg)
-              listOf(null)
-            } catch (exception: Throwable) {
-              PlatformApiPigeonUtils.wrapError(exception)
-            }
-            reply.reply(wrapped)
-          }
-        } else {
-          channel.setMessageHandler(null)
-        }
-      }
-      run {
-        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.adyen_checkout.ComponentPlatformInterface.handleAction$separatedMessageChannelSuffix", codec)
-        if (api != null) {
-          channel.setMessageHandler { message, reply ->
-            val args = message as List<Any?>
-            val actionComponentConfigurationArg = args[0] as ActionComponentConfigurationDTO
+            val checkoutIdArg = args[0] as String
             val componentIdArg = args[1] as String
-            val actionResponseArg = args[2] as Map<String?, Any?>?
             val wrapped: List<Any?> = try {
-              api.handleAction(actionComponentConfigurationArg, componentIdArg, actionResponseArg)
-              listOf(null)
-            } catch (exception: Throwable) {
-              PlatformApiPigeonUtils.wrapError(exception)
-            }
-            reply.reply(wrapped)
-          }
-        } else {
-          channel.setMessageHandler(null)
-        }
-      }
-      run {
-        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.adyen_checkout.ComponentPlatformInterface.onDispose$separatedMessageChannelSuffix", codec)
-        if (api != null) {
-          channel.setMessageHandler { message, reply ->
-            val args = message as List<Any?>
-            val componentIdArg = args[0] as String
-            val wrapped: List<Any?> = try {
-              api.onDispose(componentIdArg)
+              api.dispose(checkoutIdArg, componentIdArg)
               listOf(null)
             } catch (exception: Throwable) {
               PlatformApiPigeonUtils.wrapError(exception)
@@ -3837,53 +2394,79 @@ interface ComponentPlatformInterface {
   }
 }
 /** Generated class from Pigeon that represents Flutter messages that can be called from Kotlin. */
-class ComponentFlutterInterface(private val binaryMessenger: BinaryMessenger, private val messageChannelSuffix: String = "") {
+class CheckoutCallbacksFlutterApi(private val binaryMessenger: BinaryMessenger, private val messageChannelSuffix: String = "") {
   companion object {
-    /** The codec used by ComponentFlutterInterface. */
+    /** The codec used by CheckoutCallbacksFlutterApi. */
     val codec: MessageCodec<Any?> by lazy {
       PlatformApiPigeonCodec()
     }
   }
-  fun _generateCodecForDTOs(sessionDTOArg: SessionDTO, binLookupDataDTOArg: BinLookupDataDTO, callback: (Result<Unit>) -> Unit)
+  fun onBeforeSubmit(checkoutIdArg: String, dataArg: BeforeSubmitDataDTO, callback: (Result<BeforeSubmitResultDTO>) -> Unit)
 {
     val separatedMessageChannelSuffix = if (messageChannelSuffix.isNotEmpty()) ".$messageChannelSuffix" else ""
-    val channelName = "dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface._generateCodecForDTOs$separatedMessageChannelSuffix"
+    val channelName = "dev.flutter.pigeon.adyen_checkout.CheckoutCallbacksFlutterApi.onBeforeSubmit$separatedMessageChannelSuffix"
     val channel = BasicMessageChannel<Any?>(binaryMessenger, channelName, codec)
-    channel.send(listOf(sessionDTOArg, binLookupDataDTOArg)) {
+    channel.send(listOf(checkoutIdArg, dataArg)) {
       if (it is List<*>) {
         if (it.size > 1) {
           callback(Result.failure(AdyenPigeonError(it[0] as String, it[1] as String, it[2] as String?)))
+        } else if (it[0] == null) {
+          callback(Result.failure(AdyenPigeonError("null-error", "Flutter api returned null value for non-null return value.", "")))
         } else {
-          callback(Result.success(Unit))
+          val output = it[0] as BeforeSubmitResultDTO
+          callback(Result.success(output))
         }
       } else {
         callback(Result.failure(PlatformApiPigeonUtils.createConnectionError(channelName)))
       } 
     }
   }
-  fun onComponentCommunication(componentCommunicationModelArg: ComponentCommunicationModel, callback: (Result<Unit>) -> Unit)
+  fun onSubmit(checkoutIdArg: String, dataArg: PaymentComponentDataDTO, callback: (Result<SubmitResultDTO>) -> Unit)
 {
     val separatedMessageChannelSuffix = if (messageChannelSuffix.isNotEmpty()) ".$messageChannelSuffix" else ""
-    val channelName = "dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface.onComponentCommunication$separatedMessageChannelSuffix"
+    val channelName = "dev.flutter.pigeon.adyen_checkout.CheckoutCallbacksFlutterApi.onSubmit$separatedMessageChannelSuffix"
     val channel = BasicMessageChannel<Any?>(binaryMessenger, channelName, codec)
-    channel.send(listOf(componentCommunicationModelArg)) {
+    channel.send(listOf(checkoutIdArg, dataArg)) {
       if (it is List<*>) {
         if (it.size > 1) {
           callback(Result.failure(AdyenPigeonError(it[0] as String, it[1] as String, it[2] as String?)))
+        } else if (it[0] == null) {
+          callback(Result.failure(AdyenPigeonError("null-error", "Flutter api returned null value for non-null return value.", "")))
         } else {
-          callback(Result.success(Unit))
+          val output = it[0] as SubmitResultDTO
+          callback(Result.success(output))
         }
       } else {
         callback(Result.failure(PlatformApiPigeonUtils.createConnectionError(channelName)))
       } 
     }
   }
-  fun onApplePaySelectShippingMethod(componentIdArg: String, shippingMethodArg: ApplePayShippingMethodDTO, currentSummaryItemsArg: List<ApplePaySummaryItemDTO?>, callback: (Result<ApplePayShippingMethodUpdateDTO>) -> Unit)
+  fun onAdditionalDetails(checkoutIdArg: String, dataArg: ActionComponentDataDTO, callback: (Result<AdditionalDetailsResultDTO>) -> Unit)
 {
     val separatedMessageChannelSuffix = if (messageChannelSuffix.isNotEmpty()) ".$messageChannelSuffix" else ""
-    val channelName = "dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface.onApplePaySelectShippingMethod$separatedMessageChannelSuffix"
+    val channelName = "dev.flutter.pigeon.adyen_checkout.CheckoutCallbacksFlutterApi.onAdditionalDetails$separatedMessageChannelSuffix"
     val channel = BasicMessageChannel<Any?>(binaryMessenger, channelName, codec)
-    channel.send(listOf(componentIdArg, shippingMethodArg, currentSummaryItemsArg)) {
+    channel.send(listOf(checkoutIdArg, dataArg)) {
+      if (it is List<*>) {
+        if (it.size > 1) {
+          callback(Result.failure(AdyenPigeonError(it[0] as String, it[1] as String, it[2] as String?)))
+        } else if (it[0] == null) {
+          callback(Result.failure(AdyenPigeonError("null-error", "Flutter api returned null value for non-null return value.", "")))
+        } else {
+          val output = it[0] as AdditionalDetailsResultDTO
+          callback(Result.success(output))
+        }
+      } else {
+        callback(Result.failure(PlatformApiPigeonUtils.createConnectionError(channelName)))
+      } 
+    }
+  }
+  fun onApplePaySelectShippingMethod(checkoutIdArg: String, shippingMethodArg: ApplePayShippingMethodDTO, currentSummaryItemsArg: List<ApplePaySummaryItemDTO>, callback: (Result<ApplePayShippingMethodUpdateDTO>) -> Unit)
+{
+    val separatedMessageChannelSuffix = if (messageChannelSuffix.isNotEmpty()) ".$messageChannelSuffix" else ""
+    val channelName = "dev.flutter.pigeon.adyen_checkout.CheckoutCallbacksFlutterApi.onApplePaySelectShippingMethod$separatedMessageChannelSuffix"
+    val channel = BasicMessageChannel<Any?>(binaryMessenger, channelName, codec)
+    channel.send(listOf(checkoutIdArg, shippingMethodArg, currentSummaryItemsArg)) {
       if (it is List<*>) {
         if (it.size > 1) {
           callback(Result.failure(AdyenPigeonError(it[0] as String, it[1] as String, it[2] as String?)))
@@ -3898,12 +2481,12 @@ class ComponentFlutterInterface(private val binaryMessenger: BinaryMessenger, pr
       } 
     }
   }
-  fun onApplePaySelectShippingContact(componentIdArg: String, contactArg: ApplePayContactDTO, currentSummaryItemsArg: List<ApplePaySummaryItemDTO?>, callback: (Result<ApplePayShippingContactUpdateDTO>) -> Unit)
+  fun onApplePaySelectShippingContact(checkoutIdArg: String, contactArg: ApplePayContactDTO, currentSummaryItemsArg: List<ApplePaySummaryItemDTO>, callback: (Result<ApplePayShippingContactUpdateDTO>) -> Unit)
 {
     val separatedMessageChannelSuffix = if (messageChannelSuffix.isNotEmpty()) ".$messageChannelSuffix" else ""
-    val channelName = "dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface.onApplePaySelectShippingContact$separatedMessageChannelSuffix"
+    val channelName = "dev.flutter.pigeon.adyen_checkout.CheckoutCallbacksFlutterApi.onApplePaySelectShippingContact$separatedMessageChannelSuffix"
     val channel = BasicMessageChannel<Any?>(binaryMessenger, channelName, codec)
-    channel.send(listOf(componentIdArg, contactArg, currentSummaryItemsArg)) {
+    channel.send(listOf(checkoutIdArg, contactArg, currentSummaryItemsArg)) {
       if (it is List<*>) {
         if (it.size > 1) {
           callback(Result.failure(AdyenPigeonError(it[0] as String, it[1] as String, it[2] as String?)))
@@ -3918,12 +2501,12 @@ class ComponentFlutterInterface(private val binaryMessenger: BinaryMessenger, pr
       } 
     }
   }
-  fun onApplePayChangeCouponCode(componentIdArg: String, couponCodeArg: String, currentSummaryItemsArg: List<ApplePaySummaryItemDTO?>, callback: (Result<ApplePayCouponCodeUpdateDTO>) -> Unit)
+  fun onApplePayChangeCouponCode(checkoutIdArg: String, couponCodeArg: String, currentSummaryItemsArg: List<ApplePaySummaryItemDTO>, callback: (Result<ApplePayCouponCodeUpdateDTO>) -> Unit)
 {
     val separatedMessageChannelSuffix = if (messageChannelSuffix.isNotEmpty()) ".$messageChannelSuffix" else ""
-    val channelName = "dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface.onApplePayChangeCouponCode$separatedMessageChannelSuffix"
+    val channelName = "dev.flutter.pigeon.adyen_checkout.CheckoutCallbacksFlutterApi.onApplePayChangeCouponCode$separatedMessageChannelSuffix"
     val channel = BasicMessageChannel<Any?>(binaryMessenger, channelName, codec)
-    channel.send(listOf(componentIdArg, couponCodeArg, currentSummaryItemsArg)) {
+    channel.send(listOf(checkoutIdArg, couponCodeArg, currentSummaryItemsArg)) {
       if (it is List<*>) {
         if (it.size > 1) {
           callback(Result.failure(AdyenPigeonError(it[0] as String, it[1] as String, it[2] as String?)))
@@ -3938,12 +2521,12 @@ class ComponentFlutterInterface(private val binaryMessenger: BinaryMessenger, pr
       } 
     }
   }
-  fun onApplePayAuthorize(componentIdArg: String, paymentArg: ApplePayAuthorizedPaymentDTO, callback: (Result<ApplePayAuthorizationResultDTO>) -> Unit)
+  fun onApplePayAuthorize(checkoutIdArg: String, paymentArg: ApplePayAuthorizedPaymentDTO, callback: (Result<ApplePayAuthorizationResultDTO>) -> Unit)
 {
     val separatedMessageChannelSuffix = if (messageChannelSuffix.isNotEmpty()) ".$messageChannelSuffix" else ""
-    val channelName = "dev.flutter.pigeon.adyen_checkout.ComponentFlutterInterface.onApplePayAuthorize$separatedMessageChannelSuffix"
+    val channelName = "dev.flutter.pigeon.adyen_checkout.CheckoutCallbacksFlutterApi.onApplePayAuthorize$separatedMessageChannelSuffix"
     val channel = BasicMessageChannel<Any?>(binaryMessenger, channelName, codec)
-    channel.send(listOf(componentIdArg, paymentArg)) {
+    channel.send(listOf(checkoutIdArg, paymentArg)) {
       if (it is List<*>) {
         if (it.size > 1) {
           callback(Result.failure(AdyenPigeonError(it[0] as String, it[1] as String, it[2] as String?)))
@@ -3960,86 +2543,26 @@ class ComponentFlutterInterface(private val binaryMessenger: BinaryMessenger, pr
   }
 }
 /** Generated class from Pigeon that represents Flutter messages that can be called from Kotlin. */
-class AdyenFlutterInterface(private val binaryMessenger: BinaryMessenger, private val messageChannelSuffix: String = "") {
+class ActionOnlyFlutterApi(private val binaryMessenger: BinaryMessenger, private val messageChannelSuffix: String = "") {
   companion object {
-    /** The codec used by AdyenFlutterInterface. */
+    /** The codec used by ActionOnlyFlutterApi. */
     val codec: MessageCodec<Any?> by lazy {
       PlatformApiPigeonCodec()
     }
   }
-  fun onSubmit(platformCommunicationDTOArg: PlatformCommunicationDTO, callback: (Result<CheckoutResultDTO>) -> Unit)
+  fun onAdditionalDetails(actionIdArg: String, dataArg: ActionComponentDataDTO, callback: (Result<AdditionalDetailsResultDTO>) -> Unit)
 {
     val separatedMessageChannelSuffix = if (messageChannelSuffix.isNotEmpty()) ".$messageChannelSuffix" else ""
-    val channelName = "dev.flutter.pigeon.adyen_checkout.AdyenFlutterInterface.onSubmit$separatedMessageChannelSuffix"
+    val channelName = "dev.flutter.pigeon.adyen_checkout.ActionOnlyFlutterApi.onAdditionalDetails$separatedMessageChannelSuffix"
     val channel = BasicMessageChannel<Any?>(binaryMessenger, channelName, codec)
-    channel.send(listOf(platformCommunicationDTOArg)) {
+    channel.send(listOf(actionIdArg, dataArg)) {
       if (it is List<*>) {
         if (it.size > 1) {
           callback(Result.failure(AdyenPigeonError(it[0] as String, it[1] as String, it[2] as String?)))
         } else if (it[0] == null) {
           callback(Result.failure(AdyenPigeonError("null-error", "Flutter api returned null value for non-null return value.", "")))
         } else {
-          val output = it[0] as CheckoutResultDTO
-          callback(Result.success(output))
-        }
-      } else {
-        callback(Result.failure(PlatformApiPigeonUtils.createConnectionError(channelName)))
-      } 
-    }
-  }
-  fun onAdditionalDetails(platformCommunicationDTOArg: PlatformCommunicationDTO, callback: (Result<CheckoutResultDTO>) -> Unit)
-{
-    val separatedMessageChannelSuffix = if (messageChannelSuffix.isNotEmpty()) ".$messageChannelSuffix" else ""
-    val channelName = "dev.flutter.pigeon.adyen_checkout.AdyenFlutterInterface.onAdditionalDetails$separatedMessageChannelSuffix"
-    val channel = BasicMessageChannel<Any?>(binaryMessenger, channelName, codec)
-    channel.send(listOf(platformCommunicationDTOArg)) {
-      if (it is List<*>) {
-        if (it.size > 1) {
-          callback(Result.failure(AdyenPigeonError(it[0] as String, it[1] as String, it[2] as String?)))
-        } else if (it[0] == null) {
-          callback(Result.failure(AdyenPigeonError("null-error", "Flutter api returned null value for non-null return value.", "")))
-        } else {
-          val output = it[0] as CheckoutResultDTO
-          callback(Result.success(output))
-        }
-      } else {
-        callback(Result.failure(PlatformApiPigeonUtils.createConnectionError(channelName)))
-      } 
-    }
-  }
-}
-/**
- * Separate from [AdyenFlutterInterface] because that interface is only ever
- * implemented/registered by the advanced-flow component, while
- * `onBeforeSubmit` is a sessions-flow-only concept implemented by the
- * session component.
- *
- * Generated class from Pigeon that represents Flutter messages that can be called from Kotlin.
- */
-class SessionCheckoutFlutterInterface(private val binaryMessenger: BinaryMessenger, private val messageChannelSuffix: String = "") {
-  companion object {
-    /** The codec used by SessionCheckoutFlutterInterface. */
-    val codec: MessageCodec<Any?> by lazy {
-      PlatformApiPigeonCodec()
-    }
-  }
-  /**
-   * Called before the sessions flow submits payment data, when a merchant
-   * has registered [SessionCheckout.onBeforeSubmit].
-   */
-  fun onBeforeSubmit(dataArg: BeforeSubmitDataDTO, callback: (Result<BeforeSubmitResultDTO>) -> Unit)
-{
-    val separatedMessageChannelSuffix = if (messageChannelSuffix.isNotEmpty()) ".$messageChannelSuffix" else ""
-    val channelName = "dev.flutter.pigeon.adyen_checkout.SessionCheckoutFlutterInterface.onBeforeSubmit$separatedMessageChannelSuffix"
-    val channel = BasicMessageChannel<Any?>(binaryMessenger, channelName, codec)
-    channel.send(listOf(dataArg)) {
-      if (it is List<*>) {
-        if (it.size > 1) {
-          callback(Result.failure(AdyenPigeonError(it[0] as String, it[1] as String, it[2] as String?)))
-        } else if (it[0] == null) {
-          callback(Result.failure(AdyenPigeonError("null-error", "Flutter api returned null value for non-null return value.", "")))
-        } else {
-          val output = it[0] as BeforeSubmitResultDTO
+          val output = it[0] as AdditionalDetailsResultDTO
           callback(Result.success(output))
         }
       } else {
@@ -4085,14 +2608,14 @@ class PigeonEventSink<T>(private val sink: EventChannel.EventSink) {
   }
 }
       
-abstract class OnPlatformEventStreamHandler : PlatformApiPigeonEventChannelWrapper<ComponentCommunicationModel> {
+abstract class EventsStreamHandler : PlatformApiPigeonEventChannelWrapper<CheckoutEventDTO> {
   companion object {
-    fun register(messenger: BinaryMessenger, streamHandler: OnPlatformEventStreamHandler, instanceName: String = "") {
-      var channelName: String = "dev.flutter.pigeon.adyen_checkout.PlatformEvents.onPlatformEvent"
+    fun register(messenger: BinaryMessenger, streamHandler: EventsStreamHandler, instanceName: String = "") {
+      var channelName: String = "dev.flutter.pigeon.adyen_checkout.CheckoutEvents.events"
       if (instanceName.isNotEmpty()) {
         channelName += ".$instanceName"
       }
-      val internalStreamHandler = PlatformApiPigeonStreamHandler<ComponentCommunicationModel>(streamHandler)
+      val internalStreamHandler = PlatformApiPigeonStreamHandler<CheckoutEventDTO>(streamHandler)
       EventChannel(messenger, channelName, PlatformApiPigeonMethodCodec).setStreamHandler(internalStreamHandler)
     }
   }

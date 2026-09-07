@@ -1,52 +1,18 @@
-# Setting up the returnUrl
+# Return URL handling
 
-The `returnUrl` is a **mandatory** configuration for handling payment redirections, such as 3DS2 web
-challenges or other redirect-based payment methods. It specifies the URL where the shopper should be
-redirected back to your app after completing an action. This URL must be **provided as a parameter
-in your `/sessions` or `/payments` request**.
+The `returnUrl` belongs in the `/sessions` or `/payments` request sent by your backend. Configure a
+unique URL scheme in the host application and pass the same URL to Adyen.
 
-**Important considerations:**
+Flutter 2.0 does not generate return URLs. It forwards incoming native returns to the v6 Checkout
+flow. The example app forwards iOS URLs from both `AppDelegate` and `SceneDelegate`:
 
-* When using the `/sessions` flow, you need to know the platform (Android or iOS) and the
-  integration type (Drop-in or Components) upfront to correctly configure the `returnUrl`.
-* The maximum length for a `returnUrl` is **1024 characters**.
+```swift
+Checkout.handleReturn(url: url)
+```
 
-## For Android:
+On Android, the plugin forwards new intents to the active native checkout controller. The host
+activity must inherit from `FlutterFragmentActivity` and declare the URL intent filter required by
+the selected return URL.
 
-For Android, the returnUrl structure and prerequisites differ based on whether you are using the
-**Drop-in** or **Components** integration.
-
-### Android Drop-in
-
-When using the Drop-in solution, the returnUrl is **predefined**.
-
-* **Format:** `adyencheckout://` scheme, followed by your **package name**.
-* **Example:** `adyencheckout://com.adyen.adyen_checkout_example`.
-
-The `AdyenCheckout.instance.getReturnUrl()` method is available to provide this string value. You
-can also provide the string as a hardcoded constant.
-
-### Android Components
-
-For Components integration on Android, you need to define a **custom intent filter**.
-
-* **Format:** `adyencheckout://` scheme, followed by your **package name**.
-* **Path:** You **must add a path**.
-* **Example:** `adyencheckout://com.adyen.adyen_checkout_example/adyenPayment`.
-
-**Prerequisites for Android Components:**
-
-* **Add a [custom intent](https://github.com/Adyen/adyen-flutter/blob/main/example/android/app/src/main/AndroidManifest.xml#L29) filter** to your `Manifest.xml` file.
-* Providing an alternative custom scheme is not yet supported.
-
-## For iOS:
-
-For iOS, the returnUrl setup is **consistent for both Drop-in and Components** integrations.
-
-* **Format:** You need to **define a unique custom URL scheme** for your app.
-* **Example:** `com.mydomain.adyencheckout://`.
-
-**Prerequisites for iOS:**
-
-* **Add the [return URL handler](https://github.com/Adyen/adyen-flutter/blob/main/example/ios/Runner/AppDelegate.swift#L18)** to your `AppDelegate` in your native iOS layer.
-* **Configure the [custom URL scheme](https://developer.apple.com/documentation/xcode/defining-a-custom-url-scheme-for-your-app)** in your your `Info.plist` file.
+There can be only one active checkout flow. Returns received after explicit checkout disposal are
+ignored.

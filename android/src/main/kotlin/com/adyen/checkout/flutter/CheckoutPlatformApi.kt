@@ -1,233 +1,340 @@
 package com.adyen.checkout.flutter
 
-import android.annotation.SuppressLint
+import android.view.ViewGroup
+import android.widget.FrameLayout
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.lifecycleScope
+import com.adyen.checkout.core.action.data.Action
+import com.adyen.checkout.core.action.data.ActionComponentData
+import com.adyen.checkout.core.common.AdyenLogLevel
+import com.adyen.checkout.core.common.AdyenLogger
 import com.adyen.checkout.core.common.CheckoutContext
+import com.adyen.checkout.core.components.ActionOnlyCheckoutCallbacks
+import com.adyen.checkout.core.components.AdditionalDetailsResult
+import com.adyen.checkout.core.components.AdvancedCheckoutResult
 import com.adyen.checkout.core.components.Checkout
-import com.adyen.checkout.core.components.CheckoutConfiguration
+import com.adyen.checkout.core.components.CheckoutController
+import com.adyen.checkout.core.common.CheckoutResultCode
+import com.adyen.checkout.core.components.CheckoutAction
 import com.adyen.checkout.core.components.data.model.paymentmethod.PaymentMethods
-import com.adyen.checkout.core.old.AdyenLogLevel
-import com.adyen.checkout.core.old.AdyenLogger
+import com.adyen.checkout.core.error.CheckoutError
+import com.adyen.checkout.cse.CardEncrypter
 import com.adyen.checkout.flutter.apiOnly.AdyenCSE
 import com.adyen.checkout.flutter.apiOnly.CardValidation
-import com.adyen.checkout.flutter.generated.CardExpiryDateValidationResultDTO
-import com.adyen.checkout.flutter.generated.CardNumberValidationResultDTO
-import com.adyen.checkout.flutter.generated.CardSecurityCodeValidationResultDTO
+import com.adyen.checkout.flutter.components.CheckoutComponentRegistry
+import com.adyen.checkout.flutter.components.ComponentPlatformEventHandler
+import com.adyen.checkout.flutter.generated.ActionComponentDataDTO
+import com.adyen.checkout.flutter.generated.ActionOnlyFlutterApi
+import com.adyen.checkout.flutter.generated.AdyenPigeonError
+import com.adyen.checkout.flutter.generated.AdvancedCheckoutResultDTO
 import com.adyen.checkout.flutter.generated.CheckoutConfigurationDTO
-import com.adyen.checkout.flutter.generated.CheckoutPlatformInterface
-import com.adyen.checkout.flutter.generated.DropInConfigurationDTO
+import com.adyen.checkout.flutter.generated.CheckoutEventDTO
+import com.adyen.checkout.flutter.generated.CheckoutHostApi
+import com.adyen.checkout.flutter.generated.CheckoutSetupResultDTO
 import com.adyen.checkout.flutter.generated.EncryptedCardDTO
-import com.adyen.checkout.flutter.generated.InstantPaymentConfigurationDTO
-import com.adyen.checkout.flutter.generated.InstantPaymentType
-import com.adyen.checkout.flutter.generated.SessionDTO
 import com.adyen.checkout.flutter.generated.SessionResponseDTO
 import com.adyen.checkout.flutter.generated.UnencryptedCardDTO
 import com.adyen.checkout.flutter.session.CheckoutHolder
-import com.adyen.checkout.flutter.utils.ConfigurationMapper.mapToSessionResponse
 import com.adyen.checkout.flutter.utils.ConfigurationMapper.toCheckoutConfiguration
-import com.adyen.checkout.flutter.utils.PlatformException
-import com.adyen.checkout.redirect.old.RedirectComponent
-import com.adyen.checkout.sessions.core.CheckoutSessionResult
-import com.adyen.checkout.sessions.core.SessionModel
-import com.adyen.checkout.sessions.core.SessionSetupResponse
+import com.google.android.gms.wallet.WalletConstants
 import com.adyen.threeds2.ThreeDS2Service
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.suspendCancellableCoroutine
+import org.json.JSONArray
+import org.json.JSONObject
+import java.util.UUID
+import kotlin.coroutines.resume
 
-class CheckoutPlatformApi(
+internal class CheckoutPlatformApi(
     private val activity: FragmentActivity,
     private val checkoutHolder: CheckoutHolder,
-) : CheckoutPlatformInterface {
-    override fun getReturnUrl(callback: (Result<String>) -> Unit) {
-        callback(Result.success(RedirectComponent.getReturnUrl(activity.applicationContext)))
-    }
+    private val callbacksApi: com.adyen.checkout.flutter.generated.CheckoutCallbacksFlutterApi,
+    private val actionOnlyApi: ActionOnlyFlutterApi,
+    private val eventHandler: ComponentPlatformEventHandler,
+) : CheckoutHostApi {
+    private var actionController: CheckoutController? = null
+    private var actionView: ComposeView? = null
 
     override fun setupSession(
-        sessionResponseDTO: SessionResponseDTO,
-        checkoutConfigurationDTO: CheckoutConfigurationDTO,
-        callback: (Result<SessionDTO>) -> Unit
+        sessionResponse: SessionResponseDTO,
+        configuration: CheckoutConfigurationDTO,
+        callback: (Result<CheckoutSetupResultDTO>) -> Unit,
     ) {
-        activity.lifecycleScope.launch(Dispatchers.IO) {
+        activity.lifecycleScope.launch {
             try {
-                val sessionResponse = sessionResponseDTO.mapToSessionResponse()
-                val configuration = createConfiguration(checkoutConfigurationDTO)
-                val checkoutResult =
-                    Checkout.setup(
-                        sessionResponse,
-                        configuration
+                if (checkoutHolder.isActive()) {
+                    throw AdyenPigeonError(
+                        "CheckoutAlreadyActive",
+                        "Another checkout flow is already active.",
                     )
-
-                when (checkoutResult) {
-                    is Checkout.Result.Error ->
-                        onSetupError(
-                            error = checkoutResult.error.message ?: "Checkout setup failed.",
-                            callback = callback
-                        )
-
-                    is Checkout.Result.Success ->
-                        onSetupSuccess(
-                            checkoutSession = checkoutResult.checkoutContext,
-                            callback = callback
-                        )
                 }
-            } catch (exception: Exception) {
-                // Exception will contain the checkout error
-                // TODO: Add error handling
-                onSetupError(exception.message ?: "Checkout setup failed.", callback)
-                return@launch
+                val nativeConfiguration = configuration.toCheckoutConfiguration()
+                val result = Checkout.setup(
+                    sessionResponse = sessionResponse.toNativeSessionResponse(),
+                    configuration = nativeConfiguration,
+                )
+                when (result) {
+                    is Checkout.Result.Error -> throw result.error.toPigeonError()
+                    is Checkout.Result.Success -> {
+                        val checkoutId = UUID.randomUUID().toString()
+                        checkoutHolder.put(checkoutId, result.checkoutContext)
+                        callback(Result.success(result.checkoutContext.toSessionSetupResult(checkoutId)))
+                    }
+                }
+            } catch (error: Throwable) {
+                callback(Result.failure(error.toPigeonError()))
             }
         }
     }
 
     override fun setupAdvanced(
-        paymentMethodsResponse: String,
-        checkoutConfigurationDTO: CheckoutConfigurationDTO,
-        callback: (Result<Unit>) -> Unit
+        paymentMethodsJson: String,
+        configuration: CheckoutConfigurationDTO,
+        callback: (Result<CheckoutSetupResultDTO>) -> Unit,
     ) {
-        activity.lifecycleScope.launch(Dispatchers.IO) {
+        activity.lifecycleScope.launch {
             try {
-                val paymentMethods = PaymentMethods.SERIALIZER.deserialize(
-                        org.json.JSONObject(paymentMethodsResponse)
+                if (checkoutHolder.isActive()) {
+                    throw AdyenPigeonError(
+                        "CheckoutAlreadyActive",
+                        "Another checkout flow is already active.",
                     )
-                val configuration = checkoutConfigurationDTO.toCheckoutConfiguration()
-                val checkoutResult =
-                    Checkout.setup(
-                        paymentMethods = paymentMethods,
-                        configuration = configuration
-                    )
-
-                when (checkoutResult) {
-                    is Checkout.Result.Error ->
-                        callback(Result.failure(PlatformException(checkoutResult.error.message ?: "Checkout setup failed.")))
+                }
+                val paymentMethods = PaymentMethods.SERIALIZER.deserialize(JSONObject(paymentMethodsJson))
+                val result = Checkout.setup(
+                    paymentMethods = paymentMethods,
+                    configuration = configuration.toCheckoutConfiguration(),
+                )
+                when (result) {
+                    is Checkout.Result.Error -> throw result.error.toPigeonError()
                     is Checkout.Result.Success -> {
-                        checkoutHolder.checkoutContext = checkoutResult.checkoutContext
-                        callback(Result.success(Unit))
+                        val checkoutId = UUID.randomUUID().toString()
+                        checkoutHolder.put(checkoutId, result.checkoutContext)
+                        callback(Result.success(setupResult(checkoutId, paymentMethods)))
                     }
                 }
-            } catch (exception: Exception) {
-                callback(Result.failure(PlatformException(exception.message ?: "Checkout setup failed.")))
+            } catch (error: Throwable) {
+                callback(Result.failure(error.toPigeonError()))
             }
         }
     }
 
-    override fun clearSession() {
-        checkoutHolder.reset()
+    override fun disposeCheckout(checkoutId: String) {
+        checkoutHolder.remove(checkoutId)
+        CheckoutComponentRegistry.clearCheckout(checkoutId)
+    }
+
+    override fun handleAction(
+        actionId: String,
+        actionJson: String,
+        configuration: CheckoutConfigurationDTO,
+        callback: (Result<AdvancedCheckoutResultDTO>) -> Unit,
+    ) {
+        if (!checkoutHolder.beginAction(actionId)) {
+            callback(
+                Result.failure(
+                    AdyenPigeonError(
+                        "CheckoutAlreadyActive",
+                        "Another checkout flow is already active.",
+                    ),
+                ),
+            )
+            return
+        }
+
+        activity.lifecycleScope.launch {
+            try {
+                val action = Action.SERIALIZER.deserialize(JSONObject(actionJson))
+                val setupResult = Checkout.setup(
+                    action = action,
+                    configuration = configuration.toCheckoutConfiguration(),
+                )
+                val context = when (setupResult) {
+                    is Checkout.Result.Error -> throw setupResult.error.toPigeonError()
+                    is Checkout.Result.Success -> setupResult.checkoutContext
+                }
+                val result = CompletableDeferred<AdvancedCheckoutResult>()
+                val callbacks = ActionOnlyCheckoutCallbacks(
+                    onAdditionalDetails = { data ->
+                        try {
+                            requestActionAdditionalDetails(actionId, data)
+                        } catch (error: Throwable) {
+                            result.completeExceptionally(error.toPigeonError())
+                            AdditionalDetailsResult.Completion(CheckoutResultCode.ERROR.value)
+                        }
+                    },
+                    onFailure = { error ->
+                        result.completeExceptionally(error.toPigeonError())
+                    },
+                    onComplete = { checkoutResult ->
+                        result.complete(checkoutResult)
+                    },
+                )
+                val controller = CheckoutController(
+                    context = context,
+                    callbacks = callbacks,
+                    coroutineScope = activity.lifecycleScope,
+                )
+                actionController = controller
+                showAction(controller)
+                val checkoutResult = result.await()
+                callback(Result.success(AdvancedCheckoutResultDTO(checkoutResult.resultCode.value)))
+            } catch (error: Throwable) {
+                callback(Result.failure(error.toPigeonError()))
+            } finally {
+                hideAction()
+                actionController = null
+                checkoutHolder.endAction(actionId)
+            }
+        }
+    }
+
+    override fun enableConsoleLogging(enabled: Boolean) {
+        AdyenLogger.setLogLevel(if (enabled) AdyenLogLevel.VERBOSE else AdyenLogLevel.NONE)
     }
 
     override fun encryptCard(
-        unencryptedCardDTO: UnencryptedCardDTO,
+        card: UnencryptedCardDTO,
         publicKey: String,
-        callback: (Result<EncryptedCardDTO>) -> Unit
+        callback: (Result<EncryptedCardDTO>) -> Unit,
     ) {
-        val encryptedCardResult = AdyenCSE.encryptCard(unencryptedCardDTO, publicKey)
-        callback(encryptedCardResult)
+        try {
+            callback(Result.success(AdyenCSE.encryptCard(card, publicKey)))
+        } catch (error: Throwable) {
+            callback(Result.failure(error.toPigeonError()))
+        }
     }
 
     override fun encryptBin(
         bin: String,
         publicKey: String,
-        callback: (Result<String>) -> Unit
+        callback: (Result<String>) -> Unit,
     ) {
-        val encryptedBin = AdyenCSE.encryptBin(bin, publicKey)
-        callback(encryptedBin)
-    }
-
-    override fun validateCardNumber(
-        cardNumber: String,
-        enableLuhnCheck: Boolean
-    ): CardNumberValidationResultDTO = CardValidation.validateCardNumber(cardNumber, enableLuhnCheck)
-
-    override fun validateCardExpiryDate(
-        expiryMonth: String,
-        expiryYear: String
-    ): CardExpiryDateValidationResultDTO = CardValidation.validateCardExpiryDate(expiryMonth, expiryYear)
-
-    override fun validateCardSecurityCode(
-        securityCode: String,
-        cardBrand: String?
-    ): CardSecurityCodeValidationResultDTO = CardValidation.validateCardSecurityCode(securityCode, cardBrand)
-
-    private fun determineSessionConfiguration(configuration: Any?): CheckoutConfiguration? {
-        when (configuration) {
-            is DropInConfigurationDTO -> return configuration.toCheckoutConfiguration()
-            is InstantPaymentConfigurationDTO -> {
-                return when (configuration.instantPaymentType) {
-                    InstantPaymentType.APPLE_PAY -> throw IllegalStateException(
-                        "Apple Pay is not supported on Android."
-                    )
-
-                    else -> configuration.toCheckoutConfiguration()
-                }
-            }
-        }
-
-        return null
-    }
-
-    private fun onSessionSuccessfullyCreated(
-        sessionResult: CheckoutSessionResult.Success,
-        sessionModel: SessionModel,
-        callback: (Result<SessionDTO>) -> Unit,
-    ) {
-        with(sessionResult.checkoutSession) {
-            val sessionResponse = SessionSetupResponse.SERIALIZER.serialize(sessionSetupResponse)
-            val paymentMethodsJsonObject =
-                sessionSetupResponse.paymentMethodsApiResponse?.let {
-                    com.adyen.checkout.components.core.PaymentMethodsApiResponse.SERIALIZER
-                        .serialize(it)
-                }
-            checkoutHolder.sessionSetupResponse = sessionResponse
-            callback(
-                Result.success(
-                    SessionDTO(
-                        id = sessionModel.id,
-                        paymentMethodsJson = paymentMethodsJsonObject?.toString() ?: "",
-                    )
-                )
-            )
+        try {
+            callback(Result.success(AdyenCSE.encryptBin(bin, publicKey)))
+        } catch (error: Throwable) {
+            callback(Result.failure(error.toPigeonError()))
         }
     }
 
-    @SuppressLint("RestrictedApi")
-    override fun enableConsoleLogging(loggingEnabled: Boolean) {
-        if (loggingEnabled) {
-            com.adyen.checkout.core.common.AdyenLogger.setLogLevel(com.adyen.checkout.core.common.AdyenLogLevel.VERBOSE)
-            AdyenLogger.setLogLevel(AdyenLogLevel.VERBOSE)
-        } else {
-            com.adyen.checkout.core.common.AdyenLogger.setLogLevel(com.adyen.checkout.core.common.AdyenLogLevel.NONE)
-            AdyenLogger.setLogLevel(AdyenLogLevel.NONE)
-        }
-    }
+    override fun validateCardNumber(cardNumber: String, enableLuhnCheck: Boolean): Boolean =
+        CardValidation.validateCardNumber(cardNumber, enableLuhnCheck)
+
+    override fun validateCardExpiryDate(expiryMonth: String, expiryYear: String): Boolean =
+        CardValidation.validateCardExpiryDate(expiryMonth, expiryYear)
+
+    override fun validateCardSecurityCode(securityCode: String, cardBrand: String?): Boolean =
+        CardValidation.validateCardSecurityCode(securityCode, cardBrand)
 
     override fun getThreeDS2SdkVersion(): String = ThreeDS2Service.INSTANCE.sdkVersion
 
-    private fun onSetupSuccess(
-        checkoutSession: CheckoutContext.Sessions,
-        callback: (Result<SessionDTO>) -> Unit,
-    ) {
-        checkoutHolder.checkoutContext = checkoutSession
-        val paymentMethodsJsonObject =
-            checkoutSession.checkoutSession.sessionSetupResponse.paymentMethods?.let {
-                PaymentMethods.SERIALIZER.serialize(it)
-            }
-        callback(
-            Result.success(
-                SessionDTO(
-                    id = checkoutSession.checkoutSession.sessionSetupResponse.id,
-                    paymentMethodsJson = paymentMethodsJsonObject?.toString() ?: "",
-                )
+    fun handleReturn(intent: android.content.Intent) {
+        actionController?.handleReturn(intent)
+    }
+
+    fun teardown() {
+        hideAction()
+        actionController = null
+        checkoutHolder.clear()
+    }
+
+    private suspend fun requestActionAdditionalDetails(
+        actionId: String,
+        data: ActionComponentData,
+    ): AdditionalDetailsResult = suspendCancellableCoroutine { continuation ->
+        val dataJson = ActionComponentData.SERIALIZER.serialize(data).toString()
+        actionOnlyApi.onAdditionalDetails(
+            actionId,
+            ActionComponentDataDTO(dataJson = dataJson),
+        ) { response ->
+            if (!continuation.isActive) return@onAdditionalDetails
+            response.fold(
+                onSuccess = { result ->
+                    continuation.resume(AdditionalDetailsResult.Completion(result.resultCode))
+                },
+                onFailure = { error -> continuation.resumeWith(Result.failure(error)) },
             )
+        }
+        continuation.invokeOnCancellation { }
+    }
+
+    private fun showAction(controller: CheckoutController) {
+        val view = ComposeView(activity).apply {
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnDetachedFromWindowOrReleasedFromPool)
+            setContent {
+                CheckoutAction(controller = controller)
+            }
+        }
+        actionView = view
+        activity.addContentView(
+            view,
+            FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT,
+            ),
         )
     }
 
-    private fun onSetupError(
-        error: String,
-        callback: (Result<SessionDTO>) -> Unit,
-    ) {
-        callback(Result.failure(PlatformException(error)))
+    private fun hideAction() {
+        actionView?.let { view ->
+            (view.parent as? ViewGroup)?.removeView(view)
+        }
+        actionView = null
     }
 
-    private fun createConfiguration(configurationDTO: CheckoutConfigurationDTO): CheckoutConfiguration =
-        configurationDTO.toCheckoutConfiguration()
+    private fun SessionResponseDTO.toNativeSessionResponse(): com.adyen.checkout.core.sessions.SessionResponse =
+        com.adyen.checkout.core.sessions.SessionResponse(id, sessionData)
+
+    private fun CheckoutContext.Sessions.toSessionSetupResult(checkoutId: String): CheckoutSetupResultDTO {
+        val methods = checkoutSession.sessionSetupResponse.paymentMethods
+        return CheckoutSetupResultDTO(
+            checkoutId = checkoutId,
+            regularPaymentMethodsJson = serializeMethods(methods?.paymentMethods.orEmpty()),
+            storedPaymentMethodsJson = serializeStoredMethods(methods?.storedPaymentMethods.orEmpty()),
+        )
+    }
+
+    private fun setupResult(
+        checkoutId: String,
+        methods: PaymentMethods,
+    ): CheckoutSetupResultDTO = CheckoutSetupResultDTO(
+        checkoutId = checkoutId,
+        regularPaymentMethodsJson = serializeMethods(methods.paymentMethods.orEmpty()),
+        storedPaymentMethodsJson = serializeStoredMethods(methods.storedPaymentMethods.orEmpty()),
+    )
+
+    private fun serializeMethods(
+        methods: List<com.adyen.checkout.core.components.data.model.paymentmethod.PaymentMethod>,
+    ): String {
+        val array = JSONArray()
+        methods.forEach { method ->
+            array.put(com.adyen.checkout.core.components.data.model.paymentmethod.PaymentMethod.SERIALIZER.serialize(method))
+        }
+        return array.toString()
+    }
+
+    private fun serializeStoredMethods(
+        methods: List<com.adyen.checkout.core.components.data.model.paymentmethod.StoredPaymentMethod>,
+    ): String {
+        val array = JSONArray()
+        methods.forEach { method ->
+            array.put(com.adyen.checkout.core.components.data.model.paymentmethod.StoredPaymentMethod.SERIALIZER.serialize(method))
+        }
+        return array.toString()
+    }
+
+    private fun CheckoutError.toPigeonError(): AdyenPigeonError =
+        AdyenPigeonError(code = code, message = message)
+
+    private fun Throwable.toPigeonError(): AdyenPigeonError = when (this) {
+        is AdyenPigeonError -> this
+        else -> AdyenPigeonError(
+            code = "Generic",
+            message = message ?: "Checkout failed.",
+        )
+    }
 }

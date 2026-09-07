@@ -1,27 +1,40 @@
-#if canImport(AdyenEncryption)
-    import AdyenEncryption
-#endif
-
 import Adyen
+import AdyenEncryption
+import Foundation
 
-class AdyenCSE {
-    func encryptCard(unencryptedCardDTO: UnencryptedCardDTO, publicKey: String) -> Result<EncryptedCardDTO, any Error> {
+final class AdyenCSE {
+    func encryptCard(
+        unencryptedCardDTO: UnencryptedCardDTO,
+        publicKey: String
+    ) -> Result<EncryptedCardDTO, Error> {
         do {
-            let unencryptedCard = unencryptedCardDTO.mapToUnencryptedCard()
-            let encryptedCard = try CardEncryptor.encrypt(card: unencryptedCard, with: publicKey)
-            let encryptedCardDTO = encryptedCard.mapToEncryptedCardDTO()
-            return Result.success(encryptedCardDTO)
+            let encryptedCard = try CardEncryptor.encrypt(
+                card: Card(
+                    number: unencryptedCardDTO.cardNumber,
+                    securityCode: unencryptedCardDTO.cvc,
+                    expiryMonth: unencryptedCardDTO.expiryMonth,
+                    expiryYear: unencryptedCardDTO.expiryYear
+                ),
+                with: publicKey
+            )
+            return .success(
+                EncryptedCardDTO(
+                    encryptedCardNumber: encryptedCard.number,
+                    encryptedExpiryMonth: encryptedCard.expiryMonth,
+                    encryptedExpiryYear: encryptedCard.expiryYear,
+                    encryptedSecurityCode: encryptedCard.securityCode
+                )
+            )
         } catch {
-            return Result.failure(error)
+            return .failure(error)
         }
     }
-    
-    func encryptBin(bin: String, publicKey: String) -> Result<String, any Error> {
+
+    func encryptBin(bin: String, publicKey: String) -> Result<String, Error> {
         do {
-            let encryptedBin = try CardEncryptor.encrypt(bin: bin, with: publicKey)
-            return Result.success(encryptedBin)
+            return try .success(CardEncryptor.encrypt(bin: bin, with: publicKey))
         } catch {
-            return Result.failure(error)
+            return .failure(error)
         }
     }
 }

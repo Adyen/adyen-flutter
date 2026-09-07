@@ -1,265 +1,197 @@
 import Adyen
-#if canImport(AdyenComponents)
-    import AdyenComponents
-#endif
+import AdyenComponents
 import Contacts
+import Foundation
 import PassKit
 
-extension ApplePayConfigurationDTO {
-
-    var requiresApplePayUpdateDelegate: Bool {
-        hasOnSelectShippingMethod || hasOnSelectShippingContact || hasOnChangeCouponCode
-    }
-
-    var requiresAuthorizationDelegate: Bool {
-        hasOnAuthorize
-    }
+func mapApplePayConfiguration(
+    dto: ApplePayConfigurationDTO,
+    amount: Adyen.Amount,
+    countryCode: String,
+    callbacksApi: CheckoutCallbacksFlutterApi?,
+    checkoutId: String?
+) throws -> ApplePayConfiguration {
+    let request = try makePaymentRequest(dto: dto, amount: amount, countryCode: countryCode)
+    let configuration = try ApplePayConfiguration(paymentRequest: request)
+        .allowOnboarding(dto.allowOnboarding ?? true)
+    guard let callbacksApi, let checkoutId else { return configuration }
+    return dto.attachCallbacks(
+        to: configuration,
+        callbacksApi: callbacksApi,
+        checkoutId: checkoutId,
+        currencyCode: amount.currencyCode
+    )
 }
 
-extension ApplePayConfigurationDTO {
-    // TODO: v6 migration - ApplePayComponent is now package-access. Use ApplePayConfiguration directly.
-    func toApplePayConfiguration(
-        amount: Adyen.Amount? = nil,
-        countryCode: String? = nil,
-        componentFlutterApi: ComponentFlutterInterface? = nil,
-        componentId: (() -> String)? = nil
-    ) throws -> ApplePayConfiguration {
-        guard let amount, let countryCode else { throw PlatformError(errorDescription: "Amount and countryCode for Apple Pay not provided.") }
-        let summaryItems = try mapToPaymentSummaryItems(summaryItems: summaryItems, amount: amount)
-        let paymentRequest = try buildPaymentRequest(amount: amount, countryCode: countryCode, summaryItems: summaryItems)
-        // NOTE: allowOnboarding is now internal on ApplePayConfiguration; it will need to be set via CheckoutConfiguration DSL.
-        let configuration = try ApplePayConfiguration(paymentRequest: paymentRequest)
-        guard let componentFlutterApi, let componentId else { return configuration }
-        return attachDynamicCallbacks(
-            to: configuration,
-            amount: amount,
-            componentFlutterApi: componentFlutterApi,
-            componentId: componentId
-        )
-    }
-
-    private func attachDynamicCallbacks(
-        to configuration: ApplePayConfiguration,
-        amount: Adyen.Amount,
-        componentFlutterApi: ComponentFlutterInterface,
-        componentId: @escaping () -> String
-    ) -> ApplePayConfiguration {
-        var configuration = configuration
-        let currencyCode = amount.currencyCode
-
-        if hasOnSelectShippingMethod {
-            configuration = configuration.onSelectShippingMethod { shippingMethod, summaryItems in
-                await withCheckedContinuation { continuation in
-                    componentFlutterApi.onApplePaySelectShippingMethod(
-                        componentId: componentId(),
-                        shippingMethod: shippingMethod.toDTO(currencyCode: currencyCode),
-                        currentSummaryItems: summaryItems.map { $0.toDTO(currencyCode: currencyCode) }
-                    ) { result in
-                        let update = try? result.get().toPKPaymentRequestShippingMethodUpdate()
-                        continuation.resume(returning: update ?? PKPaymentRequestShippingMethodUpdate(paymentSummaryItems: summaryItems))
-                    }
-                }
-            }
-        }
-
-        if hasOnSelectShippingContact {
-            configuration = configuration.onSelectShippingContact { contact, summaryItems in
-                await withCheckedContinuation { continuation in
-                    componentFlutterApi.onApplePaySelectShippingContact(
-                        componentId: componentId(),
-                        contact: contact.toDTO(),
-                        currentSummaryItems: summaryItems.map { $0.toDTO(currencyCode: currencyCode) }
-                    ) { result in
-                        let update = try? result.get().toPKPaymentRequestShippingContactUpdate()
-                        continuation.resume(returning: update ?? PKPaymentRequestShippingContactUpdate(paymentSummaryItems: summaryItems))
-                    }
-                }
-            }
-        }
-
-        if hasOnChangeCouponCode {
-            configuration = configuration.onChangeCouponCode { couponCode, summaryItems in
-                await withCheckedContinuation { continuation in
-                    componentFlutterApi.onApplePayChangeCouponCode(
-                        componentId: componentId(),
-                        couponCode: couponCode,
-                        currentSummaryItems: summaryItems.map { $0.toDTO(currencyCode: currencyCode) }
-                    ) { result in
-                        let update = try? result.get().toPKPaymentRequestCouponCodeUpdate()
-                        continuation.resume(returning: update ?? PKPaymentRequestCouponCodeUpdate(paymentSummaryItems: summaryItems))
-                    }
-                }
-            }
-        }
-
-        if hasOnAuthorize {
-            configuration = configuration.onAuthorize { payment in
-                await withCheckedContinuation { continuation in
-                    componentFlutterApi.onApplePayAuthorize(
-                        componentId: componentId(),
-                        payment: payment.toAuthorizedPaymentDTO(currencyCode: currencyCode)
-                    ) { result in
-                        let authorizationResult = (try? result.get())?.toPKPaymentAuthorizationResult()
-                        continuation.resume(returning: authorizationResult ?? PKPaymentAuthorizationResult(status: .success, errors: nil))
-                    }
-                }
-            }
-        }
-
-        return configuration
-    }
-
-    private func buildPaymentRequest(amount: Adyen.Amount, countryCode: String, summaryItems: [PKPaymentSummaryItem]) throws -> PKPaymentRequest {
-        let paymentRequest = PKPaymentRequest()
-        paymentRequest.merchantIdentifier = merchantId
-        paymentRequest.paymentSummaryItems = summaryItems
-        paymentRequest.countryCode = countryCode
-        paymentRequest.currencyCode = amount.currencyCode
-        paymentRequest.billingContact = billingContact?.toApplePayContact()
-        paymentRequest.shippingContact = shippingContact?.toApplePayContact()
-        paymentRequest.merchantCapabilities = merchantCapability.toMerchantCapability()
-        if let requiredShippingContactFields {
-            paymentRequest.requiredShippingContactFields = mapToContactFields(contactFields: requiredShippingContactFields)
-        }
-
-        if let requiredBillingContactFields {
-            paymentRequest.requiredBillingContactFields = mapToContactFields(contactFields: requiredBillingContactFields)
-        }
-
-        if let applePayShippingType {
-            paymentRequest.shippingType = applePayShippingType.toPKShippingType()
-        }
-
-        if let supportedCountries {
-            paymentRequest.supportedCountries = .init(supportedCountries.compactMap { $0 })
-        }
-
-        if let shippingMethods {
-            paymentRequest.shippingMethods = try shippingMethods.compactMap { try $0?.toPKShippingMethod() }
-        }
-        
-        if #available(iOS 15.0, *) {
-            allowShippingContactEditing.map {
-                // We have to use enabled until we forcing the newest Xcode version. Otherwise the build fails.
-                paymentRequest.shippingContactEditingMode = $0 ? PKShippingContactEditingMode.enabled : PKShippingContactEditingMode.storePickup
-            }
-            supportsCouponCode.map { paymentRequest.supportsCouponCode = $0 }
-            couponCode.map { paymentRequest.couponCode = $0 }
-        }
-        
-        applicationData.map { paymentRequest.applicationData = Data($0.utf8) }
-        return paymentRequest
-    }
-
-    private func mapToContactFields(contactFields: [String?]) -> Set<PKContactField> {
-        let contactFieldsNonNil: [String] = contactFields.compactMap { $0 }
-        return Set<PKContactField>(contactFieldsNonNil.compactMap { PKContactField.fromString($0) })
-    }
-    
-    private func mapToPaymentSummaryItems(summaryItems: [ApplePaySummaryItemDTO?]?, amount: Adyen.Amount) throws -> [PKPaymentSummaryItem] {
-        guard let summaryItems else {
-            let formattedAmount = AmountFormatter.decimalAmount(
+private func makePaymentRequest(
+    dto: ApplePayConfigurationDTO,
+    amount: Adyen.Amount,
+    countryCode: String
+) throws -> PKPaymentRequest {
+    let summaryItems = try dto.summaryItems?.map { try $0.toNativeSummaryItem() } ?? [
+        PKPaymentSummaryItem(
+            label: dto.merchantName,
+            amount: AmountFormatter.decimalAmount(
                 amount.value,
                 currencyCode: amount.currencyCode,
                 localeIdentifier: amount.localeIdentifier
             )
-            return [PKPaymentSummaryItem(label: merchantName, amount: formattedAmount)]
+        )
+    ]
+    let request = PKPaymentRequest()
+    request.merchantIdentifier = dto.merchantId
+    request.paymentSummaryItems = summaryItems
+    request.countryCode = countryCode
+    request.currencyCode = amount.currencyCode
+    request.billingContact = dto.billingContact?.toNativeContact()
+    request.shippingContact = dto.shippingContact?.toNativeContact()
+    request.merchantCapabilities = dto.merchantCapability.toNativeCapabilities()
+    request.requiredBillingContactFields = dto.requiredBillingContactFields.mapToContactFields()
+    request.requiredShippingContactFields = dto.requiredShippingContactFields.mapToContactFields()
+    if let shippingType = dto.shippingType {
+        request.shippingType = shippingType.toNativeShippingType()
+    }
+    request.shippingMethods = try dto.shippingMethods?.map { try $0.toNativeShippingMethod() }
+    request.applicationData = dto.applicationData.map { Data($0.utf8) }
+    request.supportedCountries = dto.supportedCountries.map { Set($0) }
+    if #available(iOS 15.0, *) {
+        request.shippingContactEditingMode = dto.allowShippingContactEditing == true ? .enabled : .storePickup
+        request.supportsCouponCode = dto.supportsCouponCode == true
+        request.couponCode = dto.couponCode
+    }
+    return request
+}
+
+private extension [String]? {
+    func mapToContactFields() -> Set<PKContactField> {
+        Set(self?.compactMap { contactField(from: $0) } ?? [])
+    }
+}
+
+private func contactField(from value: String) -> PKContactField {
+    switch value {
+    case "email", "emailAddress": return .emailAddress
+    case "phone", "phoneNumber": return .phoneNumber
+    case "post", "postalAddress": return .postalAddress
+    case "name": return .name
+    case "phoneticName": return .phoneticName
+    default: return PKContactField(rawValue: value)
+    }
+}
+
+private extension ApplePayMerchantCapabilityDTO? {
+    func toNativeCapabilities() -> PKMerchantCapability {
+        switch self {
+        case .debit: return [.capability3DS, .capabilityDebit]
+        case .credit: return [.capability3DS, .capabilityCredit]
+        case nil: return .capability3DS
         }
-        
-        let summaryItemsNonNil: [ApplePaySummaryItemDTO] = summaryItems.compactMap { $0 }
-        return try summaryItemsNonNil.compactMap { try $0.toApplePaySummaryItem() }
     }
 }
 
-extension PKPaymentNetwork {
-    internal var txVariantName: String {
-        if self == .masterCard { return "mc" }
-        if self == .cartesBancaires { return "cartebancaire" }
-        return self.rawValue.lowercased()
+private extension ApplePayShippingTypeDTO {
+    func toNativeShippingType() -> PKShippingType {
+        switch self {
+        case .shipping: return .shipping
+        case .delivery: return .delivery
+        case .storePickup: return .storePickup
+        case .servicePickup: return .servicePickup
+        }
     }
 }
 
-extension ApplePaySummaryItemDTO {
-    func toApplePaySummaryItem() throws -> PKPaymentSummaryItem {
-        let formattedAmount = try amount.toFormattedAmount()
-        return PKPaymentSummaryItem(
+private extension ApplePaySummaryItemDTO {
+    func toNativeSummaryItem() throws -> PKPaymentSummaryItem {
+        PKPaymentSummaryItem(
             label: label,
-            amount: formattedAmount,
-            type: type.toPKPaymentSummaryItemType()
+            amount: AmountFormatter.decimalAmount(Int(amount.value), currencyCode: amount.currency),
+            type: type == .pending ? .pending : .final
         )
     }
 }
 
-extension ApplePaySummaryItemType {
-    func toPKPaymentSummaryItemType() -> PKPaymentSummaryItemType {
-        switch self {
-        case .pending:
-            return PKPaymentSummaryItemType.pending
-        case .definite:
-            return PKPaymentSummaryItemType.final
-        }
+private extension ApplePayShippingMethodDTO {
+    func toNativeShippingMethod() throws -> PKShippingMethod {
+        let method = PKShippingMethod()
+        method.label = label
+        method.detail = detail
+        method.identifier = identifier
+        method.amount = try amount.toDecimalAmount()
+        return method
     }
 }
 
-extension ApplePayMerchantCapability? {
-    func toMerchantCapability() -> PKMerchantCapability {
-        switch self {
-        case .debit:
-            return [.capability3DS, .capabilityDebit]
-        case .credit:
-            return [.capability3DS, .capabilityCredit]
-        case nil:
-            return .capability3DS
-        }
-    }
-}
-
-extension ApplePayContactDTO {
-    func toApplePayContact() -> PKContact {
+private extension ApplePayContactDTO {
+    func toNativeContact() -> PKContact {
         let contact = PKContact()
-        contact.name = extractPersonNameComponents()
-        contact.postalAddress = extractPostalAddress()
-        phoneNumber.map { contact.phoneNumber = CNPhoneNumber(stringValue: $0) }
-        emailAddress.map { contact.emailAddress = $0 }
+        var name = PersonNameComponents()
+        name.givenName = givenName
+        name.familyName = familyName
+        contact.name = name
+        let address = CNMutablePostalAddress()
+        address.street = addressLines?.joined(separator: "\n") ?? ""
+        address.subLocality = subLocality ?? ""
+        address.city = city ?? ""
+        address.postalCode = postalCode ?? ""
+        address.subAdministrativeArea = subAdministrativeArea ?? ""
+        address.state = administrativeArea ?? ""
+        address.country = country ?? ""
+        address.isoCountryCode = countryCode ?? ""
+        contact.postalAddress = address
+        if let phoneNumber {
+            contact.phoneNumber = CNPhoneNumber(stringValue: phoneNumber)
+        }
+        contact.emailAddress = emailAddress
         return contact
     }
-    
-    private func extractPersonNameComponents() -> PersonNameComponents {
-        var personName = PersonNameComponents()
-        givenName.map { personName.givenName = $0 }
-        familyName.map { personName.familyName = $0 }
-        phoneticGivenName.map {
-            personName.phoneticRepresentation = PersonNameComponents()
-            personName.phoneticRepresentation?.givenName = $0
-        }
-        
-        phoneticFamilyName.map {
-            personName.phoneticRepresentation = personName.phoneticRepresentation ?? PersonNameComponents()
-            personName.phoneticRepresentation?.familyName = $0
-        }
-        
-        return personName
-    }
-    
-    private func extractPostalAddress() -> CNMutablePostalAddress {
-        let postalAddress = CNMutablePostalAddress()
-        if let addressLines = addressLines?.compactMap({ $0 }) {
-            postalAddress.street = addressLines.joined(separator: "\n")
-        }
+}
 
-        subLocality.map { postalAddress.subLocality = $0 }
-        city.map { postalAddress.city = $0 }
-        postalCode.map { postalAddress.postalCode = $0 }
-        subAdministrativeArea.map { postalAddress.subAdministrativeArea = $0 }
-        administrativeArea.map { postalAddress.state = $0 }
-        country.map { postalAddress.country = $0 }
-        countryCode.map { postalAddress.isoCountryCode = $0 }
-        return postalAddress
+private extension AmountDTO {
+    func toDecimalAmount() throws -> NSDecimalNumber {
+        NSDecimalNumber(value: Double(value) / 100.0)
+    }
+}
+
+extension PKPaymentSummaryItem {
+    internal func toDTO(currencyCode: String) -> ApplePaySummaryItemDTO {
+        ApplePaySummaryItemDTO(
+            label: label,
+            amount: AmountDTO(
+                currency: currencyCode,
+                value: Int64(AmountFormatter.minorUnitAmount(
+                    from: amount.decimalValue,
+                    currencyCode: currencyCode
+                ))
+            ),
+            type: type == .pending ? .pending : .definite
+        )
+    }
+}
+
+extension PKShippingMethod {
+    internal func toDTO(currencyCode: String) -> ApplePayShippingMethodDTO {
+        ApplePayShippingMethodDTO(
+            label: label,
+            detail: detail ?? "",
+            amount: amount.toDTO(currencyCode: currencyCode),
+            identifier: identifier ?? "",
+            startDate: nil,
+            endDate: nil
+        )
+    }
+}
+
+private extension NSDecimalNumber {
+    func toDTO(currencyCode: String) -> AmountDTO {
+        AmountDTO(
+            currency: currencyCode,
+            value: Int64(AmountFormatter.minorUnitAmount(from: decimalValue, currencyCode: currencyCode))
+        )
     }
 }
 
 extension PKContact {
-    func toDTO() -> ApplePayContactDTO {
+    internal func toDTO() -> ApplePayContactDTO {
         ApplePayContactDTO(
             phoneNumber: phoneNumber?.stringValue,
             emailAddress: emailAddress as String?,
@@ -279,156 +211,8 @@ extension PKContact {
     }
 }
 
-extension PKContactField {
-    static func fromString(_ rawValue: String) -> PKContactField {
-        switch rawValue {
-        case "email", "emailAddress":
-            return .emailAddress
-        case "phone", "phoneNumber":
-            return .phoneNumber
-        case "post", "postalAddress":
-            return .postalAddress
-        case "name":
-            return .name
-        case "phoneticName":
-            return .phoneticName
-        default:
-            return PKContactField(rawValue: rawValue)
-        }
-    }
-}
-
-extension ApplePayShippingType {
-    func toPKShippingType() -> PKShippingType {
-        switch self {
-        case .shipping:
-            return .shipping
-        case .delivery:
-            return .delivery
-        case .storePickup:
-            return .storePickup
-        case .servicePickup:
-            return .servicePickup
-        }
-    }
-}
-
-extension ApplePayShippingMethodDTO {
-    func toPKShippingMethod() throws -> PKShippingMethod {
-        let pkShippingMethod = PKShippingMethod()
-        pkShippingMethod.label = label
-        pkShippingMethod.detail = detail
-        pkShippingMethod.identifier = identifier
-        pkShippingMethod.amount = try amount.toFormattedAmount()
-        
-        if #available(iOS 15.0, *) {
-            if let startRaw = startDate,
-               let endRaw = endDate {
-                let startDate = try startRaw.toDate()
-                let endDate = try endRaw.toDate()
-                pkShippingMethod.dateComponentsRange = .init(
-                    start: startDate.toComponents(),
-                    end: endDate.toComponents()
-                )
-            }
-        }
-        return pkShippingMethod
-    }
-}
-
-extension AmountDTO {
-    func toFormattedAmount() throws -> NSDecimalNumber {
-        guard let value = Int(exactly: value) else {
-            throw PlatformError(errorDescription: "Cannot map Int64 to Int.")
-        }
-        return AmountFormatter.decimalAmount(value, currencyCode: currency)
-    }
-}
-
-extension ApplePayShippingMethodUpdateDTO {
-    func toPKPaymentRequestShippingMethodUpdate() throws -> PKPaymentRequestShippingMethodUpdate {
-        try PKPaymentRequestShippingMethodUpdate(
-            paymentSummaryItems: summaryItems.compactMap { try $0?.toApplePaySummaryItem() }
-        )
-    }
-}
-
-@available(iOS 15.0, *)
-extension ApplePayCouponCodeUpdateDTO {
-    func toPKPaymentRequestCouponCodeUpdate() throws -> PKPaymentRequestCouponCodeUpdate {
-        try PKPaymentRequestCouponCodeUpdate(
-            errors: errors?.compactMap { $0?.toNSError() },
-            paymentSummaryItems: summaryItems.compactMap { try $0?.toApplePaySummaryItem() },
-            shippingMethods: shippingMethods?.compactMap { try $0?.toPKShippingMethod() } ?? []
-        )
-    }
-}
-
-extension ApplePayShippingContactUpdateDTO {
-    func toPKPaymentRequestShippingContactUpdate() throws -> PKPaymentRequestShippingContactUpdate {
-        try PKPaymentRequestShippingContactUpdate(
-            errors: errors?.compactMap { $0?.toNSError() },
-            paymentSummaryItems: summaryItems.compactMap { try $0?.toApplePaySummaryItem() },
-            shippingMethods: shippingMethods?.compactMap { try $0?.toPKShippingMethod() } ?? []
-        )
-    }
-}
-
-extension PKPaymentSummaryItem {
-    func toDTO(currencyCode: String) -> ApplePaySummaryItemDTO {
-        ApplePaySummaryItemDTO(
-            label: label,
-            amount: amount.toDTO(currencyCode: currencyCode),
-            type: type.toDTO()
-        )
-    }
-}
-
-extension PKPaymentSummaryItemType {
-    func toDTO() -> ApplePaySummaryItemType {
-        switch self {
-        case .pending:
-            return .pending
-        case .final:
-            return .definite
-        @unknown default:
-            return .definite
-        }
-    }
-}
-
-extension PKShippingMethod {
-    func toDTO(currencyCode: String) -> ApplePayShippingMethodDTO {
-        var startDate: String?
-        var endDate: String?
-
-        if #available(iOS 15.0, *) {
-            startDate = dateComponentsRange?.startDateComponents.date?.ISO8601Format()
-            endDate = dateComponentsRange?.endDateComponents.date?.ISO8601Format()
-        }
-
-        return ApplePayShippingMethodDTO(
-            label: label,
-            detail: detail ?? "",
-            amount: amount.toDTO(currencyCode: currencyCode),
-            identifier: identifier ?? "",
-            startDate: startDate,
-            endDate: endDate
-        )
-    }
-}
-
-extension NSDecimalNumber {
-    func toDTO(currencyCode: String) -> AmountDTO {
-        AmountDTO(
-            currency: currencyCode,
-            value: Int64(AmountFormatter.minorUnitAmount(from: decimalValue, currencyCode: currencyCode))
-        )
-    }
-}
-
 extension PKPayment {
-    func toAuthorizedPaymentDTO(currencyCode: String) -> ApplePayAuthorizedPaymentDTO {
+    internal func toDTO(currencyCode: String) -> ApplePayAuthorizedPaymentDTO {
         ApplePayAuthorizedPaymentDTO(
             token: token.paymentData.base64EncodedString(),
             network: token.paymentMethod.network?.rawValue ?? "",
@@ -439,195 +223,50 @@ extension PKPayment {
     }
 }
 
-extension ApplePayAuthorizationResultDTO {
-    func toPKPaymentAuthorizationResult() -> PKPaymentAuthorizationResult {
-        PKPaymentAuthorizationResult(
-            status: isSuccess ? .success : .failure,
-            errors: errors?.compactMap { $0?.toNSError() }
+extension ApplePayShippingMethodUpdateDTO {
+    internal func toNativeShippingMethodUpdate() -> PKPaymentRequestShippingMethodUpdate {
+        PKPaymentRequestShippingMethodUpdate(
+            paymentSummaryItems: summaryItems.compactMap { try? $0.toNativeSummaryItem() }
         )
     }
 }
 
-extension ApplePayPaymentErrorDTO {
-    func toNSError() -> Error {
-        switch type {
-        case .billingAddress:
-            return PKPaymentRequest.paymentBillingAddressInvalidError(
-                withKey: postalAddressKey(for: field),
-                localizedDescription: localizedDescription
-            )
-        case .shippingAddress:
-            return PKPaymentRequest.paymentShippingAddressInvalidError(
-                withKey: postalAddressKey(for: field),
-                localizedDescription: localizedDescription
-            )
-        case .contact:
-            return PKPaymentRequest.paymentContactInvalidError(
-                withContactField: field.map { PKContactField.fromString($0) } ?? .name,
-                localizedDescription: localizedDescription
-            )
-        case .couponCode:
-            if #available(iOS 15.0, *) {
-                return PKPaymentRequest.paymentCouponCodeInvalidError(localizedDescription: localizedDescription)
-            }
-            return NSError(domain: "ApplePayPaymentError", code: 0, userInfo: [NSLocalizedDescriptionKey: localizedDescription])
-        case .shippingAddressUnserviceable:
-            return PKPaymentRequest.paymentShippingAddressUnserviceableError(withLocalizedDescription: localizedDescription)
-        case .couponCodeExpired:
-            if #available(iOS 15.0, *) {
-                return PKPaymentRequest.paymentCouponCodeExpiredError(localizedDescription: localizedDescription)
-            }
-            return NSError(domain: "ApplePayPaymentError", code: 0, userInfo: [NSLocalizedDescriptionKey: localizedDescription])
-        case .unknown:
-            return NSError(domain: "ApplePayPaymentError", code: 0, userInfo: [NSLocalizedDescriptionKey: localizedDescription])
-        }
-    }
-}
-
-private func postalAddressKey(for field: String?) -> String {
-    switch field {
-    case "street": return CNPostalAddressStreetKey
-    case "city": return CNPostalAddressCityKey
-    case "postalCode": return CNPostalAddressPostalCodeKey
-    case "administrativeArea": return CNPostalAddressStateKey
-    case "country": return CNPostalAddressCountryKey
-    case "countryCode": return CNPostalAddressISOCountryCodeKey
-    case "subLocality": return CNPostalAddressSubLocalityKey
-    case "subAdministrativeArea": return CNPostalAddressSubAdministrativeAreaKey
-    default: return field ?? CNPostalAddressStreetKey
-    }
-}
-
-private let iso8601FormatterWithFractionalSeconds: ISO8601DateFormatter = {
-    let formatter = ISO8601DateFormatter()
-    formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
-    return formatter
-}()
-
-private let iso8601Formatter: ISO8601DateFormatter = {
-    let formatter = ISO8601DateFormatter()
-    formatter.formatOptions = .withInternetDateTime
-    return formatter
-}()
-
-extension String {
-    func toDate() throws -> Date {
-        if let date = iso8601FormatterWithFractionalSeconds.date(from: self) {
-            return date
-        }
-        if let date = iso8601Formatter.date(from: self) {
-            return date
-        }
-        throw AdyenPigeonError(
-            code: ApplePayConfigurationErrorCode.invalidDate,
-            message: "Cannot map String to Date.",
-            details: self
+extension ApplePayShippingContactUpdateDTO {
+    internal func toNativeShippingContactUpdate() -> PKPaymentRequestShippingContactUpdate {
+        PKPaymentRequestShippingContactUpdate(
+            errors: errors?.compactMap { $0.toNSError() },
+            paymentSummaryItems: summaryItems.compactMap { try? $0.toNativeSummaryItem() },
+            shippingMethods: shippingMethods?.compactMap { try? $0.toNativeShippingMethod() } ?? []
         )
-    }
-}
-
-private enum ApplePayConfigurationErrorCode {
-    static let invalidConfiguration = "apple-pay-invalid-configuration"
-    static let invalidAmount = "apple-pay-invalid-amount"
-    static let invalidDate = "apple-pay-invalid-date"
-}
-
-extension Date {
-    func toComponents() -> DateComponents {
-        Calendar.current.dateComponents([.calendar, .year, .month, .day], from: self)
-    }
-}
-
-extension ApplePayDetails {
-    func getExtraData() -> [String: Any?] {
-        var dictionary: [String: Any] = [:]
-        dictionary[ApplePayKeys.General.network] = network
-        billingContact.map { dictionary[ApplePayKeys.General.billingContact] = $0.toJsonObject() }
-        shippingContact.map { dictionary[ApplePayKeys.General.shippingContact] = $0.toJsonObject() }
-        shippingMethod.map { dictionary[ApplePayKeys.General.shippingMethod] = $0.toJsonObject() }
-        return dictionary
-    }
-}
-
-extension PKContact {
-    func toJsonObject() -> [String: Any] {
-        var dictionary: [String: Any] = [:]
-        name.map {
-            dictionary[ApplePayKeys.Contact.givenName] = $0.givenName
-            dictionary[ApplePayKeys.Contact.familyName] = $0.familyName
-        }
-        name?.phoneticRepresentation.map {
-            dictionary[ApplePayKeys.Contact.phoneticGivenName] = $0.phoneticRepresentation?.givenName
-            dictionary[ApplePayKeys.Contact.phoneticFamilyName] = $0.phoneticRepresentation?.familyName
-        }
-        postalAddress.map {
-            dictionary[ApplePayKeys.Contact.addressLines] = $0.street
-            dictionary[ApplePayKeys.Contact.subLocality] = $0.subLocality
-            dictionary[ApplePayKeys.Contact.city] = $0.city
-            dictionary[ApplePayKeys.Contact.postalCode] = $0.postalCode
-            dictionary[ApplePayKeys.Contact.subAdministrativeArea] = $0.subAdministrativeArea
-            dictionary[ApplePayKeys.Contact.administrativeArea] = $0.state
-            dictionary[ApplePayKeys.Contact.country] = $0.country
-            dictionary[ApplePayKeys.Contact.countryCode] = $0.isoCountryCode
-        }
-        emailAddress.map { dictionary[ApplePayKeys.Contact.emailAddress] = $0 }
-        phoneNumber.map { dictionary[ApplePayKeys.Contact.phoneNumber] = $0.stringValue }
-        return dictionary
-    }
-}
-
-extension PKShippingMethod {
-    func toJsonObject() -> [String: Any] {
-        var dictionary: [String: Any] = [:]
-        identifier.map { dictionary[ApplePayKeys.ShippingMethod.identifier] = $0 }
-        detail.map { dictionary[ApplePayKeys.ShippingMethod.detail] = $0 }
-        if #available(iOS 15.0, *) {
-            dateComponentsRange.map { dictionary[ApplePayKeys.ShippingMethod.dateComponentsRange] = $0.toJsonObject() }
-        }
-        return dictionary
     }
 }
 
 @available(iOS 15.0, *)
-extension PKDateComponentsRange {
-    func toJsonObject() -> [String: Any] {
-        var dictionary: [String: Any] = [:]
-        startDateComponents.date.map { dictionary[ApplePayKeys.ShippingMethod.startDate] = $0.ISO8601Format() }
-        endDateComponents.date.map { dictionary[ApplePayKeys.ShippingMethod.endDate] = $0.ISO8601Format() }
-        return dictionary
+extension ApplePayCouponCodeUpdateDTO {
+    internal func toNativeCouponCodeUpdate() -> PKPaymentRequestCouponCodeUpdate {
+        PKPaymentRequestCouponCodeUpdate(
+            errors: errors?.compactMap { $0.toNSError() },
+            paymentSummaryItems: summaryItems.compactMap { try? $0.toNativeSummaryItem() },
+            shippingMethods: shippingMethods?.compactMap { try? $0.toNativeShippingMethod() } ?? []
+        )
     }
 }
 
-internal enum ApplePayKeys {
-    enum General {
-        static let network = "network"
-        static let billingContact = "billingContact"
-        static let shippingContact = "shippingContact"
-        static let shippingMethod = "shippingMethod"
+extension ApplePayAuthorizationResultDTO {
+    internal func toNativeAuthorizationResult() -> PKPaymentAuthorizationResult {
+        PKPaymentAuthorizationResult(
+            status: isSuccess ? .success : .failure,
+            errors: errors?.compactMap { $0.toNSError() }
+        )
     }
-    
-    enum Contact {
-        static var phoneNumber = "phoneNumber"
-        static var emailAddress = "emailAddress"
-        static var givenName = "givenName"
-        static var familyName = "familyName"
-        static var phoneticGivenName = "phoneticGivenName"
-        static var phoneticFamilyName = "phoneticFamilyName"
-        static var addressLines = "addressLines"
-        static var subLocality = "subLocality"
-        static var city = "city"
-        static var postalCode = "postalCode"
-        static var subAdministrativeArea = "subAdministrativeArea"
-        static var administrativeArea = "administrativeArea"
-        static var country = "country"
-        static var countryCode = "countryCode"
-    }
+}
 
-    enum ShippingMethod {
-        static var identifier = "identifier"
-        static var detail = "detail"
-        static var dateComponentsRange = "dateComponentsRange"
-        static var startDate = "startDate"
-        static var endDate = "endDate"
+private extension ApplePayPaymentErrorDTO {
+    func toNSError() -> Error {
+        NSError(
+            domain: "AdyenCheckout.ApplePay",
+            code: 1,
+            userInfo: [NSLocalizedDescriptionKey: localizedDescription]
+        )
     }
 }

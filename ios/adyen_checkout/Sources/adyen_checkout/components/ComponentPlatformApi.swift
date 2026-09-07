@@ -1,91 +1,36 @@
+import AdyenCheckout
+import Foundation
+
 @MainActor
-class ComponentPlatformApi: ComponentPlatformInterface {
-    private let instantComponentManager: InstantComponentManager
-    private let actionComponentManager: ActionComponentManager
+final class ComponentPlatformApi: ComponentHostApi {
+    private let registry = CheckoutComponentRegistry.shared
 
-    init(componentFlutterApi: ComponentFlutterInterface, checkoutHolder: CheckoutHolder) {
-        self.instantComponentManager = InstantComponentManager(componentFlutterApi: componentFlutterApi, checkoutHolder: checkoutHolder)
-        self.actionComponentManager = ActionComponentManager(componentFlutterApi: componentFlutterApi)
-    }
-
-    func updateViewHeight(viewId: Int64) {}
-
-    func onPaymentsResult(componentId: String, paymentsResult: PaymentEventDTO) {
-        handlePaymentEvent(componentId: componentId, paymentEventDTO: paymentsResult)
-    }
-
-    func onPaymentsDetailsResult(componentId: String, paymentsDetailsResult: PaymentEventDTO) {
-        handlePaymentEvent(componentId: componentId, paymentEventDTO: paymentsDetailsResult)
-    }
-
-    func isInstantPaymentSupportedByPlatform(
-        instantPaymentConfigurationDTO: InstantPaymentConfigurationDTO,
-        paymentMethodResponse: String,
+    func submit(
+        checkoutId: String,
         componentId: String,
-        completion: @escaping (Result<InstantPaymentSetupResultDTO, Error>) -> Void
+        completion: @escaping (Result<Void, Error>) -> Void
     ) {
-        switch instantPaymentConfigurationDTO.instantPaymentType {
-        case .googlePay,
-             .instant:
+        guard let component = registry.setActive(checkoutId: checkoutId, componentId: componentId) else {
+            completion(.failure(AdyenPigeonError(
+                code: "ComponentNotFound",
+                message: "Checkout component is no longer active.",
+                details: nil
+            )))
             return
-        case .applePay:
-            instantComponentManager.isApplePayAvailable(
-                instantPaymentComponentConfigurationDTO: instantPaymentConfigurationDTO,
-                paymentMethodResponse: paymentMethodResponse,
-                componentId: componentId,
-                callback: completion
-            )
         }
+        component.submit()
+        completion(.success(()))
     }
 
-    func onInstantPaymentPressed(
-        instantPaymentConfigurationDTO: InstantPaymentConfigurationDTO,
-        encodedPaymentMethod: String,
-        componentId: String
-    ) {
-        switch instantPaymentConfigurationDTO.instantPaymentType {
-        case .googlePay:
-            return
-        case .applePay,
-             .instant:
-            instantComponentManager.startInstantComponent(
-                instantPaymentConfigurationDTO: instantPaymentConfigurationDTO,
-                encodedPaymentMethod: encodedPaymentMethod,
-                componentId: componentId
-            )
-        }
+    func dispose(checkoutId: String, componentId: String) throws {
+        registry.remove(checkoutId: checkoutId, componentId: componentId)
     }
 
-    func handleAction(actionComponentConfiguration: ActionComponentConfigurationDTO, componentId: String, actionResponse: [String?: Any?]?) throws {
-        actionComponentManager.handleAction(
-            actionComponentConfiguration: actionComponentConfiguration,
-            componentId: componentId,
-            actionResponse: actionResponse ?? [:]
-        )
+    func handleReturn(url: URL) {
+        registry.handleReturn(url: url)
     }
 
-    func onDispose(componentId: String) {
-        if isInstantPaymentComponent(componentId: componentId) {
-            instantComponentManager.onDispose()
-        } else if isActionComponent(componentId: componentId) {
-            actionComponentManager.onDispose()
-        }
-    }
-
-    private func handlePaymentEvent(componentId: String, paymentEventDTO: PaymentEventDTO) {
-        if isInstantPaymentComponent(componentId: componentId) {
-            instantComponentManager.handlePaymentEvent(paymentEventDTO: paymentEventDTO)
-        }
-    }
-
-    private func isInstantPaymentComponent(componentId: String) -> Bool {
-        componentId == InstantComponentManager.Constants.instantSessionComponentId ||
-            componentId == InstantComponentManager.Constants.instantAdvancedComponentId ||
-            componentId == InstantComponentManager.Constants.applePaySessionComponentId ||
-            componentId == InstantComponentManager.Constants.applePayAdvancedComponentId
-    }
-
-    private func isActionComponent(componentId: String) -> Bool {
-        componentId == ActionComponentManager.Constants.actionComponentId
+    func teardown() {
+        registry.clear()
     }
 }

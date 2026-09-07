@@ -2,63 +2,27 @@ import Flutter
 import UIKit
 
 @MainActor
-public class AdyenCheckoutPlugin: NSObject, FlutterPlugin {
+public final class AdyenCheckoutPlugin: NSObject, FlutterPlugin {
     public static func register(with registrar: FlutterPluginRegistrar) {
-        let checkoutHolder = CheckoutHolder()
-        let messenger: FlutterBinaryMessenger = registrar.messenger()
-        let checkoutFlutter = CheckoutFlutterInterface(binaryMessenger: messenger)
-        let componentFlutterApi = ComponentFlutterInterface(binaryMessenger: messenger)
-        //V2
-        let adyenFlutterInterface = AdyenFlutterInterface(binaryMessenger: messenger)
-        let sessionCheckoutFlutterInterface = SessionCheckoutFlutterInterface(binaryMessenger: messenger)
-        let componentPlatformEventHandler = ComponentPlatformEventHandler()
-        let checkoutPlatformApi = CheckoutPlatformApi(
-            checkoutFlutter: checkoutFlutter,
-            componentFlutterApi: componentFlutterApi,
-            adyenFlutterInterface: adyenFlutterInterface,
-            componentPlatformEventHandler: componentPlatformEventHandler,
-            checkoutHolder: checkoutHolder
+        let holder = CheckoutHolder()
+        let messenger = registrar.messenger()
+        let callbacksApi = CheckoutCallbacksFlutterApi(binaryMessenger: messenger)
+        let actionOnlyApi = ActionOnlyFlutterApi(binaryMessenger: messenger)
+        let events = ComponentPlatformEventHandler()
+        let checkoutApi = CheckoutPlatformApi(
+            callbacksApi: callbacksApi,
+            actionOnlyApi: actionOnlyApi,
+            holder: holder,
+            events: events
         )
-        
-        let componentPlatformApi = ComponentPlatformApi(
-            componentFlutterApi: componentFlutterApi,
-            checkoutHolder: checkoutHolder
-        )
-        ComponentPlatformInterfaceSetup.setUp(binaryMessenger: messenger, api: componentPlatformApi)
-        CheckoutPlatformInterfaceSetup.setUp(binaryMessenger: messenger, api: checkoutPlatformApi)
+        let componentApi = ComponentPlatformApi()
 
-        let dropInPlatformApi = DropInPlatformApi(checkoutFlutter: checkoutFlutter, checkoutHolder: checkoutHolder)
-        DropInPlatformInterfaceSetup.setUp(binaryMessenger: messenger, api: dropInPlatformApi)
-
-        //V2
-        OnPlatformEventStreamHandler.register(with: messenger, streamHandler: componentPlatformEventHandler)
-        let applePayButtonViewFactory = ApplePayButtonViewFactory(
-            componentPlatformEventHandler: componentPlatformEventHandler
-        )
-        registrar.register(applePayButtonViewFactory, withId: ApplePayButtonViewFactory.viewTypeId)
-
-        let adyenComponentSessionFactory = AdyenComponentFactory(
-            adyenFlutterInterface: adyenFlutterInterface,
-            sessionCheckoutFlutterInterface: sessionCheckoutFlutterInterface,
-            componentPlatformEventHandler: componentPlatformEventHandler,
-            checkoutHolder: checkoutHolder,
-            viewTypeId: AdyenComponentFactory.adyenSessionComponentId
-        )
+        CheckoutHostApiSetup.setUp(binaryMessenger: messenger, api: checkoutApi)
+        ComponentHostApiSetup.setUp(binaryMessenger: messenger, api: componentApi)
+        EventsStreamHandler.register(with: messenger, streamHandler: events)
         registrar.register(
-            adyenComponentSessionFactory,
-            withId: AdyenComponentFactory.adyenSessionComponentId
-        )
-
-        let adyenComponentAdvancedFactory = AdyenComponentFactory(
-            adyenFlutterInterface: adyenFlutterInterface,
-            sessionCheckoutFlutterInterface: sessionCheckoutFlutterInterface,
-            componentPlatformEventHandler: componentPlatformEventHandler,
-            checkoutHolder: checkoutHolder,
-            viewTypeId: AdyenComponentFactory.adyenAdvancedComponentId
-        )
-        registrar.register(
-            adyenComponentAdvancedFactory,
-            withId: AdyenComponentFactory.adyenAdvancedComponentId
+            CheckoutPaymentViewFactory(holder: holder, events: events),
+            withId: CheckoutPaymentViewFactory.viewType
         )
     }
 }

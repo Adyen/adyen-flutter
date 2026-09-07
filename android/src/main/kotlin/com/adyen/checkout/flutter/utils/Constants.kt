@@ -1,23 +1,10 @@
 package com.adyen.checkout.flutter.utils
 
-class Constants {
-    companion object {
-        const val WRONG_FLUTTER_ACTIVITY_USAGE_ERROR_MESSAGE =
-            "FlutterFragmentActivity not used. Your activity needs to inherit from FlutterFragmentActivity."
-        const val UNKNOWN_PAYMENT_METHOD_TYPE_ERROR_MESSAGE = "Unknown payment method type."
-        const val ADYEN_LOG_TAG = "ADYEN_CHECKOUT"
-        const val INSTANT_SESSION_COMPONENT_KEY = "INSTANT_SESSION_COMPONENT"
-        const val INSTANT_ADVANCED_COMPONENT_KEY = "INSTANT_ADVANCED_COMPONENT"
-        const val SDK_PAYMENT_CANCELED_IDENTIFIER = "Payment canceled"
-        const val ADVANCED_PAYMENT_DATA_KEY = "data"
-        const val ADVANCED_EXTRA_DATA_KEY = "extra"
-        const val PAYMENT_METHOD_KEY = "paymentMethod"
-        const val IS_STORED_PAYMENT_METHOD_KEY = "isStoredPaymentMethod"
-        const val COMPONENT_ID_KEY = "componentId"
-        const val ORDER_KEY = "order"
-        const val SHOULD_UPDATE_PAYMENT_METHODS_KEY = "shouldUpdatePaymentMethods"
-        const val UPDATED_PAYMENT_METHODS_KEY = "updatedPaymentMethods"
-        const val RESULT_CODE_KEY = "resultCode"
-        const val RESULT_CODE_CANCELLED = "cancelled"
-    }
+internal object Constants {
+    const val WRONG_FLUTTER_ACTIVITY_USAGE_ERROR_MESSAGE =
+        "FlutterFragmentActivity not used. Your activity needs to inherit from FlutterFragmentActivity."
+    const val CHECKOUT_ID_KEY = "checkoutId"
+    const val COMPONENT_ID_KEY = "componentId"
+    const val PAYMENT_METHOD_KEY = "paymentMethod"
+    const val IS_STORED_PAYMENT_METHOD_KEY = "isStoredPaymentMethod"
 }

@@ -1,26 +1,31 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
-
 import 'package:adyen_checkout_example/main_common.dart';
-import 'package:flutter/material.dart';
+import 'package:adyen_checkout_example/network/service.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-void main() {
-  testWidgets('Verify Platform version', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const MaterialApp(home: MyApp()));
+class FakeService implements Service {
+  @override
+  Future<Map<String, dynamic>> createSession(Map<String, dynamic> body) async =>
+      {};
 
-    // Verify that platform version is retrieved.
-    expect(
-      find.byWidgetPredicate(
-        (Widget widget) =>
-            widget is Text && widget.data!.startsWith('Running on:'),
-      ),
-      findsOneWidget,
-    );
+  @override
+  Future<Map<String, dynamic>> fetchPaymentMethods(
+          Map<String, dynamic> body) async =>
+      {};
+
+  @override
+  Future<Map<String, dynamic>> postPayments(Map<String, dynamic> body) async =>
+      {};
+
+  @override
+  Future<Map<String, dynamic>> postPaymentsDetails(
+          Map<String, dynamic> body) async =>
+      {};
+}
+
+void main() {
+  testWidgets('shows the checkout flow choices', (tester) async {
+    await tester.pumpWidget(CheckoutExample(service: FakeService()));
+    expect(find.text('Sessions checkout'), findsOneWidget);
+    expect(find.text('Advanced checkout'), findsOneWidget);
   });
 }

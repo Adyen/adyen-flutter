@@ -1,10 +1,9 @@
-import Flutter
 import Foundation
 
-final class ComponentPlatformEventHandler: OnPlatformEventStreamHandler {
-    private var eventSink: PigeonEventSink<ComponentCommunicationModel>?
+final class ComponentPlatformEventHandler: EventsStreamHandler {
+    private var eventSink: PigeonEventSink<CheckoutEventDTO>?
 
-    override func onListen(withArguments _: Any?, sink: PigeonEventSink<ComponentCommunicationModel>) {
+    override func onListen(withArguments _: Any?, sink: PigeonEventSink<CheckoutEventDTO>) {
         eventSink = sink
     }
 
@@ -12,7 +11,7 @@ final class ComponentPlatformEventHandler: OnPlatformEventStreamHandler {
         eventSink = nil
     }
 
-    func send(event: ComponentCommunicationModel) {
+    func send(event: CheckoutEventDTO) {
         eventSink?.success(event)
     }
 }

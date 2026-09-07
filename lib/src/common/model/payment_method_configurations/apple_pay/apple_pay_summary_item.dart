@@ -1,21 +1,18 @@
-import 'package:adyen_checkout/adyen_checkout.dart';
+import '../../amount.dart';
+import 'apple_pay_summary_item_type.dart';
 
 class ApplePaySummaryItem {
   final String label;
   final Amount amount;
   final ApplePaySummaryItemType type;
 
-  ApplePaySummaryItem({
+  const ApplePaySummaryItem({
     required this.label,
     required this.amount,
     required this.type,
   });
 
   @override
-  String toString() {
-    return 'ApplePaySummaryItem('
-        'label: $label, '
-        'amount: $amount, '
-        'type: $type)';
-  }
+  String toString() =>
+      'ApplePaySummaryItem(label: $label, amount: $amount, type: $type)';
 }

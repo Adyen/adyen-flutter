@@ -1,14 +1,15 @@
-import 'package:adyen_checkout/src/common/model/payment_method_configurations/apple_pay/apple_pay_authorization_result.dart';
-import 'package:adyen_checkout/src/common/model/payment_method_configurations/apple_pay/apple_pay_authorized_payment.dart';
-import 'package:adyen_checkout/src/common/model/payment_method_configurations/apple_pay/apple_pay_contact.dart';
-import 'package:adyen_checkout/src/common/model/payment_method_configurations/apple_pay/apple_pay_contact_field.dart';
-import 'package:adyen_checkout/src/common/model/payment_method_configurations/apple_pay/apple_pay_coupon_code_update.dart';
-import 'package:adyen_checkout/src/common/model/payment_method_configurations/apple_pay/apple_pay_shipping_contact_update.dart';
-import 'package:adyen_checkout/src/common/model/payment_method_configurations/apple_pay/apple_pay_shipping_method.dart';
-import 'package:adyen_checkout/src/common/model/payment_method_configurations/apple_pay/apple_pay_shipping_method_update.dart';
-import 'package:adyen_checkout/src/common/model/payment_method_configurations/apple_pay/apple_pay_summary_item.dart';
-import 'package:adyen_checkout/src/components/apple_pay/model/apple_pay_button_style.dart';
-import 'package:adyen_checkout/src/generated/platform_api.g.dart';
+import '../../../../components/apple_pay/model/apple_pay_button_style.dart';
+import 'apple_pay_authorization_result.dart';
+import 'apple_pay_authorized_payment.dart';
+import 'apple_pay_contact.dart';
+import 'apple_pay_contact_field.dart';
+import 'apple_pay_coupon_code_update.dart';
+import 'apple_pay_shipping_contact_update.dart';
+import 'apple_pay_shipping_method.dart';
+import 'apple_pay_shipping_method_update.dart';
+import 'apple_pay_shipping_type.dart';
+import 'apple_pay_summary_item.dart';
+import 'apple_pay_merchant_capability.dart';
 
 class ApplePayConfiguration {
   final String merchantId;
@@ -46,7 +47,7 @@ class ApplePayConfiguration {
     ApplePayAuthorizedPayment payment,
   )? onAuthorize;
 
-  ApplePayConfiguration({
+  const ApplePayConfiguration({
     required this.merchantId,
     required this.merchantName,
     this.allowOnboarding,
@@ -71,32 +72,4 @@ class ApplePayConfiguration {
     this.onChangeCouponCode,
     this.onAuthorize,
   });
-
-  @override
-  String toString() {
-    return 'ApplePayConfiguration('
-        'merchantId: $merchantId, '
-        'merchantName: $merchantName, '
-        'allowOnboarding: $allowOnboarding, '
-        'applePaySummaryItems: $applePaySummaryItems, '
-        'requiredBillingContactFields: $requiredBillingContactFields, '
-        'billingContact: $billingContact, '
-        'requiredShippingContactFields: $requiredShippingContactFields, '
-        'shippingContact: $shippingContact, '
-        'applePayShippingType: $applePayShippingType, '
-        'allowShippingContactEditing: $allowShippingContactEditing, '
-        'shippingMethods: $shippingMethods, '
-        'applicationData: $applicationData, '
-        'supportedCountries: $supportedCountries, '
-        'merchantCapability: $merchantCapability, '
-        'supportsCouponCode: $supportsCouponCode, '
-        'couponCode: $couponCode, '
-        'buttonStyle: $buttonStyle, '
-        'buttonWidth: $buttonWidth, '
-        'buttonHeight: $buttonHeight, '
-        'onSelectShippingMethod: $onSelectShippingMethod, '
-        'onSelectShippingContact: $onSelectShippingContact, '
-        'onChangeCouponCode: $onChangeCouponCode, '
-        'onAuthorize: $onAuthorize)';
-  }
 }

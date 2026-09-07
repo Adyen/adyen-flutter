@@ -296,3 +296,21 @@ embeddable platform view (e.g. Apple Pay/Google Pay render as Dart-drawn buttons
 | Flutter (Dart) | `test/`                       | Dart unit tests                                                                              |
 | Android        | `android/src/test/kotlin/...` | JVM unit tests. If you need instrumentation tests, use `android/src/androidTest/kotlin/...`. |
 | iOS            | `example/ios/RunnerTests/`    | Xcode/Swift tests for the iOS example app target.                                            |
+
+## Checkout 2.0 alpha implementation notes
+
+- This branch is the Flutter 2.0 v6 alpha implementation. The public entry point is `Checkout`,
+  with Sessions, Advanced, generic `CheckoutPaymentComponent`, and one-shot action handling.
+- Drop-in, Instant, partial-payment/order, and legacy component APIs are intentionally removed.
+- Native dependencies are pinned to Android/iOS `6.0.0-alpha.1`; iOS uses Swift Package Manager and
+  requires iOS 16.0 or later.
+- Generic native payment views are registered through `CheckoutComponentRegistry` and use
+  `CheckoutPaymentView` on both platforms.
+- After changing `pigeons/platform_api.dart`, run `dart run pigeon --input pigeons/platform_api.dart`,
+  then `dart format lib/src/generated/platform_api.g.dart` to normalize Pigeon output whitespace.
+  Do not hand-edit generated platform files.
+- Verification from the v2 package root: `flutter analyze`, `flutter test`,
+  `flutter test` from `example/`, `flutter build apk --debug` from `example/`, and
+  `flutter build ios --simulator --debug --no-codesign` from `example/`.
+- This branch is proof-only. Never publish it to pub.dev, create a GitHub release/tag, or prepare a
+  release PR. Focus on technical validation and documenting limitations.
