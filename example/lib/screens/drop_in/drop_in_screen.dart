@@ -23,6 +23,7 @@ class DropInScreen extends StatefulWidget {
 }
 
 class _DropInScreenState extends State<DropInScreen> {
+  // Prevent multiple Drop-in flows from starting at the same time.
   bool _isStartingDropIn = false;
 
   @override
@@ -35,12 +36,12 @@ class _DropInScreenState extends State<DropInScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               TextButton(
-                onPressed: () => _runDropIn(_startDropInSessions),
+                onPressed: startDropInSessions,
                 key: const Key('Drop-in sessions flow'),
                 child: const Text("Drop-in sessions flow"),
               ),
               TextButton(
-                onPressed: () => _runDropIn(_startDropInAdvancedFlow),
+                onPressed: startDropInAdvancedFlow,
                 key: const Key('Drop-in advanced flow'),
                 child: const Text("Drop-in advanced flow"),
               ),
@@ -51,18 +52,12 @@ class _DropInScreenState extends State<DropInScreen> {
     );
   }
 
-  Future<void> _runDropIn(Future<void> Function() paymentFlow) async {
-    // Prevent multiple Drop-in flows from starting at the same time.
+  Future<void> startDropInSessions() async {
     if (_isStartingDropIn) {
       return;
     }
 
     setState(() => _isStartingDropIn = true);
-    await paymentFlow();
-    setState(() => _isStartingDropIn = false);
-  }
-
-  Future<void> _startDropInSessions() async {
     try {
       final Map<String, dynamic> sessionResponse =
           await widget.repository.fetchSession();
@@ -86,10 +81,17 @@ class _DropInScreenState extends State<DropInScreen> {
       }
     } catch (error) {
       debugPrint(error.toString());
+    } finally {
+      setState(() => _isStartingDropIn = false);
     }
   }
 
-  Future<void> _startDropInAdvancedFlow() async {
+  Future<void> startDropInAdvancedFlow() async {
+    if (_isStartingDropIn) {
+      return;
+    }
+
+    setState(() => _isStartingDropIn = true);
     try {
       final Map<String, dynamic> paymentMethodsResponse =
           await widget.repository.fetchPaymentMethods();
@@ -116,6 +118,8 @@ class _DropInScreenState extends State<DropInScreen> {
       }
     } catch (error) {
       debugPrint(error.toString());
+    } finally {
+      setState(() => _isStartingDropIn = false);
     }
   }
 
