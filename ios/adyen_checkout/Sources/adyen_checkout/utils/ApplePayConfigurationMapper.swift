@@ -11,7 +11,7 @@ func mapApplePayConfiguration(
     callbacksApi: CheckoutCallbacksFlutterApi?,
     checkoutId: String?
 ) throws -> ApplePayConfiguration {
-    let request = try makePaymentRequest(dto: dto, amount: amount, countryCode: countryCode)
+    let request = try makeApplePayPaymentRequest(dto: dto, amount: amount, countryCode: countryCode)
     let configuration = try ApplePayConfiguration(paymentRequest: request)
         .allowOnboarding(dto.allowOnboarding ?? true)
     guard let callbacksApi, let checkoutId else { return configuration }
@@ -23,7 +23,7 @@ func mapApplePayConfiguration(
     )
 }
 
-private func makePaymentRequest(
+func makeApplePayPaymentRequest(
     dto: ApplePayConfigurationDTO,
     amount: Adyen.Amount,
     countryCode: String
@@ -55,7 +55,9 @@ private func makePaymentRequest(
     request.applicationData = dto.applicationData.map { Data($0.utf8) }
     request.supportedCountries = dto.supportedCountries.map { Set($0) }
     if #available(iOS 15.0, *) {
-        request.shippingContactEditingMode = dto.allowShippingContactEditing == true ? .enabled : .storePickup
+        if let allowShippingContactEditing = dto.allowShippingContactEditing {
+            request.shippingContactEditingMode = allowShippingContactEditing ? .enabled : .storePickup
+        }
         request.supportsCouponCode = dto.supportsCouponCode == true
         request.couponCode = dto.couponCode
     }

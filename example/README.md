@@ -26,7 +26,9 @@ Create an ignored `secrets.json` file in this directory:
 ```
 
 Run with `--dart-define-from-file=secrets.json`. Never commit this file or embed server credentials
-in a production application.
+in a production application. `APPLE_PAY_MERCHANT_ID_KEY` must also be supplied as an Xcode build
+setting so `ios/Runner/Runner.entitlements` can expand it, and it must match the app's provisioning
+profile. A Dart define alone does not populate an Xcode build setting.
 
 ## Run
 

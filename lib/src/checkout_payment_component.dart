@@ -87,12 +87,30 @@ class _CheckoutPaymentComponentState extends State<CheckoutPaymentComponent> {
   }
 
   Widget _buildComponentWidget() {
+    final applePayConfiguration = widget.paymentMethod.type == 'applepay'
+        ? _coordinator.applePayConfiguration(widget.checkout.id)
+        : null;
+    final applePayButtonStyle = applePayConfiguration?.buttonStyle;
+    final applePayButtonTheme = applePayButtonStyle?.theme?.name;
+    final applePayButtonType = applePayButtonStyle?.type?.name;
+
     final creationParams = <String, dynamic>{
       Constants.checkoutIdKey: widget.checkout.id,
       Constants.componentIdKey: _componentId,
       Constants.paymentMethodKey: jsonEncode(widget.paymentMethod.data),
       Constants.isStoredPaymentMethodKey:
           widget.paymentMethod is StoredPaymentMethod,
+      if (applePayButtonTheme != null)
+        Constants.applePayButtonThemeKey: applePayButtonTheme,
+      if (applePayButtonType != null)
+        Constants.applePayButtonTypeKey: applePayButtonType,
+      if (applePayButtonStyle?.cornerRadius != null)
+        Constants.applePayButtonCornerRadiusKey:
+            applePayButtonStyle?.cornerRadius,
+      if (applePayConfiguration?.buttonWidth != null)
+        Constants.applePayButtonWidthKey: applePayConfiguration?.buttonWidth,
+      if (applePayConfiguration?.buttonHeight != null)
+        Constants.applePayButtonHeightKey: applePayConfiguration?.buttonHeight,
     };
 
     switch (defaultTargetPlatform) {

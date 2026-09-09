@@ -18,7 +18,8 @@ The first release is `2.0.0-alpha.1` because the native SDK dependencies are alp
 - **Action-only**: `Checkout.handleAction` handles an action returned by your backend.
 - **Payment components**: `CheckoutPaymentComponent` renders the selected native payment method.
   Card, stored cards, BLIK, Google Pay on Android, Apple Pay on iOS, and native direct methods use
-  the same generic component API.
+  the same generic component API. On iOS, Apple Pay temporarily renders `PKPaymentButton` inside the
+  platform view until native Checkout provides its own button; this does not add a separate public component.
 - **Card utilities**: client-side encryption and card validation remain on `Checkout`.
 
 Drop-in, separate Instant APIs, partial payments, checkout theming, and web or desktop platforms are

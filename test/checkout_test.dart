@@ -3,7 +3,10 @@ import 'dart:async';
 import 'package:adyen_checkout/adyen_checkout.dart';
 import 'package:adyen_checkout/src/checkout_coordinator.dart';
 import 'package:adyen_checkout/src/checkout_gateway.dart';
+import 'package:adyen_checkout/src/components/platform/ios_platform_view.dart';
 import 'package:adyen_checkout/src/generated/platform_api.g.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 class FakeCheckoutGateway implements CheckoutGateway {
@@ -246,6 +249,65 @@ void main() {
     expect(completed, true);
     expect(checkout.isDisposed, true);
     expect(gateway.disposeCheckoutCount, 1);
+  });
+
+  testWidgets('Apple Pay passes native button configuration to iOS',
+      (tester) async {
+    debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+    addTearDown(() => debugDefaultTargetPlatformOverride = null);
+
+    final paymentMethod = PaymentMethod(type: 'applepay', name: 'Apple Pay');
+    final checkout = await Checkout.setupAdvanced(
+      paymentMethods: PaymentMethods(regular: [paymentMethod]),
+      configuration: const CheckoutConfiguration(
+        environment: Environment.test,
+        clientKey: 'test_key',
+        countryCode: 'NL',
+        amount: Amount(currency: 'EUR', value: 1000),
+        applePayConfiguration: ApplePayConfiguration(
+          merchantId: 'merchant.test',
+          merchantName: 'Test merchant',
+          buttonStyle: ApplePayButtonStyle(
+            theme: ApplePayButtonTheme.white,
+            type: ApplePayButtonType.buy,
+            cornerRadius: 8,
+          ),
+          buttonWidth: 180,
+          buttonHeight: 48,
+        ),
+      ),
+      callbacks: AdvancedCheckoutCallbacks(
+        onSubmit: (data) async =>
+            const SubmitResult.completion(resultCode: 'Authorised'),
+        onAdditionalDetails: (data) async =>
+            const AdditionalDetailsResult.completion(resultCode: 'Authorised'),
+        onFailure: (error) {},
+        onComplete: (result) {},
+      ),
+    );
+
+    await tester.pumpWidget(
+      Directionality(
+        textDirection: TextDirection.ltr,
+        child: CheckoutPaymentComponent(
+          checkout: checkout,
+          paymentMethod: paymentMethod,
+        ),
+      ),
+    );
+
+    final platformView = tester.widget<IosPlatformView>(
+      find.byType(IosPlatformView),
+    );
+    expect(platformView.creationParams['applePayButtonTheme'], 'white');
+    expect(platformView.creationParams['applePayButtonType'], 'buy');
+    expect(platformView.creationParams['applePayButtonCornerRadius'], 8);
+    expect(platformView.creationParams['applePayButtonWidth'], 180);
+    expect(platformView.creationParams['applePayButtonHeight'], 48);
+
+    await tester.pumpWidget(const SizedBox.shrink());
+    checkout.dispose();
+    debugDefaultTargetPlatformOverride = null;
   });
 
   test('checkout controller exposes readiness and submission lifecycle',

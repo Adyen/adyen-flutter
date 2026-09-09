@@ -116,7 +116,7 @@ internal class CheckoutPaymentViewFactory(
             )
 
             is CheckoutContext.Advanced -> AdvancedCheckoutCallbacks(
-                onSubmit = { data -> requestSubmit(checkoutId, data) },
+                onSubmit = { data -> requestSubmit(checkoutId, componentId, data) },
                 onAdditionalDetails = { data ->
                     requestAdditionalDetails(checkoutId, data, terminalState)
                 },
@@ -182,8 +182,10 @@ internal class CheckoutPaymentViewFactory(
 
     private suspend fun requestSubmit(
         checkoutId: String,
+        componentId: String,
         data: PaymentComponentData<*>,
     ): SubmitResult = suspendCancellableCoroutine { continuation ->
+        CheckoutComponentRegistry.setActive(checkoutId, componentId)
         val dataJson = PaymentComponentData.SERIALIZER.serialize(data).toString()
         callbacksApi.onSubmit(
             checkoutId,

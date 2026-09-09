@@ -25,6 +25,11 @@ final class CheckoutPaymentViewFactory: NSObject, FlutterPlatformViewFactory {
             componentId: arguments["componentId"] as? String ?? "",
             paymentMethodJson: arguments["paymentMethod"] as? String ?? "",
             isStoredPaymentMethod: arguments["isStoredPaymentMethod"] as? Bool ?? false,
+            applePayButtonTheme: arguments["applePayButtonTheme"] as? String,
+            applePayButtonType: arguments["applePayButtonType"] as? String,
+            applePayButtonCornerRadius: arguments["applePayButtonCornerRadius"] as? Double,
+            applePayButtonWidth: arguments["applePayButtonWidth"] as? Double,
+            applePayButtonHeight: arguments["applePayButtonHeight"] as? Double,
             holder: holder,
             events: events
         )

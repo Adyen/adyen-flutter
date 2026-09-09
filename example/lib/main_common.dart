@@ -1,237 +1,163 @@
-import 'package:adyen_checkout/adyen_checkout.dart';
 import 'package:adyen_checkout_example/config.dart';
 import 'package:adyen_checkout_example/network/service.dart';
+import 'package:adyen_checkout_example/repositories/advanced_checkout_repository.dart';
+import 'package:adyen_checkout_example/repositories/session_checkout_repository.dart';
+import 'package:adyen_checkout_example/screens/api_only/card_state_notifier.dart';
+import 'package:adyen_checkout_example/screens/api_only/custom_card_screen.dart';
+import 'package:adyen_checkout_example/screens/component/component_navigation_screen.dart';
+import 'package:adyen_checkout_example/screens/component/multi_component/multi_component_advanced_screen.dart';
+import 'package:adyen_checkout_example/screens/component/multi_component/multi_component_navigation_screen.dart';
+import 'package:adyen_checkout_example/screens/component/multi_component/multi_component_session_screen.dart';
+import 'package:adyen_checkout_example/utils/provider.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart' hide Action;
+import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 void mainCommon(Service service) {
   runApp(CheckoutExample(service: service));
 }
 
-Future<AdvancedCheckoutResult> handleStandaloneAction({
-  required Map<String, dynamic> actionJson,
-  required CheckoutConfiguration configuration,
-  required Future<AdditionalDetailsResult> Function(ActionComponentData data)
-      onAdditionalDetails,
-}) =>
-    Checkout.handleAction(
-      action: Action.fromJson(actionJson),
-      configuration: configuration,
-      onAdditionalDetails: onAdditionalDetails,
-    );
-
-class CheckoutExample extends StatefulWidget {
+class CheckoutExample extends StatelessWidget {
   final Service service;
 
   const CheckoutExample({required this.service, super.key});
 
   @override
-  State<CheckoutExample> createState() => _CheckoutExampleState();
+  Widget build(BuildContext context) {
+    final sessionRepository = SessionCheckoutRepository(service: service);
+    final advancedRepository = AdvancedCheckoutRepository(service: service);
+
+    return MaterialApp(
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [
+        Locale('en'),
+        Locale('ar'),
+      ],
+      themeMode: ThemeMode.system,
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: const Color(0xFF00112C),
+          brightness: Brightness.light,
+        ),
+      ),
+      darkTheme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: const Color(0xFFEFEFEF),
+          brightness: Brightness.dark,
+        ),
+      ),
+      routes: {
+        '/': (context) => const MyApp(),
+        '/cardComponentScreen': (context) => ComponentNavigationScreen(
+              sessionRepository: sessionRepository,
+              advancedRepository: advancedRepository,
+              title: 'Card',
+              txVariant: 'scheme',
+              showCardBottomSheet: true,
+            ),
+        '/blikComponentNavigation': (context) => ComponentNavigationScreen(
+              sessionRepository: sessionRepository,
+              advancedRepository: advancedRepository,
+              title: 'BLIK',
+              txVariant: 'blik',
+            ),
+        '/googlePayNavigation': (context) => ComponentNavigationScreen(
+              sessionRepository: sessionRepository,
+              advancedRepository: advancedRepository,
+              title: 'Google Pay',
+              txVariant: 'googlepay',
+            ),
+        '/applePayNavigation': (context) => ComponentNavigationScreen(
+              sessionRepository: sessionRepository,
+              advancedRepository: advancedRepository,
+              title: 'Apple Pay',
+              txVariant: 'applepay',
+            ),
+        '/multiComponentNavigationScreen': (context) =>
+            const MultiComponentNavigationScreen(),
+        '/multiComponentSessionScreen': (context) =>
+            MultiComponentSessionScreen(repository: sessionRepository),
+        '/multiComponentAdvancedScreen': (context) =>
+            MultiComponentAdvancedScreen(repository: advancedRepository),
+        '/customCard': (context) => Provider(
+              notifier: CardStateNotifier(repository: advancedRepository),
+              child: const CustomCardScreen(),
+            ),
+      },
+      initialRoute: '/',
+    );
+  }
 }
 
-class _CheckoutExampleState extends State<CheckoutExample> {
-  CheckoutFlow? _checkout;
-  String? _error;
-  bool _loading = false;
-
-  CheckoutConfiguration get _configuration => CheckoutConfiguration(
-        environment: Config.environment,
-        clientKey: Config.clientKey,
-        amount: Config.amount,
-        countryCode: Config.countryCode,
-        cardConfiguration: const CardConfiguration(
-          showCardholderName: true,
-          showStorePaymentMethod: false,
-          showSupportedCardBrandLogos: true,
-        ),
-        googlePayConfiguration: defaultTargetPlatform == TargetPlatform.android
-            ? const GooglePayConfiguration(
-                googlePayEnvironment: Config.googlePayEnvironment,
-                emailRequired: true,
-              )
-            : null,
-        applePayConfiguration: defaultTargetPlatform == TargetPlatform.iOS &&
-                Config.merchantId.isNotEmpty
-            ? const ApplePayConfiguration(
-                merchantId: Config.merchantId,
-                merchantName: Config.merchantName,
-                applePaySummaryItems: [
-                  ApplePaySummaryItem(
-                    label: Config.merchantName,
-                    amount: Config.amount,
-                    type: ApplePaySummaryItemType.definite,
-                  ),
-                ],
-              )
-            : null,
-      );
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      theme: ThemeData(colorSchemeSeed: const Color(0xFF00112C)),
-      home: Scaffold(
-        appBar: AppBar(title: const Text('Checkout 2.0 alpha example')),
-        body: _buildBody(),
+    final isBlikSupported =
+        Config.countryCode == 'PL' && Config.amount.currency == 'PLN';
+
+    return Scaffold(
+      appBar: AppBar(
+        title: const Center(child: Text('Checkout example app')),
+      ),
+      body: Center(
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              TextButton(
+                key: const Key('Card component'),
+                onPressed: () =>
+                    Navigator.pushNamed(context, '/cardComponentScreen'),
+                child: const Text('Card component'),
+              ),
+              if (isBlikSupported)
+                TextButton(
+                  key: const Key('BLIK component'),
+                  onPressed: () =>
+                      Navigator.pushNamed(context, '/blikComponentNavigation'),
+                  child: const Text('BLIK component'),
+                ),
+              _buildGoogleOrApplePayComponent(context),
+              TextButton(
+                key: const Key('Multi component'),
+                onPressed: () => Navigator.pushNamed(
+                    context, '/multiComponentNavigationScreen'),
+                child: const Text('Multi component'),
+              ),
+              TextButton(
+                key: const Key('Custom card (CSE)'),
+                onPressed: () => Navigator.pushNamed(context, '/customCard'),
+                child: const Text('Custom card (CSE)'),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
 
-  Widget _buildBody() {
-    if (_loading) return const Center(child: CircularProgressIndicator());
-    final checkout = _checkout;
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          if (_error case final error?)
-            Text(error,
-                style: TextStyle(color: Theme.of(context).colorScheme.error)),
-          FilledButton(
-            onPressed: _startSession,
-            child: const Text('Sessions checkout'),
-          ),
-          FilledButton(
-            onPressed: _startAdvanced,
-            child: const Text('Advanced checkout'),
-          ),
-          if (checkout case final checkout?) ...[
-            Text('Checkout ${checkout.id}'),
-            for (final method in checkout.paymentMethods)
-              CheckoutPaymentComponent(
-                checkout: checkout,
-                paymentMethod: method,
-              ),
-            for (final method in checkout.storedPaymentMethods)
-              CheckoutPaymentComponent(
-                checkout: checkout,
-                paymentMethod: method,
-              ),
-            const Text(
-                'Standalone action example: handleStandaloneAction(actionJson: ...).'),
-          ],
-        ],
-      ),
-    );
-  }
-
-  Future<void> _startSession() async {
-    await _run(() async {
-      final response = await widget.service.createSession({
-        'merchantAccount': Config.merchantAccount,
-        'amount': Config.amount.toJson(),
-        'countryCode': Config.countryCode,
-        'shopperLocale': Config.shopperLocale,
-        'returnUrl': Config.iOSReturnUrl,
-        'reference': 'flutter-session-${DateTime.now().millisecondsSinceEpoch}',
-        'channel': _channel,
-      });
-      final checkout = await Checkout.setup(
-        sessionResponse: SessionResponse.fromJson(response),
-        configuration: _configuration,
-        callbacks: SessionCheckoutCallbacks(
-          onComplete: _onSessionComplete,
-          onFailure: _onFailure,
-          onBeforeSubmit: (data) async => BeforeSubmitProceed(data: data),
-        ),
-      );
-      _replaceCheckout(checkout);
-    });
-  }
-
-  Future<void> _startAdvanced() async {
-    await _run(() async {
-      final response = await widget.service.fetchPaymentMethods({
-        'merchantAccount': Config.merchantAccount,
-        'amount': Config.amount.toJson(),
-        'countryCode': Config.countryCode,
-        'channel': _channel,
-      });
-      final checkout = await Checkout.setupAdvanced(
-        paymentMethods: PaymentMethods.fromJson(response),
-        configuration: _configuration,
-        callbacks: AdvancedCheckoutCallbacks(
-          onSubmit: _onSubmit,
-          onAdditionalDetails: _onAdditionalDetails,
-          onComplete: _onAdvancedComplete,
-          onFailure: _onFailure,
-        ),
-      );
-      _replaceCheckout(checkout);
-    });
-  }
-
-  Future<SubmitResult> _onSubmit(PaymentComponentData data) async {
-    final response = await widget.service.postPayments({
-      'merchantAccount': Config.merchantAccount,
-      'amount': Config.amount.toJson(),
-      'countryCode': Config.countryCode,
-      'returnUrl': Config.iOSReturnUrl,
-      ...data.data,
-    });
-    return _submitResult(response);
-  }
-
-  Future<AdditionalDetailsResult> _onAdditionalDetails(
-    ActionComponentData data,
-  ) async {
-    final response = await widget.service.postPaymentsDetails(data.data);
-    return AdditionalDetailsResult.completion(
-      resultCode: response['resultCode'] as String? ?? 'Error',
-    );
-  }
-
-  SubmitResult _submitResult(Map<String, dynamic> response) {
-    final action = response['action'];
-    if (action is Map) {
-      return SubmitResult.action(
-        Action.fromJson(Map<String, dynamic>.from(action)),
-      );
+  Widget _buildGoogleOrApplePayComponent(BuildContext context) {
+    switch (defaultTargetPlatform) {
+      case TargetPlatform.android:
+        return TextButton(
+          key: const Key('Google Pay component'),
+          onPressed: () => Navigator.pushNamed(context, '/googlePayNavigation'),
+          child: const Text('Google pay component'),
+        );
+      case TargetPlatform.iOS:
+        return TextButton(
+          key: const Key('Apple Pay component'),
+          onPressed: () => Navigator.pushNamed(context, '/applePayNavigation'),
+          child: const Text('Apple pay component'),
+        );
+      default:
+        return const SizedBox.shrink();
     }
-    return SubmitResult.completion(
-      resultCode: response['resultCode'] as String? ?? 'Error',
-    );
-  }
-
-  void _onSessionComplete(SessionCheckoutResult result) {
-    _showMessage('Session completed: ${result.resultCode}');
-  }
-
-  void _onAdvancedComplete(AdvancedCheckoutResult result) {
-    _showMessage('Advanced checkout completed: ${result.resultCode}');
-  }
-
-  void _onFailure(CheckoutError error) {
-    setState(
-        () => _error = '${error.code}: ${error.message ?? 'Checkout failed.'}');
-  }
-
-  Future<void> _run(Future<void> Function() operation) async {
-    setState(() {
-      _loading = true;
-      _error = null;
-    });
-    try {
-      await operation();
-    } catch (error) {
-      setState(() => _error = error.toString());
-    } finally {
-      if (mounted) setState(() => _loading = false);
-    }
-  }
-
-  void _replaceCheckout(CheckoutFlow checkout) {
-    _checkout?.dispose();
-    setState(() => _checkout = checkout);
-  }
-
-  String get _channel =>
-      defaultTargetPlatform == TargetPlatform.iOS ? 'iOS' : 'Android';
-
-  void _showMessage(String message) {
-    if (!mounted) return;
-    ScaffoldMessenger.of(context)
-        .showSnackBar(SnackBar(content: Text(message)));
   }
 }

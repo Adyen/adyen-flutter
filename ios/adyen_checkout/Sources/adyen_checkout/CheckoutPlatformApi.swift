@@ -127,7 +127,11 @@ final class CheckoutPlatformApi: CheckoutHostApi {
             return
         }
         Task { @MainActor in
-            defer { holder.endAction(id: actionId) }
+            defer {
+                holder.endAction(id: actionId)
+                presentationDelegates[actionId]?.dismiss()
+                presentationDelegates.removeValue(forKey: actionId)
+            }
             do {
                 let action = try JSONDecoder().decode(Action.self, from: Data(actionJson.utf8))
                 let presentationDelegate = makePresentationDelegate(id: actionId)
@@ -157,7 +161,6 @@ final class CheckoutPlatformApi: CheckoutHostApi {
                 completion(.failure(asPigeonError(error)))
             }
             actionCompletion = nil
-            presentationDelegates.removeValue(forKey: actionId)
         }
     }
 
@@ -300,6 +303,7 @@ final class CheckoutPlatformApi: CheckoutHostApi {
     }
 
     private func sendComplete(checkoutId: String, result: SessionCheckoutResult) {
+        presentationDelegates[checkoutId]?.dismiss()
         events.send(event: CheckoutEventDTO(
             type: .complete,
             checkoutId: checkoutId,
@@ -310,6 +314,7 @@ final class CheckoutPlatformApi: CheckoutHostApi {
     }
 
     private func sendComplete(checkoutId: String, result: AdvancedCheckoutResult) {
+        presentationDelegates[checkoutId]?.dismiss()
         events.send(event: CheckoutEventDTO(
             type: .complete,
             checkoutId: checkoutId,
@@ -322,6 +327,7 @@ final class CheckoutPlatformApi: CheckoutHostApi {
     }
 
     private func sendFailure(checkoutId: String, code: String, message: String?) {
+        presentationDelegates[checkoutId]?.dismiss()
         events.send(event: CheckoutEventDTO(
             type: .failure,
             checkoutId: checkoutId,
@@ -352,13 +358,38 @@ final class CheckoutPlatformApi: CheckoutHostApi {
 @MainActor
 private final class PresentationDelegateProxy: NSObject, Adyen.PresentationDelegate {
     weak var presentingViewController: UIViewController?
+    private weak var presentedViewController: UIViewController?
 
     init(viewController: UIViewController?) {
         self.presentingViewController = viewController
     }
 
     func present(component: PresentableComponent) {
-        presentingViewController?.present(component.viewController, animated: true)
+        let presenter = topViewController(from: presentingViewController) ?? presentingViewController
+        presentedViewController = component.viewController
+        presenter?.present(component.viewController, animated: true)
+    }
+
+    func dismiss(animated: Bool = true, completion: (() -> Void)? = nil) {
+        if let presented = presentedViewController {
+            presented.dismiss(animated: animated, completion: completion)
+            presentedViewController = nil
+        } else {
+            completion?()
+        }
+    }
+
+    private func topViewController(from root: UIViewController?) -> UIViewController? {
+        if let presented = root?.presentedViewController {
+            return topViewController(from: presented)
+        }
+        if let nav = root as? UINavigationController {
+            return topViewController(from: nav.visibleViewController)
+        }
+        if let tab = root as? UITabBarController {
+            return topViewController(from: tab.selectedViewController)
+        }
+        return root
     }
 }
 

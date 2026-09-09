@@ -3,5 +3,8 @@
 <plist version="1.0">
 <dict>
 	<key>com.apple.developer.in-app-payments</key>
+	<array>
+		<string>$(APPLE_PAY_MERCHANT_ID_KEY)</string>
+	</array>
 </dict>
 </plist>

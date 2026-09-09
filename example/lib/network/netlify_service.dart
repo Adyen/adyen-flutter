@@ -32,4 +32,8 @@ class NetlifyService implements Service {
   @override
   Future<Map<String, dynamic>> postPaymentsDetails(Map<String, dynamic> body) =>
       _post('payments/details', body);
+
+  @override
+  Future<Map<String, dynamic>> postCardDetails(Map<String, dynamic> body) =>
+      _post('cardDetails', body);
 }
