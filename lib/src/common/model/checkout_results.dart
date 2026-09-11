@@ -3,12 +3,12 @@ import 'action.dart';
 class SessionCheckoutResult {
   final String resultCode;
   final String sessionId;
-  final String sessionData;
+  final String sessionResult;
 
   const SessionCheckoutResult({
     required this.resultCode,
     required this.sessionId,
-    required this.sessionData,
+    required this.sessionResult,
   });
 
   @override

@@ -309,7 +309,7 @@ final class CheckoutPlatformApi: CheckoutHostApi {
             checkoutId: checkoutId,
             resultCode: result.resultCode.rawValue,
             sessionId: result.sessionId,
-            sessionData: result.sessionResult
+            sessionResult: result.sessionResult
         ))
     }
 

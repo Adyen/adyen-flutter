@@ -24,7 +24,7 @@ class CardStateNotifier extends ValueNotifier<CardState> {
       );
       return;
     }
-    final isValid = await Checkout.validateCardNumber(
+    final isValid = await Checkout.instance.validateCardNumber(
       cardNumber: trimmed,
       enableLuhnCheck: true,
     );
@@ -61,7 +61,7 @@ class CardStateNotifier extends ValueNotifier<CardState> {
       return;
     }
 
-    final isValid = await Checkout.validateCardExpiryDate(
+    final isValid = await Checkout.instance.validateCardExpiryDate(
       expiryMonth: expiryMonth,
       expiryYear: rawYear,
     );
@@ -81,7 +81,7 @@ class CardStateNotifier extends ValueNotifier<CardState> {
       );
       return;
     }
-    final isValid = await Checkout.validateCardSecurityCode(
+    final isValid = await Checkout.instance.validateCardSecurityCode(
       securityCode: securityCode,
       cardBrand: value.relatedCardBrands?.firstOrNull,
     );
@@ -110,7 +110,7 @@ class CardStateNotifier extends ValueNotifier<CardState> {
     value = value.copyWith(loading: true);
     try {
       final encryptedCard = await _createEncryptedCard();
-      final threeDS2SdkVersion = await Checkout.getThreeDS2SdkVersion();
+      final threeDS2SdkVersion = await Checkout.instance.getThreeDS2SdkVersion();
       final paymentsResponse = await repository.service.postPayments({
         'merchantAccount': Config.merchantAccount,
         'shopperReference': Config.shopperReference,
@@ -161,7 +161,7 @@ class CardStateNotifier extends ValueNotifier<CardState> {
       expiryYear: fullYear,
       cvc: value.securityCode,
     );
-    return Checkout.encryptCard(
+    return Checkout.instance.encryptCard(
       card: unencryptedCard,
       publicKey: Config.publicKey,
     );
@@ -171,7 +171,7 @@ class CardStateNotifier extends ValueNotifier<CardState> {
     if (cardNumber.length < cardDetailsTriggerThreshold) return;
 
     try {
-      final encryptedCard = await Checkout.encryptCard(
+      final encryptedCard = await Checkout.instance.encryptCard(
         card: UnencryptedCard(cardNumber: cardNumber),
         publicKey: Config.publicKey,
       );
@@ -201,7 +201,7 @@ class CardStateNotifier extends ValueNotifier<CardState> {
   }
 
   Future<bool> _validateInput() async {
-    final isCardNumberValid = await Checkout.validateCardNumber(
+    final isCardNumberValid = await Checkout.instance.validateCardNumber(
       cardNumber: value.cardNumber ?? '',
       enableLuhnCheck: true,
     );
@@ -210,11 +210,11 @@ class CardStateNotifier extends ValueNotifier<CardState> {
         expiryYear.length == 4 && expiryYear.startsWith('20')
             ? expiryYear.substring(2)
             : expiryYear;
-    final isExpiryDateValid = await Checkout.validateCardExpiryDate(
+    final isExpiryDateValid = await Checkout.instance.validateCardExpiryDate(
       expiryMonth: value.expiryMonth ?? '',
       expiryYear: normalizedExpiryYear,
     );
-    final isSecurityCodeValid = await Checkout.validateCardSecurityCode(
+    final isSecurityCodeValid = await Checkout.instance.validateCardSecurityCode(
       securityCode: value.securityCode ?? '',
       cardBrand: value.relatedCardBrands?.firstOrNull,
     );

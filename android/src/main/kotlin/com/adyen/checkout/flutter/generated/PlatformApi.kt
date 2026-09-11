@@ -1594,7 +1594,7 @@ data class CheckoutEventDTO (
   val binValue: String? = null,
   val resultCode: String? = null,
   val sessionId: String? = null,
-  val sessionData: String? = null,
+  val sessionResult: String? = null,
   val errorCode: String? = null,
   val errorMessage: String? = null
 )
@@ -1610,10 +1610,10 @@ data class CheckoutEventDTO (
       val binValue = pigeonVar_list[6] as String?
       val resultCode = pigeonVar_list[7] as String?
       val sessionId = pigeonVar_list[8] as String?
-      val sessionData = pigeonVar_list[9] as String?
+      val sessionResult = pigeonVar_list[9] as String?
       val errorCode = pigeonVar_list[10] as String?
       val errorMessage = pigeonVar_list[11] as String?
-      return CheckoutEventDTO(type, checkoutId, componentId, requiresUserInteraction, height, binLookupData, binValue, resultCode, sessionId, sessionData, errorCode, errorMessage)
+      return CheckoutEventDTO(type, checkoutId, componentId, requiresUserInteraction, height, binLookupData, binValue, resultCode, sessionId, sessionResult, errorCode, errorMessage)
     }
   }
   fun toList(): List<Any?> {
@@ -1627,7 +1627,7 @@ data class CheckoutEventDTO (
       binValue,
       resultCode,
       sessionId,
-      sessionData,
+      sessionResult,
       errorCode,
       errorMessage,
     )

@@ -5,6 +5,7 @@
 - Added public v6-aligned Sessions, Advanced, and one-shot action Checkout APIs.
 - Added typed payment-method, action, callback payload, result, and error models.
 - Added the generic `CheckoutPaymentComponent` and optional `CheckoutController`.
+- Added direct-method coverage for iDEAL, PayPal, Klarna, Pay by Bank, and TWINT through the generic component/controller API.
 - Added public card, Google Pay, and Apple Pay configuration subsets supported by native alpha.1 APIs.
 
 ### Changed
@@ -12,10 +13,12 @@
 - Migrated Android and iOS dependencies to `6.0.0-alpha.1` and Swift Package Manager on iOS.
 - Card validation now returns `bool`; expiry validation requires `MM` and `YY`.
 - Completion and failure callbacks are owned by the checkout flow, not individual components.
+- Fixed the Android example return URL host to match its application ID.
+- Browser cancellation failures are now visible in the single-component example screens.
 
 ### Removed
 
-- Drop-in, separate Instant, partial-payment/order, and legacy action-component APIs.
+- Drop-in, the separate v1 Instant API, partial-payment/order, and legacy action-component APIs.
 - `Checkout.getReturnUrl()` and all generated Pigeon types from the public barrel.
 
 ## 1.12.0

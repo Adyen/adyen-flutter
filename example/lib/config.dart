@@ -28,9 +28,26 @@ class Config {
   static const Environment environment = Environment.test;
   static const String baseUrl = "checkout-test.adyen.com";
   static const String apiVersion = "v72";
+  static const String androidReturnUrl =
+      "adyencheckout://com.adyen.adyen_checkout_example/adyenPayment";
+  static const String iosReturnUrl =
+      "com.mydomain.adyencheckout://adyenPayment";
   static const GooglePayEnvironment googlePayEnvironment =
       GooglePayEnvironment.test;
 
   //Example data
   static const Amount amount = Amount(currency: "EUR", value: 11295);
+  static List<Map<String, dynamic>> get lineItems => [
+        {
+          "quantity": 1,
+          "amountExcludingTax": amount.value,
+          "taxPercentage": 0,
+          "description": "Shoes",
+          "id": "Item #1",
+          "taxAmount": 0,
+          "amountIncludingTax": amount.value,
+          "productUrl": "https://example.com/products/shoes",
+          "imageUrl": "https://example.com/products/shoes.jpg",
+        },
+      ];
 }

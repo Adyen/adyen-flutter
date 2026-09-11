@@ -13,10 +13,10 @@ AdyenCheckout.session.setup(...)
 AdyenCheckout.advanced.setup(...)
 ```
 
-with the static `Checkout` entry point:
+with the singleton `Checkout.instance` entry point:
 
 ```dart
-final sessionCheckout = await Checkout.setup(
+final sessionCheckout = await Checkout.instance.setup(
   sessionResponse: sessionResponse,
   configuration: configuration,
   callbacks: SessionCheckoutCallbacks(
@@ -25,7 +25,7 @@ final sessionCheckout = await Checkout.setup(
   ),
 );
 
-final advancedCheckout = await Checkout.setupAdvanced(
+final advancedCheckout = await Checkout.instance.setupAdvanced(
   paymentMethods: PaymentMethods.fromJson(paymentMethodsJson),
   configuration: configuration,
   callbacks: AdvancedCheckoutCallbacks(
@@ -37,7 +37,7 @@ final advancedCheckout = await Checkout.setupAdvanced(
 );
 ```
 
-`Checkout.handleAction` replaces the legacy standalone action component and returns an
+`Checkout.instance.handleAction` replaces the legacy standalone action component and returns an
 `AdvancedCheckoutResult`. The action callback is supplied directly to the one-shot call.
 
 ## Components
@@ -55,6 +55,18 @@ CheckoutPaymentComponent(
 
 Completion and failure are delivered through the callback object passed during setup. Use
 `CheckoutController` for direct methods and custom submit buttons.
+
+### Instant methods
+
+The separate v1 Instant API is replaced by the same generic component used for other payment
+methods. Select iDEAL, PayPal, Klarna, Pay by Bank, or TWINT from `checkout.paymentMethods`, mount
+`CheckoutPaymentComponent` with a `CheckoutController`, and show a merchant button only when
+`controller.requiresUserInteraction == false`. Keep the zero-height component mounted while the
+payment is active so native Checkout can present and complete actions.
+
+Future native SDK versions are expected to provide their own button. A future dependency update will
+replace the temporary Flutter button with that native UI while preserving the same generic
+component/controller API; no payment-method-specific Flutter API is required.
 
 ## Models and callbacks
 

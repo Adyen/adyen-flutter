@@ -15,7 +15,7 @@ The first release is `2.0.0-alpha.1` because the native SDK dependencies are alp
 
 - **Sessions**: the native SDK handles the `/sessions` payment lifecycle.
 - **Advanced**: your callbacks handle `/payments` and `/payments/details`.
-- **Action-only**: `Checkout.handleAction` handles an action returned by your backend.
+- **Action-only**: `Checkout.instance.handleAction` handles an action returned by your backend.
 - **Payment components**: `CheckoutPaymentComponent` renders the selected native payment method.
   Card, stored cards, BLIK, Google Pay on Android, Apple Pay on iOS, and native direct methods use
   the same generic component API. On iOS, Apple Pay temporarily renders `PKPaymentButton` inside the
@@ -53,14 +53,14 @@ backend and app URL scheme.
 ## Sessions
 
 ```dart
-final checkout = await Checkout.setup(
+final checkout = await Checkout.instance.setup(
   sessionResponse: SessionResponse(
     id: sessionJson['id'] as String,
     sessionData: sessionJson['sessionData'] as String,
   ),
   configuration: configuration,
   callbacks: SessionCheckoutCallbacks(
-    onComplete: (result) => consumeSessionResult(result.sessionData),
+    onComplete: (result) => consumeSessionResult(result.sessionResult),
     onFailure: handleCheckoutError,
   ),
 );
@@ -74,7 +74,7 @@ CheckoutPaymentComponent(
 ## Advanced
 
 ```dart
-final checkout = await Checkout.setupAdvanced(
+final checkout = await Checkout.instance.setupAdvanced(
   paymentMethods: PaymentMethods.fromJson(paymentMethodsJson),
   configuration: configuration,
   callbacks: AdvancedCheckoutCallbacks(
@@ -92,6 +92,52 @@ Use an optional `CheckoutController` for a custom submit button or direct/no-inp
 It exposes `isReady`, `requiresUserInteraction`, `submit()`, and lifecycle state. A controller is
 required when `showSubmitButton` is `false` or the selected native method does not require shopper
 input.
+
+The v1 Instant methods—iDEAL, PayPal, Klarna, Pay by Bank, and TWINT—use this same generic component.
+Keep the component mounted while native Checkout owns the payment and action lifecycle. When native
+reports that no interaction is required, the platform view collapses to zero height and a merchant
+button can submit through the controller:
+
+```dart
+final controller = CheckoutController();
+bool submitted = false;
+
+Column(
+  children: [
+    CheckoutPaymentComponent(
+      checkout: checkout,
+      paymentMethod: paymentMethod,
+      controller: controller,
+    ),
+    ListenableBuilder(
+      listenable: controller,
+      builder: (context, _) {
+        final canSubmit = controller.isReady &&
+            controller.requiresUserInteraction == false &&
+            !submitted;
+        if (controller.requiresUserInteraction != false) {
+          return const SizedBox.shrink();
+        }
+        return FilledButton(
+          onPressed: canSubmit
+              ? () async {
+                  setState(() => submitted = true);
+                  await controller.submit();
+                }
+              : null,
+          child: Text('Pay with ${paymentMethod.name}'),
+        );
+      },
+    ),
+  ],
+);
+```
+
+Dispose a merchant-created controller with the owning widget. Do not classify payment method types
+in application code. With the pinned alpha.1 native SDKs, use
+`requiresUserInteraction` as the native-authoritative signal. Future native SDK versions are
+expected to render their own payment button; a future dependency update will replace this temporary
+CTA with the native UI without changing the merchant-facing Flutter component/controller API.
 
 ## Configuration
 

@@ -634,7 +634,7 @@ class CheckoutEventDTO {
   final String? binValue;
   final String? resultCode;
   final String? sessionId;
-  final String? sessionData;
+  final String? sessionResult;
   final String? errorCode;
   final String? errorMessage;
 
@@ -648,7 +648,7 @@ class CheckoutEventDTO {
     this.binValue,
     this.resultCode,
     this.sessionId,
-    this.sessionData,
+    this.sessionResult,
     this.errorCode,
     this.errorMessage,
   });

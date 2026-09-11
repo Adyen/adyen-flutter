@@ -1,20 +1,21 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'checkout_controller.dart';
-import 'checkout_coordinator.dart';
-import 'common/model/checkout.dart';
-import 'common/model/checkout_error.dart';
-import 'common/model/payment_method.dart';
-import 'common/model/stored_payment_method.dart';
-import 'components/platform/android_platform_view.dart';
-import 'components/platform/component_container.dart';
-import 'components/platform/ios_platform_view.dart';
-import 'generated/platform_api.g.dart';
-import 'util/constants.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/widgets.dart';
+
+import '../checkout_controller.dart';
+import '../checkout_runtime.dart';
+import '../common/model/checkout.dart';
+import '../common/model/checkout_error.dart';
+import '../common/model/payment_method.dart';
+import '../common/model/stored_payment_method.dart';
+import '../generated/platform_api.g.dart';
+import '../util/constants.dart';
+import 'platform/android_platform_view.dart';
+import 'component_container.dart';
+import 'platform/ios_platform_view.dart';
 
 class CheckoutPaymentComponent extends StatefulWidget {
   final CheckoutFlow checkout;
@@ -37,7 +38,7 @@ class CheckoutPaymentComponent extends StatefulWidget {
 
 class _CheckoutPaymentComponentState extends State<CheckoutPaymentComponent> {
   final GlobalKey _componentWidgetKey = GlobalKey();
-  late final CheckoutCoordinator _coordinator;
+  late final CheckoutRuntime _runtime;
   late final String _componentId;
   late final CheckoutController _effectiveController;
   late final StreamSubscription<CheckoutEventDTO> _eventSubscription;
@@ -49,14 +50,14 @@ class _CheckoutPaymentComponentState extends State<CheckoutPaymentComponent> {
   @override
   void initState() {
     super.initState();
-    _coordinator = CheckoutCoordinator.shared;
-    _componentId = _coordinator.nextComponentId();
+    _runtime = checkoutRuntimeOf(widget.checkout);
+    _componentId = _runtime.nextComponentId();
     _effectiveController = widget.controller ?? CheckoutController();
     attachCheckoutController(
       _effectiveController,
-      () => _coordinator.gateway.submit(widget.checkout.id, _componentId),
+      () => _runtime.submitComponent(widget.checkout.id, _componentId),
     );
-    _eventSubscription = _coordinator.events
+    _eventSubscription = _runtime.events
         .where(
           (event) =>
               event.checkoutId == widget.checkout.id &&
@@ -80,7 +81,7 @@ class _CheckoutPaymentComponentState extends State<CheckoutPaymentComponent> {
   @override
   void dispose() {
     unawaited(_eventSubscription.cancel());
-    _coordinator.disposeComponent(widget.checkout.id, _componentId);
+    _runtime.disposeComponent(widget.checkout.id, _componentId);
     detachCheckoutController(_effectiveController);
     if (widget.controller == null) _effectiveController.dispose();
     super.dispose();
@@ -88,7 +89,7 @@ class _CheckoutPaymentComponentState extends State<CheckoutPaymentComponent> {
 
   Widget _buildComponentWidget() {
     final applePayConfiguration = widget.paymentMethod.type == 'applepay'
-        ? _coordinator.applePayConfiguration(widget.checkout.id)
+        ? _runtime.applePayConfiguration(widget.checkout.id)
         : null;
     final applePayButtonStyle = applePayConfiguration?.buttonStyle;
     final applePayButtonTheme = applePayButtonStyle?.theme?.name;
@@ -163,10 +164,10 @@ class _CheckoutPaymentComponentState extends State<CheckoutPaymentComponent> {
   void _handleReady(bool? requiresUserInteraction) {
     if (requiresUserInteraction == null) return;
     final needsController =
-        _coordinator.requiresExternalController(widget.checkout.id) ||
+        _runtime.requiresExternalController(widget.checkout.id) ||
             !requiresUserInteraction;
     if (needsController && widget.controller == null) {
-      _coordinator.reportComponentFailure(
+      _runtime.reportComponentFailure(
         widget.checkout.id,
         const CheckoutError(
           code: CheckoutError.missingControllerCode,

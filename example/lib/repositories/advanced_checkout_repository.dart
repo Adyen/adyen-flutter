@@ -11,11 +11,11 @@ class AdvancedCheckoutRepository {
   String get channel =>
       defaultTargetPlatform == TargetPlatform.iOS ? 'iOS' : 'Android';
 
-  String determineReturnUrl() {
-    if (defaultTargetPlatform == TargetPlatform.android) {
-      return 'adyencheckout://com.adyen.checkout.flutter.example/adyenPayment';
+  String determineReturnUrl({TargetPlatform? platform}) {
+    if ((platform ?? defaultTargetPlatform) == TargetPlatform.android) {
+      return Config.androidReturnUrl;
     }
-    return 'com.mydomain.adyencheckout://adyenPayment';
+    return Config.iosReturnUrl;
   }
 
   CheckoutConfiguration buildConfiguration() => CheckoutConfiguration(
@@ -67,7 +67,7 @@ class AdvancedCheckoutRepository {
     required AdvancedCheckoutCallbacks callbacks,
   }) async {
     final paymentMethods = await fetchPaymentMethods();
-    return Checkout.setupAdvanced(
+    return Checkout.instance.setupAdvanced(
       paymentMethods: paymentMethods,
       configuration: buildConfiguration(),
       callbacks: callbacks,
@@ -91,6 +91,7 @@ class AdvancedCheckoutRepository {
         },
       },
       ...data.data,
+      'lineItems': Config.lineItems,
     });
     final action = response['action'];
     if (action is Map) {
@@ -117,7 +118,7 @@ class AdvancedCheckoutRepository {
     required Future<AdditionalDetailsResult> Function(ActionComponentData data)
         onAdditionalDetails,
   }) =>
-      Checkout.handleAction(
+      Checkout.instance.handleAction(
         action: Action.fromJson(actionJson),
         configuration: buildConfiguration(),
         onAdditionalDetails: onAdditionalDetails,

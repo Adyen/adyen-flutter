@@ -1,5 +1,6 @@
 import 'package:adyen_checkout/adyen_checkout.dart';
 import 'package:adyen_checkout_example/repositories/advanced_checkout_repository.dart';
+import 'package:adyen_checkout_example/screens/component/instant/component_submit_button.dart';
 import 'package:adyen_checkout_example/utils/dialog_builder.dart';
 import 'package:flutter/material.dart';
 
@@ -73,8 +74,11 @@ class _AdvancedComponentScreenState extends State<AdvancedComponentScreen> {
   }
 
   void _onFailure(CheckoutError error) {
-    debugPrint(
-      '${widget.title} advanced component failed: ${error.code}: ${error.message ?? 'Unknown error'}',
+    if (!mounted) return;
+    DialogBuilder.showPaymentResultDialog(
+      'Payment Failed',
+      '${error.code}: ${error.message ?? 'Unknown error'}',
+      context,
     );
   }
 
@@ -104,7 +108,7 @@ class _AdvancedComponentScreenState extends State<AdvancedComponentScreen> {
     ];
     if (paymentMethods.isEmpty) {
       debugPrint('${widget.title} payment method not found');
-      return const SizedBox.shrink();
+      return ComponentUnavailableMessage(paymentMethodName: widget.title);
     }
 
     return SingleChildScrollView(
@@ -113,7 +117,7 @@ class _AdvancedComponentScreenState extends State<AdvancedComponentScreen> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           for (final paymentMethod in paymentMethods)
-            CheckoutPaymentComponent(
+            ControlledCheckoutPaymentComponent(
               key: ValueKey(paymentMethod.data),
               checkout: checkout,
               paymentMethod: paymentMethod,

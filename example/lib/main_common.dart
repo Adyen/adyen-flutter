@@ -5,6 +5,7 @@ import 'package:adyen_checkout_example/repositories/session_checkout_repository.
 import 'package:adyen_checkout_example/screens/api_only/card_state_notifier.dart';
 import 'package:adyen_checkout_example/screens/api_only/custom_card_screen.dart';
 import 'package:adyen_checkout_example/screens/component/component_navigation_screen.dart';
+import 'package:adyen_checkout_example/screens/component/instant/instant_component_navigation_screen.dart';
 import 'package:adyen_checkout_example/screens/component/multi_component/multi_component_advanced_screen.dart';
 import 'package:adyen_checkout_example/screens/component/multi_component/multi_component_navigation_screen.dart';
 import 'package:adyen_checkout_example/screens/component/multi_component/multi_component_session_screen.dart';
@@ -77,6 +78,11 @@ class CheckoutExample extends StatelessWidget {
               title: 'Apple Pay',
               txVariant: 'applepay',
             ),
+        '/instantComponentNavigation': (context) =>
+            InstantComponentNavigationScreen(
+              sessionRepository: sessionRepository,
+              advancedRepository: advancedRepository,
+            ),
         '/multiComponentNavigationScreen': (context) =>
             const MultiComponentNavigationScreen(),
         '/multiComponentSessionScreen': (context) =>
@@ -123,6 +129,14 @@ class MyApp extends StatelessWidget {
                       Navigator.pushNamed(context, '/blikComponentNavigation'),
                   child: const Text('BLIK component'),
                 ),
+              TextButton(
+                key: const Key('Instant component'),
+                onPressed: () => Navigator.pushNamed(
+                  context,
+                  '/instantComponentNavigation',
+                ),
+                child: const Text('Instant component'),
+              ),
               _buildGoogleOrApplePayComponent(context),
               TextButton(
                 key: const Key('Multi component'),

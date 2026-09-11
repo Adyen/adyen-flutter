@@ -330,7 +330,7 @@ internal class CheckoutPaymentViewFactory(
                     componentId = componentId,
                     resultCode = result.resultCode.value,
                     sessionId = result.sessionId,
-                    sessionData = result.sessionData,
+                    sessionResult = result.sessionData,
                 ),
             )
         }

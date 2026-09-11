@@ -2184,7 +2184,7 @@ class CheckoutEventDTO {
     this.binValue,
     this.resultCode,
     this.sessionId,
-    this.sessionData,
+    this.sessionResult,
     this.errorCode,
     this.errorMessage,
   });
@@ -2207,7 +2207,7 @@ class CheckoutEventDTO {
 
   String? sessionId;
 
-  String? sessionData;
+  String? sessionResult;
 
   String? errorCode;
 
@@ -2224,7 +2224,7 @@ class CheckoutEventDTO {
       binValue,
       resultCode,
       sessionId,
-      sessionData,
+      sessionResult,
       errorCode,
       errorMessage,
     ];
@@ -2246,7 +2246,7 @@ class CheckoutEventDTO {
       binValue: result[6] as String?,
       resultCode: result[7] as String?,
       sessionId: result[8] as String?,
-      sessionData: result[9] as String?,
+      sessionResult: result[9] as String?,
       errorCode: result[10] as String?,
       errorMessage: result[11] as String?,
     );

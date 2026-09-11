@@ -1,7 +1,9 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'checkout_gateway.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
+
 import 'common/model/action.dart';
 import 'common/model/checkout.dart';
 import 'common/model/checkout_callbacks.dart';
@@ -15,35 +17,30 @@ import 'common/model/payment_methods.dart';
 import 'common/model/session_response.dart';
 import 'generated/platform_api.g.dart';
 import 'util/dto_mapper.dart';
-import 'package:flutter/foundation.dart';
-import 'package:flutter/services.dart';
 
-class CheckoutCoordinator {
-  static CheckoutCoordinator? _shared;
+Stream<CheckoutEventDTO> _nativeCheckoutEvents() => events();
 
-  static CheckoutCoordinator get shared =>
-      _shared ??= CheckoutCoordinator(gateway: NativeCheckoutGateway());
-
-  static void replaceSharedForTesting(CheckoutGateway gateway) {
-    _shared?._dispose();
-    _shared = CheckoutCoordinator(gateway: gateway);
-  }
-
-  final CheckoutGateway gateway;
+final class CheckoutRuntime {
+  final CheckoutHostApi _checkoutHostApi;
+  final ComponentHostApi _componentHostApi;
   final StreamController<CheckoutEventDTO> _eventController =
       StreamController<CheckoutEventDTO>.broadcast();
-  final Map<String, _CheckoutRecord> _checkouts = <String, _CheckoutRecord>{};
-  final Map<String, AdditionalDetailsCallback> _actionCallbacks =
-      <String, AdditionalDetailsCallback>{};
-  final Map<String, CheckoutError> _actionFailures = <String, CheckoutError>{};
+  _CheckoutRecord? _checkout;
+  AdditionalDetailsCallback? _actionCallback;
+  CheckoutError? _actionFailure;
   late final StreamSubscription<CheckoutEventDTO> _eventSubscription;
-  bool _operationInProgress = false;
   int _idCounter = 0;
 
-  CheckoutCoordinator({required this.gateway}) {
+  CheckoutRuntime({
+    CheckoutHostApi? checkoutHostApi,
+    ComponentHostApi? componentHostApi,
+    Stream<CheckoutEventDTO>? platformEvents,
+  })  : _checkoutHostApi = checkoutHostApi ?? CheckoutHostApi(),
+        _componentHostApi = componentHostApi ?? ComponentHostApi() {
     CheckoutCallbacksFlutterApi.setUp(_CheckoutCallbacksApi(this));
     ActionOnlyFlutterApi.setUp(_ActionOnlyApi(this));
-    _eventSubscription = gateway.events.listen(_handleEvent);
+    _eventSubscription =
+        (platformEvents ?? _nativeCheckoutEvents()).listen(_handleEvent);
   }
 
   Stream<CheckoutEventDTO> get events => _eventController.stream;
@@ -51,43 +48,40 @@ class CheckoutCoordinator {
   String nextComponentId() => _newId('component');
 
   bool requiresExternalController(String checkoutId) =>
-      _checkouts[checkoutId]?.configuration.showSubmitButton == false;
+      _recordFor(checkoutId)?.configuration.showSubmitButton == false;
 
   ApplePayConfiguration? applePayConfiguration(String checkoutId) =>
-      _checkouts[checkoutId]?.configuration.applePayConfiguration;
+      _recordFor(checkoutId)?.configuration.applePayConfiguration;
+
+  _CheckoutRecord? _recordFor(String checkoutId) =>
+      _checkout?.checkout.id == checkoutId ? _checkout : null;
 
   Future<SessionCheckout> setupSession({
     required SessionResponse sessionResponse,
     required CheckoutConfiguration configuration,
     required SessionCheckoutCallbacks callbacks,
   }) async {
-    _reserveOperation();
-    var completed = false;
     try {
-      final result = await gateway.setupSession(
+      final result = await _checkoutHostApi.setupSession(
         sessionResponse.toDTO(),
         configuration.toDTO(),
       );
-      _validateSetupResult(result);
       final methods = result.toPaymentMethods();
       final checkout = createSessionCheckout(
         id: result.checkoutId,
         paymentMethods: methods.regular,
         storedPaymentMethods: methods.stored,
         callbacks: callbacks,
-        coordinator: this,
+        runtime: this,
       );
-      _checkouts[result.checkoutId] = _CheckoutRecord.session(
+      _checkout = _CheckoutRecord.session(
         checkout: checkout,
         callbacks: callbacks,
         configuration: configuration,
       );
-      completed = true;
       return checkout;
     } catch (error, stackTrace) {
       throw _asCheckoutError(error, stackTrace);
-    } finally {
-      if (!completed) _operationInProgress = false;
     }
   }
 
@@ -96,32 +90,26 @@ class CheckoutCoordinator {
     required CheckoutConfiguration configuration,
     required AdvancedCheckoutCallbacks callbacks,
   }) async {
-    _reserveOperation();
-    var completed = false;
     try {
-      final result = await gateway.setupAdvanced(
+      final result = await _checkoutHostApi.setupAdvanced(
         jsonEncode(paymentMethods.toJson()),
         configuration.toDTO(),
       );
-      _validateSetupResult(result);
       final checkout = createAdvancedCheckout(
         id: result.checkoutId,
         paymentMethods: paymentMethods.regular,
         storedPaymentMethods: paymentMethods.stored,
         callbacks: callbacks,
-        coordinator: this,
+        runtime: this,
       );
-      _checkouts[result.checkoutId] = _CheckoutRecord.advanced(
+      _checkout = _CheckoutRecord.advanced(
         checkout: checkout,
         callbacks: callbacks,
         configuration: configuration,
       );
-      completed = true;
       return checkout;
     } catch (error, stackTrace) {
       throw _asCheckoutError(error, stackTrace);
-    } finally {
-      if (!completed) _operationInProgress = false;
     }
   }
 
@@ -130,30 +118,23 @@ class CheckoutCoordinator {
     required CheckoutConfiguration configuration,
     required AdditionalDetailsCallback onAdditionalDetails,
   }) async {
-    _reserveOperation();
     final actionId = _newId('action');
-    _actionCallbacks[actionId] = onAdditionalDetails;
+    _actionCallback = onAdditionalDetails;
     try {
-      final result = await gateway.handleAction(
+      final result = await _checkoutHostApi.handleAction(
         actionId,
         jsonEncode(action.data),
         configuration.toDTO(),
       );
-      final failure = _actionFailures.remove(actionId);
+      final failure = _actionFailure;
+      _actionFailure = null;
       if (failure != null) throw failure;
-      if (result.resultCode.isEmpty) {
-        throw const CheckoutError(
-          code: CheckoutError.genericCode,
-          message: 'Native action handling returned no result code.',
-        );
-      }
       return AdvancedCheckoutResult(resultCode: result.resultCode);
     } catch (error, stackTrace) {
       throw _asCheckoutError(error, stackTrace);
     } finally {
-      _actionCallbacks.remove(actionId);
-      _actionFailures.remove(actionId);
-      _operationInProgress = false;
+      _actionCallback = null;
+      _actionFailure = null;
     }
   }
 
@@ -162,7 +143,8 @@ class CheckoutCoordinator {
     required String publicKey,
   }) async {
     try {
-      return (await gateway.encryptCard(card.toDTO(), publicKey)).toModel();
+      return (await _checkoutHostApi.encryptCard(card.toDTO(), publicKey))
+          .toModel();
     } catch (error, stackTrace) {
       throw _asCheckoutError(error, stackTrace);
     }
@@ -173,7 +155,7 @@ class CheckoutCoordinator {
     required String publicKey,
   }) async {
     try {
-      return await gateway.encryptBin(bin, publicKey);
+      return await _checkoutHostApi.encryptBin(bin, publicKey);
     } catch (error, stackTrace) {
       throw _asCheckoutError(error, stackTrace);
     }
@@ -183,7 +165,7 @@ class CheckoutCoordinator {
     required String cardNumber,
     required bool enableLuhnCheck,
   }) =>
-      gateway.validateCardNumber(cardNumber, enableLuhnCheck);
+      _checkoutHostApi.validateCardNumber(cardNumber, enableLuhnCheck);
 
   Future<bool> validateCardExpiryDate({
     required String expiryMonth,
@@ -193,36 +175,40 @@ class CheckoutCoordinator {
         !RegExp(r'^\d{2}$').hasMatch(expiryYear)) {
       return false;
     }
-    return gateway.validateCardExpiryDate(expiryMonth, expiryYear);
+    return _checkoutHostApi.validateCardExpiryDate(expiryMonth, expiryYear);
   }
 
   Future<bool> validateCardSecurityCode({
     required String securityCode,
     String? cardBrand,
   }) =>
-      gateway.validateCardSecurityCode(securityCode, cardBrand);
+      _checkoutHostApi.validateCardSecurityCode(securityCode, cardBrand);
 
-  Future<String> getThreeDS2SdkVersion() => gateway.getThreeDS2SdkVersion();
+  Future<String> getThreeDS2SdkVersion() =>
+      _checkoutHostApi.getThreeDS2SdkVersion();
 
   Future<void> enableConsoleLogging({required bool enabled}) =>
-      gateway.enableConsoleLogging(enabled);
+      _checkoutHostApi.enableConsoleLogging(enabled);
 
   void disposeCheckout(String checkoutId) {
-    final record = _checkouts.remove(checkoutId);
-    if (record == null) return;
+    final record = _recordFor(checkoutId);
+    if (record == null || record.disposed) return;
+    _checkout = null;
     markFlowDisposed(record.checkout);
     record.disposed = true;
-    _operationInProgress = false;
-    unawaited(gateway
+    unawaited(_checkoutHostApi
         .disposeCheckout(checkoutId)
         .catchError((Object error, StackTrace stackTrace) {
       _reportError(error, stackTrace);
     }));
   }
 
+  Future<void> submitComponent(String checkoutId, String componentId) =>
+      _componentHostApi.submit(checkoutId, componentId);
+
   void disposeComponent(String checkoutId, String componentId) {
     unawaited(
-      gateway.disposeComponent(checkoutId, componentId).catchError(
+      _componentHostApi.dispose(checkoutId, componentId).catchError(
             (Object error, StackTrace stackTrace) =>
                 _reportError(error, stackTrace),
           ),
@@ -231,26 +217,6 @@ class CheckoutCoordinator {
 
   void reportComponentFailure(String checkoutId, CheckoutError error) {
     _terminalFailure(checkoutId, error);
-  }
-
-  void _reserveOperation() {
-    if (_operationInProgress ||
-        _checkouts.isNotEmpty ||
-        _actionCallbacks.isNotEmpty) {
-      throw CheckoutError.alreadyActive();
-    }
-    _operationInProgress = true;
-  }
-
-  void _validateSetupResult(CheckoutSetupResultDTO result) {
-    if (result.checkoutId.isEmpty ||
-        result.regularPaymentMethodsJson.isEmpty ||
-        result.storedPaymentMethodsJson.isEmpty) {
-      throw const CheckoutError(
-        code: CheckoutError.genericCode,
-        message: 'Native checkout setup returned incomplete data.',
-      );
-    }
   }
 
   void _handleEvent(CheckoutEventDTO event) {
@@ -275,13 +241,13 @@ class CheckoutCoordinator {
   }
 
   void _terminalComplete(CheckoutEventDTO event) {
-    final record = _checkouts[event.checkoutId];
+    final record = _recordFor(event.checkoutId);
     if (record == null || record.terminal || record.disposed) return;
     if (record.sessionCallbacks != null) {
       final resultCode = event.resultCode;
       final sessionId = event.sessionId;
-      final sessionData = event.sessionData;
-      if (resultCode == null || sessionId == null || sessionData == null) {
+      final sessionResult = event.sessionResult;
+      if (resultCode == null || sessionId == null || sessionResult == null) {
         _terminalFailure(
           event.checkoutId,
           const CheckoutError(
@@ -297,7 +263,7 @@ class CheckoutCoordinator {
           SessionCheckoutResult(
             resultCode: resultCode,
             sessionId: sessionId,
-            sessionData: sessionData,
+            sessionResult: sessionResult,
           ),
         ),
       );
@@ -324,7 +290,7 @@ class CheckoutCoordinator {
   }
 
   void _terminalFailure(String checkoutId, CheckoutError error) {
-    final record = _checkouts[checkoutId];
+    final record = _recordFor(checkoutId);
     if (record == null || record.terminal || record.disposed) return;
     _completeRecord(
       record,
@@ -348,7 +314,7 @@ class CheckoutCoordinator {
     String checkoutId,
     BeforeSubmitDataDTO data,
   ) async {
-    final record = _checkouts[checkoutId];
+    final record = _recordFor(checkoutId);
     final beforeSubmit = record?.sessionCallbacks?.onBeforeSubmit;
     if (record == null || beforeSubmit == null) {
       return BeforeSubmitResultDTO(
@@ -372,7 +338,7 @@ class CheckoutCoordinator {
     String checkoutId,
     PaymentComponentDataDTO data,
   ) async {
-    final callback = _checkouts[checkoutId]?.advancedCallbacks?.onSubmit;
+    final callback = _recordFor(checkoutId)?.advancedCallbacks?.onSubmit;
     if (callback == null) {
       return SubmitResultDTO(
         type: SubmitResultTypeDTO.retry,
@@ -395,7 +361,7 @@ class CheckoutCoordinator {
     ActionComponentDataDTO data,
   ) async {
     final callback =
-        _checkouts[checkoutId]?.advancedCallbacks?.onAdditionalDetails;
+        _recordFor(checkoutId)?.advancedCallbacks?.onAdditionalDetails;
     if (callback == null) {
       return AdditionalDetailsResultDTO(resultCode: 'Error');
     }
@@ -415,7 +381,7 @@ class CheckoutCoordinator {
     String actionId,
     ActionComponentDataDTO data,
   ) async {
-    final callback = _actionCallbacks[actionId];
+    final callback = _actionCallback;
     if (callback == null) {
       return AdditionalDetailsResultDTO(resultCode: 'Error');
     }
@@ -423,7 +389,7 @@ class CheckoutCoordinator {
       return (await callback(data.fromDTO())).toDTO();
     } catch (error, stackTrace) {
       _reportError(error, stackTrace);
-      _actionFailures[actionId] = CheckoutError.callbackFailure(cause: error);
+      _actionFailure = CheckoutError.callbackFailure(cause: error);
       return AdditionalDetailsResultDTO(resultCode: 'Error');
     }
   }
@@ -433,7 +399,7 @@ class CheckoutCoordinator {
     ApplePayShippingMethodDTO shippingMethod,
     List<ApplePaySummaryItemDTO> currentSummaryItems,
   ) async {
-    final callback = _checkouts[checkoutId]
+    final callback = _recordFor(checkoutId)
         ?.configuration
         .applePayConfiguration
         ?.onSelectShippingMethod;
@@ -459,7 +425,7 @@ class CheckoutCoordinator {
     ApplePayContactDTO contact,
     List<ApplePaySummaryItemDTO> currentSummaryItems,
   ) async {
-    final callback = _checkouts[checkoutId]
+    final callback = _recordFor(checkoutId)
         ?.configuration
         .applePayConfiguration
         ?.onSelectShippingContact;
@@ -486,7 +452,7 @@ class CheckoutCoordinator {
     String couponCode,
     List<ApplePaySummaryItemDTO> currentSummaryItems,
   ) async {
-    final callback = _checkouts[checkoutId]
+    final callback = _recordFor(checkoutId)
         ?.configuration
         .applePayConfiguration
         ?.onChangeCouponCode;
@@ -509,7 +475,7 @@ class CheckoutCoordinator {
     String checkoutId,
     ApplePayAuthorizedPaymentDTO payment,
   ) async {
-    final callback = _checkouts[checkoutId]
+    final callback = _recordFor(checkoutId)
         ?.configuration
         .applePayConfiguration
         ?.onAuthorize;
@@ -562,7 +528,7 @@ class CheckoutCoordinator {
   String _newId(String prefix) =>
       '$prefix-${DateTime.now().microsecondsSinceEpoch}-${_idCounter++}';
 
-  void _dispose() {
+  void dispose() {
     unawaited(_eventSubscription.cancel());
     unawaited(_eventController.close());
     CheckoutCallbacksFlutterApi.setUp(null);
@@ -597,30 +563,30 @@ class _CheckoutRecord {
 }
 
 class _CheckoutCallbacksApi extends CheckoutCallbacksFlutterApi {
-  final CheckoutCoordinator coordinator;
+  final CheckoutRuntime runtime;
 
-  _CheckoutCallbacksApi(this.coordinator);
+  _CheckoutCallbacksApi(this.runtime);
 
   @override
   Future<BeforeSubmitResultDTO> onBeforeSubmit(
     String checkoutId,
     BeforeSubmitDataDTO data,
   ) =>
-      coordinator._onBeforeSubmit(checkoutId, data);
+      runtime._onBeforeSubmit(checkoutId, data);
 
   @override
   Future<SubmitResultDTO> onSubmit(
     String checkoutId,
     PaymentComponentDataDTO data,
   ) =>
-      coordinator._onSubmit(checkoutId, data);
+      runtime._onSubmit(checkoutId, data);
 
   @override
   Future<AdditionalDetailsResultDTO> onAdditionalDetails(
     String checkoutId,
     ActionComponentDataDTO data,
   ) =>
-      coordinator._onAdditionalDetails(checkoutId, data);
+      runtime._onAdditionalDetails(checkoutId, data);
 
   @override
   Future<ApplePayShippingMethodUpdateDTO> onApplePaySelectShippingMethod(
@@ -628,7 +594,7 @@ class _CheckoutCallbacksApi extends CheckoutCallbacksFlutterApi {
     ApplePayShippingMethodDTO shippingMethod,
     List<ApplePaySummaryItemDTO> currentSummaryItems,
   ) =>
-      coordinator._onApplePaySelectShippingMethod(
+      runtime._onApplePaySelectShippingMethod(
         checkoutId,
         shippingMethod,
         currentSummaryItems,
@@ -640,7 +606,7 @@ class _CheckoutCallbacksApi extends CheckoutCallbacksFlutterApi {
     ApplePayContactDTO contact,
     List<ApplePaySummaryItemDTO> currentSummaryItems,
   ) =>
-      coordinator._onApplePaySelectShippingContact(
+      runtime._onApplePaySelectShippingContact(
         checkoutId,
         contact,
         currentSummaryItems,
@@ -652,7 +618,7 @@ class _CheckoutCallbacksApi extends CheckoutCallbacksFlutterApi {
     String couponCode,
     List<ApplePaySummaryItemDTO> currentSummaryItems,
   ) =>
-      coordinator._onApplePayChangeCouponCode(
+      runtime._onApplePayChangeCouponCode(
         checkoutId,
         couponCode,
         currentSummaryItems,
@@ -663,18 +629,18 @@ class _CheckoutCallbacksApi extends CheckoutCallbacksFlutterApi {
     String checkoutId,
     ApplePayAuthorizedPaymentDTO payment,
   ) =>
-      coordinator._onApplePayAuthorize(checkoutId, payment);
+      runtime._onApplePayAuthorize(checkoutId, payment);
 }
 
 class _ActionOnlyApi extends ActionOnlyFlutterApi {
-  final CheckoutCoordinator coordinator;
+  final CheckoutRuntime runtime;
 
-  _ActionOnlyApi(this.coordinator);
+  _ActionOnlyApi(this.runtime);
 
   @override
   Future<AdditionalDetailsResultDTO> onAdditionalDetails(
     String actionId,
     ActionComponentDataDTO data,
   ) =>
-      coordinator._onActionAdditionalDetails(actionId, data);
+      runtime._onActionAdditionalDetails(actionId, data);
 }

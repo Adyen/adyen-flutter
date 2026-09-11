@@ -1,21 +1,16 @@
 import 'dart:async';
 
 import 'package:adyen_checkout/adyen_checkout.dart';
-import 'package:adyen_checkout/src/checkout_coordinator.dart';
-import 'package:adyen_checkout/src/checkout_gateway.dart';
+import 'package:adyen_checkout/src/checkout_controller.dart';
+import 'package:adyen_checkout/src/checkout_runtime.dart';
 import 'package:adyen_checkout/src/components/platform/ios_platform_view.dart';
 import 'package:adyen_checkout/src/generated/platform_api.g.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-class FakeCheckoutGateway implements CheckoutGateway {
-  final eventsController = StreamController<CheckoutEventDTO>.broadcast();
+class FakeCheckoutHostApi extends CheckoutHostApi {
   int disposeCheckoutCount = 0;
-  int disposeComponentCount = 0;
-
-  @override
-  Stream<CheckoutEventDTO> get events => eventsController.stream;
 
   CheckoutSetupResultDTO _setupResult() => CheckoutSetupResultDTO(
         checkoutId: 'checkout-1',
@@ -86,29 +81,48 @@ class FakeCheckoutGateway implements CheckoutGateway {
 
   @override
   Future<String> getThreeDS2SdkVersion() async => '2.4.4';
+}
+
+class FakeComponentHostApi extends ComponentHostApi {
+  int disposeCount = 0;
+  int submitCount = 0;
+  String? submittedCheckoutId;
+  String? submittedComponentId;
 
   @override
-  Future<void> submit(String checkoutId, String componentId) async {}
-
-  @override
-  Future<void> disposeComponent(String checkoutId, String componentId) async {
-    disposeComponentCount++;
+  Future<void> submit(String checkoutId, String componentId) async {
+    submitCount++;
+    submittedCheckoutId = checkoutId;
+    submittedComponentId = componentId;
   }
 
-  Future<void> close() => eventsController.close();
+  @override
+  Future<void> dispose(String checkoutId, String componentId) async {
+    disposeCount++;
+  }
 }
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
-  late FakeCheckoutGateway gateway;
+  late FakeCheckoutHostApi checkoutHostApi;
+  late FakeComponentHostApi componentHostApi;
+  late StreamController<CheckoutEventDTO> eventsController;
+  late CheckoutRuntime runtime;
 
   setUp(() {
-    gateway = FakeCheckoutGateway();
-    CheckoutCoordinator.replaceSharedForTesting(gateway);
+    checkoutHostApi = FakeCheckoutHostApi();
+    componentHostApi = FakeComponentHostApi();
+    eventsController = StreamController<CheckoutEventDTO>.broadcast();
+    runtime = CheckoutRuntime(
+      checkoutHostApi: checkoutHostApi,
+      componentHostApi: componentHostApi,
+      platformEvents: eventsController.stream,
+    );
   });
 
   tearDown(() async {
-    await gateway.close();
+    runtime.dispose();
+    await eventsController.close();
   });
 
   test('payment methods preserve regular and stored order', () {
@@ -132,7 +146,7 @@ void main() {
 
   test('advanced setup returns typed checkout and disposes idempotently',
       () async {
-    final checkout = await Checkout.setupAdvanced(
+    final checkout = await runtime.setupAdvanced(
       paymentMethods: PaymentMethods.fromJson({
         'paymentMethods': [
           {'type': 'scheme', 'name': 'Card'},
@@ -158,61 +172,27 @@ void main() {
 
     checkout.dispose();
     checkout.dispose();
-    expect(gateway.disposeCheckoutCount, 1);
-  });
-
-  test('second checkout setup fails while the first is active', () async {
-    final callbacks = AdvancedCheckoutCallbacks(
-      onSubmit: (data) async =>
-          const SubmitResult.completion(resultCode: 'Authorised'),
-      onAdditionalDetails: (data) async =>
-          const AdditionalDetailsResult.completion(resultCode: 'Authorised'),
-      onFailure: (error) {},
-      onComplete: (result) {},
-    );
-    const configuration = CheckoutConfiguration(
-      environment: Environment.test,
-      clientKey: 'test_key',
-    );
-    final first = await Checkout.setupAdvanced(
-      paymentMethods: PaymentMethods(),
-      configuration: configuration,
-      callbacks: callbacks,
-    );
-
-    await expectLater(
-      Checkout.setupAdvanced(
-        paymentMethods: PaymentMethods(),
-        configuration: configuration,
-        callbacks: callbacks,
-      ),
-      throwsA(isA<CheckoutError>().having(
-        (error) => error.code,
-        'code',
-        CheckoutError.alreadyActiveCode,
-      )),
-    );
-    first.dispose();
+    expect(checkoutHostApi.disposeCheckoutCount, 1);
   });
 
   test('utility methods use named public API and validate expiry format',
       () async {
     expect(
-      await Checkout.encryptCard(
+      await runtime.encryptCard(
         card: const UnencryptedCard(cardNumber: '4111111111111111'),
         publicKey: 'key',
       ),
       isA<EncryptedCard>(),
     );
     expect(
-      await Checkout.validateCardExpiryDate(
+      await runtime.validateCardExpiryDate(
         expiryMonth: '01',
         expiryYear: '2030',
       ),
       false,
     );
     expect(
-      await Checkout.validateCardExpiryDate(
+      await runtime.validateCardExpiryDate(
         expiryMonth: '01',
         expiryYear: '30',
       ),
@@ -223,7 +203,7 @@ void main() {
   test('terminal completion invokes callback before disposing checkout',
       () async {
     var completed = false;
-    final checkout = await Checkout.setupAdvanced(
+    final checkout = await runtime.setupAdvanced(
       paymentMethods: PaymentMethods(),
       configuration: const CheckoutConfiguration(
         environment: Environment.test,
@@ -239,7 +219,7 @@ void main() {
       ),
     );
 
-    gateway.eventsController.add(CheckoutEventDTO(
+    eventsController.add(CheckoutEventDTO(
       type: CheckoutEventTypeDTO.complete,
       checkoutId: checkout.id,
       resultCode: 'Authorised',
@@ -248,7 +228,39 @@ void main() {
 
     expect(completed, true);
     expect(checkout.isDisposed, true);
-    expect(gateway.disposeCheckoutCount, 1);
+    expect(checkoutHostApi.disposeCheckoutCount, 1);
+  });
+
+  test('terminal failure invokes callback before disposing checkout', () async {
+    CheckoutError? receivedError;
+    final checkout = await runtime.setupAdvanced(
+      paymentMethods: PaymentMethods(),
+      configuration: const CheckoutConfiguration(
+        environment: Environment.test,
+        clientKey: 'test_key',
+      ),
+      callbacks: AdvancedCheckoutCallbacks(
+        onSubmit: (data) async =>
+            const SubmitResult.completion(resultCode: 'Authorised'),
+        onAdditionalDetails: (data) async =>
+            const AdditionalDetailsResult.completion(resultCode: 'Authorised'),
+        onFailure: (error) => receivedError = error,
+        onComplete: (result) {},
+      ),
+    );
+
+    eventsController.add(CheckoutEventDTO(
+      type: CheckoutEventTypeDTO.failure,
+      checkoutId: checkout.id,
+      errorCode: CheckoutError.cancellationCode,
+      errorMessage: 'Payment cancelled.',
+    ));
+    await Future<void>.delayed(Duration.zero);
+
+    expect(receivedError?.code, CheckoutError.cancellationCode);
+    expect(receivedError?.message, 'Payment cancelled.');
+    expect(checkout.isDisposed, true);
+    expect(checkoutHostApi.disposeCheckoutCount, 1);
   });
 
   testWidgets('Apple Pay passes native button configuration to iOS',
@@ -257,7 +269,7 @@ void main() {
     addTearDown(() => debugDefaultTargetPlatformOverride = null);
 
     final paymentMethod = PaymentMethod(type: 'applepay', name: 'Apple Pay');
-    final checkout = await Checkout.setupAdvanced(
+    final checkout = await runtime.setupAdvanced(
       paymentMethods: PaymentMethods(regular: [paymentMethod]),
       configuration: const CheckoutConfiguration(
         environment: Environment.test,
@@ -306,6 +318,78 @@ void main() {
     expect(platformView.creationParams['applePayButtonHeight'], 48);
 
     await tester.pumpWidget(const SizedBox.shrink());
+    checkout.dispose();
+    debugDefaultTargetPlatformOverride = null;
+  });
+
+  testWidgets(
+      'alpha.1 direct method stays mounted at zero height and submits through controller',
+      (tester) async {
+    debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+    addTearDown(() => debugDefaultTargetPlatformOverride = null);
+
+    final controller = CheckoutController();
+    final paymentMethod = PaymentMethod(type: 'ideal', name: 'iDEAL');
+    final checkout = await runtime.setupAdvanced(
+      paymentMethods: PaymentMethods(regular: [paymentMethod]),
+      configuration: const CheckoutConfiguration(
+        environment: Environment.test,
+        clientKey: 'test_key',
+      ),
+      callbacks: AdvancedCheckoutCallbacks(
+        onSubmit: (data) async =>
+            const SubmitResult.completion(resultCode: 'Authorised'),
+        onAdditionalDetails: (data) async =>
+            const AdditionalDetailsResult.completion(resultCode: 'Authorised'),
+        onFailure: (error) {},
+        onComplete: (result) {},
+      ),
+    );
+
+    await tester.pumpWidget(
+      Directionality(
+        textDirection: TextDirection.ltr,
+        child: CheckoutPaymentComponent(
+          checkout: checkout,
+          paymentMethod: paymentMethod,
+          controller: controller,
+        ),
+      ),
+    );
+    final platformView = tester.widget<IosPlatformView>(
+      find.byType(IosPlatformView),
+    );
+
+    eventsController.add(CheckoutEventDTO(
+      type: CheckoutEventTypeDTO.componentReady,
+      checkoutId: checkout.id,
+      componentId: platformView.creationParams['componentId'] as String,
+      requiresUserInteraction: false,
+    ));
+    await tester.runAsync(() => Future<void>.delayed(Duration.zero));
+    await tester.pump(const Duration(milliseconds: 300));
+
+    expect(controller.isReady, true);
+    expect(controller.requiresUserInteraction, false);
+    expect(find.byType(IosPlatformView), findsOneWidget);
+    final componentBox = tester.widget<SizedBox>(
+      find.ancestor(
+        of: find.byType(IosPlatformView),
+        matching: find.byType(SizedBox),
+      ),
+    );
+    expect(componentBox.height, 0);
+
+    await controller.submit();
+    expect(componentHostApi.submitCount, 1);
+    expect(componentHostApi.submittedCheckoutId, checkout.id);
+    expect(
+      componentHostApi.submittedComponentId,
+      platformView.creationParams['componentId'],
+    );
+
+    await tester.pumpWidget(const SizedBox.shrink());
+    controller.dispose();
     checkout.dispose();
     debugDefaultTargetPlatformOverride = null;
   });

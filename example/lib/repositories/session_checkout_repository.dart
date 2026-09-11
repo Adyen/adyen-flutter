@@ -11,11 +11,11 @@ class SessionCheckoutRepository {
   String get channel =>
       defaultTargetPlatform == TargetPlatform.iOS ? 'iOS' : 'Android';
 
-  String determineReturnUrl() {
-    if (defaultTargetPlatform == TargetPlatform.android) {
-      return 'adyencheckout://com.adyen.checkout.flutter.example/adyenPayment';
+  String determineReturnUrl({TargetPlatform? platform}) {
+    if ((platform ?? defaultTargetPlatform) == TargetPlatform.android) {
+      return Config.androidReturnUrl;
     }
-    return 'com.mydomain.adyencheckout://adyenPayment';
+    return Config.iosReturnUrl;
   }
 
   CheckoutConfiguration buildConfiguration() => const CheckoutConfiguration(
@@ -48,6 +48,7 @@ class SessionCheckoutRepository {
       'countryCode': Config.countryCode,
       'shopperLocale': Config.shopperLocale,
       'returnUrl': determineReturnUrl(),
+      'lineItems': Config.lineItems,
       'reference': 'flutter-session-${DateTime.now().millisecondsSinceEpoch}',
       'channel': channel,
     });
@@ -58,7 +59,7 @@ class SessionCheckoutRepository {
     required SessionCheckoutCallbacks callbacks,
   }) async {
     final sessionResponse = await createSessionResponse();
-    return Checkout.setup(
+    return Checkout.instance.setup(
       sessionResponse: sessionResponse,
       configuration: buildConfiguration(),
       callbacks: callbacks,

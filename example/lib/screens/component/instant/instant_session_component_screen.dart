@@ -1,27 +1,25 @@
 import 'package:adyen_checkout/adyen_checkout.dart';
 import 'package:adyen_checkout_example/repositories/session_checkout_repository.dart';
 import 'package:adyen_checkout_example/screens/component/instant/component_submit_button.dart';
+import 'package:adyen_checkout_example/screens/component/instant/instant_payment_methods.dart';
 import 'package:adyen_checkout_example/utils/dialog_builder.dart';
-import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 
-class SessionComponentScreen extends StatefulWidget {
+class InstantSessionComponentScreen extends StatefulWidget {
   final SessionCheckoutRepository repository;
-  final String title;
-  final String txVariant;
 
-  const SessionComponentScreen({
+  const InstantSessionComponentScreen({
     required this.repository,
-    required this.title,
-    required this.txVariant,
     super.key,
   });
 
   @override
-  State<SessionComponentScreen> createState() => _SessionComponentScreenState();
+  State<InstantSessionComponentScreen> createState() =>
+      _InstantSessionComponentScreenState();
 }
 
-class _SessionComponentScreenState extends State<SessionComponentScreen> {
+class _InstantSessionComponentScreenState
+    extends State<InstantSessionComponentScreen> {
   SessionCheckout? _checkout;
   bool _loading = true;
 
@@ -38,8 +36,6 @@ class _SessionComponentScreenState extends State<SessionComponentScreen> {
   }
 
   Future<void> _setupCheckout() async {
-    setState(() => _loading = true);
-
     try {
       final checkout = await widget.repository.setupCheckout(
         callbacks: SessionCheckoutCallbacks(
@@ -57,7 +53,7 @@ class _SessionComponentScreenState extends State<SessionComponentScreen> {
         _loading = false;
       });
     } catch (error, stackTrace) {
-      debugPrint('Failed to set up ${widget.title} session component: $error');
+      debugPrint('Failed to set up Instant component session: $error');
       debugPrintStack(stackTrace: stackTrace);
       if (mounted) setState(() => _loading = false);
     }
@@ -84,7 +80,7 @@ class _SessionComponentScreenState extends State<SessionComponentScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('${widget.title} component session')),
+      appBar: AppBar(title: const Text('Instant component session')),
       body: SafeArea(child: _buildBody()),
     );
   }
@@ -94,19 +90,33 @@ class _SessionComponentScreenState extends State<SessionComponentScreen> {
       return const Center(child: CircularProgressIndicator());
     }
 
-    final paymentMethod = _checkout?.paymentMethods
-        .firstWhereOrNull((method) => method.type == widget.txVariant);
-    if (paymentMethod == null) {
-      debugPrint('${widget.title} payment method not found');
-      return ComponentUnavailableMessage(paymentMethodName: widget.title);
+    final checkout = _checkout;
+    if (checkout == null) {
+      return const ComponentUnavailableMessage(
+        paymentMethodName: 'Instant component',
+      );
+    }
+
+    final paymentMethods =
+        resolveInstantPaymentMethods(checkout.paymentMethods);
+    if (paymentMethods.isEmpty) {
+      return const ComponentUnavailableMessage(
+        paymentMethodName: 'Instant component',
+      );
     }
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
-      child: ControlledCheckoutPaymentComponent(
-        key: ValueKey(paymentMethod.data),
-        checkout: _checkout!,
-        paymentMethod: paymentMethod,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          for (final paymentMethod in paymentMethods)
+            ControlledCheckoutPaymentComponent(
+              key: ValueKey(paymentMethod.data),
+              checkout: checkout,
+              paymentMethod: paymentMethod,
+            ),
+        ],
       ),
     );
   }

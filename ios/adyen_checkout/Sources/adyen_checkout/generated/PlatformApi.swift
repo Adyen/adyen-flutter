@@ -1577,7 +1577,7 @@ struct CheckoutEventDTO: Hashable {
   var binValue: String? = nil
   var resultCode: String? = nil
   var sessionId: String? = nil
-  var sessionData: String? = nil
+  var sessionResult: String? = nil
   var errorCode: String? = nil
   var errorMessage: String? = nil
 
@@ -1593,7 +1593,7 @@ struct CheckoutEventDTO: Hashable {
     let binValue: String? = nilOrValue(pigeonVar_list[6])
     let resultCode: String? = nilOrValue(pigeonVar_list[7])
     let sessionId: String? = nilOrValue(pigeonVar_list[8])
-    let sessionData: String? = nilOrValue(pigeonVar_list[9])
+    let sessionResult: String? = nilOrValue(pigeonVar_list[9])
     let errorCode: String? = nilOrValue(pigeonVar_list[10])
     let errorMessage: String? = nilOrValue(pigeonVar_list[11])
 
@@ -1607,7 +1607,7 @@ struct CheckoutEventDTO: Hashable {
       binValue: binValue,
       resultCode: resultCode,
       sessionId: sessionId,
-      sessionData: sessionData,
+      sessionResult: sessionResult,
       errorCode: errorCode,
       errorMessage: errorMessage
     )
@@ -1623,7 +1623,7 @@ struct CheckoutEventDTO: Hashable {
       binValue,
       resultCode,
       sessionId,
-      sessionData,
+      sessionResult,
       errorCode,
       errorMessage,
     ]
