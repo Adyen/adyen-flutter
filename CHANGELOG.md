@@ -1,13 +1,13 @@
-## 1.13.0 (in development)
+## 1.13.0
 
 ### Improved
 
+- Improved accessibility for Drop-in on iOS by presenting it in a dedicated window instead from the
+  FlutterViewController, keeping Full Keyboard Access focus within the native payment interface.
 - For Drop-in on iOS: simplified stored payment method deletion handling by consolidating duplicated
   internal delegates.
 - For Drop-in on iOS: reorganized internal delegate implementations into focused files to improve
   maintainability.
-- Improved accessibility for Drop-in on iOS by presenting it in a dedicated window, keeping
-  Full Keyboard Access focus within the native payment interface.
 
 ### Changed
 
