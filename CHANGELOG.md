@@ -2,20 +2,23 @@
 
 ### Improved
 
-- Improved accessibility for Drop-in on iOS by presenting it in a dedicated window instead of from
-  the FlutterViewController, keeping Full Keyboard Access focus within the native payment
-  interface.
-- For Drop-in on iOS: simplified stored payment method deletion handling by consolidating duplicated
-  internal delegates.
-- For Drop-in on iOS: reorganized internal delegate implementations into focused files to improve
-  maintainability.
+- On iOS: For improved accessibility, Drop-in now appears in a dedicated window on top of your app
+  content instead of using `FlutterViewController`. The behavior of appearing on top of your app
+  remains unchanged. For shoppers that use Full Keyboard Access, the focus now stays inside the
+  native payment interface.
+
+- **(Internal change)** For Drop-in on iOS: The internal delegates are now simpler to maintain:
+  - Stored payment method deletion uses a single delegate instead of duplicated delegates.
+  - The delegate implementations are in separate files.
 
 ### Changed
 
-- Android: Changed the default `AdyenCheckout` theme to inherit directly from `Adyen`, preventing
-  unrelated dependencies that define `AppTheme` from causing Material widget inflation failures.
-  Apps that customize Drop-in through `AppTheme` must move those attributes to an app-level
-  `AdyenCheckout` style.
+- On Android: The default `AdyenCheckout` theme now inherits directly from the `Adyen` theme,
+  instead of from the generic `AppTheme` style. Android merges resources from every dependency, so
+  an `AppTheme` style from an unrelated dependency could replace the Adyen theme and stop the
+  payment form from rendering. If you customize Drop-in through `AppTheme`, you
+  must [move those attributes to an
+  `AdyenCheckout` style in your app resources](https://github.com/Adyen/adyen-flutter/blob/main/doc/CUSTOMIZATION.md).
 
 ## 1.12.0
 
