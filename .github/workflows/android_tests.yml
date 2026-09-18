@@ -40,11 +40,6 @@ jobs:
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@9c971963bec38e04b3d30dcc455b5382be2fdbfb # v6.3.0
-        with:
-          gradle-version: '8.14.5'
-
-      - name: Init gradle wrapper
-        run: gradle wrapper
 
       - name: Lint check
         run: ./gradlew :adyen_checkout:ktlintCheck :adyen_checkout:lintReportDebug
