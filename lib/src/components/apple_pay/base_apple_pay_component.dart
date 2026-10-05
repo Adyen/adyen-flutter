@@ -26,8 +26,6 @@ abstract class BaseApplePayComponent extends StatefulWidget {
   final Widget? unavailableWidget;
   final Widget? loadingIndicator;
   abstract final String componentId;
-  final ValueNotifier<bool> isButtonClickable = ValueNotifier<bool>(true);
-  final ValueNotifier<bool> isLoading = ValueNotifier<bool>(false);
   final SdkVersionNumberProvider _sdkVersionNumberProvider =
       SdkVersionNumberProvider.instance;
   final ComponentPlatformApi componentPlatformApi =
@@ -55,7 +53,6 @@ abstract class BaseApplePayComponent extends StatefulWidget {
   void onFinished(PaymentResultDTO? paymentResultDTO);
 
   void onResult(ComponentCommunicationModel event) {
-    isLoading.value = false;
     final paymentResult = event.paymentResult;
     switch (paymentResult?.type) {
       case PaymentResultEnum.finished:
@@ -74,14 +71,14 @@ abstract class BaseApplePayComponent extends StatefulWidget {
 
   void _onCancelledByUser() => onPaymentResult(PaymentCancelledByUser());
 
-  void onLoading() => isLoading.value = true;
-
   @override
   State<BaseApplePayComponent> createState() => _BaseApplePayComponentState();
 }
 
 class _BaseApplePayComponentState extends State<BaseApplePayComponent> {
   final ComponentFlutterApi _componentFlutterApi = ComponentFlutterApi.instance;
+  final ValueNotifier<bool> _isButtonClickable = ValueNotifier<bool>(true);
+  final ValueNotifier<bool> _isLoading = ValueNotifier<bool>(false);
   late StreamSubscription<ComponentCommunicationModel>
       _componentCommunicationStream;
   late final Future<InstantPaymentSetupResultDTO> _applePaySupportedFuture;
@@ -98,7 +95,7 @@ class _BaseApplePayComponentState extends State<BaseApplePayComponent> {
         .componentCommunicationStream.stream
         .where((communicationModel) =>
             communicationModel.componentId == widget.componentId)
-        .listen(widget.handleComponentCommunication);
+        .listen(_handleComponentCommunication);
     _applePaySupportedFuture = _isApplePaySupported();
   }
 
@@ -126,11 +123,21 @@ class _BaseApplePayComponentState extends State<BaseApplePayComponent> {
     );
   }
 
+  void _handleComponentCommunication(ComponentCommunicationModel event) {
+    _isButtonClickable.value = true;
+    if (event.type case ComponentCommunicationType.loading) {
+      _isLoading.value = true;
+    } else if (event.type case ComponentCommunicationType.result) {
+      _isLoading.value = false;
+    }
+    widget.handleComponentCommunication(event);
+  }
+
   @override
   void dispose() {
     ApplePayCallbackRegistry.instance.unregister(widget.componentId);
-    widget.isButtonClickable.dispose();
-    widget.isLoading.dispose();
+    _isButtonClickable.dispose();
+    _isLoading.dispose();
     widget.componentPlatformApi.onDispose(widget.componentId);
     _componentCommunicationStream.cancel();
     _componentFlutterApi.dispose();
@@ -146,7 +153,7 @@ class _BaseApplePayComponentState extends State<BaseApplePayComponent> {
   Widget _buildApplePayOrLoadingContainer(
       AsyncSnapshot<InstantPaymentSetupResultDTO> snapshot) {
     return ValueListenableBuilder(
-      valueListenable: widget.isLoading,
+      valueListenable: _isLoading,
       builder: (BuildContext context, value, Widget? child) {
         if (value == true) {
           return widget.loadingIndicator ?? const SizedBox.shrink();
@@ -165,7 +172,7 @@ class _BaseApplePayComponentState extends State<BaseApplePayComponent> {
       width: widget.width,
       height: widget.height,
       child: ValueListenableBuilder(
-        valueListenable: widget.isButtonClickable,
+        valueListenable: _isButtonClickable,
         builder: (BuildContext context, value, Widget? child) {
           return IgnorePointer(
             ignoring: value == false,
@@ -188,7 +195,7 @@ class _BaseApplePayComponentState extends State<BaseApplePayComponent> {
   void onPressed() async {
     final instantPaymentConfigurationDTO =
         await createInstantPaymentConfigurationDTO();
-    widget.isButtonClickable.value = false;
+    _isButtonClickable.value = false;
     widget.componentPlatformApi.onInstantPaymentPressed(
       instantPaymentConfigurationDTO,
       widget.applePayPaymentMethod,

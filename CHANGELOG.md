@@ -1,3 +1,11 @@
+## Unreleased
+
+### Fixed
+
+- For Apple Pay Component on iOS: `onSubmit` and `onPaymentResult` now always use the checkout
+  currently set on the component. Previously, after updating the component they could still refer
+  to an earlier checkout instance.
+
 ## 1.13.0
 
 ### Improved

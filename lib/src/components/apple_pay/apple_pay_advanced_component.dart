@@ -35,11 +35,8 @@ class ApplePayAdvancedComponent extends BaseApplePayComponent {
 
   @override
   void handleComponentCommunication(ComponentCommunicationModel event) {
-    isButtonClickable.value = true;
     if (event.type case ComponentCommunicationType.onSubmit) {
       _onSubmit(event);
-    } else if (event.type case ComponentCommunicationType.loading) {
-      _onLoading();
     } else if (event.type case ComponentCommunicationType.result) {
       onResult(event);
     }
@@ -74,6 +71,4 @@ class ApplePayAdvancedComponent extends BaseApplePayComponent {
       );
     }
   }
-
-  void _onLoading() => isLoading.value = true;
 }
