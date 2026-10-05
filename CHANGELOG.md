@@ -5,8 +5,8 @@
 - For Apple Pay Component on iOS: `onSubmit` and `onPaymentResult` now always use the checkout
   currently set on the component. Previously, after updating the component they could still refer
   to an earlier checkout instance.
-- For Google Pay Component on Android: updating the component no longer hides the loading indicator
-  or re-enables the button while a payment is in progress.
+- For Google Pay Component on Android: optimized the notifier lifecycle by managing notifiers
+  in the component's `State`.
 
 ## 1.13.0
 
