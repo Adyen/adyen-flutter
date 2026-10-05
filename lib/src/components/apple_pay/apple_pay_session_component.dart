@@ -29,11 +29,8 @@ class ApplePaySessionComponent extends BaseApplePayComponent {
 
   @override
   void handleComponentCommunication(event) {
-    isButtonClickable.value = true;
     if (event.type case ComponentCommunicationType.result) {
       onResult(event);
-    } else if (event.type case ComponentCommunicationType.loading) {
-      onLoading();
     }
   }
 
