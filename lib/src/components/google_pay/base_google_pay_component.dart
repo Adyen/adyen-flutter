@@ -137,10 +137,10 @@ class _BaseGooglePayComponentState extends State<BaseGooglePayComponent> {
 
   @override
   void dispose() {
+    _componentCommunicationStream.cancel();
     _isButtonClickable.dispose();
     _isLoading.dispose();
     widget.componentPlatformApi.onDispose(widget.componentId);
-    _componentCommunicationStream.cancel();
     _componentFlutterApi.dispose();
     super.dispose();
   }
@@ -217,45 +217,53 @@ class _BaseGooglePayComponentState extends State<BaseGooglePayComponent> {
   }
 
   void onPressed() async {
-    final InstantPaymentConfigurationDTO instantPaymentConfigurationDTO =
-        await _createInstantPaymentConfigurationDTO();
+    final String versionNumber =
+        await widget._sdkVersionNumberProvider.getSdkVersionNumber();
+    if (!mounted) {
+      return;
+    }
 
+    final currentWidget = widget;
+    final instantPaymentConfigurationDTO =
+        currentWidget.googlePayComponentConfiguration.toDTO(
+      versionNumber,
+      InstantPaymentType.googlePay,
+    );
     _isButtonClickable.value = false;
-    widget.componentPlatformApi.onInstantPaymentPressed(
+    currentWidget.componentPlatformApi.onInstantPaymentPressed(
       instantPaymentConfigurationDTO,
-      widget.googlePayPaymentMethod,
-      widget.componentId,
+      currentWidget.googlePayPaymentMethod,
+      currentWidget.componentId,
     );
   }
 
   Future<InstantPaymentSetupResultDTO> _isGooglePayAvailable() async {
     try {
-      final InstantPaymentConfigurationDTO instantPaymentConfigurationDTO =
-          await _createInstantPaymentConfigurationDTO();
+      final String versionNumber =
+          await widget._sdkVersionNumberProvider.getSdkVersionNumber();
+      if (!mounted) {
+        return InstantPaymentSetupResultDTO(
+          instantPaymentType: InstantPaymentType.googlePay,
+          isSupported: false,
+        );
+      }
 
+      final currentWidget = widget;
+      final instantPaymentConfigurationDTO =
+          currentWidget.googlePayComponentConfiguration.toDTO(
+        versionNumber,
+        InstantPaymentType.googlePay,
+      );
       //The availability result will be provided to the availabilityCompleter.
-      widget.componentPlatformApi.isInstantPaymentSupportedByPlatform(
+      currentWidget.componentPlatformApi.isInstantPaymentSupportedByPlatform(
         instantPaymentConfigurationDTO,
-        widget.googlePayPaymentMethod,
-        widget.componentId,
+        currentWidget.googlePayPaymentMethod,
+        currentWidget.componentId,
       );
     } catch (exception, stackTrace) {
       _availabilityCompleter.completeError(exception, stackTrace);
     }
 
     return _availabilityCompleter.future;
-  }
-
-  Future<InstantPaymentConfigurationDTO>
-      _createInstantPaymentConfigurationDTO() async {
-    final String versionNumber =
-        await widget._sdkVersionNumberProvider.getSdkVersionNumber();
-    final InstantPaymentConfigurationDTO
-        instantPaymentComponentConfigurationDTO =
-        widget.googlePayComponentConfiguration.toDTO(
-      versionNumber,
-      InstantPaymentType.googlePay,
-    );
-    return instantPaymentComponentConfigurationDTO;
   }
 }
