@@ -28,7 +28,7 @@ class ApplePaySessionComponent extends BaseApplePayComponent {
   });
 
   @override
-  void handleComponentCommunication(event) {
+  void handleComponentCommunication(ComponentCommunicationModel event) {
     if (event.type case ComponentCommunicationType.result) {
       onResult(event);
     }
