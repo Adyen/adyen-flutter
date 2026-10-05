@@ -392,7 +392,7 @@ Widget _app(
             clientKey: 'test_client_key',
             countryCode: 'NL',
             amount: Amount(value: 1000, currency: 'EUR'),
-            googlePayConfiguration: GooglePayConfiguration(
+            googlePayConfiguration: const GooglePayConfiguration(
               googlePayEnvironment: GooglePayEnvironment.test,
             ),
           ),
