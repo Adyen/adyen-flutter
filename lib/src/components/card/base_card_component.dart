@@ -43,9 +43,11 @@ abstract class BaseCardComponent extends BasePlatformViewComponent {
     }
 
     if (event.data case List<Object?> binLookupDataDTOList) {
-      onBinLookup?.call(binLookupDataDTOList
-          .whereType<BinLookupDataDTO>()
-          .toBinLookupDataList());
+      onBinLookup?.call(
+        binLookupDataDTOList
+            .whereType<BinLookupDataDTO>()
+            .toBinLookupDataList(),
+      );
     }
   }
 

@@ -6,196 +6,226 @@ import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   test(
-      'when drop in configuration is provided, then should map to DropInConfigurationDTO',
-      () {
-    const demoClientKey = "1234567890";
-    const countryCode = "US";
-    const currency = "USD";
-    const amountValue = 1286;
-    const shopperLocal = "en-US";
-    final storedPaymentMethodConfiguration = StoredPaymentMethodConfiguration(
-      showPreselectedStoredPaymentMethod: true,
-      isRemoveStoredPaymentMethodEnabled: true,
-      deleteStoredPaymentMethodCallback: (String input) => Future.value(true),
-    );
-    final dropInConfiguration = DropInConfiguration(
+    'when drop in configuration is provided, then should map to DropInConfigurationDTO',
+    () {
+      const demoClientKey = "1234567890";
+      const countryCode = "US";
+      const currency = "USD";
+      const amountValue = 1286;
+      const shopperLocal = "en-US";
+      final storedPaymentMethodConfiguration = StoredPaymentMethodConfiguration(
+        showPreselectedStoredPaymentMethod: true,
+        isRemoveStoredPaymentMethodEnabled: true,
+        deleteStoredPaymentMethodCallback: (String input) => Future.value(true),
+      );
+      final dropInConfiguration = DropInConfiguration(
         environment: Environment.test,
         clientKey: demoClientKey,
         countryCode: countryCode,
         amount: Amount(value: amountValue, currency: currency),
         shopperLocale: shopperLocal,
-        storedPaymentMethodConfiguration: storedPaymentMethodConfiguration);
+        storedPaymentMethodConfiguration: storedPaymentMethodConfiguration,
+      );
 
-    final dropInConfigurationDto = dropInConfiguration.toDTO("0.0.1", true);
+      final dropInConfigurationDto = dropInConfiguration.toDTO("0.0.1", true);
 
-    expect(dropInConfigurationDto.environment, Environment.test);
-    expect(dropInConfigurationDto.clientKey, demoClientKey);
-    expect(dropInConfigurationDto.countryCode, countryCode);
-    expect(dropInConfigurationDto.amount?.value, amountValue);
-    expect(dropInConfigurationDto.amount?.currency, currency);
-    expect(dropInConfigurationDto.amount.runtimeType == AmountDTO, true);
-    expect(dropInConfigurationDto.shopperLocale, "en-US");
-    expect(dropInConfigurationDto.cardConfigurationDTO, null);
-    expect(dropInConfigurationDto.applePayConfigurationDTO, null);
-    expect(dropInConfigurationDto.googlePayConfigurationDTO, null);
-    expect(dropInConfigurationDto.cashAppPayConfigurationDTO, null);
-    expect(dropInConfigurationDto.analyticsOptionsDTO.enabled, true);
-    expect(dropInConfigurationDto.skipListWhenSinglePaymentMethod, false);
-    expect(dropInConfigurationDto.showPreselectedStoredPaymentMethod, true);
-    expect(dropInConfigurationDto.isRemoveStoredPaymentMethodEnabled, true);
-    expect(dropInConfigurationDto.isPartialPaymentSupported, true);
-    expect(dropInConfigurationDto.showStoredPaymentMethods, true);
-  });
-
-  test(
-      'when showStoredPaymentMethods is not provided, then DTO defaults to true',
-      () {
-    final dropInConfiguration = DropInConfiguration(
-      environment: Environment.test,
-      clientKey: "test-key",
-      countryCode: "US",
-    );
-
-    final dto = dropInConfiguration.toDTO("0.0.1", false);
-
-    expect(dto.showStoredPaymentMethods, true);
-  });
+      expect(dropInConfigurationDto.environment, Environment.test);
+      expect(dropInConfigurationDto.clientKey, demoClientKey);
+      expect(dropInConfigurationDto.countryCode, countryCode);
+      expect(dropInConfigurationDto.amount?.value, amountValue);
+      expect(dropInConfigurationDto.amount?.currency, currency);
+      expect(dropInConfigurationDto.amount.runtimeType == AmountDTO, true);
+      expect(dropInConfigurationDto.shopperLocale, "en-US");
+      expect(dropInConfigurationDto.cardConfigurationDTO, null);
+      expect(dropInConfigurationDto.applePayConfigurationDTO, null);
+      expect(dropInConfigurationDto.googlePayConfigurationDTO, null);
+      expect(dropInConfigurationDto.cashAppPayConfigurationDTO, null);
+      expect(dropInConfigurationDto.analyticsOptionsDTO.enabled, true);
+      expect(dropInConfigurationDto.skipListWhenSinglePaymentMethod, false);
+      expect(dropInConfigurationDto.showPreselectedStoredPaymentMethod, true);
+      expect(dropInConfigurationDto.isRemoveStoredPaymentMethodEnabled, true);
+      expect(dropInConfigurationDto.isPartialPaymentSupported, true);
+      expect(dropInConfigurationDto.showStoredPaymentMethods, true);
+    },
+  );
 
   test(
-      'when showStoredPaymentMethods is set to false, then DTO mirrors the value',
-      () {
-    final storedPaymentMethodConfiguration = StoredPaymentMethodConfiguration(
-      showStoredPaymentMethods: false,
-    );
-    final dropInConfiguration = DropInConfiguration(
-      environment: Environment.test,
-      clientKey: "test-key",
-      countryCode: "US",
-      storedPaymentMethodConfiguration: storedPaymentMethodConfiguration,
-    );
+    'when showStoredPaymentMethods is not provided, then DTO defaults to true',
+    () {
+      final dropInConfiguration = DropInConfiguration(
+        environment: Environment.test,
+        clientKey: "test-key",
+        countryCode: "US",
+      );
 
-    final dto = dropInConfiguration.toDTO("0.0.1", false);
+      final dto = dropInConfiguration.toDTO("0.0.1", false);
 
-    expect(dto.showStoredPaymentMethods, false);
-  });
+      expect(dto.showStoredPaymentMethods, true);
+    },
+  );
 
   test(
-      'when showStoredPaymentMethods is set to true, then DTO mirrors the value',
-      () {
-    final storedPaymentMethodConfiguration = StoredPaymentMethodConfiguration(
-      showStoredPaymentMethods: true,
-    );
-    final dropInConfiguration = DropInConfiguration(
-      environment: Environment.test,
-      clientKey: "test-key",
-      countryCode: "US",
-      storedPaymentMethodConfiguration: storedPaymentMethodConfiguration,
-    );
+    'when showStoredPaymentMethods is set to false, then DTO mirrors the value',
+    () {
+      final storedPaymentMethodConfiguration = StoredPaymentMethodConfiguration(
+        showStoredPaymentMethods: false,
+      );
+      final dropInConfiguration = DropInConfiguration(
+        environment: Environment.test,
+        clientKey: "test-key",
+        countryCode: "US",
+        storedPaymentMethodConfiguration: storedPaymentMethodConfiguration,
+      );
 
-    final dto = dropInConfiguration.toDTO("0.0.1", false);
+      final dto = dropInConfiguration.toDTO("0.0.1", false);
 
-    expect(dto.showStoredPaymentMethods, true);
-  });
-
-  test(
-      "when using card configuration, then should parse to CardConfigurationDTO",
-      () {
-    const cardConfiguration = CardConfiguration(
-      holderNameRequired: true,
-      addressMode: AddressMode.full,
-      showStorePaymentField: true,
-      showCvcForStoredCard: true,
-      showCvc: true,
-      kcpFieldVisibility: FieldVisibility.hide,
-      socialSecurityNumberFieldVisibility: FieldVisibility.show,
-      supportedCardTypes: ["amex"],
-    );
-
-    final cardConfigurationDTO = cardConfiguration.toDTO();
-
-    expect(cardConfigurationDTO.holderNameRequired, true);
-    expect(cardConfigurationDTO.addressMode, AddressMode.full);
-    expect(cardConfigurationDTO.showStorePaymentField, true);
-    expect(cardConfigurationDTO.showCvcForStoredCard, true);
-    expect(cardConfigurationDTO.showCvc, true);
-    expect(cardConfigurationDTO.kcpFieldVisibility, FieldVisibility.hide);
-    expect(cardConfigurationDTO.socialSecurityNumberFieldVisibility,
-        FieldVisibility.show);
-    expect(cardConfigurationDTO.supportedCardTypes, ["amex"]);
-  });
+      expect(dto.showStoredPaymentMethods, false);
+    },
+  );
 
   test(
-      "when using google pay configuration, then should parse to GooglePayConfigurationDTO",
-      () {
-    final googlePayConfiguration = GooglePayConfiguration(
-      googlePayEnvironment: GooglePayEnvironment.production,
-      merchantAccount: "GOOGLE_PAY_MERCHANT_ACCOUNT",
-      merchantInfo: MerchantInfo(
-        merchantName: "GOOGLE_PAY_MERCHANT_NAME",
-        merchantId: "GOOGLE_PAY_MERCHANT_ID",
-      ),
-      totalPriceStatus: TotalPriceStatus.finalPrice,
-      allowedCardNetworks: ["AMEX", "DISCOVER", "MASTERCARD", "VISA"],
-      allowedAuthMethods: [CardAuthMethod.cryptogram3DS],
-      allowPrepaidCards: true,
-      allowCreditCards: true,
-      assuranceDetailsRequired: false,
-      emailRequired: true,
-      existingPaymentMethodRequired: true,
-      shippingAddressRequired: true,
-      shippingAddressParameters: ShippingAddressParameters(
-        allowedCountryCodes: ["NL"],
-        isPhoneNumberRequired: true,
-      ),
-      billingAddressRequired: true,
-      billingAddressParameters:
-          BillingAddressParameters(format: "MIN", isPhoneNumberRequired: false),
-    );
+    'when showStoredPaymentMethods is set to true, then DTO mirrors the value',
+    () {
+      final storedPaymentMethodConfiguration = StoredPaymentMethodConfiguration(
+        showStoredPaymentMethods: true,
+      );
+      final dropInConfiguration = DropInConfiguration(
+        environment: Environment.test,
+        clientKey: "test-key",
+        countryCode: "US",
+        storedPaymentMethodConfiguration: storedPaymentMethodConfiguration,
+      );
 
-    final googlePayConfigurationDTO = googlePayConfiguration.toDTO();
+      final dto = dropInConfiguration.toDTO("0.0.1", false);
 
-    expect(googlePayConfigurationDTO.googlePayEnvironment,
-        GooglePayEnvironment.production);
-    expect(googlePayConfigurationDTO.merchantAccount,
-        "GOOGLE_PAY_MERCHANT_ACCOUNT");
-    expect(googlePayConfigurationDTO.merchantInfoDTO?.merchantId,
-        "GOOGLE_PAY_MERCHANT_ID");
-    expect(googlePayConfigurationDTO.merchantInfoDTO?.merchantName,
-        "GOOGLE_PAY_MERCHANT_NAME");
-    expect(googlePayConfigurationDTO.totalPriceStatus,
-        TotalPriceStatus.finalPrice);
-    expect(googlePayConfigurationDTO.allowedCardNetworks,
-        ["AMEX", "DISCOVER", "MASTERCARD", "VISA"]);
-    expect(googlePayConfigurationDTO.allowedAuthMethods, ["cryptogram3DS"]);
-    expect(googlePayConfigurationDTO.allowPrepaidCards, true);
-    expect(googlePayConfigurationDTO.allowCreditCards, true);
-    expect(googlePayConfigurationDTO.assuranceDetailsRequired, false);
-    expect(googlePayConfigurationDTO.emailRequired, true);
-    expect(googlePayConfigurationDTO.existingPaymentMethodRequired, true);
-    expect(googlePayConfigurationDTO.shippingAddressRequired, true);
-    expect(
+      expect(dto.showStoredPaymentMethods, true);
+    },
+  );
+
+  test(
+    "when using card configuration, then should parse to CardConfigurationDTO",
+    () {
+      const cardConfiguration = CardConfiguration(
+        holderNameRequired: true,
+        addressMode: AddressMode.full,
+        showStorePaymentField: true,
+        showCvcForStoredCard: true,
+        showCvc: true,
+        kcpFieldVisibility: FieldVisibility.hide,
+        socialSecurityNumberFieldVisibility: FieldVisibility.show,
+        supportedCardTypes: ["amex"],
+      );
+
+      final cardConfigurationDTO = cardConfiguration.toDTO();
+
+      expect(cardConfigurationDTO.holderNameRequired, true);
+      expect(cardConfigurationDTO.addressMode, AddressMode.full);
+      expect(cardConfigurationDTO.showStorePaymentField, true);
+      expect(cardConfigurationDTO.showCvcForStoredCard, true);
+      expect(cardConfigurationDTO.showCvc, true);
+      expect(cardConfigurationDTO.kcpFieldVisibility, FieldVisibility.hide);
+      expect(
+        cardConfigurationDTO.socialSecurityNumberFieldVisibility,
+        FieldVisibility.show,
+      );
+      expect(cardConfigurationDTO.supportedCardTypes, ["amex"]);
+    },
+  );
+
+  test(
+    "when using google pay configuration, then should parse to GooglePayConfigurationDTO",
+    () {
+      final googlePayConfiguration = GooglePayConfiguration(
+        googlePayEnvironment: GooglePayEnvironment.production,
+        merchantAccount: "GOOGLE_PAY_MERCHANT_ACCOUNT",
+        merchantInfo: MerchantInfo(
+          merchantName: "GOOGLE_PAY_MERCHANT_NAME",
+          merchantId: "GOOGLE_PAY_MERCHANT_ID",
+        ),
+        totalPriceStatus: TotalPriceStatus.finalPrice,
+        allowedCardNetworks: ["AMEX", "DISCOVER", "MASTERCARD", "VISA"],
+        allowedAuthMethods: [CardAuthMethod.cryptogram3DS],
+        allowPrepaidCards: true,
+        allowCreditCards: true,
+        assuranceDetailsRequired: false,
+        emailRequired: true,
+        existingPaymentMethodRequired: true,
+        shippingAddressRequired: true,
+        shippingAddressParameters: ShippingAddressParameters(
+          allowedCountryCodes: ["NL"],
+          isPhoneNumberRequired: true,
+        ),
+        billingAddressRequired: true,
+        billingAddressParameters: BillingAddressParameters(
+          format: "MIN",
+          isPhoneNumberRequired: false,
+        ),
+      );
+
+      final googlePayConfigurationDTO = googlePayConfiguration.toDTO();
+
+      expect(
+        googlePayConfigurationDTO.googlePayEnvironment,
+        GooglePayEnvironment.production,
+      );
+      expect(
+        googlePayConfigurationDTO.merchantAccount,
+        "GOOGLE_PAY_MERCHANT_ACCOUNT",
+      );
+      expect(
+        googlePayConfigurationDTO.merchantInfoDTO?.merchantId,
+        "GOOGLE_PAY_MERCHANT_ID",
+      );
+      expect(
+        googlePayConfigurationDTO.merchantInfoDTO?.merchantName,
+        "GOOGLE_PAY_MERCHANT_NAME",
+      );
+      expect(
+        googlePayConfigurationDTO.totalPriceStatus,
+        TotalPriceStatus.finalPrice,
+      );
+      expect(googlePayConfigurationDTO.allowedCardNetworks, [
+        "AMEX",
+        "DISCOVER",
+        "MASTERCARD",
+        "VISA",
+      ]);
+      expect(googlePayConfigurationDTO.allowedAuthMethods, ["cryptogram3DS"]);
+      expect(googlePayConfigurationDTO.allowPrepaidCards, true);
+      expect(googlePayConfigurationDTO.allowCreditCards, true);
+      expect(googlePayConfigurationDTO.assuranceDetailsRequired, false);
+      expect(googlePayConfigurationDTO.emailRequired, true);
+      expect(googlePayConfigurationDTO.existingPaymentMethodRequired, true);
+      expect(googlePayConfigurationDTO.shippingAddressRequired, true);
+      expect(
         googlePayConfigurationDTO
             .shippingAddressParametersDTO?.allowedCountryCodes,
-        ["NL"]);
-    expect(
+        ["NL"],
+      );
+      expect(
         googlePayConfigurationDTO
             .shippingAddressParametersDTO?.isPhoneNumberRequired,
-        true);
-    expect(googlePayConfigurationDTO.billingAddressRequired, true);
-    expect(
-        googlePayConfigurationDTO.billingAddressParametersDTO?.format, "MIN");
-    expect(
+        true,
+      );
+      expect(googlePayConfigurationDTO.billingAddressRequired, true);
+      expect(
+        googlePayConfigurationDTO.billingAddressParametersDTO?.format,
+        "MIN",
+      );
+      expect(
         googlePayConfigurationDTO
             .billingAddressParametersDTO?.isPhoneNumberRequired,
-        false);
-  });
+        false,
+      );
+    },
+  );
 
   test(
-      "when using apple pay configuration, then should parse to ApplePayConfigurationDTO",
-      () {
-    final shippingStartDate = DateTime.now();
-    final shippingEndDate = shippingStartDate.add(const Duration(days: 5));
-    final applePayConfiguration = ApplePayConfiguration(
+    "when using apple pay configuration, then should parse to ApplePayConfigurationDTO",
+    () {
+      final shippingStartDate = DateTime.now();
+      final shippingEndDate = shippingStartDate.add(const Duration(days: 5));
+      final applePayConfiguration = ApplePayConfiguration(
         merchantId: "APPLE_PAY_MERCHANT_ID",
         merchantName: "APPLE_PAY_MERCHANT_NAME",
         allowOnboarding: true,
@@ -204,7 +234,7 @@ void main() {
             label: "Product A",
             amount: Amount(value: 2599, currency: "EUR"),
             type: ApplePaySummaryItemType.definite,
-          )
+          ),
         ],
         requiredBillingContactFields: [
           ApplePayContactField.emailAddress,
@@ -232,7 +262,7 @@ void main() {
             identifier: "Identifier 1",
             startDate: shippingStartDate,
             endDate: shippingEndDate,
-          )
+          ),
         ],
         applicationData: null,
         supportedCountries: ["NL"],
@@ -240,353 +270,437 @@ void main() {
         supportsCouponCode: true,
         couponCode: "SUMMER10",
         onSelectShippingMethod: (method, currentSummaryItems) async =>
-            ApplePayShippingMethodUpdate(
-              summaryItems: currentSummaryItems,
-            ),
+            ApplePayShippingMethodUpdate(summaryItems: currentSummaryItems),
         onSelectShippingContact: (contact, currentSummaryItems) async =>
-            ApplePayShippingContactUpdate(
-              summaryItems: currentSummaryItems,
-            ),
+            ApplePayShippingContactUpdate(summaryItems: currentSummaryItems),
         onChangeCouponCode: (couponCode, currentSummaryItems) async =>
-            ApplePayCouponCodeUpdate(
-              summaryItems: currentSummaryItems,
-            ),
+            ApplePayCouponCodeUpdate(summaryItems: currentSummaryItems),
         onAuthorize: (payment) async =>
-            const ApplePayAuthorizationResult.success());
+            const ApplePayAuthorizationResult.success(),
+      );
 
-    final applePayConfigurationDTO = applePayConfiguration.toDTO();
+      final applePayConfigurationDTO = applePayConfiguration.toDTO();
 
-    expect(applePayConfigurationDTO.merchantId, "APPLE_PAY_MERCHANT_ID");
-    expect(applePayConfigurationDTO.merchantName, "APPLE_PAY_MERCHANT_NAME");
-    expect(applePayConfigurationDTO.allowOnboarding, true);
-    expect(
-        applePayConfigurationDTO.summaryItems?.firstOrNull?.label, "Product A");
-    expect(
-        applePayConfigurationDTO.summaryItems?.firstOrNull?.amount.value, 2599);
-    expect(applePayConfigurationDTO.summaryItems?.firstOrNull?.amount.currency,
-        "EUR");
-    expect(applePayConfigurationDTO.summaryItems?.firstOrNull?.type,
-        ApplePaySummaryItemType.definite);
-    expect(applePayConfigurationDTO.requiredBillingContactFields, [
-      "emailAddress",
-      "phoneNumber",
-    ]);
-    expect(applePayConfigurationDTO.billingContact?.emailAddress,
-        "flutterTest@adyen.com");
-    expect(applePayConfigurationDTO.billingContact?.phoneNumber, "0123456789");
-    expect(applePayConfigurationDTO.requiredShippingContactFields, [
-      "emailAddress",
-      "phoneNumber",
-    ]);
-    expect(applePayConfigurationDTO.shippingContact?.emailAddress,
-        "flutterTest@adyen.com");
-    expect(applePayConfigurationDTO.shippingContact?.phoneNumber, "9876543210");
-    expect(applePayConfigurationDTO.applePayShippingType,
-        ApplePayShippingType.servicePickup);
-    expect(applePayConfigurationDTO.allowShippingContactEditing, true);
-    expect(applePayConfigurationDTO.shippingMethods?.firstOrNull?.label,
-        "Standard shipping");
-    expect(
-        applePayConfigurationDTO.shippingMethods?.firstOrNull?.detail, "DHL");
-    expect(applePayConfigurationDTO.shippingMethods?.firstOrNull?.amount.value,
-        499);
-    expect(
+      expect(applePayConfigurationDTO.merchantId, "APPLE_PAY_MERCHANT_ID");
+      expect(applePayConfigurationDTO.merchantName, "APPLE_PAY_MERCHANT_NAME");
+      expect(applePayConfigurationDTO.allowOnboarding, true);
+      expect(
+        applePayConfigurationDTO.summaryItems?.firstOrNull?.label,
+        "Product A",
+      );
+      expect(
+        applePayConfigurationDTO.summaryItems?.firstOrNull?.amount.value,
+        2599,
+      );
+      expect(
+        applePayConfigurationDTO.summaryItems?.firstOrNull?.amount.currency,
+        "EUR",
+      );
+      expect(
+        applePayConfigurationDTO.summaryItems?.firstOrNull?.type,
+        ApplePaySummaryItemType.definite,
+      );
+      expect(applePayConfigurationDTO.requiredBillingContactFields, [
+        "emailAddress",
+        "phoneNumber",
+      ]);
+      expect(
+        applePayConfigurationDTO.billingContact?.emailAddress,
+        "flutterTest@adyen.com",
+      );
+      expect(
+        applePayConfigurationDTO.billingContact?.phoneNumber,
+        "0123456789",
+      );
+      expect(applePayConfigurationDTO.requiredShippingContactFields, [
+        "emailAddress",
+        "phoneNumber",
+      ]);
+      expect(
+        applePayConfigurationDTO.shippingContact?.emailAddress,
+        "flutterTest@adyen.com",
+      );
+      expect(
+        applePayConfigurationDTO.shippingContact?.phoneNumber,
+        "9876543210",
+      );
+      expect(
+        applePayConfigurationDTO.applePayShippingType,
+        ApplePayShippingType.servicePickup,
+      );
+      expect(applePayConfigurationDTO.allowShippingContactEditing, true);
+      expect(
+        applePayConfigurationDTO.shippingMethods?.firstOrNull?.label,
+        "Standard shipping",
+      );
+      expect(
+        applePayConfigurationDTO.shippingMethods?.firstOrNull?.detail,
+        "DHL",
+      );
+      expect(
+        applePayConfigurationDTO.shippingMethods?.firstOrNull?.amount.value,
+        499,
+      );
+      expect(
         applePayConfigurationDTO.shippingMethods?.firstOrNull?.amount.currency,
-        "EUR");
-    expect(applePayConfigurationDTO.shippingMethods?.firstOrNull?.identifier,
-        "Identifier 1");
-    expect(applePayConfigurationDTO.shippingMethods?.firstOrNull?.startDate,
-        shippingStartDate.toUtc().toIso8601String());
-    expect(applePayConfigurationDTO.shippingMethods?.firstOrNull?.endDate,
-        shippingEndDate.toUtc().toIso8601String());
-    expect(applePayConfigurationDTO.applicationData, null);
-    expect(applePayConfigurationDTO.supportedCountries, ["NL"]);
-    expect(applePayConfigurationDTO.merchantCapability,
-        ApplePayMerchantCapability.debit);
-    expect(applePayConfigurationDTO.supportsCouponCode, true);
-    expect(applePayConfigurationDTO.couponCode, "SUMMER10");
-    expect(applePayConfigurationDTO.hasOnSelectShippingMethod, true);
-    expect(applePayConfigurationDTO.hasOnSelectShippingContact, true);
-    expect(applePayConfigurationDTO.hasOnChangeCouponCode, true);
-    expect(applePayConfigurationDTO.hasOnAuthorize, true);
-  });
+        "EUR",
+      );
+      expect(
+        applePayConfigurationDTO.shippingMethods?.firstOrNull?.identifier,
+        "Identifier 1",
+      );
+      expect(
+        applePayConfigurationDTO.shippingMethods?.firstOrNull?.startDate,
+        shippingStartDate.toUtc().toIso8601String(),
+      );
+      expect(
+        applePayConfigurationDTO.shippingMethods?.firstOrNull?.endDate,
+        shippingEndDate.toUtc().toIso8601String(),
+      );
+      expect(applePayConfigurationDTO.applicationData, null);
+      expect(applePayConfigurationDTO.supportedCountries, ["NL"]);
+      expect(
+        applePayConfigurationDTO.merchantCapability,
+        ApplePayMerchantCapability.debit,
+      );
+      expect(applePayConfigurationDTO.supportsCouponCode, true);
+      expect(applePayConfigurationDTO.couponCode, "SUMMER10");
+      expect(applePayConfigurationDTO.hasOnSelectShippingMethod, true);
+      expect(applePayConfigurationDTO.hasOnSelectShippingContact, true);
+      expect(applePayConfigurationDTO.hasOnChangeCouponCode, true);
+      expect(applePayConfigurationDTO.hasOnAuthorize, true);
+    },
+  );
 
   test(
-      "when using apple pay configuration without shipping callbacks, then should map callback flags to false",
-      () {
-    final applePayConfiguration = ApplePayConfiguration(
-      merchantId: "APPLE_PAY_MERCHANT_ID",
-      merchantName: "APPLE_PAY_MERCHANT_NAME",
-    );
+    "when using apple pay configuration without shipping callbacks, then should map callback flags to false",
+    () {
+      final applePayConfiguration = ApplePayConfiguration(
+        merchantId: "APPLE_PAY_MERCHANT_ID",
+        merchantName: "APPLE_PAY_MERCHANT_NAME",
+      );
 
-    final applePayConfigurationDTO = applePayConfiguration.toDTO();
+      final applePayConfigurationDTO = applePayConfiguration.toDTO();
 
-    expect(applePayConfigurationDTO.hasOnSelectShippingMethod, false);
-    expect(applePayConfigurationDTO.hasOnSelectShippingContact, false);
-    expect(applePayConfigurationDTO.hasOnChangeCouponCode, false);
-    expect(applePayConfigurationDTO.hasOnAuthorize, false);
-  });
+      expect(applePayConfigurationDTO.hasOnSelectShippingMethod, false);
+      expect(applePayConfigurationDTO.hasOnSelectShippingContact, false);
+      expect(applePayConfigurationDTO.hasOnChangeCouponCode, false);
+      expect(applePayConfigurationDTO.hasOnAuthorize, false);
+    },
+  );
 
   test(
-      "when using apple pay shipping method update, then should parse to ApplePayShippingMethodUpdateDTO",
-      () {
-    final applePayShippingMethodUpdate = ApplePayShippingMethodUpdate(
-      summaryItems: [
-        ApplePaySummaryItem(
-          label: "Total",
-          amount: Amount(value: 3098, currency: "EUR"),
-          type: ApplePaySummaryItemType.definite,
-        )
-      ],
-    );
+    "when using apple pay shipping method update, then should parse to ApplePayShippingMethodUpdateDTO",
+    () {
+      final applePayShippingMethodUpdate = ApplePayShippingMethodUpdate(
+        summaryItems: [
+          ApplePaySummaryItem(
+            label: "Total",
+            amount: Amount(value: 3098, currency: "EUR"),
+            type: ApplePaySummaryItemType.definite,
+          ),
+        ],
+      );
 
-    final applePayShippingMethodUpdateDTO =
-        applePayShippingMethodUpdate.toDTO();
+      final applePayShippingMethodUpdateDTO =
+          applePayShippingMethodUpdate.toDTO();
 
-    expect(applePayShippingMethodUpdateDTO.summaryItems.firstOrNull?.label,
-        "Total");
-    expect(
+      expect(
+        applePayShippingMethodUpdateDTO.summaryItems.firstOrNull?.label,
+        "Total",
+      );
+      expect(
         applePayShippingMethodUpdateDTO.summaryItems.firstOrNull?.amount.value,
-        3098);
-    expect(
+        3098,
+      );
+      expect(
         applePayShippingMethodUpdateDTO
             .summaryItems.firstOrNull?.amount.currency,
-        "EUR");
-    expect(applePayShippingMethodUpdateDTO.summaryItems.firstOrNull?.type,
-        ApplePaySummaryItemType.definite);
-  });
+        "EUR",
+      );
+      expect(
+        applePayShippingMethodUpdateDTO.summaryItems.firstOrNull?.type,
+        ApplePaySummaryItemType.definite,
+      );
+    },
+  );
 
   test(
-      "when using apple pay shipping contact update, then should parse to ApplePayShippingContactUpdateDTO",
-      () {
-    final applePayShippingContactUpdate = ApplePayShippingContactUpdate(
-      summaryItems: [
-        ApplePaySummaryItem(
-          label: "Total",
-          amount: Amount(value: 3597, currency: "EUR"),
-          type: ApplePaySummaryItemType.definite,
-        )
-      ],
-      shippingMethods: [
-        ApplePayShippingMethod(
-          label: "Express shipping",
-          detail: "DHL Express",
-          amount: Amount(value: 999, currency: "EUR"),
-          identifier: "express",
-        )
-      ],
-    );
+    "when using apple pay shipping contact update, then should parse to ApplePayShippingContactUpdateDTO",
+    () {
+      final applePayShippingContactUpdate = ApplePayShippingContactUpdate(
+        summaryItems: [
+          ApplePaySummaryItem(
+            label: "Total",
+            amount: Amount(value: 3597, currency: "EUR"),
+            type: ApplePaySummaryItemType.definite,
+          ),
+        ],
+        shippingMethods: [
+          ApplePayShippingMethod(
+            label: "Express shipping",
+            detail: "DHL Express",
+            amount: Amount(value: 999, currency: "EUR"),
+            identifier: "express",
+          ),
+        ],
+      );
 
-    final applePayShippingContactUpdateDTO =
-        applePayShippingContactUpdate.toDTO();
+      final applePayShippingContactUpdateDTO =
+          applePayShippingContactUpdate.toDTO();
 
-    expect(applePayShippingContactUpdateDTO.summaryItems.firstOrNull?.label,
-        "Total");
-    expect(
+      expect(
+        applePayShippingContactUpdateDTO.summaryItems.firstOrNull?.label,
+        "Total",
+      );
+      expect(
         applePayShippingContactUpdateDTO.summaryItems.firstOrNull?.amount.value,
-        3597);
-    expect(applePayShippingContactUpdateDTO.shippingMethods?.firstOrNull?.label,
-        "Express shipping");
-    expect(
+        3597,
+      );
+      expect(
+        applePayShippingContactUpdateDTO.shippingMethods?.firstOrNull?.label,
+        "Express shipping",
+      );
+      expect(
         applePayShippingContactUpdateDTO
             .shippingMethods?.firstOrNull?.identifier,
-        "express");
-  });
+        "express",
+      );
+    },
+  );
 
   test(
-      "when using apple pay shipping contact update with errors, then should parse to ApplePayShippingContactUpdateDTO",
-      () {
-    final applePayShippingContactUpdate = ApplePayShippingContactUpdate(
-      summaryItems: [
-        ApplePaySummaryItem(
-          label: "Total",
-          amount: Amount(value: 3597, currency: "EUR"),
-          type: ApplePaySummaryItemType.definite,
-        )
-      ],
-      errors: [
-        ApplePayPaymentError(
-          type: ApplePayPaymentErrorType.shippingAddress,
-          field: ApplePayErrorField.postalCode,
-          localizedDescription: "We do not ship to this postal code.",
-        )
-      ],
-    );
+    "when using apple pay shipping contact update with errors, then should parse to ApplePayShippingContactUpdateDTO",
+    () {
+      final applePayShippingContactUpdate = ApplePayShippingContactUpdate(
+        summaryItems: [
+          ApplePaySummaryItem(
+            label: "Total",
+            amount: Amount(value: 3597, currency: "EUR"),
+            type: ApplePaySummaryItemType.definite,
+          ),
+        ],
+        errors: [
+          ApplePayPaymentError(
+            type: ApplePayPaymentErrorType.shippingAddress,
+            field: ApplePayErrorField.postalCode,
+            localizedDescription: "We do not ship to this postal code.",
+          ),
+        ],
+      );
 
-    final applePayShippingContactUpdateDTO =
-        applePayShippingContactUpdate.toDTO();
+      final applePayShippingContactUpdateDTO =
+          applePayShippingContactUpdate.toDTO();
 
-    expect(applePayShippingContactUpdateDTO.errors?.firstOrNull?.type,
-        ApplePayPaymentErrorType.shippingAddress);
-    expect(applePayShippingContactUpdateDTO.errors?.firstOrNull?.field,
-        "postalCode");
-    expect(
+      expect(
+        applePayShippingContactUpdateDTO.errors?.firstOrNull?.type,
+        ApplePayPaymentErrorType.shippingAddress,
+      );
+      expect(
+        applePayShippingContactUpdateDTO.errors?.firstOrNull?.field,
+        "postalCode",
+      );
+      expect(
         applePayShippingContactUpdateDTO
             .errors?.firstOrNull?.localizedDescription,
-        "We do not ship to this postal code.");
-  });
+        "We do not ship to this postal code.",
+      );
+    },
+  );
 
   test(
-      "when using apple pay coupon code update, then should parse to ApplePayCouponCodeUpdateDTO",
-      () {
-    final applePayCouponCodeUpdate = ApplePayCouponCodeUpdate(
-      summaryItems: [
-        ApplePaySummaryItem(
-          label: "Discounted total",
-          amount: Amount(value: 2099, currency: "EUR"),
-          type: ApplePaySummaryItemType.definite,
-        )
-      ],
-    );
+    "when using apple pay coupon code update, then should parse to ApplePayCouponCodeUpdateDTO",
+    () {
+      final applePayCouponCodeUpdate = ApplePayCouponCodeUpdate(
+        summaryItems: [
+          ApplePaySummaryItem(
+            label: "Discounted total",
+            amount: Amount(value: 2099, currency: "EUR"),
+            type: ApplePaySummaryItemType.definite,
+          ),
+        ],
+      );
 
-    final applePayCouponCodeUpdateDTO = applePayCouponCodeUpdate.toDTO();
+      final applePayCouponCodeUpdateDTO = applePayCouponCodeUpdate.toDTO();
 
-    expect(applePayCouponCodeUpdateDTO.summaryItems.firstOrNull?.label,
-        "Discounted total");
-    expect(applePayCouponCodeUpdateDTO.summaryItems.firstOrNull?.amount.value,
-        2099);
-    expect(applePayCouponCodeUpdateDTO.summaryItems.firstOrNull?.type,
-        ApplePaySummaryItemType.definite);
-  });
+      expect(
+        applePayCouponCodeUpdateDTO.summaryItems.firstOrNull?.label,
+        "Discounted total",
+      );
+      expect(
+        applePayCouponCodeUpdateDTO.summaryItems.firstOrNull?.amount.value,
+        2099,
+      );
+      expect(
+        applePayCouponCodeUpdateDTO.summaryItems.firstOrNull?.type,
+        ApplePaySummaryItemType.definite,
+      );
+    },
+  );
 
   test(
-      "when using apple pay coupon code update with errors, then should parse to ApplePayCouponCodeUpdateDTO",
-      () {
-    final applePayCouponCodeUpdate = ApplePayCouponCodeUpdate(
-      summaryItems: [
-        ApplePaySummaryItem(
-          label: "Discounted total",
-          amount: Amount(value: 2099, currency: "EUR"),
-          type: ApplePaySummaryItemType.definite,
-        )
-      ],
-      errors: [
-        ApplePayPaymentError(
-          type: ApplePayPaymentErrorType.couponCodeExpired,
-          localizedDescription: "Coupon code has expired.",
-        )
-      ],
-    );
+    "when using apple pay coupon code update with errors, then should parse to ApplePayCouponCodeUpdateDTO",
+    () {
+      final applePayCouponCodeUpdate = ApplePayCouponCodeUpdate(
+        summaryItems: [
+          ApplePaySummaryItem(
+            label: "Discounted total",
+            amount: Amount(value: 2099, currency: "EUR"),
+            type: ApplePaySummaryItemType.definite,
+          ),
+        ],
+        errors: [
+          ApplePayPaymentError(
+            type: ApplePayPaymentErrorType.couponCodeExpired,
+            localizedDescription: "Coupon code has expired.",
+          ),
+        ],
+      );
 
-    final applePayCouponCodeUpdateDTO = applePayCouponCodeUpdate.toDTO();
+      final applePayCouponCodeUpdateDTO = applePayCouponCodeUpdate.toDTO();
 
-    expect(applePayCouponCodeUpdateDTO.errors?.firstOrNull?.type,
-        ApplePayPaymentErrorType.couponCodeExpired);
-    expect(
+      expect(
+        applePayCouponCodeUpdateDTO.errors?.firstOrNull?.type,
+        ApplePayPaymentErrorType.couponCodeExpired,
+      );
+      expect(
         applePayCouponCodeUpdateDTO.errors?.firstOrNull?.localizedDescription,
-        "Coupon code has expired.");
-  });
+        "Coupon code has expired.",
+      );
+    },
+  );
 
   test(
-      "when using apple pay authorization success, then should parse to ApplePayAuthorizationResultDTO",
-      () {
-    const applePayAuthorizationResult = ApplePayAuthorizationResult.success();
+    "when using apple pay authorization success, then should parse to ApplePayAuthorizationResultDTO",
+    () {
+      const applePayAuthorizationResult = ApplePayAuthorizationResult.success();
 
-    final applePayAuthorizationResultDTO = applePayAuthorizationResult.toDTO();
+      final applePayAuthorizationResultDTO =
+          applePayAuthorizationResult.toDTO();
 
-    expect(applePayAuthorizationResultDTO.isSuccess, true);
-    expect(applePayAuthorizationResultDTO.errors, null);
-  });
+      expect(applePayAuthorizationResultDTO.isSuccess, true);
+      expect(applePayAuthorizationResultDTO.errors, null);
+    },
+  );
 
   test(
-      "when using apple pay authorization failure, then should parse to ApplePayAuthorizationResultDTO",
-      () {
-    final applePayAuthorizationResult = ApplePayAuthorizationResult.failure(
-      errors: [
-        ApplePayPaymentError(
-          type: ApplePayPaymentErrorType.shippingAddress,
-          field: ApplePayErrorField.postalCode,
-          localizedDescription: "Postal code is required.",
-        )
-      ],
-    );
+    "when using apple pay authorization failure, then should parse to ApplePayAuthorizationResultDTO",
+    () {
+      final applePayAuthorizationResult = ApplePayAuthorizationResult.failure(
+        errors: [
+          ApplePayPaymentError(
+            type: ApplePayPaymentErrorType.shippingAddress,
+            field: ApplePayErrorField.postalCode,
+            localizedDescription: "Postal code is required.",
+          ),
+        ],
+      );
 
-    final applePayAuthorizationResultDTO = applePayAuthorizationResult.toDTO();
+      final applePayAuthorizationResultDTO =
+          applePayAuthorizationResult.toDTO();
 
-    expect(applePayAuthorizationResultDTO.isSuccess, false);
-    expect(applePayAuthorizationResultDTO.errors?.firstOrNull?.type,
-        ApplePayPaymentErrorType.shippingAddress);
-    expect(applePayAuthorizationResultDTO.errors?.firstOrNull?.field,
-        "postalCode");
-    expect(
+      expect(applePayAuthorizationResultDTO.isSuccess, false);
+      expect(
+        applePayAuthorizationResultDTO.errors?.firstOrNull?.type,
+        ApplePayPaymentErrorType.shippingAddress,
+      );
+      expect(
+        applePayAuthorizationResultDTO.errors?.firstOrNull?.field,
+        "postalCode",
+      );
+      expect(
         applePayAuthorizationResultDTO
             .errors?.firstOrNull?.localizedDescription,
-        "Postal code is required.");
-  });
+        "Postal code is required.",
+      );
+    },
+  );
 
   test(
-      "when using apple pay authorized payment DTO, then should parse to ApplePayAuthorizedPayment",
-      () {
-    final applePayAuthorizedPaymentDTO = ApplePayAuthorizedPaymentDTO(
-      token: "APPLE_PAY_TOKEN",
-      network: "visa",
-      billingContact: ApplePayContactDTO(
-        emailAddress: "billing@example.com",
-        postalCode: "1011 DJ",
-      ),
-      shippingContact: ApplePayContactDTO(
-        emailAddress: "shipping@example.com",
-        postalCode: "1011 DJ",
-      ),
-      shippingMethod: ApplePayShippingMethodDTO(
-        label: "Express shipping",
-        detail: "DHL Express",
-        amount: AmountDTO(value: 999, currency: "EUR"),
-        identifier: "express",
-      ),
-    );
+    "when using apple pay authorized payment DTO, then should parse to ApplePayAuthorizedPayment",
+    () {
+      final applePayAuthorizedPaymentDTO = ApplePayAuthorizedPaymentDTO(
+        token: "APPLE_PAY_TOKEN",
+        network: "visa",
+        billingContact: ApplePayContactDTO(
+          emailAddress: "billing@example.com",
+          postalCode: "1011 DJ",
+        ),
+        shippingContact: ApplePayContactDTO(
+          emailAddress: "shipping@example.com",
+          postalCode: "1011 DJ",
+        ),
+        shippingMethod: ApplePayShippingMethodDTO(
+          label: "Express shipping",
+          detail: "DHL Express",
+          amount: AmountDTO(value: 999, currency: "EUR"),
+          identifier: "express",
+        ),
+      );
 
-    final applePayAuthorizedPayment = applePayAuthorizedPaymentDTO.fromDTO();
+      final applePayAuthorizedPayment = applePayAuthorizedPaymentDTO.fromDTO();
 
-    expect(applePayAuthorizedPayment.token, "APPLE_PAY_TOKEN");
-    expect(applePayAuthorizedPayment.network, "visa");
-    expect(applePayAuthorizedPayment.billingContact?.emailAddress,
-        "billing@example.com");
-    expect(applePayAuthorizedPayment.shippingContact?.emailAddress,
-        "shipping@example.com");
-    expect(applePayAuthorizedPayment.shippingMethod?.label, "Express shipping");
-    expect(applePayAuthorizedPayment.shippingMethod?.amount.value, 999);
-    expect(applePayAuthorizedPayment.shippingMethod?.amount.currency, "EUR");
-  });
-
-  test(
-      "when using cash app pay configuration, then should parse to CashAppPayConfigurationDTO",
-      () {
-    const cashAppPayConfiguration = CashAppPayConfiguration(
-      cashAppPayEnvironment: CashAppPayEnvironment.production,
-      returnUrl: "RETURN_URL",
-    );
-
-    final cashAppPayConfigurationDTO = cashAppPayConfiguration.toDTO();
-
-    expect(cashAppPayConfigurationDTO.cashAppPayEnvironment,
-        CashAppPayEnvironment.production);
-    expect(cashAppPayConfigurationDTO.returnUrl, "RETURN_URL");
-  });
+      expect(applePayAuthorizedPayment.token, "APPLE_PAY_TOKEN");
+      expect(applePayAuthorizedPayment.network, "visa");
+      expect(
+        applePayAuthorizedPayment.billingContact?.emailAddress,
+        "billing@example.com",
+      );
+      expect(
+        applePayAuthorizedPayment.shippingContact?.emailAddress,
+        "shipping@example.com",
+      );
+      expect(
+        applePayAuthorizedPayment.shippingMethod?.label,
+        "Express shipping",
+      );
+      expect(applePayAuthorizedPayment.shippingMethod?.amount.value, 999);
+      expect(applePayAuthorizedPayment.shippingMethod?.amount.currency, "EUR");
+    },
+  );
 
   test(
-      'when using blik component configuration, then should map to BlikComponentConfigurationDTO',
-      () {
-    final blikComponentConfiguration = BlikComponentConfiguration(
-      environment: Environment.test,
-      clientKey: 'test-client-key',
-      countryCode: 'PL',
-      amount: Amount(value: 1000, currency: 'PLN'),
-      shopperLocale: 'pl-PL',
-      analyticsOptions: AnalyticsOptions(enabled: false),
-    );
+    "when using cash app pay configuration, then should parse to CashAppPayConfigurationDTO",
+    () {
+      const cashAppPayConfiguration = CashAppPayConfiguration(
+        cashAppPayEnvironment: CashAppPayEnvironment.production,
+        returnUrl: "RETURN_URL",
+      );
 
-    final dto = blikComponentConfiguration.toDTO('0.0.1');
+      final cashAppPayConfigurationDTO = cashAppPayConfiguration.toDTO();
 
-    expect(dto.environment, Environment.test);
-    expect(dto.clientKey, 'test-client-key');
-    expect(dto.countryCode, 'PL');
-    expect(dto.amount?.value, 1000);
-    expect(dto.amount?.currency, 'PLN');
-    expect(dto.shopperLocale, 'pl-PL');
-    expect(dto.analyticsOptionsDTO.enabled, false);
-    expect(dto.analyticsOptionsDTO.version, '0.0.1');
-  });
+      expect(
+        cashAppPayConfigurationDTO.cashAppPayEnvironment,
+        CashAppPayEnvironment.production,
+      );
+      expect(cashAppPayConfigurationDTO.returnUrl, "RETURN_URL");
+    },
+  );
+
+  test(
+    'when using blik component configuration, then should map to BlikComponentConfigurationDTO',
+    () {
+      final blikComponentConfiguration = BlikComponentConfiguration(
+        environment: Environment.test,
+        clientKey: 'test-client-key',
+        countryCode: 'PL',
+        amount: Amount(value: 1000, currency: 'PLN'),
+        shopperLocale: 'pl-PL',
+        analyticsOptions: AnalyticsOptions(enabled: false),
+      );
+
+      final dto = blikComponentConfiguration.toDTO('0.0.1');
+
+      expect(dto.environment, Environment.test);
+      expect(dto.clientKey, 'test-client-key');
+      expect(dto.countryCode, 'PL');
+      expect(dto.amount?.value, 1000);
+      expect(dto.amount?.currency, 'PLN');
+      expect(dto.shopperLocale, 'pl-PL');
+      expect(dto.analyticsOptionsDTO.enabled, false);
+      expect(dto.analyticsOptionsDTO.version, '0.0.1');
+    },
+  );
 
   test('when using 3DS theme, then should map to ui customization DTO', () {
     const theme = Adyen3DSTheme(
@@ -628,8 +742,10 @@ void main() {
       descriptionTheme: descriptionTheme,
     );
 
-    final dto =
-        ThreeDS2Configuration(theme: theme, headingTitle: 'Heading').toDTO();
+    final dto = ThreeDS2Configuration(
+      theme: theme,
+      headingTitle: 'Heading',
+    ).toDTO();
 
     final label = dto.uiCustomization?.labelCustomization;
     expect(label?.textColor, '#FF111111');
@@ -648,19 +764,23 @@ void main() {
     expect(dto.requestorAppURL, 'app://cb');
   });
 
-  test('when theme has screen colors, then should map to screenCustomization',
-      () {
-    const theme = Adyen3DSTheme(
-      backgroundColor: Color(0xFF111213),
-      textColor: Color(0xFF141516),
-    );
+  test(
+    'when theme has screen colors, then should map to screenCustomization',
+    () {
+      const theme = Adyen3DSTheme(
+        backgroundColor: Color(0xFF111213),
+        textColor: Color(0xFF141516),
+      );
 
-    final dto = ThreeDS2Configuration(theme: theme).toDTO();
+      final dto = ThreeDS2Configuration(theme: theme).toDTO();
 
-    expect(
-        dto.uiCustomization?.screenCustomization?.backgroundColor, '#FF111213');
-    expect(dto.uiCustomization?.screenCustomization?.textColor, '#FF141516');
-  });
+      expect(
+        dto.uiCustomization?.screenCustomization?.backgroundColor,
+        '#FF111213',
+      );
+      expect(dto.uiCustomization?.screenCustomization?.textColor, '#FF141516');
+    },
+  );
 
   test('when header theme set, then should map header fields', () {
     const headerTheme = Adyen3DSHeaderTheme(
@@ -670,8 +790,10 @@ void main() {
     );
     const theme = Adyen3DSTheme(headerTheme: headerTheme);
 
-    final dto =
-        ThreeDS2Configuration(theme: theme, headingTitle: 'Heading').toDTO();
+    final dto = ThreeDS2Configuration(
+      theme: theme,
+      headingTitle: 'Heading',
+    ).toDTO();
 
     final heading = dto.uiCustomization?.headingCustomization;
     expect(heading?.backgroundColor, '#FF010203');
@@ -711,27 +833,28 @@ void main() {
   });
 
   test(
-      'when both headingTitle and headerTheme provided, headerTheme should win for style',
-      () {
-    const theme = Adyen3DSTheme(
-      headerTheme: Adyen3DSHeaderTheme(
-        backgroundColor: Color(0xFF212223),
-        textColor: Color(0xFF242526),
-        cancelButtonColor: Color(0xFF272829),
-      ),
-    );
+    'when both headingTitle and headerTheme provided, headerTheme should win for style',
+    () {
+      const theme = Adyen3DSTheme(
+        headerTheme: Adyen3DSHeaderTheme(
+          backgroundColor: Color(0xFF212223),
+          textColor: Color(0xFF242526),
+          cancelButtonColor: Color(0xFF272829),
+        ),
+      );
 
-    final dto = ThreeDS2Configuration(
-      headingTitle: 'Preferred heading',
-      theme: theme,
-    ).toDTO();
+      final dto = ThreeDS2Configuration(
+        headingTitle: 'Preferred heading',
+        theme: theme,
+      ).toDTO();
 
-    final heading = dto.uiCustomization?.headingCustomization;
-    expect(heading?.headerText, 'Preferred heading');
-    expect(heading?.backgroundColor, '#FF212223');
-    expect(heading?.textColor, '#FF242526');
-    expect(heading?.cancelButtonColor, '#FF272829');
-  });
+      final heading = dto.uiCustomization?.headingCustomization;
+      expect(heading?.headerText, 'Preferred heading');
+      expect(heading?.backgroundColor, '#FF212223');
+      expect(heading?.textColor, '#FF242526');
+      expect(heading?.cancelButtonColor, '#FF272829');
+    },
+  );
 
   test('when no heading or theme, uiCustomization should be null', () {
     final dto = ThreeDS2Configuration().toDTO();
@@ -781,8 +904,10 @@ void main() {
     );
 
     final theme = Adyen3DSTheme.fromThemeData(themeData);
-    final dto =
-        ThreeDS2Configuration(theme: theme, headingTitle: 'Heading').toDTO();
+    final dto = ThreeDS2Configuration(
+      theme: theme,
+      headingTitle: 'Heading',
+    ).toDTO();
 
     final ui = dto.uiCustomization;
     expect(ui?.screenCustomization?.backgroundColor, '#FF222222');
@@ -801,51 +926,51 @@ void main() {
 
     final dto = ThreeDS2Configuration(theme: theme).toDTO();
 
-    expect(dto.uiCustomization?.primaryButtonCustomization?.backgroundColor,
-        '#FF010101');
-    expect(dto.uiCustomization?.secondaryButtonCustomization, isNull);
-  });
-
-  test(
-      'headingTitle should populate headerText even if headerTheme headerText is null',
-      () {
-    const theme = Adyen3DSTheme(
-      headerTheme: Adyen3DSHeaderTheme(
-        textColor: Color(0xFF0A0A0A),
-      ),
-    );
-
-    final dto = ThreeDS2Configuration(
-      headingTitle: 'Use this heading',
-      theme: theme,
-    ).toDTO();
-
-    final heading = dto.uiCustomization?.headingCustomization;
-    expect(heading?.headerText, 'Use this heading');
-    expect(heading?.textColor, '#FF0A0A0A');
-  });
-
-  test(
-      'when only background color set, should map screenCustomization without buttons/inputs',
-      () {
-    const theme = Adyen3DSTheme(
-      backgroundColor: Color(0xFFABCDEF),
-    );
-
-    final dto = ThreeDS2Configuration(theme: theme).toDTO();
-
     expect(
-        dto.uiCustomization?.screenCustomization?.backgroundColor, '#FFABCDEF');
-    expect(dto.uiCustomization?.primaryButtonCustomization, isNull);
+      dto.uiCustomization?.primaryButtonCustomization?.backgroundColor,
+      '#FF010101',
+    );
     expect(dto.uiCustomization?.secondaryButtonCustomization, isNull);
-    expect(dto.uiCustomization?.inputCustomization, isNull);
   });
+
+  test(
+    'headingTitle should populate headerText even if headerTheme headerText is null',
+    () {
+      const theme = Adyen3DSTheme(
+        headerTheme: Adyen3DSHeaderTheme(textColor: Color(0xFF0A0A0A)),
+      );
+
+      final dto = ThreeDS2Configuration(
+        headingTitle: 'Use this heading',
+        theme: theme,
+      ).toDTO();
+
+      final heading = dto.uiCustomization?.headingCustomization;
+      expect(heading?.headerText, 'Use this heading');
+      expect(heading?.textColor, '#FF0A0A0A');
+    },
+  );
+
+  test(
+    'when only background color set, should map screenCustomization without buttons/inputs',
+    () {
+      const theme = Adyen3DSTheme(backgroundColor: Color(0xFFABCDEF));
+
+      final dto = ThreeDS2Configuration(theme: theme).toDTO();
+
+      expect(
+        dto.uiCustomization?.screenCustomization?.backgroundColor,
+        '#FFABCDEF',
+      );
+      expect(dto.uiCustomization?.primaryButtonCustomization, isNull);
+      expect(dto.uiCustomization?.secondaryButtonCustomization, isNull);
+      expect(dto.uiCustomization?.inputCustomization, isNull);
+    },
+  );
 
   test('requestorAppURL should survive alongside headingTitle and theme', () {
     const theme = Adyen3DSTheme(
-      headerTheme: Adyen3DSHeaderTheme(
-        textColor: Color(0xFFBBBBBB),
-      ),
+      headerTheme: Adyen3DSHeaderTheme(textColor: Color(0xFFBBBBBB)),
     );
 
     final dto = ThreeDS2Configuration(
@@ -855,8 +980,10 @@ void main() {
     ).toDTO();
 
     expect(dto.requestorAppURL, 'app://combined');
-    expect(dto.uiCustomization?.headingCustomization?.headerText,
-        'Combined heading');
+    expect(
+      dto.uiCustomization?.headingCustomization?.headerText,
+      'Combined heading',
+    );
     expect(dto.uiCustomization?.headingCustomization?.textColor, '#FFBBBBBB');
   });
 
@@ -869,23 +996,24 @@ void main() {
 
     final dto = ThreeDS2Configuration(theme: theme).toDTO();
 
-    expect(dto.uiCustomization?.secondaryButtonCustomization?.backgroundColor,
-        '#FF020202');
+    expect(
+      dto.uiCustomization?.secondaryButtonCustomization?.backgroundColor,
+      '#FF020202',
+    );
     expect(dto.uiCustomization?.primaryButtonCustomization, isNull);
   });
 
   test(
-      'screenCustomization should map textColor alone when backgroundColor is null',
-      () {
-    const theme = Adyen3DSTheme(
-      textColor: Color(0xFF0B0B0B),
-    );
+    'screenCustomization should map textColor alone when backgroundColor is null',
+    () {
+      const theme = Adyen3DSTheme(textColor: Color(0xFF0B0B0B));
 
-    final dto = ThreeDS2Configuration(theme: theme).toDTO();
+      final dto = ThreeDS2Configuration(theme: theme).toDTO();
 
-    expect(dto.uiCustomization?.screenCustomization?.textColor, '#FF0B0B0B');
-    expect(dto.uiCustomization?.screenCustomization?.backgroundColor, isNull);
-  });
+      expect(dto.uiCustomization?.screenCustomization?.textColor, '#FF0B0B0B');
+      expect(dto.uiCustomization?.screenCustomization?.backgroundColor, isNull);
+    },
+  );
 
   test('rounding uses .round() semantics for .5 values', () {
     const theme = Adyen3DSTheme(
@@ -903,26 +1031,23 @@ void main() {
   });
 
   test(
-      'no headingTitle and headerTheme without headerText should still map styling',
-      () {
-    const theme = Adyen3DSTheme(
-      headerTheme: Adyen3DSHeaderTheme(
-        textColor: Color(0xFF0C0C0C),
-      ),
-    );
+    'no headingTitle and headerTheme without headerText should still map styling',
+    () {
+      const theme = Adyen3DSTheme(
+        headerTheme: Adyen3DSHeaderTheme(textColor: Color(0xFF0C0C0C)),
+      );
 
-    final dto = ThreeDS2Configuration(theme: theme).toDTO();
+      final dto = ThreeDS2Configuration(theme: theme).toDTO();
 
-    final heading = dto.uiCustomization?.headingCustomization;
-    expect(heading, isNotNull);
-    expect(heading?.headerText, isNull);
-    expect(heading?.textColor, '#FF0C0C0C');
-  });
+      final heading = dto.uiCustomization?.headingCustomization;
+      expect(heading, isNotNull);
+      expect(heading?.headerText, isNull);
+      expect(heading?.textColor, '#FF0C0C0C');
+    },
+  );
 
   test('when toolbar title is set, then should map to toolbar header text', () {
-    final configuration = ThreeDS2Configuration(
-      headingTitle: 'Challenge',
-    );
+    final configuration = ThreeDS2Configuration(headingTitle: 'Challenge');
 
     final dto = configuration.toDTO();
 
@@ -932,57 +1057,60 @@ void main() {
   });
 
   test(
-      'when action component configuration has 3DS2 configuration, then should map to ActionComponentConfigurationDTO',
-      () {
-    const theme = Adyen3DSTheme(
-      headerTheme: Adyen3DSHeaderTheme(
-        textColor: Color(0xFFAABBCC),
-      ),
-    );
-    final configuration = ActionComponentConfiguration(
-      environment: Environment.test,
-      clientKey: 'test_client_key',
-      shopperLocale: 'en-US',
-      amount: Amount(value: 1500, currency: 'EUR'),
-      threeDS2Configuration: ThreeDS2Configuration(
-        requestorAppURL: 'myapp://adyen3ds2',
-        headingTitle: 'Action heading',
-        theme: theme,
-      ),
-    );
+    'when action component configuration has 3DS2 configuration, then should map to ActionComponentConfigurationDTO',
+    () {
+      const theme = Adyen3DSTheme(
+        headerTheme: Adyen3DSHeaderTheme(textColor: Color(0xFFAABBCC)),
+      );
+      final configuration = ActionComponentConfiguration(
+        environment: Environment.test,
+        clientKey: 'test_client_key',
+        shopperLocale: 'en-US',
+        amount: Amount(value: 1500, currency: 'EUR'),
+        threeDS2Configuration: ThreeDS2Configuration(
+          requestorAppURL: 'myapp://adyen3ds2',
+          headingTitle: 'Action heading',
+          theme: theme,
+        ),
+      );
 
-    final dto = configuration.toDTO('1.0.0');
+      final dto = configuration.toDTO('1.0.0');
 
-    expect(dto.environment, Environment.test);
-    expect(dto.clientKey, 'test_client_key');
-    expect(dto.shopperLocale, 'en-US');
-    expect(dto.amount?.value, 1500);
-    expect(dto.amount?.currency, 'EUR');
-    expect(dto.threeDS2ConfigurationDTO?.requestorAppURL, 'myapp://adyen3ds2');
-    expect(
-      dto.threeDS2ConfigurationDTO?.uiCustomization?.headingCustomization
-          ?.headerText,
-      'Action heading',
-    );
-    expect(
-      dto.threeDS2ConfigurationDTO?.uiCustomization?.headingCustomization
-          ?.textColor,
-      '#FFAABBCC',
-    );
-  });
+      expect(dto.environment, Environment.test);
+      expect(dto.clientKey, 'test_client_key');
+      expect(dto.shopperLocale, 'en-US');
+      expect(dto.amount?.value, 1500);
+      expect(dto.amount?.currency, 'EUR');
+      expect(
+        dto.threeDS2ConfigurationDTO?.requestorAppURL,
+        'myapp://adyen3ds2',
+      );
+      expect(
+        dto.threeDS2ConfigurationDTO?.uiCustomization?.headingCustomization
+            ?.headerText,
+        'Action heading',
+      );
+      expect(
+        dto.threeDS2ConfigurationDTO?.uiCustomization?.headingCustomization
+            ?.textColor,
+        '#FFAABBCC',
+      );
+    },
+  );
 
   test(
-      'when action component configuration omits 3DS2 configuration, then ActionComponentConfigurationDTO should contain null 3DS2 configuration',
-      () {
-    final configuration = ActionComponentConfiguration(
-      environment: Environment.test,
-      clientKey: 'test_client_key',
-    );
+    'when action component configuration omits 3DS2 configuration, then ActionComponentConfigurationDTO should contain null 3DS2 configuration',
+    () {
+      final configuration = ActionComponentConfiguration(
+        environment: Environment.test,
+        clientKey: 'test_client_key',
+      );
 
-    final dto = configuration.toDTO('1.0.0');
+      final dto = configuration.toDTO('1.0.0');
 
-    expect(dto.threeDS2ConfigurationDTO, isNull);
-  });
+      expect(dto.threeDS2ConfigurationDTO, isNull);
+    },
+  );
 
   test('color to hex should include alpha channel', () {
     const color = Color(0x80112233);

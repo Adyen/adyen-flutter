@@ -12,11 +12,7 @@ class AdyenCheckoutApi implements CheckoutPlatformInterface {
     String sessionData,
     dynamic configuration,
   ) =>
-      checkoutApi.createSession(
-        sessionId,
-        sessionData,
-        configuration,
-      );
+      checkoutApi.createSession(sessionId, sessionData, configuration);
 
   @override
   Future<void> clearSession() => checkoutApi.clearSession();
@@ -33,10 +29,7 @@ class AdyenCheckoutApi implements CheckoutPlatformInterface {
       checkoutApi.encryptCard(unencryptedCardDTO, publicKey);
 
   @override
-  Future<String> encryptBin(
-    String bin,
-    String publicKey,
-  ) =>
+  Future<String> encryptBin(String bin, String publicKey) =>
       checkoutApi.encryptBin(bin, publicKey);
 
   @override

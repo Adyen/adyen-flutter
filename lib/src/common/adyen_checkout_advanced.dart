@@ -7,10 +7,7 @@ class AdyenCheckoutAdvanced {
   final AdyenCheckoutApi adyenCheckoutApi;
   final DropIn dropIn;
 
-  AdyenCheckoutAdvanced(
-    this.adyenCheckoutApi,
-    this.dropIn,
-  );
+  AdyenCheckoutAdvanced(this.adyenCheckoutApi, this.dropIn);
 
   Future<PaymentResult> startDropIn({
     required DropInConfiguration dropInConfiguration,
@@ -28,10 +25,9 @@ class AdyenCheckoutAdvanced {
     required Map<String, dynamic> paymentMethod,
     required AdvancedCheckout checkout,
   }) =>
-      InstantAdvancedComponent(advancedCheckout: checkout).start(
-        configuration,
-        paymentMethod,
-      );
+      InstantAdvancedComponent(
+        advancedCheckout: checkout,
+      ).start(configuration, paymentMethod);
 
   Future<void> stopDropIn() async => await dropIn.stopDropIn();
 }

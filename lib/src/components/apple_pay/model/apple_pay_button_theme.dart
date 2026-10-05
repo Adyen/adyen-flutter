@@ -1,6 +1,1 @@
-enum ApplePayButtonTheme {
-  white,
-  whiteOutline,
-  black,
-  automatic,
-}
+enum ApplePayButtonTheme { white, whiteOutline, black, automatic }

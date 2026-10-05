@@ -38,10 +38,14 @@ class AdyenCardComponent extends StatelessWidget {
         if (snapshot.data != null) {
           final sdkVersionNumber = snapshot.data ?? "";
           return switch (checkout) {
-            SessionCheckout it =>
-              _buildCardSessionFlowWidget(sdkVersionNumber, it),
-            AdvancedCheckout it =>
-              _buildCardAdvancedFlowWidget(sdkVersionNumber, it),
+            SessionCheckout it => _buildCardSessionFlowWidget(
+                sdkVersionNumber,
+                it,
+              ),
+            AdvancedCheckout it => _buildCardAdvancedFlowWidget(
+                sdkVersionNumber,
+                it,
+              ),
           };
         } else {
           return Container(
@@ -57,10 +61,12 @@ class AdyenCardComponent extends StatelessWidget {
     SessionCheckout sessionCheckout,
   ) {
     final String encodedPaymentMethod = json.encode(paymentMethod);
-    final double initialHeight =
-        _determineInitialHeight(configuration.cardConfiguration);
-    final bool isStoredPaymentMethod =
-        paymentMethod.containsKey(_isStoredPaymentMethodIndicator);
+    final double initialHeight = _determineInitialHeight(
+      configuration.cardConfiguration,
+    );
+    final bool isStoredPaymentMethod = paymentMethod.containsKey(
+      _isStoredPaymentMethodIndicator,
+    );
 
     return CardSessionComponent(
       cardComponentConfiguration: configuration.toDTO(sdkVersionNumber),
@@ -78,11 +84,13 @@ class AdyenCardComponent extends StatelessWidget {
     String sdkVersionNumber,
     AdvancedCheckout advancedCheckout,
   ) {
-    final initialHeight =
-        _determineInitialHeight(configuration.cardConfiguration);
+    final initialHeight = _determineInitialHeight(
+      configuration.cardConfiguration,
+    );
     final String encodedPaymentMethod = json.encode(paymentMethod);
-    final bool isStoredPaymentMethod =
-        paymentMethod.containsKey(_isStoredPaymentMethodIndicator);
+    final bool isStoredPaymentMethod = paymentMethod.containsKey(
+      _isStoredPaymentMethodIndicator,
+    );
 
     return CardAdvancedComponent(
       cardComponentConfiguration: configuration.toDTO(sdkVersionNumber),
@@ -99,15 +107,17 @@ class AdyenCardComponent extends StatelessWidget {
 
   double _determineInitialHeight(CardConfiguration cardConfiguration) {
     return switch (defaultTargetPlatform) {
-      TargetPlatform.android =>
-        _determineInitialAndroidViewHeight(cardConfiguration),
+      TargetPlatform.android => _determineInitialAndroidViewHeight(
+          cardConfiguration,
+        ),
       TargetPlatform.iOS => _determineInitialIosViewHeight(cardConfiguration),
-      _ => throw UnsupportedError('Unsupported platform view')
+      _ => throw UnsupportedError('Unsupported platform view'),
     };
   }
 
   double _determineInitialAndroidViewHeight(
-      CardConfiguration cardConfiguration) {
+    CardConfiguration cardConfiguration,
+  ) {
     double androidViewHeight = 294;
 
     if (cardConfiguration.holderNameRequired) {

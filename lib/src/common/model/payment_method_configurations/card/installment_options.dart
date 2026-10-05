@@ -9,18 +9,12 @@ sealed class InstallmentOptions {
   /// Whether revolving payment is included as an option.
   final bool includesRevolving;
 
-  InstallmentOptions({
-    required this.values,
-    this.includesRevolving = false,
-  });
+  InstallmentOptions({required this.values, this.includesRevolving = false});
 }
 
 /// Default installment options applied to all card brands.
 class DefaultInstallmentOptions extends InstallmentOptions {
-  DefaultInstallmentOptions({
-    required super.values,
-    super.includesRevolving,
-  });
+  DefaultInstallmentOptions({required super.values, super.includesRevolving});
 
   @override
   String toString() {

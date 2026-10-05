@@ -5,11 +5,7 @@ class GooglePayButtonStyle {
   final GooglePayButtonTheme? theme;
   final int? cornerRadius;
 
-  GooglePayButtonStyle({
-    this.type,
-    this.theme,
-    this.cornerRadius,
-  });
+  GooglePayButtonStyle({this.type, this.theme, this.cornerRadius});
 
   @override
   String toString() {

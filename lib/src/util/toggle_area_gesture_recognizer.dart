@@ -50,10 +50,7 @@ class ToggleAreaGestureRecognizer extends OneSequenceGestureRecognizer {
     return tapWithinBottomHalfOfCardWidget > cardWidgetHalfHeight;
   }
 
-  bool _isPointerOverToggle(
-    PointerDownEvent event,
-    RenderBox renderBox,
-  ) {
+  bool _isPointerOverToggle(PointerDownEvent event, RenderBox renderBox) {
     const toggleWidth = 80;
     final cardWidgetWidth = renderBox.size.width;
     switch (textDirection) {

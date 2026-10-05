@@ -6,11 +6,7 @@ class ApplePayButtonStyle {
   final ApplePayButtonType? type;
   final double? cornerRadius;
 
-  const ApplePayButtonStyle({
-    this.theme,
-    this.type,
-    this.cornerRadius,
-  });
+  const ApplePayButtonStyle({this.theme, this.type, this.cornerRadius});
 
   @override
   String toString() {

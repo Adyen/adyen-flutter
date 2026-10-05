@@ -3,9 +3,7 @@ import 'package:adyen_checkout/src/common/model/payment_method_configurations/ap
 class ApplePayShippingMethodUpdate {
   final List<ApplePaySummaryItem> summaryItems;
 
-  ApplePayShippingMethodUpdate({
-    required this.summaryItems,
-  });
+  ApplePayShippingMethodUpdate({required this.summaryItems});
 
   @override
   String toString() {

@@ -31,10 +31,7 @@ class ComponentContainer extends StatelessWidget {
           ),
         ),
         if (viewportHeight == null)
-          SizedBox(
-            height: initialViewPortHeight,
-            child: _buildLoadingWidget(),
-          )
+          SizedBox(height: initialViewPortHeight, child: _buildLoadingWidget()),
       ],
     );
   }

@@ -26,10 +26,7 @@ class Update extends PaymentEvent {
   final Map<String, dynamic> paymentMethodsJson;
   final Map<String, dynamic> orderJson;
 
-  Update({
-    required this.paymentMethodsJson,
-    required this.orderJson,
-  });
+  Update({required this.paymentMethodsJson, required this.orderJson});
 
   @override
   String toString() {

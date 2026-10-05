@@ -6,5 +6,5 @@ enum GooglePayButtonType {
   order,
   pay,
   plain,
-  subscribe
+  subscribe,
 }

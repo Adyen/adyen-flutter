@@ -43,12 +43,14 @@ class ApplePaySessionComponent extends BaseApplePayComponent {
         paymentResultDTO?.result?.toResultCode() ?? ResultCode.unknown;
     adyenLogger.print("Apple Pay session flow result code: $resultCode");
     _resetSession();
-    onPaymentResult(PaymentSessionFinished(
-      sessionId: paymentResultDTO?.result?.sessionId ?? "",
-      sessionData: paymentResultDTO?.result?.sessionData ?? "",
-      sessionResult: paymentResultDTO?.result?.sessionResult ?? "",
-      resultCode: resultCode,
-    ));
+    onPaymentResult(
+      PaymentSessionFinished(
+        sessionId: paymentResultDTO?.result?.sessionId ?? "",
+        sessionData: paymentResultDTO?.result?.sessionData ?? "",
+        sessionResult: paymentResultDTO?.result?.sessionResult ?? "",
+        resultCode: resultCode,
+      ),
+    );
   }
 
   void _resetSession() => AdyenCheckout.session.clear();

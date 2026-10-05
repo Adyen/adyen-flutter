@@ -44,10 +44,7 @@ class DropIn {
         dropInFlutter.platformEventStream?.stream.listen((event) async {
       switch (event.type) {
         case CheckoutEventType.result:
-          _handleResult(
-            event,
-            dropInSessionCompleter,
-          );
+          _handleResult(event, dropInSessionCompleter);
         case CheckoutEventType.deleteStoredPaymentMethod:
           _handleDeleteStoredPaymentMethod(
             event,
@@ -70,14 +67,17 @@ class DropIn {
     return dropInSessionCompleter.future.then((paymentResultDTO) async {
       await platformEventSubscription?.cancel();
       await _cleanUpDropIn();
-      adyenLogger
-          .print("Drop-in session result type: ${paymentResultDTO.type.name}");
       adyenLogger.print(
-          "Drop-in session result code: ${paymentResultDTO.result?.resultCode}");
+        "Drop-in session result type: ${paymentResultDTO.type.name}",
+      );
+      adyenLogger.print(
+        "Drop-in session result code: ${paymentResultDTO.result?.resultCode}",
+      );
       return switch (paymentResultDTO.type) {
         PaymentResultEnum.cancelledByUser => PaymentCancelledByUser(),
-        PaymentResultEnum.error =>
-          PaymentError(reason: paymentResultDTO.reason),
+        PaymentResultEnum.error => PaymentError(
+            reason: paymentResultDTO.reason,
+          ),
         PaymentResultEnum.finished => PaymentSessionFinished(
             sessionId: paymentResultDTO.result?.sessionId ?? "",
             sessionData: paymentResultDTO.result?.sessionData ?? "",
@@ -85,7 +85,7 @@ class DropIn {
             resultCode:
                 paymentResultDTO.result?.toResultCode() ?? ResultCode.unknown,
             order: paymentResultDTO.result?.order?.fromDTO(),
-          )
+          ),
       };
     });
   }
@@ -106,10 +106,7 @@ class DropIn {
     final isPartialPaymentSupported = advancedCheckout.partialPayment != null;
 
     dropInPlatformApi.showDropInAdvanced(
-      dropInConfiguration.toDTO(
-        sdkVersionNumber,
-        isPartialPaymentSupported,
-      ),
+      dropInConfiguration.toDTO(sdkVersionNumber, isPartialPaymentSupported),
       encodedPaymentMethodsResponse,
     );
 
@@ -118,20 +115,11 @@ class DropIn {
         dropInFlutter.platformEventStream?.stream.listen((event) async {
       switch (event.type) {
         case CheckoutEventType.submit:
-          await _handleSubmit(
-            event,
-            advancedCheckout,
-          );
+          await _handleSubmit(event, advancedCheckout);
         case CheckoutEventType.additionalDetails:
-          await _handleAdditionalDetails(
-            event,
-            advancedCheckout,
-          );
+          await _handleAdditionalDetails(event, advancedCheckout);
         case CheckoutEventType.result:
-          _handleResult(
-            event,
-            dropInAdvancedFlowCompleter,
-          );
+          _handleResult(event, dropInAdvancedFlowCompleter);
         case CheckoutEventType.deleteStoredPaymentMethod:
           _handleDeleteStoredPaymentMethod(
             event,
@@ -169,16 +157,20 @@ class DropIn {
       await platformEventSubscription?.cancel();
       await _cleanUpDropIn();
       adyenLogger.print(
-          "Drop-in advanced flow result type: ${paymentResultDTO.type.name}");
+        "Drop-in advanced flow result type: ${paymentResultDTO.type.name}",
+      );
       adyenLogger.print(
-          "Drop-in advanced flow result code: ${paymentResultDTO.result?.resultCode}");
+        "Drop-in advanced flow result code: ${paymentResultDTO.result?.resultCode}",
+      );
       return switch (paymentResultDTO.type) {
         PaymentResultEnum.cancelledByUser => PaymentCancelledByUser(),
-        PaymentResultEnum.error =>
-          PaymentError(reason: paymentResultDTO.reason),
+        PaymentResultEnum.error => PaymentError(
+            reason: paymentResultDTO.reason,
+          ),
         PaymentResultEnum.finished => PaymentAdvancedFinished(
             resultCode:
-                paymentResultDTO.result?.toResultCode() ?? ResultCode.unknown)
+                paymentResultDTO.result?.toResultCode() ?? ResultCode.unknown,
+          ),
       };
     });
   }
@@ -199,10 +191,12 @@ class DropIn {
       case PaymentResultDTO paymentResultDTO:
         completer.complete(paymentResultDTO);
       default:
-        completer.complete(PaymentResultDTO(
-          type: PaymentResultEnum.error,
-          reason: "Missing payment result data",
-        ));
+        completer.complete(
+          PaymentResultDTO(
+            type: PaymentResultEnum.error,
+            reason: "Missing payment result data",
+          ),
+        );
     }
   }
 
@@ -215,22 +209,26 @@ class DropIn {
         throw Exception("Payment data is not provided.");
       }
 
-      final PaymentEvent paymentEvent =
-          await _getOnSubmitPaymentEvent(event, advancedCheckout);
+      final PaymentEvent paymentEvent = await _getOnSubmitPaymentEvent(
+        event,
+        advancedCheckout,
+      );
       PaymentEventDTO paymentEventDTO =
           _paymentEventHandler.mapToPaymentEventDTO(paymentEvent);
       dropInPlatformApi.onPaymentsResult(paymentEventDTO);
     } catch (error) {
       String errorMessage = error.toString();
       adyenLogger.print("Failure in onSubmit, $errorMessage");
-      dropInPlatformApi.onPaymentsResult(PaymentEventDTO(
-        paymentEventType: PaymentEventType.error,
-        error: ErrorDTO(
-          errorMessage: errorMessage,
-          reason: "Failure in onSubmit, $errorMessage",
-          dismissDropIn: false,
+      dropInPlatformApi.onPaymentsResult(
+        PaymentEventDTO(
+          paymentEventType: PaymentEventType.error,
+          error: ErrorDTO(
+            errorMessage: errorMessage,
+            reason: "Failure in onSubmit, $errorMessage",
+            dismissDropIn: false,
+          ),
         ),
-      ));
+      );
     }
   }
 
@@ -251,14 +249,16 @@ class DropIn {
     } catch (error) {
       String errorMessage = error.toString();
       adyenLogger.print("Failure in onAdditionalDetails, $errorMessage");
-      dropInPlatformApi.onPaymentsDetailsResult(PaymentEventDTO(
-        paymentEventType: PaymentEventType.error,
-        error: ErrorDTO(
-          errorMessage: errorMessage,
-          reason: "Failure in onAdditionalDetails, $errorMessage}",
-          dismissDropIn: false,
+      dropInPlatformApi.onPaymentsDetailsResult(
+        PaymentEventDTO(
+          paymentEventType: PaymentEventType.error,
+          error: ErrorDTO(
+            errorMessage: errorMessage,
+            reason: "Failure in onAdditionalDetails, $errorMessage}",
+            dismissDropIn: false,
+          ),
         ),
-      ));
+      );
     }
   }
 
@@ -274,17 +274,19 @@ class DropIn {
         final String storedPaymentMethodId = event.data as String;
         final bool result = await deletionCallback(storedPaymentMethodId);
         dropInPlatformApi.onDeleteStoredPaymentMethodResult(
-            DeletedStoredPaymentMethodResultDTO(
-          storedPaymentMethodId: storedPaymentMethodId,
-          isSuccessfullyRemoved: result,
-        ));
+          DeletedStoredPaymentMethodResultDTO(
+            storedPaymentMethodId: storedPaymentMethodId,
+            isSuccessfullyRemoved: result,
+          ),
+        );
       } catch (error) {
         adyenLogger.print(error.toString());
         dropInPlatformApi.onDeleteStoredPaymentMethodResult(
-            DeletedStoredPaymentMethodResultDTO(
-          storedPaymentMethodId: "",
-          isSuccessfullyRemoved: false,
-        ));
+          DeletedStoredPaymentMethodResultDTO(
+            storedPaymentMethodId: "",
+            isSuccessfullyRemoved: false,
+          ),
+        );
       }
     }
   }
@@ -297,8 +299,9 @@ class DropIn {
     final Map<String, dynamic> submitDataDecoded = jsonDecode(submitData);
     switch (advancedCheckout) {
       case AdvancedCheckout it:
-        if (submitDataDecoded[Constants.submitDataKey]
-            .containsKey(Constants.orderKey)) {
+        if (submitDataDecoded[Constants.submitDataKey].containsKey(
+          Constants.orderKey,
+        )) {
           _mapOrderToCompactOrder(submitDataDecoded);
         }
 
@@ -352,7 +355,8 @@ class DropIn {
         Constants.amountKey: data[Constants.amountKey],
       };
       final balanceCheckResponse = await onCheckBalance(
-          balanceCheckRequestBody: balanceCheckRequestBody);
+        balanceCheckRequestBody: balanceCheckRequestBody,
+      );
       dropInPlatformApi.onBalanceCheckResult(jsonEncode(balanceCheckResponse));
     } catch (error) {
       dropInPlatformApi.onBalanceCheckResult(error.toString());
@@ -398,7 +402,8 @@ class DropIn {
       dropInPlatformApi.onOrderCancelResult(orderCancelResponseDTO);
     } catch (error) {
       dropInPlatformApi.onOrderCancelResult(
-          OrderCancelResultDTO(orderCancelResponseBody: {}));
+        OrderCancelResultDTO(orderCancelResponseBody: {}),
+      );
     }
   }
 
@@ -411,9 +416,11 @@ class DropIn {
     }
 
     if (event.data case List<Object?> binLookupDataDTOList) {
-      onBinLookup.call(binLookupDataDTOList
-          .whereType<BinLookupDataDTO>()
-          .toBinLookupDataList());
+      onBinLookup.call(
+        binLookupDataDTOList
+            .whereType<BinLookupDataDTO>()
+            .toBinLookupDataList(),
+      );
     }
   }
 

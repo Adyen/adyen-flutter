@@ -64,8 +64,9 @@ class InstantAdvancedComponent extends BaseInstantComponent {
   Future<void> _onAdditionalDetails(ComponentCommunicationModel event) async {
     try {
       final String additionalData = (event.data as String);
-      final Map<String, dynamic> additionalDataDecoded =
-          jsonDecode(additionalData);
+      final Map<String, dynamic> additionalDataDecoded = jsonDecode(
+        additionalData,
+      );
       final PaymentEvent paymentEvent =
           await advancedCheckout.onAdditionalDetails(additionalDataDecoded);
       final PaymentEventDTO paymentEventDTO =

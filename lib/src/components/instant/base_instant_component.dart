@@ -32,11 +32,13 @@ abstract class BaseInstantComponent {
     Map<String, dynamic> paymentMethodResponse,
   ) async {
     completer = Completer<PaymentResult>();
-    componentCommunicationStream = ComponentFlutterApi
-        .instance.componentCommunicationStream.stream
-        .where((communicationModel) =>
-            communicationModel.componentId == componentId)
-        .listen(handleComponentCommunication);
+    componentCommunicationStream =
+        ComponentFlutterApi.instance.componentCommunicationStream.stream
+            .where(
+              (communicationModel) =>
+                  communicationModel.componentId == componentId,
+            )
+            .listen(handleComponentCommunication);
 
     final sdkVersionNumber =
         await sdkVersionNumberProvider.getSdkVersionNumber();

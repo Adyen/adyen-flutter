@@ -30,10 +30,7 @@ class GooglePaySessionComponent extends BaseGooglePayComponent {
 
   @override
   void handleComponentCommunication(ComponentCommunicationModel event) {
-    isButtonClickable.value = true;
-    if (event.type case ComponentCommunicationType.loading) {
-      onLoading();
-    } else if (event.type case ComponentCommunicationType.result) {
+    if (event.type case ComponentCommunicationType.result) {
       onResult(event);
     }
   }
@@ -44,12 +41,14 @@ class GooglePaySessionComponent extends BaseGooglePayComponent {
         paymentResultDTO.result?.toResultCode() ?? ResultCode.unknown;
     adyenLogger.print("Google Pay session result code: $resultCode");
     _resetSession();
-    onPaymentResult(PaymentSessionFinished(
-      sessionId: paymentResultDTO.result?.sessionId ?? "",
-      sessionData: paymentResultDTO.result?.sessionData ?? "",
-      sessionResult: paymentResultDTO.result?.sessionResult ?? "",
-      resultCode: resultCode,
-    ));
+    onPaymentResult(
+      PaymentSessionFinished(
+        sessionId: paymentResultDTO.result?.sessionId ?? "",
+        sessionData: paymentResultDTO.result?.sessionData ?? "",
+        sessionResult: paymentResultDTO.result?.sessionResult ?? "",
+        resultCode: resultCode,
+      ),
+    );
   }
 
   void _resetSession() => AdyenCheckout.session.clear();

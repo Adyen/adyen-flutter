@@ -27,7 +27,8 @@ class ComponentFlutterApi implements ComponentFlutterInterface {
 
   @override
   void onComponentCommunication(
-      ComponentCommunicationModel componentCommunicationModel) {
+    ComponentCommunicationModel componentCommunicationModel,
+  ) {
     _componentCommunicationStream.sink.add(componentCommunicationModel);
   }
 

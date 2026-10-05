@@ -1,4 +1,1 @@
-enum GooglePayButtonTheme {
-  dark,
-  light,
-}
+enum GooglePayButtonTheme { dark, light }

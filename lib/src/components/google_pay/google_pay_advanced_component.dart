@@ -35,13 +35,10 @@ class GooglePayAdvancedComponent extends BaseGooglePayComponent {
 
   @override
   void handleComponentCommunication(ComponentCommunicationModel event) {
-    isButtonClickable.value = true;
     if (event.type case ComponentCommunicationType.onSubmit) {
       _onSubmit(event);
     } else if (event.type case ComponentCommunicationType.additionalDetails) {
       _onAdditionalDetails(event);
-    } else if (event.type case ComponentCommunicationType.loading) {
-      onLoading();
     } else if (event.type case ComponentCommunicationType.result) {
       onResult(event);
     }
@@ -80,14 +77,17 @@ class GooglePayAdvancedComponent extends BaseGooglePayComponent {
   Future<void> _onAdditionalDetails(ComponentCommunicationModel event) async {
     try {
       final String additionalData = (event.data as String);
-      final Map<String, dynamic> additionalDataDecoded =
-          jsonDecode(additionalData);
+      final Map<String, dynamic> additionalDataDecoded = jsonDecode(
+        additionalData,
+      );
       final PaymentEvent paymentEvent =
           await advancedCheckout.onAdditionalDetails(additionalDataDecoded);
       final PaymentEventDTO paymentEventDTO =
           paymentEventHandler.mapToPaymentEventDTO(paymentEvent);
       componentPlatformApi.onPaymentsDetailsResult(
-          componentId, paymentEventDTO);
+        componentId,
+        paymentEventDTO,
+      );
     } catch (exception) {
       componentPlatformApi.onPaymentsDetailsResult(
         componentId,

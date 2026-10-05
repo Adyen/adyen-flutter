@@ -33,10 +33,11 @@ class DropInPlatformApi implements DropInPlatformInterface {
 
   @override
   Future<void> onDeleteStoredPaymentMethodResult(
-          DeletedStoredPaymentMethodResultDTO
-              deleteStoredPaymentMethodResultDTO) =>
+    DeletedStoredPaymentMethodResultDTO deleteStoredPaymentMethodResultDTO,
+  ) =>
       _dropInPlatformInterface.onDeleteStoredPaymentMethodResult(
-          deleteStoredPaymentMethodResultDTO);
+        deleteStoredPaymentMethodResultDTO,
+      );
 
   @override
   Future<void> cleanUpDropIn() => _dropInPlatformInterface.cleanUpDropIn();

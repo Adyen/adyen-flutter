@@ -18,7 +18,5 @@ class ApplePayAuthorizationSuccess extends ApplePayAuthorizationResult {
 class ApplePayAuthorizationFailure extends ApplePayAuthorizationResult {
   final List<ApplePayPaymentError> errors;
 
-  const ApplePayAuthorizationFailure({
-    required this.errors,
-  });
+  const ApplePayAuthorizationFailure({required this.errors});
 }

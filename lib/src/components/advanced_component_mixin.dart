@@ -38,8 +38,10 @@ mixin AdvancedComponentMixin on BasePlatformViewComponent {
       final PaymentEvent paymentEvent = await advancedCheckout.onSubmit(data);
       final PaymentEventDTO paymentEventDTO =
           paymentEventHandler.mapToPaymentEventDTO(paymentEvent);
-      ComponentPlatformApi.instance
-          .onPaymentsResult(componentId, paymentEventDTO);
+      ComponentPlatformApi.instance.onPaymentsResult(
+        componentId,
+        paymentEventDTO,
+      );
     } catch (exception) {
       _sendErrorToNative(exception.toString());
     }
@@ -52,8 +54,10 @@ mixin AdvancedComponentMixin on BasePlatformViewComponent {
           await advancedCheckout.onAdditionalDetails(additionalDetails);
       final PaymentEventDTO paymentEventDTO =
           paymentEventHandler.mapToPaymentEventDTO(paymentEvent);
-      ComponentPlatformApi.instance
-          .onPaymentsDetailsResult(componentId, paymentEventDTO);
+      ComponentPlatformApi.instance.onPaymentsDetailsResult(
+        componentId,
+        paymentEventDTO,
+      );
     } catch (exception) {
       _sendErrorToNative(exception.toString());
     }

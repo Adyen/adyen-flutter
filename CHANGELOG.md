@@ -1,3 +1,10 @@
+## Unreleased
+
+### Improved
+
+- **(Internal change)** For Google Pay Component on Android: the loading indicator and button lock
+  now survive widget updates, and internal state is no longer leaked when the component is rebuilt.
+
 ## 1.13.0
 
 ### Improved

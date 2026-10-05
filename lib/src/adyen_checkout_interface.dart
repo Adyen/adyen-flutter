@@ -10,10 +10,7 @@ abstract class AdyenCheckoutInterface {
     String publicKey,
   );
 
-  Future<String> encryptBin(
-    String bin,
-    String publicKey,
-  );
+  Future<String> encryptBin(String bin, String publicKey);
 
   Future<ActionResult> handleAction(
     ActionComponentConfiguration actionComponentConfiguration,

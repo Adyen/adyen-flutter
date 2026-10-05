@@ -119,13 +119,9 @@ void main() {
     });
 
     test('maps with only defaultOptions', () {
-      final defaultOptions = DefaultInstallmentOptions(
-        values: [2, 3],
-      );
+      final defaultOptions = DefaultInstallmentOptions(values: [2, 3]);
 
-      final config = InstallmentConfiguration(
-        defaultOptions: defaultOptions,
-      );
+      final config = InstallmentConfiguration(defaultOptions: defaultOptions);
 
       final dto = config.toDTO();
 
@@ -136,10 +132,7 @@ void main() {
 
     test('maps with only cardBasedOptions', () {
       final cardBasedOptions = [
-        CardBasedInstallmentOptions(
-          cardBrand: 'visa',
-          values: [2, 3, 6, 12],
-        ),
+        CardBasedInstallmentOptions(cardBrand: 'visa', values: [2, 3, 6, 12]),
       ];
 
       final config = InstallmentConfiguration(
@@ -165,18 +158,9 @@ void main() {
 
     test('maps multiple card-based options correctly', () {
       final cardBasedOptions = [
-        CardBasedInstallmentOptions(
-          cardBrand: 'visa',
-          values: [2, 3, 6, 12],
-        ),
-        CardBasedInstallmentOptions(
-          cardBrand: 'mc',
-          values: [2, 3, 6],
-        ),
-        CardBasedInstallmentOptions(
-          cardBrand: 'amex',
-          values: [3, 6],
-        ),
+        CardBasedInstallmentOptions(cardBrand: 'visa', values: [2, 3, 6, 12]),
+        CardBasedInstallmentOptions(cardBrand: 'mc', values: [2, 3, 6]),
+        CardBasedInstallmentOptions(cardBrand: 'amex', values: [3, 6]),
       ];
 
       final config = InstallmentConfiguration(
@@ -217,9 +201,7 @@ void main() {
     });
 
     test('maps CardConfiguration without installmentConfiguration', () {
-      const cardConfig = CardConfiguration(
-        holderNameRequired: false,
-      );
+      const cardConfig = CardConfiguration(holderNameRequired: false);
 
       final dto = cardConfig.toDTO();
 
@@ -289,17 +271,28 @@ void main() {
       final dto = cardConfig.toDTO();
 
       expect(dto.installmentConfiguration?.defaultOptions?.values, [6, 12]);
-      expect(dto.installmentConfiguration?.defaultOptions?.includesRevolving,
-          true);
+      expect(
+        dto.installmentConfiguration?.defaultOptions?.includesRevolving,
+        true,
+      );
       expect(dto.installmentConfiguration?.cardBasedOptions?.length, 2);
-      expect(dto.installmentConfiguration?.cardBasedOptions?[0]?.cardBrand,
-          'visa');
       expect(
-          dto.installmentConfiguration?.cardBasedOptions?[0]?.values, [9, 12]);
+        dto.installmentConfiguration?.cardBasedOptions?[0]?.cardBrand,
+        'visa',
+      );
+      expect(dto.installmentConfiguration?.cardBasedOptions?[0]?.values, [
+        9,
+        12,
+      ]);
       expect(
-          dto.installmentConfiguration?.cardBasedOptions?[1]?.cardBrand, 'mc');
-      expect(dto.installmentConfiguration?.cardBasedOptions?[1]?.values,
-          [2, 3, 6]);
+        dto.installmentConfiguration?.cardBasedOptions?[1]?.cardBrand,
+        'mc',
+      );
+      expect(dto.installmentConfiguration?.cardBasedOptions?[1]?.values, [
+        2,
+        3,
+        6,
+      ]);
       expect(dto.installmentConfiguration?.showInstallmentAmount, true);
     });
 

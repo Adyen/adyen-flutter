@@ -21,14 +21,17 @@ class ActionComponent {
   ) async {
     final sdkVersionNumber =
         await SdkVersionNumberProvider.instance.getSdkVersionNumber();
-    final actionComponentConfigurationDTO =
-        actionComponentConfiguration.toDTO(sdkVersionNumber);
+    final actionComponentConfigurationDTO = actionComponentConfiguration.toDTO(
+      sdkVersionNumber,
+    );
     completer = Completer<ActionResult>();
-    componentCommunicationStream = ComponentFlutterApi
-        .instance.componentCommunicationStream.stream
-        .where((communicationModel) =>
-            communicationModel.componentId == componentId)
-        .listen(handleComponentCommunication);
+    componentCommunicationStream =
+        ComponentFlutterApi.instance.componentCommunicationStream.stream
+            .where(
+              (communicationModel) =>
+                  communicationModel.componentId == componentId,
+            )
+            .listen(handleComponentCommunication);
     ComponentPlatformApi.instance.handleAction(
       actionComponentConfigurationDTO,
       componentId,

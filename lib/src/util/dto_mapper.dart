@@ -5,10 +5,8 @@ import 'package:adyen_checkout/adyen_checkout.dart';
 import 'package:adyen_checkout/src/generated/platform_api.g.dart';
 
 extension AnalyticsOptionsMapper on AnalyticsOptions {
-  AnalyticsOptionsDTO toDTO(String version) => AnalyticsOptionsDTO(
-        enabled: enabled,
-        version: version,
-      );
+  AnalyticsOptionsDTO toDTO(String version) =>
+      AnalyticsOptionsDTO(enabled: enabled, version: version);
 }
 
 extension DropInConfigurationMapper on DropInConfiguration {
@@ -30,7 +28,8 @@ extension DropInConfigurationMapper on DropInConfiguration {
         threeDS2ConfigurationDTO: threeDS2Configuration?.toDTO(),
         analyticsOptionsDTO: analyticsOptions.toDTO(sdkVersionNumber),
         isRemoveStoredPaymentMethodEnabled: _isRemoveStoredPaymentMethodEnabled(
-            storedPaymentMethodConfiguration),
+          storedPaymentMethodConfiguration,
+        ),
         showPreselectedStoredPaymentMethod: storedPaymentMethodConfiguration
                 ?.showPreselectedStoredPaymentMethod ??
             true,
@@ -43,7 +42,8 @@ extension DropInConfigurationMapper on DropInConfiguration {
       );
 
   bool _isRemoveStoredPaymentMethodEnabled(
-          StoredPaymentMethodConfiguration? storedPaymentMethodConfiguration) =>
+    StoredPaymentMethodConfiguration? storedPaymentMethodConfiguration,
+  ) =>
       storedPaymentMethodConfiguration?.deleteStoredPaymentMethodCallback !=
           null &&
       storedPaymentMethodConfiguration?.isRemoveStoredPaymentMethodEnabled ==
@@ -157,9 +157,7 @@ extension ApplePayAuthorizationResultMapper on ApplePayAuthorizationResult {
   ApplePayAuthorizationResultDTO toDTO() {
     switch (this) {
       case ApplePayAuthorizationSuccess():
-        return ApplePayAuthorizationResultDTO(
-          isSuccess: true,
-        );
+        return ApplePayAuthorizationResultDTO(isSuccess: true);
       case ApplePayAuthorizationFailure(errors: final errors):
         return ApplePayAuthorizationResultDTO(
           isSuccess: false,
@@ -217,20 +215,18 @@ extension ApplePayContactDTOMapper on ApplePayContactDTO {
 
 extension ApplePayShippingMethodMapper on ApplePayShippingMethod {
   ApplePayShippingMethodDTO toDTO() => ApplePayShippingMethodDTO(
-      label: label,
-      detail: detail,
-      amount: amount.toDTO(),
-      identifier: identifier,
-      startDate: startDate?.toUtc().toIso8601String(),
-      endDate: endDate?.toUtc().toIso8601String());
+        label: label,
+        detail: detail,
+        amount: amount.toDTO(),
+        identifier: identifier,
+        startDate: startDate?.toUtc().toIso8601String(),
+        endDate: endDate?.toUtc().toIso8601String(),
+      );
 }
 
 extension ApplePaySummaryItemsMapper on ApplePaySummaryItem {
-  ApplePaySummaryItemDTO toDTO() => ApplePaySummaryItemDTO(
-        label: label,
-        amount: amount.toDTO(),
-        type: type,
-      );
+  ApplePaySummaryItemDTO toDTO() =>
+      ApplePaySummaryItemDTO(label: label, amount: amount.toDTO(), type: type);
 }
 
 extension ApplePayShippingMethodUpdateMapper on ApplePayShippingMethodUpdate {
@@ -274,11 +270,8 @@ extension ApplePayShippingMethodDTOMapper on ApplePayShippingMethodDTO {
 }
 
 extension ApplePaySummaryItemDTOMapper on ApplePaySummaryItemDTO {
-  ApplePaySummaryItem fromDTO() => ApplePaySummaryItem(
-        label: label,
-        amount: amount.fromDTO(),
-        type: type,
-      );
+  ApplePaySummaryItem fromDTO() =>
+      ApplePaySummaryItem(label: label, amount: amount.fromDTO(), type: type);
 }
 
 extension ApplePaySummaryItemDTOListMapper on List<ApplePaySummaryItemDTO?> {
@@ -304,12 +297,14 @@ extension TwintConfigurationMapper on TwintConfiguration {
 extension ThreeDS2ConfigurationMapper on ThreeDS2Configuration {
   ThreeDS2ConfigurationDTO toDTO() {
     if (theme == null && headingTitle != null) {
-      final headingCustomization =
-          ThreeDS2ToolbarCustomizationDTO(headerText: headingTitle);
+      final headingCustomization = ThreeDS2ToolbarCustomizationDTO(
+        headerText: headingTitle,
+      );
       return ThreeDS2ConfigurationDTO(
         requestorAppURL: requestorAppURL,
         uiCustomization: ThreeDS2UICustomizationDTO(
-            headingCustomization: headingCustomization),
+          headingCustomization: headingCustomization,
+        ),
       );
     }
 
@@ -327,8 +322,9 @@ extension Adyen3DSThemeMapper on Adyen3DSTheme {
         backgroundColor: backgroundColor?.toHexString(),
         textColor: textColor?.toHexString(),
       ),
-      headingCustomization:
-          createHeadingCustomization(headingTitle: headingTitle),
+      headingCustomization: createHeadingCustomization(
+        headingTitle: headingTitle,
+      ),
       labelCustomization: descriptionTheme?.toDTO(),
       inputCustomization: inputDecorationTheme?.toDTO(),
       selectionItemCustomization: selectionItemTheme?.toDTO(),
@@ -337,8 +333,9 @@ extension Adyen3DSThemeMapper on Adyen3DSTheme {
     );
   }
 
-  ThreeDS2ToolbarCustomizationDTO? createHeadingCustomization(
-      {String? headingTitle}) {
+  ThreeDS2ToolbarCustomizationDTO? createHeadingCustomization({
+    String? headingTitle,
+  }) {
     final headerTheme = this.headerTheme;
     if (headerTheme == null && headingTitle == null) {
       return null;
@@ -427,10 +424,7 @@ extension SessionMapper on SessionCheckout {
 }
 
 extension AmountMapper on Amount {
-  AmountDTO toDTO() => AmountDTO(
-        value: value,
-        currency: currency,
-      );
+  AmountDTO toDTO() => AmountDTO(value: value, currency: currency);
 }
 
 extension AmountDTOMapper on AmountDTO {
@@ -438,10 +432,8 @@ extension AmountDTOMapper on AmountDTO {
 }
 
 extension OrderResponseMapper on OrderResponseDTO {
-  OrderResponse fromDTO() => OrderResponse(
-        pspReference: pspReference,
-        orderData: orderData,
-      );
+  OrderResponse fromDTO() =>
+      OrderResponse(pspReference: pspReference, orderData: orderData);
 }
 
 extension CardComponentConfigurationMapper on CardComponentConfiguration {
@@ -489,10 +481,7 @@ extension GooglePayComponentConfigurationMapper
 
 extension MerchantInfoMapper on MerchantInfo {
   MerchantInfoDTO toDTO() {
-    return MerchantInfoDTO(
-      merchantName: merchantName,
-      merchantId: merchantId,
-    );
+    return MerchantInfoDTO(merchantName: merchantName, merchantId: merchantId);
   }
 }
 

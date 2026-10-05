@@ -39,7 +39,8 @@ class IosPlatformView extends StatelessWidget {
   }
 
   Set<Factory<OneSequenceGestureRecognizer>> _createGestureRecognizers(
-      BuildContext context) {
+    BuildContext context,
+  ) {
     final groupedGestureRecognizers = <Factory<OneSequenceGestureRecognizer>>{};
     gestureRecognizers?.forEach((gestureRecognizer) {
       groupedGestureRecognizers.add(gestureRecognizer);
@@ -61,10 +62,14 @@ class IosPlatformView extends StatelessWidget {
     if (cardConfiguration?.cardConfiguration.showStorePaymentField == true) {
       groupedGestureRecognizers.addAll({
         Factory<HorizontalDragGestureRecognizer>(
-            () => HorizontalDragGestureRecognizer()),
-        Factory<ToggleAreaGestureRecognizer>(() => ToggleAreaGestureRecognizer(
+          () => HorizontalDragGestureRecognizer(),
+        ),
+        Factory<ToggleAreaGestureRecognizer>(
+          () => ToggleAreaGestureRecognizer(
             componentWidgetKey: componentWidgetKey,
-            textDirection: Directionality.of(context))),
+            textDirection: Directionality.of(context),
+          ),
+        ),
       });
     }
   }

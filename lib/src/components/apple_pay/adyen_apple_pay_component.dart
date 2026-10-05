@@ -59,7 +59,8 @@ class AdyenApplePayComponent extends StatelessWidget {
           case AdvancedCheckout it:
             if (configuration.amount == null) {
               AdyenLogger.instance.print(
-                  "Apple Pay requires to set an amount when using the advanced flow.");
+                "Apple Pay requires to set an amount when using the advanced flow.",
+              );
               onUnavailable?.call();
               return unavailableWidget ?? const SizedBox.shrink();
             }
@@ -81,7 +82,8 @@ class AdyenApplePayComponent extends StatelessWidget {
         }
       default:
         throw Exception(
-            "The Apple Pay component is not supported on $defaultTargetPlatform");
+          "The Apple Pay component is not supported on $defaultTargetPlatform",
+        );
     }
   }
 

@@ -15,19 +15,13 @@ class AdyenCheckoutSession {
   final AdyenCheckoutApi adyenCheckoutApi;
   final DropIn dropIn;
 
-  AdyenCheckoutSession(
-    this.adyenCheckoutApi,
-    this.dropIn,
-  );
+  AdyenCheckoutSession(this.adyenCheckoutApi, this.dropIn);
 
   Future<PaymentResult> startDropIn({
     required DropInConfiguration dropInConfiguration,
     required SessionCheckout checkout,
   }) =>
-      dropIn.startDropInSessionsPayment(
-        dropInConfiguration,
-        checkout,
-      );
+      dropIn.startDropInSessionsPayment(dropInConfiguration, checkout);
 
   Future<SessionCheckout> create({
     required String sessionId,
@@ -66,17 +60,11 @@ class AdyenCheckoutSession {
         InstantPaymentType.googlePay,
       );
     } else if (configuration is ApplePayComponentConfiguration) {
-      return configuration.toDTO(
-        sdkVersionNumber,
-        InstantPaymentType.applePay,
-      );
+      return configuration.toDTO(sdkVersionNumber, InstantPaymentType.applePay);
     } else if (configuration is DropInConfiguration) {
       return configuration.toDTO(sdkVersionNumber, true);
     } else if (configuration is InstantComponentConfiguration) {
-      return configuration.toDTO(
-        sdkVersionNumber,
-        InstantPaymentType.instant,
-      );
+      return configuration.toDTO(sdkVersionNumber, InstantPaymentType.instant);
     } else if (configuration is BlikComponentConfiguration) {
       return configuration.toDTO(sdkVersionNumber);
     }
@@ -87,8 +75,7 @@ class AdyenCheckoutSession {
     required Map<String, dynamic> paymentMethod,
     required SessionCheckout checkout,
   }) =>
-      InstantSessionComponent(sessionCheckout: checkout).start(
-        configuration,
-        paymentMethod,
-      );
+      InstantSessionComponent(
+        sessionCheckout: checkout,
+      ).start(configuration, paymentMethod);
 }

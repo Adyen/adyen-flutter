@@ -92,13 +92,16 @@ class _BaseApplePayComponentState extends State<BaseApplePayComponent> {
     ApplePayCallbackRegistry.instance.register(
       widget.componentId,
       ApplePayCallbackHandler(
-          () => widget.applePayComponentConfiguration.applePayConfiguration),
+        () => widget.applePayComponentConfiguration.applePayConfiguration,
+      ),
     );
-    _componentCommunicationStream = _componentFlutterApi
-        .componentCommunicationStream.stream
-        .where((communicationModel) =>
-            communicationModel.componentId == widget.componentId)
-        .listen(widget.handleComponentCommunication);
+    _componentCommunicationStream =
+        _componentFlutterApi.componentCommunicationStream.stream
+            .where(
+              (communicationModel) =>
+                  communicationModel.componentId == widget.componentId,
+            )
+            .listen(widget.handleComponentCommunication);
     _applePaySupportedFuture = _isApplePaySupported();
   }
 
@@ -114,8 +117,9 @@ class _BaseApplePayComponentState extends State<BaseApplePayComponent> {
           if (_isApplePaySupportedOnDevice(snapshot)) {
             return _buildApplePayOrLoadingContainer(snapshot);
           } else {
-            widget.adyenLogger
-                .print("Apple pay is not available on this device.");
+            widget.adyenLogger.print(
+              "Apple pay is not available on this device.",
+            );
             widget.onUnavailable?.call();
             return widget.unavailableWidget ?? const SizedBox.shrink();
           }
@@ -138,13 +142,15 @@ class _BaseApplePayComponentState extends State<BaseApplePayComponent> {
   }
 
   bool _isApplePaySupportedOnDevice(
-      AsyncSnapshot<InstantPaymentSetupResultDTO> snapshot) {
+    AsyncSnapshot<InstantPaymentSetupResultDTO> snapshot,
+  ) {
     return snapshot.data?.instantPaymentType == InstantPaymentType.applePay &&
         snapshot.data?.isSupported == true;
   }
 
   Widget _buildApplePayOrLoadingContainer(
-      AsyncSnapshot<InstantPaymentSetupResultDTO> snapshot) {
+    AsyncSnapshot<InstantPaymentSetupResultDTO> snapshot,
+  ) {
     return ValueListenableBuilder(
       valueListenable: widget.isLoading,
       builder: (BuildContext context, value, Widget? child) {
@@ -158,7 +164,8 @@ class _BaseApplePayComponentState extends State<BaseApplePayComponent> {
   }
 
   SizedBox _buildApplePayButton(
-      AsyncSnapshot<InstantPaymentSetupResultDTO> snapshot) {
+    AsyncSnapshot<InstantPaymentSetupResultDTO> snapshot,
+  ) {
     final Widget applePayButton = _buildRawApplePayButton();
 
     return SizedBox(
@@ -167,10 +174,7 @@ class _BaseApplePayComponentState extends State<BaseApplePayComponent> {
       child: ValueListenableBuilder(
         valueListenable: widget.isButtonClickable,
         builder: (BuildContext context, value, Widget? child) {
-          return IgnorePointer(
-            ignoring: value == false,
-            child: applePayButton,
-          );
+          return IgnorePointer(ignoring: value == false, child: applePayButton);
         },
       ),
     );
@@ -219,11 +223,9 @@ class _BaseApplePayComponentState extends State<BaseApplePayComponent> {
     final String versionNumber =
         await widget._sdkVersionNumberProvider.getSdkVersionNumber();
     final InstantPaymentConfigurationDTO
-        instantPaymentComponentConfigurationDTO =
-        widget.applePayComponentConfiguration.toDTO(
-      versionNumber,
-      InstantPaymentType.applePay,
-    );
+        instantPaymentComponentConfigurationDTO = widget
+            .applePayComponentConfiguration
+            .toDTO(versionNumber, InstantPaymentType.applePay);
     return instantPaymentComponentConfigurationDTO;
   }
 }

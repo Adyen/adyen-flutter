@@ -32,10 +32,14 @@ class AdyenBlikComponent extends StatelessWidget {
         if (snapshot.data != null) {
           final sdkVersionNumber = snapshot.data ?? "";
           return switch (checkout) {
-            SessionCheckout it =>
-              _buildBlikSessionFlowWidget(sdkVersionNumber, it),
-            AdvancedCheckout it =>
-              _buildBlikAdvancedFlowWidget(sdkVersionNumber, it),
+            SessionCheckout it => _buildBlikSessionFlowWidget(
+                sdkVersionNumber,
+                it,
+              ),
+            AdvancedCheckout it => _buildBlikAdvancedFlowWidget(
+                sdkVersionNumber,
+                it,
+              ),
           };
         } else {
           return Container(height: _determineInitialHeight());
@@ -79,7 +83,7 @@ class AdyenBlikComponent extends StatelessWidget {
     return switch (defaultTargetPlatform) {
       TargetPlatform.android => initialAndroidViewHeight,
       TargetPlatform.iOS => initialIosViewHeight,
-      _ => throw UnsupportedError('Unsupported platform view')
+      _ => throw UnsupportedError('Unsupported platform view'),
     };
   }
 }

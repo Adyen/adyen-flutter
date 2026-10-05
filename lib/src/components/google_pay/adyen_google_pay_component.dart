@@ -70,7 +70,8 @@ class AdyenGooglePayComponent extends StatelessWidget {
             ),
         },
       _ => throw Exception(
-          "The Google Pay component is not supported on $defaultTargetPlatform"),
+          "The Google Pay component is not supported on $defaultTargetPlatform",
+        ),
     };
   }
 

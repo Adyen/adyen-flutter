@@ -5,11 +5,7 @@ final class ThreeDS2Configuration {
   final String? headingTitle;
   final Adyen3DSTheme? theme;
 
-  ThreeDS2Configuration({
-    this.requestorAppURL,
-    this.headingTitle,
-    this.theme,
-  });
+  ThreeDS2Configuration({this.requestorAppURL, this.headingTitle, this.theme});
 
   @override
   String toString() {

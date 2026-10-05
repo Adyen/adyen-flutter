@@ -88,11 +88,13 @@ class _BasePlatformViewComponentState extends State<BasePlatformViewComponent> {
     super.initState();
 
     _platformWidget = _buildPlatformWidget();
-    _componentCommunicationStream = _componentFlutterApi
-        .componentCommunicationStream.stream
-        .where((communicationModel) =>
-            communicationModel.componentId == widget.componentId)
-        .listen(_onComponentCommunication);
+    _componentCommunicationStream =
+        _componentFlutterApi.componentCommunicationStream.stream
+            .where(
+              (communicationModel) =>
+                  communicationModel.componentId == widget.componentId,
+            )
+            .listen(_onComponentCommunication);
   }
 
   @override

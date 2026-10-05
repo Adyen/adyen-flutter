@@ -53,16 +53,15 @@ class AdyenCheckout implements AdyenCheckoutInterface {
     String publicKey,
   ) async {
     final unencryptedCardDTO = unencryptedCard.toDTO();
-    final encryptedCardDTO =
-        await _adyenCheckoutApi.encryptCard(unencryptedCardDTO, publicKey);
+    final encryptedCardDTO = await _adyenCheckoutApi.encryptCard(
+      unencryptedCardDTO,
+      publicKey,
+    );
     return encryptedCardDTO.fromDTO();
   }
 
   @override
-  Future<String> encryptBin(
-    String bin,
-    String publicKey,
-  ) =>
+  Future<String> encryptBin(String bin, String publicKey) =>
       _adyenCheckoutApi.encryptBin(bin, publicKey);
 
   @override
@@ -78,10 +77,7 @@ class AdyenCheckout implements AdyenCheckoutInterface {
     bool enableLuhnCheck = true,
   }) async {
     final CardNumberValidationResultDTO cardNumberValidation =
-        await _adyenCheckoutApi.validateCardNumber(
-      cardNumber,
-      enableLuhnCheck,
-    );
+        await _adyenCheckoutApi.validateCardNumber(cardNumber, enableLuhnCheck);
 
     return switch (cardNumberValidation) {
       CardNumberValidationResultDTO.valid => ValidCardNumber(),
@@ -90,7 +86,7 @@ class AdyenCheckout implements AdyenCheckoutInterface {
       CardNumberValidationResultDTO.invalidTooShort ||
       CardNumberValidationResultDTO.invalidTooLong ||
       CardNumberValidationResultDTO.invalidOtherReason =>
-        InvalidCardNumberOtherReason()
+        InvalidCardNumberOtherReason(),
     };
   }
 
@@ -100,10 +96,7 @@ class AdyenCheckout implements AdyenCheckoutInterface {
     required String expiryYear,
   }) async {
     final CardExpiryDateValidationResultDTO cardExpiryDateValidationResultDTO =
-        await _adyenCheckoutApi.validateCardExpiryDate(
-      expiryMonth,
-      expiryYear,
-    );
+        await _adyenCheckoutApi.validateCardExpiryDate(expiryMonth, expiryYear);
 
     return switch (cardExpiryDateValidationResultDTO) {
       CardExpiryDateValidationResultDTO.valid => ValidCardExpiryDate(),
@@ -111,7 +104,7 @@ class AdyenCheckout implements AdyenCheckoutInterface {
       CardExpiryDateValidationResultDTO.invalidTooOld ||
       CardExpiryDateValidationResultDTO.nonParseableDate ||
       CardExpiryDateValidationResultDTO.invalidOtherReason =>
-        InvalidCardExpiryDateOtherReason()
+        InvalidCardExpiryDateOtherReason(),
     };
   }
 
@@ -121,15 +114,12 @@ class AdyenCheckout implements AdyenCheckoutInterface {
     String? cardBrand,
   }) async {
     final CardSecurityCodeValidationResultDTO
-        cardSecurityCodeValidationResultDTO =
-        await _adyenCheckoutApi.validateCardSecurityCode(
-      securityCode,
-      cardBrand,
-    );
+        cardSecurityCodeValidationResultDTO = await _adyenCheckoutApi
+            .validateCardSecurityCode(securityCode, cardBrand);
 
     return switch (cardSecurityCodeValidationResultDTO) {
       CardSecurityCodeValidationResultDTO.valid => ValidCardSecurityCode(),
-      CardSecurityCodeValidationResultDTO.invalid => InvalidCardSecurityCode()
+      CardSecurityCodeValidationResultDTO.invalid => InvalidCardSecurityCode(),
     };
   }
 
