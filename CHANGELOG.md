@@ -2,9 +2,9 @@
 
 ### Fixed
 
-- For Apple Pay Component on iOS: `onSubmit` and `onPaymentResult` are now called on the widget's
-  current `AdvancedCheckout` after the component is rebuilt, instead of the checkout it was first
-  mounted with. ([#756](https://github.com/Adyen/adyen-flutter/issues/756))
+- For Apple Pay Component on iOS: `onSubmit` and `onPaymentResult` now always use the checkout
+  currently set on the component. Previously, after updating the component they could still refer
+  to an earlier checkout instance. ([#756](https://github.com/Adyen/adyen-flutter/issues/756))
 
 ## 1.13.0
 
