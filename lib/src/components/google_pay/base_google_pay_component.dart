@@ -24,8 +24,6 @@ abstract class BaseGooglePayComponent extends StatefulWidget {
   final Function()? onUnavailable;
   final Widget? unavailableWidget;
   final Widget? loadingIndicator;
-  final ValueNotifier<bool> isButtonClickable = ValueNotifier<bool>(true);
-  final ValueNotifier<bool> isLoading = ValueNotifier<bool>(false);
   final SdkVersionNumberProvider _sdkVersionNumberProvider =
       SdkVersionNumberProvider.instance;
   final ComponentPlatformApi componentPlatformApi =
@@ -53,7 +51,6 @@ abstract class BaseGooglePayComponent extends StatefulWidget {
   void onFinished(PaymentResultDTO paymentResultDTO);
 
   void onResult(ComponentCommunicationModel event) {
-    isLoading.value = false;
     final paymentResult = event.paymentResult;
     if (paymentResult == null) {
       throw Exception("Payment result handling failed");
@@ -74,14 +71,14 @@ abstract class BaseGooglePayComponent extends StatefulWidget {
 
   void _onCancelledByUser() => onPaymentResult(PaymentCancelledByUser());
 
-  void onLoading() => isLoading.value = true;
-
   @override
   State<BaseGooglePayComponent> createState() => _BaseGooglePayComponentState();
 }
 
 class _BaseGooglePayComponentState extends State<BaseGooglePayComponent> {
   final ComponentFlutterApi _componentFlutterApi = ComponentFlutterApi.instance;
+  final ValueNotifier<bool> _isButtonClickable = ValueNotifier<bool>(true);
+  final ValueNotifier<bool> _isLoading = ValueNotifier<bool>(false);
   late StreamSubscription<ComponentCommunicationModel>
       _componentCommunicationStream;
   late Completer<InstantPaymentSetupResultDTO> _availabilityCompleter;
@@ -95,13 +92,7 @@ class _BaseGooglePayComponentState extends State<BaseGooglePayComponent> {
         .componentCommunicationStream.stream
         .where((communicationModel) =>
             communicationModel.componentId == widget.componentId)
-        .listen((communicationModel) {
-      if (communicationModel.type == ComponentCommunicationType.availability) {
-        _handleAvailabilityResult(communicationModel);
-      } else {
-        widget.handleComponentCommunication(communicationModel);
-      }
-    });
+        .listen(_handleComponentCommunication);
     _googlePayAvailableFuture = _isGooglePayAvailable();
   }
 
@@ -130,10 +121,24 @@ class _BaseGooglePayComponentState extends State<BaseGooglePayComponent> {
     );
   }
 
+  void _handleComponentCommunication(ComponentCommunicationModel event) {
+    if (event.type == ComponentCommunicationType.availability) {
+      _handleAvailabilityResult(event);
+      return;
+    }
+    _isButtonClickable.value = true;
+    if (event.type case ComponentCommunicationType.loading) {
+      _isLoading.value = true;
+    } else if (event.type case ComponentCommunicationType.result) {
+      _isLoading.value = false;
+    }
+    widget.handleComponentCommunication(event);
+  }
+
   @override
   void dispose() {
-    widget.isButtonClickable.dispose();
-    widget.isLoading.dispose();
+    _isButtonClickable.dispose();
+    _isLoading.dispose();
     widget.componentPlatformApi.onDispose(widget.componentId);
     _componentCommunicationStream.cancel();
     _componentFlutterApi.dispose();
@@ -159,7 +164,7 @@ class _BaseGooglePayComponentState extends State<BaseGooglePayComponent> {
   Widget _buildGooglePayOrLoadingContainer(
       AsyncSnapshot<InstantPaymentSetupResultDTO> snapshot) {
     return ValueListenableBuilder(
-      valueListenable: widget.isLoading,
+      valueListenable: _isLoading,
       builder: (BuildContext context, value, Widget? child) {
         if (value == true) {
           return widget.loadingIndicator ?? const SizedBox.shrink();
@@ -189,7 +194,7 @@ class _BaseGooglePayComponentState extends State<BaseGooglePayComponent> {
       width: widget.width,
       height: widget.height,
       child: ValueListenableBuilder(
-        valueListenable: widget.isButtonClickable,
+        valueListenable: _isButtonClickable,
         builder: (BuildContext context, value, Widget? child) {
           return IgnorePointer(
             ignoring: value == false,
@@ -215,7 +220,7 @@ class _BaseGooglePayComponentState extends State<BaseGooglePayComponent> {
     final InstantPaymentConfigurationDTO instantPaymentConfigurationDTO =
         await _createInstantPaymentConfigurationDTO();
 
-    widget.isButtonClickable.value = false;
+    _isButtonClickable.value = false;
     widget.componentPlatformApi.onInstantPaymentPressed(
       instantPaymentConfigurationDTO,
       widget.googlePayPaymentMethod,

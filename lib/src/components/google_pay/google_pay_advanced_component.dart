@@ -35,13 +35,10 @@ class GooglePayAdvancedComponent extends BaseGooglePayComponent {
 
   @override
   void handleComponentCommunication(ComponentCommunicationModel event) {
-    isButtonClickable.value = true;
     if (event.type case ComponentCommunicationType.onSubmit) {
       _onSubmit(event);
     } else if (event.type case ComponentCommunicationType.additionalDetails) {
       _onAdditionalDetails(event);
-    } else if (event.type case ComponentCommunicationType.loading) {
-      onLoading();
     } else if (event.type case ComponentCommunicationType.result) {
       onResult(event);
     }
