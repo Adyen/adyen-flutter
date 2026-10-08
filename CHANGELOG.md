@@ -6,6 +6,17 @@
   currently set on the component. Previously, after updating the component they could still refer
   to an earlier checkout instance.
 
+### Improved
+
+- On iOS: Improved the layout of Drop-in and Components for iPhone Duo.
+
+### Changed
+
+- Dependency versions:
+  | Name | Version |
+  |---------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------|
+  | [iOS Drop-in/Components](https://docs.adyen.com/online-payments/release-notes/?title%5B0%5D=iOS+Components%2FDrop-in&version%5B0%5D=5.26.0) | 5.25.1 -> **5.26.0** |
+
 ## 1.13.0
 
 ### Improved
