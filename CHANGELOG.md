@@ -6,6 +6,10 @@
   currently set on the component. Previously, after updating the component they could still refer
   to an earlier checkout instance.
 
+### Improved
+
+- On iOS: Improved the layout of Drop-in and Components for iPhone Duo.
+
 ### Changed
 
 - Dependency versions:
