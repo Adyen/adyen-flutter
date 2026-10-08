@@ -1,10 +1,10 @@
-## Unreleased
+## 1.14.0
 
 ### Fixed
 
-- For Apple Pay Component on iOS: `onSubmit` and `onPaymentResult` now always use the checkout
-  currently set on the component. Previously, after updating the component they could still refer
-  to an earlier checkout instance.
+- For the Apple Pay component on iOS with the advanced flow: `onSubmit` and `onPaymentResult` now
+  always use the current `AdvancedCheckout` instance set on the component. Previously, after
+  rerendering the component, it could still refer to an earlier `AdvancedCheckout` instance.
 
 ### Improved
 
