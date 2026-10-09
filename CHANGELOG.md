@@ -2,13 +2,14 @@
 
 ### Fixed
 
-- For the Apple Pay component on iOS with the advanced flow: `onSubmit` and `onPaymentResult` now
-  always use the current `AdvancedCheckout` instance set on the component. Previously, after
-  rerendering the component, it could still refer to an earlier `AdvancedCheckout` instance.
+- For the Apple Pay Component on iOS with the Advanced flow: `onSubmit` and `onPaymentResult` now
+  always use the current `AdvancedCheckout` instance set on the Component. Previously, after
+  rerendering the Component, it could still refer to an earlier `AdvancedCheckout` instance.
 
 ### Improved
 
-- On iOS: Improved the layout of Drop-in and Components for iPhone Duo.
+- On iOS: Improved
+  the [layout of Drop-in and Components for iPhone Duo](https://github.com/Adyen/adyen-ios/pull/2752).
 
 ### Changed
 
