@@ -8,6 +8,8 @@
   - On Flutter 3.27 to 3.41, enable it once with `flutter config --enable-swift-package-manager`.
 - **Breaking:** The minimum supported Flutter version is raised from 3.16.0 to 3.27.0, the first
   stable Flutter version with Swift Package Manager support.
+- **Breaking:** The minimum supported Dart SDK is raised from 3.2.0 to 3.6.0, the Dart version
+  bundled with Flutter 3.27.
 
 ## 1.14.0
 
