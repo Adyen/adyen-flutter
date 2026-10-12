@@ -47,6 +47,9 @@ jobs:
           cache: true
           cache-key: beta-android
 
+      - name: Enable Swift Package Manager
+        run: flutter config --enable-swift-package-manager
+
       - run: flutter pub get
 
       - name: Create default project and add Adyen checkout plugin package
@@ -103,6 +106,9 @@ jobs:
           channel: 'beta'
           cache: true
           cache-key: beta-ios
+
+      - name: Enable Swift Package Manager
+        run: flutter config --enable-swift-package-manager
 
       - run: flutter pub get
 

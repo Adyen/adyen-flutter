@@ -33,11 +33,10 @@ jobs:
           channel: 'stable'
           cache-key: ${{ matrix.flutter-version }}
 
-      - run: flutter pub get
-
-      - name: Enable SPM where it is opt-in
-        if: contains(fromJson('["3.24.x","3.27.x","3.29.x","3.32.x","3.35.x","3.38.x","3.41.x"]'), matrix.flutter-version)
+      - name: Enable Swift Package Manager
         run: flutter config --enable-swift-package-manager
+
+      - run: flutter pub get
 
       - name: Clean SwiftPM Artifacts Cache
         run: rm -rf /Users/runner/Library/Caches/org.swift.swiftpm/artifacts

@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		1498D2341E8E89220040F4C2 /* GeneratedPluginRegistrant.m in Sources */ = {isa = PBXBuildFile; fileRef = 1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */; };
 		331C808B294A63AB00263BE5 /* RunnerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 331C807B294A618700263BE5 /* RunnerTests.swift */; };
+		38FBADF9E30AFA14C9504DF6 /* AdyenTwint in Frameworks */ = {isa = PBXBuildFile; productRef = B18283D668E33F31AC143FBF /* AdyenTwint */; };
 		3B3967161E833CAA004F5970 /* AppFrameworkInfo.plist in Resources */ = {isa = PBXBuildFile; fileRef = 3B3967151E833CAA004F5970 /* AppFrameworkInfo.plist */; };
 		74858FAF1ED2DC5600515810 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74858FAE1ED2DC5600515810 /* AppDelegate.swift */; };
 		75072B942F3508AB00DB2A56 /* ConfigurationMapperTests+DropIn.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75072B912F3508AB00DB2A56 /* ConfigurationMapperTests+DropIn.swift */; };
@@ -24,6 +25,7 @@
 		97C146FE1CF9000F007C117D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FD1CF9000F007C117D /* Assets.xcassets */; };
 		97C147011CF9000F007C117D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FF1CF9000F007C117D /* LaunchScreen.storyboard */; };
 		AA1B2C3D4E5F60718293A4B6 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1B2C3D4E5F60718293A4B5 /* SceneDelegate.swift */; };
+		B35B79B76C3BBDC119BEC002 /* AdyenCashAppPay in Frameworks */ = {isa = PBXBuildFile; productRef = CFA3373EBD176494AEAB1A26 /* AdyenCashAppPay */; };
 		D10A00022F90000000000002 /* DropInWindowManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D10A00012F90000000000001 /* DropInWindowManagerTests.swift */; };
 /* End PBXBuildFile section */
 
@@ -91,6 +93,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				78A318202AECB46A00862997 /* FlutterGeneratedPluginSwiftPackage in Frameworks */,
+				B35B79B76C3BBDC119BEC002 /* AdyenCashAppPay in Frameworks */,
+				38FBADF9E30AFA14C9504DF6 /* AdyenTwint in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -209,6 +213,8 @@
 			name = Runner;
 			packageProductDependencies = (
 				78A3181F2AECB46A00862997 /* FlutterGeneratedPluginSwiftPackage */,
+				CFA3373EBD176494AEAB1A26 /* AdyenCashAppPay */,
+				B18283D668E33F31AC143FBF /* AdyenTwint */,
 			);
 			productName = Runner;
 			productReference = 97C146EE1CF9000F007C117D /* Runner.app */;
@@ -246,6 +252,7 @@
 			mainGroup = 97C146E51CF9000F007C117D;
 			packageReferences = (
 				781AD8BC2B33823900A9FFBB /* XCLocalSwiftPackageReference "FlutterGeneratedPluginSwiftPackage" */,
+				1BA59EF4B54A6F6399C74C90 /* XCRemoteSwiftPackageReference "adyen-ios" */,
 			);
 			productRefGroup = 97C146EF1CF9000F007C117D /* Products */;
 			projectDirPath = "";
@@ -693,10 +700,31 @@
 		};
 /* End XCLocalSwiftPackageReference section */
 
+/* Begin XCRemoteSwiftPackageReference section */
+		1BA59EF4B54A6F6399C74C90 /* XCRemoteSwiftPackageReference "adyen-ios" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Adyen/adyen-ios";
+			requirement = {
+				kind = exactVersion;
+				version = 5.26.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
 /* Begin XCSwiftPackageProductDependency section */
 		78A3181F2AECB46A00862997 /* FlutterGeneratedPluginSwiftPackage */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = FlutterGeneratedPluginSwiftPackage;
+		};
+		B18283D668E33F31AC143FBF /* AdyenTwint */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 1BA59EF4B54A6F6399C74C90 /* XCRemoteSwiftPackageReference "adyen-ios" */;
+			productName = AdyenTwint;
+		};
+		CFA3373EBD176494AEAB1A26 /* AdyenCashAppPay */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 1BA59EF4B54A6F6399C74C90 /* XCRemoteSwiftPackageReference "adyen-ios" */;
+			productName = AdyenCashAppPay;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

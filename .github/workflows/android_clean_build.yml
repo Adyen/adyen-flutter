@@ -14,7 +14,7 @@ jobs:
       fail-fast: false
       matrix:
         api-level: [ 36 ]
-        flutter-version: [ 3.16.x, 3.19.x, 3.22.x, 3.24.x, 3.27.x, 3.29.x, 3.32.x, 3.35.x, 3.38.x, 3.41.x, 3.44.x, 3.47.x ]
+        flutter-version: [ 3.24.x, 3.27.x, 3.29.x, 3.32.x, 3.35.x, 3.38.x, 3.41.x, 3.44.x, 3.47.x ]
         agp_version: [ 8.13.2 ]
         gradle_version: [ 8.14.5 ]
     env:
@@ -55,6 +55,9 @@ jobs:
           cache: true
           cache-key: ${{ matrix.flutter-version }}
 
+      - name: Enable Swift Package Manager
+        run: flutter config --enable-swift-package-manager
+
       - name: Create demo project and build APK
         run: |
           flutter create --template=app --platforms=android,ios demo_project
@@ -75,16 +78,9 @@ jobs:
             sed -i "s/id \"com.android.application\" version \"7.3.0\"/id \"com.android.application\" version \"$AGP_VERSION\"/g" android/settings.gradle
           }
           
-          # Change Kotlin version and adjust Gradle for Flutter 3.16.x
-          if [[ "$FLUTTER_VERSION" == "3.16.x" ]]; then
-            sed -i "s/ext.kotlin_version = '1.7.10'/ext.kotlin_version = '1.8.22'/g" android/build.gradle
-            sed -i "s/gradle-7.5-all/gradle-$GRADLE_VERSION-all/g" android/gradle/wrapper/gradle-wrapper.properties
-            change_agp_version
-            change_sdk_versions
-          fi
           
-          # Change Kotlin version and adjust Gradle for Flutter 3.19.x - 3.24.x versions
-          if [[ "$FLUTTER_VERSION" == "3.19.x" || "$FLUTTER_VERSION" == "3.22.x" || "$FLUTTER_VERSION" == "3.24.x" ]]; then
+          # Change Kotlin version and adjust Gradle for Flutter 3.24.x
+          if [[ "$FLUTTER_VERSION" == "3.24.x" ]]; then
             sed -i 's/"org.jetbrains.kotlin.android" version "1.7.10"/"org.jetbrains.kotlin.android" version "1.8.22"/g' android/settings.gradle
             sed -i "s/gradle-7.6.3-all/gradle-$GRADLE_VERSION-all/g" android/gradle/wrapper/gradle-wrapper.properties
             change_agp_version
@@ -96,14 +92,6 @@ jobs:
             change_sdk_versions
           fi  
 
-          # Add missing Kotlin options for Flutter 3.22.x
-          if [ $FLUTTER_VERSION == '3.22.x' ]; then
-            sed -i '/defaultConfig {/i \
-              kotlinOptions {\
-                jvmTarget = 'JavaVersion.VERSION_1_8'\
-              }\
-            ' android/app/build.gradle
-          fi
                     
           # Suppress Kotlin 2.2.x strict JVM target consistency errors in dependencies (Flutter 3.44.x+)
           # pay_android 3.2.x defaults to JVM 1.8 which conflicts with our JVM 11 target
