@@ -80,6 +80,9 @@ release a new version when we need to.
   * Flutter 3.44 or later: Swift Package Manager is enabled by default, so no extra setup is needed.
   * Flutter 3.27 to 3.41: enable Swift Package Manager once with
     `flutter config --enable-swift-package-manager`.
+  * Need CocoaPods? Use
+    [adyen_checkout 1.14.0](https://pub.dev/packages/adyen_checkout/versions/1.14.0), the last
+    version that supports CocoaPods.
 * Add the return URL handler to your AppDelegate in
   your [native iOS](https://github.com/Adyen/adyen-flutter/blob/main/example/ios/Runner/AppDelegate.swift#L19)
   layer.
