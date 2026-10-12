@@ -104,6 +104,7 @@ jobs:
           xcodebuild build \
             -workspace Runner.xcworkspace \
             -scheme Runner \
+            -skipPackagePluginValidation \
             -configuration Debug \
             -destination "generic/platform=iOS Simulator" \
             CODE_SIGNING_REQUIRED=NO \
