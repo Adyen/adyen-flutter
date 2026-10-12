@@ -51,9 +51,6 @@ jobs:
           cache: true
           cache-key: ${{ matrix.flutter-version }}
 
-      - name: Enable Swift Package Manager
-        run: flutter config --enable-swift-package-manager
-
       - name: Create demo project and build APK
         run: |
           flutter create --template=app --platforms=android demo_project
