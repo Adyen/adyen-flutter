@@ -75,6 +75,8 @@ release a new version when we need to.
 #### iOS
 
 * [iOS 13](https://support.apple.com/en-us/118392) or later.
+* Flutter 3.24 or later. The iOS SDK is integrated with Swift Package Manager only; CocoaPods is no
+  longer supported. Enable it with `flutter config --enable-swift-package-manager`.
 * Add the return URL handler to your AppDelegate in
   your [native iOS](https://github.com/Adyen/adyen-flutter/blob/main/example/ios/Runner/AppDelegate.swift#L19)
   layer.

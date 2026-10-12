@@ -33,20 +33,6 @@ jobs:
       - run: flutter clean
       - run: flutter pub get
 
-      - name: Cache CocoaPods
-        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
-        with:
-          path: |
-            example/ios/Pods
-            ~/Library/Caches/CocoaPods
-            ~/.cocoapods
-          key: ${{ runner.os }}-pods-${{ hashFiles('example/ios/Podfile.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-pods-
-
-      - name: Pod install
-        run: pod install
-
       - name: Lint check
         working-directory: ios
         run: |

@@ -79,11 +79,6 @@ jobs:
         if: matrix.language == 'java-kotlin'
         uses: gradle/actions/setup-gradle@9c971963bec38e04b3d30dcc455b5382be2fdbfb
 
-      - name: Install CocoaPods dependencies
-        if: matrix.language == 'swift'
-        working-directory: example/ios
-        run: pod install
-
       - name: Initialize CodeQL
         uses: github/codeql-action/init@b96794f015dfd88f77b49b1c93e0fa7110f94c63
         with:

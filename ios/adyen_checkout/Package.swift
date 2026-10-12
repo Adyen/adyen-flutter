@@ -12,12 +12,14 @@ let package = Package(
         .library(name: "adyen-checkout", targets: ["adyen_checkout"])
     ],
     dependencies: [
-        .package(url: "https://github.com/Adyen/adyen-ios", exact: "5.26.0")
+        .package(url: "https://github.com/Adyen/adyen-ios", exact: "5.26.0"),
+        .package(name: "FlutterFramework", path: "../FlutterFramework")
     ],
     targets: [
         .target(
             name: "adyen_checkout",
             dependencies: [
+                .product(name: "FlutterFramework", package: "FlutterFramework"),
                 .product(name: "AdyenDropIn", package: "adyen-ios"),
                 .product(name: "AdyenSession", package: "adyen-ios"),
                 .product(name: "AdyenCard", package: "adyen-ios"),
