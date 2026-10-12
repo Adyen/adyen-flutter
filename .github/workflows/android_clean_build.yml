@@ -60,7 +60,7 @@ jobs:
 
       - name: Create demo project and build APK
         run: |
-          flutter create --template=app --platforms=android,ios demo_project
+          flutter create --template=app --platforms=android demo_project
           cd demo_project
           
           change_sdk_versions() {
