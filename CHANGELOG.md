@@ -5,9 +5,9 @@
 - **Breaking (iOS):** The plugin is now integrated with Swift Package Manager only. CocoaPods is no
   longer supported, so remove any CocoaPods setup for `adyen_checkout` from your app.
   - Flutter 3.44 and later enable Swift Package Manager by default, so no extra setup is needed.
-  - On Flutter 3.24 to 3.41, enable it once with `flutter config --enable-swift-package-manager`.
-- **Breaking:** The minimum supported Flutter version is raised from 3.16.0 to 3.24.0, the first
-  Flutter version with Swift Package Manager support.
+  - On Flutter 3.27 to 3.41, enable it once with `flutter config --enable-swift-package-manager`.
+- **Breaking:** The minimum supported Flutter version is raised from 3.16.0 to 3.27.0, the first
+  stable Flutter version with Swift Package Manager support.
 
 ## 1.14.0
 

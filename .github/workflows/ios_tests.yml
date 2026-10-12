@@ -36,6 +36,9 @@ jobs:
       - run: flutter clean
       - run: flutter pub get
 
+      - name: Work around flutter_launch_arguments iOS 12.0 manifest
+        run: find ~/.pub-cache/hosted/pub.dev/flutter_launch_arguments-*/ios Flutter/ephemeral -name Package.swift -path "*flutter_launch_arguments*" -exec sed -i '' 's/\.iOS("12\.0")/.iOS("13.0")/' {} +
+
       - name: Lint check
         working-directory: ios
         run: |
