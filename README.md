@@ -66,7 +66,7 @@ release a new version when we need to.
 * AGP 9 is supported with built-in Kotlin disabled (requires Flutter 3.44 or later). Built-in Kotlin
   is not supported yet. Make sure your `android/gradle.properties` contains the following flags.
   Flutter adds them automatically when creating or migrating a project. See
-  the [example app](https://github.com/Adyen/adyen-flutter/blob/main/example/android/gradle.properties).
+  the [example app](example/android/gradle.properties).
   ```properties
   android.builtInKotlin=false
   android.newDsl=false
