@@ -84,7 +84,6 @@ release a new version when we need to.
 #### iOS
 
 * [iOS 13](https://support.apple.com/en-us/118392) or later.
-* Flutter 3.27 or later. 
 * Swift Package Manager only, CocoaPods is no longer supported.
   Use [adyen_checkout 1.14.0](https://pub.dev/packages/adyen_checkout/versions/1.14.0) as the last version for CocoaPods.
 * Add the return URL handler to your AppDelegate in
