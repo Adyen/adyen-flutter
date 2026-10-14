@@ -62,26 +62,30 @@ internal class CheckoutPaymentViewFactory(
         args: Any?,
     ): PlatformView {
         val params = args as? CheckoutPaymentViewParamsDTO
-            ?: throw IllegalArgumentException("Invalid platform view params.")
-        val checkoutContext = checkoutHolder.get(params.checkoutId)
-            ?: throw AdyenPigeonError("CheckoutNotFound", "Checkout is no longer active.")
-        val paymentMethod = deserializePaymentMethod(params.paymentMethodJson, params.isStoredPaymentMethod)
-        val actionData = mutableStateOf<ActionData?>(null)
-        val callbacks = createCallbacks(params.checkoutId, params.componentId, checkoutContext) {
-            actionData.value = it
-        }
+        try {
+            if (params == null) throw IllegalArgumentException("Invalid platform view params.")
+            val checkoutContext = checkoutHolder.get(params.checkoutId)
+                ?: throw AdyenPigeonError("CheckoutNotFound", "Checkout is no longer active.")
+            val paymentMethod = deserializePaymentMethod(params.paymentMethodJson, params.isStoredPaymentMethod)
+            val actionData = mutableStateOf<ActionData?>(null)
+            val callbacks = createCallbacks(params.checkoutId, params.componentId, checkoutContext) {
+                actionData.value = it
+            }
 
-        return CheckoutPaymentView(
-            activity = activity,
-            context = context,
-            checkoutId = params.checkoutId,
-            componentId = params.componentId,
-            paymentMethod = paymentMethod,
-            checkoutContext = checkoutContext,
-            callbacks = callbacks,
-            actionData = actionData,
-            eventHandler = eventHandler,
-        )
+            return CheckoutPaymentView(
+                activity = activity,
+                context = context,
+                checkoutId = params.checkoutId,
+                componentId = params.componentId,
+                paymentMethod = paymentMethod,
+                checkoutContext = checkoutContext,
+                callbacks = callbacks,
+                actionData = actionData,
+                eventHandler = eventHandler,
+            )
+        } catch (error: Throwable) {
+            return FailedCheckoutPaymentView(context, params?.checkoutId, params?.componentId, eventHandler, error)
+        }
     }
 
     private fun deserializePaymentMethod(
