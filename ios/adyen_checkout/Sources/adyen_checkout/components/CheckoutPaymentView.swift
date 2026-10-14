@@ -2,7 +2,6 @@ import Adyen
 import AdyenCheckout
 import Flutter
 import Foundation
-import PassKit
 import UIKit
 
 @MainActor
@@ -14,7 +13,7 @@ final class CheckoutPaymentView: NSObject, FlutterPlatformView {
     private let registry: CheckoutComponentRegistry
     private let wrapperView = ComponentWrapperView()
     private var component: CheckoutPaymentComponent?
-    private var applePayButton: PKPaymentButton?
+    private var applePayButtonView: ApplePayButtonView?
     private var lastReportedHeight: Int?
 
     private var checkoutId: String {
@@ -53,7 +52,7 @@ final class CheckoutPaymentView: NSObject, FlutterPlatformView {
     func dispose() {
         registry.remove(checkoutId: checkoutId, componentId: componentId)
         component = nil
-        applePayButton = nil
+        applePayButtonView = nil
         wrapperView.arrangedSubviews.forEach { $0.removeFromSuperview() }
     }
 
@@ -86,41 +85,19 @@ final class CheckoutPaymentView: NSObject, FlutterPlatformView {
     }
 
     private func setupApplePayButton() {
-        let buttonStyle = params.applePayButtonStyle
-        let buttonType = mapApplePayButtonType(buttonStyle?.type)
-        let minimumWidth = buttonType == .plain ? 100.0 : 140.0
-        let width = max(params.applePayButtonWidth ?? minimumWidth, minimumWidth)
-        let height = max(params.applePayButtonHeight ?? 30.0, 30.0)
-        let button = PKPaymentButton(
-            paymentButtonType: buttonType,
-            paymentButtonStyle: mapApplePayButtonStyle(buttonStyle?.theme)
+        let buttonView = ApplePayButtonView(
+            style: params.applePayButtonStyle,
+            width: params.applePayButtonWidth,
+            height: params.applePayButtonHeight,
+            onTap: { [weak self] in self?.presentApplePay() }
         )
-        if let cornerRadius = buttonStyle?.cornerRadius {
-            button.cornerRadius = cornerRadius
-        }
-        button.translatesAutoresizingMaskIntoConstraints = false
-        button.addTarget(
-            self,
-            action: #selector(presentApplePay),
-            for: .touchUpInside
-        )
-
-        let container = UIView()
-        container.addSubview(button)
-        NSLayoutConstraint.activate([
-            button.centerXAnchor.constraint(equalTo: container.centerXAnchor),
-            button.centerYAnchor.constraint(equalTo: container.centerYAnchor),
-            button.widthAnchor.constraint(equalToConstant: width),
-            button.heightAnchor.constraint(equalToConstant: height),
-            container.heightAnchor.constraint(equalToConstant: height)
-        ])
-        applePayButton = button
-        wrapperView.addArrangedSubview(container)
-        sendResize(height: Int(height))
+        applePayButtonView = buttonView
+        wrapperView.addArrangedSubview(buttonView)
+        sendResize(height: Int(buttonView.height))
     }
 
-    @objc private func presentApplePay() {
-        applePayButton?.isEnabled = false
+    private func presentApplePay() {
+        applePayButtonView?.isEnabled = false
         do {
             guard let checkout = holder.checkout(for: checkoutId) else {
                 throw AdyenPigeonError(code: "CheckoutNotFound", message: "Checkout is no longer active.", details: nil)
@@ -145,10 +122,10 @@ final class CheckoutPaymentView: NSObject, FlutterPlatformView {
                 )
             }
             presenter.present(viewController, animated: true) { [weak self] in
-                self?.applePayButton?.isEnabled = true
+                self?.applePayButtonView?.isEnabled = true
             }
         } catch {
-            applePayButton?.isEnabled = true
+            applePayButtonView?.isEnabled = true
             sendFailure(error)
         }
     }
@@ -156,39 +133,6 @@ final class CheckoutPaymentView: NSObject, FlutterPlatformView {
     private var presentingViewController: UIViewController? {
         (wrapperView.window?.rootViewController ?? UIViewController.keyWindowRoot)?.topPresenter
     }
-
-    private func mapApplePayButtonStyle(_ theme: ApplePayButtonThemeDTO?) -> PKPaymentButtonStyle {
-        switch theme {
-        case .white: return .white
-        case .whiteWithLine: return .whiteOutline
-        case .automatic: return .automatic
-        case .black, nil: return .black
-        }
-    }
-
-    private func mapApplePayButtonType(_ type: ApplePayButtonTypeDTO?) -> PKPaymentButtonType {
-        guard let type else { return .plain }
-        return Self.applePayButtonTypes[type] ?? .plain
-    }
-
-    private static let applePayButtonTypes: [ApplePayButtonTypeDTO: PKPaymentButtonType] = [
-        .plain: .plain,
-        .buy: .buy,
-        .setUp: .setUp,
-        .inStore: .inStore,
-        .donate: .donate,
-        .checkout: .checkout,
-        .book: .book,
-        .subscribe: .subscribe,
-        .reload: .reload,
-        .addMoney: .addMoney,
-        .topUp: .topUp,
-        .order: .order,
-        .rent: .rent,
-        .support: .support,
-        .contribute: .contribute,
-        .tip: .tip
-    ]
 
     private func createPaymentComponent(checkout: PaymentCheckout) throws -> CheckoutPaymentComponent {
         if params.isStoredPaymentMethod {
