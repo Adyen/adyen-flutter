@@ -9,14 +9,12 @@ class IosPlatformView extends StatelessWidget {
   final Object creationParams;
   final MessageCodec<Object?> codec;
   final Set<Factory<OneSequenceGestureRecognizer>>? gestureRecognizers;
-  final GlobalKey componentWidgetKey;
 
   const IosPlatformView({
     super.key,
     required this.viewType,
     required this.creationParams,
     required this.codec,
-    required this.componentWidgetKey,
     this.gestureRecognizers,
   });
 

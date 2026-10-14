@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -5,15 +6,13 @@ class ComponentContainer extends StatelessWidget {
   const ComponentContainer({
     super.key,
     required this.viewportHeight,
-    required this.componentWidgetKey,
     required this.initialViewPortHeight,
     required this.componentWidget,
   });
 
-  final double bottomSpacing = 8;
+  static const double _bottomSpacing = 8;
   final double initialViewPortHeight;
   final int? viewportHeight;
-  final Key componentWidgetKey;
   final Widget componentWidget;
 
   @override
@@ -25,7 +24,6 @@ class ComponentContainer extends StatelessWidget {
           curve: Curves.fastOutSlowIn,
           opacity: viewportHeight != null ? 1 : 0,
           child: SizedBox(
-            key: componentWidgetKey,
             height: _determineHeight(viewportHeight),
             child: componentWidget,
           ),
@@ -43,6 +41,8 @@ class ComponentContainer extends StatelessWidget {
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
         return const Center(child: CircularProgressIndicator());
+      case TargetPlatform.iOS:
+        return const Center(child: CupertinoActivityIndicator());
       default:
         return const Center(child: SizedBox.shrink());
     }
@@ -50,6 +50,6 @@ class ComponentContainer extends StatelessWidget {
 
   double _determineHeight(int? height) {
     if (height == null) return initialViewPortHeight;
-    return height == 0 ? 0 : height + bottomSpacing;
+    return height == 0 ? 0 : height + _bottomSpacing;
   }
 }

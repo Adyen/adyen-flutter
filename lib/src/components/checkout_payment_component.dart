@@ -38,14 +38,11 @@ class CheckoutPaymentComponent extends StatefulWidget {
 }
 
 class _CheckoutPaymentComponentState extends State<CheckoutPaymentComponent> {
-  final GlobalKey _componentWidgetKey = GlobalKey();
-  late final CheckoutRuntime _runtime;
-  late final String _componentId;
-  late final CheckoutController _effectiveController;
-  late final StreamSubscription<CheckoutEventDTO> _eventSubscription;
-  late final Widget _componentWidget;
+  late CheckoutRuntime _runtime;
+  late String _componentId;
+  late CheckoutController _effectiveController;
+  late StreamSubscription<CheckoutEventDTO> _eventSubscription;
   int? _viewportHeight;
-  int? _previousViewportHeight;
   bool _hasError = false;
 
   // Approximate height of a button-only native component. Used as a provisional
@@ -55,8 +52,52 @@ class _CheckoutPaymentComponentState extends State<CheckoutPaymentComponent> {
   @override
   void initState() {
     super.initState();
+    _attach();
+  }
+
+  @override
+  void didUpdateWidget(CheckoutPaymentComponent oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    final paymentMethodChanged =
+        !identical(oldWidget.paymentMethod, widget.paymentMethod) &&
+            jsonEncode(oldWidget.paymentMethod.data) !=
+                jsonEncode(widget.paymentMethod.data);
+    if (oldWidget.checkout.id != widget.checkout.id ||
+        paymentMethodChanged ||
+        oldWidget.controller != widget.controller) {
+      _detach(
+        checkout: oldWidget.checkout,
+        ownController:
+            oldWidget.controller == null ? _effectiveController : null,
+      );
+      _attach();
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_hasError) return const SizedBox.shrink();
+    return ComponentContainer(
+      initialViewPortHeight: _initialViewHeight,
+      viewportHeight: _viewportHeight,
+      componentWidget: _buildComponentWidget(),
+    );
+  }
+
+  @override
+  void dispose() {
+    _detach(
+      checkout: widget.checkout,
+      ownController: widget.controller == null ? _effectiveController : null,
+    );
+    super.dispose();
+  }
+
+  void _attach() {
     _runtime = checkoutRuntimeOf(widget.checkout);
     _componentId = _runtime.nextComponentId();
+    _viewportHeight = null;
+    _hasError = false;
     _effectiveController = widget.controller ?? CheckoutController();
     attachCheckoutController(
       _effectiveController,
@@ -69,27 +110,16 @@ class _CheckoutPaymentComponentState extends State<CheckoutPaymentComponent> {
               event.componentId == _componentId,
         )
         .listen(_handleEvent);
-    _componentWidget = _buildComponentWidget();
   }
 
-  @override
-  Widget build(BuildContext context) {
-    if (_hasError) return const SizedBox.shrink();
-    return ComponentContainer(
-      componentWidgetKey: _componentWidgetKey,
-      initialViewPortHeight: _initialViewHeight,
-      viewportHeight: _viewportHeight,
-      componentWidget: _componentWidget,
-    );
-  }
-
-  @override
-  void dispose() {
+  void _detach({
+    required CheckoutFlow checkout,
+    required CheckoutController? ownController,
+  }) {
     unawaited(_eventSubscription.cancel());
-    _runtime.disposeComponent(widget.checkout.id, _componentId);
+    _runtime.disposeComponent(checkout.id, _componentId);
     detachCheckoutController(_effectiveController);
-    if (widget.controller == null) _effectiveController.dispose();
-    super.dispose();
+    ownController?.dispose();
   }
 
   Widget _buildComponentWidget() {
@@ -109,6 +139,7 @@ class _CheckoutPaymentComponentState extends State<CheckoutPaymentComponent> {
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
         return AndroidPlatformView(
+          key: ValueKey(_componentId),
           viewType: Constants.checkoutPaymentComponentViewType,
           creationParams: creationParams,
           codec: CheckoutHostApi.pigeonChannelCodec,
@@ -116,12 +147,11 @@ class _CheckoutPaymentComponentState extends State<CheckoutPaymentComponent> {
         );
       case TargetPlatform.iOS:
         return IosPlatformView(
-          key: UniqueKey(),
+          key: ValueKey(_componentId),
           viewType: Constants.checkoutPaymentComponentViewType,
           creationParams: creationParams,
           codec: CheckoutHostApi.pigeonChannelCodec,
           gestureRecognizers: widget.gestureRecognizers,
-          componentWidgetKey: _componentWidgetKey,
         );
       default:
         throw UnsupportedError('Unsupported platform');
@@ -183,10 +213,7 @@ class _CheckoutPaymentComponentState extends State<CheckoutPaymentComponent> {
   }
 
   void _handleResize(int? height) {
-    if (height == null || height == _previousViewportHeight) return;
-    setState(() {
-      _previousViewportHeight = height;
-      _viewportHeight = height;
-    });
+    if (height == null || height == _viewportHeight) return;
+    setState(() => _viewportHeight = height);
   }
 }
