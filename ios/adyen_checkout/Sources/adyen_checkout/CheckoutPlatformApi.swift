@@ -44,7 +44,11 @@ final class CheckoutPlatformApi: CheckoutHostApi {
         Task { @MainActor in
             do {
                 guard !holder.isActive else {
-                    throw AdyenPigeonError(code: "CheckoutAlreadyActive", message: "Another checkout flow is already active.", details: nil)
+                    throw AdyenPigeonError(
+                        code: ErrorCodes.checkoutAlreadyActive,
+                        message: "Another checkout flow is already active.",
+                        details: nil
+                    )
                 }
                 _ = makePresentationDelegate(id: checkoutId)
                 let checkout = try await Checkout.setup(
@@ -82,7 +86,11 @@ final class CheckoutPlatformApi: CheckoutHostApi {
         Task { @MainActor in
             do {
                 guard !holder.isActive else {
-                    throw AdyenPigeonError(code: "CheckoutAlreadyActive", message: "Another checkout flow is already active.", details: nil)
+                    throw AdyenPigeonError(
+                        code: ErrorCodes.checkoutAlreadyActive,
+                        message: "Another checkout flow is already active.",
+                        details: nil
+                    )
                 }
                 let paymentMethods = try JSONDecoder().decode(PaymentMethods.self, from: Data(paymentMethodsJson.utf8))
                 _ = makePresentationDelegate(id: checkoutId)
@@ -134,10 +142,10 @@ final class CheckoutPlatformApi: CheckoutHostApi {
     func startDropIn(checkoutId: String, completion: @escaping (Result<Void, Error>) -> Void) {
         do {
             guard let checkout = holder.checkout(for: checkoutId) else {
-                throw AdyenPigeonError(code: "Generic", message: "Drop-in requires an active session checkout.", details: nil)
+                throw AdyenPigeonError(code: ErrorCodes.generic, message: "Drop-in requires an active session checkout.", details: nil)
             }
             guard dropInComponents[checkoutId] == nil else {
-                throw AdyenPigeonError(code: "CheckoutAlreadyActive", message: "Drop-in is already active.", details: nil)
+                throw AdyenPigeonError(code: ErrorCodes.checkoutAlreadyActive, message: "Drop-in is already active.", details: nil)
             }
             let dropIn = try checkout.createDropIn()
             dropInComponents[checkoutId] = dropIn
@@ -156,7 +164,7 @@ final class CheckoutPlatformApi: CheckoutHostApi {
     ) {
         guard holder.beginAction(id: actionId) else {
             completion(.failure(AdyenPigeonError(
-                code: "CheckoutAlreadyActive",
+                code: ErrorCodes.checkoutAlreadyActive,
                 message: "Another checkout flow is already active.",
                 details: nil
             )))
@@ -269,7 +277,7 @@ final class CheckoutPlatformApi: CheckoutHostApi {
                 case let .success(value):
                     continuation.resume(returning: value.toNativeResult(original: data))
                 case let .failure(error):
-                    self.sendFailure(checkoutId: checkoutId, code: "CallbackFailure", message: error.localizedDescription)
+                    self.sendFailure(checkoutId: checkoutId, code: ErrorCodes.callbackFailure, message: error.localizedDescription)
                     continuation.resume(returning: .abort)
                 }
             }
@@ -313,13 +321,13 @@ final class CheckoutPlatformApi: CheckoutHostApi {
                     case let .success(value):
                         continuation.resume(returning: .completion(resultCode: value.resultCode))
                     case let .failure(error):
-                        self.sendFailure(checkoutId: checkoutId, code: "CallbackFailure", message: error.localizedDescription)
+                        self.sendFailure(checkoutId: checkoutId, code: ErrorCodes.callbackFailure, message: error.localizedDescription)
                         continuation.resume(returning: .completion(resultCode: "Error"))
                     }
                 }
             }
         } catch {
-            sendFailure(checkoutId: checkoutId, code: "CallbackFailure", message: error.localizedDescription)
+            sendFailure(checkoutId: checkoutId, code: ErrorCodes.callbackFailure, message: error.localizedDescription)
             return .completion(resultCode: "Error")
         }
     }
@@ -455,5 +463,5 @@ private func asPigeonError(_ error: Error) -> AdyenPigeonError {
     if let error = error as? CheckoutError {
         return AdyenPigeonError(code: error.code.rawValue, message: error.message, details: nil)
     }
-    return AdyenPigeonError(code: "Generic", message: error.localizedDescription, details: nil)
+    return AdyenPigeonError(code: ErrorCodes.generic, message: error.localizedDescription, details: nil)
 }

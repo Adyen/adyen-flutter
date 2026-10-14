@@ -44,6 +44,7 @@ import com.adyen.checkout.flutter.generated.SessionResponseDTO
 import com.adyen.checkout.flutter.generated.UnencryptedCardDTO
 import com.adyen.checkout.flutter.session.CheckoutHolder
 import com.adyen.checkout.flutter.utils.ConfigurationMapper.toCheckoutConfiguration
+import com.adyen.checkout.flutter.utils.ErrorCodes
 import com.google.android.gms.wallet.WalletConstants
 import com.adyen.threeds2.ThreeDS2Service
 import kotlinx.coroutines.CompletableDeferred
@@ -77,7 +78,7 @@ internal class CheckoutPlatformApi(
             try {
                 if (checkoutHolder.isActive()) {
                     throw AdyenPigeonError(
-                        "CheckoutAlreadyActive",
+                        ErrorCodes.CHECKOUT_ALREADY_ACTIVE,
                         "Another checkout flow is already active.",
                     )
                 }
@@ -110,7 +111,7 @@ internal class CheckoutPlatformApi(
             try {
                 if (checkoutHolder.isActive()) {
                     throw AdyenPigeonError(
-                        "CheckoutAlreadyActive",
+                        ErrorCodes.CHECKOUT_ALREADY_ACTIVE,
                         "Another checkout flow is already active.",
                     )
                 }
@@ -153,19 +154,19 @@ internal class CheckoutPlatformApi(
         when {
             context == null -> callback(
                 Result.failure(
-                    AdyenPigeonError("Generic", "Drop-in requires an active session checkout."),
+                    AdyenPigeonError(ErrorCodes.GENERIC, "Drop-in requires an active session checkout."),
                 ),
             )
 
             dropInCheckoutId != null -> callback(
                 Result.failure(
-                    AdyenPigeonError("CheckoutAlreadyActive", "Drop-in is already active."),
+                    AdyenPigeonError(ErrorCodes.CHECKOUT_ALREADY_ACTIVE, "Drop-in is already active."),
                 ),
             )
 
             launcher == null -> callback(
                 Result.failure(
-                    AdyenPigeonError("Generic", "Drop-in is not available."),
+                    AdyenPigeonError(ErrorCodes.GENERIC, "Drop-in is not available."),
                 ),
             )
 
@@ -203,14 +204,14 @@ internal class CheckoutPlatformApi(
             is DropInResult.Failed -> CheckoutEventDTO(
                 type = CheckoutEventTypeDTO.FAILURE,
                 checkoutId = checkoutId,
-                errorCode = "Generic",
+                errorCode = ErrorCodes.GENERIC,
                 errorMessage = result.error,
             )
 
             is DropInResult.Cancelled -> CheckoutEventDTO(
                 type = CheckoutEventTypeDTO.FAILURE,
                 checkoutId = checkoutId,
-                errorCode = "Cancelled",
+                errorCode = ErrorCodes.CANCELLED,
                 errorMessage = "Drop-in was cancelled by the shopper.",
             )
         }
@@ -227,7 +228,7 @@ internal class CheckoutPlatformApi(
             callback(
                 Result.failure(
                     AdyenPigeonError(
-                        "CheckoutAlreadyActive",
+                        ErrorCodes.CHECKOUT_ALREADY_ACTIVE,
                         "Another checkout flow is already active.",
                     ),
                 ),
@@ -424,7 +425,7 @@ internal class CheckoutPlatformApi(
     private fun Throwable.toPigeonError(): AdyenPigeonError = when (this) {
         is AdyenPigeonError -> this
         else -> AdyenPigeonError(
-            code = "Generic",
+            code = ErrorCodes.GENERIC,
             message = message ?: "Checkout failed.",
         )
     }

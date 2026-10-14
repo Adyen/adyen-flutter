@@ -26,7 +26,7 @@ internal object CheckoutCallbacksMapper {
             SubmitResultTypeDTO.COMPLETION -> {
                 val code =
                     resultCode ?: throw AdyenPigeonError(
-                        "InvalidSubmitResult",
+                        ErrorCodes.INVALID_SUBMIT_RESULT,
                         "Submit completion did not contain a result code.",
                     )
                 SubmitResult.Completion(code)
@@ -35,7 +35,7 @@ internal object CheckoutCallbacksMapper {
             SubmitResultTypeDTO.ACTION -> {
                 val actionJson =
                     actionJson ?: throw AdyenPigeonError(
-                        "InvalidSubmitResult",
+                        ErrorCodes.INVALID_SUBMIT_RESULT,
                         "Submit action did not contain action data.",
                     )
                 SubmitResult.Action(Action.SERIALIZER.deserialize(JSONObject(actionJson)))

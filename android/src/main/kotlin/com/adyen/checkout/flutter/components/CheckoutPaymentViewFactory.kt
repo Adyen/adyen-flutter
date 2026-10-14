@@ -12,6 +12,7 @@ import com.adyen.checkout.flutter.generated.CheckoutCallbacksFlutterApi
 import com.adyen.checkout.flutter.generated.CheckoutPaymentViewParamsDTO
 import com.adyen.checkout.flutter.generated.ComponentHostApi
 import com.adyen.checkout.flutter.session.CheckoutHolder
+import com.adyen.checkout.flutter.utils.ErrorCodes
 import io.flutter.plugin.platform.PlatformView
 import io.flutter.plugin.platform.PlatformViewFactory
 import org.json.JSONObject
@@ -35,7 +36,7 @@ internal class CheckoutPaymentViewFactory(
             if (params == null) throw IllegalArgumentException("Invalid platform view params.")
             val activity = activityProvider() ?: throw IllegalStateException("No FragmentActivity attached.")
             val checkoutContext = checkoutHolder.get(params.checkoutId)
-                ?: throw AdyenPigeonError("CheckoutNotFound", "Checkout is no longer active.")
+                ?: throw AdyenPigeonError(ErrorCodes.CHECKOUT_NOT_FOUND, "Checkout is no longer active.")
             val paymentMethod = deserializePaymentMethod(params.paymentMethodJson, params.isStoredPaymentMethod)
             val actionData = mutableStateOf<ActionData?>(null)
             val callbacks = callbacksBridge.createCallbacks(params.checkoutId, params.componentId, checkoutContext) {

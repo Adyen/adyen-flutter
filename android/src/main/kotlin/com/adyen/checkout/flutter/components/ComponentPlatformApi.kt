@@ -3,6 +3,7 @@ package com.adyen.checkout.flutter.components
 import android.content.Intent
 import com.adyen.checkout.flutter.generated.AdyenPigeonError
 import com.adyen.checkout.flutter.generated.ComponentHostApi
+import com.adyen.checkout.flutter.utils.ErrorCodes
 
 internal class ComponentPlatformApi(
     private val registry: CheckoutComponentRegistry,
@@ -15,7 +16,7 @@ internal class ComponentPlatformApi(
         try {
             if (!registry.submit(checkoutId, componentId)) {
                 throw AdyenPigeonError(
-                    "ComponentNotFound",
+                    ErrorCodes.COMPONENT_NOT_FOUND,
                     "Checkout component is no longer active.",
                 )
             }

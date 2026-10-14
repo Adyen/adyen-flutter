@@ -66,7 +66,7 @@ final class CheckoutPaymentView: NSObject, FlutterPlatformView {
                 return
             }
             guard let checkout = holder.checkout(for: checkoutId) else {
-                throw AdyenPigeonError(code: "CheckoutNotFound", message: "Checkout is no longer active.", details: nil)
+                throw AdyenPigeonError(code: ErrorCodes.checkoutNotFound, message: "Checkout is no longer active.", details: nil)
             }
 
             let paymentComponent = try createPaymentComponent(checkout: checkout)
@@ -103,7 +103,7 @@ final class CheckoutPaymentView: NSObject, FlutterPlatformView {
         applePayButtonView?.isEnabled = false
         do {
             guard let checkout = holder.checkout(for: checkoutId) else {
-                throw AdyenPigeonError(code: "CheckoutNotFound", message: "Checkout is no longer active.", details: nil)
+                throw AdyenPigeonError(code: ErrorCodes.checkoutNotFound, message: "Checkout is no longer active.", details: nil)
             }
             let paymentComponent = try createPaymentComponent(checkout: checkout)
             component = paymentComponent
@@ -119,7 +119,7 @@ final class CheckoutPaymentView: NSObject, FlutterPlatformView {
             let viewController = paymentComponent.viewController
             guard let presenter = presentingViewController else {
                 throw AdyenPigeonError(
-                    code: "PresentationFailure",
+                    code: ErrorCodes.presentationFailure,
                     message: "Unable to present Apple Pay.",
                     details: nil
                 )
@@ -152,7 +152,7 @@ final class CheckoutPaymentView: NSObject, FlutterPlatformView {
         if params.isStoredPaymentMethod {
             guard let identifier = paymentMethodObject?["id"] as? String else {
                 throw AdyenPigeonError(
-                    code: "InvalidPaymentMethod",
+                    code: ErrorCodes.invalidPaymentMethod,
                     message: "Stored payment method id is missing.",
                     details: nil
                 )
@@ -162,7 +162,7 @@ final class CheckoutPaymentView: NSObject, FlutterPlatformView {
         guard let type = paymentMethodObject?["type"] as? String,
               let paymentMethodType = PaymentMethodType(rawValue: type) else {
             throw AdyenPigeonError(
-                code: "InvalidPaymentMethod",
+                code: ErrorCodes.invalidPaymentMethod,
                 message: "Payment method type is missing or unsupported.",
                 details: nil
             )
@@ -184,7 +184,7 @@ final class CheckoutPaymentView: NSObject, FlutterPlatformView {
             type: .failure,
             checkoutId: checkoutId,
             componentId: componentId,
-            errorCode: "PaymentMethodFailure",
+            errorCode: ErrorCodes.paymentMethodFailure,
             errorMessage: error.localizedDescription
         ))
     }

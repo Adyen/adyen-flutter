@@ -16,7 +16,7 @@ final class ComponentPlatformApi: ComponentHostApi {
     ) {
         guard let component = registry.setActive(checkoutId: checkoutId, componentId: componentId) else {
             completion(.failure(AdyenPigeonError(
-                code: "ComponentNotFound",
+                code: ErrorCodes.componentNotFound,
                 message: "Checkout component is no longer active.",
                 details: nil
             )))

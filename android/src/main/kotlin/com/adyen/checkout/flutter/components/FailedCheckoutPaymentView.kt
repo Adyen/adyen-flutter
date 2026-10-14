@@ -5,6 +5,7 @@ import android.view.View
 import android.widget.FrameLayout
 import com.adyen.checkout.flutter.generated.CheckoutEventDTO
 import com.adyen.checkout.flutter.generated.CheckoutEventTypeDTO
+import com.adyen.checkout.flutter.utils.ErrorCodes
 import io.flutter.plugin.platform.PlatformView
 
 internal class FailedCheckoutPaymentView(
@@ -24,7 +25,7 @@ internal class FailedCheckoutPaymentView(
                         type = CheckoutEventTypeDTO.FAILURE,
                         checkoutId = checkoutId,
                         componentId = componentId,
-                        errorCode = "PaymentMethodFailure",
+                        errorCode = ErrorCodes.PAYMENT_METHOD_FAILURE,
                         errorMessage = error.message,
                     ),
                 )

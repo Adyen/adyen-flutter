@@ -25,6 +25,7 @@ import com.adyen.checkout.flutter.utils.CheckoutCallbacksMapper.toDTO
 import com.adyen.checkout.flutter.utils.CheckoutCallbacksMapper.toNativeAdditionalDetailsResult
 import com.adyen.checkout.flutter.utils.CheckoutCallbacksMapper.toNativeBeforeSubmitResult
 import com.adyen.checkout.flutter.utils.CheckoutCallbacksMapper.toNativeSubmitResult
+import com.adyen.checkout.flutter.utils.ErrorCodes
 import kotlinx.coroutines.suspendCancellableCoroutine
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.coroutines.resume
@@ -113,7 +114,7 @@ internal class CheckoutCallbacksBridge(
                 result.fold(
                     onSuccess = { response -> continuation.resume(response.toNativeBeforeSubmitResult()) },
                     onFailure = { error ->
-                        terminalState.failure("CallbackFailure", error.message)
+                        terminalState.failure(ErrorCodes.CALLBACK_FAILURE, error.message)
                         continuation.resume(BeforeSubmitResult.Abort())
                     },
                 )
@@ -157,7 +158,7 @@ internal class CheckoutCallbacksBridge(
                 result.fold(
                     onSuccess = { response -> continuation.resume(response.toNativeAdditionalDetailsResult()) },
                     onFailure = { error ->
-                        terminalState.failure("CallbackFailure", error.message)
+                        terminalState.failure(ErrorCodes.CALLBACK_FAILURE, error.message)
                         continuation.resume(AdditionalDetailsResult.Completion("Error"))
                     },
                 )
