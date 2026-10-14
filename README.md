@@ -33,6 +33,10 @@ not part of this alpha.
 - iOS integration through Swift Package Manager. Flutter 3.24–3.43 projects must opt in to SwiftPM;
   Flutter 3.44 and later enables it by default.
 - Checkout API v71 or later.
+- AGP 9 is supported with built-in Kotlin disabled (requires Flutter 3.44 or later). Built-in
+  Kotlin is not supported yet. Make sure `android/gradle.properties` contains
+  `android.builtInKotlin=false` and `android.newDsl=false`; Flutter adds them automatically when
+  creating or migrating a project. See the [example app](example/android/gradle.properties).
 
 Configure your backend return URL and forward incoming native returns to the native Checkout API:
 

@@ -81,6 +81,18 @@ private func contactField(from value: String) -> PKContactField {
     }
 }
 
+extension PKPaymentNetwork {
+    internal var txVariantName: String {
+        if self == .masterCard {
+            return "mc"
+        }
+        if self == .cartesBancaires {
+            return "cartebancaire"
+        }
+        return self.rawValue.lowercased()
+    }
+}
+
 private extension ApplePayMerchantCapabilityDTO? {
     func toNativeCapabilities() -> PKMerchantCapability {
         switch self {

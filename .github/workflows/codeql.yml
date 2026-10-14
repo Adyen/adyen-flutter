@@ -1,0 +1,120 @@
+name: CodeQL
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    - cron: '31 3 * * 1'
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: codeql-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  analyze:
+    name: Analyze (${{ matrix.language }})
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: ${{ matrix.timeout }}
+    permissions:
+      contents: read
+      security-events: write
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - language: actions
+            build-mode: none
+            runner: ubuntu-24.04
+            timeout: 15
+          - language: java-kotlin
+            build-mode: manual
+            runner: ubuntu-24.04
+            timeout: 30
+            flutter-version: 3.41.x
+          - language: swift
+            build-mode: manual
+            runner: macos-26
+            timeout: 45
+            flutter-version: 3.41.x
+
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+
+      - if: matrix.language == 'java-kotlin'
+        uses: actions/setup-java@dd06d9cba3e5552c54d9f8ea23572deb30010f7c
+        with:
+          distribution: 'zulu'
+          java-version: 17
+
+      - if: matrix.language != 'actions'
+        uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2
+        with:
+          flutter-version: ${{ matrix.flutter-version }}
+          channel: 'stable'
+          cache: true
+
+      - name: Prepare Android host project
+        if: matrix.language == 'java-kotlin'
+        run: |
+          flutter create --template=app --platforms=android codeql_android
+          cd codeql_android
+          dart pub add 'adyen_checkout:{"path":"../"}'
+          flutter pub get
+
+      - name: Prepare iOS project
+        if: matrix.language == 'swift'
+        working-directory: example
+        run: |
+          flutter clean
+          flutter pub get
+
+      - name: Setup Gradle
+        if: matrix.language == 'java-kotlin'
+        uses: gradle/actions/setup-gradle@9c971963bec38e04b3d30dcc455b5382be2fdbfb
+
+      - name: Install CocoaPods dependencies
+        if: matrix.language == 'swift'
+        working-directory: example/ios
+        run: pod install
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@b96794f015dfd88f77b49b1c93e0fa7110f94c63
+        with:
+          languages: ${{ matrix.language }}
+          build-mode: ${{ matrix.build-mode }}
+          queries: security-extended
+
+      - name: Build Android plugin
+        if: matrix.language == 'java-kotlin'
+        working-directory: codeql_android/android
+        run: |
+          ./gradlew --no-daemon --no-build-cache \
+            clean :adyen_checkout:assembleDebug
+
+      - name: Build iOS plugin
+        if: matrix.language == 'swift'
+        working-directory: example/ios
+        run: |
+          xcodebuild build \
+            -workspace Runner.xcworkspace \
+            -scheme Runner \
+            -configuration Debug \
+            -destination "generic/platform=iOS Simulator" \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=NO \
+            COMPILATION_CACHE_ENABLE_CACHING=NO \
+            SWIFT_ENABLE_COMPILE_CACHE=NO \
+            SWIFT_USE_INTEGRATED_DRIVER=NO \
+            ARCH=arm64
+
+      - name: Perform CodeQL analysis
+        uses: github/codeql-action/analyze@b96794f015dfd88f77b49b1c93e0fa7110f94c63
+        with:
+          category: "/language:${{ matrix.language }}"

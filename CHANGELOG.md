@@ -21,6 +21,48 @@
 - Drop-in, the separate v1 Instant API, partial-payment/order, and legacy action-component APIs.
 - `Checkout.getReturnUrl()` and all generated Pigeon types from the public barrel.
 
+## 1.14.0
+
+### Fixed
+
+- For the Apple Pay Component on iOS with the Advanced flow: `onSubmit` and `onPaymentResult` now
+  always use the current `AdvancedCheckout` instance set on the Component. Previously, after
+  rerendering the Component, it could still refer to an earlier `AdvancedCheckout` instance.
+
+### Improved
+
+- On iOS: Improved
+  the [layout of Drop-in and Components for iPhone Duo](https://github.com/Adyen/adyen-ios/pull/2752).
+
+### Changed
+
+- Dependency versions:
+  | Name | Version |
+  |---------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------|
+  | [iOS Drop-in/Components](https://docs.adyen.com/online-payments/release-notes/?title%5B0%5D=iOS+Components%2FDrop-in&version%5B0%5D=5.26.0) | 5.25.1 -> **5.26.0** |
+
+## 1.13.0
+
+### Improved
+
+- On iOS: For improved accessibility, Drop-in now appears in a dedicated window on top of your app
+  content instead of using `FlutterViewController`. The behavior of appearing on top of your app
+  remains unchanged. For shoppers that use Full Keyboard Access, the focus now stays inside the
+  native payment interface.
+
+- **(Internal change)** For Drop-in on iOS: The internal delegates are now simpler to maintain:
+  - Stored payment method deletion uses a single delegate instead of duplicated delegates.
+  - The delegate implementations are in separate files.
+
+### Changed
+
+- On Android: The default `AdyenCheckout` theme now inherits directly from the `Adyen` theme,
+  instead of from the generic `AppTheme` style. Android merges resources from every dependency, so
+  an `AppTheme` style from an unrelated dependency could replace the Adyen theme and stop the
+  payment form from rendering. If you customize Drop-in through `AppTheme`, you
+  must [move those attributes to an
+  `AdyenCheckout` style in your app resources](https://github.com/Adyen/adyen-flutter/blob/main/doc/CUSTOMIZATION.md).
+
 ## 1.12.0
 
 ### Improved
