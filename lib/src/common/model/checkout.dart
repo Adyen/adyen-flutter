@@ -39,6 +39,15 @@ class SessionCheckout extends CheckoutFlow {
     required super.runtime,
     required this.callbacks,
   }) : super._();
+
+  /// Presents Drop-in for this session checkout.
+  ///
+  /// The returned future completes once Drop-in is presented. Payment results
+  /// are delivered through [callbacks]: [SessionCheckoutCallbacks.onComplete]
+  /// on completion and [SessionCheckoutCallbacks.onFailure] on failure. When
+  /// the shopper dismisses Drop-in, [SessionCheckoutCallbacks.onFailure] is
+  /// invoked with [CheckoutError.cancellationCode].
+  Future<void> startDropIn() => _runtime.startDropIn(id);
 }
 
 class AdvancedCheckout extends CheckoutFlow {

@@ -190,6 +190,21 @@ final class CheckoutRuntime {
   Future<void> enableConsoleLogging({required bool enabled}) =>
       _checkoutHostApi.enableConsoleLogging(enabled);
 
+  Future<void> startDropIn(String checkoutId) async {
+    final record = _recordFor(checkoutId);
+    if (record == null || record.disposed || record.terminal) {
+      throw const CheckoutError(
+        code: CheckoutError.genericCode,
+        message: 'Drop-in cannot be started for this checkout.',
+      );
+    }
+    try {
+      await _checkoutHostApi.startDropIn(checkoutId);
+    } catch (error, stackTrace) {
+      throw _asCheckoutError(error, stackTrace);
+    }
+  }
+
   void disposeCheckout(String checkoutId) {
     final record = _recordFor(checkoutId);
     if (record == null || record.disposed) return;

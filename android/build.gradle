@@ -78,6 +78,7 @@ android {
         implementation "com.adyen.checkout:card:${adyenSnapshotVersion}"
         implementation "com.adyen.checkout:blik:${adyenSnapshotVersion}"
         implementation "com.adyen.checkout:googlepay:${adyenSnapshotVersion}"
+        implementation "com.adyen.checkout:drop-in:${adyenSnapshotVersion}"
         implementation "com.adyen.checkout:3ds2:${adyenSnapshotVersion}"
         implementation "com.adyen.checkout:cse:${adyenSnapshotVersion}"
         implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'

@@ -1971,6 +1971,7 @@ protocol CheckoutHostApi {
   func setupSession(sessionResponse: SessionResponseDTO, configuration: CheckoutConfigurationDTO, completion: @escaping (Result<CheckoutSetupResultDTO, Error>) -> Void)
   func setupAdvanced(paymentMethodsJson: String, configuration: CheckoutConfigurationDTO, completion: @escaping (Result<CheckoutSetupResultDTO, Error>) -> Void)
   func disposeCheckout(checkoutId: String) throws
+  func startDropIn(checkoutId: String, completion: @escaping (Result<Void, Error>) -> Void)
   func handleAction(actionId: String, actionJson: String, configuration: CheckoutConfigurationDTO, completion: @escaping (Result<AdvancedCheckoutResultDTO, Error>) -> Void)
   func enableConsoleLogging(enabled: Bool) throws
   func encryptCard(card: UnencryptedCardDTO, publicKey: String, completion: @escaping (Result<EncryptedCardDTO, Error>) -> Void)
@@ -2037,6 +2038,23 @@ class CheckoutHostApiSetup {
       }
     } else {
       disposeCheckoutChannel.setMessageHandler(nil)
+    }
+    let startDropInChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.CheckoutHostApi.startDropIn\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      startDropInChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let checkoutIdArg = args[0] as! String
+        api.startDropIn(checkoutId: checkoutIdArg) { result in
+          switch result {
+          case .success:
+            reply(wrapResult(nil))
+          case .failure(let error):
+            reply(wrapError(error))
+          }
+        }
+      }
+    } else {
+      startDropInChannel.setMessageHandler(nil)
     }
     let handleActionChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.CheckoutHostApi.handleAction\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {

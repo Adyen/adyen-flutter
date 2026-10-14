@@ -671,6 +671,9 @@ abstract class CheckoutHostApi {
   void disposeCheckout(String checkoutId);
 
   @async
+  void startDropIn(String checkoutId);
+
+  @async
   AdvancedCheckoutResultDTO handleAction(
     String actionId,
     String actionJson,

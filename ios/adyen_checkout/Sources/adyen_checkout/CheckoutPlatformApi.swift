@@ -17,6 +17,7 @@ final class CheckoutPlatformApi: CheckoutHostApi {
     private let holder: CheckoutHolder
     private let events: ComponentPlatformEventHandler
     private var presentationDelegates: [String: PresentationDelegateProxy] = [:]
+    private var dropInComponents: [String: CheckoutDropInComponent] = [:]
     private var actionCompletion: AsyncResult<AdvancedCheckoutResult>?
 
     init(
@@ -113,7 +114,25 @@ final class CheckoutPlatformApi: CheckoutHostApi {
     func disposeCheckout(checkoutId: String) throws {
         holder.removeCheckout(for: checkoutId)
         presentationDelegates.removeValue(forKey: checkoutId)
+        dropInComponents.removeValue(forKey: checkoutId)
         CheckoutComponentRegistry.shared.clear(checkoutId: checkoutId)
+    }
+
+    func startDropIn(checkoutId: String, completion: @escaping (Result<Void, Error>) -> Void) {
+        do {
+            guard let checkout = holder.checkout(for: checkoutId) else {
+                throw AdyenPigeonError(code: "Generic", message: "Drop-in requires an active session checkout.", details: nil)
+            }
+            guard dropInComponents[checkoutId] == nil else {
+                throw AdyenPigeonError(code: "CheckoutAlreadyActive", message: "Drop-in is already active.", details: nil)
+            }
+            let dropIn = try checkout.createDropIn()
+            dropInComponents[checkoutId] = dropIn
+            makePresentationDelegate(id: checkoutId).present(dropIn.viewController)
+            completion(.success(()))
+        } catch {
+            completion(.failure(asPigeonError(error)))
+        }
     }
 
     func handleAction(
@@ -223,6 +242,7 @@ final class CheckoutPlatformApi: CheckoutHostApi {
         holder.clear()
         CheckoutComponentRegistry.shared.clear()
         presentationDelegates.removeAll()
+        dropInComponents.removeAll()
         actionCompletion = nil
     }
 
@@ -310,6 +330,7 @@ final class CheckoutPlatformApi: CheckoutHostApi {
 
     private func sendComplete(checkoutId: String, result: SessionCheckoutResult) {
         presentationDelegates[checkoutId]?.dismiss()
+        dropInComponents.removeValue(forKey: checkoutId)
         events.send(event: CheckoutEventDTO(
             type: .complete,
             checkoutId: checkoutId,
@@ -321,6 +342,7 @@ final class CheckoutPlatformApi: CheckoutHostApi {
 
     private func sendComplete(checkoutId: String, result: AdvancedCheckoutResult) {
         presentationDelegates[checkoutId]?.dismiss()
+        dropInComponents.removeValue(forKey: checkoutId)
         events.send(event: CheckoutEventDTO(
             type: .complete,
             checkoutId: checkoutId,
@@ -334,6 +356,7 @@ final class CheckoutPlatformApi: CheckoutHostApi {
 
     private func sendFailure(checkoutId: String, code: String, message: String?) {
         presentationDelegates[checkoutId]?.dismiss()
+        dropInComponents.removeValue(forKey: checkoutId)
         events.send(event: CheckoutEventDTO(
             type: .failure,
             checkoutId: checkoutId,

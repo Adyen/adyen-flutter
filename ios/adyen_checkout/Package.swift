@@ -26,6 +26,7 @@ let package = Package(
                 .product(name: "AdyenCard", package: "adyen-ios"),
                 .product(name: "AdyenCheckout", package: "adyen-ios"),
                 .product(name: "AdyenComponents", package: "adyen-ios"),
+                .product(name: "AdyenDropIn", package: "adyen-ios"),
                 .product(name: "AdyenEncryption", package: "adyen-ios"),
                 .product(name: "AdyenSession", package: "adyen-ios")
             ],

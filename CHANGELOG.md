@@ -1,5 +1,13 @@
 ## Unreleased
 
+### New
+
+- Added `SessionCheckout.startDropIn()` to present Drop-in for a session checkout on Android and
+  iOS. Results arrive through the existing `SessionCheckoutCallbacks`: `onComplete` on completion
+  and `onFailure` on failure, with `CheckoutError.cancellationCode` when the shopper dismisses
+  Drop-in. On Android, Drop-in does not yet propagate `sessionResult` (upstream limitation), so
+  `SessionCheckoutResult.sessionResult` is empty for Drop-in completions.
+
 ### Changed
 
 - Native dependencies now track development builds instead of `6.0.0-alpha.1`: Android resolves the

@@ -9,6 +9,7 @@ import 'package:adyen_checkout_example/screens/component/instant/instant_compone
 import 'package:adyen_checkout_example/screens/component/multi_component/multi_component_advanced_screen.dart';
 import 'package:adyen_checkout_example/screens/component/multi_component/multi_component_navigation_screen.dart';
 import 'package:adyen_checkout_example/screens/component/multi_component/multi_component_session_screen.dart';
+import 'package:adyen_checkout_example/screens/drop_in/drop_in_screen.dart';
 import 'package:adyen_checkout_example/utils/provider.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -53,6 +54,8 @@ class CheckoutExample extends StatelessWidget {
       ),
       routes: {
         '/': (context) => const MyApp(),
+        '/dropInScreen': (context) =>
+            DropInScreen(repository: sessionRepository),
         '/cardComponentScreen': (context) => ComponentNavigationScreen(
               sessionRepository: sessionRepository,
               advancedRepository: advancedRepository,
@@ -116,6 +119,11 @@ class MyApp extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
+              TextButton(
+                key: const Key('Drop-in'),
+                onPressed: () => Navigator.pushNamed(context, '/dropInScreen'),
+                child: const Text('Drop-in'),
+              ),
               TextButton(
                 key: const Key('Card component'),
                 onPressed: () =>

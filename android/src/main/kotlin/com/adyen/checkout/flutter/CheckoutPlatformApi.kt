@@ -22,8 +22,12 @@ import com.adyen.checkout.core.components.CheckoutAction
 import com.adyen.checkout.core.components.data.model.paymentmethod.PaymentMethods
 import com.adyen.checkout.core.error.CheckoutError
 import com.adyen.checkout.cse.CardEncrypter
+import com.adyen.checkout.dropin.DropIn
+import com.adyen.checkout.dropin.DropInLauncher
+import com.adyen.checkout.dropin.DropInResult
 import com.adyen.checkout.flutter.apiOnly.AdyenCSE
 import com.adyen.checkout.flutter.apiOnly.CardValidation
+import com.adyen.checkout.flutter.dropIn.AdyenCheckoutDropInService
 import com.adyen.checkout.flutter.components.CheckoutComponentRegistry
 import com.adyen.checkout.flutter.components.ComponentPlatformEventHandler
 import com.adyen.checkout.flutter.generated.ActionComponentDataDTO
@@ -32,6 +36,7 @@ import com.adyen.checkout.flutter.generated.AdyenPigeonError
 import com.adyen.checkout.flutter.generated.AdvancedCheckoutResultDTO
 import com.adyen.checkout.flutter.generated.CheckoutConfigurationDTO
 import com.adyen.checkout.flutter.generated.CheckoutEventDTO
+import com.adyen.checkout.flutter.generated.CheckoutEventTypeDTO
 import com.adyen.checkout.flutter.generated.CheckoutHostApi
 import com.adyen.checkout.flutter.generated.CheckoutSetupResultDTO
 import com.adyen.checkout.flutter.generated.EncryptedCardDTO
@@ -56,9 +61,11 @@ internal class CheckoutPlatformApi(
     private val callbacksApi: com.adyen.checkout.flutter.generated.CheckoutCallbacksFlutterApi,
     private val actionOnlyApi: ActionOnlyFlutterApi,
     private val eventHandler: ComponentPlatformEventHandler,
+    private val dropInLauncher: DropInLauncher?,
 ) : CheckoutHostApi {
     private var actionController: CheckoutController? = null
     private var actionView: ComposeView? = null
+    private var dropInCheckoutId: String? = null
 
     override fun setupSession(
         sessionResponse: SessionResponseDTO,
@@ -127,6 +134,75 @@ internal class CheckoutPlatformApi(
     override fun disposeCheckout(checkoutId: String) {
         checkoutHolder.remove(checkoutId)
         CheckoutComponentRegistry.clearCheckout(checkoutId)
+    }
+
+    override fun startDropIn(checkoutId: String, callback: (Result<Unit>) -> Unit) {
+        val context = checkoutHolder.get(checkoutId) as? CheckoutContext.Sessions
+        val launcher = dropInLauncher
+        when {
+            context == null -> callback(
+                Result.failure(
+                    AdyenPigeonError("Generic", "Drop-in requires an active session checkout."),
+                ),
+            )
+
+            dropInCheckoutId != null -> callback(
+                Result.failure(
+                    AdyenPigeonError("CheckoutAlreadyActive", "Drop-in is already active."),
+                ),
+            )
+
+            launcher == null -> callback(
+                Result.failure(
+                    AdyenPigeonError("Generic", "Drop-in is not available."),
+                ),
+            )
+
+            else -> {
+                try {
+                    dropInCheckoutId = checkoutId
+                    DropIn.start(launcher, context, AdyenCheckoutDropInService::class.java)
+                    callback(Result.success(Unit))
+                } catch (error: Throwable) {
+                    dropInCheckoutId = null
+                    callback(Result.failure(error.toPigeonError()))
+                }
+            }
+        }
+    }
+
+    fun onDropInResult(result: DropInResult) {
+        val checkoutId = dropInCheckoutId ?: return
+        dropInCheckoutId = null
+        val event = when (result) {
+            is DropInResult.Completed -> {
+                val sessionId = (checkoutHolder.get(checkoutId) as? CheckoutContext.Sessions)
+                    ?.checkoutSession?.sessionSetupResponse?.id.orEmpty()
+                CheckoutEventDTO(
+                    type = CheckoutEventTypeDTO.COMPLETE,
+                    checkoutId = checkoutId,
+                    resultCode = result.resultCode.value,
+                    sessionId = sessionId,
+                    // sessionResult is not propagated by Android Drop-in yet.
+                    sessionResult = "",
+                )
+            }
+
+            is DropInResult.Failed -> CheckoutEventDTO(
+                type = CheckoutEventTypeDTO.FAILURE,
+                checkoutId = checkoutId,
+                errorCode = "Generic",
+                errorMessage = result.error,
+            )
+
+            is DropInResult.Cancelled -> CheckoutEventDTO(
+                type = CheckoutEventTypeDTO.FAILURE,
+                checkoutId = checkoutId,
+                errorCode = "Cancelled",
+                errorMessage = "Drop-in was cancelled by the shopper.",
+            )
+        }
+        eventHandler.send(event)
     }
 
     override fun handleAction(
@@ -241,6 +317,7 @@ internal class CheckoutPlatformApi(
     fun teardown() {
         hideAction()
         actionController = null
+        dropInCheckoutId = null
         checkoutHolder.clear()
     }
 

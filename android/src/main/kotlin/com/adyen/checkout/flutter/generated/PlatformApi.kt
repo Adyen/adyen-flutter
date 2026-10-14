@@ -2105,6 +2105,7 @@ interface CheckoutHostApi {
   fun setupSession(sessionResponse: SessionResponseDTO, configuration: CheckoutConfigurationDTO, callback: (Result<CheckoutSetupResultDTO>) -> Unit)
   fun setupAdvanced(paymentMethodsJson: String, configuration: CheckoutConfigurationDTO, callback: (Result<CheckoutSetupResultDTO>) -> Unit)
   fun disposeCheckout(checkoutId: String)
+  fun startDropIn(checkoutId: String, callback: (Result<Unit>) -> Unit)
   fun handleAction(actionId: String, actionJson: String, configuration: CheckoutConfigurationDTO, callback: (Result<AdvancedCheckoutResultDTO>) -> Unit)
   fun enableConsoleLogging(enabled: Boolean)
   fun encryptCard(card: UnencryptedCardDTO, publicKey: String, callback: (Result<EncryptedCardDTO>) -> Unit)
@@ -2178,6 +2179,25 @@ interface CheckoutHostApi {
               PlatformApiPigeonUtils.wrapError(exception)
             }
             reply.reply(wrapped)
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.adyen_checkout.CheckoutHostApi.startDropIn$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { message, reply ->
+            val args = message as List<Any?>
+            val checkoutIdArg = args[0] as String
+            api.startDropIn(checkoutIdArg) { result: Result<Unit> ->
+              val error = result.exceptionOrNull()
+              if (error != null) {
+                reply.reply(PlatformApiPigeonUtils.wrapError(error))
+              } else {
+                reply.reply(PlatformApiPigeonUtils.wrapResult(null))
+              }
+            }
           }
         } else {
           channel.setMessageHandler(null)
