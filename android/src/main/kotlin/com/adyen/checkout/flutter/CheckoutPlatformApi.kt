@@ -183,7 +183,8 @@ internal class CheckoutPlatformApi(
                     checkoutId = checkoutId,
                     resultCode = result.resultCode.value,
                     sessionId = sessionId,
-                    // sessionResult is not propagated by Android Drop-in yet.
+                    // TODO - Recheck on a newer native release: sessionResult is not propagated by
+                    //  Android Drop-in yet (DropInResult.Completed only carries the result code).
                     sessionResult = "",
                 )
             }
