@@ -26,6 +26,7 @@ import com.adyen.checkout.flutter.components.CheckoutComponentRegistry
 import com.adyen.checkout.flutter.components.ComponentPlatformEventHandler
 import com.adyen.checkout.flutter.generated.CheckoutEventDTO
 import com.adyen.checkout.flutter.generated.CheckoutEventTypeDTO
+import kotlin.math.ceil
 
 internal class DynamicComponentView @JvmOverloads constructor(
     context: Context,
@@ -38,6 +39,7 @@ internal class DynamicComponentView @JvmOverloads constructor(
     private var eventHandler: ComponentPlatformEventHandler? = null
     private var composeView: ComposeView? = null
     private var registry: CheckoutComponentRegistry? = null
+    private var lastReportedHeight: Long = -1
 
     constructor(
         context: Context,
@@ -53,14 +55,11 @@ internal class DynamicComponentView @JvmOverloads constructor(
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-        val heightSize = MeasureSpec.getSize(heightMeasureSpec)
-        super.onMeasure(widthMeasureSpec, heightSize)
-    }
-
-    override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
-        super.onLayout(changed, left, top, right, bottom)
-        if (changed) {
-            sendResize()
+        super.onMeasure(widthMeasureSpec, MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED))
+        val height = ceil(measuredHeight / screenDensity).toLong()
+        if (height > 0 && height != lastReportedHeight) {
+            lastReportedHeight = height
+            post { sendResize(height) }
         }
     }
 
@@ -140,13 +139,13 @@ internal class DynamicComponentView @JvmOverloads constructor(
         eventHandler = null
     }
 
-    private fun sendResize() {
+    private fun sendResize(height: Long) {
         eventHandler?.send(
             CheckoutEventDTO(
                 type = CheckoutEventTypeDTO.RESIZE,
                 checkoutId = checkoutId,
                 componentId = componentId,
-                height = (measuredHeight / screenDensity).toLong(),
+                height = height,
             ),
         )
     }

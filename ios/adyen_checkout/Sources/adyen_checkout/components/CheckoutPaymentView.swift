@@ -15,6 +15,7 @@ final class CheckoutPaymentView: NSObject, FlutterPlatformView {
     private let wrapperView = ComponentWrapperView()
     private var component: CheckoutPaymentComponent?
     private var applePayButton: PKPaymentButton?
+    private var lastReportedHeight: Int?
 
     private var checkoutId: String {
         params.checkoutId
@@ -230,8 +231,27 @@ final class CheckoutPaymentView: NSObject, FlutterPlatformView {
         ))
     }
 
+    private func measuredContentHeight() -> CGFloat {
+        guard let view = component?.viewController.view else { return 0 }
+        let preferred = component?.viewController.preferredContentSize.height ?? 0
+        if preferred > 0 {
+            return preferred
+        }
+        let width = wrapperView.bounds.width > 0
+            ? wrapperView.bounds.width
+            : wrapperView.window?.windowScene?.screen.bounds.width ?? 0
+        guard width > 0 else { return 0 }
+        return view.systemLayoutSizeFitting(
+            CGSize(width: width, height: UIView.layoutFittingCompressedSize.height),
+            withHorizontalFittingPriority: .required,
+            verticalFittingPriority: .fittingSizeLevel
+        ).height
+    }
+
     private func sendResize(height: Int? = nil) {
-        let value = height ?? Int(component?.viewController.preferredContentSize.height ?? wrapperView.bounds.height)
+        let value = height ?? Int(measuredContentHeight().rounded(.up))
+        guard value > 0, value != lastReportedHeight else { return }
+        lastReportedHeight = value
         events.send(event: CheckoutEventDTO(
             type: .resize,
             checkoutId: checkoutId,
