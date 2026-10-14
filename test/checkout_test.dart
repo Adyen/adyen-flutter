@@ -537,15 +537,15 @@ void main() {
 
     expect(failures, isEmpty);
     expect(find.byType(IosPlatformView), findsOneWidget);
-    final componentBox = tester.widget<AnimatedContainer>(
+    final componentBox = tester.widget<SizedBox>(
       find.ancestor(
         of: find.byType(IosPlatformView),
-        matching: find.byType(AnimatedContainer),
+        matching: find.byType(SizedBox),
       ),
     );
     // Provisional button height (64) plus container bottom spacing (8) until
     // the native resize event reports the exact height.
-    expect(componentBox.constraints?.maxHeight, 72);
+    expect(componentBox.height, 72);
 
     eventsController.add(CheckoutEventDTO(
       type: CheckoutEventTypeDTO.resize,
@@ -555,13 +555,13 @@ void main() {
     ));
     await tester.runAsync(() => Future<void>.delayed(Duration.zero));
     await tester.pump(const Duration(milliseconds: 300));
-    final resizedBox = tester.widget<AnimatedContainer>(
+    final resizedBox = tester.widget<SizedBox>(
       find.ancestor(
         of: find.byType(IosPlatformView),
-        matching: find.byType(AnimatedContainer),
+        matching: find.byType(SizedBox),
       ),
     );
-    expect(resizedBox.constraints?.maxHeight, 64);
+    expect(resizedBox.height, 64);
 
     await tester.pumpWidget(const SizedBox.shrink());
     checkout.dispose();
@@ -619,13 +619,13 @@ void main() {
     expect(controller.isReady, true);
     expect(controller.requiresUserInteraction, false);
     expect(find.byType(IosPlatformView), findsOneWidget);
-    final componentBox = tester.widget<AnimatedContainer>(
+    final componentBox = tester.widget<SizedBox>(
       find.ancestor(
         of: find.byType(IosPlatformView),
-        matching: find.byType(AnimatedContainer),
+        matching: find.byType(SizedBox),
       ),
     );
-    expect(componentBox.constraints?.maxHeight, 0);
+    expect(componentBox.height, 0);
 
     await controller.submit();
     expect(componentHostApi.submitCount, 1);

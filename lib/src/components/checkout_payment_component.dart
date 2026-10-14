@@ -143,9 +143,11 @@ class _CheckoutPaymentComponentState extends State<CheckoutPaymentComponent> {
   double get _initialViewHeight {
     if (widget.paymentMethod is StoredPaymentMethod) return 80;
     return switch (widget.paymentMethod.type) {
-      'googlepay' || 'paywithgoogle' || 'applepay' => 64,
+      'scheme' => 320,
       'blik' => 220,
-      _ => 320,
+      // Button-only components are the common case on the v6 generic path;
+      // unknown interactive methods grow from here instead of collapsing.
+      _ => 64,
     };
   }
 

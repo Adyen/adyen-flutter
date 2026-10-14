@@ -24,9 +24,7 @@ class ComponentContainer extends StatelessWidget {
           duration: const Duration(milliseconds: 300),
           curve: Curves.fastOutSlowIn,
           opacity: viewportHeight != null ? 1 : 0,
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 300),
-            curve: Curves.fastOutSlowIn,
+          child: SizedBox(
             key: componentWidgetKey,
             height: _determineHeight(viewportHeight),
             child: componentWidget,
