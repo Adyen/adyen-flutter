@@ -376,7 +376,25 @@ void main() {
         matching: find.byType(SizedBox),
       ),
     );
-    expect(componentBox.height, isNot(0));
+    // Provisional button height (64) plus container bottom spacing (8) until
+    // the native resize event reports the exact height.
+    expect(componentBox.height, 72);
+
+    eventsController.add(CheckoutEventDTO(
+      type: CheckoutEventTypeDTO.resize,
+      checkoutId: checkout.id,
+      componentId: platformView.creationParams['componentId'] as String,
+      height: 56,
+    ));
+    await tester.runAsync(() => Future<void>.delayed(Duration.zero));
+    await tester.pump(const Duration(milliseconds: 300));
+    final resizedBox = tester.widget<SizedBox>(
+      find.ancestor(
+        of: find.byType(IosPlatformView),
+        matching: find.byType(SizedBox),
+      ),
+    );
+    expect(resizedBox.height, 64);
 
     await tester.pumpWidget(const SizedBox.shrink());
     checkout.dispose();

@@ -47,6 +47,10 @@ class _CheckoutPaymentComponentState extends State<CheckoutPaymentComponent> {
   int? _previousViewportHeight;
   bool _hasError = false;
 
+  // Approximate height of a button-only native component. Used as a provisional
+  // height for no-interaction methods until the exact resize event arrives.
+  static const int _buttonOnlyProvisionalHeight = 64;
+
   @override
   void initState() {
     super.initState();
@@ -178,8 +182,13 @@ class _CheckoutPaymentComponentState extends State<CheckoutPaymentComponent> {
       return;
     }
     markCheckoutControllerReady(_effectiveController, requiresUserInteraction);
-    if (!requiresUserInteraction && needsController) {
+    if (requiresUserInteraction) return;
+    if (needsController) {
       setState(() => _viewportHeight = 0);
+    } else if (_viewportHeight == null) {
+      // The native view is only a button; shorten the loading placeholder to a
+      // button-sized height until the resize event reports the exact height.
+      setState(() => _viewportHeight = _buttonOnlyProvisionalHeight);
     }
   }
 
