@@ -9,19 +9,21 @@ public final class AdyenCheckoutPlugin: NSObject, FlutterPlugin {
         let callbacksApi = CheckoutCallbacksFlutterApi(binaryMessenger: messenger)
         let actionOnlyApi = ActionOnlyFlutterApi(binaryMessenger: messenger)
         let events = ComponentPlatformEventHandler()
+        let registry = CheckoutComponentRegistry()
         let checkoutApi = CheckoutPlatformApi(
             callbacksApi: callbacksApi,
             actionOnlyApi: actionOnlyApi,
             holder: holder,
-            events: events
+            events: events,
+            registry: registry
         )
-        let componentApi = ComponentPlatformApi()
+        let componentApi = ComponentPlatformApi(registry: registry)
 
         CheckoutHostApiSetup.setUp(binaryMessenger: messenger, api: checkoutApi)
         ComponentHostApiSetup.setUp(binaryMessenger: messenger, api: componentApi)
         EventsStreamHandler.register(with: messenger, streamHandler: events)
         registrar.register(
-            CheckoutPaymentViewFactory(holder: holder, events: events),
+            CheckoutPaymentViewFactory(holder: holder, events: events, registry: registry),
             withId: CheckoutPaymentViewFactory.viewType
         )
     }

@@ -51,10 +51,11 @@ import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.coroutines.resume
 
 internal class CheckoutPaymentViewFactory(
-    private val activity: FragmentActivity,
+    private val activityProvider: () -> FragmentActivity?,
     private val checkoutHolder: CheckoutHolder,
     private val callbacksApi: CheckoutCallbacksFlutterApi,
     private val eventHandler: ComponentPlatformEventHandler,
+    private val registry: CheckoutComponentRegistry,
 ) : PlatformViewFactory(ComponentHostApi.codec) {
     override fun create(
         context: Context,
@@ -64,6 +65,7 @@ internal class CheckoutPaymentViewFactory(
         val params = args as? CheckoutPaymentViewParamsDTO
         try {
             if (params == null) throw IllegalArgumentException("Invalid platform view params.")
+            val activity = activityProvider() ?: throw IllegalStateException("No FragmentActivity attached.")
             val checkoutContext = checkoutHolder.get(params.checkoutId)
                 ?: throw AdyenPigeonError("CheckoutNotFound", "Checkout is no longer active.")
             val paymentMethod = deserializePaymentMethod(params.paymentMethodJson, params.isStoredPaymentMethod)
@@ -82,6 +84,7 @@ internal class CheckoutPaymentViewFactory(
                 callbacks = callbacks,
                 actionData = actionData,
                 eventHandler = eventHandler,
+                registry = registry,
             )
         } catch (error: Throwable) {
             return FailedCheckoutPaymentView(context, params?.checkoutId, params?.componentId, eventHandler, error)
@@ -186,7 +189,7 @@ internal class CheckoutPaymentViewFactory(
         componentId: String,
         data: PaymentComponentData<*>,
     ): SubmitResult = suspendCancellableCoroutine { continuation ->
-        CheckoutComponentRegistry.setActive(checkoutId, componentId)
+        registry.setActive(checkoutId, componentId)
         val dataJson = PaymentComponentData.SERIALIZER.serialize(data).toString()
         callbacksApi.onSubmit(
             checkoutId,

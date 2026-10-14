@@ -8,10 +8,12 @@ final class CheckoutPaymentViewFactory: NSObject, FlutterPlatformViewFactory {
 
     private let holder: CheckoutHolder
     private let events: ComponentPlatformEventHandler
+    private let registry: CheckoutComponentRegistry
 
-    init(holder: CheckoutHolder, events: ComponentPlatformEventHandler) {
+    init(holder: CheckoutHolder, events: ComponentPlatformEventHandler, registry: CheckoutComponentRegistry) {
         self.holder = holder
         self.events = events
+        self.registry = registry
     }
 
     func create(
@@ -22,7 +24,7 @@ final class CheckoutPaymentViewFactory: NSObject, FlutterPlatformViewFactory {
         guard let params = args as? CheckoutPaymentViewParamsDTO else {
             return FailedPlatformView()
         }
-        return CheckoutPaymentView(params: params, holder: holder, events: events)
+        return CheckoutPaymentView(params: params, holder: holder, events: events, registry: registry)
     }
 
     func createArgsCodec() -> FlutterMessageCodec & NSObjectProtocol {

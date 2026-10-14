@@ -37,16 +37,19 @@ internal class DynamicComponentView @JvmOverloads constructor(
     private var componentId = ""
     private var eventHandler: ComponentPlatformEventHandler? = null
     private var composeView: ComposeView? = null
+    private var registry: CheckoutComponentRegistry? = null
 
     constructor(
         context: Context,
         checkoutId: String,
         componentId: String,
         eventHandler: ComponentPlatformEventHandler,
+        registry: CheckoutComponentRegistry,
     ) : this(context) {
         this.checkoutId = checkoutId
         this.componentId = componentId
         this.eventHandler = eventHandler
+        this.registry = registry
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
@@ -105,7 +108,7 @@ internal class DynamicComponentView @JvmOverloads constructor(
                     }
 
                     DisposableEffect(controller) {
-                        CheckoutComponentRegistry.register(checkoutId, componentId, controller)
+                        registry?.register(checkoutId, componentId, controller)
                         eventHandler?.send(
                             CheckoutEventDTO(
                                 type = CheckoutEventTypeDTO.COMPONENT_READY,
@@ -115,7 +118,7 @@ internal class DynamicComponentView @JvmOverloads constructor(
                             ),
                         )
                         onDispose {
-                            CheckoutComponentRegistry.unregister(checkoutId, componentId)
+                            registry?.unregister(checkoutId, componentId)
                         }
                     }
 

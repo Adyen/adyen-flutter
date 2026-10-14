@@ -14,19 +14,21 @@ import io.flutter.plugin.platform.PlatformView
 internal class CheckoutPaymentView(
     activity: FragmentActivity,
     context: Context,
-    private val checkoutId: String,
-    private val componentId: String,
+    checkoutId: String,
+    componentId: String,
     paymentMethod: PaymentMethodResponse,
     checkoutContext: CheckoutContext,
     callbacks: CheckoutCallbacks,
     actionData: MutableState<ActionData?>,
     eventHandler: ComponentPlatformEventHandler,
+    registry: CheckoutComponentRegistry,
 ) : PlatformView {
     private val dynamicComponentView = DynamicComponentView(
         context = context,
         checkoutId = checkoutId,
         componentId = componentId,
         eventHandler = eventHandler,
+        registry = registry,
     )
 
     init {
@@ -43,6 +45,5 @@ internal class CheckoutPaymentView(
 
     override fun dispose() {
         dynamicComponentView.onDispose()
-        CheckoutComponentRegistry.unregister(checkoutId, componentId)
     }
 }

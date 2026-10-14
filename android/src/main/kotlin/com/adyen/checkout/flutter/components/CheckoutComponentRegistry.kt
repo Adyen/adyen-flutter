@@ -3,7 +3,7 @@ package com.adyen.checkout.flutter.components
 import android.content.Intent
 import com.adyen.checkout.core.components.CheckoutController
 
-internal object CheckoutComponentRegistry {
+internal class CheckoutComponentRegistry {
     private data class Handle(
         val checkoutId: String,
         val submit: () -> Unit,

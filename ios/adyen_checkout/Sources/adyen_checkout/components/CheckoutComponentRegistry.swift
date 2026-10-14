@@ -3,12 +3,8 @@ import Foundation
 
 @MainActor
 final class CheckoutComponentRegistry {
-    static let shared = CheckoutComponentRegistry()
-
     private var components: [String: (checkoutId: String, component: CheckoutPaymentComponent)] = [:]
     private var activeComponentId: String?
-
-    private init() {}
 
     func register(
         checkoutId: String,
@@ -35,11 +31,6 @@ final class CheckoutComponentRegistry {
         if activeComponentId == componentId {
             activeComponentId = nil
         }
-    }
-
-    func handleReturn(url: URL) {
-        guard activeComponentId != nil else { return }
-        _ = Checkout.handleReturn(url: url)
     }
 
     func clear(checkoutId: String) {

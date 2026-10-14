@@ -16,6 +16,7 @@ final class CheckoutPlatformApi: CheckoutHostApi {
     private let actionOnlyApi: ActionOnlyFlutterApi
     private let holder: CheckoutHolder
     private let events: ComponentPlatformEventHandler
+    private let registry: CheckoutComponentRegistry
     private var presentationDelegates: [String: PresentationDelegateProxy] = [:]
     private var dropInComponents: [String: CheckoutDropInComponent] = [:]
     private var actionCompletion: AsyncResult<AdvancedCheckoutResult>?
@@ -24,12 +25,14 @@ final class CheckoutPlatformApi: CheckoutHostApi {
         callbacksApi: CheckoutCallbacksFlutterApi,
         actionOnlyApi: ActionOnlyFlutterApi,
         holder: CheckoutHolder,
-        events: ComponentPlatformEventHandler
+        events: ComponentPlatformEventHandler,
+        registry: CheckoutComponentRegistry
     ) {
         self.callbacksApi = callbacksApi
         self.actionOnlyApi = actionOnlyApi
         self.holder = holder
         self.events = events
+        self.registry = registry
     }
 
     func setupSession(
@@ -117,12 +120,12 @@ final class CheckoutPlatformApi: CheckoutHostApi {
         holder.removeCheckout(for: checkoutId)
         presentationDelegates.removeValue(forKey: checkoutId)
         dropInComponents.removeValue(forKey: checkoutId)
-        CheckoutComponentRegistry.shared.clear(checkoutId: checkoutId)
+        registry.clear(checkoutId: checkoutId)
     }
 
     func clearActiveCheckout() throws {
         holder.clear()
-        CheckoutComponentRegistry.shared.clear()
+        registry.clear()
         dropInComponents.removeAll()
         presentationDelegates.removeAll()
         actionCompletion = nil
@@ -250,7 +253,7 @@ final class CheckoutPlatformApi: CheckoutHostApi {
 
     func teardown() {
         holder.clear()
-        CheckoutComponentRegistry.shared.clear()
+        registry.clear()
         presentationDelegates.removeAll()
         dropInComponents.removeAll()
         actionCompletion = nil

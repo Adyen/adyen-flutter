@@ -62,6 +62,7 @@ internal class CheckoutPlatformApi(
     private val actionOnlyApi: ActionOnlyFlutterApi,
     private val eventHandler: ComponentPlatformEventHandler,
     private val dropInLauncher: DropInLauncher?,
+    private val componentRegistry: CheckoutComponentRegistry,
 ) : CheckoutHostApi {
     private var actionController: CheckoutController? = null
     private var actionView: ComposeView? = null
@@ -135,7 +136,7 @@ internal class CheckoutPlatformApi(
 
     override fun disposeCheckout(checkoutId: String) {
         checkoutHolder.remove(checkoutId)
-        CheckoutComponentRegistry.clearCheckout(checkoutId)
+        componentRegistry.clearCheckout(checkoutId)
     }
 
     override fun clearActiveCheckout() {
@@ -143,7 +144,7 @@ internal class CheckoutPlatformApi(
         actionController = null
         dropInCheckoutId = null
         checkoutHolder.clear()
-        CheckoutComponentRegistry.clear()
+        componentRegistry.clear()
     }
 
     override fun startDropIn(checkoutId: String, callback: (Result<Unit>) -> Unit) {

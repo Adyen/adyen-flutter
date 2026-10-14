@@ -3,7 +3,11 @@ import Foundation
 
 @MainActor
 final class ComponentPlatformApi: ComponentHostApi {
-    private let registry = CheckoutComponentRegistry.shared
+    private let registry: CheckoutComponentRegistry
+
+    init(registry: CheckoutComponentRegistry) {
+        self.registry = registry
+    }
 
     func submit(
         checkoutId: String,
@@ -24,10 +28,6 @@ final class ComponentPlatformApi: ComponentHostApi {
 
     func dispose(checkoutId: String, componentId: String) throws {
         registry.remove(checkoutId: checkoutId, componentId: componentId)
-    }
-
-    func handleReturn(url: URL) {
-        registry.handleReturn(url: url)
     }
 
     func teardown() {

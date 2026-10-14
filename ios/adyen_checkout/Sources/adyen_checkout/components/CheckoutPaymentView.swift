@@ -11,6 +11,7 @@ final class CheckoutPaymentView: NSObject, FlutterPlatformView {
     private let paymentMethodObject: [String: Any]?
     private let holder: CheckoutHolder
     private let events: ComponentPlatformEventHandler
+    private let registry: CheckoutComponentRegistry
     private let wrapperView = ComponentWrapperView()
     private var component: CheckoutPaymentComponent?
     private var applePayButton: PKPaymentButton?
@@ -30,7 +31,8 @@ final class CheckoutPaymentView: NSObject, FlutterPlatformView {
     init(
         params: CheckoutPaymentViewParamsDTO,
         holder: CheckoutHolder,
-        events: ComponentPlatformEventHandler
+        events: ComponentPlatformEventHandler,
+        registry: CheckoutComponentRegistry
     ) {
         self.params = params
         self.paymentMethodObject = try? JSONSerialization.jsonObject(
@@ -38,6 +40,7 @@ final class CheckoutPaymentView: NSObject, FlutterPlatformView {
         ) as? [String: Any]
         self.holder = holder
         self.events = events
+        self.registry = registry
         super.init()
         setup()
     }
@@ -47,7 +50,7 @@ final class CheckoutPaymentView: NSObject, FlutterPlatformView {
     }
 
     func dispose() {
-        CheckoutComponentRegistry.shared.remove(checkoutId: checkoutId, componentId: componentId)
+        registry.remove(checkoutId: checkoutId, componentId: componentId)
         component = nil
         applePayButton = nil
         wrapperView.arrangedSubviews.forEach { $0.removeFromSuperview() }
@@ -66,7 +69,7 @@ final class CheckoutPaymentView: NSObject, FlutterPlatformView {
 
             let paymentComponent = try createPaymentComponent(checkout: checkout)
             component = paymentComponent
-            CheckoutComponentRegistry.shared.register(
+            registry.register(
                 checkoutId: checkoutId,
                 componentId: componentId,
                 component: paymentComponent
@@ -123,12 +126,12 @@ final class CheckoutPaymentView: NSObject, FlutterPlatformView {
             }
             let paymentComponent = try createPaymentComponent(checkout: checkout)
             component = paymentComponent
-            CheckoutComponentRegistry.shared.register(
+            registry.register(
                 checkoutId: checkoutId,
                 componentId: componentId,
                 component: paymentComponent
             )
-            _ = CheckoutComponentRegistry.shared.setActive(
+            _ = registry.setActive(
                 checkoutId: checkoutId,
                 componentId: componentId
             )
