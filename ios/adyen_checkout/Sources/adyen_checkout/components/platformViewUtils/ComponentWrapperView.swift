@@ -2,6 +2,7 @@ import UIKit
 
 class ComponentWrapperView: UIStackView {
     var resizeViewportCallback: () -> Void = {}
+    var onMoveToWindow: () -> Void = {}
 
     init() {
         super.init(frame: .zero)
@@ -21,5 +22,10 @@ class ComponentWrapperView: UIStackView {
         super.layoutSubviews()
 
         resizeViewportCallback()
+    }
+
+    override func didMoveToWindow() {
+        super.didMoveToWindow()
+        onMoveToWindow()
     }
 }

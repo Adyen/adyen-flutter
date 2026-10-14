@@ -51,6 +51,8 @@ final class CheckoutPaymentView: NSObject, FlutterPlatformView {
 
     func dispose() {
         registry.remove(checkoutId: checkoutId, componentId: componentId)
+        component?.viewController.willMove(toParent: nil)
+        component?.viewController.removeFromParent()
         component = nil
         applePayButtonView = nil
         wrapperView.arrangedSubviews.forEach { $0.removeFromSuperview() }
@@ -78,6 +80,7 @@ final class CheckoutPaymentView: NSObject, FlutterPlatformView {
             let viewController = paymentComponent.viewController
             wrapperView.resizeViewportCallback = { [weak self] in self?.sendResize() }
             wrapperView.addArrangedSubview(viewController.view)
+            wrapperView.onMoveToWindow = { [weak self] in self?.attachToParentViewController() }
             sendResize()
         } catch {
             sendFailure(error)
@@ -128,6 +131,17 @@ final class CheckoutPaymentView: NSObject, FlutterPlatformView {
             applePayButtonView?.isEnabled = true
             sendFailure(error)
         }
+    }
+
+    private func attachToParentViewController() {
+        guard let child = component?.viewController, child.parent == nil, wrapperView.window != nil else { return }
+        var responder: UIResponder? = wrapperView.next
+        while let current = responder, !(current is UIViewController) {
+            responder = current.next
+        }
+        guard let parent = responder as? UIViewController else { return }
+        parent.addChild(child)
+        child.didMove(toParent: parent)
     }
 
     private var presentingViewController: UIViewController? {
