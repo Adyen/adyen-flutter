@@ -60,54 +60,101 @@ final class CheckoutRuntime {
     required SessionResponse sessionResponse,
     required CheckoutConfiguration configuration,
     required SessionCheckoutCallbacks callbacks,
-  }) async {
-    try {
-      final result = await _checkoutHostApi.setupSession(
-        sessionResponse.toDTO(),
-        configuration.toDTO(),
-      );
-      final methods = result.toPaymentMethods();
-      final checkout = createSessionCheckout(
-        id: result.checkoutId,
-        paymentMethods: methods.regular,
-        storedPaymentMethods: methods.stored,
-        callbacks: callbacks,
-        runtime: this,
-      );
-      _checkout = _CheckoutRecord.session(
-        checkout: checkout,
-        callbacks: callbacks,
-        configuration: configuration,
-      );
-      return checkout;
-    } catch (error, stackTrace) {
-      throw _asCheckoutError(error, stackTrace);
-    }
-  }
+  }) =>
+      _runSetup(() async {
+        String? checkoutId;
+        try {
+          final result = await _checkoutHostApi.setupSession(
+            sessionResponse.toDTO(),
+            configuration.toDTO(),
+          );
+          checkoutId = result.checkoutId;
+          final methods = result.toPaymentMethods();
+          final checkout = createSessionCheckout(
+            id: result.checkoutId,
+            paymentMethods: methods.regular,
+            storedPaymentMethods: methods.stored,
+            callbacks: callbacks,
+            runtime: this,
+          );
+          _checkout = _CheckoutRecord.session(
+            checkout: checkout,
+            callbacks: callbacks,
+            configuration: configuration,
+          );
+          return checkout;
+        } catch (_) {
+          if (checkoutId != null) _releaseNativeCheckout(checkoutId);
+          rethrow;
+        }
+      });
 
   Future<AdvancedCheckout> setupAdvanced({
     required PaymentMethods paymentMethods,
     required CheckoutConfiguration configuration,
     required AdvancedCheckoutCallbacks callbacks,
+  }) =>
+      _runSetup(() async {
+        String? checkoutId;
+        try {
+          final result = await _checkoutHostApi.setupAdvanced(
+            jsonEncode(paymentMethods.toJson()),
+            configuration.toDTO(),
+          );
+          checkoutId = result.checkoutId;
+          final checkout = createAdvancedCheckout(
+            id: result.checkoutId,
+            paymentMethods: paymentMethods.regular,
+            storedPaymentMethods: paymentMethods.stored,
+            callbacks: callbacks,
+            runtime: this,
+          );
+          _checkout = _CheckoutRecord.advanced(
+            checkout: checkout,
+            callbacks: callbacks,
+            configuration: configuration,
+          );
+          return checkout;
+        } catch (_) {
+          if (checkoutId != null) _releaseNativeCheckout(checkoutId);
+          rethrow;
+        }
+      });
+
+  // Runs a checkout setup. Fails fast when another flow is already tracked and
+  // recovers once from a stale native checkout that still blocks setup
+  // natively (e.g. after a hot restart or an interrupted action flow).
+  Future<T> _runSetup<T>(Future<T> Function() setup) async {
+    _throwIfTrackedFlow();
+    return _recoverStaleCheckout(setup);
+  }
+
+  void _throwIfTrackedFlow() {
+    if (_checkout != null || _actionCallback != null) {
+      throw CheckoutError.alreadyActive();
+    }
+  }
+
+  bool get _hasTrackedFlow => _checkout != null || _actionCallback != null;
+
+  // Invokes [call] once, then clears stale native checkout state and retries
+  // when the platform reports an active checkout that Dart no longer tracks.
+  Future<T> _recoverStaleCheckout<T>(
+    Future<T> Function() call, {
+    bool Function()? hasTrackedFlow,
   }) async {
     try {
-      final result = await _checkoutHostApi.setupAdvanced(
-        jsonEncode(paymentMethods.toJson()),
-        configuration.toDTO(),
-      );
-      final checkout = createAdvancedCheckout(
-        id: result.checkoutId,
-        paymentMethods: paymentMethods.regular,
-        storedPaymentMethods: paymentMethods.stored,
-        callbacks: callbacks,
-        runtime: this,
-      );
-      _checkout = _CheckoutRecord.advanced(
-        checkout: checkout,
-        callbacks: callbacks,
-        configuration: configuration,
-      );
-      return checkout;
+      return await call();
+    } catch (error, stackTrace) {
+      final checkoutError = _asCheckoutError(error, stackTrace);
+      final tracked = (hasTrackedFlow ?? () => _hasTrackedFlow)();
+      if (tracked || checkoutError.code != CheckoutError.alreadyActiveCode) {
+        throw checkoutError;
+      }
+    }
+    await _checkoutHostApi.clearActiveCheckout();
+    try {
+      return await call();
     } catch (error, stackTrace) {
       throw _asCheckoutError(error, stackTrace);
     }
@@ -118,13 +165,19 @@ final class CheckoutRuntime {
     required CheckoutConfiguration configuration,
     required AdditionalDetailsCallback onAdditionalDetails,
   }) async {
+    _throwIfTrackedFlow();
     final actionId = _newId('action');
     _actionCallback = onAdditionalDetails;
     try {
-      final result = await _checkoutHostApi.handleAction(
-        actionId,
-        jsonEncode(action.data),
-        configuration.toDTO(),
+      final result = await _recoverStaleCheckout(
+        () => _checkoutHostApi.handleAction(
+          actionId,
+          jsonEncode(action.data),
+          configuration.toDTO(),
+        ),
+        // The in-flight action owns _actionCallback, so only a live checkout
+        // counts as tracked state for staleness detection.
+        hasTrackedFlow: () => _checkout != null,
       );
       final failure = _actionFailure;
       _actionFailure = null;
@@ -211,6 +264,10 @@ final class CheckoutRuntime {
     _checkout = null;
     markFlowDisposed(record.checkout);
     record.disposed = true;
+    _releaseNativeCheckout(checkoutId);
+  }
+
+  void _releaseNativeCheckout(String checkoutId) {
     unawaited(_checkoutHostApi
         .disposeCheckout(checkoutId)
         .catchError((Object error, StackTrace stackTrace) {
@@ -316,12 +373,13 @@ final class CheckoutRuntime {
   void _completeRecord(_CheckoutRecord record, void Function() callback) {
     if (record.terminal || record.disposed) return;
     record.terminal = true;
+    // Dispose before invoking the callback so merchants can start a new
+    // checkout inside onComplete/onFailure without hitting CheckoutAlreadyActive.
+    disposeCheckout(record.checkout.id);
     try {
       callback();
     } catch (error, stackTrace) {
       _reportError(error, stackTrace);
-    } finally {
-      disposeCheckout(record.checkout.id);
     }
   }
 

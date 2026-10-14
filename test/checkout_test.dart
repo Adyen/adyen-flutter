@@ -6,15 +6,18 @@ import 'package:adyen_checkout/src/checkout_runtime.dart';
 import 'package:adyen_checkout/src/components/platform/ios_platform_view.dart';
 import 'package:adyen_checkout/src/generated/platform_api.g.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 class FakeCheckoutHostApi extends CheckoutHostApi {
   int disposeCheckoutCount = 0;
+  final List<String> disposedCheckoutIds = [];
+  String regularPaymentMethodsJson = '[{"type":"scheme","name":"Card"}]';
 
   CheckoutSetupResultDTO _setupResult() => CheckoutSetupResultDTO(
         checkoutId: 'checkout-1',
-        regularPaymentMethodsJson: '[{"type":"scheme","name":"Card"}]',
+        regularPaymentMethodsJson: regularPaymentMethodsJson,
         storedPaymentMethodsJson:
             '[{"type":"scheme","name":"Stored Card","id":"stored-1"}]',
       );
@@ -23,19 +26,37 @@ class FakeCheckoutHostApi extends CheckoutHostApi {
   Future<CheckoutSetupResultDTO> setupSession(
     SessionResponseDTO sessionResponse,
     CheckoutConfigurationDTO configuration,
-  ) async =>
-      _setupResult();
+  ) async {
+    if (failSetupsWithAlreadyActive) {
+      throw PlatformException(code: 'CheckoutAlreadyActive');
+    }
+    return _setupResult();
+  }
 
   @override
   Future<CheckoutSetupResultDTO> setupAdvanced(
     String paymentMethodsJson,
     CheckoutConfigurationDTO configuration,
-  ) async =>
-      _setupResult();
+  ) async {
+    if (failSetupsWithAlreadyActive) {
+      throw PlatformException(code: 'CheckoutAlreadyActive');
+    }
+    return _setupResult();
+  }
+
+  int clearActiveCheckoutCount = 0;
+  bool failSetupsWithAlreadyActive = false;
 
   @override
   Future<void> disposeCheckout(String checkoutId) async {
     disposeCheckoutCount++;
+    disposedCheckoutIds.add(checkoutId);
+  }
+
+  @override
+  Future<void> clearActiveCheckout() async {
+    clearActiveCheckoutCount++;
+    failSetupsWithAlreadyActive = false;
   }
 
   @override
@@ -175,6 +196,153 @@ void main() {
     expect(checkoutHostApi.disposeCheckoutCount, 1);
   });
 
+  test('failed session setup releases the native checkout it created',
+      () async {
+    checkoutHostApi.regularPaymentMethodsJson = '{}';
+
+    await expectLater(
+      runtime.setupSession(
+        sessionResponse: const SessionResponse(
+          id: 'session-1',
+          sessionData: 'session-data',
+        ),
+        configuration: const CheckoutConfiguration(
+          environment: Environment.test,
+          clientKey: 'test_key',
+        ),
+        callbacks: SessionCheckoutCallbacks(
+          onComplete: (result) {},
+          onFailure: (error) {},
+          onBeforeSubmit: (data) async => BeforeSubmitProceed(data: data),
+        ),
+      ),
+      throwsA(isA<CheckoutError>()),
+    );
+
+    expect(checkoutHostApi.disposedCheckoutIds, ['checkout-1']);
+  });
+
+  test('setup recovers a stale native checkout once', () async {
+    checkoutHostApi.failSetupsWithAlreadyActive = true;
+
+    final checkout = await runtime.setupSession(
+      sessionResponse: const SessionResponse(
+        id: 'session-1',
+        sessionData: 'session-data',
+      ),
+      configuration: const CheckoutConfiguration(
+        environment: Environment.test,
+        clientKey: 'test_key',
+      ),
+      callbacks: SessionCheckoutCallbacks(
+        onComplete: (result) {},
+        onFailure: (error) {},
+        onBeforeSubmit: (data) async => BeforeSubmitProceed(data: data),
+      ),
+    );
+
+    expect(checkout, isA<SessionCheckout>());
+    expect(checkoutHostApi.clearActiveCheckoutCount, 1);
+    expect(checkoutHostApi.failSetupsWithAlreadyActive, false);
+  });
+
+  test('setup throws alreadyActive while a checkout is tracked', () async {
+    await runtime.setupAdvanced(
+      paymentMethods: PaymentMethods(),
+      configuration: const CheckoutConfiguration(
+        environment: Environment.test,
+        clientKey: 'test_key',
+      ),
+      callbacks: AdvancedCheckoutCallbacks(
+        onSubmit: (data) async =>
+            const SubmitResult.completion(resultCode: 'Authorised'),
+        onAdditionalDetails: (data) async =>
+            const AdditionalDetailsResult.completion(resultCode: 'Authorised'),
+        onFailure: (error) {},
+        onComplete: (result) {},
+      ),
+    );
+
+    await expectLater(
+      runtime.setupAdvanced(
+        paymentMethods: PaymentMethods(),
+        configuration: const CheckoutConfiguration(
+          environment: Environment.test,
+          clientKey: 'test_key',
+        ),
+        callbacks: AdvancedCheckoutCallbacks(
+          onSubmit: (data) async =>
+              const SubmitResult.completion(resultCode: 'Authorised'),
+          onAdditionalDetails: (data) async =>
+              const AdditionalDetailsResult.completion(
+                  resultCode: 'Authorised'),
+          onFailure: (error) {},
+          onComplete: (result) {},
+        ),
+      ),
+      throwsA(isA<CheckoutError>().having(
+        (error) => error.code,
+        'code',
+        CheckoutError.alreadyActiveCode,
+      )),
+    );
+    expect(checkoutHostApi.clearActiveCheckoutCount, 0);
+  });
+
+  test('terminal callback can set up a new checkout', () async {
+    SessionCheckout? nextCheckout;
+    CheckoutError? setupError;
+    final checkout = await runtime.setupAdvanced(
+      paymentMethods: PaymentMethods(),
+      configuration: const CheckoutConfiguration(
+        environment: Environment.test,
+        clientKey: 'test_key',
+      ),
+      callbacks: AdvancedCheckoutCallbacks(
+        onSubmit: (data) async =>
+            const SubmitResult.completion(resultCode: 'Authorised'),
+        onAdditionalDetails: (data) async =>
+            const AdditionalDetailsResult.completion(resultCode: 'Authorised'),
+        onFailure: (error) {},
+        onComplete: (result) {
+          unawaited(
+            runtime
+                .setupSession(
+                  sessionResponse: const SessionResponse(
+                    id: 'session-2',
+                    sessionData: 'session-data',
+                  ),
+                  configuration: const CheckoutConfiguration(
+                    environment: Environment.test,
+                    clientKey: 'test_key',
+                  ),
+                  callbacks: SessionCheckoutCallbacks(
+                    onComplete: (result) {},
+                    onFailure: (error) {},
+                    onBeforeSubmit: (data) async =>
+                        BeforeSubmitProceed(data: data),
+                  ),
+                )
+                .then((value) => nextCheckout = value)
+                .catchError(
+                    (Object error) => setupError = error as CheckoutError),
+          );
+        },
+      ),
+    );
+
+    eventsController.add(CheckoutEventDTO(
+      type: CheckoutEventTypeDTO.complete,
+      checkoutId: checkout.id,
+      resultCode: 'Authorised',
+    ));
+    await Future<void>.delayed(Duration.zero);
+    await Future<void>.delayed(Duration.zero);
+
+    expect(setupError, isNull);
+    expect(nextCheckout, isA<SessionCheckout>());
+  });
+
   test('utility methods use named public API and validate expiry format',
       () async {
     expect(
@@ -200,8 +368,7 @@ void main() {
     );
   });
 
-  test('terminal completion invokes callback before disposing checkout',
-      () async {
+  test('terminal completion disposes checkout and invokes callback', () async {
     var completed = false;
     final checkout = await runtime.setupAdvanced(
       paymentMethods: PaymentMethods(),
@@ -231,7 +398,7 @@ void main() {
     expect(checkoutHostApi.disposeCheckoutCount, 1);
   });
 
-  test('terminal failure invokes callback before disposing checkout', () async {
+  test('terminal failure disposes checkout and invokes callback', () async {
     CheckoutError? receivedError;
     final checkout = await runtime.setupAdvanced(
       paymentMethods: PaymentMethods(),

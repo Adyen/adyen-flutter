@@ -1971,6 +1971,10 @@ protocol CheckoutHostApi {
   func setupSession(sessionResponse: SessionResponseDTO, configuration: CheckoutConfigurationDTO, completion: @escaping (Result<CheckoutSetupResultDTO, Error>) -> Void)
   func setupAdvanced(paymentMethodsJson: String, configuration: CheckoutConfigurationDTO, completion: @escaping (Result<CheckoutSetupResultDTO, Error>) -> Void)
   func disposeCheckout(checkoutId: String) throws
+  /// Clears all native checkout state without a checkout id. Used to recover
+  /// when Dart tracks no active checkout but the platform still holds one
+  /// (for example after a hot restart or an interrupted action flow).
+  func clearActiveCheckout() throws
   func startDropIn(checkoutId: String, completion: @escaping (Result<Void, Error>) -> Void)
   func handleAction(actionId: String, actionJson: String, configuration: CheckoutConfigurationDTO, completion: @escaping (Result<AdvancedCheckoutResultDTO, Error>) -> Void)
   func enableConsoleLogging(enabled: Bool) throws
@@ -2038,6 +2042,22 @@ class CheckoutHostApiSetup {
       }
     } else {
       disposeCheckoutChannel.setMessageHandler(nil)
+    }
+    /// Clears all native checkout state without a checkout id. Used to recover
+    /// when Dart tracks no active checkout but the platform still holds one
+    /// (for example after a hot restart or an interrupted action flow).
+    let clearActiveCheckoutChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.CheckoutHostApi.clearActiveCheckout\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      clearActiveCheckoutChannel.setMessageHandler { _, reply in
+        do {
+          try api.clearActiveCheckout()
+          reply(wrapResult(nil))
+        } catch {
+          reply(wrapError(error))
+        }
+      }
+    } else {
+      clearActiveCheckoutChannel.setMessageHandler(nil)
     }
     let startDropInChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.CheckoutHostApi.startDropIn\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {

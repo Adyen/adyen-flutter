@@ -2659,6 +2659,34 @@ class CheckoutHostApi {
     }
   }
 
+  /// Clears all native checkout state without a checkout id. Used to recover
+  /// when Dart tracks no active checkout but the platform still holds one
+  /// (for example after a hot restart or an interrupted action flow).
+  Future<void> clearActiveCheckout() async {
+    final String pigeonVar_channelName =
+        'dev.flutter.pigeon.adyen_checkout.CheckoutHostApi.clearActiveCheckout$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel =
+        BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(null);
+    final List<Object?>? pigeonVar_replyList =
+        await pigeonVar_sendFuture as List<Object?>?;
+    if (pigeonVar_replyList == null) {
+      throw _createConnectionError(pigeonVar_channelName);
+    } else if (pigeonVar_replyList.length > 1) {
+      throw PlatformException(
+        code: pigeonVar_replyList[0]! as String,
+        message: pigeonVar_replyList[1] as String?,
+        details: pigeonVar_replyList[2],
+      );
+    } else {
+      return;
+    }
+  }
+
   Future<void> startDropIn(String checkoutId) async {
     final String pigeonVar_channelName =
         'dev.flutter.pigeon.adyen_checkout.CheckoutHostApi.startDropIn$pigeonVar_messageChannelSuffix';

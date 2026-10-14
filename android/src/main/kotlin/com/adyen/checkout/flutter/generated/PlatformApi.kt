@@ -2105,6 +2105,12 @@ interface CheckoutHostApi {
   fun setupSession(sessionResponse: SessionResponseDTO, configuration: CheckoutConfigurationDTO, callback: (Result<CheckoutSetupResultDTO>) -> Unit)
   fun setupAdvanced(paymentMethodsJson: String, configuration: CheckoutConfigurationDTO, callback: (Result<CheckoutSetupResultDTO>) -> Unit)
   fun disposeCheckout(checkoutId: String)
+  /**
+   * Clears all native checkout state without a checkout id. Used to recover
+   * when Dart tracks no active checkout but the platform still holds one
+   * (for example after a hot restart or an interrupted action flow).
+   */
+  fun clearActiveCheckout()
   fun startDropIn(checkoutId: String, callback: (Result<Unit>) -> Unit)
   fun handleAction(actionId: String, actionJson: String, configuration: CheckoutConfigurationDTO, callback: (Result<AdvancedCheckoutResultDTO>) -> Unit)
   fun enableConsoleLogging(enabled: Boolean)
@@ -2174,6 +2180,22 @@ interface CheckoutHostApi {
             val checkoutIdArg = args[0] as String
             val wrapped: List<Any?> = try {
               api.disposeCheckout(checkoutIdArg)
+              listOf(null)
+            } catch (exception: Throwable) {
+              PlatformApiPigeonUtils.wrapError(exception)
+            }
+            reply.reply(wrapped)
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.adyen_checkout.CheckoutHostApi.clearActiveCheckout$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { _, reply ->
+            val wrapped: List<Any?> = try {
+              api.clearActiveCheckout()
               listOf(null)
             } catch (exception: Throwable) {
               PlatformApiPigeonUtils.wrapError(exception)

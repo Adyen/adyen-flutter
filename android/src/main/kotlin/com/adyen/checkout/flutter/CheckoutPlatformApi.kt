@@ -89,8 +89,9 @@ internal class CheckoutPlatformApi(
                     is Checkout.Result.Error -> throw result.error.toPigeonError()
                     is Checkout.Result.Success -> {
                         val checkoutId = UUID.randomUUID().toString()
+                        val reply = result.checkoutContext.toSessionSetupResult(checkoutId)
                         checkoutHolder.put(checkoutId, result.checkoutContext)
-                        callback(Result.success(result.checkoutContext.toSessionSetupResult(checkoutId)))
+                        callback(Result.success(reply))
                     }
                 }
             } catch (error: Throwable) {
@@ -121,8 +122,9 @@ internal class CheckoutPlatformApi(
                     is Checkout.Result.Error -> throw result.error.toPigeonError()
                     is Checkout.Result.Success -> {
                         val checkoutId = UUID.randomUUID().toString()
+                        val reply = setupResult(checkoutId, paymentMethods)
                         checkoutHolder.put(checkoutId, result.checkoutContext)
-                        callback(Result.success(setupResult(checkoutId, paymentMethods)))
+                        callback(Result.success(reply))
                     }
                 }
             } catch (error: Throwable) {
@@ -134,6 +136,14 @@ internal class CheckoutPlatformApi(
     override fun disposeCheckout(checkoutId: String) {
         checkoutHolder.remove(checkoutId)
         CheckoutComponentRegistry.clearCheckout(checkoutId)
+    }
+
+    override fun clearActiveCheckout() {
+        hideAction()
+        actionController = null
+        dropInCheckoutId = null
+        checkoutHolder.clear()
+        CheckoutComponentRegistry.clear()
     }
 
     override fun startDropIn(checkoutId: String, callback: (Result<Unit>) -> Unit) {

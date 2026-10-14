@@ -670,6 +670,11 @@ abstract class CheckoutHostApi {
 
   void disposeCheckout(String checkoutId);
 
+  /// Clears all native checkout state without a checkout id. Used to recover
+  /// when Dart tracks no active checkout but the platform still holds one
+  /// (for example after a hot restart or an interrupted action flow).
+  void clearActiveCheckout();
+
   @async
   void startDropIn(String checkoutId);
 

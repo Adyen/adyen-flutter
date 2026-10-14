@@ -61,8 +61,9 @@ final class CheckoutPlatformApi: CheckoutHostApi {
                 .onFailure { [weak self] error in
                     self?.sendFailure(checkoutId: checkoutId, error: error)
                 }
+                let reply = try checkout.setupResult(checkoutId: checkoutId)
                 holder.store(checkout, id: checkoutId)
-                try completion(.success(checkout.setupResult(checkoutId: checkoutId)))
+                completion(.success(reply))
             } catch {
                 completion(.failure(asPigeonError(error)))
             }
@@ -103,8 +104,9 @@ final class CheckoutPlatformApi: CheckoutHostApi {
                 .onFailure { [weak self] error in
                     self?.sendFailure(checkoutId: checkoutId, error: error)
                 }
+                let reply = try checkout.setupResult(checkoutId: checkoutId)
                 holder.store(checkout, id: checkoutId)
-                try completion(.success(checkout.setupResult(checkoutId: checkoutId)))
+                completion(.success(reply))
             } catch {
                 completion(.failure(asPigeonError(error)))
             }
@@ -116,6 +118,14 @@ final class CheckoutPlatformApi: CheckoutHostApi {
         presentationDelegates.removeValue(forKey: checkoutId)
         dropInComponents.removeValue(forKey: checkoutId)
         CheckoutComponentRegistry.shared.clear(checkoutId: checkoutId)
+    }
+
+    func clearActiveCheckout() throws {
+        holder.clear()
+        CheckoutComponentRegistry.shared.clear()
+        dropInComponents.removeAll()
+        presentationDelegates.removeAll()
+        actionCompletion = nil
     }
 
     func startDropIn(checkoutId: String, completion: @escaping (Result<Void, Error>) -> Void) {
