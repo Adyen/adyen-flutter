@@ -15,6 +15,9 @@
   `CheckoutPaymentComponent` no longer requires a `CheckoutController` for these methods and no
   longer collapses them to zero height. A `CheckoutController` is only required when
   `CheckoutConfiguration.showSubmitButton` is `false` (merchant-provided submit button).
+- `CheckoutPaymentComponent` now animates viewport height changes and shortens the loading
+  placeholder to a button-sized height for no-input methods once the component reports ready,
+  removing the visible viewport jump for instant payment methods.
 - Native dependencies now track development builds instead of `6.0.0-alpha.1`: Android resolves the
   weekly Sunday snapshot (`2026.10.11-SNAPSHOT`) from Central Portal Snapshots, and iOS pins
   `adyen-ios` `develop` to commit `80b1960` via Swift Package Manager.
