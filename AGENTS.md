@@ -302,7 +302,10 @@ embeddable platform view (e.g. Apple Pay/Google Pay render as Dart-drawn buttons
 - This branch is the Flutter 2.0 v6 alpha implementation. The public entry point is `Checkout`,
   with Sessions, Advanced, generic `CheckoutPaymentComponent`, and one-shot action handling.
 - Drop-in, Instant, partial-payment/order, and legacy component APIs are intentionally removed.
-- Native dependencies are pinned to Android/iOS `6.0.0-alpha.1`; iOS uses Swift Package Manager and
+- Native dependencies track development builds, not a release pin: Android resolves the weekly
+  Sunday snapshot (`YYYY.MM.DD-SNAPSHOT`, see `adyenSnapshotVersion` in `android/build.gradle`)
+  from Central Portal Snapshots, and iOS pins `adyen-ios` `develop` to a specific commit via the
+  `revision:` requirement in `ios/adyen_checkout/Package.swift`. iOS uses Swift Package Manager and
   requires iOS 16.0 or later.
 - Generic native payment views are registered through `CheckoutComponentRegistry` and use
   `CheckoutPaymentView` on both platforms.

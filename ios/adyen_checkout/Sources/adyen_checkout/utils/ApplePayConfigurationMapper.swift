@@ -33,8 +33,7 @@ func makeApplePayPaymentRequest(
             label: dto.merchantName,
             amount: AmountFormatter.decimalAmount(
                 amount.value,
-                currencyCode: amount.currencyCode,
-                localeIdentifier: amount.localeIdentifier
+                currencyCode: amount.currencyCode
             )
         )
     ]

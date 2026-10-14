@@ -21,21 +21,22 @@ allprojects {
     }
 }
 
-// Alpha release integration is active. Uncomment this block and comment out the
-// alpha01 dependency below to switch back to the branch-based (SNAPSHOT) integration.
-// [rootProject, this].each {
-//     it.allprojects {
-//         repositories {
-//             maven {
-//                 name = 'Central Portal Snapshots'
-//                 url = 'https://central.sonatype.com/repository/maven-snapshots/'
-//                 content {
-//                     includeGroup("com.adyen.checkout")
-//                 }
-//             }
-//         }
-//     }
-// }
+// Branch-based (SNAPSHOT) integration is active: Android dependencies resolve the
+// weekly Sunday snapshot published to Central Portal Snapshots. To switch back to a
+// release pin, comment out this block and set the release version below instead.
+[rootProject, this].each {
+    it.allprojects {
+        repositories {
+            maven {
+                name = 'Central Portal Snapshots'
+                url = 'https://central.sonatype.com/repository/maven-snapshots/'
+                content {
+                    includeGroup("com.adyen.checkout")
+                }
+            }
+        }
+    }
+}
 
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
@@ -45,7 +46,7 @@ apply plugin: 'org.jetbrains.kotlin.plugin.compose'
 
 android {
     namespace = "com.adyen.checkout.flutter"
-    compileSdk 36
+    compileSdk 37
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_11
@@ -71,13 +72,14 @@ android {
     }
 
     dependencies {
-        implementation "com.adyen.checkout:core:6.0.0-alpha.1"
-        implementation "com.adyen.checkout:card:6.0.0-alpha.1"
-        implementation "com.adyen.checkout:blik:6.0.0-alpha.1"
-        implementation "com.adyen.checkout:googlepay:6.0.0-alpha.1"
-        implementation "com.adyen.checkout:3ds2:6.0.0-alpha.1"
-        implementation "com.adyen.checkout:cse:6.0.0-alpha.1"
-        // implementation "com.adyen.checkout:core:2026.05.31-SNAPSHOT"
+        // Weekly Sunday snapshot from adyen-android main. Bump the date to move the pin forward.
+        def adyenSnapshotVersion = "2026.10.11-SNAPSHOT"
+        implementation "com.adyen.checkout:core:${adyenSnapshotVersion}"
+        implementation "com.adyen.checkout:card:${adyenSnapshotVersion}"
+        implementation "com.adyen.checkout:blik:${adyenSnapshotVersion}"
+        implementation "com.adyen.checkout:googlepay:${adyenSnapshotVersion}"
+        implementation "com.adyen.checkout:3ds2:${adyenSnapshotVersion}"
+        implementation "com.adyen.checkout:cse:${adyenSnapshotVersion}"
         implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
 
         // Compose Dependencies

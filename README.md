@@ -3,8 +3,8 @@
 # Adyen Flutter Checkout 2.0
 
 [![Pub Package](https://img.shields.io/pub/v/adyen_checkout.svg)](https://pub.dev/packages/adyen_checkout)
-[![Adyen iOS](https://img.shields.io/badge/ios-v6.0.0--alpha.1-brightgreen.svg)](https://github.com/Adyen/adyen-ios/releases/tag/6.0.0-alpha.1)
-[![Adyen Android](https://img.shields.io/badge/android-v6.0.0--alpha.1-brightgreen.svg)](https://github.com/Adyen/adyen-android/releases/tag/6.0.0-alpha.1)
+[![Adyen iOS](https://img.shields.io/badge/ios-develop%20%40%2080b1960-brightgreen.svg)](https://github.com/Adyen/adyen-ios/commit/80b19608532715b0cb157cbbab0e3396e38199ad)
+[![Adyen Android](https://img.shields.io/badge/android-snapshot%202026.10.11-brightgreen.svg)](https://central.sonatype.com/repository/maven-snapshots/com/adyen/checkout/core/)
 
 This prerelease provides a Flutter wrapper around the public Adyen Checkout v6 APIs. It supports
 Sessions, Advanced integrations, generic native payment components, and one-shot action handling.

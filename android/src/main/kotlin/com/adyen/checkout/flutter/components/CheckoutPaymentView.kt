@@ -2,7 +2,9 @@ package com.adyen.checkout.flutter.components
 
 import android.content.Context
 import android.view.View
+import androidx.compose.runtime.MutableState
 import androidx.fragment.app.FragmentActivity
+import com.adyen.checkout.core.action.data.ActionData
 import com.adyen.checkout.core.common.CheckoutContext
 import com.adyen.checkout.core.components.CheckoutCallbacks
 import com.adyen.checkout.core.components.data.model.paymentmethod.PaymentMethodResponse
@@ -17,6 +19,7 @@ internal class CheckoutPaymentView(
     paymentMethod: PaymentMethodResponse,
     checkoutContext: CheckoutContext,
     callbacks: CheckoutCallbacks,
+    actionData: MutableState<ActionData?>,
     eventHandler: ComponentPlatformEventHandler,
 ) : PlatformView {
     private val dynamicComponentView = DynamicComponentView(
@@ -32,6 +35,7 @@ internal class CheckoutPaymentView(
             paymentMethod = paymentMethod,
             checkoutContext = checkoutContext,
             callbacks = callbacks,
+            actionData = actionData,
         )
     }
 

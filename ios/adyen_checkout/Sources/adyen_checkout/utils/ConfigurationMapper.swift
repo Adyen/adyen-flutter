@@ -48,7 +48,6 @@ extension CheckoutConfigurationDTO {
         }
         let configuration = try makeCheckoutConfiguration(
             environment: environment.toNativeEnvironment(),
-            amount: amount?.toNativeAmount(),
             clientKey: clientKey,
             analyticsEnabled: analyticsConfiguration.enabled,
             card: cardConfiguration?.toNativeConfiguration(),
@@ -60,7 +59,6 @@ extension CheckoutConfigurationDTO {
 
 private func makeCheckoutConfiguration(
     environment: Adyen.Environment,
-    amount: Adyen.Amount?,
     clientKey: String,
     analyticsEnabled: Bool,
     card: AdyenCard.CardConfiguration?,
@@ -71,7 +69,6 @@ private func makeCheckoutConfiguration(
     case let (card?, applePay?):
         return try AdyenCheckout.CheckoutConfiguration(
             environment: environment,
-            amount: amount,
             clientKey: clientKey,
             analyticsConfiguration: analyticsConfiguration
         ) {
@@ -81,7 +78,6 @@ private func makeCheckoutConfiguration(
     case let (card?, nil):
         return try AdyenCheckout.CheckoutConfiguration(
             environment: environment,
-            amount: amount,
             clientKey: clientKey,
             analyticsConfiguration: analyticsConfiguration
         ) {
@@ -90,7 +86,6 @@ private func makeCheckoutConfiguration(
     case let (nil, applePay?):
         return try AdyenCheckout.CheckoutConfiguration(
             environment: environment,
-            amount: amount,
             clientKey: clientKey,
             analyticsConfiguration: analyticsConfiguration
         ) {
@@ -99,7 +94,6 @@ private func makeCheckoutConfiguration(
     case (nil, nil):
         return try AdyenCheckout.CheckoutConfiguration(
             environment: environment,
-            amount: amount,
             clientKey: clientKey,
             analyticsConfiguration: analyticsConfiguration
         ) {}

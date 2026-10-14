@@ -1,3 +1,11 @@
+## Unreleased
+
+### Changed
+
+- Native dependencies now track development builds instead of `6.0.0-alpha.1`: Android resolves the
+  weekly Sunday snapshot (`2026.10.11-SNAPSHOT`) from Central Portal Snapshots, and iOS pins
+  `adyen-ios` `develop` to commit `80b1960` via Swift Package Manager.
+
 ## 2.0.0-alpha.1
 
 ### New

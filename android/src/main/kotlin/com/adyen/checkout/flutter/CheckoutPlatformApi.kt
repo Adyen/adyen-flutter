@@ -5,6 +5,7 @@ import android.widget.FrameLayout
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.FragmentActivity
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.lifecycleScope
 import com.adyen.checkout.core.action.data.Action
 import com.adyen.checkout.core.action.data.ActionComponentData
@@ -178,6 +179,7 @@ internal class CheckoutPlatformApi(
                     context = context,
                     callbacks = callbacks,
                     coroutineScope = activity.lifecycleScope,
+                    savedStateHandle = SavedStateHandle(),
                 )
                 actionController = controller
                 showAction(controller)

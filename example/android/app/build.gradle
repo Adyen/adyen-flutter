@@ -24,7 +24,7 @@ if (flutterVersionName == null) {
 
 android {
     namespace "com.adyen.checkout.flutter.example"
-    compileSdk 36
+    compileSdk 37
     ndkVersion flutter.ndkVersion
 
     compileOptions {

@@ -12,7 +12,9 @@ let package = Package(
     ],
     dependencies: [
         .package(name: "FlutterFramework", path: "../FlutterFramework"),
-        .package(url: "https://github.com/Adyen/adyen-ios", exact: "6.0.0-alpha.1")
+        // adyen-ios develop pinned to the last commit of Friday 2026-10-09.
+        // Advance the revision to move the pin forward.
+        .package(url: "https://github.com/Adyen/adyen-ios", revision: "80b19608532715b0cb157cbbab0e3396e38199ad")
     ],
     targets: [
         .target(

@@ -6,8 +6,11 @@ import com.adyen.checkout.card.BinLookupData
 import com.adyen.checkout.card.OnBinChangeCallback
 import com.adyen.checkout.card.OnBinLookupCallback
 import com.adyen.checkout.card.card
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
 import com.adyen.checkout.core.action.data.Action
 import com.adyen.checkout.core.action.data.ActionComponentData
+import com.adyen.checkout.core.action.data.ActionData
 import com.adyen.checkout.core.common.CheckoutContext
 import com.adyen.checkout.core.components.AdditionalDetailsResult
 import com.adyen.checkout.core.components.AdvancedCheckoutCallbacks
@@ -75,7 +78,8 @@ internal class CheckoutPaymentViewFactory(
         val checkoutContext = checkoutHolder.get(checkoutId)
             ?: throw AdyenPigeonError("CheckoutNotFound", "Checkout is no longer active.")
         val paymentMethod = deserializePaymentMethod(paymentMethodJson, isStoredPaymentMethod)
-        val callbacks = createCallbacks(checkoutId, componentId, checkoutContext)
+        val actionData = mutableStateOf<ActionData?>(null)
+        val callbacks = createCallbacks(checkoutId, componentId, checkoutContext) { actionData.value = it }
 
         return CheckoutPaymentView(
             activity = activity,
@@ -85,6 +89,7 @@ internal class CheckoutPaymentViewFactory(
             paymentMethod = paymentMethod,
             checkoutContext = checkoutContext,
             callbacks = callbacks,
+            actionData = actionData,
             eventHandler = eventHandler,
         )
     }
@@ -105,10 +110,12 @@ internal class CheckoutPaymentViewFactory(
         checkoutId: String,
         componentId: String,
         checkoutContext: CheckoutContext,
+        onAction: (ActionData) -> Unit,
     ): CheckoutCallbacks {
         val terminalState = TerminalState(checkoutId, componentId, eventHandler)
         return when (checkoutContext) {
             is CheckoutContext.Sessions -> SessionCheckoutCallbacks(
+                onAction = onAction,
                 onComplete = { result -> terminalState.complete(result) },
                 onFailure = { error -> terminalState.failure(error.code, error.message) },
                 onBeforeSubmit = { data -> requestBeforeSubmit(checkoutId, data, terminalState) },
@@ -117,6 +124,7 @@ internal class CheckoutPaymentViewFactory(
 
             is CheckoutContext.Advanced -> AdvancedCheckoutCallbacks(
                 onSubmit = { data -> requestSubmit(checkoutId, componentId, data) },
+                onAction = onAction,
                 onAdditionalDetails = { data ->
                     requestAdditionalDetails(checkoutId, data, terminalState)
                 },
@@ -330,7 +338,7 @@ internal class CheckoutPaymentViewFactory(
                     componentId = componentId,
                     resultCode = result.resultCode.value,
                     sessionId = result.sessionId,
-                    sessionResult = result.sessionData,
+                    sessionResult = result.sessionResult,
                 ),
             )
         }

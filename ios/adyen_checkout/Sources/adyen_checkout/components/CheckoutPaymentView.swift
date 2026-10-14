@@ -102,10 +102,7 @@ final class CheckoutPaymentView: NSObject, FlutterPlatformView {
                 component: paymentComponent
             )
             sendReady(requiresUserInteraction: paymentComponent.requiresUserInteraction)
-            guard let viewController = paymentComponent.viewController else {
-                sendResize(height: 0)
-                return
-            }
+            let viewController = paymentComponent.viewController
             wrapperView.resizeViewportCallback = { [weak self] in self?.sendResize() }
             wrapperView.addArrangedSubview(viewController.view)
             sendResize()
@@ -175,8 +172,8 @@ final class CheckoutPaymentView: NSObject, FlutterPlatformView {
                 checkoutId: checkoutId,
                 componentId: componentId
             )
-            guard let viewController = paymentComponent.viewController,
-                  let presenter = presentingViewController else {
+            let viewController = paymentComponent.viewController
+            guard let presenter = presentingViewController else {
                 throw AdyenPigeonError(
                     code: "PresentationFailure",
                     message: "Unable to present Apple Pay.",
@@ -265,7 +262,7 @@ final class CheckoutPaymentView: NSObject, FlutterPlatformView {
     }
 
     private func sendResize(height: Int? = nil) {
-        let value = height ?? Int(component?.viewController?.preferredContentSize.height ?? wrapperView.bounds.height)
+        let value = height ?? Int(component?.viewController.preferredContentSize.height ?? wrapperView.bounds.height)
         events.send(event: CheckoutEventDTO(
             type: .resize,
             checkoutId: checkoutId,

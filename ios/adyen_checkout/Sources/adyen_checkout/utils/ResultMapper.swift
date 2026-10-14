@@ -28,7 +28,7 @@ extension SubmitResultDTO {
 
 extension PaymentCheckout {
     func setupResult(checkoutId: String) throws -> CheckoutSetupResultDTO {
-        let methods = paymentMethods ?? PaymentMethods(regular: [], stored: [])
+        let methods = PaymentMethods(regular: paymentMethods, stored: storedPaymentMethods)
         let encoded = try JSONEncoder().encode(methods)
         guard let object = try JSONSerialization.jsonObject(with: encoded) as? [String: Any],
               let regular = object["paymentMethods"],

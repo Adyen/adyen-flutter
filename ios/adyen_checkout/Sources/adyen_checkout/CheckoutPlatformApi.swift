@@ -42,12 +42,14 @@ final class CheckoutPlatformApi: CheckoutHostApi {
                 guard !holder.isActive else {
                     throw AdyenPigeonError(code: "CheckoutAlreadyActive", message: "Another checkout flow is already active.", details: nil)
                 }
-                let presentationDelegate = makePresentationDelegate(id: checkoutId)
+                _ = makePresentationDelegate(id: checkoutId)
                 let checkout = try await Checkout.setup(
                     with: sessionResponse.toSessionResponse(),
-                    configuration: configuration.toCheckoutConfiguration(callbacksApi: callbacksApi, checkoutId: checkoutId),
-                    presentationDelegate: presentationDelegate
+                    configuration: configuration.toCheckoutConfiguration(callbacksApi: callbacksApi, checkoutId: checkoutId)
                 )
+                .onAction { [weak self] _, viewController in
+                    self?.presentationDelegates[checkoutId]?.present(viewController)
+                }
                 .onBeforeSubmit { [weak self] data in
                     guard let self else { return .abort }
                     return await self.requestBeforeSubmit(checkoutId: checkoutId, data: data)
@@ -78,12 +80,14 @@ final class CheckoutPlatformApi: CheckoutHostApi {
                     throw AdyenPigeonError(code: "CheckoutAlreadyActive", message: "Another checkout flow is already active.", details: nil)
                 }
                 let paymentMethods = try JSONDecoder().decode(PaymentMethods.self, from: Data(paymentMethodsJson.utf8))
-                let presentationDelegate = makePresentationDelegate(id: checkoutId)
+                _ = makePresentationDelegate(id: checkoutId)
                 let checkout = try await Checkout.setup(
                     with: paymentMethods,
-                    configuration: configuration.toCheckoutConfiguration(callbacksApi: callbacksApi, checkoutId: checkoutId),
-                    presentationDelegate: presentationDelegate
+                    configuration: configuration.toCheckoutConfiguration(callbacksApi: callbacksApi, checkoutId: checkoutId)
                 )
+                .onAction { [weak self] _, viewController in
+                    self?.presentationDelegates[checkoutId]?.present(viewController)
+                }
                 .onSubmit { [weak self] data in
                     guard let self else { return .retry(errorMessage: "Checkout is no longer active.") }
                     return await self.requestSubmit(checkoutId: checkoutId, data: data)
@@ -134,14 +138,16 @@ final class CheckoutPlatformApi: CheckoutHostApi {
             }
             do {
                 let action = try JSONDecoder().decode(Action.self, from: Data(actionJson.utf8))
-                let presentationDelegate = makePresentationDelegate(id: actionId)
+                _ = makePresentationDelegate(id: actionId)
                 let checkout = try await Checkout.setup(
-                    configuration: configuration.toCheckoutConfiguration(),
-                    presentationDelegate: presentationDelegate
+                    configuration: configuration.toCheckoutConfiguration()
                 )
                 let result = AsyncResult<AdvancedCheckoutResult>()
                 actionCompletion = result
                 _ = checkout
+                    .onAction { [weak self] _, viewController in
+                        self?.presentationDelegates[actionId]?.present(viewController)
+                    }
                     .onAdditionalDetails { [weak self] data in
                         guard let self else { return .completion(resultCode: "Error") }
                         do {
@@ -356,7 +362,7 @@ final class CheckoutPlatformApi: CheckoutHostApi {
 // swiftlint:enable type_body_length
 
 @MainActor
-private final class PresentationDelegateProxy: NSObject, Adyen.PresentationDelegate {
+private final class PresentationDelegateProxy: NSObject {
     weak var presentingViewController: UIViewController?
     private weak var presentedViewController: UIViewController?
 
@@ -364,10 +370,10 @@ private final class PresentationDelegateProxy: NSObject, Adyen.PresentationDeleg
         self.presentingViewController = viewController
     }
 
-    func present(component: PresentableComponent) {
+    func present(_ viewController: UIViewController) {
         let presenter = topViewController(from: presentingViewController) ?? presentingViewController
-        presentedViewController = component.viewController
-        presenter?.present(component.viewController, animated: true)
+        presentedViewController = viewController
+        presenter?.present(viewController, animated: true)
     }
 
     func dismiss(animated: Bool = true, completion: (() -> Void)? = nil) {

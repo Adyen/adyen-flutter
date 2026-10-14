@@ -5,15 +5,19 @@ import android.util.AttributeSet
 import android.widget.FrameLayout
 import androidx.activity.ComponentActivity
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
+import androidx.lifecycle.SavedStateHandle
+import com.adyen.checkout.core.action.data.ActionData
 import com.adyen.checkout.core.common.CheckoutContext
 import com.adyen.checkout.core.components.AdvancedCheckoutCallbacks
+import com.adyen.checkout.core.components.CheckoutAction
 import com.adyen.checkout.core.components.CheckoutCallbacks
 import com.adyen.checkout.core.components.CheckoutController
-import com.adyen.checkout.core.components.CheckoutPaymentFlow
+import com.adyen.checkout.core.components.CheckoutPaymentMethod
 import com.adyen.checkout.core.components.CheckoutTarget
 import com.adyen.checkout.core.components.SessionCheckoutCallbacks
 import com.adyen.checkout.core.components.data.model.paymentmethod.PaymentMethodResponse
@@ -61,6 +65,7 @@ internal class DynamicComponentView @JvmOverloads constructor(
         paymentMethod: PaymentMethodResponse,
         checkoutContext: CheckoutContext,
         callbacks: CheckoutCallbacks,
+        actionData: MutableState<ActionData?>,
     ) {
         val target = when (paymentMethod) {
             is StoredPaymentMethod -> CheckoutTarget.StoredPaymentMethod(paymentMethod.id)
@@ -80,6 +85,7 @@ internal class DynamicComponentView @JvmOverloads constructor(
                                     context = checkoutContext,
                                     callbacks = callbacks,
                                     coroutineScope = coroutineScope,
+                                    savedStateHandle = SavedStateHandle(),
                                 )
 
                             checkoutContext is CheckoutContext.Sessions && callbacks is SessionCheckoutCallbacks ->
@@ -88,6 +94,7 @@ internal class DynamicComponentView @JvmOverloads constructor(
                                     context = checkoutContext,
                                     callbacks = callbacks,
                                     coroutineScope = coroutineScope,
+                                    savedStateHandle = SavedStateHandle(),
                                 )
 
                             else -> throw IllegalArgumentException(
@@ -111,7 +118,11 @@ internal class DynamicComponentView @JvmOverloads constructor(
                         }
                     }
 
-                    CheckoutPaymentFlow(controller = controller)
+                    if (actionData.value != null) {
+                        CheckoutAction(controller = controller)
+                    } else {
+                        CheckoutPaymentMethod(controller = controller)
+                    }
                 }
             },
         )
