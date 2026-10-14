@@ -3,14 +3,19 @@ import 'dart:async';
 import 'package:adyen_checkout/adyen_checkout.dart';
 import 'package:adyen_checkout/src/checkout_controller.dart';
 import 'package:adyen_checkout/src/checkout_runtime.dart';
+import 'package:adyen_checkout/src/components/platform/android_platform_view.dart';
 import 'package:adyen_checkout/src/components/platform/ios_platform_view.dart';
 import 'package:adyen_checkout/src/generated/platform_api.g.dart';
+import 'package:flutter/cupertino.dart' show CupertinoActivityIndicator;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 String componentIdOf(IosPlatformView view) =>
+    (view.creationParams as CheckoutPaymentViewParamsDTO).componentId;
+
+String componentIdOfAndroid(AndroidPlatformView view) =>
     (view.creationParams as CheckoutPaymentViewParamsDTO).componentId;
 
 class FakeCheckoutHostApi extends CheckoutHostApi {
@@ -109,6 +114,8 @@ class FakeCheckoutHostApi extends CheckoutHostApi {
 
 class FakeComponentHostApi extends ComponentHostApi {
   int disposeCount = 0;
+  final List<String> disposedCheckoutIds = [];
+  final List<String> disposedComponentIds = [];
   int submitCount = 0;
   String? submittedCheckoutId;
   String? submittedComponentId;
@@ -123,6 +130,8 @@ class FakeComponentHostApi extends ComponentHostApi {
   @override
   Future<void> dispose(String checkoutId, String componentId) async {
     disposeCount++;
+    disposedCheckoutIds.add(checkoutId);
+    disposedComponentIds.add(componentId);
   }
 }
 
@@ -142,9 +151,16 @@ void main() {
       componentHostApi: componentHostApi,
       platformEvents: eventsController.stream,
     );
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(
+      SystemChannels.platform_views,
+      (call) async => null,
+    );
   });
 
   tearDown(() async {
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(SystemChannels.platform_views, null);
     runtime.dispose();
     await eventsController.close();
   });
@@ -663,5 +679,310 @@ void main() {
     detachCheckoutController(controller);
     expect(controller.submit, throwsStateError);
     controller.dispose();
+  });
+
+  group('CheckoutPaymentComponent platform view', () {
+    final card = PaymentMethod(type: 'scheme', name: 'Card');
+    final ideal = PaymentMethod(type: 'ideal', name: 'iDEAL');
+
+    Future<AdvancedCheckout> setUpCheckout({
+      void Function(CheckoutError error)? onFailure,
+    }) =>
+        runtime.setupAdvanced(
+          paymentMethods: PaymentMethods(regular: [card, ideal]),
+          configuration: const CheckoutConfiguration(
+            environment: Environment.test,
+            clientKey: 'test_key',
+          ),
+          callbacks: AdvancedCheckoutCallbacks(
+            onSubmit: (data) async =>
+                const SubmitResult.completion(resultCode: 'Authorised'),
+            onAdditionalDetails: (data) async =>
+                const AdditionalDetailsResult.completion(
+                    resultCode: 'Authorised'),
+            onFailure: onFailure ?? (error) {},
+            onComplete: (result) {},
+          ),
+        );
+
+    Widget host(Widget child) =>
+        Directionality(textDirection: TextDirection.ltr, child: child);
+
+    Future<void> sendEvent(WidgetTester tester, CheckoutEventDTO event) async {
+      eventsController.add(event);
+      await tester.runAsync(() => Future<void>.delayed(Duration.zero));
+      await tester.pump(const Duration(milliseconds: 300));
+    }
+
+    String currentComponentId(WidgetTester tester) => componentIdOf(
+          tester.widget<IosPlatformView>(find.byType(IosPlatformView)),
+        );
+
+    double? componentHeight(WidgetTester tester) => tester
+        .widget<SizedBox>(
+          find.ancestor(
+            of: find.byType(IosPlatformView),
+            matching: find.byType(SizedBox),
+          ),
+        )
+        .height;
+
+    CheckoutEventDTO readyEvent(String checkoutId, String componentId) =>
+        CheckoutEventDTO(
+          type: CheckoutEventTypeDTO.componentReady,
+          checkoutId: checkoutId,
+          componentId: componentId,
+          requiresUserInteraction: true,
+        );
+
+    CheckoutEventDTO resizeEvent(
+      String checkoutId,
+      String componentId,
+      int height,
+    ) =>
+        CheckoutEventDTO(
+          type: CheckoutEventTypeDTO.resize,
+          checkoutId: checkoutId,
+          componentId: componentId,
+          height: height,
+        );
+
+    testWidgets('resize updates the component height', (tester) async {
+      debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+      addTearDown(() => debugDefaultTargetPlatformOverride = null);
+
+      final checkout = await setUpCheckout();
+      await tester.pumpWidget(
+        host(CheckoutPaymentComponent(checkout: checkout, paymentMethod: card)),
+      );
+      final componentId = currentComponentId(tester);
+
+      await sendEvent(tester, readyEvent(checkout.id, componentId));
+      await sendEvent(tester, resizeEvent(checkout.id, componentId, 300));
+
+      expect(componentHeight(tester), 308);
+
+      await tester.pumpWidget(const SizedBox.shrink());
+      checkout.dispose();
+      debugDefaultTargetPlatformOverride = null;
+    });
+
+    testWidgets('duplicate resize keeps the reported height', (tester) async {
+      debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+      addTearDown(() => debugDefaultTargetPlatformOverride = null);
+
+      final checkout = await setUpCheckout();
+      await tester.pumpWidget(
+        host(CheckoutPaymentComponent(checkout: checkout, paymentMethod: card)),
+      );
+      final componentId = currentComponentId(tester);
+
+      await sendEvent(tester, readyEvent(checkout.id, componentId));
+      await sendEvent(tester, resizeEvent(checkout.id, componentId, 300));
+      await sendEvent(tester, resizeEvent(checkout.id, componentId, 300));
+
+      expect(tester.takeException(), isNull);
+      expect(componentHeight(tester), 308);
+
+      await tester.pumpWidget(const SizedBox.shrink());
+      checkout.dispose();
+      debugDefaultTargetPlatformOverride = null;
+    });
+
+    testWidgets('failure collapses the component and reports the error',
+        (tester) async {
+      debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+      addTearDown(() => debugDefaultTargetPlatformOverride = null);
+
+      final failures = <CheckoutError>[];
+      final checkout = await setUpCheckout(onFailure: failures.add);
+      await tester.pumpWidget(
+        host(CheckoutPaymentComponent(checkout: checkout, paymentMethod: card)),
+      );
+      final componentId = currentComponentId(tester);
+
+      await sendEvent(
+        tester,
+        CheckoutEventDTO(
+          type: CheckoutEventTypeDTO.failure,
+          checkoutId: checkout.id,
+          componentId: componentId,
+          errorCode: CheckoutError.genericCode,
+          errorMessage: 'Component failed.',
+        ),
+      );
+
+      expect(find.byType(IosPlatformView), findsNothing);
+      expect(failures.single.code, CheckoutError.genericCode);
+      expect(failures.single.message, 'Component failed.');
+      expect(checkout.isDisposed, true);
+
+      await tester.pumpWidget(const SizedBox.shrink());
+      debugDefaultTargetPlatformOverride = null;
+    });
+
+    testWidgets('events for another component are ignored', (tester) async {
+      debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+      addTearDown(() => debugDefaultTargetPlatformOverride = null);
+
+      final checkout = await setUpCheckout();
+      await tester.pumpWidget(
+        host(CheckoutPaymentComponent(checkout: checkout, paymentMethod: card)),
+      );
+      final componentId = currentComponentId(tester);
+
+      await sendEvent(tester, readyEvent(checkout.id, componentId));
+      await sendEvent(tester, resizeEvent(checkout.id, componentId, 300));
+      await sendEvent(tester, resizeEvent(checkout.id, 'other-component', 500));
+
+      expect(componentHeight(tester), 308);
+
+      await tester.pumpWidget(const SizedBox.shrink());
+      checkout.dispose();
+      debugDefaultTargetPlatformOverride = null;
+    });
+
+    testWidgets('removing the widget disposes the native component',
+        (tester) async {
+      debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+      addTearDown(() => debugDefaultTargetPlatformOverride = null);
+
+      final checkout = await setUpCheckout();
+      await tester.pumpWidget(
+        host(CheckoutPaymentComponent(checkout: checkout, paymentMethod: card)),
+      );
+      final componentId = currentComponentId(tester);
+      expect(componentHostApi.disposeCount, 0);
+
+      await tester.pumpWidget(const SizedBox.shrink());
+
+      expect(componentHostApi.disposeCount, 1);
+      expect(componentHostApi.disposedCheckoutIds, [checkout.id]);
+      expect(componentHostApi.disposedComponentIds, [componentId]);
+
+      checkout.dispose();
+      debugDefaultTargetPlatformOverride = null;
+    });
+
+    testWidgets('payment method change recreates the native component',
+        (tester) async {
+      debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+      addTearDown(() => debugDefaultTargetPlatformOverride = null);
+
+      final checkout = await setUpCheckout();
+      await tester.pumpWidget(
+        host(CheckoutPaymentComponent(checkout: checkout, paymentMethod: card)),
+      );
+      final firstComponentId = currentComponentId(tester);
+
+      await tester.pumpWidget(
+        host(
+            CheckoutPaymentComponent(checkout: checkout, paymentMethod: ideal)),
+      );
+      final secondComponentId = currentComponentId(tester);
+
+      expect(secondComponentId, isNot(firstComponentId));
+      expect(componentHostApi.disposedComponentIds, [firstComponentId]);
+
+      await tester.pumpWidget(const SizedBox.shrink());
+      checkout.dispose();
+      debugDefaultTargetPlatformOverride = null;
+    });
+
+    testWidgets('controller swap reattaches the component', (tester) async {
+      debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+      addTearDown(() => debugDefaultTargetPlatformOverride = null);
+
+      final oldController = CheckoutController();
+      final newController = CheckoutController();
+      final checkout = await setUpCheckout();
+      await tester.pumpWidget(
+        host(CheckoutPaymentComponent(
+          checkout: checkout,
+          paymentMethod: card,
+          controller: oldController,
+        )),
+      );
+      await sendEvent(
+          tester, readyEvent(checkout.id, currentComponentId(tester)));
+      expect(oldController.isReady, true);
+
+      await tester.pumpWidget(
+        host(CheckoutPaymentComponent(
+          checkout: checkout,
+          paymentMethod: card,
+          controller: newController,
+        )),
+      );
+
+      expect(oldController.submit, throwsStateError);
+      expect(newController.isReady, false);
+
+      await sendEvent(
+          tester, readyEvent(checkout.id, currentComponentId(tester)));
+
+      expect(newController.isReady, true);
+      expect(newController.requiresUserInteraction, true);
+
+      await tester.pumpWidget(const SizedBox.shrink());
+      oldController.dispose();
+      newController.dispose();
+      checkout.dispose();
+      debugDefaultTargetPlatformOverride = null;
+    });
+
+    testWidgets('Android builds an AndroidPlatformView with view params',
+        (tester) async {
+      debugDefaultTargetPlatformOverride = TargetPlatform.android;
+      addTearDown(() => debugDefaultTargetPlatformOverride = null);
+
+      final checkout = await setUpCheckout();
+      await tester.pumpWidget(
+        host(CheckoutPaymentComponent(checkout: checkout, paymentMethod: card)),
+      );
+
+      expect(find.byType(IosPlatformView), findsNothing);
+      final platformView = tester.widget<AndroidPlatformView>(
+        find.byType(AndroidPlatformView),
+      );
+      final params =
+          platformView.creationParams as CheckoutPaymentViewParamsDTO;
+      expect(params.checkoutId, checkout.id);
+      expect(params.componentId, isNotEmpty);
+      expect(params.isStoredPaymentMethod, false);
+      expect(params.paymentMethodJson, contains('"type":"scheme"'));
+
+      await tester.pumpWidget(const SizedBox.shrink());
+      expect(
+        componentHostApi.disposedComponentIds,
+        [componentIdOfAndroid(platformView)],
+      );
+      checkout.dispose();
+      debugDefaultTargetPlatformOverride = null;
+    });
+
+    testWidgets('iOS shows a CupertinoActivityIndicator until resized',
+        (tester) async {
+      debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+      addTearDown(() => debugDefaultTargetPlatformOverride = null);
+
+      final checkout = await setUpCheckout();
+      await tester.pumpWidget(
+        host(CheckoutPaymentComponent(checkout: checkout, paymentMethod: card)),
+      );
+      final componentId = currentComponentId(tester);
+
+      expect(find.byType(CupertinoActivityIndicator), findsOneWidget);
+
+      await sendEvent(tester, readyEvent(checkout.id, componentId));
+      expect(find.byType(CupertinoActivityIndicator), findsOneWidget);
+
+      await sendEvent(tester, resizeEvent(checkout.id, componentId, 300));
+      expect(find.byType(CupertinoActivityIndicator), findsNothing);
+
+      await tester.pumpWidget(const SizedBox.shrink());
+      checkout.dispose();
+      debugDefaultTargetPlatformOverride = null;
+    });
   });
 }
