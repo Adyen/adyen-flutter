@@ -197,7 +197,8 @@ enum class ApplePayPaymentErrorTypeDTO(val raw: Int) {
 enum class ApplePayButtonThemeDTO(val raw: Int) {
   BLACK(0),
   WHITE(1),
-  WHITE_WITH_LINE(2);
+  WHITE_WITH_LINE(2),
+  AUTOMATIC(3);
 
   companion object {
     fun ofRaw(raw: Int): ApplePayButtonThemeDTO? {

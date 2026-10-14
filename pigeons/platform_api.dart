@@ -78,6 +78,7 @@ enum ApplePayButtonThemeDTO {
   black,
   white,
   whiteWithLine,
+  automatic,
 }
 
 enum ApplePayButtonTypeDTO {

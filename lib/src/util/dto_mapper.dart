@@ -284,7 +284,7 @@ extension ApplePayButtonStyleMapper on ApplePayButtonStyle {
           ApplePayButtonTheme.whiteOutline =>
             ApplePayButtonThemeDTO.whiteWithLine,
           ApplePayButtonTheme.black => ApplePayButtonThemeDTO.black,
-          ApplePayButtonTheme.automatic => null,
+          ApplePayButtonTheme.automatic => ApplePayButtonThemeDTO.automatic,
           null => null,
         },
         type: type?.toDTO(),

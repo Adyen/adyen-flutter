@@ -195,6 +195,7 @@ enum ApplePayButtonThemeDTO: Int {
   case black = 0
   case white = 1
   case whiteWithLine = 2
+  case automatic = 3
 }
 
 enum ApplePayButtonTypeDTO: Int {

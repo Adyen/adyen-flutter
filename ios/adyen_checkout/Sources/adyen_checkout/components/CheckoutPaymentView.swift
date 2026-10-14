@@ -157,30 +157,34 @@ final class CheckoutPaymentView: NSObject, FlutterPlatformView {
         switch theme {
         case .white: return .white
         case .whiteWithLine: return .whiteOutline
+        case .automatic: return .automatic
         case .black, nil: return .black
         }
     }
 
     private func mapApplePayButtonType(_ type: ApplePayButtonTypeDTO?) -> PKPaymentButtonType {
-        switch type {
-        case .plain, nil: return .plain
-        case .buy: return .buy
-        case .setUp: return .setUp
-        case .inStore: return .inStore
-        case .donate: return .donate
-        case .checkout: return .checkout
-        case .book: return .book
-        case .subscribe: return .subscribe
-        case .reload: return .reload
-        case .addMoney: return .addMoney
-        case .topUp: return .topUp
-        case .order: return .order
-        case .rent: return .rent
-        case .support: return .support
-        case .contribute: return .contribute
-        case .tip: return .tip
-        }
+        guard let type else { return .plain }
+        return Self.applePayButtonTypes[type] ?? .plain
     }
+
+    private static let applePayButtonTypes: [ApplePayButtonTypeDTO: PKPaymentButtonType] = [
+        .plain: .plain,
+        .buy: .buy,
+        .setUp: .setUp,
+        .inStore: .inStore,
+        .donate: .donate,
+        .checkout: .checkout,
+        .book: .book,
+        .subscribe: .subscribe,
+        .reload: .reload,
+        .addMoney: .addMoney,
+        .topUp: .topUp,
+        .order: .order,
+        .rent: .rent,
+        .support: .support,
+        .contribute: .contribute,
+        .tip: .tip
+    ]
 
     private func createPaymentComponent(checkout: PaymentCheckout) throws -> CheckoutPaymentComponent {
         if params.isStoredPaymentMethod {
