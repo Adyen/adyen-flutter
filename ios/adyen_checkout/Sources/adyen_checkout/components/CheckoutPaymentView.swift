@@ -134,9 +134,11 @@ final class CheckoutPaymentView: NSObject, FlutterPlatformView {
         if preferred > 0 {
             return preferred
         }
-        let width = wrapperView.bounds.width > 0
-            ? wrapperView.bounds.width
-            : wrapperView.window?.windowScene?.screen.bounds.width ?? 0
+        let width = [
+            wrapperView.bounds.width,
+            wrapperView.window?.bounds.width ?? 0,
+            UIViewController.keyWindowRoot?.view.bounds.width ?? 0
+        ].first { $0 > 0 } ?? 0
         guard width > 0 else { return 0 }
         let fitted = view.systemLayoutSizeFitting(
             CGSize(width: width, height: UIView.layoutFittingCompressedSize.height),
