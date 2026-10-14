@@ -385,10 +385,7 @@ final class CheckoutPlatformApi: CheckoutHostApi {
     }
 
     private func rootViewController() -> UIViewController? {
-        UIApplication.shared.connectedScenes
-            .compactMap { $0 as? UIWindowScene }
-            .flatMap(\.windows)
-            .first(where: { $0.isKeyWindow })?.rootViewController
+        UIViewController.keyWindowRoot
     }
 }
 
@@ -404,7 +401,7 @@ private final class PresentationDelegateProxy: NSObject {
     }
 
     func present(_ viewController: UIViewController) {
-        let presenter = topViewController(from: presentingViewController) ?? presentingViewController
+        let presenter = presentingViewController?.topPresenter
         presentedViewController = viewController
         presenter?.present(viewController, animated: true)
     }
@@ -416,19 +413,6 @@ private final class PresentationDelegateProxy: NSObject {
         } else {
             completion?()
         }
-    }
-
-    private func topViewController(from root: UIViewController?) -> UIViewController? {
-        if let presented = root?.presentedViewController {
-            return topViewController(from: presented)
-        }
-        if let nav = root as? UINavigationController {
-            return topViewController(from: nav.visibleViewController)
-        }
-        if let tab = root as? UITabBarController {
-            return topViewController(from: tab.selectedViewController)
-        }
-        return root
     }
 }
 

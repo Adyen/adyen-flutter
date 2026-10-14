@@ -180,22 +180,17 @@ final class CheckoutPaymentView: NSObject, FlutterPlatformView {
                     details: nil
                 )
             }
-            presenter.present(viewController, animated: true)
+            presenter.present(viewController, animated: true) { [weak self] in
+                self?.applePayButton?.isEnabled = true
+            }
         } catch {
+            applePayButton?.isEnabled = true
             sendFailure(error)
         }
     }
 
     private var presentingViewController: UIViewController? {
-        var viewController = UIApplication.shared.connectedScenes
-            .compactMap { $0 as? UIWindowScene }
-            .flatMap(\.windows)
-            .first(where: { $0.isKeyWindow })?
-            .rootViewController
-        while let presentedViewController = viewController?.presentedViewController {
-            viewController = presentedViewController
-        }
-        return viewController
+        (wrapperView.window?.rootViewController ?? UIViewController.keyWindowRoot)?.topPresenter
     }
 
     private func mapApplePayButtonStyle(_ style: String?) -> PKPaymentButtonStyle {
