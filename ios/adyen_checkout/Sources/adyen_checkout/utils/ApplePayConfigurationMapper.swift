@@ -286,6 +286,7 @@ private extension ApplePayPaymentErrorDTO {
 }
 
 private extension ApplePayButtonStyleDTO? {
+    // TODO: Pass the button width and height once ApplePayButtonAppearance supports a custom size.
     func toNativeButtonAppearance() -> ApplePayButtonAppearance {
         guard let style = self else { return ApplePayButtonAppearance() }
         return ApplePayButtonAppearance(

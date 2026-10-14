@@ -29,11 +29,15 @@ class ApplePayConfiguration {
   final bool? supportsCouponCode;
   final String? couponCode;
   final ApplePayButtonStyle? buttonStyle;
-  @Deprecated(
-      'Ignored. The native Apple Pay button sizes itself to the component width.')
+  // TODO: Map buttonWidth and buttonHeight to ApplePayButtonAppearance and
+  // remove the deprecation once the native iOS SDK supports a custom button size.
+  @Deprecated('Ignored. The native Apple Pay button fills the component width '
+      'and has a fixed height. Wrap CheckoutPaymentComponent in a SizedBox to '
+      'control its width.')
   final double? buttonWidth;
-  @Deprecated(
-      'Ignored. The native Apple Pay button sizes itself to the component width.')
+  @Deprecated('Ignored. The native Apple Pay button fills the component width '
+      'and has a fixed height. Wrap CheckoutPaymentComponent in a SizedBox to '
+      'control its width.')
   final double? buttonHeight;
   final Future<ApplePayShippingMethodUpdate> Function(
     ApplePayShippingMethod method,

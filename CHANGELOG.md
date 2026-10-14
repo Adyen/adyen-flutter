@@ -30,7 +30,9 @@
 ### Deprecated
 
 - `ApplePayConfiguration.buttonWidth` and `ApplePayConfiguration.buttonHeight` are ignored. The
-  native Apple Pay button sizes itself to the component width.
+  native Apple Pay button fills the component width and has a fixed height; wrap
+  `CheckoutPaymentComponent` in a `SizedBox` to control its width. Support returns once the native
+  iOS SDK allows a custom button size.
 
 ### Fixed
 
