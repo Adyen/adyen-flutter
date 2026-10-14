@@ -958,8 +958,6 @@ struct ApplePayConfigurationDTO: Hashable {
   var supportsCouponCode: Bool? = nil
   var couponCode: String? = nil
   var buttonStyle: ApplePayButtonStyleDTO? = nil
-  var buttonWidth: Double? = nil
-  var buttonHeight: Double? = nil
   var hasOnSelectShippingMethod: Bool
   var hasOnSelectShippingContact: Bool
   var hasOnChangeCouponCode: Bool
@@ -985,12 +983,10 @@ struct ApplePayConfigurationDTO: Hashable {
     let supportsCouponCode: Bool? = nilOrValue(pigeonVar_list[14])
     let couponCode: String? = nilOrValue(pigeonVar_list[15])
     let buttonStyle: ApplePayButtonStyleDTO? = nilOrValue(pigeonVar_list[16])
-    let buttonWidth: Double? = nilOrValue(pigeonVar_list[17])
-    let buttonHeight: Double? = nilOrValue(pigeonVar_list[18])
-    let hasOnSelectShippingMethod = pigeonVar_list[19] as! Bool
-    let hasOnSelectShippingContact = pigeonVar_list[20] as! Bool
-    let hasOnChangeCouponCode = pigeonVar_list[21] as! Bool
-    let hasOnAuthorize = pigeonVar_list[22] as! Bool
+    let hasOnSelectShippingMethod = pigeonVar_list[17] as! Bool
+    let hasOnSelectShippingContact = pigeonVar_list[18] as! Bool
+    let hasOnChangeCouponCode = pigeonVar_list[19] as! Bool
+    let hasOnAuthorize = pigeonVar_list[20] as! Bool
 
     return ApplePayConfigurationDTO(
       merchantId: merchantId,
@@ -1010,8 +1006,6 @@ struct ApplePayConfigurationDTO: Hashable {
       supportsCouponCode: supportsCouponCode,
       couponCode: couponCode,
       buttonStyle: buttonStyle,
-      buttonWidth: buttonWidth,
-      buttonHeight: buttonHeight,
       hasOnSelectShippingMethod: hasOnSelectShippingMethod,
       hasOnSelectShippingContact: hasOnSelectShippingContact,
       hasOnChangeCouponCode: hasOnChangeCouponCode,
@@ -1037,8 +1031,6 @@ struct ApplePayConfigurationDTO: Hashable {
       supportsCouponCode,
       couponCode,
       buttonStyle,
-      buttonWidth,
-      buttonHeight,
       hasOnSelectShippingMethod,
       hasOnSelectShippingContact,
       hasOnChangeCouponCode,
@@ -1642,9 +1634,6 @@ struct CheckoutPaymentViewParamsDTO: Hashable {
   var componentId: String
   var paymentMethodJson: String
   var isStoredPaymentMethod: Bool
-  var applePayButtonStyle: ApplePayButtonStyleDTO? = nil
-  var applePayButtonWidth: Double? = nil
-  var applePayButtonHeight: Double? = nil
 
 
   // swift-format-ignore: AlwaysUseLowerCamelCase
@@ -1653,18 +1642,12 @@ struct CheckoutPaymentViewParamsDTO: Hashable {
     let componentId = pigeonVar_list[1] as! String
     let paymentMethodJson = pigeonVar_list[2] as! String
     let isStoredPaymentMethod = pigeonVar_list[3] as! Bool
-    let applePayButtonStyle: ApplePayButtonStyleDTO? = nilOrValue(pigeonVar_list[4])
-    let applePayButtonWidth: Double? = nilOrValue(pigeonVar_list[5])
-    let applePayButtonHeight: Double? = nilOrValue(pigeonVar_list[6])
 
     return CheckoutPaymentViewParamsDTO(
       checkoutId: checkoutId,
       componentId: componentId,
       paymentMethodJson: paymentMethodJson,
-      isStoredPaymentMethod: isStoredPaymentMethod,
-      applePayButtonStyle: applePayButtonStyle,
-      applePayButtonWidth: applePayButtonWidth,
-      applePayButtonHeight: applePayButtonHeight
+      isStoredPaymentMethod: isStoredPaymentMethod
     )
   }
   func toList() -> [Any?] {
@@ -1673,9 +1656,6 @@ struct CheckoutPaymentViewParamsDTO: Hashable {
       componentId,
       paymentMethodJson,
       isStoredPaymentMethod,
-      applePayButtonStyle,
-      applePayButtonWidth,
-      applePayButtonHeight,
     ]
   }
   static func == (lhs: CheckoutPaymentViewParamsDTO, rhs: CheckoutPaymentViewParamsDTO) -> Bool {

@@ -102,8 +102,6 @@ void main() {
     expect(sessionConfiguration.amount?.currency, Config.amount.currency);
     expect(sessionConfiguration.amount?.value, Config.amount.value);
     expect(sessionConfiguration.countryCode, Config.countryCode);
-    expect(sessionConfiguration.applePayConfiguration?.buttonWidth, 200);
-    expect(sessionConfiguration.applePayConfiguration?.buttonHeight, 48);
     expect(
       sessionConfiguration.applePayConfiguration?.buttonStyle?.type,
       ApplePayButtonType.buy,

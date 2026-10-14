@@ -36,8 +36,6 @@ class SessionCheckoutRepository {
           merchantId: Config.merchantId,
           merchantName: Config.merchantName,
           buttonStyle: ApplePayButtonStyle(type: ApplePayButtonType.buy),
-          buttonWidth: 200,
-          buttonHeight: 48,
         ),
       );
 

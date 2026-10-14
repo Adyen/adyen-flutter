@@ -984,8 +984,6 @@ data class ApplePayConfigurationDTO (
   val supportsCouponCode: Boolean? = null,
   val couponCode: String? = null,
   val buttonStyle: ApplePayButtonStyleDTO? = null,
-  val buttonWidth: Double? = null,
-  val buttonHeight: Double? = null,
   val hasOnSelectShippingMethod: Boolean,
   val hasOnSelectShippingContact: Boolean,
   val hasOnChangeCouponCode: Boolean,
@@ -1011,13 +1009,11 @@ data class ApplePayConfigurationDTO (
       val supportsCouponCode = pigeonVar_list[14] as Boolean?
       val couponCode = pigeonVar_list[15] as String?
       val buttonStyle = pigeonVar_list[16] as ApplePayButtonStyleDTO?
-      val buttonWidth = pigeonVar_list[17] as Double?
-      val buttonHeight = pigeonVar_list[18] as Double?
-      val hasOnSelectShippingMethod = pigeonVar_list[19] as Boolean
-      val hasOnSelectShippingContact = pigeonVar_list[20] as Boolean
-      val hasOnChangeCouponCode = pigeonVar_list[21] as Boolean
-      val hasOnAuthorize = pigeonVar_list[22] as Boolean
-      return ApplePayConfigurationDTO(merchantId, merchantName, allowOnboarding, summaryItems, requiredBillingContactFields, billingContact, requiredShippingContactFields, shippingContact, shippingType, allowShippingContactEditing, shippingMethods, applicationData, supportedCountries, merchantCapability, supportsCouponCode, couponCode, buttonStyle, buttonWidth, buttonHeight, hasOnSelectShippingMethod, hasOnSelectShippingContact, hasOnChangeCouponCode, hasOnAuthorize)
+      val hasOnSelectShippingMethod = pigeonVar_list[17] as Boolean
+      val hasOnSelectShippingContact = pigeonVar_list[18] as Boolean
+      val hasOnChangeCouponCode = pigeonVar_list[19] as Boolean
+      val hasOnAuthorize = pigeonVar_list[20] as Boolean
+      return ApplePayConfigurationDTO(merchantId, merchantName, allowOnboarding, summaryItems, requiredBillingContactFields, billingContact, requiredShippingContactFields, shippingContact, shippingType, allowShippingContactEditing, shippingMethods, applicationData, supportedCountries, merchantCapability, supportsCouponCode, couponCode, buttonStyle, hasOnSelectShippingMethod, hasOnSelectShippingContact, hasOnChangeCouponCode, hasOnAuthorize)
     }
   }
   fun toList(): List<Any?> {
@@ -1039,8 +1035,6 @@ data class ApplePayConfigurationDTO (
       supportsCouponCode,
       couponCode,
       buttonStyle,
-      buttonWidth,
-      buttonHeight,
       hasOnSelectShippingMethod,
       hasOnSelectShippingContact,
       hasOnChangeCouponCode,
@@ -1650,10 +1644,7 @@ data class CheckoutPaymentViewParamsDTO (
   val checkoutId: String,
   val componentId: String,
   val paymentMethodJson: String,
-  val isStoredPaymentMethod: Boolean,
-  val applePayButtonStyle: ApplePayButtonStyleDTO? = null,
-  val applePayButtonWidth: Double? = null,
-  val applePayButtonHeight: Double? = null
+  val isStoredPaymentMethod: Boolean
 )
  {
   companion object {
@@ -1662,10 +1653,7 @@ data class CheckoutPaymentViewParamsDTO (
       val componentId = pigeonVar_list[1] as String
       val paymentMethodJson = pigeonVar_list[2] as String
       val isStoredPaymentMethod = pigeonVar_list[3] as Boolean
-      val applePayButtonStyle = pigeonVar_list[4] as ApplePayButtonStyleDTO?
-      val applePayButtonWidth = pigeonVar_list[5] as Double?
-      val applePayButtonHeight = pigeonVar_list[6] as Double?
-      return CheckoutPaymentViewParamsDTO(checkoutId, componentId, paymentMethodJson, isStoredPaymentMethod, applePayButtonStyle, applePayButtonWidth, applePayButtonHeight)
+      return CheckoutPaymentViewParamsDTO(checkoutId, componentId, paymentMethodJson, isStoredPaymentMethod)
     }
   }
   fun toList(): List<Any?> {
@@ -1674,9 +1662,6 @@ data class CheckoutPaymentViewParamsDTO (
       componentId,
       paymentMethodJson,
       isStoredPaymentMethod,
-      applePayButtonStyle,
-      applePayButtonWidth,
-      applePayButtonHeight,
     )
   }
   override fun equals(other: Any?): Boolean {

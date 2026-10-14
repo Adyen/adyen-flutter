@@ -13,7 +13,6 @@ final class CheckoutPaymentView: NSObject, FlutterPlatformView {
     private let registry: CheckoutComponentRegistry
     private let wrapperView = ComponentWrapperView()
     private var component: CheckoutPaymentComponent?
-    private var applePayButtonView: ApplePayButtonView?
     private var lastReportedHeight: Int?
 
     private var checkoutId: String {
@@ -22,10 +21,6 @@ final class CheckoutPaymentView: NSObject, FlutterPlatformView {
 
     private var componentId: String {
         params.componentId
-    }
-
-    private var isApplePay: Bool {
-        paymentMethodObject?["type"] as? String == PaymentMethodType.applePay.rawValue
     }
 
     init(
@@ -54,17 +49,11 @@ final class CheckoutPaymentView: NSObject, FlutterPlatformView {
         component?.viewController.willMove(toParent: nil)
         component?.viewController.removeFromParent()
         component = nil
-        applePayButtonView = nil
         wrapperView.arrangedSubviews.forEach { $0.removeFromSuperview() }
     }
 
     private func setup() {
         do {
-            if isApplePay {
-                setupApplePayButton()
-                sendReady(requiresUserInteraction: true)
-                return
-            }
             guard let checkout = holder.checkout(for: checkoutId) else {
                 throw AdyenPigeonError(code: ErrorCodes.checkoutNotFound, message: "Checkout is no longer active.", details: nil)
             }
@@ -87,52 +76,6 @@ final class CheckoutPaymentView: NSObject, FlutterPlatformView {
         }
     }
 
-    private func setupApplePayButton() {
-        let buttonView = ApplePayButtonView(
-            style: params.applePayButtonStyle,
-            width: params.applePayButtonWidth,
-            height: params.applePayButtonHeight,
-            onTap: { [weak self] in self?.presentApplePay() }
-        )
-        applePayButtonView = buttonView
-        wrapperView.addArrangedSubview(buttonView)
-        sendResize(height: Int(buttonView.height))
-    }
-
-    private func presentApplePay() {
-        applePayButtonView?.isEnabled = false
-        do {
-            guard let checkout = holder.checkout(for: checkoutId) else {
-                throw AdyenPigeonError(code: ErrorCodes.checkoutNotFound, message: "Checkout is no longer active.", details: nil)
-            }
-            let paymentComponent = try createPaymentComponent(checkout: checkout)
-            component = paymentComponent
-            registry.register(
-                checkoutId: checkoutId,
-                componentId: componentId,
-                component: paymentComponent
-            )
-            _ = registry.setActive(
-                checkoutId: checkoutId,
-                componentId: componentId
-            )
-            let viewController = paymentComponent.viewController
-            guard let presenter = presentingViewController else {
-                throw AdyenPigeonError(
-                    code: ErrorCodes.presentationFailure,
-                    message: "Unable to present Apple Pay.",
-                    details: nil
-                )
-            }
-            presenter.present(viewController, animated: true) { [weak self] in
-                self?.applePayButtonView?.isEnabled = true
-            }
-        } catch {
-            applePayButtonView?.isEnabled = true
-            sendFailure(error)
-        }
-    }
-
     private func attachToParentViewController() {
         guard let child = component?.viewController, child.parent == nil, wrapperView.window != nil else { return }
         var responder: UIResponder? = wrapperView.next
@@ -142,10 +85,6 @@ final class CheckoutPaymentView: NSObject, FlutterPlatformView {
         guard let parent = responder as? UIViewController else { return }
         parent.addChild(child)
         child.didMove(toParent: parent)
-    }
-
-    private var presentingViewController: UIViewController? {
-        (wrapperView.window?.rootViewController ?? UIViewController.keyWindowRoot)?.topPresenter
     }
 
     private func createPaymentComponent(checkout: PaymentCheckout) throws -> CheckoutPaymentComponent {

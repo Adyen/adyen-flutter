@@ -29,7 +29,11 @@ class ApplePayConfiguration {
   final bool? supportsCouponCode;
   final String? couponCode;
   final ApplePayButtonStyle? buttonStyle;
+  @Deprecated(
+      'Ignored. The native Apple Pay button sizes itself to the component width.')
   final double? buttonWidth;
+  @Deprecated(
+      'Ignored. The native Apple Pay button sizes itself to the component width.')
   final double? buttonHeight;
   final Future<ApplePayShippingMethodUpdate> Function(
     ApplePayShippingMethod method,

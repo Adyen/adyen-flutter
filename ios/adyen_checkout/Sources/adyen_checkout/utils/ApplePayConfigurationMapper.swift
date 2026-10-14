@@ -14,6 +14,7 @@ func mapApplePayConfiguration(
     let request = try makeApplePayPaymentRequest(dto: dto, amount: amount, countryCode: countryCode)
     let configuration = try ApplePayConfiguration(paymentRequest: request)
         .allowOnboarding(dto.allowOnboarding ?? true)
+        .buttonAppearance(dto.buttonStyle.toNativeButtonAppearance())
     guard let callbacksApi, let checkoutId else { return configuration }
     return dto.attachCallbacks(
         to: configuration,
@@ -281,5 +282,52 @@ private extension ApplePayPaymentErrorDTO {
             code: 1,
             userInfo: [NSLocalizedDescriptionKey: localizedDescription]
         )
+    }
+}
+
+private extension ApplePayButtonStyleDTO? {
+    func toNativeButtonAppearance() -> ApplePayButtonAppearance {
+        guard let style = self else { return ApplePayButtonAppearance() }
+        return ApplePayButtonAppearance(
+            buttonType: style.type?.toNativeButtonType() ?? .plain,
+            buttonStyle: style.theme?.toNativeButtonStyle() ?? .automatic,
+            cornerRadius: style.cornerRadius.map { CGFloat($0) }
+        )
+    }
+}
+
+private extension ApplePayButtonThemeDTO {
+    func toNativeButtonStyle() -> PKPaymentButtonStyle {
+        switch self {
+        case .black: .black
+        case .white: .white
+        case .whiteWithLine: .whiteOutline
+        case .automatic: .automatic
+        }
+    }
+}
+
+private extension ApplePayButtonTypeDTO {
+    private static let nativeButtonTypes: [ApplePayButtonTypeDTO: PKPaymentButtonType] = [
+        .plain: .plain,
+        .buy: .buy,
+        .setUp: .setUp,
+        .inStore: .inStore,
+        .donate: .donate,
+        .checkout: .checkout,
+        .book: .book,
+        .subscribe: .subscribe,
+        .reload: .reload,
+        .addMoney: .addMoney,
+        .topUp: .topUp,
+        .order: .order,
+        .rent: .rent,
+        .support: .support,
+        .contribute: .contribute,
+        .tip: .tip
+    ]
+
+    func toNativeButtonType() -> PKPaymentButtonType {
+        Self.nativeButtonTypes[self] ?? .plain
     }
 }

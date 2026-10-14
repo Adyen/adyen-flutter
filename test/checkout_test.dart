@@ -46,6 +46,7 @@ class FakeCheckoutHostApi extends CheckoutHostApi {
     String paymentMethodsJson,
     CheckoutConfigurationDTO configuration,
   ) async {
+    lastConfiguration = configuration;
     if (failSetupsWithAlreadyActive) {
       throw PlatformException(code: 'CheckoutAlreadyActive');
     }
@@ -53,6 +54,7 @@ class FakeCheckoutHostApi extends CheckoutHostApi {
   }
 
   int clearActiveCheckoutCount = 0;
+  CheckoutConfigurationDTO? lastConfiguration;
   bool failSetupsWithAlreadyActive = false;
 
   @override
@@ -449,11 +451,8 @@ void main() {
     expect(checkoutHostApi.disposeCheckoutCount, 1);
   });
 
-  testWidgets('Apple Pay passes native button configuration to iOS',
-      (tester) async {
-    debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
-    addTearDown(() => debugDefaultTargetPlatformOverride = null);
-
+  test('Apple Pay button style is passed to the native configuration',
+      () async {
     final paymentMethod = PaymentMethod(type: 'applepay', name: 'Apple Pay');
     final checkout = await runtime.setupAdvanced(
       paymentMethods: PaymentMethods(regular: [paymentMethod]),
@@ -470,8 +469,6 @@ void main() {
             type: ApplePayButtonType.buy,
             cornerRadius: 8,
           ),
-          buttonWidth: 180,
-          buttonHeight: 48,
         ),
       ),
       callbacks: AdvancedCheckoutCallbacks(
@@ -484,29 +481,13 @@ void main() {
       ),
     );
 
-    await tester.pumpWidget(
-      Directionality(
-        textDirection: TextDirection.ltr,
-        child: CheckoutPaymentComponent(
-          checkout: checkout,
-          paymentMethod: paymentMethod,
-        ),
-      ),
-    );
+    final buttonStyle =
+        checkoutHostApi.lastConfiguration?.applePayConfiguration?.buttonStyle;
+    expect(buttonStyle?.theme, ApplePayButtonThemeDTO.white);
+    expect(buttonStyle?.type, ApplePayButtonTypeDTO.buy);
+    expect(buttonStyle?.cornerRadius, 8);
 
-    final platformView = tester.widget<IosPlatformView>(
-      find.byType(IosPlatformView),
-    );
-    final params = platformView.creationParams as CheckoutPaymentViewParamsDTO;
-    expect(params.applePayButtonStyle?.theme, ApplePayButtonThemeDTO.white);
-    expect(params.applePayButtonStyle?.type, ApplePayButtonTypeDTO.buy);
-    expect(params.applePayButtonStyle?.cornerRadius, 8);
-    expect(params.applePayButtonWidth, 180);
-    expect(params.applePayButtonHeight, 48);
-
-    await tester.pumpWidget(const SizedBox.shrink());
     checkout.dispose();
-    debugDefaultTargetPlatformOverride = null;
   });
 
   testWidgets(

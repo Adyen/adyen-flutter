@@ -208,8 +208,6 @@ extension ApplePayConfigurationMapper on ApplePayConfiguration {
         supportsCouponCode: supportsCouponCode,
         couponCode: couponCode,
         buttonStyle: buttonStyle?.toDTO(),
-        buttonWidth: buttonWidth,
-        buttonHeight: buttonHeight,
         hasOnSelectShippingMethod: onSelectShippingMethod != null,
         hasOnSelectShippingContact: onSelectShippingContact != null,
         hasOnChangeCouponCode: onChangeCouponCode != null,

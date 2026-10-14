@@ -24,10 +24,17 @@
   `adyen-ios` `develop` to commit `80b1960` via Swift Package Manager.
 - `CheckoutPaymentComponent` now recreates the native component when the payment method,
   checkout or controller passed to it changes.
+- Apple Pay on iOS now renders the native SDK's Apple Pay button inline, like every other payment
+  method. `ApplePayButtonStyle` is applied to that button.
+
+### Deprecated
+
+- `ApplePayConfiguration.buttonWidth` and `ApplePayConfiguration.buttonHeight` are ignored. The
+  native Apple Pay button sizes itself to the component width.
 
 ### Fixed
 
-- The Apple Pay button re-enables after the payment sheet is dismissed or fails to present on iOS.
+- Tapping Apple Pay on iOS no longer opens an intermediate screen with a second Apple Pay button.
 - `ApplePayButtonTheme.automatic` is now honoured on iOS.
 - The native payment component is now released together with its widget on Android.
 - The component height now follows native content changes, such as card validation errors.

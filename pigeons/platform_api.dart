@@ -401,8 +401,6 @@ class ApplePayConfigurationDTO {
   final bool? supportsCouponCode;
   final String? couponCode;
   final ApplePayButtonStyleDTO? buttonStyle;
-  final double? buttonWidth;
-  final double? buttonHeight;
   final bool hasOnSelectShippingMethod;
   final bool hasOnSelectShippingContact;
   final bool hasOnChangeCouponCode;
@@ -426,8 +424,6 @@ class ApplePayConfigurationDTO {
     this.supportsCouponCode,
     this.couponCode,
     this.buttonStyle,
-    this.buttonWidth,
-    this.buttonHeight,
     required this.hasOnSelectShippingMethod,
     required this.hasOnSelectShippingContact,
     required this.hasOnChangeCouponCode,
@@ -660,18 +656,12 @@ class CheckoutPaymentViewParamsDTO {
   final String componentId;
   final String paymentMethodJson;
   final bool isStoredPaymentMethod;
-  final ApplePayButtonStyleDTO? applePayButtonStyle;
-  final double? applePayButtonWidth;
-  final double? applePayButtonHeight;
 
   CheckoutPaymentViewParamsDTO({
     required this.checkoutId,
     required this.componentId,
     required this.paymentMethodJson,
     required this.isStoredPaymentMethod,
-    this.applePayButtonStyle,
-    this.applePayButtonWidth,
-    this.applePayButtonHeight,
   });
 }
 

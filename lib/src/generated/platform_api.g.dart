@@ -1244,8 +1244,6 @@ class ApplePayConfigurationDTO {
     this.supportsCouponCode,
     this.couponCode,
     this.buttonStyle,
-    this.buttonWidth,
-    this.buttonHeight,
     required this.hasOnSelectShippingMethod,
     required this.hasOnSelectShippingContact,
     required this.hasOnChangeCouponCode,
@@ -1286,10 +1284,6 @@ class ApplePayConfigurationDTO {
 
   ApplePayButtonStyleDTO? buttonStyle;
 
-  double? buttonWidth;
-
-  double? buttonHeight;
-
   bool hasOnSelectShippingMethod;
 
   bool hasOnSelectShippingContact;
@@ -1317,8 +1311,6 @@ class ApplePayConfigurationDTO {
       supportsCouponCode,
       couponCode,
       buttonStyle,
-      buttonWidth,
-      buttonHeight,
       hasOnSelectShippingMethod,
       hasOnSelectShippingContact,
       hasOnChangeCouponCode,
@@ -1354,12 +1346,10 @@ class ApplePayConfigurationDTO {
       supportsCouponCode: result[14] as bool?,
       couponCode: result[15] as String?,
       buttonStyle: result[16] as ApplePayButtonStyleDTO?,
-      buttonWidth: result[17] as double?,
-      buttonHeight: result[18] as double?,
-      hasOnSelectShippingMethod: result[19]! as bool,
-      hasOnSelectShippingContact: result[20]! as bool,
-      hasOnChangeCouponCode: result[21]! as bool,
-      hasOnAuthorize: result[22]! as bool,
+      hasOnSelectShippingMethod: result[17]! as bool,
+      hasOnSelectShippingContact: result[18]! as bool,
+      hasOnChangeCouponCode: result[19]! as bool,
+      hasOnAuthorize: result[20]! as bool,
     );
   }
 
@@ -2276,9 +2266,6 @@ class CheckoutPaymentViewParamsDTO {
     required this.componentId,
     required this.paymentMethodJson,
     required this.isStoredPaymentMethod,
-    this.applePayButtonStyle,
-    this.applePayButtonWidth,
-    this.applePayButtonHeight,
   });
 
   String checkoutId;
@@ -2289,21 +2276,12 @@ class CheckoutPaymentViewParamsDTO {
 
   bool isStoredPaymentMethod;
 
-  ApplePayButtonStyleDTO? applePayButtonStyle;
-
-  double? applePayButtonWidth;
-
-  double? applePayButtonHeight;
-
   List<Object?> _toList() {
     return <Object?>[
       checkoutId,
       componentId,
       paymentMethodJson,
       isStoredPaymentMethod,
-      applePayButtonStyle,
-      applePayButtonWidth,
-      applePayButtonHeight,
     ];
   }
 
@@ -2318,9 +2296,6 @@ class CheckoutPaymentViewParamsDTO {
       componentId: result[1]! as String,
       paymentMethodJson: result[2]! as String,
       isStoredPaymentMethod: result[3]! as bool,
-      applePayButtonStyle: result[4] as ApplePayButtonStyleDTO?,
-      applePayButtonWidth: result[5] as double?,
-      applePayButtonHeight: result[6] as double?,
     );
   }
 

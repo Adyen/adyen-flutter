@@ -12,7 +12,6 @@ import 'common/model/checkout_error.dart';
 import 'common/model/checkout_results.dart';
 import 'common/model/cse/encrypted_card.dart';
 import 'common/model/cse/unencrypted_card.dart';
-import 'common/model/payment_method_configurations/apple_pay/apple_pay_configuration.dart';
 import 'common/model/payment_methods.dart';
 import 'common/model/session_response.dart';
 import 'generated/platform_api.g.dart';
@@ -49,9 +48,6 @@ final class CheckoutRuntime {
 
   bool requiresExternalController(String checkoutId) =>
       _recordFor(checkoutId)?.configuration.showSubmitButton == false;
-
-  ApplePayConfiguration? applePayConfiguration(String checkoutId) =>
-      _recordFor(checkoutId)?.configuration.applePayConfiguration;
 
   _CheckoutRecord? _recordFor(String checkoutId) =>
       _checkout?.checkout.id == checkoutId ? _checkout : null;

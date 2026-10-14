@@ -199,8 +199,7 @@ CheckoutPaymentComponent (lib/src/components/checkout_payment_component.dart)
     │    initSurfaceAndroidView)
     │
     └── IosPlatformView ──► CheckoutPaymentViewFactory ──► CheckoutPaymentView
-        (UiKitView)            (ios/.../components/)          ├── ComponentWrapperView + child VC
-                                                              └── ApplePayButtonView (PKPaymentButton)
+        (UiKitView)            (ios/.../components/)          └── ComponentWrapperView + child VC
 ```
 
 ### Key Files
@@ -210,7 +209,7 @@ CheckoutPaymentComponent (lib/src/components/checkout_payment_component.dart)
 | Widget                 | -                                                                  | -                                                              | `components/checkout_payment_component.dart`, `components/component_container.dart` |
 | Platform view wrapper  | -                                                                  | -                                                              | `components/platform/android_platform_view.dart`, `ios_platform_view.dart`          |
 | View factory           | `components/CheckoutPaymentViewFactory.kt`                         | `components/CheckoutPaymentViewFactory.swift`                  | -                                                                                    |
-| Native view            | `components/CheckoutPaymentView.kt`, `components/view/DynamicComponentView.kt` | `components/CheckoutPaymentView.swift`, `components/platformViewUtils/ComponentWrapperView.swift`, `components/ApplePayButtonView.swift` | -                    |
+| Native view            | `components/CheckoutPaymentView.kt`, `components/view/DynamicComponentView.kt` | `components/CheckoutPaymentView.swift`, `components/platformViewUtils/ComponentWrapperView.swift` | -                    |
 | Creation failure       | `components/FailedCheckoutPaymentView.kt`                          | -                                                              | -                                                                                    |
 | Callbacks              | `components/CheckoutCallbacksBridge.kt`, `utils/CheckoutCallbacksMapper.kt` | -                                                     | -                                                                                    |
 | Component registry     | `components/CheckoutComponentRegistry.kt`                          | `components/CheckoutComponentRegistry.swift`                   | -                                                                                    |
@@ -224,8 +223,10 @@ CheckoutPaymentComponent (lib/src/components/checkout_payment_component.dart)
 - `CheckoutComponentRegistry` is an instance, not a singleton: owned by the plugin on Android and
   created in `AdyenCheckoutPlugin.register` on iOS.
 - `lib/src/components/apple_pay/model/` only holds the public Apple Pay button models (style,
-  theme, type). Apple Pay is drawn natively as a `PKPaymentButton` inside `CheckoutPaymentView`;
-  there is no `pay` package and no Dart-drawn payment button.
+  theme, type). Apple Pay has no special case: the native SDK's Apple Pay component renders its
+  own button in its view controller, embedded like any other component. Button styling is mapped
+  to `ApplePayConfiguration.buttonAppearance` in `utils/ApplePayConfigurationMapper.swift`. Do not
+  draw a plugin-owned Apple Pay button or present the component's view controller modally.
 
 ### Adding a New Payment Method with Native UI
 

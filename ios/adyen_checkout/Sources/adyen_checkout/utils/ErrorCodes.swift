@@ -6,7 +6,6 @@ enum ErrorCodes {
     static let checkoutAlreadyActive = "CheckoutAlreadyActive"
     static let invalidSubmitResult = "InvalidSubmitResult"
     static let generic = "Generic"
-    static let presentationFailure = "PresentationFailure"
     static let invalidPaymentMethod = "InvalidPaymentMethod"
     static let invalidPaymentMethods = "InvalidPaymentMethods"
 }
