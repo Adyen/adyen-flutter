@@ -36,6 +36,7 @@ internal class DynamicComponentView @JvmOverloads constructor(
     private var checkoutId = ""
     private var componentId = ""
     private var eventHandler: ComponentPlatformEventHandler? = null
+    private var composeView: ComposeView? = null
 
     constructor(
         context: Context,
@@ -72,7 +73,7 @@ internal class DynamicComponentView @JvmOverloads constructor(
             else -> CheckoutTarget.PaymentMethod(paymentMethod.type.orEmpty())
         }
 
-        addView(
+        val view =
             ComposeView(activity).apply {
                 setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
                 setContent {
@@ -124,11 +125,14 @@ internal class DynamicComponentView @JvmOverloads constructor(
                         CheckoutPaymentMethod(controller = controller)
                     }
                 }
-            },
-        )
+            }
+        composeView = view
+        addView(view)
     }
 
     fun onDispose() {
+        composeView?.disposeComposition()
+        composeView = null
         removeAllViews()
         eventHandler = null
     }

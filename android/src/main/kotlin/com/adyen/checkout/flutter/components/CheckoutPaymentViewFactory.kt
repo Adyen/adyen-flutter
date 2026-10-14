@@ -6,7 +6,6 @@ import com.adyen.checkout.card.BinLookupData
 import com.adyen.checkout.card.OnBinChangeCallback
 import com.adyen.checkout.card.OnBinLookupCallback
 import com.adyen.checkout.card.card
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import com.adyen.checkout.core.action.data.Action
 import com.adyen.checkout.core.action.data.ActionComponentData
@@ -17,7 +16,6 @@ import com.adyen.checkout.core.components.AdvancedCheckoutCallbacks
 import com.adyen.checkout.core.components.AdvancedCheckoutResult
 import com.adyen.checkout.core.components.BeforeSubmitResult
 import com.adyen.checkout.core.components.CheckoutCallbacks
-import com.adyen.checkout.core.components.CheckoutTarget
 import com.adyen.checkout.core.components.SessionCheckoutCallbacks
 import com.adyen.checkout.core.components.SessionCheckoutResult
 import com.adyen.checkout.core.components.SubmitResult
@@ -47,10 +45,6 @@ import com.adyen.checkout.flutter.session.CheckoutHolder
 import com.adyen.checkout.flutter.utils.Constants
 import io.flutter.plugin.platform.PlatformView
 import io.flutter.plugin.platform.PlatformViewFactory
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import org.json.JSONObject
 import java.util.concurrent.atomic.AtomicBoolean
@@ -185,7 +179,6 @@ internal class CheckoutPaymentViewFactory(
                 },
             )
         }
-        continuation.invokeOnCancellation { }
     }
 
     private suspend fun requestSubmit(
@@ -207,7 +200,6 @@ internal class CheckoutPaymentViewFactory(
                 },
             )
         }
-        continuation.invokeOnCancellation { }
     }
 
     private suspend fun requestAdditionalDetails(
@@ -229,7 +221,6 @@ internal class CheckoutPaymentViewFactory(
                 },
             )
         }
-        continuation.invokeOnCancellation { }
     }
 
     private fun SubmitResultDTO.toNativeSubmitResult(): SubmitResult = when (type) {
