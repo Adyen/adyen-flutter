@@ -10,6 +10,11 @@
 
 ### Changed
 
+- Direct/no-input payment methods (iDEAL, PayPal, Klarna, Pay by Bank, TWINT, stored methods) now
+  rely on the submit button rendered inside the native component on Android and iOS.
+  `CheckoutPaymentComponent` no longer requires a `CheckoutController` for these methods and no
+  longer collapses them to zero height. A `CheckoutController` is only required when
+  `CheckoutConfiguration.showSubmitButton` is `false` (merchant-provided submit button).
 - Native dependencies now track development builds instead of `6.0.0-alpha.1`: Android resolves the
   weekly Sunday snapshot (`2026.10.11-SNAPSHOT`) from Central Portal Snapshots, and iOS pins
   `adyen-ios` `develop` to commit `80b1960` via Swift Package Manager.

@@ -92,56 +92,23 @@ final checkout = await Checkout.instance.setupAdvanced(
 );
 ```
 
-Use an optional `CheckoutController` for a custom submit button or direct/no-input payment methods.
-It exposes `isReady`, `requiresUserInteraction`, `submit()`, and lifecycle state. A controller is
-required when `showSubmitButton` is `false` or the selected native method does not require shopper
-input.
-
-The v1 Instant methods—iDEAL, PayPal, Klarna, Pay by Bank, and TWINT—use this same generic component.
-Keep the component mounted while native Checkout owns the payment and action lifecycle. When native
-reports that no interaction is required, the platform view collapses to zero height and a merchant
-button can submit through the controller:
+Native components render their own submit button by default. The v1 Instant methods—iDEAL, PayPal,
+Klarna, Pay by Bank, and TWINT—use this same generic component and show a native pay button inside
+the platform view; no Flutter-side button is needed. Keep the component mounted while native
+Checkout owns the payment and action lifecycle.
 
 ```dart
-final controller = CheckoutController();
-bool submitted = false;
-
-Column(
-  children: [
-    CheckoutPaymentComponent(
-      checkout: checkout,
-      paymentMethod: paymentMethod,
-      controller: controller,
-    ),
-    ListenableBuilder(
-      listenable: controller,
-      builder: (context, _) {
-        final canSubmit = controller.isReady &&
-            controller.requiresUserInteraction == false &&
-            !submitted;
-        if (controller.requiresUserInteraction != false) {
-          return const SizedBox.shrink();
-        }
-        return FilledButton(
-          onPressed: canSubmit
-              ? () async {
-                  setState(() => submitted = true);
-                  await controller.submit();
-                }
-              : null,
-          child: Text('Pay with ${paymentMethod.name}'),
-        );
-      },
-    ),
-  ],
+CheckoutPaymentComponent(
+  checkout: checkout,
+  paymentMethod: paymentMethod,
 );
 ```
 
-Dispose a merchant-created controller with the owning widget. Do not classify payment method types
-in application code. With the pinned alpha.1 native SDKs, use
-`requiresUserInteraction` as the native-authoritative signal. Future native SDK versions are
-expected to render their own payment button; a future dependency update will replace this temporary
-CTA with the native UI without changing the merchant-facing Flutter component/controller API.
+Use an optional `CheckoutController` when `showSubmitButton` is `false` (custom merchant button) or
+for programmatic submission. It exposes `isReady`, `requiresUserInteraction`, `submit()`, and
+lifecycle state. When `showSubmitButton` is `false`, direct/no-input methods collapse to zero
+height and the merchant's own button submits through the controller. Dispose a merchant-created
+controller with the owning widget.
 
 ## Configuration
 

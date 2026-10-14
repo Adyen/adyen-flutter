@@ -323,7 +323,68 @@ void main() {
   });
 
   testWidgets(
-      'alpha.1 direct method stays mounted at zero height and submits through controller',
+      'direct method renders natively without a controller when showSubmitButton is true',
+      (tester) async {
+    debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+    addTearDown(() => debugDefaultTargetPlatformOverride = null);
+
+    final failures = <CheckoutError>[];
+    final paymentMethod = PaymentMethod(type: 'ideal', name: 'iDEAL');
+    final checkout = await runtime.setupAdvanced(
+      paymentMethods: PaymentMethods(regular: [paymentMethod]),
+      configuration: const CheckoutConfiguration(
+        environment: Environment.test,
+        clientKey: 'test_key',
+      ),
+      callbacks: AdvancedCheckoutCallbacks(
+        onSubmit: (data) async =>
+            const SubmitResult.completion(resultCode: 'Authorised'),
+        onAdditionalDetails: (data) async =>
+            const AdditionalDetailsResult.completion(resultCode: 'Authorised'),
+        onFailure: failures.add,
+        onComplete: (result) {},
+      ),
+    );
+
+    await tester.pumpWidget(
+      Directionality(
+        textDirection: TextDirection.ltr,
+        child: CheckoutPaymentComponent(
+          checkout: checkout,
+          paymentMethod: paymentMethod,
+        ),
+      ),
+    );
+    final platformView = tester.widget<IosPlatformView>(
+      find.byType(IosPlatformView),
+    );
+
+    eventsController.add(CheckoutEventDTO(
+      type: CheckoutEventTypeDTO.componentReady,
+      checkoutId: checkout.id,
+      componentId: platformView.creationParams['componentId'] as String,
+      requiresUserInteraction: false,
+    ));
+    await tester.runAsync(() => Future<void>.delayed(Duration.zero));
+    await tester.pump(const Duration(milliseconds: 300));
+
+    expect(failures, isEmpty);
+    expect(find.byType(IosPlatformView), findsOneWidget);
+    final componentBox = tester.widget<SizedBox>(
+      find.ancestor(
+        of: find.byType(IosPlatformView),
+        matching: find.byType(SizedBox),
+      ),
+    );
+    expect(componentBox.height, isNot(0));
+
+    await tester.pumpWidget(const SizedBox.shrink());
+    checkout.dispose();
+    debugDefaultTargetPlatformOverride = null;
+  });
+
+  testWidgets(
+      'direct method requires a controller and collapses when showSubmitButton is false',
       (tester) async {
     debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
     addTearDown(() => debugDefaultTargetPlatformOverride = null);
@@ -335,6 +396,7 @@ void main() {
       configuration: const CheckoutConfiguration(
         environment: Environment.test,
         clientKey: 'test_key',
+        showSubmitButton: false,
       ),
       callbacks: AdvancedCheckoutCallbacks(
         onSubmit: (data) async =>

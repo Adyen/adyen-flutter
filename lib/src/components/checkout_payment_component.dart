@@ -164,22 +164,23 @@ class _CheckoutPaymentComponentState extends State<CheckoutPaymentComponent> {
   void _handleReady(bool? requiresUserInteraction) {
     if (requiresUserInteraction == null) return;
     final needsController =
-        _runtime.requiresExternalController(widget.checkout.id) ||
-            !requiresUserInteraction;
+        _runtime.requiresExternalController(widget.checkout.id);
     if (needsController && widget.controller == null) {
       _runtime.reportComponentFailure(
         widget.checkout.id,
         const CheckoutError(
           code: CheckoutError.missingControllerCode,
           message:
-              'A CheckoutController is required for this payment method or when showSubmitButton is false.',
+              'A CheckoutController is required when showSubmitButton is false.',
         ),
       );
       setState(() => _hasError = true);
       return;
     }
     markCheckoutControllerReady(_effectiveController, requiresUserInteraction);
-    if (!requiresUserInteraction) setState(() => _viewportHeight = 0);
+    if (!requiresUserInteraction && needsController) {
+      setState(() => _viewportHeight = 0);
+    }
   }
 
   void _handleResize(int? height) {

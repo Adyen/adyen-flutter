@@ -312,6 +312,9 @@ embeddable platform view (e.g. Apple Pay/Google Pay render as Dart-drawn buttons
   requires iOS 16.0 or later.
 - Generic native payment views are registered through `CheckoutComponentRegistry` and use
   `CheckoutPaymentView` on both platforms.
+- Direct/no-input methods render their own native submit button (`showSubmitButton` default). A
+  `CheckoutController` is only required when `showSubmitButton` is `false`; in that case
+  no-interaction components collapse to zero height and the merchant submits via the controller.
 - After changing `pigeons/platform_api.dart`, run `dart run pigeon --input pigeons/platform_api.dart`,
   then `dart format lib/src/generated/platform_api.g.dart` to normalize Pigeon output whitespace.
   Do not hand-edit generated platform files.

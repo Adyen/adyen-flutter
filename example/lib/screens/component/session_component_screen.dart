@@ -1,6 +1,6 @@
 import 'package:adyen_checkout/adyen_checkout.dart';
 import 'package:adyen_checkout_example/repositories/session_checkout_repository.dart';
-import 'package:adyen_checkout_example/screens/component/instant/component_submit_button.dart';
+import 'package:adyen_checkout_example/screens/component/instant/component_unavailable_message.dart';
 import 'package:adyen_checkout_example/utils/dialog_builder.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
@@ -103,7 +103,7 @@ class _SessionComponentScreenState extends State<SessionComponentScreen> {
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
-      child: ControlledCheckoutPaymentComponent(
+      child: CheckoutPaymentComponent(
         key: ValueKey(paymentMethod.data),
         checkout: _checkout!,
         paymentMethod: paymentMethod,

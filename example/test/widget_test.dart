@@ -8,7 +8,7 @@ import 'package:adyen_checkout_example/repositories/advanced_checkout_repository
 import 'package:adyen_checkout_example/repositories/session_checkout_repository.dart';
 import 'package:adyen_checkout_example/screens/component/advanced_component_screen.dart';
 import 'package:adyen_checkout_example/screens/component/component_navigation_screen.dart';
-import 'package:adyen_checkout_example/screens/component/instant/component_submit_button.dart';
+import 'package:adyen_checkout_example/screens/component/instant/component_unavailable_message.dart';
 import 'package:adyen_checkout_example/screens/component/instant/instant_advanced_component_screen.dart';
 import 'package:adyen_checkout_example/screens/component/instant/instant_component_navigation_screen.dart';
 import 'package:adyen_checkout_example/screens/component/instant/instant_payment_methods.dart';
@@ -17,27 +17,6 @@ import 'package:adyen_checkout_example/screens/component/session_component_scree
 import 'package:adyen_checkout_example/utils/dialog_builder.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-
-class TestCheckoutController extends CheckoutController {
-  bool _isReady = false;
-  bool? _requiresUserInteraction;
-  int submitCount = 0;
-
-  @override
-  bool get isReady => _isReady;
-
-  @override
-  bool? get requiresUserInteraction => _requiresUserInteraction;
-
-  void setReady({required bool requiresUserInteraction}) {
-    _isReady = true;
-    _requiresUserInteraction = requiresUserInteraction;
-    notifyListeners();
-  }
-
-  @override
-  Future<void> submit() async => submitCount++;
-}
 
 class CapturingSessionCheckoutRepository extends SessionCheckoutRepository {
   final Completer<SessionCheckout> _setupCompleter =
@@ -250,40 +229,6 @@ void main() {
     );
 
     expect(find.text('PayPal is not available.'), findsOneWidget);
-  });
-
-  testWidgets('direct component shows one-shot controller submit button',
-      (tester) async {
-    final controller = TestCheckoutController();
-    await tester.pumpWidget(
-      MaterialApp(
-        home: Scaffold(
-          body: ComponentSubmitButton(
-            controller: controller,
-            paymentMethodName: 'iDEAL',
-          ),
-        ),
-      ),
-    );
-
-    expect(find.text('Pay with iDEAL'), findsNothing);
-
-    controller.setReady(requiresUserInteraction: true);
-    await tester.pump();
-    expect(find.text('Pay with iDEAL'), findsNothing);
-
-    controller.setReady(requiresUserInteraction: false);
-    await tester.pump();
-    expect(find.text('Pay with iDEAL'), findsOneWidget);
-
-    await tester.tap(find.text('Pay with iDEAL'));
-    await tester.pump();
-    expect(controller.submitCount, 1);
-    expect(tester.widget<FilledButton>(find.byType(FilledButton)).onPressed,
-        isNull);
-
-    await tester.pumpWidget(const SizedBox.shrink());
-    controller.dispose();
   });
 
   testWidgets(
