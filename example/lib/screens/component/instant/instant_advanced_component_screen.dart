@@ -1,6 +1,7 @@
 import 'package:adyen_checkout/adyen_checkout.dart';
 import 'package:adyen_checkout_example/repositories/advanced_checkout_repository.dart';
 import 'package:adyen_checkout_example/screens/component/instant/component_unavailable_message.dart';
+import 'package:adyen_checkout_example/screens/component/instant/instant_payment_method_section.dart';
 import 'package:adyen_checkout_example/screens/component/instant/instant_payment_methods.dart';
 import 'package:adyen_checkout_example/utils/dialog_builder.dart';
 import 'package:flutter/material.dart';
@@ -112,8 +113,7 @@ class _InstantAdvancedComponentScreenState
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           for (final paymentMethod in paymentMethods)
-            CheckoutPaymentComponent(
-              key: ValueKey(paymentMethod.data),
+            InstantPaymentMethodSection(
               checkout: checkout,
               paymentMethod: paymentMethod,
             ),
