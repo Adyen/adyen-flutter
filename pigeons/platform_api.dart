@@ -654,6 +654,26 @@ class CheckoutEventDTO {
   });
 }
 
+class CheckoutPaymentViewParamsDTO {
+  final String checkoutId;
+  final String componentId;
+  final String paymentMethodJson;
+  final bool isStoredPaymentMethod;
+  final ApplePayButtonStyleDTO? applePayButtonStyle;
+  final double? applePayButtonWidth;
+  final double? applePayButtonHeight;
+
+  CheckoutPaymentViewParamsDTO({
+    required this.checkoutId,
+    required this.componentId,
+    required this.paymentMethodJson,
+    required this.isStoredPaymentMethod,
+    this.applePayButtonStyle,
+    this.applePayButtonWidth,
+    this.applePayButtonHeight,
+  });
+}
+
 @HostApi()
 abstract class CheckoutHostApi {
   @async

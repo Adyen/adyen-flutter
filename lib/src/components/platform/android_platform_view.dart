@@ -6,7 +6,7 @@ import 'package:flutter/widgets.dart';
 
 class AndroidPlatformView extends StatelessWidget {
   final String viewType;
-  final Map<String, dynamic> creationParams;
+  final Object creationParams;
   final MessageCodec<Object?> codec;
   final Set<Factory<OneSequenceGestureRecognizer>>? gestureRecognizers;
 

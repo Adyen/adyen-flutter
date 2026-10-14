@@ -13,6 +13,7 @@ import '../common/model/payment_method.dart';
 import '../common/model/stored_payment_method.dart';
 import '../generated/platform_api.g.dart';
 import '../util/constants.dart';
+import '../util/dto_mapper.dart';
 import 'platform/android_platform_view.dart';
 import 'component_container.dart';
 import 'platform/ios_platform_view.dart';
@@ -95,28 +96,15 @@ class _CheckoutPaymentComponentState extends State<CheckoutPaymentComponent> {
     final applePayConfiguration = widget.paymentMethod.type == 'applepay'
         ? _runtime.applePayConfiguration(widget.checkout.id)
         : null;
-    final applePayButtonStyle = applePayConfiguration?.buttonStyle;
-    final applePayButtonTheme = applePayButtonStyle?.theme?.name;
-    final applePayButtonType = applePayButtonStyle?.type?.name;
-
-    final creationParams = <String, dynamic>{
-      Constants.checkoutIdKey: widget.checkout.id,
-      Constants.componentIdKey: _componentId,
-      Constants.paymentMethodKey: jsonEncode(widget.paymentMethod.data),
-      Constants.isStoredPaymentMethodKey:
-          widget.paymentMethod is StoredPaymentMethod,
-      if (applePayButtonTheme != null)
-        Constants.applePayButtonThemeKey: applePayButtonTheme,
-      if (applePayButtonType != null)
-        Constants.applePayButtonTypeKey: applePayButtonType,
-      if (applePayButtonStyle?.cornerRadius != null)
-        Constants.applePayButtonCornerRadiusKey:
-            applePayButtonStyle?.cornerRadius,
-      if (applePayConfiguration?.buttonWidth != null)
-        Constants.applePayButtonWidthKey: applePayConfiguration?.buttonWidth,
-      if (applePayConfiguration?.buttonHeight != null)
-        Constants.applePayButtonHeightKey: applePayConfiguration?.buttonHeight,
-    };
+    final creationParams = CheckoutPaymentViewParamsDTO(
+      checkoutId: widget.checkout.id,
+      componentId: _componentId,
+      paymentMethodJson: jsonEncode(widget.paymentMethod.data),
+      isStoredPaymentMethod: widget.paymentMethod is StoredPaymentMethod,
+      applePayButtonStyle: applePayConfiguration?.buttonStyle?.toDTO(),
+      applePayButtonWidth: applePayConfiguration?.buttonWidth,
+      applePayButtonHeight: applePayConfiguration?.buttonHeight,
+    );
 
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:

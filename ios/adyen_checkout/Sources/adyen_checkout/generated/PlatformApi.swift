@@ -1635,6 +1635,55 @@ struct CheckoutEventDTO: Hashable {
   }
 }
 
+/// Generated class from Pigeon that represents data sent in messages.
+struct CheckoutPaymentViewParamsDTO: Hashable {
+  var checkoutId: String
+  var componentId: String
+  var paymentMethodJson: String
+  var isStoredPaymentMethod: Bool
+  var applePayButtonStyle: ApplePayButtonStyleDTO? = nil
+  var applePayButtonWidth: Double? = nil
+  var applePayButtonHeight: Double? = nil
+
+
+  // swift-format-ignore: AlwaysUseLowerCamelCase
+  static func fromList(_ pigeonVar_list: [Any?]) -> CheckoutPaymentViewParamsDTO? {
+    let checkoutId = pigeonVar_list[0] as! String
+    let componentId = pigeonVar_list[1] as! String
+    let paymentMethodJson = pigeonVar_list[2] as! String
+    let isStoredPaymentMethod = pigeonVar_list[3] as! Bool
+    let applePayButtonStyle: ApplePayButtonStyleDTO? = nilOrValue(pigeonVar_list[4])
+    let applePayButtonWidth: Double? = nilOrValue(pigeonVar_list[5])
+    let applePayButtonHeight: Double? = nilOrValue(pigeonVar_list[6])
+
+    return CheckoutPaymentViewParamsDTO(
+      checkoutId: checkoutId,
+      componentId: componentId,
+      paymentMethodJson: paymentMethodJson,
+      isStoredPaymentMethod: isStoredPaymentMethod,
+      applePayButtonStyle: applePayButtonStyle,
+      applePayButtonWidth: applePayButtonWidth,
+      applePayButtonHeight: applePayButtonHeight
+    )
+  }
+  func toList() -> [Any?] {
+    return [
+      checkoutId,
+      componentId,
+      paymentMethodJson,
+      isStoredPaymentMethod,
+      applePayButtonStyle,
+      applePayButtonWidth,
+      applePayButtonHeight,
+    ]
+  }
+  static func == (lhs: CheckoutPaymentViewParamsDTO, rhs: CheckoutPaymentViewParamsDTO) -> Bool {
+    return deepEqualsPlatformApi(lhs.toList(), rhs.toList())  }
+  func hash(into hasher: inout Hasher) {
+    deepHashPlatformApi(value: toList(), hasher: &hasher)
+  }
+}
+
 private class PlatformApiPigeonCodecReader: FlutterStandardReader {
   override func readValue(ofType type: UInt8) -> Any? {
     switch type {
@@ -1788,6 +1837,8 @@ private class PlatformApiPigeonCodecReader: FlutterStandardReader {
       return BinLookupDataDTO.fromList(self.readValue() as! [Any?])
     case 177:
       return CheckoutEventDTO.fromList(self.readValue() as! [Any?])
+    case 178:
+      return CheckoutPaymentViewParamsDTO.fromList(self.readValue() as! [Any?])
     default:
       return super.readValue(ofType: type)
     }
@@ -1942,6 +1993,9 @@ private class PlatformApiPigeonCodecWriter: FlutterStandardWriter {
       super.writeValue(value.toList())
     } else if let value = value as? CheckoutEventDTO {
       super.writeByte(177)
+      super.writeValue(value.toList())
+    } else if let value = value as? CheckoutPaymentViewParamsDTO {
+      super.writeByte(178)
       super.writeValue(value.toList())
     } else {
       super.writeValue(value)

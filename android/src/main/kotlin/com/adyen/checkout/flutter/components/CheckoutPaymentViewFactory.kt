@@ -36,13 +36,13 @@ import com.adyen.checkout.flutter.generated.BinLookupDataDTO
 import com.adyen.checkout.flutter.generated.CheckoutCallbacksFlutterApi
 import com.adyen.checkout.flutter.generated.CheckoutEventDTO
 import com.adyen.checkout.flutter.generated.CheckoutEventTypeDTO
+import com.adyen.checkout.flutter.generated.CheckoutPaymentViewParamsDTO
 import com.adyen.checkout.flutter.generated.ComponentHostApi
 import com.adyen.checkout.flutter.generated.PaymentComponentDataDTO
 import com.adyen.checkout.flutter.generated.SubmitResultDTO
 import com.adyen.checkout.flutter.generated.SubmitResultTypeDTO
 import com.adyen.checkout.flutter.generated.ShopperNameDTO
 import com.adyen.checkout.flutter.session.CheckoutHolder
-import com.adyen.checkout.flutter.utils.Constants
 import io.flutter.plugin.platform.PlatformView
 import io.flutter.plugin.platform.PlatformViewFactory
 import kotlinx.coroutines.suspendCancellableCoroutine
@@ -61,25 +61,21 @@ internal class CheckoutPaymentViewFactory(
         viewId: Int,
         args: Any?,
     ): PlatformView {
-        val creationParams = args as? Map<*, *> ?: emptyMap<Any, Any>()
-        val checkoutId = creationParams[Constants.CHECKOUT_ID_KEY] as? String
-            ?: throw IllegalArgumentException("checkoutId is required.")
-        val componentId = creationParams[Constants.COMPONENT_ID_KEY] as? String
-            ?: throw IllegalArgumentException("componentId is required.")
-        val paymentMethodJson = creationParams[Constants.PAYMENT_METHOD_KEY] as? String
-            ?: throw IllegalArgumentException("paymentMethod is required.")
-        val isStoredPaymentMethod = creationParams[Constants.IS_STORED_PAYMENT_METHOD_KEY] as? Boolean ?: false
-        val checkoutContext = checkoutHolder.get(checkoutId)
+        val params = args as? CheckoutPaymentViewParamsDTO
+            ?: throw IllegalArgumentException("Invalid platform view params.")
+        val checkoutContext = checkoutHolder.get(params.checkoutId)
             ?: throw AdyenPigeonError("CheckoutNotFound", "Checkout is no longer active.")
-        val paymentMethod = deserializePaymentMethod(paymentMethodJson, isStoredPaymentMethod)
+        val paymentMethod = deserializePaymentMethod(params.paymentMethodJson, params.isStoredPaymentMethod)
         val actionData = mutableStateOf<ActionData?>(null)
-        val callbacks = createCallbacks(checkoutId, componentId, checkoutContext) { actionData.value = it }
+        val callbacks = createCallbacks(params.checkoutId, params.componentId, checkoutContext) {
+            actionData.value = it
+        }
 
         return CheckoutPaymentView(
             activity = activity,
             context = context,
-            checkoutId = checkoutId,
-            componentId = componentId,
+            checkoutId = params.checkoutId,
+            componentId = params.componentId,
             paymentMethod = paymentMethod,
             checkoutContext = checkoutContext,
             callbacks = callbacks,

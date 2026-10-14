@@ -2269,6 +2269,78 @@ class CheckoutEventDTO {
   int get hashCode => Object.hashAll(_toList());
 }
 
+class CheckoutPaymentViewParamsDTO {
+  CheckoutPaymentViewParamsDTO({
+    required this.checkoutId,
+    required this.componentId,
+    required this.paymentMethodJson,
+    required this.isStoredPaymentMethod,
+    this.applePayButtonStyle,
+    this.applePayButtonWidth,
+    this.applePayButtonHeight,
+  });
+
+  String checkoutId;
+
+  String componentId;
+
+  String paymentMethodJson;
+
+  bool isStoredPaymentMethod;
+
+  ApplePayButtonStyleDTO? applePayButtonStyle;
+
+  double? applePayButtonWidth;
+
+  double? applePayButtonHeight;
+
+  List<Object?> _toList() {
+    return <Object?>[
+      checkoutId,
+      componentId,
+      paymentMethodJson,
+      isStoredPaymentMethod,
+      applePayButtonStyle,
+      applePayButtonWidth,
+      applePayButtonHeight,
+    ];
+  }
+
+  Object encode() {
+    return _toList();
+  }
+
+  static CheckoutPaymentViewParamsDTO decode(Object result) {
+    result as List<Object?>;
+    return CheckoutPaymentViewParamsDTO(
+      checkoutId: result[0]! as String,
+      componentId: result[1]! as String,
+      paymentMethodJson: result[2]! as String,
+      isStoredPaymentMethod: result[3]! as bool,
+      applePayButtonStyle: result[4] as ApplePayButtonStyleDTO?,
+      applePayButtonWidth: result[5] as double?,
+      applePayButtonHeight: result[6] as double?,
+    );
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  bool operator ==(Object other) {
+    if (other is! CheckoutPaymentViewParamsDTO ||
+        other.runtimeType != runtimeType) {
+      return false;
+    }
+    if (identical(this, other)) {
+      return true;
+    }
+    return _deepEquals(encode(), other.encode());
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  int get hashCode => Object.hashAll(_toList());
+}
+
 class _PigeonCodec extends StandardMessageCodec {
   const _PigeonCodec();
   @override
@@ -2423,6 +2495,9 @@ class _PigeonCodec extends StandardMessageCodec {
     } else if (value is CheckoutEventDTO) {
       buffer.putUint8(177);
       writeValue(buffer, value.encode());
+    } else if (value is CheckoutPaymentViewParamsDTO) {
+      buffer.putUint8(178);
+      writeValue(buffer, value.encode());
     } else {
       super.writeValue(buffer, value);
     }
@@ -2544,6 +2619,8 @@ class _PigeonCodec extends StandardMessageCodec {
         return BinLookupDataDTO.decode(readValue(buffer)!);
       case 177:
         return CheckoutEventDTO.decode(readValue(buffer)!);
+      case 178:
+        return CheckoutPaymentViewParamsDTO.decode(readValue(buffer)!);
       default:
         return super.readValueOfType(type, buffer);
     }

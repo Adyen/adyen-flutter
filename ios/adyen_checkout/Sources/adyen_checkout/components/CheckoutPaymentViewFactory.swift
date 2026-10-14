@@ -19,23 +19,22 @@ final class CheckoutPaymentViewFactory: NSObject, FlutterPlatformViewFactory {
         viewIdentifier _: Int64,
         arguments args: Any?
     ) -> FlutterPlatformView {
-        let arguments = args as? NSDictionary ?? [:]
-        return CheckoutPaymentView(
-            checkoutId: arguments["checkoutId"] as? String ?? "",
-            componentId: arguments["componentId"] as? String ?? "",
-            paymentMethodJson: arguments["paymentMethod"] as? String ?? "",
-            isStoredPaymentMethod: arguments["isStoredPaymentMethod"] as? Bool ?? false,
-            applePayButtonTheme: arguments["applePayButtonTheme"] as? String,
-            applePayButtonType: arguments["applePayButtonType"] as? String,
-            applePayButtonCornerRadius: arguments["applePayButtonCornerRadius"] as? Double,
-            applePayButtonWidth: arguments["applePayButtonWidth"] as? Double,
-            applePayButtonHeight: arguments["applePayButtonHeight"] as? Double,
-            holder: holder,
-            events: events
-        )
+        guard let params = args as? CheckoutPaymentViewParamsDTO else {
+            return FailedPlatformView()
+        }
+        return CheckoutPaymentView(params: params, holder: holder, events: events)
     }
 
     func createArgsCodec() -> FlutterMessageCodec & NSObjectProtocol {
         PlatformApiPigeonCodec.shared
+    }
+}
+
+@MainActor
+private final class FailedPlatformView: NSObject, FlutterPlatformView {
+    private let emptyView = UIView()
+
+    func view() -> UIView {
+        emptyView
     }
 }

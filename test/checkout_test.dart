@@ -10,6 +10,9 @@ import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+String componentIdOf(IosPlatformView view) =>
+    (view.creationParams as CheckoutPaymentViewParamsDTO).componentId;
+
 class FakeCheckoutHostApi extends CheckoutHostApi {
   int disposeCheckoutCount = 0;
   final List<String> disposedCheckoutIds = [];
@@ -478,11 +481,12 @@ void main() {
     final platformView = tester.widget<IosPlatformView>(
       find.byType(IosPlatformView),
     );
-    expect(platformView.creationParams['applePayButtonTheme'], 'white');
-    expect(platformView.creationParams['applePayButtonType'], 'buy');
-    expect(platformView.creationParams['applePayButtonCornerRadius'], 8);
-    expect(platformView.creationParams['applePayButtonWidth'], 180);
-    expect(platformView.creationParams['applePayButtonHeight'], 48);
+    final params = platformView.creationParams as CheckoutPaymentViewParamsDTO;
+    expect(params.applePayButtonStyle?.theme, ApplePayButtonThemeDTO.white);
+    expect(params.applePayButtonStyle?.type, ApplePayButtonTypeDTO.buy);
+    expect(params.applePayButtonStyle?.cornerRadius, 8);
+    expect(params.applePayButtonWidth, 180);
+    expect(params.applePayButtonHeight, 48);
 
     await tester.pumpWidget(const SizedBox.shrink());
     checkout.dispose();
@@ -529,7 +533,7 @@ void main() {
     eventsController.add(CheckoutEventDTO(
       type: CheckoutEventTypeDTO.componentReady,
       checkoutId: checkout.id,
-      componentId: platformView.creationParams['componentId'] as String,
+      componentId: componentIdOf(platformView),
       requiresUserInteraction: false,
     ));
     await tester.runAsync(() => Future<void>.delayed(Duration.zero));
@@ -550,7 +554,7 @@ void main() {
     eventsController.add(CheckoutEventDTO(
       type: CheckoutEventTypeDTO.resize,
       checkoutId: checkout.id,
-      componentId: platformView.creationParams['componentId'] as String,
+      componentId: componentIdOf(platformView),
       height: 56,
     ));
     await tester.runAsync(() => Future<void>.delayed(Duration.zero));
@@ -610,7 +614,7 @@ void main() {
     eventsController.add(CheckoutEventDTO(
       type: CheckoutEventTypeDTO.componentReady,
       checkoutId: checkout.id,
-      componentId: platformView.creationParams['componentId'] as String,
+      componentId: componentIdOf(platformView),
       requiresUserInteraction: false,
     ));
     await tester.runAsync(() => Future<void>.delayed(Duration.zero));
@@ -632,7 +636,7 @@ void main() {
     expect(componentHostApi.submittedCheckoutId, checkout.id);
     expect(
       componentHostApi.submittedComponentId,
-      platformView.creationParams['componentId'],
+      componentIdOf(platformView),
     );
 
     await tester.pumpWidget(const SizedBox.shrink());

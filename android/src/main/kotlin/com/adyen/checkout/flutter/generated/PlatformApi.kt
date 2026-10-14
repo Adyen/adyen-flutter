@@ -1643,6 +1643,52 @@ data class CheckoutEventDTO (
 
   override fun hashCode(): Int = toList().hashCode()
 }
+
+/** Generated class from Pigeon that represents data sent in messages. */
+data class CheckoutPaymentViewParamsDTO (
+  val checkoutId: String,
+  val componentId: String,
+  val paymentMethodJson: String,
+  val isStoredPaymentMethod: Boolean,
+  val applePayButtonStyle: ApplePayButtonStyleDTO? = null,
+  val applePayButtonWidth: Double? = null,
+  val applePayButtonHeight: Double? = null
+)
+ {
+  companion object {
+    fun fromList(pigeonVar_list: List<Any?>): CheckoutPaymentViewParamsDTO {
+      val checkoutId = pigeonVar_list[0] as String
+      val componentId = pigeonVar_list[1] as String
+      val paymentMethodJson = pigeonVar_list[2] as String
+      val isStoredPaymentMethod = pigeonVar_list[3] as Boolean
+      val applePayButtonStyle = pigeonVar_list[4] as ApplePayButtonStyleDTO?
+      val applePayButtonWidth = pigeonVar_list[5] as Double?
+      val applePayButtonHeight = pigeonVar_list[6] as Double?
+      return CheckoutPaymentViewParamsDTO(checkoutId, componentId, paymentMethodJson, isStoredPaymentMethod, applePayButtonStyle, applePayButtonWidth, applePayButtonHeight)
+    }
+  }
+  fun toList(): List<Any?> {
+    return listOf(
+      checkoutId,
+      componentId,
+      paymentMethodJson,
+      isStoredPaymentMethod,
+      applePayButtonStyle,
+      applePayButtonWidth,
+      applePayButtonHeight,
+    )
+  }
+  override fun equals(other: Any?): Boolean {
+    if (other !is CheckoutPaymentViewParamsDTO) {
+      return false
+    }
+    if (this === other) {
+      return true
+    }
+    return PlatformApiPigeonUtils.deepEquals(toList(), other.toList())  }
+
+  override fun hashCode(): Int = toList().hashCode()
+}
 private open class PlatformApiPigeonCodec : StandardMessageCodec() {
   override fun readValueOfType(type: Byte, buffer: ByteBuffer): Any? {
     return when (type) {
@@ -1891,6 +1937,11 @@ private open class PlatformApiPigeonCodec : StandardMessageCodec() {
           CheckoutEventDTO.fromList(it)
         }
       }
+      178.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          CheckoutPaymentViewParamsDTO.fromList(it)
+        }
+      }
       else -> super.readValueOfType(type, buffer)
     }
   }
@@ -2090,6 +2141,10 @@ private open class PlatformApiPigeonCodec : StandardMessageCodec() {
       }
       is CheckoutEventDTO -> {
         stream.write(177)
+        writeValue(stream, value.toList())
+      }
+      is CheckoutPaymentViewParamsDTO -> {
+        stream.write(178)
         writeValue(stream, value.toList())
       }
       else -> super.writeValue(stream, value)

@@ -7,61 +7,35 @@ import UIKit
 
 @MainActor
 final class CheckoutPaymentView: NSObject, FlutterPlatformView {
-    private static let applePayButtonTypes: [String: PKPaymentButtonType] = [
-        "buy": .buy,
-        "setUp": .setUp,
-        "inStore": .inStore,
-        "donate": .donate,
-        "checkout": .checkout,
-        "book": .book,
-        "subscribe": .subscribe,
-        "reload": .reload,
-        "addMoney": .addMoney,
-        "topUp": .topUp,
-        "order": .order,
-        "rent": .rent,
-        "support": .support,
-        "contribute": .contribute,
-        "tip": .tip
-    ]
-
-    private let checkoutId: String
-    private let componentId: String
-    private let paymentMethodJson: String
-    private let isStoredPaymentMethod: Bool
+    private let params: CheckoutPaymentViewParamsDTO
+    private let paymentMethodObject: [String: Any]?
     private let holder: CheckoutHolder
     private let events: ComponentPlatformEventHandler
-    private let applePayButtonTheme: String?
-    private let applePayButtonType: String?
-    private let applePayButtonCornerRadius: Double?
-    private let applePayButtonWidth: Double?
-    private let applePayButtonHeight: Double?
     private let wrapperView = ComponentWrapperView()
     private var component: CheckoutPaymentComponent?
     private var applePayButton: PKPaymentButton?
 
+    private var checkoutId: String {
+        params.checkoutId
+    }
+
+    private var componentId: String {
+        params.componentId
+    }
+
+    private var isApplePay: Bool {
+        paymentMethodObject?["type"] as? String == PaymentMethodType.applePay.rawValue
+    }
+
     init(
-        checkoutId: String,
-        componentId: String,
-        paymentMethodJson: String,
-        isStoredPaymentMethod: Bool,
-        applePayButtonTheme: String?,
-        applePayButtonType: String?,
-        applePayButtonCornerRadius: Double?,
-        applePayButtonWidth: Double?,
-        applePayButtonHeight: Double?,
+        params: CheckoutPaymentViewParamsDTO,
         holder: CheckoutHolder,
         events: ComponentPlatformEventHandler
     ) {
-        self.checkoutId = checkoutId
-        self.componentId = componentId
-        self.paymentMethodJson = paymentMethodJson
-        self.isStoredPaymentMethod = isStoredPaymentMethod
-        self.applePayButtonTheme = applePayButtonTheme
-        self.applePayButtonType = applePayButtonType
-        self.applePayButtonCornerRadius = applePayButtonCornerRadius
-        self.applePayButtonWidth = applePayButtonWidth
-        self.applePayButtonHeight = applePayButtonHeight
+        self.params = params
+        self.paymentMethodObject = try? JSONSerialization.jsonObject(
+            with: Data(params.paymentMethodJson.utf8)
+        ) as? [String: Any]
         self.holder = holder
         self.events = events
         super.init()
@@ -81,7 +55,7 @@ final class CheckoutPaymentView: NSObject, FlutterPlatformView {
 
     private func setup() {
         do {
-            if try isApplePayPaymentMethod(paymentMethodJson) {
+            if isApplePay {
                 setupApplePayButton()
                 sendReady(requiresUserInteraction: true)
                 return
@@ -90,11 +64,7 @@ final class CheckoutPaymentView: NSObject, FlutterPlatformView {
                 throw AdyenPigeonError(code: "CheckoutNotFound", message: "Checkout is no longer active.", details: nil)
             }
 
-            let paymentComponent = try createPaymentComponent(
-                checkout: checkout,
-                paymentMethodJson: paymentMethodJson,
-                isStoredPaymentMethod: isStoredPaymentMethod
-            )
+            let paymentComponent = try createPaymentComponent(checkout: checkout)
             component = paymentComponent
             CheckoutComponentRegistry.shared.register(
                 checkoutId: checkoutId,
@@ -111,24 +81,18 @@ final class CheckoutPaymentView: NSObject, FlutterPlatformView {
         }
     }
 
-    private func isApplePayPaymentMethod(_ paymentMethodJson: String) throws -> Bool {
-        let paymentMethod = try JSONSerialization.jsonObject(
-            with: Data(paymentMethodJson.utf8)
-        ) as? [String: Any]
-        return paymentMethod?["type"] as? String == PaymentMethodType.applePay.rawValue
-    }
-
     private func setupApplePayButton() {
-        let buttonType = mapApplePayButtonType(applePayButtonType)
+        let buttonStyle = params.applePayButtonStyle
+        let buttonType = mapApplePayButtonType(buttonStyle?.type)
         let minimumWidth = buttonType == .plain ? 100.0 : 140.0
-        let width = max(applePayButtonWidth ?? minimumWidth, minimumWidth)
-        let height = max(applePayButtonHeight ?? 30.0, 30.0)
+        let width = max(params.applePayButtonWidth ?? minimumWidth, minimumWidth)
+        let height = max(params.applePayButtonHeight ?? 30.0, 30.0)
         let button = PKPaymentButton(
             paymentButtonType: buttonType,
-            paymentButtonStyle: mapApplePayButtonStyle(applePayButtonTheme)
+            paymentButtonStyle: mapApplePayButtonStyle(buttonStyle?.theme)
         )
-        if let applePayButtonCornerRadius {
-            button.cornerRadius = applePayButtonCornerRadius
+        if let cornerRadius = buttonStyle?.cornerRadius {
+            button.cornerRadius = cornerRadius
         }
         button.translatesAutoresizingMaskIntoConstraints = false
         button.addTarget(
@@ -157,11 +121,7 @@ final class CheckoutPaymentView: NSObject, FlutterPlatformView {
             guard let checkout = holder.checkout(for: checkoutId) else {
                 throw AdyenPigeonError(code: "CheckoutNotFound", message: "Checkout is no longer active.", details: nil)
             }
-            let paymentComponent = try createPaymentComponent(
-                checkout: checkout,
-                paymentMethodJson: paymentMethodJson,
-                isStoredPaymentMethod: isStoredPaymentMethod
-            )
+            let paymentComponent = try createPaymentComponent(checkout: checkout)
             component = paymentComponent
             CheckoutComponentRegistry.shared.register(
                 checkoutId: checkoutId,
@@ -193,30 +153,38 @@ final class CheckoutPaymentView: NSObject, FlutterPlatformView {
         (wrapperView.window?.rootViewController ?? UIViewController.keyWindowRoot)?.topPresenter
     }
 
-    private func mapApplePayButtonStyle(_ style: String?) -> PKPaymentButtonStyle {
-        switch style {
-        case "white": return .white
-        case "whiteOutline": return .whiteOutline
-        case "automatic": return .automatic
-        default: return .black
+    private func mapApplePayButtonStyle(_ theme: ApplePayButtonThemeDTO?) -> PKPaymentButtonStyle {
+        switch theme {
+        case .white: return .white
+        case .whiteWithLine: return .whiteOutline
+        case .black, nil: return .black
         }
     }
 
-    private func mapApplePayButtonType(_ type: String?) -> PKPaymentButtonType {
-        guard let type else { return .plain }
-        return Self.applePayButtonTypes[type] ?? .plain
+    private func mapApplePayButtonType(_ type: ApplePayButtonTypeDTO?) -> PKPaymentButtonType {
+        switch type {
+        case .plain, nil: return .plain
+        case .buy: return .buy
+        case .setUp: return .setUp
+        case .inStore: return .inStore
+        case .donate: return .donate
+        case .checkout: return .checkout
+        case .book: return .book
+        case .subscribe: return .subscribe
+        case .reload: return .reload
+        case .addMoney: return .addMoney
+        case .topUp: return .topUp
+        case .order: return .order
+        case .rent: return .rent
+        case .support: return .support
+        case .contribute: return .contribute
+        case .tip: return .tip
+        }
     }
 
-    private func createPaymentComponent(
-        checkout: PaymentCheckout,
-        paymentMethodJson: String,
-        isStoredPaymentMethod: Bool
-    ) throws -> CheckoutPaymentComponent {
-        if isStoredPaymentMethod {
-            guard let identifier = try JSONSerialization.jsonObject(
-                with: Data(paymentMethodJson.utf8)
-            ) as? [String: Any],
-                let identifier = identifier["id"] as? String else {
+    private func createPaymentComponent(checkout: PaymentCheckout) throws -> CheckoutPaymentComponent {
+        if params.isStoredPaymentMethod {
+            guard let identifier = paymentMethodObject?["id"] as? String else {
                 throw AdyenPigeonError(
                     code: "InvalidPaymentMethod",
                     message: "Stored payment method id is missing.",
@@ -225,8 +193,7 @@ final class CheckoutPaymentView: NSObject, FlutterPlatformView {
             }
             return try checkout.createPaymentComponent(for: identifier)
         }
-        let object = try JSONSerialization.jsonObject(with: Data(paymentMethodJson.utf8)) as? [String: Any]
-        guard let type = object?["type"] as? String,
+        guard let type = paymentMethodObject?["type"] as? String,
               let paymentMethodType = PaymentMethodType(rawValue: type) else {
             throw AdyenPigeonError(
                 code: "InvalidPaymentMethod",
