@@ -22,6 +22,15 @@
 - Native dependencies now track development builds instead of `6.0.0-alpha.1`: Android resolves the
   weekly Sunday snapshot (`2026.10.11-SNAPSHOT`) from Central Portal Snapshots, and iOS pins
   `adyen-ios` `develop` to commit `80b1960` via Swift Package Manager.
+- `CheckoutPaymentComponent` now recreates the native component when the payment method,
+  checkout or controller passed to it changes.
+
+### Fixed
+
+- The Apple Pay button re-enables after the payment sheet is dismissed or fails to present on iOS.
+- `ApplePayButtonTheme.automatic` is now honoured on iOS.
+- The native payment component is now released together with its widget on Android.
+- The component height now follows native content changes, such as card validation errors.
 
 ## 2.0.0-alpha.1
 

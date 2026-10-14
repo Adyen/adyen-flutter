@@ -184,83 +184,91 @@ class ExampleConfigurationDTO {
 
 ## Native UI with Platform Views
 
-Payment components that display native UI (e.g., card input fields) use **Flutter Platform Views**
-to embed native Android/iOS views within Flutter widgets.
+All payment components that display native UI (card fields, Blik, direct/no-input methods, Google
+Pay, Apple Pay) are rendered through **one generic Flutter platform view** with the view type
+`AdyenCheckoutPaymentComponent`.
 
 ### Architecture Overview
 
 ```
-Flutter Widget (Dart)
+CheckoutPaymentComponent (lib/src/components/checkout_payment_component.dart)
+    │  ComponentContainer (component_container.dart)
     │
-    ├── AndroidPlatformView ──► PlatformViewFactory ──► Native Android View
-    │   (lib/src/components/platform/)     (android/.../components/)
+    ├── AndroidPlatformView ──► CheckoutPaymentViewFactory ──► CheckoutPaymentView
+    │   (PlatformViewLink +        (android/.../components/)      └── DynamicComponentView (ComposeView)
+    │    initSurfaceAndroidView)
     │
-    └── IosPlatformView ──► FlutterPlatformViewFactory ──► Native iOS View
-        (lib/src/components/platform/)     (ios/.../components/)
+    └── IosPlatformView ──► CheckoutPaymentViewFactory ──► CheckoutPaymentView
+        (UiKitView)            (ios/.../components/)          ├── ComponentWrapperView + child VC
+                                                              └── ApplePayButtonView (PKPaymentButton)
 ```
 
 ### Key Files
 
-| Layer                    | Android                                   | iOS                                          | Dart                                                                               |
-|--------------------------|-------------------------------------------|----------------------------------------------|------------------------------------------------------------------------------------|
-| Platform View Wrapper    | -                                         | -                                            | `lib/src/components/platform/android_platform_view.dart`, `ios_platform_view.dart` |
-| View Factory             | `components/v2/AdyenComponentFactory.kt`  | `components/v2/AdyenComponentFactory.swift`  | -                                                                                  |
-| Native View Wrapper      | `components/view/DynamicComponentView.kt` | `components/ComponentWrapperView.swift`      | -                                                                                  |
-| Component Implementation | `components/v2/AdyenComponent.kt`         | `components/v2/AdyenComponent.swift`         | `lib/src/v2/adyen_component.dart`, `adyen_base_component.dart`                     |
+| Layer                  | Android (`android/.../flutter/`)                                   | iOS (`ios/.../Sources/adyen_checkout/`)                        | Dart (`lib/src/`)                                                                    |
+|------------------------|--------------------------------------------------------------------|----------------------------------------------------------------|--------------------------------------------------------------------------------------|
+| Widget                 | -                                                                  | -                                                              | `components/checkout_payment_component.dart`, `components/component_container.dart` |
+| Platform view wrapper  | -                                                                  | -                                                              | `components/platform/android_platform_view.dart`, `ios_platform_view.dart`          |
+| View factory           | `components/CheckoutPaymentViewFactory.kt`                         | `components/CheckoutPaymentViewFactory.swift`                  | -                                                                                    |
+| Native view            | `components/CheckoutPaymentView.kt`, `components/view/DynamicComponentView.kt` | `components/CheckoutPaymentView.swift`, `components/platformViewUtils/ComponentWrapperView.swift`, `components/ApplePayButtonView.swift` | -                    |
+| Creation failure       | `components/FailedCheckoutPaymentView.kt`                          | -                                                              | -                                                                                    |
+| Callbacks              | `components/CheckoutCallbacksBridge.kt`, `utils/CheckoutCallbacksMapper.kt` | -                                                     | -                                                                                    |
+| Component registry     | `components/CheckoutComponentRegistry.kt`                          | `components/CheckoutComponentRegistry.swift`                   | -                                                                                    |
+| Error codes            | `utils/ErrorCodes.kt`                                              | `utils/ErrorCodes.swift`                                       | -                                                                                    |
 
-Note: all payment methods rendered as native platform views (Card, Blik, and any future
-method with the same shape) go through this **single generic** factory/component/wrapper —
-there is no longer a dedicated per-payment-method `CardComponentFactory`/`BlikComponentFactory`
-etc. `PlatformMethodResponse`/`paymentMethod.type` is passed straight through to the native
-v6 SDK, which resolves the concrete component internally (see
-`components/view/DynamicComponentView.kt`'s `addV6Component`). Apple Pay/Google Pay are a
-separate case (Dart-drawn buttons, not platform views) — see
-`lib/src/components/apple_pay/`, `lib/src/components/google_pay/`.
+- The view type is defined in `Constants.checkoutPaymentComponentViewType` (Dart),
+  `ComponentPlatformApi.VIEW_TYPE` (Android) and `CheckoutPaymentViewFactory.viewType` (iOS).
+- Android registers the factory once in `AdyenCheckoutPlugin.onAttachedToEngine`; the factory
+  reads the activity lazily at view creation. Creation failures render a
+  `FailedCheckoutPaymentView` and are reported as `failure` events.
+- `CheckoutComponentRegistry` is an instance, not a singleton: owned by the plugin on Android and
+  created in `AdyenCheckoutPlugin.register` on iOS.
+- `lib/src/components/apple_pay/model/` only holds the public Apple Pay button models (style,
+  theme, type). Apple Pay is drawn natively as a `PKPaymentButton` inside `CheckoutPaymentView`;
+  there is no `pay` package and no Dart-drawn payment button.
 
 ### Adding a New Payment Method with Native UI
 
-As of the v6 generic component consolidation (Card and Blik were the first to migrate),
-**do not create a new per-payment-method `PlatformViewFactory`/`FlutterPlatformViewFactory`.**
-The existing generic factory/component pair
-(`components/v2/AdyenComponentFactory.kt`+`AdyenComponent.kt` on Android,
-`components/v2/AdyenComponentFactory.swift`+`AdyenComponent.swift` on iOS) already renders
-*any* payment method type as a native platform view, by passing `paymentMethod.type`
-straight through to the native v6 SDK (`CheckoutTarget.PaymentMethod(...)` on Android,
-`checkout.createPaymentComponent(for:)` on iOS), which resolves the concrete component
-internally. This was confirmed empirically for Google Pay on Android without any plugin
-code changes (see `Plans/Unify Payment Method Components into AdyenComponent.md` in the
-Obsidian vault).
+**Do not create per-payment-method factories.** The generic `CheckoutPaymentViewFactory` /
+`CheckoutPaymentView` pair renders any payment method type: `paymentMethod.type` is passed
+straight to the native v6 SDK (`CheckoutTarget.PaymentMethod(...)` on Android,
+`checkout.createPaymentComponent(for:)` on iOS), which resolves the concrete component.
 
 Before adding anything, check whether the native v6 SDK (adyen-android/adyen-ios) already
-registers a component for the new payment method's `txVariant` in its own generic component
-registry (Android: `PaymentMethodProvider`/`*Initializer.kt` per payment method module; iOS:
-`CheckoutComponentBuilder`/`PaymentMethodType`). If it does, the payment method should
-**already work** through `AdyenComponent`/`lib/src/v2/adyen_component.dart` with no plugin
-changes at all — just verify it manually (both flows, both platforms) rather than writing
-new factory code.
-
-Only fall back to a dedicated per-payment-method implementation if the native v6 SDK does
-**not** yet support the method generically, or if it renders as something other than an
-embeddable platform view (e.g. Apple Pay/Google Pay render as Dart-drawn buttons via the
-`pay` package plus an availability/instant-payment channel, not a platform view — see
-`lib/src/components/apple_pay/`, `lib/src/components/google_pay/`,
-`android/.../components/googlepay/GooglePayComponentManager.kt`,
-`ios/.../components/instant/` for that different pattern).
+registers a component for the payment method's `txVariant` in its own registry (Android:
+`PaymentMethodProvider`/`*Initializer.kt` per payment method module; iOS:
+`CheckoutComponentBuilder`/`PaymentMethodType`). If it does, the method should already work
+through `CheckoutPaymentComponent` with no plugin changes; verify it manually (Sessions and
+Advanced, both platforms). Only add plugin code if the native SDK does not support the method
+generically.
 
 ### Communication Pattern
 
-- **Flutter → Native**: Pass data via `creationParams` when creating the view
-- **Native → Flutter**: Use `ComponentFlutterInterface.onComponentCommunication()` for events.
-    - Events: `onSubmit`, `additionalDetails`, `loading`, `result`, `resize`, `binLookup`,
-      `binValue`, `availability`
-- **Resize handling**: Native views report height changes; Dart widget updates viewport accordingly
+- **Flutter → Native (creation)**: `CheckoutPaymentViewParamsDTO` (`pigeons/platform_api.dart`)
+  is passed as `creationParams`, encoded with `CheckoutHostApi.pigeonChannelCodec`.
+- **Flutter → Native (commands)**: component submit and dispose go through `ComponentHostApi`.
+- **Native → Flutter (events)**: `CheckoutEventDTO` over the `CheckoutEvents` event channel, with
+  types `componentReady`, `resize`, `failure`, `complete`, `binLookup`, `binValue`.
+- **Native → Flutter (callbacks)**: `onSubmit`, `onAdditionalDetails`, `onBeforeSubmit` and the
+  Apple Pay callbacks go through `CheckoutCallbacksFlutterApi`.
+- **Resize handling**: native views measure their content and report the height in `resize`
+  events; the Dart widget updates its viewport. Android measures the Compose content height
+  unconstrained and reports rounded-up dp; iOS uses `preferredContentSize` or
+  `systemLayoutSizeFitting`.
 
 ### Important Notes
 
-- View type IDs must match exactly between Dart and native code
-- Use `ComponentFlutterInterface.pigeonChannelCodec` as the message codec
-- Handle view disposal properly to avoid memory leaks
-- Calculate initial view height per platform (Android/iOS have different component heights)
+- View type IDs must match exactly between Dart and native code.
+- The native view is recreated only when the component id changes (checkout id, payment method
+  data or controller). The platform view is keyed with `ValueKey(componentId)`; do not add other
+  triggers for recreation.
+- Android `DynamicComponentView` disposes its composition explicitly on dispose so the native
+  component is released together with the widget.
+- iOS `CheckoutPaymentView` embeds the native component view controller as a child of the nearest
+  parent view controller.
+- Redirect returns: Android routes the intent to the active component, otherwise to all
+  registered components (needed for Sessions without a controller). On iOS merchants call
+  `Checkout.handleReturn(url:)`.
 
 ## Common Tasks
 
