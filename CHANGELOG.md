@@ -1,3 +1,13 @@
+## Unreleased
+
+### Changed
+
+- **Breaking (iOS):** The plugin is now integrated with Swift Package Manager only. CocoaPods is no
+  longer supported.
+- **Breaking:** The minimum supported Flutter version is raised from 3.16.0 to 3.27.0.
+- **Breaking:** The minimum supported Dart SDK is raised from 3.2.0 to 3.6.0, the Dart version
+  bundled with Flutter 3.27.
+
 ## 1.14.0
 
 ### Fixed
