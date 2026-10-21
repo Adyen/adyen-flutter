@@ -25,7 +25,7 @@ jobs:
     uses: ./.github/workflows/ios_tests.yml
 
   android_agp9_compatibility:
-    name: Android AGP 9 compatibility
+    name: Android Built-in-Kotlin compatibility
     uses: ./.github/workflows/android_agp9_compatibility.yml
 
   sonar_cloud:

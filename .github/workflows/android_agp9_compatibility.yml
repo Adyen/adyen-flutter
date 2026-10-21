@@ -1,4 +1,4 @@
-name: Android AGP 9 compatibility
+name: Android Built-in-Kotlin compatibility
 
 # Informational check that monitors compatibility with Android Gradle Plugin 9 and built-in Kotlin.
 # Build failures are reported as warning annotations (yellow) instead of failing the job or the calling workflow.
@@ -12,7 +12,7 @@ permissions:
 
 jobs:
   android_agp9_compatibility:
-    name: AGP 9 / built-in Kotlin ${{ matrix.built-in-kotlin }} / Flutter ${{ matrix.flutter-version || 'latest stable' }}
+    name: Built-in Kotlin ${{ matrix.built-in-kotlin }} / Flutter ${{ matrix.flutter-version || 'latest stable' }}
     runs-on: ubuntu-24.04
     continue-on-error: true
     timeout-minutes: 30
