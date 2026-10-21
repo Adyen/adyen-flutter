@@ -24,6 +24,10 @@ jobs:
     name: iOS tests
     uses: ./.github/workflows/ios_tests.yml
 
+  android_agp9_compatibility:
+    name: Android AGP 9 compatibility
+    uses: ./.github/workflows/android_agp9_compatibility.yml
+
   sonar_cloud:
     name: Sonar cloud
     needs: [ test_android, test_ios ]

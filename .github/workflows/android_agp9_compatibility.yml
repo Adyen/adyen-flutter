@@ -1,0 +1,110 @@
+name: Android AGP 9 compatibility
+
+# Informational check that monitors compatibility with Android Gradle Plugin 9 and built-in Kotlin.
+# Build failures are reported as warning annotations (yellow) instead of failing the job or the calling workflow.
+
+on:
+  workflow_call:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  android_agp9_compatibility:
+    name: AGP 9 / built-in Kotlin ${{ matrix.built-in-kotlin }} / Flutter ${{ matrix.flutter-version || 'latest stable' }}
+    runs-on: ubuntu-24.04
+    continue-on-error: true
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - flutter-version: 3.44.x
+            built-in-kotlin: false
+          - flutter-version: 3.47.x
+            built-in-kotlin: false
+          - flutter-version: 3.47.x
+            built-in-kotlin: true
+          - flutter-version: ''
+            built-in-kotlin: true
+    env:
+      AGP_VERSION: 9.3.2
+      GRADLE_VERSION: 9.5.1
+      BUILT_IN_KOTLIN: ${{ matrix.built-in-kotlin }}
+
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Set up JDK
+        uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6 # v6.0.1
+        with:
+          distribution: 'zulu'
+          java-version: 17
+
+      - uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2.23.0
+        with:
+          flutter-version: ${{ matrix.flutter-version }}
+          channel: 'stable'
+          cache: true
+          cache-key: agp9-${{ matrix.flutter-version || 'latest' }}
+
+      - name: Gradle cache
+        uses: gradle/actions/setup-gradle@9c971963bec38e04b3d30dcc455b5382be2fdbfb # v6.3.0
+        with:
+          cache-read-only: false
+
+      - name: Create demo project with AGP 9
+        shell: bash
+        run: |
+          flutter create --template=app --platforms=android demo_project
+          cd demo_project
+
+          # Use the same AGP and Gradle versions as the plugin's example app
+          sed -i.bak -E "s/(com\.android\.application\"\)? version \")[^\"]+/\1$AGP_VERSION/" android/settings.gradle*
+          sed -i.bak -E "s/gradle-[0-9.]+-(all|bin)/gradle-$GRADLE_VERSION-\1/" android/gradle/wrapper/gradle-wrapper.properties
+          rm -f android/*.bak android/gradle/wrapper/*.bak
+
+          # Toggle built-in Kotlin and the new AGP DSL
+          sed -i.bak -E '/^android\.(builtInKotlin|newDsl)=/d' android/gradle.properties
+          rm -f android/*.bak
+          {
+            echo "android.builtInKotlin=$BUILT_IN_KOTLIN"
+            echo "android.newDsl=$BUILT_IN_KOTLIN"
+            # Suppress Kotlin JVM target consistency errors in dependencies (pay_android defaults to JVM 1.8)
+            echo "kotlin.jvm.target.validation.mode=warning"
+          } >> android/gradle.properties
+
+          dart pub add 'adyen_checkout:{"path":"../"}'
+
+      - name: Build Android app
+        id: build
+        shell: bash
+        working-directory: demo_project
+        run: |
+          if flutter build apk --debug 2>&1 | tee "$RUNNER_TEMP/build.log"; then
+            echo "result=success" >> "$GITHUB_OUTPUT"
+          else
+            echo "result=failure" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Report compatibility result
+        if: always()
+        shell: bash
+        env:
+          BUILD_RESULT: ${{ steps.build.outputs.result }}
+          MATRIX_NAME: Flutter ${{ matrix.flutter-version || 'latest stable' }}, built-in Kotlin ${{ matrix.built-in-kotlin }}
+        run: |
+          line=$(grep -m1 "plugins that apply Kotlin Gradle Plugin" "$RUNNER_TEMP/build.log" 2>/dev/null || true)
+          if [ -n "$line" ]; then
+            echo "::warning title=Built-in Kotlin ($MATRIX_NAME)::${line#WARNING: }"
+          fi
+          if [ "$BUILD_RESULT" = "failure" ]; then
+            echo "::warning title=AGP 9 compatibility ($MATRIX_NAME)::Build failed. This check is informational and does not block the PR."
+            {
+              echo "### AGP 9 build failed ($MATRIX_NAME)"
+              echo '```'
+              { grep -A8 "What went wrong" "$RUNNER_TEMP/build.log" || tail -30 "$RUNNER_TEMP/build.log"; } | head -30
+              echo '```'
+            } >> "$GITHUB_STEP_SUMMARY"
+          fi
