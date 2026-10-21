@@ -11,7 +11,7 @@ permissions:
   contents: read
 
 jobs:
-  android_agp9_compatibility:
+  android_built_in_kotlin_compatibility:
     name: Built-in Kotlin ${{ matrix.built-in-kotlin }} / Flutter ${{ matrix.flutter-version || 'latest stable' }}
     runs-on: ubuntu-24.04
     continue-on-error: true

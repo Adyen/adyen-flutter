@@ -24,9 +24,9 @@ jobs:
     name: iOS tests
     uses: ./.github/workflows/ios_tests.yml
 
-  android_agp9_compatibility:
+  android_built_in_kotlin_compatibility:
     name: Android Built-in-Kotlin compatibility
-    uses: ./.github/workflows/android_agp9_compatibility.yml
+    uses: ./.github/workflows/android_built_in_kotlin_compatibility.yml
 
   sonar_cloud:
     name: Sonar cloud
