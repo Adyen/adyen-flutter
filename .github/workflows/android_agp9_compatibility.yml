@@ -23,8 +23,6 @@ jobs:
           - flutter-version: 3.44.x
             built-in-kotlin: false
           - flutter-version: 3.47.x
-            built-in-kotlin: false
-          - flutter-version: 3.47.x
             built-in-kotlin: true
           - flutter-version: ''
             built-in-kotlin: true
