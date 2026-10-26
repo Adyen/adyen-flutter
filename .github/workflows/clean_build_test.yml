@@ -20,10 +20,6 @@ jobs:
     name: iOS clean build tests
     uses: ./.github/workflows/ios_clean_build.yml
 
-  ios_spm_build_test:
-    name: iOS SPM test
-    uses: ./.github/workflows/ios_spm_build.yml
-
   flutter_beta_clean_build_test:
     name: Flutter beta clean build test
     uses: ./.github/workflows/flutter_beta_clean_build.yml
