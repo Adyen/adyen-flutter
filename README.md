@@ -4,7 +4,7 @@
 
 [![Pub Package](https://img.shields.io/pub/v/adyen_checkout.svg)](https://pub.dev/packages/adyen_checkout)
 [![Adyen iOS](https://img.shields.io/badge/ios-v5.26.0-brightgreen.svg)](https://github.com/Adyen/adyen-ios/releases/tag/5.26.0)
-[![Adyen Android](https://img.shields.io/badge/android-v5.20.0-brightgreen.svg)](https://github.com/Adyen/adyen-android/releases/tag/5.20.0)
+[![Adyen Android](https://img.shields.io/badge/android-v5.21.0-brightgreen.svg)](https://github.com/Adyen/adyen-android/releases/tag/5.21.0)
 
 The Adyen Flutter package provides you with the building blocks to create a checkout experience for
 your shoppers, allowing them to pay using the payment method of their choice. This is
@@ -60,9 +60,10 @@ release a new version when we need to.
 #### Android
 
 * [Android 6.0](https://www.android.com/versions/marshmallow-6-0/) (API 23) or later.
-* [Kotlin 2.0.20](https://kotlinlang.org/docs/releases.html) or later.
-* [AGP 8.1](https://developer.android.com/build/releases/gradle-plugin) or later with Gradle 8 or
-  later.
+* Android `compileSdk` 36 or later.
+* [Kotlin 2.2.0](https://kotlinlang.org/docs/releases.html) or later.
+* [AGP 8.9.1](https://developer.android.com/build/releases/gradle-plugin) or later with Gradle
+  8.11.1 or later.
 * AGP 9 is supported with built-in Kotlin disabled (requires Flutter 3.44 or later). Built-in Kotlin
   is not supported yet. Make sure your `android/gradle.properties` contains the following flags.
   Flutter adds them automatically when creating or migrating a project. See

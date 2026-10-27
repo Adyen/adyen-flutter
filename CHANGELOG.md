@@ -1,3 +1,15 @@
+## Development
+
+### Changed
+
+- On Android: The minimum build requirements are now Kotlin **2.2.0** (was 2.0.20),
+  AGP **8.9.1** (was 8.1), Gradle **8.11.1** (was 8), and **compileSdk 36**. These
+  requirements come from Android SDK 5.21.0 and its dependencies.
+- Dependency versions:
+  | Name | Version |
+  |---------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------|
+  | [Android Drop-in/Components](https://docs.adyen.com/online-payments/release-notes/?title%5B0%5D=Android+Components%2FDrop-in&version%5B0%5D=5.21.0) | 5.20.0 -> **5.21.0** |
+
 ## 1.14.0
 
 ### Fixed
