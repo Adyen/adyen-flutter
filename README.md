@@ -62,6 +62,8 @@ release a new version when we need to.
 * [Android 6.0](https://www.android.com/versions/marshmallow-6-0/) (API 23) or later.
 * Android `compileSdk` 36 or later.
 * [Kotlin 2.3.21](https://kotlinlang.org/docs/releases.html) or later.
+* For Kotlin DSL builds, migrate legacy `android.kotlinOptions` to
+  [`kotlin.compilerOptions`](https://kotlinlang.org/docs/gradle-compiler-options.html).
 * [AGP 8.13.2](https://developer.android.com/build/releases/gradle-plugin) or later with Gradle
   8.13 or later.
 * AGP 9 is supported with built-in Kotlin disabled (requires Flutter 3.44 or later). Built-in Kotlin
