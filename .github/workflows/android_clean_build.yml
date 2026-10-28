@@ -101,8 +101,10 @@ jobs:
             ' android/app/build.gradle
           fi
 
-          if [ -f android/app/build.gradle.kts ]; then
-            python3 ../.github/scripts/migrate_kotlin_compiler_options.py android/app/build.gradle.kts
+          if [ -f android/app/build.gradle.kts ] && grep -q 'kotlinOptions {' android/app/build.gradle.kts; then
+            jvm_target=$(sed -n '/kotlinOptions {/,/}/s/.*jvmTarget = //p' android/app/build.gradle.kts)
+            sed -i '/kotlinOptions {/,/}/d' android/app/build.gradle.kts
+            printf '\nkotlin { compilerOptions { jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.fromTarget(%s)) } }\n' "$jvm_target" >> android/app/build.gradle.kts
           fi
                     
           # Suppress strict JVM target consistency errors in third-party dependencies.
