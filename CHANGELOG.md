@@ -2,9 +2,10 @@
 
 ### Changed
 
-- On Android: The minimum build requirements are now Kotlin **2.2.0** (was 2.0.20),
-  AGP **8.9.1** (was 8.1), Gradle **8.11.1** (was 8), and **compileSdk 36**. These
-  requirements come from Android SDK 5.21.0 and its dependencies.
+- On Android: The minimum build requirements are now Kotlin **2.3.21** (was 2.0.20),
+  AGP **8.13.2** (was 8.1), Gradle **8.13** (was 8), and **compileSdk 36**. Kotlin
+  now matches Android SDK 5.21.0, and the AGP requirement ensures D8/R8 support for
+  its Kotlin 2.3 classes.
 - Dependency versions:
   | Name | Version |
   |---------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------|

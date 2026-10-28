@@ -73,13 +73,13 @@ jobs:
           
           # Upgrade older templates to the minimum Kotlin version without downgrading newer ones.
           if [ -f android/build.gradle ]; then
-            sed -i -E "s/ext.kotlin_version = '(1\.[^']*|2\.[01]\.[^']*)'/ext.kotlin_version = '2.2.0'/g" android/build.gradle
+            sed -i -E "s/ext.kotlin_version = '(1\.[^']*|2\.[0-2]\.[^']*|2\.3\.([0-9]|1[0-9]|20))'/ext.kotlin_version = '2.3.21'/g" android/build.gradle
           fi
           if [ -f android/settings.gradle ]; then
-            sed -i -E 's/id "org.jetbrains.kotlin.android" version "(1\.[^"]*|2\.[01]\.[^"]*)"/id "org.jetbrains.kotlin.android" version "2.2.0"/g' android/settings.gradle
+            sed -i -E 's/id "org.jetbrains.kotlin.android" version "(1\.[^"]*|2\.[0-2]\.[^"]*|2\.3\.([0-9]|1[0-9]|20))"/id "org.jetbrains.kotlin.android" version "2.3.21"/g' android/settings.gradle
           fi
           if [ -f android/settings.gradle.kts ]; then
-            sed -i -E 's/id\("org.jetbrains.kotlin.android"\) version "(1\.[^"]*|2\.[01]\.[^"]*)"/id("org.jetbrains.kotlin.android") version "2.2.0"/g' android/settings.gradle.kts
+            sed -i -E 's/id\("org.jetbrains.kotlin.android"\) version "(1\.[^"]*|2\.[0-2]\.[^"]*|2\.3\.([0-9]|1[0-9]|20))"/id("org.jetbrains.kotlin.android") version "2.3.21"/g' android/settings.gradle.kts
           fi
 
           # Use the AGP 8 matrix toolchain for older templates, preserving AGP 9 templates.
@@ -101,7 +101,7 @@ jobs:
             ' android/app/build.gradle
           fi
                     
-          # Suppress Kotlin 2.2.x strict JVM target consistency errors in dependencies.
+          # Suppress strict JVM target consistency errors in third-party dependencies.
           # pay_android 3.2.x defaults to JVM 1.8 which conflicts with our JVM 11 target
           echo "kotlin.jvm.target.validation.mode=warning" >> android/gradle.properties
 
