@@ -71,30 +71,26 @@ jobs:
             fi
           }
           
-          change_agp_version() {
-            sed -i "s/id \"com.android.application\" version \"7.3.0\"/id \"com.android.application\" version \"$AGP_VERSION\"/g" android/settings.gradle
-          }
-          
-          # Change Kotlin version and adjust Gradle for Flutter 3.16.x
-          if [[ "$FLUTTER_VERSION" == "3.16.x" ]]; then
-            sed -i "s/ext.kotlin_version = '1.7.10'/ext.kotlin_version = '1.8.22'/g" android/build.gradle
-            sed -i "s/gradle-7.5-all/gradle-$GRADLE_VERSION-all/g" android/gradle/wrapper/gradle-wrapper.properties
-            change_agp_version
-            change_sdk_versions
+          # Upgrade older templates to the minimum Kotlin version without downgrading newer ones.
+          if [ -f android/build.gradle ]; then
+            sed -i -E "s/ext.kotlin_version = '(1\.[^']*|2\.[0-2]\.[^']*|2\.3\.([0-9]|1[0-9]|20))'/ext.kotlin_version = '2.3.21'/g" android/build.gradle
           fi
-          
-          # Change Kotlin version and adjust Gradle for Flutter 3.19.x - 3.24.x versions
-          if [[ "$FLUTTER_VERSION" == "3.19.x" || "$FLUTTER_VERSION" == "3.22.x" || "$FLUTTER_VERSION" == "3.24.x" ]]; then
-            sed -i 's/"org.jetbrains.kotlin.android" version "1.7.10"/"org.jetbrains.kotlin.android" version "1.8.22"/g' android/settings.gradle
-            sed -i "s/gradle-7.6.3-all/gradle-$GRADLE_VERSION-all/g" android/gradle/wrapper/gradle-wrapper.properties
-            change_agp_version
-            change_sdk_versions
+          if [ -f android/settings.gradle ]; then
+            sed -i -E 's/id "org.jetbrains.kotlin.android" version "(1\.[^"]*|2\.[0-2]\.[^"]*|2\.3\.([0-9]|1[0-9]|20))"/id "org.jetbrains.kotlin.android" version "2.3.21"/g' android/settings.gradle
+          fi
+          if [ -f android/settings.gradle.kts ]; then
+            sed -i -E 's/id\("org.jetbrains.kotlin.android"\) version "(1\.[^"]*|2\.[0-2]\.[^"]*|2\.3\.([0-9]|1[0-9]|20))"/id("org.jetbrains.kotlin.android") version "2.3.21"/g' android/settings.gradle.kts
           fi
 
-          # Ensure the demo app meets the plugin's minimum Android SDK requirement for Flutter 3.27.x - 3.32.x
-          if [[ "$FLUTTER_VERSION" == "3.27.x" || "$FLUTTER_VERSION" == "3.29.x" || "$FLUTTER_VERSION" == "3.32.x" ]]; then
-            change_sdk_versions
-          fi  
+          # Use the AGP 8 matrix toolchain for older templates, preserving AGP 9 templates.
+          if [ -f android/settings.gradle ]; then
+            sed -i -E "s/id \"com.android.application\" version \"[78]\.[^\"]*\"/id \"com.android.application\" version \"$AGP_VERSION\"/g" android/settings.gradle
+          fi
+          if [ -f android/settings.gradle.kts ]; then
+            sed -i -E "s/id\(\"com.android.application\"\) version \"[78]\.[^\"]*\"/id(\"com.android.application\") version \"$AGP_VERSION\"/g" android/settings.gradle.kts
+          fi
+          sed -i -E "s/gradle-[78]\.[^-]+-all/gradle-$GRADLE_VERSION-all/g" android/gradle/wrapper/gradle-wrapper.properties
+          change_sdk_versions
 
           # Add missing Kotlin options for Flutter 3.22.x
           if [ $FLUTTER_VERSION == '3.22.x' ]; then
@@ -104,12 +100,16 @@ jobs:
               }\
             ' android/app/build.gradle
           fi
-                    
-          # Suppress Kotlin 2.2.x strict JVM target consistency errors in dependencies (Flutter 3.44.x+)
-          # pay_android 3.2.x defaults to JVM 1.8 which conflicts with our JVM 11 target
-          if [[ "$FLUTTER_VERSION" == "3.44.x" || "$FLUTTER_VERSION" == "3.47.x" ]]; then
-            echo "kotlin.jvm.target.validation.mode=warning" >> android/gradle.properties
+
+          if [ -f android/app/build.gradle.kts ] && grep -q 'kotlinOptions {' android/app/build.gradle.kts; then
+            jvm_target=$(sed -n '/kotlinOptions {/,/}/s/.*jvmTarget = //p' android/app/build.gradle.kts)
+            sed -i '/kotlinOptions {/,/}/d' android/app/build.gradle.kts
+            printf '\nkotlin { compilerOptions { jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.fromTarget(%s)) } }\n' "$jvm_target" >> android/app/build.gradle.kts
           fi
+                    
+          # Suppress strict JVM target consistency errors in third-party dependencies.
+          # pay_android 3.2.x defaults to JVM 1.8 which conflicts with our JVM 11 target
+          echo "kotlin.jvm.target.validation.mode=warning" >> android/gradle.properties
 
           dart pub add 'adyen_checkout:{"path":"../"}'
           flutter build apk --debug  
@@ -155,4 +155,3 @@ jobs:
             echo "Emulator launched"
             adb install build/app/outputs/flutter-apk/app-debug.apk
             adb shell monkey -p com.example.demo_project  -c android.intent.category.LAUNCHER 1
-
