@@ -15,9 +15,13 @@ jobs:
       matrix:
         api-level: [ 36 ]
         flutter-version: [ 3.27.x, 3.29.x, 3.32.x, 3.35.x, 3.38.x, 3.41.x, 3.44.x, 3.47.x ]
+        agp_version: [ 8.13.2 ]
+        gradle_version: [ 8.14.5 ]
     env:
       FLUTTER_VERSION: ${{ matrix.flutter-version }}
       COMPILE_SDK_VERSION: ${{ matrix.api-level }}
+      AGP_VERSION: ${{ matrix.agp_version }}
+      GRADLE_VERSION: ${{ matrix.gradle_version }}
 
     steps:
       - name: Provide more disk space
@@ -67,14 +71,32 @@ jobs:
             fi
           }
           
-          
-          
+          # Upgrade older templates to the minimum Kotlin version without downgrading newer ones.
+          if [ -f android/build.gradle ]; then
+            sed -i -E "s/ext.kotlin_version = '(1\.[^']*|2\.[0-2]\.[^']*|2\.3\.([0-9]|1[0-9]|20))'/ext.kotlin_version = '2.3.21'/g" android/build.gradle
+          fi
+          if [ -f android/settings.gradle ]; then
+            sed -i -E 's/id "org.jetbrains.kotlin.android" version "(1\.[^"]*|2\.[0-2]\.[^"]*|2\.3\.([0-9]|1[0-9]|20))"/id "org.jetbrains.kotlin.android" version "2.3.21"/g' android/settings.gradle
+          fi
+          if [ -f android/settings.gradle.kts ]; then
+            sed -i -E 's/id\("org.jetbrains.kotlin.android"\) version "(1\.[^"]*|2\.[0-2]\.[^"]*|2\.3\.([0-9]|1[0-9]|20))"/id("org.jetbrains.kotlin.android") version "2.3.21"/g' android/settings.gradle.kts
+          fi
 
-          # Ensure the demo app meets the plugin's minimum Android SDK requirement for Flutter 3.27.x - 3.32.x
-          if [[ "$FLUTTER_VERSION" == "3.27.x" || "$FLUTTER_VERSION" == "3.29.x" || "$FLUTTER_VERSION" == "3.32.x" ]]; then
-            change_sdk_versions
-          fi  
+          # Use the AGP 8 matrix toolchain for older templates, preserving AGP 9 templates.
+          if [ -f android/settings.gradle ]; then
+            sed -i -E "s/id \"com.android.application\" version \"[78]\.[^\"]*\"/id \"com.android.application\" version \"$AGP_VERSION\"/g" android/settings.gradle
+          fi
+          if [ -f android/settings.gradle.kts ]; then
+            sed -i -E "s/id\(\"com.android.application\"\) version \"[78]\.[^\"]*\"/id(\"com.android.application\") version \"$AGP_VERSION\"/g" android/settings.gradle.kts
+          fi
+          sed -i -E "s/gradle-[78]\.[^-]+-all/gradle-$GRADLE_VERSION-all/g" android/gradle/wrapper/gradle-wrapper.properties
+          change_sdk_versions
 
+          if [ -f android/app/build.gradle.kts ] && grep -q 'kotlinOptions {' android/app/build.gradle.kts; then
+            jvm_target=$(sed -n '/kotlinOptions {/,/}/s/.*jvmTarget = //p' android/app/build.gradle.kts)
+            sed -i '/kotlinOptions {/,/}/d' android/app/build.gradle.kts
+            printf '\nkotlin { compilerOptions { jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.fromTarget(%s)) } }\n' "$jvm_target" >> android/app/build.gradle.kts
+          fi
                     
           # Suppress strict JVM target consistency errors in third-party dependencies.
           # pay_android 3.2.x defaults to JVM 1.8 which conflicts with our JVM 11 target
