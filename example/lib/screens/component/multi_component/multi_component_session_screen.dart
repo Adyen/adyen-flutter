@@ -7,6 +7,7 @@ import 'package:adyen_checkout_example/repositories/adyen_blik_component_reposit
 import 'package:adyen_checkout_example/repositories/adyen_card_component_repository.dart';
 import 'package:adyen_checkout_example/repositories/adyen_google_pay_component_repository.dart';
 import 'package:adyen_checkout_example/utils/dialog_builder.dart';
+import 'package:adyen_checkout_example/utils/google_pay_payment_method.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -158,10 +159,8 @@ class MultiComponentSessionScreen extends StatelessWidget {
       ),
     );
 
-    final Map<String, dynamic> paymentMethod = _extractPaymentMethodByType(
-      sessionCheckout.paymentMethods,
-      'googlepay',
-    );
+    final Map<String, dynamic> paymentMethod =
+        extractGooglePayPaymentMethod(sessionCheckout.paymentMethods);
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
       child: AdyenGooglePayComponent(
