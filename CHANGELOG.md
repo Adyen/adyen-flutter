@@ -1,17 +1,28 @@
-## Development
+## 1.15.0
+
+### Improved
+
+- On Android: Android Gradle Plugin (AGP) 9 is supported with built-in Kotlin disabled (requires
+  Flutter 3.44 or later).
+  See the [README](https://github.com/Adyen/adyen-flutter/blob/main/README.md#android) for the
+  required `gradle.properties` flags.
 
 ### Changed
 
-- On Android: The minimum build requirements are now Kotlin **2.3.21** (was 2.0.20),
-  AGP **8.13.2** (was 8.1), Gradle **8.13** (was 8), and **compileSdk 36**. Kotlin
-  now matches Android SDK 5.21.0, and the AGP requirement ensures D8/R8 support for
-  its Kotlin 2.3 classes. Projects using Kotlin DSL must migrate legacy
-  `android.kotlinOptions` to `kotlin.compilerOptions`.
+- On Android: Kotlin 2.3.21 matches the version
+  that [Android Drop-in/Components v5.22.0](https://docs.adyen.com/online-payments/release-notes/?title%5B0%5D=Android+Components%2FDrop-in&version%5B0%5D=5.22.0)
+  uses. Android Gradle Plugin (AGP) 8.13.2 includes the versions of D8 and R8 that can process Kotlin
+  2.3 class files. If your app uses the Kotlin DSL, you must also replace `android.kotlinOptions`
+  with `kotlin.compilerOptions` in your build file.
+
 - Dependency versions:
   | Name | Version |
   |---------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------|
   | [Android Drop-in/Components](https://docs.adyen.com/online-payments/release-notes/?title%5B0%5D=Android+Components%2FDrop-in&version%5B0%5D=5.22.0) | 5.20.0 -> **5.22.0** |
   | [iOS Drop-in/Components](https://docs.adyen.com/online-payments/release-notes/?title%5B0%5D=iOS+Components%2FDrop-in&version%5B0%5D=5.27.0) | 5.26.0 -> **5.27.0** |
+  | [Kotlin](https://github.com/JetBrains/kotlin/releases/tag/v2.3.21) | 2.0.20 -> **2.3.21** |
+  | [Android Gradle Plugin](https://developer.android.com/build/releases/gradle-plugin) | **8.13.2** |
+  | [Gradle](https://docs.gradle.org/current/userguide/compatibility.html) | **8.13** |
 
 ## 1.14.0
 
