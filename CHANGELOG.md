@@ -2,14 +2,16 @@
 
 ### Improved
 
-- On Android: AGP 9 is supported with built-in Kotlin disabled (requires Flutter 3.44 or later).
-  See the [README](https://github.com/Adyen/adyen-flutter/blob/main/README.md#android) for the required `gradle.properties` flags.
+- On Android: Android Gradle Plugin (AGP) 9 is supported with built-in Kotlin disabled (requires
+  Flutter 3.44 or later).
+  See the [README](https://github.com/Adyen/adyen-flutter/blob/main/README.md#android) for the
+  required `gradle.properties` flags.
 
 ### Changed
 
-- On Android: Kotlin **2.3.21** matches the version
+- On Android: Kotlin 2.3.21 matches the version
   that [Android Drop-in/Components v5.22.0](https://docs.adyen.com/online-payments/release-notes/?title%5B0%5D=Android+Components%2FDrop-in&version%5B0%5D=5.22.0)
-  uses. Android Gradle Plugin **8.13.2** includes the versions of D8 and R8 that can process Kotlin
+  uses. Android Gradle Plugin (AGP) 8.13.2 includes the versions of D8 and R8 that can process Kotlin
   2.3 class files. If your app uses the Kotlin DSL, you must also replace `android.kotlinOptions`
   with `kotlin.compilerOptions` in your build file.
 
