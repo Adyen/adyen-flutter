@@ -706,7 +706,7 @@
 			repositoryURL = "https://github.com/Adyen/adyen-ios";
 			requirement = {
 				kind = exactVersion;
-				version = 5.26.0;
+				version = 5.27.0;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
