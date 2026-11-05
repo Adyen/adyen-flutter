@@ -138,7 +138,7 @@ class _DropInScreenState extends State<DropInScreen> {
       billingAddressRequired: true,
     );
 
-    //To support CashAppPay please add "pod 'Adyen/CashAppPay'" to your Podfile.
+    //To support CashAppPay please add the AdyenCashAppPay product of the adyen-ios Swift package to your app target.
     final String returnUrl = await widget.repository.determineBaseReturnUrl();
     final CashAppPayConfiguration cashAppPayConfiguration =
         CashAppPayConfiguration(

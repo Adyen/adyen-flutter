@@ -60,6 +60,10 @@ jobs:
           channel: 'stable'
           cache: true
 
+      - name: Enable Swift Package Manager
+        if: matrix.language != 'actions'
+        run: flutter config --enable-swift-package-manager
+
       - name: Prepare Android host project
         if: matrix.language == 'java-kotlin'
         run: |
@@ -75,14 +79,13 @@ jobs:
           flutter clean
           flutter pub get
 
+      - name: Work around flutter_launch_arguments iOS 12.0 manifest
+        if: matrix.language == 'swift'
+        run: find ~/.pub-cache/hosted/pub.dev/flutter_launch_arguments-*/ios example/ios/Flutter/ephemeral -name Package.swift -path "*flutter_launch_arguments*" -exec sed -i '' 's/\.iOS("12\.0")/.iOS("13.0")/' {} +
+
       - name: Setup Gradle
         if: matrix.language == 'java-kotlin'
         uses: gradle/actions/setup-gradle@9c971963bec38e04b3d30dcc455b5382be2fdbfb
-
-      - name: Install CocoaPods dependencies
-        if: matrix.language == 'swift'
-        working-directory: example/ios
-        run: pod install
 
       - name: Initialize CodeQL
         uses: github/codeql-action/init@b96794f015dfd88f77b49b1c93e0fa7110f94c63
@@ -105,6 +108,7 @@ jobs:
           xcodebuild build \
             -workspace Runner.xcworkspace \
             -scheme Runner \
+            -skipPackagePluginValidation \
             -configuration Debug \
             -destination "generic/platform=iOS Simulator" \
             CODE_SIGNING_REQUIRED=NO \
