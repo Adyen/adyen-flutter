@@ -1,5 +1,5 @@
 buildscript {
-    ext.kotlin_version = '2.1.0'
+    ext.kotlin_version = '2.3.21'
     repositories {
         google()
         mavenCentral()
@@ -94,7 +94,7 @@ android {
         debugImplementation 'androidx.compose.ui:ui-test-manifest:1.10.6'
 
         testImplementation 'org.jetbrains.kotlin:kotlin-test'
-        testImplementation 'org.mockito:mockito-core:5.23.0'
+        testImplementation 'org.mockito:mockito-core:5.24.0'
     }
 
     testOptions {

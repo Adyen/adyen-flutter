@@ -28,11 +28,13 @@ not part of this alpha.
 
 ## Requirements
 
-- Flutter `>=3.24.0` and Dart `>=3.5.0`.
+- Flutter `>=3.27.0` and Dart `>=3.6.0`.
 - Android API 23 or later and a `FlutterFragmentActivity` host.
 - iOS 16.0 or later.
-- iOS integration through Swift Package Manager. Flutter 3.24–3.43 projects must opt in to SwiftPM;
-  Flutter 3.44 and later enables it by default.
+- iOS integration through Swift Package Manager only; CocoaPods is no longer supported. Flutter
+  3.27–3.43 projects must opt in to SwiftPM; Flutter 3.44 and later enables it by default. Use
+  [adyen_checkout 1.15.0](https://pub.dev/packages/adyen_checkout/versions/1.15.0) as the last
+  version for CocoaPods.
 - Checkout API v71 or later.
 - AGP 9 is supported with built-in Kotlin disabled (requires Flutter 3.44 or later). Built-in
   Kotlin is not supported yet. Make sure `android/gradle.properties` contains

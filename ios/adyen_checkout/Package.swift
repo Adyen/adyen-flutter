@@ -1,6 +1,17 @@
 // swift-tools-version: 5.9
 
+import Foundation
 import PackageDescription
+
+let hasFlutterFramework = FileManager.default.fileExists(
+    atPath: URL(fileURLWithPath: Context.packageDirectory).appendingPathComponent("../FlutterFramework").path
+)
+let flutterFrameworkDependencies: [Package.Dependency] = hasFlutterFramework
+    ? [.package(name: "FlutterFramework", path: "../FlutterFramework")]
+    : []
+let flutterFrameworkTargetDependencies: [Target.Dependency] = hasFlutterFramework
+    ? [.product(name: "FlutterFramework", package: "FlutterFramework")]
+    : []
 
 let package = Package(
     name: "adyen_checkout",
@@ -11,16 +22,14 @@ let package = Package(
         .library(name: "adyen-checkout", targets: ["adyen_checkout"])
     ],
     dependencies: [
-        .package(name: "FlutterFramework", path: "../FlutterFramework"),
         // adyen-ios develop pinned to the latest commit on 2026-11-09 (committed 2026-11-06).
         // Advance the revision to move the pin forward.
         .package(url: "https://github.com/Adyen/adyen-ios", revision: "e3092053f15139146b248d1a90ecef0cf0adbf70")
-    ],
+    ] + flutterFrameworkDependencies,
     targets: [
         .target(
             name: "adyen_checkout",
-            dependencies: [
-                .product(name: "FlutterFramework", package: "FlutterFramework"),
+            dependencies: flutterFrameworkTargetDependencies + [
                 .product(name: "Adyen", package: "adyen-ios"),
                 .product(name: "AdyenActions", package: "adyen-ios"),
                 .product(name: "AdyenCard", package: "adyen-ios"),
