@@ -19,7 +19,6 @@ import com.adyen.checkout.core.components.Checkout
 import com.adyen.checkout.core.components.CheckoutController
 import com.adyen.checkout.core.common.CheckoutResultCode
 import com.adyen.checkout.core.components.CheckoutAction
-import com.adyen.checkout.core.components.data.model.paymentmethod.PaymentMethods
 import com.adyen.checkout.core.error.CheckoutError
 import com.adyen.checkout.cse.CardEncrypter
 import com.adyen.checkout.dropin.DropIn
@@ -34,6 +33,7 @@ import com.adyen.checkout.flutter.generated.ActionComponentDataDTO
 import com.adyen.checkout.flutter.generated.ActionOnlyFlutterApi
 import com.adyen.checkout.flutter.generated.AdyenPigeonError
 import com.adyen.checkout.flutter.generated.AdvancedCheckoutResultDTO
+import com.adyen.checkout.flutter.generated.CheckoutCallbacksDTO
 import com.adyen.checkout.flutter.generated.CheckoutConfigurationDTO
 import com.adyen.checkout.flutter.generated.CheckoutEventDTO
 import com.adyen.checkout.flutter.generated.CheckoutEventTypeDTO
@@ -48,7 +48,6 @@ import com.adyen.checkout.flutter.utils.ErrorCodes
 import com.google.android.gms.wallet.WalletConstants
 import com.adyen.threeds2.ThreeDS2Service
 import kotlinx.coroutines.CompletableDeferred
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import org.json.JSONArray
@@ -59,7 +58,6 @@ import kotlin.coroutines.resume
 internal class CheckoutPlatformApi(
     private val activity: FragmentActivity,
     private val checkoutHolder: CheckoutHolder,
-    private val callbacksApi: com.adyen.checkout.flutter.generated.CheckoutCallbacksFlutterApi,
     private val actionOnlyApi: ActionOnlyFlutterApi,
     private val eventHandler: ComponentPlatformEventHandler,
     private val dropInLauncher: DropInLauncher?,
@@ -72,6 +70,7 @@ internal class CheckoutPlatformApi(
     override fun setupSession(
         sessionResponse: SessionResponseDTO,
         configuration: CheckoutConfigurationDTO,
+        callbacks: CheckoutCallbacksDTO,
         callback: (Result<CheckoutSetupResultDTO>) -> Unit,
     ) {
         activity.lifecycleScope.launch {
@@ -92,40 +91,7 @@ internal class CheckoutPlatformApi(
                     is Checkout.Result.Success -> {
                         val checkoutId = UUID.randomUUID().toString()
                         val reply = result.checkoutContext.toSessionSetupResult(checkoutId)
-                        checkoutHolder.put(checkoutId, result.checkoutContext)
-                        callback(Result.success(reply))
-                    }
-                }
-            } catch (error: Throwable) {
-                callback(Result.failure(error.toPigeonError()))
-            }
-        }
-    }
-
-    override fun setupAdvanced(
-        paymentMethodsJson: String,
-        configuration: CheckoutConfigurationDTO,
-        callback: (Result<CheckoutSetupResultDTO>) -> Unit,
-    ) {
-        activity.lifecycleScope.launch {
-            try {
-                if (checkoutHolder.isActive()) {
-                    throw AdyenPigeonError(
-                        ErrorCodes.CHECKOUT_ALREADY_ACTIVE,
-                        "Another checkout flow is already active.",
-                    )
-                }
-                val paymentMethods = PaymentMethods.SERIALIZER.deserialize(JSONObject(paymentMethodsJson))
-                val result = Checkout.setup(
-                    paymentMethods = paymentMethods,
-                    configuration = configuration.toCheckoutConfiguration(),
-                )
-                when (result) {
-                    is Checkout.Result.Error -> throw result.error.toPigeonError()
-                    is Checkout.Result.Success -> {
-                        val checkoutId = UUID.randomUUID().toString()
-                        val reply = setupResult(checkoutId, paymentMethods)
-                        checkoutHolder.put(checkoutId, result.checkoutContext)
+                        checkoutHolder.put(checkoutId, result.checkoutContext, callbacks.card)
                         callback(Result.success(reply))
                     }
                 }
@@ -389,15 +355,6 @@ internal class CheckoutPlatformApi(
             storedPaymentMethodsJson = serializeStoredMethods(methods?.storedPaymentMethods.orEmpty()),
         )
     }
-
-    private fun setupResult(
-        checkoutId: String,
-        methods: PaymentMethods,
-    ): CheckoutSetupResultDTO = CheckoutSetupResultDTO(
-        checkoutId = checkoutId,
-        regularPaymentMethodsJson = serializeMethods(methods.paymentMethods.orEmpty()),
-        storedPaymentMethodsJson = serializeStoredMethods(methods.storedPaymentMethods.orEmpty()),
-    )
 
     private fun serializeMethods(
         methods: List<com.adyen.checkout.core.components.data.model.paymentmethod.PaymentMethod>,

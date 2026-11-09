@@ -1,12 +1,11 @@
 import 'package:adyen_checkout_example/config.dart';
 import 'package:adyen_checkout_example/network/service.dart';
-import 'package:adyen_checkout_example/repositories/advanced_checkout_repository.dart';
+import 'package:adyen_checkout_example/repositories/api_only_checkout_repository.dart';
 import 'package:adyen_checkout_example/repositories/session_checkout_repository.dart';
 import 'package:adyen_checkout_example/screens/api_only/card_state_notifier.dart';
 import 'package:adyen_checkout_example/screens/api_only/custom_card_screen.dart';
 import 'package:adyen_checkout_example/screens/component/component_navigation_screen.dart';
 import 'package:adyen_checkout_example/screens/component/instant/instant_component_navigation_screen.dart';
-import 'package:adyen_checkout_example/screens/component/multi_component/multi_component_advanced_screen.dart';
 import 'package:adyen_checkout_example/screens/component/multi_component/multi_component_navigation_screen.dart';
 import 'package:adyen_checkout_example/screens/component/multi_component/multi_component_session_screen.dart';
 import 'package:adyen_checkout_example/screens/drop_in/drop_in_screen.dart';
@@ -27,7 +26,7 @@ class CheckoutExample extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final sessionRepository = SessionCheckoutRepository(service: service);
-    final advancedRepository = AdvancedCheckoutRepository(service: service);
+    final apiOnlyRepository = ApiOnlyCheckoutRepository(service: service);
 
     return MaterialApp(
       localizationsDelegates: const [
@@ -58,42 +57,35 @@ class CheckoutExample extends StatelessWidget {
             DropInScreen(repository: sessionRepository),
         '/cardComponentScreen': (context) => ComponentNavigationScreen(
               sessionRepository: sessionRepository,
-              advancedRepository: advancedRepository,
               title: 'Card',
               txVariant: 'scheme',
               showCardBottomSheet: true,
             ),
         '/blikComponentNavigation': (context) => ComponentNavigationScreen(
               sessionRepository: sessionRepository,
-              advancedRepository: advancedRepository,
               title: 'BLIK',
               txVariant: 'blik',
             ),
         '/googlePayNavigation': (context) => ComponentNavigationScreen(
               sessionRepository: sessionRepository,
-              advancedRepository: advancedRepository,
               title: 'Google Pay',
               txVariant: 'googlepay',
             ),
         '/applePayNavigation': (context) => ComponentNavigationScreen(
               sessionRepository: sessionRepository,
-              advancedRepository: advancedRepository,
               title: 'Apple Pay',
               txVariant: 'applepay',
             ),
         '/instantComponentNavigation': (context) =>
             InstantComponentNavigationScreen(
               sessionRepository: sessionRepository,
-              advancedRepository: advancedRepository,
             ),
         '/multiComponentNavigationScreen': (context) =>
             const MultiComponentNavigationScreen(),
         '/multiComponentSessionScreen': (context) =>
             MultiComponentSessionScreen(repository: sessionRepository),
-        '/multiComponentAdvancedScreen': (context) =>
-            MultiComponentAdvancedScreen(repository: advancedRepository),
         '/customCard': (context) => Provider(
-              notifier: CardStateNotifier(repository: advancedRepository),
+              notifier: CardStateNotifier(repository: apiOnlyRepository),
               child: const CustomCardScreen(),
             ),
       },

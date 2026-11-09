@@ -3,7 +3,7 @@ import Foundation
 
 @MainActor
 final class CheckoutHolder {
-    private var checkouts: [String: PaymentCheckout] = [:]
+    private var checkouts: [String: Checkout] = [:]
     private var activeActionId: String?
     var actionCheckout: ActionOnlyCheckout?
 
@@ -11,11 +11,11 @@ final class CheckoutHolder {
         !checkouts.isEmpty || activeActionId != nil
     }
 
-    func store(_ checkout: PaymentCheckout, id: String) {
+    func store(_ checkout: Checkout, id: String) {
         checkouts[id] = checkout
     }
 
-    func checkout(for id: String) -> PaymentCheckout? {
+    func checkout(for id: String) -> Checkout? {
         checkouts[id]
     }
 

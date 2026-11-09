@@ -1,6 +1,6 @@
 # Adyen Flutter Checkout 2.0 example
 
-This example demonstrates the Flutter 2.0 alpha Sessions and Advanced flows with development builds
+This example demonstrates the Flutter 2.0 alpha Sessions flow with development builds
 of the native Adyen Checkout v6 SDKs (Android weekly snapshot, iOS `develop` pin). It uses the generic `CheckoutPaymentComponent` for regular and stored
 payment methods and demonstrates the checkout-owned callback lifecycle.
 

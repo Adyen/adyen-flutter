@@ -22,7 +22,7 @@ class SessionComponentScreen extends StatefulWidget {
 }
 
 class _SessionComponentScreenState extends State<SessionComponentScreen> {
-  SessionCheckout? _checkout;
+  Checkout? _checkout;
   bool _loading = true;
 
   @override
@@ -42,7 +42,7 @@ class _SessionComponentScreenState extends State<SessionComponentScreen> {
 
     try {
       final checkout = await widget.repository.setupCheckout(
-        callbacks: SessionCheckoutCallbacks(
+        callbacks: CheckoutCallbacks(
           onComplete: _onComplete,
           onFailure: _onFailure,
           onBeforeSubmit: (data) async => BeforeSubmitProceed(data: data),
@@ -63,7 +63,7 @@ class _SessionComponentScreenState extends State<SessionComponentScreen> {
     }
   }
 
-  void _onComplete(SessionCheckoutResult result) {
+  void _onComplete(CheckoutResult result) {
     if (!mounted) return;
     DialogBuilder.showPaymentResultDialog(
       'Payment Result',

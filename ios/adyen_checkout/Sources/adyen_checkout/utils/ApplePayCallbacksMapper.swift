@@ -3,56 +3,55 @@ import AdyenComponents
 import Foundation
 import PassKit
 
-extension ApplePayConfigurationDTO {
-    func attachCallbacks(
-        to configuration: ApplePayConfiguration,
+extension ApplePayCallbacksDTO {
+    func makeCallbacks(
         callbacksApi: CheckoutCallbacksFlutterApi,
         checkoutId: String,
         currencyCode: String
-    ) -> ApplePayConfiguration {
-        var configuration = configuration
+    ) -> ApplePayCallbacks {
+        var callbacks = ApplePayCallbacks()
         if hasOnSelectShippingMethod {
-            configuration = attachShippingMethodCallback(
-                to: configuration,
+            callbacks = attachShippingMethodCallback(
+                to: callbacks,
                 callbacksApi: callbacksApi,
                 checkoutId: checkoutId,
                 currencyCode: currencyCode
             )
         }
         if hasOnSelectShippingContact {
-            configuration = attachShippingContactCallback(
-                to: configuration,
+            callbacks = attachShippingContactCallback(
+                to: callbacks,
                 callbacksApi: callbacksApi,
                 checkoutId: checkoutId,
                 currencyCode: currencyCode
             )
         }
         if hasOnChangeCouponCode {
-            configuration = attachCouponCodeCallback(
-                to: configuration,
+            callbacks = attachCouponCodeCallback(
+                to: callbacks,
                 callbacksApi: callbacksApi,
                 checkoutId: checkoutId,
                 currencyCode: currencyCode
             )
         }
         if hasOnAuthorize {
-            configuration = attachAuthorizationCallback(
-                to: configuration,
+            callbacks = attachAuthorizationCallback(
+                to: callbacks,
                 callbacksApi: callbacksApi,
                 checkoutId: checkoutId,
                 currencyCode: currencyCode
             )
         }
-        return configuration
+        return callbacks
     }
 
     private func attachShippingMethodCallback(
-        to configuration: ApplePayConfiguration,
+        to callbacks: ApplePayCallbacks,
         callbacksApi: CheckoutCallbacksFlutterApi,
         checkoutId: String,
         currencyCode: String
-    ) -> ApplePayConfiguration {
-        configuration.onSelectShippingMethod { method, currentItems in
+    ) -> ApplePayCallbacks {
+        callbacks.onSelectShippingMethod { method, currentItems in
             await withCheckedContinuation { continuation in
                 callbacksApi.onApplePaySelectShippingMethod(
                     checkoutId: checkoutId,
@@ -71,12 +70,12 @@ extension ApplePayConfigurationDTO {
     }
 
     private func attachShippingContactCallback(
-        to configuration: ApplePayConfiguration,
+        to callbacks: ApplePayCallbacks,
         callbacksApi: CheckoutCallbacksFlutterApi,
         checkoutId: String,
         currencyCode: String
-    ) -> ApplePayConfiguration {
-        configuration.onSelectShippingContact { contact, currentItems in
+    ) -> ApplePayCallbacks {
+        callbacks.onSelectShippingContact { contact, currentItems in
             await withCheckedContinuation { continuation in
                 callbacksApi.onApplePaySelectShippingContact(
                     checkoutId: checkoutId,
@@ -100,12 +99,12 @@ extension ApplePayConfigurationDTO {
 
     @available(iOS 15.0, *)
     private func attachCouponCodeCallback(
-        to configuration: ApplePayConfiguration,
+        to callbacks: ApplePayCallbacks,
         callbacksApi: CheckoutCallbacksFlutterApi,
         checkoutId: String,
         currencyCode: String
-    ) -> ApplePayConfiguration {
-        configuration.onChangeCouponCode { code, currentItems in
+    ) -> ApplePayCallbacks {
+        callbacks.onChangeCouponCode { code, currentItems in
             await withCheckedContinuation { continuation in
                 callbacksApi.onApplePayChangeCouponCode(
                     checkoutId: checkoutId,
@@ -128,12 +127,12 @@ extension ApplePayConfigurationDTO {
     }
 
     private func attachAuthorizationCallback(
-        to configuration: ApplePayConfiguration,
+        to callbacks: ApplePayCallbacks,
         callbacksApi: CheckoutCallbacksFlutterApi,
         checkoutId: String,
         currencyCode: String
-    ) -> ApplePayConfiguration {
-        configuration.onAuthorize { payment in
+    ) -> ApplePayCallbacks {
+        callbacks.onAuthorize { payment in
             await withCheckedContinuation { continuation in
                 callbacksApi.onApplePayAuthorize(
                     checkoutId: checkoutId,

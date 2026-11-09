@@ -26,7 +26,6 @@ class AdyenCheckoutPlugin : FlutterPlugin, ActivityAware {
     private var checkoutPlatformApi: CheckoutPlatformApi? = null
     private var componentPlatformApi: ComponentPlatformApi? = null
     private var eventHandler: ComponentPlatformEventHandler? = null
-    private var callbacksApi: CheckoutCallbacksFlutterApi? = null
     private var newIntentListener: Consumer<android.content.Intent>? = null
     private var dropInLauncher: DropInLauncher? = null
     private val checkoutHolder = CheckoutHolder()
@@ -37,7 +36,6 @@ class AdyenCheckoutPlugin : FlutterPlugin, ActivityAware {
         val eventHandler = ComponentPlatformEventHandler()
         val callbacksApi = CheckoutCallbacksFlutterApi(binding.binaryMessenger)
         this.eventHandler = eventHandler
-        this.callbacksApi = callbacksApi
         EventsStreamHandler.register(binding.binaryMessenger, eventHandler)
         componentPlatformApi = ComponentPlatformApi(componentRegistry)
         ComponentHostApi.setUp(binding.binaryMessenger, componentPlatformApi)
@@ -58,7 +56,6 @@ class AdyenCheckoutPlugin : FlutterPlugin, ActivityAware {
         componentRegistry.clear()
         componentPlatformApi = null
         eventHandler = null
-        callbacksApi = null
         flutterPluginBinding = null
     }
 
@@ -83,14 +80,13 @@ class AdyenCheckoutPlugin : FlutterPlugin, ActivityAware {
             ?: throw Exception(WRONG_FLUTTER_ACTIVITY_USAGE_ERROR_MESSAGE)
         activityPluginBinding = binding
         val pluginBinding = flutterPluginBinding ?: return
-        val callbacksApi = callbacksApi ?: return
         val eventHandler = eventHandler ?: return
         // Drop-in launchers must be registered while the activity is being created, before it
         // reaches the STARTED state.
         dropInLauncher = DropIn.registerForResult(activity) { result ->
             checkoutPlatformApi?.onDropInResult(result)
         }
-        setupPlatformCommunication(activity, pluginBinding.binaryMessenger, callbacksApi, eventHandler)
+        setupPlatformCommunication(activity, pluginBinding.binaryMessenger, eventHandler)
         val listener = Consumer<android.content.Intent> { intent: android.content.Intent ->
             checkoutPlatformApi?.handleReturn(intent)
             componentPlatformApi?.handleReturn(intent)
@@ -102,14 +98,12 @@ class AdyenCheckoutPlugin : FlutterPlugin, ActivityAware {
     private fun setupPlatformCommunication(
         activity: FragmentActivity,
         messenger: BinaryMessenger,
-        callbacksApi: CheckoutCallbacksFlutterApi,
         eventHandler: ComponentPlatformEventHandler,
     ) {
         val actionOnlyApi = ActionOnlyFlutterApi(messenger)
         checkoutPlatformApi = CheckoutPlatformApi(
             activity = activity,
             checkoutHolder = checkoutHolder,
-            callbacksApi = callbacksApi,
             actionOnlyApi = actionOnlyApi,
             eventHandler = eventHandler,
             dropInLauncher = dropInLauncher,

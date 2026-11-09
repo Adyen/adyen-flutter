@@ -3,10 +3,13 @@ import 'package:adyen_checkout_example/config.dart';
 import 'package:adyen_checkout_example/network/service.dart';
 import 'package:flutter/foundation.dart';
 
-class AdvancedCheckoutRepository {
+/// Backs the API-only (custom card / CSE) screen: it calls the payments
+/// endpoint directly and resolves any returned action via the action-only
+/// [AdyenCheckout.instance.handleAction].
+class ApiOnlyCheckoutRepository {
   final Service service;
 
-  AdvancedCheckoutRepository({required this.service});
+  ApiOnlyCheckoutRepository({required this.service});
 
   String get channel =>
       defaultTargetPlatform == TargetPlatform.iOS ? 'iOS' : 'Android';
@@ -21,8 +24,6 @@ class AdvancedCheckoutRepository {
   CheckoutConfiguration buildConfiguration() => CheckoutConfiguration(
         environment: Config.environment,
         clientKey: Config.clientKey,
-        amount: Config.amount,
-        countryCode: Config.countryCode,
         cardConfiguration: const CardConfiguration(
           showCardholderName: true,
           showStorePaymentMethod: false,
@@ -31,6 +32,7 @@ class AdvancedCheckoutRepository {
         googlePayConfiguration: defaultTargetPlatform == TargetPlatform.android
             ? const GooglePayConfiguration(
                 googlePayEnvironment: Config.googlePayEnvironment,
+                countryCode: Config.countryCode,
                 emailRequired: true,
               )
             : null,
@@ -39,6 +41,8 @@ class AdvancedCheckoutRepository {
             ? const ApplePayConfiguration(
                 merchantId: Config.merchantId,
                 merchantName: Config.merchantName,
+                amount: Config.amount,
+                countryCode: Config.countryCode,
                 applePaySummaryItems: [
                   ApplePaySummaryItem(
                     label: Config.merchantName,
@@ -52,57 +56,6 @@ class AdvancedCheckoutRepository {
               )
             : null,
       );
-
-  Future<PaymentMethods> fetchPaymentMethods() async {
-    final response = await service.fetchPaymentMethods({
-      'merchantAccount': Config.merchantAccount,
-      'amount': Config.amount.toJson(),
-      'countryCode': Config.countryCode,
-      'channel': channel,
-    });
-    return PaymentMethods.fromJson(response);
-  }
-
-  Future<AdvancedCheckout> setupCheckout({
-    required AdvancedCheckoutCallbacks callbacks,
-  }) async {
-    final paymentMethods = await fetchPaymentMethods();
-    return Checkout.instance.setupAdvanced(
-      paymentMethods: paymentMethods,
-      configuration: buildConfiguration(),
-      callbacks: callbacks,
-    );
-  }
-
-  Future<SubmitResult> onSubmit(PaymentComponentData data) async {
-    final response = await service.postPayments({
-      'merchantAccount': Config.merchantAccount,
-      'shopperReference': Config.shopperReference,
-      'reference': 'flutter-test_${DateTime.now().millisecondsSinceEpoch}',
-      'returnUrl': determineReturnUrl(),
-      'amount': Config.amount.toJson(),
-      'countryCode': Config.countryCode,
-      'channel': channel,
-      'recurringProcessingModel': 'CardOnFile',
-      'shopperInteraction': 'Ecommerce',
-      'authenticationData': {
-        'threeDSRequestData': {
-          'nativeThreeDS': 'preferred',
-        },
-      },
-      ...data.data,
-      'lineItems': Config.lineItems,
-    });
-    final action = response['action'];
-    if (action is Map) {
-      return SubmitResult.action(
-        Action.fromJson(Map<String, dynamic>.from(action)),
-      );
-    }
-    return SubmitResult.completion(
-      resultCode: response['resultCode'] as String? ?? 'Error',
-    );
-  }
 
   Future<AdditionalDetailsResult> onAdditionalDetails(
     ActionComponentData data,
@@ -118,7 +71,7 @@ class AdvancedCheckoutRepository {
     required Future<AdditionalDetailsResult> Function(ActionComponentData data)
         onAdditionalDetails,
   }) =>
-      Checkout.instance.handleAction(
+      AdyenCheckout.instance.handleAction(
         action: Action.fromJson(actionJson),
         configuration: buildConfiguration(),
         onAdditionalDetails: onAdditionalDetails,

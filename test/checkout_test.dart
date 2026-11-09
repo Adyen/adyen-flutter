@@ -9,7 +9,7 @@ import 'package:adyen_checkout/src/generated/platform_api.g.dart';
 import 'package:flutter/cupertino.dart' show CupertinoActivityIndicator;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/widgets.dart' hide Action;
 import 'package:flutter_test/flutter_test.dart';
 
 String componentIdOf(IosPlatformView view) =>
@@ -34,19 +34,10 @@ class FakeCheckoutHostApi extends CheckoutHostApi {
   Future<CheckoutSetupResultDTO> setupSession(
     SessionResponseDTO sessionResponse,
     CheckoutConfigurationDTO configuration,
-  ) async {
-    if (failSetupsWithAlreadyActive) {
-      throw PlatformException(code: 'CheckoutAlreadyActive');
-    }
-    return _setupResult();
-  }
-
-  @override
-  Future<CheckoutSetupResultDTO> setupAdvanced(
-    String paymentMethodsJson,
-    CheckoutConfigurationDTO configuration,
+    CheckoutCallbacksDTO callbacks,
   ) async {
     lastConfiguration = configuration;
+    lastCallbacks = callbacks;
     if (failSetupsWithAlreadyActive) {
       throw PlatformException(code: 'CheckoutAlreadyActive');
     }
@@ -55,6 +46,7 @@ class FakeCheckoutHostApi extends CheckoutHostApi {
 
   int clearActiveCheckoutCount = 0;
   CheckoutConfigurationDTO? lastConfiguration;
+  CheckoutCallbacksDTO? lastCallbacks;
   bool failSetupsWithAlreadyActive = false;
 
   @override
@@ -160,6 +152,35 @@ void main() {
     );
   });
 
+  Future<Checkout> setUpSession({
+    CheckoutConfiguration configuration = const CheckoutConfiguration(
+      environment: Environment.test,
+      clientKey: 'test_key',
+    ),
+    CheckoutCallbacks? callbacks,
+  }) =>
+      runtime.setupSession(
+        sessionResponse: const SessionResponse(
+          id: 'session-1',
+          sessionData: 'session-data',
+        ),
+        configuration: configuration,
+        callbacks: callbacks ??
+            CheckoutCallbacks(
+              onComplete: (result) {},
+              onFailure: (error) {},
+              onBeforeSubmit: (data) async => BeforeSubmitProceed(data: data),
+            ),
+      );
+
+  CheckoutEventDTO completeEvent(String checkoutId) => CheckoutEventDTO(
+        type: CheckoutEventTypeDTO.complete,
+        checkoutId: checkoutId,
+        resultCode: 'Authorised',
+        sessionId: 'session-1',
+        sessionResult: 'session-result',
+      );
+
   tearDown(() async {
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
         .setMockMethodCallHandler(SystemChannels.platform_views, null);
@@ -186,31 +207,13 @@ void main() {
     expect(methods.regular.first.data['type'], 'ideal');
   });
 
-  test('advanced setup returns typed checkout and disposes idempotently',
+  test('session setup returns typed checkout and disposes idempotently',
       () async {
-    final checkout = await runtime.setupAdvanced(
-      paymentMethods: PaymentMethods.fromJson({
-        'paymentMethods': [
-          {'type': 'scheme', 'name': 'Card'},
-        ],
-      }),
-      configuration: const CheckoutConfiguration(
-        environment: Environment.test,
-        clientKey: 'test_key',
-      ),
-      callbacks: AdvancedCheckoutCallbacks(
-        onSubmit: (data) async =>
-            const SubmitResult.completion(resultCode: 'Authorised'),
-        onAdditionalDetails: (data) async =>
-            const AdditionalDetailsResult.completion(resultCode: 'Authorised'),
-        onFailure: (error) {},
-        onComplete: (result) {},
-      ),
-    );
+    final checkout = await setUpSession();
 
-    expect(checkout, isA<AdvancedCheckout>());
+    expect(checkout, isA<Checkout>());
     expect(checkout.paymentMethods.single.type, 'scheme');
-    expect(checkout.storedPaymentMethods, isEmpty);
+    expect(checkout.storedPaymentMethods.single.id, 'stored-1');
 
     checkout.dispose();
     checkout.dispose();
@@ -231,7 +234,7 @@ void main() {
           environment: Environment.test,
           clientKey: 'test_key',
         ),
-        callbacks: SessionCheckoutCallbacks(
+        callbacks: CheckoutCallbacks(
           onComplete: (result) {},
           onFailure: (error) {},
           onBeforeSubmit: (data) async => BeforeSubmitProceed(data: data),
@@ -255,52 +258,23 @@ void main() {
         environment: Environment.test,
         clientKey: 'test_key',
       ),
-      callbacks: SessionCheckoutCallbacks(
+      callbacks: CheckoutCallbacks(
         onComplete: (result) {},
         onFailure: (error) {},
         onBeforeSubmit: (data) async => BeforeSubmitProceed(data: data),
       ),
     );
 
-    expect(checkout, isA<SessionCheckout>());
+    expect(checkout, isA<Checkout>());
     expect(checkoutHostApi.clearActiveCheckoutCount, 1);
     expect(checkoutHostApi.failSetupsWithAlreadyActive, false);
   });
 
   test('setup throws alreadyActive while a checkout is tracked', () async {
-    await runtime.setupAdvanced(
-      paymentMethods: PaymentMethods(),
-      configuration: const CheckoutConfiguration(
-        environment: Environment.test,
-        clientKey: 'test_key',
-      ),
-      callbacks: AdvancedCheckoutCallbacks(
-        onSubmit: (data) async =>
-            const SubmitResult.completion(resultCode: 'Authorised'),
-        onAdditionalDetails: (data) async =>
-            const AdditionalDetailsResult.completion(resultCode: 'Authorised'),
-        onFailure: (error) {},
-        onComplete: (result) {},
-      ),
-    );
+    await setUpSession();
 
     await expectLater(
-      runtime.setupAdvanced(
-        paymentMethods: PaymentMethods(),
-        configuration: const CheckoutConfiguration(
-          environment: Environment.test,
-          clientKey: 'test_key',
-        ),
-        callbacks: AdvancedCheckoutCallbacks(
-          onSubmit: (data) async =>
-              const SubmitResult.completion(resultCode: 'Authorised'),
-          onAdditionalDetails: (data) async =>
-              const AdditionalDetailsResult.completion(
-                  resultCode: 'Authorised'),
-          onFailure: (error) {},
-          onComplete: (result) {},
-        ),
-      ),
+      setUpSession(),
       throwsA(isA<CheckoutError>().having(
         (error) => error.code,
         'code',
@@ -311,57 +285,44 @@ void main() {
   });
 
   test('terminal callback can set up a new checkout', () async {
-    SessionCheckout? nextCheckout;
+    Checkout? nextCheckout;
     CheckoutError? setupError;
-    final checkout = await runtime.setupAdvanced(
-      paymentMethods: PaymentMethods(),
-      configuration: const CheckoutConfiguration(
-        environment: Environment.test,
-        clientKey: 'test_key',
-      ),
-      callbacks: AdvancedCheckoutCallbacks(
-        onSubmit: (data) async =>
-            const SubmitResult.completion(resultCode: 'Authorised'),
-        onAdditionalDetails: (data) async =>
-            const AdditionalDetailsResult.completion(resultCode: 'Authorised'),
-        onFailure: (error) {},
+    final checkout = await setUpSession(
+      callbacks: CheckoutCallbacks(
         onComplete: (result) {
-          unawaited(
-            runtime
-                .setupSession(
-                  sessionResponse: const SessionResponse(
-                    id: 'session-2',
-                    sessionData: 'session-data',
-                  ),
-                  configuration: const CheckoutConfiguration(
-                    environment: Environment.test,
-                    clientKey: 'test_key',
-                  ),
-                  callbacks: SessionCheckoutCallbacks(
-                    onComplete: (result) {},
-                    onFailure: (error) {},
-                    onBeforeSubmit: (data) async =>
-                        BeforeSubmitProceed(data: data),
-                  ),
-                )
-                .then((value) => nextCheckout = value)
-                .catchError(
-                    (Object error) => setupError = error as CheckoutError),
-          );
+          unawaited(() async {
+            try {
+              nextCheckout = await setUpSession();
+            } on CheckoutError catch (error) {
+              setupError = error;
+            }
+          }());
         },
+        onFailure: (error) {},
       ),
     );
 
-    eventsController.add(CheckoutEventDTO(
-      type: CheckoutEventTypeDTO.complete,
-      checkoutId: checkout.id,
-      resultCode: 'Authorised',
-    ));
+    eventsController.add(completeEvent(checkout.id));
     await Future<void>.delayed(Duration.zero);
     await Future<void>.delayed(Duration.zero);
 
     expect(setupError, isNull);
-    expect(nextCheckout, isA<SessionCheckout>());
+    expect(nextCheckout, isA<Checkout>());
+  });
+
+  test('action-only handleAction returns the native result code', () async {
+    final result = await runtime.handleAction(
+      action: Action(type: 'threeDS2', data: const {'token': 'abc'}),
+      configuration: const CheckoutConfiguration(
+        environment: Environment.test,
+        clientKey: 'test_key',
+      ),
+      onAdditionalDetails: (data) async =>
+          const AdditionalDetailsResult.completion(resultCode: 'Authorised'),
+    );
+
+    expect(result, isA<AdvancedCheckoutResult>());
+    expect(result.resultCode, 'Authorised');
   });
 
   test('utility methods use named public API and validate expiry format',
@@ -390,50 +351,30 @@ void main() {
   });
 
   test('terminal completion disposes checkout and invokes callback', () async {
-    var completed = false;
-    final checkout = await runtime.setupAdvanced(
-      paymentMethods: PaymentMethods(),
-      configuration: const CheckoutConfiguration(
-        environment: Environment.test,
-        clientKey: 'test_key',
-      ),
-      callbacks: AdvancedCheckoutCallbacks(
-        onSubmit: (data) async =>
-            const SubmitResult.completion(resultCode: 'Authorised'),
-        onAdditionalDetails: (data) async =>
-            const AdditionalDetailsResult.completion(resultCode: 'Authorised'),
+    CheckoutResult? completedWith;
+    final checkout = await setUpSession(
+      callbacks: CheckoutCallbacks(
+        onComplete: (result) => completedWith = result,
         onFailure: (error) {},
-        onComplete: (result) => completed = true,
       ),
     );
 
-    eventsController.add(CheckoutEventDTO(
-      type: CheckoutEventTypeDTO.complete,
-      checkoutId: checkout.id,
-      resultCode: 'Authorised',
-    ));
+    eventsController.add(completeEvent(checkout.id));
     await Future<void>.delayed(Duration.zero);
 
-    expect(completed, true);
+    expect(completedWith?.resultCode, 'Authorised');
+    expect(completedWith?.sessionId, 'session-1');
+    expect(completedWith?.sessionResult, 'session-result');
     expect(checkout.isDisposed, true);
     expect(checkoutHostApi.disposeCheckoutCount, 1);
   });
 
   test('terminal failure disposes checkout and invokes callback', () async {
     CheckoutError? receivedError;
-    final checkout = await runtime.setupAdvanced(
-      paymentMethods: PaymentMethods(),
-      configuration: const CheckoutConfiguration(
-        environment: Environment.test,
-        clientKey: 'test_key',
-      ),
-      callbacks: AdvancedCheckoutCallbacks(
-        onSubmit: (data) async =>
-            const SubmitResult.completion(resultCode: 'Authorised'),
-        onAdditionalDetails: (data) async =>
-            const AdditionalDetailsResult.completion(resultCode: 'Authorised'),
-        onFailure: (error) => receivedError = error,
+    final checkout = await setUpSession(
+      callbacks: CheckoutCallbacks(
         onComplete: (result) {},
+        onFailure: (error) => receivedError = error,
       ),
     );
 
@@ -453,31 +394,23 @@ void main() {
 
   test('Apple Pay button style is passed to the native configuration',
       () async {
-    final paymentMethod = PaymentMethod(type: 'applepay', name: 'Apple Pay');
-    final checkout = await runtime.setupAdvanced(
-      paymentMethods: PaymentMethods(regular: [paymentMethod]),
+    checkoutHostApi.regularPaymentMethodsJson =
+        '[{"type":"applepay","name":"Apple Pay"}]';
+    final checkout = await setUpSession(
       configuration: const CheckoutConfiguration(
         environment: Environment.test,
         clientKey: 'test_key',
-        countryCode: 'NL',
-        amount: Amount(currency: 'EUR', value: 1000),
         applePayConfiguration: ApplePayConfiguration(
           merchantId: 'merchant.test',
           merchantName: 'Test merchant',
+          amount: Amount(currency: 'EUR', value: 1000),
+          countryCode: 'nl',
           buttonStyle: ApplePayButtonStyle(
             theme: ApplePayButtonTheme.white,
             type: ApplePayButtonType.buy,
             cornerRadius: 8,
           ),
         ),
-      ),
-      callbacks: AdvancedCheckoutCallbacks(
-        onSubmit: (data) async =>
-            const SubmitResult.completion(resultCode: 'Authorised'),
-        onAdditionalDetails: (data) async =>
-            const AdditionalDetailsResult.completion(resultCode: 'Authorised'),
-        onFailure: (error) {},
-        onComplete: (result) {},
       ),
     );
 
@@ -490,6 +423,48 @@ void main() {
     checkout.dispose();
   });
 
+  test('Apple Pay amount and uppercased country code map to the native DTO',
+      () async {
+    final checkout = await setUpSession(
+      configuration: const CheckoutConfiguration(
+        environment: Environment.test,
+        clientKey: 'test_key',
+        applePayConfiguration: ApplePayConfiguration(
+          merchantId: 'merchant.test',
+          merchantName: 'Test merchant',
+          amount: Amount(currency: 'EUR', value: 1000),
+          countryCode: 'nl',
+        ),
+      ),
+    );
+
+    final applePay = checkoutHostApi.lastConfiguration?.applePayConfiguration;
+    expect(applePay?.amount.currency, 'EUR');
+    expect(applePay?.amount.value, 1000);
+    expect(applePay?.countryCode, 'NL');
+
+    checkout.dispose();
+  });
+
+  test('Google Pay country code is uppercased in the native DTO', () async {
+    final checkout = await setUpSession(
+      configuration: const CheckoutConfiguration(
+        environment: Environment.test,
+        clientKey: 'test_key',
+        googlePayConfiguration: GooglePayConfiguration(
+          googlePayEnvironment: GooglePayEnvironment.test,
+          countryCode: 'nl',
+        ),
+      ),
+    );
+
+    final googlePay = checkoutHostApi.lastConfiguration?.googlePayConfiguration;
+    expect(googlePay?.countryCode, 'NL');
+    expect(googlePay?.googlePayEnvironment, GooglePayEnvironmentDTO.test);
+
+    checkout.dispose();
+  });
+
   testWidgets(
       'direct method renders natively without a controller when showSubmitButton is true',
       (tester) async {
@@ -497,20 +472,13 @@ void main() {
     addTearDown(() => debugDefaultTargetPlatformOverride = null);
 
     final failures = <CheckoutError>[];
+    checkoutHostApi.regularPaymentMethodsJson =
+        '[{"type":"ideal","name":"iDEAL"}]';
     final paymentMethod = PaymentMethod(type: 'ideal', name: 'iDEAL');
-    final checkout = await runtime.setupAdvanced(
-      paymentMethods: PaymentMethods(regular: [paymentMethod]),
-      configuration: const CheckoutConfiguration(
-        environment: Environment.test,
-        clientKey: 'test_key',
-      ),
-      callbacks: AdvancedCheckoutCallbacks(
-        onSubmit: (data) async =>
-            const SubmitResult.completion(resultCode: 'Authorised'),
-        onAdditionalDetails: (data) async =>
-            const AdditionalDetailsResult.completion(resultCode: 'Authorised'),
-        onFailure: failures.add,
+    final checkout = await setUpSession(
+      callbacks: CheckoutCallbacks(
         onComplete: (result) {},
+        onFailure: failures.add,
       ),
     );
 
@@ -576,21 +544,14 @@ void main() {
     addTearDown(() => debugDefaultTargetPlatformOverride = null);
 
     final controller = CheckoutController();
+    checkoutHostApi.regularPaymentMethodsJson =
+        '[{"type":"ideal","name":"iDEAL"}]';
     final paymentMethod = PaymentMethod(type: 'ideal', name: 'iDEAL');
-    final checkout = await runtime.setupAdvanced(
-      paymentMethods: PaymentMethods(regular: [paymentMethod]),
+    final checkout = await setUpSession(
       configuration: const CheckoutConfiguration(
         environment: Environment.test,
         clientKey: 'test_key',
         showSubmitButton: false,
-      ),
-      callbacks: AdvancedCheckoutCallbacks(
-        onSubmit: (data) async =>
-            const SubmitResult.completion(resultCode: 'Authorised'),
-        onAdditionalDetails: (data) async =>
-            const AdditionalDetailsResult.completion(resultCode: 'Authorised'),
-        onFailure: (error) {},
-        onComplete: (result) {},
       ),
     );
 
@@ -666,25 +627,18 @@ void main() {
     final card = PaymentMethod(type: 'scheme', name: 'Card');
     final ideal = PaymentMethod(type: 'ideal', name: 'iDEAL');
 
-    Future<AdvancedCheckout> setUpCheckout({
+    Future<Checkout> setUpCheckout({
       void Function(CheckoutError error)? onFailure,
-    }) =>
-        runtime.setupAdvanced(
-          paymentMethods: PaymentMethods(regular: [card, ideal]),
-          configuration: const CheckoutConfiguration(
-            environment: Environment.test,
-            clientKey: 'test_key',
-          ),
-          callbacks: AdvancedCheckoutCallbacks(
-            onSubmit: (data) async =>
-                const SubmitResult.completion(resultCode: 'Authorised'),
-            onAdditionalDetails: (data) async =>
-                const AdditionalDetailsResult.completion(
-                    resultCode: 'Authorised'),
-            onFailure: onFailure ?? (error) {},
-            onComplete: (result) {},
-          ),
-        );
+    }) {
+      checkoutHostApi.regularPaymentMethodsJson =
+          '[{"type":"scheme","name":"Card"},{"type":"ideal","name":"iDEAL"}]';
+      return setUpSession(
+        callbacks: CheckoutCallbacks(
+          onComplete: (result) {},
+          onFailure: onFailure ?? (error) {},
+        ),
+      );
+    }
 
     Widget host(Widget child) =>
         Directionality(textDirection: TextDirection.ltr, child: child);
@@ -965,5 +919,202 @@ void main() {
       checkout.dispose();
       debugDefaultTargetPlatformOverride = null;
     });
+  });
+
+  Future<Object?> callCheckoutCallbacksApi(
+    String method,
+    List<Object?> arguments,
+  ) async {
+    const codec = CheckoutCallbacksFlutterApi.pigeonChannelCodec;
+    final reply = Completer<ByteData?>();
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .handlePlatformMessage(
+      'dev.flutter.pigeon.adyen_checkout.CheckoutCallbacksFlutterApi.$method',
+      codec.encodeMessage(arguments),
+      reply.complete,
+    );
+    final decoded = codec.decodeMessage(await reply.future) as List<Object?>;
+    return decoded.first;
+  }
+
+  test('payment method callbacks are declared to the native side', () async {
+    final checkout = await setUpSession(
+      callbacks: CheckoutCallbacks(
+        onComplete: (result) {},
+        onFailure: (error) {},
+        applePay: ApplePayCallbacks(
+          onAuthorize: (payment) async =>
+              const ApplePayAuthorizationResult.success(),
+        ),
+        card: CardCallbacks(onBinLookup: (data) {}),
+      ),
+    );
+
+    final applePay = checkoutHostApi.lastCallbacks?.applePay;
+    expect(applePay?.hasOnAuthorize, true);
+    expect(applePay?.hasOnSelectShippingMethod, false);
+    expect(applePay?.hasOnSelectShippingContact, false);
+    expect(applePay?.hasOnChangeCouponCode, false);
+    final card = checkoutHostApi.lastCallbacks?.card;
+    expect(card?.hasOnBinLookup, true);
+    expect(card?.hasOnBinChange, false);
+
+    checkout.dispose();
+  });
+
+  test('payment method callbacks are omitted when not provided', () async {
+    final checkout = await setUpSession();
+
+    expect(checkoutHostApi.lastCallbacks?.applePay, isNull);
+    expect(checkoutHostApi.lastCallbacks?.card, isNull);
+
+    checkout.dispose();
+  });
+
+  test('Apple Pay authorize is routed to the Apple Pay callbacks', () async {
+    ApplePayAuthorizedPayment? received;
+    final checkout = await setUpSession(
+      callbacks: CheckoutCallbacks(
+        onComplete: (result) {},
+        onFailure: (error) {},
+        applePay: ApplePayCallbacks(
+          onAuthorize: (payment) async {
+            received = payment;
+            return const ApplePayAuthorizationResult.success();
+          },
+        ),
+      ),
+    );
+
+    final result = await callCheckoutCallbacksApi('onApplePayAuthorize', [
+      checkout.id,
+      ApplePayAuthorizedPaymentDTO(token: 'token', network: 'visa'),
+    ]) as ApplePayAuthorizationResultDTO;
+
+    expect(received?.token, 'token');
+    expect(result.isSuccess, true);
+
+    checkout.dispose();
+  });
+
+  test('Apple Pay authorize fails when the merchant callback throws', () async {
+    final originalOnError = FlutterError.onError;
+    FlutterError.onError = (_) {};
+    addTearDown(() => FlutterError.onError = originalOnError);
+    final checkout = await setUpSession(
+      callbacks: CheckoutCallbacks(
+        onComplete: (result) {},
+        onFailure: (error) {},
+        applePay: ApplePayCallbacks(
+          onAuthorize: (payment) async => throw StateError('boom'),
+        ),
+      ),
+    );
+
+    final result = await callCheckoutCallbacksApi('onApplePayAuthorize', [
+      checkout.id,
+      ApplePayAuthorizedPaymentDTO(token: 'token', network: 'visa'),
+    ]) as ApplePayAuthorizationResultDTO;
+
+    expect(result.isSuccess, false);
+
+    checkout.dispose();
+  });
+
+  test('card BIN events are routed to the card callbacks', () async {
+    String? bin;
+    BinLookupData? lookup;
+    final checkout = await setUpSession(
+      callbacks: CheckoutCallbacks(
+        onComplete: (result) {},
+        onFailure: (error) {},
+        card: CardCallbacks(
+          onBinChange: (value) => bin = value,
+          onBinLookup: (data) => lookup = data,
+        ),
+      ),
+    );
+
+    eventsController.add(CheckoutEventDTO(
+      type: CheckoutEventTypeDTO.binValue,
+      checkoutId: checkout.id,
+      binValue: '411111',
+    ));
+    eventsController.add(CheckoutEventDTO(
+      type: CheckoutEventTypeDTO.binLookup,
+      checkoutId: checkout.id,
+      binLookupData: [
+        BinLookupDataDTO(
+          issuingCountryCode: 'NL',
+          brands: [
+            BinLookupBrandDTO(
+              brand: 'visa',
+              supported: true,
+              paymentMethodVariant: 'visacredit',
+            ),
+          ],
+        ),
+      ],
+    ));
+    await Future<void>.delayed(Duration.zero);
+
+    expect(bin, '411111');
+    expect(lookup?.issuingCountryCode, 'NL');
+    expect(lookup?.brands.single.brand, 'visa');
+
+    checkout.dispose();
+  });
+
+  test('a throwing card callback does not terminate the checkout', () async {
+    final errors = <FlutterErrorDetails>[];
+    final originalOnError = FlutterError.onError;
+    FlutterError.onError = errors.add;
+    addTearDown(() => FlutterError.onError = originalOnError);
+    final checkout = await setUpSession(
+      callbacks: CheckoutCallbacks(
+        onComplete: (result) {},
+        onFailure: (error) {},
+        card: CardCallbacks(onBinChange: (value) => throw StateError('boom')),
+      ),
+    );
+
+    eventsController.add(CheckoutEventDTO(
+      type: CheckoutEventTypeDTO.binValue,
+      checkoutId: checkout.id,
+      binValue: '411111',
+    ));
+    await Future<void>.delayed(Duration.zero);
+
+    expect(errors, hasLength(1));
+    expect(checkout.isDisposed, false);
+
+    checkout.dispose();
+  });
+
+  test('card BIN events after the checkout is disposed are ignored', () async {
+    var calls = 0;
+    final checkout = await setUpSession(
+      callbacks: CheckoutCallbacks(
+        onComplete: (result) {},
+        onFailure: (error) {},
+        card: CardCallbacks(onBinChange: (value) => calls++),
+      ),
+    );
+    final checkoutId = checkout.id;
+    checkout.dispose();
+
+    eventsController.add(CheckoutEventDTO(
+      type: CheckoutEventTypeDTO.binValue,
+      checkoutId: checkoutId,
+      binValue: '411111',
+    ));
+    eventsController.add(CheckoutEventDTO(
+      type: CheckoutEventTypeDTO.binValue,
+      checkoutId: 'unknown-checkout',
+      binValue: '411111',
+    ));
+    await Future<void>.delayed(Duration.zero);
+
+    expect(calls, 0);
   });
 }

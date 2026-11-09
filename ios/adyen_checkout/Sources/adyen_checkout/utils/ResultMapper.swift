@@ -2,35 +2,7 @@ import Adyen
 import AdyenCheckout
 import Foundation
 
-extension SubmitResultDTO {
-    func toNativeResult() throws -> SubmitResult {
-        switch type {
-        case .completion:
-            guard let resultCode else {
-                throw AdyenPigeonError(
-                    code: ErrorCodes.invalidSubmitResult,
-                    message: "Submit completion did not contain a result code.",
-                    details: nil
-                )
-            }
-            return .completion(resultCode: resultCode)
-        case .action:
-            guard let actionJson,
-                  let data = actionJson.data(using: .utf8) else {
-                throw AdyenPigeonError(
-                    code: ErrorCodes.invalidSubmitResult,
-                    message: "Submit action did not contain action data.",
-                    details: nil
-                )
-            }
-            return try .action(JSONDecoder().decode(Action.self, from: data))
-        case .retry:
-            return .retry(errorMessage: errorMessage)
-        }
-    }
-}
-
-extension PaymentCheckout {
+extension Checkout {
     func setupResult(checkoutId: String) throws -> CheckoutSetupResultDTO {
         let methods = PaymentMethods(regular: paymentMethods, stored: storedPaymentMethods)
         let encoded = try JSONEncoder().encode(methods)

@@ -21,8 +21,6 @@ class SessionCheckoutRepository {
   CheckoutConfiguration buildConfiguration() => const CheckoutConfiguration(
         environment: Config.environment,
         clientKey: Config.clientKey,
-        amount: Config.amount,
-        countryCode: Config.countryCode,
         cardConfiguration: CardConfiguration(
           showCardholderName: true,
           showStorePaymentMethod: false,
@@ -30,11 +28,14 @@ class SessionCheckoutRepository {
         ),
         googlePayConfiguration: GooglePayConfiguration(
           googlePayEnvironment: Config.googlePayEnvironment,
+          countryCode: Config.countryCode,
           emailRequired: true,
         ),
         applePayConfiguration: ApplePayConfiguration(
           merchantId: Config.merchantId,
           merchantName: Config.merchantName,
+          amount: Config.amount,
+          countryCode: Config.countryCode,
           buttonStyle: ApplePayButtonStyle(type: ApplePayButtonType.buy),
         ),
       );
@@ -53,11 +54,11 @@ class SessionCheckoutRepository {
     return SessionResponse.fromJson(response);
   }
 
-  Future<SessionCheckout> setupCheckout({
-    required SessionCheckoutCallbacks callbacks,
+  Future<Checkout> setupCheckout({
+    required CheckoutCallbacks callbacks,
   }) async {
     final sessionResponse = await createSessionResponse();
-    return Checkout.instance.setup(
+    return AdyenCheckout.instance.setup(
       sessionResponse: sessionResponse,
       configuration: buildConfiguration(),
       callbacks: callbacks,

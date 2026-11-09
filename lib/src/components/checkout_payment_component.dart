@@ -18,7 +18,7 @@ import 'component_container.dart';
 import 'platform/ios_platform_view.dart';
 
 class CheckoutPaymentComponent extends StatefulWidget {
-  final CheckoutFlow checkout;
+  final Checkout checkout;
   final PaymentMethod paymentMethod;
   final CheckoutController? controller;
   final Set<Factory<OneSequenceGestureRecognizer>>? gestureRecognizers;
@@ -112,7 +112,7 @@ class _CheckoutPaymentComponentState extends State<CheckoutPaymentComponent> {
   }
 
   void _detach({
-    required CheckoutFlow checkout,
+    required Checkout checkout,
     required CheckoutController? ownController,
   }) {
     unawaited(_eventSubscription.cancel());

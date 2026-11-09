@@ -1,20 +1,16 @@
-import 'package:adyen_checkout_example/repositories/advanced_checkout_repository.dart';
 import 'package:adyen_checkout_example/repositories/session_checkout_repository.dart';
-import 'package:adyen_checkout_example/screens/component/advanced_component_screen.dart';
 import 'package:adyen_checkout_example/screens/component/bottom_sheet/card_bottom_sheet_screen.dart';
 import 'package:adyen_checkout_example/screens/component/session_component_screen.dart';
 import 'package:flutter/material.dart';
 
 class ComponentNavigationScreen extends StatelessWidget {
   final SessionCheckoutRepository sessionRepository;
-  final AdvancedCheckoutRepository advancedRepository;
   final String title;
   final String txVariant;
   final bool showCardBottomSheet;
 
   const ComponentNavigationScreen({
     required this.sessionRepository,
-    required this.advancedRepository,
     required this.title,
     required this.txVariant,
     this.showCardBottomSheet = false,
@@ -33,10 +29,6 @@ class ComponentNavigationScreen extends StatelessWidget {
               TextButton(
                 onPressed: () => _openSession(context),
                 child: Text('$title component session'),
-              ),
-              TextButton(
-                onPressed: () => _openAdvanced(context),
-                child: Text('$title component advanced'),
               ),
               if (showCardBottomSheet)
                 TextButton(
@@ -62,22 +54,10 @@ class ComponentNavigationScreen extends StatelessWidget {
     );
   }
 
-  void _openAdvanced(BuildContext context) {
-    Navigator.of(context).push(
-      MaterialPageRoute<void>(
-        builder: (_) => AdvancedComponentScreen(
-          repository: advancedRepository,
-          title: title,
-          txVariant: txVariant,
-        ),
-      ),
-    );
-  }
-
   void _openCardBottomSheet(BuildContext context) {
     Navigator.of(context).push(
       MaterialPageRoute<void>(
-        builder: (_) => CardBottomSheetScreen(repository: advancedRepository),
+        builder: (_) => CardBottomSheetScreen(repository: sessionRepository),
       ),
     );
   }

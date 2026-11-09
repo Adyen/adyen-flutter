@@ -24,7 +24,7 @@ internal class CheckoutPaymentViewFactory(
     private val eventHandler: ComponentPlatformEventHandler,
     private val registry: CheckoutComponentRegistry,
 ) : PlatformViewFactory(ComponentHostApi.codec) {
-    private val callbacksBridge = CheckoutCallbacksBridge(callbacksApi, eventHandler, registry)
+    private val callbacksBridge = CheckoutCallbacksBridge(callbacksApi, eventHandler)
 
     override fun create(
         context: Context,
@@ -39,7 +39,12 @@ internal class CheckoutPaymentViewFactory(
                 ?: throw AdyenPigeonError(ErrorCodes.CHECKOUT_NOT_FOUND, "Checkout is no longer active.")
             val paymentMethod = deserializePaymentMethod(params.paymentMethodJson, params.isStoredPaymentMethod)
             val actionData = mutableStateOf<ActionData?>(null)
-            val callbacks = callbacksBridge.createCallbacks(params.checkoutId, params.componentId, checkoutContext) {
+            val callbacks = callbacksBridge.createCallbacks(
+                checkoutId = params.checkoutId,
+                componentId = params.componentId,
+                checkoutContext = checkoutContext,
+                cardCallbacks = checkoutHolder.getCardCallbacks(params.checkoutId),
+            ) {
                 actionData.value = it
             }
 

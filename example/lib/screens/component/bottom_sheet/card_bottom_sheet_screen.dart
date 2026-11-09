@@ -1,10 +1,10 @@
 import 'package:adyen_checkout/adyen_checkout.dart';
-import 'package:adyen_checkout_example/repositories/advanced_checkout_repository.dart';
+import 'package:adyen_checkout_example/repositories/session_checkout_repository.dart';
 import 'package:adyen_checkout_example/utils/dialog_builder.dart';
 import 'package:flutter/material.dart';
 
 class CardBottomSheetScreen extends StatelessWidget {
-  final AdvancedCheckoutRepository repository;
+  final SessionCheckoutRepository repository;
 
   const CardBottomSheetScreen({required this.repository, super.key});
 
@@ -35,7 +35,7 @@ class CardBottomSheetScreen extends StatelessWidget {
 }
 
 class CardBottomSheetContent extends StatefulWidget {
-  final AdvancedCheckoutRepository repository;
+  final SessionCheckoutRepository repository;
 
   const CardBottomSheetContent({required this.repository, super.key});
 
@@ -44,7 +44,7 @@ class CardBottomSheetContent extends StatefulWidget {
 }
 
 class _CardBottomSheetContentState extends State<CardBottomSheetContent> {
-  AdvancedCheckout? _checkout;
+  Checkout? _checkout;
   bool _loading = true;
   String? _error;
 
@@ -63,11 +63,10 @@ class _CardBottomSheetContentState extends State<CardBottomSheetContent> {
   Future<void> _setupCheckout() async {
     try {
       final checkout = await widget.repository.setupCheckout(
-        callbacks: AdvancedCheckoutCallbacks(
-          onSubmit: widget.repository.onSubmit,
-          onAdditionalDetails: widget.repository.onAdditionalDetails,
+        callbacks: CheckoutCallbacks(
           onComplete: _onComplete,
           onFailure: _onFailure,
+          onBeforeSubmit: (data) async => BeforeSubmitProceed(data: data),
         ),
       );
       if (!mounted) {
@@ -87,7 +86,7 @@ class _CardBottomSheetContentState extends State<CardBottomSheetContent> {
     }
   }
 
-  void _onComplete(AdvancedCheckoutResult result) {
+  void _onComplete(CheckoutResult result) {
     if (!mounted) return;
     DialogBuilder.showPaymentResultDialog(
       'Payment Result',
@@ -105,7 +104,7 @@ class _CardBottomSheetContentState extends State<CardBottomSheetContent> {
     );
   }
 
-  Widget _buildCardComponents(AdvancedCheckout checkout) {
+  Widget _buildCardComponents(Checkout checkout) {
     final paymentMethods = <PaymentMethod>[
       ...checkout.paymentMethods.where((method) => method.type == 'scheme'),
       ...checkout.storedPaymentMethods.where(

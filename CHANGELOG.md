@@ -2,14 +2,30 @@
 
 ### New
 
-- Added `SessionCheckout.startDropIn()` to present Drop-in for a session checkout on Android and
-  iOS. Results arrive through the existing `SessionCheckoutCallbacks`: `onComplete` on completion
+- Added `Checkout.startDropIn()` to present Drop-in for a session checkout on Android and
+  iOS. Results arrive through the existing `CheckoutCallbacks`: `onComplete` on completion
   and `onFailure` on failure, with `CheckoutError.cancellationCode` when the shopper dismisses
   Drop-in. On Android, Drop-in does not yet propagate `sessionResult` (upstream limitation), so
-  `SessionCheckoutResult.sessionResult` is empty for Drop-in completions.
+  `CheckoutResult.sessionResult` is empty for Drop-in completions.
+
+### Removed
+
+- Removed the payment-method callbacks from `ApplePayConfiguration` (`onSelectShippingMethod`,
+  `onSelectShippingContact`, `onChangeCouponCode`, `onAuthorize`) and `CardConfiguration`
+  (`onBinChange`, `onBinLookup`). Use `CheckoutCallbacks(applePay: ApplePayCallbacks(...), card:
+  CardCallbacks(...))` instead.
+- Removed the Advanced flow: `AdyenCheckout.setupAdvanced`, `AdvancedCheckout`,
+  `AdvancedCheckoutCallbacks`, `SubmitResult` and `PaymentComponentData`. The native Android and
+  iOS v6 SDKs no longer expose it publicly. Sessions and the one-shot `AdyenCheckout.handleAction` remain.
+  The example app's card bottom sheet now uses Sessions.
 
 ### Changed
 
+- Aligned the public API names with the native v6 SDKs: `SessionCheckout` is now `Checkout`,
+  `SessionCheckoutCallbacks` is now `CheckoutCallbacks`, `SessionCheckoutResult` is now
+  `CheckoutResult`, and the `CheckoutFlow` base class is removed. The singleton entry point is now
+  `AdyenCheckout.instance` (it was `Checkout.instance`) so that `Checkout` can name the object
+  returned by `setup`.
 - Direct/no-input payment methods (iDEAL, PayPal, Klarna, Pay by Bank, TWINT, stored methods) now
   rely on the submit button rendered inside the native component on Android and iOS.
   `CheckoutPaymentComponent` no longer requires a `CheckoutController` for these methods and no
@@ -20,8 +36,12 @@
   instant payment methods. Unknown interactive methods grow from the small default rather
   than collapsing from a large one.
 - Native dependencies now track development builds instead of `6.0.0-alpha.1`: Android resolves the
-  weekly Sunday snapshot (`2026.10.11-SNAPSHOT`) from Central Portal Snapshots, and iOS pins
-  `adyen-ios` `develop` to commit `80b1960` via Swift Package Manager.
+  weekly Sunday snapshot (`2026.11.08-SNAPSHOT`) from Central Portal Snapshots, and iOS pins
+  `adyen-ios` `develop` to commit `e309205` via Swift Package Manager.
+- `CheckoutConfiguration.amount` and `CheckoutConfiguration.countryCode` are removed. The amount was
+  ignored on Android (the native SDK removed it) and only used for Apple Pay on iOS. They now live
+  on the payment methods that need them: `ApplePayConfiguration.amount`/`countryCode` and
+  `GooglePayConfiguration.countryCode` (all required).
 - `CheckoutPaymentComponent` now recreates the native component when the payment method,
   checkout or controller passed to it changes.
 - Apple Pay on iOS now renders the native SDK's Apple Pay button inline, like every other payment
@@ -36,6 +56,8 @@
 
 ### Fixed
 
+- Card `onBinChange` and `onBinLookup` callbacks are now delivered on Android (the events were
+  previously dropped on the Dart side) and are implemented on iOS.
 - Tapping Apple Pay on iOS no longer opens an intermediate screen with a second Apple Pay button.
 - `ApplePayButtonTheme.automatic` is now honoured on iOS.
 - The native payment component is now released together with its widget on Android.

@@ -6,7 +6,6 @@ internal object ErrorCodes {
     const val CALLBACK_FAILURE = "CallbackFailure"
     const val PAYMENT_METHOD_FAILURE = "PaymentMethodFailure"
     const val CHECKOUT_ALREADY_ACTIVE = "CheckoutAlreadyActive"
-    const val INVALID_SUBMIT_RESULT = "InvalidSubmitResult"
     const val GENERIC = "Generic"
     const val CANCELLED = "Cancelled"
 }

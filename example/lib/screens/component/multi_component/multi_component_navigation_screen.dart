@@ -17,11 +17,6 @@ class MultiComponentNavigationScreen extends StatelessWidget {
                     context, '/multiComponentSessionScreen'),
                 child: const Text('Multi component session'),
               ),
-              TextButton(
-                onPressed: () => Navigator.pushNamed(
-                    context, '/multiComponentAdvancedScreen'),
-                child: const Text('Multi component advanced'),
-              ),
             ],
           ),
         ),

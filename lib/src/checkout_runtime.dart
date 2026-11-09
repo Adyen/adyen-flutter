@@ -12,7 +12,6 @@ import 'common/model/checkout_error.dart';
 import 'common/model/checkout_results.dart';
 import 'common/model/cse/encrypted_card.dart';
 import 'common/model/cse/unencrypted_card.dart';
-import 'common/model/payment_methods.dart';
 import 'common/model/session_response.dart';
 import 'generated/platform_api.g.dart';
 import 'util/dto_mapper.dart';
@@ -52,10 +51,10 @@ final class CheckoutRuntime {
   _CheckoutRecord? _recordFor(String checkoutId) =>
       _checkout?.checkout.id == checkoutId ? _checkout : null;
 
-  Future<SessionCheckout> setupSession({
+  Future<Checkout> setupSession({
     required SessionResponse sessionResponse,
     required CheckoutConfiguration configuration,
-    required SessionCheckoutCallbacks callbacks,
+    required CheckoutCallbacks callbacks,
   }) =>
       _runSetup(() async {
         String? checkoutId;
@@ -63,10 +62,11 @@ final class CheckoutRuntime {
           final result = await _checkoutHostApi.setupSession(
             sessionResponse.toDTO(),
             configuration.toDTO(),
+            callbacks.toDTO(),
           );
           checkoutId = result.checkoutId;
           final methods = result.toPaymentMethods();
-          final checkout = createSessionCheckout(
+          final checkout = createCheckout(
             id: result.checkoutId,
             paymentMethods: methods.regular,
             storedPaymentMethods: methods.stored,
@@ -74,38 +74,6 @@ final class CheckoutRuntime {
             runtime: this,
           );
           _checkout = _CheckoutRecord.session(
-            checkout: checkout,
-            callbacks: callbacks,
-            configuration: configuration,
-          );
-          return checkout;
-        } catch (_) {
-          if (checkoutId != null) _releaseNativeCheckout(checkoutId);
-          rethrow;
-        }
-      });
-
-  Future<AdvancedCheckout> setupAdvanced({
-    required PaymentMethods paymentMethods,
-    required CheckoutConfiguration configuration,
-    required AdvancedCheckoutCallbacks callbacks,
-  }) =>
-      _runSetup(() async {
-        String? checkoutId;
-        try {
-          final result = await _checkoutHostApi.setupAdvanced(
-            jsonEncode(paymentMethods.toJson()),
-            configuration.toDTO(),
-          );
-          checkoutId = result.checkoutId;
-          final checkout = createAdvancedCheckout(
-            id: result.checkoutId,
-            paymentMethods: paymentMethods.regular,
-            storedPaymentMethods: paymentMethods.stored,
-            callbacks: callbacks,
-            runtime: this,
-          );
-          _checkout = _CheckoutRecord.advanced(
             checkout: checkout,
             callbacks: callbacks,
             configuration: configuration,
@@ -258,7 +226,7 @@ final class CheckoutRuntime {
     final record = _recordFor(checkoutId);
     if (record == null || record.disposed) return;
     _checkout = null;
-    markFlowDisposed(record.checkout);
+    markCheckoutDisposed(record.checkout);
     record.disposed = true;
     _releaseNativeCheckout(checkoutId);
   }
@@ -300,59 +268,72 @@ final class CheckoutRuntime {
             message: event.errorMessage,
           ),
         );
+      case CheckoutEventTypeDTO.binValue:
+        _onBinValue(event);
+      case CheckoutEventTypeDTO.binLookup:
+        _onBinLookup(event);
       case CheckoutEventTypeDTO.componentReady:
       case CheckoutEventTypeDTO.resize:
-      case CheckoutEventTypeDTO.binLookup:
-      case CheckoutEventTypeDTO.binValue:
         break;
+    }
+  }
+
+  /// Returns the record for [checkoutId] only while it can still deliver
+  /// card callbacks (not terminal and not disposed).
+  _CheckoutRecord? _liveRecordFor(String checkoutId) {
+    final record = _recordFor(checkoutId);
+    if (record == null || record.terminal || record.disposed) return null;
+    return record;
+  }
+
+  void _onBinValue(CheckoutEventDTO event) {
+    final bin = event.binValue;
+    final callback =
+        _liveRecordFor(event.checkoutId)?.callbacks.card?.onBinChange;
+    if (bin == null || callback == null) return;
+    try {
+      callback(bin);
+    } catch (error, stackTrace) {
+      _reportError(error, stackTrace);
+    }
+  }
+
+  void _onBinLookup(CheckoutEventDTO event) {
+    final data = event.mappedBinLookupData;
+    final callback =
+        _liveRecordFor(event.checkoutId)?.callbacks.card?.onBinLookup;
+    if (data == null || callback == null) return;
+    try {
+      callback(data);
+    } catch (error, stackTrace) {
+      _reportError(error, stackTrace);
     }
   }
 
   void _terminalComplete(CheckoutEventDTO event) {
     final record = _recordFor(event.checkoutId);
     if (record == null || record.terminal || record.disposed) return;
-    if (record.sessionCallbacks != null) {
-      final resultCode = event.resultCode;
-      final sessionId = event.sessionId;
-      final sessionResult = event.sessionResult;
-      if (resultCode == null || sessionId == null || sessionResult == null) {
-        _terminalFailure(
-          event.checkoutId,
-          const CheckoutError(
-            code: CheckoutError.genericCode,
-            message: 'Native session completion returned incomplete data.',
-          ),
-        );
-        return;
-      }
-      _completeRecord(
-        record,
-        () => record.sessionCallbacks!.onComplete(
-          SessionCheckoutResult(
-            resultCode: resultCode,
-            sessionId: sessionId,
-            sessionResult: sessionResult,
-          ),
-        ),
-      );
-      return;
-    }
-
     final resultCode = event.resultCode;
-    if (resultCode == null) {
+    final sessionId = event.sessionId;
+    final sessionResult = event.sessionResult;
+    if (resultCode == null || sessionId == null || sessionResult == null) {
       _terminalFailure(
         event.checkoutId,
         const CheckoutError(
           code: CheckoutError.genericCode,
-          message: 'Native completion returned no result code.',
+          message: 'Native session completion returned incomplete data.',
         ),
       );
       return;
     }
     _completeRecord(
       record,
-      () => record.advancedCallbacks!.onComplete(
-        AdvancedCheckoutResult(resultCode: resultCode),
+      () => record.callbacks.onComplete(
+        CheckoutResult(
+          resultCode: resultCode,
+          sessionId: sessionId,
+          sessionResult: sessionResult,
+        ),
       ),
     );
   }
@@ -384,7 +365,7 @@ final class CheckoutRuntime {
     BeforeSubmitDataDTO data,
   ) async {
     final record = _recordFor(checkoutId);
-    final beforeSubmit = record?.sessionCallbacks?.onBeforeSubmit;
+    final beforeSubmit = record?.callbacks.onBeforeSubmit;
     if (record == null || beforeSubmit == null) {
       return BeforeSubmitResultDTO(
         isAborted: false,
@@ -400,49 +381,6 @@ final class CheckoutRuntime {
         CheckoutError.callbackFailure(cause: error),
       );
       return BeforeSubmitResultDTO(isAborted: true);
-    }
-  }
-
-  Future<SubmitResultDTO> _onSubmit(
-    String checkoutId,
-    PaymentComponentDataDTO data,
-  ) async {
-    final callback = _recordFor(checkoutId)?.advancedCallbacks?.onSubmit;
-    if (callback == null) {
-      return SubmitResultDTO(
-        type: SubmitResultTypeDTO.retry,
-        errorMessage: 'Advanced checkout is not available.',
-      );
-    }
-    try {
-      return (await callback(data.fromDTO())).toDTO();
-    } catch (error, stackTrace) {
-      _reportError(error, stackTrace);
-      return SubmitResultDTO(
-        type: SubmitResultTypeDTO.retry,
-        errorMessage: error.toString(),
-      );
-    }
-  }
-
-  Future<AdditionalDetailsResultDTO> _onAdditionalDetails(
-    String checkoutId,
-    ActionComponentDataDTO data,
-  ) async {
-    final callback =
-        _recordFor(checkoutId)?.advancedCallbacks?.onAdditionalDetails;
-    if (callback == null) {
-      return AdditionalDetailsResultDTO(resultCode: 'Error');
-    }
-    try {
-      return (await callback(data.fromDTO())).toDTO();
-    } catch (error, stackTrace) {
-      _reportError(error, stackTrace);
-      _terminalFailure(
-        checkoutId,
-        CheckoutError.callbackFailure(cause: error),
-      );
-      return AdditionalDetailsResultDTO(resultCode: 'Error');
     }
   }
 
@@ -468,10 +406,8 @@ final class CheckoutRuntime {
     ApplePayShippingMethodDTO shippingMethod,
     List<ApplePaySummaryItemDTO> currentSummaryItems,
   ) async {
-    final callback = _recordFor(checkoutId)
-        ?.configuration
-        .applePayConfiguration
-        ?.onSelectShippingMethod;
+    final callback =
+        _recordFor(checkoutId)?.callbacks.applePay?.onSelectShippingMethod;
     if (callback == null) {
       return ApplePayShippingMethodUpdateDTO(
         summaryItems: currentSummaryItems,
@@ -494,10 +430,8 @@ final class CheckoutRuntime {
     ApplePayContactDTO contact,
     List<ApplePaySummaryItemDTO> currentSummaryItems,
   ) async {
-    final callback = _recordFor(checkoutId)
-        ?.configuration
-        .applePayConfiguration
-        ?.onSelectShippingContact;
+    final callback =
+        _recordFor(checkoutId)?.callbacks.applePay?.onSelectShippingContact;
     if (callback == null) {
       return ApplePayShippingContactUpdateDTO(
         summaryItems: currentSummaryItems,
@@ -521,10 +455,8 @@ final class CheckoutRuntime {
     String couponCode,
     List<ApplePaySummaryItemDTO> currentSummaryItems,
   ) async {
-    final callback = _recordFor(checkoutId)
-        ?.configuration
-        .applePayConfiguration
-        ?.onChangeCouponCode;
+    final callback =
+        _recordFor(checkoutId)?.callbacks.applePay?.onChangeCouponCode;
     if (callback == null) {
       return ApplePayCouponCodeUpdateDTO(summaryItems: currentSummaryItems);
     }
@@ -544,10 +476,7 @@ final class CheckoutRuntime {
     String checkoutId,
     ApplePayAuthorizedPaymentDTO payment,
   ) async {
-    final callback = _recordFor(checkoutId)
-        ?.configuration
-        .applePayConfiguration
-        ?.onAuthorize;
+    final callback = _recordFor(checkoutId)?.callbacks.applePay?.onAuthorize;
     if (callback == null) {
       return ApplePayAuthorizationResultDTO(isSuccess: true);
     }
@@ -606,29 +535,19 @@ final class CheckoutRuntime {
 }
 
 class _CheckoutRecord {
-  final CheckoutFlow checkout;
-  final SessionCheckoutCallbacks? sessionCallbacks;
-  final AdvancedCheckoutCallbacks? advancedCallbacks;
+  final Checkout checkout;
+  final CheckoutCallbacks callbacks;
   final CheckoutConfiguration configuration;
   bool terminal = false;
   bool disposed = false;
 
   _CheckoutRecord.session({
     required this.checkout,
-    required SessionCheckoutCallbacks callbacks,
+    required this.callbacks,
     required this.configuration,
-  })  : sessionCallbacks = callbacks,
-        advancedCallbacks = null;
+  });
 
-  _CheckoutRecord.advanced({
-    required this.checkout,
-    required AdvancedCheckoutCallbacks callbacks,
-    required this.configuration,
-  })  : sessionCallbacks = null,
-        advancedCallbacks = callbacks;
-
-  void Function(CheckoutError) get onFailure =>
-      sessionCallbacks?.onFailure ?? advancedCallbacks!.onFailure;
+  void Function(CheckoutError) get onFailure => callbacks.onFailure;
 }
 
 class _CheckoutCallbacksApi extends CheckoutCallbacksFlutterApi {
@@ -642,20 +561,6 @@ class _CheckoutCallbacksApi extends CheckoutCallbacksFlutterApi {
     BeforeSubmitDataDTO data,
   ) =>
       runtime._onBeforeSubmit(checkoutId, data);
-
-  @override
-  Future<SubmitResultDTO> onSubmit(
-    String checkoutId,
-    PaymentComponentDataDTO data,
-  ) =>
-      runtime._onSubmit(checkoutId, data);
-
-  @override
-  Future<AdditionalDetailsResultDTO> onAdditionalDetails(
-    String checkoutId,
-    ActionComponentDataDTO data,
-  ) =>
-      runtime._onAdditionalDetails(checkoutId, data);
 
   @override
   Future<ApplePayShippingMethodUpdateDTO> onApplePaySelectShippingMethod(

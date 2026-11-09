@@ -3,7 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class MultiComponentView extends StatelessWidget {
-  final CheckoutFlow checkout;
+  final Checkout checkout;
   final PaymentMethod? cardMethod;
   final List<StoredPaymentMethod> storedCards;
   final PaymentMethod? blikMethod;

@@ -15,9 +15,8 @@ void main() {
 
     expect(configuration.clientKey, 'client_key');
     expect(paymentMethods.regular.single.type, 'scheme');
-    expect(Checkout.instance.setup, isA<Function>());
-    expect(Checkout.instance.setupAdvanced, isA<Function>());
-    expect(Checkout.instance.handleAction, isA<Function>());
+    expect(AdyenCheckout.instance.setup, isA<Function>());
+    expect(AdyenCheckout.instance.handleAction, isA<Function>());
     expect(CheckoutPaymentComponent.new, isA<Function>());
   });
 }

@@ -3,26 +3,25 @@
 # Adyen Flutter Checkout 2.0
 
 [![Pub Package](https://img.shields.io/pub/v/adyen_checkout.svg)](https://pub.dev/packages/adyen_checkout)
-[![Adyen iOS](https://img.shields.io/badge/ios-develop%20%40%2080b1960-brightgreen.svg)](https://github.com/Adyen/adyen-ios/commit/80b19608532715b0cb157cbbab0e3396e38199ad)
-[![Adyen Android](https://img.shields.io/badge/android-snapshot%202026.10.11-brightgreen.svg)](https://central.sonatype.com/repository/maven-snapshots/com/adyen/checkout/core/)
+[![Adyen iOS](https://img.shields.io/badge/ios-develop%20%40%20e309205-brightgreen.svg)](https://github.com/Adyen/adyen-ios/commit/e3092053f15139146b248d1a90ecef0cf0adbf70)
+[![Adyen Android](https://img.shields.io/badge/android-snapshot%202026.11.08-brightgreen.svg)](https://central.sonatype.com/repository/maven-snapshots/com/adyen/checkout/core/)
 
 This prerelease provides a Flutter wrapper around the public Adyen Checkout v6 APIs. It supports
-Sessions, Advanced integrations, generic native payment components, and one-shot action handling.
+Sessions, generic native payment components, and one-shot action handling.
 
 The first release is `2.0.0-alpha.1` because the native SDK dependencies are alpha releases.
 
 ## Supported flows
 
 - **Sessions**: the native SDK handles the `/sessions` payment lifecycle.
-- **Advanced**: your callbacks handle `/payments` and `/payments/details`.
-- **Action-only**: `Checkout.instance.handleAction` handles an action returned by your backend.
+- **Action-only**: `AdyenCheckout.instance.handleAction` handles an action returned by your backend.
 - **Payment components**: `CheckoutPaymentComponent` renders the selected native payment method.
   Card, stored cards, BLIK, Google Pay on Android, Apple Pay on iOS, and native direct methods use
   the same generic component API. On iOS, Apple Pay renders the native SDK's Apple Pay button, styled
   with `ApplePayButtonStyle`. The button fills the component width and has a fixed height; wrap
   `CheckoutPaymentComponent` in a `SizedBox` to control its width. `buttonWidth` and `buttonHeight`
   are deprecated and ignored until the native iOS SDK supports a custom button size.
-- **Card utilities**: client-side encryption and card validation remain on `Checkout`.
+- **Card utilities**: client-side encryption and card validation remain on `AdyenCheckout`.
 
 Drop-in, separate Instant APIs, partial payments, checkout theming, and web or desktop platforms are
 not part of this alpha.
@@ -59,13 +58,13 @@ backend and app URL scheme.
 ## Sessions
 
 ```dart
-final checkout = await Checkout.instance.setup(
+final checkout = await AdyenCheckout.instance.setup(
   sessionResponse: SessionResponse(
     id: sessionJson['id'] as String,
     sessionData: sessionJson['sessionData'] as String,
   ),
   configuration: configuration,
-  callbacks: SessionCheckoutCallbacks(
+  callbacks: CheckoutCallbacks(
     onComplete: (result) => consumeSessionResult(result.sessionResult),
     onFailure: handleCheckoutError,
   ),
@@ -77,22 +76,8 @@ CheckoutPaymentComponent(
 );
 ```
 
-## Advanced
-
-```dart
-final checkout = await Checkout.instance.setupAdvanced(
-  paymentMethods: PaymentMethods.fromJson(paymentMethodsJson),
-  configuration: configuration,
-  callbacks: AdvancedCheckoutCallbacks(
-    onSubmit: (data) async =>
-        SubmitResult.completion(resultCode: 'Authorised'),
-    onAdditionalDetails: (data) async =>
-        AdditionalDetailsResult.completion(resultCode: 'Authorised'),
-    onComplete: handleAdvancedResult,
-    onFailure: handleCheckoutError,
-  ),
-);
-```
+Payment-method callbacks are passed through `CheckoutCallbacks`, like the native v6 SDKs:
+`CheckoutCallbacks(card: CardCallbacks(onBinLookup: ...), applePay: ApplePayCallbacks(onAuthorize: ...))`.
 
 Native components render their own submit button by default. The v1 Instant methods—iDEAL, PayPal,
 Klarna, Pay by Bank, and TWINT—use this same generic component and show a native pay button inside
@@ -114,9 +99,11 @@ controller with the owning widget.
 
 ## Configuration
 
-`CheckoutConfiguration` accepts the shared environment, client key, optional amount and country
-code, analytics configuration, submit-button visibility, and the applicable Card, Apple Pay, or
-Google Pay configuration. Unsupported native options are intentionally not exposed.
+`CheckoutConfiguration` accepts the shared environment, client key, analytics configuration,
+submit-button visibility, and the applicable Card, Apple Pay, or Google Pay configuration. The
+amount and country code live on the payment methods that need them: `ApplePayConfiguration`
+(`amount`, `countryCode`) and `GooglePayConfiguration` (`countryCode`). Sessions supply the amount
+natively. Unsupported native options are intentionally not exposed.
 
 ## Migration
 

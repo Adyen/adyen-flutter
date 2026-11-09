@@ -4,9 +4,11 @@ import '../common/model/address.dart';
 import '../common/model/amount.dart';
 import '../common/model/billing_address_mode.dart';
 import '../common/model/card_callbacks/bin_lookup_data.dart';
+import '../common/model/card_callbacks/card_callbacks.dart';
 import '../common/model/action_component_data.dart';
 import '../common/model/analytics_configuration.dart';
 import '../common/model/before_submit.dart';
+import '../common/model/checkout_callbacks.dart';
 import '../common/model/checkout_configuration.dart';
 import '../common/model/checkout_results.dart';
 import '../common/model/cse/encrypted_card.dart';
@@ -14,10 +16,10 @@ import '../common/model/cse/unencrypted_card.dart';
 import '../common/model/environment.dart';
 import '../common/model/field_visibility.dart';
 import '../common/model/google_pay_environment.dart';
-import '../common/model/payment_component_data.dart';
 import '../common/model/payment_method.dart';
 import '../common/model/payment_method_configurations/card_configuration.dart';
 import '../common/model/payment_method_configurations/apple_pay/apple_pay_authorization_result.dart';
+import '../common/model/payment_method_configurations/apple_pay/apple_pay_callbacks.dart';
 import '../common/model/payment_method_configurations/apple_pay/apple_pay_authorized_payment.dart';
 import '../common/model/payment_method_configurations/apple_pay/apple_pay_configuration.dart';
 import '../common/model/payment_method_configurations/apple_pay/apple_pay_contact.dart';
@@ -69,8 +71,6 @@ extension CheckoutConfigurationMapper on CheckoutConfiguration {
   CheckoutConfigurationDTO toDTO() => CheckoutConfigurationDTO(
         environment: environment.toDTO(),
         clientKey: clientKey,
-        countryCode: countryCode?.toUpperCase(),
-        amount: amount?.toDTO(),
         analyticsConfiguration: analyticsConfiguration.toDTO(),
         showSubmitButton: showSubmitButton,
         cardConfiguration: cardConfiguration?.toDTO(),
@@ -103,6 +103,27 @@ extension CardConfigurationMapper on CardConfiguration {
         socialSecurityNumberVisibility: socialSecurityNumberVisibility.toDTO(),
         supportedCardBrands: supportedCardBrands,
         installmentConfiguration: installmentConfiguration?.toDTO(),
+      );
+}
+
+extension CheckoutCallbacksMapper on CheckoutCallbacks {
+  CheckoutCallbacksDTO toDTO() => CheckoutCallbacksDTO(
+        applePay: applePay?.toDTO(),
+        card: card?.toDTO(),
+      );
+}
+
+extension ApplePayCallbacksMapper on ApplePayCallbacks {
+  ApplePayCallbacksDTO toDTO() => ApplePayCallbacksDTO(
+        hasOnSelectShippingMethod: onSelectShippingMethod != null,
+        hasOnSelectShippingContact: onSelectShippingContact != null,
+        hasOnChangeCouponCode: onChangeCouponCode != null,
+        hasOnAuthorize: onAuthorize != null,
+      );
+}
+
+extension CardCallbacksMapper on CardCallbacks {
+  CardCallbacksDTO toDTO() => CardCallbacksDTO(
         hasOnBinChange: onBinChange != null,
         hasOnBinLookup: onBinLookup != null,
       );
@@ -150,6 +171,7 @@ extension GooglePayConfigurationMapper on GooglePayConfiguration {
           GooglePayEnvironment.test => GooglePayEnvironmentDTO.test,
           GooglePayEnvironment.production => GooglePayEnvironmentDTO.production,
         },
+        countryCode: countryCode.toUpperCase(),
         merchantAccount: merchantAccount,
         merchantInfo: merchantInfo?.toDTO(),
         totalPriceStatus: totalPriceStatus?.toDTO(),
@@ -187,6 +209,8 @@ extension ApplePayConfigurationMapper on ApplePayConfiguration {
   ApplePayConfigurationDTO toDTO() => ApplePayConfigurationDTO(
         merchantId: merchantId,
         merchantName: merchantName,
+        amount: amount.toDTO(),
+        countryCode: countryCode.toUpperCase(),
         allowOnboarding: allowOnboarding,
         summaryItems: applePaySummaryItems
             ?.map((summaryItem) => summaryItem.toDTO())
@@ -208,10 +232,6 @@ extension ApplePayConfigurationMapper on ApplePayConfiguration {
         supportsCouponCode: supportsCouponCode,
         couponCode: couponCode,
         buttonStyle: buttonStyle?.toDTO(),
-        hasOnSelectShippingMethod: onSelectShippingMethod != null,
-        hasOnSelectShippingContact: onSelectShippingContact != null,
-        hasOnChangeCouponCode: onChangeCouponCode != null,
-        hasOnAuthorize: onAuthorize != null,
       );
 }
 
@@ -475,12 +495,6 @@ extension ApplePayPaymentErrorMapper on ApplePayPaymentError {
       );
 }
 
-extension PaymentComponentDataDTOMapper on PaymentComponentDataDTO {
-  PaymentComponentData fromDTO() => PaymentComponentData.fromJson(
-        _decodeObject(dataJson, 'PaymentComponentData'),
-      );
-}
-
 extension ActionComponentDataDTOMapper on ActionComponentDataDTO {
   ActionComponentData fromDTO() => ActionComponentData.fromJson(
         _decodeObject(dataJson, 'ActionComponentData'),
@@ -523,23 +537,6 @@ extension EncryptedCardDTOMapper on EncryptedCardDTO {
         encryptedExpiryYear: encryptedExpiryYear,
         encryptedSecurityCode: encryptedSecurityCode,
       );
-}
-
-extension SubmitResultMapper on SubmitResult {
-  SubmitResultDTO toDTO() => switch (this) {
-        SubmitCompletion(resultCode: final resultCode) => SubmitResultDTO(
-            type: SubmitResultTypeDTO.completion,
-            resultCode: resultCode,
-          ),
-        SubmitAction(action: final action) => SubmitResultDTO(
-            type: SubmitResultTypeDTO.action,
-            actionJson: jsonEncode(action.data),
-          ),
-        SubmitRetry(errorMessage: final errorMessage) => SubmitResultDTO(
-            type: SubmitResultTypeDTO.retry,
-            errorMessage: errorMessage,
-          ),
-      };
 }
 
 extension AdditionalDetailsResultMapper on AdditionalDetailsResult {

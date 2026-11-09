@@ -73,7 +73,7 @@ android {
 
     dependencies {
         // Weekly Sunday snapshot from adyen-android main. Bump the date to move the pin forward.
-        def adyenSnapshotVersion = "2026.10.11-SNAPSHOT"
+        def adyenSnapshotVersion = "2026.11.08-SNAPSHOT"
         implementation "com.adyen.checkout:core:${adyenSnapshotVersion}"
         implementation "com.adyen.checkout:card:${adyenSnapshotVersion}"
         implementation "com.adyen.checkout:blik:${adyenSnapshotVersion}"

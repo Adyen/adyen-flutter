@@ -2,7 +2,7 @@ import 'package:adyen_checkout/adyen_checkout.dart';
 import 'package:flutter/material.dart';
 
 class InstantPaymentMethodSection extends StatelessWidget {
-  final CheckoutFlow checkout;
+  final Checkout checkout;
   final PaymentMethod paymentMethod;
 
   const InstantPaymentMethodSection({

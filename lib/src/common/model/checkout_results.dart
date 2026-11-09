@@ -1,11 +1,9 @@
-import 'action.dart';
-
-class SessionCheckoutResult {
+class CheckoutResult {
   final String resultCode;
   final String sessionId;
   final String sessionResult;
 
-  const SessionCheckoutResult({
+  const CheckoutResult({
     required this.resultCode,
     required this.sessionId,
     required this.sessionResult,
@@ -13,7 +11,7 @@ class SessionCheckoutResult {
 
   @override
   String toString() =>
-      'SessionCheckoutResult(resultCode: $resultCode, sessionId: $sessionId)';
+      'CheckoutResult(resultCode: $resultCode, sessionId: $sessionId)';
 }
 
 class AdvancedCheckoutResult {
@@ -23,35 +21,6 @@ class AdvancedCheckoutResult {
 
   @override
   String toString() => 'AdvancedCheckoutResult(resultCode: $resultCode)';
-}
-
-sealed class SubmitResult {
-  const SubmitResult._();
-
-  const factory SubmitResult.completion({required String resultCode}) =
-      SubmitCompletion;
-
-  const factory SubmitResult.action(Action action) = SubmitAction;
-
-  const factory SubmitResult.retry({String? errorMessage}) = SubmitRetry;
-}
-
-final class SubmitCompletion extends SubmitResult {
-  final String resultCode;
-
-  const SubmitCompletion({required this.resultCode}) : super._();
-}
-
-final class SubmitAction extends SubmitResult {
-  final Action action;
-
-  const SubmitAction(this.action) : super._();
-}
-
-final class SubmitRetry extends SubmitResult {
-  final String? errorMessage;
-
-  const SubmitRetry({this.errorMessage}) : super._();
 }
 
 sealed class AdditionalDetailsResult {

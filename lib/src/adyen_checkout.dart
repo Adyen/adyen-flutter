@@ -7,35 +7,23 @@ import 'common/model/checkout.dart';
 import 'common/model/checkout_results.dart';
 import 'common/model/cse/encrypted_card.dart';
 import 'common/model/cse/unencrypted_card.dart';
-import 'common/model/payment_methods.dart';
 import 'common/model/session_response.dart';
 
-final class Checkout {
-  static final Checkout _defaultInstance = Checkout._();
-  static Checkout get instance => _defaultInstance;
+final class AdyenCheckout {
+  static final AdyenCheckout _defaultInstance = AdyenCheckout._();
+  static AdyenCheckout get instance => _defaultInstance;
 
   late final CheckoutRuntime _runtime = CheckoutRuntime();
 
-  Checkout._();
+  AdyenCheckout._();
 
-  Future<SessionCheckout> setup({
+  Future<Checkout> setup({
     required SessionResponse sessionResponse,
     required CheckoutConfiguration configuration,
-    required SessionCheckoutCallbacks callbacks,
+    required CheckoutCallbacks callbacks,
   }) =>
       _runtime.setupSession(
         sessionResponse: sessionResponse,
-        configuration: configuration,
-        callbacks: callbacks,
-      );
-
-  Future<AdvancedCheckout> setupAdvanced({
-    required PaymentMethods paymentMethods,
-    required CheckoutConfiguration configuration,
-    required AdvancedCheckoutCallbacks callbacks,
-  }) =>
-      _runtime.setupAdvanced(
-        paymentMethods: paymentMethods,
         configuration: configuration,
         callbacks: callbacks,
       );
@@ -95,6 +83,5 @@ final class Checkout {
         cardBrand: cardBrand,
       );
 
-  Future<String> getThreeDS2SdkVersion() =>
-      _runtime.getThreeDS2SdkVersion();
+  Future<String> getThreeDS2SdkVersion() => _runtime.getThreeDS2SdkVersion();
 }

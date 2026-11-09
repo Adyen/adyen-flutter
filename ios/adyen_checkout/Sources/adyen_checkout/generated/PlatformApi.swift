@@ -226,12 +226,6 @@ enum CheckoutEventTypeDTO: Int {
   case failure = 5
 }
 
-enum SubmitResultTypeDTO: Int {
-  case completion = 0
-  case action = 1
-  case retry = 2
-}
-
 /// Generated class from Pigeon that represents data sent in messages.
 struct SessionResponseDTO: Hashable {
   var id: String
@@ -389,8 +383,6 @@ struct CardConfigurationDTO: Hashable {
   var socialSecurityNumberVisibility: FieldVisibilityDTO
   var supportedCardBrands: [String]? = nil
   var installmentConfiguration: InstallmentConfigurationDTO? = nil
-  var hasOnBinChange: Bool
-  var hasOnBinLookup: Bool
 
 
   // swift-format-ignore: AlwaysUseLowerCamelCase
@@ -405,8 +397,6 @@ struct CardConfigurationDTO: Hashable {
     let socialSecurityNumberVisibility = pigeonVar_list[7] as! FieldVisibilityDTO
     let supportedCardBrands: [String]? = nilOrValue(pigeonVar_list[8])
     let installmentConfiguration: InstallmentConfigurationDTO? = nilOrValue(pigeonVar_list[9])
-    let hasOnBinChange = pigeonVar_list[10] as! Bool
-    let hasOnBinLookup = pigeonVar_list[11] as! Bool
 
     return CardConfigurationDTO(
       billingAddressMode: billingAddressMode,
@@ -418,9 +408,7 @@ struct CardConfigurationDTO: Hashable {
       showSupportedCardBrandLogos: showSupportedCardBrandLogos,
       socialSecurityNumberVisibility: socialSecurityNumberVisibility,
       supportedCardBrands: supportedCardBrands,
-      installmentConfiguration: installmentConfiguration,
-      hasOnBinChange: hasOnBinChange,
-      hasOnBinLookup: hasOnBinLookup
+      installmentConfiguration: installmentConfiguration
     )
   }
   func toList() -> [Any?] {
@@ -435,8 +423,6 @@ struct CardConfigurationDTO: Hashable {
       socialSecurityNumberVisibility,
       supportedCardBrands,
       installmentConfiguration,
-      hasOnBinChange,
-      hasOnBinLookup,
     ]
   }
   static func == (lhs: CardConfigurationDTO, rhs: CardConfigurationDTO) -> Bool {
@@ -507,6 +493,7 @@ struct ShippingAddressParametersDTO: Hashable {
 /// Generated class from Pigeon that represents data sent in messages.
 struct GooglePayConfigurationDTO: Hashable {
   var googlePayEnvironment: GooglePayEnvironmentDTO
+  var countryCode: String
   var merchantAccount: String? = nil
   var merchantInfo: MerchantInfoDTO? = nil
   var totalPriceStatus: TotalPriceStatusDTO? = nil
@@ -519,16 +506,18 @@ struct GooglePayConfigurationDTO: Hashable {
   // swift-format-ignore: AlwaysUseLowerCamelCase
   static func fromList(_ pigeonVar_list: [Any?]) -> GooglePayConfigurationDTO? {
     let googlePayEnvironment = pigeonVar_list[0] as! GooglePayEnvironmentDTO
-    let merchantAccount: String? = nilOrValue(pigeonVar_list[1])
-    let merchantInfo: MerchantInfoDTO? = nilOrValue(pigeonVar_list[2])
-    let totalPriceStatus: TotalPriceStatusDTO? = nilOrValue(pigeonVar_list[3])
-    let emailRequired: Bool? = nilOrValue(pigeonVar_list[4])
-    let existingPaymentMethodRequired: Bool? = nilOrValue(pigeonVar_list[5])
-    let shippingAddressRequired: Bool? = nilOrValue(pigeonVar_list[6])
-    let shippingAddressParameters: ShippingAddressParametersDTO? = nilOrValue(pigeonVar_list[7])
+    let countryCode = pigeonVar_list[1] as! String
+    let merchantAccount: String? = nilOrValue(pigeonVar_list[2])
+    let merchantInfo: MerchantInfoDTO? = nilOrValue(pigeonVar_list[3])
+    let totalPriceStatus: TotalPriceStatusDTO? = nilOrValue(pigeonVar_list[4])
+    let emailRequired: Bool? = nilOrValue(pigeonVar_list[5])
+    let existingPaymentMethodRequired: Bool? = nilOrValue(pigeonVar_list[6])
+    let shippingAddressRequired: Bool? = nilOrValue(pigeonVar_list[7])
+    let shippingAddressParameters: ShippingAddressParametersDTO? = nilOrValue(pigeonVar_list[8])
 
     return GooglePayConfigurationDTO(
       googlePayEnvironment: googlePayEnvironment,
+      countryCode: countryCode,
       merchantAccount: merchantAccount,
       merchantInfo: merchantInfo,
       totalPriceStatus: totalPriceStatus,
@@ -541,6 +530,7 @@ struct GooglePayConfigurationDTO: Hashable {
   func toList() -> [Any?] {
     return [
       googlePayEnvironment,
+      countryCode,
       merchantAccount,
       merchantInfo,
       totalPriceStatus,
@@ -943,6 +933,8 @@ struct ApplePayButtonStyleDTO: Hashable {
 struct ApplePayConfigurationDTO: Hashable {
   var merchantId: String
   var merchantName: String
+  var amount: AmountDTO
+  var countryCode: String
   var allowOnboarding: Bool? = nil
   var summaryItems: [ApplePaySummaryItemDTO]? = nil
   var requiredBillingContactFields: [String]? = nil
@@ -958,39 +950,35 @@ struct ApplePayConfigurationDTO: Hashable {
   var supportsCouponCode: Bool? = nil
   var couponCode: String? = nil
   var buttonStyle: ApplePayButtonStyleDTO? = nil
-  var hasOnSelectShippingMethod: Bool
-  var hasOnSelectShippingContact: Bool
-  var hasOnChangeCouponCode: Bool
-  var hasOnAuthorize: Bool
 
 
   // swift-format-ignore: AlwaysUseLowerCamelCase
   static func fromList(_ pigeonVar_list: [Any?]) -> ApplePayConfigurationDTO? {
     let merchantId = pigeonVar_list[0] as! String
     let merchantName = pigeonVar_list[1] as! String
-    let allowOnboarding: Bool? = nilOrValue(pigeonVar_list[2])
-    let summaryItems: [ApplePaySummaryItemDTO]? = nilOrValue(pigeonVar_list[3])
-    let requiredBillingContactFields: [String]? = nilOrValue(pigeonVar_list[4])
-    let billingContact: ApplePayContactDTO? = nilOrValue(pigeonVar_list[5])
-    let requiredShippingContactFields: [String]? = nilOrValue(pigeonVar_list[6])
-    let shippingContact: ApplePayContactDTO? = nilOrValue(pigeonVar_list[7])
-    let shippingType: ApplePayShippingTypeDTO? = nilOrValue(pigeonVar_list[8])
-    let allowShippingContactEditing: Bool? = nilOrValue(pigeonVar_list[9])
-    let shippingMethods: [ApplePayShippingMethodDTO]? = nilOrValue(pigeonVar_list[10])
-    let applicationData: String? = nilOrValue(pigeonVar_list[11])
-    let supportedCountries: [String]? = nilOrValue(pigeonVar_list[12])
-    let merchantCapability: ApplePayMerchantCapabilityDTO? = nilOrValue(pigeonVar_list[13])
-    let supportsCouponCode: Bool? = nilOrValue(pigeonVar_list[14])
-    let couponCode: String? = nilOrValue(pigeonVar_list[15])
-    let buttonStyle: ApplePayButtonStyleDTO? = nilOrValue(pigeonVar_list[16])
-    let hasOnSelectShippingMethod = pigeonVar_list[17] as! Bool
-    let hasOnSelectShippingContact = pigeonVar_list[18] as! Bool
-    let hasOnChangeCouponCode = pigeonVar_list[19] as! Bool
-    let hasOnAuthorize = pigeonVar_list[20] as! Bool
+    let amount = pigeonVar_list[2] as! AmountDTO
+    let countryCode = pigeonVar_list[3] as! String
+    let allowOnboarding: Bool? = nilOrValue(pigeonVar_list[4])
+    let summaryItems: [ApplePaySummaryItemDTO]? = nilOrValue(pigeonVar_list[5])
+    let requiredBillingContactFields: [String]? = nilOrValue(pigeonVar_list[6])
+    let billingContact: ApplePayContactDTO? = nilOrValue(pigeonVar_list[7])
+    let requiredShippingContactFields: [String]? = nilOrValue(pigeonVar_list[8])
+    let shippingContact: ApplePayContactDTO? = nilOrValue(pigeonVar_list[9])
+    let shippingType: ApplePayShippingTypeDTO? = nilOrValue(pigeonVar_list[10])
+    let allowShippingContactEditing: Bool? = nilOrValue(pigeonVar_list[11])
+    let shippingMethods: [ApplePayShippingMethodDTO]? = nilOrValue(pigeonVar_list[12])
+    let applicationData: String? = nilOrValue(pigeonVar_list[13])
+    let supportedCountries: [String]? = nilOrValue(pigeonVar_list[14])
+    let merchantCapability: ApplePayMerchantCapabilityDTO? = nilOrValue(pigeonVar_list[15])
+    let supportsCouponCode: Bool? = nilOrValue(pigeonVar_list[16])
+    let couponCode: String? = nilOrValue(pigeonVar_list[17])
+    let buttonStyle: ApplePayButtonStyleDTO? = nilOrValue(pigeonVar_list[18])
 
     return ApplePayConfigurationDTO(
       merchantId: merchantId,
       merchantName: merchantName,
+      amount: amount,
+      countryCode: countryCode,
       allowOnboarding: allowOnboarding,
       summaryItems: summaryItems,
       requiredBillingContactFields: requiredBillingContactFields,
@@ -1005,17 +993,15 @@ struct ApplePayConfigurationDTO: Hashable {
       merchantCapability: merchantCapability,
       supportsCouponCode: supportsCouponCode,
       couponCode: couponCode,
-      buttonStyle: buttonStyle,
-      hasOnSelectShippingMethod: hasOnSelectShippingMethod,
-      hasOnSelectShippingContact: hasOnSelectShippingContact,
-      hasOnChangeCouponCode: hasOnChangeCouponCode,
-      hasOnAuthorize: hasOnAuthorize
+      buttonStyle: buttonStyle
     )
   }
   func toList() -> [Any?] {
     return [
       merchantId,
       merchantName,
+      amount,
+      countryCode,
       allowOnboarding,
       summaryItems,
       requiredBillingContactFields,
@@ -1031,10 +1017,6 @@ struct ApplePayConfigurationDTO: Hashable {
       supportsCouponCode,
       couponCode,
       buttonStyle,
-      hasOnSelectShippingMethod,
-      hasOnSelectShippingContact,
-      hasOnChangeCouponCode,
-      hasOnAuthorize,
     ]
   }
   static func == (lhs: ApplePayConfigurationDTO, rhs: ApplePayConfigurationDTO) -> Bool {
@@ -1045,11 +1027,104 @@ struct ApplePayConfigurationDTO: Hashable {
 }
 
 /// Generated class from Pigeon that represents data sent in messages.
+struct ApplePayCallbacksDTO: Hashable {
+  var hasOnSelectShippingMethod: Bool
+  var hasOnSelectShippingContact: Bool
+  var hasOnChangeCouponCode: Bool
+  var hasOnAuthorize: Bool
+
+
+  // swift-format-ignore: AlwaysUseLowerCamelCase
+  static func fromList(_ pigeonVar_list: [Any?]) -> ApplePayCallbacksDTO? {
+    let hasOnSelectShippingMethod = pigeonVar_list[0] as! Bool
+    let hasOnSelectShippingContact = pigeonVar_list[1] as! Bool
+    let hasOnChangeCouponCode = pigeonVar_list[2] as! Bool
+    let hasOnAuthorize = pigeonVar_list[3] as! Bool
+
+    return ApplePayCallbacksDTO(
+      hasOnSelectShippingMethod: hasOnSelectShippingMethod,
+      hasOnSelectShippingContact: hasOnSelectShippingContact,
+      hasOnChangeCouponCode: hasOnChangeCouponCode,
+      hasOnAuthorize: hasOnAuthorize
+    )
+  }
+  func toList() -> [Any?] {
+    return [
+      hasOnSelectShippingMethod,
+      hasOnSelectShippingContact,
+      hasOnChangeCouponCode,
+      hasOnAuthorize,
+    ]
+  }
+  static func == (lhs: ApplePayCallbacksDTO, rhs: ApplePayCallbacksDTO) -> Bool {
+    return deepEqualsPlatformApi(lhs.toList(), rhs.toList())  }
+  func hash(into hasher: inout Hasher) {
+    deepHashPlatformApi(value: toList(), hasher: &hasher)
+  }
+}
+
+/// Generated class from Pigeon that represents data sent in messages.
+struct CardCallbacksDTO: Hashable {
+  var hasOnBinChange: Bool
+  var hasOnBinLookup: Bool
+
+
+  // swift-format-ignore: AlwaysUseLowerCamelCase
+  static func fromList(_ pigeonVar_list: [Any?]) -> CardCallbacksDTO? {
+    let hasOnBinChange = pigeonVar_list[0] as! Bool
+    let hasOnBinLookup = pigeonVar_list[1] as! Bool
+
+    return CardCallbacksDTO(
+      hasOnBinChange: hasOnBinChange,
+      hasOnBinLookup: hasOnBinLookup
+    )
+  }
+  func toList() -> [Any?] {
+    return [
+      hasOnBinChange,
+      hasOnBinLookup,
+    ]
+  }
+  static func == (lhs: CardCallbacksDTO, rhs: CardCallbacksDTO) -> Bool {
+    return deepEqualsPlatformApi(lhs.toList(), rhs.toList())  }
+  func hash(into hasher: inout Hasher) {
+    deepHashPlatformApi(value: toList(), hasher: &hasher)
+  }
+}
+
+/// Generated class from Pigeon that represents data sent in messages.
+struct CheckoutCallbacksDTO: Hashable {
+  var applePay: ApplePayCallbacksDTO? = nil
+  var card: CardCallbacksDTO? = nil
+
+
+  // swift-format-ignore: AlwaysUseLowerCamelCase
+  static func fromList(_ pigeonVar_list: [Any?]) -> CheckoutCallbacksDTO? {
+    let applePay: ApplePayCallbacksDTO? = nilOrValue(pigeonVar_list[0])
+    let card: CardCallbacksDTO? = nilOrValue(pigeonVar_list[1])
+
+    return CheckoutCallbacksDTO(
+      applePay: applePay,
+      card: card
+    )
+  }
+  func toList() -> [Any?] {
+    return [
+      applePay,
+      card,
+    ]
+  }
+  static func == (lhs: CheckoutCallbacksDTO, rhs: CheckoutCallbacksDTO) -> Bool {
+    return deepEqualsPlatformApi(lhs.toList(), rhs.toList())  }
+  func hash(into hasher: inout Hasher) {
+    deepHashPlatformApi(value: toList(), hasher: &hasher)
+  }
+}
+
+/// Generated class from Pigeon that represents data sent in messages.
 struct CheckoutConfigurationDTO: Hashable {
   var environment: EnvironmentDTO
   var clientKey: String
-  var countryCode: String? = nil
-  var amount: AmountDTO? = nil
   var analyticsConfiguration: AnalyticsConfigurationDTO
   var showSubmitButton: Bool
   var cardConfiguration: CardConfigurationDTO? = nil
@@ -1061,19 +1136,15 @@ struct CheckoutConfigurationDTO: Hashable {
   static func fromList(_ pigeonVar_list: [Any?]) -> CheckoutConfigurationDTO? {
     let environment = pigeonVar_list[0] as! EnvironmentDTO
     let clientKey = pigeonVar_list[1] as! String
-    let countryCode: String? = nilOrValue(pigeonVar_list[2])
-    let amount: AmountDTO? = nilOrValue(pigeonVar_list[3])
-    let analyticsConfiguration = pigeonVar_list[4] as! AnalyticsConfigurationDTO
-    let showSubmitButton = pigeonVar_list[5] as! Bool
-    let cardConfiguration: CardConfigurationDTO? = nilOrValue(pigeonVar_list[6])
-    let applePayConfiguration: ApplePayConfigurationDTO? = nilOrValue(pigeonVar_list[7])
-    let googlePayConfiguration: GooglePayConfigurationDTO? = nilOrValue(pigeonVar_list[8])
+    let analyticsConfiguration = pigeonVar_list[2] as! AnalyticsConfigurationDTO
+    let showSubmitButton = pigeonVar_list[3] as! Bool
+    let cardConfiguration: CardConfigurationDTO? = nilOrValue(pigeonVar_list[4])
+    let applePayConfiguration: ApplePayConfigurationDTO? = nilOrValue(pigeonVar_list[5])
+    let googlePayConfiguration: GooglePayConfigurationDTO? = nilOrValue(pigeonVar_list[6])
 
     return CheckoutConfigurationDTO(
       environment: environment,
       clientKey: clientKey,
-      countryCode: countryCode,
-      amount: amount,
       analyticsConfiguration: analyticsConfiguration,
       showSubmitButton: showSubmitButton,
       cardConfiguration: cardConfiguration,
@@ -1085,8 +1156,6 @@ struct CheckoutConfigurationDTO: Hashable {
     return [
       environment,
       clientKey,
-      countryCode,
-      amount,
       analyticsConfiguration,
       showSubmitButton,
       cardConfiguration,
@@ -1287,31 +1356,6 @@ struct ShopperNameDTO: Hashable {
 }
 
 /// Generated class from Pigeon that represents data sent in messages.
-struct PaymentComponentDataDTO: Hashable {
-  var dataJson: String
-
-
-  // swift-format-ignore: AlwaysUseLowerCamelCase
-  static func fromList(_ pigeonVar_list: [Any?]) -> PaymentComponentDataDTO? {
-    let dataJson = pigeonVar_list[0] as! String
-
-    return PaymentComponentDataDTO(
-      dataJson: dataJson
-    )
-  }
-  func toList() -> [Any?] {
-    return [
-      dataJson
-    ]
-  }
-  static func == (lhs: PaymentComponentDataDTO, rhs: PaymentComponentDataDTO) -> Bool {
-    return deepEqualsPlatformApi(lhs.toList(), rhs.toList())  }
-  func hash(into hasher: inout Hasher) {
-    deepHashPlatformApi(value: toList(), hasher: &hasher)
-  }
-}
-
-/// Generated class from Pigeon that represents data sent in messages.
 struct ActionComponentDataDTO: Hashable {
   var dataJson: String
 
@@ -1330,43 +1374,6 @@ struct ActionComponentDataDTO: Hashable {
     ]
   }
   static func == (lhs: ActionComponentDataDTO, rhs: ActionComponentDataDTO) -> Bool {
-    return deepEqualsPlatformApi(lhs.toList(), rhs.toList())  }
-  func hash(into hasher: inout Hasher) {
-    deepHashPlatformApi(value: toList(), hasher: &hasher)
-  }
-}
-
-/// Generated class from Pigeon that represents data sent in messages.
-struct SubmitResultDTO: Hashable {
-  var type: SubmitResultTypeDTO
-  var resultCode: String? = nil
-  var actionJson: String? = nil
-  var errorMessage: String? = nil
-
-
-  // swift-format-ignore: AlwaysUseLowerCamelCase
-  static func fromList(_ pigeonVar_list: [Any?]) -> SubmitResultDTO? {
-    let type = pigeonVar_list[0] as! SubmitResultTypeDTO
-    let resultCode: String? = nilOrValue(pigeonVar_list[1])
-    let actionJson: String? = nilOrValue(pigeonVar_list[2])
-    let errorMessage: String? = nilOrValue(pigeonVar_list[3])
-
-    return SubmitResultDTO(
-      type: type,
-      resultCode: resultCode,
-      actionJson: actionJson,
-      errorMessage: errorMessage
-    )
-  }
-  func toList() -> [Any?] {
-    return [
-      type,
-      resultCode,
-      actionJson,
-      errorMessage,
-    ]
-  }
-  static func == (lhs: SubmitResultDTO, rhs: SubmitResultDTO) -> Bool {
     return deepEqualsPlatformApi(lhs.toList(), rhs.toList())  }
   func hash(into hasher: inout Hasher) {
     deepHashPlatformApi(value: toList(), hasher: &hasher)
@@ -1741,69 +1748,65 @@ private class PlatformApiPigeonCodecReader: FlutterStandardReader {
       }
       return nil
     case 141:
-      let enumResultAsInt: Int? = nilOrValue(self.readValue() as! Int?)
-      if let enumResultAsInt = enumResultAsInt {
-        return SubmitResultTypeDTO(rawValue: enumResultAsInt)
-      }
-      return nil
-    case 142:
       return SessionResponseDTO.fromList(self.readValue() as! [Any?])
-    case 143:
+    case 142:
       return AmountDTO.fromList(self.readValue() as! [Any?])
-    case 144:
+    case 143:
       return AnalyticsConfigurationDTO.fromList(self.readValue() as! [Any?])
-    case 145:
+    case 144:
       return InstallmentOptionsDTO.fromList(self.readValue() as! [Any?])
-    case 146:
+    case 145:
       return InstallmentConfigurationDTO.fromList(self.readValue() as! [Any?])
-    case 147:
+    case 146:
       return CardConfigurationDTO.fromList(self.readValue() as! [Any?])
-    case 148:
+    case 147:
       return MerchantInfoDTO.fromList(self.readValue() as! [Any?])
-    case 149:
+    case 148:
       return ShippingAddressParametersDTO.fromList(self.readValue() as! [Any?])
-    case 150:
+    case 149:
       return GooglePayConfigurationDTO.fromList(self.readValue() as! [Any?])
-    case 151:
+    case 150:
       return ApplePayContactDTO.fromList(self.readValue() as! [Any?])
-    case 152:
+    case 151:
       return ApplePaySummaryItemDTO.fromList(self.readValue() as! [Any?])
-    case 153:
+    case 152:
       return ApplePayShippingMethodDTO.fromList(self.readValue() as! [Any?])
-    case 154:
+    case 153:
       return ApplePayPaymentErrorDTO.fromList(self.readValue() as! [Any?])
-    case 155:
+    case 154:
       return ApplePayAuthorizedPaymentDTO.fromList(self.readValue() as! [Any?])
-    case 156:
+    case 155:
       return ApplePayAuthorizationResultDTO.fromList(self.readValue() as! [Any?])
-    case 157:
+    case 156:
       return ApplePayShippingMethodUpdateDTO.fromList(self.readValue() as! [Any?])
-    case 158:
+    case 157:
       return ApplePayShippingContactUpdateDTO.fromList(self.readValue() as! [Any?])
-    case 159:
+    case 158:
       return ApplePayCouponCodeUpdateDTO.fromList(self.readValue() as! [Any?])
-    case 160:
+    case 159:
       return ApplePayButtonStyleDTO.fromList(self.readValue() as! [Any?])
-    case 161:
+    case 160:
       return ApplePayConfigurationDTO.fromList(self.readValue() as! [Any?])
+    case 161:
+      return ApplePayCallbacksDTO.fromList(self.readValue() as! [Any?])
     case 162:
-      return CheckoutConfigurationDTO.fromList(self.readValue() as! [Any?])
+      return CardCallbacksDTO.fromList(self.readValue() as! [Any?])
     case 163:
-      return CheckoutSetupResultDTO.fromList(self.readValue() as! [Any?])
+      return CheckoutCallbacksDTO.fromList(self.readValue() as! [Any?])
     case 164:
-      return BeforeSubmitDataDTO.fromList(self.readValue() as! [Any?])
+      return CheckoutConfigurationDTO.fromList(self.readValue() as! [Any?])
     case 165:
-      return BeforeSubmitResultDTO.fromList(self.readValue() as! [Any?])
+      return CheckoutSetupResultDTO.fromList(self.readValue() as! [Any?])
     case 166:
-      return AddressDTO.fromList(self.readValue() as! [Any?])
+      return BeforeSubmitDataDTO.fromList(self.readValue() as! [Any?])
     case 167:
-      return ShopperNameDTO.fromList(self.readValue() as! [Any?])
+      return BeforeSubmitResultDTO.fromList(self.readValue() as! [Any?])
     case 168:
-      return PaymentComponentDataDTO.fromList(self.readValue() as! [Any?])
+      return AddressDTO.fromList(self.readValue() as! [Any?])
     case 169:
-      return ActionComponentDataDTO.fromList(self.readValue() as! [Any?])
+      return ShopperNameDTO.fromList(self.readValue() as! [Any?])
     case 170:
-      return SubmitResultDTO.fromList(self.readValue() as! [Any?])
+      return ActionComponentDataDTO.fromList(self.readValue() as! [Any?])
     case 171:
       return AdditionalDetailsResultDTO.fromList(self.readValue() as! [Any?])
     case 172:
@@ -1864,94 +1867,94 @@ private class PlatformApiPigeonCodecWriter: FlutterStandardWriter {
     } else if let value = value as? CheckoutEventTypeDTO {
       super.writeByte(140)
       super.writeValue(value.rawValue)
-    } else if let value = value as? SubmitResultTypeDTO {
-      super.writeByte(141)
-      super.writeValue(value.rawValue)
     } else if let value = value as? SessionResponseDTO {
-      super.writeByte(142)
+      super.writeByte(141)
       super.writeValue(value.toList())
     } else if let value = value as? AmountDTO {
-      super.writeByte(143)
+      super.writeByte(142)
       super.writeValue(value.toList())
     } else if let value = value as? AnalyticsConfigurationDTO {
-      super.writeByte(144)
+      super.writeByte(143)
       super.writeValue(value.toList())
     } else if let value = value as? InstallmentOptionsDTO {
-      super.writeByte(145)
+      super.writeByte(144)
       super.writeValue(value.toList())
     } else if let value = value as? InstallmentConfigurationDTO {
-      super.writeByte(146)
+      super.writeByte(145)
       super.writeValue(value.toList())
     } else if let value = value as? CardConfigurationDTO {
-      super.writeByte(147)
+      super.writeByte(146)
       super.writeValue(value.toList())
     } else if let value = value as? MerchantInfoDTO {
-      super.writeByte(148)
+      super.writeByte(147)
       super.writeValue(value.toList())
     } else if let value = value as? ShippingAddressParametersDTO {
-      super.writeByte(149)
+      super.writeByte(148)
       super.writeValue(value.toList())
     } else if let value = value as? GooglePayConfigurationDTO {
-      super.writeByte(150)
+      super.writeByte(149)
       super.writeValue(value.toList())
     } else if let value = value as? ApplePayContactDTO {
-      super.writeByte(151)
+      super.writeByte(150)
       super.writeValue(value.toList())
     } else if let value = value as? ApplePaySummaryItemDTO {
-      super.writeByte(152)
+      super.writeByte(151)
       super.writeValue(value.toList())
     } else if let value = value as? ApplePayShippingMethodDTO {
-      super.writeByte(153)
+      super.writeByte(152)
       super.writeValue(value.toList())
     } else if let value = value as? ApplePayPaymentErrorDTO {
-      super.writeByte(154)
+      super.writeByte(153)
       super.writeValue(value.toList())
     } else if let value = value as? ApplePayAuthorizedPaymentDTO {
-      super.writeByte(155)
+      super.writeByte(154)
       super.writeValue(value.toList())
     } else if let value = value as? ApplePayAuthorizationResultDTO {
-      super.writeByte(156)
+      super.writeByte(155)
       super.writeValue(value.toList())
     } else if let value = value as? ApplePayShippingMethodUpdateDTO {
-      super.writeByte(157)
+      super.writeByte(156)
       super.writeValue(value.toList())
     } else if let value = value as? ApplePayShippingContactUpdateDTO {
-      super.writeByte(158)
+      super.writeByte(157)
       super.writeValue(value.toList())
     } else if let value = value as? ApplePayCouponCodeUpdateDTO {
-      super.writeByte(159)
+      super.writeByte(158)
       super.writeValue(value.toList())
     } else if let value = value as? ApplePayButtonStyleDTO {
-      super.writeByte(160)
+      super.writeByte(159)
       super.writeValue(value.toList())
     } else if let value = value as? ApplePayConfigurationDTO {
+      super.writeByte(160)
+      super.writeValue(value.toList())
+    } else if let value = value as? ApplePayCallbacksDTO {
       super.writeByte(161)
       super.writeValue(value.toList())
-    } else if let value = value as? CheckoutConfigurationDTO {
+    } else if let value = value as? CardCallbacksDTO {
       super.writeByte(162)
       super.writeValue(value.toList())
-    } else if let value = value as? CheckoutSetupResultDTO {
+    } else if let value = value as? CheckoutCallbacksDTO {
       super.writeByte(163)
       super.writeValue(value.toList())
-    } else if let value = value as? BeforeSubmitDataDTO {
+    } else if let value = value as? CheckoutConfigurationDTO {
       super.writeByte(164)
       super.writeValue(value.toList())
-    } else if let value = value as? BeforeSubmitResultDTO {
+    } else if let value = value as? CheckoutSetupResultDTO {
       super.writeByte(165)
       super.writeValue(value.toList())
-    } else if let value = value as? AddressDTO {
+    } else if let value = value as? BeforeSubmitDataDTO {
       super.writeByte(166)
       super.writeValue(value.toList())
-    } else if let value = value as? ShopperNameDTO {
+    } else if let value = value as? BeforeSubmitResultDTO {
       super.writeByte(167)
       super.writeValue(value.toList())
-    } else if let value = value as? PaymentComponentDataDTO {
+    } else if let value = value as? AddressDTO {
       super.writeByte(168)
       super.writeValue(value.toList())
-    } else if let value = value as? ActionComponentDataDTO {
+    } else if let value = value as? ShopperNameDTO {
       super.writeByte(169)
       super.writeValue(value.toList())
-    } else if let value = value as? SubmitResultDTO {
+    } else if let value = value as? ActionComponentDataDTO {
       super.writeByte(170)
       super.writeValue(value.toList())
     } else if let value = value as? AdditionalDetailsResultDTO {
@@ -2003,8 +2006,7 @@ var platformApiPigeonMethodCodec = FlutterStandardMethodCodec(readerWriter: Plat
 
 /// Generated protocol from Pigeon that represents a handler of messages from Flutter.
 protocol CheckoutHostApi {
-  func setupSession(sessionResponse: SessionResponseDTO, configuration: CheckoutConfigurationDTO, completion: @escaping (Result<CheckoutSetupResultDTO, Error>) -> Void)
-  func setupAdvanced(paymentMethodsJson: String, configuration: CheckoutConfigurationDTO, completion: @escaping (Result<CheckoutSetupResultDTO, Error>) -> Void)
+  func setupSession(sessionResponse: SessionResponseDTO, configuration: CheckoutConfigurationDTO, callbacks: CheckoutCallbacksDTO, completion: @escaping (Result<CheckoutSetupResultDTO, Error>) -> Void)
   func disposeCheckout(checkoutId: String) throws
   /// Clears all native checkout state without a checkout id. Used to recover
   /// when Dart tracks no active checkout but the platform still holds one
@@ -2033,7 +2035,8 @@ class CheckoutHostApiSetup {
         let args = message as! [Any?]
         let sessionResponseArg = args[0] as! SessionResponseDTO
         let configurationArg = args[1] as! CheckoutConfigurationDTO
-        api.setupSession(sessionResponse: sessionResponseArg, configuration: configurationArg) { result in
+        let callbacksArg = args[2] as! CheckoutCallbacksDTO
+        api.setupSession(sessionResponse: sessionResponseArg, configuration: configurationArg, callbacks: callbacksArg) { result in
           switch result {
           case .success(let res):
             reply(wrapResult(res))
@@ -2044,24 +2047,6 @@ class CheckoutHostApiSetup {
       }
     } else {
       setupSessionChannel.setMessageHandler(nil)
-    }
-    let setupAdvancedChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.CheckoutHostApi.setupAdvanced\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
-    if let api = api {
-      setupAdvancedChannel.setMessageHandler { message, reply in
-        let args = message as! [Any?]
-        let paymentMethodsJsonArg = args[0] as! String
-        let configurationArg = args[1] as! CheckoutConfigurationDTO
-        api.setupAdvanced(paymentMethodsJson: paymentMethodsJsonArg, configuration: configurationArg) { result in
-          switch result {
-          case .success(let res):
-            reply(wrapResult(res))
-          case .failure(let error):
-            reply(wrapError(error))
-          }
-        }
-      }
-    } else {
-      setupAdvancedChannel.setMessageHandler(nil)
     }
     let disposeCheckoutChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.adyen_checkout.CheckoutHostApi.disposeCheckout\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {
@@ -2295,8 +2280,6 @@ class ComponentHostApiSetup {
 /// Generated protocol from Pigeon that represents Flutter messages that can be called from Swift.
 protocol CheckoutCallbacksFlutterApiProtocol {
   func onBeforeSubmit(checkoutId checkoutIdArg: String, data dataArg: BeforeSubmitDataDTO, completion: @escaping (Result<BeforeSubmitResultDTO, AdyenPigeonError>) -> Void)
-  func onSubmit(checkoutId checkoutIdArg: String, data dataArg: PaymentComponentDataDTO, completion: @escaping (Result<SubmitResultDTO, AdyenPigeonError>) -> Void)
-  func onAdditionalDetails(checkoutId checkoutIdArg: String, data dataArg: ActionComponentDataDTO, completion: @escaping (Result<AdditionalDetailsResultDTO, AdyenPigeonError>) -> Void)
   func onApplePaySelectShippingMethod(checkoutId checkoutIdArg: String, shippingMethod shippingMethodArg: ApplePayShippingMethodDTO, currentSummaryItems currentSummaryItemsArg: [ApplePaySummaryItemDTO], completion: @escaping (Result<ApplePayShippingMethodUpdateDTO, AdyenPigeonError>) -> Void)
   func onApplePaySelectShippingContact(checkoutId checkoutIdArg: String, contact contactArg: ApplePayContactDTO, currentSummaryItems currentSummaryItemsArg: [ApplePaySummaryItemDTO], completion: @escaping (Result<ApplePayShippingContactUpdateDTO, AdyenPigeonError>) -> Void)
   func onApplePayChangeCouponCode(checkoutId checkoutIdArg: String, couponCode couponCodeArg: String, currentSummaryItems currentSummaryItemsArg: [ApplePaySummaryItemDTO], completion: @escaping (Result<ApplePayCouponCodeUpdateDTO, AdyenPigeonError>) -> Void)
@@ -2329,48 +2312,6 @@ class CheckoutCallbacksFlutterApi: CheckoutCallbacksFlutterApiProtocol {
         completion(.failure(AdyenPigeonError(code: "null-error", message: "Flutter api returned null value for non-null return value.", details: "")))
       } else {
         let result = listResponse[0] as! BeforeSubmitResultDTO
-        completion(.success(result))
-      }
-    }
-  }
-  func onSubmit(checkoutId checkoutIdArg: String, data dataArg: PaymentComponentDataDTO, completion: @escaping (Result<SubmitResultDTO, AdyenPigeonError>) -> Void) {
-    let channelName: String = "dev.flutter.pigeon.adyen_checkout.CheckoutCallbacksFlutterApi.onSubmit\(messageChannelSuffix)"
-    let channel = FlutterBasicMessageChannel(name: channelName, binaryMessenger: binaryMessenger, codec: codec)
-    channel.sendMessage([checkoutIdArg, dataArg] as [Any?]) { response in
-      guard let listResponse = response as? [Any?] else {
-        completion(.failure(createConnectionError(withChannelName: channelName)))
-        return
-      }
-      if listResponse.count > 1 {
-        let code: String = listResponse[0] as! String
-        let message: String? = nilOrValue(listResponse[1])
-        let details: String? = nilOrValue(listResponse[2])
-        completion(.failure(AdyenPigeonError(code: code, message: message, details: details)))
-      } else if listResponse[0] == nil {
-        completion(.failure(AdyenPigeonError(code: "null-error", message: "Flutter api returned null value for non-null return value.", details: "")))
-      } else {
-        let result = listResponse[0] as! SubmitResultDTO
-        completion(.success(result))
-      }
-    }
-  }
-  func onAdditionalDetails(checkoutId checkoutIdArg: String, data dataArg: ActionComponentDataDTO, completion: @escaping (Result<AdditionalDetailsResultDTO, AdyenPigeonError>) -> Void) {
-    let channelName: String = "dev.flutter.pigeon.adyen_checkout.CheckoutCallbacksFlutterApi.onAdditionalDetails\(messageChannelSuffix)"
-    let channel = FlutterBasicMessageChannel(name: channelName, binaryMessenger: binaryMessenger, codec: codec)
-    channel.sendMessage([checkoutIdArg, dataArg] as [Any?]) { response in
-      guard let listResponse = response as? [Any?] else {
-        completion(.failure(createConnectionError(withChannelName: channelName)))
-        return
-      }
-      if listResponse.count > 1 {
-        let code: String = listResponse[0] as! String
-        let message: String? = nilOrValue(listResponse[1])
-        let details: String? = nilOrValue(listResponse[2])
-        completion(.failure(AdyenPigeonError(code: code, message: message, details: details)))
-      } else if listResponse[0] == nil {
-        completion(.failure(AdyenPigeonError(code: "null-error", message: "Flutter api returned null value for non-null return value.", details: "")))
-      } else {
-        let result = listResponse[0] as! AdditionalDetailsResultDTO
         completion(.success(result))
       }
     }

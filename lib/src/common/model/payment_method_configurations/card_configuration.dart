@@ -1,6 +1,5 @@
 import '../billing_address_mode.dart';
 import '../field_visibility.dart';
-import '../card_callbacks/bin_lookup_data.dart';
 import 'card/installment_configuration.dart';
 
 class CardConfiguration {
@@ -14,8 +13,6 @@ class CardConfiguration {
   final FieldVisibility socialSecurityNumberVisibility;
   final List<String>? supportedCardBrands;
   final InstallmentConfiguration? installmentConfiguration;
-  final void Function(String bin)? onBinChange;
-  final void Function(BinLookupData data)? onBinLookup;
 
   const CardConfiguration({
     this.billingAddressMode = BillingAddressMode.none,
@@ -28,8 +25,6 @@ class CardConfiguration {
     this.socialSecurityNumberVisibility = FieldVisibility.auto,
     this.supportedCardBrands,
     this.installmentConfiguration,
-    this.onBinChange,
-    this.onBinLookup,
   });
 
   @override

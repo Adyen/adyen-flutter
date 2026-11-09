@@ -27,24 +27,13 @@ extension AmountDTO {
 }
 
 extension CheckoutConfigurationDTO {
-    func toCheckoutConfiguration(
-        callbacksApi: CheckoutCallbacksFlutterApi? = nil,
-        checkoutId: String? = nil
-    ) throws -> AdyenCheckout.CheckoutConfiguration {
-        let nativeApplePayConfiguration: ApplePayConfiguration?
-        if let applePayConfiguration {
-            guard let amount, let countryCode else {
-                throw PlatformError(errorDescription: "Amount and countryCode are required for Apple Pay.")
-            }
-            nativeApplePayConfiguration = try mapApplePayConfiguration(
-                dto: applePayConfiguration,
-                amount: amount.toNativeAmount(),
-                countryCode: countryCode,
-                callbacksApi: callbacksApi,
-                checkoutId: checkoutId
+    func toCheckoutConfiguration() throws -> AdyenCheckout.CheckoutConfiguration {
+        let nativeApplePayConfiguration = try applePayConfiguration.map {
+            try mapApplePayConfiguration(
+                dto: $0,
+                amount: $0.amount.toNativeAmount(),
+                countryCode: $0.countryCode
             )
-        } else {
-            nativeApplePayConfiguration = nil
         }
         let configuration = try makeCheckoutConfiguration(
             environment: environment.toNativeEnvironment(),
@@ -54,6 +43,22 @@ extension CheckoutConfigurationDTO {
             applePay: nativeApplePayConfiguration
         )
         return configuration.showsSubmitButton(showSubmitButton)
+    }
+}
+
+extension CheckoutConfigurationDTO {
+    /// Apple Pay callbacks require an Apple Pay configuration, which supplies the currency code.
+    func toApplePayCallbacks(
+        callbacks: ApplePayCallbacksDTO?,
+        callbacksApi: CheckoutCallbacksFlutterApi,
+        checkoutId: String
+    ) -> ApplePayCallbacks? {
+        guard let callbacks, let applePayConfiguration else { return nil }
+        return callbacks.makeCallbacks(
+            callbacksApi: callbacksApi,
+            checkoutId: checkoutId,
+            currencyCode: applePayConfiguration.amount.currency
+        )
     }
 }
 
@@ -144,8 +149,8 @@ extension InstallmentConfigurationDTO {
         guard defaultOption != nil || !cardOptions.isEmpty else { return nil }
         if let defaultOption {
             return InstallmentConfiguration(
-                cardBasedOptions: cardOptions,
                 defaultOptions: defaultOption,
+                cardBasedOptions: cardOptions.isEmpty ? nil : cardOptions,
                 showInstallmentAmount: showInstallmentAmount
             )
         }
@@ -159,8 +164,8 @@ extension InstallmentConfigurationDTO {
 extension InstallmentOptionsDTO {
     func toNativeOptions() -> Adyen.InstallmentOptions {
         InstallmentOptions(
-            monthValues: values.map { UInt($0) },
-            includesRevolving: includesRevolving
+            values: values.map { Int($0) },
+            plans: includesRevolving ? [.regular, .revolving] : [.regular]
         )
     }
 }

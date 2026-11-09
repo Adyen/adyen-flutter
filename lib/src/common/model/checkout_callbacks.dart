@@ -1,38 +1,27 @@
+import 'action_component_data.dart';
 import 'before_submit.dart';
+import 'card_callbacks/card_callbacks.dart';
 import 'checkout_error.dart';
 import 'checkout_results.dart';
-import 'action_component_data.dart';
-import 'payment_component_data.dart';
+import 'payment_method_configurations/apple_pay/apple_pay_callbacks.dart';
 
-typedef SessionCompleteCallback = void Function(SessionCheckoutResult result);
+typedef CheckoutCompleteCallback = void Function(CheckoutResult result);
 typedef CheckoutFailureCallback = void Function(CheckoutError error);
-typedef SubmitCallback = Future<SubmitResult> Function(
-    PaymentComponentData data);
 typedef AdditionalDetailsCallback = Future<AdditionalDetailsResult> Function(
     ActionComponentData data);
 
-class SessionCheckoutCallbacks {
-  final SessionCompleteCallback onComplete;
+class CheckoutCallbacks {
+  final CheckoutCompleteCallback onComplete;
   final CheckoutFailureCallback onFailure;
   final OnBeforeSubmitCallback? onBeforeSubmit;
+  final ApplePayCallbacks? applePay;
+  final CardCallbacks? card;
 
-  const SessionCheckoutCallbacks({
+  const CheckoutCallbacks({
     required this.onComplete,
     required this.onFailure,
     this.onBeforeSubmit,
-  });
-}
-
-class AdvancedCheckoutCallbacks {
-  final SubmitCallback onSubmit;
-  final AdditionalDetailsCallback onAdditionalDetails;
-  final CheckoutFailureCallback onFailure;
-  final void Function(AdvancedCheckoutResult result) onComplete;
-
-  const AdvancedCheckoutCallbacks({
-    required this.onSubmit,
-    required this.onAdditionalDetails,
-    required this.onFailure,
-    required this.onComplete,
+    this.applePay,
+    this.card,
   });
 }

@@ -13,7 +13,6 @@ import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.lifecycle.SavedStateHandle
 import com.adyen.checkout.core.action.data.ActionData
 import com.adyen.checkout.core.common.CheckoutContext
-import com.adyen.checkout.core.components.AdvancedCheckoutCallbacks
 import com.adyen.checkout.core.components.CheckoutAction
 import com.adyen.checkout.core.components.CheckoutCallbacks
 import com.adyen.checkout.core.components.CheckoutController
@@ -82,15 +81,6 @@ internal class DynamicComponentView @JvmOverloads constructor(
                     val coroutineScope = rememberCoroutineScope()
                     val controller = remember(target, checkoutContext, callbacks) {
                         when {
-                            checkoutContext is CheckoutContext.Advanced && callbacks is AdvancedCheckoutCallbacks ->
-                                CheckoutController(
-                                    target = target,
-                                    context = checkoutContext,
-                                    callbacks = callbacks,
-                                    coroutineScope = coroutineScope,
-                                    savedStateHandle = SavedStateHandle(),
-                                )
-
                             checkoutContext is CheckoutContext.Sessions && callbacks is SessionCheckoutCallbacks ->
                                 CheckoutController(
                                     target = target,

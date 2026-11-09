@@ -1,52 +1,18 @@
 package com.adyen.checkout.flutter.utils
 
 import com.adyen.checkout.card.BinLookupData
-import com.adyen.checkout.core.action.data.Action
-import com.adyen.checkout.core.components.AdditionalDetailsResult
 import com.adyen.checkout.core.components.BeforeSubmitResult
-import com.adyen.checkout.core.components.SubmitResult
 import com.adyen.checkout.core.components.data.Address
 import com.adyen.checkout.core.components.data.BeforeSubmitData
 import com.adyen.checkout.core.components.data.ShopperName
-import com.adyen.checkout.flutter.generated.AdditionalDetailsResultDTO
 import com.adyen.checkout.flutter.generated.AddressDTO
-import com.adyen.checkout.flutter.generated.AdyenPigeonError
 import com.adyen.checkout.flutter.generated.BeforeSubmitDataDTO
 import com.adyen.checkout.flutter.generated.BeforeSubmitResultDTO
 import com.adyen.checkout.flutter.generated.BinLookupBrandDTO
 import com.adyen.checkout.flutter.generated.BinLookupDataDTO
 import com.adyen.checkout.flutter.generated.ShopperNameDTO
-import com.adyen.checkout.flutter.generated.SubmitResultDTO
-import com.adyen.checkout.flutter.generated.SubmitResultTypeDTO
-import org.json.JSONObject
 
 internal object CheckoutCallbacksMapper {
-    internal fun SubmitResultDTO.toNativeSubmitResult(): SubmitResult =
-        when (type) {
-            SubmitResultTypeDTO.COMPLETION -> {
-                val code =
-                    resultCode ?: throw AdyenPigeonError(
-                        ErrorCodes.INVALID_SUBMIT_RESULT,
-                        "Submit completion did not contain a result code.",
-                    )
-                SubmitResult.Completion(code)
-            }
-
-            SubmitResultTypeDTO.ACTION -> {
-                val actionJson =
-                    actionJson ?: throw AdyenPigeonError(
-                        ErrorCodes.INVALID_SUBMIT_RESULT,
-                        "Submit action did not contain action data.",
-                    )
-                SubmitResult.Action(Action.SERIALIZER.deserialize(JSONObject(actionJson)))
-            }
-
-            SubmitResultTypeDTO.RETRY -> SubmitResult.Retry(errorMessage)
-        }
-
-    internal fun AdditionalDetailsResultDTO.toNativeAdditionalDetailsResult(): AdditionalDetailsResult =
-        AdditionalDetailsResult.Completion(resultCode)
-
     internal fun BeforeSubmitResultDTO.toNativeBeforeSubmitResult(): BeforeSubmitResult =
         if (isAborted) {
             BeforeSubmitResult.Abort()

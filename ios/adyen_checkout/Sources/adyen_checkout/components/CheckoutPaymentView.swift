@@ -87,7 +87,7 @@ final class CheckoutPaymentView: NSObject, FlutterPlatformView {
         child.didMove(toParent: parent)
     }
 
-    private func createPaymentComponent(checkout: PaymentCheckout) throws -> CheckoutPaymentComponent {
+    private func createPaymentComponent(checkout: Checkout) throws -> CheckoutPaymentComponent {
         if params.isStoredPaymentMethod {
             guard let identifier = paymentMethodObject?["id"] as? String else {
                 throw AdyenPigeonError(

@@ -4,46 +4,28 @@ import 'package:adyen_checkout/adyen_checkout.dart';
 import 'package:adyen_checkout_example/config.dart';
 import 'package:adyen_checkout_example/main_common.dart';
 import 'package:adyen_checkout_example/network/service.dart';
-import 'package:adyen_checkout_example/repositories/advanced_checkout_repository.dart';
+import 'package:adyen_checkout_example/repositories/api_only_checkout_repository.dart';
 import 'package:adyen_checkout_example/repositories/session_checkout_repository.dart';
-import 'package:adyen_checkout_example/screens/component/advanced_component_screen.dart';
 import 'package:adyen_checkout_example/screens/component/component_navigation_screen.dart';
 import 'package:adyen_checkout_example/screens/component/instant/component_unavailable_message.dart';
-import 'package:adyen_checkout_example/screens/component/instant/instant_advanced_component_screen.dart';
 import 'package:adyen_checkout_example/screens/component/instant/instant_component_navigation_screen.dart';
 import 'package:adyen_checkout_example/screens/component/instant/instant_payment_methods.dart';
 import 'package:adyen_checkout_example/screens/component/instant/instant_session_component_screen.dart';
 import 'package:adyen_checkout_example/screens/component/session_component_screen.dart';
 import 'package:adyen_checkout_example/utils/dialog_builder.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 class CapturingSessionCheckoutRepository extends SessionCheckoutRepository {
-  final Completer<SessionCheckout> _setupCompleter =
-      Completer<SessionCheckout>();
-  late SessionCheckoutCallbacks callbacks;
+  final Completer<Checkout> _setupCompleter = Completer<Checkout>();
+  late CheckoutCallbacks callbacks;
 
   CapturingSessionCheckoutRepository() : super(service: FakeService());
 
   @override
-  Future<SessionCheckout> setupCheckout({
-    required SessionCheckoutCallbacks callbacks,
-  }) {
-    this.callbacks = callbacks;
-    return _setupCompleter.future;
-  }
-}
-
-class CapturingAdvancedCheckoutRepository extends AdvancedCheckoutRepository {
-  final Completer<AdvancedCheckout> _setupCompleter =
-      Completer<AdvancedCheckout>();
-  late AdvancedCheckoutCallbacks callbacks;
-
-  CapturingAdvancedCheckoutRepository() : super(service: FakeService());
-
-  @override
-  Future<AdvancedCheckout> setupCheckout({
-    required AdvancedCheckoutCallbacks callbacks,
+  Future<Checkout> setupCheckout({
+    required CheckoutCallbacks callbacks,
   }) {
     this.callbacks = callbacks;
     return _setupCompleter.future;
@@ -93,22 +75,32 @@ class FakeService implements Service {
 }
 
 void main() {
-  test('flow repositories build configuration directly from Config', () {
+  test('session repository builds configuration directly from Config', () {
     final sessionConfiguration =
         SessionCheckoutRepository(service: FakeService()).buildConfiguration();
-    final advancedConfiguration =
-        AdvancedCheckoutRepository(service: FakeService()).buildConfiguration();
 
-    expect(sessionConfiguration.amount?.currency, Config.amount.currency);
-    expect(sessionConfiguration.amount?.value, Config.amount.value);
-    expect(sessionConfiguration.countryCode, Config.countryCode);
+    final applePay = sessionConfiguration.applePayConfiguration;
+    expect(applePay?.amount.currency, Config.amount.currency);
+    expect(applePay?.amount.value, Config.amount.value);
+    expect(applePay?.countryCode, Config.countryCode);
+    expect(applePay?.buttonStyle?.type, ApplePayButtonType.buy);
     expect(
-      sessionConfiguration.applePayConfiguration?.buttonStyle?.type,
-      ApplePayButtonType.buy,
+      sessionConfiguration.googlePayConfiguration?.countryCode,
+      Config.countryCode,
     );
-    expect(advancedConfiguration.amount?.currency, Config.amount.currency);
-    expect(advancedConfiguration.amount?.value, Config.amount.value);
-    expect(advancedConfiguration.countryCode, Config.countryCode);
+  });
+
+  test('api-only repository passes Config country code to Google Pay', () {
+    debugDefaultTargetPlatformOverride = TargetPlatform.android;
+    addTearDown(() => debugDefaultTargetPlatformOverride = null);
+
+    final configuration =
+        ApiOnlyCheckoutRepository(service: FakeService()).buildConfiguration();
+
+    expect(
+      configuration.googlePayConfiguration?.countryCode,
+      Config.countryCode,
+    );
   });
 
   test('instant screens resolve the full v1 payment method set in order', () {
@@ -129,15 +121,14 @@ void main() {
 
   test('repositories use the registered platform return URLs', () {
     final sessionRepository = SessionCheckoutRepository(service: FakeService());
-    final advancedRepository =
-        AdvancedCheckoutRepository(service: FakeService());
+    final apiOnlyRepository = ApiOnlyCheckoutRepository(service: FakeService());
 
     expect(
       sessionRepository.determineReturnUrl(platform: TargetPlatform.android),
       'adyencheckout://com.adyen.adyen_checkout_example/adyenPayment',
     );
     expect(
-      advancedRepository.determineReturnUrl(platform: TargetPlatform.android),
+      apiOnlyRepository.determineReturnUrl(platform: TargetPlatform.android),
       'adyencheckout://com.adyen.adyen_checkout_example/adyenPayment',
     );
     expect(
@@ -145,31 +136,27 @@ void main() {
       'com.mydomain.adyencheckout://adyenPayment',
     );
     expect(
-      advancedRepository.determineReturnUrl(platform: TargetPlatform.iOS),
+      apiOnlyRepository.determineReturnUrl(platform: TargetPlatform.iOS),
       'com.mydomain.adyencheckout://adyenPayment',
     );
   });
 
-  test('Session and Advanced requests include matching line items', () async {
+  test('session requests include the shared line items', () async {
     final service = RecordingService();
     final sessionRepository = SessionCheckoutRepository(service: service);
-    final advancedRepository = AdvancedCheckoutRepository(service: service);
 
     await sessionRepository.createSessionResponse();
-    await advancedRepository.onSubmit(PaymentComponentData(data: const {}));
 
-    for (final request in [service.sessionRequest, service.paymentsRequest]) {
-      final lineItems = request?['lineItems'] as List<dynamic>;
-      expect(lineItems, hasLength(1));
-      final lineItem = lineItems.single as Map<String, dynamic>;
-      expect(lineItem['quantity'], 1);
-      expect(lineItem['amountExcludingTax'], Config.amount.value);
-      expect(lineItem['taxPercentage'], 0);
-      expect(lineItem['taxAmount'], 0);
-      expect(lineItem['amountIncludingTax'], Config.amount.value);
-      expect(lineItem['description'], 'Shoes');
-      expect(lineItem['id'], 'Item #1');
-    }
+    final lineItems = service.sessionRequest?['lineItems'] as List<dynamic>;
+    expect(lineItems, hasLength(1));
+    final lineItem = lineItems.single as Map<String, dynamic>;
+    expect(lineItem['quantity'], 1);
+    expect(lineItem['amountExcludingTax'], Config.amount.value);
+    expect(lineItem['taxPercentage'], 0);
+    expect(lineItem['taxAmount'], 0);
+    expect(lineItem['amountIncludingTax'], Config.amount.value);
+    expect(lineItem['description'], 'Shoes');
+    expect(lineItem['id'], 'Item #1');
   });
 
   testWidgets('Instant Session shows browser cancellation as a failure result',
@@ -178,28 +165,6 @@ void main() {
     await tester.pumpWidget(
       MaterialApp(
         home: InstantSessionComponentScreen(repository: repository),
-      ),
-    );
-
-    repository.callbacks.onFailure(
-      const CheckoutError(
-        code: CheckoutError.cancellationCode,
-        message: 'Payment cancelled.',
-      ),
-    );
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 300));
-
-    expect(find.text('Payment Failed'), findsOneWidget);
-    expect(find.text('Cancelled: Payment cancelled.'), findsOneWidget);
-  });
-
-  testWidgets('Instant Advanced shows browser cancellation as a failure result',
-      (tester) async {
-    final repository = CapturingAdvancedCheckoutRepository();
-    await tester.pumpWidget(
-      MaterialApp(
-        home: InstantAdvancedComponentScreen(repository: repository),
       ),
     );
 
@@ -240,8 +205,8 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Card component session'), findsOneWidget);
-    expect(find.text('Card component advanced'), findsOneWidget);
     expect(find.text('Card component bottom sheet'), findsOneWidget);
+    expect(find.textContaining('advanced'), findsNothing);
   });
 
   testWidgets('navigates to the instant flow choices', (tester) async {
@@ -252,7 +217,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Instant component session'), findsOneWidget);
-    expect(find.text('Instant component advanced'), findsOneWidget);
+    expect(find.textContaining('advanced'), findsNothing);
   });
 
   testWidgets('generic component navigation passes flat screen parameters',
@@ -261,8 +226,6 @@ void main() {
       MaterialApp(
         home: ComponentNavigationScreen(
           sessionRepository: SessionCheckoutRepository(service: FakeService()),
-          advancedRepository:
-              AdvancedCheckoutRepository(service: FakeService()),
           title: 'BLIK',
           txVariant: 'blik',
         ),
@@ -271,7 +234,7 @@ void main() {
 
     expect(find.text('BLIK component'), findsOneWidget);
     expect(find.text('BLIK component session'), findsOneWidget);
-    expect(find.text('BLIK component advanced'), findsOneWidget);
+    expect(find.textContaining('advanced'), findsNothing);
 
     await tester.tap(find.text('BLIK component session'));
     await tester.pumpAndSettle();
@@ -283,45 +246,18 @@ void main() {
     expect(screen.txVariant, 'blik');
   });
 
-  testWidgets('generic navigation passes parameters to advanced screen',
-      (tester) async {
-    await tester.pumpWidget(
-      MaterialApp(
-        home: ComponentNavigationScreen(
-          sessionRepository: SessionCheckoutRepository(service: FakeService()),
-          advancedRepository:
-              AdvancedCheckoutRepository(service: FakeService()),
-          title: 'Google Pay',
-          txVariant: 'googlepay',
-        ),
-      ),
-    );
-
-    await tester.tap(find.text('Google Pay component advanced'));
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 500));
-
-    final screen = tester.widget<AdvancedComponentScreen>(
-      find.byType(AdvancedComponentScreen),
-    );
-    expect(screen.title, 'Google Pay');
-    expect(screen.txVariant, 'googlepay');
-  });
-
   testWidgets('instant navigation opens the dedicated session screen',
       (tester) async {
     await tester.pumpWidget(
       MaterialApp(
         home: InstantComponentNavigationScreen(
           sessionRepository: SessionCheckoutRepository(service: FakeService()),
-          advancedRepository:
-              AdvancedCheckoutRepository(service: FakeService()),
         ),
       ),
     );
 
     expect(find.text('Instant component session'), findsOneWidget);
-    expect(find.text('Instant component advanced'), findsOneWidget);
+    expect(find.textContaining('advanced'), findsNothing);
     expect(find.text('iDEAL component session'), findsNothing);
 
     await tester.tap(find.text('Instant component session'));
@@ -331,25 +267,6 @@ void main() {
     expect(find.byType(InstantSessionComponentScreen), findsOneWidget);
   });
 
-  testWidgets('instant navigation opens the dedicated advanced screen',
-      (tester) async {
-    await tester.pumpWidget(
-      MaterialApp(
-        home: InstantComponentNavigationScreen(
-          sessionRepository: SessionCheckoutRepository(service: FakeService()),
-          advancedRepository:
-              AdvancedCheckoutRepository(service: FakeService()),
-        ),
-      ),
-    );
-
-    await tester.tap(find.text('Instant component advanced'));
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 500));
-
-    expect(find.byType(InstantAdvancedComponentScreen), findsOneWidget);
-  });
-
   testWidgets('navigates to multi component navigation', (tester) async {
     await tester.pumpWidget(CheckoutExample(service: FakeService()));
 
@@ -357,7 +274,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Multi component session'), findsOneWidget);
-    expect(find.text('Multi component advanced'), findsOneWidget);
+    expect(find.textContaining('advanced'), findsNothing);
   });
 
   testWidgets('navigates to custom card screen', (tester) async {

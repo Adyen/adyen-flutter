@@ -22,10 +22,8 @@ final class RunnerTests: XCTestCase {
             dto: ApplePayConfigurationDTO(
                 merchantId: "",
                 merchantName: "Test Merchant",
-                hasOnSelectShippingMethod: false,
-                hasOnSelectShippingContact: false,
-                hasOnChangeCouponCode: false,
-                hasOnAuthorize: false
+                amount: AmountDTO(currency: "EUR", value: 11295),
+                countryCode: "NL"
             ),
             amount: Adyen.Amount(value: 11295, currencyCode: "EUR"),
             countryCode: "NL"

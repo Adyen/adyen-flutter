@@ -48,13 +48,6 @@ internal class CheckoutComponentRegistry {
     }
 
     @Synchronized
-    fun setActive(checkoutId: String, componentId: String) {
-        if (components[componentId]?.checkoutId == checkoutId) {
-            activeComponentId = componentId
-        }
-    }
-
-    @Synchronized
     fun handleReturn(intent: Intent) {
         val target = activeComponentId?.let { components[it] }
         if (target != null) {

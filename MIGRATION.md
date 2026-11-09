@@ -5,39 +5,34 @@ It supports Android and iOS only.
 
 ## Entry points
 
-Replace the singleton manager API:
+Replace the v1 session and advanced setup calls:
 
 ```dart
-AdyenCheckout.instance
 AdyenCheckout.session.setup(...)
 AdyenCheckout.advanced.setup(...)
 ```
 
-with the singleton `Checkout.instance` entry point:
+with the single `AdyenCheckout.instance.setup(...)` entry point, which returns a `Checkout` (the
+native v6 name; it replaces `SessionCheckout`). Callbacks and results follow the native names:
+`CheckoutCallbacks` and `CheckoutResult` replace `SessionCheckoutCallbacks` and
+`SessionCheckoutResult`.
 
 ```dart
-final sessionCheckout = await Checkout.instance.setup(
+final checkout = await AdyenCheckout.instance.setup(
   sessionResponse: sessionResponse,
   configuration: configuration,
-  callbacks: SessionCheckoutCallbacks(
+  callbacks: CheckoutCallbacks(
     onComplete: onSessionComplete,
-    onFailure: onFailure,
-  ),
-);
-
-final advancedCheckout = await Checkout.instance.setupAdvanced(
-  paymentMethods: PaymentMethods.fromJson(paymentMethodsJson),
-  configuration: configuration,
-  callbacks: AdvancedCheckoutCallbacks(
-    onSubmit: onSubmit,
-    onAdditionalDetails: onAdditionalDetails,
-    onComplete: onAdvancedComplete,
     onFailure: onFailure,
   ),
 );
 ```
 
-`Checkout.instance.handleAction` replaces the legacy standalone action component and returns an
+The Advanced flow is not available in Checkout 2.0. The native Android and iOS v6 SDKs no longer
+expose it publicly, so `setupAdvanced`, `AdvancedCheckout`, `AdvancedCheckoutCallbacks`,
+`SubmitResult` and `PaymentComponentData` have been removed. Use Sessions instead.
+
+`AdyenCheckout.instance.handleAction` replaces the legacy standalone action component and returns an
 `AdvancedCheckoutResult`. The action callback is supplied directly to the one-shot call.
 
 ## Components
@@ -71,12 +66,16 @@ component/controller API; no payment-method-specific Flutter API is required.
 ## Models and callbacks
 
 - Raw payment-method maps become `PaymentMethods`, `PaymentMethod`, and `StoredPaymentMethod`.
-- Callback payloads become `PaymentComponentData` and `ActionComponentData`; submit data is available
-  through their unmodifiable `data` maps.
-- `PaymentEvent` becomes `SubmitResult`, `AdditionalDetailsResult`, checkout result models, and
-  `CheckoutError`.
+- Action callback payloads become `ActionComponentData`; the data is available through its
+  unmodifiable `data` map.
+- `PaymentEvent` becomes `AdditionalDetailsResult`, `CheckoutResult`, and `CheckoutError`.
+- Payment-method callbacks no longer live on the payment-method configurations. Apple Pay callbacks
+  (`onSelectShippingMethod`, `onSelectShippingContact`, `onChangeCouponCode`, `onAuthorize`) move
+  from `ApplePayConfiguration` to `ApplePayCallbacks`, and card BIN callbacks (`onBinChange`,
+  `onBinLookup`) move from `CardConfiguration` to `CardCallbacks`. Pass them through
+  `CheckoutCallbacks(applePay: ..., card: ...)`, mirroring the native v6 SDKs.
 - Card validators return `bool` and expiry validation requires two-digit `MM` and `YY` strings.
-- `Checkout.getReturnUrl()` is removed. Configure the return URL in the backend and forward incoming
+- `AdyenCheckout.instance.getReturnUrl()` is removed. Configure the return URL in the backend and forward incoming
   native URL or intent events to the native Checkout API in the host application.
 
 ## Removed APIs
@@ -89,9 +88,11 @@ of the 2.0 alpha.
 
 `CheckoutConfiguration` now accepts only the v6-aligned fields:
 
-- `environment`, `clientKey`, optional `amount`, and optional `countryCode`;
+- `environment` and `clientKey`;
 - `analyticsConfiguration` and `showSubmitButton`;
 - Card, Apple Pay, and Android-only Google Pay configuration.
 
-Unsupported fields are removed rather than silently ignored. Apple Pay requires an amount and
-country code when it is configured. Google Pay is supported on Android only.
+Unsupported fields are removed rather than silently ignored. The top-level `amount` and
+`countryCode` are gone: move them into `ApplePayConfiguration` (`amount` and `countryCode`, both
+required) and `GooglePayConfiguration` (`countryCode`, required). Sessions supply the amount
+natively. Google Pay is supported on Android only.

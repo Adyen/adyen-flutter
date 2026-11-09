@@ -3,17 +3,19 @@ import 'payment_method.dart';
 import 'stored_payment_method.dart';
 import '../../checkout_runtime.dart';
 
-abstract class CheckoutFlow {
+class Checkout {
   final String id;
   final List<PaymentMethod> paymentMethods;
   final List<StoredPaymentMethod> storedPaymentMethods;
+  final CheckoutCallbacks callbacks;
   final CheckoutRuntime _runtime;
   bool _disposed = false;
 
-  CheckoutFlow._({
+  Checkout._({
     required this.id,
     required List<PaymentMethod> paymentMethods,
     required List<StoredPaymentMethod> storedPaymentMethods,
+    required this.callbacks,
     required CheckoutRuntime runtime,
   })  : paymentMethods = List<PaymentMethod>.unmodifiable(paymentMethods),
         storedPaymentMethods =
@@ -27,49 +29,25 @@ abstract class CheckoutFlow {
     _disposed = true;
     _runtime.disposeCheckout(id);
   }
-}
 
-class SessionCheckout extends CheckoutFlow {
-  final SessionCheckoutCallbacks callbacks;
-
-  SessionCheckout._({
-    required super.id,
-    required super.paymentMethods,
-    required super.storedPaymentMethods,
-    required super.runtime,
-    required this.callbacks,
-  }) : super._();
-
-  /// Presents Drop-in for this session checkout.
+  /// Presents Drop-in for this checkout.
   ///
   /// The returned future completes once Drop-in is presented. Payment results
-  /// are delivered through [callbacks]: [SessionCheckoutCallbacks.onComplete]
-  /// on completion and [SessionCheckoutCallbacks.onFailure] on failure. When
-  /// the shopper dismisses Drop-in, [SessionCheckoutCallbacks.onFailure] is
+  /// are delivered through [callbacks]: [CheckoutCallbacks.onComplete]
+  /// on completion and [CheckoutCallbacks.onFailure] on failure. When
+  /// the shopper dismisses Drop-in, [CheckoutCallbacks.onFailure] is
   /// invoked with [CheckoutError.cancellationCode].
   Future<void> startDropIn() => _runtime.startDropIn(id);
 }
 
-class AdvancedCheckout extends CheckoutFlow {
-  final AdvancedCheckoutCallbacks callbacks;
-
-  AdvancedCheckout._({
-    required super.id,
-    required super.paymentMethods,
-    required super.storedPaymentMethods,
-    required super.runtime,
-    required this.callbacks,
-  }) : super._();
-}
-
-SessionCheckout createSessionCheckout({
+Checkout createCheckout({
   required String id,
   required List<PaymentMethod> paymentMethods,
   required List<StoredPaymentMethod> storedPaymentMethods,
-  required SessionCheckoutCallbacks callbacks,
+  required CheckoutCallbacks callbacks,
   required CheckoutRuntime runtime,
 }) =>
-    SessionCheckout._(
+    Checkout._(
       id: id,
       paymentMethods: paymentMethods,
       storedPaymentMethods: storedPaymentMethods,
@@ -77,23 +55,8 @@ SessionCheckout createSessionCheckout({
       runtime: runtime,
     );
 
-AdvancedCheckout createAdvancedCheckout({
-  required String id,
-  required List<PaymentMethod> paymentMethods,
-  required List<StoredPaymentMethod> storedPaymentMethods,
-  required AdvancedCheckoutCallbacks callbacks,
-  required CheckoutRuntime runtime,
-}) =>
-    AdvancedCheckout._(
-      id: id,
-      paymentMethods: paymentMethods,
-      storedPaymentMethods: storedPaymentMethods,
-      callbacks: callbacks,
-      runtime: runtime,
-    );
+CheckoutRuntime checkoutRuntimeOf(Checkout checkout) => checkout._runtime;
 
-CheckoutRuntime checkoutRuntimeOf(CheckoutFlow flow) => flow._runtime;
-
-void markFlowDisposed(CheckoutFlow flow) {
-  flow._disposed = true;
+void markCheckoutDisposed(Checkout checkout) {
+  checkout._disposed = true;
 }

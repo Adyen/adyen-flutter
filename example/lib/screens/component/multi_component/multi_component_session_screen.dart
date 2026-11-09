@@ -18,7 +18,7 @@ class MultiComponentSessionScreen extends StatefulWidget {
 
 class _MultiComponentSessionScreenState
     extends State<MultiComponentSessionScreen> {
-  SessionCheckout? _checkout;
+  Checkout? _checkout;
   bool _loading = true;
   String? _error;
 
@@ -42,7 +42,7 @@ class _MultiComponentSessionScreenState
 
     try {
       final checkout = await widget.repository.setupCheckout(
-        callbacks: SessionCheckoutCallbacks(
+        callbacks: CheckoutCallbacks(
           onComplete: _onComplete,
           onFailure: _onFailure,
           onBeforeSubmit: (data) async => BeforeSubmitProceed(data: data),
@@ -65,7 +65,7 @@ class _MultiComponentSessionScreenState
     }
   }
 
-  void _onComplete(SessionCheckoutResult result) {
+  void _onComplete(CheckoutResult result) {
     if (!mounted) return;
     DialogBuilder.showPaymentResultDialog(
       'Payment Result',

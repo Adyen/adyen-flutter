@@ -5,6 +5,7 @@ import 'shipping_address_parameters.dart';
 
 class GooglePayConfiguration {
   final GooglePayEnvironment googlePayEnvironment;
+  final String countryCode;
   final String? merchantAccount;
   final MerchantInfo? merchantInfo;
   final TotalPriceStatus? totalPriceStatus;
@@ -15,6 +16,7 @@ class GooglePayConfiguration {
 
   const GooglePayConfiguration({
     required this.googlePayEnvironment,
+    required this.countryCode,
     this.merchantAccount,
     this.merchantInfo,
     this.totalPriceStatus,
@@ -27,6 +29,7 @@ class GooglePayConfiguration {
   @override
   String toString() => 'GooglePayConfiguration('
       'googlePayEnvironment: $googlePayEnvironment, '
+      'countryCode: $countryCode, '
       'merchantAccount: $merchantAccount, '
       'merchantInfo: $merchantInfo, '
       'totalPriceStatus: $totalPriceStatus, '

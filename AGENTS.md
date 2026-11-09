@@ -239,8 +239,8 @@ Before adding anything, check whether the native v6 SDK (adyen-android/adyen-ios
 registers a component for the payment method's `txVariant` in its own registry (Android:
 `PaymentMethodProvider`/`*Initializer.kt` per payment method module; iOS:
 `CheckoutComponentBuilder`/`PaymentMethodType`). If it does, the method should already work
-through `CheckoutPaymentComponent` with no plugin changes; verify it manually (Sessions and
-Advanced, both platforms). Only add plugin code if the native SDK does not support the method
+through `CheckoutPaymentComponent` with no plugin changes; verify it manually (Sessions,
+both platforms). Only add plugin code if the native SDK does not support the method
 generically.
 
 ### Communication Pattern
@@ -250,8 +250,10 @@ generically.
 - **Flutter → Native (commands)**: component submit and dispose go through `ComponentHostApi`.
 - **Native → Flutter (events)**: `CheckoutEventDTO` over the `CheckoutEvents` event channel, with
   types `componentReady`, `resize`, `failure`, `complete`, `binLookup`, `binValue`.
-- **Native → Flutter (callbacks)**: `onSubmit`, `onAdditionalDetails`, `onBeforeSubmit` and the
-  Apple Pay callbacks go through `CheckoutCallbacksFlutterApi`.
+- **Native → Flutter (callbacks)**: `onBeforeSubmit` and the Apple Pay callbacks go through
+  `CheckoutCallbacksFlutterApi`; BIN callbacks arrive as `binValue`/`binLookup` events routed by
+  checkout id. Which payment-method callbacks exist is declared up front via `CheckoutCallbacksDTO`
+  (`setupSession`), so natives only register the callbacks the merchant provided; action-only `onAdditionalDetails` goes through `ActionOnlyFlutterApi`.
 - **Resize handling**: native views measure their content and report the height in `resize`
   events; the Dart widget updates its viewport. Android measures the Compose content height
   unconstrained and reports rounded-up dp; iOS uses `preferredContentSize` or
@@ -308,10 +310,10 @@ generically.
 
 ## Checkout 2.0 alpha implementation notes
 
-- This branch is the Flutter 2.0 v6 alpha implementation. The public entry point is `Checkout`,
-  with Sessions, Advanced, generic `CheckoutPaymentComponent`, and one-shot action handling.
-- Drop-in for sessions is available via `SessionCheckout.startDropIn()`; results reuse the
-  `SessionCheckoutCallbacks` event path (cancel → `CheckoutError.cancellationCode`). Android
+- This branch is the Flutter 2.0 v6 alpha implementation. The public entry point is `AdyenCheckout.instance`,
+  with Sessions, generic `CheckoutPaymentComponent`, and one-shot action handling.
+- Drop-in for sessions is available via `Checkout.startDropIn()`; results reuse the
+  `CheckoutCallbacks` event path (cancel → `CheckoutError.cancellationCode`). Android
   Drop-in does not propagate `sessionResult` yet, so it is empty for Drop-in completions.
   Instant, partial-payment/order, and legacy component APIs are intentionally removed.
 - Native dependencies track development builds, not a release pin: Android resolves the weekly
@@ -319,6 +321,10 @@ generically.
   from Central Portal Snapshots, and iOS pins `adyen-ios` `develop` to a specific commit via the
   `revision:` requirement in `ios/adyen_checkout/Package.swift`. iOS uses Swift Package Manager and
   requires iOS 16.0 or later.
+- The Advanced flow has been removed from the plugin because the native v6 SDKs no longer expose it
+  (Sessions and action-only remain). `amount` and `countryCode` are configured on
+  `ApplePayConfiguration` and `GooglePayConfiguration`, not on `CheckoutConfiguration`, because
+  adyen-android removed `amount` from its `CheckoutConfiguration` and sessions provide it.
 - Generic native payment views are registered through `CheckoutComponentRegistry` and use
   `CheckoutPaymentView` on both platforms.
 - Direct/no-input methods render their own native submit button (`showSubmitButton` default). A

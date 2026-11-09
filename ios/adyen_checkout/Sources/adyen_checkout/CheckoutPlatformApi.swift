@@ -38,6 +38,7 @@ final class CheckoutPlatformApi: CheckoutHostApi {
     func setupSession(
         sessionResponse: SessionResponseDTO,
         configuration: CheckoutConfigurationDTO,
+        callbacks: CheckoutCallbacksDTO,
         completion: @escaping (Result<CheckoutSetupResultDTO, Error>) -> Void
     ) {
         let checkoutId = UUID().uuidString
@@ -51,9 +52,25 @@ final class CheckoutPlatformApi: CheckoutHostApi {
                     )
                 }
                 _ = makePresentationDelegate(id: checkoutId)
-                let checkout = try await Checkout.setup(
-                    with: sessionResponse.toSessionResponse(),
-                    configuration: configuration.toCheckoutConfiguration(callbacksApi: callbacksApi, checkoutId: checkoutId)
+                let checkoutCallbacks = CheckoutCallbacks(
+                    onComplete: { [weak self] result in
+                        self?.sendComplete(checkoutId: checkoutId, result: result)
+                    },
+                    onFailure: { [weak self] error in
+                        self?.sendFailure(checkoutId: checkoutId, error: error)
+                    },
+                    additionalCallbacks: {
+                        if let applePayCallbacks = configuration.toApplePayCallbacks(
+                            callbacks: callbacks.applePay,
+                            callbacksApi: callbacksApi,
+                            checkoutId: checkoutId
+                        ) {
+                            applePayCallbacks
+                        }
+                        if let cardCallbacks = callbacks.card?.makeCallbacks(events: events, checkoutId: checkoutId) {
+                            cardCallbacks
+                        }
+                    }
                 )
                 .onAction { [weak self] _, viewController in
                     self?.presentationDelegates[checkoutId]?.present(viewController)
@@ -62,59 +79,11 @@ final class CheckoutPlatformApi: CheckoutHostApi {
                     guard let self else { return .abort }
                     return await self.requestBeforeSubmit(checkoutId: checkoutId, data: data)
                 }
-                .onComplete { [weak self] result in
-                    self?.sendComplete(checkoutId: checkoutId, result: result)
-                }
-                .onFailure { [weak self] error in
-                    self?.sendFailure(checkoutId: checkoutId, error: error)
-                }
-                let reply = try checkout.setupResult(checkoutId: checkoutId)
-                holder.store(checkout, id: checkoutId)
-                completion(.success(reply))
-            } catch {
-                completion(.failure(asPigeonError(error)))
-            }
-        }
-    }
-
-    func setupAdvanced(
-        paymentMethodsJson: String,
-        configuration: CheckoutConfigurationDTO,
-        completion: @escaping (Result<CheckoutSetupResultDTO, Error>) -> Void
-    ) {
-        let checkoutId = UUID().uuidString
-        Task { @MainActor in
-            do {
-                guard !holder.isActive else {
-                    throw AdyenPigeonError(
-                        code: ErrorCodes.checkoutAlreadyActive,
-                        message: "Another checkout flow is already active.",
-                        details: nil
-                    )
-                }
-                let paymentMethods = try JSONDecoder().decode(PaymentMethods.self, from: Data(paymentMethodsJson.utf8))
-                _ = makePresentationDelegate(id: checkoutId)
                 let checkout = try await Checkout.setup(
-                    with: paymentMethods,
-                    configuration: configuration.toCheckoutConfiguration(callbacksApi: callbacksApi, checkoutId: checkoutId)
+                    with: sessionResponse.toSessionResponse(),
+                    configuration: configuration.toCheckoutConfiguration(),
+                    callbacks: checkoutCallbacks
                 )
-                .onAction { [weak self] _, viewController in
-                    self?.presentationDelegates[checkoutId]?.present(viewController)
-                }
-                .onSubmit { [weak self] data in
-                    guard let self else { return .retry(errorMessage: "Checkout is no longer active.") }
-                    return await self.requestSubmit(checkoutId: checkoutId, data: data)
-                }
-                .onAdditionalDetails { [weak self] data in
-                    guard let self else { return .completion(resultCode: "Error") }
-                    return await self.requestAdditionalDetails(checkoutId: checkoutId, data: data)
-                }
-                .onComplete { [weak self] result in
-                    self?.sendComplete(checkoutId: checkoutId, result: result)
-                }
-                .onFailure { [weak self] error in
-                    self?.sendFailure(checkoutId: checkoutId, error: error)
-                }
                 let reply = try checkout.setupResult(checkoutId: checkoutId)
                 holder.store(checkout, id: checkoutId)
                 completion(.success(reply))
@@ -179,16 +148,10 @@ final class CheckoutPlatformApi: CheckoutHostApi {
             do {
                 let action = try JSONDecoder().decode(Action.self, from: Data(actionJson.utf8))
                 _ = makePresentationDelegate(id: actionId)
-                let checkout = try await Checkout.setup(
-                    configuration: configuration.toCheckoutConfiguration()
-                )
                 let result = AsyncResult<AdvancedCheckoutResult>()
                 actionCompletion = result
-                _ = checkout
-                    .onAction { [weak self] _, viewController in
-                        self?.presentationDelegates[actionId]?.present(viewController)
-                    }
-                    .onAdditionalDetails { [weak self] data in
+                let callbacks = ActionOnlyCheckoutCallbacks(
+                    onAdditionalDetails: { [weak self] data in
                         guard let self else { return .completion(resultCode: "Error") }
                         do {
                             return try await self.requestActionDetails(actionId: actionId, data: data)
@@ -196,9 +159,17 @@ final class CheckoutPlatformApi: CheckoutHostApi {
                             result.fail(error)
                             return .completion(resultCode: "Error")
                         }
-                    }
-                    .onComplete { value in result.succeed(value) }
-                    .onFailure { error in result.fail(error) }
+                    },
+                    onFailure: { error in result.fail(error) }
+                )
+                .onAction { [weak self] _, viewController in
+                    self?.presentationDelegates[actionId]?.present(viewController)
+                }
+                .onComplete { value in result.succeed(value) }
+                let checkout = try await Checkout.setup(
+                    configuration: configuration.toCheckoutConfiguration(),
+                    callbacks: callbacks
+                )
                 holder.actionCheckout = checkout
                 checkout.handle(action: action)
                 let value = try await result.wait()
@@ -284,54 +255,6 @@ final class CheckoutPlatformApi: CheckoutHostApi {
         }
     }
 
-    private func requestSubmit(checkoutId: String, data: PaymentComponentData) async -> SubmitResult {
-        do {
-            let dataJson = try EncodablePaymentComponentData(data: data).jsonString
-            return await withCheckedContinuation { continuation in
-                callbacksApi.onSubmit(
-                    checkoutId: checkoutId,
-                    data: PaymentComponentDataDTO(dataJson: dataJson)
-                ) { result in
-                    switch result {
-                    case let .success(value):
-                        do {
-                            try continuation.resume(returning: value.toNativeResult())
-                        } catch {
-                            continuation.resume(returning: .retry(errorMessage: error.localizedDescription))
-                        }
-                    case let .failure(error):
-                        continuation.resume(returning: .retry(errorMessage: error.localizedDescription))
-                    }
-                }
-            }
-        } catch {
-            return .retry(errorMessage: error.localizedDescription)
-        }
-    }
-
-    private func requestAdditionalDetails(checkoutId: String, data: ActionComponentData) async -> AdditionalDetailsResult {
-        do {
-            let dataJson = try EncodableActionComponentData(data: data).jsonString
-            return await withCheckedContinuation { continuation in
-                callbacksApi.onAdditionalDetails(
-                    checkoutId: checkoutId,
-                    data: ActionComponentDataDTO(dataJson: dataJson)
-                ) { result in
-                    switch result {
-                    case let .success(value):
-                        continuation.resume(returning: .completion(resultCode: value.resultCode))
-                    case let .failure(error):
-                        self.sendFailure(checkoutId: checkoutId, code: ErrorCodes.callbackFailure, message: error.localizedDescription)
-                        continuation.resume(returning: .completion(resultCode: "Error"))
-                    }
-                }
-            }
-        } catch {
-            sendFailure(checkoutId: checkoutId, code: ErrorCodes.callbackFailure, message: error.localizedDescription)
-            return .completion(resultCode: "Error")
-        }
-    }
-
     private func requestActionDetails(actionId: String, data: ActionComponentData) async throws -> AdditionalDetailsResult {
         let dataJson = try EncodableActionComponentData(data: data).jsonString
         return try await withCheckedThrowingContinuation { continuation in
@@ -349,7 +272,7 @@ final class CheckoutPlatformApi: CheckoutHostApi {
         }
     }
 
-    private func sendComplete(checkoutId: String, result: SessionCheckoutResult) {
+    private func sendComplete(checkoutId: String, result: CheckoutResult) {
         presentationDelegates[checkoutId]?.dismiss()
         dropInComponents.removeValue(forKey: checkoutId)
         events.send(event: CheckoutEventDTO(
@@ -358,16 +281,6 @@ final class CheckoutPlatformApi: CheckoutHostApi {
             resultCode: result.resultCode.rawValue,
             sessionId: result.sessionId,
             sessionResult: result.sessionResult
-        ))
-    }
-
-    private func sendComplete(checkoutId: String, result: AdvancedCheckoutResult) {
-        presentationDelegates[checkoutId]?.dismiss()
-        dropInComponents.removeValue(forKey: checkoutId)
-        events.send(event: CheckoutEventDTO(
-            type: .complete,
-            checkoutId: checkoutId,
-            resultCode: result.resultCode.rawValue
         ))
     }
 

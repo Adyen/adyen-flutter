@@ -109,12 +109,6 @@ enum CheckoutEventTypeDTO {
   failure,
 }
 
-enum SubmitResultTypeDTO {
-  completion,
-  action,
-  retry,
-}
-
 class SessionResponseDTO {
   final String id;
   final String sessionData;
@@ -176,8 +170,6 @@ class CardConfigurationDTO {
   final FieldVisibilityDTO socialSecurityNumberVisibility;
   final List<String>? supportedCardBrands;
   final InstallmentConfigurationDTO? installmentConfiguration;
-  final bool hasOnBinChange;
-  final bool hasOnBinLookup;
 
   CardConfigurationDTO({
     required this.billingAddressMode,
@@ -190,8 +182,6 @@ class CardConfigurationDTO {
     required this.socialSecurityNumberVisibility,
     this.supportedCardBrands,
     this.installmentConfiguration,
-    required this.hasOnBinChange,
-    required this.hasOnBinLookup,
   });
 }
 
@@ -217,6 +207,7 @@ class ShippingAddressParametersDTO {
 
 class GooglePayConfigurationDTO {
   final GooglePayEnvironmentDTO googlePayEnvironment;
+  final String countryCode;
   final String? merchantAccount;
   final MerchantInfoDTO? merchantInfo;
   final TotalPriceStatusDTO? totalPriceStatus;
@@ -227,6 +218,7 @@ class GooglePayConfigurationDTO {
 
   GooglePayConfigurationDTO({
     required this.googlePayEnvironment,
+    required this.countryCode,
     this.merchantAccount,
     this.merchantInfo,
     this.totalPriceStatus,
@@ -386,6 +378,8 @@ class ApplePayButtonStyleDTO {
 class ApplePayConfigurationDTO {
   final String merchantId;
   final String merchantName;
+  final AmountDTO amount;
+  final String countryCode;
   final bool? allowOnboarding;
   final List<ApplePaySummaryItemDTO>? summaryItems;
   final List<String>? requiredBillingContactFields;
@@ -401,14 +395,12 @@ class ApplePayConfigurationDTO {
   final bool? supportsCouponCode;
   final String? couponCode;
   final ApplePayButtonStyleDTO? buttonStyle;
-  final bool hasOnSelectShippingMethod;
-  final bool hasOnSelectShippingContact;
-  final bool hasOnChangeCouponCode;
-  final bool hasOnAuthorize;
 
   ApplePayConfigurationDTO({
     required this.merchantId,
     required this.merchantName,
+    required this.amount,
+    required this.countryCode,
     this.allowOnboarding,
     this.summaryItems,
     this.requiredBillingContactFields,
@@ -424,6 +416,16 @@ class ApplePayConfigurationDTO {
     this.supportsCouponCode,
     this.couponCode,
     this.buttonStyle,
+  });
+}
+
+class ApplePayCallbacksDTO {
+  final bool hasOnSelectShippingMethod;
+  final bool hasOnSelectShippingContact;
+  final bool hasOnChangeCouponCode;
+  final bool hasOnAuthorize;
+
+  ApplePayCallbacksDTO({
     required this.hasOnSelectShippingMethod,
     required this.hasOnSelectShippingContact,
     required this.hasOnChangeCouponCode,
@@ -431,11 +433,29 @@ class ApplePayConfigurationDTO {
   });
 }
 
+class CardCallbacksDTO {
+  final bool hasOnBinChange;
+  final bool hasOnBinLookup;
+
+  CardCallbacksDTO({
+    required this.hasOnBinChange,
+    required this.hasOnBinLookup,
+  });
+}
+
+class CheckoutCallbacksDTO {
+  final ApplePayCallbacksDTO? applePay;
+  final CardCallbacksDTO? card;
+
+  CheckoutCallbacksDTO({
+    this.applePay,
+    this.card,
+  });
+}
+
 class CheckoutConfigurationDTO {
   final EnvironmentDTO environment;
   final String clientKey;
-  final String? countryCode;
-  final AmountDTO? amount;
   final AnalyticsConfigurationDTO analyticsConfiguration;
   final bool showSubmitButton;
   final CardConfigurationDTO? cardConfiguration;
@@ -445,8 +465,6 @@ class CheckoutConfigurationDTO {
   CheckoutConfigurationDTO({
     required this.environment,
     required this.clientKey,
-    this.countryCode,
-    this.amount,
     required this.analyticsConfiguration,
     required this.showSubmitButton,
     this.cardConfiguration,
@@ -525,33 +543,11 @@ class ShopperNameDTO {
   });
 }
 
-class PaymentComponentDataDTO {
-  final String dataJson;
-
-  PaymentComponentDataDTO({
-    required this.dataJson,
-  });
-}
-
 class ActionComponentDataDTO {
   final String dataJson;
 
   ActionComponentDataDTO({
     required this.dataJson,
-  });
-}
-
-class SubmitResultDTO {
-  final SubmitResultTypeDTO type;
-  final String? resultCode;
-  final String? actionJson;
-  final String? errorMessage;
-
-  SubmitResultDTO({
-    required this.type,
-    this.resultCode,
-    this.actionJson,
-    this.errorMessage,
   });
 }
 
@@ -671,12 +667,7 @@ abstract class CheckoutHostApi {
   CheckoutSetupResultDTO setupSession(
     SessionResponseDTO sessionResponse,
     CheckoutConfigurationDTO configuration,
-  );
-
-  @async
-  CheckoutSetupResultDTO setupAdvanced(
-    String paymentMethodsJson,
-    CheckoutConfigurationDTO configuration,
+    CheckoutCallbacksDTO callbacks,
   );
 
   void disposeCheckout(String checkoutId);
@@ -730,18 +721,6 @@ abstract class CheckoutCallbacksFlutterApi {
   BeforeSubmitResultDTO onBeforeSubmit(
     String checkoutId,
     BeforeSubmitDataDTO data,
-  );
-
-  @async
-  SubmitResultDTO onSubmit(
-    String checkoutId,
-    PaymentComponentDataDTO data,
-  );
-
-  @async
-  AdditionalDetailsResultDTO onAdditionalDetails(
-    String checkoutId,
-    ActionComponentDataDTO data,
   );
 
   @async

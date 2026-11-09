@@ -10,8 +10,6 @@ import com.adyen.checkout.core.common.Environment as SdkEnvironment
 import com.adyen.checkout.core.components.AnalyticsConfiguration
 import com.adyen.checkout.core.components.AnalyticsLevel
 import com.adyen.checkout.core.components.CheckoutConfiguration
-import com.adyen.checkout.core.components.data.model.Amount
-import com.adyen.checkout.flutter.generated.AmountDTO
 import com.adyen.checkout.flutter.generated.AnalyticsConfigurationDTO
 import com.adyen.checkout.flutter.generated.BillingAddressModeDTO
 import com.adyen.checkout.flutter.generated.CardConfigurationDTO
@@ -34,18 +32,17 @@ import com.google.android.gms.wallet.WalletConstants
 
 object ConfigurationMapper {
     fun CheckoutConfigurationDTO.toCheckoutConfiguration(): CheckoutConfiguration {
-        val countryCode = countryCode?.trim()?.uppercase()
-        if (googlePayConfiguration != null && countryCode.isNullOrEmpty()) {
+        val googlePayCountryCode = googlePayConfiguration?.countryCode?.trim()?.uppercase()
+        if (googlePayConfiguration != null && googlePayCountryCode.isNullOrEmpty()) {
             throw IllegalArgumentException("countryCode is required when Google Pay is configured.")
         }
 
         return CheckoutConfiguration(
             environment = environment.toNativeEnvironment(),
             clientKey = clientKey,
-            amount = amount?.toNativeAmount(),
             analyticsConfiguration = analyticsConfiguration.toNativeAnalyticsConfiguration(),
             showSubmitButton = showSubmitButton,
-        ).apply {
+        ) {
             cardConfiguration?.let { configuration ->
                 card(
                     billingAddressMode = configuration.billingAddressMode.toNativeBillingAddressMode(),
@@ -66,7 +63,7 @@ object ConfigurationMapper {
                     merchantAccount = configuration.merchantAccount,
                     googlePayEnvironment = configuration.googlePayEnvironment.toWalletEnvironment(),
                     totalPriceStatus = configuration.totalPriceStatus?.toTotalPriceStatus(),
-                    countryCode = countryCode,
+                    countryCode = googlePayCountryCode,
                     merchantInfo = configuration.merchantInfo?.toNativeMerchantInfo(),
                     isEmailRequired = configuration.emailRequired,
                     isExistingPaymentMethodRequired = configuration.existingPaymentMethodRequired,
@@ -86,11 +83,6 @@ object ConfigurationMapper {
         EnvironmentDTO.LIVE_INDIA -> SdkEnvironment.LIVE_INDIA
         EnvironmentDTO.LIVE_NEA -> SdkEnvironment.LIVE_NEA
     }
-
-    private fun AmountDTO.toNativeAmount(): Amount = Amount(
-        currency = currency,
-        value = value.toLong(),
-    )
 
     private fun AnalyticsConfigurationDTO.toNativeAnalyticsConfiguration(): AnalyticsConfiguration =
         AnalyticsConfiguration(

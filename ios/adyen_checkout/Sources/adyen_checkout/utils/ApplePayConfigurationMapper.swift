@@ -7,21 +7,12 @@ import PassKit
 func mapApplePayConfiguration(
     dto: ApplePayConfigurationDTO,
     amount: Adyen.Amount,
-    countryCode: String,
-    callbacksApi: CheckoutCallbacksFlutterApi?,
-    checkoutId: String?
+    countryCode: String
 ) throws -> ApplePayConfiguration {
     let request = try makeApplePayPaymentRequest(dto: dto, amount: amount, countryCode: countryCode)
-    let configuration = try ApplePayConfiguration(paymentRequest: request)
+    return try ApplePayConfiguration(paymentRequest: request)
         .allowOnboarding(dto.allowOnboarding ?? true)
         .buttonAppearance(dto.buttonStyle.toNativeButtonAppearance())
-    guard let callbacksApi, let checkoutId else { return configuration }
-    return dto.attachCallbacks(
-        to: configuration,
-        callbacksApi: callbacksApi,
-        checkoutId: checkoutId,
-        currencyCode: amount.currencyCode
-    )
 }
 
 func makeApplePayPaymentRequest(
