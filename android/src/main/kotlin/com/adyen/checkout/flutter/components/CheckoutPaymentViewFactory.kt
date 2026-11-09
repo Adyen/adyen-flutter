@@ -35,18 +35,20 @@ internal class CheckoutPaymentViewFactory(
         try {
             if (params == null) throw IllegalArgumentException("Invalid platform view params.")
             val activity = activityProvider() ?: throw IllegalStateException("No FragmentActivity attached.")
-            val checkoutContext = checkoutHolder.get(params.checkoutId)
-                ?: throw AdyenPigeonError(ErrorCodes.CHECKOUT_NOT_FOUND, "Checkout is no longer active.")
+            val checkoutContext =
+                checkoutHolder.get(params.checkoutId)
+                    ?: throw AdyenPigeonError(ErrorCodes.CHECKOUT_NOT_FOUND, "Checkout is no longer active.")
             val paymentMethod = deserializePaymentMethod(params.paymentMethodJson, params.isStoredPaymentMethod)
             val actionData = mutableStateOf<ActionData?>(null)
-            val callbacks = callbacksBridge.createCallbacks(
-                checkoutId = params.checkoutId,
-                componentId = params.componentId,
-                checkoutContext = checkoutContext,
-                cardCallbacks = checkoutHolder.getCardCallbacks(params.checkoutId),
-            ) {
-                actionData.value = it
-            }
+            val callbacks =
+                callbacksBridge.createCallbacks(
+                    checkoutId = params.checkoutId,
+                    componentId = params.componentId,
+                    checkoutContext = checkoutContext,
+                    cardCallbacks = checkoutHolder.getCardCallbacks(params.checkoutId),
+                ) {
+                    actionData.value = it
+                }
 
             return CheckoutPaymentView(
                 activity = activity,

@@ -23,13 +23,14 @@ internal class CheckoutPaymentView(
     eventHandler: ComponentPlatformEventHandler,
     registry: CheckoutComponentRegistry,
 ) : PlatformView {
-    private val dynamicComponentView = DynamicComponentView(
-        context = context,
-        checkoutId = checkoutId,
-        componentId = componentId,
-        eventHandler = eventHandler,
-        registry = registry,
-    )
+    private val dynamicComponentView =
+        DynamicComponentView(
+            context = context,
+            checkoutId = checkoutId,
+            componentId = componentId,
+            eventHandler = eventHandler,
+            registry = registry,
+        )
 
     init {
         dynamicComponentView.addV6Component(

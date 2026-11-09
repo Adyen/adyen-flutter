@@ -8,7 +8,10 @@ internal class ComponentPlatformEventHandler : EventsStreamHandler() {
     var eventSink: PigeonEventSink<CheckoutEventDTO>? = null
         private set
 
-    override fun onListen(arguments: Any?, sink: PigeonEventSink<CheckoutEventDTO>) {
+    override fun onListen(
+        arguments: Any?,
+        sink: PigeonEventSink<CheckoutEventDTO>
+    ) {
         eventSink = sink
     }
 

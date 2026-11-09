@@ -82,10 +82,11 @@ internal class CheckoutPlatformApi(
                     )
                 }
                 val nativeConfiguration = configuration.toCheckoutConfiguration()
-                val result = Checkout.setup(
-                    sessionResponse = sessionResponse.toNativeSessionResponse(),
-                    configuration = nativeConfiguration,
-                )
+                val result =
+                    Checkout.setup(
+                        sessionResponse = sessionResponse.toNativeSessionResponse(),
+                        configuration = nativeConfiguration,
+                    )
                 when (result) {
                     is Checkout.Result.Error -> throw result.error.toPigeonError()
                     is Checkout.Result.Success -> {
@@ -114,27 +115,33 @@ internal class CheckoutPlatformApi(
         componentRegistry.clear()
     }
 
-    override fun startDropIn(checkoutId: String, callback: (Result<Unit>) -> Unit) {
+    override fun startDropIn(
+        checkoutId: String,
+        callback: (Result<Unit>) -> Unit
+    ) {
         val context = checkoutHolder.get(checkoutId) as? CheckoutContext.Sessions
         val launcher = dropInLauncher
         when {
-            context == null -> callback(
-                Result.failure(
-                    AdyenPigeonError(ErrorCodes.GENERIC, "Drop-in requires an active session checkout."),
-                ),
-            )
+            context == null ->
+                callback(
+                    Result.failure(
+                        AdyenPigeonError(ErrorCodes.GENERIC, "Drop-in requires an active session checkout."),
+                    ),
+                )
 
-            dropInCheckoutId != null -> callback(
-                Result.failure(
-                    AdyenPigeonError(ErrorCodes.CHECKOUT_ALREADY_ACTIVE, "Drop-in is already active."),
-                ),
-            )
+            dropInCheckoutId != null ->
+                callback(
+                    Result.failure(
+                        AdyenPigeonError(ErrorCodes.CHECKOUT_ALREADY_ACTIVE, "Drop-in is already active."),
+                    ),
+                )
 
-            launcher == null -> callback(
-                Result.failure(
-                    AdyenPigeonError(ErrorCodes.GENERIC, "Drop-in is not available."),
-                ),
-            )
+            launcher == null ->
+                callback(
+                    Result.failure(
+                        AdyenPigeonError(ErrorCodes.GENERIC, "Drop-in is not available."),
+                    ),
+                )
 
             else -> {
                 try {
@@ -152,35 +159,42 @@ internal class CheckoutPlatformApi(
     fun onDropInResult(result: DropInResult) {
         val checkoutId = dropInCheckoutId ?: return
         dropInCheckoutId = null
-        val event = when (result) {
-            is DropInResult.Completed -> {
-                val sessionId = (checkoutHolder.get(checkoutId) as? CheckoutContext.Sessions)
-                    ?.checkoutSession?.sessionSetupResponse?.id.orEmpty()
-                CheckoutEventDTO(
-                    type = CheckoutEventTypeDTO.COMPLETE,
-                    checkoutId = checkoutId,
-                    resultCode = result.resultCode.value,
-                    sessionId = sessionId,
-                    // TODO - Recheck on a newer native release: sessionResult is not propagated by
-                    //  Android Drop-in yet (DropInResult.Completed only carries the result code).
-                    sessionResult = "",
-                )
+        val event =
+            when (result) {
+                is DropInResult.Completed -> {
+                    val sessionId =
+                        (checkoutHolder.get(checkoutId) as? CheckoutContext.Sessions)
+                            ?.checkoutSession
+                            ?.sessionSetupResponse
+                            ?.id
+                            .orEmpty()
+                    CheckoutEventDTO(
+                        type = CheckoutEventTypeDTO.COMPLETE,
+                        checkoutId = checkoutId,
+                        resultCode = result.resultCode.value,
+                        sessionId = sessionId,
+                        // TODO - Recheck on a newer native release: sessionResult is not propagated by
+                        //  Android Drop-in yet (DropInResult.Completed only carries the result code).
+                        sessionResult = "",
+                    )
+                }
+
+                is DropInResult.Failed ->
+                    CheckoutEventDTO(
+                        type = CheckoutEventTypeDTO.FAILURE,
+                        checkoutId = checkoutId,
+                        errorCode = ErrorCodes.GENERIC,
+                        errorMessage = result.error,
+                    )
+
+                is DropInResult.Cancelled ->
+                    CheckoutEventDTO(
+                        type = CheckoutEventTypeDTO.FAILURE,
+                        checkoutId = checkoutId,
+                        errorCode = ErrorCodes.CANCELLED,
+                        errorMessage = "Drop-in was cancelled by the shopper.",
+                    )
             }
-
-            is DropInResult.Failed -> CheckoutEventDTO(
-                type = CheckoutEventTypeDTO.FAILURE,
-                checkoutId = checkoutId,
-                errorCode = ErrorCodes.GENERIC,
-                errorMessage = result.error,
-            )
-
-            is DropInResult.Cancelled -> CheckoutEventDTO(
-                type = CheckoutEventTypeDTO.FAILURE,
-                checkoutId = checkoutId,
-                errorCode = ErrorCodes.CANCELLED,
-                errorMessage = "Drop-in was cancelled by the shopper.",
-            )
-        }
         eventHandler.send(event)
     }
 
@@ -205,37 +219,41 @@ internal class CheckoutPlatformApi(
         activity.lifecycleScope.launch {
             try {
                 val action = Action.SERIALIZER.deserialize(JSONObject(actionJson))
-                val setupResult = Checkout.setup(
-                    action = action,
-                    configuration = configuration.toCheckoutConfiguration(),
-                )
-                val context = when (setupResult) {
-                    is Checkout.Result.Error -> throw setupResult.error.toPigeonError()
-                    is Checkout.Result.Success -> setupResult.checkoutContext
-                }
+                val setupResult =
+                    Checkout.setup(
+                        action = action,
+                        configuration = configuration.toCheckoutConfiguration(),
+                    )
+                val context =
+                    when (setupResult) {
+                        is Checkout.Result.Error -> throw setupResult.error.toPigeonError()
+                        is Checkout.Result.Success -> setupResult.checkoutContext
+                    }
                 val result = CompletableDeferred<AdvancedCheckoutResult>()
-                val callbacks = ActionOnlyCheckoutCallbacks(
-                    onAdditionalDetails = { data ->
-                        try {
-                            requestActionAdditionalDetails(actionId, data)
-                        } catch (error: Throwable) {
+                val callbacks =
+                    ActionOnlyCheckoutCallbacks(
+                        onAdditionalDetails = { data ->
+                            try {
+                                requestActionAdditionalDetails(actionId, data)
+                            } catch (error: Throwable) {
+                                result.completeExceptionally(error.toPigeonError())
+                                AdditionalDetailsResult.Completion(CheckoutResultCode.ERROR.value)
+                            }
+                        },
+                        onFailure = { error ->
                             result.completeExceptionally(error.toPigeonError())
-                            AdditionalDetailsResult.Completion(CheckoutResultCode.ERROR.value)
-                        }
-                    },
-                    onFailure = { error ->
-                        result.completeExceptionally(error.toPigeonError())
-                    },
-                    onComplete = { checkoutResult ->
-                        result.complete(checkoutResult)
-                    },
-                )
-                val controller = CheckoutController(
-                    context = context,
-                    callbacks = callbacks,
-                    coroutineScope = activity.lifecycleScope,
-                    savedStateHandle = SavedStateHandle(),
-                )
+                        },
+                        onComplete = { checkoutResult ->
+                            result.complete(checkoutResult)
+                        },
+                    )
+                val controller =
+                    CheckoutController(
+                        context = context,
+                        callbacks = callbacks,
+                        coroutineScope = activity.lifecycleScope,
+                        savedStateHandle = SavedStateHandle(),
+                    )
                 actionController = controller
                 showAction(controller)
                 val checkoutResult = result.await()
@@ -278,14 +296,20 @@ internal class CheckoutPlatformApi(
         }
     }
 
-    override fun validateCardNumber(cardNumber: String, enableLuhnCheck: Boolean): Boolean =
-        CardValidation.validateCardNumber(cardNumber, enableLuhnCheck)
+    override fun validateCardNumber(
+        cardNumber: String,
+        enableLuhnCheck: Boolean
+    ): Boolean = CardValidation.validateCardNumber(cardNumber, enableLuhnCheck)
 
-    override fun validateCardExpiryDate(expiryMonth: String, expiryYear: String): Boolean =
-        CardValidation.validateCardExpiryDate(expiryMonth, expiryYear)
+    override fun validateCardExpiryDate(
+        expiryMonth: String,
+        expiryYear: String
+    ): Boolean = CardValidation.validateCardExpiryDate(expiryMonth, expiryYear)
 
-    override fun validateCardSecurityCode(securityCode: String, cardBrand: String?): Boolean =
-        CardValidation.validateCardSecurityCode(securityCode, cardBrand)
+    override fun validateCardSecurityCode(
+        securityCode: String,
+        cardBrand: String?
+    ): Boolean = CardValidation.validateCardSecurityCode(securityCode, cardBrand)
 
     override fun getThreeDS2SdkVersion(): String = ThreeDS2Service.INSTANCE.sdkVersion
 
@@ -303,30 +327,32 @@ internal class CheckoutPlatformApi(
     private suspend fun requestActionAdditionalDetails(
         actionId: String,
         data: ActionComponentData,
-    ): AdditionalDetailsResult = suspendCancellableCoroutine { continuation ->
-        val dataJson = ActionComponentData.SERIALIZER.serialize(data).toString()
-        actionOnlyApi.onAdditionalDetails(
-            actionId,
-            ActionComponentDataDTO(dataJson = dataJson),
-        ) { response ->
-            if (!continuation.isActive) return@onAdditionalDetails
-            response.fold(
-                onSuccess = { result ->
-                    continuation.resume(AdditionalDetailsResult.Completion(result.resultCode))
-                },
-                onFailure = { error -> continuation.resumeWith(Result.failure(error)) },
-            )
+    ): AdditionalDetailsResult =
+        suspendCancellableCoroutine { continuation ->
+            val dataJson = ActionComponentData.SERIALIZER.serialize(data).toString()
+            actionOnlyApi.onAdditionalDetails(
+                actionId,
+                ActionComponentDataDTO(dataJson = dataJson),
+            ) { response ->
+                if (!continuation.isActive) return@onAdditionalDetails
+                response.fold(
+                    onSuccess = { result ->
+                        continuation.resume(AdditionalDetailsResult.Completion(result.resultCode))
+                    },
+                    onFailure = { error -> continuation.resumeWith(Result.failure(error)) },
+                )
+            }
+            continuation.invokeOnCancellation { }
         }
-        continuation.invokeOnCancellation { }
-    }
 
     private fun showAction(controller: CheckoutController) {
-        val view = ComposeView(activity).apply {
-            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnDetachedFromWindowOrReleasedFromPool)
-            setContent {
-                CheckoutAction(controller = controller)
+        val view =
+            ComposeView(activity).apply {
+                setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnDetachedFromWindowOrReleasedFromPool)
+                setContent {
+                    CheckoutAction(controller = controller)
+                }
             }
-        }
         actionView = view
         activity.addContentView(
             view,
@@ -345,7 +371,8 @@ internal class CheckoutPlatformApi(
     }
 
     private fun SessionResponseDTO.toNativeSessionResponse(): com.adyen.checkout.core.sessions.SessionResponse =
-        com.adyen.checkout.core.sessions.SessionResponse(id, sessionData)
+        com.adyen.checkout.core.sessions
+            .SessionResponse(id, sessionData)
 
     private fun CheckoutContext.Sessions.toSessionSetupResult(checkoutId: String): CheckoutSetupResultDTO {
         val methods = checkoutSession.sessionSetupResponse.paymentMethods
@@ -361,7 +388,10 @@ internal class CheckoutPlatformApi(
     ): String {
         val array = JSONArray()
         methods.forEach { method ->
-            array.put(com.adyen.checkout.core.components.data.model.paymentmethod.PaymentMethod.SERIALIZER.serialize(method))
+            array.put(
+                com.adyen.checkout.core.components.data.model.paymentmethod.PaymentMethod.SERIALIZER
+                    .serialize(method)
+            )
         }
         return array.toString()
     }
@@ -371,19 +401,24 @@ internal class CheckoutPlatformApi(
     ): String {
         val array = JSONArray()
         methods.forEach { method ->
-            array.put(com.adyen.checkout.core.components.data.model.paymentmethod.StoredPaymentMethod.SERIALIZER.serialize(method))
+            array.put(
+                com.adyen.checkout.core.components.data.model.paymentmethod.StoredPaymentMethod.SERIALIZER.serialize(
+                    method
+                )
+            )
         }
         return array.toString()
     }
 
-    private fun CheckoutError.toPigeonError(): AdyenPigeonError =
-        AdyenPigeonError(code = code, message = message)
+    private fun CheckoutError.toPigeonError(): AdyenPigeonError = AdyenPigeonError(code = code, message = message)
 
-    private fun Throwable.toPigeonError(): AdyenPigeonError = when (this) {
-        is AdyenPigeonError -> this
-        else -> AdyenPigeonError(
-            code = ErrorCodes.GENERIC,
-            message = message ?: "Checkout failed.",
-        )
-    }
+    private fun Throwable.toPigeonError(): AdyenPigeonError =
+        when (this) {
+            is AdyenPigeonError -> this
+            else ->
+                AdyenPigeonError(
+                    code = ErrorCodes.GENERIC,
+                    message = message ?: "Checkout failed.",
+                )
+        }
 }

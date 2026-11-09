@@ -12,7 +12,11 @@ internal class CheckoutHolder {
     fun isActive(): Boolean = contexts.isNotEmpty() || activeActionId != null
 
     @Synchronized
-    fun put(checkoutId: String, context: CheckoutContext, cardCallbacks: CardCallbacksDTO? = null) {
+    fun put(
+        checkoutId: String,
+        context: CheckoutContext,
+        cardCallbacks: CardCallbacksDTO? = null
+    ) {
         contexts[checkoutId] = context
         if (cardCallbacks != null) {
             this.cardCallbacks[checkoutId] = cardCallbacks

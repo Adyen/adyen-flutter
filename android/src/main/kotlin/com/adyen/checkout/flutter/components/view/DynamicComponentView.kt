@@ -27,116 +27,124 @@ import com.adyen.checkout.flutter.generated.CheckoutEventDTO
 import com.adyen.checkout.flutter.generated.CheckoutEventTypeDTO
 import kotlin.math.ceil
 
-internal class DynamicComponentView @JvmOverloads constructor(
-    context: Context,
-    attrs: AttributeSet? = null,
-    defStyle: Int = 0,
-) : FrameLayout(context, attrs, defStyle) {
-    private val screenDensity = resources.displayMetrics.density
-    private var checkoutId = ""
-    private var componentId = ""
-    private var eventHandler: ComponentPlatformEventHandler? = null
-    private var composeView: ComposeView? = null
-    private var registry: CheckoutComponentRegistry? = null
-    private var lastReportedHeight: Long = -1
-
+internal class DynamicComponentView
+    @JvmOverloads
     constructor(
         context: Context,
-        checkoutId: String,
-        componentId: String,
-        eventHandler: ComponentPlatformEventHandler,
-        registry: CheckoutComponentRegistry,
-    ) : this(context) {
-        this.checkoutId = checkoutId
-        this.componentId = componentId
-        this.eventHandler = eventHandler
-        this.registry = registry
-    }
+        attrs: AttributeSet? = null,
+        defStyle: Int = 0,
+    ) : FrameLayout(context, attrs, defStyle) {
+        private val screenDensity = resources.displayMetrics.density
+        private var checkoutId = ""
+        private var componentId = ""
+        private var eventHandler: ComponentPlatformEventHandler? = null
+        private var composeView: ComposeView? = null
+        private var registry: CheckoutComponentRegistry? = null
+        private var lastReportedHeight: Long = -1
 
-    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-        super.onMeasure(widthMeasureSpec, MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED))
-        val height = ceil(measuredHeight / screenDensity).toLong()
-        if (height > 0 && height != lastReportedHeight) {
-            lastReportedHeight = height
-            post { sendResize(height) }
-        }
-    }
-
-    fun addV6Component(
-        activity: ComponentActivity,
-        paymentMethod: PaymentMethodResponse,
-        checkoutContext: CheckoutContext,
-        callbacks: CheckoutCallbacks,
-        actionData: MutableState<ActionData?>,
-    ) {
-        val target = when (paymentMethod) {
-            is StoredPaymentMethod -> CheckoutTarget.StoredPaymentMethod(paymentMethod.id)
-            else -> CheckoutTarget.PaymentMethod(paymentMethod.type.orEmpty())
+        constructor(
+            context: Context,
+            checkoutId: String,
+            componentId: String,
+            eventHandler: ComponentPlatformEventHandler,
+            registry: CheckoutComponentRegistry,
+        ) : this(context) {
+            this.checkoutId = checkoutId
+            this.componentId = componentId
+            this.eventHandler = eventHandler
+            this.registry = registry
         }
 
-        val view =
-            ComposeView(activity).apply {
-                setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
-                setContent {
-                    val coroutineScope = rememberCoroutineScope()
-                    val controller = remember(target, checkoutContext, callbacks) {
-                        when {
-                            checkoutContext is CheckoutContext.Sessions && callbacks is SessionCheckoutCallbacks ->
-                                CheckoutController(
-                                    target = target,
-                                    context = checkoutContext,
-                                    callbacks = callbacks,
-                                    coroutineScope = coroutineScope,
-                                    savedStateHandle = SavedStateHandle(),
-                                )
+        override fun onMeasure(
+            widthMeasureSpec: Int,
+            heightMeasureSpec: Int
+        ) {
+            super.onMeasure(widthMeasureSpec, MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED))
+            val height = ceil(measuredHeight / screenDensity).toLong()
+            if (height > 0 && height != lastReportedHeight) {
+                lastReportedHeight = height
+                post { sendResize(height) }
+            }
+        }
 
-                            else -> throw IllegalArgumentException(
-                                "Invalid checkout context and callback combination.",
+        fun addV6Component(
+            activity: ComponentActivity,
+            paymentMethod: PaymentMethodResponse,
+            checkoutContext: CheckoutContext,
+            callbacks: CheckoutCallbacks,
+            actionData: MutableState<ActionData?>,
+        ) {
+            val target =
+                when (paymentMethod) {
+                    is StoredPaymentMethod -> CheckoutTarget.StoredPaymentMethod(paymentMethod.id)
+                    else -> CheckoutTarget.PaymentMethod(paymentMethod.type.orEmpty())
+                }
+
+            val view =
+                ComposeView(activity).apply {
+                    setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+                    setContent {
+                        val coroutineScope = rememberCoroutineScope()
+                        val controller =
+                            remember(target, checkoutContext, callbacks) {
+                                when {
+                                    checkoutContext is CheckoutContext.Sessions &&
+                                        callbacks is SessionCheckoutCallbacks ->
+                                        CheckoutController(
+                                            target = target,
+                                            context = checkoutContext,
+                                            callbacks = callbacks,
+                                            coroutineScope = coroutineScope,
+                                            savedStateHandle = SavedStateHandle(),
+                                        )
+
+                                    else -> throw IllegalArgumentException(
+                                        "Invalid checkout context and callback combination.",
+                                    )
+                                }
+                            }
+
+                        DisposableEffect(controller) {
+                            registry?.register(checkoutId, componentId, controller)
+                            eventHandler?.send(
+                                CheckoutEventDTO(
+                                    type = CheckoutEventTypeDTO.COMPONENT_READY,
+                                    checkoutId = checkoutId,
+                                    componentId = componentId,
+                                    requiresUserInteraction = controller.requiresUserInteraction(),
+                                ),
                             )
+                            onDispose {
+                                registry?.unregister(checkoutId, componentId)
+                            }
                         }
-                    }
 
-                    DisposableEffect(controller) {
-                        registry?.register(checkoutId, componentId, controller)
-                        eventHandler?.send(
-                            CheckoutEventDTO(
-                                type = CheckoutEventTypeDTO.COMPONENT_READY,
-                                checkoutId = checkoutId,
-                                componentId = componentId,
-                                requiresUserInteraction = controller.requiresUserInteraction(),
-                            ),
-                        )
-                        onDispose {
-                            registry?.unregister(checkoutId, componentId)
+                        if (actionData.value != null) {
+                            CheckoutAction(controller = controller)
+                        } else {
+                            CheckoutPaymentMethod(controller = controller)
                         }
-                    }
-
-                    if (actionData.value != null) {
-                        CheckoutAction(controller = controller)
-                    } else {
-                        CheckoutPaymentMethod(controller = controller)
                     }
                 }
-            }
-        composeView = view
-        addView(view)
-    }
+            composeView = view
+            addView(view)
+        }
 
-    fun onDispose() {
-        composeView?.disposeComposition()
-        composeView = null
-        removeAllViews()
-        eventHandler = null
-    }
+        fun onDispose() {
+            composeView?.disposeComposition()
+            composeView = null
+            removeAllViews()
+            eventHandler = null
+        }
 
-    private fun sendResize(height: Long) {
-        eventHandler?.send(
-            CheckoutEventDTO(
-                type = CheckoutEventTypeDTO.RESIZE,
-                checkoutId = checkoutId,
-                componentId = componentId,
-                height = height,
-            ),
-        )
+        private fun sendResize(height: Long) {
+            eventHandler?.send(
+                CheckoutEventDTO(
+                    type = CheckoutEventTypeDTO.RESIZE,
+                    checkoutId = checkoutId,
+                    componentId = componentId,
+                    height = height,
+                ),
+            )
+        }
     }
-}

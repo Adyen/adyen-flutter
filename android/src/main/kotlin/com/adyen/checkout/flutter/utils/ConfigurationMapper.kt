@@ -46,16 +46,23 @@ object ConfigurationMapper {
             cardConfiguration?.let { configuration ->
                 card(
                     billingAddressMode = configuration.billingAddressMode.toNativeBillingAddressMode(),
-                    koreanAuthenticationVisibility = configuration.koreanAuthenticationVisibility.toNativeFieldVisibility(),
+                    koreanAuthenticationVisibility =
+                        configuration.koreanAuthenticationVisibility
+                            .toNativeFieldVisibility(),
                     showCardholderName = configuration.showCardholderName,
                     showSecurityCode = configuration.showSecurityCode,
                     showSecurityCodeForStoredCard = configuration.showSecurityCodeForStoredCard,
                     showStorePaymentMethod = configuration.showStorePaymentMethod,
                     showSupportedCardBrandLogos = configuration.showSupportedCardBrandLogos,
-                    socialSecurityNumberVisibility = configuration.socialSecurityNumberVisibility.toNativeFieldVisibility(),
-                    supportedCardBrands = configuration.supportedCardBrands
-                        ?.map(::CardBrand),
-                    installmentConfiguration = configuration.installmentConfiguration?.toNativeInstallmentConfiguration(),
+                    socialSecurityNumberVisibility =
+                        configuration.socialSecurityNumberVisibility
+                            .toNativeFieldVisibility(),
+                    supportedCardBrands =
+                        configuration.supportedCardBrands
+                            ?.map(::CardBrand),
+                    installmentConfiguration =
+                        configuration.installmentConfiguration
+                            ?.toNativeInstallmentConfiguration(),
                 )
             }
             googlePayConfiguration?.let { configuration ->
@@ -68,46 +75,53 @@ object ConfigurationMapper {
                     isEmailRequired = configuration.emailRequired,
                     isExistingPaymentMethodRequired = configuration.existingPaymentMethodRequired,
                     isShippingAddressRequired = configuration.shippingAddressRequired,
-                    shippingAddressParameters = configuration.shippingAddressParameters?.toNativeShippingAddressParameters(),
+                    shippingAddressParameters =
+                        configuration.shippingAddressParameters
+                            ?.toNativeShippingAddressParameters(),
                 )
             }
         }
     }
 
-    private fun EnvironmentDTO.toNativeEnvironment(): SdkEnvironment = when (this) {
-        EnvironmentDTO.TEST -> SdkEnvironment.TEST
-        EnvironmentDTO.LIVE_EUROPE -> SdkEnvironment.LIVE_EUROPE
-        EnvironmentDTO.LIVE_UNITED_STATES -> SdkEnvironment.LIVE_UNITED_STATES
-        EnvironmentDTO.LIVE_AUSTRALIA -> SdkEnvironment.LIVE_AUSTRALIA
-        EnvironmentDTO.LIVE_APSE -> SdkEnvironment.LIVE_APSE
-        EnvironmentDTO.LIVE_INDIA -> SdkEnvironment.LIVE_INDIA
-        EnvironmentDTO.LIVE_NEA -> SdkEnvironment.LIVE_NEA
-    }
+    private fun EnvironmentDTO.toNativeEnvironment(): SdkEnvironment =
+        when (this) {
+            EnvironmentDTO.TEST -> SdkEnvironment.TEST
+            EnvironmentDTO.LIVE_EUROPE -> SdkEnvironment.LIVE_EUROPE
+            EnvironmentDTO.LIVE_UNITED_STATES -> SdkEnvironment.LIVE_UNITED_STATES
+            EnvironmentDTO.LIVE_AUSTRALIA -> SdkEnvironment.LIVE_AUSTRALIA
+            EnvironmentDTO.LIVE_APSE -> SdkEnvironment.LIVE_APSE
+            EnvironmentDTO.LIVE_INDIA -> SdkEnvironment.LIVE_INDIA
+            EnvironmentDTO.LIVE_NEA -> SdkEnvironment.LIVE_NEA
+        }
 
     private fun AnalyticsConfigurationDTO.toNativeAnalyticsConfiguration(): AnalyticsConfiguration =
         AnalyticsConfiguration(
             level = if (enabled) AnalyticsLevel.ALL else AnalyticsLevel.NONE,
         )
 
-    private fun BillingAddressModeDTO.toNativeBillingAddressMode(): BillingAddressMode = when (this) {
-        BillingAddressModeDTO.NONE -> BillingAddressMode.None()
-        BillingAddressModeDTO.POSTAL_CODE -> BillingAddressMode.PostalCode()
-    }
+    private fun BillingAddressModeDTO.toNativeBillingAddressMode(): BillingAddressMode =
+        when (this) {
+            BillingAddressModeDTO.NONE -> BillingAddressMode.None()
+            BillingAddressModeDTO.POSTAL_CODE -> BillingAddressMode.PostalCode()
+        }
 
-    private fun FieldVisibilityDTO.toNativeFieldVisibility(): SdkFieldVisibility? = when (this) {
-        FieldVisibilityDTO.SHOW -> SdkFieldVisibility.SHOW
-        FieldVisibilityDTO.HIDE -> SdkFieldVisibility.HIDE
-        FieldVisibilityDTO.AUTO -> null
-    }
+    private fun FieldVisibilityDTO.toNativeFieldVisibility(): SdkFieldVisibility? =
+        when (this) {
+            FieldVisibilityDTO.SHOW -> SdkFieldVisibility.SHOW
+            FieldVisibilityDTO.HIDE -> SdkFieldVisibility.HIDE
+            FieldVisibilityDTO.AUTO -> null
+        }
 
     private fun InstallmentConfigurationDTO.toNativeInstallmentConfiguration(): InstallmentConfiguration? {
         if (options.isEmpty()) return null
         val defaultOptions = options.firstOrNull { it.cardBrand == null }?.toNativeInstallmentOptions()
-        val cardBasedOptions = options.mapNotNull { option ->
-            option.cardBrand?.let { brand ->
-                CardBrand(brand) to option.toNativeInstallmentOptions()
-            }
-        }.toMap()
+        val cardBasedOptions =
+            options
+                .mapNotNull { option ->
+                    option.cardBrand?.let { brand ->
+                        CardBrand(brand) to option.toNativeInstallmentOptions()
+                    }
+                }.toMap()
         return InstallmentConfiguration(
             defaultOptions = defaultOptions,
             cardBasedOptions = cardBasedOptions,
@@ -118,30 +132,34 @@ object ConfigurationMapper {
     private fun InstallmentOptionsDTO.toNativeInstallmentOptions(): InstallmentOptions =
         InstallmentOptions(
             values = values.map { it.toInt() },
-            plans = if (includesRevolving) {
-                listOf(InstallmentOptions.Plan.REGULAR, InstallmentOptions.Plan.REVOLVING)
-            } else {
-                listOf(InstallmentOptions.Plan.REGULAR)
-            },
+            plans =
+                if (includesRevolving) {
+                    listOf(InstallmentOptions.Plan.REGULAR, InstallmentOptions.Plan.REVOLVING)
+                } else {
+                    listOf(InstallmentOptions.Plan.REGULAR)
+                },
             preselectedValue = null,
         )
 
-    private fun GooglePayEnvironmentDTO.toWalletEnvironment(): Int = when (this) {
-        GooglePayEnvironmentDTO.TEST -> WalletConstants.ENVIRONMENT_TEST
-        GooglePayEnvironmentDTO.PRODUCTION -> WalletConstants.ENVIRONMENT_PRODUCTION
-    }
+    private fun GooglePayEnvironmentDTO.toWalletEnvironment(): Int =
+        when (this) {
+            GooglePayEnvironmentDTO.TEST -> WalletConstants.ENVIRONMENT_TEST
+            GooglePayEnvironmentDTO.PRODUCTION -> WalletConstants.ENVIRONMENT_PRODUCTION
+        }
 
-    private fun TotalPriceStatusDTO.toTotalPriceStatus(): String = when (this) {
-        TotalPriceStatusDTO.NOT_CURRENTLY_KNOWN -> "NOT_CURRENTLY_KNOWN"
-        TotalPriceStatusDTO.ESTIMATED -> "ESTIMATED"
-        TotalPriceStatusDTO.FINAL_PRICE -> "FINAL"
-    }
+    private fun TotalPriceStatusDTO.toTotalPriceStatus(): String =
+        when (this) {
+            TotalPriceStatusDTO.NOT_CURRENTLY_KNOWN -> "NOT_CURRENTLY_KNOWN"
+            TotalPriceStatusDTO.ESTIMATED -> "ESTIMATED"
+            TotalPriceStatusDTO.FINAL_PRICE -> "FINAL"
+        }
 
-    private fun MerchantInfoDTO.toNativeMerchantInfo(): MerchantInfo = MerchantInfo(
-        merchantName = merchantName,
-        merchantId = merchantId,
-        softwareInfo = null,
-    )
+    private fun MerchantInfoDTO.toNativeMerchantInfo(): MerchantInfo =
+        MerchantInfo(
+            merchantName = merchantName,
+            merchantId = merchantId,
+            softwareInfo = null,
+        )
 
     private fun ShippingAddressParametersDTO.toNativeShippingAddressParameters(): ShippingAddressParameters =
         ShippingAddressParameters(

@@ -15,17 +15,25 @@ internal class CheckoutComponentRegistry {
     private var activeComponentId: String? = null
 
     @Synchronized
-    fun register(checkoutId: String, componentId: String, controller: CheckoutController) {
-        components[componentId] = Handle(
-            checkoutId = checkoutId,
-            submit = controller::submit,
-            handleReturn = controller::handleReturn,
-            requiresUserInteraction = controller::requiresUserInteraction,
-        )
+    fun register(
+        checkoutId: String,
+        componentId: String,
+        controller: CheckoutController
+    ) {
+        components[componentId] =
+            Handle(
+                checkoutId = checkoutId,
+                submit = controller::submit,
+                handleReturn = controller::handleReturn,
+                requiresUserInteraction = controller::requiresUserInteraction,
+            )
     }
 
     @Synchronized
-    fun unregister(checkoutId: String, componentId: String) {
+    fun unregister(
+        checkoutId: String,
+        componentId: String
+    ) {
         if (components[componentId]?.checkoutId == checkoutId) {
             components.remove(componentId)
             if (activeComponentId == componentId) activeComponentId = null
@@ -33,7 +41,10 @@ internal class CheckoutComponentRegistry {
     }
 
     @Synchronized
-    fun submit(checkoutId: String, componentId: String): Boolean {
+    fun submit(
+        checkoutId: String,
+        componentId: String
+    ): Boolean {
         val handle = components[componentId]
         if (handle?.checkoutId != checkoutId) return false
         activeComponentId = componentId
@@ -42,7 +53,10 @@ internal class CheckoutComponentRegistry {
     }
 
     @Synchronized
-    fun requiresUserInteraction(checkoutId: String, componentId: String): Boolean? {
+    fun requiresUserInteraction(
+        checkoutId: String,
+        componentId: String
+    ): Boolean? {
         val handle = components[componentId]
         return if (handle?.checkoutId == checkoutId) handle.requiresUserInteraction() else null
     }

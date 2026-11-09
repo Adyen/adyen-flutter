@@ -26,7 +26,10 @@ internal class ComponentPlatformApi(
         }
     }
 
-    override fun dispose(checkoutId: String, componentId: String) {
+    override fun dispose(
+        checkoutId: String,
+        componentId: String
+    ) {
         registry.unregister(checkoutId, componentId)
     }
 

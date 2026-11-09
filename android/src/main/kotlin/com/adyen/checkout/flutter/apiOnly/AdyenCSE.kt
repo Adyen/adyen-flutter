@@ -19,6 +19,8 @@ internal object AdyenCSE {
         )
     }
 
-    fun encryptBin(bin: String, publicKey: String): String =
-        CardEncrypter.encryptBin(bin, publicKey)
+    fun encryptBin(
+        bin: String,
+        publicKey: String
+    ): String = CardEncrypter.encryptBin(bin, publicKey)
 }

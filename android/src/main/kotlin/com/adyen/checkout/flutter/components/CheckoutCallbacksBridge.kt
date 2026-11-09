@@ -64,34 +64,36 @@ internal class CheckoutCallbacksBridge(
         val hasOnBinLookup = cardCallbacks?.hasOnBinLookup == true
         if (!hasOnBinChange && !hasOnBinLookup) return
 
-        val binChangeCallback = if (hasOnBinChange) {
-            OnBinChangeCallback { binValue ->
-                eventHandler.send(
-                    CheckoutEventDTO(
-                        type = CheckoutEventTypeDTO.BIN_VALUE,
-                        checkoutId = checkoutId,
-                        componentId = componentId,
-                        binValue = binValue,
-                    ),
-                )
+        val binChangeCallback =
+            if (hasOnBinChange) {
+                OnBinChangeCallback { binValue ->
+                    eventHandler.send(
+                        CheckoutEventDTO(
+                            type = CheckoutEventTypeDTO.BIN_VALUE,
+                            checkoutId = checkoutId,
+                            componentId = componentId,
+                            binValue = binValue,
+                        ),
+                    )
+                }
+            } else {
+                null
             }
-        } else {
-            null
-        }
-        val binLookupCallback = if (hasOnBinLookup) {
-            OnBinLookupCallback { data ->
-                eventHandler.send(
-                    CheckoutEventDTO(
-                        type = CheckoutEventTypeDTO.BIN_LOOKUP,
-                        checkoutId = checkoutId,
-                        componentId = componentId,
-                        binLookupData = listOf(data.toDTO()),
-                    ),
-                )
+        val binLookupCallback =
+            if (hasOnBinLookup) {
+                OnBinLookupCallback { data ->
+                    eventHandler.send(
+                        CheckoutEventDTO(
+                            type = CheckoutEventTypeDTO.BIN_LOOKUP,
+                            checkoutId = checkoutId,
+                            componentId = componentId,
+                            binLookupData = listOf(data.toDTO()),
+                        ),
+                    )
+                }
+            } else {
+                null
             }
-        } else {
-            null
-        }
         card(
             onBinChange = binChangeCallback,
             onBinLookup = binLookupCallback,
