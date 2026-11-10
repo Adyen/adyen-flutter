@@ -51,16 +51,9 @@ jobs:
 
       - run: flutter pub get
 
-      - name: Analyze plugin
+      - name: Analyze plugin and example app
         continue-on-error: true
-        run: flutter analyze 2>&1 | tee analyze_plugin.log
-
-      - name: Analyze example app
-        continue-on-error: true
-        working-directory: example
-        run: |
-          flutter pub get
-          flutter analyze 2>&1 | tee analyze_example.log
+        run: flutter analyze 2>&1 | tee analyze.log
 
       - name: Run unit tests
         id: unit_tests
@@ -76,12 +69,9 @@ jobs:
             echo "### Flutter beta analyzer findings"
             echo "Flutter: $(flutter --version | head -n 1)"
             echo "Unit tests: ${TEST_OUTCOME}"
-            for log in analyze_plugin.log example/analyze_example.log; do
-              echo "#### ${log}"
-              echo '```'
-              grep -E '^\s*(info|warning|error) •' "${log}" || echo 'No findings'
-              echo '```'
-            done
+            echo '```'
+            grep -E '^\s*(info|warning|error) •' analyze.log || echo 'No findings'
+            echo '```'
           } | tee -a "$GITHUB_STEP_SUMMARY"
 
       - name: Create default project and add Adyen checkout plugin package
@@ -114,8 +104,7 @@ jobs:
         with:
           name: flutter-beta-android-logs
           path: |
-            analyze_plugin.log
-            example/analyze_example.log
+            analyze.log
             demo_project/build.log
           if-no-files-found: warn
           retention-days: 14
