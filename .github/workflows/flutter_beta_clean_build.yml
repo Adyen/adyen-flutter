@@ -108,6 +108,18 @@ jobs:
             echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
 
+      - name: Upload Android beta logs
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: flutter-beta-android-logs
+          path: |
+            analyze_plugin.log
+            example/analyze_example.log
+            demo_project/build.log
+          if-no-files-found: warn
+          retention-days: 14
+
       - name: Gradle cache
         uses: gradle/actions/setup-gradle@50e97c2cd7a37755bbfafc9c5b7cafaece252f6e
         with:
@@ -177,6 +189,15 @@ jobs:
             grep -iE 'warning|deprecat' build.log || echo 'No warnings'
             echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload iOS beta logs
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: flutter-beta-ios-logs
+          path: demo_project/build.log
+          if-no-files-found: warn
+          retention-days: 14
 
       - name: Install iOS app on simulator
         working-directory: demo_project
