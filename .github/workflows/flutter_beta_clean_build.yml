@@ -8,6 +8,53 @@ permissions:
   contents: read
 
 jobs:
+  flutter_beta_analyze_and_test:
+    name: Flutter beta analyze and test
+    runs-on: ubuntu-26.04
+    continue-on-error: true
+    timeout-minutes: 30
+
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+
+      - uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2
+        with:
+          channel: 'beta'
+          cache: true
+          cache-key: beta-analyze
+
+      - run: flutter --version
+
+      - run: flutter pub get
+
+      - name: Analyze plugin
+        run: flutter analyze 2>&1 | tee analyze_plugin.log
+
+      - name: Analyze example app
+        if: ${{ !cancelled() }}
+        working-directory: example
+        run: |
+          flutter pub get
+          flutter analyze 2>&1 | tee analyze_example.log
+
+      - name: Run unit tests
+        if: ${{ !cancelled() }}
+        run: flutter test
+
+      - name: Summarize analyzer findings
+        if: ${{ !cancelled() }}
+        run: |
+          {
+            echo "### Flutter beta analyzer findings"
+            echo "Flutter: $(flutter --version | head -n 1)"
+            for log in analyze_plugin.log example/analyze_example.log; do
+              echo "#### ${log}"
+              echo '```'
+              grep -E '^\s*(info|warning|error) •' "${log}" || echo 'No findings'
+              echo '```'
+            done
+          } >> "$GITHUB_STEP_SUMMARY"
+
   android_beta_clean_build:
     name: Android beta clean build
     runs-on: ubuntu-26.04
@@ -58,9 +105,22 @@ jobs:
 
           dart pub add 'adyen_checkout:{"path":"../"}'
 
+      - run: flutter --version
+
       - name: Build Android app
         working-directory: demo_project
-        run: flutter build apk --debug
+        run: flutter build apk --debug 2>&1 | tee build.log
+
+      - name: Summarize Android build warnings
+        if: ${{ !cancelled() }}
+        working-directory: demo_project
+        run: |
+          {
+            echo "### Android beta build warnings"
+            echo '```'
+            grep -iE 'warning|deprecat' build.log || echo 'No warnings'
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Gradle cache
         uses: gradle/actions/setup-gradle@50e97c2cd7a37755bbfafc9c5b7cafaece252f6e
@@ -115,9 +175,22 @@ jobs:
           cd demo_project
           dart pub add 'adyen_checkout:{"path":"../"}'
 
+      - run: flutter --version
+
       - name: Build iOS app for simulator
         working-directory: demo_project
-        run: flutter build ios --debug --simulator
+        run: flutter build ios --debug --simulator 2>&1 | tee build.log
+
+      - name: Summarize iOS build warnings
+        if: ${{ !cancelled() }}
+        working-directory: demo_project
+        run: |
+          {
+            echo "### iOS beta build warnings"
+            echo '```'
+            grep -iE 'warning|deprecat' build.log || echo 'No warnings'
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Install iOS app on simulator
         working-directory: demo_project
