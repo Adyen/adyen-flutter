@@ -82,7 +82,7 @@ jobs:
               grep -E '^\s*(info|warning|error) •' "${log}" || echo 'No findings'
               echo '```'
             done
-          } >> "$GITHUB_STEP_SUMMARY"
+          } | tee -a "$GITHUB_STEP_SUMMARY"
 
       - name: Create default project and add Adyen checkout plugin package
         run: |
@@ -106,7 +106,7 @@ jobs:
             echo '```'
             grep -iE 'warning|deprecat' build.log || echo 'No warnings'
             echo '```'
-          } >> "$GITHUB_STEP_SUMMARY"
+          } | tee -a "$GITHUB_STEP_SUMMARY"
 
       - name: Upload Android beta logs
         if: ${{ !cancelled() }}
@@ -188,7 +188,7 @@ jobs:
             echo '```'
             grep -iE 'warning|deprecat' build.log || echo 'No warnings'
             echo '```'
-          } >> "$GITHUB_STEP_SUMMARY"
+          } | tee -a "$GITHUB_STEP_SUMMARY"
 
       - name: Upload iOS beta logs
         if: ${{ !cancelled() }}
