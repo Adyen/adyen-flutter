@@ -14,7 +14,7 @@ jobs:
       fail-fast: false
       matrix:
         api-level: [ 36 ]
-        flutter-version: [ 3.27.x, 3.29.x, 3.32.x, 3.35.x, 3.38.x, 3.41.x, 3.44.x, 3.47.x ]
+        flutter-version: [ 3.27.x, 3.29.x, 3.32.x, 3.35.x, 3.38.x, 3.41.x, 3.44.x, 3.47.x, 3.50.x ]
         agp_version: [ 8.13.2 ]
         gradle_version: [ 8.14.5 ]
     env:
