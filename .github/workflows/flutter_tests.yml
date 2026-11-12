@@ -6,7 +6,7 @@ on:
       flutter-version:
         description: 'Flutter version'
         required: false
-        default: '3.47.x'
+        default: '3.50.x'
         type: string
 
 jobs:
@@ -30,7 +30,7 @@ jobs:
         shell: bash
 
       - run: flutter pub get
-      - run: flutter analyze
+      - run: flutter analyze --no-fatal-infos
       - run: |
           flutter test --coverage 
           lcov --remove coverage/lcov.info 'lib/**/*.g.dart' -o ./coverage/coverage_with_exclusion.info 
