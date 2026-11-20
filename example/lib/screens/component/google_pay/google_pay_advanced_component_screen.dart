@@ -4,6 +4,7 @@ import 'package:adyen_checkout/adyen_checkout.dart';
 import 'package:adyen_checkout_example/config.dart';
 import 'package:adyen_checkout_example/repositories/adyen_google_pay_component_repository.dart';
 import 'package:adyen_checkout_example/utils/dialog_builder.dart';
+import 'package:adyen_checkout_example/utils/google_pay_payment_method.dart';
 import 'package:flutter/material.dart';
 
 class GooglePayAdvancedComponentScreen extends StatelessWidget {
@@ -100,7 +101,7 @@ class GooglePayAdvancedComponentScreen extends StatelessWidget {
     }
 
     return paymentMethods["paymentMethods"].firstWhere(
-      (paymentMethod) => paymentMethod["type"] == "googlepay",
+      (paymentMethod) => isGooglePayPaymentMethod(paymentMethod),
       orElse: () => throw Exception("Google pay payment method not provided"),
     );
   }
