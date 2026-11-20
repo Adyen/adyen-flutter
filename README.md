@@ -66,6 +66,8 @@ release a new version when we need to.
   [`kotlin.compilerOptions`](https://kotlinlang.org/docs/gradle-compiler-options.html).
 * [AGP 8.13.2](https://developer.android.com/build/releases/gradle-plugin) or later with Gradle
   8.13 or later.
+* With AGP 9, use AGP 9.4.1 or later. Older versions can bundle an R8 version that breaks native 3D
+  Secure 2 payments in release builds with optimization enabled.
 * AGP 9 is supported with built-in Kotlin disabled (requires Flutter 3.44 or later). Built-in Kotlin
   is not supported yet. Make sure your `android/gradle.properties` contains the following flags.
   Flutter adds them automatically when creating or migrating a project. See
