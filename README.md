@@ -64,9 +64,8 @@ release a new version when we need to.
 * [Kotlin 2.3.21](https://kotlinlang.org/docs/releases.html) or later.
 * For Kotlin DSL builds, migrate legacy `android.kotlinOptions` to
   [`kotlin.compilerOptions`](https://kotlinlang.org/docs/gradle-compiler-options.html).
-* [AGP 8.13.2](https://developer.android.com/build/releases/gradle-plugin) or later with Gradle
-  8.13 or later.
-* With AGP 9, use AGP 9.4.1 or later. Older versions can bundle an R8 version that breaks native 3D
+* [AGP 9.4.1](https://developer.android.com/build/releases/gradle-plugin) or later with Gradle
+  9.6.0 or later. Older versions can bundle an R8 version that breaks native 3D
   Secure 2 payments in release builds with optimization enabled.
 * AGP 9 is supported with built-in Kotlin disabled (requires Flutter 3.44 or later). Built-in Kotlin
   is not supported yet. Make sure your `android/gradle.properties` contains the following flags.
@@ -75,6 +74,19 @@ release a new version when we need to.
   ```properties
   android.builtInKotlin=false
   android.newDsl=false
+  ```
+* With AGP 8, pin R8 9.4.18 or later to support native 3D Secure 2
+  payments in release builds with optimization enabled. Add the following to your
+  `android/settings.gradle`, after the `pluginManagement` block:
+  ```groovy
+  buildscript {
+      repositories {
+          google()
+      }
+      dependencies {
+          classpath "com.android.tools:r8:9.4.18"
+      }
+  }
   ```
 * Requires the usage of a `FlutterFragmentActivity` instead of the default `FlutterActivity` in the
   MainActivity of
