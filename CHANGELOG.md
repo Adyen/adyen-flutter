@@ -7,6 +7,11 @@
 - **Breaking:** The minimum supported Flutter version is raised from 3.16.0 to 3.27.0.
 - **Breaking:** The minimum supported Dart SDK is raised from 3.2.0 to 3.6.0, the Dart version
   bundled with Flutter 3.27.
+- On Android: Release builds now fail when the app uses Adyen 3DS2 SDK 2.2.28 with an R8 version
+  older than 9.4.18, because this combination breaks 3D Secure 2 payments in optimized builds.
+  Upgrade to AGP 9.4.1 or later, or pin R8 9.4.18 or later with AGP 8. See the
+  [README](https://github.com/Adyen/adyen-flutter/blob/main/README.md#android). To skip the check,
+  add `adyen.checkout.skipR8VersionCheck=true` to `android/gradle.properties`.
 
 
 ## 1.15.0
