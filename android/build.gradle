@@ -1,6 +1,3 @@
-import org.gradle.api.artifacts.result.ResolvedComponentResult
-import org.gradle.api.artifacts.result.ResolvedDependencyResult
-
 buildscript {
     ext.kotlin_version = '2.3.21'
     repositories {
@@ -28,6 +25,7 @@ apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 apply from: 'ktlint.gradle'
 apply from: 'jacoco.gradle'
+apply from: 'r8-guard.gradle'
 
 android {
     namespace = "com.adyen.checkout.flutter"
@@ -76,93 +74,5 @@ android {
 
     lint {
         disable 'RestrictedApi'
-    }
-}
-
-// Adyen 3DS2 SDK 2.2.28 is miscompiled by R8 versions older than 9.4.18, which breaks 3D Secure 2
-// payments in optimized release builds. Fail the R8 task instead of silently shipping a broken app.
-class AdyenR8Check {
-    static final String SKIP_PROPERTY = 'adyen.checkout.skipR8VersionCheck'
-    static final String AFFECTED_THREE_DS2_VERSION = '2.2.28'
-    static final List<Integer> MINIMUM_R8_VERSION = [9, 4, 18]
-
-    static String effectiveR8Version(ClassLoader classLoader) {
-        try {
-            return classLoader.loadClass('com.android.tools.r8.Version').getField('LABEL').get(null)
-        } catch (Exception ignored) {
-            return null
-        }
-    }
-
-    static boolean isCompatible(String r8Version) {
-        if (r8Version == null) return false
-        def match = r8Version =~ /^(\d+)\.(\d+)\.(\d+)/
-        if (!match.find()) return false
-        def actual = (1..3).collect { match.group(it).toInteger() }
-        for (int i = 0; i < 3; i++) {
-            if (actual[i] != MINIMUM_R8_VERSION[i]) return actual[i] > MINIMUM_R8_VERSION[i]
-        }
-        return true
-    }
-
-    static String findThreeDs2Version(ResolvedComponentResult root) {
-        def visited = new HashSet()
-        def queue = new ArrayDeque([root])
-        while (!queue.isEmpty()) {
-            def component = queue.poll()
-            if (!visited.add(component.id)) continue
-            def module = component.moduleVersion
-            if (module?.group == 'com.adyen.threeds' && module?.name == 'adyen-3ds2') {
-                return module.version
-            }
-            component.dependencies.each {
-                if (it instanceof ResolvedDependencyResult) queue.add(it.selected)
-            }
-        }
-        return ''
-    }
-
-    static String failureMessage(String r8Version, String variantName) {
-        def r8 = r8Version ?: 'unknown'
-        def threeDs2 = AFFECTED_THREE_DS2_VERSION
-        """\
-            Adyen Checkout: R8 ${r8} is not compatible with Adyen 3DS2 SDK ${threeDs2} and breaks
-            3D Secure 2 payments in optimized release builds of the '${variantName}' variant.
-
-            Fix one of:
-              1. Upgrade to Android Gradle Plugin 9.4.1 or later.
-              2. With AGP 8, pin R8 ${MINIMUM_R8_VERSION.join('.')} or later in settings.gradle.
-            See https://github.com/Adyen/adyen-flutter#android
-
-            If you have verified 3DS2 payments with your setup (for example with -dontoptimize),
-            add ${SKIP_PROPERTY}=true to gradle.properties.""".stripIndent()
-    }
-}
-
-rootProject.allprojects { appProject ->
-    appProject.plugins.withId('com.android.application') { appPlugin ->
-        def skip = appProject.providers.gradleProperty(AdyenR8Check.SKIP_PROPERTY)
-            .map { it.toBoolean() }
-            .getOrElse(false)
-        def r8Version = AdyenR8Check.effectiveR8Version(appPlugin.class.classLoader)
-        if (skip || AdyenR8Check.isCompatible(r8Version)) return
-
-        appProject.tasks.matching { it.name ==~ /minify.+WithR8/ }.configureEach { r8Task ->
-            def variantName = r8Task.name
-                .replaceFirst(/^minify/, '')
-                .replaceFirst(/WithR8$/, '')
-                .uncapitalize()
-            def configurationName = "${variantName}RuntimeClasspath"
-            if (!appProject.configurations.names.contains(configurationName)) return
-            def threeDs2Version = appProject.configurations.named(configurationName)
-                .flatMap { it.incoming.resolutionResult.rootComponent }
-                .map { AdyenR8Check.findThreeDs2Version(it) }
-            def message = AdyenR8Check.failureMessage(r8Version, variantName)
-            r8Task.doFirst {
-                if (threeDs2Version.get() == AdyenR8Check.AFFECTED_THREE_DS2_VERSION) {
-                    throw new GradleException(message)
-                }
-            }
-        }
     }
 }

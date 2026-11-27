@@ -10,8 +10,9 @@
 - On Android: Release builds now fail when the app uses Adyen 3DS2 SDK 2.2.28 with an R8 version
   older than 9.4.18, because this combination breaks 3D Secure 2 payments in optimized builds.
   Upgrade to AGP 9.4.1 or later, or pin R8 9.4.18 or later with AGP 8. See the
-  [README](https://github.com/Adyen/adyen-flutter/blob/main/README.md#android). To skip the check,
-  add `adyen.checkout.skipR8VersionCheck=true` to `android/gradle.properties`.
+  [README](https://github.com/Adyen/adyen-flutter/blob/main/README.md#android). To log a warning
+  instead of failing the build, add `adyen.failOnAffectedR8=false` to `android/gradle.properties`.
+  To skip the check, add `adyen.skipR8Check=true`.
 
 
 ## 1.15.0

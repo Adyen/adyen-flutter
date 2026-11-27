@@ -90,9 +90,10 @@ release a new version when we need to.
   ```
 * Release builds fail with an `Adyen Checkout: R8 ... is not compatible` error when the app uses
   Adyen 3DS2 SDK 2.2.28 with an R8 version older than 9.4.18. This prevents shipping an app where
-  3D Secure 2 payments fail. If you have verified 3D Secure 2 payments with your setup, for example
-  with `-dontoptimize`, you can skip the check by adding `adyen.checkout.skipR8VersionCheck=true` to
-  `android/gradle.properties`.
+  3D Secure 2 payments fail. Configure the check in `android/gradle.properties`:
+    * `adyen.failOnAffectedR8=false` logs the error as a warning instead of failing the build.
+    * `adyen.skipR8Check=true` skips the check. Use it only if you have verified 3D Secure 2
+      payments with your setup, for example with `-dontoptimize`.
 * Requires the usage of a `FlutterFragmentActivity` instead of the default `FlutterActivity` in the
   MainActivity of
   your [native Android](https://github.com/Adyen/adyen-flutter/blob/main/example/android/app/src/main/kotlin/com/adyen/checkout/flutter/example/MainActivity.kt)
